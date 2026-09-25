@@ -190,7 +190,13 @@ export const MULTI_KEYS = Object.freeze({
     // The other new ladders reuse `band` (B, a scalar: every number on the item, the answer too).
     wordSet: '6A',       // vocabulary: the first N words of the skill's list (the core words)
     most: '6B',          // graphs: the largest count one bar / row / mark may show
-    // NEXT FREE IN BLOCK 6: 6C.
+    // 6C-6P: build lane fractions (KEY_SUBRANGES).
+    partLabels: '6C',    // fraction bars: each part labelled with its size (1/4), a hint
+    lineHops: '6D',      // fraction number lines: an arc over each part from 0 to the dot, a hint
+    barModel: '6E',      // a fraction of an amount / find the whole: the bar model with braces, a hint
+    opArcs: '6F',        // equivalent fractions / simplify: operator arcs blank / with the value / none
+    countLine: '6G',     // count in fractions: the number line over the row of counts (a hint)
+    // NEXT FREE FOR LANE fractions: 6H (to 6P).
 
     // Block 7 — option-panel round 3 (design/audit/OPTIONS-CRITIC-R2.md §5 #7, #20)
     poolSize: '7A',      // mixed pools: every member one step easier / as set / harder
@@ -288,8 +294,12 @@ export const VALUE_TOKENS = Object.freeze({
         // O6 AP1 (2026-09-25): teen_compose draws the ten as a rod and the ones as cubes
         blocks: 'B' }),
     // P12
-    model: Object.freeze({ none: 'N', area: 'A', bar: 'B', circle: 'C', line: 'L', set: 'S', grid: 'G', blocks: 'K', analog: 'H', digital: 'D' }),
+    model: Object.freeze({ none: 'N', area: 'A', bar: 'B', circle: 'C', line: 'L', set: 'S', grid: 'G', blocks: 'K', analog: 'H', digital: 'D',
+        // lane fractions: the fraction wall (bars one under the other)
+        wall: 'W' }),
     labels: Object.freeze({ all: 'A', some: 'S', none: 'N' }),
+    // lane fractions: operator arcs
+    opArcs: Object.freeze({ blank: 'B', value: 'V', none: 'N' }),
     // block 9 (O6 appearance, AP2): bar graphs
     bars: Object.freeze({ vertical: 'V', horizontal: 'H' }),
     precision: Object.freeze({ hour: 'H', half: 'F', quarter: 'Q', five: 'V', one: 'O' }),
@@ -385,6 +395,8 @@ export const SCALAR_ONLY = Object.freeze({
     touch: 'reserved', cover: 'reserved', mix: 'reserved', anchors: 'reserved',
     // block 8 (word problems)
     wpCues: 'bool', wpBank: 'bool', wpBar: 'bool',
+    // lane fractions (6C-6P)
+    partLabels: 'bool', lineHops: 'bool', barModel: 'bool', countLine: 'bool',
 });
 
 /**

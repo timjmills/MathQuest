@@ -57,7 +57,7 @@ function _fNlTicks(nl, period) {
  * The whole of a READ item's model (the pupil counts parts, never shades them): one width at
  * every denominator, so the cell keeps to one of two columns. A circle keeps its own size.
  */
-const _fWriteWhole = (kind) => (kind === 'circle' ? null : kind === 'line' ? 60 : 50);
+const _fWriteWhole = (kind) => (kind === 'circle' ? null : kind === 'line' ? 46 : 50);
 /**
  * A place-it-on-the-line item as the kit's `nl-place` cell (O6 lane AP3 fixes): one drawing for
  * paper, key and every screen host - the pupil taps a number, then its tick. The host grades the
@@ -73,13 +73,64 @@ function _nlKit(q) {
     q.options = [];
     q.text = p.chips.length > 1 ? 'Put each number on the number line.' : `Put ${String(p.chips[0].label).replace(/^-/, '\u2212')} on the number line.`;
 }
+/**
+ * Bar modes (build list vis_frac_bar_modes): the `model` value 'wall' draws the item's bars one
+ * under another on the same whole with their left edges lined up (a fraction wall), the number
+ * sentence on one line under them; the `labels` support writes each part's size in it (1/4).
+ */
+function _fBarModes(payload) {
+    if (!payload || !Array.isArray(payload.terms)) return payload;
+    if (payload.terms.some(t => t.kind === 'wall')) {
+        payload.terms = payload.terms.map(t => (t.kind === 'wall' ? Object.assign({}, t, { kind: 'bar' }) : t));
+        payload.wall = true;
+        payload.modelTop = true;
+        payload.wholeMm = 64;
+    }
+    // Line modes (vis_frac_line_modes): two fractions on number lines are two lines one under the
+    // other, 0 under 0 and every whole under its whole, the same length (past 1 when a value is),
+    // so equal fractions sit at one point and the bigger one lies further right.
+    const lines = payload.terms.filter(t => t.kind === 'line');
+    if (lines.length >= 2 && (payload.task === 'sign' || payload.task === 'op') && !payload.story) {
+        payload.wall = true;
+        payload.modelTop = true;
+        payload.wholeMm = 64;
+        payload.lineWholes = Math.max(1, ...lines.map(t => Math.ceil(((t.w || 0) * t.d + t.n) / t.d)));
+        if (payload.lineWholes > 1) payload.wholeMm = Math.max(30, Math.floor(96 / payload.lineWholes));
+    }
+    // `lineHops` (a hint): arcs over the parts from 0 to the dot, on a write-the-fraction line
+    const oh = state.skillOptions;
+    if (oh && oh.lineHops === true && payload.task === 'write' && payload.terms.some(t => t.kind === 'line')) payload.hops = true;
+    const o = state.skillOptions;
+    if (o && o.partLabels === true && payload.terms.some(t => t.kind === 'bar')) payload.labels = 'unit';
+    return payload;
+}
+
 /** A migrated item: the kit's `frac-model` cell for paper and key, its twin for every screen host. */
 function _fKit(q, payload) {
+    _fBarModes(payload);
     q.cell = { template: 'frac-model', v: 1, payload };
     q.visual = fracTwin(payload);
     // A sign is written in the circle on paper and tapped from the sign tiles on screen: never a
     // row of option buttons (a production item stays a production item, SP-3).
     if (payload.task === 'sign') q.options = [];
+}
+
+/** A story's sentences, one per line (P-WP-17): "Ann ate 2/8. Bo ate 3/8. How much?" -> 3 lines. */
+const _fStoryLines = (text) => String(text).split(/(?<=[.?!])\s+/).map(t => t.trim()).filter(Boolean);
+
+/**
+ * A plain word problem (`*_plain`, generate-question.js): the kit sentence keeps its story and
+ * its numbers and loses its pictures, on paper and on screen alike.
+ */
+export function fracPlainStrip(q) {
+    if (!q || !q.cell || q.cell.template !== 'frac-model' || !q.cell.payload) return false;
+    const p = Object.assign({}, q.cell.payload);
+    p.terms = (p.terms || []).map(t => Object.assign({}, t, { kind: null }));
+    delete p.area; delete p.stack; delete p.modelTop;
+    q.cell = Object.assign({}, q.cell, { payload: p });
+    q.visual = fracTwin(p);
+    q.fractionModel = null;
+    return true;
 }
 
 /** Pictures ticked off (the `pictures` option, strip): a kit sentence prints numbers only. */
@@ -100,7 +151,7 @@ function _fParts(str) {
  * whole (never the answer: RP-1), "=", and the answer boxes - a mixed number's three boxes when
  * the answer can be 1 or more (`mixed`), a fraction's two otherwise. Pictures off: numbers only.
  */
-function _fSentenceKit(q, terms, ops, kind, { mixed = false, wholeMm = 26, stack = false, perRow = 0, area = null, barH = 0 } = {}) {
+function _fSentenceKit(q, terms, ops, kind, { mixed = false, wholeMm = 26, stack = false, perRow = 0, area = null, barH = 0, story = null, modelTop = false } = {}) {
     const k = _fPicturesOff() ? null : kind;
     const a = _fParts(q.ans) || {};
     // the answer's boxes: a mixed number's three where the answer can reach 1, a fraction's two,
@@ -118,6 +169,9 @@ function _fSentenceKit(q, terms, ops, kind, { mixed = false, wholeMm = 26, stack
     if (perRow) payload.perRow = perRow;
     if (barH) payload.barH = barH;
     if (area && !_fPicturesOff()) payload.area = area;
+    if (Array.isArray(story) && story.length) { payload.story = story; payload.oneLine = true; }
+    // `modelTop`: the first term's picture alone above, the whole sentence on one line under it
+    if (modelTop && k) payload.modelTop = true;
     _fKit(q, payload);
     q.fractionModel = k;
 }
@@ -266,43 +320,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             // ==================== NEW FRACTION SKILLS ====================
 
-            if (fracSkill === "add_fractions_like" && Math.random() < 0.25) {
-                // Phase 4.5 batch 12: multi-select-check variant — click ALL sums equal to 1
-                const den = pick([4, 5, 6, 8, 10]);
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < 5 && safety < 60) {
-                    safety++;
-                    const a = rng(1, den - 1);
-                    const b = rng(1, den - 1);
-                    const key = `${a}+${b}/${den}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    items.push({ a, b, sum: (a + b) / den });
-                }
-                let opts = items.map((it, i) => ({
-                    id: 'opt' + i,
-                    label: `${it.a}/${den} + ${it.b}/${den}`,
-                    correct: Math.abs(it.sum - 1) < 1e-9
-                }));
-                // Force at least one correct option
-                if (!opts.some(o => o.correct)) {
-                    const a = rng(1, den - 1);
-                    const b = den - a;
-                    opts[0] = { id: 'opt0', label: `${a}/${den} + ${b}/${den}`, correct: true };
-                }
-                opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = 'Click ALL sums that equal 1.';
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = `Add the numerators. If the sum equals ${den}, the result is 1 whole.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Add Fractions';
-                return;
-            } else if (fracSkill === "add_fractions_like") {
+            if (fracSkill === "add_fractions_like") {
                 // Grade 4: Add fractions with SAME denominator
                 const den = rng(2, 12);
                 const maxNum = den - 1;
@@ -321,47 +339,6 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 _fSentenceKit(q, [{ n: n1, d: den }, { n: n2, d: den }], ['+'], _fModelPick() || 'bar', { mixed: sumNum >= den });
                 return;
 
-            } else if (fracSkill === "sub_fractions_like" && Math.random() < 0.25) {
-                // Phase 4.5 batch 12: multi-select-check variant — click ALL differences less than 1/2
-                const den = pick([4, 6, 8, 10, 12]);
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < 5 && safety < 60) {
-                    safety++;
-                    const a = rng(2, den);
-                    const b = rng(1, a - 1);
-                    const key = `${a}-${b}/${den}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    items.push({ a, b, diff: (a - b) / den });
-                }
-                let opts = items.map((it, i) => ({
-                    id: 'opt' + i,
-                    label: `${it.a}/${den} - ${it.b}/${den}`,
-                    correct: it.diff < 0.5 - 1e-9
-                }));
-                // Force at least one correct option
-                if (!opts.some(o => o.correct)) {
-                    const aF = rng(1, Math.floor(den / 2));
-                    const bF = aF > 1 ? rng(1, aF - 1) : 0;
-                    if (aF > bF) {
-                        opts[0] = { id: 'opt0', label: `${aF}/${den} - ${bF || 0}/${den}`, correct: (aF - (bF || 0)) / den < 0.5 - 1e-9 };
-                    }
-                    if (!opts[0].correct) {
-                        opts[0] = { id: 'opt0', label: `2/${den} - 1/${den}`, correct: true };
-                    }
-                }
-                opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = 'Click ALL differences that are less than 1/2.';
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = `Subtract the numerators. Compare the result to ${den / 2}/${den} (= 1/2).`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Subtract Fractions';
-                return;
             } else if (fracSkill === "sub_fractions_like") {
                 // Grade 4: Subtract fractions with SAME denominator
                 const den = rng(2, 12);
@@ -380,85 +357,6 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 _fSentenceKit(q, [{ n: n1, d: den }, { n: n2, d: den }], ['−'], _fModelPick() || 'bar', { mixed: diffNum >= den });
                 return;
 
-            } else if (fracSkill === "add_mixed_like" && Math.random() < 0.25) {
-                // Phase 4.5 batch 12: multi-select-check variant — click ALL sums greater than 3
-                const den = pick([2, 3, 4, 5, 6, 8]);
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < 5 && safety < 60) {
-                    safety++;
-                    const w1 = rng(1, 3);
-                    const f1 = rng(1, den - 1);
-                    const w2 = rng(1, 3);
-                    const f2 = rng(1, den - 1);
-                    const key = `${w1}.${f1}+${w2}.${f2}/${den}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    const sumVal = w1 + f1 / den + w2 + f2 / den;
-                    items.push({ w1, f1, w2, f2, sumVal });
-                }
-                let opts = items.map((it, i) => ({
-                    id: 'opt' + i,
-                    label: `${it.w1} ${it.f1}/${den} + ${it.w2} ${it.f2}/${den}`,
-                    correct: it.sumVal > 3 + 1e-9
-                }));
-                if (!opts.some(o => o.correct)) {
-                    opts[0] = { id: 'opt0', label: `2 ${den - 1}/${den} + 2 ${den - 1}/${den}`, correct: true };
-                }
-                opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = 'Click ALL sums greater than 3.';
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = 'Add the whole-number parts and the fraction parts. Watch for fractions that add to more than 1.';
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Add Mixed Numbers';
-                return;
-            } else if (fracSkill === "add_mixed_like" && Math.random() < 0.20) {
-                // Phase 4.5 batch 12: dnd-categorize variant — sort 5 sums into bins by total size
-                const den = pick([2, 3, 4, 5, 6, 8]);
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < 5 && safety < 80) {
-                    safety++;
-                    const w1 = rng(0, 2);
-                    const f1 = rng(1, den - 1);
-                    const w2 = rng(0, 2);
-                    const f2 = rng(1, den - 1);
-                    const key = `${w1}.${f1}+${w2}.${f2}/${den}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    const sumVal = w1 + f1 / den + w2 + f2 / den;
-                    items.push({ w1, f1, w2, f2, sumVal });
-                }
-                const tiles = items.map((it, i) => ({
-                    id: 't' + i,
-                    label: `${it.w1} ${it.f1}/${den} + ${it.w2} ${it.f2}/${den}`
-                }));
-                const ans = {};
-                items.forEach((it, i) => {
-                    if (it.sumVal < 2 - 1e-9) ans['t' + i] = 'binLt2';
-                    else if (it.sumVal > 3 + 1e-9) ans['t' + i] = 'binGt3';
-                    else ans['t' + i] = 'binMid';
-                });
-                q.text = 'Sort each sum into the correct bin.';
-                q.answerType = 'dnd-generic';
-                q.dndMode = 'categorize';
-                q.tiles = tiles;
-                q.bins = [
-                    { id: 'binLt2', label: 'Less than 2' },
-                    { id: 'binMid', label: 'Between 2 and 3' },
-                    { id: 'binGt3', label: 'More than 3' }
-                ];
-                q.ans = ans;
-                q.hint = 'Add the whole numbers, then add the fractions and check whether they regroup.';
-                q.options = [];
-                q.printFormat = 'dnd-generic';
-                q.skillLabel = 'Add Mixed Numbers';
-                return;
             } else if (fracSkill === "add_mixed_like") {
                 // Grade 4: Add mixed numbers with SAME denominator
                 const den = pick([2, 3, 4, 5, 6, 8]);
@@ -488,45 +386,6 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 }
                 return;
 
-            } else if (fracSkill === "sub_mixed_like" && Math.random() < 0.25) {
-                // Phase 4.5 batch 12: multi-select-check variant — click ALL differences less than 2
-                const den = pick([2, 3, 4, 5, 6, 8]);
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < 5 && safety < 80) {
-                    safety++;
-                    let w1 = rng(2, 5);
-                    let f1 = rng(1, den - 1);
-                    let w2 = rng(1, w1 - 1);
-                    let f2 = rng(1, den - 1);
-                    const t1 = w1 * den + f1;
-                    const t2 = w2 * den + f2;
-                    if (t1 <= t2) continue;
-                    const key = `${w1}.${f1}-${w2}.${f2}/${den}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    const diff = (t1 - t2) / den;
-                    items.push({ w1, f1, w2, f2, diff });
-                }
-                let opts = items.map((it, i) => ({
-                    id: 'opt' + i,
-                    label: `${it.w1} ${it.f1}/${den} - ${it.w2} ${it.f2}/${den}`,
-                    correct: it.diff < 2 - 1e-9
-                }));
-                if (!opts.some(o => o.correct)) {
-                    opts[0] = { id: 'opt0', label: `2 ${1}/${den} - ${1} ${den - 1}/${den}`, correct: true };
-                }
-                opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = 'Click ALL differences that are less than 2.';
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = 'Subtract the wholes and the fractions. Watch for borrowing when the top fraction is smaller.';
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Subtract Mixed Numbers';
-                return;
             } else if (fracSkill === "sub_mixed_like") {
                 // Grade 4: Subtract mixed numbers with SAME denominator
                 const den = pick([2, 3, 4, 5, 6, 8]);
@@ -563,55 +422,6 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 }
                 return;
 
-            } else if (fracSkill === "mult_frac_whole" && Math.random() < 0.25) {
-                // Phase 4.5 batch 9: multi-select-check variant — click ALL expressions equal to W × 1/D
-                const dDen = pick([2, 3, 4, 5, 6]);
-                const dWhole = rng(3, 8);
-                const targetVal = dWhole / dDen;
-                // Build correct options
-                const correctOpts = [
-                    `${dWhole} × 1/${dDen}`,
-                    `1/${dDen} × ${dWhole}`,
-                    `${dWhole}/${dDen}`,
-                    `${dWhole} ÷ ${dDen}`,
-                    Array.from({length: dWhole}, () => `1/${dDen}`).join(' + ')
-                ];
-                // Wrong options
-                const wrongOpts = [
-                    `${dWhole} × ${dDen}`,
-                    `${dWhole + 1} × 1/${dDen}`,
-                    `1/${dWhole} × ${dDen}`,
-                    `${dDen}/${dWhole}`,
-                    `${dWhole - 1}/${dDen}`,
-                    `${dWhole} + 1/${dDen}`,
-                    `${dWhole} - 1/${dDen}`
-                ];
-                const cCount = randInt(2, 3);
-                const wCount = 5 - cCount;
-                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
-                const seen = new Set(chosenC);
-                const chosenW = [];
-                let safety = 0;
-                while (chosenW.length < wCount && safety < 30) {
-                    safety++;
-                    const w = pick(wrongOpts);
-                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
-                }
-                while (chosenW.length < wCount) chosenW.push(`${dWhole + chosenW.length + 3} × ${dDen}`);
-                const all = shuffle([
-                    ...chosenC.map(label => ({ label, correct: true })),
-                    ...chosenW.map(label => ({ label, correct: false }))
-                ]);
-                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL expressions equal to ${dWhole} × 1/${dDen}.`;
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = `${dWhole} × 1/${dDen} = ${dWhole}/${dDen} = ${dWhole} ÷ ${dDen}.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Frac × Whole';
-                return;
             } else if (fracSkill === "mult_frac_whole") {
                 // Grade 4: Multiply fraction x whole number
                 const den = pick([2, 3, 4, 5, 6, 8]);
@@ -639,57 +449,11 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 }
                 return;
 
-            } else if (fracSkill === "decompose_fractions" && Math.random() < 0.25) {
-                // Phase 4.5 batch 9: multi-select-check variant — click ALL valid decompositions
-                const dDen = pick([3, 4, 5, 6, 8]);
-                const dNum = rng(2, Math.min(dDen, 5));
-                const targetVal = dNum / dDen;
-                // Build correct decompositions: any way to add fractions /dDen that sum to dNum
-                const correctOpts = [];
-                // Unit fraction decomposition
-                correctOpts.push(Array.from({length: dNum}, () => `1/${dDen}`).join(' + '));
-                // Two-part decomposition
-                for (let a = 1; a < dNum; a++) {
-                    const b = dNum - a;
-                    correctOpts.push(`${a}/${dDen} + ${b}/${dDen}`);
-                }
-                // Wrong decompositions
-                const wrongOpts = [
-                    `${dNum}/${dDen} + ${dNum}/${dDen}`,
-                    `1/${dDen} + ${dNum}/${dDen}`,
-                    `${dNum + 1}/${dDen}`,
-                    `${dNum - 1}/${dDen} + ${dNum}/${dDen}`,
-                    `${dNum}/${dDen + 1} + ${dNum}/${dDen + 1}`,
-                    Array.from({length: dNum + 1}, () => `1/${dDen}`).join(' + ')
-                ];
-                const cCount = randInt(2, 3);
-                const wCount = 5 - cCount;
-                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
-                const seen = new Set(chosenC);
-                const chosenW = [];
-                let safety = 0;
-                while (chosenW.length < wCount && safety < 30) {
-                    safety++;
-                    const w = pick(wrongOpts);
-                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
-                }
-                while (chosenW.length < wCount) chosenW.push(`${dNum + chosenW.length + 2}/${dDen}`);
-                const all = shuffle([
-                    ...chosenC.map(label => ({ label, correct: true })),
-                    ...chosenW.map(label => ({ label, correct: false }))
-                ]);
-                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL ways to decompose ${dNum}/${dDen} into a sum.`;
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = `Each correct expression sums to ${dNum}/${dDen}. The unit-fraction form is ${dNum} copies of 1/${dDen}.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Decompose Fractions';
-                return;
             } else if (fracSkill === "decompose_fractions") {
-                // Grade 4: Decompose to unit fractions
+                // Grade 4 (4.NF.B.3b): decompose a fraction into unit fractions. KIT (fractions
+                // lane): the fraction's model above (bars unless the teacher ticked another), and
+                // "4/6 = 1/[ ] + 1/[ ] + 1/[ ] + 1/[ ]" under it: one unit fraction per shaded part,
+                // the pupil writes the size of each part. Paper, key and screen are one drawing.
                 const den = pick([2, 3, 4, 5, 6, 8]);
                 const num = rng(2, Math.min(den, 6));
                 const answer = Array.from({length: num}, () => `1/${den}`).join(' + ');
@@ -697,78 +461,28 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.text = `Write ${num}/${den} as a sum of unit fractions.`;
                 q.ans = answer;
                 q.answerType = "text";
-                q.hint = `A unit fraction has 1 as its numerator. ${num}/${den} = ${answer}.`;
-
-                const barW = 260;
-                const barH = 36;
-                const segW = barW / den;
-                let strips = '';
-                for (let i = 0; i < den; i++) {
-                    const isFilled = i < num;
-                    strips += `<rect x="${i * segW}" y="0" width="${segW}" height="${barH}" fill="${isFilled ? 'var(--accent-cyan)' : 'var(--bg-card)'}" stroke="var(--text-bright)" stroke-width="${STROKE.normal}" opacity="${isFilled ? 1 : 0.3}"/>`;
-                    if (isFilled) {
-                        strips += `<text x="${i * segW + segW / 2}" y="${barH / 2 + 5}" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--text-bright)" font-size="12" font-weight="bold">1/${den}</text>`;
-                    }
-                }
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Decompose to Unit Fractions</div>
-                    <div style="font-size:1.3rem;margin-bottom:14px;">
-                        ${fracHTML(num, den, 'xl')} <span style="margin:0 10px;font-size:1.3rem;">=</span> <span style="color:var(--accent-green);font-weight:700;">?</span>
-                    </div>
-                    <svg width="${barW}" height="${barH}" viewBox="0 0 ${barW} ${barH}" style="display:block;margin:10px auto;">
-                        ${strips}
-                    </svg>
-                    <div style="margin-top:10px;display:flex;justify-content:center;gap:6px;flex-wrap:wrap;">
-                        ${Array.from({length: num}, (_, i) => `<div style="padding:6px 12px;background:var(--accent-cyan);color:#fff;border-radius:8px;font-weight:600;font-size:0.9rem;">1/${den}</div>`).join(`<span style="align-self:center;font-weight:700;">+</span>`)}
-                    </div>
-                </div>`;
+                q.noSimplify = true;          // the sum itself, term by term (never evaluated to one fraction)
+                q.options = [];
+                q.hint = `A unit fraction has 1 as its numerator. The model has ${den} equal parts, so each part is 1/${den}. ${num} parts are shaded.`;
+                const _dcModel = _fPicturesOff() ? null : (_fModelPick() || 'bar');
+                const _dcTerms = [{ n: num, d: den, kind: _dcModel, frac: 'show' }];
+                for (let i = 0; i < num; i++) _dcTerms.push({ n: 1, d: den, frac: 'd', ai: i });
+                const _dcPayload = {
+                    task: 'op', terms: _dcTerms, joins: ['=', ...Array(num - 1).fill('+')],
+                    answer: { terms: Array.from({ length: num }, () => ({ n: 1, d: den })), text: answer },
+                    wholeMm: _dcModel === 'circle' ? 40 : _dcModel === 'area' ? 48 : 56, modelTop: !!_dcModel,
+                    boxDigits: den < 10 ? 1 : 2,
+                };
+                q.fractionModel = _dcModel;
+                _fKit(q, _dcPayload);
                 return;
 
-            } else if (fracSkill === "frac_word_problems" && Math.random() < 0.25) {
-                // Phase 4.5 batch 12: multi-select-check variant — click ALL the numbers needed to solve
-                const den = pick([4, 5, 6, 8, 10]);
-                const itemsList = [
-                    {item: "pizza", unit: "of a pizza"},
-                    {item: "chocolate bar", unit: "of a chocolate bar"},
-                    {item: "pie", unit: "of a pie"},
-                    {item: "cake", unit: "of a cake"},
-                    {item: "watermelon", unit: "of a watermelon"}
-                ];
-                const [n1Name, n2Name] = pickTwoNames();
-                const thing = pick(itemsList);
-                const isAddV = Math.random() < 0.6;
-                const ageDistract = rng(7, 12);
-                const minutesDistract = rng(15, 45);
-                let scenarioText, neededLabels;
-                if (isAddV) {
-                    const aN = rng(1, Math.floor(den / 2));
-                    const bN = rng(1, Math.floor(den / 2));
-                    scenarioText = `${n1Name} is ${ageDistract} years old. ${n1Name} ate ${aN}/${den} ${thing.unit} for lunch in ${minutesDistract} minutes. ${n2Name} ate ${bN}/${den}. How much did they eat in total?`;
-                    neededLabels = [`${aN}/${den}`, `${bN}/${den}`];
-                } else {
-                    const aN = rng(Math.floor(den / 2) + 1, den - 1);
-                    const bN = rng(1, aN - 1);
-                    scenarioText = `${n1Name} had ${aN}/${den} ${thing.unit} after baking it for ${minutesDistract} minutes. ${n2Name}, who is ${ageDistract} years old, ate ${bN}/${den} of it. How much is left?`;
-                    neededLabels = [`${aN}/${den}`, `${bN}/${den}`];
-                }
-                const distractorLabels = [String(ageDistract), String(minutesDistract)];
-                const allLabels = shuffle([
-                    ...neededLabels.map(l => ({ label: l, correct: true })),
-                    ...distractorLabels.map(l => ({ label: l, correct: false }))
-                ]);
-                const opts = allLabels.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = scenarioText + '\n\nClick ALL the numbers you need to solve this problem.';
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = 'Look for the fractions describing portions of the food. Age and time are not part of the math.';
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Frac Word';
-                return;
             } else if (fracSkill === "frac_word_problems") {
-                // Grade 4: Fraction word problems (add/sub, like denominators)
+                // Grade 4 (4.NF.B.3d): add and subtract fractions with one denominator in a story.
+                // KIT (fractions lane): the story, one sentence per line with its fractions stacked,
+                // over the number sentence the story makes - each fraction drawn as a bar on one
+                // whole (the Visual skill) - and the answer boxes. The _plain twin prints the same
+                // story and sentence without the bars (fracPlainStrip).
                 const den = pick([4, 5, 6, 8, 10]);
                 const items = [
                     {item: "pizza", unit: "of a pizza"},
@@ -786,185 +500,55 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     n1 = rng(1, Math.floor(den / 2));
                     n2 = rng(1, Math.floor(den / 2));
                     resultNum = n1 + n2;
-                    questionText = `${name1} ate ${n1}/${den} ${thing.unit}. ${name2} ate ${n2}/${den}. How much did they eat in total?`;
+                    questionText = `${name1} ate ${n1}/${den} ${thing.unit}. ${name2} ate ${n2}/${den} ${thing.unit}. How much did they eat in all?`;
                 } else {
                     n1 = rng(Math.floor(den / 2) + 1, den - 1);
                     n2 = rng(1, n1 - 1);
                     resultNum = n1 - n2;
-                    questionText = `${name1} had ${n1}/${den} ${thing.unit}. ${name2} ate ${n2}/${den} of it. How much is left?`;
+                    questionText = `${name1} had ${n1}/${den} ${thing.unit}. ${name2} ate ${n2}/${den} ${thing.unit}. How much is left?`;
                 }
                 const answer = _fracStr(resultNum, den);
 
                 q.text = questionText;
                 q.ans = answer;
                 q.answerType = "text";
+                q.options = [];
+                if (answer !== `${resultNum}/${den}`) q.acceptedAnswers = [answer, `${resultNum}/${den}`];
                 q.hint = isAdd
                     ? `Add the fractions: ${n1}/${den} + ${n2}/${den} = ${resultNum}/${den}. Simplify if you can.`
                     : `Subtract: ${n1}/${den} \u2212 ${n2}/${den} = ${resultNum}/${den}. Simplify if you can.`;
-
-                const barW = 240;
-                const barH = 30;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Fraction Word Problem</div>
-                    <div style="font-size:1rem;margin-bottom:14px;max-width:340px;margin-left:auto;margin-right:auto;line-height:1.5;">
-                        ${questionText}
-                    </div>
-                    <div style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;">
-                        <div>
-                            <div style="font-size:0.8rem;color:var(--text-bright);margin-bottom:4px;">${name1}: ${n1}/${den}</div>
-                            ${_svgBar(n1, den, barW, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
-                        </div>
-                    </div>
-                    <div style="font-size:1.2rem;font-weight:700;margin:6px 0;">${isAdd ? '+' : '\u2212'}</div>
-                    <div style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;">
-                        <div>
-                            <div style="font-size:0.8rem;color:var(--text-bright);margin-bottom:4px;">${name2}: ${n2}/${den}</div>
-                            ${_svgBar(n2, den, barW, barH, 'var(--accent-purple)', 'var(--bg-card)')}
-                        </div>
-                    </div>
-                    <div style="border-top:2px solid var(--text-bright);margin:10px auto 6px;width:${barW}px;"></div>
-                    <div style="font-size:0.9rem;color:var(--accent-green);font-weight:600;">= ?</div>
-                </div>`;
+                _fSentenceKit(q, [{ n: n1, d: den }, { n: n2, d: den }], [isAdd ? '+' : '\u2212'], 'bar',
+                    { mixed: resultNum >= den, wholeMm: 30, story: _fStoryLines(questionText) });
                 return;
 
-            } else if (fracSkill === "frac_10_100" && Math.random() < 0.25) {
-                // Phase 4.5 batch 9: multi-select-check variant — click ALL fractions equivalent to a target decimal
-                // Pick a target value with a clear /100 representation (e.g. 0.07, 0.25)
-                const targetN100 = pick([5, 7, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90]);
-                const targetVal = targetN100 / 100;
-                // For decimal display
-                const decStr = targetN100 === 100 ? '1' : (targetN100 < 10 ? `0.0${targetN100}` : `0.${targetN100 < 100 && targetN100 % 10 === 0 ? targetN100 / 10 : targetN100}`);
-                // Build correct options
-                const correctOpts = [`${targetN100}/100`];
-                if (targetN100 % 10 === 0) correctOpts.push(`${targetN100 / 10}/10`);
-                // Equivalent simpler forms
-                function _gcdLocal(a, b) { return b === 0 ? Math.abs(a) : _gcdLocal(b, a % b); }
-                const gd = _gcdLocal(targetN100, 100);
-                if (gd > 1 && gd !== 10) correctOpts.push(`${targetN100 / gd}/${100 / gd}`);
-                // Wrong options
-                const wrongOpts = [
-                    `${targetN100 + 1}/100`,
-                    `${targetN100 - 1}/100`,
-                    `${targetN100}/10`,
-                    `${targetN100}/1000`,
-                    `${100 - targetN100}/100`,
-                    targetN100 % 10 === 0 ? `${targetN100 / 10 + 1}/10` : `${Math.floor(targetN100 / 10) + 1}/10`,
-                    `${targetN100 + 5}/100`
-                ];
-                const cCount = Math.min(correctOpts.length, randInt(2, 3));
-                const wCount = 6 - cCount;
-                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
-                const seen = new Set(chosenC);
-                const chosenW = [];
-                let safety = 0;
-                while (chosenW.length < wCount && safety < 30) {
-                    safety++;
-                    const w = pick(wrongOpts);
-                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
-                }
-                while (chosenW.length < wCount) chosenW.push(`${targetN100 + chosenW.length + 7}/100`);
-                const all = shuffle([
-                    ...chosenC.map(label => ({ label, correct: true })),
-                    ...chosenW.map(label => ({ label, correct: false }))
-                ]);
-                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL fractions equivalent to ${decStr}.`;
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = `${decStr} = ${targetN100}/100. Look for fractions that simplify to or equal ${targetN100}/100.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = '10ths & 100ths';
-                return;
             } else if (fracSkill === "frac_10_100") {
-                // Grade 4: Express /10 as /100 equivalent
+                // Grade 4 (4.NF.C.5): tenths as hundredths, and back. KIT (fractions lane): the
+                // given fraction drawn as ONE hundred square (columns are tenths, cells hundredths,
+                // sheet/cells/hundred-square.js), "7/10 = [ ]/100" beside it. 7 columns shaded are
+                // 70 cells: the square shows both names at once. Pictures off: the sentence alone.
+                const toTenths = Math.random() < 0.35;
                 const num10 = rng(1, 9);
                 const num100 = num10 * 10;
-
-                q.text = `Write ${num10}/10 as a fraction with denominator 100.`;
-                q.ans = `${num100}/100`;
+                if (toTenths) {
+                    q.text = `Write ${num100}/100 as a fraction with denominator 10.`;
+                    q.ans = `${num10}/10`;
+                    q.hint = `Every 10 hundredths make 1 tenth (one column of the square). ${num100} ÷ 10 = ${num10}.`;
+                } else {
+                    q.text = `Write ${num10}/10 as a fraction with denominator 100.`;
+                    q.ans = `${num100}/100`;
+                    q.hint = `Each tenth is a column of 10 hundredths. ${num10} × 10 = ${num100}.`;
+                }
                 q.answerType = "text";
-                q.hint = `Multiply both numerator and denominator by 10: ${num10}/10 = ${num100}/100.`;
-
-                // Side-by-side grids: 1x10 and 10x10
-                const grid10W = 30;
-                const grid10H = 200;
-                const cellH10 = grid10H / 10;
-                let grid10Rects = '';
-                for (let i = 0; i < 10; i++) {
-                    const fill = i < num10 ? 'var(--accent-cyan)' : 'var(--bg-card)';
-                    const opacity = i < num10 ? '1' : '0.3';
-                    grid10Rects += `<rect x="0" y="${i * cellH10}" width="${grid10W}" height="${cellH10}" fill="${fill}" stroke="var(--text-bright)" stroke-width="1" opacity="${opacity}"/>`;
-                }
-
-                const grid100Size = 200;
-                const cellSize = grid100Size / 10;
-                let grid100Rects = '';
-                for (let r = 0; r < 10; r++) {
-                    for (let c = 0; c < 10; c++) {
-                        const idx = r * 10 + c;
-                        const fill = idx < num100 ? 'var(--accent-purple)' : 'var(--bg-card)';
-                        const opacity = idx < num100 ? '1' : '0.3';
-                        grid100Rects += `<rect x="${c * cellSize}" y="${r * cellSize}" width="${cellSize}" height="${cellSize}" fill="${fill}" stroke="var(--text-bright)" stroke-width="0.5" opacity="${opacity}"/>`;
-                    }
-                }
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Tenths and Hundredths</div>
-                    <div style="font-size:1.2rem;margin-bottom:14px;">
-                        ${fracHTML(num10, 10, 'xl')} <span style="margin:0 10px;font-size:1.3rem;">=</span> ${fracHTML('?', 100, 'xl')}
-                    </div>
-                    <div style="display:flex;justify-content:center;align-items:center;gap:30px;">
-                        <div style="text-align:center;">
-                            <svg width="${grid10W + 4}" height="${grid10H + 4}" viewBox="-2 -2 ${grid10W + 4} ${grid10H + 4}">${grid10Rects}</svg>
-                            <div style="font-size:0.8rem;margin-top:4px;color:var(--text-bright);">${num10}/10</div>
-                        </div>
-                        <span style="font-size:1.5rem;font-weight:700;color:var(--accent-green);">=</span>
-                        <div style="text-align:center;">
-                            <svg width="${grid100Size + 4}" height="${grid100Size + 4}" viewBox="-2 -2 ${grid100Size + 4} ${grid100Size + 4}">${grid100Rects}</svg>
-                            <div style="font-size:0.8rem;margin-top:4px;color:var(--text-bright);">?/100</div>
-                        </div>
-                    </div>
-                </div>`;
+                q.noSimplify = true;
+                q.options = [];
+                const _thKind = _fPicturesOff() ? null : 'hundred';
+                const _thA = toTenths ? { n: num100, d: 100 } : { n: num10, d: 10 };
+                const _thB = toTenths ? { n: num10, d: 10 } : { n: num100, d: 100 };
+                q.fractionModel = _thKind;
+                _fKit(q, { task: 'op', terms: [Object.assign({ kind: _thKind }, _thA), Object.assign({ frac: 'n' }, _thB)],
+                    joins: ['='], answer: _thB, modelTop: !!_thKind });
                 return;
 
-            } else if (fracSkill === "add_frac_unlike" && Math.random() < 0.25) {
-                // Phase 4.5 batch 12: multi-select-check variant — click ALL sums greater than 1
-                const dPool = [2, 3, 4, 5, 6, 8];
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < 5 && safety < 100) {
-                    safety++;
-                    const dx = pick(dPool);
-                    let dy = pick(dPool);
-                    if (dx === dy) dy = pick(dPool.filter(x => x !== dx));
-                    const a = rng(1, dx - 1);
-                    const b = rng(1, dy - 1);
-                    const key = `${a}/${dx}+${b}/${dy}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    items.push({ a, dx, b, dy, sum: a / dx + b / dy });
-                }
-                let opts = items.map((it, i) => ({
-                    id: 'opt' + i,
-                    label: `${it.a}/${it.dx} + ${it.b}/${it.dy}`,
-                    correct: it.sum > 1 + 1e-9
-                }));
-                if (!opts.some(o => o.correct)) {
-                    opts[0] = { id: 'opt0', label: `2/3 + 3/4`, correct: true };
-                }
-                opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = 'Click ALL sums greater than 1.';
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = 'Compare each fraction to 1/2: if both are at least 1/2, the sum is at least 1.';
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Add Fractions (Unlike)';
-                return;
             } else if (fracSkill === "add_frac_unlike") {
                 // Grade 5: Add fractions with UNLIKE denominators
                 const denOptions = [2, 3, 4, 5, 6, 8, 10, 12];
@@ -993,46 +577,6 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 }
                 return;
 
-            } else if (fracSkill === "sub_frac_unlike" && Math.random() < 0.25) {
-                // Phase 4.5 batch 12: multi-select-check variant — click ALL differences greater than 1/4
-                const dPool = [2, 3, 4, 5, 6, 8];
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < 5 && safety < 100) {
-                    safety++;
-                    let dx = pick(dPool);
-                    let dy = pick(dPool);
-                    if (dx === dy) dy = pick(dPool.filter(x => x !== dx));
-                    let a = rng(1, dx - 1);
-                    let b = rng(1, dy - 1);
-                    let aVal = a / dx;
-                    let bVal = b / dy;
-                    if (aVal < bVal) { [a, dx, b, dy] = [b, dy, a, dx]; aVal = a / dx; bVal = b / dy; }
-                    if (aVal === bVal) continue;
-                    const key = `${a}/${dx}-${b}/${dy}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    items.push({ a, dx, b, dy, diff: aVal - bVal });
-                }
-                let opts = items.map((it, i) => ({
-                    id: 'opt' + i,
-                    label: `${it.a}/${it.dx} - ${it.b}/${it.dy}`,
-                    correct: it.diff > 0.25 + 1e-9
-                }));
-                if (!opts.some(o => o.correct)) {
-                    opts[0] = { id: 'opt0', label: `5/6 - 1/3`, correct: true };
-                }
-                opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = 'Click ALL differences greater than 1/4.';
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = 'Find a common denominator and subtract. Compare the result to 1/4.';
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Subtract Fractions (Unlike)';
-                return;
             } else if (fracSkill === "sub_frac_unlike") {
                 // Grade 5: Subtract fractions with UNLIKE denominators
                 const denOptions = [2, 3, 4, 5, 6, 8, 10, 12];
@@ -1067,87 +611,6 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 }
                 return;
 
-            } else if (fracSkill === "add_mixed_unlike" && Math.random() < 0.25) {
-                // Phase 4.5 batch 12: multi-select-check variant — click ALL sums greater than 4
-                const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < 5 && safety < 100) {
-                    safety++;
-                    const dp = pick(denPairs);
-                    const w1 = rng(1, 3);
-                    const f1 = rng(1, dp.d1 - 1);
-                    const w2 = rng(1, 3);
-                    const f2 = rng(1, dp.d2 - 1);
-                    const key = `${w1}.${f1}/${dp.d1}+${w2}.${f2}/${dp.d2}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    const sumVal = w1 + f1 / dp.d1 + w2 + f2 / dp.d2;
-                    items.push({ w1, f1, w2, f2, d1: dp.d1, d2: dp.d2, sumVal });
-                }
-                let opts = items.map((it, i) => ({
-                    id: 'opt' + i,
-                    label: `${it.w1} ${it.f1}/${it.d1} + ${it.w2} ${it.f2}/${it.d2}`,
-                    correct: it.sumVal > 4 + 1e-9
-                }));
-                if (!opts.some(o => o.correct)) {
-                    opts[0] = { id: 'opt0', label: `3 1/2 + 2 3/4`, correct: true };
-                }
-                opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = 'Click ALL sums greater than 4.';
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = 'Add the wholes, then add the fractions. Watch for fraction sums that regroup into another whole.';
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Add Mixed Numbers (Unlike)';
-                return;
-            } else if (fracSkill === "add_mixed_unlike" && Math.random() < 0.20) {
-                // Phase 4.5 batch 12: dnd-categorize variant — sort 5 sums by total size
-                const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < 5 && safety < 100) {
-                    safety++;
-                    const dp = pick(denPairs);
-                    const w1 = rng(0, 2);
-                    const f1 = rng(1, dp.d1 - 1);
-                    const w2 = rng(0, 2);
-                    const f2 = rng(1, dp.d2 - 1);
-                    const key = `${w1}.${f1}/${dp.d1}+${w2}.${f2}/${dp.d2}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    const sumVal = w1 + f1 / dp.d1 + w2 + f2 / dp.d2;
-                    items.push({ w1, f1, w2, f2, d1: dp.d1, d2: dp.d2, sumVal });
-                }
-                const tiles = items.map((it, i) => ({
-                    id: 't' + i,
-                    label: `${it.w1} ${it.f1}/${it.d1} + ${it.w2} ${it.f2}/${it.d2}`
-                }));
-                const ans = {};
-                items.forEach((it, i) => {
-                    if (it.sumVal < 2 - 1e-9) ans['t' + i] = 'binLt2';
-                    else if (it.sumVal > 3 + 1e-9) ans['t' + i] = 'binGt3';
-                    else ans['t' + i] = 'binMid';
-                });
-                q.text = 'Sort each sum into the correct bin.';
-                q.answerType = 'dnd-generic';
-                q.dndMode = 'categorize';
-                q.tiles = tiles;
-                q.bins = [
-                    { id: 'binLt2', label: 'Less than 2' },
-                    { id: 'binMid', label: 'Between 2 and 3' },
-                    { id: 'binGt3', label: 'More than 3' }
-                ];
-                q.ans = ans;
-                q.hint = 'Add wholes first; then convert fractions to a common denominator before adding.';
-                q.options = [];
-                q.printFormat = 'dnd-generic';
-                q.skillLabel = 'Add Mixed Numbers (Unlike)';
-                return;
             } else if (fracSkill === "add_mixed_unlike") {
                 // Grade 5: Add mixed numbers with UNLIKE denominators
                 const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
@@ -1179,45 +642,6 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 }
                 return;
 
-            } else if (fracSkill === "sub_mixed_unlike" && Math.random() < 0.25) {
-                // Phase 4.5 batch 12: multi-select-check variant — click ALL differences less than 2
-                const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < 5 && safety < 120) {
-                    safety++;
-                    const dp = pick(denPairs);
-                    let w1 = rng(2, 5);
-                    let f1 = rng(1, dp.d1 - 1);
-                    let w2 = rng(1, w1 - 1);
-                    let f2 = rng(1, dp.d2 - 1);
-                    const v1 = w1 + f1 / dp.d1;
-                    const v2 = w2 + f2 / dp.d2;
-                    if (v1 <= v2) continue;
-                    const key = `${w1}.${f1}/${dp.d1}-${w2}.${f2}/${dp.d2}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    items.push({ w1, f1, w2, f2, d1: dp.d1, d2: dp.d2, diff: v1 - v2 });
-                }
-                let opts = items.map((it, i) => ({
-                    id: 'opt' + i,
-                    label: `${it.w1} ${it.f1}/${it.d1} - ${it.w2} ${it.f2}/${it.d2}`,
-                    correct: it.diff < 2 - 1e-9
-                }));
-                if (!opts.some(o => o.correct)) {
-                    opts[0] = { id: 'opt0', label: `3 1/4 - 2 1/2`, correct: true };
-                }
-                opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = 'Click ALL differences less than 2.';
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = 'Subtract whole parts; then subtract fractions (find a common denominator). Borrow if the top fraction is smaller.';
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Subtract Mixed Numbers (Unlike)';
-                return;
             } else if (fracSkill === "sub_mixed_unlike") {
                 // Grade 5: Subtract mixed numbers with UNLIKE denominators
                 const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
@@ -1993,62 +1417,19 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Frac of Set";
                 return;
 
-            } else if (fracSkill === "fraction_of_set_hard_nv" && Math.random() < 0.25) {
-                // Phase 4.5 batch 9: multi-select-check variant — pick equivalent fraction expressions (larger denoms)
-                const den = rng(3, 10);
-                const num = rng(2, Math.min(5, den - 1));
-                const mult = rng(2, 5);
-                const total = den * mult;
-                const correctVal = num * mult; // n/d of total
-                const correctOpts = [
-                    `${num} × (${total} ÷ ${den})`,
-                    `${num}/${den} of ${total}`,
-                    `${num * total}/${den}`,
-                    `${num} × ${mult}`
-                ];
-                const wrongOpts = [
-                    `${num + 1}/${den} of ${total}`,
-                    `${num}/${den + 1} of ${total}`,
-                    `${total} ÷ ${num}`,
-                    `${num} + ${den}`,
-                    `${total - num}`,
-                    `${den}/${num} of ${total}`,
-                    `${total} × ${num}`,
-                    `${den * mult + num}`
-                ];
-                const cCount = randInt(2, 3);
-                const wCount = 6 - cCount;
-                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
-                const seen = new Set(chosenC);
-                const chosenW = [];
-                let safety = 0;
-                while (chosenW.length < wCount && safety < 30) {
-                    safety++;
-                    const w = pick(wrongOpts);
-                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
-                }
-                while (chosenW.length < wCount) chosenW.push(`${total + chosenW.length + 1}`);
-                const all = shuffle([
-                    ...chosenC.map(label => ({ label, correct: true })),
-                    ...chosenW.map(label => ({ label, correct: false }))
-                ]);
-                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL expressions equal to ${num}/${den} of ${total}.`;
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = `${num}/${den} of ${total} = ${correctVal}.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Frac of Set';
-                return;
             } else if (fracSkill === "fraction_of_set_hard_nv") {
-                // Grade 4: Fraction of a Set Hard (no visual)
+                // Grade 4-5: a fraction of an amount, and finding the whole (build list
+                // frac_find_whole, WRM Y6.B4.S7). KIT (fractions lane): the frac-model `amount`
+                // task - "3/5 of 40 = [ ]", "3/5 of [ ] = 24", or a short story over it - with the
+                // BAR MODEL as a support the teacher switches on (`barModel`): d equal boxes, a brace
+                // over the n known boxes and one under the whole, the unknown marked "?".
                 // LRU rotation across 3 sub-types (was Math.random() chain).
                 const roll = (typeof window !== 'undefined' && window.pickVariant)
                     ? window.pickVariant('fraction_of_set_hard_nv', ["type1","type2","type3"])
                     : (Math.random() < 0.5 ? 'type1' : (Math.random() < 0.5 ? 'type2' : 'type3'));
                 q._variant = roll;
+                const _bar = !!(state.skillOptions && state.skillOptions.barModel === true);
+                let _am;
                 if (roll === 'type1') {
                     // Type 1: "What is n/d of N?" with larger numbers
                     const den = rng(3, 12);
@@ -2060,37 +1441,49 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.ans = answer;
                     q.answerType = "number";
                     q.hint = `Divide ${total} by ${den}: ${total} ÷ ${den} = ${mult}. Multiply by ${num}: ${mult} × ${num} = ${answer}.`;
+                    _am = { n: num, d: den, total, part: answer, ask: 'part', answer: { value: answer } };
                 } else if (roll === 'type2') {
-                    // Type 2: Find the set given the part
+                    // Type 2: find the whole from the part (a unit fraction first: 1/4 of a number is 6)
                     const den = rng(3, 10);
-                    const num = rng(2, Math.min(5, den - 1));
+                    const num = rng(1, Math.min(5, den - 1));
                     const mult = rng(3, 8);
                     const part = num * mult;
                     const total = den * mult;
-                    q.text = `${num}/${den} of a number is ${part}. What is the number?`;
+                    // half of them a short story: the part is known, the whole is asked
+                    const _fwStory = Math.random() < 0.5 ? pick([
+                        [`Maya read ${part} pages.`, `That is ${num}/${den} of her book.`, 'How many pages are in the book?'],
+                        [`Leo has walked ${part} meters.`, `That is ${num}/${den} of the path.`, 'How long is the path?'],
+                        [`${part} children are in the hall.`, `That is ${num}/${den} of the school.`, 'How many children are in the school?'],
+                    ]) : null;
+                    q.text = _fwStory ? _fwStory.join(' ') : `${num}/${den} of a number is ${part}. What is the number?`;
                     q.ans = total;
                     q.answerType = "number";
-                    q.hint = `If ${num}/${den} = ${part}, then 1/${den} = ${part} ÷ ${num} = ${mult}. The whole = ${mult} × ${den} = ${total}.`;
+                    q.hint = `If ${num}/${den} is ${part}, then 1/${den} is ${part} ÷ ${num} = ${mult}. The whole is ${mult} × ${den} = ${total}.`;
+                    _am = { n: num, d: den, total, part, ask: 'whole', answer: { value: total }, ...(_fwStory ? { story: _fwStory } : {}) };
                 } else {
-                    // Type 3: Word problem with larger numbers
+                    // Type 3: a short story with larger numbers
                     const den = rng(3, 10);
                     const num = rng(2, Math.min(5, den - 1));
                     const mult = rng(4, Math.floor(100 / den));
                     const total = den * mult;
                     const answer = num * mult;
                     const contexts = [
-                        `A school has ${total} students. ${num}/${den} ride the bus.`,
-                        `A bag has ${total} jellybeans. ${num}/${den} are cherry.`,
-                        `There are ${total} books on a shelf. ${num}/${den} are fiction.`,
-                        `A farm has ${total} animals. ${num}/${den} are chickens.`
+                        [`A school has ${total} students.`, `${num}/${den} of them ride the bus.`, 'How many ride the bus?'],
+                        [`A bag has ${total} beans.`, `${num}/${den} of them are red.`, 'How many are red?'],
+                        [`A shelf has ${total} books.`, `${num}/${den} of them are about animals.`, 'How many are about animals?'],
+                        [`A farm has ${total} animals.`, `${num}/${den} of them are hens.`, 'How many are hens?'],
                     ];
-                    q.text = `${pick(contexts)} How many?`;
-                    q.ans = String(answer);
-                    q.answerType = "text";
+                    const story = pick(contexts);
+                    q.text = story.join(' ');
+                    q.ans = answer;
+                    q.answerType = "number";
                     q.hint = `Find ${num}/${den} of ${total}: divide ${total} ÷ ${den} = ${mult}, then multiply ${mult} × ${num} = ${answer}.`;
+                    _am = { n: num, d: den, total, part: answer, ask: 'part', answer: { value: answer }, story };
                 }
+                q.options = [];
                 q.printFormat = "fraction-of-set-hard-nv";
                 q.skillLabel = "Frac of Set";
+                _fKit(q, Object.assign({ task: 'amount', bar: _bar }, _am));
                 return;
 
             } else if (fracSkill === "mult_frac_whole_nv" && Math.random() < 0.25) {
@@ -2862,95 +2255,6 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Scaling";
                 return;
 
-            } else if (fracSkill === "mult_frac_frac" && Math.random() < 0.25) {
-                // Phase 4.5 batch 9: multi-select-check variant - pick equivalent multiplications
-                const tD1 = pick([2, 3, 4]);
-                const tD2 = pick([2, 3, 4]);
-                const tN1 = rng(1, tD1 - 1);
-                const tN2 = rng(1, tD2 - 1);
-                const targetProdN = tN1 * tN2;
-                const targetProdD = tD1 * tD2;
-                const correctOpts = [
-                    `${tN1}/${tD1} × ${tN2}/${tD2}`,
-                    `${tN2}/${tD2} × ${tN1}/${tD1}`,
-                    `${targetProdN}/${targetProdD}`
-                ];
-                const wrongOpts = [
-                    `${tN1}/${tD1} + ${tN2}/${tD2}`,
-                    `${tN1 + tN2}/${tD1 + tD2}`,
-                    `${tN1}/${tD2} × ${tN2}/${tD1}`,
-                    `${tD1}/${tN1} × ${tN2}/${tD2}`,
-                    `${tN1}/${tD1} ÷ ${tN2}/${tD2}`,
-                    `${targetProdD}/${targetProdN}`,
-                    `${targetProdN + 1}/${targetProdD}`
-                ];
-                const cCount = randInt(2, 3);
-                const wCount = 5 - cCount;
-                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
-                const seen = new Set(chosenC);
-                const chosenW = [];
-                let safety = 0;
-                while (chosenW.length < wCount && safety < 30) {
-                    safety++;
-                    const w = pick(wrongOpts);
-                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
-                }
-                while (chosenW.length < wCount) chosenW.push(`${targetProdN + chosenW.length + 2}/${targetProdD}`);
-                const all = shuffle([
-                    ...chosenC.map(label => ({ label, correct: true })),
-                    ...chosenW.map(label => ({ label, correct: false }))
-                ]);
-                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL expressions equal to ${tN1}/${tD1} × ${tN2}/${tD2}.`;
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = `${tN1}/${tD1} × ${tN2}/${tD2} = ${targetProdN}/${targetProdD}. Multiplication is commutative.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Frac × Frac';
-                return;
-            } else if (fracSkill === "mult_frac_frac" && Math.random() < 0.20) {
-                // Phase 4.5 batch 9: dnd-categorize variant - sort products by size relative to 1/2
-                const dPool = [2, 3, 4, 5, 6, 8];
-                const totalCount = randInt(5, 6);
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < totalCount && safety < 100) {
-                    safety++;
-                    const d1c = pick(dPool);
-                    const d2c = pick(dPool);
-                    const n1c = rng(1, d1c - 1);
-                    const n2c = rng(1, d2c - 1);
-                    const key = `${n1c}/${d1c}*${n2c}/${d2c}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    items.push({ n1: n1c, d1: d1c, n2: n2c, d2: d2c });
-                }
-                const tiles = items.map((it, i) => ({ id: 't' + i, label: `${it.n1}/${it.d1} × ${it.n2}/${it.d2}` }));
-                const ans = {};
-                items.forEach((it, i) => {
-                    const v = (it.n1 * it.n2) / (it.d1 * it.d2);
-                    if (Math.abs(v - 0.5) < 1e-9) ans['t' + i] = 'binEq';
-                    else if (v > 0.5) ans['t' + i] = 'binLg';
-                    else ans['t' + i] = 'binSm';
-                });
-                q.text = 'Sort each product by size relative to 1/2.';
-                q.answerType = 'dnd-generic';
-                q.dndMode = 'categorize';
-                q.tiles = tiles;
-                q.bins = [
-                    { id: 'binLg', label: 'Larger than 1/2' },
-                    { id: 'binSm', label: 'Smaller than 1/2' },
-                    { id: 'binEq', label: 'Equal to 1/2' }
-                ];
-                q.ans = ans;
-                q.hint = 'Multiply numerators and denominators, then compare to 1/2 (= 0.5).';
-                q.options = [];
-                q.printFormat = 'dnd-generic';
-                q.skillLabel = 'Frac × Frac';
-                return;
             } else if (fracSkill === "mult_frac_frac") {
                 // Grade 5: Fraction x Fraction
                 const d1 = pick([2, 3, 4, 5, 6]);
@@ -2974,53 +2278,6 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     { area: { rows: d1, cols: d2, shadeRows: n1, markCols: n2, n1, d1, n2, d2 } });
                 return;
 
-            } else if (fracSkill === "div_unit_fraction" && Math.random() < 0.25) {
-                // Phase 4.5 batch 9: multi-select-check variant - click ALL equal to N ÷ 1/D
-                const dDen = pick([2, 3, 4, 5]);
-                const dWhole = rng(2, 6);
-                const targetVal = dWhole * dDen;
-                const correctOpts = [
-                    `${dWhole} ÷ 1/${dDen}`,
-                    `${dWhole} × ${dDen}`,
-                    `${dDen} × ${dWhole}`,
-                    `${targetVal}`
-                ];
-                const wrongOpts = [
-                    `${dWhole} × 1/${dDen}`,
-                    `1/${dDen} ÷ ${dWhole}`,
-                    `${dWhole} ÷ ${dDen}`,
-                    `${dWhole}/${dDen}`,
-                    `${dDen}/${dWhole}`,
-                    `${targetVal + 1}`,
-                    `${targetVal - 1}`,
-                    `1/(${dWhole} × ${dDen})`
-                ];
-                const cCount = randInt(2, 3);
-                const wCount = 5 - cCount;
-                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
-                const seen = new Set(chosenC);
-                const chosenW = [];
-                let safety = 0;
-                while (chosenW.length < wCount && safety < 30) {
-                    safety++;
-                    const w = pick(wrongOpts);
-                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
-                }
-                while (chosenW.length < wCount) chosenW.push(`${targetVal + chosenW.length + 5}`);
-                const all = shuffle([
-                    ...chosenC.map(label => ({ label, correct: true })),
-                    ...chosenW.map(label => ({ label, correct: false }))
-                ]);
-                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL expressions equal to ${dWhole} ÷ 1/${dDen}.`;
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = `Dividing by 1/${dDen} is the same as multiplying by ${dDen}: ${dWhole} × ${dDen} = ${targetVal}.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Div Unit Frac';
-                return;
             } else if (fracSkill === "div_unit_fraction") {
                 // Grade 5: Divide with unit fractions. KIT (O6 lane AP3): the dividend is drawn - the
                 // wholes cut into 1/d parts, or the one unit fraction - and the divisor is a number;
@@ -3036,7 +2293,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.text = `${whole} ÷ 1/${d} = ?`;
                     q.ans = String(ans);
                     q.hint = `How many 1/${d}'s fit into ${whole}? Each whole has ${d} pieces of 1/${d}, so ${whole} × ${d} = ${ans}.`;
-                    _fSentenceKit(q, [{ w: whole, n: 0, d }, { n: 1, d, kind: null }], ['\u00f7'], _fModelPick() || 'bar', { wholeMm: 18, perRow: 2, barH: 9 });
+                    _fSentenceKit(q, [{ w: whole, n: 0, d }, { n: 1, d, kind: null }], ['\u00f7'], _fModelPick() || 'bar', { wholeMm: 18, perRow: 4, barH: 9, modelTop: true });
                 } else {
                     // (1/d) / whole = 1/(d*whole)
                     const d = pick([2, 3, 4, 5, 6]);
@@ -3049,396 +2306,107 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 }
                 return;
 
-            } else if (fracSkill === "frac_as_division" && Math.random() < 0.25) {
-                // Phase 4.5 batch 9: multi-select-check variant - click ALL fractions meaning N ÷ D
-                const dB = pick([2, 3, 4, 5, 6, 8]);
-                const dA = rng(2, Math.min(dB + 2, 9));
-                // Build correct options: all forms equal to a/b
-                function _gcdLocal3(a, b) { return b === 0 ? Math.abs(a) : _gcdLocal3(b, a % b); }
-                const gd = _gcdLocal3(dA, dB);
-                const correctOpts = [`${dA}/${dB}`];
-                if (gd > 1) correctOpts.push(`${dA / gd}/${dB / gd}`);
-                // Add equivalent multiples
-                correctOpts.push(`${dA * 2}/${dB * 2}`);
-                correctOpts.push(`${dA * 3}/${dB * 3}`);
-                // Wrong options
-                const wrongOpts = [
-                    `${dB}/${dA}`,
-                    `${dA + 1}/${dB}`,
-                    `${dA}/${dB + 1}`,
-                    `${dA - 1}/${dB}`,
-                    `${dA + dB}/${dB}`,
-                    `${dA * 2}/${dB}`,
-                    `${dA}/${dB * 2}`
-                ];
-                const cCount = randInt(2, 3);
-                const wCount = 5 - cCount;
-                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
-                const seen = new Set(chosenC);
-                const chosenW = [];
-                let safety = 0;
-                while (chosenW.length < wCount && safety < 30) {
-                    safety++;
-                    const w = pick(wrongOpts);
-                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
-                }
-                while (chosenW.length < wCount) chosenW.push(`${dA + chosenW.length + 5}/${dB}`);
-                const all = shuffle([
-                    ...chosenC.map(label => ({ label, correct: true })),
-                    ...chosenW.map(label => ({ label, correct: false }))
-                ]);
-                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL fractions that mean ${dA} ÷ ${dB}.`;
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = `${dA} ÷ ${dB} = ${dA}/${dB}. Equivalent fractions multiply top and bottom by the same number.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Frac as Division';
-                return;
             } else if (fracSkill === "frac_as_division") {
-                // Grade 5: a/b means a / b
+                // Grade 5 (5.NF.B.3): a/b is a shared by b. KIT (fractions lane): the a wholes drawn
+                // cut into b equal parts (circles unless the teacher ticked another model), "a ÷ b =",
+                // and the answer boxes - a fraction, or a mixed number's three boxes when a >= b.
+                // The pupil shares the parts; nothing is shaded, so the picture never gives the answer.
                 const b = pick([2, 3, 4, 5, 6, 8]);
-                const a = rng(1, Math.min(b + 2, 8));
-                const answer = _fracStr(a, b);
+                const a = rng(1, Math.min(b + 2, 6));
+                const answer = a >= b ? _fracStr(a, b) : `${a}/${b}`;
 
                 const scenarios = [
-                    `Share ${a} pizza${a > 1 ? 's' : ''} equally among ${b} friends. How much does each person get?`,
-                    `Divide ${a} cookie${a > 1 ? 's' : ''} equally among ${b} children. How much does each child get?`,
-                    `${a} candy bar${a > 1 ? 's are' : ' is'} shared equally by ${b} people. How much does each person get?`,
-                    `Split ${a} sandwich${a > 1 ? 'es' : ''} equally among ${b} students. How much does each student get?`
+                    `Share ${a} pizza${a > 1 ? 's' : ''} equally among ${b} friends. How much does each friend get?`,
+                    `Share ${a} cookie${a > 1 ? 's' : ''} equally among ${b} children. How much does each child get?`,
+                    `Share ${a} cake${a > 1 ? 's' : ''} equally among ${b} people. How much does each person get?`,
+                    `Share ${a} sandwich${a > 1 ? 'es' : ''} equally among ${b} students. How much does each student get?`
                 ];
-                const scenario = pick(scenarios);
-
-                q.text = scenario;
+                q.text = pick(scenarios);
                 q.ans = answer;
+                q.acceptedAnswers = [...new Set([answer, `${a}/${b}`, _fracStr(a, b)])];
                 q.answerType = "text";
-                q.hint = `${a} ÷ ${b} = ${a}/${b}${a >= b ? ` = ${answer}` : ''}. Sharing ${a} items among ${b} people means each gets ${a}/${b}.`;
-
-                // Pizzas divided among stick figures
-                const circleR = 25;
-                const circleGap = 8;
-                const figureW = 20;
-                const totalPizzaW = a * (circleR * 2 + circleGap);
-                const totalFigW = b * (figureW + 10);
-                const svgW = Math.max(totalPizzaW, totalFigW) + 20;
-
-                let pizzas = '';
-                for (let i = 0; i < a; i++) {
-                    const cx = 10 + i * (circleR * 2 + circleGap) + circleR;
-                    pizzas += `<circle cx="${cx}" cy="${circleR + 5}" r="${circleR}" fill="var(--accent-orange)" stroke="var(--text-bright)" stroke-width="2" opacity="0.7"/>`;
-                    // Slice lines
-                    for (let s = 0; s < b; s++) {
-                        const angle = (s * 2 * Math.PI) / b - Math.PI / 2;
-                        const x2 = cx + circleR * Math.cos(angle);
-                        const y2 = (circleR + 5) + circleR * Math.sin(angle);
-                        pizzas += `<line x1="${cx}" y1="${circleR + 5}" x2="${x2}" y2="${y2}" stroke="var(--text-bright)" stroke-width="1"/>`;
-                    }
-                }
-
-                let figures = '';
-                for (let i = 0; i < b; i++) {
-                    const fx = 10 + i * (figureW + 10) + figureW / 2;
-                    const fy = circleR * 2 + 30;
-                    figures += `<circle cx="${fx}" cy="${fy}" r="6" fill="var(--accent-cyan)" stroke="var(--text-bright)" stroke-width="1.5"/>`;
-                    figures += `<line x1="${fx}" y1="${fy + 6}" x2="${fx}" y2="${fy + 20}" stroke="var(--text-bright)" stroke-width="1.5"/>`;
-                    figures += `<line x1="${fx - 6}" y1="${fy + 12}" x2="${fx + 6}" y2="${fy + 12}" stroke="var(--text-bright)" stroke-width="1.5"/>`;
-                    figures += `<line x1="${fx}" y1="${fy + 20}" x2="${fx - 5}" y2="${fy + 28}" stroke="var(--text-bright)" stroke-width="1.5"/>`;
-                    figures += `<line x1="${fx}" y1="${fy + 20}" x2="${fx + 5}" y2="${fy + 28}" stroke="var(--text-bright)" stroke-width="1.5"/>`;
-                }
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Fractions as Division</div>
-                    <div style="font-size:1rem;margin-bottom:14px;max-width:320px;margin-left:auto;margin-right:auto;line-height:1.5;">${scenario}</div>
-                    <svg width="${svgW}" height="${circleR * 2 + 70}" viewBox="0 0 ${svgW} ${circleR * 2 + 70}" style="display:block;margin:0 auto;max-width:100%;">
-                        ${pizzas}
-                        ${figures}
-                    </svg>
-                    <div style="margin-top:8px;font-size:0.9rem;color:var(--accent-green);">${a} ÷ ${b} = ?</div>
-                </div>`;
-                return;
-
-            } else if (fracSkill === "mult_scaling" && Math.random() < 0.30) {
-                // Phase 4.5 batch 2: dnd-categorize variant — sort 4-6 expressions into Larger/Smaller/Equal bins
-                const whole = pick([6, 8, 10, 12]);
-                const dPool = [2, 3, 4, 5, 6, 8];
-                const totalCount = randInt(5, 6);
-                const expressions = [];
-                const seen = new Set();
-                let safety = 0;
-                while (expressions.filter(e => e.cat === 'larger').length < 1 && safety < 50) {
-                    safety++;
-                    const d = pick(dPool);
-                    const n = rng(d + 1, d * 2);
-                    const key = n + '/' + d;
-                    if (!seen.has(key)) { seen.add(key); expressions.push({ n, d, cat: 'larger' }); }
-                }
-                safety = 0;
-                while (expressions.filter(e => e.cat === 'smaller').length < 1 && safety < 50) {
-                    safety++;
-                    const d = pick(dPool);
-                    const n = rng(1, d - 1);
-                    const key = n + '/' + d;
-                    if (!seen.has(key)) { seen.add(key); expressions.push({ n, d, cat: 'smaller' }); }
-                }
-                safety = 0;
-                while (expressions.filter(e => e.cat === 'equal').length < 1 && safety < 50) {
-                    safety++;
-                    const d = pick(dPool);
-                    const key = d + '/' + d;
-                    if (!seen.has(key)) { seen.add(key); expressions.push({ n: d, d, cat: 'equal' }); }
-                }
-                safety = 0;
-                while (expressions.length < totalCount && safety < 200) {
-                    safety++;
-                    const d = pick(dPool);
-                    const cat = pick(['larger', 'smaller', 'equal']);
-                    let n;
-                    if (cat === 'larger') n = rng(d + 1, d * 2);
-                    else if (cat === 'smaller') n = rng(1, d - 1);
-                    else n = d;
-                    const key = n + '/' + d;
-                    if (!seen.has(key)) { seen.add(key); expressions.push({ n, d, cat }); }
-                }
-                const tilesArr = shuffle(expressions);
-                const tiles = tilesArr.map((e, i) => ({ id: 't' + i, label: `${e.n}/${e.d} × ${whole}` }));
-                const ans = {};
-                tilesArr.forEach((e, i) => {
-                    ans['t' + i] = e.cat === 'larger' ? 'binL' : e.cat === 'smaller' ? 'binS' : 'binE';
-                });
-                q.text = `Drag each expression into the correct bin (compared to ${whole}).`;
-                q.ans = ans;
-                q.answerType = 'dnd-generic';
-                q.dndMode = 'categorize';
-                q.tiles = tiles;
-                q.bins = [
-                    { id: 'binL', label: `Larger than ${whole}` },
-                    { id: 'binS', label: `Smaller than ${whole}` },
-                    { id: 'binE', label: `Equal to ${whole}` }
-                ];
-                q.hint = `Multiplying by a fraction > 1 grows the number; < 1 shrinks it; = 1 keeps it the same.`;
                 q.options = [];
-                q.printFormat = 'dnd-generic';
-                q.skillLabel = 'Scaling';
+                q.hint = `${a} ÷ ${b} = ${a}/${b}. Cut every whole into ${b} equal parts. Each one gets 1 part of each whole: ${a} parts of size 1/${b}.`;
+                const _adKind = _fModelPick() || 'circle';
+                _fSentenceKit(q, [{ w: a, n: 0, d: b, blank: true }, { w: b, n: 0, d: 1, kind: null }], ['\u00f7'], _adKind,
+                    { mixed: a >= b, wholeMm: _adKind === 'circle' ? 18 : 22, perRow: 3, barH: 9, modelTop: true });
+                // the answer's boxes hold a/b as written (never simplified: 2 / 4 = 2/4)
+                const _adP = q.cell.payload;
+                const _adAns = a >= b ? _fParts(_fracStr(a, b)) : { w: 0, n: a, d: b };
+                _adP.answer = { w: _adAns.w || 0, n: _adAns.n || 0, d: _adAns.d || 1 };
+                _adP.terms[_adP.terms.length - 1] = Object.assign({}, _adP.terms[_adP.terms.length - 1], { n: _adAns.n || 0, d: _adAns.d || 1 });
+                q.visual = fracTwin(_adP);
                 return;
-            } else if (fracSkill === "mult_scaling" && Math.random() < 0.30) {
-                const whole = pick([5, 6, 8, 10, 12]);
-                const correctCount = randInt(2, 3);
-                const totalCount = randInt(5, 6);
-                const dPool = [2, 3, 4, 5, 6, 8];
-                const correctSet = [];
-                const wrongSet = [];
-                const seen = new Set();
-                let safety = 0;
-                while (correctSet.length < correctCount && safety < 200) {
-                    safety++;
-                    const d = pick(dPool);
-                    const n = rng(d + 1, d * 2 + 1);
-                    const key = n + '/' + d;
-                    if (seen.has(key)) continue;
-                    if ((n * whole) / d > whole) {
-                        seen.add(key);
-                        correctSet.push({ n, d });
-                    }
-                }
-                safety = 0;
-                while (wrongSet.length < (totalCount - correctSet.length) && safety < 200) {
-                    safety++;
-                    const d = pick(dPool);
-                    const n = rng(1, d - 1);
-                    const key = n + '/' + d;
-                    if (seen.has(key)) continue;
-                    if ((n * whole) / d <= whole) {
-                        seen.add(key);
-                        wrongSet.push({ n, d });
-                    }
-                }
-                const all = shuffle([...correctSet, ...wrongSet]);
-                const options = all.map((f, i) => ({
-                    id: 'opt' + i,
-                    label: `${f.n}/${f.d} × ${whole}`,
-                    correct: (f.n * whole) / f.d > whole
-                }));
-                const ans = options.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL the results that are LARGER than ${whole}.`;
-                q.ans = ans;
-                q.options = options;
-                q.answerType = 'multi-select-check';
-                q.hint = `When you multiply by a fraction greater than 1, the result is larger than the original number.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Scaling';
-                return;
+
             } else if (fracSkill === "mult_scaling") {
-                // Grade 5: Multiplication as scaling
+                // Grade 5 (5.NF.B.5): multiplication as scaling - without multiplying, is n/d x w
+                // greater than, less than or equal to w? KIT (fractions lane): "3/4 × 6 ( ) 6", the
+                // pupil writes <, > or = in the circle; the fraction is drawn as bars against one
+                // whole, so he sees whether it is less than, equal to or more than 1 (the reason).
                 const d = pick([2, 3, 4, 5, 6, 8]);
                 const n = rng(1, d * 2);
                 const whole = rng(2, 10);
                 const fracVal = n / d;
-                let correctAnswer, explanation;
-
-                if (fracVal > 1) {
-                    correctAnswer = `Greater than ${whole}`;
-                    explanation = `${n}/${d} > 1, so multiplying by it makes the number bigger.`;
-                } else if (fracVal < 1) {
-                    correctAnswer = `Less than ${whole}`;
-                    explanation = `${n}/${d} < 1, so multiplying by it makes the number smaller.`;
-                } else {
-                    correctAnswer = `Equal to ${whole}`;
-                    explanation = `${n}/${d} = 1, so multiplying by it keeps the number the same.`;
-                }
-
+                const sign = fracVal > 1 ? '>' : fracVal < 1 ? '<' : '=';
                 q.text = `Is ${n}/${d} × ${whole} greater than, less than, or equal to ${whole}?`;
-                q.ans = correctAnswer;
-                q.answerType = "multiple-choice";
-                q.options = [`Greater than ${whole}`, `Less than ${whole}`, `Equal to ${whole}`];
-                q.hint = explanation;
-
-                // Visual: number line showing scaling
-                const lineW = 260;
-                const lineY = 50;
-                const product = (n * whole) / d;
-                const maxVal = Math.max(whole, product) * 1.2;
-                const wholeX = 20 + (whole / maxVal) * (lineW - 40);
-                const prodX = 20 + (product / maxVal) * (lineW - 40);
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Multiplication as Scaling</div>
-                    <div style="font-size:1.2rem;margin-bottom:14px;">
-                        ${fracHTML(n, d, 'xl')} <span style="margin:0 6px;">×</span> <span style="font-size:1.5rem;font-weight:700;">${whole}</span>
-                        <span style="margin:0 8px;">is</span>
-                        <span style="color:var(--accent-green);font-weight:700;">?</span>
-                    </div>
-                    <svg width="${lineW}" height="90" viewBox="0 0 ${lineW} 90" style="display:block;margin:0 auto;">
-                        <line x1="20" y1="${lineY}" x2="${lineW - 20}" y2="${lineY}" stroke="var(--text-bright)" stroke-width="2"/>
-                        <line x1="20" y1="${lineY - 5}" x2="20" y2="${lineY + 5}" stroke="var(--text-bright)" stroke-width="2"/>
-                        <text x="20" y="${lineY + 18}" text-anchor="middle" fill="var(--text-bright)" font-size="11">0</text>
-                        <!-- original number -->
-                        <circle cx="${wholeX}" cy="${lineY}" r="5" fill="var(--accent-cyan)"/>
-                        <text x="${wholeX}" y="${lineY - 10}" text-anchor="middle" fill="var(--accent-cyan)" font-size="12" font-weight="bold">${whole}</text>
-                        <!-- scaled result hint area -->
-                        <text x="${lineW / 2}" y="20" text-anchor="middle" fill="var(--text-bright)" font-size="11">${n}/${d} ${fracVal > 1 ? '> 1' : fracVal < 1 ? '< 1' : '= 1'}</text>
-                    </svg>
-                    <div style="margin-top:6px;font-size:0.85rem;color:var(--text-bright);">If the fraction is less than 1, the product is <em>smaller</em>. If greater than 1, the product is <em>bigger</em>.</div>
-                </div>`;
+                q.ans = sign;
+                q.answerType = 'symbol';
+                q.options = [];
+                q.hint = fracVal > 1 ? `${n}/${d} is more than 1 whole, so ${n}/${d} × ${whole} is more than ${whole}.`
+                    : fracVal < 1 ? `${n}/${d} is less than 1 whole, so ${n}/${d} × ${whole} is less than ${whole}.`
+                        : `${n}/${d} is 1 whole, so ${n}/${d} × ${whole} is ${whole}.`;
+                const _msKind = _fPicturesOff() ? null : 'bar';
+                q.fractionModel = _msKind;
+                // the fraction's bars above (one whole each, a value past 1 runs into a second
+                // bar), the comparison on one line under them
+                _fKit(q, { task: 'sign', terms: [{ n, d, kind: _msKind }, { w: whole, n: 0, d: 1 }, { w: whole, n: 0, d: 1 }],
+                    joins: ['\u00d7', 'sign'], answer: { sign }, wholeMm: 30, perRow: 2, barH: 11, modelTop: !!_msKind });
                 return;
 
-            } else if (fracSkill === "frac_mult_word" && Math.random() < 0.25) {
-                // Phase 4.5 batch 12: multi-select-check variant — click ALL the numbers needed to solve
-                const ageD = rng(7, 13);
-                const minutesD = rng(10, 50);
-                const variant = randInt(0, 3);
-                let textStr, neededLabels;
-                if (variant === 0) {
-                    const dF = pick([2, 3, 4]);
-                    const nF = rng(1, dF - 1);
-                    const batchesF = rng(2, 5);
-                    textStr = `A ${ageD}-year-old baker has a recipe that needs ${nF}/${dF} cup of flour and bakes for ${minutesD} minutes. You want to make ${batchesF} batches. How much flour do you need?`;
-                    neededLabels = [`${nF}/${dF}`, String(batchesF)];
-                } else if (variant === 1) {
-                    const dF = pick([3, 4, 5, 6]);
-                    const nF = rng(1, dF - 1);
-                    const totalF = rng(2, 6);
-                    textStr = `Each serving uses ${nF}/${dF} of a liter of juice. A pitcher costs $${ageD} and the meal lasts ${minutesD} minutes. How much juice is needed for ${totalF} servings?`;
-                    neededLabels = [`${nF}/${dF}`, String(totalF)];
-                } else if (variant === 2) {
-                    const dG1 = pick([2, 3, 4]);
-                    const nG1 = rng(1, dG1 - 1);
-                    const dG2 = pick([2, 3, 4, 5]);
-                    const nG2 = rng(1, dG2 - 1);
-                    textStr = `A garden bed is ${nG1}/${dG1} of a yard long and ${nG2}/${dG2} of a yard wide. The gardener works ${minutesD} minutes a day, ${ageD} days a month. What is the area of the bed?`;
-                    neededLabels = [`${nG1}/${dG1}`, `${nG2}/${dG2}`];
-                } else {
-                    const dR = pick([2, 3, 4, 5, 6]);
-                    const wholeR = rng(2, 5);
-                    textStr = `You have ${wholeR} meters of ribbon and a pair of scissors that costs $${ageD}. After ${minutesD} minutes you cut it into pieces that are each 1/${dR} of a meter long. How many pieces do you get?`;
-                    neededLabels = [String(wholeR), `1/${dR}`];
-                }
-                const distractorLabels = [String(ageD), String(minutesD)];
-                const allLabels = shuffle([
-                    ...neededLabels.map(l => ({ label: l, correct: true })),
-                    ...distractorLabels.map(l => ({ label: l, correct: false }))
-                ]);
-                const opts = allLabels.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = textStr + '\n\nClick ALL the numbers you need to solve this problem.';
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = 'Pick out the fractions and counts that describe the math. Ignore prices, times, and ages.';
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Frac Mult Word';
-                return;
             } else if (fracSkill === "frac_mult_word") {
-                // Grade 5: Fraction multiplication/division word problems
-                const scenarios = [
-                    () => {
-                        const d = pick([2, 3, 4]);
-                        const n = rng(1, d - 1);
-                        const batches = rng(2, 4);
-                        const prodN = n * batches;
-                        return {
-                            text: `A recipe needs ${n}/${d} cup of flour. You want to make ${batches} batches. How much flour do you need?`,
-                            ans: _fracStr(prodN, d),
-                            hint: `${n}/${d} × ${batches} = ${prodN}/${d}. Simplify: ${_fracStr(prodN, d)}.`,
-                            n, d, batches
-                        };
-                    },
-                    () => {
-                        const d = pick([3, 4, 5, 6]);
-                        const n = rng(1, d - 1);
-                        const total = rng(2, 6);
-                        const prodN = n * total;
-                        return {
-                            text: `Each serving uses ${n}/${d} of a liter of juice. How much juice is needed for ${total} servings?`,
-                            ans: _fracStr(prodN, d),
-                            hint: `${n}/${d} × ${total} = ${prodN}/${d} = ${_fracStr(prodN, d)}.`,
-                            n, d, batches: total
-                        };
-                    },
-                    () => {
-                        const d1 = pick([2, 3, 4]);
-                        const n1 = rng(1, d1 - 1);
-                        const d2 = pick([2, 3, 4, 5]);
-                        const n2 = rng(1, d2 - 1);
-                        const pN = n1 * n2;
-                        const pD = d1 * d2;
-                        return {
-                            text: `A garden is ${n1}/${d1} of a yard long and ${n2}/${d2} of a yard wide. What is its area?`,
-                            ans: _fracStr(pN, pD),
-                            hint: `Area = ${n1}/${d1} × ${n2}/${d2} = ${pN}/${pD} = ${_fracStr(pN, pD)} square yards.`,
-                            n: n1, d: d1, batches: 1, n2, d2
-                        };
-                    },
-                    () => {
-                        const d = pick([2, 3, 4, 5, 6]);
-                        const whole = rng(2, 5);
-                        const ans = whole * d;
-                        return {
-                            text: `You have ${whole} meters of ribbon. You cut it into pieces that are each 1/${d} of a meter long. How many pieces do you get?`,
-                            ans: String(ans),
-                            hint: `${whole} ÷ 1/${d} = ${whole} × ${d} = ${ans} pieces.`,
-                            n: 1, d, batches: whole
-                        };
-                    }
-                ];
-                const s = pick(scenarios)();
-
-                q.text = s.text;
-                q.ans = s.ans;
+                // Grade 5 (5.NF.B.6, 5.NF.B.7c): multiply and divide with fractions in a story. KIT
+                // (fractions lane): the story, one sentence per line, over the number sentence it
+                // makes, drawn as the matching skill draws it - equal groups of a fraction, the area
+                // model of a fraction of a fraction, the wholes cut into unit fractions - and the
+                // answer boxes. The _plain twin keeps the story and the sentence without pictures.
+                const kind = pick(['groups', 'servings', 'area', 'cut']);
+                if (kind === 'groups' || kind === 'servings') {
+                    const d = kind === 'groups' ? pick([2, 3, 4]) : pick([3, 4, 5, 6]);
+                    const n = rng(1, d - 1);
+                    const k = kind === 'groups' ? rng(2, 4) : rng(2, 5);
+                    const prodN = n * k;
+                    const text = kind === 'groups'
+                        ? `A recipe needs ${n}/${d} of a cup of flour. You make the recipe ${k} times. How much flour do you need?`
+                        : `Each glass holds ${n}/${d} of a liter of juice. How much juice is in ${k} glasses?`;
+                    q.text = text;
+                    q.ans = _fracStr(prodN, d);
+                    q.acceptedAnswers = [...new Set([q.ans, `${prodN}/${d}`])];
+                    q.hint = `${k} groups of ${n}/${d}: ${k} × ${n}/${d} = ${prodN}/${d} = ${q.ans}.`;
+                    _fSentenceKit(q, [{ w: k, n: 0, d: 1, kind: null }, { n, d, copies: k }], ['\u00d7'], 'bar',
+                        { mixed: prodN >= d, wholeMm: 16, perRow: 3, barH: 9, story: _fStoryLines(text) });
+                } else if (kind === 'area') {
+                    const d1 = pick([2, 3, 4]), n1 = rng(1, d1 - 1);
+                    const d2 = pick([2, 3, 4, 5]), n2 = rng(1, d2 - 1);
+                    const text = `A garden is ${n1}/${d1} of a yard long and ${n2}/${d2} of a yard wide. What is its area in square yards?`;
+                    q.text = text;
+                    q.ans = _fracStr(n1 * n2, d1 * d2);
+                    q.acceptedAnswers = [...new Set([q.ans, `${n1 * n2}/${d1 * d2}`])];
+                    q.hint = `Area = ${n1}/${d1} × ${n2}/${d2} = ${n1 * n2}/${d1 * d2}${q.ans !== `${n1 * n2}/${d1 * d2}` ? ` = ${q.ans}` : ''} square yards.`;
+                    _fSentenceKit(q, [{ n: n1, d: d1, kind: null }, { n: n2, d: d2, kind: null }], ['\u00d7'], 'area',
+                        { area: { rows: d1, cols: d2, shadeRows: n1, markCols: n2, n1, d1, n2, d2, k: 0.8 }, story: _fStoryLines(text) });
+                } else {
+                    const d = pick([2, 3, 4, 5, 6]);
+                    const whole = rng(2, 4);
+                    const ans = whole * d;
+                    const text = `You have ${whole} meters of ribbon. You cut it into pieces 1/${d} of a meter long. How many pieces do you get?`;
+                    q.text = text;
+                    q.ans = String(ans);
+                    q.hint = `${whole} ÷ 1/${d}: each meter makes ${d} pieces. ${whole} × ${d} = ${ans} pieces.`;
+                    _fSentenceKit(q, [{ w: whole, n: 0, d }, { n: 1, d, kind: null }], ['\u00f7'], 'bar',
+                        { wholeMm: 18, perRow: 4, barH: 9, story: _fStoryLines(text), modelTop: true });
+                }
                 q.answerType = "text";
-                q.hint = s.hint;
-
-                const barW = 240;
-                const barH = 26;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Fraction Word Problem</div>
-                    <div style="font-size:1rem;margin-bottom:14px;max-width:340px;margin-left:auto;margin-right:auto;line-height:1.5;">${s.text}</div>
-                    <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
-                        ${Array.from({length: Math.min(s.batches, 6)}, () => _svgBar(s.n, s.d, 70, barH, 'var(--accent-cyan)', 'var(--bg-card)')).join('')}
-                    </div>
-                    <div style="margin-top:10px;font-size:0.85rem;color:var(--accent-green);">= ?</div>
-                </div>`;
+                q.options = [];
                 return;
 
             } else if (fracSkill === "compose_whole" || fracSkill === "compose_target_frac") {
@@ -3885,204 +2853,56 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
             // ==================== END NEW FRACTION SKILLS ====================
 
             } else if (fracSkill === "fraction_of_set" || fracSkill === "fraction_of_set_hard") {
-                // ============================================================
-                // FRACTION OF A SET — variety + uncolored-until-hint visual
-                // ============================================================
-                // Variety:
-                //  - Problem TYPE rotates via per-skill counter so each
-                //    variant (numeric, multi-select, missing-numerator, word)
-                //    appears evenly instead of biasing toward one.
-                //  - Numerator picks uniformly from [1..den-1] (and ~15% of
-                //    the time num == den for "whole" fractions like 4/4 of
-                //    12) so problems are not dominated by 1/N.
-                // Uncolored-until-hint:
-                //  - The on-screen visual renders all tokens NEUTRAL grey
-                //    and tags them with .fos-token + data-fos-idx. showHint()
-                //    in hints-speech.js paints the first (num*mult) tokens
-                //    when the student requests a hint. Print uses
-                //    q.visualPrint (pre-colored) since paper has no hint.
-                // ============================================================
-                if (!window.__skillVariantCounter) window.__skillVariantCounter = {};
-                const _fosCtrKey = `${fracSkill}_typev2`;
-                const _fosCtr = (window.__skillVariantCounter[_fosCtrKey] || 0);
-                window.__skillVariantCounter[_fosCtrKey] = _fosCtr + 1;
-                const _fosVariant = _fosCtr % 4; // 0..3
-
+                // FRACTION OF A SET (3.NF.1, 4.NF.4; WRM Y3.B8.S4-S6). KIT (fractions lane, build
+                // list vis_migrate_fraction_ops): the set drawn as open counters, one row per
+                // equal group (d rows), black and white on paper and screen - the pupil shades
+                // the groups he needs; nothing is shaded for him. Under it the sentence:
+                // "3/4 of 12 = [ ]", "[ ]/4 of 12 = 9", or a short story over "3/4 of 12 = [ ]".
+                // (The legacy item also asked the pupil to CLICK emoji: a screen-only task.)
+                const _fosVariant = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant(fracSkill + '_kit', ['numeric', 'missing', 'word'])
+                    : pick(['numeric', 'missing', 'word']);
+                q._variant = _fosVariant;
                 // Pick denominator: hard biases toward larger denoms.
                 const fosDenomPool = fracSkill === "fraction_of_set_hard" ? [3, 4, 5, 6, 6, 8] : [2, 3, 4, 5, 6];
                 const fosDen = pick(fosDenomPool);
                 // Numerator uniform in [1..den-1]; ~15% chance num == den.
-                let fosNum;
-                if (Math.random() < 0.15) {
-                    fosNum = fosDen;
-                } else {
-                    fosNum = rng(1, fosDen - 1);
-                }
+                let fosNum = Math.random() < 0.15 ? fosDen : rng(1, fosDen - 1);
                 // For HARD: avoid trivial 1/N most of the time.
-                if (fracSkill === "fraction_of_set_hard" && fosNum === 1 && Math.random() < 0.6) {
-                    fosNum = rng(2, fosDen - 1);
-                }
-
-                // ---------- VARIANT 1: multi-select (click N emojis) ----
-                if (_fosVariant === 1) {
-                    const minMult = Math.max(2, Math.ceil(6 / fosDen));
-                    const maxMult = Math.max(minMult, Math.min(Math.floor(12 / fosDen), 4));
-                    const fosMS_mult = rng(minMult, maxMult);
-                    const fosMS_total = fosDen * fosMS_mult;
-                    const correctCount = Math.min(fosNum, fosDen) * fosMS_mult;
-                    const emojis = ['🍎','🐱','⭐','🍌','🐶','🚗','🍕','🐠','🌸','🎈'];
-                    const emoji = pick(emojis);
-                    const opts = [];
-                    for (let i = 0; i < fosMS_total; i++) {
-                        opts.push({ id: 'opt' + i, label: emoji, correct: i < correctCount });
-                    }
-                    const ans = opts.filter(o => o.correct).map(o => o.id);
-                    q.text = `Click ${fosNum}/${fosDen} of the ${emoji}.`;
-                    q.answerType = 'multi-select-check';
-                    q.options = opts;
-                    q.ans = ans;
-                    q.minCorrect = correctCount;
-                    q.hint = `${fosNum}/${fosDen} of ${fosMS_total} = ${correctCount}. Click ${correctCount} ${emoji}.`;
-                    q.printFormat = 'multi-select';
-                    q.skillLabel = 'Fraction of Set';
-                    return;
-                }
-
-                // Numeric / missing-num / word variants share the same visual.
-                const fosMultMax = Math.max(3, Math.min(Math.floor(range / fosDen), 12));
+                if (fracSkill === "fraction_of_set_hard" && fosNum === 1 && Math.random() < 0.6) fosNum = rng(2, fosDen - 1);
+                // The set stays countable: at most 10 in a group, 40 in all (RP-3).
+                const fosMultMax = Math.max(2, Math.min(Math.floor(range / fosDen), Math.floor(40 / fosDen), fracSkill === "fraction_of_set_hard" ? 8 : 6));
                 const fosMultiplier = rng(2, fosMultMax);
                 const fosTotal = fosDen * fosMultiplier;
                 const fosAnswer = fosNum * fosMultiplier;
-
-                if (_fosVariant === 2 && fosNum < fosDen) {
-                    // ---------- VARIANT 2: missing numerator -------------
+                let _fosAm;
+                if (_fosVariant === 'missing' && fosNum < fosDen) {
                     q.text = `?/${fosDen} of ${fosTotal} = ${fosAnswer}. Find the missing numerator.`;
                     q.ans = fosNum;
-                    q.answerType = "number";
-                    q.options = buildNumericOptions(fosNum);
                     q.hint = `Each group has ${fosTotal} ÷ ${fosDen} = ${fosMultiplier}. ${fosAnswer} ÷ ${fosMultiplier} = ${fosNum} groups.`;
-                } else if (_fosVariant === 3) {
-                    // ---------- VARIANT 3: word problem -----------------
+                    _fosAm = { ask: 'num', answer: { value: fosNum } };
+                } else if (_fosVariant === 'word') {
                     const wpItems = pick(["marbles", "stickers", "crayons", "cookies", "buttons", "beads", "apples", "stars"]);
                     const wpColor = pick(["blue", "red", "green", "yellow", "purple", "orange"]);
-                    q.text = `There are ${fosTotal} ${wpItems}. ${fosNum}/${fosDen} are ${wpColor}. How many ${wpColor} ${wpItems}?`;
+                    const story = [`There are ${fosTotal} ${wpItems}.`, `${fosNum}/${fosDen} of them are ${wpColor}.`, `How many are ${wpColor}?`];
+                    q.text = story.join(' ');
                     q.ans = fosAnswer;
-                    q.answerType = "number";
-                    q.options = buildNumericOptions(fosAnswer);
                     q.hint = `Find ${fosNum}/${fosDen} of ${fosTotal}: ${fosTotal} ÷ ${fosDen} = ${fosMultiplier}, then × ${fosNum} = ${fosAnswer}.`;
+                    _fosAm = { ask: 'part', answer: { value: fosAnswer }, story };
                 } else {
-                    // ---------- VARIANT 0: plain numeric ----------------
                     q.text = `What is ${fosNum}/${fosDen} of ${fosTotal}?`;
                     q.ans = fosAnswer;
-                    q.answerType = "number";
-                    q.options = buildNumericOptions(fosAnswer);
                     q.hint = fosNum === 1
                         ? `Divide ${fosTotal} into ${fosDen} equal groups. Each group has ${fosTotal} ÷ ${fosDen} = ${fosMultiplier} objects.`
                         : `Divide ${fosTotal} into ${fosDen} equal groups (${fosMultiplier} each), then take ${fosNum} groups: ${fosNum} × ${fosMultiplier} = ${fosAnswer}.`;
+                    _fosAm = { ask: 'part', answer: { value: fosAnswer } };
                 }
-
-                // ============================================================
-                // VISUAL — render TWO variants:
-                //   q.visual       → on-screen, all tokens NEUTRAL grey
-                //   q.visualPrint  → for print, first (num*mult) tokens COLORED
-                // showHint() in hints-speech.js paints the screen tokens when
-                // the student requests a hint (see fos-token tagging).
-                // Layout: ONE row per group (denominator = rows, multiplier =
-                // columns). For wide rows (multiplier > 14) wrap into 2-row
-                // bands per group so the visual stays readable.
-                // ============================================================
-                const fosCircleSize = 52;
-                const fosGap = 8;
-                const fosRowGap = 18;
-                const fosWide = fosMultiplier > 14;
-                const fosCols = fosWide ? Math.ceil(fosMultiplier / 2) : fosMultiplier;
-                const fosBandRows = fosWide ? 2 : 1;
-                const fosTotalRows = fosDen * fosBandRows;
-                const fosSvgW = fosCols * (fosCircleSize + fosGap) + fosGap;
-                const fosSvgH = fosTotalRows * (fosCircleSize + fosGap) + (fosDen - 1) * fosRowGap + fosGap;
-                // Shaded groups: clamp at fosDen so num==den shades all.
-                const fosShadeGroups = Math.min(fosNum, fosDen);
-                const fosHighlightCount = fosShadeGroups * fosMultiplier;
-
-                // Build circles. `colored` = false → screen (all neutral),
-                // true → print (first num*mult tokens highlighted). Tokens
-                // carry .fos-token + data-fos-idx so showHint() can re-paint
-                // them on the screen variant.
-                const _buildFosCircles = (colored) => {
-                    let html = '';
-                    let idx = 0;
-                    for (let fg = 0; fg < fosDen; fg++) {
-                        const inHighlightGroup = fg < fosShadeGroups;
-                        const fhighlighted = colored && inHighlightGroup;
-                        for (let fi = 0; fi < fosMultiplier; fi++) {
-                            const fcolInBand = fi % fosCols;
-                            const frowInBand = Math.floor(fi / fosCols);
-                            const fcx = fosGap + fcolInBand * (fosCircleSize + fosGap) + fosCircleSize / 2;
-                            const fcy = fosGap + (fg * fosBandRows + frowInBand) * (fosCircleSize + fosGap) + fg * fosRowGap + fosCircleSize / 2;
-                            const fill = fhighlighted ? 'var(--accent-cyan)' : 'var(--bg-card)';
-                            const stroke = fhighlighted ? 'var(--accent-green)' : 'var(--text-bright)';
-                            const opacity = fhighlighted ? 1 : 0.55;
-                            html += `<circle class="fos-token" data-fos-idx="${idx}" data-fos-group="${fg}" data-fos-highlight="${inHighlightGroup ? 1 : 0}" cx="${fcx}" cy="${fcy}" r="${fosCircleSize / 2 - 1}" fill="${fill}" stroke="${stroke}" stroke-width="${STROKE.normal}" opacity="${opacity}"/>`;
-                            idx++;
-                        }
-                    }
-                    return html;
-                };
-
-                const _buildFosGroupLabels = (colored) => {
-                    let html = '';
-                    for (let fg = 0; fg < fosDen; fg++) {
-                        const flbY = fosGap + (fg * fosBandRows + (fosBandRows - 1) / 2) * (fosCircleSize + fosGap) + fg * fosRowGap + fosCircleSize / 2 + 4;
-                        const isOn = colored && fg < fosShadeGroups;
-                        html += `<text class="fos-label" data-fos-group="${fg}" x="-6" y="${flbY}" text-anchor="end" font-family="${FONTS.sans}" font-size="13" font-weight="700" fill="${isOn ? 'var(--accent-green)' : 'var(--text-dim)'}" opacity="${isOn ? 1 : 0.6}">${fg + 1}</text>`;
-                    }
-                    return html;
-                };
-
-                let fosGroupLines = '';
-                for (let fg = 1; fg < fosDen; fg++) {
-                    const fly = fosGap + fg * fosBandRows * (fosCircleSize + fosGap) + (fg - 1) * fosRowGap + fosRowGap / 2;
-                    fosGroupLines += `<line x1="0" y1="${fly}" x2="${fosSvgW}" y2="${fly}" stroke="var(--accent-orange)" stroke-width="${STROKE.normal}" stroke-dasharray="5,3" opacity="0.6"/>`;
-                }
-
-                const _buildFosShadeBands = (colored) => {
-                    if (!colored) return '';
-                    let html = '';
-                    for (let fg = 0; fg < fosShadeGroups; fg++) {
-                        const fbandY = fosGap + fg * fosBandRows * (fosCircleSize + fosGap) + fg * fosRowGap - fosRowGap / 2;
-                        const fbandH = fosBandRows * (fosCircleSize + fosGap) + fosRowGap - fosGap;
-                        html += `<rect class="fos-shade-band" data-fos-group="${fg}" x="-30" y="${Math.max(0, fbandY)}" width="${fosSvgW + 30}" height="${fbandH}" fill="var(--accent-cyan)" opacity="0.07" rx="6"/>`;
-                    }
-                    return html;
-                };
-
-                // For variant 2 (missing numerator) hide the X/Y label since
-                // it would reveal the answer. Show "?/Y of Z = ANSWER" instead.
-                const fosHeaderInner = (_fosVariant === 2 && fosNum < fosDen)
-                    ? `<span style="color:var(--accent-cyan);font-weight:700;">?/${fosDen}</span> of <span style="color:var(--accent-orange);font-weight:700;">${fosTotal}</span> = <span style="color:var(--accent-green);font-weight:700;">${fosAnswer}</span>`
-                    : `<span style="color:var(--accent-cyan);font-weight:700;">${fosNum}/${fosDen}</span> of <span style="color:var(--accent-orange);font-weight:700;">${fosTotal}</span>`;
-                const fosHeaderHTML = `<div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Fraction of a Set</div>
-                    <div style="font-size:1.3rem;margin-bottom:12px;font-weight:600;">
-                        ${fosHeaderInner}
-                    </div>`;
-
-                const _buildFosVisual = (colored) => `<div class="fos-visual" data-fos-num="${fosNum}" data-fos-den="${fosDen}" data-fos-mult="${fosMultiplier}" data-fos-total="${fosTotal}" data-fos-highlight-count="${fosHighlightCount}" style="text-align:center;">
-                    ${fosHeaderHTML}
-                    <svg width="${fosSvgW + 30}" height="${fosSvgH}" viewBox="-30 0 ${fosSvgW + 30} ${fosSvgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:100%;height:auto;">
-                        ${_buildFosShadeBands(colored)}
-                        ${fosGroupLines}
-                        ${_buildFosGroupLabels(colored)}
-                        ${_buildFosCircles(colored)}
-                    </svg>
-                    <div style="margin-top:10px;font-size:0.95rem;color:var(--text-bright);">
-                        <strong>${fosDen}</strong> equal groups of <strong>${fosMultiplier}</strong> &middot; ${fosTotal} objects total
-                    </div>
-                </div>`;
-
-                q.visual = _buildFosVisual(false);       // SCREEN: neutral
-                q.visualPrint = _buildFosVisual(true);   // PRINT: pre-colored
+                q.answerType = "number";
+                q.options = [];
                 q.printFormat = 'fraction-of-set';
                 q.skillLabel = 'Frac of Set';
+                _fKit(q, Object.assign({ task: 'amount', pic: 'set', n: fosNum, d: fosDen, total: fosTotal, part: fosAnswer }, _fosAm));
+                return;
             } else if (fracSkill === "equiv_frac_visual") {
                 // Equivalent Fractions Visual — 4 problem types
                 const efvBaseDens = [2, 3, 4, 5, 6];
@@ -4205,178 +3025,75 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = 'equiv-frac-visual';
                 q.skillLabel = 'Equiv Frac (Visual)';
 
-            } else if (fracSkill === "equiv_frac_nv" && Math.random() < 0.30) {
-                // Phase 4.5 batch 2: dnd-categorize variant — sort 6 fractions by equivalence to 1/2
-                const targetN = 1, targetD = 2;
-                const targetVal = 0.5;
-                const correctCount = randInt(2, 3);
-                const wrongCount = 6 - correctCount;
-                const seen = new Set();
-                seen.add(targetN + '/' + targetD);
-                const correctSet = [];
-                let safety = 0;
-                while (correctSet.length < correctCount && safety < 60) {
-                    safety++;
-                    const m = pick([2, 3, 4, 5, 6]);
-                    const key = (targetN * m) + '/' + (targetD * m);
-                    if (!seen.has(key)) {
-                        seen.add(key);
-                        correctSet.push({ n: targetN * m, d: targetD * m });
-                    }
-                }
-                const wrongSet = [];
-                safety = 0;
-                while (wrongSet.length < wrongCount && safety < 200) {
-                    safety++;
-                    const d = pick([3, 4, 5, 6, 7, 8, 9, 10, 12]);
-                    const n = rng(1, d - 1);
-                    const v = n / d;
-                    const key = n + '/' + d;
-                    if (!seen.has(key) && Math.abs(v - targetVal) > 1e-9) {
-                        seen.add(key);
-                        wrongSet.push({ n, d });
-                    }
-                }
-                // Guaranteed: pools always yield at least 1 each. Force minimum if generation was sparse.
-                if (correctSet.length === 0) correctSet.push({ n: 2, d: 4 });
-                if (wrongSet.length === 0) wrongSet.push({ n: 1, d: 3 });
-                const all = shuffle([...correctSet, ...wrongSet]);
-                const tiles = all.map((f, i) => ({ id: 't' + i, label: f.n + '/' + f.d }));
-                const ans = {};
-                all.forEach((f, i) => {
-                    ans['t' + i] = Math.abs(f.n / f.d - targetVal) < 1e-9 ? 'binEq' : 'binNot';
-                });
-                q.text = `Drag each fraction into the correct bin.`;
-                q.ans = ans;
-                q.answerType = 'dnd-generic';
-                q.dndMode = 'categorize';
-                q.tiles = tiles;
-                q.bins = [
-                    { id: 'binEq', label: 'Equal to 1/2' },
-                    { id: 'binNot', label: 'NOT equal to 1/2' }
-                ];
-                q.hint = `Reduce each fraction. If it simplifies to 1/2, it's equivalent.`;
-                q.options = [];
-                q.printFormat = 'dnd-generic';
-                q.skillLabel = 'Equiv Frac (NV)';
-                return;
-            } else if (fracSkill === "equiv_frac_nv" && Math.random() < 0.30) {
+            } else if (fracSkill === "equiv_frac_nv") {
+                // Equivalent fractions, numbers only (3.NF.A.3b, 4.NF.A.1; WRM Y4.B7.S10, Y5.B4.S1).
+                // KIT (fractions lane, vis_migrate_fraction_ops): four forms, one thing each -
+                //   up    2/3 = [ ]/12   (missing numerator, multiply up)
+                //   upD   2/3 = 8/[ ]    (missing denominator, multiply up)
+                //   same  2/3 ( ) 8/12   (= or ≠ in the circle; the ≠ pairs are the real errors)
+                //   down  8/12 = [ ]/3   (divide down)
+                // with operator arcs (× n / ÷ n over the numerators and under the denominators) as
+                // the `opArcs` option. The old drag-into-bins and "click ALL" forms were legacy print
+                // and were dropped: the = / ≠ form asks the same question one pair at a time.
+                const nvForm = window.pickVariant
+                    ? window.pickVariant('equiv_frac_nv', ['up', 'upD', 'same', 'down'])
+                    : pick(['up', 'upD', 'same', 'down']);
+                const _nvArcsOpt = (state.skillOptions && state.skillOptions.opArcs) || 'blank';
+                const _nvArcs = (op, k) => (_nvArcsOpt === 'none' ? null : { op, k, show: _nvArcsOpt === 'value' ? 'value' : 'blank' });
                 const baseDen = pick([2, 3, 4, 5, 6]);
                 const baseNum = rng(1, baseDen - 1);
-                const baseVal = baseNum / baseDen;
-                const correctCount = randInt(2, 3);
-                const wrongCount = randInt(3, 5);
-                const correctSet = [];
-                const seen = new Set();
-                seen.add(baseNum + '/' + baseDen);
-                let safety = 0;
-                while (correctSet.length < correctCount && safety < 50) {
-                    safety++;
-                    const m = pick([2, 3, 4, 5]);
-                    const key = (baseNum * m) + '/' + (baseDen * m);
-                    if (!seen.has(key)) {
-                        seen.add(key);
-                        correctSet.push({ n: baseNum * m, d: baseDen * m });
-                    }
-                }
-                const wrongSet = [];
-                safety = 0;
-                while (wrongSet.length < wrongCount && safety < 200) {
-                    safety++;
-                    const d = pick([2, 3, 4, 5, 6, 7, 8, 9, 10, 12]);
-                    const n = rng(1, d - 1);
-                    const v = n / d;
-                    const key = n + '/' + d;
-                    if (!seen.has(key) && Math.abs(v - baseVal) > 1e-9) {
-                        seen.add(key);
-                        wrongSet.push({ n, d });
-                    }
-                }
-                const all = shuffle([...correctSet, ...wrongSet]);
-                const options = all.map((f, i) => ({
-                    id: 'opt' + i,
-                    label: f.n + '/' + f.d,
-                    correct: Math.abs(f.n / f.d - baseVal) < 1e-9
-                }));
-                const ans = options.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL the fractions equivalent to ${baseNum}/${baseDen}.`;
-                q.ans = ans;
-                q.options = options;
-                q.answerType = 'multi-select-check';
-                q.hint = `Equivalent fractions reduce to the same value. Multiply or divide top and bottom by the same number.`;
-                q.printFormat = 'multi-select';
+                const m = pick([2, 3, 4]);
+                const eqNum = baseNum * m, eqDen = baseDen * m;
+                q.options = [];
                 q.skillLabel = 'Equiv Frac (NV)';
-                return;
-            } else if (fracSkill === "equiv_frac_nv") {
-                // Equivalent Fractions Non-Visual — 3 problem types
-                const efnvBaseDens = [2, 3, 4, 5, 6];
-                const efnvBaseDen = pick(efnvBaseDens);
-                const efnvBaseNum = rng(1, efnvBaseDen - 1);
-                const efnvMultiplier = pick([2, 3, 4]);
-                const efnvEquivNum = efnvBaseNum * efnvMultiplier;
-                const efnvEquivDen = efnvBaseDen * efnvMultiplier;
-
-                const efnvRoll = Math.random();
-                if (efnvRoll < 0.40) {
-                    // Type 1: Are these equivalent? yes/no
-                    const efnvIsEquiv = Math.random() < 0.5;
-                    let efnvNum2 = efnvEquivNum;
-                    let efnvDen2 = efnvEquivDen;
-                    if (!efnvIsEquiv) {
-                        // Generate meaningful non-equivalent distractor
-                        const nvStrategies = [
-                            // Add to both num and den (common student error)
-                            { fn: () => ({ n: efnvBaseNum + efnvMultiplier, d: efnvBaseDen + efnvMultiplier }),
-                              msg: "Looks like you added the same number to the top and bottom — that does NOT make an equivalent fraction. Multiply (or divide) the top and bottom by the same number instead." },
-                            // Multiply only numerator (forget denominator)
-                            { fn: () => ({ n: efnvEquivNum, d: efnvBaseDen }),
-                              msg: "Only the top number was changed. To stay equivalent you must apply the SAME operation to BOTH the numerator and denominator." },
-                            // Multiply only denominator (forget numerator)
-                            { fn: () => ({ n: efnvBaseNum, d: efnvEquivDen }),
-                              msg: "Only the bottom number was changed. To stay equivalent you must apply the SAME operation to BOTH the numerator and denominator." },
-                            // Use different multiplier for numerator
-                            { fn: () => {
-                                const altMult = efnvMultiplier === 2 ? 3 : 2;
-                                return { n: efnvBaseNum * altMult, d: efnvEquivDen };
-                            },
-                              msg: "Different multipliers were used on the top and bottom. The SAME number must multiply both for the fractions to be equivalent." }
+                if (nvForm === 'same') {
+                    const isEquiv = Math.random() < 0.5;
+                    let n2 = eqNum, d2 = eqDen;
+                    if (!isEquiv) {
+                        // the ≠ pair is a real error: the same number ADDED to both parts, only one
+                        // part multiplied, or two different multipliers.
+                        const errs = [
+                            () => [baseNum + m, baseDen + m],
+                            () => [eqNum, baseDen],
+                            () => [baseNum, eqDen],
+                            () => [baseNum * (m === 2 ? 3 : 2), eqDen],
                         ];
-                        const strategy = pick(nvStrategies);
-                        const distractor = strategy.fn();
-                        efnvNum2 = Math.max(1, Math.min(distractor.d - 1, distractor.n));
-                        efnvDen2 = Math.max(2, distractor.d);
-                        if (efnvNum2 / efnvDen2 === efnvBaseNum / efnvBaseDen) {
-                            efnvNum2 = Math.max(1, Math.min(efnvDen2 - 1, efnvNum2 + 1));
-                        }
-                        // Correct answer is "no"; "yes" is the wrong pick — tag it.
-                        if (typeof window !== 'undefined' && typeof window.tagDistractor === 'function') {
-                            window.tagDistractor(q, "yes", strategy.msg);
-                        }
+                        [n2, d2] = pick(errs)();
+                        if (n2 >= d2) [n2, d2] = [baseNum + m, baseDen + m];
+                        if (n2 * baseDen === baseNum * d2) n2 += 1;
                     }
-                    q.text = `Are ${efnvBaseNum}/${efnvBaseDen} and ${efnvNum2}/${efnvDen2} equivalent fractions? (yes or no)`;
-                    q.ans = efnvIsEquiv ? "yes" : "no";
-                    q.answerType = "text";
-                    q.hint = efnvIsEquiv
-                        ? `Multiply ${efnvBaseNum}/${efnvBaseDen} by ${efnvMultiplier}/${efnvMultiplier} to get ${efnvEquivNum}/${efnvEquivDen}. They are equal!`
-                        : `Cross multiply: ${efnvBaseNum} × ${efnvDen2} = ${efnvBaseNum * efnvDen2} but ${efnvNum2} × ${efnvBaseDen} = ${efnvNum2 * efnvBaseDen}. They are NOT equal.`;
-                    q.fractionData = { num1: efnvBaseNum, den1: efnvBaseDen, num2: efnvNum2, den2: efnvDen2, isEquivalent: efnvIsEquiv, missingPart: null };
-                } else if (efnvRoll < 0.75) {
-                    // Type 2: Find missing numerator
-                    q.text = `Find the missing number: ${efnvBaseNum}/${efnvBaseDen} = ?/${efnvEquivDen}`;
-                    q.ans = efnvEquivNum;
-                    q.answerType = "number";
-                    q.hint = `The denominator was multiplied by ${efnvMultiplier} (${efnvBaseDen} × ${efnvMultiplier} = ${efnvEquivDen}), so multiply the numerator by ${efnvMultiplier} too: ${efnvBaseNum} × ${efnvMultiplier} = ${efnvEquivNum}.`;
-                    q.fractionData = { num1: efnvBaseNum, den1: efnvBaseDen, num2: efnvEquivNum, den2: efnvEquivDen, isEquivalent: true, missingPart: "num2" };
-                } else {
-                    // Type 3: Find missing denominator
-                    q.text = `Find the missing number: ${efnvBaseNum}/${efnvBaseDen} = ${efnvEquivNum}/?`;
-                    q.ans = efnvEquivDen;
-                    q.answerType = "number";
-                    q.hint = `The numerator was multiplied by ${efnvMultiplier} (${efnvBaseNum} × ${efnvMultiplier} = ${efnvEquivNum}), so multiply the denominator by ${efnvMultiplier} too: ${efnvBaseDen} × ${efnvMultiplier} = ${efnvEquivDen}.`;
-                    q.fractionData = { num1: efnvBaseNum, den1: efnvBaseDen, num2: efnvEquivNum, den2: efnvEquivDen, isEquivalent: true, missingPart: "den2" };
+                    q.text = `Are ${baseNum}/${baseDen} and ${n2}/${d2} equivalent? Write = or \u2260.`;
+                    q.ans = isEquiv ? '=' : '\u2260';
+                    q.answerType = 'symbol';
+                    q.hint = isEquiv
+                        ? `Multiply the top and the bottom of ${baseNum}/${baseDen} by ${m}: you get ${eqNum}/${eqDen}.`
+                        : `Multiply the top and the bottom of ${baseNum}/${baseDen} by the same number. Can you get ${n2}/${d2}?`;
+                    _fKit(q, { task: 'sign', terms: [{ n: baseNum, d: baseDen }, { n: n2, d: d2 }], joins: ['sign'], signs: ['=', '\u2260'], answer: { sign: q.ans } });
+                    return;
                 }
-                q.printFormat = 'equiv-frac-nv';
-                q.skillLabel = 'Equiv Frac (NV)';
+                q.answerType = 'number';
+                if (nvForm === 'down') {
+                    q.text = `Find the missing number: ${eqNum}/${eqDen} = ?/${baseDen}`;
+                    q.ans = baseNum;
+                    q.hint = `The denominator was divided by ${m} (${eqDen} \u00f7 ${m} = ${baseDen}), so divide the numerator by ${m} too: ${eqNum} \u00f7 ${m} = ${baseNum}.`;
+                    _fKit(q, { task: 'op', terms: [{ n: eqNum, d: eqDen }, { n: baseNum, d: baseDen, frac: 'n' }], joins: ['='],
+                        answer: { n: baseNum, d: baseDen }, arcs: _nvArcs('\u00f7', m) });
+                    return;
+                }
+                if (nvForm === 'upD') {
+                    q.text = `Find the missing number: ${baseNum}/${baseDen} = ${eqNum}/?`;
+                    q.ans = eqDen;
+                    q.hint = `The numerator was multiplied by ${m} (${baseNum} \u00d7 ${m} = ${eqNum}), so multiply the denominator by ${m} too: ${baseDen} \u00d7 ${m} = ${eqDen}.`;
+                    _fKit(q, { task: 'op', terms: [{ n: baseNum, d: baseDen }, { n: eqNum, d: eqDen, frac: 'd' }], joins: ['='],
+                        answer: { n: eqNum, d: eqDen }, arcs: _nvArcs('\u00d7', m) });
+                    return;
+                }
+                q.text = `Find the missing number: ${baseNum}/${baseDen} = ?/${eqDen}`;
+                q.ans = eqNum;
+                q.hint = `The denominator was multiplied by ${m} (${baseDen} \u00d7 ${m} = ${eqDen}), so multiply the numerator by ${m} too: ${baseNum} \u00d7 ${m} = ${eqNum}.`;
+                _fKit(q, { task: 'op', terms: [{ n: baseNum, d: baseDen }, { n: eqNum, d: eqDen, frac: 'n' }], joins: ['='],
+                    answer: { n: eqNum, d: eqDen }, arcs: _nvArcs('\u00d7', m) });
+                return;
 
             } else if (fracSkill === "order_fractions" && Math.random() < 0.30) {
                 // Phase 4.5 batch 2: dnd-order modernization of legacy "interactive ordering"
@@ -5258,71 +3975,45 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = 'Equiv Fractions';
                 return;
             } else if (fracSkill === "equivalent") {
+                // Equivalent fractions, numbers only (3.NF.A.3b, 4.NF.A.1; WRM Y5.B4.S1-S2). KIT
+                // (fractions lane): "2/3 = [ ]/12" with OPERATOR ARCS (build list vis_operator_arcs):
+                // an arc over the numerators and one under the denominators, each "× [ ]" for the
+                // pupil to fill (or "× 4" shown, the hint; or no arcs) - the `opArcs` option. The
+                // yes / no form writes = or ≠ in the circle between the two fractions.
                 const eqVariant = window.pickVariant
-                    ? window.pickVariant('equivalent', ['standard', 'yesNoEquiv', 'multiSelectHalf'], state)
+                    ? window.pickVariant('equivalent', ['standard', 'yesNoEquiv', 'multiSelectHalf'])
                     : pick(['standard', 'yesNoEquiv', 'multiSelectHalf']);
+                const _eqArcsOpt = (state.skillOptions && state.skillOptions.opArcs) || 'blank';
+                const _eqArcs = (op, k) => (_eqArcsOpt === 'none' ? null : { op, k, show: _eqArcsOpt === 'value' ? 'value' : 'blank' });
+                q.skillLabel = 'Equivalent Fractions';
+                q.options = [];
                 if (eqVariant === 'yesNoEquiv') {
-                    // Yes/no: are these two fractions equivalent?
+                    // = or not equal: are these two fractions equivalent?
                     const baseDen = pick([2, 3, 4, 5, 6]);
                     const baseNum = rng(1, baseDen - 1);
                     const isEquiv = Math.random() < 0.5;
-                    let n2, d2;
-                    if (isEquiv) {
-                        const m = rng(2, 4);
-                        n2 = baseNum * m;
-                        d2 = baseDen * m;
-                    } else {
-                        // Make a non-equivalent: tweak numerator or denominator
-                        const m = rng(2, 4);
-                        if (Math.random() < 0.5) {
-                            n2 = baseNum * m + 1;
-                            d2 = baseDen * m;
-                        } else {
-                            n2 = baseNum * m;
-                            d2 = baseDen * m + 1;
-                        }
-                        // Ensure not accidentally equivalent
-                        if (baseNum * d2 === n2 * baseDen) {
-                            n2 = baseNum * m + 1;
-                            d2 = baseDen * m;
-                        }
+                    const m = rng(2, 4);
+                    let n2 = baseNum * m, d2 = baseDen * m;
+                    if (!isEquiv) {
+                        // a near miss: one part changed (the common error: only one part multiplied)
+                        if (Math.random() < 0.5) n2 += 1; else d2 += 1;
+                        if (baseNum * d2 === n2 * baseDen) n2 += 1;
                     }
-                    q.text = `Are ${baseNum}/${baseDen} and ${n2}/${d2} equivalent?`;
-                    q.ans = isEquiv ? 'Yes' : 'No';
-                    q.answerType = 'multiple-choice';
-                    q.options = ['Yes', 'No'];
-                    q.hint = `Cross-multiply: if ${baseNum} × ${d2} equals ${n2} × ${baseDen}, they're equivalent.`;
-                    q.skillLabel = 'Equivalent Fractions';
+                    q.text = `Are ${baseNum}/${baseDen} and ${n2}/${d2} equivalent? Write = or \u2260.`;
+                    q.ans = isEquiv ? '=' : '\u2260';
+                    q.answerType = 'symbol';
+                    q.hint = `Multiply top and bottom of ${baseNum}/${baseDen} by the same number. Do you get ${n2}/${d2}?`;
+                    _fKit(q, { task: 'sign', terms: [{ n: baseNum, d: baseDen }, { n: n2, d: d2 }], joins: ['sign'], signs: ['=', '\u2260'], answer: { sign: q.ans } });
                     return;
                 }
                 if (eqVariant === 'multiSelectHalf') {
-                    // Click ALL fractions equivalent to 1/2
-                    const halfPool = [
-                        { n: 2, d: 4 }, { n: 3, d: 6 }, { n: 4, d: 8 }, { n: 5, d: 10 },
-                        { n: 6, d: 12 }, { n: 7, d: 14 }, { n: 8, d: 16 }, { n: 10, d: 20 }
-                    ];
-                    const notHalfPool = [
-                        { n: 1, d: 3 }, { n: 2, d: 5 }, { n: 3, d: 7 }, { n: 4, d: 9 },
-                        { n: 5, d: 11 }, { n: 3, d: 8 }, { n: 4, d: 10 }, { n: 6, d: 14 },
-                        { n: 5, d: 9 }, { n: 7, d: 12 }
-                    ];
-                    const cCount = randInt(2, 3);
-                    const wCount = 5 - cCount;
-                    const chosenC = shuffle(halfPool.slice()).slice(0, cCount);
-                    const chosenW = shuffle(notHalfPool.slice()).slice(0, wCount);
-                    const all = shuffle([
-                        ...chosenC.map(f => ({ ...f, correct: true })),
-                        ...chosenW.map(f => ({ ...f, correct: false }))
-                    ]);
-                    const opts = all.map((f, i) => ({ id: 'opt' + i, label: `${f.n}/${f.d}`, correct: f.correct }));
-                    const ans = opts.filter(o => o.correct).map(o => o.id);
-                    q.text = `Click ALL fractions equivalent to 1/2.`;
-                    q.ans = ans;
-                    q.answerType = 'multi-select-check';
-                    q.options = opts;
-                    q.hint = `A fraction equals 1/2 when the numerator is exactly half the denominator.`;
-                    q.printFormat = 'multi-select';
-                    q.skillLabel = 'Equivalent Fractions';
+                    // fractions equal to one half: 1/2 = [ ]/8
+                    const d2 = pick([4, 6, 8, 10, 12, 14, 16, 20]);
+                    q.text = `Find the missing number: 1/2 = ?/${d2}`;
+                    q.ans = d2 / 2;
+                    q.answerType = 'number';
+                    q.hint = `Half of ${d2} is ${d2 / 2}. The numerator is half the denominator.`;
+                    _fKit(q, { task: 'op', terms: [{ n: 1, d: 2 }, { n: d2 / 2, d: d2, frac: 'n' }], joins: ['='], answer: { n: d2 / 2, d: d2 }, arcs: _eqArcs('\u00d7', d2 / 2) });
                     return;
                 }
                 // Level 1: Equivalent fractions
@@ -5331,78 +4022,14 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 const multiplier = rng(2, 4);
                 const expandedNum = simpleNum * multiplier;
                 const expandedDen = simpleDen * multiplier;
-
-                // 25% drag-fill variant: drag num + den from a palette of digits.
-                if (Math.random() < 0.25) {
-                    const palette = [String(expandedNum), String(expandedDen)];
-                    while (palette.length < 6) {
-                        const v = rng(2, expandedDen * 2);
-                        if (!palette.includes(String(v))) palette.push(String(v));
-                    }
-                    for (let i = palette.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [palette[i], palette[j]] = [palette[j], palette[i]];
-                    }
-                    q.text = `Drag numbers to make ${simpleNum}/${simpleDen} equivalent: ?/${expandedDen}`;
-                    q.answerType = 'drag-fill';
-                    q.slots = [
-                        { id: 'num', label: 'numerator', acceptedValues: [expandedNum] },
-                        { id: 'den', label: 'denominator', acceptedValues: [expandedDen] }
-                    ];
-                    q.palette = palette;
-                    q.ans = { num: String(expandedNum), den: String(expandedDen) };
-                    q.layout = 'fraction';
-                    q.options = [];
-                    q.printFormat = 'drag-fill';
-                    q.skillLabel = 'Equivalent Fractions';
-                    return;
-                }
-
-                if (Math.random() < 0.5) {
-                    q.text = `Find the missing number:`;
-                    q.ans = expandedNum;
-                    q.visual = `<div style="text-align:center;">
-                        <div class="frac-equation" style="margin-bottom:20px;">
-                            ${fracHTML(simpleNum, simpleDen, '2xl')}
-                            <span class="frac-equals">=</span>
-                            <span class="frac frac-2xl">
-                                <span class="num" style="background:rgba(76,175,80,0.2);border-radius:6px;padding:4px 12px;border:2px dashed var(--accent-green);">?</span>
-                                <span class="den">${expandedDen}</span>
-                            </span>
-                        </div>
-                        <div style="display:flex;justify-content:center;align-items:center;gap:25px;">
-                            ${fracCircleSVG(simpleNum, simpleDen, 60, 'var(--accent-cyan)')}
-                            <span style="font-size:2rem;color:var(--accent-green);">=</span>
-                            ${fracCircleSVG(expandedNum, expandedDen, 60, 'var(--accent-purple)')}
-                        </div>
-                        <div style="margin-top:15px;font-size:0.9rem;color:var(--text-dim);">
-                            Multiply top and bottom by <strong>${multiplier}</strong>
-                        </div>
-                    </div>`;
-                } else {
-                    q.text = `Find the missing number:`;
-                    q.ans = expandedDen;
-                    q.visual = `<div style="text-align:center;">
-                        <div class="frac-equation" style="margin-bottom:20px;">
-                            ${fracHTML(simpleNum, simpleDen, '2xl')}
-                            <span class="frac-equals">=</span>
-                            <span class="frac frac-2xl">
-                                <span class="num">${expandedNum}</span>
-                                <span class="den" style="background:rgba(76,175,80,0.2);border-radius:6px;padding:4px 12px;border:2px dashed var(--accent-green);">?</span>
-                            </span>
-                        </div>
-                        <div style="display:flex;justify-content:center;align-items:center;gap:25px;">
-                            ${fracCircleSVG(simpleNum, simpleDen, 60, 'var(--accent-cyan)')}
-                            <span style="font-size:2rem;color:var(--accent-green);">=</span>
-                            ${fracCircleSVG(expandedNum, expandedDen, 60, 'var(--accent-purple)')}
-                        </div>
-                        <div style="margin-top:15px;font-size:0.9rem;color:var(--text-dim);">
-                            Multiply top and bottom by <strong>${multiplier}</strong>
-                        </div>
-                    </div>`;
-                }
-                q.options = buildNumericOptions(q.ans);
-                q.hint = `Multiply both numerator and denominator by the same number to get equivalent fractions.`;
+                const missNum = Math.random() < 0.5;
+                q.text = missNum ? `Find the missing number: ${simpleNum}/${simpleDen} = ?/${expandedDen}` : `Find the missing number: ${simpleNum}/${simpleDen} = ${expandedNum}/?`;
+                q.ans = missNum ? expandedNum : expandedDen;
+                q.answerType = 'number';
+                q.hint = `Multiply both numerator and denominator by the same number (${multiplier}) to get equivalent fractions.`;
+                _fKit(q, { task: 'op', terms: [{ n: simpleNum, d: simpleDen }, { n: expandedNum, d: expandedDen, frac: missNum ? 'n' : 'd' }], joins: ['='],
+                    answer: { n: expandedNum, d: expandedDen }, arcs: _eqArcs('\u00d7', multiplier) });
+                return;
             } else if (fracSkill === "compare") {
                 const cmpVariant = window.pickVariant
                     ? window.pickVariant('compare', ['standard', 'numericOnly', 'compareHalf'], state)
@@ -5454,7 +4081,9 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 const d1 = pick(denoms);
                 const d2 = pick(denoms);
                 const n1 = rng(1, d1 - 1);
-                const n2 = rng(1, d2 - 1);
+                let n2 = rng(1, d2 - 1);
+                // never the same fraction twice (3/4 and 3/4): an equal pair is equal in another name
+                if (d1 === d2 && n1 === n2 && d2 > 2) n2 = n1 < d2 - 1 ? n1 + 1 : n1 - 1;
                 const val1 = n1 / d1;
                 const val2 = n2 / d2;
 
@@ -5519,36 +4148,15 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     ? `Find a common denominator (LCD = ${fbLcd}), convert both fractions, then add the numerators.`
                     : `Find a common denominator (LCD = ${fbLcd}), convert both fractions, then subtract the numerators.`;
 
-                // Fraction bar SVGs. Operand bars use the same shaded color
-                // since the operator (+/-) already distinguishes them.
-                const fbBarW = 200, fbBarH = 24;
-                const fbBuildBar = (num, den) => {
-                    const segW = fbBarW / den;
-                    let segs = '';
-                    for (let i = 0; i < den; i++) {
-                        segs += `<rect x="${i * segW}" y="0" width="${segW}" height="${fbBarH}" fill="${i < num ? softFill(COLORS.primary) : COLORS.bg}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
-                    }
-                    return `<svg width="${fbBarW}" height="${fbBarH}" viewBox="0 0 ${fbBarW} ${fbBarH}" style="max-width:100%;height:auto;">${segs}</svg>`;
-                };
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="display:inline-flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;">
-                        <div style="text-align:center;">
-                            ${fbBuildBar(fbNum1, fbDen1)}
-                            <div style="margin-top:4px;font-weight:700;font-size:1rem;">${fbNum1}/${fbDen1}</div>
-                        </div>
-                        <div style="font-size:2rem;font-weight:800;">${op}</div>
-                        <div style="text-align:center;">
-                            ${fbBuildBar(fbNum2, fbDen2)}
-                            <div style="margin-top:4px;font-weight:700;font-size:1rem;">${fbNum2}/${fbDen2}</div>
-                        </div>
-                        <div style="font-size:2rem;font-weight:800;">=</div>
-                        <div style="font-size:1.3rem;font-weight:700;min-width:50px;border-bottom:2px solid #333;text-align:center;">?</div>
-                    </div>
-                </div>`;
-
+                // KIT (fractions lane, vis_migrate_fraction_ops): both fractions drawn as bars on one
+                // whole - side by side, or one under the other as a fraction wall (the `model`
+                // option) - never the answer (RP-1); the pupil writes the answer in the boxes after
+                // "=", a mixed number's three boxes when it can reach 1.
                 q.options = [];
                 q.skillLabel = 'Fraction Bar Ops';
+                _fSentenceKit(q, [{ n: fbNum1, d: fbDen1 }, { n: fbNum2, d: fbDen2 }], [op], _fModelPick() || 'bar',
+                    { mixed: fbResNum >= fbResDen, wholeMm: 30 });
+                return;
             } else if (fracSkill === "of_number") {
                 // Level 2: Fraction of a number
                 const maxMultiple = Math.floor(Math.min(range, 100) / denominator);
@@ -5574,6 +4182,96 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         Find <strong style="color:var(--accent-cyan);">${numerator}</strong> out of <strong>${denominator}</strong> equal parts of <strong style="color:var(--accent-purple);">${whole}</strong>
                     </div>
                 </div>`;
+            } else if (fracSkill === "mixed_numbers_intro") {
+                // Fractions beyond 1 (build list frac_beyond_1; 3.NF.A.1, 4.NF.B.3; WRM Y4.B7.S2, S3,
+                // S5). KIT (fractions lane): (0) whole shapes and a part, the pupil writes the mixed
+                // number; (1) a mixed number split into its wholes and its fraction, 2 3/4 = [ ] + [ ]/4;
+                // (2) a number line from 0 past 1, the pupil writes the mixed number the dot shows.
+                const _mnForms = _fChanged('forms');
+                const mode = _mnForms ? pick(_mnForms) : pick([0, 1, 2]);
+                // a line past 1 keeps its parts countable: halves, thirds and quarters
+                const d = pick(_filterDens(mode === 2 ? [2, 3, 4] : [2, 3, 4, 5, 6, 8]));
+                const w = rng(1, mode === 2 ? 2 : 3);
+                const n = rng(1, d - 1);
+                const mixedStr = `${w} ${n}/${d}`;
+                q.answerType = 'text';
+                q.options = [];
+                q.skillLabel = 'Fractions Beyond 1';
+                q.noSimplify = true;
+                if (mode === 1) {
+                    q.text = `Write ${mixedStr} as wholes and a fraction.`;
+                    q.ans = `${w} + ${n}/${d}`;
+                    q.hint = `${mixedStr} is ${w} whole${w > 1 ? 's' : ''} and ${n}/${d} more.`;
+                    const _mnKind = _fPicturesOff() ? null : (_fModelPick() || 'bar');
+                    _fKit(q, { task: 'op', terms: [{ w, n, d, kind: _mnKind, frac: 'show' }, { w, n: 0, d: 1, frac: 'w', ai: 0 }, { n, d, frac: 'n', ai: 1 }],
+                        joins: ['=', '+'], answer: { terms: [{ w, n: 0, d: 1 }, { w: 0, n, d }], text: q.ans },
+                        wholeMm: _mnKind === 'bar' ? 36 : _mnKind === 'area' ? 20 : 16, perRow: _mnKind === 'bar' ? 2 : 4, barH: 10, modelTop: !!_mnKind });
+                    return;
+                }
+                q.ans = mixedStr;
+                if (mode === 2) {
+                    q.text = `What mixed number does the dot show?`;
+                    q.hint = `Count the whole numbers first, then the parts after ${w}: each whole is cut into ${d} parts.`;
+                    _fKit(q, { task: 'write', terms: [{ w, n, d, kind: 'line', frac: 'wnd' }], answer: { w, n, d }, wholeMm: w + 1 > 2 ? 26 : 36, fracAt: 'below' });
+                    return;
+                }
+                q.text = `Write the mixed number the shapes show.`;
+                q.hint = `Count the whole shapes: ${w}. Then the part of the last shape: ${n}/${d}.`;
+                const _mnKind = _fPicturesOff() ? 'bar' : (_fModelPick() || 'circle');
+                _fKit(q, { task: 'write', terms: [{ w, n, d, kind: _mnKind, frac: 'wnd' }], answer: { w, n, d },
+                    wholeMm: _mnKind === 'bar' ? 36 : _mnKind === 'area' ? 20 : 16, perRow: _mnKind === 'bar' ? 2 : 4, barH: 10, fracAt: 'below' });
+                return;
+
+            } else if (fracSkill === "count_in_fractions") {
+                // Count in fractions (build list frac_count; 3.NF.A.2, 3.NF.A.3a/c; WRM Y2.B8.S15,
+                // Y3.B6.S8-S9, Y4.B7.S9). KIT (fractions lane): a row of six counts in one unit
+                // fraction, two or three of them the pupil's boxes, under a number line with a tick
+                // over every count, the wholes heavy (the `countLine` support). The forms climb one
+                // step at a time: within one whole; past one written as fractions (4/4, 5/4);
+                // past one written as whole and mixed numbers (1, 1 1/4); counting back.
+                const _cfForms = _fChanged('forms');
+                const mode = _cfForms ? pick(_cfForms) : pick([0, 1, 2, 3]);
+                const d = mode === 0 ? pick(_filterDens([3, 4, 5, 6, 8])) : pick(_filterDens([2, 3, 4, 5, 6, 8]));
+                // six counts (fewer inside one whole when the denominator is small)
+                const nT = mode === 0 ? Math.min(6, d + 1) : 6;
+                const k0 = mode === 0 ? d + 1 - nT : Math.max(1, d - rng(1, Math.min(3, d - 1)));
+                let ks = Array.from({ length: nT }, (_, i) => k0 + i);
+                if (mode === 3) ks = ks.reverse();
+                const mixedForm = mode !== 1;
+                const names = { 2: 'halves', 3: 'thirds', 4: 'quarters', 5: 'fifths', 6: 'sixths', 8: 'eighths', 10: 'tenths' };
+                const cand = shuffle(Array.from({ length: nT - 2 }, (_, i) => i + 2));
+                const nBlank = nT >= 5 ? (Math.random() < 0.5 ? 2 : 3) : 2;
+                const blanks = cand.slice(0, nBlank).sort((a, b) => a - b);
+                const text = (k) => (mixedForm && k % d === 0 ? String(k / d) : mixedForm && k > d ? `${Math.floor(k / d)} ${k % d}/${d}` : `${k}/${d}`);
+                const terms = [], answers = [];
+                ks.forEach((k, i) => {
+                    const w = mixedForm ? Math.floor(k / d) : 0, n = mixedForm ? k % d : k;
+                    const t = { n, d, w, whole: k % d === 0 };
+                    if (blanks.includes(i)) {
+                        t.frac = mixedForm && k % d === 0 ? 'w' : mixedForm && k > d ? 'wnd' : 'nd';
+                        t.ai = answers.length;
+                        answers.push({ w, n, d, text: text(k) });
+                    } else if (mixedForm && k === 0) {
+                        t.w = 0; t.n = 0; t.frac = 'text'; t.text = '0';
+                    } else if (!mixedForm || k % d !== 0) {
+                        t.frac = 'show';
+                    } else {
+                        t.frac = 'show';
+                    }
+                    terms.push(t);
+                });
+                q.text = `Count ${mode === 3 ? 'back ' : ''}in ${names[d] || `1/${d}s`}. Write the missing numbers.`;
+                q.ans = answers.map(a => a.text).join(', ');
+                q.answerType = 'text';
+                q.noSimplify = true;            // the count itself: 2/4, not 1/2
+                q.options = [];
+                q.hint = `Each step is 1/${d}: the numerator goes ${mode === 3 ? 'down' : 'up'} by 1. ${d}/${d} is 1 whole.`;
+                q.skillLabel = 'Count in Fractions';
+                const _cfLine = !(state.skillOptions && state.skillOptions.countLine === false);
+                const _cfDigits = Math.max(1, ...answers.map(a => Math.max(String(a.n).length, String(a.d).length, String(a.w).length)));
+                _fKit(q, { task: 'count', terms, answer: { terms: answers.map(a => ({ w: a.w, n: a.n, d: a.d })), text: q.ans }, line: _cfLine, mode, boxDigits: _cfDigits });
+                return;
+
             } else if (fracSkill === "fraction_nl_drag") {
                 // Drag-onto-number-line — fractions on [0, 1] with ticks every 1/denom.
                 // Single-target most of the time; multi-target ~35% to push deeper practice.
@@ -5658,66 +4356,19 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 _nlKit(q);
                 return;
 
-            } else if (fracSkill === "simplify" && Math.random() < 0.25) {
-                // Phase 4.5 batch 9: multi-select-check variant — click ALL fractions in simplest form
-                // Build a pool of fractions: some already simplified, some not
-                const simplestPool = [
-                    { n: 1, d: 2 }, { n: 1, d: 3 }, { n: 2, d: 3 }, { n: 1, d: 4 }, { n: 3, d: 4 },
-                    { n: 1, d: 5 }, { n: 2, d: 5 }, { n: 3, d: 5 }, { n: 4, d: 5 },
-                    { n: 1, d: 6 }, { n: 5, d: 6 }, { n: 1, d: 7 }, { n: 2, d: 7 }, { n: 3, d: 7 },
-                    { n: 1, d: 8 }, { n: 3, d: 8 }, { n: 5, d: 8 }, { n: 7, d: 8 },
-                    { n: 2, d: 9 }, { n: 4, d: 9 }, { n: 5, d: 9 }, { n: 7, d: 9 }
-                ];
-                const reduciblePool = [
-                    { n: 2, d: 4 }, { n: 2, d: 6 }, { n: 3, d: 6 }, { n: 4, d: 6 },
-                    { n: 2, d: 8 }, { n: 4, d: 8 }, { n: 6, d: 8 },
-                    { n: 3, d: 9 }, { n: 6, d: 9 },
-                    { n: 2, d: 10 }, { n: 4, d: 10 }, { n: 5, d: 10 }, { n: 6, d: 10 }, { n: 8, d: 10 },
-                    { n: 3, d: 12 }, { n: 4, d: 12 }, { n: 6, d: 12 }, { n: 8, d: 12 }, { n: 9, d: 12 }
-                ];
-                const correctCount = randInt(2, 3);
-                const wrongCount = 6 - correctCount;
-                const chosenC = shuffle(simplestPool.slice()).slice(0, correctCount);
-                const chosenW = shuffle(reduciblePool.slice()).slice(0, wrongCount);
-                const all = shuffle([
-                    ...chosenC.map(f => ({ ...f, correct: true })),
-                    ...chosenW.map(f => ({ ...f, correct: false }))
-                ]);
-                const opts = all.map((f, i) => ({ id: 'opt' + i, label: `${f.n}/${f.d}`, correct: f.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL fractions already in simplest form.`;
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = `A fraction is in simplest form when the numerator and denominator share no common factors except 1.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Simplify';
-                return;
             } else if (fracSkill === "simplify") {
+                // Simplify fractions (4.NF.A.1; WRM Y6.B3.S1). KIT (fractions lane): "12/16 = [ ]/[ ]"
+                // with OPERATOR ARCS "÷ [ ]" over the numerators and under the denominators (the
+                // `opArcs` option: blank / written / none); a fraction that is already in simplest
+                // form is copied (the "is it simplest?" judgement written, not picked); the common
+                // factor step is "the greatest common factor of 8 and 12 = [ ]".
                 const simpVariant = window.pickVariant
-                    ? window.pickVariant('simplify_main', ['standard', 'isSimplest', 'gcfStep'], state)
+                    ? window.pickVariant('simplify_main', ['standard', 'isSimplest', 'gcfStep'])
                     : pick(['standard', 'isSimplest', 'gcfStep']);
-                if (simpVariant === 'isSimplest') {
-                    const simplestPool = [
-                        { n: 1, d: 2 }, { n: 2, d: 3 }, { n: 3, d: 4 }, { n: 1, d: 5 },
-                        { n: 4, d: 5 }, { n: 5, d: 6 }, { n: 3, d: 7 }, { n: 5, d: 8 },
-                        { n: 7, d: 9 }, { n: 3, d: 10 }
-                    ];
-                    const reduciblePool = [
-                        { n: 2, d: 4 }, { n: 4, d: 6 }, { n: 6, d: 8 }, { n: 3, d: 9 },
-                        { n: 4, d: 10 }, { n: 6, d: 9 }, { n: 8, d: 12 }, { n: 4, d: 12 },
-                        { n: 6, d: 10 }, { n: 9, d: 12 }
-                    ];
-                    const isAlready = Math.random() < 0.5;
-                    const f = isAlready ? pick(simplestPool) : pick(reduciblePool);
-                    q.text = `Is ${f.n}/${f.d} already in simplest form?`;
-                    q.ans = isAlready ? 'Yes' : 'No';
-                    q.answerType = 'multiple-choice';
-                    q.options = ['Yes', 'No'];
-                    q.hint = `If GCF(${f.n}, ${f.d}) = 1, it's already simplest.`;
-                    q.skillLabel = 'Simplify';
-                    return;
-                }
+                const _sfArcsOpt = (state.skillOptions && state.skillOptions.opArcs) || 'blank';
+                const _sfArcs = (k) => (_sfArcsOpt === 'none' ? null : { op: '\u00f7', k, show: _sfArcsOpt === 'value' ? 'value' : 'blank' });
+                q.skillLabel = 'Simplify';
+                q.options = [];
                 if (simpVariant === 'gcfStep') {
                     const pairs = [
                         [8, 12], [6, 9], [10, 15], [12, 18], [9, 12],
@@ -5725,300 +4376,110 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         [12, 16], [10, 25], [8, 20]
                     ];
                     const [aN, bN] = pick(pairs);
-                    q.text = `What is the GCF of ${aN} and ${bN}? (Use this to simplify ${aN}/${bN}.)`;
+                    q.text = `What is the greatest common factor of ${aN} and ${bN}? (Use it to simplify ${aN}/${bN}.)`;
                     q.ans = _gcd(aN, bN);
                     q.answerType = 'number';
-                    q.options = buildNumericOptions(q.ans);
                     q.hint = `List the factors of each, or use the largest number that divides both.`;
-                    q.skillLabel = 'Simplify';
+                    _fKit(q, { task: 'op', terms: [{ frac: 'text', text: 'GCF' }, { frac: 'w' }], joins: ['='], answer: { w: q.ans, n: 0, d: 1 },
+                        story: ['The greatest common factor', `of ${aN} and ${bN}:`] });
                     return;
                 }
-                // Level 2: Simplify fractions
-                const multiplier = randInt(2,4);
-                const rawNum = numerator * multiplier;
-                const rawDen = denominator * multiplier;
-                q.text = `Simplify this fraction:`;
-                q.answerType = "text";
-                q.ans = simplifyFraction(rawNum, rawDen);
-                const wrongs = new Set();
-                let simpAttempts = 0;
-                while (wrongs.size < 3 && simpAttempts < 30) {
-                    simpAttempts++;
-                    const wrongSimp = simplifyFraction(rawNum + randInt(-3,3), rawDen);
-                    if (wrongSimp !== q.ans) wrongs.add(wrongSimp);
+                let rawNum, rawDen, k;
+                if (simpVariant === 'isSimplest' && Math.random() < 0.5) {
+                    // already in simplest form: the pupil writes it again
+                    const f = pick([{ n: 1, d: 2 }, { n: 2, d: 3 }, { n: 3, d: 4 }, { n: 1, d: 5 }, { n: 4, d: 5 }, { n: 5, d: 6 }, { n: 3, d: 7 }, { n: 5, d: 8 }, { n: 7, d: 9 }, { n: 3, d: 10 }]);
+                    rawNum = f.n; rawDen = f.d; k = 1;
+                } else {
+                    k = randInt(2, 4);
+                    rawNum = numerator * k; rawDen = denominator * k;
                 }
-                q.options = shuffle([q.ans, ...wrongs]);
-                q.hint = `Find a number that divides both ${rawNum} and ${rawDen} evenly. Try dividing by ${multiplier}!`;
+                const [sN, sD] = _simplify(rawNum, rawDen);
+                q.text = `Write ${rawNum}/${rawDen} in simplest form.`;
+                q.answerType = "text";
+                q.ans = `${sN}/${sD}`;
+                q.noSimplify = true;         // the simplest form itself (6/8 is not simplest)
+                q.hint = k > 1 ? `Find a number that divides both ${rawNum} and ${rawDen}. The greatest is ${k}.`
+                    : `${rawNum} and ${rawDen} have no common factor but 1: it is already in simplest form.`;
                 q.printFormat = 'fraction-simplify';
                 q.fractionData = { rawNum, rawDenom: rawDen };
-
-                q.visual = `<div style="text-align:center;">
-                    <div class="frac-equation" style="margin-bottom:20px;">
-                        <span class="frac frac-2xl" style="color:var(--accent-orange);">
-                            <span class="num">${rawNum}</span>
-                            <span class="den">${rawDen}</span>
-                        </span>
-                        <span style="font-size:2rem;margin:0 20px;color:var(--accent-green);">\u2192</span>
-                        <span class="frac frac-2xl">
-                            <span class="num" style="background:rgba(76,175,80,0.2);border-radius:6px;padding:4px 16px;border:2px dashed var(--accent-green);">?</span>
-                            <span class="den" style="background:rgba(76,175,80,0.2);border-radius:6px;padding:4px 16px;border:2px dashed var(--accent-green);">?</span>
-                        </span>
-                    </div>
-                    <div style="display:flex;justify-content:center;align-items:center;gap:20px;margin-bottom:15px;">
-                        ${fracCircleSVG(rawNum, rawDen, 80, '#ff9800')}
-                        <span style="font-size:1.5rem;color:var(--accent-green);">=</span>
-                        ${fracCircleSVG(numerator, denominator, 80, '#4caf50')}
-                    </div>
-                    <div style="background:rgba(255,255,255,0.1);padding:12px 20px;border-radius:10px;display:inline-block;">
-                        <span style="font-size:0.95rem;color:var(--text-dim);">
-                            Divide both by <strong style="color:var(--accent-cyan);">${multiplier}</strong>:
-                            <span style="color:var(--accent-orange);">${rawNum}</span> ÷ ${multiplier} = <strong>${numerator}</strong>,
-                            <span style="color:var(--accent-orange);">${rawDen}</span> ÷ ${multiplier} = <strong>${denominator}</strong>
-                        </span>
-                    </div>
-                </div>`;
-            } else if (fracSkill === "improper_mixed" && Math.random() < 0.25) {
-                // Phase 4.5 batch 9: multi-select-check variant — click all fractions equal to a target mixed number
-                const targetDen = pick([2, 3, 4, 5, 6, 8]);
-                const targetWhole = rng(1, 3);
-                const targetNumPart = rng(1, targetDen - 1);
-                const targetTotalNum = targetWhole * targetDen + targetNumPart;
-                const targetVal = targetTotalNum / targetDen;
-                // Build correct equivalent representations
-                const correctOpts = [
-                    `${targetTotalNum}/${targetDen}`, // improper form
-                    `${targetWhole} ${targetNumPart}/${targetDen}` // mixed form
-                ];
-                // Add equivalent improper with multiplier
-                for (const m of [2, 3]) {
-                    correctOpts.push(`${targetTotalNum * m}/${targetDen * m}`);
-                }
-                // Build wrong options (off-by-one variants)
-                const wrongOpts = [
-                    `${targetTotalNum + 1}/${targetDen}`,
-                    `${targetTotalNum - 1}/${targetDen}`,
-                    `${targetWhole + 1} ${targetNumPart}/${targetDen}`,
-                    `${targetWhole} ${(targetNumPart % (targetDen - 1)) + 1}/${targetDen}`,
-                    `${targetTotalNum}/${targetDen + 1}`,
-                    `${targetWhole} ${targetNumPart}/${targetDen + 1}`,
-                    targetWhole > 1 ? `${targetWhole - 1} ${targetNumPart}/${targetDen}` : `${targetWhole + 2} ${targetNumPart}/${targetDen}`
-                ];
-                const cCount = randInt(2, 3);
-                const wCount = 6 - cCount;
-                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
-                const seen = new Set(chosenC);
-                const chosenW = [];
-                let safety = 0;
-                while (chosenW.length < wCount && safety < 30) {
-                    safety++;
-                    const w = pick(wrongOpts);
-                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
-                }
-                while (chosenW.length < wCount) chosenW.push(`${targetTotalNum + chosenW.length + 5}/${targetDen}`);
-                const all = shuffle([
-                    ...chosenC.map(label => ({ label, correct: true })),
-                    ...chosenW.map(label => ({ label, correct: false }))
-                ]);
-                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL fractions equal to ${targetWhole} ${targetNumPart}/${targetDen}.`;
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = `${targetWhole} ${targetNumPart}/${targetDen} = ${targetTotalNum}/${targetDen}. Equivalent fractions multiply top and bottom by the same number.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Improper/Mixed';
+                _fKit(q, { task: 'op', terms: [{ n: rawNum, d: rawDen }, { n: sN, d: sD, frac: 'nd' }], joins: ['='], answer: { n: sN, d: sD },
+                    arcs: _sfArcs(rawNum / sN) });
                 return;
             } else if (fracSkill === "improper_mixed") {
-                // Level 2: Convert between improper fractions and mixed numbers
+                // Improper <-> mixed (4.NF.B.3, WRM Y4.B7.S6-S8, Y5.B4.S4-S5). KIT (fractions lane,
+                // vis_migrate_fraction_ops): the amount drawn as whole shapes and a part (circles
+                // unless the teacher ticked another model; pictures can come off), and under it the
+                // given form "=" the boxes of the other, or - from the picture alone - the improper
+                // fraction. The pupil WRITES the answer (the legacy screen offered four buttons).
                 const den = pick([2, 3, 4, 5, 6, 8]);
-                const wholes = rng(1, 4); // 1-4 whole parts
-                const extraNum = rng(1, den - 1); // Additional fraction part
-                const totalNum = wholes * den + extraNum; // Total numerator for improper fraction
-
-                // Randomly choose: show improper and ask for mixed, OR show mixed and ask for improper
-                const mode = pick(["improper_to_mixed", "mixed_to_improper", "visual_to_both"]);
-
-                if (mode === "improper_to_mixed") {
-                    q.text = `Convert to a mixed number:`;
-                    q.ans = `${wholes} ${extraNum}/${den}`;
-                    q.answerType = "text";
-                    q.printFormat = 'improper-to-mixed';
-                    q.fractionData = { totalNum, den };
-                    const wrongs = new Set();
-                    wrongs.add(`${wholes + 1} ${extraNum}/${den}`);
-                    wrongs.add(`${wholes - 1 > 0 ? wholes - 1 : wholes + 2} ${extraNum}/${den}`);
-                    wrongs.add(`${wholes} ${extraNum + 1 > den - 1 ? 1 : extraNum + 1}/${den}`);
-                    q.options = shuffle([q.ans, ...Array.from(wrongs).slice(0, 3)]);
+                const wholes = rng(1, 3);
+                const extraNum = rng(1, den - 1);
+                const totalNum = wholes * den + extraNum;
+                const _imForms = _fChanged('forms');
+                const _imModes = ['improper_to_mixed', 'mixed_to_improper', 'visual_to_both'];
+                const mode = _imForms ? _imModes[pick(_imForms)] : pick(_imModes);
+                const mixedStr = `${wholes} ${extraNum}/${den}`, impStr = `${totalNum}/${den}`;
+                const _imKind = _fPicturesOff() ? null : (_fModelPick() || 'circle');
+                let given, ansTerm, answer, joins = ['='];
+                if (mode === 'improper_to_mixed') {
+                    q.text = `Write ${impStr} as a mixed number.`;
+                    q.ans = mixedStr;
                     q.hint = `Divide ${totalNum} by ${den}. The quotient is the whole number, the remainder is the numerator.`;
-
-                    // Create visual with multiple circles
-                    const circlesHTML = Array.from({length: wholes}, () =>
-                        fracCircleSVG(den, den, 60, 'var(--accent-cyan)')
-                    ).join('') + fracCircleSVG(extraNum, den, 60, 'var(--accent-cyan)');
-
-                    q.visual = `<div style="text-align:center;">
-                        <div class="frac-equation" style="margin-bottom:20px;">
-                            <span class="frac frac-2xl" style="color:var(--accent-orange);">
-                                <span class="num">${totalNum}</span>
-                                <span class="den">${den}</span>
-                            </span>
-                            <span style="font-size:2rem;margin:0 20px;color:var(--accent-green);">=</span>
-                            <span style="font-size:2rem;color:var(--accent-green);font-weight:700;">? <sup>?</sup>\u2044<sub>?</sub></span>
-                        </div>
-                        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:15px;">
-                            ${circlesHTML}
-                        </div>
-                        <div style="font-size:0.9rem;color:var(--text-dim);">
-                            Divide ${totalNum} by ${den}: the quotient is the whole, the remainder is the new numerator.
-                        </div>
-                    </div>`;
-                } else if (mode === "mixed_to_improper") {
-                    q.text = `Convert to an improper fraction:`;
-                    q.ans = `${totalNum}/${den}`;
-                    q.answerType = "text";
-                    q.printFormat = 'mixed-to-improper';
-                    q.fractionData = { wholes, extraNum, den, totalNum };
-                    const wrongs = new Set();
-                    wrongs.add(`${totalNum + den}/${den}`);
-                    wrongs.add(`${totalNum - den > 0 ? totalNum - den : totalNum + 2}/${den}`);
-                    wrongs.add(`${wholes + extraNum}/${den}`);
-                    q.options = shuffle([q.ans, ...Array.from(wrongs).slice(0, 3)]);
+                    given = { n: totalNum, d: den }; ansTerm = { n: extraNum, d: den, frac: 'wnd' }; answer = { w: wholes, n: extraNum, d: den };
+                } else if (mode === 'mixed_to_improper' || !_imKind) {
+                    q.text = `Write ${mixedStr} as an improper fraction.`;
+                    q.ans = impStr;
                     q.hint = `Multiply ${wholes} × ${den} = ${wholes * den}, then add ${extraNum} to get the numerator.`;
-
-                    const circlesHTML = Array.from({length: wholes}, () =>
-                        fracCircleSVG(den, den, 60, 'var(--accent-purple)')
-                    ).join('') + fracCircleSVG(extraNum, den, 60, 'var(--accent-purple)');
-
-                    q.visual = `<div style="text-align:center;">
-                        <div class="frac-equation" style="margin-bottom:20px;">
-                            <span style="font-size:2.2rem;font-weight:700;color:var(--accent-purple);">
-                                ${wholes}<span class="frac frac-xl" style="margin-left:8px;">
-                                    <span class="num">${extraNum}</span>
-                                    <span class="den">${den}</span>
-                                </span>
-                            </span>
-                            <span style="font-size:2rem;margin:0 20px;color:var(--accent-green);">=</span>
-                            <span class="frac frac-2xl" style="color:var(--accent-green);">
-                                <span class="num" style="background:rgba(76,175,80,0.2);border-radius:6px;padding:4px 12px;border:2px dashed var(--accent-green);">?</span>
-                                <span class="den">${den}</span>
-                            </span>
-                        </div>
-                        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:15px;">
-                            ${circlesHTML}
-                        </div>
-                        <div style="font-size:0.9rem;color:var(--text-dim);">
-                            (${wholes} × ${den}) + ${extraNum} = ?
-                        </div>
-                    </div>`;
+                    given = { w: wholes, n: extraNum, d: den }; ansTerm = { n: totalNum, d: den, frac: 'nd' }; answer = { w: 0, n: totalNum, d: den };
                 } else {
-                    // visual_to_both: Show visual and ask for BOTH forms
-                    q.text = `Write this amount as an improper fraction AND a mixed number:`;
-                    q.ans = `${totalNum}/${den}`;
-                    q.answerType = "text";
-                    q.printFormat = 'mixed-improper-visual';
-                    q.fractionData = { wholes, extraNum, den, totalNum };
-                    q.secondAnswer = `${wholes} ${extraNum}/${den}`;
-                    const wrongs = new Set();
-                    wrongs.add(`${totalNum + 1}/${den}`);
-                    wrongs.add(`${totalNum - 1}/${den}`);
-                    wrongs.add(`${wholes}/${den}`);
-                    q.options = shuffle([q.ans, ...Array.from(wrongs).slice(0, 3)]);
-                    q.hint = `Count total shaded parts for improper. Count full circles for whole number.`;
-
-                    const circlesHTML = Array.from({length: wholes}, (_, i) => `
-                        <div style="text-align:center;">
-                            ${fracCircleSVG(den, den, 70, 'var(--accent-cyan)')}
-                            <div style="font-size:0.8rem;color:var(--text-dim);">Full</div>
-                        </div>
-                    `).join('') + `
-                        <div style="text-align:center;">
-                            ${fracCircleSVG(extraNum, den, 70, 'var(--accent-cyan)')}
-                            <div style="font-size:0.8rem;color:var(--text-dim);">${extraNum}/${den}</div>
-                        </div>
-                    `;
-
-                    q.visual = `<div style="text-align:center;">
-                        <div style="display:flex;justify-content:center;gap:15px;flex-wrap:wrap;margin-bottom:20px;">
-                            ${circlesHTML}
-                        </div>
-                        <div style="background:rgba(255,255,255,0.1);padding:15px 20px;border-radius:12px;">
-                            <div style="display:flex;justify-content:center;gap:30px;align-items:center;">
-                                <div>
-                                    <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:5px;">Improper Fraction:</div>
-                                    <span class="frac frac-xl" style="color:var(--accent-orange);">
-                                        <span class="num" style="border-bottom:2px dashed var(--accent-orange);min-width:30px;">?</span>
-                                        <span class="den">${den}</span>
-                                    </span>
-                                </div>
-                                <span style="font-size:1.5rem;color:var(--accent-green);">=</span>
-                                <div>
-                                    <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:5px;">Mixed Number:</div>
-                                    <span style="font-size:1.5rem;color:var(--accent-purple);font-weight:700;">
-                                        <span style="border-bottom:2px dashed var(--accent-purple);">?</span>
-                                        <span class="frac frac-lg" style="margin-left:5px;">
-                                            <span class="num" style="border-bottom:2px dashed var(--accent-purple);min-width:20px;">?</span>
-                                            <span class="den">${den}</span>
-                                        </span>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
+                    // the picture alone: how many parts in all, as an improper fraction
+                    q.text = `Write the amount shown as an improper fraction.`;
+                    q.ans = impStr;
+                    q.hint = `Count all the shaded parts: that is the numerator. Each whole has ${den} parts.`;
+                    given = { w: wholes, n: extraNum, d: den, frac: 'none' }; ansTerm = { n: totalNum, d: den, frac: 'nd' }; answer = { w: 0, n: totalNum, d: den };
+                    joins = [''];
                 }
+                q.answerType = 'text';
+                // an improper answer is written as one (2 1/2 is not 5/2 here); a mixed answer may
+                // come simplified (10/4 = 2 2/4 = 2 1/2)
+                q.noSimplify = mode !== 'improper_to_mixed';
+                q.options = [];
+                q.skillLabel = 'Improper/Mixed';
+                q.fractionData = { wholes, extraNum, den, totalNum };
+                q.fractionModel = _imKind;
+                _fKit(q, { task: 'op', terms: [Object.assign({ kind: _imKind }, given), ansTerm], joins, answer,
+                    wholeMm: _imKind === 'bar' ? 36 : _imKind === 'area' ? 20 : 16, perRow: _imKind === 'bar' ? 2 : 4, barH: 10, modelTop: !!_imKind });
+                return;
             } else if (fracSkill === "mixed_improper_visual") {
-                // Visual Mixed ↔ Improper with pizza/pie circles and dual-fraction answer
+                // Mixed <-> improper with a picture (4.NF.B.3, WRM Y4.B7 / Y5.B3). KIT (fractions
+                // lane, build list vis_migrate_fraction_ops): the amount drawn as whole models and a
+                // part (circles unless the teacher ticked another model), and under it the amount in
+                // one form "=" the boxes of the other: "2 3/4 = [ ]/[ ]" or "11/4 = [ ] [ ]/[ ]".
+                // One written answer per item (the legacy item asked for both in two typed boxes
+                // that never printed); a page mixes the two directions.
                 const visDen = pick([2, 3, 4, 5, 6, 8]);
-                const visWholes = rng(1, 4);
+                const visWholes = rng(1, 3);
                 const visExtra = rng(1, visDen - 1);
                 const visTotalNum = visWholes * visDen + visExtra;
-
-                // Build pizza SVGs: whole pies + partial pie
-                const pizzaColors = ['#d4e5f7', '#e8d4f0', '#f5d4e8', '#d4f0e5'];
-                const fillColor = pick(pizzaColors);
-                const pizzaSVGs = Array.from({length: visWholes}, () =>
-                    `<div style="text-align:center;"><div style="font-size:0.95rem;color:var(--text-dim);margin-bottom:4px;font-weight:600;">Full</div>${fracCircleSVG(visDen, visDen, 170, fillColor)}</div>`
-                ).join('') + `<div style="text-align:center;"><div style="font-size:0.95rem;color:var(--text-dim);margin-bottom:4px;font-weight:600;">${visExtra}/${visDen}</div>${fracCircleSVG(visExtra, visDen, 170, fillColor)}</div>`;
-
-                q.text = `Write this amount as a mixed number AND an improper fraction:`;
-                q.answerType = "dual-fraction";
-                q.dualFractionAnswers = {
-                    mixed: `${visWholes} ${visExtra}/${visDen}`,
-                    improper: `${visTotalNum}/${visDen}`
-                };
-                q.ans = `${visTotalNum}/${visDen}`; // fallback for print/standard checks
+                const _miForms = _fChanged('forms');
+                const toImproper = _miForms && _miForms.length === 1 ? _miForms[0] === 0 : Math.random() < 0.5;
+                const mixedStr = `${visWholes} ${visExtra}/${visDen}`, impStr = `${visTotalNum}/${visDen}`;
+                q.text = toImproper ? `Write ${mixedStr} as an improper fraction.` : `Write ${impStr} as a mixed number.`;
+                q.ans = toImproper ? impStr : mixedStr;
+                q.answerType = 'text';
+                q.noSimplify = toImproper;
                 q.options = [];
-                q.hint = `Count ${visWholes} full pizzas and ${visExtra}/${visDen} of another. Mixed: ${visWholes} ${visExtra}/${visDen}. Improper: (${visWholes}×${visDen})+${visExtra} = ${visTotalNum} over ${visDen}.`;
+                q.hint = `Count ${visWholes} whole${visWholes > 1 ? 's' : ''} and ${visExtra}/${visDen} more. Each whole is ${visDen}/${visDen}: ${visWholes} × ${visDen} + ${visExtra} = ${visTotalNum}.`;
                 q.skillLabel = 'Mixed↔Improper';
-                q.printFormat = 'mixed-improper-visual';
                 q.fractionData = { wholes: visWholes, extraNum: visExtra, den: visDen, totalNum: visTotalNum };
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.1rem;">Pizza Fractions</div>
-                    <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
-                        ${pizzaSVGs}
-                    </div>
-                    <div style="background:rgba(255,255,255,0.08);padding:16px 20px;border-radius:14px;display:inline-block;">
-                        <div style="display:flex;justify-content:center;gap:30px;align-items:flex-start;">
-                            <div>
-                                <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:8px;font-weight:600;">Mixed Number:</div>
-                                <div style="display:flex;align-items:center;gap:4px;">
-                                    <input type="text" id="mixedInput" class="dual-frac-input" placeholder="e.g. 2 3/4" autocomplete="off"
-                                        style="width:110px;height:42px;text-align:center;font-size:1.1rem;font-weight:700;border:3px solid var(--accent-purple);border-radius:10px;background:var(--bg-card);color:var(--text-primary);outline:none;padding:0 6px;">
-                                </div>
-                            </div>
-                            <div style="font-size:1.5rem;color:var(--accent-green);font-weight:700;margin-top:24px;">=</div>
-                            <div>
-                                <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:8px;font-weight:600;">Improper Fraction:</div>
-                                <div style="display:flex;align-items:center;gap:4px;">
-                                    <input type="text" id="improperInput" class="dual-frac-input" placeholder="e.g. 11/4" autocomplete="off"
-                                        style="width:110px;height:42px;text-align:center;font-size:1.1rem;font-weight:700;border:3px solid var(--accent-orange);border-radius:10px;background:var(--bg-card);color:var(--text-primary);outline:none;padding:0 6px;">
-                                </div>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary" id="checkDualFracBtn" onclick="checkDualFractionAnswer()" style="margin-top:14px;opacity:0.5;pointer-events:none;">Check Both Answers</button>
-                    </div>
-                </div>`;
+                const _miKind = _fPicturesOff() ? null : (_fModelPick() || 'circle');
+                const _miGiven = toImproper ? { w: visWholes, n: visExtra, d: visDen } : { n: visTotalNum, d: visDen };
+                const _miAns = toImproper ? { n: visTotalNum, d: visDen, frac: 'nd' } : { n: visExtra, d: visDen, frac: 'wnd' };
+                q.fractionModel = _miKind;
+                _fKit(q, { task: 'op', terms: [Object.assign({ kind: _miKind }, _miGiven), _miAns], joins: ['='],
+                    answer: toImproper ? { w: 0, n: visTotalNum, d: visDen } : { w: visWholes, n: visExtra, d: visDen },
+                    wholeMm: _miKind === 'bar' ? 36 : _miKind === 'area' ? 20 : 16, perRow: _miKind === 'bar' ? 2 : 4, barH: 10, modelTop: !!_miKind });
+                return;
 
             } else if (fracSkill === "add" || fracSkill === "sub") {
                 // Level 3: Add/Subtract fractions with SAME denominator
@@ -6711,99 +5172,57 @@ export function generateConversionsQuestion(q, mappedSkill, helpers) {
                         ${fracHTML('?', '?', 'xl')}
                     </div>
                 </div>`;
-            } else if (convSkill === "percent_visual" && Math.random() < 0.25) {
-                // Phase 4.5 batch 9: multi-select-check variant - click ALL grids that show target percent
-                const pctMultiples = [10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90];
-                const targetPct = pick(pctMultiples);
-                // Build 4 small grid SVGs: 1-2 are correct, others off
-                function _miniGrid(pct, fillColor) {
-                    const cs = 8; // small cell size
-                    const w = cs * 10 + 2;
-                    const h = cs * 10 + 2;
-                    let svg = `<svg viewBox="0 0 ${w} ${h}" width="90" height="90" style="display:block;">`;
-                    for (let r = 0; r < 10; r++) {
-                        for (let c = 0; c < 10; c++) {
-                            const idx = r * 10 + c;
-                            const shaded = idx < pct;
-                            svg += `<rect x="${c * cs + 1}" y="${r * cs + 1}" width="${cs}" height="${cs}" fill="${shaded ? fillColor : '#ffffff'}" stroke="#444" stroke-width="0.6" opacity="${shaded ? '0.85' : '1'}"/>`;
-                        }
-                    }
-                    svg += '</svg>';
-                    return svg;
-                }
-                // Pick distinct percentages — include target at least once, and 2-3 distractors
-                const correctCount = randInt(1, 2);
-                const distractorPool = pctMultiples.filter(p => p !== targetPct);
-                const wrongChosen = shuffle(distractorPool.slice()).slice(0, 4 - correctCount);
-                const all = [];
-                for (let i = 0; i < correctCount; i++) all.push({ pct: targetPct, correct: true });
-                wrongChosen.forEach(p => all.push({ pct: p, correct: false }));
-                shuffle(all);
-                const opts = all.map((it, i) => ({
-                    id: 'opt' + i,
-                    label: '',
-                    svg: _miniGrid(it.pct, '#1976d2'),
-                    correct: it.correct
-                }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL grids that show ${targetPct}%.`;
-                q.answerType = 'multi-select-check';
-                q.options = opts;
-                q.ans = ans;
-                q.hint = `Each small square is 1%. Count the shaded squares — find ones with exactly ${targetPct} shaded.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Percent Visual';
-                return;
             } else if (convSkill === "percent_visual") {
-                // Grade 6: 10x10 grid shading for percents
+                // Grade 6 (6.RP.A.3c; WRM Y5.B7.S12, Y6.B9.S3): percent on the HUNDRED SQUARE. KIT
+                // (fractions lane, vis_hundred_square): one 10 x 10 square as one whole, the shaded
+                // cells filled column by column (sheet/cells/hundred-square.js), and under it the
+                // pupil writes the percent, the fraction, the number of squares, or the hundredths.
                 const pctMultiples = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95];
                 const percent = pick(pctMultiples);
-                // LRU rotation across 3 problem types so students see all forms.
+                // LRU rotation across the problem types so students see all forms.
                 const problemType = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('percent_visual', ["identify", "fraction", "shade"])
-                    : pick(["identify", "fraction", "shade"]);
+                    ? window.pickVariant('percent_visual', ["identify", "fraction", "shade", "hundredths"])
+                    : pick(["identify", "fraction", "shade", "hundredths"]);
                 q._variant = problemType;
-
-                // Build 10x10 grid SVG
-                const cellSize = 24;
-                const gridW = cellSize * 10 + 2;
-                const gridH = cellSize * 10 + 2;
-                let gridSvg = '';
-                for (let row = 0; row < 10; row++) {
-                    for (let col = 0; col < 10; col++) {
-                        const idx = row * 10 + col;
-                        const isShaded = idx < percent;
-                        gridSvg += `<rect x="${col * cellSize + 1}" y="${row * cellSize + 1}" width="${cellSize}" height="${cellSize}" fill="${isShaded ? 'var(--accent-cyan)' : 'var(--bg-card)'}" stroke="var(--text-bright)" stroke-width="0.8" opacity="${isShaded ? '0.85' : '0.3'}"/>`;
-                    }
-                }
-
+                const grid = { n: percent, d: 100, kind: _fPicturesOff() ? null : 'hundred', frac: 'none' };
+                let terms, joins, answer;
+                q.options = [];
                 if (problemType === "identify") {
                     q.text = `What percent of the grid is shaded?`;
                     q.ans = percent;
                     q.answerType = "number";
-                    q.options = buildNumericOptions(percent);
-                    q.hint = `Each small square = 1%. Count the shaded squares.`;
+                    q.hint = `Each small square = 1%. Count the shaded squares: a whole column is 10.`;
+                    terms = [grid, { frac: 'w', unit: '%' }]; joins = [''];
+                    answer = { w: percent, n: 0, d: 1 };
                 } else if (problemType === "fraction") {
                     const [sn, sd] = _simplifyConv(percent, 100);
-                    q.text = `What fraction of the grid is shaded? (simplify)`;
+                    q.text = `What fraction of the grid is shaded? Write it in simplest form.`;
                     q.ans = sd === 1 ? String(sn) : `${sn}/${sd}`;
                     q.answerType = "text";
-                    q.hint = `${percent} shaded out of 100 total = ${percent}/100. Simplify to lowest terms.`;
-                } else {
+                    q.hint = `${percent} shaded out of 100 = ${percent}/100. Simplify to lowest terms.`;
+                    terms = [grid, { n: sn, d: sd, frac: 'nd' }]; joins = [''];
+                    answer = { w: 0, n: sn, d: sd };
+                } else if (problemType === "shade") {
                     q.text = `${percent}% of this grid is shaded. How many squares are shaded?`;
                     q.ans = percent;
                     q.answerType = "number";
-                    q.options = buildNumericOptions(percent);
                     q.hint = `Each small square = 1%. ${percent}% means ${percent} squares.`;
+                    terms = [grid, { frac: 'text', text: `${percent}%` }, { frac: 'w', unit: 'squares' }]; joins = ['', '='];
+                    answer = { w: percent, n: 0, d: 1 };
+                } else {
+                    q.text = `Write ${percent}% as hundredths.`;
+                    q.ans = `${percent}/100`;
+                    q.answerType = "text";
+                    q.noSimplify = true;
+                    q.hint = `Percent means out of 100: ${percent}% = ${percent}/100.`;
+                    terms = [grid, { frac: 'text', text: `${percent}%` }, { n: percent, d: 100, frac: 'n' }]; joins = ['', '='];
+                    answer = { w: 0, n: percent, d: 100 };
                 }
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Percent Grid</div>
-                    <svg viewBox="0 0 ${gridW} ${gridH}" style="display:block;margin:0 auto;max-width:260px;">${gridSvg}</svg>
-                    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:6px;">Each square = 1%</div>
-                </div>`;
                 q.printFormat = "percent-grid";
                 q.skillLabel = "Percent Visual";
+                q.fractionModel = grid.kind;
+                _fKit(q, { task: 'op', terms, joins, answer, modelTop: !!grid.kind });
+                return;
 
             } else if (convSkill === "d_to_p") {
                 // Grade 6: Decimal to Percent conversion

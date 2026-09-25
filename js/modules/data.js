@@ -259,6 +259,8 @@ export const SKILL_GRADES = {
     'gcf_easy': 6, 'gcf_hard': 6, 'lcm': 6, 'divisibility_sort': 4,
     // Drag-onto-number-line family (nl-drag widget)
     'fraction_nl_drag': 3, 'decimal_nl_drag': 4, 'mixed_nl_drag': 4, 'integer_nl_drag': 6,
+    // build lane fractions
+    'count_in_fractions': 3, 'mixed_numbers_intro': 3,
     // Reusable primitive demos (inline-cloze + image-hotspot)
     'cloze_addition': 2, 'hotspot_quads': 3,
     // Math Vocabulary (grade-level matching skills)
@@ -843,6 +845,9 @@ export const SKILLS = {
         { v: "fraction_bar_ops", l: "Fraction Bar Operations (Visual)" },
         { v: "fraction_nl_drag", l: "Place Fractions on a Number Line" },
         { v: "mixed_nl_drag", l: "Place Mixed Numbers on a Number Line" },
+        // build lane fractions (design/BUILD_LIST.md), appended 2026-09-25
+        { v: "count_in_fractions", l: "Count in Fractions" },
+        { v: "mixed_numbers_intro", l: "Fractions Beyond 1" },
     ],
     fraction_operations: [
         // Grade 4 fraction operations
@@ -1305,7 +1310,7 @@ export const SKILLS = {
 export function isMixedMetaSkill(v) {
     // Real playable skills that happen to start with 'mixed_' or end with '_all'
     const realPlayableSkills = new Set([
-        'mixed_add_sub', 'mixed_mult_div', 'mixed_improper_visual', 'mixed_nl_drag',
+        'mixed_add_sub', 'mixed_mult_div', 'mixed_improper_visual', 'mixed_nl_drag', 'mixed_numbers_intro',
         'coordinate_all',
     ]);
     if (realPlayableSkills.has(v)) return false;
@@ -2046,6 +2051,8 @@ export const SKILL_PRINT_SIZE = {
     // Drag-onto-number-line family (nl-drag widget — full-width number line)
     fraction_nl_drag: "wide", decimal_nl_drag: "wide",
     mixed_nl_drag: "wide", integer_nl_drag: "wide",
+    // build lane fractions: a row of fraction tiles under a number line (kit frac-model `count`)
+    count_in_fractions: "wide", mixed_numbers_intro: "medium",
     // Compose-fraction-tiles & compose-shape-blocks widget skills (full-width drag stages)
     compose_whole: "wide", compose_target_frac: "wide",
     compose_hexagon: "wide", compose_rect_from_squares: "wide",

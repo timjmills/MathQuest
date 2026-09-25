@@ -22,20 +22,20 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
+- Covered 522 (60%), partial only 145 (17%), gap 205 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 328 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 330 skills carry WRM tags. 158 proposals (118 new skills, 40 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
 | Reception | PK | 18 | 119 | 58 (49%) | 28 | 33 |
 | Year 1 | K | 14 | 116 | 72 (62%) | 24 | 20 |
-| Year 2 | 1 | 11 | 124 | 80 (65%) | 18 | 26 |
-| Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
-| Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
+| Year 2 | 1 | 11 | 124 | 81 (65%) | 18 | 25 |
+| Year 3 | 2 | 12 | 134 | 80 (60%) | 23 | 31 |
+| Year 4 | 3 | 14 | 129 | 85 (66%) | 16 | 28 |
 | Year 5 | 4 | 15 | 136 | 81 (60%) | 22 | 33 |
-| Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **513 (59%)** | **149** | **210** |
+| Year 6 | 5 | 13 | 114 | 65 (57%) | 14 | 35 |
+| **All** | | **97** | **872** | **522 (60%)** | **145** | **205** |
 
 ## Source disagreements
 
@@ -182,17 +182,11 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Strengthens: Y6.B9.S9  
   _proposal id: percent_multi_
 
-### fractions (18 proposals, 28 steps)
+### fractions (14 proposals, 19 steps)
 
-- **Count in Fractions** — new skill `fractions:count_in_fractions`. Teaches counting up and down in unit fractions on a number line and past a whole (1/4, 2/4, 3/4, 1, 1 1/4). Representation: a number line with fraction ticks; fill the missing counts.  
-  Closes (4): Y2.B8.S15 Count in fractions up to a whole; Y3.B6.S8 Count in fractions on a number line; Y3.B6.S9 Equivalent fractions on a number line; Y4.B7.S9 Equivalent fractions on a number line  
-  _proposal id: frac_count_
 - **Equal and Unequal Parts** — new skill `fractions:equal_parts`. Teaches parts and wholes; deciding whether parts are equal; finding the whole from a part. Representation: shapes split into parts; tick equal / not equal; draw the whole from a half or a quarter.  
   Closes (3): Y2.B8.S1 Introduction to parts and whole; Y2.B8.S2 Equal and unequal parts; Y2.B8.S9 Find the whole  
   _proposal id: fraction_parts_
-- **Fractions Beyond 1** — new skill `fractions:mixed_numbers_intro`. Teaches counting beyond 1 in fractions, partitioning a mixed number into wholes and a fraction, mixed numbers on a number line. Representation: bar and number-line models with wholes shaded; write the mixed number.  
-  Closes (3): Y4.B7.S2 Count beyond 1; Y4.B7.S3 Partition a mixed number; Y4.B7.S5 Compare and order mixed numbers  
-  _proposal id: frac_beyond_1_
 - **Halves and Quarters** — new skill `fractions:halves_and_quarters`. Teaches finding and recognising a half and a quarter of a shape, an object and a small quantity (equal parts, 2 or 4). Representation: shapes and small sets of objects; shade or circle a half/quarter; tick if the parts are equal.  
   Closes (2): Y1.B10.S3 Recognise a half of a quantity; Y1.B10.S7 Recognise a quarter of a quantity  
   _proposal id: half_quarter_
@@ -226,18 +220,12 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
 - **Fractions as Operators** — new skill `fractions:fraction_as_operator`. Teaches using a fraction as an operator (2/5 of 30 = 30 ÷ 5 × 2) and seeing that 1/4 of 20 = 20 ÷ 4 = 20 × 1/4. Representation: a bar model with the operator arrows; write the calculation both ways.  
   Closes (1): Y5.B6.S7 Use fractions as operators  
   _proposal id: frac_operator_
-- **Equivalent Fractions on a Number Line (option)** — option on `fractions:equiv_frac_visual`: number lines. Teaches equivalent fractions shown on stacked number lines. Representation: a double number-line representation option.  
-  Closes (1): Y6.B3.S2 Equivalent fractions on a number line  
-  _proposal id: frac_nl_equiv_
 - **Compare Fractions by Numerator (option)** — option on `fractions:compare`: same numerator. Teaches comparing and ordering fractions with the same numerator (3/5 > 3/7) and by denominators. Representation: a comparison-type option on compare/order.  
   Closes (1): Y6.B3.S4 Compare and order (numerator)  
   _proposal id: compare_numerator_
 - **Multi-Step Fraction Problems** — new skill `fraction_operations:fraction_multi_step_problems`. Teaches multi-step word problems with adding and subtracting fractions, using a bar model. Representation: a bar model with the steps; write each step's answer.  
   Closes (1): Y6.B3.S9 Multi-step problems  
   _proposal id: frac_multistep_
-- **Fraction of an Amount: Find the Whole (option)** — option on `fractions:fraction_of_set_hard_nv`: find the whole. Teaches finding the whole from a known fractional part with a bar model (3/5 is 24, what is the whole?). Representation: a "find the whole" task option with a bar model support.  
-  Closes (1): Y6.B4.S7 Fraction of an amount - find the whole  
-  _proposal id: frac_find_whole_
 
 ### geometry (27 proposals, 65 steps)
 
@@ -1844,8 +1832,8 @@ whatever happens to the WRM gaps.
 - **Y2.B8.S14** Find three-quarters — covered. _3.NF.A.1, M.EE.3.NF.1_  
   Skills: Shade the Fraction (`fractions:shade_fraction`) {3/4}; Fraction of a Set (Visual) (`fractions:fraction_of_set`) {3/4}  
   Vocabulary: quarter, three-quarters, equal groups  
-- **Y2.B8.S15** Count in fractions up to a whole — GAP. _3.NF.A.1, 3.NF.A.3c, M.EE.3.NF.1, M.EE.3.NF.3_  
-  Proposal: Count in Fractions  
+- **Y2.B8.S15** Count in fractions up to a whole — covered. _3.NF.A.1, 3.NF.A.3c, M.EE.3.NF.1, M.EE.3.NF.3_  
+  Skills: Count in Fractions (`fractions:count_in_fractions`)  
   Vocabulary: numerator, denominator, whole  
 
 #### Y2.B9 Summer Block 2: Time
@@ -2202,12 +2190,11 @@ whatever happens to the WRM gaps.
 - **Y3.B6.S7** Fractions on a number line — covered. _2.MD.B.6, 3.NF.A.2, M.EE.2.MD.6, M.EE.3.NF.2_  
   Skills: Fractions on Number Line (Visual) (`composing:fraction_number_line`); Place Fractions on Number Line (`fractions:graph_fractions`)  
   Vocabulary: interval, marker, equal parts  
-- **Y3.B6.S8** Count in fractions on a number line — GAP. _3.NF.A.2, M.EE.3.NF.2_  
-  Proposal: Count in Fractions  
+- **Y3.B6.S8** Count in fractions on a number line — covered. _3.NF.A.2, M.EE.3.NF.2_  
+  Skills: Count in Fractions (`fractions:count_in_fractions`)  
   Vocabulary: interval, denominator, endpoint  
-- **Y3.B6.S9** Equivalent fractions on a number line — PARTIAL. _3.NF.A.2, 3.NF.A.3a, M.EE.3.NF.2, M.EE.3.NF.3_  
-  Partial: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`), missing equivalent fractions shown on two number lines  
-  Proposal: Count in Fractions  
+- **Y3.B6.S9** Equivalent fractions on a number line — covered. _3.NF.A.2, 3.NF.A.3a, M.EE.3.NF.2, M.EE.3.NF.3_  
+  Skills: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`) {equivalent fractions on two number lines (model: line)}; Count in Fractions (`fractions:count_in_fractions`)  
   Vocabulary: equivalent, in line with, equal in length  
 - **Y3.B6.S10** Equivalent fractions as bar models — covered. _3.NF.A.3b, M.EE.3.NF.3_  
   Skills: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`)  
@@ -2640,18 +2627,18 @@ whatever happens to the WRM gaps.
 - **Y4.B7.S1** Understand the whole — covered. _3.NF.A.1, M.EE.3.NF.1_  
   Skills: Whole Numbers as Fractions (Visual) (`composing:whole_as_fraction`); Compose 1 Whole from Unit Fractions (`composing:compose_whole`)  
   Vocabulary: whole, equal parts, denominator  
-- **Y4.B7.S2** Count beyond 1 — GAP. _3.NF.A.1, M.EE.3.NF.1_  
-  Proposal: Fractions Beyond 1  
+- **Y4.B7.S2** Count beyond 1 — covered. _3.NF.A.1, M.EE.3.NF.1_  
+  Skills: Fractions Beyond 1 (`fractions:mixed_numbers_intro`)  
   Vocabulary: interval, mixed number, integer  
-- **Y4.B7.S3** Partition a mixed number — GAP. _3.NF.A.1, 4.NF.B.3, M.EE.3.NF.1, M.EE.4.NF.3_  
-  Proposal: Fractions Beyond 1  
+- **Y4.B7.S3** Partition a mixed number — covered. _3.NF.A.1, 4.NF.B.3, M.EE.3.NF.1, M.EE.4.NF.3_  
+  Skills: Fractions Beyond 1 (`fractions:mixed_numbers_intro`)  
   Vocabulary: partition, mixed number, fractional part  
 - **Y4.B7.S4** Number lines with mixed numbers — covered. _3.NF.A.2, M.EE.3.NF.2_  
   Skills: Fractions on Number Line (Visual) (`composing:fraction_number_line`)  
   Vocabulary: interval, mixed number, midpoint  
-- **Y4.B7.S5** Compare and order mixed numbers — PARTIAL. _3.NF.A.3, 4.NF.A.2, M.EE.3.NF.3, M.EE.4.NF.2_  
+- **Y4.B7.S5** Compare and order mixed numbers — covered. _3.NF.A.3, 4.NF.A.2, M.EE.3.NF.3, M.EE.4.NF.2_  
+  Skills: Fractions Beyond 1 (`fractions:mixed_numbers_intro`)  
   Partial: Compare Fractions (>, <, =) (`fractions:compare`), missing comparing and ordering mixed numbers  
-  Proposal: Fractions Beyond 1  
   Vocabulary: whole number, numerator, compare  
 - **Y4.B7.S6** Understand improper fractions — covered. _3.NF.A.1, 3.NF.A.3c, M.EE.3.NF.1, M.EE.3.NF.3_  
   Skills: Improper ↔ Mixed Numbers (`fractions:improper_mixed`); Mixed ↔ Improper (Visual Pizza) (`fractions:mixed_improper_visual`)  
@@ -2662,9 +2649,8 @@ whatever happens to the WRM gaps.
 - **Y4.B7.S8** Convert improper fractions to mixed numbers — covered. _3.NF.A.1, 4.NF.B.3b, M.EE.3.NF.1, M.EE.4.NF.3_  
   Skills: Improper ↔ Mixed Numbers (`fractions:improper_mixed`)  
   Vocabulary: whole, remaining, leftover, mixed number  
-- **Y4.B7.S9** Equivalent fractions on a number line — PARTIAL. _3.NF.A.2, 3.NF.A.3a, M.EE.3.NF.2, M.EE.3.NF.3_  
-  Partial: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`), missing equivalent fractions on number lines  
-  Proposal: Count in Fractions  
+- **Y4.B7.S9** Equivalent fractions on a number line — covered. _3.NF.A.2, 3.NF.A.3a, M.EE.3.NF.2, M.EE.3.NF.3_  
+  Skills: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`) {equivalent fractions on number lines (model: line)}; Count in Fractions (`fractions:count_in_fractions`)  
   Vocabulary: equivalent, equal parts, divisions, line up (align)  
 - **Y4.B7.S10** Equivalent fraction families — covered. _3.NF.A.3b, 4.NF.A.1, M.EE.3.NF.3, M.EE.4.NF.1_  
   Skills: Equivalent Fractions (No Visuals) (`fractions:equiv_frac_nv`); Equivalent Fractions (`fractions:equivalent`)  
@@ -3431,8 +3417,8 @@ whatever happens to the WRM gaps.
 - **Y6.B3.S1** Equivalent fractions and simplifying — covered. _4.NF.A.1, M.EE.4.NF.1_  
   Skills: Equivalent Fractions (`fractions:equivalent`); Simplify Fractions (`fractions:simplify`)  
   Vocabulary: simplify, simplest form, common factor  
-- **Y6.B3.S2** Equivalent fractions on a number line — GAP. _4.NF.A.1, M.EE.4.NF.1_  
-  Proposal: Equivalent Fractions on a Number Line (option)  
+- **Y6.B3.S2** Equivalent fractions on a number line — covered. _4.NF.A.1, M.EE.4.NF.1_  
+  Skills: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`) {equivalent fractions on stacked number lines (model: line)}  
   Vocabulary: equivalent, interval, simplify  
 - **Y6.B3.S3** Compare and order (denominator) — covered. _4.NF.A.2, M.EE.4.NF.2_  
   Skills: Order Fractions (`fractions:order_fractions`); Compare Fractions (LCD) (`fractions:compare_frac_lcd`)  
@@ -3479,9 +3465,8 @@ whatever happens to the WRM gaps.
 - **Y6.B4.S6** Fraction of an amount — covered. _5.NF.B.4_  
   Skills: Fraction of a Set - Hard (Visual) (`fractions:fraction_of_set_hard`); Fraction of a Set - Hard (No Visuals) (`fractions:fraction_of_set_hard_nv`)  
   Vocabulary: denominator, numerator, each part  
-- **Y6.B4.S7** Fraction of an amount - find the whole — PARTIAL. _5.NF.B.4_  
-  Partial: Fraction of a Set - Hard (No Visuals) (`fractions:fraction_of_set_hard_nv`), missing a page of find-the-whole only, with a bar model  
-  Proposal: Fraction of an Amount: Find the Whole (option)  
+- **Y6.B4.S7** Fraction of an amount - find the whole — covered. _5.NF.B.4_  
+  Skills: Fraction of a Set - Hard (No Visuals) (`fractions:fraction_of_set_hard_nv`) {find the whole, with the bar model support (fractions lane)}  
   Vocabulary: whole, numerator, denominator  
 - _Awsaj supplement (not a WRM step):_ Divide a whole number by a unit fraction — 5.NF.B.7, 5.NF.B.7b, 5.NF.B.7c
 

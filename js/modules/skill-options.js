@@ -2034,13 +2034,15 @@ Object.assign(P12_OPTIONS, {
     'fractions:write_fraction': [_p12Denoms()],
     'fractions:shade_fraction': [_p12Denoms()],
     'fractions:equiv_frac_visual': [_p12Denoms()],
-    'fractions:equiv_frac_nv': [_p12Denoms()],
+    'fractions:equiv_frac_nv': [_p12Denoms(), _p12Variants('equiv_frac_nv', ['up', 'upD', 'same', 'down'],
+        ['Missing numerator (2/3 = __/12)', 'Missing denominator (2/3 = 8/__)', 'Equivalent or not? (= or \u2260)', 'Divide down (8/12 = __/3)'],
+        { label: 'What the items ask' })],
     'fractions:equivalent': [_p12Denoms(), _p12Variants('equivalent', ['standard', 'yesNoEquiv', 'multiSelectHalf'],
-        ['Find the missing number (1/2 = __/8)', 'Equivalent or not? (yes or no)', 'Click every fraction equal to 1/2'])],
+        ['Find the missing number (2/3 = __/12)', 'Equivalent or not? (= or \u2260)', 'Fractions equal to one half (1/2 = __/8)'])],
     'fractions:compare': [_p12Denoms([2, 3]), _p12Variants('compare', ['standard', 'numericOnly', 'compareHalf'],
         ['Compare with fraction bars', 'Compare the numbers only', 'Compare with one half'])],
     'fractions:simplify': [_p12Variants('simplify_main', ['standard', 'isSimplest', 'gcfStep'],
-        ['Simplify the fraction', 'Is it in simplest form? (yes or no)', 'Find the greatest common factor first'])],
+        ['Simplify the fraction', 'Some already in simplest form (the pupil copies them)', 'Find the greatest common factor first'])],
     'fractions:improper_mixed': [_p12Denoms()],
     'fractions:mixed_improper_visual': [_p12Denoms()],
     'fractions:compose_target_frac': [_p12Denoms()],
@@ -2140,7 +2142,7 @@ Object.assign(P12_OPTIONS, {
     'conversions:d_to_p': [_p12Dp([1, 2], 'Tenths (0.7 = 70%) come before hundredths (0.08 = 8%).')],
     'conversions:p_to_d': [_p12Dp([1, 2], 'Tenths (70% = 0.7) come before hundredths (8% = 0.08).')],
     'conversions:percent_visual': [_p12Match([['What percent is shaded?', 'What percent'], ['What fraction is shaded?', 'What fraction'],
-        ['"80% is shaded": how many squares?', 'How many squares'], ['Click every grid that shows it', 'Click ALL']])],
+        ['"80% is shaded": how many squares?', 'How many squares'], ['Write the percent as hundredths (45% = __/100)', 'as hundredths']])],
     'conversions:percent_of_number': [_p12Match([['What is 20% of 60?', '^What is'], ['Click every expression equal to it', 'Click ALL']]),
         _p12Max([50], 100)],
     'conversions:find_whole_from_pct': [_p12Match([['"16 is 40% of what number?"', 'of what number'], ['Click every value that works', 'Click ALL']])],
@@ -2910,7 +2912,23 @@ SKILL_OPTIONS['composing:number_chart_fill'] = [
 // Each default is what the skill drew before (R2), so an untouched skill and every old link draw
 // the same items. Share-code keys: `model` 5D (reserved for exactly this); `ticks` 2E, the id and
 // vocabulary nl_mult / nl_div already use ('one' = every number), with two new tokens.
-const _AP3_MODEL = { area: 'Rectangle (area model)', bar: 'Bar (fraction strip)', circle: 'Circle', line: 'Number line 0 to 1 (a dot marks it)' };
+const _AP3_MODEL = { area: 'Rectangle (area model)', bar: 'Bar (fraction strip)', circle: 'Circle', line: 'Number line 0 to 1 (a dot marks it)',
+    wall: 'Fraction wall (the bars one under the other)' };
+/** Line modes (fractions lane): hops over the parts from 0 to the dot - a hint that fades. */
+const _FRAC_HOPS = {
+    id: 'lineHops', label: 'Hops on the number line', type: 'bool', default: false, group: 'support',
+    help: 'On draws an arc over every part from 0 to the dot, so the pupil counts the hops for the numerator. '
+        + 'A hint: switch it off as the pupil grows sure. Number-line items only.',
+    appliesTo: (o) => Array.isArray(o.model) && o.model.includes('line'),
+};
+/** Bar modes (fractions lane): each part of a bar labelled with its size - a hint that fades. */
+const _FRAC_LABELS = {
+    id: 'partLabels', label: 'Label the parts', type: 'bool', default: false, group: 'support',
+    help: 'On writes the size of one part inside every part of the bars (1/4 in each quarter), so the pupil reads '
+        + 'the unit fraction instead of working it out. A hint: switch it off as the pupil grows sure. Bars and '
+        + 'fraction walls only; parts too narrow to hold it stay blank.',
+    appliesTo: (o) => !Array.isArray(o.model) || o.model.some((m) => m === 'bar' || m === 'wall'),
+};
 const _ap3Model = (values, dflt, help, appliesTo = null) => ({
     id: 'model', label: 'Fraction model', type: 'set', group: 'layout', default: dflt,
     values: values.map(v => ({ v, l: _AP3_MODEL[v] })), allLabel: 'Every model, mixed', help,
@@ -2950,14 +2968,17 @@ const _AP3_OPTIONS = {
     'fractions:shade_fraction': [_ap3Model(['area', 'bar', 'circle'], ['area', 'bar', 'circle'],
         'Default: rectangles, bars and circles, mixed. The empty picture the pupil shades, on paper and on screen. '
         + 'A number line is not offered: a pupil marks a point on a line, he does not shade it.')],
-    'fractions:compare': [_ap3Model(['bar', 'circle', 'area', 'line'], ['bar'],
+    'fractions:compare': [_ap3Model(['bar', 'wall', 'circle', 'area', 'line'], ['bar'],
         'Default: bars. The two pictures on each "compare the fractions" item: both fractions are drawn as the ticked '
-        + 'model on the same size of whole, on paper and on screen. Tick several to mix them. The other kinds of item '
+        + 'model on the same size of whole, on paper and on screen. A fraction wall puts one bar under the other, '
+        + 'left edges lined up, with the sentence under them. Tick several to mix them. The other kinds of item '
         + '(numbers only, compare to 1/2) have no picture.',
-        (o) => !Array.isArray(o.forms) || !o.forms.length || o.forms.includes(0))],
-    'fractions:equiv_frac_visual': [_ap3Model(['circle', 'bar', 'area'], ['circle'],
+        (o) => !Array.isArray(o.forms) || !o.forms.length || o.forms.includes(0)), _FRAC_LABELS],
+    'fractions:equiv_frac_visual': [_ap3Model(['circle', 'bar', 'wall', 'area', 'line'], ['circle'],
         'Default: circles, as the skill always drew. Both fractions are drawn as the ticked model on the same size of whole, '
-        + 'so the pupil sees they cover the same amount. Bars (fraction strips) are the usual picture for equivalence.')],
+        + 'so the pupil sees they cover the same amount. Bars (fraction strips) are the usual picture for equivalence; '
+        + 'a fraction wall puts one bar under the other so the equal lengths line up. Number lines are two lines, one under '
+        + 'the other, 0 under 0: equivalent fractions sit at the same point.'), _FRAC_LABELS],
     'fraction_operations:add_fractions_like': [_ap3Model(['bar', 'area', 'circle'], ['bar'],
         'Default: the skill\'s own bars. A rectangle or a circle draws each fraction of the sum that way, in black and '
         + 'white, and never draws the answer. Pictures off prints numbers only.', (o) => o.pictures !== false)],
@@ -3011,6 +3032,78 @@ const _AP3_OPTIONS = {
         + 'ends only the pupil counts the wholes too. (Every part is not offered: nineteen mixed numbers do not fit.)')],
 };
 for (const [key, defs] of Object.entries(_AP3_OPTIONS)) SKILL_OPTIONS[key] = [...(SKILL_OPTIONS[key] || []), ...defs];
+// Fractions lane (2026-09-25): the fraction-operation skills that left the legacy pictures for the
+// frac-model cell get the same "Fraction model" choice (share-code key `model` 5D, as above).
+/** Operator arcs (vis_operator_arcs): "× [ ]" over the numerators and under the denominators. */
+const _FRAC_ARCS = (op) => ({
+    id: 'opArcs', label: 'Operator arcs', type: 'enum', default: 'blank', group: 'support',
+    values: [
+        { v: 'blank', l: `Arcs with a box to write the ${op === '×' ? 'multiplier' : 'divisor'} (${op} __) (default)` },
+        { v: 'value', l: `Arcs with the ${op === '×' ? 'multiplier' : 'divisor'} written (${op} 4)` },
+        { v: 'none', l: 'No arcs' },
+    ],
+    help: `An arc over the two numerators and one under the two denominators, each with "${op}" and a box: the pupil writes `
+        + `the number both parts are ${op === '×' ? 'multiplied' : 'divided'} by (his working, not scored). "Written" shows it (a hint); `
+        + 'no arcs is the fraction sentence alone. Only the missing-number items carry arcs.',
+});
+const _FRAC_LANE_OPTIONS = {
+    'fractions:fraction_bar_ops': [_ap3Model(['bar', 'wall'], ['bar'],
+        'Default: the two bars side by side. A fraction wall puts one bar under the other on the same whole, left edges '
+        + 'lined up, with the number sentence on one line under them. The answer is never drawn.'), _FRAC_LABELS],
+    'fractions:mixed_numbers_intro': [
+        _p12Denoms(),
+        formsOption([{ v: 0, l: 'Wholes and a part: write the mixed number' }, { v: 1, l: 'Split it: 2 3/4 = __ + __/4' },
+            { v: 2, l: 'On a number line past 1' }],
+        { label: 'What the items ask', help: 'Tick one kind for a page of it alone, or several to mix them.' }),
+        _ap3Model(['circle', 'bar', 'area'], ['circle'],
+            'Default: circles. The whole shapes and the part, in black and white on paper and screen (the number-line items draw a line). '
+            + 'Pictures off prints "split it" items as numbers only; the other items are their picture.', (o) => o.pictures !== false),
+        { ..._p12Strip('Off prints the "split it" items as numbers only. The items whose question IS the picture keep it.') },
+    ],
+    'fractions:count_in_fractions': [
+        _p12Denoms([2, 3, 5]),
+        formsOption([{ v: 0, l: 'Within one whole (1/4, 2/4, 3/4, 1)' }, { v: 1, l: 'Past one, as fractions (4/4, 5/4, 6/4)' },
+            { v: 2, l: 'Past one, as mixed numbers (1, 1 1/4, 1 2/4)' }, { v: 3, l: 'Counting back (1 1/4, 1, 3/4)' }],
+        { label: 'What the counts are', help: 'One step up the ladder at a time: counts inside one whole, then past it written as fractions, then as whole and mixed numbers, then counting back. Tick several to mix them.' }),
+        { id: 'countLine', label: 'Number line over the counts', type: 'bool', default: true, group: 'support',
+            help: 'On draws a number line over the row of counts, a tick over each count and the whole numbers heavy, so the pupil sees each count move one equal part. A hint: switch it off to leave the row of counts alone.' },
+    ],
+    'fractions:equivalent': [_FRAC_ARCS('×')],
+    'fractions:equiv_frac_nv': [_FRAC_ARCS('×')],
+    'fractions:simplify': [_FRAC_ARCS('÷')],
+    'fractions:fraction_of_set_hard_nv': [{
+        id: 'barModel', label: 'Bar model', type: 'bool', default: false, group: 'support',
+        help: 'On draws a bar of equal boxes over each item: a brace over the known parts and one under the whole, the '
+            + 'unknown marked "?". The pupil finds one box, then the answer. A hint: switch it off as the pupil grows sure.',
+    }],
+    'fractions:identify': [_FRAC_HOPS],
+    'fractions:write_fraction': [_FRAC_HOPS],
+    'fraction_operations:decompose_fractions': [_ap3Model(['bar', 'area', 'circle'], ['bar'],
+        'Default: bars. The fraction is drawn above its sum of unit fractions, one part per unit fraction, in black and '
+        + 'white on paper and screen. Pictures off prints the number sentence only.', (o) => o.pictures !== false)],
+    'fraction_operations:frac_as_division': [_ap3Model(['circle', 'bar', 'area'], ['circle'],
+        'Default: circles (the wholes being shared). Each whole is drawn cut into as many equal parts as there are people '
+        + 'to share it; nothing is shaded, so the picture never gives the answer. Pictures off prints the division only.',
+        (o) => o.pictures !== false)],
+    'fractions:improper_mixed': [
+        formsOption([{ v: 0, l: 'Improper to mixed (11/4 = __ __/4)' }, { v: 1, l: 'Mixed to improper (2 3/4 = __/4)' },
+            { v: 2, l: 'From the picture: the improper fraction' }],
+        { label: 'Which way', help: 'Tick one kind for a page of it, or several to mix them. With pictures off, "from the picture" items are written mixed to improper.' }),
+        _ap3Model(['circle', 'bar', 'area'], ['circle'],
+            'Default: circles. The amount is drawn as whole shapes and a part, in black and white on paper and screen. '
+            + 'Pictures off prints the numbers only.', (o) => o.pictures !== false),
+        { ..._p12Strip('Off prints the same conversions as numbers only, without the whole shapes.') },
+    ],
+    'fractions:mixed_improper_visual': [
+        formsOption([{ v: 0, l: 'Mixed to improper (2 3/4 = __/4)' }, { v: 1, l: 'Improper to mixed (11/4 = __ __/4)' }],
+            { label: 'Which way', help: 'Tick one direction for a page of it, or both to mix them. The picture shows the amount either way.' }),
+        _ap3Model(['circle', 'bar', 'area'], ['circle'],
+            'Default: circles. The amount is drawn as whole shapes and a part, in black and white on paper and screen; '
+            + 'the pupil counts the parts. Pictures off prints the numbers only.', (o) => o.pictures !== false),
+        { ..._p12Strip('Off prints the same conversions as numbers only, without the whole shapes.') },
+    ],
+};
+for (const [key, defs] of Object.entries(_FRAC_LANE_OPTIONS)) SKILL_OPTIONS[key] = [...(SKILL_OPTIONS[key] || []), ...defs];
 // ============================ end O6 · fraction models and number lines ============================
 
 // ===========================================================================

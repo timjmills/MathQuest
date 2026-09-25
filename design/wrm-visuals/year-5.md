@@ -326,7 +326,7 @@ decimals, orientation), so a Y3 MATCH can be a Y5 PARTIAL.
 | R54 | Fraction bars: stacked equal-length, wall rows, past one whole, mixed-number bars (wholes + part), brackets / braces, 100 % head | B4 S1–S17; B6 S1–S3, S7; B7 S13 | Y3 | PARTIAL | `frac-model` bar (one bar) → `stack`, `wholes`, `brackets`, `labels: 'unit'`, `whole: '100%'` |
 | R55 | Fraction number line (past 1: 0–3, 0–4; fraction blocks sitting on the line) | B4 S4–S5, S7, S16; B6 S1–S2 | Y3 | PARTIAL | `fraction_nl_drag`, `mixed_nl_drag` (`ticks`) → `blocks: true` |
 | R56 | Two stacked fraction lines (equivalence; subtraction hops) | B4 S1–S2, S14 | Y3 | PARTIAL | `frac-model` line → `stack: 2` |
-| R57 | Fraction of a set (pictured objects ringed) | B6 S4 | Y3 | PARTIAL | `fractions:fraction_of_set` (legacy) → `template:arrays` rings |
+| R57 | Fraction of a set (pictured objects ringed) | B6 S4 | Y3 | MATCH | `fractions:fraction_of_set_hard`: frac-model `amount`, `pic: 'set'` (counters ringed into equal groups) |
 | R58 | Data / listing table with blanks (populations, masses, conversions, cube table, translation table, temperatures) | B1 S11, S14; B2 S4; B3 S7; B9 S1, S3; B11 S4; B13 S1, S5; B14 S5 | Y3 | GAP | `template:data-table` |
 | R59 | Sort table (2–5 labelled columns) | B3 S5; B6 S4; B10 S2; B12 S6, S8 | Y3 | PARTIAL | `hands-sort` page tag; kit `template:sort-table` GAP |
 | R60 | Analogue clock (minute-hand turn in degrees) | B10 S1 | Y3 | MATCH | `template:clock` |

@@ -31,6 +31,131 @@ const mixedText = (w, n, d) => (w ? `${w}${n ? ` ${n}/${d}` : ''}` : `${n}/${d}`
 const gcd = (a, b) => (b ? gcd(b, a % b) : Math.abs(a));
 const lineModel = (t) => t && t.kind === 'line';
 
+/* ========================================================= the Stretch page's open task */
+
+/**
+ * `open(q, {rows})`: the open task of the Stretch page (roles/stretch.js). A fraction item has no
+ * whole-number pairs to hunt for, so the pupil hunts for FRACTIONS: the ones equal to the item's
+ * fraction (bigger denominators, top and bottom multiplied by the same number), or, for a sum of
+ * two fractions with one denominator, other pairs that make the same sum. Every row of the key is
+ * a right answer and there are always more, so "There are more." is the true box.
+ */
+function fracOpen(q, { rows = 6 } = {}) {
+    const p = payloadOf(q);
+    if (!p) return null;
+    let base = null;
+    if (p.task === 'shade' || p.task === 'pick') base = p.show;
+    else if (p.task === 'write' || p.task === 'part' || p.task === 'sign') base = p.terms[0];
+    else if (p.task === 'op') {
+        const s = sentenceOf(q);
+        const a = p.answer || {};
+        if (s && s.terms.length === 2 && s.ops[0] === '+' && !s.terms[0].w && !s.terms[1].w && s.terms[0].d === s.terms[1].d && !a.w && a.n) {
+            // pairs of fractions with the item's denominator that add to the same total
+            const d = s.terms[0].d, tot = s.terms[0].n + s.terms[1].n;
+            if (tot >= 4) {
+                const keyRows = [];
+                for (let x = tot - 1; x >= 1 && keyRows.length < rows; x--) {
+                    if (x === s.terms[0].n || x === 1) continue;
+                    keyRows.push([fr(x, d), fr(tot - x, d), fr(tot, d)]);
+                }
+                if (keyRows.length >= 3) {
+                    return { prompt: [`Two fractions add to ${fr(tot, d)}.`, 'Find different pairs.'], columns: ['First fraction', 'Second fraction', 'Check: total'],
+                        example: [fr(1, d), fr(tot - 1, d), fr(tot, d)], keyRows, total: Infinity };
+                }
+            }
+        }
+        base = a.n && !a.w ? { n: a.n, d: a.d } : null;
+    }
+    if (!base || !(Number(base.n) > 0) || !(Number(base.d) > 1)) return null;
+    const g = gcd(Number(base.n), Number(base.d));
+    const n = base.n / g, d = base.d / g;
+    const keyRows = [];
+    for (let k = 3; keyRows.length < rows && k <= 12; k++) if (!(n * k === base.n && d * k === base.d)) keyRows.push([n * k, d * k, `× ${k}`]);
+    return {
+        prompt: [`Find fractions equal to ${fr(n, d)}.`, 'Multiply the top and the bottom by the same number.'],
+        columns: ['Numerator', 'Denominator', 'Multiplied by'],
+        example: [n * 2, d * 2, '× 2'],
+        keyRows, total: Infinity,
+    };
+}
+
+/** Stretch: fractions equal to n/d (a whole number too: 1 = 2/2 = 3/3 ...). */
+function equivOpen(n0, d0, rows = 6) {
+    if (!(n0 > 0) || !(d0 > 0)) return null;
+    const g = gcd(n0, d0);
+    const n = n0 / g, d = d0 / g;
+    const keyRows = [];
+    for (let k = 3; keyRows.length < rows && k <= 12; k++) if (!(n * k === n0 && d * k === d0)) keyRows.push([n * k, d * k, `× ${k}`]);
+    return {
+        prompt: [`Find fractions equal to ${d === 1 ? n : fr(n, d)}.`, 'Multiply the top and the bottom by the same number.'],
+        columns: ['Numerator', 'Denominator', 'Multiplied by'],
+        example: [n * 2, d * 2, '× 2'], keyRows, total: Infinity,
+    };
+}
+
+/** Stretch: other ways to make the item's fraction from two fractions with its denominator (4.NF.B.3b "in more than one way"). */
+function decomposeOpen(q, { rows = 6 } = {}) {
+    const p = payloadOf(q);
+    if (!p || !p.terms || !p.terms[0]) return null;
+    const { n, d } = p.terms[0];
+    const tot = d >= 5 ? Math.min(d, Math.max(n, 5)) : (n >= 5 ? n : null);
+    // a small fraction (2/3, 3/4, 2/2): its equal fractions instead (1 = 2/2 = 3/3 ...)
+    if (!tot) return equivOpen(n, d, rows);
+    const keyRows = [];
+    for (let x = tot - 2; x >= 1 && keyRows.length < rows; x--) keyRows.push([fr(x, d), fr(tot - x, d), fr(tot, d)]);
+    if (keyRows.length < 3) return equivOpen(n, d, rows);
+    return { prompt: [`Make ${fr(tot, d)} from two fractions.`, 'Find different ways.'], columns: ['First fraction', 'Second fraction', 'Check: total'],
+        example: [fr(tot - 1, d), fr(1, d), fr(tot, d)], keyRows, total: tot - 1 };
+}
+
+/** Stretch: other shares that give each person the same amount (a ÷ b = ka ÷ kb). */
+function shareOpen(q, { rows = 6 } = {}) {
+    const p = payloadOf(q);
+    if (!p || !p.terms || p.terms.length < 2) return null;
+    const a = Number(p.terms[0].w), b = Number(p.terms[1].w);
+    if (!(a > 0) || !(b > 1)) return null;
+    const keyRows = [];
+    for (let k = 3; keyRows.length < rows && k <= 12; k++) keyRows.push([a * k, b * k, fr(a, b)]);
+    return { prompt: [`${a} shared by ${b} gives each ${fr(a, b)}.`, 'Find other shares that give each the same.'],
+        columns: ['Wholes', 'Shared by', 'Each gets'], example: [a * 2, b * 2, fr(a, b)], keyRows, total: Infinity };
+}
+
+/** Stretch: fractions that make the product of the item's whole less than, more than or equal to it. */
+function scalingOpen(q, { rows = 6 } = {}) {
+    const p = payloadOf(q);
+    if (!p || !p.terms || p.terms.length < 2) return null;
+    const { n, d } = p.terms[0];
+    const w = Number(p.terms[1].w);
+    const s = n < d ? '<' : n > d ? '>' : '=';
+    const xs = [];
+    if (s === '<') for (let x = 1; x < d; x++) { if (x !== n) xs.push([x, d]); }
+    else if (s === '>') for (let x = d + 1; x <= 3 * d; x++) { if (x !== n) xs.push([x, d]); }
+    else for (let k = 2; k <= 8; k++) xs.push([k, k]);
+    const keyRows = xs.slice(0, rows).map(([x, y]) => [fr(x, y), `${fr(x, y)} × ${w} ${s} ${w}`]);
+    if (keyRows.length < 3) return null;
+    const word = { '<': 'less than', '>': 'more than', '=': 'equal to' }[s];
+    return { prompt: [`${fr(n, d)} × ${w} is ${word} ${w}.`, `Find other fractions that make the answer ${word} ${w}.`],
+        columns: ['Fraction', 'Check'], example: [fr(n, d), `${fr(n, d)} × ${w} ${s} ${w}`], keyRows, total: s === '<' ? d - 1 : Infinity };
+}
+
+/** Stretch: other fractions bigger than 1 with the item's denominator, each as a mixed number. */
+function mixedOpen(q, { rows = 6 } = {}) {
+    const p = payloadOf(q);
+    if (!p || !p.terms || !p.terms[0]) return null;
+    const g = p.terms[0];
+    const d = Number(g.d);
+    if (!(d > 1)) return null;
+    const own = Number(g.w || 0) * d + Number(g.n || 0);
+    const keyRows = [];
+    for (let x = d + 1; keyRows.length < rows && x <= 4 * d; x++) {
+        if (x === own || x % d === 0) continue;
+        keyRows.push([fr(x, d), mixedText(Math.floor(x / d), x % d, d)]);
+    }
+    if (keyRows.length < 3) return null;
+    return { prompt: [`Find fractions bigger than 1 with ${d} as the denominator.`, 'Write each one as a mixed number.'],
+        columns: ['Improper fraction', 'Mixed number'], example: [fr(own, d), mixedText(Math.floor(own / d), own % d, d)], keyRows, total: Infinity };
+}
+
 /* ================================================================ write the fraction shown */
 
 function writeSteps(q) {
@@ -65,7 +190,7 @@ function writeWrong(q) {
     const c = [];
     if (t.d - t.n > 0) c.push({ value: fr(t.d - t.n, t.d), misconception: 'counted-unshaded', slot: 'n', slots: { n: String(t.d - t.n), d: String(t.d) },
         explain: `Counted the parts that are NOT ${lineModel(t) ? 'before the dot' : 'shaded'}: ${t.d - t.n}, not ${t.n}.` });
-    if (t.d - t.n > 0 && !lineModel(t)) c.push({ value: fr(t.n, t.d - t.n), misconception: 'part-over-part', slot: 'd', slots: { n: String(t.n), d: String(t.d - t.n) },
+    if (t.d - t.n > 1 && !lineModel(t)) c.push({ value: fr(t.n, t.d - t.n), misconception: 'part-over-part', slot: 'd', slots: { n: String(t.n), d: String(t.d - t.n) },
         explain: `Wrote shaded over unshaded (${t.n} and ${t.d - t.n}). The denominator is ALL the parts: ${t.d}.` });
     if (lineModel(t)) c.push({ value: fr(t.n, t.d + 1), misconception: 'counted-ticks', slot: 'd', slots: { n: String(t.n), d: String(t.d + 1) },
         explain: `Counted the tick marks (${t.d + 1}), not the spaces between them (${t.d}).` });
@@ -82,6 +207,7 @@ const WRITE_DEF = {
 };
 
 registerSkill('fractions:write_fraction', {
+    open: fracOpen,
     strings: strings(WRITE_DEF),
     misconceptions: ['counted-unshaded', 'part-over-part', 'counted-ticks'],
     workedSteps: writeSteps,
@@ -89,6 +215,7 @@ registerSkill('fractions:write_fraction', {
 });
 
 registerSkill('fractions:identify', {
+    open: fracOpen,
     strings: strings(Object.assign({}, WRITE_DEF, {
         iCan: 'I Can name the fraction a model shows',
         instructionKey: 'frac-name',
@@ -131,6 +258,7 @@ registerSkill('fractions:identify', {
 /* ======================================================================= shade the fraction */
 
 registerSkill('fractions:shade_fraction', {
+    open: fracOpen,
     strings: strings({
         iCan: 'I Can shade a model to show a fraction',
         instructionKey: 'shade',
@@ -166,6 +294,7 @@ registerSkill('fractions:shade_fraction', {
 function signOf(a, b) { return a > b ? '>' : a < b ? '<' : '='; }
 
 registerSkill('fractions:compare', {
+    open: fracOpen,
     strings: strings({
         iCan: 'I Can compare two fractions',
         instructionKey: 'compare',
@@ -228,6 +357,7 @@ registerSkill('fractions:compare', {
 /* =========================================================================== equivalent */
 
 registerSkill('fractions:equiv_frac_visual', {
+    open: fracOpen,
     strings: strings({
         iCan: 'I Can find equivalent fractions with models',
         instructionKey: 'models-complete',
@@ -452,6 +582,7 @@ const sayOf = (q) => {
 export function registerFractionSentence(key, op, extra = {}) {
     const def = SENTENCE[op];
     registerSkill(key, {
+        open: fracOpen,
         strings: strings(Object.assign({}, def, { sayValues: sayOf, vocabulary: ['numerator', 'denominator'] }, extra)),
         misconceptions: ['added-denominators', 'subtracted-denominators', 'did-not-regroup', 'wholes-only', 'multiplied-denominator', 'divided-wrong-way'],
         workedSteps: sentenceSteps,
@@ -475,3 +606,582 @@ registerFractionSentence('fraction_operations:mult_frac_whole', 'x');
 registerFractionSentence('fraction_operations:mult_frac_frac', 'x', { iCan: 'I Can multiply two fractions',
     steps: ['Draw rows for the first fraction.', 'Take the columns of the second fraction.', 'Count the cells inside both. Count all the cells.'], say: '__ times __ is __.' });
 registerFractionSentence('fraction_operations:div_unit_fraction', '÷');
+registerFractionSentence('fractions:fraction_bar_ops', '+', { iCan: 'I Can add and subtract fractions with fraction bars',
+    steps: ['Look at the bars: are the parts the same size?', 'If not, cut the bars into the same size of parts.', 'Add or subtract the parts. Write the answer.'] });
+
+/* =============================================================== fractions lane, 2026-09-25 */
+// decompose_fractions, frac_10_100, frac_as_division, mult_scaling and the fraction word
+// problems, all on the frac-model cell (gen-fractions.js).
+
+registerSkill('fraction_operations:decompose_fractions', {
+    open: decomposeOpen,
+    strings: strings({
+        iCan: 'I Can write a fraction as a sum of unit fractions',
+        instructionKey: 'unit-fractions',
+        steps: ['Count all the equal parts. Each part is 1 over that number.', 'Count the shaded parts.', 'Write one unit fraction for each shaded part.'],
+        say: '__ is __ unit fractions of __.',
+        sayValues: (q) => { const p = payloadOf(q); if (!p) return null; const t = p.terms[0]; return [fr(t.n, t.d), t.n, fr(1, t.d)]; },
+        vocabulary: ['unit fraction', 'numerator', 'denominator'],
+    }),
+    misconceptions: ['used-numerator', 'counted-shaded-as-parts'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        if (!p) return [];
+        const t = p.terms[0];
+        const marks = (p.answer.terms || []).map((u, i) => ({ slot: `d${i}`, value: String(u.d) }));
+        return clampSteps([
+            step(`The whole has ${t.d} equal parts. Each part is ${fr(1, t.d)}: a unit fraction.`),
+            step(`${t.n} parts are shaded, so ${fr(t.n, t.d)} is ${t.n} parts of ${fr(1, t.d)}.`),
+            step(`Write ${fr(1, t.d)} ${t.n} times: ${p.answer.text}.`, marks),
+        ]);
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        if (!p) return null;
+        const t = p.terms[0];
+        const k = (p.answer.terms || []).length;
+        const all = (d) => { const o = {}; for (let i = 0; i < k; i++) o[`d${i}`] = String(d); return o; };
+        const text = (d) => Array.from({ length: k }, () => fr(1, d)).join(' + ');
+        return chooseWrong(q, [
+            t.n !== t.d ? { value: text(t.n), misconception: 'used-numerator', slot: 'd0', slots: all(t.n), explain: `Used the numerator ${t.n} as the size of each part. The parts are ${fr(1, t.d)}: count ALL the parts.` } : null,
+            t.d - t.n > 1 ? { value: text(t.d - t.n), misconception: 'counted-shaded-as-parts', slot: 'd0', slots: all(t.d - t.n), explain: `Counted the white parts (${t.d - t.n}) as the denominator. The denominator is all ${t.d} parts.` } : null,
+        ]);
+    },
+});
+
+registerSkill('fraction_operations:frac_10_100', {
+    open: fracOpen,
+    strings: strings({
+        iCan: 'I Can write tenths as hundredths',
+        instructionKey: 'missing',
+        steps: ['A tenth is one column of the hundred square.', 'One column is 10 hundredths.', 'Multiply by 10, or divide by 10.'],
+        say: '__ is equal to __.',
+        sayValues: (q) => { const p = payloadOf(q); if (!p) return null; return [fr(p.terms[0].n, p.terms[0].d), fr(p.answer.n, p.answer.d)]; },
+        vocabulary: ['tenths', 'hundredths', 'equivalent'],
+    }),
+    misconceptions: ['added-zero-to-denominator-only', 'divided-wrong-way'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        if (!p) return [];
+        const t = p.terms[0], a = p.answer;
+        const up = t.d === 10;
+        return clampSteps([
+            step(up ? `${fr(t.n, 10)} is ${t.n} columns of the hundred square.` : `${fr(t.n, 100)} is ${t.n} small squares: ${t.n / 10} whole columns.`),
+            step(up ? `Each column is 10 hundredths: ${t.n} × 10 = ${a.n}.` : `Each column is 1 tenth: ${t.n} ÷ 10 = ${a.n}.`),
+            step(`${fr(t.n, t.d)} = ${fr(a.n, a.d)}. Write ${a.n}.`, [{ slot: 'n', value: String(a.n) }]),
+        ]);
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        if (!p) return null;
+        const t = p.terms[0];
+        return chooseWrong(q, [
+            { value: fr(t.n, p.answer.d), misconception: 'added-zero-to-denominator-only', slot: 'n', slots: { n: String(t.n) }, explain: 'Changed the denominator only. The numerator changes by the same factor.' },
+            t.d === 10 ? { value: fr(t.n + 10, 100), misconception: 'divided-wrong-way', slot: 'n', slots: { n: String(t.n + 10) }, explain: 'Added 10 instead of multiplying by 10.' } : null,
+        ]);
+    },
+});
+
+registerSkill('fraction_operations:frac_as_division', {
+    open: shareOpen,
+    strings: strings({
+        iCan: 'I Can see a fraction as a division',
+        instructionKey: 'share-fraction',
+        steps: ['Cut every whole into as many equal parts as there are people.', 'Give each person one part of each whole.', 'Count one person\'s parts: that is the fraction.'],
+        say: '__ shared by __ is __ each.',
+        sayValues: (q) => { const p = payloadOf(q); if (!p) return null; return [p.terms[0].w, p.terms[1].w, mixedText(p.answer.w, p.answer.n, p.answer.d)]; },
+        vocabulary: ['share', 'equal parts', 'divide'],
+    }),
+    misconceptions: ['divided-wrong-way', 'counted-all-parts'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        if (!p) return [];
+        const a = p.terms[0].w, b = p.terms[1].w, ans = p.answer;
+        const marks = [...(ans.w ? [{ slot: 'w', value: String(ans.w) }] : []), ...(ans.n ? [{ slot: 'n', value: String(ans.n) }, { slot: 'd', value: String(ans.d) }] : [])];
+        return clampSteps([
+            step(`Cut each of the ${a} whole${a > 1 ? 's' : ''} into ${b} equal parts. Each part is ${fr(1, b)}.`),
+            step(`Each of the ${b} gets one part of every whole: ${a} parts of ${fr(1, b)}.`),
+            step(`${a} ÷ ${b} = ${fr(a, b)}${mixedText(ans.w, ans.n, ans.d) !== fr(a, b) ? ` = ${mixedText(ans.w, ans.n, ans.d)}` : ''}. Write it.`, marks),
+        ]);
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        if (!p) return null;
+        const a = p.terms[0].w, b = p.terms[1].w;
+        const mixed = p.terms[p.terms.length - 1].frac === 'wnd';
+        const inv = b >= a ? { w: Math.floor(b / a), n: b % a, d: a } : { w: 0, n: b, d: a };
+        const c = [];
+        if (a !== b) {
+            const explain = `Wrote ${b} over ${a}: the people over the wholes. It is the wholes shared: ${fr(a, b)}.`;
+            if (mixed) c.push({ value: mixedText(inv.w, inv.n, inv.d), misconception: 'divided-wrong-way', slot: 'd', explain,
+                slots: { w: inv.w ? String(inv.w) : '', n: inv.n ? String(inv.n) : '', d: inv.n ? String(inv.d) : '' } });
+            else c.push({ value: fr(b, a), misconception: 'divided-wrong-way', slot: 'd', slots: { n: String(b), d: String(a) }, explain });
+        }
+        if (!mixed && a < b) c.push({ value: fr(a, a * b), misconception: 'counted-all-parts', slot: 'd', slots: { n: String(a), d: String(a * b) }, explain: `Counted every part of all the wholes (${a * b}) as the denominator. One whole has ${b} parts.` });
+        return chooseWrong(q, c);
+    },
+});
+
+registerSkill('fraction_operations:mult_scaling', {
+    open: scalingOpen,
+    strings: strings({
+        iCan: 'I Can tell if multiplying by a fraction makes a number bigger or smaller',
+        instructionKey: 'scaling-compare',
+        steps: ['Look at the fraction: is it less than 1, equal to 1, or more than 1?', 'Less than 1 makes the number smaller. More than 1 makes it bigger.', 'Write <, > or = in the circle.'],
+        say: '__ times __ is __ __.',
+        sayValues: (q) => {
+            const p = payloadOf(q);
+            if (!p) return null;
+            const word = { '>': 'greater than', '<': 'less than', '=': 'equal to' }[p.answer.sign];
+            return `${fr(p.terms[0].n, p.terms[0].d)} times ${p.terms[1].w} is ${word} ${p.terms[2].w}.`;
+        },
+        vocabulary: ['scaling', 'greater than', 'less than'],
+    }),
+    misconceptions: ['multiplying-always-bigger', 'sign-reversed'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        if (!p) return [];
+        const t = p.terms[0], w = p.terms[1].w, s = p.answer.sign;
+        const vs = t.n > t.d ? 'more than 1' : t.n < t.d ? 'less than 1' : 'equal to 1';
+        return clampSteps([
+            step(`${fr(t.n, t.d)} is ${vs}: look at the bars.`),
+            step(s === '=' ? `Times 1 keeps ${w} the same.` : `Times a number ${vs} makes ${w} ${s === '>' ? 'bigger' : 'smaller'}.`),
+            step(`${fr(t.n, t.d)} × ${w} ${s} ${w}. Write ${s} in the circle.`, [{ slot: 'sign', value: s }]),
+        ]);
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        if (!p) return null;
+        const s = p.answer.sign;
+        return chooseWrong(q, [
+            s !== '>' ? { value: '>', misconception: 'multiplying-always-bigger', slot: 'sign', slots: { sign: '>' }, explain: 'Thought multiplying always makes a number bigger. Times a fraction less than 1 makes it smaller.' } : null,
+            s !== '=' ? { value: s === '>' ? '<' : '>', misconception: 'sign-reversed', slot: 'sign', slots: { sign: s === '>' ? '<' : '>' }, explain: 'Wrote the sign the wrong way round.' } : null,
+        ]);
+    },
+});
+
+// The fraction word problems: the story over the number sentence it makes. Their worked steps
+// and wrong answers are the sentence's (+, −, groups, area, a whole ÷ a unit fraction).
+const STORY = { instructionKey: 'story-fraction', steps: ['Read the story. Find the fractions.', 'Look at the number sentence the story makes.', 'Work it out. Write the answer.'] };
+registerFractionSentence('fraction_operations:frac_word_problems', '+', Object.assign({ iCan: 'I Can solve fraction stories with adding and subtracting', say: 'The answer is __.', sayValues: (q) => [q.ans] }, STORY));
+registerFractionSentence('fraction_operations:frac_word_problems_plain', '+', Object.assign({ iCan: 'I Can solve fraction stories with adding and subtracting', say: 'The answer is __.', sayValues: (q) => [q.ans] }, STORY));
+registerFractionSentence('fraction_operations:frac_mult_word', 'x', Object.assign({ iCan: 'I Can solve fraction stories with multiplying and dividing', say: 'The answer is __.', sayValues: (q) => [q.ans] }, STORY));
+registerFractionSentence('fraction_operations:frac_mult_word_plain', 'x', Object.assign({ iCan: 'I Can solve fraction stories with multiplying and dividing', say: 'The answer is __.', sayValues: (q) => [q.ans] }, STORY));
+registerFractionSentence('fraction_operations:frac_word_mixed', '+', Object.assign({ iCan: 'I Can solve fraction stories', say: 'The answer is __.', sayValues: (q) => [q.ans] }, STORY));
+registerFractionSentence('fraction_operations:frac_word_mixed_plain', '+', Object.assign({ iCan: 'I Can solve fraction stories', say: 'The answer is __.', sayValues: (q) => [q.ans] }, STORY));
+
+const MIXED_IMPROPER = {
+    open: mixedOpen,
+    strings: strings({
+        iCan: 'I Can change mixed numbers and improper fractions',
+        instructionKey: 'missing',
+        steps: ['Count the equal parts in one whole: the denominator.', 'Count all the shaded parts: the improper numerator.', 'Count the whole shapes and the parts left: the mixed number.'],
+        say: '__ is the same as __.',
+        sayValues: (q) => { const p = payloadOf(q); if (!p) return null; const g = p.terms[0], a = p.answer; return [mixedText(g.w, g.n, g.d), mixedText(a.w, a.n, a.d)]; },
+        vocabulary: ['mixed number', 'improper fraction', 'whole'],
+    }),
+    misconceptions: ['added-whole-to-numerator', 'wholes-as-parts', 'remainder-as-whole'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        if (!p) return [];
+        const g = p.terms[0], a = p.answer, d = g.d;
+        const total = (g.w || 0) * d + g.n;
+        const w = Math.floor(total / d), n = total % d;
+        if (a.w) {
+            return clampSteps([
+                step(`${d} parts make one whole.`),
+                step(`${total} ÷ ${d} = ${w} wholes and ${n} parts left.`),
+                step(`Write ${w} ${fr(n, d)}.`, [{ slot: 'w', value: String(w) }, { slot: 'n', value: String(n) }, { slot: 'd', value: String(d) }]),
+            ]);
+        }
+        return clampSteps([
+            step(`Each whole is ${fr(d, d)}: ${g.w} wholes are ${g.w} × ${d} = ${g.w * d} parts.`),
+            step(`Add the ${g.n} parts: ${g.w * d} + ${g.n} = ${total}.`),
+            step(`Write ${fr(total, d)}.`, [{ slot: 'n', value: String(total) }, { slot: 'd', value: String(d) }]),
+        ]);
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        if (!p) return null;
+        const g = p.terms[0], a = p.answer, d = g.d;
+        if (a.w) {
+            const total = g.n;
+            return chooseWrong(q, [
+                a.n !== a.w ? { value: `${a.n} ${fr(a.w, d)}`, misconception: 'remainder-as-whole', slot: 'w', slots: { w: String(a.n), n: String(a.w), d: String(d) }, explain: 'Swapped the wholes and the parts left over.' } : null,
+                a.w > 1 ? { value: `1 ${fr(total - d, d)}`, misconception: 'wholes-as-parts', slot: 'w', slots: { w: '1', n: String(total - d), d: String(d) }, explain: `Took out one whole only. ${fr(total, d)} holds ${a.w} wholes.` } : null,
+            ]);
+        }
+        return chooseWrong(q, [
+            { value: fr(g.w + g.n, d), misconception: 'added-whole-to-numerator', slot: 'n', slots: { n: String(g.w + g.n), d: String(d) }, explain: `Added the whole number to the numerator. Each whole is ${d} parts, not 1.` },
+            { value: fr(g.w * d, d), misconception: 'wholes-as-parts', slot: 'n', slots: { n: String(g.w * d), d: String(d) }, explain: `Counted the wholes but forgot the ${g.n} parts.` },
+        ]);
+    },
+};
+registerSkill('fractions:mixed_improper_visual', MIXED_IMPROPER);
+registerSkill('fractions:improper_mixed', MIXED_IMPROPER);
+
+/* ============================================= a fraction of an amount, and find the whole */
+
+const AMOUNT_DEF = (iCan) => ({
+    strings: strings({
+        iCan,
+        instructionKey: 'missing',
+        steps: ['The denominator says how many equal parts the whole has.', 'Find one part: divide.', 'Multiply by the parts you need.'],
+        say: '__ of __ is __.',
+        sayValues: (q) => { const p = payloadOf(q); return p && p.task === 'amount' ? [fr(p.n, p.d), p.total, p.part] : null; },
+        vocabulary: ['fraction of', 'equal parts', 'whole'],
+    }),
+    misconceptions: ['divided-by-numerator', 'multiplied-only', 'forgot-to-divide', 'divided-by-denominator'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        if (!p || p.task !== 'amount') return [];
+        const one = p.total / p.d;
+        if (p.ask === 'num') {
+            return clampSteps([
+                step(`Cut ${p.total} into ${p.d} equal groups: ${p.total} ÷ ${p.d} = ${one} in each.`),
+                step(`How many groups make ${p.part}? ${p.part} ÷ ${one} = ${p.n}.`),
+                step(`${fr(p.n, p.d)} of ${p.total} is ${p.part}. Write ${p.n}.`, [{ slot: 'answer', value: String(p.n) }]),
+            ]);
+        }
+        if (p.ask === 'whole') {
+            return clampSteps([
+                step(`${fr(p.n, p.d)} is ${p.part}: ${p.n} equal part${p.n > 1 ? 's' : ''} make ${p.part}.`),
+                step(`One part is ${p.part} ÷ ${p.n} = ${one}.`),
+                step(`The whole is ${p.d} parts: ${one} × ${p.d} = ${p.total}.`, [{ slot: 'answer', value: String(p.total) }]),
+            ]);
+        }
+        return clampSteps([
+            step(`Cut ${p.total} into ${p.d} equal parts: ${p.total} ÷ ${p.d} = ${one}.`),
+            step(`Take ${p.n} part${p.n > 1 ? 's' : ''}: ${one} × ${p.n} = ${p.part}.`),
+            step(`${fr(p.n, p.d)} of ${p.total} is ${p.part}.`, [{ slot: 'answer', value: String(p.part) }]),
+        ]);
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        if (!p || p.task !== 'amount') return null;
+        const one = p.total / p.d;
+        if (p.ask === 'num') {
+            return chooseWrong(q, [
+                { value: p.part, misconception: 'multiplied-only', slot: 'answer', slots: { answer: String(p.part) }, explain: `Wrote the part (${p.part}), not how many groups it is.` },
+                one !== p.n ? { value: one, misconception: 'divided-by-denominator', slot: 'answer', slots: { answer: String(one) }, explain: `Wrote the size of one group (${one}). The numerator counts the groups: ${p.part} ÷ ${one}.` } : null,
+            ]);
+        }
+        if (p.ask === 'whole') {
+            return chooseWrong(q, [
+                { value: p.part * p.d, misconception: 'forgot-to-divide', slot: 'answer', slots: { answer: String(p.part * p.d) }, explain: `Multiplied ${p.part} by ${p.d} without finding one part first (${p.part} ÷ ${p.n}).` },
+                Number.isInteger(p.part / p.d) ? { value: p.part / p.d, misconception: 'divided-by-denominator', slot: 'answer', slots: { answer: String(p.part / p.d) }, explain: `Divided ${p.part} by ${p.d}. ${p.part} is ${p.n} parts of the whole, so the whole is bigger.` } : null,
+            ]);
+        }
+        return chooseWrong(q, [
+            { value: one, misconception: 'multiplied-only', slot: 'answer', slots: { answer: String(one) }, explain: `Found one part (${one}) and stopped. ${fr(p.n, p.d)} is ${p.n} parts.` },
+            Number.isInteger(p.total / p.n) ? { value: p.total / p.n, misconception: 'divided-by-numerator', slot: 'answer', slots: { answer: String(p.total / p.n) }, explain: `Divided by the numerator ${p.n}. Divide by the denominator ${p.d} to find one part.` } : null,
+        ]);
+    },
+});
+registerSkill('fractions:fraction_of_set_hard_nv', AMOUNT_DEF('I Can find a fraction of an amount, and the whole'));
+registerSkill('fractions:fraction_of_set', AMOUNT_DEF('I Can find a fraction of a set'));
+registerSkill('fractions:fraction_of_set_hard', AMOUNT_DEF('I Can find a fraction of a set'));
+
+/* ================================================================ percent on the hundred square */
+
+const pctOf = (p) => (p && p.terms && p.terms[0] ? Math.round((p.terms[0].n * 100) / p.terms[0].d) : null);
+registerSkill('conversions:percent_visual', {
+    strings: strings({
+        iCan: 'I Can read percent on a hundred square',
+        instructionKey: 'missing',
+        steps: ['The square is one whole: 100 small squares.', 'Each small square is 1%. A column is 10%.', 'Count the shaded squares.'],
+        say: '__ out of 100 is __ percent.',
+        sayValues: (q) => { const v = pctOf(payloadOf(q)); return v === null ? null : [v, v]; },
+        vocabulary: ['percent', 'hundredths', 'whole'],
+    }),
+    misconceptions: ['counted-unshaded', 'columns-as-ones', 'not-simplified'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        const v = pctOf(p);
+        if (v === null) return [];
+        const a = p.answer;
+        const ans = p.terms[p.terms.length - 1];
+        const marks = ans.frac === 'nd' ? [{ slot: 'n', value: String(a.n) }, { slot: 'd', value: String(a.d) }]
+            : ans.frac === 'n' ? [{ slot: 'n', value: String(a.n) }] : [{ slot: 'w', value: String(a.w) }];
+        const tens = Math.floor(v / 10), ones = v % 10;
+        return clampSteps([
+            step(`Count the full columns: ${tens} columns of 10 = ${tens * 10}.${ones ? ` Then ${ones} more: ${v}.` : ''}`),
+            step(`${v} of the 100 squares are shaded: ${v}%, or ${fr(v, 100)}.`),
+            ...(ans.frac === 'nd' && a.d !== 100 ? [step(`${fr(v, 100)} in simplest form is ${fr(a.n, a.d)}.`)] : []),
+            step(`Write ${ans.frac === 'nd' ? fr(a.n, a.d) : ans.frac === 'n' ? a.n : a.w}.`, marks),
+        ]);
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        const v = pctOf(p);
+        if (v === null) return null;
+        const ans = p.terms[p.terms.length - 1];
+        if (ans.frac === 'nd') {
+            return chooseWrong(q, [
+                p.answer.d !== 100 ? { value: fr(v, 100), misconception: 'not-simplified', slot: 'n', slots: { n: String(v), d: '100' }, explain: `Wrote ${fr(v, 100)} and did not simplify it.` } : null,
+                { value: fr(100 - v, 100), misconception: 'counted-unshaded', slot: 'n', slots: { n: String(100 - v), d: '100' }, explain: 'Counted the white squares.' },
+            ]);
+        }
+        const slot = ans.frac === 'n' ? 'n' : 'w';
+        return chooseWrong(q, [
+            { value: ans.frac === 'n' ? fr(100 - v, 100) : 100 - v, misconception: 'counted-unshaded', slot, slots: { [slot]: String(100 - v) }, explain: 'Counted the white squares, not the shaded ones.' },
+            v % 10 === 0 && v > 10 ? { value: ans.frac === 'n' ? fr(v / 10, 100) : v / 10, misconception: 'columns-as-ones', slot, slots: { [slot]: String(v / 10) }, explain: `Counted the columns (${v / 10}) as single squares. Each column is 10 squares.` } : null,
+        ]);
+    },
+});
+
+/* ==================================================== equivalent fractions and simplifying */
+
+/** The factor between the two fractions of "a/b = c/d" (c/a or a/c), and which way. */
+function factorOf(p) {
+    const [x, y] = p.terms;
+    const up = y.d >= x.d;
+    const k = up ? y.d / x.d : x.d / y.d;
+    return { x, y, up, k: Number.isInteger(k) ? k : null };
+}
+
+const EQUIV_DEF = {
+    open: fracOpen,
+    strings: strings({
+        iCan: 'I Can find equivalent fractions',
+        instructionKey: 'missing',
+        steps: ['Look at the two denominators (or numerators): what are they multiplied by?', 'Multiply the other part by the same number.', 'Write the missing number.'],
+        say: '__ is equal to __.',
+        sayValues: (q) => { const p = payloadOf(q); return p && p.task === 'op' ? [fr(p.terms[0].n, p.terms[0].d), fr(p.answer.n, p.answer.d)] : null; },
+        vocabulary: ['equivalent', 'numerator', 'denominator', 'multiply'],
+    }),
+    misconceptions: ['added-same-number', 'only-one-multiplied', 'said-equal'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        if (!p) return [];
+        if (p.task === 'sign') {
+            const [a, b] = p.terms;
+            const s = p.answer.sign;
+            const k = b.d / a.d;
+            return clampSteps([
+                step(Number.isInteger(k) ? `${a.d} × ${k} = ${b.d}: the denominator is multiplied by ${k}.` : `${a.d} does not go into ${b.d} a whole number of times.`),
+                step(Number.isInteger(k) ? `${a.n} × ${k} = ${a.n * k}. ${a.n * k === b.n ? 'That is the numerator too.' : `The numerator is ${b.n}, not ${a.n * k}.`}` : `So ${fr(a.n, a.d)} and ${fr(b.n, b.d)} are not the same size.`),
+                step(`Write ${s} in the circle.`, [{ slot: 'sign', value: s }]),
+            ]);
+        }
+        const { x, y, k, up } = factorOf(p);
+        const miss = y.frac === 'n' ? 'n' : 'd';
+        const op = up ? '×' : '÷';
+        const verb = up ? 'Multiply' : 'Divide';
+        const known = miss === 'n' ? `${x.d} ${op} ${k} = ${y.d}` : `${x.n} ${op} ${k} = ${y.n}`;
+        return clampSteps([
+            step(`${known}: ${up ? 'multiplied' : 'divided'} by ${k}.`, p.arcs ? [{ slot: 'arc-top', value: String(k) }, { slot: 'arc-bottom', value: String(k) }] : []),
+            step(miss === 'n' ? `${verb} the numerator by ${k} too: ${x.n} ${op} ${k} = ${y.n}.` : `${verb} the denominator by ${k} too: ${x.d} ${op} ${k} = ${y.d}.`),
+            step(`${fr(x.n, x.d)} = ${fr(y.n, y.d)}. Write ${miss === 'n' ? y.n : y.d}.`, [{ slot: miss, value: String(miss === 'n' ? y.n : y.d) }]),
+        ]);
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        if (!p) return null;
+        if (p.task === 'sign') {
+            const s = p.answer.sign;
+            return chooseWrong(q, [{ value: s === '=' ? '≠' : '=', misconception: 'said-equal', slot: 'sign', slots: { sign: s === '=' ? '≠' : '=' },
+                explain: s === '=' ? 'Said they are not equal because the numbers are different.' : 'Said they are equal without multiplying both parts by one number.' }]);
+        }
+        const { x, y, up } = factorOf(p);
+        const miss = y.frac === 'n' ? 'n' : 'd';
+        const add = miss === 'n' ? x.n + (y.d - x.d) : x.d + (y.n - x.n);
+        const right = miss === 'n' ? y.n : y.d;
+        return chooseWrong(q, [
+            add > 0 && add !== right ? { value: add, misconception: 'added-same-number', slot: miss, slots: { [miss]: String(add) },
+                explain: up ? 'Added the same number to top and bottom. Multiply both by the same number instead.' : 'Took the same number off top and bottom. Divide both by the same number instead.' } : null,
+            { value: miss === 'n' ? x.n : x.d, misconception: 'only-one-multiplied', slot: miss, slots: { [miss]: String(miss === 'n' ? x.n : x.d) },
+                explain: up ? 'Kept the number the same: only one part was multiplied.' : 'Kept the number the same: only one part was divided.' },
+        ]);
+    },
+};
+registerSkill('fractions:equivalent', EQUIV_DEF);
+registerSkill('fractions:equiv_frac_nv', { ...EQUIV_DEF, strings: strings({
+    iCan: 'I Can find equivalent fractions without pictures',
+    instructionKey: 'missing',
+    steps: ['Look at the two numbers you know on the top or the bottom: what are they multiplied or divided by?', 'Do the same to the other part.', 'Write the missing number.'],
+    say: '__ is equal to __.',
+    sayValues: (q) => { const p = payloadOf(q); return p && p.task === 'op' ? [fr(p.terms[0].n, p.terms[0].d), fr(p.answer.n, p.answer.d)] : null; },
+    vocabulary: ['equivalent', 'numerator', 'denominator', 'multiply', 'divide'],
+}) });
+
+registerSkill('fractions:simplify', {
+    open: fracOpen,
+    strings: strings({
+        iCan: 'I Can write a fraction in simplest form',
+        instructionKey: 'simplest-form',
+        steps: ['Find the greatest number that divides the numerator and the denominator.', 'Divide both by it.', 'Check: only 1 divides both now.'],
+        say: '__ in simplest form is __.',
+        sayValues: (q) => { const p = payloadOf(q); return p && p.terms[0].frac !== 'text' ? [fr(p.terms[0].n, p.terms[0].d), fr(p.answer.n, p.answer.d)] : null; },
+        vocabulary: ['simplest form', 'common factor', 'divide'],
+    }),
+    misconceptions: ['not-fully-simplified', 'divided-one-part', 'factor-not-gcf'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        if (!p) return [];
+        if (p.terms[0].frac === 'text') {
+            const m = /of (\d+) and (\d+)/.exec((p.story || []).join(' ')) || [];
+            const a = Number(m[1]), b = Number(m[2]), g = p.answer.w;
+            return clampSteps([
+                step(`List the factors of ${a} and of ${b}.`),
+                step(`The biggest number in both lists is ${g}.`),
+                step(`Write ${g}.`, [{ slot: 'w', value: String(g) }]),
+            ]);
+        }
+        const [x] = p.terms, a = p.answer;
+        const g = x.n / a.n;
+        if (g === 1) {
+            return clampSteps([
+                step(`Which numbers divide both ${x.n} and ${x.d}? Only 1.`),
+                step(`So ${fr(x.n, x.d)} is already in simplest form.`),
+                step(`Write ${fr(a.n, a.d)}.`, [{ slot: 'n', value: String(a.n) }, { slot: 'd', value: String(a.d) }]),
+            ]);
+        }
+        return clampSteps([
+            step(`The greatest number that divides ${x.n} and ${x.d} is ${g}.`, p.arcs ? [{ slot: 'arc-top', value: String(g) }, { slot: 'arc-bottom', value: String(g) }] : []),
+            step(`${x.n} ÷ ${g} = ${a.n} and ${x.d} ÷ ${g} = ${a.d}.`),
+            step(`Write ${fr(a.n, a.d)}.`, [{ slot: 'n', value: String(a.n) }, { slot: 'd', value: String(a.d) }]),
+        ]);
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        if (!p) return null;
+        if (p.terms[0].frac === 'text') {
+            const g = p.answer.w;
+            return chooseWrong(q, [g % 2 === 0 && g > 2 ? { value: 2, misconception: 'factor-not-gcf', slot: 'w', slots: { w: '2' }, explain: '2 is a common factor, but not the greatest.' } : null,
+                { value: 1, misconception: 'factor-not-gcf', slot: 'w', slots: { w: '1' }, explain: '1 divides every number: look for a bigger common factor.' }]);
+        }
+        const [x] = p.terms, a = p.answer;
+        const g = x.n / a.n;
+        const c = [];
+        if (g % 2 === 0 && g > 2) c.push({ value: fr(x.n / 2, x.d / 2), misconception: 'not-fully-simplified', slot: 'n', slots: { n: String(x.n / 2), d: String(x.d / 2) }, explain: 'Divided by 2 and stopped: it can be simplified again.' });
+        if (g > 1) c.push({ value: fr(a.n, x.d), misconception: 'divided-one-part', slot: 'd', slots: { n: String(a.n), d: String(x.d) }, explain: `Divided the numerator only. Divide the denominator by ${g} too.` });
+        return chooseWrong(q, c);
+    },
+});
+
+/* ==================================================================== count in fractions */
+
+registerSkill('fractions:count_in_fractions', {
+    strings: strings({
+        iCan: 'I Can count in fractions',
+        instructionKey: 'missing-many',
+        steps: ['Each step is one unit fraction: the numerator goes up by 1.', 'When the numerator equals the denominator, you have 1 whole.', 'Keep counting past the whole.'],
+        say: '__, __, __ ...',
+        sayValues: (q) => {
+            const p = payloadOf(q);
+            if (!p || p.task !== 'count') return null;
+            const txt = (t) => (t.frac === 'text' ? t.text : mixedText(t.w, t.n, t.d));
+            return p.terms.slice(0, 3).map((t) => (t.ai === undefined ? txt(t) : ((p.answer.terms || [])[t.ai] ? mixedText(p.answer.terms[t.ai].w, p.answer.terms[t.ai].n, p.answer.terms[t.ai].d) : ''))).join(', ') + ' ...';
+        },
+        vocabulary: ['unit fraction', 'whole', 'count on', 'count back'],
+    }),
+    misconceptions: ['added-to-denominator', 'did-not-name-whole', 'counted-wrong-way'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        if (!p || p.task !== 'count') return [];
+        const d = p.terms[0].d;
+        const back = p.mode === 3;
+        const marks = [];
+        p.terms.forEach((t) => {
+            if (t.ai === undefined) return;
+            const a = p.answer.terms[t.ai];
+            if (/w/.test(t.frac) && a.w) marks.push({ slot: `w${t.ai}`, value: String(a.w) });
+            if (/n/.test(t.frac) && (t.frac !== 'wnd' || a.n)) marks.push({ slot: `n${t.ai}`, value: String(a.n) });
+            if (/d/.test(t.frac) && (t.frac !== 'wnd' || a.n)) marks.push({ slot: `d${t.ai}`, value: String(a.d) });
+        });
+        return clampSteps([
+            step(`Each step is ${fr(1, d)}. The numerator goes ${back ? 'down' : 'up'} by 1; the denominator stays ${d}.`),
+            step(p.mode === 1 ? `${fr(d, d)} is 1 whole; after it come ${fr(d + 1, d)}, ${fr(d + 2, d)} ...` : `${fr(d, d)} is 1 whole: write 1. After 1 comes 1 ${fr(1, d)}.`),
+            step(`Write the missing counts: ${p.answer.text}.`, marks),
+        ]);
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        if (!p || p.task !== 'count') return null;
+        const ans = p.answer.terms;
+        // the commonest slip: the denominator counted up too (1/4, 1/5, 1/6)
+        const slots = {};
+        const vals = [];
+        let changed = false;
+        p.terms.forEach((t) => {
+            if (t.ai === undefined) return;
+            const a = ans[t.ai];
+            if (t.frac === 'nd' && a.d) {
+                const wd = a.d + t.ai + 1;
+                slots[`n${t.ai}`] = String(a.n); slots[`d${t.ai}`] = String(wd); vals.push(`${a.n}/${wd}`); changed = true;
+            } else vals.push(mixedText(a.w, a.n, a.d));
+        });
+        const c = [];
+        if (changed) c.push({ value: vals.join(', '), misconception: 'added-to-denominator', slot: Object.keys(slots)[1] || 'd0', slots,
+            explain: 'Counted the denominator up too. The parts stay the same size: only the numerator counts.' });
+        // a whole written as a fraction on the mixed ladder: 4/4 left as 4/4 instead of 1
+        const wi = p.terms.find((t) => t.frac === 'w' && t.ai !== undefined);
+        if (wi) {
+            const a = ans[wi.ai];
+            const v2 = ans.map((x, i) => (i === wi.ai ? `${a.w * a.d}/${a.d}` : mixedText(x.w, x.n, x.d)));
+            c.push({ value: v2.join(', '), misconception: 'did-not-name-whole', slot: `w${wi.ai}`, slots: { [`w${wi.ai}`]: `${a.w * a.d}/${a.d}` },
+                explain: `Wrote ${a.w * a.d}/${a.d} where the count reaches ${a.w} whole${a.w > 1 ? 's' : ''}: name the whole number.` });
+        }
+        return chooseWrong(q, c);
+    },
+});
+
+/* ==================================================================== fractions beyond 1 */
+
+registerSkill('fractions:mixed_numbers_intro', {
+    open: fracOpen,
+    strings: strings({
+        iCan: 'I Can write numbers bigger than 1 with fractions',
+        instructionKey: 'missing',
+        steps: ['Count the wholes first.', 'Then count the parts of the next whole.', 'Write the wholes, then the fraction.'],
+        say: '__ wholes and __ is __.',
+        sayValues: (q) => {
+            const p = payloadOf(q);
+            if (!p) return null;
+            const t = p.terms[0];
+            return [t.w, fr(t.n, t.d), mixedText(t.w, t.n, t.d)];
+        },
+        vocabulary: ['mixed number', 'whole', 'part'],
+    }),
+    misconceptions: ['counted-all-parts', 'whole-as-numerator', 'parts-of-wrong-whole'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        if (!p) return [];
+        const t = p.terms[0];
+        if (p.task === 'op') {
+            return clampSteps([
+                step(`${mixedText(t.w, t.n, t.d)} means ${t.w} whole${t.w > 1 ? 's' : ''} and ${fr(t.n, t.d)} more.`),
+                step(`The wholes: ${t.w}.`, [{ slot: 'w0', value: String(t.w) }]),
+                step(`The fraction: ${fr(t.n, t.d)}. ${mixedText(t.w, t.n, t.d)} = ${t.w} + ${fr(t.n, t.d)}.`, [{ slot: 'w0', value: String(t.w) }, { slot: 'n1', value: String(t.n) }]),
+            ]);
+        }
+        const marks = [{ slot: 'w', value: String(t.w) }, { slot: 'n', value: String(t.n) }, { slot: 'd', value: String(t.d) }];
+        if (t.kind === 'line') {
+            return clampSteps([
+                step(`The dot is past ${t.w}: that is the whole number.`),
+                step(`Each whole is cut into ${t.d} equal parts. Count the parts from ${t.w} to the dot: ${t.n}.`),
+                step(`Write ${mixedText(t.w, t.n, t.d)}.`, marks),
+            ]);
+        }
+        return clampSteps([
+            step(`Count the whole shapes: ${t.w}.`),
+            step(`The last shape has ${t.n} of its ${t.d} parts shaded: ${fr(t.n, t.d)}.`),
+            step(`Write ${mixedText(t.w, t.n, t.d)}.`, marks),
+        ]);
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        if (!p) return null;
+        const t = p.terms[0];
+        if (p.task === 'op') {
+            return chooseWrong(q, [{ value: `${t.w * t.d + t.n} + ${fr(t.n, t.d)}`, misconception: 'whole-as-numerator', slot: 'w0', slots: { w0: String(t.w * t.d + t.n), n1: String(t.n) },
+                explain: `Wrote all the parts as the whole number. The wholes are ${t.w}.` }]);
+        }
+        const total = t.w * t.d + t.n;
+        return chooseWrong(q, [
+            { value: `${t.w} ${fr(total, t.d)}`, misconception: 'counted-all-parts', slot: 'n', slots: { w: String(t.w), n: String(total), d: String(t.d) }, explain: `Counted every part (${total}) for the fraction. Only the parts after the wholes count: ${t.n}.` },
+            t.w > 1 ? { value: `${t.w - 1} ${fr(t.n, t.d)}`, misconception: 'parts-of-wrong-whole', slot: 'w', slots: { w: String(t.w - 1), n: String(t.n), d: String(t.d) }, explain: `Counted one whole too few.` } : null,
+        ]);
+    },
+});

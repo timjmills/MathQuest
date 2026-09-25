@@ -308,8 +308,8 @@ offered and need not be (the school is in Qatar).
 | R53 | Fraction shapes (equal / unequal parts, shade) | B6 S1,3–5; B8 S3 | PARTIAL | legacy `fractions:identify`, `shade_fraction`, `shapes_early:partition_shapes` → kit `template:fraction-shape` |
 | R54 | Fraction bars / strips, stacked, fraction wall | B6 S2–5,10; B8 S1–2 | PARTIAL | legacy `fractions:compare`, `equiv_frac_visual`, `fraction_bar_ops` → kit `template:fraction-bar` |
 | R55 | Fraction number line 0–1 (labels, count, circles above, segments) | B6 S7–8; B8 S1 | PARTIAL | legacy `composing:fraction_number_line`, `fractions:fraction_nl_drag` → kit `template:fraction-line` |
-| R56 | Double fraction number lines (equivalence) | B6 S9 | PARTIAL | legacy `equiv_frac_nv` → fraction-line `stack:2` |
-| R57 | Fraction of a set (objects ringed into groups) | B8 S4–5 | PARTIAL | legacy `fractions:fraction_of_set` → reuse `template:arrays` ringed groups |
+| R56 | Double fraction number lines (equivalence) | B6 S9 | MATCH | `fractions:equiv_frac_visual` `model: line` (and `fractions:compare`): two frac-model lines one under the other, 0 under 0, the same length |
+| R57 | Fraction of a set (objects ringed into groups) | B8 S4–5 | MATCH | `fractions:fraction_of_set` / `fraction_of_set_hard`: frac-model `amount`, `pic: 'set'` (counters ringed into equal groups) |
 | R58 | Data / listing table with blanks (conversions, timetable, jumps, 3-D properties, combinations, tally collect) | B1 S5; B4 S11; B5 S7–8; B10 S8–9,11; B11 S9–10; B12 S5 | GAP | new `template:data-table` (ruled table, heads, blank cells = writing boxes) |
 | R59 | Sort table (2–3 labelled columns) | B5 S4; B7 S4; B10 S5; B11 S2–3,5 | PARTIAL | `hands-sort` page tag exists; kit `template:sort-table` GAP |
 | R60 | Analogue clock (Arabic; draw hands; minute ring) | B8 S6; B10 S1–4,8,12 | MATCH | `template:clock` (`response`, `numerals`, `support` minute ring) |

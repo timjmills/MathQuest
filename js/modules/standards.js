@@ -286,6 +286,8 @@ export const SKILL_STANDARDS = {
     'fractions:fraction_bar_ops': { ccss: ['4.NF.B.3a', '5.NF.A.1'], ee: ['M.EE.4.NF.3', 'M.EE.5.NF.1'] }, // Fraction Bar Operations (Visual)
     'fractions:fraction_nl_drag': { ccss: ['3.NF.A.2b', '3.NF.A.2a'], ee: ['M.EE.3.NF.2'] }, // Place Fractions on a Number Line
     'fractions:mixed_nl_drag': { ccss: [], ee: [], pool: true }, // Place Mixed Numbers on a Number Line
+    'fractions:mixed_numbers_intro': { ccss: ['3.NF.A.1', '4.NF.B.3', '3.NF.A.3', '4.NF.A.2'], ee: ['M.EE.3.NF.1', 'M.EE.4.NF.3', 'M.EE.3.NF.3', 'M.EE.4.NF.2'] }, // Fractions Beyond 1 (build lane fractions)
+    'fractions:count_in_fractions': { ccss: ['3.NF.A.2', '3.NF.A.3c', '3.NF.A.3a', '3.NF.A.1'], ee: ['M.EE.3.NF.2', 'M.EE.3.NF.3', 'M.EE.3.NF.1'] }, // Count in Fractions (build lane fractions)
 
     // ---- fraction_operations
     'fraction_operations:add_fractions_like': { ccss: ['4.NF.B.3a'], ee: ['M.EE.4.NF.3'] }, // Add Fractions (Like Denom) (Visual)

@@ -24,23 +24,23 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 601 live skills; 492 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 603 live skills; 494 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
-- **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
+- **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 104 FULL, 91 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 275 entries — 132 new skills, 88 options on existing skills, 2 repairs; 162 from the White Rose audit (42 of them extended to close standards clauses), 60 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+- The one build list: 271 entries — 130 new skills, 86 options on existing skills, 2 repairs; 158 from the White Rose audit (40 of them extended to close standards clauses), 60 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
 | K | 10 / 11 / 1 of 22 (45% full) | 11 / 12 / 1 of 24 | 6 / 4 / 0 of 10 (60% full) | 21/22, 10/10 |
 | 1 | 11 / 10 / 0 of 21 (52% full) | 13 / 10 / 0 of 23 | 10 / 5 / 1 of 16 (63% full) | 21/21, 16/16 |
 | 2 | 12 / 10 / 4 of 26 (46% full) | 12 / 9 / 6 of 27 | 11 / 7 / 1 of 19 (58% full) | 22/26, 18/19 |
-| 3 | 12 / 13 / 0 of 25 (48% full) | 18 / 15 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
+| 3 | 12 / 13 / 0 of 25 (48% full) | 19 / 14 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
 | 4 | 14 / 13 / 1 of 28 (50% full) | 19 / 13 / 2 of 34 | 16 / 4 / 0 of 20 (80% full) | 27/28, 20/20 |
 | 5 | 10 / 14 / 2 of 26 (38% full) | 16 / 13 / 5 of 34 | 13 / 4 / 1 of 18 (72% full) | 24/26, 17/18 |
 | 6 | 7 / 19 / 3 of 29 (24% full) | 14 / 20 / 8 of 42 | 10 / 7 / 0 of 17 (59% full) | 26/29, 17/17 |
-| **All** | **76 / 90 / 11 of 177 (43% full)** | **103 / 92 / 22 of 217** | **81 / 33 / 3 of 117 (69% full)** | 166/177, 115/117 |
+| **All** | **76 / 90 / 11 of 177 (43% full)** | **104 / 91 / 22 of 217** | **81 / 33 / 3 of 117 (69% full)** | 166/177, 115/117 |
 
 ## Tag fixes made by this audit
 
@@ -296,33 +296,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 16 | **1st, 2nd, 3rd** (`ordinal`) | new `counting:ordinal_numbers` | - | 1 |
 | 17 | **Number Words 0 to 10 (option)** (`words_0_10`) | option on `composing:number_word_form` | - | 1 |
 
-### Fractions (22)
-
-| # | Entry | Kind | Closes standards | Closes WRM steps |
-|---|---|---|---|---|
-| 1 | **Count in Fractions** (`frac_count`) | new `fractions:count_in_fractions` | 3.NF.A.3a, 3.NF.A.3c | 4 |
-| 2 | **Equal and Unequal Parts** (`fraction_parts`) | new `fractions:equal_parts` | 2.G.A.3, M.EE.3.G.2 | 3 |
-| 3 | **Compare Fractions by Numerator (option)** (`compare_numerator`) | option on `fractions:compare` | 3.NF.A.3d, M.EE.6.NS.1 | 1 |
-| 4 | **Compare Fractions of the Same Whole (option)** (`frac_same_whole`) | option on `fractions:compare` | 3.NF.A.3d, 4.NF.A.2 | - |
-| 5 | **Halves and Quarters** (`half_quarter`) | new `fractions:halves_and_quarters` | 1.G.A.3 | 2 |
-| 6 | **Fractions Beyond 1** (`frac_beyond_1`) | new `fractions:mixed_numbers_intro` | - | 3 |
-| 7 | **Multi-Step Fraction Problems** (`frac_multistep`) | new `fraction_operations:fraction_multi_step_problems` | 5.NF.A.2 | 1 |
-| 8 | **Equivalent Fractions on a Number Line (option)** (`frac_nl_equiv`) | option on `fractions:equiv_frac_visual` | 3.NF.A.3a | 1 |
-| 9 | **Multiply a Mixed Number by an Integer (option)** (`mult_mixed_int`) | option on `fraction_operations:mult_frac_whole` | 5.NF.B.6 | 1 |
-| 10 | **Divide Fractions by Fractions** (`div_frac_frac`) | new `fraction_operations:div_frac_frac` | 6.NS.A.1 | - |
-| 11 | **Add and Subtract More Fractions (option)** (`frac_add_multi`) | option on `fraction_operations:add_fractions_like` | - | 2 |
-| 12 | **Fraction Word Problems With Unlike Denominators (option)** (`frac_wp_unlike`) | option on `fraction_operations:frac_word_problems` | 5.NF.A.2 | - |
-| 13 | **Mixed Fraction Questions** (`mixed_frac_qs`) | new `fraction_operations:mixed_fraction_questions` | - | 2 |
-| 14 | **Fractions That Equal Whole Numbers (option)** (`whole_frac_reverse`) | option on `composing:whole_as_fraction` | 3.NF.A.3c | - |
-| 15 | **Fraction of an Amount Problems** (`frac_amount_wp`) | new `fractions:fraction_of_amount_problems` | - | 1 |
-| 16 | **Compare and Order Fractions Greater Than 1 (option)** (`frac_compare_gt1`) | option on `fractions:compare` | - | 1 |
-| 17 | **Fraction of an Amount: Find the Whole (option)** (`frac_find_whole`) | option on `fractions:fraction_of_set_hard_nv` | - | 1 |
-| 18 | **Fractions as Operators** (`frac_operator`) | new `fractions:fraction_as_operator` | - | 1 |
-| 19 | **Fractions and Scales** (`frac_scales`) | new `fractions:fractions_on_scales` | - | 1 |
-| 20 | **Understand the Whole** (`frac_whole`) | new `fractions:understand_the_whole` | - | 1 |
-| 21 | **Partition the Whole** (`frac_whole_partition`) | new `fractions:partition_the_whole` | - | 1 |
-| 22 | **Subtract from a Mixed Number: Break the Whole (option)** (`sub_break_whole`) | option on `fraction_operations:sub_mixed_like` | - | 1 |
-
 ### Place value (12)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
@@ -356,6 +329,29 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 10 | **Block Diagrams** (`block_diagram`) | new `graphs:block_diagrams` | - | 1 |
 | 11 | **Collect and Represent Data** (`collect_data`) | new `graphs:collect_and_represent` | - | 1 |
 | 12 | **Dual Bar Charts** (`dual_bar`) | new `graphs:dual_bar_charts` | - | 1 |
+
+### Fractions (18)
+
+| # | Entry | Kind | Closes standards | Closes WRM steps |
+|---|---|---|---|---|
+| 1 | **Equal and Unequal Parts** (`fraction_parts`) | new `fractions:equal_parts` | 2.G.A.3, M.EE.3.G.2 | 3 |
+| 2 | **Compare Fractions by Numerator (option)** (`compare_numerator`) | option on `fractions:compare` | 3.NF.A.3d, M.EE.6.NS.1 | 1 |
+| 3 | **Compare Fractions of the Same Whole (option)** (`frac_same_whole`) | option on `fractions:compare` | 3.NF.A.3d, 4.NF.A.2 | - |
+| 4 | **Halves and Quarters** (`half_quarter`) | new `fractions:halves_and_quarters` | 1.G.A.3 | 2 |
+| 5 | **Multi-Step Fraction Problems** (`frac_multistep`) | new `fraction_operations:fraction_multi_step_problems` | 5.NF.A.2 | 1 |
+| 6 | **Multiply a Mixed Number by an Integer (option)** (`mult_mixed_int`) | option on `fraction_operations:mult_frac_whole` | 5.NF.B.6 | 1 |
+| 7 | **Divide Fractions by Fractions** (`div_frac_frac`) | new `fraction_operations:div_frac_frac` | 6.NS.A.1 | - |
+| 8 | **Add and Subtract More Fractions (option)** (`frac_add_multi`) | option on `fraction_operations:add_fractions_like` | - | 2 |
+| 9 | **Fraction Word Problems With Unlike Denominators (option)** (`frac_wp_unlike`) | option on `fraction_operations:frac_word_problems` | 5.NF.A.2 | - |
+| 10 | **Mixed Fraction Questions** (`mixed_frac_qs`) | new `fraction_operations:mixed_fraction_questions` | - | 2 |
+| 11 | **Fractions That Equal Whole Numbers (option)** (`whole_frac_reverse`) | option on `composing:whole_as_fraction` | 3.NF.A.3c | - |
+| 12 | **Fraction of an Amount Problems** (`frac_amount_wp`) | new `fractions:fraction_of_amount_problems` | - | 1 |
+| 13 | **Compare and Order Fractions Greater Than 1 (option)** (`frac_compare_gt1`) | option on `fractions:compare` | - | 1 |
+| 14 | **Fractions as Operators** (`frac_operator`) | new `fractions:fraction_as_operator` | - | 1 |
+| 15 | **Fractions and Scales** (`frac_scales`) | new `fractions:fractions_on_scales` | - | 1 |
+| 16 | **Understand the Whole** (`frac_whole`) | new `fractions:understand_the_whole` | - | 1 |
+| 17 | **Partition the Whole** (`frac_whole_partition`) | new `fractions:partition_the_whole` | - | 1 |
+| 18 | **Subtract from a Mixed Number: Break the Whole (option)** (`sub_break_whole`) | option on `fraction_operations:sub_mixed_like` | - | 1 |
 
 ### Algebra and patterns (13)
 
@@ -663,14 +659,10 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught in part by: Multiplication Chart (Visual) (`multiplication:mult_chart`); Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Count-By Fill-In (1-12) (`patterns:count_by_fill`)  
   Missing: patterns in the addition table; explain a pattern with a property (4 × n is always even)  
   Build: What Do You Notice? (`patterns_notice`)
-- **3.NF.A.3a** — PARTIAL. Understand two fractions as equivalent (equal) if they are the same size, or the same point on a number line.  
-  Taught in part by: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`)  
-  Missing: equivalent fractions as the same point on a number line  
-  Build: Equivalent Fractions on a Number Line (option) (`frac_nl_equiv`); Count in Fractions (`frac_count`)
 - **3.NF.A.3c** — PARTIAL. Express whole numbers as fractions, and recognize fractions that are equivalent to whole numbers. Examples: Express 3 in the form 3 = 3/1; recognize that 6/1 = 6; locate 4/4 and 1 at the same point of a number line diagram.  
-  Taught in part by: Whole Numbers as Fractions (Visual) (`composing:whole_as_fraction`); Compose 1 Whole from Unit Fractions (`composing:compose_whole`)  
-  Missing: recognise a fraction as a whole number (6/1 = 6); locate 4/4 and 1 at the same point of a number line  
-  Build: Fractions That Equal Whole Numbers (option) (`whole_frac_reverse`); Count in Fractions (`frac_count`)
+  Taught in part by: Whole Numbers as Fractions (Visual) (`composing:whole_as_fraction`); Compose 1 Whole from Unit Fractions (`composing:compose_whole`); Count in Fractions (`fractions:count_in_fractions`)  
+  Missing: recognise a fraction as a whole number (6/1 = 6)  
+  Build: Fractions That Equal Whole Numbers (option) (`whole_frac_reverse`)
 - **3.NF.A.3d** — PARTIAL. Compare two fractions with the same numerator or the same denominator by reasoning about their size. Recognize that comparisons are valid only when the two fractions refer to the same whole. Record the results of comparisons with the symbols >, =, or <, and justify the conclusions, e.g., by using a visual fraction model.  
   Taught in part by: Compare Fractions (>, <, =) (`fractions:compare`); Order Fractions (`fractions:order_fractions`)  
   Missing: same-numerator comparisons (3/5 vs 3/8); comparisons are valid only for the same whole  
@@ -1386,7 +1378,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **3.NF.A.1** — FULL. Understand a fraction 1/b as the quantity formed by 1 part when a whole is partitioned into b equal parts; understand a fraction a/b as the quantity formed by a parts of size 1/b.  
   Taught by: Identify Fractions (Visual) (`fractions:identify`); Write the Fraction Shown (`fractions:write_fraction`); Shade the Fraction (`fractions:shade_fraction`); Compose 1 Whole from Unit Fractions (`composing:compose_whole`)  
-  Also tagged: `fractions:fraction_of_set`, `fractions:identify_nv`, `fractions:fraction_of_set_nv`
+  Also tagged: `fractions:fraction_of_set`, `fractions:identify_nv`, `fractions:fraction_of_set_nv`, `fractions:mixed_numbers_intro`, `fractions:count_in_fractions`
 - **3.NF.A.2** — FULL (from its parts). Understand a fraction as a number on the number line; represent fractions on a number line diagram.  
 -   **3.NF.A.2a** — FULL. Represent a fraction 1/b on a number line diagram by defining the interval from 0 to 1 as the whole and partitioning it into b equal parts. Recognize that each part has size 1/b and that the endpoint of the part based at 0 locates the number 1/b on the number line.  
   Taught by: Fractions on Number Line (Visual) (`composing:fraction_number_line`); Place Fractions on Number Line (`fractions:graph_fractions`); Place Fractions on a Number Line (`fractions:fraction_nl_drag`)  
@@ -1395,14 +1387,14 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Also tagged: `fractions:benchmark_fractions`, `fractions:graph_fractions`
 - **3.NF.A.3** — PARTIAL (from its parts). Explain equivalence of fractions in special cases, and compare fractions by reasoning about their size.  
   Not FULL because of its lettered parts.  
--   **3.NF.A.3a** — PARTIAL. Understand two fractions as equivalent (equal) if they are the same size, or the same point on a number line.  
-  In part: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`)  
-  Missing: equivalent fractions as the same point on a number line → `frac_nl_equiv`, `frac_count`  
+-   **3.NF.A.3a** — FULL. Understand two fractions as equivalent (equal) if they are the same size, or the same point on a number line.  
+  Taught by: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`) — equal areas (circles, bars, a fraction wall) and the same point on two stacked number lines (model: line; fractions lane)  
+  Also tagged: `fractions:count_in_fractions`
 -   **3.NF.A.3b** — FULL. Recognize and generate simple equivalent fractions, e.g., 1/2 = 2/4, 4/6 = 2/3. Explain why the fractions are equivalent, e.g., by using a visual fraction model.  
   Taught by: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`); Equivalent Fractions (No Visuals) (`fractions:equiv_frac_nv`); Circle the Equivalent Fractions (MAP) (`fractions:select_equiv_frac`)  
 -   **3.NF.A.3c** — PARTIAL. Express whole numbers as fractions, and recognize fractions that are equivalent to whole numbers. Examples: Express 3 in the form 3 = 3/1; recognize that 6/1 = 6; locate 4/4 and 1 at the same point of a number line diagram.  
-  In part: Whole Numbers as Fractions (Visual) (`composing:whole_as_fraction`); Compose 1 Whole from Unit Fractions (`composing:compose_whole`)  
-  Missing: recognise a fraction as a whole number (6/1 = 6); locate 4/4 and 1 at the same point of a number line → `whole_frac_reverse`, `frac_count`  
+  In part: Whole Numbers as Fractions (Visual) (`composing:whole_as_fraction`); Compose 1 Whole from Unit Fractions (`composing:compose_whole`); Count in Fractions (`fractions:count_in_fractions`) — 4/4 and 1 at the same point: count_in_fractions (fractions lane)  
+  Missing: recognise a fraction as a whole number (6/1 = 6) → `whole_frac_reverse`  
 -   **3.NF.A.3d** — PARTIAL. Compare two fractions with the same numerator or the same denominator by reasoning about their size. Recognize that comparisons are valid only when the two fractions refer to the same whole. Record the results of comparisons with the symbols >, =, or <, and justify the conclusions, e.g., by using a visual fraction model.  
   In part: Compare Fractions (>, <, =) (`fractions:compare`); Order Fractions (`fractions:order_fractions`)  
   Missing: same-numerator comparisons (3/5 vs 3/8); comparisons are valid only for the same whole → `compare_numerator`, `frac_same_whole`  
@@ -1528,7 +1520,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **4.NF.A.2** — PARTIAL. Compare two fractions with different numerators and different denominators, e.g., by creating common denominators or numerators, or by comparing to a benchmark fraction such as 1/2. Recognize that comparisons are valid only when the two fractions refer to the same whole. Record the results of comparisons with symbols >, =, or <, and justify the conclusions, e.g., by using a visual fraction model.  
   In part: Compare Fractions (>, <, =) (`fractions:compare`); Compare Fractions (LCD) (`fractions:compare_frac_lcd`); Benchmark Fractions (0, ¼, ½, ¾, 1) (`fractions:benchmark_fractions`)  
   Missing: comparisons are valid only for the same whole; justify with a visual model → `frac_same_whole`  
-  Also tagged: `fractions:order_fractions`, `fractions:order_frac_numline`
+  Also tagged: `fractions:order_fractions`, `fractions:order_frac_numline`, `fractions:mixed_numbers_intro`
 *B. Build fractions from unit fractions by applying and extending previous understandings of operations on whole numbers.*
 
 - **4.NF.B.3** — FULL (from its parts). Understand a fraction a/b with a > 1 as a sum of fractions 1/b.  

@@ -19,10 +19,10 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 
 ## Summary
 
-- 275 entries: **132 new skills, 88 new options, 2 repairs**, and **53 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 28 option, 1 skill, 6 migration, 1 band).
-- 162 from the White Rose audit (42 extended for standards), 60 from the standards audit.
-- They close 114 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
-- The visual catalogue: 210 representations (MATCH 6, PARTIAL 103, GAP 101); every PARTIAL and GAP one is on an entry below.
+- 271 entries: **130 new skills, 86 new options, 2 repairs**, and **53 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 28 option, 1 skill, 6 migration, 1 band).
+- 158 from the White Rose audit (40 extended for standards), 60 from the standards audit.
+- They close 113 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
+- The visual catalogue: 210 representations (MATCH 7, PARTIAL 102, GAP 101); every PARTIAL and GAP one is on an entry below.
 - 30 new sheet-kit templates and panes are needed; each is owned by one lane.
 - Lanes `k2` and `operations` were already building from this list: their entries keep their order and names, and the catalogue's entries are APPENDED after them.
 
@@ -32,7 +32,7 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 | Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 40 | 18 | 10 | 1 | 11 | 21 | 50 | 35 | 316 |
 | Place value, rounding and estimation (the pv kit) (`placevalue`) | 21 | 4 | 8 | 0 | 9 | 9 | 36 | 23 | 327 |
 | Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 28 | 14 | 10 | 0 | 4 | 19 | 20 | 17 | 104 |
-| Fractions, decimals, conversions, ratio (`fractions`) | 45 | 17 | 21 | 0 | 7 | 19 | 49 | 23 | 233 |
+| Fractions, decimals, conversions, ratio (`fractions`) | 41 | 15 | 19 | 0 | 7 | 18 | 40 | 21 | 213 |
 | Geometry, area, volume, coordinates (`geometry`) | 46 | 30 | 12 | 1 | 3 | 35 | 78 | 33 | 144 |
 | Measurement (length, mass, capacity, conversions) (`measurement`) | 23 | 12 | 9 | 0 | 2 | 14 | 34 | 11 | 74 |
 | Time and money (`timemoney`) | 17 | 10 | 5 | 0 | 2 | 8 | 30 | 18 | 81 |
@@ -74,7 +74,7 @@ positions are share codes, so nothing is spliced and the integrator fixes the fi
 
 | Template | Owner lane | What | Used by |
 |---|---|---|---|
-| `bar-model` | `operations` | part-whole and comparison bars (tape diagrams), fraction bars of an amount, with labelled parts and one blank | 17 entries |
+| `bar-model` | `operations` | part-whole and comparison bars (tape diagrams), fraction bars of an amount, with labelled parts and one blank | 16 entries |
 | `picture-row` | `k2` | a row or small grid of line-drawn pictures with letter tags: match, odd one out, order events, repeating patterns | 15 entries |
 | `sort-rings` | `k2` | two or three sorting rings, a Carroll two-box table or a two-set Venn, with tiles written in by letter | 4 entries |
 | `shape-grid` | `geometry` | a square or dot grid with shapes, mirror lines, arrows: draw, complete, reflect, translate, area/perimeter on squares | 22 entries |
@@ -1588,7 +1588,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 step 0.1 → 0.2 / 0.5 → 0.25; up → down · O3 step arrows drawn → none · O6 track / number line.
 - **Misconceptions:** 0.9 + 0.1 = 0.10; keeps the step in the wrong place (+0.01).
 
-## Lane `fractions`: Fractions, decimals, conversions, ratio (45)
+## Lane `fractions`: Fractions, decimals, conversions, ratio (41)
 
 Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred-square,double-scale}.js`, `js/modules/sheet/cells/panes/operator-arcs.js`, `js/modules/svg-fractions.js`. Builds templates: `hundred-square`, `double-scale`, `operator-arcs`.
 
@@ -1641,20 +1641,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **After:** `decimal_pv`, `vis_pv_decimal_places` (lane `placevalue`).
 - **Visual catalogue:** also draws V167 Decimal place-value chart and counters (Tth, Hth, Thth) (reach 39 steps).
 
-### 5. Fraction of an Amount: Find the Whole (option) — `frac_find_whole`
-
-- **What:** option on `fractions:fraction_of_set_hard_nv`: find the whole. Grade 5 · family fractions · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 5.NF.B.4, EE -
-- **Closes (White Rose steps):** Y6.B4.S7
-- **Teaches:** finding the whole from a known fractional part with a bar model (3/5 is 24, what is the whole?).
-- **Problem types:** (1) 3/5 is 24: what is the whole?; (2) unit fraction first; (3) story version; (4) check by finding the fraction.
-- **Representation:** a "find the whole" task option with a bar model support. Templates: `frac-model`, `word-work`; new: `bar-model`.
-- **Answer:** write the whole.
-- **Ladder:** O2 unit → non-unit · O3 bar with the known parts labelled → none · O6 bar / plain.
-- **Misconceptions:** multiplies 24 by 3/5; divides by the denominator only.
-- **Visual catalogue:** also draws V027 Equal-parts bar (fraction of an amount, find the whole) (reach 31 steps).
-
-### 6. Fraction Area Modes (two-way split, several wholes, regions) — `vis_frac_area_modes`
+### 5. Fraction Area Modes (two-way split, several wholes, regions) — `vis_frac_area_modes`
 
 - **Added from visual catalogue.** option · grade K-5 · lane `fractions`.
 - **Build:** frac-model `area` / `circle` gain `split: [a, b]` (two-way), several wholes, `task: 'cut' | 'complete-half' | 'whole-from-part'`, `ring: k` grouping, named regions, and `model: 'area2'` (fraction × fraction: split one way then the other, overlap shaded).
@@ -1664,7 +1651,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Reach:** 28 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 7. Migrate Legacy Fraction Visuals to B&W Kit Cells — `vis_migrate_fraction_ops`
+### 6. Migrate Legacy Fraction Visuals to B&W Kit Cells — `vis_migrate_fraction_ops`
 
 - **Added from visual catalogue.** migration · grade K-5 · lane `fractions`.
 - **Build:** every fraction skill still drawing a legacy colour strip or circle moves onto frac-model / arrays: fraction_of_set (ringed groups on template:arrays), mixed_improper_visual, improper_mixed (fraction counters ringed into wholes), fraction_bar_ops, mult_frac_frac, equiv_frac_nv, composing:fraction_number_line, frac_10_100, percent_visual and double_num_line; then delete their legacy branches.
@@ -1675,7 +1662,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **After:** `vis_frac_bar_modes`, `vis_frac_line_modes`, `vis_frac_area_modes`.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 8. Hundred Square as One Whole (and the thousand square) — `vis_hundred_square`
+### 7. Hundred Square as One Whole (and the thousand square) — `vis_hundred_square`
 
 - **Added from visual catalogue.** template · grade 1-5 · lane `fractions`.
 - **Build:** a new hundred-square template: a 10 × 10 square as one whole (columns = tenths, cells = hundredths), shade or read, `labels: 'decimal' | 'fraction' | 'percent'`, two squares for more than 1, `grid: 1000`, and the two-tone complement mode the operations entry bonds_100 uses.
@@ -1685,36 +1672,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Reach:** 23 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 9. Equivalent Fractions on a Number Line (option) — `frac_nl_equiv`
-
-- **What:** option on `fractions:equiv_frac_visual`: number lines. Grade 5 · family fractions · source White Rose audit.
-- **Closes (standards):** 3.NF.A.3a · tag with CCSS 4.NF.A.1, 3.NF.A.3a, EE M.EE.4.NF.1
-- **Closes (White Rose steps):** Y6.B3.S2
-- **Teaches:** equivalent fractions shown on stacked number lines.
-- **Extended for the standards:** Grade 3 level (halves, quarters, eighths) for 3.NF.A.3a, not only Year 6.
-- **Problem types:** (1) equivalent fractions at one point on two lines; (2) same point on the number line?; (3) write the equivalent from stacked lines; (4) find the matching tick.
-- **Representation:** a double number-line representation option. Templates: `number-line`, `frac-model`.
-- **Answer:** write the fraction.
-- **Ladder:** O2 halves/quarters → thirds/sixths → eighths · O3 dashed line across the stacked lines → none · O6 stacked lines / bars.
-- **Misconceptions:** thinks more ticks mean a bigger number; matches numerators.
-- **After:** `vis_frac_line_modes`.
-- **Visual catalogue:** also draws V056 Two stacked fraction lines; multi-labelled line (F, D, %) (reach 12 steps).
-
-### 10. Fractions Beyond 1 — `frac_beyond_1`
-
-- **What:** new skill `fractions:mixed_numbers_intro`. Grade 3 · family fractions · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 3.NF.A.1, 4.NF.B.3, 3.NF.A.3, 4.NF.A.2, EE M.EE.3.NF.1, M.EE.4.NF.3, M.EE.3.NF.3, M.EE.4.NF.2
-- **Closes (White Rose steps):** Y4.B7.S2, Y4.B7.S3, Y4.B7.S5
-- **Teaches:** counting beyond 1 in fractions, partitioning a mixed number into wholes and a fraction, mixed numbers on a number line.
-- **Problem types:** (1) count beyond 1 in fractions; (2) wholes and a fraction (partition a mixed number); (3) mixed number on a number line; (4) improper and mixed together.
-- **Representation:** bar and number-line models with wholes shaded; write the mixed number. Templates: `frac-model`, `number-line`.
-- **Answer:** write the mixed number or improper fraction.
-- **Ladder:** O2 halves → quarters → eighths; to 2 → to 5 · O3 wholes shaded solid → none · O6 bars / circles / line.
-- **Misconceptions:** writes 1 1/4 as 11/4; counts all parts as the denominator.
-- **After:** `vis_frac_bar_modes`.
-- **Visual catalogue:** also draws V164 Mixed numbers / improper fractions across several wholes (reach 9 steps).
-
-### 11. Percentages: Multi-Step and Missing Values (option) — `percent_multi`
+### 8. Percentages: Multi-Step and Missing Values (option) — `percent_multi`
 
 - **What:** option on `conversions:percent_of_number`: multi-step. Grade 5 · family decimals · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 6.RP.A.3, EE -
@@ -1727,7 +1685,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Misconceptions:** adds the percent as a number (40 + 30% = 70); finds 30% and stops for an increase.
 - **Visual catalogue:** also draws V196 Percentage bar (reach 11 steps).
 
-### 12. Operator Arcs (pane) — `vis_operator_arcs`
+### 9. Operator Arcs (pane) — `vis_operator_arcs`
 
 - **Added from visual catalogue.** pane · grade 4-5 · lane `fractions`.
 - **Build:** a new pane:operator-arcs: an arc with an operator box above and below a pair (× n / ÷ n on numerator and denominator, + / − between numbers, the 2 × 2 proportion arrow box), a support value on the equivalence, percent and double-line skills.
@@ -1737,7 +1695,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Reach:** 12 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 13. Double and Triple Number Lines — `vis_double_scale`
+### 10. Double and Triple Number Lines — `vis_double_scale`
 
 - **Added from visual catalogue.** template · grade 1-5 · lane `fractions`.
 - **Build:** a new double-scale template: two or three aligned scales (kg | g, m | cm, h | min; fraction | decimal | percent; a ratio) with blanks on either row and operator arcs above / below; conversions:double_num_line leaves the legacy path.
@@ -1748,22 +1706,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **After:** `vis_operator_arcs`.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 14. Count in Fractions — `frac_count`
-
-- **What:** new skill `fractions:count_in_fractions`. Grade 1-3 · family fractions · source White Rose audit.
-- **Closes (standards):** 3.NF.A.3a, 3.NF.A.3c · tag with CCSS 3.NF.A.1, 3.NF.A.3c, 3.NF.A.2, 3.NF.A.3a, EE M.EE.3.NF.1, M.EE.3.NF.3, M.EE.3.NF.2
-- **Closes (White Rose steps):** Y2.B8.S15, Y3.B6.S8, Y3.B6.S9, Y4.B7.S9
-- **Teaches:** counting up and down in unit fractions on a number line and past a whole (1/4, 2/4, 3/4, 1, 1 1/4).
-- **Extended for the standards:** locate 4/4 and 1 (and 6/3 and 2) at the same point.
-- **Problem types:** (1) count up in unit fractions; (2) count past a whole (3/4, 1, 1 1/4); (3) fill missing ticks on a line; (4) equivalent fractions at the same point; (5) count down.
-- **Representation:** a number line with fraction ticks; fill the missing counts. Templates: `number-line`, `count-row`.
-- **Answer:** write the missing fractions.
-- **Ladder:** O2 within 1 → past 1 → mixed numbers · O3 all ticks labelled → some → ends · O6 line / track.
-- **Misconceptions:** counts 1/4, 2/4, 3/4, 4/4, 5/4 without naming 1; adds to the denominator (1/4, 1/5, 1/6).
-- **After:** `vis_frac_line_modes`.
-- **Visual catalogue:** also draws V093 Count in fractions as a picture sequence (reach 1 steps).
-
-### 15. Ratio and Proportion Problems — `ratio_problems`
+### 11. Ratio and Proportion Problems — `ratio_problems`
 
 - **What:** new skill `conversions:ratio_problems_bar`. Grade 5 · family ratio · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 6.RP.A.3, EE -
@@ -1776,7 +1719,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Misconceptions:** adds instead of scaling; uses the ratio numbers as amounts.
 - **Visual catalogue:** also draws V028 Scaling / ratio bar (1 box vs n boxes; a : b rows) (reach 8 steps).
 
-### 16. Scale Drawing and Scale Factors — `scale`
+### 12. Scale Drawing and Scale Factors — `scale`
 
 - **What:** new skill `conversions:scale_drawing`. Grade 5 · family ratio · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 6.RP.A.3, 5.NF.B.5, EE -
@@ -1789,7 +1732,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Misconceptions:** adds the scale factor; enlarges one side only.
 - **Visual catalogue:** also draws V173 Scale drawing (plan vs actual); V197 Similar shapes with letter unknowns (reach 5 steps).
 
-### 17. Equal and Unequal Parts — `fraction_parts`
+### 13. Equal and Unequal Parts — `fraction_parts`
 
 - **What:** new skill `fractions:equal_parts`. Grade 1 · family fractions · source White Rose audit.
 - **Closes (standards):** 2.G.A.3, M.EE.3.G.2 · tag with CCSS 1.G.A.3, 2.G.A.3, EE M.EE.1.G.3, M.EE.3.G.2
@@ -1802,7 +1745,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 halves → thirds → quarters; draw the whole · O3 grid under the shape → none · O6 shapes / strips.
 - **Misconceptions:** counts parts without checking they are equal; thinks equal parts must look the same.
 
-### 18. Compare Fractions by Numerator (option) — `compare_numerator`
+### 14. Compare Fractions by Numerator (option) — `compare_numerator`
 
 - **What:** option on `fractions:compare`: same numerator. Grade 5 · family fractions · source White Rose audit.
 - **Closes (standards):** 3.NF.A.3d, M.EE.6.NS.1 · tag with CCSS 4.NF.A.2, 3.NF.A.3d, EE M.EE.4.NF.2, M.EE.6.NS.1
@@ -1815,7 +1758,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 unit fractions → same numerator → mixed · O3 bars under each → none · O6 bars / circles.
 - **Misconceptions:** 1/5 > 1/3 because 5 > 3; compares fractions of different wholes.
 
-### 19. Decimals from Known Facts — `dec_known_facts`
+### 15. Decimals from Known Facts — `dec_known_facts`
 
 - **What:** new skill `decimals:decimal_known_facts`. Grade 4 · family decimals · source White Rose audit.
 - **Closes (standards):** 5.NBT.B.7 · tag with CCSS 4.NBT.B.4, 5.NBT.B.7, EE M.EE.4.NBT.4, M.EE.5.NBT.7
@@ -1827,7 +1770,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 tenths → hundredths → crossing 1 · O3 the whole fact printed beside → none · O6 fact pair / bond.
 - **Misconceptions:** 0.3 + 0.4 = 0.07; forgets to exchange 10 tenths for 1.
 
-### 20. Decimal Place Value (option) — `dec_pv_within1`
+### 16. Decimal Place Value (option) — `dec_pv_within1`
 
 - **What:** option on `decimals:decimal_place_value`: within 1 and integers. Grade 5 · family decimals · source White Rose audit.
 - **Closes (standards):** 5.NBT.A.1 · tag with CCSS 5.NBT.A.1, 5.NBT.A.3, EE M.EE.5.NBT.1, M.EE.5.NBT.3
@@ -1840,7 +1783,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Misconceptions:** ignores a zero place; reads the decimal part as a whole number.
 - **After:** `decimal_pv`, `vis_pv_decimal_places` (lane `placevalue`).
 
-### 21. Compare Fractions of the Same Whole (option) — `frac_same_whole`
+### 17. Compare Fractions of the Same Whole (option) — `frac_same_whole`
 
 - **What:** option on `fractions:compare`: items "same whole?": two fractions of different-size wholes (can we compare?) and justify a comparison with a model. Grade 3-4 · family fractions · source standards audit.
 - **Closes (standards):** 3.NF.A.3d, 4.NF.A.2 · tag with CCSS 3.NF.A.3d, 4.NF.A.2, EE M.EE.4.NF.2
@@ -1853,7 +1796,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Misconceptions:** a half is always bigger than a third; the bigger picture is the bigger fraction.
 - **After:** `compare_numerator`.
 
-### 22. Halves and Quarters — `half_quarter`
+### 18. Halves and Quarters — `half_quarter`
 
 - **What:** new skill `fractions:halves_and_quarters`. Grade K · family fractions · source White Rose audit.
 - **Closes (standards):** 1.G.A.3 · tag with CCSS 1.G.A.3, EE M.EE.1.G.3
@@ -1866,7 +1809,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 half → quarter → mix; shapes → quantities · O3 cut lines drawn → none · O6 shapes / objects.
 - **Misconceptions:** any two parts is a half; a quarter is bigger because 4 > 2.
 
-### 23. Multi-Step Fraction Problems — `frac_multistep`
+### 19. Multi-Step Fraction Problems — `frac_multistep`
 
 - **What:** new skill `fraction_operations:fraction_multi_step_problems`. Grade 5 · family fractions · source White Rose audit.
 - **Closes (standards):** 5.NF.A.2 · tag with CCSS 5.NF.A.2, EE -
@@ -1878,7 +1821,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 like → unlike denominators · O3 bar model with steps → none · O6 bar / plain.
 - **Misconceptions:** answers the first step only; adds denominators.
 
-### 24. Multiply a Mixed Number by an Integer (option) — `mult_mixed_int`
+### 20. Multiply a Mixed Number by an Integer (option) — `mult_mixed_int`
 
 - **What:** option on `fraction_operations:mult_frac_whole`: mixed numbers. Grade 4 · family fractions · source White Rose audit.
 - **Closes (standards):** 5.NF.B.6 · tag with CCSS 4.NF.B.4, 5.NF.B.6, EE -
@@ -1892,7 +1835,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Misconceptions:** multiplies the whole only; forgets to regroup improper parts.
 - **After:** `vis_frac_bar_modes`.
 
-### 25. Compare Decimals With Models (option) — `dec_compare_model`
+### 21. Compare Decimals With Models (option) — `dec_compare_model`
 
 - **What:** option on `decimals:compare_decimal`: support "hundred squares" beside each decimal and items "same whole?". Grade 4 · family decimals · source standards audit.
 - **Closes (standards):** 4.NF.C.7 · tag with CCSS 4.NF.C.7, EE -
@@ -1905,7 +1848,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Misconceptions:** 0.45 > 0.5 because 45 > 5; more digits means bigger.
 - **After:** `vis_pv_decimal_places` (lane `placevalue`).
 
-### 26. Decimal Operations With Models (option) — `decimal_models`
+### 22. Decimal Operations With Models (option) — `decimal_models`
 
 - **What:** option on `decimals:add_decimal` (and `decimals:sub_decimal`, `decimals:mult_decimal`): support "decimal model": hundred squares or place-value counters beside the column, and an area model for decimal × whole. Grade 5 · family decimals · source standards audit.
 - **Closes (standards):** 5.NBT.B.7 · tag with CCSS 5.NBT.B.7, EE M.EE.5.NBT.7
@@ -1918,7 +1861,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Misconceptions:** lines up the right-hand digits, not the points; 0.3 + 0.45 = 0.48.
 - **After:** `decimal_pv`, `vis_pv_decimal_places` (lane `placevalue`).
 
-### 27. Make a Whole with Decimals — `decimal_whole`
+### 23. Make a Whole with Decimals — `decimal_whole`
 
 - **What:** new skill `decimals:make_a_whole`. Grade 3 · family decimals · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 3.NF.A.1, 4.NF.C.6, EE M.EE.3.NF.1
@@ -1930,7 +1873,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 tenths → hundredths (multiples of 5) → any hundredths · O3 hundred square shaded → strip → none · O6 strip / hundred square / bond.
 - **Misconceptions:** 0.45 + 0.65 = 1 (makes 10 in each place); answers 0.55 → 0.65 by adding 1 to tenths.
 
-### 28. Divide Fractions by Fractions — `div_frac_frac`
+### 24. Divide Fractions by Fractions — `div_frac_frac`
 
 - **What:** new skill `fraction_operations:div_frac_frac`. Grade 6 · family fractions · source standards audit.
 - **Closes (standards):** 6.NS.A.1 · tag with CCSS 6.NS.A.1, EE M.EE.6.NS.1
@@ -1942,7 +1885,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 same denominator → related → any · O3 bar model with the divisor marked → none · O6 bars / number line.
 - **Misconceptions:** divides numerators and denominators straight across whatever the sizes; flips the wrong fraction; quotient must be smaller.
 
-### 29. Convert Units With Ratios (option) — `dnl_units`
+### 25. Convert Units With Ratios (option) — `dnl_units`
 
 - **What:** option on `conversions:double_num_line`: context "measurement units": convert units with a double number line or ratio table (12 in : 1 ft, 100 cm : 1 m). Grade 6 · family ratio · source standards audit.
 - **Closes (standards):** 6.RP.A.3d · tag with CCSS 6.RP.A.3d, EE -
@@ -1955,7 +1898,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Misconceptions:** multiplies when dividing is needed; mixes the units in the answer.
 - **After:** `vis_double_scale`.
 
-### 30. Add and Subtract More Fractions (option) — `frac_add_multi`
+### 26. Add and Subtract More Fractions (option) — `frac_add_multi`
 
 - **What:** option on `fraction_operations:add_fractions_like`: three addends and wholes. Grade 3 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 3.NF.A.1, 4.NF.B.3, EE M.EE.3.NF.1, M.EE.4.NF.3
@@ -1967,7 +1910,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 two addends → three → from a whole · O3 bar model → none · O6 bar / numbers.
 - **Misconceptions:** adds the denominators; 3 − 3/4 = 3/4.
 
-### 31. Fraction Word Problems With Unlike Denominators (option) — `frac_wp_unlike`
+### 27. Fraction Word Problems With Unlike Denominators (option) — `frac_wp_unlike`
 
 - **What:** option on `fraction_operations:frac_word_problems` (and `fraction_operations:frac_word_problems_plain`): denominators "unlike" and task "is the answer reasonable?" (benchmark estimate). Grade 5 · family fractions · source standards audit.
 - **Closes (standards):** 5.NF.A.2 · tag with CCSS 5.NF.A.2, EE M.EE.5.NF.1
@@ -1979,7 +1922,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 related denominators → unrelated → mixed numbers · O3 bar model → none · O6 pictures / plain.
 - **Misconceptions:** adds numerators and denominators; answer smaller than a part it added.
 
-### 32. Mixed Fraction Questions — `mixed_frac_qs`
+### 28. Mixed Fraction Questions — `mixed_frac_qs`
 
 - **What:** new skill `fraction_operations:mixed_fraction_questions`. Grade 5 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 5.NF.B.7, 5.NF.B.6, EE -
@@ -1991,7 +1934,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 two operations → four · O3 operation sign boxed → none · O6 cards / plain.
 - **Misconceptions:** divides the numerator only when it does not divide; multiplies both parts by the integer.
 
-### 33. Multiply Decimals by Decimals (option) — `mult_dec_dec`
+### 29. Multiply Decimals by Decimals (option) — `mult_dec_dec`
 
 - **What:** option on `decimals:mult_decimal`: factors "decimal × decimal" (3.45 × 2.6) with the standard algorithm. Grade 6 · family decimals · source standards audit.
 - **Closes (standards):** 6.NS.B.3 · tag with CCSS 6.NS.B.3, EE -
@@ -2003,7 +1946,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 1 dp × 1 dp → 2 dp × 1 dp → 2 dp × 2 dp · O3 count-the-places box → none · O6 grid / plain.
 - **Misconceptions:** lines up the points as in addition; counts the places of one factor only.
 
-### 34. Ratio Tables: Plot and Compare (option) — `ratio_table_plot`
+### 30. Ratio Tables: Plot and Compare (option) — `ratio_table_plot`
 
 - **What:** option on `conversions:ratio_tables`: task "plot the pairs" on a coordinate grid and task "compare two ratio tables". Grade 6 · family ratio · source standards audit.
 - **Closes (standards):** 6.RP.A.3a · tag with CCSS 6.RP.A.3a, EE -
@@ -2015,7 +1958,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 whole numbers small → larger · O3 first rows and axis scale given → none · O6 table / graph.
 - **Misconceptions:** adds the same amount to both rows; plots (y, x).
 
-### 35. Fraction Unit Rates (option) — `unit_rate_fraction`
+### 31. Fraction Unit Rates (option) — `unit_rate_fraction`
 
 - **What:** option on `conversions:unit_rate_intro`: unit rates that are fractions (3 cups flour to 4 cups sugar = 3/4 cup per cup) and rate language. Grade 6 · family ratio · source standards audit.
 - **Closes (standards):** 6.RP.A.2 · tag with CCSS 6.RP.A.2, EE M.EE.6.RP.1
@@ -2027,7 +1970,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 whole rates → fraction rates → decimals · O3 ratio table → none · O6 table / double line.
 - **Misconceptions:** divides the wrong way (4/3 cup per cup); drops the unit.
 
-### 36. Fractions That Equal Whole Numbers (option) — `whole_frac_reverse`
+### 32. Fractions That Equal Whole Numbers (option) — `whole_frac_reverse`
 
 - **What:** option on `composing:whole_as_fraction`: direction "fraction → whole" (6/1 = 6, 8/4 = 2) and "same point" on a number line (4/4 and 1). Grade 3 · family fractions · source standards audit.
 - **Closes (standards):** 3.NF.A.3c · tag with CCSS 3.NF.A.3c, EE M.EE.3.NF.3
@@ -2038,9 +1981,8 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Answer:** write the whole number; mark.
 - **Ladder:** O2 over 1 → equal to 1 → equal to 2, 3 · O3 model drawn → none · O6 bars / line.
 - **Misconceptions:** 6/1 = 1/6; 4/4 = 4.
-- **After:** `frac_count`.
 
-### 37. Multiply and Divide Decimals in Context (option) — `dec_context`
+### 33. Multiply and Divide Decimals in Context (option) — `dec_context`
 
 - **What:** option on `decimals:mult_decimal`: context. Grade 5 · family decimals · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 5.NBT.B.7, EE M.EE.5.NBT.7
@@ -2052,7 +1994,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 × by 1-digit → ÷ by 1-digit → two steps · O3 bar model and cues → none · O6 pictures / plain.
 - **Misconceptions:** puts the decimal point in the wrong place; divides the wrong way round.
 
-### 38. Fraction of an Amount Problems — `frac_amount_wp`
+### 34. Fraction of an Amount Problems — `frac_amount_wp`
 
 - **What:** new skill `fractions:fraction_of_amount_problems`. Grade 2 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 3.NF.A.1, 3.OA.A.3, EE M.EE.3.NF.1
@@ -2064,7 +2006,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 unit fractions → non-unit → find the whole · O3 bar split and labelled → none · O6 bar / plain.
 - **Misconceptions:** divides by the numerator; multiplies the amount by the denominator.
 
-### 39. Compare and Order Fractions Greater Than 1 (option) — `frac_compare_gt1`
+### 35. Compare and Order Fractions Greater Than 1 (option) — `frac_compare_gt1`
 
 - **What:** option on `fractions:compare`: greater than 1. Grade 4 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 4.NF.A.2, EE M.EE.4.NF.2
@@ -2077,7 +2019,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Misconceptions:** compares only the whole numbers; thinks a bigger denominator means bigger.
 - **After:** `vis_frac_bar_modes`.
 
-### 40. Fractions as Operators — `frac_operator`
+### 36. Fractions as Operators — `frac_operator`
 
 - **What:** new skill `fractions:fraction_as_operator`. Grade 4 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 4.NF.B.4, EE -
@@ -2089,7 +2031,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 unit → non-unit → measures · O3 bar with operator arrows → none · O6 bar / arrows.
 - **Misconceptions:** multiplies by the denominator; divides by the numerator.
 
-### 41. Fractions and Scales — `frac_scales`
+### 37. Fractions and Scales — `frac_scales`
 
 - **What:** new skill `fractions:fractions_on_scales`. Grade 2 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 2.G.A.3, EE -
@@ -2101,7 +2043,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 halves → quarters → fifths/tenths · O3 every tick labelled → wholes only · O6 ruler / jug / line.
 - **Misconceptions:** counts ticks not spaces; reads the scale as tenths every time.
 
-### 42. Understand the Whole — `frac_whole`
+### 38. Understand the Whole — `frac_whole`
 
 - **What:** new skill `fractions:understand_the_whole`. Grade 2 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 2.G.A.3, 3.NF.A.1, EE M.EE.3.NF.1
@@ -2113,7 +2055,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 halves → eighths · O3 bar drawn and cut → none · O6 bar / circle.
 - **Misconceptions:** counts shaded parts only; thinks the whole has the shaded number of parts.
 
-### 43. Partition the Whole — `frac_whole_partition`
+### 39. Partition the Whole — `frac_whole_partition`
 
 - **What:** new skill `fractions:partition_the_whole`. Grade 2 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 4.NF.B.3, EE M.EE.4.NF.3
@@ -2125,7 +2067,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 halves → fifths → eighths; within 1 → 2 · O3 bar cut into parts → none · O6 bar / bond.
 - **Misconceptions:** subtracts the denominators; writes the shaded part again.
 
-### 44. Ratio and Fractions (option) — `ratio_fraction`
+### 40. Ratio and Fractions (option) — `ratio_fraction`
 
 - **What:** option on `conversions:ratio_intro`: ratio and fractions. Grade 5 · family decimals · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 6.RP.A.1, EE M.EE.6.RP.1
@@ -2137,7 +2079,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 small totals → larger · O3 bar drawn and split → none · O6 bar / counters.
 - **Misconceptions:** 3 : 2 means 3/2; uses a part as the whole.
 
-### 45. Subtract from a Mixed Number: Break the Whole (option) — `sub_break_whole`
+### 41. Subtract from a Mixed Number: Break the Whole (option) — `sub_break_whole`
 
 - **What:** option on `fraction_operations:sub_mixed_like`: breaking the whole. Grade 4 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 4.NF.B.3, EE M.EE.4.NF.3

@@ -89,7 +89,12 @@
     "wpCues": "8A",
     "wpBank": "8B",
     "wpBar": "8C",
-    "bars": "9F"
+    "bars": "9F",
+    "partLabels": "6C",
+    "lineHops": "6D",
+    "barModel": "6E",
+    "opArcs": "6F",
+    "countLine": "6G"
   },
   "blocks": {
     "0": {
@@ -390,7 +395,8 @@
       "grid": "G",
       "blocks": "K",
       "analog": "H",
-      "digital": "D"
+      "digital": "D",
+      "wall": "W"
     },
     "labels": {
       "all": "A",
@@ -628,7 +634,16 @@
     "bars": {
       "vertical": "V",
       "horizontal": "H"
-    }
+    },
+    "partLabels": {},
+    "lineHops": {},
+    "barModel": {},
+    "opArcs": {
+      "blank": "B",
+      "value": "V",
+      "none": "N"
+    },
+    "countLine": {}
   },
   "scalarOnly": {
     "range": "decimal",
@@ -657,7 +672,11 @@
     "poolSupport": "decimal",
     "wpCues": "bool",
     "wpBank": "bool",
-    "wpBar": "bool"
+    "wpBar": "bool",
+    "partLabels": "bool",
+    "lineHops": "bool",
+    "barModel": "bool",
+    "countLine": "bool"
   },
   "subranges": {
     "3B-3M": "build lane k2 (BUILD_LIST.md)",

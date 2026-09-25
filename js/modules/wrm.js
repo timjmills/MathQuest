@@ -468,10 +468,11 @@ export const SKILL_WRM = {
     ],
     'fractions:equiv_frac_visual': [
         { step: 'Y2.B8.S12', note: 'halves and quarters' },
-        { step: 'Y3.B6.S9', partial: 'equivalent fractions shown on two number lines' },
+        { step: 'Y3.B6.S9', note: 'equivalent fractions on two number lines (model: line)' },
         'Y3.B6.S10',
-        { step: 'Y4.B7.S9', partial: 'equivalent fractions on number lines' },
+        { step: 'Y4.B7.S9', note: 'equivalent fractions on number lines (model: line)' },
         'Y5.B4.S2',
+        { step: 'Y6.B3.S2', note: 'equivalent fractions on stacked number lines (model: line)' },
     ],
     'fractions:equiv_frac_nv': ['Y4.B7.S10', 'Y5.B4.S1'],
     'fractions:select_equiv_frac': ['Y5.B4.S3'],
@@ -501,6 +502,9 @@ export const SKILL_WRM = {
         'Y5.B4.S6',
     ],
     'fractions:simplify': ['Y6.B3.S1'],
+    // build lane fractions (2026-09-25)
+    'fractions:count_in_fractions': ['Y2.B8.S15', 'Y3.B6.S8', 'Y3.B6.S9', 'Y4.B7.S9'],
+    'fractions:mixed_numbers_intro': ['Y4.B7.S2', 'Y4.B7.S3', 'Y4.B7.S5'],
     'fractions:improper_mixed': ['Y4.B7.S6', 'Y4.B7.S7', 'Y4.B7.S8', 'Y5.B4.S4', 'Y5.B4.S5'],
     'fractions:mixed_improper_visual': ['Y4.B7.S6', 'Y5.B4.S4', 'Y5.B4.S5'],
     'fractions:fraction_of_set_nv': ['Y3.B8.S5', 'Y5.B6.S4'],
@@ -508,7 +512,7 @@ export const SKILL_WRM = {
         'Y5.B6.S5',
         { step: 'Y5.B6.S6', note: 'find the whole' },
         'Y6.B4.S6',
-        { step: 'Y6.B4.S7', partial: 'a page of find-the-whole only, with a bar model' },
+        { step: 'Y6.B4.S7', note: 'find the whole, with the bar model support (fractions lane)' },
     ],
     'fractions:order_fractions': ['Y3.B6.S2', 'Y3.B6.S5', 'Y5.B4.S7', 'Y6.B3.S3'],
     'fractions:compare_frac_lcd': ['Y5.B4.S6', 'Y6.B3.S3'],
@@ -1409,14 +1413,6 @@ export const WRM_PROPOSALS = {
         family: 'fractions',
         steps: ['Y2.B8.S1', 'Y2.B8.S2', 'Y2.B8.S9'],
     },
-    frac_count: {
-        kind: 'new', skill: 'fractions:count_in_fractions',
-        name: 'Count in Fractions',
-        teaches: 'counting up and down in unit fractions on a number line and past a whole (1/4, 2/4, 3/4, 1, 1 1/4)',
-        representation: 'a number line with fraction ticks; fill the missing counts',
-        family: 'fractions',
-        steps: ['Y2.B8.S15', 'Y3.B6.S8', 'Y3.B6.S9', 'Y4.B7.S9'],
-    },
     frac_whole: {
         kind: 'new', skill: 'fractions:understand_the_whole',
         name: 'Understand the Whole',
@@ -1448,14 +1444,6 @@ export const WRM_PROPOSALS = {
         representation: 'a bar model split into equal parts with the whole or a part labelled; write the missing value',
         family: 'fractions',
         steps: ['Y3.B8.S6'],
-    },
-    frac_beyond_1: {
-        kind: 'new', skill: 'fractions:mixed_numbers_intro',
-        name: 'Fractions Beyond 1',
-        teaches: 'counting beyond 1 in fractions, partitioning a mixed number into wholes and a fraction, mixed numbers on a number line',
-        representation: 'bar and number-line models with wholes shaded; write the mixed number',
-        family: 'fractions',
-        steps: ['Y4.B7.S2', 'Y4.B7.S3', 'Y4.B7.S5'],
     },
     frac_add_multi: {
         kind: 'option', skill: 'fraction_operations:add_fractions_like', option: 'three addends and wholes',
@@ -1497,14 +1485,6 @@ export const WRM_PROPOSALS = {
         family: 'fractions',
         steps: ['Y5.B6.S7'],
     },
-    frac_nl_equiv: {
-        kind: 'option', skill: 'fractions:equiv_frac_visual', option: 'number lines',
-        name: 'Equivalent Fractions on a Number Line (option)',
-        teaches: 'equivalent fractions shown on stacked number lines',
-        representation: 'a double number-line representation option',
-        family: 'fractions',
-        steps: ['Y6.B3.S2'],
-    },
     compare_numerator: {
         kind: 'option', skill: 'fractions:compare', option: 'same numerator',
         name: 'Compare Fractions by Numerator (option)',
@@ -1528,14 +1508,6 @@ export const WRM_PROPOSALS = {
         representation: 'a page mixing the four operations with fraction cards',
         family: 'fractions',
         steps: ['Y6.B4.S4', 'Y6.B4.S5'],
-    },
-    frac_find_whole: {
-        kind: 'option', skill: 'fractions:fraction_of_set_hard_nv', option: 'find the whole',
-        name: 'Fraction of an Amount: Find the Whole (option)',
-        teaches: 'finding the whole from a known fractional part with a bar model (3/5 is 24, what is the whole?)',
-        representation: 'a "find the whole" task option with a bar model support',
-        family: 'fractions',
-        steps: ['Y6.B4.S7'],
     },
 
     // ---- geometry

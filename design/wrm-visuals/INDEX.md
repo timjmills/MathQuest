@@ -20,16 +20,16 @@ the first entry.
 ## Summary
 
 - **575 year rows** (Reception 67, Year 1 79, Year 2 75, Year 3 84, Year 4 89, Year 5 92, Year 6 89) → **210 representations**.
-- **MATCH 6 · PARTIAL 103 · GAP 101.**
-- The 204 PARTIAL / GAP representations are closed by 93 existing build-list entries (merged) and 53 entries added from this catalogue.
+- **MATCH 7 · PARTIAL 102 · GAP 101.**
+- The 203 PARTIAL / GAP representations are closed by 89 existing build-list entries (merged) and 53 entries added from this catalogue.
 
 | Lane | Representations it owns | MATCH | PARTIAL | GAP | Entries added from the catalogue |
 |---|---|---|---|---|---|
-| `k2` | 50 | 0 | 21 | 29 | 12 |
+| `k2` | 51 | 0 | 21 | 30 | 12 |
 | `operations` | 32 | 0 | 20 | 12 | 11 |
 | `placevalue` | 17 | 0 | 9 | 8 | 9 |
 | `algebra` | 15 | 0 | 6 | 9 | 4 |
-| `fractions` | 18 | 0 | 11 | 7 | 7 |
+| `fractions` | 17 | 1 | 10 | 6 | 7 |
 | `geometry` | 33 | 0 | 17 | 16 | 3 |
 | `measurement` | 9 | 0 | 7 | 2 | 2 |
 | `timemoney` | 18 | 0 | 6 | 12 | 2 |
@@ -75,10 +75,10 @@ the first entry.
 | V021 | Bridging split under the second number | Y2 R21, Y3 R21, Y5 R21 | 7 | GAP | - | `vis_split_mark`* | `operations` |
 | V022 | Number track / sequence boxes (fractions, decimals, below zero) | R R25 (MATCH), R R40 (MATCH), Y1 R10 (MATCH), Y2 R22 (MATCH), Y3 R22 (MATCH), Y4 R08 (MATCH), Y5 R22 (M/P), Y6 R22 (M/P) | 45 | PARTIAL | `template:seqstrip`, `counting:number_seq_fill`, `counting:count_sequence`, `template:count-row`, `patterns:count_by_fill`, `multiplication:count_by_tables`, `patterns:count_by_powers_of_10` | `vis_count_row_values`* | `k2` |
 | V023 | Hundred square: shade multiples, circle, sieve | R R36 (MATCH), Y1 R47 (M/P), Y2 R23, Y3 R23, Y4 R26, Y5 R23, Y6 R23 | 24 | PARTIAL | `template:chartwindow`, `composing:hundreds_chart_fill`, `pane:hundreds`, `patterns:skip_count_grid` | `vis_chart_shade`* | `k2` |
-| V024 | 10 × 10 square: two-tone complement, hundredths, percent | Y2 R24 (GAP), Y3 R24 (GAP), Y4 R27, Y5 N5-05, Y6 R24 | 22 | PARTIAL | `conversions:percent_visual`, `fraction_operations:frac_10_100` | `vis_hundred_square`* | `fractions` |
+| V024 | 10 × 10 square: two-tone complement, hundredths, percent | Y2 R24 (GAP), Y3 R24 (GAP), Y4 R27, Y5 N5-05, Y6 R24 | 22 | PARTIAL | `conversions:percent_visual`, `fraction_operations:frac_10_100`, `template:hundred-square` | `vis_hundred_square`* | `fractions` |
 | V025 | Bar model part-whole (numbers, fractions, letters, degrees) | Y1 R36, Y2 R25, Y3 R25, Y4 R20, Y5 R25, Y6 R25 | 57 | PARTIAL | `pane:bar`, `algebra:tape_diagram`, `template:word-work` | `vis_bar_family`*, `vis_supports_wiring`* | `operations` |
 | V026 | Comparison bars (difference; sum and difference brace) | Y2 R26 (M/P), Y3 R26 (M/P), Y4 R21 (M/P), Y5 R26 (M/P), Y6 R26 (PARTIAL / GAP) | 21 | PARTIAL | - | `vis_bar_family`*, `pairs_values` | `operations` |
-| V027 | Equal-parts bar (fraction of an amount, find the whole) | Y1 R57, Y2 R27, Y3 R27, Y4 R22, Y5 R27, Y6 R27 | 31 | GAP | `division:share_into_groups`, `division:div_equation_parts`, `division:div_facts` | `vis_bar_family`*, `frac_find_whole` | `operations` |
+| V027 | Equal-parts bar (fraction of an amount, find the whole) | Y1 R57, Y2 R27, Y3 R27, Y4 R22, Y5 R27, Y6 R27 | 31 | GAP | `division:share_into_groups`, `division:div_equation_parts`, `division:div_facts` | `vis_bar_family`* | `operations` |
 | V028 | Scaling / ratio bar (1 box vs n boxes; a : b rows) | Y2 R28, Y3 R28, Y6 R28 | 8 | GAP | `multiplication:mult_comparison`, `conversions:ratio_intro`, `conversions:equiv_ratios`, `conversions:ratio_tables` | `vis_bar_family`*, `comparison_statements`, `ratio_problems` | `operations` |
 | V029 | Unit-conversion bars (1 m cells over 100 cm) | Y2 R29, Y3 R29, Y4 R66, Y5 R29, Y6 R29 | 10 | GAP | `measurement:length_metric`, `measurement:unit_conversions` | `vis_bar_family`*, `vis_conversion_models`* | `operations` |
 | V030 | Column method on squared paper (to 7 digits; decimal point track) | Y3 R30 (MATCH), Y4 R16 (MATCH), Y5 R30 (M/P), Y6 R30 (M/P) | 27 | PARTIAL | `template:stack`, `pane:gridpaper`, `subtraction:sub_across_zeros`, `addition:add_missing_digit`, `template:money-columns`, `addition:add_1m_mixed` | `vis_stack_layouts`* | `operations` |
@@ -107,8 +107,8 @@ the first entry.
 | V053 | Fraction shapes (equal / unequal parts, shade, cut) | Y1 R55, Y2 R53, Y3 R53, Y4 R49, Y5 R53, Y6 R53 (M/P) | 25 | PARTIAL | `shapes_early:partition_shapes`, `fractions:identify`, `fractions:shade_fraction`, `fractions:write_fraction` | `vis_frac_area_modes`* | `fractions` |
 | V054 | Fraction bars / wall (stacked, split, wholes, braces) | Y2 R54, Y3 R54, Y4 R54, Y5 R54, Y6 R54 | 46 | PARTIAL | `fractions:equiv_frac_visual`, `fractions:compare`, `fractions:fraction_bar_ops` | `vis_frac_bar_modes`*, `vis_migrate_fraction_ops`* | `fractions` |
 | V055 | Fraction number line (past 1; blocks on the line) | Y3 R55, Y4 R51, Y4 R55 (GAP), Y5 R55, Y6 R55 | 21 | PARTIAL | `composing:fraction_number_line`, `fractions:fraction_nl_drag`, `fractions:mixed_nl_drag`, `template:count-row` | `vis_frac_line_modes`*, `vis_migrate_fraction_ops`* | `fractions` |
-| V056 | Two stacked fraction lines; multi-labelled line (F, D, %) | Y3 R56, Y4 R52 (GAP), Y4 R53, Y5 R56, Y6 R56 (GAP) | 12 | PARTIAL | `fractions:equiv_frac_nv` | `vis_frac_line_modes`*, `frac_nl_equiv` | `fractions` |
-| V057 | Fraction of a set (objects ringed into groups) | Y1 R56, Y2 R57, Y3 R57, Y5 R57 | 16 | PARTIAL | `fractions:fraction_of_set`, `patterns:halve` | `vis_migrate_fraction_ops`* | `fractions` |
+| V056 | Two stacked fraction lines; multi-labelled line (F, D, %) | Y3 R56 (MATCH), Y4 R52 (GAP), Y4 R53, Y5 R56, Y6 R56 (GAP) | 12 | PARTIAL | `fractions:equiv_frac_visual`, `fractions:compare`, `fractions:equiv_frac_nv` | `vis_frac_line_modes`* | `fractions` |
+| V057 | Fraction of a set (objects ringed into groups) | Y1 R56, Y2 R57, Y3 R57, Y5 R57 | 16 | MATCH | `fractions:fraction_of_set`, `fractions:fraction_of_set_hard` | `vis_migrate_fraction_ops`* | `fractions` |
 | V058 | Data / listing table with blanks | Y1 R46, Y2 R58, Y3 R58, Y4 R40, Y4 R41, Y5 R58, Y6 R58 | 69 | GAP | - | `table_data` | `data` |
 | V059 | Sorting rings and sort tables (2–5 labelled columns) | R R04, Y1 R03 (GAP), Y2 R59, Y3 R59, Y4 R42, Y5 R59, Y6 R59 | 41 | PARTIAL | `comparing:classify_count` | `sort_groups`, `vis_sort_diagrams`* | `k2` |
 | V060 | Analogue clock | Y1 R76 (MATCH), Y2 R60 (M/P), Y3 R60 (MATCH), Y4 R68 (MATCH), Y5 R60 (MATCH) | 19 | PARTIAL | `template:clock`, `measurement:time_hour`, `measurement:time_half_hour`, `measurement:time_5min` | `vis_clock_options`* | `timemoney` |
@@ -144,7 +144,7 @@ the first entry.
 | V090 | Total grid (row / column totals) | Y2 R91, Y4 R62, Y6 R91 | 4 | GAP | - | `vis_puzzle_grids`* | `algebra` |
 | V091 | Shape-symbol unknowns | Y1 R39, Y2 R92, Y4 R47, Y5 R92, Y6 R92 | 10 | GAP | `template:equation` | `vis_symbol_puzzle`* | `algebra` |
 | V092 | Fact-labelled count line ("n × 2" above the ticks) | Y2 R93 | 3 | PARTIAL | `template:hop-line` | `vis_hop_line_options`* | `operations` |
-| V093 | Count in fractions as a picture sequence | Y2 R95 | 1 | GAP | - | `frac_count`, `vis_count_row_values`* | `fractions` |
+| V093 | Count in fractions as a picture sequence | Y2 R95 | 1 | GAP | - | `vis_count_row_values`* | `k2` |
 | V094 | Symmetry completion on squared paper | Y2 R96, Y4 R79, Y5 R96 | 5 | GAP | - | `symmetry_complete`, `reflect_grid` | `geometry` |
 | V095 | Repeating pattern row (AB … ABCD; unit of repeat; round a circle) | R R57, R R59 (GAP), R R60 (GAP), Y1 R42, Y2 R97 | 11 | PARTIAL | `patterns:shape_pattern` | `pattern_make`, `pattern_turns` | `algebra` |
 | V096 | Thermometer (vertical / horizontal; below zero) | Y2 R98, Y5 R98, Y6 R98 | 5 | PARTIAL | `measurement:temperature`, `integers:number_line_int` | `vis_migrate_measures`*, `vis_value_line_vertical`* | `measurement` |
@@ -215,7 +215,7 @@ the first entry.
 | V161 | Short multiplication column; expanded partial-product column | Y4 R38 (MATCH / GAP) | 2 | PARTIAL | `template:stack`, `multiplication:multiply`, `multiplication:mult_missing_digit` | `vis_stack_layouts`* | `operations` |
 | V162 | Area by unit squares (half squares; same area) | Y4 R43, Y6 N31 | 5 | PARTIAL | `area_perimeter:area_unit_squares`, `area_perimeter:area` | `area_compare`, `same_area`, `vis_migrate_area_volume`* | `geometry` |
 | V163 | Regular polygons with equal-side hatch marks | Y4 R46 | 3 | GAP | `area_perimeter:perimeter` | `regular_polygon`, `polygons` | `geometry` |
-| V164 | Mixed numbers / improper fractions across several wholes | Y4 R50 | 9 | PARTIAL | `fractions:mixed_improper_visual`, `fractions:improper_mixed` | `vis_frac_bar_modes`*, `frac_beyond_1` | `fractions` |
+| V164 | Mixed numbers / improper fractions across several wholes | Y4 R50 | 9 | PARTIAL | `fractions:mixed_improper_visual`, `fractions:improper_mixed` | `vis_frac_bar_modes`* | `fractions` |
 | V165 | Fraction counters ringed into wholes | Y4 R56 | 1 | GAP | `template:counters`, `fractions:improper_mixed` | `vis_migrate_fraction_ops`* | `fractions` |
 | V166 | Tenths pictured (bar, frame, 0–1 line) | Y4 R59 | 4 | PARTIAL | `decimals:decimal_nl_drag` | `vis_frac_bar_modes`*, `decimal_pv` | `fractions` |
 | V167 | Decimal place-value chart and counters (Tth, Hth, Thth) | Y4 R60, Y4 R61, Y5 N5-03, Y6 N01 | 39 | GAP | `template:pv`, `placevalue:expand`, `placevalue:place_value_disks`, `placevalue:pv_disks_build`, `placevalue:value` | `vis_pv_decimal_places`*, `decimal_pv`, `thousandths_pv` | `placevalue` |
@@ -227,7 +227,7 @@ the first entry.
 | V173 | Scale drawing (plan vs actual) | Y4 R87, Y6 N18 | 4 | GAP | - | `scale` | `fractions` |
 | V174 | Roman numerals | Y5 N5-01 | 3 | GAP | - | `roman_100`, `roman_1000` | `placevalue` |
 | V175 | Period-grouped PV chart (Thousands \| Ones) | Y5 N5-02 | 4 | GAP | `placevalue:pv_digit_drag`, `placevalue:number_word_names` | `vis_pv_bands_millions`* | `placevalue` |
-| V176 | Thousand square | Y5 N5-06 | 1 | GAP | - | `vis_hundred_square`* | `fractions` |
+| V176 | Thousand square | Y5 N5-06 | 1 | GAP | `template:hundred-square` | `vis_hundred_square`* | `fractions` |
 | V177 | Number pyramid | Y5 N5-11 | 2 | GAP | - | `vis_puzzle_grids`* | `algebra` |
 | V178 | Timetables | Y5 N5-20 | 2 | GAP | - | `timetables` | `timemoney` |
 | V179 | Number line through zero, horizontal and vertical | Y5 N5-21 (M/P) | 5 | PARTIAL | `integers:number_line_int`, `integers:integer_nl_drag` | `vis_value_line_vertical`* | `placevalue` |
@@ -294,17 +294,13 @@ Every entry of `design/BUILD_LIST.md` that draws a catalogued representation, wi
 | `vis_frac_line_modes` Fraction Line Modes (past 1, hops, blocks, two lines) | `fractions` | added from visual catalogue | V020, V055, V056 | 61 |
 | `decimal_pv` Tenths and Hundredths in a Place-Value Chart | `fractions` | White Rose audit | V166, V167 | 40 |
 | `thousandths_pv` Thousandths (option) | `fractions` | White Rose audit | V167 | 39 |
-| `frac_find_whole` Fraction of an Amount: Find the Whole (option) | `fractions` | White Rose audit | V027 | 31 |
 | `vis_frac_area_modes` Fraction Area Modes (two-way split, several wholes, regions) | `fractions` | added from visual catalogue | V053, V194, V209 | 28 |
 | `vis_hundred_square` Hundred Square as One Whole (and the thousand square) | `fractions` | added from visual catalogue | V024, V176 | 23 |
 | `vis_double_scale` Double and Triple Number Lines | `fractions` | added from visual catalogue | V048 | 20 |
-| `frac_nl_equiv` Equivalent Fractions on a Number Line (option) | `fractions` | White Rose audit | V056 | 12 |
 | `vis_operator_arcs` Operator Arcs (pane) | `fractions` | added from visual catalogue | V187 | 12 |
 | `percent_multi` Percentages: Multi-Step and Missing Values (option) | `fractions` | White Rose audit | V196 | 11 |
-| `frac_beyond_1` Fractions Beyond 1 | `fractions` | White Rose audit | V164 | 9 |
 | `ratio_problems` Ratio and Proportion Problems | `fractions` | White Rose audit | V028 | 8 |
 | `scale` Scale Drawing and Scale Factors | `fractions` | White Rose audit | V173, V197 | 5 |
-| `frac_count` Count in Fractions | `fractions` | White Rose audit | V093 | 1 |
 | `vis_migrate_shapes` Migrate Legacy Shape and Angle Visuals to B&W Kit Cells | `geometry` | added from visual catalogue | V074, V075, V076, V078, V079, V148, V200 | 53 |
 | `vis_migrate_area_volume` Migrate Legacy Area and Volume Visuals to B&W Kit Cells | `geometry` | added from visual catalogue | V052, V162, V206 | 32 |
 | `missing_lengths` Missing Lengths in Rectilinear Shapes | `geometry` | White Rose audit | V052 | 20 |

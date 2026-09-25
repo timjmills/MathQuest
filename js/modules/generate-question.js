@@ -5,7 +5,7 @@ import { randInt, pick, buildNumericOptions } from './utils.js';
 
 // Domain-specific generators
 import { generateOperationsQuestion, generateIntegersQuestion } from './gen-operations.js';
-import { generateFractionsQuestion, generateConversionsQuestion, generateDecimalsQuestion } from './gen-fractions.js';
+import { generateFractionsQuestion, generateConversionsQuestion, generateDecimalsQuestion, fracPlainStrip } from './gen-fractions.js';
 import { generateGeometryQuestion } from './gen-geometry.js';
 import { generateMeasurementQuestion } from './gen-measurement.js';
 import { generateDataStatsQuestion } from './gen-data-stats.js';
@@ -996,6 +996,7 @@ function generateResolvedQuestion() {
     // P12: a plain word-problem member drawn by a mixed pool prints plain, like the skill itself.
     if (poolPlainSkill && !isPlainWord) {
         q.visual = '';
+        fracPlainStrip(q);   // a kit fraction story keeps its story and sentence, without pictures
         if (q.cell && q.cell.template === 'wordpic' && q.cell.payload) {
             q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { pictures: false }) });
         }
@@ -1006,6 +1007,7 @@ function generateResolvedQuestion() {
     // Plain word problems: strip visuals and restore original skill on state
     if (isPlainWord && originalPlainSkill) {
         q.visual = '';
+        fracPlainStrip(q);   // a kit fraction story keeps its story and sentence, without pictures
         // A kit picture word problem prints without its picture row (the plain variant).
         if (q.cell && q.cell.template === 'wordpic' && q.cell.payload) {
             q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { pictures: false }) });

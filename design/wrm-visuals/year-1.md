@@ -321,7 +321,7 @@ one-to-one.
 | R53 | Grouping: ring runs of the group size | B9 S8 | R40 | MATCH | counters `share` (`division:share_into_groups`) |
 | R54 | Sharing into drawn empty containers (plates, boxes, rings) | B9 S9; B10 S3–S4, S8 | R40 (part) | GAP | counters kind `share-into` |
 | R55 | Halves / quarters of a shape: equal or not; shade; draw the cut; draw the other half | B10 S1–S2, S5–S6 | R53 | PARTIAL | frac-model `model` (shade / identify MATCH); `partition_shapes` legacy; `fraction-shape` `equal`, `task: 'cut' \| 'complete-half'` GAP |
-| R56 | Half / quarter of a set (plates, rings, arrays; shade half of a row) | B10 S3–S4, S7–S8 | R57 | PARTIAL | `fraction_of_set`, `patterns:halve` (legacy); counters `share-into` k = 2 / 4 and `shade-part` GAP |
+| R56 | Half / quarter of a set (plates, rings, arrays; shade half of a row) | B10 S3–S4, S7–S8 | R57 | MATCH | `fractions:fraction_of_set` on the frac-model `amount` cell, `pic: 'set'`: the set dealt into 2 or 4 ringed equal groups, the pupil shades the groups (fractions lane, 2026-09-25) |
 | R57 | Bar in 2 or 4 equal parts with counters in each part (whole above or "?") | B10 S7–S8 | R27 | GAP | `model: 'bar'` + `fill: 'counters'` on fraction_of_set |
 | R58 | Two objects side by side on one baseline (longer / taller; misaligned error) | B7 S1 | **NEW** | PARTIAL | `comparing:compare_objects`, `order_objects_length` (legacy) → `template:length-pair` |
 | R59 | Non-standard units in a row under / beside an object (clips, cubes; gaps error) | B7 S2 | **NEW** | PARTIAL | `shapes_early:measure_nonstandard` (legacy, `labels`) → `template:unit-measure` |

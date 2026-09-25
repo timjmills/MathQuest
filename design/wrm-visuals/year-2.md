@@ -299,7 +299,7 @@ Rows R01–R84 keep the Year 3 ids; **R85–R101 are new in Year 2**.
 | R51 | Glasses / beakers / buckets / barrels (level; read, draw, shade) | B7 S5–S8 | PARTIAL | `mass_volume_liquid` cylinder (legacy), `capacity` (sort) → `template:jug` |
 | R53 | Fraction shapes — equal / unequal parts, split, shade irregular outlines | B8 S2–S3, S5, S7, S10–S11, S13 | PARTIAL | `frac-model` via `model` (regular, equal parts only); `partition_shapes` (legacy) → `template:fraction-shape` |
 | R54 | Fraction strips stacked (halves / quarters; unit fractions) | B8 S10, S12–S13, S15 | PARTIAL | `frac-model` `model:'bar'` on `compare`, `equiv_frac_visual` |
-| R57 | Fraction of a set (objects ringed into groups / a column ringed) | B8 S3–S5, S7–S8, S10–S11, S13–S14 | PARTIAL | `fraction_of_set` (legacy) → reuse `template:arrays` ringed groups |
+| R57 | Fraction of a set (objects ringed into groups / a column ringed) | B8 S3–S5, S7–S8, S10–S11, S13–S14 | MATCH | `fractions:fraction_of_set` / `fraction_of_set_hard`: frac-model `amount`, `pic: 'set'` (counters ringed into d equal groups; "3/4 of 12 = [ ]", "[ ]/4 of 12 = 9", a story) |
 | R58 | Data / listing table (base-10 \| numerals \| words; sentence \| picture; price list; cities) | B1 S6, S16; B4 S7; B5 S4–S5, S11; B7 S9; B10 S2; B11 S1 | GAP | `template:data-table` |
 | R59 | Sort into labelled groups (hoops, two regions, 2-D \| 3-D) | B3 S1, S7, S11; B5 S12; B6 S2; B8 S11 | PARTIAL | `hands-sort` page tag; kit `template:sort-table` GAP |
 | R60 | Analogue clock (read, draw hands; answer in words) | B9 S1–S5, S7 | MATCH / PARTIAL | `template:clock` (`time_hour` … `time_5min`, `response:'draw'`, `numerals`, `support`); `answer:'words'` GAP |
