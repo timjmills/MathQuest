@@ -1241,3 +1241,8 @@ html body .mq-scell .mq-nl-track {
 }
 /* the place-value mat's zones stay side by side (H T O is one row, never wrapped) */
 html body .problem-card .pvb-zones[data-role="zones"], html body .mq-scell .pvb-zones[data-role="zones"] { flex-wrap: nowrap !important; }
+
+/* Round on a number line (round_nl_*, 2026-09-25): the dot turns green with its (hidden) slot. */
+html body .mq-rlwrap svg circle.mq-rl-dot.mq-rl-dot--ok { fill: #1B7A43 !important; }
+html body .mq-rl:focus-visible { outline: 3px solid #1B7A43; outline-offset: 2px; border-radius: 8px; }
+html body .mq-scell .mq-rlwrap .mq-cellbox > input { width: 100% !important; height: 100% !important; border: 0 !important; margin: 0 !important; box-shadow: none !important; }

@@ -664,6 +664,33 @@ const _pvMoreLessSupport2 = (withChart) => {
     d.help = 'Most support first. The strip shows only the number; the pupil works out the box beside it.';
     return d;
 };
+// Round on a number line to thousands and beyond (owner, 2026-09-25). The number SIZE is the
+// skill (its id); the place is its option, offered from the tens up to one place above the
+// number's own top place (648,000 -> nearest 1,000,000). The line options reuse rounding_visual's
+// ids and tokens (`line`, `midLabel`), so the family reads as one system. No "mixed places"
+// value: a page changes one thing, the place, by choosing it.
+export const ROUND_NL = Object.freeze({
+    round_nl_thousands: Object.freeze({ lo: 1000, hi: 9999, places: [10, 100, 1000, 10000], dflt: 1000 }),
+    round_nl_ten_thousands: Object.freeze({ lo: 10000, hi: 99999, places: [10, 100, 1000, 10000, 100000], dflt: 10000 }),
+    round_nl_hundred_thousands: Object.freeze({ lo: 100000, hi: 999999, places: [10, 100, 1000, 10000, 100000, 1000000], dflt: 100000 }),
+});
+function _pvRoundNl(id) {
+    const d = ROUND_NL[id];
+    return [
+        { id: 'place', label: 'Round to the nearest', type: 'enum', default: d.dflt, group: 'difficulty',
+            values: d.places.map(v => ({ v, l: v.toLocaleString('en-US') })),
+            help: 'The place the number is rounded to. The line runs from one multiple of it to the next.' },
+        _pvMidpoint(true),
+        { id: 'line', label: 'Dot on the line', type: 'enum', default: 'mark', group: 'support',
+            values: [
+                { v: 'plotted', l: 'The dot is shown on the line' },
+                { v: 'mark', l: 'The pupil places the dot' },
+            ],
+            help: 'Most support first: the dot is drawn for the pupil, then the pupil places it.' },
+        { id: 'midLabel', label: 'Label the halfway point', type: 'bool', default: true, group: 'support',
+            help: 'The halfway number printed under the middle tick. Off is the fade: the tick stays marked.' },
+    ];
+}
 const P9_PV_OPTIONS = {
     'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport(), _pvIdentifyResponse(), _pvRepeatDigit()],
     'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit()],
@@ -737,6 +764,9 @@ const P9_PV_OPTIONS = {
             help: 'A hint: the halfway number is printed under the middle tick.' },
     ],
     'number_sense:between_tens': [_pvBand([100, 1000], 100)],
+    'number_sense:round_nl_thousands': _pvRoundNl('round_nl_thousands'),
+    'number_sense:round_nl_ten_thousands': _pvRoundNl('round_nl_ten_thousands'),
+    'number_sense:round_nl_hundred_thousands': _pvRoundNl('round_nl_hundred_thousands'),
     'number_sense:place_on_number_line': [
         { id: 'span', label: 'The line goes from', type: 'enum', default: 10, group: 'difficulty',
             values: [{ v: 10, l: 'One ten to the next' }, { v: 100, l: 'One hundred to the next' }, { v: 1000, l: 'One thousand to the next' }],
@@ -780,6 +810,7 @@ export function pvRoundPlace(skillId, opts) {
     const m = String(skillId).match(/^(?:nearest|round_sort)_(10|100|1000|10000|100000|million)$/);
     if (m) return _PV_ID_PLACE[m[1]];
     if (skillId === 'rounding_visual') return Number((opts && opts.place) || 10);
+    if (ROUND_NL[skillId]) return Number((opts && opts.place) || ROUND_NL[skillId].dflt);
     return 0;
 }
 
@@ -790,6 +821,8 @@ export function pvRoundPlace(skillId, opts) {
  */
 export function pvBandFloor(categoryId, skillId, opts) {
     const o = normalizeOptions(categoryId, skillId, opts);
+    // A round-on-a-number-line skill's numbers are its id's size, whatever place it rounds to.
+    if (ROUND_NL[skillId]) return ROUND_NL[skillId].hi + 1;
     const place = pvRoundPlace(skillId, o);
     if (place) return place * 10;
     if (skillId === 'more_less_100') return Number(o.step) === 1000 ? 10000 : 1000;
@@ -2731,6 +2764,217 @@ const _AP2_POINTS = { all: 'Points named with their coordinates: A(3, 2)', some:
 
 Object.assign(SKILL_OPTIONS, P12_OPTIONS);
 // ============================ end P12 · every other family ============================
+
+// ===========================================================================
+// O6 · AP1 · K-2 PICTURE KIND — "Objects"  (counting, comparing, composing; 2026-09-25)
+// ===========================================================================
+// OPTIONS-RUBRIC.md O6: a K-2 counting or composing skill offers the PICTURE KIND the pupil counts,
+// wherever the skill can honestly draw more than one. The family shares ONE control, `objects`
+// (share key J), with ONE value vocabulary, so a teacher reads the same words on every K-2 panel:
+//   shapes    plain outline shapes (circle, square, triangle, star)      RP-20 plain set
+//   pictures  the in-house line-art (ball, apple, fish, flower)          RP-20 picture set
+//   frame     counters in ten (or five) frames                           RP-10 / RP-11
+//   dice      dice patterns of up to six pips
+//   blocks    base-10 blocks: a ten rod and unit cubes                   RP-30
+// It is an APPEARANCE control (group 'layout'): it never changes the numbers dealt, only what the
+// numbers are drawn with. Each skill offers only the kinds its picture can carry, its own default
+// first, marked "(default)". The generator writes the choice into q.cell.payload and a sheet-kit
+// template draws it (every skill with this control is a kit cell since round 2), so paper, key and
+// screen draw the same picture. The default reproduces today's items exactly (add_5_pictures,
+// tens_foundation_visual, classify_count and teen_compose moved to the kit in round 2: their
+// defaults draw the same content as before, in kit form).
+//
+// Skills that keep ONE form (the drawing is the lesson): make_ten and ten_frame_build(_teen) (the
+// ten frame is what is taught and counted), hundreds_chart_fill / number_chart_fill (the chart),
+// base10_* (the blocks), count_sequence and number_seq_fill (a number path), compare_objects (its "What is compared" already picks lines, towers or bars).
+const K2_OBJECT_LABELS = Object.freeze({
+    shapes: 'Plain shapes (circles, squares, triangles, stars)',
+    pictures: 'Pictures (balls, apples, fish)',
+    frame: 'Counters in ten frames',
+    dice: 'Dice patterns',
+    blocks: 'Base-10 blocks (a ten rod and ones)',
+});
+/** The family's picture-kind control: `values` in panel order, `dflt` marked "(default)". */
+export const k2ObjectsOption = (values, dflt, { labels = {}, help, appliesTo } = {}) => ({
+    id: 'objects', label: 'Objects', type: 'enum', default: dflt, group: 'layout',
+    values: values.map(v => ({ v, l: `${labels[v] || K2_OBJECT_LABELS[v]}${v === dflt ? ' (default)' : ''}` })),
+    help: help || 'What the pupil counts. The numbers stay the same; only the picture changes.',
+    ...(appliesTo ? { appliesTo } : {}),
+});
+/** Put `def` into a skill's list: in place of its own `id`, or at the end. */
+const _ap1Put = (key, def, at = null) => {
+    const list = (SKILL_OPTIONS[key] || []).slice();
+    const i = list.findIndex(o => o && o.id === def.id);
+    if (i >= 0) list[i] = def;
+    else if (at !== null) list.splice(at, 0, def);
+    else list.push(def);
+    SKILL_OPTIONS[key] = list;
+};
+// Support level 0 on the picture skills is "the number sentence alone": no picture to choose.
+const _ap1HasPicture = (o) => !(Array.isArray(o && o.level) && o.level.length && o.level.every(v => Number(v) === 0));
+// count_objects: the same four kinds it always had, now through the family factory (the values,
+// the default and the share tokens are unchanged; it moves under the Layout heading).
+_ap1Put('counting:count_objects', k2ObjectsOption(['shapes', 'pictures', 'frame', 'dice'], 'shapes', {
+    labels: { shapes: 'Plain shapes (one kind per item)' },
+    help: 'What the pupil counts. Ten frames and dice let a pupil count on from a group he knows.',
+}));
+// compare_groups: both groups drawn the same way. Frames, shapes and pictures stand in rows of
+// five on the same 10 mm pitch, one above the other, so the pupil still matches column by column.
+_ap1Put('comparing:compare_groups', k2ObjectsOption(['frame', 'shapes', 'pictures', 'dice'], 'frame', {
+    labels: { frame: 'Counters in ten frames', shapes: 'Plain shapes in rows of five', pictures: 'Pictures in rows of five (balls, apples, fish)',
+        dice: 'Dice patterns (match the dice, then the dots)' },
+    help: 'What each group is drawn with; both groups always use the same kind. Frames, shapes and pictures '
+        + 'line up column by column so the pupil can match one to one; dice are compared by their dot patterns.',
+}));
+// classify_count: the category IS the kind of object, so only kinds that differ from each other:
+// four plain shapes, or four pictures.
+_ap1Put('comparing:classify_count', k2ObjectsOption(['shapes', 'pictures'], 'shapes', {
+    labels: { pictures: 'Pictures (balls, apples, fish, flowers)' },
+    help: 'What the pupil sorts. The kind to count is shown in the key box beside the picture.',
+}));
+// sub_5_pictures: the take-away picture (the taken ones crossed out). Hidden with Pictures off.
+_ap1Put('subtraction:sub_5_pictures', k2ObjectsOption(['shapes', 'pictures', 'frame'], 'shapes', {
+    labels: { pictures: 'Pictures (balls, apples, fish, flowers)', frame: 'Counters in a five frame' },
+    help: 'What the take-away is drawn with. The ones taken away are crossed out in every kind.',
+    appliesTo: (o) => o.pictures !== false,
+}));
+// teen_compose: a teen number as "a ten and some ones": a full ten frame and loose counters, or a
+// ten rod and unit cubes. Hidden at Support level 0 (the number sentence alone).
+_ap1Put('composing:teen_compose', k2ObjectsOption(['frame', 'blocks'], 'frame', {
+    labels: { frame: 'A full ten frame and loose counters', blocks: 'A ten rod and unit cubes' },
+    help: 'How the ten and the ones are drawn. The number sentence under the picture stays the same.',
+    appliesTo: _ap1HasPicture,
+}), 1);
+// add_5_pictures (round 2, now the kit's counters cell): the two groups drawn as plain shapes,
+// pictures, one five frame (the first group solid, the second hollow) or two dice. Hidden with
+// Pictures off (the number sentence alone).
+_ap1Put('addition:add_5_pictures', k2ObjectsOption(['shapes', 'pictures', 'frame', 'dice'], 'shapes', {
+    labels: { shapes: 'Plain shapes (circles, squares, triangles, stars, diamonds)', pictures: 'Pictures (balls, apples, fish, flowers)',
+        frame: 'Counters in a five frame (one group solid, one hollow)', dice: 'Two dice' },
+    help: 'What the two groups are drawn with. The sum and the sentence under the picture stay the same.',
+    appliesTo: (o) => o.pictures !== false,
+}));
+// tens_foundation_visual (round 2, now the kit's counters cell): the tens as rods (base-10
+// blocks) or as full ten frames, each with its rule ("One rod is one ten." / "One full frame
+// is one ten."). Both are a ten the pupil counts as one; the count of tens is the same.
+_ap1Put('composing:tens_foundation_visual', k2ObjectsOption(['blocks', 'frame'], 'blocks', {
+    labels: { blocks: 'Rods of ten (base-10 blocks)', frame: 'Full ten frames' },
+    help: 'What one ten is drawn as. The pupil counts the tens either way.',
+}));
+// number_bonds: the bond drawn with the whole on top (RP-60, the default) or with the whole at
+// the side, the two parts stacked to its right. Same boxes, same missing box.
+_ap1Put('composing:number_bonds', {
+    id: 'orientation', label: 'How the bond is drawn', type: 'enum', default: 'vertical', group: 'layout',
+    values: [{ v: 'vertical', l: 'Whole on top, parts below (default)' }, { v: 'horizontal', l: 'Whole at the side, parts stacked' }],
+    help: 'One way for the whole page. Seeing both ways shows the whole is the whole wherever it sits.',
+});
+
+// hundreds_chart_fill (owner, 2026-09-25): "Numbers to" 10, 20, 30, 40, 50 and 100. Each chart
+// is the first N numbers in rows of ten; the window is cut from inside it (1 to 10 is its one
+// row, drawn whole). 100 stays the default, so every old page and code is unchanged.
+_ap1Put('composing:hundreds_chart_fill', _opsBand([10, 20, 30, 40, 50, 100], 100, {
+    labels: { 10: '10 (the row 1 to 10)', 20: '20 (two rows)', 30: '30 (three rows)', 100: '100 (the whole chart)' },
+    help: 'The chart the window is cut from: the first 10, 20, 30, 40, 50 or 100 numbers, ten to a row. '
+        + 'A small chart holds fewer empty boxes (at most 5 in the row to 10, 6 in the chart to 20).',
+}));
+// number_chart_fill: the same window cut from a chart of bigger numbers (the hundreds, then the
+// thousands). "Numbers in" names the stretch of the chart; every number in the window is in it.
+SKILL_OPTIONS['composing:number_chart_fill'] = [
+    _opsBand([200, 500, 1000, 5000, 10000], 200, {
+        label: 'Numbers in',
+        labels: { 200: '101 to 200', 500: '201 to 500', 1000: '501 to 1,000', 5000: '1,001 to 5,000', 10000: '5,001 to 10,000' },
+        help: 'The stretch of the number chart the window is cut from. 101 to 1,000 is counting in the hundreds '
+            + '(Level 2); the thousands need four- and five-digit boxes, so at size L the window prints one to a row.',
+    }),
+    {
+        id: 'tiles', label: 'Empty boxes', type: 'enum', default: null, group: 'difficulty',
+        values: [{ v: null, l: '1 to 3, dealt' }, { v: 1, l: '1 box' }, ...[2, 3, 4, 5, 6].map(n => ({ v: n, l: `${n} boxes` }))],
+        help: 'How many numbers the pupil writes in each window (3 rows of 4): at most two in a row, never side by side.',
+    },
+];
+// ============================ end O6 · AP1 · K-2 picture kind ============================
+
+// O6 APPEARANCE · FRACTION MODELS AND NUMBER LINES  (lane AP3, 2026-09-25)
+// ===========================================================================
+// design/audit/OPTIONS-RUBRIC.md O6: "how an item looks", never the number size or the help.
+// Appended to the skill's own panel under Layout ("only changes the look"). Each value changes
+// the printed cell AND the screen, through one builder used by both:
+//   model  "Fraction model" - gen-fractions.js _fModelPick -> sheet/cells/frac-model.js (screen
+//          q.visual; print: the legacy handler draws fractionData.model / prints q.visual).
+//          Offered only for the models a skill can honestly draw: a pupil does not SHADE a line.
+//   ticks  "Numbers on the line" - which ticks carry a numeral (sheet/cells/line-labels.js); the
+//          ticks themselves never move (P-1). + / − jump lines: number-line.js via
+//          gen-operations.js _nlKitItem. Drag onto the line: nlData.labelAt, read by
+//          widgets/nl-drag.js and the print twin. number_line_int: sheet/cells/value-line.js.
+// Each default is what the skill drew before (R2), so an untouched skill and every old link draw
+// the same items. Share-code keys: `model` 5D (reserved for exactly this); `ticks` 2E, the id and
+// vocabulary nl_mult / nl_div already use ('one' = every number), with two new tokens.
+const _AP3_MODEL = { area: 'Rectangle (area model)', bar: 'Bar (fraction strip)', circle: 'Circle', line: 'Number line 0 to 1 (a dot marks it)' };
+const _ap3Model = (values, dflt, help, appliesTo = null) => ({
+    id: 'model', label: 'Fraction model', type: 'set', group: 'layout', default: dflt,
+    values: values.map(v => ({ v, l: _AP3_MODEL[v] })), allLabel: 'Every model, mixed', help,
+    ...(appliesTo ? { appliesTo } : {}),
+});
+const _ap3Ticks = (values, dflt, help) => ({
+    id: 'ticks', label: 'Numbers on the line', type: 'enum', default: dflt, group: 'layout',
+    values: values.map(([v, l]) => ({ v, l: v === dflt ? `${l} (default)` : l })), help,
+});
+const _AP3_ADD_LINE = _ap3Ticks([['one', 'Every number: 0, 1, 2, 3 …'], ['some', 'Every 2nd number: 0, 2, 4 …'], ['ends', 'The two ends only']], 'one',
+    'Which ticks carry a numeral. Every number has a tick and every hop is one number whatever you choose; '
+    + 'the dot the pupil starts from is always numbered. Fewer numerals make the pupil count along the ticks.');
+const _AP3_OPTIONS = {
+    'fractions:identify': [_ap3Model(['area', 'bar', 'circle', 'line'], ['bar', 'circle'],
+        'Default: circles and bars, mixed, as the skill always drew. The picture on each "What fraction is shaded?" item, '
+        + 'on paper and on screen: tick one model for a page of it, or several to mix them. On a number line a dot marks '
+        + 'the fraction. The other kinds of item (pick the model, name the numerator) keep their own look.',
+        (o) => !Array.isArray(o.forms) || !o.forms.length || o.forms.includes(0))],
+    'fractions:write_fraction': [_ap3Model(['area', 'bar', 'circle', 'line'], ['area', 'bar', 'circle'],
+        'Default: rectangles, bars and circles, mixed. The picture the pupil writes the fraction for, on paper and on '
+        + 'screen. Tick one model for a page of it. On a number line a dot marks the fraction.')],
+    'fractions:shade_fraction': [_ap3Model(['area', 'bar', 'circle'], ['area', 'bar', 'circle'],
+        'Default: rectangles, bars and circles, mixed. The empty picture the pupil shades, on paper and on screen. '
+        + 'A number line is not offered: a pupil marks a point on a line, he does not shade it.')],
+    'fractions:compare': [_ap3Model(['bar', 'circle', 'area', 'line'], ['bar', 'circle'],
+        'Default: bars on screen and circles on paper, as the skill always drew. The two pictures on each "compare the '
+        + 'fractions" item: tick one model and both fractions are drawn that way, on the same size of whole, on paper and '
+        + 'on screen. The other kinds of item (numbers only, compare to 1/2) have no picture.',
+        (o) => !Array.isArray(o.forms) || !o.forms.length || o.forms.includes(0))],
+    'fractions:equiv_frac_visual': [_ap3Model(['circle', 'bar', 'area'], ['circle'],
+        'Default: circles, as the skill always drew. Both fractions are drawn as the ticked model on the same size of whole, '
+        + 'so the pupil sees they cover the same amount; the shade-it items on paper give an empty one of the same model. '
+        + 'Bars (fraction strips) are the usual picture for equivalence.')],
+    'fraction_operations:add_fractions_like': [_ap3Model(['bar', 'area', 'circle'], ['bar'],
+        'Default: the skill\'s own bars. A rectangle or a circle draws each fraction of the sum that way, in black and '
+        + 'white, and never draws the answer. Pictures off prints numbers only.', (o) => o.pictures !== false)],
+    'fraction_operations:sub_fractions_like': [_ap3Model(['bar', 'area', 'circle'], ['bar'],
+        'Default: the skill\'s own bars. A rectangle or a circle draws both fractions that way, in black and white, and '
+        + 'never draws the answer. Pictures off prints numbers only.', (o) => o.pictures !== false)],
+    'addition:number_line_add': [_AP3_ADD_LINE],
+    'subtraction:number_line_sub': [_AP3_ADD_LINE],
+    'addition:nl_add': [_AP3_ADD_LINE],
+    'subtraction:nl_sub': [_AP3_ADD_LINE],
+    'integers:number_line_int': [_ap3Ticks([['one', 'Every number but the marked one'], ['some', 'Every 5th number: −10, −5, 0, 5, 10'],
+        ['ends', 'The two ends and 0']], 'some',
+    'Which ticks carry a numeral; the marked number is never numbered. Every 5th is the line the skill always drew. '
+        + 'Every number and the ends draw a line of 20 with a tick at every whole number, so the pupil counts from a numeral.')],
+    'integers:integer_nl_drag': [_ap3Ticks([['one', 'Every number: −10, −9, −8 …'], ['some', 'Every 5th number, the ends and 0'],
+        ['ends', 'The two ends and 0']], 'some',
+    'Which ticks carry a numeral; there is a tick at every whole number whatever you choose. With every number the '
+        + 'pupil matches each number to its numeral; with fewer he counts along the ticks. On the −5 to 5 line every '
+        + '5th becomes every 2nd.')],
+    'decimals:decimal_nl_drag': [_ap3Ticks([['one', 'Every tenth: 0, 0.1, 0.2 …'], ['some', '0, 0.5 and 1'], ['ends', '0 and 1 only']], 'some',
+        'Which ticks carry a numeral; there is a tick at every tenth whatever you choose. With every tenth the pupil '
+        + 'matches each decimal to its numeral; with fewer he counts the tenths.')],
+    'fractions:fraction_nl_drag': [_ap3Ticks([['one', 'Every part: 0, 1/4, 2/4 …'], ['some', '0, the halfway tick and 1'], ['ends', '0 and 1 only']], 'one',
+        'Which ticks carry a numeral; the line is always cut into equal parts. With every part numbered the pupil '
+        + 'matches each fraction to its numeral; with fewer he counts the parts. A line in thirds or fifths has no '
+        + 'halfway tick, so there "halfway" numbers 0 and 1 only.')],
+    'fractions:mixed_nl_drag': [_ap3Ticks([['some', 'Every whole number: 0, 1, 2, 3'], ['ends', '0 and 3 only']], 'some',
+        'Which ticks carry a numeral; every whole number and every part has a tick whatever you choose. With the '
+        + 'ends only the pupil counts the wholes too. (Every part is not offered: nineteen mixed numbers do not fit.)')],
+};
+for (const [key, defs] of Object.entries(_AP3_OPTIONS)) SKILL_OPTIONS[key] = [...(SKILL_OPTIONS[key] || []), ...defs];
+// ============================ end O6 · fraction models and number lines ============================
 
 // ===========================================================================
 // WORD WORK · the keyword supports of every whole-number word problem (2026-09-25)

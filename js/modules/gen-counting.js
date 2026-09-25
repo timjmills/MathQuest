@@ -95,10 +95,6 @@ const _kCell = (inner, note, selfContained) => `<div class="k2-cell`
     + `font-family:${K_FONT};">${inner}`
     + `${note ? `<div style="margin-top:8px;font-size:0.95rem;line-height:1.35;">${note}</div>` : ''}</div>`;
 
-/** The rule reminder a cell may carry (BD-10) — never a restatement of the instruction. */
-const _kRuleBox = (text) => `<div style="display:inline-block;border:${K_HEAVY}px solid ${K_INK};`
-    + `border-radius:10px;padding:4px 12px;margin-bottom:10px;font-size:0.95rem;">${text}</div>`;
-
 /** Tick boxes: a LIST, with the box on the RIGHT of its label (owner, 2026-09-20). */
 const _kTickList = (labels) => `<div style="display:inline-block;text-align:left;margin-top:10px;">`
     + labels.map(l => `<div style="display:flex;align-items:center;gap:10px;margin:5px 0;font-size:1.05rem;">`
@@ -236,37 +232,6 @@ function _kTenFrame(filled, { frames = 1, cell = 36, rows = 2 } = {}) {
     return out;
 }
 
-/**
- * Base-10 rods of ten.
- *
- * Drawn here rather than by createBase10Blocks(), because that helper prints the stack's VALUE
- * underneath it — "50" under five rods — and that is a different number from the answer to "How
- * many tens?". For a pupil who cannot read the question, the number in the picture IS the answer
- * the picture gives, so five rods labelled 50 is the worst kind of item this family can print.
- *
- * Each rod is ONE outlined box divided into ten by nine hairlines, so a rod is visibly a ten and
- * the drawing is made of SVG primitives a gate can count — rather than of a CSS height a
- * restyle would move.
- */
-function _kRods(rods) {
-    const rodW = 18, rodH = 76, gap = 10, pad = 4;
-    const w = rods * (rodW + gap) - gap + pad * 2;
-    const h = rodH + pad * 2;
-    let body = '';
-    for (let i = 0; i < rods; i++) {
-        const x = pad + i * (rodW + gap);
-        body += `<rect x="${x}" y="${pad}" width="${rodW}" height="${rodH}" fill="none" `
-            + `stroke="${K_INK}" stroke-width="${K_HEAVY}"/>`;
-        for (let j = 1; j < 10; j++) {
-            const y = (pad + (j / 10) * rodH).toFixed(1);
-            body += `<line x1="${x}" y1="${y}" x2="${x + rodW}" y2="${y}" `
-                + `stroke="${K_INK}" stroke-width="${K_HAIR}"/>`;
-        }
-    }
-    return `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w * 1.3, 320)}" `
-        + `style="display:block;margin:0 auto;">${body}</svg>`;
-}
-
 /** A horizontal bar: `len` is its length, `thick` its thickness. White inside, outline carries it. */
 const _kHBar = (len, thick, boxW) =>
     `<svg viewBox="0 0 ${boxW} 44" width="${Math.min(boxW, 300)}" height="44" style="display:block;flex:0 1 auto;min-width:0;">`
@@ -320,6 +285,8 @@ function _kSetCell(q, template, payload) {
 
 /** The plain counters of the count cells (one SVG primitive each, RP-20 plain set). */
 const K2_COUNT_SHAPES = ['circle', 'square', 'triangle', 'star'];
+/** O6 AP1: the in-house line-art pictures (RP-20 picture set) the "Objects: Pictures" value draws. */
+const K2_PICTURE_KINDS = ['ball', 'apple', 'fish', 'flower'];
 
 /**
  * A choice held for a whole printed page: drawn at the page's first item and kept (one routine
@@ -516,6 +483,19 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         q.hint = `Match them one to one. Group A has ${countA}. Group B has ${countB}.`;
         q.distractorTags = { [values[1 - correct]]: 'judged by how the groups look, not by matching one to one' };
         const _cgPayload = { a: countA, b: countB, labels, values, correct };
+        // O6 AP1 "Objects": both groups drawn the same way — counters in ten frames (the default,
+        // unchanged), plain shapes or pictures in rows of five, or dice. Only the picture changes;
+        // the counts above were dealt first, so they are the same items.
+        const _cgObj = _kOpt('objects');
+        if (_cgObj === 'shapes' || _cgObj === 'pictures' || _cgObj === 'dice') {
+            _cgPayload.objects = _cgObj;
+            let noun = 'dots';
+            if (_cgObj !== 'dice') {
+                _cgPayload.shape = _cgObj === 'pictures' ? K2_PICTURE_KINDS[_kDeal(3)] : K2_COUNT_SHAPES[_kDeal(K2_COUNT_SHAPES.length)];
+                noun = K2_SHAPES[_cgPayload.shape].plural;
+            }
+            q.text = form === 'same' ? `Do the groups have the same number of ${noun}?` : `Which group has ${form === 'more' ? 'more' : 'fewer'} ${noun}?`;
+        }
         if (_kLevel(1) >= 2) _cgPayload.showCounts = true;   // P11 hint: how many, beside each frame
         _kSetCell(q, 'compare', _cgPayload);
         q.skillLabel = 'More, Fewer, Same';
@@ -616,7 +596,14 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     else if (mappedSkill === "classify_count") {
         // P11: "Kinds of shape" (2 / 3 / 4) and "Count to" (3 / 6 / 10; 6 is the default).
         const _ccKinds = Number(_kOpt('tiles'));
-        const kinds = shuffle(K_SHAPES.slice()).slice(0, _ccKinds >= 2 ? _ccKinds : 2 + _kDeal(2));   // 2 or 3 kinds
+        // O6 AP1 round 2: drawn by the kit's `counters` cell (kind 'sort'): a key box with one
+        // specimen of the kind to count, the mixed bag six to a row, and the K answer square — the
+        // same content the old HTML cell drew, now one drawing on paper, key and screen, with no
+        // "Answer:" line under it. "Objects": four plain outline shapes (the default) or four
+        // line-art pictures. The draws are the old ones (a four-way shuffle, the counts, the bag).
+        const _ccPics = _kOpt('objects') === 'pictures';
+        const _ccPool = _ccPics ? K2_PICTURE_KINDS : K2_COUNT_SHAPES;
+        const kinds = shuffle(_ccPool.slice()).slice(0, _ccKinds >= 2 ? _ccKinds : 2 + _kDeal(2));   // 2 or 3 kinds
         const _ccTop = Number(_kOpt('band')) || 6;
         const counts = kinds.map(() => rng(_ccTop <= 3 ? 1 : 2, _ccTop));
         const _ccCap = _ccTop <= 3 ? 9 : _ccTop <= 6 ? 14 : 24;
@@ -627,24 +614,8 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const askIdx = rng(0, kinds.length - 1);
         const asked = kinds[askIdx];
         const answer = counts[askIdx];
-
         const bag = shuffle(kinds.flatMap((k, i) => Array.from({ length: counts[i] }, () => k)));
-        const cell = 46, cols = Math.min(6, bag.length), pad = 8;
-        const rows = Math.ceil(bag.length / cols);
-        const w = cols * cell + pad * 2;
-        const h = rows * cell + pad * 2;
-        let body = '';
-        bag.forEach((k, i) => {
-            body += k.draw(pad + (i % cols) * cell + cell / 2,
-                pad + Math.floor(i / cols) * cell + cell / 2, cell * 0.32);
-        });
-
-        // The key: one specimen of the asked kind in its own box. Not an instruction — the
-        // referent the words "How many triangles?" point at.
-        const keySvg = `<svg viewBox="0 0 46 46" width="46" height="46" style="vertical-align:middle;">`
-            + `<rect x="${K_HEAVY / 2}" y="${K_HEAVY / 2}" width="${46 - K_HEAVY}" height="${46 - K_HEAVY}" `
-            + `rx="5" fill="none" stroke="${K_INK}" stroke-width="${K_HEAVY}"/>`
-            + asked.draw(23, 23, 13) + `</svg>`;
+        const plural = K2_SHAPES[asked].plural;
 
         // NOT "how many ...?". This is a SUBSET question — the picture holds three kinds and the
         // answer counts one of them — and "how many" is how ws-content-audit recognises a cell
@@ -652,14 +623,17 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // drawn and call a correct answer wrong. "Count only the ..." says the same thing in
         // plainer English and leaves the item honestly unchecked, which is what that gate says
         // it wants for a subset.
-        q.text = `Count only the ${asked.plural}.`;
+        q.text = `Count only the ${plural}.`;
         q.printText = 'Count one kind. Write how many.';
         q.ans = answer;
         q.answerType = "number";
-        q.hint = `Look only at the ${asked.plural}. Touch each one as you count.`;
-        q.visual = _kCell(
-            `<div style="margin-bottom:8px;">${keySvg}</div>`
-            + `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w, 340)}" style="display:block;margin:0 auto;">${body}</svg>`);
+        q.options = [];
+        q.selfAnswering = true;     // the answer square is the one slot (SL-7)
+        q.hint = `Look only at the ${plural}. Touch each one as you count.`;
+        // The sort's real errors: counting every object, or counting the kind next to it.
+        const _ccOther = counts.find((c, i) => i !== askIdx && c !== answer);
+        q.distractorTags = _ccOther !== undefined ? { [_ccOther]: 'counted a different kind' } : { [bag.length]: 'counted every object' };
+        _kSetCell(q, 'counters', { kind: 'sort', bag, asked, ans: answer });
         q.skillLabel = 'Sort & Count';
         return;
     }
@@ -715,7 +689,10 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const known = unknown === 'whole' ? 0 : total - answer;
         const wrong = unknown === 'whole' ? (partA === partB ? total - 1 : Math.abs(partA - partB)) : total + known;
         q.distractorTags = { [wrong]: unknown === 'whole' ? 'took one part from the other' : 'added the two numbers it could see' };
-        _kSetCell(q, 'bond', { whole: total, a: partA, b: partB, unknown });
+        const _nbPayload = { whole: total, a: partA, b: partB, unknown };
+        // O6 AP1: "How the bond is drawn" — whole above (the default, unchanged) or at the side.
+        if (_kOpt('orientation') === 'horizontal') _nbPayload.orientation = 'horizontal';
+        _kSetCell(q, 'bond', _nbPayload);
         q.skillLabel = 'Number Bonds';
         return;
     }
@@ -765,38 +742,41 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const teen = 10 + ones;
         const askTotal = _kDeal(2) === 1;
 
-        const extras = _kShapeGrid(ones, K_SHAPES[0], { cell: 34, cols: 5 });
-        // THE NUMBER SENTENCE IS PART OF THE CELL, not part of the instruction. Two wrong ways
-        // round were tried on paper first: with `printText` the printed cell was a ten frame,
-        // five loose counters and "Write the missing number." — unanswerable, because 5 and 15
-        // are both defensible; without it, the underscores in the wording put the cell down
-        // print-generate's inline-cloze path, which printed the sentence and threw the picture
-        // away, on a skill whose title says "(Visual)". The sentence therefore lives in the
-        // drawing, under the counters it describes, and q.text keeps it for the screen, the
-        // answer check and the gate's equation rule.
+        // THE NUMBER SENTENCE IS PART OF THE CELL, not part of the instruction: "Write the missing
+        // number." over a ten frame and five loose counters is unanswerable (5 and 15 both fit), so
+        // the sentence with its one box sits under the picture it describes.
         //
-        // Because the sentence is IN the cell, q.text must not also be laid out beside it: on
-        // screen the card rendered "10 + 8 =" twice, once from the drawing and once from
-        // q.text, which is the restatement CL-1 forbids and the last thing a pupil who cannot
-        // read a sentence needs two of. `_kCell(..., true)` marks the cell self-contained, so
-        // q.text stays in the DOM for TTS, screen readers and the gate but out of the layout.
-        q.text = askTotal ? `10 + ${ones} = ___` : `10 + ___ = ${teen}`;
+        // O6 AP1 round 2: drawn by the kit's `counters` cell (kind 'teen'), so paper, key and
+        // screen are one drawing and the sentence's box is the item's one answer slot (AK-4: the
+        // old HTML line carried no slot, so the pupil page had none while the key had one). The
+        // online worksheet used to redraw "10 + 1 = ___" as a bare vertical fact and drop the
+        // picture; a kit cell keeps it.
+        // The sentence is IN the cell, so q.text says it in words rather than repeating it above
+        // the cell on screen (CL-1); TTS reads it, and the teen stays the largest number named.
+        q.text = askTotal ? `What number is 10 and ${ones} more?` : `10 and what number make ${teen}?`;
         q.printText = 'Write the missing number.';
         q.ans = askTotal ? teen : ones;
         q.answerType = "number";
+        q.options = [];
+        q.selfAnswering = true;
         q.hint = askTotal
             ? `The full frame is 10. Count on from 10 for each loose counter.`
             : `The full frame is 10. Count the loose counters — that is how many more than 10.`;
-        q.visual = _kCell(
-            _kTenFrame(10, { cell: 30 })
-            + `<div style="margin-top:6px;">${extras.svg}</div>`
-            + `<div style="margin-top:10px;font-size:1.6rem;font-weight:700;white-space:nowrap;">`
-            + (askTotal ? `10 + ${ones} = ${_kLine(3)}` : `10 + ${_kLine(3)} = ${teen}`)
-            + `</div>`, null, true);
-        // P11 Support level 0: the number sentence alone, no ten frame or loose counters.
+        // The teen number's real errors: the loose ones written for the whole, or the whole
+        // written for the ones.
+        q.distractorTags = askTotal ? { [ones]: 'wrote only the loose ones' } : { [teen]: 'wrote the whole number, not the ones' };
+        const _tcPayload = { kind: 'teen', ones, askTotal, ans: q.ans };
+        // "Objects: A ten rod and unit cubes": the same ten and ones as base-10 blocks (RP-30).
+        if (_kOpt('objects') === 'blocks') {
+            _tcPayload.objects = 'blocks';
+            q.hint = askTotal
+                ? `The rod is 10. Count on from 10 for each loose cube.`
+                : `The rod is 10. Count the loose cubes — that is how many more than 10.`;
+        }
+        _kSetCell(q, 'counters', _tcPayload);
+        // P11 Support level 0: the number sentence alone (the kit's equation cell), no picture.
         if (_kLevel(1) === 0) {
-            q.visual = _kCell(`<div style="font-size:1.6rem;font-weight:700;white-space:nowrap;">`
-                + (askTotal ? `10 + ${ones} = ${_kLine(3)}` : `10 + ${_kLine(3)} = ${teen}`) + `</div>`, null, true);
+            _kSetCell(q, 'equation', { a: 10, b: ones, op: '+', result: teen, unknown: askTotal ? 'result' : 'b', digits: 2 });
             q.supportLevel = 0;
         }
         q.skillLabel = 'Teen Numbers';
@@ -817,11 +797,24 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         q.ans = rods;
         q.answerType = "number";
         q.options = [];
+        q.selfAnswering = true;     // `[ ] tens` is the one slot (SL-7)
         q.hint = `Each rod is one ten. Count the rods.`;
-        q.visual = _kCell(_kRuleBox('One rod is one ten.') + _kRods(rods));
+        // The real error: writing the value (50) for the number of tens (5).
+        q.distractorTags = { [rods * 10]: 'wrote the value, not how many tens' };
+        // O6 AP1 round 2: drawn by the kit's `counters` cell (kind 'tens'): the rule box, the rods
+        // (gridded, RP-30) and `[ ] tens`, one drawing on paper, key and screen (the old print
+        // handler drew its own grey rods from q.tensData). "Objects: Full ten frames" draws the
+        // same number of tens as full ten frames, with the rule "One full frame is one ten."
+        const _tfPayload = { kind: 'tens', n: rods, ans: rods };
+        if (_kOpt('objects') === 'frame') {
+            _tfPayload.objects = 'frame';
+            q.hint = `Each full frame is one ten. Count the frames.`;
+        }
+        _kSetCell(q, 'counters', _tfPayload);
         q.skillLabel = "Count Tens";
+        // printFormat keeps the card's size class; no q.tensData, so the legacy print path draws the
+        // kit twin too (its own rod handler needs tensData) — one drawing everywhere.
         q.printFormat = "tens-foundation";
-        q.tensData = { rods };
         return;
     }
 
@@ -830,7 +823,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // +10 down. Black and white: the blank is a dashed box (LS-8), not an orange one, and the
     // cell no longer carries a caption naming a colour that paper does not have.
     // ========================================
-    else if (mappedSkill === "hundreds_chart_fill") {
+    else if (mappedSkill === "hundreds_chart_fill" || mappedSkill === "number_chart_fill") {
         // P10 (critic, regrade 2026-09-25): the kit's `chartwindow` cell. A 3 x 5 window cut from
         // ANYWHERE on the 1-100 chart (its first row and its last row included), with one to three
         // empty cells ANYWHERE in it — a corner, an edge or the middle — each one a whole chart
@@ -839,34 +832,58 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // more; down: ten more). The window and the gaps are dealt, so a page is never six
         // centre cells read off their left neighbour.
         // P11: "Numbers to" 50 / 100 (the chart's rows) and "Empty boxes" 1 to 7 (default 1 to 3, dealt).
-        const r0 = rng(0, Number(_kOpt('band')) === 50 ? 2 : 7);
-        const c0 = rng(0, 5);
-        const rows = [r0, r0 + 1, r0 + 2];
-        const cols = [0, 1, 2, 3, 4].map(k => c0 + k);
+        //
+        // Owner (2026-09-25): "Numbers to" 10, 20, 30, 40, 50 and 100, and a bigger chart as its own
+        // skill (number_chart_fill: "Numbers in" 101-200 ... 5,001-10,000). The chart is always
+        // rows of ten, row r holding r*10+1 .. r*10+10, so a window is a run of whole chart rows
+        // and five of its columns (four on the big chart) — except the chart to 10, which is its one row, drawn whole
+        // (1 x 10). A window of R rows and C columns holds at most R * min(ceil(C/2), C-2) gaps:
+        // no two side by side in a row, at least two printed numbers left in every row. At 100
+        // and 50 the draws are exactly the old ones.
+        const big = mappedSkill === "number_chart_fill";
+        const band = Number(_kOpt('band')) || (big ? 200 : 100);
+        let rowLo, rowHi;                                  // the chart rows inside the band
+        if (big) {
+            const lo = { 200: 101, 500: 201, 1000: 501, 5000: 1001, 10000: 5001 }[band] || 101;
+            rowLo = (lo - 1) / 10; rowHi = (lo === 101 ? 200 : band) / 10 - 1;   // an unknown band falls back to 101-200
+        } else {
+            rowLo = 0; rowHi = [10, 20, 30, 40, 50].includes(band) ? band / 10 - 1 : 9;
+        }
+        const R = Math.min(3, rowHi - rowLo + 1);
+        // The big chart's numbers need wider boxes (three to five digits at the working size), so
+        // its window is four columns wide: two windows still share a row at size L.
+        const C = big ? 4 : band === 10 ? 10 : 5;
+        const r0 = big ? rng(rowLo, rowHi - (R - 1)) : rng(0, rowHi - (R - 1));
+        const c0 = C === 10 ? 0 : rng(0, 10 - C);
+        const rows = Array.from({ length: R }, (_, k) => r0 + k);
+        const cols = Array.from({ length: C }, (_, k) => c0 + k);
+        const N = R * C;
         const _hcWant = Number(_kOpt('tiles'));
-        const want = [1, 2, 3, 4, 5, 6, 7].includes(_hcWant) ? _hcWant : [1, 2, 2, 3][_kDeal(4)];
-        const at = (i) => rows[Math.floor(i / 5)] * 10 + cols[i % 5] + 1;
+        const cap = R * Math.min(Math.ceil(C / 2), C - 2);
+        const want = Math.min(cap, [1, 2, 3, 4, 5, 6, 7].includes(_hcWant) ? _hcWant : [1, 2, 2, 3][_kDeal(4)]);
+        const at = (i) => rows[Math.floor(i / C)] * 10 + cols[i % C] + 1;
         const neighbours = (i) => {
-            const r = Math.floor(i / 5), c = i % 5, out = [];
+            const r = Math.floor(i / C), c = i % C, out = [];
             if (c > 0) out.push(i - 1);
-            if (c < 4) out.push(i + 1);
-            if (r > 0) out.push(i - 5);
-            if (r < 2) out.push(i + 5);
+            if (c < C - 1) out.push(i + 1);
+            if (r > 0) out.push(i - C);
+            if (r < R - 1) out.push(i + C);
             return out;
         };
         let pickIdx = [];
         for (let t = 0; t < 400; t++) {
-            const cand = shuffle(Array.from({ length: 15 }, (_, i) => i)).slice(0, want);
+            const cand = shuffle(Array.from({ length: N }, (_, i) => i)).slice(0, want);
             const set = new Set(cand);
             // every gap keeps a printed neighbour, and no two gaps sit side by side in a row
             if (!cand.every(i => neighbours(i).some(j => !set.has(j)))) continue;
-            if (cand.some(i => i % 5 < 4 && set.has(i + 1))) continue;
+            if (cand.some(i => i % C < C - 1 && set.has(i + 1))) continue;
             pickIdx = cand;
             break;
         }
         // Fallback (never expected): a checkerboard of gaps honours both rules at any count to 7.
-        if (!pickIdx.length) pickIdx = shuffle([0, 2, 4, 6, 8, 10, 12, 14]).slice(0, want);
+        if (!pickIdx.length) pickIdx = shuffle(R === 3 && C === 5 ? [0, 2, 4, 6, 8, 10, 12, 14] : Array.from({ length: N }, (_, i) => i).filter(i => (i % C) % 2 === 0)).slice(0, want);
         const blanks = pickIdx.sort((x, y) => x - y).map(at);
+        const top = (rowHi + 1) * 10;
         q.chartWindow = { rows, cols };
         q.chartData = { target: blanks[0], targets: blanks.slice() };
         q.text = blanks.length === 1 ? 'What number goes in the empty box?' : 'Write the missing numbers in the empty boxes.';
@@ -877,12 +894,13 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         q.answerType = blanks.length === 1 ? "number" : "text";
         q.options = [];
         q.selfAnswering = true;
-        q.hint = `Across a row the number goes up by 1. Down a column it goes up by 10.`;
+        q.hint = R > 1 ? `Across a row the number goes up by 1. Down a column it goes up by 10.`
+            : `Along the row the number goes up by 1.`;
         // The chart's real error: moving ten (down a column) where the gap is one along the row.
-        const wrongFirst = blanks[0] + 10 <= 100 ? blanks[0] + 10 : blanks[0] - 10;
+        const wrongFirst = blanks[0] + 10 <= top ? blanks[0] + 10 : blanks[0] - 10;
         q.distractorTags = { [[wrongFirst, ...blanks.slice(1)].join(', ')]: 'moved ten instead of one along the row' };
         _kSetCell(q, 'chartwindow', { rows, cols, blanks });
-        q.skillLabel = "100-Chart Fill";
+        q.skillLabel = big ? "Number Chart Fill" : "100-Chart Fill";
         q.printFormat = "hundreds-chart-fill";
         return;
     }
@@ -1022,13 +1040,18 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     }
 
     // ========================================
-    // ADD 5 PICTURES (Grade K) — sums to 5, drawn as two groups of counters.
+    // ADD 5 PICTURES (Grade K) — sums to 5, drawn as two groups of objects.
     //
     // These two live in the addition / subtraction categories rather than in this family, but
-    // they are generated here and they used emoji counters, which the owner has ruled out: they
-    // render in colour, they differ from machine to machine and they are not age-neutral. The
-    // counter is now a geometric glyph, which is monochrome text on every platform, prints in
-    // the sheet's own ink and survives the cross-out rule the sub-5 print cell draws.
+    // they are generated here. No emoji (owner): they render in colour and vary by platform.
+    //
+    // O6 AP1 round 2: drawn by the kit's `counters` cell (kind 'join'), the twin of sub_5_pictures:
+    // the two groups joined by +, and `n + m = [ ]` under them, the box the item's one answer place
+    // on paper, in the key and on screen. The old cell printed font glyphs on a ruled line and
+    // asked for the answer on screen as a choice of three buttons — a production item turned into
+    // multiple choice on screen only (P-29); the pupil now writes the number everywhere.
+    // "Objects": plain shapes (the default: the glyph the old cell dealt, as an outline shape),
+    // pictures, a five frame (the first group solid, the second hollow), or two dice.
     // ========================================
     else if (mappedSkill === "add_5_pictures") {
         const counterSet = ["●", "■", "▲", "★", "◆"];
@@ -1036,35 +1059,34 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         let n, m;
         do { n = randInt(1, 3); m = randInt(1, 3); } while (n + m > 5);
         const total = n + m;
-
-        const group = (k) => `<span style="font-size:1.9rem;letter-spacing:5px;color:${K_INK};">${counter.repeat(k)}</span>`;
-
+        // The old choice row's draws are still made (and dropped), so a page deals the same sums
+        // in the same order as before the migration.
         const optsSet = new Set([total]);
         while (optsSet.size < 3) {
             const cand = total + (Math.random() < 0.5 ? -1 : 1) * randInt(1, 2);
             if (cand >= 0 && cand <= 5) optsSet.add(cand);
         }
-        if (optsSet.size < 3) { for (let v = 0; v <= 5 && optsSet.size < 3; v++) optsSet.add(v); }
+        shuffle([...optsSet]);
 
-        const mcOptions = shuffle([...optsSet]);
         q.text = `How many in all? ${n} + ${m} = ?`;
         q.printText = 'Count them all. Write how many.';
         q.ans = total;
-        q.answerType = "multiple-choice";
-        q.options = mcOptions;
+        q.answerType = "number";
+        q.options = [];
+        q.selfAnswering = true;     // the sentence's box is the one slot (SL-7)
         q.hint = `Count the first group, then keep counting into the second. ${n} + ${m} = ${total}.`;
-        q.visual = _kCell(
-            `<div style="display:inline-flex;align-items:center;justify-content:center;gap:14px;`
-            + `border:${K_HEAVY}px solid ${K_INK};border-radius:10px;padding:12px 16px;white-space:nowrap;max-width:100%;">`
-            + group(n)
-            + `<span style="font-size:1.7rem;font-weight:800;">+</span>`
-            + group(m)
-            + `<span style="font-size:1.7rem;font-weight:800;">=</span>`
-            + `<span style="display:inline-block;min-width:2.4em;border-bottom:${K_HEAVY}px solid ${K_INK};">&nbsp;</span>`
-            + `</div>`);
+        // The real joining errors: counting one group only, or counting one object twice.
+        q.distractorTags = n !== m ? { [Math.max(n, m)]: 'counted only one group' } : { [total + 1]: 'counted one object twice' };
+        const _a5Obj = _kOpt('objects');
+        const _a5Idx = counterSet.indexOf(counter);
+        const shape = _a5Obj === 'pictures' ? K2_PICTURE_KINDS[_a5Idx % K2_PICTURE_KINDS.length]
+            : ['circle', 'square', 'triangle', 'star', 'diamond'][_a5Idx];
+        const _a5Payload = { kind: 'join', n, m, shape, ans: total };
+        if (_a5Obj === 'frame' || _a5Obj === 'dice') _a5Payload.objects = _a5Obj;
+        _kSetCell(q, 'counters', _a5Payload);
         q.skillLabel = "Add ≤5 Pics";
+        // The card's size class; no q.pictureData, so the legacy print path draws the kit twin too.
         q.printFormat = "add-5-pictures";
-        q.pictureData = { emoji: counter, n, m, total, mcOptions };
         // P11 Pictures off: the same sum as a number sentence (the kit's equation cell).
         if (_kOpt('pictures') === false) {
             q.picturesOff = true;
@@ -1085,7 +1107,11 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // answer place). The answer 0-4 is dealt through a shuffled permutation, which also deals
         // the two edge facts a within-5 page otherwise never shows: take away none (m = 0) and
         // take away all (the answer 0).
-        const shape = K2_COUNT_SHAPES[_kDeal(K2_COUNT_SHAPES.length)];
+        // O6 AP1 "Objects": plain shapes (the default), pictures, or counters in a five frame. The
+        // pictures are dealt off the same four-way deal as the shapes, so the numbers that follow
+        // are the same items whichever kind is drawn.
+        const _sbObj = _kOpt('objects');
+        const shape = (_sbObj === 'pictures' ? K2_PICTURE_KINDS : K2_COUNT_SHAPES)[_kDeal(K2_COUNT_SHAPES.length)];
         // R3 (critic round 3): "take away 0" came up on a fifth of the items (three of six on a
         // worksheet). Now each edge fact is ONE slot in ten - take away all (answer 0) and take
         // away none (m = 0) - and every other item takes at least one away and leaves 1 to 4.
@@ -1105,7 +1131,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         q.hint = `Count only the ones that are NOT crossed out. ${n} − ${m} = ${remain}.`;
         q.distractorTags = m > 0 && m !== remain ? { [m]: 'counted the ones crossed out' }
             : m === 0 ? { [n - 1]: 'took one away when none were taken' } : { [n]: 'did not take any away' };
-        _kSetCell(q, 'counters', { kind: 'takeaway', n, m, shape, ans: remain });
+        const _sbPayload = { kind: 'takeaway', n, m, shape, ans: remain };
+        if (_sbObj === 'frame') _sbPayload.objects = 'frame';
+        _kSetCell(q, 'counters', _sbPayload);
         q.skillLabel = "Sub ≤5 Pics";
         q.printFormat = "sub-5-pictures";
         q.pictureData = { shape, n, m, remain };

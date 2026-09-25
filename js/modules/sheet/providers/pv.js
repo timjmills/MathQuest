@@ -768,6 +768,72 @@ registerSkill('number_sense:rounding_visual', {
     wrongAnswer: roundingWrong,
 });
 
+/* ------------------------------------------------ round on a number line: thousands and beyond */
+// round_nl_thousands / _ten_thousands / _hundred_thousands (owner, 2026-09-25). The pupil places
+// the number as a dot, finds the halfway point, and decides; the steps say exactly that.
+const RNL_SIZE = { round_nl_thousands: 'thousands', round_nl_ten_thousands: 'ten thousands', round_nl_hundred_thousands: 'hundred thousands' };
+function roundNlSteps(q) {
+    const p = pvOf(q);
+    if (!p.place || !Array.isArray(p.line)) return [];
+    const [lo, hi] = p.line.map(Number);
+    const half = lo + p.place / 2;
+    const r = roundTo(p.n, p.place);
+    const place = p.lineMode === 'plotted'
+        ? step(`${f(p.n)} is the dot, between ${f(lo)} and ${f(hi)}.`)
+        : step(`Put a dot for ${f(p.n)} between ${f(lo)} and ${f(hi)}.`, [{ slot: 'mark', value: f(p.n) }]);
+    const decide = p.n === lo ? step(`${f(p.n)} is already a multiple of ${f(p.place)}. It stays ${f(p.n)}.`)
+        : p.n === half ? step(`${f(p.n)} is exactly halfway. Halfway rounds up.`)
+            : step(`${f(p.n)} is ${p.n > half ? 'after' : 'before'} halfway, so it is nearer ${f(r)}.`);
+    return [place, step(`Halfway between ${f(lo)} and ${f(hi)} is ${f(half)}.`), decide,
+        step(`Write ${f(r)}.`, [{ slot: 'answer', value: f(r) }])];
+}
+function roundNlWrong(q) {
+    const p = pvOf(q);
+    if (!p.place || !Array.isArray(p.line)) return null;
+    const [lo, hi] = p.line.map(Number);
+    const blanks = q.answerType === 'inline-blanks';
+    const explain = { 'M-R1': 'Rounded to the other end of the line.', 'M-R2': 'Rounded halfway down.',
+        'M-R3': 'Changed only the digit after the place.', 'M-R4': 'Did not change the next place at a 9.', 'M-R5': 'Rounded to the wrong place.' };
+    const c = pvRoundingErrors(p.n, p.place).map((w) => ({ ...w, explain: explain[w.misconception] }));
+    // M-R8: the dot counted from the wrong end of the line, so it lands on the other side of
+    // halfway and the number rounds the wrong way (only where the pupil places the dot).
+    if (p.lineMode !== 'plotted') {
+        const mirror = hi - (p.n - lo);
+        const rm = roundTo(mirror, p.place);
+        if (mirror !== p.n && rm !== roundTo(p.n, p.place)) c.push({ value: rm, misconception: 'M-R8', explain: 'Placed the dot from the wrong end of the line.', mark: mirror });
+    }
+    // Always down (truncating): the lower end, even when the number is past halfway.
+    if (roundTo(p.n, p.place) !== lo) c.push({ value: lo, misconception: 'M-R1', explain: 'Always rounded down: kept the digits and wrote zeros after them.' });
+    return choose(q, c.map((w) => ({
+        value: w.value, misconception: w.misconception, explain: w.explain,
+        ...(blanks ? { slot: 'answer', slots: { mark: f(w.mark !== undefined ? w.mark : p.n), answer: f(w.value) } } : {}),
+    })));
+}
+const RNL_MARK = {
+    iCan: 'I Can place a number on a number line and round it',
+    instructionKey: 'mark-dot-round',
+    instructionVars: (q) => ({ place: f(pvOf(q).place || 1000) }),
+    steps: ['Put a dot for the number between the two ends.', 'Find the halfway point.', 'Before halfway: round down. Halfway or after: round up.'],
+    say: roundSay,
+    sayValues: roundSayValues,
+};
+const RNL_PLOTTED = {
+    iCan: 'I Can round a number on a number line',
+    instructionKey: 'round',
+    instructionVars: (q) => ({ place: f(pvOf(q).place || 1000) }),
+    steps: ['Find the dot between the two ends.', 'Find the halfway point.', 'Before halfway: round down. Halfway or after: round up.'],
+    say: roundSay,
+    sayValues: roundSayValues,
+};
+for (const id of Object.keys(RNL_SIZE)) {
+    registerSkill(`number_sense:${id}`, {
+        strings: stringsBy((q) => (pvOf(q).lineMode === 'plotted' ? RNL_PLOTTED : RNL_MARK), RNL_MARK),
+        misconceptions: ['M-R1', 'M-R2', 'M-R3', 'M-R4', 'M-R5', 'M-R8'],
+        workedSteps: roundNlSteps,
+        wrongAnswer: roundNlWrong,
+    });
+}
+
 registerSkill('number_sense:between_tens', {
     strings: strings({
         iCan: 'I Can find the two tens a number is between',
@@ -1034,5 +1100,6 @@ export const PV_PROVIDER_IDS = Object.freeze([
     'number_sense:rounding_visual', 'number_sense:between_tens', 'number_sense:place_on_number_line', 'number_sense:rounding_table',
     ...['nearest_10', 'nearest_100', 'nearest_1000', 'nearest_10000', 'nearest_100000', 'nearest_million'].map((s) => `number_sense:${s}`),
     ...SORTS.map(([s]) => `number_sense:${s}`),
+    ...Object.keys(RNL_SIZE).map((s) => `number_sense:${s}`),
     ...EST.map(([s]) => `number_sense:${s}`),
 ]);

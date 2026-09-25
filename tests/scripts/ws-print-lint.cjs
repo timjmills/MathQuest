@@ -23,6 +23,8 @@
 //   --files 01,11             pack: only page files whose name starts with one of these
 //   --count N                 legacy: items per section (default 20, the print dialog's default)
 //   --roles r1,r2             kit: the page roles to lint (default independent); any role buildSheet knows
+//   --count auto|N            kit practice roles: the problem count (default auto, as the print screen);
+//                             auto also turns on L-DENSITY PAGEFILL (an empty strip over 20% of a page)
 //   --anchors side|sections   kit: print with step-by-step anchor problems (S6); adds L-ANCHOR
 //   --supports all|id,id      kit: print every skill with supports on (S2): `all` ticks every
 //                             render-time support its Support control offers; adds L-SUPPORT
@@ -989,12 +991,16 @@ function wsLintPage(cfg) {
             const itemShapes = items.flatMap(c => c.shapes);
             const size = pg.getAttribute('data-ws-size') || (['S', 'M', 'L'].find(s => pg.classList.contains('ws-' + s)) || 'L');
             const footRect = foot ? mmRect(foot.getBoundingClientRect(), pr) : null;
+            // L-PAGEFILL: where the last grid on the page ends (mm from the page top)
+            const grids = [...pg.querySelectorAll('.ws-grid, .ws-gridrows')].filter(g => g.getBoundingClientRect().height > 0);
+            const gridBottom = grids.length ? Math.max(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)).map(r => r[1] + r[3])) : null;
+            const gridTop = grids.length ? Math.min(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)[1])) : null;
             out.pages.push({
                 idx: ri.idx + 1, tag: pg.id, key: ri.key, role, size, look: pg.getAttribute('data-ws-look') || '',
                 sheet: pg.getAttribute('data-ws-sheet') || '', tab, bands, foot: footParts,
                 pageId: (footParts[2] || '').split('·').map(s => s.trim()).filter(s => /^\d\d-[A-Z]\d?$/.test(s))[0] || '',
                 w: mm(pr.width), h: mm(pr.height), padB: mm(parseFloat(cs.paddingBottom)), padT: mm(parseFloat(cs.paddingTop)),
-                footRect, cells, items: items.length,
+                footRect, cells, items: items.length, gridBottom, gridTop,
                 oneSymbol: (itemShapes.length > 0 && itemShapes.every(s => oneSymbolShapes.has(s)))
                     || (/^test\b/.test(role) && items.length > 0 && items.every(c => c.short)),
                 slots: cells.reduce((n, c) => n + c.slots, 0), instructions: ri.instructions,
@@ -1364,12 +1370,32 @@ function lintKitGeometry(dom, pdf, info, F) {
         const max = Math.max(...pt.pages.map(p => p.items));
         const comparable = info.mode === 'kit' || pt.pages.every(p => p.role === pt.pages[0].role && p.items > 0);
         pt.pages.forEach((p, j) => {
-            const c = ceilingFor(p.role, p.size, p.oneSymbol);
+            let c = ceilingFor(p.role, p.size, p.oneSymbol);
+            // Page fill (owner 2026-09-25, proposed 12.1 change): an Independent / More Practice
+            // page of SHORT problems - every problem cell no taller than a fifth of the grid - may
+            // hold up to DN-1's 20 scored problems.
+            if (c && /^(independent|more-practice)$/.test(p.role) && p.gridTop !== null && p.gridBottom !== null) {
+                const gh = p.gridBottom - p.gridTop;
+                const its = p.cells.filter(x => x.item);
+                if (its.length && gh > 0 && its.every(x => x.rect[3] <= gh / 4.5)) c = { n: Math.max(c.n, 20), name: `${c.name} (short problems, DN-1)` };
+                // 12.3's capacity tables (layout.js DENSE_CEILING): a kit page packed to its
+                // problems' measured size holds up to 12 standard problems (3 x 4).
+                else if (info.mode === 'kit') c = { n: Math.max(c.n, 12), name: `${c.name} (12.3 dense capacity)` };
+            }
             if (c && p.items > c.n) F('L-DENSITY', 'DN-1', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} items; the ${c.name} ceiling at size ${p.size} is ${c.n} (section 12.1)`, `over ceiling ${p.role}`);
             if (p.role && !c) info.notes.push(`page ${p.idx}: role "${p.role}" has no ceiling in this gate`);
             const last = j === pt.pages.length - 1;
             if (comparable && !last && max > 0 && p.items < max / 2) F('L-DENSITY', 'DN-2', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} item(s) while page ${pt.pages[pt.pages.length - 1].idx} of the same sheet follows and its fullest page holds ${max}: a page is never less than half used (PG-20, PG-23)`, 'half-empty page');
             if (comparable && last && pt.pages.length > 1 && max > 0 && p.items > 0 && p.items < max / 3) F('L-DENSITY', 'PG-23', 'major', { page: p.idx }, `last page ${p.idx} holds ${p.items} item(s), under a third of a full page (${max}): rows are rebalanced across the sheet's pages (PG-23)`, 'short last page');
+            // L-DENSITY PAGEFILL (owner 2026-09-25, RUBRIC H13): with the problem count on Auto (the
+            // print screen's default; --count N fixes it and turns this off), a practice page whose
+            // problems end more than 20% of the body above the footer wastes the page. The last page
+            // of a multi-page sheet may be short (PG-23).
+            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.footRect && p.gridBottom !== null && p.gridTop !== null && !(last && pt.pages.length > 1)) {
+                const body = p.footRect[1] - (p.padT || 0);
+                const strip = p.footRect[1] - p.gridBottom;
+                if (body > 0 && strip > 0.2 * body) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)`, 'empty strip under grid');
+            }
         });
     }
     // key
@@ -1612,6 +1638,8 @@ async function runApp(source) {
             const ok = await page.evaluate(() => typeof window.buildSheet === 'function' && typeof window.sheetDocument === 'function');
             if (!ok) throw new Error('--source kit needs window.buildSheet(req) and window.sheetDocument(html, title) (js/modules/print-sheet.js), and this tree does not put them on window. Lint the legacy print path with --source legacy, or run on a tree that has the kit renderer.');
         }
+        // Kit practice roles print what the teacher's print screen prints: the count on Auto (the
+        // page capacity, teacher-print.js) unless --count N fixes it. Legacy keeps its 20.
         const COUNT = parseInt(arg('count', '20'), 10);
         console.log(`${TOOL}: source ${source}, ${skills.length} skill(s)${source === 'legacy' ? `, ${COUNT} items per section` : ''}`);
         // --roles (kit only): every page role buildSheet composes, per skill. A role the skill
@@ -1647,7 +1675,7 @@ async function runApp(source) {
                         try { out = await window.buildSheet(req); } catch (e) { if (e && e.unsupported) return { unsupported: e.message }; throw e; }
                         const body = [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');
                         return { doc: window.sheetDocument(body, s.label), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml };
-                    }, { s, seed, COUNT: parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null) });
+                    }, { s, seed, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null) });
                     if (html && html.doc) { kitHalves = html; html = html.doc; }
                 }
                 if (html && html.unsupported) {

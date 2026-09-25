@@ -56,7 +56,7 @@ const RETRIES = 12;               // duplicate retries per item before a duplica
 
 /** The stylesheets a sheet document renders with, in the app's cascade order. */
 const SHEET_STYLESHEETS = Object.freeze([
-    'css/variables.css', 'css/base.css', 'css/ui-components.css', 'css/word-problem-visuals.css',
+    'css/brand.css', 'css/variables.css', 'css/base.css', 'css/ui-components.css', 'css/word-problem-visuals.css',
     'css/print-worksheet.css', 'css/fonts/andika.css', 'css/sheet-kit.css',
 ]);
 

@@ -117,7 +117,7 @@ function shellHTML() {
     const levelOpts = LEVELS.map((l) => `<option value="${l}">${l === 'M' ? 'Mixed levels' : `Level ${l}`}</option>`).join('');
     return `
 <header class="tv-header">
-  <div><h1 class="tv-h1" id="tvlTitle">Skills library</h1><p class="tv-sub" id="tvlSub">Every skill in Maths Quest. Choose one to see an example, then practise it, add it to a set or print it.</p></div>
+  <div><h1 class="tv-h1" id="tvlTitle">Skills library</h1><p class="tv-sub" id="tvlSub">Every skill in Math Quest Pro. Choose one to see an example, then practise it, add it to a set or print it.</p></div>
   <div class="tv-header-actions"><button type="button" class="tv-btn tvl-std-toggle" data-lib-act="standards" title="Which Common Core standards and Essential Elements our skills cover, and which they do not yet">${icon('chart', 18)}<span>Standards coverage</span></button></div>
 </header>
 <section class="tvl-std-view" id="tvlStd" aria-labelledby="tvlTitle" hidden></section>
@@ -344,7 +344,7 @@ function syncMode() {
     root.querySelector('#tvlTitle').textContent = std ? 'Standards coverage' : 'Skills library';
     root.querySelector('#tvlSub').textContent = std
         ? 'Every Common Core standard and Essential Element for levels K to 6. The ones not covered yet are the skills still to make.'
-        : 'Every skill in Maths Quest. Choose one to see an example, then practise it, add it to a set or print it.';
+        : 'Every skill in Math Quest Pro. Choose one to see an example, then practise it, add it to a set or print it.';
     const t = root.querySelector('.tvl-std-toggle');
     t.dataset.libAct = std ? 'skills' : 'standards';
     t.classList.toggle('is-back', std);

@@ -352,7 +352,8 @@
       "shapes": "S",
       "pictures": "P",
       "frame": "F",
-      "dice": "D"
+      "dice": "D",
+      "blocks": "B"
     },
     "touch": {},
     "cover": {
@@ -515,7 +516,9 @@
     },
     "ticks": {
       "step": "S",
-      "one": "O"
+      "one": "O",
+      "some": "M",
+      "ends": "E"
     },
     "shape": {
       "box": "B",

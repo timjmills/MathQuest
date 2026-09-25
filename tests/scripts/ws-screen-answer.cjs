@@ -41,6 +41,7 @@ const PV = [
 const SKILLS = (arg('skills', '') || '').split(',').map(s => s.trim()).filter(Boolean);
 const LIST = SKILLS.length ? SKILLS : arg('family', '') === 'pv' ? PV : DEFAULT;
 const HOSTS = (arg('hosts', 'card,worksheet,quiz') || '').split(',');
+const OPTS = (() => { const v = arg('opts', null); return v ? JSON.parse(v) : null; })();
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // In the page: decide what the pupil does in one cell to give the right answer. Every target is
@@ -69,6 +70,18 @@ function PLAN(rootSel, which) {
         if (land && !land.classList.contains('mq-nl-start')) tag(land, { type: 'click', check: 'nl' });   // + 0 has no jump
     }
     all('input.mq-opswork').slice(0, 2).forEach(w => tag(w, { type: 'text', value: '9', check: 'work' }));
+
+    // Round on a number line (round_nl_*): tap the line where the number is (the dot), then
+    // write the rounded number in the one visible box. The dot's slot is hidden: only a tap fills it.
+    const rl = all('.mq-rl');
+    if (rl.length && q.inlineBlanksData) {
+        const set = q.inlineBlanksData.acceptedSets[0].map(String);
+        tag(rl[0], { type: 'rl', value: String(rl[0].dataset.mqRlN) });
+        const box = all('input.ib-cell, input.mq-cellslot');
+        if (!box.length) return { error: 'round line: no box for the rounded number' };
+        tag(box[box.length - 1], { type: 'text', value: set[1] });
+        return { plan, q: set.join(', ') };
+    }
 
     // the kit's model: tap boxes of the ten frame, or + under each base-ten zone
     const model = root.querySelector('[data-mq-model]');
@@ -228,6 +241,23 @@ async function run(page, sel, which) {
         if (step.type === 'click') { await el.click(); await sleep(40); continue; }
         if (step.type === 'domclick') { await el.evaluate(e => e.click()); await sleep(40); continue; }
         if (step.type === 'evclick') { await el.evaluate(e => e.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))); await sleep(60); continue; }
+        if (step.type === 'rl') {
+            // A real mouse tap on the line at the number's place (the kit's line geometry).
+            const pt = await el.evaluate((e, v) => {
+                const svg = e.querySelector('svg'); const r = svg.getBoundingClientRect();
+                const w = +svg.dataset.rlW, h = +svg.dataset.rlH, pad = +svg.dataset.rlPad, len = +svg.dataset.rlLen, ax = +svg.dataset.rlAxis;
+                const lo = +e.dataset.mqRlLo, hi = +e.dataset.mqRlHi;
+                return { x: r.left + r.width * ((pad + len * (v - lo) / (hi - lo)) / w), y: r.top + r.height * (ax / h) };
+            }, Number(step.value));
+            await page.mouse.click(pt.x, pt.y);
+            await sleep(60);
+            const dotOn = await el.evaluate(e => { const d = e.querySelector('.mq-rl-dot'); return !!d && d.getAttribute('visibility') === 'visible'; });
+            if (!dotOn) {
+                const hit = await page.evaluate((x, y) => { const e = document.elementFromPoint(x, y); return e ? `${e.tagName}.${e.className && e.className.baseVal !== undefined ? e.className.baseVal : e.className}` : 'nothing'; }, pt.x, pt.y);
+                return { error: `round line: the tap at (${Math.round(pt.x)}, ${Math.round(pt.y)}) placed no dot (it hit ${hit})` };
+            }
+            continue;
+        }
         // A box can be briefly unclickable while the worksheet scrolls to the next card: focus it
         // instead, as a pupil's tap would, rather than abort the whole run.
         try { await el.click({ clickCount: 3 }); } catch (e) { await el.evaluate(x => x.focus()); }
@@ -318,6 +348,9 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
         // over from one skill must not replace the next skill's item mid-entry
         await page.reload({ waitUntil: 'networkidle2' });
         await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS, { timeout: 30000 });
+        // --opts '{"band":10}' (O6, 2026-09-25): the skill's options in the set's option store, which
+        // the card, the online worksheet and the quiz all read, so a non-default value is answered too.
+        if (OPTS) await page.evaluate((c, k, o) => { window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, o, { silent: true }); }, c, k, OPTS);
         if (HOSTS.includes('card')) {
             await page.evaluate((c, k, seed) => {
                 if (window.__wsReseed) window.__wsReseed(seed);

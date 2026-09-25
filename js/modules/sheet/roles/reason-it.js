@@ -73,7 +73,7 @@ export function plan(input = {}) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Reason It A', title: 'Reason It', score: items.length });
     const rows = Math.max(1, items.length);
     const grid = gridPart(items.map((it) => planItem(it, { cols: 1 })), { cols: 1, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
-    if (rows === L.rows) { grid.cls = ''; grid.height = ''; }
+    if (rows === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
     return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart('which'), grid] }], {
         meta: { items: items.length, scoreOutOf: items.length, format: 'which-is-correct', fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },
     });

@@ -7,30 +7,35 @@
    banner, XP pill, mascot, floating shapes) is HIDDEN here rather than deleted,
    because older modules still look those element ids up.
 
-   Tokens: page #f6f6f4 · surface #fff · border #e4e3de · text #1c1d1f / #3f4247
-   · caption #5b5f66 · accent #3b4bc8 (hover #2c3aa6, tint #eef0fb) · selected
-   #1f2023. 8px spacing scale, 12px card radius, 44px primary targets. No
-   gradients, no 3D shadows, no emoji.
+   Tokens: the --tv-* set below points at the shared brand layer css/brand.css
+   (2026-09-25, "Math Quest Pro" cohesion), so the teacher view speaks the
+   student's palette: brand purple accent, purple-tinted ink, lavender rules, the
+   student's dark world. css/teacher-brand.css (loaded after the teacher sheets)
+   adds the brand moments: logo, Nunito display type, purple buttons, switches,
+   selection and cards. 8px spacing scale, 44px primary targets, no gradients,
+   no emoji.
    ========================================================================== */
 
 body.teacher-mode {
-    --tv-page: #f6f6f4;
+    /* Brand-linked (css/brand.css). The page keeps a whisper of the student's
+       teal (--mq-bg #EAF8F8) and the neutrals take the student's lavender. */
+    --tv-page: #f3f6f7;
     --tv-surface: #ffffff;
-    --tv-subtle: #f1f1ee;
-    --tv-subtle-2: #fafaf9;
-    --tv-border: #e4e3de;
-    --tv-rule: #eeede9;
-    --tv-rule-soft: #f1f1ee;
-    --tv-control: #85878c;
-    --tv-control-soft: #c9c9c4;
-    --tv-text: #1c1d1f;
-    --tv-text-2: #3f4247;
-    --tv-nav-text: #2a2c30;
-    --tv-caption: #5b5f66;
-    --tv-accent: #3b4bc8;
-    --tv-accent-hover: #2c3aa6;
-    --tv-accent-tint: #eef0fb;
-    --tv-selected: #1f2023;
+    --tv-subtle: #f1eff8;
+    --tv-subtle-2: #faf9fd;
+    --tv-border: var(--brand-rule);
+    --tv-rule: #edeaf5;
+    --tv-rule-soft: #f3f1f9;
+    --tv-control: var(--brand-muted);
+    --tv-control-soft: var(--brand-rule-2);
+    --tv-text: var(--brand-ink);
+    --tv-text-2: var(--brand-ink-2);
+    --tv-nav-text: #3a3652;
+    --tv-caption: var(--brand-caption);
+    --tv-accent: var(--brand-purple-d);
+    --tv-accent-hover: var(--brand-purple-dd);
+    --tv-accent-tint: var(--brand-purple-soft);
+    --tv-selected: var(--brand-ink);
     --tv-on-selected: #ffffff;
     --tv-danger: #b42318;
     --tv-side-w: 248px;
@@ -41,24 +46,25 @@ body.teacher-mode {
 }
 
 html.dark body.teacher-mode {
-    --tv-page: #16171a;
-    --tv-surface: #1f2024;
-    --tv-subtle: #2a2b30;
-    --tv-subtle-2: #24252a;
-    --tv-border: #34353b;
-    --tv-rule: #2e2f35;
-    --tv-rule-soft: #2a2b30;
-    --tv-control: #8d9098;
-    --tv-control-soft: #4a4c53;
-    --tv-text: #eeeef0;
-    --tv-text-2: #c9cbd0;
-    --tv-nav-text: #dcdde1;
-    --tv-caption: #a3a6ad;
-    --tv-accent: #8c98f0;
-    --tv-accent-hover: #aab3f5;
-    --tv-accent-tint: #262a45;
-    --tv-selected: #eeeef0;
-    --tv-on-selected: #16171a;
+    /* The student's dark world (#1A1828), with cards one step calmer. */
+    --tv-page: var(--brand-night);
+    --tv-surface: var(--brand-night-surface);
+    --tv-subtle: #2e2a44;
+    --tv-subtle-2: #27243a;
+    --tv-border: var(--brand-night-rule);
+    --tv-rule: #312d46;
+    --tv-rule-soft: #2b2840;
+    --tv-control: var(--brand-night-muted);
+    --tv-control-soft: var(--brand-night-rule-2);
+    --tv-text: var(--brand-night-ink);
+    --tv-text-2: var(--brand-night-ink-2);
+    --tv-nav-text: #ddd8ee;
+    --tv-caption: var(--brand-night-muted);
+    --tv-accent: var(--brand-purple-l);
+    --tv-accent-hover: var(--brand-purple-ll);
+    --tv-accent-tint: var(--brand-purple-soft-dark);
+    --tv-selected: var(--brand-night-ink);
+    --tv-on-selected: var(--brand-night);
 }
 
 /* ---------------------------------------------------------------- the shell */
