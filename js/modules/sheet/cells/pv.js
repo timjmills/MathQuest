@@ -268,6 +268,15 @@ function frameHTML(ctx, text, key, digits) {
     // size, words at the cell-text size, all bottom-aligned in the kit's equation row (`.ws-eq`)
     // so the writing line sits on the digits' baseline.
     const parts = String(text || '____').split('____');
+    // A long frame ("100 more than 900 is ____.") may wrap between its words so it stands in a
+    // 2-column cell (owner 2026-09-25: two columns for almost every problem); the word before the
+    // slot, the slot and what follows it stay together on the last line.
+    if (parts.length === 2) {
+        const pre = parts[0].trim().split(/\s+/).filter(Boolean);
+        const last = pre.pop() || '';
+        const grp = `<span class="pv-slotgroup" style="display:inline-flex;align-items:flex-end;flex-wrap:nowrap;white-space:nowrap;column-gap:0.2em;">${piece(ctx, last)}${slot}${piece(ctx, parts[1])}</span>`;
+        return `<div class="ws-eq pv-frame" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:2mm;">${piece(ctx, pre.join(' '))}${grp}</div>`;
+    }
     const body = parts.length > 1 ? parts.map(s => piece(ctx, s)).join(slot) : `${piece(ctx, text)}${slot}`;
     return `<div class="ws-eq pv-frame" style="font-weight:700;">${body}</div>`;
 }
@@ -317,7 +326,9 @@ function slotFloor(p, grow) {
     for (const t of String(p.frame || '').match(/\d[\d,]*/g) || []) lens.push(t.replace(/,/g, '').length);
     for (const v of p.nums || []) lens.push(String(v).replace(/[^0-9]/g, '').length);
     const m = lens.length ? Math.max(...lens) : 0;
-    return m ? m + (grow ? 1 : 0) : 0;
+    // A section mixes 1- and 2-digit numbers ("1 more than 9" beside "1 more than 95"): the slot
+    // of an answer that can gain a digit is never drawn under three digits.
+    return m ? Math.max(m + (grow ? 1 : 0), grow ? 3 : 0) : 0;
 }
 
 /** Words or numbers printed for the pupil to ring; the key rings the right ones. */

@@ -69,6 +69,8 @@ const ROLE_LOOK = arg('look', 'auto');
 // --anchors off|side|sections  S6 step-by-step anchor problems on the practice roles.
 const ROLE_ANCHORS = arg('anchors', 'off');
 const ROLE_PAPER = arg('paper', 'A4');
+// --columns auto|N  the print dialog's Columns choice for every role (default Auto).
+const ROLE_COLUMNS = (() => { const v = arg('columns', 'auto'); return v === 'auto' ? 'auto' : Math.max(1, parseInt(v, 10) || 1); })();
 // Max Number for every surface. A place-value skill whose place needs more than the default 100
 // (Round to the nearest 100 needs 1,000) is refused below it, so its page is only visible here.
 const RANGE = arg('range', null);
@@ -355,10 +357,10 @@ async function renderRole(page, skill, role, dir) {
     await applyRange(page);
     const seed = hash(slug(skill) + ':' + role) % 1000000;
     const set = skill.set || [{ categoryId: skill.categoryId, skillId: skill.skillId }];
-    const built = await page.evaluate(async ({ skill, set, role, seed, count, size, look, paper, anchors }) => {
+    const built = await page.evaluate(async ({ skill, set, role, seed, count, size, look, paper, anchors, columns }) => {
         try {
             const r = await window.buildSheet({
-                role, sections: [{ skills: set, count, columns: 'auto' }],
+                role, sections: [{ skills: set, count, columns }],
                 size, look, paper, seed, form: 'A', key: true, anchors,
             });
             const title = r.title || skill.label;
@@ -370,7 +372,7 @@ async function renderRole(page, skill, role, dir) {
                 items: r.items.map(it => ({ template: it.template, fclass: it.fclass, text: it.text.slice(0, 80), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans), letter: it.letter, measured: it.measured })),
             };
         } catch (e) { return e && e.unsupported ? { unsupported: e.message } : { error: (e && e.stack) || String(e) }; }
-    }, { skill, set, role, seed, count: ROLE_COUNT, size: ROLE_SIZE, look: ROLE_LOOK, paper: ROLE_PAPER, anchors: ROLE_ANCHORS });
+    }, { skill, set, role, seed, count: ROLE_COUNT, size: ROLE_SIZE, look: ROLE_LOOK, paper: ROLE_PAPER, anchors: ROLE_ANCHORS, columns: ROLE_COLUMNS });
     if (built.error) return { error: built.error };
     if (built.unsupported) return { unsupported: built.unsupported };
     const pdfP = path.join(dir, `${role}.pdf`);

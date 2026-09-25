@@ -474,6 +474,21 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     ok(g.r.pupilPages.length >= 2 && g.r.keyPages.length === g.r.pupilPages.length, `Guided, 110 mm cells: continues on page 2, key a facsimile (${g.r.pupilPages.length} / ${g.r.keyPages.length})`);
     ok(/data-ws-label="model"/.test(g.r.pupilPages[0]) && g.plan.meta.scoreOutOf === g.plan.meta.items - 1, 'Guided: the Model is on page 1 and unscored');
 }
+// Owner 2026-09-25: a problem that only fits one column keeps one and goes at the bottom of the
+// section - it never pulls the whole section down to one column, and is never interleaved.
+{
+    const items = Array.from({ length: 8 }, (_, i) => {
+        const it = hostLike(stackQ(11 + i, 22 + i), 40);
+        if (i % 4 === 1) it.fclass = 'word';
+        return it;
+    });
+    const plan = independentPlan({ items, skills: SKILL, sections: [{ columns: 2 }], seed: 3 });
+    const r = renderPlan(plan);
+    const grids = r.pupilPages.join('').match(/grid-template-columns:repeat\((\d+),1fr\)/g) || [];
+    ok(grids.length >= 2 && /repeat\(2,/.test(grids[0]) && /repeat\(1,/.test(grids[grids.length - 1]), `Columns 2 with two one-column problems: a 2-column grid, then a 1-column group at the bottom (${grids.join(' | ')})`);
+    const fitLines = (plan.meta.fits || []).map((f) => f.line || '').join(' / ');
+    ok(/full-width problem/.test(fitLines), `the fits line says where the full-width problems went (${fitLines})`);
+}
 // Critic round 2: the instruction fits the slots and the section.
 {
     const { resolveInstruction } = await import('../../js/modules/sheet/roles/practice.js');
