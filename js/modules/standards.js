@@ -570,6 +570,7 @@ export const SKILL_STANDARDS = {
     'placevalue:value': { ccss: ['2.NBT.A.1', '4.NBT.A.1'], ee: ['M.EE.2.NBT.1'] }, // Value of a Digit
     'placevalue:compare': { ccss: ['2.NBT.A.4', '4.NBT.A.2', '1.NBT.B.3', 'K.CC.C.7'], ee: ['M.EE.2.NBT.4', 'M.EE.4.NBT.2', 'M.EE.1.NBT.3', 'M.EE.5.NBT.3'] }, // Compare Numbers (>, <, =)
     'placevalue:expand': { ccss: ['2.NBT.A.3', '4.NBT.A.2'], ee: ['M.EE.2.NBT.3', 'M.EE.4.NBT.2'] }, // Expanded Form
+    'placevalue:unit_form': { ccss: ['2.NBT.A.1', '2.NBT.A.3'], ee: ['M.EE.2.NBT.3'] }, // Unit Form
     'placevalue:combine': { ccss: ['2.NBT.A.3', '4.NBT.A.2'], ee: ['M.EE.2.NBT.3', 'M.EE.4.NBT.2'] }, // Standard Form
     'placevalue:order_least_to_greatest': { ccss: ['2.NBT.A.4', '4.NBT.A.2'], ee: ['M.EE.2.NBT.4', 'M.EE.4.NBT.2'] }, // Order: Least to Greatest
     'placevalue:order_greatest_to_least': { ccss: ['2.NBT.A.4', '4.NBT.A.2'], ee: ['M.EE.2.NBT.4', 'M.EE.4.NBT.2'] }, // Order: Greatest to Least
@@ -577,6 +578,8 @@ export const SKILL_STANDARDS = {
 
     // ---- number_sense
     'number_sense:rounding_visual': { ccss: ['3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Round on a Number Line
+    'number_sense:between_tens': { ccss: ['3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Find the Two Tens a Number Is Between
+    'number_sense:place_on_number_line': { ccss: ['2.MD.B.6', '3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Mark a Number on a Number Line
     'number_sense:nearest_10': { ccss: ['3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Round to Nearest 10
     'number_sense:nearest_100': { ccss: ['3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Round to Nearest 100
     'number_sense:nearest_1000': { ccss: ['4.NBT.A.3'], ee: ['M.EE.4.NBT.3'] }, // Round to Nearest 1,000

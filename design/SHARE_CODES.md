@@ -31,6 +31,37 @@ field   = KEY value            KEY: one letter, table below
 | `pictures`                | `P` | `1` / `0` |
 | `band`                    | `B` | decimal digits |
 
+### Two-character keys (block 0, P9 place value, 2026-09-25)
+
+The 26 one-letter keys are all taken, so later options take a key of **`0` + one letter**. Block 0
+(`0A`–`0Q`) belongs to the P9 place-value / rounding / estimation options:
+
+| Option id | KEY | Value tokens |
+|---|---|---|
+| `repeatDigit` (identify) | `0A` | `1` / `0` |
+| `form` (value, expand) | `0B` | `V` value · `U` unit · `N` notation · `S` sum |
+| `zeroDigit` (value) | `0C` | `1` / `0` |
+| `frame` (expand) | `0D` | `B` boxes · `L` line |
+| `responseScope` (nearest_*) | `0E` | `F` full · `N` notation · `D` decision · `J` judge |
+| `bins` (round_sort_*) | `0F` | `A` adjacent · `P` one apart · `T` three |
+| `blank` (rounding_table) | `0G` | `C` column · `R` row |
+| `line` (rounding_visual) | `0H` | `P` plotted · `M` mark · `E` ends |
+| `midLabel` (rounding_visual) | `0J` | `1` / `0` |
+| `closeness` (compare, order) | `0K` | `F` far · `C` close |
+| `lengths` (compare, order) | `0L` | `E` equal · `M` mixed |
+| `count` (order) | `0M` | decimal digit |
+| `source` (pv_digit_drag) | `0N` | `W` word · `E` expanded · `N` numeral |
+| `rename` (unit_form) | `0P` | `S` standard · `M` more than 9 |
+| `span` (place_on_number_line) | `0Q` | decimal digits |
+
+Values appended to one-letter keys by P9: `response` `L` circle · `B` bank; `unknown` `T` start;
+`support` `P` strip · `F` shift · `W` rewrite.
+
+Why `0`: no v1 field starts with a digit, and version 0 was never issued, so `0<letter>` cannot be
+read as a version. One-letter fields are always written first, so an older decoder still reads them
+and skips the `0X` fields as unknown keys. A payload made *only* of two-character fields starts with
+a digit, and an older decoder ignores it: the skill loads at its defaults, never misread.
+
 An empty set field (`C` alone) means "none ticked", which the option model reads as *no
 restriction*. A field that is absent means the option is at its default.
 

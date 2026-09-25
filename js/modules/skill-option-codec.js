@@ -8,7 +8,8 @@
 // OPTIONAL SUFFIX. The full format is in design/SHARE_CODES.md; in short:
 //
 //     <skill reference>[~<payload>]          payload = field ( "_" field )*
-//                                            field   = KEY value      (KEY is one letter)
+//                                            field   = KEY value      (KEY is one letter, or
+//                                                                        "0" + one letter: see below)
 //
 //   EA~C78            mult_facts, fact set {7, 8}                         (2-char skill code)
 //   EA3~C78_NA        ... weight 3, written across                        (weight digits sit before ~)
@@ -69,19 +70,54 @@ export const OPTION_KEYS = {
     // P11 K-2 counting (2026-09-25): the last free letter.
     objects: 'J',
 };
+
+// THE TWO-CHARACTER KEY FORM (P9 step 8, 2026-09-25). The 26 one-letter keys are all taken, so an
+// option added from here on takes a key of "0" + one letter: "0A" ... "0Z" (26 more). The escape
+// digit is "0" because no v1 field ever starts with a digit (values follow a LETTER key) and
+// because the only other thing a leading digit means is "a later format version" — and version 0
+// was never issued, so "0<letter>" cannot be read as a version by this decoder.
+//   - Fields are written with every one-letter key FIRST, so an old decoder that meets a payload
+//     with both kinds reads its one-letter fields and skips the "0X" ones (an unknown key).
+//   - An old decoder that meets a payload made ONLY of two-character fields sees a leading digit
+//     and ignores the whole payload: the skill loads at its defaults, never misread.
+// APPEND-ONLY, like the one-letter table.
+export const OPTION_KEYS_2 = {
+    repeatDigit: '0A',   // identify: a repeated digit (747: which 7?)
+    form: '0B',          // value: 700 / 7 hundreds / 7 x 100; expand: sum / expanded notation
+    zeroDigit: '0C',     // value: may ask the value of a 0
+    frame: '0D',         // expand: one box per place / a ruled line
+    responseScope: '0E', // nearest_*: full / notation / decision / judge
+    bins: '0F',          // round_sort_*: adjacent / one apart / three bins
+    blank: '0G',         // rounding_table: a whole column / a whole row
+    line: '0H',          // rounding_visual: dot plotted / pupil marks / ends only
+    midLabel: '0J',      // rounding_visual: the midpoint labelled (hint H2)
+    closeness: '0K',     // compare / order: far / close
+    lengths: '0L',       // compare / order: equal / mixed digit counts
+    count: '0M',         // order: how many numbers
+    source: '0N',        // pv_digit_drag: word / expanded / numeral
+    rename: '0P',        // unit_form: standard / more than 9 of one place
+    span: '0Q',          // place_on_number_line: the line from one ten / hundred / thousand to the next
+};
+Object.assign(OPTION_KEYS, OPTION_KEYS_2);
 const KEY_TO_OPTION = Object.fromEntries(Object.entries(OPTION_KEYS).map(([id, k]) => [k, id]));
+/** The key a field starts with: "0" + a letter, or one letter. */
+const fieldKey = (field) => (/^0[A-Z]/.test(field) ? field.slice(0, 2) : field[0]);
 
 // String values get a one-letter token per option. APPEND-ONLY, unique within an option.
 // Integer values are written as themselves: base 36, one character, inside a set ({7, 8} -> "78",
 // {10, 11} -> "AB"); decimal digits for a single enum / int value (Max Number 1,000 -> "1000").
 export const VALUE_TOKENS = {
+    response: { standard: 'S', 'which-numbers': 'W', 'array-builder': 'A', write: 'R', 'circle-all': 'C',
+        // P9 step 8 identify (appended)
+        circle: 'L', bank: 'B' },
     notation: { stacked: 'S', across: 'A', bracket: 'B', fraction: 'F' },
-    response: { standard: 'S', 'which-numbers': 'W', 'array-builder': 'A', write: 'R', 'circle-all': 'C' },
     regroup: { none: 'N', always: 'A', mixed: 'M' },
     orientation: { vertical: 'V', horizontal: 'H',
         // P11 count_objects arrangement (appended)
         rows: 'R', line: 'L', scattered: 'S' },
-    unknown: { answer: 'A', first: 'F', second: 'S', mixed: 'M' },
+    unknown: { answer: 'A', first: 'F', second: 'S', mixed: 'M',
+        // P9 step 8 more / less (appended)
+        start: 'T' },
     wordform: { to_number: 'N', to_words: 'W' },
     dir: { more: 'M', less: 'L', both: 'B',
         // P11 counting / comparing (appended)
@@ -95,8 +131,21 @@ export const VALUE_TOKENS = {
     midpoint: { never: 'N', seeded: 'S', only: 'O' },
     support: { cut: 'C', line: 'L', none: 'N', labels: 'B', chart: 'T',
         // P11 operations hint pictures (appended)
-        tile: 'D', frame: 'R', skip: 'K', array: 'A', think: 'H', bar: 'M' },
+        tile: 'D', frame: 'R', skip: 'K', array: 'A', think: 'H', bar: 'M',
+        // P9 step 8 (appended): the more/less row strip, the x10 shift chart, the estimation rewrite
+        strip: 'P', shift: 'F', rewrite: 'W' },
     objects: { shapes: 'S', pictures: 'P', frame: 'F', dice: 'D' },
+    // P9 step 8 (two-character keys, above)
+    form: { value: 'V', unit: 'U', notation: 'N', sum: 'S' },
+    frame: { boxes: 'B', line: 'L' },
+    responseScope: { full: 'F', notation: 'N', decision: 'D', judge: 'J' },
+    bins: { adjacent: 'A', apart: 'P', three: 'T' },
+    blank: { column: 'C', row: 'R' },
+    line: { plotted: 'P', mark: 'M', ends: 'E' },
+    closeness: { far: 'F', close: 'C' },
+    lengths: { equal: 'E', mixed: 'M' },
+    source: { word: 'W', expanded: 'E', numeral: 'N' },
+    rename: { standard: 'S', more: 'M' },
     // Numeric sets whose members are not all under 36: one digit per power of ten.
     power: { 10: '1', 100: '2', 1000: '3' },
     places: { 1: '0', 10: '1', 100: '2', 1000: '3', 10000: '4', 100000: '5' },
@@ -137,24 +186,27 @@ function _fromToken(optId, def, tok, inSet) {
 export function encodeOptionPayload(categoryId, skillId, opts) {
     const packed = packOptions(categoryId, skillId, opts);
     const fields = [];
+    const fields2 = [];
     for (const def of optionsFor(categoryId, skillId)) {
         if (!(def.id in packed)) continue;
         const key = OPTION_KEYS[def.id];
         if (!key) continue;
         const v = packed[def.id];
+        const out = key.length > 1 ? fields2 : fields;
         try {
             if (def.type === 'set') {
                 const order = (def.values || []).map(x => x.v);
                 const list = (Array.isArray(v) ? v : []).slice().sort((a, b) => order.indexOf(a) - order.indexOf(b));
-                fields.push(key + list.map(x => _setToken(def.id, x)).join(''));
+                out.push(key + list.map(x => _setToken(def.id, x)).join(''));
             } else if (def.type === 'bool') {
-                fields.push(key + (v ? '1' : '0'));
+                out.push(key + (v ? '1' : '0'));
             } else if (v !== null && v !== undefined) {
-                fields.push(key + _scalarToken(def.id, v));
+                out.push(key + _scalarToken(def.id, v));
             }
         } catch (e) { /* an unencodable value stays at its default rather than corrupting the code */ }
     }
-    return fields.join('_');
+    // One-letter fields first, so an older decoder still reads them (see OPTION_KEYS_2).
+    return fields.concat(fields2).join('_');
 }
 
 /** "~" + payload, or '' — the form every share-code writer appends to a skill reference. */
@@ -172,15 +224,16 @@ export function decodeOptionPayload(categoryId, skillId, payload) {
     let p = String(payload == null ? '' : payload).trim().toUpperCase();
     if (p.startsWith('~')) p = p.slice(1);
     if (!p) return {};
-    if (/^\d/.test(p)) return {};             // a later format version: ignore, never misread
+    if (/^\d/.test(p) && !/^0[A-Z]/.test(p)) return {};   // a later format version: ignore, never misread
     const defs = optionsFor(categoryId, skillId);
     const raw = {};
     for (const field of p.split('_')) {
         if (!field) continue;
-        const optId = KEY_TO_OPTION[field[0]];
+        const key = fieldKey(field);
+        const optId = KEY_TO_OPTION[key];
         const def = optId && defs.find(d => d.id === optId);
         if (!def) continue;                    // an option this skill (or this app) does not know
-        const body = field.slice(1);
+        const body = field.slice(key.length);
         if (def.type === 'set') {
             raw[optId] = [...body].map(t => _fromToken(optId, def, t, true)).filter(v => v !== undefined);
         } else if (def.type === 'bool') {

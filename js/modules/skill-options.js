@@ -426,6 +426,7 @@ const _pvNearest = (place) => {
             ],
             help: '"Circle every number" is its own step: eight numbers, with near misses either side of halfway.',
         },
+        _pvResponseScope(),
     ];
 };
 const _pvSort = (place) => {
@@ -446,8 +447,15 @@ const _pvSort = (place) => {
             ],
             help: 'The number line runs between the two bins, so the pupil can see which end each number is nearer.',
         },
+        // Bins one apart / three bins are whole-number steps (RS-2); the decimal sorts keep two.
+        ...(place ? [_pvBins()] : []),
     ];
 };
+const _pvEstSupport = () => ({
+    id: 'support', label: 'Support', type: 'enum', default: 'rewrite', group: 'support',
+    values: [{ v: 'rewrite', l: 'A line to write the rounded numbers' }, { v: 'none', l: 'None: the estimate only' }],
+    help: 'The rewrite line holds each rounded number under the one it came from; "None" is the fade.',
+});
 const _pvTask = () => ({
     id: 'task', label: 'Task', type: 'enum', default: 'compute', group: 'layout',
     values: [
@@ -490,18 +498,105 @@ const _pvMoreLessSupport = (withChart) => ({
     help: withChart ? 'A picture to count on or back with: most support first, "None" is the fade.'
         : 'A number line to jump along: "None" is the fade.',
 });
+// ---- P9 step 8 (§19.4 step 8): the remaining options of §2.5, each read by gen-pv.js. ----
+const _pvIdentifyResponse = () => ({
+    id: 'response', label: 'How the pupil answers', type: 'enum', default: 'circle', group: 'layout',
+    values: [
+        { v: 'circle', l: 'Circle one of three place words' },
+        { v: 'bank', l: 'Write the place word from a word bank' },
+    ],
+    help: 'Circling is the first step; writing the word from a bank is the next one.',
+});
+const _pvRepeatDigit = () => ({
+    id: 'repeatDigit', label: 'A repeated digit (747: which 7?)', type: 'bool', default: false, group: 'difficulty',
+    help: 'On gives numbers with the same digit twice, so the pupil must read the underlined one.',
+});
+const _pvValueForm = () => ({
+    id: 'form', label: 'How the value is written', type: 'enum', default: 'value', group: 'layout',
+    values: [
+        { v: 'value', l: 'The value (700)' },
+        { v: 'unit', l: 'Unit form (7 hundreds)' },
+        { v: 'notation', l: 'Expanded notation (7 × 100)' },
+    ],
+    help: 'One way per page. Unit form and expanded notation name the place and the digit.',
+});
+const _pvZeroDigit = () => ({
+    id: 'zeroDigit', label: 'Ask the value of a 0', type: 'bool', default: false, group: 'difficulty',
+    help: 'On underlines a zero on some items: its value is 0, but it holds the place.',
+});
+const _pvExpandFrame = () => ({
+    id: 'frame', label: 'Answer frame', type: 'enum', default: 'boxes', group: 'support',
+    values: [
+        { v: 'boxes', l: 'One box for each place' },
+        { v: 'line', l: 'A line (300 + 5 or 300 + 0 + 5 both right)' },
+    ],
+    help: 'The boxes are the support; the line is the fade. On the line a zero part may be left out.',
+});
+const _pvExpandForm = () => ({
+    id: 'form', label: 'How the parts are written', type: 'enum', default: 'sum', group: 'layout',
+    values: [
+        { v: 'sum', l: 'Values (300 + 40 + 5)' },
+        { v: 'notation', l: 'Expanded notation (3 × 100 + 4 × 10 + 5 × 1)' },
+    ],
+    help: 'Expanded notation is the grade 4 form: the pupil writes the digit for each place.',
+});
+const _pvCloseness = () => ({
+    id: 'closeness', label: 'How close the numbers are', type: 'enum', default: 'far', group: 'difficulty',
+    values: [{ v: 'far', l: 'Far apart' }, { v: 'close', l: 'Close (same first digit)' }],
+    help: 'Close numbers share their first digit, so the pupil must look at the next place.',
+});
+const _pvLengths = () => ({
+    id: 'lengths', label: 'Digit counts', type: 'enum', default: 'equal', group: 'difficulty',
+    values: [{ v: 'equal', l: 'Same number of digits' }, { v: 'mixed', l: 'Different numbers of digits' }],
+    help: 'Different lengths teach that more digits means a bigger number.',
+});
+const _pvOrderCount = () => ({
+    id: 'count', label: 'How many numbers', type: 'enum', default: 3, group: 'difficulty',
+    values: [3, 4, 5, 6].map(v => ({ v, l: String(v) })),
+    help: 'The same count on every item of the page.',
+});
+const _pvResponseScope = () => ({
+    id: 'responseScope', label: 'What the pupil does', type: 'enum', default: 'full', group: 'layout',
+    values: [
+        { v: 'full', l: 'Round the number' },
+        { v: 'notation', l: 'Underline the place and circle the next digit (do not round)' },
+        { v: 'decision', l: 'Decide: round up or round down' },
+        { v: 'judge', l: 'Check a finished rounding (correct or fix it)' },
+    ],
+    help: 'The sub-steps before rounding, and checking a rounding, each as a page of their own.',
+});
+const _pvBins = () => ({
+    id: 'bins', label: 'The bins', type: 'enum', default: 'adjacent', group: 'difficulty',
+    values: [
+        { v: 'adjacent', l: 'Two next to each other (40 and 50)' },
+        { v: 'apart', l: 'One apart, with a Neither bin (40 and 60)' },
+        { v: 'three', l: 'Three in a row (40, 50 and 60)' },
+    ],
+    help: 'Bins one apart stop the pupil sorting by the first digit alone.',
+});
+const _pvMoreLessUnknown = () => ({
+    id: 'unknown', label: 'What is missing', type: 'enum', default: 'answer', group: 'difficulty',
+    values: [{ v: 'answer', l: 'The answer (10 more than 47 is __)' }, { v: 'start', l: 'The start (47 is 10 more than __)' }],
+    help: 'A missing start is the inverse: the pupil does the opposite of the word.',
+});
+const _pvMoreLessSupport2 = (withChart) => {
+    const d = _pvMoreLessSupport(withChart);
+    d.values = [{ v: 'strip', l: 'A strip of the hundreds chart (the number in its row or column)' }, ...d.values];
+    d.help = 'Most support first. The strip shows only the number; the pupil works out the box beside it.';
+    return d;
+};
 const P9_PV_OPTIONS = {
-    'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport()],
-    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport()],
-    'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true)],
+    'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport(), _pvIdentifyResponse(), _pvRepeatDigit()],
+    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit()],
+    'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), _pvExpandFrame(), _pvExpandForm()],
     'placevalue:combine': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), {
         id: 'order', label: 'Order of the parts', type: 'enum', default: 'largest', group: 'difficulty',
         values: [{ v: 'largest', l: 'Largest first' }, { v: 'scrambled', l: 'Scrambled (5 + 300 + 20)' }],
         help: 'Scrambled parts are harder: the pupil has to put each part in its place.',
     }],
-    'placevalue:compare': [_pvBand([99, 999, 9999, 99999, 999999], 999)],
-    'placevalue:order_least_to_greatest': [_pvBand([99, 999, 9999, 99999, 999999], 999)],
-    'placevalue:order_greatest_to_least': [_pvBand([99, 999, 9999, 99999, 999999], 999)],
+    'placevalue:compare': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvCloseness(), _pvLengths()],
+    'placevalue:order_least_to_greatest': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvOrderCount(), _pvCloseness(), _pvLengths()],
+    'placevalue:order_greatest_to_least': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvOrderCount(), _pvCloseness(), _pvLengths()],
     'placevalue:place_value_disks': [_pvBand([99, 999, 9999], 999), {
         id: 'task', label: 'Task', type: 'enum', default: 'read', group: 'layout',
         values: [{ v: 'read', l: 'Read the number from the disks' }, { v: 'count', l: "Count one place's disks" }],
@@ -509,11 +604,20 @@ const P9_PV_OPTIONS = {
     }, _pvZeroPlace(false)],
     // Draw to 999 only (owner ruling 3): nine 1,000 disks and 27 others is a poster, not a cell.
     'placevalue:pv_disks_build': [_pvBand([99, 999], 999), _pvZeroPlace(false)],
-    'placevalue:pv_digit_drag': [_pvBand([999, 9999, 99999, 999999], 99999)],
+    'placevalue:pv_digit_drag': [_pvBand([999, 9999, 99999, 999999], 99999), {
+        id: 'source', label: 'The number is given as', type: 'enum', default: 'expanded', group: 'difficulty',
+        values: [
+            { v: 'expanded', l: 'Expanded form (40,000 + 300 + 6)' },
+            { v: 'word', l: 'Words (forty thousand, three hundred six)' },
+            { v: 'numeral', l: 'A numeral with commas (copying, the easiest)' },
+        ],
+        help: 'Expanded form and words make the pupil work out each digit\'s place; a numeral is copying.',
+    }],
     'placevalue:number_word_names': [_pvBand([999, 9999, 99999, 999999], 999999)],
-    'placevalue:more_less_10': [_pvStep([1, 10], 1), _pvDir(), _pvBand([20, 50, 100, 120], 100), _pvMoreLessSupport(true)],
-    // Numbers 100-900 (2.NBT.B.8): the band is fixed at 1,000, so there is no band control.
-    'placevalue:more_less_100': [_pvStep([10, 100], 100), _pvDir(), _pvMoreLessSupport(false)],
+    'placevalue:more_less_10': [_pvStep([1, 10], 1), _pvDir(), _pvBand([20, 50, 100, 120], 100), _pvMoreLessSupport2(true), _pvMoreLessUnknown()],
+    // Numbers 100-900 (2.NBT.B.8): the band is fixed at 1,000, so there is no band control. The
+    // 1,000 step (4.NBT) is appended to the enum (SCC-P12) and works to 10,000.
+    'placevalue:more_less_100': [_pvStep([10, 100, 1000], 100), _pvDir(), _pvMoreLessSupport2(false), _pvMoreLessUnknown()],
     'placevalue:place_value_10x': [
         { id: 'op', label: 'Multiply or divide', type: 'enum', default: 'x', group: 'difficulty',
             values: [{ v: 'x', l: '× (digits move left)' }, { v: '/', l: '÷ (digits move right)' }],
@@ -524,13 +628,37 @@ const P9_PV_OPTIONS = {
         _pvBand([1000, 10000, 100000, 1000000], 10000, 'The biggest number on the page (the larger of the number and its answer).'),
         { id: 'decimals', label: 'Decimals (grade 5)', type: 'bool', default: false, group: 'difficulty',
             help: 'On gives numbers with a decimal point, such as 3.4 × 100.' },
+        { id: 'support', label: 'Support', type: 'enum', default: 'shift', group: 'support',
+            values: [{ v: 'shift', l: 'Shift chart (the digits move across the places)' }, { v: 'none', l: 'None: the equation only' }],
+            help: 'The chart shows each digit moving one place for each zero; "None" is the fade.' },
     ],
+    'placevalue:unit_form': [_pvBand([99, 999, 9999], 999), {
+        id: 'rename', label: 'More than 9 of one place', type: 'enum', default: 'standard', group: 'difficulty',
+        values: [{ v: 'standard', l: 'No (476 = 4 hundreds 7 tens 6 ones)' }, { v: 'more', l: 'Yes (476 = 47 tens 6 ones)' }],
+        help: 'Renaming (47 tens) is the idea regrouping is built on.',
+    }],
     'number_sense:rounding_visual': [
         { id: 'place', label: 'Round to the nearest', type: 'enum', default: 10, group: 'difficulty',
             values: [{ v: 10, l: '10' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }],
             help: 'The place the number is rounded to. The numbers grow to fit the place.' },
         _pvBand([100, 1000, 10000], 100, 'The biggest number on the page. It grows to fit the place when the place needs more.'),
         _pvMidpoint(true),
+        { id: 'line', label: 'The number line', type: 'enum', default: 'mark', group: 'support',
+            values: [
+                { v: 'plotted', l: 'The number is marked on the line' },
+                { v: 'mark', l: 'The pupil marks the number' },
+                { v: 'ends', l: 'The ends only (no marking)' },
+            ],
+            help: 'Most support first: the dot is drawn, then the pupil marks it, then the line alone.' },
+        { id: 'midLabel', label: 'Label the halfway tick', type: 'bool', default: false, group: 'support',
+            help: 'A hint: the halfway number is printed under the middle tick.' },
+    ],
+    'number_sense:between_tens': [_pvBand([100, 1000], 100)],
+    'number_sense:place_on_number_line': [
+        { id: 'span', label: 'The line goes from', type: 'enum', default: 10, group: 'difficulty',
+            values: [{ v: 10, l: 'One ten to the next' }, { v: 100, l: 'One hundred to the next' }, { v: 1000, l: 'One thousand to the next' }],
+            help: 'The two ends are the tens (hundreds, thousands) the number is between.' },
+        _pvBand([100, 1000, 10000], 100, 'The biggest number on the page. It grows to fit the line.'),
     ],
     'number_sense:nearest_10': _pvNearest(10),
     'number_sense:nearest_100': _pvNearest(100),
@@ -546,6 +674,17 @@ const P9_PV_OPTIONS = {
     'number_sense:round_sort_million': _pvSort(1000000),
     'number_sense:round_sort_tenths': _pvSort(0),
     'number_sense:round_sort_hundredths': _pvSort(0),
+    'number_sense:rounding_table': [
+        { id: 'places', label: 'Columns (round to the nearest)', type: 'set', default: [10, 100], group: 'difficulty',
+            values: [{ v: 10, l: '10' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }, { v: 10000, l: '10,000' }],
+            allLabel: 'All four columns',
+            help: 'One column per place. The numbers are as big as the biggest place needs.' },
+        { id: 'blank', label: 'What the pupil fills in', type: 'enum', default: 'column', group: 'layout',
+            values: [{ v: 'column', l: 'A whole column' }, { v: 'row', l: 'A whole row (one number to every place)' }],
+            help: 'A whole column or row is blank, so no answer can be read off its neighbours.' },
+    ],
+    'number_sense:estimate_sum': [_pvEstPlace(), _pvEstSupport()],
+    'number_sense:estimate_diff': [_pvEstPlace(), _pvEstSupport()],
     'number_sense:estimate_sums_diffs': [_pvEstPlace(), _pvTask()],
     'number_sense:estimate_products': [_pvEstPlace(), _pvTask()],
     'number_sense:estimate_quotient': [_pvQuotientPlace(), _pvTask()],
@@ -570,7 +709,13 @@ export function pvBandFloor(categoryId, skillId, opts) {
     const o = normalizeOptions(categoryId, skillId, opts);
     const place = pvRoundPlace(skillId, o);
     if (place) return place * 10;
-    if (skillId === 'more_less_100') return 1000;
+    if (skillId === 'more_less_100') return Number(o.step) === 1000 ? 10000 : 1000;
+    if (skillId === 'between_tens') return 100;
+    if (skillId === 'place_on_number_line') return (Number(o.span) || 10) * 10;
+    if (skillId === 'rounding_table') {
+        const ps = (Array.isArray(o.places) && o.places.length ? o.places : [10, 100]).map(Number);
+        return Math.max(...ps) * 10;
+    }
     if (skillId === 'more_less_10') return Number(o.step) === 10 ? 20 : 10;
     if (skillId === 'pv_digit_drag') return 1000;
     if (skillId === 'place_value_10x') {

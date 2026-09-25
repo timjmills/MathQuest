@@ -13,10 +13,10 @@
 // A skill with {} honours none of the three; it still carries the universal level in the model
 // (skill-options.js), but no control is shown for it — see offeredOptionsFor().
 //
-// Summary: {"skills":583,"range":145,"decimals":12,"level":50,"none":389,"coarse":14,"stat":24,"unstable":29,"hang":3}
+// Summary: {"skills":586,"range":142,"decimals":12,"level":50,"none":395,"coarse":14,"stat":24,"unstable":29,"hang":3}
 import { registerDerivedOptions } from './skill-options.js';
 
-export const DERIVED_SUMMARY = {"skills":583,"range":145,"decimals":12,"level":50,"none":389,"coarse":14,"stat":24,"unstable":29,"hang":3};
+export const DERIVED_SUMMARY = {"skills":586,"range":142,"decimals":12,"level":50,"none":395,"coarse":14,"stat":24,"unstable":29,"hang":3};
 
 export const DERIVED_OPTIONS = {
     "addition:add": {"range":[10,20,100,1000]},
@@ -392,12 +392,13 @@ export const DERIVED_OPTIONS = {
     "number_ops_mixed:which_sign": {"range":[10,50,100,1000]},
     "number_ops_mixed:word_problems_mixed": {"range":[10,100],"decimals":[0,1,2,3],"mode":"stat"},
     "number_ops_mixed:word_problems_mixed_plain": {"range":[10,100],"decimals":[0,1,2,3],"mode":"stat"},
+    "number_sense:between_tens": {},
     "number_sense:compensation": {"range":[10,20,50,100]},
     "number_sense:doubles_near_doubles": {},
-    "number_sense:estimate_diff": {"range":[10,50,100,1000,10000,100000,1000000]},
+    "number_sense:estimate_diff": {},
     "number_sense:estimate_products": {},
     "number_sense:estimate_quotient": {},
-    "number_sense:estimate_sum": {"range":[10,50,100,1000,10000,100000,1000000]},
+    "number_sense:estimate_sum": {},
     "number_sense:estimate_sums_diffs": {},
     "number_sense:make_a_ten": {},
     "number_sense:mixed_number_sense": {"range":[10,20,50,100,1000,10000,100000,1000000]},
@@ -407,6 +408,7 @@ export const DERIVED_OPTIONS = {
     "number_sense:nearest_10000": {},
     "number_sense:nearest_100000": {},
     "number_sense:nearest_million": {},
+    "number_sense:place_on_number_line": {},
     "number_sense:round_sort_10": {},
     "number_sense:round_sort_100": {},
     "number_sense:round_sort_1000": {},
@@ -415,7 +417,7 @@ export const DERIVED_OPTIONS = {
     "number_sense:round_sort_hundredths": {},
     "number_sense:round_sort_million": {},
     "number_sense:round_sort_tenths": {},
-    "number_sense:rounding_table": {"range":[10,20,50,100,1000,10000]},
+    "number_sense:rounding_table": {},
     "number_sense:rounding_visual": {},
     "number_theory:divisibility_sort": {"range":[100,1000],"hang":["range 10","range 20","range 50"]},
     "number_theory:factor_links_easy": {"range":[10,20,100]},
@@ -472,6 +474,7 @@ export const DERIVED_OPTIONS = {
     "placevalue:place_value_disks": {},
     "placevalue:pv_digit_drag": {},
     "placevalue:pv_disks_build": {},
+    "placevalue:unit_form": {},
     "placevalue:value": {},
     "probability:mixed_probability": {},
     "probability:probability_basic": {},

@@ -296,6 +296,9 @@ export const FROZEN_SKILL_CODES = {
     "division:div_zero_in_quotient": "UK", "division:remainder_too_big": "UL",
     "division:div_check_by_multiplying": "UM", "division:div_fix_estimate": "UN",
     "number_ops_mixed:which_sign": "UP", "number_ops_mixed:missing_factor_or_addend": "UQ",
+    // ---- P9 appends, 2026-09-25 (place-value-rounding.md §18). APPEND ONLY, never reorder. ----
+    "placevalue:unit_form": "UR",
+    "number_sense:between_tens": "US", "number_sense:place_on_number_line": "UT",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and
@@ -470,6 +473,8 @@ export const FROZEN_CATEGORY_ORDER = {
         "more_less_10", "more_less_100", "place_value_disks", "pv_disks_build", "pv_digit_drag", "number_word_names",
         "place_value_10x", "identify", "value", "compare", "expand", "combine", "order_least_to_greatest",
         "order_greatest_to_least", "mixed_placevalue",
+        // P9 appends, 2026-09-25 — APPEND ONLY.
+        "unit_form",
     ],
     "number_sense": [
         "rounding_visual", "nearest_10", "nearest_100", "nearest_1000", "nearest_10000", "nearest_100000",
@@ -477,6 +482,8 @@ export const FROZEN_CATEGORY_ORDER = {
         "round_sort_100000", "round_sort_million", "round_sort_tenths", "round_sort_hundredths", "estimate_sum",
         "estimate_diff", "estimate_sums_diffs", "estimate_products", "estimate_quotient", "rounding_table",
         "make_a_ten", "doubles_near_doubles", "compensation", "mixed_number_sense",
+        // P9 appends, 2026-09-25 — APPEND ONLY.
+        "between_tens", "place_on_number_line",
     ],
     "number_theory": [
         "prime_composite", "factors_identify", "factor_tchart_easy", "factor_tchart_medium", "factor_tchart_hard",
