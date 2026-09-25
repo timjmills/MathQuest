@@ -35,6 +35,9 @@ export const CONTRACT_MEMBERS = Object.freeze([
 export const OPTIONAL_MEMBERS = Object.freeze([
     'decision', 'setupOnly', 'open', 'claims', 'variants', 'notations', 'representations',
     'supports', 'misconceptions',
+    // `stories(q, {seed}) -> Story | null`: an original story carrying ONE item's numbers, with a
+    // number + label answer, for the word-problem role (section 3.8; providers/stories.js).
+    'stories',
 ]);
 
 /* ================================================== the controlled instruction library */
@@ -105,6 +108,18 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'cut-sort': 'Cut. Sort. Glue.',
     'cut-order': 'Cut. Put in order. Glue.',
     'find-color': 'Find every {n}. Color it.',
+    // Added 2026-09-25 with the first real skill providers (PEDAGOGY_STANDARD.md 10.1): tasks
+    // the library had no string for, so each skill was falling back to "Solve.".
+    'line-jumps': 'Draw the jumps on the line. Write the answer.',
+    'draw-blocks': 'Draw tens and ones to show the number.',
+    'draw-blocks-100': 'Draw hundreds, tens and ones to show the number.',
+    'check-groups': 'Look at the groups. Check one box.',
+    'how-many-left': 'Write how many are left.',
+    'ring-remainder': 'Circle groups of {n}. Write how many groups and how many left.',
+    'pick-parts': 'Circle one number in each list to make the sum.',
+    'fact-family': 'Use the three numbers. Fill in the fact family.',
+    'chart-fill': 'Fill in the missing products.',
+    'groups-total': 'Write the groups, the number in each, and the total.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',
@@ -195,7 +210,12 @@ const SCREEN_VERB_SINGLE = new Set(
 export function instructionFor(key, vars = {}) {
     const raw = INSTRUCTION_LIBRARY[key];
     if (raw === undefined) throw new Error(`instructionFor: "${key}" is not in the controlled library`);
-    return raw.replace(/\{(\w+)\}/g, (m, name) => (vars[name] === undefined ? m : String(vars[name])));
+    const out = raw.replace(/\{(\w+)\}/g, (m, name) => (
+        vars[name] === undefined || vars[name] === null || vars[name] === '' ? m : String(vars[name])));
+    // A placeholder left unfilled would print "{n}" on a pupil's page. Throw instead, so every
+    // caller's existing fallback (the neutral default instruction) applies.
+    if (/\{\w+\}/.test(out)) throw new Error(`instructionFor: "${key}" needs ${out.match(/\{\w+\}/g).join(', ')}`);
+    return out;
 }
 
 /** The library key of a string, or '' when the string was composed freely (lint seam). */

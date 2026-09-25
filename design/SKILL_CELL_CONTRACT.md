@@ -546,7 +546,7 @@ The millimetre values above only illustrate the shape of a footprint; the real v
 ### 3.1 API
 
 ```js
-// js/modules/sheet/providers.js
+// js/modules/sheet/contract.js (providers register from js/modules/sheet/providers/*.js, section 3.8)
 export function registerSkill(key, provider) {}     // key: 'categoryId:skillId' or 'skillId'
 export function getProvider(categoryId, skillId) {} // never null: gaps are filled by default adapters
 ```
@@ -756,6 +756,129 @@ registerSkill('division:div_facts', {
     wrongAnswer: (q) => ({ value: q.a - q.b, misconception: 'subtracted' }),
 });
 ```
+
+### 3.8 The role-facing interface of a real provider (2026-09-25)
+
+The first real providers live in `js/modules/sheet/providers/` (one file per family: `addition.js`,
+`subtraction.js`, `multiplication.js`, `division.js`, `k2.js`, plus `stories.js` and `util.js`), are
+registered on load by `providers/index.js`, and reach every consumer through `sheet/index.js`. They cover
+the 24 skills re-graded on 2026-09-25 (`REGRADED_SKILLS`) and the sibling ladder ids in the same
+generator branch: `sub_facts`, `number_line_sub`, `area_model_mult_hard`, `mult_chart_easy`,
+`ten_frame_build_teen`, `base10_build_hundreds`, and every `add_wp_*` / `sub_wp_*` band with its `_plain`
+twin. `tests/scripts/ws-providers-unit.mjs` holds them to this section.
+
+The page roles (`sheet/roles/*`, `print-sheet.js`) consume exactly these members. The shapes are the
+interface; a role must not reach past them into a provider's helpers.
+
+**`strings`** is a function `(ref) -> SkillStrings`. `ref` is what roles already pass
+(`{categoryId, skillId, label}`); when it also carries `q` (the first item of the section) the
+instruction comes back with its placeholders filled.
+
+```js
+/**
+ * @typedef {Object} SkillStrings   (extends 3.4)
+ * @property {string} iCan              'I Can add three or four numbers in columns' (SCC-P7)
+ * @property {string} instruction       the library string; filled when ref.q was given
+ * @property {string} instructionKey    its key in INSTRUCTION_LIBRARY (PEDAGOGY_STANDARD.md 10.1)
+ * @property {(q) => Object} [instructionVars]   {n: 3} for keys with a placeholder
+ *                                      ('ring-groups', 'ring-remainder', 'skip-count')
+ * @property {string[]} steps           2-4 general steps for the Steps band, right for THIS skill
+ * @property {string} say               the `Say:` frame; blanks are `__` only, never `{unit}`
+ * @property {string} oralFrame         the same string as `say` (the name roles used before)
+ * @property {(q) => string} sayFill    the frame with THIS item's numbers (and unit word) filled,
+ *                                      '' when it cannot be filled. Roles use it instead of filling
+ *                                      `__` from the operands themselves: frames such as
+ *                                      "__ tens and __ ones is __." or "The answer is __ __." do not
+ *                                      take the operands in order.
+ */
+```
+
+- **SCC-P17** A role that needs an instruction for a key with a placeholder calls
+  `instructionFor(key, strings.instructionVars(q))`. `instructionFor` now **throws** when a placeholder is
+  left unfilled, so "Circle groups of {n}." can never print; every role's existing `try` then falls back to
+  the neutral default.
+- **SCC-P18** `steps` never carries a strategy the skill does not use. The unit test holds each skill to a
+  forbidden list (count-on or regrouping on grade-1 subtraction, "Count by the second number" on arrays and
+  charts, "Touch each one" on sequences, times-fact steps on ringing skills) and to a required key idea
+  (jumps on a number line, rings on share-into-groups, the remainder on div_remainders, and so on).
+
+**`workedSteps(q)`** returns 3 to 6 `{text, marks}` steps of the actual model: jumps on a number line,
+partial products on the area model, rings on groups, the regroup digit in a column, bring-down in long
+division. `marks[].slot` names a LOGICAL slot, which the role maps onto the cell it draws:
+
+| Skill kind | Slots |
+|---|---|
+| fact cells (`*_facts`) | `ans` |
+| single answers | `answer` |
+| column addition | `ones`, `tens`, `hundreds`, `regroup:tens`, `regroup:hundreds`, `answer` |
+| number line | `start`, `jump:1` .. `jump:n` (value `"from-to"`), `jump:10s`, `jump:1s`, `answer` |
+| fact family | `eq0` .. `eq3` |
+| cloze | `part1`, `part2` |
+| arrays, groups | `groups`, `size`, `total` |
+| area model | `part0` .. (one row) or `r0c0` .. (grid), `total` |
+| multiplication chart | `cell0` .. |
+| division | `ans` / `answer`, `quotient`, `remainder`, `q0` .. (quotient digits), `ring:1`, `ring:all` |
+| number sequence | `blank0` .. |
+| base-10 build | `hundreds`, `tens`, `ones`, `answer` |
+| ten frame | `counters` |
+| compare groups | `choice` |
+| word problems | `equation`, `answer`, `label` |
+
+The last step always marks the graded slot(s).
+
+**`wrongAnswer(q)`** returns a REAL misconception, never the right answer, or `null`:
+
+```js
+/**
+ * @typedef {Object} WrongAnswer    (extends 3.3)
+ * @property {*} value              same TYPE and shape as q.ans (number, "8 R 5", ["14","3"], "20, 20, 15, 5")
+ * @property {string} display       the value as printable text
+ * @property {string} misconception an id listed in provider.misconceptions
+ * @property {string} slot          the slot that holds the wrong value: the one the pupil circles and fixes
+ * @property {Object} slots         {slotId: wrongValue} for every slot the error changes
+ * @property {string} explain       one sentence for the teacher key
+ * @property {string} [label]       word problems: the unit word that goes with the wrong number
+ */
+```
+
+Each skill declares 2 to 4 named misconceptions (PEDAGOGY_STANDARD.md misconception list): forgot to
+regroup, wrote the whole column total, added instead of subtracted, counted the start point, jumped the
+wrong way, remainder not less than the divisor, ignored the remainder, wrote the group size instead of the
+number of groups, dropped the zeros of a partial product, swapped tens and ones, reversed teen digits, read
+the next column of a chart, and so on. The candidate list is rotated per item by a stable hash, so a page
+of six shows more than one error; a candidate equal to the answer, or negative, is skipped.
+
+**`stories(q, {seed})`** (optional member, SCC-P19) returns an original story carrying ONE item's
+numbers, or `null` when they cannot carry one (a zero operand, a remainder the story would hide):
+
+```js
+/**
+ * @typedef {Object} Story
+ * @property {string} schema      'join' | 'part-whole' | 'join-place' | 'separate' | 'take-from' | 'lose'
+ *                                | 'groups' | 'rows' | 'grouping' | 'sharing' | 'grouping-left'
+ * @property {string} op          '+' | '-' | 'x' | '÷'
+ * @property {string[]} lines     one sentence per line (P-WP-17), at most 8 words at Levels K-1
+ * @property {string} question    the last line
+ * @property {string[]} sentences lines + question
+ * @property {number} ans         the number the pupil writes (the item's answer)
+ * @property {string} label       the unit word that agrees with ans: "1 apple", "4 apples"
+ * @property {{one: string, many: string}} unit   both forms, for a pre-printed label
+ * @property {string} answerText  "4 apples"
+ * @property {string} equation    "2 + 2 = 4"
+ * @property {string} say         "The answer is 4 apples."
+ * @property {string} [leftOver]  remainder stories: "3 apples are left over."
+ */
+```
+
+Agreement is built in (`nounFor(n)`, `be(n)`), so "There are 1 ball" cannot be produced; names repeat
+instead of pronouns; nouns come from the controlled neutral list. `stories` is supplied for the
+word-problem ladder (`add_wp_*`, `sub_wp_*`) and for every skill whose item carries two operands a story
+can hold (facts, `add`, `subtract`, number lines, `sub_5_pictures`, `mult_facts`, area models,
+`div_facts`, `long_div_2digit`, `share_into_groups`, `div_remainders`).
+
+The instruction library gained ten keys with these providers (`line-jumps`, `draw-blocks`,
+`draw-blocks-100`, `check-groups`, `how-many-left`, `ring-remainder`, `pick-parts`, `fact-family`,
+`chart-fill`, `groups-total`), added in `contract.js` and in PEDAGOGY_STANDARD.md 10.1 together.
 
 ---
 
