@@ -839,6 +839,14 @@ division. `marks[].slot` names a LOGICAL slot, which the role maps onto the cell
 
 The last step always marks the graded slot(s).
 
+**Step states (S5, 2026-09-25).** A template MAY register a `stepState(payload, steps, k, ctx)` member
+that draws its cell as it looks after step `k` of `steps` (a provider's `workedSteps`, or the anchor's
+grouped steps): the marks of step `k` in trace grey, every earlier mark in solid black, nothing
+later (P-LC-9), in the same geometry as the cell's other states. It maps the LOGICAL slots above onto
+its own geometry with `sheet/steps.js`. `stack`, `fact`, `equation`, `division` and `area-model`
+implement it; the anchor problems (`sheet/anchors.js`, design/SUPPORTS.md S5-S6) draw any other
+template whole, with the numbered text steps beside it.
+
 **`wrongAnswer(q)`** returns a REAL misconception, never the right answer, or `null`:
 
 ```js

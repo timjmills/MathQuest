@@ -121,7 +121,8 @@ export function placeSections(sections, { bodyFirstMm, bodyContMm }) {
     };
     sections.forEach((s, si) => {
         (s.chunks || []).forEach((chunk, ci) => {
-            const heightMm = s.instrMm + chunk.rows * s.layout.cellH;
+            // S6: a chunk of anchored blocks also carries its anchor bands (anchors.js blockPages).
+            const heightMm = s.instrMm + (Number(chunk.anchorMm) || 0) + chunk.rows * s.layout.cellH;
             const fitsHere = cur && ci === 0 && cur.usedMm + heightMm <= cur.bodyMm - SAFETY;
             if (!fitsHere) open();
             cur.parts.push({ section: si, chunk, heightMm });

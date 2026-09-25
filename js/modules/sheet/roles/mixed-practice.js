@@ -13,6 +13,11 @@
 //              the same numbers, so the skill-to-item map is the key's order
 //   Look       Daily by default; two-line tab "Level N | Mixed 1"; title "Mixed practice" (HD-13)
 //   Overflow   a shelf never splits; shelves that do not fit spill to page 2 (PT-MIX-9)
+//   Anchors    S6 (input.anchors, built by the host): SECTIONS (the default when on) puts ONE
+//              worked example - an anchor band - on each skill's first shelf band, above its
+//              problems; SIDE BY SIDE makes each shelf rows of [twin | problem] pairs (a skill whose
+//              problems cannot sit two to a shelf takes the band instead). Anchors are unscored,
+//              unlabelled and carry the Model tab; the numbering counts pupil problems only.
 //
 // SHUFFLED packing (2 x 2 blocks) is not built yet. Pure module (SCC-01).
 
@@ -21,6 +26,7 @@ import {
     instructionText, assemble, poolItems, labelStyleOf, STRAND_BY_CATEGORY,
 } from './compose.js';
 import { skillWords } from './practice.js';
+import { anchorPlanItem, anchorHeightMm } from '../anchors.js';
 
 export const ROLE_ID = 'mixed-practice';
 export const DEFAULT_LOOK = 'daily';
@@ -40,38 +46,68 @@ function packing(poolsIn, input) {
     const N = AUTO_N[ctx.look][ctx.size];
     const ids = Object.keys(poolsIn).filter((id) => (poolsIn[id] || []).length);
     const shelf = {};
+    const A = input.anchors && input.anchors.byPool ? input.anchors : null;
     for (const id of ids) {
         const its = poolsIn[id];
-        const k = divisorsDesc(N).find((d) => d <= 6 && fitsAt(its, Math.min(d, 6), ctx)) || 1;
-        const h = hMinAt(its, Math.min(k, 6), ctx);
-        shelf[id] = { k, h: Number.isFinite(h) ? h : 60, n: 0 };
+        const a = A && A.byPool[id];
+        const twins = a && A.mode === 'side' ? (a.side || []) : [];
+        // SIDE: a shelf of [twin | problem] pairs needs an even count of cells the twins fit too.
+        const pairK = twins.length ? divisorsDesc(N).find((d) => d <= 6 && d % 2 === 0 && fitsAt(its, d, ctx) && fitsAt(twins, d, ctx)) : 0;
+        const k = pairK || divisorsDesc(N).find((d) => d <= 6 && fitsAt(its, Math.min(d, 6), ctx)) || 1;
+        const h = Math.max(hMinAt(its, Math.min(k, 6), ctx), pairK ? hMinAt(twins, k, ctx) : 0);
+        // The skill's anchor band (SECTIONS, or SIDE when no pair fits): measured by the host.
+        const band = a && (A.mode === 'sections' || !pairK) && (a.band || []).length ? Math.max(0, ...a.band.map((x) => anchorHeightMm(x, 1))) : 0;
+        shelf[id] = { k, h: Number.isFinite(h) ? h : 60, n: 0, pairs: !!pairK, band, per: pairK ? k / 2 : k };
     }
     const weights = Object.fromEntries((input.pools || []).map((p) => [p.id, p.weight || 1]));
     const bandH = (id) => m.strip + shelf[id].h;
-    // Page 1: one shelf per skill first, then extra shelves by weight gap, while they fit.
+    // Page 1: one shelf per skill first (with its anchor band), then extra shelves by weight gap.
     let used = 0;
     const order = [];
-    for (const id of ids) { order.push(id); used += bandH(id); shelf[id].n = 1; }
-    const total = () => ids.reduce((a, id) => a + shelf[id].n * shelf[id].k, 0);
+    for (const id of ids) { order.push(id); used += bandH(id) + shelf[id].band; shelf[id].n = 1; }
+    const total = () => ids.reduce((a, id) => a + shelf[id].n * shelf[id].per, 0);
     // WORKSHEET_DESIGN_STANDARD 12.1: Mixed practice holds at most 9 / 7 / 5 rows (shelves).
     const maxShelves = { S: 9, M: 7, L: 5 }[ctx.size] || 5;
+    // With anchor bands a set may need more than one page (whole shelves spill, PT-MIX-9): the
+    // extra shelves then fill the pages the anchors already take, never adding a page.
+    const pagesOf = () => {
+        let pages = 1;
+        let cur = 0;
+        for (const id of ids) {
+            for (let k = 0; k < shelf[id].n; k++) {
+                const hh = bandH(id) + (k === 0 ? shelf[id].band : 0);
+                const budget = pages === 1 ? m.budget : mCont.budget;
+                if (cur && cur + hh > budget) { pages++; cur = 0; }
+                cur += hh;
+            }
+        }
+        return pages;
+    };
+    const basePages = A ? pagesOf() : 1;
     for (let guard = 0; guard < 40; guard++) {
-        if (ids.reduce((a, id) => a + shelf[id].n, 0) >= maxShelves) break;
+        if (ids.reduce((a, id) => a + shelf[id].n, 0) >= maxShelves * basePages) break;
         const tw = ids.reduce((a, id) => a + (weights[id] || 1), 0);
-        const gaps = ids.map((id) => ({ id, gap: (weights[id] || 1) / tw - (shelf[id].n * shelf[id].k) / Math.max(1, total()) }))
+        const gaps = ids.map((id) => ({ id, gap: (weights[id] || 1) / tw - (shelf[id].n * shelf[id].per) / Math.max(1, total()) }))
             .sort((a, b) => b.gap - a.gap);
-        const next = gaps.find((g) => used + bandH(g.id) <= m.budget);
+        const fits = (id) => {
+            if (!A) return used + bandH(id) <= m.budget;
+            shelf[id].n++;
+            const ok = pagesOf() <= basePages;
+            shelf[id].n--;
+            return ok;
+        };
+        const next = gaps.find((g) => fits(g.id));
         if (!next) break;
         shelf[next.id].n++;
         used += bandH(next.id);
     }
-    return { ctx, m, mCont, N, ids, shelf, used };
+    return { ctx, m, mCont, N, ids, shelf, used, pages: basePages };
 }
 
 export function counts(pools, input) {
     const p = packing(pools, input);
     const out = {};
-    for (const id of p.ids) out[id] = p.shelf[id].n * p.shelf[id].k;
+    for (const id of p.ids) out[id] = p.shelf[id].n * p.shelf[id].per;
     return out;
 }
 
@@ -83,36 +119,47 @@ export function plan(input = {}) {
     const labels = labelStyleOf(ctx.look, input.labels);
     // Lay the shelves out skill by skill (GROUPED), paginating whole shelves.
     const shelves = [];
+    const A = input.anchors && input.anchors.byPool ? input.anchors : null;
     for (const id of p.ids) {
-        const its = pools[id].slice(0, p.shelf[id].n * p.shelf[id].k);
-        for (let s = 0; s < p.shelf[id].n; s++) {
-            const chunk = its.slice(s * p.shelf[id].k, (s + 1) * p.shelf[id].k);
-            if (chunk.length) shelves.push({ id, items: chunk, k: p.shelf[id].k, h: p.shelf[id].h });
+        const sh = p.shelf[id];
+        const its = pools[id].slice(0, sh.n * sh.per);
+        for (let s = 0; s < sh.n; s++) {
+            let chunk = its.slice(s * sh.per, (s + 1) * sh.per);
+            // SIDE: [twin | problem] pairs, the twin first (example, then problem).
+            if (sh.pairs) chunk = chunk.flatMap((it) => (it.twin ? [it.twin, it] : [it]));
+            const anchor = s === 0 && sh.band && A ? ((A.byPool[id] || {}).band || [])[0] : null;
+            if (chunk.length) shelves.push({ id, items: chunk, k: sh.k, h: sh.h, anchor, bandMm: sh.band });
         }
     }
-    const n = shelves.reduce((a, s) => a + s.items.length, 0);
+    const n = shelves.reduce((a, s) => a + s.items.filter((it) => !it.anchor).length, 0);
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Mixed 1', title: 'Mixed practice', twoLine: true, score: n });
     const pages = [];
     let cur = null;
     let start = 1;
-    const spare = Math.max(0, m.budget - p.used);
+    const spare = p.pages > 1 ? 0 : Math.max(0, m.budget - p.used);
     const grow = shelves.length ? Math.min(12, spare / shelves.length) : 0;
     for (const [i, sh] of shelves.entries()) {
-        const bandH = m.strip + sh.h + grow;
-        const budget = pages.length ? p.mCont.budget : m.budget;
+        const bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
+        const budget = pages.length > 1 ? p.mCont.budget : m.budget;   // the page `cur` is on
         if (!cur || cur.used + bandH > budget) { cur = { sections: [], used: 0 }; pages.push(cur); }
-        const skill = (input.skills || []).find((s) => sh.items[0] && sh.items[0].q && s.skillId === sh.items[0].q.skillId) || {};
+        const first = sh.items.find((it) => !it.anchor);
+        const skill = (input.skills || []).find((s) => first && first.q && s.skillId === first.q.skillId) || {};
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
         const title = STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';
-        cur.sections.push({
-            kind: 'band', label: firstOfSkill ? title : '', instr: firstOfSkill ? instructionText(instructionKeyOf(sh.items, input.skills), sh.items) : '',
-            content: gridPart(sh.items.map((it) => planItem(it, { cols: Math.min(sh.k, 6) })), { cols: sh.k, rows: 1, cellH: sh.h + grow, labels, start }),
-        });
-        start += sh.items.length;
+        const pupil = sh.items.filter((it) => !it.anchor);
+        const grid = gridPart(sh.items.map((it) => (it.anchor ? anchorPlanItem(it, Math.min(sh.k, 6)) : planItem(it, { cols: Math.min(sh.k, 6) }))), { cols: sh.k, rows: 1, cellH: sh.h + grow, labels, start });
+        const band = {
+            kind: 'band', label: firstOfSkill ? title : '', instr: firstOfSkill ? instructionText(instructionKeyOf(pupil, input.skills), pupil) : '',
+        };
+        // SECTIONS: the skill's worked example sits in its band, above its problems.
+        if (sh.anchor) band.contents = [gridPart([anchorPlanItem(sh.anchor, 1)], { cols: 1, rows: 1, cellH: sh.bandMm, labels: 'none', start, cls: 'mq-anchorgrid' }), grid];
+        else band.content = grid;
+        cur.sections.push(band);
+        start += pupil.length;
         cur.used += bandH;
     }
     const achieved = {};
-    for (const sh of shelves) achieved[sh.id] = (achieved[sh.id] || 0) + sh.items.length;
+    for (const sh of shelves) achieved[sh.id] = (achieved[sh.id] || 0) + sh.items.filter((it) => !it.anchor).length;
     return assemble(ROLE_ID, input, frame, pages.map((pg) => ({ sections: pg.sections })), {
         defaultLook: DEFAULT_LOOK,
         meta: { items: n, scoreOutOf: n, units: p.N, achieved,

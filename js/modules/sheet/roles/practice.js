@@ -31,6 +31,7 @@ import {
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
 import { deriveSeed } from '../rng.js';
+import { ANCHOR_CSS, anchorPlanItem, sideItems, pupilCount, blockPlan, blockPages } from '../anchors.js';
 
 /* ======================================================================= engine stylesheet */
 
@@ -228,6 +229,7 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-wpspace.mq-wpmodel{align-items:stretch;justify-content:center;padding:6mm 2mm 2mm}
 :is(.ws-page,.ws-sheet) .mq-wpspace.mq-wpmodel>div{width:100%;display:flex;flex-direction:column;align-items:center}
 :is(.ws-page,.ws-sheet) .mq-wppics{display:flex;flex-wrap:wrap;gap:3mm;justify-content:center;align-items:center;padding:2mm}
+${ANCHOR_CSS}
 `.trim();
 
 export const styleBlock = () => `<style data-mq-sheet-engine>${SHEET_ENGINE_CSS}</style>`;
@@ -525,6 +527,8 @@ export function hookClasses(it, level) {
  * from it and the fact ladder its digit size, and the key calls the SAME function (AK-1).
  */
 function planItem(it, level, cols) {
+    // S6: a worked twin (side by side) is an anchor - unscored, unlabelled, Model tab.
+    if (it.anchor) return anchorPlanItem(it, cols);
     const q = it.q || null;
     return {
         q,
@@ -543,18 +547,55 @@ function planItem(it, level, cols) {
  * Lay out every section of ONE sheet and place it on pages.
  * @returns {{layouts, chunksBySection, pages}}
  */
-function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, headerFirst, availableWidthMm }) {
-    const layouts = sectionsIn.map((sec, si) => resolveSectionLayout(
-        { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense },
-        itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
-    ));
-    const chunksBySection = layouts.map((L, si) => paginate(itemsBySection[si].length, L));
+function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, headerFirst, availableWidthMm, anchors }) {
     const instr = instructionMm(size);
+    const body = bodyHeightMm(paper, headerFirst);
+    const layouts = sectionsIn.map((sec, si) => {
+        const L = resolveSectionLayout(
+            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols },
+            itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
+        );
+        // S6 SECTIONS: anchor band + 3-4 problems per block; the band's height comes off the page
+        // (anchors.js blockPlan) and a block is never split.
+        const aMm = anchorBandOf(anchors, si);
+        // SIDE BY SIDE in ONE column (a problem too wide for two): each twin sits above its
+        // problem, so a page holds whole pairs - an even number of rows (PG-21: never an example
+        // at the foot of a page with its problem overleaf).
+        if (anchors && anchors.mode === 'side' && L.cols === 1 && itemsBySection[si].some((it) => it.anchor)) {
+            const rows = Math.max(2, L.rows - (L.rows % 2));
+            return Object.assign({}, L, { rows, perPage: rows, pairs: true });
+        }
+        if (!aMm) return L;
+        const bp = blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: sec.gridH ? sec.gridH + instr : body, instrMm: instr, anchorMm: aMm });
+        return Object.assign({}, L, { cellH: bp.cellH, perPage: bp.perPage, rows: bp.blocksPerPage * bp.blockRows, blocks: bp, anchorMm: aMm });
+    });
+    const chunksBySection = layouts.map((L, si) => (L.blocks
+        ? blockPages(itemsBySection[si].length, L.blocks, L.cols, L.anchorMm)
+        : L.pairs
+            // Paginate PAIRS, then count them back as rows: a page break never falls inside one.
+            ? paginate(Math.ceil(itemsBySection[si].length / 2), { cols: 1, rows: L.rows / 2 })
+                .map((c) => Object.assign({}, c, { from: c.from * 2, count: Math.min(c.count * 2, itemsBySection[si].length - c.from * 2), rows: c.rows * 2 }))
+            : paginate(itemsBySection[si].length, L)));
     const pages = placeSections(
         layouts.map((L, si) => ({ layout: L, chunks: chunksBySection[si], instrMm: instr })),
-        { bodyFirstMm: bodyHeightMm(paper, headerFirst), bodyContMm: bodyHeightMm(paper, headerFirst, { cont: true }) },
+        { bodyFirstMm: body, bodyContMm: bodyHeightMm(paper, headerFirst, { cont: true }) },
     );
     return { layouts, chunksBySection, pages };
+}
+
+/** The anchor band height (mm) of section `si` in SECTIONS mode, else 0. */
+const anchorBandOf = (anchors, si) => (anchors && anchors.mode === 'sections' && anchors.bandMm && Number(anchors.bandMm[si]) > 0
+    && anchors.bySection && (anchors.bySection[si] || []).length ? Number(anchors.bandMm[si]) : 0);
+
+/**
+ * S6 SIDE BY SIDE: each pupil item that carries a worked twin (`it.twin`, anchors.js anchorItem
+ * 'side') is preceded by it, and the section is two columns: rows of [twin | problem].
+ */
+export function withAnchors(norm, sheetItems, anchors) {
+    if (!anchors || anchors.mode !== 'side') return { sections: norm.sections, items: sheetItems };
+    const items = sheetItems.map((list) => sideItems(list, list.map((it) => it.twin || null)));
+    const sections = norm.sections.map((sec, si) => (items[si].some((it) => it.anchor) ? Object.assign({}, sec, { columns: 2 }) : sec));
+    return { sections, items };
 }
 
 /** PT-MPR-2: every More Practice letter is its own seed, so Practice C reprints identically. */
@@ -573,8 +614,10 @@ function sheetLayout(role, input, norm, sheetItems, tabId) {
         titleLines,
     };
     const W = Number(norm.ctxIn.availableWidthMm) || LIVE_W_MM;
-    const laid = layoutSheet(role, norm.sections, sheetItems, { size, look, paper, headerFirst: headerForLayout, availableWidthMm: W });
-    return Object.assign({ skills, words, titleLines }, laid);
+    const anchors = input.anchors || null;
+    const aw = withAnchors(norm, sheetItems, anchors);
+    const laid = layoutSheet(role, aw.sections, aw.items, { size, look, paper, headerFirst: headerForLayout, availableWidthMm: W, anchors });
+    return Object.assign({ skills, words, titleLines, sheetItems: aw.items, anchors }, laid);
 }
 
 /**
@@ -587,25 +630,30 @@ function composeSheet(role, input, norm, sheetItems, { tabId, seed, form }) {
     const level = 1;                                        // PT 1.7: Independent and More Practice
     const labelStyle = input.labels === 'none' ? 'none' : input.labels === 'tab' || input.labels === 'letter' ? input.labels
         : (LOOKS[look] || LOOKS[DEFAULT_LOOK]).label;       // CL-10 / CL-30, dialog override CL-20
-    const { skills, words, titleLines, layouts, pages } = sheetLayout(role, input, norm, sheetItems, tabId);
+    const laidOut = sheetLayout(role, input, norm, sheetItems, tabId);
+    const { skills, words, titleLines, layouts, pages, anchors } = laidOut;
+    // S6: with side-by-side anchors the sections' items carry their twins (unscored, unlabelled).
+    sheetItems = laidOut.sheetItems;
 
     // Instruction per section (BD-10, BD-13): the section's own key, else the skills' keys.
     const instr = norm.sections.map((sec, si) => {
+        const pupil = sheetItems[si].filter((it) => !it.anchor);
         const keys = sec.instructionKey ? [sec.instructionKey]
-            : sheetItems[si].map((it) => {
+            : pupil.map((it) => {
                 const q = it.q || {};
                 const s = skills.find((k) => k.skillId === q.skillId && (!q.categoryId || k.categoryId === q.categoryId));
                 return (it.instructionKey) || (s ? skillWords(s).instructionKey : '');
             });
         let key = sectionInstructionKey(keys);
         let text;
-        ({ key, text } = resolveInstruction(key, sheetItems[si], sec.instructionVars));
+        ({ key, text } = resolveInstruction(key, pupil, sec.instructionVars));
         return { key, text };
     });
 
     // Labels and Score across the sheet (CL-12, CL-33, PT-FRM-4).
     const partsInOrder = pages.flatMap((pg) => pg.parts);
-    const counts = partsInOrder.map((p) => p.chunk.count);
+    // Only pupil problems are labelled and scored: a worked twin or an anchor band is neither.
+    const counts = partsInOrder.map((p) => pupilCount(sheetItems[p.section].slice(p.chunk.from, p.chunk.from + p.chunk.count)));
     const { starts, notes: labelNotes } = labelStarts(counts, { style: labelStyle, restartEachPage: false });
     // Every cell on these roles is scored (none is a Model or a Guided cell, CL-14).
     const score = scoreDenominator(counts);
@@ -625,8 +673,29 @@ function composeSheet(role, input, norm, sheetItems, { tabId, seed, form }) {
             // PG-10 / PT-ENG-6: page 1 lets a lone full section fill the body by flex (exactly
             // gridH); every other grid carries the section's fixed height, rows x cellH, so a
             // cell is the same size on every page of the section.
-            const fillByFlex = !pg.cont && lone && part.chunk.rows === L.rows;
+            const fillByFlex = !pg.cont && lone && part.chunk.rows === L.rows && !L.blocks;
             sections.push({ kind: 'html', html: instructionHtml(instr[part.section].key, instr[part.section].text) });
+            if (L.blocks && part.chunk.blocks) {
+                // S6 SECTIONS: each block is its anchor band (its own Model tab, no label, no
+                // score) and then its 3-4 problems; the labels run on across the blocks.
+                const list = (anchors.bySection[part.section] || []);
+                let at = start;
+                for (const b of part.chunk.blocks) {
+                    const bi = Math.floor(b.from / Math.max(1, L.blocks.perBlock));
+                    const a = list[bi % list.length];
+                    sections.push({
+                        kind: 'grid', cols: 1, rows: 1, labels: 'none', start: at, cls: 'fixed mq-anchorgrid',
+                        height: `${Math.round(L.anchorMm * 1000) / 1000}mm`, items: [anchorPlanItem(a, 1)],
+                    });
+                    sections.push({
+                        kind: 'grid', cols: L.cols, rows: b.rows, labels: labelStyle, start: at, cls: 'fixed',
+                        height: `${Math.round(b.rows * L.cellH * 1000) / 1000}mm`,
+                        items: sheetItems[part.section].slice(b.from, b.from + b.count).map((it) => planItem(it, level, L.cols)),
+                    });
+                    at += b.count;
+                }
+                continue;
+            }
             sections.push({
                 kind: 'grid',
                 cols: L.cols,
@@ -644,6 +713,7 @@ function composeSheet(role, input, norm, sheetItems, { tabId, seed, form }) {
     const fits = layouts.map((L) => ({
         cols: L.cols, rows: L.rows, perPage: L.perPage, pages: L.pages, cellW: L.cellW, cellH: L.cellH,
         requested: L.requested, clamped: L.clamped, note: L.note, line: fitsLine(L), cls: L.cls, digitPt: L.digitPt,
+        hMin: L.hMin, anchorMm: L.anchorMm || 0, blocks: L.blocks || null,
     }));
     return {
         pages: planPages,
@@ -715,10 +785,10 @@ export function composePractice(role, input = {}) {
     } else {
         // Paginate the whole run once, exactly as an Independent run would be (PG-23 included),
         // then each page becomes the next letter.
-        const { pages } = sheetLayout(role, input, norm, bySection, 'Practice A');
-        groups = pages.map((pg, i) => {
+        const laid = sheetLayout(role, input, norm, bySection, 'Practice A');
+        groups = laid.pages.map((pg, i) => {
             const secs = norm.sections.map(() => []);
-            for (const part of pg.parts) secs[part.section].push(...bySection[part.section].slice(part.chunk.from, part.chunk.from + part.chunk.count));
+            for (const part of pg.parts) secs[part.section].push(...laid.sheetItems[part.section].slice(part.chunk.from, part.chunk.from + part.chunk.count).filter((it) => !it.anchor));
             return { letter: firstLetter + i, secs };
         });
     }
