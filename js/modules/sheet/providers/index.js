@@ -24,11 +24,13 @@ import './pv.js';
 import './word-work.js';
 import './fractions.js';
 import './nl-place.js';
+import './geometry.js';
 
 export { storiesFor, STORY_NOUNS, STORY_NAMES, STORY_TEMPLATES, nounFor } from './stories.js';
 export { columnAdd, lineSteps } from './addition.js';
 export { longDivision } from './division.js';
 export { pvRoundingErrors, PV_PROVIDER_IDS } from './pv.js';
+export { GEO_PROVIDER_SKILLS } from './geometry.js';
 
 /** The 24 skills re-graded on 2026-09-25, each of which now has a real provider. */
 export const REGRADED_SKILLS = Object.freeze([

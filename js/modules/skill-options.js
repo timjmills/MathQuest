@@ -2197,8 +2197,31 @@ Object.assign(P12_OPTIONS, {
         _p12Kinds('units', 'Measured with', [['Paper clips', 'paper clips'], ['Cubes', '\\bcubes\\b'], ['Crayons', 'crayons']]),
         _p12Max([5], 8, { label: 'Lengths up to', help: 'The longest length, in units.' }),
     ],
-    'shapes_early:compose_shapes': [_p12Kinds('shapes', 'The shape made', [['A triangle', '=> Triangle$'],
-        ['A square or a rectangle', '=> (Square|Rectangle)$'], ['A hexagon', '=> Hexagon$']])],
+    // Build lane geometry (2026-09-25, the owner's Combine Shapes bug): the kit shape-grid cell. Every
+    // control is read by gen-geometry.js _composeShapes; `shapes` keeps its key and its first three
+    // values (a share code written before still decodes to the same kinds) and is read directly.
+    'shapes_early:compose_shapes': [
+        { id: 'compose', label: 'What the pupil does', type: 'enum', default: 'name', group: 'difficulty',
+            values: [{ v: 'name', l: 'Name the shape the pieces make' }, { v: 'pieces', l: 'Find the pieces that make a shape' }],
+            help: 'Naming the joined shape comes first. Then the shape is drawn and the pupil checks the set of pieces that fills it.' },
+        { id: 'shapes', label: 'The shape made', type: 'set', default: [0, 1, 2, 3, 4], group: 'difficulty',
+            values: [{ v: 0, l: 'A triangle' }, { v: 1, l: 'A square or a rectangle' }, { v: 2, l: 'A hexagon' },
+                { v: 3, l: 'A pentagon, trapezoid or rhombus' }, { v: 4, l: 'A circle or a half circle' }],
+            allLabel: 'All of them, mixed',
+            help: 'Tick one kind for a page of it alone. Squares, rectangles and triangles come first; halves of a circle are grade 1.' },
+        { id: 'tiles', label: 'Pieces in each shape', type: 'enum', default: 2, group: 'difficulty',
+            values: [{ v: 2, l: '2 pieces' }, { v: 3, l: '3 pieces' }],
+            help: 'Three pieces is the harder step (1.G.A.2: a shape made from a shape already made).' },
+        { id: 'count', label: 'Names to choose from', type: 'enum', default: 2, group: 'difficulty',
+            values: [{ v: 2, l: '2 names' }, { v: 3, l: '3 names' }],
+            help: 'Two names is the start (RP-123); three is harder. One wrong name is often the name of a piece.',
+            appliesTo: (o) => (o && o.compose) !== 'pieces' },
+        { id: 'response', label: 'How the pupil answers', type: 'enum', default: 'check', group: 'layout',
+            values: [{ v: 'check', l: 'Check the name' }, { v: 'write', l: 'Write the name (copied from a word bank)' }],
+            help: 'Writing the name from the bank is the next step. On screen the pupil taps the box, or types the name.',
+            appliesTo: (o) => (o && o.compose) !== 'pieces' },
+        levelSubset([3, 2, 1], 1, 'Level 3 checks or writes the answer in grey to trace; level 2 puts grey dots on the corners of the whole shape; level 1 is the pieces alone.'),
+    ],
     'shapes_early:compose_hexagon': [_p12Kinds('shapes', 'Blocks used', [['Triangles', '\\(triangles\\)'], ['Trapezoids', '\\(trapezoids\\)'], ['Rhombi', '\\(rhombi\\)']],
         'Two trapezoids is the easiest fill; six triangles the most blocks to place.')],
     'shapes_early:partition_shapes': [
@@ -2668,7 +2691,7 @@ const _o2Add = (key, ...defs) => {
     ['area_perimeter:volume_composite', _o2RangeBand([50, 100], { label: 'Volume to' })],
     // ---- shapes, angles, coordinates
     // The naming skills (name_2d / 3d_shapes, identify_angles / lines, classify_triangles,
-    // measure_angles, cross_section_3d, shape_positions, compose_shapes) are NOT given a pick-list ladder:
+    // measure_angles, cross_section_3d, shape_positions) are NOT given a pick-list ladder:
     // their printed item is written (the name on a line), so a shorter pick list would change the
     // screen and not the paper (OC3). Their shape / angle / position sets are their ladder.
     ['shapes_early:count_edges_faces_vertices', _o2Band([6, 10], { label: 'Counts up to', natural: 18,

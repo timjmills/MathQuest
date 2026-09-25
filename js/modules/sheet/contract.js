@@ -212,6 +212,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'frac-name': 'Write the fraction, or circle the model that shows it.',
     'models-complete': 'Look at the two models. Complete the number sentence.',
     'line-mark-each': 'Mark each number on the line.',
+    // Build lane geometry (2026-09-25): Combine Shapes on the kit shape-grid cell.
+    'compose-name': 'Check the name of the shape the pieces make.',
+    'compose-name-write': 'Write the name of the shape the pieces make.',
+    'compose-pieces': 'Check the pieces that make the shape.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',

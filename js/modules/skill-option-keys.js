@@ -155,6 +155,9 @@ export const MULTI_KEYS = Object.freeze({
     ticks: '2E',         // nl_mult, nl_div: labels every step / every number
     shape: '2F',         // count_by_tables, number_patterns_rule, number_seq_fill: box / circle / hexagon
     // NEXT FREE IN BLOCK 2: 2G.
+    // Sub-range 2G-2T — build lane geometry (design/BUILD_LIST.md, 2026-09-25).
+    compose: '2G',       // compose_shapes: name the shape the pieces make / find the pieces that make a shape
+    // NEXT FREE FOR BUILD LANE GEOMETRY: 2H (to 2T).
 
     // Block 3 — function tables (2026-09-25). Their other options reuse one-letter keys with value
     // tokens only (task, response, order: inorder, support); `ops` is its own key because the
@@ -314,6 +317,8 @@ export const VALUE_TOKENS = Object.freeze({
         // O6 appearance (lane AP3): "Numbers on the line" on + / − lines, drag-onto-the-line and read-the-line items
         some: 'M', ends: 'E' }),
     shape: Object.freeze({ box: 'B', circle: 'C', hex: 'H', mixed: 'M' }),
+    // build lane geometry (sub-range 2G-2T)
+    compose: Object.freeze({ name: 'N', pieces: 'P' }),
     // block 3 (2026-09-25)
     ops: Object.freeze({ '+': 'A', '-': 'S', x: 'M', '/': 'D' }),
     // block 7 (option-panel round 3)

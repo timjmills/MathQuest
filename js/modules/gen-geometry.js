@@ -4,6 +4,8 @@ import { randInt, shuffle, pick, buildNumericOptions, pickName } from './utils.j
 import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG, computeTriangleAngles } from './svg-geometry.js';
 import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
+import { k2Twin, fadeRung, COMPOSE_LETTERS } from './sheet/index.js';
+import { compositionsFor, dealComposition, decoyPieceSets, nameBank, corners, transformShape } from './geo-compose.js';
 
 // O6 appearance (lane AP2): the "Figure labels" choice for the skill being generated — 'all',
 // 'some' or 'none' — or `dflt` when this skill has no such control (a mixed pool, a skill without
@@ -16,6 +18,116 @@ function _figLabels(dflt = 'all') {
     const o = state.skillOptions;
     const v = o && typeof o === 'object' ? o.labels : undefined;
     return def.values.some(x => x.v === v) ? v : def.default;
+}
+
+/* ============================================================ build lane geometry: shared */
+
+/** A skill option's value for the skill being generated (its default when unset), or undefined. */
+function _geoOpt(id) {
+    let def = null;
+    try { def = optionsFor(state.category, state.skill).find(o => o.id === id) || null; } catch (e) { def = null; }
+    if (!def) return undefined;
+    const o = state.skillOptions;
+    const v = o && typeof o === 'object' && Object.prototype.hasOwnProperty.call(o, id) ? o[id] : undefined;
+    return v === undefined ? def.default : v;
+}
+// Page position: a printed page passes state.itemIndex; live play counts its own items.
+let _geoAt = 0;
+let _geoLiveCursor = -1;
+const _geoPerms = {};
+function _geoBegin() { _geoAt = Number.isFinite(state.itemIndex) ? state.itemIndex : ++_geoLiveCursor; }
+/** A page-long permutation of 0..n-1 (shuffled at the page's first item), read at the position. */
+function _geoDeal(key, n) {
+    if (n <= 1) return 0;
+    const k = `${key}:${n}`;
+    if (_geoAt === 0 || !_geoPerms[k]) _geoPerms[k] = shuffle(Array.from({ length: n }, (_, i) => i));
+    return _geoPerms[k][((_geoAt % n) + n) % n];
+}
+/** The Support level for this item: the ticked levels dealt most-support-first down a page. */
+function _geoLevel(fallback = 1) {
+    let t = _geoOpt('level');
+    if (typeof t === 'number') t = [t];
+    t = Array.isArray(t) ? t.map(Number).filter(Number.isFinite) : [];
+    if (!t.length) return fallback;
+    t = t.slice().sort((x, y) => y - x);
+    return t[fadeRung(_geoAt, t.length, state.itemCount, Number.isFinite(state.itemIndex))];
+}
+
+/* ============================================================ Combine Shapes (compose_shapes) */
+
+const _SAY_COUNT = ['', 'One', 'Two', 'Three', 'Four'];
+const _plural = (nm) => (nm === 'rhombus' ? 'rhombuses' : `${nm}s`);
+/** "two triangles", "a square and a triangle": the pieces as a pupil says them. */
+export function composePiecesPhrase(names) {
+    const counts = {};
+    names.forEach((n) => { counts[n] = (counts[n] || 0) + 1; });
+    const parts = Object.entries(counts).map(([n, c]) => (c === 1 ? `a ${n}` : `${_SAY_COUNT[c].toLowerCase()} ${_plural(n)}`));
+    return parts.length === 1 ? parts[0] : `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
+}
+
+/**
+ * Combine Shapes. Two tasks (option `compose`, 2G): `name` - the pieces drawn joined; check (or
+ * write, from a bank) the name of the shape they make; `pieces` - the shape drawn; check the set of pieces that
+ * makes it. Every composition comes from geo-compose.js, whose pieces tile the target exactly.
+ */
+function _composeShapes(q) {
+    _geoBegin();
+    const task = _geoOpt('compose') === 'pieces' ? 'pieces' : 'name';
+    const n = Number(_geoOpt('tiles')) === 3 ? 3 : 2;
+    const groups = _geoOpt('shapes');
+    let list = compositionsFor({ groups, n });
+    if (!list.length) list = compositionsFor({ n });
+    // One composition per item, in a page-long order, so six items show six different builds
+    // where the ticked kinds allow it.
+    const pickDealt = (arr) => (arr === list ? arr[_geoDeal(`compose:${n}:${list.length}`, list.length)] : pick(arr));
+    const deal = dealComposition(list, { pick: pickDealt, int: randInt });
+    const lvl = _geoLevel(1);
+    const answer = deal.target.name;
+    const pieceNames = deal.parts.map(s => s.name);
+    const say = `${composePiecesPhrase(pieceNames).replace(/^./, c => c.toUpperCase())} make ${/^[aeiou]/.test(answer) ? 'an' : 'a'} ${answer}.`;
+    let payload;
+    if (task === 'pieces') {
+        const decoys = decoyPieceSets(deal, n, { shuffle }).map(parts => parts.map(s => transformShape(s, deal.rot, deal.flip)));
+        const sets = shuffle([{ parts: deal.parts, right: true }, ...decoys.map(parts => ({ parts, right: false }))]);
+        const correct = sets.findIndex(s => s.right);
+        payload = {
+            kind: 'compose', task: 'pieces', comp: deal.id, target: deal.target, parts: deal.parts,
+            choices: sets.map(s => ({ parts: s.parts })), correct, answer, traced: lvl >= 3,
+        };
+        const letter = COMPOSE_LETTERS[correct];
+        q.text = 'Which pieces make this shape?';
+        q.ans = letter;
+        q.answerType = 'text';
+        q.selfAnswering = true;
+        q.printAnswer = letter;
+        q.options = [];
+        q.hint = 'Look at each set of pieces. Slide them together in your head. Do they fill the shape with no gaps?';
+    } else {
+        const response = _geoOpt('response') === 'write' ? 'write' : 'check';
+        const count = Number(_geoOpt('count')) === 3 ? 3 : 2;
+        const names = nameBank(answer, pieceNames, { shuffle }).slice(0, count);
+        if (!names.includes(answer)) names[names.length - 1] = answer;
+        const bank = shuffle(names);
+        payload = {
+            kind: 'compose', task: 'name', comp: deal.id, parts: deal.parts, target: deal.target,
+            corners: corners(deal.target), names: bank, answer, response, dots: lvl >= 2, traced: lvl >= 3,
+        };
+        q.text = 'What shape do the pieces make?';
+        q.ans = answer;
+        // Both answer in the cell: a check box by the name (wireTickBoxes on every screen host) or
+        // the name written in the box (the host's input takes the box's place).
+        q.answerType = 'text';
+        q.options = [];
+        if (response === 'check') { q.selfAnswering = true; q.printAnswer = answer; }
+        q.hint = 'Look at the outside of the whole shape. Count its corners and its sides. Do not count the pieces.';
+    }
+    q.cell = { template: 'shape-grid', v: 1, payload };
+    q.visual = k2Twin('shape-grid', payload);
+    q.say = say;
+    q.skillLabel = 'Combine Shapes';
+    // the task rides on the print format, which the page's header meta carries to the provider's
+    // strings (the instruction line: check / write the name, or check the pieces)
+    q.printFormat = task === 'pieces' ? 'shape-grid-pieces' : payload.response === 'write' ? 'shape-grid-write' : 'shape-grid';
 }
 
 // IXL-aligned shape style: cycle through the 6-color categorical palette.
@@ -1091,73 +1203,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 return;
             }
 
-            // ===== COMPOSE SHAPES (Grade K-1) =====
+            // ===== COMPOSE SHAPES (Grade K-1, K.G.B.6 / 1.G.A.2) =====
+            // Owner bug 2026-09-25: the old item drew the answer (a "Result" panel) and its pieces did
+            // not make that result. Now the pieces are dealt from geo-compose.js, where every
+            // composition is written as coordinates that tile its target exactly, and the kit cell
+            // (sheet/cells/shape-grid.js) draws the pieces joined, never the shape they make.
             if (mappedSkill === "compose_shapes") {
-                // Use IXL palette: piece A = blue (idx 0), piece B = orange (idx 2),
-                // composed result = green (idx 1) with dashed seam in axis dark.
-                const _pa = shapeStyle(0); // piece A
-                const _pb = shapeStyle(2); // piece B
-                const _pr = shapeStyle(1); // result
-                const compositions = [
-                    { result: "Rectangle", parts: ["Two squares"], partSvg: `
-                        <rect x="10" y="50" width="60" height="60" fill="${_pa.fill}" stroke="${_pa.stroke}" stroke-width="${STROKE.normal}"/>
-                        <rect x="90" y="50" width="60" height="60" fill="${_pb.fill}" stroke="${_pb.stroke}" stroke-width="${STROKE.normal}"/>`,
-                        resultSvg: `<rect x="10" y="50" width="120" height="60" fill="${_pr.fill}" stroke="${_pr.stroke}" stroke-width="${STROKE.normal}"/>
-                        <line x1="70" y1="50" x2="70" y2="110" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}" stroke-dasharray="6,4"/>` },
-                    { result: "Square", parts: ["Two triangles"], partSvg: `
-                        <polygon points="10,110 70,50 70,110" fill="${_pa.fill}" stroke="${_pa.stroke}" stroke-width="${STROKE.normal}"/>
-                        <polygon points="90,50 150,50 150,110" fill="${_pb.fill}" stroke="${_pb.stroke}" stroke-width="${STROKE.normal}"/>`,
-                        resultSvg: `<rect x="10" y="50" width="60" height="60" fill="${_pr.fill}" stroke="${_pr.stroke}" stroke-width="${STROKE.normal}"/>
-                        <line x1="10" y1="110" x2="70" y2="50" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}" stroke-dasharray="6,4"/>` },
-                    { result: "Triangle", parts: ["Two smaller triangles"], partSvg: `
-                        <polygon points="10,110 50,50 50,110" fill="${_pa.fill}" stroke="${_pa.stroke}" stroke-width="${STROKE.normal}"/>
-                        <polygon points="100,110 100,50 140,110" fill="${_pb.fill}" stroke="${_pb.stroke}" stroke-width="${STROKE.normal}"/>`,
-                        resultSvg: `<polygon points="10,110 70,30 130,110" fill="${_pr.fill}" stroke="${_pr.stroke}" stroke-width="${STROKE.normal}"/>
-                        <line x1="70" y1="30" x2="70" y2="110" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}" stroke-dasharray="6,4"/>` },
-                    { result: "Hexagon", parts: ["Two trapezoids"], partSvg: `
-                        <polygon points="20,80 40,50 80,50 100,80" fill="${_pa.fill}" stroke="${_pa.stroke}" stroke-width="${STROKE.normal}"/>
-                        <polygon points="110,80 130,110 90,110 70,80" fill="${_pb.fill}" stroke="${_pb.stroke}" stroke-width="${STROKE.normal}"/>`,
-                        resultSvg: (() => {
-                            const pts = [];
-                            for (let i = 0; i < 6; i++) {
-                                const a = Math.PI / 3 * i - Math.PI / 2;
-                                pts.push(`${70 + 40 * Math.cos(a)},${80 + 40 * Math.sin(a)}`);
-                            }
-                            return `<polygon points="${pts.join(' ')}" fill="${_pr.fill}" stroke="${_pr.stroke}" stroke-width="${STROKE.normal}"/>`;
-                        })() }
-                ];
-
-                const comp = pick(compositions);
-                const wrongResults = ["Rectangle", "Square", "Triangle", "Hexagon", "Circle", "Pentagon"].filter(s => s !== comp.result);
-                const opts = shuffle([comp.result, ...wrongResults.slice(0, 3)]);
-
-                q.text = `What shape do you make when you put these two shapes together?`;
-                q.ans = comp.result;
-                q.answerType = "multiple-choice";
-                q.options = opts;
-                q.hint = `Look at the pieces and imagine sliding them together. ${comp.parts[0]} can make a ${comp.result}.`;
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">Compose Shapes</div>
-                    <div style="display:flex;justify-content:center;align-items:center;gap:15px;flex-wrap:wrap;">
-                        <div>
-                            <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:5px;font-weight:600;">Pieces</div>
-                            <svg width="160" height="130" viewBox="0 0 160 130" style="max-width:100%;background:var(--bg-card);border-radius:8px;padding:5px;">
-                                ${comp.partSvg}
-                            </svg>
-                        </div>
-                        <div style="font-size:2rem;color:var(--accent-cyan);font-weight:900;">=</div>
-                        <div>
-                            <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:5px;font-weight:600;">Result</div>
-                            <svg width="140" height="130" viewBox="0 0 140 130" style="max-width:100%;background:var(--bg-card);border-radius:8px;padding:5px;">
-                                ${comp.resultSvg}
-                            </svg>
-                            <div style="font-size:1rem;font-weight:700;margin-top:5px;color:var(--accent-green);">?</div>
-                        </div>
-                    </div>
-                </div>`;
-                q.skillLabel = 'Compose';
-                q.printFormat = 'geometry-compose';
+                _composeShapes(q);
                 return;
             }
 
