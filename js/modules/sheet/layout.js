@@ -106,6 +106,21 @@ export const PRACTICE_TARGET = Object.freeze({
     word: Object.freeze({ cols: 1, rows: Object.freeze({ S: 4, M: 3, L: 3 }) }),
 });
 
+/**
+ * Dense packing (`section.dense`): the most columns tried, the room a cell keeps over its
+ * tallest measured content (1.2 x: the measurement already holds the pads and the open answer
+ * zone, so a fifth again of breathing room is what CL-5 needs), and the per-class ceilings from 12.3's capacity tables - one-symbol
+ * answers and facts up to 16 (12.1's one-symbol ceiling; 20 at S and M on a Test), stacked work
+ * up to 12 (3 x 4), long procedures up to 6.
+ */
+export const DENSE_MAX_COLS = 4;
+export const DENSE_ROOM = 1.2;
+export const DENSE_CEILING = Object.freeze({
+    short: Object.freeze({ S: 16, M: 16, L: 16 }),
+    standard: Object.freeze({ S: 12, M: 12, L: 12 }),
+    long: Object.freeze({ S: 6, M: 6, L: 4 }),
+});
+
 /** PT-IND-1: target rows when the teacher sets the column count explicitly. */
 export const EXPLICIT_TARGET_ROWS = Object.freeze({ 1: 4, 2: 3, 3: 3, 4: 4, 5: 5, 6: 6 });
 
@@ -475,6 +490,32 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     if (hMin > G - SAFETY_H_MM) {
         clamped = true;
         notes.push('A problem is taller than the page at this size.');
+    }
+
+    // DENSE PACKING (2026-09-25 re-grade, C3: "cells ~70% empty"). With `section.dense`, a
+    // section whose cells are much shorter or narrower than the default grid gives them is packed
+    // tighter: more columns while every item still fits (measured, DN-10), and as many rows as
+    // keep each cell at least DENSE_ROOM x its tallest content, up to the section's dense ceiling
+    // (12.3's capacity tables; never above DN-1's 20 scored responses at L). The teacher's
+    // explicit column count is never overridden (DN-12), and it only ever ADDS items.
+    if (section.dense && !clamped && cls !== 'word' && cls !== 'wide' && hMin > 0) {
+        const dCeil = bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling;
+        const colOpts = requested === 'auto'
+            ? Array.from({ length: Math.max(0, Math.min(DENSE_MAX_COLS, hardCap) - cols + 1) }, (_, k) => cols + k)
+            : [cols];
+        let best = { perPage: rows * cols, cols, rows };
+        for (const c of colOpts) {
+            const pc = probe(c, c > cols);
+            if (!pc.fits) continue;
+            let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (pc.hMin * DENSE_ROOM)), Math.floor(dCeil / c)));
+            if (c === 2) rr = TWO_COL_ROWS.find((x) => x <= rr) || rr;
+            if (rr * c > best.perPage) best = { perPage: rr * c, cols: c, rows: rr, hMin: pc.hMin };
+        }
+        if (best.perPage > rows * cols) {
+            cols = best.cols;
+            rows = best.rows;
+            notes.push(`Dense: ${cols} x ${rows}, cells sized to the problems.`);
+        }
     }
 
     // Stacked, visual and word-problem cells fill the grid (PG-11: no stretch cap on these roles).

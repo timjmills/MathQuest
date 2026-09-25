@@ -25,7 +25,7 @@
 import { generateQuestionFor } from './generate-question.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords } from './sheet/roles/practice.js';
@@ -72,6 +72,9 @@ function normaliseRequest(req = {}) {
             pages: s && s.pages ? clampInt(s.pages, 1, 10, 1) : null,
             columns: s && s.columns && s.columns !== 'auto' ? clampInt(s.columns, 1, 10, 'auto') : 'auto',
             instructionKey: s && s.instructionKey,
+            // Cells sized to their content (layout.js dense packing); `dense: false` keeps the
+            // plain 12.1 grid.
+            dense: req.dense !== false && !(s && s.dense === false),
         }))
         .filter((s) => s.skills.length);
     return {
@@ -151,8 +154,15 @@ const FACT_FORMAT_RE = /-facts-(vertical|horizontal|fraction|long)$/;
  * counting takes "Count. Write the number.", a ten frame to fill takes "Draw counters to show
  * the number.". Every key is from the controlled library; nothing is composed here.
  */
+/** The library key of a K-2 skill whose provider has not named one yet (never "Solve."). */
+const SKILL_INSTRUCTION_FALLBACK = Object.freeze({
+    count_objects: 'count-write', ten_frame_build: 'draw-count', base10_build: 'draw-blocks',
+    compare_groups: 'check-groups', share_into_groups: 'ring-groups', number_bonds: 'missing',
+});
+
 function instructionKeyFor(q, words) {
     if (words && words.instructionKey && !/^default-/.test(words.instructionKey)) return words.instructionKey;
+    if (SKILL_INSTRUCTION_FALLBACK[q.skillId]) return SKILL_INSTRUCTION_FALLBACK[q.skillId];
     const f = String(q.printFormat || '');
     const cat = String(q.categoryId || '');
     if (/^column-add|add-facts/.test(f)) return 'add';
@@ -188,10 +198,16 @@ function balanceDivs(html) {
 const LEGACY_TAB_RE = /<span class="ws-tab" data-ws-label="tab" style="position:absolute;[^"]*">[^<]*<\/span>/g;
 const legacyClean = (html) => balanceDivs(String(html).replace(LEGACY_TAB_RE, ''));
 
+/** Registered K-2 templates that pack as one-symbol answers (a ten frame, a number track, a chart window). */
+const SHORT_TEMPLATES = new Set(['tenframe', 'seqstrip', 'chartwindow']);
+
 /** PT 2.4 footprint classes: long procedures, one-symbol answers, word problems. */
 function footprintClass(q, template, size) {
     const f = String(q.printFormat || '');
     if (size === 'spacious' || /word/.test(f)) return 'word';
+    // The K-2 picture templates hold one small picture and one short answer: they pack like
+    // one-symbol answers (2 x 4 and up), not like 6-per-page stacks.
+    if (SHORT_TEMPLATES.has(template) || q.answerType === 'ten-frame-build') return 'short';
     const operands = (q.cell && q.cell.payload && q.cell.payload.operands) || [q.a, q.b];
     if (/long-div|long_div/.test(f) || template === 'division') return 'long';
     if (/^column-mult/.test(f) && Number(operands[1]) >= 10) return 'long';
@@ -213,6 +229,7 @@ const SOLID_STYLE = 'font-weight:700;color:#000;';
  * mat AFTER the trade its prompt asks for (one ten fewer, ten ones more).
  */
 function drawModelFor(q) {
+    if (!q) return null;
     const target = Math.floor(Number(q && (q.target !== undefined ? q.target : q.ans)));
     if (!Number.isFinite(target) || target < 0) return null;
     const places = Array.isArray(q.places) && q.places.length ? q.places : (target >= 100 ? [100, 10, 1] : [10, 1]);
@@ -226,10 +243,10 @@ function drawModelFor(q) {
 /** P8: `n` quick-draw symbols for one place (RP-31): a square, a stick or a circle. */
 function quickDraw(place, n) {
     const sym = place === 100
-        ? '<svg width="8mm" height="8mm" viewBox="0 0 10 10" style="display:block"><rect x="1" y="1" width="8" height="8" fill="none" stroke="#000" stroke-width="1"/></svg>'
+        ? '<svg width="8mm" height="8mm" viewBox="0 0 10 10" style="display:block"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1"/></svg>'
         : place === 10
-            ? '<svg width="2.4mm" height="14mm" viewBox="0 0 4 24" style="display:block"><line x1="2" y1="1" x2="2" y2="23" stroke="#000" stroke-width="1.6" stroke-linecap="round"/></svg>'
-            : '<svg width="4mm" height="4mm" viewBox="0 0 6 6" style="display:block"><circle cx="3" cy="3" r="2.2" fill="none" stroke="#000" stroke-width="0.9"/></svg>';
+            ? '<svg width="2.4mm" height="14mm" viewBox="0 0 4 24" style="display:block"><line x1="2" y1="1" x2="2" y2="23" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
+            : '<svg width="4mm" height="4mm" viewBox="0 0 6 6" style="display:block"><circle cx="3" cy="3" r="2.2" fill="none" stroke="currentColor" stroke-width="0.9"/></svg>';
     return Array.from({ length: Math.max(0, n) }, () => sym).join('');
 }
 
@@ -267,7 +284,7 @@ export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
         if (parts.length === boxSlots.length) {
             let k = 0;
             return html.replace(/(<span class="blank-box" data-ws-slot="[^"]*" data-ws-shape="box"[^>]*>)(<\/span>)/g,
-                (m, open, close) => `${open.replace(/>$/, ' data-ws-ink="solid">')}<b style="${INK_STYLE}">${escText(parts[k++])}</b>${close}`);
+                (m, open, close) => `${open.replace(/>$/, ` data-ws-ink="${inkAttr}">`)}<b style="${INK_STYLE}">${escText(parts[k++])}</b>${close}`);
         }
     }
 
@@ -281,7 +298,7 @@ export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
             let k = 0;
             const skip = boxes.length - digits.length;
             const filled = row
-                .replace(/^<div data-ws-slot="answer" data-ws-shape="boxes"/, '<div data-ws-slot="answer" data-ws-shape="boxes" data-ws-ink="solid"')
+                .replace(/^<div data-ws-slot="answer" data-ws-shape="boxes"/, `<div data-ws-slot="answer" data-ws-shape="boxes" data-ws-ink="${inkAttr}"`)
                 .replace(/<span data-ws-box="1"([^>]*)><\/span>/g, (m, attrs) => {
                     const d = k >= skip ? digits[k - skip] : '';
                     k++;
@@ -298,7 +315,7 @@ export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
         const model = drawModelFor(q);
         if (model) {
             let out = html.replace('class="ws-draw-mat" data-ws-slot="answer" data-ws-shape="draw"',
-                'class="ws-draw-mat" data-ws-slot="answer" data-ws-shape="draw" data-ws-ink="solid"');
+                `class="ws-draw-mat" data-ws-slot="answer" data-ws-shape="draw" data-ws-ink="${inkAttr}"`);
             for (const place of Object.keys(model)) {
                 const zoneRe = new RegExp(`(<div data-ws-zone="${place}" style="[^"]*")(><\\/div>)`);
                 out = out.replace(zoneRe, (m, open, close) => `${open.replace(/"$/, ';display:flex;flex-wrap:wrap;align-content:flex-start;justify-content:center;gap:1.2mm;padding:2mm;box-sizing:border-box;"')}>${quickDraw(Number(place), model[place])}</div>`);
@@ -312,14 +329,14 @@ export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
     const frames = html.match(/<svg class="ws-tenframe"[^>]*>[\s\S]*?<\/svg>/g) || [];
     if (frames.length && /^\d+$/.test(digits) && /data-ws-shape="draw"/.test(html)) {
         let left = Math.min(Number(digits), frames.length * 10);
-        let out = html.replace(/(data-ws-slot="answer" data-ws-shape="draw")/, '$1 data-ws-ink="solid"');
+        let out = html.replace(/(data-ws-slot="answer" data-ws-shape="draw")/, `$1 data-ws-ink="${inkAttr}"`);
         for (const fr of frames) {
             const n = Math.min(10, left);
             left -= n;
             let dots = '';
             for (let i = 0; i < n; i++) {
                 const cx = 5 + (i % 5) * 10, cy = 5 + Math.floor(i / 5) * 10;
-                dots += `<circle cx="${cx}" cy="${cy}" r="3.4" fill="#000"/>`;
+                dots += `<circle cx="${cx}" cy="${cy}" r="3.4" fill="currentColor"/>`;
             }
             out = out.replace(fr, fr.replace(/<\/svg>$/, `${dots}</svg>`));
         }
@@ -356,6 +373,13 @@ export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
         if (digits.length > tracks) return null;
         const cells = digits.padStart(tracks, ' ').split('').map((d) => `<span data-ws-ink="${inkAttr}" style="height:${h};line-height:${h};display:flex;align-items:center;justify-content:center;${INK_STYLE}">${d.trim()}</span>`).join('');
         return html.replace(factRows[0], cells);
+    }
+
+    // 2b. A horizontal equation's own write slot ("36 ÷ 4 = ____"): one empty `.ws-slot` line or
+    // box, the value written on it.
+    const eqSlots = html.match(/<span class="ws-slot" data-ws-shape="(?:line|box)"[^>]*><\/span>/g) || [];
+    if (eqSlots.length === 1 && display && /style="[^"]*"><\/span>$/.test(eqSlots[0])) {
+        return html.replace(eqSlots[0], eqSlots[0].replace(/"><\/span>$/, `;display:inline-flex;align-items:flex-end;justify-content:center;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;">${escText(display)}</b></span>`));
     }
 
     // 3. One "Answer:" line: a label, then a ruled blank that stretches (28+ print branches).
@@ -405,7 +429,10 @@ function hostItem(g, sectionIndex, size) {
     // the legacy template picks its size class from it, the fact ladder its digit size.
     const key = cellAnswerKey(q);
     const scalar = (v) => (v === undefined || v === null || typeof v === 'object' ? '' : String(v));
-    const answer = scalar(q0.ans) || scalar(key && key.value);
+    // A several-part answer (a cloze's parts) is written one part per box, comma separated - the
+    // same form as the roles' answerOf (compose.js).
+    const parts = (v) => (Array.isArray(v) && v.length && v.every((x) => x !== null && typeof x !== 'object') ? v.map(String).join(', ') : '');
+    const answer = scalar(q0.ans) || parts(q0.ans) || scalar(key && key.value);
     /**
      * The draw function. `cols` is the section's final column count; `shown` is a value written
      * INTO the cell's own answer slot in both states (the finished work of Error analysis, a
@@ -415,20 +442,30 @@ function hostItem(g, sectionIndex, size) {
      * slot can hold it, the value prints on an answer line under the cell - in both states, so
      * the geometry is still identical (AK-1).
      */
-    const render = (c, { cols = 2, shown, ink } = {}) => {
+    const render = (c, { cols = 2, shown, ink, prompt, shownSlots } = {}) => {
+        const html0 = draw(c, { cols, shown, ink, shownSlots });
+        // The cell's own instruction line goes when the page's instruction line already says it
+        // (BD-10: one instruction per section), or when the role asks (`prompt: false`: Error
+        // analysis and the thinking roles print their own instruction over finished work).
+        return (prompt === false || item.stripPrompt) && cellPrompt ? stripPrompt(html0) : html0;
+    };
+    const draw = (c, { cols = 2, shown, ink, shownSlots } = {}) => {
         const hasShown = shown !== undefined && shown !== null && shown !== '';
         let st = c.state;
         let wrong = c.wrong;
         if (hasShown) {
             const v = String(shown);
             if (ink === 'trace' && v === answer) st = 'traced';
-            else { st = 'wrong'; wrong = { value: v, slots: {} }; }
+            else { st = 'wrong'; wrong = { value: v, slots: Object.assign({}, shownSlots || {}) }; }
         }
         const ctx = Object.assign({}, c, { state: legacy && hasShown ? 'blank' : st, wrong, columns: cols, options: Object.assign({}, c.options || {}, { factColumns: cols }) });
         const html = legacy ? legacyClean(renderCell(q, ctx)) : renderCell(q, ctx);
         if (legacy && hasShown) {
             const v = String(shown);
-            const filled = legacyKeyFill(html.replace(STAMP_RE, ''), v === answer ? q0 : null, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid' });
+            // A wrong value is written as a pupil would have written it: a place-value mat draws
+            // the WRONG model, boxed slots take the wrong value, never the right parts.
+            const asQ = v === answer ? q0 : Object.assign({}, q0, { ans: v, target: v, keyParts: undefined, printAnswer: undefined });
+            const filled = legacyKeyFill(html.replace(STAMP_RE, ''), asQ, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid' });
             if (filled !== null) return filled;
             return html + shownLine(v, ink);
         }
@@ -461,8 +498,22 @@ function hostItem(g, sectionIndex, size) {
         const long = footprintClass(q, template, printSize) === 'long';
         fp = Object.assign({}, fp, { measure: true, hMm: null, maxCols: printSize === 'spacious' ? 1 : long ? 2 : 6, size: printSize });
     }
-    return {
+    // The cell's own leading instruction line (legacy markup prints the question's stem first:
+    // "Write the missing number.", "Add.", "Count. Write how many."). Only an item-independent
+    // imperative is a candidate - no digits, no question - so "Draw 9 counters ..." stays.
+    let cellPrompt = null;
+    if (legacy) {
+        try {
+            const blankHtml = legacyClean(renderCell(q, resolveCtx({ mode: 'print', size, look: 'ican', state: 'blank' })));
+            const m = PROMPT_RE.exec(blankHtml);
+            if (m && isGenericPrompt(m[2])) cellPrompt = m[2].trim();
+        } catch (e) { cellPrompt = null; }
+    }
+    const item = {
         q, render, template, legacy,
+        cellPrompt,
+        promptKey: cellPrompt ? libraryKeyOf(cellPrompt) : '',
+        stripPrompt: false,
         section: sectionIndex,
         skill: `${q.categoryId || ''}:${q.skillId || ''}`,
         answerType: q.answerType || '',
@@ -473,6 +524,52 @@ function hostItem(g, sectionIndex, size) {
         key,
         canShow,
     };
+    return item;
+}
+
+/* ------------------------------------------------------ the cell's own instruction line */
+
+/** The first stem line of a legacy cell: a plain `<div>` straight after `.problem-content`. */
+const PROMPT_RE = /(<div class="problem-content"[^>]*>\s*)<div (?:class="p-prompt"[^>]*|style="font-size:1rem;margin-bottom:8px;")>([^<]*)<\/div>/;
+const stripPrompt = (html) => html.replace(PROMPT_RE, '$1');
+const normText = (t) => String(t || '').replace(/_/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+
+/** An instruction that is the same for every item: an imperative, no digits, not a question. */
+function isGenericPrompt(text) {
+    const t = String(text || '').trim();
+    if (!t || /\d|\?/.test(t) || t.split(/\s+/).length > 12) return false;
+    return /^(Add|Subtract|Multiply|Divide|Write|Count|Circle|Draw|Check|Fill in|Find|Solve|Use|Read|Look|Trace|Shade|Mark|Match|Measure|Complete|Finish|Show|Make|Say)\b/.test(t);
+}
+
+/**
+ * The library key whose string the stem says (P-14: page code never composes an instruction; it
+ * can only ask for a key). A few legacy stems say a library instruction in other words.
+ */
+const PROMPT_SYNONYMS = Object.freeze({
+    'count. write how many.': 'count-write',
+    'count. write the number.': 'count-write',
+    'complete the fact family.': '',
+});
+function libraryKeyOf(text) {
+    const n = normText(text);
+    if (Object.prototype.hasOwnProperty.call(PROMPT_SYNONYMS, n)) return PROMPT_SYNONYMS[n];
+    for (const [k, v] of Object.entries(INSTRUCTION_LIBRARY)) if (!/\{/.test(v) && normText(v) === n) return k;
+    return '';
+}
+
+/**
+ * BD-10 for the items of one section: when the cell's stem IS a library instruction, the
+ * section's instruction line prints it (the item's `instructionKey`) and the cell drops it; when
+ * the section already prints the skill's own (non-default) instruction, the stem repeats it and
+ * is dropped too. A stem the page line does not cover stays in the cell.
+ */
+function settlePrompts(items, sectionKey) {
+    for (const it of items) {
+        if (!it.cellPrompt) continue;
+        if (it.promptKey) { it.instructionKey = it.promptKey; it.stripPrompt = true; }
+        else if (sectionKey && !/^default-/.test(sectionKey)) it.stripPrompt = true;
+    }
+    return items;
 }
 
 /**
@@ -505,6 +602,12 @@ function ensureEngineStyle(doc) {
  *         or is a picture drawn narrower than it is at one column (DN-10: content never shrinks
  *         with columns)
  */
+/** Why a column count did not fit, kept on the item (the dialog note and the tests read it). */
+function why(it, c, reason) {
+    it.measureWhy = it.measureWhy || {};
+    if (!it.measureWhy[c]) it.measureWhy[c] = String(reason).slice(0, 80);
+}
+
 function measureItems(items, { size, look, colsList }) {
     if (typeof document === 'undefined' || !document.body || !items.length) return;
     ensureEngineStyle(document);
@@ -517,6 +620,7 @@ function measureItems(items, { size, look, colsList }) {
     const root = host.firstChild;
     const cols = [...new Set([1, ...colsList])].sort((a, b) => a - b);
     const baseW = new Map();          // item -> Map(svg index -> width at 1 column)
+    const baseLeaves = new Map();     // item -> widths of its grid / table leaves at 1 column
     try {
         for (const c of cols) {
             const { inner } = cellWidthMm(c, LIVE_W_MM, look);
@@ -538,6 +642,7 @@ function measureItems(items, { size, look, colsList }) {
                     let contentBottom = r.top;
                     let stampH = 0;
                     const pics = [];
+                    const leaves = [];
                     for (const el of cell.querySelectorAll('*')) {
                         const er = el.getBoundingClientRect();
                         if (!er.width && !er.height) continue;
@@ -548,16 +653,35 @@ function measureItems(items, { size, look, colsList }) {
                         }
                         if (el.closest('.ws-legacy-answer')) continue;
                         contentBottom = Math.max(contentBottom, er.bottom);
-                        if (er.right > r.right - padR + 1 || er.left < r.left + padL - 1) fits = false;
-                        if ((ecs.overflowX === 'hidden' || ecs.overflowX === 'clip') && el.scrollWidth > el.clientWidth + 1) fits = false;
-                        if ((ecs.overflowY === 'hidden' || ecs.overflowY === 'clip') && el.scrollHeight > el.clientHeight + 1) fits = false;
+                        if (er.right > r.right - padR + 1 || er.left < r.left + padL - 1) { fits = false; why(it, c, `x ${el.tagName}.${el.className} +${((er.right - (r.right - padR)) / PX_PER_MM).toFixed(1)}mm w${(er.width / PX_PER_MM).toFixed(1)} of ${((r.width - padL - padR) / PX_PER_MM).toFixed(1)}`); }
+                        // A clip under 1 mm is a stroke or a line box, not hidden content.
+                        if ((ecs.overflowX === 'hidden' || ecs.overflowX === 'clip') && el.scrollWidth > el.clientWidth + PX_PER_MM) { fits = false; why(it, c, `ox ${el.tagName}.${el.className}`); }
+                        if ((ecs.overflowY === 'hidden' || ecs.overflowY === 'clip') && el.scrollHeight > el.clientHeight + PX_PER_MM) { fits = false; why(it, c, `oy ${el.tagName}.${el.className}`); }
                         if (el.tagName === 'svg' || el.tagName === 'IMG' || el.tagName === 'CANVAS') pics.push(er.width);
+                        // A chart or table squeezed into a narrow column: its numbers touch the
+                        // cell walls and run together ("100110"). A leaf of a grid or table is
+                        // cramped when it is narrower than it is at one column AND its text now
+                        // fills it (a box drawn exactly two digits wide at every width is not).
+                        if (state === 'blank' && !el.children.length && el.textContent.trim().length >= 2) {
+                            const pd = el.parentElement ? getComputedStyle(el.parentElement).display : '';
+                            if (/grid|table/.test(pd) || /table-cell/.test(ecs.display)) {
+                                const k = leaves.length;
+                                leaves.push(er.width);
+                                const w1 = (baseLeaves.get(it) || [])[k];
+                                if (c !== cols[0] && w1 && er.width < w1 * 0.9) {
+                                    const rg = document.createRange();
+                                    rg.selectNodeContents(el);
+                                    const tw = rg.getBoundingClientRect().width;
+                                    if (tw > er.width - 0.8 * PX_PER_MM) { fits = false; why(it, c, `cramp ${el.tagName} ${el.textContent.trim()}`); }
+                                }
+                            }
+                        }
                     }
                     // The key's answer stamp sits at the foot of the cell and costs no layout
                     // (AK-1); its line is reserved under the content so it never covers it.
                     if (stampH) hPx = Math.max(hPx, contentBottom - r.top + 1 * PX_PER_MM + stampH + 1.5 * PX_PER_MM);
                     if (state === 'blank') {
-                        if (c === cols[0]) baseW.set(it, pics);
+                        if (c === cols[0]) { baseW.set(it, pics); baseLeaves.set(it, leaves); }
                         else {
                             // DN-10: a picture never shrinks to fit a narrower column. A registered
                             // visual is held to that exactly; a legacy picture declares no minimum
@@ -565,13 +689,26 @@ function measureItems(items, { size, look, colsList }) {
                             // scale-down of up to 10% is read as the same picture.
                             const tol = it.legacy ? 0.9 : 0.98;
                             const b = baseW.get(it) || [];
-                            if (pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) fits = false;
+                            if (pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) { fits = false; why(it, c, 'shrunk picture'); }
                         }
                     }
                     best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits };
                 }
                 it.measured = it.measured || {};
                 it.measured[c] = { hMm: Math.ceil(best.hMm * 10) / 10, fits: best.fits };
+            }
+        }
+        // A MINIMUM COLUMN WIDTH for legacy markup that reflows instead of overflowing (an area
+        // model whose part boxes wrap into a pile, a chart window whose rows break): when a
+        // narrower column makes the cell much taller than it is at one column, the content has
+        // collapsed, and that column count does not fit (DN-10: content never shrinks or
+        // re-arranges to fit). A wrapped line of text costs a few mm and is not a collapse.
+        for (const it of items) {
+            const m = it.measured || {};
+            const base = m[cols[0]] && m[cols[0]].hMm;
+            if (!base) continue;
+            for (const c of cols.slice(1)) {
+                if (m[c] && m[c].hMm > base * 1.3 && m[c].hMm - base > 12) { m[c].fits = false; why(it, c, 'reflow'); }
             }
         }
     } finally {
@@ -600,7 +737,9 @@ async function fontsReady() {
 
 /** The column counts a section's layout may choose, so each gets measured. */
 function candidateCols(columns) {
-    if (columns === 'auto') return [1, 2];
+    // Dense packing (layout.js) may take an Auto section up to DENSE_MAX_COLS columns, so every
+    // count it may choose is measured (an unmeasured legacy count would be read as fitting).
+    if (columns === 'auto') return [1, 2, 3, 4];
     return Array.from({ length: Math.max(1, columns) }, (_, i) => i + 1);
 }
 
@@ -630,7 +769,7 @@ function skillMeta(sk, q) {
 
 /** One-section layout for a set of host items, exactly as the role will compute it. */
 function layoutOf(role, section, items, n, ctx) {
-    return resolveSectionLayout({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH }, items, ctx.paper, LIVE_W_MM, {
+    return resolveSectionLayout({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense }, items, ctx.paper, LIVE_W_MM, {
         size: n.size, look: n.look, header: ctx.header,
     });
 }
@@ -718,7 +857,7 @@ export async function buildSheet(req = {}) {
 
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
         const gen = generateRun(sec.skills, count, baseSeed, extra);
-        return gen.map((g) => hostItem(g, sectionIdx, n.size));
+        return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size)], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
     };
 
     const notes = [];
@@ -784,7 +923,7 @@ export async function buildSheet(req = {}) {
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
-                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH },
+                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense },
                     probesOf(si), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
                 out[si] = L.perPage;
             });
@@ -869,7 +1008,7 @@ export async function buildSheet(req = {}) {
     const input = {
         items: hostItems,
         skills,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
@@ -899,7 +1038,7 @@ export async function buildSheet(req = {}) {
         fits,
         items: hostItems.map((it) => ({
             skill: it.skill, section: it.section, letter: it.letter, template: it.template,
-            text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured,
+            text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy,
         })),
         gaps: out.gaps,
         floors: n.sections.map((s) => s.floor || null),
@@ -970,6 +1109,7 @@ async function buildRoleSheet(n, metaOf) {
     const ctx = { size: n.size, look: n.look, paper: n.paper, photocopySafe: n.photocopySafe };
     const colsList = (typeof mod.measureCols === 'function' ? mod.measureCols(ctx) : [1, 2]) || [1, 2];
     const needsShow = SHOWS_WORK.has(n.role);
+    const strictShow = n.role === 'error-analysis';
     const input = {
         items: [], skills: allSkills, pools: pools.map((p) => ({ id: p.id, weight: p.weight || 1 })),
         ctx, header, form: n.form, seed: n.seed, labels: n.labels, lesson: n.lesson,
@@ -1000,8 +1140,10 @@ async function buildRoleSheet(n, metaOf) {
             next += batch;
             for (const g of gen) {
                 if (out.length >= want) break;
-                const it = hostItem(g, 0, n.size);
-                if (needsShow && pass < 3 && !it.canShow()) continue;
+                const it = settlePrompts([hostItem(g, 0, n.size)], metaOf(g.skill).instructionKey)[0];
+                // Error analysis never falls back to an "Answer:" line under the cell: the shown work
+                // must sit in the cell's own slot, or the pupil sees two answer places (C1).
+                if (needsShow && (pass < 3 || strictShow) && !it.canShow()) continue;
                 const k = out.length;
                 const prepared = typeof mod.prepare === 'function'
                     ? mod.prepare(it, { index: k, seed: n.seed, wrong: !!flags[k], size: n.size, look: n.look })
@@ -1075,7 +1217,7 @@ async function buildRoleSheet(n, metaOf) {
         fits: { cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: out.pupilPages.length, note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '), sections: fitsList },
         items: items.map((it) => ({
             skill: it.skill, section: 0, pool: it.pool, template: it.template,
-            text: String((it.q && it.q.text) || ''), ans: it.q && it.q.ans, fclass: it.fclass, measured: it.measured,
+            text: String((it.q && it.q.text) || ''), ans: it.q && it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy,
             thinking: it.thinking ? { isWrong: !!it.thinking.isWrong, shown: it.thinking.shown } : undefined,
         })),
         gaps: out.gaps,

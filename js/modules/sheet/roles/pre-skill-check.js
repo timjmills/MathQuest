@@ -56,7 +56,7 @@ export function plan(input = {}) {
     let start = 1;
     const band = (its, cols, rows, cellH, pageCols) => {
         const b = {
-            kind: 'band', label: '', instr: instructionText(instructionKeyOf(its, input.skills)), extra: scoreTag(its.length),
+            kind: 'band', label: '', instr: instructionText(instructionKeyOf(its, input.skills), its), extra: scoreTag(its.length),
             content: gridPart(its.map((it) => planItem(it, { cols: pageCols, level: 0 })), { cols, rows, cellH, labels, start }),
         };
         start += its.length;

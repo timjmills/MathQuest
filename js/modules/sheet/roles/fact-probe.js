@@ -32,7 +32,7 @@ export const counts = () => ({ main: 20 });
 export function supports(items) {
     if (!items.length) return 'no items were generated';
     return items.every(isFact) ? null
-        : 'The fact probe needs a fact skill (a single-step fact up to 12 x 12). Use the Test for this skill.';
+        : 'The fact probe needs a fact or a one-step computation (add, subtract, multiply or divide in columns). Use the Test for this skill.';
 }
 
 /** A horizontal fact drawn from the question's operands: "7 x 3 = ____". */
@@ -45,7 +45,7 @@ function horizontal(it) {
     const key = slotKey({ answer: ans }, ans);
     const digits = Math.max(2, ans.length);
     return Object.assign({}, it, {
-        render: (c) => `<div class="mq-hfact"><span>${esc(String(ops[0]))} ${opGlyphOf(op)} ${esc(String(ops[1]))} =</span>${writeLine('answer', c, key, digits)}</div>`,
+        render: (c) => `<div class="mq-hfact"><span>${ops.map((v) => esc(String(v))).join(` ${opGlyphOf(op)} `)} =</span>${writeLine('answer', c, key, digits)}</div>`,
         key, drawsAnswer: true, visual: false, template: 'equation', legacy: false, cellCls: 'mq-hfactcell',
     });
 }
@@ -102,7 +102,7 @@ export function plan(input = {}) {
         const gH = gridPart(hor.map((it) => planItem(it, { cols: 2 })), { cols: 2, rows: 3, cellH: hH, labels, start: 16 });
         body = { kind: 'col', gap: '6mm', parts: [gV, gH] };
     }
-    const sections = [instructionPart(instructionKeyOf(items, input.skills))];
+    const sections = [instructionPart(instructionKeyOf(items, input.skills), items)];
     if (strip) {
         const w = strip[strip.length - 1] >= 100 ? { S: 14, M: 14, L: 16 }[ctx.size] : { S: 10, M: 10, L: 12 }[ctx.size];
         const stripHtml = `<div class="mq-skipstrip" style="height:${(vRows * vH).toFixed(2)}mm">${strip.map((v) => `<span>${v}</span>`).join('')}</div>`;

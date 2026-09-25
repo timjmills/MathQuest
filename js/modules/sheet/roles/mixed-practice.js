@@ -105,7 +105,7 @@ export function plan(input = {}) {
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
         const title = STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';
         cur.sections.push({
-            kind: 'band', label: firstOfSkill ? title : '', instr: firstOfSkill ? instructionText(instructionKeyOf(sh.items, input.skills)) : '',
+            kind: 'band', label: firstOfSkill ? title : '', instr: firstOfSkill ? instructionText(instructionKeyOf(sh.items, input.skills), sh.items) : '',
             content: gridPart(sh.items.map((it) => planItem(it, { cols: Math.min(sh.k, 6) })), { cols: sh.k, rows: 1, cellH: sh.h + grow, labels, start }),
         });
         start += sh.items.length;

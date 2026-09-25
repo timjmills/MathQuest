@@ -29,7 +29,7 @@ import {
 import { paperOf, bodyHeightMm, instructionMm, resolveSectionLayout, fitsLine, LIVE_W_MM } from '../layout.js';
 import {
     skillWords, levelLine, gradeWords, instructionHtml, estimateTitleLines, styleBlock, hookClasses,
-    STRAND_BY_CATEGORY, sectionInstructionKey,
+    STRAND_BY_CATEGORY, sectionInstructionKey, resolveInstruction, varsOfItems,
 } from './practice.js';
 
 export { esc, blank, instructionHtml, styleBlock, deriveSeed, rng, shuffle, resolveSectionLayout, fitsLine, LIVE_W_MM };
@@ -208,10 +208,10 @@ export function gridPart(items, { cols, rows, cellH, labels = 'none', start = 1,
 
 /** A library instruction line (BD-10). Unknown keys fall back to the neutral default. */
 export function instructionPart(key, vars = {}) {
-    let k = key;
-    let text;
-    try { text = instructionFor(k, vars); } catch (e) { k = 'default-write'; text = INSTRUCTION_LIBRARY[k]; }
-    return { kind: 'html', html: instructionHtml(k, text), key: k, text };
+    // `vars` may be the section's items: their {n}, when they all agree (SCC-P17); a key whose
+    // placeholder cannot be filled takes its plain fallback ("Write the missing number.").
+    const r = Array.isArray(vars) ? resolveInstruction(key, vars) : resolveInstruction(key, [], vars);
+    return { kind: 'html', html: instructionHtml(r.key, r.text), key: r.key, text: r.text };
 }
 
 /** The instruction key of a set of items (BD-13), from the skills' own keys. */
@@ -226,8 +226,8 @@ export function instructionKeyOf(items, skills) {
 }
 
 /** The library text of an instruction key, for a band strip. */
-export function instructionText(key) {
-    try { return instructionFor(key); } catch (e) { return INSTRUCTION_LIBRARY['default-write']; }
+export function instructionText(key, items) {
+    return resolveInstruction(key, items || [], items ? undefined : {}).text;
 }
 
 /* =================================================================== answer handling */
@@ -237,11 +237,19 @@ export function answerOf(it) {
     const k = it.key || {};
     const q = it.q || {};
     if (q.ans !== undefined && q.ans !== null && typeof q.ans !== 'object') return String(q.ans);
+    // A several-part answer (a cloze's two parts): its parts in order, comma separated - the
+    // form the host writes into a cell's boxes one part per box.
+    if (Array.isArray(q.ans) && q.ans.length && q.ans.every((v) => v !== null && typeof v !== 'object')) return q.ans.map(String).join(', ');
     if (k.value !== undefined && k.value !== null && typeof k.value !== 'object') return String(k.value);
     return '';
 }
 
-/** The misconception-based wrong answer of a question, through its provider (SCC). Scalar only. */
+/**
+ * The misconception-based wrong answer of a question, through its provider (SCC 3.8):
+ * `{value, display, misconception, slot, slots, explain}`. The value keeps the answer's shape
+ * (a number, "8 R 5", ["14", "3"] -> "14, 3", "20, 20, 15, 5"); null when there is none or it
+ * equals the answer.
+ */
 export function wrongOf(it) {
     const q = it.q || {};
     let w = null;
@@ -249,10 +257,16 @@ export function wrongOf(it) {
         const p = getProvider(q.categoryId || '', q.skillId || '');
         w = typeof p.wrongAnswer === 'function' ? p.wrongAnswer(q) : null;
     } catch (e) { w = null; }
-    if (!w || w.value === undefined || w.value === null || typeof w.value === 'object') return null;
-    const v = String(w.value);
-    if (!v.trim() || v === answerOf(it)) return null;
-    return Object.assign({}, w, { value: v });
+    if (!w || w.value === undefined || w.value === null) return null;
+    let v;
+    if (Array.isArray(w.value)) {
+        if (!w.value.length || w.value.some((x) => x === null || typeof x === 'object')) return null;
+        v = w.value.map(String).join(', ');
+    } else if (typeof w.value === 'object') return null;
+    else v = String(w.value);
+    const norm = (t) => String(t).replace(/\s+/g, '').toLowerCase();
+    if (!v.trim() || norm(v) === norm(answerOf(it))) return null;
+    return Object.assign({}, w, { value: v, display: w.display !== undefined ? String(w.display) : v });
 }
 
 /** The worked steps of a question, through its provider (SCC-P4); at most `max`. */
@@ -270,7 +284,7 @@ export function stringsOf(it) {
     const q = it.q || {};
     try {
         const p = getProvider(q.categoryId || '', q.skillId || '');
-        const raw = typeof p.strings === 'function' ? p.strings({ categoryId: q.categoryId, skillId: q.skillId, label: q.skillLabel }) : p.strings;
+        const raw = typeof p.strings === 'function' ? p.strings({ categoryId: q.categoryId, skillId: q.skillId, label: q.skillLabel, q }) : p.strings;
         return raw || {};
     } catch (e) { return {}; }
 }
@@ -316,8 +330,16 @@ export function operandsOf(q = {}) {
         if (out.length >= 2 && out.every(Number.isFinite)) return out;
     }
     // Last resort: the question's own text, "7 × 3 = ?" / "46 − 18".
-    const m = /(-?[\d,]+)\s*([+\-−×x*÷/])\s*(-?[\d,]+)/.exec(String(q.text || '').replace(/<[^>]*>/g, ' '));
-    return m ? [num(m[1]), num(m[3])] : [];
+    // A chain of one operator ("13 + 72 + 8 = ?", column addition of several addends) keeps
+    // every operand.
+    const plain = String(q.text || '').replace(/<[^>]*>/g, ' ');
+    const chain = /(-?[\d,]+)((?:\s*([+\-−×x*÷/])\s*-?[\d,]+)+)/.exec(plain);
+    if (chain) {
+        const rest = [...chain[2].matchAll(/\s*([+\-−×x*÷/])\s*(-?[\d,]+)/g)];
+        if (rest.every((r) => r[1] === rest[0][1])) return [num(chain[1]), ...rest.map((r) => num(r[2]))];
+        return [num(chain[1]), num(rest[0][2])];
+    }
+    return [];
 }
 
 const isWhole = (v) => /^-?\d+$/.test(String(v).replace(/,/g, '').trim());
@@ -329,7 +351,13 @@ const isWhole = (v) => /^-?\d+$/.test(String(v).replace(/,/g, '').trim());
 export function oralFrameOf(it, { fill = false } = {}) {
     const str = stringsOf(it);
     const q = it.q || {};
-    let frame = str.oralFrame || '';
+    // SCC 3.8: a real provider fills its own frame ("__ tens and __ ones is __." does not take
+    // the operands in order, so the role never fills a provider's frame itself).
+    if (fill && typeof str.sayFill === 'function') {
+        try { const v = str.sayFill(q); if (v) return String(v); } catch (e) { /* fall through */ }
+    }
+    let frame = str.say || str.oralFrame || '';
+    const own = !!frame;
     const op = opOf(q);
     const ops = operandsOf(q);
     const ans = answerOf(it);
@@ -343,35 +371,51 @@ export function oralFrameOf(it, { fill = false } = {}) {
         else frame = 'The answer is __.';
     }
     if (!fill) return frame;
+    // A provider's frame without sayFill keeps its blanks (it may not take the operands in
+    // order); only the role's own operation frames are filled here.
+    if (own) return frame;
     const vals = op && ops.length >= 2 ? [ops[0], ops[1], ans] : [ans];
     let k = 0;
     return frame.replace(/__/g, () => { const v = vals[k++]; return v === undefined ? '__' : String(v); });
 }
 
+/** A provider's steps as a list of short strings (an array, or one string of lines). */
+function stepList(raw) {
+    if (Array.isArray(raw)) return raw.map((s) => String(s && typeof s === 'object' ? s.text || '' : s || '').trim()).filter(Boolean);
+    if (typeof raw !== 'string' || !raw.trim()) return [];
+    return raw.split(/\n+/).map((s) => s.trim()).filter(Boolean);
+}
+
 /**
- * The general steps of the Steps band (PT-OPN-3: 3 to 6 imperatives, 10 words or fewer), for the
- * four operations and counting; any other skill takes its worked steps (the default adapter's
- * worked-solution text). The last step is always a check or the answer (P-LG).
+ * The Steps band's steps (PT-OPN-3), from the SKILL only (SCC 3.8): the provider's
+ * `strings.steps` (general steps right for this skill), else its own authored `workedSteps(q)`.
+ * A skill with no provider steps gets [] - no Steps box - never generic operation steps, which
+ * were wrong for half the skills (regrouping steps on a basic-facts sheet, "Write the sum" on a
+ * missing-part item).
  */
 export function generalSteps(it) {
+    const own = stepList(stringsOf(it).steps);
+    if (own.length) return own.slice(0, 6);
+    return providerWorkedSteps(it, 6).map((s) => s.text);
+}
+
+/** The provider's authored `workedSteps(q)`; [] when the skill has none (the default adapter's are not used). */
+export function providerWorkedSteps(it, max = 6) {
     const q = it.q || {};
-    const op = opOf(q);
-    const ops = operandsOf(q);
-    const big = ops.some((n) => Math.abs(n) >= 10);
-    const f = String(q.printFormat || '');
-    if (op === 'add') return big ? ['Add the ones.', 'Regroup 10 ones as 1 ten.', 'Add the tens.', 'Read the sum.']
-        : ['Start with the bigger number.', 'Count on.', 'Write the sum.'];
-    if (op === 'subtract') return big ? ['Look at the ones. Is the top digit smaller?', 'Regroup 1 ten as 10 ones.', 'Subtract the ones.', 'Subtract the tens.', 'Read the difference.']
-        : ['Start with the bigger number.', 'Count back.', 'Write the difference.'];
-    if (op === 'multiply') return /facts|fact/.test(f) || ops.every((n) => Math.abs(n) <= 12)
-        ? ['Read the fact.', 'Count by the second number.', 'Write the product.']
-        : ['Multiply the ones.', 'Regroup the tens.', 'Multiply the tens.', 'Add the regrouped tens.', 'Read the product.'];
-    if (op === 'divide') return /long/.test(f) || ops.some((n) => n >= 100)
-        ? ['Divide.', 'Multiply.', 'Subtract.', 'Bring down.', 'Write the remainder.']
-        : ['Think of the times fact.', 'Find the missing factor.', 'Write the quotient.'];
-    if (q.categoryId === 'counting' || /count/.test(String(q.skillId || ''))) return ['Touch each one.', 'Count.', 'Write the number.'];
-    const worked = workedStepsOf(it, 5).map((s) => s.text);
-    return worked.length ? worked : ['Read the problem.', 'Solve.', 'Write the answer.'];
+    try {
+        const p = getProvider(q.categoryId || '', q.skillId || '');
+        if (!p || !Array.isArray(p.real) || !p.real.includes('workedSteps') || typeof p.workedSteps !== 'function') return [];
+        const st = p.workedSteps(q);
+        return (Array.isArray(st) ? st : []).map((s) => ({ text: String((s && s.text) || '').trim(), marks: (s && s.marks) || [] })).filter((s) => s.text).slice(0, max);
+    } catch (e) { return []; }
+}
+
+/**
+ * The values of an instruction's placeholders (`{n}`) for a set of items, from the provider's
+ * `strings.instructionVars(q)` (SCC-P17): "Circle groups of {n}." takes the first item's n.
+ */
+export function instructionVarsOf(items) {
+    return varsOfItems(items);
 }
 
 /* ===================================================================== small drawings */
@@ -453,7 +497,7 @@ export const poolItems = (input, id) => (input.items || []).filter((it) => (it.p
 export default {
     ctxOf, labelStyleOf, topicOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, bestCols, planItem,
     gridPart, instructionPart, instructionKeyOf, instructionText, answerOf, wrongOf, workedStepsOf, stringsOf,
-    wrongPattern, opOf, opGlyphOf, operandsOf, oralFrameOf, generalSteps, checkLine, writeLine, stepsHtml,
+    wrongPattern, opOf, opGlyphOf, operandsOf, oralFrameOf, generalSteps, providerWorkedSteps, instructionVarsOf, checkLine, writeLine, stepsHtml,
     slotKey, assemble, poolItems, isWhole, JUDGE_LABELS, STRAND_BY_CATEGORY,
 };
 export { isWhole, JUDGE_LABELS, STRAND_BY_CATEGORY };

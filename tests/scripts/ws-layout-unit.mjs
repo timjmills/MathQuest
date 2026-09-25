@@ -253,7 +253,7 @@ eq(scoreDenominator([6, 6, 4, 4]), 20, 'PT-FRM-4: Score = every scored cell on t
 
 const stackQ = (a, b, op = '+') => ({
     categoryId: 'addition', skillId: 'add_1k_regroup', skillLabel: 'Add within 1,000', answerType: 'number',
-    text: `${a} ${op} ${b} = ?`, ans: op === '+' ? a + b : a - b,
+    text: `${a} ${op} ${b} = ?`, ans: op === '+' ? a + b : a - b, a, b, op,
     cell: { template: 'stack', v: 1, payload: { operands: [a, b], op } },
 });
 const stackRun = (n) => run(n, (i) => ({ q: stackQ(111 + i * 7, 222 + i * 3) }));
@@ -397,6 +397,11 @@ function hostPlan(roleId, skills, make, extra = {}) {
 }
 const cellsOf = (html) => (html.match(/data-ws-cell/g) || []).length;
 const addMake = (pool, sk, i) => stackQ(111 + i * 7, 222 + i * 3);
+// A skill with a real provider (sheet/providers/addition.js): its own steps, Say frame and stories.
+const PROV_SKILL = { categoryId: 'addition', skillId: 'add', label: 'Addition', grade: 1, instructionKey: 'add' };
+const provMake = (pool, sk, i) => Object.assign(stackQ(12 + i, 25 + i), { skillId: 'add', skillLabel: 'Addition', printFormat: 'column-add' });
+const bigAMake = (pool, sk, i) => stackQ(333 + i * 7, 111 + i * 3);
+const storyMake = (pool, sk, i) => Object.assign(stackQ(3 + i, 4), { skillId: 'add_wp_10', printFormat: 'word-problem', text: `Sam has ${3 + i} apples. He gets 4 more. How many apples does Sam have now?` });
 
 eq(Object.keys(ROLE_MODULES).length, 14, 'roles/index.js carries the fourteen P7.2b role modules');
 ok(Object.keys(ROLE_MODULES).every((id) => ROLE_IDS.includes(id)), 'ROLE_IDS lists every P7.2b role');
@@ -404,7 +409,9 @@ eq(ROLE_ALIASES.model, 'scripted-model', 'the print screen\'s "model" names the 
 
 // AK-1 / PT-KEY-7 for every role: the key is the pupil page, cell for cell and page for page.
 for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'review', 'test', 'pre-skill-check', 'word-problems', 'true-false', 'reason-it', 'stretch']) {
-    const res = hostPlan(id, [ADD_SKILL], addMake);
+    const res = id === 'scripted-model' || id === 'opener' ? hostPlan(id, [PROV_SKILL], provMake)
+        : hostPlan(id, [ADD_SKILL], id === 'word-problems' ? storyMake : id === 'error-analysis' ? bigAMake : addMake);
+    if (res.unsupported) { fails.push(`${id}: unsupported (${res.unsupported})`); continue; }
     ok(res.plan && res.r.pupilPages.length >= 1, `${id}: composes at least one page`);
     eq(res.r.keyPages.length, res.r.pupilPages.length, `AK-1 ${id}: as many key pages as pupil pages`);
     eq(res.r.keyPages.map(cellsOf), res.r.pupilPages.map(cellsOf), `AK-1 ${id}: the key has the pupil page's cells, page for page`);
@@ -413,32 +420,109 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     ok(!res.r.pupilPages.some((pg) => /undefined|NaN|\[object Object\]/.test(pg.replace(/<style[\s\S]*?<\/style>/g, ''))), `${id}: no undefined / NaN / [object Object] printed`);
 }
 
-// PT-GDP-1: Guided - unlabelled, unscored, cell 1 traced in grey, at most 6 cells at L.
+// PT-GDP-1: Guided - unlabelled, unscored, the fade across items, the page filled.
 {
     const { plan, r } = hostPlan('guided', [ADD_SKILL], addMake);
-    ok(plan.meta.items <= 6 && plan.meta.items >= 3, 'PT 2.3: Guided at L holds 3 to 6 cells (ceiling 6)');
+    ok(plan.meta.items >= 6 && plan.meta.items <= 12, `PT 2.3 (re-grade 2026-09-25): Guided at L fills the page, 6 to 12 cells (${plan.meta.items})`);
     eq(plan.header.score, false, 'PT-FRM-4: Guided prints no Score');
     ok(!/data-ws-label="letter"/.test(r.pupilHtml), 'PT-LBL-6: Guided cells are unlabelled');
     ok(/data-ws-ink="trace"/.test(r.pupilPages[0]), 'PT-GDP-1: cell 1 carries its answer in trace grey');
-    ok(/Steps:/.test(r.pupilHtml) && /Guided Practice:/.test(r.pupilHtml), 'PT 2.3: a Steps band over the Guided Practice band');
+    ok(/Guided Practice:/.test(r.pupilHtml), 'PT 2.3: the Guided Practice band');
+    // No provider steps -> no Steps band, never the generic operation steps.
+    ok(!/Steps:/.test(r.pupilHtml) && plan.meta.steps === 0, 'Guided: no Steps band when the skill supplies no steps of its own');
+    ok(!/Regroup 10 ones as 1 ten/.test(r.pupilHtml), 'Guided: no generic operation steps');
+    // H5: the rest of row 1 carries a PARTIAL trace (one digit shown, the rest hidden, geometry kept).
+    const cells = r.pupilPages[0].split('data-ws-cell=').slice(1);
+    ok(cells.length >= 3 && /class="mq-untraced"/.test(cells[1]) && /data-ws-ink="trace"|ws-trace/.test(cells[1]), 'PEDAGOGY 4.2 H5: cell 2 is partially traced');
+    ok(!/ws-trace|data-ws-ink="trace"/.test(cells[cells.length - 1]), 'PT-GDP-1: the last row is solid (no trace)');
+    const grid = plan.pages[0].sections.find((s) => s.kind === 'band' && s.label === 'Guided Practice:').content;
+    ok(parseFloat(grid.height) >= 170, `Guided: the grid fills the page under the bands (${grid.height})`);
+}
+// Guided Steps band: the provider's own steps, read row by row (1 2 / 3 4), never 1 3 / 2.
+{
+    const { partialTrace, stepsOf } = ROLE_MODULES.guided;
+    eq(stepsOf([]), [], 'Guided: no items, no steps');
+    const pg = hostPlan('guided', [PROV_SKILL], provMake);
+    ok(pg.plan.meta.steps >= 2 && /<b>Steps:<\/b>/.test(pg.r.pupilHtml) && /mq-steps-rows/.test(pg.r.pupilHtml), 'SCC 3.8: Guided prints the provider\'s own steps, row by row');
+    const wp = hostPlan('word-problems', [PROV_SKILL], provMake);
+    ok(wp.plan && wp.plan.meta.items === 2, 'SCC-P19: a skill with provider stories prints Word problems');
+    ok(wp.r && /data-ws-slot="wp-label"[^>]*>[a-z]+</.test(wp.r.keyHtml), 'SCC-P19: the key writes the story\'s label word');
+    eq(partialTrace('<span class="ws-trace">1</span><span class="ws-trace">4</span>'), '<span class="ws-trace"><span class="mq-untraced">1</span></span><span class="ws-trace">4</span>', 'H5: a column answer keeps its ones digit');
+    eq(partialTrace('<b data-ws-ink="trace" style="x">25</b>'), '<b data-ws-ink="trace" style="x">2<span class="mq-untraced">5</span></b>', 'H5: a one-slot answer keeps its first digit');
+    eq(partialTrace('<b data-ws-ink="trace">7</b>'), null, 'H5: a one-digit answer has no partial trace');
+    ok(/mq-steps-rows\{display:grid;grid-template-columns:1fr 1fr/.test(renderPlan(hostPlan('guided', [ADD_SKILL], addMake).plan).pupilHtml), 'PT-GDP-2: the Steps list is a row-major 2-column grid');
+}
+// Test: every item in its own ruled cell, packed to its content.
+{
+    const { plan, r } = hostPlan('test', [ADD_SKILL], addMake, { h: 30 });
+    const grid = plan.pages[0].sections.find((s) => s.kind === 'grid');
+    ok(!/\bopen\b/.test(grid.cls || ''), 'PT 2.9 (re-grade): the Test grid draws its cell rules (no open array)');
+    ok(plan.meta.items >= 9 && plan.meta.items <= 16, `Test at L: cells pack to their content, 9-16 items (${plan.meta.items})`);
+    ok(!/class="ws-grid[^"]*\bopen\b/.test(r.pupilHtml), 'Test: no open grid in the rendered page');
+}
+// Dense packing (layout.js): short cells get more columns and rows; the default grid otherwise.
+{
+    const short = run(20, (i) => ({ q: stackQ(11 + i, 22 + i), measured: Object.fromEntries([1, 2, 3, 4].map((c) => [c, { hMm: 30, fits: true }])), footprint: { measure: true, hMm: null, maxCols: 6 } }));
+    const plain = L(short, 'auto', 'L');
+    const dense = L(short, 'auto', 'L', { dense: true });
+    ok(dense.perPage > plain.perPage && dense.perPage <= 12, `dense: more items than the 2 x 3 default, within the 12 ceiling (${plain.perPage} -> ${dense.perPage})`);
+    ok(dense.cellH >= 30 * 1.2 - 0.01, 'dense: every cell keeps 1.2 x its measured content');
+    const tall = run(6, (i) => ({ q: stackQ(11 + i, 22 + i), measured: Object.fromEntries([1, 2, 3, 4].map((c) => [c, { hMm: 70, fits: true }])), footprint: { measure: true, hMm: null, maxCols: 6 } }));
+    ok(L(tall, 'auto', 'L', { dense: true }).perPage >= L(tall, 'auto', 'L').perPage, 'dense: never fewer items than the default grid');
+    ok(L(tall, 'auto', 'L', { dense: true }).cellH >= 70 * 1.2 - 0.01, 'dense: tall cells keep their room');
+    const narrow = run(20, (i) => ({ q: stackQ(11 + i, 22 + i), measured: { 1: { hMm: 30, fits: true }, 2: { hMm: 30, fits: true }, 3: { hMm: 30, fits: false }, 4: { hMm: 30, fits: false } }, footprint: { measure: true, hMm: null, maxCols: 6 } }));
+    ok(L(narrow, 'auto', 'L', { dense: true }).cols <= 2, 'dense: never more columns than the measurement fits (minimum column width)');
+    eq(L(short, 2, 'L', { dense: true }).cols, 2, 'dense: an explicit column count is honoured (DN-12)');
+}
+// Error analysis: a real wrong answer or nothing; the cell's stem suppressed; a real fix slot.
+{
+    const { plan, r } = hostPlan('error-analysis', [ADD_SKILL], bigAMake);
+    ok(plan.meta.wrongShare > 0, 'PT-ERR-1: at least one real wrong answer');
+    ok(/data-ws-slot="ea-ans" data-ws-shape="box"/.test(r.pupilHtml), 'Error analysis: the fix is a square write box');
+    ok(/correct answer<\/small>/.test(r.pupilHtml), 'Error analysis: the write box is captioned');
+    const none = hostPlan('error-analysis', [ADD_SKILL], addMake);
+    ok(typeof none.unsupported === 'string' && /wrong/.test(none.unsupported), `PT-ERR-1: no real wrong answer -> unsupported, never an all-correct page (${none.unsupported || none.plan.meta.wrongShare})`);
+}
+// Word problems: stories only; story, work space, number + label.
+{
+    ok(typeof hostPlan('word-problems', [ADD_SKILL], addMake).unsupported === 'string', 'PT 3.7: a non-story skill is unsupported on Word problems');
+    const { r } = hostPlan('word-problems', [ADD_SKILL], storyMake);
+    ok(/class="mq-wpspace"/.test(r.pupilHtml) && /data-ws-slot="wp-num"/.test(r.pupilHtml) && /data-ws-slot="wp-label"/.test(r.pupilHtml), 'PT 3.7 v2: story, work space, number and label');
+    ok(!/class="mq-wpcell"/.test(r.pupilHtml), 'PT 3.7: no bare cell pasted into the band');
+    ok(/mq-wp2 \.mq-wpstory\{border-radius:0\}/.test(r.pupilHtml), 'Word problems: no rounded card on paper');
+}
+// Titles: "I Can work on ..." is never printed; the category verb builds the fallback.
+{
+    const { skillWords, iCanFromCategory } = await import('../../js/modules/sheet/roles/practice.js');
+    const { resolveInstruction } = await import('../../js/modules/sheet/roles/practice.js');
+    eq(resolveInstruction('skip-count', [], { n: 5 }).text, 'Count by 5. Write the missing numbers.', 'SCC-P17: {n} filled from the items');
+    eq(resolveInstruction('skip-count', [], {}).key, 'missing', 'SCC-P17: no single {n} -> the plain "Write the missing number.", never "Solve."');
+    eq(iCanFromCategory({ categoryId: 'addition' }, 'addition facts within 20'), 'I Can add facts within 20', 'HD-10: I Can from the category verb');
+    eq(iCanFromCategory({ categoryId: 'addition' }, 'pick the missing addends'), 'I Can pick the missing addends', 'HD-10: a label that starts with a verb');
+    eq(iCanFromCategory({ categoryId: 'multiplication' }, 'multiplication chart'), 'I Can multiply with a chart', 'HD-10: a chart');
+    ok(!/work on/i.test(skillWords({ categoryId: 'addition', skillId: 'no_such_skill', label: 'Addition Facts (within 20)' }).iCan), 'HD-10: skillWords never returns "I Can work on"');
 }
 // PT-OPN-1: the Opener bands in their fixed order; Say band on by default.
 {
-    const { plan, r } = hostPlan('opener', [ADD_SKILL], addMake);
+    const { plan, r } = hostPlan('opener', [PROV_SKILL], provMake);
     const order = ['Model:', 'Steps:', 'Say:', 'Guided Practice:'].map((w) => r.pupilHtml.indexOf(`<b>${w}</b>`));
     ok(order.every((i) => i > 0) && order.every((v, i) => !i || v > order[i - 1]), 'PT-OPN-1: Model, Steps, Say, Guided in that order');
     eq(plan.header.score === false ? 0 : plan.header.score, plan.meta.independent, 'PT-OPN-7: Score counts the Independent rows only');
 }
 // PT-MOD-1 / PT-MOD-4: one state per step, the Say band filled in, nothing to answer.
 {
-    const { plan, r } = hostPlan('scripted-model', [ADD_SKILL], addMake);
+    const { plan, r } = hostPlan('scripted-model', [PROV_SKILL], provMake);
     ok(plan.nothingToAnswer === true, 'PT-KEY-7: the Scripted Model page is its own key');
     ok(plan.meta.states >= 3, 'PT-MOD-1: at least three states');
-    ok(/plus/.test(r.pupilHtml) && /equals/.test(r.pupilHtml), 'PT-MOD-4: the Say band is filled for this problem');
+    ok(!/__/.test(r.pupilHtml.replace(/<style[\s\S]*?<\/style>/g, '').split('Say:')[1] || '__'), 'PT-MOD-4: the Say band is filled for this problem (provider sayFill)');
+    ok(typeof hostPlan('scripted-model', [ADD_SKILL], addMake).unsupported === 'string', 'SCC 3.8: no provider steps -> no Scripted Model page (never generic steps)');
+    const op = hostPlan('opener', [ADD_SKILL], addMake);
+    ok(op.plan && !/<b>Steps:<\/b>/.test(op.r.pupilHtml), 'SCC 3.8: the Opener prints no Steps box for a skill with no steps');
 }
 // PT-ERR-1 / PT-TOF-1: 40 to 60% wrong; the key checks the right box on every item.
 for (const id of ['error-analysis', 'true-false']) {
-    const { plan, r } = hostPlan(id, [ADD_SKILL], addMake);
+    // a > b: the default adapter's real misconception (the other operation) exists for every item.
+    const { plan, r } = hostPlan(id, [ADD_SKILL], (pool, sk, i) => stackQ(333 + i * 7, 111 + i * 3));
     const share = id === 'true-false' ? plan.meta.falseShare : plan.meta.wrongShare;
     ok(share >= 0.4 && share <= 0.6, `${id}: 40-60% of the shown answers are wrong (${share})`);
     eq((r.keyHtml.match(/>✓</g) || []).length, plan.meta.items, `${id}: the key checks exactly one box per item`);
@@ -496,8 +580,14 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
 }
 // PT-CMP-2: the fact layouts take fact skills only, and say why otherwise.
 {
-    ok(typeof hostPlan('fact-rows', [ADD_SKILL], addMake).unsupported === 'string', 'PT-CMP-2: Fact rows refuse a non-fact skill, with a reason');
-    ok(typeof hostPlan('fact-probe', [ADD_SKILL], addMake).unsupported === 'string', 'PT-CMP-2: the Fact probe refuses a non-fact skill');
+    // CLAUDE.md: fact AND operations skills get the fact layouts; pictures / stories do not.
+    ok(!hostPlan('fact-rows', [ADD_SKILL], addMake).unsupported, 'CLAUDE.md: Fact rows take a one-step operations skill (column addition)');
+    ok(!hostPlan('fact-probe', [ADD_SKILL], addMake).unsupported, 'CLAUDE.md: the Fact probe takes a one-step operations skill');
+    const multi = (pool, sk, i) => Object.assign(stackQ(10 + i, 20 + i), { skillId: 'add_column_multi', printFormat: 'column-add-multi', text: `${10 + i} + ${20 + i} + ${30 + i} = ?`, ans: 60 + 3 * i, a: undefined, b: undefined, op: undefined });
+    ok(!hostPlan('fact-rows', [ADD_SKILL], multi).unsupported, 'Fact rows take column addition of several addends');
+    const pic = (pool, sk, i) => Object.assign(stackQ(3 + i, 2), { skillId: 'number_line_add', printFormat: 'number-line-visual' });
+    ok(typeof hostPlan('fact-rows', [ADD_SKILL], pic).unsupported === 'string', 'PT-CMP-2: Fact rows refuse a number-line skill, with a reason');
+    ok(typeof hostPlan('fact-probe', [ADD_SKILL], storyMake).unsupported === 'string', 'PT-CMP-2: the Fact probe refuses a story skill');
     const fr = hostPlan('fact-rows', [FACT_SKILL], (pool, sk, i) => factQ(2 + (i % 11), 3), { h: 30 });
     eq(fr.plan.pages[0].sections.find((s) => s.kind === 'grid').cols, 5, 'PT-FRW-2: Fact rows Auto 5 columns at L');
     eq(fr.plan.header.title, 'Multiply by 3', 'HD-13: the fact stub title');

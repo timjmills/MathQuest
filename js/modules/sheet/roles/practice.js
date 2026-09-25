@@ -154,6 +154,34 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-hfact{width:100%;display:flex;align-items:flex-end;gap:2mm;padding-top:2mm;font-size:var(--ws-digit);line-height:1}
 :is(.ws-page,.ws-sheet) .mq-hfact .ws-line{font-size:var(--ws-digit)}
 :is(.ws-page,.ws-sheet) .mq-skipstrip{border:var(--ws-heavy) solid var(--ws-ink);border-radius:3mm;display:flex;flex-direction:column;justify-content:space-around;align-items:center;font-size:var(--ws-text);font-weight:700;line-height:1}
+/* ---- 2026-09-25 re-grade fixes (additive) ---- */
+/* Guided Steps band: row-major, so the steps read 1 2 / 3 4 left to right (never 1 3 / 2). */
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps-rows{display:grid;grid-template-columns:1fr 1fr;column-gap:8mm;row-gap:2.2mm;columns:auto}
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps-rows.mq-steps-one{grid-template-columns:1fr}
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps-rows li{margin-bottom:0}
+/* Error analysis: the judgement beside the work, in the top of the cell (no dead band), and one
+   square write box the pupil writes the fix in. */
+:is(.ws-page,.ws-sheet) .mq-judge.mq-judge2{align-items:start;column-gap:6mm}
+:is(.ws-page,.ws-sheet) .mq-judge2>.mq-judge-row{align-self:start;gap:4mm;padding:1mm 1mm 1mm 0}
+:is(.ws-page,.ws-sheet) .mq-fixrow{display:flex;flex-direction:column;align-items:flex-start;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-fixslot{margin-left:9mm}
+:is(.ws-page,.ws-sheet) .mq-judge.mq-judge2.mq-judge-stack{grid-template-columns:minmax(0,1fr);row-gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-judge-stack>.mq-judge-row{flex-direction:row;align-items:flex-start;gap:10mm;padding-left:4mm}
+:is(.ws-page,.ws-sheet) .mq-judge-stack .mq-fixrow{flex-direction:row;align-items:flex-start;gap:4mm}
+:is(.ws-page,.ws-sheet) .mq-judge-stack .mq-fixslot{margin-left:0}
+:is(.ws-page,.ws-sheet) .mq-fixslot .ws-box,:is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpanswer .ws-box{height:calc(var(--ws-hw) + 4mm);min-height:calc(var(--ws-hw) + 4mm);display:inline-flex;align-items:center;justify-content:center;font-size:var(--ws-digit);font-weight:700;line-height:1}
+/* Word problems v2: story, work space, answer row - square corners on paper. */
+:is(.ws-page,.ws-sheet) .mq-wp.mq-wp2{padding-left:6mm;gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpstory{border-radius:0}
+:is(.ws-page,.ws-sheet) .mq-wpspace{position:relative;flex:1 1 auto;min-height:30mm;border:var(--ws-hair) solid var(--ws-ink);display:flex;align-items:center;justify-content:center}
+:is(.ws-page,.ws-sheet) .mq-wpspace>small{position:absolute;left:2mm;top:1mm;font-size:var(--ws-zone);line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-wpsentence{font-size:var(--ws-digit);font-weight:700;line-height:1}
+:is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpanswer{margin-top:0;padding-right:0;justify-content:flex-end;gap:6mm}
+/* INK-3: everything inside a traced slot is trace grey, the legacy key's inline-black <b> and a
+   drawn model's currentColor strokes included (print-worksheet.css forces legacy text black). */
+:is(.ws-page,.ws-sheet) [data-ws-ink="trace"] *{color:#949494!important}
+/* Guided fade: a partially traced value keeps its geometry; the untraced part is not printed. */
+:is(.ws-page,.ws-sheet) .mq-untraced{visibility:hidden}
 `.trim();
 
 export const styleBlock = () => `<style data-mq-sheet-engine>${SHEET_ENGINE_CSS}</style>`;
@@ -207,6 +235,47 @@ function titleFromLabel(label) {
 }
 
 /**
+ * The verb a category's skills are practised with, and the words of a label that only restate
+ * it ("Addition", "Adding" ...). An I Can line reads "I Can <verb> <what is left>".
+ */
+const CATEGORY_VERB = Object.freeze({
+    addition: ['add', /\b(?:addition|adding|add|sums?)\b/g],
+    subtraction: ['subtract', /\b(?:subtraction|subtracting|subtract|differences?)\b/g],
+    multiplication: ['multiply', /\b(?:multiplication|multiplying|multiply|times)\b/g],
+    division: ['divide', /\b(?:division|dividing|divide)\b/g],
+    counting: ['count', /\b(?:counting|count)\b/g],
+    comparing: ['compare', /\b(?:comparing|compare|comparison)\b/g],
+    composing: ['make', /\b(?:composing|compose|making|make)\b/g],
+    fractions: ['work with fractions', /\b(?:fractions?)\b/g],
+    decimals: ['work with decimals', /\b(?:decimals?)\b/g],
+});
+/** Leading words that are already a verb: the label then reads "I Can <label>". */
+const LEAD_VERB_RE = /^(?:add|subtract|multiply|divide|count|compare|order|round|estimate|read|write|tell|measure|find|make|build|show|solve|name|use|draw|skip|identify|sort|pick|fill|complete|match|share|split|fix|check|place)\b/;
+
+/**
+ * "I Can work on addition facts (within 20)" -> "I Can add facts within 20";
+ * "pick the missing addends" -> "I Can pick the missing addends"; "multiplication chart" ->
+ * "I Can multiply with a chart". '' when the category has no verb (the caller keeps its line).
+ */
+export function iCanFromCategory(skill = {}, rest = '') {
+    const cv = CATEGORY_VERB[skill.categoryId];
+    let r = String(rest || skill.label || '').replace(/[()]/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+    if (LEAD_VERB_RE.test(r)) return `I Can ${r}`;
+    if (!cv) return '';
+    const [verb, restate] = cv;
+    r = r.replace(restate, ' ').replace(/\s+/g, ' ').replace(/^(?:basic|simple)\s+/, '').trim();
+    if (!r) return `I Can ${verb} numbers`;
+    if (/^(?:chart|table|grid)\b/.test(r)) return `I Can ${verb} with a ${r}`;
+    if (/^(?:word problems?|stories)\b/.test(r)) {
+        const ing = { add: 'adding', subtract: 'subtracting', multiply: 'multiplying', divide: 'dividing' }[verb];
+        return ing ? `I Can solve ${ing} ${r}` : `I Can solve ${r}`;
+    }
+    if (/^(?:with|on|in|using|to|within|up to|by)\b/.test(r)) return `I Can ${verb} ${r}`;
+    if (/^(?:number line|pictures?|objects?|counters|models?|arrays?|groups?|columns?)\b/.test(r)) return `I Can ${verb} with ${r}`;
+    return `I Can ${verb} ${r}`;
+}
+
+/**
  * The strings a skill contributes, from its provider (or the default adapter), with the host's
  * own values first. `iCan` falls back to the label, never to a generic sheet name (PT-FRM-6).
  */
@@ -224,8 +293,54 @@ export function skillWords(skill = {}) {
     }
     let iCan = skill.iCan || str.iCan || '';
     if (!iCan || /work on this skill$/i.test(iCan)) iCan = titleFromLabel(skill.label || String(skill.skillId || '').replace(/_/g, ' '));
+    // "I Can work on <label>" is the default adapter's placeholder, not an I Can statement
+    // (2026-09-25 re-grade, C4). Until the skill's provider writes its own `strings.iCan`, the
+    // title is built from the category's verb: "I Can add facts within 20".
+    if (/^I Can work on\b/i.test(iCan)) iCan = iCanFromCategory(skill, iCan.replace(/^I Can work on\s*/i, '')) || iCan;
     const instructionKey = skill.instructionKey || str.instructionKey || 'default-write';
     return { iCan, instructionKey, strand: skill.strand || STRAND_BY_CATEGORY[skill.categoryId] || '' };
+}
+
+/**
+ * SCC-P17: the values of an instruction's placeholders ("Circle groups of {n}.") for a section,
+ * from the first item whose provider has `strings.instructionVars(q)`; {} when none has.
+ */
+export function varsOfItems(items) {
+    // The section prints ONE instruction, so its {n} must hold for every item: a set whose items
+    // disagree ("Count by 10" beside "Count by 5") has no single value, and {} is returned.
+    const all = (items || []).map((it) => varsOfItems1(it));
+    const known = all.filter((v) => v && Object.keys(v).length);
+    if (!known.length) return {};
+    const k0 = JSON.stringify(known[0]);
+    return known.length === all.length && known.every((v) => JSON.stringify(v) === k0) ? known[0] : {};
+}
+
+/** A key with a placeholder, when the section has no single value for it: the nearest plain key. */
+export const PLACEHOLDER_FALLBACK = Object.freeze({
+    'skip-count': 'missing', 'ring-groups': 'groups-of', 'ring-remainder': 'groups-of',
+});
+
+/** The printed instruction of a section: its key with the items' {n}, or the plain fallback. */
+export function resolveInstruction(key, items, vars) {
+    const v = vars || varsOfItems(items);
+    try { return { key, text: instructionFor(key, v) }; } catch (e) { /* placeholder left */ }
+    const fb = PLACEHOLDER_FALLBACK[key];
+    if (fb) { try { return { key: fb, text: instructionFor(fb, {}) }; } catch (e) { /* fall through */ } }
+    return { key: 'default-write', text: INSTRUCTION_LIBRARY['default-write'] };
+}
+
+/** One item's placeholder values, from its provider's `strings.instructionVars(q)`; {} when none. */
+function varsOfItems1(it) {
+    const q = (it && it.q) || {};
+    try {
+        const p = getProvider(q.categoryId || '', q.skillId || '');
+        const str = typeof p.strings === 'function' ? p.strings({ categoryId: q.categoryId, skillId: q.skillId, label: q.skillLabel, q }) : p.strings;
+        if (str && typeof str.instructionVars === 'function') {
+            const v = str.instructionVars(q);
+            if (v && typeof v === 'object') return v;
+        }
+    } catch (e) { /* none */ }
+    return {};
 }
 
 /** BD-13: one section, one instruction; a mixed-operation section takes mixed-sign or mixed-ops. */
@@ -366,7 +481,7 @@ function planItem(it, level, cols) {
  */
 function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, headerFirst, availableWidthMm }) {
     const layouts = sectionsIn.map((sec, si) => resolveSectionLayout(
-        { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH },
+        { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense },
         itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
     ));
     const chunksBySection = layouts.map((L, si) => paginate(itemsBySection[si].length, L));
@@ -420,7 +535,7 @@ function composeSheet(role, input, norm, sheetItems, { tabId, seed, form }) {
             });
         let key = sectionInstructionKey(keys);
         let text;
-        try { text = instructionFor(key, sec.instructionVars || {}); } catch (e) { key = 'default-write'; text = INSTRUCTION_LIBRARY[key]; }
+        ({ key, text } = resolveInstruction(key, sheetItems[si], sec.instructionVars));
         return { key, text };
     });
 

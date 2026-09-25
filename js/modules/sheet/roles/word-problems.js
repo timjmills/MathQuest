@@ -1,15 +1,18 @@
 // js/modules/sheet/roles/word-problems.js
-// WORD PROBLEMS (design/PAGE_TYPES.md 3.7), version 2: two per page, faded - a rounded story box,
-// an open work zone with an equation line, and an answer row of a number blank plus a label
-// blank. Problems are lettered through the set; Score is one point per problem (PT-WPR-8).
+// WORD PROBLEMS (design/PAGE_TYPES.md 3.7), version 2: two per page, faded. Each problem is
 //
-//   Story skills   the story is the question's own text, one sentence per line (PT-WPR-3)
-//   Other skills   "a non-story skill ... the role prints the skill's cell inside the band"
-//                  (section 10): the skill's cell sits where the story would, with the same work
-//                  zone and answer row
-//   Density        1 column always (PT-WPR-1); 3 / 2 / 2 per page at S / M / L (v2 at M and L,
-//                  bands at S), fewer when the story is taller than the band
-//   Key            the answer row filled; the work zone left open (working varies)
+//   story      the story, one sentence per line (PT-WPR-3), in a square-cornered story box
+//              (no rounded card chrome on paper - 2026-09-25 re-grade)
+//   work       an open picture / work space the pupil draws or writes in, framed with a hairline
+//              and captioned "work space"; on the key it shows the number sentence
+//   answer     one answer row: a number box and a label line, captioned "number" and "label"
+//              (the only scored place, PT-WPR-8), the label pre-filled on the key
+//
+//   Who        STORY skills only: a provider that supplies `stories(q, {seed})` (SCC 3.8), or a
+//              word-problem generator (the item's own story text). A non-story skill is `unsupported` with its
+//              reason - pasting a bare cell under "Write the number and the label" is not a word
+//              problem page (PAGE_TYPES 10: the neutral story frame needs a declared unit word)
+//   Density    1 column always (PT-WPR-1); 2 per page at every size (12.1, v2)
 //
 // Pure module (SCC-01).
 
@@ -18,6 +21,7 @@ import {
     resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, esc, blank, slotKey,
     slotOnly, operandsOf, opOf, opGlyphOf,
 } from './compose.js';
+import { getProvider } from '../index.js';
 
 export const ROLE_ID = 'word-problems';
 // WORKSHEET_DESIGN_STANDARD 12.1: word problem v2 (faded) prints 2 per page at every size.
@@ -26,59 +30,106 @@ const PER_PAGE = { S: 2, M: 2, L: 2 };
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1];
 
-/** Is this a story item? (a word-problem print format or the spacious size class) */
+/** Is this item a story from a word-problem generator? (its print format or its skill id) */
 export const isStory = (it) => {
     const q = it.q || {};
     const f = String(q.printFormat || '');
-    return /word/.test(f) || /_wp_|word/.test(String(q.skillId || '')) || (it.footprint && it.footprint.size === 'spacious');
+    const text = plainText(q.printText || q.text);
+    const looksLikeStory = /[a-z]{3,}.*[.!]\s+.*\?\s*$/i.test(text) || text.split(/\s+/).length >= 8;
+    return (/word/.test(f) || /_wp_|_wp$|word/.test(String(q.skillId || ''))) && looksLikeStory;
 };
+
+const plainText = (text) => String(text || '').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+
+/**
+ * The provider's story for one item (SCC 3.8 / SCC-P19): `stories(q, {seed})` -> Story | null,
+ * carrying THIS item's numbers, one sentence per line, with the answer's number and the unit word
+ * that agrees with it. null when the skill has no `stories` or the item cannot carry one.
+ */
+export function providerStory(it, seed) {
+    const q = it.q || {};
+    let p = null;
+    try { p = getProvider(q.categoryId || '', q.skillId || ''); } catch (e) { p = null; }
+    if (!p || typeof p.stories !== 'function' || !Array.isArray(p.real) || !p.real.includes('stories')) return null;
+    let st = null;
+    try { st = p.stories(q, { seed }); } catch (e) { st = null; }
+    if (!st || typeof st !== 'object') return null;
+    const lines = Array.isArray(st.sentences) && st.sentences.length ? st.sentences
+        : [...(Array.isArray(st.lines) ? st.lines : []), st.question].filter(Boolean);
+    const num = st.ans !== undefined && st.ans !== null ? String(st.ans) : '';
+    if (!lines.length || !/^-?[\d,.]+$/.test(num)) return null;
+    return { lines: lines.map(String), num, label: String(st.label || ''), equation: String(st.equation || '') };
+}
+
+/**
+ * The story of an item: the provider's story first (its grammar is built in), else the
+ * word-problem generator's own text; null for a non-story item.
+ */
+export function storyOf(it, seed) {
+    const own = providerStory(it, seed);
+    if (own) return own;
+    if (!isStory(it)) return null;
+    const q = it.q || {};
+    const text = plainText(q.printText || q.text);
+    const ans = answerOf(it) || (it.key && it.key.display !== undefined ? String(it.key.display) : '');
+    const num = (/^-?[\d,.]+/.exec(ans) || [''])[0];
+    if (!num) return null;
+    // The label word: the answer's own unit when it carries one, else the noun of the question
+    // ("How many apples ...?"), which is the word a pupil is asked to write.
+    const asked = /how many\s+(?:more\s+|fewer\s+|less\s+)?([a-z]+)/i.exec(text);
+    const label = ans.slice(num.length).trim() || (asked ? asked[1].toLowerCase() : '');
+    const ops = operandsOf(q);
+    const glyph = opGlyphOf(opOf(q));
+    return { lines: storyLines(text), num, label, equation: ops.length >= 2 && glyph ? `${ops[0]} ${glyph} ${ops[1]} = ${num}` : '' };
+}
 
 /** One sentence per line (PT-WPR-3). */
 function storyLines(text) {
-    const plain = String(text || '').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ')
-        .replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
-    return plain.split(/(?<=[.?!])\s+(?=[A-Z0-9])/).map((s) => s.trim()).filter(Boolean).slice(0, 6);
+    return plainText(text).split(/(?<=[.?!])\s+(?=[A-Z0-9])/).map((s) => s.trim()).filter(Boolean).slice(0, 6);
 }
 
-export function prepare(it) {
-    const q = it.q || {};
-    const story = isStory(it);
-    const ans = answerOf(it) || (it.key && it.key.display !== undefined ? String(it.key.display) : '');
-    const num = (/^-?[\d,.]+/.exec(ans) || [''])[0];
-    // The label word: the answer's own unit when it carries one, else the noun of the question
-    // ("How many apples ...?"), which is the word a pupil is asked to write.
-    const asked = /how many\s+([a-z]+)/i.exec(String(q.printText || q.text || '').replace(/<[^>]*>/g, ' '));
-    const label = (num ? ans.slice(num.length).trim() : '') || (story && asked ? asked[1].toLowerCase() : '');
-    // The equation frame is written too on the key when the story's numbers and operation are
-    // known (a + b = c): a key shows what the pupil writes, not only the final answer (PT-KEY-1).
-    const ops = operandsOf(q);
-    const glyph = opGlyphOf(opOf(q));
-    const eq = story && ops.length >= 2 && glyph && num ? { 'wp-a': ops[0], 'wp-op': glyph, 'wp-b': ops[1], 'wp-c': num } : {};
-    const key = slotKey(Object.assign({ 'wp-num': num || ans, 'wp-label': label }, eq), ans);
-    const digits = Math.max(2, Math.min(6, (num || ans).replace(/[^0-9]/g, '').length || 2));
-    // 07-D mock-up: the answer row (a number line of B(n) and a long label line, each captioned)
-    // sits inside the story box at its foot; under the box, an open equation frame
-    // (line, sign circle, line = line) and the rest of the cell is open working room.
-    const answerRow = (c) => `<div class="mq-wpanswer">`
-        + `<span class="mq-ansslot">${blank({ id: 'wp-num', kind: 'number', shape: 'line', digits }, c, slotOnly(key, 'wp-num'))}<small>number</small></span>`
-        + `<span class="mq-ansslot">${blank({ id: 'wp-label', kind: 'text', shape: 'line', widthMm: { S: 40, M: 46, L: 52 }[c.size] || 52 }, c, slotOnly(key, 'wp-label'))}<small>label</small></span></div>`;
-    const eqFrame = (c) => `<div class="mq-frame">${blank({ id: 'wp-a', kind: 'number', shape: 'line', digits, graded: false }, c, slotOnly(key, 'wp-a'))}`
-        + `${blank({ id: 'wp-op', kind: 'sign', shape: 'circle', graded: false }, c, slotOnly(key, 'wp-op'))}`
-        + `${blank({ id: 'wp-b', kind: 'number', shape: 'line', digits, graded: false }, c, slotOnly(key, 'wp-b'))}<span>=</span>`
-        + `${blank({ id: 'wp-c', kind: 'number', shape: 'line', digits, graded: false }, c, slotOnly(key, 'wp-c'))}</div>`;
-    const render = (c, o = {}) => {
-        const top = story
-            ? `<div class="ws-story mq-wpstory">${storyLines(q.printText || q.text).map((l) => `<div>${esc(l)}</div>`).join('')}${answerRow(c)}</div>`
-            // Section 10: a non-story skill prints its own cell inside the band, answered in its
-            // own slot on the key; the number / label row belongs to stories only.
-            : `<div class="mq-wpcell">${it.render(c, Object.assign({}, o, { cols: 1 }))}</div>`;
-        return `<div class="mq-wp">${top}<div class="mq-wpwork">${story ? eqFrame(c) : ''}</div></div>`;
+export function prepare(it, info = {}) {
+    // The K picture word problem (`wordpic` template) IS a word-problem cell: story, countable
+    // picture, work box and one number box with its label word. It prints as it is - the role
+    // never prints its story a second time.
+    if (it.template === 'wordpic') {
+        return Object.assign({}, it, {
+            render: (c, o = {}) => it.render(c, Object.assign({}, o, { cols: 1 })),
+            measured: null, footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: 1, size: 'spacious' }),
+            fclass: 'word', story: true,
+        });
+    }
+    const st = storyOf(it, ((Number(info.seed) || 0) + (Number(info.index) || 0) * 7919) >>> 0);
+    if (!st) return null;                                    // not a story: see supports()
+    const { num, label } = st;
+    const key = slotKey({ 'wp-num': num, 'wp-label': label }, label ? `${num} ${label}` : num);
+    const digits = Math.max(2, Math.min(6, num.replace(/[^0-9]/g, '').length || 2));
+    const render = (c) => {
+        const answered = c.state === 'answered';
+        const numW = Math.max({ S: 22, M: 26, L: 30 }[c.size] || 30, digits * ({ S: 6, M: 7, L: 8 }[c.size] || 8) + 6);
+        return `<div class="mq-wp mq-wp2">`
+            + `<div class="ws-story mq-wpstory">${st.lines.slice(0, 6).map((l) => `<div>${esc(l)}</div>`).join('')}</div>`
+            + `<div class="mq-wpspace"><small>work space</small>${answered && st.equation ? `<b class="mq-wpsentence" data-ws-ink="solid">${esc(st.equation)}</b>` : ''}</div>`
+            + `<div class="mq-wpanswer">`
+            + `<span class="mq-ansslot">${blank({ id: 'wp-num', kind: 'number', shape: 'box', widthMm: numW }, c, slotOnly(key, 'wp-num'))}<small>number</small></span>`
+            + `<span class="mq-ansslot">${blank({ id: 'wp-label', kind: 'text', shape: 'line', widthMm: { S: 40, M: 46, L: 52 }[c.size] || 52 }, c, slotOnly(key, 'wp-label'))}<small>label</small></span>`
+            + `</div></div>`;
     };
     return Object.assign({}, it, {
-        render, key, measured: null, drawsAnswer: true, visual: !story && !!it.visual,
+        render, key, measured: null, drawsAnswer: true, visual: false,
         footprint: { measure: true, hMm: null, maxCols: 1, size: 'spacious' },
-        fclass: 'word', story, cellCls: [it.cellCls || '', 'mq-wpcellbox'].join(' ').trim(),
+        fclass: 'word', story: true, legacy: false, template: 'word', cellCls: [it.cellCls || '', 'mq-wpcellbox'].join(' ').replace(/\bmq-legacy\b/g, '').trim(),
     });
+}
+
+/** Word problems need stories (PAGE_TYPES 3.7 / 10). */
+export function supports(items) {
+    if (!items.length) {
+        return 'Word problems need a story skill (a word-problem generator or provider stories). '
+            + 'This skill has no stories yet: use the Independent page, or a word-problem skill of the same operation.';
+    }
+    return null;
 }
 
 function layout(items, input) {
@@ -101,11 +152,9 @@ export function plan(input = {}) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: items.length });
     const grid = gridPart(items.map((it) => planItem(it, { cols: 1 })), { cols: 1, rows: items.length, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
     if (items.length === L.rows) { grid.cls = ''; grid.height = ''; }
-    const stories = items.filter((it) => it.story).length;
     return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart('story-v2'), grid] }], {
-        meta: { items: items.length, scoreOutOf: items.length, stories, fits: [Object.assign({}, L, { line: fitsLine(L) })],
-            notes: [L.note, stories < items.length ? 'Not a story skill: the skill\'s own cell prints in the word-problem band.' : ''].filter(Boolean) },
+        meta: { items: items.length, scoreOutOf: items.length, stories: items.length, fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },
     });
 }
 
-export default { ROLE_ID, sources, measureCols, prepare, counts, plan, isStory };
+export default { ROLE_ID, sources, measureCols, prepare, supports, counts, plan, isStory, storyOf };

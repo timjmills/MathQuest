@@ -81,18 +81,23 @@ export function plan(input = {}) {
     const sections = [];
     if (g.whatsNew) sections.push({ kind: 'band', label: "What's New:", instr: g.whatsNew, html: '' });
     const modelContentH = g.modelBand - m.strip;
-    sections.push({
-        kind: 'row', widths: ['1fr', '1fr'], cls: 'mq-modelrow',
-        parts: [
-            { kind: 'band', label: 'Model:', instr: '', content: gridPart(modelItems, { cols: nModel, rows: 1, cellH: modelContentH, labels: 'none' }) },
-            { kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-stepszone" style="height:${modelContentH.toFixed(2)}mm">${stepsHtml(g.steps)}</div>` },
-        ],
-    });
+    // SCC 3.8: the Steps come from the skill's provider; a skill with none gets no Steps box
+    // (generic operation steps were wrong for half the skills), and the Model takes the row.
+    const modelBandPart = { kind: 'band', label: 'Model:', instr: '', content: gridPart(modelItems, { cols: nModel, rows: 1, cellH: modelContentH, labels: 'none' }) };
+    if (g.steps.length) {
+        sections.push({
+            kind: 'row', widths: ['1fr', '1fr'], cls: 'mq-modelrow',
+            parts: [
+                modelBandPart,
+                { kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-stepszone" style="height:${modelContentH.toFixed(2)}mm">${stepsHtml(g.steps)}</div>` },
+            ],
+        });
+    } else sections.push(modelBandPart);
     sections.push({ kind: 'say', frame: oralFrameOf(items[0] || {}), digits: 2 });
-    sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key),
+    sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, items),
         content: gridPart(guided.map((it) => planItem(it, { cols: g.gc, level: 2, nolabel: true })), { cols: g.gc, rows: 1, cellH: g.gH + g.grow, labels: 'none' }) });
     if (indep.length) {
-        sections.push({ kind: 'band', label: 'Independent Practice:', instr: instructionText(key),
+        sections.push({ kind: 'band', label: 'Independent Practice:', instr: instructionText(key, items),
             content: gridPart(indep.map((it) => planItem(it, { cols: g.gc, level: 1 })), { cols: g.gc, rows: g.iRows, cellH: g.gH + g.grow, labels: labelStyleOf(ctx.look, input.labels), start: 1 }) });
     }
     const notes = [];

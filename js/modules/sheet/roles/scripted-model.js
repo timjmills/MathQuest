@@ -14,7 +14,7 @@
 // Pure module (SCC-01).
 
 import {
-    ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, workedStepsOf,
+    ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, providerWorkedSteps,
     generalSteps, oralFrameOf, assemble, poolItems, answerOf, instructionText, esc,
 } from './compose.js';
 
@@ -26,16 +26,21 @@ export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1, 2, 3];
 export const counts = () => ({ main: 1 });
 
-/** The steps of the example: the worked steps when there are at least 3, else the general ones. */
+/**
+ * The steps of the example (SCC 3.8): the provider's own `workedSteps(q)` for THIS problem when
+ * it has at least 3, else its general `strings.steps`. A skill with neither has no scripted
+ * model (see `supports`) - generic operation steps are not the skill's steps.
+ */
 function stepsFor(it) {
-    // The operation and counting steps are written for the problem's own size (count on for a
-    // one-digit addend, the column steps with regrouping for two digits); the default adapter's
-    // generic worked steps only speak for skills that have neither.
-    const general = generalSteps(it);
-    const generic = /^(?:Read the problem\.|Solve\.|Write the answer\.)$/;
-    if (!general.every((s) => generic.test(s))) return general;
-    const worked = workedStepsOf(it, 6).map((s) => s.text).filter((t) => t.length <= 90);
-    return worked.length >= 3 ? worked : general;
+    const worked = providerWorkedSteps(it, 6).map((s) => s.text).filter((t) => t.length <= 90);
+    return worked.length >= 3 ? worked : generalSteps(it);
+}
+
+/** PAGE_TYPES 2.2: the page IS the steps; a skill that supplies none cannot be modelled yet. */
+export function supports(items) {
+    if (!items.length) return 'no items were generated';
+    return stepsFor(items[0]).length ? null
+        : 'This skill has no worked steps yet (strings.steps / workedSteps), so it has no Scripted Model page.';
 }
 
 export function plan(input = {}) {
@@ -83,4 +88,4 @@ export function plan(input = {}) {
     });
 }
 
-export default { ROLE_ID, sources, measureCols, counts, plan };
+export default { ROLE_ID, sources, measureCols, counts, supports, plan };
