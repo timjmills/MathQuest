@@ -86,6 +86,9 @@
     "ftRules": "7C",
     "ftTable": "7D",
     "ftTask": "7E",
+    "wpCues": "8A",
+    "wpBank": "8B",
+    "wpBar": "8C",
     "bars": "9F"
   },
   "blocks": {
@@ -130,14 +133,14 @@
       "keys": "7A-7E"
     },
     "8": {
-      "owner": "",
-      "status": "spare",
-      "keys": ""
+      "owner": "word problems (word-work cell, 2026-09-25)",
+      "status": "assigned",
+      "keys": "8A-8C"
     },
     "9": {
-      "owner": "",
-      "status": "spare",
-      "keys": ""
+      "owner": "O6 appearance lanes (AP1 9A-9E, AP2 9F-9J, AP3 9K-9O, AP4 9P-9T) and the options verifier (9U-9Z)",
+      "status": "assigned",
+      "keys": "9A-9Z"
     }
   },
   "tokens": {
@@ -282,7 +285,8 @@
     },
     "op": {
       "x": "M",
-      "/": "D"
+      "/": "D",
+      "both": "B"
     },
     "power": {
       "10": "1",
@@ -478,7 +482,8 @@
     "midLabel": {},
     "closeness": {
       "far": "F",
-      "close": "C"
+      "close": "C",
+      "some": "S"
     },
     "lengths": {
       "equal": "E",
@@ -614,6 +619,9 @@
       "mixed-check": "N",
       "make": "K"
     },
+    "wpCues": {},
+    "wpBank": {},
+    "wpBar": {},
     "bars": {
       "vertical": "V",
       "horizontal": "H"
@@ -643,6 +651,9 @@
     "wordSet": "decimal",
     "most": "decimal",
     "ftTable": "decimal",
-    "poolSupport": "decimal"
+    "poolSupport": "decimal",
+    "wpCues": "bool",
+    "wpBank": "bool",
+    "wpBar": "bool"
   }
 }

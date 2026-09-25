@@ -128,6 +128,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'ring-remainder-each': 'Circle groups of the second number. Write the quotient and the remainder.',
     'missing-all': 'Write the missing numbers.',
     'story-k2': 'Solve. Write the number.',
+    // Every whole-number word problem (owner ruling 2026-09-25): the word-work cell.
+    'story-work': 'Circle the sign. Write the numbers in the boxes. Solve.',
     'pick-parts': 'Write one number from each list to make the sum.',
     'fact-family': 'Use the three numbers. Fill in the fact family.',
     'chart-fill': 'Fill in the missing products.',
@@ -194,6 +196,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'round-table': 'Round each number. Fill in the table.',
     estimate: 'Round each number. Then estimate.',
     'estimate-place': 'Round each number to the nearest {place}. Then estimate.',
+    // Round-3: the product rounds ONE number (the other is a one-digit factor), and the quotient
+    // uses a compatible number, not rounding — each instruction now says what the key does.
+    'estimate-product': 'Round the bigger number to the nearest {place}. Then multiply.',
+    'estimate-compatible': 'Find a near number that divides easily. Then divide.',
     'estimate-closest': 'Circle the closest estimate.',
     'estimate-reasonable': 'Estimate. Check one box: Reasonable or Not reasonable.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).

@@ -444,7 +444,7 @@ const _pvMidpoint = (withOnly = true) => ({
     help: 'Halfway numbers round up. "Only" gives a page of nothing else, to teach that rule on its own.',
 });
 const _pvZeroPlace = (withAlways = true) => ({
-    id: 'zeroPlace', label: 'A zero place (305, 340)', type: 'enum', default: 'none', group: 'difficulty',
+    id: 'zeroPlace', label: 'A zero place (305, 340)', type: 'enum', default: 'some', group: 'difficulty',
     values: [
         { v: 'none', l: 'Never' },
         { v: 'some', l: 'Some numbers' },
@@ -552,13 +552,16 @@ const _pvQuotientPlace = () => ({
         { v: 100, l: 'Hundreds (4,300 ÷ 6 is about 700)' }, { v: 1000, l: 'Thousands (43,000 ÷ 6 is about 7,000)' }],
     help: 'The dividend is rounded to a number the divisor goes into; this sets how big the answer is.',
 });
-const _pvStep = (values, dflt) => ({
+// `mixed` appends the value 0, "both jumps the skill's name promises, dealt in turn" (round-3:
+// "1 More, 1 Less, 10 More, 10 Less" dealt only "1 more" at its defaults). 0 is written by value
+// in a share code (no token needed), and it is appended, so no existing value moves.
+const _pvStep = (values, dflt, mixed = '') => ({
     id: 'step', label: 'How much more or less', type: 'enum', default: dflt, group: 'difficulty',
-    values: values.map(v => ({ v, l: String(v) })),
-    help: 'The jump the pupil adds or takes away.',
+    values: [...values.map(v => ({ v, l: String(v) })), ...(mixed ? [{ v: 0, l: mixed }] : [])],
+    help: 'The jump the pupil adds or takes away. "Both" deals the two jumps in the name in turn.',
 });
-const _pvDir = () => ({
-    id: 'dir', label: 'More or less', type: 'enum', default: 'more', group: 'difficulty',
+const _pvDir = (dflt = 'more') => ({
+    id: 'dir', label: 'More or less', type: 'enum', default: dflt, group: 'difficulty',
     values: [{ v: 'more', l: 'More' }, { v: 'less', l: 'Less' }, { v: 'both', l: 'Both, alternating' }],
     help: '"Less" is harder than "More"; "Both" mixes them so the pupil must read the word.',
 });
@@ -615,8 +618,10 @@ const _pvExpandForm = () => ({
     help: 'Expanded notation is the grade 4 form: the pupil writes the digit for each place.',
 });
 const _pvCloseness = () => ({
-    id: 'closeness', label: 'How close the numbers are', type: 'enum', default: 'far', group: 'difficulty',
-    values: [{ v: 'far', l: 'Far apart' }, { v: 'close', l: 'Close (same first digit)' }],
+    id: 'closeness', label: 'How close the numbers are', type: 'enum', default: 'some', group: 'difficulty',
+    // 'some' (appended, round-3): a page where the first digit does NOT always decide — every
+    // other item shares its first digit, so the pupil must go on to the next place.
+    values: [{ v: 'far', l: 'Far apart' }, { v: 'close', l: 'Close (same first digit)' }, { v: 'some', l: 'Both (every other item close)' }],
     help: 'Close numbers share their first digit, so the pupil must look at the next place.',
 });
 const _pvLengths = () => ({
@@ -688,18 +693,22 @@ const P9_PV_OPTIONS = {
         help: 'Expanded form and words make the pupil work out each digit\'s place; a numeral is copying.',
     }],
     'placevalue:number_word_names': [_pvBand([999, 9999, 99999, 999999], 999999)],
-    'placevalue:more_less_10': [_pvStep([1, 10], 1), _pvDir(), _pvBand([20, 50, 100, 120], 100), _pvMoreLessSupport2(true), _pvMoreLessUnknown()],
+    'placevalue:more_less_10': [_pvStep([1, 10], 0, 'Both: 1 and 10'), _pvDir('both'), _pvBand([20, 50, 100, 120], 100), _pvMoreLessSupport2(true), _pvMoreLessUnknown()],
     // Numbers 100-900 (2.NBT.B.8): the band is fixed at 1,000, so there is no band control. The
     // 1,000 step (4.NBT) is appended to the enum (SCC-P12) and works to 10,000.
-    'placevalue:more_less_100': [_pvStep([10, 100, 1000], 100), _pvDir(), _pvMoreLessSupport2(false), _pvMoreLessUnknown()],
+    'placevalue:more_less_100': [_pvStep([10, 100, 1000], 0, 'Both: 10 and 100'), _pvDir('both'), _pvMoreLessSupport2(false), _pvMoreLessUnknown()],
     'placevalue:place_value_10x': [
-        { id: 'op', label: 'Multiply or divide', type: 'enum', default: 'x', group: 'difficulty',
-            values: [{ v: 'x', l: '× (digits move left)' }, { v: '/', l: '÷ (digits move right)' }],
+        // Round-3: the defaults deal what the name promises — × AND ÷, by 10, 100 AND 1,000 ('both'
+        // is appended; a single op or power is still one tick away).
+        { id: 'op', label: 'Multiply or divide', type: 'enum', default: 'both', group: 'difficulty',
+            values: [{ v: 'x', l: '× (digits move left)' }, { v: '/', l: '÷ (digits move right)' }, { v: 'both', l: 'Both, in turn' }],
             help: 'Dividing is the harder direction: the digits move right.' },
-        { id: 'power', label: 'By', type: 'set', default: [10], group: 'difficulty',
+        { id: 'power', label: 'By', type: 'set', default: [10, 100, 1000], group: 'difficulty',
             values: [{ v: 10, l: '10' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }], allLabel: '10, 100 and 1,000',
             help: 'Tick one power for a page that stays with it, or several to mix them.' },
-        _pvBand([1000, 10000, 100000, 1000000], 10000, 'The biggest number on the page (the larger of the number and its answer).'),
+        // Default 100,000 (round-3): with × and ÷ by 1,000 in the default mix, a band of 10,000
+        // left ÷ 1,000 only 10,000 ÷ 1,000 to deal.
+        _pvBand([1000, 10000, 100000, 1000000], 100000, 'The biggest number on the page (the larger of the number and its answer).'),
         { id: 'decimals', label: 'Decimals (grade 5)', type: 'bool', default: false, group: 'difficulty',
             help: 'On gives numbers with a decimal point, such as 3.4 × 100.' },
         { id: 'support', label: 'Support', type: 'enum', default: 'shift', group: 'support',
@@ -790,7 +799,7 @@ export function pvBandFloor(categoryId, skillId, opts) {
         const ps = (Array.isArray(o.places) && o.places.length ? o.places : [10, 100]).map(Number);
         return Math.max(...ps) * 10;
     }
-    if (skillId === 'more_less_10') return Number(o.step) === 10 ? 20 : 10;
+    if (skillId === 'more_less_10') return Number(o.step) === 1 ? 10 : 20;
     if (skillId === 'pv_digit_drag') return 1000;
     if (skillId === 'place_value_10x') {
         const powers = (Array.isArray(o.power) && o.power.length ? o.power : [10]).map(Number);
@@ -812,10 +821,16 @@ export function pvBand(categoryId, skillId, opts, fallback = 0) {
 }
 
 /**
- * The refusal line when an EXPLICITLY lowered Max Number cannot host the skill, or '' when it
- * can. Max Number at its app default never refuses (pvCap).
+ * The refusal line when Max Number cannot host the skill, or '' when it can.
+ *
+ * A STAND-ALONE skill never refuses (owner direction of 2026-09-25, round-3 fix wave): a skill
+ * owns its numbers ("Round to the nearest 1,000" printed blank pages at Max Number 1,000): its band
+ * option, floored by its place, is its range whatever Max Number says (gen-pv.js capOf) — print,
+ * worksheet, quiz and card alike. Only a MEMBER of a mixed
+ * review (`strict`), which has no band of its own, is left out when Max Number cannot host it.
  */
 export function pvRefusal(categoryId, skillId, range, opts, strict = false) {
+    if (!strict) return '';
     const floor = pvBandFloor(categoryId, skillId, opts);
     if (!floor) return '';
     const cap = pvCap(pvBand(categoryId, skillId, opts), range, strict);
@@ -2716,6 +2731,34 @@ const _AP2_POINTS = { all: 'Points named with their coordinates: A(3, 2)', some:
 
 Object.assign(SKILL_OPTIONS, P12_OPTIONS);
 // ============================ end P12 · every other family ============================
+
+// ===========================================================================
+// WORD WORK · the keyword supports of every whole-number word problem (2026-09-25)
+// ===========================================================================
+// Every story is drawn by the word-work cell (sheet/cells/word-work.js: story, a small + − × ÷
+// row, column boxes, "Answer: [ ] ____" with a unit bank). Its three supports are hints, so they
+// are OFF by default and fade by being switched off (owner ruling 2026-09-25). Read by
+// js/modules/word-work.js. The ranged stories (add_wp_* / sub_wp_*) already carry the bar model
+// as `support: bar` (_opsBar), so they get the two keyword supports only.
+const WORD_WORK_OPTIONS = (bar) => [
+    { id: 'wpCues', label: 'Key words', type: 'bool', default: false, group: 'support',
+        help: 'The words that point to the sign (in all, left, each, share equally) print bold and underlined.' },
+    { id: 'wpBank', label: 'Keyword bank', type: 'bool', default: false, group: 'support',
+        help: 'A small box beside each story lists the key words for + − × ÷.' },
+    ...(bar ? [{ id: 'wpBar', label: 'Bar model', type: 'bool', default: false, group: 'support',
+        help: 'A bar model under each story (parts and whole, compare, or equal parts) with empty labels to fill.' }] : []),
+];
+{
+    const own = ['addition:add_word_problems', 'subtraction:sub_word_problems', 'multiplication:mult_word_problems',
+        'division:div_word_problems', 'multiplication:mult_comparison', 'algebra:multi_step_word'];
+    const keys = [...own, ...own.map(k => `${k}_plain`), 'division:remainder_interpret', 'division:remainder_contexts', 'addition:add_wp_10'];
+    for (const op of ['add', 'sub']) for (const code of Object.keys(_OPS_BANDS)) keys.push(`${op === 'add' ? 'addition' : 'subtraction'}:${op}_wp_${code}`, `${op === 'add' ? 'addition' : 'subtraction'}:${op}_wp_${code}_plain`);
+    for (const key of new Set(keys)) {
+        const cur = SKILL_OPTIONS[key] || [];
+        const hasBar = cur.some(o => o.id === 'support' && Array.isArray(o.values) && o.values.some(v => v.v === 'bar'));
+        SKILL_OPTIONS[key] = [...cur, ...WORD_WORK_OPTIONS(!hasBar)];
+    }
+}
 
 // Options every skill understands, whether or not it declares anything of its own.
 export const UNIVERSAL_OPTIONS = [levelOption()];

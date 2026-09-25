@@ -3117,17 +3117,28 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 const options = choiceNumbers.map(n => cap(numberToWordForm(n)) + '.');
 
                 q.text = `Which is the word name for ${target.toLocaleString()}?`;
+                q.printText = 'Circle the word name of the number.';
                 q.ans = correctText;
                 q.options = options;
-                q.answerType = 'choice';
+                // 'multiple-choice' (it was 'choice', which the quiz host does not know, so the quiz
+                // printed a bare write-line for a Choose skill).
+                q.answerType = 'multiple-choice';
                 // The hint names the method; it used to print the answer itself (Q-8).
                 q.hint = 'Read each part: millions, thousands, then hundreds, tens and ones.';
                 q.skillLabel = 'Word Name';
-                q.printFormat = 'number-word-names';
-
                 // Visual: the numeral under its place letters, in ink (it was a seven-colour
                 // chart that printed as grey blocks).
                 q.visual = `<div style="text-align:center;">${numeralTracksHTML(target)}</div>`;
+                // The kit cell (it was template:legacy, whose handler printed "word name for NaN"
+                // and a second Answer line under the choices): the numeral, then the four word
+                // names one per line; ONE response — ring the right one. The key rings it.
+                // `labels` / `correct`: the choices' letters, so a fix on Error analysis is a check
+                // box by the right letter, not the whole word name copied into a box.
+                const letters = options.map((_, i) => 'ABCD'[i]);
+                q.cell = { template: 'pv', v: 1, payload: { kind: 'word-choice', n: target, choices: options, labels: letters,
+                    correct: options.indexOf(correctText), keyValue: correctText } };
+                q.printFormat = 'pv-cell';
+                q.pv = { kind: 'words', n: target, choices: options.slice() };
             }
             return;
 }
