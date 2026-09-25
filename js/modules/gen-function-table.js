@@ -10,11 +10,11 @@
 //
 // The whole item is decided by the skill's options (skill-options.js, "FUNCTION TABLES"):
 //   task      outputs | rule | inputs | mixed | make       one per page
-//   op        {+, −, ×, ÷}                                  dealt in turn by item index
+//   ops       {+, −, ×, ÷}                                  dealt in turn by item index
 //   step      {1, 2}                                        one- or two-step rules, in turn
 //   band      10 | 20 | 50 | 100 | 1000                     caps EVERY number in the table
 //   tiles     3 | 4 | 5                                     rows
-//   order     ordered | scrambled                           the In numbers
+//   order     inorder | scrambled                           the In numbers
 //   support   frame | line                                  the rule column / rule frame
 //   pictures  bool                                          the function machine
 //   response  standard | check                             a Check row under the table
@@ -140,7 +140,7 @@ export function generateFunctionTable(q, skillId) {
     const band = [10, 20, 50, 100, 1000].includes(Number(o.band)) ? Number(o.band) : (skillId === 'function_table_hard' ? 100 : 20);
     const cap = Math.max(10, pvCap(band, state.range));
     const rowsN = [3, 4, 5].includes(Number(o.tiles)) ? Number(o.tiles) : 4;
-    const ops = ticked(o.op, OPS);
+    const ops = ticked(o.ops, OPS);
     const stepsSet = ticked(o.step, [1, 2]);
     const wantCheck = o.response === 'check' && task !== 'make';
     const need = rowsN + (wantCheck ? 1 : 0);

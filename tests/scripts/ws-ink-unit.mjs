@@ -265,6 +265,21 @@ has('var grey border', inkHTML(`<div style="border:1px solid var(--mq-muted)"></
         }
     }
 }
+// 26. Critic round 2 (C4): the key's digits keep the sheet's open 4 (cv04) at Andika 700, never
+//     cv01 (TY-4), and the role CSS stays in the ink set.
+{
+    const { SHEET_ENGINE_CSS } = await import('../../js/modules/sheet/roles/practice.js');
+    ok('key answers keep cv04', /\[data-ws-ink="solid"\][^{]*\{font-feature-settings:"cv04" 1\}/.test(SHEET_ENGINE_CSS));
+    ok('TY-4: no cv01 / cv06 anywhere in the role CSS', !/cv0[16]"/.test(SHEET_ENGINE_CSS));
+    ok('key answers are Andika 700', /\.ws-key \[data-ws-ink="solid"\][^{]*\{font-weight:700\}/.test(SHEET_ENGINE_CSS));
+    ok('pupil ink (error analysis) is the one grey', /\.mq-pupil,[^{]*\.mq-pupil \*\{color:#949494!important\}/.test(SHEET_ENGINE_CSS));
+    const colours = [...SHEET_ENGINE_CSS.matchAll(/#[0-9a-fA-F]{3,6}\b/g)].map((m) => m[0].toLowerCase());
+    ok('role CSS: ink, paper and the one grey only', colours.every((c) => ['#000', '#000000', '#fff', '#ffffff', '#949494'].includes(c)), colours.join(','));
+    const { dotTile } = await import('../../js/modules/sheet/roles/guided.js');
+    const tile = dotTile(7);
+    eq('dot tile: seven dots', (tile.match(/<circle/g) || []).length, 7);
+    ok('dot tile: trace grey only', [...tile.matchAll(/#[0-9a-fA-F]{3,6}\b/g)].every((m) => ['#949494', '#fff'].includes(m[0].toLowerCase())));
+}
 // 25. Residue finder sees what is left.
 ok('residue finds colour', inkResidue(`<div style="color:#1565c0"></div>`).length === 1);
 

@@ -121,8 +121,23 @@ function scoreVariant(skillId, variant, idx, weight, hist, wrongMap, adaptiveOn)
  * @returns {*} One element of `variants`. Returns `variants[0]` when
  *              variants is empty/invalid (caller should pass a real array).
  */
+// P12 (2026-09-25): the teacher's "What the items ask" choice. A skill that declares a `forms`
+// option over one of its pickVariant() keys (skill-options.js, `variantKey`) narrows the rotation
+// to the forms he ticked. generate-question.js registers the resolver; it returns undefined when
+// the teacher has not narrowed anything, and then the LRU rotation below runs exactly as before.
+let _variantOverride = null;
+export function registerVariantOverride(fn) { _variantOverride = typeof fn === 'function' ? fn : null; }
+
 export function pickVariant(skillId, variants, weights = null) {
     if (!Array.isArray(variants) || variants.length === 0) return null;
+    if (_variantOverride) {
+        let forced;
+        try { forced = _variantOverride(skillId, variants); } catch (e) { forced = undefined; }
+        if (forced !== undefined && variants.includes(forced)) {
+            pushHistory(skillId, forced);
+            return forced;
+        }
+    }
     if (variants.length === 1) {
         pushHistory(skillId, variants[0]);
         return variants[0];

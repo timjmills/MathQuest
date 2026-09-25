@@ -95,6 +95,8 @@ export const SKILL_GRADES = {
     'number_families_mult': 3, 'number_families_mult_med': 3,
     'missing_mult_div': 3, 'mixed_mult_div': 3, 'mult_properties': 3, 'mult_chart': 3,
     'mult_chart_easy': 3, 'mult_chart_medium': 4, 'mult_chart_hard': 5,
+    // 2026-09-25: count by 1-12 (3.OA.7 prep) and number patterns with a rule (3.OA.9 / 4.OA.5)
+    'count_by_tables': 3, 'number_patterns_rule': 3,
     'number_families_mixed_med': 3, 'word_problems_mixed': 3, 'word_problems_mixed_plain': 3,
     'number_families_mult_hard': 4, 'number_families_mixed_hard': 4,
     'div_remainders': 4, 'area_model_mult': 4, 'area_model_div_2by1': 4,
@@ -227,11 +229,13 @@ export const SKILL_GRADES = {
     // Place Value (prefixed to avoid collision with fractions)
     'place_value_disks': 2, 'pv_disks_build': 2, 'pv_digit_drag': 4, 'number_word_names': 4, 'place_value_10x': 5, 'placevalue:identify': 2, 'value': 2,
     'placevalue:compare': 2, 'expand': 2, 'combine': 2,
+    'unit_form': 2,
     // Ordering skills (multi-grade K-3)
     'order_least_to_greatest': 'M', 'order_greatest_to_least': 'M',
     'order_negatives': 6,
     // Number Sense
     'rounding_visual': 3, 'nearest_10': 3, 'nearest_100': 3, 'nearest_1000': 3, 'rounding_table': 3,
+    'between_tens': 3, 'place_on_number_line': 2,
     'nearest_10000': 4, 'nearest_100000': 5, 'nearest_million': 5,
     'round_sort_10': 3, 'round_sort_100': 3,
     'round_sort_1000': 4, 'round_sort_10000': 4,
@@ -739,6 +743,8 @@ export const SKILLS = {
         { v: "mult_zeros", l: "Multiply by 10, 100 and Multiples of Ten" },          // MB-1, MB-2: factors outside every fact skill's factRange
         { v: "mult_placeholder_zero", l: "Write the Placeholder Zero" },             // MB-9: the placeholder-zero box (M-M6, the biggest 2×2 error)
         { v: "mult_missing_digit", l: "Find the Missing Digit (Multiplication)" },   // MB-12
+        // APPENDED 2026-09-25 (owner): one count-by row per table, to 12x (3.OA.7 prep).
+        { v: "count_by_tables", l: "Count by 1–12" },
     ],
     division: [
         { v: "div_facts", l: "Division Facts (1-12)" },
@@ -1081,6 +1087,8 @@ export const SKILLS = {
         { v: "number_pattern", l: "Number Patterns" },
         { v: "pattern_relationship", l: "Two Patterns, Find Relationship (Visual)" },
         { v: "mixed_patterns", l: "Mixed Patterns" },
+        // APPENDED 2026-09-25 (owner): count on / back / double from ones to thousands, with the rule.
+        { v: "number_patterns_rule", l: "Number Patterns: Count On, Count Back, Double" },
     ],
     algebra: [
         { v: "tape_diagram", l: "Tape Diagrams / Bar Models (Visual)" },
@@ -1138,6 +1146,8 @@ export const SKILLS = {
         { v: "order_least_to_greatest", l: "Order: Least to Greatest" },
         { v: "order_greatest_to_least", l: "Order: Greatest to Least" },
         { v: "mixed_placevalue", l: "Mixed Place Value" },
+        // P9 appends, 2026-09-25 (§18) — APPEND ONLY, after every existing id.
+        { v: "unit_form", l: "Unit Form (4 hundreds 7 tens 6 ones)" },
     ],
     number_sense: [
         { v: "rounding_visual", l: "Round on a Number Line" },
@@ -1165,6 +1175,9 @@ export const SKILLS = {
         { v: "doubles_near_doubles", l: "Doubles & Near Doubles" },
         { v: "compensation", l: "Compensation Strategy" },
         { v: "mixed_number_sense", l: "Mixed Rounding & Estimation" },
+        // P9 appends, 2026-09-25 (§18) — APPEND ONLY, after every existing id.
+        { v: "between_tens", l: "Find the Two Tens a Number Is Between" },
+        { v: "place_on_number_line", l: "Mark a Number on a Number Line" },
     ],
     number_theory: [
         { v: "prime_composite", l: "Prime vs Composite" },
@@ -1270,7 +1283,7 @@ export const SKILLS = {
 export function isMixedMetaSkill(v) {
     // Real playable skills that happen to start with 'mixed_' or end with '_all'
     const realPlayableSkills = new Set([
-        'mixed_add_sub', 'mixed_mult_div', 'mixed_improper_visual',
+        'mixed_add_sub', 'mixed_mult_div', 'mixed_improper_visual', 'mixed_nl_drag',
         'coordinate_all',
     ]);
     if (realPlayableSkills.has(v)) return false;
@@ -1807,6 +1820,7 @@ export const SKILL_PRINT_SIZE = {
     round_sort_10000: "wide", round_sort_100000: "wide", round_sort_million: "wide",
     round_sort_tenths: "wide", round_sort_hundredths: "wide",
     rounding_table: "medium",
+    unit_form: "standard", between_tens: "compact", place_on_number_line: "wide",
     identify: "compact",
     value: "compact",
     add_sub_10s: "compact", add_sub_100s: "compact",
@@ -1957,6 +1971,8 @@ export const SKILL_PRINT_SIZE = {
     mult_properties: "medium", div_remainders: "medium",
     mult_chart: "medium",
     mult_chart_easy: "wide", mult_chart_medium: "wide", mult_chart_hard: "wide",
+    // 2026-09-25: one full-width row each (the kit draws them; this is the legacy fallback)
+    count_by_tables: "wide", number_patterns_rule: "wide",
     divisibility_sort: "medium",
     factor_tchart_easy: "medium", factor_tchart_medium: "medium", factor_tchart_hard: "medium",
     factor_links_easy: "medium", factor_links_medium: "medium", factor_links_hard: "medium",

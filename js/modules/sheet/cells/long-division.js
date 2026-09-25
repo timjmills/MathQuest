@@ -25,6 +25,7 @@
 import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, inked, box, esc, HAIR, HEAVY } from './ops-common.js';
 import { INK, stripPos } from '../tokens.js';
+import { stepMarks, WHOLE_SLOTS } from '../steps.js';
 
 /** Work rows: the payload's count, else two per step of the algorithm (at least two). */
 const rowsOf = (p) => (Number(p.workRows) > 0 ? Number(p.workRows) : Math.max(2, 2 * divisionSteps(p.dividend, p.divisor).length));
@@ -104,13 +105,17 @@ register('division', {
         });
         const cols = `grid-template-columns:repeat(${dv}, ${g.em(trackMm)}) ${g.em(gutterMm)} repeat(${n}, ${g.em(trackMm)})`
             + `${p.rbox ? ` ${g.em(trackMm * 0.9)} ${g.em(trackMm * 1.2)}` : ''};`;
+        // S5 step state: {slot: {value, ink}} and one ink per work row (stepState below).
+        const sv = ctx.stepVals || null;
+        const vAt = (id) => (sv ? ((sv[id] && sv[id].value) || '') : vals[id] || '');
+        const iAt = (id) => (sv ? ((sv[id] && sv[id].ink) || null) : ink);
         const cell = (content, col, row, extra = '') =>
             `<span style="grid-column:${col};grid-row:${row};display:flex;align-items:center;justify-content:center;${extra}">${content}</span>`;
         let html = '';
         // Row 1: the quotient strip over every dividend track (VA-61, SL-12).
         for (let i = 0; i < n; i++) {
             html += cell(box(g, `q-${i}`, {
-                wMm: trackMm, hMm: g.stripMm, value: vals[`q-${i}`] || '', ink, mark: 'cell', seg: stripPos(i, n),
+                wMm: trackMm, hMm: g.stripMm, value: vAt(`q-${i}`), ink: iAt(`q-${i}`), mark: 'cell', seg: stripPos(i, n),
                 // A box before the quotient's first digit stays empty on the key: ungraded.
                 graded: k.slots[`q-${i}`] !== '',
             }), dv + 2 + i, 1, 'align-items:flex-end;padding-bottom:0.08em;');
@@ -118,7 +123,7 @@ register('division', {
         // P11: the remainder slot, "R [ ]", on the quotient's row after the last dividend track.
         if (p.rbox) {
             html += cell('<span style="font-weight:700">R</span>', dv + 2 + n, 1, 'align-items:flex-end;padding-bottom:0.08em;');
-            html += cell(box(g, 'r', { wMm: trackMm, hMm: g.stripMm, value: vals.r || '', ink, mark: 'cell' }), dv + 3 + n, 1, 'align-items:flex-end;padding-bottom:0.08em;');
+            html += cell(box(g, 'r', { wMm: trackMm, hMm: g.stripMm, value: vAt('r'), ink: iAt('r'), mark: 'cell' }), dv + 3 + n, 1, 'align-items:flex-end;padding-bottom:0.08em;');
         }
         // Row 2: divisor, bracket, dividend. The vinculum is the top border of the dividend row.
         for (let i = 0; i < dv; i++) html += cell(esc(V[i]), i + 1, 2);
@@ -129,13 +134,14 @@ register('division', {
         // Work rows (VA-63). The key and a Model cell write the finished work; the pupil page
         // leaves the rows open. The "−" and the rule under each subtract row are structural.
         const shownQ = ctx.state === 'wrong' ? Object.keys(k.slots).map((id) => vals[id] || ' ').join('') : null;
-        const work = ink === null ? [] : workRows(p, rows, shownQ);
+        const work = sv ? workRows(p, rows, null) : ink === null ? [] : workRows(p, rows, shownQ);
         const rowH = g.em(Math.max(g.writeMm, 6) + 1);
         for (let r = 0; r < rows; r++) {
             const gridRow = 3 + r;
             const subtract = r % 2 === 0;
             const w = work[r];
-            const t = w ? w.text.padStart(w.col + 1, ' ') : '';
+            const rInk = sv ? ((ctx.stepWork || [])[r] || null) : ink;
+            const t = w && rInk ? w.text.padStart(w.col + 1, ' ') : '';
             // The "−" is structural (VA-63): printed in the gutter of every subtract row, so it
             // never sits in a digit track and never touches the product's first digit.
             html += cell(subtract ? `<span style="font-weight:700">−</span>` : '', dv + 1, gridRow, `height:${rowH};`);
@@ -146,7 +152,7 @@ register('division', {
                 const grid = `border-left:${HAIR} solid ${INK.grey};${i === n - 1 ? `border-right:${HAIR} solid ${INK.grey};` : ''}`
                     + (r === 0 ? `border-top:${HAIR} solid ${INK.grey};` : '')
                     + `border-bottom:${HAIR} solid ${subtract ? INK.ink : INK.grey};`;
-                html += cell(ch ? inked(ch, ink) : '', dv + 2 + i, gridRow, `box-sizing:border-box;height:${rowH};${grid}`);
+                html += cell(ch ? inked(ch, rInk) : '', dv + 2 + i, gridRow, `box-sizing:border-box;height:${rowH};${grid}`);
             }
         }
         const label = `${D} divided by ${V}`;
@@ -187,4 +193,42 @@ register('division', {
         return out;
     },
     layout() { return { card: 'card-division', checker: 'value', requiresVisual: true }; },
+    /**
+     * S5 / P-LC-9: the bracket after step k. A quotient-digit mark `q<j>` writes the j-th digit of
+     * the quotient over its dividend digit AND the two work rows of that step of the algorithm
+     * (product, then difference and bring-down) in the same ink; a whole `answer` / `quotient`
+     * mark writes every quotient digit (keeping the ink of those already written); `remainder`
+     * fills the "R" box. Newest grey, earlier black.
+     */
+    stepState(p, steps, k, ctx) {
+        const D = String(p.dividend);
+        const n = D.length;
+        const alg = divisionSteps(p.dividend, p.divisor);
+        const kk = keyOf(p);
+        const sv = {};
+        const work = [];
+        for (const m of stepMarks(steps, k)) {
+            const qd = /^q(\d+)$/.exec(m.slot);
+            if (qd) {
+                const j = Number(qd[1]);
+                const st = alg[j];
+                if (!st) continue;
+                sv[`q-${st.col}`] = { value: String(m.value).replace(/\D/g, '') || String(st.digit), ink: m.ink };
+                work[2 * j] = m.ink;
+                work[2 * j + 1] = m.ink;
+                continue;
+            }
+            if (m.slot === 'remainder' && p.rbox) { sv.r = { value: m.value, ink: m.ink }; continue; }
+            if (WHOLE_SLOTS.has(m.slot)) {
+                for (let i = 0; i < n; i++) {
+                    const v = kk.slots[`q-${i}`];
+                    if (!v) continue;
+                    if (!sv[`q-${i}`] || sv[`q-${i}`].value !== v) sv[`q-${i}`] = { value: v, ink: m.ink };
+                }
+                for (let r = 0; r < 2 * alg.length; r++) if (!work[r]) work[r] = m.ink;
+                if (p.rbox && /R/i.test(String(m.value)) && !sv.r) sv.r = { value: String(kk.remainder), ink: m.ink };
+            }
+        }
+        return this.render(p, Object.assign({}, ctx, { state: 'blank', stepVals: sv, stepWork: work }));
+    },
 });

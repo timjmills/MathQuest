@@ -201,6 +201,12 @@
 :is(.ws-page, .ws-sheet).ws-photocopy .ws-trace,
 :is(.ws-page, .ws-sheet) .ws-photocopy .ws-trace { color: transparent; -webkit-text-stroke: .6pt var(--ws-ink); }
 
+/* ---------- touch dots (S1, design/SUPPORTS.md) ----------
+   A number span that carries a touch-dot overlay (js/modules/sheet/touchdots.js). The overlay SVG is
+   absolutely positioned on the span's centre and takes no space, so nothing moves. Additive only. */
+:is(.ws-page, .ws-sheet) .ws-td, .ws-td { position: relative; }
+:is(.ws-page, .ws-sheet) .ws-td-svg { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+
 /* ---------- vertical facts (VA-70) ---------- */
 :is(.ws-page, .ws-sheet) .ws-fact { font-size: var(--fd, var(--ws-digit)); line-height: 1; display: grid; grid-template-columns: repeat(3, 0.72em); justify-content: center; }
 :is(.ws-page, .ws-sheet) .ws-fact > span { text-align: center; height: 1.15em; display: flex; align-items: center; justify-content: center; }

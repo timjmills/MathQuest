@@ -31,6 +31,7 @@ import {
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
 import { deriveSeed } from '../rng.js';
+import { ANCHOR_CSS, anchorPlanItem, sideItems, pupilCount, blockPlan, blockPages } from '../anchors.js';
 
 /* ======================================================================= engine stylesheet */
 
@@ -175,13 +176,60 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpstory{border-radius:0}
 :is(.ws-page,.ws-sheet) .mq-wpspace{position:relative;flex:1 1 auto;min-height:30mm;border:var(--ws-hair) solid var(--ws-ink);display:flex;align-items:center;justify-content:center}
 :is(.ws-page,.ws-sheet) .mq-wpspace>small{position:absolute;left:2mm;top:1mm;font-size:var(--ws-zone);line-height:1.2}
-:is(.ws-page,.ws-sheet) .mq-wpsentence{font-size:var(--ws-digit);font-weight:700;line-height:1}
+:is(.ws-page,.ws-sheet) .mq-wpsentence{font-size:calc(var(--ws-text) * 1.35);font-weight:700;line-height:1.15;text-align:center;padding:0 2mm}
 :is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpanswer{margin-top:0;padding-right:0;justify-content:flex-end;gap:6mm}
 /* INK-3: everything inside a traced slot is trace grey, the legacy key's inline-black <b> and a
    drawn model's currentColor strokes included (print-worksheet.css forces legacy text black). */
 :is(.ws-page,.ws-sheet) [data-ws-ink="trace"] *{color:#949494!important}
 /* Guided fade: a partially traced value keeps its geometry; the untraced part is not printed. */
 :is(.ws-page,.ws-sheet) .mq-untraced{visibility:hidden}
+/* ---- critic round 2 (2026-09-25) ---- */
+/* AK-1 facsimile: a key answer is Andika 700 and keeps the sheet's open 4 (cv04, TY-4) however deep
+   it sits (a legacy key style or an inline font shorthand reset it, and the 4 closed). cv01 is NOT
+   set: TY-4 (owner ruling 2026-09-19) rejects it, so the bold face keeps its own flagged 1. */
+:is(.ws-page,.ws-sheet) :is(b,strong,th,.ws-tab,[data-ws-ink="solid"],[data-ws-ink="solid"] *,.ws-legacy-answer,.ws-legacy-answer *){font-feature-settings:"cv04" 1}
+.ws-key [data-ws-ink="solid"]:not(.mq-pupil):not(:is(.mq-pupil,.mq-judge-work,.mq-abbox,.mq-tf) *){font-weight:700}
+/* Guided cells: the count cue of a level-2 cell (H3), grey, beside the fact. */
+:is(.ws-page,.ws-sheet) .mq-cuewrap{display:flex;align-items:flex-start;justify-content:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-cue{display:flex;flex-direction:column;gap:1mm;padding-top:1mm}
+:is(.ws-page,.ws-sheet) .mq-cue svg{display:block}
+:is(.ws-page,.ws-sheet) .mq-cuecol{width:100%;display:flex;flex-direction:column;align-items:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-thinkcue{font-size:var(--ws-text);line-height:1.2;white-space:nowrap;border:1pt solid #949494;border-radius:2mm;padding:1mm 3mm}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-modelcell{padding-top:calc(var(--ws-tab,6mm) + 1.5mm)}
+/* Error analysis: what the pupil wrote is shown in "pupil writing" (trace grey, tagged), so it is
+   never confused with the printed numbers (critic round 2, C1). */
+:is(.ws-page,.ws-sheet) .mq-pupiltag{position:absolute;left:8mm;top:1mm;font-size:var(--ws-zone);line-height:1.2;font-style:normal;white-space:nowrap}
+/* the "<name> wrote:" tag sits on the letter's line; the work starts under it */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-eacell{padding-top:calc(var(--ws-zone) * 1.2 + 2.5mm)}
+:is(.ws-page,.ws-sheet) .mq-pupil,:is(.ws-page,.ws-sheet) .mq-pupil *{color:#949494!important}
+:is(.ws-page,.ws-sheet) .mq-klabel{display:inline-flex;align-items:center;min-height:calc(var(--ws-hw) + 4mm);font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .mq-pupilwork{font-size:var(--ws-digit);line-height:1.1;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixes{display:flex;gap:3mm;flex-wrap:wrap}
+:is(.ws-page,.ws-sheet) .mq-redraw{display:flex;flex-direction:column;align-items:flex-start;gap:1mm}
+:is(.ws-page,.ws-sheet) .mq-redraw>small{font-size:var(--ws-zone);line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-fixchoice{display:flex;flex-direction:column;gap:2mm}
+/* VA-2: the operator keeps to the left of its own track, clear of a two-digit bottom number. */
+:is(.ws-page,.ws-sheet) .ws-fact>.op{justify-content:flex-start}
+/* Fact rows across form (PT-FRW-7) and the division sentence frame under a picture. */
+:is(.ws-page,.ws-sheet) .mq-hfact.mq-across{justify-content:flex-start;padding-top:1mm}
+:is(.ws-page,.ws-sheet) .mq-hfact.mq-across>span{white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-sframe{display:flex;align-items:flex-end;justify-content:center;gap:1.5mm;margin-top:1mm;font-size:var(--ws-text);line-height:1.1;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-sframe .ws-line{height:7mm}
+/* Word problems: the skill's named model in the work space, a picture row for K. */
+/* The answer column sits BESIDE the work space, at its foot, so a story with its model fits three
+   (or two) to a page instead of one: story across the top, work space left, number and label right. */
+:is(.ws-page,.ws-sheet) .mq-wp.mq-wp2{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto 1fr;column-gap:4mm;row-gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2>.mq-wpstory{grid-column:1 / -1;padding-top:2mm;padding-bottom:2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2>.mq-wpspace{grid-column:1;grid-row:2;min-height:20mm}
+:is(.ws-page,.ws-sheet) .mq-wp2>.mq-wpanswer{grid-column:2;grid-row:2;flex-direction:column;align-items:flex-end;justify-content:flex-end;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpk>.mq-wpanswer{flex-direction:row;align-items:flex-start;gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpk>.mq-wpanswer .mq-ansslot small:empty{display:none}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpunder{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpunder>.mq-wpanswer{grid-column:1;grid-row:3;flex-direction:row;align-items:flex-end}
+:is(.ws-page,.ws-sheet) .mq-wpspace.mq-wpmodel{align-items:stretch;justify-content:center;padding:6mm 2mm 2mm}
+:is(.ws-page,.ws-sheet) .mq-wpspace.mq-wpmodel>div{width:100%;display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-wppics{display:flex;flex-wrap:wrap;gap:3mm;justify-content:center;align-items:center;padding:2mm}
+${ANCHOR_CSS}
 `.trim();
 
 export const styleBlock = () => `<style data-mq-sheet-engine>${SHEET_ENGINE_CSS}</style>`;
@@ -317,16 +365,34 @@ export function varsOfItems(items) {
 
 /** A key with a placeholder, when the section has no single value for it: the nearest plain key. */
 export const PLACEHOLDER_FALLBACK = Object.freeze({
-    'skip-count': 'missing', 'ring-groups': 'groups-of', 'ring-remainder': 'groups-of',
+    'skip-count': 'missing', 'ring-groups': 'ring-groups-each', 'ring-remainder': 'ring-remainder-each',
 });
 
 /** The printed instruction of a section: its key with the items' {n}, or the plain fallback. */
 export function resolveInstruction(key, items, vars) {
     const v = vars || varsOfItems(items);
+    key = pluralKey(key, items);
     try { return { key, text: instructionFor(key, v) }; } catch (e) { /* placeholder left */ }
-    const fb = PLACEHOLDER_FALLBACK[key];
+    const fb = pluralKey(PLACEHOLDER_FALLBACK[key], items);
     if (fb) { try { return { key: fb, text: instructionFor(fb, {}) }; } catch (e) { /* fall through */ } }
     return { key: 'default-write', text: INSTRUCTION_LIBRARY['default-write'] };
+}
+
+/** How many blanks an item asks for: the parts of its answer ("35, 56" is two). */
+function blanksOf(it) {
+    const q = (it && it.q) || {};
+    if (Array.isArray(q.ans)) return q.ans.length;
+    const a = typeof q.ans === 'string' ? q.ans : '';
+    return /,\s/.test(a) ? a.split(/,\s*/).length : 1;
+}
+
+/**
+ * Critic round 2: "Write the missing number." over windows and tracks with two or three blanks.
+ * A section in which any item has more than one blank takes the plural string.
+ */
+function pluralKey(key, items) {
+    if (key !== 'missing') return key;
+    return (items || []).some((it) => blanksOf(it) > 1) ? 'missing-all' : key;
 }
 
 /** One item's placeholder values, from its provider's `strings.instructionVars(q)`; {} when none. */
@@ -461,6 +527,8 @@ export function hookClasses(it, level) {
  * from it and the fact ladder its digit size, and the key calls the SAME function (AK-1).
  */
 function planItem(it, level, cols) {
+    // S6: a worked twin (side by side) is an anchor - unscored, unlabelled, Model tab.
+    if (it.anchor) return anchorPlanItem(it, cols);
     const q = it.q || null;
     return {
         q,
@@ -479,18 +547,55 @@ function planItem(it, level, cols) {
  * Lay out every section of ONE sheet and place it on pages.
  * @returns {{layouts, chunksBySection, pages}}
  */
-function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, headerFirst, availableWidthMm }) {
-    const layouts = sectionsIn.map((sec, si) => resolveSectionLayout(
-        { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense },
-        itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
-    ));
-    const chunksBySection = layouts.map((L, si) => paginate(itemsBySection[si].length, L));
+function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, headerFirst, availableWidthMm, anchors }) {
     const instr = instructionMm(size);
+    const body = bodyHeightMm(paper, headerFirst);
+    const layouts = sectionsIn.map((sec, si) => {
+        const L = resolveSectionLayout(
+            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols },
+            itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
+        );
+        // S6 SECTIONS: anchor band + 3-4 problems per block; the band's height comes off the page
+        // (anchors.js blockPlan) and a block is never split.
+        const aMm = anchorBandOf(anchors, si);
+        // SIDE BY SIDE in ONE column (a problem too wide for two): each twin sits above its
+        // problem, so a page holds whole pairs - an even number of rows (PG-21: never an example
+        // at the foot of a page with its problem overleaf).
+        if (anchors && anchors.mode === 'side' && L.cols === 1 && itemsBySection[si].some((it) => it.anchor)) {
+            const rows = Math.max(2, L.rows - (L.rows % 2));
+            return Object.assign({}, L, { rows, perPage: rows, pairs: true });
+        }
+        if (!aMm) return L;
+        const bp = blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: sec.gridH ? sec.gridH + instr : body, instrMm: instr, anchorMm: aMm });
+        return Object.assign({}, L, { cellH: bp.cellH, perPage: bp.perPage, rows: bp.blocksPerPage * bp.blockRows, blocks: bp, anchorMm: aMm });
+    });
+    const chunksBySection = layouts.map((L, si) => (L.blocks
+        ? blockPages(itemsBySection[si].length, L.blocks, L.cols, L.anchorMm)
+        : L.pairs
+            // Paginate PAIRS, then count them back as rows: a page break never falls inside one.
+            ? paginate(Math.ceil(itemsBySection[si].length / 2), { cols: 1, rows: L.rows / 2 })
+                .map((c) => Object.assign({}, c, { from: c.from * 2, count: Math.min(c.count * 2, itemsBySection[si].length - c.from * 2), rows: c.rows * 2 }))
+            : paginate(itemsBySection[si].length, L)));
     const pages = placeSections(
         layouts.map((L, si) => ({ layout: L, chunks: chunksBySection[si], instrMm: instr })),
-        { bodyFirstMm: bodyHeightMm(paper, headerFirst), bodyContMm: bodyHeightMm(paper, headerFirst, { cont: true }) },
+        { bodyFirstMm: body, bodyContMm: bodyHeightMm(paper, headerFirst, { cont: true }) },
     );
     return { layouts, chunksBySection, pages };
+}
+
+/** The anchor band height (mm) of section `si` in SECTIONS mode, else 0. */
+const anchorBandOf = (anchors, si) => (anchors && anchors.mode === 'sections' && anchors.bandMm && Number(anchors.bandMm[si]) > 0
+    && anchors.bySection && (anchors.bySection[si] || []).length ? Number(anchors.bandMm[si]) : 0);
+
+/**
+ * S6 SIDE BY SIDE: each pupil item that carries a worked twin (`it.twin`, anchors.js anchorItem
+ * 'side') is preceded by it, and the section is two columns: rows of [twin | problem].
+ */
+export function withAnchors(norm, sheetItems, anchors) {
+    if (!anchors || anchors.mode !== 'side') return { sections: norm.sections, items: sheetItems };
+    const items = sheetItems.map((list) => sideItems(list, list.map((it) => it.twin || null)));
+    const sections = norm.sections.map((sec, si) => (items[si].some((it) => it.anchor) ? Object.assign({}, sec, { columns: 2 }) : sec));
+    return { sections, items };
 }
 
 /** PT-MPR-2: every More Practice letter is its own seed, so Practice C reprints identically. */
@@ -509,8 +614,10 @@ function sheetLayout(role, input, norm, sheetItems, tabId) {
         titleLines,
     };
     const W = Number(norm.ctxIn.availableWidthMm) || LIVE_W_MM;
-    const laid = layoutSheet(role, norm.sections, sheetItems, { size, look, paper, headerFirst: headerForLayout, availableWidthMm: W });
-    return Object.assign({ skills, words, titleLines }, laid);
+    const anchors = input.anchors || null;
+    const aw = withAnchors(norm, sheetItems, anchors);
+    const laid = layoutSheet(role, aw.sections, aw.items, { size, look, paper, headerFirst: headerForLayout, availableWidthMm: W, anchors });
+    return Object.assign({ skills, words, titleLines, sheetItems: aw.items, anchors }, laid);
 }
 
 /**
@@ -523,25 +630,30 @@ function composeSheet(role, input, norm, sheetItems, { tabId, seed, form }) {
     const level = 1;                                        // PT 1.7: Independent and More Practice
     const labelStyle = input.labels === 'none' ? 'none' : input.labels === 'tab' || input.labels === 'letter' ? input.labels
         : (LOOKS[look] || LOOKS[DEFAULT_LOOK]).label;       // CL-10 / CL-30, dialog override CL-20
-    const { skills, words, titleLines, layouts, pages } = sheetLayout(role, input, norm, sheetItems, tabId);
+    const laidOut = sheetLayout(role, input, norm, sheetItems, tabId);
+    const { skills, words, titleLines, layouts, pages, anchors } = laidOut;
+    // S6: with side-by-side anchors the sections' items carry their twins (unscored, unlabelled).
+    sheetItems = laidOut.sheetItems;
 
     // Instruction per section (BD-10, BD-13): the section's own key, else the skills' keys.
     const instr = norm.sections.map((sec, si) => {
+        const pupil = sheetItems[si].filter((it) => !it.anchor);
         const keys = sec.instructionKey ? [sec.instructionKey]
-            : sheetItems[si].map((it) => {
+            : pupil.map((it) => {
                 const q = it.q || {};
                 const s = skills.find((k) => k.skillId === q.skillId && (!q.categoryId || k.categoryId === q.categoryId));
                 return (it.instructionKey) || (s ? skillWords(s).instructionKey : '');
             });
         let key = sectionInstructionKey(keys);
         let text;
-        ({ key, text } = resolveInstruction(key, sheetItems[si], sec.instructionVars));
+        ({ key, text } = resolveInstruction(key, pupil, sec.instructionVars));
         return { key, text };
     });
 
     // Labels and Score across the sheet (CL-12, CL-33, PT-FRM-4).
     const partsInOrder = pages.flatMap((pg) => pg.parts);
-    const counts = partsInOrder.map((p) => p.chunk.count);
+    // Only pupil problems are labelled and scored: a worked twin or an anchor band is neither.
+    const counts = partsInOrder.map((p) => pupilCount(sheetItems[p.section].slice(p.chunk.from, p.chunk.from + p.chunk.count)));
     const { starts, notes: labelNotes } = labelStarts(counts, { style: labelStyle, restartEachPage: false });
     // Every cell on these roles is scored (none is a Model or a Guided cell, CL-14).
     const score = scoreDenominator(counts);
@@ -561,8 +673,29 @@ function composeSheet(role, input, norm, sheetItems, { tabId, seed, form }) {
             // PG-10 / PT-ENG-6: page 1 lets a lone full section fill the body by flex (exactly
             // gridH); every other grid carries the section's fixed height, rows x cellH, so a
             // cell is the same size on every page of the section.
-            const fillByFlex = !pg.cont && lone && part.chunk.rows === L.rows;
+            const fillByFlex = !pg.cont && lone && part.chunk.rows === L.rows && !L.blocks;
             sections.push({ kind: 'html', html: instructionHtml(instr[part.section].key, instr[part.section].text) });
+            if (L.blocks && part.chunk.blocks) {
+                // S6 SECTIONS: each block is its anchor band (its own Model tab, no label, no
+                // score) and then its 3-4 problems; the labels run on across the blocks.
+                const list = (anchors.bySection[part.section] || []);
+                let at = start;
+                for (const b of part.chunk.blocks) {
+                    const bi = Math.floor(b.from / Math.max(1, L.blocks.perBlock));
+                    const a = list[bi % list.length];
+                    sections.push({
+                        kind: 'grid', cols: 1, rows: 1, labels: 'none', start: at, cls: 'fixed mq-anchorgrid',
+                        height: `${Math.round(L.anchorMm * 1000) / 1000}mm`, items: [anchorPlanItem(a, 1)],
+                    });
+                    sections.push({
+                        kind: 'grid', cols: L.cols, rows: b.rows, labels: labelStyle, start: at, cls: 'fixed',
+                        height: `${Math.round(b.rows * L.cellH * 1000) / 1000}mm`,
+                        items: sheetItems[part.section].slice(b.from, b.from + b.count).map((it) => planItem(it, level, L.cols)),
+                    });
+                    at += b.count;
+                }
+                continue;
+            }
             sections.push({
                 kind: 'grid',
                 cols: L.cols,
@@ -580,6 +713,7 @@ function composeSheet(role, input, norm, sheetItems, { tabId, seed, form }) {
     const fits = layouts.map((L) => ({
         cols: L.cols, rows: L.rows, perPage: L.perPage, pages: L.pages, cellW: L.cellW, cellH: L.cellH,
         requested: L.requested, clamped: L.clamped, note: L.note, line: fitsLine(L), cls: L.cls, digitPt: L.digitPt,
+        hMin: L.hMin, anchorMm: L.anchorMm || 0, blocks: L.blocks || null,
     }));
     return {
         pages: planPages,
@@ -651,10 +785,10 @@ export function composePractice(role, input = {}) {
     } else {
         // Paginate the whole run once, exactly as an Independent run would be (PG-23 included),
         // then each page becomes the next letter.
-        const { pages } = sheetLayout(role, input, norm, bySection, 'Practice A');
-        groups = pages.map((pg, i) => {
+        const laid = sheetLayout(role, input, norm, bySection, 'Practice A');
+        groups = laid.pages.map((pg, i) => {
             const secs = norm.sections.map(() => []);
-            for (const part of pg.parts) secs[part.section].push(...bySection[part.section].slice(part.chunk.from, part.chunk.from + part.chunk.count));
+            for (const part of pg.parts) secs[part.section].push(...laid.sheetItems[part.section].slice(part.chunk.from, part.chunk.from + part.chunk.count).filter((it) => !it.anchor));
             return { letter: firstLetter + i, secs };
         });
     }

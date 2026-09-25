@@ -54,17 +54,30 @@ export const STORY_NOUNS = Object.freeze([
 export const STORY_NAMES = Object.freeze(['Mia', 'Omar', 'Lena', 'Ravi', 'Sam', 'Ana', 'Kofi', 'Yuki', 'Zara', 'Leo', 'Noor', 'Ben']);
 
 const BAG = { one: 'bag', many: 'bags' };
+const BOX = { one: 'box', many: 'boxes' };
 const ROW = { one: 'row', many: 'rows' };
 const CHAIR = { one: 'chair', many: 'chairs' };
+const PLATE = { one: 'plate', many: 'plates' };
+const FLOWER = { one: 'flower', many: 'flowers' };
+const CHILD = { one: 'child', many: 'children' };
+const TEAM = { one: 'team', many: 'teams' };
+const VASE = { one: 'vase', many: 'vases' };
+const CAR = { one: 'car', many: 'cars' };
+const JAR = { one: 'jar', many: 'jars' };
 
 export const nounFor = (unit, n) => (n === 1 ? unit.one : unit.many);
 export const be = (n) => (n === 1 ? 'is' : 'are');
 const count = (unit, n) => `${fmt(n)} ${nounFor(unit, n)}`;
 
 /**
- * The templates, by operation. Each takes {a, b, ans, unit, n1, n2} and returns
- * {schema, lines, question, ans, label unit}. `a` and `b` are the item's own operands in the
- * item's own order; the templates never change the numbers, only the words.
+ * The templates, by operation. Each takes {a, b, ans, rem, unit, n1, n2} and returns
+ * {schema, lines, question, unit?, ans?, work?}. `a` and `b` are the item's own operands in the
+ * item's own order; the templates never change the numbers, only the words. A template may
+ * return null when the numbers do not suit it.
+ *
+ * Critic round 2: a page held "rows of chairs" twice, or "balls into bags" twice, because x and ÷
+ * had two templates each and one noun per item. Each operation now has several contexts, and the
+ * role hands in the item's place on the page, which rotates template and noun (see storiesFor).
  */
 export const STORY_TEMPLATES = Object.freeze({
     '+': [
@@ -114,19 +127,102 @@ export const STORY_TEMPLATES = Object.freeze({
             lines: [`There ${be(a)} ${count(ROW, a)} of chairs.`, `Each row has ${count(CHAIR, b)}.`],
             question: 'How many chairs are there in all?',
         }),
+        ({ a, b, unit, n1 }) => ({
+            schema: 'groups',
+            lines: [`${n1} packs ${count(BOX, a)}.`, `Each box holds ${count(unit, b)}.`],
+            question: `How many ${unit.many} are in the boxes?`,
+        }),
+        ({ a, b, unit }) => ({
+            schema: 'groups',
+            lines: [`There ${be(a)} ${count(PLATE, a)}.`, `Each plate has ${count(unit, b)}.`],
+            question: `How many ${unit.many} are on the plates?`,
+        }),
+        ({ a, b, n1 }) => ({
+            schema: 'rows',
+            unit: FLOWER,
+            lines: [`${n1} plants ${count(ROW, a)} of flowers.`, `Each row has ${count(FLOWER, b)}.`],
+            question: `How many flowers does ${n1} plant?`,
+        }),
     ],
-    // a ÷ b. Grouping answers with BAGS; sharing answers with the thing noun.
-    '÷': [
+    // a ÷ b, MEASUREMENT (grouping): b in each group, how many groups. The label is the group noun.
+    grouping: [
         ({ a, b, n1, unit }) => ({
             schema: 'grouping',
             unit: BAG,
             lines: [`${n1} has ${count(unit, a)}.`, `${n1} puts ${fmt(b)} in each bag.`],
             question: `How many bags does ${n1} fill?`,
         }),
+        ({ a, b, n1, unit }) => ({
+            schema: 'grouping',
+            unit: BOX,
+            lines: [`${n1} has ${count(unit, a)}.`, `Each box holds ${count(unit, b)}.`],
+            question: `How many boxes does ${n1} fill?`,
+        }),
+        ({ a, b }) => ({
+            schema: 'grouping',
+            unit: TEAM,
+            lines: [`There ${be(a)} ${count(CHILD, a)} in the gym.`, `Each team has ${count(CHILD, b)}.`],
+            question: 'How many teams are there?',
+        }),
+        ({ a, b, n1 }) => ({
+            schema: 'grouping',
+            unit: VASE,
+            lines: [`${n1} has ${count(FLOWER, a)}.`, `${n1} puts ${fmt(b)} flowers in each vase.`],
+            question: `How many vases does ${n1} fill?`,
+        }),
+    ],
+    // a ÷ b, SHARING (partitive): b groups, how many in each. The label is the thing noun.
+    sharing: [
         ({ a, b, n1, unit }) => (b < 2 ? null : {
             schema: 'sharing',
             lines: [`${n1} has ${count(unit, a)}.`, `${n1} shares them into ${fmt(b)} bags.`, 'Each bag gets the same.'],
             question: `How many ${unit.many} go in each bag?`,
+        }),
+        ({ a, b, n1, unit }) => (b < 2 ? null : {
+            schema: 'sharing',
+            lines: [`${n1} puts ${count(unit, a)} on ${fmt(b)} plates.`, 'Each plate gets the same.'],
+            question: `How many ${unit.many} are on each plate?`,
+        }),
+    ],
+    // a ÷ b with a REMAINDER: the question interprets the left-over (PEDAGOGY 8.6, critic round 2).
+    remainder: [
+        // how many are left over: the answer IS the remainder
+        ({ a, b, rem, n1, unit }) => ({
+            schema: 'grouping-left',
+            ans: rem,
+            lines: [`${n1} has ${count(unit, a)}.`, `${n1} puts ${fmt(b)} in each bag.`],
+            question: `How many ${unit.many} are left over?`,
+        }),
+        // round UP: every one needs a place
+        ({ a, b, quo, rem }) => ({
+            schema: 'grouping-up',
+            unit: CAR,
+            ans: quo + 1,
+            lines: [`${count(CHILD, a)} go to the park.`, `Each car holds ${count(CHILD, b)}.`],
+            question: 'How many cars do they need?',
+            work: `${fmt(a)} ÷ ${fmt(b)} = ${fmt(quo)} R ${fmt(rem)}, so ${fmt(quo + 1)} cars`,
+        }),
+        // round DOWN: only full groups count
+        ({ a, b, quo, rem, n1, unit }) => ({
+            schema: 'grouping-full',
+            unit: JAR,
+            ans: quo,
+            lines: [`${n1} has ${count(unit, a)}.`, `A full jar holds ${count(unit, b)}.`],
+            question: `How many jars can ${n1} fill?`,
+            work: `${fmt(a)} ÷ ${fmt(b)} = ${fmt(quo)} R ${fmt(rem)}, so ${fmt(quo)} full jars`,
+        }),
+    ],
+    // Kindergarten take-away (P-WP-18: at most 6 words a line), about the picture's own objects.
+    'k-': [
+        ({ a, b, unit, n1 }) => ({
+            schema: 'take-from',
+            lines: [`${n1} has ${count(unit, a)}.`, `${n1} gives away ${fmt(b)}.`],
+            question: `How many ${unit.many} are left?`,
+        }),
+        ({ a, b, unit }) => ({
+            schema: 'take-from',
+            lines: [`There ${be(a)} ${count(unit, a)}.`, `${fmt(b)} ${b === 1 ? 'goes' : 'go'} away.`],
+            question: `How many ${unit.many} are left?`,
         }),
     ],
 });
@@ -134,11 +230,28 @@ export const STORY_TEMPLATES = Object.freeze({
 const OP_OF = { '+': '+', '-': '-', '−': '-', '×': 'x', x: 'x', '*': 'x', '÷': '÷', '/': '÷' };
 const GLYPH = { '+': '+', '-': '−', x: '×', '÷': '÷' };
 
+/** The template list an item draws from. */
+function templatesFor(op, cfg, rem) {
+    if (op === '÷') {
+        if (rem) return cfg.remainder ? STORY_TEMPLATES.remainder : [];
+        if (cfg.grouping) return STORY_TEMPLATES.grouping;
+        return [...STORY_TEMPLATES.grouping, ...STORY_TEMPLATES.sharing];
+    }
+    if (op === '-' && cfg.k) return STORY_TEMPLATES['k-'];
+    return STORY_TEMPLATES[op] || [];
+}
+
 /**
  * Build a `stories` member for one operation.
  * @param {'+'|'-'|'x'|'÷'} op
- * @param {{remainder?: boolean, max?: number}} [cfg]  remainder: division stories ask how many
- *        bags are FULL and say what is left over (the interpretation step of div_remainders)
+ * @param {{remainder?: boolean, grouping?: boolean, k?: boolean}} [cfg]
+ *        remainder: division stories interpret the left-over (how many left, round up, full groups)
+ *        grouping:  measurement division only - "N in each bag, how many bags" (share_into_groups)
+ *        k:         Kindergarten stories: short lines about the picture's own objects (`opts.unit`)
+ *
+ * `opts` = {seed, index, unit}. With `index` (the item's place on the page) the template and the
+ * noun ROTATE from a page-wide start drawn from `seed`, so neighbours never share either; without
+ * it, both are drawn per item (the old behaviour, kept for single-item callers).
  */
 export function storiesFor(op, cfg = {}) {
     const fn = (q = {}, opts = {}) => {
@@ -146,50 +259,65 @@ export function storiesFor(op, cfg = {}) {
         if (!Number.isFinite(a) || !Number.isFinite(b) || a <= 0 || b <= 0) return null;
         let ans;
         let rem = 0;
+        let quo = 0;
         if (op === '+') ans = a + b;
         else if (op === '-') { if (b >= a) return null; ans = a - b; }
         else if (op === 'x') ans = a * b;
         else {
             if (b < 1) return null;
-            ans = Math.floor(a / b);
-            rem = a - ans * b;
+            quo = Math.floor(a / b);
+            rem = a - quo * b;
             if (rem && !cfg.remainder) return null;
-            if (ans < 1) return null;
+            if (quo < 1) return null;
+            ans = quo;
         }
-        const seed = opts.seed !== undefined ? deriveSeed(opts.seed, 'story', a, b) : itemHash(q, 'story');
+        const placed = Number.isInteger(opts.index) && opts.index >= 0;
+        const seed = placed ? deriveSeed(opts.seed === undefined ? 0 : opts.seed, 'story-page', op)
+            : opts.seed !== undefined ? deriveSeed(opts.seed, 'story', a, b) : itemHash(q, 'story');
         const r = rng(seed);
-        const [n1, n2] = shuffle(r, STORY_NAMES).slice(0, 2);
-        const unit = pick(r, STORY_NOUNS);
-        let templates = STORY_TEMPLATES[op];
-        // A remainder is only meaningful when the question counts full groups.
-        if (op === '÷' && rem) templates = templates.slice(0, 1);
-        const order = shuffle(r, templates.map((t, i) => i));
+        const names = shuffle(r, STORY_NAMES);
+        const nouns = shuffle(r, STORY_NOUNS);
+        const templates = templatesFor(op, cfg, rem);
+        if (!templates.length) return null;
+        const start = Math.floor(r() * templates.length);
+        const k = placed ? opts.index : 0;
+        const n1 = names[(2 * k) % names.length];
+        const n2 = names[(2 * k + 1) % names.length];
+        const unit = opts.unit && opts.unit.one && opts.unit.many ? opts.unit
+            : nouns[placed ? k % nouns.length : Math.floor(r() * nouns.length)];
+        const order = placed
+            ? templates.map((t, i) => (start + k + i) % templates.length)
+            : shuffle(r, templates.map((t, i) => i));
         let body = null;
-        for (const i of order) { body = templates[i]({ a, b, ans, unit, n1, n2 }); if (body) break; }
+        for (const i of order) { body = templates[i]({ a, b, ans, quo, rem, unit, n1, n2 }); if (body) break; }
         if (!body) return null;
         const u = body.unit || unit;
-        const label = nounFor(u, ans);
+        const answer = body.ans !== undefined ? body.ans : ans;
+        const label = nounFor(u, answer);
+        const equation = rem
+            ? `${fmt(a)} ÷ ${fmt(b)} = ${fmt(quo)} R ${fmt(rem)}`
+            : `${fmt(a)} ${GLYPH[op]} ${fmt(b)} = ${fmt(ans)}`;
         const story = {
-            schema: rem ? 'grouping-left' : body.schema,
+            schema: body.schema,
             op,
             lines: body.lines,
-            question: rem ? `How many bags does ${n1} fill?` : body.question,
-            ans,
+            question: body.question,
+            ans: answer,
             label,
             unit: { one: u.one, many: u.many },
-            answerText: `${fmt(ans)} ${label}`,
-            equation: rem
-                ? `${fmt(a)} ÷ ${fmt(b)} = ${fmt(ans)} R ${fmt(rem)}`
-                : `${fmt(a)} ${GLYPH[op]} ${fmt(b)} = ${fmt(ans)}`,
-            say: `The answer is ${fmt(ans)} ${label}.`,
+            answerText: `${fmt(answer)} ${label}`,
+            equation,
+            work: body.work || (rem ? `${equation}: ${fmt(rem)} left over` : equation),
+            say: `The answer is ${fmt(answer)} ${label}.`,
             names: body.lines.join(' ').includes(n2) ? [n1, n2] : [n1],
         };
+        if (cfg.k) story.k = true;
         if (rem) story.leftOver = `${count(unit, rem)} ${be(rem)} left over.`;
         story.sentences = story.lines.concat(story.question);
         return story;
     };
     fn.op = op;
-    fn.templates = STORY_TEMPLATES[op];
+    fn.templates = templatesFor(op, cfg, cfg.remainder ? 1 : 0);
     return fn;
 }
 

@@ -23,6 +23,7 @@
 //   --files 01,11             pack: only page files whose name starts with one of these
 //   --count N                 legacy: items per section (default 20, the print dialog's default)
 //   --roles r1,r2             kit: the page roles to lint (default independent); any role buildSheet knows
+//   --anchors side|sections   kit: print with step-by-step anchor problems (S6); adds L-ANCHOR
 //   --no-combined             legacy: skip the combined multi-section sheet (see below)
 //   --lints L-INK,L-KEY       only report these lints (the others still run)
 //   --json out.json           machine-readable findings for the critic loop
@@ -80,6 +81,9 @@
 //              show has a drawing zone >= 30 mm tall with >= 60 % of it empty (measured and reported).
 //   L-INPUT    no <input>, <button>, <select>, <textarea> or contenteditable on a printed sheet.
 //   L-CCSS     SC-5 / HD-6 no CCSS code, "Grade N" or snake_case skill id outside the teacher footer.
+//   L-ANCHOR   S6 / PT-LBL-6 (kit, with --anchors side|sections): every step-by-step anchor cell carries
+//              the outlined Model tab, no letter or tab label and no answer slot (anchors are unscored),
+//              and draws identically on the key.
 //
 // DETERMINISM. The app runs with a seeded Math.random, reseeded per skill from hash(category:skill)
 // exactly as ws-grade-render does, so the same tree prints the same items and this gate's output is
@@ -100,7 +104,28 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 && argv[
 const has = k => argv.includes('--' + k);
 
 const TOOL = 'ws-print-lint';
-const LINTS = ['L-INK', 'L-EMOJI', 'L-FONT', 'L-SIZE', 'L-OVERFLOW', 'L-SPLIT', 'L-DENSITY', 'L-KEY', 'L-VERBS', 'L-ANSAREA', 'L-INPUT', 'L-CCSS'];
+const LINTS = ['L-INK', 'L-EMOJI', 'L-FONT', 'L-SIZE', 'L-OVERFLOW', 'L-SPLIT', 'L-DENSITY', 'L-KEY', 'L-VERBS', 'L-ANSAREA', 'L-INPUT', 'L-CCSS', 'L-ANCHOR'];
+
+/**
+ * L-ANCHOR (S6, PT-LBL-6): the anchor cells of a kit document, read from its HTML. Each anchor
+ * cell must carry the Model tab, no letter / tab label and no data-ws-slot (unscored); the key
+ * half of the document must draw the same anchors in the same order (AK-1).
+ */
+function anchorFindings(pupilHtml, keyHtml) {
+    const out = [];
+    const cells = (h) => String(h || '').split(/(?=<div class="ws-cell )/).filter((c) => /^<div class="ws-cell [^"]*mq-anchorcell/.test(c));
+    const P = cells(pupilHtml), K = cells(keyHtml);
+    P.forEach((c, i) => {
+        if (!/data-ws-label="model"/.test(c)) out.push({ lint: 'L-ANCHOR', rule: 'PT-LBL-6', sev: 'major', msg: `anchor ${i + 1} has no Model tab (PT-LBL-6)`, key: 'anchor tab' });
+        if (/data-ws-label="(?:letter|tab)"/.test(c)) out.push({ lint: 'L-ANCHOR', rule: 'PT-LBL-6', sev: 'major', msg: `anchor ${i + 1} is labelled like a problem (PT-LBL-6: unlabelled)`, key: 'anchor label' });
+        if (/ data-ws-slot=/.test(c)) out.push({ lint: 'L-ANCHOR', rule: 'PT-LBL-6', sev: 'critical', msg: `anchor ${i + 1} carries an answer slot: an anchor is unscored`, key: 'anchor slot' });
+    });
+    const body = (c) => (c.match(/<div class="mq-anchor[\s\S]*/) || [''])[0];
+    if (keyHtml && (P.length !== K.length || P.some((c, i) => body(c).slice(0, 4000) !== body(K[i] || '').slice(0, 4000)))) {
+        out.push({ lint: 'L-ANCHOR', rule: 'AK-1', sev: 'critical', msg: `the key draws the anchors differently (${P.length} on the pupil pages, ${K.length} on the key)`, key: 'anchor key' });
+    }
+    return out;
+}
 const OPS_CATS = ['addition', 'subtraction', 'multiplication', 'division'];
 const K2_CATS = ['counting', 'comparing', 'composing', 'counting_mixed'];
 const FAMILIES = { operations: OPS_CATS, k2: K2_CATS, redone: [...OPS_CATS, ...K2_CATS] };
@@ -121,7 +146,9 @@ const CEILINGS = {
     decision: { base: [12, 8, 8], name: 'Sub-skill / decision' },
     'error-analysis': { base: [6, 4, 4], name: 'Error analysis' },
     review: { base: [16, 12, 12], name: 'Review' },
-    test: { base: [20, 16, 12], name: 'Test A / B' },
+    // PT 2.9's table: facts and equations 4 x 5 = 20 at every size (45.6 mm rows); critic round 2
+    // (C3) asked for fact tests packed from the measured height, not 4 x 3 of 75 mm cells.
+    test: { base: [20, 16, 12], one: [20, 20, 20], name: 'Test A / B' },
     'pre-skill': { base: [24, 20, 16], name: 'Pre-skill check' },
     'true-false': { base: [8, 6, 4], name: 'True or False?' },
     'reason-it': { base: [4, 3, 2], name: 'Reason It' },
@@ -821,6 +848,8 @@ function wsLintPage(cfg) {
                     answered: slots.filter(slotAnswered).length, weightOk: slots.every(slotWeightOk),
                     shapes: [...new Set(slots.map(s => s.getAttribute('data-ws-shape')))],
                     item: !model && !ITEM_BANDS.test(bandLabel),
+                    // a one-line fact, equation or number track: one short answer (PT 2.9 packs 20)
+                    short: !!c.querySelector('.ws-fact, .ws-eq, .mq-hfact, .k2-seqstrip'),
                 };
             });
             let role = pg.getAttribute('data-ws-role') || '';
@@ -843,7 +872,8 @@ function wsLintPage(cfg) {
                 pageId: (footParts[2] || '').split('·').map(s => s.trim()).filter(s => /^\d\d-[A-Z]\d?$/.test(s))[0] || '',
                 w: mm(pr.width), h: mm(pr.height), padB: mm(parseFloat(cs.paddingBottom)), padT: mm(parseFloat(cs.paddingTop)),
                 footRect, cells, items: items.length,
-                oneSymbol: itemShapes.length > 0 && itemShapes.every(s => oneSymbolShapes.has(s)),
+                oneSymbol: (itemShapes.length > 0 && itemShapes.every(s => oneSymbolShapes.has(s)))
+                    || (/^test\b/.test(role) && items.length > 0 && items.every(c => c.short)),
                 slots: cells.reduce((n, c) => n + c.slots, 0), instructions: ri.instructions,
             });
         }
@@ -1462,6 +1492,7 @@ async function runApp(source) {
             const id = `${s.categoryId}:${s.skillId}${role && role !== 'independent' ? '#' + role : ''}`;
             const seed = hash(`${s.categoryId}__${s.skillId}:print`);
             let r;
+            let kitHalves = null;
             try {
                 await page.evaluate(sd => { if (window.__wsReseed) window.__wsReseed(sd); }, seed);
                 let html;
@@ -1469,22 +1500,24 @@ async function runApp(source) {
                     await renderPrint(page, s, { problemCount: COUNT, includeAnswerKey: true });
                     html = await legacyDocumentHtml(page);
                 } else {
-                    html = await page.evaluate(async ({ s, seed, COUNT, role }) => {
+                    html = await page.evaluate(async ({ s, seed, COUNT, role, ANCHORS }) => {
                         // js/modules/print-sheet.js buildSheet(req): sections carry the skills; the result has
                         // pupilHtml and keyHtml (the facsimile key, same plan).
                         const practice = role === 'independent' || role === 'more-practice';
-                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId }], count: practice ? COUNT : undefined }], size: 'L', look: practice ? 'ican' : 'auto', key: true, seed };
+                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId }], count: practice ? COUNT : undefined }], size: 'L', look: practice ? 'ican' : 'auto', key: true, seed, anchors: ANCHORS };
                         let out;
                         try { out = await window.buildSheet(req); } catch (e) { if (e && e.unsupported) return { unsupported: e.message }; throw e; }
                         const body = [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');
-                        return window.sheetDocument(body, s.label);
-                    }, { s, seed, COUNT: parseInt(arg('count', '6'), 10), role });
+                        return { doc: window.sheetDocument(body, s.label), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml };
+                    }, { s, seed, COUNT: parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off') });
+                    if (html && html.doc) { kitHalves = html; html = html.doc; }
                 }
                 if (html && html.unsupported) {
                     process.stdout.write(`  ${id}: n/a (${html.unsupported})\n`);
                     continue;
                 }
                 r = await lintHtmlInSheetPage(app, html, id, source === 'legacy' ? 'legacy' : 'kit');
+                if (kitHalves) r.findings.push(...anchorFindings(kitHalves.pupilHtml, kitHalves.keyHtml));
             } catch (e) {
                 r = { info: { id, mode: source, error: e.message }, findings: [{ lint: 'L-SPLIT', rule: 'RENDER', sev: 'critical', msg: `the sheet did not render: ${e.message}`, key: 'render error' }] };
             }
@@ -1743,6 +1776,27 @@ async function selfTest() {
         }
     } finally { await env.close(); }
     const lintsCovered = new Set(SELF_TESTS.flatMap(t => (Array.isArray(t.expect[0]) ? t.expect : [t.expect]).map(e => e[0])));
+    {
+        // L-ANCHOR reads the kit's HTML halves (anchorFindings), so it is proven on planted strings.
+        const cell = (inner, tab = true) => `<div class="ws-cell mq-anchorcell">${tab ? '<span class="ws-modeltab" data-ws-label="model">Model</span>' : ''}<div class="mq-anchor mq-anchor-band">${inner}</div></div>`;
+        const clean = cell('<span data-ws-aslot="ans">5</span>');
+        const cases = [
+            ['anchor clean', clean, clean, null],
+            ['anchor without its Model tab', cell('<b>5</b>', false), cell('<b>5</b>', false), ['L-ANCHOR', 'PT-LBL-6']],
+            ['anchor with a letter label', cell('<span class="ws-letter" data-ws-label="letter">a.</span>'), cell('<span class="ws-letter" data-ws-label="letter">a.</span>'), ['L-ANCHOR', 'PT-LBL-6']],
+            ['anchor with an answer slot', cell('<span data-ws-slot="ans"></span>'), cell('<span data-ws-slot="ans"></span>'), ['L-ANCHOR', 'PT-LBL-6']],
+            ['anchor drawn differently on the key', clean, cell('<b>6</b>'), ['L-ANCHOR', 'AK-1']],
+        ];
+        let allOk = true;
+        for (const [name, pupil, key, want] of cases) {
+            asserts++;
+            const f = anchorFindings(pupil, key);
+            const hit = want ? f.some(x => x.lint === want[0] && x.rule === want[1]) : !f.length;
+            if (hit) console.log(`  ok   ${name}: ${want ? want.join(' ') + ' fired' : '0 findings'}`);
+            else { allOk = false; bad.push(`${name}: expected ${want ? want.join(' ') : 'no findings'}, got ${f.map(x => `${x.lint} ${x.rule}`).join(', ') || 'nothing'}`); }
+        }
+        if (allOk) lintsCovered.add('L-ANCHOR');
+    }
     const uncovered = LINTS.filter(l => !lintsCovered.has(l));
     if (uncovered.length) bad.push(`lints with no self-test: ${uncovered.join(', ')}`);
     if (bad.length) { console.error(`${TOOL}: FAIL - ${bad.length} self-test(s)`); bad.forEach(b => console.error('  - ' + b)); process.exit(1); }

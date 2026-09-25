@@ -78,6 +78,12 @@ export {
 export { stack, stackTabStep, stackAnswerSlot } from './cells/stack.js';
 export { fact, factPadTop, factWidthMm, factFillOfColumn, factWriteMm, FACT_GEOMETRY, factCue } from './cells/fact.js';
 export { equation, equationParts, equationColumns, frac, mixed } from './cells/equation.js';
+// S1 touch dots: the engine only (design/SUPPORTS.md §S1). No skill or option uses it yet.
+export {
+    TOUCH_DOTS, TOUCH_DOTS_BOLD, TOUCH_DOT_BASELINE_EM, TOUCH_DOT_SIZES, TOUCH_DOT_DEFAULT, TOUCH_DOT_MIN,
+    touchDots, touchDotCount, touchDotOrder, touchDotsFits, touchDotGeometry, touchDotsMarks, touchDotsSVG,
+    touchDotsDigitHTML, touchDotNearest, touchTallySVG,
+} from './touchdots.js';
 // P9 place value + rounding: the `pv` template and the drawings the screen card shares with it.
 export {
     DISK_SIZES, diskDiameter, zoneSide, zoneCapacity, diskMatSVG, numeralTracksHTML, roundingLineSVG,
@@ -106,6 +112,13 @@ import './cells/chartwindow.js';
 import './cells/seqstrip.js';
 import './cells/compare.js';
 import './cells/wordpic.js';
+// Count-by rows, number patterns, the chart to complete, and × / ÷ on a number line (2026-09-25).
+import './cells/count-row.js';
+import './cells/mult-grid.js';
+import './cells/hop-line.js';
+export { tile as shapeTile, shapeAt, tileSize, TILE_SHAPES } from './cells/shapes.js';
+export { gridSlots, shadeList } from './cells/mult-grid.js';
+export { hopSlots, sentenceOf, ONE_TICK_MAX } from './cells/hop-line.js';
 
 // Function tables (function_table_easy / _hard): the In / Out table, its rule helpers and the
 // screen checker every host uses (a 'make your own' table is right when every row follows the rule).

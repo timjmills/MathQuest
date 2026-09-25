@@ -272,12 +272,38 @@ function td(g, content, { w, h, head = false, extra = '', photocopySafe = false 
 
 const numCell = (v) => `<span style="display:inline-block;line-height:1;vertical-align:middle;${KEY_FEATURES}">${esc(v)}</span>`;
 
-function tableHtml(p, g, d, vals, ink, slotsById, ctx) {
+/**
+ * ERROR ANALYSIS (SCC 2.4.1, the `line` kind of the role): with `ctx.options.fix` the table
+ * draws its own fix places - a Fix column beside the rows the pupil wrote in, and one fix box
+ * after the rule and after the Check row - so the judgement beside the cell is only Correct /
+ * Fix it (no row of five loose boxes). The key writes the right value only where the shown work
+ * is wrong (`options.fixKey`: the work is drawn in state `wrong` on both pages).
+ */
+function fixOf(p, ctx, vals, key) {
+    const on = !!(p.fix || (ctx && ctx.options && ctx.options.fix));
+    const keyed = on && !!((ctx.options && ctx.options.fixKey) || ctx.state === 'answered' || ctx.state === 'traced');
+    const ids = ftSlots(p).map((s) => s.id);
+    return { on, keyed, vals, key, idx: (id) => ids.indexOf(id) };
+}
+/** One fix box for the slots `ids` (the first one's index names it: x<k>). */
+function fixBox(g, d, fx, ids, { wMm = null, value = null } = {}) {
+    const wrong = fx.keyed && ids.some((id) => String(fx.vals[id] === undefined ? '' : fx.vals[id]) !== String(fx.key[id]));
+    const v = wrong ? (value !== null ? value : String(fx.key[ids[0]])) : '';
+    let html = box(g, `x${fx.idx(ids[0])}`, { wMm: wMm || d.boxW, hMm: d.boxH, value: '', ink: null, mark: g.twin ? 'cell' : null });
+    // The key's fix is the TEACHER's ink: the solid mark sits on the fix slot itself, so the role
+    // never restyles it as the pupil's shown work (its pupil-ink pass skips x<k> slots).
+    if (v) html = html.replace(/(data-ws-slot="x\d+")/, '$1 data-ws-ink="solid"').replace(/><\/span>$/, `><span style="color:${INK.ink};font-weight:700;${KEY_FEATURES}">${esc(v)}</span></span>`);
+    return html;
+}
+
+function tableHtml(p, g, d, vals, ink, slotsById, ctx, fx = { on: false }) {
     const pcs = !!ctx.photocopySafe;
+    const fixCol = fx.on && (p.rows || []).some((r, i) => slotsById[`r${i}in`] || slotsById[`r${i}out`]);
     const expr = hasExprCol(p);
     const heads = [td(g, txt(g, `In (${X})`, { bold: true }), { w: d.colW, h: d.headH, head: true, photocopySafe: pcs, extra: `border-bottom:${HEAVY} solid ${INK.ink};` })];
     if (expr) heads.push(td(g, txt(g, ruleHtml(p.rule), { bold: true }), { w: d.exprW, h: d.headH, head: true, photocopySafe: pcs, extra: `border-bottom:${HEAVY} solid ${INK.ink};` }));
     heads.push(td(g, txt(g, 'Out', { bold: true }), { w: d.colW, h: d.headH, head: true, photocopySafe: pcs, extra: `border-bottom:${HEAVY} solid ${INK.ink};` }));
+    if (fixCol) heads.push(td(g, txt(g, 'Fix', { bold: true }), { w: d.colW, h: d.headH, head: true, photocopySafe: pcs, extra: `border-bottom:${HEAVY} solid ${INK.ink};border-left:${HEAVY} solid ${INK.ink};` }));
     let rows = `<tr>${heads.join('')}</tr>`;
     (p.rows || []).forEach((r, i) => {
         const inS = slotsById[`r${i}in`];
@@ -285,6 +311,10 @@ function tableHtml(p, g, d, vals, ink, slotsById, ctx) {
         const cells = [td(g, inS ? slotBox(g, inS, d, vals, ink) : numCell(r.x), { w: d.colW, h: d.rowH })];
         if (expr) cells.push(td(g, txt(g, esc(ruleOn(p.rule, r.x))), { w: d.exprW, h: d.rowH }));
         cells.push(td(g, outS ? slotBox(g, outS, d, vals, ink) : numCell(r.y), { w: d.colW, h: d.rowH }));
+        if (fixCol) {
+            const ids = [inS, outS].filter(Boolean).map((t) => t.id);
+            cells.push(td(g, ids.length ? fixBox(g, d, fx, ids, { value: ids.map((id) => fx.key[id]).join(', ') }) : '', { w: d.colW, h: d.rowH, extra: `border-left:${HEAVY} solid ${INK.ink};` }));
+        }
         rows += `<tr>${cells.join('')}</tr>`;
     });
     return `<table class="ft-table" role="grid" aria-label="function table" style="border-collapse:collapse;table-layout:fixed;margin:0 auto;`
@@ -292,17 +322,21 @@ function tableHtml(p, g, d, vals, ink, slotsById, ctx) {
 }
 
 /** The width a cell gives its content at the section's column count (unknown: one column). */
-const availMm = (ctx) => 186 / Math.max(1, Number(ctx && ctx.columns) || 1) - 6.5;
+const fixMode = (ctx) => !!(ctx && ctx.options && ctx.options.fix);
+/** Error analysis at one column keeps ~50 mm beside the work for the judgement. */
+const availMm = (ctx) => 186 / Math.max(1, Number(ctx && ctx.columns) || 1) - 6.5
+    - (fixMode(ctx) && Number(ctx && ctx.columns) === 1 ? 50 : 0);
 const lineW = (d) => Math.max(34, d.colW * 2 - 8);
 
 /** "Rule:" beside the frame when the row fits the cell, else "The rule is:" on its own line. */
-function ruleInline(p, g, d, ctx) {
-    const w = p.support === 'line' ? lineW(d) + 0.6 * g.E + 2 : d.frameW;
+const fixRuleW = (p, g, d) => Math.max(d.boxW, ruleText(p.rule, { variable: false }).length * 0.5 * g.E + 4);
+function ruleInline(p, g, d, ctx, fx = { on: false }) {
+    const w = (p.support === 'line' ? lineW(d) + 0.6 * g.E + 2 : d.frameW) + (fx.on && !fx.below ? 3 + 4 * 0.55 * d.textMm + 1 + fixRuleW(p, g, d) : 0);
     return 5 * 0.55 * d.textMm + 2 + w <= availMm(ctx);
 }
 
 /** Under the table: the rule to write (task 'rule'). */
-function ruleAnswer(p, g, d, vals, ink, slots, ctx) {
+function ruleAnswer(p, g, d, vals, ink, slots, ctx, fx = { on: false }, fixBelow = false) {
     const own = slots.filter((s) => s.kind === 'sign' || /^n\d$/.test(s.id) || s.kind === 'rule');
     const gap = (mm) => `<span style="display:inline-block;width:${g.em(mm)}"></span>`;
     let frame;
@@ -312,11 +346,15 @@ function ruleAnswer(p, g, d, vals, ink, slots, ctx) {
         frame = `${txt(g, X, { em: 1 })}` + own.map((s) => gap(s.kind === 'sign' ? 1.5 : 0.8)
             + slotBox(g, s, d, vals, ink, s.kind === 'sign' ? {} : { wMm: d.ruleBoxW })).join('');
     }
+    const fixHtml = fx.on ? `${txt(g, 'Fix:', { bold: true })}<span style="display:inline-block;width:${g.em(1)}"></span>`
+        + fixBox(g, d, fx, own.map((s) => s.id), { wMm: fixRuleW(p, g, d), value: ruleText(p.rule, { variable: false }) }) : '';
+    if (fx.on && !fixBelow) frame += `<span style="display:inline-block;width:${g.em(3)}"></span>${fixHtml}`;
     const row = (inner) => `<div style="display:inline-flex;align-items:center;white-space:nowrap">${inner}</div>`;
-    const body = ruleInline(p, g, d, ctx)
+    const body = ruleInline(p, g, d, ctx, fx)
         ? row(`${txt(g, 'Rule:', { bold: true })}${gap(2)}${frame}`)
         : `<div style="margin-bottom:${g.em(0.4)};line-height:1">${txt(g, 'The rule is:', { bold: true, em: Math.max(11 / g.pt, g.zoneEm) })}</div>${row(frame)}`;
-    return `<div class="ft-rule" style="margin:${g.em(1.2)} auto 0;text-align:center">${body}</div>`;
+    const below = fx.on && fixBelow ? `<div style="margin-top:${g.em(1.2)}">${row(fixHtml)}</div>` : '';
+    return `<div class="ft-rule" style="margin:${g.em(1.2)} auto 0;text-align:center">${body}${below}</div>`;
 }
 
 /**
@@ -334,14 +372,15 @@ const checkInline = (d, ctx) => 6 * 0.55 * d.textMm + 2 + checkW(d).inW + checkW
  * scales to the phone as one column).
  */
 const sideW = (d) => Math.max(6 * 0.55 * d.textMm, checkW(d).inW + checkW(d).outW);
-const checkSide = (p, g, d, ctx) => !!p.check && !g.twin && Number(ctx && ctx.columns) > 0
+const checkSide = (p, g, d, ctx) => !!p.check && !g.twin && !fixMode(ctx) && Number(ctx && ctx.columns) > 0
     && tableWidth(p, d) + 7 + sideW(d) <= availMm(ctx);
 
-function checkRow(p, g, d, vals, ink, slotsById, ctx, side = false) {
+function checkRow(p, g, d, vals, ink, slotsById, ctx, side = false, fx = { on: false }) {
     const s = slotsById.chk;
     const { inW, outW } = checkW(d);
     const ch = d.boxH + 2.5;                   // the Check row: one writing box tall, not a table row
-    const cells = td(g, numCell(p.check.x), { w: inW, h: ch }) + td(g, slotBox(g, s, d, vals, ink), { w: outW, h: ch, extra: `padding:0 ${g.em(0.5)};` });
+    const cells = td(g, numCell(p.check.x), { w: inW, h: ch }) + td(g, slotBox(g, s, d, vals, ink), { w: outW, h: ch, extra: `padding:0 ${g.em(0.5)};` })
+        + (fx.on ? td(g, fixBox(g, d, fx, ['chk']), { w: outW, h: ch, extra: `padding:0 ${g.em(0.5)};border-left:${HEAVY} solid ${INK.ink};` }) : '');
     const table = `<table style="border-collapse:collapse;table-layout:fixed;border:${HEAVY} solid ${INK.ink};background:#fff"><tr>${cells}</tr></table>`;
     if (side) {
         return `<div class="ft-check" style="grid-area:check;align-self:end;text-align:center">`
@@ -353,6 +392,31 @@ function checkRow(p, g, d, vals, ink, slotsById, ctx, side = false) {
     }
     return `<div class="ft-check" style="margin:${g.em(1)} auto 0;display:flex;align-items:center;justify-content:center;gap:${g.em(2)}">`
         + `${txt(g, 'Check:', { bold: true })}${table}</div>`;
+}
+
+/**
+ * THE WIDE ROW. A print cell of one column (Error analysis puts one item per row, its judgement
+ * beside it) has room for the machine, the rule and the Check row beside the table; stacked, a
+ * table there is taller than a third of the page and only two fit. Never on screen, and only
+ * while the whole row stays inside 125 mm (the judgement column keeps the rest).
+ */
+const SIDE_MACHINE_MM = 54;
+const WIDE_GAP_MM = 8;
+const WIDE_MAX_MM = 132;
+function sideWidth(p, g, d, ctx) {
+    const fx = fixMode(ctx);
+    let w = p.machine ? SIDE_MACHINE_MM : 0;
+    if (p.task === 'rule') w = Math.max(w, 5 * 0.55 * d.textMm + 2 + (p.support === 'line' ? lineW(d) + 0.6 * g.E + 2 : d.frameW),
+        fx ? 4 * 0.55 * d.textMm + 1 + fixRuleW(p, g, d) : 0);
+    if (p.check) w = Math.max(w, 6 * 0.55 * d.textMm + 2 + checkW(d).inW + checkW(d).outW * (fx ? 2 : 1));
+    return w;
+}
+const fixColW = (p, d, ctx) => (fixMode(ctx) && (p.rows || []).some((r) => r.hide) ? d.colW : 0);
+/** Only for Error analysis (its own fix places), one item to a row: never measured elsewhere. */
+function wideLayout(p, g, d, ctx) {
+    if (g.twin || !fixMode(ctx) || Number(ctx && ctx.columns) !== 1) return false;
+    const w = tableWidth(p, d) + fixColW(p, d, ctx) + WIDE_GAP_MM + sideWidth(p, g, d, ctx);
+    return w <= Math.min(availMm(ctx), WIDE_MAX_MM);
 }
 
 function keyMap(p) {
@@ -376,7 +440,22 @@ register('function-table', {
             return o;
         });
         const wMm = tableWidth(p, d);
+        const fx = fixOf(p, ctx, vals, key);
         let inner = '';
+        if (wideLayout(p, g, d, ctx)) {
+            // A full-width print row (Error analysis): the machine, the rule and the Check row
+            // stand in a column BESIDE the table, so the row is only as tall as the table. DOM
+            // order is still the reading order of the slots: table, rule, Check.
+            let sideHtml = p.machine ? machine(p, g, d, SIDE_MACHINE_MM)
+                : p.task !== 'rule' ? `<div style="margin-bottom:${g.em(1.5)}">${txt(g, `Rule: ${ruleHtml(p.rule)}`, { bold: true })}</div>` : '';
+            if (p.task === 'rule') sideHtml += ruleAnswer(p, g, d, vals, ink, slots, ctx, Object.assign({}, fx, { below: true }), true);
+            if (p.check && slotsById.chk) sideHtml += checkRow(p, g, d, vals, ink, slotsById, ctx, false, fx);
+            if (p.note) sideHtml += `<div class="ft-note" style="margin-top:${g.em(2.5)}">${txt(g, esc(p.note), { em: g.zoneEm })}</div>`;
+            inner = `<div style="display:flex;align-items:center;justify-content:center;gap:${g.em(WIDE_GAP_MM)}">`
+                + `<div>${tableHtml(p, g, d, vals, ink, slotsById, ctx, fx)}</div>`
+                + `<div style="display:flex;flex-direction:column;align-items:center">${sideHtml}</div></div>`;
+            return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;text-align:center">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
+        }
         if (p.machine) inner += machine(p, g, d, wMm);
         else if (p.task !== 'rule') inner += `<div style="text-align:center;margin-bottom:${g.em(1.5)}">${txt(g, `Rule: ${ruleHtml(p.rule)}`, { bold: true })}</div>`;
         const side = checkSide(p, g, d, ctx) && !!slotsById.chk;
@@ -385,14 +464,14 @@ register('function-table', {
             // beside the table
             inner += `<div style="display:grid;grid-template-columns:auto auto;grid-template-areas:'table check' 'rule rule';`
                 + `column-gap:${g.em(7)};justify-content:center;align-items:end">`
-                + `<div style="grid-area:table">${tableHtml(p, g, d, vals, ink, slotsById, ctx)}</div>`
-                + (p.task === 'rule' ? `<div style="grid-area:rule">${ruleAnswer(p, g, d, vals, ink, slots, ctx)}</div>` : '')
+                + `<div style="grid-area:table">${tableHtml(p, g, d, vals, ink, slotsById, ctx, fx)}</div>`
+                + (p.task === 'rule' ? `<div style="grid-area:rule">${ruleAnswer(p, g, d, vals, ink, slots, ctx, fx)}</div>` : '')
                 + checkRow(p, g, d, vals, ink, slotsById, ctx, true)
                 + '</div>';
         } else {
-            inner += tableHtml(p, g, d, vals, ink, slotsById, ctx);
-            if (p.task === 'rule') inner += ruleAnswer(p, g, d, vals, ink, slots, ctx);
-            if (p.check && slotsById.chk) inner += checkRow(p, g, d, vals, ink, slotsById, ctx);
+            inner += tableHtml(p, g, d, vals, ink, slotsById, ctx, fx);
+            if (p.task === 'rule') inner += ruleAnswer(p, g, d, vals, ink, slots, ctx, fx);
+            if (p.check && slotsById.chk) inner += checkRow(p, g, d, vals, ink, slotsById, ctx, false, fx);
         }
         if (p.note) inner += `<div class="ft-note" style="margin-top:${g.em(2.5)};text-align:center">${txt(g, esc(p.note), { em: g.zoneEm })}</div>`;
         return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;text-align:center">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
@@ -407,6 +486,12 @@ register('function-table', {
     footprint(p, ctx) {
         const g = geo(ctx);
         const d = dims(p, g);
+        if (wideLayout(p, g, d, ctx)) {
+            const tableH = d.headH + (p.rows || []).length * d.rowH + 2;
+            const sideH = (p.machine ? d.machineH + 1 : 0) + (p.task === 'rule' ? 1.2 + d.signW : 0) + (p.check ? 1 + d.boxH + 2.5 : 0);
+            return { wMm: Math.ceil(tableWidth(p, d) + fixColW(p, d, ctx) + WIDE_GAP_MM + sideWidth(p, g, d, ctx) + 4), hMm: Math.ceil(Math.max(tableH, sideH) + 4),
+                measure: true, factLike: false, maxCols: 3 };
+        }
         const w = Math.max(tableWidth(p, d) + (checkSide(p, g, d, ctx) ? 7 + sideW(d) : 0), p.machine ? 52 : 0, p.task === 'rule' ? (p.support === 'line' ? lineW(d) + 6 : d.frameW + 2) : 0);
         let h = d.headH + (p.rows || []).length * d.rowH + 2;
         if (p.machine || p.task !== 'rule') h += d.machineH + 0.8;
