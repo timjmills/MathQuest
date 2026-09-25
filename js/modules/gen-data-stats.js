@@ -800,7 +800,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     if (chosenThreshold !== null) {
                         const opts = categories.map((cat, i) => ({
                             id: 'opt' + i,
-                            label: `${cat} (${values[i]})`,
+                            label: cat,   // AP2: the value is read off the graph, never printed on the option
                             correct: values[i] > chosenThreshold,
                         }));
                         const ans = opts.filter(o => o.correct).map(o => o.id);
@@ -854,7 +854,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                         q.printFormat = 'multi-select';
                         q.skillLabel = 'Bar Graph';
                         q.ccss = '3.MD.B.3';
-                        q.dataData = { categories, values, context: context.title, threshold: chosenThreshold, type: 'bar_graph_msc' };
+                        q.dataData = { categories, values, context: context.title, threshold: chosenThreshold, type: 'bar_graph_msc', ...(_barsLyingDown() ? { bars: 'horizontal' } : {}) };
                         return;
                     }
                 }
@@ -975,7 +975,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     if (chosenThreshold !== null) {
                         const opts = categories.map((cat, i) => ({
                             id: 'opt' + i,
-                            label: `${cat} (${values[i]})`,
+                            label: cat,   // AP2: the value is read off the graph, never printed on the option
                             correct: values[i] > chosenThreshold,
                         }));
                         const ans = opts.filter(o => o.correct).map(o => o.id);
@@ -1158,7 +1158,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     if (chosenThreshold !== null) {
                         const opts = categories.map((cat, i) => ({
                             id: 'opt' + i,
-                            label: `${cat} (${values[i]})`,
+                            label: cat,   // AP2: the value is read off the graph, never printed on the option
                             correct: values[i] >= chosenThreshold,
                         }));
                         const ans = opts.filter(o => o.correct).map(o => o.id);
@@ -1177,14 +1177,13 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                             <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
                             <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: 3.MD.B.3 | Tally Chart</div>
                             <div style="background:var(--bg-card);padding:10px 14px;border-radius:12px;display:inline-block;max-width:720px;width:100%;box-sizing:border-box;">
-                                <div style="display:grid;grid-template-columns:120px 1fr 60px;gap:8px;font-weight:600;padding-bottom:6px;border-bottom:2px solid var(--border-light);margin-bottom:4px;font-size:1rem;">
-                                    <span>Category</span><span>Tallies</span><span>Count</span>
+                                <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;font-weight:600;padding-bottom:6px;border-bottom:2px solid var(--border-light);margin-bottom:4px;font-size:1rem;">
+                                    <span>Category</span><span>Tallies</span>
                                 </div>
                                 ${categories.map((cat, i) => `
-                                    <div style="display:grid;grid-template-columns:120px 1fr 60px;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-light);">
+                                    <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-light);">
                                         <span style="font-weight:600;font-size:1rem;">${cat}</span>
                                         <span style="font-size:1.4rem;color:${chartColors[i % chartColors.length]};line-height:1;">${makeTallyV(values[i])}</span>
-                                        <span style="font-weight:700;color:var(--accent-cyan);font-size:1.05rem;">${values[i]}</span>
                                     </div>
                                 `).join('')}
                             </div>
@@ -1240,14 +1239,13 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
                     <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss} | Tally Chart</div>
                     <div style="background:var(--bg-card);padding:14px 18px;border-radius:14px;display:inline-block;max-width:720px;width:100%;box-sizing:border-box;">
-                        <div style="display:grid;grid-template-columns:140px 1fr 80px;gap:10px;font-weight:600;padding-bottom:8px;border-bottom:2px solid var(--border-light);margin-bottom:6px;font-size:1.15rem;">
-                            <span>Category</span><span>Tallies</span><span>Count</span>
+                        <div style="display:grid;grid-template-columns:140px 1fr;gap:10px;font-weight:600;padding-bottom:8px;border-bottom:2px solid var(--border-light);margin-bottom:6px;font-size:1.15rem;">
+                            <span>Category</span><span>Tallies</span>
                         </div>
                         ${categories.map((cat, i) => `
-                            <div style="display:grid;grid-template-columns:140px 1fr 80px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-light);">
+                            <div style="display:grid;grid-template-columns:140px 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-light);">
                                 <span style="font-weight:600;font-size:1.4rem;">${cat}</span>
                                 <span style="font-size:2.6rem;color:${chartColors[i % chartColors.length]};line-height:1;">${makeTally(values[i])}</span>
-                                <span style="font-weight:700;color:var(--accent-cyan);font-size:1.7rem;">${values[i]}</span>
                             </div>
                         `).join('')}
                     </div>
