@@ -13,6 +13,14 @@ function _dOpt(id) {
     return o[id];
 }
 
+// O2 (2026-09-25): a whole-number option value (the graphs' "Categories" `tiles`, "Largest count"
+// `most`), or null when unset / not a number — the branch then deals exactly as before.
+function _dNum(id) {
+    const v = _dOpt(id);
+    const n = Number(v);
+    return v !== null && v !== undefined && Number.isFinite(n) && n > 0 ? n : null;
+}
+
 // generate-question.js post-strips q.options when no array element is a
 // non-numeric string. Our multi-select-check options are objects
 // ({id,label,correct}), so the stripper would wipe them — leaving the widget
@@ -47,7 +55,8 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
             // ========================================
             if (mappedSkill === 'line_plot_g2') {
                 const labels = [3, 4, 5, 6, 7];
-                const counts = labels.map(() => randInt(0, 4));
+                const _g2Most = _dNum('most');
+                const counts = labels.map(() => randInt(0, _g2Most || 4));
                 // Ensure at least one non-zero count
                 if (counts.every(c => c === 0)) counts[randInt(0, 4)] = randInt(1, 3);
                 const variant = randInt(0, 2);
@@ -763,9 +772,9 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
             } else if (dataSkill === "bar_graph") {
                 // Bar Graph - CCSS 3.MD.B.3
                 const context = pick(contexts);
-                const numBars = pick([4, 5]);
+                const numBars = _dNum('tiles') || pick([4, 5]);
                 const categories = context.categories.slice(0, numBars);
-                const barMax = Math.max(5, Math.min(Math.ceil(dataMax / 5), 50));
+                const barMax = _dNum('most') || Math.max(5, Math.min(Math.ceil(dataMax / 5), 50));
                 const values = categories.map(() => rng(2, barMax));
                 const maxVal = Math.max(...values);
 
@@ -917,7 +926,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
             } else if (dataSkill === "pictograph") {
                 // Pictograph - CCSS 3.MD.B.3
                 const context = pick(contexts);
-                const numRows = pick([3, 4, 5]);
+                const numRows = _dNum('tiles') || pick([3, 4, 5]);
                 const categories = context.categories.slice(0, numRows);
                 const scaleOpts = range >= 100 ? [2, 5, 10, 25] : range >= 50 ? [2, 5, 10] : [2, 5];
                 const scale = pick(scaleOpts);
@@ -1020,7 +1029,8 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 const counts = {};
 
                 // Generate data points (lengths in fractions of an inch)
-                for (let i = 0; i < rng(8, 12); i++) {
+                const _lpN = _dNum('tiles');
+                for (let i = 0; i < (_lpN || rng(8, 12)); i++) {
                     const num = rng(0, denom * 2);
                     const frac = num / denom;
                     fractions.push(frac);
@@ -1103,9 +1113,10 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
             } else if (dataSkill === "tally_chart") {
                 // Tally Chart - CCSS 3.MD.B.3
                 const context = pick(contexts);
-                const numRows = pick([3, 4, 5]);
+                const numRows = _dNum('tiles') || pick([3, 4, 5]);
                 const categories = context.categories.slice(0, numRows);
-                const values = categories.map(() => rng(3, 15));
+                const _tMost = _dNum('most');
+                const values = categories.map(() => (_tMost ? rng(_tMost <= 5 ? 1 : 3, _tMost) : rng(3, 15)));
 
                 // Phase 4.5 batch 6 (completion) — multi-select-check variant: "Click ALL categories with at least N tallies"
                 if (Math.random() < 0.20) {
@@ -1221,7 +1232,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
             } else if (dataSkill === "pie_chart") {
                 // Pie Chart - CCSS 5.MD.B.2
                 const context = pick(contexts);
-                const numSlices = pick([3, 4]);
+                const numSlices = _dNum('tiles') || pick([3, 4]);
                 const categories = context.categories.slice(0, numSlices);
 
                 // Generate percentages that add to 100
@@ -1323,7 +1334,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 }
 
                 // Generate 8-15 data points
-                const numPoints = rng(8, 15);
+                const numPoints = _dNum('tiles') || rng(8, 15);
                 const dataPoints = []; // array of position indices
                 const countsByPos = {}; // key = position index, value = count
                 for (let dp = 0; dp < numPoints; dp++) {
