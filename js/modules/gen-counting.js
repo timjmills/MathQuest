@@ -348,7 +348,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         if (objects === 'frame' || objects === 'dice') _coPayload.objects = objects;
         const layout = _kOpt('orientation') || 'rows';
         if (layout === 'line' || layout === 'scattered') _coPayload.layout = layout;
-        if (layout === 'circle' && objects !== 'frame' && objects !== 'dice') _coPayload.layout = 'circle';
+        if (layout === 'circle' && objects !== 'frame' && objects !== 'dice') { _coPayload.layout = 'circle'; _coPayload.ringN = Math.min(20, band); }
         if (band > 20 && !_coPayload.layout && objects !== 'frame' && objects !== 'dice') _coPayload.layout = 'line';   // to 30: rows of ten, every item alike
         if (layout === 'scattered' && objects !== 'frame' && objects !== 'dice') _coPayload.pos = _kScatter(count, rng);
         const lvl = _kLevel(1);

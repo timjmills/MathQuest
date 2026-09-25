@@ -40,15 +40,19 @@ function countPicture(ctx, n, shape, p = {}) {
     if (p.objects === 'frame') return framePicture(ctx, n);
     if (p.objects === 'dice') return dicePicture(ctx, n);
     if (p.layout === 'circle') return circlePicture(ctx, n, shape, p);
+    // L1 (LESSONS_LEARNED): the objects and their pitch follow the sheet size (S 0.8, M 0.9, L 1),
+    // so a smaller size fits more; strokes and numerals keep their weights
+    const k = pscale(ctx);
     if (p.layout === 'scattered' && Array.isArray(p.pos) && p.pos.length === n) {
-        const d = 9;
-        const w = Math.max(...p.pos.map((q) => q[0])) + d / 2 + 1, h = Math.max(...p.pos.map((q) => q[1])) + d / 2 + 1;
-        const body = p.pos.map(([x, y]) => shapeOf(shape).draw(x, y, d)).join('');
+        const d = 9 * k;
+        const pos = p.pos.map(([x, y]) => [x * k, y * k]);
+        const w = Math.max(...pos.map((q) => q[0])) + d / 2 + 1, h = Math.max(...pos.map((q) => q[1])) + d / 2 + 1;
+        const body = pos.map(([x, y]) => shapeOf(shape).draw(x, y, d)).join('');
         return svg(ctx, w, h, body, { label: `${n} ${shapeOf(shape).plural}` });
     }
     const line = p.layout === 'line';
     const per = line ? 10 : 5;
-    const d = line ? 7 : 9, pitch = line ? 8.8 : 11.6, gap = 3;   // the K mock-up's pitch (05-B): five in a row beside the square
+    const d = (line ? 7 : 9) * k, pitch = (line ? 8.8 : 11.6) * k, gap = 3 * k;   // the K mock-up's pitch (05-B): five in a row beside the square
     const cols = Math.min(per, Math.max(1, n));
     const rows = Math.ceil(n / per);
     const w = (cols - 1) * pitch + d + 1;
@@ -80,8 +84,13 @@ function countPicture(ctx, n, shape, p = {}) {
  * marks where to start, so the pupil does not count round twice.
  */
 function circlePicture(ctx, n, shape, p = {}) {
-    const d = 8, pitch = 11;
-    const R = Math.max(12, (n * pitch) / (2 * Math.PI));
+    const k = pscale(ctx);
+    const d = 8 * k, pitch = 10.2 * k;
+    // one circle size for the whole page (p.ringN, the Count-to band): the objects spread round
+    // it, so every cell of a page is the same height
+    // with the answer box inside (p.boxInside, its side in mm) the ring clears the box's corners by 2 mm
+    const inner = Number(p.boxInside) > 0 ? Number(p.boxInside) * 0.71 + 2 + d / 2 : 0;
+    const R = Math.max(12 * k, inner, (Math.max(n, Number(p.ringN) || 0) * pitch) / (2 * Math.PI));
     const pad = 1 + d / 2 + (p.startMark ? 5 : 0);
     const c = R + pad;
     let body = '';
@@ -383,10 +392,11 @@ register('counters', {
             const rowA = `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};">${lab('A')}${mat(countPicture(ctx, p.n, p.shape, { countMarks: p.marks }))}</div>`;
             const rowB = `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};margin-top:${L(ctx, 3)};">${lab('B')}`
                 + `${mat(countPicture(ctx, p.m, p.shape, { layout: 'scattered', pos: p.posB }))}</div>`;
-            // flex-wrap: on a narrow screen the check boxes drop under the pictures, which keep their size
-            return root(ctx, 'k2-conserve', `<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:${L(ctx, 4)} ${L(ctx, 8)};">`
+            // the check boxes under the pictures, on paper and on screen alike: one shape at every
+            // size, so the cell is never wide in one item and tall in the next (a page keeps one grid)
+            return root(ctx, 'k2-conserve', `<div style="display:inline-flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};">`
                 + `<div style="display:inline-block;flex:none;text-align:left;">${rowA}${rowB}</div>`
-                + choiceRow(ctx, labels.map((l) => ({ label: l })), { on, vertical: true, labelPt: textPt(ctx) + 2 }) + '</div>');
+                + `<div style="padding-left:${L(ctx, 10)};">${choiceRow(ctx, labels.map((l) => ({ label: l })), { on, vertical: true, labelPt: textPt(ctx) + 2 })}</div></div>`);
         }
         if (p.kind === 'zero') {
             const k = pscale(ctx);
@@ -469,6 +479,15 @@ register('counters', {
         // the objects centred in the room left of it - a box that followed each picture's width
         // jumped about from cell to cell.
         const pp = ctx.state === 'traced' && !p.objects && p.layout !== 'scattered' ? Object.assign({}, p, { countMarks: true }) : p;
+        if (p.layout === 'circle') {
+            // the answer box stands in the MIDDLE of the ring (the ring is sized to leave room for
+            // it): the cell is only as big as the circle, beside or below would double it
+            const pic = countPicture(ctx, p.n, p.shape, Object.assign({}, pp, { boxInside: sq }));
+            return root(ctx, 'k2-count', `<div style="display:flex;justify-content:center;"><div style="position:relative;flex:none;">${pic}`
+                + `<div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);line-height:0;">${slot}</div></div></div>`
+                + (p.track ? `<div style="display:flex;justify-content:center;margin-top:${L(ctx, 3)};">${trackStrip(ctx, p.track)}</div>` : ''),
+            isTwin(ctx) ? {} : { style: 'width:100%;box-sizing:border-box;' });
+        }
         return root(ctx, 'k2-count', `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:${L(ctx, 4)};">`
             + `<div style="display:flex;justify-content:center;"><div style="flex:none;">${countPicture(ctx, p.n, p.shape, pp)}</div></div>${slot}</div>`
             // P11 Support level 2: a number track under the picture to point along.
