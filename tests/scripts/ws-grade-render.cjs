@@ -90,16 +90,16 @@ function supportOptsInPage({ list, SUPPORTS, COVER, MIX }) {
         return o;
     });
 }
-// --opts '{"objects":"pictures"}'  (O6, 2026-09-25) skill options for every rendered skill, on the
-// roles (buildSheet section options) and on the screen hosts (the set's option store), merged over
-// any --supports options: renders a skill at an appearance or difficulty value.
-const OPTS = (() => { const v = arg('opts', null); return v ? JSON.parse(v) : null; })();
+// --opts '{"labels":"some"}'  O6: skill option values every skill in scope carries, on the roles and
+// the screen hosts (merged over any --supports). A value a skill does not offer is dropped by the
+// app's own normalizeOptions, so one --opts can serve a mixed skill list.
+const OPTS = arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null;
 const withOpts = (o) => (OPTS ? Object.assign({}, o || {}, OPTS) : o);
 /** Put the --supports / --opts options in the set's option store (the screen hosts read it). */
 async function storeSupports(page, skill) {
     if (!SUPPORTS && !OPTS) return;
-    const [sup] = await page.evaluate(supportOptsInPage, { list: [[skill.categoryId, skill.skillId]], SUPPORTS, COVER, MIX });
-    const opts = withOpts(sup);
+    const [raw] = await page.evaluate(supportOptsInPage, { list: [[skill.categoryId, skill.skillId]], SUPPORTS, COVER, MIX });
+    const opts = withOpts(raw);
     await page.evaluate(({ skill, opts }) => {
         window.clearSetOptions({ silent: true });
         if (opts) window.setSetOptions(skill.categoryId, skill.skillId, opts, { silent: true });

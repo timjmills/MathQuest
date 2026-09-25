@@ -27,8 +27,10 @@ function _largeTargets() {
 
 // Build SVG markup for the empty grid (lines, axes, labels). Returns a string;
 // the lattice-click hit targets and dot layer are appended live.
-function buildGridSVG(quadrantMode, maxCoord, gridSpacing, gridSize, origin, large) {
-    const labelStep = maxCoord > 12 ? 4 : maxCoord > 8 ? 2 : 2;
+// `labelEvery` (O6 "Figure labels", gen-geometry.js q.coordinateData.labelStep): 1 numbers every
+// grid line; unset keeps the usual every-other labels.
+function buildGridSVG(quadrantMode, maxCoord, gridSpacing, gridSize, origin, large, labelEvery) {
+    const labelStep = labelEvery || (maxCoord > 12 ? 4 : maxCoord > 8 ? 2 : 2);
     const labelFontSize = maxCoord > 12 ? 8 : 10;
     let gridLines = '';
     let axisLabels = '';
@@ -100,7 +102,7 @@ export function renderCoordPlot(q, container) {
         : { x: gridSize / 2, y: gridSize / 2 };
 
     const large = _largeTargets();
-    const inner = buildGridSVG(quadrantMode, maxCoord, gridSpacing, gridSize, origin, large);
+    const inner = buildGridSVG(quadrantMode, maxCoord, gridSpacing, gridSize, origin, large, data.labelStep);
 
     // Prompt sidebar: list of points to plot, with a tally of placed/expected.
     const promptItems = ansArr.map((p, i) => {

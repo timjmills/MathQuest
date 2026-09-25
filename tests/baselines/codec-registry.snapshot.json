@@ -88,7 +88,8 @@
     "ftTask": "7E",
     "wpCues": "8A",
     "wpBank": "8B",
-    "wpBar": "8C"
+    "wpBar": "8C",
+    "bars": "9F"
   },
   "blocks": {
     "0": {
@@ -137,9 +138,9 @@
       "keys": "8A-8C"
     },
     "9": {
-      "owner": "",
-      "status": "spare",
-      "keys": ""
+      "owner": "O6 appearance lanes (AP1 9A-9E, AP2 9F-9J, AP3 9K-9O, AP4 9P-9T) and the options verifier (9U-9Z)",
+      "status": "assigned",
+      "keys": "9A-9Z"
     }
   },
   "tokens": {
@@ -284,7 +285,8 @@
     },
     "op": {
       "x": "M",
-      "/": "D"
+      "/": "D",
+      "both": "B"
     },
     "power": {
       "10": "1",
@@ -481,7 +483,8 @@
     "midLabel": {},
     "closeness": {
       "far": "F",
-      "close": "C"
+      "close": "C",
+      "some": "S"
     },
     "lengths": {
       "equal": "E",
@@ -619,7 +622,11 @@
     },
     "wpCues": {},
     "wpBank": {},
-    "wpBar": {}
+    "wpBar": {},
+    "bars": {
+      "vertical": "V",
+      "horizontal": "H"
+    }
   },
   "scalarOnly": {
     "range": "decimal",
