@@ -140,7 +140,19 @@ export function panePayloadOf(p, template) {
 }
 
 /** A counting checklist (the steps pane on a count-the-objects cell): no number, no answer. */
-export const COUNT_STEPS = Object.freeze(['Point to each.', 'Count in order.', 'Say the last number.', 'Write it.']);
+export const COUNT_STEPS = Object.freeze(['Point to each.', 'Count each once.', 'Say the last one.', 'Write it.']);
+/**
+ * The checklist a support strip carries beside a problem: the S4 steps, cut to about 13 characters a
+ * line so the strip (about 40 mm at S) stands BESIDE a column problem in a two-column cell
+ * instead of under it. Print verbs, one action a line (P-5).
+ */
+export const SUPPORT_STEPS = Object.freeze({
+    '+': Object.freeze(['Ones first.', 'Add down.', 'Regroup tens.', 'Next column.']),
+    '-': Object.freeze(['Ones first.', 'Top smaller?', 'Regroup.', 'Subtract.']),
+    '*': Object.freeze(['Ones first.', 'Multiply.', 'Regroup tens.', 'Next column.']),
+    '/': Object.freeze(['Divide.', 'Multiply.', 'Subtract.', 'Bring down.']),
+    round: Object.freeze(['Find the place.', 'Look next door.', '5 or more: up.', 'Write it.']),
+});
 
 /** Can a template payload draw support `id`? */
 export function canDraw(id, p, template) {
@@ -158,6 +170,7 @@ export function canDraw(id, p, template) {
         if (template === 'stack' && Array.isArray(p.operands) && p.operands.length > 2) return false;
         const { a, b, op } = pp;
         if (id === 'think') return op === '/';
+        if (id === 'array' && op === '/') return !!(PANES.array && PANES.array.accepts(pp));
         if (id === 'skip' || id === 'array') return op === '*' || op === '/';
         return (op === '+' || op === '-') && a <= 20 && b <= 20;
     }
@@ -201,6 +214,14 @@ const order = (ids) => ids.slice().sort((x, y) => {
     return (ix < 0 ? 99 : ix) - (iy < 0 ? 99 : iy) || String(x).localeCompare(String(y));
 });
 
+/** The tally row's size in mm (its SVG is in em of the digit size). */
+const tallyFoot = (n, ctx) => {
+    const pt = Math.max(24, (ctx.metrics && ctx.metrics.digitPt) || 28);
+    const em = pt * 25.4 / 72;
+    const m = /width:([\d.]+)em;height:([\d.]+)em/.exec(touchTallySVG(n, { em: pt, unit: 'pt' })) || [];
+    return { wMm: (Number(m[1]) || 2) * em, hMm: (Number(m[2]) || 1) * em + 0.5, placements: ['beside', 'under'] };
+};
+
 /**
  * The ÷ tally-dot row, sized in CSS em of a wrapper at the page's digit size, so its dots are the
  * fact's own single touch dots. Its length is the section's (`supports.tally`), never the quotient.
@@ -212,25 +233,55 @@ const tallyHtml = (n, ctx) => {
         + touchTallySVG(n, { em: screen ? 40 : pt, unit: screen ? 'px' : 'pt' }) + '</div>';
 };
 
+// The S4 pane that draws a P11 cue (owner, 2026-09-25: the pane versions, whose crosses sit on
+// white-edged counters, replace the old cue drawing). A cue a pane cannot draw keeps factCue.
+const CUE_PANE = Object.freeze({ tile: ['dice', 'tenframe'], frame: ['tenframe'] });
+// A support attached to a problem is drawn one preset smaller than the page (the pupil's own
+// problem stays the biggest thing in the cell): pictures at M (their touch floors hold, §S4.2),
+// the marks and the checklist at S. The problem itself is the matching number sentence, so the
+// pane's own sentence is left off.
+const PANE_SIZE = (id, size) => (size === 'S' ? 'S' : EXTRA_IDS.includes(id) ? 'S' : 'M');
+const EXTRA_IDS = ['boxsign', 'startarrow', 'steps', 'round-mark'];
+const MM_RE = /width="([\d.]+)mm" height="([\d.]+)mm"/;
+
+function paneOf(id, pp0, ctx, twin) {
+    const P = PANES[id];
+    const pp = id === 'steps' && pp0 && !pp0.steps ? { ...pp0, steps: SUPPORT_STEPS[pp0.kind === 'round' ? 'round' : pp0.op] } : pp0;
+    if (!P || !pp || !P.accepts(pp)) return null;
+    const pctx = { size: PANE_SIZE(id, ctx.size), twin, ink: 'black', sentence: false };
+    return { html: P.draw(pp, pctx), foot: P.footprint(pp, pctx), place: null };
+}
+
 function pieceOf(id, p, template, ctx) {
     const pp = panePayloadOf(p, template);
     const twin = ctx.mode === 'screen';
     if (TOUCH_IDS.includes(id)) {
         if (opKey(p.op) !== '/') return null;          // overlay on the digits: no piece
         const n = Number(p.supports && p.supports.tally) || 10;
-        return { html: tallyHtml(n, ctx), place: 'under' };
+        return { html: tallyHtml(n, ctx), foot: tallyFoot(n, ctx), place: null };
     }
     if (CUE_IDS.includes(id)) {
         if (!pp || !pp.op) return null;
+        // Subtraction's crossed-out counters use the panes (white-edged crosses, owner 2026-09-25);
+        // addition keeps the compact cue, which has no crosses to clutter.
+        // ÷: the old array cue drew the quotient as its row count (it gave the answer away); the
+        // S4 array pane draws the dividend's counters loose, to be ringed (answer-free, §S4.2).
+        const panes = pp.op === '-' ? CUE_PANE[id] || [] : pp.op === '/' && id === 'array' ? ['array'] : [];
+        if (pp.op === '/' && id === 'array') {
+            const pane = paneOf('array', pp, ctx, twin);
+            return pane;                                   // null: this ÷ fact has no answer-free array
+        }
+        for (const pid of panes) {
+            const pane = paneOf(pid, pp, ctx, twin);
+            if (pane) return pane;
+        }
         const cue = factCueOf({ a: pp.a, b: pp.b, op: pp.op, cue: id }, twin);
-        return cue ? { html: `<div class="ws-factcue">${cue}</div>`, place: 'under' } : null;
+        if (!cue) return null;
+        const m = MM_RE.exec(factCueOf({ a: pp.a, b: pp.b, op: pp.op, cue: id }, false)) || [];
+        const foot = { wMm: Number(m[1]) || 40, hMm: Number(m[2]) || 12, placements: ['beside', 'under'] };
+        return { html: `<div class="ws-factcue">${cue}</div>`, foot, place: null };
     }
-    const P = PANES[id];
-    if (!P || !pp || !P.accepts(pp)) return null;
-    const pctx = { size: ctx.size, twin, ink: 'black' };
-    const html = P.draw(pp, pctx);
-    const foot = P.footprint(pp, pctx);
-    return { html, foot, place: null };
+    return paneOf(id, pp, ctx, twin);
 }
 
 // fact.js registers itself and imports this module, so the cue drawing is handed in at load
@@ -291,9 +342,16 @@ export function withSupports(problemHtml, p, template, ctx = {}, { problemWMm = 
     const twin = ctx.mode === 'screen';
     if (groups['over-ones'].length) html = attachPane(html, groups['over-ones'].join(''), 'over-ones', { twin });
     if (groups.before.length) html = attachPane(html, `<div style="display:flex;flex-direction:column;gap:2mm">${groups.before.join('')}</div>`, 'before', { twin });
-    if (groups.beside.length) html = attachPane(html, `<div style="display:flex;flex-direction:column;gap:${PANE_GAP_MM}mm">${groups.beside.join('')}</div>`, 'beside', { twin });
+    if (groups.beside.length) {
+        html = attachPane(html, `<div style="display:flex;flex-direction:column;gap:${PANE_GAP_MM}mm">${groups.beside.join('')}</div>`, 'beside', { twin });
+        // A picture beside the problem may differ in width from cell to cell (an array of 3 x 4 and
+        // one of 9 x 7), so on paper the pair starts at the cell's left, not its centre: the
+        // problem and its answer zone stand in the same place in every cell (SCC-T10).
+        if (!twin) html = html.replace('data-ws-pane-place="beside" style="display:flex;', 'data-ws-pane-place="beside" style="display:flex;box-sizing:border-box;width:100%;align-self:stretch;padding-left:2mm;').replace(/(data-ws-pane-place="beside" style="[^"]*?)justify-content:center;/, '$1justify-content:flex-start;');
+    }
     if (groups.under.length) html = attachPane(html, `<div style="display:flex;flex-direction:column;align-items:center;gap:2mm">${groups.under.join('')}</div>`, 'under', { twin });
-    return html === problemHtml ? html : `<div class="ws-supported" data-ws-supports="${s.on.join(' ')}">${html}</div>`;
+    const wide = !twin && groups.beside.length ? ' style="align-self:stretch;width:100%"' : '';
+    return html === problemHtml ? html : `<div class="ws-supported" data-ws-supports="${s.on.join(' ')}"${wide}>${html}</div>`;
 }
 
 /** Does a supports spec add anything round the problem (so the cell must be measured)? */
@@ -303,16 +361,14 @@ export function addsSpace(p, template) {
     return [...s.on, ...s.reserve].some((id) => (TOUCH_IDS.includes(id) ? opKey(p.op) === '/' : true));
 }
 
-/** The widest pane of a supports spec (mm), so a footprint can cap its columns. */
+/** The widest piece drawn round a problem (mm), so a footprint can cap its columns. */
 export function widestPaneMm(p, template, size = 'L') {
     const s = supportsOf(p);
-    const pp = panePayloadOf(p, template);
-    if (!s || !pp) return 0;
+    if (!s) return 0;
     let w = 0;
     for (const id of [...s.on, ...s.reserve]) {
-        const P = PANES[id];
-        if (P && P.accepts(pp)) w = Math.max(w, P.footprint(pp, { size }).wMm);
-        if (CUE_IDS.includes(id)) w = Math.max(w, 42);
+        const piece = pieceOf(id, p, template, { size, mode: 'print', metrics: null });
+        if (piece && piece.foot) w = Math.max(w, piece.foot.wMm);
     }
     return w;
 }

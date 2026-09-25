@@ -481,8 +481,12 @@ function supportPlanFor(sk, q, template, size, mix = null) {
     // alternative (supports.js deals mixKey % alternatives), so that is all it keeps room for.
     const mixMode = n_mix(mix) || o.mix || 'section';
     if (mix && mix.count >= 2 && mixMode === 'section') {
-        const alts = alternativesOf(worst);
-        if (alts.length > 1) worst = alts[mix.key % alts.length];
+        const alts = alternativesOf(chosen);
+        if (alts.length > 1) {
+            const alt = alts[(Number.isFinite(mix.alt) ? mix.alt : mix.key) % alts.length];
+            worst = worst.filter((x) => alt.includes(x));
+            if (!worst.length) return null;
+        }
     }
     const need = Object.fromEntries(worst.map((id) => [id, supportNeeds(id, p, template)]));
     const touch = worst.some((x) => TOUCH_IDS.includes(x));
@@ -501,6 +505,33 @@ function supportPlanFor(sk, q, template, size, mix = null) {
         chosen, worst, need, forceL, extra,
         cover: o.cover || 'whole', mix: o.mix || 'section',
     };
+}
+
+/**
+ * S2: one section of one skill whose ticked supports clash, mixed by section, split into one
+ * sub-section per alternative (dealt like a grouped section: counts by share, or a page shared).
+ */
+function splitBySupports(sec, gi, n) {
+    if (sec.group || !sec.skills || sec.skills.length !== 1) return [sec];
+    const sk = sec.skills[0];
+    let def = null;
+    try { def = optionsFor(sk.categoryId, sk.skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
+    if (!def) return [sec];
+    const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
+    if ((n.mix || o.mix || 'section') !== 'section') return [sec];
+    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
+    const alts = alternativesOf(chosen);
+    // Up to four alternatives. A page-driven split is checked once its parts are measured (buildSheet
+    // undoes it when one row of each does not fit a page, or when it holds fewer problems than the
+    // one section). Beyond four the alternatives are dealt in blocks inside the one section.
+    if (alts.length < 2 || alts.length > 4) return [sec];
+    const k = alts.length;
+    const counts = sec.count ? alts.map((_, i) => Math.floor(sec.count / k) + (i < sec.count % k ? 1 : 0)) : null;
+    return alts.map((_, i) => Object.assign({}, sec, {
+        count: counts ? counts[i] || null : null,
+        group: { id: `sup${gi}`, share: 1 / k },
+        supportAlt: i,
+    })).filter((x) => !counts || x.count);
 }
 
 /** The sheet-level mix, when the request sets one. */
@@ -527,8 +558,9 @@ function supportFactSpec(sk, q) {
 function allocateHostSupports(items, n) {
     const list = items.filter((it) => it && it.supportsBox && it.supportsBox.plan);
     if (!list.length) return;
-    // A skill fades down ITS page: a More Practice letter is a page of its own.
-    const skillKey = (it) => `${it.skill}${it.letter ? `|${it.letter}` : ''}`;
+    // A More Practice set's letters are ONE sheet (coordinator, 2026-09-25): a skill fades down the
+    // whole set, and its section is dealt across the letters, A before B.
+    const skillKey = (it) => it.skill;
     const chosen = {}, cover = {}, mix = {};
     for (const it of list) {
         const pl = it.supportsBox.plan;
@@ -536,11 +568,11 @@ function allocateHostSupports(items, n) {
         cover[skillKey(it)] = n.coverage || pl.cover;
         mix[skillKey(it)] = n.mix || pl.mix;
     }
-    // A section is a section of the sheet (a More Practice letter is its own page of it), or a
-    // Mixed practice pool.
+    // A section is a section of the sheet (every More Practice letter of it), or a Mixed practice
+    // pool.
     const keys = new Map();
     const keyOf = (it) => {
-        const k = it.pool !== undefined && it.pool !== null ? `p${it.pool}` : `s${it.section || 0}|${it.letter || ''}`;
+        const k = it.pool !== undefined && it.pool !== null ? `p${it.pool}` : `s${it.section || 0}`;
         if (!keys.has(k)) keys.set(k, keys.size);
         return keys.get(k);
     };
@@ -891,6 +923,9 @@ function measureItems(items, { size, look, colsList }) {
         // collapsed, and that column count does not fit (DN-10: content never shrinks or
         // re-arranges to fit). A wrapped line of text costs a few mm and is not a collapse.
         for (const it of items) {
+            // S2: a support stands BESIDE its problem where the cell is wide enough and under it
+            // where it is not, so a wide cell is shorter by design, not a collapse.
+            if (it.supportsBox && it.supportsBox.plan) continue;
             const m = it.measured || {};
             const base = m[cols[0]] && m[cols[0]].hMm;
             if (!base) continue;
@@ -1111,6 +1146,12 @@ export async function buildSheet(req = {}) {
             group: { id: gi, share: tw > 0 ? w[i] / tw : 1 / sec.skills.length },
         })).filter((x) => !dealt || x.count);
     });
+    // S2: a sheet of ONE section whose skill ticks supports that clash, mixed section by section,
+    // becomes one sub-section per alternative (section A touch dots, section B dot tiles). Each
+    // sub-section lays out and reserves room for its OWN support only, so a page is as full as it
+    // is without supports, less that support's own size.
+    const unsplit = n.sections;
+    if (n.sections.length === 1 && n.role === 'independent' && n.anchors === 'off') n.sections = n.sections.flatMap((sec, gi) => splitBySupports(sec, gi, n));
 
     const skills = n.sections.flatMap((s) => s.skills.map(metaOf));
     const titles = [...new Set(skills.map((s) => s.iCan))];
@@ -1154,7 +1195,7 @@ export async function buildSheet(req = {}) {
 
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
         const gen = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null }, extra));
-        const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix };
+        const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix, alt: sec.supportAlt };
         return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size, { mix })], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
     };
 
@@ -1233,12 +1274,38 @@ export async function buildSheet(req = {}) {
     let probesOf = () => [];
 
     if (n.role === 'independent') {
-        const probes = n.sections.map((sec, si) => {
+        const makeProbes = () => n.sections.map((sec, si) => {
             const base = (n.seed + si * 100003) >>> 0;
             const probe = probeRun(sec, si, base);
             sec.floor = floorWith(si, probe.items);
             return { base, probe };
         });
+        let probes = makeProbes();
+        // S2: the sub-sections of a support split share the page. When one row of each does not
+        // fit one page, the split is undone: the alternatives are dealt in blocks in one section.
+        if (n.sections !== unsplit && n.sections.some((sec) => !sec.count)) {
+            const body = bodyHeightMm(paper, layoutHeader) - 1;
+            // One row of each at its TALLEST column count: a supported cell is shorter where its
+            // support stands beside it, and the shared page may pick a narrower column.
+            const tallest = (sec) => Math.max(0, ...Object.values(sec.floor || {}).filter((f) => f && f.fits !== false).map((f) => f.hMm || 0));
+            const need = n.sections.reduce((a, sec, si) => a + instrMm + Math.max(tallest(sec), layoutOf(n.role, sec, probes[si].probe.items, n, lctx).hMin) + 1, 0);
+            let undo = need > body;
+            if (!undo) {
+                // Keep the split only when it holds at least as many problems as the one section
+                // (two instruction lines and two part-rows can cost more than the reserve saves).
+                const splitSecs = n.sections;
+                const splitProbes = probes;
+                probesOf = (si) => splitProbes[si].probe.items;
+                const splitCap = shareRows(splitSecs.map((sec, si) => layoutOf(n.role, sec, splitProbes[si].probe.items, n, lctx)))
+                    .reduce((a, v) => a + (v || 0), 0);
+                n.sections = unsplit.map((sec) => Object.assign({}, sec));
+                const one = makeProbes();
+                const oneCap = capFromL(n.sections[0], 0, layoutOf(n.role, n.sections[0], one[0].probe.items, n, lctx));
+                if (oneCap >= splitCap) probes = one;
+                else { n.sections = splitSecs; probes = splitProbes; }
+            }
+            if (undo) { n.sections = unsplit.map((sec) => Object.assign({}, sec)); probes = makeProbes(); }
+        }
         probesOf = (si) => probes[si].probe.items;
         const shared = shareRows(n.sections.map((sec, si) => layoutOf(n.role, sec, withTwins(si, probes[si].probe.items), n, lctx)));
         n.sections.forEach((sec, si) => {

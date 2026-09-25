@@ -122,10 +122,11 @@ export function renderCell(q, ctx = {}) {
     try {
         const html = tpl.render(payload, c);
         if (!SUPPORTS || tpl === FALLBACK || !SUPPORTS.supportsOf(payload)) return html;
-        // The problem's own footprint (without its supports) decides beside or under.
+        // The problem's own footprint (without its supports, less its cell padding) decides beside
+        // or under.
         let fp = null;
         try { fp = tpl.footprint ? tpl.footprint.call(tpl, withoutSupports(payload), c) : null; } catch (e) { fp = null; }
-        return SUPPORTS.withSupports(html, payload, spec.template, c, { problemWMm: (fp && fp.wMm) || 40, problemHMm: (fp && fp.hMm) || 30 });
+        return SUPPORTS.withSupports(html, payload, spec.template, c, { problemWMm: fp && fp.wMm ? Math.max(10, fp.wMm - 5) : 40, problemHMm: (fp && fp.hMm) || 30 });
     } catch (e) {
         return FALLBACK.render({ text: (q && q.text) || '' }, c);
     }

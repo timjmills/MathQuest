@@ -323,6 +323,47 @@ two items a rung; live play still cycles).
   `payload.cue` and `q.visual` (a double draw, and a legacy cell on screen). A fact the legacy path drew
   (sub_facts) is drawn by the kit's fact template when it carries a support.
 
+### S2.6 Density (coordinator, 2026-09-25)
+
+Supports cost only their own room:
+
+- **One section, clashing supports, mixed by section** → the section is split into one sub-section
+  per alternative (`print-sheet.js splitBySupports`: counts shared out, or the page shared like a
+  grouped section). Each lays out and reserves room for its OWN alternative only. With several
+  sections, a section already reserves only the alternative it is dealt.
+- **Beside when the cell allows**: every piece (cue, tally row, pane) has a footprint and stands
+  beside the problem where problem + 4 mm + piece fits the column, else under it. The host's
+  "reflow" veto (a narrow column much taller than one column) does not apply to a supported cell:
+  beside at one column and under at three is the design. On paper a beside pair starts at the
+  cell's left (2 mm in), so the answer zone stands in one place even when the pictures differ in
+  width.
+- **Smaller attached supports**: a pane drawn round a problem is one preset smaller than the page
+  (pictures at M, keeping their touch floors; marks and the checklist at S), without its own number
+  sentence (the problem is the sentence). The checklist uses short lines (`SUPPORT_STEPS`, about 13
+  characters) so it fits beside a column stack in a two-column cell.
+- **Subtraction cues** (dot tiles, ten frames) use the S4 panes (`dice`, `tenframe`), whose crosses
+  sit on white-edged counters; addition keeps the compact P11 cue. The ÷ dot array uses the S4
+  `array` pane (loose counters to ring): the old cue drew the quotient as its row count.
+- **More Practice**: the letters of a set are ONE sheet for the allocator (section mixing and the
+  support fade run across A, B, …). (The generator's support-LEVEL fade still restarts each letter:
+  each letter is generated under its own seed.)
+
+Measured (Independent, L, A4, one page, Max Number 1,000; items per page without → with):
+
+| Skill · supports | without | with |
+|---|---|---|
+| add_facts · touch | 12 | 12 |
+| add_facts · dot tiles | 12 | 9 |
+| add_facts · every support | 12 | 8 |
+| sub_facts · dot tiles (panes) | 12 | 6 |
+| subtract · every support | 9 | 6 |
+| mult_facts · every support | 12 | 12 |
+| div_facts · touch (tally row) | 16 | 12 |
+| div_facts · every support | 16 | 7 |
+| add_column_multi · every support / steps | 6 | 6 / 4 |
+| count_objects · checklist | 8 | 4 |
+| nearest_100 · chart / marks | 10 | 4 / 8 |
+
 ### S2.5 Gates
 
 - `node tests/scripts/ws-supports-unit.mjs` — determinism, balance, clash dealing by section (one and
