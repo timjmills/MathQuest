@@ -406,10 +406,10 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
             await page.evaluate(() => { Array.from(document.body.children).filter(e => getComputedStyle(e).position === 'fixed' && getComputedStyle(e).zIndex === '9999').forEach(e => e.remove()); });
         }
         if (HOSTS.includes('quiz')) {
-            await page.evaluate((c, k, seed) => {
+            await page.evaluate((c, k, seed, opts) => {
                 const questions = [];
                 for (let i = 0; i < 3; i++) {
-                    const q = window.generateQuestionFor({ category: c, skill: k, seed: seed + i, itemIndex: i });
+                    const q = window.generateQuestionFor({ category: c, skill: k, seed: seed + i, itemIndex: i, ...(opts ? { opts } : {}) });
                     questions.push({ id: i, skillId: k, points: 1, questionData: window.quizQuestionData(q) });
                 }
                 const test = { id: null, name: 'Answer', sections: [{ id: 0, label: 'A', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions }],
@@ -417,7 +417,7 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
                 window.handleQuizURL(window.compressTestForURL(test));
                 const name = document.getElementById('qtStudentName'); name.value = 'A'; name.dispatchEvent(new Event('input'));
                 window.startQuizTest();
-            }, c, k, hash(s + ':quizans'));
+            }, c, k, hash(s + ':quizans'), OPTS);
             await sleep(500);
             let err = '';
             for (let i = 0; i < 3; i++) {

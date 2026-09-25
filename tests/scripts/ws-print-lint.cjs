@@ -30,6 +30,7 @@
 //                             render-time support its Support control offers; adds L-SUPPORT
 //   --cover whole|needed|fade kit, with --supports: the sheet's coverage (default whole)
 //   --mix section|problem     kit, with --supports: how clashing supports are shared (default section)
+//   --opts '{"notation":["across"]}'  kit: option values every skill in scope carries (O6 appearance)
 //   --no-combined             legacy: skip the combined multi-section sheet (see below)
 //   --lints L-INK,L-KEY       only report these lints (the others still run)
 //   --json out.json           machine-readable findings for the critic loop
@@ -1657,17 +1658,19 @@ async function runApp(source) {
                     await renderPrint(page, s, { problemCount: COUNT, includeAnswerKey: true });
                     html = await legacyDocumentHtml(page);
                 } else {
-                    html = await page.evaluate(async ({ s, seed, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX }) => {
+                    html = await page.evaluate(async ({ s, seed, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS }) => {
                         // js/modules/print-sheet.js buildSheet(req): sections carry the skills; the result has
                         // pupilHtml and keyHtml (the facsimile key, same plan).
                         const practice = role === 'independent' || role === 'more-practice';
                         // S2: --supports ticks the skill's supports (all = every render-time value offered).
-                        let opts;
+                        // --opts (O6, 2026-09-25): option values every skill carries (normalizeOptions
+                        // drops what a skill does not declare, so one --opts serves a mixed list).
+                        let opts = OPTS ? { ...OPTS } : undefined;
                         if (SUPPORTS) {
                             const def = window.offeredOptionsFor(s.categoryId, s.skillId).find((d) => d.id === 'support' && d.supportsModel);
                             if (def) {
                                 const want = SUPPORTS === 'all' ? def.render : SUPPORTS.split(',').filter((v) => def.render.includes(v));
-                                opts = { support: [...new Set([...(def.default || []), ...want])] };
+                                opts = { ...(opts || {}), support: [...new Set([...(def.default || []), ...want])] };
                             }
                         }
                         const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId, opts }], count: practice ? COUNT : undefined }], size: 'L', look: practice ? 'ican' : 'auto', key: true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
@@ -1675,7 +1678,7 @@ async function runApp(source) {
                         try { out = await window.buildSheet(req); } catch (e) { if (e && e.unsupported) return { unsupported: e.message }; throw e; }
                         const body = [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');
                         return { doc: window.sheetDocument(body, s.label), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml };
-                    }, { s, seed, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null) });
+                    }, { s, seed, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null });
                     if (html && html.doc) { kitHalves = html; html = html.doc; }
                 }
                 if (html && html.unsupported) {

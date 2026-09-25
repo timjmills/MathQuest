@@ -3004,6 +3004,197 @@ const WORD_WORK_OPTIONS = (bar) => [
     }
 }
 
+// ================ O6 · APPEARANCE: OPERATIONS, CLOCKS, MONEY  (lane AP4, 2026-09-25) ================
+// design/audit/OPTIONS-RUBRIC.md §1 O6. Each control changes how an item LOOKS — never the numbers
+// dealt (O2) or the Support level (O3) — and the generator writes the choice into the item's kit
+// cell (q.cell.payload), which the printed cell and the screen twin both draw. The default of every
+// control draws exactly what the skill drew before, so an old link or saved page is unchanged.
+// Keys: `notation` (N), `numerals` (1N) and `order` (V), with their existing value tokens.
+//
+// HOW IT IS WRITTEN — decided per skill (the pupils are SPED / ELL; one form is kept where the
+// column or the bracket IS the lesson, and the help line says why):
+//   add_/sub_ 50 … 1m ids  across is offered wherever the page is one-line work: within 100 with no
+//                          regrouping (2.NBT.5: tens and ones, mentally). A regrouping item, and
+//                          every item from within 1,000 up, stays stacked — the regroup box sits
+//                          over the next column, and past two digits the columns line the places
+//                          up. So the control is declared on the four 50 / 100 no-regrouping ids;
+//                          on every other id the Support level's help line says "always stacked"
+//                          and why.
+//   mult_zeros             across (default) / stacked: 70 above × 8 is the column the algorithm
+//                          will use, and a one-digit × a multiple of ten keeps its carry box.
+//   div_remainders         across (default) / the long-division bracket (4.NBT.6 writes remainders
+//                          both ways); the counters and the two answer boxes are the same.
+//   add_three              across (default) / stacked; the dot groups belong to the across
+//                          sentence, so "Pictures" shows while Across is ticked.
+//   multiply / divide      the existing control shows only while the item is a fact: bigger
+//                          numbers are always stacked / in the bracket (the tiles help says so).
+//   one form, stated       sub_across_zeros and mult_placeholder_zero (the column is the lesson).
+//   not here               integers (signed numbers are not added in columns; they are written
+//                          across only) and add / sub / mult_decimal (gen-fractions.js; lining up
+//                          the points is the lesson) — see the AP4 report.
+// CLOCKS: "Numbers on the clock" (1N) on every skill that draws an analog face and lacked it.
+// MONEY: "Coins set out" (V) on every skill that draws a collection of coins to count or compare.
+const _AP4_DEFAULT = ' (default)';
+const _ap4Add = (key, ...defs) => { if (SKILL_OPTIONS[key]) SKILL_OPTIONS[key] = [...SKILL_OPTIONS[key], ...defs]; };
+const _ap4First = (key, def) => { if (SKILL_OPTIONS[key]) SKILL_OPTIONS[key] = [def, ...SKILL_OPTIONS[key]]; };
+/** Replace one control of a skill with a patched copy (the original def objects are shared). */
+const _ap4Patch = (key, id, patch) => {
+    const list = SKILL_OPTIONS[key];
+    if (!list) return;
+    SKILL_OPTIONS[key] = list.map(d => (d.id === id ? { ...d, ...patch(d) } : d));
+};
+const _ap4Ticked = (cur, dflt) => {
+    const t = cur && cur.notation;
+    return Array.isArray(t) && t.length ? t : typeof t === 'string' ? [t] : dflt;
+};
+
+// ---- + / − from within 50 up -------------------------------------------------------------
+/** Is the rung these choices deal one-line work (gen-operations.js ranged branch)? */
+const _ap4OneLine = (ownMax, ownRg) => (cur) => {
+    const b = Number(cur && cur.band);
+    const band = b && b <= ownMax ? b : ownMax;
+    const rg = ownRg === 'mixed' && cur && cur.regroup
+        ? ({ none: 'no_regroup', always: 'regroup', mixed: 'mixed' }[cur.regroup] || 'mixed') : ownRg;
+    return band <= 20 || (band <= 100 && rg === 'no_regroup');
+};
+const _ap4OpsNotation = (op, ownMax, ownRg) => {
+    const g = op === 'add' ? '+' : '−';
+    const [a, b] = op === 'add' ? ['34', '25'] : ['68', '25'];
+    return {
+        ...notationOption(op === 'add' ? '+' : '-'),
+        values: [
+            { v: 'stacked', l: `Stacked  (${a} above ${g} ${b}, with a rule under it)${_AP4_DEFAULT}` },
+            { v: 'across', l: `Across  (${a} ${g} ${b} = __)` },
+        ],
+        help: 'Tick one way for a single-notation page, or both to mix them so the pupil has to rewrite between '
+            + 'the two. Across is offered here because no item regroups and every number has at most two digits '
+            + '(2.NBT.5: tens and ones, on one line). The regrouping skills, and every skill from within 1,000 up, '
+            + 'stay stacked, because the regroup box sits over the next column and the columns line the places up.',
+        helpShort: 'Stacked in columns, or across on one line. Regrouping and bigger numbers are always stacked.',
+    };
+};
+for (const op of ['add', 'sub']) {
+    const cat = op === 'add' ? 'addition' : 'subtraction';
+    for (const [code, max] of Object.entries(_OPS_BANDS)) {
+        if (max < 50) continue;
+        for (const rg of ['no_regroup', 'regroup', 'mixed']) {
+            const key = `${cat}:${op}_${code}_${rg}`;
+            const oneLine = _ap4OneLine(max, rg);
+            // Declared only where the id's OWN rung is one-line work (within 50 / 100, no
+            // regrouping): a control whose value is overruled at the skill's default would be a
+            // dead end (OC6). Lowering the band on those ids still reaches the within-20 rungs,
+            // which honour it too.
+            if (oneLine({})) _ap4First(key, _ap4OpsNotation(op, max, rg));
+            // The column support level draws on stacked items only: hidden when every item is across.
+            // Its help line carries the one-form reason where across is not on offer.
+            const why = rg === 'no_regroup'
+                ? 'Always stacked from within 1,000 up: the columns line the places up.'
+                : 'Regrouping items are always stacked: the regroup box sits over the next column.';
+            _ap4Patch(key, 'level', (d) => ({
+                appliesTo: (cur) => (typeof d.appliesTo !== 'function' || d.appliesTo(cur))
+                    && (!oneLine(cur) || _ap4Ticked(cur, ['stacked']).includes('stacked')),
+                helpShort: `${why} 3 traces the answer, 2 adds the place heads, 1 is the bare column.`,
+            }));
+        }
+    }
+}
+
+// ---- the other operations --------------------------------------------------------------------
+_ap4Patch('subtraction:sub_across_zeros', 'band', () => ({
+    helpShort: 'The largest number you start from. Always stacked: the borrow crosses the zero column by column.',
+}));
+_ap4Patch('multiplication:mult_placeholder_zero', 'tiles', (d) => ({
+    helpShort: 'The multiplier always has two digits. Always stacked: the zero holds a place in the second row.',
+    help: `${d.help} Always stacked: the placeholder zero is a place in the second row, which only the column shows.`,
+}));
+// × / ÷ by size: the existing notation control shows only while the item is a fact.
+_ap4Patch('multiplication:multiply', 'notation', () => ({
+    appliesTo: (cur) => cur.tiles === null || cur.tiles === undefined || Number(cur.tiles) === 11,
+}));
+_ap4Patch('multiplication:multiply', 'tiles', (d) => ({
+    helpShort: 'The size of the two numbers. From 2-digit × 1-digit up the item is always stacked: the carries need the columns.',
+    help: `${d.help} From 2-digit × 1-digit up the item is always stacked, because the carry boxes sit over the columns.`,
+}));
+_ap4Patch('division:divide', 'notation', () => ({
+    appliesTo: (cur) => (cur.tiles === null || cur.tiles === undefined) && (cur.regroup || 'none') === 'none',
+}));
+_ap4Patch('division:divide', 'tiles', (d) => ({
+    helpShort: 'The size of the numbers. A 2-digit number shared, or a remainder, is always in the bracket, where the working goes.',
+    help: `${d.help} A 2-digit or bigger number shared, and any remainder, is always written in the long-division bracket, because that is where the working goes.`,
+}));
+_ap4Add('multiplication:mult_zeros', {
+    id: 'notation', label: 'How it is written', type: 'set', default: ['across'],
+    values: [
+        { v: 'across', l: `Across  (8 × 70 = __)${_AP4_DEFAULT}` },
+        { v: 'stacked', l: 'Stacked  (70 above × 8, with a rule under it)' },
+    ],
+    allLabel: 'Both ways, mixed',
+    help: 'Across reads the pattern along one line (8 × 7 = 56, so 8 × 70 = 560). Stacked writes the multiple of '
+        + 'ten on top and the one-digit number under it, the column the written method uses, with its carry box. '
+        + 'Tick both to mix them on one page.',
+    helpShort: 'Across on one line, or stacked in a column (multiple of ten on top).',
+});
+_ap4Add('division:div_remainders', {
+    id: 'notation', label: 'How it is written', type: 'set', default: ['across'],
+    values: [
+        { v: 'across', l: `Across  (23 ÷ 5 = __ R __)${_AP4_DEFAULT}` },
+        { v: 'bracket', l: 'Long division bracket  (5 ⟌ 23, the answer on top, R beside it)' },
+    ],
+    allLabel: 'Both ways, mixed',
+    help: 'The same division under the same counters, written across or in the long-division bracket, the '
+        + 'form written division grows into. The pupil writes the quotient and the remainder either way. Tick '
+        + 'both to mix them on one page.',
+    helpShort: 'Across (23 ÷ 5), or in the long-division bracket (5 ⟌ 23).',
+});
+_ap4First('addition:add_three', {
+    id: 'notation', label: 'How it is written', type: 'set', default: ['across'],
+    values: [
+        { v: 'across', l: `Across  (8 + 5 + 3 = __)${_AP4_DEFAULT}` },
+        { v: 'stacked', l: 'Stacked  (8, 5 and 3 in one column)' },
+    ],
+    allLabel: 'Both ways, mixed',
+    help: 'Stacked puts the three numbers in one column over a rule, so the pupil can look for two that make ten. '
+        + 'The dot pictures stand along the across sentence, so a stacked item is numbers only; tick both ways to '
+        + 'mix pictured sentences with columns on one page.',
+    helpShort: 'Across on one line (with the dot pictures), or the three numbers in one column.',
+});
+// The dot groups belong to the across sentence: "Pictures" shows while Across is ticked.
+_ap4Patch('addition:add_three', 'pictures', () => ({
+    appliesTo: (cur) => _ap4Ticked(cur, ['across']).includes('across'),
+}));
+
+// ---- clocks: "Numbers on the clock" (1N) -------------------------------------------------------
+_ap4Add('measurement:time_fives_ring', { ..._tmNumerals(), group: 'layout',
+    help: 'The hour numbers printed on the face. Fewer numbers is harder: the pupil finds each 5 by its place round the face. The minute boxes do not change.' });
+_ap4Add('measurement:clock_parts', { ..._tmNumerals(), group: 'layout',
+    help: 'The numbers printed on the face. "Write the missing numbers" always leaves 3 to 5 places as boxes; with fewer numbers printed the pupil counts round from the nearest printed one. "Which is the hour hand" prints the same face with its hands.',
+    helpShort: 'The numbers printed on the face. Fewer is harder: the pupil counts round from 12.' });
+for (const id of ['elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard']) {
+    _ap4Add(`measurement:${id}`, { ..._tmNumerals(), group: 'layout',
+        help: 'The hour numbers on the two clock faces. Fewer numbers is harder: the pupil reads the hands by their position.',
+        appliesTo: (cur) => cur.notation !== 'digital' });
+}
+{
+    const FACE = ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock'];
+    _ap4Add('measurement:mixed_time', { ..._tmNumerals(), group: 'layout',
+        help: 'The numbers on every clock face in the review. Fewer numbers is harder: the pupil reads the hands by their position.',
+        appliesTo: (cur) => !Array.isArray(cur.members) || cur.members.some(m => FACE.includes(m)) });
+}
+
+// ---- money: "Coins set out" (V) ------------------------------------------------------------
+const _ap4CoinsSetOut = () => ({
+    id: 'order', label: 'Coins set out', type: 'enum', default: 'largest', group: 'layout',
+    values: [
+        { v: 'largest', l: `Biggest first, in a row${_AP4_DEFAULT}` },
+        { v: 'scrambled', l: 'Scattered: the pupil finds the biggest first' },
+    ],
+    help: 'The same coins, set out biggest first or scattered. Scattered is harder: the pupil has to find the biggest coin before counting on. Notes stay biggest first.',
+    helpShort: 'Biggest coin first, or scattered so the pupil finds the biggest.',
+});
+for (const id of ['equiv_coin_sets', 'enough_money', 'money_compare']) _ap4Add(`measurement:${id}`, _ap4CoinsSetOut());
+_ap4Add('measurement:money_notation', { ..._ap4CoinsSetOut(), appliesTo: (cur) => cur.task !== 'words' });
+// ============================ end O6 · appearance: operations, clocks, money (AP4) ============
+
 // Options every skill understands, whether or not it declares anything of its own.
 export const UNIVERSAL_OPTIONS = [levelOption()];
 

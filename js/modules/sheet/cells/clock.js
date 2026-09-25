@@ -148,7 +148,7 @@ function parts(p, ctx) {
         const on = tickedIndex(ctx, labels, right);
         // letter the hour hand A or B, as the item says
         const lab = right === 'A' ? ['A', 'B'] : ['B', 'A'];
-        const face = faceSVG(ctx, { D, hands: true, hour: p.h, minute: p.m, labelHands: lab, label: 'clock with hands lettered A and B' });
+        const face = faceSVG(ctx, { D, hands: true, hour: p.h, minute: p.m, labelHands: lab, missing: hiddenNumerals(p), label: 'clock with hands lettered A and B' });
         return cellRoot(ctx, 'tm-parts', `${face}${words(ctx, 'The hour hand is:', { pt: textPt(ctx) })}${tickList(ctx, labels, { on, vertical: false })}`);
     }
     const missing = (p.missing || []).map(Number);
@@ -156,7 +156,9 @@ function parts(p, ctx) {
     // printed numerals. The face is bigger (the cell is half a page wide) and each box stands on
     // its own numeral's place, inside the tick ring, a box's width from its neighbours.
     const Dp = { S: 56, M: 62, L: 66 }[sizeOf(ctx)];
-    const face = faceSVG(ctx, { D: Dp, hands: false, missing, label: 'clock face with numbers missing' });
+    // O6 (AP4): a face printing only 12, 3, 6, 9 (or 12) leaves its other places empty too.
+    const unprinted = [...new Set([...missing, ...hiddenNumerals(p)])];
+    const face = faceSVG(ctx, { D: Dp, hands: false, missing: unprinted, label: 'clock face with numbers missing' });
     const R = Dp / 2, pad = 1.5 * 0.35278, W = Dp + 2 * pad, c = W / 2;
     const bw = Math.min(S(ctx).writeMm + 1, 9.5);
     const numMm = numeralMm(ctx, Dp);
@@ -187,7 +189,7 @@ function fives(p, ctx) {
     const Rr = Math.max(...Array.from({ length: 12 }, (_, k) => rOf(k + 1)));
     const W = 2 * (Rr + bw / 2) + 2;
     const c = W / 2;
-    const face = faceSVG(ctx, { D, hands: false, label: 'clock face' });
+    const face = faceSVG(ctx, { D, hands: false, missing: hiddenNumerals(p), label: 'clock face' });
     const given = new Set((p.given || []).map(Number));
     const blanks = [];
     for (let i = 1; i <= 12; i++) if (!given.has(i)) blanks.push(i);

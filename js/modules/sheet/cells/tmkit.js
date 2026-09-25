@@ -431,9 +431,12 @@ export function coinRow(ctx, values, { dots = false, compact = false, wrap = 6, 
     for (let i = 0; i < values.length; i += wrap) lines.push(values.slice(i, i + wrap));
     return `<div class="tm-coins" data-tm-coins="${esc(values.join(','))}" style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 2)};">`
         // `scatter` (MC-6, order: scattered): the coins stand at uneven heights and gaps, not in a
-        // tidy row, so the pupil has to find the biggest one before counting.
-        + lines.map((ln) => `<div style="display:flex;align-items:${scatter ? 'flex-start' : 'center'};justify-content:center;gap:${L(ctx, scatter ? 4 : 2)};flex-wrap:wrap;">`
-            + ln.map((v, i) => (scatter ? `<span style="display:inline-block;margin-top:${L(ctx, [0, 7, 2, 9, 4, 1][i % 6])};">${one(v)}</span>` : one(v))).join('') + `</div>`).join('')
+        // tidy row, so the pupil has to find the biggest one before counting. 'soft' (O6, the
+        // check / enough / compare / notation cells) keeps the tidy row's 2 mm gaps and rises at
+        // most 2 mm, so a cell that also holds a price, a slot or a second collection keeps its
+        // height and the page its rows.
+        + lines.map((ln) => `<div style="display:flex;align-items:${scatter ? 'flex-start' : 'center'};justify-content:center;gap:${L(ctx, scatter === true ? 4 : 2)};flex-wrap:wrap;">`
+            + ln.map((v, i) => (scatter ? `<span style="display:inline-block;${scatter === 'soft' ? 'line-height:0;' : ''}margin-top:${L(ctx, (scatter === 'soft' ? [0, 2, 0.5, 2, 0, 1] : [0, 7, 2, 9, 4, 1])[i % 6])};">${one(v)}</span>` : one(v))).join('') + `</div>`).join('')
         + `</div>`;
 }
 
