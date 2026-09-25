@@ -15,7 +15,7 @@ import {
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
     regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
     clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget, isNumberLineItem, NUMBER_LINE_INSTRUCTION,
-    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect,
+    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs,
 } from './screen-cell.js';
 
 // Escape HTML-significant characters so q.text strings (which may contain
@@ -1377,6 +1377,13 @@ function _restoreAnswerSlot() {
     if (input && area && !area.contains(input)) area.insertBefore(input, area.firstChild);
     releaseVisualBlank(input);
     unwireLiveCorrect(input);
+    if (input && input.dataset.mqMapHidden === '1') {
+        delete input.dataset.mqMapHidden;
+        input.style.removeProperty('display');
+    }
+    if (input) input.classList.remove('mq-map-slot', 'mq-cellslot-host');
+    const _va = document.getElementById('visualAid');
+    if (_va) _va.classList.remove('mq-map-cellslots');
     if (input) {
         input.classList.remove('mq-slot', 'mq-slot--box', 'mq-slot--text');
         input.style.removeProperty('--mq-n');
@@ -1391,6 +1398,38 @@ function _restoreAnswerSlot() {
 function _isPracticeHost(card) {
     return !!card && !!card.closest && !!card.closest('#gameView')
         && !(document.body && document.body.classList.contains('map-immersive'));
+}
+
+// MAP: a cell that draws its own answer places (a time's [ ]:[ ], a sentence's boxes) answers in
+// them; #answerInput moves into a lone blank, or feeds several boxes and is hidden. The CHECK
+// button (in #answerInputArea) stays and submits #answerInput as before.
+function _applyMapSlots(q) {
+    const visualAid = document.getElementById('visualAid');
+    const input = document.getElementById('answerInput');
+    const qt = document.getElementById('questionText');
+    if (qt) screenTextLine(qt);                 // a screen verb on screen (Type, not Write)
+    if (visualAid) {
+        // ... inside the drawing too, and again once a widget has mounted (dynamic import)
+        screenCellVerbs(visualAid);
+        [120, 400, 900].forEach((ms) => setTimeout(() => { if (visualAid.isConnected) screenCellVerbs(visualAid); }, ms));
+    }
+    if (!visualAid || !input || input.disabled || (q.options && q.options.length)) return;
+    if (!visualAid.querySelector('[data-mq-cell], [data-mq-blank]')) markLegacyBlanks(visualAid);
+    if (!visualAid.querySelector('[data-mq-cell], [data-mq-blank]')) {
+        if (qt && !visualAid.querySelector('input') && adoptVisualBlank(qt, input)) input.classList.add('mq-map-slot');
+        return;
+    }
+    if (adoptVisualBlank(visualAid, input)) {
+        input.classList.add('mq-map-slot');
+        return;
+    }
+    if (wireCellSlots(visualAid, input)) {
+        input.dataset.mqMapHidden = '1';
+        input.style.setProperty('display', 'none', 'important');
+        visualAid.classList.add('mq-map-cellslots');
+        const first = visualAid.querySelector('input.mq-cellslot');
+        if (first && !state.hasAnswered) { try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); } }
+    }
 }
 
 // The answer slot's shape and blank width (section 6, SL-2).
@@ -1429,7 +1468,16 @@ function _applyScreenCell() {
     const qt = document.getElementById('questionText');
     if (qt) qt.classList.remove('mq-dup');
     _watchChromeCheck();
-    if (!practice || !q) { _syncChromeCheck(); return; }
+    if (!practice || !q) {
+        // MAP borrows this card with the paper wrapper off, but the one-answer-area rule still
+        // holds (owner 2026-09-26: "where they give a blank, it should not have a separate answer
+        // area"): the cell's own boxes take the answer; MAP's CHECK stays.
+        if (q && document.body && document.body.classList.contains('map-immersive')) {
+            try { _applyMapSlots(q); } catch (e) { console.error('map slots:', e); }
+        }
+        _syncChromeCheck();
+        return;
+    }
 
     // The practice card is one column: the paper is the layout (SP-12 widths).
     card.classList.remove('layout-visual-left', 'layout-pv-disks', 'layout-fnl', 'qc-bundled-side-by-side');
@@ -1512,6 +1560,7 @@ function _applyScreenCell() {
         const typed = !(q.options && q.options.length) && visualAid && visualAid.style.display !== 'none';
         if (typed && input && !input.disabled && adoptVisualBlank(visualAid, input)) {
             paper.classList.add('mq-slot-moved');
+            wireSignCircle(visualAid, input, { signs: signsFor(q) });
             visualAid.dataset.mqNoZoom = '1';
             if (!state.hasAnswered) {
                 try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); }
@@ -1529,6 +1578,13 @@ function _applyScreenCell() {
             if (first && !state.hasAnswered) {
                 try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); }
             }
+        } else if (!(q.options && q.options.length) && input && !input.disabled && qt && !qt.classList.contains('mq-dup')
+            && !(visualAid && visualAid.style.display !== 'none' && visualAid.querySelector('input, [data-mq-cell], [data-mq-blank]'))
+            && adoptVisualBlank(qt, input)) {
+            // the sentence itself holds the one blank ("Complete: 4, 6, ___, 10"): the pupil
+            // writes in it, and there is no separate answer area (owner ruling 2026-09-26)
+            paper.classList.add('mq-slot-moved');
+            if (!state.hasAnswered) { try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); } }
         }
         // A printed "Check one box." cell is tapped, not typed (PEDAGOGY 10.2, SP-3).
         if (visualAid && input && wireTickBoxes(visualAid, q, input)) paper.classList.add('mq-tick-mode');
