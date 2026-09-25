@@ -225,7 +225,9 @@ export const OPTION_KEYS = Object.freeze({ ...ONE_LETTER_KEYS, ...MULTI_KEYS });
 export const VALUE_TOKENS = Object.freeze({
     notation: Object.freeze({ stacked: 'S', across: 'A', bracket: 'B', fraction: 'F',
         // block 1 P10 elapsed_visual_*: the start and end shown on
-        analog: 'G', digital: 'D', mixed: 'M' }),
+        analog: 'G', digital: 'D', mixed: 'M',
+        // build lane k2: bonds_in_order as a bond over a two-column table
+        table: 'T' }),
     response: Object.freeze({ standard: 'S', 'which-numbers': 'W', 'array-builder': 'A', write: 'R', 'circle-all': 'C',
         // P9 step 8 identify
         circle: 'L', bank: 'B',

@@ -35,6 +35,7 @@ export const SKILL_GRADES = {
     'odd_one_out': 'K',
     'compare_size': 'K',
     'zero_none': 'K',
+    'bonds_in_order': 'K',
     // Phase 5 batch 1: K-2 MAP early-band skills
     'add_5_pictures': 'K', 'sub_5_pictures': 'K',
     'heavier_lighter_visual': 'K', 'pictograph_intro': 'K',
@@ -596,6 +597,8 @@ export const SKILLS = {
         { v: "mixed_composing", l: "Mixed Number Sense" },
         // APPENDED (owner, 2026-09-25): never splice above it — share codes index by position.
         { v: "number_chart_fill", l: "Number Chart - Find the Missing Number (to 1,000 and beyond)" },
+        // Build lane k2 (2026-09-25): appended.
+        { v: "bonds_in_order", l: "Number Bonds in Order" },
     ],
     counting_mixed: [
         { v: "counting_all", l: "All Counting & Cardinality" },
@@ -1589,7 +1592,7 @@ export const SKILL_TIME_CATEGORY = {
     // New K-3 skills (quick)
     count_objects: "quick", count_sequence: "quick", compare_groups: "quick",
     // Build lane k2 (2026-09-25)
-    zero_none: "quick", sort_into_groups: "quick", ordinal_numbers: "quick", what_can_we_measure: "quick", compare_capacity: "quick", match_same: "quick", odd_one_out: "quick", compare_size: "quick",
+    zero_none: "quick", bonds_in_order: "quick", sort_into_groups: "quick", ordinal_numbers: "quick", what_can_we_measure: "quick", compare_capacity: "quick", match_same: "quick", odd_one_out: "quick", compare_size: "quick",
     compare_objects: "quick", classify_count: "quick", number_bonds: "quick", make_ten: "quick",
     teen_compose: "quick", odd_even: "quick", number_word_form: "quick",
     // MAP gap fills (Phase 6)
@@ -1863,7 +1866,7 @@ export const SKILL_PRINT_SIZE = {
     more_less_10: "medium", more_less_100: "medium",
     count_objects: "compact", count_sequence: "compact",
     // Build lane k2 (2026-09-25)
-    zero_none: "compact", sort_into_groups: "wide", ordinal_numbers: "wide", what_can_we_measure: "compact", compare_capacity: "compact", match_same: "compact", odd_one_out: "compact", compare_size: "compact",
+    zero_none: "compact", bonds_in_order: "wide", sort_into_groups: "wide", ordinal_numbers: "wide", what_can_we_measure: "compact", compare_capacity: "compact", match_same: "compact", odd_one_out: "compact", compare_size: "compact",
     compare_groups: "compact", compare_objects: "compact",
     nearest_10: "medium", nearest_100: "medium", nearest_1000: "medium",
     nearest_10000: "medium", nearest_100000: "medium", nearest_million: "medium",

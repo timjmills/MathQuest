@@ -3195,6 +3195,23 @@ const K2_LANE_OPTIONS = {
             help: 'What stands in the line. The line is always one kind, with a star to find on "Write the place".',
         },
     ],
+    'composing:bonds_in_order': [
+        _opsBand([5, 10], 10, { label: 'Bonds of', labels: { 5: 'The numbers 3 to 5', 10: 'The numbers 6 to 10' },
+            help: 'The whole each table lists. 3 to 5 first (4 to 6 rows); then 6 to 10 (7 to 11 rows, one table a column).' }),
+        {
+            id: 'task', label: 'Task', type: 'enum', default: 'fill', group: 'difficulty',
+            values: [{ v: 'fill', l: 'Write the second part of each row (default)' }, { v: 'missing', l: 'Write the missing rows (both parts)' },
+                { v: 'pattern', l: 'Every row shown: how does a column change? (check a box)' }],
+            help: 'One task for the whole page: list the bonds first, then find the missing rows, then name the pattern.',
+        },
+        { ...levelSubset([3, 2, 1], 2, 'Level 3 fills the first two rows and draws each row as dots (the first part solid, '
+            + 'the second hollow); level 2 fills the first two rows; level 1 fills none (the pupil starts at 0 and the whole).') },
+        {
+            id: 'notation', label: 'Written as', type: 'enum', default: 'table', group: 'layout',
+            values: [{ v: 'table', l: 'A bond over a two-column table (default)' }, { v: 'across', l: 'Number sentences (0 + 5 = 5)' }],
+            help: 'The same bonds, as the parts of a bond listed in two columns, or written as addition sentences.',
+        },
+    ],
     'comparing:sort_into_groups': [
         {
             id: 'task', label: 'Task', type: 'enum', default: 'count', group: 'difficulty',

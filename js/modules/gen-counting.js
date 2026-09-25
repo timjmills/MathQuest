@@ -1372,6 +1372,7 @@ function _k2LaneSkill(q, id, rng) {
         case 'what_can_we_measure': return _k2Measurable(q, rng);
         case 'ordinal_numbers': return _k2OrdinalLine(q, rng);
         case 'sort_into_groups': return _k2SortGroups(q, rng);
+        case 'bonds_in_order': return _k2BondsInOrder(q, rng);
         default: return false;
     }
 }
@@ -2035,5 +2036,69 @@ function _k2Conserve(q, rng) {
     q.supportLevel = lvl;
     q.skillLabel = 'Count Objects';
     _kSetCell(q, 'counters', { kind: 'conserve', n, m, shape, posB: _k2Spread(m, rng), labels, correct, ans: labels[correct], marks: lvl >= 2 });
+    return true;
+}
+
+/**
+ * NUMBER BONDS IN ORDER (composing:bonds_in_order; WRM Y1.B2.S6 "systematic methods", K.OA.A.3
+ * decompose 10 or less in more than one way). Every bond of one whole n, listed in order: the
+ * first part counts up 0, 1, 2 ... n while the second counts down n ... 0 (the `bond` template's
+ * table, or sentences 0 + n = n). Tasks: 'fill' the second parts, 'missing' whole rows, 'pattern'
+ * (every row printed: how does a column change?). Support: level 2 fills the first two rows; level
+ * 3 also draws each row as dots (the parts solid and hollow). The whole is dealt round the page.
+ */
+function _k2BondsInOrder(q, rng) {
+    const band = Number(_kOpt('band')) === 5 ? 5 : 10;
+    const task = _kOpt('task') || 'fill';
+    const lvl = _kLevel(2);
+    const n = band === 5 ? 3 + _kDealShuffled(3) : 6 + _kDealShuffled(5);
+    const notation = _kOpt('notation') === 'across' ? 'across' : 'table';
+    // pattern pages also list the bonds from n down to 0 (half the items), so the answer moves
+    const down = task === 'pattern' && _kDealShuffled(2) === 1;
+    const rows = Array.from({ length: n + 1 }, (_, i) => { const a = down ? n - i : i; return { a, b: n - a, hide: null }; });
+    const given = lvl >= 2 ? 2 : 0;
+    if (task === 'fill') rows.forEach((r, i) => { if (i >= given) r.hide = 'b'; });
+    if (task === 'missing') {
+        const k = n <= 5 ? 2 : 3;
+        const pool = shuffle(Array.from({ length: n + 1 - given }, (_, i) => i + given));
+        pool.slice(0, k).forEach((i) => { rows[i].hide = 'both'; });
+    }
+    const payload = { kind: 'table', task, n, rows, notation, dots: lvl >= 3 };
+    q.options = [];
+    q.selfAnswering = true;
+    q.skillLabel = 'Number Bonds in Order';
+    q.supportLevel = lvl;
+    q._variant = task;
+    q.printFormat = `k2-${task}`;
+    if (task === 'pattern') {
+        const ask = _kDealShuffled(2) === 0 ? 'second' : 'first';
+        const labels = ['Goes up by 1', 'Goes down by 1', 'Stays the same'];
+        const goesUp = (ask === 'first') !== down;
+        const correct = goesUp ? 0 : 1;
+        q.text = `Read the bonds of ${n} in order. How does the ${ask} number change?`;
+        q.printText = 'Read down the numbers. Check how they change.';
+        q.ans = labels[correct];
+        q.printAnswer = labels[correct];
+        q.acceptedAnswers = [labels[correct].toLowerCase(), goesUp ? 'up' : 'down'];
+        q.answerType = 'text';
+        q.hint = 'Read the numbers from the top to the bottom. Is each one 1 more or 1 less?';
+        q.distractorTags = { [labels[1 - correct]]: 'read the other column' };
+        _kSetCell(q, 'bond', Object.assign(payload, { ask, labels, correct }));
+        return true;
+    }
+    const blanks = [];
+    rows.forEach((r) => { if (r.hide === 'both') blanks.push(r.a); if (r.hide) blanks.push(r.b); });
+    q.text = task === 'fill' ? `Write the bonds of ${n} in order. Fill in the second part of each row.`
+        : `Some bonds of ${n} are missing. Write both parts of each missing row.`;
+    q.printText = task === 'fill' ? 'Write the missing part in each row.' : 'Write the missing rows. Keep the bonds in order.';
+    q.ans = blanks.join(', ');
+    q.keyParts = blanks.map(String);
+    q.acceptedAnswers = [blanks.join(','), blanks.join(' ')];
+    q.answerType = 'text';
+    q.hint = 'The first part goes up by 1. The second part goes down by 1. Both parts make the whole.';
+    q.distractorTags = task === 'fill'
+        ? { [rows.filter((r) => r.hide).map((r) => r.a).join(', ')]: 'copied the first part' }
+        : { [blanks.map((v, i) => (i % 2 === 0 ? v - 1 : v + 1)).join(', ')]: 'copied the row above' };
+    _kSetCell(q, 'bond', payload);
     return true;
 }

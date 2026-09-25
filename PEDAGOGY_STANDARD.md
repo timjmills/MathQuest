@@ -1270,6 +1270,9 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `count-tens` | Write how many tens. | count rods or full ten frames as tens (added 2026-09-25) |
 | `count-zero` | Count. Write how many. None is 0. | count objects on a plate, an empty one included: zero means none (build lane k2, 2026-09-25) |
 | `check-none` | Check the one with none. | find the empty plate, box or frame among three (build lane k2) |
+| `fill-bonds` | Write the missing part in each row. | bonds of one number listed in order: write each second part (build lane k2) |
+| `missing-bonds` | Write the missing rows. Keep the bonds in order. | bonds in order with whole rows left out: write both parts (build lane k2) |
+| `check-bond-pattern` | Read down the numbers. Check how they change. | a full bonds table: does a column go up by 1, down by 1 or stay the same (build lane k2) |
 | `check-same-number` | Same number? Check one box. | count A, count B, check Same or Not the same after the objects move (build lane k2) |
 | `sort-count` | Sort. Write how many in each ring. | sort pictures into labelled rings, then count each ring (build lane k2) |
 | `check-most-ring` | Check the ring with the most. | compare the groups of a finished sort (build lane k2) |

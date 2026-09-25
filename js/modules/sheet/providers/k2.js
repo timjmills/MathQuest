@@ -1243,3 +1243,97 @@ registerSkill('comparing:sort_into_groups', {
         return other ? chooseWrong(q, [{ value: other, misconception: 'rule-does-not-fit', explain: 'Named a rule that does not split the rings.' }]) : null;
     },
 });
+
+/* ============================================================================ bonds_in_order */
+
+const BONDS_ICAN = 'I Can find all the bonds of a number in order';
+const BONDS_DEFS = {
+    fill: {
+        iCan: BONDS_ICAN, instructionKey: 'fill-bonds',
+        steps: ['Start with 0 and the whole.', 'The first part goes up by 1.', 'The second part goes down by 1.', 'Check: the two parts make the whole.'],
+        say: '__ is __ and __.',
+        sayValues: (q) => { const p = payloadOf(q); const r = (p.rows || [])[1]; return r ? [p.n, r.a, r.b] : null; },
+    },
+    missing: {
+        iCan: BONDS_ICAN, instructionKey: 'missing-bonds',
+        steps: ['Read the row above the gap.', 'The first part is 1 more.', 'The second part is 1 less.', 'Write both parts.'],
+        say: '__ is __ and __.',
+        sayValues: (q) => { const p = payloadOf(q); const r = (p.rows || []).find((x) => x.hide === 'both'); return r ? [p.n, r.a, r.b] : null; },
+    },
+    pattern: {
+        iCan: BONDS_ICAN, instructionKey: 'check-bond-pattern',
+        steps: ['Read the first numbers down.', 'Read the second numbers down.', 'Is each one 1 more, 1 less or the same?', 'Check how the numbers change.'],
+        say: 'The first number goes __ by 1.',
+        sayValues: (q) => { const p = payloadOf(q); const r = p.rows || []; return r.length > 1 ? [r[1].a > r[0].a ? 'up' : 'down'] : null; },
+    },
+};
+
+/** The table's blanks in reading order (the bond template's order): {id, value, i, part, r}. */
+function bondBlanks(rows) {
+    const out = [];
+    rows.forEach((r, i) => {
+        if (r.hide === 'both') out.push({ id: `r${i}a`, value: String(r.a), v: r.a, i, part: 'a', r });
+        if (r.hide) out.push({ id: `r${i}b`, value: String(r.b), v: r.b, i, part: 'b', r });
+    });
+    return out;
+}
+
+registerSkill('composing:bonds_in_order', {
+    strings: stringsBy((t, ref) => BONDS_DEFS[t] || BONDS_DEFS[ref && ref.opts && ref.opts.task] || null, BONDS_DEFS.fill),
+    misconceptions: ['copied-first-part', 'second-goes-up', 'missed-zero', 'parts-miss-whole', 'repeated-a-row', 'up-down-swapped'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        const rows = p.rows || [];
+        const n = num(p.n);
+        if (!rows.length || !Number.isFinite(n)) return [];
+        const marks = (list) => list.map((b) => ({ slot: b.id, value: b.value }));
+        const blanks = bondBlanks(rows);
+        if (p.task === 'pattern') {
+            const col = p.ask === 'first' ? rows.map((r) => r.a) : rows.map((r) => r.b);
+            return [
+                step(`Read the ${p.ask === 'first' ? 'first' : 'second'} numbers: ${col.slice(0, 4).join(', ')} ...`),
+                step(`Each one is 1 ${col[1] > col[0] ? 'more' : 'less'} than the one before.`),
+                step(`Check "${q.ans}".`, [{ slot: 'answer', value: String(q.ans) }]),
+            ];
+        }
+        if (p.task === 'missing') {
+            const hidden = rows.map((r, i) => (r.hide === 'both' ? i : -1)).filter((i) => i >= 0);
+            const out = [step(`The bonds of ${n} go 0 and ${n}, 1 and ${n - 1} ... in order.`)];
+            hidden.slice(0, 2).forEach((i) => out.push(step(`Row ${i + 1}: ${rows[i].a} and ${rows[i].b} make ${n}.`, marks(blanks.filter((b) => b.i === i)))));
+            out.push(step('Write both parts of each missing row.', marks(blanks)));
+            return clampSteps(out);
+        }
+        const first = blanks[0];
+        const r0 = first ? first.r : rows[0];
+        return clampSteps([
+            step(`The whole is ${n}. The first part goes up by 1.`),
+            step(`${r0.a} and ${r0.b} make ${n}. Write ${r0.b}.`, first ? [{ slot: first.id, value: first.value }] : []),
+            step('Each next second part is 1 less.'),
+            step(`Write ${blanks.map((b) => b.value).join(', ')}.`, marks(blanks)),
+        ]);
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        const rows = p.rows || [];
+        if (p.task === 'pattern') {
+            const other = (p.labels || []).find((l) => l !== q.ans && l !== 'Stays the same');
+            return other ? chooseWrong(q, [{ value: other, misconception: 'up-down-swapped', explain: 'Read the other column.' }]) : null;
+        }
+        const blanks = bondBlanks(rows);
+        if (!blanks.length) return null;
+        const mk = (vals, m, e) => ({ value: vals.join(', '), misconception: m, slot: blanks[0].id, slots: Object.fromEntries(blanks.map((b, k) => [b.id, String(vals[k])])), explain: e });
+        const right = blanks.map((b) => b.v).join(', ');
+        const c = [];
+        if (p.task === 'fill') {
+            c.push(mk(blanks.map((b) => b.r.a), 'copied-first-part', 'Wrote the first part again.'));
+            const minus = blanks.map((b, k) => (k === blanks.length - 1 && b.v > 0 ? b.v - 1 : b.v));
+            c.push(mk(minus, 'parts-miss-whole', 'The last two parts do not make the whole.'));
+        } else {
+            // a missing row written as the row above it (the pair repeated)
+            const rep = blanks.map((b) => (b.part === 'a' ? b.v - 1 : b.v + 1));
+            if (rep.every((v) => v >= 0)) c.push(mk(rep, 'repeated-a-row', 'Wrote the row above again.'));
+            c.push(mk(blanks.map((b) => (b.part === 'a' ? b.r.b : b.r.a)), 'up-down-swapped', 'Swapped the two parts.'));
+        }
+        return chooseWrong(q, c.filter((x) => x.value !== right));
+    },
+});
