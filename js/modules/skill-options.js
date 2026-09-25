@@ -1306,6 +1306,44 @@ Object.assign(P12_OPTIONS, {
     'coordinates:coord_polygon': [_p12Match([['The length of one side', 'length of side'], ['The perimeter', 'perimeter']])],
 });
 
+// ======================= DATA: GRAPHS, STATISTICS, PROBABILITY (gen-data-stats.js) ==========
+const _statKinds = (word) => [
+    _p12Match([[`Find the ${word}`, '^Find the'], ['Click the data sets that match', '^Click ALL']]),
+    _p12Kinds('points', 'Numbers in the data set', [['4 or 5', ': \\d+(\\.\\d+)?(, \\d+(\\.\\d+)?){3,4} =>'], ['6 to 8', ': \\d+(\\.\\d+)?(, \\d+(\\.\\d+)?){5,7} =>']],
+        'Fewer numbers is the easier step.'),
+];
+Object.assign(P12_OPTIONS, {
+    'graphs:bar_graph': [_p12Match([['Which is the most or the least?', 'Which category has the'], ['How many for one bar?', 'How many chose'],
+        ['The difference between two bars', 'difference'], ['The total of all the bars', 'total'], ['Click the bars that match', 'Click ALL']])],
+    'graphs:pictograph': [
+        _p12Match([['Which has the most?', 'Which has the most'], ['How many for one row?', 'How many for'], ['The total', 'total'], ['Click the rows that match', 'Click ALL']]),
+        _p12Kinds('scale', 'Each picture stands for', [['2', 'Each . = 2\\)'], ['5', 'Each . = 5\\)'], ['10', 'Each . = 10\\)'], ['25', 'Each . = 25\\)']],
+            'Counting in 2s is the easiest key; 25s the hardest.'),
+    ],
+    // Read by gen-data-stats.js (_dOpt): `tiles` the bars / rows, `band` the tallest one.
+    'graphs:build_bar_graph': [_p12Enum('tiles', 'Bars to draw', [{ v: null, l: '3 or 4, dealt' }, { v: 3, l: '3' }, { v: 4, l: '4' }], null, 'More bars is more to draw.'),
+        _opsBand([5, 10], 10, { label: 'Tallest bar', help: 'The largest value a bar has to reach.' })],
+    'graphs:build_pictograph': [_p12Enum('tiles', 'Rows to draw', [{ v: null, l: '3 or 4, dealt' }, { v: 3, l: '3' }, { v: 4, l: '4' }], null, 'More rows is more to draw.'),
+        _opsBand([5, 7], 7, { label: 'Most pictures in a row', help: 'The largest value a row has to reach.' })],
+    'graphs:tally_chart': [_p12Match([['How many for one row?', 'How many tallies for'], ['Which has the most?', 'most tall'], ['The total', 'total'], ['Click the rows that match', 'Click ALL']])],
+    'graphs:line_plot': [_p12Match([['How many at one mark?', 'How many plants (were|measure)'], ['Which is the most common?', 'Which measurement is mo']])],
+    'graphs:line_plot_g2': [_p12Match([['The most common size', 'most common'], ['How many at one size?', 'wear size'], ['How many in all?', 'How many students are shown']])],
+    'graphs:line_plot_fractions': [_p12Match([['How many in all?', 'total measurements'], ['The most common measurement', 'most common'], ['How many at one mark?', 'measurements are at']])],
+    'graphs:pie_chart': [_p12Match([['What percent chose one?', 'What percent chose (?!.* OR )'], ['What percent chose two? (add them)', ' OR '],
+        ['Which part is the largest or smallest?', 'Which category has']])],
+    'data_analysis:mean': _statKinds('mean'),
+    'data_analysis:median': _statKinds('median'),
+    'data_analysis:mode': [_statKinds('mode')[0], _p12Kinds('points', 'Numbers in the data set', [['7 or 8', ': \\d+(, \\d+){6,7} =>'],
+        ['9 or 10', ': \\d+(, \\d+){8,9} =>']], 'Fewer numbers is the easier step.')],
+    'data_analysis:range': _statKinds('range'),
+    'data_analysis:box_plot_intro': [_p12Match([['The median', 'the median'], ['The minimum or maximum', 'minimum|maximum'], ['The range', 'What is the range'],
+        ['The quartiles', 'quartile|interquartile']], { help: 'The median, least and greatest come first; quartiles last.' })],
+    'data_analysis:histogram_read': [_p12Match([['The highest or lowest bar', 'highest|lowest'], ['How many in an interval?', 'between|in the interv'], ['How many in all?', 'total data']])],
+    'data_analysis:mad': [_p12Kinds('points', 'Numbers in the data set', [['4', ': \\d+(, \\d+){3} =>'], ['5 or more', ': \\d+(, \\d+){4,} =>']])],
+    'probability:probability_basic': [_p12Match([['Find the probability (a bag of marbles)', '^A (bag|jar|box)'], ['Click the events that match', 'Click ALL'],
+        ['Sort by how likely (drag)', 'Drag each']])],
+});
+
 // ======================= MEASUREMENT, TIME, MONEY (gen-measurement.js) =====================
 // ROUTES. Several measurement skills are one rung each of a ladder that lives in sibling ids
 // (time_hour … time_1min; elapsed_30min … elapsed_mixed; the four clock-ordering ids). Their
