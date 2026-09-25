@@ -478,7 +478,7 @@ export async function createClassroomAssignment(courseId, formUrl, title, token)
 
 // ── Section 7: Export Modal UI ──────────────────────────────
 
-export function openGoogleExportModal(problems, source) {
+export function openGoogleExportModal(problems, source, title) {
     // Called with nothing (or a bad value) it still opens, with nothing to export.
     problems = Array.isArray(problems) ? problems.filter(Boolean) : [];
     pendingExportProblems = problems;
@@ -492,9 +492,10 @@ export function openGoogleExportModal(problems, source) {
     const existing = document.getElementById('googleExportOverlay');
     if (existing) existing.remove();
 
-    const defaultTitle = source === 'quiz' ? 'Quiz' : 'Math Worksheet';
+    const named = typeof title === 'string' ? title.trim() : '';
+    const defaultTitle = named || (source === 'quiz' ? 'Quiz' : 'Maths worksheet');
     const warningHtml = skippable.length > 0
-        ? `<div id="gexWarning" class="google-export-warning">${skippable.length} interactive problem(s) will be skipped (drag-and-drop, sorting, etc.)</div>`
+        ? `<div id="gexWarning" class="google-export-warning">${skippable.length} interactive problem${skippable.length === 1 ? '' : 's'} will be skipped (drag-and-drop, sorting and similar)</div>`
         : '<div id="gexWarning" class="google-export-warning" style="display:none;"></div>';
 
     const overlay = document.createElement('div');
@@ -508,17 +509,17 @@ export function openGoogleExportModal(problems, source) {
             </div>
 
             <div class="google-export-stepper">
-                <div class="google-export-step active" data-step="1"><span class="step-num">1</span><span class="step-label">Sign In</span></div>
-                <div class="google-export-step" data-step="2"><span class="step-num">2</span><span class="step-label">Render</span></div>
+                <div class="google-export-step active" data-step="1"><span class="step-num">1</span><span class="step-label">Sign in</span></div>
+                <div class="google-export-step" data-step="2"><span class="step-num">2</span><span class="step-label">Prepare</span></div>
                 <div class="google-export-step" data-step="3"><span class="step-num">3</span><span class="step-label">Upload</span></div>
-                <div class="google-export-step" data-step="4"><span class="step-num">4</span><span class="step-label">Create Form</span></div>
+                <div class="google-export-step" data-step="4"><span class="step-num">4</span><span class="step-label">Create form</span></div>
                 <div class="google-export-step" data-step="5"><span class="step-num">5</span><span class="step-label">Done</span></div>
             </div>
 
             <div class="google-export-body">
                 <div id="gexConfig">
                     <label class="gex-label" for="gexTitle">Form title</label>
-                    <input type="text" id="gexTitle" class="gex-field" value="${defaultTitle}">
+                    <input type="text" id="gexTitle" class="gex-field" value="${gexEsc(defaultTitle)}" maxlength="120">
 
                     <label class="gex-label" for="gexPoints">Points per question</label>
                     <select id="gexPoints" class="gex-field">
@@ -538,7 +539,7 @@ export function openGoogleExportModal(problems, source) {
                     ${warningHtml}
 
                     <div class="gex-count">
-                        ${problems.length ? `${exportableCount} of ${problems.length} problems will be exported` : 'There are no problems to export yet. Open this from a quiz or a worksheet.'}
+                        ${problems.length ? (exportableCount === problems.length ? `${problems.length} problem${problems.length === 1 ? '' : 's'} will be exported` : `${exportableCount} of ${problems.length} problems will be exported`) : 'There are no problems to export yet. Open this from a quiz or a worksheet.'}
                     </div>
                 </div>
 
@@ -565,11 +566,41 @@ export function openGoogleExportModal(problems, source) {
     overlay.addEventListener('click', (e) => {
         if (e.target === overlay) closeGoogleExportModal();
     });
-    overlay.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') { e.preventDefault(); closeGoogleExportModal(); }
-    });
+    // A modal dialog: the page behind it is inert, Tab stays inside, Escape closes, and focus
+    // returns to whatever opened it.
+    gexReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    gexInerted = [...document.body.children].filter((n) => n !== overlay && !n.inert && n.tagName !== 'SCRIPT');
+    gexInerted.forEach((n) => { n.inert = true; });
+    document.addEventListener('keydown', gexKeydown, true);
     const first = overlay.querySelector('#gexTitle');
-    if (first) first.focus();
+    if (first) { first.focus(); first.select(); }
+}
+
+let gexInerted = [];
+let gexReturnFocus = null;
+
+function gexEsc(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function gexKeydown(e) {
+    const overlay = document.getElementById('googleExportOverlay');
+    if (!overlay) { document.removeEventListener('keydown', gexKeydown, true); return; }
+    if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        closeGoogleExportModal();
+        return;
+    }
+    if (e.key !== 'Tab') return;
+    const items = [...overlay.querySelectorAll('button, input, select, textarea, a[href], [tabindex]:not([tabindex="-1"])')]
+        .filter((n) => !n.disabled && n.offsetParent !== null);
+    if (!items.length) { e.preventDefault(); return; }
+    const firstEl = items[0];
+    const lastEl = items[items.length - 1];
+    const inside = overlay.contains(document.activeElement);
+    if (e.shiftKey && (document.activeElement === firstEl || !inside)) { e.preventDefault(); lastEl.focus(); }
+    else if (!e.shiftKey && (document.activeElement === lastEl || !inside)) { e.preventDefault(); firstEl.focus(); }
 }
 
 export function closeGoogleExportModal() {
@@ -580,6 +611,12 @@ export function closeGoogleExportModal() {
     const overlay = document.getElementById('googleExportOverlay');
     if (overlay) overlay.remove();
     pendingExportProblems = null;
+    document.removeEventListener('keydown', gexKeydown, true);
+    gexInerted.forEach((n) => { n.inert = false; });
+    gexInerted = [];
+    const back = gexReturnFocus;
+    gexReturnFocus = null;
+    if (back && back.isConnected) { try { back.focus(); } catch (e) { /* focus is best effort */ } }
 }
 
 function updateExportStep(stepNum) {
@@ -828,7 +865,7 @@ export async function exportQuizToGoogleForms(testId) {
         showToast('Quiz has no questions to export.', 'error');
         return;
     }
-    openGoogleExportModal(problems, 'quiz');
+    openGoogleExportModal(problems, 'quiz', test.name || '');
 }
 
 // All public functions are exported inline above.

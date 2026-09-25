@@ -177,7 +177,16 @@ function tidySample(cell) {
     cell.querySelectorAll('button').forEach((b) => {
         if (/^\s*(check|submit|reset|clear|undo|start over|try again)\b/i.test(b.textContent || '')) b.style.display = 'none';
     });
+    // A print header that held only the item number is an empty ruled line: drop it.
+    cell.querySelectorAll('.tvp-printed .p-head, .tvp-printed .problem-header').forEach((h) => {
+        const left = [...h.childNodes].some((n) => (n.nodeType === 3 ? n.textContent.trim() : (n.nodeType === 1 && n.style.display !== 'none' && n.textContent.trim())));
+        if (!left) h.style.display = 'none';
+    });
 }
+
+// Below this scale a sample's lines and digits are hairlines in a thumbnail: show a legible crop.
+const MIN_LEGIBLE = 0.3;
+const CROP_SCALE = 0.45;
 
 /** Fit the stage inside its frame: scale down (never up), centred. */
 function fit(frame) {
@@ -195,6 +204,12 @@ function fit(frame) {
     const fw = frame.clientWidth - 12, fh = frame.clientHeight - 12;
     if (fw <= 0 || fh <= 0) return;
     const s = Math.min(1, fw / w, fh / h);
+    if (s < MIN_LEGIBLE && fh < 200) {
+        frame.classList.add('is-cropped');
+        stage.style.transform = `scale(${CROP_SCALE})`;
+        return;
+    }
+    frame.classList.remove('is-cropped');
     stage.style.transform = `translate(-50%, -50%) scale(${s.toFixed(4)})`;
 }
 

@@ -74,8 +74,15 @@ function drawList(el, labelOf) {
     const covered = top.filter((r) => r.covered).length;
     const rows = inLevel.filter((r) => view.status === 'all' || (view.status === 'gaps' ? !r.covered : r.covered));
     const noun = view.fw === 'ee' ? 'Essential Element' : 'standard';
-    el.querySelector('#tvsCount').textContent = `${rows.length} ${noun}${rows.length === 1 ? '' : 's'}`;
-    el.querySelector('#tvsSum').textContent = `${view.level ? `Level ${view.level}` : 'Levels K to 6'}: ${covered} of ${top.length} ${noun}s covered (${pct(covered, top.length)}%)${view.fw === 'ccss' ? ', not counting lettered parts' : ''}.`;
+    const nouns = `${noun}${top.length === 1 ? '' : 's'}`;
+    // ONE count everywhere: the standards themselves. Lettered parts (3.NF.A.3a) are listed under
+    // their standard but never counted, so the heading and the summary agree.
+    el.querySelector('#tvsCount').textContent = view.status === 'gaps'
+        ? `${top.length - covered} of ${top.length} ${nouns} not covered`
+        : view.status === 'covered'
+            ? `${covered} of ${top.length} ${nouns} covered`
+            : `${top.length} ${nouns} · ${covered} covered`;
+    el.querySelector('#tvsSum').textContent = `${view.level ? `Level ${view.level}` : 'Levels K to 6'}: ${pct(covered, top.length)}% covered.${view.fw === 'ccss' ? ' Lettered parts sit under their standard and are not counted.' : ''}`;
     const box = el.querySelector('#tvsList');
     if (!rows.length) {
         box.innerHTML = `<div class="tv-empty-lg"><span class="tv-empty-icon" aria-hidden="true">${icon('check', 22)}</span>
@@ -106,7 +113,7 @@ function rowHTML(r, labelOf) {
     const shown = named.slice(0, SHOW_SKILLS);
     const more = named.length - shown.length;
     const skills = shown.length
-        ? `<p class="tvs-skills">${shown.map(([k, l]) => `<button type="button" class="tv-link" data-std-skill="${esc(k)}">${esc(l)}</button>`).join('<span aria-hidden="true">, </span>')}${more > 0 ? ` <span class="tv-muted">and ${more} more</span>` : ''}</p>`
+        ? `<ul class="tvs-skills" aria-label="Skills for ${esc(r.short)}">${shown.map(([k, l]) => `<li><button type="button" class="tv-link" data-std-skill="${esc(k)}">${esc(l)}</button></li>`).join('')}${more > 0 ? `<li class="tv-muted">and ${more} more</li>` : ''}</ul>`
         : '';
     const approx = !r.covered && r.approxSkills.length
         ? `<p class="tv-cap">Close but not exact: ${r.approxSkills.map((k) => esc(labelOf(k) || k)).join(', ')}</p>` : '';

@@ -29,6 +29,7 @@ import { tvpAttrs, infoButtonHTML } from './teacher-preview.js';
 import { skillHasOfferedOptions } from './skill-options-ui.js';
 import { generateQuestionFor } from './generate-question.js';
 import { getSetOptions } from './skill-option-store.js';
+import { getProvider } from './sheet/index.js';
 
 // The page types buildSheet composes (print-sheet.js SHEET_ROLES). Anything else is listed,
 // disabled, as "coming soon".
@@ -83,7 +84,7 @@ let buildTimer = null;
 let last = null;     // {sections:[{pupilHtml,keyHtml,pageCount,keyPageCount,fits,role,letters}], pupilHtml, keyHtml, pages:[labels], keyPages}
 
 function newSection(skills = []) {
-    return { role: 'more-practice', columns: 'auto', letters: ['A', 'B'], pages: 1, skills, optionsOpen: '', picking: false, menu: '' };
+    return { role: 'more-practice', columns: 'auto', letters: ['A', 'B'], pages: 1, skills, optionsOpen: '', picking: false, menu: '', types: false };
 }
 
 function initState() {
@@ -246,7 +247,24 @@ function onClick(e) {
     if (!b || !root.contains(b)) return;
     const d = b.dataset;
     switch (d.act) {
-        case 'role': { const s = sec(d.sec); if (s.role !== d.v) { s.role = d.v; renderWhat(); scheduleBuild(); } break; }
+        case 'role': {
+            const s = sec(d.sec);
+            const changed = s.role !== d.v;
+            s.role = d.v;
+            s.types = false;
+            renderWhat();
+            root.querySelector(`[data-act="types"][data-sec="${d.sec}"]`)?.focus();
+            if (changed) { renderSetup(); scheduleBuild(); }
+            break;
+        }
+        case 'types': {
+            const s = sec(d.sec);
+            s.types = !s.types;
+            renderWhat();
+            if (s.types) root.querySelector(`[data-act="role"][data-sec="${d.sec}"][aria-checked="true"]`)?.focus();
+            else root.querySelector(`[data-act="types"][data-sec="${d.sec}"]`)?.focus();
+            break;
+        }
         case 'classic-build': buildClassic(); break;
         case 'classic-forms': exportForms(); break;
         case 'classic-opt': pr.classic[d.v] = !pr.classic[d.v]; renderSetup(); break;
@@ -284,7 +302,7 @@ function onClick(e) {
         case 'size': pr.size = d.v; renderSetup(); scheduleBuild(); break;
         case 'look': pr.look = d.v; renderSetup(); scheduleBuild(); break;
         case 'paper': pr.paper = d.v; renderSetup(); scheduleBuild(); break;
-        case 'anchors': pr.anchors = d.v; renderSetup(); scheduleBuild(); break;
+        case 'anchors': if (b.getAttribute('aria-disabled') === 'true') break; pr.anchors = d.v; renderSetup(); scheduleBuild(); break;
         case 'header': pr.header[d.v] = !pr.header[d.v]; renderSetup(); scheduleBuild(); break;
         case 'key': pr.key = !pr.key; if (pr.view === 'key' && !pr.key) pr.view = 0; renderSetup(); scheduleBuild(); break;
         case 'view': pr.view = d.v === 'key' ? 'key' : Number(d.v); showPreview(); break;
@@ -315,6 +333,7 @@ function sectionHTML(s, i) {
     const name = `Section ${String.fromCharCode(65 + i)}`;
     const sub = `${ROLE_NAME[s.role] || ''}${s.role === 'more-practice' ? ` · ${s.letters.length} page${s.letters.length === 1 ? '' : 's'}` : s.role === 'independent' ? ` · ${s.pages} page${s.pages === 1 ? '' : 's'}` : ''}`;
     const bad = s.unsupported && s.unsupported.role === s.role ? s.unsupported.why : '';
+    const chosen = PAGE_GROUPS.flatMap(([, list]) => list).find(([v]) => v === s.role) || [s.role, ROLE_NAME[s.role] || s.role, ''];
     const typeCards = PAGE_GROUPS.map(([g, list]) => `<div class="tv-ptype-group" role="group" aria-label="${g}"><span class="tv-ptype-h">${g}</span><div class="tv-ptypes">${list.map(([v, l, text]) => {
         const on = s.role === v;
         const why = on && bad ? bad : '';
@@ -364,19 +383,23 @@ function sectionHTML(s, i) {
     <div><h3 class="tv-h3" id="tvSecH${i}">${name}</h3><div class="tv-cap">${esc(sub)}</div></div>
     <div class="tv-menu-wrap"><button type="button" class="tv-icon-btn" data-act="menu" data-menu="more" data-sec="${i}" aria-label="More actions for ${name}" aria-expanded="${s.menu === 'more'}">${icon('dots', 18)}</button>${moreMenu}</div>
   </div>
-  <div>
-    <span class="tv-label" id="tvRoleL${i}">Page type</span>
-    <div class="tv-ptype-groups" role="radiogroup" aria-labelledby="tvRoleL${i}">${typeCards}</div>
-    ${whyNote}
-  </div>
-  ${s.role === 'more-practice' ? `<div class="tv-fields-cols"><div><label class="tv-label" for="tvCols${i}">Columns</label><select id="tvCols${i}" class="tv-select" data-cols="${i}">${cols}</select></div></div>${pagesPart}`
-        : `<div class="tv-fields-cols"><div><label class="tv-label" for="tvCols${i}">Columns</label><select id="tvCols${i}" class="tv-select" data-cols="${i}">${cols}</select></div>${pagesPart}</div>`}
   <div>${skills || '<p class="tv-empty">No skills in this section yet.</p>'}</div>
   <div class="tv-row">
     <button type="button" class="tv-btn tv-btn-ghost" data-act="pick" data-sec="${i}" aria-expanded="${!!s.picking}">${icon('plus', 16)}<span>Add a skill</span></button>
     <div class="tv-menu-wrap"><button type="button" class="tv-btn tv-btn-ghost" data-act="menu" data-menu="set" data-sec="${i}" aria-expanded="${s.menu === 'set'}">${icon('layers', 16)}<span>Add a set</span></button>${setMenu}</div>
   </div>
   ${s.picking ? `<div class="tv-search"><label class="tv-sr" for="tvPick${i}">Find a skill</label>${icon('search', 18)}<input id="tvPick${i}" class="tv-input" type="search" data-pick="${i}" placeholder="Search skills" autocomplete="off"></div><div class="tv-pick-results" id="tvPickRes${i}"><p class="tv-cap" style="padding:8px 12px;">Type to search.</p></div>` : ''}
+  <div class="tv-divided">
+    <span class="tv-label" id="tvRoleL${i}">Page type</span>
+    <div class="tv-ptype-now">
+      <div class="tv-ptype is-static${bad ? ' is-unfit' : ''}">${pageThumb(chosen[0])}<span><span class="tv-radio-title">${esc(chosen[1])}</span><span class="tv-radio-text">${esc(chosen[2])}</span></span></div>
+      <button type="button" class="tv-btn" data-act="types" data-sec="${i}" aria-expanded="${!!s.types}" aria-controls="tvTypes${i}" aria-label="${s.types ? 'Close the page types' : `Change the page type of ${name}`}">${s.types ? `${icon('x', 16)}<span>Close</span>` : '<span>Change</span>'}</button>
+    </div>
+    ${s.types ? `<div class="tv-ptype-groups" id="tvTypes${i}" role="radiogroup" aria-labelledby="tvRoleL${i}">${typeCards}</div>` : ''}
+    ${whyNote}
+  </div>
+  ${s.role === 'more-practice' ? `<div class="tv-fields-cols"><div><label class="tv-label" for="tvCols${i}">Columns</label><select id="tvCols${i}" class="tv-select" data-cols="${i}">${cols}</select></div></div>${pagesPart}`
+        : `<div class="tv-fields-cols"><div><label class="tv-label" for="tvCols${i}">Columns</label><select id="tvCols${i}" class="tv-select" data-cols="${i}">${cols}</select></div>${pagesPart}</div>`}
 </div>`;
 }
 
@@ -523,7 +546,7 @@ function exportForms() {
         }
     }
     if (!problems.length) { toast('Could not make any questions'); return; }
-    window.openGoogleExportModal(problems, 'print');
+    window.openGoogleExportModal(problems, 'print', titleOf());
 }
 
 function renderPickResults(i, q) {
@@ -577,10 +600,7 @@ function renderSetup() {
     <div class="tv-fields-2">
       <div><span class="tv-label">Paper</span>${seg('paper', pr.paper, [['A4', 'A4'], ['Letter', 'Letter']], 'Paper')}</div>
     </div>
-    <div><span class="tv-label">Anchor problems</span>${seg('anchors', pr.anchors || 'off', [['off', 'Off'], ['side', 'Side by side'], ['sections', 'Sections']], 'Anchor problems')}
-      <p class="tv-cap" style="margin-top:6px;">${pr.anchors === 'side' ? 'Side by side: a worked example beside each problem, with the same steps and easier numbers.'
-        : pr.anchors === 'sections' ? 'Sections: a worked example, then 3 or 4 problems, then the next example. Mixed practice: one example per skill.'
-            : 'Worked examples, step by step, on Independent, More Practice and Mixed practice pages. Not scored.'}</p></div>
+    ${anchorsHTML()}
     <div class="tv-divided">
       <span class="tv-label">Header</span>
       <div class="tv-fields-2" style="gap:4px 12px;">${check('name', 'Name')}${check('date', 'Date')}${check('score', 'Score')}${check('tab', 'Strand tab')}${check('title', 'Title')}</div>
@@ -598,6 +618,42 @@ function renderSetup() {
   ${classicHTML()}`;
     const det = box.querySelector('.tv-extras');
     if (det) det.addEventListener('toggle', () => { pr.classic.open = det.open; });
+}
+
+/**
+ * Anchor problems (worked examples on the page). The control is disabled, with its reason, when
+ * no section can take them: the page type ignores anchors, or no chosen skill has worked steps.
+ */
+function anchorsHTML() {
+    const why = anchorsBlocked();
+    const mode = why ? 'off' : (pr.anchors || 'off');
+    const opts = [['off', 'Off'], ['side', 'Beside'], ['sections', 'In blocks']];
+    const segHtml = `<div class="tv-seg" role="radiogroup" aria-labelledby="tvAnchorL"${why ? ' aria-describedby="tvAnchorWhy"' : ''}>${opts.map(([v, t]) => `<button type="button" role="radio" data-act="anchors" data-v="${v}" aria-checked="${mode === v}"${why ? ' aria-disabled="true" tabindex="-1"' : ''}>${t}</button>`).join('')}</div>`;
+    const cap = why ? `<p class="tv-cap tv-cap-why" id="tvAnchorWhy" style="margin-top:6px;">${icon('info', 14)}<span>${esc(why)}</span></p>`
+        : `<p class="tv-cap" style="margin-top:6px;">${mode === 'side' ? 'Beside: worked examples next to the problems, with the same steps and easier numbers. The page makes as many as fit.'
+            : mode === 'sections' ? 'In blocks: a worked example, then 3 or 4 problems, then the next example. Mixed practice: one example per skill.'
+                : 'Worked examples, step by step, on Independent, More Practice and Mixed practice pages. Not scored.'}</p>`;
+    return `<div><span class="tv-label" id="tvAnchorL">Anchor problems</span>${segHtml}${cap}</div>`;
+}
+
+/** Why anchor problems cannot go on this sheet, or '' when they can. */
+function anchorsBlocked() {
+    const used = pr.sections.filter((s) => s.skills.length);
+    if (!used.length) return 'Add a skill first.';
+    const roles = used.filter((s) => ANCHOR_PAGE_TYPES.includes(s.role));
+    if (!roles.length) return `${ROLE_NAME[used[0].role] || 'This page type'} does not take worked examples. Use Independent, More Practice or Mixed practice.`;
+    const any = roles.some((s) => s.skills.some((k) => hasWorkedSteps(k.categoryId, k.skillId)));
+    if (!any) return 'None of the chosen skills has step-by-step worked examples yet.';
+    return '';
+}
+
+const ANCHOR_PAGE_TYPES = ['independent', 'more-practice', 'mixed-practice'];
+
+function hasWorkedSteps(categoryId, skillId) {
+    try {
+        const p = getProvider(categoryId, skillId);
+        return !!(p && Array.isArray(p.real) && p.real.includes('workedSteps'));
+    } catch (e) { return false; }
 }
 
 function classicHTML() {
@@ -647,7 +703,7 @@ function requestFor(s, i) {
         look: pr.look === 'daily' || pr.look === 'ican' ? pr.look : 'auto',
         paper: pr.paper,
         photocopySafe: pr.photocopySafe,
-        anchors: pr.anchors || 'off',
+        anchors: anchorsBlocked() ? 'off' : (pr.anchors || 'off'),
         header: { name: h.name, date: h.date, score: h.score, tab: h.tab ? undefined : false, title: h.title ? (pr.title.trim() || true) : false },
         key: pr.key,
         seed: (pr.seed + i * 7919) >>> 0,
@@ -706,10 +762,11 @@ async function runBuild() {
         last.req = req;
         if (pr.view !== 'key' && pr.view >= last.pages.length) pr.view = 0;
         if (pr.view === 'key' && !pr.key) pr.view = 0;
-        const fits = built.parts.map((p, i) => {
-            const note = p.res.fits && p.res.fits.note ? p.res.fits.note.replace(/^\s*Fits:\s*/i, '') : `${p.res.pageCount} page${p.res.pageCount === 1 ? '' : 's'}`;
-            return built.parts.length > 1 ? `Section ${String.fromCharCode(65 + i)}: ${note}` : note;
-        }).join(' ');
+        const plain = built.parts.map((p, i) => {
+            const line = fitsLine(p.res);
+            return built.parts.length > 1 ? `Section ${String.fromCharCode(65 + (req.idx ? req.idx[i] : i))}: ${line}` : line;
+        });
+        const details = [...new Set(built.parts.flatMap((p) => fitsNotes(p.res)))];
         // A one-page type sized by its tallest item can hold fewer cells than there are skills:
         // say so, rather than let a chosen skill quietly miss the sheet.
         const short = built.parts.map((p, i) => {
@@ -719,7 +776,7 @@ async function runBuild() {
             if (!p.res.items || n >= asked.size) return '';
             return `Only ${n} of ${asked.size} skills fit on ${ROLE_NAME[p.role] || 'this page type'}${built.parts.length > 1 ? ` (Section ${String.fromCharCode(65 + (req.idx ? req.idx[i] : i))})` : ''}. Independent, More Practice and Mixed practice fit every skill.`;
         }).filter(Boolean);
-        root.querySelector('#tvFits').innerHTML = `<strong>Fits:</strong> ${esc(fits)}${short.length ? `<span class="tv-fits-warn">${icon('info', 16)}<span>${esc(short.join(' '))}</span></span>` : ''}`;
+        root.querySelector('#tvFits').innerHTML = `<span class="tv-fits-line">${plain.map(esc).join('<br>')}</span>${details.length ? `<details class="tv-fits-why"><summary>Why?</summary><ul>${details.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></details>` : ''}${short.length ? `<span class="tv-fits-warn">${icon('info', 16)}<span>${esc(short.join(' '))}</span></span>` : ''}`;
         renderTabs(); renderSetup(); showPreview();
     } catch (e) {
         if (token !== buildToken) return;
@@ -738,6 +795,43 @@ async function runBuild() {
         loadFrame('');
         renderTabs(); renderSetup();
     }
+}
+
+/** One plain line for a built section: "12 problems on 2 pages · 3 columns". */
+function fitsLine(res) {
+    const f = res.fits || {};
+    const n = Array.isArray(res.items) ? res.items.length : 0;
+    const pages = res.pageCount || f.pages || 1;
+    const parts = [];
+    parts.push(n ? `${n} problem${n === 1 ? '' : 's'} on ${pages} page${pages === 1 ? '' : 's'}` : `${pages} page${pages === 1 ? '' : 's'}`);
+    // A page mixes groups (Add. / Subtract.), each with its own column count.
+    const cols = [...new Set((Array.isArray(f.sections) && f.sections.length ? f.sections.map((x) => x && x.cols) : [f.cols]).filter((c) => c > 0))].sort((a, b) => a - b);
+    if (cols.length === 1) parts.push(`${cols[0]} column${cols[0] === 1 ? '' : 's'}`);
+    else if (cols.length > 1) parts.push(`${cols[0]} to ${cols[cols.length - 1]} columns`);
+    return parts.join(' · ');
+}
+
+/**
+ * The engine's notes, as short sentences without repeats or layout jargon (for "Why?"). The
+ * counts the plain line already gives ("2 columns x 1 rows, 2 per page, 1 page") are dropped.
+ */
+function fitsNotes(res) {
+    const raw = String((res.fits && res.fits.note) || '').replace(/^\s*Fits:\s*/i, '');
+    const out = [];
+    for (let t of raw.split(/(?<=[.!?])\s+/)) {
+        t = t.trim();
+        if (!t) continue;
+        if (/^\d+\s+columns?\s*[x×]\s*\d+\s+rows?/i.test(t)) {
+            // "2 columns x 1 rows, 2 per page, 1 page. Tall problems: …" keeps only what follows.
+            t = t.replace(/^\d+\s+columns?\s*[x×]\s*\d+\s+rows?,?\s*(\d+\s+per page,?\s*)?(\d+\s+pages?\.?)?\s*/i, '').trim();
+            if (!t) continue;
+        }
+        t = t.replace(/\bat size ([SML])\b/g, (m, z) => `at size ${z === 'S' ? 'Small' : z === 'M' ? 'Medium' : 'Large'}`)
+            .replace(/\bmax (\d+) columns?\b/gi, (m, k) => `at most ${k} column${k === '1' ? '' : 's'}`)
+            .replace(/\bstep-by-step steps\b/g, 'worked steps');
+        if (!out.includes(t)) out.push(t);
+    }
+    return out;
 }
 
 function renderTabs() {
@@ -798,7 +892,10 @@ function fitPreview() {
     const sticky = getComputedStyle(stage.closest('.tv-preview-card') || stage).position === 'sticky';
     const tabs = root.querySelector('#tvPageTabs');
     const availH = window.innerHeight - 48 - 32 - (tabs && !tabs.hidden ? tabs.offsetHeight + 12 : 0) - 40;
-    const s = Math.min(1, avail / w, sticky && availH > 240 ? availH / h : 1);
+    // Stacked (narrow screens) the preview comes first, so it is kept compact: about half the
+    // window height, so the controls start on the same screen.
+    const compactH = Math.max(280, Math.round(window.innerHeight * 0.42));
+    const s = Math.min(1, avail / w, sticky && availH > 240 ? availH / h : (!sticky ? compactH / h : 1));
     frame.style.transform = `scale(${s})`;
     box.style.width = Math.round(w * s) + 'px';
     box.style.height = Math.round(h * s) + 'px';
