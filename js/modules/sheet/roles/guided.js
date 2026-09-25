@@ -39,19 +39,31 @@ import {
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
-import { FILL_CAP, groupByHeight } from '../layout.js';
+import { FILL_CAP, groupByHeight, rowGapFor } from '../layout.js';
 
 /** The model first, then the tries grouped by height (H13: rows hold problems of one height). */
 const ordered = (items0, cols) => {
     // Round-4 re-grade: the Model is a problem the Steps work forwards - a start-unknown or
     // missing-part item ("[ ] - 1 = 15") is never the worked example when another item is not.
-    const k = items0.findIndex((it) => !(it && it.q && it.q.missing));
+    // Regrade 5 (tally_chart: page 1 held the Model alone, a 184 mm chart): of those, the Model is
+    // the SHORTEST (measured at this column count), so the Model and its tries share page 1.
+    const hOf = (it) => { const m = it && it.measured && it.measured[cols]; return m && Number.isFinite(m.hMm) ? m.hMm : Infinity; };
+    let k = -1;
+    items0.forEach((it, i) => {
+        if (it && it.q && it.q.missing) return;
+        if (k < 0 || hOf(it) < hOf(items0[k]) - 0.5) k = i;
+    });
     const items = k > 0 ? [items0[k], ...items0.slice(0, k), ...items0.slice(k + 1)] : items0;
     return items.length > 2 ? [items[0], ...groupByHeight(items.slice(1), cols)] : items;
 };
 
-/** The first tries (the partial stage, BD-7): the cells right after the Model, at most two. */
-export const partialEndOf = (cols, span) => (span ? Math.min(cols + 1, 3) : Math.max(2, Math.min(cols, 3)));
+/**
+ * The first tries (the partial stage, BD-7): the rest of the Model's row, or the whole first row
+ * of tries under a spanning Model. The whole ROW, so the grey hint line that makes that row
+ * taller is in every cell of it (regrade 5 at S: two hinted cells and a third without one left a
+ * 33% band in the third, H13).
+ */
+export const partialEndOf = (cols, span) => (span ? cols + 1 : Math.max(2, cols));
 /** The row the first tries sit in. */
 const partialRowOf = (cols, span) => (span || cols === 1 ? 1 : 0);
 
@@ -699,7 +711,7 @@ export function plan(input = {}) {
     const worked = use.length > 1 && !!answerOf(use[0]);
     const scored = use.length - (worked ? 1 : 0);
     const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: scored });
-    // The partial stage is the rest of row 1, never more than two cells.
+    // The partial stage is the rest of the Model's row (or the first row of tries), partialEndOf.
     const partialEnd = partialEndOf(cols, fit.span);
     const planItems = use.map((it, i) => {
         const ans = answerOf(it);
@@ -759,6 +771,13 @@ export function plan(input = {}) {
         const part = gridPart(chunk, { cols, rows, cellH, labels: 'none', start: letter });
         if (spanHere) part.spanFirst = true;
         if (rows > 1 && Math.max(...Hr) - Math.min(...Hr) >= 1) part.rowsTpl = Hr.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ');
+        // L2 (regrade 5 at S: a page of short compare rows left 40% of the page blank under the
+        // grid): the ceiling stops more rows and FILL_CAP more height, so the spare height goes
+        // BETWEEN the rows as whitespace, never inside the cells (grid.js rowGap, as a Test).
+        if (rows > 1) {
+            const g = rowGapFor(rows, gridH, pg.avail);
+            if (g.gap) { part.rowGap = g.gap; part.height = `${g.heightMm}mm`; }
+        }
         sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, use), content: part });
         letter += chunk.filter((p) => !p.nolabel).length;
         pages.push({ sections });
