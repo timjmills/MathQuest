@@ -28,6 +28,28 @@ import {
 } from './teacher-ui.js';
 import { printSkills } from './teacher-print.js';
 import { skillView, setSkillView, viewToggleHTML, mountSample, lazyThumbs } from './teacher-preview.js';
+import { renderStandardsCoverage } from './teacher-standards.js';
+
+// Standards (owner request 2026-09-25): the detail panel tags each skill with its CCSS standards
+// and Essential Elements, the search finds skills by a standard code (3.OA.7, EE.3.OA.6), and a
+// "Standards coverage" view lists every standard as covered or not. standards.js and its database
+// are ~200 KB, so they load the first time the library opens, never at boot; until then the
+// library works exactly as before.
+let STD = null;
+let stdLoading = null;
+function loadStandards() {
+    if (STD || stdLoading) return stdLoading;
+    stdLoading = import('./standards.js').then((m) => {
+        STD = m;
+        if (root && root.isConnected) {
+            renderResults();
+            renderDetail();
+            if (lib.mode === 'standards') renderStandardsView();
+        }
+        return m;
+    }).catch((e) => { console.warn('[teacher-library] standards', e); stdLoading = null; return null; });
+    return stdLoading;
+}
 
 const LEVELS = ['K', '1', '2', '3', '4', '5', '6', 'M'];
 const UI_KEY = 'mq_teacher_library_ui';
@@ -44,6 +66,9 @@ const lib = {
     menu: false,
     optionsOpen: false,
     thumbLimit: THUMB_PAGE,
+    mode: 'skills',     // 'skills' | 'standards' (the Standards coverage view)
+    stdHits: null,      // Set of 'categoryId:skillId' when the search is a standard code
+    stdRec: null,       // the standard the search names, when it names exactly one
 };
 
 (function restore() {
@@ -68,6 +93,8 @@ export function renderLibraryScreen(el) {
     syncControls();
     renderResults();
     renderDetail();
+    syncMode();
+    loadStandards();
 }
 
 /** Select a skill on the library screen (for callers that want to deep-link one). */
@@ -87,10 +114,12 @@ function shellHTML() {
     const levelOpts = LEVELS.map((l) => `<option value="${l}">${l === 'M' ? 'Mixed levels' : `Level ${l}`}</option>`).join('');
     return `
 <header class="tv-header">
-  <div><h1 class="tv-h1">Skills library</h1><p class="tv-sub">Every skill in Maths Quest. Choose one to see an example, then practise it, add it to a set or print it.</p></div>
+  <div><h1 class="tv-h1" id="tvlTitle">Skills library</h1><p class="tv-sub" id="tvlSub">Every skill in Maths Quest. Choose one to see an example, then practise it, add it to a set or print it.</p></div>
+  <div class="tv-header-actions"><button type="button" class="tv-btn tvl-std-toggle" data-lib-act="standards" title="Which Common Core standards and Essential Elements our skills cover, and which they do not yet">${icon('chart', 18)}<span>Standards coverage</span></button></div>
 </header>
+<section class="tvl-std-view" id="tvlStd" aria-labelledby="tvlTitle" hidden></section>
 <div class="tvl-bar" role="search" aria-label="Find a skill">
-  <div class="tv-search tvl-bar-search"><label class="tv-sr" for="tvlSearch">Search skills</label>${icon('search', 18)}<input id="tvlSearch" class="tv-input" type="search" placeholder="Search, e.g. subtract across zeros" autocomplete="off"></div>
+  <div class="tv-search tvl-bar-search"><label class="tv-sr" for="tvlSearch">Search skills</label>${icon('search', 18)}<input id="tvlSearch" class="tv-input" type="search" placeholder="Search, e.g. subtract across zeros or 3.OA.7" autocomplete="off"></div>
   <div class="tvl-bar-filter"><label class="tv-sr" for="tvlLevel">Level</label><select id="tvlLevel" class="tv-select"><option value="">All levels</option>${levelOpts}</select></div>
   <div class="tvl-bar-filter"><label class="tv-sr" for="tvlDomain">Domain</label><select id="tvlDomain" class="tv-select"><option value="">All domains</option>${domainOpts}</select></div>
 </div>
@@ -118,6 +147,7 @@ function syncControls() {
 function matches(s) {
     if (lib.level && s.level !== lib.level) return false;
     if (lib.domain && s.domainId !== lib.domain) return false;
+    if (lib.stdHits) return lib.stdHits.has(`${s.categoryId}:${s.skillId}`);
     const words = lib.query.trim().toLowerCase().split(/\s+/).filter(Boolean);
     if (!words.length) return true;
     const hay = `${s.label} ${s.categoryName} ${s.domainName} ${s.skillId.replace(/_/g, ' ')}`.toLowerCase();
@@ -128,9 +158,41 @@ function shown() { return skillCatalogue().filter(matches); }
 
 function keyOf(s) { return `${s.categoryId}|${s.skillId}`; }
 
+/** A search that is a standard code (3.OA.7, 3.OA, EE.3.OA.6, M.3.OA.C.6) finds skills by standard. */
+function stdSearch() {
+    lib.stdHits = null;
+    lib.stdRec = null;
+    const q = lib.query.trim();
+    if (!STD || !q || !STD.looksLikeStandardCode(q)) return;
+    const rec = STD.findStandard(q);
+    lib.stdRec = rec;
+    lib.stdHits = new Set(rec ? STD.skillsForStandard(q) : STD.skillsMatchingCode(q));
+}
+
+function stdBannerHTML(count) {
+    const q = lib.query.trim();
+    const r = lib.stdRec;
+    if (!r) {
+        return `<div class="tvl-std-banner"><p class="tv-cap">${count ? `Skills tagged with a standard starting ${esc(q)}.` : `No standard or skill matches ${esc(q)}.`}</p></div>`;
+    }
+    const kind = r.type === 'ee' ? 'Essential Element' : r.type === 'wi' ? 'Wisconsin standard' : 'Common Core';
+    return `<div class="tvl-std-banner"><p class="tvl-std-banner-code">${esc(r.short || r.code)} <span class="tv-muted">· ${kind}, Level ${esc(r.grade)}</span></p>
+      <p class="tvl-std-banner-text">${esc(r.text)}</p>${count ? '' : '<p class="tv-cap">No skill covers this yet. It is on the gap list in Standards coverage.</p>'}</div>`;
+}
+
 function renderResults() {
     const box = root.querySelector('#tvlResults');
+    stdSearch();
     const list = shown();
+    if (lib.stdHits) {
+        const banner = stdBannerHTML(list.length);
+        root.querySelector('#tvlCount').textContent = `${list.length} skill${list.length === 1 ? '' : 's'}`;
+        root.querySelector('[data-lib-act="clear-filters"]').hidden = false;
+        if (!list.length) { box.innerHTML = banner; return; }
+        if (lib.view === 'thumbs') renderThumbs(box, list); else renderList(box, list);
+        box.insertAdjacentHTML('afterbegin', banner);
+        return;
+    }
     const filtered = !!(lib.query.trim() || lib.level || lib.domain);
     root.querySelector('#tvlCount').textContent = `${list.length} skill${list.length === 1 ? '' : 's'}${filtered ? '' : ' in all'}`;
     root.querySelector('[data-lib-act="clear-filters"]').hidden = !filtered;
@@ -213,6 +275,7 @@ function renderDetail() {
     <h2 class="tv-h2" id="tvlSelName">${esc(s.label)}</h2>
     <p class="tv-cap">${esc(levelText(s.level))} · ${esc(s.domainName)} · ${esc(s.categoryName)}</p>
   </div>
+  ${standardsTagsHTML(s)}
   <div class="tvl-prev">
     <div class="tvl-prev-head"><span class="tv-label" style="margin:0;">Example</span>
       <button type="button" class="tv-btn tv-btn-ghost" data-lib-act="new-example">${icon('reset', 16)}<span>New example</span></button></div>
@@ -236,6 +299,65 @@ function renderDetail() {
   </div>
   <div class="tv-opt-panel" id="tvlOptions"${lib.optionsOpen ? '' : ' hidden'}>${lib.optionsOpen ? optionsReadOnlyHTML(s.categoryId, s.skillId, opts) : ''}</div>`;
     drawDetailPreview();
+}
+
+/**
+ * The skill's standards as quiet tags: CCSS first (primary first), then Essential Elements.
+ * Hovering or focusing a tag shows its descriptor (a tooltip linked by aria-describedby).
+ */
+function standardsTagsHTML(s) {
+    if (!STD) return '';
+    const st = STD.standardsFor(s.categoryId, s.skillId);
+    if (!st.ccss.length && !st.ee.length) {
+        return st.reason ? `<div class="tvl-std"><p class="tv-cap"><span class="tvl-std-k">Standards</span> ${esc(st.reason)}</p></div>` : '';
+    }
+    let n = 0;
+    const tags = (list, ee) => list.map((r) => {
+        const id = `tvlTip${n++}`;
+        return `<li><span class="tvl-tag${ee ? ' tvl-tag-ee' : ''}" tabindex="0" aria-describedby="${id}">${esc(r.short)}</span>`
+            + `<span class="tvl-tip" role="tooltip" id="${id}"><b>${esc(r.code)}</b> ${esc(r.text)}</span></li>`;
+    }).join('');
+    const row = (k, title, list, ee) => (list.length
+        ? `<div class="tvl-std-row"><span class="tvl-std-k" title="${esc(title)}">${k}</span><ul class="tvl-tags" role="list" aria-label="${esc(title)}">${tags(list, ee)}</ul></div>` : '');
+    return `<div class="tvl-std">
+    ${row('CCSS', 'Common Core State Standards', st.ccss, false)}
+    ${row('EE', 'Essential Elements', st.ee, true)}
+    ${st.approx ? `<p class="tv-cap">Closest match: ${esc(st.note)}</p>` : ''}
+  </div>`;
+}
+
+/* ---------------------------------------------------------------- standards coverage view */
+
+function syncMode() {
+    const std = lib.mode === 'standards';
+    const view = root.querySelector('#tvlStd');
+    view.hidden = !std;
+    root.querySelector('.tvl-bar').hidden = std;
+    root.querySelector('.tvl-grid').hidden = std;
+    root.querySelector('#tvlTitle').textContent = std ? 'Standards coverage' : 'Skills library';
+    root.querySelector('#tvlSub').textContent = std
+        ? 'Every Common Core standard and Essential Element for levels K to 6. The ones not covered yet are the skills still to make.'
+        : 'Every skill in Maths Quest. Choose one to see an example, then practise it, add it to a set or print it.';
+    const t = root.querySelector('.tvl-std-toggle');
+    t.dataset.libAct = std ? 'skills' : 'standards';
+    t.classList.toggle('is-back', std);
+    t.innerHTML = std ? `${icon('arrow', 18)}<span>Back to skills</span>` : `${icon('chart', 18)}<span>Standards coverage</span>`;
+    t.title = std ? 'Back to the Skills library' : 'Which Common Core standards and Essential Elements our skills cover, and which they do not yet';
+    if (std) renderStandardsView();
+}
+
+function renderStandardsView() {
+    const view = root.querySelector('#tvlStd');
+    if (!STD) {
+        view.innerHTML = `<div class="tv-card"><p class="tv-cap">Loading the standards…</p></div>`;
+        delete view.dataset.built;
+        return;
+    }
+    renderStandardsCoverage(view, STD, (key) => {
+        const [c, k] = key.split(':');
+        const hit = findSkill(c, k);
+        return hit ? hit.label : '';
+    });
 }
 
 function drawDetailPreview() {
@@ -325,6 +447,13 @@ function onAction(act, btn) {
             lib.thumbLimit += THUMB_PAGE;
             renderResults();
             return;
+        case 'standards':
+        case 'skills':
+            lib.mode = act;
+            lib.menu = false;
+            syncMode();
+            root.querySelector('.tvl-std-toggle')?.focus();
+            return;
         default: break;
     }
     if (!s) return;
@@ -391,6 +520,14 @@ function wire() {
             return;
         }
         if (b.dataset.libSkill) { select(b.dataset.libSkill); return; }
+        if (b.dataset.stdSkill) {
+            // A skill named in the coverage view: open it in the library.
+            lib.mode = 'skills';
+            syncMode();
+            select(b.dataset.stdSkill.replace(':', '|'));
+            root.querySelector(`[data-lib-skill="${CSS.escape(lib.sel)}"]`)?.scrollIntoView({ block: 'nearest' });
+            return;
+        }
         if (b.dataset.act === 'skill-view') {
             const v = b.dataset.view === 'thumbs' ? 'thumbs' : 'list';
             if (lib.view !== v) {

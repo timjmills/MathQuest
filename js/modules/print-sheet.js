@@ -604,12 +604,24 @@ function candidateCols(columns) {
     return Array.from({ length: Math.max(1, columns) }, (_, i) => i + 1);
 }
 
+// The teacher footer prints each skill's primary CCSS code (HD-6: codes appear only there). The
+// map lives in standards.js, which is loaded on the first print rather than at boot.
+let standardsMod = null;
+async function loadStandards() {
+    if (standardsMod) return standardsMod;
+    try { standardsMod = await import('./standards.js'); } catch (e) { standardsMod = null; }
+    return standardsMod;
+}
+function primaryCcss(sk) {
+    try { return standardsMod ? standardsMod.primaryStandard(sk.categoryId, sk.skillId, { short: true }) : ''; } catch (e) { return ''; }
+}
+
 /** Skill metadata the frame prints: label, level, and the strings the role reads. */
 function skillMeta(sk, q) {
     const label = SKILL_FULL_LABELS[sk.skillId] || (q && q.skillLabel) || sk.skillId;
     let grade = null;
     try { grade = getSkillGrade(sk.skillId, sk.categoryId); } catch (e) { grade = null; }
-    const meta = { categoryId: sk.categoryId, skillId: sk.skillId, label, grade: grade === null || grade === undefined ? '' : String(grade), ccss: sk.ccss || '' };
+    const meta = { categoryId: sk.categoryId, skillId: sk.skillId, label, grade: grade === null || grade === undefined ? '' : String(grade), ccss: sk.ccss || primaryCcss(sk) };
     const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta));
     meta.iCan = sk.iCan || words.iCan;
     meta.instructionKey = q ? instructionKeyFor(q, words) : words.instructionKey;
@@ -662,6 +674,7 @@ export async function buildSheet(req = {}) {
     const n = normaliseRequest(req);
     if (!n.sections.length) throw new Error('buildSheet: no section has a skill');
     await fontsReady();
+    await loadStandards();
     const paper = n.paper;
 
     // The frame words decide the header height, which decides gridH (HD-12 / HD-14): resolve the

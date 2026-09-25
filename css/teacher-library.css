@@ -145,3 +145,85 @@
     .tvl-bar-search { grid-column: 1 / -1; }
     .tvm-domains { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* ---------------------------------------------------------------- Standards (2026-09-25)
+   Quiet code tags in the skill detail (descriptor on hover / focus), the standard-code search
+   banner, and the Standards coverage view (teacher-standards.js). Neutral, one accent, the
+   same tokens as the rest of the library. */
+
+.tvl-std { display: flex; flex-direction: column; gap: 6px; }
+.tvl-std-row { position: relative; display: flex; align-items: flex-start; gap: 8px; }
+.tvl-std-k {
+    flex: none; width: 36px; padding-top: 3px;
+    font-size: 11px; line-height: 16px; font-weight: 700; letter-spacing: .04em; color: var(--tv-caption);
+}
+.tvl-std .tv-cap .tvl-std-k { display: inline; width: auto; padding: 0; margin-right: 4px; }
+.tvl-tags { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.tvl-tag {
+    display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: 6px;
+    border: 1px solid var(--tv-border); background: var(--tv-page); color: var(--tv-text-2, var(--tv-text));
+    font-size: 12px; line-height: 16px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap;
+    cursor: default;
+}
+.tvl-tag:hover { border-color: var(--tv-control-soft); }
+.tvl-tag:focus-visible { outline: 2px solid var(--tv-accent); outline-offset: 1px; }
+/* The descriptor opens under the whole row, full width of the panel, so it never runs off-screen. */
+.tvl-tip {
+    display: none; position: absolute; z-index: 30; left: 44px; right: 0; top: calc(100% + 6px);
+    padding: 10px 12px; border-radius: 8px; border: 1px solid var(--tv-border);
+    background: var(--tv-surface); color: var(--tv-text); box-shadow: 0 6px 20px rgba(0, 0, 0, .12);
+    font-size: 13px; line-height: 18px; font-weight: 500;
+}
+.tvl-tip b { font-weight: 700; margin-right: 4px; }
+.tvl-tag:hover + .tvl-tip, .tvl-tag:focus + .tvl-tip { display: block; }
+
+.tvl-std-banner {
+    display: flex; flex-direction: column; gap: 2px;
+    margin: 4px 0 8px; padding: 12px; border-radius: 8px; background: var(--tv-subtle);
+}
+.tvl-std-banner-code { margin: 0; font-size: 14px; line-height: 18px; font-weight: 600; color: var(--tv-text); }
+.tvl-std-banner-code .tv-muted { font-weight: 500; }
+.tvl-std-banner-text { margin: 0; font-size: 14px; line-height: 20px; color: var(--tv-text); }
+
+.tvl-std-toggle { height: 44px; }
+.tvl-std-toggle.is-back svg { transform: scaleX(-1); }
+.tvl-std-view { display: flex; flex-direction: column; gap: 16px; }
+.tvl-std-view[hidden], .tvl-bar[hidden], .tvl-grid[hidden] { display: none; }
+
+.tvs-bar { display: grid; grid-template-columns: minmax(0, 320px) 180px minmax(0, 360px); gap: 12px; align-items: center; }
+.tvs-bar .tv-select { height: 44px; }
+.tvs-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+.tvs-body { padding: 4px 12px 16px; }
+.tvs-group + .tvs-group { border-top: 1px solid var(--tv-rule); margin-top: 8px; }
+.tvs-group-h { margin: 0; padding: 16px 12px 4px; font-size: 14px; line-height: 20px; font-weight: 700; color: var(--tv-text); }
+.tvs-list { list-style: none; margin: 0; padding: 0; }
+.tvs-dom { padding: 12px 12px 4px; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--tv-caption); }
+.tvs-row {
+    display: grid; grid-template-columns: 104px minmax(0, 1fr) auto; gap: 12px; align-items: start;
+    padding: 10px 12px; border-radius: 8px;
+}
+.tvs-row + .tvs-row { border-top: 1px solid var(--tv-rule-soft); }
+.tvs-row.is-part .tvs-code { padding-left: 12px; }
+.tvs-code { font-size: 14px; line-height: 20px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--tv-text); white-space: nowrap; }
+.tvs-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tvs-text { margin: 0; font-size: 14px; line-height: 20px; color: var(--tv-text); }
+.tvs-skills { margin: 0; font-size: 13px; line-height: 20px; color: var(--tv-caption); }
+.tvs-skills .tv-link { font-size: 13px; line-height: 20px; font-weight: 600; text-align: left; }
+.tvs-state {
+    display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+    font-size: 12px; line-height: 20px; font-weight: 600; color: var(--tv-caption);
+}
+.tvs-row.is-gap .tvs-state { color: var(--tv-text); }
+.tvs-row.is-gap .tvs-state span {
+    padding: 0 8px; border-radius: 6px; border: 1px solid var(--tv-control-soft); background: var(--tv-page);
+}
+
+@media (max-width: 1100px) {
+    .tvs-bar { grid-template-columns: minmax(0, 1fr) 160px; }
+    .tvs-status { grid-column: 1 / -1; }
+}
+@media (max-width: 700px) {
+    .tvs-bar { grid-template-columns: minmax(0, 1fr); }
+    .tvs-row { grid-template-columns: minmax(0, 1fr) auto; }
+    .tvs-code { grid-column: 1 / -1; }
+}
