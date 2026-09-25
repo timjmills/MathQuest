@@ -210,7 +210,10 @@ const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlan
     'maxDots', 'places', 'allowRegroup', 'quotientRemainder', 'acceptedAnswers', 'regroup', 'notation',
     'operands', 'selfAnswering', 'printAnswer', 'a', 'b', 'op', 'ftCheck',
     // round 3: the kit cell travels with the item, so the quiz draws the paper's cell
-    'cell', 'skillId', 'categoryId'];
+    'cell', 'skillId', 'categoryId',
+    // AP2 round 3: a twin that prints its own question (a graph's) says its instruction here,
+    // as it does on the card and the worksheet
+    'screenInstr'];
 export function quizQuestionData(q) {
     if (!q) return null;
     const d = {

@@ -1172,7 +1172,9 @@ function _wsRenderCard(grid, q, i) {
         // Tiered multiplication chart — full-width 12x12 grid
         'mult-chart-tier',
         // Vocab match widget — full-width two-column matching layout
-        'vocab-match'];
+        'vocab-match',
+        // AP2 round 3: the true-scale ruler (sheet/cells/figures.js) needs the whole row
+        'reading-ruler', 'reading-ruler-hard'];
     const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
     const isMediumVisual = isNewVisualSkill && !isWideVisual;
 
