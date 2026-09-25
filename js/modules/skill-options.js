@@ -2733,6 +2733,135 @@ Object.assign(SKILL_OPTIONS, P12_OPTIONS);
 // ============================ end P12 · every other family ============================
 
 // ===========================================================================
+// O6 · AP1 · K-2 PICTURE KIND — "Objects"  (counting, comparing, composing; 2026-09-25)
+// ===========================================================================
+// OPTIONS-RUBRIC.md O6: a K-2 counting or composing skill offers the PICTURE KIND the pupil counts,
+// wherever the skill can honestly draw more than one. The family shares ONE control, `objects`
+// (share key J), with ONE value vocabulary, so a teacher reads the same words on every K-2 panel:
+//   shapes    plain outline shapes (circle, square, triangle, star)      RP-20 plain set
+//   pictures  the in-house line-art (ball, apple, fish, flower)          RP-20 picture set
+//   frame     counters in ten (or five) frames                           RP-10 / RP-11
+//   dice      dice patterns of up to six pips
+//   blocks    base-10 blocks: a ten rod and unit cubes                   RP-30
+// It is an APPEARANCE control (group 'layout'): it never changes the numbers dealt, only what the
+// numbers are drawn with. Each skill offers only the kinds its picture can carry, its own default
+// first, marked "(default)". The generator writes the choice into q.cell.payload and a sheet-kit
+// template draws it (every skill with this control is a kit cell since round 2), so paper, key and
+// screen draw the same picture. The default reproduces today's items exactly (add_5_pictures,
+// tens_foundation_visual, classify_count and teen_compose moved to the kit in round 2: their
+// defaults draw the same content as before, in kit form).
+//
+// Skills that keep ONE form (the drawing is the lesson): make_ten and ten_frame_build(_teen) (the
+// ten frame is what is taught and counted), hundreds_chart_fill / number_chart_fill (the chart),
+// base10_* (the blocks), count_sequence and number_seq_fill (a number path), compare_objects (its "What is compared" already picks lines, towers or bars).
+const K2_OBJECT_LABELS = Object.freeze({
+    shapes: 'Plain shapes (circles, squares, triangles, stars)',
+    pictures: 'Pictures (balls, apples, fish)',
+    frame: 'Counters in ten frames',
+    dice: 'Dice patterns',
+    blocks: 'Base-10 blocks (a ten rod and ones)',
+});
+/** The family's picture-kind control: `values` in panel order, `dflt` marked "(default)". */
+export const k2ObjectsOption = (values, dflt, { labels = {}, help, appliesTo } = {}) => ({
+    id: 'objects', label: 'Objects', type: 'enum', default: dflt, group: 'layout',
+    values: values.map(v => ({ v, l: `${labels[v] || K2_OBJECT_LABELS[v]}${v === dflt ? ' (default)' : ''}` })),
+    help: help || 'What the pupil counts. The numbers stay the same; only the picture changes.',
+    ...(appliesTo ? { appliesTo } : {}),
+});
+/** Put `def` into a skill's list: in place of its own `id`, or at the end. */
+const _ap1Put = (key, def, at = null) => {
+    const list = (SKILL_OPTIONS[key] || []).slice();
+    const i = list.findIndex(o => o && o.id === def.id);
+    if (i >= 0) list[i] = def;
+    else if (at !== null) list.splice(at, 0, def);
+    else list.push(def);
+    SKILL_OPTIONS[key] = list;
+};
+// Support level 0 on the picture skills is "the number sentence alone": no picture to choose.
+const _ap1HasPicture = (o) => !(Array.isArray(o && o.level) && o.level.length && o.level.every(v => Number(v) === 0));
+// count_objects: the same four kinds it always had, now through the family factory (the values,
+// the default and the share tokens are unchanged; it moves under the Layout heading).
+_ap1Put('counting:count_objects', k2ObjectsOption(['shapes', 'pictures', 'frame', 'dice'], 'shapes', {
+    labels: { shapes: 'Plain shapes (one kind per item)' },
+    help: 'What the pupil counts. Ten frames and dice let a pupil count on from a group he knows.',
+}));
+// compare_groups: both groups drawn the same way. Frames, shapes and pictures stand in rows of
+// five on the same 10 mm pitch, one above the other, so the pupil still matches column by column.
+_ap1Put('comparing:compare_groups', k2ObjectsOption(['frame', 'shapes', 'pictures', 'dice'], 'frame', {
+    labels: { frame: 'Counters in ten frames', shapes: 'Plain shapes in rows of five', pictures: 'Pictures in rows of five (balls, apples, fish)',
+        dice: 'Dice patterns (match the dice, then the dots)' },
+    help: 'What each group is drawn with; both groups always use the same kind. Frames, shapes and pictures '
+        + 'line up column by column so the pupil can match one to one; dice are compared by their dot patterns.',
+}));
+// classify_count: the category IS the kind of object, so only kinds that differ from each other:
+// four plain shapes, or four pictures.
+_ap1Put('comparing:classify_count', k2ObjectsOption(['shapes', 'pictures'], 'shapes', {
+    labels: { pictures: 'Pictures (balls, apples, fish, flowers)' },
+    help: 'What the pupil sorts. The kind to count is shown in the key box beside the picture.',
+}));
+// sub_5_pictures: the take-away picture (the taken ones crossed out). Hidden with Pictures off.
+_ap1Put('subtraction:sub_5_pictures', k2ObjectsOption(['shapes', 'pictures', 'frame'], 'shapes', {
+    labels: { pictures: 'Pictures (balls, apples, fish, flowers)', frame: 'Counters in a five frame' },
+    help: 'What the take-away is drawn with. The ones taken away are crossed out in every kind.',
+    appliesTo: (o) => o.pictures !== false,
+}));
+// teen_compose: a teen number as "a ten and some ones": a full ten frame and loose counters, or a
+// ten rod and unit cubes. Hidden at Support level 0 (the number sentence alone).
+_ap1Put('composing:teen_compose', k2ObjectsOption(['frame', 'blocks'], 'frame', {
+    labels: { frame: 'A full ten frame and loose counters', blocks: 'A ten rod and unit cubes' },
+    help: 'How the ten and the ones are drawn. The number sentence under the picture stays the same.',
+    appliesTo: _ap1HasPicture,
+}), 1);
+// add_5_pictures (round 2, now the kit's counters cell): the two groups drawn as plain shapes,
+// pictures, one five frame (the first group solid, the second hollow) or two dice. Hidden with
+// Pictures off (the number sentence alone).
+_ap1Put('addition:add_5_pictures', k2ObjectsOption(['shapes', 'pictures', 'frame', 'dice'], 'shapes', {
+    labels: { shapes: 'Plain shapes (circles, squares, triangles, stars, diamonds)', pictures: 'Pictures (balls, apples, fish, flowers)',
+        frame: 'Counters in a five frame (one group solid, one hollow)', dice: 'Two dice' },
+    help: 'What the two groups are drawn with. The sum and the sentence under the picture stay the same.',
+    appliesTo: (o) => o.pictures !== false,
+}));
+// tens_foundation_visual (round 2, now the kit's counters cell): the tens as rods (base-10
+// blocks) or as full ten frames, each with its rule ("One rod is one ten." / "One full frame
+// is one ten."). Both are a ten the pupil counts as one; the count of tens is the same.
+_ap1Put('composing:tens_foundation_visual', k2ObjectsOption(['blocks', 'frame'], 'blocks', {
+    labels: { blocks: 'Rods of ten (base-10 blocks)', frame: 'Full ten frames' },
+    help: 'What one ten is drawn as. The pupil counts the tens either way.',
+}));
+// number_bonds: the bond drawn with the whole on top (RP-60, the default) or with the whole at
+// the side, the two parts stacked to its right. Same boxes, same missing box.
+_ap1Put('composing:number_bonds', {
+    id: 'orientation', label: 'How the bond is drawn', type: 'enum', default: 'vertical', group: 'layout',
+    values: [{ v: 'vertical', l: 'Whole on top, parts below (default)' }, { v: 'horizontal', l: 'Whole at the side, parts stacked' }],
+    help: 'One way for the whole page. Seeing both ways shows the whole is the whole wherever it sits.',
+});
+
+// hundreds_chart_fill (owner, 2026-09-25): "Numbers to" 10, 20, 30, 40, 50 and 100. Each chart
+// is the first N numbers in rows of ten; the window is cut from inside it (1 to 10 is its one
+// row, drawn whole). 100 stays the default, so every old page and code is unchanged.
+_ap1Put('composing:hundreds_chart_fill', _opsBand([10, 20, 30, 40, 50, 100], 100, {
+    labels: { 10: '10 (the row 1 to 10)', 20: '20 (two rows)', 30: '30 (three rows)', 100: '100 (the whole chart)' },
+    help: 'The chart the window is cut from: the first 10, 20, 30, 40, 50 or 100 numbers, ten to a row. '
+        + 'A small chart holds fewer empty boxes (at most 5 in the row to 10, 6 in the chart to 20).',
+}));
+// number_chart_fill: the same window cut from a chart of bigger numbers (the hundreds, then the
+// thousands). "Numbers in" names the stretch of the chart; every number in the window is in it.
+SKILL_OPTIONS['composing:number_chart_fill'] = [
+    _opsBand([200, 500, 1000, 5000, 10000], 200, {
+        label: 'Numbers in',
+        labels: { 200: '101 to 200', 500: '201 to 500', 1000: '501 to 1,000', 5000: '1,001 to 5,000', 10000: '5,001 to 10,000' },
+        help: 'The stretch of the number chart the window is cut from. 101 to 1,000 is counting in the hundreds '
+            + '(Level 2); the thousands need four- and five-digit boxes, so at size L the window prints one to a row.',
+    }),
+    {
+        id: 'tiles', label: 'Empty boxes', type: 'enum', default: null, group: 'difficulty',
+        values: [{ v: null, l: '1 to 3, dealt' }, { v: 1, l: '1 box' }, ...[2, 3, 4, 5, 6].map(n => ({ v: n, l: `${n} boxes` }))],
+        help: 'How many numbers the pupil writes in each window (3 rows of 4): at most two in a row, never side by side.',
+    },
+];
+// ============================ end O6 · AP1 · K-2 picture kind ============================
+
+// ===========================================================================
 // WORD WORK · the keyword supports of every whole-number word problem (2026-09-25)
 // ===========================================================================
 // Every story is drawn by the word-work cell (sheet/cells/word-work.js: story, a small + − × ÷

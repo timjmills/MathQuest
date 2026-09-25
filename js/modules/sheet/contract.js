@@ -120,6 +120,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'draw-blocks-100': 'Draw hundreds, tens and ones to show the number.',
     'check-groups': 'Look at the groups. Check one box.',
     'how-many-left': 'Write how many are left.',
+    // O6 AP1 round 2 (2026-09-25): the K picture cells moved to the kit.
+    'count-all': 'Count them all. Write how many.',
+    'count-kind': 'Count one kind. Write how many.',
+    'count-tens': 'Write how many tens.',
     'ring-remainder': 'Circle groups of {n}. Write the quotient and the remainder.',
     // 2026-09-25 critic round 2: the same tasks when the section's items do not share one {n}
     // (each cell prints its own group size / divisor). Their fallback used to be `groups-of`,

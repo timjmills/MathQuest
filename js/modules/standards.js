@@ -54,6 +54,7 @@ export const SKILL_STANDARDS = {
     'composing:teen_compose': { ccss: ['K.NBT.A.1'], ee: ['M.EE.2.NBT.1'] }, // Teen Numbers: 10 + Ones (Visual)
     'composing:tens_foundation_visual': { ccss: ['1.NBT.B.2c', '1.NBT.B.2a'], ee: ['M.EE.1.NBT.2', 'M.EE.2.NBT.1', 'M.EE.3.NBT.2'] }, // How Many Tens? (Visual)
     'composing:hundreds_chart_fill': { ccss: ['1.NBT.A.1'], ee: ['M.EE.1.NBT.1'] }, // Hundreds Chart - Find the Missing Number (Visual)
+    'composing:number_chart_fill': { ccss: ['2.NBT.A.2', '4.NBT.A.2'], ee: ['M.EE.2.NBT.2', 'M.EE.4.NBT.2'] }, // Number Chart - Find the Missing Number (to 1,000 and beyond)
     'composing:ten_frame_build': { ccss: ['K.CC.B.5', 'K.CC.B.4b'], ee: ['M.EE.K.CC.6', 'M.EE.K.CC.4', 'M.EE.1.NBT.2'] }, // Build a Number on a Ten Frame
     'composing:ten_frame_build_teen': { ccss: ['K.NBT.A.1', 'K.CC.B.5'], ee: ['M.EE.K.CC.6', 'M.EE.2.NBT.1'] }, // Build a Teen Number on Two Ten Frames
     'composing:base10_build': { ccss: ['1.NBT.B.2', '2.NBT.A.1'], ee: ['M.EE.1.NBT.2', 'M.EE.2.NBT.1', 'M.EE.3.NBT.2'] }, // Build a Number with Base-10 Blocks

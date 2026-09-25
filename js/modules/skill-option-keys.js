@@ -264,7 +264,9 @@ export const VALUE_TOKENS = Object.freeze({
     // S2 supports model (block 4): which problems carry the supports, and how clashing ones mix.
     cover: Object.freeze({ whole: 'W', needed: 'N', fade: 'F' }),
     mix: Object.freeze({ section: 'S', problem: 'P' }),
-    objects: Object.freeze({ shapes: 'S', pictures: 'P', frame: 'F', dice: 'D' }),
+    objects: Object.freeze({ shapes: 'S', pictures: 'P', frame: 'F', dice: 'D',
+        // O6 AP1 (2026-09-25): teen_compose draws the ten as a rod and the ones as cubes
+        blocks: 'B' }),
     // P12
     model: Object.freeze({ none: 'N', area: 'A', bar: 'B', circle: 'C', line: 'L', set: 'S', grid: 'G', blocks: 'K', analog: 'H', digital: 'D' }),
     labels: Object.freeze({ all: 'A', some: 'S', none: 'N' }),

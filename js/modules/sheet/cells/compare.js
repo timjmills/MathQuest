@@ -20,7 +20,8 @@
 
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
-import { L, P, INK, SW, n2, svg, root, checkBox, textPt, digitPt } from './k2kit.js';
+import { L, P, INK, SW, n2, svg, root, checkBox, textPt, digitPt, shapeOf } from './k2kit.js';
+import { dicePicture } from './counters.js';
 
 const C = 10;
 
@@ -35,6 +36,24 @@ function frame(ctx, n, solid) {
             : `<circle cx="${cx}" cy="${cy}" r="${n2(3.4 - SW.heavy / 2)}" fill="#fff" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`;
     }
     return svg(ctx, w + 2 * m, h + 2 * m, s, { label: `${n} counters` });
+}
+
+/**
+ * O6 AP1 "Objects" (payload.objects): a group drawn WITHOUT the frame, on the frame's own grid of
+ * two rows of five, so group A and group B still line up column by column (one-to-one matching,
+ * RP-21 rows of five). `shapes` and `pictures` draw one outline object of payload.shape per place
+ * (8 mm on the 10 mm pitch: 2 mm between two objects); `dice` draws the count as dice faces of up
+ * to six (the count_objects dice), compared by their dot patterns.
+ */
+function group(ctx, n, solid, p) {
+    if (p.objects === 'dice') return dicePicture(ctx, n);
+    if (p.objects !== 'shapes' && p.objects !== 'pictures') return frame(ctx, n, solid);
+    const m = SW.heavy / 2, d = 8, rows = n > 5 ? 2 : 1;
+    let s = '';
+    for (let k = 0; k < n; k++) s += shapeOf(p.shape).draw(m + (k % 5 + 0.5) * C, m + (Math.floor(k / 5) + 0.5) * C, d);
+    // The drawing keeps the frame's full width (five places), so the two groups share a left edge
+    // and a column pitch whatever their counts.
+    return svg(ctx, 5 * C + 2 * m, rows * C + 2 * m, s, { label: `${n} ${shapeOf(p.shape).plural}` });
 }
 
 /** Which box a state checks: the key's, the wrong work's, or none. */
@@ -53,7 +72,7 @@ register('compare', {
     render(p, ctx) {
         const on = checkedIndex(p, ctx);
         const row = (name, n, solid) => `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};margin:${L(ctx, 1.5)} 0;">`
-            + `<b style="width:${L(ctx, 7)};text-align:right;font-size:${P(ctx, digitPt(ctx) * 0.8)};line-height:1;">${name}</b>${frame(ctx, n, solid)}`
+            + `<b style="width:${L(ctx, 7)};text-align:right;font-size:${P(ctx, digitPt(ctx) * 0.8)};line-height:1;">${name}</b>${group(ctx, n, solid, p)}`
             // P11 hint (Support level 2): how many, written beside each frame, so the pupil can
             // compare two numbers instead of matching one to one. Faded at level 1 (absent).
             + `${p.showCounts ? `<span data-k2-count="1" style="font-size:${P(ctx, digitPt(ctx) * 0.8)};font-weight:700;line-height:1;">${esc(n)}</span>` : ''}</div>`;

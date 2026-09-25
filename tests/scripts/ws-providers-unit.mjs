@@ -586,7 +586,7 @@ for (const k of ['line-jumps', 'draw-blocks', 'draw-blocks-100', 'check-groups',
     ok(lintInstruction(text).length === 0, `library "${k}" fails the lint: ${lintInstruction(text).join('; ')}`);
 }
 // Critic round 2: the new library strings pass the lint too.
-for (const k of ['ring-groups-each', 'ring-remainder-each', 'missing-all', 'story-k2']) {
+for (const k of ['ring-groups-each', 'ring-remainder-each', 'missing-all', 'story-k2', 'count-all', 'count-kind', 'count-tens']) {
     ok(k in INSTRUCTION_LIBRARY && lintInstruction(instructionFor(k, {})).length === 0, `library "${k}" is missing or fails the lint`);
 }
 ok(/quotient and the remainder/.test(instructionFor('ring-remainder', { n: 4 })), 'ring-remainder names the quotient and the remainder (its two slots)');
