@@ -24,23 +24,23 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 606 live skills; 495 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 55 have no standard, with a reason (50 vocabulary games, 5 beyond grade 6).
+- Skills mapped: 607 live skills; 496 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 55 have no standard, with a reason (50 vocabulary games, 5 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
-- **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
+- **Full coverage: CCSS 77 of 177 standards FULL, 89 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 104 FULL, 91 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 270 entries — 127 new skills, 88 options on existing skills, 2 repairs; 157 from the White Rose audit (41 of them extended to close standards clauses), 60 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+- The one build list: 269 entries — 126 new skills, 88 options on existing skills, 2 repairs; 157 from the White Rose audit (41 of them extended to close standards clauses), 59 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
-| K | 10 / 11 / 1 of 22 (45% full) | 11 / 12 / 1 of 24 | 6 / 4 / 0 of 10 (60% full) | 21/22, 10/10 |
+| K | 11 / 10 / 1 of 22 (50% full) | 12 / 11 / 1 of 24 | 6 / 4 / 0 of 10 (60% full) | 21/22, 10/10 |
 | 1 | 11 / 10 / 0 of 21 (52% full) | 13 / 10 / 0 of 23 | 10 / 5 / 1 of 16 (63% full) | 21/21, 16/16 |
 | 2 | 12 / 10 / 4 of 26 (46% full) | 12 / 9 / 6 of 27 | 11 / 7 / 1 of 19 (58% full) | 22/26, 18/19 |
 | 3 | 12 / 13 / 0 of 25 (48% full) | 18 / 15 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
 | 4 | 14 / 13 / 1 of 28 (50% full) | 19 / 13 / 2 of 34 | 16 / 4 / 0 of 20 (80% full) | 27/28, 20/20 |
 | 5 | 10 / 14 / 2 of 26 (38% full) | 16 / 13 / 5 of 34 | 13 / 4 / 1 of 18 (72% full) | 24/26, 17/18 |
 | 6 | 7 / 19 / 3 of 29 (24% full) | 14 / 20 / 8 of 42 | 10 / 7 / 0 of 17 (59% full) | 26/29, 17/17 |
-| **All** | **76 / 90 / 11 of 177 (43% full)** | **103 / 92 / 22 of 217** | **81 / 33 / 3 of 117 (69% full)** | 166/177, 115/117 |
+| **All** | **77 / 89 / 11 of 177 (44% full)** | **104 / 91 / 22 of 217** | **81 / 33 / 3 of 117 (69% full)** | 166/177, 115/117 |
 
 ## Tag fixes made by this audit
 
@@ -138,7 +138,7 @@ Every partial and gap clause below names one of these. Order inside a family: de
 highest impact first (standards closed × 2 + White Rose steps closed). The full spec of each entry — problem types,
 representation, answer, option ladder, misconceptions, lane and file ownership — is in `design/BUILD_LIST.md`.
 
-### Measurement, time and money (44)
+### Measurement, time and money (43)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
 |---|---|---|---|---|
@@ -170,22 +170,21 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 26 | **Convert Units of Time (option)** (`time_convert`) | option on `measurement:unit_conversion_word` | 4.MD.A.1 | 1 |
 | 27 | **Conversion Tables (option)** (`conversion_table`) | option on `measurement:unit_conversions` | 4.MD.A.1 | - |
 | 28 | **Time Word Problems (option)** (`elapsed_stories`) | option on `measurement:elapsed_mixed` | 3.MD.A.1 | - |
-| 29 | **What Can We Measure?** (`measurable_attributes`) | new `comparing:what_can_we_measure` | K.MD.A.1 | - |
-| 30 | **Measure With Two Units (option)** (`measure_two_units`) | option on `shapes_early:measure_nonstandard` | 2.MD.A.2 | - |
-| 31 | **Dollars and Cents (option)** (`money_convert`) | option on `measurement:money_notation` | - | 2 |
-| 32 | **Measure Capacity with Cups** (`nonstandard_capacity`) | new `measurement:measure_capacity_cups` | - | 2 |
-| 33 | **Measure Mass with Cubes** (`nonstandard_mass`) | new `measurement:measure_mass_cubes` | - | 2 |
-| 34 | **Perimeter of Regular Polygons (option)** (`regular_polygon`) | option on `area_perimeter:perimeter` | - | 2 |
-| 35 | **The Hour for the Routine (option)** (`routine_hour`) | option on `measurement:time_sense` | M.EE.2.MD.7 | - |
-| 36 | **The 24-Hour Clock** (`time_24h_convert`) | new `measurement:twenty_four_hour_clock` | - | 2 |
-| 37 | **Estimate Area** (`area_estimate`) | new `area_perimeter:estimate_area` | - | 1 |
-| 38 | **Balanced or Not?** (`balance`) | new `measurement:balance_scales` | - | 1 |
-| 39 | **Kilometres and Metres (option)** (`km_m`) | option on `measurement:length_metric` | - | 1 |
-| 40 | **Metric and Imperial Units** (`metric_imperial`) | new `measurement:metric_imperial` | - | 1 |
-| 41 | **Miles and Kilometres** (`miles_km`) | new `measurement:miles_kilometres` | - | 1 |
-| 42 | **Recognise Notes (option)** (`money_notes`) | option on `measurement:coin_value` | - | 1 |
-| 43 | **Roman Numerals to 12** (`roman_12`) | new `measurement:roman_numerals_clock` | - | 1 |
-| 44 | **Hours, Minutes or Seconds?** (`time_units`) | new `measurement:hours_minutes_seconds` | - | 1 |
+| 29 | **Measure With Two Units (option)** (`measure_two_units`) | option on `shapes_early:measure_nonstandard` | 2.MD.A.2 | - |
+| 30 | **Dollars and Cents (option)** (`money_convert`) | option on `measurement:money_notation` | - | 2 |
+| 31 | **Measure Capacity with Cups** (`nonstandard_capacity`) | new `measurement:measure_capacity_cups` | - | 2 |
+| 32 | **Measure Mass with Cubes** (`nonstandard_mass`) | new `measurement:measure_mass_cubes` | - | 2 |
+| 33 | **Perimeter of Regular Polygons (option)** (`regular_polygon`) | option on `area_perimeter:perimeter` | - | 2 |
+| 34 | **The Hour for the Routine (option)** (`routine_hour`) | option on `measurement:time_sense` | M.EE.2.MD.7 | - |
+| 35 | **The 24-Hour Clock** (`time_24h_convert`) | new `measurement:twenty_four_hour_clock` | - | 2 |
+| 36 | **Estimate Area** (`area_estimate`) | new `area_perimeter:estimate_area` | - | 1 |
+| 37 | **Balanced or Not?** (`balance`) | new `measurement:balance_scales` | - | 1 |
+| 38 | **Kilometres and Metres (option)** (`km_m`) | option on `measurement:length_metric` | - | 1 |
+| 39 | **Metric and Imperial Units** (`metric_imperial`) | new `measurement:metric_imperial` | - | 1 |
+| 40 | **Miles and Kilometres** (`miles_km`) | new `measurement:miles_kilometres` | - | 1 |
+| 41 | **Recognise Notes (option)** (`money_notes`) | option on `measurement:coin_value` | - | 1 |
+| 42 | **Roman Numerals to 12** (`roman_12`) | new `measurement:roman_numerals_clock` | - | 1 |
+| 43 | **Hours, Minutes or Seconds?** (`time_units`) | new `measurement:hours_minutes_seconds` | - | 1 |
 
 ### Geometry (37)
 
@@ -447,10 +446,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught in part by: Number Bonds within 10 (Visual) (`composing:number_bonds`)  
   Missing: decompose one number in more than one way and record each (5 = 2 + 3 and 5 = 4 + 1)  
   Build: Number Bonds in Order (`systematic_bonds`)
-- **K.MD.A.1** — PARTIAL. Describe measurable attributes of objects, such as length or weight. Describe several measurable attributes of a single object.  
-  Taught in part by: Compare Attributes (Visual) (`comparing:compare_objects`)  
-  Missing: describe several measurable attributes of one object (long, tall, heavy, holds) and tell measurable from not  
-  Build: What Can We Measure? (`measurable_attributes`)
 - **K.MD.B.3** — PARTIAL. Classify objects into given categories; count the numbers of objects in each category and sort the categories by count.  
   Taught in part by: Sort & Count by Category (Visual) (`comparing:classify_count`)  
   Missing: classify every object into the given categories (the skill counts one kind); count each category and sort the categories by count  
@@ -1080,10 +1075,8 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 *A. Describe and compare measurable attributes.*
 
-- **K.MD.A.1** — PARTIAL. Describe measurable attributes of objects, such as length or weight. Describe several measurable attributes of a single object.  
-  In part: Compare Attributes (Visual) (`comparing:compare_objects`) — capacity described (full / empty / holds more): comparing:compare_capacity (build lane k2)  
-  Missing: describe several measurable attributes of one object (long, tall, heavy, holds) and tell measurable from not → `measurable_attributes`  
-  Also tagged: `comparing:compare_capacity`
+- **K.MD.A.1** — FULL. Describe measurable attributes of objects, such as length or weight. Describe several measurable attributes of a single object.  
+  Taught by: Compare Attributes (Visual) (`comparing:compare_objects`); Full, Empty, Holds More (`comparing:compare_capacity`); What Can We Measure? (`comparing:what_can_we_measure`) — length and height: compare_objects; capacity (full / empty / holds more): compare_capacity; several attributes of one object, measurable or not, and the tool: what_can_we_measure (build lane k2)  
 - **K.MD.A.2** — FULL. Directly compare two objects with a measurable attribute in common, to see which object has “more of”/“less of” the attribute, and describe the difference. For example, directly compare the heights of two children and describe one child as taller/shorter.  
   Taught by: Compare Attributes (Visual) (`comparing:compare_objects`); Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`)  
   Also tagged: `comparing:compare_capacity`, `comparing:compare_size`

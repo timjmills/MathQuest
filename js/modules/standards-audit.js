@@ -46,7 +46,7 @@ export const CCSS_AUDIT = {
     'K.OA.A.4': F(['composing:make_ten']),
     'K.OA.A.5': F(['addition:add_5_pictures', 'subtraction:sub_5_pictures', 'addition:add_facts', 'subtraction:sub_facts'], 'fluency: add_facts / sub_facts at band 5'),
     'K.NBT.A.1': F(['composing:teen_compose', 'composing:ten_frame_build_teen']),
-    'K.MD.A.1': P(['comparing:compare_objects'], ['describe several measurable attributes of one object (long, tall, heavy, holds) and tell measurable from not'], ['measurable_attributes'], 'capacity described (full / empty / holds more): comparing:compare_capacity (build lane k2)'),
+    'K.MD.A.1': F(['comparing:compare_objects', 'comparing:compare_capacity', 'comparing:what_can_we_measure'], 'length and height: compare_objects; capacity (full / empty / holds more): compare_capacity; several attributes of one object, measurable or not, and the tool: what_can_we_measure (build lane k2)'),
     'K.MD.A.2': F(['comparing:compare_objects', 'measurement:heavier_lighter_visual']),
     'K.MD.B.3': P(['comparing:classify_count'], ['classify every object into the given categories (the skill counts one kind)', 'count each category and sort the categories by count'], ['sort_groups']),
     'K.G.A.1': P(['shapes_early:shape_positions'], ['name the shapes of objects in the environment', 'in front of, behind, next to (the skill has above, below, beside)'], ['shapes_world', 'position_map']),

@@ -1026,3 +1026,48 @@ registerSkill('comparing:compare_capacity', {
             : { value: other, misconception: 'more-less-swapped', explain: 'Mixed up more and less water.' }]);
     },
 });
+
+/* ============================================================================ what_can_we_measure */
+
+const MEAS_ICAN = 'I Can say what we can measure';
+const MEAS_WHICH = {
+    iCan: MEAS_ICAN, instructionKey: 'check-measure',
+    steps: ['Look at the thing in the picture.', 'We can measure how long, tall, heavy, or how much it holds.', 'We cannot measure a colour or a name.'],
+    say: 'We can measure __.', sayValues: (q) => [String(q.ans).toLowerCase().replace(/^how /, 'how ')],
+};
+const MEAS_TOOL = {
+    iCan: MEAS_ICAN, instructionKey: 'check-tool',
+    steps: ['Read the question: long, tall, heavy or holds?', 'A ruler measures long and tall. A scale measures heavy.', 'A jug measures how much it holds.'],
+    say: 'We use a __.', sayValues: (q) => [String(q.ans).toLowerCase()],
+};
+const MEAS_WORD = { long: 'how long', heavy: 'how heavy', tall: 'how tall', holds: 'how much it holds' };
+
+registerSkill('comparing:what_can_we_measure', {
+    strings: stringsBy((t, ref) => (t === 'tool' || (ref && ref.opts && ref.opts.task === 'find') ? MEAS_TOOL : null), MEAS_WHICH),
+    misconceptions: ['colour-is-measured', 'name-is-measured', 'wrong-tool'],
+    workedSteps: (q) => {
+        const attr = q.measureAttr || 'long';
+        if (q._variant === 'tool') {
+            return [
+                step(`The question is ${MEAS_WORD[attr]}.`),
+                step(attr === 'heavy' ? 'A scale shows which is heavier.' : attr === 'holds' ? 'A jug shows how much it holds.' : 'A ruler shows how long or tall.'),
+                step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
+            ];
+        }
+        return [
+            step('Look at the thing in the picture.'),
+            step(`We can find ${MEAS_WORD[attr]} it is.`.replace('how much it holds it is', 'how much it holds')),
+            step('A colour or a name is not measured.'),
+            step(`Check "${q.ans}".`, [{ slot: 'answer', value: String(q.ans) }]),
+        ];
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        const others = (p.words || []).map((w) => w.label).filter((l) => l !== q.ans);
+        return chooseWrong(q, others.map((l) => ({
+            value: l,
+            misconception: q._variant === 'tool' ? 'wrong-tool' : /colour/i.test(l) ? 'colour-is-measured' : 'name-is-measured',
+            explain: q._variant === 'tool' ? `Chose the ${l.toLowerCase()} for ${MEAS_WORD[q.measureAttr || 'long']}.` : `Thought we can measure ${l.toLowerCase()}.`,
+        })));
+    },
+});

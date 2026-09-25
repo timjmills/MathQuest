@@ -1270,6 +1270,8 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `count-tens` | Write how many tens. | count rods or full ten frames as tens (added 2026-09-25) |
 | `count-zero` | Count. Write how many. None is 0. | count objects on a plate, an empty one included: zero means none (build lane k2, 2026-09-25) |
 | `check-none` | Check the one with none. | find the empty plate, box or frame among three (build lane k2) |
+| `check-measure` | What can we measure? Check one box. | name a measurable attribute (long, heavy, tall, holds) against colour or name (build lane k2) |
+| `check-tool` | Which tool measures it? Check one box. | match an attribute to its tool: ruler, scale, jug (build lane k2) |
 | `check-level` | How full is it? Check one box. | capacity words: full, half full, empty, nearly full, nearly empty (build lane k2) |
 | `check-holds-more` | Check the one that holds more. | compare the capacity of two containers (build lane k2) |
 | `check-has-more` | Check the one that has more. | compare how much is in two containers (build lane k2) |

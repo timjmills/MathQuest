@@ -259,6 +259,11 @@ export const SHAPES = Object.freeze({
         draw: (cx, cy, d) => art(cx, cy, d, (o, i) => `<path d="M1.6 8.4H22.4V17.6H1.6Z" ${o}/>`
             + `<path d="M1.6 13H22.4M8.6 8.4V13M16 8.4V13M5 13V17.6M12.2 13V17.6M19.4 13V17.6" ${i}/>`),
     },
+    pencil: {
+        plural: 'pencils', one: 'pencil',
+        draw: (cx, cy, d) => art(cx, cy, d, (o, i) => `<path d="M1.4 10.4H18.4L22.8 12L18.4 13.6H1.4Z" ${o}/>`
+            + `<path d="M18.4 10.4V13.6M5.2 10.4V13.6M21.2 11.4V12.6" ${i}/>`),
+    },
     sock: {
         plural: 'socks', one: 'sock',
         draw: (cx, cy, d) => art(cx, cy, d, (o, i) => `<path d="M7.6 1.8H15.6V13.2L19.4 16.8Q21.4 19 19.8 21Q18 22.8 15.6 21.2L8.8 15.6Q7.6 14.6 7.6 13Z" ${o}/>`

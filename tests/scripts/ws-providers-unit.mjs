@@ -657,9 +657,21 @@ const K2_LANE_MAKERS = {
         const want = /more/.test(form) ? 1 : 0; const correct = at.indexOf(want); const letter = 'AB'[correct];
         return { ans: letter, printAnswer: letter, answerType: 'text', text: 'Which glass holds more?', _variant: form, cell: cellOf('picture-row', { kind: 'pick', choices, correct }) };
     },
+    'comparing:what_can_we_measure': (r, i) => {
+        const attr = ['long', 'heavy', 'tall', 'holds'][i % 4];
+        const lab = { long: 'How long', heavy: 'How heavy', tall: 'How tall', holds: 'How much it holds' }[attr];
+        if (i % 3 === 2) {
+            const tool = { long: 'Ruler', tall: 'Ruler', heavy: 'Scale', holds: 'Jug' }[attr];
+            const words = [{ label: 'Ruler' }, { label: 'Scale' }, { label: 'Jug' }]; const correct = words.findIndex((w) => w.label === tool);
+            return { ans: tool, printAnswer: tool, answerType: 'text', text: 'Which tool measures it?', _variant: 'tool', measureAttr: attr, cell: cellOf('picture-row', { kind: 'words', pic0: { shape: 'rock' }, words, correct }) };
+        }
+        const words = shuffle(r, [{ label: lab }, { label: 'What colour' }]); const correct = words.findIndex((w) => w.label === lab);
+        return { ans: lab, printAnswer: lab, answerType: 'text', text: 'What can we measure?', _variant: 'which', measureAttr: attr, cell: cellOf('picture-row', { kind: 'words', pic0: { shape: 'rock' }, words, correct }) };
+    },
 };
 Object.assign(REQUIRED, {
     'counting:zero_none': /none/i,
+    'comparing:what_can_we_measure': /measure/i,
     'comparing:compare_capacity': /water|holds|bigger/i,
     'counting:match_same': /same|outline/i,
     'comparing:odd_one_out': /not like|not belong|reason/i,

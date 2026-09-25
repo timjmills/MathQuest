@@ -207,15 +207,6 @@ export const STANDARD_PROPOSALS = {
         ladder: 'O2 within 5 → within 10 · O3 frame with signs printed → blank line · O6 pictures / dots / ten frame',
         misconceptions: ['writes the total first (5 + 3 = 2)', 'uses + for a take-away picture'], wrmSteps: ['Y1.B2.S1'], after: [],
     }),
-    measurable_attributes: P({
-        kind: 'new', skill: 'comparing:what_can_we_measure', name: 'What Can We Measure?', grade: 'K', family: 'measurement',
-        standards: ['K.MD.A.1'], ee: ['M.EE.K.MD.1'],
-        teaches: 'naming measurable attributes of one object (how long, how tall, how heavy, how much it holds) and telling measurable from not measurable (colour)',
-        problemTypes: ['tick every word that you can measure for this object', 'which question can a ruler answer?', 'match the attribute to the tool', 'long or heavy? sort the questions'],
-        templates: ['wordpic'], newTemplates: ['picture-row'], answer: 'tick words from a picture-word bank',
-        ladder: 'O2 two attributes (long, heavy) → four (tall, holds) · O3 icons beside each word → words only · O6 objects',
-        misconceptions: ['colour is something we measure', 'only length can be measured'], wrmSteps: ['R.B2.S1', 'R.B8.S3'], after: [],
-    }),
 
     // ------------------------------------------------------------------ operations (1-2)
     add_three_forms: P({

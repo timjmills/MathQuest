@@ -1360,6 +1360,7 @@ function _k2LaneSkill(q, id, rng) {
         case 'odd_one_out': return _k2OddOneOut(q, rng);
         case 'match_same': return _k2MatchSame(q, rng);
         case 'compare_capacity': return _k2Capacity(q, rng);
+        case 'what_can_we_measure': return _k2Measurable(q, rng);
         default: return false;
     }
 }
@@ -1720,5 +1721,72 @@ function _k2Capacity(q, rng) {
     q._variant = `${verb}-${dir}`;
     q.printFormat = `k2-${q._variant}`;
     _kSetCell(q, 'picture-row', Object.assign(payload, { correct, labels: K2_LETTERS.slice(0, n) }));
+    return true;
+}
+
+/** What can we measure: each measurable attribute, the objects it suits, its tool and its pictogram. */
+const K2_MEASURE = {
+    long: { label: 'How long', icon: 'long', tool: 'ruler', toolWord: 'Ruler', q: 'How long?', objects: [{ shape: 'pencil' }, { shape: 'car' }, { shape: 'feather' }] },
+    heavy: { label: 'How heavy', icon: 'heavy', tool: 'scale', toolWord: 'Scale', q: 'How heavy?', objects: [{ shape: 'rock' }, { shape: 'brick' }, { shape: 'ball' }] },
+    tall: { label: 'How tall', icon: 'tall', tool: 'ruler', toolWord: 'Ruler', q: 'How tall?', objects: [{ shape: 'tree' }, { shape: 'house' }] },
+    holds: { label: 'How much it holds', icon: 'holds', tool: 'jug', toolWord: 'Jug', q: 'How much in it?', objects: [{ container: 'bucket', fill: 0 }, { container: 'bottle', fill: 0 }, { shape: 'cup' }] },
+};
+const K2_NOT_MEASURE = [{ label: 'What colour', icon: 'colour' }, { label: 'Its name', icon: null }];
+
+/**
+ * WHAT CAN WE MEASURE? (K.MD.A.1: describe measurable attributes of objects). One object, large,
+ * beside a short bank:
+ *   which  one measurable attribute that suits the object (how long, how heavy, how tall, how much
+ *          it holds) among ones we cannot measure (what colour, its name): check the one we can.
+ *   tool   the question ("How heavy is it?"): check the tool that measures it (ruler, scale, jug).
+ * Options: Task, Attributes in play (count: long and heavy / all four), Choices (tiles 2 / 3),
+ * Support level 2 (a pictogram beside each word) / 1.
+ */
+function _k2Measurable(q, rng) {
+    const task = _kOpt('task') === 'find' ? 'tool' : 'which';
+    const four = Number(_kOpt('count')) === 4;
+    const n = Number(_kOpt('tiles')) === 3 ? 3 : 2;
+    const keys = four ? ['long', 'heavy', 'tall', 'holds'] : ['long', 'heavy'];
+    const key = keys[_kDealShuffled(keys.length)];
+    const m = K2_MEASURE[key];
+    const obj = m.objects[rng(0, m.objects.length - 1)];
+    const lvl = _kLevel(1);
+    q.options = [];
+    q.selfAnswering = true;
+    q.skillLabel = 'What Can We Measure?';
+    q.supportLevel = lvl;
+    let words, correct;
+    if (task === 'tool') {
+        const tools = [{ label: 'Ruler', icon: 'tool-ruler' }, { label: 'Scale', icon: 'tool-scale' }, { label: 'Jug', icon: 'tool-jug' }];
+        const pool = n === 3 ? tools : [tools.find((t) => t.label === m.toolWord), tools.find((t) => t.label !== m.toolWord && (key !== 'heavy' ? t.label === 'Scale' : t.label === 'Ruler'))];
+        words = shuffle(pool.slice());
+        correct = words.findIndex((w) => w.label === m.toolWord);
+        q.text = `${m.q} Which tool measures it?`;
+        q.printText = 'Which tool measures it? Check one box.';
+        q._variant = 'tool';
+        q.printFormat = 'k2-tool';
+        q.hint = key === 'heavy' ? 'A scale tells how heavy.' : key === 'holds' ? 'A jug tells how much it holds.' : 'A ruler tells how long or how tall.';
+    } else {
+        const nots = shuffle(K2_NOT_MEASURE.slice()).slice(0, n - 1);
+        words = shuffle([{ label: m.label, icon: m.icon }, ...nots]);
+        correct = words.findIndex((w) => w.label === m.label);
+        q.text = 'What can we measure? Check one box.';
+        q.printText = 'What can we measure? Check one box.';
+        q._variant = 'which';
+        q.printFormat = 'k2-which';
+        q.hint = 'We can measure how long, how tall, how heavy and how much it holds. We cannot measure a colour or a name.';
+    }
+    const label = words[correct].label;
+    q.ans = label;
+    q.printAnswer = label;
+    q.acceptedAnswers = [label, label.toLowerCase()];
+    q.answerType = 'text';
+    const wrong = words.find((w, i) => i !== correct);
+    q.distractorTags = { [wrong.label]: task === 'tool' ? 'chose the wrong tool' : 'thought a colour or a name can be measured' };
+    q.measureAttr = key;
+    _kSetCell(q, 'picture-row', {
+        kind: 'words', pic0: obj, words, correct, labels: words.map((w) => w.label), pic: 19,
+        icons: task === 'tool' || lvl >= 2, iconSize: task === 'tool' ? 11 : 6.5, caption: task === 'tool' ? m.q : null,
+    });
     return true;
 }

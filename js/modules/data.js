@@ -27,6 +27,7 @@ export const SKILL_GRADES = {
     'compare_groups': 'K', 'compare_objects': 'K', 'classify_count': 'K',
     'number_bonds': 'K', 'make_ten': 'K', 'teen_compose': 'K',
     // Build lane k2 (2026-09-25, design/BUILD_LIST.md). PK skills are Level K (GRADE_COLORS has no PK).
+    'what_can_we_measure': 'K',
     'compare_capacity': 'K',
     'match_same': 'K',
     'odd_one_out': 'K',
@@ -566,6 +567,7 @@ export const SKILLS = {
         { v: "compare_size", l: "Big and Small" },
         { v: "odd_one_out", l: "Which One Does Not Belong?" },
         { v: "compare_capacity", l: "Full, Empty, Holds More" },
+        { v: "what_can_we_measure", l: "What Can We Measure?" },
     ],
     composing: [
         { v: "number_bonds", l: "Number Bonds within 10 (Visual)" },
@@ -1583,7 +1585,7 @@ export const SKILL_TIME_CATEGORY = {
     // New K-3 skills (quick)
     count_objects: "quick", count_sequence: "quick", compare_groups: "quick",
     // Build lane k2 (2026-09-25)
-    zero_none: "quick", compare_capacity: "quick", match_same: "quick", odd_one_out: "quick", compare_size: "quick",
+    zero_none: "quick", what_can_we_measure: "quick", compare_capacity: "quick", match_same: "quick", odd_one_out: "quick", compare_size: "quick",
     compare_objects: "quick", classify_count: "quick", number_bonds: "quick", make_ten: "quick",
     teen_compose: "quick", odd_even: "quick", number_word_form: "quick",
     // MAP gap fills (Phase 6)
@@ -1857,7 +1859,7 @@ export const SKILL_PRINT_SIZE = {
     more_less_10: "medium", more_less_100: "medium",
     count_objects: "compact", count_sequence: "compact",
     // Build lane k2 (2026-09-25)
-    zero_none: "compact", compare_capacity: "compact", match_same: "compact", odd_one_out: "compact", compare_size: "compact",
+    zero_none: "compact", what_can_we_measure: "compact", compare_capacity: "compact", match_same: "compact", odd_one_out: "compact", compare_size: "compact",
     compare_groups: "compact", compare_objects: "compact",
     nearest_10: "medium", nearest_100: "medium", nearest_1000: "medium",
     nearest_10000: "medium", nearest_100000: "medium", nearest_million: "medium",

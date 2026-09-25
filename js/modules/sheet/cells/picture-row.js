@@ -130,6 +130,7 @@ function icon(kind, d) {
     if (kind === 'tall') return `<path d="M${n2(s / 2)} ${n2(s * 0.08)}V${n2(s * 0.92)}M${n2(s * 0.33)} ${n2(s * 0.25)}L${n2(s / 2)} ${n2(s * 0.08)}L${n2(s * 0.67)} ${n2(s * 0.25)}M${n2(s * 0.33)} ${n2(s * 0.75)}L${n2(s / 2)} ${n2(s * 0.92)}L${n2(s * 0.67)} ${n2(s * 0.75)}" ${st}/>`;
     if (kind === 'heavy') return `<path d="M${n2(s * 0.3)} ${n2(s * 0.4)}Q${n2(s * 0.3)} ${n2(s * 0.12)} ${n2(s / 2)} ${n2(s * 0.12)}Q${n2(s * 0.7)} ${n2(s * 0.12)} ${n2(s * 0.7)} ${n2(s * 0.4)}M${n2(s * 0.15)} ${n2(s * 0.9)}L${n2(s * 0.25)} ${n2(s * 0.4)}H${n2(s * 0.75)}L${n2(s * 0.85)} ${n2(s * 0.9)}Z" ${st}/>`;
     if (kind === 'holds') return `<path d="M${n2(s * 0.22)} ${n2(s * 0.12)}H${n2(s * 0.7)}L${n2(s * 0.64)} ${n2(s * 0.9)}H${n2(s * 0.28)}Z" ${st}/><path d="M${n2(s * 0.26)} ${n2(s * 0.5)}H${n2(s * 0.66)}" ${st}/>`;
+    if (/^tool-/.test(kind)) return tool(kind.slice(5), s, s);
     const FILL = { full: 1, nearfull: 0.84, half: 0.5, nearempty: 0.14, empty: 0 };
     if (kind in FILL) return `<g transform="translate(${n2(s * 0.12)} 0)">${container('glass', FILL[kind], s * 0.76, s)}</g>`;
     if (kind === 'colour') return `<circle cx="${n2(s * 0.3)}" cy="${n2(s * 0.35)}" r="${n2(s * 0.14)}" ${st}/><circle cx="${n2(s * 0.68)}" cy="${n2(s * 0.35)}" r="${n2(s * 0.14)}" ${st}/><circle cx="${n2(s / 2)}" cy="${n2(s * 0.7)}" r="${n2(s * 0.14)}" ${st}/>`;
@@ -200,7 +201,7 @@ register('picture-row', {
         if (p.kind === 'words') {
             const labels = (p.words || []).map((wd) => wd.label);
             const on = checkedChoice(p, ctx, labels);
-            const iconD = 6.5;
+            const iconD = p.iconSize || 6.5;
             const choices = (p.words || []).map((wd) => ({
                 label: wd.label,
                 pic: p.icons && wd.icon ? svg(ctx, iconD, iconD, icon(wd.icon, iconD), { label: '' }) : '',
@@ -212,7 +213,9 @@ register('picture-row', {
                 : picture(ctx, p.pic0, bw * 1.3, bh * 1.3);
             const dir = p.row ? 'column' : 'row';
             return root(ctx, 'k2-prow', `<div style="display:flex;flex-direction:${dir};align-items:center;justify-content:center;gap:${L(ctx, p.row ? 4 : 8)};">`
-                + `<div style="flex:none;">${pics}${cueLine(ctx, p.cue)}</div>${choiceRow(ctx, choices, { on, vertical: true, labelW, labelPt: lp })}</div>`);
+                + `<div style="flex:none;">${pics}${cueLine(ctx, p.cue)}</div>`
+                + `<div style="flex:none;text-align:left;">${p.caption ? `<div style="font-size:${P(ctx, lp)};font-weight:700;line-height:1.25;margin-bottom:${L(ctx, 1.5)};">${esc(p.caption)}</div>` : ''}`
+                + `${choiceRow(ctx, choices, { on, vertical: true, labelW, labelPt: lp })}</div></div>`);
         }
 
         if (p.kind === 'line') {

@@ -42,6 +42,7 @@ export const SKILL_STANDARDS = {
     'counting:number_seq_fill': { ccss: ['1.NBT.A.1', 'K.CC.A.2', 'K.CC.A.1'], ee: ['M.EE.1.NBT.1', 'M.EE.2.NBT.3', 'M.EE.K.CC.1'] }, // Number Sequence: Fill Missing (Grid)
     'counting:mixed_counting': { ccss: [], ee: [], pool: true }, // Mixed Counting
     // Build lane k2 (2026-09-25)
+    'comparing:what_can_we_measure': { ccss: ['K.MD.A.1'], ee: ['M.EE.K.MD.1'] }, // What Can We Measure?
     'comparing:compare_capacity': { ccss: ['K.MD.A.2', 'K.MD.A.1', '3.MD.A.2'], ee: ['M.EE.K.MD.2', 'M.EE.K.MD.1', 'M.EE.3.MD.2'] }, // Full, Empty, Holds More
     'counting:match_same': { ccss: [], ee: [], reason: 'Reception (PK): match objects and pictures one to one, before the Kindergarten standards' }, // Match the Same
     'comparing:odd_one_out': { ccss: [], ee: [], reason: 'Reception (PK): identify a set by one shared attribute, before the Kindergarten standards' }, // Which One Does Not Belong?

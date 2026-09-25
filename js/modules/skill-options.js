@@ -3124,6 +3124,25 @@ const K2_LANE_OPTIONS = {
             help: 'What is drawn. Mixed deals a different container in each item.',
         },
     ],
+    'comparing:what_can_we_measure': [
+        {
+            id: 'task', label: 'Task', type: 'enum', default: 'read', group: 'difficulty',
+            values: [{ v: 'read', l: 'What can we measure? (check the word) (default)' }, { v: 'find', l: 'Which tool measures it? (ruler, scale, jug)' }],
+            help: 'One task for the whole page: name what can be measured first, then choose the tool.',
+        },
+        {
+            id: 'count', label: 'Measures in play', type: 'enum', default: 2, group: 'difficulty',
+            values: [{ v: 2, l: 'Two: how long, how heavy (default)' }, { v: 4, l: 'Four: also how tall, how much it holds' }],
+            help: 'Long and heavy first; tall and how much it holds come next.',
+        },
+        {
+            id: 'tiles', label: 'Choices', type: 'enum', default: 2, group: 'difficulty',
+            values: [{ v: 2, l: 'Two to choose from (default)' }, { v: 3, l: 'Three to choose from' }],
+            help: 'Two: one we can measure and one we cannot. Three adds another.',
+        },
+        { ...levelSubset([2, 1], 1, 'Level 2 draws a small picture beside each word (an arrow for long, a weight for heavy, a jug for holds); level 1 prints the words alone. (The word task only: the tools are always pictured.)'),
+            appliesTo: (o) => o.task !== 'find' },
+    ],
 };
 for (const [key, defs] of Object.entries(K2_LANE_OPTIONS)) SKILL_OPTIONS[key] = defs;
 // ============================ end build lane k2 ============================
