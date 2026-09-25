@@ -24,6 +24,7 @@
 //            'pick'    circle the model (A, B, C, D) that shows the printed fraction
 //            'sign'    write <, > or = (or = / ≠) in the circle between two models (compare)
 //            'op'      a number sentence of fractions; one term holds the answer boxes
+//            'part'    name a part of a printed fraction: "3/8  numerator = [ ]" (`part`: 'n' | 'd')
 //   terms    [{n, d, w?, kind?, frac?, blank?, letter?}]
 //            n / d (w: a mixed number's whole part); kind: a model (none: the fraction alone);
 //            frac: 'show' (written), 'none', or where the answer boxes are: 'n', 'd', 'nd'
@@ -34,6 +35,7 @@
 //   answer   {n, d, w} | {sign} | {letter} | {shade}: the key
 //   wholeMm  one whole's width at L (S and M scale it), for terms that must match
 //   fracAt   'left' | 'below' (default: left for one term, below for several)
+//   showAbove  a shade task prints its fraction ABOVE a short model (a bar, a rectangle)
 // The key writes the answer in the pupil's own boxes (AK-1), shades the pupil's model, rings
 // the right letter, or writes the sign in the circle. The screen twin (ctx.options.twin) is the
 // same drawing: its boxes carry `data-mq-cell` (joined "/" for a fraction, "mixed" for a mixed
@@ -108,15 +110,28 @@ function part(tag, attrs, idx, shaded, o, box) {
 /** How many whole models a value needs, and how many parts are shaded in all. */
 function countsOf(p) {
     const d = Math.max(1, Math.round(Number(p.d) || 1));
+    const copies = Math.max(0, Math.round(Number(p.copies) || 0));
+    if (copies > 1) {
+        // k equal groups of the same fraction (fraction x whole): k models, each shaded n
+        return { d, total: Math.max(0, Math.round(Number(p.n) || 0)), models: copies, copies };
+    }
     const total = Math.max(0, Math.round((Number(p.w) || 0) * d + (Number(p.n) || 0)));
     const models = Math.max(1, Number(p.models) || Math.ceil(total / d) || 1);
-    return { d, total, models };
+    return { d, total, models, copies: 0 };
 }
 
+/** Models per row: a long row of wholes (a mixed number, k groups) folds after `perRow`. */
+const perRowOf = (p, models) => {
+    const k = Math.round(Number(p.perRow) || 0);
+    return k > 0 ? Math.min(k, models) : models;
+};
+
 /** One whole's size in mm at a preset. */
-function wholeSize(kind, d, size, wholeMm) {
+function wholeSize(kind, d, size, wholeMm, barHmm = null) {
     const D = DIM[size] || DIM.L;
     const whole = Number(wholeMm) > 0 ? Number(wholeMm) * (WHOLE_K[size] || 1) : null;
+    // a slim strip (a mixed number's wholes, k equal groups): read, never shaded by the pupil
+    if (kind === 'bar' && Number(barHmm) > 0) return { w: whole || Math.max(D.barW, d * D.barPart), h: Number(barHmm) * (WHOLE_K[size] || 1) };
     if (kind === 'circle') {
         // RP-93: a part at least 6 mm at mid-radius -> D >= 12 d / pi
         const dia = whole || Math.max(D.circle, Math.ceil((12 * d) / Math.PI));
@@ -139,10 +154,10 @@ export function fracModelGeom(p) {
     const kind = FRAC_MODELS.includes(p.kind) ? p.kind : 'bar';
     const size = DIM[p.size] ? p.size : 'L';
     const D = DIM[size];
-    const { d, total, models } = countsOf(p);
+    const { d, total, models, copies } = countsOf(p);
     const o = { targets: !!p.targets, hatch: !!p.hatch };
     const blank = !!p.blank || o.targets;
-    const one = wholeSize(kind, d, size, p.wholeMm);
+    const one = wholeSize(kind, d, size, p.wholeMm, p.barH);
     let body = '';
     if (kind === 'line') {
         // One line from 0 to the last whole, a tick per part; the whole numbers labelled.
@@ -164,8 +179,12 @@ export function fracModelGeom(p) {
         return { body, wMm: len + 10, hMm: 6 + 3 + lab * 1.3 + 1, aria: `number line from 0 to ${models} in parts of 1/${d}` };
     }
     let idx = 0;
+    const per = perRowOf(p, models);
+    // a part is shaded while the running count is under the total (a mixed number fills whole
+    // after whole); k groups of one fraction shade the same n parts of every model
+    const on = (i, k) => !blank && (copies ? k < total : i < total);
     for (let m = 0; m < models; m++) {
-        const ox = 0.5 + m * (one.w + GAP_MM), oy = 0.5;
+        const ox = 0.5 + (m % per) * (one.w + GAP_MM), oy = 0.5 + Math.floor(m / per) * (one.h + GAP_MM);
         if (kind === 'circle') {
             const r = one.w / 2, cx = ox + r, cy = oy + r;
             for (let i = 0; i < d; i++, idx++) {
@@ -173,8 +192,8 @@ export function fracModelGeom(p) {
                 const a1 = -Math.PI / 2 + (2 * Math.PI * (i + 1)) / d;
                 const box = { x: ox, y: oy, w: one.w, h: one.w };
                 body += d === 1
-                    ? part('circle', `cx="${f2(cx)}" cy="${f2(cy)}" r="${f2(r)}"`, idx, !blank && idx < total, o, box)
-                    : part('path', `d="${sectorPath(cx, cy, r, a0, a1)}"`, idx, !blank && idx < total, o, box);
+                    ? part('circle', `cx="${f2(cx)}" cy="${f2(cy)}" r="${f2(r)}"`, idx, on(idx, i), o, box)
+                    : part('path', `d="${sectorPath(cx, cy, r, a0, a1)}"`, idx, on(idx, i), o, box);
             }
             body += `<circle cx="${f2(cx)}" cy="${f2(cy)}" r="${f2(r)}" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}"/>`;
         } else {
@@ -183,13 +202,16 @@ export function fracModelGeom(p) {
             for (let i = 0; i < d; i++, idx++) {
                 const r = Math.floor(i / cols), k = i % cols;
                 const box = { x: ox + k * cw, y: oy + r * ch, w: cw, h: ch };
-                body += part('rect', `x="${f2(box.x)}" y="${f2(box.y)}" width="${f2(cw)}" height="${f2(ch)}"`, idx, !blank && idx < total, o, box);
+                body += part('rect', `x="${f2(box.x)}" y="${f2(box.y)}" width="${f2(cw)}" height="${f2(ch)}"`, idx, on(idx, i), o, box);
             }
             body += `<rect x="${f2(ox)}" y="${f2(oy)}" width="${f2(one.w)}" height="${f2(one.h)}" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}"/>`;
         }
     }
-    const wMm = models * one.w + (models - 1) * GAP_MM + 1, hMm = one.h + 1;
-    const aria = `${models > 1 ? `${models} ${kind} models` : `${kind} model`} in ${d} equal parts${blank ? '' : `, ${total} shaded`}`;
+    const rowsOf = Math.ceil(models / per);
+    const wMm = per * one.w + (per - 1) * GAP_MM + 1, hMm = rowsOf * one.h + (rowsOf - 1) * GAP_MM + 1;
+    const aria = copies
+        ? `${copies} ${kind} models, each in ${d} equal parts${blank ? '' : `, ${total} shaded in each`}`
+        : `${models > 1 ? `${models} ${kind} models` : `${kind} model`} in ${d} equal parts${blank ? '' : `, ${total} shaded`}`;
     return { body, wMm, hMm, aria };
 }
 
@@ -235,7 +257,8 @@ const GLYPH = { '+': '+', '-': '−', '−': '−', 'x': '×', '×': '×', '/': 
 /** The answer written in the pupil's slots, by state: the key's, a wrong one's, or none. */
 function answerValues(p, ctx) {
     const a = p.answer || {};
-    const key = { n: a.n, d: a.d, w: a.w, sign: a.sign, letter: a.letter, shade: a.shade };
+    const whole = !Number(a.n) && Number(a.w) > 0;
+    const key = { n: whole ? '' : a.n, d: whole ? '' : a.d, w: a.w || '', sign: a.sign, letter: a.letter, shade: a.shade, part: a.part };
     if (ctx.state === 'blank') return {};
     if (ctx.state === 'wrong') {
         const w = ctx.wrong || {};
@@ -244,7 +267,7 @@ function answerValues(p, ctx) {
         const m = /^(?:(\d+)\s+)?(\d+)\s*\/\s*(\d+)$/.exec(raw);
         if (m) { out.w = m[1] || ''; out.n = m[2]; out.d = m[3]; }
         else if (/^\d+$/.test(raw)) { out.n = raw; out.d = raw; out.w = raw; out.shade = Number(raw); }
-        out.sign = raw; out.letter = raw.toUpperCase();
+        out.sign = raw; out.letter = raw.toUpperCase(); out.part = raw;
         if (w.slots) for (const k of Object.keys(w.slots)) out[k] = w.slots[k];
         return out;
     }
@@ -275,7 +298,7 @@ function stack(ctx, top, bottom, { attrs = '' } = {}) {
 /** How many answer boxes the payload carries (one box alone is the twin's single blank). */
 function boxCount(p) {
     let n = 0;
-    for (const t of p.terms || []) n += { n: 1, d: 1, nd: 2, wnd: 3 }[t.frac] || 0;
+    for (const t of p.terms || []) n += { n: 1, d: 1, w: 1, nd: 2, wnd: 3 }[t.frac] || 0;
     return n;
 }
 
@@ -286,6 +309,7 @@ function termFrac(p, t, ctx, vals) {
     const v = (k) => (vals[k] === undefined || vals[k] === null ? '' : String(vals[k]));
     switch (t.frac) {
         case 'none': return '';
+        case 'w': return slotBox(ctx, 'w', v('w'), mark);
         case 'n': return stack(ctx, slotBox(ctx, 'n', v('n'), mark), numeral(ctx, t.d));
         case 'd': return stack(ctx, numeral(ctx, t.n), slotBox(ctx, 'd', v('d'), mark));
         case 'nd': return stack(ctx, slotBox(ctx, 'n', v('n'), mark), slotBox(ctx, 'd', v('d'), mark), { attrs: isTwin(ctx) ? ' data-mq-join="/"' : '' });
@@ -312,6 +336,7 @@ function termModel(p, t, ctx, { shaded = null, targets = false } = {}) {
         n, d: t.d, w: shaded === null ? t.w : 0, kind: t.kind, size, wholeMm: p.wholeMm,
         blank: !!t.blank && shaded === null, targets, hatch: !!ctx.photocopySafe,
         models: t.blank || shaded !== null ? countsOf(t).models : null,
+        copies: t.copies, perRow: p.perRow, barH: p.barH,
     });
     const tgt = targets ? ' data-mq-shade="1"' : '';
     return `<svg class="fm-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f2(g.wMm)} ${f2(g.hMm)}" role="img" aria-label="${esc(g.aria)}"${tgt} `
@@ -365,12 +390,65 @@ function renderTerm(p, t, i, ctx, vals, below) {
 const answerLine = (p) => {
     const t = p.terms || [];
     const last = t[t.length - 1];
-    return p.task === 'op' && t.length >= 3 && last && !last.kind && /^(nd|wnd|n|d)$/.test(last.frac || '')
-        && t.slice(0, -1).some((x) => x.kind);
+    return p.task === 'op' && t.length >= 3 && last && !last.kind && /^(nd|wnd|n|d|w)$/.test(last.frac || '')
+        && (t.slice(0, -1).some((x) => x.kind) || !!p.area);
 };
+
+/**
+ * The area model of a fraction times a fraction (5.NF.4b), drawn WITHOUT the answer (RP-1): a
+ * rectangle cut into d1 rows and d2 columns, the first factor's n1 rows shaded, the second
+ * factor's n2 columns marked with a bracket under them. The pupil counts the shaded cells inside
+ * the bracket and all the cells; the overlap is never set apart.
+ */
+const AREA_W = 56, AREA_H = 40;
+function areaProductGeom(a, size, hatch) {
+    const k = WHOLE_K[size] || 1;
+    const W = AREA_W * k, H = AREA_H * k;
+    const rows = Math.max(1, a.rows | 0), cols = Math.max(1, a.cols | 0);
+    const lab = (DIM[size] || DIM.L).label * PT_MM;
+    const x0 = 0.5 + lab * 2.4 + 3, y0 = 0.5;
+    const cw = W / cols, ch = H / rows;
+    const o = { targets: false, hatch };
+    let body = '';
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            const box = { x: x0 + c * cw, y: y0 + r * ch, w: cw, h: ch };
+            body += part('rect', `x="${f2(box.x)}" y="${f2(box.y)}" width="${f2(cw)}" height="${f2(ch)}"`, r * cols + c, r < (a.shadeRows | 0), o, box);
+        }
+    }
+    body += `<rect x="${f2(x0)}" y="${f2(y0)}" width="${f2(W)}" height="${f2(H)}" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}"/>`;
+    const text = (x, y, t) => `<text x="${f2(x)}" y="${f2(y)}" text-anchor="middle" font-size="${f2(lab)}" font-weight="700" font-family="Andika, sans-serif" fill="${INK.ink}">${esc(t)}</text>`;
+    // the rows' bracket (left) and the columns' bracket (under), each with its fraction
+    const rb = (a.shadeRows | 0) * ch, bx = x0 - 2;
+    body += `<path d="M${f2(bx + 1.2)} ${f2(y0)} H${f2(bx)} V${f2(y0 + rb)} H${f2(bx + 1.2)}" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}"/>`;
+    body += text(bx - lab * 1.2 - 0.5, y0 + rb / 2 + lab * 0.35, `${a.n1}/${a.d1}`);
+    const cb = (a.markCols | 0) * cw, by = y0 + H + 2;
+    body += `<path d="M${f2(x0)} ${f2(by - 1.2)} V${f2(by)} H${f2(x0 + cb)} V${f2(by - 1.2)}" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}"/>`;
+    body += text(x0 + cb / 2, by + lab + 0.8, `${a.n2}/${a.d2}`);
+    const wMm = x0 + W + 1, hMm = by + lab * 1.3 + 1.5;
+    return { body, wMm, hMm, aria: `area model: ${rows} rows and ${cols} columns, ${a.shadeRows} rows shaded, ${a.markCols} columns bracketed` };
+}
+function areaProduct(p, ctx) {
+    const g = areaProductGeom(p.area, sizeOf(ctx), !!ctx.photocopySafe);
+    return `<svg class="fm-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f2(g.wMm)} ${f2(g.hMm)}" role="img" aria-label="${esc(g.aria)}" `
+        + `data-frac-model="area-product" style="display:block;width:${L(ctx, g.wMm)};height:auto;max-width:100%;overflow:visible;">${g.body}</svg>`;
+}
+
+/** The printed fraction over "numerator = [ ]": the fraction, the part's name and one box. */
+function partRow(p, ctx, vals) {
+    const t = (p.terms || [])[0] || {};
+    const v = vals.part === undefined || vals.part === null ? '' : String(vals.part);
+    const name = p.part === 'd' ? 'denominator' : 'numerator';
+    return `<div class="fm-row" style="display:flex;flex-direction:column;flex-wrap:nowrap;align-items:center;justify-content:center;gap:${L(ctx, 4)};">`
+        + `${termFrac(p, { n: t.n, d: t.d, frac: 'show' }, ctx, {})}`
+        + `<span style="display:inline-flex;align-items:center;gap:${L(ctx, 3)};flex:none;">`
+        + `<span style="font-size:${P(ctx, textPt(ctx) + 2)};font-weight:700;line-height:1;">${name}</span>`
+        + `${join(p, '=', ctx, vals)}${slotBox(ctx, 'part', v, 'blank')}</span></div>`;
+}
 
 function renderRow(p, ctx) {
     const vals = answerValues(p, ctx);
+    if (p.task === 'part') return partRow(p, ctx, vals);
     const terms = p.terms || [];
     const below = p.fracAt ? p.fracAt === 'below' : terms.length > 1;
     const parts = [];
@@ -390,14 +468,37 @@ function renderRow(p, ctx) {
         // the line under it (the sentence stays within one of two columns).
         const n = terms.length - 1;
         const top = [];
+        // `stack`: the terms one under another, each with its fraction to the left of its models
+        // (a mixed number's wholes need the width); else side by side, the fraction under each
+        const stacked = !!p.stack;
         terms.slice(0, n).forEach((t, i) => {
             if (i > 0) top.push(join(p, (p.joins || [])[i - 1] || '', ctx, vals));
-            top.push(renderTerm(p, t, i, ctx, vals, true));
+            top.push(renderTerm(p, t, i, ctx, vals, !stacked));
         });
         const hold = isTwin(ctx) ? ' data-mq-wrapped="1"' : '';
+        let topRow;
+        if (stacked) {
+            topRow = `<span style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 2)};">${top.join('')}</span>`;
+        } else {
+            // two lines of one grid: each model above its own number, and the signs on the
+            // numbers' line (a sign never floats halfway up a picture)
+            const cols = [];
+            terms.slice(0, n).forEach((t, i) => {
+                if (i > 0) cols.push({ pic: '', num: join(p, (p.joins || [])[i - 1] || '', ctx, vals) });
+                cols.push({ pic: termModel(p, t, ctx), num: termFrac(p, t, ctx, vals) });
+            });
+            topRow = `<span class="fm-grid" style="display:inline-grid;grid-template-columns:repeat(${cols.length}, auto);column-gap:${L(ctx, 4)};row-gap:${L(ctx, 2)};">`
+                + cols.map((c) => `<span style="display:flex;align-items:flex-end;justify-content:center;">${c.pic}</span>`).join('')
+                + cols.map((c) => `<span style="display:flex;align-items:center;justify-content:center;">${c.num}</span>`).join('')
+                + `</span>`;
+        }
+        const eq = `${join(p, (p.joins || [])[n - 1] || '=', ctx, vals)}${renderTerm(p, terms[n], n, ctx, vals, true)}`;
         parts.push(`<span style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};flex:none;">`
-            + `<span${hold} style="display:flex;align-items:center;gap:${L(ctx, 4)};">${top.join('')}</span>`
-            + `<span${hold} style="display:flex;align-items:center;gap:${L(ctx, 4)};">${join(p, (p.joins || [])[n - 1] || '=', ctx, vals)}${renderTerm(p, terms[n], n, ctx, vals, true)}</span></span>`);
+            + (p.area
+                // the area model above a sentence of numbers, the sentence on one line
+                ? `${areaProduct(p, ctx)}<span${hold} style="display:flex;align-items:center;gap:${L(ctx, 4)};">${top.join('')}${eq}</span>`
+                : `${topRow}<span${hold} style="display:flex;align-items:center;gap:${L(ctx, 4)};">${eq}</span>`)
+            + `</span>`);
     } else {
         terms.forEach((t, i) => {
             if (i > 0) parts.push(join(p, (p.joins || [])[i - 1] || '', ctx, vals));
@@ -412,7 +513,8 @@ function renderRow(p, ctx) {
     // A sentence stays on ONE line on screen too (model, sign, model): the host shrinks the
     // drawing to fit rather than wrap a sign away from what it joins (data-mq-wrapped tells
     // fitTwinRows not to wrap it). A long sum already puts "= answer" on its own line.
-    return `<div class="fm-row"${slotAttrs}${shadeSlot}${model}${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;flex-wrap:nowrap;align-items:center;justify-content:center;`
+    const col = p.task === 'shade' && p.showAbove ? 'flex-direction:column;' : '';
+    return `<div class="fm-row"${slotAttrs}${shadeSlot}${model}${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;${col}flex-wrap:nowrap;align-items:center;justify-content:center;`
         + `gap:${L(ctx, pick ? 6 : 4)};row-gap:${L(ctx, 4)};">${parts.join('')}</div>`;
 }
 
@@ -423,12 +525,18 @@ function rowSize(p, ctx) {
     const box = inlineBoxMm(ctx, 2);
     const terms = p.terms || [];
     const below = p.fracAt ? p.fracAt === 'below' : terms.length > 1;
-    const fracW = (t) => (t.frac === 'none' ? 0 : t.frac === 'wnd' ? 2 * box.w + 1.5 : /^(n|d|nd)$/.test(t.frac || '') ? box.w
+    const fracW = (t) => (t.frac === 'none' ? 0 : t.frac === 'wnd' ? 2 * box.w + 1.5 : /^(n|d|nd|w)$/.test(t.frac || '') ? box.w
         : Math.max(7, String(Math.max(Number(t.n) || 0, Number(t.d) || 0)).length * dig * 0.62) + (Number(t.w) ? dig * 0.7 : 0));
-    const fracH = (t) => (t.frac === 'none' ? 0 : /^(n|d|nd|wnd)$/.test(t.frac || '') ? 2 * box.h + 2 : 2 * dig * 1.05 + 2);
+    const fracH = (t) => (t.frac === 'none' ? 0 : t.frac === 'w' ? box.h : /^(n|d|nd|wnd)$/.test(t.frac || '') ? 2 * box.h + 2
+        : (!Number(t.n) && Number(t.w)) ? dig * 1.05 : 2 * dig * 1.05 + 2);
     let w = 0, h = 0;
+    if (p.task === 'part') {
+        const t = terms[0] || {};
+        const label = (p.part === 'd' ? 11 : 9) * (textPt(ctx) + 2) * PT_MM * 0.55;
+        return { w: Math.max(fracW(t), label + 3 + dig * 0.7 + 3 + box.w), h: fracH(t) + 4 + box.h };
+    }
     if (p.task === 'pick') {
-        const one = terms.map((t) => (t.kind ? fracModelGeom({ n: t.n, d: t.d, kind: t.kind, size, wholeMm: p.wholeMm, blank: true }) : { wMm: 0, hMm: 0 }));
+        const one = terms.map((t) => (t.kind ? fracModelGeom({ n: t.n, d: t.d, kind: t.kind, size, wholeMm: p.wholeMm, barH: p.barH, blank: true }) : { wMm: 0, hMm: 0 }));
         const cw = Math.max(...one.map((g) => g.wMm)) + 11, ch = Math.max(...one.map((g) => g.hMm), 9);
         const cols = Math.min(2, terms.length), rows = Math.ceil(terms.length / cols);
         w = 12 + 5 + cols * cw + (cols - 1) * 6;
@@ -437,19 +545,35 @@ function rowSize(p, ctx) {
     }
     const split = answerLine(p);
     const list = split ? terms.slice(0, -1) : terms;
+    const stacked = split && !!p.stack;
+    const tb = stacked ? false : below;
     list.forEach((t, i) => {
-        const g = t.kind ? fracModelGeom({ n: t.n, d: t.d, w: t.w, kind: t.kind, size, wholeMm: p.wholeMm, blank: true, models: countsOf(t).models }) : { wMm: 0, hMm: 0 };
-        const tw = below ? Math.max(g.wMm, fracW(t)) : g.wMm + (fracW(t) ? fracW(t) + 5 : 0);
-        const th = below ? g.hMm + (fracH(t) ? fracH(t) + 2 : 0) : Math.max(g.hMm, fracH(t));
-        w += tw + (i > 0 ? 8 + 8 : 0);
-        h = Math.max(h, th + (t.letter ? 11 : 0));
+        const g = t.kind ? fracModelGeom({ n: t.n, d: t.d, w: t.w, kind: t.kind, size, wholeMm: p.wholeMm, blank: true, models: countsOf(t).models, copies: t.copies, perRow: p.perRow, barH: p.barH }) : { wMm: 0, hMm: 0 };
+        const tw = tb ? Math.max(g.wMm, fracW(t)) : g.wMm + (fracW(t) ? fracW(t) + 5 : 0);
+        const th = tb ? g.hMm + (fracH(t) ? fracH(t) + 2 : 0) : Math.max(g.hMm, fracH(t));
+        if (stacked) {
+            // one term under another, a sign line between them
+            w = Math.max(w, tw);
+            h += th + (i > 0 ? dig * 1.05 + 4 : 0);
+        } else {
+            w += tw + (i > 0 ? 8 + 8 : 0);
+            h = Math.max(h, th + (t.letter ? 11 : 0));
+        }
     });
     if (split) {
         const last = terms[terms.length - 1];
-        w = Math.max(w, 8 + fracW(last));
-        h += fracH(last) + 3;
+        if (p.area) {
+            // the area model over one line: the numbers, "=", the answer
+            const g = areaProductGeom(p.area, size, false);
+            w = Math.max(g.wMm, w + 16 + fracW(last));
+            h = g.hMm + 3 + Math.max(h, fracH(last));
+        } else {
+            w = Math.max(w, 8 + fracW(last));
+            h += fracH(last) + 3;
+        }
     }
-    if (p.show && (p.task === 'shade' || p.task === 'pick')) { w += 12 + 5; h = Math.max(h, 2 * dig * 1.05 + 2); }
+    if (p.show && p.task === 'shade' && p.showAbove) { w = Math.max(w, 12); h += 2 * dig * 1.05 + 2 + 4; }
+    else if (p.show && (p.task === 'shade' || p.task === 'pick')) { w += 12 + 5; h = Math.max(h, 2 * dig * 1.05 + 2); }
     return { w, h };
 }
 
@@ -464,14 +588,17 @@ register('frac-model', {
         if (p.task === 'shade') return { value: String(a.shade), display: `${a.shade} parts shaded`, slots: { answer: { value: String(a.shade), graded: true } } };
         if (p.task === 'pick') return { value: a.letter, display: a.letter, slots: { answer: { value: a.letter, graded: true } } };
         if (p.task === 'sign') return { value: a.sign, display: a.sign, slots: { sign: { value: a.sign, graded: true } } };
-        const t = (p.terms || []).find((x) => /^(n|d|nd|wnd)$/.test(x.frac || '')) || {};
+        if (p.task === 'part') return { value: Number(a.part), display: String(a.part), slots: { part: { value: String(a.part), graded: true } } };
+        const t = (p.terms || []).find((x) => /^(n|d|w|nd|wnd)$/.test(x.frac || '')) || {};
         const slots = {};
-        if (/n/.test(t.frac)) slots.n = { value: String(a.n), graded: true };
-        if (/d/.test(t.frac)) slots.d = { value: String(a.d), graded: true };
-        if (t.frac === 'wnd') slots.w = { value: a.w ? String(a.w) : '', graded: !!a.w };
-        const display = t.frac === 'n' ? String(a.n) : t.frac === 'd' ? String(a.d)
+        // a whole-number answer in a mixed number's boxes: the whole box only (never "0/1")
+        const part = t.frac !== 'wnd' || Number(a.n) > 0;
+        if (/n/.test(t.frac)) slots.n = { value: part ? String(a.n) : '', graded: part };
+        if (/d/.test(t.frac)) slots.d = { value: part ? String(a.d) : '', graded: part };
+        if (t.frac === 'wnd' || t.frac === 'w') slots.w = { value: a.w ? String(a.w) : '', graded: !!a.w || t.frac === 'w' };
+        const display = t.frac === 'n' ? String(a.n) : t.frac === 'd' ? String(a.d) : t.frac === 'w' ? String(a.w || 0)
             : `${a.w ? `${a.w} ` : ''}${Number(a.n) ? `${a.n}/${a.d}` : ''}`.trim() || String(a.w || 0);
-        return { value: t.frac === 'n' ? Number(a.n) : t.frac === 'd' ? Number(a.d) : display, display, slots };
+        return { value: t.frac === 'n' ? Number(a.n) : t.frac === 'd' ? Number(a.d) : t.frac === 'w' ? Number(a.w || 0) : display, display, slots };
     },
     footprint(p, ctx) {
         const { w, h } = rowSize(p, ctx);
@@ -482,7 +609,8 @@ register('frac-model', {
         if (p.task === 'shade') return [{ id: 'answer', kind: 'number', shape: 'draw', graded: true, order: 0, scopes: ['full'] }];
         if (p.task === 'pick') return [{ id: 'answer', kind: 'choice', shape: 'choice', graded: true, order: 0, scopes: ['full'] }];
         if (p.task === 'sign') return [{ id: 'sign', kind: 'sign', shape: 'circle', graded: true, order: 0, scopes: ['full', 'answer-only'] }];
-        const t = (p.terms || []).find((x) => /^(n|d|nd|wnd)$/.test(x.frac || '')) || {};
+        if (p.task === 'part') return [{ id: 'part', kind: 'number', shape: 'box', graded: true, order: 0, inputmode: 'numeric', scopes: ['full', 'answer-only'] }];
+        const t = (p.terms || []).find((x) => /^(n|d|w|nd|wnd)$/.test(x.frac || '')) || {};
         const ids = t.frac === 'wnd' ? ['w', 'n', 'd'] : t.frac === 'nd' ? ['n', 'd'] : [t.frac || 'n'];
         return ids.map((id, k) => ({ id, kind: 'number', shape: 'box', graded: true, order: k, inputmode: 'numeric', scopes: ['full', 'answer-only'] }));
     },

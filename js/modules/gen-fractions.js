@@ -85,16 +85,24 @@ function _fParts(str) {
  * whole (never the answer: RP-1), "=", and the answer boxes - a mixed number's three boxes when
  * the answer can be 1 or more (`mixed`), a fraction's two otherwise. Pictures off: numbers only.
  */
-function _fSentenceKit(q, terms, ops, kind, { mixed = false, wholeMm = 26 } = {}) {
+function _fSentenceKit(q, terms, ops, kind, { mixed = false, wholeMm = 26, stack = false, perRow = 0, area = null, barH = 0 } = {}) {
     const k = _fPicturesOff() ? null : kind;
     const a = _fParts(q.ans) || {};
+    // the answer's boxes: a mixed number's three where the answer can reach 1, a fraction's two,
+    // one box where the answer can only be a whole number (a whole divided by a unit fraction)
+    const whole = !a.n && !mixed;
     const payload = {
         task: 'op',
-        terms: [...terms.map(t => Object.assign({}, t, { kind: t.kind === null ? null : k })), { n: a.n || 0, d: a.d || 1, frac: mixed ? 'wnd' : 'nd' }],
+        terms: [...terms.map(t => Object.assign({}, t, { kind: t.kind === null ? null : k })),
+            { n: a.n || 0, d: a.d || 1, frac: mixed ? 'wnd' : whole ? 'w' : 'nd' }],
         joins: [...ops, '='],
         answer: { w: a.w || 0, n: a.n || 0, d: a.d || 1 },
         wholeMm,
     };
+    if (stack && k) payload.stack = true;
+    if (perRow) payload.perRow = perRow;
+    if (barH) payload.barH = barH;
+    if (area && !_fPicturesOff()) payload.area = area;
     _fKit(q, payload);
     q.fractionModel = k;
 }
@@ -455,28 +463,14 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     ? `Add wholes: ${w1} + ${w2} = ${w1 + w2}. Add fractions: ${f1}/${den} + ${f2}/${den} = ${fracSum}/${den} = 1 ${fracSum - den}/${den}. Regroup!`
                     : `Add wholes: ${w1} + ${w2} = ${w1 + w2}. Add fractions: ${f1}/${den} + ${f2}/${den} = ${fracSum}/${den}.`;
 
-                const barW = 240;
-                const barH = 26;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Add Mixed Numbers</div>
-                    <div style="font-size:1.2rem;margin-bottom:14px;">
-                        <span style="color:var(--accent-cyan);font-weight:700;">${w1} ${fracHTML(f1, den)}</span>
-                        <span style="margin:0 10px;font-size:1.3rem;">+</span>
-                        <span style="color:var(--accent-purple);font-weight:700;">${w2} ${fracHTML(f2, den)}</span>
-                        <span style="margin:0 10px;font-size:1.3rem;">=</span>
-                        <span style="color:var(--accent-green);font-weight:700;font-size:1.3rem;">?</span>
-                    </div>
-                    <div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-                        ${Array.from({length: w1}, () => _svgBar(den, den, 60, barH, 'var(--accent-cyan)', 'var(--bg-card)')).join('')}
-                        ${_svgBar(f1, den, 60, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
-                    </div>
-                    <div style="font-size:1.2rem;font-weight:700;margin:4px 0;">+</div>
-                    <div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-                        ${Array.from({length: w2}, () => _svgBar(den, den, 60, barH, 'var(--accent-purple)', 'var(--bg-card)')).join('')}
-                        ${_svgBar(f2, den, 60, barH, 'var(--accent-purple)', 'var(--bg-card)')}
-                    </div>
-                    ${needsRegroup ? `<div style="margin-top:8px;font-size:0.85rem;color:var(--accent-orange);">Fraction parts add to ${fracSum}/${den} \u2014 regroup!</div>` : ''}
-                </div>`;
+                // KIT (O6 lane AP3): the two mixed numbers drawn as wholes and a part, one under the
+                // other, in black and white on paper and screen; never the sum (RP-1). Bars unless
+                // the teacher ticked other models.
+                {
+                    const _mk = _fModelPick() || 'bar';
+                    _fSentenceKit(q, [{ w: w1, n: f1, d: den }, { w: w2, n: f2, d: den }], ['+'], _mk,
+                        { mixed: true, wholeMm: _mk === 'line' ? 12 : 20, stack: true, perRow: 2, barH: 9 });
+                }
                 return;
 
             } else if (fracSkill === "sub_mixed_like" && Math.random() < 0.25) {
@@ -544,28 +538,14 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     ? `Since ${f1}/${den} < ${f2}/${den}, borrow 1 whole (${den}/${den}) from ${w1}. Then ${w1 - 1} ${f1 + den}/${den} \u2212 ${w2} ${f2}/${den}.`
                     : `Subtract wholes: ${w1} \u2212 ${w2} = ${w1 - w2}. Subtract fractions: ${f1}/${den} \u2212 ${f2}/${den} = ${f1 - f2}/${den}.`;
 
-                const barW = 240;
-                const barH = 26;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Subtract Mixed Numbers</div>
-                    <div style="font-size:1.2rem;margin-bottom:14px;">
-                        <span style="color:var(--accent-cyan);font-weight:700;">${w1} ${fracHTML(f1, den)}</span>
-                        <span style="margin:0 10px;font-size:1.3rem;">\u2212</span>
-                        <span style="color:var(--accent-orange);font-weight:700;">${w2} ${fracHTML(f2, den)}</span>
-                        <span style="margin:0 10px;font-size:1.3rem;">=</span>
-                        <span style="color:var(--accent-green);font-weight:700;font-size:1.3rem;">?</span>
-                    </div>
-                    <div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-                        ${Array.from({length: w1}, () => _svgBar(den, den, 60, barH, 'var(--accent-cyan)', 'var(--bg-card)')).join('')}
-                        ${f1 > 0 ? _svgBar(f1, den, 60, barH, 'var(--accent-cyan)', 'var(--bg-card)') : ''}
-                    </div>
-                    <div style="font-size:1.2rem;font-weight:700;margin:4px 0;color:var(--accent-orange);">\u2212</div>
-                    <div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-                        ${Array.from({length: w2}, () => _svgBar(den, den, 60, barH, 'var(--accent-orange)', 'var(--bg-card)')).join('')}
-                        ${_svgBar(f2, den, 60, barH, 'var(--accent-orange)', 'var(--bg-card)')}
-                    </div>
-                    ${needsBorrow ? `<div style="margin-top:8px;font-size:0.85rem;color:var(--accent-orange);">Need to borrow! ${f1}/${den} < ${f2}/${den}</div>` : ''}
-                </div>`;
+                // KIT (O6 lane AP3): the two mixed numbers drawn as wholes and a part, one under the
+                // other, in black and white on paper and screen; never the sum (RP-1). Bars unless
+                // the teacher ticked other models.
+                {
+                    const _mk = _fModelPick() || 'bar';
+                    _fSentenceKit(q, [{ w: w1, n: f1, d: den }, { w: w2, n: f2, d: den }], ['\u2212'], _mk,
+                        { mixed: true, wholeMm: _mk === 'line' ? 12 : 20, stack: true, perRow: 2, barH: 9 });
+                }
                 return;
 
             } else if (fracSkill === "mult_frac_whole" && Math.random() < 0.25) {
@@ -633,23 +613,15 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.answerType = "text";
                 q.hint = `Multiply the numerator by the whole number: ${num} × ${whole} = ${prodNum}. Keep the denominator: ${prodNum}/${den}. Simplify if needed.`;
 
-                const barW = 70;
-                const barH = 28;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Multiply Fraction × Whole</div>
-                    <div style="font-size:1.2rem;margin-bottom:14px;">
-                        ${showOrder ? `<span style="font-size:1.5rem;font-weight:700;color:var(--accent-orange);">${whole}</span> <span style="margin:0 6px;">×</span> ${fracHTML(num, den, 'xl')}` : `${fracHTML(num, den, 'xl')} <span style="margin:0 6px;">×</span> <span style="font-size:1.5rem;font-weight:700;color:var(--accent-orange);">${whole}</span>`}
-                        <span style="margin:0 8px;">=</span>
-                        <span style="font-size:1.3rem;color:var(--accent-green);font-weight:700;">?</span>
-                    </div>
-                    <div style="font-size:0.9rem;color:var(--text-bright);margin-bottom:8px;">${whole} groups of ${num}/${den}:</div>
-                    <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
-                        ${Array.from({length: whole}, (_, i) => `<div style="text-align:center;">
-                            ${_svgBar(num, den, barW, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
-                            <div style="font-size:0.75rem;color:var(--text-dim);">Group ${i + 1}</div>
-                        </div>`).join('')}
-                    </div>
-                </div>`;
+                // KIT (O6 lane AP3): the whole number of equal groups of the fraction, each group a
+                // model of n/d (4.NF.4a); the pupil counts the shaded parts, the answer is never drawn.
+                {
+                    const _mk = _fModelPick() || 'bar';
+                    const _grp = { n: num, d: den, copies: whole };
+                    const _wn = { w: whole, n: 0, d: 1, kind: null };
+                    _fSentenceKit(q, showOrder ? [_wn, _grp] : [_grp, _wn], ['\u00d7'], _mk,
+                        { mixed: prodNum >= den, wholeMm: 16, perRow: 2, barH: 9 });
+                }
                 return;
 
             } else if (fracSkill === "decompose_fractions" && Math.random() < 0.25) {
@@ -997,26 +969,13 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.answerType = "text";
                 q.hint = `Find LCD = ${lcd}. Convert: ${n1}/${d1} = ${conv1}/${lcd} and ${n2}/${d2} = ${conv2}/${lcd}. Add: ${conv1}/${lcd} + ${conv2}/${lcd} = ${sumNum}/${lcd}. Simplify.`;
 
-                const barW = 260;
-                const barH = 28;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Add Fractions (Unlike Denominators)</div>
-                    <div style="font-size:1.2rem;margin-bottom:14px;">
-                        ${fracHTML(n1, d1, 'xl')} <span style="margin:0 8px;font-size:1.3rem;">+</span> ${fracHTML(n2, d2, 'xl')} <span style="margin:0 8px;font-size:1.3rem;">=</span> <span style="font-size:1.3rem;color:var(--accent-green);font-weight:700;">?</span>
-                    </div>
-                    <div style="margin-bottom:6px;font-size:0.85rem;color:var(--text-bright);">Original:</div>
-                    <div style="display:flex;justify-content:center;gap:10px;margin-bottom:8px;">
-                        <div>${_svgBar(n1, d1, 120, barH, 'var(--accent-cyan)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${n1}/${d1}</div></div>
-                        <div>${_svgBar(n2, d2, 120, barH, 'var(--accent-purple)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${n2}/${d2}</div></div>
-                    </div>
-                    <div style="background:rgba(255,255,255,0.08);padding:10px;border-radius:10px;margin:8px auto;max-width:300px;">
-                        <div style="font-size:0.85rem;color:var(--accent-green);margin-bottom:6px;">LCD = <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--accent-green);">&nbsp;</span></div>
-                        <div style="display:flex;justify-content:center;gap:10px;">
-                            <div>${_svgBar(conv1, lcd, 120, barH, 'var(--accent-cyan)', 'var(--bg-card)')}<div style="font-size:0.75rem;">__/__</div></div>
-                            <div>${_svgBar(conv2, lcd, 120, barH, 'var(--accent-purple)', 'var(--bg-card)')}<div style="font-size:0.75rem;">__/__</div></div>
-                        </div>
-                    </div>
-                </div>`;
+                // KIT (O6 lane AP3): both fractions drawn on the same whole, each cut into its own
+                // parts - the pupil finds the common denominator; never the answer (RP-1).
+                {
+                    const _mk = _fModelPick() || 'bar';
+                    _fSentenceKit(q, [{ n: n1, d: d1 }, { n: n2, d: d2 }], ['+'], _mk,
+                        { mixed: sumNum >= lcd, wholeMm: _mk === 'line' ? 40 : 26 });
+                }
                 return;
 
             } else if (fracSkill === "sub_frac_unlike" && Math.random() < 0.25) {
@@ -1084,26 +1043,13 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.answerType = "text";
                 q.hint = `Find LCD = ${lcd}. Convert: ${n1}/${d1} = ${conv1}/${lcd} and ${n2}/${d2} = ${conv2}/${lcd}. Subtract: ${conv1}/${lcd} \u2212 ${conv2}/${lcd} = ${diffNum}/${lcd}. Simplify.`;
 
-                const barW = 260;
-                const barH = 28;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Subtract Fractions (Unlike Denominators)</div>
-                    <div style="font-size:1.2rem;margin-bottom:14px;">
-                        ${fracHTML(n1, d1, 'xl')} <span style="margin:0 8px;font-size:1.3rem;">\u2212</span> ${fracHTML(n2, d2, 'xl')} <span style="margin:0 8px;font-size:1.3rem;">=</span> <span style="font-size:1.3rem;color:var(--accent-green);font-weight:700;">?</span>
-                    </div>
-                    <div style="margin-bottom:6px;font-size:0.85rem;color:var(--text-bright);">Original:</div>
-                    <div style="display:flex;justify-content:center;gap:10px;margin-bottom:8px;">
-                        <div>${_svgBar(n1, d1, 120, barH, 'var(--accent-cyan)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${n1}/${d1}</div></div>
-                        <div>${_svgBar(n2, d2, 120, barH, 'var(--accent-orange)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${n2}/${d2}</div></div>
-                    </div>
-                    <div style="background:rgba(255,255,255,0.08);padding:10px;border-radius:10px;margin:8px auto;max-width:300px;">
-                        <div style="font-size:0.85rem;color:var(--accent-green);margin-bottom:6px;">LCD = <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--accent-green);">&nbsp;</span></div>
-                        <div style="display:flex;justify-content:center;gap:10px;">
-                            <div>${_svgBar(conv1, lcd, 120, barH, 'var(--accent-cyan)', 'var(--bg-card)')}<div style="font-size:0.75rem;">__/__</div></div>
-                            <div>${_svgBar(conv2, lcd, 120, barH, 'var(--accent-orange)', 'var(--bg-card)')}<div style="font-size:0.75rem;">__/__</div></div>
-                        </div>
-                    </div>
-                </div>`;
+                // KIT (O6 lane AP3): both fractions drawn on the same whole, each cut into its own
+                // parts - the pupil finds the common denominator; never the answer (RP-1).
+                {
+                    const _mk = _fModelPick() || 'bar';
+                    _fSentenceKit(q, [{ n: n1, d: d1 }, { n: n2, d: d2 }], ['\u2212'], _mk,
+                        { mixed: false, wholeMm: _mk === 'line' ? 40 : 26 });
+                }
                 return;
 
             } else if (fracSkill === "add_mixed_unlike" && Math.random() < 0.25) {
@@ -1208,29 +1154,14 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.answerType = "text";
                 q.hint = `Find LCD = ${lcd}. Convert fractions: ${f1}/${d1} = ${conv1}/${lcd}, ${f2}/${d2} = ${conv2}/${lcd}. Add wholes: ${w1} + ${w2} = ${w1 + w2}. Add fractions: ${conv1}/${lcd} + ${conv2}/${lcd} = ${fracSum}/${lcd}. Simplify.`;
 
-                const barH = 24;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Add Mixed Numbers (Unlike Denominators)</div>
-                    <div style="font-size:1.1rem;margin-bottom:14px;">
-                        <span style="color:var(--accent-cyan);font-weight:700;">${w1} ${fracHTML(f1, d1)}</span>
-                        <span style="margin:0 8px;">+</span>
-                        <span style="color:var(--accent-purple);font-weight:700;">${w2} ${fracHTML(f2, d2)}</span>
-                        <span style="margin:0 8px;">=</span>
-                        <span style="color:var(--accent-green);font-weight:700;">?</span>
-                    </div>
-                    <div style="background:rgba(255,255,255,0.08);padding:10px;border-radius:10px;max-width:300px;margin:0 auto;">
-                        <div style="font-size:0.85rem;color:var(--accent-green);margin-bottom:8px;">LCD = <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--accent-green);">&nbsp;</span></div>
-                        <div style="margin-bottom:6px;">
-                            <div style="font-size:0.8rem;color:var(--text-bright);">${f1}/${d1} = __/__</div>
-                            ${_svgBar(conv1, lcd, 200, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
-                        </div>
-                        <div style="font-size:1rem;font-weight:700;">+</div>
-                        <div>
-                            <div style="font-size:0.8rem;color:var(--text-bright);">${f2}/${d2} = __/__</div>
-                            ${_svgBar(conv2, lcd, 200, barH, 'var(--accent-purple)', 'var(--bg-card)')}
-                        </div>
-                    </div>
-                </div>`;
+                // KIT (O6 lane AP3): the two mixed numbers drawn as wholes and a part, one under the
+                // other, in black and white on paper and screen; never the sum (RP-1). Bars unless
+                // the teacher ticked other models.
+                {
+                    const _mk = _fModelPick() || 'bar';
+                    _fSentenceKit(q, [{ w: w1, n: f1, d: d1 }, { w: w2, n: f2, d: d2 }], ['+'], _mk,
+                        { mixed: true, wholeMm: _mk === 'line' ? 12 : 20, stack: true, perRow: 2, barH: 9 });
+                }
                 return;
 
             } else if (fracSkill === "sub_mixed_unlike" && Math.random() < 0.25) {
@@ -1300,30 +1231,14 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.answerType = "text";
                 q.hint = `Find LCD = ${lcd}. Convert: ${f1}/${d1} = ${conv1}/${lcd}, ${f2}/${d2} = ${conv2}/${lcd}.${needsBorrow ? ` Since ${conv1}/${lcd} < ${conv2}/${lcd}, borrow 1 whole (${lcd}/${lcd}).` : ''} Subtract.`;
 
-                const barH = 24;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Subtract Mixed Numbers (Unlike Denominators)</div>
-                    <div style="font-size:1.1rem;margin-bottom:14px;">
-                        <span style="color:var(--accent-cyan);font-weight:700;">${w1} ${fracHTML(f1, d1)}</span>
-                        <span style="margin:0 8px;">\u2212</span>
-                        <span style="color:var(--accent-orange);font-weight:700;">${w2} ${fracHTML(f2, d2)}</span>
-                        <span style="margin:0 8px;">=</span>
-                        <span style="color:var(--accent-green);font-weight:700;">?</span>
-                    </div>
-                    <div style="background:rgba(255,255,255,0.08);padding:10px;border-radius:10px;max-width:300px;margin:0 auto;">
-                        <div style="font-size:0.85rem;color:var(--accent-green);margin-bottom:8px;">LCD = <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--accent-green);">&nbsp;</span></div>
-                        <div style="margin-bottom:6px;">
-                            <div style="font-size:0.8rem;color:var(--text-bright);">${f1}/${d1} = __/__</div>
-                            ${_svgBar(conv1, lcd, 200, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
-                        </div>
-                        <div style="font-size:1rem;font-weight:700;color:var(--accent-orange);">\u2212</div>
-                        <div>
-                            <div style="font-size:0.8rem;color:var(--text-bright);">${f2}/${d2} = __/__</div>
-                            ${_svgBar(conv2, lcd, 200, barH, 'var(--accent-orange)', 'var(--bg-card)')}
-                        </div>
-                        ${needsBorrow ? `<div style="margin-top:6px;font-size:0.8rem;color:var(--accent-orange);">Borrowing needed!</div>` : ''}
-                    </div>
-                </div>`;
+                // KIT (O6 lane AP3): the two mixed numbers drawn as wholes and a part, one under the
+                // other, in black and white on paper and screen; never the sum (RP-1). Bars unless
+                // the teacher ticked other models.
+                {
+                    const _mk = _fModelPick() || 'bar';
+                    _fSentenceKit(q, [{ w: w1, n: f1, d: d1 }, { w: w2, n: f2, d: d2 }], ['\u2212'], _mk,
+                        { mixed: true, wholeMm: _mk === 'line' ? 12 : 20, stack: true, perRow: 2, barH: 9 });
+                }
                 return;
 
             // ==================== NON-VISUAL ADD/SUB FRACTION SKILLS ====================
@@ -3036,46 +2951,12 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.answerType = "text";
                 q.hint = `Multiply numerators: ${n1} × ${n2} = ${prodN}. Multiply denominators: ${d1} × ${d2} = ${prodD}. Answer: ${prodN}/${prodD}. Simplify.`;
 
-                // Area model: rectangle with horizontal and vertical divisions
-                const rectW = 200;
-                const rectH = 200;
-                const colW = rectW / d2;
-                const rowH = rectH / d1;
-                let areaRects = '';
-                // Draw grid
-                for (let r = 0; r < d1; r++) {
-                    for (let c = 0; c < d2; c++) {
-                        const isHoriz = r < n1;
-                        const isVert = c < n2;
-                        let fill, opacity;
-                        if (isHoriz && isVert) {
-                            fill = 'var(--accent-green)'; opacity = '0.85';
-                        } else if (isHoriz) {
-                            fill = 'var(--accent-cyan)'; opacity = '0.35';
-                        } else if (isVert) {
-                            fill = 'var(--accent-purple)'; opacity = '0.35';
-                        } else {
-                            fill = 'var(--bg-card)'; opacity = '0.15';
-                        }
-                        areaRects += `<rect x="${c * colW}" y="${r * rowH}" width="${colW}" height="${rowH}" fill="${fill}" stroke="var(--text-bright)" stroke-width="1" opacity="${opacity}"/>`;
-                    }
-                }
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Multiply Fractions (Area Model)</div>
-                    <div style="font-size:1.2rem;margin-bottom:14px;">
-                        ${fracHTML(n1, d1, 'xl')} <span style="margin:0 8px;">×</span> ${fracHTML(n2, d2, 'xl')} <span style="margin:0 8px;">=</span> <span style="color:var(--accent-green);font-weight:700;">?</span>
-                    </div>
-                    <svg width="${rectW + 4}" height="${rectH + 4}" viewBox="-2 -2 ${rectW + 4} ${rectH + 4}" style="display:block;margin:0 auto;">
-                        ${areaRects}
-                        <rect x="0" y="0" width="${rectW}" height="${rectH}" fill="none" stroke="var(--text-bright)" stroke-width="2"/>
-                    </svg>
-                    <div style="margin-top:10px;display:flex;justify-content:center;gap:16px;font-size:0.85rem;">
-                        <span><span style="display:inline-block;width:14px;height:14px;background:var(--accent-cyan);opacity:0.5;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>${n1}/${d1}</span>
-                        <span><span style="display:inline-block;width:14px;height:14px;background:var(--accent-purple);opacity:0.5;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>${n2}/${d2}</span>
-                        <span><span style="display:inline-block;width:14px;height:14px;background:var(--accent-green);opacity:0.85;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>overlap = ${prodN}/${prodD}</span>
-                    </div>
-                </div>`;
+                // KIT (O6 lane AP3): the area model of 5.NF.4b WITHOUT the answer (the legacy picture
+                // coloured the overlap and printed "overlap = n/d"): d1 rows by d2 columns, the
+                // first factor's rows shaded, the second factor's columns bracketed. The pupil
+                // counts the shaded cells inside the bracket and all the cells.
+                _fSentenceKit(q, [{ n: n1, d: d1, kind: null }, { n: n2, d: d2, kind: null }], ['\u00d7'], 'area',
+                    { area: { rows: d1, cols: d2, shadeRows: n1, markCols: n2, n1, d1, n2, d2 } });
                 return;
 
             } else if (fracSkill === "div_unit_fraction" && Math.random() < 0.25) {
@@ -3126,67 +3007,31 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = 'Div Unit Frac';
                 return;
             } else if (fracSkill === "div_unit_fraction") {
-                // Grade 5: Divide with unit fractions
+                // Grade 5: Divide with unit fractions. KIT (O6 lane AP3): the dividend is drawn - the
+                // wholes cut into 1/d parts, or the one unit fraction - and the divisor is a number;
+                // the answer is never drawn (the legacy strip split 1/d and lit one piece of the
+                // answer's size). Bars unless the teacher ticked other models.
                 const mode = Math.random() < 0.5 ? "whole_div_frac" : "frac_div_whole";
-                let questionText, answer, hintText, visualHTML;
-
+                q.answerType = "text";
                 if (mode === "whole_div_frac") {
                     // whole / (1/d) = whole * d
                     const d = pick([2, 3, 4, 5, 6, 8]);
                     const whole = rng(1, 5);
                     const ans = whole * d;
-                    questionText = `${whole} ÷ 1/${d} = ?`;
-                    answer = String(ans);
-                    hintText = `How many 1/${d}'s fit into ${whole}? Each whole has ${d} pieces of 1/${d}, so ${whole} × ${d} = ${ans}.`;
-
-                    const stripW = 220;
-                    const stripH = 28;
-                    const segW = stripW / d;
-                    let strips = '';
-                    for (let w = 0; w < whole; w++) {
-                        let segs = '';
-                        for (let i = 0; i < d; i++) {
-                            segs += `<rect x="${i * segW}" y="0" width="${segW}" height="${stripH}" fill="var(--accent-cyan)" stroke="var(--text-bright)" stroke-width="1" opacity="0.8"/>`;
-                            segs += `<text x="${i * segW + segW / 2}" y="${stripH / 2 + 4}" text-anchor="middle" fill="var(--text-bright)" font-size="10">1/${d}</text>`;
-                        }
-                        strips += `<div style="margin:2px 0;"><svg width="${stripW}" height="${stripH}" viewBox="0 0 ${stripW} ${stripH}">${segs}</svg><span style="font-size:0.75rem;margin-left:6px;">= 1</span></div>`;
-                    }
-                    visualHTML = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Divide by Unit Fraction</div>
-                        <div style="font-size:1.3rem;margin-bottom:14px;">${whole} ÷ ${fracHTML(1, d, 'xl')} = <span style="color:var(--accent-green);font-weight:700;">?</span></div>
-                        <div style="font-size:0.9rem;margin-bottom:8px;color:var(--text-bright);">How many 1/${d}'s in ${whole}?</div>
-                        ${strips}
-                        <div style="margin-top:8px;font-size:0.85rem;color:var(--accent-green);">Count all pieces: ${whole} × ${d} = ?</div>
-                    </div>`;
+                    q.text = `${whole} ÷ 1/${d} = ?`;
+                    q.ans = String(ans);
+                    q.hint = `How many 1/${d}'s fit into ${whole}? Each whole has ${d} pieces of 1/${d}, so ${whole} × ${d} = ${ans}.`;
+                    _fSentenceKit(q, [{ w: whole, n: 0, d }, { n: 1, d, kind: null }], ['\u00f7'], _fModelPick() || 'bar', { wholeMm: 18, perRow: 2, barH: 9 });
                 } else {
                     // (1/d) / whole = 1/(d*whole)
                     const d = pick([2, 3, 4, 5, 6]);
                     const whole = rng(2, 5);
                     const ansD = d * whole;
-                    questionText = `1/${d} ÷ ${whole} = ?`;
-                    answer = `1/${ansD}`;
-                    hintText = `Split 1/${d} into ${whole} equal parts. Each part is 1/(${d} × ${whole}) = 1/${ansD}.`;
-
-                    const stripW = 240;
-                    const stripH = 40;
-                    const mainSegW = stripW;
-                    const subSegW = stripW / whole;
-                    visualHTML = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Divide Unit Fraction by Whole</div>
-                        <div style="font-size:1.3rem;margin-bottom:14px;">${fracHTML(1, d, 'xl')} ÷ <span style="font-size:1.5rem;font-weight:700;">${whole}</span> = <span style="color:var(--accent-green);font-weight:700;">?</span></div>
-                        <div style="font-size:0.9rem;margin-bottom:8px;color:var(--text-bright);">Split 1/${d} into ${whole} equal parts. What size is each piece?</div>
-                        <svg width="${stripW + 4}" height="${stripH + 4}" viewBox="-2 -2 ${stripW + 4} ${stripH + 4}" style="display:block;margin:0 auto;">
-                            <rect x="0" y="0" width="${mainSegW}" height="${stripH}" fill="var(--accent-cyan)" stroke="var(--text-bright)" stroke-width="2" opacity="0.4"/>
-                            ${Array.from({length: whole}, (_, i) => `<rect x="${i * subSegW}" y="0" width="${subSegW}" height="${stripH}" fill="${i === 0 ? 'var(--accent-green)' : 'var(--accent-cyan)'}" stroke="var(--text-bright)" stroke-width="1.5" opacity="${i === 0 ? '0.85' : '0.3'}"/>`).join('')}
-                        </svg>
-                    </div>`;
+                    q.text = `1/${d} ÷ ${whole} = ?`;
+                    q.ans = `1/${ansD}`;
+                    q.hint = `Split 1/${d} into ${whole} equal parts. Each part is 1/(${d} × ${whole}) = 1/${ansD}.`;
+                    _fSentenceKit(q, [{ n: 1, d }, { w: whole, n: 0, d: 1, kind: null }], ['\u00f7'], _fModelPick() || 'bar', { wholeMm: 26 });
                 }
-
-                q.text = questionText;
-                q.ans = answer;
-                q.answerType = "text";
-                q.hint = hintText;
-                q.visual = visualHTML;
                 return;
 
             } else if (fracSkill === "frac_as_division" && Math.random() < 0.25) {
@@ -5243,7 +5088,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.options = letters.slice(0, all.length);
                     q.hint = `Count the equal parts (${tDen}). Find the model with ${tNum} of them shaded.`;
                     q.skillLabel = 'Identify Fractions';
-                    _fKit(q, { task: 'pick', show: { n: tNum, d: tDen }, terms, answer: { letter: right }, wholeMm: 22 });
+                    _fKit(q, { task: 'pick', show: { n: tNum, d: tDen }, terms, answer: { letter: right }, wholeMm: 19, barH: 11 });
                     return;
                 }
                 if (idVariant === 'partLabel') {
@@ -5261,8 +5106,11 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         q.hint = `The denominator is the BOTTOM number of a fraction.`;
                     }
                     q.answerType = 'number';
-                    q.options = buildNumericOptions(q.ans);
+                    // Written on paper, so typed on screen (never a row of number buttons): the
+                    // printed fraction, the part's name and one box (the kit's `part` task).
+                    q.options = [];
                     q.skillLabel = 'Identify Fractions';
+                    _fKit(q, { task: 'part', part: askNum ? 'n' : 'd', terms: [{ n: plNum, d: plDen }], answer: { part: q.ans } });
                     return;
                 }
                 // Level 1: Identify fractions from visual
@@ -5331,7 +5179,10 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.fractionData = { num, den, model: _sfModel };
                 q.fractionModel = _sfModel;
                 q.skillLabel = 'Shade Frac';
-                _fKit(q, { task: 'shade', show: { n: num, d: den }, terms: [{ n: num, d: den, kind: _sfModel, blank: true, frac: 'none' }], answer: { shade: num } });
+                // a bar or a rectangle is short: its fraction stands above it, so the cell is as
+                // tall as a circle's and a row of mixed models has no empty band (RUBRIC H13)
+                _fKit(q, { task: 'shade', show: { n: num, d: den }, terms: [{ n: num, d: den, kind: _sfModel, blank: true, frac: 'none' }], answer: { shade: num },
+                    ...(_sfModel === 'bar' || _sfModel === 'area' ? { showAbove: true } : {}) });
                 return;
             } else if (fracSkill === "select_equiv_frac") {
                 // MAP-style multi-select-check: "Click ALL fractions equivalent to N/D"

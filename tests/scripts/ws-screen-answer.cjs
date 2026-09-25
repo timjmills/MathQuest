@@ -81,6 +81,15 @@ function PLAN(rootSel, which) {
         if (sp && vis(sp)) tag(sp, { type: 'domclick' });
         return { plan, q: String(t) };
     }
+    // a "Click ALL ..." list (multi-select-check): tap every right option, then its Submit
+    const msc = all('.msc-opt');
+    if (msc.length && Array.isArray(ans)) {
+        msc.filter(b => ans.includes(b.dataset.id)).forEach(b => tag(b, { type: 'domclick' }));
+        // the card and each worksheet card grade the list on its own Submit
+        const sub = root.querySelector('.msc-submit');
+        if (sub && which.host !== 'quiz') tag(sub, { type: 'domclick' });
+        return { plan, q: ans.join(',') };
+    }
     // a sign circle (frac-model, pv compare): tap the sign tile that is the answer
     const signTiles = all('.mq-signtile');
     if (signTiles.length) {
@@ -356,7 +365,14 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
                 const m = res.match(/Score:\s*(\d+)\/(\d+)/);
                 const ok = m && m[1] === m[2] && +m[2] > 0;
                 line.push(`worksheet ${ok ? 'ok' : 'WRONG'} (${m ? `${m[1]}/${m[2]}` : res})`);
-                if (!ok) fails.push(`${s} worksheet: ${res}`);
+                if (!ok) {
+                    // which cards: the answer type and the card's verdict class
+                    const per = await page.evaluate(() => window.state.worksheetQs.map((q, i) => {
+                        const c = document.getElementById(`ws_card_${i}`);
+                        return `${i + 1}:${q.answerType}:${c ? (c.className.match(/\b(correct|incorrect|wrong)\b/) || ['?'])[0] : '?'}`;
+                    }).join(' '));
+                    fails.push(`${s} worksheet: ${res} [${per}]`);
+                }
             }
             // the score pop-up covers the page; a pupil closes it before the next task
             await page.evaluate(() => { Array.from(document.body.children).filter(e => getComputedStyle(e).position === 'fixed' && getComputedStyle(e).zIndex === '9999').forEach(e => e.remove()); });

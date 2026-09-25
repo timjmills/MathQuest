@@ -2761,6 +2761,14 @@ const _ap3Ticks = (values, dflt, help) => ({
 const _AP3_ADD_LINE = _ap3Ticks([['one', 'Every number: 0, 1, 2, 3 …'], ['some', 'Every 2nd number: 0, 2, 4 …'], ['ends', 'The two ends only']], 'one',
     'Which ticks carry a numeral. Every number has a tick and every hop is one number whatever you choose; '
     + 'the dot the pupil starts from is always numbered. Fewer numerals make the pupil count along the ticks.');
+const _AP3_MIXED = _ap3Model(['bar', 'area', 'circle', 'line'], ['bar'],
+    'Default: bars. Each mixed number is drawn as its wholes and a part (two wholes to a row), the two numbers one '
+    + 'under the other, in black and white on paper and screen; the answer is never drawn. On a number line a dot '
+    + 'marks each number. Pictures off prints numbers only.', (o) => o.pictures !== false);
+const _AP3_UNLIKE = _ap3Model(['bar', 'area', 'circle', 'line'], ['bar'],
+    'Default: bars. Both fractions are drawn on the same size of whole, each cut into its own parts, so the pupil '
+    + 'sees why a common denominator is needed; the answer is never drawn. Pictures off prints numbers only.',
+    (o) => o.pictures !== false);
 const _AP3_OPTIONS = {
     'fractions:identify': [_ap3Model(['area', 'bar', 'circle', 'line'], ['bar', 'circle'],
         'Default: circles and bars, mixed, as the skill always drew. The pictures of the "What fraction is shaded?" and '
@@ -2787,6 +2795,22 @@ const _AP3_OPTIONS = {
     'fraction_operations:sub_fractions_like': [_ap3Model(['bar', 'area', 'circle'], ['bar'],
         'Default: the skill\'s own bars. A rectangle or a circle draws both fractions that way, in black and white, and '
         + 'never draws the answer. Pictures off prints numbers only.', (o) => o.pictures !== false)],
+    // #4 of the AP3 fixes: the fraction-operations picture skills, redrawn in black and white by the
+    // kit (never the answer). Bars stay the default, as the skills drew them.
+    'fraction_operations:add_mixed_like': [_AP3_MIXED],
+    'fraction_operations:sub_mixed_like': [_AP3_MIXED],
+    'fraction_operations:add_mixed_unlike': [_AP3_MIXED],
+    'fraction_operations:sub_mixed_unlike': [_AP3_MIXED],
+    'fraction_operations:add_frac_unlike': [_AP3_UNLIKE],
+    'fraction_operations:sub_frac_unlike': [_AP3_UNLIKE],
+    'fraction_operations:mult_frac_whole': [_ap3Model(['bar', 'area', 'circle'], ['bar'],
+        'Default: bars. The equal groups of the fraction ("3 groups of 2/5"), each drawn as the ticked model, in black '
+        + 'and white; the pupil counts the shaded parts. A number line is not offered: a group is not a point. '
+        + 'Pictures off prints numbers only.', (o) => o.pictures !== false)],
+    'fraction_operations:div_unit_fraction': [_ap3Model(['bar', 'area', 'circle'], ['bar'],
+        'Default: bars. The number divided, drawn as the ticked model: the wholes cut into unit-fraction parts '
+        + '(4 ÷ 1/3), or the unit fraction to cut (1/3 ÷ 2). The answer is never drawn. Pictures off prints numbers only.',
+        (o) => o.pictures !== false)],
     'addition:number_line_add': [_AP3_ADD_LINE],
     'subtraction:number_line_sub': [_AP3_ADD_LINE],
     'addition:nl_add': [_AP3_ADD_LINE],

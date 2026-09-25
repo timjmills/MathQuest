@@ -11,8 +11,9 @@
 //
 // Each reads only the item's cell payload (q.cell.payload: terms, joins, answer), which the
 // generator (gen-fractions.js _fKit / _fSentenceKit) wrote, so the same item always gets the
-// same worked steps and the same wrong answer. Items of the same skill that are still text items
-// (identify's "name the numerator", compare's numbers-only items) get no worked steps.
+// same worked steps and the same wrong answer. Every item of these skills is a kit item now
+// (identify's "name the numerator" is the `part` task; compare's numbers-only items are `sign`
+// items without pictures), except the multi-select and sort variants of the operations skills.
 //
 // The misconceptions are the ones the fraction research names for SPED / ELL pupils: counting
 // the UNSHADED parts, writing shaded over unshaded (a part-to-part ratio), a denominator one too
@@ -92,9 +93,18 @@ registerSkill('fractions:identify', {
         iCan: 'I Can name the fraction a model shows',
         instructionKey: 'frac-name',
     })),
-    misconceptions: ['counted-unshaded', 'part-over-part', 'counted-ticks', 'counted-parts-only'],
+    misconceptions: ['counted-unshaded', 'part-over-part', 'counted-ticks', 'counted-parts-only', 'swapped-parts'],
     workedSteps: (q) => {
         const p = payloadOf(q);
+        if (p && p.task === 'part') {
+            const t = p.terms[0];
+            const top = p.part === 'n';
+            return clampSteps([
+                step(`The numerator is the number on top: ${t.n}. It counts the parts we have.`),
+                step(`The denominator is the number under the bar: ${t.d}. It counts the equal parts in the whole.`),
+                step(`The ${top ? 'numerator' : 'denominator'} is ${top ? t.n : t.d}. Write ${top ? t.n : t.d}.`, [{ slot: 'part', value: String(top ? t.n : t.d) }]),
+            ]);
+        }
         if (p && p.task === 'pick') {
             const right = p.terms.find((t) => t.letter === p.answer.letter);
             return clampSteps([
@@ -105,7 +115,17 @@ registerSkill('fractions:identify', {
         }
         return writeSteps(q);
     },
-    wrongAnswer: writeWrong,
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        if (p && p.task === 'part') {
+            // the commonest slip: the other number (top and bottom mixed up)
+            const t = p.terms[0];
+            const v = p.part === 'n' ? t.d : t.n;
+            return chooseWrong(q, [{ value: v, misconception: 'swapped-parts', slot: 'part', slots: { part: String(v) },
+                explain: p.part === 'n' ? 'Wrote the bottom number. The numerator is the TOP number.' : 'Wrote the top number. The denominator is the BOTTOM number.' }]);
+        }
+        return writeWrong(q);
+    },
 });
 
 /* ======================================================================= shade the fraction */
@@ -266,8 +286,18 @@ registerSkill('fractions:equiv_frac_visual', {
 function sentenceOf(q) {
     const p = payloadOf(q);
     if (!p || p.task !== 'op') return null;
-    const terms = p.terms.filter((t) => !/^(n|d|nd|wnd)$/.test(t.frac || ''));
+    const terms = p.terms.filter((t) => !/^(n|d|w|nd|wnd)$/.test(t.frac || ''));
     return { p, terms, ops: p.joins.slice(0, -1), a: p.answer };
+}
+
+/** A whole-number term (the 3 of 3 x 2/5, the 4 of 4 / 1/3): no fraction part. */
+const isWholeTerm = (t) => !Number(t.n) && Number(t.w) > 0 && !t.copies;
+
+/** A x sentence as {k: the whole number, f: the fraction term}, whichever way round it is written. */
+function groupsOf(x, y) {
+    if (isWholeTerm(x)) return { k: Number(x.w), f: y };
+    if (isWholeTerm(y)) return { k: Number(y.w), f: x };
+    return null;
 }
 
 function sentenceSteps(q) {
@@ -278,6 +308,35 @@ function sentenceSteps(q) {
     const ansText = mixedText(s.a.w, s.a.n, s.a.d);
     const marks = [...(s.a.w ? [{ slot: 'w', value: String(s.a.w) }] : []), ...(s.a.n ? [{ slot: 'n', value: String(s.a.n) }, { slot: 'd', value: String(s.a.d) }] : [])];
     const xv = (x.w || 0) * x.d + x.n, yv = (y.w || 0) * y.d + y.n;
+    if ((op === '+' || op === '−') && (x.w || y.w)) {
+        // a mixed number: the parts first (on one denominator), then the wholes, then regroup
+        const L = (x.d * y.d) / gcd(x.d, y.d);
+        const xn = x.n * (L / x.d), yn = y.n * (L / y.d);
+        const same = x.d === y.d;
+        const rename = same ? [] : [step(`Make the denominators the same: ${L}. ${fr(x.n, x.d)} = ${fr(xn, L)} and ${fr(y.n, y.d)} = ${fr(yn, L)}.`)];
+        if (op === '+') {
+            const parts = xn + yn, wholes = (x.w || 0) + (y.w || 0);
+            return clampSteps([
+                ...rename,
+                step(`Add the parts: ${fr(xn, L)} + ${fr(yn, L)} = ${fr(parts, L)}.`),
+                step(`Add the wholes: ${x.w || 0} + ${y.w || 0} = ${wholes}.`),
+                ...(parts >= L ? [step(`${fr(parts, L)} is 1 whole or more: regroup. ${wholes} + ${fr(parts, L)} = ${ansText}.`)]
+                    : mixedText(wholes, parts, L) !== ansText ? [step(`${mixedText(wholes, parts, L)} = ${ansText} in simplest form.`)] : []),
+                step(`Write ${ansText}.`, marks),
+            ]);
+        }
+        const borrow = xn < yn;
+        const pw = (borrow ? x.w - 1 : x.w) - (y.w || 0), pn = (borrow ? xn + L : xn) - yn;
+        const simp = mixedText(pw, pn, L) !== ansText ? [step(`${mixedText(pw, pn, L)} = ${ansText} in simplest form.`)] : [];
+        return clampSteps([
+            ...rename,
+            ...(borrow ? [step(`${fr(xn, L)} is less than ${fr(yn, L)}: take 1 whole as ${fr(L, L)}. ${x.w} ${fr(xn, L)} = ${x.w - 1} ${fr(xn + L, L)}.`)] : []),
+            step(`Subtract the parts: ${fr(borrow ? xn + L : xn, L)} − ${fr(yn, L)} = ${fr((borrow ? xn + L : xn) - yn, L)}.`),
+            step(`Subtract the wholes: ${borrow ? x.w - 1 : x.w} − ${y.w || 0} = ${pw}.`),
+            ...simp,
+            step(`Write ${ansText}.`, marks),
+        ]);
+    }
     if ((op === '+' || op === '−') && x.d === y.d) {
         const r = op === '+' ? xv + yv : xv - yv;
         return clampSteps([
@@ -297,10 +356,35 @@ function sentenceSteps(q) {
         ]);
     }
     if (op === '×') {
+        const g = groupsOf(x, y);
+        if (g) {
+            return clampSteps([
+                step(`${g.k} groups of ${fr(g.f.n, g.f.d)}.`),
+                step(`Count the shaded parts: ${g.k} × ${g.f.n} = ${g.k * g.f.n}. That is ${fr(g.k * g.f.n, g.f.d)}.`),
+                ...(ansText !== fr(g.k * g.f.n, g.f.d) ? [step(`${fr(g.k * g.f.n, g.f.d)} = ${ansText}.`)] : []),
+                step(`Write ${ansText}.`, marks),
+            ]);
+        }
+        // a fraction of a fraction: the area model's cells
         return clampSteps([
-            step(`${xv} groups of ${fr(y.n, y.d)}.`),
-            step(`Count the shaded parts: ${xv} × ${y.n} = ${xv * y.n}. That is ${fr(xv * y.n, y.d)}.`),
-            step(`Write ${ansText}.`, marks),
+            step(`Cut the whole into ${x.d} rows and ${y.d} columns: ${x.d * y.d} equal cells. That is the denominator.`),
+            step(`Shade ${x.n} row${x.n === 1 ? '' : 's'}. Take ${y.n} of the ${y.d} columns: ${x.n} × ${y.n} = ${x.n * y.n} cell${x.n * y.n === 1 ? '' : 's'}.`),
+            step(`${fr(x.n, x.d)} × ${fr(y.n, y.d)} = ${fr(x.n * y.n, x.d * y.d)}${ansText !== fr(x.n * y.n, x.d * y.d) ? ` = ${ansText}` : ''}. Write ${ansText}.`, marks),
+        ]);
+    }
+    if (op === '÷') {
+        if (isWholeTerm(x)) {
+            // a whole divided by a unit fraction: how many 1/d parts are in the wholes?
+            return clampSteps([
+                step(`How many ${fr(1, y.d)} parts are in ${x.w}?`),
+                step(`Each whole has ${y.d} parts. ${x.w} × ${y.d} = ${x.w * y.d}.`),
+                step(`Write ${ansText}.`, marks),
+            ]);
+        }
+        return clampSteps([
+            step(`Cut ${fr(x.n, x.d)} into ${y.w} equal parts.`),
+            step(`The whole now has ${x.d} × ${y.w} = ${x.d * y.w} of those parts.`),
+            step(`Each part is ${fr(1, x.d * y.w)}. Write ${ansText}.`, marks),
         ]);
     }
     return [];
@@ -318,22 +402,49 @@ function sentenceWrong(q) {
     if (op === '−' && x.d === y.d && !x.w && !y.w) c.push({ value: fr(xv - yv, 2 * x.d), misconception: 'subtracted-denominators', slot: 'd', slots: { n: String(xv - yv), d: String(2 * x.d), w: '' }, explain: 'Changed the denominator. Only the numerators are subtracted.' });
     if ((op === '+' || op === '−') && (x.w || y.w)) {
         const w = op === '+' ? (x.w || 0) + (y.w || 0) : (x.w || 0) - (y.w || 0);
-        const n = op === '+' ? x.n + y.n : Math.abs(x.n - y.n);
-        if (w >= 0) c.push({ value: `${w} ${fr(n, x.d)}`, misconception: 'did-not-regroup', slot: 'n', slots: { w: String(w), n: String(n), d: String(x.d) }, explain: 'Worked the wholes and the parts apart and did not regroup a whole.' });
+        const right = op === '+' ? xv / x.d + yv / y.d : xv / x.d - yv / y.d;
+        const push = (n, d, misconception, explain) => {
+            if (w < 0 || d <= 1 || Math.abs(w + n / d - right) < 1e-9) return;   // never the right value, never "n/1"
+            c.push({ value: `${w} ${fr(n, d)}`, misconception, slot: 'n', slots: { w: String(w), n: String(n), d: String(d) }, explain });
+        };
+        if (x.d === y.d) {
+            // the parts added past a whole (or subtracted the smaller from the bigger) and kept apart
+            push(op === '+' ? x.n + y.n : Math.abs(x.n - y.n), x.d, 'did-not-regroup',
+                op === '+' ? 'Added the parts past a whole and did not regroup it.' : 'Took the smaller part from the bigger one instead of taking a whole.');
+            if (op === '+') push(x.n + y.n, x.d + y.d, 'added-denominators', 'Added the denominators of the parts too. The size of the parts does not change.');
+            else push(x.n, x.d, 'wholes-only', 'Subtracted the wholes and left the parts as they were.');
+        } else {
+            push(op === '+' ? x.n + y.n : Math.abs(x.n - y.n), op === '+' ? x.d + y.d : Math.abs(x.d - y.d),
+                op === '+' ? 'added-denominators' : 'subtracted-denominators',
+                op === '+' ? 'Added the denominators of the parts. Make them the same first.' : 'Subtracted the denominators of the parts. Make them the same first.');
+        }
     }
-    if (op === '×') c.push({ value: fr(xv * y.n, xv * y.d), misconception: 'multiplied-denominator', slot: 'd', slots: { n: String(xv * y.n), d: String(xv * y.d), w: '' }, explain: 'Multiplied the denominator too. The parts stay the same size: only count them.' });
+    if (op === '×') {
+        const g = groupsOf(x, y);
+        if (g) c.push({ value: fr(g.k * g.f.n, g.k * g.f.d), misconception: 'multiplied-denominator', slot: 'd', slots: { n: String(g.k * g.f.n), d: String(g.k * g.f.d), w: '' }, explain: 'Multiplied the denominator too. The parts stay the same size: only count them.' });
+        else c.push({ value: fr(x.n * y.n, x.d + y.d), misconception: 'added-denominators', slot: 'd', slots: { n: String(x.n * y.n), d: String(x.d + y.d), w: '' }, explain: 'Added the denominators. Count ALL the cells of the area model: rows times columns.' });
+    }
+    if (op === '÷') {
+        // the commonest error: divided the other way (4 ÷ 1/3 read as 4 × 1/3, 1/3 ÷ 2 as 2/3)
+        if (isWholeTerm(x)) c.push({ value: fr(x.w, y.d), misconception: 'divided-wrong-way', slot: 'w', slots: { w: fr(x.w, y.d) }, explain: `Found ${fr(1, y.d)} of ${x.w}. The question is how many ${fr(1, y.d)} parts FIT in ${x.w}.` });
+        else c.push({ value: fr(y.w, x.d), misconception: 'divided-wrong-way', slot: 'n', slots: { n: String(y.w), d: String(x.d), w: '' }, explain: `Multiplied instead of dividing. Cut ${fr(x.n, x.d)} into ${y.w} parts: each part is SMALLER.` });
+    }
     return chooseWrong(q, c);
 }
 
 const SENTENCE = {
     '+': { iCan: 'I Can add fractions', instructionKey: 'add', steps: ['Look at the denominators.', 'Add the numerators. The denominator stays the same.', 'Write the answer in simplest form.'], say: '__ plus __ is __.' },
     '−': { iCan: 'I Can subtract fractions', instructionKey: 'subtract', steps: ['Look at the denominators.', 'Subtract the numerators. The denominator stays the same.', 'Write the answer in simplest form.'], say: '__ minus __ is __.' },
+    '÷': { iCan: 'I Can divide with unit fractions', instructionKey: 'divide', steps: ['Look at what is divided and what it is divided by.', 'Count how many parts fit, or cut the part into equal parts.', 'Write the answer.'], say: '__ divided by __ is __.' },
     'x': { iCan: 'I Can multiply a fraction by a whole number', instructionKey: 'multiply', steps: ['Read it as groups: how many groups of the fraction?', 'Count the shaded parts in all the groups.', 'Keep the denominator.'], say: '__ groups of __ is __.' },
 };
 const sayOf = (q) => {
     const s = sentenceOf(q);
     if (!s || s.terms.length !== 2) return null;
     const t = (u) => mixedText(u.w, u.n, u.d);
+    const g = s.ops[0] === '×' ? groupsOf(s.terms[0], s.terms[1]) : null;
+    // "__ groups of __ is __." reads the whole number first, whichever way the sum is written
+    if (g) return [String(g.k), t(g.f), mixedText(s.a.w, s.a.n, s.a.d)];
     return [t(s.terms[0]), t(s.terms[1]), mixedText(s.a.w, s.a.n, s.a.d)];
 };
 
@@ -342,7 +453,7 @@ export function registerFractionSentence(key, op, extra = {}) {
     const def = SENTENCE[op];
     registerSkill(key, {
         strings: strings(Object.assign({}, def, { sayValues: sayOf, vocabulary: ['numerator', 'denominator'] }, extra)),
-        misconceptions: ['added-denominators', 'subtracted-denominators', 'did-not-regroup', 'multiplied-denominator'],
+        misconceptions: ['added-denominators', 'subtracted-denominators', 'did-not-regroup', 'wholes-only', 'multiplied-denominator', 'divided-wrong-way'],
         workedSteps: sentenceSteps,
         wrongAnswer: sentenceWrong,
     });
@@ -361,3 +472,6 @@ registerFractionSentence('fraction_operations:add_mixed_unlike', '+', { iCan: 'I
 registerFractionSentence('fraction_operations:sub_mixed_unlike', '−', { iCan: 'I Can subtract mixed numbers with different denominators',
     steps: ['Find a common denominator.', 'Regroup a whole if you need more parts.', 'Subtract the wholes, then the fractions.'] });
 registerFractionSentence('fraction_operations:mult_frac_whole', 'x');
+registerFractionSentence('fraction_operations:mult_frac_frac', 'x', { iCan: 'I Can multiply two fractions',
+    steps: ['Draw rows for the first fraction.', 'Take the columns of the second fraction.', 'Count the cells inside both. Count all the cells.'], say: '__ times __ is __.' });
+registerFractionSentence('fraction_operations:div_unit_fraction', '÷');
