@@ -240,7 +240,8 @@ function storyWork(it, shown, wrong, isWrong) {
 function choicesOf(it, correct, shown) {
     const q = it.q || {};
     const payload = (q.cell && q.cell.payload) || {};
-    if (CHOICE.has(it.template) && Array.isArray(payload.labels) && payload.labels.length) {
+    // pv lane: a word-choice payload (number_word_names A-D) is fixed by letter too.
+    if ((CHOICE.has(it.template) || payload.kind === 'word-choice') && Array.isArray(payload.labels) && payload.labels.length) {
         return { labels: payload.labels.map(String), correct: Number(payload.correct) || 0 };
     }
     if (/^\d[\d,.]*$/.test(correct)) return null;
