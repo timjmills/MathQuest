@@ -759,6 +759,7 @@ function measureItems(items, { size, look, colsList }) {
         // collapsed, and that column count does not fit (DN-10: content never shrinks or
         // re-arranges to fit). A wrapped line of text costs a few mm and is not a collapse.
         for (const it of items) {
+            if (it.colsLayout) continue;   // a role that lays the cell out per column count on purpose (Error analysis)
             const m = it.measured || {};
             const base = m[cols[0]] && m[cols[0]].hMm;
             if (!base) continue;
@@ -1428,7 +1429,7 @@ async function buildRoleSheet(n, metaOf) {
     }
 
     if (typeof mod.supports === 'function') {
-        const why = mod.supports(items);
+        const why = mod.supports(items, { skills: reqSkills });
         if (why) {
             const err = new Error(why);
             err.unsupported = true;

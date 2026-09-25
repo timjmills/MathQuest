@@ -433,7 +433,7 @@ registerSkill('placevalue:pv_disks_build', {
         say: 'I drew __.',
         sayValues: (q) => { const p = pvOf(q); return p.n ? [arr(p.places).map((pl) => `${digitAt(p.n, pl)} ${PLACE_WORD[pl]}`).join(', ')] : null; },
     }),
-    misconceptions: ['M-V1', 'M-V13', 'M-V7'],
+    misconceptions: ['M-V1', 'M-V16', 'M-V13', 'M-V7'],
     workedSteps: (q) => {
         const p = pvOf(q);
         const places = arr(p.places).map(Number);
@@ -446,9 +446,12 @@ registerSkill('placevalue:pv_disks_build', {
         const p = pvOf(q);
         if (!p.n) return null;
         const ds = String(p.n).split('');
+        // Each error is a mat a pupil really draws, and the mat drawn IS that number (critic
+        // round 3: "every disk a ones disk" was drawn as the digit sum's own mat, 1 ten 5 ones).
+        const swapTO = ds.length >= 2 ? num(ds.slice(0, -2).concat([ds[ds.length - 1], ds[ds.length - 2]]).join('')) : null;
         return choose(q, [
-            { value: num(ds.slice().reverse().join('')), misconception: 'M-V1', explain: 'Drew the digits in the wrong zones.' },
-            { value: ds.reduce((a, d) => a + Number(d), 0), misconception: 'M-V13', explain: 'Drew every disk as a ones disk.' },
+            { value: num(ds.slice().reverse().join('')), misconception: 'M-V1', explain: 'Drew the digits in the wrong zones: read the number from the right.' },
+            swapTO !== null && swapTO !== p.n ? { value: swapTO, misconception: 'M-V16', explain: 'Swapped the tens and the ones.' } : null,
         ]);
     },
 });
@@ -542,7 +545,7 @@ registerSkill('placevalue:compare', {
         say: '__ is __ __.',
         sayValues: (q) => { const p = pvOf(q); return p.a !== undefined ? [p.a, q.ans === '>' ? 'greater than' : q.ans === '<' ? 'less than' : 'equal to', p.b] : null; },
     }),
-    misconceptions: ['M-C1', 'M-C2'],
+    misconceptions: ['M-C1', 'M-C2', 'M-C3'],
     workedSteps: (q) => {
         const p = pvOf(q);
         if (p.a === undefined) return [];
@@ -562,10 +565,15 @@ registerSkill('placevalue:compare', {
         if (p.a === undefined) return null;
         const flip = q.ans === '>' ? '<' : q.ans === '<' ? '>' : '<';
         const lastDigits = (String(p.a).slice(-1) > String(p.b).slice(-1)) ? '>' : (String(p.a).slice(-1) < String(p.b).slice(-1) ? '<' : '=');
-        return choose(q, [
-            { value: flip, misconception: 'M-C1', explain: 'Wrote the sign the wrong way round.' },
+        const sa = String(p.a), sb = String(p.b);
+        const firstDigits = sa.length !== sb.length ? (sa[0] > sb[0] ? '>' : sa[0] < sb[0] ? '<' : null) : null;
+        // A named place error first (critic round 3: every shown mistake was the reversed sign);
+        // the reversed sign only when no place error gives a wrong sign.
+        const place = [
+            firstDigits ? { value: firstDigits, misconception: 'M-C3', explain: 'Compared the first digits, not how many digits.' } : null,
             { value: lastDigits, misconception: 'M-C2', explain: 'Compared the ones digits, not the biggest place.' },
-        ]);
+        ].filter((c) => c && c.value !== String(q.ans));
+        return choose(q, place.length ? place : [{ value: flip, misconception: 'M-C1', explain: 'Wrote the sign the wrong way round.' }]);
     },
 });
 
@@ -839,7 +847,7 @@ registerSkill('number_sense:rounding_table', {
         say: 'To the nearest __, __ is __.',
         sayValues: (q) => { const p = pvOf(q); const rows = arr(p.rows); const pl = arr(p.places); return rows.length ? [pl[0], rows[0], roundTo(rows[0], pl[0])] : null; },
     }),
-    misconceptions: ['M-R6', 'M-R5'],
+    misconceptions: ['M-R6', 'M-R5', 'M-R1'],
     workedSteps: (q) => {
         const p = pvOf(q);
         const cells = arr(p.cells);
@@ -856,12 +864,23 @@ registerSkill('number_sense:rounding_table', {
         const rows = arr(p.rows).map(Number);
         const places = arr(p.places).map(Number);
         if (!cells.length) return null;
-        // M-R6: rounded from the column before (a chain); M-R5: rounded to the next place up.
-        const chain = cells.map(([r, c]) => (c > 0 ? roundTo(roundTo(rows[r], places[c - 1]), places[c]) : roundTo(rows[r], places[c] * 10)));
-        const wrongPlace = cells.map(([r, c]) => roundTo(rows[r], places[c] * 10));
+        // M-R6: rounded from the column before (a chain: 145 -> 150 -> 200); M-R5: rounded to the
+        // place AFTER the one asked (171 to the nearest 100 written 170); M-R1: always rounded
+        // down. A cell the error does not change keeps its right value, so a table shows the one
+        // mistake a pupil really makes, never "0, 0, 1,000" (critic round 3: rounding to the next
+        // place UP turned 3-digit numbers into 0s and 1,000s).
+        const down = (n, P) => Math.floor(n / P) * P;
+        const chain = cells.map(([r, c]) => (c > 0 ? roundTo(roundTo(rows[r], places[c - 1]), places[c]) : roundTo(rows[r], places[c])));
+        const wrongPlace = cells.map(([r, c]) => (places[c] >= 100 ? roundTo(rows[r], places[c] / 10) : down(rows[r], places[c])));
+        const alwaysDown = cells.map(([r, c]) => down(rows[r], places[c]));
+        const right = cells.map(([r, c]) => roundTo(rows[r], places[c]));
+        const differs = (list) => list.some((v, i) => v !== right[i]);
         return choose(q, [
-            { value: chain.map(f).join('; '), misconception: 'M-R6', explain: 'Rounded the rounded number again.' },
-            { value: wrongPlace.map(f).join('; '), misconception: 'M-R5', explain: 'Rounded to the wrong place.' },
+            differs(chain) ? { value: chain.map(f).join('; '), misconception: 'M-R6', explain: 'Rounded the rounded number again.' } : null,
+            differs(wrongPlace) ? { value: wrongPlace.map(f).join('; '), misconception: 'M-R5', explain: 'Rounded to the wrong place.' } : null,
+            differs(alwaysDown) ? { value: alwaysDown.map(f).join('; '), misconception: 'M-R1', explain: 'Always rounded down.' } : null,
+            // every number here rounds down: the other end of the line is rounding UP each time
+            !differs(alwaysDown) ? { value: cells.map(([r, c]) => Math.ceil(rows[r] / places[c]) * places[c]).map(f).join('; '), misconception: 'M-R1', explain: 'Always rounded up.' } : null,
         ]);
     },
 });
@@ -905,25 +924,36 @@ function estimateWrong(q) {
     const [ra, rb] = arr(p.rounded).map(Number);
     const P = p.place;
     const exact = p.op === '+' ? p.a + p.b : p.op === '−' ? p.a - p.b : p.op === '×' ? p.a * p.b : p.a / p.b;
+    const calc = (x, y) => (p.op === '+' ? x + y : p.op === '−' ? x - y : p.op === '÷' ? x / y : x * y);
     const c = [];
     if (p.op === '÷') {
         c.push({ value: p.est * 10, misconception: 'M-G4', explain: 'Wrote an extra zero.' });
         if (p.est >= 20) c.push({ value: p.est / 10, misconception: 'M-G4', explain: 'Dropped a zero.' });
-        c.push({ value: p.est + P, misconception: 'M-G1', explain: 'Rounded the dividend to the wrong compatible number.' });
+        // Only when that quotient is clearly off: 37 ÷ 6 ≈ 7 is defensible (42 ÷ 6), so it is not
+        // a mistake to find (critic round 3).
+        if (Math.abs((p.est + P) * p.b - p.a) > p.b) c.push({ value: p.est + P, misconception: 'M-G1', explain: 'Rounded the dividend to the wrong compatible number.' });
     } else {
+        // `ab`: the two numbers the pupil wrote in the rounded-problem boxes, so the shown work of
+        // an inline item is the work THAT error produces (critic round 3: "80 + 80 = 170" named
+        // "rounded one number the wrong way" with both numbers rounded right).
         const rOfExact = roundTo(exact, p.op === '×' ? P * 10 : P);
-        c.push({ value: rOfExact, misconception: 'M-G1', explain: 'Worked out the exact answer, then rounded it.' });
-        c.push({ value: p.op === '+' ? ra + p.b : p.op === '−' ? ra - p.b : ra * p.b + 0, misconception: 'M-G2', explain: 'Rounded only one number.' });
-        if (p.op === '−') c.push({ value: rb - ra, misconception: 'M-G3', explain: 'Took the bigger number from the smaller.' });
-        if (p.op === '×') c.push({ value: p.est / 10, misconception: 'M-G4', explain: 'Dropped a zero from the product.' });
-        c.push({ value: p.est + (p.op === '×' ? P * p.b : P), misconception: 'M-R1', explain: 'Rounded one number the wrong way.' });
+        c.push({ value: rOfExact, ab: [ra, rb], misconception: 'M-G1', explain: 'Worked out the exact answer, then rounded it.' });
+        c.push({ value: calc(ra, p.b), ab: [ra, p.b], misconception: 'M-G2', explain: 'Rounded only one number.' });
+        if (p.op === '−') c.push({ value: rb - ra, ab: [rb, ra], misconception: 'M-G3', explain: 'Took the bigger number from the smaller.' });
+        if (p.op === '×') c.push({ value: p.est / 10, ab: [ra, rb], misconception: 'M-G4', explain: 'Dropped a zero from the product.' });
+        const other = ra > p.a ? ra - P : ra + P;
+        if (other > 0) c.push({ value: calc(other, rb), ab: [other, rb], misconception: 'M-R1', explain: 'Rounded one number the wrong way.' });
     }
     const asText = typeof q.ans === 'string';
-    return choose(q, c.filter((w) => Number.isInteger(w.value)).map((w) => ({
-        ...w, value: asText ? f(w.value) : w.value,
-        slots: q.answerType === 'inline-blanks' ? { b0: f(ra), b1: f(rb), b2: f(w.value) } : undefined,
-        slot: q.answerType === 'inline-blanks' ? 'b2' : 'answer',
-    })));
+    const inline = q.answerType === 'inline-blanks';
+    return choose(q, c.filter((w) => Number.isInteger(w.value) && w.value >= 0)
+        // an exact-then-rounded answer next to the rounded numbers would contradict itself
+        .filter((w) => !inline || !w.ab || w.misconception !== 'M-G1' || calc(w.ab[0], w.ab[1]) === w.value)
+        .map(({ ab, ...w }) => ({
+            ...w, value: asText ? f(w.value) : w.value,
+            slots: inline ? { b0: f((ab || [ra])[0]), b1: f((ab || [ra, rb])[1]), b2: f(w.value) } : undefined,
+            slot: inline ? 'b2' : 'answer',
+        })));
 }
 
 const EST = [

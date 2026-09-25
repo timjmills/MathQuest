@@ -229,6 +229,28 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-wpspace.mq-wpmodel{align-items:stretch;justify-content:center;padding:6mm 2mm 2mm}
 :is(.ws-page,.ws-sheet) .mq-wpspace.mq-wpmodel>div{width:100%;display:flex;flex-direction:column;align-items:center}
 :is(.ws-page,.ws-sheet) .mq-wppics{display:flex;flex-wrap:wrap;gap:3mm;justify-content:center;align-items:center;padding:2mm}
+/* ---- Error analysis, critic round 3 (2026-09-25): the fix copies the item's own answer shape ---- */
+:is(.ws-page,.ws-sheet) .mq-fixpat{display:inline-flex;align-items:center;flex-wrap:nowrap;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-fixglue{font-size:var(--ws-text);font-weight:400;line-height:1;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixchoice.mq-fixletters{flex-direction:row;gap:5mm}
+:is(.ws-page,.ws-sheet) .mq-fixglue.mq-fixsym{font-size:var(--ws-digit);font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-fixes>.mq-ansslot small{white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixtext .ws-line{font-size:var(--ws-text);font-weight:700;max-width:100%}
+:is(.ws-page,.ws-sheet) .mq-eacell .mq-fixslot small{font-size:max(var(--ws-zone),11pt)}
+:is(.ws-page,.ws-sheet) .mq-fixcols{gap:0}
+:is(.ws-page,.ws-sheet) .mq-eatask{font-size:var(--ws-text);line-height:1.2;margin:0 0 1mm;align-self:flex-start}
+:is(.ws-page,.ws-sheet) .mq-fixcols>.ws-box+.ws-box{margin-left:-.75pt}
+/* the flow judgement: beside the work when --mq-jw fits, under it when not */
+:is(.ws-page,.ws-sheet) .mq-judge.mq-judge3{display:flex;flex-wrap:wrap;align-items:flex-start;align-content:flex-start;justify-content:center;column-gap:6mm;row-gap:2mm;width:100%}
+:is(.ws-page,.ws-sheet) .mq-judge3>.mq-judge-work{flex:0 1 auto;min-width:0;max-width:100%;align-self:flex-start}
+:is(.ws-page,.ws-sheet) .mq-judge3>.mq-judge-row{flex:1 1 var(--mq-jw,44mm);min-width:min(var(--mq-jw,44mm),100%);max-width:100%;display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:6mm;row-gap:2mm;padding:1mm 0 0 2mm}
+:is(.ws-page,.ws-sheet) .mq-judge3 .mq-fixrow{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:4mm;row-gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-judge3 .mq-fixslot{margin-left:0}
+:is(.ws-page,.ws-sheet) .mq-judge3>.mq-redraw{flex:1 1 100%}
+:is(.ws-page,.ws-sheet) .mq-judge-drawn .mq-fixrow{display:contents}
+:is(.ws-page,.ws-sheet) .mq-judge-drawn .mq-fixzone{flex:0 0 100%}
+/* the key's correction is black Andika 700, even inside the pupil's grey work (a fix box per fact) */
+:is(.ws-page,.ws-sheet) .mq-judge-work :is([data-ws-slot^="x"],[data-ws-slot^="fix"]):is([data-ws-ink="solid"],[data-ws-ink="solid"] *),:is(.ws-page,.ws-sheet) .mq-judge-work :is([data-ws-slot^="x"],[data-ws-slot^="fix"]) :is([data-ws-ink="solid"],[data-ws-ink="solid"] *){color:#000!important;font-weight:700}
 ${ANCHOR_CSS}
 `.trim();
 
