@@ -13,10 +13,10 @@
 // A skill with {} honours none of the three; it still carries the universal level in the model
 // (skill-options.js), but no control is shown for it — see offeredOptionsFor().
 //
-// Summary: {"skills":583,"range":186,"decimals":25,"level":6,"none":390,"coarse":14,"stat":23,"unstable":28,"hang":3}
+// Summary: {"skills":583,"range":186,"decimals":25,"level":6,"none":390,"coarse":14,"stat":24,"unstable":28,"hang":3}
 import { registerDerivedOptions } from './skill-options.js';
 
-export const DERIVED_SUMMARY = {"skills":583,"range":186,"decimals":25,"level":6,"none":390,"coarse":14,"stat":23,"unstable":28,"hang":3};
+export const DERIVED_SUMMARY = {"skills":583,"range":186,"decimals":25,"level":6,"none":390,"coarse":14,"stat":24,"unstable":28,"hang":3};
 
 export const DERIVED_OPTIONS = {
     "addition:add": {"range":[10,100],"decimals":[0,1,2,3]},
@@ -148,7 +148,7 @@ export const DERIVED_OPTIONS = {
     "composing:hundreds_chart_fill": {},
     "composing:make_ten": {},
     "composing:mixed_composing": {"range":[10,20,50,100,1000,10000]},
-    "composing:number_bonds": {},
+    "composing:number_bonds": {"mode":"stat"},
     "composing:number_word_form": {"range":[10,20,50,100,1000,10000]},
     "composing:odd_even": {"range":[10,20,50,100]},
     "composing:select_even_odd": {"range":[10,50,100]},
