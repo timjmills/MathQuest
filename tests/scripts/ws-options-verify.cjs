@@ -327,6 +327,8 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
     for (const def of defs) {
         if (!def.label) statics.push(`${def.id}: no label`);
         if (!OPTION_KEYS[def.id]) statics.push(`${def.id}: no share-code key (the choice cannot travel in a link)`);
+        // P12: an extended ("X" + letter) key cannot sit beside `op` (skill-option-codec.js).
+        if (OPTION_KEYS[def.id] && OPTION_KEYS[def.id].length === 2 && defs.some(d => d.id === 'op')) statics.push(`${def.id}: extended key beside op (it cannot travel in a link)`);
         if (def.values) {
             const ls = def.values.map(x => x.l);
             if (new Set(ls).size !== ls.length) statics.push(`${def.id}: duplicate value labels`);
@@ -477,7 +479,15 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         else if (!ps.items.length) { fail('print', 'sheet has no items'); r.checks.print = 'fail'; }
         else {
             const same = !pd.error && ps.pupil === pd.pupil && JSON.stringify(ps.items) === JSON.stringify(pd.items);
-            if (same && diff !== null) fail('print', 'printed sheet identical to the default sheet');
+            // P12: a value that KEEPS only some items (a kind, a family, a bound) prints the same
+            // sheet as the default when the default sheet already happened to satisfy it (six items,
+            // one dominant kind). That is not a dead control: generation differs and the predicate
+            // holds on the default sheet too. Reported as a warning, not a failure.
+            const _coincide = () => { const p = runPred(def, value, pd.items || [], 'print'); return p.checked && !p.fails.length && r.checks.gen === 'ok'; };
+            if (same && diff !== null) {
+                if (_coincide()) warn('print', 'printed sheet identical to the default, which already satisfies this value');
+                else fail('print', 'printed sheet identical to the default sheet');
+            }
             const pr = runPred(def, value, ps.items, 'print');
             pr.fails.forEach(m => fail('print', m)); pr.warns.forEach(m => warn('print', m));
             // Digits may sit in separate grid boxes, so compare with all white space removed, and
@@ -500,7 +510,11 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         for (const [host, list, dl] of [['worksheet', sc.worksheet, sd.worksheet], ['practice', sc.practice, sd.practice]]) {
             if (!list.length) { fail(`screen/${host}`, 'no items'); continue; }
             const dd = differs(list, dl);
-            if (dd === false) fail(`screen/${host}`, 'items identical to the default (store not honoured)');
+            if (dd === false) {
+                const p = runPred(def, value, dl, 'screen');
+                if (p.checked && !p.fails.length && r.checks.gen === 'ok') warn(`screen/${host}`, 'items identical to the default, which already satisfy this value');
+                else fail(`screen/${host}`, 'items identical to the default (store not honoured)');
+            }
             const pr = runPred(def, value, list, 'screen');
             pr.fails.forEach(m => fail(`screen/${host}`, m));
         }

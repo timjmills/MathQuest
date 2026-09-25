@@ -907,7 +907,8 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // name; the id and the label both say teen, so the content moves).
     // ========================================
     else if (mappedSkill === "ten_frame_build_teen") {
-        const target = 11 + _kDealShuffled(9);  // 11..19, shuffled
+        // P12: `band` 15 keeps the target to 11-15 (one row of the second frame).
+        const target = 11 + (Number(_kOpt('band')) === 15 ? _kDealShuffled(5) : _kDealShuffled(9));  // 11..19, shuffled
         q.text = `Build ${target} on the ten frames.`;
         q.printText = `Draw ${target} counters in the ten frames.`;
         q.target = target;
@@ -1239,7 +1240,10 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             { shape: 'star', many: 'stars', place: 'on a card', place2: 'on a page', arrive: 'are added' },
         ];
         const scene = SCENES[_kDeal(SCENES.length)];
-        const sum = 4 + _kDealShuffled(7);                    // 4..10
+        // P12: `band` "Total to" 5 or 7 (read off the raw options: the plain twin is generated here
+        // under the base id, whose own panel does not declare it). The default, 10, is the old deal.
+        const _wpBand = state.skillOptions && typeof state.skillOptions === 'object' ? Number(state.skillOptions.band) : NaN;
+        const sum = 4 + (_wpBand === 5 ? _kDealShuffled(2) : _wpBand === 7 ? _kDealShuffled(4) : _kDealShuffled(7));   // 4..10
         const a = rng(2, sum - 2);
         const b = sum - a;
         const N = scene.many;
