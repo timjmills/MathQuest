@@ -8,16 +8,13 @@
 // blanks, make your own table, a function-machine header, a Check row, a rule frame that fades
 // to a free line, and In numbers out of order so the pupil cannot just follow the Out column.
 //
-// The whole item is decided by the skill's options (skill-options.js, "FUNCTION TABLES"):
-//   task      outputs | rule | inputs | mixed | make       one per page
-//   ops       {+, −, ×, ÷}                                  dealt in turn by item index
-//   step      {1, 2}                                        one- or two-step rules, in turn
+// The whole item is decided by the skill's options (skill-options.js, "FUNCTION TABLES"). Five
+// controls since the option-panel round 3 (nine before; the old ids are folded on decode):
+//   ftTask    outputs | rule | inputs | mixed, each also "-check" (a Check row), | make
+//   ftRules   {+, −, ×, ÷, ×+, ×−, ÷+, ÷−}                   one- and two-step kinds, dealt in turn
 //   band      10 | 20 | 50 | 100 | 1000                     caps EVERY number in the table
-//   tiles     3 | 4 | 5                                     rows
-//   order     inorder | scrambled                           the In numbers
-//   support   frame | line                                  the rule column / rule frame
-//   pictures  bool                                          the function machine
-//   response  standard | check                             a Check row under the table
+//   ftTable   rows × 10 + (1 in order | 2 out of order)     31 … 52
+//   support   frame | frame-bare | line | line-bare         the rule frame; "-bare" drops the machine
 //
 // Guarantees (held by ws-content-audit's function-table rules): every row satisfies the rule; no
 // number is negative or above the band; ÷ is always exact; a "find the rule" table shows at least
@@ -28,26 +25,23 @@
 // a page; the ticked operations and step counts are dealt round-robin by state.itemIndex.
 import { state } from './state.js';
 import { randInt, shuffle } from './utils.js';
-import { optionsFor, pvCap } from './skill-options.js';
+import { optionsFor, normalizeOptions, pvCap } from './skill-options.js';
 import { renderCell, applyRule, ruleText, ftSlots } from './sheet/index.js';
 
 export const FUNCTION_TABLE_SKILLS = Object.freeze(['function_table_easy', 'function_table_hard']);
 
-const OPS = ['+', '-', 'x', '/'];
 let _cursor = 0;
 
-/** The skill's option values: the set's / caller's choice, else the default. */
+/** The skill's option values: the set's / caller's choice, else the default (old codes folded). */
 export function ftOptions(skillId) {
-    let defs = [];
-    try { defs = optionsFor('algebra', skillId); } catch (e) { defs = []; }
     // Options belong to the skill being played: an item dealt by a mixed patterns page takes the
     // defaults, never another skill's choices.
     const mine = state.skill === skillId && state.skillOptions && typeof state.skillOptions === 'object' ? state.skillOptions : {};
+    try { return normalizeOptions('algebra', skillId, mine); } catch (e) { /* fall through */ }
+    let defs = [];
+    try { defs = optionsFor('algebra', skillId); } catch (e) { defs = []; }
     const out = {};
-    for (const d of defs) {
-        const has = Object.prototype.hasOwnProperty.call(mine, d.id) && mine[d.id] !== undefined;
-        out[d.id] = has ? mine[d.id] : d.default;
-    }
+    for (const d of defs) out[d.id] = d.default;
     return out;
 }
 
@@ -136,26 +130,28 @@ const HINT = {
 export function generateFunctionTable(q, skillId) {
     const o = ftOptions(skillId);
     const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _cursor++;
-    const task = ['outputs', 'rule', 'inputs', 'mixed', 'make'].includes(o.task) ? o.task : 'outputs';
+    const taskRaw = String(o.ftTask || '');
+    const task = ['outputs', 'rule', 'inputs', 'mixed', 'make'].includes(taskRaw.replace(/-check$/, '')) ? taskRaw.replace(/-check$/, '') : 'outputs';
     const band = [10, 20, 50, 100, 1000].includes(Number(o.band)) ? Number(o.band) : (skillId === 'function_table_hard' ? 100 : 20);
     const cap = Math.max(10, pvCap(band, state.range));
-    const rowsN = [3, 4, 5].includes(Number(o.tiles)) ? Number(o.tiles) : 4;
-    const ops = ticked(o.ops, OPS);
-    const stepsSet = ticked(o.step, [1, 2]);
-    const wantCheck = o.response === 'check' && task !== 'make';
+    const tableV = Number(o.ftTable);
+    const rowsN = [3, 4, 5].includes(Math.floor(tableV / 10)) ? Math.floor(tableV / 10) : 4;
+    const scrambled = tableV % 10 === 2;
+    const wantCheck = /-check$/.test(taskRaw) && task !== 'make';
     const need = rowsN + (wantCheck ? 1 : 0);
 
-    // Deal the step count and the operation in turn, so every ticked choice appears on a page.
+    // The ticked rule kinds: one-step (+ − × ÷) and two-step (×+ ×− ÷+ ÷−). When both are ticked
+    // the page alternates one-step and two-step rules, each list dealt in turn.
+    const kinds = ticked(o.ftRules, ['+', '-', 'x', '/', 'x+', 'x-', '/+', '/-']);
+    const ones = kinds.filter((k) => k.length === 1), twos = kinds.filter((k) => k.length === 2);
+    const stepsSet = [...(ones.length ? [1] : []), ...(twos.length ? [2] : [])];
     let steps = stepsSet[at % stepsSet.length];
     let kind;
     if (steps === 2) {
-        const muls = ops.filter((x) => x === 'x' || x === '/');
-        const adds = ops.filter((x) => x === '+' || x === '-');
-        const M = muls.length ? muls : ['x'];
-        const A = adds.length ? adds : ['+'];
-        kind = [M[Math.floor(at / stepsSet.length) % M.length], A[Math.floor(at / (stepsSet.length * M.length)) % A.length]];
+        const k2 = twos[Math.floor(at / stepsSet.length) % twos.length];
+        kind = [k2[0], k2[1]];
     } else {
-        kind = ops[Math.floor(at / stepsSet.length) % ops.length];
+        kind = ones[Math.floor(at / stepsSet.length) % ones.length];
     }
 
     let rule = null, pool = [];
@@ -178,7 +174,7 @@ export function generateFunctionTable(q, skillId) {
         const pickd = shuffle(pool.slice()).slice(0, need);
         xs = pickd.slice(0, rowsN);
         const cx = wantCheck ? pickd[rowsN] : null;
-        if (o.order === 'scrambled') {
+        if (scrambled) {
             // never smallest-first (nor largest-first): the Out column cannot be read down
             for (let k = 0; k < 20; k++) {
                 const asc = xs.every((v, i) => i === 0 || v > xs[i - 1]);
@@ -215,8 +211,8 @@ export function generateFunctionTable(q, skillId) {
 
     const payload = {
         task, rule, rows, check,
-        support: o.support === 'line' ? 'line' : 'frame',
-        machine: o.pictures !== false,
+        support: /^line/.test(String(o.support)) ? 'line' : 'frame',
+        machine: !/-bare$/.test(String(o.support)) && o.pictures !== false,
     };
     if (note) payload.note = note;
 

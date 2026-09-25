@@ -53,6 +53,13 @@ function dealPerm(key, n, at = _at) {
     return _perms[k][((at % n) + n) % n];
 }
 const pos6 = () => ((_at % 6) + 6) % 6;
+/**
+ * The position an EDGE case is seeded at. Every page of six still carries it (the content gate's
+ * edge-seeded rule), but on the odd pages of six it runs from the other end, so a nine-item page
+ * (a test, a guided page) meets each edge once, not twice (critic round 3: 12:00 three times, 12:45
+ * twice, five of nine ending :05 or :55).
+ */
+const edge6 = () => (Math.floor(_at / 6) % 2 === 0 ? pos6() : 5 - pos6());
 
 function optsOf(skill) {
     // A mixed parent's options (only `members`) never name a member's own options, so the member's
@@ -149,8 +156,10 @@ const REVIEW_MINUTES = { time_half_hour: [0], time_quarter: [0, 30], time_5min: 
 
 /** One reading time: its hour and minute, with the step's edge cases at fixed page positions. */
 function readingTime(skill, o) {
-    const k = pos6();
-    const hour = 1 + dealPerm(`${skill}:h`, 12);
+    const k = edge6();
+    // The edge case owns 12 (k === 0); every other item takes an hour 1-11 from a page-long
+    // permutation, so no hour comes back until all eleven have been used (critic round 3).
+    const hour = 1 + dealPerm(`${skill}:h11`, 11);
     if (o.review === 'some' && k === 5 && REVIEW_MINUTES[skill]) {
         const pool = REVIEW_MINUTES[skill];
         return { h: hour, m: pool[deal(`${skill}:rv`, pool.length)] };
@@ -159,22 +168,21 @@ function readingTime(skill, o) {
     switch (skill) {
         case 'time_hour':
             if (k === 0) return { h: 12, m: 0 };
-            if (k === 1) return { h: 1, m: 0 };
             return { h: hour, m: 0 };
         case 'time_half_hour':
             if (k === 0) return { h: 12, m: 30 };      // the hour hand between 12 and 1 (M-T2)
-            if (k === 1) return { h: 2, m: 30 };       // "3" is the tempting neighbour
             return { h: hour, m: 30 };
         case 'time_quarter': {
             const m = mins[deal(`${skill}:q`, mins.length)];
-            if (k === 0) return { h: m === 45 ? 12 : 12, m };   // 12:45 is quarter to 1; 12:15 quarter past 12
-            if (k === 1 && m === 45) return { h: 11, m };       // 11:45: quarter to 12
+            // 12:45 is quarter to 1, 12:15 quarter past 12: the page's edge alternates page by page.
+            if (k === 0) return { h: 12, m: mins[Math.floor(_at / 6) % mins.length] };
+            if (k === 1 && m === 45 && hour !== 11) return { h: 11, m };   // 11:45: quarter to 12
             return { h: hour, m };
         }
         case 'time_5min':
             if (k === 0) return { h: hour, m: 5 };      // the leading zero (M-T6)
             if (k === 1) return { h: hour, m: 55 };     // almost the next hour (M-T7)
-            return { h: hour, m: FIVES_NEW[dealPerm(`${skill}:m`, FIVES_NEW.length)] };
+            { const mid = FIVES_NEW.filter((x) => x !== 5 && x !== 55); return { h: hour, m: mid[dealPerm(`${skill}:m`, mid.length)] }; }   // :05 and :55 are the edges, once each
         default: {
             if (k === 0) return { h: hour, m: 10 * randInt(0, 5) + 3 };
             if (k === 1) return { h: hour, m: 10 * randInt(0, 5) + 7 };
@@ -309,10 +317,15 @@ function genOrderClocks(q, skill) {
         picked = shuffle(slots.slice()).slice(0, n);
         if (!across || (picked.some((t) => t < 12 * 60) && picked.some((t) => t >= 12 * 60 && t < 13 * 60) && picked.some((t) => t >= 13 * 60))) break;
     }
-    // Never already in order: a row that is its own answer (1, 2, 3) teaches nothing.
-    for (let t = 0; t < 8 && picked.every((v, i) => !i || (asc ? v > picked[i - 1] : v < picked[i - 1])); t++) picked = shuffle(picked.slice());
-    const sorted = picked.slice().sort((a, b) => (asc ? a - b : b - a));
-    const ranks = picked.map((t) => sorted.indexOf(t) + 1);
+    // The ORDER is dealt, not left to the shuffle: a page runs through every arrangement that is
+    // not already in order (a row that is its own answer teaches nothing) before one comes back,
+    // so the ranks are never one copyable pattern down the page (critic round 3: 1, 3, 2 on every
+    // item).
+    const sortedT = picked.slice().sort((a, b) => (asc ? a - b : b - a));
+    const pats = rankPatterns(n);
+    const pat = pats[dealPerm(`${skill}:pat`, pats.length)];
+    picked = pat.map((r) => sortedT[r - 1]);
+    const ranks = pat.slice();
     const times = picked.map((t) => { const x = fromMin(t); return { h: x.h, m: x.m, ...(across ? { ap: x.h >= 12 ? 'p.m.' : 'a.m.' } : {}) }; });
     setCell(q, 'clock', { kind: 'order', analog, dir: asc ? 'asc' : 'desc', times, ranks, precision: P, numerals: faceNumerals(o) });
     q.text = asc ? 'Write 1, 2, 3 under the clocks. Start with the earliest.' : 'Write 1, 2, 3 under the clocks. Start with the latest.';
@@ -321,20 +334,39 @@ function genOrderClocks(q, skill) {
     q.hint = asc ? 'Read every clock first. The earliest time gets 1.' : 'Read every clock first. The latest time gets 1.';
 }
 
+/** Every arrangement of ranks 1..n except 1, 2, ..., n itself (n <= 5). */
+const _pats = {};
+function rankPatterns(n) {
+    if (_pats[n]) return _pats[n];
+    const out = [];
+    const walk = (pre, rest) => {
+        if (!rest.length) { if (pre.some((v, i) => v !== i + 1)) out.push(pre); return; }
+        rest.forEach((v, i) => walk(pre.concat(v), rest.slice(0, i).concat(rest.slice(i + 1))));
+    };
+    walk([], Array.from({ length: n }, (_, i) => i + 1));
+    _pats[n] = out;
+    return out;
+}
+
 /* ============================================================================ elapsed (TE) */
 
 /**
  * One elapsed item. `mode` later | earlier | duration | start; `durs` the durations (minutes) the
  * step allows; `startStep` the minute step of the given time; `spanH` the line's length in hours.
  */
-function elapsedItem(q, skill, { mode, durs, startStep, spanH, tickStep, support = 'labels', answer = 'time', faces = null, noon = 'never', response = 'write', seeds = [] }) {
+function elapsedItem(q, skill, { mode, durs, startStep, spanH, tickStep, support = 'labels', answer = 'time', faces = null, noon = 'never', response = 'write', seeds = [], both = false }) {
     const k = pos6();
     let total = durs[dealPerm(`${skill}:d`, durs.length)];
     // Crossing noon (TE-9): some items start before 12 and end after it, a.m. / p.m. printed.
     const crossNoon = noon === 'seeded' && (k === 2 || k === 5);
     let start;
     const seed = seeds[k];
-    if (seed) { total = seed.total !== undefined ? seed.total : total; start = seed.start; }
+    if (seed) {
+        total = seed.total ? seed.total : total;
+        start = seed.start;
+        // a seed whose total is 0 crosses 12 on the face: the smallest whole-hour total that does
+        if (seed.total === 0) total = durs.find((d) => start + d > 12 * 60) || durs[durs.length - 1];
+    }
     if (start === undefined) {
         if (crossNoon) {
             const latest = 12 * 60 - startStep;
@@ -361,7 +393,7 @@ function elapsedItem(q, skill, { mode, durs, startStep, spanH, tickStep, support
     const payload = {
         mode, start: { h: s.h, m: s.m }, end: { h: e.h, m: e.m }, total, step: tickStep,
         axis: { from: ((from % 1440) + 1440) % 1440, hours }, support, answer, ampm, response,
-        ...(faces ? { faces } : {}),
+        ...(faces ? { faces } : {}), ...(both ? { both: true } : {}),
     };
     setCell(q, 'timeline', payload, { twin: response !== 'draw' });
     const durText = fmtDuration(Math.floor(total / 60), total % 60);
@@ -386,6 +418,9 @@ function elapsedItem(q, skill, { mode, durs, startStep, spanH, tickStep, support
             q.answerType = 'text';
         }
         q.hint = back ? 'Start at the end time. Hop back the hours, then the minutes.' : 'Start at the start time. Hop the hours, then the minutes.';
+        // A page dealing later AND earlier carries one instruction for both (the cell's own
+        // Start / End label names the time to write).
+        if (both && response !== 'draw') q.text = 'Use the time line. Write the missing time.';
     }
     q.tm.ampm = ampm;
 }
@@ -397,26 +432,38 @@ const durWordsShort = (total) => {
 function genElapsed(q, skill) {
     const o = optsOf(skill);
     const support = ['labels', 'pupil', 'none'].includes(o.support) ? o.support : 'labels';
-    const dir = o.dir === 'earlier' ? 'earlier' : 'later';
+    // "Later or earlier" (the skills' names): `both` deals the two directions down one page,
+    // alternately; `later` / `earlier` keep one direction per page (critic round 3).
+    const both = o.dir === 'both';
+    const dir = both ? (dealPerm(`${skill}:dir`, 2) === 0 ? 'later' : 'earlier') : o.dir === 'earlier' ? 'earlier' : 'later';
+    // An afternoon hour (1 p.m. - 8 p.m.) for a seeded edge: the edge is the MINUTE, so the hour is
+    // drawn, and a role's model, its first item and its test never repeat one item (critic round 3).
+    const pmHour = (lo = 13, hi = 20) => 60 * randInt(lo, hi);
     switch (skill) {
         case 'elapsed_hour': {
             const spanH = Number(o.hours) === 5 ? 5 : 3;
             const durs = Array.from({ length: spanH }, (_, i) => 60 * (i + 1));
             elapsedItem(q, skill, {
-                mode: dir, durs, startStep: 60, spanH, tickStep: 30, support, response: o.response === 'draw' ? 'draw' : 'write',
+                mode: dir, durs, startStep: 60, spanH, tickStep: 30, support, response: o.response === 'draw' ? 'draw' : 'write', both,
                 // a whole-hour interval from a non-zero minute (4:15 + 2 h), and crossing 12 on the face (11:30 + 2 h = 1:30)
-                seeds: { 1: { start: 16 * 60 + 15, total: 120 }, 3: { start: 11 * 60 + 30, total: 120 } },
+                seeds: {
+                    1: { start: pmHour(13, 18) + 15 * randInt(1, 3), total: 60 * randInt(1, Math.min(2, spanH)) },
+                    3: { start: (spanH >= 3 && randInt(0, 1) ? 10 : 11) * 60 + 30, total: 0 },
+                },
             });
             return;
         }
         case 'elapsed_30min':
-            elapsedItem(q, skill, { mode: dir, durs: [30], startStep: 15, spanH: 1, tickStep: 15, support,
-                seeds: { 0: { start: 15 * 60 + 45 }, 2: { start: 14 * 60 + 30 } } });   // crossing the hour
+            elapsedItem(q, skill, { mode: dir, durs: [30], startStep: 15, spanH: 1, tickStep: 15, support, both,
+                seeds: { 0: { start: pmHour() + 45 }, 2: { start: pmHour() + 30 } } });   // crossing the hour
             return;
         case 'elapsed_15min': {
             const set = Array.isArray(o.step) && o.step.length ? o.step.map(Number).filter((x) => [15, 30, 45].includes(x)) : [15];
-            elapsedItem(q, skill, { mode: dir, durs: set.length ? set : [15], startStep: 15, spanH: 1, tickStep: 15, support,
-                seeds: { 0: { start: 15 * 60 + 45, total: (set.length ? set : [15])[0] } } });
+            const use = set.length ? set : [15];
+            // crossing the hour: the start's minutes and the step make 60 or more
+            const t0 = use[dealPerm(`${skill}:t0`, use.length)];
+            elapsedItem(q, skill, { mode: dir, durs: use, startStep: 15, spanH: 1, tickStep: 15, support, both,
+                seeds: { 0: { start: pmHour() + 15 * randInt(Math.max(1, Math.ceil((60 - t0) / 15)), 3), total: t0 } } });
             return;
         }
         default: break;
@@ -430,8 +477,10 @@ function genElapsed(q, skill) {
     const startStep = step === 1 ? 1 : step;
     const noon = o.noon === 'seeded' ? 'seeded' : 'never';
     if (skill === 'elapsed_mixed') {
+        // minutes pass 60 (M-E2): a :45 start and more than 15 minutes on top, at a drawn hour
+        const extra = step === 15 ? 15 * randInt(2, 3) : step === 5 ? 5 * randInt(4, 11) : randInt(16, 58);
         elapsedItem(q, skill, { mode: 'later', durs, startStep, spanH, tickStep: tick, support, noon,
-            seeds: { 0: { start: 14 * 60 + 45, total: 60 + (step === 15 ? 30 : step === 5 ? 25 : 27) } } });   // minutes pass 60 (M-E2)
+            seeds: { 0: { start: 60 * randInt(13, 18) + 45, total: 60 * randInt(1, Math.max(1, spanH - 1)) + extra } } });
     } else if (skill === 'elapsed_find_duration') {
         elapsedItem(q, skill, { mode: 'duration', durs, startStep, spanH, tickStep: tick, support, noon, answer: o.response === 'minutes' ? 'minutes' : 'hm' });
     } else if (skill === 'elapsed_find_start') {
@@ -492,15 +541,31 @@ function genFivesRing(q, skill) {
 const ACTIVITIES = [
     { text: 'Wake up', h: 6, m: 30, ap: 'a.m.' }, { text: 'Eat breakfast', h: 7, m: 0, ap: 'a.m.' },
     { text: 'School starts', h: 7, m: 30, ap: 'a.m.' }, { text: 'Break time', h: 10, m: 0, ap: 'a.m.' },
+    { text: 'Walk to school', h: 7, m: 15, ap: 'a.m.' }, { text: 'Maths lesson', h: 9, m: 0, ap: 'a.m.' },
+    { text: 'Eat a snack', h: 10, m: 30, ap: 'a.m.' }, { text: 'Brush your teeth', h: 6, m: 45, ap: 'a.m.' },
     { text: 'Eat lunch', h: 12, m: 30, ap: 'p.m.' }, { text: 'Play in the park', h: 4, m: 30, ap: 'p.m.' },
     { text: 'Eat dinner', h: 7, m: 0, ap: 'p.m.' }, { text: 'Go to bed', h: 8, m: 30, ap: 'p.m.' },
+    { text: 'School ends', h: 2, m: 30, ap: 'p.m.' }, { text: 'Swimming lesson', h: 3, m: 45, ap: 'p.m.' },
+    { text: 'Read a bedtime story', h: 8, m: 0, ap: 'p.m.' }, { text: 'Do homework', h: 5, m: 0, ap: 'p.m.' },
 ];
+/** The a.m. / p.m. pattern of a page: each run of six holds three of each in a dealt order, so the
+ *  answers never simply alternate (critic round 3: a, p, a, p ... could be guessed). */
+const _apBlocks = {};
+function apAt(skill, at) {
+    const b = Math.floor(at / 6);
+    const key = `${skill}:${b}`;
+    if (_at === 0) for (const k of Object.keys(_apBlocks)) delete _apBlocks[k];
+    if (!_apBlocks[key]) _apBlocks[key] = shuffle([true, true, true, false, false, false]);
+    return _apBlocks[key][((at % 6) + 6) % 6];
+}
 function genTimeSense(q, skill) {
     const am = ACTIVITIES.filter((a) => a.ap === 'a.m.'), pm = ACTIVITIES.filter((a) => a.ap === 'p.m.');
-    const pickAm = deal(`${skill}:ap`, 2) === 0;
+    const pickAm = apAt(skill, _at);
     const pool = pickAm ? am : pm;
-    // a.m. and p.m. alternate, so each list is read at every other position (floor(at / 2)).
-    const a = pool[dealPerm(`${skill}:${pickAm ? 'a' : 'p'}`, pool.length, Math.floor(_at / 2))];
+    // Each list is read at its own running count, so no activity repeats until the list is used up.
+    let n = 0;
+    for (let j = 0; j < _at; j++) if (apAt(skill, j) === pickAm) n++;
+    const a = pool[dealPerm(`${skill}:${pickAm ? 'a' : 'p'}`, pool.length, n)];
     setCell(q, 'clock', { kind: 'sense', h: a.h, m: a.m, ap: a.ap, activity: a.text });
     q.text = 'Read the time. Check a.m. or p.m.';
     choiceAnswer(q, a.ap);
@@ -538,33 +603,41 @@ function scatter(list) {
     return list.slice().reverse();
 }
 
+// Plain numbers have no notes of their own beyond 20 (tmkit CURRENCIES), so a Plain page of notes
+// "to 100" or "to 500" could only reach 80. A plain note is a generic value rectangle like a plain
+// coin, so Plain counts notes of 1 to 100 (option-panel round 3, OPTIONS-CRITIC-R2 §5 #16).
+const PLAIN_NOTES = [1, 5, 10, 20, 50, 100];
+
 function genMoneyCount(q, skill) {
     const o = optsOf(skill);
     const c = currencyOf(o.currency);
-    let kind = ['like', 'two', 'mixed', 'notes', 'notes100', 'notes500', 'notes-coins'].includes(o.kind) ? o.kind : 'like';
-    // The notes steps carry their own totals (MB-3): to 20, to 100, to 500 whole units.
-    const noteCap = kind === 'notes500' ? 500 : kind === 'notes100' ? 100 : 20;
-    if (kind === 'notes100' || kind === 'notes500') kind = 'notes';
+    // What to count (the old notes kinds are folded into note / both by skill-options.js).
+    const kind = ['like', 'two', 'mixed', 'note', 'both'].includes(o.kind) ? o.kind : 'like';
     const band = Number(o.band) || 100;
-    const maxN = Number(o.tiles) === 10 ? 10 : 6;
+    // Coins in a cell: six fit a half-width cell; "Totals to 500" (or an old "Coins at most: 10")
+    // deals up to ten, a full-width row.
+    const maxN = Number(o.tiles) === 10 || band >= 500 ? 10 : 6;
+    const order = String(o.order || 'largest');
     const k = pos6();
-    if (kind === 'notes' || kind === 'notes-coins') {
-        const capMajor = noteCap;
-        const notesAll = c.notes.filter((v) => v <= capMajor);
+    if (kind === 'note' || kind === 'both') {
+        // Notes total to the band in WHOLE units (the notes' own totals: to 20, 100, 500).
+        const capMajor = band;
+        const notesAll = (o.currency === 'plain' ? PLAIN_NOTES : c.notes).filter((v) => v <= capMajor);
         let notes;
-        if (k <= 1 && kind === 'notes') {
+        if (k <= 1 && kind === 'note') {
             const v = notesAll[dealPerm(`${skill}:nv`, notesAll.length)];
-            const cnt = Math.max(1, Math.min(5, Math.floor(capMajor / v), 1 + randInt(1, 4)));
+            const cnt = Math.max(1, Math.min(5, maxN, Math.floor(capMajor / v), 1 + randInt(1, 4)));
             notes = Array.from({ length: cnt }, () => v);                  // like notes: "five 10 notes"
         } else if (k === 2 && o.currency === 'qar' && capMajor >= 70) {
             notes = [50, 10, 10];                                          // the 50 -> 60 -> 70 jump (no 20 note)
         } else {
-            notes = randomCoins(notesAll, 1 + randInt(1, kind === 'notes-coins' ? 2 : 3), capMajor);
+            notes = randomCoins(notesAll, Math.min(maxN, 1 + randInt(1, kind === 'both' ? 2 : 3)), capMajor);
         }
         notes.sort((a, b) => b - a);
-        if (kind === 'notes') {
+        if (kind === 'note') {
             const total = sum(notes);
             setCell(q, 'coins', { kind: 'count', notes, coins: [], currency: o.currency, answer: 'major', total, dots: 'none' });
+            q.printFormat = 'tm-notes';
             q.text = 'Count the money. Write the total.';
             q.ans = total;
             q.answerType = 'number';
@@ -575,6 +648,7 @@ function genMoneyCount(q, skill) {
         const coins = randomCoins(coinVals, 1 + randInt(1, 3), 99);
         const total = sum(notes) * 100 + sum(coins);
         setCell(q, 'coins', { kind: 'count', notes, coins, currency: o.currency, answer: 'two', total, dots: 'none' });
+        q.printFormat = 'tm-notes-coins';
         q.text = 'Count the notes, then the coins. Write both numbers.';
         q.ans = `${sum(notes)}, ${sum(coins)}`;
         q.answerType = 'text';
@@ -605,20 +679,22 @@ function genMoneyCount(q, skill) {
         }
         if (!coins) coins = [a, b].filter((v) => v <= band);
     } else {
-        const n = randInt(3, Math.min(maxN, 3 + 3));
+        const n = randInt(3, maxN === 10 ? 9 : 6);                        // ten coins: up to nine mixed
         coins = randomCoins(vals, n, band);
         if (k === 3 && vals.includes(25) && vals.includes(10) && vals.includes(5) && band >= 75) coins = [25, 25, 10, 10, 5].slice(0, Math.min(5, maxN));   // M-M3
     }
     coins.sort((x, y) => y - x);
-    const scattered = o.order === 'scrambled';
+    const scattered = /^scrambled/.test(order);
     if (scattered && new Set(coins).size > 1) coins = scatter(coins);
     const total = sum(coins);
-    const dots = ['auto', 'dots', 'none'].includes(o.support) ? o.support : 'auto';
+    // "Coins set out": the -dots values keep the count-by-five dots on every page (an old code's
+    // `support: dots` is folded into them); otherwise they show on Model and Guided pages only.
+    const dots = /-dots$/.test(order) || o.support === 'dots' ? 'dots' : 'auto';
     setCell(q, 'coins', { kind: 'count', coins, notes: [], currency: o.currency, answer: 'minor', total, dots, ...(scattered ? { scatter: true } : {}) });
     q.text = 'Count the coins. Write the total.';
     q.ans = total;
     q.answerType = 'number';
-    q.hint = o.order === 'scrambled' ? 'Find the biggest coin first. Count on from it.' : 'Start with the biggest coin. Count on by each coin\'s value.';
+    q.hint = scattered ? 'Find the biggest coin first. Count on from it.' : 'Start with the biggest coin. Count on by each coin\'s value.';
 }
 
 /** Does a + b (or a - b) regroup in any column of the minor-unit digits? */
@@ -671,6 +747,8 @@ function genMoneyChange(q, skill) {
             paid = (Math.floor(price / 100) + 1) * 100;
         }
         if (!paid || paid > band || paid === price) continue;
+        // a step in cents deals a price with cents: 2.00 - 1.00 is not a change-with-cents item
+        if (step < 100 && price % 100 === 0) continue;
         if (k === 0 && step < 100 && paid % 100 === 0 && price % 100 !== 0) break;   // across zeros (5.00 - 3.25)
         if (regroups(paid, price, '-') === want) break;
     }
@@ -720,7 +798,9 @@ function genFewestCoins(q, skill) {
     // Every amount must be makeable with the ticked coins: a multiple of the smallest one.
     const unit = values[values.length - 1] || 1;
     let target = unit * randInt(Math.max(1, Math.ceil(Math.max(6, band * 0.3) / unit)), Math.max(1, Math.floor(band / unit)));
-    if (pos6() === 0) target = unit * Math.floor(band / unit);   // exactly the band (or the nearest amount below it)
+    // exactly the band (or the nearest amount below it), once a page, and not as the first item
+    // (critic round 3: every form opened with "Make 50")
+    if (edge6() === 3) target = unit * Math.floor(band / unit);
     // The fewest coins by dynamic programming: greedy is optimal for 1-5-10-25(-50), but not for a
     // teacher's chosen few (10 and 25 make 30 as 10 + 10 + 10, which greedy cannot find).
     let counts = fewestCounts(values, target);
@@ -739,13 +819,20 @@ function genEnough(q, skill) {
     const vals = coinSet(o).filter((v) => v <= band);
     const enough = dealPerm(`${skill}:e`, 2) === 0;
     const near = o.gap === 'near';
+    // The exact price ("the same is enough", §2.3) on the second Enough item of each six.
+    const k = pos6();
+    let before = 0;
+    for (let j = _at - k; j < _at; j++) if (dealPerm(`${skill}:e`, 2, j) === 0) before++;
+    const exact = enough && before === 1;
     let coins, price;
     for (let t = 0; t < 120; t++) {
         coins = randomCoins(vals, randInt(2, 6), band);
         const s = sum(coins);
-        const gap = near ? randInt(1, 5) : randInt(10, Math.max(10, Math.floor(band / 3)));
-        price = enough ? s - (pos6() === 4 ? 0 : gap) : s + gap;
-        if (price > 0 && price <= band) break;
+        // "Far" is 10 or more away, but never so far that one glance decides it (critic round 3:
+        // 31 against a price of 5): at most 20 away, and a price is never under 10.
+        const gap = near ? randInt(1, 5) : randInt(10, Math.max(10, Math.min(20, Math.floor(band / 3))));
+        price = enough ? s - (exact ? 0 : gap) : s + gap;
+        if (price >= Math.min(10, band) && price <= band) break;
     }
     setCell(q, 'coins', { kind: 'enough', coins, currency: o.currency, price, enough: sum(coins) >= price, dots: 'none' });
     q.text = 'Is there enough money? Check one box.';
@@ -774,12 +861,16 @@ function genCoinValue(q, skill) {
     const v = vals[dealPerm(`${skill}:v`, vals.length)];
     const count = randInt(2, 5);
     const others = vals.filter((x) => x !== v);
-    const field = [...Array(count).fill(v), ...Array.from({ length: 10 - count }, () => others[randInt(0, others.length - 1)])];
-    setCell(q, 'coins', { kind: 'find', coins: shuffle(field), target: v, count, currency: o.currency, dots: 'none', wrap: 5 });
+    const field = [...Array(count).fill(v), ...Array.from({ length: 8 - count }, () => others[randInt(0, others.length - 1)])];
+    // "Coins and Notes": two notes stand in the field too, one printed with the SAME number where the
+    // currency has that note, so the task is "a coin worth 5", not "find the numeral 5" (critic round 3).
+    const noteVals = c.notes.filter((x) => x <= 20);
+    const notes = [noteVals.includes(v) ? v : noteVals[randInt(0, noteVals.length - 1)], noteVals[randInt(0, noteVals.length - 1)]].sort((a, b) => b - a);
+    setCell(q, 'coins', { kind: 'find', coins: shuffle(field), notes, target: v, count, currency: o.currency, dots: 'none', wrap: 4 });
     q.text = 'Circle every coin worth the number. Write how many.';
     q.ans = count;
     q.answerType = 'number';
-    q.hint = 'Read the number on each coin. Circle it if it matches.';
+    q.hint = 'Look at the coins only. Circle each coin with the number.';
 }
 
 function genMoneyNotation(q, skill) {
@@ -828,7 +919,10 @@ function genMoneyCompare(q, skill) {
         if (k === 1 && !(a.length > b.length && sum(a) < sum(b)) && !(b.length > a.length && sum(b) < sum(a))) continue;
         if (ok) break;
     }
-    if (dealPerm(`${skill}:s`, 2) === 1) [a, b] = [b, a];
+    // Which side has more is dealt (three A and three B in each six, in a dealt order), never left
+    // to the draw (critic round 3: the answer was B on every item of a page).
+    const wantA = dealPerm(`${skill}:s6`, 6) < 3;
+    if ((sum(a) > sum(b)) !== wantA && sum(a) !== sum(b)) [a, b] = [b, a];
     const sa = sum(a), sb = sum(b);
     if (o.response === 'sign') {
         const sign = sa > sb ? '>' : sa < sb ? '<' : '=';

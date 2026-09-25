@@ -1,0 +1,324 @@
+/* ==========================================================================
+   play-teacher.css — the pupil play views when a TEACHER launches them
+   (TEACHER-SCREENS-AUDIT-R2 items 2, 3 and 4).
+
+   Run practice (Practice / Boss / Race), Board display, the online worksheet and
+   a MAP session wear the calm teacher style here: the tv tokens of teacher.css
+   (--tv-*, defined on body.teacher-mode), 1 px borders, no 3-D shadows, no
+   orange, one accent for the one primary action, 44 px targets, Manrope for the
+   chrome. The black-and-white paper cells are content and are not touched.
+
+   ADDITIVE ONLY, and every rule is scoped to body.teacher-mode (or to classes
+   only launch-chrome.js / worked-preview.js / worksheet.js add in teacher mode),
+   so the pupil views are unchanged.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- shared: the tv button */
+body.teacher-mode :is(#gameView, #mapSessionView) #questionCard > .mq-qactions > .btn,
+body.teacher-mode :is(#gameView, #mapSessionView) #questionCard > .mq-qactions > button,
+body.teacher-mode #gameView .game-header .btn,
+body.teacher-mode #gameView #nextBtnContainer .btn,
+body.teacher-mode :is(#gameView, #mapSessionView) .mq-inline-check,
+body.teacher-mode #worksheetView .game-header .btn,
+body.teacher-mode #worksheetView #worksheetUnlimitedControls .btn,
+body.teacher-mode #mapSessionView .map-session-banner :is(.map-end-btn, .map-audio-toggle),
+body.teacher-mode #worksheetView .mq-wsbar button,
+.mq-how-teacher .mq-how-close,
+.mq-wsres-teacher .mq-wsres-btn {
+    font-family: var(--tv-font);
+    font-size: 15px; font-weight: 600; line-height: 20px; letter-spacing: 0; text-transform: none;
+    height: 44px; min-height: 44px; min-width: 44px; padding: 0 16px;
+    /* no display here: the game shows and hides these buttons with inline display and
+       #qcCheckBtn's .mq-show, and that must keep working */
+    align-items: center; justify-content: center; gap: 8px;
+    border: 1px solid var(--tv-control-soft); border-radius: 8px;
+    background: var(--tv-surface); color: var(--tv-text);
+    box-shadow: none; transform: none; text-shadow: none; white-space: nowrap;
+    cursor: pointer;
+}
+body.teacher-mode :is(#gameView, #mapSessionView) #questionCard > .mq-qactions > :is(.btn, button):hover,
+body.teacher-mode #gameView .game-header .btn:hover,
+body.teacher-mode #worksheetView .game-header .btn:hover,
+body.teacher-mode #worksheetView .mq-wsbar button:hover,
+body.teacher-mode #mapSessionView .map-session-banner :is(.map-end-btn, .map-audio-toggle):hover,
+.mq-how-teacher .mq-how-close:hover,
+.mq-wsres-teacher .mq-wsres-btn:hover {
+    border-color: var(--tv-control); background: var(--tv-subtle-2); color: var(--tv-text); transform: none; box-shadow: none;
+}
+body.teacher-mode :is(#gameView, #mapSessionView) #questionCard > .mq-qactions > :is(.btn, button):active,
+body.teacher-mode #worksheetView .game-header .btn:active { transform: none; box-shadow: none; }
+
+/* The one primary action of each view: Check, Next question, Check answers. */
+body.teacher-mode :is(#gameView, #mapSessionView) #questionCard > .mq-qactions > #qcCheckBtn,
+body.teacher-mode #gameView #nextBtnContainer .btn,
+body.teacher-mode :is(#gameView, #mapSessionView) .mq-inline-check,
+body.teacher-mode #worksheetView .game-header .btn[onclick="checkAllWorksheet()"],
+.mq-how-teacher .mq-how-close,
+.mq-wsres-teacher .mq-wsres-btn.is-primary {
+    background: var(--tv-accent); border-color: var(--tv-accent); color: #fff; padding: 0 20px;
+}
+body.teacher-mode :is(#gameView, #mapSessionView) #questionCard > .mq-qactions > #qcCheckBtn:hover,
+body.teacher-mode #gameView #nextBtnContainer .btn:hover,
+body.teacher-mode #worksheetView .game-header .btn[onclick="checkAllWorksheet()"]:hover,
+.mq-how-teacher .mq-how-close:hover,
+.mq-wsres-teacher .mq-wsres-btn.is-primary:hover {
+    background: var(--tv-accent-hover); border-color: var(--tv-accent-hover); color: #fff;
+}
+body.teacher-mode :is(#gameView, #mapSessionView) #questionCard > .mq-qactions > #qcCheckBtn { min-height: 48px; height: 48px; font-size: 16px; }
+
+body.teacher-mode :is(#gameView, #worksheetView, #mapSessionView) :is(button, .btn):focus-visible,
+.mq-how-teacher button:focus-visible,
+.mq-wsres-teacher button:focus-visible {
+    outline: 3px solid var(--tv-accent); outline-offset: 2px;
+}
+
+#tvHowBtn[hidden] { display: none !important; }
+
+/* ---------------------------------------------------------------- game view (Practice / Boss / Race) */
+body.teacher-mode #gameView { font-family: var(--tv-font); color: var(--tv-text); }
+body.teacher-mode #gameView .game-header {
+    background: var(--tv-surface); border: 1px solid var(--tv-border); border-radius: 12px;
+    box-shadow: none; padding: 12px 16px;
+}
+body.teacher-mode #gameView #gameScore { font-weight: 600; color: var(--tv-text-2); }
+body.teacher-mode #gameView #gameTopicDisplay { font-weight: 600 !important; color: var(--tv-text) !important; font-size: 15px; }
+/* The pupil's own mastery bar ("New Skill") means nothing on the classroom screen. */
+body.teacher-mode #gameView #skillProgressContainer { display: none; }
+body.teacher-mode #gameView #questionCard {
+    background: var(--tv-surface); border: 1px solid var(--tv-border); border-radius: 12px; box-shadow: none;
+}
+body.teacher-mode #gameView #qNum { color: var(--tv-caption); font-family: var(--tv-font); font-weight: 600; }
+body.teacher-mode :is(#gameView, #mapSessionView) #skillLabel.mq-skill-pill {
+    font-family: var(--tv-font); font-size: 14px; font-weight: 600; letter-spacing: 0; text-transform: none;
+    color: var(--tv-text-2); background: var(--tv-subtle); border: 1px solid var(--tv-border); border-radius: 999px;
+    padding: 4px 12px; box-shadow: none;
+}
+body.teacher-mode #gameView .timer-container .timer-display {
+    font-family: var(--tv-font); background: var(--tv-surface); color: var(--tv-text);
+    border: 1px solid var(--tv-border); box-shadow: none;
+}
+/* One toast style: the legacy toast wears the tv toast's calm colours. */
+body.teacher-mode.tv-play .toast-notification {
+    background: var(--tv-selected) !important; color: var(--tv-on-selected) !important;
+    font-family: var(--tv-font) !important; border-radius: 8px !important; box-shadow: 0 8px 24px rgba(0, 0, 0, .16) !important;
+}
+
+/* ---------------------------------------------------------------- Board display */
+/* One large question at a time, as the Run screen's preview draws it: a dark frame with
+   "Question N" and "Whole class" chips, the question in a big white paper cell, and the
+   teacher's controls. No pupil tools, score, dots, timer or toasts. */
+body.teacher-mode.tv-bigboard #gameView.active {
+    zoom: 1;
+    position: fixed; inset: 0; z-index: 45;
+    display: flex; flex-direction: column; gap: 16px;
+    margin: 0; max-width: none; width: auto; box-sizing: border-box;
+    padding: 20px 24px; overflow: auto;
+    background: #1f2023; color: #fff;
+}
+body.teacher-mode.tv-bigboard #gameView > :is(.game-header, #skillProgressContainer, #timerContainer, #bossStatus, #bossArena, #raceStatus, #raceTrack, #qDotsRow, #practiceReviewBanner, .q-dots-row),
+body.teacher-mode.tv-bigboard #gameView #questionCard > :is(.mq-qtop, #answerInputArea, #feedbackArea, .mq-qactions, #nextBtnContainer, .next-btn-container),
+body.teacher-mode.tv-bigboard #gameView #questionCard :is(#answerInputArea, #feedbackArea, .mq-qactions, #nextBtnContainer),
+body.teacher-mode.tv-bigboard .toast-notification,
+body.teacher-mode.tv-bigboard #floatingTimer,
+body.teacher-mode.tv-bigboard #gameStatsBanner { display: none !important; }
+body.teacher-mode.tv-bigboard #gameView #questionCard {
+    flex: 1 1 auto; min-height: 0; margin: 0; width: auto; max-width: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: #fff; color: #000; border: 0; border-radius: 16px; box-shadow: none;
+    padding: 32px 24px; overflow: auto;
+}
+body.teacher-mode.tv-bigboard #gameView #questionPaper { zoom: 1.6; max-width: 100%; }
+body.teacher-mode.tv-bigboard #gameView #answerOptions { pointer-events: none; }
+@media (max-width: 1023px) {
+    body.teacher-mode.tv-bigboard #gameView #questionPaper { zoom: 1.25; }
+}
+@media (max-width: 600px) {
+    body.teacher-mode.tv-bigboard #gameView.active { padding: 12px; gap: 12px; }
+    body.teacher-mode.tv-bigboard #gameView #questionPaper { zoom: 1; }
+}
+
+#tvBoardBar, #tvBoardCtl { display: none; }
+body.teacher-mode.tv-bigboard #gameView #tvBoardBar { display: flex; }
+body.teacher-mode.tv-bigboard #gameView #tvBoardCtl { display: flex; }
+.tvb-bar { align-items: center; gap: 12px; flex: none; font-family: var(--tv-font); }
+.tvb-chip {
+    display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border-radius: 999px;
+    background: rgba(255, 255, 255, .12); color: #fff; font-size: 14px; font-weight: 600; white-space: nowrap;
+}
+.tvb-title {
+    flex: 1 1 auto; min-width: 0; color: rgba(255, 255, 255, .86); font-size: 16px; font-weight: 600;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tvb-ctl { flex-direction: column; gap: 12px; flex: none; font-family: var(--tv-font); }
+.tvb-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.tvb-grow { flex: 1 1 auto; }
+.tvb-btn {
+    height: 44px; min-width: 44px; padding: 0 18px; border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, .32); background: transparent; color: #fff;
+    font-family: var(--tv-font); font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.tvb-btn:hover { background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .5); }
+.tvb-btn-primary { background: #fff; border-color: #fff; color: #1f2023; }
+.tvb-btn-primary:hover { background: #e9e9ec; border-color: #e9e9ec; }
+.tvb-btn-quiet { border-color: transparent; color: rgba(255, 255, 255, .86); }
+.tvb-btn:focus-visible { outline: 3px solid #8c98f0; outline-offset: 2px; }
+.tvb-answer {
+    display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;
+    padding: 12px 20px; border-radius: 12px; background: #fff; color: #000;
+}
+.tvb-answer[hidden] { display: none; }
+.tvb-answer-l { font-family: var(--tv-font); font-size: 15px; font-weight: 600; color: #5b5f66; }
+.tvb-answer-v { font-family: 'Andika', var(--tv-font); font-size: 40px; line-height: 1.1; font-weight: 700; }
+@media (max-width: 600px) {
+    .tvb-bar { flex-wrap: wrap; }
+    .tvb-title { order: 5; flex-basis: 100%; }
+    .tvb-row .tvb-grow { display: none; }
+    .tvb-row .tvb-btn { flex: 1 1 auto; }
+}
+
+/* ---------------------------------------------------------------- the worked example ("Show me how") */
+.mq-worked-preview-overlay.mq-how-teacher {
+    position: fixed; inset: 0; z-index: 10040;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+    background: rgba(20, 21, 24, .5);
+}
+.mq-how-card {
+    box-sizing: border-box; width: 100%; max-width: 520px; max-height: calc(100vh - 32px); overflow: auto;
+    padding: 24px; border-radius: 12px; border: 1px solid var(--tv-border, #e4e3de);
+    background: var(--tv-surface, #fff); color: var(--tv-text, #1c1d1f);
+    font-family: var(--tv-font, Manrope, system-ui, sans-serif);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .18);
+}
+.mq-how-eyebrow { font-size: 13px; font-weight: 600; color: var(--tv-caption, #5b5f66); margin: 0 0 4px; }
+.mq-how-title { font-size: 20px; line-height: 28px; font-weight: 700; margin: 0 0 16px; color: var(--tv-text, #1c1d1f); }
+.mq-how-example { border: 1px solid var(--tv-border, #e4e3de); border-radius: 8px; padding: 16px; background: var(--tv-subtle-2, #fafaf9); }
+.mq-how-teacher .mq-how-problem {
+    background: #fff; color: #000; border: 1px solid #000; border-radius: 6px; padding: 12px 16px;
+    font-family: 'Andika', var(--tv-font); font-size: 28px; line-height: 1.3; text-align: center;
+}
+.mq-how-visual { max-height: 260px; overflow: auto; }
+.mq-how-slot { display: inline-block; width: 1.1em; height: 1.2em; border: 2px solid #000; border-radius: 4px; vertical-align: middle; }
+.mq-how-steps { margin: 16px 0 0 22px; padding: 0; font-size: 15px; line-height: 24px; color: var(--tv-text-2, #3f4247); }
+.mq-how-steps li { margin: 2px 0; }
+.mq-how-answer { margin-top: 12px; font-size: 15px; font-weight: 700; color: var(--tv-text, #1c1d1f); }
+.mq-how-none { margin: 0; font-size: 15px; color: var(--tv-caption, #5b5f66); }
+.mq-how-foot { display: flex; justify-content: flex-end; margin-top: 20px; }
+.mq-how-slot, .mq-worked-preview-card .mq-how-slot { vertical-align: middle; }
+
+/* ---------------------------------------------------------------- online worksheet */
+body.teacher-mode #worksheetView { font-family: var(--tv-font); color: var(--tv-text); }
+body.teacher-mode #worksheetView > .game-header {
+    background: var(--tv-surface); border: 1px solid var(--tv-border); border-radius: 12px;
+    box-shadow: none; padding: 12px 16px; gap: 12px; flex-wrap: wrap;
+}
+body.teacher-mode #worksheetView > .game-header > div { gap: 12px !important; align-items: center; flex-wrap: wrap; }
+body.teacher-mode #worksheetView > .game-header span[style*="font-weight"] { font-size: 18px; font-weight: 700 !important; color: var(--tv-text); }
+body.teacher-mode #worksheetView #worksheetSkillPill {
+    background: transparent; border: 0; padding: 0; box-shadow: none;
+    font-family: var(--tv-font); font-size: 14px; font-weight: 500; color: var(--tv-caption);
+    white-space: normal;
+}
+body.teacher-mode #worksheetView .problem-card.mq-wscard {
+    border: 1px solid var(--tv-border); border-radius: 12px; box-shadow: none; background: var(--tv-surface);
+}
+body.teacher-mode #worksheetView .mq-wsbar .mq-wsnum { color: var(--tv-caption); font-family: var(--tv-font); font-weight: 600; }
+/* The per-cell tools (Read, Hint, Skip, Zoom) show only on the cell in use: 3 quiet buttons on
+   one cell instead of 60 coloured ones on the page. visibility (not display) keeps the bar's
+   height, so the cells do not jump as focus moves. A skipped cell keeps its "Undo skip". */
+body.teacher-mode #worksheetView .mq-wsbar button {
+    visibility: hidden; opacity: 1; pointer-events: auto; width: auto; font-size: 14px; padding: 0 12px;
+}
+body.teacher-mode #worksheetView .problem-card.mq-wscard:focus-within .mq-wsbar button,
+body.teacher-mode #worksheetView .problem-card.mq-wscard.ws-skipped .mq-wsbar .ws-skip-btn { visibility: visible; }
+body.teacher-mode #worksheetView .problem-card.mq-wscard:focus-within {
+    border-color: var(--tv-accent); box-shadow: 0 0 0 1px var(--tv-accent);
+}
+body.teacher-mode #worksheetView .hint-popup {
+    font-family: var(--tv-font); background: var(--tv-surface); color: var(--tv-text);
+    border: 1px solid var(--tv-border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+}
+body.teacher-mode #worksheetView .hint-popup .hint-title { color: var(--tv-text); font-weight: 700; }
+body.teacher-mode #worksheetView #worksheetResult { font-family: var(--tv-font); font-weight: 600; color: var(--tv-text); }
+
+/* The result card after "Check answers". */
+.mq-wsres-teacher {
+    position: fixed; inset: 0; z-index: 9999;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+    background: rgba(20, 21, 24, .5);
+}
+.mq-wsres-card {
+    box-sizing: border-box; width: 100%; max-width: 500px; padding: 24px; border-radius: 12px;
+    border: 1px solid var(--tv-border, #e4e3de); background: var(--tv-surface, #fff); color: var(--tv-text, #1c1d1f);
+    font-family: var(--tv-font, Manrope, system-ui, sans-serif); box-shadow: 0 16px 40px rgba(0, 0, 0, .18);
+}
+.mq-wsres-eyebrow { font-size: 13px; font-weight: 600; color: var(--tv-caption, #5b5f66); }
+.mq-wsres-title { margin: 4px 0 4px; font-size: 24px; line-height: 32px; font-weight: 700; }
+.mq-wsres-pct { font-size: 15px; font-weight: 600; color: var(--tv-text-2, #3f4247); }
+.mq-wsres-desc { margin: 12px 0 0; font-size: 14px; color: var(--tv-caption, #5b5f66); }
+.mq-wsres-foot { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+/* ---------------------------------------------------------------- MAP session */
+/* End session and Audio sit IN the banner (map-engine.js), never over it. */
+body.teacher-mode #mapSessionView { font-family: var(--tv-font); color: var(--tv-text); }
+body.teacher-mode #mapSessionView .map-session-banner,
+body.teacher-mode.map-immersive #mapSessionView .map-session-banner {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    padding: 8px 12px; margin: 0 0 8px;
+    background: var(--tv-surface); border: 1px solid var(--tv-border); border-radius: 12px;
+    font-family: var(--tv-font); font-size: 15px; font-weight: 600; color: var(--tv-text);
+}
+body.teacher-mode #mapSessionView :is(.map-banner-left, .map-banner-right) { display: flex; align-items: center; gap: 12px; }
+body.teacher-mode #mapSessionView .map-session-banner :is(.map-end-btn, .map-audio-toggle) { position: static; z-index: auto; }
+body.teacher-mode #mapSessionView .map-session-banner .map-audio-toggle.audio-on {
+    background: var(--tv-accent-tint); border-color: var(--tv-accent); color: var(--tv-accent);
+}
+body.teacher-mode #mapSessionView #mapDomainRotation { color: var(--tv-text-2); font-weight: 600; }
+body.teacher-mode #mapSessionView .map-mode-tag {
+    background: var(--tv-subtle); color: var(--tv-text-2); border: 1px solid var(--tv-border);
+    border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; letter-spacing: 0;
+}
+body.teacher-mode #mapSessionView .map-nav-bar {
+    background: var(--tv-surface); border: 1px solid var(--tv-border); border-radius: 12px; margin: 0 0 8px;
+}
+body.teacher-mode #mapSessionView .map-nav-arrow {
+    width: 44px; height: 44px; border-radius: 8px; border: 1px solid var(--tv-control-soft);
+    background: var(--tv-surface); color: var(--tv-text); box-shadow: none;
+}
+body.teacher-mode #mapSessionView #questionCard {
+    background: var(--tv-surface); border: 1px solid var(--tv-border); border-radius: 12px; box-shadow: none;
+}
+/* The on-screen keypad: neutral keys, the one primary (Submit) in the accent. */
+body.teacher-mode #mapSessionView .np-btn {
+    font-family: var(--tv-font); font-weight: 600; border: 1px solid var(--tv-control-soft); border-radius: 8px;
+    background: var(--tv-surface); color: var(--tv-text); transform: none; box-shadow: none;
+}
+body.teacher-mode #mapSessionView .np-btn:hover { background: var(--tv-subtle-2); border-color: var(--tv-control); transform: none; }
+body.teacher-mode #mapSessionView .np-btn.np-action,
+body.teacher-mode #mapSessionView .np-btn.np-clear { background: var(--tv-subtle); color: var(--tv-text); border-color: var(--tv-control-soft); }
+body.teacher-mode #mapSessionView .np-btn.np-submit { background: var(--tv-accent); border-color: var(--tv-accent); color: #fff; }
+body.teacher-mode #mapSessionView .np-btn.np-submit:hover { background: var(--tv-accent-hover); border-color: var(--tv-accent-hover); }
+body.teacher-mode #mapSessionView .np-display { border: 2px solid var(--tv-control); border-radius: 8px; }
+body.teacher-mode #mapSessionView .np-display input { color: #000; }
+
+/* ---------------------------------------------------------------- focus rings in the one accent */
+body.teacher-mode #gameView #questionCard.mq-card #questionPaper.mq-qpaper:focus-within::before,
+body.teacher-mode #mapSessionView #questionCard.mq-card #questionPaper.mq-qpaper:focus-within::before { box-shadow: 0 0 0 3px var(--tv-accent); }
+body.teacher-mode .online-edition .problem-card.mq-wscard .ws-cell.mq-scell:focus-within { box-shadow: 0 0 0 3px var(--tv-accent); }
+/* The board shows the question, not an answer box being typed in. */
+body.teacher-mode.tv-bigboard #gameView #questionCard.mq-card #questionPaper.mq-qpaper:focus-within::before { box-shadow: none; }
+
+/* Dark theme: the accent is light there, so the primary's label is dark (as .tv-btn-primary). */
+html.dark body.teacher-mode :is(#gameView, #mapSessionView) #questionCard > .mq-qactions > #qcCheckBtn,
+html.dark body.teacher-mode :is(#gameView, #mapSessionView) #nextBtnContainer .btn,
+html.dark body.teacher-mode :is(#gameView, #mapSessionView) .mq-inline-check,
+html.dark body.teacher-mode #worksheetView .game-header .btn[onclick="checkAllWorksheet()"],
+html.dark body.teacher-mode #mapSessionView .np-btn.np-submit,
+html.dark .mq-how-teacher .mq-how-close,
+html.dark .mq-wsres-teacher .mq-wsres-btn.is-primary { color: var(--tv-on-selected, #16171a); }
+body.teacher-mode #worksheetView .hint-popup .hint-close {
+    width: 44px; height: 44px; border-radius: 8px; border: 1px solid transparent;
+    background: transparent; color: var(--tv-text-2); box-shadow: none; font-size: 20px;
+}
+body.teacher-mode #worksheetView .hint-popup .hint-close:hover { background: var(--tv-subtle); }
+body.teacher-mode #worksheetView .hint-popup .hint-close { top: 2px; right: 2px; }
+body.teacher-mode #worksheetView .hint-popup .hint-content { padding-right: 44px; }
