@@ -20,6 +20,10 @@ const DEFAULT = [
     'multiplication:mult_facts', 'multiplication:arrays_groups', 'multiplication:area_model_mult',
     'multiplication:mult_chart', 'division:div_facts', 'division:div_remainders', 'division:long_div_2digit',
     'division:share_into_groups',
+    // P10 time + money: the two-box time slot, the h / min slot, a coin count, the money slot,
+    // a check-one-box decision and the fewest-coins table
+    'measurement:time_quarter', 'measurement:elapsed_find_duration', 'measurement:money_count',
+    'measurement:money_notation', 'measurement:enough_money', 'measurement:make_change_least_coins',
     // function tables (2026-09-25): one box per blank, a sign typed into the rule circle
     'algebra:function_table_easy', 'algebra:function_table_hard',
     // 2026-09-25: count by 1-12, number patterns, the chart to fill, x / ÷ on a number line
@@ -158,7 +162,12 @@ function PLAN(rootSel, which) {
             slots.forEach((c, i) => { if (i >= pad) tag(c, { type: 'text', value: d.charAt(i - pad) }); });
             return { plan, q: d };
         }
-        const vals = sets ? sets[0].map(String) : parts(ans);
+        // P10: a time `[ ]:[ ]`, an amount `[ ].[ ]` and a duration `[ ] h [ ] min` split the
+        // answer at their own printed separator.
+        const jn = joinEl ? joinEl.getAttribute('data-mq-join') : null;
+        let vals = sets ? sets[0].map(String) : parts(ans);
+        if (jn === ':' || jn === '.') vals = String(ans).split(jn);
+        if (jn === ' h ') { const m = /(\d+)\s*h\s*(\d+)/.exec(String(ans)); if (m) vals = [m[1], m[2]]; }
         slots.forEach((c, i) => tag(c, { type: 'text', value: vals[i] }));
         return { plan, q: vals.join(', ') };
     }

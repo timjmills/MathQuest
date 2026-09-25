@@ -579,7 +579,16 @@ function generateResolvedQuestion() {
             const fits = pool.filter(sk => !P4_STRATEGY.has(sk) && !pvRefusal(mixedConfig.category, sk, state.range, {}, true));
             if (fits.length) pool = fits;
         }
-        actualSkill = pick(pool);
+        // P10 §2.5 the pool rule: Mixed Time deals only its ticked `members`, round-robin down
+        // the page (each at its own options), never a 1-minute elapsed item on a grade 1 review.
+        if (state.skill === 'mixed_time') {
+            const m = state.skillOptions && Array.isArray(state.skillOptions.members) ? state.skillOptions.members : null;
+            const members = m && m.length ? pool.filter(sk => m.includes(sk)) : pool.filter(sk => /^time_(hour|half_hour|quarter|5min|1min)$/.test(sk));
+            if (members.length) pool = members;
+            actualSkill = Number.isFinite(state.itemIndex) ? pool[state.itemIndex % pool.length] : pick(pool);
+        } else {
+            actualSkill = pick(pool);
+        }
         poolMember = actualSkill;
         console.log(`Mixed skill ${state.skill} resolved to: ${actualSkill}`);
 

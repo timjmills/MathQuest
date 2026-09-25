@@ -301,6 +301,11 @@ export const FROZEN_SKILL_CODES = {
     "number_sense:between_tens": "US", "number_sense:place_on_number_line": "UT",
     // ---- 2026-09-25 appends (owner): count by 1-12, number patterns with a rule. APPEND ONLY. ----
     "multiplication:count_by_tables": "UU", "patterns:number_patterns_rule": "UV",
+    // ---- P10 appends, 2026-09-25 (time + money, design/research/time-money.md §18). APPEND ONLY. ----
+    // Pinned at the codes the auto assigner gave after the P9 and count-by appends above.
+    "measurement:clock_parts": "UW", "measurement:time_fives_ring": "UX", "measurement:time_sense": "UY",
+    "measurement:elapsed_find_start": "UZ", "measurement:coin_value": "U2", "measurement:money_notation": "U3",
+    "measurement:money_change": "U4", "measurement:money_compare": "U5",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and
@@ -439,6 +444,9 @@ export const FROZEN_CATEGORY_ORDER = {
         "money_count", "money", "equiv_coin_sets", "enough_money", "make_change_least_coins", "temperature",
         "capacity", "unit_conversions", "length_customary", "length_metric", "unit_conversion_word",
         "mass_volume_liquid", "estimate_length", "mixed_measurement", "mixed_time",
+        // P10 appends, 2026-09-25 — APPEND ONLY.
+        "clock_parts", "time_fives_ring", "time_sense", "elapsed_find_start", "coin_value", "money_notation",
+        "money_change", "money_compare",
     ],
     "geo_mixed": [
         "geometry_all", "measurement_all", "geo_meas_all",

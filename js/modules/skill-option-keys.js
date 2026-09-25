@@ -75,7 +75,7 @@ export const ONE_LETTER_KEYS = Object.freeze({
 // merges — nobody else may take one), 'spare' (unallocated; claim a whole block here first).
 export const KEY_BLOCKS = Object.freeze({
     0: Object.freeze({ owner: 'P9 place value (second wave)', status: 'assigned', keys: '0A-0Q' }),
-    1: Object.freeze({ owner: 'P10 time and money', status: 'reserved', keys: '1A-1M' }),
+    1: Object.freeze({ owner: 'P10 time and money', status: 'assigned', keys: '1A-1O' }),
     2: Object.freeze({ owner: 'count-by, patterns, multiplication chart', status: 'assigned', keys: '2A-2F' }),
     3: Object.freeze({ owner: 'function tables', status: 'assigned', keys: '3A-3A' }),
     4: Object.freeze({ owner: 'supports', status: 'assigned', keys: '4A-4D' }),
@@ -105,6 +105,27 @@ export const MULTI_KEYS = Object.freeze({
     rename: '0P',        // unit_form: standard / more than 9 of one place
     span: '0Q',          // place_on_number_line: one ten / hundred / thousand to the next
     // NEXT FREE IN BLOCK 0: 0R.
+
+    // Block 1 — P10 time and money (design/research/time-money.md §20). Its other options reuse
+    // keys already allocated: response / dir / task / support / notation / step / order / tiles /
+    // band (one letter), precision (5F), members (5A, with def tokens). 1D, 1K and 1M were
+    // P10's pre-registry keys for precision, sign and members; none ever shipped, and they stay
+    // unassigned rather than be handed out again.
+    review: '1A',        // time reading: 1 in 6 items from the steps before
+    stimulus: '1B',      // time reading: a clock / the time in words (three spoken forms)
+    words: '1C',         // time_match_clock: the words said as numerals / past / oh
+    hours: '1E',         // elapsed time: the longest time that passes (enum of minutes)
+    noon: '1F',          // elapsed / order clocks: cross 12 noon
+    currency: '1G',      // money: plain numbers / Qatari riyal / US dollar
+    kind: '1H',          // money_count: like / two / mixed coins, notes, notes and coins
+    values: '1I',        // money: which coins (a numeric set)
+    paid: '1J',          // money_change: paid with the next unit / the next note
+    gap: '1L',           // money_compare: far / near
+    numerals: '1N',      // clocks: all 12 numerals / 12, 3, 6, 9 / 12 only
+    // time_quarter: quarter past / quarter to. A SET, so it may not ride on `dir` (I): the deployed
+    // decoder would read the unknown past / to tokens as an EMPTY set, i.e. "no restriction".
+    quarters: '1O',
+    // NEXT FREE IN BLOCK 1: 1P.
 
     // Block 2 — count by 1-12, number patterns, the multiplication chart, x / ÷ hop lines (2026-09-25)
     missing: '2A',       // count_by_tables, number_patterns_rule, mult_chart(_easy): % of numbers left blank
@@ -154,14 +175,18 @@ export const OPTION_KEYS = Object.freeze({ ...ONE_LETTER_KEYS, ...MULTI_KEYS });
 // it). APPEND-ONLY. `power` / `places` are numeric sets with members past 35, so they carry their
 // own digit tokens (one per power of ten).
 export const VALUE_TOKENS = Object.freeze({
-    notation: Object.freeze({ stacked: 'S', across: 'A', bracket: 'B', fraction: 'F' }),
+    notation: Object.freeze({ stacked: 'S', across: 'A', bracket: 'B', fraction: 'F',
+        // block 1 P10 elapsed_visual_*: the start and end shown on
+        analog: 'G', digital: 'D', mixed: 'M' }),
     response: Object.freeze({ standard: 'S', 'which-numbers': 'W', 'array-builder': 'A', write: 'R', 'circle-all': 'C',
         // P9 step 8 identify
         circle: 'L', bank: 'B',
         // block 2 (2026-09-25): x / ÷ on a number line
         draw: 'Q', sentence: 'Z', missing: 'X',
         // block 3 (2026-09-25): a function table's Check row
-        check: 'K' }),
+        check: 'K',
+        // block 1 P10 time + money (draw and write reuse Q and R)
+        hm: 'H', minutes: 'T', ring: 'Y', sign: 'G' }),
     regroup: Object.freeze({ none: 'N', always: 'A', mixed: 'M' }),
     orientation: Object.freeze({ vertical: 'V', horizontal: 'H',
         // P11 count_objects arrangement
@@ -172,14 +197,18 @@ export const VALUE_TOKENS = Object.freeze({
     wordform: Object.freeze({ to_number: 'N', to_words: 'W' }),
     dir: Object.freeze({ more: 'M', less: 'L', both: 'B',
         // P11 counting / comparing
-        fewer: 'F', same: 'S', mixed: 'X', forward: 'W', back: 'K' }),
+        fewer: 'F', same: 'S', mixed: 'X', forward: 'W', back: 'K',
+        // block 1 P10 time + money (enums only)
+        later: 'A', earlier: 'E', 'to-digital': 'G', 'to-analog': 'D' }),
     task: Object.freeze({ read: 'R', count: 'C', compute: 'P', closest: 'N', reasonable: 'E',
         // P11 compare_objects
         length: 'L', height: 'H', thickness: 'T', all: 'A',
         // block 2 (2026-09-25): the multiplication chart
         fill: 'Q', headers: 'Z', shade: 'X', pattern: 'J',
         // block 3 (2026-09-25): function tables (O U I W F D left to P10 and count-by)
-        outputs: 'G', rule: 'Y', inputs: 'V', mixed: 'M', make: 'K' }),
+        outputs: 'G', rule: 'Y', inputs: 'V', mixed: 'M', make: 'K',
+        // block 1 P10 time + money (`all` reuses A)
+        find: 'F', order: 'O', collection: 'D', words: 'W', missing: 'I', numerals: 'U', hands: 'B' }),
     zeroPlace: Object.freeze({ none: 'N', some: 'S', always: 'A' }),
     op: Object.freeze({ x: 'M', '/': 'D' }),
     order: Object.freeze({ largest: 'L', scrambled: 'S',
@@ -195,10 +224,14 @@ export const VALUE_TOKENS = Object.freeze({
         strip: 'P', shift: 'F', rewrite: 'W',
         // block 2 (2026-09-25): hop numbers on a x / ÷ number line
         numbers: 'Z',
+        // block 1 P10 time + money: the minute ring, the time line's labels, the coin dots
+        plain: 'Y', ring: 'G', pupil: 'U', auto: 'Q', dots: 'O',
         // S2 supports model: `support` became the ONE multi-select set of supports (an old one-cue
-        // code, "~FD", decodes to that one tick). Touch dots (two rungs) and the S4 panes.
-        touch: 'Q', touchall: 'V', boxsign: 'X', startarrow: 'S', steps: 'U',
-        'round-pv': 'O', 'round-mark': 'Y' }),
+        // code, "~FD", decodes to that one tick). Touch dots (two rungs) and the S4 panes. The
+        // letters left were I J S V X; the two rounding panes take digits (never a field's first
+        // character, so a payload never starts with one).
+        touch: 'V', touchall: 'X', boxsign: 'J', startarrow: 'S', steps: 'I',
+        'round-pv': '1', 'round-mark': '2' }),
     // S2 supports model (block 4): which problems carry the supports, and how clashing ones mix.
     cover: Object.freeze({ whole: 'W', needed: 'N', fade: 'F' }),
     mix: Object.freeze({ section: 'S', problem: 'P' }),
@@ -228,6 +261,20 @@ export const VALUE_TOKENS = Object.freeze({
     shape: Object.freeze({ box: 'B', circle: 'C', hex: 'H', mixed: 'M' }),
     // block 3 (2026-09-25)
     ops: Object.freeze({ '+': 'A', '-': 'S', x: 'M', '/': 'D' }),
+    // block 1 (P10 time + money)
+    review: Object.freeze({ none: 'N', some: 'S' }),
+    stimulus: Object.freeze({ clock: 'C', words: 'W', 'words-past': 'P', 'words-oh': 'O' }),
+    words: Object.freeze({ numerals: 'M', past: 'P', oh: 'O' }),
+    noon: Object.freeze({ never: 'N', seeded: 'S', across: 'A' }),
+    currency: Object.freeze({ plain: 'P', qar: 'Q', usd: 'U' }),
+    kind: Object.freeze({ like: 'L', two: 'T', mixed: 'M', notes: 'N', 'notes-coins': 'C', notes100: 'H', notes500: 'F' }),
+    paid: Object.freeze({ unit: 'U', note: 'N' }),
+    gap: Object.freeze({ far: 'F', near: 'N' }),
+    numerals: Object.freeze({ all: 'A', quarters: 'Q', twelve: 'T' }),
+    quarters: Object.freeze({ past: 'P', to: 'T' }),
+    // `step` is a numeric SET on elapsed_mixed (15, 30, 45 minutes): 15 and 30 go base 36, 45 has
+    // no one-character base-36 form and takes X.
+    step: Object.freeze({ 45: 'X' }),
     power: Object.freeze({ 10: '1', 100: '2', 1000: '3' }),
     places: Object.freeze({ 1: '0', 10: '1', 100: '2', 1000: '3', 10000: '4', 100000: '5' }),
 });
@@ -238,7 +285,7 @@ export const VALUE_TOKENS = Object.freeze({
 export const NUMERIC_SET_VALUES = Object.freeze({
     constant: Object.freeze([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]),
     level: Object.freeze([0, 1, 2, 3]),
-    step: Object.freeze([0, 1, 2]),
+    step: Object.freeze([0, 1, 2, 15, 30]),
     dir: Object.freeze([0, 1]),
     task: Object.freeze([0, 1, 2, 3]),
     unknown: Object.freeze([0, 1, 2]),
@@ -251,6 +298,8 @@ export const NUMERIC_SET_VALUES = Object.freeze({
     digits: Object.freeze([1, 2]),
     units: Object.freeze([0, 1, 2]),
     scale: Object.freeze([0, 1, 2, 3]),
+    // block 1 (P10): the coins a money page uses
+    values: Object.freeze([1, 5, 10, 25]),
 });
 
 // Option ids whose values are written as decimal digits (a numeric scalar) or 1 / 0 (a bool), or
@@ -262,6 +311,8 @@ export const SCALAR_ONLY = Object.freeze({
     count: 'decimal', span: 'decimal', repeatDigit: 'bool', zeroDigit: 'bool', midLabel: 'bool',
     // block 2 (2026-09-25)
     missing: 'decimal', rule: 'bool',
+    // block 1 (P10): the longest elapsed time, in minutes
+    hours: 'decimal',
     members: 'def-tokens',   // two base-36 characters per member: its position (skill-options-pools.js)
     // reserved ids (block 4): their values are allocated when they are built. (Pinned history:
     // `cover` and `mix` were built by S2 and now carry VALUE_TOKENS; `touch` rides in `support`.)

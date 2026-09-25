@@ -66,7 +66,19 @@
     "chart": "2D",
     "ticks": "2E",
     "shape": "2F",
-    "ops": "3A"
+    "ops": "3A",
+    "review": "1A",
+    "stimulus": "1B",
+    "words": "1C",
+    "hours": "1E",
+    "noon": "1F",
+    "currency": "1G",
+    "kind": "1H",
+    "values": "1I",
+    "paid": "1J",
+    "gap": "1L",
+    "numerals": "1N",
+    "quarters": "1O"
   },
   "blocks": {
     "0": {
@@ -76,8 +88,8 @@
     },
     "1": {
       "owner": "P10 time and money",
-      "status": "reserved",
-      "keys": "1A-1M"
+      "status": "assigned",
+      "keys": "1A-1O"
     },
     "2": {
       "owner": "count-by, patterns, multiplication chart",
@@ -141,7 +153,10 @@
       "stacked": "S",
       "across": "A",
       "bracket": "B",
-      "fraction": "F"
+      "fraction": "F",
+      "analog": "G",
+      "digital": "D",
+      "mixed": "M"
     },
     "level": {
       "0": "0",
@@ -160,7 +175,11 @@
       "draw": "Q",
       "sentence": "Z",
       "missing": "X",
-      "check": "K"
+      "check": "K",
+      "hm": "H",
+      "minutes": "T",
+      "ring": "Y",
+      "sign": "G"
     },
     "range": {},
     "decimals": {},
@@ -196,7 +215,10 @@
     "step": {
       "0": "0",
       "1": "1",
-      "2": "2"
+      "2": "2",
+      "15": "F",
+      "30": "U",
+      "45": "X"
     },
     "dir": {
       "0": "0",
@@ -208,7 +230,11 @@
       "same": "S",
       "mixed": "X",
       "forward": "W",
-      "back": "K"
+      "back": "K",
+      "later": "A",
+      "earlier": "E",
+      "to-digital": "G",
+      "to-analog": "D"
     },
     "task": {
       "0": "0",
@@ -232,7 +258,14 @@
       "rule": "Y",
       "inputs": "V",
       "mixed": "M",
-      "make": "K"
+      "make": "K",
+      "find": "F",
+      "order": "O",
+      "collection": "D",
+      "words": "W",
+      "missing": "I",
+      "numerals": "U",
+      "hands": "B"
     },
     "zeroPlace": {
       "none": "N",
@@ -285,13 +318,18 @@
       "shift": "F",
       "rewrite": "W",
       "numbers": "Z",
-      "touch": "Q",
-      "touchall": "V",
-      "boxsign": "X",
+      "plain": "Y",
+      "ring": "G",
+      "pupil": "U",
+      "auto": "Q",
+      "dots": "O",
+      "touch": "V",
+      "touchall": "X",
+      "boxsign": "J",
       "startarrow": "S",
-      "steps": "U",
-      "round-pv": "O",
-      "round-mark": "Y"
+      "steps": "I",
+      "round-pv": "1",
+      "round-mark": "2"
     },
     "tiles": {},
     "objects": {
@@ -473,6 +511,64 @@
       "-": "S",
       "x": "M",
       "/": "D"
+    },
+    "review": {
+      "none": "N",
+      "some": "S"
+    },
+    "stimulus": {
+      "clock": "C",
+      "words": "W",
+      "words-past": "P",
+      "words-oh": "O"
+    },
+    "words": {
+      "numerals": "M",
+      "past": "P",
+      "oh": "O"
+    },
+    "hours": {},
+    "noon": {
+      "never": "N",
+      "seeded": "S",
+      "across": "A"
+    },
+    "currency": {
+      "plain": "P",
+      "qar": "Q",
+      "usd": "U"
+    },
+    "kind": {
+      "like": "L",
+      "two": "T",
+      "mixed": "M",
+      "notes": "N",
+      "notes-coins": "C",
+      "notes100": "H",
+      "notes500": "F"
+    },
+    "values": {
+      "1": "1",
+      "5": "5",
+      "10": "A",
+      "25": "P"
+    },
+    "paid": {
+      "unit": "U",
+      "note": "N"
+    },
+    "gap": {
+      "far": "F",
+      "near": "N"
+    },
+    "numerals": {
+      "all": "A",
+      "quarters": "Q",
+      "twelve": "T"
+    },
+    "quarters": {
+      "past": "P",
+      "to": "T"
     }
   },
   "scalarOnly": {
@@ -494,6 +590,7 @@
     "zeroDigit": "bool",
     "midLabel": "bool",
     "missing": "decimal",
-    "rule": "bool"
+    "rule": "bool",
+    "hours": "decimal"
   }
 }

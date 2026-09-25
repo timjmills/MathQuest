@@ -111,7 +111,7 @@ owned by one wave, 26 keys a block, and a wave takes only the next letter of its
 | Block | Owner | Status | Keys |
 |---|---|---|---|
 | `0` | P9 place value (second wave) | assigned | `0A`–`0Q` (next free `0R`) |
-| `1` | P10 time and money | reserved | `1A`–`1M` (its thirteen keys, renumbered from its own `0x` scheme) |
+| `1` | P10 time and money | assigned | `review` 1A · `stimulus` 1B · `words` 1C · `hours` 1E · `noon` 1F · `currency` 1G · `kind` 1H · `values` 1I · `paid` 1J · `gap` 1L · `numerals` 1N · `quarters` 1O (next free `1P`; 1D, 1K, 1M never shipped and stay unassigned: `precision` rides on 5F and `members` on 5A) |
 | `2` | count-by, patterns, multiplication chart | reserved | `2A`–`2F` (renumbered from `9A`–`9F`) |
 | `3` | function tables | reserved | none yet (value tokens only today) |
 | `4` | supports | assigned | `touch` 4A · `cover` 4B · `mix` 4C · `anchors` 4D (ids reserved; no skill declares them yet) |

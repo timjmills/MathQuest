@@ -261,11 +261,11 @@ generation-time values of the same set). Values:
 
 | Id | What | Token |
 |---|---|---|
-| `touch` | touch dots, the lighter rung: count on (+), count back (−), count by (×), the tally row (÷) | Q |
-| `touchall` | touch dots on every number (count all) | V |
+| `touch` | touch dots, the lighter rung: count on (+), count back (−), count by (×), the tally row (÷) | V |
+| `touchall` | touch dots on every number (count all) | X |
 | `tile` `frame` `line` `skip` `array` `think` | the P11 fact cues (fact.js `factCue`), now drawn at render time | D R L K A H |
-| `boxsign` `startarrow` `steps` | S4 extras | X S U |
-| `round-pv` `round-mark` | S4 rounding panes | O Y |
+| `boxsign` `startarrow` `steps` | S4 extras | J S I |
+| `round-pv` `round-mark` | S4 rounding panes | 1 2 |
 
 Two more controls appear **only once a render-time support is ticked** (`appliesTo`), so a panel stays at
 ≤ 5 controls at rest: `cover` (4B: whole / needed / fade; W N F) and, when two ticked supports can clash,

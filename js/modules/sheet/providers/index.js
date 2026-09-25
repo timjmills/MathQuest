@@ -17,6 +17,7 @@ import './subtraction.js';
 import './multiplication.js';
 import './division.js';
 import './k2.js';
+import './time-money.js';
 import './function-table.js';
 import './countby.js';
 import './pv.js';

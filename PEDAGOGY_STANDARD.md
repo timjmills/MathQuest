@@ -1274,6 +1274,27 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `fact-family` | Use the three numbers. Fill in the fact family. | addition and subtraction fact families |
 | `chart-fill` | Fill in the missing products. | multiplication chart |
 | `groups-total` | Write the groups, the number in each, and the total. | arrays and equal groups |
+| `check-clock` | Check the clock that shows the time. | time: find the clock for a digital time or for words (P10, added 2026-09-25) |
+| `order-times` | Write 1, 2, 3 under the clocks. Start with the earliest. | time: order clocks, earliest first (P10, added 2026-09-25) |
+| `order-times-late` | Write 1, 2, 3 under the clocks. Start with the latest. | time: order clocks, latest first (P10, added 2026-09-25) |
+| `elapsed-end` | Use the time line. Write the end time. | elapsed time: find the end (P10, added 2026-09-25) |
+| `elapsed-start` | Use the time line. Write the start time. | elapsed time: find the start (earlier) (P10, added 2026-09-25) |
+| `elapsed-how-long` | Use the time line. Write how long it takes. | elapsed time: find the duration (P10, added 2026-09-25) |
+| `hour-hand` | Which is the hour hand? Check one box. | parts of a clock: the hands (P10, added 2026-09-25) |
+| `clock-numbers` | Write the missing numbers on the clock. | parts of a clock: the numerals (P10, added 2026-09-25) |
+| `fives-ring` | Count by 5. Write the minutes round the clock. | the fives ring round a face (P10, added 2026-09-25) |
+| `am-pm` | Read the time. Check a.m. or p.m. | a.m. or p.m. from an activity (P10, added 2026-09-25) |
+| `money-count` | Count the money. Write the total. | count notes (P10, added 2026-09-25) |
+| `money-two` | Count the notes, then the coins. Write both numbers. | count notes and coins, two unit numbers (P10, added 2026-09-25) |
+| `money-add` | Add the prices. | add money in columns (P10, added 2026-09-25) |
+| `money-change` | Subtract to find the change. | change in columns (P10, added 2026-09-25) |
+| `coins-make` | Do the coins make the amount? Check one box. | does a coin set make an amount (P10, added 2026-09-25) |
+| `fewest-coins` | Use the fewest coins. Write how many of each. | fewest coins, tally table (P10, added 2026-09-25) |
+| `enough` | Is there enough money? Check one box. | enough money for a price (P10, added 2026-09-25) |
+| `notes-order` | Write 1, 2, 3 under the notes. Start with the least. | order notes least to most (Qatari currency row) (P10, added 2026-09-25) |
+| `coin-find` | Circle every coin worth the number. Write how many. | find the coins of one value (P10, added 2026-09-25) |
+| `money-write` | Write the amount. Use the point. | write an amount with a decimal point (P10, added 2026-09-25) |
+| `money-more` | Which has more money? Check one box. | compare two collections (P10, added 2026-09-25) |
 | `table-rule` | Find the rule. Write the rule. | function table: every row given, the rule unknown (added 2026-09-25) |
 | `table-in` | Use the rule backward. Write each In number. | function table: the In numbers missing |
 | `table-make` | Write your own In numbers. Use the rule for Out. | function table: the pupil makes the rows |

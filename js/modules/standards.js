@@ -428,22 +428,22 @@ export const SKILL_STANDARDS = {
     'coordinates:mixed_coordinates': { ccss: [], ee: [], pool: true }, // Mixed Coordinates
 
     // ---- measurement
-    'measurement:time_hour': { ccss: ['1.MD.B.3'], ee: ['M.EE.1.MD.3', 'M.EE.2.MD.7', 'M.EE.3.MD.1'] }, // Time to the Hour
-    'measurement:time_half_hour': { ccss: ['1.MD.B.3'], ee: ['M.EE.1.MD.3'] }, // Time to Half Hour
-    'measurement:time_quarter': { ccss: ['2.MD.C.7'], ee: ['M.EE.2.MD.7'] }, // Time to Quarter Hour
-    'measurement:time_5min': { ccss: ['2.MD.C.7'], ee: ['M.EE.2.MD.7'] }, // Time to 5 Minutes
-    'measurement:time_1min': { ccss: ['3.MD.A.1'], ee: ['M.EE.3.MD.1'] }, // Time to the Minute
-    'measurement:time_analog_digital': { ccss: ['2.MD.C.7', '1.MD.B.3'], ee: ['M.EE.2.MD.7', 'M.EE.1.MD.3'] }, // Analog ↔ Digital Match
+    'measurement:time_hour': { ccss: ['1.MD.B.3'], ee: ['M.EE.1.MD.3', 'M.EE.2.MD.7', 'M.EE.3.MD.1', 'M.EE.4.MD.2'] }, // Time to the Hour
+    'measurement:time_half_hour': { ccss: ['1.MD.B.3'], ee: ['M.EE.1.MD.3', 'M.EE.5.MD.1'] }, // Time to Half Hour
+    'measurement:time_quarter': { ccss: ['2.MD.C.7'], ee: ['M.EE.2.MD.7', 'M.EE.5.MD.1'] }, // Time to Quarter Hour
+    'measurement:time_5min': { ccss: ['2.MD.C.7'], ee: ['M.EE.2.MD.7', 'M.EE.5.MD.1'] }, // Time to 5 Minutes
+    'measurement:time_1min': { ccss: ['3.MD.A.1'], ee: ['M.EE.3.MD.1', 'M.EE.5.MD.1'] }, // Time to the Minute
+    'measurement:time_analog_digital': { ccss: ['2.MD.C.7', '1.MD.B.3'], ee: ['M.EE.2.MD.7', 'M.EE.1.MD.3', 'M.EE.4.MD.2', 'M.EE.3.MD.1'] }, // Analog ↔ Digital Match
     'measurement:time_match_clock': { ccss: ['2.MD.C.7'], ee: ['M.EE.2.MD.7'] }, // Match Time to Clock
-    'measurement:order_clocks_analog_asc': { ccss: ['2.MD.C.7'], ee: ['M.EE.2.MD.7'] }, // Order Clocks (Analog) — Earliest to Latest
-    'measurement:order_clocks_analog_desc': { ccss: ['2.MD.C.7'], ee: ['M.EE.2.MD.7'] }, // Order Clocks (Analog) — Latest to Earliest
-    'measurement:order_clocks_digital_asc': { ccss: ['2.MD.C.7'], ee: ['M.EE.2.MD.7'] }, // Order Clocks (Digital) — Earliest to Latest
-    'measurement:order_clocks_digital_desc': { ccss: ['2.MD.C.7'], ee: ['M.EE.2.MD.7'] }, // Order Clocks (Digital) — Latest to Earliest
+    'measurement:order_clocks_analog_asc': { ccss: ['2.MD.C.7'], ee: ['M.EE.2.MD.7', 'M.EE.1.MD.3'], approx: true, note: 'Ordering times is not itself a CCSS standard; EE 1.MD.3.c (before, next, after) is the closest.' }, // Order Clocks (Analog) — Earliest to Latest
+    'measurement:order_clocks_analog_desc': { ccss: ['2.MD.C.7'], ee: ['M.EE.2.MD.7', 'M.EE.1.MD.3'], approx: true, note: 'Ordering times is not itself a CCSS standard; EE 1.MD.3.c (before, next, after) is the closest.' }, // Order Clocks (Analog) — Latest to Earliest
+    'measurement:order_clocks_digital_asc': { ccss: ['2.MD.C.7'], ee: ['M.EE.2.MD.7', 'M.EE.1.MD.3'], approx: true, note: 'Ordering times is not itself a CCSS standard; EE 1.MD.3.c (before, next, after) is the closest.' }, // Order Clocks (Digital) — Earliest to Latest
+    'measurement:order_clocks_digital_desc': { ccss: ['2.MD.C.7'], ee: ['M.EE.2.MD.7', 'M.EE.1.MD.3'], approx: true, note: 'Ordering times is not itself a CCSS standard; EE 1.MD.3.c (before, next, after) is the closest.' }, // Order Clocks (Digital) — Latest to Earliest
     'measurement:elapsed_30min': { ccss: ['3.MD.A.1'], ee: ['M.EE.3.MD.1'] }, // Elapsed Time (30 min)
-    'measurement:elapsed_hour': { ccss: ['3.MD.A.1'], ee: ['M.EE.3.MD.1'] }, // Elapsed Time (Hours)
+    'measurement:elapsed_hour': { ccss: ['3.MD.A.1'], ee: ['M.EE.3.MD.1', 'M.EE.4.MD.1'] }, // Elapsed Time (Hours)
     'measurement:elapsed_15min': { ccss: ['3.MD.A.1'], ee: ['M.EE.3.MD.1'] }, // Elapsed Time (15 min)
-    'measurement:elapsed_mixed': { ccss: ['3.MD.A.1'], ee: ['M.EE.3.MD.1'] }, // Elapsed Time (Hours & Minutes)
-    'measurement:elapsed_find_duration': { ccss: ['3.MD.A.1'], ee: ['M.EE.3.MD.1'] }, // Find the Duration
+    'measurement:elapsed_mixed': { ccss: ['3.MD.A.1'], ee: ['M.EE.3.MD.1', 'M.EE.4.MD.1'] }, // Elapsed Time (Hours & Minutes)
+    'measurement:elapsed_find_duration': { ccss: ['3.MD.A.1', '4.MD.A.1', '4.MD.A.2'], ee: ['M.EE.3.MD.1', 'M.EE.4.MD.1'] }, // Find the Duration
     'measurement:elapsed_visual_easy': { ccss: ['3.MD.A.1'], ee: ['M.EE.3.MD.1'] }, // Elapsed Time Clocks - Easy (Visual)
     'measurement:elapsed_visual_medium': { ccss: ['3.MD.A.1'], ee: ['M.EE.3.MD.1'] }, // Elapsed Time Clocks - Medium (Visual)
     'measurement:elapsed_visual_hard': { ccss: ['3.MD.A.1', '4.MD.A.2'], ee: ['M.EE.3.MD.1', 'M.EE.4.MD.2'] }, // Elapsed Time Clocks - Hard (Visual)
@@ -452,10 +452,10 @@ export const SKILL_STANDARDS = {
     'measurement:bar_graph_intro': { ccss: ['1.MD.C.4', '2.MD.D.10'], ee: ['M.EE.1.MD.4', 'M.EE.2.MD.10'] }, // Bar Graph Intro (Visual)
     'measurement:reading_ruler': { ccss: ['2.MD.A.1'], ee: ['M.EE.2.MD.1', 'M.EE.3.MD.4'] }, // Reading a Ruler (Visual)
     'measurement:reading_ruler_hard': { ccss: ['3.MD.B.4'], ee: ['M.EE.3.MD.4'] }, // Reading a Ruler - Quarter Inches (Visual)
-    'measurement:money_count': { ccss: ['2.MD.C.8'], ee: ['M.EE.2.MD.8'] }, // Counting Coins & Bills (Visual)
+    'measurement:money_count': { ccss: ['2.MD.C.8'], ee: ['M.EE.2.MD.8', 'M.EE.3.NBT.3', 'M.EE.5.MD.1', 'M.EE.4.MD.2', 'M.EE.4.MD.5.d'] }, // Counting Coins & Bills (Visual)
     'measurement:money': { ccss: ['2.MD.C.8', '4.MD.A.2'], ee: ['M.EE.2.MD.8', 'M.EE.4.MD.2'] }, // Money & Making Change
-    'measurement:equiv_coin_sets': { ccss: ['2.MD.C.8'], ee: ['M.EE.2.MD.8'] }, // Equivalent Coin Sets (Visual)
-    'measurement:enough_money': { ccss: ['2.MD.C.8'], ee: ['M.EE.2.MD.8'] }, // Do You Have Enough? (Visual)
+    'measurement:equiv_coin_sets': { ccss: ['2.MD.C.8'], ee: ['M.EE.2.MD.8', 'M.EE.5.MD.1'] }, // Equivalent Coin Sets (Visual)
+    'measurement:enough_money': { ccss: ['2.MD.C.8'], ee: ['M.EE.2.MD.8', 'M.EE.5.MD.1'] }, // Do You Have Enough? (Visual)
     'measurement:make_change_least_coins': { ccss: ['2.MD.C.8', '4.MD.A.2'], ee: ['M.EE.2.MD.8', 'M.EE.4.MD.2'] }, // Fewest Coins to Make Amount (Visual)
     'measurement:temperature': { ccss: ['2.MD.B.6'], ee: ['M.EE.2.MD.6'], approx: true, note: "CCSS K-6 does not name temperature; reading a thermometer scale is closest to the number-line scale of 2.MD.6." }, // Temperature (°C/°F)
     'measurement:capacity': { ccss: ['4.MD.A.1', '4.MD.A.2'], ee: ['M.EE.4.MD.1', 'M.EE.4.MD.2'] }, // Capacity/Volume Units
@@ -467,6 +467,15 @@ export const SKILL_STANDARDS = {
     'measurement:estimate_length': { ccss: ['2.MD.A.3'], ee: ['M.EE.2.MD.3'] }, // Estimate Lengths (Visual)
     'measurement:mixed_measurement': { ccss: [], ee: [], pool: true }, // Mixed Measurement
     'measurement:mixed_time': { ccss: [], ee: [], pool: true }, // Mixed Time Skills
+    // ---- measurement: P10 appends (design/research/time-money.md §21)
+    'measurement:clock_parts': { ccss: ['1.MD.B.3'], ee: ['M.EE.1.MD.3'], approx: true, note: 'Naming the parts of the face comes before reading it; 1.MD.B.3 is the reading standard it prepares.' }, // Parts of a Clock
+    'measurement:time_fives_ring': { ccss: ['2.MD.C.7', '2.NBT.A.2'], ee: ['M.EE.2.MD.7', 'M.EE.2.NBT.2'] }, // Count the Minutes by Fives
+    'measurement:time_sense': { ccss: ['2.MD.C.7'], ee: ['M.EE.1.MD.3'] }, // a.m. or p.m.?
+    'measurement:elapsed_find_start': { ccss: ['3.MD.A.1'], ee: ['M.EE.3.MD.1'] }, // Find the Start Time
+    'measurement:coin_value': { ccss: ['2.MD.C.8'], ee: ['M.EE.2.MD.8', 'M.EE.4.MD.2', 'M.EE.4.MD.5.d'] }, // Coins and Notes by Value
+    'measurement:money_notation': { ccss: ['2.MD.C.8', '4.MD.A.2'], ee: ['M.EE.2.MD.8'] }, // Write an Amount of Money
+    'measurement:money_change': { ccss: ['2.MD.C.8', '4.MD.A.2'], ee: ['M.EE.2.MD.8', 'M.EE.4.MD.2'] }, // Find the Change
+    'measurement:money_compare': { ccss: ['2.MD.C.8'], ee: ['M.EE.5.MD.1'] }, // Which Has More Money?
 
     // ---- geo_mixed
     'geo_mixed:geometry_all': { ccss: [], ee: [], pool: true }, // All Geometry Skills
