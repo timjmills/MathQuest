@@ -193,6 +193,9 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-cuewrap{display:flex;align-items:flex-start;justify-content:center;gap:2mm}
 :is(.ws-page,.ws-sheet) .mq-cue{display:flex;flex-direction:column;gap:1mm;padding-top:1mm}
 :is(.ws-page,.ws-sheet) .mq-cue svg{display:block}
+/* R3: a K story's label word stands in one fixed width, so the number box is in the same place in every cell. */
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpk .mq-klabel{min-width:30mm;justify-content:flex-start}
+:is(.ws-page,.ws-sheet) .mq-cue.mq-cue-b{padding-top:calc(var(--fd,var(--ws-digit)) * 1.15 + .5mm)}
 :is(.ws-page,.ws-sheet) .mq-cuecol{width:100%;display:flex;flex-direction:column;align-items:center;gap:2mm}
 :is(.ws-page,.ws-sheet) .mq-thinkcue{font-size:var(--ws-text);line-height:1.2;white-space:nowrap;border:1pt solid #949494;border-radius:2mm;padding:1mm 3mm}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-modelcell{padding-top:calc(var(--ws-tab,6mm) + 1.5mm)}
@@ -332,7 +335,7 @@ export function skillWords(skill = {}) {
     try {
         const p = getProvider(skill.categoryId || '', skill.skillId || '');
         const raw = typeof p.strings === 'function'
-            ? p.strings({ categoryId: skill.categoryId, skillId: skill.skillId, label: skill.label, answerType: skill.answerType, printFormat: skill.printFormat })
+            ? p.strings({ categoryId: skill.categoryId, skillId: skill.skillId, label: skill.label, answerType: skill.answerType, printFormat: skill.printFormat, opts: skill.opts })
             : p.strings;
         str = raw || {};
     } catch (e) { str = {}; }

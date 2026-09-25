@@ -156,3 +156,28 @@ registerSkill('subtraction:number_line_sub', {
     },
     stories: storiesFor('-'),
 });
+
+/* ============================================================================ nl_sub */
+// Owner request (2026-09-25): nl_sub draws on the kit's number line, one hop per number.
+registerSkill('subtraction:nl_sub', {
+    strings: strings({
+        iCan: 'I Can subtract by hopping back on a number line',
+        instructionKey: 'line-jumps',
+        steps: [
+            'Find the first number on the line.',
+            'Hop to the left, one number each hop.',
+            'Count the hops. Write the missing number.',
+        ],
+        say: '__ minus __ equals __.',
+    }),
+    misconceptions: ['counted-start', 'jumped-wrong-way'],
+    workedSteps: (q) => { const [a, b] = operands(q); return Number.isFinite(a) && Number.isFinite(b) ? lineSteps(a, b, -1) : []; },
+    wrongAnswer: (q) => {
+        const [a, b] = operands(q);
+        if (!Number.isFinite(a) || !Number.isFinite(b) || q.missing) return null;
+        return chooseWrong(q, [
+            { value: a - b + 1, misconception: 'counted-start', explain: `Counted ${a}, the start, as the first hop.` },
+            { value: a + b, misconception: 'jumped-wrong-way', explain: 'Hopped to the right, not the left.' },
+        ]);
+    },
+});

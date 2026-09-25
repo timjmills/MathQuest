@@ -310,8 +310,8 @@ export const SKILL_OPTIONS = {
         'Level 2 leaves only each answer blank (numbers to 5), level 1 blanks two numbers in '
         + 'every row (numbers to 8), level 0 blanks the whole family (numbers to 10).')],
     'multiplication:mult_chart_easy': [levelSubset([2, 1, 0], 2,
-        'The same 12 x 12 chart every time: level 2 leaves 2 cells to fill, level 1 leaves 6, '
-        + 'level 0 leaves 22. Level 2 never blanks the 1 row or the 1 column.')],
+        'The same 12 x 12 chart every time: level 2 leaves 8 cells to fill, level 1 leaves 16, '
+        + 'level 0 leaves 30. Level 2 never blanks the 1 row or the 1 column.')],
 };
 
 // ===========================================================================
@@ -1124,7 +1124,8 @@ const CB_CHART_LINE_OPTIONS = {
     ],
     'patterns:number_patterns_rule': [
         {
-            id: 'pattern', label: 'Pattern', type: 'set', default: ['add', 'sub'], group: 'difficulty',
+            // R3 (critic round 3): the skill is named "Count On, Count Back, Double", so doubling is dealt by default.
+            id: 'pattern', label: 'Pattern', type: 'set', default: ['add', 'sub', 'double'], group: 'difficulty',
             values: [{ v: 'add', l: 'Count on (+2, +5, +10, +25, +100 …)' }, { v: 'sub', l: 'Count back (−2, −5, −10 …)' },
                 { v: 'double', l: 'Doubling and halving' }, { v: 'times10', l: '× 10 each time' },
                 { v: 'grow', l: 'Growing steps (+1, +2, +3 …)' }],
@@ -1142,8 +1143,9 @@ const CB_CHART_LINE_OPTIONS = {
         _cbPercent(null, { nullLabel: 'None: continue it (the first 3 shown, the rest to write)',
             help: 'None asks the pupil to continue the pattern. A percentage leaves that many numbers out ANYWHERE along the row; the first number is always printed.' }),
         {
-            id: 'rule', label: 'Write the rule', type: 'bool', default: false, group: 'support',
-            help: 'Off prints the rule above the row ("Rule: count on by 5."). On hides it and adds a Rule box to fill.',
+            // R3 (critic round 3): "find the rule" is the skill, so the pupil writes the rule by default.
+            id: 'rule', label: 'Write the rule', type: 'bool', default: true, group: 'support',
+            help: 'On hides the rule and adds a Rule box for the pupil to fill. Off prints the rule above the row ("Rule: count on by 5.").',
         },
         _cbShape('box'),
     ],
@@ -1161,10 +1163,10 @@ const CB_CHART_LINE_OPTIONS = {
         _chartTask(),
     ],
     'multiplication:mult_chart_easy': [
-        levelSubset([2, 1, 0], 2, 'The same chart every time: level 2 leaves 2 cells to fill, level 1 leaves 6, '
-            + 'level 0 leaves 22. Level 2 never blanks the 1 row or the 1 column.'),
+        levelSubset([2, 1, 0], 2, 'The same chart every time: level 2 leaves 8 cells to fill, level 1 leaves 16, '
+            + 'level 0 leaves 30. Level 2 never blanks the 1 row or the 1 column.'),
         _chartBand(144),
-        _cbPercent(null, { nullLabel: 'As the support level sets it (2, 6 or 22 cells)',
+        _cbPercent(null, { nullLabel: 'As the support level sets it (8, 16 or 30 cells)',
             help: 'A percentage of the chart instead of the support level\'s count. 100% is a blank chart to fill in completely.' }),
         _cbTables(1, 'Tables with blanks', 'Times tables', 'Only the rows and columns of the ticked tables have blanks.'),
         _chartTask(),

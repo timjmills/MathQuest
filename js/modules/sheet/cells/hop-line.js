@@ -76,13 +76,22 @@ function lineSVG(g, p, { hops, ink }) {
     const W = max * pitch + PAD_MM * 2 + 4;
     let body = `<line x1="${(PAD_MM - 2).toFixed(2)}" y1="${yLine.toFixed(2)}" x2="${(X(max) + 3).toFixed(2)}" y2="${yLine.toFixed(2)}" stroke="${INK.ink}" stroke-width="0.53"/>`;
     body += `<path d="M${(X(max) + 4.5).toFixed(2)} ${yLine.toFixed(2)} l-2.4 -1.3 v2.6 z" fill="${INK.ink}"/>`;
-    const minor = !one && pitch >= 1.2;
+    // R3 (critic round 3): a tick at every whole number gave 60-77 ticks 2 mm apart on a line to
+    // 72, and the pupil hunted the labelled multiples. The whole-number ticks are drawn only when
+    // they are countable - a small step (up to 5) and at least 3 mm apart - otherwise the line
+    // is ticked by the step alone.
+    const minor = !one && s <= 5 && pitch >= 3;
+    // Labels never touch: when two neighbouring step labels would be closer than their own width
+    // (3-digit labels at a pitch of 8 mm; the screen draws the line smaller still), every other
+    // step is labelled (every third ...). Every step keeps its long tick.
+    const widest = String(max).length * 0.56 * labelMm + (g.screen ? 3 : 1.5);
+    const every = one ? 1 : Math.max(1, Math.ceil(widest / (s * pitch * (g.screen ? 0.8 : 1))));
     for (let v = 0; v <= max; v++) {
         const major = one || v % s === 0;
         if (!major && !minor) continue;
         const t = major ? 2.4 : 1.3;
         body += `<line x1="${X(v).toFixed(2)}" y1="${(yLine - t).toFixed(2)}" x2="${X(v).toFixed(2)}" y2="${(yLine + t).toFixed(2)}" stroke="${INK.ink}" stroke-width="${major ? 0.35 : 0.2}"/>`;
-        if (major) body += `<text x="${X(v).toFixed(2)}" y="${(yLine + 3 + labelMm).toFixed(2)}" text-anchor="middle" font-size="${labelMm.toFixed(2)}" font-family="Andika, sans-serif" fill="${INK.ink}">${v}</text>`;
+        if (major && (one || (v / s) % every === 0 || v === max)) body += `<text x="${X(v).toFixed(2)}" y="${(yLine + 3 + labelMm).toFixed(2)}" text-anchor="middle" font-size="${labelMm.toFixed(2)}" font-family="Andika, sans-serif" fill="${INK.ink}">${v}</text>`;
     }
     body += `<circle cx="${X(0).toFixed(2)}" cy="${yLine.toFixed(2)}" r="1.3" fill="${INK.ink}" data-nl-start="0"/>`;
     if (hops > 0 && ink) {

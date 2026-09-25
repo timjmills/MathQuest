@@ -1481,7 +1481,7 @@ export function screenTwin(q) {
     const t = q.answerType;
     if (t === 'inline-blanks' && /_{3,}/.test(String(q.text || ''))) {
         const widths = q.inlineBlanksData && q.inlineBlanksData.cellWidths;
-        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths) + (q.visual || ''), instr: 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
+        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths) + (q.visual || ''), instr: q.screenInstr || 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
     }
     if (t === 'inline-cloze' && /_{3,}/.test(String(q.text || ''))) {
         return { mode: 'slots', html: clozeHTML(q), instr: 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };

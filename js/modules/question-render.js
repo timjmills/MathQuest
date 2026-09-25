@@ -1598,7 +1598,7 @@ function _applyCardTwin(q, paper, visualAid, qt) {
         visualAid.insertBefore(line, visualAid.firstChild);
         visualAid.style.display = 'block';
         paper.classList.add('mq-twin');
-        setInstr('Solve.');
+        setInstr(q.screenInstr || 'Solve.');
         visualAid.dataset.mqNoZoom = '1';
         return;
     }

@@ -3,7 +3,7 @@
 //
 //   `arrays`     an array of dots, or ringed equal groups, with "[ ] rows of [ ]. [ ] in all."
 //                (or "[ ] groups of [ ]. [ ] in all.", or "[ ] in all."), one clause per line
-//   `remainder`  counters in runs of the divisor to ring, with "19 ÷ 3 = [ ] R [ ]"
+//   `remainder`  counters in a neutral array to ring, with "19 ÷ 3 = [ ] R [ ]"
 //
 // Counters are solid dots (arrays) or open circles (remainder) of at least 4 mm (RP-3: a pupil
 // counts them by touching each one), on a fixed pitch, so 40 of them are still countable and
@@ -21,7 +21,7 @@
 import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, box, esc, splitList, splitRemainder, HAIR } from './ops-common.js';
 import { INK } from '../tokens.js';
-import { groupRuns } from './k2kit.js';
+import { looseArray } from './k2kit.js';
 
 /* ------------------------------------------------------------------ shared drawing */
 
@@ -192,7 +192,9 @@ function remainderCounters(g, p) {
     // between two counters of a run, 9 mm between runs, 7 mm between lines; the last, shorter
     // run is the remainder. (The 2026-09-25 regrade: rows of 12 at a 2.5 mm gap let a group of
     // 5 wrap a row end, so it could not be ringed.)
-    const lay = groupRuns(Number(p.dividend), Number(p.divisor), { d, gap: 4, runGap: 9, rowGap: 7, pad: 0.5 });
+    // R3 (critic round 3): runs of the divisor drew the quotient and the remainder for the pupil
+    // (9 ÷ 2 as four pairs and one on its own). A neutral array (k2kit looseArray) never does.
+    const lay = looseArray(Number(p.dividend), Number(p.divisor), { d, gap: 5, rowGap: 6, pad: 0.5, order: [8, 7, 6, 5] });
     const body = lay.pts.map((c) => dot(c.cx, c.cy, r, true)).join('');
     return { svg: svgMm(g, lay.w, lay.h, body, `${p.dividend} counters`), wMm: lay.w };
 }
@@ -209,10 +211,12 @@ register('remainder', {
         const key = remKey(p);
         const vals = slotValues(ctx, key, (w) => splitRemainder(w));
         const pic = remainderCounters(g, p);
-        const bw = Math.max(g.writeMm * 2, 0.62 * g.E + 5);
+        // R3: one-digit answers take the 14 mm writing box (RUBRIC H9), not two writing widths,
+        // so "23 ÷ 4 = [ ] R [ ]" is one line inside a 2-column cell (it was ~100 mm, one column).
+        const bw = Math.max(14, 0.62 * g.E + 5);
         const slot = (id) => box(g, id, { wMm: bw, hMm: g.stripMm, value: vals[id] || '', ink, mark: g.twin ? 'cell' : null });
         // VA-62: the "R" and its box print in every cell, whatever the remainder.
-        const eq = `<div data-mq-join=" R " style="display:inline-flex;align-items:center;gap:0.28em;white-space:nowrap;margin-top:0.4em">`
+        const eq = `<div data-mq-join=" R " style="display:inline-flex;align-items:center;gap:0.2em;white-space:nowrap;margin-top:0.4em">`
             + `<span>${esc(p.dividend)}</span><span style="font-weight:700;width:1em;text-align:center">÷</span><span>${esc(p.divisor)}</span>`
             + `<span style="font-weight:700;width:1em;text-align:center">=</span>${slot('q')}<span style="font-weight:700">R</span>${slot('r')}</div>`;
         return root(g, 'remainder', `${pic.svg}${eq}`, 'text-align:center;', this.footprint(p, ctx).wMm);

@@ -22,7 +22,7 @@ import { num, arr, obj, operands, chooseWrong, strings, step, clampSteps, fmt } 
 
 /** A `strings` member whose library key (and steps) depend on the item: `pick(q)` -> def. */
 function stringsBy(pick) {
-    const fn = (ref = {}) => strings(pick(ref && ref.q))(ref);
+    const fn = (ref = {}) => strings(pick(ref && ref.q, ref || {}))(ref);
     fn.def = pick(null);
     return fn;
 }
@@ -131,16 +131,25 @@ const RULE_WORDS = {
 };
 
 registerSkill('patterns:number_patterns_rule', {
-    strings: stringsBy((q) => {
+    strings: stringsBy((q, ref = {}) => {
         const d = q ? patternData(q) : null;
+        // R3 (critic round 3): the steps match the task - finding the rule when the pupil
+        // writes it, reading it when it is printed - and the title reads as one verb.
+        // With no item (the page title and instruction), the section's own option says it.
+        const shown = d ? !d.ruleHidden : !!(ref.opts && ref.opts.rule === false);
         return {
-            iCan: 'I Can find and use the rule of a number pattern',
-            instructionKey: d && d.ruleHidden ? 'pattern-find-rule' : 'pattern-rule',
-            steps: [
+            iCan: shown ? 'I Can use the rule of a number pattern' : 'I Can find the rule of a number pattern',
+            instructionKey: shown ? 'pattern-rule' : 'pattern-find-rule',   // R3: the default (no item) is find the rule
+            steps: shown ? [
+                'Read the rule.',
+                'Start at the last number shown.',
+                'Use the rule to get the next number.',
+                'Write each missing number.',
+            ] : [
                 'Look at two numbers side by side.',
                 'Find the rule: more, less, double, half or times 10?',
                 'Check the rule on the next pair.',
-                'Use the rule to write each missing number.',
+                'Write the rule. Use it to write each missing number.',
             ],
             say: 'The rule is __. The next number is __.',
             sayValues: (item) => {

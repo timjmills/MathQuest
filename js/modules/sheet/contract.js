@@ -121,7 +121,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     // (each cell prints its own group size / divisor). Their fallback used to be `groups-of`,
     // which asks for a group size the page already prints.
     'ring-groups-each': 'Circle groups of the number shown. Write how many groups.',
-    'ring-remainder-each': 'Circle groups of the divisor. Write the quotient and the remainder.',
+    'ring-remainder-each': 'Circle groups of the second number. Write the quotient and the remainder.',
     'missing-all': 'Write the missing numbers.',
     'story-k2': 'Solve. Write the number.',
     'pick-parts': 'Write one number from each list to make the sum.',

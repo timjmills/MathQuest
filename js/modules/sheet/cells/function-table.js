@@ -83,10 +83,13 @@ export function undoRule(rule, y) {
     return v;
 }
 
-/** "x + 7", "x × 2 + 1" (with the variable) or "+ 7", "× 2 + 1" (without). */
+/**
+ * "n + 7", "n × 2 + 1" (with the variable) or "+ 7", "× 2 + 1" (without). R3 (critic round 3):
+ * the variable is n, never the letter x, which beside an operator reads as "times" ("x × 4 + 1").
+ */
 export function ruleText(rule, { variable = true } = {}) {
     const body = (rule || []).map((s) => `${FT_GLYPH[s.op] || s.op} ${s.n}`).join(' ');
-    return variable ? `x ${body}` : body;
+    return variable ? `n ${body}` : body;
 }
 
 /** "3 + 7" / "3 × 2 + 1": the rule written on one In number. */
@@ -210,7 +213,16 @@ function dims(p, g) {
     return { rowH, headH, boxW, boxH, colW, exprW, textMm, ruleBoxW, signW, frameW, machineH, digitMm, maxDigits };
 }
 
-const hasExprCol = (p) => p.task === 'outputs' && p.support !== 'line';
+const hasExprCol = (p) => p.task === 'outputs' && p.support !== 'line' && !p._noExpr;
+/**
+ * R3 (critic round 3): the worked column ("3 + 7" beside each In number) is a HINT scaffold, so it
+ * fades: it prints on the Model and the first Guided row (scaffold level 2 and 3) and never on an
+ * Independent, Test or screen table, where the pupil applies the rule unaided.
+ */
+const withFade = (p, ctx) => {
+    const lvl = ctx && Number.isFinite(ctx.scaffoldLevel) ? ctx.scaffoldLevel : 1;
+    return lvl >= 2 || p.task !== 'outputs' ? p : Object.assign({}, p, { _noExpr: true });
+};
 
 function tableWidth(p, d) {
     return d.colW * 2 + (hasExprCol(p) ? d.exprW : 0);
@@ -222,8 +234,8 @@ function tableWidth(p, d) {
 const txt = (g, s, { bold = false, em = null } = {}) =>
     `<span style="font-size:${(em || g.textEm).toFixed(3)}em;font-weight:${bold ? 700 : 400};white-space:nowrap">${s}</span>`;
 
-/** The variable x: upright (TY-2 allows no italic); the times sign is always the × glyph, never x. */
-const X = '<span style="font-weight:400">x</span>';
+/** The variable n: upright (TY-2 allows no italic). Never x, which reads as the times sign (R3). */
+const X = '<span style="font-weight:400">n</span>';
 const ruleHtml = (rule, variable = true) => `${variable ? `${X} ` : ''}${esc(ruleText(rule, { variable: false }))}`;
 
 /** A right-pointing arrow (mm), black: a hairline shaft and a small solid head (INK-5). */
@@ -427,6 +439,7 @@ function keyMap(p) {
 
 register('function-table', {
     render(p, ctx) {
+        p = withFade(p, ctx);
         const g = geo(ctx);
         const d = dims(p, g);
         const slots = ftSlots(p);
@@ -484,6 +497,7 @@ register('function-table', {
         return { value: list.join(', '), display: list.join(', '), slots: out };
     },
     footprint(p, ctx) {
+        p = withFade(p, ctx);
         const g = geo(ctx);
         const d = dims(p, g);
         if (wideLayout(p, g, d, ctx)) {

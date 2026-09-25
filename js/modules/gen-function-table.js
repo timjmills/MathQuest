@@ -123,7 +123,7 @@ const INSTRUCTION = {
 };
 const HINT = {
     outputs: 'Do the rule to each In number. Write what comes out.',
-    rule: 'Look at each In and Out. Test + and × on every row, not just one.',
+    rule: 'Look at each In and Out. Test +, −, × and ÷ on every row, not just one.',
     inputs: 'Work backward: do the opposite of the rule to each Out number.',
     mixed: 'Go forward with the rule to find Out. Go backward to find In.',
     make: 'Choose any In number. Do the rule to it. That is the Out number.',

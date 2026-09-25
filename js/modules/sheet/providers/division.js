@@ -23,6 +23,12 @@ registerSkill('division:div_facts', {
             'Write the times fact with a gap: 6 × __ = 24.',
             'Find the missing factor. It is the answer.',
         ],
+        stepsFor: (q) => {
+            const [a, b] = operands(q);
+            if (!Number.isInteger(a) || !Number.isInteger(b) || !b || a % b) return null;
+            return [`Read the division: ${a} ÷ ${b}.`, `Write the times fact with a gap: ${b} × __ = ${a}.`,
+                'Find the missing factor. It is the answer.'];
+        },
         say: '__ divided by __ equals __.',
     }),
     misconceptions: ['subtracted', 'off-by-one-group'],
@@ -120,7 +126,9 @@ registerSkill('division:long_div_2digit', {
             explain: `The last digit is too big: ${L.quotient + 1} × ${b} is more than ${fmt(a)}.` });
         return chooseWrong(q, c, { rotate: false });
     },
-    stories: storiesFor('÷'),
+    // R3: most 2-digit divisions leave a remainder; without remainder stories the Word problems
+    // page found one story in a pool and printed it alone on the page (H5).
+    stories: storiesFor('÷', { remainder: true }),
 });
 
 /* ======================================================================= div_remainders */
@@ -138,15 +146,22 @@ const qrText = (quo, rem) => `${quo} R ${rem}`;
 
 registerSkill('division:div_remainders', {
     strings: strings({
-        iCan: 'I Can divide and find the remainder',
+        iCan: 'I Can divide with remainders',
         instructionKey: 'ring-remainder',
         instructionVars: (q) => ({ n: operands(q)[1] }),
         steps: [
-            'Circle groups of the divisor.',
-            'Count the groups. That is the quotient.',
+            'Circle a group. Count the counters in it.',
+            'Count the groups. That is the answer.',
             'Count the ones left over. That is the remainder.',
-            'Check: the remainder is less than the divisor.',
+            'Check: the remainder is less than one group.',
         ],
+        // R3: the Steps band names the model's own group size, never the word "divisor".
+        stepsFor: (q) => {
+            const [, b] = operands(q);
+            if (!Number.isInteger(b) || b < 1) return null;
+            return [`Circle groups of ${b}.`, 'Count the groups. That is the answer.',
+                'Count the ones left over. That is the remainder.', `Check: the remainder is less than ${b}.`];
+        },
         say: '__ divided by __ equals __, remainder __.',
         sayValues: (q) => { const [a, b] = operands(q); const r = qr(q); return r ? [a, b, r.quo, r.rem] : null; },
     }),
@@ -200,12 +215,9 @@ registerSkill('division:share_into_groups', {
             'Count the circles. Write how many groups.',
         ],
         say: '__ in groups of __ makes __ groups.',
-        // Critic round 2: the rings link to dividing through the number sentence under them.
-        sentence: (q) => {
-            const [a, b] = operands(q);
-            if (!Number.isFinite(a) || !Number.isFinite(b) || !b || a % b) return null;
-            return { parts: [String(a), '÷', String(b), '=', String(a / b)], blanks: [0, 2, 4] };
-        },
+        // R3 (critic round 3): the "___ ÷ ___ = ___" line under the rings asked for the number of
+        // groups a second time (a doubled slot, H8). The box beside "groups of" is the one answer
+        // place; the division sentence is the Say: frame's job, spoken, not written twice.
     }),
     misconceptions: ['wrote-group-size', 'counted-counters', 'one-group-short'],
     workedSteps: (q) => {
