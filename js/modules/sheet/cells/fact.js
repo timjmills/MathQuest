@@ -79,9 +79,9 @@ export function factCue(p, { px = 0 } = {}) {
     const div = op === '/' || op === '÷';
     const INK = '#000';
     const f2 = (v) => Number(v).toFixed(2);
-    const size = (w, h) => (px ? `width="${Math.round(w * px)}" height="${Math.round(h * px)}"` : `width="${f2(w)}mm" height="${f2(h)}mm"`);
+    const size = (w, h) => (px ? `width="${Math.round(w * px)}" height="${Math.round(h * px)}" data-px="1"` : `width="${f2(w)}mm" height="${f2(h)}mm"`);
     const wrap = (w, h, body, label) => `<svg class="ws-factcue-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f2(w)} ${f2(h)}" ${size(w, h)} `
-        + `role="img" aria-label="${label}" style="display:block;margin:0 auto;max-width:100%;overflow:visible;">${body}</svg>`;
+        + `role="img" aria-label="${label}" style="display:block;margin:0 auto;max-width:100%;overflow:visible;${px ? `width:${Math.round(w * px)}px;height:auto;` : ''}">${body}</svg>`;
     const dot = (x, y, r, open) => `<circle cx="${f2(x)}" cy="${f2(y)}" r="${f2(r)}" ${open ? `fill="none" stroke="${INK}" stroke-width="0.35"` : `fill="${INK}"`}/>`;
     const cross = (x, y, r) => `<path d="M${f2(x - r)} ${f2(y - r)}L${f2(x + r)} ${f2(y + r)}M${f2(x + r)} ${f2(y - r)}L${f2(x - r)} ${f2(y + r)}" stroke="${INK}" stroke-width="0.5"/>`;
     const text = (x, y, s, pt = 3.2, anchor = 'middle') => `<text x="${f2(x)}" y="${f2(y)}" font-size="${pt}" text-anchor="${anchor}" font-family="Andika, sans-serif" fill="${INK}">${s}</text>`;

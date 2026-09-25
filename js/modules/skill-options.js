@@ -625,8 +625,8 @@ const _OPS_BANDS = { '10': 10, '20': 20, '50': 50, '100': 100, '1k': 1000, '10k'
 const _opsBand = (values, dflt, { label = 'Numbers to', help, labels = {} } = {}) => ({
     id: 'band', label, type: 'enum', default: dflt,
     values: values.map(v => ({ v, l: labels[v] || (v === null ? 'As the support level sets it' : v.toLocaleString('en-US')) })),
-    help: help || 'Bounds the answer (the sum, the number you start from, the product or the number '
-        + 'shared), never the numbers you start from.',
+    help: help || 'The largest answer on the page: the sum for +, the number you take from for −, the product '
+        + 'for ×, the number shared for ÷.',
 });
 const _opsRegroup = (dflt, sub = false) => ({
     id: 'regroup', label: sub ? 'Regrouping (borrowing)' : 'Regrouping (carrying)', type: 'enum', default: dflt,
@@ -725,6 +725,10 @@ const P11_OPS_OPTIONS = {
     // --- the number lines: which number is missing ---------------------------------------------
     'addition:nl_add': [_opsUnknown('mixed', { answer: 'Where it lands (7 + 5 = __)', first: 'The start (__ + 5 = 12)', second: 'The jump (7 + __ = 12)' })],
     'subtraction:nl_sub': [_opsUnknown('mixed', { answer: 'Where it lands (12 − 5 = __)', first: 'The start (__ − 5 = 7)', second: 'The jump back (12 − __ = 7)' })],
+
+    // --- add_three: the sum and the dot groups -------------------------------------------------
+    'addition:add_three': [_opsBand([10, 20], 20, { label: 'Sum to', help: 'The largest total of the three numbers.' }),
+        { ...picturesOption(true), help: 'Off leaves the number sentence without the three dot groups.' }],
 
     // --- add_column_multi: how many numbers are added ------------------------------------------
     'addition:add_column_multi': [{

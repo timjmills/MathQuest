@@ -1970,7 +1970,8 @@ const _KIT_OP = { '+': '+', '-': '-', '−': '-', '×': '*', '÷': '/' };
  */
 function _applyKitFactCell(q, skill, range) {
     if (!_KIT_FACT_SKILLS.has(skill) || !q || q.cell) return;
-    if (state.decimalPlaces > 0) return;
+    // P11: a fact drill is whole numbers whatever the Decimals setting, so its cell does not change with it.
+    if (state.decimalPlaces > 0 && !/_facts$/.test(skill)) return;
     const op = _KIT_OP[q.op];
     const a = Number(q.a), b = Number(q.b);
     if (!op || !Number.isInteger(a) || !Number.isInteger(b) || a < 0 || b < 0) return;
@@ -2136,7 +2137,14 @@ function _applyOptionPost(q, selected, routed) {
             }
             q.cell = { ...q.cell, payload: { ...q.cell.payload, cue } };
             q.cueKind = cue;
-            q.visual = `${q.visual || ''}<div class="mq-factcue" style="margin-top:10px;text-align:center;">${_factCue({ a, b, op, cue }, { px: 3.4 })}</div>`;
+            // On screen the host redraws a `facts-column-visual` fact from its numbers alone and
+            // would drop the cue, so a cued fact is shown as its number sentence with the cue under
+            // it and the host's answer box (paper keeps the vertical fact and the cue together).
+            const base = /facts-column-visual|column-answer-input/.test(String(q.visual || '')) ? '' : (q.visual || '');
+            const svg = _factCue({ a, b, op, cue }, { px: 4.5 });
+            const w = Number((/width="(\d+)"/.exec(svg) || [])[1]) || 160;
+            // The card's stylesheet stretches a bare SVG to its width, so the cue is held at its size.
+            q.visual = `${base}<div class="mq-factcue" style="margin:10px auto 0;max-width:${w}px;text-align:center;">${svg}</div>`;
         }
     }
 
@@ -2144,7 +2152,8 @@ function _applyOptionPost(q, selected, routed) {
     if (_opt('pictures') === false) {
         q.visual = '';
         if (q.cell && q.cell.template === 'wordpic') q.cell = { ...q.cell, payload: { ...q.cell.payload, pictures: false } };
-        q.printFormat = 'word-plain';
+        // A story prints as the plain story with a work space; a sum (add_three) prints its sentence.
+        if (/^word/.test(String(q.printFormat || '')) || _WP_RE.test(routed) || /word_problems/.test(selected)) q.printFormat = 'word-plain';
         q.picturesOff = true;
     }
 
@@ -2157,7 +2166,7 @@ function _applyOptionPost(q, selected, routed) {
 
     // --- the column support level (ranged ids from 50 up) ------------------------------------
     const rm = String(routed).match(_RANGED_RE);
-    if (rm && RANGE_MAP[rm[2]] >= 50 && ints && (isAdd || isSubOp) && _optDef('level')) {
+    if (rm && RANGE_MAP[rm[2]] >= 50 && Number.isInteger(q.a) && Number.isInteger(q.b) && (isAdd || isSubOp) && _optDef('level')) {
         const lvl = supportLevelFor(1);
         const maxVal = RANGE_MAP[rm[2]];
         const payload = { operands: [q.a, q.b], op: isAdd ? '+' : '-', ansDigits: String(isAdd ? maxVal : maxVal - 1).length };
@@ -3187,13 +3196,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // ADD THREE (Grade 1) - Add three numbers <= 20
             // ========================================
             if (mappedSkill === "add_three") {
-                // Generate 3 numbers, each <= 10, sum <= 20
+                // Generate 3 numbers, each <= 10, sum <= 20 (P11: "Sum to" 10 / 20 bounds the sum)
+                const _a3Top = Number(_opt('band')) || 20;
                 let a, b, c;
                 do {
-                    a = rng(1, 10);
-                    b = rng(1, 10);
-                    c = rng(1, Math.min(10, 20 - a - b));
-                } while (a + b + c > 20 || c < 1);
+                    a = rng(1, Math.min(10, _a3Top - 2));
+                    b = rng(1, Math.min(10, _a3Top - 2));
+                    c = rng(1, Math.min(10, _a3Top - a - b));
+                } while (a + b + c > _a3Top || c < 1);
                 const sum = a + b + c;
 
                 q.text = `${a} + ${b} + ${c} = ?`;
