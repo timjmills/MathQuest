@@ -506,7 +506,7 @@ register('pv', {
                 return `<div class="pv-cell">${top ?? center(numeral({ underline: p.place }))}${frameHTML(ctx, p.frame, kv, digits)}</div>`;
             case 'blanks': {
                 const pic = p.place && !p.hideNumeral ? center(numeral({ underline: p.place })) : '';
-                return `<div class="pv-cell">${pic}${blanksHTML(ctx, p.frame, p.keys, p.words, slotFloor(p, true))}</div>`;
+                return `<div class="pv-cell">${pic}${blanksHTML(ctx, p.frame, p.keys, p.words, slotFloor(p, false))}</div>`;
             }
             case 'expand':
                 return `<div class="pv-cell">${expandHTML(p, ctx)}</div>`;

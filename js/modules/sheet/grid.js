@@ -33,7 +33,7 @@ export const blankRun = (fromColumn) => `<div class="ws-cell blankrun" style="--
  * @param {string} [opts.rowsTpl]           a grid-template-rows value other than equal rows (the
  *                                          Guided page's model row, which carries its worked trace)
  */
-export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '' } = {}) {
+export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', spanFirst = false, rowGap = 0 } = {}) {
     const n = cols * (rows || Math.ceil(cells.length / cols));
     let k = start;
     const out = cells.map((c, i) => {
@@ -41,8 +41,26 @@ export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', 
         const lab = unlabelled.includes(i) || item.nolabel ? (item.model ? label('model') : '') : label(labels, k++);
         return cell(item.html, { label: lab, cls: item.cls || '', style: item.style || '' });
     });
-    if (cells.length < n) out.push(blankRun((cells.length % cols) + 1));
+    // `spanFirst`: the first cell spans the whole first row (the Guided model with its lines).
+    const used = cells.length + (spanFirst ? cols - 1 : 0);
+    if (used < n) out.push(blankRun((used % cols) + 1));
     const r = rows || Math.ceil(cells.length / cols);
+    // `rowGap` (mm, RUBRIC H13 page fill): a sheet whose problem count is fixed (a Test, the
+    // teacher's count) spends the page's spare height as WHITESPACE BETWEEN rows - each row its
+    // own framed strip - never as empty space inside the cells. Only with a fixed height.
+    const Hmm = parseFloat(height);
+    if (rowGap > 0 && r > 1 && Number.isFinite(Hmm) && !spanFirst) {
+        const fr = /repeat\(/.test(rowsTpl || 'repeat(') ? Array(r).fill(1) : String(rowsTpl).split(/\s+/).map((t) => parseFloat(t) || 1);
+        const sum = fr.reduce((a, b) => a + b, 0);
+        const inner = Hmm - rowGap * (r - 1);
+        const rowsHtml = [];
+        for (let i = 0; i < r; i++) {
+            const h = Math.round((inner * fr[i] / sum) * 100) / 100;
+            const part = out.slice(i * cols, (i + 1) * cols).join('') + (i === r - 1 ? out.slice(r * cols).join('') : '');
+            rowsHtml.push(`<div class="ws-grid ${cls} ws-gridrow" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:1fr;height:${h}mm;${i ? `margin-top:${rowGap}mm;` : ''}">${part}</div>`);
+        }
+        return `<div class="ws-gridrows" data-ws-rowgap="${rowGap}" style="flex:none;">${rowsHtml.join('')}</div>`;
+    }
     return `<div class="ws-grid ${cls}" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:${rowsTpl || `repeat(${r},1fr)`};${height ? `height:${height};` : ''}">${out.join('')}</div>`;
 }
 
