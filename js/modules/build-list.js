@@ -48,6 +48,23 @@ export const NEW_TEMPLATES = {
     calendar: { lane: 'timemoney', what: 'a calendar page or day strip (days, weeks, months, seasons)' },
     expression: { lane: 'algebra', what: 'an expression or formula with brackets, boxed parts and labels (term, factor, coefficient)' },
     'long-multiplication': { lane: 'operations', what: 'the long-multiplication grid with carry boxes and the placeholder row' },
+    // added from the visual catalogue (design/wrm-visuals/INDEX.md); a "pane" is an answer-free support drawn round a problem
+    beadstring: { lane: 'k2', what: 'pane: a bead string of 10, 20 or 100 beads in runs of five or ten (unit 1, 0.1 or 1 %)' },
+    cover: { lane: 'k2', what: 'pane: an outline cover box with "?" laid over part of a picture, a bond part, digits or a chart' },
+    'split-op': { lane: 'operations', what: 'a part-whole split with an operation arrow under each part and the recombined answer' },
+    split: { lane: 'operations', what: 'pane: the second number split under a calculation to bridge a ten, hundred or whole' },
+    'pv-exchange': { lane: 'placevalue', what: 'pane: a place-value chart of counters beside a written method, with exchanges for + − × ÷ and decimals' },
+    gattegno: { lane: 'placevalue', what: 'the Gattegno chart: rows 1–9 × powers of ten, decimal rows, read / ring / shift' },
+    'total-grid': { lane: 'algebra', what: 'a 3 × 3 grid of numbers or symbols with row and column totals' },
+    pyramid: { lane: 'algebra', what: 'a number pyramid of 3–5 rows, each brick the sum of the two below' },
+    'hundred-square': { lane: 'fractions', what: 'a 10 × 10 (or 1,000-cell) square as one whole: shade and read hundredths, decimals, percent; two-tone complement' },
+    'double-scale': { lane: 'fractions', what: 'two or three aligned scales (units, fraction | decimal | percent, ratio) with blanks and operator arcs' },
+    'operator-arcs': { lane: 'fractions', what: 'pane: operator arcs above and below a pair of numbers or fractions (× n, ÷ n, +, −)' },
+    ladder: { lane: 'measurement', what: 'pane: the unit-conversion ladder (mm → cm → m → km, ÷ above, × below)' },
+    'past-to': { lane: 'timemoney', what: 'pane: a clock face half-shaded past / to' },
+    'hour-line': { lane: 'timemoney', what: 'pane: a 1–12 line with the hour hand as a pointer' },
+    'factor-pairs': { lane: 'numtheory', what: 'a systematic factor-pair table, factor rainbow or bug, non-factors crossed out' },
+    'factor-tree': { lane: 'numtheory', what: 'a factor tree or halving tree to prime factors' },
 };
 
 /* ================================================================ lanes */
@@ -56,17 +73,18 @@ export const NEW_TEMPLATES = {
 export const LANES = {
     k2: { name: 'Counting and early number (K-1 pictures)', files: ['js/modules/gen-counting.js', 'js/modules/sheet/cells/{counters,tenframe,bond,seqstrip,compare,chartwindow,base10,wordpic,count-row,k2kit}.js', 'js/modules/sheet/providers/k2.js'], newTemplates: ['picture-row', 'sort-rings'] },
     operations: { name: 'Operations (+ − × ÷, facts, multi-digit, integers arithmetic)', files: ['js/modules/gen-operations.js', 'js/modules/gen-mult-patterns.js', 'js/modules/sheet/cells/{stack,fact,family,equation,cloze-bank,arrays,area-model,mult-grid,mult-chart,division,long-division,ops-counters,ops-common,hop-line,number-line}.js', 'js/modules/sheet/providers/{addition,subtraction,multiplication,division,countby}.js'], newTemplates: ['bar-model', 'long-multiplication'] },
-    placevalue: { name: 'Place value, rounding and estimation (the pv kit)', files: ['js/modules/gen-pv.js', 'js/modules/sheet/cells/{pv,value-line,line-labels}.js', 'js/modules/pv-support-cell.js', 'js/modules/sheet/providers/pv.js'], newTemplates: [] },
-    algebra: { name: 'Patterns, algebra, order of operations, strategies (gen-algebraic)', files: ['js/modules/gen-algebraic.js', 'js/modules/gen-function-table.js', 'js/modules/sheet/cells/function-table.js', 'js/modules/sheet/providers/function-table.js'], newTemplates: ['expression'] },
-    fractions: { name: 'Fractions, decimals, conversions, ratio', files: ['js/modules/gen-fractions.js', 'js/modules/sheet/cells/frac-model.js', 'js/modules/svg-fractions.js'], newTemplates: [] },
+    placevalue: { name: 'Place value, rounding and estimation (the pv kit)', files: ['js/modules/gen-pv.js', 'js/modules/sheet/cells/{pv,value-line,line-labels,gattegno}.js', 'js/modules/pv-support-cell.js', 'js/modules/sheet/providers/pv.js', 'js/modules/sheet/cells/panes/{place,extras,pv-exchange}.js'], newTemplates: ['gattegno', 'pv-exchange'] },
+    algebra: { name: 'Patterns, algebra, order of operations, strategies (gen-algebraic)', files: ['js/modules/gen-algebraic.js', 'js/modules/gen-function-table.js', 'js/modules/sheet/cells/{function-table,total-grid,pyramid}.js', 'js/modules/sheet/providers/function-table.js'], newTemplates: ['expression', 'total-grid', 'pyramid'] },
+    fractions: { name: 'Fractions, decimals, conversions, ratio', files: ['js/modules/gen-fractions.js', 'js/modules/sheet/cells/{frac-model,hundred-square,double-scale}.js', 'js/modules/sheet/cells/panes/operator-arcs.js', 'js/modules/svg-fractions.js'], newTemplates: ['hundred-square', 'double-scale', 'operator-arcs'] },
     geometry: { name: 'Geometry, area, volume, coordinates', files: ['js/modules/gen-geometry.js', 'js/modules/svg-geometry.js', 'js/modules/sheet/cells/shapes.js'], newTemplates: ['shape-grid', 'coord-grid', 'angle-kit', 'solid-kit'] },
-    measurement: { name: 'Measurement (length, mass, capacity, conversions)', files: ['js/modules/gen-measurement.js'], newTemplates: ['measure-scale', 'balance'] },
-    timemoney: { name: 'Time and money', files: ['js/modules/gen-time-money.js', 'js/modules/svg-clock.js', 'js/modules/sheet/cells/{clock,timeline,coins,money-columns,tmkit}.js', 'js/modules/sheet/providers/time-money.js'], newTemplates: ['calendar'] },
+    measurement: { name: 'Measurement (length, mass, capacity, conversions)', files: ['js/modules/gen-measurement.js', 'js/modules/sheet/cells/panes/ladder.js'], newTemplates: ['measure-scale', 'balance', 'ladder'] },
+    timemoney: { name: 'Time and money', files: ['js/modules/gen-time-money.js', 'js/modules/svg-clock.js', 'js/modules/sheet/cells/{clock,timeline,coins,money-columns,tmkit}.js', 'js/modules/sheet/providers/time-money.js'], newTemplates: ['calendar', 'past-to', 'hour-line'] },
     data: { name: 'Data and statistics', files: ['js/modules/gen-data-stats.js'], newTemplates: ['graph-axes', 'data-table'] },
-    numtheory: { name: 'Number theory', files: ['js/modules/gen-number-theory.js', 'js/modules/svg-factors.js'], newTemplates: [] },
+    numtheory: { name: 'Number theory', files: ['js/modules/gen-number-theory.js', 'js/modules/svg-factors.js', 'js/modules/sheet/cells/{factor-pairs,factor-tree}.js'], newTemplates: ['factor-pairs', 'factor-tree'] },
 };
 export const SHARED_APPEND_ONLY = ['js/modules/data.js (SKILLS, SKILL_PRINT_SIZE)', 'js/modules/skill-options.js', 'js/modules/standards.js (SKILL_STANDARDS)',
-    'js/modules/wrm.js (SKILL_WRM; delete a built proposal)', 'js/modules/generate-question.js (skillCategoryOverride)', 'js/modules/sheet/providers/index.js', 'js/globals.js'];
+    'js/modules/wrm.js (SKILL_WRM; delete a built proposal)', 'js/modules/generate-question.js (skillCategoryOverride)', 'js/modules/sheet/providers/index.js', 'js/globals.js',
+    'js/modules/sheet/cells/panes/index.js (PANES, PANE_GROUP: register a new pane)', 'js/modules/sheet/providers/util.js (FAMILY_SUPPORTS) and every provider\'s `supports` array (append a support id)'];
 
 const CATEGORY_LANE = {
     counting: 'k2', comparing: 'k2', composing: 'k2', counting_mixed: 'k2',
@@ -711,6 +729,285 @@ export const STANDARD_PROPOSALS = {
     }),
 };
 
+/* ================================================================ added from the visual catalogue */
+// The White Rose VISUAL catalogue (design/wrm-visuals/INDEX.md, js/modules/visual-catalogue.js) names
+// 210 representations; every PARTIAL and GAP one is closed by an entry of the list. Where a WRM or
+// standards proposal above already draws it, the representation is sent to that entry (VISUALS in
+// visual-catalogue.js names it) and nothing is added. What no entry builds is below: kit templates,
+// support panes, options on a template, the supports wiring, the migration of legacy colour visuals to
+// black-and-white kit cells, and the widening of place-value bands.
+//
+// FROZEN_LANES are already building from the list of 2026-09-25: their existing entries keep their
+// order and names, their new entries are APPENDED after them (marked "added from visual catalogue"),
+// and no dependency is injected into their existing entries.
+export const FROZEN_LANES = ['k2', 'operations'];
+
+const V = (o) => o;
+/**
+ * id -> { lane, kind: 'wiring'|'template'|'pane'|'option'|'skill'|'migration'|'band', name, build (what
+ * to make), hosts (skills that offer it), templates (existing kit templates it extends), newTemplates,
+ * files (what the owner lane edits), after, low (a low-priority page) }.
+ */
+export const VISUAL_BUILDS = {
+    // ------------------------------------------------------------------ k2 (appended)
+    vis_base10_read: V({ lane: 'k2', kind: 'option', name: 'Read a Base-10 Picture (template option)',
+        build: 'template:base10 gains `task: \'read\'` (a to-scale picture to count, the pupil writes the number), the hundred flat and a thousand-cube symbol, `unit: \'flat\'` (flat = 1 for tenths and hundredths), ring marks round groups and crossed-out blocks for take-away',
+        hosts: ['composing:base10_build', 'composing:base10_build_hundreds', 'composing:tens_foundation_visual'], templates: ['base10'], newTemplates: [],
+        files: ['js/modules/sheet/cells/base10.js'], after: [] }),
+    vis_object_kinds: V({ lane: 'k2', kind: 'option', name: 'New Picture Kinds: Cubes, Bundles, Number Shapes, Rods, Dominoes',
+        build: 'pane:objects / k2kit gain line-drawn kinds: linking cubes (towers, `layout: \'staircase\'`), bundles and packs printed 10 / 100 / 1,000, number shapes (plates with holes in two columns), number rods, a domino (one tile, two halves), and algebra cubes (a lettered cube + unit squares); every kind in B&W with the single grey',
+        hosts: ['counting:count_objects', 'comparing:compare_groups', 'composing:tens_foundation_visual', 'counting:number_seq_fill'], templates: ['counters'], newTemplates: [],
+        files: ['js/modules/sheet/cells/k2kit.js', 'js/modules/sheet/cells/panes/k2.js'], after: [] }),
+    vis_tenframe_options: V({ lane: 'k2', kind: 'option', name: 'Ten-Frame Options (units, frames, fills, five frame)',
+        build: 'tenframe gains `unit: 1 | 10 | 100 | 1000 | 0.1` (place-value counters in the frame), `frames: 2 | 3`, `orientation: \'vertical\'`, `fill: \'five\' | \'pairs\' | \'rows\' | \'any\'`, `mode: \'double\'` (top row mirrored), `frame: \'five\'` (the 1 × 5 frame) and a third, hatched set; ten_frame_build_teen moves off the legacy path',
+        hosts: ['composing:ten_frame_build', 'composing:ten_frame_build_teen', 'composing:make_ten', 'addition:add_5_pictures'], templates: ['tenframe'], newTemplates: [],
+        files: ['js/modules/sheet/cells/tenframe.js', 'js/modules/sheet/cells/panes/k2.js'], after: [] }),
+    vis_bond_options: V({ lane: 'k2', kind: 'option', name: 'Part-Whole Options (parts, values, pictures, open, chains)',
+        build: 'template:bond gains `parts: 2..5`, `orientation: \'up\'`, `values: \'decimal\' | \'fraction\' | \'text\'`, `draw: \'objects\' | \'cubes\' | \'base10\' | \'disks\' | \'coins\' | \'regions\'` (the two-region mat), `task: \'open\' | \'bond-list\'` (all blank, many answers, the key shows one; a list of bonds in order) and `link` / `levels` (chained bonds, the F / D / P tree, the mixed-number partition flow). The fact-family look `facts: \'add4\' | \'eight\'` is asked of the operations lane (family.js)',
+        hosts: ['composing:number_bonds', 'composing:part_whole_model', 'composing:bonds_in_order'], templates: ['bond'], newTemplates: [],
+        files: ['js/modules/sheet/cells/bond.js'], after: [] }),
+    vis_count_row_values: V({ lane: 'k2', kind: 'option', name: 'Number Tracks With Fractions, Decimals, Words and Pictures',
+        build: 'count-row / seqstrip tiles take fractions, decimals, words (Roman numerals) and pictures (a washing line of cards, growing counter columns for pattern terms, a fraction shape shaded one more part each tile), and a track may start below zero',
+        hosts: ['counting:number_seq_fill', 'patterns:count_by_fill'], templates: ['count-row', 'seqstrip'], newTemplates: [],
+        files: ['js/modules/sheet/cells/count-row.js', 'js/modules/sheet/cells/seqstrip.js'], after: [] }),
+    vis_chart_shade: V({ lane: 'k2', kind: 'option', name: 'Shade the Hundred Square (whole-chart tasks)',
+        build: 'chartwindow gains the whole chart with `task: \'shade\' | \'circle\' | \'sieve\'` (multiples, a second set ringed, the sieve of primes) and the cross-shaped window; patterns:skip_count_grid (algebra lane generator) moves onto it from the legacy path',
+        hosts: ['composing:hundreds_chart_fill', 'patterns:skip_count_grid'], templates: ['chartwindow'], newTemplates: [],
+        files: ['js/modules/sheet/cells/chartwindow.js'], after: [] }),
+    vis_k2_picture_tasks: V({ lane: 'k2', kind: 'option', name: 'Picture Task Kinds (one more, order, which, match, pairs)',
+        build: 'counters / compare task kinds: `plusone` (a row + one empty place to draw), `order` (order pictured groups or dominoes), `which` (tick every picture that shows n), `match` (draw one-to-one lines between two rows or cards), `ask: \'difference\'` (how many more) to 20, `layout: \'pairs\'` (odd / even, one left over), and pictures either side of a compare circle',
+        hosts: ['counting:count_objects', 'comparing:compare_groups', 'counting:count_out'], templates: ['counters', 'compare'], newTemplates: [],
+        files: ['js/modules/sheet/cells/counters.js', 'js/modules/sheet/cells/compare.js'], after: [] }),
+    vis_sort_diagrams: V({ lane: 'k2', kind: 'option', name: 'Sort Tables, Venn and Carroll Diagrams',
+        build: 'sort-rings gains the sort table (2–5 labelled columns), the Venn diagram (2 sets; a universal rectangle; blank labels; nested) and the Carroll diagram (2 × 2), each taking number, shape or picture tiles written in by letter',
+        hosts: ['comparing:sort_into_groups', 'number_theory:multiples'], templates: [], newTemplates: ['sort-rings'],
+        files: ['js/modules/sheet/cells/sort-rings.js'], after: ['sort_groups'] }),
+    vis_bead_panes: V({ lane: 'k2', kind: 'pane', name: 'Bead String and Hundred-Bead Rekenrek',
+        build: 'a new pane:beadstring (10, 20 or 100 beads in runs of five or ten alternating solid / hollow; `unit` 1, 0.1 or 1 %) and `rows: 1..10` on pane:rekenrek (100 beads); both answer-free supports',
+        hosts: ['composing:number_bonds', 'addition:add_facts', 'composing:bonds_to_20'], templates: [], newTemplates: ['beadstring'],
+        files: ['js/modules/sheet/cells/panes/beadstring.js', 'js/modules/sheet/cells/panes/k2.js'], after: [] }),
+    vis_cover_mark: V({ lane: 'k2', kind: 'pane', name: 'Hidden Part (cover mark)',
+        build: 'a cover mark: an outline box with "?" laid over k items of a pane (counters, beads, a bond part, digits, part of a chart); the hidden amount is the answer; `hide: k` on the hosts',
+        hosts: ['counting:count_objects', 'composing:number_bonds', 'composing:hundreds_chart_fill'], templates: ['counters', 'bond'], newTemplates: ['cover'],
+        files: ['js/modules/sheet/cells/panes/cover.js'], after: [] }),
+    vis_story_strip: V({ lane: 'k2', kind: 'option', name: 'First – Then – Now Story Strip',
+        build: 'picture-row gains the three-panel story strip (outline panels captioned First / Then / Now, pictures or ten frames, a sentence frame under) with `unknown: \'start\' | \'change\' | \'result\'`',
+        hosts: ['addition:add_wp_10', 'addition:add_5_pictures', 'subtraction:sub_5_pictures'], templates: ['wordpic'], newTemplates: ['picture-row'],
+        files: ['js/modules/sheet/cells/picture-row.js'], after: ['sort_groups'] }),
+    vis_k2_hands_on: V({ lane: 'k2', kind: 'template', name: 'Hands-On Card and Game Pages (low)', low: true,
+        build: 'printable hands-on pages that are not cells: memory / snap card sheets, a spinner or dice track game, a bingo grid of numerals; no answer key beyond the card list',
+        hosts: ['counting:count_objects'], templates: [], newTemplates: [],
+        files: ['js/modules/sheet/roles (a hands-on page kind; agree the role file with the integrator)'], after: [] }),
+
+    // ------------------------------------------------------------------ operations (appended)
+    vis_bar_family: V({ lane: 'operations', kind: 'template', name: 'The Bar-Model Family (every WRM bar)',
+        build: 'the bar-model template in full: part-whole (numbers, fractions, letters, degrees), comparison (difference arrow; sum-and-difference brace; two unknowns), equal parts with `fill: \'counters\' | \'disks\' | \'numbers\'` and `task: \'part\' | \'whole\'`, scaling (1 box vs n boxes) and ratio rows (a : b, a : b : c), nested / halving stacks with link arrows, unit-conversion bars (1 m cells over 100 cm), the percentage bar ("100 %" over 2–20 cells; two levels) and the journey line; offered as `model: \'bar\'` on the operations hosts, and used by the fractions, algebra and measurement entries that name bar-model',
+        hosts: ['division:share_into_groups', 'division:div_equation_parts', 'multiplication:mult_comparison', 'algebra:tape_diagram'], templates: ['word-work'], newTemplates: ['bar-model'],
+        files: ['js/modules/sheet/cells/bar-model.js', 'js/modules/sheet/cells/panes/models.js (pane:bar)'], after: [] }),
+    vis_split_op: V({ lane: 'operations', kind: 'template', name: 'Split and Operate (template)',
+        build: 'a new split-op template: a part-whole split with an operation arrow (× n or ÷ n) under each part and the recombined answer, for partitioning in multiplication and division',
+        hosts: ['multiplication:partition_multiply', 'division:div_equation_parts'], templates: ['bond'], newTemplates: ['split-op'],
+        files: ['js/modules/sheet/cells/split-op.js'], after: [] }),
+    vis_area_model_rows: V({ lane: 'operations', kind: 'option', name: 'Area Model: 2 × 2 and 2 × 3 Grids',
+        build: 'area-model gains `rows` (2 × 2, 2 × 3 grids), `fill: \'base10\' | \'disks\'` inside the cells and the +1 row / column adjust strip; area_model_mult_hard leaves the legacy path',
+        hosts: ['multiplication:area_model_mult_hard', 'multiplication:area_model_mult'], templates: ['area-model'], newTemplates: [],
+        files: ['js/modules/sheet/cells/area-model.js'], after: [] }),
+    vis_hop_line_options: V({ lane: 'operations', kind: 'option', name: 'Hop Lines: Through Zero, Chunks, Fact Labels',
+        build: 'hop-line gains a negative start and `bridge: 0`, unequal "chunk" arcs, and `labels: \'facts\'` ("n × 2" above each tick, values below)',
+        hosts: ['multiplication:nl_mult', 'division:nl_div', 'integers:number_line_int'], templates: ['hop-line'], newTemplates: [],
+        files: ['js/modules/sheet/cells/hop-line.js'], after: [] }),
+    vis_open_line: V({ lane: 'operations', kind: 'option', name: 'Open Number Line (template option)',
+        build: 'number-line gains `line: \'open\'` (no ticks, labelled hops) with `hops: \'bridge\' | \'compensate\' | \'count-on\'` and decimal, fraction and integer values, beyond 0–20',
+        hosts: ['addition:nl_add', 'subtraction:nl_sub', 'measurement:money_change'], templates: ['number-line'], newTemplates: [],
+        files: ['js/modules/sheet/cells/number-line.js'], after: [] }),
+    vis_split_mark: V({ lane: 'operations', kind: 'pane', name: 'Bridging Split Mark (pane)',
+        build: 'a new pane:split: the second number split under the calculation to make the next ten, hundred or whole (6 → 2 + 4; 0.67 → 0.55 + 0.12), a support value on the add / subtract hosts',
+        hosts: ['addition:add_10k_mixed', 'decimals:add_decimal'], templates: [], newTemplates: ['split'],
+        files: ['js/modules/sheet/cells/panes/split.js'], after: [] }),
+    vis_stack_layouts: V({ lane: 'operations', kind: 'option', name: 'Column Layouts: Decimal Point Track and Expanded Column',
+        build: 'stack gains the decimal-point track `dp: 1..3` (lifted from money-columns) so decimal add / subtract leave the legacy decimal-column-add print, and `form: \'expanded\'` (the partial-product column with annotations)',
+        hosts: ['decimals:add_decimal', 'decimals:sub_decimal', 'multiplication:multiply'], templates: ['stack', 'money-columns'], newTemplates: [],
+        files: ['js/modules/sheet/cells/stack.js'], after: [] }),
+    vis_division_layouts: V({ lane: 'operations', kind: 'option', name: 'Division Layouts: Bus Stop, Notes, Missing Digits',
+        build: 'the division template gains `layout: \'short\'` (bus stop with small exchange-digit slots, an r slot, a decimal point and trailing zeros), `support: \'multiples\'` (a multiples list beside), step notes, and `unknown` digits; box_division_* leave the legacy path',
+        hosts: ['division:long_div_2digit', 'division:box_division_easy', 'division:box_division_hard'], templates: ['division', 'long-division'], newTemplates: [],
+        files: ['js/modules/sheet/cells/division.js', 'js/modules/sheet/cells/long-division.js'], after: [] }),
+    vis_array_options: V({ lane: 'operations', kind: 'option', name: 'Array Options (split, hidden, place-value counters, three factors)',
+        build: 'arrays gain a split line, a hidden part, finish-the-array, `counter: \'one\' | \'ten\' | \'hundred\'`, `model: \'array-groups\'` (an array of arrays for three factors) and expression matching; mult-grid takes non-consecutive heads',
+        hosts: ['multiplication:dot_array_mult', 'multiplication:mult_chart', 'multiplication:multiply_three_numbers'], templates: ['arrays', 'mult-grid'], newTemplates: [],
+        files: ['js/modules/sheet/cells/arrays.js', 'js/modules/sheet/cells/mult-grid.js'], after: [] }),
+    vis_cloze_boxes: V({ lane: 'operations', kind: 'option', name: 'Cloze Banks: Word Banks and Digit-Card Boxes',
+        build: 'cloze-bank gains word banks (`response: \'word\'`: fewer / more / same, less than / greater than) and digit-card box templates (□□□ × □□, □.□□, □ < □) where the pupil places given cards',
+        hosts: ['addition:cloze_addition', 'comparing:compare_groups'], templates: ['cloze-bank'], newTemplates: [],
+        files: ['js/modules/sheet/cells/cloze-bank.js'], after: [] }),
+    vis_word_pictures: V({ lane: 'operations', kind: 'option', name: 'Pictures on Word Problems',
+        build: '`pictures` option on word-work: grouped-object pictures (bags, packs, jars, egg boxes) and price-tagged items drawn beside the problem, answer-free',
+        hosts: ['addition:add_wp_100', 'multiplication:mult_word_problems'], templates: ['word-work'], newTemplates: [],
+        files: ['js/modules/sheet/cells/word-work.js (unowned today; this entry takes it)'], after: [] }),
+
+    // ------------------------------------------------------------------ place value
+    vis_supports_wiring: V({ lane: 'placevalue', kind: 'wiring', name: 'Wire the Built Picture Panes as Supports',
+        build: 'the panes already drawn but never offered become `support` values: rekenrek, fingers, dice, base10-quick, disks, pvgrid, openline, bar, gridpaper, hundreds, base10 and objects (solid / hollow two sets). DECLARATIONS ONLY: append the pane ids to FAMILY_SUPPORTS (providers/util.js) and to the providers\' own `supports` arrays (append-only, one id per line, in every lane\'s provider), check each pane\'s `accepts` on its hosts, and run ws-supports-unit. It does NOT edit answer-check.js (the support-ladder work), sheet/supports.js or support-draw.js (the S2 allocator); it lands after S2',
+        hosts: ['addition:add_facts', 'subtraction:sub_facts', 'composing:number_bonds', 'placevalue:place_value_disks', 'addition:nl_add'], templates: [], newTemplates: [],
+        files: ['js/modules/sheet/providers/util.js (FAMILY_SUPPORTS)', 'js/modules/sheet/providers/*.js (supports arrays, append-only)'], after: [] }),
+    vis_pv_decimal_places: V({ lane: 'placevalue', kind: 'template', name: 'Decimal Places in the Place-Value Chart',
+        build: 'pv.js gains the places below the ones (Tth, Hth, Thth), the decimal point on the column line, counters 0.1 / 0.01 / 0.001 (also fraction-labelled 1/10 …), decimal digit-chart heads, and decimal bands on place_value_disks, pv_disks_build, value, expand and compare — the dependency of every decimal place-value entry in the fractions lane',
+        hosts: ['placevalue:place_value_disks', 'placevalue:pv_disks_build', 'placevalue:value', 'placevalue:expand', 'placevalue:compare'], templates: ['pv', 'pv-support'], newTemplates: [],
+        files: ['js/modules/sheet/cells/pv.js', 'js/modules/pv-support-cell.js'], after: [] }),
+    vis_pv_dot_disks: V({ lane: 'placevalue', kind: 'option', name: 'Plain Dots and Crossed Counters on the Chart',
+        build: '`disk: \'value\' | \'dot\' | \'crossed\'` on the pv mat (plain dots take their value from the column; crossed counters for take-away), `motion: \'left\' | \'right\'` arrows for × / ÷ 10, and `task: \'all-numbers\'` (use exactly n counters, list every number)',
+        hosts: ['placevalue:place_value_disks', 'placevalue:pv_disks_build'], templates: ['pv'], newTemplates: [],
+        files: ['js/modules/sheet/cells/pv.js'], after: [] }),
+    vis_pv_bands_millions: V({ lane: 'placevalue', kind: 'band', name: 'Widen Place Value to 7 Digits (millions)',
+        build: 'bands 99,999 / 999,999 / 9,999,999 on place_value_disks, pv_disks_build, compare, expand, value and number_word_names; period heads (Millions | Thousands | Ones, H T O under each, commas in threes); million bands on rounding_visual / round_nl_*; the odometer digit display. pv_digit_drag\'s band is `big_numbers`',
+        hosts: ['placevalue:place_value_disks', 'placevalue:pv_disks_build', 'placevalue:compare', 'placevalue:expand', 'placevalue:number_word_names', 'number_sense:rounding_visual'], templates: ['pv'], newTemplates: [],
+        files: ['js/modules/gen-pv.js', 'js/modules/sheet/cells/pv.js'], after: ['big_numbers'] }),
+    vis_pv_exchange: V({ lane: 'placevalue', kind: 'pane', name: 'Place-Value Chart Beside the Method (exchanges)',
+        build: 'a new pane:pv-exchange drawn beside a written method: counters in a chart with the exchange ring and arrow for +, crossing out for −, n repeated rows for ×, sharing rows or grouping rings for ÷, with decimal places; a support value on the column skills',
+        hosts: ['addition:add_10k_mixed', 'multiplication:multiply', 'division:long_div_2digit', 'decimals:add_decimal'], templates: [], newTemplates: ['pv-exchange'],
+        files: ['js/modules/sheet/cells/panes/pv-exchange.js'], after: ['vis_pv_decimal_places', 'vis_pv_dot_disks'] }),
+    vis_gattegno: V({ lane: 'placevalue', kind: 'template', name: 'Gattegno Chart',
+        build: 'a new gattegno template: rows 1–9 × powers of ten (including decimal rows), `task: \'read\' | \'ring\' | \'shift\'` (× 10 = one row up), offered as a support on place_value_10x and more_less_*',
+        hosts: ['placevalue:place_value_10x', 'placevalue:more_less_100'], templates: [], newTemplates: ['gattegno'],
+        files: ['js/modules/sheet/cells/gattegno.js'], after: [] }),
+    vis_round_line_decimals: V({ lane: 'placevalue', kind: 'option', name: 'Rounding Lines for Decimals',
+        build: 'round-line / round-chart / round-pv take decimals (to 1 and 2 dp) and `hops: \'bounds\'` (hops to each bound, bounds circled) and `task: \'ends\'`',
+        hosts: ['number_sense:rounding_visual', 'number_sense:round_nl_thousands', 'decimals:round_decimals'], templates: ['pv'], newTemplates: [],
+        files: ['js/modules/sheet/cells/panes/extras.js', 'js/modules/sheet/cells/pv.js'], after: [] }),
+    vis_more_less_table: V({ lane: 'placevalue', kind: 'option', name: '"−n | Number | +n" Table',
+        build: '`layout: \'table\' | \'strip\'` on more_less_10 / 100: a row of three boxes (n less, the number, n more)',
+        hosts: ['placevalue:more_less_10', 'placevalue:more_less_100'], templates: ['pv'], newTemplates: [],
+        files: ['js/modules/gen-pv.js'], after: [] }),
+    vis_value_line_vertical: V({ lane: 'placevalue', kind: 'option', name: 'Vertical Number Line Through Zero',
+        build: 'value-line gains `orientation: \'vertical\'` (a lift panel, a sea-level scale) and a thermometer look (`line: \'thermometer\'`) through zero',
+        hosts: ['integers:number_line_int', 'integers:integer_nl_drag'], templates: ['value-line'], newTemplates: [],
+        files: ['js/modules/sheet/cells/value-line.js'], after: [] }),
+
+    // ------------------------------------------------------------------ algebra
+    vis_symbol_puzzle: V({ lane: 'algebra', kind: 'skill', name: 'Symbol Puzzles (new skill algebra:symbol_puzzle)',
+        build: 'a new skill: shapes as unknowns (○ + △ = 4; ★ + ★ = ▲ chains; ● + ▲ = 38 with ● = ▲ + 6), solved one symbol at a time; tag it in SKILL_STANDARDS and SKILL_WRM',
+        hosts: [], templates: ['equation'], newTemplates: [],
+        files: ['js/modules/gen-algebraic.js'], after: [] }),
+    vis_puzzle_grids: V({ lane: 'algebra', kind: 'template', name: 'Total Grids and Number Pyramids',
+        build: 'two templates: total-grid (3 × 3 numbers or symbols with row and column totals; the sum-to-1 grid) and pyramid (3–5 rows, each brick the sum of the two below, blanks anywhere, whole numbers or decimals)',
+        hosts: ['algebra:solve_unknown'], templates: [], newTemplates: ['total-grid', 'pyramid'],
+        files: ['js/modules/sheet/cells/total-grid.js', 'js/modules/sheet/cells/pyramid.js'], after: [] }),
+    vis_strategy_pictures: V({ lane: 'algebra', kind: 'option', name: 'Strategy Pictures: Doubles and Constant Difference',
+        build: '`support: \'pictures\'` on doubles and halves (before → after picture pairs, dice / fingers pairs, double or not a double) and `model: \'shift\'` on compensation (two short lines with matching hops; the constant difference)',
+        hosts: ['patterns:double', 'patterns:halve', 'number_sense:doubles_near_doubles', 'number_sense:compensation'], templates: ['number-line'], newTemplates: [],
+        files: ['js/modules/gen-algebraic.js'], after: [] }),
+    vis_reasoning_frames: V({ lane: 'algebra', kind: 'template', name: 'Reasoning Frames (low)', low: true,
+        build: 'page frames over existing panes, for lesson, reasoning and error-analysis pages: one number four ways, the representation triangle, two worked methods side by side (which is correct / more efficient), the priority-pyramid anchor chart, and a maze of operations',
+        hosts: ['number_sense:why_it_works'], templates: [], newTemplates: [],
+        files: ['js/modules/sheet/roles (frames; agree the role file with the integrator)'], after: [] }),
+
+    // ------------------------------------------------------------------ fractions
+    vis_frac_bar_modes: V({ lane: 'fractions', kind: 'option', name: 'Fraction Bar Modes (stack, wholes, split, cross, braces)',
+        build: 'frac-model `bar` gains `stack` (equal-length stacked bars, the wall), `wholes` (mixed numbers, bars past one), `split` (a dashed re-split), `cross: k` (hatched or X over parts), `brackets` / braces, `copies`, `labels: \'unit\' | \'decimal\'` (tenths labelled) and `whole: \'100%\'`',
+        hosts: ['fractions:compare', 'fractions:equiv_frac_visual', 'fractions:mixed_improper_visual'], templates: ['frac-model'], newTemplates: [],
+        files: ['js/modules/sheet/cells/frac-model.js'], after: [] }),
+    vis_frac_line_modes: V({ lane: 'fractions', kind: 'option', name: 'Fraction Line Modes (past 1, hops, blocks, two lines)',
+        build: 'frac-model `line` gains `max` past 1 (0–3, 0–4), `hops`, `blocks` (fraction blocks sitting on the line), `segments`, `stack: 2` with links, circles above the ticks, and `labels: {above, below}` by form (fraction, decimal, percent)',
+        hosts: ['fractions:fraction_nl_drag', 'fractions:mixed_nl_drag', 'fractions:equiv_frac_nv'], templates: ['frac-model'], newTemplates: [],
+        files: ['js/modules/sheet/cells/frac-model.js'], after: [] }),
+    vis_frac_area_modes: V({ lane: 'fractions', kind: 'option', name: 'Fraction Area Modes (two-way split, several wholes, regions)',
+        build: 'frac-model `area` / `circle` gain `split: [a, b]` (two-way), several wholes, `task: \'cut\' | \'complete-half\' | \'whole-from-part\'`, `ring: k` grouping, named regions, and `model: \'area2\'` (fraction × fraction: split one way then the other, overlap shaded)',
+        hosts: ['fractions:identify', 'fractions:shade_fraction', 'fraction_operations:mult_frac_frac'], templates: ['frac-model'], newTemplates: [],
+        files: ['js/modules/sheet/cells/frac-model.js'], after: [] }),
+    vis_migrate_fraction_ops: V({ lane: 'fractions', kind: 'migration', name: 'Migrate Legacy Fraction Visuals to B&W Kit Cells',
+        build: 'every fraction skill still drawing a legacy colour strip or circle moves onto frac-model / arrays: fraction_of_set (ringed groups on template:arrays), mixed_improper_visual, improper_mixed (fraction counters ringed into wholes), fraction_bar_ops, mult_frac_frac, equiv_frac_nv, composing:fraction_number_line, frac_10_100, percent_visual and double_num_line; then delete their legacy branches',
+        hosts: ['fractions:fraction_of_set', 'fractions:mixed_improper_visual', 'fractions:improper_mixed', 'fractions:fraction_bar_ops', 'fraction_operations:mult_frac_frac', 'fractions:equiv_frac_nv', 'composing:fraction_number_line', 'fraction_operations:frac_10_100'],
+        templates: ['frac-model', 'arrays'], newTemplates: [],
+        files: ['js/modules/gen-fractions.js', 'js/modules/svg-fractions.js'], after: ['vis_frac_bar_modes', 'vis_frac_line_modes', 'vis_frac_area_modes'] }),
+    vis_hundred_square: V({ lane: 'fractions', kind: 'template', name: 'Hundred Square as One Whole (and the thousand square)',
+        build: 'a new hundred-square template: a 10 × 10 square as one whole (columns = tenths, cells = hundredths), shade or read, `labels: \'decimal\' | \'fraction\' | \'percent\'`, two squares for more than 1, `grid: 1000`, and the two-tone complement mode the operations entry bonds_100 uses',
+        hosts: ['conversions:percent_visual', 'fraction_operations:frac_10_100', 'decimals:decimal_place_value'], templates: [], newTemplates: ['hundred-square'],
+        files: ['js/modules/sheet/cells/hundred-square.js'], after: [] }),
+    vis_operator_arcs: V({ lane: 'fractions', kind: 'pane', name: 'Operator Arcs (pane)',
+        build: 'a new pane:operator-arcs: an arc with an operator box above and below a pair (× n / ÷ n on numerator and denominator, + / − between numbers, the 2 × 2 proportion arrow box), a support value on the equivalence, percent and double-line skills',
+        hosts: ['fractions:equivalent', 'fractions:simplify', 'conversions:f_to_p'], templates: [], newTemplates: ['operator-arcs'],
+        files: ['js/modules/sheet/cells/panes/operator-arcs.js'], after: [] }),
+    vis_double_scale: V({ lane: 'fractions', kind: 'template', name: 'Double and Triple Number Lines',
+        build: 'a new double-scale template: two or three aligned scales (kg | g, m | cm, h | min; fraction | decimal | percent; a ratio) with blanks on either row and operator arcs above / below; conversions:double_num_line leaves the legacy path',
+        hosts: ['conversions:double_num_line', 'measurement:unit_conversions', 'conversions:f_to_p'], templates: [], newTemplates: ['double-scale'],
+        files: ['js/modules/sheet/cells/double-scale.js'], after: ['vis_operator_arcs'] }),
+
+    // ------------------------------------------------------------------ geometry
+    vis_migrate_shapes: V({ lane: 'geometry', kind: 'migration', name: 'Migrate Legacy Shape and Angle Visuals to B&W Kit Cells',
+        build: 'the shape, line and angle skills still on legacy colour SVG move onto shape-grid / angle-kit / solid-kit: identify_angles, measure_angles, identify_lines (with parallel arrows, equal-side ticks, right-angle squares), symmetry, place_symmetry_lines, name_2d_shapes, shape_name_match_2d / 3d, count_sides_vertices_2d, shape_corners_count, shape_attributes (hatch marks), name_3d_shapes, count_edges_faces_vertices, net_identify (folds, opposite face, open box), classify_triangles, classify_quads, hotspot_quads, compose_shapes, compose_hexagon, compose_rect_from_squares (outline to fill; split a shape), partition_shapes, shape_positions',
+        hosts: ['angles_lines:identify_angles', 'angles_lines:measure_angles', 'angles_lines:identify_lines', 'angles_lines:symmetry', 'shapes_early:name_2d_shapes', 'shapes_early:name_3d_shapes', 'shapes_classify:net_identify', 'shapes_early:compose_shapes', 'shapes_early:shape_positions'],
+        templates: [], newTemplates: ['shape-grid', 'angle-kit', 'solid-kit'],
+        files: ['js/modules/gen-geometry.js', 'js/modules/svg-geometry.js', 'js/modules/sheet/cells/shapes.js'], after: [] }),
+    vis_migrate_area_volume: V({ lane: 'geometry', kind: 'migration', name: 'Migrate Legacy Area and Volume Visuals to B&W Kit Cells',
+        build: 'area_unit_squares, area, area_perimeter, composite_shapes, area_polygon_decompose (split two ways; complete and subtract), area_triangle, volume and volume_composite move onto shape-grid (unit squares, half squares) and solid-kit (isometric cube builds with hidden cubes, cuboids in layers, isometric dot paper)',
+        hosts: ['area_perimeter:area_unit_squares', 'area_perimeter:area', 'area_perimeter:composite_shapes', 'area_perimeter:area_polygon_decompose', 'area_perimeter:area_triangle', 'area_perimeter:volume', 'area_perimeter:volume_composite'],
+        templates: [], newTemplates: ['shape-grid', 'solid-kit'],
+        files: ['js/modules/gen-geometry.js', 'js/modules/svg-geometry.js'], after: [] }),
+    vis_migrate_coordinates: V({ lane: 'geometry', kind: 'migration', name: 'Migrate Legacy Coordinate Visuals to the B&W Coordinate Grid',
+        build: 'coordinate_q1, coordinate_graph, coord_polygon, coordinate_all (and the quadrant diagram), geo_translate and geo_reflect move onto coord-grid (read / plot / join; translate and reflect with the image drawn and the move described; `grid: \'none\'` sketch axes), replacing multiple choice with a written response where the pages write one',
+        hosts: ['coordinates:coordinate_q1', 'coordinates:coordinate_graph', 'coordinates:coord_polygon', 'coordinates:coordinate_all', 'coordinates:geo_translate', 'coordinates:geo_reflect'],
+        templates: [], newTemplates: ['coord-grid'],
+        files: ['js/modules/gen-geometry.js'], after: [] }),
+
+    // ------------------------------------------------------------------ measurement
+    vis_migrate_measures: V({ lane: 'measurement', kind: 'migration', name: 'Migrate Legacy Measure Visuals to B&W Kit Cells',
+        build: 'reading_ruler (cm with mm, offset start, decimal labels; inches kept as an option), heavier_lighter_visual (a pan balance, not emoji), mass_volume_liquid (dial and jug scales), temperature (createThermometerSVG → measure-scale with `orientation`, `min` / `max` / `every`, colour to a reading, below zero), measure_nonstandard, order_objects_length and compare_objects (one baseline) move onto measure-scale / balance',
+        hosts: ['measurement:reading_ruler', 'measurement:heavier_lighter_visual', 'measurement:mass_volume_liquid', 'measurement:temperature', 'shapes_early:measure_nonstandard', 'shapes_early:order_objects_length'],
+        templates: [], newTemplates: ['measure-scale', 'balance'],
+        files: ['js/modules/gen-measurement.js'], after: [] }),
+    vis_conversion_models: V({ lane: 'measurement', kind: 'pane', name: 'Conversion Ladder and Conversion Bars',
+        build: 'a new pane:ladder (unit boxes mm → cm → m → km with ÷ arcs above and × arcs below), a structural support on the conversion skills, and `model: \'bars\'` (unit-conversion bars; 60-second cells) on length_metric, unit_conversions and the time conversions',
+        hosts: ['measurement:length_metric', 'measurement:unit_conversions'], templates: [], newTemplates: ['ladder', 'bar-model'],
+        files: ['js/modules/sheet/cells/panes/ladder.js', 'js/modules/gen-measurement.js'], after: ['vis_bar_family', 'vis_operator_arcs'] }),
+
+    // ------------------------------------------------------------------ time and money
+    vis_clock_options: V({ lane: 'timemoney', kind: 'option', name: 'Clock and Time-Line Options',
+        build: 'clock gains `numerals: \'roman\'`, `hands: \'hour\'` (hour hand only), the past / to half-shaded hint pane, the 1–12 hour-line hint pane, an answer in words, stopwatch readouts `format: \'mm:ss\' | \'h:mm:ss\'`, the 24-hour readout, a.m. / p.m.; timeline gains `span: \'day\'` (midnight – noon – midnight)',
+        hosts: ['measurement:time_hour', 'measurement:time_half_hour', 'measurement:time_analog_digital', 'measurement:elapsed_find_duration'], templates: ['clock', 'timeline'], newTemplates: ['past-to', 'hour-line'],
+        files: ['js/modules/sheet/cells/clock.js', 'js/modules/sheet/cells/timeline.js', 'js/modules/sheet/cells/tmkit.js'], after: [] }),
+    vis_coin_options: V({ lane: 'timemoney', kind: 'option', name: 'Coin Options: Dot Counters, Count-On Track, Chart, Price Tags',
+        build: 'coins gain `face: \'dots\'` (1 / 2 / 5 / 10 dots in a circle, pre-money), `track: \'task\'` (a number track above equal coins to count on in 2s, 5s, 10s), a place-value chart of coins (£1 / 10p / 1p), and price tags on pictured items for the money word problems',
+        hosts: ['measurement:coin_value', 'measurement:money_count', 'measurement:money_change'], templates: ['coins', 'money-columns'], newTemplates: [],
+        files: ['js/modules/sheet/cells/coins.js', 'js/modules/sheet/cells/tmkit.js'], after: [] }),
+
+    // ------------------------------------------------------------------ data
+    vis_migrate_graphs: V({ lane: 'data', kind: 'migration', name: 'Migrate Legacy Graphs to B&W Kit Cells',
+        build: 'bar_graph, build_bar_graph, pictograph, build_pictograph, tally_chart and pie_chart (plus the measurement lane\'s pictograph_intro / bar_graph_intro, asked of that lane) move onto graph-axes: B&W bars and fill keys, outline symbols with part symbols, tally sticks, outline pie sectors with letter codes; then delete their legacy colour branches',
+        hosts: ['graphs:bar_graph', 'graphs:build_bar_graph', 'graphs:pictograph', 'graphs:build_pictograph', 'graphs:tally_chart', 'graphs:pie_chart'],
+        templates: [], newTemplates: ['graph-axes'],
+        files: ['js/modules/gen-data-stats.js'], after: [] }),
+    vis_mean_levelling: V({ lane: 'data', kind: 'option', name: 'The Mean as Levelling',
+        build: '`support: \'level\'` on the mean: objects per person → pooled → equal rows; towers levelled',
+        hosts: ['data_analysis:mean'], templates: [], newTemplates: ['graph-axes'],
+        files: ['js/modules/gen-data-stats.js'], after: ['vis_migrate_graphs'] }),
+
+    // ------------------------------------------------------------------ number theory
+    vis_factor_diagrams: V({ lane: 'numtheory', kind: 'template', name: 'Factor Diagrams: Pair Table, Rainbow, Factor Tree',
+        build: 'factor_tchart_* and factor_links_* leave the legacy drag visuals for a B&W factor-pairs template (a systematic two-row table with crossed-out non-factors; the factor rainbow / bug), and a new factor-tree template (prime factors; the halving tree) used by prime_composite and the operations entry div_factors',
+        hosts: ['number_theory:factor_tchart_easy', 'number_theory:factor_tchart_hard', 'number_theory:factor_links_easy', 'number_theory:factor_links_hard', 'number_theory:prime_composite'],
+        templates: [], newTemplates: ['factor-pairs', 'factor-tree'],
+        files: ['js/modules/gen-number-theory.js', 'js/modules/svg-factors.js', 'js/modules/sheet/cells/factor-tree.js'], after: [] }),
+};
+
+/** Extra dependencies of existing entries (never in a frozen lane): the option waits for the drawing it rides on. */
+export const VISUAL_AFTER = {
+    decimal_pv: ['vis_pv_decimal_places'], dec_pv_within1: ['vis_pv_decimal_places'], thousandths_pv: ['vis_pv_decimal_places'],
+    dec_compare_model: ['vis_pv_decimal_places'], decimal_models: ['vis_pv_decimal_places'],
+    round_whole: ['vis_round_line_decimals'],
+    frac_beyond_1: ['vis_frac_bar_modes'], frac_compare_gt1: ['vis_frac_bar_modes'], mult_mixed_int: ['vis_frac_bar_modes'], sub_break_whole: ['vis_frac_bar_modes'],
+    frac_nl_equiv: ['vis_frac_line_modes'], frac_count: ['vis_frac_line_modes'],
+    dnl_units: ['vis_double_scale'],
+    four_quadrants: ['vis_migrate_coordinates'], coord_context: ['vis_migrate_coordinates'],
+    protractor_read: ['vis_migrate_shapes'], angles_point: ['vis_migrate_shapes'], shape_faces: ['vis_migrate_shapes'],
+    partition_draw: ['vis_migrate_shapes'], rect_rows_columns: ['vis_migrate_shapes'],
+    area_tile_multiply: ['vis_migrate_area_volume'], area_triangle_grid: ['vis_migrate_area_volume'], volume_fractional: ['vis_migrate_area_volume'],
+    volume_composite_repair: ['vis_migrate_area_volume'],
+    ruler_cm: ['vis_migrate_measures'], metres: ['vis_migrate_measures'], ruler_difference: ['vis_migrate_measures'], mass_scales: ['vis_migrate_measures'],
+    measure_two_units: ['vis_migrate_measures'], order_length_tasks: ['vis_migrate_measures'],
+    bar_graph_scale: ['vis_migrate_graphs'], pictogram_scale: ['vis_migrate_graphs'],
+    common_mf: ['vis_sort_diagrams'],
+};
+
 /* ================================================================ the unified list */
 const stepById = new Map(WRM_STEPS.map((s) => [s.id, s]));
 function gradeOfSteps(steps) {
@@ -727,7 +1024,7 @@ function gradeOfSteps(steps) {
  * templates, newTemplates, answer, ladder, misconceptions, extension, after }]. WRM proposals
  * carry their WRM_EXTENSIONS scope and derive grade and codes from their small steps.
  */
-export function buildList() {
+export function buildList(visualIndex = null) {
     const out = [];
     for (const [id, p] of Object.entries(WRM_PROPOSALS)) {
         const spec = WRM_SPECS[id] || null;
@@ -760,6 +1057,26 @@ export function buildList() {
             extension: '', after: [...(p.after || [])],
             problemTypes: p.problemTypes, templates: p.templates, newTemplates: p.newTemplates, answer: p.answer, ladder: p.ladder,
             misconceptions: p.misconceptions, specMissing: false,
+        });
+    }
+    // The visual catalogue: the representations each entry draws (`visuals`, `visualSteps` = the WRM
+    // steps whose pages use them, the entry's REACH), dependencies on the drawing an option rides on,
+    // and the entries only the catalogue adds (source 'visual').
+    const vis = visualIndex || new Map();
+    const reach = (id) => vis.get(id) || { visuals: [], steps: [] };
+    for (const e of out) {
+        e.visuals = [...reach(e.id).visuals];
+        e.visualSteps = [...reach(e.id).steps];
+        if (VISUAL_AFTER[e.id] && !FROZEN_LANES.includes(e.lane)) e.after.push(...VISUAL_AFTER[e.id]);
+    }
+    for (const [id, b] of Object.entries(VISUAL_BUILDS)) {
+        const r = reach(id);
+        out.push({
+            id, source: 'visual', kind: b.kind, skill: b.hosts[0] || '', also: b.hosts.slice(1), option: '', name: b.name,
+            grade: gradeOfSteps(r.steps), family: b.lane, lane: b.lane, standards: [], ee: [], wrmSteps: [], wrmImproves: [],
+            teaches: b.build, representation: b.build, extension: '', after: [...b.after],
+            problemTypes: [], templates: [...b.templates], newTemplates: [...b.newTemplates], answer: '', ladder: '', misconceptions: [],
+            specMissing: false, files: [...b.files], low: !!b.low, visuals: [...r.visuals], visualSteps: [...r.steps],
         });
     }
     return out;

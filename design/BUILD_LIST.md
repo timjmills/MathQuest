@@ -7,7 +7,10 @@ standards clauses they were extended to close (`WRM_EXTENSIONS`), and `STANDARD_
 
 **One list.** Where a standards clause was already on a White Rose proposal, that proposal was extended (its
 "Extended for the standards" line) rather than a second entry added. Where White Rose does not teach the content
-at that step, the standards audit added its own entry.
+at that step, the standards audit added its own entry. The White Rose VISUAL catalogue (`design/wrm-visuals/INDEX.md`)
+adds only what no entry already draws: a representation an entry draws is sent to that entry (its "Visual catalogue"
+line); the rest are the entries "added from visual catalogue" (templates, panes, options, the supports wiring, the
+legacy-to-B&W migrations and the wider place-value bands).
 
 **Done means** (for every entry): researched per CLAUDE.md, built in the sheet kit (no legacy handlers), ≥ 8 on all
 four `design/audit/RUBRIC.md` criteria on every page type and screen host and ≥ 8 on OPTIONS-RUBRIC O1-O6, graded
@@ -16,23 +19,25 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 
 ## Summary
 
-- 222 entries: **132 new skills, 88 new options, 2 repairs**.
+- 275 entries: **132 new skills, 88 new options, 2 repairs**, and **53 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 28 option, 1 skill, 6 migration, 1 band).
 - 162 from the White Rose audit (42 extended for standards), 60 from the standards audit.
 - They close 114 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
-- 14 new sheet-kit templates are needed; each is owned by one lane.
+- The visual catalogue: 210 representations (MATCH 6, PARTIAL 103, GAP 101); every PARTIAL and GAP one is on an entry below.
+- 30 new sheet-kit templates and panes are needed; each is owned by one lane.
+- Lanes `k2` and `operations` were already building from this list: their entries keep their order and names, and the catalogue's entries are APPENDED after them.
 
-| Lane | Entries | New skills | Options | Repairs | Standards closed | WRM steps closed |
-|---|---|---|---|---|---|---|
-| Counting and early number (K-1 pictures) (`k2`) | 23 | 16 | 7 | 0 | 20 | 34 |
-| Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 29 | 18 | 10 | 1 | 21 | 50 |
-| Place value, rounding and estimation (the pv kit) (`placevalue`) | 12 | 4 | 8 | 0 | 9 | 36 |
-| Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 24 | 14 | 10 | 0 | 19 | 20 |
-| Fractions, decimals, conversions, ratio (`fractions`) | 38 | 17 | 21 | 0 | 19 | 49 |
-| Geometry, area, volume, coordinates (`geometry`) | 43 | 30 | 12 | 1 | 35 | 78 |
-| Measurement (length, mass, capacity, conversions) (`measurement`) | 21 | 12 | 9 | 0 | 14 | 34 |
-| Time and money (`timemoney`) | 15 | 10 | 5 | 0 | 8 | 30 |
-| Data and statistics (`data`) | 12 | 10 | 2 | 0 | 12 | 18 |
-| Number theory (`numtheory`) | 5 | 1 | 4 | 0 | 2 | 10 |
+| Lane | Entries | New skills | Options | Repairs | Added from visual catalogue | Standards closed | WRM steps closed | Representations drawn | Visual reach (steps) |
+|---|---|---|---|---|---|---|---|---|---|
+| Counting and early number (K-1 pictures) (`k2`) | 35 | 16 | 7 | 0 | 12 | 20 | 34 | 55 | 454 |
+| Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 40 | 18 | 10 | 1 | 11 | 21 | 50 | 35 | 316 |
+| Place value, rounding and estimation (the pv kit) (`placevalue`) | 21 | 4 | 8 | 0 | 9 | 9 | 36 | 23 | 327 |
+| Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 28 | 14 | 10 | 0 | 4 | 19 | 20 | 17 | 104 |
+| Fractions, decimals, conversions, ratio (`fractions`) | 45 | 17 | 21 | 0 | 7 | 19 | 49 | 23 | 233 |
+| Geometry, area, volume, coordinates (`geometry`) | 46 | 30 | 12 | 1 | 3 | 35 | 78 | 33 | 144 |
+| Measurement (length, mass, capacity, conversions) (`measurement`) | 23 | 12 | 9 | 0 | 2 | 14 | 34 | 11 | 74 |
+| Time and money (`timemoney`) | 17 | 10 | 5 | 0 | 2 | 8 | 30 | 18 | 81 |
+| Data and statistics (`data`) | 14 | 10 | 2 | 0 | 2 | 12 | 18 | 9 | 93 |
+| Number theory (`numtheory`) | 6 | 1 | 4 | 0 | 1 | 2 | 10 | 4 | 17 |
 
 ## File ownership
 
@@ -49,48 +54,68 @@ positions are share codes, so nothing is spliced and the integrator fixes the fi
 - js/modules/generate-question.js (skillCategoryOverride)
 - js/modules/sheet/providers/index.js
 - js/globals.js
+- js/modules/sheet/cells/panes/index.js (PANES, PANE_GROUP: register a new pane)
+- js/modules/sheet/providers/util.js (FAMILY_SUPPORTS) and every provider's `supports` array (append a support id)
 
 | Lane | Owns | New templates it builds |
 |---|---|---|
 | `k2` Counting and early number (K-1 pictures) | `js/modules/gen-counting.js`<br>`js/modules/sheet/cells/{counters,tenframe,bond,seqstrip,compare,chartwindow,base10,wordpic,count-row,k2kit}.js`<br>`js/modules/sheet/providers/k2.js` | `picture-row`, `sort-rings` |
 | `operations` Operations (+ − × ÷, facts, multi-digit, integers arithmetic) | `js/modules/gen-operations.js`<br>`js/modules/gen-mult-patterns.js`<br>`js/modules/sheet/cells/{stack,fact,family,equation,cloze-bank,arrays,area-model,mult-grid,mult-chart,division,long-division,ops-counters,ops-common,hop-line,number-line}.js`<br>`js/modules/sheet/providers/{addition,subtraction,multiplication,division,countby}.js` | `bar-model`, `long-multiplication` |
-| `placevalue` Place value, rounding and estimation (the pv kit) | `js/modules/gen-pv.js`<br>`js/modules/sheet/cells/{pv,value-line,line-labels}.js`<br>`js/modules/pv-support-cell.js`<br>`js/modules/sheet/providers/pv.js` | - |
-| `algebra` Patterns, algebra, order of operations, strategies (gen-algebraic) | `js/modules/gen-algebraic.js`<br>`js/modules/gen-function-table.js`<br>`js/modules/sheet/cells/function-table.js`<br>`js/modules/sheet/providers/function-table.js` | `expression` |
-| `fractions` Fractions, decimals, conversions, ratio | `js/modules/gen-fractions.js`<br>`js/modules/sheet/cells/frac-model.js`<br>`js/modules/svg-fractions.js` | - |
+| `placevalue` Place value, rounding and estimation (the pv kit) | `js/modules/gen-pv.js`<br>`js/modules/sheet/cells/{pv,value-line,line-labels,gattegno}.js`<br>`js/modules/pv-support-cell.js`<br>`js/modules/sheet/providers/pv.js`<br>`js/modules/sheet/cells/panes/{place,extras,pv-exchange}.js` | `gattegno`, `pv-exchange` |
+| `algebra` Patterns, algebra, order of operations, strategies (gen-algebraic) | `js/modules/gen-algebraic.js`<br>`js/modules/gen-function-table.js`<br>`js/modules/sheet/cells/{function-table,total-grid,pyramid}.js`<br>`js/modules/sheet/providers/function-table.js` | `expression`, `total-grid`, `pyramid` |
+| `fractions` Fractions, decimals, conversions, ratio | `js/modules/gen-fractions.js`<br>`js/modules/sheet/cells/{frac-model,hundred-square,double-scale}.js`<br>`js/modules/sheet/cells/panes/operator-arcs.js`<br>`js/modules/svg-fractions.js` | `hundred-square`, `double-scale`, `operator-arcs` |
 | `geometry` Geometry, area, volume, coordinates | `js/modules/gen-geometry.js`<br>`js/modules/svg-geometry.js`<br>`js/modules/sheet/cells/shapes.js` | `shape-grid`, `coord-grid`, `angle-kit`, `solid-kit` |
-| `measurement` Measurement (length, mass, capacity, conversions) | `js/modules/gen-measurement.js` | `measure-scale`, `balance` |
-| `timemoney` Time and money | `js/modules/gen-time-money.js`<br>`js/modules/svg-clock.js`<br>`js/modules/sheet/cells/{clock,timeline,coins,money-columns,tmkit}.js`<br>`js/modules/sheet/providers/time-money.js` | `calendar` |
+| `measurement` Measurement (length, mass, capacity, conversions) | `js/modules/gen-measurement.js`<br>`js/modules/sheet/cells/panes/ladder.js` | `measure-scale`, `balance`, `ladder` |
+| `timemoney` Time and money | `js/modules/gen-time-money.js`<br>`js/modules/svg-clock.js`<br>`js/modules/sheet/cells/{clock,timeline,coins,money-columns,tmkit}.js`<br>`js/modules/sheet/providers/time-money.js` | `calendar`, `past-to`, `hour-line` |
 | `data` Data and statistics | `js/modules/gen-data-stats.js` | `graph-axes`, `data-table` |
-| `numtheory` Number theory | `js/modules/gen-number-theory.js`<br>`js/modules/svg-factors.js` | - |
+| `numtheory` Number theory | `js/modules/gen-number-theory.js`<br>`js/modules/svg-factors.js`<br>`js/modules/sheet/cells/{factor-pairs,factor-tree}.js` | `factor-pairs`, `factor-tree` |
 
 ### New templates
 
 | Template | Owner lane | What | Used by |
 |---|---|---|---|
-| `bar-model` | `operations` | part-whole and comparison bars (tape diagrams), fraction bars of an amount, with labelled parts and one blank | 15 entries |
-| `picture-row` | `k2` | a row or small grid of line-drawn pictures with letter tags: match, odd one out, order events, repeating patterns | 14 entries |
-| `sort-rings` | `k2` | two or three sorting rings, a Carroll two-box table or a two-set Venn, with tiles written in by letter | 3 entries |
-| `shape-grid` | `geometry` | a square or dot grid with shapes, mirror lines, arrows: draw, complete, reflect, translate, area/perimeter on squares | 20 entries |
-| `coord-grid` | `geometry` | a coordinate plane (quadrant I or four quadrants) with labelled axes: plot, read, join, translate, reflect | 7 entries |
-| `angle-kit` | `geometry` | rays, lines, segments, angles, turns and a protractor overlay; parts of a circle | 10 entries |
-| `solid-kit` | `geometry` | line drawings of 3-D shapes, isometric cube solids and layers, skeletons and nets | 9 entries |
-| `graph-axes` | `data` | one frame for block diagrams, pictograms, bar/dual bar, line graphs, dot plots, histograms, box plots and pie sectors, read or drawn | 10 entries |
+| `bar-model` | `operations` | part-whole and comparison bars (tape diagrams), fraction bars of an amount, with labelled parts and one blank | 17 entries |
+| `picture-row` | `k2` | a row or small grid of line-drawn pictures with letter tags: match, odd one out, order events, repeating patterns | 15 entries |
+| `sort-rings` | `k2` | two or three sorting rings, a Carroll two-box table or a two-set Venn, with tiles written in by letter | 4 entries |
+| `shape-grid` | `geometry` | a square or dot grid with shapes, mirror lines, arrows: draw, complete, reflect, translate, area/perimeter on squares | 22 entries |
+| `coord-grid` | `geometry` | a coordinate plane (quadrant I or four quadrants) with labelled axes: plot, read, join, translate, reflect | 8 entries |
+| `angle-kit` | `geometry` | rays, lines, segments, angles, turns and a protractor overlay; parts of a circle | 11 entries |
+| `solid-kit` | `geometry` | line drawings of 3-D shapes, isometric cube solids and layers, skeletons and nets | 11 entries |
+| `graph-axes` | `data` | one frame for block diagrams, pictograms, bar/dual bar, line graphs, dot plots, histograms, box plots and pie sectors, read or drawn | 12 entries |
 | `data-table` | `data` | two-column, two-way, tally, conversion, ratio and timetable tables with blank cells | 16 entries |
-| `measure-scale` | `measurement` | a ruler, metre stick, dial, jug or thermometer scale with an object or pointer; labelled every n ticks | 12 entries |
-| `balance` | `measurement` | a pan balance, tipped or level, with objects or cubes in each pan | 2 entries |
+| `measure-scale` | `measurement` | a ruler, metre stick, dial, jug or thermometer scale with an object or pointer; labelled every n ticks | 13 entries |
+| `balance` | `measurement` | a pan balance, tipped or level, with objects or cubes in each pan | 3 entries |
 | `calendar` | `timemoney` | a calendar page or day strip (days, weeks, months, seasons) | 2 entries |
 | `expression` | `algebra` | an expression or formula with brackets, boxed parts and labels (term, factor, coefficient) | 5 entries |
 | `long-multiplication` | `operations` | the long-multiplication grid with carry boxes and the placeholder row | 1 entries |
+| `beadstring` | `k2` | pane: a bead string of 10, 20 or 100 beads in runs of five or ten (unit 1, 0.1 or 1 %) | 1 entries |
+| `cover` | `k2` | pane: an outline cover box with "?" laid over part of a picture, a bond part, digits or a chart | 1 entries |
+| `split-op` | `operations` | a part-whole split with an operation arrow under each part and the recombined answer | 1 entries |
+| `split` | `operations` | pane: the second number split under a calculation to bridge a ten, hundred or whole | 1 entries |
+| `pv-exchange` | `placevalue` | pane: a place-value chart of counters beside a written method, with exchanges for + − × ÷ and decimals | 1 entries |
+| `gattegno` | `placevalue` | the Gattegno chart: rows 1–9 × powers of ten, decimal rows, read / ring / shift | 1 entries |
+| `total-grid` | `algebra` | a 3 × 3 grid of numbers or symbols with row and column totals | 1 entries |
+| `pyramid` | `algebra` | a number pyramid of 3–5 rows, each brick the sum of the two below | 1 entries |
+| `hundred-square` | `fractions` | a 10 × 10 (or 1,000-cell) square as one whole: shade and read hundredths, decimals, percent; two-tone complement | 1 entries |
+| `double-scale` | `fractions` | two or three aligned scales (units, fraction | decimal | percent, ratio) with blanks and operator arcs | 1 entries |
+| `operator-arcs` | `fractions` | pane: operator arcs above and below a pair of numbers or fractions (× n, ÷ n, +, −) | 1 entries |
+| `ladder` | `measurement` | pane: the unit-conversion ladder (mm → cm → m → km, ÷ above, × below) | 1 entries |
+| `past-to` | `timemoney` | pane: a clock face half-shaded past / to | 1 entries |
+| `hour-line` | `timemoney` | pane: a 1–12 line with the hour hand as a pointer | 1 entries |
+| `factor-pairs` | `numtheory` | a systematic factor-pair table, factor rainbow or bug, non-factors crossed out | 1 entries |
+| `factor-tree` | `numtheory` | a factor tree or halving tree to prime factors | 1 entries |
 
 ## Build order
 
 1. Each lane builds its new templates first (they unblock entries in other lanes: `bar-model`, `graph-axes`,
    `shape-grid`, `coord-grid` are the most shared).
 2. Inside a lane, entries in the order below: dependencies first (`after`), then highest impact first
-   (standards closed × 2 + White Rose steps closed).
+   (standards closed × 2 + White Rose steps closed + the small steps whose pages use the representations it draws).
+   The frozen lanes (`k2`, `operations`) keep their original order; their entries added from the visual
+   catalogue follow, in dependency-then-reach order.
 3. Lanes run in parallel; an entry whose dependency is in another lane waits for it (named in its `After` line).
 
-## Lane `k2`: Counting and early number (K-1 pictures) (23)
+## Lane `k2`: Counting and early number (K-1 pictures) (35)
 
 Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,bond,seqstrip,compare,chartwindow,base10,wordpic,count-row,k2kit}.js`, `js/modules/sheet/providers/k2.js`. Builds templates: `picture-row`, `sort-rings`.
 
@@ -375,7 +400,133 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 1st-3rd → 1st-5th → 1st-10th · O3 start flag and numbers under each place → flag only · O6 children / objects.
 - **Misconceptions:** counts from the wrong end; writes 2th, 3th.
 
-## Lane `operations`: Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (29)
+### Added from visual catalogue (appended 2026-09-25; the entries above are unchanged)
+
+Your existing entries that also draw catalogued representations (build them with these pictures): `sort_groups` (V059); `capacity_early` (V121); `systematic_bonds` (V112); `subitise` (V102, V135); `ten_count_out` (V101); `tens_ones_group` (V116); `zero` (V145); `match_same` (V131); `teen_structure` (V103); `compare_size` (V134); `odd_one_out` (V133); `ordinal` (V123).
+
+### 24. Picture Task Kinds (one more, order, which, match, pairs) — `vis_k2_picture_tasks`
+
+- **Added from visual catalogue.** option · grade PK-5 · lane `k2`.
+- **Build:** counters / compare task kinds: `plusone` (a row + one empty place to draw), `order` (order pictured groups or dominoes), `which` (tick every picture that shows n), `match` (draw one-to-one lines between two rows or cards), `ask: 'difference'` (how many more) to 20, `layout: 'pairs'` (odd / even, one left over), and pictures either side of a compare circle.
+- **Offered on:** `counting:count_objects`, `comparing:compare_groups`, `counting:count_out`.
+- **Templates:** `counters`, `compare`. **Files:** `js/modules/sheet/cells/counters.js`, `js/modules/sheet/cells/compare.js`.
+- **Draws (visual catalogue):** V034 Compare circle (< > =) between numbers, expressions, pictures; V105 Numeral ↔ word ↔ quantity matching; V106 Draw one more (row + one empty place); V107 One-to-one matching lines between two rows; V108 Compare two groups: more, fewer, how many more; V110 Order pictured groups / dominoes / numbers; V117 "Which pictures show n?" across representations; V144 Pairs for odd / even (one left over).
+- **Reach:** 133 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 25. Part-Whole Options (parts, values, pictures, open, chains) — `vis_bond_options`
+
+- **Added from visual catalogue.** option · grade PK-5 · lane `k2`.
+- **Build:** template:bond gains `parts: 2..5`, `orientation: 'up'`, `values: 'decimal' | 'fraction' | 'text'`, `draw: 'objects' | 'cubes' | 'base10' | 'disks' | 'coins' | 'regions'` (the two-region mat), `task: 'open' | 'bond-list'` (all blank, many answers, the key shows one; a list of bonds in order) and `link` / `levels` (chained bonds, the F / D / P tree, the mixed-number partition flow). The fact-family look `facts: 'add4' | 'eight'` is asked of the operations lane (family.js).
+- **Offered on:** `composing:number_bonds`, `composing:part_whole_model`, `composing:bonds_in_order`.
+- **Templates:** `bond`. **Files:** `js/modules/sheet/cells/bond.js`.
+- **Draws (visual catalogue):** V011 Part-whole model, 2 parts (numbers, decimals, words); V012 Part-whole with pictures in the circles (base 10, counters, coins, cubes); V013 Part-whole, 3–5 parts / chained; V014 Part-whole with fractions; F / D / P tree; V112 Blank part-whole to fill many ways; V113 Two-colour counter rows (bonds; ratio sets); V140 Part-part in two places (two-region mat); V183 Partition flow for mixed numbers.
+- **Reach:** 103 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 26. Read a Base-10 Picture (template option) — `vis_base10_read`
+
+- **Added from visual catalogue.** option · grade PK-5 · lane `k2`.
+- **Build:** template:base10 gains `task: 'read'` (a to-scale picture to count, the pupil writes the number), the hundred flat and a thousand-cube symbol, `unit: 'flat'` (flat = 1 for tenths and hundredths), ring marks round groups and crossed-out blocks for take-away.
+- **Offered on:** `composing:base10_build`, `composing:base10_build_hundreds`, `composing:tens_foundation_visual`.
+- **Templates:** `base10`. **Files:** `js/modules/sheet/cells/base10.js`.
+- **Draws (visual catalogue):** V001 Base-10 blocks to scale, read (hundreds flat, thousand cube, flat = 1); V032 Crossed-out counters, blocks, disks and fraction parts.
+- **Reach:** 101 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 27. New Picture Kinds: Cubes, Bundles, Number Shapes, Rods, Dominoes — `vis_object_kinds`
+
+- **Added from visual catalogue.** option · grade PK-5 · lane `k2`.
+- **Build:** pane:objects / k2kit gain line-drawn kinds: linking cubes (towers, `layout: 'staircase'`), bundles and packs printed 10 / 100 / 1,000, number shapes (plates with holes in two columns), number rods, a domino (one tile, two halves), and algebra cubes (a lettered cube + unit squares); every kind in B&W with the single grey.
+- **Offered on:** `counting:count_objects`, `comparing:compare_groups`, `composing:tens_foundation_visual`, `counting:number_seq_fill`.
+- **Templates:** `counters`. **Files:** `js/modules/sheet/cells/k2kit.js`, `js/modules/sheet/cells/panes/k2.js`.
+- **Draws (visual catalogue):** V008 Bundles / packs of 10, 100, 1,000; V041 Linking-cube towers and staircases; V088 Number shapes / number pieces (plates with holes); V102 Dice, domino and dot-plate patterns; V138 Cube staircase; V141 Number rods; V195 Algebra cubes.
+- **Reach:** 94 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 28. Ten-Frame Options (units, frames, fills, five frame) — `vis_tenframe_options`
+
+- **Added from visual catalogue.** option · grade PK-4 · lane `k2`.
+- **Build:** tenframe gains `unit: 1 | 10 | 100 | 1000 | 0.1` (place-value counters in the frame), `frames: 2 | 3`, `orientation: 'vertical'`, `fill: 'five' | 'pairs' | 'rows' | 'any'`, `mode: 'double'` (top row mirrored), `frame: 'five'` (the 1 × 5 frame) and a third, hatched set; ten_frame_build_teen moves off the legacy path.
+- **Offered on:** `composing:ten_frame_build`, `composing:ten_frame_build_teen`, `composing:make_ten`, `addition:add_5_pictures`.
+- **Templates:** `tenframe`. **Files:** `js/modules/sheet/cells/tenframe.js`, `js/modules/sheet/cells/panes/k2.js`.
+- **Draws (visual catalogue):** V009 Ten frame of counters; V010 Ten frame of place-value counters (10s, 100s, tenths); V103 Two / three ten frames (teens, 30); V104 Ten frame doubles, vertical / pair-wise fill; V136 Five frame (1 × 5); V137 Ten frame of two sets (start + added).
+- **Reach:** 79 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 29. Sort Tables, Venn and Carroll Diagrams — `vis_sort_diagrams`
+
+- **Added from visual catalogue.** option · grade PK-5 · lane `k2`.
+- **Build:** sort-rings gains the sort table (2–5 labelled columns), the Venn diagram (2 sets; a universal rectangle; blank labels; nested) and the Carroll diagram (2 × 2), each taking number, shape or picture tiles written in by letter.
+- **Offered on:** `comparing:sort_into_groups`, `number_theory:multiples`.
+- **Templates:** -; new or owned: `sort-rings`. **Files:** `js/modules/sheet/cells/sort-rings.js`.
+- **Draws (visual catalogue):** V043 Venn diagram (2 sets; universal set; nested); V044 Carroll diagram (2 × 2); V059 Sorting rings and sort tables (2–5 labelled columns).
+- **Reach:** 51 White Rose small steps use these pictures.
+- **After:** `sort_groups`.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 30. Number Tracks With Fractions, Decimals, Words and Pictures — `vis_count_row_values`
+
+- **Added from visual catalogue.** option · grade PK-5 · lane `k2`.
+- **Build:** count-row / seqstrip tiles take fractions, decimals, words (Roman numerals) and pictures (a washing line of cards, growing counter columns for pattern terms, a fraction shape shaded one more part each tile), and a track may start below zero.
+- **Offered on:** `counting:number_seq_fill`, `patterns:count_by_fill`.
+- **Templates:** `count-row`, `seqstrip`. **Files:** `js/modules/sheet/cells/count-row.js`, `js/modules/sheet/cells/seqstrip.js`.
+- **Draws (visual catalogue):** V022 Number track / sequence boxes (fractions, decimals, below zero); V093 Count in fractions as a picture sequence; V139 Washing line of picture / numeral cards; V184 Counter-pattern terms.
+- **Reach:** 49 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 31. Bead String and Hundred-Bead Rekenrek — `vis_bead_panes`
+
+- **Added from visual catalogue.** pane · grade PK-4 · lane `k2`.
+- **Build:** a new pane:beadstring (10, 20 or 100 beads in runs of five or ten alternating solid / hollow; `unit` 1, 0.1 or 1 %) and `rows: 1..10` on pane:rekenrek (100 beads); both answer-free supports.
+- **Offered on:** `composing:number_bonds`, `addition:add_facts`, `composing:bonds_to_20`.
+- **Templates:** -; new or owned: `beadstring`. **Files:** `js/modules/sheet/cells/panes/beadstring.js`, `js/modules/sheet/cells/panes/k2.js`.
+- **Draws (visual catalogue):** V007 Bead string (10, 20, 100; tenths, 1 %); V086 Rekenrek, 100 beads (ten rows).
+- **Reach:** 37 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 32. Hidden Part (cover mark) — `vis_cover_mark`
+
+- **Added from visual catalogue.** pane · grade PK-5 · lane `k2`.
+- **Build:** a cover mark: an outline box with "?" laid over k items of a pane (counters, beads, a bond part, digits, part of a chart); the hidden amount is the answer; `hide: k` on the hosts.
+- **Offered on:** `counting:count_objects`, `composing:number_bonds`, `composing:hundreds_chart_fill`.
+- **Templates:** `counters`, `bond`; new or owned: `cover`. **Files:** `js/modules/sheet/cells/panes/cover.js`.
+- **Draws (visual catalogue):** V087 Covered / hidden part (cloth, hand, splat).
+- **Reach:** 29 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 33. Shade the Hundred Square (whole-chart tasks) — `vis_chart_shade`
+
+- **Added from visual catalogue.** option · grade PK-5 · lane `k2`.
+- **Build:** chartwindow gains the whole chart with `task: 'shade' | 'circle' | 'sieve'` (multiples, a second set ringed, the sieve of primes) and the cross-shaped window; patterns:skip_count_grid (algebra lane generator) moves onto it from the legacy path.
+- **Offered on:** `composing:hundreds_chart_fill`, `patterns:skip_count_grid`.
+- **Templates:** `chartwindow`. **Files:** `js/modules/sheet/cells/chartwindow.js`.
+- **Draws (visual catalogue):** V023 Hundred square: shade multiples, circle, sieve.
+- **Reach:** 24 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 34. First – Then – Now Story Strip — `vis_story_strip`
+
+- **Added from visual catalogue.** option · grade PK-K · lane `k2`.
+- **Build:** picture-row gains the three-panel story strip (outline panels captioned First / Then / Now, pictures or ten frames, a sentence frame under) with `unknown: 'start' | 'change' | 'result'`.
+- **Offered on:** `addition:add_wp_10`, `addition:add_5_pictures`, `subtraction:sub_5_pictures`.
+- **Templates:** `wordpic`; new or owned: `picture-row`. **Files:** `js/modules/sheet/cells/picture-row.js`.
+- **Draws (visual catalogue):** V115 First – Then – Now story strip.
+- **Reach:** 13 White Rose small steps use these pictures.
+- **After:** `sort_groups`.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 35. Hands-On Card and Game Pages (low) — `vis_k2_hands_on`
+
+- **Added from visual catalogue.** template (low priority) · grade PK · lane `k2`.
+- **Build:** printable hands-on pages that are not cells: memory / snap card sheets, a spinner or dice track game, a bingo grid of numerals; no answer key beyond the card list.
+- **Offered on:** `counting:count_objects`.
+- **Templates:** -. **Files:** `js/modules/sheet/roles (a hands-on page kind; agree the role file with the integrator)`.
+- **Draws (visual catalogue):** V132 Memory / snap picture cards; V142 Spinner / dice track game; V143 Bingo grid of numerals.
+- **Reach:** 8 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+## Lane `operations`: Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (40)
 
 Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/modules/sheet/cells/{stack,fact,family,equation,cloze-bank,arrays,area-model,mult-grid,mult-chart,division,long-division,ops-counters,ops-common,hop-line,number-line}.js`, `js/modules/sheet/providers/{addition,subtraction,multiplication,division,countby}.js`. Builds templates: `bar-model`, `long-multiplication`.
 
@@ -732,11 +883,135 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 2-digit × 1-digit → 3-digit · O3 grid drawn → none · O6 grid / part-whole.
 - **Misconceptions:** multiplies tens as ones; adds the factors.
 
-## Lane `placevalue`: Place value, rounding and estimation (the pv kit) (12)
+### Added from visual catalogue (appended 2026-09-25; the entries above are unchanged)
 
-Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels}.js`, `js/modules/pv-support-cell.js`, `js/modules/sheet/providers/pv.js`.
+Your existing entries that also draw catalogued representations (build them with these pictures): `share_group` (V040); `long_mult` (V191); `mult_three` (V158); `tens_any` (V089); `equal_groups_early` (V037); `comparison_statements` (V028); `difference` (V108); `div_factors` (V192); `known_facts` (V193); `long_div_rem` (V190); `mult_multiples` (V160).
 
-### 1. Numbers on a Number Line (any scale) — `nl_20`
+### 30. The Bar-Model Family (every WRM bar) — `vis_bar_family`
+
+- **Added from visual catalogue.** template · grade K-5 · lane `operations`.
+- **Build:** the bar-model template in full: part-whole (numbers, fractions, letters, degrees), comparison (difference arrow; sum-and-difference brace; two unknowns), equal parts with `fill: 'counters' | 'disks' | 'numbers'` and `task: 'part' | 'whole'`, scaling (1 box vs n boxes) and ratio rows (a : b, a : b : c), nested / halving stacks with link arrows, unit-conversion bars (1 m cells over 100 cm), the percentage bar ("100 %" over 2–20 cells; two levels) and the journey line; offered as `model: 'bar'` on the operations hosts, and used by the fractions, algebra and measurement entries that name bar-model.
+- **Offered on:** `division:share_into_groups`, `division:div_equation_parts`, `multiplication:mult_comparison`, `algebra:tape_diagram`.
+- **Templates:** `word-work`; new or owned: `bar-model`. **Files:** `js/modules/sheet/cells/bar-model.js`, `js/modules/sheet/cells/panes/models.js (pane:bar)`.
+- **Draws (visual catalogue):** V025 Bar model part-whole (numbers, fractions, letters, degrees); V026 Comparison bars (difference; sum and difference brace); V027 Equal-parts bar (fraction of an amount, find the whole); V028 Scaling / ratio bar (1 box vs n boxes; a : b rows); V029 Unit-conversion bars (1 m cells over 100 cm); V045 Stacked halving / nested bars; V083 Journey / distance line (towns, km segments); V196 Percentage bar.
+- **Reach:** 122 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 31. Pictures on Word Problems — `vis_word_pictures`
+
+- **Added from visual catalogue.** option · grade K-5 · lane `operations`.
+- **Build:** `pictures` option on word-work: grouped-object pictures (bags, packs, jars, egg boxes) and price-tagged items drawn beside the problem, answer-free.
+- **Offered on:** `addition:add_wp_100`, `multiplication:mult_word_problems`.
+- **Templates:** `word-work`. **Files:** `js/modules/sheet/cells/word-work.js (unowned today; this entry takes it)`.
+- **Draws (visual catalogue):** V069 Price tags on pictured items; V082 Grouped-object pictures for word problems.
+- **Reach:** 87 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 32. Array Options (split, hidden, place-value counters, three factors) — `vis_array_options`
+
+- **Added from visual catalogue.** option · grade K-5 · lane `operations`.
+- **Build:** arrays gain a split line, a hidden part, finish-the-array, `counter: 'one' | 'ten' | 'hundred'`, `model: 'array-groups'` (an array of arrays for three factors) and expression matching; mult-grid takes non-consecutive heads.
+- **Offered on:** `multiplication:dot_array_mult`, `multiplication:mult_chart`, `multiplication:multiply_three_numbers`.
+- **Templates:** `arrays`, `mult-grid`. **Files:** `js/modules/sheet/cells/arrays.js`, `js/modules/sheet/cells/mult-grid.js`.
+- **Draws (visual catalogue):** V038 Arrays (split, hidden part, finish the array); V039 Arrays / groups of place-value counters (tens, hundreds); V042 Multiplication grid (partial or non-consecutive headers); V158 Array of arrays (three factors).
+- **Reach:** 42 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 33. Cloze Banks: Word Banks and Digit-Card Boxes — `vis_cloze_boxes`
+
+- **Added from visual catalogue.** option · grade K-5 · lane `operations`.
+- **Build:** cloze-bank gains word banks (`response: 'word'`: fewer / more / same, less than / greater than) and digit-card box templates (□□□ × □□, □.□□, □ < □) where the pupil places given cards.
+- **Offered on:** `addition:cloze_addition`, `comparing:compare_groups`.
+- **Templates:** `cloze-bank`. **Files:** `js/modules/sheet/cells/cloze-bank.js`.
+- **Draws (visual catalogue):** V081 Digit / operation cards into box templates; V109 Word-bank sentences (fewer / more / same).
+- **Reach:** 41 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 34. Division Layouts: Bus Stop, Notes, Missing Digits — `vis_division_layouts`
+
+- **Added from visual catalogue.** option · grade K-5 · lane `operations`.
+- **Build:** the division template gains `layout: 'short'` (bus stop with small exchange-digit slots, an r slot, a decimal point and trailing zeros), `support: 'multiples'` (a multiples list beside), step notes, and `unknown` digits; box_division_* leave the legacy path.
+- **Offered on:** `division:long_div_2digit`, `division:box_division_easy`, `division:box_division_hard`.
+- **Templates:** `division`, `long-division`. **Files:** `js/modules/sheet/cells/division.js`, `js/modules/sheet/cells/long-division.js`.
+- **Draws (visual catalogue):** V033 Missing-digit boxes (column, bus stop, long division); V189 Short division (bus stop) with exchanges, r and decimal point; V190 Long division with step notes and a multiples list.
+- **Reach:** 33 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 35. Open Number Line (template option) — `vis_open_line`
+
+- **Added from visual catalogue.** option · grade K-5 · lane `operations`.
+- **Build:** number-line gains `line: 'open'` (no ticks, labelled hops) with `hops: 'bridge' | 'compensate' | 'count-on'` and decimal, fraction and integer values, beyond 0–20.
+- **Offered on:** `addition:nl_add`, `subtraction:nl_sub`, `measurement:money_change`.
+- **Templates:** `number-line`. **Files:** `js/modules/sheet/cells/number-line.js`.
+- **Draws (visual catalogue):** V020 Open number line with labelled hops (bridge, compensate, fractions).
+- **Reach:** 32 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 36. Column Layouts: Decimal Point Track and Expanded Column — `vis_stack_layouts`
+
+- **Added from visual catalogue.** option · grade 2-5 · lane `operations`.
+- **Build:** stack gains the decimal-point track `dp: 1..3` (lifted from money-columns) so decimal add / subtract leave the legacy decimal-column-add print, and `form: 'expanded'` (the partial-product column with annotations).
+- **Offered on:** `decimals:add_decimal`, `decimals:sub_decimal`, `multiplication:multiply`.
+- **Templates:** `stack`, `money-columns`. **Files:** `js/modules/sheet/cells/stack.js`.
+- **Draws (visual catalogue):** V030 Column method on squared paper (to 7 digits; decimal point track); V161 Short multiplication column; expanded partial-product column.
+- **Reach:** 29 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 37. Hop Lines: Through Zero, Chunks, Fact Labels — `vis_hop_line_options`
+
+- **Added from visual catalogue.** option · grade K-4 · lane `operations`.
+- **Build:** hop-line gains a negative start and `bridge: 0`, unequal "chunk" arcs, and `labels: 'facts'` ("n × 2" above each tick, values below).
+- **Offered on:** `multiplication:nl_mult`, `division:nl_div`, `integers:number_line_int`.
+- **Templates:** `hop-line`. **Files:** `js/modules/sheet/cells/hop-line.js`.
+- **Draws (visual catalogue):** V019 Skip-count / equal-jump line; V092 Fact-labelled count line ("n × 2" above the ticks).
+- **Reach:** 16 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 38. Split and Operate (template) — `vis_split_op`
+
+- **Added from visual catalogue.** template · grade 2-5 · lane `operations`.
+- **Build:** a new split-op template: a part-whole split with an operation arrow (× n or ÷ n) under each part and the recombined answer, for partitioning in multiplication and division.
+- **Offered on:** `multiplication:partition_multiply`, `division:div_equation_parts`.
+- **Templates:** `bond`; new or owned: `split-op`. **Files:** `js/modules/sheet/cells/split-op.js`.
+- **Draws (visual catalogue):** V015 Split-and-operate part-whole (× / ÷ arrows under each part).
+- **Reach:** 10 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 39. Area Model: 2 × 2 and 2 × 3 Grids — `vis_area_model_rows`
+
+- **Added from visual catalogue.** option · grade 2-5 · lane `operations`.
+- **Build:** area-model gains `rows` (2 × 2, 2 × 3 grids), `fill: 'base10' | 'disks'` inside the cells and the +1 row / column adjust strip; area_model_mult_hard leaves the legacy path.
+- **Offered on:** `multiplication:area_model_mult_hard`, `multiplication:area_model_mult`.
+- **Templates:** `area-model`. **Files:** `js/modules/sheet/cells/area-model.js`.
+- **Draws (visual catalogue):** V016 Area model (2 × 2, 2 × 3; counters inside; adjust strip).
+- **Reach:** 7 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 40. Bridging Split Mark (pane) — `vis_split_mark`
+
+- **Added from visual catalogue.** pane · grade 1-4 · lane `operations`.
+- **Build:** a new pane:split: the second number split under the calculation to make the next ten, hundred or whole (6 → 2 + 4; 0.67 → 0.55 + 0.12), a support value on the add / subtract hosts.
+- **Offered on:** `addition:add_10k_mixed`, `decimals:add_decimal`.
+- **Templates:** -; new or owned: `split`. **Files:** `js/modules/sheet/cells/panes/split.js`.
+- **Draws (visual catalogue):** V021 Bridging split under the second number.
+- **Reach:** 7 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+## Lane `placevalue`: Place value, rounding and estimation (the pv kit) (21)
+
+Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels,gattegno}.js`, `js/modules/pv-support-cell.js`, `js/modules/sheet/providers/pv.js`, `js/modules/sheet/cells/panes/{place,extras,pv-exchange}.js`. Builds templates: `gattegno`, `pv-exchange`.
+
+### 1. Wire the Built Picture Panes as Supports — `vis_supports_wiring`
+
+- **Added from visual catalogue.** wiring · grade PK-5 · lane `placevalue`.
+- **Build:** the panes already drawn but never offered become `support` values: rekenrek, fingers, dice, base10-quick, disks, pvgrid, openline, bar, gridpaper, hundreds, base10 and objects (solid / hollow two sets). DECLARATIONS ONLY: append the pane ids to FAMILY_SUPPORTS (providers/util.js) and to the providers' own `supports` arrays (append-only, one id per line, in every lane's provider), check each pane's `accepts` on its hosts, and run ws-supports-unit. It does NOT edit answer-check.js (the support-ladder work), sheet/supports.js or support-draw.js (the S2 allocator); it lands after S2.
+- **Offered on:** `addition:add_facts`, `subtraction:sub_facts`, `composing:number_bonds`, `placevalue:place_value_disks`, `addition:nl_add`.
+- **Templates:** -. **Files:** `js/modules/sheet/providers/util.js (FAMILY_SUPPORTS)`, `js/modules/sheet/providers/*.js (supports arrays, append-only)`.
+- **Draws (visual catalogue):** V001 Base-10 blocks to scale, read (hundreds flat, thousand cube, flat = 1); V003 Place-value counters loose / in a row (to 999,999); V004 Place-value chart with counters, build / read (to 7 digits); V020 Open number line with labelled hops (bridge, compensate, fractions); V025 Bar model part-whole (numbers, fractions, letters, degrees); V085 Rekenrek, 20 beads; V102 Dice, domino and dot-plate patterns; V113 Two-colour counter rows (bonds; ratio sets); V114 Fingers / hands (and dice, cube rows as number pictures).
+- **Reach:** 239 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 2. Numbers on a Number Line (any scale) — `nl_20`
 
 - **What:** new skill `number_sense:number_line_scales`. Grade K-4 · family placevalue · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS K.CC.A.2, K.CC.A.3, 1.NBT.A.1, 2.MD.B.6, 2.NBT.A.1, 3.NBT.A.1, 4.NBT.A.2, EE M.EE.1.NBT.1, M.EE.2.MD.6, M.EE.2.NBT.1, M.EE.3.NBT.1, M.EE.4.NBT.2
@@ -747,8 +1022,60 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Answer:** write the number; mark it.
 - **Ladder:** O2 0-20 → 0-100 → 0-1,000 → 0-1,000,000 · O3 all ticks labelled → some → ends · O6 labels.
 - **Misconceptions:** counts ticks not intervals; assumes steps of 1.
+- **Visual catalogue:** also draws V017 Number line, end-labelled: label, read arrows, place (to 10,000,000 and 0.001); V018 Estimate / rounding line (ends, midpoint, bounds; decimals) (reach 56 steps).
 
-### 2. Compare Numbers to 10 and 20 (option) — `compare_small`
+### 3. Plain Dots and Crossed Counters on the Chart — `vis_pv_dot_disks`
+
+- **Added from visual catalogue.** option · grade PK-5 · lane `placevalue`.
+- **Build:** `disk: 'value' | 'dot' | 'crossed'` on the pv mat (plain dots take their value from the column; crossed counters for take-away), `motion: 'left' | 'right'` arrows for × / ÷ 10, and `task: 'all-numbers'` (use exactly n counters, list every number).
+- **Offered on:** `placevalue:place_value_disks`, `placevalue:pv_disks_build`.
+- **Templates:** `pv`. **Files:** `js/modules/sheet/cells/pv.js`.
+- **Draws (visual catalogue):** V005 Place-value chart with plain unlabelled dots; V032 Crossed-out counters, blocks, disks and fraction parts.
+- **Reach:** 65 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 4. Decimal Places in the Place-Value Chart — `vis_pv_decimal_places`
+
+- **Added from visual catalogue.** template · grade 1-5 · lane `placevalue`.
+- **Build:** pv.js gains the places below the ones (Tth, Hth, Thth), the decimal point on the column line, counters 0.1 / 0.01 / 0.001 (also fraction-labelled 1/10 …), decimal digit-chart heads, and decimal bands on place_value_disks, pv_disks_build, value, expand and compare — the dependency of every decimal place-value entry in the fractions lane.
+- **Offered on:** `placevalue:place_value_disks`, `placevalue:pv_disks_build`, `placevalue:value`, `placevalue:expand`, `placevalue:compare`.
+- **Templates:** `pv`, `pv-support`. **Files:** `js/modules/sheet/cells/pv.js`, `js/modules/pv-support-cell.js`.
+- **Draws (visual catalogue):** V006 Place-value digit chart / place heads (to Thth, to millions); V167 Decimal place-value chart and counters (Tth, Hth, Thth).
+- **Reach:** 56 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 5. Place-Value Chart Beside the Method (exchanges) — `vis_pv_exchange`
+
+- **Added from visual catalogue.** pane · grade 1-5 · lane `placevalue`.
+- **Build:** a new pane:pv-exchange drawn beside a written method: counters in a chart with the exchange ring and arrow for +, crossing out for −, n repeated rows for ×, sharing rows or grouping rings for ÷, with decimal places; a support value on the column skills.
+- **Offered on:** `addition:add_10k_mixed`, `multiplication:multiply`, `division:long_div_2digit`, `decimals:add_decimal`.
+- **Templates:** -; new or owned: `pv-exchange`. **Files:** `js/modules/sheet/cells/panes/pv-exchange.js`.
+- **Draws (visual catalogue):** V031 Place-value chart beside the method with exchanges (+ − × ÷, decimals).
+- **Reach:** 38 White Rose small steps use these pictures.
+- **After:** `vis_pv_decimal_places`, `vis_pv_dot_disks`.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 6. Rounding Lines for Decimals — `vis_round_line_decimals`
+
+- **Added from visual catalogue.** option · grade K-5 · lane `placevalue`.
+- **Build:** round-line / round-chart / round-pv take decimals (to 1 and 2 dp) and `hops: 'bounds'` (hops to each bound, bounds circled) and `task: 'ends'`.
+- **Offered on:** `number_sense:rounding_visual`, `number_sense:round_nl_thousands`, `decimals:round_decimals`.
+- **Templates:** `pv`. **Files:** `js/modules/sheet/cells/panes/extras.js`, `js/modules/sheet/cells/pv.js`.
+- **Draws (visual catalogue):** V018 Estimate / rounding line (ends, midpoint, bounds; decimals).
+- **Reach:** 29 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 7. Gattegno Chart — `vis_gattegno`
+
+- **Added from visual catalogue.** template · grade 3-5 · lane `placevalue`.
+- **Build:** a new gattegno template: rows 1–9 × powers of ten (including decimal rows), `task: 'read' | 'ring' | 'shift'` (× 10 = one row up), offered as a support on place_value_10x and more_less_*.
+- **Offered on:** `placevalue:place_value_10x`, `placevalue:more_less_100`.
+- **Templates:** -; new or owned: `gattegno`. **Files:** `js/modules/sheet/cells/gattegno.js`.
+- **Draws (visual catalogue):** V155 Gattegno chart (rows 1–9 × powers of ten, decimal rows).
+- **Reach:** 16 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 8. Compare Numbers to 10 and 20 (option) — `compare_small`
 
 - **What:** option on `placevalue:compare`: band 10/20 and pictures. Grade K-1 · family placevalue · source White Rose audit.
 - **Closes (standards):** K.CC.C.7, M.EE.4.NBT.2, M.EE.5.NBT.1 · tag with CCSS K.CC.C.6, K.CC.C.7, 1.NBT.B.3, EE M.EE.K.CC.7, M.EE.1.NBT.3, M.EE.4.NBT.2, M.EE.5.NBT.1
@@ -761,7 +1088,27 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Ladder:** O2 to 10 → 20 → 99 · O3 pictures (frames / tens and ones) → numbers · O6 frames / rods / numbers.
 - **Misconceptions:** the sign points to the bigger number; compares ones before tens.
 
-### 3. Powers of Ten With Exponents (option) — `pv10_exponents`
+### 9. "−n | Number | +n" Table — `vis_more_less_table`
+
+- **Added from visual catalogue.** option · grade K-2 · lane `placevalue`.
+- **Build:** `layout: 'table' | 'strip'` on more_less_10 / 100: a row of three boxes (n less, the number, n more).
+- **Offered on:** `placevalue:more_less_10`, `placevalue:more_less_100`.
+- **Templates:** `pv`. **Files:** `js/modules/gen-pv.js`.
+- **Draws (visual catalogue):** V035 "−n | Number | +n" table / strip.
+- **Reach:** 8 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 10. Vertical Number Line Through Zero — `vis_value_line_vertical`
+
+- **Added from visual catalogue.** option · grade 1-5 · lane `placevalue`.
+- **Build:** value-line gains `orientation: 'vertical'` (a lift panel, a sea-level scale) and a thermometer look (`line: 'thermometer'`) through zero.
+- **Offered on:** `integers:number_line_int`, `integers:integer_nl_drag`.
+- **Templates:** `value-line`. **Files:** `js/modules/sheet/cells/value-line.js`.
+- **Draws (visual catalogue):** V096 Thermometer (vertical / horizontal; below zero); V179 Number line through zero, horizontal and vertical.
+- **Reach:** 7 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 11. Powers of Ten With Exponents (option) — `pv10_exponents`
 
 - **What:** option on `placevalue:place_value_10x`: notation "powers written with exponents" (× 10³) and task "compare powers of ten by counting zeros". Grade 5 · family placevalue · source standards audit.
 - **Closes (standards):** 5.NBT.A.2, M.EE.5.NBT.2 · tag with CCSS 5.NBT.A.2, EE M.EE.5.NBT.2
@@ -773,91 +1120,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Ladder:** O2 whole numbers → decimals → divide · O3 shift arrows → none · O6 chart / plain.
 - **Misconceptions:** 10³ = 30; moves the point the wrong way when dividing.
 
-### 4. Round Decimals to the Nearest Whole (option) — `round_whole`
-
-- **What:** option on `decimals:round_decimals`: nearest whole. Grade 3-4 · family decimals · source White Rose audit.
-- **Closes (standards):** 5.NBT.A.4 · tag with CCSS 4.NF.C.6, 5.NBT.A.4, EE M.EE.5.NBT.4
-- **Closes (White Rose steps):** Y4.B9.S7, Y5.B7.S10
-- **Teaches:** rounding a 1-dp or 2-dp decimal to the nearest whole number on a number line.
-- **Problem types:** (1) round a 1-dp decimal to the nearest whole; (2) round a 2-dp decimal; (3) mark it on a number line first; (4) halfway cases (2.5).
-- **Representation:** a "nearest whole" target option with a number-line support. Templates: `number-line`, `pv`.
-- **Answer:** write the whole number.
-- **Ladder:** O2 1 dp → 2 dp; not halfway → halfway · O3 number line from whole to whole → none · O6 line / chart.
-- **Misconceptions:** rounds to the nearest tenth instead; rounds 2.45 up because of the 5.
-
-### 5. Ten Times the Place to the Right (option) — `value_ten_times`
-
-- **What:** option on `placevalue:value`: form "ten times / one tenth": compare the value of the same digit in two places (the 7 in 700 is 10 times the 7 in 70; 700 ÷ 70 = 10). Grade 4-5 · family placevalue · source standards audit.
-- **Closes (standards):** 4.NBT.A.1, 5.NBT.A.1 · tag with CCSS 4.NBT.A.1, 5.NBT.A.1, EE -
-- **Closes (White Rose steps):** none · strengthens Y4.B1.S2
-- **Teaches:** a digit in one place is worth 10 times what it is worth in the place to its right and 1/10 of the place to its left.
-- **Problem types:** (1) how many times greater is the 4 in 4,300 than the 4 in 430?; (2) 700 ÷ 70 = ?; (3) the 3 in 0.3 is 1/10 of the 3 in 3; (4) which digit is worth ten times more?.
-- **Representation:** Templates: `pv`, `pv-support`.
-- **Answer:** write 10, 100 or 1/10.
-- **Ladder:** O2 adjacent places → two places apart → decimals (Grade 5) · O3 chart with the shift arrows → none · O6 chart / numbers.
-- **Misconceptions:** the value is the digit; answers "one more place" instead of ×10.
-
-### 6. Numbers to 10,000,000 (option) — `big_numbers`
-
-- **What:** option on `placevalue:pv_digit_drag`: to 10,000,000. Grade 5 · family placevalue · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 5.NBT.A.1, 4.NBT.A.2, EE M.EE.5.NBT.1, M.EE.4.NBT.2
-- **Closes (White Rose steps):** Y6.B1.S2, Y6.B1.S3, Y6.B1.S5
-- **Teaches:** reading, writing, partitioning, comparing and placing numbers to ten million.
-- **Problem types:** (1) read and write to 10,000,000; (2) partition; (3) compare; (4) place on a line.
-- **Representation:** band 9,999,999 on pv_digit_drag, number_word_names, compare and the number-line proposal. Templates: `pv`.
-- **Answer:** write the number / words from a bank.
-- **Ladder:** O2 1,000,000 → 10,000,000 · O3 place-value headings → none · O6 chart.
-- **Misconceptions:** misses a zero; groups digits wrongly.
-
-### 7. Multiply and Divide Decimals: Missing Values (option) — `dec_missing`
-
-- **What:** option on `placevalue:place_value_10x`: missing number. Grade 4 · family placevalue · source White Rose audit.
-- **Closes (standards):** 5.NBT.A.2 · tag with CCSS 5.NBT.A.2, EE M.EE.5.NBT.2
-- **Closes (White Rose steps):** Y5.B12.S12
-- **Teaches:** finding the missing number or the missing power of 10 (3.4 × __ = 340).
-- **Problem types:** (1) 3.4 × __ = 340; (2) __ ÷ 100 = 0.25; (3) missing power of 10; (4) place value chart shift.
-- **Representation:** an "unknown" option on place_value_10x. Templates: `pv-support`.
-- **Answer:** write the missing number.
-- **Ladder:** O2 × → ÷ → mixed · O3 shift arrows → none · O6 chart.
-- **Misconceptions:** adds zeros to decimals (3.4 × 10 = 3.40); shifts the wrong way.
-
-### 8. Partition Numbers Flexibly — `flex_partition`
-
-- **What:** new skill `placevalue:flexible_partition`. Grade 1-3 · family placevalue · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 1.NBT.B.2, 2.NBT.A.3, 4.NBT.A.2, 2.NBT.A.1, EE M.EE.1.NBT.2, M.EE.2.NBT.3, M.EE.4.NBT.2, M.EE.2.NBT.1
-- **Closes (White Rose steps):** Y2.B1.S7, Y3.B1.S7, Y4.B1.S7 · strengthens Y3.B1.S2
-- **Teaches:** partitioning a 2-, 3- or 4-digit number in more than one way (45 = 40 + 5 = 30 + 15), with base-10 and part-whole models.
-- **Problem types:** (1) 45 = 40 + 5 = 30 + 15; (2) missing part; (3) base-10 picture; (4) three parts.
-- **Representation:** a part-whole diagram with one part given; base-10 picture beside it; write the other part. Templates: `bond`, `base10`, `pv`.
-- **Answer:** write the other part.
-- **Ladder:** O2 2-digit → 3 → 4 · O3 base-10 picture → none · O6 cherry / bar.
-- **Misconceptions:** only standard partitions; partitions into digits (45 = 4 + 5).
-
-### 9. Mental Calculation and Estimation — `mental_estimate`
-
-- **What:** new skill `number_sense:estimate_and_check`. Grade 5 · family operations · source White Rose audit.
-- **Closes (standards):** 3.OA.D.8 · tag with CCSS 5.OA.A.2, 4.NBT.A.3, EE M.EE.4.NBT.3
-- **Closes (White Rose steps):** Y6.B2.S16
-- **Teaches:** estimating to check answers to calculations with all four operations and choosing mental methods.
-- **Problem types:** (1) estimate to check; (2) is the answer reasonable?; (3) choose a mental method; (4) round then calculate.
-- **Representation:** a calculation with a proposed answer; round, estimate and tick reasonable or not. Templates: `pv`.
-- **Answer:** tick reasonable / not; write the estimate.
-- **Ladder:** O2 + − → × ÷ · O3 rounding line → none · O6 plain.
-- **Misconceptions:** rounds every number up; accepts an answer ten times too big.
-
-### 10. 10,000 and 100,000 More or Less (option) — `pv_more_less_big`
-
-- **What:** option on `placevalue:more_less_100`: 10,000 and 100,000. Grade 4 · family placevalue · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 4.NBT.A.1, EE -
-- **Closes (White Rose steps):** Y5.B1.S7
-- **Teaches:** finding 10, 100, 1,000, 10,000 and 100,000 more or less than a number to 1,000,000.
-- **Problem types:** (1) 10,000 more / less; (2) 100,000 more / less; (3) missing start; (4) mixed steps.
-- **Representation:** step values 10,000 and 100,000 on more_less_100. Templates: `pv`.
-- **Answer:** write the number.
-- **Ladder:** O2 1,000 → 10,000 → 100,000 · O3 strip → none · O6 chart / strip.
-- **Misconceptions:** changes the wrong digit; forgets the carry into millions.
-
-### 11. Roman Numerals — `roman_100`
+### 12. Roman Numerals — `roman_100`
 
 - **What:** new skill `placevalue:roman_numerals`. Grade 3 · family placevalue · source White Rose audit.
 - **Closes (standards):** none not already full
@@ -868,8 +1131,9 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Answer:** write the value or the numeral.
 - **Ladder:** O2 to 20 → 50 → 100 · O3 key → none · O6 cards.
 - **Misconceptions:** IIII for 4; XL = 60.
+- **Visual catalogue:** also draws V174 Roman numerals (reach 3 steps).
 
-### 12. Roman Numerals to 1,000 (option) — `roman_1000`
+### 13. Roman Numerals to 1,000 (option) — `roman_1000`
 
 - **What:** option on `placevalue:roman_numerals`: to 1,000. Grade 4 · family placevalue · source White Rose audit.
 - **Closes (standards):** none not already full
@@ -881,12 +1145,122 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Ladder:** O2 to 500 → 1,000 → years · O3 key → none · O6 cards.
 - **Misconceptions:** CM = 1,100; MD = 500.
 - **After:** `roman_100`.
+- **Visual catalogue:** also draws V174 Roman numerals (reach 3 steps).
 
-## Lane `algebra`: Patterns, algebra, order of operations, strategies (gen-algebraic) (24)
+### 14. Round Decimals to the Nearest Whole (option) — `round_whole`
 
-Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/modules/sheet/cells/function-table.js`, `js/modules/sheet/providers/function-table.js`. Builds templates: `expression`.
+- **What:** option on `decimals:round_decimals`: nearest whole. Grade 3-4 · family decimals · source White Rose audit.
+- **Closes (standards):** 5.NBT.A.4 · tag with CCSS 4.NF.C.6, 5.NBT.A.4, EE M.EE.5.NBT.4
+- **Closes (White Rose steps):** Y4.B9.S7, Y5.B7.S10
+- **Teaches:** rounding a 1-dp or 2-dp decimal to the nearest whole number on a number line.
+- **Problem types:** (1) round a 1-dp decimal to the nearest whole; (2) round a 2-dp decimal; (3) mark it on a number line first; (4) halfway cases (2.5).
+- **Representation:** a "nearest whole" target option with a number-line support. Templates: `number-line`, `pv`.
+- **Answer:** write the whole number.
+- **Ladder:** O2 1 dp → 2 dp; not halfway → halfway · O3 number line from whole to whole → none · O6 line / chart.
+- **Misconceptions:** rounds to the nearest tenth instead; rounds 2.45 up because of the 5.
+- **After:** `vis_round_line_decimals`.
 
-### 1. Make a Pattern — `pattern_make`
+### 15. Ten Times the Place to the Right (option) — `value_ten_times`
+
+- **What:** option on `placevalue:value`: form "ten times / one tenth": compare the value of the same digit in two places (the 7 in 700 is 10 times the 7 in 70; 700 ÷ 70 = 10). Grade 4-5 · family placevalue · source standards audit.
+- **Closes (standards):** 4.NBT.A.1, 5.NBT.A.1 · tag with CCSS 4.NBT.A.1, 5.NBT.A.1, EE -
+- **Closes (White Rose steps):** none · strengthens Y4.B1.S2
+- **Teaches:** a digit in one place is worth 10 times what it is worth in the place to its right and 1/10 of the place to its left.
+- **Problem types:** (1) how many times greater is the 4 in 4,300 than the 4 in 430?; (2) 700 ÷ 70 = ?; (3) the 3 in 0.3 is 1/10 of the 3 in 3; (4) which digit is worth ten times more?.
+- **Representation:** Templates: `pv`, `pv-support`.
+- **Answer:** write 10, 100 or 1/10.
+- **Ladder:** O2 adjacent places → two places apart → decimals (Grade 5) · O3 chart with the shift arrows → none · O6 chart / numbers.
+- **Misconceptions:** the value is the digit; answers "one more place" instead of ×10.
+
+### 16. Numbers to 10,000,000 (option) — `big_numbers`
+
+- **What:** option on `placevalue:pv_digit_drag`: to 10,000,000. Grade 5 · family placevalue · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 5.NBT.A.1, 4.NBT.A.2, EE M.EE.5.NBT.1, M.EE.4.NBT.2
+- **Closes (White Rose steps):** Y6.B1.S2, Y6.B1.S3, Y6.B1.S5
+- **Teaches:** reading, writing, partitioning, comparing and placing numbers to ten million.
+- **Problem types:** (1) read and write to 10,000,000; (2) partition; (3) compare; (4) place on a line.
+- **Representation:** band 9,999,999 on pv_digit_drag, number_word_names, compare and the number-line proposal. Templates: `pv`.
+- **Answer:** write the number / words from a bank.
+- **Ladder:** O2 1,000,000 → 10,000,000 · O3 place-value headings → none · O6 chart.
+- **Misconceptions:** misses a zero; groups digits wrongly.
+
+### 17. Widen Place Value to 7 Digits (millions) — `vis_pv_bands_millions`
+
+- **Added from visual catalogue.** band · grade 1-5 · lane `placevalue`.
+- **Build:** bands 99,999 / 999,999 / 9,999,999 on place_value_disks, pv_disks_build, compare, expand, value and number_word_names; period heads (Millions | Thousands | Ones, H T O under each, commas in threes); million bands on rounding_visual / round_nl_*; the odometer digit display. pv_digit_drag's band is `big_numbers`.
+- **Offered on:** `placevalue:place_value_disks`, `placevalue:pv_disks_build`, `placevalue:compare`, `placevalue:expand`, `placevalue:number_word_names`, `number_sense:rounding_visual`.
+- **Templates:** `pv`. **Files:** `js/modules/gen-pv.js`, `js/modules/sheet/cells/pv.js`.
+- **Draws (visual catalogue):** V003 Place-value counters loose / in a row (to 999,999); V004 Place-value chart with counters, build / read (to 7 digits); V006 Place-value digit chart / place heads (to Thth, to millions); V175 Period-grouped PV chart (Thousands | Ones); V186 Odometer / 7-digit counter display.
+- **Reach:** 86 White Rose small steps use these pictures.
+- **After:** `big_numbers`.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 18. Multiply and Divide Decimals: Missing Values (option) — `dec_missing`
+
+- **What:** option on `placevalue:place_value_10x`: missing number. Grade 4 · family placevalue · source White Rose audit.
+- **Closes (standards):** 5.NBT.A.2 · tag with CCSS 5.NBT.A.2, EE M.EE.5.NBT.2
+- **Closes (White Rose steps):** Y5.B12.S12
+- **Teaches:** finding the missing number or the missing power of 10 (3.4 × __ = 340).
+- **Problem types:** (1) 3.4 × __ = 340; (2) __ ÷ 100 = 0.25; (3) missing power of 10; (4) place value chart shift.
+- **Representation:** an "unknown" option on place_value_10x. Templates: `pv-support`.
+- **Answer:** write the missing number.
+- **Ladder:** O2 × → ÷ → mixed · O3 shift arrows → none · O6 chart.
+- **Misconceptions:** adds zeros to decimals (3.4 × 10 = 3.40); shifts the wrong way.
+
+### 19. Partition Numbers Flexibly — `flex_partition`
+
+- **What:** new skill `placevalue:flexible_partition`. Grade 1-3 · family placevalue · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 1.NBT.B.2, 2.NBT.A.3, 4.NBT.A.2, 2.NBT.A.1, EE M.EE.1.NBT.2, M.EE.2.NBT.3, M.EE.4.NBT.2, M.EE.2.NBT.1
+- **Closes (White Rose steps):** Y2.B1.S7, Y3.B1.S7, Y4.B1.S7 · strengthens Y3.B1.S2
+- **Teaches:** partitioning a 2-, 3- or 4-digit number in more than one way (45 = 40 + 5 = 30 + 15), with base-10 and part-whole models.
+- **Problem types:** (1) 45 = 40 + 5 = 30 + 15; (2) missing part; (3) base-10 picture; (4) three parts.
+- **Representation:** a part-whole diagram with one part given; base-10 picture beside it; write the other part. Templates: `bond`, `base10`, `pv`.
+- **Answer:** write the other part.
+- **Ladder:** O2 2-digit → 3 → 4 · O3 base-10 picture → none · O6 cherry / bar.
+- **Misconceptions:** only standard partitions; partitions into digits (45 = 4 + 5).
+
+### 20. Mental Calculation and Estimation — `mental_estimate`
+
+- **What:** new skill `number_sense:estimate_and_check`. Grade 5 · family operations · source White Rose audit.
+- **Closes (standards):** 3.OA.D.8 · tag with CCSS 5.OA.A.2, 4.NBT.A.3, EE M.EE.4.NBT.3
+- **Closes (White Rose steps):** Y6.B2.S16
+- **Teaches:** estimating to check answers to calculations with all four operations and choosing mental methods.
+- **Problem types:** (1) estimate to check; (2) is the answer reasonable?; (3) choose a mental method; (4) round then calculate.
+- **Representation:** a calculation with a proposed answer; round, estimate and tick reasonable or not. Templates: `pv`.
+- **Answer:** tick reasonable / not; write the estimate.
+- **Ladder:** O2 + − → × ÷ · O3 rounding line → none · O6 plain.
+- **Misconceptions:** rounds every number up; accepts an answer ten times too big.
+
+### 21. 10,000 and 100,000 More or Less (option) — `pv_more_less_big`
+
+- **What:** option on `placevalue:more_less_100`: 10,000 and 100,000. Grade 4 · family placevalue · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 4.NBT.A.1, EE -
+- **Closes (White Rose steps):** Y5.B1.S7
+- **Teaches:** finding 10, 100, 1,000, 10,000 and 100,000 more or less than a number to 1,000,000.
+- **Problem types:** (1) 10,000 more / less; (2) 100,000 more / less; (3) missing start; (4) mixed steps.
+- **Representation:** step values 10,000 and 100,000 on more_less_100. Templates: `pv`.
+- **Answer:** write the number.
+- **Ladder:** O2 1,000 → 10,000 → 100,000 · O3 strip → none · O6 chart / strip.
+- **Misconceptions:** changes the wrong digit; forgets the carry into millions.
+
+## Lane `algebra`: Patterns, algebra, order of operations, strategies (gen-algebraic) (28)
+
+Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/modules/sheet/cells/{function-table,total-grid,pyramid}.js`, `js/modules/sheet/providers/function-table.js`. Builds templates: `expression`, `total-grid`, `pyramid`.
+
+### 1. Pairs of Values and Two Unknowns — `pairs_values`
+
+- **What:** new skill `algebra:pairs_of_values`. Grade 5 · family algebra · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 4.OA.B.4, 6.EE.B.6, 3.OA.D.8, EE M.EE.4.OA.4, M.EE.6.EE.5-7, M.EE.3.OA.7
+- **Closes (White Rose steps):** Y6.B7.S9, Y6.B7.S10
+- **Teaches:** finding all whole-number pairs that satisfy an equation (a + b = 8, 2a + b = 10) and solving simple problems with two unknowns.
+- **Problem types:** (1) list all pairs for a + b = n; (2) list pairs for 2a + b = n; (3) find the pair that fits two clues; (4) bar-model problem with two unknowns.
+- **Representation:** a two-column table to list pairs systematically; option: a bar model problem. Templates: `function-table`; new: `data-table`, `bar-model`.
+- **Answer:** write the pairs in a two-column table.
+- **Ladder:** O2 a + b ≤ 10 → 2a + b → two clues · O3 first rows of the table filled, in order → none · O6 table / bar model.
+- **Misconceptions:** stops before listing every pair; lists a pair twice (3,5 and 5,3 when order does not matter).
+- **Visual catalogue:** also draws V026 Comparison bars (difference; sum and difference brace) (reach 21 steps).
+
+### 2. Make a Pattern — `pattern_make`
 
 - **What:** new skill `patterns:make_a_pattern`. Grade PK · family algebra · source White Rose audit.
 - **Closes (standards):** none not already full
@@ -897,8 +1271,102 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Answer:** draw or write the letter of the next shape in each box.
 - **Ladder:** O2 AB → ABB → ABC → growing unit length · O3 unit boxed and shaded → unit boxed → none · O6 shapes / pictures / letters.
 - **Misconceptions:** repeats only the last item; treats AB and ABB as the same; restarts the unit mid-row.
+- **Visual catalogue:** also draws V095 Repeating pattern row (AB … ABCD; unit of repeat; round a circle); V151 Action / sound pattern pictograms (reach 12 steps).
 
-### 2. Compare Calculations — `compare_calcs`
+### 3. Add or Multiply? — `add_or_mult`
+
+- **What:** new skill `algebra:add_or_multiply`. Grade 5 · family operations · source White Rose audit.
+- **Closes (standards):** 4.OA.A.2 · tag with CCSS 5.NF.B.5, 4.OA.A.2, EE M.EE.4.OA.2
+- **Closes (White Rose steps):** Y6.B6.S1
+- **Teaches:** recognising additive and multiplicative relationships between two quantities.
+- **Extended for the standards:** Grade 4 stories that contrast "3 more than" with "3 times as many".
+- **Problem types:** (1) add 3 or multiply by 3?; (2) complete the table; (3) more than vs times as many in a story (4.OA.A.2); (4) write the rule.
+- **Representation:** two sets of values in a table; tick "add 3" or "multiply by 3". Templates: `function-table`.
+- **Answer:** tick; write the rule.
+- **Ladder:** O2 tables → stories · O3 difference and ratio shown → none · O6 table / story.
+- **Misconceptions:** 3 times as many = 3 more; uses the first pair only.
+- **Visual catalogue:** also draws V187 Operator arcs (× n / ÷ n, + / − above and below a pair) (reach 12 steps).
+
+### 4. Function Machines — `function_machine`
+
+- **What:** new skill `algebra:function_machines`. Grade 5 · family algebra · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 5.OA.A.2, EE -
+- **Closes (White Rose steps):** Y6.B7.S2
+- **Teaches:** 1-step and 2-step function machines: find the output, the input (work backwards) or the rule.
+- **Problem types:** (1) find the output; (2) find the input (work backwards); (3) find the rule from pairs; (4) two-step machine.
+- **Representation:** drawn machine boxes with arrows; fill the empty box. Templates: `function-table`.
+- **Answer:** write the number in the empty box; write the rule.
+- **Ladder:** O2 one step (+ −) → one step (× ÷) → two steps · O3 inverse arrow drawn → none · O6 machine picture / table.
+- **Misconceptions:** applies the rule forwards when working backwards; reads a two-step machine in the wrong order.
+- **Visual catalogue:** also draws V036 Function machine chain (reach 14 steps).
+
+### 5. Shape Patterns with Turns — `pattern_turns`
+
+- **What:** new skill `patterns:patterns_with_turns`. Grade 1 · family geometry · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 1.G.A.1, EE M.EE.1.G.1
+- **Closes (White Rose steps):** Y2.B11.S5
+- **Teaches:** continuing patterns made by turning a shape (quarter turns clockwise).
+- **Problem types:** (1) continue a turning pattern; (2) which tile comes next?; (3) describe the turn each time; (4) find the mistake.
+- **Representation:** a row of arrow or shape tiles turning; draw or circle the next one. Templates: `legacy`; new: `picture-row`, `angle-kit`.
+- **Answer:** draw or circle the next tile.
+- **Ladder:** O2 quarter turns → half turns → mixed · O3 turn arrow between tiles → none · O6 arrows / shapes.
+- **Misconceptions:** turns the wrong way; repeats the first tile.
+- **Visual catalogue:** also draws V095 Repeating pattern row (AB … ABCD; unit of repeat; round a circle) (reach 11 steps).
+
+### 6. Reasoning Frames (low) — `vis_reasoning_frames`
+
+- **Added from visual catalogue.** template (low priority) · grade 2-5 · lane `algebra`.
+- **Build:** page frames over existing panes, for lesson, reasoning and error-analysis pages: one number four ways, the representation triangle, two worked methods side by side (which is correct / more efficient), the priority-pyramid anchor chart, and a maze of operations.
+- **Offered on:** `number_sense:why_it_works`.
+- **Templates:** -. **Files:** `js/modules/sheet/roles (frames; agree the role file with the integrator)`.
+- **Draws (visual catalogue):** V084 Path / maze grid of operations; V169 Representation triangle (numeral, words, Roman); V181 One number, four ways; V182 Two worked methods side by side; V210 Order-of-operations priority pyramid (anchor chart).
+- **Reach:** 11 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 7. Number Words 0 to 10 (option) — `words_0_10`
+
+- **What:** option on `composing:number_word_form`: words 0-10. Grade K · family counting · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS K.CC.A.3, 2.NBT.A.3, EE M.EE.2.NBT.3
+- **Closes (White Rose steps):** Y1.B1.S5
+- **Teaches:** reading and writing the number words zero to ten (the skill starts at 10).
+- **Problem types:** (1) numeral to word; (2) word to numeral; (3) match the word to the picture count; (4) spell the missing letters.
+- **Representation:** a band option "0 to 10" on the existing skill: numeral to word and word to numeral. Templates: `wordpic`.
+- **Answer:** write the numeral or copy the word from a bank.
+- **Ladder:** O2 0-5 → 0-10 · O3 word bank with pictures → bank only → none · O6 word bank / trace.
+- **Misconceptions:** writes the word for the next number; confuses six/seven, two/three spellings.
+- **Visual catalogue:** also draws V105 Numeral ↔ word ↔ quantity matching (reach 10 steps).
+
+### 8. Symbol Puzzles (new skill algebra:symbol_puzzle) — `vis_symbol_puzzle`
+
+- **Added from visual catalogue.** skill · grade K-5 · lane `algebra`.
+- **Build:** a new skill: shapes as unknowns (○ + △ = 4; ★ + ★ = ▲ chains; ● + ▲ = 38 with ● = ▲ + 6), solved one symbol at a time; tag it in SKILL_STANDARDS and SKILL_WRM.
+- **Offered on:** -.
+- **Templates:** `equation`. **Files:** `js/modules/gen-algebraic.js`.
+- **Draws (visual catalogue):** V091 Shape-symbol unknowns.
+- **Reach:** 10 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 9. Strategy Pictures: Doubles and Constant Difference — `vis_strategy_pictures`
+
+- **Added from visual catalogue.** option · grade PK-3 · lane `algebra`.
+- **Build:** `support: 'pictures'` on doubles and halves (before → after picture pairs, dice / fingers pairs, double or not a double) and `model: 'shift'` on compensation (two short lines with matching hops; the constant difference).
+- **Offered on:** `patterns:double`, `patterns:halve`, `number_sense:doubles_near_doubles`, `number_sense:compensation`.
+- **Templates:** `number-line`. **Files:** `js/modules/gen-algebraic.js`.
+- **Draws (visual catalogue):** V118 Doubles / halves pictures (before → after); V157 Constant difference (matching hops on two lines).
+- **Reach:** 9 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 10. Total Grids and Number Pyramids — `vis_puzzle_grids`
+
+- **Added from visual catalogue.** template · grade 1-5 · lane `algebra`.
+- **Build:** two templates: total-grid (3 × 3 numbers or symbols with row and column totals; the sum-to-1 grid) and pyramid (3–5 rows, each brick the sum of the two below, blanks anywhere, whole numbers or decimals).
+- **Offered on:** `algebra:solve_unknown`.
+- **Templates:** -; new or owned: `total-grid`, `pyramid`. **Files:** `js/modules/sheet/cells/total-grid.js`, `js/modules/sheet/cells/pyramid.js`.
+- **Draws (visual catalogue):** V090 Total grid (row / column totals); V177 Number pyramid.
+- **Reach:** 6 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 11. Compare Calculations — `compare_calcs`
 
 - **What:** new skill `algebra:compare_calculations`. Grade 4 · family operations · source White Rose audit.
 - **Closes (standards):** 5.OA.A.2, M.EE.6.EE.3 · tag with CCSS 4.NBT.B.4, 5.OA.A.2, EE M.EE.4.NBT.4, M.EE.6.EE.3
@@ -911,7 +1379,20 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 one change → two changes · O3 matching parts linked → none · O6 plain.
 - **Misconceptions:** calculates both; bigger number means bigger result.
 
-### 3. Absolute Value in Context (option) — `abs_context`
+### 12. Odd or Even by Pairing (option) — `odd_even_pairs`
+
+- **What:** option on `composing:odd_even`: form: picture of up to 20 objects to pair up, and "write the even number as a double" (14 = 7 + 7). Grade 2 · family counting · source standards audit.
+- **Closes (standards):** 2.OA.C.3 · tag with CCSS 2.OA.C.3, EE M.EE.2.OA.3
+- **Closes (White Rose steps):** none · strengthens Y2.B5.S12
+- **Teaches:** deciding odd or even by pairing objects or counting in 2s, and writing an even number as a sum of two equal addends.
+- **Problem types:** (1) pair the objects: odd or even?; (2) count in 2s to decide; (3) write 14 = 7 + 7; (4) which number is a double?.
+- **Representation:** Templates: `counters`, `equation`.
+- **Answer:** tick odd / even; write the double.
+- **Ladder:** O2 to 10 → 20 · O3 pairs ringed → first pair ringed → none · O6 objects / counters / cubes.
+- **Misconceptions:** a number is odd if it has an odd digit anywhere; writes 14 = 10 + 4.
+- **Visual catalogue:** also draws V144 Pairs for odd / even (one left over) (reach 3 steps).
+
+### 13. Absolute Value in Context (option) — `abs_context`
 
 - **What:** option on `integers:abs_value`: context: debt, depth, temperature; and "absolute value vs order" items (a balance less than −30 is a debt greater than 30). Grade 6 · family integers · source standards audit.
 - **Closes (standards):** 6.NS.C.7c, 6.NS.C.7d · tag with CCSS 6.NS.C.7c, 6.NS.C.7d, EE M.EE.6.NS.7
@@ -924,7 +1405,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Misconceptions:** −40 > −30 because 40 > 30; absolute value makes a number negative.
 - **After:** `negative_count` (lane `operations`).
 
-### 4. Equivalent Expressions? (option) — `equiv_expressions`
+### 14. Equivalent Expressions? (option) — `equiv_expressions`
 
 - **What:** option on `algebra:combine_like_terms`: task "equivalent or not?": test two expressions with values (y + y + y and 3y). Grade 6 · family algebra · source standards audit.
 - **Closes (standards):** 6.EE.A.4, M.EE.6.EE.3 · tag with CCSS 6.EE.A.4, EE M.EE.6.EE.3
@@ -936,7 +1417,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 like terms → distributive → both · O3 substitution table → none · O6 plain.
 - **Misconceptions:** one value that works proves equivalence; 3y = y + 3.
 
-### 5. Two-Step Problems With All Four Operations (option) — `multi_step_four_ops`
+### 15. Two-Step Problems With All Four Operations (option) — `multi_step_four_ops`
 
 - **What:** option on `algebra:multi_step_word` (and `algebra:multi_step_word_plain`): two steps with × and ÷ (3 packs of 6, 4 eaten), write the equation with a letter for the unknown, remainder steps, and a "reasonable?" estimate. Grade 3-4 · family algebra · source standards audit.
 - **Closes (standards):** 3.OA.D.8, 4.OA.A.3 · tag with CCSS 3.OA.D.8, 4.OA.A.3, EE M.EE.3.OA.7, M.EE.4.OA.3
@@ -948,7 +1429,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 within 100 → 1,000; two steps → three · O3 bar model and step boxes → step boxes → none · O6 pictures / plain.
 - **Misconceptions:** answers the first step; uses the letter as a label, not a number; ignores the remainder.
 
-### 6. What Do You Notice? — `patterns_notice`
+### 16. What Do You Notice? — `patterns_notice`
 
 - **What:** new skill `patterns:notice_patterns`. Grade 3-4 · family algebra · source standards audit.
 - **Closes (standards):** 3.OA.D.9, 4.OA.C.5 · tag with CCSS 3.OA.D.9, 4.OA.C.5, EE M.EE.3.OA.8, M.EE.4.OA.5
@@ -960,20 +1441,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 addition table → multiplication table → rule sequences · O3 pattern shaded → none · O6 table / track.
 - **Misconceptions:** a pattern seen in three terms always continues; odd × odd is even.
 
-### 7. Add or Multiply? — `add_or_mult`
-
-- **What:** new skill `algebra:add_or_multiply`. Grade 5 · family operations · source White Rose audit.
-- **Closes (standards):** 4.OA.A.2 · tag with CCSS 5.NF.B.5, 4.OA.A.2, EE M.EE.4.OA.2
-- **Closes (White Rose steps):** Y6.B6.S1
-- **Teaches:** recognising additive and multiplicative relationships between two quantities.
-- **Extended for the standards:** Grade 4 stories that contrast "3 more than" with "3 times as many".
-- **Problem types:** (1) add 3 or multiply by 3?; (2) complete the table; (3) more than vs times as many in a story (4.OA.A.2); (4) write the rule.
-- **Representation:** two sets of values in a table; tick "add 3" or "multiply by 3". Templates: `function-table`.
-- **Answer:** tick; write the rule.
-- **Ladder:** O2 tables → stories · O3 difference and ratio shown → none · O6 table / story.
-- **Misconceptions:** 3 times as many = 3 more; uses the first pair only.
-
-### 8. Compare Number Sentences — `compare_sentences`
+### 17. Compare Number Sentences — `compare_sentences`
 
 - **What:** new skill `algebra:compare_number_sentences`. Grade 1 · family operations · source White Rose audit.
 - **Closes (standards):** 1.OA.D.7 · tag with CCSS 1.OA.D.7, EE M.EE.1.OA.7
@@ -985,7 +1453,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 one change → two changes · O3 matching parts linked → none · O6 plain.
 - **Misconceptions:** calculates every side; bigger first number means bigger.
 
-### 9. Count in 50s, 100s and 1,000s (option) — `count_50s`
+### 18. Count in 50s, 100s and 1,000s (option) — `count_50s`
 
 - **What:** option on `patterns:count_by_step_up`: steps 50, 100, 1,000. Grade 2-3 · family algebra · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 2.NBT.A.1, 2.NBT.A.2, 4.NBT.A.1, 4.NBT.A.2, EE M.EE.2.NBT.1, M.EE.2.NBT.2, M.EE.4.NBT.2
@@ -997,7 +1465,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 step 100 → 50 → 1,000, forwards then backwards · O3 base-10 picture above each term → none · O6 track / number line.
 - **Misconceptions:** changes the wrong digit (350 + 50 = 355); forgets the crossing of 1,000 (950, 1,000, 1,050).
 
-### 10. Formulae — `formulae`
+### 19. Formulae — `formulae`
 
 - **What:** new skill `algebra:use_formulae`. Grade 5 · family algebra · source White Rose audit.
 - **Closes (standards):** 6.EE.A.2c · tag with CCSS 5.OA.A.2, 6.EE.A.2c, EE -
@@ -1010,7 +1478,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 one operation → two operations → brackets and powers (V = s³) · O3 substitution line printed (P = 2 × ( __ + __ )) → none · O6 formula in words / letters.
 - **Misconceptions:** adds instead of multiplying where letters touch (2l = 2 + l); ignores the brackets.
 
-### 11. Why Does It Work? — `explain_strategy`
+### 20. Why Does It Work? — `explain_strategy`
 
 - **What:** new skill `number_sense:why_it_works`. Grade 2 · family operations · source standards audit.
 - **Closes (standards):** 2.NBT.B.9 · tag with CCSS 2.NBT.B.9, EE -
@@ -1023,7 +1491,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Misconceptions:** compensation changes the answer; the order of subtraction does not matter.
 - **After:** `add_sub_patterns` (lane `operations`).
 
-### 12. Write and Graph Inequalities (option) — `inequality_write_graph`
+### 21. Write and Graph Inequalities (option) — `inequality_write_graph`
 
 - **What:** option on `algebra:inequalities`: task "write it from words" (x > c) and "show the solutions on a number line" (open/closed circle, arrow). Grade 6 · family algebra · source standards audit.
 - **Closes (standards):** 6.EE.B.8 · tag with CCSS 6.EE.B.8, EE -
@@ -1035,7 +1503,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 > < → ≥ ≤ · O3 circle drawn, pupil adds the arrow → none · O6 horizontal / vertical line.
 - **Misconceptions:** only whole numbers are solutions; closed circle for >.
 
-### 13. Subtract Back Through Ten (option) — `make_ten_subtract`
+### 22. Subtract Back Through Ten (option) — `make_ten_subtract`
 
 - **What:** option on `number_sense:make_a_ten`: subtraction: back through ten (13 − 4 = 13 − 3 − 1). Grade 1 · family operations · source standards audit.
 - **Closes (standards):** 1.OA.C.6 · tag with CCSS 1.OA.C.6, EE -
@@ -1047,31 +1515,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 teens − 1-digit crossing 10 · O3 ten frame pair drawn → number line → none · O6 frames / line.
 - **Misconceptions:** takes the whole second number from 10; splits the wrong number.
 
-### 14. Odd or Even by Pairing (option) — `odd_even_pairs`
-
-- **What:** option on `composing:odd_even`: form: picture of up to 20 objects to pair up, and "write the even number as a double" (14 = 7 + 7). Grade 2 · family counting · source standards audit.
-- **Closes (standards):** 2.OA.C.3 · tag with CCSS 2.OA.C.3, EE M.EE.2.OA.3
-- **Closes (White Rose steps):** none · strengthens Y2.B5.S12
-- **Teaches:** deciding odd or even by pairing objects or counting in 2s, and writing an even number as a sum of two equal addends.
-- **Problem types:** (1) pair the objects: odd or even?; (2) count in 2s to decide; (3) write 14 = 7 + 7; (4) which number is a double?.
-- **Representation:** Templates: `counters`, `equation`.
-- **Answer:** tick odd / even; write the double.
-- **Ladder:** O2 to 10 → 20 · O3 pairs ringed → first pair ringed → none · O6 objects / counters / cubes.
-- **Misconceptions:** a number is odd if it has an odd digit anywhere; writes 14 = 10 + 4.
-
-### 15. Pairs of Values and Two Unknowns — `pairs_values`
-
-- **What:** new skill `algebra:pairs_of_values`. Grade 5 · family algebra · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 4.OA.B.4, 6.EE.B.6, 3.OA.D.8, EE M.EE.4.OA.4, M.EE.6.EE.5-7, M.EE.3.OA.7
-- **Closes (White Rose steps):** Y6.B7.S9, Y6.B7.S10
-- **Teaches:** finding all whole-number pairs that satisfy an equation (a + b = 8, 2a + b = 10) and solving simple problems with two unknowns.
-- **Problem types:** (1) list all pairs for a + b = n; (2) list pairs for 2a + b = n; (3) find the pair that fits two clues; (4) bar-model problem with two unknowns.
-- **Representation:** a two-column table to list pairs systematically; option: a bar model problem. Templates: `function-table`; new: `data-table`, `bar-model`.
-- **Answer:** write the pairs in a two-column table.
-- **Ladder:** O2 a + b ≤ 10 → 2a + b → two clues · O3 first rows of the table filled, in order → none · O6 table / bar model.
-- **Misconceptions:** stops before listing every pair; lists a pair twice (3,5 and 5,3 when order does not matter).
-
-### 16. Parts of an Expression — `parts_of_expression`
+### 23. Parts of an Expression — `parts_of_expression`
 
 - **What:** new skill `algebra:parts_of_expression`. Grade 6 · family algebra · source standards audit.
 - **Closes (standards):** 6.EE.A.2b · tag with CCSS 6.EE.A.2b, EE -
@@ -1083,7 +1527,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 numbers → letters → brackets · O3 parts boxed → none · O6 plain.
 - **Misconceptions:** the coefficient is the letter; 2(8 + 7) has three terms.
 
-### 17. Two Patterns as Ordered Pairs (option) — `pattern_pairs_graph`
+### 24. Two Patterns as Ordered Pairs (option) — `pattern_pairs_graph`
 
 - **What:** option on `patterns:pattern_relationship`: task "make the pairs and plot them" on a quadrant-I grid. Grade 5 · family algebra · source standards audit.
 - **Closes (standards):** 5.OA.B.3 · tag with CCSS 5.OA.B.3, EE M.EE.5.OA.3
@@ -1095,55 +1539,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 add rules → multiply relationship · O3 first terms given → none · O6 grid size.
 - **Misconceptions:** pairs terms from different positions; plots (y, x).
 
-### 18. Write Number Expressions (option) — `write_numeric_expression`
-
-- **What:** option on `algebra:write_expression`: numbers only, with brackets ("add 8 and 7, then multiply by 2" = 2 × (8 + 7)) and "interpret without calculating". Grade 5 · family algebra · source standards audit.
-- **Closes (standards):** 5.OA.A.2 · tag with CCSS 5.OA.A.2, EE -
-- **Closes (White Rose steps):** none
-- **Teaches:** writing numerical expressions that record calculations, with brackets, and interpreting expressions without evaluating them.
-- **Problem types:** (1) words → expression with brackets; (2) expression → words (bank); (3) 3 × (a + b) is how many times a + b?; (4) which expression matches?.
-- **Representation:** Templates: `equation`; new: `expression`.
-- **Answer:** write the expression; circle from a bank.
-- **Ladder:** O2 one operation → two with brackets · O3 bracket boxes printed → none · O6 plain.
-- **Misconceptions:** writes 2 × 8 + 7 for "add then multiply"; evaluates when asked to interpret.
-
-### 19. Count in 3s — `count_3s`
-
-- **What:** new skill `patterns:count_in_3s`. Grade 1 · family counting · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 1.NBT.A.1, EE M.EE.1.NBT.1
-- **Closes (White Rose steps):** Y2.B1.S16
-- **Teaches:** counting forwards and backwards in 3s from 0 (the step before the 3 times-table).
-- **Problem types:** (1) count on in 3s; (2) count back in 3s; (3) fill the missing 3s; (4) jumps on the number line.
-- **Representation:** a number track and a number line jumping in 3s; write the missing numbers. Templates: `count-row`, `hop-line`.
-- **Answer:** write the missing numbers.
-- **Ladder:** O2 to 15 → to 36; forwards → backwards · O3 hops drawn → none · O6 track / line.
-- **Misconceptions:** adds 2 or 4 at the crossing of a ten; loses the count after 12.
-
-### 20. Decimal Sequences — `dec_sequence`
-
-- **What:** new skill `patterns:decimal_sequences`. Grade 4 · family decimals · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 4.OA.C.5, 5.NBT.B.7, EE M.EE.4.OA.5, M.EE.5.NBT.7
-- **Closes (White Rose steps):** Y5.B12.S9
-- **Teaches:** continuing and finding the rule of sequences with decimal steps (0.2, 0.4, 0.6 ... ; 1.5, 1.25, 1.0).
-- **Problem types:** (1) continue a decimal sequence; (2) find the rule; (3) fill a missing term; (4) decreasing sequences.
-- **Representation:** a number track with decimal steps; write the missing terms and the rule. Templates: `count-row`.
-- **Answer:** write the terms and the rule.
-- **Ladder:** O2 step 0.1 → 0.2 / 0.5 → 0.25; up → down · O3 step arrows drawn → none · O6 track / number line.
-- **Misconceptions:** 0.9 + 0.1 = 0.10; keeps the step in the wrong place (+0.01).
-
-### 21. Function Machines — `function_machine`
-
-- **What:** new skill `algebra:function_machines`. Grade 5 · family algebra · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 5.OA.A.2, EE -
-- **Closes (White Rose steps):** Y6.B7.S2
-- **Teaches:** 1-step and 2-step function machines: find the output, the input (work backwards) or the rule.
-- **Problem types:** (1) find the output; (2) find the input (work backwards); (3) find the rule from pairs; (4) two-step machine.
-- **Representation:** drawn machine boxes with arrows; fill the empty box. Templates: `function-table`.
-- **Answer:** write the number in the empty box; write the rule.
-- **Ladder:** O2 one step (+ −) → one step (× ÷) → two steps · O3 inverse arrow drawn → none · O6 machine picture / table.
-- **Misconceptions:** applies the rule forwards when working backwards; reads a two-step machine in the wrong order.
-
-### 22. Two Quantities That Change Together — `two_variables`
+### 25. Two Quantities That Change Together — `two_variables`
 
 - **What:** new skill `algebra:two_variable_relationships`. Grade 6 · family algebra · source standards audit.
 - **Closes (standards):** 6.EE.C.9 · tag with CCSS 6.EE.C.9, EE -
@@ -1156,59 +1552,65 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Misconceptions:** swaps dependent and independent; adds the rate instead of multiplying.
 - **After:** `function_machine`.
 
-### 23. Shape Patterns with Turns — `pattern_turns`
+### 26. Write Number Expressions (option) — `write_numeric_expression`
 
-- **What:** new skill `patterns:patterns_with_turns`. Grade 1 · family geometry · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 1.G.A.1, EE M.EE.1.G.1
-- **Closes (White Rose steps):** Y2.B11.S5
-- **Teaches:** continuing patterns made by turning a shape (quarter turns clockwise).
-- **Problem types:** (1) continue a turning pattern; (2) which tile comes next?; (3) describe the turn each time; (4) find the mistake.
-- **Representation:** a row of arrow or shape tiles turning; draw or circle the next one. Templates: `legacy`; new: `picture-row`, `angle-kit`.
-- **Answer:** draw or circle the next tile.
-- **Ladder:** O2 quarter turns → half turns → mixed · O3 turn arrow between tiles → none · O6 arrows / shapes.
-- **Misconceptions:** turns the wrong way; repeats the first tile.
+- **What:** option on `algebra:write_expression`: numbers only, with brackets ("add 8 and 7, then multiply by 2" = 2 × (8 + 7)) and "interpret without calculating". Grade 5 · family algebra · source standards audit.
+- **Closes (standards):** 5.OA.A.2 · tag with CCSS 5.OA.A.2, EE -
+- **Closes (White Rose steps):** none
+- **Teaches:** writing numerical expressions that record calculations, with brackets, and interpreting expressions without evaluating them.
+- **Problem types:** (1) words → expression with brackets; (2) expression → words (bank); (3) 3 × (a + b) is how many times a + b?; (4) which expression matches?.
+- **Representation:** Templates: `equation`; new: `expression`.
+- **Answer:** write the expression; circle from a bank.
+- **Ladder:** O2 one operation → two with brackets · O3 bracket boxes printed → none · O6 plain.
+- **Misconceptions:** writes 2 × 8 + 7 for "add then multiply"; evaluates when asked to interpret.
 
-### 24. Number Words 0 to 10 (option) — `words_0_10`
+### 27. Count in 3s — `count_3s`
 
-- **What:** option on `composing:number_word_form`: words 0-10. Grade K · family counting · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS K.CC.A.3, 2.NBT.A.3, EE M.EE.2.NBT.3
-- **Closes (White Rose steps):** Y1.B1.S5
-- **Teaches:** reading and writing the number words zero to ten (the skill starts at 10).
-- **Problem types:** (1) numeral to word; (2) word to numeral; (3) match the word to the picture count; (4) spell the missing letters.
-- **Representation:** a band option "0 to 10" on the existing skill: numeral to word and word to numeral. Templates: `wordpic`.
-- **Answer:** write the numeral or copy the word from a bank.
-- **Ladder:** O2 0-5 → 0-10 · O3 word bank with pictures → bank only → none · O6 word bank / trace.
-- **Misconceptions:** writes the word for the next number; confuses six/seven, two/three spellings.
+- **What:** new skill `patterns:count_in_3s`. Grade 1 · family counting · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 1.NBT.A.1, EE M.EE.1.NBT.1
+- **Closes (White Rose steps):** Y2.B1.S16
+- **Teaches:** counting forwards and backwards in 3s from 0 (the step before the 3 times-table).
+- **Problem types:** (1) count on in 3s; (2) count back in 3s; (3) fill the missing 3s; (4) jumps on the number line.
+- **Representation:** a number track and a number line jumping in 3s; write the missing numbers. Templates: `count-row`, `hop-line`.
+- **Answer:** write the missing numbers.
+- **Ladder:** O2 to 15 → to 36; forwards → backwards · O3 hops drawn → none · O6 track / line.
+- **Misconceptions:** adds 2 or 4 at the crossing of a ten; loses the count after 12.
 
-## Lane `fractions`: Fractions, decimals, conversions, ratio (38)
+### 28. Decimal Sequences — `dec_sequence`
 
-Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js/modules/svg-fractions.js`.
+- **What:** new skill `patterns:decimal_sequences`. Grade 4 · family decimals · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 4.OA.C.5, 5.NBT.B.7, EE M.EE.4.OA.5, M.EE.5.NBT.7
+- **Closes (White Rose steps):** Y5.B12.S9
+- **Teaches:** continuing and finding the rule of sequences with decimal steps (0.2, 0.4, 0.6 ... ; 1.5, 1.25, 1.0).
+- **Problem types:** (1) continue a decimal sequence; (2) find the rule; (3) fill a missing term; (4) decreasing sequences.
+- **Representation:** a number track with decimal steps; write the missing terms and the rule. Templates: `count-row`.
+- **Answer:** write the terms and the rule.
+- **Ladder:** O2 step 0.1 → 0.2 / 0.5 → 0.25; up → down · O3 step arrows drawn → none · O6 track / number line.
+- **Misconceptions:** 0.9 + 0.1 = 0.10; keeps the step in the wrong place (+0.01).
 
-### 1. Count in Fractions — `frac_count`
+## Lane `fractions`: Fractions, decimals, conversions, ratio (45)
 
-- **What:** new skill `fractions:count_in_fractions`. Grade 1-3 · family fractions · source White Rose audit.
-- **Closes (standards):** 3.NF.A.3a, 3.NF.A.3c · tag with CCSS 3.NF.A.1, 3.NF.A.3c, 3.NF.A.2, 3.NF.A.3a, EE M.EE.3.NF.1, M.EE.3.NF.3, M.EE.3.NF.2
-- **Closes (White Rose steps):** Y2.B8.S15, Y3.B6.S8, Y3.B6.S9, Y4.B7.S9
-- **Teaches:** counting up and down in unit fractions on a number line and past a whole (1/4, 2/4, 3/4, 1, 1 1/4).
-- **Extended for the standards:** locate 4/4 and 1 (and 6/3 and 2) at the same point.
-- **Problem types:** (1) count up in unit fractions; (2) count past a whole (3/4, 1, 1 1/4); (3) fill missing ticks on a line; (4) equivalent fractions at the same point; (5) count down.
-- **Representation:** a number line with fraction ticks; fill the missing counts. Templates: `number-line`, `count-row`.
-- **Answer:** write the missing fractions.
-- **Ladder:** O2 within 1 → past 1 → mixed numbers · O3 all ticks labelled → some → ends · O6 line / track.
-- **Misconceptions:** counts 1/4, 2/4, 3/4, 4/4, 5/4 without naming 1; adds to the denominator (1/4, 1/5, 1/6).
+Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred-square,double-scale}.js`, `js/modules/sheet/cells/panes/operator-arcs.js`, `js/modules/svg-fractions.js`. Builds templates: `hundred-square`, `double-scale`, `operator-arcs`.
 
-### 2. Equal and Unequal Parts — `fraction_parts`
+### 1. Fraction Bar Modes (stack, wholes, split, cross, braces) — `vis_frac_bar_modes`
 
-- **What:** new skill `fractions:equal_parts`. Grade 1 · family fractions · source White Rose audit.
-- **Closes (standards):** 2.G.A.3, M.EE.3.G.2 · tag with CCSS 1.G.A.3, 2.G.A.3, EE M.EE.1.G.3, M.EE.3.G.2
-- **Closes (White Rose steps):** Y2.B8.S1, Y2.B8.S2, Y2.B8.S9
-- **Teaches:** parts and wholes; deciding whether parts are equal; finding the whole from a part.
-- **Extended for the standards:** thirds; "the whole is three thirds"; equal shares of identical wholes need not have the same shape; recognise equal areas (EE).
-- **Problem types:** (1) equal or not equal? tick; (2) draw the whole from a part; (3) how many parts? are they equal?; (4) thirds: the whole is three thirds; (5) same size, different shape.
-- **Representation:** shapes split into parts; tick equal / not equal; draw the whole from a half or a quarter. Templates: `frac-model`.
-- **Answer:** tick, count or draw.
-- **Ladder:** O2 halves → thirds → quarters; draw the whole · O3 grid under the shape → none · O6 shapes / strips.
-- **Misconceptions:** counts parts without checking they are equal; thinks equal parts must look the same.
+- **Added from visual catalogue.** option · grade PK-5 · lane `fractions`.
+- **Build:** frac-model `bar` gains `stack` (equal-length stacked bars, the wall), `wholes` (mixed numbers, bars past one), `split` (a dashed re-split), `cross: k` (hatched or X over parts), `brackets` / braces, `copies`, `labels: 'unit' | 'decimal'` (tenths labelled) and `whole: '100%'`.
+- **Offered on:** `fractions:compare`, `fractions:equiv_frac_visual`, `fractions:mixed_improper_visual`.
+- **Templates:** `frac-model`. **Files:** `js/modules/sheet/cells/frac-model.js`.
+- **Draws (visual catalogue):** V032 Crossed-out counters, blocks, disks and fraction parts; V054 Fraction bars / wall (stacked, split, wholes, braces); V164 Mixed numbers / improper fractions across several wholes; V166 Tenths pictured (bar, frame, 0–1 line).
+- **Reach:** 78 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 2. Fraction Line Modes (past 1, hops, blocks, two lines) — `vis_frac_line_modes`
+
+- **Added from visual catalogue.** option · grade K-5 · lane `fractions`.
+- **Build:** frac-model `line` gains `max` past 1 (0–3, 0–4), `hops`, `blocks` (fraction blocks sitting on the line), `segments`, `stack: 2` with links, circles above the ticks, and `labels: {above, below}` by form (fraction, decimal, percent).
+- **Offered on:** `fractions:fraction_nl_drag`, `fractions:mixed_nl_drag`, `fractions:equiv_frac_nv`.
+- **Templates:** `frac-model`. **Files:** `js/modules/sheet/cells/frac-model.js`.
+- **Draws (visual catalogue):** V020 Open number line with labelled hops (bridge, compensate, fractions); V055 Fraction number line (past 1; blocks on the line); V056 Two stacked fraction lines; multi-labelled line (F, D, %).
+- **Reach:** 61 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
 ### 3. Tenths and Hundredths in a Place-Value Chart — `decimal_pv`
 
@@ -1221,33 +1623,10 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Answer:** write the decimal / the parts.
 - **Ladder:** O2 tenths → hundredths → flexible · O3 chart headings with counters → headings only → none · O6 counters / base-10 (flat = 1) / chart.
 - **Misconceptions:** writes 0.6 for 6 hundredths; thinks 0.36 has 36 tenths.
+- **After:** `vis_pv_decimal_places` (lane `placevalue`).
+- **Visual catalogue:** also draws V166 Tenths pictured (bar, frame, 0–1 line); V167 Decimal place-value chart and counters (Tth, Hth, Thth) (reach 40 steps).
 
-### 4. Compare Fractions by Numerator (option) — `compare_numerator`
-
-- **What:** option on `fractions:compare`: same numerator. Grade 5 · family fractions · source White Rose audit.
-- **Closes (standards):** 3.NF.A.3d, M.EE.6.NS.1 · tag with CCSS 4.NF.A.2, 3.NF.A.3d, EE M.EE.4.NF.2, M.EE.6.NS.1
-- **Closes (White Rose steps):** Y6.B3.S4
-- **Teaches:** comparing and ordering fractions with the same numerator (3/5 > 3/7) and by denominators.
-- **Extended for the standards:** Grade 3 same-numerator comparisons and unit fractions (1/3 vs 1/5) with models, for the EE.
-- **Problem types:** (1) same numerator: which is greater?; (2) unit fractions (1/3 vs 1/5, EE); (3) order by numerator; (4) same whole? can we compare?.
-- **Representation:** a comparison-type option on compare/order. Templates: `frac-model`, `compare`.
-- **Answer:** write <, > or =.
-- **Ladder:** O2 unit fractions → same numerator → mixed · O3 bars under each → none · O6 bars / circles.
-- **Misconceptions:** 1/5 > 1/3 because 5 > 3; compares fractions of different wholes.
-
-### 5. Decimals from Known Facts — `dec_known_facts`
-
-- **What:** new skill `decimals:decimal_known_facts`. Grade 4 · family decimals · source White Rose audit.
-- **Closes (standards):** 5.NBT.B.7 · tag with CCSS 4.NBT.B.4, 5.NBT.B.7, EE M.EE.4.NBT.4, M.EE.5.NBT.7
-- **Closes (White Rose steps):** Y5.B12.S1, Y5.B12.S2, Y5.B12.S8
-- **Teaches:** adding and subtracting decimals within 1 using known facts (3 + 4 = 7 so 0.3 + 0.4 = 0.7), complements to 1 and efficient strategies.
-- **Problem types:** (1) use a whole fact for tenths (3 + 4 → 0.3 + 0.4); (2) subtract with a known fact; (3) complements to 1; (4) choose an efficient strategy.
-- **Representation:** a fact and its decimal twin; write the answer; option: complements to 1. Templates: `fact`, `bond`.
-- **Answer:** write the answer.
-- **Ladder:** O2 tenths → hundredths → crossing 1 · O3 the whole fact printed beside → none · O6 fact pair / bond.
-- **Misconceptions:** 0.3 + 0.4 = 0.07; forgets to exchange 10 tenths for 1.
-
-### 6. Thousandths (option) — `thousandths_pv`
+### 4. Thousandths (option) — `thousandths_pv`
 
 - **What:** option on `decimals:decimal_place_value`: thousandths. Grade 4 · family decimals · source White Rose audit.
 - **Closes (standards):** 5.NBT.A.3a · tag with CCSS 4.NF.C.6, 5.NBT.A.3, 4.NBT.A.1, 5.NBT.A.3a, EE M.EE.5.NBT.3
@@ -1259,46 +1638,67 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Answer:** write the decimal, fraction, words (bank) or expanded form.
 - **Ladder:** O2 x/1000 → mixed places → words and expanded · O3 chart headings → none · O6 chart / counters.
 - **Misconceptions:** 0.034 read as thirty-four tenths; writes 0.34 for 34 thousandths.
-- **After:** `decimal_pv`.
+- **After:** `decimal_pv`, `vis_pv_decimal_places` (lane `placevalue`).
+- **Visual catalogue:** also draws V167 Decimal place-value chart and counters (Tth, Hth, Thth) (reach 39 steps).
 
-### 7. Decimal Place Value (option) — `dec_pv_within1`
+### 5. Fraction of an Amount: Find the Whole (option) — `frac_find_whole`
 
-- **What:** option on `decimals:decimal_place_value`: within 1 and integers. Grade 5 · family decimals · source White Rose audit.
-- **Closes (standards):** 5.NBT.A.1 · tag with CCSS 5.NBT.A.1, 5.NBT.A.3, EE M.EE.5.NBT.1, M.EE.5.NBT.3
-- **Closes (White Rose steps):** Y6.B8.S1, Y6.B8.S2
-- **Teaches:** the value of each digit in decimals within 1 and in numbers with integer and decimal parts.
-- **Problem types:** (1) value of each digit to thousandths; (2) numbers with integer and decimal parts; (3) partition 4.305; (4) which digit is worth 5 hundredths?.
-- **Representation:** the decimal_pv proposal with thousandths and integer parts. Templates: `pv`, `pv-support`.
-- **Answer:** write the value or the digit.
-- **Ladder:** O2 within 1 → integer parts → zeros inside · O3 chart headings → none · O6 chart / expanded.
-- **Misconceptions:** ignores a zero place; reads the decimal part as a whole number.
-- **After:** `decimal_pv`.
+- **What:** option on `fractions:fraction_of_set_hard_nv`: find the whole. Grade 5 · family fractions · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 5.NF.B.4, EE -
+- **Closes (White Rose steps):** Y6.B4.S7
+- **Teaches:** finding the whole from a known fractional part with a bar model (3/5 is 24, what is the whole?).
+- **Problem types:** (1) 3/5 is 24: what is the whole?; (2) unit fraction first; (3) story version; (4) check by finding the fraction.
+- **Representation:** a "find the whole" task option with a bar model support. Templates: `frac-model`, `word-work`; new: `bar-model`.
+- **Answer:** write the whole.
+- **Ladder:** O2 unit → non-unit · O3 bar with the known parts labelled → none · O6 bar / plain.
+- **Misconceptions:** multiplies 24 by 3/5; divides by the denominator only.
+- **Visual catalogue:** also draws V027 Equal-parts bar (fraction of an amount, find the whole) (reach 31 steps).
 
-### 8. Compare Fractions of the Same Whole (option) — `frac_same_whole`
+### 6. Fraction Area Modes (two-way split, several wholes, regions) — `vis_frac_area_modes`
 
-- **What:** option on `fractions:compare`: items "same whole?": two fractions of different-size wholes (can we compare?) and justify a comparison with a model. Grade 3-4 · family fractions · source standards audit.
-- **Closes (standards):** 3.NF.A.3d, 4.NF.A.2 · tag with CCSS 3.NF.A.3d, 4.NF.A.2, EE M.EE.4.NF.2
-- **Closes (White Rose steps):** none
-- **Teaches:** comparisons of fractions are valid only when they refer to the same whole; justify with a visual model.
-- **Problem types:** (1) half of a small pizza vs a third of a large one: can we compare?; (2) draw both on the same whole; (3) justify: tick the model that proves it; (4) compare, then show.
-- **Representation:** Templates: `frac-model`, `compare`.
-- **Answer:** write <, > or =, or tick "cannot tell".
-- **Ladder:** O2 same denominator → same numerator → different · O3 models drawn on equal bars → none · O6 bars / circles.
-- **Misconceptions:** a half is always bigger than a third; the bigger picture is the bigger fraction.
-- **After:** `compare_numerator`.
+- **Added from visual catalogue.** option · grade K-5 · lane `fractions`.
+- **Build:** frac-model `area` / `circle` gain `split: [a, b]` (two-way), several wholes, `task: 'cut' | 'complete-half' | 'whole-from-part'`, `ring: k` grouping, named regions, and `model: 'area2'` (fraction × fraction: split one way then the other, overlap shaded).
+- **Offered on:** `fractions:identify`, `fractions:shade_fraction`, `fraction_operations:mult_frac_frac`.
+- **Templates:** `frac-model`. **Files:** `js/modules/sheet/cells/frac-model.js`.
+- **Draws (visual catalogue):** V053 Fraction shapes (equal / unequal parts, shade, cut); V194 Two-way area grid for fraction × fraction; V209 Region / area diagram of fractions.
+- **Reach:** 28 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 9. Halves and Quarters — `half_quarter`
+### 7. Migrate Legacy Fraction Visuals to B&W Kit Cells — `vis_migrate_fraction_ops`
 
-- **What:** new skill `fractions:halves_and_quarters`. Grade K · family fractions · source White Rose audit.
-- **Closes (standards):** 1.G.A.3 · tag with CCSS 1.G.A.3, EE M.EE.1.G.3
-- **Closes (White Rose steps):** Y1.B10.S3, Y1.B10.S7
-- **Teaches:** finding and recognising a half and a quarter of a shape, an object and a small quantity (equal parts, 2 or 4).
-- **Extended for the standards:** the words halves / fourths / quarters, "the whole is two halves / four quarters", and "more shares, smaller shares".
-- **Problem types:** (1) shade a half / a quarter of a shape; (2) circle half / a quarter of a set; (3) are the parts equal? tick; (4) the whole is two halves / four quarters; (5) which is bigger: a half or a quarter?.
-- **Representation:** shapes and small sets of objects; shade or circle a half/quarter; tick if the parts are equal. Templates: `frac-model`, `counters`.
-- **Answer:** shade, circle or tick; words half / quarter from a bank.
-- **Ladder:** O2 half → quarter → mix; shapes → quantities · O3 cut lines drawn → none · O6 shapes / objects.
-- **Misconceptions:** any two parts is a half; a quarter is bigger because 4 > 2.
+- **Added from visual catalogue.** migration · grade K-5 · lane `fractions`.
+- **Build:** every fraction skill still drawing a legacy colour strip or circle moves onto frac-model / arrays: fraction_of_set (ringed groups on template:arrays), mixed_improper_visual, improper_mixed (fraction counters ringed into wholes), fraction_bar_ops, mult_frac_frac, equiv_frac_nv, composing:fraction_number_line, frac_10_100, percent_visual and double_num_line; then delete their legacy branches.
+- **Offered on:** `fractions:fraction_of_set`, `fractions:mixed_improper_visual`, `fractions:improper_mixed`, `fractions:fraction_bar_ops`, `fraction_operations:mult_frac_frac`, `fractions:equiv_frac_nv`, `composing:fraction_number_line`, `fraction_operations:frac_10_100`.
+- **Templates:** `frac-model`, `arrays`. **Files:** `js/modules/gen-fractions.js`, `js/modules/svg-fractions.js`.
+- **Draws (visual catalogue):** V054 Fraction bars / wall (stacked, split, wholes, braces); V055 Fraction number line (past 1; blocks on the line); V057 Fraction of a set (objects ringed into groups); V165 Fraction counters ringed into wholes.
+- **Reach:** 74 White Rose small steps use these pictures.
+- **After:** `vis_frac_bar_modes`, `vis_frac_line_modes`, `vis_frac_area_modes`.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 8. Hundred Square as One Whole (and the thousand square) — `vis_hundred_square`
+
+- **Added from visual catalogue.** template · grade 1-5 · lane `fractions`.
+- **Build:** a new hundred-square template: a 10 × 10 square as one whole (columns = tenths, cells = hundredths), shade or read, `labels: 'decimal' | 'fraction' | 'percent'`, two squares for more than 1, `grid: 1000`, and the two-tone complement mode the operations entry bonds_100 uses.
+- **Offered on:** `conversions:percent_visual`, `fraction_operations:frac_10_100`, `decimals:decimal_place_value`.
+- **Templates:** -; new or owned: `hundred-square`. **Files:** `js/modules/sheet/cells/hundred-square.js`.
+- **Draws (visual catalogue):** V024 10 × 10 square: two-tone complement, hundredths, percent; V176 Thousand square.
+- **Reach:** 23 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 9. Equivalent Fractions on a Number Line (option) — `frac_nl_equiv`
+
+- **What:** option on `fractions:equiv_frac_visual`: number lines. Grade 5 · family fractions · source White Rose audit.
+- **Closes (standards):** 3.NF.A.3a · tag with CCSS 4.NF.A.1, 3.NF.A.3a, EE M.EE.4.NF.1
+- **Closes (White Rose steps):** Y6.B3.S2
+- **Teaches:** equivalent fractions shown on stacked number lines.
+- **Extended for the standards:** Grade 3 level (halves, quarters, eighths) for 3.NF.A.3a, not only Year 6.
+- **Problem types:** (1) equivalent fractions at one point on two lines; (2) same point on the number line?; (3) write the equivalent from stacked lines; (4) find the matching tick.
+- **Representation:** a double number-line representation option. Templates: `number-line`, `frac-model`.
+- **Answer:** write the fraction.
+- **Ladder:** O2 halves/quarters → thirds/sixths → eighths · O3 dashed line across the stacked lines → none · O6 stacked lines / bars.
+- **Misconceptions:** thinks more ticks mean a bigger number; matches numerators.
+- **After:** `vis_frac_line_modes`.
+- **Visual catalogue:** also draws V056 Two stacked fraction lines; multi-labelled line (F, D, %) (reach 12 steps).
 
 ### 10. Fractions Beyond 1 — `frac_beyond_1`
 
@@ -1311,8 +1711,162 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Answer:** write the mixed number or improper fraction.
 - **Ladder:** O2 halves → quarters → eighths; to 2 → to 5 · O3 wholes shaded solid → none · O6 bars / circles / line.
 - **Misconceptions:** writes 1 1/4 as 11/4; counts all parts as the denominator.
+- **After:** `vis_frac_bar_modes`.
+- **Visual catalogue:** also draws V164 Mixed numbers / improper fractions across several wholes (reach 9 steps).
 
-### 11. Multi-Step Fraction Problems — `frac_multistep`
+### 11. Percentages: Multi-Step and Missing Values (option) — `percent_multi`
+
+- **What:** option on `conversions:percent_of_number`: multi-step. Grade 5 · family decimals · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 6.RP.A.3, EE -
+- **Closes (White Rose steps):** Y6.B9.S8 · strengthens Y6.B9.S9
+- **Teaches:** percentage of an amount in two steps (increase/decrease), and missing values (what percent is 12 of 40?).
+- **Problem types:** (1) percent of an amount in two steps (10% then 30%); (2) increase / decrease; (3) what percent is 12 of 40?; (4) missing whole.
+- **Representation:** task options on percent_of_number. Templates: `word-work`; new: `bar-model`.
+- **Answer:** write the amount or the percent.
+- **Ladder:** O2 10%, 50% → multiples of 10% → any · O3 bar split into 10% parts → none · O6 bar / table.
+- **Misconceptions:** adds the percent as a number (40 + 30% = 70); finds 30% and stops for an increase.
+- **Visual catalogue:** also draws V196 Percentage bar (reach 11 steps).
+
+### 12. Operator Arcs (pane) — `vis_operator_arcs`
+
+- **Added from visual catalogue.** pane · grade 4-5 · lane `fractions`.
+- **Build:** a new pane:operator-arcs: an arc with an operator box above and below a pair (× n / ÷ n on numerator and denominator, + / − between numbers, the 2 × 2 proportion arrow box), a support value on the equivalence, percent and double-line skills.
+- **Offered on:** `fractions:equivalent`, `fractions:simplify`, `conversions:f_to_p`.
+- **Templates:** -; new or owned: `operator-arcs`. **Files:** `js/modules/sheet/cells/panes/operator-arcs.js`.
+- **Draws (visual catalogue):** V187 Operator arcs (× n / ÷ n, + / − above and below a pair).
+- **Reach:** 12 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 13. Double and Triple Number Lines — `vis_double_scale`
+
+- **Added from visual catalogue.** template · grade 1-5 · lane `fractions`.
+- **Build:** a new double-scale template: two or three aligned scales (kg | g, m | cm, h | min; fraction | decimal | percent; a ratio) with blanks on either row and operator arcs above / below; conversions:double_num_line leaves the legacy path.
+- **Offered on:** `conversions:double_num_line`, `measurement:unit_conversions`, `conversions:f_to_p`.
+- **Templates:** -; new or owned: `double-scale`. **Files:** `js/modules/sheet/cells/double-scale.js`.
+- **Draws (visual catalogue):** V048 Double / triple number line (units; F | D | %; ratio).
+- **Reach:** 20 White Rose small steps use these pictures.
+- **After:** `vis_operator_arcs`.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 14. Count in Fractions — `frac_count`
+
+- **What:** new skill `fractions:count_in_fractions`. Grade 1-3 · family fractions · source White Rose audit.
+- **Closes (standards):** 3.NF.A.3a, 3.NF.A.3c · tag with CCSS 3.NF.A.1, 3.NF.A.3c, 3.NF.A.2, 3.NF.A.3a, EE M.EE.3.NF.1, M.EE.3.NF.3, M.EE.3.NF.2
+- **Closes (White Rose steps):** Y2.B8.S15, Y3.B6.S8, Y3.B6.S9, Y4.B7.S9
+- **Teaches:** counting up and down in unit fractions on a number line and past a whole (1/4, 2/4, 3/4, 1, 1 1/4).
+- **Extended for the standards:** locate 4/4 and 1 (and 6/3 and 2) at the same point.
+- **Problem types:** (1) count up in unit fractions; (2) count past a whole (3/4, 1, 1 1/4); (3) fill missing ticks on a line; (4) equivalent fractions at the same point; (5) count down.
+- **Representation:** a number line with fraction ticks; fill the missing counts. Templates: `number-line`, `count-row`.
+- **Answer:** write the missing fractions.
+- **Ladder:** O2 within 1 → past 1 → mixed numbers · O3 all ticks labelled → some → ends · O6 line / track.
+- **Misconceptions:** counts 1/4, 2/4, 3/4, 4/4, 5/4 without naming 1; adds to the denominator (1/4, 1/5, 1/6).
+- **After:** `vis_frac_line_modes`.
+- **Visual catalogue:** also draws V093 Count in fractions as a picture sequence (reach 1 steps).
+
+### 15. Ratio and Proportion Problems — `ratio_problems`
+
+- **What:** new skill `conversions:ratio_problems_bar`. Grade 5 · family ratio · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 6.RP.A.3, EE -
+- **Closes (White Rose steps):** Y6.B6.S10
+- **Teaches:** ratio, proportion and recipe problems solved with a bar model or ratio table.
+- **Problem types:** (1) recipe for more people; (2) share in a ratio; (3) bar model; (4) ratio table.
+- **Representation:** a bar model / ratio table beside a short story; write the missing amount. Templates: `word-work`; new: `bar-model`, `data-table`.
+- **Answer:** write the amount.
+- **Ladder:** O2 simple → two-step · O3 bar model → none · O6 bar / table.
+- **Misconceptions:** adds instead of scaling; uses the ratio numbers as amounts.
+- **Visual catalogue:** also draws V028 Scaling / ratio bar (1 box vs n boxes; a : b rows) (reach 8 steps).
+
+### 16. Scale Drawing and Scale Factors — `scale`
+
+- **What:** new skill `conversions:scale_drawing`. Grade 5 · family ratio · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 6.RP.A.3, 5.NF.B.5, EE -
+- **Closes (White Rose steps):** Y6.B6.S5, Y6.B6.S6, Y6.B6.S7
+- **Teaches:** enlarging shapes by a scale factor, scale drawings and similar shapes (find the missing side).
+- **Problem types:** (1) enlarge by a scale factor; (2) find the scale factor; (3) missing side of similar shapes; (4) scale drawing lengths.
+- **Representation:** shapes on squared paper with one side of the image given; write the scale factor or the missing side. Templates: `legacy`; new: `shape-grid`.
+- **Answer:** write the factor or the length.
+- **Ladder:** O2 factors 2, 3 → fractions · O3 grid → none · O6 grid / plain.
+- **Misconceptions:** adds the scale factor; enlarges one side only.
+- **Visual catalogue:** also draws V173 Scale drawing (plan vs actual); V197 Similar shapes with letter unknowns (reach 5 steps).
+
+### 17. Equal and Unequal Parts — `fraction_parts`
+
+- **What:** new skill `fractions:equal_parts`. Grade 1 · family fractions · source White Rose audit.
+- **Closes (standards):** 2.G.A.3, M.EE.3.G.2 · tag with CCSS 1.G.A.3, 2.G.A.3, EE M.EE.1.G.3, M.EE.3.G.2
+- **Closes (White Rose steps):** Y2.B8.S1, Y2.B8.S2, Y2.B8.S9
+- **Teaches:** parts and wholes; deciding whether parts are equal; finding the whole from a part.
+- **Extended for the standards:** thirds; "the whole is three thirds"; equal shares of identical wholes need not have the same shape; recognise equal areas (EE).
+- **Problem types:** (1) equal or not equal? tick; (2) draw the whole from a part; (3) how many parts? are they equal?; (4) thirds: the whole is three thirds; (5) same size, different shape.
+- **Representation:** shapes split into parts; tick equal / not equal; draw the whole from a half or a quarter. Templates: `frac-model`.
+- **Answer:** tick, count or draw.
+- **Ladder:** O2 halves → thirds → quarters; draw the whole · O3 grid under the shape → none · O6 shapes / strips.
+- **Misconceptions:** counts parts without checking they are equal; thinks equal parts must look the same.
+
+### 18. Compare Fractions by Numerator (option) — `compare_numerator`
+
+- **What:** option on `fractions:compare`: same numerator. Grade 5 · family fractions · source White Rose audit.
+- **Closes (standards):** 3.NF.A.3d, M.EE.6.NS.1 · tag with CCSS 4.NF.A.2, 3.NF.A.3d, EE M.EE.4.NF.2, M.EE.6.NS.1
+- **Closes (White Rose steps):** Y6.B3.S4
+- **Teaches:** comparing and ordering fractions with the same numerator (3/5 > 3/7) and by denominators.
+- **Extended for the standards:** Grade 3 same-numerator comparisons and unit fractions (1/3 vs 1/5) with models, for the EE.
+- **Problem types:** (1) same numerator: which is greater?; (2) unit fractions (1/3 vs 1/5, EE); (3) order by numerator; (4) same whole? can we compare?.
+- **Representation:** a comparison-type option on compare/order. Templates: `frac-model`, `compare`.
+- **Answer:** write <, > or =.
+- **Ladder:** O2 unit fractions → same numerator → mixed · O3 bars under each → none · O6 bars / circles.
+- **Misconceptions:** 1/5 > 1/3 because 5 > 3; compares fractions of different wholes.
+
+### 19. Decimals from Known Facts — `dec_known_facts`
+
+- **What:** new skill `decimals:decimal_known_facts`. Grade 4 · family decimals · source White Rose audit.
+- **Closes (standards):** 5.NBT.B.7 · tag with CCSS 4.NBT.B.4, 5.NBT.B.7, EE M.EE.4.NBT.4, M.EE.5.NBT.7
+- **Closes (White Rose steps):** Y5.B12.S1, Y5.B12.S2, Y5.B12.S8
+- **Teaches:** adding and subtracting decimals within 1 using known facts (3 + 4 = 7 so 0.3 + 0.4 = 0.7), complements to 1 and efficient strategies.
+- **Problem types:** (1) use a whole fact for tenths (3 + 4 → 0.3 + 0.4); (2) subtract with a known fact; (3) complements to 1; (4) choose an efficient strategy.
+- **Representation:** a fact and its decimal twin; write the answer; option: complements to 1. Templates: `fact`, `bond`.
+- **Answer:** write the answer.
+- **Ladder:** O2 tenths → hundredths → crossing 1 · O3 the whole fact printed beside → none · O6 fact pair / bond.
+- **Misconceptions:** 0.3 + 0.4 = 0.07; forgets to exchange 10 tenths for 1.
+
+### 20. Decimal Place Value (option) — `dec_pv_within1`
+
+- **What:** option on `decimals:decimal_place_value`: within 1 and integers. Grade 5 · family decimals · source White Rose audit.
+- **Closes (standards):** 5.NBT.A.1 · tag with CCSS 5.NBT.A.1, 5.NBT.A.3, EE M.EE.5.NBT.1, M.EE.5.NBT.3
+- **Closes (White Rose steps):** Y6.B8.S1, Y6.B8.S2
+- **Teaches:** the value of each digit in decimals within 1 and in numbers with integer and decimal parts.
+- **Problem types:** (1) value of each digit to thousandths; (2) numbers with integer and decimal parts; (3) partition 4.305; (4) which digit is worth 5 hundredths?.
+- **Representation:** the decimal_pv proposal with thousandths and integer parts. Templates: `pv`, `pv-support`.
+- **Answer:** write the value or the digit.
+- **Ladder:** O2 within 1 → integer parts → zeros inside · O3 chart headings → none · O6 chart / expanded.
+- **Misconceptions:** ignores a zero place; reads the decimal part as a whole number.
+- **After:** `decimal_pv`, `vis_pv_decimal_places` (lane `placevalue`).
+
+### 21. Compare Fractions of the Same Whole (option) — `frac_same_whole`
+
+- **What:** option on `fractions:compare`: items "same whole?": two fractions of different-size wholes (can we compare?) and justify a comparison with a model. Grade 3-4 · family fractions · source standards audit.
+- **Closes (standards):** 3.NF.A.3d, 4.NF.A.2 · tag with CCSS 3.NF.A.3d, 4.NF.A.2, EE M.EE.4.NF.2
+- **Closes (White Rose steps):** none
+- **Teaches:** comparisons of fractions are valid only when they refer to the same whole; justify with a visual model.
+- **Problem types:** (1) half of a small pizza vs a third of a large one: can we compare?; (2) draw both on the same whole; (3) justify: tick the model that proves it; (4) compare, then show.
+- **Representation:** Templates: `frac-model`, `compare`.
+- **Answer:** write <, > or =, or tick "cannot tell".
+- **Ladder:** O2 same denominator → same numerator → different · O3 models drawn on equal bars → none · O6 bars / circles.
+- **Misconceptions:** a half is always bigger than a third; the bigger picture is the bigger fraction.
+- **After:** `compare_numerator`.
+
+### 22. Halves and Quarters — `half_quarter`
+
+- **What:** new skill `fractions:halves_and_quarters`. Grade K · family fractions · source White Rose audit.
+- **Closes (standards):** 1.G.A.3 · tag with CCSS 1.G.A.3, EE M.EE.1.G.3
+- **Closes (White Rose steps):** Y1.B10.S3, Y1.B10.S7
+- **Teaches:** finding and recognising a half and a quarter of a shape, an object and a small quantity (equal parts, 2 or 4).
+- **Extended for the standards:** the words halves / fourths / quarters, "the whole is two halves / four quarters", and "more shares, smaller shares".
+- **Problem types:** (1) shade a half / a quarter of a shape; (2) circle half / a quarter of a set; (3) are the parts equal? tick; (4) the whole is two halves / four quarters; (5) which is bigger: a half or a quarter?.
+- **Representation:** shapes and small sets of objects; shade or circle a half/quarter; tick if the parts are equal. Templates: `frac-model`, `counters`.
+- **Answer:** shade, circle or tick; words half / quarter from a bank.
+- **Ladder:** O2 half → quarter → mix; shapes → quantities · O3 cut lines drawn → none · O6 shapes / objects.
+- **Misconceptions:** any two parts is a half; a quarter is bigger because 4 > 2.
+
+### 23. Multi-Step Fraction Problems — `frac_multistep`
 
 - **What:** new skill `fraction_operations:fraction_multi_step_problems`. Grade 5 · family fractions · source White Rose audit.
 - **Closes (standards):** 5.NF.A.2 · tag with CCSS 5.NF.A.2, EE -
@@ -1324,20 +1878,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Ladder:** O2 like → unlike denominators · O3 bar model with steps → none · O6 bar / plain.
 - **Misconceptions:** answers the first step only; adds denominators.
 
-### 12. Equivalent Fractions on a Number Line (option) — `frac_nl_equiv`
-
-- **What:** option on `fractions:equiv_frac_visual`: number lines. Grade 5 · family fractions · source White Rose audit.
-- **Closes (standards):** 3.NF.A.3a · tag with CCSS 4.NF.A.1, 3.NF.A.3a, EE M.EE.4.NF.1
-- **Closes (White Rose steps):** Y6.B3.S2
-- **Teaches:** equivalent fractions shown on stacked number lines.
-- **Extended for the standards:** Grade 3 level (halves, quarters, eighths) for 3.NF.A.3a, not only Year 6.
-- **Problem types:** (1) equivalent fractions at one point on two lines; (2) same point on the number line?; (3) write the equivalent from stacked lines; (4) find the matching tick.
-- **Representation:** a double number-line representation option. Templates: `number-line`, `frac-model`.
-- **Answer:** write the fraction.
-- **Ladder:** O2 halves/quarters → thirds/sixths → eighths · O3 dashed line across the stacked lines → none · O6 stacked lines / bars.
-- **Misconceptions:** thinks more ticks mean a bigger number; matches numerators.
-
-### 13. Multiply a Mixed Number by an Integer (option) — `mult_mixed_int`
+### 24. Multiply a Mixed Number by an Integer (option) — `mult_mixed_int`
 
 - **What:** option on `fraction_operations:mult_frac_whole`: mixed numbers. Grade 4 · family fractions · source White Rose audit.
 - **Closes (standards):** 5.NF.B.6 · tag with CCSS 4.NF.B.4, 5.NF.B.6, EE -
@@ -1349,20 +1890,9 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Answer:** write the answer as a mixed number.
 - **Ladder:** O2 halves → other; × 2-5 · O3 repeated addition written → none · O6 bars / numbers.
 - **Misconceptions:** multiplies the whole only; forgets to regroup improper parts.
+- **After:** `vis_frac_bar_modes`.
 
-### 14. Scale Drawing and Scale Factors — `scale`
-
-- **What:** new skill `conversions:scale_drawing`. Grade 5 · family ratio · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 6.RP.A.3, 5.NF.B.5, EE -
-- **Closes (White Rose steps):** Y6.B6.S5, Y6.B6.S6, Y6.B6.S7
-- **Teaches:** enlarging shapes by a scale factor, scale drawings and similar shapes (find the missing side).
-- **Problem types:** (1) enlarge by a scale factor; (2) find the scale factor; (3) missing side of similar shapes; (4) scale drawing lengths.
-- **Representation:** shapes on squared paper with one side of the image given; write the scale factor or the missing side. Templates: `legacy`; new: `shape-grid`.
-- **Answer:** write the factor or the length.
-- **Ladder:** O2 factors 2, 3 → fractions · O3 grid → none · O6 grid / plain.
-- **Misconceptions:** adds the scale factor; enlarges one side only.
-
-### 15. Compare Decimals With Models (option) — `dec_compare_model`
+### 25. Compare Decimals With Models (option) — `dec_compare_model`
 
 - **What:** option on `decimals:compare_decimal`: support "hundred squares" beside each decimal and items "same whole?". Grade 4 · family decimals · source standards audit.
 - **Closes (standards):** 4.NF.C.7 · tag with CCSS 4.NF.C.7, EE -
@@ -1373,8 +1903,9 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Answer:** write <, > or =.
 - **Ladder:** O2 tenths → hundredths → mixed · O3 squares shaded → outline → none · O6 squares / strips.
 - **Misconceptions:** 0.45 > 0.5 because 45 > 5; more digits means bigger.
+- **After:** `vis_pv_decimal_places` (lane `placevalue`).
 
-### 16. Decimal Operations With Models (option) — `decimal_models`
+### 26. Decimal Operations With Models (option) — `decimal_models`
 
 - **What:** option on `decimals:add_decimal` (and `decimals:sub_decimal`, `decimals:mult_decimal`): support "decimal model": hundred squares or place-value counters beside the column, and an area model for decimal × whole. Grade 5 · family decimals · source standards audit.
 - **Closes (standards):** 5.NBT.B.7 · tag with CCSS 5.NBT.B.7, EE M.EE.5.NBT.7
@@ -1385,9 +1916,9 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Answer:** write the answer in the column (the model is support).
 - **Ladder:** O2 tenths → hundredths → crossing 1 · O3 model with exchanges drawn → model only → none · O6 hundred squares / counters.
 - **Misconceptions:** lines up the right-hand digits, not the points; 0.3 + 0.45 = 0.48.
-- **After:** `decimal_pv`.
+- **After:** `decimal_pv`, `vis_pv_decimal_places` (lane `placevalue`).
 
-### 17. Make a Whole with Decimals — `decimal_whole`
+### 27. Make a Whole with Decimals — `decimal_whole`
 
 - **What:** new skill `decimals:make_a_whole`. Grade 3 · family decimals · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 3.NF.A.1, 4.NF.C.6, EE M.EE.3.NF.1
@@ -1399,7 +1930,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Ladder:** O2 tenths → hundredths (multiples of 5) → any hundredths · O3 hundred square shaded → strip → none · O6 strip / hundred square / bond.
 - **Misconceptions:** 0.45 + 0.65 = 1 (makes 10 in each place); answers 0.55 → 0.65 by adding 1 to tenths.
 
-### 18. Divide Fractions by Fractions — `div_frac_frac`
+### 28. Divide Fractions by Fractions — `div_frac_frac`
 
 - **What:** new skill `fraction_operations:div_frac_frac`. Grade 6 · family fractions · source standards audit.
 - **Closes (standards):** 6.NS.A.1 · tag with CCSS 6.NS.A.1, EE M.EE.6.NS.1
@@ -1411,7 +1942,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Ladder:** O2 same denominator → related → any · O3 bar model with the divisor marked → none · O6 bars / number line.
 - **Misconceptions:** divides numerators and denominators straight across whatever the sizes; flips the wrong fraction; quotient must be smaller.
 
-### 19. Convert Units With Ratios (option) — `dnl_units`
+### 29. Convert Units With Ratios (option) — `dnl_units`
 
 - **What:** option on `conversions:double_num_line`: context "measurement units": convert units with a double number line or ratio table (12 in : 1 ft, 100 cm : 1 m). Grade 6 · family ratio · source standards audit.
 - **Closes (standards):** 6.RP.A.3d · tag with CCSS 6.RP.A.3d, EE -
@@ -1422,8 +1953,9 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Answer:** write the converted amount with its unit.
 - **Ladder:** O2 whole-number rates → fractional amounts · O3 line with the unit pair marked → none · O6 line / table.
 - **Misconceptions:** multiplies when dividing is needed; mixes the units in the answer.
+- **After:** `vis_double_scale`.
 
-### 20. Add and Subtract More Fractions (option) — `frac_add_multi`
+### 30. Add and Subtract More Fractions (option) — `frac_add_multi`
 
 - **What:** option on `fraction_operations:add_fractions_like`: three addends and wholes. Grade 3 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 3.NF.A.1, 4.NF.B.3, EE M.EE.3.NF.1, M.EE.4.NF.3
@@ -1435,7 +1967,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Ladder:** O2 two addends → three → from a whole · O3 bar model → none · O6 bar / numbers.
 - **Misconceptions:** adds the denominators; 3 − 3/4 = 3/4.
 
-### 21. Fraction Word Problems With Unlike Denominators (option) — `frac_wp_unlike`
+### 31. Fraction Word Problems With Unlike Denominators (option) — `frac_wp_unlike`
 
 - **What:** option on `fraction_operations:frac_word_problems` (and `fraction_operations:frac_word_problems_plain`): denominators "unlike" and task "is the answer reasonable?" (benchmark estimate). Grade 5 · family fractions · source standards audit.
 - **Closes (standards):** 5.NF.A.2 · tag with CCSS 5.NF.A.2, EE M.EE.5.NF.1
@@ -1447,7 +1979,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Ladder:** O2 related denominators → unrelated → mixed numbers · O3 bar model → none · O6 pictures / plain.
 - **Misconceptions:** adds numerators and denominators; answer smaller than a part it added.
 
-### 22. Mixed Fraction Questions — `mixed_frac_qs`
+### 32. Mixed Fraction Questions — `mixed_frac_qs`
 
 - **What:** new skill `fraction_operations:mixed_fraction_questions`. Grade 5 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 5.NF.B.7, 5.NF.B.6, EE -
@@ -1459,7 +1991,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Ladder:** O2 two operations → four · O3 operation sign boxed → none · O6 cards / plain.
 - **Misconceptions:** divides the numerator only when it does not divide; multiplies both parts by the integer.
 
-### 23. Multiply Decimals by Decimals (option) — `mult_dec_dec`
+### 33. Multiply Decimals by Decimals (option) — `mult_dec_dec`
 
 - **What:** option on `decimals:mult_decimal`: factors "decimal × decimal" (3.45 × 2.6) with the standard algorithm. Grade 6 · family decimals · source standards audit.
 - **Closes (standards):** 6.NS.B.3 · tag with CCSS 6.NS.B.3, EE -
@@ -1471,7 +2003,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Ladder:** O2 1 dp × 1 dp → 2 dp × 1 dp → 2 dp × 2 dp · O3 count-the-places box → none · O6 grid / plain.
 - **Misconceptions:** lines up the points as in addition; counts the places of one factor only.
 
-### 24. Ratio Tables: Plot and Compare (option) — `ratio_table_plot`
+### 34. Ratio Tables: Plot and Compare (option) — `ratio_table_plot`
 
 - **What:** option on `conversions:ratio_tables`: task "plot the pairs" on a coordinate grid and task "compare two ratio tables". Grade 6 · family ratio · source standards audit.
 - **Closes (standards):** 6.RP.A.3a · tag with CCSS 6.RP.A.3a, EE -
@@ -1483,7 +2015,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Ladder:** O2 whole numbers small → larger · O3 first rows and axis scale given → none · O6 table / graph.
 - **Misconceptions:** adds the same amount to both rows; plots (y, x).
 
-### 25. Fraction Unit Rates (option) — `unit_rate_fraction`
+### 35. Fraction Unit Rates (option) — `unit_rate_fraction`
 
 - **What:** option on `conversions:unit_rate_intro`: unit rates that are fractions (3 cups flour to 4 cups sugar = 3/4 cup per cup) and rate language. Grade 6 · family ratio · source standards audit.
 - **Closes (standards):** 6.RP.A.2 · tag with CCSS 6.RP.A.2, EE M.EE.6.RP.1
@@ -1495,7 +2027,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Ladder:** O2 whole rates → fraction rates → decimals · O3 ratio table → none · O6 table / double line.
 - **Misconceptions:** divides the wrong way (4/3 cup per cup); drops the unit.
 
-### 26. Fractions That Equal Whole Numbers (option) — `whole_frac_reverse`
+### 36. Fractions That Equal Whole Numbers (option) — `whole_frac_reverse`
 
 - **What:** option on `composing:whole_as_fraction`: direction "fraction → whole" (6/1 = 6, 8/4 = 2) and "same point" on a number line (4/4 and 1). Grade 3 · family fractions · source standards audit.
 - **Closes (standards):** 3.NF.A.3c · tag with CCSS 3.NF.A.3c, EE M.EE.3.NF.3
@@ -1508,7 +2040,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Misconceptions:** 6/1 = 1/6; 4/4 = 4.
 - **After:** `frac_count`.
 
-### 27. Multiply and Divide Decimals in Context (option) — `dec_context`
+### 37. Multiply and Divide Decimals in Context (option) — `dec_context`
 
 - **What:** option on `decimals:mult_decimal`: context. Grade 5 · family decimals · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 5.NBT.B.7, EE M.EE.5.NBT.7
@@ -1520,7 +2052,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Ladder:** O2 × by 1-digit → ÷ by 1-digit → two steps · O3 bar model and cues → none · O6 pictures / plain.
 - **Misconceptions:** puts the decimal point in the wrong place; divides the wrong way round.
 
-### 28. Fraction of an Amount Problems — `frac_amount_wp`
+### 38. Fraction of an Amount Problems — `frac_amount_wp`
 
 - **What:** new skill `fractions:fraction_of_amount_problems`. Grade 2 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 3.NF.A.1, 3.OA.A.3, EE M.EE.3.NF.1
@@ -1532,7 +2064,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Ladder:** O2 unit fractions → non-unit → find the whole · O3 bar split and labelled → none · O6 bar / plain.
 - **Misconceptions:** divides by the numerator; multiplies the amount by the denominator.
 
-### 29. Compare and Order Fractions Greater Than 1 (option) — `frac_compare_gt1`
+### 39. Compare and Order Fractions Greater Than 1 (option) — `frac_compare_gt1`
 
 - **What:** option on `fractions:compare`: greater than 1. Grade 4 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 4.NF.A.2, EE M.EE.4.NF.2
@@ -1543,20 +2075,9 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Answer:** write <, > or =; order.
 - **Ladder:** O2 same denominator → related denominators · O3 number line 0-3 → none · O6 line / bars.
 - **Misconceptions:** compares only the whole numbers; thinks a bigger denominator means bigger.
+- **After:** `vis_frac_bar_modes`.
 
-### 30. Fraction of an Amount: Find the Whole (option) — `frac_find_whole`
-
-- **What:** option on `fractions:fraction_of_set_hard_nv`: find the whole. Grade 5 · family fractions · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 5.NF.B.4, EE -
-- **Closes (White Rose steps):** Y6.B4.S7
-- **Teaches:** finding the whole from a known fractional part with a bar model (3/5 is 24, what is the whole?).
-- **Problem types:** (1) 3/5 is 24: what is the whole?; (2) unit fraction first; (3) story version; (4) check by finding the fraction.
-- **Representation:** a "find the whole" task option with a bar model support. Templates: `frac-model`, `word-work`; new: `bar-model`.
-- **Answer:** write the whole.
-- **Ladder:** O2 unit → non-unit · O3 bar with the known parts labelled → none · O6 bar / plain.
-- **Misconceptions:** multiplies 24 by 3/5; divides by the denominator only.
-
-### 31. Fractions as Operators — `frac_operator`
+### 40. Fractions as Operators — `frac_operator`
 
 - **What:** new skill `fractions:fraction_as_operator`. Grade 4 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 4.NF.B.4, EE -
@@ -1568,7 +2089,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Ladder:** O2 unit → non-unit → measures · O3 bar with operator arrows → none · O6 bar / arrows.
 - **Misconceptions:** multiplies by the denominator; divides by the numerator.
 
-### 32. Fractions and Scales — `frac_scales`
+### 41. Fractions and Scales — `frac_scales`
 
 - **What:** new skill `fractions:fractions_on_scales`. Grade 2 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 2.G.A.3, EE -
@@ -1580,7 +2101,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Ladder:** O2 halves → quarters → fifths/tenths · O3 every tick labelled → wholes only · O6 ruler / jug / line.
 - **Misconceptions:** counts ticks not spaces; reads the scale as tenths every time.
 
-### 33. Understand the Whole — `frac_whole`
+### 42. Understand the Whole — `frac_whole`
 
 - **What:** new skill `fractions:understand_the_whole`. Grade 2 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 2.G.A.3, 3.NF.A.1, EE M.EE.3.NF.1
@@ -1592,7 +2113,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Ladder:** O2 halves → eighths · O3 bar drawn and cut → none · O6 bar / circle.
 - **Misconceptions:** counts shaded parts only; thinks the whole has the shaded number of parts.
 
-### 34. Partition the Whole — `frac_whole_partition`
+### 43. Partition the Whole — `frac_whole_partition`
 
 - **What:** new skill `fractions:partition_the_whole`. Grade 2 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 4.NF.B.3, EE M.EE.4.NF.3
@@ -1604,19 +2125,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Ladder:** O2 halves → fifths → eighths; within 1 → 2 · O3 bar cut into parts → none · O6 bar / bond.
 - **Misconceptions:** subtracts the denominators; writes the shaded part again.
 
-### 35. Percentages: Multi-Step and Missing Values (option) — `percent_multi`
-
-- **What:** option on `conversions:percent_of_number`: multi-step. Grade 5 · family decimals · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 6.RP.A.3, EE -
-- **Closes (White Rose steps):** Y6.B9.S8 · strengthens Y6.B9.S9
-- **Teaches:** percentage of an amount in two steps (increase/decrease), and missing values (what percent is 12 of 40?).
-- **Problem types:** (1) percent of an amount in two steps (10% then 30%); (2) increase / decrease; (3) what percent is 12 of 40?; (4) missing whole.
-- **Representation:** task options on percent_of_number. Templates: `word-work`; new: `bar-model`.
-- **Answer:** write the amount or the percent.
-- **Ladder:** O2 10%, 50% → multiples of 10% → any · O3 bar split into 10% parts → none · O6 bar / table.
-- **Misconceptions:** adds the percent as a number (40 + 30% = 70); finds 30% and stops for an increase.
-
-### 36. Ratio and Fractions (option) — `ratio_fraction`
+### 44. Ratio and Fractions (option) — `ratio_fraction`
 
 - **What:** option on `conversions:ratio_intro`: ratio and fractions. Grade 5 · family decimals · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 6.RP.A.1, EE M.EE.6.RP.1
@@ -1628,19 +2137,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Ladder:** O2 small totals → larger · O3 bar drawn and split → none · O6 bar / counters.
 - **Misconceptions:** 3 : 2 means 3/2; uses a part as the whole.
 
-### 37. Ratio and Proportion Problems — `ratio_problems`
-
-- **What:** new skill `conversions:ratio_problems_bar`. Grade 5 · family ratio · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 6.RP.A.3, EE -
-- **Closes (White Rose steps):** Y6.B6.S10
-- **Teaches:** ratio, proportion and recipe problems solved with a bar model or ratio table.
-- **Problem types:** (1) recipe for more people; (2) share in a ratio; (3) bar model; (4) ratio table.
-- **Representation:** a bar model / ratio table beside a short story; write the missing amount. Templates: `word-work`; new: `bar-model`, `data-table`.
-- **Answer:** write the amount.
-- **Ladder:** O2 simple → two-step · O3 bar model → none · O6 bar / table.
-- **Misconceptions:** adds instead of scaling; uses the ratio numbers as amounts.
-
-### 38. Subtract from a Mixed Number: Break the Whole (option) — `sub_break_whole`
+### 45. Subtract from a Mixed Number: Break the Whole (option) — `sub_break_whole`
 
 - **What:** option on `fraction_operations:sub_mixed_like`: breaking the whole. Grade 4 · family fractions · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 4.NF.B.3, EE M.EE.4.NF.3
@@ -1651,12 +2148,33 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/frac-model.js`, `js
 - **Answer:** write the answer.
 - **Ladder:** O2 halves → fifths → eighths · O3 exchanged whole drawn → none · O6 bar / numbers.
 - **Misconceptions:** subtracts the smaller fraction from the larger (3 1/5 − 4/5 = 3 3/5); takes 1 whole but forgets to add its parts.
+- **After:** `vis_frac_bar_modes`.
 
-## Lane `geometry`: Geometry, area, volume, coordinates (43)
+## Lane `geometry`: Geometry, area, volume, coordinates (46)
 
 Owns: `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sheet/cells/shapes.js`. Builds templates: `shape-grid`, `coord-grid`, `angle-kit`, `solid-kit`.
 
-### 1. Volume by Counting Cubes — `volume_cubes`
+### 1. Migrate Legacy Shape and Angle Visuals to B&W Kit Cells — `vis_migrate_shapes`
+
+- **Added from visual catalogue.** migration · grade PK-5 · lane `geometry`.
+- **Build:** the shape, line and angle skills still on legacy colour SVG move onto shape-grid / angle-kit / solid-kit: identify_angles, measure_angles, identify_lines (with parallel arrows, equal-side ticks, right-angle squares), symmetry, place_symmetry_lines, name_2d_shapes, shape_name_match_2d / 3d, count_sides_vertices_2d, shape_corners_count, shape_attributes (hatch marks), name_3d_shapes, count_edges_faces_vertices, net_identify (folds, opposite face, open box), classify_triangles, classify_quads, hotspot_quads, compose_shapes, compose_hexagon, compose_rect_from_squares (outline to fill; split a shape), partition_shapes, shape_positions.
+- **Offered on:** `angles_lines:identify_angles`, `angles_lines:measure_angles`, `angles_lines:identify_lines`, `angles_lines:symmetry`, `shapes_early:name_2d_shapes`, `shapes_early:name_3d_shapes`, `shapes_classify:net_identify`, `shapes_early:compose_shapes`, `shapes_early:shape_positions`.
+- **Templates:** -; new or owned: `shape-grid`, `angle-kit`, `solid-kit`. **Files:** `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sheet/cells/shapes.js`.
+- **Draws (visual catalogue):** V074 Angles: two rays + arc, right-angle mark; V075 Line pairs and geometric marks (parallel arrows, ticks); V076 Lines of symmetry on shapes; V078 2-D shapes: names, properties, hatch marks; V079 3-D solids, properties, nets; V148 Outline to fill with pieces; decompose a shape; V200 Protractor over an angle.
+- **Reach:** 53 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 2. Migrate Legacy Area and Volume Visuals to B&W Kit Cells — `vis_migrate_area_volume`
+
+- **Added from visual catalogue.** migration · grade 2-5 · lane `geometry`.
+- **Build:** area_unit_squares, area, area_perimeter, composite_shapes, area_polygon_decompose (split two ways; complete and subtract), area_triangle, volume and volume_composite move onto shape-grid (unit squares, half squares) and solid-kit (isometric cube builds with hidden cubes, cuboids in layers, isometric dot paper).
+- **Offered on:** `area_perimeter:area_unit_squares`, `area_perimeter:area`, `area_perimeter:composite_shapes`, `area_perimeter:area_polygon_decompose`, `area_perimeter:area_triangle`, `area_perimeter:volume`, `area_perimeter:volume_composite`.
+- **Templates:** -; new or owned: `shape-grid`, `solid-kit`. **Files:** `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`.
+- **Draws (visual catalogue):** V052 Perimeter / area of rectilinear shapes (split, subtract, missing sides); V162 Area by unit squares (half squares; same area); V206 Isometric cube builds and cuboids.
+- **Reach:** 32 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 3. Volume by Counting Cubes — `volume_cubes`
 
 - **What:** new skill `area_perimeter:volume_counting_cubes`. Grade 4-5 · family measurement · source White Rose audit.
 - **Closes (standards):** 5.MD.C.3a, 5.MD.C.3b, 5.MD.C.4, 5.MD.C.5a, M.EE.5.MD.4, M.EE.5.MD.5, M.EE.6.G.2 · tag with CCSS 5.MD.C.3, 5.MD.C.4, 3.MD.A.2, 5.MD.C.3a, 5.MD.C.3b, 5.MD.C.5a, EE M.EE.5.MD.3, M.EE.5.MD.4, M.EE.3.MD.2, M.EE.5.MD.5, M.EE.6.G.2
@@ -1668,8 +2186,22 @@ Owns: `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sh
 - **Answer:** write the number of cubic units.
 - **Ladder:** O2 single layer → layers → hidden cubes · O3 layers separated → stacked · O6 isometric / layers.
 - **Misconceptions:** counts faces not cubes; misses hidden cubes.
+- **Visual catalogue:** also draws V206 Isometric cube builds and cuboids (reach 8 steps).
 
-### 2. Where Is It? Positions and Maps — `position_map`
+### 4. Missing Lengths in Rectilinear Shapes — `missing_lengths`
+
+- **What:** new skill `area_perimeter:rectilinear_missing_sides`. Grade 3 · family measurement · source White Rose audit.
+- **Closes (standards):** 3.MD.D.8 · tag with CCSS 3.MD.D.8, EE -
+- **Closes (White Rose steps):** Y4.B6.S6, Y4.B6.S7
+- **Teaches:** finding missing side lengths in rectilinear shapes and then their perimeter.
+- **Problem types:** (1) find a missing side in an L-shape; (2) two missing sides; (3) then the perimeter; (4) T and U shapes.
+- **Representation:** an L or T shape with some sides labelled; write the missing lengths. Templates: `legacy`; new: `shape-grid`.
+- **Answer:** write the lengths.
+- **Ladder:** O2 one missing → two → perimeter · O3 matching sides coloured grey → none · O6 labelled / some labels.
+- **Misconceptions:** adds the wrong pair; forgets a side in the perimeter.
+- **Visual catalogue:** also draws V052 Perimeter / area of rectilinear shapes (split, subtract, missing sides) (reach 20 steps).
+
+### 5. Where Is It? Positions and Maps — `position_map`
 
 - **What:** new skill `shapes_early:position_and_maps`. Grade PK-K · family geometry · source White Rose audit.
 - **Closes (standards):** K.G.A.1, M.EE.1.G.1 · tag with CCSS K.G.A.1, EE M.EE.1.G.1
@@ -1681,8 +2213,9 @@ Owns: `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sh
 - **Answer:** circle or write the position word; draw the route.
 - **Ladder:** O2 on/in/under → next to/behind → left/right → routes · O3 word bank with icons → words · O6 picture / grid map.
 - **Misconceptions:** left and right from the viewer's side; behind and in front swapped.
+- **Visual catalogue:** also draws V098 Position grid / position picture (above, below, beside); V122 Left / right track; V153 Maps: story map, route, maze, treasure (reach 10 steps).
 
-### 3. Turns and Angles — `turns_angles`
+### 6. Turns and Angles — `turns_angles`
 
 - **What:** new skill `angles_lines:turns_and_angles`. Grade 2-3 · family geometry · source White Rose audit.
 - **Closes (standards):** 4.MD.C.5a, 4.MD.C.5b, M.EE.4.MD.6 · tag with CCSS 2.G.A.1, 4.G.A.2, 4.MD.C.5, 3.G.A.1, 4.MD.C.5a, 4.MD.C.5b, EE M.EE.2.G.1, M.EE.4.G.2, M.EE.4.MD.5, M.EE.3.G.1, M.EE.4.MD.6
@@ -1694,8 +2227,9 @@ Owns: `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sh
 - **Answer:** tick greater / less / right angle; write degrees.
 - **Ladder:** O2 right angles → compare → degrees from turns · O3 angle tester drawn in the corner → none · O6 turns / angles.
 - **Misconceptions:** longer arms mean a bigger angle; a quarter turn is 25°.
+- **Visual catalogue:** also draws V080 Compass rose / turns (reach 10 steps).
 
-### 4. Draw 2-D Shapes — `shape_draw`
+### 7. Draw 2-D Shapes — `shape_draw`
 
 - **What:** new skill `shapes_early:draw_2d_shapes`. Grade 1-2 · family geometry · source White Rose audit.
 - **Closes (standards):** K.G.B.5, 1.G.A.1, 2.G.A.1, 3.G.A.1 · tag with CCSS 1.G.A.1, 2.G.A.1, K.G.B.5, 3.G.A.1, EE M.EE.1.G.1, M.EE.2.G.1
@@ -1707,8 +2241,180 @@ Owns: `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sh
 - **Answer:** draw on the dot grid; the key shows one correct drawing.
 - **Ladder:** O2 triangle/square → rectangle/pentagon → quadrilaterals by rule · O3 first side drawn → none · O6 dot / square grid.
 - **Misconceptions:** draws curved sides; a square is drawn as a rectangle only.
+- **Visual catalogue:** also draws V077 Square dot grid / squared paper for drawing (reach 10 steps).
 
-### 5. Sort 2-D and 3-D Shapes — `shape_sort`
+### 8. Angle Rules — `angle_rules`
+
+- **What:** new skill `angles_lines:angle_rules`. Grade 5 · family geometry · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 4.MD.C.7, 4.G.A.2, EE M.EE.4.G.2
+- **Closes (White Rose steps):** Y6.B12.S3, Y6.B12.S4, Y6.B12.S5, Y6.B12.S6, Y6.B12.S7, Y6.B12.S8
+- **Teaches:** vertically opposite angles, angles in a triangle (180°), in a quadrilateral (360°), in polygons, and special triangles.
+- **Problem types:** (1) vertically opposite angles; (2) angles in a triangle (180°); (3) in a quadrilateral (360°); (4) isosceles triangle angles; (5) polygons.
+- **Representation:** a diagram with some angles given; write the missing angle. Templates: `legacy`; new: `angle-kit`.
+- **Answer:** write the missing angle.
+- **Ladder:** O2 one rule → two rules · O3 the rule printed → none · O6 diagrams.
+- **Misconceptions:** uses 360° in a triangle; assumes angles look equal.
+- **Visual catalogue:** also draws V201 Missing-angle diagrams (point, line, triangle, polygon); V202 Polygon split into triangles from one vertex (reach 11 steps).
+
+### 9. Migrate Legacy Coordinate Visuals to the B&W Coordinate Grid — `vis_migrate_coordinates`
+
+- **Added from visual catalogue.** migration · grade 3-5 · lane `geometry`.
+- **Build:** coordinate_q1, coordinate_graph, coord_polygon, coordinate_all (and the quadrant diagram), geo_translate and geo_reflect move onto coord-grid (read / plot / join; translate and reflect with the image drawn and the move described; `grid: 'none'` sketch axes), replacing multiple choice with a written response where the pages write one.
+- **Offered on:** `coordinates:coordinate_q1`, `coordinates:coordinate_graph`, `coordinates:coord_polygon`, `coordinates:coordinate_all`, `coordinates:geo_translate`, `coordinates:geo_reflect`.
+- **Templates:** -; new or owned: `coord-grid`. **Files:** `js/modules/gen-geometry.js`.
+- **Draws (visual catalogue):** V171 First-quadrant coordinate grid; V172 Translation / reflection on a grid; V207 Four-quadrant grid and the quadrant diagram.
+- **Reach:** 15 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 10. 3-D Shapes: Names and Properties — `shapes_3d_props`
+
+- **What:** new skill `shapes_classify:3d_shape_properties`. Grade 4 · family geometry · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 1.G.A.1, EE M.EE.1.G.1
+- **Closes (White Rose steps):** Y5.B10.S10
+- **Teaches:** naming 3-D shapes (prisms, pyramids) from faces, edges and vertices and from their 2-D views or nets.
+- **Problem types:** (1) name the solid from its properties; (2) faces, edges, vertices table; (3) which net?; (4) prism or pyramid?.
+- **Representation:** a 3-D shape drawing with a property table; option: which net makes it. Templates: `legacy`; new: `solid-kit`.
+- **Answer:** write the name; fill the table.
+- **Ladder:** O2 cube/cuboid → prisms → pyramids · O3 hidden edges dashed → none · O6 solids / nets.
+- **Misconceptions:** a cube is not a prism; counts faces on a net wrongly.
+- **Visual catalogue:** also draws V079 3-D solids, properties, nets (reach 13 steps).
+
+### 11. Angles Around a Point and on a Line (option) — `angles_point`
+
+- **What:** option on `angles_lines:additive_angles`: point and straight line. Grade 4 · family geometry · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 4.MD.C.7, EE -
+- **Closes (White Rose steps):** Y5.B10.S6, Y5.B10.S7
+- **Teaches:** angles on a straight line sum to 180°, around a point to 360°.
+- **Problem types:** (1) angles on a straight line sum to 180°; (2) around a point to 360°; (3) find the missing angle; (4) two missing angles.
+- **Representation:** diagram-type options on additive_angles. Templates: `legacy`; new: `angle-kit`.
+- **Answer:** write the angle.
+- **Ladder:** O2 two angles → three → two unknowns equal · O3 180°/360° reminder → none · O6 diagrams.
+- **Misconceptions:** uses 360° on a line; measures instead of calculating.
+- **After:** `vis_migrate_shapes`.
+- **Visual catalogue:** also draws V201 Missing-angle diagrams (point, line, triangle, polygon) (reach 11 steps).
+
+### 12. Coordinates in Four Quadrants (option) — `four_quadrants`
+
+- **What:** option on `coordinates:coordinate_all`: problems. Grade 5 · family geometry · source White Rose audit.
+- **Closes (standards):** 6.NS.C.6b, 6.NS.C.8, 6.G.A.3 · tag with CCSS 5.G.A.2, 6.NS.C.6b, 6.NS.C.8, 6.G.A.3, EE M.EE.5.G.2
+- **Closes (White Rose steps):** Y6.B13.S3
+- **Teaches:** reading, plotting and solving problems with coordinates in four quadrants (missing vertices, midpoints).
+- **Extended for the standards:** signs name the quadrant; points that differ only by signs are reflections across an axis; distance across an axis with absolute value; draw a polygon from vertices.
+- **Problem types:** (1) read and plot in four quadrants; (2) which quadrant?; (3) find the missing vertex; (4) reflect a point across an axis (signs change); (5) distance between points with the same x or y (across an axis).
+- **Representation:** a task option on coordinate_all. Templates: `legacy`; new: `coord-grid`.
+- **Answer:** write the coordinates; plot.
+- **Ladder:** O2 quadrant I → II → all · O3 axes numbered every 1 → every 2 · O6 grid size.
+- **Misconceptions:** (x, y) swapped; distance across the axis ignores the sign.
+- **After:** `vis_migrate_coordinates`.
+- **Visual catalogue:** also draws V207 Four-quadrant grid and the quadrant diagram; V208 Sketch axes without a grid (reach 5 steps).
+
+### 13. Reflect on a Grid — `reflect_grid`
+
+- **What:** new skill `coordinates:reflect_on_grid`. Grade 4 · family geometry · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 4.G.A.1, 5.G.A.1, EE M.EE.4.G.1, M.EE.5.G.1
+- **Closes (White Rose steps):** Y5.B11.S6
+- **Teaches:** reflecting a shape in a horizontal or vertical mirror line on a square grid and in the axes.
+- **Problem types:** (1) reflect a point; (2) reflect a shape in a vertical line; (3) in a horizontal line; (4) in the axes.
+- **Representation:** a grid with a dashed mirror line and a shape; draw the reflection; key shows it. Templates: `legacy`; new: `coord-grid`, `shape-grid`.
+- **Answer:** draw the reflection.
+- **Ladder:** O2 vertical → horizontal → axes · O3 distances marked → none · O6 grid / coordinates.
+- **Misconceptions:** translates instead of reflecting; reflects to the wrong distance.
+- **Visual catalogue:** also draws V094 Symmetry completion on squared paper; V172 Translation / reflection on a grid (reach 11 steps).
+
+### 14. Whole, Half and Quarter Turns — `turns`
+
+- **What:** new skill `coordinates:whole_half_quarter_turns`. Grade K-1 · family geometry · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS K.G.A.1, EE -
+- **Closes (White Rose steps):** Y1.B11.S1, Y2.B11.S3
+- **Teaches:** describing turns (whole, half, quarter, three-quarter; clockwise, anticlockwise) of an arrow or object.
+- **Problem types:** (1) whole, half, quarter or three-quarter turn?; (2) clockwise or anticlockwise; (3) draw the arrow after the turn; (4) how far has it turned?.
+- **Representation:** an arrow or object drawn before and after a turn; circle the turn from a word bank. Templates: `clock`; new: `angle-kit`.
+- **Answer:** circle the turn from a bank; draw the arrow.
+- **Ladder:** O2 half/whole → quarter → three-quarter · O3 turn arc drawn → none · O6 arrow / object / clock hand.
+- **Misconceptions:** clockwise confused with anticlockwise; three-quarter turn drawn as quarter.
+- **Visual catalogue:** also draws V080 Compass rose / turns (reach 10 steps).
+
+### 15. Translate on a Grid — `translate_grid`
+
+- **What:** new skill `coordinates:translate_on_grid`. Grade 3-4 · family geometry · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 3.G.A.1, 5.G.A.1, 4.G.A.1, EE M.EE.3.G.1, M.EE.5.G.1, M.EE.4.G.1
+- **Closes (White Rose steps):** Y4.B14.S3, Y4.B14.S4, Y5.B11.S2, Y5.B11.S4
+- **Teaches:** translating a shape or point on a first-quadrant grid and describing a translation (3 right, 2 up).
+- **Problem types:** (1) translate a point; (2) translate a shape; (3) describe the translation; (4) where is the new vertex?.
+- **Representation:** a coordinate grid with a shape and its image; write the translation or draw the image. Templates: `legacy`; new: `coord-grid`.
+- **Answer:** draw the image or write the translation.
+- **Ladder:** O2 one direction → two → coordinates · O3 arrow drawn → none · O6 grid / coordinates.
+- **Misconceptions:** translates the shape by its size; counts the start square.
+- **Visual catalogue:** also draws V172 Translation / reflection on a grid (reach 7 steps).
+
+### 16. Graph Points in a Real Problem (option) — `coord_context`
+
+- **What:** option on `coordinates:coordinate_q1`: form "in context": points are data (hours and pages, days and height); plot them and say what a point means. Grade 5 · family geometry · source standards audit.
+- **Closes (standards):** 5.G.A.2 · tag with CCSS 5.G.A.2, EE -
+- **Closes (White Rose steps):** none · strengthens Y6.B13.S2
+- **Teaches:** representing real-world problems by graphing points in the first quadrant and interpreting the coordinates.
+- **Problem types:** (1) plot the table as points; (2) what does (3, 12) mean in the story?; (3) which point shows …?; (4) read the missing value.
+- **Representation:** Templates: `legacy`; new: `coord-grid`, `data-table`.
+- **Answer:** plot; write the meaning from a bank.
+- **Ladder:** O2 axes by 1 → by 2 or 5 · O3 axis titles with units → none · O6 grid size.
+- **Misconceptions:** x and y swapped; reads the point on the wrong axis.
+- **After:** `vis_migrate_coordinates`.
+- **Visual catalogue:** also draws V171 First-quadrant coordinate grid (reach 8 steps).
+
+### 17. Copy and Build — `scenes`
+
+- **What:** new skill `shapes_early:build_and_copy`. Grade PK · family geometry · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS K.G.B.6, K.G.B.5, EE -
+- **Closes (White Rose steps):** R.B15.S4, R.B15.S6, R.B15.S7, R.B17.S4, R.B17.S5
+- **Teaches:** copying a picture or construction made of shapes, visualising from another viewpoint, replicating a scene.
+- **Problem types:** (1) copy the shape picture; (2) which copy matches?; (3) the same scene from another side; (4) replicate a scene.
+- **Representation:** a model picture made of shapes beside an empty frame; draw or choose the matching copy. Templates: `wordpic`; new: `shape-grid`.
+- **Answer:** draw in the frame or tick the match.
+- **Ladder:** O2 2 shapes → 4 → rotated · O3 dotted frame → none · O6 shapes / blocks.
+- **Misconceptions:** mirrors the picture; misses the position of one shape.
+- **Visual catalogue:** also draws V149 Shape picture to copy; V152 Viewpoints; plan → model (reach 5 steps).
+
+### 18. What Can This Shape Do? — `shape_3d_tasks`
+
+- **What:** new skill `shapes_early:shape_properties_3d`. Grade PK · family geometry · source White Rose audit.
+- **Closes (standards):** K.G.B.4 · tag with CCSS K.G.A.3, K.G.B.4, EE M.EE.K.G.3
+- **Closes (White Rose steps):** R.B12.S2, R.B12.S3, R.B15.S1, R.B15.S8
+- **Teaches:** properties of 3-D shapes in use: roll, stack, slide; flat and curved faces; faces seen in 3-D shapes.
+- **Problem types:** (1) does it roll, stack or slide?; (2) flat or curved faces; (3) match the face print to the solid; (4) choose a shape for a job.
+- **Representation:** line drawings of 3-D shapes; tick roll/stack/slide; match the face print to the 3-D shape. Templates: `wordpic`; new: `solid-kit`.
+- **Answer:** tick roll / stack / slide; draw a line.
+- **Ladder:** O2 cube, sphere, cylinder → cone, pyramid, prism · O3 pictures of the action → words · O6 solids.
+- **Misconceptions:** a cylinder cannot stack; every flat face is a square.
+- **Visual catalogue:** also draws V150 Face prints; roll / stack (reach 4 steps).
+
+### 19. Make and Compare Areas — `area_compare`
+
+- **What:** new skill `area_perimeter:compare_areas`. Grade 3 · family measurement · source White Rose audit.
+- **Closes (standards):** 3.MD.C.6 · tag with CCSS 3.MD.C.5, 3.MD.C.6, EE -
+- **Closes (White Rose steps):** Y4.B3.S3, Y4.B3.S4
+- **Teaches:** making shapes with a given area from squares and comparing areas by counting squares.
+- **Problem types:** (1) make a shape with a given area; (2) compare areas by counting squares; (3) which is bigger?; (4) same area, different shape.
+- **Representation:** two shapes on squared paper; circle the larger area or draw a shape of 6 squares. Templates: `legacy`; new: `shape-grid`.
+- **Answer:** circle or write the area; draw.
+- **Ladder:** O2 whole squares → larger shapes · O3 squares numbered → none · O6 grid.
+- **Misconceptions:** compares perimeters; counts edges.
+- **Visual catalogue:** also draws V162 Area by unit squares (half squares; same area) (reach 5 steps).
+
+### 20. Same Area, Different Perimeter — `same_area`
+
+- **What:** new skill `area_perimeter:same_area_different_perimeter`. Grade 5 · family measurement · source White Rose audit.
+- **Closes (standards):** 3.MD.D.8 · tag with CCSS 3.MD.D.8, EE -
+- **Closes (White Rose steps):** Y6.B10.S1
+- **Teaches:** shapes with the same area but different perimeters, and the reverse.
+- **Extended for the standards:** Grade 3 level: exhibit rectangles with the same perimeter and different areas, and the reverse.
+- **Problem types:** (1) same area, different perimeter; (2) same perimeter, different area (3.MD.D.8); (3) draw two rectangles with area 12; (4) which pair matches?.
+- **Representation:** shapes on squared paper; write area and perimeter for each; circle the pair that match. Templates: `legacy`; new: `shape-grid`.
+- **Answer:** write area and perimeter; circle the pair.
+- **Ladder:** O2 given → draw · O3 grid numbered → none · O6 grid.
+- **Misconceptions:** same area means same perimeter; counts the corner squares twice.
+- **Visual catalogue:** also draws V162 Area by unit squares (half squares; same area) (reach 5 steps).
+
+### 21. Sort 2-D and 3-D Shapes — `shape_sort`
 
 - **What:** new skill `shapes_early:sort_shapes`. Grade K-1 · family geometry · source White Rose audit.
 - **Closes (standards):** K.G.A.3, M.EE.1.G.2 · tag with CCSS K.G.A.2, K.G.B.4, 1.G.A.1, K.G.A.3, EE M.EE.K.G.2, M.EE.1.G.1, M.EE.1.G.2
@@ -1721,32 +2427,89 @@ Owns: `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sh
 - **Ladder:** O2 one property → two (Carroll) → rule found · O3 labels with pictures → words · O6 rings / Carroll.
 - **Misconceptions:** sorts a square out of "rectangles"; counts a curved edge as a side.
 
-### 6. Coordinates in Four Quadrants (option) — `four_quadrants`
+### 22. Shapes Around Us — `shapes_world`
 
-- **What:** option on `coordinates:coordinate_all`: problems. Grade 5 · family geometry · source White Rose audit.
-- **Closes (standards):** 6.NS.C.6b, 6.NS.C.8, 6.G.A.3 · tag with CCSS 5.G.A.2, 6.NS.C.6b, 6.NS.C.8, 6.G.A.3, EE M.EE.5.G.2
-- **Closes (White Rose steps):** Y6.B13.S3
-- **Teaches:** reading, plotting and solving problems with coordinates in four quadrants (missing vertices, midpoints).
-- **Extended for the standards:** signs name the quadrant; points that differ only by signs are reflections across an axis; distance across an axis with absolute value; draw a polygon from vertices.
-- **Problem types:** (1) read and plot in four quadrants; (2) which quadrant?; (3) find the missing vertex; (4) reflect a point across an axis (signs change); (5) distance between points with the same x or y (across an axis).
-- **Representation:** a task option on coordinate_all. Templates: `legacy`; new: `coord-grid`.
-- **Answer:** write the coordinates; plot.
-- **Ladder:** O2 quadrant I → II → all · O3 axes numbered every 1 → every 2 · O6 grid size.
-- **Misconceptions:** (x, y) swapped; distance across the axis ignores the sign.
+- **What:** new skill `shapes_early:shapes_around_us`. Grade PK · family geometry · source White Rose audit.
+- **Closes (standards):** K.G.A.1 · tag with CCSS K.G.A.1, EE -
+- **Closes (White Rose steps):** R.B4.S3, R.B6.S3, R.B12.S4
+- **Teaches:** recognising 2-D and 3-D shapes in everyday objects (a clock is a circle, a tin is a cylinder).
+- **Extended for the standards:** name the shape of an everyday object from a bank.
+- **Problem types:** (1) which shape is this object?; (2) circle the objects that are circles; (3) match objects to 3-D shapes; (4) name from a word bank.
+- **Representation:** line drawings of everyday objects; circle or write the matching shape name from a word bank. Templates: `wordpic`; new: `picture-row`.
+- **Answer:** write the shape name from a bank or circle.
+- **Ladder:** O2 2-D faces → 3-D solids · O3 shape outline drawn beside the object → none · O6 line drawings.
+- **Misconceptions:** names the object not the shape; calls a cylinder a circle.
+- **Visual catalogue:** also draws V146 Shapes in the environment (reach 3 steps).
 
-### 7. Angle Rules — `angle_rules`
+### 23. Area of Triangles (option) — `area_triangle_grid`
 
-- **What:** new skill `angles_lines:angle_rules`. Grade 5 · family geometry · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 4.MD.C.7, 4.G.A.2, EE M.EE.4.G.2
-- **Closes (White Rose steps):** Y6.B12.S3, Y6.B12.S4, Y6.B12.S5, Y6.B12.S6, Y6.B12.S7, Y6.B12.S8
-- **Teaches:** vertically opposite angles, angles in a triangle (180°), in a quadrilateral (360°), in polygons, and special triangles.
-- **Problem types:** (1) vertically opposite angles; (2) angles in a triangle (180°); (3) in a quadrilateral (360°); (4) isosceles triangle angles; (5) polygons.
-- **Representation:** a diagram with some angles given; write the missing angle. Templates: `legacy`; new: `angle-kit`.
-- **Answer:** write the missing angle.
-- **Ladder:** O2 one rule → two rules · O3 the rule printed → none · O6 diagrams.
-- **Misconceptions:** uses 360° in a triangle; assumes angles look equal.
+- **What:** option on `area_perimeter:area_triangle`: counting squares and right-angled. Grade 5 · family measurement · source White Rose audit.
+- **Closes (standards):** 6.G.A.1 · tag with CCSS 3.MD.C.6, EE -
+- **Closes (White Rose steps):** Y6.B10.S3
+- **Teaches:** the area of a triangle by counting squares, then as half a rectangle for right-angled and any triangles.
+- **Problem types:** (1) count squares for a triangle; (2) half the rectangle; (3) right-angled triangles; (4) any triangle.
+- **Representation:** grid and "half the rectangle" supports on area_triangle. Templates: `legacy`; new: `shape-grid`.
+- **Answer:** write the area.
+- **Ladder:** O2 right-angled on grid → any on grid → no grid · O3 rectangle dashed → none · O6 grid.
+- **Misconceptions:** uses the slant side as the height; forgets to halve.
+- **After:** `vis_migrate_area_volume`.
+- **Visual catalogue:** also draws V205 Triangles and parallelograms on a squared grid (reach 4 steps).
 
-### 8. Draw Angles and Lines — `draw_angles`
+### 24. Area of a Parallelogram — `parallelogram`
+
+- **What:** new skill `area_perimeter:area_parallelogram`. Grade 5 · family measurement · source White Rose audit.
+- **Closes (standards):** 6.G.A.1 · tag with CCSS 3.MD.C.7, 6.G.A.1, EE -
+- **Closes (White Rose steps):** Y6.B10.S6
+- **Teaches:** area of a parallelogram as base × perpendicular height, by cutting and moving a triangle.
+- **Extended for the standards:** trapezoids and other polygons by composing rectangles or decomposing into triangles.
+- **Problem types:** (1) area of a parallelogram (base × height); (2) cut and move a triangle; (3) trapezoid by decomposing (6.G.A.1); (4) polygon split into triangles and rectangles (6.G.A.1); (5) find a missing base or height.
+- **Representation:** a parallelogram on squared paper with the height dashed; write the area. Templates: `legacy`; new: `shape-grid`.
+- **Answer:** write the area.
+- **Ladder:** O2 on grid → no grid → trapezoids/polygons · O3 height dashed → none · O6 grid / plain.
+- **Misconceptions:** uses the slant side; halves a parallelogram.
+- **Visual catalogue:** also draws V205 Triangles and parallelograms on a squared grid (reach 4 steps).
+
+### 25. Regular and Irregular Polygons — `polygons`
+
+- **What:** new skill `shapes_classify:regular_irregular_polygons`. Grade 3-4 · family geometry · source White Rose audit.
+- **Closes (standards):** 3.G.A.1 · tag with CCSS 3.G.A.1, 4.G.A.2, 5.G.B.3, EE M.EE.3.G.1, M.EE.4.G.2, M.EE.5.G.3
+- **Closes (White Rose steps):** Y4.B12.S6, Y5.B10.S9
+- **Teaches:** naming polygons by the number of sides, and telling regular from irregular.
+- **Problem types:** (1) name the polygon by sides; (2) regular or irregular?; (3) draw a regular polygon; (4) why is it irregular?.
+- **Representation:** polygon line drawings; write the name and tick regular / irregular. Templates: `legacy`; new: `shape-grid`.
+- **Answer:** write the name from a bank; tick regular / irregular.
+- **Ladder:** O2 3-6 sides → 8, 10 sides → reasons · O3 equal sides marked → none · O6 outlines.
+- **Misconceptions:** a regular shape must be upright; counts vertices for sides wrongly on concave shapes.
+- **Visual catalogue:** also draws V163 Regular polygons with equal-side hatch marks (reach 3 steps).
+
+### 26. Complete the Symmetric Shape — `symmetry_complete`
+
+- **What:** new skill `angles_lines:complete_symmetric_shape`. Grade 1-3 · family geometry · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 1.G.A.1, 4.G.A.3, 3.G.A.1, EE M.EE.1.G.1, M.EE.4.G.3, M.EE.3.G.1
+- **Closes (White Rose steps):** Y2.B3.S6, Y4.B12.S8
+- **Teaches:** using a vertical line of symmetry to complete a shape or pattern on a square grid.
+- **Problem types:** (1) complete the shape across a vertical line; (2) complete a pattern; (3) horizontal mirror line; (4) find the mistake.
+- **Representation:** half a shape on squared paper beside a dashed mirror line; draw the other half. Templates: `legacy`; new: `shape-grid`.
+- **Answer:** draw the other half.
+- **Ladder:** O2 vertical → horizontal → diagonal-free patterns · O3 squares numbered from the line → none · O6 square / dot grid.
+- **Misconceptions:** translates instead of reflecting; counts from the wrong edge.
+- **Visual catalogue:** also draws V094 Symmetry completion on squared paper (reach 5 steps).
+
+### 27. Same and Different Shapes — `compare_shapes`
+
+- **What:** new skill `shapes_early:compare_two_shapes`. Grade PK · family geometry · source White Rose audit.
+- **Closes (standards):** K.G.B.4 · tag with CCSS K.G.B.4, K.G.A.2, EE M.EE.K.G.2
+- **Closes (White Rose steps):** R.B4.S2, R.B15.S2
+- **Teaches:** comparing two shapes by sides, corners and straight or curved edges.
+- **Extended for the standards:** compare two 3-D shapes (faces, edges, vertices) and "sides of equal length".
+- **Problem types:** (1) same or different? (sides, corners, curved); (2) tick what both shapes have; (3) how are they different?; (4) sides of equal length; (5) 3-D: faces and edges.
+- **Representation:** two shapes side by side with a same/different checklist (sides, corners, curved). Templates: `wordpic`; new: `picture-row`.
+- **Answer:** tick the checklist; one word from a bank.
+- **Ladder:** O2 2-D → 3-D; one attribute → three · O3 corners dotted → none · O6 outlines / solids.
+- **Misconceptions:** counts corners on curved shapes; thinks size makes a different shape.
+- **Visual catalogue:** also draws V147 Compare two shapes (reach 2 steps).
+
+### 28. Draw Angles and Lines — `draw_angles`
 
 - **What:** new skill `angles_lines:draw_angles`. Grade 4 · family geometry · source White Rose audit.
 - **Closes (standards):** 4.MD.C.6, 4.G.A.1 · tag with CCSS 4.MD.C.6, 4.G.A.1, EE M.EE.4.MD.6, M.EE.4.G.1
@@ -1759,251 +2522,6 @@ Owns: `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sh
 - **Ladder:** O2 multiples of 10° → any → reflex · O3 protractor printed on the line → none · O6 protractor picture.
 - **Misconceptions:** reads the wrong scale; draws the angle on the wrong side.
 
-### 9. What Can This Shape Do? — `shape_3d_tasks`
-
-- **What:** new skill `shapes_early:shape_properties_3d`. Grade PK · family geometry · source White Rose audit.
-- **Closes (standards):** K.G.B.4 · tag with CCSS K.G.A.3, K.G.B.4, EE M.EE.K.G.3
-- **Closes (White Rose steps):** R.B12.S2, R.B12.S3, R.B15.S1, R.B15.S8
-- **Teaches:** properties of 3-D shapes in use: roll, stack, slide; flat and curved faces; faces seen in 3-D shapes.
-- **Problem types:** (1) does it roll, stack or slide?; (2) flat or curved faces; (3) match the face print to the solid; (4) choose a shape for a job.
-- **Representation:** line drawings of 3-D shapes; tick roll/stack/slide; match the face print to the 3-D shape. Templates: `wordpic`; new: `solid-kit`.
-- **Answer:** tick roll / stack / slide; draw a line.
-- **Ladder:** O2 cube, sphere, cylinder → cone, pyramid, prism · O3 pictures of the action → words · O6 solids.
-- **Misconceptions:** a cylinder cannot stack; every flat face is a square.
-
-### 10. Copy and Build — `scenes`
-
-- **What:** new skill `shapes_early:build_and_copy`. Grade PK · family geometry · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS K.G.B.6, K.G.B.5, EE -
-- **Closes (White Rose steps):** R.B15.S4, R.B15.S6, R.B15.S7, R.B17.S4, R.B17.S5
-- **Teaches:** copying a picture or construction made of shapes, visualising from another viewpoint, replicating a scene.
-- **Problem types:** (1) copy the shape picture; (2) which copy matches?; (3) the same scene from another side; (4) replicate a scene.
-- **Representation:** a model picture made of shapes beside an empty frame; draw or choose the matching copy. Templates: `wordpic`; new: `shape-grid`.
-- **Answer:** draw in the frame or tick the match.
-- **Ladder:** O2 2 shapes → 4 → rotated · O3 dotted frame → none · O6 shapes / blocks.
-- **Misconceptions:** mirrors the picture; misses the position of one shape.
-
-### 11. Shapes Around Us — `shapes_world`
-
-- **What:** new skill `shapes_early:shapes_around_us`. Grade PK · family geometry · source White Rose audit.
-- **Closes (standards):** K.G.A.1 · tag with CCSS K.G.A.1, EE -
-- **Closes (White Rose steps):** R.B4.S3, R.B6.S3, R.B12.S4
-- **Teaches:** recognising 2-D and 3-D shapes in everyday objects (a clock is a circle, a tin is a cylinder).
-- **Extended for the standards:** name the shape of an everyday object from a bank.
-- **Problem types:** (1) which shape is this object?; (2) circle the objects that are circles; (3) match objects to 3-D shapes; (4) name from a word bank.
-- **Representation:** line drawings of everyday objects; circle or write the matching shape name from a word bank. Templates: `wordpic`; new: `picture-row`.
-- **Answer:** write the shape name from a bank or circle.
-- **Ladder:** O2 2-D faces → 3-D solids · O3 shape outline drawn beside the object → none · O6 line drawings.
-- **Misconceptions:** names the object not the shape; calls a cylinder a circle.
-
-### 12. Make and Compare Areas — `area_compare`
-
-- **What:** new skill `area_perimeter:compare_areas`. Grade 3 · family measurement · source White Rose audit.
-- **Closes (standards):** 3.MD.C.6 · tag with CCSS 3.MD.C.5, 3.MD.C.6, EE -
-- **Closes (White Rose steps):** Y4.B3.S3, Y4.B3.S4
-- **Teaches:** making shapes with a given area from squares and comparing areas by counting squares.
-- **Problem types:** (1) make a shape with a given area; (2) compare areas by counting squares; (3) which is bigger?; (4) same area, different shape.
-- **Representation:** two shapes on squared paper; circle the larger area or draw a shape of 6 squares. Templates: `legacy`; new: `shape-grid`.
-- **Answer:** circle or write the area; draw.
-- **Ladder:** O2 whole squares → larger shapes · O3 squares numbered → none · O6 grid.
-- **Misconceptions:** compares perimeters; counts edges.
-
-### 13. Area by Tiling and Multiplying (option) — `area_tile_multiply`
-
-- **What:** option on `area_perimeter:area_unit_squares`: unit label (square units, cm², m², in², ft²) and form "tile, then multiply" (count the squares, then write rows × columns). Grade 3 · family geometry · source standards audit.
-- **Closes (standards):** 3.MD.C.6, 3.MD.C.7a · tag with CCSS 3.MD.C.5a, 3.MD.C.6, 3.MD.C.7a, EE M.EE.4.MD.3, M.EE.6.G.1
-- **Closes (White Rose steps):** none · strengthens Y3.B4.S3
-- **Teaches:** area measured in square units of a named size, and that the tiled count equals side × side.
-- **Problem types:** (1) count the squares; write the unit; (2) count, then rows × columns; (3) same area, check by multiplying; (4) which unit square was used?.
-- **Representation:** Templates: `legacy`; new: `shape-grid`.
-- **Answer:** write the area with its square unit; write the multiplication.
-- **Ladder:** O2 rectangles to 24 → to 60 · O3 squares numbered → rows numbered → none · O6 unit name shown / pupil writes it.
-- **Misconceptions:** writes cm for cm²; counts the perimeter squares only.
-
-### 14. Same and Different Shapes — `compare_shapes`
-
-- **What:** new skill `shapes_early:compare_two_shapes`. Grade PK · family geometry · source White Rose audit.
-- **Closes (standards):** K.G.B.4 · tag with CCSS K.G.B.4, K.G.A.2, EE M.EE.K.G.2
-- **Closes (White Rose steps):** R.B4.S2, R.B15.S2
-- **Teaches:** comparing two shapes by sides, corners and straight or curved edges.
-- **Extended for the standards:** compare two 3-D shapes (faces, edges, vertices) and "sides of equal length".
-- **Problem types:** (1) same or different? (sides, corners, curved); (2) tick what both shapes have; (3) how are they different?; (4) sides of equal length; (5) 3-D: faces and edges.
-- **Representation:** two shapes side by side with a same/different checklist (sides, corners, curved). Templates: `wordpic`; new: `picture-row`.
-- **Answer:** tick the checklist; one word from a bank.
-- **Ladder:** O2 2-D → 3-D; one attribute → three · O3 corners dotted → none · O6 outlines / solids.
-- **Misconceptions:** counts corners on curved shapes; thinks size makes a different shape.
-
-### 15. Missing Lengths in Rectilinear Shapes — `missing_lengths`
-
-- **What:** new skill `area_perimeter:rectilinear_missing_sides`. Grade 3 · family measurement · source White Rose audit.
-- **Closes (standards):** 3.MD.D.8 · tag with CCSS 3.MD.D.8, EE -
-- **Closes (White Rose steps):** Y4.B6.S6, Y4.B6.S7
-- **Teaches:** finding missing side lengths in rectilinear shapes and then their perimeter.
-- **Problem types:** (1) find a missing side in an L-shape; (2) two missing sides; (3) then the perimeter; (4) T and U shapes.
-- **Representation:** an L or T shape with some sides labelled; write the missing lengths. Templates: `legacy`; new: `shape-grid`.
-- **Answer:** write the lengths.
-- **Ladder:** O2 one missing → two → perimeter · O3 matching sides coloured grey → none · O6 labelled / some labels.
-- **Misconceptions:** adds the wrong pair; forgets a side in the perimeter.
-
-### 16. Cut Into Equal Areas (option) — `partition_draw`
-
-- **What:** option on `shapes_early:partition_shapes`: task "draw the cuts": partition a shape into n equal-area parts and write the unit fraction of each part. Grade 3 · family geometry · source standards audit.
-- **Closes (standards):** 3.G.A.2, M.EE.3.G.2 · tag with CCSS 3.G.A.2, EE M.EE.3.G.2
-- **Closes (White Rose steps):** none · strengthens Y3.B6.S1
-- **Teaches:** partitioning shapes into parts with equal areas and naming each part as a unit fraction of the whole.
-- **Problem types:** (1) draw lines to make 4 equal parts; each is __ of the shape; (2) are these parts equal in area?; (3) two different ways to cut into quarters; (4) name one part.
-- **Representation:** Templates: `frac-model`; new: `shape-grid`.
-- **Answer:** draw the cut lines; write the unit fraction.
-- **Ladder:** O2 halves/quarters → thirds/sixths → eighths · O3 grid under the shape → dots → none · O6 rectangles / circles / hexagons.
-- **Misconceptions:** equal parts must be the same shape; counts parts that are not equal.
-
-### 17. Regular and Irregular Polygons — `polygons`
-
-- **What:** new skill `shapes_classify:regular_irregular_polygons`. Grade 3-4 · family geometry · source White Rose audit.
-- **Closes (standards):** 3.G.A.1 · tag with CCSS 3.G.A.1, 4.G.A.2, 5.G.B.3, EE M.EE.3.G.1, M.EE.4.G.2, M.EE.5.G.3
-- **Closes (White Rose steps):** Y4.B12.S6, Y5.B10.S9
-- **Teaches:** naming polygons by the number of sides, and telling regular from irregular.
-- **Problem types:** (1) name the polygon by sides; (2) regular or irregular?; (3) draw a regular polygon; (4) why is it irregular?.
-- **Representation:** polygon line drawings; write the name and tick regular / irregular. Templates: `legacy`; new: `shape-grid`.
-- **Answer:** write the name from a bank; tick regular / irregular.
-- **Ladder:** O2 3-6 sides → 8, 10 sides → reasons · O3 equal sides marked → none · O6 outlines.
-- **Misconceptions:** a regular shape must be upright; counts vertices for sides wrongly on concave shapes.
-
-### 18. Translate on a Grid — `translate_grid`
-
-- **What:** new skill `coordinates:translate_on_grid`. Grade 3-4 · family geometry · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 3.G.A.1, 5.G.A.1, 4.G.A.1, EE M.EE.3.G.1, M.EE.5.G.1, M.EE.4.G.1
-- **Closes (White Rose steps):** Y4.B14.S3, Y4.B14.S4, Y5.B11.S2, Y5.B11.S4
-- **Teaches:** translating a shape or point on a first-quadrant grid and describing a translation (3 right, 2 up).
-- **Problem types:** (1) translate a point; (2) translate a shape; (3) describe the translation; (4) where is the new vertex?.
-- **Representation:** a coordinate grid with a shape and its image; write the translation or draw the image. Templates: `legacy`; new: `coord-grid`.
-- **Answer:** draw the image or write the translation.
-- **Ladder:** O2 one direction → two → coordinates · O3 arrow drawn → none · O6 grid / coordinates.
-- **Misconceptions:** translates the shape by its size; counts the start square.
-
-### 19. Area of Triangles (option) — `area_triangle_grid`
-
-- **What:** option on `area_perimeter:area_triangle`: counting squares and right-angled. Grade 5 · family measurement · source White Rose audit.
-- **Closes (standards):** 6.G.A.1 · tag with CCSS 3.MD.C.6, EE -
-- **Closes (White Rose steps):** Y6.B10.S3
-- **Teaches:** the area of a triangle by counting squares, then as half a rectangle for right-angled and any triangles.
-- **Problem types:** (1) count squares for a triangle; (2) half the rectangle; (3) right-angled triangles; (4) any triangle.
-- **Representation:** grid and "half the rectangle" supports on area_triangle. Templates: `legacy`; new: `shape-grid`.
-- **Answer:** write the area.
-- **Ladder:** O2 right-angled on grid → any on grid → no grid · O3 rectangle dashed → none · O6 grid.
-- **Misconceptions:** uses the slant side as the height; forgets to halve.
-
-### 20. Make 3-D Shapes — `make_3d`
-
-- **What:** new skill `shapes_early:make_3d_shapes`. Grade 2 · family geometry · source White Rose audit.
-- **Closes (standards):** K.G.B.5 · tag with CCSS 2.G.A.1, 1.G.A.1, K.G.B.5, 1.G.A.2, EE M.EE.2.G.1, M.EE.1.G.1, M.EE.1.G.2
-- **Closes (White Rose steps):** Y3.B11.S10
-- **Teaches:** making skeleton 3-D shapes (straws and balls) and matching nets or faces to shapes.
-- **Extended for the standards:** K level: build a shape from sticks and balls (count sticks and balls).
-- **Problem types:** (1) how many straws and balls?; (2) match a skeleton to the solid; (3) match a net; (4) build from a description.
-- **Representation:** a picture of a skeleton model; write how many straws and balls; option: match a net. Templates: `legacy`; new: `solid-kit`.
-- **Answer:** write the numbers; draw a line.
-- **Ladder:** O2 cube → prisms → pyramids · O3 vertices dotted → none · O6 skeleton / solid.
-- **Misconceptions:** counts straws twice; confuses edges and vertices.
-
-### 21. Area of a Parallelogram — `parallelogram`
-
-- **What:** new skill `area_perimeter:area_parallelogram`. Grade 5 · family measurement · source White Rose audit.
-- **Closes (standards):** 6.G.A.1 · tag with CCSS 3.MD.C.7, 6.G.A.1, EE -
-- **Closes (White Rose steps):** Y6.B10.S6
-- **Teaches:** area of a parallelogram as base × perpendicular height, by cutting and moving a triangle.
-- **Extended for the standards:** trapezoids and other polygons by composing rectangles or decomposing into triangles.
-- **Problem types:** (1) area of a parallelogram (base × height); (2) cut and move a triangle; (3) trapezoid by decomposing (6.G.A.1); (4) polygon split into triangles and rectangles (6.G.A.1); (5) find a missing base or height.
-- **Representation:** a parallelogram on squared paper with the height dashed; write the area. Templates: `legacy`; new: `shape-grid`.
-- **Answer:** write the area.
-- **Ladder:** O2 on grid → no grid → trapezoids/polygons · O3 height dashed → none · O6 grid / plain.
-- **Misconceptions:** uses the slant side; halves a parallelogram.
-
-### 22. Same Area, Different Perimeter — `same_area`
-
-- **What:** new skill `area_perimeter:same_area_different_perimeter`. Grade 5 · family measurement · source White Rose audit.
-- **Closes (standards):** 3.MD.D.8 · tag with CCSS 3.MD.D.8, EE -
-- **Closes (White Rose steps):** Y6.B10.S1
-- **Teaches:** shapes with the same area but different perimeters, and the reverse.
-- **Extended for the standards:** Grade 3 level: exhibit rectangles with the same perimeter and different areas, and the reverse.
-- **Problem types:** (1) same area, different perimeter; (2) same perimeter, different area (3.MD.D.8); (3) draw two rectangles with area 12; (4) which pair matches?.
-- **Representation:** shapes on squared paper; write area and perimeter for each; circle the pair that match. Templates: `legacy`; new: `shape-grid`.
-- **Answer:** write area and perimeter; circle the pair.
-- **Ladder:** O2 given → draw · O3 grid numbered → none · O6 grid.
-- **Misconceptions:** same area means same perimeter; counts the corner squares twice.
-
-### 23. Angles Around a Point and on a Line (option) — `angles_point`
-
-- **What:** option on `angles_lines:additive_angles`: point and straight line. Grade 4 · family geometry · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 4.MD.C.7, EE -
-- **Closes (White Rose steps):** Y5.B10.S6, Y5.B10.S7
-- **Teaches:** angles on a straight line sum to 180°, around a point to 360°.
-- **Problem types:** (1) angles on a straight line sum to 180°; (2) around a point to 360°; (3) find the missing angle; (4) two missing angles.
-- **Representation:** diagram-type options on additive_angles. Templates: `legacy`; new: `angle-kit`.
-- **Answer:** write the angle.
-- **Ladder:** O2 two angles → three → two unknowns equal · O3 180°/360° reminder → none · O6 diagrams.
-- **Misconceptions:** uses 360° on a line; measures instead of calculating.
-
-### 24. Graph Points in a Real Problem (option) — `coord_context`
-
-- **What:** option on `coordinates:coordinate_q1`: form "in context": points are data (hours and pages, days and height); plot them and say what a point means. Grade 5 · family geometry · source standards audit.
-- **Closes (standards):** 5.G.A.2 · tag with CCSS 5.G.A.2, EE -
-- **Closes (White Rose steps):** none · strengthens Y6.B13.S2
-- **Teaches:** representing real-world problems by graphing points in the first quadrant and interpreting the coordinates.
-- **Problem types:** (1) plot the table as points; (2) what does (3, 12) mean in the story?; (3) which point shows …?; (4) read the missing value.
-- **Representation:** Templates: `legacy`; new: `coord-grid`, `data-table`.
-- **Answer:** plot; write the meaning from a bank.
-- **Ladder:** O2 axes by 1 → by 2 or 5 · O3 axis titles with units → none · O6 grid size.
-- **Misconceptions:** x and y swapped; reads the point on the wrong axis.
-
-### 25. Is It Still a Triangle? — `defining_attributes`
-
-- **What:** new skill `shapes_early:defining_attributes`. Grade 1 · family geometry · source standards audit.
-- **Closes (standards):** 1.G.A.1 · tag with CCSS 1.G.A.1, EE M.EE.1.G.1
-- **Closes (White Rose steps):** none · strengthens Y1.B3.S3, Y2.B3.S2
-- **Teaches:** defining attributes (closed, number of straight sides, corners) versus non-defining attributes (colour-free: size, orientation, thickness of line).
-- **Problem types:** (1) is it still a triangle when turned / bigger / thinner?; (2) which of these are triangles? (open shapes, curved sides); (3) what makes it a square? tick; (4) sort: changes the shape / does not.
-- **Representation:** Templates: `wordpic`; new: `picture-row`.
-- **Answer:** tick yes / no; tick attributes from a bank.
-- **Ladder:** O2 triangles/squares → rectangles/hexagons · O3 attribute icons → words · O6 outline weight / orientation.
-- **Misconceptions:** an upside-down triangle is not a triangle; a long thin rectangle is not a rectangle; an open shape counts.
-
-### 26. Describe Movement — `movement`
-
-- **What:** new skill `coordinates:describe_movement`. Grade 1 · family geometry · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS K.G.A.1, EE -
-- **Closes (White Rose steps):** Y2.B11.S2, Y2.B11.S4
-- **Teaches:** describing movement on a grid (up, down, left, right, number of squares) and combining movement with quarter/half turns.
-- **Problem types:** (1) write the moves (up 3, right 2); (2) follow a route; (3) moves with quarter turns; (4) which square does it end on?.
-- **Representation:** a square grid with a start and an object; write the moves; option: follow a route. Templates: `legacy`; new: `shape-grid`.
-- **Answer:** write the moves or the end square.
-- **Ladder:** O2 one direction → two → with turns · O3 arrows drawn → none · O6 grid / map.
-- **Misconceptions:** counts the start square; left and right swapped.
-
-### 27. Surface Area From Nets With Triangles (option) — `net_sa_triangles`
-
-- **What:** option on `coordinates:net_surface_area`: solids with triangle faces: triangular prisms and square pyramids. Grade 6 · family geometry · source standards audit.
-- **Closes (standards):** 6.G.A.4 · tag with CCSS 6.G.A.4, EE -
-- **Closes (White Rose steps):** none
-- **Teaches:** nets made of rectangles and triangles and the surface area from the net.
-- **Problem types:** (1) which solid does the net make?; (2) area of each face; (3) total surface area; (4) find the missing face.
-- **Representation:** Templates: `legacy`; new: `solid-kit`.
-- **Answer:** write each area and the total.
-- **Ladder:** O2 prisms → pyramids · O3 faces labelled with dimensions → none · O6 net / solid.
-- **Misconceptions:** forgets to halve a triangle; counts a face twice.
-
-### 28. Point, Line, Segment or Ray? — `points_lines_rays`
-
-- **What:** new skill `angles_lines:points_lines_rays`. Grade 4 · family geometry · source standards audit.
-- **Closes (standards):** 4.G.A.1 · tag with CCSS 4.G.A.1, EE M.EE.4.G.1
-- **Closes (White Rose steps):** none · strengthens Y3.B11.S6, Y3.B11.S7
-- **Teaches:** identifying and drawing points, lines, line segments, rays, right/acute/obtuse angles and perpendicular and parallel lines, and finding them in 2-D figures.
-- **Problem types:** (1) name it: point, line, segment, ray; (2) draw a ray from A through B on a dot grid; (3) draw a line parallel / perpendicular to this one; (4) find the perpendicular sides in the shape; (5) draw an obtuse angle.
-- **Representation:** Templates: `legacy`; new: `angle-kit`, `shape-grid`.
-- **Answer:** write the word from a bank; draw on the grid (the key shows one drawing).
-- **Ladder:** O2 name → draw → find in figures · O3 arrowheads and end dots explained in a key → none · O6 dot / square grid.
-- **Misconceptions:** a segment and a line are the same; lines must be horizontal to be parallel.
-
 ### 29. Measure With a Protractor (option) — `protractor_read`
 
 - **What:** option on `angles_lines:measure_angles`: form "read the protractor": a protractor drawn over the angle; write the degrees (not multiple choice). Grade 4 · family geometry · source standards audit.
@@ -2015,18 +2533,21 @@ Owns: `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sh
 - **Answer:** write the angle in degrees.
 - **Ladder:** O2 multiples of 10° → 5° → 1° · O3 the 0 of the scale ringed → none · O6 arm to the right / to the left.
 - **Misconceptions:** reads the wrong scale (60° for 120°); does not line up the base.
+- **After:** `vis_migrate_shapes`.
+- **Visual catalogue:** also draws V200 Protractor over an angle (reach 4 steps).
 
-### 30. Rows and Columns of Squares (option) — `rect_rows_columns`
+### 30. Describe Movement — `movement`
 
-- **What:** option on `shapes_early:compose_rect_from_squares`: sizes up to 5 × 5 and task "partition and count": draw the rows and columns, then write the total. Grade 2 · family geometry · source standards audit.
-- **Closes (standards):** 2.G.A.2 · tag with CCSS 2.G.A.2, EE -
-- **Closes (White Rose steps):** none · strengthens Y3.B4.S6
-- **Teaches:** partitioning a rectangle into rows and columns of same-size squares and counting them.
-- **Problem types:** (1) draw the lines at the marks, count the squares; (2) how many rows? columns? squares?; (3) fill with squares (the current drag task, now any size); (4) which rectangle has 12 squares?.
-- **Representation:** Templates: `legacy`; new: `shape-grid`.
-- **Answer:** draw lines; write rows, columns, total.
-- **Ladder:** O2 2 × 3 → 3 × 4 → 5 × 5 · O3 tick marks on all sides → two sides → none · O6 grid dots / ticks.
-- **Misconceptions:** unequal squares; counts lines instead of squares.
+- **What:** new skill `coordinates:describe_movement`. Grade 1 · family geometry · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS K.G.A.1, EE -
+- **Closes (White Rose steps):** Y2.B11.S2, Y2.B11.S4
+- **Teaches:** describing movement on a grid (up, down, left, right, number of squares) and combining movement with quarter/half turns.
+- **Problem types:** (1) write the moves (up 3, right 2); (2) follow a route; (3) moves with quarter turns; (4) which square does it end on?.
+- **Representation:** a square grid with a start and an object; write the moves; option: follow a route. Templates: `legacy`; new: `shape-grid`.
+- **Answer:** write the moves or the end square.
+- **Ladder:** O2 one direction → two → with turns · O3 arrows drawn → none · O6 grid / map.
+- **Misconceptions:** counts the start square; left and right swapped.
+- **Visual catalogue:** also draws V099 Moves and routes on a grid (reach 3 steps).
 
 ### 31. Perimeter of Regular Polygons (option) — `regular_polygon`
 
@@ -2039,58 +2560,48 @@ Owns: `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sh
 - **Answer:** write the perimeter.
 - **Ladder:** O2 triangle/square → hexagon/octagon → reverse · O3 equal marks → none · O6 outlines.
 - **Misconceptions:** multiplies by the wrong number of sides; adds one side only.
+- **Visual catalogue:** also draws V163 Regular polygons with equal-side hatch marks (reach 3 steps).
 
-### 32. Complete the Symmetric Shape — `symmetry_complete`
+### 32. Area by Tiling and Multiplying (option) — `area_tile_multiply`
 
-- **What:** new skill `angles_lines:complete_symmetric_shape`. Grade 1-3 · family geometry · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 1.G.A.1, 4.G.A.3, 3.G.A.1, EE M.EE.1.G.1, M.EE.4.G.3, M.EE.3.G.1
-- **Closes (White Rose steps):** Y2.B3.S6, Y4.B12.S8
-- **Teaches:** using a vertical line of symmetry to complete a shape or pattern on a square grid.
-- **Problem types:** (1) complete the shape across a vertical line; (2) complete a pattern; (3) horizontal mirror line; (4) find the mistake.
-- **Representation:** half a shape on squared paper beside a dashed mirror line; draw the other half. Templates: `legacy`; new: `shape-grid`.
-- **Answer:** draw the other half.
-- **Ladder:** O2 vertical → horizontal → diagonal-free patterns · O3 squares numbered from the line → none · O6 square / dot grid.
-- **Misconceptions:** translates instead of reflecting; counts from the wrong edge.
+- **What:** option on `area_perimeter:area_unit_squares`: unit label (square units, cm², m², in², ft²) and form "tile, then multiply" (count the squares, then write rows × columns). Grade 3 · family geometry · source standards audit.
+- **Closes (standards):** 3.MD.C.6, 3.MD.C.7a · tag with CCSS 3.MD.C.5a, 3.MD.C.6, 3.MD.C.7a, EE M.EE.4.MD.3, M.EE.6.G.1
+- **Closes (White Rose steps):** none · strengthens Y3.B4.S3
+- **Teaches:** area measured in square units of a named size, and that the tiled count equals side × side.
+- **Problem types:** (1) count the squares; write the unit; (2) count, then rows × columns; (3) same area, check by multiplying; (4) which unit square was used?.
+- **Representation:** Templates: `legacy`; new: `shape-grid`.
+- **Answer:** write the area with its square unit; write the multiplication.
+- **Ladder:** O2 rectangles to 24 → to 60 · O3 squares numbered → rows numbered → none · O6 unit name shown / pupil writes it.
+- **Misconceptions:** writes cm for cm²; counts the perimeter squares only.
+- **After:** `vis_migrate_area_volume`.
 
-### 33. Whole, Half and Quarter Turns — `turns`
+### 33. Cut Into Equal Areas (option) — `partition_draw`
 
-- **What:** new skill `coordinates:whole_half_quarter_turns`. Grade K-1 · family geometry · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS K.G.A.1, EE -
-- **Closes (White Rose steps):** Y1.B11.S1, Y2.B11.S3
-- **Teaches:** describing turns (whole, half, quarter, three-quarter; clockwise, anticlockwise) of an arrow or object.
-- **Problem types:** (1) whole, half, quarter or three-quarter turn?; (2) clockwise or anticlockwise; (3) draw the arrow after the turn; (4) how far has it turned?.
-- **Representation:** an arrow or object drawn before and after a turn; circle the turn from a word bank. Templates: `clock`; new: `angle-kit`.
-- **Answer:** circle the turn from a bank; draw the arrow.
-- **Ladder:** O2 half/whole → quarter → three-quarter · O3 turn arc drawn → none · O6 arrow / object / clock hand.
-- **Misconceptions:** clockwise confused with anticlockwise; three-quarter turn drawn as quarter.
+- **What:** option on `shapes_early:partition_shapes`: task "draw the cuts": partition a shape into n equal-area parts and write the unit fraction of each part. Grade 3 · family geometry · source standards audit.
+- **Closes (standards):** 3.G.A.2, M.EE.3.G.2 · tag with CCSS 3.G.A.2, EE M.EE.3.G.2
+- **Closes (White Rose steps):** none · strengthens Y3.B6.S1
+- **Teaches:** partitioning shapes into parts with equal areas and naming each part as a unit fraction of the whole.
+- **Problem types:** (1) draw lines to make 4 equal parts; each is __ of the shape; (2) are these parts equal in area?; (3) two different ways to cut into quarters; (4) name one part.
+- **Representation:** Templates: `frac-model`; new: `shape-grid`.
+- **Answer:** draw the cut lines; write the unit fraction.
+- **Ladder:** O2 halves/quarters → thirds/sixths → eighths · O3 grid under the shape → dots → none · O6 rectangles / circles / hexagons.
+- **Misconceptions:** equal parts must be the same shape; counts parts that are not equal.
+- **After:** `vis_migrate_shapes`.
 
-### 34. Composite 3-D Volume (repair) — `volume_composite_repair`
+### 34. Make 3-D Shapes — `make_3d`
 
-- **What:** repair on `area_perimeter:volume_composite`: deal what the name says: two non-overlapping rectangular prisms joined (L-shaped solids), not one prism. Grade 5 · family geometry · source standards audit.
-- **Closes (standards):** 5.MD.C.5c · tag with CCSS 5.MD.C.5c, EE M.EE.5.MD.5
-- **Closes (White Rose steps):** none · strengthens Y6.B10.S8
-- **Teaches:** volume is additive: the volume of two joined prisms is the sum of their volumes, in real-world problems.
-- **Problem types:** (1) volume of an L-shaped solid; (2) split it two ways; (3) find a missing edge first; (4) story: two boxes joined.
-- **Representation:** Templates: `legacy`; new: `solid-kit`.
-- **Answer:** write the volume in cubic units.
-- **Ladder:** O2 small edges → larger · O3 split line drawn → none · O6 labelled / some labels.
-- **Misconceptions:** multiplies all the edges shown; counts the overlap twice.
-- **After:** `volume_cubes`.
+- **What:** new skill `shapes_early:make_3d_shapes`. Grade 2 · family geometry · source White Rose audit.
+- **Closes (standards):** K.G.B.5 · tag with CCSS 2.G.A.1, 1.G.A.1, K.G.B.5, 1.G.A.2, EE M.EE.2.G.1, M.EE.1.G.1, M.EE.1.G.2
+- **Closes (White Rose steps):** Y3.B11.S10
+- **Teaches:** making skeleton 3-D shapes (straws and balls) and matching nets or faces to shapes.
+- **Extended for the standards:** K level: build a shape from sticks and balls (count sticks and balls).
+- **Problem types:** (1) how many straws and balls?; (2) match a skeleton to the solid; (3) match a net; (4) build from a description.
+- **Representation:** a picture of a skeleton model; write how many straws and balls; option: match a net. Templates: `legacy`; new: `solid-kit`.
+- **Answer:** write the numbers; draw a line.
+- **Ladder:** O2 cube → prisms → pyramids · O3 vertices dotted → none · O6 skeleton / solid.
+- **Misconceptions:** counts straws twice; confuses edges and vertices.
 
-### 35. Volume With Fractional Edges (option) — `volume_fractional`
-
-- **What:** option on `area_perimeter:volume`: fractional edge lengths (1/2 and 1/4 units) and packing with unit-fraction cubes. Grade 6 · family geometry · source standards audit.
-- **Closes (standards):** 6.G.A.2 · tag with CCSS 6.G.A.2, EE M.EE.6.G.2
-- **Closes (White Rose steps):** none
-- **Teaches:** volume of a prism with fractional edges by packing 1/2-unit cubes and by V = l × w × h = B × h.
-- **Problem types:** (1) how many 1/2-unit cubes fill it?; (2) V = l × w × h with fractions; (3) show the two answers match; (4) story.
-- **Representation:** Templates: `legacy`; new: `solid-kit`.
-- **Answer:** write the volume as a fraction or mixed number of cubic units.
-- **Ladder:** O2 halves → quarters → mixed numbers · O3 layers drawn → none · O6 cubes / plain.
-- **Misconceptions:** each small cube is 1 cubic unit; adds the edges.
-- **After:** `volume_cubes`.
-
-### 36. Estimate Area — `area_estimate`
+### 35. Estimate Area — `area_estimate`
 
 - **What:** new skill `area_perimeter:estimate_area`. Grade 4 · family measurement · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 3.MD.C.6, EE -
@@ -2101,8 +2612,9 @@ Owns: `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sh
 - **Answer:** write the estimate.
 - **Ladder:** O2 whole → halves → mixed · O3 half squares shaded → none · O6 grid.
 - **Misconceptions:** counts every touched square as 1; ignores half squares.
+- **Visual catalogue:** also draws V180 Estimate area of an irregular shape on a cm grid (reach 1 steps).
 
-### 37. Parts of a Circle — `circles`
+### 36. Parts of a Circle — `circles`
 
 - **What:** new skill `shapes_classify:parts_of_a_circle`. Grade 5 · family geometry · source White Rose audit.
 - **Closes (standards):** none not already full
@@ -2113,6 +2625,19 @@ Owns: `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sh
 - **Answer:** write the word from a bank or the length.
 - **Ladder:** O2 name → calculate · O3 centre marked → none · O6 circles.
 - **Misconceptions:** radius is the whole width; halves the radius for the diameter.
+- **Visual catalogue:** also draws V203 Circle parts (reach 1 steps).
+
+### 37. Is It Still a Triangle? — `defining_attributes`
+
+- **What:** new skill `shapes_early:defining_attributes`. Grade 1 · family geometry · source standards audit.
+- **Closes (standards):** 1.G.A.1 · tag with CCSS 1.G.A.1, EE M.EE.1.G.1
+- **Closes (White Rose steps):** none · strengthens Y1.B3.S3, Y2.B3.S2
+- **Teaches:** defining attributes (closed, number of straight sides, corners) versus non-defining attributes (colour-free: size, orientation, thickness of line).
+- **Problem types:** (1) is it still a triangle when turned / bigger / thinner?; (2) which of these are triangles? (open shapes, curved sides); (3) what makes it a square? tick; (4) sort: changes the shape / does not.
+- **Representation:** Templates: `wordpic`; new: `picture-row`.
+- **Answer:** tick yes / no; tick attributes from a bank.
+- **Ladder:** O2 triangles/squares → rectangles/hexagons · O3 attribute icons → words · O6 outline weight / orientation.
+- **Misconceptions:** an upside-down triangle is not a triangle; a long thin rectangle is not a rectangle; an open shape counts.
 
 ### 38. Draw Shapes Accurately — `draw_accurately`
 
@@ -2125,8 +2650,72 @@ Owns: `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sh
 - **Answer:** draw; the key shows a drawing.
 - **Ladder:** O2 right-angled → any angle · O3 base line printed → none · O6 sketch shown / not.
 - **Misconceptions:** protractor on the wrong vertex; reads the inner and outer scale mixed.
+- **Visual catalogue:** also draws V204 Construction brief (sketch → accurate drawing) (reach 1 steps).
 
-### 39. Horizontal and Vertical Lines — `hv_lines`
+### 39. Surface Area From Nets With Triangles (option) — `net_sa_triangles`
+
+- **What:** option on `coordinates:net_surface_area`: solids with triangle faces: triangular prisms and square pyramids. Grade 6 · family geometry · source standards audit.
+- **Closes (standards):** 6.G.A.4 · tag with CCSS 6.G.A.4, EE -
+- **Closes (White Rose steps):** none
+- **Teaches:** nets made of rectangles and triangles and the surface area from the net.
+- **Problem types:** (1) which solid does the net make?; (2) area of each face; (3) total surface area; (4) find the missing face.
+- **Representation:** Templates: `legacy`; new: `solid-kit`.
+- **Answer:** write each area and the total.
+- **Ladder:** O2 prisms → pyramids · O3 faces labelled with dimensions → none · O6 net / solid.
+- **Misconceptions:** forgets to halve a triangle; counts a face twice.
+
+### 40. Point, Line, Segment or Ray? — `points_lines_rays`
+
+- **What:** new skill `angles_lines:points_lines_rays`. Grade 4 · family geometry · source standards audit.
+- **Closes (standards):** 4.G.A.1 · tag with CCSS 4.G.A.1, EE M.EE.4.G.1
+- **Closes (White Rose steps):** none · strengthens Y3.B11.S6, Y3.B11.S7
+- **Teaches:** identifying and drawing points, lines, line segments, rays, right/acute/obtuse angles and perpendicular and parallel lines, and finding them in 2-D figures.
+- **Problem types:** (1) name it: point, line, segment, ray; (2) draw a ray from A through B on a dot grid; (3) draw a line parallel / perpendicular to this one; (4) find the perpendicular sides in the shape; (5) draw an obtuse angle.
+- **Representation:** Templates: `legacy`; new: `angle-kit`, `shape-grid`.
+- **Answer:** write the word from a bank; draw on the grid (the key shows one drawing).
+- **Ladder:** O2 name → draw → find in figures · O3 arrowheads and end dots explained in a key → none · O6 dot / square grid.
+- **Misconceptions:** a segment and a line are the same; lines must be horizontal to be parallel.
+
+### 41. Rows and Columns of Squares (option) — `rect_rows_columns`
+
+- **What:** option on `shapes_early:compose_rect_from_squares`: sizes up to 5 × 5 and task "partition and count": draw the rows and columns, then write the total. Grade 2 · family geometry · source standards audit.
+- **Closes (standards):** 2.G.A.2 · tag with CCSS 2.G.A.2, EE -
+- **Closes (White Rose steps):** none · strengthens Y3.B4.S6
+- **Teaches:** partitioning a rectangle into rows and columns of same-size squares and counting them.
+- **Problem types:** (1) draw the lines at the marks, count the squares; (2) how many rows? columns? squares?; (3) fill with squares (the current drag task, now any size); (4) which rectangle has 12 squares?.
+- **Representation:** Templates: `legacy`; new: `shape-grid`.
+- **Answer:** draw lines; write rows, columns, total.
+- **Ladder:** O2 2 × 3 → 3 × 4 → 5 × 5 · O3 tick marks on all sides → two sides → none · O6 grid dots / ticks.
+- **Misconceptions:** unequal squares; counts lines instead of squares.
+- **After:** `vis_migrate_shapes`.
+
+### 42. Composite 3-D Volume (repair) — `volume_composite_repair`
+
+- **What:** repair on `area_perimeter:volume_composite`: deal what the name says: two non-overlapping rectangular prisms joined (L-shaped solids), not one prism. Grade 5 · family geometry · source standards audit.
+- **Closes (standards):** 5.MD.C.5c · tag with CCSS 5.MD.C.5c, EE M.EE.5.MD.5
+- **Closes (White Rose steps):** none · strengthens Y6.B10.S8
+- **Teaches:** volume is additive: the volume of two joined prisms is the sum of their volumes, in real-world problems.
+- **Problem types:** (1) volume of an L-shaped solid; (2) split it two ways; (3) find a missing edge first; (4) story: two boxes joined.
+- **Representation:** Templates: `legacy`; new: `solid-kit`.
+- **Answer:** write the volume in cubic units.
+- **Ladder:** O2 small edges → larger · O3 split line drawn → none · O6 labelled / some labels.
+- **Misconceptions:** multiplies all the edges shown; counts the overlap twice.
+- **After:** `volume_cubes`, `vis_migrate_area_volume`.
+
+### 43. Volume With Fractional Edges (option) — `volume_fractional`
+
+- **What:** option on `area_perimeter:volume`: fractional edge lengths (1/2 and 1/4 units) and packing with unit-fraction cubes. Grade 6 · family geometry · source standards audit.
+- **Closes (standards):** 6.G.A.2 · tag with CCSS 6.G.A.2, EE M.EE.6.G.2
+- **Closes (White Rose steps):** none
+- **Teaches:** volume of a prism with fractional edges by packing 1/2-unit cubes and by V = l × w × h = B × h.
+- **Problem types:** (1) how many 1/2-unit cubes fill it?; (2) V = l × w × h with fractions; (3) show the two answers match; (4) story.
+- **Representation:** Templates: `legacy`; new: `solid-kit`.
+- **Answer:** write the volume as a fraction or mixed number of cubic units.
+- **Ladder:** O2 halves → quarters → mixed numbers · O3 layers drawn → none · O6 cubes / plain.
+- **Misconceptions:** each small cube is 1 cubic unit; adds the edges.
+- **After:** `volume_cubes`, `vis_migrate_area_volume`.
+
+### 44. Horizontal and Vertical Lines — `hv_lines`
 
 - **What:** new skill `angles_lines:horizontal_vertical`. Grade 2 · family geometry · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 2.G.A.1, EE M.EE.2.G.1
@@ -2138,7 +2727,7 @@ Owns: `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sh
 - **Ladder:** O2 shapes → grids → drawing · O3 grid behind → none · O6 shapes / letters.
 - **Misconceptions:** a slanted line is horizontal; confuses the two words.
 
-### 40. Lengths and Angles in Shapes — `lengths_angles_shapes`
+### 45. Lengths and Angles in Shapes — `lengths_angles_shapes`
 
 - **What:** new skill `shapes_classify:angles_in_shapes`. Grade 4 · family geometry · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 4.G.A.2, 4.MD.C.7, EE M.EE.4.G.2
@@ -2150,19 +2739,7 @@ Owns: `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sh
 - **Ladder:** O2 rectangles → regular polygons · O3 equal-side marks explained → none · O6 diagrams.
 - **Misconceptions:** ignores the equal marks; adds all sides for one.
 
-### 41. Reflect on a Grid — `reflect_grid`
-
-- **What:** new skill `coordinates:reflect_on_grid`. Grade 4 · family geometry · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 4.G.A.1, 5.G.A.1, EE M.EE.4.G.1, M.EE.5.G.1
-- **Closes (White Rose steps):** Y5.B11.S6
-- **Teaches:** reflecting a shape in a horizontal or vertical mirror line on a square grid and in the axes.
-- **Problem types:** (1) reflect a point; (2) reflect a shape in a vertical line; (3) in a horizontal line; (4) in the axes.
-- **Representation:** a grid with a dashed mirror line and a shape; draw the reflection; key shows it. Templates: `legacy`; new: `coord-grid`, `shape-grid`.
-- **Answer:** draw the reflection.
-- **Ladder:** O2 vertical → horizontal → axes · O3 distances marked → none · O6 grid / coordinates.
-- **Misconceptions:** translates instead of reflecting; reflects to the wrong distance.
-
-### 42. Faces, Edges or Vertices (option) — `shape_faces`
+### 46. Faces, Edges or Vertices (option) — `shape_faces`
 
 - **What:** option on `shapes_early:count_edges_faces_vertices`: by part. Grade 1 · family geometry · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 1.G.A.1, 2.G.A.1, EE M.EE.1.G.1, M.EE.2.G.1
@@ -2173,24 +2750,23 @@ Owns: `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sh
 - **Answer:** write the number.
 - **Ladder:** O2 one property per page → mixed · O3 hidden edges dashed → none · O6 solid drawings.
 - **Misconceptions:** misses hidden faces; counts a vertex as an edge.
+- **After:** `vis_migrate_shapes`.
 
-### 43. 3-D Shapes: Names and Properties — `shapes_3d_props`
+## Lane `measurement`: Measurement (length, mass, capacity, conversions) (23)
 
-- **What:** new skill `shapes_classify:3d_shape_properties`. Grade 4 · family geometry · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 1.G.A.1, EE M.EE.1.G.1
-- **Closes (White Rose steps):** Y5.B10.S10
-- **Teaches:** naming 3-D shapes (prisms, pyramids) from faces, edges and vertices and from their 2-D views or nets.
-- **Problem types:** (1) name the solid from its properties; (2) faces, edges, vertices table; (3) which net?; (4) prism or pyramid?.
-- **Representation:** a 3-D shape drawing with a property table; option: which net makes it. Templates: `legacy`; new: `solid-kit`.
-- **Answer:** write the name; fill the table.
-- **Ladder:** O2 cube/cuboid → prisms → pyramids · O3 hidden edges dashed → none · O6 solids / nets.
-- **Misconceptions:** a cube is not a prism; counts faces on a net wrongly.
+Owns: `js/modules/gen-measurement.js`, `js/modules/sheet/cells/panes/ladder.js`. Builds templates: `measure-scale`, `balance`, `ladder`.
 
-## Lane `measurement`: Measurement (length, mass, capacity, conversions) (21)
+### 1. Migrate Legacy Measure Visuals to B&W Kit Cells — `vis_migrate_measures`
 
-Owns: `js/modules/gen-measurement.js`. Builds templates: `measure-scale`, `balance`.
+- **Added from visual catalogue.** migration · grade PK-5 · lane `measurement`.
+- **Build:** reading_ruler (cm with mm, offset start, decimal labels; inches kept as an option), heavier_lighter_visual (a pan balance, not emoji), mass_volume_liquid (dial and jug scales), temperature (createThermometerSVG → measure-scale with `orientation`, `min` / `max` / `every`, colour to a reading, below zero), measure_nonstandard, order_objects_length and compare_objects (one baseline) move onto measure-scale / balance.
+- **Offered on:** `measurement:reading_ruler`, `measurement:heavier_lighter_visual`, `measurement:mass_volume_liquid`, `measurement:temperature`, `shapes_early:measure_nonstandard`, `shapes_early:order_objects_length`.
+- **Templates:** -; new or owned: `measure-scale`, `balance`. **Files:** `js/modules/gen-measurement.js`.
+- **Draws (visual catalogue):** V046 Ruler, cm with mm (offset start; decimal labels); V049 Dial weighing scale; V050 Balance / see-saw; V051 Measuring jug / beaker with a scale; V096 Thermometer (vertical / horizontal; below zero); V119 Two objects on one baseline (longer, taller); V120 Non-standard units beside an object.
+- **Reach:** 56 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 1. Read Scales (g, kg, ml, l) — `mass_scales`
+### 2. Read Scales (g, kg, ml, l) — `mass_scales`
 
 - **What:** new skill `measurement:read_scales`. Grade 1-2 · family measurement · source White Rose audit.
 - **Closes (standards):** 3.MD.A.2, M.EE.3.MD.2 · tag with CCSS 3.MD.A.2, 4.MD.A.1, EE M.EE.3.MD.2, M.EE.4.MD.1
@@ -2202,8 +2778,48 @@ Owns: `js/modules/gen-measurement.js`. Builds templates: `measure-scale`, `balan
 - **Answer:** write the reading with its unit.
 - **Ladder:** O2 labelled every step → every 2nd, 5th → unlabelled intervals · O3 arrow to the tick → none · O6 dial / jug / bar scale.
 - **Misconceptions:** counts ticks as 1 each; reads the next labelled number.
+- **After:** `vis_migrate_measures`.
+- **Visual catalogue:** also draws V049 Dial weighing scale; V051 Measuring jug / beaker with a scale (reach 22 steps).
 
-### 2. Mass and Capacity Word Problems — `mass_ops`
+### 3. Read a Centimetre Ruler (option) — `ruler_cm`
+
+- **What:** option on `measurement:reading_ruler`: centimetres and millimetres. Grade K-2 · family measurement · source White Rose audit.
+- **Closes (standards):** 2.MD.A.1 · tag with CCSS K.MD.A.1, 2.MD.A.1, 1.MD.A.2, EE M.EE.K.MD.1, M.EE.2.MD.1, M.EE.1.MD.2
+- **Closes (White Rose steps):** Y1.B7.S3, Y2.B6.S1, Y3.B5.S2
+- **Teaches:** measuring lengths in whole centimetres, then millimetres, on a metric ruler (the skill reads inches only).
+- **Problem types:** (1) measure in whole cm; (2) measure in mm; (3) how long? (starts at 0); (4) object not at 0.
+- **Representation:** a unit option (cm, mm) on reading_ruler with the same arrow-and-ruler picture. Templates: `legacy`; new: `measure-scale`.
+- **Answer:** write the length with cm or mm.
+- **Ladder:** O2 whole cm → half cm → mm; start at 0 → not at 0 · O3 arrow to the reading → none · O6 ruler picture.
+- **Misconceptions:** starts at 1; counts lines not spaces.
+- **After:** `vis_migrate_measures`.
+- **Visual catalogue:** also draws V046 Ruler, cm with mm (offset start; decimal labels) (reach 14 steps).
+
+### 4. Balanced or Not? — `balance`
+
+- **What:** new skill `measurement:balance_scales`. Grade PK · family measurement · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS K.MD.A.2, EE M.EE.K.MD.2
+- **Closes (White Rose steps):** R.B8.S2
+- **Teaches:** a balance scale shows heavier, lighter or equal (balanced) mass.
+- **Problem types:** (1) heavier, lighter or balanced?; (2) which side is heavier?; (3) what makes it balance?; (4) order by mass from balances.
+- **Representation:** a drawn pan balance tipped or level with objects in each pan; tick heavier, lighter or balanced. Templates: `wordpic`; new: `balance`.
+- **Answer:** tick one.
+- **Ladder:** O2 two objects → three via two balances · O3 arrow on the heavy side → none · O6 balance picture.
+- **Misconceptions:** the higher pan is heavier; bigger is heavier.
+- **Visual catalogue:** also draws V050 Balance / see-saw (reach 12 steps).
+
+### 5. Conversion Ladder and Conversion Bars — `vis_conversion_models`
+
+- **Added from visual catalogue.** pane · grade 1-5 · lane `measurement`.
+- **Build:** a new pane:ladder (unit boxes mm → cm → m → km with ÷ arcs above and × arcs below), a structural support on the conversion skills, and `model: 'bars'` (unit-conversion bars; 60-second cells) on length_metric, unit_conversions and the time conversions.
+- **Offered on:** `measurement:length_metric`, `measurement:unit_conversions`.
+- **Templates:** -; new or owned: `ladder`, `bar-model`. **Files:** `js/modules/sheet/cells/panes/ladder.js`, `js/modules/gen-measurement.js`.
+- **Draws (visual catalogue):** V029 Unit-conversion bars (1 m cells over 100 cm); V188 Conversion ladder (mm → cm → m → km).
+- **Reach:** 12 White Rose small steps use these pictures.
+- **After:** `vis_bar_family` (lane `operations`), `vis_operator_arcs` (lane `fractions`).
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 6. Mass and Capacity Word Problems — `mass_ops`
 
 - **What:** new skill `measurement:mass_capacity_word_problems`. Grade 1-2 · family measurement · source White Rose audit.
 - **Closes (standards):** 3.MD.A.2, 4.MD.A.2 · tag with CCSS 3.MD.A.2, K.MD.A.2, 4.MD.A.2, EE M.EE.3.MD.2, M.EE.K.MD.2
@@ -2216,7 +2832,33 @@ Owns: `js/modules/gen-measurement.js`. Builds templates: `measure-scale`, `balan
 - **Ladder:** O2 same unit → mixed units → × ÷ with decimals · O3 scale picture and bar → none · O6 pictures / plain.
 - **Misconceptions:** adds g to kg directly; divides the wrong way.
 
-### 3. Length Word Problems — `length_ops`
+### 7. Compare Lengths — `compare_lengths`
+
+- **What:** new skill `measurement:compare_lengths`. Grade 2 · family measurement · source White Rose audit.
+- **Closes (standards):** 2.MD.A.4 · tag with CCSS 2.MD.A.4, EE M.EE.2.MD.4
+- **Closes (White Rose steps):** Y3.B5.S7
+- **Teaches:** comparing and ordering lengths in mixed units (1 m 20 cm vs 125 cm).
+- **Problem types:** (1) compare in mixed units; (2) order lengths; (3) convert then compare; (4) which is longer by how much?.
+- **Representation:** two labelled bars; write <, > or = after converting. Templates: `compare`.
+- **Answer:** write <, > or =.
+- **Ladder:** O2 same unit → mixed · O3 conversion fact → none · O6 bars / numbers.
+- **Misconceptions:** compares the numbers without units; 1 m 20 cm < 125 cm because 1 < 125.
+- **Visual catalogue:** also draws V119 Two objects on one baseline (longer, taller) (reach 6 steps).
+
+### 8. Measure Capacity with Cups — `nonstandard_capacity`
+
+- **What:** new skill `measurement:measure_capacity_cups`. Grade K · family measurement · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS K.MD.A.1, K.MD.A.2, EE M.EE.K.MD.1, M.EE.K.MD.2
+- **Closes (White Rose steps):** Y1.B8.S6, Y1.B8.S7
+- **Teaches:** measuring capacity and volume with non-standard units (cups, spoons) and comparing.
+- **Problem types:** (1) how many cups fill it?; (2) which holds more?; (3) order by capacity; (4) compare with the same cup.
+- **Representation:** containers with a count of cups drawn beside them; write how many cups; circle the one that holds more. Templates: `counters`.
+- **Answer:** write the number of cups.
+- **Ladder:** O2 to 10 → 20 · O3 cups drawn in a row → none · O6 containers.
+- **Misconceptions:** different cup sizes compared as equal; counts half cups as whole.
+- **Visual catalogue:** also draws V121 Unscaled containers (empty … full; cupfuls) (reach 7 steps).
+
+### 9. Length Word Problems — `length_ops`
 
 - **What:** new skill `measurement:length_word_problems`. Grade 1 · family measurement · source White Rose audit.
 - **Closes (standards):** 2.MD.B.5, 4.MD.A.2, M.EE.2.MD.5 · tag with CCSS 2.MD.B.5, 4.MD.A.2, EE M.EE.2.MD.5
@@ -2228,79 +2870,6 @@ Owns: `js/modules/gen-measurement.js`. Builds templates: `measure-scale`, `balan
 - **Answer:** write the answer with the unit.
 - **Ladder:** O2 same unit within 20 → within 100 → × ÷; cube trains for EE · O3 ruler or bar drawn → none · O6 pictures / plain.
 - **Misconceptions:** adds when the story compares; drops the unit.
-
-### 4. Compare Lengths Indirectly and by Units (option) — `order_length_tasks`
-
-- **What:** option on `shapes_early:order_objects_length`: task "compare using a third object" (A is longer than C, C is longer than B) and "order by counted units" (cube trains). Grade 1 · family measurement · source standards audit.
-- **Closes (standards):** 1.MD.A.1, M.EE.2.MD.3, M.EE.2.MD.4 · tag with CCSS 1.MD.A.1, EE M.EE.2.MD.3, M.EE.2.MD.4
-- **Closes (White Rose steps):** none · strengthens Y1.B7.S2
-- **Teaches:** comparing two lengths indirectly by a third object, and ordering objects by lengths measured in non-standard units.
-- **Problem types:** (1) the string is longer than the pencil and shorter than the book: which is longest?; (2) order three by cube counts; (3) which is longer? use the string; (4) longest / shortest.
-- **Representation:** Templates: `wordpic`, `counters`; new: `picture-row`.
-- **Answer:** circle or number 1-3.
-- **Ladder:** O2 two clues → three objects → units · O3 objects drawn to scale → clue sentences only · O6 pictures / bars.
-- **Misconceptions:** the object mentioned first is longer; more units always means longer even with different units.
-
-### 5. Read a Centimetre Ruler (option) — `ruler_cm`
-
-- **What:** option on `measurement:reading_ruler`: centimetres and millimetres. Grade K-2 · family measurement · source White Rose audit.
-- **Closes (standards):** 2.MD.A.1 · tag with CCSS K.MD.A.1, 2.MD.A.1, 1.MD.A.2, EE M.EE.K.MD.1, M.EE.2.MD.1, M.EE.1.MD.2
-- **Closes (White Rose steps):** Y1.B7.S3, Y2.B6.S1, Y3.B5.S2
-- **Teaches:** measuring lengths in whole centimetres, then millimetres, on a metric ruler (the skill reads inches only).
-- **Problem types:** (1) measure in whole cm; (2) measure in mm; (3) how long? (starts at 0); (4) object not at 0.
-- **Representation:** a unit option (cm, mm) on reading_ruler with the same arrow-and-ruler picture. Templates: `legacy`; new: `measure-scale`.
-- **Answer:** write the length with cm or mm.
-- **Ladder:** O2 whole cm → half cm → mm; start at 0 → not at 0 · O3 arrow to the reading → none · O6 ruler picture.
-- **Misconceptions:** starts at 1; counts lines not spaces.
-
-### 6. Add and Subtract Lengths — `add_sub_lengths`
-
-- **What:** new skill `measurement:add_subtract_lengths`. Grade 2 · family measurement · source White Rose audit.
-- **Closes (standards):** 2.MD.B.5 · tag with CCSS 2.MD.B.5, EE M.EE.2.MD.5
-- **Closes (White Rose steps):** Y3.B5.S8, Y3.B5.S9
-- **Teaches:** adding and subtracting lengths in the same and mixed units, including bar-model "longer by" / "shorter by" problems.
-- **Problem types:** (1) add lengths, same unit; (2) mixed units; (3) bar model longer by; (4) shorter by.
-- **Representation:** a bar model with two lengths; write the total or the difference with the unit. Templates: `word-work`; new: `bar-model`.
-- **Answer:** write the answer with the unit.
-- **Ladder:** O2 same unit → mixed · O3 bar model → none · O6 bar / plain.
-- **Misconceptions:** adds m to cm; difference by adding.
-
-### 7. Metres, Centimetres, Millimetres (option) — `mm_cm_m`
-
-- **What:** option on `measurement:length_metric`: mm and cm. Grade 2 · family measurement · source White Rose audit.
-- **Closes (standards):** 2.MD.A.2 · tag with CCSS 2.MD.A.1, 2.MD.A.2, 4.MD.A.1, EE M.EE.2.MD.1, M.EE.4.MD.1
-- **Closes (White Rose steps):** Y3.B5.S1, Y3.B5.S3
-- **Teaches:** measuring in mm, cm and m and converting between them (2 m 30 cm = 230 cm).
-- **Extended for the standards:** measure one object in two units and say why the counts differ (bigger unit, smaller count).
-- **Problem types:** (1) measure in mm, cm, m; (2) convert 2 m 30 cm = 230 cm; (3) measure one object in two units and compare (2.MD.A.2); (4) mixed-unit answers.
-- **Representation:** ruler pictures in mm; mixed-unit answers (_ m _ cm). Templates: `legacy`; new: `measure-scale`.
-- **Answer:** write the length in each unit.
-- **Ladder:** O2 cm ↔ mm → m ↔ cm → mixed · O3 conversion fact → none · O6 ruler picture.
-- **Misconceptions:** 2 m 30 cm = 2030 cm; more units means longer object.
-
-### 8. How Much Longer? (option) — `ruler_difference`
-
-- **What:** option on `measurement:reading_ruler`: task "how much longer?": two objects on one ruler; cm and inches. Grade 2 · family measurement · source standards audit.
-- **Closes (standards):** 2.MD.A.4, M.EE.4.MD.2 · tag with CCSS 2.MD.A.4, EE M.EE.4.MD.2
-- **Closes (White Rose steps):** none · strengthens Y2.B6.S4, Y3.B5.S7
-- **Teaches:** measuring two objects with a standard unit and finding how much longer one is.
-- **Problem types:** (1) measure both, then the difference; (2) which is longer and by how much?; (3) difference on the ruler (count on); (4) story: the ribbon is longer by ….
-- **Representation:** Templates: `legacy`; new: `measure-scale`.
-- **Answer:** write both lengths and the difference with the unit.
-- **Ladder:** O2 whole inches → whole cm · O3 both start at 0 → one not at 0 · O6 ruler above / below.
-- **Misconceptions:** adds the two lengths; reads the end number of an object not starting at 0.
-
-### 9. Compare Lengths — `compare_lengths`
-
-- **What:** new skill `measurement:compare_lengths`. Grade 2 · family measurement · source White Rose audit.
-- **Closes (standards):** 2.MD.A.4 · tag with CCSS 2.MD.A.4, EE M.EE.2.MD.4
-- **Closes (White Rose steps):** Y3.B5.S7
-- **Teaches:** comparing and ordering lengths in mixed units (1 m 20 cm vs 125 cm).
-- **Problem types:** (1) compare in mixed units; (2) order lengths; (3) convert then compare; (4) which is longer by how much?.
-- **Representation:** two labelled bars; write <, > or = after converting. Templates: `compare`.
-- **Answer:** write <, > or =.
-- **Ladder:** O2 same unit → mixed · O3 conversion fact → none · O6 bars / numbers.
-- **Misconceptions:** compares the numbers without units; 1 m 20 cm < 125 cm because 1 < 125.
 
 ### 10. Measure in Metres (option) — `metres`
 
@@ -2314,8 +2883,75 @@ Owns: `js/modules/gen-measurement.js`. Builds templates: `measure-scale`, `balan
 - **Answer:** write the length; circle the unit or tool.
 - **Ladder:** O2 whole m → m and cm · O3 metre stick drawn → none · O6 picture.
 - **Misconceptions:** a door is 2 cm tall; uses a ruler for a playground.
+- **After:** `vis_migrate_measures`.
+- **Visual catalogue:** also draws V047 Metre stick (vertical; striped) (reach 4 steps).
 
-### 11. Calculate with Metric Measures — `metric_calc`
+### 11. Measure With Two Units (option) — `measure_two_units`
+
+- **What:** option on `shapes_early:measure_nonstandard`: task "measure twice": the same object in two units (paper clips and crayons; inches and cm). Grade 2 · family measurement · source standards audit.
+- **Closes (standards):** 2.MD.A.2 · tag with CCSS 2.MD.A.2, EE M.EE.2.MD.1
+- **Closes (White Rose steps):** none · strengthens Y2.B6.S1
+- **Teaches:** measuring one length in two different units and relating the counts to the unit size (the bigger unit gives the smaller count).
+- **Problem types:** (1) how many clips? how many crayons?; (2) which unit is longer?; (3) why is the number smaller?; (4) predict the second count.
+- **Representation:** Templates: `legacy`; new: `measure-scale`.
+- **Answer:** write both counts; tick the longer unit.
+- **Ladder:** O2 non-standard → cm and inches · O3 units drawn end to end → start marks only · O6 units.
+- **Misconceptions:** more units means the object is longer; gaps and overlaps ignored.
+- **After:** `vis_migrate_measures`.
+- **Visual catalogue:** also draws V120 Non-standard units beside an object (reach 4 steps).
+
+### 12. Compare Lengths Indirectly and by Units (option) — `order_length_tasks`
+
+- **What:** option on `shapes_early:order_objects_length`: task "compare using a third object" (A is longer than C, C is longer than B) and "order by counted units" (cube trains). Grade 1 · family measurement · source standards audit.
+- **Closes (standards):** 1.MD.A.1, M.EE.2.MD.3, M.EE.2.MD.4 · tag with CCSS 1.MD.A.1, EE M.EE.2.MD.3, M.EE.2.MD.4
+- **Closes (White Rose steps):** none · strengthens Y1.B7.S2
+- **Teaches:** comparing two lengths indirectly by a third object, and ordering objects by lengths measured in non-standard units.
+- **Problem types:** (1) the string is longer than the pencil and shorter than the book: which is longest?; (2) order three by cube counts; (3) which is longer? use the string; (4) longest / shortest.
+- **Representation:** Templates: `wordpic`, `counters`; new: `picture-row`.
+- **Answer:** circle or number 1-3.
+- **Ladder:** O2 two clues → three objects → units · O3 objects drawn to scale → clue sentences only · O6 pictures / bars.
+- **Misconceptions:** the object mentioned first is longer; more units always means longer even with different units.
+- **After:** `vis_migrate_measures`.
+
+### 13. Add and Subtract Lengths — `add_sub_lengths`
+
+- **What:** new skill `measurement:add_subtract_lengths`. Grade 2 · family measurement · source White Rose audit.
+- **Closes (standards):** 2.MD.B.5 · tag with CCSS 2.MD.B.5, EE M.EE.2.MD.5
+- **Closes (White Rose steps):** Y3.B5.S8, Y3.B5.S9
+- **Teaches:** adding and subtracting lengths in the same and mixed units, including bar-model "longer by" / "shorter by" problems.
+- **Problem types:** (1) add lengths, same unit; (2) mixed units; (3) bar model longer by; (4) shorter by.
+- **Representation:** a bar model with two lengths; write the total or the difference with the unit. Templates: `word-work`; new: `bar-model`.
+- **Answer:** write the answer with the unit.
+- **Ladder:** O2 same unit → mixed · O3 bar model → none · O6 bar / plain.
+- **Misconceptions:** adds m to cm; difference by adding.
+
+### 14. Metres, Centimetres, Millimetres (option) — `mm_cm_m`
+
+- **What:** option on `measurement:length_metric`: mm and cm. Grade 2 · family measurement · source White Rose audit.
+- **Closes (standards):** 2.MD.A.2 · tag with CCSS 2.MD.A.1, 2.MD.A.2, 4.MD.A.1, EE M.EE.2.MD.1, M.EE.4.MD.1
+- **Closes (White Rose steps):** Y3.B5.S1, Y3.B5.S3
+- **Teaches:** measuring in mm, cm and m and converting between them (2 m 30 cm = 230 cm).
+- **Extended for the standards:** measure one object in two units and say why the counts differ (bigger unit, smaller count).
+- **Problem types:** (1) measure in mm, cm, m; (2) convert 2 m 30 cm = 230 cm; (3) measure one object in two units and compare (2.MD.A.2); (4) mixed-unit answers.
+- **Representation:** ruler pictures in mm; mixed-unit answers (_ m _ cm). Templates: `legacy`; new: `measure-scale`.
+- **Answer:** write the length in each unit.
+- **Ladder:** O2 cm ↔ mm → m ↔ cm → mixed · O3 conversion fact → none · O6 ruler picture.
+- **Misconceptions:** 2 m 30 cm = 2030 cm; more units means longer object.
+
+### 15. How Much Longer? (option) — `ruler_difference`
+
+- **What:** option on `measurement:reading_ruler`: task "how much longer?": two objects on one ruler; cm and inches. Grade 2 · family measurement · source standards audit.
+- **Closes (standards):** 2.MD.A.4, M.EE.4.MD.2 · tag with CCSS 2.MD.A.4, EE M.EE.4.MD.2
+- **Closes (White Rose steps):** none · strengthens Y2.B6.S4, Y3.B5.S7
+- **Teaches:** measuring two objects with a standard unit and finding how much longer one is.
+- **Problem types:** (1) measure both, then the difference; (2) which is longer and by how much?; (3) difference on the ruler (count on); (4) story: the ribbon is longer by ….
+- **Representation:** Templates: `legacy`; new: `measure-scale`.
+- **Answer:** write both lengths and the difference with the unit.
+- **Ladder:** O2 whole inches → whole cm · O3 both start at 0 → one not at 0 · O6 ruler above / below.
+- **Misconceptions:** adds the two lengths; reads the end number of an object not starting at 0.
+- **After:** `vis_migrate_measures`.
+
+### 16. Calculate with Metric Measures — `metric_calc`
 
 - **What:** new skill `measurement:metric_measure_problems`. Grade 5 · family measurement · source White Rose audit.
 - **Closes (standards):** 5.MD.A.1 · tag with CCSS 5.MD.A.1, EE M.EE.5.MD.1
@@ -2327,7 +2963,7 @@ Owns: `js/modules/gen-measurement.js`. Builds templates: `measure-scale`, `balan
 - **Ladder:** O2 one conversion → two steps · O3 conversion step printed → none · O6 plain.
 - **Misconceptions:** moves the decimal point the wrong way; adds different units.
 
-### 12. Convert Units of Time (option) — `time_convert`
+### 17. Convert Units of Time (option) — `time_convert`
 
 - **What:** option on `measurement:unit_conversion_word`: time. Grade 4 · family measurement · source White Rose audit.
 - **Closes (standards):** 4.MD.A.1 · tag with CCSS 4.MD.A.1, EE M.EE.4.MD.1
@@ -2339,7 +2975,7 @@ Owns: `js/modules/gen-measurement.js`. Builds templates: `measure-scale`, `balan
 - **Ladder:** O2 one step → two steps · O3 conversion table → none · O6 table / plain.
 - **Misconceptions:** uses 100 as the base; 2.5 hours = 2 h 50 min.
 
-### 13. Conversion Tables (option) — `conversion_table`
+### 18. Conversion Tables (option) — `conversion_table`
 
 - **What:** option on `measurement:unit_conversions`: form "conversion table": complete a two-column table (1 ft = 12 in, 2 ft, 3 ft …) and use it. Grade 4 · family measurement · source standards audit.
 - **Closes (standards):** 4.MD.A.1 · tag with CCSS 4.MD.A.1, EE M.EE.4.MD.1
@@ -2352,31 +2988,7 @@ Owns: `js/modules/gen-measurement.js`. Builds templates: `measure-scale`, `balan
 - **Misconceptions:** uses 100 for every conversion; divides when going to a smaller unit.
 - **After:** `time_convert`.
 
-### 14. Measure With Two Units (option) — `measure_two_units`
-
-- **What:** option on `shapes_early:measure_nonstandard`: task "measure twice": the same object in two units (paper clips and crayons; inches and cm). Grade 2 · family measurement · source standards audit.
-- **Closes (standards):** 2.MD.A.2 · tag with CCSS 2.MD.A.2, EE M.EE.2.MD.1
-- **Closes (White Rose steps):** none · strengthens Y2.B6.S1
-- **Teaches:** measuring one length in two different units and relating the counts to the unit size (the bigger unit gives the smaller count).
-- **Problem types:** (1) how many clips? how many crayons?; (2) which unit is longer?; (3) why is the number smaller?; (4) predict the second count.
-- **Representation:** Templates: `legacy`; new: `measure-scale`.
-- **Answer:** write both counts; tick the longer unit.
-- **Ladder:** O2 non-standard → cm and inches · O3 units drawn end to end → start marks only · O6 units.
-- **Misconceptions:** more units means the object is longer; gaps and overlaps ignored.
-
-### 15. Measure Capacity with Cups — `nonstandard_capacity`
-
-- **What:** new skill `measurement:measure_capacity_cups`. Grade K · family measurement · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS K.MD.A.1, K.MD.A.2, EE M.EE.K.MD.1, M.EE.K.MD.2
-- **Closes (White Rose steps):** Y1.B8.S6, Y1.B8.S7
-- **Teaches:** measuring capacity and volume with non-standard units (cups, spoons) and comparing.
-- **Problem types:** (1) how many cups fill it?; (2) which holds more?; (3) order by capacity; (4) compare with the same cup.
-- **Representation:** containers with a count of cups drawn beside them; write how many cups; circle the one that holds more. Templates: `counters`.
-- **Answer:** write the number of cups.
-- **Ladder:** O2 to 10 → 20 · O3 cups drawn in a row → none · O6 containers.
-- **Misconceptions:** different cup sizes compared as equal; counts half cups as whole.
-
-### 16. Measure Mass with Cubes — `nonstandard_mass`
+### 19. Measure Mass with Cubes — `nonstandard_mass`
 
 - **What:** new skill `measurement:measure_mass_cubes`. Grade K · family measurement · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS K.MD.A.1, K.MD.A.2, EE M.EE.K.MD.1, M.EE.K.MD.2
@@ -2388,19 +3000,7 @@ Owns: `js/modules/gen-measurement.js`. Builds templates: `measure-scale`, `balan
 - **Ladder:** O2 to 10 cubes → to 20 · O3 cubes counted in 5s → none · O6 balance.
 - **Misconceptions:** counts the object as 1 cube; thinks more cubes means lighter.
 
-### 17. Balanced or Not? — `balance`
-
-- **What:** new skill `measurement:balance_scales`. Grade PK · family measurement · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS K.MD.A.2, EE M.EE.K.MD.2
-- **Closes (White Rose steps):** R.B8.S2
-- **Teaches:** a balance scale shows heavier, lighter or equal (balanced) mass.
-- **Problem types:** (1) heavier, lighter or balanced?; (2) which side is heavier?; (3) what makes it balance?; (4) order by mass from balances.
-- **Representation:** a drawn pan balance tipped or level with objects in each pan; tick heavier, lighter or balanced. Templates: `wordpic`; new: `balance`.
-- **Answer:** tick one.
-- **Ladder:** O2 two objects → three via two balances · O3 arrow on the heavy side → none · O6 balance picture.
-- **Misconceptions:** the higher pan is heavier; bigger is heavier.
-
-### 18. Measure and Draw Accurately — `draw_measure`
+### 20. Measure and Draw Accurately — `draw_measure`
 
 - **What:** new skill `measurement:draw_lines_accurately`. Grade 2 · family geometry · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 2.MD.A.1, 3.MD.B.4, EE M.EE.2.MD.1, M.EE.3.MD.4
@@ -2412,7 +3012,7 @@ Owns: `js/modules/gen-measurement.js`. Builds templates: `measure-scale`, `balan
 - **Ladder:** O2 whole cm → half cm → mm · O3 ruler drawn under the line → none · O6 ruler picture.
 - **Misconceptions:** starts at 1 not 0; counts marks not spaces.
 
-### 19. Kilometres and Metres (option) — `km_m`
+### 21. Kilometres and Metres (option) — `km_m`
 
 - **What:** option on `measurement:length_metric`: km and m mixed. Grade 3 · family measurement · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 4.MD.A.1, EE M.EE.4.MD.1
@@ -2424,7 +3024,7 @@ Owns: `js/modules/gen-measurement.js`. Builds templates: `measure-scale`, `balan
 - **Ladder:** O2 whole km → mixed · O3 fact box → none · O6 numbers.
 - **Misconceptions:** 1 km = 100 m; 2 km 300 m = 2,030 m.
 
-### 20. Metric and Imperial Units — `metric_imperial`
+### 22. Metric and Imperial Units — `metric_imperial`
 
 - **What:** new skill `measurement:metric_imperial`. Grade 4 · family measurement · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 4.MD.A.1, EE M.EE.4.MD.1
@@ -2436,7 +3036,7 @@ Owns: `js/modules/gen-measurement.js`. Builds templates: `measure-scale`, `balan
 - **Ladder:** O2 one fact → mixed · O3 fact box beside → none · O6 plain.
 - **Misconceptions:** uses an equals sign as exact; divides instead of multiplies.
 
-### 21. Miles and Kilometres — `miles_km`
+### 23. Miles and Kilometres — `miles_km`
 
 - **What:** new skill `measurement:miles_kilometres`. Grade 5 · family measurement · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 5.MD.A.1, EE M.EE.5.MD.1
@@ -2448,11 +3048,58 @@ Owns: `js/modules/gen-measurement.js`. Builds templates: `measure-scale`, `balan
 - **Ladder:** O2 multiples of 5 → any · O3 double line drawn → none · O6 line / table.
 - **Misconceptions:** uses 8 : 5; adds 3.
 
-## Lane `timemoney`: Time and money (15)
+## Lane `timemoney`: Time and money (17)
 
-Owns: `js/modules/gen-time-money.js`, `js/modules/svg-clock.js`, `js/modules/sheet/cells/{clock,timeline,coins,money-columns,tmkit}.js`, `js/modules/sheet/providers/time-money.js`. Builds templates: `calendar`.
+Owns: `js/modules/gen-time-money.js`, `js/modules/svg-clock.js`, `js/modules/sheet/cells/{clock,timeline,coins,money-columns,tmkit}.js`, `js/modules/sheet/providers/time-money.js`. Builds templates: `calendar`, `past-to`, `hour-line`.
 
-### 1. Two-Step Money Problems — `money_2step`
+### 1. Coin Options: Dot Counters, Count-On Track, Chart, Price Tags — `vis_coin_options`
+
+- **Added from visual catalogue.** option · grade K-5 · lane `timemoney`.
+- **Build:** coins gain `face: 'dots'` (1 / 2 / 5 / 10 dots in a circle, pre-money), `track: 'task'` (a number track above equal coins to count on in 2s, 5s, 10s), a place-value chart of coins (£1 / 10p / 1p), and price tags on pictured items for the money word problems.
+- **Offered on:** `measurement:coin_value`, `measurement:money_count`, `measurement:money_change`.
+- **Templates:** `coins`, `money-columns`. **Files:** `js/modules/sheet/cells/coins.js`, `js/modules/sheet/cells/tmkit.js`.
+- **Draws (visual catalogue):** V068 Coins and notes (count, find, fewest, change; in a PV chart); V069 Price tags on pictured items; V124 Dot "pre-money" counters; V125 Number track above a row of equal coins.
+- **Reach:** 43 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 2. Clock and Time-Line Options — `vis_clock_options`
+
+- **Added from visual catalogue.** option · grade K-4 · lane `timemoney`.
+- **Build:** clock gains `numerals: 'roman'`, `hands: 'hour'` (hour hand only), the past / to half-shaded hint pane, the 1–12 hour-line hint pane, an answer in words, stopwatch readouts `format: 'mm:ss' | 'h:mm:ss'`, the 24-hour readout, a.m. / p.m.; timeline gains `span: 'day'` (midnight – noon – midnight).
+- **Offered on:** `measurement:time_hour`, `measurement:time_half_hour`, `measurement:time_analog_digital`, `measurement:elapsed_find_duration`.
+- **Templates:** `clock`, `timeline`; new or owned: `past-to`, `hour-line`. **Files:** `js/modules/sheet/cells/clock.js`, `js/modules/sheet/cells/timeline.js`, `js/modules/sheet/cells/tmkit.js`.
+- **Draws (visual catalogue):** V060 Analogue clock; V061 Roman-numeral clock face; V062 Past / to half-shaded clock face; V063 Digital clock readout (a.m. / p.m.); V065 Day time line (midnight – noon – midnight); V067 Stopwatch display (mm:ss); V128 Hour-hand-only clock face; V129 1–12 hour line with the hour hand as a pointer; V168 24-hour displays.
+- **Reach:** 27 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 3. Years, Months, Days, Hours — `time_calendar`
+
+- **What:** new skill `measurement:calendar_and_units`. Grade 2-3 · family measurement · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 2.MD.C.7, 3.MD.A.1, EE M.EE.2.MD.7, M.EE.3.MD.1
+- **Closes (White Rose steps):** Y3.B10.S6, Y3.B10.S7, Y3.B10.S10, Y3.B10.S11, Y4.B11.S1, Y4.B11.S2
+- **Teaches:** converting and comparing units of time: years, months, weeks, days, hours, minutes, seconds; days in each month; leap years.
+- **Problem types:** (1) days in each month; (2) convert weeks, days, hours; (3) leap years; (4) read a calendar page; (5) compare durations.
+- **Representation:** a calendar page or conversion table; fill the missing values. Templates: `timeline`; new: `calendar`, `data-table`.
+- **Answer:** write the number.
+- **Ladder:** O2 days/weeks → months → years · O3 calendar shown → none · O6 calendar / table.
+- **Misconceptions:** every month has 30 days; 1 year = 100 days.
+- **Visual catalogue:** also draws V066 Calendar month grid; V127 Days-of-the-week strip (reach 6 steps).
+
+### 4. First, Next, Then — `day_order`
+
+- **What:** new skill `measurement:order_events`. Grade PK-K · family measurement · source White Rose audit.
+- **Closes (standards):** M.EE.1.MD.3 · tag with CCSS 1.MD.B.3, EE M.EE.1.MD.3
+- **Closes (White Rose steps):** R.B6.S4, R.B10.S6, Y1.B14.S1
+- **Teaches:** sequencing events and times of day (morning, afternoon, evening, night; before, after; first, next, then).
+- **Extended for the standards:** EE level: before / next / after activities and morning / afternoon / day / night.
+- **Problem types:** (1) number the pictures 1-4; (2) first, next, then, last; (3) before or after?; (4) morning, afternoon, evening, night; (5) what comes next in the day?.
+- **Representation:** three or four picture cards; number them 1-4 in order; option: before/after questions. Templates: `wordpic`; new: `picture-row`.
+- **Answer:** write 1-4 or a word from a bank.
+- **Ladder:** O2 3 → 4 events → times of day · O3 word bank with icons → words only · O6 picture cards.
+- **Misconceptions:** orders by picture position; confuses morning and evening.
+- **Visual catalogue:** also draws V126 Sequence picture cards (first, next, finally) (reach 3 steps).
+
+### 5. Two-Step Money Problems — `money_2step`
 
 - **What:** new skill `measurement:money_two_step`. Grade 1-3 · family measurement · source White Rose audit.
 - **Closes (standards):** 2.MD.C.8, 4.MD.A.2 · tag with CCSS 2.MD.C.8, 2.OA.A.1, 4.MD.A.2, EE M.EE.2.MD.8, M.EE.4.MD.2
@@ -2465,57 +3112,20 @@ Owns: `js/modules/gen-time-money.js`, `js/modules/svg-clock.js`, `js/modules/she
 - **Ladder:** O2 one step within $1 → two steps within $10 → $100 · O3 price tags and bar model → none · O6 pictures / plain.
 - **Misconceptions:** adds the change to the price; mixes cents and dollars.
 
-### 2. Years, Months, Days, Hours — `time_calendar`
+### 6. Roman Numerals to 12 — `roman_12`
 
-- **What:** new skill `measurement:calendar_and_units`. Grade 2-3 · family measurement · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 2.MD.C.7, 3.MD.A.1, EE M.EE.2.MD.7, M.EE.3.MD.1
-- **Closes (White Rose steps):** Y3.B10.S6, Y3.B10.S7, Y3.B10.S10, Y3.B10.S11, Y4.B11.S1, Y4.B11.S2
-- **Teaches:** converting and comparing units of time: years, months, weeks, days, hours, minutes, seconds; days in each month; leap years.
-- **Problem types:** (1) days in each month; (2) convert weeks, days, hours; (3) leap years; (4) read a calendar page; (5) compare durations.
-- **Representation:** a calendar page or conversion table; fill the missing values. Templates: `timeline`; new: `calendar`, `data-table`.
-- **Answer:** write the number.
-- **Ladder:** O2 days/weeks → months → years · O3 calendar shown → none · O6 calendar / table.
-- **Misconceptions:** every month has 30 days; 1 year = 100 days.
+- **What:** new skill `measurement:roman_numerals_clock`. Grade 2 · family measurement · source White Rose audit.
+- **Closes (standards):** none not already full
+- **Closes (White Rose steps):** Y3.B10.S1
+- **Teaches:** reading Roman numerals I to XII on a clock face.
+- **Problem types:** (1) read Roman numerals on a clock; (2) write the time on a Roman clock; (3) numeral to number; (4) number to numeral.
+- **Representation:** a clock face with Roman numerals; write the time or the numeral value. Templates: `clock`.
+- **Answer:** write the number or time.
+- **Ladder:** O2 I-VI → VII-XII · O3 key beside the clock → none · O6 clock / cards.
+- **Misconceptions:** IV read as 6; IX read as 11.
+- **Visual catalogue:** also draws V061 Roman-numeral clock face (reach 5 steps).
 
-### 3. First, Next, Then — `day_order`
-
-- **What:** new skill `measurement:order_events`. Grade PK-K · family measurement · source White Rose audit.
-- **Closes (standards):** M.EE.1.MD.3 · tag with CCSS 1.MD.B.3, EE M.EE.1.MD.3
-- **Closes (White Rose steps):** R.B6.S4, R.B10.S6, Y1.B14.S1
-- **Teaches:** sequencing events and times of day (morning, afternoon, evening, night; before, after; first, next, then).
-- **Extended for the standards:** EE level: before / next / after activities and morning / afternoon / day / night.
-- **Problem types:** (1) number the pictures 1-4; (2) first, next, then, last; (3) before or after?; (4) morning, afternoon, evening, night; (5) what comes next in the day?.
-- **Representation:** three or four picture cards; number them 1-4 in order; option: before/after questions. Templates: `wordpic`; new: `picture-row`.
-- **Answer:** write 1-4 or a word from a bank.
-- **Ladder:** O2 3 → 4 events → times of day · O3 word bank with icons → words only · O6 picture cards.
-- **Misconceptions:** orders by picture position; confuses morning and evening.
-
-### 4. Estimate with Money — `money_estimate`
-
-- **What:** new skill `measurement:estimate_with_money`. Grade 3 · family measurement · source White Rose audit.
-- **Closes (standards):** M.EE.4.NBT.3, M.EE.5.NBT.4 · tag with CCSS 3.NBT.A.1, 4.MD.A.2, EE M.EE.3.NBT.1, M.EE.4.MD.2, M.EE.4.NBT.3, M.EE.5.NBT.4
-- **Closes (White Rose steps):** Y4.B10.S4
-- **Teaches:** rounding prices to the nearest dollar to estimate totals and change.
-- **Extended for the standards:** estimate sums and differences in stories within 30 and 100 (EE).
-- **Problem types:** (1) round prices to the nearest dollar; (2) estimate the total; (3) estimate the change; (4) is it enough?; (5) estimate a sum or difference within 30 / 100 in a story (EE 4.NBT.3, 5.NBT.4).
-- **Representation:** a price list; write the rounded prices and the estimate. Templates: `money-columns`, `word-work`.
-- **Answer:** write the rounded prices and the estimate.
-- **Ladder:** O2 within 30 → within 100 → dollars and cents · O3 number line between dollars → none · O6 price tags / list.
-- **Misconceptions:** rounds down always; adds the exact prices.
-
-### 5. Count Money (option) — `money_uk`
-
-- **What:** option on `measurement:money_count`: notes and cents. Grade 1 · family measurement · source White Rose audit.
-- **Closes (standards):** 2.MD.C.8 · tag with CCSS 2.MD.C.8, EE M.EE.2.MD.8
-- **Closes (White Rose steps):** Y2.B4.S2, Y2.B4.S3, Y2.B4.S8
-- **Teaches:** counting notes and coins together and in dollars and cents, choosing coins to make an amount, making the same amount two ways.
-- **Problem types:** (1) count notes and coins; (2) dollars and cents; (3) choose coins to make an amount; (4) make the same amount two ways.
-- **Representation:** options on money_count / equiv_coin_sets: notes, dollars-and-cents mode, "make it two ways". Templates: `coins`, `money-columns`.
-- **Answer:** write the amount; draw or write the coins.
-- **Ladder:** O2 coins → notes → dollars and cents · O3 coins sorted largest first → scattered · O6 currency.
-- **Misconceptions:** counts coins not values; writes $3.5 for $3.05.
-
-### 6. Time Words — `time_talk`
+### 7. Time Words — `time_talk`
 
 - **What:** new skill `measurement:time_words`. Grade PK-K · family measurement · source White Rose audit.
 - **Closes (standards):** M.EE.1.MD.3
@@ -2527,18 +3137,7 @@ Owns: `js/modules/gen-time-money.js`, `js/modules/svg-clock.js`, `js/modules/she
 - **Answer:** circle or write the word from a bank.
 - **Ladder:** O2 days → months → seasons · O3 calendar strip shown → none · O6 strip / calendar.
 - **Misconceptions:** yesterday and tomorrow swapped; week starts at any day.
-
-### 7. Minutes, Hours and Days — `time_facts`
-
-- **What:** new skill `measurement:time_facts`. Grade 1 · family measurement · source White Rose audit.
-- **Closes (standards):** 4.MD.A.1 · tag with CCSS 1.MD.B.3, 4.MD.A.1, EE M.EE.1.MD.3, M.EE.4.MD.1
-- **Closes (White Rose steps):** Y2.B9.S6, Y2.B9.S7
-- **Teaches:** knowing and using 60 minutes in an hour, 24 hours in a day, 7 days in a week, and converting simple times.
-- **Problem types:** (1) 60 minutes in an hour; (2) 24 hours in a day, 7 days in a week; (3) convert hours to minutes; (4) word problems.
-- **Representation:** fact cells with a clock or timeline support; option: word problems. Templates: `clock`, `timeline`.
-- **Answer:** write the number.
-- **Ladder:** O2 facts → one conversion → problems · O3 fact box → none · O6 clock / timeline.
-- **Misconceptions:** 100 minutes in an hour; 1 hour 30 minutes = 130 minutes.
+- **Visual catalogue:** also draws V154 Sand timer; then / now (reach 1 steps).
 
 ### 8. Timetables — `timetables`
 
@@ -2551,8 +3150,59 @@ Owns: `js/modules/gen-time-money.js`, `js/modules/svg-clock.js`, `js/modules/she
 - **Answer:** write the time or duration.
 - **Ladder:** O2 read → durations → planning · O3 row and column ruled → none · O6 table.
 - **Misconceptions:** reads across the wrong row; subtracts times like decimals.
+- **Visual catalogue:** also draws V178 Timetables (reach 2 steps).
 
-### 9. Time Word Problems (option) — `elapsed_stories`
+### 9. Estimate with Money — `money_estimate`
+
+- **What:** new skill `measurement:estimate_with_money`. Grade 3 · family measurement · source White Rose audit.
+- **Closes (standards):** M.EE.4.NBT.3, M.EE.5.NBT.4 · tag with CCSS 3.NBT.A.1, 4.MD.A.2, EE M.EE.3.NBT.1, M.EE.4.MD.2, M.EE.4.NBT.3, M.EE.5.NBT.4
+- **Closes (White Rose steps):** Y4.B10.S4
+- **Teaches:** rounding prices to the nearest dollar to estimate totals and change.
+- **Extended for the standards:** estimate sums and differences in stories within 30 and 100 (EE).
+- **Problem types:** (1) round prices to the nearest dollar; (2) estimate the total; (3) estimate the change; (4) is it enough?; (5) estimate a sum or difference within 30 / 100 in a story (EE 4.NBT.3, 5.NBT.4).
+- **Representation:** a price list; write the rounded prices and the estimate. Templates: `money-columns`, `word-work`.
+- **Answer:** write the rounded prices and the estimate.
+- **Ladder:** O2 within 30 → within 100 → dollars and cents · O3 number line between dollars → none · O6 price tags / list.
+- **Misconceptions:** rounds down always; adds the exact prices.
+
+### 10. Count Money (option) — `money_uk`
+
+- **What:** option on `measurement:money_count`: notes and cents. Grade 1 · family measurement · source White Rose audit.
+- **Closes (standards):** 2.MD.C.8 · tag with CCSS 2.MD.C.8, EE M.EE.2.MD.8
+- **Closes (White Rose steps):** Y2.B4.S2, Y2.B4.S3, Y2.B4.S8
+- **Teaches:** counting notes and coins together and in dollars and cents, choosing coins to make an amount, making the same amount two ways.
+- **Problem types:** (1) count notes and coins; (2) dollars and cents; (3) choose coins to make an amount; (4) make the same amount two ways.
+- **Representation:** options on money_count / equiv_coin_sets: notes, dollars-and-cents mode, "make it two ways". Templates: `coins`, `money-columns`.
+- **Answer:** write the amount; draw or write the coins.
+- **Ladder:** O2 coins → notes → dollars and cents · O3 coins sorted largest first → scattered · O6 currency.
+- **Misconceptions:** counts coins not values; writes $3.5 for $3.05.
+
+### 11. The 24-Hour Clock — `time_24h_convert`
+
+- **What:** new skill `measurement:twenty_four_hour_clock`. Grade 3 · family measurement · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 3.MD.A.1, EE M.EE.3.MD.1
+- **Closes (White Rose steps):** Y4.B11.S4, Y4.B11.S5
+- **Teaches:** converting between 12-hour and 24-hour times and between analogue and digital.
+- **Problem types:** (1) 12-hour to 24-hour; (2) 24-hour to 12-hour; (3) analogue to 24-hour; (4) a.m./p.m. clues.
+- **Representation:** an analogue clock beside a 24-hour display; write the time; option: a.m./p.m. to 24-hour. Templates: `clock`.
+- **Answer:** write the time.
+- **Ladder:** O2 on the hour → any time · O3 conversion strip → none · O6 clocks.
+- **Misconceptions:** 14:00 = 4 p.m.; forgets 12:00 is noon.
+- **Visual catalogue:** also draws V168 24-hour displays (reach 2 steps).
+
+### 12. Minutes, Hours and Days — `time_facts`
+
+- **What:** new skill `measurement:time_facts`. Grade 1 · family measurement · source White Rose audit.
+- **Closes (standards):** 4.MD.A.1 · tag with CCSS 1.MD.B.3, 4.MD.A.1, EE M.EE.1.MD.3, M.EE.4.MD.1
+- **Closes (White Rose steps):** Y2.B9.S6, Y2.B9.S7
+- **Teaches:** knowing and using 60 minutes in an hour, 24 hours in a day, 7 days in a week, and converting simple times.
+- **Problem types:** (1) 60 minutes in an hour; (2) 24 hours in a day, 7 days in a week; (3) convert hours to minutes; (4) word problems.
+- **Representation:** fact cells with a clock or timeline support; option: word problems. Templates: `clock`, `timeline`.
+- **Answer:** write the number.
+- **Ladder:** O2 facts → one conversion → problems · O3 fact box → none · O6 clock / timeline.
+- **Misconceptions:** 100 minutes in an hour; 1 hour 30 minutes = 130 minutes.
+
+### 13. Time Word Problems (option) — `elapsed_stories`
 
 - **What:** option on `measurement:elapsed_mixed` (and `measurement:elapsed_find_duration`, `measurement:elapsed_find_start`): form "story": time-interval word problems with the time line as the drawing. Grade 3 · family measurement · source standards audit.
 - **Closes (standards):** 3.MD.A.1 · tag with CCSS 3.MD.A.1, EE M.EE.3.MD.1
@@ -2564,7 +3214,7 @@ Owns: `js/modules/gen-time-money.js`, `js/modules/svg-clock.js`, `js/modules/she
 - **Ladder:** O2 within the hour → across the hour → two intervals · O3 time line with jumps drawn → blank line → none · O6 analogue / digital times.
 - **Misconceptions:** treats 1:50 + 20 min as 1:70; subtracts times like decimals.
 
-### 10. Dollars and Cents (option) — `money_convert`
+### 14. Dollars and Cents (option) — `money_convert`
 
 - **What:** option on `measurement:money_notation`: convert. Grade 2-3 · family measurement · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 2.MD.C.8, 4.MD.A.1, EE M.EE.2.MD.8, M.EE.4.MD.1
@@ -2576,7 +3226,7 @@ Owns: `js/modules/gen-time-money.js`, `js/modules/svg-clock.js`, `js/modules/she
 - **Ladder:** O2 whole dollars → cents → mixed · O3 place chart $ | ¢ → none · O6 chart / plain.
 - **Misconceptions:** 345 cents = $34.5; $3.5 means 3 dollars 5 cents.
 
-### 11. The Hour for the Routine (option) — `routine_hour`
+### 15. The Hour for the Routine (option) — `routine_hour`
 
 - **What:** option on `measurement:time_sense`: task "which hour?": choose the digital hour that matches a routine activity. Grade 2 · family measurement · source standards audit.
 - **Closes (standards):** M.EE.2.MD.7 · tag with CCSS 2.MD.C.7, EE M.EE.2.MD.7
@@ -2588,19 +3238,7 @@ Owns: `js/modules/gen-time-money.js`, `js/modules/svg-clock.js`, `js/modules/she
 - **Ladder:** O2 two choices → three · O3 activity picture → words only · O6 digital / analogue.
 - **Misconceptions:** picks the earliest time every time; confuses 12:00 noon and midnight.
 
-### 12. The 24-Hour Clock — `time_24h_convert`
-
-- **What:** new skill `measurement:twenty_four_hour_clock`. Grade 3 · family measurement · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 3.MD.A.1, EE M.EE.3.MD.1
-- **Closes (White Rose steps):** Y4.B11.S4, Y4.B11.S5
-- **Teaches:** converting between 12-hour and 24-hour times and between analogue and digital.
-- **Problem types:** (1) 12-hour to 24-hour; (2) 24-hour to 12-hour; (3) analogue to 24-hour; (4) a.m./p.m. clues.
-- **Representation:** an analogue clock beside a 24-hour display; write the time; option: a.m./p.m. to 24-hour. Templates: `clock`.
-- **Answer:** write the time.
-- **Ladder:** O2 on the hour → any time · O3 conversion strip → none · O6 clocks.
-- **Misconceptions:** 14:00 = 4 p.m.; forgets 12:00 is noon.
-
-### 13. Recognise Notes (option) — `money_notes`
+### 16. Recognise Notes (option) — `money_notes`
 
 - **What:** option on `measurement:coin_value`: notes. Grade K · family measurement · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 2.MD.C.8, EE M.EE.2.MD.8
@@ -2612,19 +3250,7 @@ Owns: `js/modules/gen-time-money.js`, `js/modules/svg-clock.js`, `js/modules/she
 - **Ladder:** O2 1, 5 notes → 10, 20, 50, 100 · O3 value printed on the note → none · O6 currency (USD, QAR).
 - **Misconceptions:** a coin is worth more because it is bigger; counts notes as 1 each.
 
-### 14. Roman Numerals to 12 — `roman_12`
-
-- **What:** new skill `measurement:roman_numerals_clock`. Grade 2 · family measurement · source White Rose audit.
-- **Closes (standards):** none not already full
-- **Closes (White Rose steps):** Y3.B10.S1
-- **Teaches:** reading Roman numerals I to XII on a clock face.
-- **Problem types:** (1) read Roman numerals on a clock; (2) write the time on a Roman clock; (3) numeral to number; (4) number to numeral.
-- **Representation:** a clock face with Roman numerals; write the time or the numeral value. Templates: `clock`.
-- **Answer:** write the number or time.
-- **Ladder:** O2 I-VI → VII-XII · O3 key beside the clock → none · O6 clock / cards.
-- **Misconceptions:** IV read as 6; IX read as 11.
-
-### 15. Hours, Minutes or Seconds? — `time_units`
+### 17. Hours, Minutes or Seconds? — `time_units`
 
 - **What:** new skill `measurement:hours_minutes_seconds`. Grade K · family measurement · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 1.MD.B.3, EE M.EE.1.MD.3
@@ -2636,34 +3262,32 @@ Owns: `js/modules/gen-time-money.js`, `js/modules/svg-clock.js`, `js/modules/she
 - **Ladder:** O2 minutes/hours → seconds → order · O3 icons for each unit → none · O6 pictures.
 - **Misconceptions:** brushing teeth takes hours; seconds longer than minutes.
 
-## Lane `data`: Data and statistics (12)
+## Lane `data`: Data and statistics (14)
 
 Owns: `js/modules/gen-data-stats.js`. Builds templates: `graph-axes`, `data-table`.
 
-### 1. Make a Line Plot — `make_line_plot`
+### 1. Tables — `table_data`
 
-- **What:** new skill `graphs:make_a_line_plot`. Grade 2-6 · family data · source standards audit.
-- **Closes (standards):** 2.MD.D.9, 3.MD.B.4, 4.MD.B.4, 5.MD.B.2, 6.SP.B.4 · tag with CCSS 2.MD.D.9, 3.MD.B.4, 4.MD.B.4, 5.MD.B.2, EE M.EE.2.MD.9, M.EE.3.MD.4, M.EE.4.MD.4, M.EE.5.MD.2
-- **Closes (White Rose steps):** none · strengthens Y3.B12.S5
-- **Teaches:** measuring objects (ruler pictures) or reading a data list, then making a line plot (dot plot) on a scale of whole numbers, halves, quarters or eighths, and solving problems from it.
-- **Problem types:** (1) measure the objects, then plot; (2) plot a list of measurements; (3) difference between longest and shortest; (4) total or share equally (Grade 5 redistribute); (5) how many measured more than …?.
-- **Representation:** Templates: `legacy`; new: `graph-axes`, `measure-scale`.
-- **Answer:** draw the × marks; write the answers.
-- **Ladder:** O2 whole units → halves/quarters → eighths; plot → compute · O3 scale drawn with every tick labelled → ends only · O6 × / dots.
-- **Misconceptions:** puts marks side by side instead of stacking; fraction ticks spaced unevenly; counts marks as the measurement.
+- **What:** new skill `graphs:read_and_make_tables`. Grade 1-4 · family data · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 1.MD.C.4, 4.OA.A.3, EE M.EE.1.MD.4, M.EE.4.OA.3
+- **Closes (White Rose steps):** Y2.B10.S2, Y5.B9.S3
+- **Teaches:** reading and completing simple tables and tally-to-number tables.
+- **Problem types:** (1) read a table; (2) complete a table from a tally; (3) total a row; (4) answer a comparison question.
+- **Representation:** a two-column table with blanks; fill in the counts; answer one question. Templates: `legacy`; new: `data-table`.
+- **Answer:** write the missing numbers; one short answer.
+- **Ladder:** O2 2 rows → 4 rows → totals · O3 first row filled → none · O6 table / tally + table.
+- **Misconceptions:** reads the wrong row; counts tallies of 5 as 4.
+- **Visual catalogue:** also draws V058 Data / listing table with blanks (reach 69 steps).
 
-### 2. Describe the Data — `describe_distribution`
+### 2. Migrate Legacy Graphs to B&W Kit Cells — `vis_migrate_graphs`
 
-- **What:** new skill `data_analysis:describe_distribution`. Grade 6 · family data · source standards audit.
-- **Closes (standards):** 6.SP.A.2, 6.SP.A.3, 6.SP.B.5b, 6.SP.B.5c, 6.SP.B.5d · tag with CCSS 6.SP.A.2, 6.SP.A.3, 6.SP.B.5b, 6.SP.B.5c, 6.SP.B.5d, EE M.EE.6.SP.2, M.EE.6.SP.5
-- **Closes (White Rose steps):** none
-- **Teaches:** describing a distribution by centre, spread and shape; measures of centre vs variation; the attribute and its units; outliers, and choosing mean or median.
-- **Problem types:** (1) what was measured and in what unit?; (2) centre, spread or shape? sort the statements; (3) is it symmetric or does it have a tail? any gap or outlier?; (4) mean or median describes it better? why; (5) is this a measure of centre or variation?.
-- **Representation:** Templates: `legacy`; new: `graph-axes`.
-- **Answer:** tick statements from a bank; write one measure.
-- **Ladder:** O2 dot plots → histograms → box plots · O3 vocabulary key (centre, spread, shape) → none · O6 plot kind.
-- **Misconceptions:** the mode is always the centre; an outlier changes the median a lot; range is a measure of centre.
-- **After:** `make_line_plot`.
+- **Added from visual catalogue.** migration · grade PK-5 · lane `data`.
+- **Build:** bar_graph, build_bar_graph, pictograph, build_pictograph, tally_chart and pie_chart (plus the measurement lane's pictograph_intro / bar_graph_intro, asked of that lane) move onto graph-axes: B&W bars and fill keys, outline symbols with part symbols, tally sticks, outline pie sectors with letter codes; then delete their legacy colour branches.
+- **Offered on:** `graphs:bar_graph`, `graphs:build_bar_graph`, `graphs:pictograph`, `graphs:build_pictograph`, `graphs:tally_chart`, `graphs:pie_chart`.
+- **Templates:** -; new or owned: `graph-axes`. **Files:** `js/modules/gen-data-stats.js`.
+- **Draws (visual catalogue):** V070 Pictogram with key; V071 Bar chart (single, dual, three-series); V072 Tally chart / tally sticks; V198 Pie chart, read and draw.
+- **Reach:** 22 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
 ### 3. Line Graphs — `line_graph`
 
@@ -2676,6 +3300,7 @@ Owns: `js/modules/gen-data-stats.js`. Builds templates: `graph-axes`, `data-tabl
 - **Answer:** write the value / the difference; plot.
 - **Ladder:** O2 scale 1 → 2 → 5 → 10; read → plot · O3 gridlines to the axis dashed → none · O6 with / without points.
 - **Misconceptions:** reads the next gridline; joins points in size order not time order.
+- **Visual catalogue:** also draws V170 Line graph (reach 5 steps).
 
 ### 4. Pictograms with a Key (option) — `pictogram_scale`
 
@@ -2688,8 +3313,35 @@ Owns: `js/modules/gen-data-stats.js`. Builds templates: `graph-axes`, `data-tabl
 - **Answer:** write the value; draw the pictures.
 - **Ladder:** O2 key 1 → 2 → 5 → 10 → half pictures · O3 key repeated beside every row → key once · O6 icons / circles.
 - **Misconceptions:** counts each picture as 1; draws a whole picture for 5 when the key is 10.
+- **After:** `vis_migrate_graphs`.
+- **Visual catalogue:** also draws V070 Pictogram with key (reach 8 steps).
 
-### 5. Pie Charts — `pie`
+### 5. Make a Line Plot — `make_line_plot`
+
+- **What:** new skill `graphs:make_a_line_plot`. Grade 2-6 · family data · source standards audit.
+- **Closes (standards):** 2.MD.D.9, 3.MD.B.4, 4.MD.B.4, 5.MD.B.2, 6.SP.B.4 · tag with CCSS 2.MD.D.9, 3.MD.B.4, 4.MD.B.4, 5.MD.B.2, EE M.EE.2.MD.9, M.EE.3.MD.4, M.EE.4.MD.4, M.EE.5.MD.2
+- **Closes (White Rose steps):** none · strengthens Y3.B12.S5
+- **Teaches:** measuring objects (ruler pictures) or reading a data list, then making a line plot (dot plot) on a scale of whole numbers, halves, quarters or eighths, and solving problems from it.
+- **Problem types:** (1) measure the objects, then plot; (2) plot a list of measurements; (3) difference between longest and shortest; (4) total or share equally (Grade 5 redistribute); (5) how many measured more than …?.
+- **Representation:** Templates: `legacy`; new: `graph-axes`, `measure-scale`.
+- **Answer:** draw the × marks; write the answers.
+- **Ladder:** O2 whole units → halves/quarters → eighths; plot → compute · O3 scale drawn with every tick labelled → ends only · O6 × / dots.
+- **Misconceptions:** puts marks side by side instead of stacking; fraction ticks spaced unevenly; counts marks as the measurement.
+
+### 6. Describe the Data — `describe_distribution`
+
+- **What:** new skill `data_analysis:describe_distribution`. Grade 6 · family data · source standards audit.
+- **Closes (standards):** 6.SP.A.2, 6.SP.A.3, 6.SP.B.5b, 6.SP.B.5c, 6.SP.B.5d · tag with CCSS 6.SP.A.2, 6.SP.A.3, 6.SP.B.5b, 6.SP.B.5c, 6.SP.B.5d, EE M.EE.6.SP.2, M.EE.6.SP.5
+- **Closes (White Rose steps):** none
+- **Teaches:** describing a distribution by centre, spread and shape; measures of centre vs variation; the attribute and its units; outliers, and choosing mean or median.
+- **Problem types:** (1) what was measured and in what unit?; (2) centre, spread or shape? sort the statements; (3) is it symmetric or does it have a tail? any gap or outlier?; (4) mean or median describes it better? why; (5) is this a measure of centre or variation?.
+- **Representation:** Templates: `legacy`; new: `graph-axes`.
+- **Answer:** tick statements from a bank; write one measure.
+- **Ladder:** O2 dot plots → histograms → box plots · O3 vocabulary key (centre, spread, shape) → none · O6 plot kind.
+- **Misconceptions:** the mode is always the centre; an outlier changes the median a lot; range is a measure of centre.
+- **After:** `make_line_plot`.
+
+### 7. Pie Charts — `pie`
 
 - **What:** new skill `graphs:pie_charts_read_draw`. Grade 5 · family data · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 6.RP.A.3, 4.MD.C.6, EE M.EE.4.MD.6
@@ -2700,44 +3352,20 @@ Owns: `js/modules/gen-data-stats.js`. Builds templates: `graph-axes`, `data-tabl
 - **Answer:** write the fraction, percent or amount.
 - **Ladder:** O2 halves/quarters → tenths/percent → angles (360°) · O3 sector lines at 10% → none · O6 fraction / percent labels.
 - **Misconceptions:** treats a sector as a count; uses 100 instead of 360 for degrees.
+- **Visual catalogue:** also draws V198 Pie chart, read and draw (reach 5 steps).
 
-### 6. Draw a Scaled Bar Graph (option) — `bar_graph_scale`
+### 8. Dual Bar Charts — `dual_bar`
 
-- **What:** option on `graphs:build_bar_graph`: scale 2, 5 or 10 per square (draw a scaled bar graph). Grade 3 · family data · source standards audit.
-- **Closes (standards):** 3.MD.B.3 · tag with CCSS 3.MD.B.3, EE M.EE.3.MD.3
-- **Closes (White Rose steps):** none · strengthens Y3.B12.S3, Y3.B12.S4
-- **Teaches:** drawing scaled bar graphs and answering one- and two-step "how many more / less" questions from them.
-- **Problem types:** (1) draw the bars with scale 2; (2) scale 5 with halfway bars; (3) how many more? (two steps); (4) which scale fits the data?.
-- **Representation:** Templates: `legacy`; new: `graph-axes`.
-- **Answer:** draw the bars; write the answer.
-- **Ladder:** O2 scale 2 → 5 → 10 · O3 axis numbered every square → every 2 → none · O6 vertical / horizontal.
-- **Misconceptions:** counts squares as 1 each; bars start above 0.
-- **After:** `pictogram_scale`.
-
-### 7. Make a Histogram or Box Plot — `make_histogram_box`
-
-- **What:** new skill `data_analysis:make_histogram_box_plot`. Grade 6 · family data · source standards audit.
-- **Closes (standards):** 6.SP.B.4 · tag with CCSS 6.SP.B.4, EE M.EE.6.SP.4
-- **Closes (White Rose steps):** none
-- **Teaches:** displaying numerical data in histograms (equal intervals) and box plots (five-number summary).
-- **Problem types:** (1) tally into intervals, then draw the histogram; (2) find the five-number summary; (3) draw the box plot; (4) which display matches the data?.
-- **Representation:** Templates: `legacy`; new: `graph-axes`, `data-table`.
-- **Answer:** draw the display; write the summary.
-- **Ladder:** O2 10 values → 20 · O3 intervals given, summary started → none · O6 histogram / box plot.
-- **Misconceptions:** unequal intervals; the box shows the mean.
-- **After:** `make_line_plot`.
-
-### 8. Tables — `table_data`
-
-- **What:** new skill `graphs:read_and_make_tables`. Grade 1-4 · family data · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 1.MD.C.4, 4.OA.A.3, EE M.EE.1.MD.4, M.EE.4.OA.3
-- **Closes (White Rose steps):** Y2.B10.S2, Y5.B9.S3
-- **Teaches:** reading and completing simple tables and tally-to-number tables.
-- **Problem types:** (1) read a table; (2) complete a table from a tally; (3) total a row; (4) answer a comparison question.
-- **Representation:** a two-column table with blanks; fill in the counts; answer one question. Templates: `legacy`; new: `data-table`.
-- **Answer:** write the missing numbers; one short answer.
-- **Ladder:** O2 2 rows → 4 rows → totals · O3 first row filled → none · O6 table / tally + table.
-- **Misconceptions:** reads the wrong row; counts tallies of 5 as 4.
+- **What:** new skill `graphs:dual_bar_charts`. Grade 5 · family data · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 3.MD.B.3, EE M.EE.3.MD.3
+- **Closes (White Rose steps):** Y6.B11.S2
+- **Teaches:** reading and drawing dual bar charts that compare two sets of data.
+- **Problem types:** (1) read both bars; (2) compare the two sets; (3) find the total of one category; (4) draw the dual bars.
+- **Representation:** a dual bar chart with a key; answer comparison questions. Templates: `legacy`; new: `graph-axes`.
+- **Answer:** write the value / the difference.
+- **Ladder:** O2 read → compare → draw · O3 key with patterns labelled on bars → key only · O6 hatched / plain.
+- **Misconceptions:** mixes up the key; compares across categories.
+- **Visual catalogue:** also draws V071 Bar chart (single, dual, three-series) (reach 5 steps).
 
 ### 9. Two-Way Tables — `two_way`
 
@@ -2750,8 +3378,22 @@ Owns: `js/modules/gen-data-stats.js`. Builds templates: `graph-axes`, `data-tabl
 - **Answer:** write the missing numbers.
 - **Ladder:** O2 2×2 → 3×3 with totals · O3 one total given → none · O6 table only.
 - **Misconceptions:** adds across the totals row; reads the wrong header.
+- **Visual catalogue:** also draws V073 Two-way table with totals (reach 3 steps).
 
-### 10. Block Diagrams — `block_diagram`
+### 10. Draw a Scaled Bar Graph (option) — `bar_graph_scale`
+
+- **What:** option on `graphs:build_bar_graph`: scale 2, 5 or 10 per square (draw a scaled bar graph). Grade 3 · family data · source standards audit.
+- **Closes (standards):** 3.MD.B.3 · tag with CCSS 3.MD.B.3, EE M.EE.3.MD.3
+- **Closes (White Rose steps):** none · strengthens Y3.B12.S3, Y3.B12.S4
+- **Teaches:** drawing scaled bar graphs and answering one- and two-step "how many more / less" questions from them.
+- **Problem types:** (1) draw the bars with scale 2; (2) scale 5 with halfway bars; (3) how many more? (two steps); (4) which scale fits the data?.
+- **Representation:** Templates: `legacy`; new: `graph-axes`.
+- **Answer:** draw the bars; write the answer.
+- **Ladder:** O2 scale 2 → 5 → 10 · O3 axis numbered every square → every 2 → none · O6 vertical / horizontal.
+- **Misconceptions:** counts squares as 1 each; bars start above 0.
+- **After:** `pictogram_scale`, `vis_migrate_graphs`.
+
+### 11. Block Diagrams — `block_diagram`
 
 - **What:** new skill `graphs:block_diagrams`. Grade 1 · family data · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 1.MD.C.4, 2.MD.D.10, EE M.EE.1.MD.4, M.EE.2.MD.10
@@ -2762,8 +3404,22 @@ Owns: `js/modules/gen-data-stats.js`. Builds templates: `graph-axes`, `data-tabl
 - **Answer:** write the count; colour the squares.
 - **Ladder:** O2 scale 1 → 2 · O3 grid numbered → axis only · O6 vertical / horizontal.
 - **Misconceptions:** counts the grid lines, not the blocks; ignores the scale of 2.
+- **Visual catalogue:** also draws V097 Block diagram (reach 1 steps).
 
-### 11. Collect and Represent Data — `collect_data`
+### 12. Make a Histogram or Box Plot — `make_histogram_box`
+
+- **What:** new skill `data_analysis:make_histogram_box_plot`. Grade 6 · family data · source standards audit.
+- **Closes (standards):** 6.SP.B.4 · tag with CCSS 6.SP.B.4, EE M.EE.6.SP.4
+- **Closes (White Rose steps):** none
+- **Teaches:** displaying numerical data in histograms (equal intervals) and box plots (five-number summary).
+- **Problem types:** (1) tally into intervals, then draw the histogram; (2) find the five-number summary; (3) draw the box plot; (4) which display matches the data?.
+- **Representation:** Templates: `legacy`; new: `graph-axes`, `data-table`.
+- **Answer:** draw the display; write the summary.
+- **Ladder:** O2 10 values → 20 · O3 intervals given, summary started → none · O6 histogram / box plot.
+- **Misconceptions:** unequal intervals; the box shows the mean.
+- **After:** `make_line_plot`.
+
+### 13. Collect and Represent Data — `collect_data`
 
 - **What:** new skill `graphs:collect_and_represent`. Grade 2 · family data · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 2.MD.D.10, EE M.EE.2.MD.10
@@ -2775,23 +3431,36 @@ Owns: `js/modules/gen-data-stats.js`. Builds templates: `graph-axes`, `data-tabl
 - **Ladder:** O2 10 items → 20 → 30 · O3 categories given → pupil finds them · O6 pictogram / bar chart.
 - **Misconceptions:** misses an item; tallies five as five upright strokes.
 
-### 12. Dual Bar Charts — `dual_bar`
+### 14. The Mean as Levelling — `vis_mean_levelling`
 
-- **What:** new skill `graphs:dual_bar_charts`. Grade 5 · family data · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 3.MD.B.3, EE M.EE.3.MD.3
-- **Closes (White Rose steps):** Y6.B11.S2
-- **Teaches:** reading and drawing dual bar charts that compare two sets of data.
-- **Problem types:** (1) read both bars; (2) compare the two sets; (3) find the total of one category; (4) draw the dual bars.
-- **Representation:** a dual bar chart with a key; answer comparison questions. Templates: `legacy`; new: `graph-axes`.
-- **Answer:** write the value / the difference.
-- **Ladder:** O2 read → compare → draw · O3 key with patterns labelled on bars → key only · O6 hatched / plain.
-- **Misconceptions:** mixes up the key; compares across categories.
+- **Added from visual catalogue.** option · grade 5 · lane `data`.
+- **Build:** `support: 'level'` on the mean: objects per person → pooled → equal rows; towers levelled.
+- **Offered on:** `data_analysis:mean`.
+- **Templates:** -; new or owned: `graph-axes`. **Files:** `js/modules/gen-data-stats.js`.
+- **Draws (visual catalogue):** V199 Mean as levelling.
+- **Reach:** 1 White Rose small steps use these pictures.
+- **After:** `vis_migrate_graphs`.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-## Lane `numtheory`: Number theory (5)
+## Lane `numtheory`: Number theory (6)
 
-Owns: `js/modules/gen-number-theory.js`, `js/modules/svg-factors.js`.
+Owns: `js/modules/gen-number-theory.js`, `js/modules/svg-factors.js`, `js/modules/sheet/cells/{factor-pairs,factor-tree}.js`. Builds templates: `factor-pairs`, `factor-tree`.
 
-### 1. Square and Cube Numbers — `square_cube`
+### 1. Common Multiples and Common Factors (option) — `common_mf`
+
+- **What:** option on `number_theory:multiples`: common multiples and factors. Grade 4-5 · family number_theory · source White Rose audit.
+- **Closes (standards):** none not already full · tag with CCSS 4.OA.B.4, 6.NS.B.4, EE M.EE.4.OA.4
+- **Closes (White Rose steps):** Y5.B3.S2, Y5.B3.S4, Y6.B2.S2, Y6.B2.S3
+- **Teaches:** listing multiples and factors of two numbers and circling those they share (all of them, not only the least or greatest).
+- **Problem types:** (1) list factors of two numbers, circle the common ones; (2) list multiples, circle the common ones; (3) Venn diagram; (4) find all common factors to 100.
+- **Representation:** two lists side by side or a Venn diagram; circle the common ones. Templates: `legacy`; new: `sort-rings`.
+- **Answer:** write the lists; circle.
+- **Ladder:** O2 small numbers → to 100 · O3 lists started → none · O6 lists / Venn.
+- **Misconceptions:** lists only the greatest; stops the list early.
+- **After:** `vis_sort_diagrams` (lane `k2`).
+- **Visual catalogue:** also draws V043 Venn diagram (2 sets; universal set; nested) (reach 10 steps).
+
+### 2. Square and Cube Numbers — `square_cube`
 
 - **What:** new skill `number_theory:square_and_cube_numbers`. Grade 4-5 · family number_theory · source White Rose audit.
 - **Closes (standards):** 6.EE.A.1 · tag with CCSS 6.EE.A.1, EE M.EE.6.EE.1-2
@@ -2803,20 +3472,19 @@ Owns: `js/modules/gen-number-theory.js`, `js/modules/svg-factors.js`.
 - **Answer:** write the number or the notation.
 - **Ladder:** O2 squares → cubes → notation · O3 arrays drawn → none · O6 dots / cubes.
 - **Misconceptions:** 5² = 10; 2³ = 6.
+- **Visual catalogue:** also draws V185 Square and cube notation (reach 3 steps).
 
-### 2. Common Multiples and Common Factors (option) — `common_mf`
+### 3. Factor Diagrams: Pair Table, Rainbow, Factor Tree — `vis_factor_diagrams`
 
-- **What:** option on `number_theory:multiples`: common multiples and factors. Grade 4-5 · family number_theory · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS 4.OA.B.4, 6.NS.B.4, EE M.EE.4.OA.4
-- **Closes (White Rose steps):** Y5.B3.S2, Y5.B3.S4, Y6.B2.S2, Y6.B2.S3
-- **Teaches:** listing multiples and factors of two numbers and circling those they share (all of them, not only the least or greatest).
-- **Problem types:** (1) list factors of two numbers, circle the common ones; (2) list multiples, circle the common ones; (3) Venn diagram; (4) find all common factors to 100.
-- **Representation:** two lists side by side or a Venn diagram; circle the common ones. Templates: `legacy`; new: `sort-rings`.
-- **Answer:** write the lists; circle.
-- **Ladder:** O2 small numbers → to 100 · O3 lists started → none · O6 lists / Venn.
-- **Misconceptions:** lists only the greatest; stops the list early.
+- **Added from visual catalogue.** template · grade 3-5 · lane `numtheory`.
+- **Build:** factor_tchart_* and factor_links_* leave the legacy drag visuals for a B&W factor-pairs template (a systematic two-row table with crossed-out non-factors; the factor rainbow / bug), and a new factor-tree template (prime factors; the halving tree) used by prime_composite and the operations entry div_factors.
+- **Offered on:** `number_theory:factor_tchart_easy`, `number_theory:factor_tchart_hard`, `number_theory:factor_links_easy`, `number_theory:factor_links_hard`, `number_theory:prime_composite`.
+- **Templates:** -; new or owned: `factor-pairs`, `factor-tree`. **Files:** `js/modules/gen-number-theory.js`, `js/modules/svg-factors.js`, `js/modules/sheet/cells/factor-tree.js`.
+- **Draws (visual catalogue):** V159 Factor pairs: arrays of n, factor bug / rainbow, pair table; V192 Factor tree / halving tree.
+- **Reach:** 6 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 3. Factor a Sum With the GCF (option) — `gcf_distributive`
+### 4. Factor a Sum With the GCF (option) — `gcf_distributive`
 
 - **What:** option on `number_theory:gcf_easy`: task "write the sum as a product": 36 + 8 = 4 × (9 + 2). Grade 6 · family number_theory · source standards audit.
 - **Closes (standards):** 6.NS.B.4 · tag with CCSS 6.NS.B.4, EE -
@@ -2828,7 +3496,7 @@ Owns: `js/modules/gen-number-theory.js`, `js/modules/svg-factors.js`.
 - **Ladder:** O2 small sums → to 100 · O3 GCF given → none · O6 plain.
 - **Misconceptions:** uses a common factor that is not the greatest; 4 × (9 + 8).
 
-### 4. Multiples of 2, 5 and 10 (option) — `multiples_2_5_10`
+### 5. Multiples of 2, 5 and 10 (option) — `multiples_2_5_10`
 
 - **What:** option on `number_theory:multiples`: 2, 5, 10 at Grade 2. Grade 2 · family number_theory · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 2.OA.C.3, 2.OA.C.4, 2.NBT.A.2, EE M.EE.2.OA.3, M.EE.2.OA.4, M.EE.2.NBT.2
@@ -2840,7 +3508,7 @@ Owns: `js/modules/gen-number-theory.js`, `js/modules/svg-factors.js`.
 - **Ladder:** O2 to 50 → to 100 · O3 hundred square shaded → none · O6 chart / list.
 - **Misconceptions:** 15 is a multiple of 10; even numbers end in 0 only.
 
-### 5. Rules of Divisibility (option) — `divisibility_rules`
+### 6. Rules of Divisibility (option) — `divisibility_rules`
 
 - **What:** option on `number_theory:divisibility_sort`: rules. Grade 5 · family number_theory · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 4.OA.B.4, EE M.EE.4.OA.4

@@ -96,13 +96,18 @@ Every live skill is tagged with the CCSS standards it teaches and the Wisconsin 
 | `js/modules/standards-audit.js` | The FULL-coverage verdicts: every CCSS standard, lettered part and EE judged full / partial / gap against every clause of its text from what the skills actually deal, the missing clauses, the proposal that closes each, and `TAG_FIXES` (mis-tags corrected) |
 | `js/modules/build-list.js`, `js/modules/build-specs.js` | THE single build list (WRM + CCSS + EE): `STANDARD_PROPOSALS`, `WRM_EXTENSIONS`, the specs of every `WRM_PROPOSALS` entry, the lanes (file ownership) and the new templates |
 | `design/BUILD_LIST.md` | Generated: every new skill and option with its spec, grouped into buildable lanes in build order |
+| `design/wrm-visuals/{reception,year-1 … year-6}.md` | The White Rose VISUAL catalogues: every representation WRM draws, year by year, matched against our templates, panes and options |
+| `js/modules/visual-catalogue.js` | The joins across years (`VISUAL_ALIASES`) and the final ids `V###` (`VISUALS`: anchor row, name, the build-list entries that close it); the entries only the catalogue adds are `VISUAL_BUILDS` in build-list.js |
+| `design/wrm-visuals/INDEX.md` | Generated: the ONE de-duplicated catalogue (210 representations, status, what exists, the entry and lane that close it) |
 
 Rules: a **new skill must get a `SKILL_STANDARDS` entry** (primary CCSS first, plus its EE) in the same
 change; `node tests/scripts/ws-standards.cjs` is the gate (`--report` regenerates the coverage report and
 the build list). A skill cited by an audit verdict must stay tagged to that code. **Tagged is not covered:**
 `--strict` fails while any standard or EE lacks a FULL verdict (it fails today by design; do not add it to an
 all-gates-must-pass list yet). When a build-list entry is built to the 8/10 gate, tag it, flip the verdicts
-it closes to full in `standards-audit.js`, and delete the entry.
+it closes to full in `standards-audit.js`, and delete the entry. A visual-catalogue entry (`vis_*`) is done when its
+representations are MATCH: mark them MATCH in their year catalogues, drop the `vis_*` id from their `VISUALS` build list,
+and delete the entry. Lanes in `FROZEN_LANES` keep their order: new entries for them are appended, never interleaved.
 
 ### White Rose Maths small steps (the school's curriculum)
 

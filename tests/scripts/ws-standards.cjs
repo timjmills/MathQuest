@@ -3,8 +3,8 @@
  * ws-standards — the standards database and the skill -> standard map.
  *
  *   node tests/scripts/ws-standards.cjs              # GATE: validate, print ws-standards: OK / FAIL
- *   node tests/scripts/ws-standards.cjs --report     # also write design/STANDARDS_COVERAGE.md and
- *                                                    # design/BUILD_LIST.md
+ *   node tests/scripts/ws-standards.cjs --report     # also write design/STANDARDS_COVERAGE.md,
+ *                                                    # design/BUILD_LIST.md and design/wrm-visuals/INDEX.md
  *   node tests/scripts/ws-standards.cjs --strict     # ALSO fail while any CCSS standard, lettered
  *                                                    # part or Essential Element lacks a FULL-coverage
  *                                                    # verdict (js/modules/standards-audit.js), or a
@@ -30,6 +30,9 @@
  *     names its missing clauses and a proposal that exists in the one build list
  *     (js/modules/build-list.js + WRM_PROPOSALS), every proposal closes something, every recorded
  *     tag fix is applied. (Structure only: a partial or gap verdict does not fail the default run.)
+ *   - the WRM visual catalogue (design/wrm-visuals/*.md + js/modules/visual-catalogue.js): every year row
+ *     joins exactly one representation id, every PARTIAL / GAP representation names a build-list entry
+ *     that exists, every entry added from the catalogue is used, has a lane, hosts and files.
  *
  * Two coverage numbers are printed. "Tagged" is the old count (a skill is tagged to the code). "Full"
  * is the audit's: the tagged skills teach and assess every clause of the standard.
@@ -54,6 +57,256 @@ const failures = [];
 const fail = (m) => failures.push(m);
 
 function loadJSON(name) { return JSON.parse(fs.readFileSync(path.join(DATA, name), 'utf8')); }
+
+/* ------------------------------------------------------------ the WRM visual catalogue */
+// design/wrm-visuals/{reception,year-1 … year-6}.md each end with an "Every … representation
+// (de-duplicated)" table. Their rows are joined into ONE catalogue by the years' cross-references plus
+// js/modules/visual-catalogue.js (VISUAL_ALIASES, VISUALS), and written as design/wrm-visuals/INDEX.md.
+const VIS_DIR = path.join(ROOT, 'design', 'wrm-visuals');
+const VIS_INDEX = path.join(VIS_DIR, 'INDEX.md');
+const VIS_FILES = { R: 'reception', Y1: 'year-1', Y2: 'year-2', Y3: 'year-3', Y4: 'year-4', Y5: 'year-5', Y6: 'year-6' };
+const VIS_YEAR_NAME = { R: 'Reception', Y1: 'Year 1', Y2: 'Year 2', Y3: 'Year 3', Y4: 'Year 4', Y5: 'Year 5', Y6: 'Year 6' };
+
+function visCells(line) { return line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map((c) => c.trim()); }
+
+/** The WRM step ids a "Where" cell names ("B1 S2–S4, S7; B2 S1", "B1 S1,4,5,9,12–13", "B1–B4"). */
+function visSteps(year, where, blockSteps) {
+    const out = new Set();
+    let w = where.replace(/\*\*/g, '');
+    const bare = w.replace(/\([^)]*\)/g, '');
+    if (/B\d/.test(bare)) w = bare;
+    for (const seg of w.split(';')) {
+        const re = /B(\d+)(?:\s*[–-]\s*B?(\d+))?((?:\s*,?\s*S\s*\d+(?:\s*[–-]\s*S?\d+)?|\s*,\s*\d+(?:\s*[–-]\s*\d+)?)*)/g;
+        let m;
+        while ((m = re.exec(seg))) {
+            const b0 = +m[1], b1 = m[2] ? +m[2] : b0, sPart = m[3] || '';
+            if (!/\d/.test(sPart) || m[2]) {
+                for (let b = b0; b <= b1; b++) (blockSteps.get(`${year}.B${b}`) || []).forEach((s) => out.add(s));
+                continue;
+            }
+            for (const r of sPart.replace(/S/g, '').split(',')) {
+                const mm = r.trim().match(/^(\d+)(?:\s*[–-]\s*(\d+))?$/);
+                if (!mm) continue;
+                for (let s = +mm[1]; s <= (mm[2] ? +mm[2] : +mm[1]); s++) {
+                    const id = `${year}.B${b0}.S${s}`;
+                    if ((blockSteps.get(`${year}.B${b0}`) || []).includes(id)) out.add(id);
+                    else fail(`visual catalogue: ${year} "${where}" names ${id}, which is not a WRM step`);
+                }
+            }
+        }
+    }
+    return [...out];
+}
+
+function parseVisualTables(blockSteps) {
+    const rows = [];
+    for (const [y, f] of Object.entries(VIS_FILES)) {
+        const file = path.join(VIS_DIR, `${f}.md`);
+        if (!fs.existsSync(file)) { fail(`visual catalogue: ${path.relative(ROOT, file)} is missing`); continue; }
+        const txt = fs.readFileSync(file, 'utf8').split('\n');
+        let i = txt.findIndex((l) => /^## Every .*representation/.test(l));
+        if (i < 0) { fail(`visual catalogue: ${f}.md has no "Every … representation" table`); continue; }
+        let header = null;
+        for (i++; i < txt.length; i++) {
+            const l = txt[i];
+            if (/^## /.test(l)) break;
+            if (!l.startsWith('|')) continue;
+            const c = visCells(l);
+            if (!header) { header = c; continue; }
+            if (/^-+$/.test(c[0].replace(/:/g, ''))) continue;
+            const get = (re) => { const k = header.findIndex((h) => re.test(h)); return k < 0 ? '' : c[k]; };
+            const idRaw = c[0].replace(/\*\*/g, '').trim();
+            const id = /^Y\d R\d+/.test(idRaw) ? idRaw.replace(' ', ':') : idRaw;
+            const where = get(/^Where/);
+            const status = get(/^Status/).replace(/\*\*/g, '').replace(/^NEW · /, '');
+            rows.push({ year: y, id, key: `${y}:${id}`, name: c[1].replace(/\*\*/g, ''), where, y3: get(/^Y3$/), y1: get(/^(Y1|Y1\/Y2)$/),
+                status, proposal: get(/^Existing/), steps: visSteps(y, where, blockSteps), everywhere: !/B\d/.test(where) });
+        }
+    }
+    return rows;
+}
+
+/** One row status -> M / P / G. */
+function visTone(s) { return s === 'MATCH' ? 'M' : s === 'GAP' ? 'G' : 'P'; }
+
+function buildVisualCatalogue(vc, wrmJson) {
+    const blockSteps = new Map();
+    for (const y of wrmJson.years) for (const b of y.blocks) blockSteps.set(b.id, b.steps.map((s) => s.id));
+    const rows = parseVisualTables(blockSteps);
+    const byKey = new Map(rows.map((r) => [r.key, r]));
+    const firstR = (s) => { const m = (s || '').match(/R(\d+)/); return m ? `R${m[1].padStart(2, '0')}` : null; };
+    const link = (r) => {
+        if (r.key in vc.VISUAL_ALIASES) return vc.VISUAL_ALIASES[r.key];
+        const n = /^R\d+$/.test(r.id) ? +r.id.slice(1) : null;
+        if (['Y2', 'Y5', 'Y6'].includes(r.year)) {
+            if (n !== null) return n <= 84 ? `Y3:${r.id}` : `Y2:${r.id}`;
+            return /^Y\d:R\d+$/.test(r.id) ? r.id : null;
+        }
+        if (r.year === 'Y1') { const t = /NEW|—/.test(r.y3) ? null : firstR(r.y3); return t ? `Y3:${t}` : null; }
+        if (r.year === 'Y4') {
+            const t = /^—/.test(r.y3) || /^\(/.test(r.y3) ? null : firstR(r.y3);
+            if (t) return `Y3:${t}`;
+            const u = /—/.test(r.y1) ? null : firstR(r.y1);
+            return u ? `Y1:${u}` : null;
+        }
+        return null;
+    };
+    for (const k of Object.keys(vc.VISUAL_ALIASES)) if (!byKey.has(k)) fail(`visual catalogue: alias ${k} is not a row of the year tables`);
+    const parent = new Map(rows.map((r) => [r.key, r.key]));
+    const find = (k) => { while (parent.get(k) !== k) k = parent.get(k); return k; };
+    for (const r of rows) {
+        const t = link(r);
+        if (!t || t === r.key) continue;
+        if (!byKey.has(t)) { fail(`visual catalogue: ${r.key} joins ${t}, which is not a row`); continue; }
+        const a = find(r.key), b = find(t);
+        if (a !== b) parent.set(a, b);
+    }
+    const members = new Map();
+    for (const r of rows) { const k = find(r.key); if (!members.has(k)) members.set(k, []); members.get(k).push(r); }
+    // pin each group to its VISUALS id through the anchor
+    const groupOfRow = new Map();
+    for (const [root, ms] of members) for (const m of ms) groupOfRow.set(m.key, root);
+    const groups = [];
+    const seenRoot = new Set();
+    for (const [id, [anchor, name, build]] of Object.entries(vc.VISUALS)) {
+        if (!/^V\d{3}$/.test(id)) fail(`visual catalogue: ${id} is not a V### id`);
+        const root = groupOfRow.get(anchor);
+        if (!root) { fail(`visual catalogue: ${id} anchor ${anchor} is not a row`); continue; }
+        if (seenRoot.has(root)) { fail(`visual catalogue: ${id} (${anchor}) is the same representation as another id`); continue; }
+        seenRoot.add(root);
+        const ms = members.get(root);
+        const tones = ms.map((m) => visTone(m.status));
+        const status = tones.every((t) => t === 'M') ? 'MATCH' : tones.every((t) => t === 'G') ? 'GAP' : 'PARTIAL';
+        const steps = [...new Set(ms.flatMap((m) => m.steps))];
+        const years = Object.keys(VIS_FILES).filter((y) => ms.some((m) => m.year === y));
+        if (status !== 'MATCH' && !build.length) fail(`visual catalogue: ${id} ${name} is ${status} and names no build-list entry`);
+        groups.push({ id, anchor, name, build: [...build], members: ms, status, steps, years, everywhere: ms.some((m) => m.everywhere) });
+    }
+    for (const root of members.keys()) if (!seenRoot.has(root)) fail(`visual catalogue: ${members.get(root).map((m) => m.key).join(' = ')} has no VISUALS id`);
+    const byBuild = new Map();
+    for (const g of groups) for (const b of g.build) {
+        if (!byBuild.has(b)) byBuild.set(b, { visuals: [], steps: new Set() });
+        byBuild.get(b).visuals.push(g.id);
+        g.steps.forEach((s) => byBuild.get(b).steps.add(s));
+    }
+    const index = new Map([...byBuild].map(([b, v]) => [b, { visuals: v.visuals, steps: [...v.steps] }]));
+    return { rows, groups, index };
+}
+
+/** After the build list exists: every build a representation names is on it; every catalogue entry is used. */
+function checkVisualCatalogue(V, A, bl, liveKeys) {
+    for (const g of V.groups) for (const b of g.build) if (!A.byId.has(b)) fail(`visual catalogue: ${g.id} names ${b}, which is not on the build list`);
+    const proposed = new Set(A.list.filter((e) => e.kind === 'new').map((e) => e.skill));
+    for (const [id, b] of Object.entries(bl.VISUAL_BUILDS)) {
+        if (!V.index.has(id)) fail(`visual build ${id}: no representation names it`);
+        if (!bl.LANES[b.lane]) fail(`visual build ${id}: unknown lane ${b.lane}`);
+        for (const f of ['kind', 'name', 'build']) if (!b[f]) fail(`visual build ${id}: missing ${f}`);
+        if (!['wiring', 'template', 'pane', 'option', 'skill', 'migration', 'band'].includes(b.kind)) fail(`visual build ${id}: bad kind ${b.kind}`);
+        if (b.kind !== 'skill' && !b.hosts.length) fail(`visual build ${id}: names no host skill`);
+        for (const h of b.hosts) if (!liveKeys.has(h) && !proposed.has(h)) fail(`visual build ${id}: host ${h} is neither live nor proposed`);
+        if (!b.files.length) fail(`visual build ${id}: names no files`);
+        if (A.byId.has(id) && A.byId.get(id).source !== 'visual') fail(`visual build ${id} collides with a proposal id`);
+    }
+    for (const [id, deps] of Object.entries(bl.VISUAL_AFTER)) {
+        const e = A.byId.get(id);
+        if (!e) { fail(`VISUAL_AFTER: ${id} is not on the build list`); continue; }
+        if (bl.FROZEN_LANES.includes(e.lane)) fail(`VISUAL_AFTER: ${id} is in the frozen lane ${e.lane}`);
+        for (const d of deps) if (!bl.VISUAL_BUILDS[d]) fail(`VISUAL_AFTER: ${id} waits for ${d}, which is not a visual build`);
+    }
+}
+
+function visHave(g, liveKeys) {
+    const found = new Set();
+    const cells = new Set(fs.readdirSync(path.join(ROOT, 'js/modules/sheet/cells')).filter((f) => f.endsWith('.js')).map((f) => f.slice(0, -3)));
+    const paneSrc = fs.readFileSync(path.join(ROOT, 'js/modules/sheet/cells/panes/index.js'), 'utf8');
+    const liveBySkill = new Map();
+    for (const k of liveKeys) { const s = k.split(':')[1]; liveBySkill.set(s, liveBySkill.has(s) ? null : k); }
+    for (const m of g.members) {
+        for (const t of m.proposal.match(/`[^`]+`/g) || []) {
+            const s = t.slice(1, -1).trim();
+            let mm;
+            if ((mm = s.match(/^template:([a-z0-9-]+)$/)) && cells.has(mm[1])) found.add(`template:${mm[1]}`);
+            else if ((mm = s.match(/^pane:([a-z0-9-]+)$/)) && new RegExp(`['\\s{]${mm[1].replace(/-/g, '\\-')}'?:`).test(paneSrc)) found.add(`pane:${mm[1]}`);
+            else if (liveKeys.has(s)) found.add(s);
+            else if (/^[a-z0-9_]+$/.test(s) && liveBySkill.get(s)) found.add(liveBySkill.get(s));
+        }
+    }
+    return [...found];
+}
+
+function writeVisualIndex(V, A, liveKeys) {
+    const out = [];
+    const L = (s = '') => out.push(s);
+    const esc = (s) => String(s).replace(/\|/g, '\\|');
+    const laneOf = (g) => { const e = g.build.length ? A.byId.get(g.build[0]) : null; return e ? e.lane : '-'; };
+    const cnt = (st) => V.groups.filter((g) => g.status === st).length;
+    const ents = (g) => g.build.map((b) => { const e = A.byId.get(b); return `\`${b}\`${e && e.source === 'visual' ? '*' : ''}`; }).join(', ');
+    L('# WRM visual catalogue — the de-duplicated index');
+    L();
+    L('Generated by `node tests/scripts/ws-standards.cjs --report`. Do not edit by hand. Sources: the seven year catalogues in');
+    L('this folder (their "Every … representation (de-duplicated)" tables) and `js/modules/visual-catalogue.js` (the joins');
+    L('and the final ids). Owner, 2026-09-25: every White Rose visual is to be replicated in our skills, as an option within');
+    L('a skill or as a skill of its own.');
+    L();
+    L('**How rows became one catalogue.** Years 2, 5 and 6 reuse the Year 3 ids (R01–R84) and the Year 2 additions');
+    L('(R85–R101); Years 1 and 4 name the Year 3 / Year 1 row in their cross-reference columns; `VISUAL_ALIASES` joins the');
+    L('rest by hand (Reception has no cross-reference column; the "NEW" rows of Years 4–6 repeat each other). Each group has');
+    L('ONE final id `V###`, pinned in `VISUALS` — ids are append-only.');
+    L();
+    L('**Status** is computed from the year rows: MATCH when every year row is MATCH (built and offered, B&W), GAP when every');
+    L('year row is GAP, PARTIAL otherwise (it exists for some years, some ranges or some looks, or only on the legacy colour');
+    L('path). **Steps** = distinct White Rose small steps whose lesson pages use it (a representation used "throughout" is');
+    L('marked +). **Build** names the entries of `design/BUILD_LIST.md` that close it: an existing WRM or standards entry that');
+    L('already draws it (merged, not duplicated) or an entry added from this catalogue (marked *). **Lane** is the owner lane of');
+    L('the first entry.');
+    L();
+    L('## Summary');
+    L();
+    L(`- **${V.rows.length} year rows** (${Object.keys(VIS_FILES).map((y) => `${VIS_YEAR_NAME[y]} ${V.rows.filter((r) => r.year === y).length}`).join(', ')}) → **${V.groups.length} representations**.`);
+    L(`- **MATCH ${cnt('MATCH')} · PARTIAL ${cnt('PARTIAL')} · GAP ${cnt('GAP')}.**`);
+    const visEntries = A.list.filter((e) => e.source === 'visual');
+    const merged = new Set(V.groups.flatMap((g) => g.build).filter((b) => A.byId.get(b) && A.byId.get(b).source !== 'visual'));
+    L(`- The ${cnt('PARTIAL') + cnt('GAP')} PARTIAL / GAP representations are closed by ${merged.size} existing build-list entries (merged) and ${visEntries.length} entries added from this catalogue.`);
+    L();
+    L('| Lane | Representations it owns | MATCH | PARTIAL | GAP | Entries added from the catalogue |');
+    L('|---|---|---|---|---|---|');
+    for (const id of Object.keys(A.bl.LANES)) {
+        const gs = V.groups.filter((g) => laneOf(g) === id);
+        L(`| \`${id}\` | ${gs.length} | ${gs.filter((g) => g.status === 'MATCH').length} | ${gs.filter((g) => g.status === 'PARTIAL').length} | ${gs.filter((g) => g.status === 'GAP').length} | ${visEntries.filter((e) => e.lane === id).length} |`);
+    }
+    L();
+    L('## Cross-cutting findings');
+    L();
+    const line = (id, what) => { const e = A.byId.get(id); if (e) L(`- **${what}** → \`${id}\` (lane \`${e.lane}\`): ${e.visuals.join(', ')}.`); };
+    line('vis_supports_wiring', 'Picture panes built but never offered as supports (rekenrek, fingers, dice, base10-quick, disks, pvgrid, openline, bar, gridpaper, hundreds, base10, objects)');
+    for (const id of ['vis_migrate_shapes', 'vis_migrate_area_volume', 'vis_migrate_coordinates', 'vis_migrate_measures', 'vis_migrate_fraction_ops', 'vis_migrate_graphs']) line(id, `Legacy colour → B&W: ${A.byId.get(id) ? A.byId.get(id).name : id}`);
+    line('vis_pv_bands_millions', 'Widening band: 7-digit / millions place value');
+    line('vis_pv_decimal_places', 'Widening band: decimals to thousandths in the place-value chart');
+    L();
+    L('## The catalogue');
+    L();
+    L('| Id | Representation | Year rows | Steps | Status | Have today | Build | Lane |');
+    L('|---|---|---|---|---|---|---|---|');
+    for (const g of V.groups) {
+        const rowsTxt = g.members.map((m) => `${m.year === 'R' ? 'R' : m.year} ${m.id.replace(/^Y\d:/, '')}${m.status !== g.status ? ` (${m.status === 'MATCH / PARTIAL' ? 'M/P' : m.status})` : ''}`).join(', ');
+        const have = visHave(g, liveKeys);
+        L(`| ${g.id} | ${esc(g.name)} | ${esc(rowsTxt)} | ${g.steps.length}${g.everywhere ? '+' : ''} | ${g.status} | ${have.length ? have.map((h) => `\`${h}\``).join(', ') : '-'} | ${ents(g) || '-'} | ${g.build.length ? `\`${laneOf(g)}\`` : '-'} |`);
+    }
+    L();
+    L('## By build-list entry');
+    L();
+    L('Every entry of `design/BUILD_LIST.md` that draws a catalogued representation, with its reach (distinct small steps).');
+    L();
+    L('| Entry | Lane | Source | Representations | Reach (steps) |');
+    L('|---|---|---|---|---|');
+    const ids = [...V.index.keys()].sort((a, b) => (A.byId.get(a) ? A.byId.get(a).lane : '').localeCompare(A.byId.get(b) ? A.byId.get(b).lane : '') || V.index.get(b).steps.length - V.index.get(a).steps.length);
+    for (const id of ids) {
+        const e = A.byId.get(id);
+        if (!e) continue;
+        L(`| \`${id}\` ${esc(e.name)} | \`${e.lane}\` | ${e.source === 'visual' ? 'added from visual catalogue' : e.source === 'wrm' ? 'White Rose audit' : 'standards audit'} | ${V.index.get(id).visuals.join(', ')} | ${V.index.get(id).steps.length} |`);
+    }
+    fs.writeFileSync(VIS_INDEX, `${out.join('\n')}\n`);
+}
 
 /* ------------------------------------------------------------ database checks */
 function checkDatabase(cc, ee) {
@@ -136,7 +389,7 @@ const combine = (list) => (list.every((s) => s === 'full') ? 'full' : list.every
  * Check js/modules/standards-audit.js and the one build list, and compute what the reports need:
  * { ccssRows, eeRows, tally, list, byId, closes, fixCount, kinds }. Structural problems go to fail().
  */
-function checkAudit({ cc, ee, audit, bl, wrm, map, liveKeys, labels }) {
+function checkAudit({ cc, ee, audit, bl, wrm, map, liveKeys, labels, vis }) {
     const CA = audit.CCSS_AUDIT, EA = audit.EE_AUDIT;
     const ccByCode = new Map(cc.standards.map((s) => [s.code, s]));
     const eeByCode = new Map(ee.essentialElements.map((e) => [e.code, e]));
@@ -191,14 +444,14 @@ function checkAudit({ cc, ee, audit, bl, wrm, map, liveKeys, labels }) {
     for (const code of Object.keys(EA)) if (!eeByCode.has(code)) fail(`audit: ${code} is not an Essential Element`);
 
     // the build list
-    const list = bl.buildList();
+    const list = bl.buildList(vis ? vis.index : null);
     const byId = new Map(list.map((e) => [e.id, e]));
     const closes = new Map(list.map((e) => [e.id, []]));
     for (const r of [...ccssRows, ...eeRows]) for (const id of r.build) if (closes.has(id)) closes.get(id).push(r.code);
     const kinds = { new: 0, option: 0, repair: 0 };
     const allCodes = new Set([...ccByCode.keys(), ...eeByCode.keys(), ...ee.essentialElements.flatMap((e) => (e.subs || []).map((x) => x.code))]);
     for (const e of list) {
-        kinds[e.kind] = (kinds[e.kind] || 0) + 1;
+        if (e.source !== 'visual') kinds[e.kind] = (kinds[e.kind] || 0) + 1;
         if (e.source === 'standards') {
             for (const f of ['kind', 'skill', 'name', 'grade', 'family', 'teaches', 'answer', 'ladder']) if (!e[f]) fail(`proposal ${e.id}: missing ${f}`);
             if (!['new', 'option', 'repair'].includes(e.kind)) fail(`proposal ${e.id}: kind must be new, option or repair`);
@@ -283,7 +536,7 @@ function writeReport(cov, cc, ee, skillLabel, mapStats, A) {
     L(`- **Full coverage: CCSS ${T.top.full} of ${T.top.total} standards FULL, ${T.top.partial} PARTIAL, ${T.top.gap} GAP** (tagged: ${S.ccss.covered}). Counting leaves and lettered parts (${T.leaf.total}): ${T.leaf.full} FULL, ${T.leaf.partial} PARTIAL, ${T.leaf.gap} GAP.`);
     L(`- **Essential Elements: ${T.ee.full} of ${T.ee.total} FULL, ${T.ee.partial} PARTIAL, ${T.ee.gap} GAP** (tagged: ${S.ee.covered}).`);
     L(`- Tag fixes: ${A.fixCount['mis-tag']} mis-tags corrected, ${A.fixCount.flag} broken skill flagged, ${A.fixCount.add} missing tags added (below).`);
-    L(`- The one build list: ${A.list.length} entries — ${A.kinds.new} new skills, ${A.kinds.option} options on existing skills, ${A.kinds.repair} repairs; ${A.list.filter((e) => e.source === 'wrm').length} from the White Rose audit (${Object.keys(A.list.filter((e) => e.source === 'wrm' && e.extension).reduce((o, e) => { o[e.id] = 1; return o; }, {})).length} of them extended to close standards clauses), ${A.list.filter((e) => e.source === 'standards').length} from this audit.`);
+    L(`- The one build list: ${A.list.length} entries — ${A.kinds.new} new skills, ${A.kinds.option} options on existing skills, ${A.kinds.repair} repairs; ${A.list.filter((e) => e.source === 'wrm').length} from the White Rose audit (${Object.keys(A.list.filter((e) => e.source === 'wrm' && e.extension).reduce((o, e) => { o[e.id] = 1; return o; }, {})).length} of them extended to close standards clauses), ${A.list.filter((e) => e.source === 'standards').length} from this audit, ${A.list.filter((e) => e.source === 'visual').length} added from the White Rose visual catalogue (\`design/wrm-visuals/INDEX.md\`).`);
     L();
     L('| Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |');
     L('|---|---|---|---|---|');
@@ -319,11 +572,12 @@ function writeReport(cov, cc, ee, skillLabel, mapStats, A) {
     L('highest impact first (standards closed × 2 + White Rose steps closed). The full spec of each entry — problem types,');
     L('representation, answer, option ladder, misconceptions, lane and file ownership — is in `design/BUILD_LIST.md`.');
     L();
-    const fams = [...new Set(A.list.map((e) => e.family))];
+    const std = A.list.filter((e) => e.source !== 'visual');
+    const fams = [...new Set(std.map((e) => e.family))];
     const impact = impactOf(A);
-    fams.sort((a, b) => A.list.filter((e) => e.family === b).reduce((s, e) => s + impact(e), 0) - A.list.filter((e) => e.family === a).reduce((s, e) => s + impact(e), 0));
+    fams.sort((a, b) => std.filter((e) => e.family === b).reduce((s, e) => s + impact(e), 0) - std.filter((e) => e.family === a).reduce((s, e) => s + impact(e), 0));
     for (const f of fams) {
-        const entries = A.bl.orderLane(A.list.filter((e) => e.family === f), impact);
+        const entries = A.bl.orderLane(std.filter((e) => e.family === f), impact);
         L(`### ${FAMILY_NAMES[f] || f} (${entries.length})`);
         L();
         L('| # | Entry | Kind | Closes standards | Closes WRM steps |');
@@ -401,7 +655,10 @@ function writeBuildList(A, skillLabel) {
     L();
     L('**One list.** Where a standards clause was already on a White Rose proposal, that proposal was extended (its');
     L('"Extended for the standards" line) rather than a second entry added. Where White Rose does not teach the content');
-    L('at that step, the standards audit added its own entry.');
+    L('at that step, the standards audit added its own entry. The White Rose VISUAL catalogue (`design/wrm-visuals/INDEX.md`)');
+    L('adds only what no entry already draws: a representation an entry draws is sent to that entry (its "Visual catalogue"');
+    L('line); the rest are the entries "added from visual catalogue" (templates, panes, options, the supports wiring, the');
+    L('legacy-to-B&W migrations and the wider place-value bands).');
     L();
     L('**Done means** (for every entry): researched per CLAUDE.md, built in the sheet kit (no legacy handlers), ≥ 8 on all');
     L('four `design/audit/RUBRIC.md` criteria on every page type and screen host and ≥ 8 on OPTIONS-RUBRIC O1-O6, graded');
@@ -410,17 +667,23 @@ function writeBuildList(A, skillLabel) {
     L();
     L('## Summary');
     L();
-    L(`- ${A.list.length} entries: **${A.kinds.new} new skills, ${A.kinds.option} new options, ${A.kinds.repair} repairs**.`);
+    const visAll = A.list.filter((e) => e.source === 'visual');
+    L(`- ${A.list.length} entries: **${A.kinds.new} new skills, ${A.kinds.option} new options, ${A.kinds.repair} repairs**, and **${visAll.length} added from the visual catalogue** (${['wiring', 'template', 'pane', 'option', 'skill', 'migration', 'band'].map((k) => `${visAll.filter((e) => e.kind === k).length} ${k}`).join(', ')}).`);
     L(`- ${A.list.filter((e) => e.source === 'wrm').length} from the White Rose audit (${A.list.filter((e) => e.source === 'wrm' && e.extension).length} extended for standards), ${A.list.filter((e) => e.source === 'standards').length} from the standards audit.`);
     L(`- They close ${A.tally.leaf.partial + A.tally.leaf.gap} CCSS leaves and parts and ${A.tally.ee.partial + A.tally.ee.gap} Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.`);
-    L(`- ${Object.keys(NEW_TEMPLATES).length} new sheet-kit templates are needed; each is owned by one lane.`);
+    L(`- The visual catalogue: ${A.vis.groups.length} representations (MATCH ${A.vis.groups.filter((g) => g.status === 'MATCH').length}, PARTIAL ${A.vis.groups.filter((g) => g.status === 'PARTIAL').length}, GAP ${A.vis.groups.filter((g) => g.status === 'GAP').length}); every PARTIAL and GAP one is on an entry below.`);
+    L(`- ${Object.keys(NEW_TEMPLATES).length} new sheet-kit templates and panes are needed; each is owned by one lane.`);
+    L(`- Lanes ${A.bl.FROZEN_LANES.map((l) => `\`${l}\``).join(' and ')} were already building from this list: their entries keep their order and names, and the catalogue's entries are APPENDED after them.`);
     L();
-    L('| Lane | Entries | New skills | Options | Repairs | Standards closed | WRM steps closed |');
-    L('|---|---|---|---|---|---|---|');
+    L('| Lane | Entries | New skills | Options | Repairs | Added from visual catalogue | Standards closed | WRM steps closed | Representations drawn | Visual reach (steps) |');
+    L('|---|---|---|---|---|---|---|---|---|---|');
     for (const id of lanes) {
         const es = A.list.filter((e) => e.lane === id);
+        const std = es.filter((e) => e.source !== 'visual');
         const codes = new Set(es.flatMap((e) => A.closes.get(e.id) || []));
-        L(`| ${LANES[id].name} (\`${id}\`) | ${es.length} | ${es.filter((e) => e.kind === 'new').length} | ${es.filter((e) => e.kind === 'option').length} | ${es.filter((e) => e.kind === 'repair').length} | ${codes.size} | ${es.reduce((s, e) => s + e.wrmSteps.length, 0)} |`);
+        const reps = new Set(es.flatMap((e) => e.visuals || []));
+        const steps = new Set(es.flatMap((e) => e.visualSteps || []));
+        L(`| ${LANES[id].name} (\`${id}\`) | ${es.length} | ${std.filter((e) => e.kind === 'new').length} | ${std.filter((e) => e.kind === 'option').length} | ${std.filter((e) => e.kind === 'repair').length} | ${es.length - std.length} | ${codes.size} | ${es.reduce((s, e) => s + e.wrmSteps.length, 0)} | ${reps.size} | ${steps.size} |`);
     }
     L();
     L('## File ownership');
@@ -451,17 +714,48 @@ function writeBuildList(A, skillLabel) {
     L('1. Each lane builds its new templates first (they unblock entries in other lanes: `bar-model`, `graph-axes`,');
     L('   `shape-grid`, `coord-grid` are the most shared).');
     L('2. Inside a lane, entries in the order below: dependencies first (`after`), then highest impact first');
-    L('   (standards closed × 2 + White Rose steps closed).');
+    L('   (standards closed × 2 + White Rose steps closed + the small steps whose pages use the representations it draws).');
+    L(`   The frozen lanes (${A.bl.FROZEN_LANES.map((l) => `\`${l}\``).join(', ')}) keep their original order; their entries added from the visual`);
+    L('   catalogue follow, in dependency-then-reach order.');
     L('3. Lanes run in parallel; an entry whose dependency is in another lane waits for it (named in its `After` line).');
     L();
+    const reach = (e) => (e.visualSteps || []).length;
+    const mergedImpact = (e) => impact(e) + reach(e);
+    const visLabel = (ids) => ids.map((v) => `${v} ${(A.vis.groups.find((g) => g.id === v) || {}).name || ''}`).join('; ');
+    const renderVisual = (e, i, id) => {
+        L(`### ${i + 1}. ${e.name} — \`${e.id}\``);
+        L();
+        L(`- **Added from visual catalogue.** ${e.kind}${e.low ? ' (low priority)' : ''} · grade ${e.grade || '-'} · lane \`${e.lane}\`.`);
+        L(`- **Build:** ${e.teaches}.`);
+        L(`- **Offered on:** ${[e.skill, ...e.also].filter(Boolean).map((k) => `\`${k}\``).join(', ') || '-'}.`);
+        L(`- **Templates:** ${(e.templates || []).map((t) => `\`${t}\``).join(', ') || '-'}${(e.newTemplates || []).length ? `; new or owned: ${e.newTemplates.map((t) => `\`${t}\``).join(', ')}` : ''}. **Files:** ${(e.files || []).map((f) => `\`${f}\``).join(', ')}.`);
+        L(`- **Draws (visual catalogue):** ${visLabel(e.visuals)}.`);
+        L(`- **Reach:** ${reach(e)} White Rose small steps use these pictures.`);
+        if (e.after.length) L(`- **After:** ${e.after.map((d) => `\`${d}\`${A.byId.get(d) && A.byId.get(d).lane !== id ? ` (lane \`${A.byId.get(d).lane}\`)` : ''}`).join(', ')}.`);
+        L('- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.');
+        L();
+    };
     for (const id of lanes) {
-        const es = A.bl.orderLane(A.list.filter((e) => e.lane === id), impact);
+        const frozen = A.bl.FROZEN_LANES.includes(id);
+        const es = frozen
+            ? [...A.bl.orderLane(A.list.filter((e) => e.lane === id && e.source !== 'visual'), impact), ...A.bl.orderLane(A.list.filter((e) => e.lane === id && e.source === 'visual'), reach)]
+            : A.bl.orderLane(A.list.filter((e) => e.lane === id), mergedImpact);
         if (!es.length) continue;
         L(`## Lane \`${id}\`: ${LANES[id].name} (${es.length})`);
         L();
         L(`Owns: ${LANES[id].files.map((f) => `\`${f}\``).join(', ')}${LANES[id].newTemplates.length ? `. Builds templates: ${LANES[id].newTemplates.map((t) => `\`${t}\``).join(', ')}` : ''}.`);
         L();
+        let firstVisual = true;
         es.forEach((e, i) => {
+            if (frozen && e.source === 'visual' && firstVisual) {
+                firstVisual = false;
+                L(`### Added from visual catalogue (appended 2026-09-25; the entries above are unchanged)`);
+                L();
+                const carried = es.filter((x) => x.source !== 'visual' && (x.visuals || []).length);
+                if (carried.length) L(`Your existing entries that also draw catalogued representations (build them with these pictures): ${carried.map((x) => `\`${x.id}\` (${x.visuals.join(', ')})`).join('; ')}.`);
+                L();
+            }
+            if (e.source === 'visual') { renderVisual(e, i, id); return; }
             const cl = A.closes.get(e.id) || [];
             const what = e.kind === 'new' ? `new skill \`${e.skill}\`` : `${e.kind} on \`${e.skill}\`${e.also.length ? ` (and ${e.also.map((k) => `\`${k}\``).join(', ')})` : ''}: ${e.option}`;
             L(`### ${i + 1}. ${e.name} — \`${e.id}\``);
@@ -477,6 +771,7 @@ function writeBuildList(A, skillLabel) {
             L(`- **Ladder:** ${e.ladder || 'SPEC MISSING'}.`);
             L(`- **Misconceptions:** ${(e.misconceptions || []).join('; ') || 'SPEC MISSING'}.`);
             if (e.after.length) L(`- **After:** ${e.after.map((d) => `\`${d}\`${A.byId.get(d) && A.byId.get(d).lane !== id ? ` (lane \`${A.byId.get(d).lane}\`)` : ''}`).join(', ')}.`);
+            if (!frozen && (e.visuals || []).length) L(`- **Visual catalogue:** also draws ${visLabel(e.visuals)} (reach ${reach(e)} steps).`);
             L();
         });
     }
@@ -500,7 +795,7 @@ function writeBuildList(A, skillLabel) {
     globalThis.localStorage = { getItem: (k) => (k in mem ? mem[k] : null), setItem: (k, v) => { mem[k] = String(v); }, removeItem: (k) => { delete mem[k]; } };
     const origLog = console.log;
     console.log = () => {};
-    let data, std, aliases, audit, bl, wrm;
+    let data, std, aliases, audit, bl, wrm, vc;
     try {
         data = await import(pathToFileURL(path.join(ROOT, 'js/modules/data.js')).href);
         std = await import(pathToFileURL(path.join(ROOT, 'js/modules/standards.js')).href);
@@ -508,6 +803,7 @@ function writeBuildList(A, skillLabel) {
         audit = await import(pathToFileURL(path.join(ROOT, 'js/modules/standards-audit.js')).href);
         bl = await import(pathToFileURL(path.join(ROOT, 'js/modules/build-list.js')).href);
         wrm = await import(pathToFileURL(path.join(ROOT, 'js/modules/wrm.js')).href);
+        vc = await import(pathToFileURL(path.join(ROOT, 'js/modules/visual-catalogue.js')).href);
     } finally { console.log = origLog; }
 
     const live = [];
@@ -556,11 +852,15 @@ function writeBuildList(A, skillLabel) {
 
     const cov = std.coverage();
     const S = cov.summary;
-    const A = checkAudit({ cc, ee, audit, bl, wrm, map, liveKeys, labels });
+    const V = buildVisualCatalogue(vc, JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'curriculum', 'wrm-steps.json'), 'utf8')));
+    const A = checkAudit({ cc, ee, audit, bl, wrm, map, liveKeys, labels, vis: V });
+    checkVisualCatalogue(V, A, bl, liveKeys);
+    A.vis = V;
     if (WRITE_REPORT && !failures.length) {
         writeReport(cov, cc, ee, (k) => labels.get(k) || k, stats, A);
         writeBuildList(A, (k) => labels.get(k) || k);
-        console.log(`wrote ${path.relative(ROOT, REPORT)} and ${path.relative(ROOT, BUILD_LIST)}`);
+        writeVisualIndex(V, A, liveKeys);
+        console.log(`wrote ${path.relative(ROOT, REPORT)}, ${path.relative(ROOT, BUILD_LIST)} and ${path.relative(ROOT, VIS_INDEX)}`);
     }
     console.log(`standards: ${cc.meta.counts.standards} CCSS (+${cc.meta.counts.subStandards} parts), ${ee.meta.counts.essentialElements} EE`);
     console.log(`skills: ${stats.live} live, ${stats.withCcss} with CCSS (${stats.approx} approx), ${stats.pools} pools, ${stats.reasoned} with a reason`);
@@ -568,7 +868,9 @@ function writeBuildList(A, skillLabel) {
     console.log(`  by level: ${GRADES.map((g) => `${g} ${pct((S.ccss.byGrade[g] || {}).covered, (S.ccss.byGrade[g] || {}).total)}`).join('  ')}`);
     const T = A.tally;
     console.log(`full coverage (audit): CCSS ${T.top.full}/${T.top.total} full, ${T.top.partial} partial, ${T.top.gap} gap; parts and leaves ${T.leaf.full}/${T.leaf.total} full, ${T.leaf.partial} partial, ${T.leaf.gap} gap; EE ${T.ee.full}/${T.ee.total} full, ${T.ee.partial} partial, ${T.ee.gap} gap`);
-    console.log(`  tag fixes: ${A.fixCount['mis-tag']} mis-tags, ${A.fixCount.flag} flagged, ${A.fixCount.add} missing tags added; build list: ${A.list.length} entries (${A.kinds.new} new skills, ${A.kinds.option} options, ${A.kinds.repair} repairs) in ${Object.keys(bl.LANES).length} lanes`);
+    console.log(`  tag fixes: ${A.fixCount['mis-tag']} mis-tags, ${A.fixCount.flag} flagged, ${A.fixCount.add} missing tags added; build list: ${A.list.length} entries (${A.kinds.new} new skills, ${A.kinds.option} options, ${A.kinds.repair} repairs, ${A.list.filter((e) => e.source === 'visual').length} added from the visual catalogue) in ${Object.keys(bl.LANES).length} lanes`);
+    const vst = (st) => V.groups.filter((g) => g.status === st).length;
+    console.log(`visual catalogue: ${V.rows.length} year rows -> ${V.groups.length} representations (MATCH ${vst('MATCH')}, PARTIAL ${vst('PARTIAL')}, GAP ${vst('GAP')}); ${A.list.filter((e) => e.source === 'visual').length} build-list entries added from it`);
     if (!failures.length && STRICT) {
         const notFull = [...A.ccssRows.filter((r) => r.leaf && r.status !== 'full'), ...A.eeRows.filter((r) => r.status !== 'full')];
         const noSpec = A.list.filter((e) => e.specMissing);
