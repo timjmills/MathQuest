@@ -273,20 +273,51 @@ function frameHTML(ctx, text, key, digits) {
 }
 
 /** A frame with several slots: each "____" is slot b0, b1 … keyed by `keys[i]`. */
-function blanksHTML(ctx, text, keys, words) {
+function blanksHTML(ctx, text, keys, words, floor = 0) {
     const parts = String(text || '').split('____');
-    let out = '';
+    // Round-3 re-grade (H-slot): every number slot of a frame is as wide as the widest answer the
+    // SECTION can need (`floor`, from the numbers printed), never its own answer - a longer slot
+    // told the pupil which answers have three digits.
+    const numKeys = (keys || []).map((k) => String(k === undefined ? '' : k)).filter((k) => /^\d/.test(k));
+    const width = Math.max(floor, ...numKeys.map((k) => k.replace(/[^0-9]/g, '').length), 1);
+    const slots = [];
     parts.forEach((seg, i) => {
-        out += piece(ctx, seg);
         if (i < parts.length - 1) {
             const k = keys && keys[i] !== undefined ? String(keys[i]) : '';
-            const digits = Math.max(1, k.replace(/[^0-9]/g, '').length || k.length || 1);
+            const digits = /^\d/.test(k) ? width : Math.max(1, k.length || 1);
             const shape = words && !/^\d/.test(k) ? 'line' : 'box';
-            out += blank({ id: `b${i}`, kind: /^\d/.test(k) ? 'number' : 'text', shape, digits: Math.max(digits, shape === 'line' ? 6 : 1),
-                graded: true, order: i, scopes: ['full', 'answer-only'] }, ctx, k);
+            slots.push(blank({ id: `b${i}`, kind: /^\d/.test(k) ? 'number' : 'text', shape, digits: Math.max(digits, shape === 'line' ? 6 : 1),
+                graded: true, order: i, scopes: ['full', 'answer-only'] }, ctx, k));
         }
     });
+    // The slots and the words between them ("____ and ____") stay on ONE line: a wrap that left
+    // "and" at a line end and the second slot alone on the next read as two separate answers.
+    let out = piece(ctx, parts[0]);
+    if (slots.length) {
+        let grp = '';
+        parts.slice(1).forEach((seg, i) => {
+            grp += slots[i];
+            if (i < slots.length - 1) grp += piece(ctx, seg);
+        });
+        out += `<span class="pv-slotgroup" style="display:inline-flex;align-items:flex-end;flex-wrap:nowrap;white-space:nowrap;column-gap:0.2em;">${grp}</span>`;
+        out += piece(ctx, parts[parts.length - 1]);
+    }
     return `<div class="ws-eq pv-frame pv-blanks" style="font-weight:700;flex-wrap:wrap;row-gap:2mm;">${out}</div>`;
+}
+
+/**
+ * The digits a number slot of this item is drawn for: the longest number the item prints (its
+ * number, its bounds, the numbers of its frame), plus one when the answer can gain a digit
+ * (rounding 95 gives 100, a sum of two 2-digit numbers can reach 3). Items of one section print
+ * numbers of one size, so their slots come out the same width whatever each answer is.
+ */
+function slotFloor(p, grow) {
+    const lens = [p.n, p.a, p.b, p.lo, p.hi].filter((v) => typeof v === 'number' && Number.isFinite(v))
+        .map((v) => String(Math.abs(Math.round(v))).length);
+    for (const t of String(p.frame || '').match(/\d[\d,]*/g) || []) lens.push(t.replace(/,/g, '').length);
+    for (const v of p.nums || []) lens.push(String(v).replace(/[^0-9]/g, '').length);
+    const m = lens.length ? Math.max(...lens) : 0;
+    return m ? m + (grow ? 1 : 0) : 0;
 }
 
 /** Words or numbers printed for the pupil to ring; the key rings the right ones. */
@@ -393,8 +424,11 @@ function orderHTML(p, ctx) {
     const digits = Math.max(...(p.sorted || ['00']).map(v => String(v).replace(/[^0-9]/g, '').length), 2);
     const boxes = (p.sorted || []).map((v, i) => blank({ id: `o${i}`, kind: 'number', shape: 'box', digits, graded: true, order: i,
         scopes: ['full', 'answer-only'] }, ctx, v)).join('<span class="o">,</span>');
+    // The answer boxes are one row, read left to right: never wrapped (a third box alone on a
+    // second line behind a dangling comma had no reading order). A row too wide for the column
+    // is measured as not fitting, and the layout takes fewer columns (DN-10).
     return `<div style="text-align:center;font-size:${pt(ctx.metrics.digitPt * 0.8)};font-weight:700;margin-bottom:3mm;">${cards}</div>`
-        + `<div class="ws-eq pv-order" style="font-weight:700;flex-wrap:wrap;row-gap:2mm;justify-content:center;">${boxes}</div>`;
+        + `<div class="ws-eq pv-order" style="font-weight:700;flex-wrap:nowrap;white-space:nowrap;justify-content:center;">${boxes}</div>`;
 }
 
 const keyDigits = (kv) => Math.max(2, String(kv === undefined ? '' : kv).replace(/[^0-9]/g, '').length);
@@ -416,7 +450,9 @@ register('pv', {
         const center = (h) => `<div style="text-align:center;margin:1mm 0 2mm;">${h}</div>`;
         const big = (h) => `<span style="font-size:${pt(m.digitPt)};font-weight:700;">${h}</span>`;
         const kv = typeof p.keyValue === 'number' ? fmt(p.keyValue) : p.keyValue;
-        const digits = keyDigits(kv);
+        // A slot's width never tells the answer (round-3 re-grade): at least the longest number the
+        // item prints, plus one where the answer can gain a digit (rounding, estimating).
+        const digits = Math.max(keyDigits(kv), slotFloor(p, p.kind !== 'value'));
         const top = p.hideNumeral ? '' : undefined;
         switch (p.kind) {
             case 'place':
@@ -431,7 +467,7 @@ register('pv', {
                 return `<div class="pv-cell">${top ?? center(numeral({ underline: p.place }))}${frameHTML(ctx, p.frame, kv, digits)}</div>`;
             case 'blanks': {
                 const pic = p.place && !p.hideNumeral ? center(numeral({ underline: p.place })) : '';
-                return `<div class="pv-cell">${pic}${blanksHTML(ctx, p.frame, p.keys, p.words)}</div>`;
+                return `<div class="pv-cell">${pic}${blanksHTML(ctx, p.frame, p.keys, p.words, slotFloor(p, true))}</div>`;
             }
             case 'expand':
                 return `<div class="pv-cell">${expandHTML(p, ctx)}</div>`;

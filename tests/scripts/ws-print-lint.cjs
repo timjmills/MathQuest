@@ -610,6 +610,38 @@ function wsLintPage(cfg) {
                 if (over > TOL) { F('L-OVERFLOW', 'PG-12', 'major', d, `sticks out of its cell by ${mm(over)} mm (cell ${mm(cr.width)} x ${mm(cr.height)} mm) (PG-12, CL-1)`, 'out of cell'); break; }
             }
         }
+        /* L-DENSITY H13 (RUBRIC hard cap, owner 2026-09-25): a kit cell whose drawing leaves one empty
+           band of 30% or more of the cell's height (or width) - a row sized for a taller item than it
+           holds. The content box is every visible in-flow descendant (absolutely placed labels, tabs
+           and the key's answer stamp excluded); the band is measured inside the cell's padding. */
+        if (!isLegacy) {
+            for (const c of ri.cells) {
+                if (c.classList.contains('blankrun') || c.closest('.mq-anchorgrid') || c.querySelector('[data-ws-anchor]')) continue;
+                const cr = c.getBoundingClientRect();
+                if (cr.height < 12 * PX || cr.width < 12 * PX) continue;
+                const cs = getComputedStyle(c);
+                const inner = { t: cr.top + parseFloat(cs.paddingTop), b: cr.bottom - parseFloat(cs.paddingBottom), l: cr.left + parseFloat(cs.paddingLeft), r: cr.right - parseFloat(cs.paddingRight) };
+                let box = null;
+                for (const d of c.querySelectorAll('*')) {
+                    if (!visible(d)) continue;
+                    if (d.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab, .ws-legacy-answer')) continue;
+                    if (getComputedStyle(d).position === 'absolute') continue;
+                    const r = d.getBoundingClientRect();
+                    if (!r.width || !r.height) continue;
+                    if (d.children.length && !(d instanceof SVGElement) && !d.textContent.trim() && !/^(svg|img|canvas)$/i.test(d.tagName)) {
+                        const bs = getComputedStyle(d);
+                        if (!(parseFloat(bs.borderTopWidth) || parseFloat(bs.borderBottomWidth))) continue;
+                    }
+                    box = box ? { t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom), l: Math.min(box.l, r.left), r: Math.max(box.r, r.right) } : { t: r.top, b: r.bottom, l: r.left, r: r.right };
+                }
+                if (!box) continue;
+                const H = cr.height, W = cr.width;
+                const vBand = Math.max(box.t - inner.t, inner.b - box.b, 0);
+                const hBand = Math.max(box.l - inner.l, inner.r - box.r, 0);
+                if (vBand >= 0.3 * H) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(vBand)} mm tall in a ${mm(H)} mm cell (${Math.round((vBand / H) * 100)}%): the row is sized for a taller item than it holds (RUBRIC H13)`, 'empty band in cell');
+                else if (hBand >= 0.3 * W) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(hBand)} mm wide in a ${mm(W)} mm cell (${Math.round((hBand / W) * 100)}%): the content is pinned to one side (RUBRIC H13)`, 'empty band in cell');
+            }
+        }
         if (!isLegacy) {
             const pg = ri.el;
             const pr = pg.getBoundingClientRect();
@@ -1659,6 +1691,13 @@ const SELF_TESTS = [
         p1.after(p2);
         p1.querySelector('.ws-foot b').textContent = '1/2'; p2.querySelector('.ws-foot b').textContent = '2/2';
         [...p1.querySelectorAll('[data-ws-cell]')].slice(2).forEach(c => c.remove());
+    } },
+    { name: 'empty band under a cell drawing (H13)', expect: ['L-DENSITY', 'H13'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.style.justifyContent = 'flex-start';
+        c.insertAdjacentHTML('afterbegin', '<div style="height:1mm"></div>');
+        const g = c.closest('.ws-grid');
+        if (g) g.style.gridTemplateRows = `${Math.max(3 * c.getBoundingClientRect().height, 60 * 96 / 25.4)}px repeat(20, auto)`;
     } },
     { name: 'eight items on an Independent page', expect: ['L-DENSITY', 'DN-1'], fn: () => {
         const p1 = document.querySelector('.ws-page');

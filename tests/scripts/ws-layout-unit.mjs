@@ -465,6 +465,15 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     const gcells = g.r.pupilPages[0].split('data-ws-cell=').slice(2);
     ok(gcells.length >= 3 && gcells.every((c) => !/ws-factans ws-trace|mq-untraced/.test(c)), 'Guided: facts after the worked example carry no partial trace');
 }
+// Round-3 re-grade: a Guided sheet of tall cells gives the Model AND at least three tries, on a
+// continuation page when page 1 holds only two (never "a model and ONE practice item").
+{
+    const g = hostPlan('guided', [FACT_SKILL], (pool, sk, i) => factQ(2 + i, 7), { h: 110 });
+    const cells = g.r.pupilPages.reduce((a, p) => a + (p.split('data-ws-cell=').length - 1), 0);
+    ok(g.plan.meta.items >= 4 && cells >= 4, `Guided, 110 mm cells: model + >= 3 tries (${g.plan.meta.items} items, ${cells} cells)`);
+    ok(g.r.pupilPages.length >= 2 && g.r.keyPages.length === g.r.pupilPages.length, `Guided, 110 mm cells: continues on page 2, key a facsimile (${g.r.pupilPages.length} / ${g.r.keyPages.length})`);
+    ok(/data-ws-label="model"/.test(g.r.pupilPages[0]) && g.plan.meta.scoreOutOf === g.plan.meta.items - 1, 'Guided: the Model is on page 1 and unscored');
+}
 // Critic round 2: the instruction fits the slots and the section.
 {
     const { resolveInstruction } = await import('../../js/modules/sheet/roles/practice.js');
@@ -476,7 +485,12 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
 // Critic round 2 (C3): a test of one-line facts is a dense grid.
 {
     const t = hostPlan('test', [FACT_SKILL], (pool, sk, i) => factQ(2 + (i % 9), 7), { h: 40 });
-    ok(t.plan.meta.items >= 16 && t.plan.meta.items <= 20, `Test of facts at L: 16-20 items (${t.plan.meta.items})`);
+    // 12.1: Test A / B at L holds 12 (a ceiling is never exceeded); dense packing fills it.
+    // Round-3 re-grade: the page printed 20 under an "At most 12 problems" note.
+    ok(t.plan.meta.items === 12, `Test of facts at L: the 12.1 ceiling, 12 items (${t.plan.meta.items})`);
+    const fl = ((t.plan.meta.fits || [])[0] || {}).note || '';
+    const said = /At most (\d+) problems/.exec(fl);
+    ok(!said || Number(said[1]) >= t.plan.meta.items, `Test of facts: the fits note agrees with the page (${fl})`);
 }
 // Critic round 2: Error analysis - pupil ink, and a fix slot of the skill's own kind.
 {

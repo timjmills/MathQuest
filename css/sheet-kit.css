@@ -276,3 +276,8 @@
 :is(.ws-page, .ws-sheet) .ws-stack .ws-grey:is([data-ws-seg="last"], [data-ws-seg="only"]) > i { border-right-width: 1pt !important; }
 /* A missing-digit box and a stand-alone digit box inside a stack keep their own outline (LS-8). */
 :is(.ws-page, .ws-sheet) .ws-stack .ws-box--unknown { border-radius: var(--ws-slot-r, 1.25mm); }
+/* Round-3 re-grade (C3, "a ~45% empty band under every chart / sentence stuck at the top"): a
+   printed grid row is as tall as the page shares out, so a cell's content sits in the MIDDLE of
+   its cell, never pinned to the top over an empty band. `safe` keeps an over-tall cell top-aligned
+   (never clipped above the letter). Print pages only; the screen hosts keep their own layout. */
+.ws-page .ws-grid > .ws-cell:not(.blankrun) { justify-content: safe center; }

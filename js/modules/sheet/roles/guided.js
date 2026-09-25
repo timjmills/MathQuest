@@ -20,7 +20,14 @@
 //                  worked example carries the "Model" tab and is not scored
 //   Capacity       columns Auto 4 / 3 / 3 (S / M / L, clamped by fit); rows while they fit, so
 //                  the page is filled (2026-09-25 re-grade: 35-45% of the page was left empty),
-//                  never above 16 / 12 / 12 cells, the spare height shared by the rows
+//                  never above 12.1's 8 / 6 / 6 cells, the spare height shared by the rows
+//   Pages          round-3 re-grade ("a model and ONE practice item"): when page 1 holds fewer
+//                  than the Model and three tries, the sheet continues on page 2 (and 3) under
+//                  the continuation header with the Steps band repeated; each page's rows are
+//                  sized by the items it holds, the model row taller by its worked trace
+//   Worked trace   P-LC-9: a template that draws no step states marks its model in grey - the
+//                  story's numbers ringed and its sentence in the work box, a chart's factors
+//                  ringed - or prints the provider's worked lines for THIS problem under it
 //
 // The key renders from the same plan: every cell answered, the traced first cell included.
 // Pure module (SCC-01).
@@ -28,24 +35,31 @@
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, bestCols, planItem, gridPart, instructionKeyOf,
     instructionText, stepsHtml, assemble, poolItems, answerOf, stringsOf, labelStyleOf, opOf, operandsOf,
+    providerWorkedSteps, esc,
 } from './compose.js';
 import { getProvider } from '../index.js';
+import { stepTemplateOf } from '../anchors.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
 export const ROLE_ID = 'guided';
-const CEILING = { S: 16, M: 12, L: 12 };
+// 12.1: a Guided page holds 8 / 6 / 3-6 (S / M / L). The continuation page (below) is what gives a
+// sheet of tall cells its Model and three tries.
+const CEILING = { S: 8, M: 6, L: 6 };
 const AUTO_COLS = { S: 4, M: 3, L: 3 };
 
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1, 2, 3, 4];
 
+/** The Model plus at least three guided tries (round-3 re-grade: "a model and ONE practice item"). */
+export const MIN_ITEMS = 4;
+const MAX_PAGES = 3;
+
 export function counts(pools, input) {
     const ctx = ctxOf(input);
     const items = pools.main || [];
     const cols = bestCols(items, [AUTO_COLS[ctx.size], 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= AUTO_COLS[ctx.size]), ctx);
-    const { rows } = fitRows(items, cols, ctx, input);
-    return { main: Math.min(CEILING[ctx.size], rows * cols) };
+    return { main: sheetFit(items, cols, ctx, input).total };
 }
 
 /** The steps as the provider writes them: an array, or one string of lines / sentences. */
@@ -102,11 +116,163 @@ function fitRows(items, cols, ctx, input) {
     const steps = stepsOf(items);
     const stepsH = steps.length ? m.strip + stepsBodyMm(steps, m) + 4 : 0;
     const avail = m.budget - stepsH - m.strip;
-    // The think line under a division fact (row 1) and the Model tab clearance are drawn by the role, so their height is added here.
-    const h = hMinAt(items, cols, ctx) + (items.slice(0, cols).some((it) => thinkCueOf(it)) ? 17 : 0);
+    // The think line under a division fact (row 1), the Model tab clearance and the model's work
+    // lines are drawn by the role, so their height is added here (the rows share one height).
+    const model = items[0];
+    const extra = !model || items.length < 2 ? 0
+        : thinkCueOf(model) ? 17
+        : (OWN_TOP_BAND.has(model.template) ? 0 : TAB_CLEAR_MM) + workLinesMm(workLinesOf(model), cols, m);
+    const h0 = hMinAt(items, cols, ctx);
+    const h = h0 + extra;
     const rows = Math.max(1, Math.min(Math.floor(CEILING[ctx.size] / cols), Math.floor(avail / Math.max(1, h))));
-    return { rows, h, avail, stepsH, steps };
+    return { rows, h, h0, avail, stepsH, steps, frame, m };
 }
+
+/**
+ * The pages of the sheet. Page 1 holds what fits under its Steps band; when that is fewer than
+ * the Model and three tries (a tall clock, coin set or story holds two a page), the section
+ * continues on page 2 (and 3) under the continuation header, the Steps band repeated so the steps
+ * stay in view (PT-GDP-2, PG-22). A continuation page is filled, never above the ceiling.
+ */
+function sheetFit(items, cols, ctx, input) {
+    const first = fitRows(items, cols, ctx, input);
+    const extra = first.h - first.h0;
+    const mc = bandMetrics(ctx, layoutHeader(first.frame.contHeader), { cont: true });
+    const availC = mc.budget - first.stepsH - mc.strip;
+    const all = hMinAt(items, cols, ctx);
+    // A page's rows are sized by the items that page holds (a tall coin set on page 2 does not
+    // cost page 1 a row). Past the end of the probe the tallest probe item stands in.
+    const hOf = (from, n) => {
+        const slice = items.slice(from, from + n);
+        const h = slice.length ? hMinAt(slice, cols, ctx) : all;
+        return slice.length < n ? Math.max(h, all) : h;
+    };
+    const pages = [];
+    let total = 0;
+    while (pages.length < MAX_PAGES && total < CEILING[ctx.size] && (pages.length === 0 || total < MIN_ITEMS)) {
+        const isFirst = pages.length === 0;
+        const avail = isFirst ? first.avail : availC;
+        const maxR = Math.max(1, Math.ceil((CEILING[ctx.size] - total) / cols));
+        let r = 1;
+        for (let k = maxR; k >= 1; k--) {
+            // Page 1's first row is taller by the model's trace (its own row height, below).
+            const h = hOf(total, k * cols);
+            if (k * h + (isFirst ? extra : 0) <= avail) { r = k; break; }
+        }
+        pages.push({ rows: r, avail, h: hOf(total, r * cols), extra: isFirst ? extra : 0 });
+        total += r * cols;
+    }
+    return Object.assign(first, { pages, rows: pages[0].rows, total: Math.min(CEILING[ctx.size], total) });
+}
+
+/* ================================================================== the worked trace */
+
+/** The Model tab's clearance over a model cell's top pad (tab + 1.5 mm, less the 3 mm pad). */
+const TAB_CLEAR_MM = 5;
+
+/**
+ * P-LC-9 on the Guided page: a template that cannot draw its own step states (a clock, coins, a
+ * story, a chart, a place-value frame) shows its worked example WHOLE - the answer traced - and
+ * under it the working of THIS problem in trace grey: the provider's worked steps that carry the
+ * example's numbers ("Circle the numbers: 3 and 5." "3 + 5 = 8.", "Count: 1, 2, 3, 4, 5, 6.",
+ * "Row 2, column 8: 2 × 8 = 16."). The bare "Write 8." that only repeats the traced answer is
+ * left off. A stack, fact or equation traces its own working and gets none.
+ */
+export function workLinesOf(it) {
+    if (!it || stepTemplateOf(it) || DRAWN_MARKS[it.template] || WHOLE_WORK.has(it.template)) return [];
+    const steps = providerWorkedSteps(it, 6).map((s) => s.text).filter((t) => /\d/.test(t) && t.length <= 90);
+    const work = steps.filter((t) => !/^Write\b/i.test(t));
+    return (work.length ? work : steps).slice(0, 3);
+}
+
+/**
+ * Templates whose worked example the Guided page marks IN the drawing (P-LC-9: the marks the
+ * Steps ask for, in trace grey), so it needs no work lines under it.
+ *   wordpic  the story's numbers ringed, the question underlined, and the number sentence
+ *            written in the work box ("4 + 6 = 10") - Steps 2 and 3 of an addition story
+ */
+const DRAWN_MARKS = {
+    wordpic(html, it) {
+        const ringed = html.replace(/(<div class="k2-story"[^>]*>)((?:<div>[^<]*<\/div>)+)/, (m, open, lines) => {
+            const ls = [...lines.matchAll(/<div>([^<]*)<\/div>/g)].map((x) => x[1]);
+            const last = ls.length - 1;
+            return open + ls.map((t, i) => {
+                const withRings = t.replace(/\b\d+\b/g, (d) => `<span class="mq-ring" data-ws-ink="trace">${d}</span>`);
+                return `<div>${i === last && /\?/.test(t) ? `<span class="mq-uline" data-ws-ink="trace">${withRings}</span>` : withRings}</div>`;
+            }).join('');
+        });
+        const eq = sentenceOf(it);
+        if (!eq) return ringed;
+        return ringed.replace(/(aria-label="work space"[^>]*>)/, `$1<span class="mq-workeq ws-trace" data-ws-ink="trace">${esc(eq)}</span>`);
+    },
+    // mult-grid  Steps 1-3 ("one finger on the row number, another on the column number, slide
+    //            them to where they meet"): the two factors of every empty cell ringed in grey,
+    //            the product traced in the cell by the template itself
+    'mult-grid'(html, it) {
+        const p = (it.q && it.q.cell && it.q.cell.payload) || {};
+        const rowsOn = new Set((p.blanks || []).map(([i]) => i + 1));
+        const colsOn = new Set((p.blanks || []).map(([, j]) => j + 1));
+        if (!rowsOn.size) return html;
+        const ring = 'box-shadow:inset 0 0 0 2pt #949494;border-radius:1.5mm;';
+        let r = -1;
+        return html.replace(/<tr>([\s\S]*?)<\/tr>/g, (m, inner) => {
+            r++;
+            let c = -1;
+            const out = inner.replace(/<td style="/g, (td) => {
+                c++;
+                const on = (r === 0 && colsOn.has(c)) || (c === 0 && r > 0 && rowsOn.has(r));
+                return on ? `<td class="mq-factorring" style="${ring}` : td;
+            });
+            return `<tr>${out}</tr>`;
+        });
+    },
+};
+
+/** Templates whose traced answer IS the whole working (every fact of a family, both parts of a bond). */
+const WHOLE_WORK = new Set(['family', 'bond']);
+
+/** Templates whose drawing starts below a band of its own, clear of the Model tab. */
+const OWN_TOP_BAND = new Set(['stack', 'mult-grid']);
+
+/** The number sentence of a worked example, from its provider's marks ("3+5=8" -> "3 + 5 = 8"). */
+function sentenceOf(it) {
+    for (const st of providerWorkedSteps(it, 6)) {
+        for (const mk of st.marks || []) {
+            if (mk && mk.slot === 'equation' && mk.value !== undefined && mk.value !== null) {
+                return String(mk.value).replace(/\s+/g, '').replace(/([+\-−×÷=])/g, ' $1 ').replace(/\s+/g, ' ').trim();
+            }
+        }
+    }
+    return '';
+}
+
+/** The model cell's drawn marks (trace grey), when its template has them. */
+export function modelMarks(html, it) {
+    const f = it && DRAWN_MARKS[it.template];
+    if (!f) return html;
+    try { return f(html, it); } catch (e) { return html; }
+}
+
+function workLinesMm(lines, cols, m) {
+    if (!lines.length) return 0;
+    const colW = 186 / Math.max(1, cols) - 8;
+    const charMm = 0.5 * m.textPt * (25.4 / 72);
+    const lineMm = m.textPt * 1.25 * (25.4 / 72);
+    const n = lines.reduce((a, t) => a + Math.max(1, Math.ceil((t.length * charMm) / colW)), 0);
+    return n * lineMm + 4;
+}
+
+const workHtml = (lines) => (lines.length
+    ? `<ul class="mq-worklines ws-trace" data-ws-ink="trace">${lines.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '');
+
+const GUIDED_CSS = `<style data-mq-guided>
+:is(.ws-page,.ws-sheet) .mq-worklines{list-style:none;margin:2mm 0 0;padding:0;width:100%;font-size:var(--ws-text);line-height:1.25;text-align:center}
+:is(.ws-page,.ws-sheet) .mq-worklines li{margin:0}
+:is(.ws-page,.ws-sheet) .mq-workwrap{width:100%;display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-ring{display:inline-block;border:1pt solid #949494;border-radius:999px;padding:0 .2em;line-height:1.1}
+:is(.ws-page,.ws-sheet) .mq-uline{text-decoration:underline;text-decoration-color:#949494;text-decoration-thickness:1pt;text-underline-offset:.15em}
+:is(.ws-page,.ws-sheet) .mq-workeq{position:absolute;left:0;right:0;top:45%;text-align:center;font-size:var(--ws-text);font-weight:700;line-height:1.2}
+</style>`;
 
 /* ======================================================================= the fade */
 
@@ -249,7 +415,11 @@ function withCue(html, it, stage) {
  *   'blank'    every later row: structural supports only
  */
 function fadeRender(it, stage, ans) {
-    const cue = (html) => withCue(html, it, stage);
+    const work = stage === 'model' ? workHtml(workLinesOf(it)) : '';
+    const cue = (html0) => {
+        const html = stage === 'model' ? modelMarks(html0, it) : html0;
+        return work ? `<div class="mq-workwrap">${withCue(html, it, stage)}${work}</div>` : withCue(html, it, stage);
+    };
     return (c, o) => {
         if (c.state !== 'blank') {
             const html = it.render(c, o);
@@ -274,11 +444,8 @@ export function plan(input = {}) {
     const lesson = Math.max(1, Number(input.lesson) || 1);
     const colsWanted = AUTO_COLS[ctx.size];
     const cols = bestCols(items, [colsWanted, 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= colsWanted), ctx);
-    const fit = fitRows(items, cols, ctx, input);
-    const use = items.slice(0, Math.min(items.length, fit.rows * cols));
-    const rows = Math.max(1, Math.ceil(use.length / cols));
-    // The rows share the height under the bands: the page is filled, never left 40% blank.
-    const cellH = fit.avail / Math.max(rows, fit.rows);
+    const fit = sheetFit(items, cols, ctx, input);
+    const use = items.slice(0, Math.min(items.length, fit.total));
     const key = instructionKeyOf(use, input.skills);
     // Critic round 2 (C4): the Guided page is labelled and scored like every other role. The
     // worked example carries the "Model" tab and is not scored; the rest run a. b. c. ...
@@ -291,23 +458,49 @@ export function plan(input = {}) {
         const ans = answerOf(it);
         const stage = i === 0 && worked ? 'model' : i < partialEnd && ans ? 'partial' : 'blank';
         const level = stage === 'model' ? 3 : stage === 'partial' ? 2 : 1;
-        // An across fact starts at the cell's left edge, under the Model tab: it steps down clear of it.
-        const cell = stage === 'model' && thinkCueOf(it) ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-modelcell'].join(' ').trim() }) : it;
+        // Round-3 re-grade: the Model tab overprinted the first line of a story, a sentence or a
+        // tile row. Every model cell but a column stack (whose grid already starts below the tab)
+        // steps its content down clear of the tab.
+        const cell = stage === 'model' && !OWN_TOP_BAND.has(it.template)
+            ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-modelcell'].join(' ').trim() }) : it;
         return planItem(cell, { cols, level, render: fadeRender(it, stage, ans), model: stage === 'model', nolabel: stage === 'model' });
     });
-    const sections = [];
-    if (fit.steps.length) {
+    const stepsBand = () => {
         const cls = `mq-steps-rows${fit.steps.length <= 2 ? ' mq-steps-one' : ''}`;
-        sections.push({ kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-stepsband">${stepsHtml(fit.steps, { cls })}</div>` });
-    }
-    sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, use), content: gridPart(planItems, { cols, rows, cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 }) });
-    return assemble(ROLE_ID, input, frame, [{ sections }], {
+        return { kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-stepsband">${stepsHtml(fit.steps, { cls })}</div>` };
+    };
+    // One page per entry of fit.pages, the rows of each page sharing that page's height (the page
+    // is filled, never left 40% blank); letters run on across the pages (CL-12).
+    const pages = [];
+    const fitsOut = [];
+    let from = 0;
+    let letter = 1;
+    fit.pages.forEach((pg, pi) => {
+        if (from >= planItems.length) return;
+        const chunk = planItems.slice(from, from + pg.rows * cols);
+        from += chunk.length;
+        const rows = Math.max(1, Math.ceil(chunk.length / cols));
+        const cellH = pg.avail / Math.max(rows, pg.rows);
+        const sections = [];
+        if (pi === 0) sections.push({ kind: 'html', html: GUIDED_CSS });
+        if (fit.steps.length) sections.push(stepsBand());
+        const part = gridPart(chunk, { cols, rows, cellH, labels: labelStyleOf(ctx.look, input.labels), start: letter });
+        // The model row carries the worked trace: it takes its extra height, and the rows share
+        // the rest in proportion (every row still fills its share of the page).
+        if (pg.extra > 0 && rows > 1) part.rowsTpl = `${Math.round((pg.h + pg.extra) * 10) / 10}fr repeat(${rows - 1},${Math.round(pg.h * 10) / 10}fr)`;
+        sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, use), content: part });
+        letter += chunk.filter((p) => !p.nolabel).length;
+        pages.push({ sections });
+        fitsOut.push({ cols, rows, cellH });
+    });
+    const n = pages.length;
+    return assemble(ROLE_ID, input, frame, pages, {
         meta: {
             items: use.length, scoreOutOf: scored, steps: fit.steps.length,
-            fits: [{ cols, rows, cellH, line: `Fits: ${cols} columns x ${rows} rows, ${use.length} guided cells.` }],
+            fits: fitsOut.map((f, i) => Object.assign(f, { line: `Fits: ${cols} columns x ${f.rows} rows${n > 1 ? ` (page ${i + 1} of ${n})` : ''}, ${use.length} guided cells.` })),
             notes: fit.steps.length ? [] : ['No Steps band: this skill supplies no steps of its own yet (strings.steps / workedSteps).'],
         },
     });
 }
 
-export default { ROLE_ID, sources, measureCols, counts, plan, stepsOf, partialTrace, traceCarries, dotTile, countCueOf, thinkCueOf };
+export default { ROLE_ID, sources, measureCols, counts, plan, stepsOf, workLinesOf, modelMarks, partialTrace, traceCarries, dotTile, countCueOf, thinkCueOf };

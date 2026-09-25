@@ -513,7 +513,11 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     // (12.3's capacity tables; never above DN-1's 20 scored responses at L). The teacher's
     // explicit column count is never overridden (DN-12), and it only ever ADDS items.
     if (section.dense && !clamped && cls !== 'word' && cls !== 'wide' && hMin > 0) {
-        const dCeil = bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling;
+        // 12.1: a role that states its own ceiling (a Test: 20 / 16 / 12) is never packed past it,
+        // however dense it asks to be (round-3 re-grade: a Test printed 20 facts at L under a
+        // "At most 12 problems" note).
+        const dCeil0 = bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling;
+        const dCeil = section.ceiling !== undefined && section.ceiling !== null ? Math.min(dCeil0, ceiling) : dCeil0;
         const colOpts = requested === 'auto'
             ? Array.from({ length: Math.max(0, Math.min(Number(section.denseMaxCols) > 0 ? Number(section.denseMaxCols) : DENSE_MAX_COLS, hardCap) - cols + 1) }, (_, k) => cols + k)
             : [cols];
@@ -534,6 +538,11 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         if (best.perPage > rows * cols) {
             cols = best.cols;
             rows = best.rows;
+            // The note says what the page prints: a practice ceiling the dense tables go past
+            // (one-symbol answers up to 16, 12.1) is not reported as the page's limit.
+            if (rows * cols > ceiling) {
+                for (let k = notes.length - 1; k >= 0; k--) if (/^At most \d+ problems/.test(notes[k])) notes.splice(k, 1);
+            }
             notes.push(`Dense: ${cols} x ${rows}, cells sized to the problems.`);
         }
     }
