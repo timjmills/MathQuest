@@ -34,6 +34,7 @@
 import { state } from './state.js';
 import { randInt, shuffle, pick } from './utils.js';
 import { MONO, MONO_STROKE } from './design-tokens.js';
+import { k2Twin, K2_SHAPES } from './sheet/index.js';
 
 /* ============================================================== the black-and-white K-2 cell kit */
 
@@ -176,71 +177,6 @@ function _kShapeGrid(count, shape, { cell = 40, cols = 5, frame = false, tenGap 
         + `style="display:block;margin:0 auto;">${body}</svg>`, w, h, rows };
 }
 
-/**
- * A number bond (RP-60): the whole box above, two part boxes below, joined by 0.75 pt lines.
- * Square-cornered writing boxes, side `--mq-bond` (18 mm on paper, the middle of RP-60's
- * 14 / 16 / 20 mm; screen-cell.css re-declares it in px). The whole box has a 1.5 pt border, the
- * parts 0.75 pt. The unknown box is EMPTY and solid, never dashed (LS-3), and it carries the
- * slot markers two consumers read: `blank-box` + `data-ws-slot` / `data-ws-shape="box"` (the
- * print key writes the answer into it, print-sheet.js legacyKeyFill) and `data-mq-blank` (the
- * screen hosts put the answer input in its place, screen-cell.js adoptVisualBlank).
- * `unknown` is 'A' (left part), 'B' (right part) or 'whole'.
- */
-function _kBond(total, partA, partB, unknown) {
-    // Geometry in box units B: three columns B wide with 0.6 B between them, two rows with 0.9 B.
-    const W = 4.2, H = 2.9;
-    const box = (col, row, value, heavy, empty) => {
-        const pos = `position:absolute;left:calc(var(--mq-bond, 18mm) * ${(col * 1.6).toFixed(1)});`
-            + `top:calc(var(--mq-bond, 18mm) * ${(row * 1.9).toFixed(1)});`;
-        const shape = `width:var(--mq-bond, 18mm);height:var(--mq-bond, 18mm);box-sizing:border-box;`
-            + `border:${heavy ? '1.5pt' : '0.75pt'} solid ${K_INK};border-radius:0;background:#fff;`
-            + `display:inline-flex;align-items:center;justify-content:center;`
-            + `font-family:${K_FONT};font-weight:700;font-size:calc(var(--mq-bond, 18mm) * 0.52);line-height:1;color:${K_INK};`;
-        return empty
-            ? `<span class="blank-box" data-ws-slot="answer" data-ws-shape="box" data-mq-blank="box" style="${pos}${shape}"></span>`
-            : `<span class="mq-bond-box" style="${pos}${shape}">${value}</span>`;
-    };
-    // Lines from the bottom middle of the whole to the top middle of each part (box units).
-    const line = (x2) => `<line x1="2.1" y1="1" x2="${x2}" y2="1.9" stroke="${K_INK}" `
-        + `stroke-width="1" vector-effect="non-scaling-stroke" stroke-linecap="round"/>`;
-    return `<div class="mq-bond" role="img" aria-label="number bond" style="position:relative;display:inline-block;`
-        + `width:calc(var(--mq-bond, 18mm) * ${W});height:calc(var(--mq-bond, 18mm) * ${H});margin:2mm auto;vertical-align:top;">`
-        + `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true" `
-        + `style="position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;">${line(0.5)}${line(3.7)}</svg>`
-        + box(1, 0, total, true, unknown === 'whole')
-        + box(0, 1, partA, false, unknown === 'A')
-        + box(2, 1, partB, false, unknown === 'B')
-        + `</div>`;
-}
-
-/**
- * P8b: a take-away strip — `n` counters of one K_SHAPES shape in a row, the first `m` crossed out
- * with a bold X drawn through the whole object. Every counter is an OUTLINE (a filled 9 mm
- * counter is over the INK-5 7 mm limit, and the X must read against what it crosses). Sized by
- * `--mq-pic` (10 mm on paper, section 11.2 counting size; screen-cell.css re-declares it in px),
- * so print and screen draw the same picture.
- */
-function _kTakeAwayStrip(n, m, shapeIdx) {
-    const shape = K_SHAPES[shapeIdx] || K_SHAPES[0];
-    const pitch = 48, s = 17;                    // user units per counter; the shape's radius
-    const w = n * pitch, h = pitch;
-    let body = '';
-    for (let i = 0; i < n; i++) {
-        const cx = pitch * i + pitch / 2, cy = h / 2;
-        // the outline form of the counter (K_SHAPES' circle is solid; here it is drawn open)
-        body += shape.name === 'counter'
-            ? `<circle cx="${cx}" cy="${cy}" r="${s}" fill="none" stroke="${K_INK}" stroke-width="${K_HEAVY}"/>`
-            : shape.draw(cx, cy, s);
-        if (i < m) {
-            const d = s + 4;
-            body += `<path d="M${cx - d} ${cy - d} L${cx + d} ${cy + d} M${cx + d} ${cy - d} L${cx - d} ${cy + d}" `
-                + `stroke="${K_INK}" stroke-width="3.5" stroke-linecap="round" fill="none"/>`;
-        }
-    }
-    return `<svg class="mq-takeaway" viewBox="0 0 ${w} ${h}" role="img" aria-label="${n} ${shape.plural}, ${m} crossed out" `
-        + `style="display:inline-block;width:calc(var(--mq-pic, 10mm) * ${n});height:var(--mq-pic, 10mm);overflow:visible;">${body}</svg>`;
-}
-
 /** A 5x2 ten frame with the first `filled` cells carrying a black counter. */
 function _kTenFrame(filled, { frames = 1, cell = 36 } = {}) {
     const pad = 6;
@@ -338,6 +274,29 @@ function _kPair(rng, lo, hi, gapLo, gapHi) {
     return rng(0, 1) === 1 ? [hi, lo] : [lo, hi];
 }
 
+/* ===================================================== the kit cell (SKILL_CELL_CONTRACT 10.1) */
+
+// P10: the migrated skills hand their item to a SHEET KIT template (`q.cell`), and the screen
+// hosts draw that same template's twin (`q.visual`), so paper, key and screen are one drawing.
+function _kSetCell(q, template, payload) {
+    q.cell = { template, v: 1, payload };
+    q.visual = k2Twin(template, payload);
+}
+
+/** The plain counters of the count cells (one SVG primitive each, RP-20 plain set). */
+const K2_COUNT_SHAPES = ['circle', 'square', 'triangle', 'star'];
+
+/**
+ * A choice held for a whole printed page: drawn at the page's first item and kept (one routine
+ * per page, P-28). Live play has no page, so it deals round-robin instead.
+ */
+const _kPageHeld = {};
+function _kPageDeal(key, n) {
+    if (!Number.isFinite(state.itemIndex)) return _kDeal(n);
+    if (state.itemIndex === 0 || _kPageHeld[key] === undefined) _kPageHeld[key] = Math.floor(Math.random() * n);
+    return _kPageHeld[key];
+}
+
 /* ================================================================================ the generator */
 
 export function generateCountingQuestion(q, mappedSkill, helpers) {
@@ -350,28 +309,28 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // rows of five and says nothing else.
     // ========================================
     if (mappedSkill === "count_objects") {
-        // P8 (critic, baseline 2026-09-24):
-        // - Counts of 1 or 2 are a glance, not a count: at most one cell in ten deals one, and
-        //   the rest spread over 3-20 so the teen counts (the hard part of "1-20") get their share.
-        // - Every object is drawn at a 52-unit pitch, which prints at about 9 mm (WS 11.2, the
-        //   counting-picture minimum); the old 36-unit pitch printed 16-19 objects at 6 mm.
-        // - A count above ten is drawn as TEN AND SOME: two rows of five, a gap, then the rest,
-        //   so the picture teaches the ten inside a teen number (RP-21).
-        const count = (_kAt % 10 === 9) ? rng(1, 2) : rng(3, 20);
-        const shape = K_SHAPES[_kDeal(K_SHAPES.length)];
-        const grid = _kShapeGrid(count, shape, { cell: 52, tenGap: count > 10 ? 18 : 0 });
-
-        // "are there" is not padding: it is the count-EVERYTHING wording, and ws-content-audit
-        // only proves "the number drawn equals the answer key" on cells that ask for the whole
-        // picture. Losing it would switch off the one rule that catches the worst defect a
-        // non-reader can meet.
-        q.text = `How many ${shape.plural} are there?`;
-        // The cell DRAWS the objects, so paper says only what the pupil must do (BD-10).
+        // P10 (critic, regrade 2026-09-25): the kit's `counters` cell. Outline objects 9 mm across
+        // (never a solid fill over 7 mm, INK-5) in rows of five, a ten as two rows and the ones
+        // under a gap, beside the K answer square — the only answer place, no "Answer:" line.
+        // The count is dealt through a shuffled permutation of 3-20 (one cell in ten a 1 or 2), so
+        // a page spreads it instead of rolling six numbers that may repeat.
+        const count = (_kAt % 10 === 9) ? rng(1, 2) : 3 + _kDealShuffled(18);
+        const shape = K2_COUNT_SHAPES[rng(0, K2_COUNT_SHAPES.length - 1)];
+        const plural = K2_SHAPES[shape].plural;
+        // "are there" is not padding: it is the count-EVERYTHING wording ws-content-audit keys its
+        // "the number drawn equals the answer key" rule on.
+        q.text = `How many ${plural} are there?`;
         q.printText = 'Count. Write how many.';
         q.ans = count;
         q.answerType = "number";
+        q.options = [];
+        q.selfAnswering = true;
         q.hint = "Touch each one as you count. The last number you say is how many.";
-        q.visual = _kCell(grid.svg);
+        // The two real counting errors (a K pupil's error analysis): one counted twice, one missed.
+        q.distractorTags = _kDeal(2) === 0 || count === 1
+            ? { [count + 1]: 'counted one object twice' }
+            : { [count - 1]: 'missed one object' };
+        _kSetCell(q, 'counters', { kind: 'count', n: count, shape, ans: count });
         q.skillLabel = 'Count Objects';
         return;
     }
@@ -445,93 +404,54 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // them column by column — and the response is a mark in a check box.
     // ========================================
     else if (mappedSkill === "compare_groups") {
+        // P10 (critic, regrade 2026-09-25): the kit's `compare` cell. Two fixed 2 x 5 frames, one
+        // above the other, aligned column by column for one-to-one matching; the two labelled
+        // check boxes are the only answer place.
+        //   ONE ROUTINE PER PAGE: the form (more / fewer / same) is drawn at a page's first item
+        // and held, so a sheet never switches task between cells (P-28). Live play deals it.
+        //   NEAR MISSES: the two counts differ by 1 to 3 (never 1 against 10), so the pupil has to
+        // match to decide; half the "same?" items really are the same.
         const FORMS = ['more', 'fewer', 'same'];
-        const form = FORMS[_kDeal(3)];
+        const form = FORMS[_kPageDeal('compare_groups', 3)];
         q._variant = form;
-
-        // Both counts are drawn independently from 1..10, so which box holds more is a coin
-        // flip rather than a rule ("B is always the bigger one") a pupil could learn instead of
-        // looking. A difference of one is fair here: the five-wide frames line the counters up,
-        // so nine against ten shows as one empty cell.
-        const countA = rng(1, 10);
-        let countB = rng(1, 10);
-        // Half the "same?" items really ARE the same; otherwise that form always answers "not
-        // the same" and the picture stops mattering.
         const wantSame = form === 'same' && _kDeal(2) === 0;
-        if (wantSame) countB = countA;
-        else for (let t = 0; t < 40 && countB === countA; t++) countB = rng(1, 10);
-        if (!wantSame && countB === countA) countB = countA === 10 ? 9 : countA + 1;
-
-        // The counter shape is dealt on its own cycle (4) beside the form's (3), so six cells
-        // are six different pictures rather than three wordings printed twice.
-        const shape = K_SHAPES[_kDeal(K_SHAPES.length)];
-        const cell = 32, pad = 6, cols = 5;
-        const boxW = cols * cell + pad * 2;
-        // P8 (critic, baseline 2026-09-24): both frames are the SAME size — two rows of five,
-        // whatever the count — so the frame's size never stands in for the number, and A's and
-        // B's counters sit in the same columns for one-to-one matching.
-        const drawBox = (n) => {
-            const rows = 2;
-            const h = rows * cell + pad * 2;
-            let body = `<rect x="${K_HEAVY / 2}" y="${K_HEAVY / 2}" width="${boxW - K_HEAVY}" `
-                + `height="${h - K_HEAVY}" rx="6" fill="none" stroke="${K_INK}" stroke-width="${K_HEAVY}"/>`;
-            for (let i = 0; i < n; i++) {
-                body += shape.draw(pad + (i % cols) * cell + cell / 2,
-                    pad + Math.floor(i / cols) * cell + cell / 2, cell * 0.3);
-            }
-            return `<svg viewBox="0 0 ${boxW} ${h}" width="${boxW}" height="${h}" style="display:block;">${body}</svg>`;
-        };
-        const row = (label, n) => `<div style="display:flex;align-items:center;gap:12px;margin:5px 0;">`
-            + `<span style="font-size:1.4rem;font-weight:700;width:1.2em;text-align:right;">${label}</span>`
-            + drawBox(n) + `</div>`;
-
-        // THE PAPER WORDING (BD-12 / BD-17, owner ruling 2026-09-19). "Tick" is not a word a
-        // pupil ever reads, and `Check` is the library's verb for marking a printed box — but
-        // P-LG-14 makes it name its object, so the string is "Check one box." and the two drawn
-        // collections had to stop being called boxes or the pupil is told to check a box while
-        // looking at two things also called boxes. They are GROUPS, which is what the skill's own
-        // name calls them, so "box" now means the check box and nothing else.
-        //   One string per task, byte-identical everywhere (P-LG-2 / BD-14): the question form
-        // follows `decide-regroup` ("Do you need to regroup? Check one box."), and the same/not
-        // the same form follows `true-false` ("Check one box: True or False."), which names its
-        // two labels in the string.
-        let questionText, answer, accepted, ticks;
-        if (form === 'more') {
-            questionText = `Which group has more ${shape.plural}?`;
-            answer = countA > countB ? 'A' : 'B';
-            accepted = answer === 'A' ? ['A', 'group a', 'box a'] : ['B', 'group b', 'box b'];
-            ticks = ['Group A', 'Group B'];
-            q.printText = 'Which group has more? Check one box.';
-            q.selfAnswering = true;   // the cell draws the boxes; no writing rule beneath
-            q.printAnswer = `Group ${answer}`;
-        } else if (form === 'fewer') {
-            questionText = `Which group has fewer ${shape.plural}?`;
-            answer = countA < countB ? 'A' : 'B';
-            accepted = answer === 'A' ? ['A', 'group a', 'box a'] : ['B', 'group b', 'box b'];
-            ticks = ['Group A', 'Group B'];
-            q.printText = 'Which group has fewer? Check one box.';
-            q.selfAnswering = true;   // the cell draws the boxes; no writing rule beneath
-            q.printAnswer = `Group ${answer}`;
+        let countA, countB;
+        if (wantSame) {
+            countA = countB = 2 + _kDealShuffled(9);
         } else {
-            questionText = `Do the groups have the same number of ${shape.plural}?`;
-            answer = countA === countB ? 'same' : 'not the same';
-            accepted = countA === countB ? ['same', 'yes'] : ['not the same', 'no', 'different'];
-            ticks = ['Same', 'Not the same'];
-            q.printText = 'Check one box: Same or Not the same.';
-            q.selfAnswering = true;   // the cell draws the boxes; no writing rule beneath
-            // The key is markable only if it reads one of the two labels the cell prints.
-            q.printAnswer = countA === countB ? 'Same' : 'Not the same';
+            const diff = [1, 1, 2, 2, 3][_kDeal(5)];
+            const lo = 2 + rng(0, 8 - diff);                     // 2 .. 10 - diff
+            const big = lo + diff;
+            [countA, countB] = rng(0, 1) === 1 ? [big, lo] : [lo, big];
         }
-
+        let labels, values, correct, questionText, printText;
+        if (form === 'same') {
+            labels = ['Same', 'Not the same'];
+            values = ['same', 'not the same'];
+            correct = countA === countB ? 0 : 1;
+            questionText = 'Do the groups have the same number of counters?';
+            printText = 'Check one box: Same or Not the same.';
+            q.acceptedAnswers = correct === 0 ? ['same', 'yes'] : ['not the same', 'no', 'different'];
+        } else {
+            const word = form === 'more' ? 'more' : 'fewer';
+            labels = [`A has ${word}`, `B has ${word}`];
+            values = ['A', 'B'];
+            const aWins = form === 'more' ? countA > countB : countA < countB;
+            correct = aWins ? 0 : 1;
+            questionText = `Which group has ${word} counters?`;
+            printText = `Which group has ${word}? Check one box.`;
+            q.acceptedAnswers = correct === 0 ? ['A', 'group a', `a has ${word}`] : ['B', 'group b', `b has ${word}`];
+        }
         q.text = questionText;
-        q.ans = answer;
-        q.acceptedAnswers = accepted;
+        q.printText = printText;
+        q.ans = values[correct];
+        q.printAnswer = labels[correct];
+        q.selfAnswering = true;             // the check boxes are the answer place (SL-7)
         q.answerType = "text";              // P-29: a check box on paper is a written answer on screen
         q.options = [];
         q.hint = `Match them one to one. Group A has ${countA}. Group B has ${countB}.`;
-        q.visual = _kCell(
-            `<div style="display:inline-block;">${row('A', countA)}${row('B', countB)}</div>`
-            + _kTickList(ticks));
+        q.distractorTags = { [values[1 - correct]]: 'judged by how the groups look, not by matching one to one' };
+        _kSetCell(q, 'compare', { a: countA, b: countB, labels, values, correct });
         q.skillLabel = 'More, Fewer, Same';
         return;
     }
@@ -683,6 +603,10 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // 2-10 (whole) instead of letting it fall where the whole happens to put it.
     // ========================================
     else if (mappedSkill === "number_bonds") {
+        // The kit's `bond` cell (RP-60): the unknown is the EMPTY box, and it is the item's one
+        // answer place on paper, in the key and on screen (the host input takes its place).
+        // Answers are dealt first, through a shuffled permutation, so a page spreads them over
+        // 1-9 (a part) and 3-10 (the whole); a third of the items hide the whole.
         const unknown = ['A', 'B', 'whole'][_kDeal(3)];
         let total, partA, partB, answer;
         if (unknown === 'whole') {
@@ -697,25 +621,24 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             partA = unknown === 'A' ? answer : shown;
             partB = unknown === 'B' ? answer : shown;
         }
-
-        // Written part + part = whole rather than whole = part + part. Both are number-bond
-        // sentences and the diagram is the cell either way; this order is the one
-        // ws-content-audit can read as an equation, so the answer key is checked on every item
-        // instead of being taken on trust.
+        // part + part = whole, the order ws-content-audit reads as an equation.
         q.text = unknown === 'whole' ? `${partA} + ${partB} = ?`
             : `${unknown === 'A' ? '?' : partA} + ${unknown === 'B' ? '?' : partB} = ${total}`;
-        // One instruction for every item of the section (missing part or missing whole).
         q.printText = 'Write the missing number.';
-        // The empty box of the bond IS the answer slot (RP-60), so paper gets no second
-        // "Answer:" rule under the diagram (SL-7: one slot per item).
         q.selfAnswering = true;
         q.ans = answer;
         q.answerType = "number";
+        q.options = [];
         q.hint = unknown === 'whole'
             ? `The two parts are ${partA} and ${partB}. Put them together to find the whole.`
             : `${total} splits into two parts. One part is ${total - answer}. `
                 + `Count on from ${total - answer} to ${total} to find the other part.`;
-        q.visual = _kCell(_kBond(total, partA, partB, unknown));
+        // The bond's real errors: a missing part answered by ADDING the two numbers shown, and a
+        // missing whole answered by taking one part from the other.
+        const known = unknown === 'whole' ? 0 : total - answer;
+        const wrong = unknown === 'whole' ? (partA === partB ? total - 1 : Math.abs(partA - partB)) : total + known;
+        q.distractorTags = { [wrong]: unknown === 'whole' ? 'took one part from the other' : 'added the two numbers it could see' };
+        _kSetCell(q, 'bond', { whole: total, a: partA, b: partB, unknown });
         q.skillLabel = 'Number Bonds';
         return;
     }
@@ -812,49 +735,56 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // cell no longer carries a caption naming a colour that paper does not have.
     // ========================================
     else if (mappedSkill === "hundreds_chart_fill") {
-        // P8 (critic, baseline 2026-09-24): a WINDOW of the chart, not the whole chart. One
-        // blank in a full 1-100 chart was a whole page representation per item (four to a page,
-        // numerals ~7 pt), and a blank in row 1 is read off its neighbour. The window is three
-        // rows of five cut from the chart, the blank in its MIDDLE row and never at a window
-        // edge, so it has a number on all four sides: one more / one less across, ten more /
-        // ten less down — the two patterns the chart exists to teach. Rows 2-9 only.
-        const hcRow = randInt(1, 8);                       // 0-based chart row of the blank
-        const hcCol = randInt(0, 9);                       // 0-based chart column
-        const hcC0 = Math.max(0, Math.min(5, hcCol - 2));  // window's first column
-        const hcCols = [0, 1, 2, 3, 4].map(k => hcC0 + k);
-        // Keep the blank off the window's left and right edges.
-        const target = hcRow * 10 + Math.max(hcC0 + 1, Math.min(hcC0 + 3, hcCol)) + 1;
-        const hcRows = [hcRow - 1, hcRow, hcRow + 1];
-        const cellW = 60, cellH = 48, padL = 4, padT = 4;
-        const svgW = padL * 2 + 5 * cellW;
-        const svgH = padT * 2 + 3 * cellH;
-        let cells = '';
-        hcRows.forEach((r, ri) => hcCols.forEach((c, ci) => {
-            const n = r * 10 + c + 1;
-            const x = padL + ci * cellW;
-            const y = padT + ri * cellH;
-            const isBlank = n === target;
-            cells += `<rect x="${x}" y="${y}" width="${cellW}" height="${cellH}" fill="none" `
-                + `stroke="${K_INK}" stroke-width="${isBlank ? K_HEAVY * 1.5 : K_HAIR}"/>`;
-            if (!isBlank) {
-                cells += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 8}" text-anchor="middle" `
-                    + `font-family="${K_FONT}" font-size="24" fill="${K_INK}">${n}</text>`;
-            }
-        }));
-        q.chartWindow = { rows: hcRows, cols: hcCols };
-
-        q.text = `What number goes in the blank?`;
-        q.printText = 'Write the missing number.';
-        q.ans = target;
-        q.answerType = "number";
+        // P10 (critic, regrade 2026-09-25): the kit's `chartwindow` cell. A 3 x 5 window cut from
+        // ANYWHERE on the 1-100 chart (its first row and its last row included), with one to three
+        // empty cells ANYWHERE in it — a corner, an edge or the middle — each one a whole chart
+        // cell to write in (17 x 15 mm at L). The only rule: every gap has a printed number beside
+        // it in its row or its column, so the pupil always has one to count on from (across: one
+        // more; down: ten more). The window and the gaps are dealt, so a page is never six
+        // centre cells read off their left neighbour.
+        const r0 = rng(0, 7);
+        const c0 = rng(0, 5);
+        const rows = [r0, r0 + 1, r0 + 2];
+        const cols = [0, 1, 2, 3, 4].map(k => c0 + k);
+        const want = [1, 2, 2, 3][_kDeal(4)];
+        const at = (i) => rows[Math.floor(i / 5)] * 10 + cols[i % 5] + 1;
+        const neighbours = (i) => {
+            const r = Math.floor(i / 5), c = i % 5, out = [];
+            if (c > 0) out.push(i - 1);
+            if (c < 4) out.push(i + 1);
+            if (r > 0) out.push(i - 5);
+            if (r < 2) out.push(i + 5);
+            return out;
+        };
+        let pickIdx = [];
+        for (let t = 0; t < 60; t++) {
+            const cand = shuffle(Array.from({ length: 15 }, (_, i) => i)).slice(0, want);
+            const set = new Set(cand);
+            // every gap keeps a printed neighbour, and no two gaps sit side by side in a row
+            if (!cand.every(i => neighbours(i).some(j => !set.has(j)))) continue;
+            if (cand.some(i => i % 5 < 4 && set.has(i + 1))) continue;
+            pickIdx = cand;
+            break;
+        }
+        if (!pickIdx.length) pickIdx = [rng(0, 14)];
+        const blanks = pickIdx.sort((x, y) => x - y).map(at);
+        q.chartWindow = { rows, cols };
+        q.chartData = { target: blanks[0], targets: blanks.slice() };
+        q.text = blanks.length === 1 ? 'What number goes in the empty box?' : 'Write the missing numbers in the empty boxes.';
+        q.printText = 'Write the missing numbers.';
+        q.keyParts = blanks.map(String);
+        q.ans = blanks.length === 1 ? blanks[0] : blanks.join(', ');
+        if (blanks.length > 1) q.acceptedAnswers = [blanks.join(','), blanks.join(', '), blanks.join(' ')];
+        q.answerType = blanks.length === 1 ? "number" : "text";
         q.options = [];
+        q.selfAnswering = true;
         q.hint = `Across a row the number goes up by 1. Down a column it goes up by 10.`;
-        q.visual = _kCell(
-            `<svg viewBox="0 0 ${svgW} ${svgH}" width="100%" preserveAspectRatio="xMidYMid meet" `
-            + `style="width:100%;max-width:420px;height:auto;display:block;margin:0 auto;">${cells}</svg>`);
+        // The chart's real error: moving ten (down a column) where the gap is one along the row.
+        const wrongFirst = blanks[0] + 10 <= 100 ? blanks[0] + 10 : blanks[0] - 10;
+        q.distractorTags = { [[wrongFirst, ...blanks.slice(1)].join(', ')]: 'moved ten instead of one along the row' };
+        _kSetCell(q, 'chartwindow', { rows, cols, blanks });
         q.skillLabel = "100-Chart Fill";
         q.printFormat = "hundreds-chart-fill";
-        q.chartData = { target };
         return;
     }
 
@@ -863,9 +793,12 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // empty frame and writes its own "Draw N dots" prompt, so the cell is honest on paper too.
     // ========================================
     else if (mappedSkill === "ten_frame_build") {
+        // P10 (critic, regrade 2026-09-25): the kit's `tenframe` cell — the target printed big
+        // beside a 55 x 22 mm frame of 11 mm cells (the RP-10 "pupil draws counters" size), and
+        // the cell is sized to that frame, never a frame at the top of a half-empty cell.
         const target = 1 + _kDealShuffled(10);  // 1..10, dealt so six items differ, shuffled
         q.text = `Build ${target} on the ten frame.`;
-        q.printText = `Draw ${target} counter${target === 1 ? '' : 's'} in the ten frame.`;   // P8: "1 counter"
+        q.printText = `Draw counters to show the number.`;
         q.target = target;
         q.ans = target;
         q.maxDots = 10;
@@ -873,8 +806,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         q.hint = `Put one counter in each box until you have ${target}.`;
         q.skillLabel = "Ten Frame Build";
         q.printFormat = "ten-frame-build";
-        q.visual = "";
         q.options = [];
+        q.distractorTags = target === 10 ? { 9: 'stopped one counter short' } : { [target + 1]: 'drew one counter too many' };
+        _kSetCell(q, 'tenframe', { target, frames: 1 });
         return;
     }
 
@@ -903,11 +837,17 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // BASE-10 BUILD (Grade 1) — model 11..99 with rods and units, no regrouping.
     // ========================================
     else if (mappedSkill === "base10_build") {
-        const target = rng(11, 99);
-        const tens = Math.floor(target / 10);
-        const ones = target % 10;
+        // P10 (critic, regrade 2026-09-25): the kit's `base10` cell — the number, then a Tens |
+        // Ones mat whose zones hold nine sticks and nine dots with room to spare (H12). The tens
+        // digit (1-9) and the ones digit (0-9) are dealt through two shuffled permutations, so a
+        // page spans the decades — teens, a zero in the ones (40), a nine in the ones (69) —
+        // instead of clustering in one decade.
+        const tens = 1 + _kDealShuffled(9);
+        let ones = _kDealShuffled(10);
+        if (tens === 1 && ones === 0) ones = rng(1, 9);   // 10 is not "11-99"
+        const target = tens * 10 + ones;
         q.text = `Build ${target} with base-10 blocks.`;
-        q.printText = `Draw ${target} with rods and units.`;
+        q.printText = `Draw the number with tens and ones.`;
         q.target = target;
         q.ans = target;
         q.maxPlace = 10;
@@ -917,8 +857,14 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         q.hint = `${target} is ${tens} ten${tens === 1 ? '' : 's'} and ${ones} one${ones === 1 ? '' : 's'}.`;
         q.skillLabel = "Base-10 Build";
         q.printFormat = "base10-build";
-        q.visual = "";
         q.options = [];
+        // The base-10 error: tens and ones swapped (57 drawn as 75); with a zero or a double digit
+        // that cannot be seen, so the other real one: the wrong number of tens.
+        const swapped = ones * 10 + tens;
+        q.distractorTags = ones > 0 && ones !== tens && swapped >= 11
+            ? { [swapped]: 'swapped the tens and the ones' }
+            : { [target + (tens < 9 ? 10 : -10)]: 'drew the wrong number of tens' };
+        _kSetCell(q, 'base10', { target, places: [10, 1], counts: { 10: tens, 1: ones } });
         return;
     }
 
@@ -1024,35 +970,179 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // SUB 5 PICTURES (Grade K) — take away from a group of at most 5, the taken ones crossed out.
     // ========================================
     else if (mappedSkill === "sub_5_pictures") {
-        // P8b: the counters are DRAWN (SVG outlines from K_SHAPES), never font glyphs. The ★ / ■
-        // characters printed in whatever face carried them (DejaVu, Liberation: L-FONT, and ★ is
-        // an L-EMOJI pictograph), and a solid black glyph hid the cross-out drawn over it.
-        const shapeIdx = _kDeal(K_SHAPES.length);
-        // P8: one cell in six is an edge case — take away 0, or take away all of them — the two
-        // facts a within-5 page otherwise never deals (critic, baseline 2026-09-24).
-        const n = randInt(2, 5);
-        const m = (_kAt % 6 === 5) ? (randInt(0, 1) ? n : 0) : randInt(1, n - 1);
-        const remain = n - m;
-
+        // The kit's `counters` cell, take-away form: outline objects 10 mm across in one row, the
+        // taken ones crossed out with a bold X, and `n − m = [ ]` under them (the box is the one
+        // answer place). The answer 0-4 is dealt through a shuffled permutation, which also deals
+        // the two edge facts a within-5 page otherwise never shows: take away none (m = 0) and
+        // take away all (the answer 0).
+        const shape = K2_COUNT_SHAPES[_kDeal(K2_COUNT_SHAPES.length)];
+        const remain = _kDealShuffled(5);                 // 0..4
+        const n = rng(Math.max(2, remain), 5);
+        const m = n - remain;
         q.text = `Start with ${n}, take away ${m}. How many are left?`;
-        // "Count the ones not crossed out" used "ones", a place-value word, for a K pupil.
         q.printText = 'Write how many are left.';
         q.ans = remain;
-        // A production item: the pupil writes the number (SP-3), on paper and on screen.
+        q.a = n; q.b = m; q.op = '−';
         q.answerType = "number";
         q.options = [];
         q.selfAnswering = true;     // the equation's box is the one slot (SL-7)
         q.hint = `Count only the ones that are NOT crossed out. ${n} − ${m} = ${remain}.`;
-        const strip = _kTakeAwayStrip(n, m, shapeIdx);
-        q.visual = _kCell(
-            `<div style="display:inline-block;padding:4px 8px;">`
-            + `<div style="line-height:0;">${strip}</div>`
-            + `<div style="margin-top:10px;font-size:1.6rem;font-weight:700;">${n} − ${m} = `
-            + `<span data-mq-blank="line" style="display:inline-block;min-width:1.6em;border-bottom:${K_HEAVY}px solid ${K_INK};">&nbsp;</span></div>`
-            + `</div>`);
+        q.distractorTags = m > 0 && m !== remain ? { [m]: 'counted the ones crossed out' }
+            : m === 0 ? { [n - 1]: 'took one away when none were taken' } : { [n]: 'did not take any away' };
+        _kSetCell(q, 'counters', { kind: 'takeaway', n, m, shape, ans: remain });
         q.skillLabel = "Sub ≤5 Pics";
         q.printFormat = "sub-5-pictures";
-        q.pictureData = { shape: K_SHAPES[shapeIdx].name, n, m, remain, strip };
+        q.pictureData = { shape, n, m, remain };
+        return;
+    }
+
+    // ========================================
+    // NUMBER SEQUENCE FILL (counting, K-2) — a five-tile number track with missing numbers.
+    //
+    // P10 (critic, regrade 2026-09-25): generated here now (it was a 'patterns' override into
+    // gen-algebraic.js) and drawn by the kit's `seqstrip` cell. What changed:
+    //   * the STEP and the START vary item by item — count by 1, 2, 5 and 10 (and 100 above Max
+    //     Number 100), from on and off the decade, one track in four counting BACK — instead of a
+    //     page of count-by-10 strips from the same start;
+    //   * no caption: "10s: 3-93" and "Numbers 71-80" named the ends of the strip, which gave the
+    //     first and last blanks away. The step is read off two printed neighbours, which every
+    //     track keeps;
+    //   * the missing numbers are boxes IN the track (14 x 15 mm at L, RUBRIC H9), and each is
+    //     one screen input (data-mq-cell) — so the quiz, which drew no strip at all, draws it.
+    // ========================================
+    else if (mappedSkill === "number_seq_fill") {
+        const range = Number(state.range) || 100;
+        const cap = Math.max(10, Math.min(range, 999));
+        const steps = cap < 20 ? [1] : cap <= 20 ? [1, 2] : cap <= 100 ? [1, 2, 5, 10] : [2, 5, 10, 100];
+        const LEN = 5;
+        const step = steps[_kDeal(steps.length)];
+        const down = _kDeal(4) === 3;
+        const span = step * (LEN - 1);
+        const lo = step >= 10 ? 1 : (step === 1 ? 0 : 1);
+        let start;
+        if (step >= 5 && _kDeal(2) === 0) {
+            // on the decade / on the step (5, 10, 15 ... or 20, 30, 40 ...)
+            start = step * rng(1, Math.max(1, Math.floor((cap - span) / step)));
+        } else {
+            start = rng(lo, Math.max(lo, cap - span));
+        }
+        if (start + span > cap) start = Math.max(lo, cap - span);
+        let values = Array.from({ length: LEN }, (_, i) => start + i * step);
+        if (down) values = values.reverse();
+
+        // Blanks: one or two; never both ends, never three in a row, and always two printed
+        // neighbours side by side somewhere, so the step can be read.
+        const want = [1, 2, 2, 1, 2][_kDeal(5)];
+        let blanks = [];
+        for (let t = 0; t < 80; t++) {
+            const cand = shuffle(Array.from({ length: LEN }, (_, i) => i)).slice(0, want).sort((x, y) => x - y);
+            const set = new Set(cand);
+            if (set.has(0) && set.has(LEN - 1)) continue;
+            let run = 0, bad = false;
+            for (let i = 0; i < LEN; i++) { run = set.has(i) ? run + 1 : 0; if (run >= 3) bad = true; }
+            if (bad) continue;
+            let pair = false;
+            for (let i = 0; i < LEN - 1; i++) if (!set.has(i) && !set.has(i + 1)) pair = true;
+            if (!pair) continue;
+            blanks = cand;
+            break;
+        }
+        if (!blanks.length) blanks = [rng(2, LEN - 2)];
+        const parts = blanks.map(i => values[i]);
+
+        q.text = 'Write the missing numbers in the number track.';
+        q.printText = 'Write the missing numbers.';
+        q.hint = `Look at two numbers side by side. Each number is ${step} ${down ? 'less' : 'more'} than the one before it.`;
+        q.skillLabel = 'Number Sequence';
+        q.keyParts = parts.map(String);
+        q.ans = parts.length === 1 ? parts[0] : parts.join(', ');
+        if (parts.length > 1) q.acceptedAnswers = [parts.join(','), parts.join(', '), parts.join(' ')];
+        q.answerType = parts.length === 1 ? 'number' : 'text';
+        q.options = [];
+        q.selfAnswering = true;
+        q.seqData = { step, down, values: values.slice(), blanks: blanks.slice() };
+        // The track's real error: counting on by ONE where the step is bigger (or by two by ones).
+        const prev = (i) => (i > 0 ? values[i - 1] : values[i + 1]);
+        const wrongFirst = step === 1 ? prev(blanks[0]) + (down ? -2 : 2) : prev(blanks[0]) + (down ? -1 : 1);
+        q.distractorTags = { [[wrongFirst, ...parts.slice(1)].join(', ')]: 'counted on by one, not by the step' };
+        _kSetCell(q, 'seqstrip', { values, blanks });
+        q.printFormat = 'seq-strip';
+        return;
+    }
+
+    // ========================================
+    // SHARE INTO GROUPS (division family, a picture skill) — ring groups of d, count the groups.
+    //
+    // P10 (critic, regrade 2026-09-25): generated here now (the dispatcher routes it) and drawn by
+    // the kit's `counters` cell. The counters were 5 mm dots packed in 5 + 5 rows with 2 mm gaps,
+    // so a ring of 6 or 4 across the frame split could not be drawn (H12). Now: solid 5 mm
+    // counters in a LOOSE array, 6 mm apart, in rows that are NOT a group long (so the pupil
+    // rings, not reads rows), and `[ ] groups of d` under them — the one answer place. The group
+    // size is 3 to 8 and the number of groups is dealt over 2-8.
+    // ========================================
+    else if (mappedSkill === "share_into_groups") {
+        const groups = 2 + _kDealShuffled(7);                 // 2..8
+        // At most 24 counters: four rows of a 6- or 7-wide array, so six cells fit a page.
+        const sizes = [3, 4, 5, 6, 7, 8].filter(s => s * groups >= 8 && s * groups <= 24);
+        const size = sizes.length ? sizes[rng(0, sizes.length - 1)] : 3;
+        const total = size * groups;
+        q.text = `There are ${total} counters. Make groups of ${size}. How many groups are there?`;
+        // "Ring" is not a library verb: paper circles.
+        q.printText = 'Circle the groups. Write how many groups.';
+        q.ans = groups;
+        q.a = total; q.b = size; q.op = '÷';
+        q.answerType = 'number';
+        q.options = [];
+        q.selfAnswering = true;
+        q.skillLabel = 'Make Equal Groups to Divide';
+        q.hint = `Circle ${size} counters, then ${size} more, until they are all used. Count the circles.`;
+        q.distractorTags = size !== groups ? { [size]: 'wrote the size of a group, not how many groups' } : { [groups + 1]: 'counted one group twice' };
+        _kSetCell(q, 'counters', { kind: 'share', n: total, size, ans: groups });
+        q.printFormat = 'share-into-groups';
+        return;
+    }
+
+    // ========================================
+    // ADD WORD PROBLEMS WITHIN 10 (Grade K) — the K picture word problem (SF-52).
+    //
+    // P10 (critic, regrade 2026-09-25): generated here now (the dispatcher routes it) and drawn by
+    // the kit's `wordpic` cell: a short story, the two groups it names as 10 mm line-art objects
+    // (no rounded pills, no count caption), an empty work box, and ONE number box with the label
+    // word after it. The dealing no longer leans on 1 + 1 / 2 + 1: the total is dealt over 4-10
+    // through a shuffled permutation and both parts are at least 2; the stories are three
+    // frames (add to, put together, "I have") dealt round-robin, and every count is at least 2, so
+    // no story can print "There are 1 ball".
+    // ========================================
+    else if (mappedSkill === "add_wp_10") {
+        const SCENES = [
+            { shape: 'ball', many: 'balls', place: 'in a box', place2: 'on the grass', arrive: 'roll in' },
+            { shape: 'apple', many: 'apples', place: 'in a bag', place2: 'on a plate', arrive: 'are put in' },
+            { shape: 'fish', many: 'fish', place: 'in a pond', place2: 'in a tank', arrive: 'swim in' },
+            { shape: 'star', many: 'stars', place: 'on a card', place2: 'on a page', arrive: 'are added' },
+        ];
+        const scene = SCENES[_kDeal(SCENES.length)];
+        const sum = 4 + _kDealShuffled(7);                    // 4..10
+        const a = rng(2, sum - 2);
+        const b = sum - a;
+        const N = scene.many;
+        const FRAMES = [
+            [`There are ${a} ${N} ${scene.place}.`, `${b} more ${N} ${scene.arrive}.`, `How many ${N} are there now?`],
+            [`${a} ${N} are ${scene.place}.`, `${b} ${N} are ${scene.place2}.`, `How many ${N} are there in all?`],
+            [`I have ${a} ${N}.`, `I get ${b} more ${N}.`, `How many ${N} do I have now?`],
+        ];
+        const lines = FRAMES[_kDeal(FRAMES.length)];
+        q.text = lines.join(' ');
+        q.printText = 'Write the total in the box.';
+        q.ans = sum;
+        q.a = a; q.b = b; q.op = '+';
+        q.answerType = 'number';
+        q.options = [];
+        q.selfAnswering = true;
+        q.skillLabel = 'Add Word ≤10';
+        q.hint = `Count the first group: ${a}. Keep counting the next group: ${b} more. How many in all?`;
+        q.distractorTags = { [a]: 'counted only the first group' };
+        _kSetCell(q, 'wordpic', { lines, a, b, shape: scene.shape, unit: N, ans: sum, pictures: true });
+        q.printFormat = 'word-add';
         return;
     }
 
