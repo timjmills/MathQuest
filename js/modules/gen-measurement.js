@@ -6,7 +6,7 @@ import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { createAnalogClockSVG, createDigitalClockHTML, addTime, subtractTime, formatTime, timeToWords, generateTimeDistractors, createMagnifiableClock, createClockChoiceWithMagnify } from './svg-clock.js';
 import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 import { isTimeMoneySkill, generateTimeMoneyQuestion } from './gen-time-money.js';
-import { createBarGraphSVG, createThermometerSVG, rectBoxFor } from './svg-geometry.js';
+import { k2Twin } from './sheet/index.js';
 
 // O6 appearance (lane AP2): the value of an appearance control (`labels`, `bars`) for the skill
 // being generated, or `dflt` when the skill has no such control. It never consumes a random
@@ -18,6 +18,29 @@ function _mLook(id, dflt) {
     const o = state.skillOptions;
     const v = o && typeof o === 'object' ? o[id] : undefined;
     return def.values.some(x => x.v === v) ? v : def.default;
+}
+
+// AP2 round 3: the values ticked in a SET option (`forms`, `parts`) for the skill being generated,
+// the option's default when none is ticked, or null when the skill has no such option.
+function _mSet(id) {
+    let def = null;
+    try { def = optionsFor(state.category, state.skill).find(o => o.id === id) || null; } catch (e) { def = null; }
+    if (!def || def.type !== 'set') return null;
+    const o = state.skillOptions;
+    const v = o && typeof o === 'object' ? o[id] : undefined;
+    const legal = def.values.map(x => x.v);
+    const t = Array.isArray(v) ? legal.filter(x => v.includes(x)) : [];
+    if (t.length) return t;
+    const d = Array.isArray(def.default) ? legal.filter(x => def.default.includes(x)) : [];
+    return d.length ? d : legal;
+}
+
+// A length in inches as a pupil writes it: 3, 1/2, 2 3/4 (a half never 2/4).
+function _inchText(x) {
+    const q4 = Math.round(x * 4);
+    const w = Math.floor(q4 / 4), r = q4 % 4;
+    const f = r === 0 ? '' : r === 2 ? '1/2' : `${r}/4`;
+    return f ? (w ? `${w} ${f}` : f) : String(w);
 }
 
 // ── Regrouping/carry-box helper for multi-digit unit conversion multiplications ──
@@ -755,273 +778,170 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
             }
 
             // ===== PICTOGRAPH INTRO (Grade K) =====
-            // Phase 5 batch 1: 2-3 categories, 1-to-1 picture graph (each icon = 1 unit)
+            // AP2 round 3 (the bar graph's defects, critic round 4): a kit cell (sheet/cells/figures.js
+            // `pictograph`), drawn the same on paper, in the key and on the three screen hosts: 2-3
+            // rows of in-house line pictures (RP-20; the emoji broke INK-7) in a ruled table, one
+            // picture for one, the key printed under it; the question beside it, one box.
             if (mappedSkill === "pictograph_intro") {
                 const themes = [
-                    { title: 'Pets We Have', items: [
-                        { name: 'Cats', icon: '🐱' }, { name: 'Dogs', icon: '🐶' },
-                        { name: 'Birds', icon: '🐦' }, { name: 'Fish', icon: '🐠' }
-                    ]},
-                    { title: 'Fruits We Like', items: [
-                        { name: 'Apples', icon: '🍎' }, { name: 'Bananas', icon: '🍌' },
-                        { name: 'Grapes', icon: '🍇' }, { name: 'Pears', icon: '🍐' }
-                    ]},
-                    { title: 'Toys in the Box', items: [
-                        { name: 'Cars', icon: '🚗' }, { name: 'Balls', icon: '⚽' },
-                        { name: 'Blocks', icon: '🧱' }
-                    ]},
+                    { title: 'Pets We Have', icon: 'fish', items: ['Cats', 'Dogs', 'Birds', 'Fish'], cat: 'Pet', val: 'Number of pets',
+                        count: c => `How many ${c.toLowerCase()}?`, more: (a, b) => `How many more ${a.toLowerCase()} than ${b.toLowerCase()}?` },
+                    { title: 'Fruits We Like', icon: 'apple', items: ['Apples', 'Pears', 'Grapes', 'Plums'], cat: 'Fruit', val: 'Number of children',
+                        count: c => `How many children like ${c.toLowerCase()}?`, more: (a, b) => `How many more children like ${a.toLowerCase()} than ${b.toLowerCase()}?` },
+                    { title: 'Toys in the Box', icon: 'ball', items: ['Cars', 'Balls', 'Blocks'], cat: 'Toy', val: 'Number of toys',
+                        count: c => `How many ${c.toLowerCase()}?`, more: (a, b) => `How many more ${a.toLowerCase()} than ${b.toLowerCase()}?` },
                 ];
                 const theme = pick(themes);
                 const numCats = pick([2, 3]);
                 const cats = shuffle([...theme.items]).slice(0, numCats);
                 const counts = cats.map(() => randInt(1, 5));
-
-                // Question type: specific count, OR how many more
-                const askType = pick(['count', 'count', 'more']); // weight count
-                let askIdx, askIdx2, ans, text;
-                if (askType === 'count') {
-                    askIdx = randInt(0, numCats - 1);
-                    ans = counts[askIdx];
-                    text = `How many ${cats[askIdx].name.toLowerCase()}?`;
+                const forms = _mSet('forms') || [0, 1];
+                const askType = ['count', 'more'][pick(forms)] || 'count';
+                let ask, text, ans;
+                if (askType === 'more') {
+                    if (Math.max(...counts) === Math.min(...counts)) counts[0] = counts[0] < 5 ? counts[0] + 1 : counts[0] - 1;
+                    const order = [...counts.keys()].sort((x, y) => counts[y] - counts[x]);
+                    const i = order[0], j = order[order.length - 1];
+                    ans = counts[i] - counts[j];
+                    text = theme.more(cats[i], cats[j]);
+                    ask = { kind: 'more', i, j };
                 } else {
-                    // Find max and a different category
-                    const sortedIdx = [...counts.keys()].sort((a, b) => counts[b] - counts[a]);
-                    askIdx = sortedIdx[0];
-                    askIdx2 = sortedIdx[sortedIdx.length - 1];
-                    ans = counts[askIdx] - counts[askIdx2];
-                    text = `How many MORE ${cats[askIdx].name.toLowerCase()} than ${cats[askIdx2].name.toLowerCase()}?`;
+                    const i = randInt(0, numCats - 1);
+                    ans = counts[i];
+                    text = theme.count(cats[i]);
+                    ask = { kind: 'value', i };
                 }
-
-                // Build pictograph rows
-                const rows = cats.map((cat, i) => {
-                    const icons = `<span style="font-size:1.6rem;letter-spacing:6px;">${cat.icon.repeat(counts[i])}</span>`;
-                    return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border-light);">
-                        <span style="min-width:80px;font-weight:600;font-size:0.95rem;">${cat.name}</span>
-                        ${icons}
-                    </div>`;
-                }).join('');
-
+                const payload = { title: theme.title, categories: cats, values: counts, scale: 1, icon: theme.icon,
+                    catTitle: theme.cat, valTitle: theme.val, ask, question: text, answer: ans };
+                q.cell = { template: 'pictograph', v: 1, payload };
+                q.visual = k2Twin('pictograph', payload);
                 q.text = text;
+                q.screenInstr = 'Use the picture graph. Answer the question.';
                 q.ans = ans;
                 q.answerType = "number";
+                q.options = [];
                 q.hint = `Each picture stands for 1. Count the pictures in the row.`;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">${theme.title}</div>
-                    <div style="background:var(--bg-card);border-radius:12px;padding:14px;display:inline-block;text-align:left;">
-                        <div style="font-weight:600;margin-bottom:8px;text-align:center;font-size:0.85rem;color:var(--text-dim);">Each picture = 1</div>
-                        ${rows}
-                    </div>
-                </div>`;
                 q.skillLabel = "Picture Graph";
                 q.printFormat = "pictograph-intro";
-                q.dataData = {
-                    title: theme.title,
-                    categories: cats.map(c => c.name),
-                    icons: cats.map(c => c.icon),
-                    values: counts,
-                    scale: 1,
-                    askType,
-                    askIdx,
-                    askIdx2: askIdx2 != null ? askIdx2 : null,
-                };
+                q.dataData = { title: theme.title, categories: cats, values: counts, scale: 1, askType,
+                    askIdx: ask.i, askIdx2: ask.j != null ? ask.j : null };
                 return;
             }
 
             // ===== BAR GRAPH INTRO (Grade K) =====
-            // Phase 5 batch 1: 2-3 named categories, single-unit scale, max ≤5
+            // AP2 round 3 (critic round 4): a kit cell (sheet/cells/figures.js `bar-graph`), drawn the
+            // same on paper, in the key and on the three screen hosts: 2-3 bars on a full numbered
+            // scale 0 to 5, axis titles in words, no number over any bar. "Which has the most?" is
+            // answered with one check box (the most is never a tie); a count with one box.
             if (mappedSkill === "bar_graph_intro") {
                 const themes = [
-                    { title: 'Pets in Our Class', items: ['Cats', 'Dogs', 'Birds'] },
-                    { title: 'Snacks We Like', items: ['Apples', 'Crackers', 'Grapes'] },
-                    { title: 'Favorite Colors', items: ['Red', 'Blue', 'Green'] },
-                    { title: 'Sports We Play', items: ['Soccer', 'Basketball'] },
-                    { title: 'Books on the Shelf', items: ['Mysteries', 'Comics', 'Nature'] },
+                    { title: 'Pets in Our Class', items: ['Cats', 'Dogs', 'Birds'], cat: 'Pet', val: 'Number of pets',
+                        count: c => `How many ${c.toLowerCase()}?`, more: (a, b) => `How many more ${a.toLowerCase()} than ${b.toLowerCase()}?` },
+                    { title: 'Snacks We Like', items: ['Apples', 'Crackers', 'Grapes'], cat: 'Snack', val: 'Number of children',
+                        count: c => `How many children like ${c.toLowerCase()}?`, more: (a, b) => `How many more children like ${a.toLowerCase()} than ${b.toLowerCase()}?` },
+                    { title: 'Favorite Colors', items: ['Red', 'Blue', 'Green'], cat: 'Color', val: 'Number of children',
+                        count: c => `How many children like ${c.toLowerCase()}?`, more: (a, b) => `How many more children like ${a.toLowerCase()} than ${b.toLowerCase()}?` },
+                    { title: 'Sports We Play', items: ['Soccer', 'Tennis'], cat: 'Sport', val: 'Number of children',
+                        count: c => `How many children play ${c.toLowerCase()}?`, more: (a, b) => `How many more children play ${a.toLowerCase()} than ${b.toLowerCase()}?` },
+                    { title: 'Books on the Shelf', items: ['Animal', 'Comic', 'Nature'], cat: 'Kind of book', val: 'Number of books',
+                        count: c => `How many ${c.toLowerCase()} books?`, more: (a, b) => `How many more ${a.toLowerCase()} books than ${b.toLowerCase()} books?` },
                 ];
                 const theme = pick(themes);
-                const requestedNum = pick([2, 3]);
-                const numCats = Math.min(requestedNum, theme.items.length);
+                const numCats = Math.min(pick([2, 3]), theme.items.length);
                 const cats = theme.items.slice(0, numCats);
                 const counts = cats.map(() => randInt(1, 5));
-
-                // Decide question type
-                const askType = pick(['count', 'most', 'more']);
-                let ans, text, answerType, options;
-                if (askType === 'count') {
-                    const idx = randInt(0, cats.length - 1);
-                    ans = counts[idx];
-                    text = `How many ${cats[idx].toLowerCase()}?`;
-                    answerType = "number";
-                } else if (askType === 'most') {
-                    // Ensure unique max for clean answer
+                // the kinds the teacher ticked (forms: 0 most, 1 how many, 2 how many more)
+                const forms = _mSet('forms') || [0, 1, 2];
+                const askType = ['most', 'count', 'more'][pick(forms)] || 'count';
+                let ask, text, ans;
+                if (askType === 'most') {
+                    // one bar is the most: break a tie
                     const maxVal = Math.max(...counts);
-                    const maxIndices = counts.map((c, i) => c === maxVal ? i : -1).filter(i => i >= 0);
-                    if (maxIndices.length > 1) {
-                        // Bump the first one up (or down) to break tie
-                        const bumpIdx = maxIndices[0];
-                        if (counts[bumpIdx] < 5) counts[bumpIdx]++;
-                        else counts[bumpIdx]--;
-                    }
-                    const finalMax = Math.max(...counts);
-                    const winIdx = counts.indexOf(finalMax);
-                    ans = cats[winIdx];
-                    text = `Which has the MOST?`;
-                    answerType = "multiple-choice";
-                    options = [...cats];
+                    const top = counts.map((c, i) => (c === maxVal ? i : -1)).filter(i => i >= 0);
+                    if (top.length > 1) { if (counts[top[0]] < 5) counts[top[0]]++; else counts[top[1]]--; }
+                    ans = cats[counts.indexOf(Math.max(...counts))];
+                    text = 'Which has the most?';
+                    ask = { kind: 'most' };
+                } else if (askType === 'more') {
+                    // two different counts: move one when every bar is the same
+                    if (Math.max(...counts) === Math.min(...counts)) counts[0] = counts[0] < 5 ? counts[0] + 1 : counts[0] - 1;
+                    const order = [...counts.keys()].sort((x, y) => counts[y] - counts[x]);
+                    const i = order[0], j = order[order.length - 1];
+                    ans = counts[i] - counts[j];
+                    text = theme.more(cats[i], cats[j]);
+                    ask = { kind: 'more', i, j };
                 } else {
-                    // "How many more X than Y?"
-                    const sortedIdx = [...counts.keys()].sort((a, b) => counts[b] - counts[a]);
-                    const idxHi = sortedIdx[0];
-                    const idxLo = sortedIdx[sortedIdx.length - 1];
-                    const catHi = (cats[idxHi] || '').toLowerCase();
-                    const catLo = (cats[idxLo] || '').toLowerCase();
-                    ans = counts[idxHi] - counts[idxLo];
-                    if (ans === 0 || idxHi === idxLo) {
-                        // Tie or single category: switch to count question
-                        ans = counts[idxHi];
-                        text = `How many ${catHi}?`;
-                    } else {
-                        text = `How many MORE ${catHi} than ${catLo}?`;
-                    }
-                    answerType = "number";
+                    const i = randInt(0, cats.length - 1);
+                    ans = counts[i];
+                    text = theme.count(cats[i]);
+                    ask = { kind: 'value', i };
                 }
-
-                // Build SVG bar graph
-                const svgW = 320, svgH = 200;
-                const barAreaH = 130;
-                const barW = 50;
-                const gap = 28;
-                const startX = 60;
-                const baseY = 160;
-                // Single-color bars per IXL bar-chart convention.
-                const barColor = COLORS.primary;
-                let bars = '';
-                let yLabels = '';
-                for (let v = 0; v <= 5; v++) {
-                    const y = baseY - (v / 5) * barAreaH;
-                    yLabels += `<text x="48" y="${y + 4}" text-anchor="end" font-family='${FONTS.sans}' font-size="11" fill="${COLORS.textMuted}">${v}</text>`;
-                    yLabels += `<line x1="55" y1="${y}" x2="${svgW - 10}" y2="${y}" stroke="${COLORS.grid}" stroke-width="${STROKE.hair}"/>`;
-                }
-                cats.forEach((cat, i) => {
-                    const x = startX + i * (barW + gap);
-                    const h = (counts[i] / 5) * barAreaH;
-                    const y = baseY - h;
-                    bars += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${barColor}" fill-opacity="0.7" stroke="${barColor}" stroke-width="${STROKE.normal}" rx="3"/>`;
-                    bars += `<text x="${x + barW / 2}" y="${baseY + 16}" text-anchor="middle" font-family='${FONTS.sans}' font-size="11" font-weight="600" fill="${COLORS.text}">${cat}</text>`;
-                });
-                // Axes
-                const axes = `<line x1="55" y1="${baseY - barAreaH}" x2="55" y2="${baseY}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>
-                              <line x1="55" y1="${baseY}" x2="${svgW - 10}" y2="${baseY}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
-
+                const orientation = _mLook('bars', 'vertical') === 'horizontal' ? 'horizontal' : 'vertical';
+                const payload = { title: theme.title, categories: cats, values: counts, step: 1, top: 5, orientation,
+                    catTitle: theme.cat, valTitle: theme.val, ask, question: text, answer: ans };
+                q.cell = { template: 'bar-graph', v: 1, payload };
+                q.visual = k2Twin('bar-graph', payload);
                 q.text = text;
+                q.screenInstr = 'Use the graph. Answer the question.';
                 q.ans = ans;
-                q.answerType = answerType;
-                if (options) q.options = options;
-                q.hint = `Look at the height of each bar. The numbers on the side tell you how many.`;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">${theme.title}</div>
-                    <svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW, 360)}" style="background:var(--bg-card);border-radius:12px;padding:8px;">
-                        ${yLabels}
-                        ${bars}
-                        ${axes}
-                    </svg>
-                </div>`;
+                q.options = [];
+                if (askType === 'most') { q.answerType = 'text'; q.selfAnswering = true; q.printAnswer = ans; }
+                else q.answerType = 'number';
+                q.hint = orientation === 'horizontal' ? 'Look at how long each bar is. The numbers along the bottom tell you how many.'
+                    : 'Look at the height of each bar. The numbers up the side tell you how many.';
                 q.skillLabel = "Bar Graph Intro";
                 q.printFormat = "bar-graph-intro";
-                q.dataData = { title: theme.title, categories: cats, values: counts, scale: 1 };
-                // O6 "Bars" (AP2): the same graph lying down — the categories down the left, the
-                // scale 0 to 5 along the bottom. Screen and print draw it with one builder.
-                if (_mLook('bars', 'vertical') === 'horizontal') {
-                    q.hint = `Look at how long each bar is. The numbers along the bottom tell you how many.`;
-                    q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">${theme.title}</div>
-                    ${createBarGraphSVG({ categories: cats, values: counts, max: 5 })}
-                </div>`;
-                    q.dataData.bars = 'horizontal';
-                }
+                q.dataData = { title: theme.title, categories: cats, values: counts, scale: 1, ...(orientation === 'horizontal' ? { bars: 'horizontal' } : {}) };
                 return;
             }
 
-            // ===== PERIMETER INTRO (Grade 1) =====
-            // Phase 5 batch 3: simple polygon (rectangle, square, or triangle), small side lengths 1-10
+            // ===== PERIMETER INTRO (Grade 3, 3.MD.D.8) =====
+            // AP2 round 3 (critic round 4): a kit cell (sheet/cells/figures.js `perimeter-shape`): a
+            // rectangle, square or triangle drawn to scale, each side labelled with its length and
+            // a real unit at the working digit size, and "Perimeter = [ ] cm" under it. O6 "Figure
+            // labels: some" labels one length and one width of a rectangle or square (the other two
+            // follow from equal opposite sides); a triangle keeps all three.
             if (mappedSkill === "perimeter_intro") {
-                // Pick shape: rectangle (60%), square (25%), triangle (15%)
                 const shapeRoll = Math.random();
-                let shape, sides, ans, sideLabels;
-                if (shapeRoll < 0.6) {
+                let shape, sides, sideLabels;
+                if (shapeRoll < 0.55) {
                     shape = "rectangle";
                     const w = randInt(2, 9);
                     let l = randInt(2, 10);
                     if (l === w) l = w + 1;
-                    sides = [l, w, l, w];
+                    sides = [l, w, l, w];                    // top, left, bottom, right
                     sideLabels = { length: l, width: w };
-                    ans = 2 * (l + w);
-                } else if (shapeRoll < 0.85) {
+                } else if (shapeRoll < 0.75) {
                     shape = "square";
-                    const s = randInt(2, 9);
-                    sides = [s, s, s, s];
-                    sideLabels = { side: s };
-                    ans = 4 * s;
+                    const e = randInt(2, 9);
+                    sides = [e, e, e, e];
+                    sideLabels = { side: e };
                 } else {
                     shape = "triangle";
-                    // Pick triangle inequality-safe sides
-                    const a = randInt(2, 8);
-                    const b = randInt(2, 8);
-                    const cMax = Math.min(10, a + b - 1);
-                    const cMin = Math.max(2, Math.abs(a - b) + 1);
+                    // three different-looking sides, the longest along the bottom
+                    const a = randInt(3, 9), b = randInt(3, 9);
+                    const cMax = Math.min(10, a + b - 1), cMin = Math.max(3, Math.abs(a - b) + 1);
                     const c = cMin <= cMax ? randInt(cMin, cMax) : a;
-                    sides = [a, b, c];
-                    sideLabels = { a, b, c };
-                    ans = a + b + c;
+                    const t = [a, b, c].sort((x, y) => y - x);
+                    sides = [t[0], t[1], t[2]];              // base, right, left
+                    sideLabels = { a: t[0], b: t[1], c: t[2] };
                 }
-
-                // Build SVG. O6 "Figure labels" (AP2): `some` labels one length (top) and one width
-                // (left) of a rectangle or square — the bottom and right follow from equal opposite
-                // sides. A triangle keeps all three (none can be worked out).
-                const _piLabels = _mLook('labels', 'all');
-                const _piShow = (i) => _piLabels !== 'some' || shape === 'triangle' || i < 2;
-                let svg = '';
-                if (shape === "rectangle" || shape === "square") {
-                    // AP2: drawn to scale (a 10 by 3 rectangle is long and thin, a square is square),
-                    // so with "some" labels the pupil can SEE which sides are equal.
-                    const box = rectBoxFor(sides[0], sides[1]);
-                    const padX = 40, padY = 25;
-                    const rectW = box.w, rectH = box.h;
-                    const W = rectW + padX * 2, H = rectH + padY * 2;
-                    svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.round(W * 220 / 180)}" style="display:block;margin:0 auto;background:#fff;max-width:100%;">
-                        <rect x="${padX}" y="${padY}" width="${rectW}" height="${rectH}" fill="${softFill(COLORS.primary)}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}"/>
-                        <text x="${W / 2}" y="${padY - 6}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[0]}</text>
-                        ${_piShow(2) ? `<text x="${W / 2}" y="${H - padY + 16}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[2]}</text>` : ''}
-                        <text x="${padX - 6}" y="${H / 2 + 4}" text-anchor="end" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[1]}</text>
-                        ${_piShow(3) ? `<text x="${W - padX + 6}" y="${H / 2 + 4}" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[3]}</text>` : ''}
-                    </svg>`;
-                } else {
-                    // Triangle (isoceles-ish layout)
-                    const W = 200, H = 130;
-                    const apexX = W / 2, apexY = 20;
-                    const baseY = H - 25;
-                    const baseHalf = 60;
-                    const leftX = apexX - baseHalf, rightX = apexX + baseHalf;
-                    const pts = `${apexX},${apexY} ${rightX},${baseY} ${leftX},${baseY}`;
-                    svg = `<svg viewBox="0 0 ${W} ${H}" width="220" style="display:block;margin:0 auto;background:#fff;">
-                        <polygon points="${pts}" fill="${softFill(COLORS.fill[2])}" stroke="${COLORS.fill[2]}" stroke-width="${STROKE.bold}"/>
-                        <text x="${(apexX + rightX) / 2 + 8}" y="${(apexY + baseY) / 2}" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[0]}</text>
-                        <text x="${apexX}" y="${baseY + 16}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[1]}</text>
-                        <text x="${(apexX + leftX) / 2 - 8}" y="${(apexY + baseY) / 2}" text-anchor="end" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[2]}</text>
-                    </svg>`;
-                }
-
+                const ans = sides.reduce((x, y) => x + y, 0);
+                const unit = pick(['cm', 'm']);
+                const some = _mLook('labels', 'all') === 'some' && shape !== 'triangle';
+                const show = sides.map((_, i) => !some || i < 2);
+                const payload = { shape, sides, show, unit, ans };
+                q.cell = { template: 'perimeter-shape', v: 1, payload };
+                q.visual = k2Twin('perimeter-shape', payload);
                 q.text = `What is the perimeter?`;
+                q.screenInstr = 'Add the lengths of all the sides. Write the perimeter.';
                 q.ans = ans;
                 q.answerType = "number";
-                q.hint = `Add up the lengths of all the sides: ${sides.join(' + ')} = ?`;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.05rem;">Find the Perimeter</div>
-                    ${svg}
-                    <div style="margin-top:8px;font-size:0.9rem;color:var(--text-dim);">Add all the sides to find the perimeter.</div>
-                </div>`;
+                q.options = [];
+                q.hint = some ? 'A side with no number is as long as the side opposite it. Add all the sides.' : 'Add the lengths of all the sides.';
                 q.skillLabel = "Perimeter Intro";
                 q.printFormat = "perimeter-intro";
-                q.perimeterIntroData = { shape, sides, sideLabels, ans, ...(_piLabels === 'some' ? { labels: 'some' } : {}) };
+                q.perimeterIntroData = { shape, sides, sideLabels, ans, unit, ...(some ? { labels: 'some' } : {}) };
                 return;
             }
 
@@ -1197,219 +1117,65 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== READING A RULER =====
             if (measSkill === "reading_ruler" || measSkill === "reading_ruler_hard") {
-                let rrMeasurement, rrAnswerText;
-                const rrRulerLen = 6;
-                const rrPxPerInch = 105; // bumped from 75 for layout-visual-left
-                const rrPad = 36;
-                const rrSvgW = rrRulerLen * rrPxPerInch + rrPad * 2;
-                const rrSvgH = 150; // bumped from 110
-                const rrRulerY = 20; // top edge of ruler
-
-                if (measSkill === "reading_ruler_hard") {
-                    // Quarter inches
-                    const rrWholeInch = rng(0, rrRulerLen - 1);
-                    const rrQuarter = pick([0, 1, 2, 3]);
-                    rrMeasurement = rrWholeInch + rrQuarter * 0.25;
-                    if (rrQuarter === 0) rrAnswerText = `${rrWholeInch}`;
-                    else if (rrQuarter === 2) rrAnswerText = rrWholeInch === 0 ? '1/2' : `${rrWholeInch} 1/2`;
-                    else rrAnswerText = rrWholeInch === 0 ? `${rrQuarter}/4` : `${rrWholeInch} ${rrQuarter}/4`;
-                } else {
-                    // Easy: 40% whole inches, 30% half inches, 30% quarter inches
-                    const rrRoll = Math.random();
-                    if (rrRoll < 0.4) {
-                        rrMeasurement = rng(1, rrRulerLen);
-                        rrAnswerText = `${rrMeasurement}`;
-                    } else if (rrRoll < 0.7) {
-                        const rrWholeInch = rng(0, rrRulerLen - 1);
-                        rrMeasurement = rrWholeInch + 0.5;
-                        rrAnswerText = rrWholeInch === 0 ? '1/2' : `${rrWholeInch} 1/2`;
-                    } else {
-                        const rrWholeInch = rng(0, rrRulerLen - 1);
-                        const rrQuarter = pick([1, 3]);
-                        rrMeasurement = rrWholeInch + rrQuarter * 0.25;
-                        rrAnswerText = rrWholeInch === 0 ? `${rrQuarter}/4` : `${rrWholeInch} ${rrQuarter}/4`;
-                    }
-                }
-                if (rrMeasurement === 0) { rrMeasurement = 1; rrAnswerText = '1'; }
-
+                // AP2 round 3 (critic round 4): a kit cell (sheet/cells/figures.js `ruler`), drawn the
+                // same on paper, in the key and on the three screen hosts. The ruler is at TRUE scale
+                // (RP-160), the arrow comes from above, and there is ONE answer slot, in the sentence
+                // "The arrow points to [ ] inches." Reading to the inch is the Grade 2 step
+                // (2.MD.A.1): `parts` defaults to whole inches there; the Quarter Inches skill
+                // (3.MD.B.4) reads all three. The ruler carries only the marks the page reads.
+                const hard = measSkill === "reading_ruler_hard";
+                const parts = _mSet('parts') || (hard ? [0, 1, 2] : [0]);
+                const kind = pick(parts);
+                const res = parts.includes(2) ? 4 : parts.includes(1) ? 2 : 1;
+                let meas;
+                if (kind === 0) meas = rng(1, 6);
+                else if (kind === 1) meas = rng(0, 5) + 0.5;
+                else meas = rng(0, 5) + pick([0.25, 0.75]);
+                const ans = _inchText(meas);
+                const payload = { len: 6, meas, res, labels: _mLook('labels', 'all'), ans };
+                q.cell = { template: 'ruler', v: 1, payload };
+                q.visual = k2Twin('ruler', payload);
                 q.text = `What length does the arrow point to?`;
-                q.ans = rrAnswerText;
-                q.answerType = "text";
-                q.hint = `Look at the tick marks: tall marks = whole inches, medium = 1/2 inch, short = 1/4 inch.`;
-
-                const rrOptions = new Set();
-                rrOptions.add(rrAnswerText);
-                let rrAttempts = 0;
-                while (rrOptions.size < 4 && rrAttempts < 40) {
-                    rrAttempts++;
-                    const rrOff = pick([-1, -0.5, -0.25, 0.25, 0.5, 1]);
-                    const rrCand = rrMeasurement + rrOff;
-                    if (rrCand > 0 && rrCand <= rrRulerLen) {
-                        let rrCandText;
-                        const rrCandWhole = Math.floor(rrCand);
-                        const rrCandFrac = rrCand - rrCandWhole;
-                        if (rrCandFrac === 0) rrCandText = `${rrCandWhole}`;
-                        else if (Math.abs(rrCandFrac - 0.5) < 0.01) rrCandText = rrCandWhole === 0 ? '1/2' : `${rrCandWhole} 1/2`;
-                        else if (Math.abs(rrCandFrac - 0.25) < 0.01) rrCandText = rrCandWhole === 0 ? '1/4' : `${rrCandWhole} 1/4`;
-                        else if (Math.abs(rrCandFrac - 0.75) < 0.01) rrCandText = rrCandWhole === 0 ? '3/4' : `${rrCandWhole} 3/4`;
-                        else rrCandText = `${rrCand}`;
-                        rrOptions.add(rrCandText);
-                    }
-                }
-                // AP2 (2026-09-25): the pupil WRITES the length, on screen as on paper. The card
-                // used to turn this production item into four buttons (the paper page asks for a
-                // written answer; PEDAGOGY P-LG), so the offers are kept as named errors instead:
-                // they still feed error-analysis and Reason It pages.
-                shuffle([...rrOptions]);   // still drawn, so a seeded page deals the same items as before
+                q.screenInstr = 'Read the ruler. Write the number the arrow points to.';
+                q.ans = res === 1 ? meas : ans;
+                q.answerType = res === 1 ? "number" : "text";
                 q.options = [];
-                q.distractorTags = {};
-                for (const cand of rrOptions) {
-                    if (cand === rrAnswerText) continue;
-                    const toNum = (s) => String(s).split(' ').reduce((t, p) => t + (p.includes('/') ? Number(p.split('/')[0]) / Number(p.split('/')[1]) : Number(p)), 0);
-                    const off = toNum(cand) - rrMeasurement;
-                    q.distractorTags[cand] = Math.abs(off) === 0.25 ? 'Read the small mark next to the arrow instead of the one it points to.'
-                        : Math.abs(off) === 0.5 ? 'Counted a half inch too ' + (off > 0 ? 'far' : 'short') + '.'
-                        : off > 0 ? 'Read the next inch number after the arrow, not the one before it.'
-                        : 'Counted one inch too few.';
-                }
-
-                // Build B&W ruler SVG with clear tick marks
-                const _rrLabels = _mLook('labels', 'all');
-                let rrTicks = '';
-                // Heavy ruler edge line at top
-                rrTicks += `<line x1="${rrPad}" y1="${rrRulerY}" x2="${rrPad + rrRulerLen * rrPxPerInch}" y2="${rrRulerY}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
-                for (let ri = 0; ri <= rrRulerLen * 4; ri++) {
-                    const rrTickX = rrPad + ri * (rrPxPerInch / 4);
-                    let rrTickH, rrTickW;
-                    if (ri % 4 === 0) { rrTickH = 42; rrTickW = STROKE.normal; }       // inch marks — tall
-                    else if (ri % 2 === 0) { rrTickH = 28; rrTickW = 1; }     // half-inch — medium
-                    else { rrTickH = 17; rrTickW = STROKE.hair; }                      // quarter-inch — short
-                    rrTicks += `<line x1="${rrTickX}" y1="${rrRulerY}" x2="${rrTickX}" y2="${rrRulerY + rrTickH}" stroke="${COLORS.axis}" stroke-width="${rrTickW}"/>`;
-                    // O6 "Figure labels" (AP2): every inch numbered, or every other inch (0, 2, 4, 6).
-                    if (ri % 4 === 0 && (_rrLabels !== 'some' || (ri / 4) % 2 === 0)) {
-                        rrTicks += `<text x="${rrTickX}" y="${rrRulerY + 70}" text-anchor="middle" font-size="22" font-family='${FONTS.sans}' font-weight="bold" fill="${COLORS.axis}">${ri / 4}</text>`;
-                    }
-                }
-                // Arrow pointing up to measurement from below
-                const rrArrowX = rrPad + rrMeasurement * rrPxPerInch;
-                const rrArrowTip = rrRulerY + 78;
-                const rrArrowBase = rrSvgH - 8;
-                rrTicks += `<line x1="${rrArrowX}" y1="${rrArrowBase}" x2="${rrArrowX}" y2="${rrArrowTip + 10}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
-                rrTicks += `<polygon points="${rrArrowX - 9},${rrArrowTip + 12} ${rrArrowX + 9},${rrArrowTip + 12} ${rrArrowX},${rrArrowTip}" fill="${COLORS.axis}"/>`;
-
-                q.visual = `<div style="text-align:center;">
-                    <svg width="${rrSvgW}" height="${rrSvgH}" viewBox="0 0 ${rrSvgW} ${rrSvgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:820px;height:auto;">
-                        ${rrTicks}
-                    </svg>
-                    <div style="margin-top:8px;font-size:1.15rem;">The arrow points to <span style="border-bottom:2px solid #333;padding:0 15px;min-width:50px;display:inline-block;">?</span> inches</div>
-                </div>`;
+                q.hint = res === 1 ? 'Follow the arrow down to the ruler. Read the number under the long mark.'
+                    : res === 2 ? 'Find the inch number before the arrow. A mark between two numbers is a half inch.'
+                        : 'Find the inch number before the arrow. Count the small spaces after it: each is a quarter inch.';
+                q.measurementData = { meas, res, ans };
                 q.printFormat = 'reading-ruler';
                 q.skillLabel = 'Ruler';
             }
             // ===== TEMPERATURE =====
             else if (measSkill === "temperature") {
-                // Phase 4.5 batch 11: 25% multi-select-check "above N°F" variant
-                if (Math.random() < 0.25) {
-                    const target = pick([60, 65, 70, 75, 80]);
-                    const candidates = new Set();
-                    while (candidates.size < 6) {
-                        candidates.add(rng(20, 100));
-                    }
-                    const arr = [...candidates];
-                    const opts = arr.map((t, i) => ({
-                        id: 'opt' + i,
-                        label: `${t}°F`,
-                        correct: t > target
-                    }));
-                    // Ensure at least 1 correct and at least 1 incorrect
-                    if (!opts.some(o => o.correct)) {
-                        opts[0].label = `${target + 5}°F`; opts[0].correct = true;
-                    }
-                    if (!opts.some(o => !o.correct)) {
-                        opts[opts.length - 1].label = `${Math.max(0, target - 10)}°F`;
-                        opts[opts.length - 1].correct = false;
-                    }
-                    const ans = opts.filter(o => o.correct).map(o => o.id);
-                    q.text = `Click ALL temperatures above ${target}°F.`;
-                    q.answerType = 'multi-select-check';
-                    q.options = opts;
-                    q.ans = ans;
-                    q.hint = `Select every value greater than ${target}°F.`;
-                    q.printFormat = 'multi-select';
-                    q.skillLabel = 'Temperature';
-                    return;
-                }
-                // Phase 4.5 batch 11: 20% dnd-categorize variant — sort temps into Cold/Cool/Warm/Hot bins
-                if (Math.random() < 0.20) {
-                    const pool = [
-                        { temp: 15, label: '15°F' }, { temp: 25, label: '25°F' },
-                        { temp: 32, label: '32°F' }, { temp: 45, label: '45°F' },
-                        { temp: 55, label: '55°F' }, { temp: 70, label: '70°F' },
-                        { temp: 75, label: '75°F' }, { temp: 85, label: '85°F' },
-                        { temp: 95, label: '95°F' }, { temp: 100, label: '100°F' }
-                    ];
-                    const items = shuffle([...pool]).slice(0, 6);
-                    const tiles = items.map((it, i) => ({ id: 't' + i, label: it.label }));
-                    const bins = [
-                        { id: 'cold', label: 'Cold (<32°F)' },
-                        { id: 'cool', label: 'Cool (32-59°F)' },
-                        { id: 'warm', label: 'Warm (60-80°F)' },
-                        { id: 'hot',  label: 'Hot (>80°F)' }
-                    ];
-                    const ans = {};
-                    items.forEach((it, i) => {
-                        if (it.temp < 32) ans['t' + i] = 'cold';
-                        else if (it.temp < 60) ans['t' + i] = 'cool';
-                        else if (it.temp <= 80) ans['t' + i] = 'warm';
-                        else ans['t' + i] = 'hot';
-                    });
-                    q.text = 'Sort each temperature into the correct category.';
-                    q.answerType = 'dnd-generic';
-                    q.dndMode = 'categorize';
-                    q.tiles = tiles;
-                    q.bins = bins;
-                    q.ans = ans;
-                    q.options = [];
-                    q.hint = 'Cold is freezing or below; Cool is jacket weather; Warm is comfortable; Hot is sweating weather.';
-                    q.printFormat = 'dnd-generic';
-                    q.skillLabel = 'Temperature';
-                    return;
-                }
-                const mode = pick(["read", "convert"]);
-                if (mode === "read") {
-                    const temp = rng(-10, 40);
-                    const unit = pick(["°C", "°F"]);
-                    q.ans = temp;
-                    q.text = `What temperature is shown? (${unit})`;
-                    q.hint = `Find where the dark column stops. Start at the nearest number below it and count up one degree for each small mark.`;
-
-                    // AP2 (2026-09-25): a thermometer to read. The card used to print the answer
-                    // itself in large type ("23°C") above the answer box. O6 "Figure labels": the
-                    // scale numbered every 5 degrees, or every 10 (a mark for every degree either way).
-                    const every = _mLook('labels', 'all') === 'some' ? 10 : 5;
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Temperature</div>
-                        ${createThermometerSVG({ temp, unit, every })}
-                    </div>`;
-                    q.measurementData = { temp, unit, every };
-                } else {
-                    const celsius = rng(0, 40);
-                    const fahrenheit = Math.round(celsius * 9 / 5 + 32);
-                    const direction = pick(["c_to_f", "f_to_c"]);
-
-                    if (direction === "c_to_f") {
-                        q.ans = fahrenheit;
-                        q.text = `Convert ${celsius}°C to Fahrenheit`;
-                        q.hint = `°F = (°C × 9/5) + 32`;
-                    } else {
-                        q.ans = celsius;
-                        q.text = `Convert ${fahrenheit}°F to Celsius`;
-                        q.hint = `°C = (°F - 32) × 5/9`;
-                    }
-                    q.measurementData = { celsius, fahrenheit, direction };
-                }
-                q.options = buildNumericOptions(q.ans);
+                // AP2 round 3 (critic round 4): ONE task, read the thermometer, as a kit cell
+                // (sheet/cells/figures.js `thermometer`) drawn the same on paper, in the key and on the
+                // three screen hosts, with ONE box and the unit printed after it. The click-all and
+                // sort variants (a drag task on paper) and the conversions (a formula, not reading a
+                // scale) are gone. A 20-degree window, a mark every degree; the scale numbered every
+                // 5 or, with O6 "Figure labels: some", every 10. Never below zero (negative numbers
+                // are Grade 6).
+                const forms = _mSet('forms');
+                const units = (forms || [0, 1]).map(i => ['°F', '°C'][i]).filter(Boolean);
+                const unit = pick(units.length ? units : ['°F', '°C']);
+                const every = _mLook('labels', 'all') === 'some' ? 10 : 5;
+                const lo = pick(unit === '°F' ? [30, 40, 50, 60, 70] : [0, 10, 20]);
+                const hi = lo + 20;
+                let temp = rng(lo + 1, hi - 1);
+                if (temp % every === 0) temp = rng(lo + 1, hi - 1);   // mostly between two numbers
+                const payload = { temp, unit, lo, hi, every };
+                q.cell = { template: 'thermometer', v: 1, payload };
+                q.visual = k2Twin('thermometer', payload);
+                q.text = `What is the temperature in ${unit}?`;
+                q.screenInstr = 'Read the thermometer. Write the temperature.';
+                q.ans = temp;
+                q.answerType = 'number';
+                q.options = [];
+                q.hint = 'Find the top of the dark column. Start at the number just below it and count up one degree for each small mark.';
+                q.measurementData = { temp, unit, every, lo, hi };
                 q.printFormat = "measurement-temp";
+                q.skillLabel = 'Temperature';
             }
 
             // ===== CAPACITY =====

@@ -1344,6 +1344,10 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `frac-name` | Write the fraction, or circle the model that shows it. | identify fractions: write the fraction a model shows, or pick the model (A-D) that shows a fraction (added 2026-09-25, O6 lane AP3) |
 | `models-complete` | Look at the two models. Complete the number sentence. | equivalent fractions with two models: the missing fraction, number, or = / ≠ (added 2026-09-25, O6 lane AP3) |
 | `line-mark-each` | Mark each number on the line. | put fractions, mixed numbers, decimals or integers on a number line: a dot on the tick, and the number's letter when there are several (added 2026-09-25, O6 lane AP3) |
+| `read-thermometer` | Read the thermometer. Write the temperature. | read a thermometer: one box, the unit printed after it (added 2026-09-25, O6 lane AP2) |
+| `read-ruler` | Read the ruler. Write the number the arrow points to. | read an inch ruler at true scale: one answer slot, a whole box and a stacked fraction on a half / quarter ruler (added 2026-09-25, O6 lane AP2) |
+| `add-sides` | Add the lengths of all the sides. Write the perimeter. | perimeter of a drawn rectangle, square or triangle (added 2026-09-25, O6 lane AP2) |
+| `tally` | Use the tally chart. Answer the questions. | read a tally chart: one box, or one check box for the row with the most / least (added 2026-09-25, O6 lane AP2) |
 | `default-write` | Solve. Write the answer. | default adapter: skills with no provider, number or text answer |
 | `default-circle` | Circle the answer. | default adapter: choice items |
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |

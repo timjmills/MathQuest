@@ -50,7 +50,7 @@ export const SKILL_GRADES = {
     'count_edges_faces_vertices': 2, 'coord_distance_q1': 5,
     'count_sides_vertices_2d': "M",
     // Phase 5 batch 3: mid-to-high band MAP skills
-    'perimeter_intro': 1,
+    'perimeter_intro': 3,          // AP2 round 3: 3.MD.D.8 is Grade 3 (critic round 4)
     'unit_conversion_word': 4,
     'box_plot_intro': 5,
     'histogram_read': 6, 'ratio_intro': 6, 'unit_rate_intro': 6, 'double_num_line': 6,
