@@ -767,6 +767,14 @@ export function pvRefusal(categoryId, skillId, range, opts, strict = false) {
 // `support` (the one HINT picture a page carries, which fades to None), `tiles` (how many — addends,
 // or digits × digits written 21 for "2-digit × 1-digit"), `unknown`, `pictures`, `level`.
 const _OPS_BANDS = { '10': 10, '20': 20, '50': 50, '100': 100, '1k': 1000, '10k': 10000, '100k': 100000, '1m': 1000000 };
+// One honest help sentence per operation (OPTIONS-CRITIC-R2 §5 #22): a + page is told about
+// sums, a − page about the number it starts from, never the four-operation catch-all.
+const _OPS_BAND_HELP = {
+    add: 'The largest sum on the page (the answer). The numbers added are smaller.',
+    sub: 'The largest number you start from (the first number). The answer is always smaller.',
+    add_wp: 'The largest total in a story (the answer).',
+    sub_wp: 'The largest number a story starts from. The answer is always smaller.',
+};
 const _opsBand = (values, dflt, { label = 'Numbers to', help, labels = {} } = {}) => ({
     id: 'band', label, type: 'enum', default: dflt,
     values: values.map(v => ({ v, l: labels[v] || (v === null ? 'As the support level sets it' : v.toLocaleString('en-US')) })),
@@ -812,11 +820,15 @@ const _opsMulCue = (div = false) => ({
     ],
     help: 'A hint drawn under every fact on the page, in print and on screen. None is the fade.',
 });
-const _opsFactBand = () => ({ ..._opsBand([5, 10, 12, 15, 20], 20, {
+const _opsFactBand = (sub = false) => ({ ..._opsBand([5, 10, 12, 15, 20], 20, {
     label: 'Facts to',
-    help: 'The largest sum (or the largest number you start from, for −). Independent of the fact '
-        + 'set: "Add 6, facts to 10". A fact set larger than the band is left out.',
-}), helpShort: 'The largest answer (for −, the largest number you start from). Single-digit facts never pass 18.' });
+    help: sub
+        ? 'The largest number you start from. Independent of the fact set: "Subtract 6, facts to 10". '
+            + 'A fact set larger than the band is left out.'
+        : 'The largest sum. Independent of the fact set: "Add 6, facts to 10". A fact set larger '
+            + 'than the band is left out.',
+}), helpShort: sub ? 'The largest number you start from. Single-digit facts never pass 18.'
+    : 'The largest sum. Single-digit facts never pass 18.' });
 const _opsTableBand = () => _opsBand([100, 144], 144, {
     label: 'Tables to', labels: { 100: '10 × 10', 144: '12 × 12' },
     help: 'Up to the 10s table or the whole 12s table: the largest product (or number shared) is 100 or 144.',
@@ -834,7 +846,7 @@ const _opsBar = () => ({
 const P11_OPS_OPTIONS = {
     // --- fact drills: the band and a fading picture cue sit beside the fact set -----------------
     'addition:add_facts': [constantOption(13, 'Add'), notationOption('+'), _opsFactBand(), _opsAddCue()],
-    'subtraction:sub_facts': [constantOption(13, 'Subtract'), notationOption('-'), _opsFactBand(), _opsAddCue()],
+    'subtraction:sub_facts': [constantOption(13, 'Subtract'), notationOption('-'), _opsFactBand(true), _opsAddCue()],
     'multiplication:mult_facts': [constantOption(12, 'Times', 'Multiply by'), notationOption('x'), _opsTableBand(), _opsMulCue(false)],
     // Dividing BY 0 is undefined, so the 0 box is the zero facts it really deals: 0 ÷ n.
     'division:div_facts': [(() => {
@@ -846,22 +858,27 @@ const P11_OPS_OPTIONS = {
 
     // --- the four basic skills: regrouping and the unknown position ----------------------------
     // Basic + and − are grade 1 (1.OA.6, within 20): the band is 10 or 20, the sum / the number taken from.
-    'addition:add': [notationOption('+'), _opsBand([10, 20], 20), _opsRegroup('mixed'), _opsUnknown()],
-    'subtraction:subtract': [notationOption('-'), _opsBand([10, 20], 20), _opsRegroup('mixed', true), _opsUnknown('answer',
+    'addition:add': [notationOption('+'), _opsBand([10, 20], 20, { help: _OPS_BAND_HELP.add }), _opsRegroup('mixed'), _opsUnknown()],
+    'subtraction:subtract': [notationOption('-'), _opsBand([10, 20], 20, { help: _OPS_BAND_HELP.sub }), _opsRegroup('mixed', true), _opsUnknown('answer',
         { answer: 'The answer (15 − 7 = __)', first: 'The number you start from (__ − 7 = 8)', second: 'The number taken away (15 − __ = 8)' })],
     'multiplication:multiply': [notationOption('x'), {
-        id: 'tiles', label: 'Digits × digits', type: 'enum', default: null, group: 'difficulty',
-        values: [{ v: null, l: 'Set by Max Number' }, { v: 11, l: '1-digit × 1-digit (7 × 8)' },
+        // `ownsNumbers`: this control IS the skill's number size, so the measured Max Number is
+        // not shown beside it (OPTIONS-CRITIC-R2 §5 #8 / #17: two size controls, and "Up to 100"
+        // dealt 12 × 11 = 132). It stays in the model, so an old share code still decodes.
+        id: 'tiles', label: 'Digits × digits', type: 'enum', default: null, group: 'difficulty', ownsNumbers: true,
+        values: [{ v: null, l: 'Tables facts to 12 × 12 (follows Max Number)' }, { v: 11, l: '1-digit × 1-digit (7 × 8)' },
             { v: 21, l: '2-digit × 1-digit (34 × 6)' }, { v: 31, l: '3-digit × 1-digit (215 × 4)' },
             { v: 22, l: '2-digit × 2-digit (34 × 26)' }],
-        help: 'This skill only: the size of the two numbers, instead of the Max Number setting.',
+        help: 'The size of the two numbers you multiply. The first choice deals the times-table facts '
+            + '(products to 144), or bigger numbers when the Max Number setting is 1,000 or more.',
     }],
     'division:divide': [notationOption('/'), {
-        id: 'tiles', label: 'Digits ÷ digit', type: 'enum', default: null, group: 'difficulty',
-        values: [{ v: null, l: 'Set by Max Number' }, { v: 21, l: '2-digit ÷ 1-digit (84 ÷ 4)' },
+        id: 'tiles', label: 'Digits ÷ digit', type: 'enum', default: null, group: 'difficulty', ownsNumbers: true,
+        values: [{ v: null, l: 'Tables facts to 144 ÷ 12 (follows Max Number)' }, { v: 21, l: '2-digit ÷ 1-digit (84 ÷ 4)' },
             { v: 31, l: '3-digit ÷ 1-digit (756 ÷ 7)' }, { v: 41, l: '4-digit ÷ 1-digit (5,016 ÷ 8)' },
             { v: 32, l: '3-digit ÷ 2-digit (736 ÷ 23)' }],
-        help: 'This skill only: the size of the number shared and the divisor, instead of Max Number.',
+        help: 'The size of the number you share and the number you divide by. The first choice deals '
+            + 'the times-table facts backwards (numbers shared to 144).',
     }, {
         id: 'regroup', label: 'Remainders', type: 'enum', default: 'none',
         values: [{ v: 'none', l: 'None (it shares exactly)' }, { v: 'mixed', l: 'Some items' }, { v: 'always', l: 'Every item' }],
@@ -901,48 +918,76 @@ const P11_OPS_OPTIONS = {
     'addition:add_5_pictures': [{ ...picturesOption(true), help: 'Off writes the same sums as numbers only.' }],
     'subtraction:sub_5_pictures': [{ ...picturesOption(true), help: 'Off writes the same take-away as numbers only.' }],
     'addition:add_wp_10': [{ ...picturesOption(true), help: 'Off prints the same story with no picture row.' }],
+
+    // --- across zeros: its own bound on the number you start from (OPTIONS-CRITIC-R2 §5 #18) ----
+    // The measured "Up to 100" dealt 408 − 89: a borrow can only travel through a zero from 100
+    // up, so the skill draws from at least 400. Its own band says what it really deals and bounds
+    // the minuend (the answer-side number of −); owning a band hides the measured Max Number.
+    'subtraction:sub_across_zeros': [_opsBand([500, 1000, 10000], 500, {
+        label: 'Start numbers to',
+        labels: { 500: '500 (304 − 126)', 1000: '1,000 (905 − 367)', 10000: '10,000 (5,003 − 2,847)' },
+        help: 'The largest number you start from. Every item still borrows across a zero.',
+    })],
 };
 
-// The 48 ranged ids (add_/sub_ × 8 bands × never / always / mixed) are ONE ladder per operation:
-// each id is a band and a regrouping choice, so from any of them the teacher can move one step in
-// either direction without leaving the skill (the id he picked is the default, R2). Within 10 and
-// 20 the item is a one-line fact (notation + a fading picture cue); from 50 up it is column work
-// (a support level: traced, heads, bare). Within 10 WITH regrouping is the bridging-ten rung, whose
-// own support level (split frame, ten frames) already exists.
+// The 48 ranged ids (add_/sub_ × 8 bands × never / always / mixed). Each id NAMES its band and,
+// for _no_regroup / _regroup, its regrouping; the option panel may never contradict the name
+// (OPTIONS-CRITIC-R2 §5 #1-#3; "within N" bounds the answer):
+//   - `band` offers only the bands AT OR BELOW the id's own ("Add within 50" -> 10 / 20 / 50).
+//     The next id up is the harder step. A band with one value left is no control, so it is dropped.
+//   - `regroup` is offered only on the _mixed ids (the ids whose name leaves it open), and not
+//     within 10, where no item can regroup and stay within 10 (bridging ten is its own id,
+//     add_10_regroup / sub_10_regroup, whose numbers run 11 to 18).
+//   - Across zeros shows only while it can happen: regrouping on, and a band of 1,000 or more.
+// A hidden value in an old share code decodes to the id's own value (normalizeOptions keeps only
+// listed values, and every hidden band is above the id's own, so its own band is also the nearest
+// one); gen-operations.js clamps a raw, unnormalised value the same way.
+// Within 10 and 20 the item is a one-line fact (notation + a fading picture cue); from 50 up it is
+// column work (a support level: traced, heads, bare).
 for (const op of ['add', 'sub']) {
     const cat = op === 'add' ? 'addition' : 'subtraction';
     for (const [code, max] of Object.entries(_OPS_BANDS)) {
         for (const rg of ['no_regroup', 'regroup', 'mixed']) {
             const id = `${op}_${code}_${rg}`;
-            const dfltRg = rg === 'no_regroup' ? 'none' : rg === 'regroup' ? 'always' : 'mixed';
             const bridging = max === 10 && rg === 'regroup';
-            // "To 10" with every item regrouping is the bridging rung (answers 11 to 18), so only
-            // that rung offers it; elsewhere Every-item regrouping starts at 20.
-            const bands = Object.values(_OPS_BANDS).filter(b => b !== 10 || rg !== 'regroup' || bridging);
-            const opts = [_opsBand(bands, max, bridging ? {
-                labels: { 10: '10 — bridging ten (9 + 5, answers 11 to 18)' },
-            } : {}), _opsRegroup(dfltRg, op === 'sub')];
+            // Every item regrouping within 10 is only the bridging rung, never a lower band.
+            const bands = Object.values(_OPS_BANDS).filter(b => b <= max && (b !== 10 || rg !== 'regroup'));
+            const opts = [];
+            if (bands.length > 1) opts.push(_opsBand(bands, max, { help: _OPS_BAND_HELP[op] }));
+            if (rg === 'mixed' && max > 10) {
+                opts.push({
+                    ..._opsRegroup('mixed', op === 'sub'),
+                    // At a band of 10 no item can regroup and stay within 10.
+                    appliesTo: cur => !(Number(cur.band) <= 10),
+                });
+            }
             if (max <= 20) {
                 opts.unshift(notationOption(op === 'add' ? '+' : '-'));
                 opts.push(bridging ? levelSubset([3, 2, 1], 1,
                     'Level 3 draws the two ten frames beside the split, level 2 the split frame alone '
                     + '(write both parts, then the answer), level 1 the answer only.') : _opsAddCue(false));
             } else {
-                opts.push(_opsColumnLevel());
-                if (op === 'sub' && max >= 1000 && rg !== 'no_regroup') opts.push(_opsAcrossZeros(rg === 'regroup'));
+                // The column support level draws on column work only (a band of 50 or more).
+                opts.push({ ..._opsColumnLevel(), appliesTo: cur => !(Number(cur.band) <= 20) });
+                if (op === 'sub' && max >= 1000 && rg !== 'no_regroup') {
+                    opts.push({
+                        ..._opsAcrossZeros(rg === 'regroup'),
+                        appliesTo: cur => cur.regroup !== 'none' && !(Number(cur.band) < 1000),
+                    });
+                }
             }
             P11_OPS_OPTIONS[`${cat}:${id}`] = opts;
         }
     }
-    // Word problems by band: one ladder too. The no-picture twins (_plain) keep the band only:
-    // generate-question.js strips their visual after generation, so a bar model could not reach
-    // them. Pictures exist on the stories to 100; the bar model on every band.
+    // Word problems by band: one ladder too, bands at or below the id's own. The no-picture twins
+    // (_plain) keep the band only: generate-question.js strips their visual after generation, so a
+    // bar model could not reach them. Pictures exist on the stories to 100; the bar model on every band.
     for (const [code, max] of Object.entries(_OPS_BANDS)) {
         if (op === 'add' && max === 10) continue;      // add_wp_10 is the K picture story (gen-counting.js)
-        const bands = Object.values(_OPS_BANDS).filter(b => b >= 20 || (op === 'sub' && b === 10));
-        const band = _opsBand(bands, max, { help: 'Bounds the answer of every story (the total, or the number you start from).' });
-        P11_OPS_OPTIONS[`${cat}:${op}_wp_${code}`] = [band, ...(max <= 100 ? [_opsPictures()] : []), _opsBar()];
-        P11_OPS_OPTIONS[`${cat}:${op}_wp_${code}_plain`] = [band];
+        const bands = Object.values(_OPS_BANDS).filter(b => b <= max && (b >= 20 || (op === 'sub' && b === 10)));
+        const band = bands.length > 1 ? [_opsBand(bands, max, { help: _OPS_BAND_HELP[`${op}_wp`] })] : [];
+        P11_OPS_OPTIONS[`${cat}:${op}_wp_${code}`] = [...band, ...(max <= 100 ? [_opsPictures()] : []), _opsBar()];
+        P11_OPS_OPTIONS[`${cat}:${op}_wp_${code}_plain`] = band;
     }
 }
 Object.assign(SKILL_OPTIONS, P11_OPS_OPTIONS);
@@ -2320,7 +2365,11 @@ export function offeredOptionsFor(categoryId, skillId) {
     const ownIds = new Set(own.map(o => o.id));
     const d = DERIVED[`${categoryId}:${skillId}`];
     const out = [];
+    // An own control flagged `ownsNumbers` (× / ÷ "Digits × digits") IS the number size: the
+    // measured Max Number stays in the model (old share codes decode) but is not shown beside it.
+    const sized = own.some(o => o.ownsNumbers);
     for (const o of optionsFor(categoryId, skillId)) {
+        if (sized && o.id === 'range' && !ownIds.has('range')) continue;
         if (ownIds.has(o.id) || o.id !== 'level') { out.push(o); continue; }
         // The universal level: only the levels measured to draw something different.
         if (d && Array.isArray(d.level) && d.level.length > 1) out.push(levelSubset(d.level, 1));
