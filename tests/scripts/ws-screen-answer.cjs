@@ -102,6 +102,13 @@ function PLAN(rootSel, which) {
     const slots = all('input.mq-cellslot, input.cloze-cell');
     if (slots.length) {
         const sets = q.inlineBlanksData && q.inlineBlanksData.acceptedSets;
+        const joinEl = slots[0].closest('[data-mq-join]');
+        if (joinEl && joinEl.getAttribute('data-mq-join') === '') {
+            // one digit per box (a quotient strip), right-aligned
+            const d = String(ans).replace(/[^0-9]/g, ''); const pad = slots.length - d.length;
+            slots.forEach((c, i) => { if (i >= pad) tag(c, { type: 'text', value: d.charAt(i - pad) }); });
+            return { plan, q: d };
+        }
         const vals = sets ? sets[0].map(String) : parts(ans);
         slots.forEach((c, i) => tag(c, { type: 'text', value: vals[i] }));
         return { plan, q: vals.join(', ') };

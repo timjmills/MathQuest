@@ -1438,6 +1438,16 @@ function _applyScreenCell() {
     const input = document.getElementById('answerInput');
     const kind = (q.answerType === 'number' || !q.answerType) ? cellKindFor(q) : null;
 
+    // Long division is worked in the cell, not on a calculator (regrade 2026-09-25): the work
+    // rows under the bracket are the pupil's working space.
+    if ((kind && kind.kind === 'division') || /long-div/.test(String(q.printFormat || ''))
+        || /^long_div/.test(String(q.skillId || state.skill || ''))) {
+        const calc = document.getElementById('calcBtn');
+        if (calc) calc.style.display = 'none';
+        if (typeof window !== 'undefined' && typeof window.hideCalculator === 'function') {
+            try { window.hideCalculator(); } catch (e) { /* ignore */ }
+        }
+    }
     if (kind && visualAid) {
         paper.classList.add(`mq-kind-${kind.kind}`);
         visualAid.dataset.mqNoZoom = '1';
@@ -1451,15 +1461,6 @@ function _applyScreenCell() {
             visualAid.innerHTML = kindHTML(kind, { slotHtml: '<span class="mq-slothost"></span>' })
                 + (kind.kind === 'division' ? workRowsHTML(kind) : '');
             visualAid.style.display = 'block';
-            if (kind.kind === 'division') {
-                // Long division is worked on paper, not on a calculator (regrade 2026-09-25):
-                // the work rows under the bracket are the pupil's working space.
-                const calc = document.getElementById('calcBtn');
-                if (calc) calc.style.display = 'none';
-                if (typeof window !== 'undefined' && typeof window.hideCalculator === 'function') {
-                    try { window.hideCalculator(); } catch (e) { /* ignore */ }
-                }
-            }
             const host = visualAid.querySelector('.mq-slothost');
             if (host && input) {
                 host.replaceWith(input);

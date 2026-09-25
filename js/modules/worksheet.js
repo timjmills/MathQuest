@@ -1390,7 +1390,7 @@ function _wsRenderCard(grid, q, i) {
             // a drawing with its own answer boxes (fact family, area model): those boxes are the
             // slots; the card's own input is fed from them and its line is not drawn (H8)
             const inp = document.getElementById(`ws_input_${i}`);
-            const n = !kind && !twin ? wireDrawnAnswers(cellEl, inp) : 0;
+            const n = !kind && (!twin || twin.mode === 'kit') ? wireDrawnAnswers(cellEl, inp) : 0;
             if (n) {
                 if (n > 1) q._mqSlots = n;
                 const row = cellEl.querySelector(':scope > .mq-answerrow');

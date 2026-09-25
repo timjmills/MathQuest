@@ -26,7 +26,7 @@
 // Layer: 4 (imports only the pure sheet kit; the build twins load their widget on demand).
 // No window writes; no state import.
 
-import { opGlyph, toScreenInstruction } from './sheet/index.js';
+import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle } from './sheet/index.js';
 
 export const INK = '#000000';
 export const PAPER = '#ffffff';
@@ -200,10 +200,13 @@ export function equationHTML(k, slotHtml) {
 
 /** Vertical fact (VA-70): three 0.72 em tracks, operator on the bottom row, sum rule, then the slot. */
 export function factHTML(k, slotHtml) {
-    const A = String(k.a).padStart(3, ' '), B = String(k.b).padStart(3, ' ');
-    const row = (s, first) => [...s].map((ch, i) => `<span${i === 0 && first ? ' class="op"' : ''}>${i === 0 && first ? first : ch === ' ' ? '' : ch}</span>`).join('');
-    return `<div class="ws-sheet mq-kit"><div class="ws-fact mq-fact" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
-        + `${row(A)}${row(B, opGlyph(k.op))}<span class="rule"></span>`
+    // VA-2 (the kit's fact template): the operator has a track of its OWN, left of the digit
+    // tracks, so "×12" never touches; the digit tracks cover both operands and the answer.
+    const n = factDigitTracks(k.a, k.b, String(k.ans != null ? k.ans : '').length);
+    const A = String(k.a).padStart(n, ' '), B = String(k.b).padStart(n, ' ');
+    const row = (s) => [...s].map((ch) => `<span>${ch === ' ' ? '' : ch}</span>`).join('');
+    return `<div class="ws-sheet mq-kit"><div class="ws-fact mq-fact" style="${factGridStyle(n)}" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
+        + `<span></span>${row(A)}<span class="op">${opGlyph(k.op)}</span>${row(B)}<span class="rule"></span>`
         + `<span class="ws-factans mq-factans">${slotHtml || ''}</span></div></div>`;
 }
 
@@ -908,6 +911,29 @@ export function clozeHTML(q) {
 /** Wire the list tiles of a cloze twin to its boxes (after wireCellSlots made them inputs). */
 export function wireClozeBanks(root) {
     if (!root) return;
+    // The kit's cloze-bank twin prints each bank as numbers to READ under its box; on screen a
+    // tap on one of them writes it into that box (it can still be typed).
+    root.querySelectorAll('.cloze-bank [data-mq-cell]').forEach((slot) => {
+        const box = slot.querySelector('input');
+        const bank = slot.parentElement && slot.parentElement.lastElementChild;
+        if (!box || !bank || bank === slot || bank.dataset.mqWired === '1') return;
+        bank.dataset.mqWired = '1';
+        bank.classList.add('mq-kitbank');
+        Array.from(bank.children).forEach((item) => {
+            item.setAttribute('role', 'button');
+            item.setAttribute('tabindex', '0');
+            item.setAttribute('aria-label', `choose ${item.textContent.trim()}`);
+            const pick = () => {
+                if (box.disabled) return;
+                box.value = item.textContent.trim();
+                Array.from(bank.children).forEach((b) => b.setAttribute('aria-pressed', b === item ? 'true' : 'false'));
+                box.dispatchEvent(new Event('input', { bubbles: true }));
+                box.dispatchEvent(new Event('change', { bubbles: true }));
+            };
+            item.addEventListener('click', pick);
+            item.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); pick(); } });
+        });
+    });
     root.querySelectorAll('.mq-cloze').forEach((cz) => {
         const boxes = Array.from(cz.querySelectorAll('input.mq-cellslot, input.cloze-cell'));
         cz.querySelectorAll('.mq-banktile').forEach((btn) => {
@@ -1230,7 +1256,7 @@ export function screenTwin(q) {
     }
     // any other kit twin (a strip, a chart window, a bond, a picture sum): the twin IS the cell;
     // its data-mq-blank / data-mq-cell boxes take the answer (the generic slot pass wires them)
-    if (/class="k2-twin"/.test(String(q.visual || ''))) {
+    if (/class="k2-twin"|data-mq-cell=|data-mq-blank=|area-model-total|fact-family-input/.test(String(q.visual || ''))) {
         const cells = (String(q.visual).match(/data-mq-cell=/g) || []).length;
         return { mode: 'kit', html: q.visual, instr: plainText(q.text), count: cells > 1 ? cells : 0 };
     }
