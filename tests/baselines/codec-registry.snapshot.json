@@ -78,7 +78,9 @@
     "paid": "1J",
     "gap": "1L",
     "numerals": "1N",
-    "quarters": "1O"
+    "quarters": "1O",
+    "wordSet": "6A",
+    "most": "6B"
   },
   "blocks": {
     "0": {
@@ -112,9 +114,9 @@
       "keys": "5A-5M"
     },
     "6": {
-      "owner": "",
-      "status": "spare",
-      "keys": ""
+      "owner": "O2 easier / harder ladders (vocabulary, integers, geometry, graphs, algebra, number theory)",
+      "status": "assigned",
+      "keys": "6A-6B"
     },
     "7": {
       "owner": "",
@@ -555,7 +557,9 @@
     "quarters": {
       "past": "P",
       "to": "T"
-    }
+    },
+    "wordSet": {},
+    "most": {}
   },
   "scalarOnly": {
     "range": "decimal",
@@ -577,6 +581,8 @@
     "midLabel": "bool",
     "missing": "decimal",
     "rule": "bool",
-    "hours": "decimal"
+    "hours": "decimal",
+    "wordSet": "decimal",
+    "most": "decimal"
   }
 }
