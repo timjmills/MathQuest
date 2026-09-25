@@ -634,3 +634,191 @@ html.tvp-touch .tv-label .tvp-info { width: 24px; height: 24px; margin: -4px 0 -
 .tvp-mwscard { padding-top: 11px; }
 .tvp-mwscard .tvp-stage { padding: 4px; }
 .tvp-mwscard .tvp-instr { display: none; }
+
+/* ==========================================================================
+   Shell pass 2 (2026-09-25): targets, legacy overlays, popover, board code,
+   Send action bar, Print layout + page-type cards, teacher-launched play.
+   Additive: every rule below overrides an earlier one by order, never edits it.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- legacy overlays
+   .container is its own stacking context (z-index:1), which kept every legacy
+   modal scrim UNDER the fixed sidebar (z 50): the sidebar stayed bright and
+   clickable behind a modal. In teacher mode the container does not overlap the
+   sidebar (the body is padded), so it can drop the context and let its fixed
+   overlays cover the whole window. */
+body.teacher-mode > .container { z-index: auto; }
+
+/* Dark mode: white type on the light indigo accent read at about 2.6:1. The primary button
+   takes the page's dark ink instead (about 7:1). */
+html.dark body.teacher-mode .tv-btn-primary,
+html.dark body.teacher-mode .tv-btn-primary:hover { color: var(--tv-on-selected); }
+
+/* ---------------------------------------------------------------- 44px targets */
+.tv-btn, .tv-btn-sm, .tv-btn-ghost { height: 44px; min-height: 44px; }
+#teacherApp .tv-btn { min-height: 44px; }
+.tv-btn.tv-btn-block { height: 48px; }
+.tv-icon-btn { width: 44px; height: 44px; }
+.tv-input, .tv-select { height: 44px; min-height: 44px; }
+.tv-seg > button { height: 44px; }
+.tvp-viewseg > button { height: 44px; }
+.tv-chip { min-width: 44px; height: 44px; }
+.tv-chip-sm { min-width: 44px; height: 44px; font-size: 14px; border-radius: 8px; }
+.tv-letters { flex-wrap: wrap; gap: 4px; }
+.tv-letters .tv-chip { width: 44px; height: 44px; font-size: 14px; }
+.tv-check { min-height: 44px; }
+.tv-opt-btn { height: 44px; padding: 0 12px; }
+.tv-weight { height: auto; }
+.tv-weight button { width: 44px; height: 44px; }
+.tv-skill-row .tv-add, .tvp-card .tv-add { width: 44px; height: 44px; }
+.tv-tree-btn, .tv-tree-cat { min-height: 44px; }
+.tv-menu button { height: 44px; }
+#teacherApp .tv-link { display: inline-flex; align-items: center; min-height: 44px; vertical-align: middle; }
+.tv-cell-title.tv-link-row { padding: 12px 0; margin: -12px 0; }
+.tv-pick-results button { min-height: 52px; }
+html.tvp-touch .tvp-info { width: 44px; height: 44px; }
+html.tvp-touch .tv-skill-name .tvp-info,
+html.tvp-touch .tv-pill .tvp-info,
+html.tvp-touch .tv-label .tvp-info { width: 44px; height: 44px; margin: -12px -10px -12px 0; }
+
+/* The switch: a 52×44 hit area that draws the same 44×24 track. */
+.tv-switch {
+    position: relative; display: inline-block; width: 52px; height: 44px; padding: 0;
+    border: 0; border-radius: 8px; background: transparent;
+}
+.tv-switch::before {
+    content: ''; position: absolute; left: 4px; top: 10px; width: 44px; height: 24px; box-sizing: border-box;
+    border-radius: 12px; border: 1px solid var(--tv-control); background: var(--tv-surface);
+}
+.tv-switch::after { position: absolute; left: 8px; top: 13px; transition: left .12s ease; }
+.tv-switch[aria-checked="true"] { background: transparent; border-color: transparent; }
+.tv-switch[aria-checked="true"]::before { background: var(--tv-selected); border-color: var(--tv-selected); }
+.tv-switch[aria-checked="true"]::after { left: 26px; }
+@media (prefers-reduced-motion: reduce) { .tv-switch::after { transition: none; } }
+
+/* ---------------------------------------------------------------- skill options popover (teacher mode)
+   skill-options-ui.js draws it with these classes when body.teacher-mode is on. The option
+   controls carry inline styles in the app's --text/--border vocabulary, so the popover maps
+   that vocabulary onto the teacher tokens. */
+.tv-sko {
+    --text: var(--tv-text); --text-dim: var(--tv-caption); --border: var(--tv-border);
+    --bg-card: var(--tv-surface); --bg-card-light: var(--tv-subtle-2);
+    position: fixed; z-index: 10050; box-sizing: border-box;
+    display: flex; flex-direction: column; overflow: hidden;
+    background: var(--tv-surface); color: var(--tv-text);
+    border: 1px solid var(--tv-border); border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(20, 20, 30, .16);
+    font-family: var(--tv-font);
+}
+html.dark body.teacher-mode .tv-sko { box-shadow: 0 12px 32px rgba(0, 0, 0, .5); }
+.tv-sko *, .tv-sko *::before, .tv-sko *::after { box-sizing: border-box; }
+.tv-sko.is-sheet { left: 0 !important; right: 0; bottom: 0; top: auto !important; width: auto !important; border-radius: 16px 16px 0 0; }
+.tv-sko-head { display: flex; align-items: flex-start; gap: 12px; padding: 16px 12px 12px 20px; border-bottom: 1px solid var(--tv-rule); }
+.tv-sko-head > div { flex: 1; min-width: 0; }
+.tv-sko-title { margin: 0; font-size: 16px; line-height: 24px; font-weight: 700; color: var(--tv-text); }
+.tv-sko-sum { margin: 2px 0 0; font-size: 13px; line-height: 18px; font-weight: 500; color: var(--tv-text-2); }
+.tv-sko-body { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 20px 16px; }
+.tv-sko-row { padding: 12px 0; border-bottom: 1px solid var(--tv-rule); }
+.tv-sko-help { margin: 6px 0 0; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--tv-caption); }
+.tv-sko-none { margin: 16px 0 8px; font-size: 14px; line-height: 20px; font-weight: 500; color: var(--tv-text-2); }
+.tv-sko label { min-height: 44px; font-size: 14px !important; }
+.tv-sko select, .tv-sko input[type="number"] { min-height: 44px; font-size: 14px !important; border-color: var(--tv-control) !important; border-radius: 8px !important; }
+.tv-sko button:not(.tv-btn):not(.tv-icon-btn) { min-height: 44px; min-width: 56px; font-size: 13px !important; font-weight: 600; color: var(--tv-text) !important; border-radius: 8px !important; }
+.tv-sko input[type="checkbox"] { width: 18px !important; height: 18px !important; }
+.tv-sko-sample { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.tv-sko-frame { height: 156px; }
+.tv-sko-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 20px 16px; border-top: 1px solid var(--tv-rule); background: var(--tv-surface); }
+
+/* ---------------------------------------------------------------- board code overlay */
+.tv-boardcode {
+    position: fixed; inset: 0; z-index: 100002; overflow-y: auto;
+    display: flex; align-items: center; justify-content: center; padding: 40px 24px;
+    background: var(--tv-page); color: var(--tv-text); font-family: var(--tv-font);
+}
+.tv-boardcode *, .tv-boardcode *::before, .tv-boardcode *::after { box-sizing: border-box; }
+.tv-boardcode-card {
+    display: flex; flex-direction: column; align-items: center; gap: 24px; width: min(960px, 100%);
+    margin: auto; padding: 48px 40px 40px; text-align: center;
+    background: var(--tv-surface); border: 1px solid var(--tv-border); border-radius: 16px;
+}
+.tv-boardcode-kicker { margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--tv-caption); }
+.tv-boardcode-name { margin: -16px 0 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.2; font-weight: 700; color: var(--tv-text); overflow-wrap: anywhere; }
+.tv-boardcode-steps { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: clamp(18px, 2.2vw, 24px); line-height: 1.4; font-weight: 500; color: var(--tv-text-2); }
+.tv-boardcode-steps strong { color: var(--tv-text); font-weight: 700; }
+.tv-boardcode-code {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 0; max-width: 100%;
+    padding: 20px 32px; border: 2px solid var(--tv-selected); border-radius: 16px;
+    font-family: var(--tv-mono); font-size: clamp(44px, 8vw, 96px); line-height: 1.15; font-weight: 600; letter-spacing: .08em; color: var(--tv-text);
+}
+.tv-boardcode-code span { white-space: nowrap; }
+.tv-boardcode-note { margin: 0; font-size: 14px; line-height: 20px; font-weight: 500; color: var(--tv-caption); }
+
+/* ---------------------------------------------------------------- Send: sticky action bar */
+.tv-actionbar {
+    position: sticky; bottom: 0; z-index: 5; margin: 0 -40px -40px; padding: 12px 40px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    background: var(--tv-surface); border-top: 1px solid var(--tv-border);
+    box-shadow: 0 -4px 16px rgba(20, 20, 30, .06);
+}
+.tv-actionbar[hidden] { display: none !important; }
+.tv-actionbar-text { flex: 1; min-width: 0; }
+.tv-actionbar-text .tv-h3, .tv-actionbar-text .tv-cap { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tv-actionbar .tv-row { flex-wrap: nowrap; }
+@media (max-width: 1023px) { .tv-actionbar { margin: 0 -24px -24px; padding: 12px 24px; } }
+
+/* ---------------------------------------------------------------- Print: preview beside the controls
+   ≥1361px: three columns (what · preview · setup). 1024–1360px: what + setup on the left, the
+   preview on the right. At desktop widths the preview sticks while the controls scroll. */
+.tv-print-grid { grid-template-areas: "what preview setup"; }
+.tv-print-grid > .tv-print-what { grid-area: what; }
+.tv-print-grid > .tv-preview-card { grid-area: preview; position: sticky; top: 24px; align-self: start; }
+.tv-print-grid > #tvSetup { grid-area: setup; }
+@media (max-width: 1360px) {
+    .tv-print-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "what preview" "setup preview"; }
+    .tv-print-grid > .tv-preview-card { grid-column: auto; grid-row: auto; }
+}
+@media (max-width: 1023px) {
+    .tv-print-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "what" "preview" "setup"; }
+    .tv-print-grid > .tv-preview-card { position: static; }
+}
+
+/* Page-type cards: a small drawing of the page, a name and one line. */
+.tv-ptypes { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; }
+.tv-ptype {
+    display: flex; align-items: center; gap: 12px; min-height: 76px; padding: 10px 12px; border-radius: 10px; cursor: pointer; text-align: left;
+    border: 1px solid var(--tv-control-soft); background: var(--tv-surface); color: var(--tv-text);
+}
+.tv-ptype:hover { border-color: var(--tv-control); }
+.tv-ptype[aria-checked="true"] { border-color: var(--tv-selected); box-shadow: 0 0 0 1px var(--tv-selected); }
+.tv-ptype svg { flex: none; }
+.tv-ptype .tv-radio-text { margin-top: 2px; }
+.tv-fields-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 160px)); gap: 12px; }
+
+/* The classic mixed worksheet (the older automatic layout) and its extras. */
+.tv-extras { border-top: 1px solid var(--tv-rule); }
+.tv-extras > summary {
+    display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 24px; cursor: pointer; list-style: none;
+    font-size: 14px; line-height: 20px; font-weight: 700; color: var(--tv-text);
+}
+.tv-extras > summary::-webkit-details-marker { display: none; }
+.tv-extras > summary svg { flex: none; color: var(--tv-caption); transition: transform .15s ease; }
+.tv-extras[open] > summary svg { transform: rotate(90deg); }
+.tv-extras-body { padding: 0 24px 24px; display: flex; flex-direction: column; gap: 12px; }
+
+/* The classic worksheet preview (#printPreviewContainer) opened from the Print screen gets a
+   teacher toolbar in place of the pupil-app one. */
+.tv-classic-bar { display: none; }
+body.teacher-mode .tv-classic-bar {
+    position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    padding: 12px 24px; background: var(--tv-surface); border-bottom: 1px solid var(--tv-border);
+    font-family: var(--tv-font); color: var(--tv-text);
+}
+body.teacher-mode #printPreviewContainer .print-preview-toolbar { display: none; }
+
+/* ---------------------------------------------------------------- teacher-launched play views */
+/* The adaptive chip reads "L3 · Add within…" beside a Level K skill: on the board it reads as a
+   grade level and repeats the skill badge. The teacher's board shows the skill badge only. */
+body.teacher-mode #adaptiveLevelChip { display: none !important; }
+/* Dark mode: the online worksheet kept a white page behind dark cards. */
+html.dark body.teacher-mode #worksheetView.online-edition { background: var(--tv-page); color: var(--tv-text); }
+html.dark body.teacher-mode #worksheetView.online-edition .game-header { background: var(--tv-surface); border-color: var(--tv-border); color: var(--tv-text); }

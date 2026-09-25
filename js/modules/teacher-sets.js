@@ -23,11 +23,12 @@ import { DOMAINS } from './data.js';
 import {
     icon, esc, toast, copyText, skillCatalogue, findSkill, levelText, currentSet, addToCurrentSet,
     removeFromCurrentSet, loadSetIntoQueue, snapshotCurrentSet, savedSets, writeSets, optionsSummary,
-    optionsReadOnlyHTML, readStore, writeStore,
+    optionsReadOnlyHTML, readStore, writeStore, pupilCode,
 } from './teacher-ui.js';
 import {
     skillView, setSkillView, viewToggleHTML, lazyThumbs, tvpAttrs, infoButtonHTML, installPreview, modeAttrs,
 } from './teacher-preview.js';
+import { skillHasOfferedOptions } from './skill-options-ui.js';
 
 const LEVELS = ['K', '1', '2', '3', '4', '5', '6'];
 const UI_KEY = 'mq_teacher_sets_ui';
@@ -163,7 +164,7 @@ function shellHTML() {
   </section>
   <section class="tv-card" aria-labelledby="tvSendH" id="tvSendPanel"></section>
 </div>
-<div id="tvBoardCode" class="tv-board-code" hidden></div>`;
+<div class="tv-actionbar" id="tvSetsBar" role="region" aria-label="Send this set" hidden></div>`;
 }
 
 function wire() {
@@ -173,7 +174,7 @@ function wire() {
         clearTimeout(t);
         t = setTimeout(() => { ui.query = search.value.trim(); ui.thumbLimit = THUMB_PAGE; renderBrowser(); }, 120);
     });
-    root.querySelector('#tvSetName').addEventListener('input', (e) => { ui.name = e.target.value; });
+    root.querySelector('#tvSetName').addEventListener('input', (e) => { ui.name = e.target.value; renderBar(); });
 
     root.addEventListener('click', (e) => {
         const b = e.target.closest('button, a');
@@ -237,7 +238,13 @@ function wire() {
             case 'options': openOptions(d.key, b); break;
             case 'type': ui.type = d.type; ui.result = null; persist(); renderSend(); break;
             case 'lock': ui.lock = !ui.lock; ui.result = null; renderSend(); break;
-            case 'create': createLink(); break;
+            case 'create': {
+                const fromBar = !!b.closest('#tvSetsBar');
+                createLink();
+                if (fromBar && ui.result) scrollToSend();
+                break;
+            }
+            case 'goto-send': scrollToSend(); break;
             case 'copy-link': copyOut('link'); break;
             case 'copy-code': copyOut('code'); break;
             case 'board-code': showBoardCode(); break;
@@ -445,7 +452,7 @@ function renderSet() {
     <button type="button" class="tv-icon-btn" data-act="remove" data-key="${esc(k)}" aria-label="Remove ${esc(label)}">${icon('x', 18)}</button>
   </div>
   <div class="tv-set-tools">
-    <button type="button" class="tv-opt-btn" data-act="options" data-key="${esc(k)}" aria-expanded="${open}" aria-label="Options for ${esc(label)}">${icon('sliders', 16)}<span>Options</span></button>
+    ${skillHasOfferedOptions(s.categoryId, s.skillId) ? `<button type="button" class="tv-opt-btn" data-act="options" data-key="${esc(k)}" aria-expanded="${open}" aria-label="Options for ${esc(label)}">${icon('sliders', 16)}<span>Options</span></button>` : '<span class="tv-cap">No options</span>'}
     <div class="tv-weight" role="group" aria-label="How often ${esc(label)} comes up">
       <button type="button" data-act="weight" data-dir="-1" data-key="${esc(k)}" aria-label="Less often">${icon('minus', 16)}</button>
       <span>×${w}</span>
@@ -500,6 +507,63 @@ function checkHTML(label) {
 }
 
 function renderSend() {
+    renderSendPanel();
+    renderBar();
+}
+
+/**
+ * Step 3 sits below the fold whenever the screen stacks (1360px and narrower), and so did
+ * "Create link" and its result. A sticky bar at the foot of the screen carries the set's summary
+ * and the primary action; it steps aside once step 3 itself is on screen.
+ */
+function renderBar() {
+    const bar = root.querySelector('#tvSetsBar');
+    if (!bar) return;
+    const n = currentSet().length;
+    const name = (ui.name || '').trim();
+    const what = ui.type === 'qs' ? 'Quick Start link' : 'Direct link';
+    const r = ui.result;
+    const count = `${n} skill${n === 1 ? '' : 's'}`;
+    bar.innerHTML = `
+  <div class="tv-actionbar-text">
+    <div class="tv-h3">${n ? esc(name || `${count} chosen`) : 'No skills chosen yet'}</div>
+    <div class="tv-cap">${n ? `${name ? `${count} · ` : ''}${what}${r ? ' · link ready' : ''}` : 'Add skills from the list to make a link.'}</div>
+  </div>
+  <div class="tv-row">
+    ${r ? `<button type="button" class="tv-btn" data-act="copy-link">${icon('copy', 18)}<span>Copy link</span></button>
+    <button type="button" class="tv-btn tv-btn-primary" data-act="goto-send">${icon('chevD', 18)}<span>See link and code</span></button>`
+        : `<button type="button" class="tv-btn tv-btn-primary" data-act="create"${n ? '' : ' aria-disabled="true"'}>${icon('link', 18)}<span>Create link</span></button>`}
+  </div>`;
+    watchSendButton();
+}
+
+let barObserver = null;
+let sendVisible = false;
+function watchSendButton() {
+    const bar = root.querySelector('#tvSetsBar');
+    const panel = root.querySelector('#tvSendPanel');
+    if (!bar || !panel) return;
+    if (!barObserver && 'IntersectionObserver' in window) {
+        barObserver = new IntersectionObserver((entries) => {
+            for (const e of entries) sendVisible = e.isIntersecting;
+            const b = root && root.querySelector('#tvSetsBar');
+            if (b) b.hidden = sendVisible;
+        }, { threshold: 0, rootMargin: '0px 0px -120px 0px' });
+        // Once step 3 is well on screen the bar steps aside, so it never covers step 3 itself.
+        barObserver.observe(panel);
+    }
+    bar.hidden = sendVisible;
+}
+
+function scrollToSend() {
+    const panel = root.querySelector('#tvSendPanel');
+    const target = panel && (panel.querySelector('.tv-result') || panel);
+    if (target) target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    const focusable = panel && panel.querySelector('.tv-result [data-act="copy-link"]');
+    if (focusable) { try { focusable.focus({ preventScroll: true }); } catch (e) { /* */ } }
+}
+
+function renderSendPanel() {
     const box = root.querySelector('#tvSendPanel');
     if (!box) return;
     const empty = currentSet().length === 0;
@@ -531,8 +595,8 @@ function renderSend() {
     </div>
     <div>
       <div class="tv-result-row"><span class="tv-label" style="margin:0;" id="tvCodeL">Code <span class="tv-muted" style="font-weight:500;">· pupils can type it</span></span><button type="button" class="tv-btn tv-btn-sm" data-act="copy-code">${icon('copy', 16)}<span>Copy code</span></button></div>
-      <code class="tv-code tv-code-block" aria-labelledby="tvCodeL">${esc(r.code)}</code>
-      <p class="tv-cap" style="margin-top:6px;">Carries each skill's weight${typeof window.openSkillOptionsPanel === 'function' ? ' and options' : ''}.</p>
+      <code class="tv-code tv-code-block" aria-labelledby="tvCodeL">${esc(pupilCode(r.code))}</code>
+      <p class="tv-cap" style="margin-top:6px;">Carries each skill's weight${typeof window.openSkillOptionsPanel === 'function' ? ' and options' : ''}. Your mode, timer and other rules travel in the link.</p>
     </div>
     <button type="button" class="tv-btn tv-btn-sm" data-act="board-code" style="align-self:flex-start;">${icon('board', 16)}<span>Show the code on the board</span></button>
   </div>` : ''}`;
@@ -599,26 +663,64 @@ function saveSet() {
 
 async function copyOut(which) {
     if (!ui.result) return;
-    const ok = await copyText(which === 'link' ? ui.result.link : ui.result.code);
+    const ok = await copyText(which === 'link' ? ui.result.link : pupilCode(ui.result.code));
     toast(ok ? (which === 'link' ? 'Link copied' : 'Code copied') : 'Could not copy');
 }
 
+/**
+ * Show the code on the classroom board: the set's name, where to type it, and the code itself in
+ * large type. The code shown is the SKILLS part only (the part before "|"): it is what a pupil can
+ * type on a tablet, and the start screen opens it on its own. The rules (mode, timer ...) travel
+ * in the link. The teacher app is inert behind it (teacher-shell syncInert); Esc or Close ends it.
+ */
 function showBoardCode() {
     if (!ui.result) return;
+    const opener = document.activeElement;
     let ov = document.getElementById('tvBoardOverlay');
-    if (!ov) {
-        ov = document.createElement('div');
-        ov.id = 'tvBoardOverlay';
-        ov.setAttribute('role', 'dialog');
-        ov.setAttribute('aria-label', 'Code for pupils');
-        ov.style.cssText = 'position:fixed;inset:0;z-index:100002;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:40px;font-family:Manrope,system-ui,sans-serif;color:#1c1d1f;text-align:center;';
-        document.body.appendChild(ov);
-        ov.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) ov.remove(); });
-        document.addEventListener('keydown', function onKey(e) { if (e.key === 'Escape') { ov.remove(); document.removeEventListener('keydown', onKey); } });
+    const close = () => {
+        const el = document.getElementById('tvBoardOverlay');
+        if (el) el.remove();
+        document.removeEventListener('keydown', onKey, true);
+        const back = root && root.querySelector('[data-act="board-code"]');
+        const target = opener && opener.isConnected ? opener : back;
+        if (target) { try { target.focus({ preventScroll: true }); } catch (e) { /* */ } }
+    };
+    function onKey(e) {
+        // Closed some other way (a sidebar route closes every overlay): stop listening.
+        if (!document.getElementById('tvBoardOverlay')) { document.removeEventListener('keydown', onKey, true); return; }
+        if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+        if (e.key === 'Tab') {
+            // One control: keep focus on it.
+            e.preventDefault();
+            document.querySelector('#tvBoardOverlay [data-close]')?.focus();
+        }
     }
-    ov.innerHTML = `<div style="font-size:28px;font-weight:700;">Type this code on the start screen</div>
-<div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:clamp(32px,6vw,72px);font-weight:500;word-break:break-all;max-width:90vw;border:2px solid #1f2023;border-radius:12px;padding:16px 32px;">${esc(ui.result.code)}</div>
-<button type="button" data-close class="tv-btn" style="height:44px;padding:0 20px;border-radius:8px;border:1px solid #c9c9c4;background:#fff;font:600 14px Manrope,system-ui,sans-serif;cursor:pointer;">Close</button>`;
+    if (ov) ov.remove();
+    ov = document.createElement('div');
+    ov.id = 'tvBoardOverlay';
+    ov.className = 'tv-boardcode';
+    ov.setAttribute('role', 'dialog');
+    ov.setAttribute('aria-modal', 'true');
+    ov.setAttribute('aria-labelledby', 'tvBoardName');
+    const code = pupilCode(ui.result.code);
+    const parts = code.split('-').filter(Boolean);
+    const name = (ui.name || '').trim() || autoName(snapshotCurrentSet());
+    let host = 'the Maths Quest start screen';
+    try { host = new URL(ui.result.link).host || host; } catch (e) { /* keep the words */ }
+    ov.innerHTML = `<div class="tv-boardcode-card">
+  <p class="tv-boardcode-kicker">Maths Quest</p>
+  <h2 class="tv-boardcode-name" id="tvBoardName">${esc(name)}</h2>
+  <ol class="tv-boardcode-steps">
+    <li>1. Go to <strong>${esc(host)}</strong></li>
+    <li>2. Type this code on the start screen:</li>
+  </ol>
+  <div class="tv-boardcode-code" aria-label="Code: ${esc(parts.join(' dash '))}">${parts.map((p, i) => `<span>${esc(p)}${i < parts.length - 1 ? '-' : ''}</span>`).join('')}</div>
+  <p class="tv-boardcode-note">The code opens these skills. Your mode, timer and other rules travel in the link.</p>
+  <button type="button" class="tv-btn" data-close>${icon('x', 18)}<span>Close</span></button>
+</div>`;
+    document.body.appendChild(ov);
+    ov.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) close(); });
+    document.addEventListener('keydown', onKey, true);
     ov.querySelector('[data-close]').focus();
 }
 

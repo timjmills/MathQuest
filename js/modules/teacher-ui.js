@@ -57,6 +57,14 @@ const P = {
     grip: '<circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/>',
 };
 
+/**
+ * The code a pupil types: the skills part of a share code, without the "|T0-N20..." rules
+ * (those travel in the link). The start screen opens the skills part on its own.
+ */
+export function pupilCode(code) {
+    return String(code || '').split('|')[0];
+}
+
 export function icon(name, size = 20, extra = '') {
     return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"${extra}>${P[name] || ''}</svg>`;
 }
