@@ -32,7 +32,7 @@ import {
 } from '../../js/modules/sheet/roles/practice.js';
 import { ROLE_IDS, ROLE_MODULES, ROLE_ALIASES } from '../../js/modules/sheet/roles/index.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, getProvider } from '../../js/modules/sheet/index.js';
-import { stack } from '../../js/modules/sheet/cells/stack.js';
+import { stack, regroupWorking } from '../../js/modules/sheet/cells/stack.js';
 import { SLOT, SIZES as KIT_SIZES, slotRadiusMm, stripSegStyle, stripPos } from '../../js/modules/sheet/tokens.js';
 
 let pass = 0;
@@ -1010,6 +1010,19 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     ok(ws.some((s) => s.marks.some((m) => m.slot === 'strike:tens')) && ws.some((s) => s.marks.some((m) => m.slot === 'regroup:ones' && m.value === '17')), 'provider sub_100_regroup: the regroup step crosses out and writes 5 tens 17 ones');
     eq(ws.flatMap((s) => s.marks).filter((m) => m.slot === 'tens' || m.slot === 'ones').map((m) => m.value).join(''), '94', 'provider sub_100_regroup: the ones 9 then the tens 4');
     eq(p.wrongAnswer({ a: 67, b: 18, ans: 49, text: '67 − 18 = ?' }) !== null, true, 'provider sub_100_regroup: a misconception answer');
+    // Lessons r1 / AK-2 over VA-13: the key's regroup working.
+    const w1 = regroupWorking({ op: '-', a: 67, b: 18 }, 3);
+    eq(`${w1.vals[1]}|${w1.vals[2]}|${!!w1.strikes[1]}|${!!w1.strikes[2]}`, '5|17|true|true', 'key working: 67 - 18 writes 5 over the crossed 6 and 17 over the crossed 7');
+    const w2 = regroupWorking({ op: '-', a: 500, b: 238 }, 4);
+    eq(`${w2.vals[1]}|${w2.vals[2]}|${w2.vals[3]}`, '4|9|10', 'key working: 500 - 238 regroups through the 0 (4, 9, 10)');
+    eq(regroupWorking({ op: '-', a: 58, b: 23 }, 3).vals.filter(Boolean).length, 0, 'key working: no regroup, nothing written');
+    const w3 = regroupWorking({ op: '+', operands: [58, 37, 45, 65] }, 4);
+    eq(`${w3.vals[1] || ''}|${w3.vals[2] || ''}`, '2|2', 'key working: 58 + 37 + 45 + 65 carries 2 and 2');
+    const k = cellAnswerKey({ cell: { template: 'stack', payload: { a: 67, b: 18, op: '-', check: true } } });
+    eq(`${k.slots['check-ans'].value}|${k.slots['check-sum'].value}|${k.slots['regroup-2'].value}`, '49|67|17', 'stack key: the Check line and the regroup box are filled');
+    // The lesson's second example: never the example's own numbers turned round.
+    const fq = (a, b) => ({ q: { a, b, op: '+', text: `${a} + ${b} = ?`, cell: { template: 'fact', payload: { a, b, op: '+' } } }, template: 'fact' });
+    ok(L.CASE_TESTS.bigSecond(fq(2, 5)) && !L.CASE_TESTS.bigSecond(fq(5, 2)), 'lesson: the big-number-second case');
 }
 
 /* ======================================================================= report */

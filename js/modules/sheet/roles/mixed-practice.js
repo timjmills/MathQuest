@@ -38,11 +38,20 @@ export const measureCols = () => [1, 2, 3, 4, 5, 6];
 
 const divisorsDesc = (n) => Array.from({ length: n }, (_, i) => n - i).filter((d) => n % d === 0);
 
+/**
+ * A lesson packet's Mixed page (lessons r1): the lesson's step strip heads page 1
+ * (`input.stepStrip`, `input.stepStripMm`), and `input.fill` shares the page's spare height into
+ * the shelves up to 0.35 x a shelf's own height (a drawing centred in its cell keeps each empty band
+ * under 30 %, H13) instead of a tenth - no blank band above the footer.
+ */
+const stripMmOf = (input) => (input.stepStrip && Number(input.stepStripMm) > 0 ? Number(input.stepStripMm) : 0);
+
 /** Shelves: for each pool {id, k, h}, then how many shelves each gets. */
 function packing(poolsIn, input) {
     const ctx = ctxOf(input, DEFAULT_LOOK);
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Mixed 1', title: 'Mixed practice', twoLine: true, score: 1 });
-    const m = bandMetrics(ctx, layoutHeader(frame.header));
+    const m0 = bandMetrics(ctx, layoutHeader(frame.header));
+    const m = Object.assign({}, m0, { budget: m0.budget - stripMmOf(input) });
     const mCont = bandMetrics(ctx, layoutHeader(frame.header), { cont: true });
     const N = AUTO_N[ctx.look][ctx.size];
     const ids = Object.keys(poolsIn).filter((id) => (poolsIn[id] || []).length);
@@ -144,18 +153,24 @@ export function plan(input = {}) {
     let cur = null;
     let start = 1;
     const used = shelves.reduce((a, sh, i) => a + (i === 0 || shelves[i - 1].id !== sh.id ? m.strip : 0) + sh.h + (sh.anchor ? sh.bandMm : 0), 0);
-    const spare = p.pages > 1 ? 0 : Math.max(0, m.budget - used);
+    // (1 mm kept back: shares that sum to the whole budget must not spill a shelf on rounding.)
+    const spare = p.pages > 1 ? 0 : Math.max(0, m.budget - used - (input.fill ? 1 : 0));
     // The spare height is shared into the shelves only as far as a cell keeps its drawing filling
     // it (H13: never an empty band of 30% of a cell): a tenth of a shelf's own height at most.
-    const growOf = (sh) => (shelves.length ? Math.min(12, sh.h * 0.1, spare / shelves.length) : 0);
+    const growOf = (sh) => (shelves.length ? (input.fill ? Math.min(sh.h * 0.35, spare / shelves.length) : Math.min(12, sh.h * 0.1, spare / shelves.length)) : 0);
     for (const [i, sh] of shelves.entries()) {
         const grow = growOf(sh);
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
         const budget = pages.length > 1 ? p.mCont.budget : m.budget;   // the page `cur` is on
         let bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
-        let joins = !firstOfSkill && !!cur && cur.sections.length > 0 && cur.used + bandH - m.strip <= budget;
+        let joins = !firstOfSkill && !!cur && cur.sections.some((x) => x.kind === 'band') && cur.used + bandH - m.strip <= budget;
         if (joins) bandH -= m.strip;
-        if (!cur || cur.used + bandH > budget) { cur = { sections: [], used: 0 }; pages.push(cur); joins = false; bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0); }
+        if (!cur || cur.used + bandH > budget) {
+            cur = { sections: pages.length === 0 && input.stepStrip ? [{ kind: 'html', html: input.stepStrip }] : [], used: 0 };
+            pages.push(cur);
+            joins = false;
+            bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
+        }
         const first = sh.items.find((it) => !it.anchor);
         const skill = (input.skills || []).find((s) => first && first.q && s.skillId === first.q.skillId) || {};
         const title = STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';

@@ -86,10 +86,15 @@ function normaliseRequest(req = {}) {
             instructionKey: s && s.instructionKey,
             // Cells sized to their content (layout.js dense packing); `dense: false` keeps the
             // plain 12.1 grid.
-            dense: req.dense !== false && !(s && s.dense === false),
+            // (An object {S, M, L} is the section's own dense ceiling: a lesson practice page asks
+            // for whole rows of three within 12.1's 16, lessons r1.)
+            dense: s && s.dense && typeof s.dense === 'object' ? Object.assign({}, s.dense) : req.dense !== false && !(s && s.dense === false),
             // A grid height the caller caps (the lesson's practice page); the page's body otherwise.
             gridH: s && Number(s.gridH) > 0 ? Number(s.gridH) : undefined,
             capH: !!(s && Number(s.gridH) > 0),
+            // A lesson practice page (lessons r1): the rows share the whole grid (no FILL_CAP row
+            // gaps) - the caller has chosen a count whose cells stay under H13's band.
+            noCap: !!(s && s.noCap),
         }))
         .filter((s) => s.skills.length);
     return {
@@ -117,6 +122,8 @@ function normaliseRequest(req = {}) {
         lookAsked: req.look === 'daily' || req.look === 'ican' ? req.look : 'auto',
         // A practice page's step reminder (the lesson's anchor chart in one strip): {html, hMm}.
         stepStrip: req.stepStrip && req.stepStrip.html && Number(req.stepStrip.hMm) > 0 ? { html: String(req.stepStrip.html), hMm: Number(req.stepStrip.hMm) } : null,
+        // The strand tab's last line, when a packet names its part ("Practice 1", lessons r1).
+        tabId: typeof req.tabId === 'string' && req.tabId.trim() ? req.tabId.trim().slice(0, 16) : '',
     };
 }
 
@@ -173,6 +180,9 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
             if (!seen.has(signature(cand))) break;
         }
         if (!q) return;
+        // A lesson's practice page (lessons r1): `check` on the skill ref puts the Check line
+        // ("Check: add back") under every subtraction stack. Not a skill option - the page's.
+        if (sk.check && q.cell && q.cell.template === 'stack') q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { check: true }) });
         seen.add(signature(q));
         kept.set(key, itemIndex + 1);
         out.push({ q, skill: sk });
@@ -1061,7 +1071,7 @@ function oneColumnOnly(it, n) {
  * clocks a page in one column because two of its nine skills are full width).
  */
 function layoutOf(role, section, items, n, ctx) {
-    const base = { role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols };
+    const base = { role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap };
     const opts = { size: n.size, look: n.look, header: ctx.header };
     const whole = resolveSectionLayout(base, items, ctx.paper, LIVE_W_MM, opts);
     if (!(role === 'independent' || role === 'more-practice') || (n.anchors && n.anchors !== 'off') || section.gridH || items.length < 2) return whole;
@@ -1395,7 +1405,7 @@ export async function buildSheet(req = {}) {
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
-                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols },
+                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
                     withTwins(si, probesOf(si)), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
                 out[si] = capFromL(sec, si, L);
             });
@@ -1539,13 +1549,14 @@ export async function buildSheet(req = {}) {
         items: hostItems,
         skills,
         anchors: anchorsIn,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols, capH: s.capH })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
         seed: n.seed,
         labels: n.labels,
         lesson: n.lesson,
+        tabId: n.tabId || '',
         stepStrip: n.stepStrip ? n.stepStrip.html : '',
     };
     const plan = n.role === 'more-practice' ? morePracticePlan(input) : independentPlan(input);
@@ -1651,6 +1662,10 @@ async function buildRoleSheet(n, metaOf) {
         targetSkill: metaOf(reqSkills[0]),
         floors: {},
         lesson: n.lessonInput,
+        // A lesson packet's step strip (Mixed page) and page fill (lessons r1).
+        stepStrip: n.stepStrip ? n.stepStrip.html : '',
+        stepStripMm: n.stepStrip ? n.stepStrip.hMm : 0,
+        fill: !!n.stepStrip,
     };
 
     /**
@@ -1837,81 +1852,64 @@ async function buildLesson(n, metaOf) {
     const header = Object.assign({}, n.header, { footerLeft: tagLine });
     const lessonNo = Math.max(1, Number(n.lesson) || 1);
 
-    // 1. The teaching sheet: the anchor chart, Vocabulary, Warm-up, Guided and Independent rows.
-    const teach = await buildRoleSheet(Object.assign({}, n, {
-        role: 'lesson', header, look: 'ican',
-        lessonInput: { data, warmSkills, tagLine, number: lessonNo },
-    }), metaOf);
-    const parts = [{ part: 'teach', role: 'lesson', res: teach }];
+    // Lessons r1: a lesson packet never prints below M (the regroup scaffold, the place-value
+    // letters and the step words are unreadable at S), and its ANCHOR CHART is a wall chart: L type
+    // at every size. S is printed as M and says so in the notes.
+    const size = n.size === 'S' ? 'M' : n.size;
+    const sizeNote = size !== n.size ? [`A lesson packet prints at M or L: S is printed at M (lessons r1).`] : [];
+    const nz = Object.assign({}, n, { size });
+    const lessonInput = { data, warmSkills, tagLine, number: lessonNo };
 
-    // 2. Massed practice: Independent pages with the chart's step strip.
+    // 1. The anchor chart (always L) and the teaching sheet: Vocabulary, Warm-up, Guided, Independent.
+    const chart = await buildRoleSheet(Object.assign({}, nz, {
+        size: 'L', role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'chart' }),
+    }), metaOf);
+    const teach = await buildRoleSheet(Object.assign({}, nz, {
+        role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'sheet' }),
+    }), metaOf);
+    const parts = [{ part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
+
+    // 2. Massed practice: Independent pages with the chart's step strip, the grid filling the page
+    // body in ONE frame (CL-1; lessons r1: no blank band above the footer, no gutters).
     const common = {
-        size: n.size, look: 'ican', paper: n.paper, key: n.key, labels: n.labels, lesson: lessonNo,
+        size, look: 'ican', paper: n.paper, key: n.key, labels: n.labels, lesson: lessonNo,
         photocopySafe: n.photocopySafe, header,
     };
+    const strip = (teach.extras || []).find((x) => x.lessonStrip);
+    const stripH = strip && strip.measured && strip.measured[1] ? strip.measured[1].hMm + 0.5 : 0;
+    const stripHtml = strip && stripH ? strip.render(resolveCtx({ size, look: 'ican', mode: 'print' })) : '';
+    // A rounding item ("27 -> ___") is a one-number answer on one line, like a fact.
+    const oneLine = (it) => it.template === 'fact' || (it.template === 'pv' && it.kind === 'round');
+    const facts = (teach.items || []).filter((it) => it.pool === 'main').every(oneLine);
+    // The skill ref of the practice pages: a subtraction lesson gives step 5 ("Check: add back")
+    // its room, a Check line under every problem.
+    const practiceSk = data && data.checkRow ? Object.assign({}, sk, { check: true }) : sk;
+    // One-line answers: the engine fills the page (PAGE FILL, DN-1) - one frame, no row gaps,
+    // because the count is the page's own. Taller problems: 12.1's six a page, 2 x 3, each cell
+    // with its working space and Check line.
+    const section = facts ? { skills: [practiceSk], pages: 0, noCap: true, dense: { S: 15, M: 15, L: 15 } } : { skills: [practiceSk], count: 0, columns: 2, noCap: true };
+    const practiceReq = (pages, withStrip) => Object.assign({}, common, {
+        role: 'independent', tabId: `Practice ${lessonNo}`,
+        sections: [facts ? Object.assign({}, section, { pages }) : Object.assign({}, section, { count: 6 * pages })],
+        seed: (n.seed + 7919) >>> 0,
+        stepStrip: withStrip && stripHtml ? { html: stripHtml, hMm: stripH } : undefined,
+    });
     if (n.practicePages > 0) {
-        const strip = (teach.extras || []).find((x) => x.lessonStrip);
-        const h = strip && strip.measured && strip.measured[1] ? strip.measured[1].hMm + 0.5 : 0;
-        const stripHtml = strip && h ? strip.render(resolveCtx({ size: n.size, look: 'ican', mode: 'print' })) : '';
-        // A rounding item ("27 -> ___") is a one-number answer on one line, like a fact.
-        const oneLine = (it) => it.template === 'fact' || (it.template === 'pv' && it.kind === 'round');
-        const facts = (teach.items || []).filter((it) => it.pool === 'main').every(oneLine);
-        // One-line items take the dense grid at the most a page holds within the 12.1 ceiling, in
-        // whole rows of three (15 at S, then 12). Taller problems (column subtraction) print six a
-        // page, three across, grown to at most 1.3 x their own height (the lesson rows' cap): a
-        // taller row is an empty band in every cell (H13), so the grid stops short instead.
-        const tries = (facts ? (n.size === 'S' ? [15, 12] : [12]) : []).map((k) => ({ per: k, dense: true })).concat([{ per: 6, dense: false, columns: 3 }]);
-        const make = async (t) => {
-            let req = Object.assign({}, common, {
-                role: 'independent', sections: [{ skills: [sk], count: t.per * n.practicePages, dense: t.dense, columns: t.columns }], seed: (n.seed + 7919) >>> 0,
-            });
-            let res = await buildSheet(req);
-            const f0 = res && res.fits && res.fits.sections && res.fits.sections[0];
-            if (!t.dense && f0 && f0.hMin > 0 && f0.rows > 0 && f0.cellH > f0.hMin * 1.3) {
-                const gridH = Math.floor(f0.rows * f0.hMin * 1.3 * 1000) / 1000;
-                req = Object.assign({}, req, { sections: [Object.assign({}, req.sections[0], { gridH, columns: f0.cols })] });
-                res = await buildSheet(req);
-            }
-            return { req, res };
-        };
-        // The strip goes on only where it fits without crowding the page (owner, 2026-09-25): the
-        // page with the strip keeps the columns, the page count and the items a page of it holds.
-        // A strip that would turn three columns into two wide, half-empty ones is left off.
-        const withStrip = async (t, base) => {
-            const cols = (base.res.fits && base.res.fits.cols) || 'auto';
-            const cap = Math.min((base.res.fits && base.res.fits.perPage) || 0, t.per);
-            let out = null;
-            try {
-                out = await buildSheet(Object.assign({}, base.req, {
-                    sections: [Object.assign({}, base.req.sections[0], { columns: cols })], stepStrip: { html: stripHtml, hMm: h },
-                }));
-            } catch (e) { out = null; }
-            return out && out.fits && out.fits.cols === cols && (out.fits.perPage || 0) >= cap && out.pageCount <= base.res.pageCount ? out : null;
-        };
-        // A page with the step strip beats a fuller page without it (the strip is how the practice
-        // page points back to the anchor chart); a count that spills past the pages asked for
-        // steps down.
-        let res = null;
-        let plain = null;
-        for (const t of tries) {
-            const base = await make(t);
-            if (!plain || plain.pageCount > n.practicePages) plain = base.res;
-            if (base.res.pageCount > n.practicePages) continue;
-            const striped = stripHtml ? await withStrip(t, base) : null;
-            if (striped) { res = striped; break; }
-            if (!stripHtml) { res = base.res; break; }
-        }
-        if (!res) res = plain;
+        let res = await buildSheet(practiceReq(n.practicePages, true));
+        // The strip never pushes a page overleaf: without room for it the page prints without it.
+        if (res.pageCount > n.practicePages) res = await buildSheet(practiceReq(n.practicePages, false));
         parts.push({ part: 'practice', role: 'independent', res, strip: /data-mq-lesson-strip/.test(res.pupilHtml) });
     }
 
-    // 3. Mixed practice (optional): the lesson skill with the earlier skills the lesson names.
+    // 3. Mixed practice (optional): the lesson skill with EARLIER skills only (lessons r1), each
+    // skill its own section, the page filled in one frame per section.
     if (n.mixed) {
         const withSkills = data && data.mixWith ? data.mixWith.map(skillRef) : earlierSkills(sk, 2);
         const res = await buildSheet(Object.assign({}, common, {
             // The lesson's own look (I Can) unless the teacher chose Daily for the packet.
-            role: 'mixed-practice', look: n.lookAsked === 'daily' ? 'daily' : 'ican', sections: [{ skills: [sk, ...withSkills] }],
+            role: 'mixed-practice', look: n.lookAsked === 'daily' ? 'daily' : 'ican', sections: [{ skills: [practiceSk, ...withSkills] }],
             seed: (n.seed + 15838) >>> 0,
+            stepStrip: stripHtml ? { html: stripHtml, hMm: stripH } : undefined,
         }));
         parts.push({ part: 'mixed', role: 'mixed-practice', res });
     }
@@ -1923,13 +1921,14 @@ async function buildLesson(n, metaOf) {
         let k = 0;
         return String(html || '').replace(/<section class="ws-page/g, (m) => `<section data-ws-sheet="${k++ === 0 ? first : rest}" class="ws-page`);
     };
-    const sheetIds = (p) => (p.part === 'teach' ? ['lesson-chart', 'lesson-sheet'] : [`lesson-${p.part}`, `lesson-${p.part}`]);
+    const sheetIds = (p) => (p.part === 'teach' ? ['lesson-sheet', 'lesson-sheet'] : [`lesson-${p.part}`, `lesson-${p.part}`]);
     const pupilHtml = parts.map((p) => tagSheets(p.res.pupilHtml, ...sheetIds(p))).join('\n');
     const keyHtml = n.key ? parts.map((p) => tagSheets(p.res.keyHtml || '', ...sheetIds(p))).join('\n') : '';
     const pageCount = parts.reduce((a, p) => a + (p.res.pageCount || 0), 0);
     const keyPageCount = n.key ? parts.reduce((a, p) => a + (p.res.keyPageCount || 0), 0) : 0;
-    const notes = [...new Set(parts.flatMap((p) => p.res.notes || []))];
-    const line = parts.map((p) => `${p.part === 'teach' ? 'Lesson' : p.part === 'practice' ? 'Practice' : 'Mixed'}: ${p.res.pageCount} page${p.res.pageCount === 1 ? '' : 's'}`).join(' · ');
+    const notes = [...new Set(sizeNote.concat(parts.flatMap((p) => p.res.notes || [])))];
+    const PART_NAME = { chart: 'Anchor chart', teach: 'Lesson', practice: 'Practice', mixed: 'Mixed' };
+    const line = parts.map((p) => `${PART_NAME[p.part]}: ${p.res.pageCount} page${p.res.pageCount === 1 ? '' : 's'}`).join(' · ');
     return {
         pupilHtml, keyHtml, pageCount, keyPageCount,
         fits: { cols: teach.fits.cols, rows: teach.fits.rows, pages: pageCount, note: [`${line}.`, teach.fits.note].filter(Boolean).join(' '), sections: teach.fits.sections },
@@ -1949,7 +1948,9 @@ async function buildLesson(n, metaOf) {
                 : { skills: warmSkills.map((s) => `${s.categoryId}:${s.skillId}`), concepts: [], vocab: [] },
             steps: data ? data.steps.map((s) => s.text) : [], chant: data ? data.chant : '', format: data ? data.format : null,
             parts: parts.map((p) => ({ part: p.part, role: p.role, pages: p.res.pageCount, keyPages: p.res.keyPageCount, strip: p.strip })),
-            example: teach.plan && teach.plan.meta ? teach.plan.meta.example : '',
+            example: chart.plan && chart.plan.meta ? chart.plan.meta.example : '',
+            chart: chart.plan && chart.plan.meta ? { zoom: chart.plan.meta.chartZoom, example2: chart.plan.meta.example2, example2Found: chart.plan.meta.example2Found, sizing: chart.plan.meta.chartSizing } : null,
+            size,
         },
     };
 }

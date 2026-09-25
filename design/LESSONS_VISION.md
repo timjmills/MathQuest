@@ -52,18 +52,27 @@ relates to every other (prerequisite / builds on / leads to), with concepts and 
 ## First build (2026-09-25): the `lesson` page role
 `buildSheet({role: 'lesson', sections: [{skills: [skill]}], practicePages, mixed})` prints the packet
 (`js/modules/sheet/roles/lesson.js`, host `buildLesson` in `js/modules/print-sheet.js`):
-1. **Anchor chart** (no Name / Score; its own key): the worked example in 2-4 step panels, `Say:`, `Rule:`.
+A packet prints at **M or L** (lessons r1: the regroup scaffold, place-value letters and step words
+are unreadable at S; an S request prints at M and says so), and its anchor chart at **L** always.
+1. **Anchor chart** (no Name / Score; its own sheet and key, a wall chart): the worked example in 2-4
+   step panels sized to their content (the drawing enlarged until the page is full, never shrunk), a
+   closing step that draws nothing ("Check: add back") on a line of its own under the panels, an
+   `Another example:` row of the OTHER case where there is room (the big number second; a 0 in the
+   ones; a number that rounds down - `second` in the lesson data), `Say:`, `Rule:`. One icon per
+   STEP (round: ends / eye / arrows / pencil; subtract: eye / rod-to-ones / minus-ones / minus-tens /
+   check), drawn at 1.5 pt so a photocopy keeps them dark.
 2. **Lesson sheet**: `Vocabulary:` match (word to picture, key draws the lines), `Remember:` (the key
-   concept), `Warm-up:` (the prerequisite skills' own generators, lettered and scored), `Guided Practice:`
-   2-3 cells beside the chart's `Steps:` (cell 1 with the first step traced), then `Independent
-   Practice:` rows filling the page.
-3. **Practice pages** (Independent, the teacher's count) with the chart's step strip. One-line,
-   one-number items (facts, "27 → ___") take the dense grid at the most a page holds within the 12.1
-   ceiling, in whole rows of three (15 at S, else 12); taller items (column subtraction) print six a page, three across,
-   grown to at most 1.3 × their own height (H13), so a short grid stops above the footer rather
-   than drawing empty bands in every cell. The strip stays only when it keeps the page's columns
-   and capacity.
-4. **Mixed practice** (optional) with the lesson's earlier skills.
+   concept), `Warm-up:` (the prerequisite skills' own generators, lettered and scored; one
+   instruction when both halves share it), `Guided Practice:` 2-3 VARIED cells (different answers, at
+   most one make-10, the big number on both sides) beside the chart's `Steps:` - cell 1 with step 1
+   done in grey; a rounding cell carries the chart's number line with two empty tens boxes - then
+   `Independent Practice:` rows where they fit (else the bands share the spare height).
+3. **Practice pages** (Independent, the teacher's count, tab `Practice n`) with the chart's step
+   strip, ONE frame filling the body, no row gaps: one-line answers (facts, "27 → ___") in whole
+   rows of three up to 15 (12.1: 16); column subtraction six a page, 2 x 3, every problem with a
+   `Check: ___ + 18 = ___` line (step 5 given room). Keys fill the regroup boxes (VA-13 / AK-2).
+4. **Mixed practice** (optional) with the lesson's step strip, the lesson skill and EARLIER skills
+   only, each from its own strand (never a later skill such as nearest 100).
 Every sheet's teacher footer carries the tags: skill id, grade, primary CCSS, EEs (`standards.js`).
 The per-lesson data (prerequisite skills, concepts, vocabulary with pictures, the steps with their
 icons, the chant and why) lives in `js/modules/lessons/prereqs.js`, shaped to grow into the

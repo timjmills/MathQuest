@@ -32,7 +32,7 @@
 // prints comes from js/modules/standards.js (standardsFor), never from this file.
 
 /** The action icons a step may use (drawn by sheet/lesson-icons.js). */
-export const STEP_ICONS = Object.freeze(['look', 'start', 'count', 'write', 'regroup', 'subtract', 'decide', 'check', 'say']);
+export const STEP_ICONS = Object.freeze(['look', 'start', 'count', 'write', 'regroup', 'subtract', 'subOnes', 'subTens', 'ends', 'decide', 'check', 'say']);
 
 export const LESSONS = Object.freeze({
     // ---------------------------------------------------------------- Add within 10 (K-1)
@@ -43,8 +43,8 @@ export const LESSONS = Object.freeze({
             { key: 'composing:number_bonds', opts: { band: 10 }, why: 'Two parts make a whole: the idea of adding.' },
         ],
         concepts: [
-            { id: 'join', text: 'Adding puts two groups together.' },
             { id: 'count-on', text: 'Start at the bigger number and count on.' },
+            { id: 'join', text: 'Adding puts two groups together.' },
             { id: 'bigger', text: 'Tell which of two numbers is bigger.' },
         ],
         vocab: [
@@ -62,7 +62,11 @@ export const LESSONS = Object.freeze({
             kind: 'icons + very short steps',
             why: 'Three actions of two to five words each: the counting-on words are said aloud anyway (the Say band), so a chant would only add words.',
         },
-        example: { match: 'Count on' },
+        // Count on 2 or 3 (a 1-step hop shows nothing being counted).
+        example: { match: 'Count on', test: 'bigFirst', prefer: '\\+ [23] =' },
+        // The chart's second example: the big number SECOND (lessons r1: the Guided and practice
+        // items put it on either side, so the chart models both).
+        second: { test: 'bigSecond', label: 'Big number second? Start with it.' },
         mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'counting:count_objects', opts: { band: 10 } }],
     },
 
@@ -85,8 +89,8 @@ export const LESSONS = Object.freeze({
         steps: [
             { icon: 'look', text: 'Look at the ones.' },
             { icon: 'regroup', text: 'Top smaller? Regroup a ten.' },
-            { icon: 'subtract', text: 'Subtract the ones.' },
-            { icon: 'subtract', text: 'Subtract the tens.' },
+            { icon: 'subOnes', text: 'Subtract the ones.' },
+            { icon: 'subTens', text: 'Subtract the tens.' },
             { icon: 'check', text: 'Check: add back.' },
         ],
         chant: 'Top too small? Take a ten!',
@@ -95,6 +99,10 @@ export const LESSONS = Object.freeze({
             why: 'The one decision pupils forget is whether to regroup; a four-word chant said at step 2 cues it every time.',
         },
         example: { match: 'Regroup a ten' },
+        // The second example: a 0 in the ones (the edge case: 0 is smaller than any digit).
+        second: { test: 'zeroOnes', label: '0 ones? Regroup a ten.' },
+        // Practice cells give step 5 its room: a Check line under every problem.
+        checkRow: true,
         mixWith: [{ key: 'addition:add_100_regroup' }],
     },
 
@@ -115,7 +123,7 @@ export const LESSONS = Object.freeze({
             { word: 'halfway', meaning: 'the middle: 25 between 20 and 30', picture: { kind: 'line', lo: 20, hi: 30, mark: 25 } },
         ],
         steps: [
-            { icon: 'look', text: 'Find the two tens.' },
+            { icon: 'ends', text: 'Find the two tens.' },
             { icon: 'look', text: 'Look at the ones digit.' },
             { icon: 'decide', text: 'Round up or down.' },
             { icon: 'write', text: 'Write the ten.' },
@@ -126,7 +134,13 @@ export const LESSONS = Object.freeze({
             why: 'The whole skill turns on one rule; saying it as a rhythm is what pupils remember when the number line is gone.',
         },
         example: { match: 'round up', prefer: '\\b\\d[678]\\b' },
-        mixWith: [{ key: 'number_sense:nearest_100' }],
+        // The second example rounds DOWN (the first rounds up): both directions of the rule.
+        second: { test: 'roundDown', label: '4 or less? Round down.' },
+        // The provider's words, in the lesson's own terms ("the cut" is never taught here).
+        words: [{ from: '^The digit after the cut is (\\d+):.*$', to: 'The ones digit is $1.' }],
+        // Mixed practice: EARLIER skills only, each from its own strand (lessons r1: never nearest
+        // 100, which comes after, and never two "Number Sense" sections).
+        mixWith: [{ key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }, { key: 'addition:add_100_regroup' }],
     },
 });
 
