@@ -85,3 +85,11 @@ export {
 
 /** Which cell templates this build carries. `legacy` is registered by `adapters.js`. */
 export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv'];
+
+/* ------------------------------------------------- skill providers (register on load) */
+// The real per-skill providers (strings, workedSteps, wrongAnswer, stories). Importing the
+// barrel registers them once; a skill without one keeps the default adapters.
+export {
+    REGRADED_SKILLS, storiesFor, STORY_NOUNS, STORY_NAMES, STORY_TEMPLATES, nounFor,
+    columnAdd, lineSteps, longDivision,
+} from './providers/index.js';
