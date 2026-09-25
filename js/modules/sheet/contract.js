@@ -221,6 +221,11 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'frac-name': 'Write the fraction, or circle the model that shows it.',
     'models-complete': 'Look at the two models. Complete the number sentence.',
     'line-mark-each': 'Mark each number on the line.',
+    // O6 lane AP2 round 3 (2026-09-25): the figure and data cells moved to the kit.
+    'read-thermometer': 'Read the thermometer. Write the temperature.',
+    'read-ruler': 'Read the ruler. Write the number the arrow points to.',
+    'add-sides': 'Add the lengths of all the sides. Write the perimeter.',
+    tally: 'Use the tally chart. Answer the questions.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',

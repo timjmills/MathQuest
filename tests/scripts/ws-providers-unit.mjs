@@ -556,6 +556,77 @@ for (const key of Object.keys(SIBLINGS)) checkSkill(key, { requireStories: /_wp_
 for (const key of TM_PROVIDER_SKILLS) checkSkill(key);
 for (const key of Object.keys(COUNTBY_MAKERS)) checkSkill(key);
 
+// ---- O6 lane AP2 round 3: the figure and data cells (providers/figures.js), items in the shapes
+// gen-measurement.js / gen-data-stats.js emit (the kit payload the providers read).
+const { FIGURE_PROVIDER_IDS, inchText } = await import('../../js/modules/sheet/providers/index.js');
+const figCell = (template, payload, extra = {}) => Object.assign({ cell: { template, v: 1, payload } }, extra);
+const DATA_CATS = ['Dogs', 'Cats', 'Fish', 'Birds', 'Rabbits'];
+const dataItem = (template, { scale = 1, step = 1, max = 10, kinds = ['value', 'most', 'least', 'more', 'total'] } = {}) => (r) => {
+    const n = int(r, 3, 5);
+    const categories = DATA_CATS.slice(0, n);
+    let values = categories.map(() => int(r, 1, max) * scale * step);
+    const kind = pick(r, kinds);
+    let ask, answer;
+    if (kind === 'most' || kind === 'least') {
+        values = values.map((v, i) => v + i * scale * step);        // distinct, so one extreme
+        values = shuffle(r, values);
+        const v = kind === 'most' ? Math.max(...values) : Math.min(...values);
+        ask = { kind }; answer = categories[values.indexOf(v)];
+    } else if (kind === 'more') {
+        values[0] = values[1] + scale * step * int(r, 1, 3);
+        ask = { kind, i: 0, j: 1 }; answer = values[0] - values[1];
+    } else if (kind === 'total') {
+        ask = { kind }; answer = values.reduce((a, b) => a + b, 0);
+    } else {
+        const i = int(r, 0, n - 1);
+        ask = { kind: 'value', i }; answer = values[i];
+    }
+    const payload = { title: 'Favorite Pets', categories, values, step, top: Math.max(...values) + step, scale, icon: 'circle', catTitle: 'Pet',
+        valTitle: 'Number of children', ask, question: 'Which pet?', answer, orientation: 'vertical' };
+    return figCell(template, payload, { ans: answer, text: payload.question, answerType: typeof answer === 'string' ? 'text' : 'number' });
+};
+const FIGURE_MAKERS = {
+    'measurement:temperature': (r) => {
+        const unit = pick(r, ['°F', '°C']); const lo = pick(r, [0, 10, 20, 30]); const every = pick(r, [5, 10]);
+        const temp = int(r, lo + 1, lo + 19);
+        return figCell('thermometer', { temp, unit, lo, hi: lo + 20, every }, { ans: temp, text: `What is the temperature in ${unit}?` });
+    },
+    'measurement:reading_ruler': (r) => {
+        const res = pick(r, [1, 1, 2]);
+        const meas = res === 1 ? int(r, 1, 6) : int(r, 0, 5) + 0.5;
+        const ans = inchText(meas, 4);
+        return figCell('ruler', { len: 6, meas, res, labels: 'all', ans }, { ans: res === 1 ? meas : ans, text: 'What length does the arrow point to?' });
+    },
+    'measurement:reading_ruler_hard': (r) => {
+        const meas = int(r, 0, 5) + pick(r, [0.25, 0.5, 0.75, 1]);
+        const ans = inchText(meas, 4);
+        return figCell('ruler', { len: 6, meas, res: 4, labels: 'all', ans }, { ans, text: 'What length does the arrow point to?' });
+    },
+    'graphs:bar_graph': dataItem('bar-graph', { step: 2 }),
+    'measurement:bar_graph_intro': dataItem('bar-graph', { max: 5, kinds: ['value', 'most', 'more'] }),
+    'graphs:pictograph': dataItem('pictograph', { scale: 5, max: 6 }),
+    'measurement:pictograph_intro': dataItem('pictograph', { max: 5, kinds: ['value', 'more'] }),
+    'graphs:tally_chart': dataItem('tally-chart', { max: 15 }),
+    'area_perimeter:perimeter_intro': (r) => {
+        const shape = pick(r, ['rectangle', 'square', 'triangle']);
+        let sides;
+        if (shape === 'rectangle') { const l = int(r, 3, 10), w = int(r, 2, l - 1); sides = [l, w, l, w]; }
+        else if (shape === 'square') { const e = int(r, 2, 9); sides = [e, e, e, e]; }
+        else sides = [9, 7, 5];
+        const some = shape !== 'triangle' && r() < 0.5;
+        const show = sides.map((_, i) => !some || i < 2);
+        const ans = sides.reduce((a, b) => a + b, 0);
+        return figCell('perimeter-shape', { shape, sides, show, unit: 'cm', ans }, { ans, text: 'What is the perimeter?' });
+    },
+};
+for (const [key, maker] of Object.entries(FIGURE_MAKERS)) ITEM_MAKERS[key] = maker;
+for (const key of FIGURE_PROVIDER_IDS) checkSkill(key);
+ok(FIGURE_PROVIDER_IDS.length === Object.keys(FIGURE_MAKERS).length, `FIGURE_PROVIDER_IDS lists ${FIGURE_PROVIDER_IDS.length}, the test makes ${Object.keys(FIGURE_MAKERS).length}`);
+for (const k of ['read-thermometer', 'read-ruler', 'add-sides', 'tally']) {
+    ok(k in INSTRUCTION_LIBRARY, `figure library key "${k}" is missing`);
+    ok(lintInstruction(INSTRUCTION_LIBRARY[k]).length === 0, `figure library "${k}" fails the lint: ${lintInstruction(INSTRUCTION_LIBRARY[k]).join('; ')}`);
+}
+
 // ---- P9: every place-value, rounding and estimation id has a real provider (no "Solve.").
 for (const key of PV_PROVIDER_IDS) checkSkill(key);
 ok(PV_PROVIDER_IDS.length === Object.keys(PV_MAKERS).length, `PV_PROVIDER_IDS lists ${PV_PROVIDER_IDS.length}, the test makes ${Object.keys(PV_MAKERS).length}`);
