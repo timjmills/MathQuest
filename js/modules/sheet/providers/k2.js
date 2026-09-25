@@ -371,7 +371,10 @@ registerSkill('composing:hundreds_chart_fill', {
         steps: [
             'Look left: the number before. Add 1.',
             'Look up: the number above. Add 10.',
-            'Both ways give the same number. Write it.',
+            // Round-4 re-grade: a gap in the window's top row has no number above; its worked
+            // steps read the number below, so the Steps band names that way too.
+            'Top row? Look down: the number below. Take away 10.',
+            'Write the missing number.',
         ],
         say: 'The missing number is __.',
     }),
@@ -398,7 +401,10 @@ registerSkill('composing:number_chart_fill', {
         steps: [
             'Look left: the number before. Add 1.',
             'Look up: the number above. Add 10.',
-            'Both ways give the same number. Write it.',
+            // Round-4 re-grade: a gap in the window's top row has no number above; its worked
+            // steps read the number below, so the Steps band names that way too.
+            'Top row? Look down: the number below. Take away 10.',
+            'Write the missing number.',
         ],
         say: 'The missing number is __.',
     }),

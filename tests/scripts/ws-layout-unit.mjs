@@ -286,13 +286,16 @@ eq(scoreDenominator([6, 6, 4, 4]), 20, 'PT-FRM-4: Score = every scored cell on t
 
 /* ===================================================================== the two roles */
 
+// The fixture skill has NO provider (its roles fall back to the kit's defaults, SCC 3.8). It was
+// add_1k_regroup until round 4 gave the addition ladder a provider; the id is a stand-in now.
+const NOPROV = 'add_noprovider_fixture';
 const stackQ = (a, b, op = '+') => ({
-    categoryId: 'addition', skillId: 'add_1k_regroup', skillLabel: 'Add within 1,000', answerType: 'number',
+    categoryId: 'addition', skillId: NOPROV, skillLabel: 'Add within 1,000', answerType: 'number',
     text: `${a} ${op} ${b} = ?`, ans: op === '+' ? a + b : a - b, a, b, op,
     cell: { template: 'stack', v: 1, payload: { operands: [a, b], op } },
 });
 const stackRun = (n) => run(n, (i) => ({ q: stackQ(111 + i * 7, 222 + i * 3) }));
-const SKILL = [{ categoryId: 'addition', skillId: 'add_1k_regroup', label: 'Add within 1,000 (With Regrouping)', grade: 3, instructionKey: 'add', ccss: '3.NBT.A.2' }];
+const SKILL = [{ categoryId: 'addition', skillId: NOPROV, label: 'Add within 1,000 (With Regrouping)', grade: 3, instructionKey: 'add', ccss: '3.NBT.A.2' }];
 
 eq(ROLE_IDS.includes('independent') && ROLE_IDS.includes('more-practice'), true, 'roles/index.js registers both roles');
 
@@ -407,7 +410,7 @@ const ADD_SKILL = Object.assign({}, SKILL[0], { iCan: 'I Can add within 1,000' }
  */
 function hostPlan(roleId, skills, make, extra = {}) {
     const mod = ROLE_MODULES[roleId];
-    const earlier = (sk, n) => (sk.skillId === 'add_1k_regroup' ? ['add_100_regroup', 'add_100_no_regroup', 'add_20_regroup', 'add_10'].map((skillId) => ({ categoryId: 'addition', skillId })).slice(0, n) : []);
+    const earlier = (sk, n) => (sk.skillId === NOPROV ? ['add_100_regroup', 'add_100_no_regroup', 'add_20_regroup', 'add_10'].map((skillId) => ({ categoryId: 'addition', skillId })).slice(0, n) : []);
     const pools = mod.sources(skills.map((s) => ({ categoryId: s.categoryId, skillId: s.skillId, weight: s.weight })), { earlier });
     const input = Object.assign({ items: [], skills, pools: pools.map((p) => ({ id: p.id, weight: p.weight || 1 })), ctx: { size: 'L', paper: 'A4' }, seed: 42, form: 'A', floors: {} }, extra);
     const deal = (pool, n) => {
@@ -460,10 +463,11 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
 {
     const { plan, r } = hostPlan('guided', [ADD_SKILL], addMake);
     ok(plan.meta.items >= 6 && plan.meta.items <= 12, `PT 2.3 (re-grade 2026-09-25): Guided at L fills the page, 6 to 12 cells (${plan.meta.items})`);
-    // Critic round 2 (C4): the Guided page is lettered and scored like every other role; the
-    // worked example carries the Model tab and is not scored.
+    // The Guided page is scored like every other role; the worked example carries the Model tab
+    // and is not scored.
     eq(plan.header.score, plan.meta.items - 1, 'Guided: Score counts every cell but the worked example');
-    ok(/data-ws-label="letter"/.test(r.pupilHtml), 'Guided: quiet letter labels');
+    // CL-14 (round-4 re-grade, superseding round 2's letters): Guided cells are unlabelled.
+    ok(!/data-ws-label="letter"/.test(r.pupilHtml), 'CL-14: Guided cells carry no letter labels');
     ok(/data-ws-label="model"/.test(r.pupilPages[0]), 'Guided: the worked example carries the Model tab');
     ok(/data-ws-ink="trace"/.test(r.pupilPages[0]), 'PT-GDP-1: cell 1 carries its answer in trace grey');
     ok(/Guided Practice:/.test(r.pupilHtml), 'PT 2.3: the Guided Practice band');
