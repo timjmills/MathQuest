@@ -461,8 +461,11 @@ function generateResolvedQuestion() {
         'order_least_to_greatest': 'placevalue',
         'order_greatest_to_least': 'placevalue',
         'order_negatives': 'placevalue',
-        // Grid-fill counting/sequencing skills — gen code is in patterns handler (gen-algebraic.js)
-        'number_seq_fill': 'patterns',
+        // P10: the K-2 picture cells drawn by the sheet kit's templates live in gen-counting.js:
+        // the number track, the ring-the-groups picture and the K picture word problem.
+        'number_seq_fill': 'counting_cardinality',
+        'share_into_groups': 'counting_cardinality',
+        'add_wp_10': 'counting_cardinality',
         // Build-expression (drag tiles): addsub variant lives in gen-operations.js
         // (multdiv variant lives in gen-algebraic.js algebra branch — no override needed).
         'build_expr_addsub': 'operations',
@@ -694,6 +697,10 @@ function generateResolvedQuestion() {
     // Plain word problems: strip visuals and restore original skill on state
     if (isPlainWord && originalPlainSkill) {
         q.visual = '';
+        // A kit picture word problem prints without its picture row (the plain variant).
+        if (q.cell && q.cell.template === 'wordpic' && q.cell.payload) {
+            q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { pictures: false }) });
+        }
         q.printFormat = 'word-plain';
         q.skillId = originalPlainSkill;
         state.skill = originalPlainSkill;
