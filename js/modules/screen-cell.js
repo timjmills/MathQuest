@@ -371,6 +371,106 @@ export function wireTickBoxes(cellEl, q, input) {
     return true;
 }
 
+/* ------------------------------------------------------------------ one slot per answer (SL-7) */
+
+/**
+ * One slot per answer on screen, as on paper (SL-7, RUBRIC H8). A legacy visual may draw its own
+ * answer blank: the ruled blank after "=" in "5 − 2 = ___", the empty box of a number bond. The
+ * generator marks that blank `data-mq-blank="line"` or `"box"`. When the cell holds EXACTLY ONE
+ * such blank, the host's answer input takes its place, so the pupil writes where the paper pupil
+ * writes and the host's separate answer row is left empty (the caller hides it). The input keeps
+ * its id and listeners, so every checker keeps working; a box blank lends the input its size.
+ *
+ * @param {Element} cellEl                 the cell (or the visual inside it)
+ * @param {HTMLInputElement} input         the host's answer input
+ * @returns {boolean} true when the input moved into the visual
+ */
+export function adoptVisualBlank(cellEl, input) {
+    if (!cellEl || !input) return false;
+    const blanks = cellEl.querySelectorAll('[data-mq-blank]');
+    if (blanks.length !== 1) return false;
+    const blank = blanks[0];
+    const box = blank.getAttribute('data-mq-blank') === 'box';
+    input.classList.add('mq-slot', 'mq-slot--invisual');
+    input.classList.toggle('mq-slot--box', box);
+    if (box) {
+        // The box is positioned by the drawing (a bond's corner boxes are absolutely placed):
+        // the input inherits the box's own placement and size, and draws its border.
+        input.dataset.mqPrevStyle = input.getAttribute('style') || '';
+        input.style.cssText += `;${blank.getAttribute('style') || ''}`;
+        input.style.removeProperty('display');
+    }
+    blank.replaceWith(input);
+    return true;
+}
+
+/**
+ * Several answers in one drawing (a multiplication chart's empty cells): the generator marks
+ * each boxed slot `data-mq-cell`. On screen each becomes its own input, where the paper pupil
+ * writes (one input per answer, never three answers typed into one comma list). The values
+ * travel to the host's answer input in reading order, joined ", ", which is what `q.ans` holds,
+ * so every checker keeps working. The host input is hidden; its row is the caller's to hide.
+ *
+ * @param {Element} cellEl
+ * @param {HTMLInputElement} input   the host's answer input (#answerInput, ws_input_N, #qtAnswerInput)
+ * @param {{onChange?: function(string): void}} [opts]
+ * @returns {boolean} true when the cell's slots were wired
+ */
+export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
+    if (!cellEl || !input) return false;
+    const slots = Array.from(cellEl.querySelectorAll('[data-mq-cell]'));
+    if (!slots.length) return false;
+    // What stands between the answers in `q.ans`: ", " for a list, " R " for a quotient and
+    // remainder (the drawing says so with `data-mq-join` on an ancestor of the slots).
+    const joinEl = slots[0].closest('[data-mq-join]');
+    const join = joinEl ? joinEl.getAttribute('data-mq-join') : ', ';
+    const saved = String(input.value || '').split(join.trim() || ',').map((t) => t.trim());
+    const boxes = slots.map((slot, k) => {
+        const el = document.createElement('input');
+        el.type = 'text';
+        el.className = 'mq-cellslot';
+        el.setAttribute('inputmode', 'numeric');
+        el.setAttribute('autocomplete', 'off');
+        el.setAttribute('spellcheck', 'false');
+        el.setAttribute('maxlength', '4');
+        el.setAttribute('aria-label', `answer ${k + 1} of ${slots.length}`);
+        if (saved[k]) el.value = saved[k];
+        slot.textContent = '';
+        slot.appendChild(el);
+        return el;
+    });
+    const compose = () => boxes.map((b) => (b.value || '').trim()).join(join);
+    boxes.forEach((b, k) => {
+        b.addEventListener('input', () => {
+            b.value = b.value.replace(/[^0-9]/g, '');
+            input.value = compose();
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        b.addEventListener('change', () => { if (onChange) onChange(compose()); });
+        b.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const next = boxes[k + 1];
+                if (next && !next.value) next.focus();
+                else if (onChange) onChange(compose());
+                else input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+            }
+        });
+    });
+    input.classList.add('mq-cellslot-host');
+    return true;
+}
+
+/** Undo adoptVisualBlank on an input that outlives its cell (the practice card's #answerInput). */
+export function releaseVisualBlank(input) {
+    if (!input || !input.classList.contains('mq-slot--invisual')) return;
+    input.classList.remove('mq-slot--invisual');
+    if (input.dataset.mqPrevStyle !== undefined) {
+        input.setAttribute('style', input.dataset.mqPrevStyle);
+        delete input.dataset.mqPrevStyle;
+    }
+}
+
 /* ------------------------------------------------------------------ legacy visual clean-up */
 
 // Screen-only captions some legacy visuals carry above or under the drawing. On paper the

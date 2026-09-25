@@ -8,7 +8,7 @@ import { deriveSeed } from './sheet/index.js';
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
-    wireTickBoxes,
+    wireTickBoxes, adoptVisualBlank, wireCellSlots,
 } from './screen-cell.js';
 
 // Build a static (non-interactive) visual for a grid-fill question so that
@@ -783,13 +783,22 @@ export function initWorksheet() {
 }
 
 // One item of the sheet: seeded, the skill's options honoured, worksheet host (so a generator's
-// worksheet-only fallback applies). A retry seed replaces an item that repeats the one before it
-// (PEDAGOGY Q-10: never two identical items side by side).
+// worksheet-only fallback applies). A retry seed replaces an item that repeats ANY earlier item
+// of the sheet (PEDAGOGY Q-10; baseline 2026-09-24: "14 − 4" dealt on three of six cards). A
+// skill whose pool is smaller than the sheet cannot avoid every repeat, so after the retries it
+// settles for an item that at least differs from the one just before it.
+function _wsItemKey(q) {
+    if (!q) return '';
+    return plainText(q.text) + '\u0001' + String(q.ans) + '\u0001' + plainText(q.visual || '');
+}
 function _wsGenerate(i) {
     const base = (state.worksheetSeed >>> 0) || 1;
-    const prev = i > 0 ? state.worksheetQs[i - 1] : null;
+    const earlier = state.worksheetQs.slice(0, i);
+    const seen = new Set(earlier.map(_wsItemKey));
+    const prevKey = i > 0 ? _wsItemKey(earlier[i - 1]) : null;
     let q = null;
-    for (let attempt = 0; attempt < 4; attempt++) {
+    let fallback = null;                 // the first candidate that is not a copy of the item before it
+    for (let attempt = 0; attempt < 12; attempt++) {
         const seed = attempt === 0 ? deriveSeed(base, 'item', i) : deriveSeed(base, 'item', i, 'retry', attempt);
         let cand = null;
         try {
@@ -801,11 +810,12 @@ function _wsGenerate(i) {
             console.error('worksheet: generateQuestionFor failed', e);
         }
         if (!cand) continue;
-        q = cand;
-        const same = prev && plainText(prev.text) === plainText(cand.text) && String(prev.ans) === String(cand.ans)
-            && String(prev.visual || '') === String(cand.visual || '');
-        if (!same) break;
+        const key = _wsItemKey(cand);
+        if (!seen.has(key)) { q = cand; break; }
+        if (!fallback && key !== prevKey) fallback = cand;
+        if (!q) q = cand;
     }
+    if (q && seen.has(_wsItemKey(q)) && fallback) q = fallback;
     if (!q) {
         // Last resort: the unseeded live-play path, as before this wave.
         try { q = generateQuestion(); } catch (e) { q = null; }
@@ -992,6 +1002,8 @@ function _wsRenderCard(grid, q, i) {
         'array-builder',
         // Tiered multiplication chart with missing products
         'mult-chart-tier',
+        // P8b: a window of the multiplication chart with its empty cells (medium card)
+        'mult-chart',
         // Vocabulary matching widget (vocab_grade_K..6, vocab_match)
         'vocab-match'];
     const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
@@ -1327,6 +1339,15 @@ function _wsRenderCard(grid, q, i) {
     if (cellEl) {
         if (!kind) _wsTidyLegacyCell(cellEl);
         if (!kind) wireTickBoxes(cellEl, q, document.getElementById(`ws_input_${i}`));
+        // One slot per answer (SL-7): the visual's own blank takes the input; the separate
+        // answer row under the cell then goes.
+        if (!kind && answerRow && !(q.options && q.options.length)) {
+            const row = cellEl.querySelector(':scope > .mq-answerrow');
+            const inp = row && row.querySelector(`#ws_input_${i}`);
+            if (inp && adoptVisualBlank(cellEl, inp)) row.remove();
+            // several blanks in one drawing: an input in each, feeding the (hidden) card input
+            else if (inp && wireCellSlots(cellEl, inp)) row.style.display = 'none';
+        }
         wireStackEntry(cellEl);
         monoCell(cellEl, {
             // a widget mounting late may print the question line again

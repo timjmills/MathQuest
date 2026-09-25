@@ -1,6 +1,6 @@
 // generate-question.js - Dispatcher: routes to domain-specific question generators
 import { state } from './state.js';
-import { DEFAULT_TABLES, SKILLS, DOMAINS, SKILL_GRADES, getSkillGrade, isMixedMetaSkill, getSkillsForCategory, getSkillsForDomain, getSkillsForGrade, getCategoryForSkill, getMixedSkillScope } from './data.js';
+import { DEFAULT_TABLES, SKILLS, DOMAINS, SKILL_GRADES, getSkillGrade, isMixedMetaSkill, getSkillsForCategory, getMixedPoolSkills, getSkillsForDomain, getSkillsForGrade, getCategoryForSkill, getMixedSkillScope } from './data.js';
 import { randInt, pick, buildNumericOptions } from './utils.js';
 
 // Domain-specific generators
@@ -354,7 +354,7 @@ function generateResolvedQuestion() {
         // Find all mixed_* entries in this category (single-category mixed skills)
         for (const s of catSkills) {
             if (s.v.startsWith('mixed_') && s.v !== 'mixed') {
-                categoryMixedSkills[s.v] = { category: catId, skills: playable };
+                categoryMixedSkills[s.v] = { category: catId, skills: getMixedPoolSkills(catId, s.v) };
             }
         }
     }

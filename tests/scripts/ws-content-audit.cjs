@@ -668,6 +668,22 @@ function p8Rules(items, F) {
     if (bad.plural.length) F('one-plural', `${bad.plural.length} items put a plural noun after 1: ${show(bad.plural)}`);
 }
 
+/**
+ * P8b: a number-bond page asks for the WHOLE as well as a part, and spreads its answers (the
+ * baseline page hid only parts and answered 1 on six items of twenty). The item's sentence is
+ * "part + part = whole", so a missing whole is the one that ends "= ?".
+ */
+function bondRules(items, F) {
+    const live = items.filter(it => it && !it.error && !it.empty);
+    if (!live.length) return;
+    const whole = live.filter(it => /=\s*\?\s*$/.test(String(it.text || ''))).length;
+    if (whole / live.length < 0.2) F('bond-whole', `${whole} of ${live.length} bonds ask for the whole; a bond page asks for the whole as well as a part (at least 1 in 5)`);
+    const tally = {};
+    for (const it of live) tally[String(it.ans)] = (tally[String(it.ans)] || 0) + 1;
+    const [top, n] = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
+    if (n / live.length > 0.2) F('bond-spread', `the answer ${top} is dealt on ${n} of ${live.length} bonds (more than 1 in 5): spread the answers`);
+}
+
 // fnv1a: a per-skill seed that depends on the skill id alone, so --skill reproduces the full run
 function seedFor(key) {
     let h = 2166136261;
@@ -1045,6 +1061,7 @@ function audit(skill, items) {
     // remainder in the answer itself ("59 R 5"), so this never fires; if it starts firing, a
     // generator has begun dropping remainders silently and the owner should see it.
     p8Rules(items, F);
+    if (id === 'number_bonds') bondRules(items, F);
 
     if (r.eqRemainder) NOTE('answer-floor', `${r.eqRemainder} of ${r.eqChecked} equations answer with the whole-number quotient and drop the remainder`);
 
@@ -1064,6 +1081,20 @@ function audit(skill, items) {
         F('ops', skill.pool
             ? `deals ${stray.join(' and ')}, which no skill in its pool of ${skill.pool.size} can produce (pool declares ${[...ops].join(' ')}; dealt ${list})`
             : `deals ${stray.join(' and ')}, which the name does not promise (name declares ${[...ops].join(' ') || 'nothing'}; dealt ${list})`);
+    }
+    // P8 name-hold: a mixed page named after ONE operation ("Mixed Division") is held to its
+    // own name, not to the pool union. The union licensed "9 × 8 = ___" on a Mixed Division page
+    // because a sibling in the category ("Mixed Multiplication & Division") promises ×; the app
+    // now narrows the pool (data.js getMixedPoolSkills), and this keeps it narrowed.
+    // Scoped to × and ÷ for now: Mixed Addition / Subtraction still draw add_sub_10s and
+    // unknown_start_wp, whose names promise both signs (a P8 leftover, owner to rule).
+    if (skill.pool && /^mixed_(multiplication|division)$/.test(id)) {
+        const own = declaredOps(id, label, categoryId);
+        const off = Object.keys(r.seenOps).filter(o => !own.has(o));
+        if (off.length) {
+            const list = Object.entries(r.seenOps).map(([k, v]) => `${k} x${v}`).join(', ');
+            F('name-hold', `"${label}" deals ${off.join(' and ')}, which its own name does not promise (dealt ${list}); narrow the pool in getMixedPoolSkills`);
+        }
     }
     if (skill.pool) NOTE('mixed-pool', `deliberately mixed: draws from ${skill.pool.size} sibling skills in ${categoryId}, whose names together declare ${[...ops].join(' ')}`);
 
@@ -1320,7 +1351,14 @@ function selfTest() {
         for (const [cat, list] of Object.entries(window.SKILLS)) {
             if (!Array.isArray(list)) continue;
             const playable = list.filter(x => !window.isMixedMetaSkill(x.v)).map(x => ({ v: x.v, l: x.l }));
-            for (const s of list) if (/^mixed[_ ]/.test(s.v) && playable.length) out[`${cat}:${s.v}`] = playable;
+            // P8: the app narrows a one-operation pool ("Mixed Division" never draws from "Mixed
+            // Multiplication & Division"); read the narrowed pool back when the app has one.
+            const pool = (id) => {
+                if (typeof window.getMixedPoolSkills !== 'function') return playable;
+                const keep = new Set(window.getMixedPoolSkills(cat, id));
+                return playable.filter(x => keep.has(x.v));
+            };
+            for (const s of list) if (/^mixed[_ ]/.test(s.v) && playable.length) out[`${cat}:${s.v}`] = pool(s.v);
         }
         return out;
     });

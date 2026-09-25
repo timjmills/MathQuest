@@ -13,7 +13,7 @@ import {
 import {
     cellKindFor, kindHTML, instructionForKind,
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
-    regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes,
+    regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
 } from './screen-cell.js';
 
 // Escape HTML-significant characters so q.text strings (which may contain
@@ -1373,6 +1373,7 @@ function _restoreAnswerSlot() {
     const input = document.getElementById('answerInput');
     const area = document.getElementById('answerInputArea');
     if (input && area && !area.contains(input)) area.insertBefore(input, area.firstChild);
+    releaseVisualBlank(input);
     if (input) {
         input.classList.remove('mq-slot', 'mq-slot--box', 'mq-slot--text');
         input.style.removeProperty('--mq-n');
@@ -1475,6 +1476,24 @@ function _applyScreenCell() {
             if (!qt.classList.contains('mq-dup')) screenTextLine(qt);
         }
         if (input && input.closest('#answerInputArea')) _styleSlot(input, q, 'line');
+        // One slot per answer (SL-7): a visual that draws its own blank ("5 − 2 = ___", a
+        // bond's empty box) takes the input in its place, and #answerInputArea is hidden.
+        const typed = !(q.options && q.options.length) && visualAid && visualAid.style.display !== 'none';
+        if (typed && input && !input.disabled && adoptVisualBlank(visualAid, input)) {
+            paper.classList.add('mq-slot-moved');
+            visualAid.dataset.mqNoZoom = '1';
+            if (!state.hasAnswered) {
+                try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); }
+            }
+        } else if (typed && input && !input.disabled && wireCellSlots(visualAid, input)) {
+            // several blanks in one drawing (a chart's empty cells): one input in each
+            paper.classList.add('mq-slot-moved');
+            visualAid.dataset.mqNoZoom = '1';
+            const first = visualAid.querySelector('input.mq-cellslot');
+            if (first && !state.hasAnswered) {
+                try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); }
+            }
+        }
         // A printed "Check one box." cell is tapped, not typed (PEDAGOGY 10.2, SP-3).
         if (visualAid && input && wireTickBoxes(visualAid, q, input)) paper.classList.add('mq-tick-mode');
     }
