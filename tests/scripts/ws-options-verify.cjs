@@ -327,8 +327,6 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
     for (const def of defs) {
         if (!def.label) statics.push(`${def.id}: no label`);
         if (!OPTION_KEYS[def.id]) statics.push(`${def.id}: no share-code key (the choice cannot travel in a link)`);
-        // P12: an extended ("X" + letter) key cannot sit beside `op` (skill-option-codec.js).
-        if (OPTION_KEYS[def.id] && OPTION_KEYS[def.id].length === 2 && defs.some(d => d.id === 'op')) statics.push(`${def.id}: extended key beside op (it cannot travel in a link)`);
         if (def.values) {
             const ls = def.values.map(x => x.l);
             if (new Set(ls).size !== ls.length) statics.push(`${def.id}: duplicate value labels`);

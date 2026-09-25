@@ -853,8 +853,9 @@ of one skill).
 | ROUTE | `p12RouteFor` before dispatch | time / elapsed / clock-ordering rungs (supersedable, P10 owns time and money) |
 | POOL | `narrowPool` | `members` on every mixed review (skills, or topics for grade / "_all" reviews) |
 
-Codec: two-character extended keys `X` + letter (`skill-option-codec.js`, XA … XM used, next XN),
-append-only and backward compatible; an extended key is never written beside `op`.
+Codec: two-character keys in block 5 of the key registry (`skill-option-keys.js`, 5A … 5M used,
+next 5N; they were `XA` … `XM` before anything shipped), append-only and backward compatible —
+see design/SHARE_CODES.md.
 
 ### Fixes found on the way (pre-existing bugs)
 
