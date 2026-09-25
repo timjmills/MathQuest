@@ -371,7 +371,7 @@ const K2_SHAPE_OF = {
     tenframe: ['ten-frame', 'ten-frame-build'],
     base10: ['base10-build'],
     chart: ['hundreds-chart-fill'],
-    grid: ['grid-fill'],
+    grid: ['grid-fill', 'seq-strip'],
     rods: ['tens-foundation'],
     select: ['multi-select'],
     oddeven: ['odd-even'],
@@ -596,6 +596,14 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv }) {
             item.remainderShown = new RegExp(`Remainder:?\\s*${rem}\\b|(^|\\s)R\\s*${rem}(\\s|$)`).test(vis);
         }
         if (q.printText) item.printTextAll = String(q.printText).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200);
+        // P10: a K-2 picture cell drawn by a sheet-kit template carries its plain-data payload
+        // (SCC-Q3), which the picture rules read instead of the drawing, and the words and
+        // numerals its screen twin prints (the caption-giveaway rule).
+        if (q.cell && q.cell.template && ['counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic'].includes(q.cell.template)) {
+            item.cellT = q.cell.template;
+            try { item.cellP = JSON.parse(JSON.stringify(q.cell.payload || {})); } catch (e) { item.cellP = {}; }
+            item.visPlain = String(q.visual || '').replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 400);
+        }
         if (pv) {
             const strip = (h) => String(h || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
             const vis = String(q.visual || '');
@@ -709,6 +717,91 @@ function p8Rules(items, F) {
     if (bad.give.length) F('giveaway', `${bad.give.length} items show the answer in the picture: ${show(bad.give)}`);
     if (bad.fam.length) F('fact-family', `${bad.fam.length} fact families are not three different numbers with parts of 2+ and a whole within 20: ${show(bad.fam)}`);
     if (bad.plural.length) F('one-plural', `${bad.plural.length} items put a plural noun after 1: ${show(bad.plural)}`);
+}
+
+/**
+ * P10: the K-2 picture cells (count_objects, number_seq_fill, compare_groups, number_bonds,
+ * base10_build, hundreds_chart_fill, ten_frame_build, share_into_groups, add_wp_10,
+ * sub_5_pictures), each drawn by a sheet-kit template and judged on its own payload.
+ *
+ *   answer-spread     no single numeric answer on more than 1 item in 5 (a label answer from a
+ *                     two-box bank, "A" / "B", is a choice, not a spread, and is not counted)
+ *   caption-giveaway  a fill-the-gaps cell (keyParts) never prints one of its answers, and no
+ *                     picture carries a range caption ("10s: 3-93", "Numbers 71-80") naming the
+ *                     ends of the run
+ *   chart-window      a 3 x 5 window of the 1-100 chart: every gap is inside the window, the key
+ *                     lists the gaps in reading order, each gap has a printed neighbour in its row
+ *                     or column, and the gaps are not all in one place across the skill
+ *   seq-track         a number track is one arithmetic run, its key is the run at the gaps, two
+ *                     printed neighbours show the step, and the skill deals several steps
+ */
+const K2_PICTURE_SKILLS = new Set(['count_objects', 'number_seq_fill', 'compare_groups', 'number_bonds', 'base10_build',
+    'hundreds_chart_fill', 'ten_frame_build', 'share_into_groups', 'add_wp_10', 'sub_5_pictures']);
+function pictureRules(items, F) {
+    const live = items.filter(it => it && !it.error && !it.empty);
+    if (!live.length) return;
+    const show = (a) => [...new Set(a)].slice(0, 4).join('; ');
+    // answer-spread
+    const nums = live.map(it => asNumber(it.ans)).filter(v => v !== null);
+    if (nums.length >= live.length * 0.8) {
+        const tally = {};
+        for (const v of nums) tally[v] = (tally[v] || 0) + 1;
+        const [top, n] = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
+        if (n / nums.length > 0.2) F('answer-spread', `the answer ${top} is dealt on ${n} of ${nums.length} items (more than 1 in 5): spread the answers`);
+    }
+    // caption-giveaway
+    const give = [];
+    for (const it of live) {
+        const vis = it.visPlain || '';
+        if (/\b\d+s?\s*:\s*\d[\d,]*\s*[-–]\s*\d/.test(vis) || /\bNumbers\s+\d+\s*[-–]\s*\d+/i.test(vis)) give.push(`range caption "${vis.slice(0, 40)}"`);
+        if (Array.isArray(it.keyParts) && it.cellT) {
+            const printed = new Set((vis.match(/\d[\d,]*/g) || []).map(t => t.replace(/,/g, '')));
+            const hit = it.keyParts.find(k => printed.has(String(k).replace(/,/g, '')));
+            if (hit !== undefined) give.push(`the answer ${hit} is printed in the cell`);
+        }
+    }
+    if (give.length) F('caption-giveaway', `${give.length} items print their own answer or the ends of their run: ${show(give)}`);
+    // chart-window
+    const chart = live.filter(it => it.cellT === 'chartwindow');
+    if (chart.length) {
+        const bad = [];
+        const spots = new Set();
+        for (const it of chart) {
+            const p = it.cellP || {};
+            const rows = p.rows || [], cols = p.cols || [], blanks = (p.blanks || []).map(Number);
+            const inWin = (n) => rows.includes(Math.floor((n - 1) / 10)) && cols.includes((n - 1) % 10);
+            const key = (it.keyParts || [String(it.ans)]).map(Number);
+            if (rows.length !== 3 || cols.length !== 5 || rows.some(r => r < 0 || r > 9) || cols.some(c => c < 0 || c > 9)) bad.push('the window is not 3 x 5 on the chart');
+            if (!blanks.length || blanks.some(b => !inWin(b))) bad.push(`a gap outside its window (${blanks.join(', ')})`);
+            if (key.join(',') !== blanks.slice().sort((a, b) => a - b).join(',')) bad.push(`the key ${key.join(', ')} is not the gaps ${blanks.join(', ')} in reading order`);
+            for (const b of blanks) {
+                const row = (n) => Math.floor((n - 1) / 10);
+                const nb = [b - 1, b + 1].filter(n => row(n) === row(b)).concat([b - 10, b + 10]).filter(inWin);
+                if (!nb.some(n => !blanks.includes(n))) bad.push(`the gap ${b} has no printed neighbour`);
+                spots.add(`${rows.indexOf(Math.floor((b - 1) / 10))}:${cols.indexOf((b - 1) % 10)}`);
+            }
+        }
+        if (bad.length) F('chart-window', `${bad.length} chart windows are wrong: ${show(bad)}`);
+        if (chart.length >= 20 && spots.size < 8) F('chart-window', `the gaps sit in only ${spots.size} of the window's 15 places across ${chart.length} items: deal them over the window`);
+    }
+    // seq-track
+    const seq = live.filter(it => it.cellT === 'seqstrip');
+    if (seq.length) {
+        const bad = [];
+        const steps = new Set();
+        for (const it of seq) {
+            const v = (it.cellP.values || []).map(Number), bl = (it.cellP.blanks || []).map(Number);
+            const d = v[1] - v[0];
+            steps.add(Math.abs(d));
+            if (v.length < 5 || !d || v.some((x, i) => i && x - v[i - 1] !== d)) bad.push(`not one arithmetic run (${v.join(', ')})`);
+            const key = (it.keyParts || [String(it.ans)]).map(Number);
+            if (key.join(',') !== bl.map(i => v[i]).join(',')) bad.push(`the key ${key.join(', ')} is not the run at its gaps`);
+            if (bl.includes(0) && bl.includes(v.length - 1)) bad.push('both ends are gaps');
+            if (!v.some((_, i) => i < v.length - 1 && !bl.includes(i) && !bl.includes(i + 1))) bad.push('no two printed neighbours show the step');
+        }
+        if (bad.length) F('seq-track', `${bad.length} number tracks are wrong: ${show(bad)}`);
+        if (seq.length >= 20 && steps.size < 3) F('seq-track', `every track counts by ${[...steps].join(' or ')}: deal several steps`);
+    }
 }
 
 /**
@@ -1383,6 +1476,7 @@ function audit(skill, items) {
     // generator has begun dropping remainders silently and the owner should see it.
     p8Rules(items, F);
     if (id === 'number_bonds') bondRules(items, F);
+    if (K2_PICTURE_SKILLS.has(id)) pictureRules(items, F);
 
     if (r.eqRemainder) NOTE('answer-floor', `${r.eqRemainder} of ${r.eqChecked} equations answer with the whole-number quotient and drop the remainder`);
 
