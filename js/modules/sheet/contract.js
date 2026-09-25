@@ -208,6 +208,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'estimate-compatible': 'Find a near number that divides easily. Then divide.',
     'estimate-closest': 'Circle the closest estimate.',
     'estimate-reasonable': 'Estimate. Check one box: Reasonable or Not reasonable.',
+    // O6 lane AP3 (2026-09-25): the fraction family's kit cells (sheet/cells/frac-model.js).
+    'frac-name': 'Write the fraction, or circle the model that shows it.',
+    'models-complete': 'Look at the two models. Complete the number sentence.',
+    'line-mark-each': 'Mark each number on the line.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',
@@ -261,6 +265,7 @@ const SCREEN_VERB_MAP = Object.freeze([
     ['Shade every multiple of', 'Tap every multiple of'],
     ['Draw a line to match', 'Tap the two that match'],
     ['Mark the number on the line', 'Tap the number on the line'],
+    ['Mark each number on the line', 'Tap each number, then its tick on the line'],
     ['Mark the number with a dot', 'Tap the line to place the number'],
     ['Shade the fraction', 'Tap the parts of the fraction'],
     ['Draw the hands', 'Drag the hands'],
