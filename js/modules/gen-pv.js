@@ -1192,14 +1192,16 @@ function genNearest(q, skill, o) {
     const lower = Math.floor(n / P) * P;
     const rounded = roundTo(n, P);
     const scope = ['notation', 'decision', 'judge'].includes(o.responseScope) ? o.responseScope : 'full';
+    // Plain (owner 2026-09-26): "Round 4,683 to the nearest 100." and a line - no drawing at all.
+    const plain = o.responseScope === 'plain';
     q.skillLabel = `Round to ${fmt(P)}`;
     q.options = [];
-    q.pv = { kind: 'round', n, place: P, deal: kind, scope };
+    q.pv = { kind: 'round', n, place: P, deal: kind, scope, ...(plain ? { plain: true } : {}) };
     // S2: `support` is a SET now. Its generation rungs are 'line' and 'cut' (line wins when both
     // are ticked); the chart and the marks ('round-pv', 'round-mark') are drawn round the cell at
     // render time. Nothing ticked (an old "none") is the bare number. A scalar is an old value.
     const sup = Array.isArray(o.support) ? o.support : [o.support === undefined || o.support === null ? 'cut' : o.support];
-    const support = scope === 'full' ? (sup.includes('line') ? 'line' : sup.includes('cut') ? 'cut' : 'none') : 'cut';
+    const support = plain ? 'none' : scope === 'full' ? (sup.includes('line') ? 'line' : sup.includes('cut') ? 'cut' : 'none') : 'cut';
     const strip = numeralTracksHTML(n, { cut: P, arrow: scope === 'full' || scope === 'judge' });
     if (scope === 'notation') {
         // RN-7a: find the place and the digit that decides — no rounding. Paper: underline and
@@ -1256,7 +1258,7 @@ function genNearest(q, skill, o) {
     } else if (support === 'none') {
         q.visual = '';
         q.hint = `Look at the digit after the ${PLACE_WORD[P]} place. 5 or more rounds up.`;
-        setCell(q, { kind: 'round', n, place: P, support: 'none' });
+        setCell(q, { kind: 'round', n, place: P, support: 'none', ...(plain ? { plain: true } : {}) });
     } else {
         q.visual = `<div style="text-align:center;">${strip}</div>`;
         q.hint = 'Look at the digit after the cut line. 5 or more rounds up.';
@@ -1629,12 +1631,92 @@ function genRoundSort(q, skill, o) {
 }
 
 /** RT-1 / RT-2: the rounding table — a whole column (or a whole row) blank, never one cell. */
+/**
+ * Round one number to several places (owner 2026-09-26: "round this number to nearest 10s, 100s,
+ * 1000s, or just two of them"). One number a problem, a line for each chosen place. The number is
+ * as big as the biggest place needs (its floor), inside the band / Max Number.
+ *
+ * Dealt, never rolled (block of six): a plain number, a halfway number (for one of the places, in
+ * turn; per the midpoint option), the chain trap (1,445: to the nearest 10 it is 1,450, to the
+ * nearest 100 it is 1,400, never 1,500 - M-R6), a number that rounds up across a place (9,962 ->
+ * 10,000 to the nearest 100), a plain number, and a zero in a middle place (4,062). Never a
+ * multiple of every chosen place (nothing to round).
+ */
+function roundMultiNumber(places, cap, o) {
+    const small = places[0], top = places[places.length - 1];
+    const lo = top + 1, hi = Math.max(top + 2, cap - 1);
+    const isMid = (v) => places.some((P) => v % P === P / 2);
+    const ok = (v) => v >= lo && v <= hi && v % top !== 0;
+    const plain = () => {
+        for (let t = 0; t < 80; t++) {
+            const v = randInt(lo, hi);
+            if (ok(v) && v % small !== 0 && !isMid(v)) return v;
+        }
+        return lo + (small > 1 ? 1 : 0);
+    };
+    let kind = o.midpoint === 'only' ? 'mid' : ['plain', 'mid', 'chain', 'across', 'plain', 'zero'][slot(6)];
+    if (kind === 'mid' && o.midpoint === 'never') kind = 'plain';
+    if (kind === 'chain' && (places.length < 2 || o.midpoint === 'never')) kind = 'plain';
+    if (kind === 'mid') {
+        // halfway for the chosen places in turn (4,685 for 10; 4,650 for 100)
+        const P = places[_at % places.length];
+        for (let t = 0; t < 40; t++) {
+            const v = randInt(Math.floor(lo / P), Math.floor(hi / P)) * P + P / 2;
+            if (ok(v)) return { n: v, kind };
+        }
+    }
+    if (kind === 'chain') {
+        const P2 = places[1];
+        for (let t = 0; t < 40; t++) {
+            const v = randInt(Math.max(1, Math.floor(lo / P2)), Math.floor(hi / P2)) * P2 + P2 / 2 - small / 2;
+            if (ok(v)) return { n: v, kind };
+        }
+    }
+    if (kind === 'across') {
+        // just under a multiple of ten of the smallest place's neighbour: every place rounds up
+        const T = small * 10;
+        for (let t = 0; t < 40; t++) {
+            const v = randInt(Math.ceil(lo / T), Math.floor(hi / T)) * T - randInt(1, Math.max(1, small / 2 - 1));
+            if (ok(v) && !isMid(v) && v % small !== 0) return { n: v, kind };
+        }
+    }
+    if (kind === 'zero' && String(hi).length >= 4) {
+        for (let t = 0; t < 40; t++) {
+            const ds = String(plain()).split('');
+            ds[randInt(1, ds.length - 2)] = '0';
+            const v = Number(ds.join(''));
+            if (ok(v) && v % small !== 0 && !isMid(v)) return { n: v, kind };
+        }
+    }
+    return { n: plain(), kind: 'plain' };
+}
+
+function genRoundMulti(q, skill, o, places, cap) {
+    const { n, kind } = roundMultiNumber(places, cap, o);
+    const keys = places.map((P) => roundTo(n, P));
+    const list = places.map(fmt);
+    const said = list.length > 1 ? `${list.slice(0, -1).join(', ')} and ${list[list.length - 1]}` : list[0];
+    q.text = `Round ${fmt(n)} to the nearest ${said}.`;
+    q.printText = `Round each number to the nearest ${said}.`;
+    inlineBlanks(q, `Round ${fmt(n)}. ${places.map((P) => `Nearest ${fmt(P)}: ___`).join('  ')}`, [keys],
+        keys.map(() => String(n).length + 1));
+    q.ans = keys.map(fmt).join('; ');
+    q.printAnswer = q.ans;
+    q.visual = '';
+    q.hint = 'Round from the number itself every time: find the place, then look at the digit after it.';
+    q.skillLabel = 'Round to Several Places';
+    q.pv = { kind: 'multi', n, places: places.slice(), keys, deal: kind };
+    setCell(q, { kind: 'round-multi', n, places: places.slice(), keys: keys.map(fmt), keyValue: q.ans });
+}
+
 function genRoundingTable(q, skill, o) {
-    let places = (Array.isArray(o.places) && o.places.length ? o.places : [10, 100]).map(Number).filter(p => [10, 100, 1000, 10000].includes(p));
+    let places = (Array.isArray(o.places) && o.places.length ? o.places : [10, 100]).map(Number).filter(p => [10, 100, 1000, 10000, 100000, 1000000].includes(p));
     if (!places.length) places = [10, 100];
     places.sort((a, b) => a - b);
     const top = places[places.length - 1];
     const cap = capOf('number_sense', skill, o, top * 10);
+    // One number a problem (the default, owner 2026-09-26); the table is a layout choice.
+    if (o.blank !== 'column' && o.blank !== 'row') { genRoundMulti(q, skill, o, places, cap); return; }
     const rowsN = 4;
     const nums = new Set();
     // One halfway number for the smallest place, and one chain-rounding trap (1,449: to the

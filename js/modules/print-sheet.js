@@ -484,13 +484,16 @@ function sentenceHtml(sf, c, ink) {
  * is measured with all of them (the worst case); the allocator later says which it draws, and the
  * rest are drawn invisibly, so the geometry never changes between measurement and print.
  */
+/** A Support set hidden by the skill's other choices (`appliesTo`: plain rounding) draws nothing. */
+const supportOff = (def, o) => typeof def.appliesTo === 'function' && !def.appliesTo(o);
+
 function supportPlanFor(sk, q, template, size, mix = null) {
     if (!sk || !q || !q.cell || template === 'legacy') return null;
     let def = null;
     try { def = optionsFor(sk.categoryId, sk.skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
     if (!def) return null;
     const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
-    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
+    const chosen = supportOff(def, o) ? [] : (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
     if (!chosen.length) return null;
     const p = q.cell.payload || {};
     let worst = chosen.filter((id) => canDraw(id, p, template));
@@ -537,7 +540,7 @@ function splitBySupports(sec, gi, n) {
     if (!def) return [sec];
     const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
     if ((n.mix || o.mix || 'section') !== 'section') return [sec];
-    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
+    const chosen = supportOff(def, o) ? [] : (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
     const alts = alternativesOf(chosen);
     // Up to four alternatives. A page-driven split is checked once its parts are measured (buildSheet
     // undoes it when one row of each does not fit a page, or when it holds fewer problems than the
@@ -564,7 +567,7 @@ function supportFactSpec(sk, q) {
     try { def = optionsFor(sk.categoryId, sk.skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
     if (!def) return null;
     const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
-    if (!(Array.isArray(o.support) ? o.support : []).some((v) => def.render.includes(v))) return null;
+    if (supportOff(def, o) || !(Array.isArray(o.support) ? o.support : []).some((v) => def.render.includes(v))) return null;
     const op = KIT_OP[q.op];
     return { template: 'fact', payload: { a: Number(q.a), b: Number(q.b), op, notation: q.notation === 'across' ? 'horiz' : 'vertical', digits: 2 } };
 }

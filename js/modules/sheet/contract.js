@@ -207,6 +207,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'counters-move': 'Move each counter one place. Write the answer.',
     'counters-all': 'Write every number the counters make. Start with the smallest.',
     'draw-dots': 'Draw dots in the chart to show the number.',
+    // rounding_table, one number a problem (owner 2026-09-26): {place} is the list "10, 100 and 1,000".
+    'round-places': 'Round each number to the nearest {place}.',
     'sort-round': 'Write each number under what it rounds to.',
     'round-table': 'Round each number. Fill in the table.',
     estimate: 'Round each number. Then estimate.',

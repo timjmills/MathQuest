@@ -1545,6 +1545,15 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
                     if (pv.hi > R * 1.0001 && R >= 20) add('pv-band', `a line to ${pv.hi} past ${R}`);
                     break;
                 }
+                case 'multi': {
+                    // one number rounded to several places (owner 2026-09-26): every key recomputed,
+                    // never a number that is already a multiple of every place.
+                    const want = (pv.places || []).map((P) => pvRound(pv.n, P));
+                    if (want.join() !== (pv.keys || []).join() || !(it.keyParts || []).length || it.keyParts.map(Number).join() !== want.join()) add('pv-recompute', `${pv.n} rounds to ${want.join(', ')}, keyed ${(it.keyParts || []).join(', ')}`);
+                    const top = Math.max(...(pv.places || [1]));
+                    if (pv.n % top === 0 || pv.n <= top) add('pv-band', `${pv.n}: nothing to round to the nearest ${(pv.places || []).join(', ')}`);
+                    break;
+                }
                 case 'table': {
                     const want = (pv.cells || []).map(([r, c]) => pvRound(pv.rows[r], pv.places[c]));
                     if (want.join() !== (pv.keys || []).join() || !(it.keyParts || []).length || it.keyParts.map(Number).join() !== want.join()) add('pv-recompute', `table keys ${want.join(', ')}, keyed ${(it.keyParts || []).join(', ')}`);
@@ -1728,8 +1737,10 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
         for (const pg of pages) {
             if (pg.some(x => !x || !x.pv)) continue;
             const mid = pg.some(x => x.pv.kind === 'round' ? pvRound(x.pv.n, x.pv.place) - x.pv.n === x.pv.place / 2
-                : x.pv.kind === 'sort' ? (x.pv.tiles || []).some(t => Math.abs(t - x.pv.bins[0] - x.pv.place / 2) < 1e-9) : false);
-            const across = pg.some(x => x.pv.kind !== 'round' || (pvRound(x.pv.n, x.pv.place) > x.pv.n && pvRound(x.pv.n, x.pv.place) % (10 * x.pv.place) === 0));
+                : x.pv.kind === 'multi' ? (x.pv.places || []).some(P => x.pv.n % P === P / 2)
+                    : x.pv.kind === 'sort' ? (x.pv.tiles || []).some(t => Math.abs(t - x.pv.bins[0] - x.pv.place / 2) < 1e-9) : false);
+            const across = pg.some(x => (x.pv.kind === 'multi' ? (x.pv.places || []).some(P => pvRound(x.pv.n, P) > x.pv.n && pvRound(x.pv.n, P) % (10 * P) === 0)
+                : x.pv.kind !== 'round' || (pvRound(x.pv.n, x.pv.place) > x.pv.n && pvRound(x.pv.n, x.pv.place) % (10 * x.pv.place) === 0)));
             if (!mid) noMid++;
             if (!across) noAcross++;
         }

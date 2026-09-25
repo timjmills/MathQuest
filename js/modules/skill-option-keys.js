@@ -329,9 +329,9 @@ export const VALUE_TOKENS = Object.freeze({
     // P9 step 8 (block 0)
     form: Object.freeze({ value: 'V', unit: 'U', notation: 'N', sum: 'S' }),
     frame: Object.freeze({ boxes: 'B', line: 'L' }),
-    responseScope: Object.freeze({ full: 'F', notation: 'N', decision: 'D', judge: 'J' }),
+    responseScope: Object.freeze({ full: 'F', notation: 'N', decision: 'D', judge: 'J', plain: 'P' }),
     bins: Object.freeze({ adjacent: 'A', apart: 'P', three: 'T' }),
-    blank: Object.freeze({ column: 'C', row: 'R' }),
+    blank: Object.freeze({ column: 'C', row: 'R', list: 'L' }),
     line: Object.freeze({ plotted: 'P', mark: 'M', ends: 'E' }),
     closeness: Object.freeze({ far: 'F', close: 'C', some: 'S' }),
     lengths: Object.freeze({ equal: 'E', mixed: 'M' }),
@@ -368,7 +368,7 @@ export const VALUE_TOKENS = Object.freeze({
     // no one-character base-36 form and takes X.
     step: Object.freeze({ 45: 'X' }),
     power: Object.freeze({ 10: '1', 100: '2', 1000: '3' }),
-    places: Object.freeze({ 1: '0', 10: '1', 100: '2', 1000: '3', 10000: '4', 100000: '5' }),
+    places: Object.freeze({ 1: '0', 10: '1', 100: '2', 1000: '3', 10000: '4', 100000: '5', 1000000: '6' }),
 });
 
 // Every member a numeric SET option takes on any skill, written as itself in base 36 (7 -> "7",

@@ -295,8 +295,11 @@ function hundreds(c, { rows, ring = null, bottomUp = false }) {
 // on every rounding line, and neither is marked.
 function roundLine(c, n, place) {
     const lo = Math.floor(n / place) * place, hi = lo + place, mid = lo + place / 2;
-    const len = by(c, { S: 90, M: 95, L: 100 }), pad = 8;   // tick pitch 9-10 mm (RP-51)
     const pt = c.S.zonePt + 1;
+    // The end labels stand centred on the end ticks: the pad holds half the longest one, so
+    // "8,000,000" is never clipped at the drawing's edge (the plain rounding ladder to 1,000,000).
+    const pad = Math.max(8, hi.toLocaleString('en-US').length * 0.56 * mm(pt) / 2 + 1);
+    const len = by(c, { S: 90, M: 95, L: 100 });   // tick pitch 9-10 mm (RP-51)
     const axisY = 8;
     const W = len + 2 * pad, H = axisY + 5 + mm(pt) * 1.4 + 1;
     let body = `<line x1="1" y1="${axisY}" x2="${n2(W - 1)}" y2="${axisY}" ${st(c, SW.heavy)}/>`
@@ -429,7 +432,9 @@ export const PLACE_PANES = {
     },
     'round-line': {
         label: 'Rounding number line', grades: ['3', '4'], ops: ['round'], scaffold: 'hint',
-        accepts(p) { return Number.isInteger(num(p.n)) && num(p.n) >= 0 && PLACES.includes(num(p.place || 10)); },
+        // Every place to 1,000,000 (owner 2026-09-26, the plain rounding ladder): the line is always
+        // ten intervals with its two ends and halfway labelled, whatever the place.
+        accepts(p) { return Number.isInteger(num(p.n)) && num(p.n) >= 0 && num(p.n) <= 9999999 && RPV_PLACES.includes(num(p.place || 10)); },
         sentence: roundSentence,
         geom(p, c) {
             const place = num(p.place || 10);

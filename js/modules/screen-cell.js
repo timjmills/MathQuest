@@ -2216,7 +2216,9 @@ export function fitTwinRows(root) {
  */
 const PV_TWIN_KINDS = new Set(['frame', 'value', 'compare', 'round', 'expand-line', 'place-bank', 'disks', 'estimate', 'blanks', 'chart',
     // build lane placevalue: the number line of any scale (read the arrow; the lettered numbers)
-    'scale']);
+    'scale',
+    // one number rounded to several places (rounding_table, owner 2026-09-26): a line per place
+    'round-multi']);
 const PV_TWIN_TYPES = new Set(['number', 'text', 'symbol', 'inline-blanks', 'pv-digit-drag', '', undefined]);
 
 function _categoriesOf(skillId, given) {

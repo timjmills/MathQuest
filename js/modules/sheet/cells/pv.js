@@ -738,7 +738,16 @@ register('pv', {
                     return `<div class="pv-cell">${head}${center(p.mark ? `<div data-ws-slot="mark" data-ws-shape="draw">${line}</div>` : line)}`
                         + `${frameHTML(ctx, `Round to the nearest ${fmt(p.place)}: ____`, kv, rDigits)}</div>`;
                 }
-                const pic = p.support === 'none' ? big(`${esc(fmt(p.n))} →`) : numeral({ cut: p.place, arrow: true });
+                if (p.support === 'none') {
+                    // Plain (no drawing): "4,683 →" and the line. The two halves may stack when the
+                    // number is long (a 6-digit number at size L), so a plain page keeps two columns
+                    // instead of one (LESSONS L1/L2); the number never splits from its arrow.
+                    const keep = 'display:inline-block;white-space:nowrap;';
+                    const long = String(Math.trunc(Math.abs(Number(p.n) || 0))).length >= 5;
+                    return `<div class="pv-cell pv-round1 pv-round-plain" style="text-align:center;${long ? '' : 'white-space:nowrap;'}">`
+                        + `<span style="${keep}">${big(`${esc(fmt(p.n))} →`)}</span> <span style="${keep}">${big(slot)}</span></div>`;
+                }
+                const pic = numeral({ cut: p.place, arrow: true });
                 return `<div class="pv-cell pv-round1" style="text-align:center;white-space:nowrap;">${pic}${big(slot)}</div>`;
             }
             case 'round-notate': {
@@ -789,6 +798,22 @@ register('pv', {
             }
             case 'table':
                 return `<div class="pv-cell">${tableHTML(p, ctx)}</div>`;
+            case 'round-multi': {
+                // One number rounded to every chosen place (owner 2026-09-26): the number, then one
+                // row per place - "Nearest 100 →" and a line. Every line is as wide as the longest
+                // answer the number can have (one digit more), so no line tells which rounds up.
+                // The number stands BESIDE its lines where the column is wide enough, over them
+                // where it is not (footprint `restacks`), so a cell is only as tall as its lines.
+                // The page instruction names the places; each line is labelled with its place.
+                const w = String(Math.trunc(Math.abs(Number(p.n) || 0))).length + 1;
+                const rows = (p.places || []).map((P, i) => `<div style="display:table-row;">`
+                    + `<span style="display:table-cell;text-align:right;padding:0 2mm 0 0;font-size:${pt(m.textPt + 2)};white-space:nowrap;vertical-align:bottom;">${esc(fmt(P))} →</span>`
+                    + `<span style="display:table-cell;padding:0.5mm 0;vertical-align:bottom;">${blank({ id: `b${i}`, kind: 'number', shape: 'line', digits: w, graded: true, order: i,
+                        scopes: ['full', 'answer-only'] }, ctx, (p.keys || [])[i])}</span></div>`).join('');
+                return `<div class="pv-cell pv-rmulti" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;column-gap:6mm;row-gap:1mm;">`
+                    + `<div style="white-space:nowrap;">${big(esc(fmt(p.n)))}</div>`
+                    + `<div class="ws-eq" style="display:table;font-weight:700;">${rows}</div></div>`;
+            }
             case 'scale': {
                 // nl_20 (number_sense:number_line_scales): read the arrow, write the lettered
                 // numbers, mark a number, or estimate where it goes on a line with only its ends.
@@ -879,7 +904,7 @@ register('pv', {
         const display = typeof value === 'number' ? value.toLocaleString('en-US') : String(value);
         const slots = { answer: { value: display, graded: true, accept: [String(value)] } };
         if (p.kind === 'expand') (p.parts || []).forEach((v, i) => { slots[`part${i}`] = { value: fmt(v), graded: true }; });
-        if (p.kind === 'blanks' || p.kind === 'estimate') (p.keys || []).forEach((v, i) => { slots[`b${i}`] = { value: String(v), graded: true }; });
+        if (p.kind === 'blanks' || p.kind === 'estimate' || p.kind === 'round-multi') (p.keys || []).forEach((v, i) => { slots[`b${i}`] = { value: String(v), graded: true }; });
         if (p.kind === 'order' || (p.kind === 'disks' && p.task === 'all')) (p.sorted || []).forEach((v, i) => { slots[`o${i}`] = { value: String(v), graded: true }; });
         if (p.kind === 'chart') (p.keys || []).forEach((v, i) => { slots[`d${i}`] = { value: String(v), graded: true }; });
         if (p.kind === 'scale' && p.task === 'fill') (p.targets || []).forEach((v, i) => { slots[`b${i}`] = { value: fmt(v), graded: true }; });
@@ -890,7 +915,7 @@ register('pv', {
         const nd = String(p.n === undefined ? '' : p.n).length;
         const wide = p.kind === 'sort' || p.kind === 'table' || p.kind === 'line-mark' || p.kind === 'chart' || p.kind === 'scale'
             || (p.kind === 'word-choice' && Math.max(0, ...(p.choices || []).map(c => String(c).length)) > 30)
-            || (p.kind === 'round' && (p.support === 'line' || nd >= 6)) || (p.kind === 'judge' && nd >= 6)
+            || (p.kind === 'round' && (p.support === 'line' || (nd >= 6 && p.support !== 'none'))) || (p.kind === 'judge' && nd >= 6)
             || ((p.kind === 'disks' || p.kind === 'build') && (p.places || []).length >= 3)
             || (p.kind === 'expand' && (nd >= 4 || (nd === 3 && ctx.size === 'L')))
             || ((p.kind === 'blanks' || p.kind === 'expand-line') && String(p.frame || p.n || '').length > 34)
@@ -907,7 +932,10 @@ register('pv', {
         // class (5 rows); at M and L the one-column grid (4 rows) - 'wide' there would drop L to 3
         // rows and leave a third of every cell empty (L2).
         const fclass = ctx.size === 'S' && wide && (p.kind === 'scale' || ((p.kind === 'disks' || p.kind === 'build') && (p.places || []).length >= 3)) ? 'wide' : undefined;
-        return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2, ...(fclass ? { fclass } : {}) };
+        // A plain rounding cell stacks its line under the number on purpose when the column is
+        // narrow (the render keeps "4,683 →" whole): that is not a collapse (measureItems' reflow).
+        const restacks = (p.kind === 'round' && p.support === 'none' && nd >= 5) || p.kind === 'round-multi';
+        return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2, ...(fclass ? { fclass } : {}), ...(restacks ? { restacks } : {}) };
     },
     inputs() { return [{ id: 'answer', kind: 'number', shape: 'line', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },
     layout(p) {

@@ -399,6 +399,14 @@ const PV_MAKERS = {
             answerType: plotted ? 'number' : 'inline-blanks' };
     }])),
     'number_sense:rounding_table': (r, i) => {
+        // one number rounded to several places (the default layout, owner 2026-09-26): every other item
+        if (i % 2 === 0) {
+            const places = [[10, 100], [10, 100, 1000], [100, 1000, 10000, 100000, 1000000]][(i / 2) % 3];
+            const top = places[places.length - 1];
+            const n = i % 4 === 0 ? int(r, 1, 9) * top + places[0] / 2 * 3 : int(r, top + 1, top * 10 - 1);
+            const keys = places.map((P) => rnd(n, P));
+            return { pv: { kind: 'multi', n, places, keys }, ans: keys.join('; '), keyParts: keys.map(String), answerType: 'inline-blanks' };
+        }
         const rows = [int(r, 101, 999), int(r, 101, 999), int(r, 101, 999), int(r, 101, 999)]; const places = [10, 100]; const c = i % 2;
         const cells = rows.map((_, k) => [k, c]); const keys = cells.map(([k, cc]) => rnd(rows[k], places[cc]));
         return { pv: { kind: 'table', rows, places, blank: 'column', cells, keys }, ans: keys.join('; ') };
@@ -410,7 +418,9 @@ for (const [id, P] of [['nearest_10', 10], ['nearest_100', 100], ['nearest_1000'
         const scope = ['full', 'full', 'full', 'decision', 'judge'][i % 5];
         const rd = rnd(n, P); const shown = i % 2 ? rd : Math.floor(n / P) * P === rd ? rd + P : Math.floor(n / P) * P;
         const ans = scope === 'decision' ? (rd > n ? 'Round up' : 'Round down') : scope === 'judge' ? (shown === rd ? 'Correct' : 'Fix it') : rd;
-        return { pv: { kind: 'round', n, place: P, scope, shown }, ans };
+        // plain rounding (owner 2026-09-26): no drawing, the steps name the place's digit
+        const plain = scope === 'full' && i % 3 === 2;
+        return { pv: { kind: 'round', n, place: P, scope, shown, ...(plain ? { plain: true } : {}) }, ans };
     };
 }
 for (const [id, P] of [['round_sort_10', 10], ['round_sort_100', 100], ['round_sort_1000', 1000], ['round_sort_10000', 10000], ['round_sort_100000', 100000], ['round_sort_million', 1000000]]) {

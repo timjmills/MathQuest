@@ -1189,7 +1189,7 @@ export const SKILLS = {
         { v: "estimate_sums_diffs", l: "Estimate Sums & Differences" },
         { v: "estimate_products", l: "Estimate Products" },
         { v: "estimate_quotient", l: "Estimate Quotients" },
-        { v: "rounding_table", l: "Rounding Table" },
+        { v: "rounding_table", l: "Round to Several Places (10, 100, 1,000 ...)" },
         { v: "make_a_ten", l: "Make a Ten Strategy" },
         { v: "doubles_near_doubles", l: "Doubles & Near Doubles" },
         { v: "compensation", l: "Compensation Strategy" },

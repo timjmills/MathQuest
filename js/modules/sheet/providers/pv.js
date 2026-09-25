@@ -904,7 +904,8 @@ function roundingSteps(q) {
             step(`Circle the digit after it: ${next}.`, [{ slot: 'b0', value: String(digitAt(p.n, P)) }, { slot: 'b1', value: String(next) }])];
     }
     const out = [step(`${f(p.n)} is between ${f(lo)} and ${f(lo + P)}.`),
-        p.n - lo === P / 2 ? step(`It is exactly halfway. Halfway rounds up.`) : step(`The digit after the cut is ${next}: ${next >= 5 ? '5 or more, round up' : '4 or less, round down'}.`)];
+        p.n - lo === P / 2 ? step(`It is exactly halfway. Halfway rounds up.`)
+            : step(`The digit after ${p.plain ? `the ${PLACE_WORD[P]} digit` : 'the cut'} is ${next}: ${next >= 5 ? '5 or more, round up' : '4 or less, round down'}.`)];
     if (p.scope === 'decision') return out.concat(step(`Check ${String(q.ans)}.`, [{ slot: 'answer', value: String(q.ans) }]));
     if (p.scope === 'judge') return out.concat(step(`${f(p.n)} rounds to ${f(r)}.`), step(`${f(p.shown)} is ${p.shown === r ? 'correct' : 'wrong'}.`, [{ slot: 'answer', value: String(q.ans) }]));
     return out.concat(step(`${f(p.n)} rounds to ${f(r)}.`), step(`Write ${f(r)}.`, [{ slot: 'answer', value: f(r) }]));
@@ -955,11 +956,23 @@ const nearestDef = (P) => ({
     sayValues: roundSayValues,
 });
 
+// Plain rounding (owner 2026-09-26): no cut line on the page, so the steps name the place's digit.
+const nearestPlainDef = (P) => ({
+    ...nearestDef(P),
+    steps: [`Find the ${PLACE_WORD[P]} digit.`, 'Look at the digit just after it.', '5 or more: round up. 4 or less: round down.'],
+});
+
 for (const [id, P] of [['nearest_10', 10], ['nearest_100', 100], ['nearest_1000', 1000], ['nearest_10000', 10000], ['nearest_100000', 100000], ['nearest_million', 1000000]]) {
     const main = nearestDef(P);
+    const plainDef = nearestPlainDef(P);
     registerSkill(`number_sense:${id}`, {
+        // The support ladder on screen (support-ladder.js): a wrong answer first marks the digits
+        // (the place's digit ringed, the next one underlined), then adds the rounding number line,
+        // then the place-value chart. Owner 2026-09-26.
+        supports: ['round-mark', 'round-line', 'round-pv'],
         strings: stringsBy((q) => {
             const p = pvOf(q);
+            if (p.plain || p.responseScope === 'plain') return plainDef;
             if (p.kind === 'circle') return ROUND_CIRCLE;
             return p.scope === 'notation' ? ROUND_NOTATE : p.scope === 'decision' ? ROUND_DECIDE : p.scope === 'judge' ? ROUND_JUDGE : null;
         }, main),
@@ -1259,16 +1272,62 @@ for (const [id, P] of SORTS) {
     });
 }
 
+/* One number rounded to several places (owner 2026-09-26). The steps and the Say line are the
+ * item's own number and places; the wrong answers are the four real errors: rounded the rounded
+ * number (chain, M-R6), rounded to the place below (M-R5), cut the digits off (always down, M-R1),
+ * rounded halfway down (M-R2). */
+const placesSaid = (pl) => { const l = pl.map(f); return l.length > 1 ? `${l.slice(0, -1).join(', ')} and ${l[l.length - 1]}` : (l[0] || '10'); };
+const ROUND_MULTI = {
+    iCan: 'I Can round a number to different places',
+    instructionKey: 'round-places',
+    instructionVars: (q) => { const p = pvOf(q); const pl = arr(p.places).map(Number); return { place: placesSaid(pl.length ? pl : [10, 100]) }; },
+    steps: ['Find the place you round to.', 'Look at the digit just after it: 5 or more rounds up.', 'Start again from the number for each place.'],
+    say: 'To the nearest __, __ rounds to __.',
+    sayValues: (q) => { const p = pvOf(q); const pl = arr(p.places).map(Number); return pl.length && p.n !== undefined ? [f(pl[pl.length - 1]), f(p.n), f(roundTo(p.n, pl[pl.length - 1]))] : null; },
+};
+function multiSteps(q) {
+    const p = pvOf(q);
+    const places = arr(p.places).map(Number);
+    if (!places.length) return [];
+    const out = places.slice(0, 3).map((P, i) => {
+        const lo = Math.floor(p.n / P) * P, r = roundTo(p.n, P);
+        const nx = digitAt(p.n, P / 10 >= 1 ? P / 10 : 1);
+        const why = p.n - lo === P / 2 ? 'exactly halfway, so round up' : `the next digit is ${nx}, so round ${nx >= 5 ? 'up' : 'down'}`;
+        return step(`Nearest ${f(P)}: ${f(p.n)} is between ${f(lo)} and ${f(lo + P)}; ${why}: ${f(r)}.`, [{ slot: `b${i}`, value: f(r) }]);
+    });
+    if (places.length > 3) out.push(step(`Do the same for ${places.slice(3).map(f).join(' and ')}.`, places.slice(3).map((P, k) => ({ slot: `b${k + 3}`, value: f(roundTo(p.n, P)) }))));
+    return clampSteps(out.length >= 3 ? out : [step(`Round ${f(p.n)} from the number itself each time.`)].concat(out));
+}
+function multiWrong(q) {
+    const p = pvOf(q);
+    const places = arr(p.places).map(Number);
+    if (!places.length) return null;
+    const right = places.map((P) => roundTo(p.n, P));
+    const as = (list, misconception, explain) => (list.some((v, i) => v !== right[i])
+        ? { value: list.map(f).join('; '), misconception, explain, slots: Object.fromEntries(list.map((v, i) => [`b${i}`, f(v)])) } : null);
+    const chain = places.map((P, i) => (i ? roundTo(roundTo(p.n, places[i - 1]), P) : roundTo(p.n, P)));
+    const below = places.map((P) => (P >= 100 ? roundTo(p.n, P / 10) : Math.floor(p.n / P) * P));
+    const cut = places.map((P) => Math.floor(p.n / P) * P);
+    const halfDown = places.map((P) => (p.n % P === P / 2 ? p.n - P / 2 : roundTo(p.n, P)));
+    return choose(q, [
+        as(chain, 'M-R6', 'Rounded the rounded number again, not the number itself.'),
+        as(halfDown, 'M-R2', 'Rounded halfway down.'),
+        as(below, 'M-R5', 'Rounded to the place below the one asked.'),
+        as(cut, 'M-R1', 'Cut the digits off: always rounded down.'),
+    ]);
+}
+
 registerSkill('number_sense:rounding_table', {
-    strings: strings({
+    strings: stringsBy((q) => (pvOf(q).kind === 'multi' || (pvOf(q).blank !== 'column' && pvOf(q).blank !== 'row' && pvOf(q).kind !== 'table') ? ROUND_MULTI : null), {
         iCan: 'I Can round a number to different places',
         instructionKey: 'round-table',
         steps: ['Round from the number itself every time.', 'Find the place, then the digit after it.', '5 or more rounds up.'],
         say: 'To the nearest __, __ is __.',
         sayValues: (q) => { const p = pvOf(q); const rows = arr(p.rows); const pl = arr(p.places); return rows.length ? [pl[0], rows[0], roundTo(rows[0], pl[0])] : null; },
     }),
-    misconceptions: ['M-R6', 'M-R5', 'M-R1'],
+    misconceptions: ['M-R6', 'M-R5', 'M-R1', 'M-R2'],
     workedSteps: (q) => {
+        if (pvOf(q).kind === 'multi') return multiSteps(q);
         const p = pvOf(q);
         const cells = arr(p.cells);
         const rows = arr(p.rows).map(Number);
@@ -1279,6 +1338,7 @@ registerSkill('number_sense:rounding_table', {
         return clampSteps(out.length >= 3 ? out : [step('Round from the number itself.')].concat(out));
     },
     wrongAnswer: (q) => {
+        if (pvOf(q).kind === 'multi') return multiWrong(q);
         const p = pvOf(q);
         const cells = arr(p.cells);
         const rows = arr(p.rows).map(Number);

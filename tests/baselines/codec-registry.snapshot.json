@@ -306,7 +306,8 @@
       "100": "2",
       "1000": "3",
       "10000": "4",
-      "100000": "5"
+      "100000": "5",
+      "1000000": "6"
     },
     "order": {
       "largest": "L",
@@ -471,7 +472,8 @@
       "full": "F",
       "notation": "N",
       "decision": "D",
-      "judge": "J"
+      "judge": "J",
+      "plain": "P"
     },
     "bins": {
       "adjacent": "A",
@@ -480,7 +482,8 @@
     },
     "blank": {
       "column": "C",
-      "row": "R"
+      "row": "R",
+      "list": "L"
     },
     "line": {
       "plotted": "P",

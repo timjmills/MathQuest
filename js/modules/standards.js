@@ -617,7 +617,7 @@ export const SKILL_STANDARDS = {
     'number_sense:estimate_sums_diffs': { ccss: ['3.NBT.A.1', '3.OA.D.8'], ee: ['M.EE.3.NBT.1', 'M.EE.3.OA.7', 'M.EE.4.NBT.3', 'M.EE.5.NBT.4'] }, // Estimate Sums & Differences
     'number_sense:estimate_products': { ccss: ['4.OA.A.3', '4.NBT.A.3'], ee: ['M.EE.4.OA.3', 'M.EE.4.NBT.3'] }, // Estimate Products
     'number_sense:estimate_quotient': { ccss: ['4.NBT.B.6', '4.OA.A.3'], ee: ['M.EE.4.OA.3'] }, // Estimate Quotients
-    'number_sense:rounding_table': { ccss: ['3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Rounding Table
+    'number_sense:rounding_table': { ccss: ['3.NBT.A.1', '4.NBT.A.3'], ee: ['M.EE.3.NBT.1', 'M.EE.4.NBT.3'] }, // Round to Several Places (to 1,000,000: 4.NBT.3)
     'number_sense:make_a_ten': { ccss: ['1.OA.C.6'], ee: [] }, // Make a Ten Strategy
     'number_sense:doubles_near_doubles': { ccss: ['1.OA.C.6'], ee: [] }, // Doubles & Near Doubles
     'number_sense:compensation': { ccss: ['2.NBT.B.5'], ee: ['M.EE.2.NBT.5'] }, // Compensation Strategy
