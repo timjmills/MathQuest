@@ -85,7 +85,7 @@ export const VALUE_TOKENS = {
     op: { x: 'M', '/': 'D' },
     order: { largest: 'L', scrambled: 'S' },
     midpoint: { never: 'N', seeded: 'S', only: 'O' },
-    support: { cut: 'C', line: 'L', none: 'N' },
+    support: { cut: 'C', line: 'L', none: 'N', labels: 'B', chart: 'T' },
     // Numeric sets whose members are not all under 36: one digit per power of ten.
     power: { 10: '1', 100: '2', 1000: '3' },
     places: { 1: '0', 10: '1', 100: '2', 1000: '3', 10000: '4', 100000: '5' },

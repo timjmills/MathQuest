@@ -10,9 +10,14 @@
 //     that rounds to N" is `response: circle-all`, its own step); the ones that were a different
 //     skill left (placing a number on a line is RN-2's new id, "click all numbers 10 more than
 //     57" had nothing to select). What a page varies is dealt round-robin off state.itemIndex.
-//   * THE BAND BINDS (§2.1, owner ruling 2). `band` caps the number, Max Number caps the band, the
-//     place sets a floor. A skill whose place Max Number cannot host is REFUSED (q.refused), never
-//     silently dealt at a bigger number — generateQuestionFor() then returns null.
+//   * THE BAND BINDS (owner ruling of 2026-09-25, superseding §2.1). The skill's own `band` SETS
+//     the working range and the place sets a floor under it (pvBand); Max Number lowers it only
+//     when the teacher explicitly set Max Number below it (pvCap — the app default 100 is "not
+//     chosen"). A skill whose place an explicitly lowered Max Number cannot host is REFUSED
+//     (q.refused), never silently dealt at a bigger number — generateQuestionFor() returns null.
+//   * SUPPORT IS AN OPTION. The place-value chart / bare numeral (identify, value), the hundreds
+//     chart / number line (more / less) and the number line between the bins (round_sort_*) are
+//     drawn by pv-support-cell.js, on screen (q.visual) and in print (the `pv-support` template).
 //   * THE ANSWER IS NOT IN THE ITEM (§17 answer-in-item, Q-8). No place strip with the target
 //     picked out, no "5 x 10 = ?", no midpoint label, no plotted dot, no bars with the distances
 //     written on them, no more / less cross printing the neighbours, no hint holding the answer.
@@ -31,8 +36,9 @@
 
 import { state } from './state.js';
 import { randInt, shuffle } from './utils.js';
-import { normalizeOptions, pvRefusal, pvRoundPlace } from './skill-options.js';
+import { normalizeOptions, pvRefusal, pvRoundPlace, pvCap, pvBand } from './skill-options.js';
 import { diskMatSVG, numeralTracksHTML, roundingLineSVG } from './sheet/index.js';
+import { plainNumeralHTML, placeChartHTML, hundredsRowsHTML, hundredsWindow, pvLineSVG, moreLessLine } from './pv-support-cell.js';
 
 const PLACE_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands', 1000000: 'millions' };
 const PLACE_ONE = { 1: 'one', 10: 'ten', 100: 'hundred', 1000: 'thousand', 10000: 'ten thousand', 100000: 'hundred thousand', 1000000: 'million' };
@@ -67,8 +73,19 @@ function digitSpan(cap) {
     return [lo, c];
 }
 
+/**
+ * True while this skill is dealt as a member of a mixed review (state.skill is the review's id).
+ * The review has no band of its own, so its Max Number caps every member (pvCap `strict`).
+ */
+const inReview = (skill) => !!state.skill && state.skill !== skill && /(^mixed|_all$|_mixed$)/.test(String(state.skill));
+
+/** The biggest number this skill deals: its band (or `fallback`), floored by its place, capped by pvCap. */
+function capOf(cat, skill, o, fallback) {
+    return pvCap(pvBand(cat, skill, o, fallback), state.range, inReview(skill));
+}
+
 function refuse(q, cat, skill, o) {
-    const msg = pvRefusal(cat, skill, state.range, o);
+    const msg = pvRefusal(cat, skill, state.range, o, inReview(skill));
     if (!msg) return false;
     q.refused = msg;
     q.text = msg;
@@ -77,7 +94,7 @@ function refuse(q, cat, skill, o) {
     q.answerType = 'text';
     q.options = [];
     q.visual = '';
-    q.hint = 'Ask your teacher to choose a bigger Max Number.';
+    q.hint = 'Ask your teacher to raise Max Number.';
     return true;
 }
 
@@ -112,14 +129,27 @@ function setCell(q, payload) {
 
 /* =========================================================================== PLACE VALUE */
 
+const PV_ALL_PLACES = [1, 10, 100, 1000, 10000, 100000];
+
 function genPlace(q, skill, o) {
-    const cap = Math.min(Number(o.band) || 999, state.range);
-    const [lo, hi] = digitSpan(cap);
-    const nd = String(hi).length;
-    const allPlaces = Array.from({ length: nd }, (_, i) => 10 ** i);
-    let ticked = skill === 'identify' && Array.isArray(o.places) ? o.places.map(Number).filter(p => allPlaces.includes(p)) : [];
-    if (!ticked.length) ticked = allPlaces;
+    const cap = capOf('placevalue', skill, o, 999);
+    let [lo, hi] = digitSpan(cap);
+    let nd = String(hi).length;
+    const bandPlaces = Array.from({ length: nd }, (_, i) => 10 ** i);
+    // The ticked places. Every place ticked (or none) means "every place the number has", so the
+    // band alone decides. A narrower tick is honoured exactly: a place the band's numbers do not
+    // have makes THAT item's number just long enough to have it, unless an explicitly lowered Max
+    // Number forbids it, when the place is dropped (the tick cannot be honoured, the page is not
+    // emptied).
+    let ticked = [];
+    if (skill === 'identify' && Array.isArray(o.places)) {
+        const t = o.places.map(Number).filter(p => PV_ALL_PLACES.includes(p));
+        if (t.length && t.length < PV_ALL_PLACES.length) ticked = t.filter(p => p < 10 * hi || pvCap(p * 10 - 1, state.range) >= p);
+    }
+    if (!ticked.length) ticked = bandPlaces;
     const place = ticked[slot(ticked.length)];
+    if (place > hi) { lo = place; hi = place * 10 - 1; nd = String(hi).length; }
+    const allPlaces = Array.from({ length: nd }, (_, i) => 10 ** i);
     // The digit at the asked place is non-zero and appears once, so "the underlined digit" and
     // "the 7" can never mean two different digits (PN-5's repeated digit is its own step).
     let n = 0;
@@ -132,8 +162,21 @@ function genPlace(q, skill, o) {
     }
     const s = String(n);
     const digit = Number(s[s.length - 1 - Math.round(Math.log10(place))]);
-    const visual = `<div style="text-align:center;">${numeralTracksHTML(n, { underline: place })}</div>`;
-    q.visual = visual;
+    // Place-value support (a separate control, P-1): the chart names every place, the letters
+    // (the `pv` template's own numeral) remind, and "none" leaves the digit's position to read.
+    const support = o.support === 'chart' || o.support === 'none' ? o.support : 'labels';
+    const drawNumeral = (opt) => support === 'chart' ? placeChartHTML(n, opt)
+        : support === 'none' ? plainNumeralHTML(n, opt) : numeralTracksHTML(n, opt);
+    q.visual = `<div style="text-align:center;">${drawNumeral({ underline: place })}</div>`;
+    const readHint = support === 'chart' ? 'Read the place name above the underlined digit.'
+        : support === 'none' ? 'Count the places from the right: ones, tens, hundreds, thousands.'
+            : 'Read the letter above the underlined digit.';
+    const cellFor = (payload) => {
+        if (support === 'labels') { setCell(q, payload); return; }
+        q.cell = { template: 'pv-support', v: 1, payload: { picture: support === 'chart' ? 'chart' : 'plain', n, place,
+            base: { keyValue: q.ans, ...payload } } };
+        q.printFormat = 'pv-cell';
+    };
     if (skill === 'identify') {
         // Three printed place words to ring at up to 999 (PN-1 prints all three even for a 2-digit
         // number); above that, one word per place the number has.
@@ -143,20 +186,20 @@ function genPlace(q, skill, o) {
         q.ans = PLACE_WORD[place];
         q.answerType = 'multiple-choice';
         q.options = words;
-        q.hint = 'Read the letter above the underlined digit.';
+        q.hint = readHint;
         q.skillLabel = 'Name the Place';
-        q.pv = { kind: 'place', n, place, digit };
-        setCell(q, { kind: 'place', n, place, words });
+        q.pv = { kind: 'place', n, place, digit, support };
+        cellFor({ kind: 'place', n, place, words });
     } else {
         q.text = 'What is the underlined digit worth?';
         q.printText = 'Write what the underlined digit is worth.';
         q.ans = digit * place;
         q.answerType = 'number';
         q.options = [];
-        q.hint = 'Read the letter above the underlined digit. That place tells you what the digit is worth.';
+        q.hint = `${readHint} That place tells you what the digit is worth.`;
         q.skillLabel = 'Value of a Digit';
-        q.pv = { kind: 'value', n, place, digit };
-        setCell(q, { kind: 'value', n, place, frame: 'worth ____' });
+        q.pv = { kind: 'value', n, place, digit, support };
+        cellFor({ kind: 'value', n, place, frame: 'worth ____' });
     }
 }
 
@@ -165,7 +208,7 @@ function wantZero(o) {
 }
 
 function genExpandCombine(q, skill, o) {
-    const cap = Math.min(Number(o.band) || 999, state.range);
+    const cap = capOf('placevalue', skill, o, 999);
     const [lo, hi] = digitSpan(cap);
     const nd = String(hi).length;
     const zero = wantZero(o);
@@ -222,10 +265,14 @@ function genExpandCombine(q, skill, o) {
 function genMoreLess(q, skill, o) {
     const step = Number(o.step) || (skill === 'more_less_100' ? 100 : 1);
     const dir = o.dir === 'both' ? (slot(2) === 0 ? 'more' : 'less') : (o.dir || 'more');
-    const cap = Math.min(Number(o.band) || 100, state.range);
+    const cap = capOf('placevalue', skill, o, 100);
+    // Support is its own control (P-1): a hundreds chart (more_less_10 only), a number line, or
+    // nothing. It changes the picture, never the numbers dealt, except that the chart starts at 1,
+    // so an item drawn on it never asks for an answer of 0.
+    const support = o.support === 'chart' && skill === 'more_less_10' ? 'chart' : o.support === 'line' ? 'line' : 'none';
     // The band caps BOTH the given number and the answer (§2.1). 2.NBT.B.8 keeps the hundreds
     // step to 100-900.
-    const nLo = skill === 'more_less_100' ? 100 : (dir === 'less' ? step : 0);
+    const nLo = skill === 'more_less_100' ? 100 : (dir === 'less' ? step + (support === 'chart' ? 1 : 0) : 0);
     const nHi = skill === 'more_less_100' ? Math.min(900, cap - (dir === 'more' ? step : 0))
         : (dir === 'more' ? cap - step : cap);
     let n;
@@ -249,8 +296,24 @@ function genMoreLess(q, skill, o) {
     q.hint = step === 1 ? `Count ${dir === 'more' ? 'on' : 'back'} one.`
         : `Only the ${PLACE_WORD[step]} digit changes, unless it goes past 9 or below 0.`;
     q.skillLabel = skill === 'more_less_100' ? '10 or 100 More or Less' : '1 or 10 More or Less';
-    q.pv = { kind: 'moreless', n, step, dir };
-    setCell(q, { kind: 'frame', frame: q.printText });
+    q.pv = { kind: 'moreless', n, step, dir, support };
+    const base = { keyValue: q.ans, kind: 'frame', frame: q.printText };
+    if (support === 'chart') {
+        const rows = hundredsWindow(n, ans, cap);
+        q.visual = `<div style="text-align:center;">${hundredsRowsHTML(rows[0], rows[1], { size: '1.05em' })}</div>`;
+        q.hint = step === 1 ? `Find ${fmt(n)} on the chart. Move one box ${dir === 'more' ? 'right' : 'left'}.`
+            : `Find ${fmt(n)} on the chart. Move one row ${dir === 'more' ? 'down' : 'up'}.`;
+        q.cell = { template: 'pv-support', v: 1, payload: { picture: 'hchart', rows, base } };
+        q.printFormat = 'pv-cell';
+    } else if (support === 'line') {
+        const line = moreLessLine(n, step);
+        q.visual = `<div style="text-align:center;">${pvLineSVG({ ticks: line.ticks, labels: line.labels, lengthMm: 110, pxPerMm: SCREEN_PX_PER_MM })}</div>`;
+        q.hint = `Each jump on the line is ${step}. Jump once ${dir === 'more' ? 'to the right' : 'to the left'} from ${fmt(n)}.`;
+        q.cell = { template: 'pv-support', v: 1, payload: { picture: 'line', ticks: line.ticks, labels: line.labels, base } };
+        q.printFormat = 'pv-cell';
+    } else {
+        setCell(q, { kind: 'frame', frame: q.printText });
+    }
 }
 
 function diskCounts(places, o) {
@@ -263,7 +326,7 @@ function diskCounts(places, o) {
 }
 
 function genDisks(q, skill, o) {
-    const cap = Math.min(Number(o.band) || 999, state.range, skill === 'pv_disks_build' ? 999 : 9999);
+    const cap = Math.min(capOf('placevalue', skill, o, 999), skill === 'pv_disks_build' ? 999 : 9999);
     const [, hi] = digitSpan(cap);
     const nd = String(hi).length;
     const places = Array.from({ length: nd }, (_, i) => 10 ** (nd - 1 - i));
@@ -317,7 +380,7 @@ function genTimesTen(q, skill, o) {
     if (!powers.length) powers = [10];
     powers.sort((a, b) => a - b);
     const power = powers[slot(powers.length)];
-    const cap = Math.min(Number(o.band) || 10000, state.range);
+    const cap = capOf('placevalue', skill, o, 10000);
     const kMax = Math.max(1, Math.floor(cap / power));
     let n, ans;
     if (o.decimals && op === 'x') {
@@ -330,7 +393,15 @@ function genTimesTen(q, skill, o) {
         ans = +(n / power).toFixed(4);
     } else {
         // Whole numbers: × keeps the product in the band; ÷ divides a multiple of the power.
-        const k = kMax >= 10 && slot(3) !== 0 ? randInt(10, Math.min(kMax, 999)) : randInt(1, Math.min(kMax, 999));
+        // Two items in three come from the band's top digit span, so a bigger band really deals
+        // bigger numbers (Numbers to 1,000,000 with x 10: 12,345 x 10); the third is a one-digit
+        // number, the easy anchor.
+        let k;
+        if (kMax >= 10 && slot(3) !== 0) {
+            const [a, b] = digitSpan(kMax);
+            const kLo = Math.max(10, a);
+            k = randInt(kLo, Math.max(kLo, b));
+        } else k = randInt(1, Math.min(kMax, 9));
         if (op === 'x') { n = k; ans = k * power; } else { n = k * power; ans = k; }
     }
     const glyph = op === 'x' ? '×' : '÷';
@@ -393,7 +464,7 @@ function dealRoundKind(o) {
 
 function genNearest(q, skill, o) {
     const P = pvRoundPlace(skill, o);
-    const cap = Math.min(Number(o.band) || P * 10, state.range);
+    const cap = capOf('number_sense', skill, o, P * 10);
     const name = `the nearest ${fmt(P)}`;
     if (o.response === 'circle-all') {
         // RN-10: eight printed numbers, three to five of them round to T, with the near misses
@@ -456,7 +527,8 @@ function genNearest(q, skill, o) {
 
 function genRoundingVisual(q, skill, o) {
     const P = Number(o.place) || 10;
-    const cap = Math.min(Number(o.band) || 100, state.range);
+    // The band grows to fit the place ("to the nearest 1,000" needs numbers to 10,000).
+    const cap = capOf('number_sense', skill, o, 100);
     const kind = dealRoundKind(o);
     const n = roundNumber(P, cap, kind, o.midpoint === 'never');
     const lower = Math.floor(n / P) * P;
@@ -482,7 +554,7 @@ function genRoundSort(q, skill, o) {
     // tenths sort), so the place is always 10 units and halfway is 5.
     const unit = dec ? 10 ** -(dec + 1) : 1;
     const Pu = dec ? 10 : P;
-    const cap = dec ? Infinity : state.range;
+    const cap = dec ? Infinity : capOf('number_sense', skill, o, P * 10);
     // The bins: two neighbouring multiples, the upper one inside the band.
     const mMin = dec ? (dec === 1 ? 1 : 40) : 1;
     const mMax = dec ? (dec === 1 ? 8 : 95) : Math.max(1, Math.floor(cap / P) - 1);
@@ -515,11 +587,23 @@ function genRoundSort(q, skill, o) {
     const lows = units.filter(isLow).map(u => label(u, dec + 1));
     const highs = units.filter(u => !isLow(u)).map(u => label(u, dec + 1));
     q.printAnswer = `${q.bins[0].label}: ${lows.join(', ')} · ${q.bins[1].label}: ${highs.join(', ')}`;
-    q.pv = { kind: 'sort', place: P, tiles: units.map(val), bins: [val(Lu), val(Lu + Pu)] };
-    setCell(q, {
+    const support = o.support === 'line' ? 'line' : 'none';
+    q.pv = { kind: 'sort', place: P, tiles: units.map(val), bins: [val(Lu), val(Lu + Pu)], support };
+    const base = {
         kind: 'sort', bank: q.tiles.map(t => t.label), bins: q.bins.map(b => `rounds to ${b.label}`),
         rows: count / 2 + 1, sorted: [lows, highs], keyValue: q.printAnswer,
-    });
+    };
+    if (support === 'line') {
+        // The number line from one bin to the other: eleven ticks, only the two ends labelled, so
+        // the pupil places each number and sees which end it is nearer. Halfway is not labelled.
+        const labels = { 0: q.bins[0].label, 10: q.bins[1].label };
+        q.visual = `<div style="text-align:center;">${pvLineSVG({ ticks: 11, labels, lengthMm: 120, pxPerMm: SCREEN_PX_PER_MM })}</div>`;
+        q.hint = 'Find each number on the line. Is it nearer the left end or the right end? Halfway rounds up.';
+        q.cell = { template: 'pv-support', v: 1, payload: { picture: 'line', ticks: 11, labels, base: { keyValue: q.printAnswer, ...base } } };
+        q.printFormat = 'pv-cell';
+    } else {
+        setCell(q, base);
+    }
 }
 
 /* =========================================================================== entry points */
@@ -558,6 +642,6 @@ export function generatePvRounding(q, skill) {
 /** The digit span of a band, for the older branches in gen-algebraic.js that now bind to it. */
 export function pvSpan(categoryId, skillId, fallbackBand) {
     const o = optsOf(categoryId, skillId);
-    return digitSpan(Math.min(Number(o.band) || fallbackBand, state.range));
+    return digitSpan(capOf(categoryId, skillId, o, fallbackBand));
 }
 export { refuse as pvRefuse, optsOf as pvOptions };

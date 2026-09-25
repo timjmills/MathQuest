@@ -26,6 +26,23 @@
 // its text and answer only — and is marked `coarse`. If even that is unstable it is marked
 // `unstable` and offered nothing.
 //
+// THE OPTION PATH (owner, 2026-09-25: "don't keep values that do nothing"). Phase 1 measures what
+// the generator reads through the app SETTING (state.range / decimalPlaces). A value is then offered
+// only if choosing it AS THE SKILL'S OWN OPTION ({ opts: { range: v } }, with the app setting left
+// at its default) really changes the items: a mixed pool whose members drop the parent's options on
+// the way down, or a generator that reads Max Number somewhere the option cannot reach, measured as
+// "changes the items" in phase 1 and did nothing on the teacher's page. Phase 2 re-measures every
+// kept value through the option and drops the ones that come back identical to the default, and the
+// ones that make the skill refuse (return no item).
+//
+// A kept value must also move at least one item in six (a printed page of six should show it).
+//
+// POLICY, on top of the measurement (the same owner rule):
+//   * K-2 skills (getSkillGrade 0-2) are never offered Decimal places: a decimal on a K-2 page is
+//     outside the grade, whatever the generator does with it.
+//   * "Whole numbers" (decimals 0) is not offered where the items at 0 still carry decimals: a
+//     decimal skill that cannot be whole would break the value's own promise.
+//
 // The output is committed. Re-run this whenever a generator changes what it reads; --check is
 // what a CI step would call.
 const fs = require('fs');
@@ -53,8 +70,12 @@ function seedFor(key) {
     return (h >>> 0) % 1000000;
 }
 
-// Runs in the page. Returns one hash per requested configuration.
-function sampleInPage({ categoryId, skillId, n, baseSeed, configs }) {
+// Runs in the page. Returns one hash per requested configuration. A configuration with `grant`
+// first registers a temporary measured entry for the skill (so its own `range` / `decimals` option
+// is legal and reaches the generator), and puts the committed table back afterwards.
+async function sampleInPage({ categoryId, skillId, n, baseSeed, configs }) {
+    const SO = await import('/js/modules/skill-options.js');
+    const DO = await import('/js/modules/skill-options-derived.js');
     const fnv = (s) => {
         let h = 2166136261;
         for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
@@ -98,17 +119,23 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, configs }) {
     const out = [];
     for (const c of configs) {
         const f = [], k = [];
-        for (let i = 0; i < n; i++) {
-            let q = null;
-            try {
-                q = window.generateQuestionFor({
-                    category: categoryId, skill: skillId, range: c.range, decimals: c.decimals,
-                    opts: c.opts || {}, seed: baseSeed + i, itemIndex: i,
-                });
-            } catch (e) { q = { __error: String((e && e.message) || e) }; }
-            f.push(fine(q)); k.push(coarse(q));
+        if (c.grant) SO.registerDerivedOptions({ ...DO.DERIVED_OPTIONS, [`${categoryId}:${skillId}`]: c.grant });
+        try {
+            for (let i = 0; i < n; i++) {
+                let q = null;
+                try {
+                    q = window.generateQuestionFor({
+                        category: categoryId, skill: skillId, range: c.range, decimals: c.decimals,
+                        opts: c.opts || {}, seed: baseSeed + i, itemIndex: i,
+                    });
+                } catch (e) { q = { __error: String((e && e.message) || e) }; }
+                f.push(fine(q)); k.push(coarse(q));
+            }
+        } finally {
+            if (c.grant) SO.registerDerivedOptions(DO.DERIVED_OPTIONS);
         }
-        out.push({ fine: fnv(f.join('\n')), coarse: fnv(k.join('\n')), errors: f.filter(x => x.includes('__error')).length, ...stats(k) });
+        out.push({ fine: fnv(f.join('\n')), coarse: fnv(k.join('\n')), errors: f.filter(x => x.includes('__error')).length,
+            nulls: f.filter(x => x === 'null').length, perFine: f.map(fnv), perCoarse: k.map(fnv), ...stats(k) });
     }
     return out;
 }
@@ -158,7 +185,8 @@ async function measure(s, baseSeed, config) {
             if (!Array.isArray(list)) continue;
             for (const s of list) {
                 if (s.retired || s.v === 'custom_mixed') continue;
-                out.push({ categoryId, skillId: s.v, label: s.l, meta: !!(window.isMixedMetaSkill && window.isMixedMetaSkill(s.v)) });
+                const grade = window.getSkillGrade ? window.getSkillGrade(s.v, categoryId) : null;
+                out.push({ categoryId, skillId: s.v, label: s.l, meta: !!(window.isMixedMetaSkill && window.isMixedMetaSkill(s.v)), grade });
             }
         }
         return out;
@@ -231,6 +259,46 @@ async function measure(s, baseSeed, config) {
             if (ranges.length > 1) entry.range = ranges;
             if (decimals.length > 1) entry.decimals = decimals;
             if (levels.length > 1) entry.level = levels.slice().sort((x, y) => y - x);
+        }
+        // ---- policy: no decimals on a K-2 page; no "Whole numbers" where 0 still deals decimals.
+        if (entry.decimals && typeof s.grade === 'number' && s.grade <= 2) delete entry.decimals;
+        if (entry.decimals) {
+            const at0 = dRes[DECIMALS.indexOf(0)];
+            if (at0 && at0.maxDp > 0) entry.decimals = entry.decimals.filter(d => d !== 0);
+            if (entry.decimals.length < 2) delete entry.decimals;
+        }
+        // ---- phase 2: the option path. Each kept value, chosen as the skill's OWN option with the
+        // app setting at its default, must change the items and must not make the skill refuse.
+        const sameAsBase = (r) => (mode === 'stat' ? (near(r.maxNum, a.maxNum) && r.maxDp === a.maxDp)
+            : mode === 'coarse' ? r.coarse === a.coarse : r.fine === a.fine);
+        for (const [id, base0] of [['range', BASE_RANGE], ['decimals', BASE_DECIMALS]]) {
+            if (!entry[id]) continue;
+            const grant = { range: RANGES, decimals: DECIMALS };
+            const keep = [];
+            const seen = [];
+            for (const v of entry[id]) {
+                if (v === base0) { keep.push(v); continue; }
+                const r = await measure(s, baseSeed, { ...base, opts: { [id]: v }, grant });
+                if (!r || r.errors || r.nulls > a.nulls || sameAsBase(r)) continue;
+                // It must change the page a teacher prints: at least one item in six, so a
+                // six-item sheet can be expected to show it. A value that moves one item type in
+                // ten (money_count "Up to 1,000" reaches only the rare mixed-bills item) reads as
+                // "does nothing" on the page and is not offered.
+                if (mode !== 'stat') {
+                    const mine = mode === 'coarse' ? r.perCoarse : r.perFine;
+                    const theirs = mode === 'coarse' ? a.perCoarse : a.perFine;
+                    const moved = mine.filter((h, i) => h !== theirs[i]).length;
+                    // A mixed pool must show it on one item in three: its members vary, so a thinner effect is luck.
+                    if (moved < Math.ceil(mine.length / (s.meta ? 3 : 6))) continue;
+                }
+                // Two option values that print the same page are one choice (keep the first).
+                const sig = mode === 'stat' ? `${r.maxNum}|${r.maxDp}` : mode === 'coarse' ? r.coarse : r.fine;
+                if (seen.includes(sig)) continue;
+                seen.push(sig);
+                keep.push(v);
+            }
+            if (keep.filter(v => v !== base0).length) entry[id] = keep.sort((x, y) => x - y);
+            else delete entry[id];
         }
         if (mode !== 'fine') entry.mode = mode;
         if (hangs.length) entry.hang = hangs;

@@ -633,7 +633,9 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv }) {
             for (const m of vis.matchAll(/data-pv-disk="(\d+)"/g)) drawn[m[1]] = (drawn[m[1]] || 0) + 1;
             item.drawnDisks = drawn;
             item.lineEnds = [...vis.matchAll(/data-pv-end="([\d.]+)"/g)].map(m => parseFloat(m[1]));
-            const cp = q.cell && q.cell.template === 'pv' ? (q.cell.payload || {}) : null;
+            // `pv-support` (a support picture over the `pv` cell) carries the `pv` payload as `base`.
+            const cp = q.cell && q.cell.template === 'pv' ? (q.cell.payload || {})
+                : q.cell && q.cell.template === 'pv-support' ? ((q.cell.payload || {}).base || {}) : null;
             item.cellKind = cp ? cp.kind : '';
             item.cellBank = cp && Array.isArray(cp.bank) ? cp.bank.length : 0;
             out.push(item);
@@ -1098,10 +1100,12 @@ function k2Rules(skill, items, live, r, F, NOTE) {
 // are named in PV_EXCLUDED so the coverage line says they were left out rather than passed.
 //
 // WHAT A PV NAME DECLARES. "Round to Nearest 100" declares a PLACE, and the place declares a
-// floor: a nearest-100 item is at least three digits, so the skill needs Numbers to 1,000 and
-// below that it must be REFUSED (owner ruling 2, 2026-09-24) — never dealt at a bigger number
-// than the teacher chose. "Name the Place" declares nothing numeric, so Max Number is its band,
-// and at Max Number 100 it must deal two-digit numbers (it never did: smallest seen 104).
+// floor: a nearest-100 item is at least three digits, so the skill needs numbers to 1,000.
+// THE BAND (owner ruling of 2026-09-25, superseding ruling 2 of 2026-09-24): the skill's own band
+// option SETS its working range, and its default is the place's natural band (nearest_100 -> to
+// 1,000). Max Number at its app default (100) is "not chosen", so at Max Number 100 every skill
+// DEALS, judged against its default band; only a Max Number the teacher explicitly LOWERED below
+// the floor refuses (skill-options.js pvCap / pvRefusal), and that is checked at Max Number 50.
 //
 // HOW IT IS READ. Every rewritten generator publishes `q.pv`, a plain description of the item
 // (the number, the place, the parts, the disks), and every rule below RECOMPUTES the answer from
@@ -1142,7 +1146,7 @@ const pvDigitAt = (n, place) => Math.floor(Math.abs(n) / place) % 10;
 const PV_CAPS = /\b[A-Z]{2,}\b/;
 
 /**
- * @param {Object} ctx {R: the Max Number the items were dealt at, refusedAt100: {floor, dealt, sample}|null,
+ * @param {Object} ctx {R: the biggest number allowed (the default band), refusedLow: {floor, at, dealt, sample}|null,
  *                      midpointSeeded: boolean, geom: in-page disk geometry, buildMax10k: number}
  */
 function pvRules(skill, items, live, r, F, NOTE, ctx) {
@@ -1154,9 +1158,10 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
     r.pvPlace = P || null;
 
     // pv-refusal: below the floor the skill must return nothing at all.
-    if (ctx.refusedAt100 && ctx.refusedAt100.dealt) {
-        F('pv-band', `needs Numbers to ${ctx.refusedAt100.floor.toLocaleString('en-US')} (its place), but at Max Number 100 it still dealt ${ctx.refusedAt100.dealt} items instead of refusing: ${ctx.refusedAt100.sample.join('; ')}`);
+    if (ctx.refusedLow && ctx.refusedLow.dealt) {
+        F('pv-band', `needs numbers to ${ctx.refusedLow.floor.toLocaleString('en-US')} (its place), but with Max Number explicitly lowered to ${ctx.refusedLow.at} it still dealt ${ctx.refusedLow.dealt} items instead of refusing: ${ctx.refusedLow.sample.join('; ')}`);
     }
+    if (ctx.deadAtDefault) F('pv-band', `refuses at the app default Max Number 100: a stand-alone skill must deal at its default band`);
 
     const bad = {};
     const add = (cls, msg) => { (bad[cls] = bad[cls] || []).push(msg); };
@@ -1177,7 +1182,7 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
         // The number the item is ABOUT counts even when its digits are printed one per track.
         const shown = pv && Number.isFinite(pv.n) ? [...ns, pv.n] : ns;
         const maxP = shown.length ? Math.max(...shown) : null;
-        if (maxP !== null && maxP > R) add('pv-band', `prints ${maxP.toLocaleString('en-US')} at Max Number ${R.toLocaleString('en-US')} (${printedText.slice(0, 50)})`);
+        if (maxP !== null && maxP > R) add('pv-band', `prints ${maxP.toLocaleString('en-US')} past its default band ${R.toLocaleString('en-US')} (${printedText.slice(0, 50)})`);
         if (maxP !== null && maxP >= 10 && maxP <= 99) twoDigit++;
         if (pv && pv.kind === 'round' && (pv.n < pv.place || pv.n % pv.place === 0)) add('pv-band', `rounds ${pv.n} to the nearest ${pv.place}: below the place, or already rounded`);
         if (pv && pv.kind === 'moreless') {
@@ -1231,7 +1236,7 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
                     const want = pv.op === 'x' ? pv.n * pv.power : pv.n / pv.power;
                     if (Math.abs(Number(ans) - want) > 1e-9) add('pv-recompute', `${pv.n} ${pv.op === 'x' ? '×' : '÷'} ${pv.power} = ${want}, keyed ${ans}`);
                     const big = Math.max(Math.abs(pv.n), Math.abs(want));
-                    if (big > R) add('pv-band', `${pv.n} ${pv.op === 'x' ? '×' : '÷'} ${pv.power}: ${big} is past Max Number ${R}`);
+                    if (big > R) add('pv-band', `${pv.n} ${pv.op === 'x' ? '×' : '÷'} ${pv.power}: ${big} is past its default band ${R}`);
                     break;
                 }
                 case 'round':
@@ -1770,7 +1775,7 @@ function selfTest() {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ws-audit-'));
     const mjs = path.join(tmp, 'skill-options.mjs');
     fs.writeFileSync(mjs, fs.readFileSync(path.join(ROOT, 'js', 'modules', 'skill-options.js')));
-    const { optionsFor, pvBandFloor } = await import(pathToFileURL(mjs).href);
+    const { optionsFor, pvBandFloor, pvBand } = await import(pathToFileURL(mjs).href);
     fs.rmSync(tmp, { recursive: true, force: true });
     const withNotation = new Set(skills
         .filter(s => optionsFor(s.categoryId, s.skillId).some(o => o.id === 'notation'))
@@ -1866,17 +1871,18 @@ function selfTest() {
         };
         const baseSeed = seedFor(`${s.categoryId}:${s.skillId}`);
         if (family === 'pv') {
-            // TWO RUNS. At Max Number 100 (the gate's standard) a skill whose place needs more must
-            // REFUSE — every item null — and a skill that can be dealt there is judged there. A
-            // skill with a floor is then judged at its floor, the smallest Max Number that hosts
-            // its place. The floor is read off the NAME ("Nearest 1,000" needs 10,000); where the
-            // name carries no place, the skill's own declaration (pvBandFloor) says.
+            // TWO RUNS. At Max Number 100 (the app default, "not chosen") every skill DEALS and is
+            // judged against its default band R (owner ruling 2026-09-25). A skill with a floor is
+            // then run with Max Number explicitly LOWERED to 50 and must REFUSE there when its
+            // place needs more. The floor is read off the NAME ("Nearest 1,000" needs 10,000);
+            // where the name carries no place, the skill's own declaration (pvBandFloor) says.
             const floor = Math.max(pvNameFloor(s.skillId, s.label), pvBandFloor(s.categoryId, s.skillId, {}) || 0);
-            const R = Math.max(100, floor);
-            const at100 = await app.page.evaluate(sampleInPage, { categoryId: s.categoryId, skillId: s.skillId, n: floor > 100 ? Math.min(N, 60) : N, baseSeed, range: 100, pv: true });
-            const items = R === 100 ? at100
-                : await app.page.evaluate(sampleInPage, { categoryId: s.categoryId, skillId: s.skillId, n: N, baseSeed, range: R, pv: true });
-            const dealt = floor > 100 ? at100.filter(x => !x.error && !x.empty) : [];
+            const R = Math.max(100, floor, pvBand(s.categoryId, s.skillId, {}, 0) || 0);
+            const LOW = 50;
+            const items = await app.page.evaluate(sampleInPage, { categoryId: s.categoryId, skillId: s.skillId, n: N, baseSeed, range: 100, pv: true });
+            const low = floor > LOW ? await app.page.evaluate(sampleInPage, { categoryId: s.categoryId, skillId: s.skillId, n: Math.min(N, 60), baseSeed, range: LOW, pv: true }) : [];
+            const dealt = low.filter(x => !x.error && !x.empty);
+            const deadAtDefault = items.length > 0 && items.every(x => x.error || x.empty);
             let buildMax10k = 0;
             if (s.skillId === 'pv_disks_build') {
                 const big = await app.page.evaluate(sampleInPage, { categoryId: s.categoryId, skillId: s.skillId, n: 60, baseSeed, range: 10000, pv: true });
@@ -1884,7 +1890,8 @@ function selfTest() {
             }
             skill.pvCtx = {
                 R, geom: pvGeom, buildMax10k,
-                refusedAt100: floor > 100 ? { floor, dealt: dealt.length, sample: dealt.slice(0, 3).map(x => x.fullText.slice(0, 40)) } : null,
+                refusedLow: floor > LOW ? { floor, at: LOW, dealt: dealt.length, sample: dealt.slice(0, 3).map(x => x.fullText.slice(0, 40)) } : null,
+                deadAtDefault,
                 midpointSeeded: optionsFor(s.categoryId, s.skillId).some(o => o.id === 'midpoint' && o.default === 'seeded'),
             };
             out.push({ ...skill, ...audit(skill, items) });
