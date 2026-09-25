@@ -15,7 +15,7 @@ const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 
         for (const [c, list] of Object.entries(window.SKILLS)) {
             if (!Array.isArray(list) || (cat && c !== cat)) continue;
             for (const s of list) {
-                if (s.retired || (skill && s.v !== skill)) continue;
+                if (s.retired || (skill && !skill.split(',').includes(s.v))) continue;
                 if (dist) {
                     // --dist: how often each answer and each opening of the question occurs.
                     const A = {}, T = {};
@@ -38,7 +38,7 @@ const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 
             }
         }
         return res.join('\n');
-    }, { dist: parseInt(arg('dist', '0'), 10), cat: arg('category', null), skill: arg('skill', null), n: parseInt(arg('n', '3'), 10), opts: JSON.parse(arg('opts', 'null')), fields: (arg('fields', '') || '').split(',').filter(Boolean) });
+    }, { dist: parseInt(arg('dist', '0'), 10), cat: arg('category', null), skill: arg('skill', null) || (arg('skills-file', null) ? require('fs').readFileSync(arg('skills-file', null), 'utf8').trim().split(/\s+/).join(',') : null), n: parseInt(arg('n', '3'), 10), opts: JSON.parse(arg('opts', 'null')), fields: (arg('fields', '') || '').split(',').filter(Boolean) });
     console.log(out);
     await app.close();
 })();

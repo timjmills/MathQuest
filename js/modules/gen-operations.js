@@ -4087,7 +4087,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // P11 (critic round 2): ONE frame on every item, three slots — ___ rows of ___ (or groups of
                 // ___), ___ in all. The count-all item (one slot) is no longer dealt, so the slot set never
                 // changes from cell to cell.
-                const questionType = ['write_mult', 'equal_groups'][_dealRung(2)];
+                // P12: `forms` deals arrays only or groups only when the teacher narrows it.
+                const questionType = ['write_mult', 'equal_groups'][_p12Form(() => _dealRung(2))];
                 // Scale array size with range but cap for visual display
                 const arrMaxRows = Math.max(2, Math.min(range <= 50 ? 5 : range <= 100 ? 6 : 8, 10));
                 const arrMaxCols = Math.max(2, Math.min(range <= 50 ? 6 : range <= 100 ? 8 : 10, 12));

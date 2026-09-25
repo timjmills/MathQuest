@@ -257,7 +257,7 @@ export function itemDenominators(q) {
         const str = String(s == null ? '' : s);
         if (html) for (const m of str.matchAll(/class="den"[^>]*>\s*(\d+)\s*</g)) out.push(Number(m[1]));
         const txt = html ? str.replace(/<[^>]+>/g, ' ') : str;
-        for (const m of txt.matchAll(/(?:^|[^\d.])\d+\s*\/\s*(\d+)(?![\d.])/g)) out.push(Number(m[1]));
+        for (const m of txt.matchAll(/(?:^|[^\d.])\d+\s*\/\s*(\d+)(?!\d|\.\d)/g)) out.push(Number(m[1]));
         return out.filter(d => d > 1);
     };
     const question = [...dens(q.text, true), ...dens(q.printText, true), ...dens(q.visual, true)];
@@ -788,6 +788,8 @@ function generateResolvedQuestion() {
                     allSkillsFlattened = allSkillsFlattened.concat(categorySkillMap[cat]);
                 }
             });
+            // P12: a one-topic review ("Fractions — All") ticks skills, not topics.
+            allSkillsFlattened = narrowPool(allSkillsFlattened);
 
             let targetCategory, targetSkill;
             let skillsWithCategories = [];

@@ -96,6 +96,7 @@ export const OPTION_KEYS = {
     digits: 'XK',        // how many digits (area models, box division)
     units: 'XL',         // measurement: which units
     parts: 'XM',         // equal parts (halves / thirds / fourths), or the parts a figure is split into
+    // NEXT FREE EXTENDED KEY: XN. Take the next letter in order and add a line above.
 };
 const KEY_TO_OPTION = Object.fromEntries(Object.entries(OPTION_KEYS).map(([id, k]) => [k, id]));
 /** True for a two-character extended key (see above). */

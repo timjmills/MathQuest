@@ -562,7 +562,7 @@ function genFileFor(r) {
         }
         return out;
     });
-    const all = skills.filter(s => (!ONLY || s.skillId === ONLY) && (!CAT || s.categoryId === CAT));
+    const all = skills.filter(s => (!ONLY || ONLY.split(',').includes(s.skillId)) && (!CAT || s.categoryId === CAT));
     const todo = all.filter(s => s.nOffered > 0);
     const results = [];
     const t0 = Date.now();

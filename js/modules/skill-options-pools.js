@@ -123,8 +123,11 @@ function poolOptions(categoryId, skillId) {
         const cats = [...new Set(getSkillsForGrade(grade).map(x => x.categoryId))];
         def = _catMembers(cats, 'Tick the topics this grade review draws from. All ticked mixes every topic of the grade.');
     } else if ((skillId.endsWith('_all') && skillId !== 'coordinate_all') || skillId === 'all_domains_mixed' || skillId === 'counting_all') {
-        const cats = getMixedSkillScope(skillId) || [];
-        def = _catMembers(cats.filter(c => getSkillsForCategory(c).length), 'Tick the topics this review draws from. All ticked mixes every topic.');
+        const cats = (getMixedSkillScope(skillId) || []).filter(c => getSkillsForCategory(c).length);
+        // A review of ONE topic ("Fractions — All") offers that topic's skills instead.
+        def = cats.length === 1
+            ? _skillMembers(getSkillsForCategory(cats[0]).map(id => [cats[0], id]), 'Tick the skills this review draws from. All ticked mixes every skill.')
+            : _catMembers(cats, 'Tick the topics this review draws from. All ticked mixes every topic.');
     } else if (skillId.startsWith('mixed_') && isMixedMetaSkill(skillId)) {
         const pool = categoryPool(categoryId, skillId);
         const cat = skillId === 'mixed_time' ? 'measurement' : categoryId;

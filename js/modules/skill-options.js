@@ -1390,6 +1390,54 @@ Object.assign(P12_OPTIONS, {
         ['Add, then take away', 'Take away, then add', 'Add twice', 'Take away twice'], { label: 'The two steps' })],
 });
 
+// ======================= FRACTION AND MEASUREMENT LEFTOVERS =================================
+Object.assign(P12_OPTIONS, {
+    'fractions:select_equiv_frac': [_p12Denoms([2, 3])],
+    // Read by gen-fractions.js (_fChanged('denoms')): the line's denominator.
+    'fractions:mixed_nl_drag': [{ ..._p12Denoms(), values: [{ v: 2, l: 'Fourths' }, { v: 3, l: 'Thirds and sixths' }, { v: 5, l: 'Fifths' }] }],
+    // Its number size is the measured Max Number control (it draws to the Max Number setting).
+    'subtraction:mixed_add_sub': [_p12Kinds('task', 'Operation', [['Adding', ' \\+ '], ['Subtracting', ' - ']], 'One operation for a warm-up; both mixed makes the pupil read the sign.')],
+    'division:mixed_mult_div': [_p12Kinds('task', 'Operation', [['Multiplying', '×'], ['Dividing', '÷']], 'One operation for a warm-up; both mixed makes the pupil read the sign.')],
+    'fractions:order_fractions': [_p12Match([['Least to greatest (write the order)', '^Order these fractions from least'],
+        ['Greatest to least (write the order)', '^Order these fractions from greatest'], ['Drag into order', '^Drag the fractions']])],
+    'fractions:benchmark_fractions': [_p12Match([['The closest benchmark (0, ¼, ½, ¾, 1)', 'closest to 0, '], ['Sort into benchmark bins (drag)', 'Drag each fraction into the bin'],
+        ['Put in order (drag)', 'Drag the fractions from'], ['Click the fractions closest to one', 'Click ALL the fractions closest']])],
+    'fraction_operations:frac_10_100_nv': [_p12Match([['Write tenths as hundredths', '^Write \\d+/10 as'], ['Find the missing numerator', 'Find the missing numerator'],
+        ['Add tenths and hundredths', '^\\d+/10 \\+ \\d+/100'], ['Click the equal fractions', '^Click ALL']])],
+    'fraction_operations:estimate_frac_ops': [_p12Kinds('task', 'Operation', [['Adding', '^Estimate: \\d+/\\d+ \\+'], ['Subtracting', '^Estimate: \\d+/\\d+ -']])],
+    'measurement:unit_conversion_word': [_p12Kinds('units', 'Units', [['Time (hours, minutes, seconds)', ' (hr|min)\\. How many (min|sec)'],
+        ['Metric (km, m, cm, kg, g)', ' (km|m|cm|kg|g|L)\\. How many'], ['Customary (yd, ft, in, lb, oz, qt, pt)', ' (mi|yd|ft|lb|gal|qt|pt)\\. How many']])],
+});
+
+// ======================= SECOND CONTROLS FOR THE MEASURED-ONLY SKILLS =======================
+// These skills already had the measured Max Number (their number size). P12 adds what the
+// items ask, so the teacher can also change the kind of work, not only the size.
+const _ops4 = [['Adding', ' \\+ '], ['Subtracting', ' - '], ['Multiplying', ' × '], ['Dividing', ' ÷ ']];
+Object.assign(P12_OPTIONS, {
+    'composing:odd_even': [_p12Match([['Odd or even? (one number)', '^Is \\d+ odd or even'], ['Click all the even or odd numbers', '^Click all'],
+        ['Which number is even or odd?', '^Which number']])],
+    'subtraction:missing_add_sub': [
+        _p12Kinds('unknown', 'What is missing', [['The answer (8 + 5 = __)', '= ___ =>'], ['A number before the = sign', '___ [+-]|[+-] ___']]),
+        _p12Kinds('task', 'Operation', [['Adding', '\\+'], ['Subtracting', ' - ']]),
+    ],
+    // Read by gen-operations.js (_p12Form): 0 = arrays, 1 = equal groups.
+    'multiplication:arrays_groups': [formsOption([{ v: 0, l: 'Arrays (rows of dots)' }, { v: 1, l: 'Equal groups (rings of dots)' }], { label: 'The picture' })],
+    'decimals:div_decimal': [_p12Variants('div_decimal', ['dec_by_whole', 'whole_by_dec', 'dec_by_dec'],
+        ['A decimal ÷ a whole number (31.6 ÷ 4)', 'A whole number ÷ a decimal (6 ÷ 0.2)', 'A decimal ÷ a decimal (1.8 ÷ 0.9)'], { label: 'Which division' })],
+    'decimals:compare_decimal': [_p12Match([['Compare two decimals', '^Compare'], ['Click the decimals that match', '^Click ALL'], ['Put in order (drag)', '^Drag']])],
+    'decimals:round_decimals': [_p12Kinds('precision', 'Round to the nearest', [['Tenth', 'nearest tenth'], ['Hundredth', 'nearest hundredth']])],
+    'decimals:order_decimals': [
+        _p12Kinds('dir', 'Order', [['Least to greatest', 'least to great'], ['Greatest to least', 'greatest to least']]),
+        _p12Match([['Write the order', '^Order'], ['Drag into order', '^Drag']]),
+    ],
+    'coordinates:coordinate_q1': [_p12Match([['Read the coordinates', '^What are the coordinates'], ['Plot the points', '^Plot']])],
+    'coordinates:coordinate_all': [_p12Match([['Read the coordinates', '^What are the coordinates'], ['Plot the points', '^Plot']])],
+    'coordinates:coordinate_graph': [_p12Match([['Read the coordinates', '^What are the coordinates'], ['Plot the points', '^Plot']])],
+    'number_ops_mixed:mixed': [_p12Kinds('task', 'Operations', _ops4, 'Tick the operations the page mixes.')],
+    'order_of_operations:three_ops_no_paren': [_p12Match([['× written first (4 × 3 − 2 + 1)', '^\\d+ × \\d+ [-+]'], ['+ written first (4 + 3 + 2 × 1)', '^\\d+ \\+ \\d+']])],
+    'order_of_operations:paren_multi': [_p12Match([['(a − b) × c + d', '^\\(\\d+ - \\d+\\) × \\d+ \\+'], ['a × (b + c) − d', '^\\d+ × \\('], ['(a + b) × (c + d)', '\\) × \\(']])],
+});
+
 // ======================= K-2 AND NUMBER-SENSE LEFTOVERS =====================================
 Object.assign(P12_OPTIONS, {
     // Read by gen-counting.js (band) and gen-algebraic.js (_estForm).

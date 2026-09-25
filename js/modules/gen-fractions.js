@@ -5827,7 +5827,10 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "mixed_nl_drag") {
                 // Multi-marker drag — mixed numbers on [0, 3] with quarter ticks.
-                const den = pick([3, 4, 5, 6]);
+                // P12: `denoms` families (2 = fourths, 3 = thirds and sixths, 5 = fifths).
+                const _mnFam = _fChanged('denoms');
+                const _mnDens = _mnFam ? [3, 4, 5, 6].filter(d => _mnFam.includes(d === 4 ? 2 : d === 5 ? 5 : 3)) : [];
+                const den = pick(_mnDens.length ? _mnDens : [3, 4, 5, 6]);
                 const wholeMax = 3;
                 // Build candidate values strictly between 0 and wholeMax (skip
                 // bare 0 / wholeMax to keep targets non-trivial).
