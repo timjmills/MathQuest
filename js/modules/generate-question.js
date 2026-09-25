@@ -1012,7 +1012,9 @@ function generateResolvedQuestion() {
         && typeof q.ans === 'string'
         && /^-?\d+\/-?\d+$/.test(q.ans.trim())
         && state.gameMode !== 'worksheet'
-        && state.quizMode !== true) {
+        && state.quizMode !== true
+        // a kit fraction cell (frac-model.js) draws its own numerator / denominator boxes
+        && !(q.cell && q.cell.template === 'frac-model')) {
         q.answerType = 'fraction-input';
     }
 

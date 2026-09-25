@@ -70,6 +70,24 @@ function PLAN(rootSel, which) {
     }
     all('input.mq-opswork').slice(0, 2).forEach(w => tag(w, { type: 'text', value: '9', check: 'work' }));
 
+    // a fraction model to shade (frac-model, O6 AP3): tap as many parts as the answer counts.
+    // Dispatched on the part itself: a wedge's box centre can lie in the next wedge.
+    const shadeParts = all('.shade-target');
+    if (shadeParts.length && q.answerType === 'shade-parts') {
+        const t = Number(q.shadeTarget != null ? q.shadeTarget : ans);
+        shadeParts.slice(0, t).forEach(g => tag(g, { type: 'domclick' }));
+        // the practice card grades the shading on its own Submit (question-render.js shade-parts)
+        const sp = which.host === 'card' ? document.querySelector('.sp-submit') : null;
+        if (sp && vis(sp)) tag(sp, { type: 'domclick' });
+        return { plan, q: String(t) };
+    }
+    // a sign circle (frac-model, pv compare): tap the sign tile that is the answer
+    const signTiles = all('.mq-signtile');
+    if (signTiles.length) {
+        const hit = signTiles.find(b => b.textContent.trim() === String(ans).trim());
+        if (hit) { tag(hit, { type: 'click' }); return { plan, q: String(ans) }; }
+    }
+
     // the kit's model: tap boxes of the ten frame, or + under each base-ten zone
     const model = root.querySelector('[data-mq-model]');
     if (model && model.dataset.mqBuilt === '1') {
@@ -168,6 +186,14 @@ function PLAN(rootSel, which) {
         let vals = sets ? sets[0].map(String) : parts(ans);
         if (jn === ':' || jn === '.') vals = String(ans).split(jn);
         if (jn === ' h ') { const m = /(\d+)\s*h\s*(\d+)/.exec(String(ans)); if (m) vals = [m[1], m[2]]; }
+        // a fraction [n]/[d], a mixed number [w] [n]/[d] (frac-model): the answer's own parts
+        if (jn === '/' || jn === 'mixed') {
+            const a = String(ans).trim();
+            const m = /^(?:(\d+)\s+)?(\d+)\s*\/\s*(\d+)$/.exec(a) || (/^\d+$/.test(a) ? [a, a] : []);
+            vals = jn === '/' ? [m[2] || m[1] || '', m[3] || '1'] : [m[1] || '', m[2] || '', m[3] || ''];
+            slots.forEach((c, i) => { if (vals[i]) tag(c, { type: 'text', value: vals[i] }); });
+            return { plan, q: String(ans) };
+        }
         slots.forEach((c, i) => tag(c, { type: 'text', value: vals[i] }));
         return { plan, q: vals.join(', ') };
     }
@@ -192,7 +218,7 @@ async function run(page, sel, which) {
         if (!el) return { error: `lost target ${step.sa}` };
         await el.evaluate(e => e.scrollIntoView({ block: 'center' }));
         if (step.type === 'click') { await el.click(); await sleep(40); continue; }
-        if (step.type === 'domclick') { await el.evaluate(e => e.click()); await sleep(40); continue; }
+        if (step.type === 'domclick') { await el.evaluate(e => (e.click ? e.click() : e.dispatchEvent(new MouseEvent('click', { bubbles: true })))); await sleep(40); continue; }
         await el.click({ clickCount: 3 });
         await el.evaluate(e => { e.value = ''; });
         await page.keyboard.type(step.value, { delay: 10 });

@@ -5,7 +5,7 @@ import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
 import { getSkillGrade, maxDenominatorForGrade } from './data.js';
 import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
-import { fracModelSVG, fracModelSizedHTML, fracStackHTML, tickLabelSet } from './sheet/index.js';
+import { fracModelSVG, fracModelSizedHTML, fracStackHTML, fracTwin, tickLabelSet } from './sheet/index.js';
 
 // ---- O6 APPEARANCE (lane AP3, 2026-09-25) --------------------------------------------------
 // `model` (skill-options.js, "Fraction model"): the teacher ticks the models a page draws. The
@@ -51,6 +51,52 @@ function _fNlTicks(nl, period) {
     for (let i = 0; i <= N; i++) if (i % mult === 0) old.push(i);
     if (old.length === set.length && old.every((x, k) => x === set[k])) return;
     nl.labelAt = set;
+}
+
+/**
+ * The whole of a READ item's model (the pupil counts parts, never shades them): one width at
+ * every denominator, so the cell keeps to one of two columns. A circle keeps its own size.
+ */
+const _fWriteWhole = (kind) => (kind === 'circle' ? null : kind === 'line' ? 60 : 50);
+/** A migrated item: the kit's `frac-model` cell for paper and key, its twin for every screen host. */
+function _fKit(q, payload) {
+    q.cell = { template: 'frac-model', v: 1, payload };
+    q.visual = fracTwin(payload);
+    // A sign is written in the circle on paper and tapped from the sign tiles on screen: never a
+    // row of option buttons (a production item stays a production item, SP-3).
+    if (payload.task === 'sign') q.options = [];
+}
+
+/** Pictures ticked off (the `pictures` option, strip): a kit sentence prints numbers only. */
+function _fPicturesOff() {
+    return !!(state.skillOptions && state.skillOptions.pictures === false);
+}
+/** The parts of an answer string: "1 3/8" -> {w:1, n:3, d:8}; "3/8" -> {n:3, d:8}; "2" -> {w:2}. */
+function _fParts(str) {
+    const t = String(str).trim();
+    let m = /^(\d+)\s+(\d+)\/(\d+)$/.exec(t);
+    if (m) return { w: +m[1], n: +m[2], d: +m[3] };
+    m = /^(\d+)\/(\d+)$/.exec(t);
+    if (m) return { n: +m[1], d: +m[2] };
+    return /^\d+$/.test(t) ? { w: +t, n: 0, d: 1 } : null;
+}
+/**
+ * A fraction number sentence as the kit's `frac-model` cell: every term drawn as `kind` on one
+ * whole (never the answer: RP-1), "=", and the answer boxes - a mixed number's three boxes when
+ * the answer can be 1 or more (`mixed`), a fraction's two otherwise. Pictures off: numbers only.
+ */
+function _fSentenceKit(q, terms, ops, kind, { mixed = false, wholeMm = 26 } = {}) {
+    const k = _fPicturesOff() ? null : kind;
+    const a = _fParts(q.ans) || {};
+    const payload = {
+        task: 'op',
+        terms: [...terms.map(t => Object.assign({}, t, { kind: t.kind === null ? null : k })), { n: a.n || 0, d: a.d || 1, frac: mixed ? 'wnd' : 'nd' }],
+        joins: [...ops, '='],
+        answer: { w: a.w || 0, n: a.n || 0, d: a.d || 1 },
+        wholeMm,
+    };
+    _fKit(q, payload);
+    q.fractionModel = k;
 }
 
 // P12: a SET option the teacher changed from its default (skill-options.js), else null.
@@ -247,32 +293,9 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.answerType = "text";
                 q.hint = `Same denominator! Add the numerators: ${n1} + ${n2} = ${sumNum}. Then simplify ${sumNum}/${den} if possible.`;
 
-                // O6 `model`: each term drawn as the ticked model (never the sum: RP-1), B&W.
-                const _afModel = _fModelPick();
-                if (_afModel) {
-                    q.visual = `<div class="mq-frac-visual" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;">`
-                        + _fTerm(n1, den, _afModel) + _fSign('+') + _fTerm(n2, den, _afModel) + `</div>`;
-                    q.fractionModel = _afModel;
-                    return;
-                }
-
-                const barW = 260;
-                const barH = 32;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Add Fractions (Like Denominators)</div>
-                    <div style="font-size:1.3rem;margin-bottom:14px;">
-                        ${fracHTML(n1, den, 'xl')} <span style="margin:0 8px;font-size:1.5rem;">+</span> ${fracHTML(n2, den, 'xl')} <span style="margin:0 8px;font-size:1.5rem;">=</span> <span style="font-size:1.5rem;color:var(--accent-green);font-weight:700;">?</span>
-                    </div>
-                    <div style="margin-bottom:8px;font-size:0.85rem;color:var(--text-bright);">${n1}/${den}</div>
-                    ${_svgBar(n1, den, barW, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
-                    <div style="margin:6px 0 2px;font-size:1.2rem;font-weight:700;">+</div>
-                    <div style="font-size:0.85rem;color:var(--text-bright);">${n2}/${den}</div>
-                    ${_svgBar(n2, den, barW, barH, 'var(--accent-purple)', 'var(--bg-card)')}
-                    <div style="border-top:2px solid var(--text-bright);margin:10px auto 6px;width:${barW}px;"></div>
-                    <div style="font-size:0.85rem;color:var(--text-bright);">= ?/${den}</div>
-                    ${_svgBar(Math.min(sumNum, den), den, barW, barH, 'var(--accent-green)', 'var(--bg-card)')}
-                    ${sumNum > den ? `<div style="margin-top:4px;font-size:0.8rem;color:var(--accent-orange);">+ ${sumNum - den}/${den} more (improper fraction!)</div>` : ''}
-                </div>`;
+                // KIT (O6 lane AP3): both fractions drawn on one whole as the ticked model (bars by
+                // default), never the sum (RP-1); the pupil writes the sum in the boxes after "=".
+                _fSentenceKit(q, [{ n: n1, d: den }, { n: n2, d: den }], ['+'], _fModelPick() || 'bar', { mixed: sumNum >= den });
                 return;
 
             } else if (fracSkill === "sub_fractions_like" && Math.random() < 0.25) {
@@ -329,42 +352,9 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.answerType = "text";
                 q.hint = `Same denominator! Subtract the numerators: ${n1} \u2212 ${n2} = ${diffNum}. Then simplify ${diffNum}/${den} if possible.`;
 
-                // O6 `model`: each term drawn as the ticked model (never the difference: RP-1), B&W.
-                const _sfxModel = _fModelPick();
-                if (_sfxModel) {
-                    q.visual = `<div class="mq-frac-visual" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;">`
-                        + _fTerm(n1, den, _sfxModel) + _fSign('\u2212') + _fTerm(n2, den, _sfxModel) + `</div>`;
-                    q.fractionModel = _sfxModel;
-                    return;
-                }
-
-                const barW = 260;
-                const barH = 32;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Subtract Fractions (Like Denominators)</div>
-                    <div style="font-size:1.3rem;margin-bottom:14px;">
-                        ${fracHTML(n1, den, 'xl')} <span style="margin:0 8px;font-size:1.5rem;">\u2212</span> ${fracHTML(n2, den, 'xl')} <span style="margin:0 8px;font-size:1.5rem;">=</span> <span style="font-size:1.5rem;color:var(--accent-green);font-weight:700;">?</span>
-                    </div>
-                    <div style="margin-bottom:8px;font-size:0.85rem;color:var(--text-bright);">Start with ${n1}/${den}</div>
-                    ${_svgBar(n1, den, barW, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
-                    <div style="margin:6px 0 2px;font-size:0.85rem;color:var(--accent-orange);">Remove ${n2}/${den}</div>
-                    ${(() => {
-                        const segW = barW / den;
-                        let rects = '';
-                        for (let i = 0; i < den; i++) {
-                            const inOriginal = i < n1;
-                            const removed = i >= diffNum && i < n1;
-                            const fill = removed ? 'var(--accent-orange)' : (inOriginal ? 'var(--accent-cyan)' : 'var(--bg-card)');
-                            const opacity = inOriginal ? (removed ? '0.4' : '1') : '0.3';
-                            rects += `<rect x="${i * segW}" y="0" width="${segW}" height="${barH}" fill="${fill}" stroke="var(--text-bright)" stroke-width="1.5" opacity="${opacity}"/>`;
-                            if (removed) rects += `<line x1="${i * segW}" y1="0" x2="${(i + 1) * segW}" y2="${barH}" stroke="var(--accent-orange)" stroke-width="2"/>`;
-                        }
-                        return `<svg width="${barW}" height="${barH}" viewBox="0 0 ${barW} ${barH}" style="display:block;margin:4px auto;">${rects}</svg>`;
-                    })()}
-                    <div style="border-top:2px solid var(--text-bright);margin:10px auto 6px;width:${barW}px;"></div>
-                    <div style="font-size:0.85rem;color:var(--accent-green);">= ?/${den} remaining</div>
-                    ${_svgBar(diffNum, den, barW, barH, 'var(--accent-green)', 'var(--bg-card)')}
-                </div>`;
+                // KIT (O6 lane AP3): both fractions drawn on one whole as the ticked model (bars by
+                // default), never the difference (RP-1); the pupil writes it in the boxes after "=".
+                _fSentenceKit(q, [{ n: n1, d: den }, { n: n2, d: den }], ['−'], _fModelPick() || 'bar', { mixed: diffNum >= den });
                 return;
 
             } else if (fracSkill === "add_mixed_like" && Math.random() < 0.25) {
@@ -4241,14 +4231,8 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 const efvMultiplier = pick([2, 3, 4]);
                 const efvEquivNum = efvBaseNum * efvMultiplier;
                 const efvEquivDen = efvBaseDen * efvMultiplier;
-                const efvColorA = '#d4e5f7';
-                const efvColorB = '#f5d4e8';
-                // O6 `model`: the ticked model replaces the circles, both fractions on the SAME
-                // whole so the pictures show the equivalence; print reads fractionData.model.
+                // O6 `model`: the ticked model (else circles), both fractions on the SAME whole.
                 const _efvModel = _fModelPick();
-                const efvPic = (n, d, px, col) => (_efvModel
-                    ? _fModel(n, d, _efvModel, { wholeMm: px >= 150 ? 50 : 38 })
-                    : fracCircleSVG(n, d, px, col));
 
                 const efvRoll = Math.random();
                 if (efvRoll < 0.30) {
@@ -4257,20 +4241,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.ans = `${efvEquivNum}/${efvEquivDen}`;
                     q.answerType = "text";
                     q.hint = `The first circle shows ${efvBaseNum}/${efvBaseDen}. Count the shaded parts in the second circle. Multiply numerator and denominator by ${efvMultiplier}.`;
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Equivalent Fractions</div>
-                        <div class="efv-row" style="display:flex;justify-content:center;align-items:flex-start;gap:32px;flex-wrap:wrap;">
-                            <div class="efv-col" style="display:flex;flex-direction:column;align-items:center;gap:10px;">
-                                <div style="height:180px;display:flex;align-items:center;justify-content:center;">${efvPic(efvBaseNum, efvBaseDen, 180, efvColorA)}</div>
-                                <div style="font-weight:600;">${fracHTML(efvBaseNum, efvBaseDen)}</div>
-                            </div>
-                            <span style="align-self:center;font-size:2rem;font-weight:700;color:var(--accent-green);margin-top:55px;">=</span>
-                            <div class="efv-col" style="display:flex;flex-direction:column;align-items:center;gap:10px;">
-                                <div style="height:180px;display:flex;align-items:center;justify-content:center;">${efvPic(efvEquivNum, efvEquivDen, 180, efvColorB)}</div>
-                                <div style="font-weight:600;">${fracHTML('?', '?')}</div>
-                            </div>
-                        </div>
-                    </div>`;
+                    q.visual = '';
                     q.fractionData = { num1: efvBaseNum, den1: efvBaseDen, num2: efvEquivNum, den2: efvEquivDen, isEquivalent: true, missingPart: null, printType: pick(['both_shaded', 'shade_second', 'fill_numbers']) };
                 } else if (efvRoll < 0.55) {
                     // Type 2: One circle shaded, identify the equivalent fraction
@@ -4278,20 +4249,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.ans = `${efvEquivNum}/${efvEquivDen}`;
                     q.answerType = "text";
                     q.hint = `The second circle has ${efvEquivDen} equal parts with ${efvEquivNum} shaded. Multiply top and bottom of ${efvBaseNum}/${efvBaseDen} by ${efvMultiplier}.`;
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Equivalent Fractions</div>
-                        <div class="efv-row" style="display:flex;justify-content:center;align-items:flex-start;gap:32px;flex-wrap:wrap;">
-                            <div class="efv-col" style="display:flex;flex-direction:column;align-items:center;gap:10px;">
-                                <div style="height:180px;display:flex;align-items:center;justify-content:center;">${efvPic(efvBaseNum, efvBaseDen, 180, efvColorA)}</div>
-                                <div style="font-weight:600;">${fracHTML(efvBaseNum, efvBaseDen)}</div>
-                            </div>
-                            <span style="align-self:center;font-size:2rem;font-weight:700;color:var(--accent-green);margin-top:55px;">=</span>
-                            <div class="efv-col" style="display:flex;flex-direction:column;align-items:center;gap:10px;">
-                                <div style="height:180px;display:flex;align-items:center;justify-content:center;">${efvPic(efvEquivNum, efvEquivDen, 180, efvColorB)}</div>
-                                <div style="font-weight:600;">${fracHTML('?', '?')}</div>
-                            </div>
-                        </div>
-                    </div>`;
+                    q.visual = '';
                     q.fractionData = { num1: efvBaseNum, den1: efvBaseDen, num2: efvEquivNum, den2: efvEquivDen, isEquivalent: true, missingPart: null, printType: pick(['shade_second', 'fill_numbers', 'both_shaded']) };
                 } else if (efvRoll < 0.80) {
                     // Type 3: Both circles shown, compare with = or ≠
@@ -4344,20 +4302,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.hint = efvIsEquiv
                         ? `Both fractions equal ${(efvBaseNum / efvBaseDen).toFixed(2)} so they are equivalent.`
                         : `${efvBaseNum}/${efvBaseDen} = ${(efvBaseNum / efvBaseDen).toFixed(2)} but ${efvCmpNum2}/${efvCmpDen2} = ${(efvCmpNum2 / efvCmpDen2).toFixed(2)}, so they are NOT equivalent.`;
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Are These Equivalent?</div>
-                        <div class="efv-row" style="display:flex;justify-content:center;align-items:flex-start;gap:32px;flex-wrap:wrap;">
-                            <div class="efv-col" style="display:flex;flex-direction:column;align-items:center;gap:10px;">
-                                <div style="height:180px;display:flex;align-items:center;justify-content:center;">${efvPic(efvBaseNum, efvBaseDen, 180, efvColorA)}</div>
-                                <div style="font-weight:600;">${fracHTML(efvBaseNum, efvBaseDen)}</div>
-                            </div>
-                            <span style="align-self:center;font-size:2rem;font-weight:700;color:var(--text-dim);margin-top:55px;">?</span>
-                            <div class="efv-col" style="display:flex;flex-direction:column;align-items:center;gap:10px;">
-                                <div style="height:180px;display:flex;align-items:center;justify-content:center;">${efvPic(efvCmpNum2, efvCmpDen2, 180, efvColorB)}</div>
-                                <div style="font-weight:600;">${fracHTML(efvCmpNum2, efvCmpDen2)}</div>
-                            </div>
-                        </div>
-                    </div>`;
+                    q.visual = '';
                     q.fractionData = { num1: efvBaseNum, den1: efvBaseDen, num2: efvCmpNum2, den2: efvCmpDen2, isEquivalent: efvIsEquiv, missingPart: null, printType: pick(['compare', 'shade_both_compare']) };
                 } else {
                     // Type 4: Find missing numerator or denominator
@@ -4372,28 +4317,31 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         q.hint = `Multiply the denominator by ${efvMultiplier}: ${efvBaseDen} × ${efvMultiplier} = ${efvEquivDen}.`;
                     }
                     q.answerType = "number";
-                    const efvMissLabel = efvMissNum
-                        ? `<span class="frac frac-2xl"><span class="num" style="background:rgba(76,175,80,0.2);border-radius:6px;padding:4px 12px;border:2px dashed var(--accent-green);">?</span><span class="den">${efvEquivDen}</span></span>`
-                        : `<span class="frac frac-2xl"><span class="num">${efvEquivNum}</span><span class="den" style="background:rgba(76,175,80,0.2);border-radius:6px;padding:4px 12px;border:2px dashed var(--accent-green);">?</span></span>`;
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Find the Missing Number</div>
-                        <div class="frac-equation" style="margin-bottom:20px;">
-                            ${fracHTML(efvBaseNum, efvBaseDen, '2xl')}
-                            <span class="frac-equals">=</span>
-                            ${efvMissLabel}
-                        </div>
-                        <div style="display:flex;justify-content:center;align-items:center;gap:25px;">
-                            ${efvPic(efvBaseNum, efvBaseDen, 110, efvColorA)}
-                            <span style="font-size:2rem;color:var(--accent-green);">=</span>
-                            ${efvPic(efvEquivNum, efvEquivDen, 110, efvColorB)}
-                        </div>
-                        <div style="margin-top:12px;font-size:0.9rem;color:var(--text-dim);">
-                            Multiply top and bottom by <strong>${efvMultiplier}</strong>
-                        </div>
-                    </div>`;
+                    q.visual = '';
                     q.fractionData = { num1: efvBaseNum, den1: efvBaseDen, num2: efvEquivNum, den2: efvEquivDen, isEquivalent: true, missingPart: efvMissNum ? "num2" : "den2", printType: 'missing_number' };
                 }
-                if (_efvModel && q.fractionData) q.fractionData.model = _efvModel;
+                // KIT (O6 lane AP3): both fractions on the SAME whole, the kit's `frac-model` cell for
+                // paper, key and screen. Circles unless the teacher ticked other models.
+                {
+                    const fd = q.fractionData;
+                    const kind = _efvModel || 'circle';
+                    fd.model = kind;
+                    q.fractionModel = kind;
+                    const t1 = { n: fd.num1, d: fd.den1, kind };
+                    if (q.answerType === 'text' && q.options && q.options.length) {
+                        // = or not equal: the sign in the circle between the two pictures
+                        q.answerType = 'symbol';
+                        _fKit(q, { task: 'sign', terms: [t1, { n: fd.num2, d: fd.den2, kind }], joins: ['sign'], signs: ['=', '\u2260'], answer: { sign: q.ans }, wholeMm: 30 });
+                    } else if (fd.missingPart) {
+                        const frac = fd.missingPart === 'num2' ? 'n' : 'd';
+                        _fKit(q, { task: 'op', terms: [t1, { n: fd.num2, d: fd.den2, kind, frac }], joins: ['='], answer: { n: fd.num2, d: fd.den2 }, wholeMm: 30 });
+                    } else {
+                        // write the fraction the second picture shows
+                        q.text = `The first model shows ${fd.num1}/${fd.den1}. Write the fraction the second model shows.`;
+                        q.noSimplify = true;
+                        _fKit(q, { task: 'op', terms: [t1, { n: fd.num2, d: fd.den2, kind, frac: 'nd' }], joins: ['='], answer: { n: fd.num2, d: fd.den2 }, wholeMm: 30 });
+                    }
+                }
                 q.printFormat = 'equiv-frac-visual';
                 q.skillLabel = 'Equiv Frac (Visual)';
 
@@ -5250,6 +5198,8 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
 
             } else if (fracSkill === "identify") {
+                // KIT (O6 lane AP3, 2026-09-25): every picture item is the kit's `frac-model` cell -
+                // one drawing on paper, in the key and on screen (sheet/cells/frac-model.js).
                 const idVariant = window.pickVariant
                     ? window.pickVariant('identify', ['standard', 'pickModel', 'partLabel'], state)
                     : pick(['standard', 'pickModel', 'partLabel']);
@@ -5276,25 +5226,24 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         { n: tNum, d: tDen, correct: true },
                         ...distractors.map(x => ({ ...x, correct: false }))
                     ]);
-                    const opts = all.map((f, i) => {
+                    // The models are the choices (they used to be thrown away, leaving "3/8" to
+                    // match "3/8"): lettered A-D on paper and on screen, the pupil circles or taps
+                    // the letter. The ticked models, else circles and bars as the skill drew.
+                    const _pmModels = _fChanged('model');
+                    const letters = ['A', 'B', 'C', 'D'];
+                    const terms = all.map((f, i) => {
                         const useCircle = Math.random() < 0.5;
-                        const vis = useCircle
-                            ? fracCircleSVG(f.n, f.d, 56, 'var(--accent-cyan)', 'var(--bg-card-light)')
-                            : `<div style="display:flex;justify-content:center;">${fracBarHTML(f.n, f.d, 'var(--accent-cyan)')}</div>`;
-                        return {
-                            id: 'opt' + i,
-                            label: vis,
-                            html: true,
-                            value: `${f.n}/${f.d}`,
-                            correct: f.correct
-                        };
+                        const kind = _pmModels ? pick(_pmModels) : (useCircle ? 'circle' : 'bar');
+                        return { n: f.n, d: f.d, kind, frac: 'none', letter: letters[i] };
                     });
-                    q.text = `Pick the model showing ${tNum}/${tDen}.`;
-                    q.ans = `${tNum}/${tDen}`;
+                    const right = letters[all.findIndex(f => f.correct)];
+                    q.text = `Which model shows ${tNum}/${tDen}?`;
+                    q.ans = right;
                     q.answerType = 'multiple-choice';
-                    q.options = opts.map(o => o.value);
-                    q.hint = `Count the shaded parts (${tNum}) over the total parts (${tDen}).`;
+                    q.options = letters.slice(0, all.length);
+                    q.hint = `Count the equal parts (${tDen}). Find the model with ${tNum} of them shaded.`;
                     q.skillLabel = 'Identify Fractions';
+                    _fKit(q, { task: 'pick', show: { n: tNum, d: tDen }, terms, answer: { letter: right }, wholeMm: 22 });
                     return;
                 }
                 if (idVariant === 'partLabel') {
@@ -5319,186 +5268,70 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 // Level 1: Identify fractions from visual
                 const den = pick([2, 3, 4, 5, 6, 8]);
                 const num = rng(1, den - 1);
-                q.text = `What fraction is shaded?`;
-                q.ans = simplifyFraction(num, den);
-                q.answerType = "text";
+                const simple = simplifyFraction(num, den);
                 const wrongs = new Set();
                 wrongs.add(`${den - num}/${den}`);
                 wrongs.add(`${num}/${den + 1}`);
                 wrongs.add(`${Math.min(num + 1, den)}/${den}`);
-                q.options = shuffle([q.ans, ...Array.from(wrongs).slice(0, 3)]);
-                q.hint = `Count the shaded parts (numerator) and total parts (denominator).`;
-
-                // Use ONE random visual type (circle or bar, not both)
+                shuffle([simple, ...Array.from(wrongs).slice(0, 3)]);   // kept: the draws of the old choice list
                 const useCircle = Math.random() < 0.5;
-                q.visual = `<div style="text-align:center;">
-                    <div style="margin-bottom:12px;">
-                        ${useCircle
-                            ? fracCircleSVG(num, den, 60, 'var(--accent-cyan)', 'var(--bg-card-light)')
-                            : `<div style="display:flex;justify-content:center;">${fracBarHTML(num, den, 'var(--accent-cyan)')}</div>`
-                        }
-                    </div>
-                </div>`;
-                // O6 `model`: the ticked model(s), one B&W drawing on screen and in print (the
-                // legacy print path prints q.visual for this skill). A line marks the fraction
-                // with a dot, so the question names the dot.
-                const _idModel = _fModelPick();
-                if (_idModel) {
-                    q.visual = `<div class="mq-frac-visual" style="text-align:center;">${_fModelP(num, den, _idModel)}</div>`;
-                    if (_idModel === 'line') {
-                        q.text = `What fraction does the dot show?`;
-                        q.hint = `Count the equal parts from 0 to 1 (the denominator). Count the parts from 0 to the dot (the numerator).`;
-                    }
-                    q.fractionModel = _idModel;
-                }
+                const _idModel = _fModelPick() || (useCircle ? 'circle' : 'bar');
+                // Written, not picked (a production item on paper stays one on screen): the pupil
+                // writes the numerator and the denominator; the simplest form is right too.
+                q.text = _idModel === 'line' ? `What fraction does the dot show?` : `What fraction is shaded?`;
+                q.ans = `${num}/${den}`;
+                q.acceptedAnswers = simple !== q.ans ? [q.ans, simple] : [q.ans];
+                q.answerType = 'text';
+                q.options = [];
+                q.hint = _idModel === 'line'
+                    ? `Count the equal parts from 0 to 1 (the denominator). Count the parts from 0 to the dot (the numerator).`
+                    : `Count the shaded parts (numerator) and total parts (denominator).`;
+                q.fractionModel = _idModel;
+                q.fractionData = { num, den, model: _idModel };
+                q.skillLabel = 'Identify Fractions';
+                _fKit(q, { task: 'write', terms: [{ n: num, d: den, kind: _idModel, frac: 'nd' }], answer: { n: num, d: den }, wholeMm: _fWriteWhole(_idModel) });
             } else if (fracSkill === "write_fraction") {
-                // Write the fraction shown — typed numerator + denominator inputs.
-                // Equivalent fractions are NOT accepted: student must type the literal
-                // counted parts (e.g. visual shows 2/4 → must type 2/4, not 1/2).
+                // Write the fraction shown: the pupil writes the numerator and the denominator in
+                // the two boxes of the fraction (paper and screen). Equivalent fractions are NOT
+                // accepted: the literal counted parts (2/4 shaded -> 2/4, not 1/2).
                 const den = pick([2, 3, 4, 5, 6, 8, 10]);
                 const num = rng(1, den - 1);
                 const visualPick = Math.random();
-                const fillColor = 'var(--accent-cyan)';
-
-                let visualHTML;
-                if (visualPick < 0.34) {
-                    visualHTML = fracCircleSVG(num, den, 130, fillColor, 'var(--bg-card-light)');
-                } else if (visualPick < 0.67) {
-                    visualHTML = `<div style="display:flex;justify-content:center;">${fracBarHTML(num, den, fillColor)}</div>`;
-                } else {
-                    // Rectangle / array (rows × cols of squares, num shaded)
-                    const cols = den <= 4 ? den : (den % 2 === 0 ? den / 2 : den);
-                    const rows = Math.ceil(den / cols);
-                    const cellSize = 38;
-                    let cells = '';
-                    for (let i = 0; i < den; i++) {
-                        const isFilled = i < num;
-                        const r = Math.floor(i / cols);
-                        const c = i % cols;
-                        cells += `<rect x="${c * cellSize}" y="${r * cellSize}" width="${cellSize}" height="${cellSize}" fill="${isFilled ? fillColor : 'var(--bg-card-light)'}" stroke="var(--text-bright)" stroke-width="2"/>`;
-                    }
-                    const w = cols * cellSize;
-                    const h = rows * cellSize;
-                    visualHTML = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block;margin:0 auto;">${cells}</svg>`;
-                }
-
-                // O6 `model`: the ticked model(s) replace the old mix, drawn by the kit's builder;
-                // the print handler draws the same model from fractionData.model.
-                const _wfModel = _fModelPick();
-                if (_wfModel) visualHTML = _fModel(num, den, _wfModel);
-
+                const _wfModel = _fModelPick() || (visualPick < 0.34 ? 'circle' : visualPick < 0.67 ? 'bar' : 'area');
                 q.text = _wfModel === 'line' ? `Write the fraction the dot shows.` : `Write the fraction that is shaded.`;
                 q.ans = `${num}/${den}`;
-                q.answerType = "fraction-input";
+                q.answerType = 'text';
                 q.noSimplify = true;
                 q.hint = _wfModel === 'line'
                     ? `Count the parts from 0 to the dot. That's the numerator. Count the equal parts from 0 to 1. That's the denominator.`
                     : `Count the shaded parts. That's the numerator. Count the total parts. That's the denominator.`;
                 q.options = [];
-                q.visual = `<div style="text-align:center;">
-                    <div style="margin-bottom:12px;">${visualHTML}</div>
-                </div>`;
                 q.printFormat = 'write-fraction';
-                q.fractionData = _wfModel ? { num, den, model: _wfModel } : { num, den };
+                q.fractionData = { num, den, model: _wfModel };
+                q.fractionModel = _wfModel;
                 q.skillLabel = 'Write Frac';
+                _fKit(q, { task: 'write', terms: [{ n: num, d: den, kind: _wfModel, frac: 'nd' }], answer: { n: num, d: den }, wholeMm: _fWriteWhole(_wfModel) });
                 return;
             } else if (fracSkill === "shade_fraction") {
-                // Shade the fraction — student clicks parts of a blank visual to toggle shade.
-                // Correct when the COUNT of shaded parts matches num (which parts don't matter).
+                // Shade the fraction: the pupil shades parts of an empty model (any parts: the
+                // COUNT is the answer). Paper: shade with a pencil; the key shades the model.
+                // Screen: tap the parts (the card's shade handler, or the grid hosts' model mount).
                 const den = pick([2, 3, 4, 5, 6, 8, 10]);
                 const num = rng(1, den - 1);
                 const visualPick = Math.random();
-
-                const fillColor = '#1e88e5';
-                const emptyColor = '#ffffff';
-                const stroke = '#333';
-
-                let visualHTML;
-                if (visualPick < 0.34) {
-                    // Circle (pie) — each <g class="shade-target"> is a clickable wedge
-                    const size = 180;
-                    const cx = size / 2;
-                    const cy = size / 2;
-                    const r = (size / 2) - 8;
-                    const sliceAngle = 360 / den;
-                    let slices = '';
-                    for (let i = 0; i < den; i++) {
-                        const startAngle = (i * sliceAngle) - 90;
-                        const endAngle = startAngle + sliceAngle;
-                        const startRad = (startAngle * Math.PI) / 180;
-                        const endRad = (endAngle * Math.PI) / 180;
-                        const x1 = cx + r * Math.cos(startRad);
-                        const y1 = cy + r * Math.sin(startRad);
-                        const x2 = cx + r * Math.cos(endRad);
-                        const y2 = cy + r * Math.sin(endRad);
-                        const largeArc = sliceAngle > 180 ? 1 : 0;
-                        const path = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
-                        slices += `<g class="shade-target" data-idx="${i}" data-shaded="0" style="cursor:pointer;">
-                            <path d="${path}" fill="${emptyColor}" stroke="${stroke}" stroke-width="2" data-fill-color="${fillColor}"/>
-                        </g>`;
-                    }
-                    visualHTML = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display:block;margin:0 auto;">
-                        <circle cx="${cx}" cy="${cy}" r="${r}" fill="${emptyColor}" stroke="${stroke}" stroke-width="2"/>
-                        ${slices}
-                    </svg>`;
-                } else if (visualPick < 0.67) {
-                    // Bar (horizontal segments)
-                    const segW = Math.max(38, Math.min(60, 360 / den));
-                    const segH = 60;
-                    let rects = '';
-                    for (let i = 0; i < den; i++) {
-                        rects += `<g class="shade-target" data-idx="${i}" data-shaded="0" style="cursor:pointer;">
-                            <rect x="${i * segW}" y="0" width="${segW}" height="${segH}" fill="${emptyColor}" stroke="${stroke}" stroke-width="2" data-fill-color="${fillColor}"/>
-                        </g>`;
-                    }
-                    const w = den * segW;
-                    visualHTML = `<svg width="${w}" height="${segH}" viewBox="0 0 ${w} ${segH}" style="display:block;margin:0 auto;">${rects}</svg>`;
-                } else {
-                    // Rectangle / array
-                    const cols = den <= 4 ? den : (den % 2 === 0 ? den / 2 : den);
-                    const rows = Math.ceil(den / cols);
-                    const cellSize = 48;
-                    let cells = '';
-                    for (let i = 0; i < den; i++) {
-                        const r = Math.floor(i / cols);
-                        const c = i % cols;
-                        cells += `<g class="shade-target" data-idx="${i}" data-shaded="0" style="cursor:pointer;">
-                            <rect x="${c * cellSize}" y="${r * cellSize}" width="${cellSize}" height="${cellSize}" fill="${emptyColor}" stroke="${stroke}" stroke-width="2" data-fill-color="${fillColor}"/>
-                        </g>`;
-                    }
-                    const w = cols * cellSize;
-                    const h = rows * cellSize;
-                    visualHTML = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block;margin:0 auto;">${cells}</svg>`;
-                }
-
-                // O6 `model`: the ticked model(s), every part a shade target (the screen host
-                // toggles `.shade-target` groups); print draws the same blank model.
-                const _sfModel = _fModelPick();
-                if (_sfModel) visualHTML = _fModel(num, den, _sfModel, { targets: true });
-
-                q.text = `Shade ${num}/${den} of the figure.`;
+                const _sfModel = _fModelPick() || (visualPick < 0.34 ? 'circle' : visualPick < 0.67 ? 'bar' : 'area');
+                // Verb-free on purpose: the screen verb map turns a leading "Shade" into "Tap the parts".
+                q.text = `Show ${num}/${den} on the model.`;
                 q.ans = String(num);
                 q.shadeTarget = num;
                 q.answerType = "shade-parts";
-                q.hint = `Click ${num} parts to shade them. Click again to unshade. The denominator is ${den} — that's how many equal parts.`;
+                q.hint = `Tap ${num} parts to shade them. Tap again to clear one. The denominator is ${den}: that's how many equal parts.`;
                 q.options = [];
-                if (_sfModel) {
-                    q.visual = `<div class="mq-frac-visual" style="text-align:center;">`
-                        + `<div style="font-weight:700;margin-bottom:10px;font-size:1.1rem;">Shade <span style="font-size:1.3rem;">${fracStackHTML(num, den)}</span></div>`
-                        + `<div style="margin-bottom:12px;">${visualHTML}</div></div>`;
-                    q.printFormat = 'shade-fraction';
-                    q.fractionData = { num, den, model: _sfModel };
-                    q.skillLabel = 'Shade Frac';
-                    return;
-                }
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Shade ${num}/${den}</div>
-                    <div style="margin-bottom:12px;">${visualHTML}</div>
-                    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:8px;">Click parts to toggle shading. Then press Submit.</div>
-                </div>`;
                 q.printFormat = 'shade-fraction';
-                q.fractionData = { num, den };
+                q.fractionData = { num, den, model: _sfModel };
+                q.fractionModel = _sfModel;
                 q.skillLabel = 'Shade Frac';
+                _fKit(q, { task: 'shade', show: { n: num, d: den }, terms: [{ n: num, d: den, kind: _sfModel, blank: true, frac: 'none' }], answer: { shade: num } });
                 return;
             } else if (fracSkill === "select_equiv_frac") {
                 // MAP-style multi-select-check: "Click ALL fractions equivalent to N/D"
@@ -5720,15 +5553,16 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         cn2 = (cn2 % (cd2 - 1)) + 1;
                         if (cn2 === cn1 && cd1 === cd2) cn2 = Math.max(1, cn2 - 1);
                     }
-                    q.text = `Which is greater: ${cn1}/${cd1} or ${cn2}/${cd2}? (Type the greater fraction, or "equal")`;
+                    // Numbers only, in the same cell as the picture items: <, > or = in the circle
+                    // between the two fractions (one instruction for the page, P-LG-5).
                     const v1 = cn1 / cd1, v2 = cn2 / cd2;
-                    if (v1 > v2) q.ans = `${cn1}/${cd1}`;
-                    else if (v2 > v1) q.ans = `${cn2}/${cd2}`;
-                    else q.ans = 'equal';
-                    q.answerType = 'multiple-choice';
-                    q.options = shuffle([`${cn1}/${cd1}`, `${cn2}/${cd2}`, 'equal']);
+                    q.text = `Compare the fractions: ${cn1}/${cd1} and ${cn2}/${cd2}.`;
+                    q.ans = v1 > v2 ? '>' : v1 < v2 ? '<' : '=';
+                    q.answerType = 'symbol';
+                    q.options = ['>', '<', '='];
                     q.hint = `Find a common denominator, or compare each to 1/2 or 1.`;
                     q.skillLabel = 'Compare Fractions';
+                    _fKit(q, { task: 'sign', terms: [{ n: cn1, d: cd1 }, { n: cn2, d: cd2 }], joins: ['sign'], answer: { sign: q.ans } });
                     return;
                 }
                 if (cmpVariant === 'compareHalf') {
@@ -5737,19 +5571,19 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     const hd = pick(halfDens);
                     const hn = rng(1, hd - 1);
                     const val = hn / hd;
-                    let ans;
-                    if (val > 0.5) ans = 'greater than';
-                    else if (val < 0.5) ans = 'less than';
-                    else ans = 'equal to';
-                    q.text = `Is ${hn}/${hd} greater than, less than, or equal to 1/2?`;
-                    q.ans = ans;
-                    q.answerType = 'multiple-choice';
-                    q.options = ['greater than', 'less than', 'equal to'];
-                    q.hint = `1/2 of ${hd} is ${hd / 2}. Compare ${hn} to ${hd / 2}.`;
+                    // The benchmark 1/2, in the same circle cell as the other compare items.
+                    q.text = `Compare the fractions: ${hn}/${hd} and 1/2.`;
+                    q.ans = val > 0.5 ? '>' : val < 0.5 ? '<' : '=';
+                    q.answerType = 'symbol';
+                    q.options = ['>', '<', '='];
+                    q.hint = `Half of ${hd} is ${hd / 2}. Compare ${hn} to ${hd / 2}.`;
                     q.skillLabel = 'Compare Fractions';
+                    _fKit(q, { task: 'sign', terms: [{ n: hn, d: hd }, { n: 1, d: 2 }], joins: ['sign'], answer: { sign: q.ans }, benchmark: true });
                     return;
                 }
-                // Level 2: Compare fractions with side-by-side fraction bar visuals
+                // Level 2: compare two fractions drawn on the SAME whole (the kit's `frac-model`
+                // cell, O6 lane AP3): the pupil writes <, > or = in the circle between them. Bars
+                // unless the teacher ticked other models; paper, key and screen are one drawing.
                 const denoms = [2, 3, 4, 5, 6, 8];
                 const d1 = pick(denoms);
                 const d2 = pick(denoms);
@@ -5758,51 +5592,17 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 const val1 = n1 / d1;
                 const val2 = n2 / d2;
 
-                q.text = `Compare the fractions: ${n1}/${d1} ___ ${n2}/${d2}`;
+                q.text = `Compare the fractions: ${n1}/${d1} and ${n2}/${d2}.`;
                 q.ans = val1 > val2 ? ">" : val1 < val2 ? "<" : "=";
                 q.answerType = "symbol";
                 q.options = [">", "<", "="];
-                q.hint = `Convert to same denominator, or compare how close each is to 1.`;
+                q.hint = `Both pictures are the same whole. Which one has more shaded? Or give them the same denominator.`;
+                const _cmpModel = _fModelPick() || 'bar';
                 q.printFormat = 'fraction-compare';
-                q.fractionData = { num1: n1, denom1: d1, num2: n2, denom2: d2 };
-
-                // Build fraction bar SVGs for side-by-side comparison.
-                // Both bars use the same shaded color since this skill is about
-                // comparing magnitudes (not identifying which side a bar belongs to).
-                const cmpBarW = 200;
-                const cmpBarH = 24;
-                const buildCompareBar = (num, den) => {
-                    const segW = cmpBarW / den;
-                    let segs = '';
-                    for (let i = 0; i < den; i++) {
-                        segs += `<rect x="${i * segW}" y="0" width="${segW}" height="${cmpBarH}" fill="${i < num ? softFill(COLORS.primary) : COLORS.bg}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
-                    }
-                    return `<svg width="${cmpBarW}" height="${cmpBarH}" viewBox="0 0 ${cmpBarW} ${cmpBarH}" style="max-width:100%;height:auto;">${segs}</svg>`;
-                };
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="display:inline-flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center;">
-                        <div style="text-align:center;">
-                            ${buildCompareBar(n1, d1)}
-                            <div style="margin-top:6px;font-weight:700;font-size:1.1rem;">${n1}/${d1}</div>
-                        </div>
-                        <div style="font-size:2.5rem;font-weight:800;min-width:40px;"><span class="answer-blank-inline" style="min-width:50px;width:50px;border-bottom-width:4px;"></span></div>
-                        <div style="text-align:center;">
-                            ${buildCompareBar(n2, d2)}
-                            <div style="margin-top:6px;font-weight:700;font-size:1.1rem;">${n2}/${d2}</div>
-                        </div>
-                    </div>
-                </div>`;
-                // O6 `model`: both fractions drawn as the ticked model on the SAME whole, so the
-                // pictures compare; print draws the same from fractionData.model.
-                const _cmpModel = _fModelPick();
-                if (_cmpModel) {
-                    const col = (n, d) => `<span style="display:inline-flex;flex-direction:column;align-items:center;gap:6px;">`
-                        + `${_fModel(n, d, _cmpModel, { wholeMm: 44 })}<span style="font-size:1.4rem;">${fracStackHTML(n, d)}</span></span>`;
-                    q.visual = `<div class="mq-frac-visual" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:16px;">`
-                        + col(n1, d1) + `<span class="answer-blank-inline" style="min-width:50px;width:50px;border-bottom-width:4px;"></span>` + col(n2, d2) + `</div>`;
-                    q.fractionData.model = _cmpModel;
-                }
+                q.fractionData = { num1: n1, denom1: d1, num2: n2, denom2: d2, model: _cmpModel };
+                q.fractionModel = _cmpModel;
+                _fKit(q, { task: 'sign', terms: [{ n: n1, d: d1, kind: _cmpModel }, { n: n2, d: d2, kind: _cmpModel }],
+                    joins: ['sign'], answer: { sign: q.ans }, wholeMm: _cmpModel === 'line' ? 40 : 26 });
             } else if (fracSkill === "fraction_bar_ops") {
                 // Fraction bar operations — add/subtract with visual bar models
                 const isAdd = Math.random() < 0.55;

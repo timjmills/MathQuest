@@ -1241,3 +1241,7 @@ html body .mq-scell .mq-nl-track {
 }
 /* the place-value mat's zones stay side by side (H T O is one row, never wrapped) */
 html body .problem-card .pvb-zones[data-role="zones"], html body .mq-scell .pvb-zones[data-role="zones"] { flex-wrap: nowrap !important; }
+
+/* O6 AP3: a sign circle between two pictures keeps its circle when the row is tight (it never
+   shrinks into an oval; the host shrinks the drawing instead) */
+html body .mq-scell input.mq-slot.mq-slot--invisual.mq-slot--circle { flex: none !important; }

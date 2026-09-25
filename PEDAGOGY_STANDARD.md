@@ -1310,6 +1310,8 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `hop-draw-div` | Draw hops of the number you divide by. Write how many hops. | division on a number line |
 | `hop-sentence` | Look at the hops. Write the number sentence. | × / ÷ on a number line, hops drawn |
 | `hop-missing` | Look at the hops. Write the missing number. | × / ÷ on a number line, one number missing |
+| `frac-name` | Write the fraction, or circle the model that shows it. | identify fractions: write the fraction a model shows, or pick the model (A-D) that shows a fraction (added 2026-09-25, O6 lane AP3) |
+| `models-complete` | Look at the two models. Complete the number sentence. | equivalent fractions with two models: the missing fraction, number, or = / ≠ (added 2026-09-25, O6 lane AP3) |
 | `default-write` | Solve. Write the answer. | default adapter: skills with no provider, number or text answer |
 | `default-circle` | Circle the answer. | default adapter: choice items |
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |

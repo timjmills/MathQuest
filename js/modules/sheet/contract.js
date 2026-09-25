@@ -202,6 +202,9 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'estimate-compatible': 'Find a near number that divides easily. Then divide.',
     'estimate-closest': 'Circle the closest estimate.',
     'estimate-reasonable': 'Estimate. Check one box: Reasonable or Not reasonable.',
+    // O6 lane AP3 (2026-09-25): the fraction family's kit cells (sheet/cells/frac-model.js).
+    'frac-name': 'Write the fraction, or circle the model that shows it.',
+    'models-complete': 'Look at the two models. Complete the number sentence.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',

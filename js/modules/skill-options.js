@@ -2763,25 +2763,24 @@ const _AP3_ADD_LINE = _ap3Ticks([['one', 'Every number: 0, 1, 2, 3 …'], ['some
     + 'the dot the pupil starts from is always numbered. Fewer numerals make the pupil count along the ticks.');
 const _AP3_OPTIONS = {
     'fractions:identify': [_ap3Model(['area', 'bar', 'circle', 'line'], ['bar', 'circle'],
-        'Default: circles and bars, mixed, as the skill always drew. The picture on each "What fraction is shaded?" item, '
-        + 'on paper and on screen: tick one model for a page of it, or several to mix them. On a number line a dot marks '
-        + 'the fraction. The other kinds of item (pick the model, name the numerator) keep their own look.',
-        (o) => !Array.isArray(o.forms) || !o.forms.length || o.forms.includes(0))],
+        'Default: circles and bars, mixed, as the skill always drew. The pictures of the "What fraction is shaded?" and '
+        + '"Which model shows it?" items, on paper and on screen: tick one model for a page of it, or several to mix them. '
+        + 'On a number line a dot marks the fraction. "Name the numerator" items have no picture.',
+        (o) => !Array.isArray(o.forms) || !o.forms.length || o.forms.includes(0) || o.forms.includes(1))],
     'fractions:write_fraction': [_ap3Model(['area', 'bar', 'circle', 'line'], ['area', 'bar', 'circle'],
         'Default: rectangles, bars and circles, mixed. The picture the pupil writes the fraction for, on paper and on '
         + 'screen. Tick one model for a page of it. On a number line a dot marks the fraction.')],
     'fractions:shade_fraction': [_ap3Model(['area', 'bar', 'circle'], ['area', 'bar', 'circle'],
         'Default: rectangles, bars and circles, mixed. The empty picture the pupil shades, on paper and on screen. '
         + 'A number line is not offered: a pupil marks a point on a line, he does not shade it.')],
-    'fractions:compare': [_ap3Model(['bar', 'circle', 'area', 'line'], ['bar', 'circle'],
-        'Default: bars on screen and circles on paper, as the skill always drew. The two pictures on each "compare the '
-        + 'fractions" item: tick one model and both fractions are drawn that way, on the same size of whole, on paper and '
-        + 'on screen. The other kinds of item (numbers only, compare to 1/2) have no picture.',
+    'fractions:compare': [_ap3Model(['bar', 'circle', 'area', 'line'], ['bar'],
+        'Default: bars. The two pictures on each "compare the fractions" item: both fractions are drawn as the ticked '
+        + 'model on the same size of whole, on paper and on screen. Tick several to mix them. The other kinds of item '
+        + '(numbers only, compare to 1/2) have no picture.',
         (o) => !Array.isArray(o.forms) || !o.forms.length || o.forms.includes(0))],
     'fractions:equiv_frac_visual': [_ap3Model(['circle', 'bar', 'area'], ['circle'],
         'Default: circles, as the skill always drew. Both fractions are drawn as the ticked model on the same size of whole, '
-        + 'so the pupil sees they cover the same amount; the shade-it items on paper give an empty one of the same model. '
-        + 'Bars (fraction strips) are the usual picture for equivalence.')],
+        + 'so the pupil sees they cover the same amount. Bars (fraction strips) are the usual picture for equivalence.')],
     'fraction_operations:add_fractions_like': [_ap3Model(['bar', 'area', 'circle'], ['bar'],
         'Default: the skill\'s own bars. A rectangle or a circle draws each fraction of the sum that way, in black and '
         + 'white, and never draws the answer. Pictures off prints numbers only.', (o) => o.pictures !== false)],

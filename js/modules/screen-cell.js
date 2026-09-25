@@ -597,7 +597,13 @@ function _slotExpectations(q, count, join) {
     if (q.ftCheck) return null;                                    // a rule table has no one answer per box
     let parts;
     if (Array.isArray(q.ans)) parts = q.ans.map(String);
-    else if (join === ':' || join === '.') parts = String(q.ans).split(join);
+    else if (join === ':' || join === '.' || join === '/') parts = String(q.ans).split(join);
+    else if (join === 'mixed') {
+        // a mixed number's three boxes (frac-model.js): whole, numerator, denominator
+        const m = /^\s*(?:(\d+)\s+)?(\d+)\s*\/\s*(\d+)\s*$/.exec(String(q.ans));
+        const w = /^\s*(\d+)\s*$/.exec(String(q.ans));
+        parts = m ? [m[1] || '', m[2], m[3]] : w ? [w[1], '', ''] : null;
+    }
     else if (join === ' h ') { const m = /(\d+)\s*h\s*(\d+)/.exec(String(q.ans)); parts = m ? [m[1], m[2]] : null; }
     else if (join === '') { const d = String(q.ans == null ? '' : q.ans).replace(/[^0-9]/g, ''); parts = d.length === count ? d.split('') : null; }
     else parts = String(q.ans == null ? '' : q.ans).split(/\s*,\s*|\s+R\s+/i);
@@ -740,7 +746,10 @@ export function adoptVisualBlank(cellEl, input) {
     if (circle) {
         input.setAttribute('maxlength', '1');
         input.setAttribute('inputmode', 'text');
-        input.setAttribute('aria-label', 'sign: <, = or >');
+        // a circle that takes other signs (= or ≠, frac-model.js) names them
+        const signs = blank.getAttribute('data-mq-signs');
+        if (signs) input.dataset.mqSigns = signs;
+        input.setAttribute('aria-label', `sign: ${signs ? signs.split(',').join(' or ') : '<, = or >'}`);
     }
     if (box && !blank.classList.contains('mq-kblank')) {
         // The box is positioned by the drawing (a bond's corner boxes are absolutely placed):
@@ -790,7 +799,11 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     // remainder (the drawing says so with `data-mq-join` on an ancestor of the slots).
     const joinEl = slots[0].closest('[data-mq-join]');
     const join = joinEl ? joinEl.getAttribute('data-mq-join') : ', ';
-    const saved = String(input.value || '').split(join.trim() || ',').map((t) => t.trim());
+    // A mixed number (frac-model.js, data-mq-join="mixed"): "1 3/8" from whole, numerator and
+    // denominator, the whole or the fraction left out when its boxes are empty.
+    const mixed = join === 'mixed';
+    const splitMixed = (v) => { const m = /^\s*(?:(\d+)\s+)?(\d*)\s*\/?\s*(\d*)\s*$/.exec(String(v || '')); return m ? [m[1] || '', m[2] || '', m[3] || ''] : []; };
+    const saved = mixed ? splitMixed(input.value) : String(input.value || '').split(join.trim() || ',').map((t) => t.trim());
     const boxes = slots.map((slot, k) => {
         const el = document.createElement('input');
         el.type = 'text';
@@ -808,7 +821,12 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         slot.appendChild(el);
         return el;
     });
-    const compose = () => boxes.map((b) => (b.value || '').trim()).join(join);
+    const compose = () => {
+        const v = boxes.map((b) => (b.value || '').trim());
+        if (!mixed) return v.join(join);
+        const [w, n, d] = v;
+        return `${w}${w && (n || d) ? ' ' : ''}${n || d ? `${n}/${d}` : ''}`;
+    };
     boxes.forEach((b, k) => {
         b.addEventListener('input', () => {
             b.value = _slotChars(b.value, b.dataset.mqKind);
@@ -2034,12 +2052,14 @@ export function wireSignCircle(root, input, { onChange = null } = {}) {
     bank.className = 'mq-signbank';
     bank.setAttribute('role', 'group');
     bank.setAttribute('aria-label', 'signs');
-    ['<', '=', '>'].forEach((sg) => {
+    const signs = input.dataset.mqSigns ? input.dataset.mqSigns.split(',') : ['<', '=', '>'];
+    const SIGN_NAMES = { '<': 'less than', '>': 'greater than', '=': 'equals', '≠': 'not equal to' };
+    signs.forEach((sg) => {
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'mq-signtile';
         b.textContent = sg;
-        b.setAttribute('aria-label', sg === '<' ? 'less than' : sg === '>' ? 'greater than' : 'equals');
+        b.setAttribute('aria-label', SIGN_NAMES[sg] || sg);
         b.addEventListener('click', () => {
             if (input.disabled || input.readOnly) return;
             input.value = sg;
@@ -2158,6 +2178,34 @@ export function mountModel(root, input, { onValue = null } = {}) {
     };
     const locked = () => !!input.disabled;
     const model = el.getAttribute('data-mq-model');
+    if (model === 'shade') {
+        // O6 lane AP3: a fraction model to shade (sheet/cells/frac-model.js). A tap shades a part
+        // (the one grey), a tap again clears it; the count of shaded parts is the answer.
+        const parts = Array.from(el.querySelectorAll('.shade-target'));
+        const count = () => parts.filter((g) => g.getAttribute('data-shaded') === '1').length;
+        parts.forEach((g, i) => {
+            const fillEl = g.querySelector('[data-fill-color]');
+            g.setAttribute('role', 'button');
+            g.setAttribute('tabindex', '0');
+            g.setAttribute('aria-pressed', 'false');
+            g.setAttribute('aria-label', `part ${i + 1}`);
+            const toggle = () => {
+                if (locked()) return;
+                const on = g.getAttribute('data-shaded') !== '1';
+                g.setAttribute('data-shaded', on ? '1' : '0');
+                g.setAttribute('aria-pressed', on ? 'true' : 'false');
+                if (fillEl) fillEl.setAttribute('fill', on ? (fillEl.getAttribute('data-fill-color') || GREY) : PAPER);
+                write(count());
+            };
+            g.addEventListener('click', toggle);
+            g.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); } });
+        });
+        const cue = document.createElement('div');
+        cue.className = 'mq-buildcue';
+        cue.textContent = 'Tap the parts to shade them.';
+        el.appendChild(cue);
+        return true;
+    }
     if (model === 'ten-frame') {
         const cells = Array.from(el.querySelectorAll('td'));
         const count = () => cells.filter((c) => c.dataset.on === '1').length;

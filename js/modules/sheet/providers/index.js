@@ -22,6 +22,7 @@ import './function-table.js';
 import './countby.js';
 import './pv.js';
 import './word-work.js';
+import './fractions.js';
 
 export { storiesFor, STORY_NOUNS, STORY_NAMES, STORY_TEMPLATES, nounFor } from './stories.js';
 export { columnAdd, lineSteps } from './addition.js';
