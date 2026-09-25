@@ -6,6 +6,7 @@ import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 import { optionsFor, pvCap } from './skill-options.js';
 import { generatePvRounding, generatePvPlaceValue, pvSpan, pvRefuse, pvOptions } from './gen-pv.js';
 import { numeralTracksHTML } from './sheet/index.js';
+import { genNumberPatterns } from './gen-mult-patterns.js';
 
 // ===========================================================================
 // THE ODD / EVEN SORT ON PAPER
@@ -1122,6 +1123,9 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
 }
 
 export function generatePatternsQuestion(q, mappedSkill, helpers) {
+    // Number patterns with a rule (owner, 2026-09-25): count on / back, double / halve, x 10,
+    // growing steps, from the ones to the thousands. See gen-mult-patterns.js genNumberPatterns.
+    if (mappedSkill === 'number_patterns_rule') { genNumberPatterns(q); return; }
     const { rng, range, applyDecimals, ensureTables } = helpers;
             const start = rng(1, range);
             // allowRuleQ: only true for mixed patterns, not specific ones like seq_2, seq_5, etc.

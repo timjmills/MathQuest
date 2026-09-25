@@ -106,6 +106,13 @@ import './cells/chartwindow.js';
 import './cells/seqstrip.js';
 import './cells/compare.js';
 import './cells/wordpic.js';
+// Count-by rows, number patterns, the chart to complete, and × / ÷ on a number line (2026-09-25).
+import './cells/count-row.js';
+import './cells/mult-grid.js';
+import './cells/hop-line.js';
+export { tile as shapeTile, shapeAt, tileSize, TILE_SHAPES } from './cells/shapes.js';
+export { gridSlots, shadeList } from './cells/mult-grid.js';
+export { hopSlots, sentenceOf, ONE_TICK_MAX } from './cells/hop-line.js';
 
 /** Which cell templates this build carries. `legacy` is registered by `adapters.js`. */
 export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv',

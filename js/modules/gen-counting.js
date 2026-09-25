@@ -1180,7 +1180,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const prev = (i) => (i > 0 ? values[i - 1] : values[i + 1]);
         const wrongFirst = step === 1 ? prev(blanks[0]) + (down ? -2 : 2) : prev(blanks[0]) + (down ? -1 : 1);
         q.distractorTags = { [[wrongFirst, ...parts.slice(1)].join(', ')]: 'counted on by one, not by the step' };
-        _kSetCell(q, 'seqstrip', { values, blanks });
+        // The tile shape (owner, 2026-09-25): circles and hexagons for the younger years by default.
+        const _sfShape = _kOpt('shape');
+        _kSetCell(q, 'seqstrip', { values, blanks, ...(_sfShape && _sfShape !== 'box' ? { shape: _sfShape } : {}) });
         q.printFormat = 'seq-strip';
         return;
     }

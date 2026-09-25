@@ -31,6 +31,31 @@ field   = KEY value            KEY: one letter, table below
 | `pictures`                | `P` | `1` / `0` |
 | `band`                    | `B` | decimal digits |
 
+The later one-letter keys (`T I K Z X E A V Q H F Y J`) are listed in `OPTION_KEYS` in
+`js/modules/skill-option-codec.js`, which is the authority.
+
+**Two-character keys (2026-09-25).** All 26 letters are spent, so an option added after `J` takes a
+key of a **digit then a letter** (`EXT_OPTION_KEYS`): `2A50` is `missing` = 50. The encoder writes
+every one-letter field first and every two-character field after them; if a payload would still
+begin with a digit (only two-character fields), it starts with an empty field — `~_2A50` — because a
+payload whose first character is a digit names a later format version. An older decoder reads a
+field by its first character, finds no option for a digit, and skips the field: the skill loads with
+that option at its default, never misread. Each digit is a block of up to 26 keys (`2A`–`2Z`; block 2 is this wave, blocks 0, 1, 3, 4, 5 belong to others); a
+later wave takes the next free letter or a new digit, append-only like the letters.
+
+| Option id | KEY | Value written as |
+|---|---|---|
+| `missing` (numbers left blank, %) | `2A` | decimal digits — `2A50` |
+| `pattern` (number patterns)       | `2B` | set: `A` add · `S` subtract · `D` double/halve · `T` × 10 · `G` growing |
+| `rule` (write the rule)           | `2C` | `1` / `0` |
+| `chart` (window / whole)          | `2D` | `W` · `F` |
+| `ticks` (number line labels)      | `2E` | `S` every step · `O` every number |
+| `shape` (tile shape)              | `2F` | `B` box · `C` circle · `H` hexagon · `M` circles and hexagons |
+
+New value tokens on existing keys (append-only): `response` draw `Q` · sentence `Z` · missing `X`;
+`task` fill `Q` · headers `Z` · shade `X` · pattern `J`; `order` in order `Q` · mixed `Z`;
+`support` hop numbers `Z`.
+
 An empty set field (`C` alone) means "none ticked", which the option model reads as *no
 restriction*. A field that is absent means the option is at its default.
 

@@ -210,6 +210,7 @@ export const SKILL_STANDARDS = {
     'multiplication:mult_zeros': { ccss: ['3.NBT.A.3'], ee: ['M.EE.3.NBT.3'] }, // Multiply by 10, 100 and Multiples of Ten
     'multiplication:mult_placeholder_zero': { ccss: ['4.NBT.B.5', '5.NBT.B.5'], ee: ['M.EE.5.NBT.5'] }, // Write the Placeholder Zero
     'multiplication:mult_missing_digit': { ccss: ['4.NBT.B.5'], ee: [] }, // Find the Missing Digit (Multiplication)
+    'multiplication:count_by_tables': { ccss: ['3.OA.C.7', '3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Count by 1–12 (3.OA.7 prep: skip-counting the tables)
 
     // ---- division
     'division:div_facts': { ccss: ['3.OA.C.7'], ee: ['M.EE.3.OA.6'] }, // Division Facts (1-12)
@@ -518,6 +519,7 @@ export const SKILL_STANDARDS = {
     'patterns:number_pattern': { ccss: ['4.OA.C.5'], ee: ['M.EE.4.OA.5', 'M.EE.3.OA.8', 'M.EE.5.OA.3'] }, // Number Patterns
     'patterns:pattern_relationship': { ccss: ['5.OA.B.3'], ee: ['M.EE.5.OA.3'] }, // Two Patterns, Find Relationship (Visual)
     'patterns:mixed_patterns': { ccss: [], ee: [], pool: true }, // Mixed Patterns
+    'patterns:number_patterns_rule': { ccss: ['3.OA.D.9', '4.OA.C.5'], ee: ['M.EE.3.OA.8', 'M.EE.4.OA.5'] }, // Number Patterns: Count On, Count Back, Double
 
     // ---- algebra
     'algebra:tape_diagram': { ccss: ['4.OA.A.3', '3.OA.D.8'], ee: ['M.EE.4.OA.3', 'M.EE.3.OA.7'] }, // Tape Diagrams / Bar Models (Visual)

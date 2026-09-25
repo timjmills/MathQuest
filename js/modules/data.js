@@ -95,6 +95,8 @@ export const SKILL_GRADES = {
     'number_families_mult': 3, 'number_families_mult_med': 3,
     'missing_mult_div': 3, 'mixed_mult_div': 3, 'mult_properties': 3, 'mult_chart': 3,
     'mult_chart_easy': 3, 'mult_chart_medium': 4, 'mult_chart_hard': 5,
+    // 2026-09-25: count by 1-12 (3.OA.7 prep) and number patterns with a rule (3.OA.9 / 4.OA.5)
+    'count_by_tables': 3, 'number_patterns_rule': 3,
     'number_families_mixed_med': 3, 'word_problems_mixed': 3, 'word_problems_mixed_plain': 3,
     'number_families_mult_hard': 4, 'number_families_mixed_hard': 4,
     'div_remainders': 4, 'area_model_mult': 4, 'area_model_div_2by1': 4,
@@ -739,6 +741,8 @@ export const SKILLS = {
         { v: "mult_zeros", l: "Multiply by 10, 100 and Multiples of Ten" },          // MB-1, MB-2: factors outside every fact skill's factRange
         { v: "mult_placeholder_zero", l: "Write the Placeholder Zero" },             // MB-9: the placeholder-zero box (M-M6, the biggest 2×2 error)
         { v: "mult_missing_digit", l: "Find the Missing Digit (Multiplication)" },   // MB-12
+        // APPENDED 2026-09-25 (owner): one count-by row per table, to 12x (3.OA.7 prep).
+        { v: "count_by_tables", l: "Count by 1–12" },
     ],
     division: [
         { v: "div_facts", l: "Division Facts (1-12)" },
@@ -1081,6 +1085,8 @@ export const SKILLS = {
         { v: "number_pattern", l: "Number Patterns" },
         { v: "pattern_relationship", l: "Two Patterns, Find Relationship (Visual)" },
         { v: "mixed_patterns", l: "Mixed Patterns" },
+        // APPENDED 2026-09-25 (owner): count on / back / double from ones to thousands, with the rule.
+        { v: "number_patterns_rule", l: "Number Patterns: Count On, Count Back, Double" },
     ],
     algebra: [
         { v: "tape_diagram", l: "Tape Diagrams / Bar Models (Visual)" },
@@ -1957,6 +1963,8 @@ export const SKILL_PRINT_SIZE = {
     mult_properties: "medium", div_remainders: "medium",
     mult_chart: "medium",
     mult_chart_easy: "wide", mult_chart_medium: "wide", mult_chart_hard: "wide",
+    // 2026-09-25: one full-width row each (the kit draws them; this is the legacy fallback)
+    count_by_tables: "wide", number_patterns_rule: "wide",
     divisibility_sort: "medium",
     factor_tchart_easy: "medium", factor_tchart_medium: "medium", factor_tchart_hard: "medium",
     factor_links_easy: "medium", factor_links_medium: "medium", factor_links_hard: "medium",

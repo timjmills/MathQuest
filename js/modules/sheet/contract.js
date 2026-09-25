@@ -121,6 +121,18 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'fact-family': 'Use the three numbers. Fill in the fact family.',
     'chart-fill': 'Fill in the missing products.',
     'groups-total': 'Write the groups, the number in each, and the total.',
+    // Added 2026-09-25 with count by 1-12, number patterns, the chart tasks and x / ÷ on a line.
+    'count-by-row': 'Count by the number in the box. Write the missing numbers.',
+    'pattern-rule': 'Use the rule. Write the missing numbers.',
+    'pattern-find-rule': 'Find the rule. Write the missing numbers and the rule.',
+    'chart-fill-all': 'Fill in the whole multiplication chart.',
+    'chart-headers': 'Fill in the missing row and column numbers.',
+    'shade-multiples': 'Shade every multiple of {n}.',
+    'chart-row-rule': 'Fill in the row. Write the rule.',
+    'hop-draw': 'Draw the hops on the line. Write the product.',
+    'hop-draw-div': 'Draw hops of the number you divide by. Write how many hops.',
+    'hop-sentence': 'Look at the hops. Write the number sentence.',
+    'hop-missing': 'Look at the hops. Write the missing number.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',
@@ -169,6 +181,9 @@ export const BANNED_INSTRUCTION_WORDS = Object.freeze([
 // word the verb-only swap cannot. The bare verb stays below as the fallback for any string
 // outside the closed library.
 const SCREEN_VERB_MAP = Object.freeze([
+    ['Draw hops of the number you divide by', 'Tap the line to hop by the number you divide by'],
+    ['Draw the hops on the line', 'Tap the line to make the hops'],
+    ['Shade every multiple of', 'Tap every multiple of'],
     ['Draw a line to match', 'Tap the two that match'],
     ['Mark the number on the line', 'Tap the number on the line'],
     ['Shade the fraction', 'Tap the parts of the fraction'],

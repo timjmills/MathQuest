@@ -900,6 +900,140 @@ const P11_K2_OPTIONS = {
 };
 Object.assign(SKILL_OPTIONS, P11_K2_OPTIONS);
 // ============================ end P11 · K-2 options ============================
+// ===========================================================================
+// COUNT-BY · MULTIPLICATION CHART · × / ÷ NUMBER LINE · NUMBER PATTERNS  (2026-09-25)
+// ===========================================================================
+// One contiguous block, merged into SKILL_OPTIONS below (it REPLACES the earlier entries for
+// mult_chart, mult_chart_easy, nl_mult and nl_div). Every option is read by
+// js/modules/gen-mult-patterns.js, which gen-operations.js / gen-algebraic.js / gen-counting.js
+// call for these skills. The share-code keys of the new option ids (missing, pattern, rule,
+// chart, ticks, shape) are the two-character keys of skill-option-codec.js (EXT_OPTION_KEYS).
+const _cbPercent = (dflt, { nullLabel = null, help } = {}) => ({
+    id: 'missing', label: 'Numbers left blank', type: 'enum', default: dflt, group: 'support',
+    values: [...(nullLabel ? [{ v: null, l: nullLabel }] : []),
+        ...[20, 50, 70, 80, 90, 100].map(v => ({ v, l: `${v}%` }))],
+    help: help || 'How many of the numbers the pupil writes. The first number is always printed.',
+});
+const _cbTables = (from, label, titleVerb, help) => ({
+    id: 'constant', label, type: 'set', group: 'difficulty',
+    default: Array.from({ length: 13 - from }, (_, k) => k + from),
+    values: Array.from({ length: 13 - from }, (_, k) => ({ v: k + from, l: String(k + from) })),
+    allLabel: from === 1 ? 'All twelve' : `All (${from} to 12)`,
+    titleVerb,
+    help,
+});
+const _cbShape = (dflt) => ({
+    id: 'shape', label: 'Box shape', type: 'enum', default: dflt, group: 'layout',
+    values: [{ v: 'box', l: 'Boxes' }, { v: 'circle', l: 'Circles' }, { v: 'hex', l: 'Hexagons' },
+        { v: 'mixed', l: 'Circles and hexagons (younger pupils)' }],
+    help: 'The outline each number is written in. Outlines only, black and white; every shape is big enough to write in.',
+});
+const _chartBand = (dflt) => _opsBand([25, 36, 100, 144], dflt, {
+    label: 'Chart size', labels: { 25: '5 × 5', 36: '6 × 6', 100: '10 × 10', 144: '12 × 12' },
+    help: 'The part of the chart used: its largest factor is 5, 6, 10 or 12. The whole chart at 12 × 12 fills a page.',
+});
+const _chartTask = () => ({
+    id: 'task', label: 'Task', type: 'enum', default: 'fill', group: 'difficulty',
+    values: [{ v: 'fill', l: 'Fill in the missing products' },
+        { v: 'headers', l: 'Fill in the missing row and column numbers' },
+        { v: 'shade', l: 'Shade every multiple of a number' },
+        { v: 'pattern', l: 'Find the pattern in one row (write the rule)' }],
+    help: 'One task per page. Shade and pattern print every product; the pupil looks for the pattern.',
+});
+const _hopLine = (div) => [
+    div ? _cbTables(2, 'Divide by', 'Divide by', 'The size of each hop (the number you divide by). Tick one or several.')
+        : _cbTables(2, 'Hop size (tables)', 'Hops of', 'The size of each hop: the table the page practises. Tick one or several.'),
+    _opsBand([20, 50, 100, 144], 100, {
+        label: 'Line from 0 to', labels: { 20: '0 to 20', 50: '0 to 50', 100: '0 to 100', 144: '0 to 144' },
+        help: (div ? 'The longest line: the number shared is never bigger.' : 'The longest line: the product is never bigger.')
+            + ' A longer line leans on the tables that need it (0 to 144: the 9s to 12s first).',
+    }),
+    {
+        id: 'ticks', label: 'Numbers on the line', type: 'enum', default: 'step', group: 'support',
+        values: [{ v: 'step', l: 'Every hop (0, 3, 6, 9 …)' }, { v: 'one', l: 'Every number (0, 1, 2, 3 …), lines to 36' }],
+        help: 'Every number keeps the line to 0-36 so each label has room; the pupil counts every step of each hop.',
+    },
+    {
+        id: 'response', label: 'Task', type: 'enum', default: 'draw', group: 'difficulty',
+        values: [{ v: 'draw', l: div ? 'Draw the hops, write how many (12 ÷ 3 = __)' : 'Draw the hops, write the product (4 × 3 = __)' },
+            { v: 'sentence', l: div ? 'Read the hops, write the sentence (__ ÷ __ = __)' : 'Read the hops, write the sentence (__ × __ = __)' },
+            { v: 'missing', l: 'Read the hops, write the missing number' }],
+        help: 'One task per page. Draw is the hardest to start; reading the hops is the model.',
+    },
+    {
+        id: 'support', label: 'Hop numbers', type: 'enum', default: 'none', group: 'support',
+        values: [{ v: 'none', l: 'None' }, { v: 'numbers', l: 'Number each hop 1, 2, 3 …' }],
+        help: 'A number over each drawn hop (in the model and the key) so the pupil counts the hops. None is the fade.',
+    },
+];
+const CB_CHART_LINE_OPTIONS = {
+    'multiplication:count_by_tables': [
+        _cbTables(1, 'Tables', 'Count by', 'One row per ticked table, in the order below. Tick one table for a page of it, or several.'),
+        _cbPercent(50),
+        {
+            id: 'order', label: 'Order of the rows', type: 'enum', default: 'inorder', group: 'layout',
+            values: [{ v: 'inorder', l: 'In order (2, 3, 4 …)' }, { v: 'mixed', l: 'Mixed tables' }],
+            help: 'In order runs the ticked tables smallest first down the page; mixed shuffles them.',
+        },
+        _cbShape('box'),
+    ],
+    'patterns:number_patterns_rule': [
+        {
+            id: 'pattern', label: 'Pattern', type: 'set', default: ['add', 'sub'], group: 'difficulty',
+            values: [{ v: 'add', l: 'Count on (+2, +5, +10, +25, +100 …)' }, { v: 'sub', l: 'Count back (−2, −5, −10 …)' },
+                { v: 'double', l: 'Doubling and halving' }, { v: 'times10', l: '× 10 each time' },
+                { v: 'grow', l: 'Growing steps (+1, +2, +3 …)' }],
+            allLabel: 'All five, mixed',
+            help: 'Tick one kind for a page of it, or several to mix them (the pupil must find which rule each row uses).',
+        },
+        {
+            id: 'places', label: 'Start in the', type: 'set', default: [1, 10], group: 'difficulty',
+            values: [{ v: 1, l: 'Ones (start 1-9)' }, { v: 10, l: 'Tens (start 10-99)' },
+                { v: 100, l: 'Hundreds (start 100-999)' }, { v: 1000, l: 'Thousands (start 1,000-9,999)' }],
+            allLabel: 'All four',
+            help: 'Where the first number starts. A row that starts in the ones stays under 100, in the tens under 1,000, '
+                + 'in the hundreds or thousands under 10,000 (× 10 runs on to the thousands). Max Number lowers this only if you set it lower.',
+        },
+        _cbPercent(null, { nullLabel: 'None: continue it (the first 3 shown, the rest to write)',
+            help: 'None asks the pupil to continue the pattern. A percentage leaves that many numbers out ANYWHERE along the row; the first number is always printed.' }),
+        {
+            id: 'rule', label: 'Write the rule', type: 'bool', default: false, group: 'support',
+            help: 'Off prints the rule above the row ("Rule: count on by 5."). On hides it and adds a Rule box to fill.',
+        },
+        _cbShape('box'),
+    ],
+    'multiplication:mult_chart': [
+        {
+            id: 'chart', label: 'Chart', type: 'enum', default: 'window', group: 'layout',
+            values: [{ v: 'window', l: 'A window of the chart (4 rows × 5 columns)' },
+                { v: 'whole', l: 'The whole chart (up to the chart size)' }],
+            help: 'A window is a small piece cut from anywhere in the chart. The whole chart at 12 × 12 is one item per page.',
+        },
+        _chartBand(144),
+        _cbPercent(null, { nullLabel: 'A few (3 in a window, half of a whole chart)',
+            help: 'How many of the products (or, for Task: row and column numbers, the factors) are left blank. 100% is a blank chart to fill in.' }),
+        _cbTables(1, 'Tables with blanks', 'Times tables', 'Only the rows and columns of the ticked tables have blanks (tick 7 and 8 to practise those two).'),
+        _chartTask(),
+    ],
+    'multiplication:mult_chart_easy': [
+        levelSubset([2, 1, 0], 2, 'The same chart every time: level 2 leaves 2 cells to fill, level 1 leaves 6, '
+            + 'level 0 leaves 22. Level 2 never blanks the 1 row or the 1 column.'),
+        _chartBand(144),
+        _cbPercent(null, { nullLabel: 'As the support level sets it (2, 6 or 22 cells)',
+            help: 'A percentage of the chart instead of the support level\'s count. 100% is a blank chart to fill in completely.' }),
+        _cbTables(1, 'Tables with blanks', 'Times tables', 'Only the rows and columns of the ticked tables have blanks.'),
+        _chartTask(),
+    ],
+    'multiplication:nl_mult': _hopLine(false),
+    'division:nl_div': _hopLine(true),
+    'counting:number_seq_fill': [
+        ...(SKILL_OPTIONS['counting:number_seq_fill'] || []).filter(o => o.id !== 'shape'),
+        _cbShape('mixed'),
+    ],
+};
+Object.assign(SKILL_OPTIONS, CB_CHART_LINE_OPTIONS);
+// ======================= end count-by · chart · number line · patterns =======================
+
 // number_word_form: which way round (gen-algebraic.js wordFormWay() reads it; the codec has had
 // `W` since the option was specified). Words to numeral is the default: it is the lower writing
 // load, and a misspelled "fourty" would be a spelling error marked as a maths error.

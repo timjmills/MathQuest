@@ -296,6 +296,8 @@ export const FROZEN_SKILL_CODES = {
     "division:div_zero_in_quotient": "UK", "division:remainder_too_big": "UL",
     "division:div_check_by_multiplying": "UM", "division:div_fix_estimate": "UN",
     "number_ops_mixed:which_sign": "UP", "number_ops_mixed:missing_factor_or_addend": "UQ",
+    // ---- 2026-09-25 appends (owner): count by 1-12, number patterns with a rule. APPEND ONLY. ----
+    "multiplication:count_by_tables": "UR", "patterns:number_patterns_rule": "US",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and
@@ -353,6 +355,8 @@ export const FROZEN_CATEGORY_ORDER = {
         // P4 appends, 2026-09-20 (owner ruling R1) — APPEND ONLY.
         "repeated_add_to_mult", "equal_or_unequal_groups", "mult_zeros", "mult_placeholder_zero",
         "mult_missing_digit",
+        // 2026-09-25 append — APPEND ONLY.
+        "count_by_tables",
     ],
     "division": [
         "div_facts", "divide", "div_remainders", "div_word_problems", "div_word_problems_plain",
@@ -454,6 +458,8 @@ export const FROZEN_CATEGORY_ORDER = {
         "seq_2", "seq_5", "seq_10", "count_by_fill", "skip_count_line", "skip_count_grid", "count_by_step_up",
         "count_by_step_down", "count_by_powers_of_10", "double", "halve", "shape_pattern", "number_pattern",
         "pattern_relationship", "mixed_patterns",
+        // 2026-09-25 append — APPEND ONLY.
+        "number_patterns_rule",
     ],
     "algebra": [
         "tape_diagram", "tape_diagram_plain", "multi_step_word", "multi_step_word_plain", "solve_unknown",

@@ -17,6 +17,7 @@ import './subtraction.js';
 import './multiplication.js';
 import './division.js';
 import './k2.js';
+import './countby.js';
 
 export { storiesFor, STORY_NOUNS, STORY_NAMES, STORY_TEMPLATES, nounFor } from './stories.js';
 export { columnAdd, lineSteps } from './addition.js';

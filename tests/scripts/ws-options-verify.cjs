@@ -288,10 +288,10 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
 
     // ---------- static (definition) checks ----------
     const statics = [];
-    const { OPTION_KEYS } = await import('/js/modules/skill-option-codec.js');
+    const { OPTION_KEYS, EXT_OPTION_KEYS } = await import('/js/modules/skill-option-codec.js');
     for (const def of defs) {
         if (!def.label) statics.push(`${def.id}: no label`);
-        if (!OPTION_KEYS[def.id]) statics.push(`${def.id}: no share-code key (the choice cannot travel in a link)`);
+        if (!OPTION_KEYS[def.id] && !(EXT_OPTION_KEYS || {})[def.id]) statics.push(`${def.id}: no share-code key (the choice cannot travel in a link)`);
         if (def.values) {
             const ls = def.values.map(x => x.l);
             if (new Set(ls).size !== ls.length) statics.push(`${def.id}: duplicate value labels`);

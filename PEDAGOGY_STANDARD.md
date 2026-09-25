@@ -1270,6 +1270,17 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `fact-family` | Use the three numbers. Fill in the fact family. | addition and subtraction fact families |
 | `chart-fill` | Fill in the missing products. | multiplication chart |
 | `groups-total` | Write the groups, the number in each, and the total. | arrays and equal groups |
+| `count-by-row` | Count by the number in the box. Write the missing numbers. | count by 1-12: one row per table (added 2026-09-25) |
+| `pattern-rule` | Use the rule. Write the missing numbers. | number patterns, the rule printed |
+| `pattern-find-rule` | Find the rule. Write the missing numbers and the rule. | number patterns, the pupil writes the rule |
+| `chart-fill-all` | Fill in the whole multiplication chart. | the blank chart (100%) |
+| `chart-headers` | Fill in the missing row and column numbers. | multiplication chart: the factors on its edges |
+| `shade-multiples` | Shade every multiple of {n}. | multiplication chart: find the multiples |
+| `chart-row-rule` | Fill in the row. Write the rule. | multiplication chart: a row's pattern |
+| `hop-draw` | Draw the hops on the line. Write the product. | multiplication on a number line |
+| `hop-draw-div` | Draw hops of the number you divide by. Write how many hops. | division on a number line |
+| `hop-sentence` | Look at the hops. Write the number sentence. | × / ÷ on a number line, hops drawn |
+| `hop-missing` | Look at the hops. Write the missing number. | × / ÷ on a number line, one number missing |
 | `default-write` | Solve. Write the answer. | default adapter: skills with no provider, number or text answer |
 | `default-circle` | Circle the answer. | default adapter: choice items |
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |

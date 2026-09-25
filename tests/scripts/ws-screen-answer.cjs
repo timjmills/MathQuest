@@ -19,6 +19,9 @@ const DEFAULT = [
     'multiplication:mult_facts', 'multiplication:arrays_groups', 'multiplication:area_model_mult',
     'multiplication:mult_chart', 'division:div_facts', 'division:div_remainders', 'division:long_div_2digit',
     'division:share_into_groups',
+    // 2026-09-25: count by 1-12, number patterns, the chart to fill, x / ÷ on a number line
+    'multiplication:count_by_tables', 'patterns:number_patterns_rule', 'multiplication:mult_chart_easy',
+    'multiplication:nl_mult', 'division:nl_div',
 ];
 const SKILLS = (arg('skills', '') || '').split(',').map(s => s.trim()).filter(Boolean);
 const LIST = SKILLS.length ? SKILLS : DEFAULT;

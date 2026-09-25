@@ -169,6 +169,45 @@ Object.assign(ITEM_MAKERS, {
     'composing:base10_build_hundreds': (r) => { const n = int(r, 100, 999); return { target: n, ans: n, places: [100, 10, 1] }; },
 });
 
+// Count by 1-12, number patterns and x / ÷ on a number line (2026-09-25, providers/countby.js),
+// in the shapes js/modules/gen-mult-patterns.js emits.
+const COUNTBY_MAKERS = {
+    'multiplication:count_by_tables': (r) => {
+        const t = int(r, 2, 12); const values = Array.from({ length: 12 }, (_, i) => t * (i + 1));
+        const blanks = shuffle(r, Array.from({ length: 11 }, (_, i) => i + 1)).slice(0, int(r, 2, 10)).sort((a, b) => a - b);
+        const k = blanks.map((i) => values[i]);
+        return { a: t, b: 12, op: '×', ans: k.join(', '), keyParts: k.map(String), countBy: { step: t, values, blanks }, text: `Count by ${t}. Write the missing numbers.` };
+    },
+    'patterns:number_patterns_rule': (r) => {
+        const kind = pick(r, ['add', 'sub', 'double', 'halve', 'times10', 'grow']);
+        const hidden = int(r, 0, 1) === 1;
+        let values; let stepN = 2;
+        if (kind === 'add') { stepN = pick(r, [2, 5, 10, 25]); const s0 = int(r, 1, 90); values = Array.from({ length: 8 }, (_, i) => s0 + i * stepN); }
+        else if (kind === 'sub') { stepN = pick(r, [2, 5, 10]); const s0 = int(r, 80, 99); values = Array.from({ length: 8 }, (_, i) => s0 - i * stepN); }
+        else if (kind === 'double') { const s0 = int(r, 1, 3); values = Array.from({ length: 6 }, (_, i) => s0 * 2 ** i); }
+        else if (kind === 'halve') { const e = int(r, 1, 3); values = Array.from({ length: 6 }, (_, i) => e * 2 ** (5 - i)); }
+        else if (kind === 'times10') { stepN = 10; const s0 = int(r, 1, 9); values = [s0, s0 * 10, s0 * 100, s0 * 1000]; }
+        else { stepN = pick(r, [1, 2]); const s0 = int(r, 1, 20); values = [s0]; for (let i = 1; i < 6; i++) values.push(values[i - 1] + i * stepN); }
+        const blanks = Array.from({ length: values.length - 3 }, (_, i) => i + 3);
+        const rule = kind === 'double' || kind === 'halve' ? 2 : stepN;
+        const k = blanks.map((i) => values[i]).concat(hidden ? [rule] : []);
+        return { ans: k.join(', '), keyParts: k.map(String), pattern: { kind, step: stepN, values, blanks, place: 1, ruleHidden: hidden, rule }, text: 'Use the rule. Write the missing numbers.' };
+    },
+    'multiplication:nl_mult': (r) => {
+        const g = int(r, 2, 9); const s2 = int(r, 2, 10); const response = pick(r, ['draw', 'sentence', 'missing']);
+        const base = { a: g, b: s2, op: '×', hopLine: { hops: g, step: s2, max: s2 * 12, response, ticks: 'step', numbered: false } };
+        if (response === 'sentence') return { ...base, ans: `${g}, ${s2}, ${g * s2}`, keyParts: [String(g), String(s2), String(g * s2)], text: 'Look at the hops. Write the multiplication sentence.' };
+        return { ...base, ans: g * s2, text: `${g} × ${s2} = ?` };
+    },
+    'division:nl_div': (r) => {
+        const g = int(r, 2, 9); const s2 = int(r, 2, 10); const response = pick(r, ['draw', 'sentence', 'missing']);
+        const base = { a: g * s2, b: s2, op: '÷', hopLine: { hops: g, step: s2, max: s2 * 12, response, ticks: 'step', numbered: false } };
+        if (response === 'sentence') return { ...base, ans: `${g * s2}, ${s2}, ${g}`, keyParts: [String(g * s2), String(s2), String(g)], text: 'Look at the hops. Write the division sentence.' };
+        return { ...base, ans: g, text: `${g * s2} ÷ ${s2} = ?` };
+    },
+};
+Object.assign(ITEM_MAKERS, COUNTBY_MAKERS);
+
 /* ============================================================ skill-specific phrasing */
 
 // Phrases a skill's STEPS must never use (the critics' 2026-09-25 findings, and their kin).
@@ -191,6 +230,10 @@ const FORBIDDEN = {
     'multiplication:area_model_mult_hard': [/regroup/i, /count by the second number/i],
     'multiplication:mult_facts': [/count by the second number/i],
     'counting:number_seq_fill': [/touch each/i],
+    'multiplication:count_by_tables': [/touch each/i, /count by the second number/i],
+    'patterns:number_patterns_rule': [/touch each/i],
+    'multiplication:nl_mult': [/count by the second number/i],
+    'division:nl_div': [/times fact/i],
     'division:share_into_groups': [/times fact/i, /missing factor/i],
     'division:div_remainders': [/times fact/i, /missing factor/i],
     'comparing:compare_groups': [/write the answer/i],
@@ -224,6 +267,10 @@ const REQUIRED = {
     'multiplication:mult_chart': /row.*column|column/i,
     'subtraction:subtract': /take away|count back/i,
     'subtraction:sub_5_pictures': /crossed out/i,
+    'multiplication:count_by_tables': /jump/i,
+    'patterns:number_patterns_rule': /rule/i,
+    'multiplication:nl_mult': /hop/i,
+    'division:nl_div': /hop/i,
 };
 
 /* ================================================================================ run */
@@ -321,6 +368,7 @@ function checkSkill(key, { requireStories = false } = {}) {
 
 for (const key of REGRADED_SKILLS) checkSkill(key, { requireStories: key === 'addition:add_wp_10' });
 for (const key of Object.keys(SIBLINGS)) checkSkill(key, { requireStories: /_wp_/.test(key) });
+for (const key of Object.keys(COUNTBY_MAKERS)) checkSkill(key);
 
 // ---- the contract seam the roles rely on
 ok(REGRADED_SKILLS.length === 24, `REGRADED_SKILLS lists ${REGRADED_SKILLS.length} skills, not 24`);
@@ -348,4 +396,4 @@ if (failures.length) {
     console.log(`ws-providers-unit: FAIL (${failures.length} of ${checks} checks)`);
     process.exit(1);
 }
-console.log(`ws-providers-unit: OK (${checks} checks, ${REGRADED_SKILLS.length} re-graded skills + ${Object.keys(SIBLINGS).length} siblings)`);
+console.log(`ws-providers-unit: OK (${checks} checks, ${REGRADED_SKILLS.length} re-graded skills + ${Object.keys(SIBLINGS).length} siblings + ${Object.keys(COUNTBY_MAKERS).length} count-by)`);

@@ -64,6 +64,9 @@ const K2_CATS = ['counting', 'comparing', 'composing', 'counting_mixed'];
 // place.
 const PV_FAMILY_CATS = ['placevalue', 'number_sense'];
 const CATS = [...OPS_CATS, ...K2_CATS, ...PV_FAMILY_CATS];
+// Skills audited outside the three families' categories: the number pattern skill of 2026-09-25
+// is held to its own rule (countByRules) with none of the families' name-readers.
+const EXTRA_SKILLS = new Map([['patterns:number_patterns_rule', 'patterns']]);
 const familyOf = cat => (OPS_CATS.includes(cat) ? 'operations' : PV_FAMILY_CATS.includes(cat) ? 'pv' : 'k2');
 const FAMILY_CATS = { operations: OPS_CATS, k2: K2_CATS, pv: PV_FAMILY_CATS };
 
@@ -347,7 +350,8 @@ const SHAPE_OF = {
         'div-facts-fraction', 'missing-number', 'missing-operator', 'missing-factor', 'inline-cloze', 'build-expr'],
     word: ['word-add', 'word-sub', 'word-problem', 'word-plain', 'unknown-start-wp'],
     model: ['area-model-mult', 'area-model-mult-hard', 'area-model-div', 'box-division', 'array-builder', 'arrays-groups',
-        'dot-array-visual', 'add-5-pictures', 'sub-5-pictures', 'div-remainders', 'mult-properties', 'mult-chart', 'mult-chart-tier'],
+        'dot-array-visual', 'add-5-pictures', 'sub-5-pictures', 'div-remainders', 'mult-properties', 'mult-chart', 'mult-chart-tier',
+        'mult-grid', 'count-row', 'hop-line'],
     numberline: ['nl-add', 'nl-sub', 'nl-mult', 'nl-div', 'number-line-visual'],
     family: ['fact-family-add-sub', 'fact-family-mult-div', 'number-family-add-sub', 'number-family-mult-div'],
     select: ['multi-select'],
@@ -371,7 +375,7 @@ const K2_SHAPE_OF = {
     tenframe: ['ten-frame', 'ten-frame-build'],
     base10: ['base10-build'],
     chart: ['hundreds-chart-fill'],
-    grid: ['grid-fill', 'seq-strip'],
+    grid: ['grid-fill', 'seq-strip', 'count-row'],
     rods: ['tens-foundation'],
     select: ['multi-select'],
     oddeven: ['odd-even'],
@@ -599,6 +603,14 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv }) {
         // P10: a K-2 picture cell drawn by a sheet-kit template carries its plain-data payload
         // (SCC-Q3), which the picture rules read instead of the drawing, and the words and
         // numerals its screen twin prints (the caption-giveaway rule).
+        // The count-by family (2026-09-25): count rows, number patterns, the chart, hop lines.
+        if (q.cell && q.cell.template && ['count-row', 'mult-grid', 'hop-line'].includes(q.cell.template)) {
+            item.cellT = q.cell.template;
+            try { item.cellP = JSON.parse(JSON.stringify(q.cell.payload || {})); } catch (e) { item.cellP = {}; }
+            for (const k of ['countBy', 'pattern', 'hopLine', 'chartTask', 'chartRow', 'shadeOf', 'chartTables']) if (q[k] !== undefined) item[k] = JSON.parse(JSON.stringify(q[k]));
+            if (Array.isArray(q.options) && q.options.some(o => o && typeof o === 'object' && 'correct' in o)) item.optCorrect = q.options.map(o => ({ label: String(o.label), correct: !!o.correct }));
+            item.opts = q.skillOptions ? JSON.parse(JSON.stringify(q.skillOptions)) : null;
+        }
         if (q.cell && q.cell.template && ['counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic'].includes(q.cell.template)) {
             item.cellT = q.cell.template;
             try { item.cellP = JSON.parse(JSON.stringify(q.cell.payload || {})); } catch (e) { item.cellP = {}; }
@@ -804,6 +816,108 @@ function pictureRules(items, F) {
         if (bad.length) F('seq-track', `${bad.length} number tracks are wrong: ${show(bad)}`);
         if (seq.length >= 20 && steps.size < 3) F('seq-track', `every track counts by ${[...steps].join(' or ')}: deal several steps`);
     }
+}
+
+/**
+ * COUNT-BY FAMILY (2026-09-25, owner requests A-C and the number-line idea board). Every rule reads
+ * the item's own payload and bookkeeping (q.cell.payload, q.countBy, q.pattern, q.hopLine), never
+ * the drawing:
+ *
+ *   count-row      a count-by row is the table's 12 multiples, the FIRST number is always
+ *                  printed, the key is the row at its gaps, the % blank is honoured (20 / 50 / 70 /
+ *                  80 / 90 / 100 of the eleven after the first), and the gaps are never all at the
+ *                  end of the row unless every number after the first is missing
+ *   pattern        a number pattern follows its declared rule term by term (count on / back by
+ *                  its step, double, halve, x 10, growing steps), never goes negative, halves only
+ *                  whole numbers, keeps the first number printed, and its key (the gaps, then the
+ *                  rule when the pupil writes it) is the row at its gaps
+ *   mult-grid      a chart's key is the product of each empty cell's row and column (or the
+ *                  factor of each empty edge cell); a shade task's answers are exactly the
+ *                  multiples; blanks sit only in the rows / columns of the ticked tables
+ *   hop-line       the hops, the line and the sentence agree: hops x step = product <= line end
+ */
+function countByRules(items, F) {
+    const live = items.filter(it => it && !it.error && !it.empty && it.cellT);
+    if (!live.length) return;
+    const show = (a) => [...new Set(a)].slice(0, 4).join('; ');
+    const keyOf = (it) => (it.keyParts || String(it.ans).split(/\s*,\s*/)).map(v => Number(String(v).replace(/,/g, '')));
+    const bad = { row: [], pat: [], grid: [], hop: [] };
+    for (const it of live) {
+        const p = it.cellP || {};
+        if (it.cellT === 'count-row' && it.countBy) {
+            const { step, values, blanks, pct } = it.countBy;
+            if (values.length !== 12 || values.some((v, i) => v !== step * (i + 1))) bad.row.push(`not the 12 multiples of ${step}: ${values.join(', ')}`);
+            if (blanks.includes(0)) bad.row.push(`the first number (${step}) is blank`);
+            const k = pct >= 100 ? 11 : Math.max(1, Math.round(pct / 100 * 11));
+            if (blanks.length !== k) bad.row.push(`${pct}% blank should leave ${k} of 11 gaps, not ${blanks.length}`);
+            if (pct < 100 && blanks.length && blanks.every((b, i) => b === 12 - blanks.length + i)) bad.row.push(`the gaps are all at the end (${blanks.join(', ')})`);
+            const key = keyOf(it);
+            if (key.join(',') !== blanks.map(i => values[i]).join(',')) bad.row.push(`the key ${key.join(', ')} is not the row at its gaps`);
+            if (JSON.stringify(p.values) !== JSON.stringify(values) || JSON.stringify(p.blanks) !== JSON.stringify(blanks)) bad.row.push('the drawn row is not the declared row');
+        }
+        if (it.cellT === 'count-row' && it.pattern) {
+            const d = it.pattern;
+            const v = d.values;
+            const next = { add: (x) => x + d.step, sub: (x) => x - d.step, double: (x) => x * 2, halve: (x) => x / 2, times10: (x) => x * 10 };
+            for (let i = 1; i < v.length; i++) {
+                const want = d.kind === 'grow' ? v[i - 1] + i * d.step : next[d.kind] ? next[d.kind](v[i - 1]) : NaN;
+                if (v[i] !== want) { bad.pat.push(`${d.kind} by ${d.step}: ${v.join(', ')} breaks at ${v[i]}`); break; }
+            }
+            if (v.some(x => x < 0 || !Number.isInteger(x))) bad.pat.push(`a negative or fractional number: ${v.join(', ')}`);
+            if (d.blanks.includes(0)) bad.pat.push('the first number is blank');
+            if (d.ruleHidden && d.blanks.some(b => b < 3)) bad.pat.push('the rule is hidden but the first three numbers are not all printed');
+            const cap = { 1: 99, 10: 999, 100: 9999, 1000: 9999 }[d.place] || 9999;
+            if (d.kind !== 'times10' && Math.max(...v) > cap) bad.pat.push(`a number over ${cap} for a row starting in the ${d.place}s: ${Math.max(...v)}`);
+            const key = keyOf(it);
+            const want = d.blanks.map(i => v[i]).concat(d.ruleHidden ? [Number(d.rule)] : []);
+            if (key.join(',') !== want.join(',')) bad.pat.push(`the key ${key.join(', ')} is not ${want.join(', ')}`);
+            const pct = d.gaps;
+            if (pct === null || pct === undefined) {
+                if (d.blanks.join(',') !== Array.from({ length: v.length - 3 }, (_, i) => i + 3).join(',')) bad.pat.push('"continue it" but the first three are not the only printed numbers');
+            }
+        }
+        if (it.cellT === 'mult-grid') {
+            const rows = p.rows || [], cols = p.cols || [];
+            const key = keyOf(it);
+            if ((it.chartTask || 'fill') === 'fill' || it.chartTask === 'pattern') {
+                const prods = (p.blanks || []).map(([i, j]) => rows[i] * cols[j]);
+                const want = it.chartTask === 'pattern' ? prods.concat([Number(p.ruleBox && p.ruleBox.value)]) : prods;
+                if (key.join(',') !== want.join(',')) bad.grid.push(`the key ${key.slice(0, 6).join(', ')} is not the products at the gaps`);
+                if (it.chartTask === 'pattern' && Number(p.ruleBox && p.ruleBox.value) !== it.chartRow) bad.grid.push(`the ${it.chartRow} row's rule is not "add ${it.chartRow}"`);
+            }
+            if (it.chartTask === 'headers') {
+                const want = ((p.hdr && p.hdr.cols) || []).map(j => cols[j]).concat(((p.hdr && p.hdr.rows) || []).map(i => rows[i]));
+                if (key.join(',') !== want.join(',')) bad.grid.push(`the key ${key.join(', ')} is not the missing factors ${want.join(', ')}`);
+            }
+            if (it.chartTask === 'shade') {
+                const n = Number(p.shade);
+                const wrong = (it.optCorrect || []).filter(o => (Number(o.label) % n === 0) !== o.correct);
+                if (!n || wrong.length) bad.grid.push(`shade ${n}: ${wrong.length} option(s) keyed wrongly`);
+            }
+            if (Array.isArray(it.chartTables) && (p.blanks || []).length) {
+                const t = new Set(it.chartTables);
+                const out = (p.blanks || []).filter(([i, j]) => !t.has(rows[i]) && !t.has(cols[j]));
+                if (out.length) bad.grid.push(`a gap outside the ticked tables {${it.chartTables}}: ${rows[out[0][0]]} x ${cols[out[0][1]]}`);
+            }
+        }
+        if (it.cellT === 'hop-line' && it.hopLine) {
+            const h = it.hopLine;
+            const prod = h.hops * h.step;
+            if (prod > h.max) bad.hop.push(`${h.hops} hops of ${h.step} run past the line's end ${h.max}`);
+            if (h.ticks === 'one' && h.max > 36) bad.hop.push(`a line labelled at every number runs to ${h.max} (ticks under 4.4 mm apart)`);
+            if (h.ticks !== 'one' && h.max % h.step !== 0) bad.hop.push(`a line labelled every hop ends at ${h.max}, not a multiple of ${h.step}`);
+            const div = it.op === '÷';
+            const sentence = div ? [prod, h.step, h.hops] : [h.hops, h.step, prod];
+            if (Number(it.a) !== sentence[0] || Number(it.b) !== sentence[1]) bad.hop.push(`the sentence ${it.a} ${it.op} ${it.b} is not the hops`);
+            if (h.response === 'sentence') { if (keyOf(it).join(',') !== sentence.join(',')) bad.hop.push(`the key ${it.ans} is not ${sentence.join(', ')}`); }
+            else if (h.response === 'draw' && Number(it.ans) !== sentence[2]) bad.hop.push(`the answer ${it.ans} is not ${sentence[2]}`);
+            else if (h.response === 'missing' && !sentence.includes(Number(it.ans))) bad.hop.push(`the missing number ${it.ans} is not in ${sentence.join(', ')}`);
+        }
+    }
+    if (bad.row.length) F('count-row', `${bad.row.length} count-by rows are wrong: ${show(bad.row)}`);
+    if (bad.pat.length) F('pattern-rule', `${bad.pat.length} patterns break their rule: ${show(bad.pat)}`);
+    if (bad.grid.length) F('mult-grid', `${bad.grid.length} charts are keyed wrongly: ${show(bad.grid)}`);
+    if (bad.hop.length) F('hop-line', `${bad.hop.length} number lines disagree with their sentence: ${show(bad.hop)}`);
 }
 
 /**
@@ -1482,6 +1596,7 @@ function audit(skill, items) {
     p8Rules(items, F);
     if (id === 'number_bonds') bondRules(items, F);
     if (K2_PICTURE_SKILLS.has(id)) pictureRules(items, F);
+    countByRules(items, F);
 
     if (r.eqRemainder) NOTE('answer-floor', `${r.eqRemainder} of ${r.eqChecked} equations answer with the whole-number quotient and drop the remainder`);
 
@@ -1759,8 +1874,9 @@ function selfTest() {
     }
     const app = await open({ seed: 4242 });
     await hideOverlays(app.page);
-    let skills = (await listSkills(app.page)).filter(s => CATS.includes(s.categoryId)
+    let skills = (await listSkills(app.page)).filter(s => (CATS.includes(s.categoryId) || EXTRA_SKILLS.has(`${s.categoryId}:${s.skillId}`))
         && !(PV_FAMILY_CATS.includes(s.categoryId) && PV_EXCLUDED.has(s.skillId)));
+    for (const s of skills) if (EXTRA_SKILLS.has(`${s.categoryId}:${s.skillId}`)) s.family = EXTRA_SKILLS.get(`${s.categoryId}:${s.skillId}`);
     if (ONLY_FAMILY) skills = skills.filter(s => FAMILY_CATS[ONLY_FAMILY].includes(s.categoryId));
     if (ONLY_CAT) skills = skills.filter(s => s.categoryId === ONLY_CAT);
     if (ONLY_SKILL) skills = skills.filter(s => s.skillId === ONLY_SKILL);
