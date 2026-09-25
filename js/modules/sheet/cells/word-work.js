@@ -15,9 +15,14 @@
 //                  row of partial-product boxes per digit of a 2-digit multiplier; ÷ the long
 //                  division frame (divisor boxes, bracket, dividend boxes, quotient boxes, two
 //                  work rows per step, an R box when the item leaves a remainder)
-//   the answer     "Answer: [box] ______" - the number box is the one scored place (PT-WPR-8),
-//                  the unit word is copied from a small printed bank of three words beside it
-//                  (P-TH-1: a word from a bank of at most 4)
+//   the answer     written ONCE (round-4 critic, H8): the bottom row of the columns (the
+//                  quotient row of ÷) is the scored place (PT-WPR-8), in heavier boxes, with the
+//                  label line beside it and a bank of three label words to copy from (P-TH-1).
+//                  Only a ÷ story whose answer is not the quotient ("left over", "cars needed",
+//                  a quotient with a remainder) keeps a separate "Answer: [ ] ______" line
+//   geometry       the SKILL's tracks on every item (payload.tracks) and a regroup row on every
+//                  + / − item (a structural scaffold, empty on the pupil page); × carries only
+//                  when a 2-digit number is multiplied by one digit
 //   two-step       two work blocks side by side, "Step 1" and "Step 2", each with its own sign
 //                  row (P-WP-11)
 //
@@ -27,8 +32,9 @@
 //
 // SCREEN TWIN (`ctx.options.twin`, drawn by `wordWorkTwin`): the same drawing in --mq-k2 px,
 // stacked for a narrow card. The sign boxes are buttons, the work boxes and the sign box are
-// typed inputs (scratch, ungraded), the answer box is the host's own input
-// (`data-mq-blank="box"`), and the unit bank words fill the unit line. Every writing place
+// typed inputs (scratch, ungraded), the answer row's boxes are the host's own digit boxes
+// (`data-mq-cell`, composed into the answer; the separate Answer box is `data-mq-blank="box"`),
+// and the label bank words fill the label line. Every writing place
 // carries `data-mq-expect` - the value the model expects - so the host can mark each one right
 // as it is filled (js/modules/word-work-screen.js does the tapping and the per-box marks).
 //
@@ -250,6 +256,156 @@ export function cueRanges(line, ops) {
     return out.sort((x, y) => x[0] - y[0]);
 }
 
+/* ---------------------------------------------------------------------- the story (P-WP-17..24)
+ * Round-4 critic: the generators' own story frames were ungrammatical or nonsense for an ELL
+ * pupil ("After 423 removed, how many were left?", "Then 102 spent.", "7 rows of cents" in a
+ * garden, "planted rock samples", "picks 37 trees", "She" for "James"). Every word-work story is
+ * therefore RETOLD here from the item's own numbers and its solving structure, in one controlled
+ * grammar: present or simple past, one fact per sentence, a name repeated instead of a pronoun,
+ * countable nouns that fit their verbs, and every count agreeing with its noun ("1 bag",
+ * "4 bags"). The generator decides the numbers and the kind of story (its schema); the words are
+ * ours. tests/scripts/ws-story-lint.mjs holds every template to these rules over a large sample.
+ */
+
+/** Short, mixed, international names (P-WP-21). */
+export const WW_NAMES = Object.freeze(['Mia', 'Omar', 'Lena', 'Ravi', 'Sam', 'Ana', 'Kofi', 'Yuki', 'Zara', 'Leo', 'Noor', 'Ben', 'Aya', 'Tom']);
+
+const N = (one, many) => Object.freeze({ one, many });
+/** Things a child has, gets, gives, shares and packs (P-WP-20: every noun with both forms). */
+export const WW_THINGS = Object.freeze([
+    N('apple', 'apples'), N('pencil', 'pencils'), N('sticker', 'stickers'), N('book', 'books'),
+    N('marble', 'marbles'), N('card', 'cards'), N('shell', 'shells'), N('bead', 'beads'),
+    N('stamp', 'stamps'), N('crayon', 'crayons'), N('button', 'buttons'), N('cookie', 'cookies'),
+]);
+/** Money: a count of dollars (P-WP-22: plain amounts, no currency sign). */
+export const WW_MONEY = N('dollar', 'dollars');
+/** Containers for equal groups, grouping and full-groups stories. */
+export const WW_CONTAINERS = Object.freeze([
+    N('bag', 'bags'), N('box', 'boxes'), N('jar', 'jars'), N('plate', 'plates'), N('basket', 'baskets'), N('pack', 'packs'),
+]);
+const CHILD = N('child', 'children');
+/** The subjects of a story in thousands (P-WP-22: neutral places). */
+export const WW_PLACES = Object.freeze(['The shop', 'The school', 'The club', 'The farm', 'The library', 'The museum']);
+const CAR = N('car', 'cars');
+
+const num = (n) => (Math.abs(n) >= 1000 ? Number(n).toLocaleString('en-US') : String(n));
+/** "1 bag", "4 bags" (P-WP-20). */
+export const countOf = (n, noun) => `${num(n)} ${n === 1 ? noun.one : noun.many}`;
+
+/** A deterministic pick from a list by a seed. */
+const pickAt = (list, k) => list[((Math.floor(k) % list.length) + list.length) % list.length];
+
+/**
+ * The schema of a one-step story: what KIND of story the generator told, read from its own words
+ * and the solving step (never from the words alone: "more" is also in a subtraction question).
+ */
+export function schemaOf(text, st, ans) {
+    const t = String(text || '').toLowerCase();
+    const some = /\bsome\b/.test(t) && /\b(at first|at the start|to start|start with|started with|in the beginning)\b/.test(t);
+    const change = /\b(needs?|wants?|after (getting|walking|reading|earning|saving)|now has|now have|in total|started with|some more)\b/.test(t);
+    const compare = /\b(more|fewer|less)\s+than\b|\bhow (many|much) (more|fewer|less)\b|\bdifference\b/.test(t);
+    if (st.op === '+') {
+        if (some) return 'start-sub';
+        if (/\bmore than\b/.test(t)) return 'compare-more';
+        return 'join';
+    }
+    if (st.op === '-') {
+        if (some) return 'start-add';
+        if (change && /\bhow many more\b/.test(t)) return 'change';
+        if (compare) return 'compare';
+        return 'separate';
+    }
+    if (st.op === '*') return /\btimes as many\b/.test(t) ? 'times' : 'groups';
+    // division
+    if (st.r) {
+        if (ans === st.r) return 'rem-left';
+        if (ans === st.q + 1) return 'rem-up';
+        return 'rem-full';
+    }
+    if (/\bhow many times\b/.test(t)) return 'times-howmany';
+    if (/\btimes as many\b/.test(t)) return 'times-inverse';
+    if (/\bhow many (bags|boxes|packs|baskets|jars|shelves|buses|cars|teams|rows|groups|plates|vases|pots|tables)\b/.test(t)) return 'grouping';
+    return 'sharing';
+}
+
+/**
+ * The story's sentences for one schema, from the step's numbers. Returns
+ * {lines: [...sentences, question], unit: {one, many} | null, ans}. `k` varies names and nouns.
+ */
+export function tellStory(schema, st, k0 = 0, { ans = st.ans, money = false, times = null } = {}) {
+    let k = k0;
+    const a = st.top, b = st.bottom;
+    // Thousands of stickers in a child's hands is nonsense (round-4 critic): a + / − story with a
+    // number of 1,000 or more is about a place and its money ("The shop has 57,938 dollars.").
+    const big = (st.op === '+' || st.op === '-') && Math.max(a, b, ans) >= 1000;
+    const n1 = big ? pickAt(WW_PLACES, k) : pickAt(WW_NAMES, k);
+    const n2 = big ? pickAt(WW_PLACES, k + 1) : pickAt(WW_NAMES, k + 5);
+    const T = money || big ? WW_MONEY : pickAt(WW_THINGS, k * 7 + 3);
+    const C = pickAt(WW_CONTAINERS, k * 5 + 1);
+    // a place is "The shop" at the start of a sentence and "the shop" inside one
+    const S = (lines, unit, answer = ans) => ({ lines: big ? lines.map((l) => l.replace(/(.)\bThe (shop|school|club|farm|library|museum)\b/g, '$1the $2')) : lines, unit, ans: answer });
+    if ((big || money) && schema === 'separate') k = 1;      // money is given, not kept in a box
+    switch (schema) {
+        case 'join':
+            return (k % 2)
+                ? S([`${n1} has ${countOf(a, T)}.`, `${n2} has ${countOf(b, T)}.`, `How many ${T.many} do they have in all?`], T)
+                : S([`${n1} has ${countOf(a, T)}.`, `${n1} gets ${countOf(b, T).replace(/^(\S+) /, '$1 more ')}.`, `How many ${T.many} does ${n1} have now?`], T);
+        case 'compare-more':
+            return S([`${n1} has ${countOf(a, T)}.`, `${n2} has ${countOf(b, T).replace(/^(\S+) /, '$1 more ')} than ${n1}.`, `How many ${T.many} does ${n2} have?`], T);
+        case 'start-sub':
+            return S([`${n1} had some ${T.many}.`, `${n1} gave away ${countOf(b, T)}.`, `Now ${n1} has ${countOf(a, T)}.`, `How many ${T.many} did ${n1} have at first?`], T);
+        case 'separate':
+            return (k % 2)
+                ? S([`${n1} has ${countOf(a, T)}.`, `${n1} gives ${countOf(b, T)} to ${n2}.`, `How many ${T.many} does ${n1} have left?`], T)
+                : S([`There ${a === 1 ? 'is' : 'are'} ${countOf(a, T)} in a box.`, `${n1} takes ${countOf(b, T)} out.`, `How many ${T.many} are left in the box?`], T);
+        case 'compare':
+            return S([`${n1} has ${countOf(a, T)}.`, `${n2} has ${countOf(b, T)}.`, `How many more ${T.many} does ${n1} have than ${n2}?`], T);
+        case 'change':
+            return S([`${n1} has ${countOf(b, T)}.`, `${n1} wants ${countOf(a, T)}.`, `How many more ${T.many} does ${n1} need?`], T);
+        case 'start-add':
+            return S([`${n1} had some ${T.many}.`, `${n1} got ${countOf(b, T).replace(/^(\S+) /, '$1 more ')}.`, `Now ${n1} has ${countOf(a, T)}.`, `How many ${T.many} did ${n1} have at first?`], T);
+        case 'groups': {
+            const G = pickAt(WW_CONTAINERS, k * 5 + 1);
+            return S([`${n1} has ${countOf(b, G)}.`, `Each ${G.one} has ${countOf(a, T)}.`, `How many ${T.many} are there in all?`], T);
+        }
+        case 'times': {
+            const m = times && (times === a || times === b) ? times : b;
+            const s = m === a ? b : a;
+            return S([`${n1} has ${countOf(s, T)}.`, `${n2} has ${num(m)} times as many ${T.many}.`, `How many ${T.many} does ${n2} have?`], T);
+        }
+        case 'sharing':
+            if (b < 2) return null;
+            return (k % 2)
+                ? S([`${n1} has ${countOf(a, T)}.`, `${n1} puts them into ${num(b)} equal groups.`, `How many ${T.many} are in each group?`], T)
+                : S([`${n1} has ${countOf(a, T)}.`, `${n1} shares them equally among ${num(b)} friends.`, `How many ${T.many} does each friend get?`], T);
+        case 'grouping':
+            return S([`${n1} has ${countOf(a, T)}.`, `${n1} puts ${countOf(b, T)} in each ${C.one}.`, `How many ${C.many} does ${n1} fill?`], C);
+        case 'times-inverse':
+            return S([`${n1} has ${countOf(a, T)}.`, `That is ${num(b)} times as many as ${n2} has.`, `How many ${T.many} does ${n2} have?`], T);
+        case 'times-howmany':
+            return S([`${n1} has ${countOf(b, T)}.`, `${n2} has ${countOf(a, T)}.`, `How many times as many ${T.many} does ${n2} have?`], null);
+        case 'rem-left':
+            return S([`${n1} has ${countOf(a, T)}.`, `${n1} puts ${countOf(b, T)} in each ${C.one}.`, `How many ${T.many} are left over?`], T);
+        case 'rem-up':
+            return a >= 2 && b >= 2
+                ? S([`${countOf(a, CHILD)} go on a trip.`, `Each car holds ${countOf(b, CHILD)}.`, `How many cars do they need?`], CAR)
+                : null;
+        case 'rem-full':
+            return S([`${n1} has ${countOf(a, T)}.`, `A full ${C.one} holds ${countOf(b, T)}.`, `How many ${C.many} can ${n1} fill?`], C);
+        default:
+            return null;
+    }
+}
+
+/** A two-step story (P-WP-11): start, change 1, change 2, question; the name repeated, never "She". */
+export function tellTwoStep(s1, s2, k = 0) {
+    const n1 = pickAt(WW_NAMES, k);
+    const T = pickAt(WW_THINGS, k * 7 + 3);
+    const c1 = s1.op === '+' ? `${n1} got ${num(s1.bottom)} more.` : `${n1} gave away ${num(s1.bottom)}.`;
+    const c2 = s2.op === '+' ? `Then ${n1} found ${num(s2.bottom)} more.` : `Then ${n1} lost ${num(s2.bottom)}.`;
+    return { lines: [`${n1} had ${countOf(s1.top, T)}.`, c1, c2, `How many ${T.many} does ${n1} have now?`], unit: T, ans: s2.ans };
+}
+
 /* ---------------------------------------------------------------------- the payload */
 
 /**
@@ -268,14 +424,34 @@ export function wordWorkPayload(q, o = {}) {
     if (!steps) return null;
     const last = steps[steps.length - 1];
     if (last.op !== '/' && last.ans !== ans) return null;
-    const lines = storyLines(q.text);
+    let lines = storyLines(q.text);
     if (!lines.length) return null;
-    const unit = unitOf(q, ans);
+    let unit = unitOf(q, ans);
     const seed = steps.reduce((s, st) => s + st.a * 7 + st.b * 13, ans);
-    const cmp = /\b(more|fewer|less)\s+than\b|\bhow many (more|fewer)\b|\bhow much more\b|\btimes as many\b/i.test(q.text);
-    const barKind = last.op === '*' || last.op === '/' ? 'groups' : cmp ? 'compare' : 'whole';
+    // The story is RETOLD in the controlled grammar (the K picture story keeps its own words).
+    const schema = steps.length > 1 ? 'two-step' : schemaOf(q.text, last, ans);
+    if (o.retell !== false) {
+        const k = Number.isFinite(o.seed) ? o.seed : seed;
+        const tm = /(\d[\d,]*)\s+times as many\b/i.exec(plain(q.text));
+        const told = steps.length > 1 ? tellTwoStep(steps[0], steps[1], k)
+            : tellStory(schema, last, k, { ans, money: /\b(dollars?|cents?|coins?)\b/i.test(q.text) && ['join', 'compare-more', 'start-sub', 'separate', 'compare', 'change', 'start-add'].includes(schema), times: tm ? Number(tm[1].replace(/,/g, '')) : null });
+        if (told && told.ans === ans) {
+            lines = told.lines;
+            const u = told.unit;
+            const others = [];
+            for (const x of [...WW_CONTAINERS.map((c) => c.many), ...WW_THINGS.map((c) => c.many)]) if (lines.join(' ').includes(` ${x}`) && (!u || x !== u.many)) others.push(x);
+            unit = u ? { word: ans === 1 ? u.one : u.many, many: u.many, others } : { word: '', many: '', others };
+        }
+    }
+    // The answer is written ONCE (round-4 critic, H8): in the bottom row of the columns (or the
+    // quotient row), with the unit line beside it. Only a division story whose answer is not the
+    // quotient (a remainder read as "left over", "round up", or a quotient with a remainder) keeps
+    // a separate "Answer: [ ] ____" line, and then its quotient row is working.
+    const inRow = !(last.op === '/' && (last.r || ans !== last.q));
+    const barKind = last.op === '*' || last.op === '/' ? 'groups' : /compare/.test(schema) ? 'compare' : 'whole';
     return {
-        lines, steps, ans, unit: unit.word, bank: unitBank(unit, unit.others, seed),
+        lines, steps, ans, unit: unit.word, bank: unitBank(unit, unit.others, seed), schema, inRow,
+        tracks: Number(o.tracks) > 0 ? Number(o.tracks) : 0,
         hl: !!o.hl, kb: !!o.kb, bar: !!o.bar && steps.length === 1, barKind,
         pic: o.pic || null,
     };
@@ -323,14 +499,16 @@ function subRegroup(x, y) {
     return out;
 }
 
-/** The carries of x × d (one digit), by position from the ones. */
+/** The carries of x × d (one digit), by position from the ones: only into a digit of x (a carry
+ *  out of the last digit is written in the answer, never above an empty track). */
 function multCarries(x, d) {
     const out = {};
     let c = 0;
-    digitsOf(x).split('').reverse().forEach((ch, i) => {
+    const ds = digitsOf(x).split('').reverse();
+    ds.forEach((ch, i) => {
         const p = Number(ch) * d + c;
         c = Math.floor(p / 10);
-        if (c) out[i + 1] = String(c);
+        if (c && i + 1 < ds.length) out[i + 1] = String(c);
     });
     return out;
 }
@@ -338,22 +516,26 @@ function multCarries(x, d) {
 /**
  * The rows of one column step: what each row holds on the KEY, as strings right-aligned to the
  * ones track, and which tracks carry a box. `T` counts the digit tracks (the sign track is extra).
+ *
+ * Round-4 critic: the geometry is the SKILL's, not the item's. `minT` (the tracks the skill's
+ * largest numbers need) keeps every item of a page on the same tracks, and the regroup row is a
+ * STRUCTURAL scaffold: every + and − item with two or more tracks gets it, empty on the pupil
+ * page, the key filling only the boxes the item needs (a row printed only where regrouping
+ * happens told the pupil whether to regroup). × gets a carry row only when its top number has
+ * two or more digits and the multiplier one: a 1-digit fact has nothing to carry into.
  */
-export function columnRows(st) {
+export function columnRows(st, minT = 0) {
     const x = st.top, y = st.bottom, z = st.ans;
     const lx = digitsOf(x).length, ly = digitsOf(y).length, lz = digitsOf(z).length;
     const rows = [];
     let T;
-    if (st.op === '+') {
-        T = Math.max(lx, ly) + 1;
-        if (hasCarry(x, y)) rows.push({ kind: 'carry', tracks: range(1, T), vals: addCarries(x, y) });
-    } else if (st.op === '-') {
-        T = Math.max(lx, ly, lz);
-        if (hasBorrow(x, y)) rows.push({ kind: 'carry', tracks: range(0, lx), vals: subRegroup(x, y), wide: true });
-    } else {
-        T = lx + ly;
-        if (ly === 1 && multCarry(x, y)) rows.push({ kind: 'carry', tracks: range(1, T), vals: multCarries(x, y) });
-    }
+    if (st.op === '+') T = Math.max(lx, ly) + 1;
+    else if (st.op === '-') T = Math.max(lx, ly, lz);
+    else T = lx + ly;
+    T = Math.max(T, lz, Number(minT) || 0);
+    if (st.op === '+' && T >= 2) rows.push({ kind: 'carry', tracks: range(1, T), vals: addCarries(x, y) });
+    else if (st.op === '-' && T >= 2) rows.push({ kind: 'carry', tracks: range(0, T), vals: subRegroup(x, y), wide: true });
+    else if (st.op === '*' && ly === 1 && lx >= 2) rows.push({ kind: 'carry', tracks: range(1, T), vals: multCarries(x, y) });
     rows.push({ kind: 'num', value: String(x), id: 'top' });
     rows.push({ kind: 'num', value: String(y), id: 'bottom', sign: st.op });
     rows.push({ kind: 'rule' });
@@ -365,7 +547,7 @@ export function columnRows(st) {
         rows.push({ kind: 'rule' });
     }
     rows.push({ kind: 'num', value: String(z), id: 'ans' });
-    return { T: Math.max(T, lz), rows };
+    return { T, rows };
 }
 /** Positions [from, to) counted from the ones. */
 function range(from, to) { const out = []; for (let i = from; i < to; i++) out.push(i); return out; }
@@ -402,6 +584,24 @@ function wbox(ctx, { id, value = '', expect = '', w, h, pt, kind = 'digit', grad
         + ` style="display:flex;align-items:center;justify-content:center;${base}">${esc(value)}</span>`;
 }
 
+/**
+ * One box of the ANSWER row. On paper a graded digit slot; on screen the host's own digit box
+ * (`data-mq-cell`: the host puts an input in it and composes the typed digits into the answer),
+ * with the digit it expects, so the host can turn it green when it is right.
+ */
+function abox(ctx, { id, value = '', expect = '', w, pt }) {
+    const ink = value !== '' ? inkOf(ctx) : null;
+    const color = ink === 'trace' ? GREY : INK;
+    const base = `box-sizing:border-box;width:${tw(ctx, w)};height:${tw(ctx, w)};border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;`
+        + `font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, pt)};font-weight:700;line-height:1;color:${color};text-align:center;${KEY_FEATURES}`;
+    if (isTwin(ctx)) {
+        return `<span class="mq-wwans" data-ws-slot="${esc(id)}" data-ws-shape="box" data-mq-cell="1" data-mq-w="1" data-mq-label="answer digit" data-mq-expect="${esc(expect)}" style="display:flex;align-items:center;justify-content:center;${base}"></span>`;
+    }
+    // a box left of the answer's digits holds nothing on the key: it is part of the row, not a slot;
+    // finished work shown to be checked (Error analysis) is judged, its fix box is the slot
+    return `<span data-ws-slot="${esc(id)}" data-ws-shape="box"${expect === '' || ctx.state === 'wrong' ? ' data-ws-graded="0"' : ''}${ink ? ` data-ws-ink="${ink}"` : ''} style="display:flex;align-items:center;justify-content:center;${base}">${esc(value)}</span>`;
+}
+
 /** The small sign row: + − × ÷, the chosen one ringed on the key. */
 function signRow(ctx, op, pick, idx) {
     const s = boxMm(ctx) * (isTwin(ctx) ? 0.78 : 0.72);
@@ -425,12 +625,13 @@ function signRow(ctx, op, pick, idx) {
 const at = (value, T, i) => { const p = String(value).padStart(T, ' '); return p[i] === ' ' ? '' : p[i]; };
 
 /** The + − × column work of one step: a CSS grid of boxes, the sign box on the bottom row. */
-function columnWork(ctx, st, show, idx) {
-    const { T, rows } = columnRows(show);
+function columnWork(ctx, st, show, idx, p = {}, isAnswer = false) {
+    const minT = Math.max(Number(p.tracks) || 0, columnRows(st).T);
+    const { T, rows } = columnRows(show, minT);
     const bx = boxMm(ctx), pt = digitPt(ctx);
     const sb = bx * 0.58;
     const cols = `${tw(ctx, bx)} repeat(${T}, ${tw(ctx, bx)})`;
-    const expect = columnRows(st);          // what the model expects, whatever is shown
+    const expect = columnRows(st, minT);    // what the model expects, whatever is shown
     const eRow = (id) => (expect.rows.find((r) => r.id === id) || {}).value || '';
     const put = filled(ctx);
     let html = '';
@@ -458,18 +659,21 @@ function columnWork(ctx, st, show, idx) {
         }
         const ev = eRow(row.id);
         const eT = expect.T;
+        // the bottom row of the LAST step is the one answer place (graded; on screen the host's
+        // digit boxes, composing the answer): every other row is working the pupil writes in
+        const ans = isAnswer && row.id === 'ans';
         for (let i = 0; i < T; i++) {
             const v = put ? at(row.value, T, i) : '';
             const e = eT === T ? at(ev, T, i) : '';
-            html += `<span style="grid-row:${r};grid-column:${i + 2};">${wbox(ctx, { id: `w${idx}-${row.id}-${i}`, value: v, expect: e, w: bx, h: bx, pt })}</span>`;
+            html += `<span style="grid-row:${r};grid-column:${i + 2};">${ans ? abox(ctx, { id: `ans-${i}`, value: v, expect: e, w: bx, pt }) : wbox(ctx, { id: `w${idx}-${row.id}-${i}`, value: v, expect: e, w: bx, h: bx, pt })}</span>`;
         }
         r++;
     }
-    return `<div class="mq-wwcols" role="group" aria-label="column work" style="display:inline-grid;grid-template-columns:${cols};column-gap:${L(ctx, GAP)};row-gap:${L(ctx, 0.5)};align-items:end;">${html}</div>`;
+    return `<div class="mq-wwcols" role="group" aria-label="column work"${isAnswer && isTwin(ctx) ? ' data-mq-join=""' : ''} style="display:inline-grid;grid-template-columns:${cols};column-gap:${L(ctx, GAP)};row-gap:${L(ctx, 0.5)};align-items:end;">${html}</div>`;
 }
 
 /** The ÷ frame: divisor boxes, the bracket, dividend boxes, quotient boxes, the working, R. */
-function divisionWork(ctx, st, show, idx) {
+function divisionWork(ctx, st, show, idx, p = {}, isAnswer = false) {
     const x = show.top, y = show.bottom;
     const Dx = digitsOf(st.top).length, Dy = digitsOf(st.bottom).length;
     const bx = boxMm(ctx), pt = digitPt(ctx);
@@ -485,7 +689,7 @@ function divisionWork(ctx, st, show, idx) {
     // row 1: the quotient over the dividend (one box over every dividend track, VA-61), then R [ ]
     const qs = String(q).padStart(Dx, ' '), eq = String(Math.floor(st.top / st.bottom)).padStart(Dx, ' ');
     for (let i = 0; i < Dx; i++) {
-        html += `<span style="grid-row:1;grid-column:${c0 + i};">${wbox(ctx, { id: `w${idx}-q-${i}`, value: put ? qs[i].trim() : '', expect: eq[i].trim(), w: bx, h: bx, pt })}</span>`;
+        html += `<span style="grid-row:1;grid-column:${c0 + i};">${isAnswer ? abox(ctx, { id: `ans-${i}`, value: put ? qs[i].trim() : '', expect: eq[i].trim(), w: bx, pt }) : wbox(ctx, { id: `w${idx}-q-${i}`, value: put ? qs[i].trim() : '', expect: eq[i].trim(), w: bx, h: bx, pt })}</span>`;
     }
     if (hasR) {
         html += `<span style="grid-row:1;grid-column:${c0 + Dx};align-self:center;font-size:${P(ctx, textPt(ctx) + 2)};font-weight:700;padding:0 ${L(ctx, 1.2)};">R</span>`
@@ -526,11 +730,11 @@ function divisionWork(ctx, st, show, idx) {
             html += `<span style="grid-row:${row};grid-column:${c0 + i};${er.minus ? `border-bottom:${B(ctx, 0.75)} solid ${INK};padding-bottom:${L(ctx, 0.6)};` : ''}">${wbox(ctx, { id: `w${idx}-wk${k}-${i}`, value: v, expect: e, w: bx, h: bx, pt })}</span>`;
         }
     });
-    return `<div class="mq-wwcols mq-wwdiv" role="group" aria-label="division work" style="display:inline-grid;grid-template-columns:${cols};column-gap:${L(ctx, GAP)};row-gap:${L(ctx, 0.5)};align-items:end;">${html}</div>`;
+    return `<div class="mq-wwcols mq-wwdiv" role="group" aria-label="division work"${isAnswer && isTwin(ctx) ? ' data-mq-join=""' : ''} style="display:inline-grid;grid-template-columns:${cols};column-gap:${L(ctx, GAP)};row-gap:${L(ctx, 0.5)};align-items:end;">${html}</div>`;
 }
 
 /** The width (mm) of one step's work block: the wider of its sign row and its columns. */
-function blockWidthMm(ctx, st) {
+function blockWidthMm(ctx, st, p = {}) {
     const bx = boxMm(ctx);
     const signs = 4 * bx * 0.72 + 3 * 2.6 + 3.2;
     let work;
@@ -538,16 +742,25 @@ function blockWidthMm(ctx, st) {
         const Dx = digitsOf(st.top).length, Dy = digitsOf(st.bottom).length;
         work = (Dx + Dy) * (bx + GAP) + bx * 0.45 + (st.top % st.bottom ? bx + 6 : 0);
     } else {
-        work = (columnRows(st).T + 1) * (bx + GAP);
+        work = (columnRows(st, p.tracks).T + 1) * (bx + GAP);
     }
     return Math.max(signs, work);
 }
 
 /** One step's work block: its sign row over its columns. */
-function stepBlock(ctx, st, show, pick, idx, caption) {
-    const work = st.op === '/' ? divisionWork(ctx, st, show, idx) : columnWork(ctx, st, show, idx);
+function stepBlock(ctx, st, show, pick, idx, caption, p = {}, unitBlock = '', noSigns = false) {
+    const isAnswer = !!unitBlock || (p.inRow && idx === (p.steps || []).length - 1);
+    const grid = st.op === '/' ? divisionWork(ctx, st, show, idx, p, isAnswer) : columnWork(ctx, st, show, idx, p, isAnswer);
+    // The unit line stands beside the answer row (the bottom row; the quotient row of ÷), its
+    // word bank beside it: one answer place, number and label together.
+    const work = unitBlock
+        ? (isTwin(ctx)
+            // on screen the label line and its word chips sit in one row right under the columns
+            ? `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 2)};">${grid}${unitBlock}</div>`
+            : `<div style="display:flex;gap:${L(ctx, 3)};align-items:${st.op === '/' ? 'flex-start' : 'flex-end'};">${grid}${unitBlock}</div>`)
+        : grid;
     const cap = caption ? `<div style="font-size:${P(ctx, zonePt(ctx))};font-weight:700;line-height:1.3;">${esc(caption)}</div>` : '';
-    return `<div class="mq-wwstep" style="display:flex;flex-direction:column;align-items:${isTwin(ctx) ? 'center' : 'flex-start'};gap:${L(ctx, 1)};">${cap}${signRow(ctx, st.op, pick, idx)}`
+    return `<div class="mq-wwstep" style="display:flex;flex-direction:column;align-items:${isTwin(ctx) ? 'center' : 'flex-start'};gap:${L(ctx, 1)};">${cap}${noSigns ? '' : signRow(ctx, st.op, pick, idx)}`
         + `<div style="max-width:100%;overflow-x:auto;">${work}</div></div>`;
 }
 
@@ -664,6 +877,28 @@ function answerBlock(ctx, p, shown, unitShown, vertical = false) {
         + bank + '</div>';
 }
 
+/**
+ * The label beside the answer row: the unit-word bank and the line the pupil copies the word
+ * onto. Above the line for a bottom answer row, under it for the quotient row of ÷.
+ */
+function unitBlock(ctx, p, unitShown, top = false) {
+    if (!p.unit) return '';
+    const bx = boxMm(ctx);
+    const tp = textPt(ctx) + 2;
+    const uw = isTwin(ctx) ? 26 : { S: 20, M: 22, L: 24 }[sizeOf(ctx)];
+    const uInk = unitShown !== '' ? inkOf(ctx) : null;
+    const line = `<span class="mq-wwunit" data-ws-slot="answer-label" data-ws-shape="line" data-ws-graded="0"${uInk ? ` data-ws-ink="${uInk}"` : ''} data-mq-expect="${esc(p.unit)}" aria-label="label" style="display:inline-flex;align-items:flex-end;justify-content:center;box-sizing:border-box;width:${L(ctx, uw)};height:${isTwin(ctx) ? `max(44px, ${L(ctx, bx)})` : L(ctx, bx)};border-bottom:${B(ctx, 1)} solid ${INK};font-size:${P(ctx, tp)};font-weight:700;line-height:1.1;padding-bottom:${L(ctx, 0.6)};color:${uInk === 'trace' ? GREY : INK};">${esc(unitShown)}</span>`;
+    const bank = p.bank && p.bank.length
+        ? `<div class="mq-wwwords" aria-label="label words" style="display:inline-flex;flex-direction:${isTwin(ctx) ? 'row' : 'column'};align-items:flex-start;gap:${L(ctx, isTwin(ctx) ? 1.2 : 0.3)};border:${B(ctx, 0.75)} solid ${INK};padding:${L(ctx, 0.6)} ${L(ctx, 1.6)};font-size:${P(ctx, zonePt(ctx) + 1)};line-height:1.15;">`
+            + p.bank.map((wd) => (isTwin(ctx)
+                ? `<button type="button" class="mq-wwword" data-mq-word="${esc(wd)}" style="min-height:44px;min-width:44px;padding:0 ${L(ctx, 1.5)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};font:inherit;cursor:pointer;">${esc(wd)}</button>`
+                : `<span>${esc(wd)}</span>`)).join('')
+            + '</div>'
+        : '';
+    if (isTwin(ctx)) return `<div class="mq-wwanswer" style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:center;gap:${L(ctx, 2)};">${line}${bank}</div>`;
+    return `<div class="mq-wwanswer" style="display:flex;flex-direction:column;align-items:flex-start;gap:${L(ctx, 1.2)};">${top ? line + bank : bank + line}</div>`;
+}
+
 /** The step a cell SHOWS: the model's, or (Error analysis) the same numbers worked with the wrong sign. */
 function shownSteps(p, ctx) {
     const w = ctx.state === 'wrong' ? (ctx.wrong || {}) : null;
@@ -690,22 +925,34 @@ register(WW_TEMPLATE, {
         const put = filled(ctx);
         const sh = shownSteps(p, ctx);
         const two = p.steps.length > 1;
-        const blocks = p.steps.map((st, i) => stepBlock(ctx, st, sh.steps[i], put ? sh.picks[i] : null, i, two ? `Step ${i + 1}` : '')).join('');
-        const answer = answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '');
-        // In a column cell the answer stands BESIDE a narrow stack (label, box, unit line, bank),
-        // so two short stories fit one above the other; a wider stack puts it underneath.
+        const inRow = p.inRow !== false;
+        const lastI = p.steps.length - 1;
+        const unitHere = inRow ? unitBlock(ctx, p, put ? p.unit : '', p.steps[lastI].op === '/') : '';
+        const blocks = p.steps.map((st, i) => stepBlock(ctx, st, sh.steps[i], put ? sh.picks[i] : null, i, two ? `Step ${i + 1}` : '', p, i === lastI ? unitHere : '')).join('');
+        const answer = inRow ? '' : answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '');
+        // In a column cell a separate "Answer:" block stands BESIDE a narrow stack; a wider stack
+        // (or a two-step story) makes the cell a full-width one (see fullW below).
         const cols = Math.max(1, Number(ctx.columns || 1));
         const innerW = 186 / cols - (cols > 1 ? 9 : 10);
-        const side = !twin && narrow && !two && blockWidthMm(ctx, p.steps[0]) + 5 + { S: 20, M: 22, L: 24 }[sizeOf(ctx)] <= innerW;
+        const beside = (p.unit ? { S: 22, M: 25, L: 28 }[sizeOf(ctx)] : 0) + 3;
+        const side = !twin && narrow && !two && blockWidthMm(ctx, p.steps[0], p) + (inRow ? beside : 5 + { S: 20, M: 22, L: 24 }[sizeOf(ctx)]) <= innerW;
         const head = `<div style="display:flex;gap:${L(ctx, 4)};align-items:flex-start;${narrow ? 'flex-direction:column;align-items:stretch;' : ''}">${storyHTML(ctx, p, narrow)}${p.kb ? keywordBank(ctx) : ''}</div>`
             + pictureRow(ctx, p.pic) + (p.bar ? barModel(ctx, p) : '');
+        // A FULL-WIDTH cell whose work is narrow reads left to right: the story with its sign row
+        // under it on the left, the columns and the answer on the right. The page then holds three
+        // stories at L (the word-problem role's 12.1 ceiling) with no half-empty right side (H13).
+        const workW = blockWidthMm(ctx, p.steps[0], p) + (inRow ? beside : 44);
+        if (!twin && !narrow && !two && !p.kb && workW <= 88) {
+            const grid = stepBlock(ctx, p.steps[0], sh.steps[0], put ? sh.picks[0] : null, 0, '', p, unitHere, true);
+            const left = `<div style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:${L(ctx, 2)};">${head}${signRow(ctx, p.steps[0].op, put ? sh.picks[0] : null, 0)}</div>`;
+            const right = `<div style="flex:none;display:flex;align-items:flex-end;gap:${L(ctx, 5)};">${grid}${answer ? answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', true) : ''}</div>`;
+            return `<div class="mq-ww" data-ww-ops="${p.steps[0].op}" style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 5)};display:flex;gap:${L(ctx, 6)};align-items:flex-start;">${left}${right}</div>`;
+        }
         const body = side
-            ? `<div style="display:flex;align-items:flex-start;gap:${L(ctx, 5)};margin-top:${L(ctx, 1.2)};">${blocks}${answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', true)}</div>`
+            ? `<div style="display:flex;align-items:flex-start;gap:${L(ctx, 5)};margin-top:${L(ctx, 1.2)};">${blocks}${answer ? answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', true) : ''}</div>`
             : narrow
             ? `<div style="display:flex;flex-direction:column;align-items:${twin ? 'center' : 'flex-start'};gap:${L(ctx, 3)};margin-top:${L(ctx, 3)};">${two ? `<div style="display:flex;flex-wrap:wrap;gap:${L(ctx, 6)};justify-content:${twin ? 'center' : 'flex-start'};">${blocks}</div>` : blocks}${answer}</div>`
-            : two
-                ? `<div style="display:flex;align-items:flex-start;gap:${L(ctx, 8)};margin-top:${L(ctx, 3)};">${blocks}<div style="margin-left:auto;align-self:flex-end;">${answer}</div></div>`
-                : `<div style="display:flex;align-items:flex-end;gap:${L(ctx, 10)};margin-top:${L(ctx, 3)};">${blocks}<div style="margin-left:auto;padding-right:${L(ctx, 4)};">${answer}</div></div>`;
+            : `<div style="display:flex;align-items:flex-end;gap:${L(ctx, 8)};margin-top:${L(ctx, 3)};">${blocks}${answer ? `<div style="margin-left:auto;padding-right:${L(ctx, 4)};">${answer}</div>` : ''}</div>`;
         // A column cell that cannot hold its answer beside the work (a wide stack, two steps) is a
         // FULL-WIDTH item: it keeps its full-width layout's width, so the page's measurement reads
         // it as not fitting the column and prints it in the full-width group at the bottom
@@ -715,6 +962,13 @@ register(WW_TEMPLATE, {
     },
     answerKey(p) {
         const slots = { answer: { value: String(p.ans), graded: true, accept: [Number(p.ans).toLocaleString('en-US')] } };
+        // the answer row's digit boxes (the one answer place when the answer is the row's result)
+        if (p.inRow !== false && Array.isArray(p.steps) && p.steps.length) {
+            const st = p.steps[p.steps.length - 1];
+            const T = st.op === '/' ? digitsOf(st.top).length : columnRows(st, p.tracks).T;
+            const d = String(p.ans).padStart(T, ' ');
+            for (let i = 0; i < T; i++) slots[`ans-${i}`] = { value: d[i] === ' ' ? '' : d[i], graded: d[i] !== ' ' };
+        }
         if (p.unit) slots['answer-label'] = { value: p.unit, graded: false };
         (p.steps || []).forEach((s, i) => { slots[`op${i}`] = { value: GLYPH[s.op], graded: false }; });
         return { value: p.ans, display: p.unit ? `${Number(p.ans).toLocaleString('en-US')} ${p.unit}` : String(p.ans), slots };
