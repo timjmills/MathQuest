@@ -9,7 +9,7 @@ import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, wireCellInputs, signsFor,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
 } from './screen-cell.js';
 
@@ -1369,6 +1369,10 @@ function _wsRenderCard(grid, q, i) {
     } else if (isGeometryWithVisual) {
         // Show both the visual AND text for geometry questions
         questionDisplay = `${q.visual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
+    } else if (/ws-v2-cell/.test(String(q.visual || ''))) {
+        // the new skills' drawing (round 4: the worksheet showed an empty cell): the sentence
+        // goes to the instruction position, the drawing - with its blank - is the cell
+        questionDisplay = `<div class="question-line">${q.text}</div>${q.visual}`;
     } else {
         questionDisplay = `<div class="question-line">${q.text}</div>`;
     }
@@ -1479,13 +1483,33 @@ function _wsRenderCard(grid, q, i) {
         if (!kind) wireTickBoxes(cellEl, q, document.getElementById(`ws_input_${i}`));
         // One slot per answer (SL-7): the visual's own blank takes the input; the separate
         // answer row under the cell then goes.
-        if (!kind && answerRow && (!(q.options && q.options.length) || (twin && twin.kit))) {
+        if (!kind && answerRow && (!(q.options && q.options.length) || (twin && twin.kit) || q.answerType === 'symbol')) {
             const row = cellEl.querySelector(':scope > .mq-answerrow');
             const inp = row && row.querySelector(`#ws_input_${i}`);
-            if (inp && adoptVisualBlank(cellEl, inp)) { row.remove(); wireSignCircle(cellEl, inp); }
+            if (inp && adoptVisualBlank(cellEl, inp)) { row.remove(); wireSignCircle(cellEl, inp, { signs: signsFor(q) }); }
             else if (inp && (q.answerType === 'number' || !q.answerType) && adoptSvgBlank(cellEl, inp)) row.remove();
             // several blanks in one drawing: an input in each, feeding the (hidden) card input
             else if (inp && wireCellSlots(cellEl, inp)) row.style.display = 'none';
+            // the drawing's own inputs (a factor table, a bracket division's roof, a fraction's
+            // two boxes) are the answer area: they feed the card input; no second answer row
+            else if (inp) {
+                const parts = wireCellInputs(cellEl, inp, q);
+                if (parts) {
+                    row.style.display = 'none';
+                    q._mqSlots = parts;      // graded once every part is in
+                } else if (!cellEl.querySelector('input:not(.worksheet-input), [data-mq-cell]')) {
+                    // the sentence holds the one blank ("Complete: 4, 6, ___, 10"): the pupil
+                    // writes in it, never in a separate answer row (owner ruling 2026-09-26)
+                    const line = cellEl.parentNode && cellEl.parentNode.querySelector(':scope > .question-line.mq-instr, :scope > .mq-instr');
+                    if (line && adoptVisualBlank(line, inp)) {
+                        row.remove();
+                        // a sign goes in a circle, tapped from the bank of signs
+                        if (q.answerType === 'symbol') { inp.classList.add('mq-slot--circle'); inp.setAttribute('maxlength', '1'); wireSignCircle(cellEl, inp, { signs: signsFor(q) }); }
+                        // the sentence IS the problem: it sits in the cell, at the cell's size
+                        if (!cellEl.textContent.trim()) { line.classList.remove('mq-instr'); line.classList.add('mq-legline'); cellEl.appendChild(line); }
+                    }
+                }
+            }
         }
         wireStackEntry(cellEl);
         // green as soon as it is right (owner request 2026-09-25): digit, regroup and answer boxes

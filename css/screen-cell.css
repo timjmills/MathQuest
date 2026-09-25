@@ -1246,3 +1246,36 @@ html body .problem-card .pvb-zones[data-role="zones"], html body .mq-scell .pvb-
 html body .mq-rlwrap svg circle.mq-rl-dot.mq-rl-dot--ok { fill: #1B7A43 !important; }
 html body .mq-rl:focus-visible { outline: 3px solid #1B7A43; outline-offset: 2px; border-radius: 8px; }
 html body .mq-scell .mq-rlwrap .mq-cellbox > input { width: 100% !important; height: 100% !important; border: 0 !important; margin: 0 !important; box-shadow: none !important; }
+
+/* ---- R4-1. One answer area in MAP too (owner 2026-09-26): the cell's own boxes are the inputs
+   (question-render.js _applyMapSlots); MAP's CHECK stays. */
+body.map-immersive #visualAid [data-mq-cell] > input.mq-cellslot {
+    display: block; box-sizing: border-box; width: 100%; height: 100%; min-height: 40px;
+    margin: 0; padding: 0; border: 0; border-radius: inherit; background: transparent; color: #000;
+    font-family: "Andika", sans-serif; font-size: 1em; font-weight: 700; line-height: 1;
+    text-align: center; caret-color: #000; outline: none;
+}
+body.map-immersive #visualAid [data-mq-cell]:focus-within { box-shadow: inset 0 0 0 3px #000; }
+body.map-immersive #visualAid input.mq-slot--invisual.mq-slot--box {
+    box-sizing: border-box; min-width: 48px; min-height: 44px; padding: 0 !important;
+    border: 1px solid #000 !important; border-radius: 6px !important; background: #fff !important; color: #000 !important;
+    font-family: "Andika", sans-serif; font-weight: 700; text-align: center;
+}
+body.map-immersive #visualAid input.mq-slot--invisual.mq-bsize { width: max(48px, var(--mq-bw)) !important; height: max(44px, var(--mq-bh)) !important; }
+
+/* ---- R4-2. A sentence that holds the one blank sits in the cell at the cell's size, the answer
+   input in its blank (owner 2026-09-26: no separate answer area). */
+.mq-scell .mq-legline { font-size: calc(var(--mq-digit) * 0.8); line-height: 1.5; text-align: center; font-weight: 700; }
+html body .mq-scell :is(.mq-legline, .mq-instr, #questionText) input.mq-slot.mq-slot--invisual {
+    font-size: 1em !important; height: max(44px, 1.3em) !important; vertical-align: baseline; margin: 0 0.2em !important;
+}
+/* a drawn working box of a new-skill drawing (screen-cell.js markV2Blanks): a real input, not graded */
+html body .mq-scell input.mq-workbox, html body #visualAid input.mq-workbox {
+    box-sizing: border-box; width: 2.6em; min-width: 44px; height: 1.3em; min-height: 44px; margin: 0; padding: 0; vertical-align: baseline;
+    border: 0; background: transparent; color: #000; font: inherit; font-weight: 700; text-align: center; outline: none;
+}
+html body .mq-scell input.mq-workbox:focus { box-shadow: inset 0 0 0 3px #000; }
+
+/* a start-unknown number line: the given point is where the hops land - a hollow ring, never the
+   filled start dot (round 4) */
+html body .mq-scell .mq-nl-start.mq-nl-given .mq-nl-mark::after { background: #fff !important; border: 3px solid #000; box-sizing: border-box; }
