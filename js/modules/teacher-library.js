@@ -27,7 +27,7 @@ import {
     loadSetIntoQueue, optionsSummary, optionsReadOnlyHTML, readStore, writeStore,
 } from './teacher-ui.js';
 import { printSkills } from './teacher-print.js';
-import { skillView, setSkillView, viewToggleHTML, mountSample, lazyThumbs } from './teacher-preview.js';
+import { skillView, setSkillView, viewToggleHTML, mountSample, lazyThumbs, tvpAttrs, infoButtonHTML } from './teacher-preview.js';
 import { renderStandardsCoverage } from './teacher-standards.js';
 
 // Standards (owner request 2026-09-25): the detail panel tags each skill with its CCSS standards
@@ -223,8 +223,12 @@ function renderList(box, list) {
             html += `<li class="tvl-cat" role="presentation">${esc(s.categoryName)}</li>`;
         }
         const k = keyOf(s);
-        html += `<li><button type="button" class="tvl-row" data-lib-skill="${esc(k)}"${lib.sel === k ? ' aria-current="true"' : ''}>
-          <span class="tvl-row-name">${esc(s.label)}</span><span class="tvl-row-level">${esc(s.level === 'M' ? 'Mixed' : `Level ${s.level}`)}</span></button></li>`;
+        // Owner request 2026-09-25: a row shows the skill's floating preview (teacher-preview.js)
+        // on hover and on keyboard focus, like the chips elsewhere; on a touch screen the (i)
+        // button beside the row pins it. The trigger is the <li> so the (i) button can sit beside
+        // the row button (a button cannot hold a button); the pop anchors to the row itself.
+        html += `<li class="tvl-li"${tvpAttrs(s.categoryId, s.skillId, lib.opts[k])}><button type="button" class="tvl-row" data-tvp-anchor data-lib-skill="${esc(k)}"${lib.sel === k ? ' aria-current="true"' : ''}>
+          <span class="tvl-row-name">${esc(s.label)}</span><span class="tvl-row-level">${esc(s.level === 'M' ? 'Mixed' : `Level ${s.level}`)}</span></button>${infoButtonHTML(s.label)}</li>`;
     }
     if (dom) html += '</ul></div>';
     box.innerHTML = html;
@@ -510,7 +514,33 @@ function select(key) {
 
 /* ================================================================= wiring */
 
+/* The search bar and its filters stay at the top of the window while the list scrolls (owner
+   request 2026-09-25). CSS makes .tvl-bar sticky; this keeps --tvl-bar-h (the bar's height, which
+   the sticky detail panel and the document's scroll-padding read) current, and marks the bar
+   .is-stuck once content scrolls under it so it draws its bottom rule only then. */
+function wireStickyBar() {
+    const bar = root.querySelector('.tvl-bar');
+    if (!bar) return;
+    const html = document.documentElement;
+    const measure = () => {
+        const h = bar.offsetHeight;
+        if (h) html.style.setProperty('--tvl-bar-h', `${h}px`);
+    };
+    let raf = 0;
+    const stuck = () => {
+        raf = 0;
+        if (!bar.isConnected || !bar.offsetParent) return;
+        const on = window.scrollY > 0 && bar.getBoundingClientRect().top <= 0.5;
+        if (bar.classList.contains('is-stuck') !== on) bar.classList.toggle('is-stuck', on);
+    };
+    try { new ResizeObserver(() => { measure(); stuck(); }).observe(bar); } catch (e) { measure(); }
+    window.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(stuck); }, { passive: true });
+    window.addEventListener('resize', measure, { passive: true });
+    measure();
+}
+
 function wire() {
+    wireStickyBar();
     document.addEventListener('click', (e) => {
         // A click inside the screen re-renders the detail, which can detach its target first.
         if (!e.target.isConnected) return;

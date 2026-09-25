@@ -2070,3 +2070,20 @@
 .msc-grid.msc-ring .msc-opt .msc-mark { display: none; }
 .msc-grid.msc-ring .msc-opt.selected { border-color: #000 !important; }
 .msc-grid.msc-ring .msc-opt:focus-visible { outline: 3px solid #1976d2; outline-offset: 2px; }
+
+/* MAP immersion: the floating End Session (top-left) and Audio (top-right) pills must not
+   cover the banner's own text ("Item 1 of 20" sat under End Session, and the mode tag under
+   Audio: "PRAC" at 1280, hidden at 820). The banner keeps their room clear; below 700 px the
+   pills get a strip of their own above the banner. A teacher-launched session puts the two
+   controls inside the banner instead (.has-controls, css/play-teacher.css). */
+body.map-immersive #mapSessionView .map-session-banner:not(.has-controls) {
+    padding-left: 170px;
+    padding-right: 128px;
+}
+@media (max-width: 699px) {
+    body.map-immersive #mapSessionView .map-session-banner:not(.has-controls) {
+        padding: 58px 16px 6px;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+}

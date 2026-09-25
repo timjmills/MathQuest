@@ -171,6 +171,7 @@ A cap sets the **maximum** for the criterion named, whatever else is right.
 | H9 | No room to write or draw the answer | C1 ≤ 5 |
 | H10 | Answer key is a list rather than a facsimile of the page | C4 ≤ 6 |
 | H11 | A page type the skill must support cannot be produced | all four = 1 for that version |
+| H13 | Wasted space inside cells (owner ruling 2026-09-25): a cell whose content leaves an empty band of ≥ 30 % of the cell's height (or width), or a row/section of a mixed sheet sized for a taller item than it holds. Measure it; do not eyeball it past. | C3 ≤ 6 |
 | H12 | The task does not make sense on paper: the space to draw or build the model is smaller than the hardest item needs, or the item only works with a mouse or finger | C1 ≤ 4, C2 ≤ 5 |
 
 ---

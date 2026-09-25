@@ -232,3 +232,46 @@ ul.tvs-skills > li.tv-muted { min-height: 24px; }
     .tvs-row { grid-template-columns: minmax(0, 1fr) auto; }
     .tvs-code { grid-column: 1 / -1; }
 }
+
+/* ---------------------------------------------------------------- Sticky search + list previews
+   (owner request 2026-09-25). Additive: these rules follow and override the ones above.
+
+   1. The search bar and its Level / Domain filters stay pinned to the top of the window while the
+      library scrolls, so a teacher never scrolls back up to search again. The bar bleeds to the
+      workspace edges (the .tv-main padding) on the page colour, so rows slide cleanly under it;
+      the negative block margin keeps the screen's 24px rhythm unchanged. It draws a bottom rule
+      only once content is under it (.is-stuck, set by teacher-library.js). --tvl-bar-h (its
+      height, measured by teacher-library.js) sets the sticky detail panel's offset and the
+      document's scroll-padding, so a focused or scrolled-to row is never hidden under the bar.
+   2. List rows carry the floating skill preview (teacher-preview.js). The row <li> is the
+      trigger; on a touch screen the (i) button sits at the row's end as a 44px target. */
+
+.tvl-bar {
+    position: sticky; top: 0; z-index: 20;
+    margin: -12px -40px; padding: 12px 40px;
+    background: var(--tv-page);
+    border-bottom: 1px solid transparent;
+}
+.tvl-bar.is-stuck {
+    border-bottom-color: var(--tv-border);
+    box-shadow: 0 4px 12px rgba(20, 20, 30, .06);
+}
+html.dark body.teacher-mode .tvl-bar.is-stuck { box-shadow: 0 4px 12px rgba(0, 0, 0, .35); }
+html:has(#teacherMain .tv-screen.is-active[data-screen="library"] .tvl-bar:not([hidden])) {
+    scroll-padding-top: calc(var(--tvl-bar-h, 68px) + 8px);
+}
+.tvl-detail { top: calc(var(--tvl-bar-h, 68px) + 16px); }
+
+.tvl-li { display: flex; align-items: center; gap: 4px; }
+.tvl-li > .tvl-row { flex: 1; min-width: 0; }
+.tvl-li > .tvp-info { width: 44px; height: 44px; }
+
+@media (max-width: 1100px) {
+    .tvl-detail { top: auto; }
+}
+@media (max-width: 1023px) {
+    .tvl-bar { margin: -12px -24px; padding: 12px 24px; }
+}
+@media (max-width: 600px) {
+    .tvl-bar { gap: 8px; margin: -8px -24px; padding: 8px 24px; }
+}
