@@ -1337,8 +1337,9 @@ function k2Rules(skill, items, live, r, F, NOTE) {
 // THE BAND (owner ruling of 2026-09-25, superseding ruling 2 of 2026-09-24): the skill's own band
 // option SETS its working range, and its default is the place's natural band (nearest_100 -> to
 // 1,000). Max Number at its app default (100) is "not chosen", so at Max Number 100 every skill
-// DEALS, judged against its default band; only a Max Number the teacher explicitly LOWERED below
-// the floor refuses (skill-options.js pvCap / pvRefusal), and that is checked at Max Number 50.
+// DEALS, judged against its default band; a Max Number the teacher explicitly LOWERED below the
+// floor lowers the band only to the floor — the skill still deals (round-3 direction: a skill owns
+// its numbers; skill-options.js pvRefusal refuses only a mixed-review member), checked at Max Number 50.
 //
 // HOW IT IS READ. Every rewritten generator publishes `q.pv`, a plain description of the item
 // (the number, the place, the parts, the disks), and every rule below RECOMPUTES the answer from
@@ -1390,9 +1391,11 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
     r.pvMaxNumber = R;
     r.pvPlace = P || null;
 
-    // pv-refusal: below the floor the skill must return nothing at all.
-    if (ctx.refusedLow && ctx.refusedLow.dealt) {
-        F('pv-band', `needs numbers to ${ctx.refusedLow.floor.toLocaleString('en-US')} (its place), but with Max Number explicitly lowered to ${ctx.refusedLow.at} it still dealt ${ctx.refusedLow.dealt} items instead of refusing: ${ctx.refusedLow.sample.join('; ')}`);
+    // pv-owns-numbers (round-3 direction, superseding the old pv-refusal rule): a stand-alone
+    // skill owns its numbers, so with Max Number explicitly lowered below its place's floor it
+    // must STILL deal, at the floor — a refused skill printed blank pages and error cards.
+    if (ctx.refusedLow && !ctx.refusedLow.dealt) {
+        F('pv-band', `needs numbers to ${ctx.refusedLow.floor.toLocaleString('en-US')} (its place); with Max Number explicitly lowered to ${ctx.refusedLow.at} it dealt nothing (refused). A stand-alone skill owns its numbers and must deal at its floor.`);
     }
     if (ctx.deadAtDefault) F('pv-band', `refuses at the app default Max Number 100: a stand-alone skill must deal at its default band`);
 
@@ -2382,7 +2385,7 @@ function selfTest() {
         if (family === 'pv') {
             // TWO RUNS. At Max Number 100 (the app default, "not chosen") every skill DEALS and is
             // judged against its default band R (owner ruling 2026-09-25). A skill with a floor is
-            // then run with Max Number explicitly LOWERED to 50 and must REFUSE there when its
+            // then run with Max Number explicitly LOWERED to 50 and must STILL DEAL there (at its floor) when its
             // place needs more. The floor is read off the NAME ("Nearest 1,000" needs 10,000);
             // where the name carries no place, the skill's own declaration (pvBandFloor) says.
             const floor = Math.max(pvNameFloor(s.skillId, s.label), pvBandFloor(s.categoryId, s.skillId, {}) || 0);

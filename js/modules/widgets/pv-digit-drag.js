@@ -136,7 +136,12 @@ export function renderPvDigitDrag(q, container) {
     const colsHtml = places.map(p => _columnHtml(p, places.length)).join('');
     const tilesHtml = shuffled.map(t => _tileHtml(t.digit, t.idx)).join('');
 
-    const promptText = q.text || `Place each digit of ${target.toLocaleString()} in the correct column.`;
+    // The P9 chart-fill item gives the number as expanded form or words (q.pv.sourceText): that
+    // source is what the big line shows — printing the numeral itself gave the answer away.
+    const source = q.pv && q.pv.sourceText ? String(q.pv.sourceText) : '';
+    let promptText = q.text || `Place each digit of ${target.toLocaleString()} in the correct column.`;
+    if (source && promptText.endsWith(source)) promptText = promptText.slice(0, -source.length).replace(/[:\s]+$/, '.');
+    const shownTarget = source && source !== target.toLocaleString() ? source : target.toLocaleString();
 
     const colMin = places.length >= 7 ? 78 : places.length >= 6 ? 88 : 100;
     const gridMaxW = Math.min(720, places.length * colMin + 40);
@@ -148,7 +153,7 @@ export function renderPvDigitDrag(q, container) {
                  margin-bottom:8px;color:var(--text-bright);">${_esc(promptText)}</div>
             <div class="pvdd-target" style="text-align:center;font-weight:900;font-size:2.4rem;
                  color:var(--accent-purple);margin-bottom:14px;letter-spacing:2px;">
-                ${target.toLocaleString()}
+                ${_esc(shownTarget)}
             </div>
             <div class="pvdd-table" data-role="table"
                  style="display:flex;justify-content:center;gap:10px;

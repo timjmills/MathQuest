@@ -67,15 +67,35 @@ const PLACE_STEPS = [
     'Read the place letter above it: O, T, H or Th.',
     'The letter names the place: ones, tens, hundreds, thousands.',
 ];
+// A page of numbers below 1,000 never talks about thousands (round-3 finding).
+const PLACE_STEPS_3 = [
+    'Find the underlined digit.',
+    'Read the place letter above it: O, T or H.',
+    'The letter names the place: ones, tens or hundreds.',
+];
+const placeSteps = (q) => ((num(pvOf(q).n) || 0) < 1000 ? PLACE_STEPS_3 : PLACE_STEPS);
+const placeSay = (q) => { const p = pvOf(q); return Number.isFinite(p.digit) ? [p.digit, PLACE_WORD[p.place]] : null; };
+const PLACE_BANK = {
+    iCan: 'I Can name the place of a digit',
+    instructionKey: 'place-write',
+    steps: PLACE_STEPS.concat('Copy the place word from the bank.'),
+    say: 'The __ is in the __ place.',
+    sayValues: placeSay,
+};
+const PLACE_BANK_3 = { ...PLACE_BANK, steps: PLACE_STEPS_3.concat('Copy the place word from the bank.') };
+const PLACE_CIRCLE = {
+    iCan: 'I Can name the place of a digit',
+    instructionKey: 'place-circle',
+    steps: PLACE_STEPS.concat('Circle the place word.'),
+    say: 'The __ is in the __ place.',
+    sayValues: placeSay,
+};
+const PLACE_CIRCLE_3 = { ...PLACE_CIRCLE, steps: PLACE_STEPS_3.concat('Circle the place word.') };
 
 registerSkill('placevalue:identify', {
-    strings: stringsBy((q) => (pvOf(q).response === 'bank' ? PLACE_BANK : null), {
-        iCan: 'I Can name the place of a digit',
-        instructionKey: 'place-circle',
-        steps: PLACE_STEPS.concat('Circle the place word.'),
-        say: 'The __ is in the __ place.',
-        sayValues: (q) => { const p = pvOf(q); return Number.isFinite(p.digit) ? [p.digit, PLACE_WORD[p.place]] : null; },
-    }),
+    strings: stringsBy((q) => (pvOf(q).response === 'bank'
+        ? (placeSteps(q) === PLACE_STEPS ? PLACE_BANK : PLACE_BANK_3)
+        : (placeSteps(q) === PLACE_STEPS ? PLACE_CIRCLE : PLACE_CIRCLE_3)), PLACE_CIRCLE_3),
     misconceptions: ['M-V1', 'M-V3', 'M-V14'],
     workedSteps: (q) => {
         const p = pvOf(q);
@@ -99,18 +119,15 @@ registerSkill('placevalue:identify', {
             const other = places.find((pl) => pl !== p.place && digitAt(p.n, pl) === p.digit);
             if (other) c.push({ value: PLACE_WORD[other], misconception: 'M-V3', explain: `Named the place of the other ${p.digit}.` });
         }
-        c.push({ value: PLACE_WORD[p.place * 10] || PLACE_WORD[p.place / 10], misconception: 'M-V14', explain: 'Named the place next to it.' });
+        // M-V14: the place next to it — a neighbour the number really has, on either side, so
+        // the wrong answers differ from child to child (round-3: every child circled "hundreds").
+        for (const nb of [p.place * 10, p.place / 10]) {
+            if (places.includes(nb)) c.push({ value: PLACE_WORD[nb], misconception: 'M-V14', explain: 'Named the place next to it.' });
+        }
         return choose(q, c);
     },
 });
 
-const PLACE_BANK = {
-    iCan: 'I Can name the place of a digit',
-    instructionKey: 'place-write',
-    steps: PLACE_STEPS.concat('Copy the place word from the bank.'),
-    say: 'The __ is in the __ place.',
-    sayValues: (q) => { const p = pvOf(q); return Number.isFinite(p.digit) ? [p.digit, PLACE_WORD[p.place]] : null; },
-};
 
 function valueParts(q) {
     const p = pvOf(q);
@@ -363,7 +380,8 @@ for (const id of ['more_less_10', 'more_less_100']) {
         strings: strings({
             iCan: id === 'more_less_10' ? 'I Can find 1 more, 1 less, 10 more and 10 less' : 'I Can find 10 or 100 more and less',
             instructionKey: 'missing',
-            steps: ['Read the number and the jump: 1, 10 or 100.', 'More: that digit goes up 1. Less: it goes down 1.', 'Past 9 or 0, the next place changes too.'],
+            steps: ['Read the number, the jump and the word more or less.',
+                'More: that digit goes up 1. Less: it goes down 1.', 'Past 9 or 0, the next place changes too.'],
             say: '__ __ than __ is __.',
             sayValues: (q) => { const p = pvOf(q); return p.step ? (p.unknown === 'start' ? [p.step, p.dir, p.n, p.given] : [p.step, p.dir, p.n, q.ans]) : null; },
         }),
@@ -515,17 +533,29 @@ registerSkill('placevalue:place_value_10x', {
     },
 });
 
+// The steps follow the number's size: a three-digit page never talks about thousands.
+const WORD_NAME_BASE = {
+    iCan: 'I Can match a number to its word name',
+    instructionKey: 'word-name',
+    say: '__ is __.',
+    sayValues: (q) => [pvOf(q).n !== undefined ? f(pvOf(q).n) : (String(q.text || '').replace(/[^\d,]/g, '') || '?'), q.ans],
+};
+const WORD_NAME_SMALL = { ...WORD_NAME_BASE,
+    steps: ['Read the hundreds digit. Say the word hundred.', 'Read the tens and ones together.', 'Find the choice with the same words.'] };
+const WORD_NAME_BIG = { ...WORD_NAME_BASE,
+    steps: ['Read the number in groups of three digits.', 'Say the thousands, then the word thousand.', 'Say the hundreds, tens and ones.'] };
+const wordNameN = (q) => { const n = num(pvOf(q).n); return Number.isFinite(n) ? n : num(String(q.text || '').replace(/[^\d]/g, '')); };
+
 registerSkill('placevalue:number_word_names', {
-    strings: strings({
-        iCan: 'I Can match a number to its word name',
-        instructionKey: 'word-name',
-        steps: ['Read the number in groups of three digits.', 'Say the thousands, then the word thousand.', 'Say the hundreds, tens and ones.'],
-        say: '__ is __.',
-        sayValues: (q) => [String(q.text || '').replace(/[^\d,]/g, '') || '?', q.ans],
-    }),
+    strings: stringsBy((q) => (wordNameN(q) < 1000 ? WORD_NAME_SMALL : WORD_NAME_BIG), WORD_NAME_BIG),
     misconceptions: ['M-V9', 'M-V10'],
-    workedSteps: (q) => [step('Read the thousands group first.'), step('Then read the hundreds, tens and ones.'),
-        step('Find the choice with the same words.'), step(`Circle: ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }])],
+    workedSteps: (q) => {
+        const n = wordNameN(q);
+        const first = n >= 1000
+            ? [step(`Read the thousands group first: ${f(Math.floor(n / 1000))} thousand.`), step(`Then read the rest: ${f(n % 1000)}.`)]
+            : [step(`Read the hundreds: ${Math.floor(n / 100)} hundred.`), step(`Then read the tens and ones: ${n % 100}.`)];
+        return [...first, step('Find the choice with the same words.'), step(`Circle: ${q.ans}`, [{ slot: 'answer', value: String(q.ans) }])];
+    },
     wrongAnswer: (q) => {
         const opts = arr(q.options).map((o) => (o && typeof o === 'object' ? o.label : o)).map(String).filter((o) => o !== String(q.ans));
         return choose(q, opts.slice(0, 2).map((o, i) => ({ value: o, misconception: i ? 'M-V10' : 'M-V9', explain: i ? 'Dropped a place.' : 'Swapped two digits.' })));
@@ -806,7 +836,14 @@ for (const [id, P] of SORTS) {
             if (!bins.length) return [];
             const out = bins.slice(0, 3).map((b) => step(`${b.label === 'Neither' ? 'Neither' : `Rounds to ${b.label}`}: ${arr(q.tiles).filter((t) => a[t.id] === b.id).map((t) => t.label).join(', ') || 'none'}.`));
             out.push(step('Write each number in its column.', [{ slot: 'answer', value: String(q.printAnswer || '') }]));
-            return clampSteps([step('Find the halfway numbers first.')].concat(out));
+            // Name the halfway number itself (the step the page's Steps band teaches).
+            const bv = arr(pvOf(q).bins).map(Number);
+            const dec = P < 1 ? (P === 0.1 ? 2 : 3) : 0;
+            const halves = bv.slice(1).map((b, i) => (bv[i] + b) / 2).filter((h, i) => bv[i + 1] - bv[i] <= P + 1e-9);
+            const first = halves.length
+                ? step(`Halfway between ${dec ? bv[0].toFixed(dec - 1) : f(bv[0])} and ${dec ? (bv[0] + P).toFixed(dec - 1) : f(bv[0] + P)} is ${dec ? halves[0].toFixed(dec) : f(halves[0])}. Halfway rounds up.`)
+                : step('Find the halfway numbers first. Halfway rounds up.');
+            return clampSteps([first].concat(out));
         },
         wrongAnswer: (q) => {
             const a = obj(q.ans) || {};
@@ -893,7 +930,8 @@ function estimateSteps(q) {
         step(`${f(p.shown)} is ${p.reasonable ? '' : 'not '}close to ${f(p.est)}.`), step(`Check ${String(q.ans)}.`, [{ slot: 'answer', value: String(q.ans) }])];
     const rewrite = q.answerType === 'inline-blanks';
     return [step(`${f(p.a)} is about ${f(ra)}.`, rewrite ? [{ slot: 'b0', value: f(ra) }] : []),
-        step(p.op === '÷' ? `${f(ra)} is a number ${f(p.b)} goes into.` : `${f(p.b)} is about ${f(rb)}.`, rewrite ? [{ slot: 'b1', value: f(rb) }] : []),
+        step(p.op === '÷' ? `${f(ra)} is a number ${f(p.b)} goes into. Keep ${f(p.b)}.` : p.op === '×' ? `Keep ${f(p.b)}: it is one digit.` : `${f(p.b)} is about ${f(rb)}.`,
+            rewrite ? [{ slot: 'b1', value: f(rb) }] : []),
         step(`${f(ra)} ${p.op} ${f(rb)} = ${f(p.est)}.`),
         step(`Write ${f(p.est)}.`, [{ slot: rewrite ? 'b2' : 'answer', value: f(p.est) }])];
 }
@@ -937,11 +975,15 @@ for (const [id, iCan] of EST) {
     const main = {
         iCan,
         // The place is printed (§12, owner Q10): the key is definite only when it is.
-        instructionKey: id === 'estimate_quotient' ? 'estimate' : 'estimate-place',
+        // Each instruction says what the key does (round-3): the product rounds only the bigger
+        // number, the quotient changes the dividend to a compatible number (it does not round).
+        instructionKey: id === 'estimate_quotient' ? 'estimate-compatible' : id === 'estimate_products' ? 'estimate-product' : 'estimate-place',
         ...(id === 'estimate_quotient' ? {} : { instructionVars: (q) => ({ place: f(pvOf(q).place || 10) }) }),
         steps: id === 'estimate_quotient'
-            ? ['Find a number near the dividend that the divisor goes into.', 'Divide the easy numbers.', 'Write the estimate.']
-            : ['Round each number to the place shown.', 'Write the rounded numbers under the problem.', 'Work out the rounded problem.'],
+            ? ['Find a number near the first number that the divisor goes into.', 'Write the easy numbers in the boxes.', 'Divide the easy numbers. Write the estimate.']
+            : id === 'estimate_products'
+                ? ['Round the bigger number to the place shown.', 'Keep the one-digit number. Write both in the boxes.', 'Multiply the easy numbers. Write the estimate.']
+                : ['Round each number to the place shown.', 'Write the rounded numbers in the boxes.', 'Work out the rounded problem.'],
         say: 'About __ is about __.',
         sayValues: (q) => { const p = pvOf(q); const r = arr(p.rounded).map(Number); return p.est !== undefined ? [`${f(r[0])} ${{ '+': 'plus', '−': 'minus', '×': 'times', '÷': 'divided by' }[p.op]} ${f(r[1])}`, f(p.est)] : null; },
     };

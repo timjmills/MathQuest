@@ -13,8 +13,10 @@
 //   * THE BAND BINDS (owner ruling of 2026-09-25, superseding §2.1). The skill's own `band` SETS
 //     the working range and the place sets a floor under it (pvBand); Max Number lowers it only
 //     when the teacher explicitly set Max Number below it (pvCap — the app default 100 is "not
-//     chosen"). A skill whose place an explicitly lowered Max Number cannot host is REFUSED
-//     (q.refused), never silently dealt at a bigger number — generateQuestionFor() returns null.
+//     chosen"). Round-3 direction: a stand-alone skill OWNS its numbers — its band is its range
+//     whatever Max Number says, and it is never refused. Only a member of a mixed review is capped
+//     by the review's Max Number, and left out when that cannot host its place (q.refused;
+//     generateQuestionFor() returns null).
 //   * SUPPORT IS AN OPTION. The place-value chart / bare numeral (identify, value), the hundreds
 //     chart / number line (more / less) and the number line between the bins (round_sort_*) are
 //     drawn by pv-support-cell.js, on screen (q.visual) and in print (the `pv-support` template).
@@ -55,6 +57,15 @@ let _liveCursor = -1;
 let _at = 0;
 function beginItem() { _at = Number.isFinite(state.itemIndex) ? state.itemIndex : ++_liveCursor; }
 const slot = (n) => ((_at % n) + n) % n;
+/**
+ * The order of 0 .. L-1 for the current block of L items: each block takes every value once, the
+ * order changes from block to block (a fixed mixing, no Math.random, so a seed reprints a page).
+ */
+function blockOrder(L) {
+    const block = Math.floor(_at / Math.max(1, L));
+    const key = (i) => ((i + 1) * 7919 + (block + 3) * 104729 + (i + 1) * (block + 5) * 31) % 257;
+    return Array.from({ length: L }, (_, i) => i).sort((a, b) => key(a) - key(b) || a - b);
+}
 
 function optsOf(cat, skill) {
     // A mixed parent's options (only `level`) never name a member's own options, so the member's
@@ -82,8 +93,14 @@ const inReview = (skill) => !!state.skill && state.skill !== skill && /(^mixed|_
 
 /** The biggest number this skill deals: its band (or `fallback`), floored by its place, capped by pvCap. */
 function capOf(cat, skill, o, fallback) {
-    return pvCap(pvBand(cat, skill, o, fallback), state.range, inReview(skill));
+    // A stand-alone skill OWNS its numbers (round-3 direction): its band option (floored by its
+    // place) is its range on every surface — print, worksheet, quiz and card — whatever Max Number
+    // says ("Round to the nearest 1,000" printed blank pages at Max Number 1,000). Only a member
+    // of a mixed review, which has no band of its own, is capped by the review's Max Number.
+    return inReview(skill) ? pvCap(pvBand(cat, skill, o, fallback), state.range, true) : pvBand(cat, skill, o, fallback);
 }
+/** A number bound read off Max Number: the review's cap for a review member, else the bound itself. */
+const rangeCap = (skill, v) => (inReview(skill) ? pvCap(v, state.range, true) : v);
 
 function refuse(q, cat, skill, o) {
     const msg = pvRefusal(cat, skill, state.range, o, inReview(skill));
@@ -159,10 +176,12 @@ function genPlace(q, skill, o) {
     let ticked = [];
     if (skill === 'identify' && Array.isArray(o.places)) {
         const t = o.places.map(Number).filter(p => PV_ALL_PLACES.includes(p));
-        if (t.length && t.length < PV_ALL_PLACES.length) ticked = t.filter(p => p < 10 * hi || pvCap(p * 10 - 1, state.range) >= p);
+        if (t.length && t.length < PV_ALL_PLACES.length) ticked = t.filter(p => p < 10 * hi || rangeCap(skill, p * 10 - 1) >= p);
     }
     if (!ticked.length) ticked = bandPlaces;
-    let place = ticked[slot(ticked.length)];
+    // Every place once per block of items, but in a different order each block, so the answers
+    // never run ones, tens, hundreds, ones, tens ... down the page (round-3 finding).
+    let place = ticked[blockOrder(ticked.length)[slot(ticked.length)]];
     if (place > hi) { lo = place; hi = place * 10 - 1; nd = String(hi).length; }
     // PN-7: the value of a zero, on about a third of items. A zero is never the leading digit, so
     // a leading place hands its zero to a lower place.
@@ -432,7 +451,10 @@ function genUnitForm(q, skill, o) {
 }
 
 function genMoreLess(q, skill, o) {
-    const step = Number(o.step) || (skill === 'more_less_100' ? 100 : 1);
+    // Step 0 is "both jumps the name promises" (1 and 10, or 10 and 100), dealt in turn with the
+    // direction so a page of four already carries all four: 1 more, 1 less, 10 more, 10 less.
+    const both = skill === 'more_less_100' ? [10, 100] : [1, 10];
+    const step = Number(o.step) || both[Math.floor(_at / 2) % 2];
     const dir = o.dir === 'both' ? (slot(2) === 0 ? 'more' : 'less') : (o.dir || 'more');
     const cap = capOf('placevalue', skill, o, 100);
     // Support is its own control (P-1): a strip of the hundreds chart, the chart rows, a number
@@ -474,7 +496,7 @@ function genMoreLess(q, skill, o) {
             : `Only the ${PLACE_WORD[step]} digit changes, unless it goes past 9 or below 0.`;
     q.skillLabel = big ? '10, 100 or 1,000 More or Less' : '1 or 10 More or Less';
     q.pv = { kind: 'moreless', n, step, dir, support, unknown: start ? 'start' : 'answer', given };
-    const base = { keyValue: q.ans, kind: 'frame', frame: q.printText };
+    const base = { keyValue: q.ans, kind: 'frame', frame: q.printText, slotDigits: String(Math.trunc(cap)).length };
     if (support === 'chart') {
         const rows = hundredsWindow(n, result, cap);
         q.visual = `<div style="text-align:center;">${hundredsRowsHTML(rows[0], rows[1], { size: '1.05em' })}</div>`;
@@ -497,7 +519,7 @@ function genMoreLess(q, skill, o) {
         q.cell = { template: 'pv-support', v: 1, payload: { picture: 'line', ticks: line.ticks, labels: line.labels, base } };
         q.printFormat = 'pv-cell';
     } else {
-        setCell(q, { kind: 'frame', frame: q.printText });
+        setCell(q, { kind: 'frame', frame: q.printText, slotDigits: base.slotDigits });
     }
 }
 
@@ -577,11 +599,12 @@ function genDisks(q, skill, o) {
 }
 
 function genTimesTen(q, skill, o) {
-    const op = o.op === '/' ? '/' : 'x';
     let powers = (Array.isArray(o.power) && o.power.length ? o.power : [10]).map(Number).filter(p => [10, 100, 1000].includes(p));
     if (!powers.length) powers = [10];
     powers.sort((a, b) => a - b);
     const power = powers[slot(powers.length)];
+    // 'both': a block of × (one per power), then a block of ÷, so every op meets every power.
+    const op = o.op === 'both' ? (Math.floor(_at / powers.length) % 2 === 0 ? 'x' : '/') : o.op === '/' ? '/' : 'x';
     const cap = capOf('placevalue', skill, o, 10000);
     const kMax = Math.max(1, Math.floor(cap / power));
     let n, ans;
@@ -602,13 +625,14 @@ function genTimesTen(q, skill, o) {
         let k;
         if (kMax >= 10 && slot(3) !== 0) {
             const [a, b] = digitSpan(kMax);
-            const kLo = Math.max(10, a);
+            // Not a round ten (10 x 1,000 teaches nothing a one-digit item does not).
+            const kLo = Math.max(b > 11 ? 11 : 10, a);
             k = randInt(kLo, Math.max(kLo, b));
             if (slot(3) === 2 && k >= 100) {
                 const ds = String(k).split(''); ds[randInt(1, ds.length - 1)] = '0';
                 const k2 = Number(ds.join('')); if (k2 >= kLo) k = k2;
             }
-        } else k = randInt(1, Math.min(kMax, 9));
+        } else k = randInt(Math.min(2, kMax), Math.max(Math.min(2, kMax), Math.min(kMax, 9)));
         if (op === 'x') { n = k; ans = k * power; } else { n = k * power; ans = k; }
     }
     const glyph = op === 'x' ? '×' : '÷';
@@ -653,7 +677,9 @@ function comparableSet(count, cap, o) {
     const [lo, hi] = digitSpan(cap);
     const nd = String(hi).length;
     const mixed = o.lengths === 'mixed' && nd >= 2;
-    const close = o.closeness === 'close';
+    // 'some': every other item is close, so the first digit does not decide every item.
+    // (Not strictly alternate: in a two-column page that would put every close item in one column.)
+    const close = o.closeness === 'close' || (o.closeness === 'some' && [0, 1, 1, 0, 1, 0][slot(6)] === 1);
     for (let t = 0; t < 200; t++) {
         const out = new Set();
         if (close && !mixed) {
@@ -708,7 +734,7 @@ function genCompare(q, skill, o) {
         + `<div style="font-size:2rem;font-weight:700;">${fmt(a)}</div>`
         + `<div style="width:2.2rem;height:2.2rem;border:1.5pt solid #000;border-radius:50%;"></div>`
         + `<div style="font-size:2rem;font-weight:700;">${fmt(b)}</div></div>`;
-    q.pv = { kind: 'compare', a, b, closeness: o.closeness || 'far', lengths: o.lengths || 'equal' };
+    q.pv = { kind: 'compare', a, b, closeness: String(a)[0] === String(b)[0] && String(a).length === String(b).length ? 'close' : 'far', lengths: o.lengths || 'equal' };
     setCell(q, { kind: 'compare', a, b, keyValue: q.ans });
 }
 
@@ -819,8 +845,11 @@ function roundNumber(P, cap, kind, avoidMid) {
         const n = pickIn(1, mMax) * P + pickIn(1, P / 10 - 1);
         if (n >= lo && n <= cap) return n;
     }
+    // A plain item stays below the band's top step: the numbers just under the next place (96,
+    // 97 ... for the nearest 10) belong to the one `across` item, so they do not crowd a page.
+    const plainHi = cap - P > lo + P ? cap - P : cap;
     for (let t = 0; t < 60; t++) {
-        const n = pickIn(lo, cap);
+        const n = pickIn(lo, plainHi);
         if (n % P === 0) continue;
         if (n % P === P / 2) continue;       // a plain item is never halfway: halfway is dealt
         return n;
@@ -1001,8 +1030,10 @@ function genPlaceOnLine(q, skill, o) {
     // A tick inside the line, never an end; halfway is dealt one item in six.
     const k = slot(6) === 1 ? 5 : randInt(1, 9);
     const n = lo + k * tick;
-    q.text = `Mark ${fmt(n)} on the number line.`;
-    q.printText = q.text;
+    // The screen verb map turns a leading "Mark" into "Tap the line", which garbled this item
+    // ("Tap the line 76 on the number line."), so the screen sentence is written with its own verb.
+    q.text = `Tap ${fmt(n)} on the number line.`;
+    q.printText = `Mark ${fmt(n)} on the number line.`;
     q.ans = n;
     q.answerType = 'number-line-extended';
     q.rangeMin = lo;
@@ -1051,9 +1082,18 @@ function genRoundSort(q, skill, o) {
         chosen.add(Lu + Pu / 2);
         if (bins !== 'adjacent' && Lu + Pu + Pu / 2 <= hiU) chosen.add(Lu + Pu + Pu / 2);
     }
-    // An even split, dealt — never rolled: the groups take turns.
+    // The split is dealt, never rolled, and it CHANGES from item to item (round-3: every set split
+    // 3 / 3, so the last numbers could be placed by counting): two bins take 2 / 4, 4 / 2 or 3 / 3
+    // in turn; three groups take every group at least one.
+    const inGroup = (u) => groups.indexOf(rnd(u));
+    const quota = groups.length === 2
+        ? (() => { const k = [2, 4, 3][slot(3)] + (count === 8 ? 1 : 0); return [k, count - k]; })()
+        : groups.map((_, i) => Math.floor(count / groups.length) + (i < count % groups.length ? 1 : 0) + (i === slot(groups.length) ? 1 : 0) - (i === (slot(groups.length) + 1) % groups.length ? 1 : 0));
+    const have = () => groups.map((_, i) => [...chosen].filter(u => inGroup(u) === i).length);
     for (let g = 0, t = 0; chosen.size < count && t < 400; t++, g++) {
-        const target = groups[g % groups.length];
+        const gi = g % groups.length;
+        if (have()[gi] >= quota[gi] && t < 300) continue;
+        const target = groups[gi];
         const a = Math.max(loU, target - Pu / 2), b = Math.min(hiU, target + Pu / 2 - 1);
         if (a > b) continue;
         const u = randInt(a, b);
@@ -1176,10 +1216,14 @@ function genEstimate(q, skill, o) {
         // ES-9: a nearby number the divisor goes into (compatible numbers), then divide.
         const pf = Number(o.place) || 1;
         const divisor = [3, 4, 5, 6, 7, 8, 9][randInt(0, 6)];
-        const off = pf === 1 ? Math.max(1, Math.ceil(divisor / 2) - 1) : Math.max(1, Math.floor(pf / 2) - 1);
-        const quotCap = pvCap(divisor * 9 * pf + off, state.range);
-        const qMax = Math.max(2, Math.min(9, Math.floor((quotCap - off) / (divisor * pf))));
-        est = randInt(2, qMax) * pf;
+        // The dividend sits within a THIRD of the divisor of its compatible number, so one friendly
+        // fact is clearly nearest (84 ÷ 9 -> 81 ÷ 9, never the two-way 85 ÷ 9), and it has at
+        // least two digits (a 5 ÷ 3 "estimate" teaches nothing, 4.NBT.B.6).
+        const off = pf === 1 ? Math.max(1, Math.floor(divisor / 3)) : Math.max(1, Math.floor(pf / 3));
+        const quotCap = rangeCap(skill, divisor * 9 * pf + off);
+        const qMax = Math.max(3, Math.min(9, Math.floor((quotCap - off) / (divisor * pf))));
+        const qMin = Math.min(qMax, Math.max(2, Math.ceil((10 + off) / (divisor * pf))));
+        est = randInt(qMin, qMax) * pf;
         compat = divisor * est;
         a = Math.max(1, compat + randInt(1, off) * (slot(2) ? 1 : -1));
         if (a === compat) a += 1;
@@ -1190,7 +1234,9 @@ function genEstimate(q, skill, o) {
     } else {
         const roundTo_ = Number(o.place) || 10;
         P = roundTo_;
-        const top = pvCap(P * 10 - 1, state.range);
+        // The estimate owns its numbers (the place's two-digit multiples); only a mixed review's
+        // Max Number narrows them, never below three of the place.
+        const top = Math.max(3 * P, rangeCap(skill, P * 10 - 1));
         op = skill === 'estimate_sum' ? '+' : skill === 'estimate_diff' ? '−' : skill === 'estimate_products' ? '×' : (slot(2) === 0 ? '+' : '−');
         if (op === '×') {
             a = estOperand(P, P + 1, top);
@@ -1198,9 +1244,15 @@ function genEstimate(q, skill, o) {
             est = roundTo(a, P) * b;
             exact = a * b;
         } else {
+            // The edge cases are dealt, not rolled (§2.3): one item in six has a number exactly
+            // halfway (45 -> 50, halfway rounds up) and one a number that rounds up into the next
+            // place (97 -> 100).
+            const edge = slot(6) === 1 ? 'mid' : slot(6) === 4 && top >= 10 * P - 1 ? 'across' : '';
             for (let t = 0; t < 60; t++) {
                 a = estOperand(P, P + 1, top);
                 b = estOperand(P, P + 1, top);
+                if (edge === 'mid') a = randInt(1, Math.max(1, Math.floor((top - P / 2) / P))) * P + P / 2;
+                if (edge === 'across') a = 10 * P - randInt(1, P / 2 - 1);
                 if (op === '+') break;
                 if (a < b) [a, b] = [b, a];
                 if (roundTo(a, P) > roundTo(b, P)) break;       // the estimate is a real difference
@@ -1257,20 +1309,24 @@ function genEstimate(q, skill, o) {
         setCell(q, { kind: 'decide', expr: `${expr} ${op === '÷' ? '≈' : '='} ${fmt(shown)}`, labels: ['Reasonable', 'Not reasonable'], keyValue: q.ans });
         return;
     }
-    // Round, then compute: the two-line rewrite (RD-07) — each rounded number in a box under the
-    // one it came from, then the estimate — or, as the fade, the estimate alone.
-    const rewrite = (skill === 'estimate_sum' || skill === 'estimate_diff') ? o.support !== 'none' : false;
-    q.printText = op === '÷' ? `Estimate. ${expr}` : `Round to ${placeName}. Then estimate. ${expr}`;
+    // Round, then compute: the two-line rewrite (RD-07) — the working frame: each changed number
+    // in a box under the problem, then the estimate — or, as the fade (a `support: none` option
+    // where the skill has one), the estimate alone. Every estimation skill gets the frame, so the
+    // rounding step has a slot and a key (round-3: sums/diffs, products and quotients had none).
+    const rewrite = o.support !== 'none';
+    const lead = op === '÷' ? 'Find a near number that divides easily.'
+        : op === '×' ? `Round the bigger number to ${placeName}.` : `Round each number to ${placeName}.`;
+    q.printText = op === '÷' ? `${lead} Then divide. ${expr}` : op === '×' ? `${lead} Then multiply. ${expr}` : `${lead} Then estimate. ${expr}`;
     q.hint = op === '÷' ? `Find a number near ${fmt(a)} that ${fmt(b)} goes into. Then divide.`
-        : op === '×' ? `Round ${fmt(a)} to ${placeName}. Then multiply.` : `Round each number to ${placeName}. Then ${op === '+' ? 'add' : 'subtract'}.`;
+        : op === '×' ? `Round ${fmt(a)} to ${placeName}. Keep ${fmt(b)}. Then multiply.` : `Round each number to ${placeName}. Then ${op === '+' ? 'add' : 'subtract'}.`;
     if (rewrite) {
-        inlineBlanks(q, `Round to ${placeName}. ${expr} ≈ ___ ${op} ___ = ___`, [[ra, rb, est]]);
+        inlineBlanks(q, `${lead} ${expr} ≈ ___ ${op} ___ = ___`, [[ra, rb, est]]);
         q.ans = est;
         q.printAnswer = `${fmt(ra)} ${op} ${fmt(rb)} = ${fmt(est)}`;
         setCell(q, { kind: 'estimate', expr, op, keys: [fmt(ra), fmt(rb), fmt(est)], keyValue: q.printAnswer });
         return;
     }
-    q.text = op === '÷' ? `Estimate: ${expr} ≈ ?` : `Round to ${placeName}, then estimate: ${expr} ≈ ?`;
+    q.text = `${lead} ${expr} ≈ ?`;
     q.ans = est;
     q.answerType = 'number';
     setCell(q, { kind: 'frame', frame: `${expr} ≈ ____`, keyValue: est });
