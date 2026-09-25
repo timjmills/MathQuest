@@ -9,7 +9,7 @@ import {
     markAllCorrectFired,
 } from './widget-retry.js';
 import { ftAnswerMatches } from './sheet/index.js';
-import { practiceLadderWrong, markTried } from './support-ladder.js';
+import { practiceLadderWrong, markTried, ladderWillHelp, ladderOf } from './support-ladder.js';
 
 // Expose per-skill calculator gate so #calcBtn show/hide logic in other
 // modules (question-render, etc.) can consult it. Default is no calc.
@@ -344,6 +344,7 @@ export function isRetryWithSkipMode() {
 
 // Reset attempt tracking — call when a new question is shown or after correct answer.
 export function resetAttemptTracking() {
+    flushDeferredAdaptive();
     state.currentQAttempts = 0;
     state.currentQAttemptHistory = [];
     // Hide skip button + clear any cross-outs
@@ -436,7 +437,7 @@ export function showSkipButtonIfNeeded() {
 // Record a wrong attempt: bumps counter, stores submission, optionally crosses
 // out the multi-choice button, optionally appends to history chips.
 // Then conditionally shows Skip.
-export function recordWrongAttempt({ submitted, btnElement, showHistoryChip, noHint = false }) {
+export function recordWrongAttempt({ submitted, btnElement, showHistoryChip, noHint = false, noSkip = false }) {
     state.currentQAttempts = (state.currentQAttempts || 0) + 1;
     if (!Array.isArray(state.currentQAttemptHistory)) state.currentQAttemptHistory = [];
     state.currentQAttemptHistory.push(submitted);
@@ -444,7 +445,14 @@ export function recordWrongAttempt({ submitted, btnElement, showHistoryChip, noH
     if (showHistoryChip && submitted !== undefined && submitted !== null && String(submitted).length) {
         appendAttemptHistory(submitted);
     }
-    showSkipButtonIfNeeded();
+    // On a support-ladder step the action is to try again: no "Next ->" under the feedback (the
+    // card's own Skip stays in its tool row).
+    if (noSkip) {
+        const skipBtn = document.getElementById('skipBtn');
+        if (skipBtn) skipBtn.style.display = 'none';
+    } else {
+        showSkipButtonIfNeeded();
+    }
 
     // Auto-reveal the hint popup on the FIRST wrong attempt — every skill
     // gets the same scaffolding behavior. Student doesn't have to know to
@@ -493,7 +501,21 @@ export function skipCurrentItem() {
 }
 
 // ===== PER-SKILL SESSION TRACKING =====
-export function trackSkillAnswer(isCorrect) {
+// Adaptive level changes are held while an item's support ladder climbs (a "Going back to Level
+// 2" toast must not land on a support step): its wrong answers are recorded when the item ends.
+let _deferredAdaptive = null;          // { skillId, n }
+export function flushDeferredAdaptive() {
+    const d = _deferredAdaptive;
+    _deferredAdaptive = null;
+    if (!d || !d.n || typeof window === 'undefined' || typeof window.recordAdaptiveAnswer !== 'function') return;
+    if (!state.adaptiveModeEnabled || state.mapMode || state.quizMode) return;
+    for (let i = 0; i < d.n; i++) {
+        try { window.recordAdaptiveAnswer(d.skillId, false); } catch { /* never break answer flow */ }
+    }
+}
+
+export function trackSkillAnswer(isCorrect, { defer = false } = {}) {
+    if (!defer) flushDeferredAdaptive();
     const skillId = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
     if (skillId === 'custom_mixed' || skillId === 'all_mixed') return;
     const timeMs = state.questionStartTime ? Math.max(0, Date.now() - state.questionStartTime) : 0;
@@ -514,7 +536,12 @@ export function trackSkillAnswer(isCorrect) {
     // a quiz is in progress (MAP & Quiz own their own scoring/difficulty).
     if (state.adaptiveModeEnabled && !state.mapMode && !state.quizMode
         && typeof window !== 'undefined' && typeof window.recordAdaptiveAnswer === 'function') {
-        try { window.recordAdaptiveAnswer(skillId, !!isCorrect); } catch { /* never break answer flow */ }
+        if (defer && !isCorrect) {
+            if (!_deferredAdaptive || _deferredAdaptive.skillId !== skillId) { flushDeferredAdaptive(); _deferredAdaptive = { skillId, n: 0 }; }
+            _deferredAdaptive.n += 1;
+        } else {
+            try { window.recordAdaptiveAnswer(skillId, !!isCorrect); } catch { /* never break answer flow */ }
+        }
     }
 
     // Variant cycler bias feedback: when a question carries a `_variant` tag
@@ -726,14 +753,16 @@ export function checkFractionInputAnswer() {
         ? (`${numV}/${denV}` === String(q.ans).replace(/\s+/g, ''))
         : fractionAnswersMatch(userAns, q.ans);
 
-    // Visual flash on the two boxes (matches box-correct / box-wrong styling).
+    // Visual flash on the two boxes (matches box-correct / box-wrong styling). On a support-ladder
+    // step the entry is kept and marked gently instead (support-ladder.js).
+    const fiGentle = !isFracMatch && _ladderNext(q);
     if (numEl) {
         numEl.classList.remove('box-correct', 'box-wrong');
-        numEl.classList.add(isFracMatch ? 'box-correct' : 'box-wrong');
+        if (fiGentle) _keepEntry(numEl); else numEl.classList.add(isFracMatch ? 'box-correct' : 'box-wrong');
     }
     if (denEl) {
         denEl.classList.remove('box-correct', 'box-wrong');
-        denEl.classList.add(isFracMatch ? 'box-correct' : 'box-wrong');
+        if (fiGentle) _keepEntry(denEl); else denEl.classList.add(isFracMatch ? 'box-correct' : 'box-wrong');
     }
 
     // Route the result through checkAnswer so it shares ALL the scoring,
@@ -940,6 +969,50 @@ function isFractionSkill(skill) {
         'd_to_f', 'p_to_f'
     ];
     return fracSkills.includes(skill);
+}
+
+// ===== THE SUPPORT LADDER ON THE PRACTICE CARD (support-ladder.js) =====
+/**
+ * A widget that answers through its own submit (the draw-the-hands clock) asks here on a wrong
+ * answer: true = a ladder step was drawn (the widget keeps its hands, says nothing more and lets
+ * the pupil try again); false = the widget's own wrong-answer behaviour.
+ */
+export function widgetLadderWrong(q, submitted) {
+    if (!_ladderNext(q)) return false;
+    state.sessionStreak = 0;
+    awardXP(2, 'ladder');
+    recordWrongAttempt({ submitted, btnElement: null, showHistoryChip: false, noHint: true, noSkip: true });
+    trackSkillAnswer(false, { defer: true });
+    if (typeof window !== 'undefined' && window.bannerRecordAnswer) window.bannerRecordAnswer(false, { quiet: true });
+    if (state.mapMode !== true) _snapshotQ(false, submitted);
+    _ladderAfter(q, submitted);
+    state.hasAnswered = false;
+    return true;
+}
+/** Is the practice card's ladder in play (practice, not a quiz, MAP or a redo)? */
+function _ladderOn() {
+    return state.gameMode === 'practice' && !state.quizMode && state.mapMode !== true && !isReviewing();
+}
+/** Will this wrong answer climb a rung? Asked BEFORE any wrong-answer chrome is painted. */
+function _ladderNext(q) {
+    return _ladderOn() && ladderWillHelp(q, { categoryId: state.category, skillId: state.skill });
+}
+/** After a calm wrong answer: the next rung in the cell, its message, no Solution or "Next ->". */
+function _ladderAfter(q, userAns) {
+    practiceLadderWrong(q, userAns);
+    const sb = document.getElementById('solutionBtn');
+    if (sb) sb.style.display = 'none';
+    const skipBtn = document.getElementById('skipBtn');
+    if (skipBtn) skipBtn.style.display = 'none';
+    const card = document.getElementById('questionCard');
+    if (card) card.classList.remove('incorrect-bg');
+}
+/** An input kept after a calm wrong answer: gently marked, selected so typing replaces it. */
+function _keepEntry(el) {
+    if (!el || !el.value) return;
+    markTried(el);
+    el.style.borderColor = '';
+    el.style.background = '';
 }
 
 export function checkAnswer(userAns, btnElement) {
@@ -1162,17 +1235,12 @@ export function checkAnswer(userAns, btnElement) {
         // show Skip after the 2nd wrong attempt.
         state.sessionStreak = 0;
         state.lastStreakBonus = 0;
-        awardXP(2, 'attempt');
-
         // The SUPPORT LADDER (support-ladder.js, owner 2026-09-25): on the practice card each wrong
         // answer on this item adds a support in its cell (1st, a different 2nd, then the worked
-        // steps). While it climbs, the entry stays, marked gently: no red flood, no solution.
-        const ladder = state.gameMode === 'practice' && !state.quizMode ? practiceLadderWrong(q, userAns) : null;
-        const gentle = !!(ladder && !ladder.spent);
-        if (gentle) {
-            const sb = document.getElementById("solutionBtn");
-            if (sb) sb.style.display = "none";
-        }
+        // steps). While it climbs, the entry stays, marked gently: no red flood, no shake, no
+        // toasts, no solution, no "Next ->" (the pupil's action is to try again).
+        const gentle = _ladderNext(q);
+        awardXP(2, gentle ? 'ladder' : 'attempt');
 
         const card = document.getElementById("questionCard");
         if (card) {
@@ -1201,7 +1269,8 @@ export function checkAnswer(userAns, btnElement) {
             submitted: userAns,
             btnElement: isMC ? btnElement : null,
             showHistoryChip: !isMC && !gentle,
-            noHint: !!ladder,
+            noHint: _ladderOn(),
+            noSkip: gentle,
         });
 
         // Snapshot the wrong attempt so the dot row turns red AND the
@@ -1220,18 +1289,21 @@ export function checkAnswer(userAns, btnElement) {
         }
 
         // Record attempt but do NOT advance
-        trackSkillAnswer(false);
+        trackSkillAnswer(false, { defer: gentle });
         const logSkill = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
         const logTime = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
         recordPracticeLog(logSkill, false, logTime);
 
         // Update game stats banner
         if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-            window.bannerRecordAnswer(false);
+            window.bannerRecordAnswer(false, { quiet: gentle });
         }
 
         // Badge triggers
         checkBadgeTriggers('answer', { isCorrect: false });
+
+        // The ladder's next rung, drawn in the cell, with its calm message
+        if (gentle) _ladderAfter(q, userAns);
 
         // Allow another submission immediately
         state.hasAnswered = false;
@@ -1793,29 +1865,35 @@ export function checkBoxDivisionAnswer() {
         const solutionBtn = document.getElementById('solutionBtn');
         if (solutionBtn) solutionBtn.style.display = 'inline-block';
     } else {
+        // support ladder (support-ladder.js): a calm step keeps the boxes, marked grey, not red
+        const gentle = _ladderNext(q);
         const card = document.getElementById('questionCard');
-        if (card) {
+        if (card && !gentle) {
             card.classList.add('incorrect-bg');
             setTimeout(() => card.classList.remove('incorrect-bg'), 700);
         }
+        if (gentle) allInputs.forEach((el) => { if (el.style.borderColor === 'rgb(198, 40, 40)' || el.style.borderColor === '#c62828') { el.style.borderColor = '#949494'; el.style.background = '#fff'; } });
         if (feedback) {
             feedback.className = 'feedback-area incorrect';
             feedback.innerHTML = `❌ Some boxes are off — check the red ones and try again. Hint: ${q.hint || ''}`;
         }
-        celebrateWrong();
+        if (!gentle) celebrateWrong();
         state.lastAnswerCorrect = false;
         recordWrongAttempt({
-            submitted: 'box-method-partial',
+            submitted: allInputs.map((el) => el.value || '').join('|') || 'box-method-partial',
             btnElement: null,
             showHistoryChip: false,
+            noHint: _ladderOn(),
+            noSkip: gentle,
         });
-        trackSkillAnswer(false);
+        if (gentle) _ladderAfter(q, allInputs.map((el) => el.value || '').join('|'));
+        trackSkillAnswer(false, { defer: gentle });
         const logSkillBD2 = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
         const logTimeBD2 = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
         recordPracticeLog(logSkillBD2, false, logTimeBD2);
 
         if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-            window.bannerRecordAnswer(false);
+            window.bannerRecordAnswer(false, { quiet: !!ladderOf(q) && _ladderOn() });
         }
         // Focus the first wrong cell so the student can fix it immediately.
         if (firstWrong) {
@@ -1933,8 +2011,10 @@ export function checkDualAnswer(userPerimeter, userArea) {
         const solutionBtn = document.getElementById("solutionBtn");
         if (solutionBtn) solutionBtn.style.display = "inline-block";
     } else {
+        // support ladder (support-ladder.js): a calm step keeps the wrong entry, marked gently
+        const gentle = _ladderNext(q);
         const card = document.getElementById("questionCard");
-        if (card) {
+        if (card && !gentle) {
             card.classList.add("incorrect-bg");
             setTimeout(() => card.classList.remove("incorrect-bg"), 700);
         }
@@ -1949,20 +2029,20 @@ export function checkDualAnswer(userPerimeter, userArea) {
             msg += "Area is incorrect. Try again!";
         }
         feedback.innerHTML = msg;
-        celebrateWrong();
+        if (!gentle) celebrateWrong();
 
         // Lock the part the student got right so they keep that credit on
         // retry; only the wrong field is reset/refocused. The locked input
         // is disabled so they can't accidentally clear it.
         if (perimeterInput) {
-            perimeterInput.classList.add(perimeterCorrect ? "correct" : "incorrect");
+            perimeterInput.classList.add(perimeterCorrect ? "correct" : gentle ? "mq-tried" : "incorrect");
             if (perimeterCorrect) {
                 perimeterInput.disabled = true;
                 perimeterInput.classList.add('locked-correct');
             }
         }
         if (areaInput) {
-            areaInput.classList.add(areaCorrect ? "correct" : "incorrect");
+            areaInput.classList.add(areaCorrect ? "correct" : gentle ? "mq-tried" : "incorrect");
             if (areaCorrect) {
                 areaInput.disabled = true;
                 areaInput.classList.add('locked-correct');
@@ -1974,26 +2054,27 @@ export function checkDualAnswer(userPerimeter, userArea) {
             submitted: `P=${userPerimeter},A=${userArea}`,
             btnElement: null,
             showHistoryChip: false,
+            noHint: _ladderOn(),
+            noSkip: gentle,
         });
 
         // Record attempt
-        trackSkillAnswer(false);
+        trackSkillAnswer(false, { defer: gentle });
         const logSkillD2 = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
         const logTimeD2 = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
         recordPracticeLog(logSkillD2, false, logTimeD2);
 
         if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-            window.bannerRecordAnswer(false);
+            window.bannerRecordAnswer(false, { quiet: gentle });
         }
+        if (gentle) _ladderAfter(q, `P=${userPerimeter},A=${userArea}`);
 
-        // Allow another submission immediately. Clear only the wrong fields
-        // and refocus the first wrong one so the student knows where to type.
-        if (perimeterInput && !perimeterCorrect) {
-            perimeterInput.value = "";
-            try { perimeterInput.focus(); } catch (_) {}
-        } else if (areaInput && !areaCorrect) {
-            areaInput.value = "";
-            try { areaInput.focus(); } catch (_) {}
+        // Allow another submission immediately. Clear only the wrong fields (a ladder step keeps
+        // them, selected) and refocus the first wrong one so the student knows where to type.
+        const wrongEl = perimeterInput && !perimeterCorrect ? perimeterInput : areaInput && !areaCorrect ? areaInput : null;
+        if (wrongEl) {
+            if (!gentle) wrongEl.value = "";
+            try { wrongEl.focus(); if (gentle) wrongEl.select(); } catch (_) {}
         }
         state.hasAnswered = false;
     }
@@ -2314,17 +2395,19 @@ export function checkWordProblemAnswer(userAnswer) {
         const solutionBtn = document.getElementById("solutionBtn");
         if (solutionBtn) solutionBtn.style.display = "inline-block";
     } else {
+        // support ladder (support-ladder.js): a calm step keeps the entry, marked gently
+        const gentle = _ladderNext(q);
         const card = document.getElementById("questionCard");
-        if (card) {
+        if (card && !gentle) {
             card.classList.add("incorrect-bg");
             setTimeout(() => card.classList.remove("incorrect-bg"), 700);
         }
         feedback.className = "feedback-area incorrect";
         // Don't reveal the answer — tell student to try again
         feedback.innerHTML = pickWrongMessage();
-        celebrateWrong();
+        if (!gentle) celebrateWrong();
 
-        if (answerInput) {
+        if (answerInput && !gentle) {
             answerInput.style.borderColor = "var(--accent-red)";
             answerInput.style.background = "rgba(244, 67, 54, 0.15)";
         }
@@ -2333,22 +2416,25 @@ export function checkWordProblemAnswer(userAnswer) {
         recordWrongAttempt({
             submitted: userAnswer,
             btnElement: null,
-            showHistoryChip: true,
+            showHistoryChip: !gentle,
+            noHint: _ladderOn(),
+            noSkip: gentle,
         });
 
         // Record attempt
-        trackSkillAnswer(false);
+        trackSkillAnswer(false, { defer: gentle });
         const logSkillWP2 = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
         const logTimeWP2 = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
         recordPracticeLog(logSkillWP2, false, logTimeWP2);
 
         if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-            window.bannerRecordAnswer(false);
+            window.bannerRecordAnswer(false, { quiet: gentle });
         }
+        if (gentle) _ladderAfter(q, userAnswer);
 
         // Allow another submission immediately
         if (answerInput) {
-            answerInput.value = "";
+            if (gentle) _keepEntry(answerInput); else answerInput.value = "";
             answerInput.style.borderColor = "";
             answerInput.style.background = "";
             setTimeout(() => answerInput.focus(), 50);
@@ -3192,19 +3278,33 @@ export function submitInlineBlanks() {
         return;
     }
 
-    // Wrong path — bump attempt counter, surface Skip after 2 attempts.
+    // Wrong path — bump attempt counter, surface Skip after 2 attempts. A support-ladder step
+    // (support-ladder.js) keeps the boxes, marked grey, and draws a support instead.
+    const ibGentle = _ladderNext(q);
+    if (ibGentle) {
+        cells.forEach((cell) => { if (/198, 40, 40|c62828/i.test(cell.style.borderBottomColor)) { cell.style.borderBottomColor = '#949494'; cell.style.color = ''; } });
+    }
     recordWrongAttempt({
         submitted: userValues.join(','),
         btnElement: null,
         showHistoryChip: false,
+        noHint: _ladderOn(),
+        noSkip: ibGentle,
     });
     state.lastAnswerCorrect = false;
-    trackSkillAnswer(false);
+    trackSkillAnswer(false, { defer: ibGentle });
     const logSk2 = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
     const logTm2 = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
     recordPracticeLog(logSk2, false, logTm2);
     if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-        window.bannerRecordAnswer(false);
+        window.bannerRecordAnswer(false, { quiet: ibGentle });
+    }
+    if (ibGentle) {
+        _ladderAfter(q, userValues.join(','));
+        const firstCell = cells.find((c, i) => !valueMatches(userValues[i], compareSet[i])) || cells[0];
+        if (firstCell) { try { firstCell.focus(); firstCell.select && firstCell.select(); } catch (_) {} }
+        state.hasAnswered = false;
+        return;
     }
 
     const attempts = state.currentQAttempts || 1;

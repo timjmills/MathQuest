@@ -23,9 +23,16 @@ const { open } = require('../lib/ws-harness.cjs');
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const has = (k) => process.argv.includes('--' + k);
 const DEFAULT = ['addition:add_facts', 'subtraction:subtract', 'measurement:time_quarter', 'counting:count_objects'];
+// `--wide`: one skill per family on the practice card, and every card checker the ladder runs on
+// (the word-work cell, rounding on a number line, box division, perimeter + area, fraction boxes,
+// the draw-the-hands clock). A skill may carry options after a `|`: `measurement:time_quarter|{"response":"draw"}`.
+const WIDE = ['multiplication:mult_facts', 'division:div_facts', 'division:box_division_easy', 'addition:add_wp_20',
+    'addition:add_word_problems', 'number_sense:round_nl_thousands', 'number_sense:nearest_100', 'measurement:money_count',
+    'measurement:time_quarter|{"response":"draw"}', 'area_perimeter:area_perimeter', 'fractions:write_fraction',
+    'algebra:function_table_easy', 'placevalue:value', 'comparing:compare_groups', 'composing:number_bonds'];
 const LIST = (arg('skills', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
-const SKILLS = LIST.length ? LIST : DEFAULT;
-const HOSTS = (arg('hosts', 'card,worksheet,quiz') || '').split(',');
+const SKILLS = LIST.length ? LIST : has('wide') ? WIDE : DEFAULT;
+const HOSTS = (arg('hosts', has('wide') ? 'card' : 'card,worksheet,quiz') || '').split(',');
 const SHOTS = arg('shots', null);
 const WIDTHS = SHOTS ? [1280, 390] : [1280];
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -60,11 +67,12 @@ async function LOOK(which) {
     const root = document.querySelector(which.sel);
     if (!root || !q) return { error: 'no cell' };
     const s = L.shownOf(q);
-    const drawn = Array.from(root.querySelectorAll('[data-mq-ladder], .mq-ladder-extra'));
+    const drawn = Array.from(root.querySelectorAll('[data-mq-ladder], .mq-ladder-extra, .mq-ladder-tiles, .mq-ladder-under'));
     const kitOn = [...Array.from(root.querySelectorAll('.ws-supported')).map((el) => el.getAttribute('data-ws-supports') || ''),
         ...Array.from(root.querySelectorAll('[data-mq-ladder]:not(svg)')).map((el) => el.getAttribute('data-mq-ladder') || '')].join(' ');
-    const dots = root.querySelectorAll('.ws-td').length;
-    const extraOn = Array.from(root.querySelectorAll('.mq-ladder-extra [data-mq-ladder-on]')).map((el) => el.getAttribute('data-mq-ladder-on')).join(' ');
+    const dots = root.querySelectorAll('.ws-td, [data-ws-tally]').length;
+    const extraOn = (Array.from(root.querySelectorAll('[data-mq-ladder-on]')).map((el) => el.getAttribute('data-mq-ladder-on')).join(' ')
+        + ' ' + Array.from(root.querySelectorAll('.mq-ww[data-mq-ladder]')).map((el) => (el.getAttribute('data-mq-ladder') || '').replace('hl', 'wpCues').replace('bar', 'wpBar').replace('kb', 'wpBank')).join(' ')).trim();
     const ring = !!root.querySelector('svg[data-mq-ladder="ring"]');
     const worked = !!root.querySelector('.mq-ladder-worked');
     // the text the ladder added (inputs excluded: the pupil's entry is not the ladder's)
@@ -94,18 +102,68 @@ async function LOOK(which) {
         : which.host === 'card' ? (document.getElementById('feedbackArea') || {}).textContent || '' : '';
     return {
         n: s.n, ids: s.ids, drawnIds: s.drawnIds, spent: s.spent, kitOn, dots, extraOn, ring, worked, leaks, red, fb: fb.trim(),
-        entry: input && input.type !== 'hidden' ? input.value : null, ans: a,
+        entry: input && input.type !== 'hidden' && input.offsetParent ? input.value : null, ans: a,
+        len: L.ladderOf(q) ? L.ladderOf(q).rungs.length : 0,
     };
 }
 
-async function giveCard(page, value) {
-    await page.evaluate((v) => {
-        const inp = document.getElementById('answerInput');
-        if (inp) inp.value = v;
-        window.state.hasAnswered = false;
+// In the page: answer the practice card's item the way its answer type takes it. k = 0 the right
+// answer, k = 1..3 three different wrong ones.
+function CARD_ANSWER(k) {
+    const st = window.state;
+    const q = st.currentQ;
+    st.hasAnswered = false;
+    const bump = (v) => { const n = Number(String(v).replace(/,/g, '')); return Number.isFinite(n) ? String(n + k) : `${v}${k ? 'x'.repeat(k) : ''}`; };
+    const t = q.answerType;
+    if (t === 'dual' && q.dualAnswers) {
+        const p = document.getElementById('perimeterInput'), a = document.getElementById('areaInput');
+        if (p && !p.disabled) p.value = bump(q.dualAnswers.perimeter);
+        if (a && !a.disabled) a.value = String(q.dualAnswers.area);
         window.submitAnswer();
-    }, value);
-    await sleep(350);
+        return 'dual';
+    }
+    if (t === 'inline-blanks' && q.inlineBlanksData) {
+        const cells = Array.from(document.querySelectorAll('#gameView .ib-cell'));
+        const set = q.inlineBlanksData.acceptedSets[0];
+        cells.forEach((c, i) => { c.value = i === cells.length - 1 ? bump(set[i]) : String(set[i]); });
+        window.submitInlineBlanks();
+        return 'inline';
+    }
+    if (t === 'fraction-input') {
+        const [n, d] = String(q.ans).split('/');
+        document.getElementById('fiNum').value = bump(n);
+        document.getElementById('fiDen').value = String(d);
+        window.checkFractionInputAnswer();
+        return 'fraction';
+    }
+    if (t === 'box-division') {
+        const ins = Array.from(document.querySelectorAll('#visualAid .bx-roof, #visualAid .bx-sub, #visualAid .bx-rem'));
+        ins.forEach((el, i) => { el.value = i === 0 ? bump(el.dataset.answer) : String(el.dataset.answer); });
+        window.submitAnswer();
+        return 'box';
+    }
+    if (t === 'clock-set') {
+        const host = document.querySelector('#visualAid .cs-host');
+        const click = (act) => host.querySelector(`[data-act="${act}"]`).click();
+        const read = (r) => Number(host.querySelector(`[data-role="${r}-readout"]`).textContent);
+        const wantH = (((q.ans.hour + k) % 12) + 12) % 12 || 12, wantM = q.ans.minute;
+        for (let i = 0; i < 13 && read('hour') !== wantH; i++) click('hour-up');
+        for (let i = 0; i < 61 && read('minute') !== wantM; i++) click('min-up');
+        host.querySelector('.cs-submit').click();
+        return 'clock-set';
+    }
+    const inp = document.getElementById('answerInput');
+    const a = String(q.ans);
+    const tm = /^(\d{1,2}):(\d{2})$/.exec(a);
+    const v = k === 0 ? a : tm ? `${((Number(tm[1]) - 1 + k) % 12) + 1}:${tm[2]}` : bump(a);
+    if (inp) inp.value = v;
+    window.submitAnswer();
+    return 'typed';
+}
+
+async function giveCard(page, k) {
+    await page.evaluate(CARD_ANSWER, k);
+    await sleep(400);
 }
 
 async function giveWorksheet(page, i, value) {
@@ -139,6 +197,8 @@ async function giveQuiz(page, value) {
 function judge(k, r, host, fails, tag) {
     const F = (m) => fails.push(`${tag} wrong ${k}: ${m}`);
     if (r.error) return F(r.error);
+    // a short ladder (worked steps only, or one support) is spent early: the host's own behaviour
+    if (r.len && k > r.len) { if (!r.worked) F('spent without ever showing the worked steps'); if (r.n !== r.len) F(`ladder at ${r.n}, want ${r.len}`); return; }
     if (r.n !== k) F(`ladder at ${r.n}, want ${k}`);
     if (r.leaks.length) F(`the answer shows: ${r.leaks.join(', ')}`);
     if (r.red) F('red flood on a ladder step');
@@ -172,12 +232,14 @@ async function shot(page, host, skill, k, w) {
     const fails = [];
     for (const w of WIDTHS) {
         await page.setViewport({ width: w, height: w < 600 ? 844 : 900, deviceScaleFactor: 1 });
-        for (const s of SKILLS) {
+        for (const spec of SKILLS) {
+            const [s, optJson] = spec.split('|');
             const [c, k] = s.split(':');
             const line = [];
             await page.reload({ waitUntil: 'networkidle2' });
             await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS, { timeout: 30000 });
             await page.evaluate(() => { window.setHelpAfterWrong('ladder'); window.state.ttsEnabled = true; });
+            if (optJson) await page.evaluate((c, k, o) => { window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, o, { silent: true }); }, c, k, JSON.parse(optJson));
             if (HOSTS.includes('card')) {
                 const tag = `${s} card @${w}`;
                 await page.evaluate((c, k, seed) => {
@@ -186,17 +248,16 @@ async function shot(page, host, skill, k, w) {
                     window.showView('gameView'); st.currentQ = window.generateQuestion(); window.renderQuestion();
                 }, c, k, hash(s + ':ladder'));
                 await sleep(500);
-                const ans = await page.evaluate(ANSWERS, { host: 'card' });
                 const before = await page.evaluate(() => window.state.score || 0);
                 const seen = [];
                 for (let n = 1; n <= 3; n++) {
-                    await giveCard(page, ans.wrong[n - 1]);
+                    await giveCard(page, n);
                     const r = await page.evaluate(LOOK, { host: 'card', sel: '#questionPaper' });
                     judge(n, r, 'card', fails, tag);
                     seen.push(r.ids.join('+') || '-');
                     await shot(page, 'card', s, n, w);
                 }
-                await giveCard(page, ans.right);
+                await giveCard(page, 0);
                 const after = await page.evaluate(() => window.state.score || 0);
                 if (!(after > before)) fails.push(`${tag}: the right answer did not score`);
                 const help = await page.evaluate((k) => JSON.stringify((window.state.sessionHelp || {})[k] || {}), k);
@@ -282,8 +343,7 @@ async function shot(page, host, skill, k, w) {
             window.showView('gameView'); st.currentQ = window.generateQuestion(); window.renderQuestion();
         });
         await sleep(400);
-        const ans = await page.evaluate(ANSWERS, { host: 'card' });
-        await giveCard(page, ans.wrong[0]);
+        await giveCard(page, 1);
         const r = await page.evaluate(LOOK, { host: 'card', sel: '#questionPaper' });
         if (r.n) fails.push('help "none": the ladder still ran');
         // worked example only
@@ -292,8 +352,7 @@ async function shot(page, host, skill, k, w) {
             const st = window.state; st.hasAnswered = false; st.currentQ = window.generateQuestion(); window.renderQuestion();
         });
         await sleep(400);
-        const ans2 = await page.evaluate(ANSWERS, { host: 'card' });
-        await giveCard(page, ans2.wrong[0]);
+        await giveCard(page, 1);
         const r2 = await page.evaluate(LOOK, { host: 'card', sel: '#questionPaper' });
         if (!(r2.worked && r2.ids.join() === 'worked')) fails.push(`help "worked": want the worked steps alone, got ${r2.ids.join('+')}`);
         await page.evaluate(() => window.setHelpAfterWrong('ladder'));

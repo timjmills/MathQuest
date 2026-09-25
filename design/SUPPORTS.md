@@ -827,3 +827,32 @@ checkWorksheetAnswerFromColumns wrong branches → `worksheetLadderWrong` (it wa
 fraction is still shorter than its answer); `quiz-take.js` recordAnswer → `quizLadderWrong`, the
 instant feedback line, and `drawLadder` after the cell mounts. `screen-cell.js` `slotsFilled` now
 reads a time's two boxes (`h:mm`), so a clock item on the online worksheet is checked live.
+
+### S9.1 Round 2 (coordinator review, 2026-09-25)
+
+- **Placement and size.** Touch dots, the boxed sign and the start arrow are drawn IN the kit cell.
+  The dot tile / ten frame is drawn as counters BESIDE the number it stands for: a vertical fact
+  gets a column of frames level with its rows (the rows grow to the frame's height), a horizontal
+  fact a frame under each number; a subtraction's minuend frame crosses out the ones taken away
+  (white-edged crosses). Frames are at least 78 px tall (26 px counters, 6.9 mm: RP-5). When the
+  cell has no room beside the fact, or a number is over 10, the frames go under the problem. Every
+  other picture is its S4 pane at L (marks and checklists at M) with `--mq-k2` at least 3.8 px
+  (4.4 px from 600 px wide); a pane wider than a phone's cell is drawn at a smaller millimetre,
+  never cut off.
+- **No competing chrome mid-ladder.** On a ladder step: no red flash, no shake, no "Keep trying"
+  or "Timer paused" toast (the timer still pauses), no "Next →" under the feedback (the card's own
+  Skip stays), no Solution button, no hint popup. Adaptive level changes are HELD while the ladder
+  climbs and recorded when the item ends (a right answer, a skip, the next item).
+- **Fonts.** The worked panel, its Say: line and the worksheet's ladder line are Andika, ink on
+  paper, with the single grey.
+- **Every card checker.** checkAnswer (typed, choice, word-work), the fraction boxes, box division,
+  perimeter + area, the inline blanks (rounding on a number line) and the draw-the-hands clock
+  (`widgetLadderWrong`; the widget unlocks for another try, its face gains the minute ring, then
+  the checklist). The word-work cell's ladder is its own keyword supports: key words bold and
+  underlined, then the bar model (or the key-word box on a two-step story). Rounding gets the
+  skill's rounding panes; box division and coins their checklists; a skill with no support of its
+  own gets the worked steps alone.
+- **Count worked step.** A count from 1 up to the answer ("Count: 1, 2, 3 ... 18.") becomes
+  "Count: say one number for each one."
+- **Gate.** `ws-support-ladder` (the four skills on all three hosts, at 1280 and 390 with
+  `--shots`) and `ws-support-ladder --wide` (15 skills, one per family and every card checker).
