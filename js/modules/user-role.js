@@ -57,8 +57,8 @@ export function setUserRole(role, { persist = true } = {}) {
     window.renderFavorites?.();
 }
 
-// Link parameters that are addressed to a pupil (skill code, MX- code, MAP test, quiz).
-const PUPIL_LINK_PARAMS = ['c', 'code', 'map', 'quiz'];
+// Link parameters that are addressed to a pupil (skill code, MX- code, Quick Start, MAP test, quiz).
+const PUPIL_LINK_PARAMS = ['c', 'code', 'qs', 'map', 'quiz'];
 
 export function loadUserRole() {
     // A pupil link always opens in student view, even on a device last used as a teacher;
