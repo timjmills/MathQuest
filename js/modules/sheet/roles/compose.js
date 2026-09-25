@@ -316,8 +316,16 @@ export function operandsOf(q = {}) {
         if (out.length >= 2 && out.every(Number.isFinite)) return out;
     }
     // Last resort: the question's own text, "7 × 3 = ?" / "46 − 18".
-    const m = /(-?[\d,]+)\s*([+\-−×x*÷/])\s*(-?[\d,]+)/.exec(String(q.text || '').replace(/<[^>]*>/g, ' '));
-    return m ? [num(m[1]), num(m[3])] : [];
+    // A chain of one operator ("13 + 72 + 8 = ?", column addition of several addends) keeps
+    // every operand.
+    const plain = String(q.text || '').replace(/<[^>]*>/g, ' ');
+    const chain = /(-?[\d,]+)((?:\s*([+\-−×x*÷/])\s*-?[\d,]+)+)/.exec(plain);
+    if (chain) {
+        const rest = [...chain[2].matchAll(/\s*([+\-−×x*÷/])\s*(-?[\d,]+)/g)];
+        if (rest.every((r) => r[1] === rest[0][1])) return [num(chain[1]), ...rest.map((r) => num(r[2]))];
+        return [num(chain[1]), num(rest[0][2])];
+    }
+    return [];
 }
 
 const isWhole = (v) => /^-?\d+$/.test(String(v).replace(/,/g, '').trim());

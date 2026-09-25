@@ -37,7 +37,7 @@ export function prepare(it, info = {}) {
     const right = aRight ? 'A' : 'B';
     const digits = Math.max(2, Math.min(6, correct.replace(/[^0-9]/g, '').length || 2));
     const key = slotKey({ 'ri-a': aRight ? 'A' : '', 'ri-b': aRight ? '' : 'B', 'ri-who': right, 'ri-ans': correct }, `${right}: ${correct}`);
-    const work = (c, o, v) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: 3, shown: v }));
+    const work = (c, o, v) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: 3, shown: v, prompt: false }));
     const render = (c, o = {}) => `<div class="mq-ab">`
         + `<div class="mq-abbox"><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value)}</div>`
         + `<div class="mq-abbox"><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct)}</div>`

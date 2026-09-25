@@ -3,7 +3,7 @@
 // seeded forms.
 //
 //   Title      "Test A: <topic>" (HD-13), tab "Test A" / "Test B", Score in the header
-//   Grid       one instruction over a ruled grid of the skill's cell: 4 x 4 for facts, equations
+//   Grid       one instruction over a ruled grid of the skill's cell, every item boxed: 4 x 4 for facts, equations
 //              and 2- or 3-digit stacks, 3 columns when 4 do not fit, 2 x 2 for long algorithms;
 //              ceiling 20 / 16 / 12 (S / M / L); a teacher count is honoured up to the page
 //   Forms      Form B holds Form A's items in a seeded re-order (PT-TST-1), so both forms are
@@ -19,6 +19,7 @@ import {
 
 export const ROLE_ID = 'test';
 const CEILING = { S: 20, M: 16, L: 12 };
+const DENSE = { S: 20, M: 20, L: 16 };
 
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1, 2, 3, 4];
@@ -32,6 +33,9 @@ function layout(items, input, count) {
         role: 'test', columns: input.columns || 'auto', count: count || items.length,
         target: long ? { cols: 2, rows: { S: 3, M: 2, L: 2 } } : { cols: 4, rows: { S: 5, M: 4, L: 4 }, rowsByCols: { 3: 4, 2: 4, 1: 4 } },
         ceiling: long ? { S: 6, M: 4, L: 4 } : CEILING, floor: (input.floors || {}).main,
+        // Cells sized to the problems (layout.js dense packing): a test of one-line facts in
+        // 57 mm cells left ~70% of every cell empty. Up to DN-1's 20 responses (16 at L).
+        dense: long ? false : DENSE,
     }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
 }
 
@@ -55,12 +59,13 @@ export function plan(input = {}) {
     const sections = [
         instr,
         gridPart(items.map((it) => planItem(it, { cols: L.cols, level: 0 })), {
+            // Every item in its own boxed cell (the 04-G "open array" drew the outer frame only,
+            // and the items floated in one big box: 2026-09-25 re-grade, C3/C4).
             cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1,
-            cls: 'open',                                   // 04-G: an open array, outer frame only
         }),
     ];
     // The layout's grid height is the page's (one instruction); a lone full grid fills by flex.
-    if (rows === L.rows) { sections[1].cls = 'open'; sections[1].height = ''; }
+    if (rows === L.rows) { sections[1].cls = ''; sections[1].height = ''; }
     return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, [{ sections }], {
         scaffoldLevel: 0,
         meta: { items: items.length, scoreOutOf: items.length, form, fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },

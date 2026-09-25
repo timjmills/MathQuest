@@ -40,7 +40,7 @@ export function prepare(it, info = {}) {
     const glyph = opGlyphOf(opOf(it.q || {}));
     const stem = ops.length >= 2 && glyph ? `${ops[0]} ${glyph} ${ops[1]} = ` : 'The answer is ';
     const render = (c, o = {}) => {
-        const work = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { shown }));
+        const work = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { shown, prompt: false }));
         return `<div class="mq-judge mq-tf">`
             + `<div class="mq-judge-work">${work}</div>`
             + judgeGroup('tf-judge', `${checkLine('tf-true', 'True', c, key, { graded: false })}${checkLine('tf-false', 'False', c, key, { graded: false })}`)

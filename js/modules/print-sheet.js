@@ -25,7 +25,7 @@
 import { generateQuestionFor } from './generate-question.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords } from './sheet/roles/practice.js';
@@ -72,6 +72,9 @@ function normaliseRequest(req = {}) {
             pages: s && s.pages ? clampInt(s.pages, 1, 10, 1) : null,
             columns: s && s.columns && s.columns !== 'auto' ? clampInt(s.columns, 1, 10, 'auto') : 'auto',
             instructionKey: s && s.instructionKey,
+            // Cells sized to their content (layout.js dense packing); `dense: false` keeps the
+            // plain 12.1 grid.
+            dense: req.dense !== false && !(s && s.dense === false),
         }))
         .filter((s) => s.skills.length);
     return {
@@ -213,6 +216,7 @@ const SOLID_STYLE = 'font-weight:700;color:#000;';
  * mat AFTER the trade its prompt asks for (one ten fewer, ten ones more).
  */
 function drawModelFor(q) {
+    if (!q) return null;
     const target = Math.floor(Number(q && (q.target !== undefined ? q.target : q.ans)));
     if (!Number.isFinite(target) || target < 0) return null;
     const places = Array.isArray(q.places) && q.places.length ? q.places : (target >= 100 ? [100, 10, 1] : [10, 1]);
@@ -226,10 +230,10 @@ function drawModelFor(q) {
 /** P8: `n` quick-draw symbols for one place (RP-31): a square, a stick or a circle. */
 function quickDraw(place, n) {
     const sym = place === 100
-        ? '<svg width="8mm" height="8mm" viewBox="0 0 10 10" style="display:block"><rect x="1" y="1" width="8" height="8" fill="none" stroke="#000" stroke-width="1"/></svg>'
+        ? '<svg width="8mm" height="8mm" viewBox="0 0 10 10" style="display:block"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1"/></svg>'
         : place === 10
-            ? '<svg width="2.4mm" height="14mm" viewBox="0 0 4 24" style="display:block"><line x1="2" y1="1" x2="2" y2="23" stroke="#000" stroke-width="1.6" stroke-linecap="round"/></svg>'
-            : '<svg width="4mm" height="4mm" viewBox="0 0 6 6" style="display:block"><circle cx="3" cy="3" r="2.2" fill="none" stroke="#000" stroke-width="0.9"/></svg>';
+            ? '<svg width="2.4mm" height="14mm" viewBox="0 0 4 24" style="display:block"><line x1="2" y1="1" x2="2" y2="23" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
+            : '<svg width="4mm" height="4mm" viewBox="0 0 6 6" style="display:block"><circle cx="3" cy="3" r="2.2" fill="none" stroke="currentColor" stroke-width="0.9"/></svg>';
     return Array.from({ length: Math.max(0, n) }, () => sym).join('');
 }
 
@@ -267,7 +271,7 @@ export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
         if (parts.length === boxSlots.length) {
             let k = 0;
             return html.replace(/(<span class="blank-box" data-ws-slot="[^"]*" data-ws-shape="box"[^>]*>)(<\/span>)/g,
-                (m, open, close) => `${open.replace(/>$/, ' data-ws-ink="solid">')}<b style="${INK_STYLE}">${escText(parts[k++])}</b>${close}`);
+                (m, open, close) => `${open.replace(/>$/, ` data-ws-ink="${inkAttr}">`)}<b style="${INK_STYLE}">${escText(parts[k++])}</b>${close}`);
         }
     }
 
@@ -281,7 +285,7 @@ export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
             let k = 0;
             const skip = boxes.length - digits.length;
             const filled = row
-                .replace(/^<div data-ws-slot="answer" data-ws-shape="boxes"/, '<div data-ws-slot="answer" data-ws-shape="boxes" data-ws-ink="solid"')
+                .replace(/^<div data-ws-slot="answer" data-ws-shape="boxes"/, `<div data-ws-slot="answer" data-ws-shape="boxes" data-ws-ink="${inkAttr}"`)
                 .replace(/<span data-ws-box="1"([^>]*)><\/span>/g, (m, attrs) => {
                     const d = k >= skip ? digits[k - skip] : '';
                     k++;
@@ -298,7 +302,7 @@ export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
         const model = drawModelFor(q);
         if (model) {
             let out = html.replace('class="ws-draw-mat" data-ws-slot="answer" data-ws-shape="draw"',
-                'class="ws-draw-mat" data-ws-slot="answer" data-ws-shape="draw" data-ws-ink="solid"');
+                `class="ws-draw-mat" data-ws-slot="answer" data-ws-shape="draw" data-ws-ink="${inkAttr}"`);
             for (const place of Object.keys(model)) {
                 const zoneRe = new RegExp(`(<div data-ws-zone="${place}" style="[^"]*")(><\\/div>)`);
                 out = out.replace(zoneRe, (m, open, close) => `${open.replace(/"$/, ';display:flex;flex-wrap:wrap;align-content:flex-start;justify-content:center;gap:1.2mm;padding:2mm;box-sizing:border-box;"')}>${quickDraw(Number(place), model[place])}</div>`);
@@ -312,14 +316,14 @@ export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
     const frames = html.match(/<svg class="ws-tenframe"[^>]*>[\s\S]*?<\/svg>/g) || [];
     if (frames.length && /^\d+$/.test(digits) && /data-ws-shape="draw"/.test(html)) {
         let left = Math.min(Number(digits), frames.length * 10);
-        let out = html.replace(/(data-ws-slot="answer" data-ws-shape="draw")/, '$1 data-ws-ink="solid"');
+        let out = html.replace(/(data-ws-slot="answer" data-ws-shape="draw")/, `$1 data-ws-ink="${inkAttr}"`);
         for (const fr of frames) {
             const n = Math.min(10, left);
             left -= n;
             let dots = '';
             for (let i = 0; i < n; i++) {
                 const cx = 5 + (i % 5) * 10, cy = 5 + Math.floor(i / 5) * 10;
-                dots += `<circle cx="${cx}" cy="${cy}" r="3.4" fill="#000"/>`;
+                dots += `<circle cx="${cx}" cy="${cy}" r="3.4" fill="currentColor"/>`;
             }
             out = out.replace(fr, fr.replace(/<\/svg>$/, `${dots}</svg>`));
         }
@@ -415,7 +419,14 @@ function hostItem(g, sectionIndex, size) {
      * slot can hold it, the value prints on an answer line under the cell - in both states, so
      * the geometry is still identical (AK-1).
      */
-    const render = (c, { cols = 2, shown, ink } = {}) => {
+    const render = (c, { cols = 2, shown, ink, prompt } = {}) => {
+        const html0 = draw(c, { cols, shown, ink });
+        // The cell's own instruction line goes when the page's instruction line already says it
+        // (BD-10: one instruction per section), or when the role asks (`prompt: false`: Error
+        // analysis and the thinking roles print their own instruction over finished work).
+        return (prompt === false || item.stripPrompt) && cellPrompt ? stripPrompt(html0) : html0;
+    };
+    const draw = (c, { cols = 2, shown, ink } = {}) => {
         const hasShown = shown !== undefined && shown !== null && shown !== '';
         let st = c.state;
         let wrong = c.wrong;
@@ -428,7 +439,10 @@ function hostItem(g, sectionIndex, size) {
         const html = legacy ? legacyClean(renderCell(q, ctx)) : renderCell(q, ctx);
         if (legacy && hasShown) {
             const v = String(shown);
-            const filled = legacyKeyFill(html.replace(STAMP_RE, ''), v === answer ? q0 : null, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid' });
+            // A wrong value is written as a pupil would have written it: a place-value mat draws
+            // the WRONG model, boxed slots take the wrong value, never the right parts.
+            const asQ = v === answer ? q0 : Object.assign({}, q0, { ans: v, target: v, keyParts: undefined, printAnswer: undefined });
+            const filled = legacyKeyFill(html.replace(STAMP_RE, ''), asQ, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid' });
             if (filled !== null) return filled;
             return html + shownLine(v, ink);
         }
@@ -461,8 +475,22 @@ function hostItem(g, sectionIndex, size) {
         const long = footprintClass(q, template, printSize) === 'long';
         fp = Object.assign({}, fp, { measure: true, hMm: null, maxCols: printSize === 'spacious' ? 1 : long ? 2 : 6, size: printSize });
     }
-    return {
+    // The cell's own leading instruction line (legacy markup prints the question's stem first:
+    // "Write the missing number.", "Add.", "Count. Write how many."). Only an item-independent
+    // imperative is a candidate - no digits, no question - so "Draw 9 counters ..." stays.
+    let cellPrompt = null;
+    if (legacy) {
+        try {
+            const blankHtml = legacyClean(renderCell(q, resolveCtx({ mode: 'print', size, look: 'ican', state: 'blank' })));
+            const m = PROMPT_RE.exec(blankHtml);
+            if (m && isGenericPrompt(m[2])) cellPrompt = m[2].trim();
+        } catch (e) { cellPrompt = null; }
+    }
+    const item = {
         q, render, template, legacy,
+        cellPrompt,
+        promptKey: cellPrompt ? libraryKeyOf(cellPrompt) : '',
+        stripPrompt: false,
         section: sectionIndex,
         skill: `${q.categoryId || ''}:${q.skillId || ''}`,
         answerType: q.answerType || '',
@@ -473,6 +501,52 @@ function hostItem(g, sectionIndex, size) {
         key,
         canShow,
     };
+    return item;
+}
+
+/* ------------------------------------------------------ the cell's own instruction line */
+
+/** The first stem line of a legacy cell: a plain `<div>` straight after `.problem-content`. */
+const PROMPT_RE = /(<div class="problem-content"[^>]*>\s*)<div (?:class="p-prompt"[^>]*|style="font-size:1rem;margin-bottom:8px;")>([^<]*)<\/div>/;
+const stripPrompt = (html) => html.replace(PROMPT_RE, '$1');
+const normText = (t) => String(t || '').replace(/_/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+
+/** An instruction that is the same for every item: an imperative, no digits, not a question. */
+function isGenericPrompt(text) {
+    const t = String(text || '').trim();
+    if (!t || /\d|\?/.test(t) || t.split(/\s+/).length > 12) return false;
+    return /^(Add|Subtract|Multiply|Divide|Write|Count|Circle|Draw|Check|Fill in|Find|Solve|Use|Read|Look|Trace|Shade|Mark|Match|Measure|Complete|Finish|Show|Make|Say)\b/.test(t);
+}
+
+/**
+ * The library key whose string the stem says (P-14: page code never composes an instruction; it
+ * can only ask for a key). A few legacy stems say a library instruction in other words.
+ */
+const PROMPT_SYNONYMS = Object.freeze({
+    'count. write how many.': 'count-write',
+    'count. write the number.': 'count-write',
+    'complete the fact family.': '',
+});
+function libraryKeyOf(text) {
+    const n = normText(text);
+    if (Object.prototype.hasOwnProperty.call(PROMPT_SYNONYMS, n)) return PROMPT_SYNONYMS[n];
+    for (const [k, v] of Object.entries(INSTRUCTION_LIBRARY)) if (!/\{/.test(v) && normText(v) === n) return k;
+    return '';
+}
+
+/**
+ * BD-10 for the items of one section: when the cell's stem IS a library instruction, the
+ * section's instruction line prints it (the item's `instructionKey`) and the cell drops it; when
+ * the section already prints the skill's own (non-default) instruction, the stem repeats it and
+ * is dropped too. A stem the page line does not cover stays in the cell.
+ */
+function settlePrompts(items, sectionKey) {
+    for (const it of items) {
+        if (!it.cellPrompt) continue;
+        if (it.promptKey) { it.instructionKey = it.promptKey; it.stripPrompt = true; }
+        else if (sectionKey && !/^default-/.test(sectionKey)) it.stripPrompt = true;
+    }
+    return items;
 }
 
 /**
@@ -552,6 +626,18 @@ function measureItems(items, { size, look, colsList }) {
                         if ((ecs.overflowX === 'hidden' || ecs.overflowX === 'clip') && el.scrollWidth > el.clientWidth + 1) fits = false;
                         if ((ecs.overflowY === 'hidden' || ecs.overflowY === 'clip') && el.scrollHeight > el.clientHeight + 1) fits = false;
                         if (el.tagName === 'svg' || el.tagName === 'IMG' || el.tagName === 'CANVAS') pics.push(er.width);
+                        // A chart or table squeezed into a narrow column: its numbers touch the
+                        // cell walls and run together ("100110"). A leaf of a grid or table whose
+                        // text fills its own box is cramped (only checked narrower than 1 column).
+                        if (c !== cols[0] && !el.children.length && el.textContent.trim().length >= 2) {
+                            const pd = el.parentElement ? getComputedStyle(el.parentElement).display : '';
+                            if (/grid|table/.test(pd) || /table-cell/.test(ecs.display)) {
+                                const rg = document.createRange();
+                                rg.selectNodeContents(el);
+                                const tw = rg.getBoundingClientRect().width;
+                                if (tw > er.width - 0.8 * PX_PER_MM) fits = false;
+                            }
+                        }
                     }
                     // The key's answer stamp sits at the foot of the cell and costs no layout
                     // (AK-1); its line is reserved under the content so it never covers it.
@@ -572,6 +658,19 @@ function measureItems(items, { size, look, colsList }) {
                 }
                 it.measured = it.measured || {};
                 it.measured[c] = { hMm: Math.ceil(best.hMm * 10) / 10, fits: best.fits };
+            }
+        }
+        // A MINIMUM COLUMN WIDTH for legacy markup that reflows instead of overflowing (an area
+        // model whose part boxes wrap into a pile, a chart window whose rows break): when a
+        // narrower column makes the cell much taller than it is at one column, the content has
+        // collapsed, and that column count does not fit (DN-10: content never shrinks or
+        // re-arranges to fit). A wrapped line of text costs a few mm and is not a collapse.
+        for (const it of items) {
+            const m = it.measured || {};
+            const base = m[cols[0]] && m[cols[0]].hMm;
+            if (!base) continue;
+            for (const c of cols.slice(1)) {
+                if (m[c] && m[c].hMm > base * 1.3 && m[c].hMm - base > 12) m[c].fits = false;
             }
         }
     } finally {
@@ -600,7 +699,9 @@ async function fontsReady() {
 
 /** The column counts a section's layout may choose, so each gets measured. */
 function candidateCols(columns) {
-    if (columns === 'auto') return [1, 2];
+    // Dense packing (layout.js) may take an Auto section up to DENSE_MAX_COLS columns, so every
+    // count it may choose is measured (an unmeasured legacy count would be read as fitting).
+    if (columns === 'auto') return [1, 2, 3, 4];
     return Array.from({ length: Math.max(1, columns) }, (_, i) => i + 1);
 }
 
@@ -630,7 +731,7 @@ function skillMeta(sk, q) {
 
 /** One-section layout for a set of host items, exactly as the role will compute it. */
 function layoutOf(role, section, items, n, ctx) {
-    return resolveSectionLayout({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH }, items, ctx.paper, LIVE_W_MM, {
+    return resolveSectionLayout({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense }, items, ctx.paper, LIVE_W_MM, {
         size: n.size, look: n.look, header: ctx.header,
     });
 }
@@ -718,7 +819,7 @@ export async function buildSheet(req = {}) {
 
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
         const gen = generateRun(sec.skills, count, baseSeed, extra);
-        return gen.map((g) => hostItem(g, sectionIdx, n.size));
+        return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size)], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
     };
 
     const notes = [];
@@ -869,7 +970,7 @@ export async function buildSheet(req = {}) {
     const input = {
         items: hostItems,
         skills,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
@@ -1000,7 +1101,7 @@ async function buildRoleSheet(n, metaOf) {
             next += batch;
             for (const g of gen) {
                 if (out.length >= want) break;
-                const it = hostItem(g, 0, n.size);
+                const it = settlePrompts([hostItem(g, 0, n.size)], metaOf(g.skill).instructionKey)[0];
                 if (needsShow && pass < 3 && !it.canShow()) continue;
                 const k = out.length;
                 const prepared = typeof mod.prepare === 'function'
