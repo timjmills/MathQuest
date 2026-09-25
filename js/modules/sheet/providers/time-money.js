@@ -41,12 +41,17 @@ const LETTERS = ['A', 'B', 'C', 'D', 'E'];
  * or latest first; notes or coins). `choose(q)` names one of the `defs` by key; the first def is
  * the default, used when the role asks with no item.
  */
-function stringsBy(defs, choose) {
+function stringsBy(defs, choose, chooseRef = null) {
     const fns = Object.fromEntries(Object.entries(defs).map(([k, d]) => [k, strings(d)]));
     const first = Object.keys(defs)[0];
     const fn = (ref = {}) => {
         let k = first;
-        try { if (ref && ref.q) k = choose(ref.q) || first; } catch (e) { k = first; }
+        // `chooseRef(ref)`: a role that asks with no item (the sheet header) still names the
+        // item's kind through `ref.printFormat` (money_count: coins, notes, or both).
+        try {
+            if (ref && ref.q) k = choose(ref.q) || first;
+            else if (ref && chooseRef) k = chooseRef(ref) || first;
+        } catch (e) { k = first; }
         const out = (fns[k] || fns[first])(ref);
         const sayFill = out.sayFill;
         out.sayFill = (item) => { let kk = first; try { kk = choose(item) || first; } catch (e) { /* default */ } return (fns[kk] || fns[first])({}).sayFill(item) || sayFill(item); };
@@ -438,7 +443,10 @@ registerSkill('measurement:money_count', {
         two: { iCan: 'I Can count notes and coins', instructionKey: 'money-two',
             steps: ['Count the notes.', 'Then count the coins.', 'Write the two numbers.'],
             say: '__ and __.', sayValues: (q) => { const p = payloadOf(q); return [sum(p.notes), sum(p.coins)]; } },
-    }, (q) => { const p = payloadOf(q); return p.answer === 'two' ? 'two' : p.answer === 'major' ? 'notes' : 'coins'; }),
+    }, (q) => { const p = payloadOf(q); return p.answer === 'two' ? 'two' : p.answer === 'major' ? 'notes' : 'coins'; },
+    // The sheet header asks with the first item's printFormat only (gen-time-money.js sets
+    // tm-notes / tm-notes-coins), so a page of notes is titled and instructed for notes.
+    (ref) => (ref.printFormat === 'tm-notes-coins' ? 'two' : ref.printFormat === 'tm-notes' ? 'notes' : 'coins')),
     misconceptions: ['M-M1', 'M-M2', 'M-M5', 'M-M11', 'counted-twice'],
     workedSteps: countSteps,
     wrongAnswer: countWrong,

@@ -29,6 +29,19 @@
 export const OPTION_TYPES = ['int', 'enum', 'bool', 'set'];
 
 // ---------------------------------------------------------------------------
+// FOLDED CONTROLS (option-panel round 3, 2026-09-25)
+// ---------------------------------------------------------------------------
+// A panel may hold at most five controls (OPTIONS-RUBRIC.md O5). Where a skill had more, two or
+// three old controls become one (the function table's "Rows" and "In numbers" become "Table").
+// The old options stay in the model with `hidden: true` — so a share code written before still
+// decodes through its own key — and a FOLD rewrites their values into the new control inside
+// normalizeOptions(), then drops them (they fall back to their defaults, which a code never
+// writes). `fold(raw)` receives the caller's raw object (a decoded code holds only what differed
+// from the old defaults) and returns it rewritten. Each family registers its own fold beside its
+// options.
+export const OPTION_FOLDS = {};
+
+// ---------------------------------------------------------------------------
 // Shared option definitions, so families stay consistent
 // ---------------------------------------------------------------------------
 
@@ -1066,14 +1079,25 @@ const P11_K2_OPTIONS = {
         },
     ],
     'composing:number_bonds': [
-        _opsBand([5, 10, 20], 10, { label: 'Bonds to', help: 'The largest whole.' }),
+        // Capped at the skill's name ("within 10", OPTIONS-CRITIC-R2 §5 #10): bonds to 20 are the
+        // next skill up, not a value of this one.
+        _opsBand([5, 10], 10, { label: 'Bonds to', help: 'The largest whole. Bonds to 5 first, then to 10.' }),
         {
             id: 'unknown', label: 'What is missing', type: 'enum', default: 'mixed',
             values: [{ v: 'answer', l: 'The whole' }, { v: 'first', l: 'The first part' }, { v: 'second', l: 'The second part' }, { v: 'mixed', l: 'Mixed' }],
         },
     ],
-    'composing:make_ten': [levelSubset([1, 0], 1, 'Level 1 shows the ten frame; level 0 is the number sentence alone (6 + __ = 10).')],
-    'composing:teen_compose': [levelSubset([1, 0], 1, 'Level 1 shows the full ten frame and the ones; level 0 is the number sentence alone.')],
+    // OPTIONS-CRITIC-R2 §5 #11: a number-size ladder beside the support level on both.
+    'composing:make_ten': [
+        _opsBand([5, 10, 20], 10, { label: 'Make', labels: { 5: 'Make 5 (a five frame)', 10: 'Make 10 (a ten frame)', 20: 'Make 20 (two ten frames, the first one full)' },
+            help: 'The number the pupil makes. Make 5 comes first; make 20 fills the second ten frame.' }),
+        levelSubset([1, 0], 1, 'Level 1 shows the frame; level 0 is the number sentence alone (6 + __ = 10).'),
+    ],
+    'composing:teen_compose': [
+        _opsBand([15, 19], 19, { label: 'Teen numbers to', labels: { 15: '15 (10 and up to 5 more)', 19: '19 (10 and up to 9 more)' },
+            help: 'Up to 15 keeps the loose ones to one row of five.' }),
+        levelSubset([1, 0], 1, 'Level 1 shows the full ten frame and the ones; level 0 is the number sentence alone.'),
+    ],
     'composing:ten_frame_build': [_k2CountTo([5, 10], 10)],
     'composing:base10_build': [_opsBand([20, 50, 99], 99, { label: 'Numbers to', help: 'The largest number to build.' })],
     'composing:base10_regroup': [_opsBand([50, 99], 99, { label: 'Numbers to', help: 'The largest number to build and trade.' })],
@@ -1403,28 +1427,40 @@ const P10_TM_OPTIONS = {
         help: '"Total minutes" adds the conversion 1 hour = 60 minutes (4.MD.A.1).',
     }, _tmSpan([2, 3, 5], 3), _tmStep([15, 5, 1], 15), _tmSupport(), _tmNoon()],
     'measurement:elapsed_find_start': [_tmSpan([2, 3, 5], 3), _tmStep([15, 5, 1], 15), _tmSupport(), _tmNoon()],
+    // FIVE CONTROLS (option-panel round 3, OPTIONS-CRITIC-R2 §5 #6 / #16). It had seven, and two
+    // of them set the size of the page against each other ("Totals to 25" beside "Notes, totals
+    // to 500"). Now "What to count" says WHAT is counted, "Totals to" alone says how big, and the
+    // coins' arrangement and their count-by-five dots are one "Coins set out" ladder, most help
+    // first. "Coins at most" is retired: 500 deals up to ten coins in a row. The old kinds, the
+    // dots and the coin count stay hidden so an old code decodes (_mcFold).
     'measurement:money_count': [_tmCurrency(), {
         id: 'kind', label: 'What to count', type: 'enum', default: 'like', group: 'difficulty',
         values: [
-            { v: 'like', l: 'Coins that are all the same' }, { v: 'two', l: 'Two kinds of coin' },
-            { v: 'mixed', l: 'Mixed coins' }, { v: 'notes', l: 'Notes, totals to 20' },
-            { v: 'notes100', l: 'Notes, totals to 100' }, { v: 'notes500', l: 'Notes, totals to 500' },
-            { v: 'notes-coins', l: 'Notes and coins (write two numbers)' },
+            { v: 'like', l: 'Coins, all the same (six 10s)' }, { v: 'two', l: 'Coins, two kinds' },
+            { v: 'mixed', l: 'Coins, mixed' }, { v: 'note', l: 'Notes' },
+            { v: 'both', l: 'Notes and coins (write two numbers)' },
         ],
-        help: 'Teach them in this order: one kind, two kinds, mixed; notes to 20, 100, 500; then notes and coins.',
-    }, _tmCoinSet('All ticked uses the usual coins. Tick 10 alone for "count 10s".'), _tmMoneyBand([25, 50, 100], 100), {
-        id: 'tiles', label: 'Coins at most', type: 'enum', default: 6, group: 'difficulty',
-        values: [{ v: 6, l: '6 coins' }, { v: 10, l: '10 coins' }],
-        help: '6 fit a half-width cell; 10 take a full-width row.',
+        help: 'Teach them in this order: one kind of coin, two kinds, mixed; then notes; then notes and coins together.',
     }, {
-        id: 'order', label: 'Coins set out', type: 'enum', default: 'largest', group: 'difficulty',
-        values: [{ v: 'largest', l: 'Biggest first' }, { v: 'scrambled', l: 'Scattered (the pupil starts with the biggest)' }],
-        help: 'Scattered coins are harder: the pupil has to find the biggest coin first.',
-    }, {
-        id: 'support', label: 'Count-by-five dots', type: 'enum', default: 'auto', group: 'support',
-        values: [{ v: 'auto', l: 'Only on Model and Guided pages' }, { v: 'dots', l: 'On every page' }],
-        help: 'Dots under the number on each coin, one for each 5: a hint that fades.',
-    }],
+        ..._tmMoneyBand([20, 25, 50, 100, 500], 100),
+        values: [20, 25, 50, 100, 500].map(v => ({ v, l: String(v) })),
+        helpShort: 'The biggest number the pupil writes. Coins count in coin units (100 make one riyal or dollar); notes count in whole riyals or dollars.',
+        help: 'The biggest total the pupil writes. Coins are counted in coin units (100 is one riyal or one dollar), notes in whole riyals or dollars, so "100" is up to one dollar of coins, or up to 100 dollars of notes. 500 lets a coin page hold up to ten coins in a row.',
+    }, _tmCoinSet('All ticked uses the usual coins. Tick 10 alone for "count 10s". The coins in "Notes and coins" come from here too.'), {
+        id: 'order', label: 'Coins set out', type: 'enum', default: 'largest', group: 'support',
+        values: [
+            { v: 'largest-dots', l: 'Biggest first, count-by-five dots on every page' },
+            { v: 'largest', l: 'Biggest first (dots on Model and Guided pages only)' },
+            { v: 'scrambled-dots', l: 'Scattered, with the count-by-five dots' },
+            { v: 'scrambled', l: 'Scattered: the pupil finds the biggest first' },
+        ],
+        helpShort: 'Most help first. Dots under each coin count by fives; scattered coins make the pupil find the biggest first.',
+        help: 'Dots under the number on each coin, one for each 5, are a hint that fades on Independent pages unless kept here. Scattered coins are harder: the pupil has to find the biggest coin first. Notes are always set out biggest first.',
+    },
+    // ---- hidden: the retired controls, kept so an old code decodes (folded by _mcFold) ----
+    { id: 'tiles', hidden: true, label: 'Coins at most', type: 'enum', default: 6, values: [{ v: 6, l: '6' }, { v: 10, l: '10' }] },
+    { id: 'support', hidden: true, label: 'Count-by-five dots', type: 'enum', default: 'auto',
+        values: [{ v: 'auto', l: 'auto' }, { v: 'dots', l: 'dots' }] }],
     'measurement:money': [_tmCurrency(), _tmMoneyBand([500, 2000, 10000], 2000), _tmCents(100), _tmRegroup('none')],
     'measurement:money_change': [_tmCurrency(), _tmMoneyBand([100, 500, 2000, 10000], 500), _tmCents(25), _tmRegroup('mixed'), {
         id: 'paid', label: 'Paid with', type: 'enum', default: 'unit', group: 'difficulty',
@@ -1499,6 +1535,20 @@ for (const id of ['elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visua
     }, _tmSupport()];
 }
 Object.assign(SKILL_OPTIONS, P10_TM_OPTIONS);
+// money_count's retired values, in the five controls: the notes kinds carried their own totals
+// (to 20 / 100 / 500), the dots were their own control, and "Coins at most: 10" had its own.
+OPTION_FOLDS['measurement:money_count'] = (raw) => {
+    const NOTES = { notes: ['note', 20], notes100: ['note', 100], notes500: ['note', 500], 'notes-coins': ['both', 20] };
+    if (NOTES[raw.kind]) { const [k, b] = NOTES[raw.kind]; raw.kind = k; raw.band = b; }
+    if (raw.support === 'dots') {
+        const base = raw.order === 'scrambled' || raw.order === 'scrambled-dots' ? 'scrambled' : 'largest';
+        raw.order = `${base}-dots`;
+    }
+    delete raw.support;
+    // An old "Coins at most: 10" stays in the hidden `tiles`, which the generator still honours
+    // (Reset to default clears it); a new page gets ten coins from "Totals to 500".
+    return raw;
+};
 
 /** The P10 ids js/modules/gen-time-money.js generates (the audit's `tm` family). */
 export const TM_SKILLS = Object.freeze([
@@ -1521,29 +1571,43 @@ export const TM_SKILLS = Object.freeze([
 // THE BAND caps every number in the table — In, Out, and the rule's own numbers — the same way
 // the place-value band does (pvCap): Max Number only lowers it when the teacher has set Max
 // Number below the band.
+//
+// FIVE CONTROLS (option-panel round 3, OPTIONS-CRITIC-R2 §5 #7). The panel had nine. Nothing a
+// teacher could choose is lost; the nine are folded into five:
+//   Task      the task and the Check row          (was task + response)
+//   Rules     the rule kinds, one- and two-step   (was ops + step)
+//   Numbers to                                     (unchanged)
+//   Table     the rows and the In-number order    (was tiles + order)
+//   Support   frame / line, with or without the machine picture   (was support + pictures)
+// The old seven stay hidden so a code written before still decodes; _ftFold rewrites them.
+const _FT_TASKS = [
+    ['outputs', 'Complete the table (the rule is given, write each Out)'],
+    ['rule', 'Find the rule (every row given, write the rule)'],
+    ['inputs', 'Find the missing In numbers (work the rule backward)'],
+    ['mixed', 'Mixed blanks (some In and some Out missing)'],
+];
+const _FT_RULES = [
+    ['+', '+ (x + 7)'], ['-', '− (x − 3)'], ['x', '× (x × 4)'], ['/', '÷ (x ÷ 2, exact only)'],
+    ['x+', 'Two steps: × then + (x × 2 + 1)'], ['x-', 'Two steps: × then − (x × 3 − 2)'],
+    ['/+', 'Two steps: ÷ then + (x ÷ 2 + 5)'], ['/-', 'Two steps: ÷ then − (x ÷ 2 − 1)'],
+];
+/** A table value: rows × 10, then 1 = In numbers in order, 2 = out of order (41 = 4 rows, in order). */
+export const ftTableValue = (rows, scrambled) => rows * 10 + (scrambled ? 2 : 1);
 const _ftOptions = (easy) => [
     {
-        id: 'task', label: 'Task', type: 'enum', default: easy ? 'outputs' : 'rule', group: 'layout',
+        id: 'ftTask', label: 'Task', type: 'enum', default: easy ? 'outputs' : 'rule-check', group: 'difficulty',
         values: [
-            { v: 'outputs', l: 'Complete the table (the rule is given, write each Out)' },
-            { v: 'rule', l: 'Find the rule (every row given, write the rule)' },
-            { v: 'inputs', l: 'Find the missing In numbers (work the rule backward)' },
-            { v: 'mixed', l: 'Mixed blanks (some In and some Out missing)' },
+            ..._FT_TASKS.flatMap(([v, l]) => [{ v, l }, { v: `${v}-check`, l: `${l.replace(/ \(.*$/, '')}, then a Check row` }]),
             { v: 'make', l: 'Make your own (the rule is given, the pupil chooses the In numbers)' },
         ],
-        help: 'One task per page, so the instruction says one thing. "Make your own" accepts any rows that follow the rule.',
+        helpShort: 'One task per page. A Check row adds one more In number under the table to test the rule on.',
+        help: 'One task per page, so the instruction says one thing. A Check row gives one more In number under the table to test the rule on. "Make your own" accepts any rows that follow the rule.',
     },
     {
-        id: 'ops', label: 'Operations in the rule', type: 'set', default: easy ? ['+', '-'] : ['+', '-', 'x', '/'], group: 'difficulty',
-        values: [{ v: '+', l: '+ (add)' }, { v: '-', l: '− (subtract)' }, { v: 'x', l: '× (multiply)' }, { v: '/', l: '÷ (divide, exact only)' }],
-        allLabel: 'All four',
-        help: 'The page deals the ticked operations in turn. Division rules always divide exactly.',
-    },
-    {
-        id: 'step', label: 'Steps in the rule', type: 'set', default: easy ? [1] : [1, 2], group: 'difficulty',
-        values: [{ v: 1, l: 'One step (x + 7)' }, { v: 2, l: 'Two steps (x × 2 + 1)' }],
-        allLabel: 'Both, alternating',
-        help: 'A two-step rule multiplies or divides, then adds or subtracts (the ticked × ÷ and + −, or × and + when none is ticked).',
+        id: 'ftRules', label: 'Rules', type: 'set', default: easy ? ['+', '-'] : _FT_RULES.map(([v]) => v), group: 'difficulty',
+        values: _FT_RULES.map(([v, l]) => ({ v, l })),
+        allLabel: 'Every kind, one- and two-step',
+        help: 'The page deals the ticked kinds of rule in turn. One-step rules come first; a two-step rule multiplies or divides, then adds or subtracts. Division always divides exactly.',
     },
     {
         id: 'band', label: 'Numbers to', type: 'enum', default: easy ? 20 : 100, group: 'difficulty',
@@ -1551,37 +1615,79 @@ const _ftOptions = (easy) => [
         help: 'The biggest number anywhere in the table. Max Number only lowers it if you set Max Number below this.',
     },
     {
-        id: 'tiles', label: 'Rows in the table', type: 'enum', default: easy ? 4 : 3, group: 'layout',
-        values: [{ v: 3, l: '3 rows' }, { v: 4, l: '4 rows' }, { v: 5, l: '5 rows' }],
-        help: 'Three rows are enough to find a rule. More rows are more practice; a tall table '
-            + '(5 rows, a Check row and a two-step rule together) fits four tables to a page instead of six.',
-    },
-    {
-        id: 'order', label: 'In numbers', type: 'enum', default: easy ? 'inorder' : 'scrambled', group: 'difficulty',
-        values: [{ v: 'inorder', l: 'In order, smallest first' }, { v: 'scrambled', l: 'Out of order' }],
-        help: 'Out of order stops the pupil just following the Out column down: each row has to use the rule.',
+        id: 'ftTable', label: 'Table', type: 'enum', default: easy ? ftTableValue(4, false) : ftTableValue(3, true), group: 'difficulty',
+        values: [3, 4, 5].flatMap((r) => [
+            { v: ftTableValue(r, false), l: `${r} rows, In numbers in order` },
+            { v: ftTableValue(r, true), l: `${r} rows, In numbers out of order` },
+        ]),
+        helpShort: 'Three rows are enough to find a rule. Out of order stops the pupil just reading down the Out column.',
+        help: 'Three rows are enough to find a rule. Out of order stops the pupil just following the Out column down. A tall table fits four to a page instead of six.',
     },
     {
         id: 'support', label: 'Support', type: 'enum', default: 'frame', group: 'support',
         values: [
-            { v: 'frame', l: 'Frame (the rule on each In number; the rule box x ○ □)' },
-            { v: 'line', l: 'Line (just In and Out; the rule written on a line)' },
+            { v: 'frame', l: 'Frame and machine picture' },
+            { v: 'frame-bare', l: 'Frame only' },
+            { v: 'line', l: 'Line and machine picture' },
+            { v: 'line-bare', l: 'Line only (no help)' },
         ],
-        help: 'The frame is the support: completing, a middle column shows "3 + 7"; finding the rule, '
-            + 'a circle for the sign and a box for the number. The line is the fade.',
+        helpShort: 'Most help first. The frame shows the rule on each In number; the line is the fade.',
+        help: 'The frame: completing, a middle column shows "3 + 7"; finding the rule, a circle for the sign and a box for the number. '
+            + 'The machine picture is a small In → [rule] → Out drawing above the table. The line is the fade.',
     },
-    {
-        id: 'pictures', label: 'Function machine picture', type: 'bool', default: true, group: 'support',
-        help: 'A small In → [rule] → Out machine drawn above the table. Off prints the rule as a line.',
-    },
-    {
-        id: 'response', label: 'Check row', type: 'enum', default: easy ? 'standard' : 'check', group: 'layout',
-        values: [{ v: 'standard', l: 'No check row' }, { v: 'check', l: 'Add a Check row (a new In number to test the rule)' }],
-        help: 'The Check row gives one more In number under the table, so the pupil tests the rule on it. Not used with "Make your own".',
-    },
+    // ---- hidden: the retired controls, kept so an old code decodes (folded by _ftFold) ----
+    { id: 'task', hidden: true, label: 'Task', type: 'enum', default: easy ? 'outputs' : 'rule', group: 'layout',
+        values: ['outputs', 'rule', 'inputs', 'mixed', 'make'].map((v) => ({ v, l: v })) },
+    { id: 'ops', hidden: true, label: 'Operations', type: 'set', default: easy ? ['+', '-'] : ['+', '-', 'x', '/'],
+        values: ['+', '-', 'x', '/'].map((v) => ({ v, l: v })) },
+    { id: 'step', hidden: true, label: 'Steps', type: 'set', default: easy ? [1] : [1, 2], values: [{ v: 1, l: '1' }, { v: 2, l: '2' }] },
+    { id: 'tiles', hidden: true, label: 'Rows', type: 'enum', default: easy ? 4 : 3, values: [3, 4, 5].map((v) => ({ v, l: String(v) })) },
+    { id: 'order', hidden: true, label: 'In numbers', type: 'enum', default: easy ? 'inorder' : 'scrambled',
+        values: [{ v: 'inorder', l: 'inorder' }, { v: 'scrambled', l: 'scrambled' }] },
+    { id: 'pictures', hidden: true, label: 'Machine picture', type: 'bool', default: true },
+    { id: 'response', hidden: true, label: 'Check row', type: 'enum', default: easy ? 'standard' : 'check',
+        values: [{ v: 'standard', l: 'standard' }, { v: 'check', l: 'check' }] },
 ];
+const _FT_LEGACY = ['task', 'ops', 'step', 'tiles', 'order', 'pictures', 'response'];
+const _has = (o, k) => Object.prototype.hasOwnProperty.call(o, k) && o[k] !== undefined;
+/** The fold: an old code's task / ops / step / tiles / order / pictures / response, in the new controls. */
+const _ftFold = (easy) => (raw) => {
+    const old = {};
+    for (const d of _ftOptions(easy)) if (d.hidden) old[d.id] = d.default;
+    const given = _FT_LEGACY.filter((k) => _has(raw, k) && JSON.stringify(raw[k]) !== JSON.stringify(old[k]));
+    if (!given.length) { for (const k of _FT_LEGACY) delete raw[k]; return raw; }
+    const eff = { ...old };
+    for (const k of given) eff[k] = raw[k];
+    const touched = (...ks) => ks.some((k) => given.includes(k));
+    if (touched('task', 'response') && !_has(raw, 'ftTask')) {
+        raw.ftTask = eff.task === 'make' || eff.response !== 'check' ? eff.task : `${eff.task}-check`;
+    }
+    if (touched('ops', 'step') && !_has(raw, 'ftRules')) {
+        const ops = Array.isArray(eff.ops) && eff.ops.length ? eff.ops : ['+', '-', 'x', '/'];
+        const steps = Array.isArray(eff.step) && eff.step.length ? eff.step : [1, 2];
+        const out = [];
+        if (steps.includes(1)) out.push(...ops);
+        if (steps.includes(2)) {
+            const M = ops.filter((o) => o === 'x' || o === '/'), A = ops.filter((o) => o === '+' || o === '-');
+            for (const m of (M.length ? M : ['x'])) for (const a of (A.length ? A : ['+'])) out.push(m + a);
+        }
+        raw.ftRules = _FT_RULES.map(([v]) => v).filter((v) => out.includes(v));
+    }
+    if (touched('tiles', 'order') && !_has(raw, 'ftTable')) {
+        const rows = [3, 4, 5].includes(Number(eff.tiles)) ? Number(eff.tiles) : 4;
+        raw.ftTable = ftTableValue(rows, eff.order === 'scrambled');
+    }
+    if (touched('pictures') && eff.pictures === false) {
+        const sup = raw.support === 'line' ? 'line' : raw.support === 'frame' || !_has(raw, 'support') ? 'frame' : null;
+        if (sup) raw.support = `${sup}-bare`;
+    }
+    for (const k of _FT_LEGACY) delete raw[k];
+    return raw;
+};
 SKILL_OPTIONS['algebra:function_table_easy'] = _ftOptions(true);
 SKILL_OPTIONS['algebra:function_table_hard'] = _ftOptions(false);
+OPTION_FOLDS['algebra:function_table_easy'] = _ftFold(true);
+OPTION_FOLDS['algebra:function_table_hard'] = _ftFold(false);
 // ============================ end function tables ============================
 // ===========================================================================
 // P12 · EVERY OTHER FAMILY  (design/audit/OPTIONS-RUBRIC.md, 2026-09-25)
@@ -2504,6 +2610,8 @@ export const rangeOption = (values) => ({
         + 'Only the numbers that really change this skill\'s problems are listed.',
 });
 
+// Decimal skills that live outside the decimals category (the decimals review of Mixed FDP).
+const DECIMAL_SKILLS_ELSEWHERE = new Set(['decimals_all']);
 const DECIMAL_LABELS = { 0: 'Whole numbers', 1: 'Tenths (1 place)', 2: 'Hundredths (2 places)', 3: 'Thousandths (3 places)' };
 export const decimalsOption = (values) => ({
     id: 'decimals', label: 'Decimal places', type: 'enum', default: null,
@@ -2539,9 +2647,16 @@ function _measuredOptions(categoryId, skillId, own) {
     const ids = new Set(own.map(o => o.id));
     const out = [];
     if (Array.isArray(d.range) && d.range.length > 1 && !ids.has('range') && !own.some(o => OWNS_ITS_NUMBERS.has(o.id))) {
-        out.push(rangeOption(d.range));
+        // A review's own "Numbers, for the whole review" (poolSize) pitches every member, so its
+        // measured Max Number is not shown beside it; it stays (hidden) so an old code still decodes.
+        out.push(own.some(o => o.id === 'poolSize') ? { ...rangeOption(d.range), hidden: true } : rangeOption(d.range));
     }
-    if (Array.isArray(d.decimals) && d.decimals.length > 1 && !ids.has('decimals')) out.push(decimalsOption(d.decimals));
+    if (Array.isArray(d.decimals) && d.decimals.length > 1 && !ids.has('decimals')) {
+        // A decimals skill deals decimals at the app's "whole numbers" setting too, so its null
+        // value must not read "Use the Decimals setting (now whole numbers)" (OPTIONS-CRITIC-R2 §5 #9).
+        const own = categoryId === 'decimals' || DECIMAL_SKILLS_ELSEWHERE.has(skillId);
+        out.push(own ? { ...decimalsOption(d.decimals), nullLabel: 'Tenths and hundredths (this skill\'s own)' } : decimalsOption(d.decimals));
+    }
     return out;
 }
 
@@ -2569,8 +2684,13 @@ export function offeredOptionsFor(categoryId, skillId) {
     // measured Max Number stays in the model (old share codes decode) but is not shown beside it.
     const sized = own.some(o => o.ownsNumbers);
     for (const o of optionsFor(categoryId, skillId)) {
+        // A `hidden` option is a retired control folded into another one (OPTION_FOLDS below): it
+        // stays in the model so an old share code still decodes, but the teacher never sees it.
+        if (o.hidden) continue;
         if (sized && o.id === 'range' && !ownIds.has('range')) continue;
         if (ownIds.has(o.id) || o.id !== 'level') { out.push(o); continue; }
+        // A review's own "Support, for the whole review" sets every member's level already.
+        if (ownIds.has('poolSupport')) continue;
         // The universal level: only the levels measured to draw something different.
         if (d && Array.isArray(d.level) && d.level.length > 1) out.push(levelSubset(d.level, 1));
     }
@@ -2592,6 +2712,10 @@ export function normalizeOptions(categoryId, skillId, opts) {
     const defs = optionsFor(categoryId, skillId);
     const out = defaultOptions(categoryId, skillId);
     if (!opts || typeof opts !== 'object') return out;
+    // Retired controls folded into a newer one: an old code's values are rewritten into the
+    // control that now carries them before anything else reads them (see OPTION_FOLDS).
+    const fold = OPTION_FOLDS[`${categoryId}:${skillId}`];
+    if (fold) { try { opts = fold({ ...opts }) || opts; } catch (e) { /* keep opts as given */ } }
     for (const def of defs) {
         if (!(def.id in opts)) continue;
         const v = opts[def.id];
