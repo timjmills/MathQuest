@@ -31,7 +31,8 @@ const MINUS = '−';
 function geometry(p, ctx) {
     const res = p.op === '-' ? p.a - p.b : p.a + p.b;
     const whole = (v) => String(Math.floor(v / 100));
-    const nW = Math.max(whole(p.a).length, whole(p.b).length, whole(res).length);
+    // SL-2: one track count per section, from the section's band (the biggest amount it deals).
+    const nW = Math.max(whole(p.a).length, whole(p.b).length, whole(res).length, p.band ? String(Math.floor((p.band - 1) / 100)).length : 1);
     const track = (ctx.metrics && ctx.metrics.trackMm) || digitPt(ctx) * PT_MM * 0.72;
     return { res, nW, track, pointW: Math.max(3, track * 0.35) };
 }

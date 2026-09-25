@@ -30,7 +30,7 @@ import {
     fmtTime, fmtDuration, toMin, fromMin, ampmOf,
 } from './tmkit.js';
 
-const AXIS_MM = 170;
+const AXIS_MM = 158;
 
 /** "2 h 30 min" as the pupil reads it in the cell: "2 hours 30 minutes". */
 function durWords(total) {
@@ -69,7 +69,7 @@ function line(p, ctx) {
     const perHour = AXIS_MM / hours;
     let step = Number(p.step) || 30;
     while (perHour * step / 60 < 5 && step < 60) step = step < 5 ? 5 : step < 15 ? 15 : step < 30 ? 30 : 60;
-    const x0 = 7, y = 24, W = AXIS_MM + 14;
+    const x0 = 7, y = 19, W = AXIS_MM + 14;
     const X = (t) => x0 + (t - from) * perHour / 60;
     const zone = zonePt(ctx) * PT_MM;
     let s = `<line x1="${n2(x0 - 3)}" y1="${y}" x2="${n2(x0 + AXIS_MM + 3)}" y2="${y}" stroke="${INK}" stroke-width="${n2(SW.heavy)}" data-tm-axis="1"/>`;
@@ -96,7 +96,7 @@ function line(p, ctx) {
         for (const hop of hopsOf(p)) {
             const a = hop.from < from ? hop.from + 1440 : hop.from;
             const b = hop.to < from ? hop.to + 1440 : hop.to;
-            const xa = X(a), xb = X(b), mid = (xa + xb) / 2, hgt = Math.min(12, 4 + Math.abs(xb - xa) * 0.12);
+            const xa = X(a), xb = X(b), mid = (xa + xb) / 2, hgt = Math.min(7.5, 3 + Math.abs(xb - xa) * 0.1);
             s += `<path d="M${n2(xa)} ${n2(y - 1)}Q${n2(mid)} ${n2(y - 1 - 2 * hgt)} ${n2(xb)} ${n2(y - 1)}" fill="none" stroke="${keyed ? col : INK}" stroke-width="${n2(keyed ? SW.heavy : SW.hair)}" data-tm-hop="1"/>`;
             labels.push({ x: mid, y: y - 1 - hgt - 1, text: keyed ? hop.label : '' });
         }
@@ -127,7 +127,7 @@ function line(p, ctx) {
 
 function givenTime(ctx, t, ampm) {
     const ap = ampm ? ` ${ampmOf(t)}` : '';
-    return readout(ctx, fmtTime(t.h, t.m) + ap);
+    return readout(ctx, fmtTime(t.h, t.m) + ap, { small: true });
 }
 
 function faces(p, ctx) {

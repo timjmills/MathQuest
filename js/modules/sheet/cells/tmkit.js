@@ -205,7 +205,7 @@ export function readout(ctx, text, { small = false } = {}) {
     const dims = { S: [31, 14], M: [40, 17], L: [48, 19] }[sizeOf(ctx)];
     const [w, h] = small ? [dims[0] * 0.85, dims[1] * 0.85] : dims;
     return `<span class="tm-readout" data-tm-readout="${esc(text)}" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;`
-        + `width:${L(ctx, w)};height:${L(ctx, h)};border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 3)};background:#fff;`
+        + `min-width:${L(ctx, w)};padding:0 ${L(ctx, 2)};height:${L(ctx, h)};border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 3)};background:#fff;white-space:nowrap;`
         + `font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;${KEY_FEATURES}">${esc(text)}</span>`;
 }
 
@@ -371,15 +371,15 @@ export function coinRow(ctx, values, { dots = false, compact = false, wrap = 6, 
     const one = (v) => {
         const c = coinSVG(ctx, v, { dots, compact });
         return twin
-            ? `<label class="tm-cointap" style="display:inline-block;position:relative;line-height:0;"><input type="checkbox" class="tm-cointap-in" aria-label="coin worth ${v}: tap when counted">${c}<span class="tm-cointap-mark" aria-hidden="true"></span></label>`
-            : `<span style="display:inline-block;line-height:0;">${c}</span>`;
+            ? `<label class="tm-cointap" style="display:inline-block;position:relative;line-height:0;flex:none;"><input type="checkbox" class="tm-cointap-in" aria-label="coin worth ${v}: tap when counted">${c}<span class="tm-cointap-mark" aria-hidden="true"></span></label>`
+            : `<span style="display:inline-block;line-height:0;flex:none;">${c}</span>`;
     };
     const lines = [];
     for (let i = 0; i < values.length; i += wrap) lines.push(values.slice(i, i + wrap));
     return `<div class="tm-coins" data-tm-coins="${esc(values.join(','))}" style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 2)};">`
         // `scatter` (MC-6, order: scattered): the coins stand at uneven heights and gaps, not in a
         // tidy row, so the pupil has to find the biggest one before counting.
-        + lines.map((ln) => `<div style="display:flex;align-items:${scatter ? 'flex-start' : 'center'};justify-content:center;gap:${L(ctx, scatter ? 4 : 2)};">`
+        + lines.map((ln) => `<div style="display:flex;align-items:${scatter ? 'flex-start' : 'center'};justify-content:center;gap:${L(ctx, scatter ? 4 : 2)};flex-wrap:wrap;">`
             + ln.map((v, i) => (scatter ? `<span style="display:inline-block;margin-top:${L(ctx, [0, 7, 2, 9, 4, 1][i % 6])};">${one(v)}</span>` : one(v))).join('') + `</div>`).join('')
         + `</div>`;
 }
@@ -387,7 +387,7 @@ export function coinRow(ctx, values, { dots = false, compact = false, wrap = 6, 
 /** A row of notes, highest value first, 3 mm gaps. */
 export function noteRow(ctx, values, { compact = false } = {}) {
     return `<div class="tm-notes" data-tm-notes="${esc(values.join(','))}" style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 3)};flex-wrap:wrap;">`
-        + values.map((v) => `<span style="display:inline-block;line-height:0;">${noteSVG(ctx, v, { compact })}</span>`).join('') + `</div>`;
+        + values.map((v) => `<span style="display:inline-block;line-height:0;flex:none;">${noteSVG(ctx, v, { compact })}</span>`).join('') + `</div>`;
 }
 
 /** A price tag: a rounded label with the price, drawn like a luggage tag (no colour). */

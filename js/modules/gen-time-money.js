@@ -614,7 +614,7 @@ function genMoneyCount(q, skill) {
     if (scattered && new Set(coins).size > 1) coins = scatter(coins);
     const total = sum(coins);
     const dots = ['auto', 'dots', 'none'].includes(o.support) ? o.support : 'auto';
-    setCell(q, 'coins', { kind: 'count', coins, notes: [], currency: o.currency, answer: 'minor', total, dots, wrap: coins.length > 6 ? 5 : 6, ...(scattered ? { scatter: true } : {}) });
+    setCell(q, 'coins', { kind: 'count', coins, notes: [], currency: o.currency, answer: 'minor', total, dots, ...(scattered ? { scatter: true } : {}) });
     q.text = 'Count the coins. Write the total.';
     q.ans = total;
     q.answerType = 'number';
@@ -648,7 +648,7 @@ function genMoneyAdd(q, skill) {
         if (regroups(a, b, '+') === want) break;
     }
     const cents = step < 100;
-    setCell(q, 'money-columns', { op: '+', a, b, cents, currency: o.currency, sign: o.currency !== 'plain' && cents });
+    setCell(q, 'money-columns', { op: '+', a, b, band, cents, currency: o.currency, sign: o.currency !== 'plain' && cents });
     q.text = 'Add the prices.';
     if (cents) { q.ans = fmtMoney(a + b); q.answerType = 'text'; } else { q.ans = (a + b) / 100; q.answerType = 'number'; }
     q.hint = cents ? 'Line up the points. Add the right column first.' : 'Add the ones first, then the tens.';
@@ -676,7 +676,7 @@ function genMoneyChange(q, skill) {
     }
     if (!paid || paid > band) { paid = Math.min(band, 100 * Math.ceil((price + 1) / 100)); }
     const cents = step < 100;
-    setCell(q, 'money-columns', { op: '-', a: paid, b: price, cents, currency: o.currency, sign: o.currency !== 'plain' && cents, paid: o.paid === 'note' ? 'note' : 'unit' });
+    setCell(q, 'money-columns', { op: '-', a: paid, b: price, band, cents, currency: o.currency, sign: o.currency !== 'plain' && cents, paid: o.paid === 'note' ? 'note' : 'unit' });
     q.text = 'Subtract to find the change.';
     if (cents) { q.ans = fmtMoney(paid - price); q.answerType = 'text'; } else { q.ans = (paid - price) / 100; q.answerType = 'number'; }
     q.hint = 'Take the price from the money paid. Regroup across the zeros if you need to.';

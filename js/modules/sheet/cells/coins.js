@@ -54,7 +54,7 @@ function dotsOn(p, ctx) {
 function collection(ctx, p, { compact = false } = {}) {
     const parts = [];
     if (Array.isArray(p.notes) && p.notes.length) parts.push(noteRow(ctx, p.notes, { compact }));
-    if (Array.isArray(p.coins) && p.coins.length) parts.push(coinRow(ctx, p.coins, { dots: dotsOn(p, ctx), compact, wrap: p.wrap || (p.coins.length > 6 ? 5 : 6), scatter: !!p.scatter }));
+    if (Array.isArray(p.coins) && p.coins.length) parts.push(coinRow(ctx, p.coins, { dots: dotsOn(p, ctx), compact, wrap: p.wrap || (p.coins.length > 6 ? 5 : (p.kind === 'count' && levelOf(ctx) >= 2 && p.coins.length <= 5 && !(p.notes || []).length ? 5 : 3)), scatter: !!p.scatter }));
     return parts.join('');
 }
 
@@ -91,7 +91,7 @@ function count(p, ctx) {
     } else {
         const major = p.answer === 'major';
         const unit = major ? (c.major ? c.major : '') : (c.minor ? c.minor : '');
-        slot = numberSlot(ctx, 'answer', p.total, { digits: String(p.total).length > 2 ? 3 : 2, unit, mark: 'blank' });
+        slot = numberSlot(ctx, 'answer', p.total, { digits: 3, unit, mark: 'blank' });   // SL-2: one width per section (totals to 100 or 500)
     }
     return cellRoot(ctx, 'tm-count', `${collection(ctx, p)}${countOn(ctx, p)}${row(ctx, lbl(ctx, 'Total') + slot, { gap: 3 })}`);
 }
@@ -99,7 +99,7 @@ function count(p, ctx) {
 function find(p, ctx) {
     const unit = unitWord(p.currency, p.target);
     const head = lbl(ctx, `Worth ${p.target}${unit ? ` ${esc(unit)}` : ''}:`);
-    return cellRoot(ctx, 'tm-find', `${collection(ctx, Object.assign({}, p, { dots: 'none', wrap: 6 }))}`
+    return cellRoot(ctx, 'tm-find', `${collection(ctx, Object.assign({}, p, { dots: 'none', wrap: 5 }))}`
         + row(ctx, head + numberSlot(ctx, 'answer', p.count, { digits: 2, unit: p.count === 1 ? 'coin' : 'coins', mark: 'blank' }), { gap: 3 }));
 }
 
