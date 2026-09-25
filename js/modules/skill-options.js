@@ -949,8 +949,13 @@ const _tmFace = () => ({
 });
 const _tmStimulus = () => ({
     id: 'stimulus', label: 'What the pupil reads', type: 'enum', default: 'clock', group: 'difficulty',
-    values: [{ v: 'clock', l: 'A clock (write) or digital time (draw)' }, { v: 'words', l: 'The time in words' }],
-    help: '"The time in words" is its own step: "twenty past 7". The pupil always writes the digital time.',
+    values: [
+        { v: 'clock', l: 'A clock (write) or digital time (draw)' },
+        { v: 'words', l: 'Words: "5 minutes past 2"' },
+        { v: 'words-past', l: 'Words: "five past two"' },
+        { v: 'words-oh', l: 'Words: "two-oh-five"' },
+    ],
+    help: 'The time in words is its own step; say it the way your class says it (ruling Q11). The pupil always writes the digital time.',
 });
 const _tmWords = () => ({
     id: 'words', label: 'Time in words, said as', type: 'enum', default: 'numerals', group: 'difficulty',
@@ -969,11 +974,13 @@ const _tmNumerals = () => ({
     help: 'Fewer numbers is harder: the pupil reads the hands by their position.',
 });
 // Which coins a money page may use (P12 self-score O1): the currency's usual coins, or a chosen few.
+// All four ticked (the default) is "the currency's usual coins": 1, 5, 10, 25, and at Qatari riyal
+// 25 and 50 first (ruling Q12). A subset uses exactly those coins.
 const _tmCoinSet = (help) => ({
-    id: 'values', label: 'Coins used', type: 'set', default: [], group: 'difficulty',
-    values: [{ v: 1, l: '1' }, { v: 5, l: '5' }, { v: 10, l: '10' }, { v: 25, l: '25' }, { v: 50, l: '50 (Qatari riyal only)' }],
-    allLabel: 'The currency\'s usual coins',
-    help: help || 'Leave all unticked for the usual coins (at Qatari riyal: 25 and 50 first). Tick a few to use only those.',
+    id: 'values', label: 'Coins used', type: 'set', default: [1, 5, 10, 25], group: 'difficulty',
+    values: [{ v: 1, l: '1' }, { v: 5, l: '5' }, { v: 10, l: '10' }, { v: 25, l: '25' }],
+    allLabel: 'The currency\'s usual coins (at Qatari riyal: 25 and 50)',
+    help: help || 'All ticked uses the usual coins. Tick a few to use only those.',
 });
 const _tmPrecision = (dflt = 5, withOne = true) => ({
     id: 'precision', label: 'Times to the nearest', type: 'enum', default: dflt, group: 'difficulty',
@@ -1012,12 +1019,14 @@ const _tmNoon = () => ({
     values: [{ v: 'never', l: 'Never' }, { v: 'seeded', l: 'Some items cross noon (a.m. and p.m. printed)' }],
     help: 'Going past 12 is its own hard case: 11:30 a.m. and 2 hours is 1:30 p.m.',
 });
-const _tmCurrency = () => ({
+// `usd: false` for a skill whose page shows only coins and no unit word (money_compare): US
+// coins are drawn exactly like Plain numbers there, so the value would change nothing.
+const _tmCurrency = ({ usd = true } = {}) => ({
     id: 'currency', label: 'Currency', type: 'enum', default: 'plain', group: 'layout',
     values: [
         { v: 'plain', l: 'Plain numbers (coins 1, 5, 10, 25; no sign)' },
         { v: 'qar', l: 'Qatari riyal (dirham coins 1-50; riyal notes)' },
-        { v: 'usd', l: 'US dollar (cent coins; dollar notes)' },
+        ...(usd ? [{ v: 'usd', l: 'US dollar (cent coins; dollar notes)' }] : []),
     ],
     help: 'The coins are the same plain value circles in all three. A currency adds its unit words, its notes and, at Qatari riyal, the 50 coin.',
 });
@@ -1039,16 +1048,16 @@ const _tmRegroup = (dflt) => ({ ...regroupOption(), default: dflt, group: 'diffi
 
 const _TM_READ = ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min'];
 const P10_TM_OPTIONS = {
-    'measurement:time_hour': [_tmResponse(), _tmStimulus(), _tmWords(), _tmNumerals()],
-    'measurement:time_half_hour': [_tmResponse(), _tmReview(), _tmStimulus(), _tmWords(), _tmNumerals()],
+    'measurement:time_hour': [_tmResponse(), _tmStimulus(), _tmNumerals()],
+    'measurement:time_half_hour': [_tmResponse(), _tmReview(), _tmStimulus(), _tmNumerals()],
     'measurement:time_quarter': [_tmResponse(), {
         id: 'dir', label: 'Quarter past or quarter to', type: 'set', default: ['past', 'to'], group: 'difficulty',
         values: [{ v: 'past', l: 'Quarter past (:15)' }, { v: 'to', l: 'Quarter to (:45)' }],
         allLabel: 'Both, alternating',
         help: 'Quarter to counts back from the next hour; it is a step of its own. Tick one for a single-step page.',
-    }, _tmReview(), _tmStimulus(), _tmWords(), _tmNumerals()],
-    'measurement:time_5min': [_tmResponse(), _tmReview(), _tmFace(), _tmStimulus(), _tmWords(), _tmNumerals()],
-    'measurement:time_1min': [_tmResponse(), _tmReview(), _tmFace(), _tmStimulus(), _tmWords(), _tmNumerals()],
+    }, _tmReview(), _tmStimulus(), _tmNumerals()],
+    'measurement:time_5min': [_tmResponse(), _tmReview(), _tmFace(), _tmStimulus(), _tmNumerals()],
+    'measurement:time_1min': [_tmResponse(), _tmReview(), _tmFace(), _tmStimulus(), _tmNumerals()],
     'measurement:time_analog_digital': [{
         id: 'dir', label: 'Which way', type: 'enum', default: 'to-digital', group: 'difficulty',
         values: [{ v: 'to-digital', l: 'Clock to digital (write the time)' }, { v: 'to-analog', l: 'Digital to clock (check one of three)' }],
@@ -1074,11 +1083,12 @@ const P10_TM_OPTIONS = {
         id: 'kind', label: 'What to count', type: 'enum', default: 'like', group: 'difficulty',
         values: [
             { v: 'like', l: 'Coins that are all the same' }, { v: 'two', l: 'Two kinds of coin' },
-            { v: 'mixed', l: 'Mixed coins' }, { v: 'notes', l: 'Notes only' },
+            { v: 'mixed', l: 'Mixed coins' }, { v: 'notes', l: 'Notes, totals to 20' },
+            { v: 'notes100', l: 'Notes, totals to 100' }, { v: 'notes500', l: 'Notes, totals to 500' },
             { v: 'notes-coins', l: 'Notes and coins (write two numbers)' },
         ],
-        help: 'Teach them in this order: one kind, two kinds, mixed; notes; then notes and coins. Notes and coins need a currency.',
-    }, _tmCoinSet('Leave all unticked for the usual coins (at Qatari riyal: 25 and 50 first). Tick 10 alone for "count 10s".'), _tmMoneyBand([25, 50, 100, 500, 2000, 10000, 50000], 100), {
+        help: 'Teach them in this order: one kind, two kinds, mixed; notes to 20, 100, 500; then notes and coins.',
+    }, _tmCoinSet('All ticked uses the usual coins. Tick 10 alone for "count 10s".'), _tmMoneyBand([25, 50, 100], 100), {
         id: 'tiles', label: 'Coins at most', type: 'enum', default: 6, group: 'difficulty',
         values: [{ v: 6, l: '6 coins' }, { v: 10, l: '10 coins' }],
         help: '6 fit a half-width cell; 10 take a full-width row.',
@@ -1088,7 +1098,7 @@ const P10_TM_OPTIONS = {
         help: 'Scattered coins are harder: the pupil has to find the biggest coin first.',
     }, {
         id: 'support', label: 'Count-by-five dots', type: 'enum', default: 'auto', group: 'support',
-        values: [{ v: 'auto', l: 'Only on Model and Guided pages' }, { v: 'dots', l: 'On every page' }, { v: 'none', l: 'Never' }],
+        values: [{ v: 'auto', l: 'Only on Model and Guided pages' }, { v: 'dots', l: 'On every page' }],
         help: 'Dots under the number on each coin, one for each 5: a hint that fades.',
     }],
     'measurement:money': [_tmCurrency(), _tmMoneyBand([500, 2000, 10000], 2000), _tmCents(100), _tmRegroup('none')],
@@ -1112,12 +1122,9 @@ const P10_TM_OPTIONS = {
     'measurement:money_notation': [_tmCurrency(), {
         id: 'task', label: 'The pupil reads', type: 'enum', default: 'collection', group: 'difficulty',
         values: [{ v: 'collection', l: 'Notes and coins' }, { v: 'words', l: 'The amount in words' }],
-        help: 'Words ("2 riyals 50 dirhams") come after reading notes and coins.',
-    }, {
-        id: 'sign', label: 'Print the sign before the slot (QR, $)', type: 'bool', default: true, group: 'support',
-        help: 'Only with a currency: plain numbers never carry a sign.',
+        help: 'Words ("2 riyals 50 dirhams") come after reading notes and coins. With a currency the sign (QR, $) is printed before the slot.',
     }],
-    'measurement:money_compare': [_tmCurrency(), _tmMoneyBand([25, 50, 100], 100), {
+    'measurement:money_compare': [_tmCurrency({ usd: false }), _tmMoneyBand([25, 50, 100], 100), {
         id: 'response', label: 'How the pupil answers', type: 'enum', default: 'ring', group: 'layout',
         values: [{ v: 'ring', l: 'Check the one with more' }, { v: 'sign', l: 'Write <, > or =' }],
         help: 'Writing the sign is the next step.',
@@ -1148,7 +1155,7 @@ for (const id of ['order_clocks_analog_asc', 'order_clocks_analog_desc', 'order_
         id: 'tiles', label: 'How many clocks', type: 'enum', default: 3, group: 'difficulty',
         values: [{ v: 3, l: '3' }, { v: 4, l: '4' }, { v: 5, l: '5 (sizes S and M)' }],
         help: 'More clocks is harder. Five clocks fit a row only at sizes S and M.',
-    }, _tmPrecision(15, false), _tmNumerals(), {
+    }, _tmPrecision(15, false), ...(id.indexOf('analog') !== -1 ? [_tmNumerals()] : []), {
         id: 'noon', label: 'Times from', type: 'enum', default: 'never', group: 'difficulty',
         values: [{ v: 'never', l: 'One morning or one afternoon' }, { v: 'across', l: 'Across 12 o\'clock (a.m. and p.m. printed)' }],
         help: '12:30 comes before 1:00 in the afternoon but not at night: crossing 12 is its own step.',

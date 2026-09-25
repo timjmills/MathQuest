@@ -117,8 +117,9 @@ function choose(p, ctx) {
         + faceSVG(ctx, { D, hands: true, hour: f.h, minute: f.m, missing: hiddenNumerals(p), label: `clock ${LETTERS[i]}` })
         // one label span + one box span: the shape wireTickBoxes turns into a tap target
         + `<div style="display:flex;align-items:center;gap:${L(ctx, 2)};"><span style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;">${LETTERS[i]}</span>`
-        + checkBox(ctx, { id: `choice${i}`, on: i === on }) + `</div></div>`).join('');
-    return cellRoot(ctx, 'tm-choose', `${stimulus(ctx, p)}<div data-ws-slot="choice" data-ws-shape="check" style="display:flex;justify-content:center;gap:${L(ctx, 10)};">${cols}</div>`);
+        + checkBox(ctx, { id: `choice${i}`, on: i === on, slot: false }) + `</div></div>`).join('');
+    const ink = on >= 0 ? ` data-ws-ink="${ctx.state === 'traced' ? 'trace' : 'solid'}"` : '';
+    return cellRoot(ctx, 'tm-choose', `${stimulus(ctx, p)}<div data-ws-slot="choice" data-ws-shape="check"${ink} style="display:flex;justify-content:center;gap:${L(ctx, 10)};">${cols}</div>`);
 }
 
 function order(p, ctx) {

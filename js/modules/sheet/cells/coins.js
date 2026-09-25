@@ -54,7 +54,7 @@ function dotsOn(p, ctx) {
 function collection(ctx, p, { compact = false } = {}) {
     const parts = [];
     if (Array.isArray(p.notes) && p.notes.length) parts.push(noteRow(ctx, p.notes, { compact }));
-    if (Array.isArray(p.coins) && p.coins.length) parts.push(coinRow(ctx, p.coins, { dots: dotsOn(p, ctx), compact, wrap: p.wrap || (p.coins.length > 6 ? 5 : 6) }));
+    if (Array.isArray(p.coins) && p.coins.length) parts.push(coinRow(ctx, p.coins, { dots: dotsOn(p, ctx), compact, wrap: p.wrap || (p.coins.length > 6 ? 5 : 6), scatter: !!p.scatter }));
     return parts.join('');
 }
 
@@ -87,7 +87,7 @@ function count(p, ctx) {
         const b = (id) => box(ctx, { id, value: val(id), w: 16, h: S(ctx).writeMm + 2, mark: 'cell' });
         const join = isTwin(ctx) ? ' data-mq-join=", "' : '';
         slot = `<span data-ws-slot="two" data-ws-shape="unit"${join} style="display:inline-flex;align-items:center;gap:${L(ctx, 2)};">`
-            + `${b('major')}${words(ctx, esc(c.major || 'wholes'))}${b('minor')}${words(ctx, esc(c.minor || 'parts'))}</span>`;
+            + `${b('major')}${words(ctx, esc(c.major || 'in notes'))}${b('minor')}${words(ctx, esc(c.minor || 'in coins'))}</span>`;
     } else {
         const major = p.answer === 'major';
         const unit = major ? (c.major ? c.major : '') : (c.minor ? c.minor : '');
@@ -196,7 +196,7 @@ function keyOf(p) {
         default: {
             if (p.answer === 'two') {
                 const M = Math.floor(p.total / 100), m = p.total % 100;
-                return { value: `${M}, ${m}`, display: `${M} ${unitWord(p.currency, M, true) || 'wholes'} ${m} ${unitWord(p.currency, m) || 'parts'}`,
+                return { value: `${M}, ${m}`, display: `${M} ${unitWord(p.currency, M, true) || 'in notes'}, ${m} ${unitWord(p.currency, m) || 'in coins'}`,
                     slots: { major: { value: String(M), graded: true }, minor: { value: String(m), graded: true } } };
             }
             return { value: p.total, display: String(p.total), slots: { answer: { value: String(p.total), graded: true } } };

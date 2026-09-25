@@ -133,13 +133,12 @@ export const VALUE_TOKENS = {
     // `response`, `support`, `dir`, `task` and `notation` gain values here (see the P10 lines
     // appended to each below), the new options take tables of their own.
     review: { none: 'N', some: 'S' },
-    stimulus: { clock: 'C', words: 'W' },
+    stimulus: { clock: 'C', words: 'W', 'words-past': 'P', 'words-oh': 'O' },
     words: { numerals: 'M', past: 'P', oh: 'O' },
     noon: { never: 'N', seeded: 'S', across: 'A' },
     numerals: { all: 'A', quarters: 'Q', twelve: 'T' },
     currency: { plain: 'P', qar: 'Q', usd: 'U' },
-    kind: { like: 'L', two: 'T', mixed: 'M', notes: 'N', 'notes-coins': 'C' },
-    values: { 50: 'Z' },
+    kind: { like: 'L', two: 'T', mixed: 'M', notes: 'N', 'notes-coins': 'C', notes100: 'H', notes500: 'F' },
     paid: { unit: 'U', note: 'N' },
     gap: { far: 'F', near: 'N' },
     members: { time_hour: 'H', time_half_hour: 'A', time_quarter: 'Q', time_5min: '5', time_1min: '1', time_analog_digital: 'D', time_match_clock: 'M' },

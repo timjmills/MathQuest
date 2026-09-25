@@ -288,8 +288,10 @@ export function numberSlot(ctx, id, keyValue, { digits = 2, unit = '', mark = 'b
 export function tickList(ctx, labels, { on = -1, id = 'choice', vertical = true, pt = null } = {}) {
     const rows = labels.map((lab, i) => `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};margin:${L(ctx, 1)} ${vertical ? 0 : L(ctx, 3)};">`
         + `<span style="font-size:${P(ctx, pt || textPt(ctx) + 1)};font-weight:700;line-height:1.2;">${esc(lab)}</span>`
-        + checkBox(ctx, { id: `${id}${i}`, on: i === on }) + `</div>`).join('');
-    return `<div class="tm-ticks" data-ws-slot="${esc(id)}" data-ws-shape="check" style="display:inline-flex;flex-direction:${vertical ? 'column' : 'row'};`
+        + checkBox(ctx, { id: `${id}${i}`, on: i === on, slot: false }) + `</div>`).join('');
+    // ONE decision, so ONE slot: the group of boxes, inked when one is checked (AK-2).
+    const ink = on >= 0 ? ` data-ws-ink="${ctx.state === 'traced' ? 'trace' : 'solid'}"` : '';
+    return `<div class="tm-ticks" data-ws-slot="${esc(id)}" data-ws-shape="check"${ink} style="display:inline-flex;flex-direction:${vertical ? 'column' : 'row'};`
         + `align-items:flex-start;justify-content:center;">${rows}</div>`;
 }
 
@@ -364,7 +366,7 @@ export function noteSVG(ctx, v, { compact = false } = {}) {
  * screen twin of touching each coin with a pencil (ruling: "coins you tap to count"). The mark
  * shows no number, so tapping never gives the total away.
  */
-export function coinRow(ctx, values, { dots = false, compact = false, wrap = 6 } = {}) {
+export function coinRow(ctx, values, { dots = false, compact = false, wrap = 6, scatter = false } = {}) {
     const twin = isTwin(ctx);
     const one = (v) => {
         const c = coinSVG(ctx, v, { dots, compact });
@@ -375,7 +377,10 @@ export function coinRow(ctx, values, { dots = false, compact = false, wrap = 6 }
     const lines = [];
     for (let i = 0; i < values.length; i += wrap) lines.push(values.slice(i, i + wrap));
     return `<div class="tm-coins" data-tm-coins="${esc(values.join(','))}" style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 2)};">`
-        + lines.map((ln) => `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 2)};">${ln.map(one).join('')}</div>`).join('')
+        // `scatter` (MC-6, order: scattered): the coins stand at uneven heights and gaps, not in a
+        // tidy row, so the pupil has to find the biggest one before counting.
+        + lines.map((ln) => `<div style="display:flex;align-items:${scatter ? 'flex-start' : 'center'};justify-content:center;gap:${L(ctx, scatter ? 4 : 2)};">`
+            + ln.map((v, i) => (scatter ? `<span style="display:inline-block;margin-top:${L(ctx, [0, 7, 2, 9, 4, 1][i % 6])};">${one(v)}</span>` : one(v))).join('') + `</div>`).join('')
         + `</div>`;
 }
 

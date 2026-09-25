@@ -188,8 +188,9 @@ function genReading(q, skill) {
     const o = optsOf(skill);
     const P = READ_PRECISION[skill];
     const { h, m } = readingTime(skill, o);
-    const words = o.stimulus === 'words';
-    const said = timeWords(h, m, o.words || 'numerals');
+    // `stimulus` carries the spoken form too (ruling Q11): words / words-past / words-oh.
+    const words = /^words/.test(String(o.stimulus || ''));
+    const said = timeWords(h, m, o.stimulus === 'words-past' ? 'past' : o.stimulus === 'words-oh' ? 'oh' : 'numerals');
     if (o.response === 'draw') {
         setCell(q, 'clock', { kind: 'draw', h, m, precision: P, ring: ringFlag(o), numerals: faceNumerals(o),
             stimulus: words ? 'words' : 'digital', text: words ? said : fmtTime(h, m) }, { twin: false });
@@ -512,7 +513,8 @@ function genTimeSense(q, skill) {
 function coinSet(o) {
     const c = currencyOf(o.currency);
     const ticked = Array.isArray(o.values) ? o.values.map(Number).filter((v) => c.coins.includes(v)) : [];
-    if (ticked.length) return ticked.slice().sort((a, b) => b - a);
+    // None ticked, or all four, is the currency's usual set (at Qatari riyal 50 and 25 first, Q12).
+    if (ticked.length && ticked.length < 4) return ticked.slice().sort((a, b) => b - a);
     return o.currency === 'qar' ? [50, 25] : c.coins.slice().sort((a, b) => b - a);
 }
 const sum = (list) => list.reduce((a, b) => a + b, 0);
@@ -539,18 +541,15 @@ function scatter(list) {
 function genMoneyCount(q, skill) {
     const o = optsOf(skill);
     const c = currencyOf(o.currency);
-    const kind = ['like', 'two', 'mixed', 'notes', 'notes-coins'].includes(o.kind) ? o.kind : 'like';
+    let kind = ['like', 'two', 'mixed', 'notes', 'notes100', 'notes500', 'notes-coins'].includes(o.kind) ? o.kind : 'like';
+    // The notes steps carry their own totals (MB-3): to 20, to 100, to 500 whole units.
+    const noteCap = kind === 'notes500' ? 500 : kind === 'notes100' ? 100 : 20;
+    if (kind === 'notes100' || kind === 'notes500') kind = 'notes';
     const band = Number(o.band) || 100;
     const maxN = Number(o.tiles) === 10 ? 10 : 6;
     const k = pos6();
     if (kind === 'notes' || kind === 'notes-coins') {
-        if (kind === 'notes-coins' && o.currency === 'plain') {
-            refuse(q, 'Notes and coins need a currency: choose Qatari riyal or US dollar.');
-            return;
-        }
-        // Notes are counted in whole units; below 5 units there is nothing to count, so the notes
-        // steps work to 20 unless the teacher chose 100 or 500 (§11 MB-3).
-        const capMajor = Math.max(band >= 500 ? band / 100 : 20, 5);
+        const capMajor = noteCap;
         const notesAll = c.notes.filter((v) => v <= capMajor);
         let notes;
         if (k <= 1 && kind === 'notes') {
@@ -579,7 +578,7 @@ function genMoneyCount(q, skill) {
         q.text = 'Count the notes, then the coins. Write both numbers.';
         q.ans = `${sum(notes)}, ${sum(coins)}`;
         q.answerType = 'text';
-        q.hint = `Count the notes in ${c.major}. Then count the coins in ${c.minor}.`;
+        q.hint = 'Count the notes first. Then count the coins.';
         return;
     }
     const vals = coinSet(o).filter((v) => v <= band);
@@ -611,10 +610,11 @@ function genMoneyCount(q, skill) {
         if (k === 3 && vals.includes(25) && vals.includes(10) && vals.includes(5) && band >= 75) coins = [25, 25, 10, 10, 5].slice(0, Math.min(5, maxN));   // M-M3
     }
     coins.sort((x, y) => y - x);
-    if (o.order === 'scrambled' && new Set(coins).size > 1) coins = scatter(coins);
+    const scattered = o.order === 'scrambled';
+    if (scattered && new Set(coins).size > 1) coins = scatter(coins);
     const total = sum(coins);
     const dots = ['auto', 'dots', 'none'].includes(o.support) ? o.support : 'auto';
-    setCell(q, 'coins', { kind: 'count', coins, notes: [], currency: o.currency, answer: 'minor', total, dots, wrap: coins.length > 6 ? 5 : 6 });
+    setCell(q, 'coins', { kind: 'count', coins, notes: [], currency: o.currency, answer: 'minor', total, dots, wrap: coins.length > 6 ? 5 : 6, ...(scattered ? { scatter: true } : {}) });
     q.text = 'Count the coins. Write the total.';
     q.ans = total;
     q.answerType = 'number';
@@ -716,7 +716,7 @@ function genFewestCoins(q, skill) {
     const c = currencyOf(o.currency);
     const band = Number(o.band) || 50;
     const ticked = Array.isArray(o.values) ? o.values.map(Number).filter((v) => c.coins.includes(v)) : [];
-    const values = (ticked.length ? ticked : c.coins).filter((v) => v <= Math.max(band, 25)).slice().sort((a, b) => b - a);
+    const values = (ticked.length && ticked.length < 4 ? ticked : c.coins).filter((v) => v <= Math.max(band, 25)).slice().sort((a, b) => b - a);
     // Every amount must be makeable with the ticked coins: a multiple of the smallest one.
     const unit = values[values.length - 1] || 1;
     let target = unit * randInt(Math.max(1, Math.ceil(Math.max(6, band * 0.3) / unit)), Math.max(1, Math.floor(band / unit)));
@@ -795,7 +795,7 @@ function genMoneyNotation(q, skill) {
         const text = c.major
             ? `${major ? `${major} ${unitWord(o.currency, major, true)}` : ''}${major && minor ? ' ' : ''}${minor ? `${minor} ${unitWord(o.currency, minor)}` : ''}` || `0 ${c.minor}`
             : `${major} and ${minor} hundredths`;
-        setCell(q, 'coins', { kind: 'notation', words: text, total, currency: o.currency, sign: !!o.sign });
+        setCell(q, 'coins', { kind: 'notation', words: text, total, currency: o.currency, sign: o.currency !== 'plain' });
     } else {
         const notes = [];
         let r = major;
@@ -804,7 +804,7 @@ function genMoneyNotation(q, skill) {
         const coins = [];
         let rm = minor;
         for (const v of coinVals) while (rm >= v && coins.length < 6) { coins.push(v); rm -= v; }
-        setCell(q, 'coins', { kind: 'notation', notes, coins, total: sum(notes) * 100 + sum(coins), currency: o.currency, sign: !!o.sign, dots: 'none' });
+        setCell(q, 'coins', { kind: 'notation', notes, coins, total: sum(notes) * 100 + sum(coins), currency: o.currency, sign: o.currency !== 'plain', dots: 'none' });
         minor = sum(coins);
     }
     q.text = 'Write the amount. Use the point.';

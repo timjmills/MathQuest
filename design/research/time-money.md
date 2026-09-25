@@ -939,21 +939,23 @@ family), P10 supplies `currency`.
 |---|---|---|
 | 1 | A `currency` option on every money skill: Plain numbers / Qatari riyal / US dollar. **The default is Plain numbers.** An app-wide Currency setting the per-skill option starts from, defaulting to Plain, if cheap. | `currency` on every money id, default `plain`. The app-wide setting is **not** built: it needs the options dialog to pre-fill the value, and letting it move the option's default would change what every existing positional money code deals (§18). |
 | 2 | The 50 coin only at Qatari riyal (recommendation). | 26.51 mm, the next RP-111 step; the `values` set offers 50 labelled "Qatari riyal only". |
-| 3 | Sign or unit only after blanks, on the write-the-amount step and left of the money columns; QR; "notes" (recommendation). | `unitWord` after count blanks; `money_notation` `sign`; `money-columns` sign track left of the top operand. Never on a coin, note, title or instruction. |
+| 3 | Sign or unit only after blanks, on the write-the-amount step and left of the money columns; QR; "notes" (recommendation). | `unitWord` after count blanks; the sign before the `money_notation` slot whenever a currency is chosen; `money-columns` sign track left of the top operand. Never on a coin, note, title or instruction. |
 | 4 | An option per skill, "How the pupil answers: write the time / draw the hands", on each clock-reading skill. No new skill. The hidden 30% branch removed. | `response: write / draw` on `time_hour` … `time_1min`; draw is the empty face on paper and the tap-or-drag clock on screen. |
 | 5 | The teacher chooses: a timeline (hop the hours, then the minutes; answer `__ h __ min`) and two clocks are both options; "total minutes" is an option too (grade 4). | The timeline is on every elapsed page (`support`: labels / pupil labels / none); `elapsed_visual_*` `notation`: two faces / two digital times / one of each; `elapsed_find_duration` `response: hm / minutes`. |
-| 6 | Money bounded by the total and the coin count, with the one kind → two kinds → mixed ladder (recommendation). | `band`, `tiles` (6 / 10), `kind: like / two / mixed / notes / notes-coins`. |
+| 6 | Money bounded by the total and the coin count, with the one kind → two kinds → mixed ladder (recommendation). | `band` (coin totals 25 / 50 / 100), `tiles` (6 / 10), `kind: like / two / mixed / notes (to 20) / notes100 / notes500 / notes-coins` — the notes steps carry their own totals. At Plain numbers notes and coins are written `[ ] in notes [ ] in coins`. |
 | 7 | Quarter past and quarter to are separate steps (recommendation). | `time_quarter` `dir` set: past / to. |
 | 8 | Hand-length guide rings as a fading hint (recommendation). | Drawn on draw-the-hands faces in Model (labelled) and Guided. |
 | 9 | No calendars, 24-hour time or seconds (recommendation). | Not built. |
 | 10 | Order times within one morning or one afternoon by default (recommendation). | `order_clocks_*` `noon: never / across` (across prints a.m./p.m.). |
-| 11 | Both spoken forms as an option: "5 minutes past 2" / "five past two" style, and "two-oh-five" style. Pupils always WRITE digital. | `words`: numerals / past / oh; the answer is always the two-box digital slot. |
+| 11 | Both spoken forms as an option: "5 minutes past 2" / "five past two" style, and "two-oh-five" style. Pupils always WRITE digital. | On the reading ids the spoken form rides in `stimulus` (clock / words / words-past / words-oh), so there is no control that only works after another is set; `time_match_clock` has `words` (numerals / past / oh). The answer is always the two-box digital slot. |
 | 12 | At Qatari riyal, 25 / 50 dirham coins and notes first (recommendation). | With no coins ticked, a QR page deals 25 and 50; 1, 5, 10 when ticked. |
 | 13 | Re-tag `time_1min` to grade 3 and `order_clocks_*` to 1-2; add the workbook row code and split the merged EE sub-letters (recommendation). | `time_1min` 3; analog order ids 1, digital 2; `M.EE.4.MD.5.d` (school workbook), `M.EE.1.MD.3.d` and `M.EE.4.MD.2.d` in `data/standards/ee-math.json`; §21 applied in `standards.js`. |
 
 Two controls were added after the P12 options self-score put this family's O1 / O3 at 7: **Numbers on
 the clock** (`numerals`: all 12 / 12, 3, 6, 9 / 12 only — a support fade) on every clock-reading
-id, and **Coins used** (`values`) on every money id that draws coins.
+id (analog faces), and **Coins used** (`values`: 1, 5, 10, 25; all ticked is the currency's usual set, at QR 25 and 50) on every money id that draws coins.
+
+Option ids were aligned with the key registry on main: the elapsed `span` is `hours` (P9 owns a numeric `span`), ordering across 12 is `noon: never / across`, and every P10-only option key is two characters in block 1 (`1A` …).
 
 The questions as they were asked follow.
 
