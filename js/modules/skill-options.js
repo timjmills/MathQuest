@@ -1145,7 +1145,7 @@ Object.assign(P12_OPTIONS, {
     'fraction_operations:frac_word_problems_plain': [_p12Denoms()],
     'fraction_operations:frac_10_100': [_p12Strip('Off prints the same problems as numbers only, without the tenths and hundredths grids.')],
     'fraction_operations:add_frac_unlike': [_p12Denoms(), _p12Strip()],
-    'fraction_operations:sub_frac_unlike': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:sub_frac_unlike': [_p12Denoms([2, 3]), _p12Strip()],
     'fraction_operations:add_mixed_unlike': [_p12Denoms(), _p12Strip()],
     'fraction_operations:sub_mixed_unlike': [_p12Denoms(), _p12Strip()],
     'fraction_operations:add_frac_like_nv': [_p12Denoms([2, 3, 5, 7]), _fracNvForms('add_frac_like_nv')],
@@ -1169,7 +1169,7 @@ Object.assign(P12_OPTIONS, {
     'fraction_operations:frac_as_div_word': [_p12Denoms([2, 3, 5, 7])],
     'fraction_operations:mult_scaling_nv': [_p12Variants('mult_scaling_nv', ['type1', 'type2', 'type3'],
         ['A fraction less than 1: is the product smaller?', 'A fraction greater than 1: is the product bigger?', 'Write >, < or ='])],
-    'fraction_operations:mult_frac_frac': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:mult_frac_frac': [_p12Denoms([2, 3]), _p12Strip()],
     'fraction_operations:div_unit_fraction': [_p12Denoms(), _p12Strip()],
     'fraction_operations:frac_as_division': [_p12Denoms([2, 5]), _p12Strip()],
     'fraction_operations:mult_scaling': [_p12Strip('Off prints the same comparisons as numbers only, without the scaling bars.')],
@@ -1504,8 +1504,6 @@ Object.assign(P12_OPTIONS, {
     'algebra:inequalities': [_p12Match([['True or false?', 'true or false'], ['Drag a marker onto the line', 'Drag the marker'], ['Sort values into bins (drag)', 'Drag each value']])],
     'algebra:combine_like_terms': [_p12Match([['Simplify (3x + 2 + 5x)', '^Simplify'], ['How many x-terms?', 'How many x-terms']])],
     'algebra:distributive_expr': [_p12Match([['Expand a(x + b)', '\\(x \\+'], ['Expand a(x − b)', '\\(x -'], ['Factor out the greatest common factor', 'Factor out']])],
-    'algebra:function_table_easy': [_p12Match([['Fill in the table', '^Function Table'], ['Drag the pairs that fit the rule', '^The rule is']])],
-    'algebra:function_table_hard': [_p12Match([['Fill in the table', '^Function Table'], ['Drag the pairs that fit the rule', '^The rule is']])],
     'algebra:solve_eq_addsub': [_p12Match([['? + a = b (a box)', 'Solve: \\? '], ['x + a = b', 'Solve: [a-z] \\+'], ['x − a = b', 'Solve: [a-z] -'],
         ['b = x + a (turned round)', 'Solve: \\d+ = '], ['Drag the numbers that work', '^Equation']])],
     'algebra:solve_eq_multdiv': [_p12Match([['? ÷ a = b (a box)', 'Solve: \\? ÷'], ['ax = b', 'Solve: \\d+[a-z] ='], ['a × x = b', 'Solve: \\d+ × [a-z]'],
@@ -1555,6 +1553,8 @@ Object.assign(P12_OPTIONS, {
 });
 
 // ======================= MEASUREMENT, TIME, MONEY (gen-measurement.js) =====================
+// NOTE: the time rungs, elapsed rungs and clock-ordering routes just below, and the TIME AND
+// MONEY block at the end of P12, are supersedable stop-gaps (a P10 agent owns time and money).
 // ROUTES. Several measurement skills are one rung each of a ladder that lives in sibling ids
 // (time_hour … time_1min; elapsed_30min … elapsed_mixed; the four clock-ordering ids). Their
 // option picks the sibling rung, whose own branch draws the item (generate-question.js asks
@@ -1614,12 +1614,6 @@ for (const [model, byDir] of Object.entries(_ORD)) {
     }
 }
 Object.assign(P12_OPTIONS, {
-    'measurement:time_analog_digital': [_p12Match([['Which analog clock shows the time?', 'Which analog clock'],
-        ['Which digital clock shows the same time?', 'Which digital clock'], ['Put the clocks in order (drag)', 'Drag the clocks']])],
-    'measurement:time_match_clock': [_p12Kinds('precision', 'Times to', [['The hour', '=> \\d+:00$'], ['The half hour', '=> \\d+:30$'],
-        ['The quarter hour', '=> \\d+:(15|45)$'], ['5 minutes', '=> \\d+:(05|10|20|25|35|40|50|55)$']])],
-    'measurement:elapsed_find_duration': [_p12Max([120, 180], 300, { label: 'Longest time', labels: { 120: '2 hours', 180: '3 hours' },
-        help: 'The longest time that passes, in minutes.' })],
     'measurement:heavier_lighter_visual': [_p12Match([['Which is heavier?', 'heavier'], ['Which is lighter?', 'lighter']])],
     'measurement:pictograph_intro': [_p12Match([['How many?', '^How many (?!MORE)'], ['How many more?', 'How many MORE']])],
     'measurement:bar_graph_intro': [_p12Match([['Which has the most?', 'MOST'], ['How many?', '^How many (?!MORE)'], ['How many more?', 'How many MORE']])],
@@ -1627,12 +1621,6 @@ Object.assign(P12_OPTIONS, {
         ['Quarter inches', '=> (\\d+ )?[13]/4$']], 'Whole inches first, then halves, then quarters.')],
     'measurement:reading_ruler_hard': [_p12Kinds('parts', 'Marks read', [['Whole inches', '=> \\d+$'], ['Half inches', '=> (\\d+ )?1/2$'],
         ['Quarter inches', '=> (\\d+ )?[13]/4$']], 'Whole inches first, then halves, then quarters.')],
-    'measurement:money_count': [_p12Match([['Count coins (cents)', 'Count the coins|cents do these'], ['Count bills (dollars)', 'Count the bills'],
-        ['Coins and bills together', 'Count all the money'], ['Click the sets that make it', 'Click ALL']])],
-    'measurement:money': [_p12Match([['Add two amounts', 'Find the total'], ['Find the change', 'You paid'], ['Click every way to make it', 'Click ALL']])],
-    'measurement:equiv_coin_sets': [_p12Max([25, 50], 100, { label: 'Amounts to', help: 'The amount in cents the coin sets must make.' })],
-    'measurement:enough_money': [_p12Match([['Enough money (yes)', '=> Yes$'], ['Not enough money', '=> No']], { label: 'Which answer',
-        help: 'Both, mixed, is the default: the pupil has to add up. One kind alone is a warm-up.' })],
     'measurement:temperature': [
         _p12Match([['Read the thermometer (°F)', 'shown\\? \\(°F\\)'], ['Read the thermometer (°C)', 'shown\\? \\(°C\\)'],
             ['Convert between °C and °F', '^Convert'], ['Click or sort temperatures', 'Click ALL|Sort each']]),
@@ -1654,6 +1642,26 @@ Object.assign(P12_OPTIONS, {
     'measurement:estimate_length': [_p12Match([['About how long?', 'About how long'], ['Click every reasonable estimate', 'Click ALL'], ['Sort by unit (drag)', 'Sort each']])],
     'shapes_early:order_objects_length': [_p12Enum('tiles', 'Objects to order', [{ v: null, l: '3 or 4, dealt' }, { v: 3, l: '3' }, { v: 4, l: '4' }], null,
         'Four objects is harder: one more comparison to make.')],
+});
+
+// ---- TIME AND MONEY (P12, SUPERSEDABLE) ---------------------------------------------------
+// A P10 agent owns the time and money skills (options, generators, clock / coin drawing). These
+// entries and the time / elapsed / clock-ordering route loops above are P12's stop-gap panels,
+// kept in one place so P10 can replace them wholesale: assigning a new entry for the same key
+// after this block supersedes it, and deleting P12_ROUTES entries turns the routes off.
+Object.assign(P12_OPTIONS, {
+    'measurement:time_analog_digital': [_p12Match([['Which analog clock shows the time?', 'Which analog clock'],
+        ['Which digital clock shows the same time?', 'Which digital clock'], ['Put the clocks in order (drag)', 'Drag the clocks']])],
+    'measurement:time_match_clock': [_p12Kinds('precision', 'Times to', [['The hour', '=> \\d+:00$'], ['The half hour', '=> \\d+:30$'],
+        ['The quarter hour', '=> \\d+:(15|45)$'], ['5 minutes', '=> \\d+:(05|10|20|25|35|40|50|55)$']])],
+    'measurement:elapsed_find_duration': [_p12Max([120, 180], 300, { label: 'Longest time', labels: { 120: '2 hours', 180: '3 hours' },
+        help: 'The longest time that passes, in minutes.' })],
+    'measurement:money_count': [_p12Match([['Count coins (cents)', 'Count the coins|cents do these'], ['Count bills (dollars)', 'Count the bills'],
+        ['Coins and bills together', 'Count all the money'], ['Click the sets that make it', 'Click ALL']])],
+    'measurement:money': [_p12Match([['Add two amounts', 'Find the total'], ['Find the change', 'You paid'], ['Click every way to make it', 'Click ALL']])],
+    'measurement:equiv_coin_sets': [_p12Max([25, 50], 100, { label: 'Amounts to', help: 'The amount in cents the coin sets must make.' })],
+    'measurement:enough_money': [_p12Match([['Enough money (yes)', '=> Yes$'], ['Not enough money', '=> No']], { label: 'Which answer',
+        help: 'Both, mixed, is the default: the pupil has to add up. One kind alone is a warm-up.' })],
 });
 
 Object.assign(SKILL_OPTIONS, P12_OPTIONS);

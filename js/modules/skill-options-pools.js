@@ -23,7 +23,7 @@
 // The category letters are copied from number-selection.js FROZEN_CATEGORY_CODES, which ws-boot-smoke
 // pins; they are the letters a teacher already holds on paper, so they are safe to reuse here.
 import { SKILLS, getMixedPoolSkills, getSkillsForCategory, getMixedSkillScope, getSkillsForGrade, isMixedMetaSkill } from './data.js';
-import { registerPoolOptions } from './skill-options.js';
+import { registerPoolOptions, pvRefusal, APP_DEFAULT_RANGE } from './skill-options.js';
 
 const CATEGORY_LETTER = {
     decimals: 'L', integers: 'I', algebra: 'G', measurement: 'M', number_theory: 'N',
@@ -106,7 +106,15 @@ export function categoryPool(categoryId, skillId) {
     if (skillId === 'mixed_time') {
         return getSkillsForCategory('measurement').filter(s => s.startsWith('time_') || s.startsWith('elapsed_'));
     }
-    return getMixedPoolSkills(categoryId, skillId);
+    const pool = getMixedPoolSkills(categoryId, skillId);
+    // The place-value / rounding reviews never deal a member Max Number cannot host, nor P4's
+    // strategy ladders (generate-question.js, P9 §2.5), so they are not offered as ticks either:
+    // a page of only "nearest 1,000" from a review is refused at the default Max Number.
+    if (categoryId === 'placevalue' || categoryId === 'number_sense') {
+        const P4 = new Set(['make_a_ten', 'doubles_near_doubles', 'compensation']);
+        return pool.filter(sk => !P4.has(sk) && !pvRefusal(categoryId, sk, APP_DEFAULT_RANGE, {}, true));
+    }
+    return pool;
 }
 
 const _cache = new Map();

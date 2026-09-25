@@ -51,6 +51,10 @@ function narrowPool(pool) {
     const o = state.skillOptions;
     const m = o && Array.isArray(o.members) ? o.members : null;
     if (!m || !m.length) return pool;
+    // Every offered member ticked is the default: the pool is untouched (it may hold members the
+    // control does not offer, such as a rounding place the default Max Number cannot host).
+    const def = (optionsFor(state.category, state.skill) || []).find(d => d.id === 'members');
+    if (def && def.values.every(x => m.includes(x.v))) return pool;
     const out = pool.filter(s => m.includes(s));
     return out.length ? out : pool;
 }
@@ -440,8 +444,10 @@ function generateResolvedQuestion() {
     // P12: remember the pool id and put it back at the end. It used to stay swapped, so in live
     // practice every item after the first came from whichever story kind the first item drew.
     const mixedWordSkill = MIXED_WORD_SKILLS[state.skill] ? state.skill : null;
+    let wordMember = null;
     if (MIXED_WORD_SKILLS[state.skill]) {
         state.skill = pick(narrowPool(MIXED_WORD_SKILLS[state.skill]));
+        wordMember = state.skill;
     }
 
     // Map new categories to legacy category handling
@@ -783,13 +789,27 @@ function generateResolvedQuestion() {
             // P12: the "Which topics" choice of a grade / "_all" review narrows its categories.
             categoriesToUse = narrowPool(categoriesToUse);
             let allSkillsFlattened = [];
+            // P12: the category of each flattened skill, by position. A skill id can live in two
+            // categories (placevalue:compare and fractions:compare); looking the category up by id
+            // afterwards dealt the fractions skill on a "Place value" review.
+            let allSkillCats = [];
             categoriesToUse.forEach(cat => {
                 if (categorySkillMap[cat]) {
                     allSkillsFlattened = allSkillsFlattened.concat(categorySkillMap[cat]);
+                    allSkillCats = allSkillCats.concat(categorySkillMap[cat].map(() => cat));
                 }
             });
             // P12: a one-topic review ("Fractions — All") ticks skills, not topics.
-            allSkillsFlattened = narrowPool(allSkillsFlattened);
+            // (Only when its members are skills: a topic can share its id with a skill, area_perimeter.)
+            const _memDef = (optionsFor(state.category, state.skill) || []).find(d => d.id === 'members');
+            if (_memDef && !_memDef.values.every(x => Array.isArray(SKILLS[x.v]))) {
+                const keep = narrowPool(allSkillsFlattened);
+                if (keep !== allSkillsFlattened) {
+                    const idx = allSkillsFlattened.map((s, i) => i).filter(i => keep.includes(allSkillsFlattened[i]));
+                    allSkillsFlattened = idx.map(i => allSkillsFlattened[i]);
+                    allSkillCats = idx.map(i => allSkillCats[i]);
+                }
+            }
 
             let targetCategory, targetSkill;
             let skillsWithCategories = [];
@@ -816,13 +836,9 @@ function generateResolvedQuestion() {
                 targetCategory = picked.category;
                 console.log(`custom_mixed picked: skill=${targetSkill}, category=${targetCategory}`);
             } else if (allSkillsFlattened.length > 0) {
-                targetSkill = pick(allSkillsFlattened);
-                for (const [cat, skills] of Object.entries(categorySkillMap)) {
-                    if (skills.includes(targetSkill)) {
-                        targetCategory = cat;
-                        break;
-                    }
-                }
+                const _at = randInt(0, allSkillsFlattened.length - 1);   // the same draw pick() made
+                targetSkill = allSkillsFlattened[_at];
+                targetCategory = allSkillCats[_at];
             }
 
             if (!targetCategory) {
@@ -854,6 +870,7 @@ function generateResolvedQuestion() {
 
             q.skillLabel = window.getSkillLabelForQuestion ? window.getSkillLabelForQuestion(targetSkill, targetCategory) : '';
             q.skillId = targetSkill;
+            q.poolMember = targetCategory;   // P12: the topic this item came from (a grade / "_all" review)
 
             break;
         }
@@ -887,6 +904,7 @@ function generateResolvedQuestion() {
     }
 
     if (poolMember) q.poolMember = poolMember;
+    else if (mixedWordSkill) q.poolMember = wordMember;
     if (mixedWordSkill && !isPlainWord) state.skill = mixedWordSkill;
     // P12: a plain word-problem member drawn by a mixed pool prints plain, like the skill itself.
     if (poolPlainSkill && !isPlainWord) {

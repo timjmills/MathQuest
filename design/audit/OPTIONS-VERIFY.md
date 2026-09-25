@@ -9,30 +9,72 @@ What it checks, per skill and per value of every option the teacher is shown (`o
 | | |
 |---|---|
 | Live skills | 583 |
-| Skills with at least one option shown | 288 |
-| Skills with NO option shown | 295 |
-| Option values checked | 1795 |
-| Values passing every surface | 1791 |
-| Values failing | 4 |
-| … of which gated behind Max Number | 0 |
-| Failing surface counts (a value can fail several) | gen 0 · print 4 · screen 3 · trip 0 |
-| Skills whose every option value passes | 286 / 288 |
+| Skills with at least one option shown | 577 |
+| Skills with NO option shown | 6 |
+| Option values checked | 3776 |
+| Values passing every surface | 3750 |
+| Values failing | 26 |
+| … of which gated behind Max Number | 10 |
+| Failing surface counts (a value can fail several) | gen 24 · print 6 · screen 16 · trip 0 |
+| Skills whose every option value passes | 566 / 577 |
 
 ## Failures by generator file
 
-### gen-counting.js — 1 skill(s), 1 value(s)
+### (algebra_mixed) — 1 skill(s), 1 value(s)
 
 | Skill | Option = value | Failure |
 |---|---|---|
-| `counting:mixed_counting` | level = `[0]` | print: printed sheet identical to the default sheet |
+| `algebra_mixed:algebraic_all` | members = `["placevalue"]` | gen: 4 item(s) from an unticked member (compare,identify)<br>screen/worksheet: 4 item(s) from an unticked member (compare,identify)<br>screen/practice: 4 item(s) from an unticked member (compare,identify) |
 
-### gen-operations.js — 1 skill(s), 3 value(s)
+### (all_mixed) — 3 skill(s), 4 value(s)
 
 | Skill | Option = value | Failure |
 |---|---|---|
-| `number_ops_mixed:word_problems_mixed` | decimals = `1` | print: no number with 1 decimal place(s)<br>screen/practice: no number with 1 decimal place(s) |
-| `number_ops_mixed:word_problems_mixed` | decimals = `2` | print: no number with 2 decimal place(s)<br>screen/practice: no number with 2 decimal place(s) |
-| `number_ops_mixed:word_problems_mixed` | decimals = `3` | print: no number with 3 decimal place(s)<br>screen/practice: no number with 3 decimal place(s) |
+| `all_mixed:all_domains_mixed` | members = `["area_perimeter"]` | gen: items identical to the default (the control does nothing)<br>print: printed sheet identical to the default sheet<br>screen/worksheet: items identical to the default (store not honoured) |
+| `all_mixed:all_domains_mixed` | members = `["placevalue"]` | gen: 2 item(s) from an unticked member (identify)<br>screen/worksheet: 2 item(s) from an unticked member (identify)<br>screen/practice: 1 item(s) from an unticked member (identify) |
+| `all_mixed:grade_2_mixed` | members = `["placevalue"]` | gen: 3 item(s) from an unticked member (compare,identify)<br>screen/worksheet: 3 item(s) from an unticked member (compare,identify)<br>screen/practice: 3 item(s) from an unticked member (identify,compare) |
+| `all_mixed:grade_4_mixed` | members = `["area_perimeter"]` | gen: items identical to the default (the control does nothing)<br>print: printed sheet identical to the default sheet<br>screen/worksheet: items identical to the default (store not honoured) |
+
+### (geo_mixed) — 2 skill(s), 2 value(s)
+
+| Skill | Option = value | Failure |
+|---|---|---|
+| `geo_mixed:geometry_all` | members = `["area_perimeter"]` | gen: items identical to the default (the control does nothing)<br>print: printed sheet identical to the default sheet<br>screen/worksheet: items identical to the default (store not honoured) |
+| `geo_mixed:geo_meas_all` | members = `["area_perimeter"]` | gen: items identical to the default (the control does nothing)<br>print: printed sheet identical to the default sheet<br>screen/worksheet: items identical to the default (store not honoured) |
+
+### gen-algebraic.js — 2 skill(s), 12 value(s)
+
+| Skill | Option = value | Failure |
+|---|---|---|
+| `placevalue:mixed_placevalue` | members = `["more_less_100"]` | gen: no items at any Max Number<br>print: sheet has no items<br>screen/worksheet: no items |
+| `placevalue:mixed_placevalue` | members = `["pv_digit_drag"]` | gen: no items at any Max Number<br>print: sheet has no items<br>screen/worksheet: no items |
+| `number_sense:mixed_number_sense` | members = `["nearest_100"]` | gen: refused at Max Number 100 (no items); works at 10000000 (gated) |
+| `number_sense:mixed_number_sense` | members = `["nearest_1000"]` | gen: refused at Max Number 100 (no items); works at 10000000 (gated) |
+| `number_sense:mixed_number_sense` | members = `["nearest_10000"]` | gen: refused at Max Number 100 (no items); works at 10000000 (gated) |
+| `number_sense:mixed_number_sense` | members = `["nearest_100000"]` | gen: refused at Max Number 100 (no items); works at 10000000 (gated) |
+| `number_sense:mixed_number_sense` | members = `["nearest_million"]` | gen: refused at Max Number 100 (no items); works at 10000000 (gated) |
+| `number_sense:mixed_number_sense` | members = `["round_sort_100"]` | gen: refused at Max Number 100 (no items); works at 10000000 (gated) |
+| `number_sense:mixed_number_sense` | members = `["round_sort_1000"]` | gen: refused at Max Number 100 (no items); works at 10000000 (gated) |
+| `number_sense:mixed_number_sense` | members = `["round_sort_10000"]` | gen: refused at Max Number 100 (no items); works at 10000000 (gated) |
+| `number_sense:mixed_number_sense` | members = `["round_sort_100000"]` | gen: refused at Max Number 100 (no items); works at 10000000 (gated) |
+| `number_sense:mixed_number_sense` | members = `["round_sort_million"]` | gen: refused at Max Number 100 (no items); works at 10000000 (gated) |
+
+### gen-fractions.js — 2 skill(s), 2 value(s)
+
+| Skill | Option = value | Failure |
+|---|---|---|
+| `fraction_operations:sub_frac_unlike` | denoms = `[5]` | screen/practice: denominator outside the ticked families {5}: 2,12,6,3 |
+| `fraction_operations:mult_frac_frac` | denoms = `[5]` | screen/practice: denominator outside the ticked families {5}: 2 |
+
+### gen-operations.js — 1 skill(s), 5 value(s)
+
+| Skill | Option = value | Failure |
+|---|---|---|
+| `number_ops_mixed:word_problems_mixed_plain` | members = `["add_word_problems"]` | gen: 12 item(s) from an unticked member (word_problems_mixed_plain)<br>screen/worksheet: 12 item(s) from an unticked member (word_problems_mixed_plain)<br>screen/practice: 12 item(s) from an unticked member (word_problems_mixed_plain) |
+| `number_ops_mixed:word_problems_mixed_plain` | members = `["sub_word_problems"]` | gen: 12 item(s) from an unticked member (word_problems_mixed_plain)<br>screen/worksheet: 12 item(s) from an unticked member (word_problems_mixed_plain)<br>screen/practice: 12 item(s) from an unticked member (word_problems_mixed_plain) |
+| `number_ops_mixed:word_problems_mixed_plain` | members = `["mult_word_problems"]` | gen: 12 item(s) from an unticked member (word_problems_mixed_plain)<br>screen/worksheet: 12 item(s) from an unticked member (word_problems_mixed_plain)<br>screen/practice: 12 item(s) from an unticked member (word_problems_mixed_plain) |
+| `number_ops_mixed:word_problems_mixed_plain` | members = `["div_word_problems"]` | gen: 12 item(s) from an unticked member (word_problems_mixed_plain)<br>screen/worksheet: 12 item(s) from an unticked member (word_problems_mixed_plain)<br>screen/practice: 12 item(s) from an unticked member (word_problems_mixed_plain) |
+| `number_ops_mixed:word_problems_mixed_plain` | members = `["mult_comparison"]` | gen: 12 item(s) from an unticked member (word_problems_mixed_plain)<br>screen/worksheet: 12 item(s) from an unticked member (word_problems_mixed_plain)<br>screen/practice: 12 item(s) from an unticked member (word_problems_mixed_plain) |
 
 ## Warnings (not failures)
 
@@ -54,15 +96,16 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `counting:number_seq_fill` | range = `50` | print: 4/6 answer(s) not found in the key text (e.g. "19, 21") |
 | `counting:number_seq_fill` | range = `100` | print: 4/6 answer(s) not found in the key text (e.g. "38, 40") |
 | `counting:number_seq_fill` | range = `1000` | print: 3/6 answer(s) not found in the key text (e.g. "601, 501") |
-| `counting:mixed_counting` | range = `10` | gen: "Up to 10" but the answer reaches 18 and the numbers 18<br>print: "Up to 10" but the answer reaches 15 and the numbers null<br>print: 1/6 answer(s) not found in the key text (e.g. "2, 4") |
-| `counting:mixed_counting` | range = `20` | print: 1/6 answer(s) not found in the key text (e.g. "6, 10") |
-| `counting:mixed_counting` | range = `50` | print: 1/6 answer(s) not found in the key text (e.g. "9, 13") |
-| `counting:mixed_counting` | range = `100` | print: 1/6 answer(s) not found in the key text (e.g. "15, 19") |
-| `counting:mixed_counting` | range = `1000` | print: 1/6 answer(s) not found in the key text (e.g. "124, 134") |
-| `counting:mixed_counting` | level = `[3]` | print: 3/6 answer(s) not found in the key text (e.g. "14") |
-| `counting:mixed_counting` | level = `[2]` | print: 1/6 answer(s) not found in the key text (e.g. "15, 19") |
-| `counting:mixed_counting` | level = `[0]` | print: 1/6 answer(s) not found in the key text (e.g. "15, 19") |
-| `counting:mixed_counting` | level = `[3,2,1,0]` | print: 3/6 answer(s) not found in the key text (e.g. "14") |
+| `counting:mixed_counting` | members = `["number_seq_fill"]` | print: 4/6 answer(s) not found in the key text (e.g. "66, 68") |
+| `counting:mixed_counting` | range = `10` | gen: "Up to 10" but the answer reaches 18 and the numbers 18<br>print: "Up to 10" but the answer reaches 15 and the numbers null<br>print: 2/6 answer(s) not found in the key text (e.g. "2, 4") |
+| `counting:mixed_counting` | range = `20` | print: 2/6 answer(s) not found in the key text (e.g. "6, 10") |
+| `counting:mixed_counting` | range = `50` | print: 2/6 answer(s) not found in the key text (e.g. "9, 13") |
+| `counting:mixed_counting` | range = `100` | print: 2/6 answer(s) not found in the key text (e.g. "15, 19") |
+| `counting:mixed_counting` | range = `1000` | print: 2/6 answer(s) not found in the key text (e.g. "124, 134") |
+| `counting:mixed_counting` | level = `[3]` | print: 4/6 answer(s) not found in the key text (e.g. "14") |
+| `counting:mixed_counting` | level = `[2]` | print: 2/6 answer(s) not found in the key text (e.g. "15, 19") |
+| `counting:mixed_counting` | level = `[0]` | print: 2/6 answer(s) not found in the key text (e.g. "15, 19") |
+| `counting:mixed_counting` | level = `[3,2,1,0]` | print: 4/6 answer(s) not found in the key text (e.g. "14") |
 | `comparing:compare_groups` | dir = `"more"` | print: 4/6 answer(s) not found in the key text (e.g. "B") |
 | `comparing:compare_groups` | dir = `"fewer"` | print: 2/6 answer(s) not found in the key text (e.g. "B") |
 | `comparing:compare_groups` | dir = `"same"` | print: 6/6 answer(s) not found in the key text (e.g. "not the same") |
@@ -74,8 +117,10 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `comparing:compare_objects` | task = `"length"` | print: 2/6 answer(s) not found in the key text (e.g. "B") |
 | `comparing:compare_objects` | task = `"height"` | print: 2/6 answer(s) not found in the key text (e.g. "B") |
 | `comparing:compare_objects` | task = `"thickness"` | print: 2/6 answer(s) not found in the key text (e.g. "B") |
-| `comparing:mixed_comparing` | level = `[2]` | print: 3/6 answer(s) not found in the key text (e.g. "B") |
-| `comparing:mixed_comparing` | level = `[2,1]` | print: 3/6 answer(s) not found in the key text (e.g. "B") |
+| `comparing:mixed_comparing` | members = `["compare_groups"]` | print: 3/6 answer(s) not found in the key text (e.g. "not the same") |
+| `comparing:mixed_comparing` | members = `["compare_objects"]` | print: 3/6 answer(s) not found in the key text (e.g. "B") |
+| `comparing:mixed_comparing` | level = `[2]` | print: 4/6 answer(s) not found in the key text (e.g. "B") |
+| `comparing:mixed_comparing` | level = `[2,1]` | print: 4/6 answer(s) not found in the key text (e.g. "B") |
 | `composing:number_bonds` | band = `5` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `composing:number_bonds` | unknown = `"first"` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `composing:number_bonds` | unknown = `"second"` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
@@ -84,13 +129,23 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `composing:hundreds_chart_fill` | tiles = `2` | print: 6/6 answer(s) not found in the key text (e.g. "76, 79") |
 | `composing:hundreds_chart_fill` | tiles = `3` | print: 6/6 answer(s) not found in the key text (e.g. "76, 79, 88") |
 | `composing:ten_frame_build` | band = `5` | print: 6/6 answer(s) not found in the key text (e.g. "1") |
+| `composing:ten_frame_build_teen` | band = `15` | print: 6/6 answer(s) not found in the key text (e.g. "14") |
 | `composing:base10_build` | band = `20` | print: 6/6 answer(s) not found in the key text (e.g. "14") |
 | `composing:base10_build` | band = `50` | print: 6/6 answer(s) not found in the key text (e.g. "27") |
 | `composing:base10_regroup` | band = `50` | print: 6/6 answer(s) not found in the key text (e.g. "24") |
 | `composing:base10_build_hundreds` | band = `500` | print: 6/6 answer(s) not found in the key text (e.g. "263") |
-| `composing:mixed_composing` | level = `[0]` | print: 4/6 answer(s) not found in the key text (e.g. "20") |
-| `composing:mixed_composing` | level = `[1,0]` | print: 4/6 answer(s) not found in the key text (e.g. "20") |
-| `counting_mixed:counting_all` | range = `10` | gen: "Up to 10" but the answer reaches 327 and the numbers 327<br>print: "Up to 10" but the answer reaches 16 and the numbers 16<br>print: 3/6 answer(s) not found in the key text (e.g. "5, 3") |
+| `composing:mixed_composing` | members = `["tens_foundation_visual"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `composing:mixed_composing` | members = `["hundreds_chart_fill"]` | print: 4/6 answer(s) not found in the key text (e.g. "4, 18, 28") |
+| `composing:mixed_composing` | members = `["ten_frame_build"]` | print: 6/6 answer(s) not found in the key text (e.g. "4") |
+| `composing:mixed_composing` | members = `["ten_frame_build_teen"]` | print: 6/6 answer(s) not found in the key text (e.g. "17") |
+| `composing:mixed_composing` | members = `["base10_build"]` | print: 6/6 answer(s) not found in the key text (e.g. "78") |
+| `composing:mixed_composing` | members = `["base10_regroup"]` | print: 6/6 answer(s) not found in the key text (e.g. "20") |
+| `composing:mixed_composing` | members = `["base10_build_hundreds"]` | print: 6/6 answer(s) not found in the key text (e.g. "100") |
+| `composing:mixed_composing` | level = `[0]` | print: 3/6 answer(s) not found in the key text (e.g. "20") |
+| `composing:mixed_composing` | level = `[1,0]` | print: 3/6 answer(s) not found in the key text (e.g. "20") |
+| `counting_mixed:counting_all` | members = `["comparing"]` | print: 2/6 answer(s) not found in the key text (e.g. "same") |
+| `counting_mixed:counting_all` | members = `["composing"]` | print: 2/6 answer(s) not found in the key text (e.g. "1") |
+| `counting_mixed:counting_all` | range = `10` | gen: "Up to 10" but the answer reaches 327 and the numbers 327<br>print: "Up to 10" but the answer reaches 13 and the numbers 13<br>print: 3/6 answer(s) not found in the key text (e.g. "5, 3") |
 | `counting_mixed:counting_all` | range = `20` | gen: "Up to 20" but the answer reaches 327 and the numbers 327<br>print: 3/6 answer(s) not found in the key text (e.g. "11, 7") |
 | `counting_mixed:counting_all` | range = `100` | gen: "Up to 100" but the answer reaches 327 and the numbers 327<br>print: 3/6 answer(s) not found in the key text (e.g. "50, 40") |
 | `addition:add_facts` | constant = `[0]` | print: sheet is not titled "Add 0" (P-31) |
@@ -107,6 +162,7 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `addition:add_facts` | constant = `[11]` | print: sheet is not titled "Add 11" (P-31) |
 | `addition:add_facts` | constant = `[12]` | print: sheet is not titled "Add 12" (P-31) |
 | `addition:add_facts` | constant = `[13]` | print: sheet is not titled "Add 13" (P-31) |
+| `addition:add_word_problems_plain` | range = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `addition:add_sub_fact_family` | range = `10` | print: 6/6 answer(s) not found in the key text (e.g. "10, 10, 2, 8") |
 | `addition:add_sub_fact_family` | range = `100` | print: 6/6 answer(s) not found in the key text (e.g. "19, 19, 2, 17") |
 | `addition:comparison_word` | range = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
@@ -154,6 +210,10 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `addition:nl_add` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only |
 | `addition:cloze_addition` | range = `10` | print: 6/6 answer(s) not found in the key text (e.g. "5, 5") |
 | `addition:cloze_addition` | range = `100` | print: 6/6 answer(s) not found in the key text (e.g. "9, 9") |
+| `addition:mixed_addition` | members = `["add_sub_fact_family"]` | print: 6/6 answer(s) not found in the key text (e.g. "18, 18, 6, 12") |
+| `addition:mixed_addition` | members = `["comparison_word"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `addition:mixed_addition` | members = `["cloze_addition"]` | print: 6/6 answer(s) not found in the key text (e.g. "10, 5") |
+| `addition:mixed_addition` | members = `["add_missing_digit"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `addition:fact_family_sort` | range = `10` | gen: "Up to 10" but the answer reaches null and the numbers 13<br>print: "Up to 10" but the answer reaches null and the numbers 13 |
 | `subtraction:sub_facts` | constant = `[0]` | print: sheet is not titled "Subtract 0" (P-31) |
 | `subtraction:sub_facts` | constant = `[1]` | print: sheet is not titled "Subtract 1" (P-31) |
@@ -252,6 +312,58 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `subtraction:nl_sub` | unknown = `"second"` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `subtraction:nl_sub` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `subtraction:nl_sub` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_facts"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["subtract"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_word_problems"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_word_problems_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["missing_add_sub"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_5_pictures"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["unknown_start_wp"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_10_no_regroup"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_10_regroup"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_10_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_20_no_regroup"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_20_regroup"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_20_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:mixed_subtraction` | members = `["sub_50_no_regroup"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_50_regroup"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_50_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_100_no_regroup"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_100_regroup"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_100_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_1k_no_regroup"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_1k_regroup"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_1k_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_10k_no_regroup"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_10k_regroup"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_10k_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_100k_no_regroup"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_100k_regroup"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_100k_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_1m_no_regroup"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_1m_regroup"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_1m_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_wp_10"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:mixed_subtraction` | members = `["sub_wp_10_plain"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:mixed_subtraction` | members = `["sub_wp_20"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:mixed_subtraction` | members = `["sub_wp_20_plain"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:mixed_subtraction` | members = `["sub_wp_50"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_wp_50_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_wp_100"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_wp_100_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_wp_1k"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_wp_1k_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_wp_10k"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_wp_10k_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_wp_100k"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_wp_100k_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_wp_1m"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_wp_1m_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["nl_sub"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["number_line_sub"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:mixed_subtraction` | members = `["sub_across_zeros"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_missing_digit"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:mixed_subtraction` | members = `["sub_check_by_adding"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `subtraction:sub_across_zeros` | range = `100` | gen: "Up to 100" but the answer reaches 319 and the numbers 408<br>print: "Up to 100" but the answer reaches 319 and the numbers 408 |
 | `subtraction:sub_missing_digit` | range = `100` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `subtraction:sub_missing_digit` | range = `1000` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
@@ -269,8 +381,35 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `multiplication:mult_facts` | constant = `[11]` | print: sheet is not titled "Multiply by 11" (P-31) |
 | `multiplication:mult_facts` | constant = `[12]` | print: sheet is not titled "Multiply by 12" (P-31) |
 | `multiplication:arrays_groups` | range = `10` | gen: "Up to 10" but the answer reaches 25 and the numbers null<br>print: "Up to 10" but the answer reaches 25 and the numbers null |
+| `multiplication:mult_properties` | forms = `[1]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `multiplication:area_model_mult` | tiles = `21` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:area_model_mult` | tiles = `31` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:area_model_mult_hard` | tiles = `22` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:area_model_mult_hard` | tiles = `23` | gen: generator not reproducible; difference not checkable, predicate only |
 | `multiplication:mult_chart` | band = `25` | print: 6/6 answer(s) not found in the key text (e.g. "3, 16, 25") |
 | `multiplication:mult_chart` | band = `100` | print: 6/6 answer(s) not found in the key text (e.g. "28, 56, 72") |
+| `multiplication:mixed_multiplication` | members = `["mult_facts"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["multiply"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["arrays_groups"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["dot_array_mult"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["mult_properties"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["mult_word_problems"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["mult_word_problems_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["mult_comparison"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["mult_comparison_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["area_model_mult"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["area_model_mult_hard"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["mult_div_fact_family"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["number_families_mult"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["mult_chart"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 6/6 answer(s) not found in the key text (e.g. "36, 35, 27") |
+| `multiplication:mixed_multiplication` | members = `["mult_chart_easy"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["nl_mult"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["repeated_add_to_mult"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["equal_or_unequal_groups"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["mult_zeros"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["mult_placeholder_zero"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["mult_missing_digit"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 4/6 answer(s) not found in the key text (e.g. "6") |
+| `multiplication:mult_missing_digit` | tiles = `31` | print: 2/6 answer(s) not found in the key text (e.g. "4") |
 | `division:div_facts` | constant = `[0]` | print: sheet is not titled "Zero divided by a number" (P-31) |
 | `division:div_facts` | constant = `[1]` | print: sheet is not titled "Divide by 1" (P-31) |
 | `division:div_facts` | constant = `[2]` | print: sheet is not titled "Divide by 2" (P-31) |
@@ -289,65 +428,373 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `division:divide` | notation = `["fraction"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `division:divide` | notation = `["across","bracket","fraction"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `division:divide` | range = `100` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `division:div_remainders` | constant = `[2]` | print: sheet is not titled "Divide by 2" (P-31) |
+| `division:div_remainders` | constant = `[3]` | print: sheet is not titled "Divide by 3" (P-31) |
+| `division:div_remainders` | constant = `[4]` | print: sheet is not titled "Divide by 4" (P-31) |
+| `division:div_remainders` | constant = `[5]` | print: sheet is not titled "Divide by 5" (P-31) |
+| `division:div_remainders` | constant = `[6]` | print: sheet is not titled "Divide by 6" (P-31) |
+| `division:div_remainders` | constant = `[7]` | print: sheet is not titled "Divide by 7" (P-31) |
+| `division:div_remainders` | constant = `[8]` | print: sheet is not titled "Divide by 8" (P-31) |
+| `division:div_remainders` | constant = `[9]` | print: sheet is not titled "Divide by 9" (P-31) |
 | `division:remainder_interpret` | range = `100` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `division:remainder_interpret` | range = `1000` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `division:remainder_contexts` | range = `100` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `division:box_division_easy` | constant = `[2]` | print: sheet is not titled "Divide by 2" (P-31) |
+| `division:box_division_easy` | constant = `[3]` | print: sheet is not titled "Divide by 3" (P-31) |
+| `division:box_division_easy` | constant = `[4]` | print: sheet is not titled "Divide by 4" (P-31) |
+| `division:box_division_easy` | constant = `[5]` | print: sheet is not titled "Divide by 5" (P-31) |
+| `division:box_division_easy` | constant = `[6]` | print: sheet is not titled "Divide by 6" (P-31) |
+| `division:box_division_easy` | constant = `[7]` | print: sheet is not titled "Divide by 7" (P-31) |
+| `division:box_division_easy` | constant = `[8]` | print: sheet is not titled "Divide by 8" (P-31) |
+| `division:box_division_easy` | constant = `[9]` | print: sheet is not titled "Divide by 9" (P-31) |
+| `division:box_division_hard` | constant = `[2]` | print: sheet is not titled "Divide by 2" (P-31) |
+| `division:box_division_hard` | constant = `[3]` | print: sheet is not titled "Divide by 3" (P-31) |
+| `division:box_division_hard` | constant = `[4]` | print: sheet is not titled "Divide by 4" (P-31) |
+| `division:box_division_hard` | constant = `[5]` | print: sheet is not titled "Divide by 5" (P-31) |
+| `division:box_division_hard` | constant = `[6]` | print: sheet is not titled "Divide by 6" (P-31) |
+| `division:box_division_hard` | constant = `[7]` | print: sheet is not titled "Divide by 7" (P-31) |
+| `division:box_division_hard` | constant = `[8]` | print: sheet is not titled "Divide by 8" (P-31) |
+| `division:box_division_hard` | constant = `[9]` | print: sheet is not titled "Divide by 9" (P-31) |
+| `division:area_model_div_2by1` | constant = `[2]` | print: sheet is not titled "Divide by 2" (P-31) |
+| `division:area_model_div_2by1` | constant = `[3]` | print: sheet is not titled "Divide by 3" (P-31) |
+| `division:area_model_div_2by1` | constant = `[4]` | print: sheet is not titled "Divide by 4" (P-31) |
+| `division:area_model_div_2by1` | constant = `[5]` | print: sheet is not titled "Divide by 5" (P-31) |
+| `division:area_model_div_2by1` | constant = `[6]` | print: sheet is not titled "Divide by 6" (P-31) |
+| `division:area_model_div_2by1` | constant = `[7]` | print: sheet is not titled "Divide by 7" (P-31) |
+| `division:area_model_div_2by1` | constant = `[8]` | print: sheet is not titled "Divide by 8" (P-31) |
+| `division:area_model_div_2by1` | constant = `[9]` | print: sheet is not titled "Divide by 9" (P-31) |
+| `division:area_model_div_3by1` | constant = `[2]` | print: sheet is not titled "Divide by 2" (P-31) |
+| `division:area_model_div_3by1` | constant = `[3]` | print: sheet is not titled "Divide by 3" (P-31) |
+| `division:area_model_div_3by1` | constant = `[4]` | print: sheet is not titled "Divide by 4" (P-31) |
+| `division:area_model_div_3by1` | constant = `[5]` | print: sheet is not titled "Divide by 5" (P-31) |
+| `division:area_model_div_3by1` | constant = `[6]` | print: sheet is not titled "Divide by 6" (P-31) |
+| `division:area_model_div_3by1` | constant = `[7]` | print: sheet is not titled "Divide by 7" (P-31) |
+| `division:area_model_div_3by1` | constant = `[8]` | print: sheet is not titled "Divide by 8" (P-31) |
+| `division:area_model_div_3by1` | constant = `[9]` | print: sheet is not titled "Divide by 9" (P-31) |
 | `division:missing_mult_div` | notation = `["bracket"]` | gen: 6/12 items overruled to  (multi-digit exception) |
 | `division:missing_mult_div` | notation = `["fraction"]` | gen: 6/12 items overruled to  (multi-digit exception) |
 | `division:missing_mult_div` | notation = `["across","bracket","fraction"]` | gen: 6/12 items overruled to  (multi-digit exception) |
 | `division:nl_div` | band = `20` | gen: generator not reproducible; difference not checkable, predicate only |
 | `division:nl_div` | band = `50` | gen: generator not reproducible; difference not checkable, predicate only |
-| `division:mixed_mult_div` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 100" but the answer reaches 107 and the numbers 264 |
-| `division:mixed_mult_div` | range = `1000` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 1000" but the answer reaches 4075 and the numbers 8150 |
+| `division:mixed_division` | members = `["div_facts"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["divide"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["div_remainders"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["div_word_problems"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["div_word_problems_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["remainder_interpret"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["remainder_contexts"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["box_division_easy"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["box_division_hard"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["area_model_div_2by1"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["area_model_div_3by1"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["long_div_2digit"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["nl_div"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["share_into_groups"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["div_equation_parts"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["div_zero_in_quotient"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["remainder_too_big"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["div_check_by_multiplying"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:mixed_division` | members = `["div_fix_estimate"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `division:div_zero_in_quotient` | range = `100` | gen: "Up to 100" but the answer reaches 405 and the numbers 912<br>print: "Up to 100" but the answer reaches 405 and the numbers 912 |
 | `division:div_zero_in_quotient` | range = `1000` | gen: "Up to 1000" but the answer reaches 4028 and the numbers 8056<br>print: "Up to 1000" but the answer reaches 4028 and the numbers 8056 |
+| `division:remainder_too_big` | constant = `[3]` | print: sheet is not titled "Divide by 3" (P-31) |
+| `division:remainder_too_big` | constant = `[4]` | print: sheet is not titled "Divide by 4" (P-31) |
+| `division:remainder_too_big` | constant = `[5]` | print: sheet is not titled "Divide by 5" (P-31) |
+| `division:remainder_too_big` | constant = `[6]` | print: sheet is not titled "Divide by 6" (P-31) |
+| `division:remainder_too_big` | constant = `[7]` | print: sheet is not titled "Divide by 7" (P-31) |
+| `division:remainder_too_big` | constant = `[8]` | print: sheet is not titled "Divide by 8" (P-31) |
+| `division:remainder_too_big` | constant = `[9]` | print: sheet is not titled "Divide by 9" (P-31) |
+| `integers:integer_nl_drag` | forms = `[0]` | print: printed sheet identical to the default, which already satisfies this value |
+| `integers:mixed_integers` | members = `["number_line_int"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `integers:ordering_rationals` | forms = `[1]` | screen/practice: items identical to the default, which already satisfy this value |
 | `number_ops_mixed:mixed` | range = `10` | gen: "Up to 10" but the answer reaches 42 and the numbers 55<br>print: "Up to 10" but the answer reaches 42 and the numbers 55 |
 | `number_ops_mixed:mixed` | range = `20` | gen: "Up to 20" but the answer reaches 42 and the numbers 55<br>print: "Up to 20" but the answer reaches 42 and the numbers 55 |
 | `number_ops_mixed:mixed` | range = `50` | gen: "Up to 50" but the answer reaches 68 and the numbers 55 |
-| `number_ops_mixed:word_problems_mixed` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 10" but the answer reaches 30 and the numbers 49 |
-| `number_ops_mixed:word_problems_mixed` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only |
-| `number_ops_mixed:word_problems_mixed` | decimals = `0` | gen: generator not reproducible; difference not checkable, predicate only |
-| `number_ops_mixed:word_problems_mixed` | decimals = `1` | gen: generator not reproducible; difference not checkable, predicate only |
-| `number_ops_mixed:word_problems_mixed` | decimals = `2` | gen: generator not reproducible; difference not checkable, predicate only |
-| `number_ops_mixed:word_problems_mixed` | decimals = `3` | gen: generator not reproducible; difference not checkable, predicate only |
-| `number_ops_mixed:word_problems_mixed_plain` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 10" but the answer reaches 14 and the numbers 49 |
-| `number_ops_mixed:word_problems_mixed_plain` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
-| `number_ops_mixed:word_problems_mixed_plain` | decimals = `0` | gen: generator not reproducible; difference not checkable, predicate only |
-| `number_ops_mixed:word_problems_mixed_plain` | decimals = `1` | gen: generator not reproducible; difference not checkable, predicate only |
-| `number_ops_mixed:word_problems_mixed_plain` | decimals = `2` | gen: generator not reproducible; difference not checkable, predicate only |
-| `number_ops_mixed:word_problems_mixed_plain` | decimals = `3` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `number_ops_mixed:word_problems_mixed` | members = `["add_word_problems"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `number_ops_mixed:word_problems_mixed` | members = `["sub_word_problems"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `number_ops_mixed:word_problems_mixed` | members = `["mult_word_problems"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `number_ops_mixed:word_problems_mixed` | members = `["div_word_problems"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `number_ops_mixed:word_problems_mixed` | members = `["mult_comparison"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `number_ops_mixed:word_problems_mixed_plain` | members = `["add_word_problems"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `number_ops_mixed:word_problems_mixed_plain` | members = `["sub_word_problems"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `number_ops_mixed:word_problems_mixed_plain` | members = `["mult_word_problems"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `number_ops_mixed:word_problems_mixed_plain` | members = `["div_word_problems"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `number_ops_mixed:word_problems_mixed_plain` | members = `["mult_comparison"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `number_ops_mixed:operations_all` | members = `["addition"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `number_ops_mixed:operations_all` | members = `["subtraction"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `number_ops_mixed:operations_all` | members = `["multiplication"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `number_ops_mixed:operations_all` | members = `["division"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `number_ops_mixed:operations_all` | members = `["integers"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `number_ops_mixed:which_sign` | range = `10` | gen: "Up to 10" but the answer reaches null and the numbers 20<br>print: "Up to 10" but the answer reaches null and the numbers 20 |
-| `fractions:fraction_of_set` | range = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `fractions:fraction_of_set` | denoms = `[2]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `fractions:fraction_of_set` | denoms = `[3]` | print: 3/6 answer(s) not found in the key text (e.g. "1") |
+| `fractions:fraction_of_set` | denoms = `[5]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `fractions:fraction_of_set` | range = `20` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `fractions:fraction_of_set` | range = `100` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
-| `fractions:fraction_of_set_hard` | range = `10` | gen: "Up to 10" but the answer reaches 24 and the numbers 24<br>print: "Up to 10" but the answer reaches 18 and the numbers 18 |
+| `fractions:fraction_of_set_hard` | range = `10` | gen: "Up to 10" but the answer reaches 18 and the numbers 24<br>print: "Up to 10" but the answer reaches 18 and the numbers 18 |
+| `fractions:fraction_of_set_hard` | range = `20` | gen: "Up to 20" but the answer reaches 24 and the numbers 24 |
+| `fractions:simplify` | forms = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:simplify` | forms = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:simplify` | forms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["identify"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["write_fraction"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["shade_fraction"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `fractions:mixed_fractions` | members = `["equiv_frac_visual"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["equiv_frac_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["select_equiv_frac"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["equivalent"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["fraction_of_set"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["fraction_of_set_hard"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["compare"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["simplify"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["improper_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["mixed_improper_visual"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["compose_target_frac"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["identify_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["fraction_of_set_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["fraction_of_set_hard_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["order_fractions"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["order_frac_numline"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["benchmark_fractions"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["compare_frac_lcd"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["graph_fractions"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `fractions:mixed_fractions` | members = `["round_fractions"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["fraction_bar_ops"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["fraction_nl_drag"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:mixed_fractions` | members = `["mixed_nl_drag"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:fraction_of_set_nv` | denoms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:fraction_of_set_nv` | denoms = `[3]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:fraction_of_set_nv` | denoms = `[5]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:fraction_of_set_nv` | denoms = `[7]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:fraction_of_set_nv` | forms = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:fraction_of_set_nv` | forms = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:fraction_of_set_nv` | forms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:fraction_of_set_hard_nv` | denoms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:fraction_of_set_hard_nv` | denoms = `[3]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:fraction_of_set_hard_nv` | denoms = `[5]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:fraction_of_set_hard_nv` | forms = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:fraction_of_set_hard_nv` | forms = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:fraction_of_set_hard_nv` | forms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fractions:graph_fractions` | denoms = `[2]` | print: 2/6 answer(s) not found in the key text (e.g. "1") |
+| `fractions:graph_fractions` | denoms = `[3]` | print: 2/6 answer(s) not found in the key text (e.g. "1") |
+| `fractions:round_fractions` | denoms = `[2]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `fractions:round_fractions` | denoms = `[3]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `fraction_operations:frac_word_problems` | denoms = `[2]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `fraction_operations:add_frac_like_nv` | forms = `[1]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `fraction_operations:add_frac_unlike_nv` | forms = `[2]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `fraction_operations:sub_frac_unlike_nv` | denoms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:sub_frac_unlike_nv` | denoms = `[3]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:sub_frac_unlike_nv` | denoms = `[5]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:sub_frac_unlike_nv` | forms = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:sub_frac_unlike_nv` | forms = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:sub_frac_unlike_nv` | forms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 2/6 answer(s) not found in the key text (e.g. "1") |
+| `fraction_operations:decompose_frac_nv` | denoms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:decompose_frac_nv` | denoms = `[3]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:decompose_frac_nv` | denoms = `[5]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:decompose_frac_nv` | denoms = `[7]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:decompose_frac_nv` | forms = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:decompose_frac_nv` | forms = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:decompose_frac_nv` | forms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:frac_10_100_nv` | forms = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:frac_10_100_nv` | forms = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:frac_10_100_nv` | forms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:frac_10_100_nv` | forms = `[3]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mult_frac_frac_nv` | denoms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mult_frac_frac_nv` | denoms = `[3]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mult_frac_frac_nv` | denoms = `[5]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `fraction_operations:mult_frac_frac_nv` | forms = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mult_frac_frac_nv` | forms = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mult_frac_frac_nv` | forms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:div_unit_frac_nv` | denoms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:div_unit_frac_nv` | denoms = `[3]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:div_unit_frac_nv` | denoms = `[5]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:div_unit_frac_nv` | forms = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:div_unit_frac_nv` | forms = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:div_unit_frac_nv` | forms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:div_unit_frac_nv` | forms = `[3]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mult_scaling_nv` | forms = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mult_scaling_nv` | forms = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mult_scaling_nv` | forms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["add_fractions_like"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["sub_fractions_like"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["add_mixed_like"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["sub_mixed_like"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["mult_frac_whole"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["decompose_fractions"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["frac_word_problems"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["frac_word_problems_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["frac_10_100"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["add_frac_unlike"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["sub_frac_unlike"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["add_mixed_unlike"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["sub_mixed_unlike"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["add_frac_like_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["sub_frac_like_nv"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `fraction_operations:mixed_fraction_ops` | members = `["add_frac_unlike_nv"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 2/6 answer(s) not found in the key text (e.g. "1") |
+| `fraction_operations:mixed_fraction_ops` | members = `["sub_frac_unlike_nv"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `fraction_operations:mixed_fraction_ops` | members = `["add_mixed_like_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["sub_mixed_like_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["add_mixed_unlike_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["sub_mixed_unlike_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["mult_frac_whole_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["decompose_frac_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["frac_10_100_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["mult_frac_frac_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["div_unit_frac_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["frac_as_div_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["frac_as_div_word"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["mult_scaling_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["mult_frac_frac"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["div_unit_fraction"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["frac_as_division"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["mult_scaling"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["frac_mult_word"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["frac_mult_word_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["frac_word_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["frac_word_mixed_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `fraction_operations:mixed_fraction_ops` | members = `["estimate_frac_ops"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `decimals:add_decimal` | range = `1000` | print: 1/6 answer(s) not found in the key text (e.g. "64") |
 | `decimals:add_decimal` | decimals = `1` | print: 1/6 answer(s) not found in the key text (e.g. "14") |
+| `decimals:mixed_decimals` | members = `["add_decimal"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `decimals:mixed_decimals` | members = `["sub_decimal"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `decimals:mixed_decimals` | members = `["mult_decimal"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `decimals:mixed_decimals` | members = `["div_decimal"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `decimals:mixed_decimals` | members = `["compare_decimal"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `decimals:mixed_decimals` | members = `["compare_thousandths"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `decimals:mixed_decimals` | members = `["round_decimals"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `decimals:mixed_decimals` | members = `["round_thousandths"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `decimals:mixed_decimals` | members = `["order_decimals"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `decimals:mixed_decimals` | members = `["decimal_nl_drag"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `decimals:mixed_decimals` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only |
 | `decimals:mixed_decimals` | range = `1000` | gen: generator not reproducible; difference not checkable, predicate only |
 | `decimals:mixed_decimals` | decimals = `1` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: some numbers have more than 1 places<br>print: some numbers have more than 1 places |
 | `decimals:mixed_decimals` | decimals = `2` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: some numbers have more than 2 places<br>print: some numbers have more than 2 places |
 | `decimals:mixed_decimals` | decimals = `3` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:percent_visual` | forms = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:percent_visual` | forms = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:percent_visual` | forms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:percent_visual` | forms = `[3]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:double_num_line` | band = `10` | print: 2/6 answer(s) not found in the key text (e.g. "1") |
+| `conversions:double_num_line` | band = `20` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `conversions:mixed_conversions` | members = `["f_to_d"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:mixed_conversions` | members = `["d_to_f"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:mixed_conversions` | members = `["f_to_p"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:mixed_conversions` | members = `["p_to_f"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:mixed_conversions` | members = `["d_to_p"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:mixed_conversions` | members = `["p_to_d"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:mixed_conversions` | members = `["percent_visual"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:mixed_conversions` | members = `["percent_of_number"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:mixed_conversions` | members = `["find_whole_from_pct"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:mixed_conversions` | members = `["order_fdp"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:mixed_conversions` | members = `["ratio_intro"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:mixed_conversions` | members = `["unit_rate_intro"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:mixed_conversions` | members = `["double_num_line"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:mixed_conversions` | members = `["equiv_ratios"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `conversions:mixed_conversions` | members = `["ratio_tables"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["identify"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["write_fraction"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["shade_fraction"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["equiv_frac_visual"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["equiv_frac_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["select_equiv_frac"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["equivalent"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["fraction_of_set"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["fraction_of_set_hard"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["compare"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["simplify"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["improper_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["mixed_improper_visual"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["compose_target_frac"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["identify_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["fraction_of_set_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["fraction_of_set_hard_nv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["order_fractions"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["order_frac_numline"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["benchmark_fractions"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["compare_frac_lcd"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["graph_fractions"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["round_fractions"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["fraction_bar_ops"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["fraction_nl_drag"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fractions_all` | members = `["mixed_nl_drag"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:decimals_all` | members = `["add_decimal"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:decimals_all` | members = `["sub_decimal"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:decimals_all` | members = `["mult_decimal"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:decimals_all` | members = `["div_decimal"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:decimals_all` | members = `["compare_decimal"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:decimals_all` | members = `["compare_thousandths"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:decimals_all` | members = `["round_decimals"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:decimals_all` | members = `["round_thousandths"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:decimals_all` | members = `["order_decimals"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:decimals_all` | members = `["decimal_nl_drag"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `frac_dec_mixed:decimals_all` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only |
 | `frac_dec_mixed:decimals_all` | range = `1000` | gen: generator not reproducible; difference not checkable, predicate only |
 | `frac_dec_mixed:decimals_all` | decimals = `1` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: some numbers have more than 1 places<br>print: some numbers have more than 1 places |
 | `frac_dec_mixed:decimals_all` | decimals = `2` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: some numbers have more than 2 places<br>print: some numbers have more than 2 places |
 | `frac_dec_mixed:decimals_all` | decimals = `3` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fdp_all` | members = `["fractions"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `frac_dec_mixed:fdp_all` | members = `["fraction_operations"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fdp_all` | members = `["decimals"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `frac_dec_mixed:fdp_all` | members = `["conversions"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `shapes_early:count_edges_faces_vertices` | forms = `[0]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `shapes_early:mixed_shapes_early` | members = `["count_edges_faces_vertices"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `area_perimeter:area_unit_squares` | forms = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `area_perimeter:area_unit_squares` | forms = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `area_perimeter:area_unit_squares` | band = `12` | gen: generator not reproducible; difference not checkable, predicate only |
+| `area_perimeter:area_unit_squares` | band = `24` | gen: generator not reproducible; difference not checkable, predicate only |
 | `area_perimeter:perimeter` | range = `10` | gen: "Up to 10" but the answer reaches 16 and the numbers 16<br>print: "Up to 10" but the answer reaches 16 and the numbers 14 |
-| `area_perimeter:area` | range = `10` | gen: "Up to 10" but the answer reaches 25 and the numbers 25<br>print: "Up to 10" but the answer reaches 16 and the numbers 20 |
+| `area_perimeter:area` | range = `10` | gen: "Up to 10" but the answer reaches 20 and the numbers 25<br>print: "Up to 10" but the answer reaches 20 and the numbers 20 |
 | `area_perimeter:area_distributive_visual` | range = `10` | gen: "Up to 10" but the answer reaches 49 and the numbers null<br>print: "Up to 10" but the answer reaches 42 and the numbers null |
 | `area_perimeter:area_triangle` | range = `10` | gen: "Up to 10" but the answer reaches 28 and the numbers null<br>print: "Up to 10" but the answer reaches 28 and the numbers null |
 | `area_perimeter:area_polygon_decompose` | range = `10` | gen: "Up to 10" but the answer reaches 26 and the numbers null<br>print: "Up to 10" but the answer reaches 24 and the numbers null |
-| `area_perimeter:composite_shapes` | range = `10` | gen: "Up to 10" but the answer reaches 38 and the numbers null<br>print: "Up to 10" but the answer reaches 32 and the numbers null |
+| `area_perimeter:composite_shapes` | range = `10` | gen: "Up to 10" but the answer reaches 38 and the numbers null<br>print: "Up to 10" but the answer reaches 36 and the numbers null |
 | `area_perimeter:volume` | range = `10` | gen: "Up to 10" but the answer reaches 12 and the numbers 12<br>print: "Up to 10" but the answer reaches 12 and the numbers 12 |
+| `area_perimeter:mixed_area_perimeter` | members = `["perimeter_intro"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `area_perimeter:mixed_area_perimeter` | members = `["area_unit_squares"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `area_perimeter:mixed_area_perimeter` | members = `["perimeter_grid"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `area_perimeter:mixed_area_perimeter` | members = `["perimeter"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `area_perimeter:mixed_area_perimeter` | members = `["area"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `area_perimeter:mixed_area_perimeter` | members = `["area_perimeter"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `area_perimeter:mixed_area_perimeter` | members = `["area_distributive_visual"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `area_perimeter:mixed_area_perimeter` | members = `["area_triangle"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `area_perimeter:mixed_area_perimeter` | members = `["area_polygon_decompose"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `area_perimeter:mixed_area_perimeter` | members = `["composite_shapes"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `area_perimeter:mixed_area_perimeter` | members = `["volume"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `area_perimeter:mixed_area_perimeter` | members = `["volume_composite"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `angles_lines:symmetry` | forms = `[0]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `angles_lines:mixed_angles_lines` | members = `["symmetry"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `coordinates:coord_distance_q1` | range = `10` | print: 2/6 answer(s) not found in the key text (e.g. "1") |
 | `coordinates:coord_distance_q1` | range = `100` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `coordinates:coord_distance_q1` | range = `1000` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `coordinates:mixed_coordinates` | members = `["coordinate_q1"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `coordinates:mixed_coordinates` | members = `["coordinate_all"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `coordinates:mixed_coordinates` | members = `["coordinate_graph"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `coordinates:mixed_coordinates` | members = `["coord_distance_q1"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `coordinates:mixed_coordinates` | members = `["coord_polygon"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `coordinates:mixed_coordinates` | members = `["net_surface_area"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `coordinates:mixed_coordinates` | members = `["geo_reflect"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `coordinates:mixed_coordinates` | members = `["geo_rotate"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `coordinates:mixed_coordinates` | members = `["geo_translate"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `measurement:pictograph_intro` | forms = `[0]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `measurement:bar_graph_intro` | forms = `[1]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `measurement:reading_ruler` | parts = `[0]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `measurement:reading_ruler_hard` | parts = `[0]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `measurement:money_count` | range = `10` | gen: "Up to 10" but the answer reaches 105 and the numbers null<br>print: "Up to 10" but the answer reaches 81 and the numbers null |
 | `measurement:money_count` | range = `20` | gen: "Up to 20" but the answer reaches 105 and the numbers null<br>print: "Up to 20" but the answer reaches 81 and the numbers null |
 | `measurement:money_count` | range = `50` | gen: "Up to 50" but the answer reaches 120 and the numbers null<br>print: "Up to 50" but the answer reaches 81 and the numbers null |
 | `measurement:money_count` | range = `100` | gen: "Up to 100" but the answer reaches 240 and the numbers null<br>print: "Up to 100" but the answer reaches 166 and the numbers null |
+| `measurement:unit_conversions` | units = `[0]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `measurement:mixed_measurement` | members = `["pictograph_intro"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `geo_mixed:geo_meas_all` | members = `["coordinates"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `geo_mixed:geo_meas_all` | members = `["measurement"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `graphs:line_plot_g2` | forms = `[1]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `graphs:line_plot_fractions` | forms = `[2]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `data_analysis:mixed_data_analysis` | range = `10` | gen: "Up to 10" but the answer reaches 15 and the numbers 12<br>print: "Up to 10" but the answer reaches 15 and the numbers 12 |
+| `patterns:seq_2` | forms = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `patterns:seq_2` | forms = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `patterns:seq_2` | unknown = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `patterns:seq_2` | unknown = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `patterns:seq_2` | unknown = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `patterns:seq_2` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 10" but the answer reaches 16 and the numbers 15<br>print: "Up to 10" but the answer reaches 16 and the numbers 14 |
 | `patterns:seq_2` | range = `20` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 20" but the answer reaches 26 and the numbers 24<br>print: "Up to 20" but the answer reaches 26 and the numbers 24 |
 | `patterns:seq_2` | range = `50` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 50" but the answer reaches 56 and the numbers 54<br>print: "Up to 50" but the answer reaches 56 and the numbers 54 |
@@ -360,6 +807,11 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `patterns:seq_5` | range = `20` | gen: "Up to 20" but the answer reaches 33 and the numbers 28<br>print: "Up to 20" but the answer reaches 33 and the numbers 34 |
 | `patterns:seq_5` | range = `50` | gen: "Up to 50" but the answer reaches 58 and the numbers 53<br>print: "Up to 50" but the answer reaches 58 and the numbers 61 |
 | `patterns:seq_5` | range = `100` | print: "Up to 100" but the answer reaches 101 and the numbers 106 |
+| `patterns:seq_10` | forms = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `patterns:seq_10` | forms = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `patterns:seq_10` | unknown = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `patterns:seq_10` | unknown = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `patterns:seq_10` | unknown = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `patterns:seq_10` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 10" but the answer reaches 39 and the numbers 40<br>print: "Up to 10" but the answer reaches 39 and the numbers 39 |
 | `patterns:seq_10` | range = `50` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 50" but the answer reaches 73 and the numbers 77<br>print: "Up to 50" but the answer reaches 73 and the numbers 72 |
 | `patterns:seq_10` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 100" but the answer reaches 115 and the numbers 123<br>print: "Up to 100" but the answer reaches 115 and the numbers 114 |
@@ -370,6 +822,8 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `patterns:halve` | range = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `patterns:halve` | range = `20` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `patterns:halve` | range = `100` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `patterns:number_pattern` | forms = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `patterns:number_pattern` | forms = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `patterns:number_pattern` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only |
 | `patterns:number_pattern` | range = `20` | gen: generator not reproducible; difference not checkable, predicate only |
 | `patterns:number_pattern` | range = `50` | gen: generator not reproducible; difference not checkable, predicate only |
@@ -378,6 +832,7 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `patterns:number_pattern` | range = `10000` | gen: generator not reproducible; difference not checkable, predicate only |
 | `patterns:number_pattern` | range = `100000` | gen: generator not reproducible; difference not checkable, predicate only |
 | `patterns:number_pattern` | range = `1000000` | gen: generator not reproducible; difference not checkable, predicate only |
+| `patterns:pattern_relationship` | forms = `[0]` | print: printed sheet identical to the default, which already satisfies this value |
 | `algebra:tape_diagram` | range = `10` | gen: "Up to 10" but the answer reaches 20 and the numbers 20<br>print: "Up to 10" but the answer reaches 20 and the numbers 20 |
 | `algebra:tape_diagram` | range = `20` | gen: "Up to 20" but the answer reaches 35 and the numbers 35<br>print: "Up to 20" but the answer reaches 35 and the numbers 34 |
 | `algebra:tape_diagram` | range = `50` | gen: "Up to 50" but the answer reaches 79 and the numbers 81<br>print: "Up to 50" but the answer reaches 79 and the numbers 76 |
@@ -386,29 +841,59 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `algebra:tape_diagram_plain` | range = `20` | gen: "Up to 20" but the answer reaches 37 and the numbers 40<br>print: "Up to 20" but the answer reaches 37 and the numbers 29 |
 | `algebra:tape_diagram_plain` | range = `50` | gen: "Up to 50" but the answer reaches 91 and the numbers 100<br>print: "Up to 50" but the answer reaches 86 and the numbers 57 |
 | `algebra:tape_diagram_plain` | range = `100` | gen: "Up to 100" but the answer reaches 184 and the numbers 199<br>print: "Up to 100" but the answer reaches 169 and the numbers 104 |
-| `algebra:multi_step_word` | range = `10` | gen: "Up to 10" but the answer reaches 23 and the numbers 32<br>print: "Up to 10" but the answer reaches 26 and the numbers 34 |
+| `algebra:multi_step_word` | range = `10` | gen: "Up to 10" but the answer reaches 27 and the numbers 37<br>print: "Up to 10" but the answer reaches 23 and the numbers 25 |
 | `algebra:multi_step_word_plain` | range = `10` | gen: "Up to 10" but the answer reaches 36 and the numbers 44<br>print: "Up to 10" but the answer reaches 35 and the numbers 45 |
 | `algebra:solve_unknown` | range = `10` | gen: "Up to 10" but the answer reaches 12 and the numbers 90 |
 | `algebra:balance_addsub` | range = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `algebra:balance_addsub` | range = `20` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `algebra:evaluate_expression` | range = `10` | gen: "Up to 10" but the answer reaches 64 and the numbers 24<br>print: "Up to 10" but the answer reaches 30 and the numbers 24 |
 | `algebra:evaluate_expression` | range = `20` | gen: "Up to 20" but the answer reaches 144 and the numbers 24<br>print: "Up to 20" but the answer reaches 80 and the numbers 24 |
+| `algebra:evaluate_expression_hard` | forms = `[0]` | print: printed sheet identical to the default, which already satisfies this value<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `algebra:inequalities` | range = `10` | gen: "Up to 10" but the answer reaches 20 and the numbers 20<br>print: "Up to 10" but the answer reaches 20 and the numbers 20 |
 | `algebra:function_table_easy` | range = `10` | gen: "Up to 10" but the answer reaches 20 and the numbers 11<br>print: "Up to 10" but the answer reaches 15 and the numbers 11 |
-| `algebra:algebra_word_mixed` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 10" but the answer reaches 35 and the numbers 43<br>print: "Up to 10" but the answer reaches 26 and the numbers 24 |
-| `algebra:algebra_word_mixed` | range = `50` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 50" but the answer reaches 51 and the numbers 83<br>print: "Up to 50" but the answer reaches 58 and the numbers 83 |
-| `algebra:algebra_word_mixed` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 100" but the answer reaches 101 and the numbers 160 |
+| `algebra:algebra_word_mixed` | members = `["tape_diagram"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:algebra_word_mixed` | members = `["multi_step_word"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:algebra_word_mixed` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 10" but the answer reaches 35 and the numbers 43<br>print: "Up to 10" but the answer reaches 23 and the numbers 27 |
+| `algebra:algebra_word_mixed` | range = `50` | gen: generator not reproducible; difference not checkable, predicate only<br>print: "Up to 50" but the answer reaches 58 and the numbers 83 |
+| `algebra:algebra_word_mixed` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 100" but the answer reaches 114 and the numbers 160 |
 | `algebra:algebra_word_mixed_plain` | range = `10` | gen: "Up to 10" but the answer reaches 23 and the numbers 30<br>print: "Up to 10" but the answer reaches 23 and the numbers 30 |
 | `algebra:algebra_word_mixed_plain` | range = `20` | gen: "Up to 20" but the answer reaches 37 and the numbers 39<br>print: "Up to 20" but the answer reaches 37 and the numbers 39 |
 | `algebra:algebra_word_mixed_plain` | range = `50` | gen: "Up to 50" but the answer reaches 85 and the numbers 96<br>print: "Up to 50" but the answer reaches 85 and the numbers 96 |
 | `algebra:algebra_word_mixed_plain` | range = `100` | gen: "Up to 100" but the answer reaches 167 and the numbers 191<br>print: "Up to 100" but the answer reaches 167 and the numbers 191 |
+| `algebra:solve_eq_addsub` | forms = `[0]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:solve_eq_addsub` | forms = `[1]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:solve_eq_addsub` | forms = `[2]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:solve_eq_addsub` | forms = `[3]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:solve_eq_addsub` | forms = `[4]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `algebra:solve_eq_addsub` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `algebra:solve_eq_addsub` | range = `20` | gen: generator not reproducible; difference not checkable, predicate only |
 | `algebra:solve_eq_addsub` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only |
 | `algebra:solve_eq_multdiv` | range = `10` | gen: "Up to 10" but the answer reaches 14 and the numbers 16 |
-| `algebra:solve_eq_twostep` | range = `10` | gen: "Up to 10" but the answer reaches 18 and the numbers 13<br>print: "Up to 10" but the answer reaches 16 and the numbers 20 |
+| `algebra:solve_eq_twostep` | range = `10` | gen: "Up to 10" but the answer reaches 19 and the numbers 20<br>print: "Up to 10" but the answer reaches 19 and the numbers 18 |
 | `algebra:solve_eq_twostep` | range = `20` | gen: "Up to 20" but the answer reaches 29 and the numbers 23 |
 | `algebra:write_equation` | range = `10` | gen: "Up to 10" but the answer reaches null and the numbers 20<br>print: "Up to 10" but the answer reaches null and the numbers 16 |
+| `algebra:mixed_algebra` | members = `["tape_diagram"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["tape_diagram_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["multi_step_word"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["multi_step_word_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["solve_unknown"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["balance_addsub"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["write_expression"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["evaluate_expression"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["evaluate_expression_hard"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["inequalities"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["combine_like_terms"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["distributive_expr"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["function_table_easy"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["function_table_hard"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["algebra_word_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["algebra_word_mixed_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["solve_eq_addsub"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["solve_eq_multdiv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["solve_eq_twostep"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["write_equation"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["build_expr_addsub"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["build_expr_multdiv"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `order_of_operations:two_ops_no_paren` | range = `10` | gen: "Up to 10" but the answer reaches 89 and the numbers 45<br>print: "Up to 10" but the answer reaches 89 and the numbers 13 |
 | `order_of_operations:two_ops_no_paren` | range = `20` | gen: "Up to 20" but the answer reaches 298 and the numbers 153<br>print: "Up to 20" but the answer reaches 298 and the numbers 24<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `order_of_operations:two_ops_no_paren` | range = `50` | gen: "Up to 50" but the answer reaches 1745 and the numbers 882<br>print: "Up to 50" but the answer reaches 1745 and the numbers 108 |
@@ -421,6 +906,11 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `order_of_operations:paren_simple` | range = `20` | gen: "Up to 20" but the answer reaches 182 and the numbers 190<br>print: "Up to 20" but the answer reaches 150 and the numbers 190 |
 | `order_of_operations:paren_simple` | range = `50` | gen: "Up to 50" but the answer reaches 1190 and the numbers 1140<br>print: "Up to 50" but the answer reaches 840 and the numbers 1140 |
 | `order_of_operations:paren_simple` | range = `100` | gen: "Up to 100" but the answer reaches 1995 and the numbers 1125<br>print: "Up to 100" but the answer reaches 840 and the numbers 1125 |
+| `order_of_operations:nested_complex` | band = `50` | print: printed sheet identical to the default, which already satisfies this value<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `order_of_operations:exponents_simple` | forms = `[0]` | print: printed sheet identical to the default, which already satisfies this value |
+| `order_of_operations:exponents_simple` | step = `[1]` | print: printed sheet identical to the default, which already satisfies this value |
+| `order_of_operations:mixed_order_ops` | members = `["two_ops_no_paren"]` | print: 2/6 answer(s) not found in the key text (e.g. "1") |
+| `order_of_operations:mixed_order_ops` | members = `["nested_complex"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `order_of_operations:mixed_order_ops` | range = `10` | gen: "Up to 10" but the answer reaches 60 and the numbers 16<br>print: "Up to 10" but the answer reaches 55 and the numbers 16 |
 | `placevalue:place_value_disks` | task = `"count"` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `placevalue:pv_disks_build` | band = `99` | print: 6/6 answer(s) not found in the key text (e.g. "69") |
@@ -438,6 +928,18 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `placevalue:identify` | support = `"chart"` | print: 6/6 answer(s) not found in the key text (e.g. "ones") |
 | `placevalue:identify` | support = `"none"` | print: 6/6 answer(s) not found in the key text (e.g. "ones") |
 | `placevalue:value` | band = `99` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `placevalue:mixed_placevalue` | members = `["more_less_10"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `placevalue:mixed_placevalue` | members = `["place_value_disks"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `placevalue:mixed_placevalue` | members = `["pv_disks_build"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 6/6 answer(s) not found in the key text (e.g. "59") |
+| `placevalue:mixed_placevalue` | members = `["number_word_names"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `placevalue:mixed_placevalue` | members = `["place_value_10x"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `placevalue:mixed_placevalue` | members = `["identify"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 6/6 answer(s) not found in the key text (e.g. "ones") |
+| `placevalue:mixed_placevalue` | members = `["value"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `placevalue:mixed_placevalue` | members = `["compare"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `placevalue:mixed_placevalue` | members = `["expand"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `placevalue:mixed_placevalue` | members = `["combine"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `placevalue:mixed_placevalue` | members = `["order_least_to_greatest"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `placevalue:mixed_placevalue` | members = `["order_greatest_to_least"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `number_sense:estimate_sum` | range = `10` | gen: "Up to 10" but the answer reaches 40 and the numbers 22<br>print: "Up to 10" but the answer reaches 40 and the numbers 22 |
 | `number_sense:compensation` | range = `10` | gen: "Up to 10" but the answer reaches 100 and the numbers 97<br>print: "Up to 10" but the answer reaches 42 and the numbers 61 |
 | `number_sense:compensation` | range = `20` | gen: "Up to 20" but the answer reaches 100 and the numbers 97<br>print: "Up to 20" but the answer reaches 42 and the numbers 61 |
@@ -458,10 +960,99 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `algebra_mixed:patterns_all` | range = `10` | gen: "Up to 10" but the answer reaches 170000 and the numbers 32<br>print: "Up to 10" but the answer reaches 37 and the numbers 32 |
 | `algebra_mixed:patterns_all` | range = `20` | gen: "Up to 20" but the answer reaches 170000 and the numbers 34<br>print: "Up to 20" but the answer reaches 44 and the numbers 34 |
 | `algebra_mixed:patterns_all` | range = `50` | gen: "Up to 50" but the answer reaches 170000 and the numbers 54<br>print: "Up to 50" but the answer reaches 64 and the numbers 54 |
+| `algebra_mixed:algebra_all` | members = `["tape_diagram"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["tape_diagram_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["multi_step_word"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["multi_step_word_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["solve_unknown"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["balance_addsub"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["write_expression"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["evaluate_expression"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["evaluate_expression_hard"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["inequalities"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["combine_like_terms"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["distributive_expr"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["function_table_easy"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["function_table_hard"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["algebra_word_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["algebra_word_mixed_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["solve_eq_addsub"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["solve_eq_multdiv"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["solve_eq_twostep"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["write_equation"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["build_expr_addsub"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["build_expr_multdiv"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `algebra_mixed:order_ops_all` | range = `10` | gen: "Up to 10" but the answer reaches 125 and the numbers 27<br>print: "Up to 10" but the answer reaches 56 and the numbers 18 |
 | `algebra_mixed:order_ops_all` | range = `20` | gen: "Up to 20" but the answer reaches 729 and the numbers 44<br>print: "Up to 20" but the answer reaches 114 and the numbers 44 |
 | `algebra_mixed:order_ops_all` | range = `50` | gen: "Up to 50" but the answer reaches 9261 and the numbers 216<br>print: "Up to 50" but the answer reaches 600 and the numbers 216 |
 | `algebra_mixed:order_ops_all` | range = `100` | gen: "Up to 100" but the answer reaches 9261 and the numbers 216<br>print: "Up to 100" but the answer reaches 615 and the numbers 216 |
+| `algebra_mixed:placevalue_all` | members = `["pv_disks_build"]` | print: 6/6 answer(s) not found in the key text (e.g. "799") |
+| `algebra_mixed:algebraic_all` | members = `["patterns"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebraic_all` | members = `["algebra"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebraic_all` | members = `["order_of_operations"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebraic_all` | members = `["placevalue"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "624") |
+| `algebra_mixed:algebraic_all` | members = `["number_sense"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebraic_all` | members = `["number_theory"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["counting"]` | print: 1/6 answer(s) not found in the key text (e.g. "50, 40") |
+| `all_mixed:all_domains_mixed` | members = `["composing"]` | print: 3/6 answer(s) not found in the key text (e.g. "85") |
+| `all_mixed:grade_k_mixed` | members = `["comparing"]` | print: 4/6 answer(s) not found in the key text (e.g. "same") |
+| `all_mixed:grade_k_mixed` | members = `["subtraction"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `all_mixed:grade_1_mixed` | members = `["composing"]` | print: 6/6 answer(s) not found in the key text (e.g. "82, 86") |
+| `all_mixed:grade_2_mixed` | members = `["composing"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 5/6 answer(s) not found in the key text (e.g. "576") |
+| `all_mixed:grade_2_mixed` | members = `["addition"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_2_mixed` | members = `["subtraction"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_2_mixed` | members = `["multiplication"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_2_mixed` | members = `["number_ops_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_2_mixed` | members = `["shapes_early"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `all_mixed:grade_2_mixed` | members = `["measurement"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_2_mixed` | members = `["graphs"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_2_mixed` | members = `["patterns"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_2_mixed` | members = `["placevalue"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 2/6 answer(s) not found in the key text (e.g. "589") |
+| `all_mixed:grade_2_mixed` | members = `["number_sense"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_2_mixed` | members = `["vocabulary"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_3_mixed` | members = `["composing"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_3_mixed` | members = `["addition"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_3_mixed` | members = `["subtraction"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_3_mixed` | members = `["multiplication"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "30, 16, 27") |
+| `all_mixed:grade_3_mixed` | members = `["division"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `all_mixed:grade_3_mixed` | members = `["number_ops_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_3_mixed` | members = `["fractions"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 3/6 answer(s) not found in the key text (e.g. "1") |
+| `all_mixed:grade_3_mixed` | members = `["area_perimeter"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_3_mixed` | members = `["shapes_classify"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_3_mixed` | members = `["measurement"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_3_mixed` | members = `["graphs"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `all_mixed:grade_3_mixed` | members = `["algebra"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_3_mixed` | members = `["number_sense"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_3_mixed` | members = `["vocabulary"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["addition"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["subtraction"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["multiplication"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["division"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["fraction_operations"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `all_mixed:grade_5_mixed` | members = `["decimals"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["area_perimeter"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["shapes_classify"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["coordinates"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["graphs"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["data_analysis"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["patterns"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["algebra"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["order_of_operations"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["placevalue"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["number_sense"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["vocabulary"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_6_mixed` | members = `["integers"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_6_mixed` | members = `["decimals"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_6_mixed` | members = `["conversions"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `all_mixed:grade_6_mixed` | members = `["area_perimeter"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_6_mixed` | members = `["shapes_classify"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_6_mixed` | members = `["coordinates"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_6_mixed` | members = `["data_analysis"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_6_mixed` | members = `["probability"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_6_mixed` | members = `["algebra"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_6_mixed` | members = `["order_of_operations"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_6_mixed` | members = `["number_theory"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_6_mixed` | members = `["vocabulary"]` | gen: generator not reproducible; difference not checkable, predicate only |
 
 ## Every skill with options
 
@@ -470,31 +1061,37 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `counting:count_objects` | gen-counting.js | band, objects, orientation, level | 10 | 0 |  |
 | `counting:count_sequence` | gen-counting.js | band, dir, level | 6 | 0 |  |
 | `counting:number_seq_fill` | gen-counting.js | step, dir, range | 11 | 0 |  |
-| `counting:mixed_counting` | gen-counting.js | range, level | 9 | 1 | print |
+| `counting:mixed_counting` | gen-counting.js | members, range, level | 12 | 0 |  |
 | `comparing:compare_groups` | gen-counting.js | dir, band, level | 6 | 0 |  |
 | `comparing:compare_objects` | gen-counting.js | dir, task | 5 | 0 |  |
 | `comparing:classify_count` | gen-counting.js | band, tiles | 5 | 0 |  |
-| `comparing:mixed_comparing` | gen-counting.js | level | 2 | 0 |  |
+| `comparing:mixed_comparing` | gen-counting.js | members, level | 5 | 0 |  |
 | `composing:number_bonds` | gen-counting.js | band, unknown | 5 | 0 |  |
 | `composing:make_ten` | gen-counting.js | level | 2 | 0 |  |
 | `composing:teen_compose` | gen-counting.js | level | 2 | 0 |  |
 | `composing:tens_foundation_visual` | gen-counting.js | band | 1 | 0 |  |
 | `composing:hundreds_chart_fill` | gen-counting.js | band, tiles | 4 | 0 |  |
 | `composing:ten_frame_build` | gen-counting.js | band | 1 | 0 |  |
+| `composing:ten_frame_build_teen` | gen-counting.js | band | 1 | 0 |  |
 | `composing:base10_build` | gen-counting.js | band | 2 | 0 |  |
 | `composing:base10_regroup` | gen-counting.js | band | 1 | 0 |  |
 | `composing:base10_build_hundreds` | gen-counting.js | band | 1 | 0 |  |
-| `composing:odd_even` | gen-counting.js | range | 4 | 0 |  |
+| `composing:odd_even` | gen-counting.js | forms, range | 7 | 0 |  |
 | `composing:select_even_odd` | gen-counting.js | range | 3 | 0 |  |
 | `composing:number_word_form` | gen-counting.js | wordform, range | 8 | 0 |  |
-| `composing:mixed_composing` | gen-counting.js | level | 2 | 0 |  |
-| `counting_mixed:counting_all` | (counting_mixed) | range | 3 | 0 |  |
+| `composing:fraction_number_line` | gen-counting.js | denoms | 3 | 0 |  |
+| `composing:whole_as_fraction` | gen-counting.js | denoms | 3 | 0 |  |
+| `composing:compose_whole` | gen-counting.js | parts | 2 | 0 |  |
+| `composing:mixed_composing` | gen-counting.js | members, level | 18 | 0 |  |
+| `counting_mixed:counting_all` | (counting_mixed) | members, range | 6 | 0 |  |
 | `addition:add_facts` | gen-operations.js | constant, notation, band, support | 23 | 0 |  |
+| `addition:add_sub_10s` | gen-operations.js | task, band | 3 | 0 |  |
+| `addition:add_sub_100s` | gen-operations.js | task, band | 3 | 0 |  |
 | `addition:add` | gen-operations.js | notation, band, regroup, unknown | 8 | 0 |  |
-| `addition:add_word_problems` | gen-operations.js | response, pictures, range | 6 | 0 |  |
-| `addition:add_word_problems_plain` | gen-operations.js | range | 4 | 0 |  |
+| `addition:add_word_problems` | gen-operations.js | response, pictures, forms, range | 9 | 0 |  |
+| `addition:add_word_problems_plain` | gen-operations.js | forms, range | 7 | 0 |  |
 | `addition:add_sub_fact_family` | gen-operations.js | range | 2 | 0 |  |
-| `addition:number_families_add` | gen-operations.js | level | 3 | 0 |  |
+| `addition:number_families_add` | gen-operations.js | band, level | 6 | 0 |  |
 | `addition:add_three` | gen-operations.js | band, pictures | 2 | 0 |  |
 | `addition:comparison_word` | gen-operations.js | response, range | 3 | 0 |  |
 | `addition:equal_sign` | gen-operations.js | range | 2 | 0 |  |
@@ -523,7 +1120,8 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `addition:add_1m_no_regroup` | gen-operations.js | band, regroup, level | 12 | 0 |  |
 | `addition:add_1m_regroup` | gen-operations.js | band, regroup, level | 11 | 0 |  |
 | `addition:add_1m_mixed` | gen-operations.js | band, regroup, level | 12 | 0 |  |
-| `addition:add_wp_10` | gen-operations.js | pictures | 1 | 0 |  |
+| `addition:add_wp_10` | gen-operations.js | pictures, band | 3 | 0 |  |
+| `addition:add_wp_10_plain` | gen-operations.js | band | 2 | 0 |  |
 | `addition:add_wp_20` | gen-operations.js | band, pictures, support | 8 | 0 |  |
 | `addition:add_wp_20_plain` | gen-operations.js | band | 6 | 0 |  |
 | `addition:add_wp_50` | gen-operations.js | band, pictures, support | 8 | 0 |  |
@@ -541,14 +1139,15 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `addition:nl_add` | gen-operations.js | unknown, range | 5 | 0 |  |
 | `addition:number_line_add` | gen-operations.js | range | 2 | 0 |  |
 | `addition:cloze_addition` | gen-operations.js | range | 2 | 0 |  |
+| `addition:mixed_addition` | gen-operations.js | members | 58 | 0 |  |
 | `addition:add_column_multi` | gen-operations.js | tiles | 2 | 0 |  |
 | `addition:add_missing_digit` | gen-operations.js | range | 2 | 0 |  |
 | `addition:fact_family_sort` | gen-operations.js | range | 2 | 0 |  |
 | `subtraction:sub_facts` | gen-operations.js | constant, notation, band, support | 23 | 0 |  |
 | `subtraction:subtract` | gen-operations.js | notation, band, regroup, unknown | 8 | 0 |  |
-| `subtraction:sub_word_problems` | gen-operations.js | response, pictures, range | 6 | 0 |  |
-| `subtraction:sub_word_problems_plain` | gen-operations.js | range | 4 | 0 |  |
-| `subtraction:missing_add_sub` | gen-operations.js | range | 2 | 0 |  |
+| `subtraction:sub_word_problems` | gen-operations.js | response, pictures, forms, range | 9 | 0 |  |
+| `subtraction:sub_word_problems_plain` | gen-operations.js | forms, range | 7 | 0 |  |
+| `subtraction:missing_add_sub` | gen-operations.js | unknown, task, range | 6 | 0 |  |
 | `subtraction:sub_5_pictures` | gen-operations.js | pictures | 1 | 0 |  |
 | `subtraction:unknown_start_wp` | gen-operations.js | range | 3 | 0 |  |
 | `subtraction:sub_10_no_regroup` | gen-operations.js | notation, band, regroup, support | 13 | 0 |  |
@@ -593,116 +1192,330 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `subtraction:sub_wp_1m_plain` | gen-operations.js | band | 7 | 0 |  |
 | `subtraction:nl_sub` | gen-operations.js | unknown, range | 5 | 0 |  |
 | `subtraction:number_line_sub` | gen-operations.js | range | 2 | 0 |  |
+| `subtraction:mixed_add_sub` | gen-operations.js | task, range | 6 | 0 |  |
+| `subtraction:mixed_subtraction` | gen-operations.js | members | 52 | 0 |  |
 | `subtraction:sub_across_zeros` | gen-operations.js | range | 3 | 0 |  |
 | `subtraction:sub_missing_digit` | gen-operations.js | range | 2 | 0 |  |
 | `subtraction:sub_check_by_adding` | gen-operations.js | range | 2 | 0 |  |
 | `multiplication:mult_facts` | gen-operations.js | constant, notation, band, support | 18 | 0 |  |
 | `multiplication:multiply` | gen-operations.js | notation, tiles, range | 8 | 0 |  |
-| `multiplication:arrays_groups` | gen-operations.js | range | 2 | 0 |  |
-| `multiplication:mult_word_problems` | gen-operations.js | response, range | 4 | 0 |  |
-| `multiplication:mult_word_problems_plain` | gen-operations.js | range | 2 | 0 |  |
+| `multiplication:arrays_groups` | gen-operations.js | forms, range | 4 | 0 |  |
+| `multiplication:dot_array_mult` | gen-operations.js | band, support | 2 | 0 |  |
+| `multiplication:mult_properties` | gen-operations.js | forms, pictures | 5 | 0 |  |
+| `multiplication:mult_word_problems` | gen-operations.js | response, forms, range | 7 | 0 |  |
+| `multiplication:mult_word_problems_plain` | gen-operations.js | forms, range | 5 | 0 |  |
 | `multiplication:mult_comparison` | gen-operations.js | response, range | 6 | 0 |  |
 | `multiplication:mult_comparison_plain` | gen-operations.js | range | 5 | 0 |  |
+| `multiplication:area_model_mult` | gen-operations.js | tiles | 2 | 0 |  |
+| `multiplication:area_model_mult_hard` | gen-operations.js | tiles | 2 | 0 |  |
 | `multiplication:mult_div_fact_family` | gen-operations.js | notation | 3 | 0 |  |
-| `multiplication:number_families_mult` | gen-operations.js | level | 3 | 0 |  |
+| `multiplication:number_families_mult` | gen-operations.js | band, level | 5 | 0 |  |
 | `multiplication:mult_chart` | gen-operations.js | band | 2 | 0 |  |
 | `multiplication:mult_chart_easy` | gen-operations.js | level | 3 | 0 |  |
 | `multiplication:nl_mult` | gen-operations.js | band | 2 | 0 |  |
+| `multiplication:mixed_multiplication` | gen-operations.js | members | 21 | 0 |  |
+| `multiplication:repeated_add_to_mult` | gen-operations.js | band, pictures | 3 | 0 |  |
+| `multiplication:equal_or_unequal_groups` | gen-operations.js | forms, step | 3 | 0 |  |
+| `multiplication:mult_zeros` | gen-operations.js | forms | 3 | 0 |  |
+| `multiplication:mult_placeholder_zero` | gen-operations.js | tiles | 1 | 0 |  |
+| `multiplication:mult_missing_digit` | gen-operations.js | tiles | 1 | 0 |  |
 | `division:div_facts` | gen-operations.js | constant, notation, band, support | 20 | 0 |  |
 | `division:divide` | gen-operations.js | notation, tiles, regroup, range | 11 | 0 |  |
-| `division:div_word_problems` | gen-operations.js | response, range | 3 | 0 |  |
-| `division:div_word_problems_plain` | gen-operations.js | range | 2 | 0 |  |
+| `division:div_remainders` | gen-operations.js | constant | 9 | 0 |  |
+| `division:div_word_problems` | gen-operations.js | response, forms, range | 6 | 0 |  |
+| `division:div_word_problems_plain` | gen-operations.js | forms, range | 5 | 0 |  |
 | `division:remainder_interpret` | gen-operations.js | range | 2 | 0 |  |
 | `division:remainder_contexts` | gen-operations.js | range | 2 | 0 |  |
+| `division:box_division_easy` | gen-operations.js | constant, regroup | 10 | 0 |  |
+| `division:box_division_hard` | gen-operations.js | constant, regroup | 10 | 0 |  |
+| `division:area_model_div_2by1` | gen-operations.js | constant | 8 | 0 |  |
+| `division:area_model_div_3by1` | gen-operations.js | constant | 8 | 0 |  |
 | `division:long_div_2digit` | gen-operations.js | range | 2 | 0 |  |
 | `division:missing_mult_div` | gen-operations.js | notation, range | 5 | 0 |  |
 | `division:nl_div` | gen-operations.js | band | 2 | 0 |  |
-| `division:mixed_mult_div` | gen-operations.js | range | 2 | 0 |  |
+| `division:mixed_mult_div` | gen-operations.js | task, range | 4 | 0 |  |
+| `division:mixed_division` | gen-operations.js | members | 19 | 0 |  |
+| `division:share_into_groups` | gen-operations.js | band | 1 | 0 |  |
+| `division:div_equation_parts` | gen-operations.js | forms, band | 4 | 0 |  |
 | `division:div_zero_in_quotient` | gen-operations.js | range | 2 | 0 |  |
+| `division:remainder_too_big` | gen-operations.js | forms, constant, band | 11 | 0 |  |
 | `division:div_check_by_multiplying` | gen-operations.js | range | 2 | 0 |  |
-| `integers:number_line_int` | gen-operations.js | range | 3 | 0 |  |
-| `integers:compare_int` | gen-operations.js | range | 3 | 0 |  |
-| `integers:add_int` | gen-operations.js | range | 3 | 0 |  |
-| `integers:sub_int` | gen-operations.js | range | 3 | 0 |  |
-| `integers:order_negatives` | gen-operations.js | range | 4 | 0 |  |
-| `integers:mixed_integers` | gen-operations.js | range | 4 | 0 |  |
-| `number_ops_mixed:mixed` | gen-operations.js | range, decimals | 12 | 0 |  |
-| `number_ops_mixed:word_problems_mixed` | gen-operations.js | range, decimals | 6 | 3 | print, screen/practice |
-| `number_ops_mixed:word_problems_mixed_plain` | gen-operations.js | range, decimals | 6 | 0 |  |
-| `number_ops_mixed:number_families_mixed` | gen-operations.js | level | 3 | 0 |  |
+| `division:div_fix_estimate` | gen-operations.js | forms, tiles | 4 | 0 |  |
+| `integers:number_line_int` | gen-operations.js | forms, range | 5 | 0 |  |
+| `integers:compare_int` | gen-operations.js | forms, shapes, range | 8 | 0 |  |
+| `integers:add_int` | gen-operations.js | forms, range | 7 | 0 |  |
+| `integers:sub_int` | gen-operations.js | forms, range | 7 | 0 |  |
+| `integers:order_negatives` | gen-operations.js | points, range | 6 | 0 |  |
+| `integers:integer_nl_drag` | gen-operations.js | forms | 2 | 0 |  |
+| `integers:mixed_integers` | gen-operations.js | members, range | 13 | 0 |  |
+| `integers:abs_value` | gen-operations.js | forms | 3 | 0 |  |
+| `integers:opposite_numbers` | gen-operations.js | forms | 3 | 0 |  |
+| `integers:ordering_rationals` | gen-operations.js | forms | 2 | 0 |  |
+| `number_ops_mixed:mixed` | gen-operations.js | task, range, decimals | 16 | 0 |  |
+| `number_ops_mixed:word_problems_mixed` | gen-operations.js | members | 5 | 0 |  |
+| `number_ops_mixed:word_problems_mixed_plain` | gen-operations.js | members | 5 | 5 | gen, screen/worksheet, screen/practice |
+| `number_ops_mixed:number_families_mixed` | gen-operations.js | band, level | 5 | 0 |  |
+| `number_ops_mixed:operations_all` | gen-operations.js | members | 5 | 0 |  |
 | `number_ops_mixed:which_sign` | gen-operations.js | range | 4 | 0 |  |
 | `number_ops_mixed:missing_factor_or_addend` | gen-operations.js | range | 4 | 0 |  |
-| `fractions:fraction_of_set` | gen-fractions.js | range | 4 | 0 |  |
-| `fractions:fraction_of_set_hard` | gen-fractions.js | range | 4 | 0 |  |
+| `fractions:identify` | gen-fractions.js | denoms, forms | 6 | 0 |  |
+| `fractions:write_fraction` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fractions:shade_fraction` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fractions:equiv_frac_visual` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fractions:equiv_frac_nv` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fractions:select_equiv_frac` | gen-fractions.js | denoms | 2 | 0 |  |
+| `fractions:equivalent` | gen-fractions.js | denoms, forms | 6 | 0 |  |
+| `fractions:fraction_of_set` | gen-fractions.js | denoms, range | 7 | 0 |  |
+| `fractions:fraction_of_set_hard` | gen-fractions.js | denoms, range | 7 | 0 |  |
+| `fractions:compare` | gen-fractions.js | denoms, forms | 5 | 0 |  |
+| `fractions:simplify` | gen-fractions.js | forms | 3 | 0 |  |
+| `fractions:improper_mixed` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fractions:mixed_improper_visual` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fractions:mixed_fractions` | gen-fractions.js | members | 26 | 0 |  |
+| `fractions:compose_target_frac` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fractions:identify_nv` | gen-fractions.js | denoms, forms | 7 | 0 |  |
+| `fractions:fraction_of_set_nv` | gen-fractions.js | denoms, forms | 7 | 0 |  |
+| `fractions:fraction_of_set_hard_nv` | gen-fractions.js | denoms, forms | 6 | 0 |  |
+| `fractions:order_fractions` | gen-fractions.js | forms | 3 | 0 |  |
+| `fractions:order_frac_numline` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fractions:benchmark_fractions` | gen-fractions.js | forms | 4 | 0 |  |
+| `fractions:compare_frac_lcd` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fractions:graph_fractions` | gen-fractions.js | denoms | 2 | 0 |  |
+| `fractions:round_fractions` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fractions:fraction_bar_ops` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fractions:fraction_nl_drag` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fractions:mixed_nl_drag` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fraction_operations:add_fractions_like` | gen-fractions.js | denoms, pictures | 5 | 0 |  |
+| `fraction_operations:sub_fractions_like` | gen-fractions.js | denoms, pictures | 5 | 0 |  |
+| `fraction_operations:add_mixed_like` | gen-fractions.js | denoms, pictures | 4 | 0 |  |
+| `fraction_operations:sub_mixed_like` | gen-fractions.js | denoms, pictures | 4 | 0 |  |
+| `fraction_operations:mult_frac_whole` | gen-fractions.js | denoms, pictures | 4 | 0 |  |
+| `fraction_operations:decompose_fractions` | gen-fractions.js | denoms, pictures | 4 | 0 |  |
+| `fraction_operations:frac_word_problems` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fraction_operations:frac_word_problems_plain` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fraction_operations:frac_10_100` | gen-fractions.js | pictures | 1 | 0 |  |
+| `fraction_operations:add_frac_unlike` | gen-fractions.js | denoms, pictures | 4 | 0 |  |
+| `fraction_operations:sub_frac_unlike` | gen-fractions.js | denoms, pictures | 4 | 1 | screen/practice |
+| `fraction_operations:add_mixed_unlike` | gen-fractions.js | denoms, pictures | 4 | 0 |  |
+| `fraction_operations:sub_mixed_unlike` | gen-fractions.js | denoms, pictures | 4 | 0 |  |
+| `fraction_operations:add_frac_like_nv` | gen-fractions.js | denoms, forms | 7 | 0 |  |
+| `fraction_operations:sub_frac_like_nv` | gen-fractions.js | denoms, forms | 7 | 0 |  |
+| `fraction_operations:add_frac_unlike_nv` | gen-fractions.js | denoms, forms | 6 | 0 |  |
+| `fraction_operations:sub_frac_unlike_nv` | gen-fractions.js | denoms, forms | 6 | 0 |  |
+| `fraction_operations:add_mixed_like_nv` | gen-fractions.js | denoms, forms | 6 | 0 |  |
+| `fraction_operations:sub_mixed_like_nv` | gen-fractions.js | denoms, forms | 6 | 0 |  |
+| `fraction_operations:add_mixed_unlike_nv` | gen-fractions.js | denoms, forms | 5 | 0 |  |
+| `fraction_operations:sub_mixed_unlike_nv` | gen-fractions.js | denoms, forms | 4 | 0 |  |
+| `fraction_operations:mult_frac_whole_nv` | gen-fractions.js | denoms, forms | 7 | 0 |  |
+| `fraction_operations:decompose_frac_nv` | gen-fractions.js | denoms, forms | 7 | 0 |  |
+| `fraction_operations:frac_10_100_nv` | gen-fractions.js | forms | 4 | 0 |  |
+| `fraction_operations:mult_frac_frac_nv` | gen-fractions.js | denoms, forms | 6 | 0 |  |
+| `fraction_operations:div_unit_frac_nv` | gen-fractions.js | denoms, forms | 7 | 0 |  |
+| `fraction_operations:frac_as_div_nv` | gen-fractions.js | denoms, forms | 6 | 0 |  |
+| `fraction_operations:frac_as_div_word` | gen-fractions.js | denoms | 4 | 0 |  |
+| `fraction_operations:mult_scaling_nv` | gen-fractions.js | forms | 3 | 0 |  |
+| `fraction_operations:mult_frac_frac` | gen-fractions.js | denoms, pictures | 4 | 1 | screen/practice |
+| `fraction_operations:div_unit_fraction` | gen-fractions.js | denoms, pictures | 4 | 0 |  |
+| `fraction_operations:frac_as_division` | gen-fractions.js | denoms, pictures | 3 | 0 |  |
+| `fraction_operations:mult_scaling` | gen-fractions.js | pictures | 1 | 0 |  |
+| `fraction_operations:frac_mult_word` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fraction_operations:frac_mult_word_plain` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fraction_operations:frac_word_mixed` | gen-fractions.js | members | 2 | 0 |  |
+| `fraction_operations:frac_word_mixed_plain` | gen-fractions.js | denoms | 3 | 0 |  |
+| `fraction_operations:mixed_fraction_ops` | gen-fractions.js | members | 38 | 0 |  |
+| `fraction_operations:estimate_frac_ops` | gen-fractions.js | task | 2 | 0 |  |
 | `decimals:add_decimal` | gen-fractions.js | range, decimals | 5 | 0 |  |
 | `decimals:sub_decimal` | gen-fractions.js | range, decimals | 5 | 0 |  |
 | `decimals:mult_decimal` | gen-fractions.js | range, decimals | 5 | 0 |  |
-| `decimals:div_decimal` | gen-fractions.js | range | 5 | 0 |  |
-| `decimals:compare_decimal` | gen-fractions.js | range, decimals | 5 | 0 |  |
-| `decimals:round_decimals` | gen-fractions.js | range | 5 | 0 |  |
-| `decimals:order_decimals` | gen-fractions.js | range, decimals | 5 | 0 |  |
-| `decimals:mixed_decimals` | gen-fractions.js | range, decimals | 5 | 0 |  |
-| `frac_dec_mixed:decimals_all` | (frac_dec_mixed) | range, decimals | 5 | 0 |  |
-| `area_perimeter:perimeter` | gen-geometry.js | range | 5 | 0 |  |
-| `area_perimeter:area` | gen-geometry.js | range | 5 | 0 |  |
+| `decimals:div_decimal` | gen-fractions.js | forms, range | 8 | 0 |  |
+| `decimals:compare_decimal` | gen-fractions.js | forms, range, decimals | 8 | 0 |  |
+| `decimals:compare_thousandths` | gen-fractions.js | forms | 2 | 0 |  |
+| `decimals:round_decimals` | gen-fractions.js | precision, range | 7 | 0 |  |
+| `decimals:round_thousandths` | gen-fractions.js | forms | 2 | 0 |  |
+| `decimals:order_decimals` | gen-fractions.js | dir, forms, range, decimals | 9 | 0 |  |
+| `decimals:decimal_nl_drag` | gen-fractions.js | forms | 2 | 0 |  |
+| `decimals:mixed_decimals` | gen-fractions.js | members, range, decimals | 15 | 0 |  |
+| `conversions:f_to_d` | gen-fractions.js | denoms | 2 | 0 |  |
+| `conversions:d_to_f` | gen-fractions.js | forms | 2 | 0 |  |
+| `conversions:f_to_p` | gen-fractions.js | forms | 2 | 0 |  |
+| `conversions:p_to_f` | gen-fractions.js | denoms, forms | 4 | 0 |  |
+| `conversions:d_to_p` | gen-fractions.js | digits | 2 | 0 |  |
+| `conversions:p_to_d` | gen-fractions.js | digits | 2 | 0 |  |
+| `conversions:percent_visual` | gen-fractions.js | forms | 4 | 0 |  |
+| `conversions:percent_of_number` | gen-fractions.js | forms, band | 3 | 0 |  |
+| `conversions:find_whole_from_pct` | gen-fractions.js | forms | 2 | 0 |  |
+| `conversions:order_fdp` | gen-fractions.js | forms | 2 | 0 |  |
+| `conversions:ratio_intro` | gen-fractions.js | forms, band | 4 | 0 |  |
+| `conversions:unit_rate_intro` | gen-fractions.js | band | 2 | 0 |  |
+| `conversions:double_num_line` | gen-fractions.js | band | 2 | 0 |  |
+| `conversions:mixed_conversions` | gen-fractions.js | members | 15 | 0 |  |
+| `conversions:equiv_ratios` | gen-fractions.js | forms, band | 5 | 0 |  |
+| `conversions:ratio_tables` | gen-fractions.js | band | 1 | 0 |  |
+| `frac_dec_mixed:fractions_all` | (frac_dec_mixed) | members | 26 | 0 |  |
+| `frac_dec_mixed:decimals_all` | (frac_dec_mixed) | members, range, decimals | 15 | 0 |  |
+| `frac_dec_mixed:conversions_all` | (frac_dec_mixed) | members | 15 | 0 |  |
+| `frac_dec_mixed:fdp_all` | (frac_dec_mixed) | members | 4 | 0 |  |
+| `shapes_early:name_2d_shapes` | (shapes_early) | forms, shapes | 7 | 0 |  |
+| `shapes_early:name_3d_shapes` | (shapes_early) | forms, shapes | 7 | 0 |  |
+| `shapes_early:shape_positions` | (shapes_early) | forms | 3 | 0 |  |
+| `shapes_early:shape_corners_count` | (shapes_early) | band | 2 | 0 |  |
+| `shapes_early:count_edges_faces_vertices` | (shapes_early) | forms, shapes | 6 | 0 |  |
+| `shapes_early:count_sides_vertices_2d` | (shapes_early) | forms, band | 4 | 0 |  |
+| `shapes_early:order_objects_length` | (shapes_early) | tiles | 2 | 0 |  |
+| `shapes_early:measure_nonstandard` | (shapes_early) | units, band | 4 | 0 |  |
+| `shapes_early:compose_shapes` | (shapes_early) | shapes | 3 | 0 |  |
+| `shapes_early:compose_hexagon` | (shapes_early) | shapes | 3 | 0 |  |
+| `shapes_early:partition_shapes` | (shapes_early) | forms, parts | 5 | 0 |  |
+| `shapes_early:shape_attributes` | (shapes_early) | forms | 2 | 0 |  |
+| `shapes_early:compose_from_attributes` | (shapes_early) | forms | 4 | 0 |  |
+| `shapes_early:mixed_shapes_early` | (shapes_early) | members | 16 | 0 |  |
+| `area_perimeter:perimeter_intro` | gen-geometry.js | band | 2 | 0 |  |
+| `area_perimeter:area_unit_squares` | gen-geometry.js | forms, band | 4 | 0 |  |
+| `area_perimeter:perimeter_grid` | gen-geometry.js | forms, band | 5 | 0 |  |
+| `area_perimeter:perimeter` | gen-geometry.js | forms, range | 8 | 0 |  |
+| `area_perimeter:area` | gen-geometry.js | forms, range | 8 | 0 |  |
 | `area_perimeter:area_perimeter` | gen-geometry.js | range | 5 | 0 |  |
 | `area_perimeter:area_distributive_visual` | gen-geometry.js | range | 3 | 0 |  |
 | `area_perimeter:area_triangle` | gen-geometry.js | range | 3 | 0 |  |
-| `area_perimeter:area_polygon_decompose` | gen-geometry.js | range | 4 | 0 |  |
-| `area_perimeter:composite_shapes` | gen-geometry.js | range | 4 | 0 |  |
-| `area_perimeter:volume` | gen-geometry.js | range | 6 | 0 |  |
-| `area_perimeter:volume_composite` | gen-geometry.js | range | 6 | 0 |  |
-| `coordinates:coordinate_q1` | gen-geometry.js | range | 2 | 0 |  |
-| `coordinates:coordinate_all` | gen-geometry.js | range | 2 | 0 |  |
-| `coordinates:coordinate_graph` | gen-geometry.js | range | 2 | 0 |  |
+| `area_perimeter:area_polygon_decompose` | gen-geometry.js | shapes, range | 7 | 0 |  |
+| `area_perimeter:composite_shapes` | gen-geometry.js | forms, range | 6 | 0 |  |
+| `area_perimeter:volume` | gen-geometry.js | forms, range | 9 | 0 |  |
+| `area_perimeter:volume_composite` | gen-geometry.js | shapes, range | 8 | 0 |  |
+| `area_perimeter:mixed_area_perimeter` | gen-geometry.js | members | 12 | 0 |  |
+| `angles_lines:identify_angles` | (angles_lines) | forms, shapes | 6 | 0 |  |
+| `angles_lines:measure_angles` | (angles_lines) | forms | 2 | 0 |  |
+| `angles_lines:identify_lines` | (angles_lines) | forms, shapes | 5 | 0 |  |
+| `angles_lines:symmetry` | (angles_lines) | forms | 3 | 0 |  |
+| `angles_lines:place_symmetry_lines` | (angles_lines) | shapes | 2 | 0 |  |
+| `angles_lines:additive_angles` | (angles_lines) | forms | 3 | 0 |  |
+| `angles_lines:mixed_angles_lines` | (angles_lines) | members | 6 | 0 |  |
+| `shapes_classify:classify_triangles` | (shapes_classify) | forms, shapes | 4 | 0 |  |
+| `shapes_classify:classify_quads` | (shapes_classify) | forms | 2 | 0 |  |
+| `shapes_classify:net_identify` | (shapes_classify) | shapes | 2 | 0 |  |
+| `shapes_classify:cross_section_3d` | (shapes_classify) | forms | 2 | 0 |  |
+| `shapes_classify:mixed_shapes` | (shapes_classify) | members | 5 | 0 |  |
+| `coordinates:coordinate_q1` | gen-geometry.js | forms, range | 4 | 0 |  |
+| `coordinates:coordinate_all` | gen-geometry.js | forms, range | 4 | 0 |  |
+| `coordinates:coordinate_graph` | gen-geometry.js | forms, range | 4 | 0 |  |
 | `coordinates:coord_distance_q1` | gen-geometry.js | range | 3 | 0 |  |
-| `coordinates:coord_polygon` | gen-geometry.js | range | 3 | 0 |  |
-| `coordinates:net_surface_area` | gen-geometry.js | range | 4 | 0 |  |
-| `measurement:money_count` | gen-measurement.js | range | 4 | 0 |  |
+| `coordinates:coord_polygon` | gen-geometry.js | forms, range | 5 | 0 |  |
+| `coordinates:net_surface_area` | gen-geometry.js | forms, range | 6 | 0 |  |
+| `coordinates:geo_reflect` | gen-geometry.js | forms | 2 | 0 |  |
+| `coordinates:geo_rotate` | gen-geometry.js | forms | 3 | 0 |  |
+| `coordinates:geo_translate` | gen-geometry.js | forms | 4 | 0 |  |
+| `coordinates:mixed_coordinates` | gen-geometry.js | members | 9 | 0 |  |
+| `measurement:time_hour` | gen-measurement.js | precision, forms | 6 | 0 |  |
+| `measurement:time_half_hour` | gen-measurement.js | precision, forms | 6 | 0 |  |
+| `measurement:time_quarter` | gen-measurement.js | precision, forms | 6 | 0 |  |
+| `measurement:time_5min` | gen-measurement.js | precision, forms | 6 | 0 |  |
+| `measurement:time_1min` | gen-measurement.js | precision, forms | 6 | 0 |  |
+| `measurement:time_analog_digital` | gen-measurement.js | forms | 3 | 0 |  |
+| `measurement:time_match_clock` | gen-measurement.js | precision | 4 | 0 |  |
+| `measurement:order_clocks_analog_asc` | gen-measurement.js | dir, model | 2 | 0 |  |
+| `measurement:order_clocks_analog_desc` | gen-measurement.js | dir, model | 2 | 0 |  |
+| `measurement:order_clocks_digital_asc` | gen-measurement.js | dir, model | 2 | 0 |  |
+| `measurement:order_clocks_digital_desc` | gen-measurement.js | dir, model | 2 | 0 |  |
+| `measurement:elapsed_30min` | gen-measurement.js | step, forms | 6 | 0 |  |
+| `measurement:elapsed_hour` | gen-measurement.js | step, forms | 6 | 0 |  |
+| `measurement:elapsed_15min` | gen-measurement.js | step, forms | 6 | 0 |  |
+| `measurement:elapsed_mixed` | gen-measurement.js | step, forms | 5 | 0 |  |
+| `measurement:elapsed_find_duration` | gen-measurement.js | band | 2 | 0 |  |
+| `measurement:elapsed_visual_easy` | gen-measurement.js | precision, forms | 4 | 0 |  |
+| `measurement:elapsed_visual_medium` | gen-measurement.js | precision, forms | 4 | 0 |  |
+| `measurement:elapsed_visual_hard` | gen-measurement.js | precision, forms | 4 | 0 |  |
+| `measurement:heavier_lighter_visual` | gen-measurement.js | forms | 2 | 0 |  |
+| `measurement:pictograph_intro` | gen-measurement.js | forms | 2 | 0 |  |
+| `measurement:bar_graph_intro` | gen-measurement.js | forms | 3 | 0 |  |
+| `measurement:reading_ruler` | gen-measurement.js | parts | 3 | 0 |  |
+| `measurement:reading_ruler_hard` | gen-measurement.js | parts | 3 | 0 |  |
+| `measurement:money_count` | gen-measurement.js | forms, range | 8 | 0 |  |
+| `measurement:money` | gen-measurement.js | forms | 3 | 0 |  |
+| `measurement:equiv_coin_sets` | gen-measurement.js | band | 2 | 0 |  |
+| `measurement:enough_money` | gen-measurement.js | forms | 2 | 0 |  |
 | `measurement:make_change_least_coins` | gen-measurement.js | range | 4 | 0 |  |
-| `graphs:bar_graph` | gen-data-stats.js | range | 4 | 0 |  |
-| `graphs:pictograph` | gen-data-stats.js | range | 5 | 0 |  |
-| `data_analysis:mean` | gen-data-stats.js | range | 4 | 0 |  |
-| `data_analysis:median` | gen-data-stats.js | range | 4 | 0 |  |
-| `data_analysis:mode` | gen-data-stats.js | range | 4 | 0 |  |
-| `data_analysis:range` | gen-data-stats.js | range | 5 | 0 |  |
-| `data_analysis:mixed_data_analysis` | gen-data-stats.js | range | 4 | 0 |  |
-| `data_mixed:data_stats_all` | (data_mixed) | range | 4 | 0 |  |
-| `patterns:seq_2` | gen-algebraic.js | range | 8 | 0 |  |
-| `patterns:seq_5` | gen-algebraic.js | range | 8 | 0 |  |
-| `patterns:seq_10` | gen-algebraic.js | range | 7 | 0 |  |
-| `patterns:skip_count_line` | gen-algebraic.js | range | 6 | 0 |  |
-| `patterns:count_by_step_up` | gen-algebraic.js | range | 8 | 0 |  |
-| `patterns:count_by_step_down` | gen-algebraic.js | range | 7 | 0 |  |
+| `measurement:temperature` | gen-measurement.js | forms | 4 | 0 |  |
+| `measurement:capacity` | gen-measurement.js | units, forms | 4 | 0 |  |
+| `measurement:unit_conversions` | gen-measurement.js | units, forms | 4 | 0 |  |
+| `measurement:length_customary` | gen-measurement.js | forms | 4 | 0 |  |
+| `measurement:length_metric` | gen-measurement.js | forms | 4 | 0 |  |
+| `measurement:unit_conversion_word` | gen-measurement.js | units | 3 | 0 |  |
+| `measurement:mass_volume_liquid` | gen-measurement.js | forms | 3 | 0 |  |
+| `measurement:estimate_length` | gen-measurement.js | forms | 3 | 0 |  |
+| `measurement:mixed_measurement` | gen-measurement.js | members | 37 | 0 |  |
+| `measurement:mixed_time` | gen-measurement.js | members | 15 | 0 |  |
+| `geo_mixed:geometry_all` | (geo_mixed) | members, range | 10 | 1 | gen, print, screen/worksheet |
+| `geo_mixed:measurement_all` | (geo_mixed) | members | 37 | 0 |  |
+| `geo_mixed:geo_meas_all` | (geo_mixed) | members, range | 11 | 1 | gen, print, screen/worksheet |
+| `graphs:bar_graph` | gen-data-stats.js | forms, range | 9 | 0 |  |
+| `graphs:build_bar_graph` | gen-data-stats.js | tiles, band | 3 | 0 |  |
+| `graphs:pictograph` | gen-data-stats.js | forms, scale, range | 13 | 0 |  |
+| `graphs:build_pictograph` | gen-data-stats.js | tiles, band | 3 | 0 |  |
+| `graphs:tally_chart` | gen-data-stats.js | forms | 4 | 0 |  |
+| `graphs:line_plot` | gen-data-stats.js | forms | 2 | 0 |  |
+| `graphs:line_plot_g2` | gen-data-stats.js | forms | 3 | 0 |  |
+| `graphs:line_plot_fractions` | gen-data-stats.js | forms | 3 | 0 |  |
+| `graphs:pie_chart` | gen-data-stats.js | forms | 3 | 0 |  |
+| `graphs:mixed_graphs` | gen-data-stats.js | members | 9 | 0 |  |
+| `data_analysis:mean` | gen-data-stats.js | forms, points, range | 8 | 0 |  |
+| `data_analysis:median` | gen-data-stats.js | forms, points, range | 8 | 0 |  |
+| `data_analysis:mode` | gen-data-stats.js | forms, points, range | 8 | 0 |  |
+| `data_analysis:range` | gen-data-stats.js | forms, points, range | 9 | 0 |  |
+| `data_analysis:box_plot_intro` | gen-data-stats.js | forms | 4 | 0 |  |
+| `data_analysis:histogram_read` | gen-data-stats.js | forms | 3 | 0 |  |
+| `data_analysis:mad` | gen-data-stats.js | points | 2 | 0 |  |
+| `data_analysis:mixed_data_analysis` | gen-data-stats.js | members, range | 12 | 0 |  |
+| `probability:probability_basic` | gen-data-stats.js | forms | 3 | 0 |  |
+| `data_mixed:data_stats_all` | (data_mixed) | members, range | 7 | 0 |  |
+| `patterns:seq_2` | gen-algebraic.js | forms, unknown, range | 13 | 0 |  |
+| `patterns:seq_5` | gen-algebraic.js | forms, unknown, range | 13 | 0 |  |
+| `patterns:seq_10` | gen-algebraic.js | forms, unknown, range | 12 | 0 |  |
+| `patterns:count_by_fill` | gen-algebraic.js | forms, step | 5 | 0 |  |
+| `patterns:skip_count_line` | gen-algebraic.js | step, range | 9 | 0 |  |
+| `patterns:skip_count_grid` | gen-algebraic.js | step | 3 | 0 |  |
+| `patterns:count_by_step_up` | gen-algebraic.js | step, range | 10 | 0 |  |
+| `patterns:count_by_step_down` | gen-algebraic.js | step, range | 9 | 0 |  |
+| `patterns:count_by_powers_of_10` | gen-algebraic.js | step, dir | 5 | 0 |  |
 | `patterns:double` | gen-algebraic.js | range | 8 | 0 |  |
 | `patterns:halve` | gen-algebraic.js | range | 8 | 0 |  |
-| `patterns:number_pattern` | gen-algebraic.js | range | 8 | 0 |  |
-| `patterns:pattern_relationship` | gen-algebraic.js | range | 4 | 0 |  |
-| `algebra:tape_diagram` | gen-algebraic.js | range | 4 | 0 |  |
-| `algebra:tape_diagram_plain` | gen-algebraic.js | range | 4 | 0 |  |
-| `algebra:multi_step_word` | gen-algebraic.js | range | 3 | 0 |  |
-| `algebra:multi_step_word_plain` | gen-algebraic.js | range | 3 | 0 |  |
-| `algebra:solve_unknown` | gen-algebraic.js | range, decimals | 8 | 0 |  |
-| `algebra:balance_addsub` | gen-algebraic.js | range | 4 | 0 |  |
-| `algebra:write_expression` | gen-algebraic.js | range | 3 | 0 |  |
-| `algebra:evaluate_expression` | gen-algebraic.js | range, decimals | 7 | 0 |  |
-| `algebra:inequalities` | gen-algebraic.js | range | 3 | 0 |  |
-| `algebra:function_table_easy` | gen-algebraic.js | range | 8 | 0 |  |
-| `algebra:function_table_hard` | gen-algebraic.js | range | 8 | 0 |  |
-| `algebra:algebra_word_mixed` | gen-algebraic.js | range | 3 | 0 |  |
+| `patterns:shape_pattern` | gen-algebraic.js | points | 2 | 0 |  |
+| `patterns:number_pattern` | gen-algebraic.js | forms, range | 10 | 0 |  |
+| `patterns:pattern_relationship` | gen-algebraic.js | forms, task, range | 8 | 0 |  |
+| `patterns:mixed_patterns` | gen-algebraic.js | members | 14 | 0 |  |
+| `algebra:tape_diagram` | gen-algebraic.js | forms, range | 7 | 0 |  |
+| `algebra:tape_diagram_plain` | gen-algebraic.js | forms, range | 7 | 0 |  |
+| `algebra:multi_step_word` | gen-algebraic.js | forms, range | 7 | 0 |  |
+| `algebra:multi_step_word_plain` | gen-algebraic.js | forms, range | 7 | 0 |  |
+| `algebra:solve_unknown` | gen-algebraic.js | forms, range, decimals | 12 | 0 |  |
+| `algebra:balance_addsub` | gen-algebraic.js | unknown, range | 7 | 0 |  |
+| `algebra:write_expression` | gen-algebraic.js | task, forms, range | 9 | 0 |  |
+| `algebra:evaluate_expression` | gen-algebraic.js | forms, range, decimals | 9 | 0 |  |
+| `algebra:evaluate_expression_hard` | gen-algebraic.js | forms | 2 | 0 |  |
+| `algebra:inequalities` | gen-algebraic.js | forms, range | 6 | 0 |  |
+| `algebra:combine_like_terms` | gen-algebraic.js | forms | 2 | 0 |  |
+| `algebra:distributive_expr` | gen-algebraic.js | forms | 3 | 0 |  |
+| `algebra:function_table_easy` | gen-algebraic.js | forms, range | 10 | 0 |  |
+| `algebra:function_table_hard` | gen-algebraic.js | forms, range | 10 | 0 |  |
+| `algebra:algebra_word_mixed` | gen-algebraic.js | members, range | 5 | 0 |  |
 | `algebra:algebra_word_mixed_plain` | gen-algebraic.js | range | 4 | 0 |  |
-| `algebra:solve_eq_addsub` | gen-algebraic.js | range | 3 | 0 |  |
-| `algebra:solve_eq_multdiv` | gen-algebraic.js | range | 2 | 0 |  |
-| `algebra:solve_eq_twostep` | gen-algebraic.js | range | 3 | 0 |  |
-| `algebra:write_equation` | gen-algebraic.js | range | 3 | 0 |  |
-| `algebra:build_expr_addsub` | gen-algebraic.js | range | 4 | 0 |  |
-| `order_of_operations:two_ops_no_paren` | gen-algebraic.js | range | 6 | 0 |  |
-| `order_of_operations:three_ops_no_paren` | gen-algebraic.js | range | 4 | 0 |  |
+| `algebra:solve_eq_addsub` | gen-algebraic.js | forms, range | 8 | 0 |  |
+| `algebra:solve_eq_multdiv` | gen-algebraic.js | forms, range | 7 | 0 |  |
+| `algebra:solve_eq_twostep` | gen-algebraic.js | forms, range | 7 | 0 |  |
+| `algebra:write_equation` | gen-algebraic.js | forms, range | 7 | 0 |  |
+| `algebra:build_expr_addsub` | gen-algebraic.js | task, range | 6 | 0 |  |
+| `algebra:build_expr_multdiv` | gen-algebraic.js | task | 2 | 0 |  |
+| `algebra:mixed_algebra` | gen-algebraic.js | members | 22 | 0 |  |
+| `order_of_operations:oop_easy` | gen-algebraic.js | forms | 3 | 0 |  |
+| `order_of_operations:oop_medium` | gen-algebraic.js | forms | 5 | 0 |  |
+| `order_of_operations:oop_hard` | gen-algebraic.js | forms | 2 | 0 |  |
+| `order_of_operations:two_ops_no_paren` | gen-algebraic.js | forms, range | 8 | 0 |  |
+| `order_of_operations:three_ops_no_paren` | gen-algebraic.js | forms, range | 6 | 0 |  |
 | `order_of_operations:multi_ops_no_paren` | gen-algebraic.js | range | 5 | 0 |  |
-| `order_of_operations:paren_simple` | gen-algebraic.js | range | 6 | 0 |  |
-| `order_of_operations:paren_multi` | gen-algebraic.js | range | 4 | 0 |  |
-| `order_of_operations:exponents_simple` | gen-algebraic.js | range | 4 | 0 |  |
-| `order_of_operations:mixed_order_ops` | gen-algebraic.js | range | 4 | 0 |  |
+| `order_of_operations:paren_simple` | gen-algebraic.js | forms, range | 9 | 0 |  |
+| `order_of_operations:paren_multi` | gen-algebraic.js | forms, range | 7 | 0 |  |
+| `order_of_operations:nested_complex` | gen-algebraic.js | band | 2 | 0 |  |
+| `order_of_operations:exponents_simple` | gen-algebraic.js | forms, step, range | 8 | 0 |  |
+| `order_of_operations:compare_expressions` | gen-algebraic.js | forms | 2 | 0 |  |
+| `order_of_operations:mixed_order_ops` | gen-algebraic.js | members, range | 15 | 0 |  |
 | `placevalue:more_less_10` | gen-pv.js | step, dir, band, support | 8 | 0 |  |
 | `placevalue:more_less_100` | gen-pv.js | step, dir, support | 4 | 0 |  |
 | `placevalue:place_value_disks` | gen-pv.js | band, task, zeroPlace | 4 | 0 |  |
@@ -717,6 +1530,7 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `placevalue:combine` | gen-pv.js | band, zeroPlace, order | 7 | 0 |  |
 | `placevalue:order_least_to_greatest` | gen-pv.js | band | 4 | 0 |  |
 | `placevalue:order_greatest_to_least` | gen-pv.js | band | 4 | 0 |  |
+| `placevalue:mixed_placevalue` | gen-algebraic.js | members | 14 | 2 | gen, print, screen/worksheet |
 | `number_sense:rounding_visual` | gen-pv.js | place, band, midpoint | 6 | 0 |  |
 | `number_sense:nearest_10` | gen-pv.js | band, midpoint, support, response | 10 | 0 |  |
 | `number_sense:nearest_100` | gen-pv.js | band, midpoint, support, response | 9 | 0 |  |
@@ -738,9 +1552,11 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `number_sense:estimate_products` | gen-pv.js | place, task | 4 | 0 |  |
 | `number_sense:estimate_quotient` | gen-pv.js | place, task | 5 | 0 |  |
 | `number_sense:rounding_table` | gen-algebraic.js | range | 6 | 0 |  |
+| `number_sense:make_a_ten` | gen-algebraic.js | forms | 2 | 0 |  |
+| `number_sense:doubles_near_doubles` | gen-algebraic.js | forms | 3 | 0 |  |
 | `number_sense:compensation` | gen-algebraic.js | range | 4 | 0 |  |
-| `number_sense:mixed_number_sense` | gen-algebraic.js | range | 8 | 0 |  |
-| `number_theory:prime_composite` | gen-number-theory.js | range | 3 | 0 |  |
+| `number_sense:mixed_number_sense` | gen-algebraic.js | members, range | 32 | 10 | gen |
+| `number_theory:prime_composite` | gen-number-theory.js | forms, range | 7 | 0 |  |
 | `number_theory:factors_identify` | gen-number-theory.js | range | 4 | 0 |  |
 | `number_theory:factor_tchart_easy` | gen-number-theory.js | range | 3 | 0 |  |
 | `number_theory:factor_tchart_medium` | gen-number-theory.js | range | 4 | 0 |  |
@@ -748,13 +1564,77 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `number_theory:factor_links_easy` | gen-number-theory.js | range | 3 | 0 |  |
 | `number_theory:factor_links_medium` | gen-number-theory.js | range | 4 | 0 |  |
 | `number_theory:factor_links_hard` | gen-number-theory.js | range | 3 | 0 |  |
-| `number_theory:multiples` | gen-number-theory.js | range | 4 | 0 |  |
-| `number_theory:gcf_easy` | gen-number-theory.js | range | 3 | 0 |  |
-| `number_theory:gcf_hard` | gen-number-theory.js | range | 3 | 0 |  |
-| `number_theory:lcm` | gen-number-theory.js | range | 2 | 0 |  |
-| `number_theory:divisibility_sort` | gen-number-theory.js | range | 2 | 0 |  |
-| `algebra_mixed:patterns_all` | (algebra_mixed) | range | 8 | 0 |  |
-| `algebra_mixed:order_ops_all` | (algebra_mixed) | range | 4 | 0 |  |
+| `number_theory:multiples` | gen-number-theory.js | forms, range | 8 | 0 |  |
+| `number_theory:gcf_easy` | gen-number-theory.js | forms, range | 5 | 0 |  |
+| `number_theory:gcf_hard` | gen-number-theory.js | forms, range | 5 | 0 |  |
+| `number_theory:lcm` | gen-number-theory.js | forms, range | 4 | 0 |  |
+| `number_theory:divisibility_sort` | gen-number-theory.js | step, range | 5 | 0 |  |
+| `number_theory:mixed_number_theory` | gen-number-theory.js | members | 13 | 0 |  |
+| `algebra_mixed:patterns_all` | (algebra_mixed) | members, range | 22 | 0 |  |
+| `algebra_mixed:algebra_all` | (algebra_mixed) | members | 22 | 0 |  |
+| `algebra_mixed:order_ops_all` | (algebra_mixed) | members, range | 15 | 0 |  |
+| `algebra_mixed:placevalue_all` | (algebra_mixed) | members | 14 | 0 |  |
+| `algebra_mixed:number_sense_all` | (algebra_mixed) | members | 24 | 0 |  |
+| `algebra_mixed:number_theory_all` | (algebra_mixed) | members | 13 | 0 |  |
+| `algebra_mixed:algebraic_all` | (algebra_mixed) | members | 6 | 1 | gen, screen/worksheet, screen/practice |
+| `all_mixed:all_domains_mixed` | (all_mixed) | members, range | 33 | 2 | gen, print, screen/worksheet, screen/practice |
+| `all_mixed:grade_k_mixed` | (all_mixed) | members | 8 | 0 |  |
+| `all_mixed:grade_1_mixed` | (all_mixed) | members | 9 | 0 |  |
+| `all_mixed:grade_2_mixed` | (all_mixed) | members | 12 | 1 | gen, screen/worksheet, screen/practice |
+| `all_mixed:grade_3_mixed` | (all_mixed) | members | 14 | 0 |  |
+| `all_mixed:grade_4_mixed` | (all_mixed) | members, range | 26 | 1 | gen, print, screen/worksheet |
+| `all_mixed:grade_5_mixed` | (all_mixed) | members | 17 | 0 |  |
+| `all_mixed:grade_6_mixed` | (all_mixed) | members | 12 | 0 |  |
+| `vocabulary:vocab_grade_K` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_1` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_2` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_3` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_4` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_5` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_6` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_K_operations` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_K_counting` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_K_geometry` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_K_data` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_K_algebra` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_K_measurement` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_1_operations` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_1_counting` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_1_geometry` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_1_data` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_1_algebra` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_1_measurement` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_2_operations` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_2_counting` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_2_fractions` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_2_geometry` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_2_data` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_2_algebra` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_2_measurement` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_3_operations` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_3_fractions` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_3_geometry` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_3_data` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_3_algebra` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_3_measurement` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_4_operations` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_4_fractions` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_4_geometry` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_4_data` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_4_algebra` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_4_measurement` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_5_operations` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_5_fractions` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_5_geometry` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_5_data` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_5_algebra` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_5_measurement` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_6_operations` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_6_fractions` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_6_geometry` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_6_data` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_6_algebra` | gen-vocabulary.js | forms | 3 | 0 |  |
+| `vocabulary:vocab_grade_6_measurement` | gen-vocabulary.js | forms | 3 | 0 |  |
 
 ## Skills with no option shown
 
@@ -762,34 +1642,7 @@ These skills show the teacher no Options control at all. See OPTIONS-AUDIT.md fo
 
 | Category | Count | Skills |
 |---|---|---|
-| composing | 4 | `ten_frame_build_teen` `fraction_number_line` `whole_as_fraction` `compose_whole` |
-| addition | 4 | `add_sub_10s` `add_sub_100s` `add_wp_10_plain` `mixed_addition` |
-| subtraction | 2 | `mixed_add_sub` `mixed_subtraction` |
-| multiplication | 10 | `dot_array_mult` `mult_properties` `area_model_mult` `area_model_mult_hard` `mixed_multiplication` `repeated_add_to_mult` `equal_or_unequal_groups` `mult_zeros` `mult_placeholder_zero` `mult_missing_digit` |
-| division | 10 | `div_remainders` `box_division_easy` `box_division_hard` `area_model_div_2by1` `area_model_div_3by1` `mixed_division` `share_into_groups` `div_equation_parts` `remainder_too_big` `div_fix_estimate` |
-| integers | 4 | `integer_nl_drag` `abs_value` `opposite_numbers` `ordering_rationals` |
-| number_ops_mixed | 1 | `operations_all` |
-| fractions | 25 | `identify` `write_fraction` `shade_fraction` `equiv_frac_visual` `equiv_frac_nv` `select_equiv_frac` `equivalent` `compare` `simplify` `improper_mixed` `mixed_improper_visual` `mixed_fractions` `compose_target_frac` `identify_nv` `fraction_of_set_nv` `fraction_of_set_hard_nv` `order_fractions` `order_frac_numline` `benchmark_fractions` `compare_frac_lcd` `graph_fractions` `round_fractions` `fraction_bar_ops` `fraction_nl_drag` `mixed_nl_drag` |
-| fraction_operations | 39 | `add_fractions_like` `sub_fractions_like` `add_mixed_like` `sub_mixed_like` `mult_frac_whole` `decompose_fractions` `frac_word_problems` `frac_word_problems_plain` `frac_10_100` `add_frac_unlike` `sub_frac_unlike` `add_mixed_unlike` `sub_mixed_unlike` `add_frac_like_nv` `sub_frac_like_nv` `add_frac_unlike_nv` `sub_frac_unlike_nv` `add_mixed_like_nv` `sub_mixed_like_nv` `add_mixed_unlike_nv` `sub_mixed_unlike_nv` `mult_frac_whole_nv` `decompose_frac_nv` `frac_10_100_nv` `mult_frac_frac_nv` `div_unit_frac_nv` `frac_as_div_nv` `frac_as_div_word` `mult_scaling_nv` `mult_frac_frac` `div_unit_fraction` `frac_as_division` `mult_scaling` `frac_mult_word` `frac_mult_word_plain` `frac_word_mixed` `frac_word_mixed_plain` `mixed_fraction_ops` `estimate_frac_ops` |
-| decimals | 3 | `compare_thousandths` `round_thousandths` `decimal_nl_drag` |
-| conversions | 16 | `f_to_d` `d_to_f` `f_to_p` `p_to_f` `d_to_p` `p_to_d` `percent_visual` `percent_of_number` `find_whole_from_pct` `order_fdp` `ratio_intro` `unit_rate_intro` `double_num_line` `mixed_conversions` `equiv_ratios` `ratio_tables` |
-| frac_dec_mixed | 3 | `fractions_all` `conversions_all` `fdp_all` |
-| shapes_early | 17 | `name_2d_shapes` `name_3d_shapes` `shape_name_match_2d` `shape_name_match_3d` `shape_positions` `shape_corners_count` `count_edges_faces_vertices` `count_sides_vertices_2d` `order_objects_length` `measure_nonstandard` `compose_shapes` `compose_hexagon` `compose_rect_from_squares` `partition_shapes` `shape_attributes` `compose_from_attributes` `mixed_shapes_early` |
-| area_perimeter | 4 | `perimeter_intro` `area_unit_squares` `perimeter_grid` `mixed_area_perimeter` |
-| angles_lines | 7 | `identify_angles` `measure_angles` `identify_lines` `symmetry` `place_symmetry_lines` `additive_angles` `mixed_angles_lines` |
-| shapes_classify | 6 | `classify_triangles` `classify_quads` `hotspot_quads` `net_identify` `cross_section_3d` `mixed_shapes` |
-| coordinates | 4 | `geo_reflect` `geo_rotate` `geo_translate` `mixed_coordinates` |
-| measurement | 37 | `time_hour` `time_half_hour` `time_quarter` `time_5min` `time_1min` `time_analog_digital` `time_match_clock` `order_clocks_analog_asc` `order_clocks_analog_desc` `order_clocks_digital_asc` `order_clocks_digital_desc` `elapsed_30min` `elapsed_hour` `elapsed_15min` `elapsed_mixed` `elapsed_find_duration` `elapsed_visual_easy` `elapsed_visual_medium` `elapsed_visual_hard` `heavier_lighter_visual` `pictograph_intro` `bar_graph_intro` `reading_ruler` `reading_ruler_hard` `money` `equiv_coin_sets` `enough_money` `temperature` `capacity` `unit_conversions` `length_customary` `length_metric` `unit_conversion_word` `mass_volume_liquid` `estimate_length` `mixed_measurement` `mixed_time` |
-| geo_mixed | 3 | `geometry_all` `measurement_all` `geo_meas_all` |
-| graphs | 8 | `build_bar_graph` `build_pictograph` `tally_chart` `line_plot` `line_plot_g2` `line_plot_fractions` `pie_chart` `mixed_graphs` |
-| data_analysis | 4 | `box_plot_intro` `histogram_read` `mad` `statistical_question` |
-| probability | 2 | `probability_basic` `mixed_probability` |
-| patterns | 5 | `count_by_fill` `skip_count_grid` `count_by_powers_of_10` `shape_pattern` `mixed_patterns` |
-| algebra | 5 | `evaluate_expression_hard` `combine_like_terms` `distributive_expr` `build_expr_multdiv` `mixed_algebra` |
-| order_of_operations | 5 | `oop_easy` `oop_medium` `oop_hard` `nested_complex` `compare_expressions` |
-| placevalue | 1 | `mixed_placevalue` |
-| number_sense | 2 | `make_a_ten` `doubles_near_doubles` |
-| number_theory | 1 | `mixed_number_theory` |
-| algebra_mixed | 5 | `algebra_all` `placevalue_all` `number_sense_all` `number_theory_all` `algebraic_all` |
-| all_mixed | 8 | `all_domains_mixed` `grade_k_mixed` `grade_1_mixed` `grade_2_mixed` `grade_3_mixed` `grade_4_mixed` `grade_5_mixed` `grade_6_mixed` |
-| vocabulary | 50 | `vocab_grade_K` `vocab_grade_1` `vocab_grade_2` `vocab_grade_3` `vocab_grade_4` `vocab_grade_5` `vocab_grade_6` `vocab_grade_K_operations` `vocab_grade_K_counting` `vocab_grade_K_geometry` `vocab_grade_K_data` `vocab_grade_K_algebra` `vocab_grade_K_measurement` `vocab_grade_1_operations` `vocab_grade_1_counting` `vocab_grade_1_geometry` `vocab_grade_1_data` `vocab_grade_1_algebra` `vocab_grade_1_measurement` `vocab_grade_2_operations` `vocab_grade_2_counting` `vocab_grade_2_fractions` `vocab_grade_2_geometry` `vocab_grade_2_data` `vocab_grade_2_algebra` `vocab_grade_2_measurement` `vocab_grade_3_operations` `vocab_grade_3_fractions` `vocab_grade_3_geometry` `vocab_grade_3_data` `vocab_grade_3_algebra` `vocab_grade_3_measurement` `vocab_grade_4_operations` `vocab_grade_4_fractions` `vocab_grade_4_geometry` `vocab_grade_4_data` `vocab_grade_4_algebra` `vocab_grade_4_measurement` `vocab_grade_5_operations` `vocab_grade_5_fractions` `vocab_grade_5_geometry` `vocab_grade_5_data` `vocab_grade_5_algebra` `vocab_grade_5_measurement` `vocab_grade_6_operations` `vocab_grade_6_fractions` `vocab_grade_6_geometry` `vocab_grade_6_data` `vocab_grade_6_algebra` `vocab_grade_6_measurement` |
+| shapes_early | 3 | `shape_name_match_2d` `shape_name_match_3d` `compose_rect_from_squares` |
+| shapes_classify | 1 | `hotspot_quads` |
+| data_analysis | 1 | `statistical_question` |
+| probability | 1 | `mixed_probability` |
