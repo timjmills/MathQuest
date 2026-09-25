@@ -1989,6 +1989,19 @@ function _applyKitFactCell(q, skill, range) {
         return;
     }
     const across = q.notation === 'across' || /horizontal/.test(String(q.printFormat || ''));
+    // P11 (critic round 2): a stacked two-digit add / subtract item that REGROUPS is column work,
+    // not a fact: it prints on the stack template with its carry (or borrow) strip, and the screen
+    // shows the same stack, its digit boxes typed and composing the answer.
+    if (small && !across && (skill === 'add' || skill === 'subtract') && Math.max(a, b) >= 10
+        && (op === '+' ? hasCarry(a, b) : hasBorrow(a, b))) {
+        const payload = { operands: [a, b], op, heads: false, regroup: op === '+' ? 'add' : 'sub', ansDigits: digits };
+        q.cell = { template: 'stack', v: 1, payload };
+        q.visual = _kitStackTwin(payload);
+        q.selfAnswering = true;
+        q.printFormat = op === '+' ? 'column-add' : 'column-sub';
+        q.notation = 'stacked';
+        return;
+    }
     if (small) {
         q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: across ? 'horiz' : 'vertical', digits } };
         if (!across && /column-(add|sub)/.test(String(q.printFormat || ''))) {
@@ -2063,6 +2076,9 @@ function _optionAccepts(q, selected, routed) {
     if (selected === 'add' || selected === 'subtract') {
         const rg = _opt('regroup');
         const has = isAdd ? hasCarry(q.a, q.b) : hasBorrow(q.a, q.b);
+        // The band bounds the ANSWER: the sum for +, the number taken from for −.
+        const band = Number(_opt('band'));
+        if (band && (isAdd ? q.a + q.b : q.a) > band) return false;
         if (rg === 'none' && has) return false;
         if (rg === 'always' && !has) return false;
     }
@@ -2277,16 +2293,19 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
     const selected = mappedSkill;
     mappedSkill = _routeByOptions(mappedSkill);
     const _init = Object.assign({}, q);
+    // Basic + and −: the band (10 / 20) caps the numbers dealt as well, so the sum filter rarely retries.
+    const _selBand = (selected === 'add' || selected === 'subtract') ? Number(_opt('band')) : 0;
+    const _genHelpers = _selBand ? { ...helpers, range: Math.min(Number(helpers.range) || _selBand, _selBand) } : helpers;
     let result;
     if (_generateSizedMultDiv(q, selected, helpers)) result = q;
     else {
         for (let t = 0; t < 60; t++) {
             if (t) { for (const k of Object.keys(q)) delete q[k]; Object.assign(q, _init); }
-            result = _generateOperationsQuestionInner(q, mappedSkill, helpers);
+            result = _generateOperationsQuestionInner(q, mappedSkill, _genHelpers);
             if (_optionAccepts(q, selected, mappedSkill)) break;
         }
     }
-    try { _applyKitFactCell(q, mappedSkill, Number((helpers && helpers.range) || state.range || 100)); } catch (e) { /* the legacy cell stays */ }
+    try { _applyKitFactCell(q, mappedSkill, Number((_genHelpers && _genHelpers.range) || state.range || 100)); } catch (e) { /* the legacy cell stays */ }
     try { _applyOptionPost(q, selected, mappedSkill); } catch (e) { /* the item stands as generated */ }
     if (q && typeof q.text === 'string') q.text = agreeWithOne(q.text);
     if (q && typeof q.printText === 'string') q.printText = agreeWithOne(q.printText);
@@ -3993,7 +4012,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // print-sheet.js legacyKeyFill); q.ans stays the total for the single-number
                 // checkers. The picture is black line art drawn at a fixed dot pitch (about
                 // 9 mm) so 40 dots are still countable, with no caption telling the pupil how.
-                const questionType = ['count_all', 'write_mult', 'equal_groups'][_dealRung(3)];
+                // P11 (critic round 2): ONE frame on every item, three slots — ___ rows of ___ (or groups of
+                // ___), ___ in all. The count-all item (one slot) is no longer dealt, so the slot set never
+                // changes from cell to cell.
+                const questionType = ['write_mult', 'equal_groups'][_dealRung(2)];
                 // Scale array size with range but cap for visual display
                 const arrMaxRows = Math.max(2, Math.min(range <= 50 ? 5 : range <= 100 ? 6 : 8, 10));
                 const arrMaxCols = Math.max(2, Math.min(range <= 50 ? 6 : range <= 100 ? 8 : 10, 12));

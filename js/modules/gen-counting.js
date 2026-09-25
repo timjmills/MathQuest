@@ -470,10 +470,12 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const FORMS = ['more', 'fewer', 'same'];
         // P11: "Compare by" fixes the question for the page; the default deals one per page.
         const _cgDir = _kOpt('dir');
-        const form = FORMS.includes(_cgDir) ? _cgDir : FORMS[_kPageDeal('compare_groups', 3)];
+        // P11 (critic round 2): Mixed deals more, fewer and same across the page, two of each per six,
+        // through a shuffled permutation, so there is no question pattern to copy.
+        const form = FORMS.includes(_cgDir) ? _cgDir : FORMS[_kDealShuffled(6) % 3];
         const _cgTop = Number(_kOpt('band')) || 10;
         q._variant = form;
-        const wantSame = form === 'same' && _kDeal(2) === 0;
+        const wantSame = form === 'same' && rng(0, 1) === 0;   // rolled: a dealt same / not alternated
         let countA, countB;
         if (wantSame) {
             countA = countB = 2 + _kDealShuffled(_cgTop - 1);
@@ -1158,8 +1160,13 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         if (!blanks.length) blanks = [rng(2, LEN - 2)];
         const parts = blanks.map(i => values[i]);
 
-        q.text = 'Write the missing numbers in the number track.';
-        q.printText = 'Write the missing numbers.';
+        // P11 (critic round 2): the instruction follows the blank count (one number / numbers), and the
+        // track is handed to the sheet provider as `gridFill` so its skip-count line can name the step.
+        const _one = parts.length === 1;
+        q.text = _one ? 'Write the missing number in the number track.' : 'Write the missing numbers in the number track.';
+        q.printText = _one ? 'Write the missing number.' : 'Write the missing numbers.';
+        q.blankCount = parts.length;
+        q.gridFill = { cells: values.map((v, i) => ({ row: 0, col: i, value: v, blank: blanks.includes(i) })) };
         q.hint = `Look at two numbers side by side. Each number is ${step} ${down ? 'less' : 'more'} than the one before it.`;
         q.skillLabel = 'Number Sequence';
         q.keyParts = parts.map(String);

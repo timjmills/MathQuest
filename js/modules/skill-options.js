@@ -700,8 +700,9 @@ const P11_OPS_OPTIONS = {
     })(), notationOption('/'), _opsTableBand(), _opsMulCue(true)],
 
     // --- the four basic skills: regrouping and the unknown position ----------------------------
-    'addition:add': [notationOption('+'), _opsRegroup('mixed'), _opsUnknown()],
-    'subtraction:subtract': [notationOption('-'), _opsRegroup('mixed', true), _opsUnknown('answer',
+    // Basic + and − are grade 1 (1.OA.6, within 20): the band is 10 or 20, the sum / the number taken from.
+    'addition:add': [notationOption('+'), _opsBand([10, 20], 20), _opsRegroup('mixed'), _opsUnknown()],
+    'subtraction:subtract': [notationOption('-'), _opsBand([10, 20], 20), _opsRegroup('mixed', true), _opsUnknown('answer',
         { answer: 'The answer (15 − 7 = __)', first: 'The number you start from (__ − 7 = 8)', second: 'The number taken away (15 − __ = 8)' })],
     'multiplication:multiply': [notationOption('x'), {
         id: 'tiles', label: 'Digits × digits', type: 'enum', default: null, group: 'difficulty',
@@ -849,8 +850,8 @@ const P11_K2_OPTIONS = {
         {
             id: 'dir', label: 'Compare by', type: 'enum', default: 'mixed',
             values: [{ v: 'more', l: 'Which has more?' }, { v: 'fewer', l: 'Which has fewer?' }, { v: 'same', l: 'Same or not the same?' },
-                { v: 'mixed', l: 'One of the three per page' }],
-            help: 'One question for the whole page, so the instruction says one thing.',
+                { v: 'mixed', l: 'All three, mixed on the page' }],
+            help: 'One question for the whole page, or all three mixed (the pupil reads each question).',
         },
         _k2CountTo([5, 10], 10),
         levelSubset([2, 1], 1, 'Level 2 writes how many under each group (compare the numbers); level 1 leaves the pupil to match one to one.'),
