@@ -7,6 +7,7 @@
 //   node tests/scripts/ws-content-audit.cjs --family operations    # + - x / only
 //   node tests/scripts/ws-content-audit.cjs --family k2            # counting & cardinality only
 //   node tests/scripts/ws-content-audit.cjs --family pv            # place value, rounding, estimation (P9)
+//   node tests/scripts/ws-content-audit.cjs --family tm            # time and money (P10)
 //   node tests/scripts/ws-content-audit.cjs --category addition    # one category
 //   node tests/scripts/ws-content-audit.cjs --category composing   # ...including a K-2 one
 //   node tests/scripts/ws-content-audit.cjs --skill add_20_regroup # one skill
@@ -63,9 +64,20 @@ const K2_CATS = ['counting', 'comparing', 'composing', 'counting_mixed'];
 // with the rest of the pv family further down; PV_CATS is hoisted here so the family table is one
 // place.
 const PV_FAMILY_CATS = ['placevalue', 'number_sense'];
-const CATS = [...OPS_CATS, ...K2_CATS, ...PV_FAMILY_CATS];
-const familyOf = cat => (OPS_CATS.includes(cat) ? 'operations' : PV_FAMILY_CATS.includes(cat) ? 'pv' : 'k2');
-const FAMILY_CATS = { operations: OPS_CATS, k2: K2_CATS, pv: PV_FAMILY_CATS };
+// P10: time + money (design/research/time-money.md §17). `measurement` is shared with rulers,
+// conversions and capacity, so the family is an ID LIST inside it, not a category.
+const TM_CATS = ['measurement'];
+const TM_IDS = new Set([
+    'time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock',
+    'order_clocks_analog_asc', 'order_clocks_analog_desc', 'order_clocks_digital_asc', 'order_clocks_digital_desc',
+    'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
+    'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard',
+    'money_count', 'money', 'equiv_coin_sets', 'enough_money', 'make_change_least_coins', 'mixed_time',
+    'clock_parts', 'time_fives_ring', 'time_sense', 'elapsed_find_start', 'coin_value', 'money_notation', 'money_change', 'money_compare',
+]);
+const CATS = [...OPS_CATS, ...K2_CATS, ...PV_FAMILY_CATS, ...TM_CATS];
+const familyOf = cat => (OPS_CATS.includes(cat) ? 'operations' : PV_FAMILY_CATS.includes(cat) ? 'pv' : TM_CATS.includes(cat) ? 'tm' : 'k2');
+const FAMILY_CATS = { operations: OPS_CATS, k2: K2_CATS, pv: PV_FAMILY_CATS, tm: TM_CATS };
 
 // ---------------------------------------------------------------------------
 // Reading the promise out of the name
@@ -458,7 +470,7 @@ function equationCheck(it) {
 // ---------------------------------------------------------------------------
 // Sampling (runs inside the page)
 // ---------------------------------------------------------------------------
-function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv }) {
+function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm }) {
     // What a K-2 cell carries INSTEAD of a and b. These are the fields the generators already
     // publish so the renderers can draw the representation, and they are exactly what the
     // representation rules need, so the audit reads the item's own declaration rather than
@@ -603,6 +615,25 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv }) {
             item.cellT = q.cell.template;
             try { item.cellP = JSON.parse(JSON.stringify(q.cell.payload || {})); } catch (e) { item.cellP = {}; }
             item.visPlain = String(q.visual || '').replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 400);
+        }
+        if (tm) {
+            // P10: the kit cell's plain payload is the item's declaration; the rules recompute
+            // from it and read what the pupil sees (text, hint, the twin's words).
+            const strip = (h) => String(h || '').replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim();
+            const visRaw = String(q.visual || '');
+            item.fp = `${JSON.stringify(q.cell || null)}|${JSON.stringify(q.ans)}`;
+            item.tmT = q.cell ? q.cell.template : '';
+            try { item.tmP = JSON.parse(JSON.stringify(q.cell ? q.cell.payload : null)); } catch (e) { item.tmP = null; }
+            item.fullText = text;
+            item.hint = strip(q.hint);
+            item.visText = strip(visRaw);
+            item.optLen = Array.isArray(q.options) ? q.options.length : 0;
+            item.colors = [...new Set((visRaw.match(/#[0-9a-fA-F]{3,6}\b|rgb\([^)]*\)/g) || []).map(c => c.toLowerCase()))];
+            item.emoji = (visRaw.match(/\p{Extended_Pictographic}/gu) || []).length;
+            item.refused = q.refused || '';
+            item.skillId = q.skillId;
+            out.push(item);
+            continue;
         }
         if (pv) {
             const strip = (h) => String(h || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -1371,6 +1402,154 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
     if (/^estimate_(sums_diffs|products|quotient)$/.test(id)) NOTE('not-checked', 'reasonable-balance: task "reasonable" is off by default (§19.4 step 8 builds its 40-60% balance)');
 }
 
+// ===========================================================================
+// THE TM FAMILY: time and money (P10, design/research/time-money.md §17)
+// ===========================================================================
+// Every rewritten item carries `q.cell`: a `clock`, `timeline`, `coins` or `money-columns`
+// template with a plain payload. The rules RECOMPUTE the answer from that payload (the hands'
+// h:m, the elapsed start + duration, the coin total, the fewest set by dynamic programming, the
+// change in integer minor units) and never trust q.ans; they hold every step to its NAME's
+// precision, band and response. Each is zero-tolerance at the audit's deterministic seeds.
+const TM_T = (h, m) => `${((h % 12) + 12) % 12 || 12}:${String(m).padStart(2, '0')}`;
+const TM_MIN = (t) => ((t.h * 60 + t.m) % 1440 + 1440) % 1440;
+const TM_READ = { time_hour: [0], time_half_hour: [30], time_quarter: [15, 45], time_5min: [5, 10, 20, 25, 35, 40, 50, 55] };
+const TM_PLAIN_COINS = new Set([1, 5, 10, 25]);
+const TM_BANNED = /\b(click|drag|tap|select|press)\b/i;
+const tmSum = (l) => (l || []).reduce((a, b) => a + b, 0);
+function tmFewest(values, target) {
+    const best = new Array(target + 1).fill(Infinity); best[0] = 0;
+    for (let a = 1; a <= target; a++) for (const v of values) if (v <= a && best[a - v] + 1 < best[a]) best[a] = best[a - v] + 1;
+    return best[target];
+}
+/** The answer the payload implies, recomputed independently of the generator. */
+function tmExpected(t, p) {
+    if (!p) return undefined;
+    if (t === 'clock') {
+        switch (p.kind) {
+            case 'read': case 'words': return TM_T(p.h, p.m);
+            case 'draw': return JSON.stringify({ hour: p.h % 12, minute: p.m });
+            case 'choose': { const f = (p.faces || [])[p.correct]; return f && f.h % 12 === p.h % 12 && f.m === p.m ? 'ABC'[p.correct] : '?'; }
+            case 'order': {
+                const mins = (p.times || []).map(x => x.h * 60 + x.m);
+                const sorted = mins.slice().sort((a, b) => (p.dir === 'desc' ? b - a : a - b));
+                return mins.map(v => sorted.indexOf(v) + 1).join(', ');
+            }
+            case 'parts': return p.task === 'hands' ? p.hourLetter : (p.missing || []).join(', ');
+            case 'fives': { const g = new Set(p.given || []); const v = []; for (let i = 1; i <= 12; i++) if (!g.has(i)) v.push(i === 12 ? 0 : i * 5); return v.join(', '); }
+            case 'sense': return ['a.m.', 'p.m.'].includes(p.ap) ? p.ap : '?';
+            default: return undefined;
+        }
+    }
+    if (t === 'timeline') {
+        const d = ((TM_MIN(p.end) - TM_MIN(p.start)) % 1440 + 1440) % 1440;
+        if (d !== p.total) return '?duration';
+        if (p.mode === 'duration') return p.answer === 'minutes' ? String(p.total) : `${Math.floor(p.total / 60)} h ${p.total % 60} min`;
+        const u = p.mode === 'later' ? p.end : p.start;
+        return p.response === 'draw' ? JSON.stringify({ hour: u.h % 12, minute: u.m }) : TM_T(u.h, u.m);
+    }
+    if (t === 'coins') {
+        switch (p.kind) {
+            case 'count': {
+                if (p.answer === 'two') return `${tmSum(p.notes)}, ${tmSum(p.coins)}`;
+                return String(p.answer === 'major' ? tmSum(p.notes) : tmSum(p.coins));
+            }
+            case 'find': return String((p.coins || []).filter(v => v === p.target).length);
+            case 'order': { const l = p.notes && p.notes.length ? p.notes : p.coins; const s = l.slice().sort((a, b) => a - b); return l.map(v => s.indexOf(v) + 1).join(', '); }
+            case 'tally': {
+                const made = (p.values || []).reduce((a, v, i) => a + v * (p.counts || [])[i], 0);
+                const n = tmSum(p.counts);
+                return made === p.target && n === tmFewest(p.values, p.target) ? (p.counts || []).join(', ') : '?fewest';
+            }
+            case 'enough': return tmSum(p.coins) >= p.price ? 'Enough' : 'Not enough';
+            case 'check': return tmSum(p.coins) === p.target ? 'Yes' : 'No';
+            case 'compare': { const a = tmSum(p.a.coins), b = tmSum(p.b.coins); return p.response === 'sign' ? (a > b ? '>' : a < b ? '<' : '=') : (a > b ? 'A' : b > a ? 'B' : '?'); }
+            case 'notation': {
+                const tot = p.words ? p.total : tmSum(p.notes) * 100 + tmSum(p.coins);
+                return `${Math.floor(tot / 100)}.${String(tot % 100).padStart(2, '0')}`;
+            }
+            default: return undefined;
+        }
+    }
+    if (t === 'money-columns') {
+        const v = p.op === '-' ? p.a - p.b : p.a + p.b;
+        return p.cents ? `${Math.floor(v / 100)}.${String(v % 100).padStart(2, '0')}` : String(v / 100);
+    }
+    return undefined;
+}
+
+function tmRules(skill, items, live, r, F, NOTE) {
+    const id = skill.skillId;
+    const ok = items.filter(it => !it.error && !it.empty && !it.refused);
+    if (!ok.length) return;
+    const bad = (cls, list, msg) => { if (list.length) F(cls, `${list.length} of ${ok.length} items ${msg}: ${list.slice(0, 3).join('; ')}`); };
+    // tm-payload: every item is a kit cell
+    bad('tm-payload', ok.filter(it => !it.tmT || !it.tmP).map(it => it.fullText.slice(0, 40)), 'carry no kit cell (q.cell)');
+    const cells = ok.filter(it => it.tmT && it.tmP);
+    // tm-recompute
+    bad('tm-recompute', cells.filter(it => {
+        const want = tmExpected(it.tmT, it.tmP);
+        if (want === undefined) return false;
+        const got = typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans);
+        return got !== want;
+    }).map(it => `${JSON.stringify(it.ans)} vs ${tmExpected(it.tmT, it.tmP)}`), 'ship an answer their own cell does not produce');
+    // tm-precision: a reading step deals only its new positions (review off by default)
+    if (TM_READ[id]) bad('tm-precision', cells.filter(it => !TM_READ[id].includes(it.tmP.m)).map(it => TM_T(it.tmP.h, it.tmP.m)), `show a minute outside the step's positions (${TM_READ[id].join(', ')})`);
+    if (id === 'time_1min') bad('tm-precision', cells.filter(it => it.tmP.m % 5 === 0).map(it => TM_T(it.tmP.h, it.tmP.m)), 'show a five-minute time on the 1-minute step');
+    // tm-band: coins within the plain set, within the band and the coin cap; elapsed within the span
+    if (cells.some(it => it.tmT === 'coins')) {
+        bad('tm-band', cells.filter(it => [...(it.tmP.coins || []), ...((it.tmP.a || {}).coins || []), ...((it.tmP.b || {}).coins || [])].some(v => !TM_PLAIN_COINS.has(v))).map(it => JSON.stringify(it.tmP.coins)), 'deal a coin outside 1, 5, 10, 25 at Plain numbers');
+        if (id === 'money_count') bad('tm-band', cells.filter(it => (it.tmP.coins || []).length > 6 || tmSum(it.tmP.coins) > 100).map(it => JSON.stringify(it.tmP.coins)), 'go over the default 6 coins / total 100');
+    }
+    if (cells.some(it => it.tmT === 'timeline')) {
+        const cap = { elapsed_30min: 30, elapsed_15min: 45, elapsed_hour: 180 }[id] || 180;
+        bad('tm-band', cells.filter(it => it.tmP.total > cap).map(it => `${it.tmP.total} min`), `run longer than the default span (${cap} min)`);
+    }
+    // answer-in-item: the hint and the screen text never hold the answer
+    bad('answer-in-item', cells.filter(it => {
+        if (typeof it.ans === 'object') return false;
+        const a = String(it.ans);
+        if (a.length < 3 && !/:/.test(a)) return false;
+        // a label from a printed bank (check one box) is on the page by design
+        if (['Enough', 'Not enough', 'Yes', 'No', 'a.m.', 'p.m.'].includes(a)) return false;
+        return it.hint.includes(a) || (it.tmT !== 'clock' || it.tmP.kind !== 'draw') && it.fullText.includes(a);
+    }).map(it => `${it.ans} in "${it.hint.slice(0, 50)}"`), 'print their answer in the hint or the text');
+    // one-response: one answer type and one cell kind per page (a mixed review excepted)
+    if (!/^mixed/.test(id)) {
+        const kinds = new Set(cells.map(it => `${it.type}/${it.tmT}/${it.tmP.kind || it.tmP.mode || it.tmP.op}`));
+        if (kinds.size > 1 && !/^elapsed/.test(id)) F('one-response', `${kinds.size} different responses on one page: ${[...kinds].join(', ')}`);
+        const ts = new Set(cells.map(it => it.type));
+        if (ts.size > 1) F('one-response', `${ts.size} answer types on one page: ${[...ts].join(', ')}`);
+    }
+    // production-stays-production
+    bad('production-stays-production', cells.filter(it => it.optLen > 0).map(it => it.fullText.slice(0, 30)), 'turn a written answer into buttons (q.options)');
+    // banned-verb (paper and screen text alike) and capitals
+    bad('banned-verb', cells.filter(it => TM_BANNED.test(it.fullText) || /\b[A-Z]{3,}\b/.test(it.fullText)).map(it => it.fullText.slice(0, 50)), 'use a screen verb or capitals');
+    // currency-sign: the default is Plain numbers
+    bad('currency-sign', cells.filter(it => /[$¢]|\bQR\b|\bcents?\b|\bdollars?\b|\briyals?\b|\bdirhams?\b/i.test(`${it.fullText} ${it.visText}`)).map(it => it.visText.slice(0, 40)), 'print a currency sign or word at Plain numbers');
+    // ink: no colour, no emoji inside the cell
+    bad('ink', cells.filter(it => it.emoji || it.colors.some(c => !['#000', '#000000', '#fff', '#ffffff', '#949494'].includes(c))).map(it => `${it.colors.join(' ')}${it.emoji ? ' emoji' : ''}`), 'draw with a colour or an emoji');
+    // balanced-decision: a check-one-box decision is 40-60% each way
+    const DEC = { enough_money: 'Enough', equiv_coin_sets: 'Yes', time_sense: 'a.m.', money_compare: 'A' };
+    if (DEC[id] && cells.length >= 12) {
+        const share = cells.filter(it => it.ans === DEC[id]).length / cells.length;
+        if (share < 0.4 || share > 0.6) F('balanced-decision', `"${DEC[id]}" is the answer on ${Math.round(100 * share)}% of items (40-60% required)`);
+    }
+    // edge-seeded: every seeded page of six carries the step's edge case (§2.3)
+    const EDGE = {
+        time_hour: (p) => p.h % 12 === 0, time_half_hour: (p) => p.h % 12 === 0, time_quarter: (p) => p.h % 12 === 0,
+        time_5min: (p) => p.m === 5 || p.m === 55, time_1min: (p) => p.m === 58,
+        money_notation: (p) => { const t = p.words ? p.total : tmSum(p.notes) * 100 + tmSum(p.coins); return t % 100 < 10 || t < 100; },
+        elapsed_30min: (p) => p.start.m + 30 >= 60,
+    };
+    if (EDGE[id]) {
+        const pages = [];
+        for (let i = 0; i + 6 <= cells.length; i += 6) pages.push(cells.slice(i, i + 6));
+        const miss = pages.filter(pg => !pg.some(it => EDGE[id](it.tmP)));
+        if (miss.length) F('edge-seeded', `${miss.length} of ${pages.length} pages of six lack the step's edge case`);
+    }
+}
+
+// ---------------------------------------------------------------------------
 function audit(skill, items) {
     const { skillId: id, label, categoryId } = skill;
     // A category pool ("Mixed Division") deals a random playable sibling from its own category,
@@ -1405,8 +1584,8 @@ function audit(skill, items) {
         if (it.empty) { r.empty++; continue; }
         bump(r.formats, it.fmt); bump(r.types, it.type);
         // The pv family has no shape table: one-response (pvRules) is its cell-shape rule.
-        const shape = isOps ? shapeOf(it.fmt) : family === 'pv' ? null : k2ShapeOf(it);
-        if (shape) bump(r.shapes, shape); else if (family !== 'pv') unknownFormats.add(it.fmt);
+        const shape = isOps ? shapeOf(it.fmt) : (family === 'pv' || family === 'tm') ? null : k2ShapeOf(it);
+        if (shape) bump(r.shapes, shape); else if (family !== 'pv' && family !== 'tm') unknownFormats.add(it.fmt);
 
         // Does the cell's own equation balance with the answer it ships? (see equationCheck)
         const eq = equationCheck(it);
@@ -1570,6 +1749,7 @@ function audit(skill, items) {
 
     if (family === 'k2' && live) k2Rules(skill, items, live, r, F, NOTE);
     if (family === 'pv') pvRules(skill, items, live, r, F, NOTE, skill.pvCtx || { R: 100 });
+    if (family === 'tm') tmRules(skill, items, live, r, F, NOTE);
     // A skill whose generator lives in another domain's file. Reported and never moved: four
     // positional share-code systems index SKILLS[category], so a move re-points every saved code.
     if (skill.routedTo && skill.routedTo !== categoryId) NOTE('misfiled', `sits in the ${categoryId} category but its generator is the ${skill.routedTo} one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.`);
@@ -1760,6 +1940,7 @@ function selfTest() {
     const app = await open({ seed: 4242 });
     await hideOverlays(app.page);
     let skills = (await listSkills(app.page)).filter(s => CATS.includes(s.categoryId)
+        && (!TM_CATS.includes(s.categoryId) || TM_IDS.has(s.skillId))
         && !(PV_FAMILY_CATS.includes(s.categoryId) && PV_EXCLUDED.has(s.skillId)));
     if (ONLY_FAMILY) skills = skills.filter(s => FAMILY_CATS[ONLY_FAMILY].includes(s.categoryId));
     if (ONLY_CAT) skills = skills.filter(s => s.categoryId === ONLY_CAT);
@@ -1899,7 +2080,7 @@ function selfTest() {
         }
         const items = await app.page.evaluate(sampleInPage, {
             categoryId: s.categoryId, skillId: s.skillId, n: N, baseSeed, range: 100,
-            k2: family === 'k2',
+            k2: family === 'k2', tm: family === 'tm',
         });
         out.push({ ...skill, ...audit(skill, items) });
     }
@@ -1950,7 +2131,7 @@ function selfTest() {
     if (JSON_OUT) { fs.writeFileSync(path.resolve(ROOT, JSON_OUT), JSON.stringify(out, null, 1)); console.log('wrote', JSON_OUT); }
 
     const scope = [ONLY_FAMILY, ONLY_CAT, ONLY_SKILL].filter(Boolean).join('/')
-        || [...new Set(out.map(s => s.family))].map(f => ({ operations: 'operations', k2: 'K-2', pv: 'place value' })[f] || f).join(' + ');
+        || [...new Set(out.map(s => s.family))].map(f => ({ operations: 'operations', k2: 'K-2', pv: 'place value', tm: 'time and money' })[f] || f).join(' + ');
     const noteCount = out.reduce((n, s) => n + s.notes.length, 0);
     // "lying about itself" vs "legitimately mixed": a failing skill contradicts its own name; a
     // mixed pool is held to the union of its pool's names and is counted separately, so the

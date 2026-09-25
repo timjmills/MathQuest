@@ -47,10 +47,10 @@ function deal(key, n) {
     return (((_at + _offsets[k]) % n) + n) % n;
 }
 /** A page-long permutation of 0..n-1 (shuffled at the page's first item), read at the position. */
-function dealPerm(key, n) {
+function dealPerm(key, n, at = _at) {
     const k = `${key}:${n}`;
     if (_at === 0 || !_perms[k]) _perms[k] = shuffle(Array.from({ length: n }, (_, i) => i));
-    return _perms[k][((_at % n) + n) % n];
+    return _perms[k][((at % n) + n) % n];
 }
 const pos6 = () => ((_at % 6) + 6) % 6;
 
@@ -308,6 +308,8 @@ function genOrderClocks(q, skill) {
         picked = shuffle(slots.slice()).slice(0, n);
         if (!across || (picked.some((t) => t < 12 * 60) && picked.some((t) => t >= 12 * 60 && t < 13 * 60) && picked.some((t) => t >= 13 * 60))) break;
     }
+    // Never already in order: a row that is its own answer (1, 2, 3) teaches nothing.
+    for (let t = 0; t < 8 && picked.every((v, i) => !i || (asc ? v > picked[i - 1] : v < picked[i - 1])); t++) picked = shuffle(picked.slice());
     const sorted = picked.slice().sort((a, b) => (asc ? a - b : b - a));
     const ranks = picked.map((t) => sorted.indexOf(t) + 1);
     const times = picked.map((t) => { const x = fromMin(t); return { h: x.h, m: x.m, ...(across ? { ap: x.h >= 12 ? 'p.m.' : 'a.m.' } : {}) }; });
@@ -465,7 +467,7 @@ function genClockParts(q, skill) {
     q.text = 'Write the missing numbers on the clock.';
     q.ans = missing.join(', ');
     q.answerType = 'text';
-    q.hint = 'Count round the clock from 12: 1, 2, 3 ... up to 12.';
+    q.hint = 'Count round the clock from the top, one number at each big mark.';
 }
 
 function genFivesRing(q, skill) {
@@ -496,11 +498,12 @@ function genTimeSense(q, skill) {
     const am = ACTIVITIES.filter((a) => a.ap === 'a.m.'), pm = ACTIVITIES.filter((a) => a.ap === 'p.m.');
     const pickAm = deal(`${skill}:ap`, 2) === 0;
     const pool = pickAm ? am : pm;
-    const a = pool[dealPerm(`${skill}:${pickAm ? 'a' : 'p'}`, pool.length)];
+    // a.m. and p.m. alternate, so each list is read at every other position (floor(at / 2)).
+    const a = pool[dealPerm(`${skill}:${pickAm ? 'a' : 'p'}`, pool.length, Math.floor(_at / 2))];
     setCell(q, 'clock', { kind: 'sense', h: a.h, m: a.m, ap: a.ap, activity: a.text });
     q.text = 'Read the time. Check a.m. or p.m.';
     choiceAnswer(q, a.ap);
-    q.hint = 'a.m. is the morning, from 12 at night to 12 noon. p.m. is after 12 noon.';
+    q.hint = 'Morning is before 12 noon. Afternoon, evening and night come after 12 noon.';
 }
 
 /* ============================================================================ money */
