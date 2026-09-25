@@ -16,14 +16,14 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 
 ## Summary
 
-- 221 entries: **131 new skills, 88 new options, 2 repairs**.
-- 161 from the White Rose audit (41 extended for standards), 60 from the standards audit.
+- 220 entries: **130 new skills, 88 new options, 2 repairs**.
+- 160 from the White Rose audit (41 extended for standards), 60 from the standards audit.
 - They close 114 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
 - 14 new sheet-kit templates are needed; each is owned by one lane.
 
 | Lane | Entries | New skills | Options | Repairs | Standards closed | WRM steps closed |
 |---|---|---|---|---|---|---|
-| Counting and early number (K-1 pictures) (`k2`) | 22 | 15 | 7 | 0 | 20 | 33 |
+| Counting and early number (K-1 pictures) (`k2`) | 21 | 14 | 7 | 0 | 20 | 32 |
 | Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 29 | 18 | 10 | 1 | 21 | 50 |
 | Place value, rounding and estimation (the pv kit) (`placevalue`) | 12 | 4 | 8 | 0 | 9 | 36 |
 | Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 24 | 14 | 10 | 0 | 19 | 20 |
@@ -68,7 +68,7 @@ positions are share codes, so nothing is spliced and the integrator fixes the fi
 | Template | Owner lane | What | Used by |
 |---|---|---|---|
 | `bar-model` | `operations` | part-whole and comparison bars (tape diagrams), fraction bars of an amount, with labelled parts and one blank | 15 entries |
-| `picture-row` | `k2` | a row or small grid of line-drawn pictures with letter tags: match, odd one out, order events, repeating patterns | 14 entries |
+| `picture-row` | `k2` | a row or small grid of line-drawn pictures with letter tags: match, odd one out, order events, repeating patterns | 13 entries |
 | `sort-rings` | `k2` | two or three sorting rings, a Carroll two-box table or a two-set Venn, with tiles written in by letter | 3 entries |
 | `shape-grid` | `geometry` | a square or dot grid with shapes, mirror lines, arrows: draw, complete, reflect, translate, area/perimeter on squares | 20 entries |
 | `coord-grid` | `geometry` | a coordinate plane (quadrant I or four quadrants) with labelled axes: plot, read, join, translate, reflect | 7 entries |
@@ -90,7 +90,7 @@ positions are share codes, so nothing is spliced and the integrator fixes the fi
    (standards closed × 2 + White Rose steps closed).
 3. Lanes run in parallel; an entry whose dependency is in another lane waits for it (named in its `After` line).
 
-## Lane `k2`: Counting and early number (K-1 pictures) (22)
+## Lane `k2`: Counting and early number (K-1 pictures) (21)
 
 Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,bond,seqstrip,compare,chartwindow,base10,wordpic,count-row,k2kit}.js`, `js/modules/sheet/providers/k2.js`. Builds templates: `picture-row`, `sort-rings`.
 
@@ -325,19 +325,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 bonds to 10 → to 20 → within 20 · O3 two frames → none · O6 frames / bond.
 - **Misconceptions:** 13 + 7 = 10; answers 3 for 20 − 7.
 
-### 20. Big and Small — `compare_size`
-
-- **What:** new skill `comparing:compare_size`. Grade PK · family measurement · source White Rose audit.
-- **Closes (standards):** none not already full · tag with CCSS K.MD.A.2, EE M.EE.K.MD.2
-- **Closes (White Rose steps):** R.B2.S1
-- **Teaches:** comparing overall size (big, bigger, small, smaller) of two or three objects.
-- **Problem types:** (1) circle the bigger; (2) circle the smaller; (3) order three by size; (4) same size?.
-- **Representation:** pairs of the same object drawn at different sizes; circle the bigger or the smaller. Templates: `wordpic`; new: `picture-row`.
-- **Answer:** circle one.
-- **Ladder:** O2 two → three objects · O3 base line drawn → none · O6 objects.
-- **Misconceptions:** compares height only; picks the busier picture.
-
-### 21. Which One Does Not Belong? — `odd_one_out`
+### 20. Which One Does Not Belong? — `odd_one_out`
 
 - **What:** new skill `comparing:odd_one_out`. Grade PK · family counting · source White Rose audit.
 - **Closes (standards):** none not already full
@@ -349,7 +337,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 kind → colour-free attribute (size, shape) → two attributes · O3 reason bank shown → none · O6 objects / shapes.
 - **Misconceptions:** chooses by position (always the last); picks a reason that fits every picture.
 
-### 22. 1st, 2nd, 3rd — `ordinal`
+### 21. 1st, 2nd, 3rd — `ordinal`
 
 - **What:** new skill `counting:ordinal_numbers`. Grade K · family counting · source White Rose audit.
 - **Closes (standards):** none not already full

@@ -607,9 +607,27 @@ const K2_LANE_MAKERS = {
         const n = i % 3 === 0 ? 0 : int(r, 1, 5);
         return { ans: n, text: 'How many are on the plate?', _variant: 'count', cell: cellOf('counters', { kind: 'zero', task, objects: 'plates', shape: 'apple', n, ans: n }) };
     },
+    'comparing:compare_size': (r, i) => {
+        const form = ['bigger', 'smaller', 'biggest', 'smallest', 'order'][i % 5];
+        const n = form === 'bigger' || form === 'smaller' ? 2 : 3;
+        const sizes = n === 2 ? [0.5, 1] : [0.42, 0.7, 1];
+        const at = shuffle(r, Array.from({ length: n }, (_, k) => k));
+        const choices = at.map((k) => ({ shape: 'ball', s: sizes[k] }));
+        if (form === 'order') {
+            const order = at.map((k) => k + 1);
+            return { ans: order.join(', '), answerType: 'text', text: 'Write 1, 2, 3 under the balls. Start with the smallest.', _variant: 'order',
+                cell: cellOf('picture-row', { kind: 'order', choices, order }) };
+        }
+        const want = form === 'bigger' || form === 'biggest' ? n - 1 : 0;
+        const correct = at.indexOf(want);
+        const letter = 'ABC'[correct];
+        return { ans: letter, printAnswer: letter, answerType: 'text', text: `Which ball is ${form}?`, _variant: form,
+            cell: cellOf('picture-row', { kind: 'pick', choices, correct }) };
+    },
 };
 Object.assign(REQUIRED, {
     'counting:zero_none': /none/i,
+    'comparing:compare_size': /room|smallest/i,
 });
 for (const [key, mk] of Object.entries(K2_LANE_MAKERS)) { let k = 0; ITEM_MAKERS[key] = (r) => mk(r, k++); checkSkill(key); }
 

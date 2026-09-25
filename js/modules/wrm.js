@@ -61,6 +61,7 @@ export const SKILL_WRM = {
         { step: 'Y1.B4.S1', note: 'count to 20' },
     ],
     // Build lane k2 (2026-09-25)
+    'comparing:compare_size': ['R.B2.S1'],
     'counting:zero_none': ['R.B7.S1'],
     'counting:count_sequence': [
         { step: 'R.B3.S4', note: 'the number after, to 10' },
@@ -1761,14 +1762,6 @@ export const WRM_PROPOSALS = {
     },
 
     // ---- measurement
-    compare_size: {
-        kind: 'new', skill: 'comparing:compare_size',
-        name: 'Big and Small',
-        teaches: 'comparing overall size (big, bigger, small, smaller) of two or three objects',
-        representation: 'pairs of the same object drawn at different sizes; circle the bigger or the smaller',
-        family: 'measurement',
-        steps: ['R.B2.S1'],
-    },
     capacity_early: {
         kind: 'new', skill: 'comparing:compare_capacity',
         name: 'Full, Empty, Holds More',

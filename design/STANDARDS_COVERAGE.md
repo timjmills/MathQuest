@@ -24,12 +24,12 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 602 live skills; 493 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 603 live skills; 494 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
 - **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 221 entries — 131 new skills, 88 options on existing skills, 2 repairs; 161 from the White Rose audit (41 of them extended to close standards clauses), 60 from this audit.
+- The one build list: 220 entries — 130 new skills, 88 options on existing skills, 2 repairs; 160 from the White Rose audit (41 of them extended to close standards clauses), 60 from this audit.
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
@@ -138,7 +138,7 @@ Every partial and gap clause below names one of these. Order inside a family: de
 highest impact first (standards closed × 2 + White Rose steps closed). The full spec of each entry — problem types,
 representation, answer, option ladder, misconceptions, lane and file ownership — is in `design/BUILD_LIST.md`.
 
-### Measurement, time and money (46)
+### Measurement, time and money (45)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
 |---|---|---|---|---|
@@ -181,13 +181,12 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 37 | **The 24-Hour Clock** (`time_24h_convert`) | new `measurement:twenty_four_hour_clock` | - | 2 |
 | 38 | **Estimate Area** (`area_estimate`) | new `area_perimeter:estimate_area` | - | 1 |
 | 39 | **Balanced or Not?** (`balance`) | new `measurement:balance_scales` | - | 1 |
-| 40 | **Big and Small** (`compare_size`) | new `comparing:compare_size` | - | 1 |
-| 41 | **Kilometres and Metres (option)** (`km_m`) | option on `measurement:length_metric` | - | 1 |
-| 42 | **Metric and Imperial Units** (`metric_imperial`) | new `measurement:metric_imperial` | - | 1 |
-| 43 | **Miles and Kilometres** (`miles_km`) | new `measurement:miles_kilometres` | - | 1 |
-| 44 | **Recognise Notes (option)** (`money_notes`) | option on `measurement:coin_value` | - | 1 |
-| 45 | **Roman Numerals to 12** (`roman_12`) | new `measurement:roman_numerals_clock` | - | 1 |
-| 46 | **Hours, Minutes or Seconds?** (`time_units`) | new `measurement:hours_minutes_seconds` | - | 1 |
+| 40 | **Kilometres and Metres (option)** (`km_m`) | option on `measurement:length_metric` | - | 1 |
+| 41 | **Metric and Imperial Units** (`metric_imperial`) | new `measurement:metric_imperial` | - | 1 |
+| 42 | **Miles and Kilometres** (`miles_km`) | new `measurement:miles_kilometres` | - | 1 |
+| 43 | **Recognise Notes (option)** (`money_notes`) | option on `measurement:coin_value` | - | 1 |
+| 44 | **Roman Numerals to 12** (`roman_12`) | new `measurement:roman_numerals_clock` | - | 1 |
+| 45 | **Hours, Minutes or Seconds?** (`time_units`) | new `measurement:hours_minutes_seconds` | - | 1 |
 
 ### Geometry (37)
 
@@ -1089,6 +1088,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Missing: describe several measurable attributes of one object (long, tall, heavy, holds) and tell measurable from not → `measurable_attributes`, `capacity_early`  
 - **K.MD.A.2** — FULL. Directly compare two objects with a measurable attribute in common, to see which object has “more of”/“less of” the attribute, and describe the difference. For example, directly compare the heights of two children and describe one child as taller/shorter.  
   Taught by: Compare Attributes (Visual) (`comparing:compare_objects`); Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`)  
+  Also tagged: `comparing:compare_size`
 *B. Classify objects and count the number of objects in each category.*
 
 - **K.MD.B.3** — PARTIAL. Classify objects into given categories; count the numbers of objects in each category and sort the categories by count.  

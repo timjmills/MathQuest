@@ -1270,6 +1270,11 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `count-tens` | Write how many tens. | count rods or full ten frames as tens (added 2026-09-25) |
 | `count-zero` | Count. Write how many. None is 0. | count objects on a plate, an empty one included: zero means none (build lane k2, 2026-09-25) |
 | `check-none` | Check the one with none. | find the empty plate, box or frame among three (build lane k2) |
+| `check-bigger` | Check the bigger one. | compare the size of two pictures (build lane k2) |
+| `check-smaller` | Check the smaller one. | compare the size of two pictures (build lane k2) |
+| `check-biggest` | Check the biggest one. | compare the size of three pictures (build lane k2) |
+| `check-smallest` | Check the smallest one. | compare the size of three pictures (build lane k2) |
+| `order-size` | Write 1, 2, 3 under them. Start with the smallest. | order three pictures by size (build lane k2) |
 | `ring-remainder` | Circle groups of {n}. Write the quotient and the remainder. | division with a remainder, pictured (its two slots: `= [ ] R [ ]`) |
 | `ring-groups-each` | Circle groups of the number shown. Write how many groups. | `ring-groups` when the section's items do not share one {n} (added 2026-09-25, critic round 2) |
 | `ring-remainder-each` | Circle groups of the second number. Write the quotient and the remainder. | `ring-remainder` when the divisors differ (R3: "the divisor" was jargon on the page) |

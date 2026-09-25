@@ -766,3 +766,83 @@ registerSkill('counting:zero_none', {
         ]);
     },
 });
+
+/* ============================================================================ compare_size */
+
+const SIZE_WORDS = ['bigger', 'smaller', 'biggest', 'smallest'];
+const sizeDef = (word) => ({
+    iCan: 'I Can compare the size of things',
+    instructionKey: `check-${word}`,
+    steps: word === 'bigger' || word === 'biggest'
+        ? ['Look at the whole of each one.', 'Find the one that takes up the most room.', 'That one is the ' + word + '. Check its box.']
+        : ['Look at the whole of each one.', 'Find the one that takes up the least room.', 'That one is the ' + word + '. Check its box.'],
+    say: `The __ is ${word}.`,
+    sayValues: (q) => [String(q.ans)],
+});
+const SIZE_DEFS = Object.fromEntries(SIZE_WORDS.map((w) => [w, sizeDef(w)]));
+const SIZE_ORDER = {
+    iCan: 'I Can compare the size of things',
+    instructionKey: 'order-size',
+    steps: ['Find the smallest. Write 1 under it.', 'Find the next size. Write 2.', 'The biggest gets 3.'],
+    say: '__ is the smallest.',
+    sayValues: (q) => { const o = String(q.ans).split(/\s*,\s*/); const i = o.indexOf('1'); return i >= 0 ? [LETTERS_K2[i]] : null; },
+};
+const LETTERS_K2 = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+registerSkill('comparing:compare_size', {
+    strings: stringsBy((t, ref) => {
+        if (t === 'order') return SIZE_ORDER;
+        if (SIZE_DEFS[t]) return SIZE_DEFS[t];
+        const o = (ref && ref.opts) || {};
+        if (o.task === 'order') return SIZE_ORDER;
+        const three = Number(o.tiles) === 3;
+        return SIZE_DEFS[o.dir === 'less' ? (three ? 'smallest' : 'smaller') : (three ? 'biggest' : 'bigger')];
+    }, SIZE_DEFS.bigger),
+    misconceptions: ['size-swapped', 'middle-one', 'order-reversed', 'order-by-place'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        const n = (p.choices || []).length;
+        const names = LETTERS_K2.slice(0, n).join(', ');
+        if (p.kind === 'order') {
+            const order = (p.order || []).map(Number);
+            const at = (r) => LETTERS_K2[order.indexOf(r)];
+            return [
+                step(`Look at ${names}.`),
+                step(`${at(1)} is the smallest. Write 1 under ${at(1)}.`, [{ slot: `b${order.indexOf(1)}`, value: '1' }]),
+                step(`${at(2)} is the next size. Write 2 under ${at(2)}.`, [{ slot: `b${order.indexOf(2)}`, value: '2' }]),
+                step(`${at(3)} is the biggest. Write 3 under ${at(3)}.`, order.map((r, i) => ({ slot: `b${i}`, value: String(r) }))),
+            ];
+        }
+        const word = SIZE_DEFS[q._variant] ? q._variant : 'bigger';
+        const most = word === 'bigger' || word === 'biggest';
+        return [
+            step(`Look at the whole of ${names}.`),
+            step(`${q.ans} takes up the ${most ? 'most' : 'least'} room.`),
+            step(`${q.ans} is the ${word}.`),
+            step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
+        ];
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        const n = (p.choices || []).length;
+        if (p.kind === 'order') {
+            const order = (p.order || []).map(Number);
+            const rev = order.map((r) => 4 - r);
+            const place = [1, 2, 3];
+            return chooseWrong(q, [
+                { value: rev.join(', '), misconception: 'order-reversed', slot: 'b0', slots: Object.fromEntries(rev.map((r, i) => [`b${i}`, String(r)])), explain: 'Started with the biggest, not the smallest.' },
+                { value: place.join(', '), misconception: 'order-by-place', slot: 'b0', slots: Object.fromEntries(place.map((r, i) => [`b${i}`, String(r)])), explain: 'Wrote 1, 2, 3 left to right without comparing.' },
+            ]);
+        }
+        const sizes = (p.choices || []).map((c) => Number(c.s) || 1);
+        const correct = Number(p.correct) || 0;
+        const most = /bigg/.test(String(q._variant || 'bigger'));
+        const opposite = sizes.indexOf(most ? Math.min(...sizes) : Math.max(...sizes));
+        const c = [{ value: LETTERS_K2[opposite], misconception: 'size-swapped', explain: `Chose the ${most ? 'smallest' : 'biggest'} one: mixed up bigger and smaller.` }];
+        if (n === 3) {
+            const mid = sizes.map((s, i) => [s, i]).sort((a, b) => a[0] - b[0])[1][1];
+            if (mid !== correct) c.push({ value: LETTERS_K2[mid], misconception: 'middle-one', explain: 'Chose the middle size: compared only two of the three.' });
+        }
+        return chooseWrong(q, c);
+    },
+});

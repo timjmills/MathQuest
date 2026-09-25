@@ -121,6 +121,8 @@ import './cells/chartwindow.js';
 import './cells/seqstrip.js';
 import './cells/compare.js';
 import './cells/wordpic.js';
+// Build lane k2 (2026-09-25): a row of pictures to match / compare / order; sorting rings.
+import './cells/picture-row.js';
 // Every whole-number word problem (owner ruling 2026-09-25): story, sign row, column boxes, answer + unit bank.
 export { wordWorkPayload, wordWorkTwin, solveStory, parseTwoStep, storyLines, unitOf, cueRanges, columnRows, KEYWORD_BANK, WW_TEMPLATE } from './cells/word-work.js';
 // Count-by rows, number patterns, the chart to complete, and × / ÷ on a number line (2026-09-25).
@@ -156,7 +158,7 @@ export const TM_TEMPLATE_IDS = ['clock', 'timeline', 'coins', 'money-columns'];
 
 /** Which cell templates this build carries. `legacy` is registered by `adapters.js`. */
 export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv',
-    'counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic', 'word-work',
+    'counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic', 'word-work', 'picture-row',
     ...OPS_TEMPLATE_IDS, ...TM_TEMPLATE_IDS, 'function-table'];
 
 /* ------------------------------------------------- skill providers (register on load) */

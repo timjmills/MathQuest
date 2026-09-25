@@ -412,7 +412,9 @@ export function choiceRow(ctx, choices, { on = -1, gapMm = 7, vertical = false, 
             + `<span style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 1.5)};font-size:${P(ctx, lp)};font-weight:700;line-height:1;">`
             + `${c.pic || ''}${esc(c.label)}</span>${box}</div>`;
     }).join('');
-    const ink = on >= 0 ? ` data-ws-ink="${ctx.state === 'traced' ? 'trace' : 'solid'}"` : '';
+    // A traced Model marks only the check in grey (the box carries its own trace ink): a trace ink
+    // on the whole row would grey the pictures and their labels too (practice.js INK-3 rule).
+    const ink = on >= 0 && ctx.state !== 'traced' ? ' data-ws-ink="solid"' : '';
     return `<div class="k2-choices" data-ws-slot="answer" data-ws-shape="check"${ink} style="display:${vertical ? 'inline-block' : 'flex'};`
         + `${vertical ? 'text-align:left;' : `justify-content:center;align-items:flex-end;gap:${L(ctx, gapMm)};flex-wrap:wrap;`}">${cols}</div>`;
 }

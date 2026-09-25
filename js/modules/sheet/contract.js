@@ -127,6 +127,11 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     // Build lane k2 (2026-09-25, design/BUILD_LIST.md): the new K-1 picture skills.
     'count-zero': 'Count. Write how many. None is 0.',
     'check-none': 'Check the one with none.',
+    'check-bigger': 'Check the bigger one.',
+    'check-smaller': 'Check the smaller one.',
+    'check-biggest': 'Check the biggest one.',
+    'check-smallest': 'Check the smallest one.',
+    'order-size': 'Write 1, 2, 3 under them. Start with the smallest.',
     'ring-remainder': 'Circle groups of {n}. Write the quotient and the remainder.',
     // 2026-09-25 critic round 2: the same tasks when the section's items do not share one {n}
     // (each cell prints its own group size / divisor). Their fallback used to be `groups-of`,

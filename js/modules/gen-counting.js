@@ -1356,6 +1356,7 @@ const K2_HOLDER_PREP = { plates: 'on the', boxes: 'in the', frame: 'in the' };
 function _k2LaneSkill(q, id, rng) {
     switch (id) {
         case 'zero_none': return _k2Zero(q, rng);
+        case 'compare_size': return _k2CompareSize(q, rng);
         default: return false;
     }
 }
@@ -1433,5 +1434,81 @@ function _k2Zero(q, rng) {
     if (lvl >= 2) payload.track = band;
     q.supportLevel = lvl;
     _kSetCell(q, 'counters', payload);
+    return true;
+}
+
+/** The line-art pictures a picture row draws one kind of (RP-20, k2kit SHAPES). */
+const K2_ROW_PICTURES = ['ball', 'apple', 'fish', 'flower', 'car', 'house', 'tree', 'boat', 'cup', 'hat', 'leaf', 'balloon', 'heart', 'star'];
+const K2_ROW_SHAPES = ['circle', 'square', 'triangle', 'star', 'diamond'];
+const K2_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+/** A permutation of 0..n-1 from the page deal (the positions of a row, never in size order twice running). */
+function _k2Perm(n) {
+    // two: dealt round the page (half the items the bigger one stands first)
+    if (n === 2) return _kDealShuffled(2) === 0 ? [0, 1] : [1, 0];
+    let out = shuffle(Array.from({ length: n }, (_, i) => i));
+    // never in size order (smallest to biggest left to right): the pupil must look, not read the row
+    for (let t = 0; t < 6 && out.every((v, i) => v === i); t++) out = shuffle(out);
+    if (out.every((v, i) => v === i)) out = out.slice(1).concat(out[0]);
+    return out;
+}
+
+/**
+ * BIG AND SMALL (R.B2.S1; K.MD.A.2 compare two objects by an attribute, M.EE.K.MD.2). The same
+ * object drawn at two or three sizes on one floor (never the same size, never a busier drawing:
+ * one kind per item, uniformly scaled, so "bigger" is overall size and not height alone).
+ *   find   Check the bigger (biggest) / smaller (smallest) one. `dir` more / less.
+ *   order  Three sizes: write 1, 2, 3 under them, smallest first.
+ * Options: How many 2 / 3 (tiles), How different far / near (gap), Objects pictures / shapes,
+ * Support level 2 (a base line under the row) / 1.
+ */
+function _k2CompareSize(q, rng) {
+    const n = Number(_kOpt('tiles')) === 3 ? 3 : 2;
+    const task = _kOpt('task') === 'order' ? 'order' : 'find';
+    const dir = _kOpt('dir') === 'less' ? 'less' : 'more';
+    const near = _kOpt('gap') === 'near';
+    const pool = _kOpt('objects') === 'shapes' ? K2_ROW_SHAPES : K2_ROW_PICTURES;
+    const shape = pool[_kDealShuffled(pool.length)];
+    const count = task === 'order' ? 3 : n;
+    const sizes = count === 3 ? (near ? [0.66, 0.83, 1] : [0.42, 0.7, 1]) : (near ? [0.76, 1] : [0.5, 1]);
+    const at = _k2Perm(count);                         // at[i] = which size stands at place i
+    const choices = at.map((k) => ({ shape, s: sizes[k] }));
+    const plural = K2_SHAPES[shape] ? K2_SHAPES[shape].plural : 'pictures';
+    const lvl = _kLevel(1);
+    q.options = [];
+    q.selfAnswering = true;
+    q.skillLabel = 'Big and Small';
+    q.supportLevel = lvl;
+    const payload = { kind: task === 'order' ? 'order' : 'pick', choices, base: lvl >= 2, pic: 20 };
+    if (task === 'order') {
+        const order = at.map((k) => k + 1);           // 1 = the smallest
+        q.text = `Write 1, 2, 3 under the ${plural}. Start with the smallest.`;
+        q.printText = 'Write 1, 2, 3 under them. Start with the smallest.';
+        q.ans = order.join(', ');
+        q.keyParts = order.map(String);
+        q.acceptedAnswers = [order.join(','), order.join(' ')];
+        q.answerType = 'text';
+        q.hint = 'Find the smallest first. Write 1 under it. Then 2, then 3.';
+        q.distractorTags = { [order.map((r) => count + 1 - r).join(', ')]: 'started with the biggest' };
+        q._variant = 'order';
+        q.printFormat = 'k2-order';
+        _kSetCell(q, 'picture-row', Object.assign(payload, { order }));
+        return true;
+    }
+    const want = dir === 'more' ? count - 1 : 0;       // the size index asked for
+    const correct = at.indexOf(want);
+    const letter = K2_LETTERS[correct];
+    const word = count === 3 ? (dir === 'more' ? 'biggest' : 'smallest') : (dir === 'more' ? 'bigger' : 'smaller');
+    q.text = `Which ${K2_SHAPES[shape] ? K2_SHAPES[shape].one : 'one'} is ${count === 3 ? 'the ' : ''}${word}?`;
+    q.printText = `Check the ${word} one.`;
+    q.ans = letter;
+    q.printAnswer = letter;
+    q.acceptedAnswers = [letter, letter.toLowerCase()];
+    q.answerType = 'text';
+    q.hint = `Look at the whole of each one. The ${word} one takes up ${dir === 'more' ? 'the most' : 'the least'} room.`;
+    q.distractorTags = { [K2_LETTERS[at.indexOf(dir === 'more' ? 0 : count - 1)]]: `chose the ${dir === 'more' ? 'smaller' : 'bigger'} one` };
+    q._variant = word;
+    q.printFormat = `k2-${word}`;
+    _kSetCell(q, 'picture-row', Object.assign(payload, { correct }));
     return true;
 }

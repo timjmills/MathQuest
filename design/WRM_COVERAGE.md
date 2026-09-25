@@ -22,20 +22,20 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 514 (59%), partial only 149 (17%), gap 209 (24%).
+- Covered 515 (59%), partial only 148 (17%), gap 209 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 329 skills carry WRM tags. 161 proposals (119 new skills, 42 options on existing skills) would close every gap.
+- 330 skills carry WRM tags. 160 proposals (118 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
-| Reception | PK | 18 | 119 | 59 (50%) | 28 | 32 |
+| Reception | PK | 18 | 119 | 60 (50%) | 27 | 32 |
 | Year 1 | K | 14 | 116 | 72 (62%) | 24 | 20 |
 | Year 2 | 1 | 11 | 124 | 80 (65%) | 18 | 26 |
 | Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
 | Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
 | Year 5 | 4 | 15 | 136 | 81 (60%) | 22 | 33 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **514 (59%)** | **149** | **209** |
+| **All** | | **97** | **872** | **515 (59%)** | **148** | **209** |
 
 ## Source disagreements
 
@@ -326,7 +326,7 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Closes (3): Y5.B13.S2 Count through zero in 1s; Y5.B13.S3 Count through zero in multiples; Y5.B13.S5 Find the difference  
   _proposal id: negative_count_
 
-### measurement (39 proposals, 85 steps)
+### measurement (38 proposals, 84 steps)
 
 - **Read Scales (g, kg, ml, l)** — new skill `measurement:read_scales`. Teaches reading mass and capacity scales in grams, kilograms, millilitres and litres with scale steps of 1, 2, 5, 10, 100. Representation: a drawn dial or jug scale; write the reading with the unit; option: scale step.  
   Closes (7): Y2.B7.S2 Measure in grams; Y2.B7.S3 Measure in kilograms; Y2.B7.S7 Measure in litres; Y3.B7.S1 Use scales; Y3.B7.S3 Measure mass in kilograms and grams; Y3.B7.S4 Equivalent masses (kilograms and grams); Y3.B7.S8 Measure capacity and volume in litres and millilitres  
@@ -391,9 +391,6 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
 - **Timetables** — new skill `measurement:read_timetables`. Teaches reading and calculating with bus and train timetables (times, durations, which bus). Representation: a drawn timetable table; answer questions with times and durations.  
   Closes (2): Y5.B9.S5 Read and interpret timetables; Y5.B14.S6 Calculate with timetables  
   _proposal id: timetables_
-- **Big and Small** — new skill `comparing:compare_size`. Teaches comparing overall size (big, bigger, small, smaller) of two or three objects. Representation: pairs of the same object drawn at different sizes; circle the bigger or the smaller.  
-  Closes (1): R.B2.S1 Compare size  
-  _proposal id: compare_size_
 - **Balanced or Not?** — new skill `measurement:balance_scales`. Teaches a balance scale shows heavier, lighter or equal (balanced) mass. Representation: a drawn pan balance tipped or level with objects in each pan; tick heavier, lighter or balanced.  
   Closes (1): R.B8.S2 Find a balance  
   _proposal id: balance_
@@ -650,9 +647,9 @@ whatever happens to the WRM gaps.
 
 #### R.B2 Autumn Block 2: Talk about measure and patterns
 
-- **R.B2.S1** Compare size — PARTIAL. _K.MD.A.2, M.EE.K.MD.2_  
+- **R.B2.S1** Compare size — covered. _K.MD.A.2, M.EE.K.MD.2_  
+  Skills: Big and Small (`comparing:compare_size`)  
   Partial: Compare Attributes (Visual) (`comparing:compare_objects`), missing overall size (big/small); the skill compares length, height and thickness only  
-  Proposal: Big and Small  
   Vocabulary: big, small, bigger, smaller  
 - **R.B2.S2** Compare mass — covered. _K.MD.A.2, M.EE.K.MD.2_  
   Skills: Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`)  

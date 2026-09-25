@@ -56,9 +56,6 @@ export const WRM_SPECS = {
     subitise: S(['say how many (dots, dice, fingers)', 'how many on the ten frame?', 'see the two parts (3 and 2)', 'match patterns with the same number'],
         ['counters', 'tenframe'], 'write the number; write the two parts', 'O2 0-3 → 0-5 → to 10 (conceptual) · O3 screen flash time long → short; parts ringed → none · O6 dots / dice / fingers / frame',
         ['counts one by one', 'confuses 4 and 5 dice patterns', 'forgets zero is a number']),
-    zero: S(['how many? (including none)', 'write 0 for an empty set', 'which plate has none?', 'take all away: how many are left?'],
-        ['counters', 'wordpic'], 'write the number, 0 included', 'O2 0-3 → 0-5 → 0-10 · O3 empty plate shaded → plain · O6 plates / boxes / ten frames',
-        ['writes nothing for zero', 'writes 1 for an empty set', 'reads 0 as the letter O']),
     consolidate: S(['count and write', 'compare two groups', 'make 5 / make 10', 'continue the pattern', 'number before / after'],
         ['counters', 'tenframe', 'compare', 'bond', 'seqstrip'], 'as each member skill', 'O2 the pool\'s members at to 5 / to 10 · O3 the members\' own support levels · O6 as the members',
         ['depends on the drawn member (see its skill)']),
@@ -284,9 +281,6 @@ export const WRM_SPECS = {
         ['counts 1, 0, 1 (no negatives)', 'difference 3 to −2 is 1'], ['measure-scale']),
 
     // ------------------------------------------------------------------ measurement
-    compare_size: S(['circle the bigger', 'circle the smaller', 'order three by size', 'same size?'],
-        ['wordpic'], 'circle one', 'O2 two → three objects · O3 base line drawn → none · O6 objects',
-        ['compares height only', 'picks the busier picture'], ['picture-row']),
     capacity_early: S(['full, empty, half full?', 'which holds more?', 'order three containers', 'nearly full / nearly empty'],
         ['wordpic'], 'circle or write the word from a bank', 'O2 full/empty → half → order · O3 fill line marked → none · O6 containers',
         ['a taller container always holds more', 'half full means any amount'], ['measure-scale']),

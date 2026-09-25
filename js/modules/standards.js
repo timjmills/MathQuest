@@ -42,6 +42,7 @@ export const SKILL_STANDARDS = {
     'counting:number_seq_fill': { ccss: ['1.NBT.A.1', 'K.CC.A.2', 'K.CC.A.1'], ee: ['M.EE.1.NBT.1', 'M.EE.2.NBT.3', 'M.EE.K.CC.1'] }, // Number Sequence: Fill Missing (Grid)
     'counting:mixed_counting': { ccss: [], ee: [], pool: true }, // Mixed Counting
     // Build lane k2 (2026-09-25)
+    'comparing:compare_size': { ccss: ['K.MD.A.2'], ee: ['M.EE.K.MD.2'] }, // Big and Small
     'counting:zero_none': { ccss: ['K.CC.A.3', 'K.CC.B.4'], ee: ['M.EE.K.CC.4'] }, // Zero Means None
 
     // ---- comparing

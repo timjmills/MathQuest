@@ -3031,6 +3031,36 @@ const K2_LANE_OPTIONS = {
             help: 'What holds the objects. An empty plate, an empty box or an empty ten frame is 0.',
         },
     ],
+    'comparing:compare_size': [
+        {
+            id: 'task', label: 'Task', type: 'enum', default: 'find', group: 'difficulty',
+            values: [{ v: 'find', l: 'Check the bigger or smaller one (default)' }, { v: 'order', l: 'Order three by size (write 1, 2, 3)' }],
+            help: 'One task for the whole page. Ordering always shows three and starts with the smallest.',
+        },
+        {
+            id: 'dir', label: 'Which one', type: 'enum', default: 'more', group: 'difficulty',
+            values: [{ v: 'more', l: 'The bigger one (default)' }, { v: 'less', l: 'The smaller one' }],
+            help: 'Bigger first; smaller is the harder word. One for the whole page.',
+            appliesTo: (o) => o.task !== 'order',
+        },
+        {
+            id: 'tiles', label: 'How many pictures', type: 'enum', default: 2, group: 'difficulty',
+            values: [{ v: 2, l: 'Two (bigger / smaller) (default)' }, { v: 3, l: 'Three (biggest / smallest)' }],
+            help: 'Two pictures, then three: with three the pupil compares twice.',
+            appliesTo: (o) => o.task !== 'order',
+        },
+        {
+            id: 'gap', label: 'How different', type: 'enum', default: 'far', group: 'difficulty',
+            values: [{ v: 'far', l: 'Very different sizes (default)' }, { v: 'near', l: 'Close sizes (look carefully)' }],
+            help: 'Close sizes are harder: the smaller picture is three quarters of the bigger one.',
+        },
+        { ...levelSubset([2, 1], 1, 'Level 2 draws a base line under the row, so the pupil sees the pictures stand on one floor; level 1 leaves it out.') },
+        {
+            id: 'objects', label: 'Objects', type: 'enum', default: 'pictures', group: 'layout',
+            values: [{ v: 'pictures', l: 'Pictures (ball, apple, car, house ...) (default)' }, { v: 'shapes', l: 'Plain shapes (circle, square, triangle ...)' }],
+            help: 'What is drawn. One kind in each item, at two or three sizes.',
+        },
+    ],
 };
 for (const [key, defs] of Object.entries(K2_LANE_OPTIONS)) SKILL_OPTIONS[key] = defs;
 // ============================ end build lane k2 ============================
