@@ -48,6 +48,14 @@ export function isFact(it) {
     return isOperation(it);
 }
 
+/** A computation that qualifies only as an operation, not as a fact skill (its title stays its own). */
+function isOperationOnly(it) {
+    const q = it.q || {};
+    const fact = it.template === 'fact' || q.__factLike || (it.footprint && it.footprint.factLike)
+        || FACT_SKILL_RE.test(String(q.skillId || '')) || /-facts-(vertical|horizontal)$/.test(String(q.printFormat || ''));
+    return !fact;
+}
+
 /**
  * A one-step whole-number computation of an operations skill in a column format: two or more
  * whole-number operands, one operation, one whole-number answer. Pictures, number lines, models,
@@ -72,8 +80,13 @@ export function supports(items) {
         : 'Fact rows need a fact or a one-step computation (add, subtract, multiply or divide in columns). This skill is a picture, model or story: use the Independent page or the Test.';
 }
 
-/** The fact stub title (HD-13): "Multiply by 3" for one constant, else "Multiplication facts". */
+/**
+ * The fact stub title (HD-13): "Multiply by 3" for one constant, else "Multiplication facts".
+ * A one-step computation that is not a fact skill (column addition, subtract within 20) keeps
+ * its own I Can title: undefined here, and the frame takes the skill's line.
+ */
 export function factTitle(items) {
+    if (items.length && !items.every((it) => isFact(it) && !isOperationOnly(it))) return undefined;
     const q0 = (items[0] || {}).q || {};
     const op = opOf(q0);
     const seconds = [...new Set(items.map((it) => operandsOf(it.q || {})[1]).filter((v) => v !== undefined))];

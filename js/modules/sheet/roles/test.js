@@ -19,7 +19,7 @@ import {
 
 export const ROLE_ID = 'test';
 const CEILING = { S: 20, M: 16, L: 12 };
-const DENSE = { S: 20, M: 20, L: 16 };
+const DENSE = CEILING;          // 12.1 is law: 20 / 16 / 12 (L-DENSITY holds it)
 
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1, 2, 3, 4];

@@ -154,8 +154,15 @@ const FACT_FORMAT_RE = /-facts-(vertical|horizontal|fraction|long)$/;
  * counting takes "Count. Write the number.", a ten frame to fill takes "Draw counters to show
  * the number.". Every key is from the controlled library; nothing is composed here.
  */
+/** The library key of a K-2 skill whose provider has not named one yet (never "Solve."). */
+const SKILL_INSTRUCTION_FALLBACK = Object.freeze({
+    count_objects: 'count-write', ten_frame_build: 'draw-count', base10_build: 'draw-blocks',
+    compare_groups: 'check-groups', share_into_groups: 'ring-groups', number_bonds: 'missing',
+});
+
 function instructionKeyFor(q, words) {
     if (words && words.instructionKey && !/^default-/.test(words.instructionKey)) return words.instructionKey;
+    if (SKILL_INSTRUCTION_FALLBACK[q.skillId]) return SKILL_INSTRUCTION_FALLBACK[q.skillId];
     const f = String(q.printFormat || '');
     const cat = String(q.categoryId || '');
     if (/^column-add|add-facts/.test(f)) return 'add';
@@ -191,10 +198,16 @@ function balanceDivs(html) {
 const LEGACY_TAB_RE = /<span class="ws-tab" data-ws-label="tab" style="position:absolute;[^"]*">[^<]*<\/span>/g;
 const legacyClean = (html) => balanceDivs(String(html).replace(LEGACY_TAB_RE, ''));
 
+/** Registered K-2 templates that pack as one-symbol answers (a ten frame, a number track, a chart window). */
+const SHORT_TEMPLATES = new Set(['tenframe', 'seqstrip', 'chartwindow']);
+
 /** PT 2.4 footprint classes: long procedures, one-symbol answers, word problems. */
 function footprintClass(q, template, size) {
     const f = String(q.printFormat || '');
     if (size === 'spacious' || /word/.test(f)) return 'word';
+    // The K-2 picture templates hold one small picture and one short answer: they pack like
+    // one-symbol answers (2 x 4 and up), not like 6-per-page stacks.
+    if (SHORT_TEMPLATES.has(template) || q.answerType === 'ten-frame-build') return 'short';
     const operands = (q.cell && q.cell.payload && q.cell.payload.operands) || [q.a, q.b];
     if (/long-div|long_div/.test(f) || template === 'division') return 'long';
     if (/^column-mult/.test(f) && Number(operands[1]) >= 10) return 'long';

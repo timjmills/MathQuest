@@ -29,7 +29,7 @@ import {
 import { paperOf, bodyHeightMm, instructionMm, resolveSectionLayout, fitsLine, LIVE_W_MM } from '../layout.js';
 import {
     skillWords, levelLine, gradeWords, instructionHtml, estimateTitleLines, styleBlock, hookClasses,
-    STRAND_BY_CATEGORY, sectionInstructionKey,
+    STRAND_BY_CATEGORY, sectionInstructionKey, resolveInstruction, varsOfItems,
 } from './practice.js';
 
 export { esc, blank, instructionHtml, styleBlock, deriveSeed, rng, shuffle, resolveSectionLayout, fitsLine, LIVE_W_MM };
@@ -208,11 +208,10 @@ export function gridPart(items, { cols, rows, cellH, labels = 'none', start = 1,
 
 /** A library instruction line (BD-10). Unknown keys fall back to the neutral default. */
 export function instructionPart(key, vars = {}) {
-    if (Array.isArray(vars)) vars = instructionVarsOf(vars);
-    let k = key;
-    let text;
-    try { text = instructionFor(k, vars); } catch (e) { k = 'default-write'; text = INSTRUCTION_LIBRARY[k]; }
-    return { kind: 'html', html: instructionHtml(k, text), key: k, text };
+    // `vars` may be the section's items: their {n}, when they all agree (SCC-P17); a key whose
+    // placeholder cannot be filled takes its plain fallback ("Write the missing number.").
+    const r = Array.isArray(vars) ? resolveInstruction(key, vars) : resolveInstruction(key, [], vars);
+    return { kind: 'html', html: instructionHtml(r.key, r.text), key: r.key, text: r.text };
 }
 
 /** The instruction key of a set of items (BD-13), from the skills' own keys. */
@@ -228,7 +227,7 @@ export function instructionKeyOf(items, skills) {
 
 /** The library text of an instruction key, for a band strip. */
 export function instructionText(key, items) {
-    try { return instructionFor(key, items ? instructionVarsOf(items) : {}); } catch (e) { return INSTRUCTION_LIBRARY['default-write']; }
+    return resolveInstruction(key, items || [], items ? undefined : {}).text;
 }
 
 /* =================================================================== answer handling */
@@ -416,12 +415,7 @@ export function providerWorkedSteps(it, max = 6) {
  * `strings.instructionVars(q)` (SCC-P17): "Circle groups of {n}." takes the first item's n.
  */
 export function instructionVarsOf(items) {
-    for (const it of items || []) {
-        const str = stringsOf(it);
-        if (typeof str.instructionVars !== 'function') continue;
-        try { const v = str.instructionVars((it && it.q) || {}); if (v && typeof v === 'object') return v; } catch (e) { /* next */ }
-    }
-    return {};
+    return varsOfItems(items);
 }
 
 /* ===================================================================== small drawings */

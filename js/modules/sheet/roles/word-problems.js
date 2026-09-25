@@ -90,6 +90,16 @@ function storyLines(text) {
 }
 
 export function prepare(it, info = {}) {
+    // The K picture word problem (`wordpic` template) IS a word-problem cell: story, countable
+    // picture, work box and one number box with its label word. It prints as it is - the role
+    // never prints its story a second time.
+    if (it.template === 'wordpic') {
+        return Object.assign({}, it, {
+            render: (c, o = {}) => it.render(c, Object.assign({}, o, { cols: 1 })),
+            measured: null, footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: 1, size: 'spacious' }),
+            fclass: 'word', story: true,
+        });
+    }
     const st = storyOf(it, ((Number(info.seed) || 0) + (Number(info.index) || 0) * 7919) >>> 0);
     if (!st) return null;                                    // not a story: see supports()
     const { num, label } = st;

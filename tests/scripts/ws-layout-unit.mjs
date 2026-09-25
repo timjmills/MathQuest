@@ -494,6 +494,9 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
 // Titles: "I Can work on ..." is never printed; the category verb builds the fallback.
 {
     const { skillWords, iCanFromCategory } = await import('../../js/modules/sheet/roles/practice.js');
+    const { resolveInstruction } = await import('../../js/modules/sheet/roles/practice.js');
+    eq(resolveInstruction('skip-count', [], { n: 5 }).text, 'Count by 5. Write the missing numbers.', 'SCC-P17: {n} filled from the items');
+    eq(resolveInstruction('skip-count', [], {}).key, 'missing', 'SCC-P17: no single {n} -> the plain "Write the missing number.", never "Solve."');
     eq(iCanFromCategory({ categoryId: 'addition' }, 'addition facts within 20'), 'I Can add facts within 20', 'HD-10: I Can from the category verb');
     eq(iCanFromCategory({ categoryId: 'addition' }, 'pick the missing addends'), 'I Can pick the missing addends', 'HD-10: a label that starts with a verb');
     eq(iCanFromCategory({ categoryId: 'multiplication' }, 'multiplication chart'), 'I Can multiply with a chart', 'HD-10: a chart');

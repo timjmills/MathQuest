@@ -302,17 +302,40 @@ export function skillWords(skill = {}) {
  * from the first item whose provider has `strings.instructionVars(q)`; {} when none has.
  */
 export function varsOfItems(items) {
-    for (const it of items || []) {
-        const q = (it && it.q) || {};
-        try {
-            const p = getProvider(q.categoryId || '', q.skillId || '');
-            const str = typeof p.strings === 'function' ? p.strings({ categoryId: q.categoryId, skillId: q.skillId, label: q.skillLabel, q }) : p.strings;
-            if (str && typeof str.instructionVars === 'function') {
-                const v = str.instructionVars(q);
-                if (v && typeof v === 'object') return v;
-            }
-        } catch (e) { /* next */ }
-    }
+    // The section prints ONE instruction, so its {n} must hold for every item: a set whose items
+    // disagree ("Count by 10" beside "Count by 5") has no single value, and {} is returned.
+    const all = (items || []).map((it) => varsOfItems1(it));
+    const known = all.filter((v) => v && Object.keys(v).length);
+    if (!known.length) return {};
+    const k0 = JSON.stringify(known[0]);
+    return known.length === all.length && known.every((v) => JSON.stringify(v) === k0) ? known[0] : {};
+}
+
+/** A key with a placeholder, when the section has no single value for it: the nearest plain key. */
+export const PLACEHOLDER_FALLBACK = Object.freeze({
+    'skip-count': 'missing', 'ring-groups': 'groups-of', 'ring-remainder': 'groups-of',
+});
+
+/** The printed instruction of a section: its key with the items' {n}, or the plain fallback. */
+export function resolveInstruction(key, items, vars) {
+    const v = vars || varsOfItems(items);
+    try { return { key, text: instructionFor(key, v) }; } catch (e) { /* placeholder left */ }
+    const fb = PLACEHOLDER_FALLBACK[key];
+    if (fb) { try { return { key: fb, text: instructionFor(fb, {}) }; } catch (e) { /* fall through */ } }
+    return { key: 'default-write', text: INSTRUCTION_LIBRARY['default-write'] };
+}
+
+/** One item's placeholder values, from its provider's `strings.instructionVars(q)`; {} when none. */
+function varsOfItems1(it) {
+    const q = (it && it.q) || {};
+    try {
+        const p = getProvider(q.categoryId || '', q.skillId || '');
+        const str = typeof p.strings === 'function' ? p.strings({ categoryId: q.categoryId, skillId: q.skillId, label: q.skillLabel, q }) : p.strings;
+        if (str && typeof str.instructionVars === 'function') {
+            const v = str.instructionVars(q);
+            if (v && typeof v === 'object') return v;
+        }
+    } catch (e) { /* none */ }
     return {};
 }
 
@@ -508,7 +531,7 @@ function composeSheet(role, input, norm, sheetItems, { tabId, seed, form }) {
             });
         let key = sectionInstructionKey(keys);
         let text;
-        try { text = instructionFor(key, sec.instructionVars || varsOfItems(sheetItems[si])); } catch (e) { key = 'default-write'; text = INSTRUCTION_LIBRARY[key]; }
+        ({ key, text } = resolveInstruction(key, sheetItems[si], sec.instructionVars));
         return { key, text };
     });
 
