@@ -4849,6 +4849,12 @@ function _renderQuestionImpl() {
             mod.renderClockSet(q, host);
             mod.setOnClockSetSubmit((qq, st) => {
                 const correct = mod.checkClockSet(qq, st);
+                // the support ladder (support-ladder.js): a calm step - the hands stay, a support is drawn
+                if (!correct && typeof window.widgetLadderWrong === 'function' && window.widgetLadderWrong(qq, JSON.stringify(st))) {
+                    const h = host.querySelector('.cs-host');
+                    if (h && typeof h._csUnlock === 'function') h._csUnlock();
+                    return;
+                }
 
                 // Visual feedback: flash the clock face.
                 const csHost = host.querySelector('.cs-host');

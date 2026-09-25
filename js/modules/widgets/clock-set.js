@@ -354,6 +354,20 @@ export function renderClockSet(q, container) {
     // Initial paint
     repaint();
 
+    // Unlock after a wrong answer the host lets the pupil try again (the support ladder,
+    // support-ladder.js): the hands stay where the pupil put them.
+    host._csUnlock = function () {
+        locked = false;
+        submit.disabled = false;
+        hourHand.style.pointerEvents = '';
+        minuteHand.style.pointerEvents = '';
+        hourHand.setAttribute('tabindex', '0');
+        minuteHand.setAttribute('tabindex', '0');
+        controls.querySelectorAll('.cs-btn').forEach(b => { b.disabled = false; });
+        const clock = container.querySelector('.cs-clock');
+        if (clock) clock.classList.remove('flash-correct', 'flash-wrong');
+    };
+
     // Expose a flash helper for integrators.
     host._csFlash = function (correct) {
         const clock = container.querySelector('.cs-clock');

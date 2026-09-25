@@ -55,6 +55,8 @@ export function init() {
     if (celebToggle) celebToggle.checked = state.celebrationsEnabled;
     const voiceToggle = document.getElementById('voiceToggle');
     if (voiceToggle) voiceToggle.checked = state.ttsEnabled;
+    const helpSelect = document.getElementById('helpAfterWrongSelect');
+    if (helpSelect && typeof window.helpMode === 'function') helpSelect.value = window.helpMode();
 
     checkURLParameters();
 
@@ -206,6 +208,9 @@ export function checkURLParameters() {
         // Enhanced code with settings (contains | character) — show landing modal
         if (code.includes('|')) {
             const parsed = parseEnhancedSkillCode(code);
+            if (parsed.settings && parsed.settings.help && typeof window.setHelpAfterWrong === 'function') {
+                window.setHelpAfterWrong(parsed.settings.help, { link: true });
+            }
             showStudentLandingModal(parsed);
             return;
         }

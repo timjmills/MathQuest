@@ -1664,6 +1664,10 @@ export function slotAnswerMatches(value, q) {
 
 /** Are all the slots of a multi-slot answer filled? */
 export function slotsFilled(value, count) {
+    // A time's two boxes join with ":" (the clock twin's data-mq-join): filled once the hour is in
+    // and the minutes have both digits ("12:" and "12:1" are still being typed).
+    const t = /^\s*(\d*)\s*:\s*(\d*)\s*$/.exec(String(value == null ? '' : value));
+    if (t && count === 2) return !!t[1] && t[2].length >= 2;
     const parts = String(value == null ? '' : value).split(/\s*(?:,|\bR\b)\s*/i).map((s) => s.trim());
     return parts.length >= count && parts.slice(0, count).every(Boolean);
 }
