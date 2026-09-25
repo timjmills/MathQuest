@@ -83,7 +83,7 @@ export const KEY_BLOCKS = Object.freeze({
     6: Object.freeze({ owner: 'O2 easier / harder ladders (vocabulary, integers, geometry, graphs, algebra, number theory)', status: 'assigned', keys: '6A-6B' }),
     7: Object.freeze({ owner: 'option-panel round 3 (pools, function tables)', status: 'assigned', keys: '7A-7E' }),
     8: Object.freeze({ owner: 'word problems (word-work cell, 2026-09-25)', status: 'assigned', keys: '8A-8C' }),
-    9: Object.freeze({ owner: '', status: 'spare', keys: '' }),
+    9: Object.freeze({ owner: 'O6 appearance lanes (AP1 9A-9E, AP2 9F-9J, AP3 9K-9O, AP4 9P-9T) and the options verifier (9U-9Z)', status: 'assigned', keys: '9A-9Z' }),
 });
 
 // Option id -> its multi-character key. APPEND-ONLY. Take the next letter of your OWN block.
