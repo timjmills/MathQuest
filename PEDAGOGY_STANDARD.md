@@ -1270,6 +1270,10 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `count-tens` | Write how many tens. | count rods or full ten frames as tens (added 2026-09-25) |
 | `count-zero` | Count. Write how many. None is 0. | count objects on a plate, an empty one included: zero means none (build lane k2, 2026-09-25) |
 | `check-none` | Check the one with none. | find the empty plate, box or frame among three (build lane k2) |
+| `check-level` | How full is it? Check one box. | capacity words: full, half full, empty, nearly full, nearly empty (build lane k2) |
+| `check-holds-more` | Check the one that holds more. | compare the capacity of two containers (build lane k2) |
+| `check-has-more` | Check the one that has more. | compare how much is in two containers (build lane k2) |
+| `order-holds` | Write 1, 2, 3. Start with the one that holds least. | order three containers by capacity (build lane k2) |
 | `check-odd` | Check the one that does not belong. | find the odd one out of a row of pictures (build lane k2) |
 | `check-why` | Why does the circled one not belong? Check one box. | name the rule the odd one breaks: a different kind or size (build lane k2) |
 | `check-same` | Check the one that is the same. | match a picture to the same picture (build lane k2) |

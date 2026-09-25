@@ -3102,6 +3102,28 @@ const K2_LANE_OPTIONS = {
             help: 'What is drawn in the box and in the row.',
         },
     ],
+    'comparing:compare_capacity': [
+        {
+            id: 'task', label: 'Task', type: 'enum', default: 'read', group: 'difficulty',
+            values: [{ v: 'read', l: 'Full, half full or empty? (check the word) (default)' }, { v: 'find', l: 'Which holds more? (two sizes, empty)' },
+                { v: 'fill', l: 'Which has more in it? (two fills)' }, { v: 'order', l: 'Order three by how much they hold (write 1, 2, 3)' }],
+            help: 'One task for the whole page: the words first, then comparing two (how much it holds, then how much is in it), then ordering three.',
+        },
+        {
+            id: 'tiles', label: 'Words to choose from', type: 'enum', default: 3, group: 'difficulty',
+            values: [{ v: 3, l: 'Three: full, half full, empty (default)' }, { v: 5, l: 'Five: also nearly full, nearly empty' }],
+            help: 'Nearly full and nearly empty come after the three main words. (The word task only.)',
+            appliesTo: (o) => !o.task || o.task === 'read',
+        },
+        { ...levelSubset([2, 1], 1, 'Level 2 draws a small glass beside each word (full, half full, empty) as a picture of the word; level 1 prints the words alone. (The word task only.)'),
+            appliesTo: (o) => !o.task || o.task === 'read' },
+        {
+            id: 'objects', label: 'Containers', type: 'enum', default: null, group: 'layout',
+            values: [{ v: null, l: 'Mixed: glass, jug, bucket, bottle, bowl (default)' }, { v: 'glass', l: 'Glasses' }, { v: 'jug', l: 'Jugs' },
+                { v: 'bucket', l: 'Buckets' }, { v: 'bottle', l: 'Bottles' }, { v: 'bowl', l: 'Bowls' }],
+            help: 'What is drawn. Mixed deals a different container in each item.',
+        },
+    ],
 };
 for (const [key, defs] of Object.entries(K2_LANE_OPTIONS)) SKILL_OPTIONS[key] = defs;
 // ============================ end build lane k2 ============================

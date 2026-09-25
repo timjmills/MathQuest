@@ -169,7 +169,7 @@ export const VISUALS = {
     V118: ['Y1:R49', 'Doubles / halves pictures (before → after)', ['vis_strategy_pictures']],
     V119: ['Y1:R58', 'Two objects on one baseline (longer, taller)', ['compare_lengths', 'vis_migrate_measures']],
     V120: ['Y1:R59', 'Non-standard units beside an object', ['measure_two_units', 'vis_migrate_measures']],
-    V121: ['Y1:R62', 'Unscaled containers (empty … full; cupfuls)', ['capacity_early', 'nonstandard_capacity']],
+    V121: ['Y1:R62', 'Unscaled containers (empty … full; cupfuls)', ['nonstandard_capacity']],
     V122: ['Y1:R65', 'Left / right track', ['position_map']],
     V123: ['Y1:R68', 'Ordinal positions in a line', ['ordinal']],
     V124: ['Y1:R69', 'Dot "pre-money" counters', ['vis_coin_options']],

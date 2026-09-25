@@ -1359,6 +1359,7 @@ function _k2LaneSkill(q, id, rng) {
         case 'compare_size': return _k2CompareSize(q, rng);
         case 'odd_one_out': return _k2OddOneOut(q, rng);
         case 'match_same': return _k2MatchSame(q, rng);
+        case 'compare_capacity': return _k2Capacity(q, rng);
         default: return false;
     }
 }
@@ -1626,5 +1627,98 @@ function _k2MatchSame(q, rng) {
     q.printFormat = `k2-${task}`;
     _kSetCell(q, 'picture-row', { kind: 'pick', target: { shape: target, s: 0.9, sil: task === 'shadow' }, choices, correct: at, labels: K2_LETTERS.slice(0, n),
         pic: n === 4 ? 12 : n === 3 ? 14 : 17, gap: 4 });
+    return true;
+}
+
+/** The containers compare_capacity draws (picture-row `container` pictures). */
+const K2_CONTAINERS = ['glass', 'jug', 'bucket', 'bottle', 'bowl'];
+const K2_CONTAINER_NOUN = { glass: ['glass', 'glasses'], jug: ['jug', 'jugs'], bucket: ['bucket', 'buckets'], bottle: ['bottle', 'bottles'], bowl: ['bowl', 'bowls'] };
+/** The capacity words, in the order a bank prints them, and the fill each one is drawn at. */
+const K2_FILL_WORDS = [
+    { label: 'Full', fill: 1, icon: 'full' }, { label: 'Nearly full', fill: 0.84, icon: 'nearfull' },
+    { label: 'Half full', fill: 0.5, icon: 'half' }, { label: 'Nearly empty', fill: 0.14, icon: 'nearempty' },
+    { label: 'Empty', fill: 0, icon: 'empty' },
+];
+
+/**
+ * FULL, EMPTY, HOLDS MORE (R.B2.S3, R.B8.S3-S4, Y1.B8.S4-S5, Y2.B7.S5; K.MD.A.1-2). Outline
+ * containers with their liquid in the single grey under a surface line (no scale: this is the
+ * language of capacity, before measuring).
+ *   read   one container: check the word - Full / Half full / Empty (+ Nearly full / Nearly empty)
+ *   find   two containers: check the one that HOLDS more / less (the same kind, two sizes, empty),
+ *          or the one that HAS more / less in it (the same container, two fills)
+ *   order  three: write 1, 2, 3, least first
+ */
+function _k2Capacity(q, rng) {
+    const task0 = ['read', 'find', 'fill', 'order'].includes(_kOpt('task')) ? _kOpt('task') : 'read';
+    // find: which HOLDS more (capacity); fill: which HAS more in it (volume); order: holds, least first
+    const holds = task0 !== 'fill';
+    const task = task0 === 'fill' ? 'find' : task0;
+    const dir = 'more';
+    const five = Number(_kOpt('tiles')) === 5;
+    const obj = _kOpt('objects');
+    const kind = K2_CONTAINERS.includes(obj) ? obj : K2_CONTAINERS[_kDealShuffled(K2_CONTAINERS.length)];
+    const [one, many] = K2_CONTAINER_NOUN[kind];
+    const lvl = _kLevel(1);
+    q.options = [];
+    q.selfAnswering = true;
+    q.skillLabel = 'Full, Empty, Holds More';
+    q.supportLevel = lvl;
+    if (task === 'read') {
+        const words = five ? K2_FILL_WORDS : K2_FILL_WORDS.filter((w) => !/Nearly/.test(w.label));
+        const correct = _kDealShuffled(words.length);
+        const w = words[correct];
+        q.text = `Is the ${one} full, half full or empty?`;
+        q.printText = 'How full is it? Check one box.';
+        q.ans = w.label;
+        q.printAnswer = w.label;
+        q.acceptedAnswers = [w.label, w.label.toLowerCase()];
+        q.answerType = 'text';
+        q.hint = 'Look at the grey water. Is it at the top, halfway, or is there none?';
+        const near = words[Math.min(words.length - 1, correct + 1)] || words[0];
+        q.distractorTags = { [(near.label === w.label ? words[0] : near).label]: 'read the level as the word next to it' };
+        q._variant = 'read';
+        q.printFormat = 'k2-read';
+        _kSetCell(q, 'picture-row', { kind: 'words', pic0: { container: kind, fill: w.fill }, words: words.map((x) => ({ label: x.label, icon: x.icon })),
+            icons: lvl >= 2, correct, labels: words.map((x) => x.label), pic: 22 });
+        return true;
+    }
+    const n = task === 'order' ? 3 : 2;
+    const at = _k2Perm(n);
+    // holds: the same container at two / three sizes, empty; has: one size, two / three fills
+    const sizes = n === 3 ? [0.62, 0.8, 1] : [0.62, 1];
+    const fills = n === 3 ? [0.22, 0.52, 0.86] : [0.25, 0.8];
+    const choices = at.map((k) => (holds ? { container: kind, fill: 0, w: sizes[k], h: sizes[k] } : { container: kind, fill: fills[k] }));
+    const payload = { kind: task === 'order' ? 'order' : 'pick', choices, pic: 20 };
+    const verb = holds ? 'holds' : 'has';
+    if (task === 'order') {
+        const order = at.map((k) => k + 1);
+        q.text = holds ? `Write 1, 2, 3 under the ${many}. Start with the one that holds the least.` : `Write 1, 2, 3 under the ${many}. Start with the one that has the least.`;
+        q.printText = 'Write 1, 2, 3. Start with the one that holds least.';
+        q.ans = order.join(', ');
+        q.keyParts = order.map(String);
+        q.acceptedAnswers = [order.join(','), order.join(' ')];
+        q.answerType = 'text';
+        q.hint = holds ? 'The smallest one holds the least. Write 1 under it.' : 'The one with the lowest water has the least. Write 1 under it.';
+        q.distractorTags = { [order.map((r) => 4 - r).join(', ')]: 'started with the most' };
+        q._variant = holds ? 'order-holds' : 'order-has';
+        q.printFormat = `k2-${q._variant}`;
+        _kSetCell(q, 'picture-row', Object.assign(payload, { order }));
+        return true;
+    }
+    const want = dir === 'more' ? n - 1 : 0;
+    const correct = at.indexOf(want);
+    const letter = K2_LETTERS[correct];
+    q.text = `Which ${one} ${verb} ${dir}?`;
+    q.printText = `Check the one that ${verb} ${dir}.`;
+    q.ans = letter;
+    q.printAnswer = letter;
+    q.acceptedAnswers = [letter, letter.toLowerCase()];
+    q.answerType = 'text';
+    q.hint = holds ? `The bigger ${one} holds more. Look at how big each one is.` : `Look at the grey water. Higher water means more in it.`;
+    q.distractorTags = { [K2_LETTERS[1 - correct]]: `chose the one that ${verb} ${dir === 'more' ? 'less' : 'more'}` };
+    q._variant = `${verb}-${dir}`;
+    q.printFormat = `k2-${q._variant}`;
+    _kSetCell(q, 'picture-row', Object.assign(payload, { correct, labels: K2_LETTERS.slice(0, n) }));
     return true;
 }

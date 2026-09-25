@@ -24,12 +24,12 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 605 live skills; 494 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 55 have no standard, with a reason (50 vocabulary games, 5 beyond grade 6).
+- Skills mapped: 606 live skills; 495 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 55 have no standard, with a reason (50 vocabulary games, 5 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
 - **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 271 entries — 128 new skills, 88 options on existing skills, 2 repairs; 158 from the White Rose audit (41 of them extended to close standards clauses), 60 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+- The one build list: 270 entries — 127 new skills, 88 options on existing skills, 2 repairs; 157 from the White Rose audit (41 of them extended to close standards clauses), 60 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
@@ -138,55 +138,54 @@ Every partial and gap clause below names one of these. Order inside a family: de
 highest impact first (standards closed × 2 + White Rose steps closed). The full spec of each entry — problem types,
 representation, answer, option ladder, misconceptions, lane and file ownership — is in `design/BUILD_LIST.md`.
 
-### Measurement, time and money (45)
+### Measurement, time and money (44)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
 |---|---|---|---|---|
 | 1 | **Volume by Counting Cubes** (`volume_cubes`) | new `area_perimeter:volume_counting_cubes` | 5.MD.C.3a, 5.MD.C.3b, 5.MD.C.4, 5.MD.C.5a, M.EE.5.MD.4, M.EE.5.MD.5, M.EE.6.G.2 | 5 |
 | 2 | **Read Scales (g, kg, ml, l)** (`mass_scales`) | new `measurement:read_scales` | 3.MD.A.2, M.EE.3.MD.2 | 7 |
-| 3 | **Full, Empty, Holds More** (`capacity_early`) | new `comparing:compare_capacity` | K.MD.A.1, 3.MD.A.2 | 6 |
-| 4 | **Mass and Capacity Word Problems** (`mass_ops`) | new `measurement:mass_capacity_word_problems` | 3.MD.A.2, 4.MD.A.2 | 6 |
-| 5 | **Length Word Problems** (`length_ops`) | new `measurement:length_word_problems` | 2.MD.B.5, 4.MD.A.2, M.EE.2.MD.5 | 1 |
-| 6 | **Two-Step Money Problems** (`money_2step`) | new `measurement:money_two_step` | 2.MD.C.8, 4.MD.A.2 | 3 |
-| 7 | **Compare Lengths Indirectly and by Units (option)** (`order_length_tasks`) | option on `shapes_early:order_objects_length` | 1.MD.A.1, M.EE.2.MD.3, M.EE.2.MD.4 | - |
-| 8 | **Years, Months, Days, Hours** (`time_calendar`) | new `measurement:calendar_and_units` | - | 6 |
-| 9 | **First, Next, Then** (`day_order`) | new `measurement:order_events` | M.EE.1.MD.3 | 3 |
-| 10 | **Estimate with Money** (`money_estimate`) | new `measurement:estimate_with_money` | M.EE.4.NBT.3, M.EE.5.NBT.4 | 1 |
-| 11 | **Count Money (option)** (`money_uk`) | option on `measurement:money_count` | 2.MD.C.8 | 3 |
-| 12 | **Read a Centimetre Ruler (option)** (`ruler_cm`) | option on `measurement:reading_ruler` | 2.MD.A.1 | 3 |
-| 13 | **Time Words** (`time_talk`) | new `measurement:time_words` | M.EE.1.MD.3 | 3 |
-| 14 | **Add and Subtract Lengths** (`add_sub_lengths`) | new `measurement:add_subtract_lengths` | 2.MD.B.5 | 2 |
-| 15 | **Make and Compare Areas** (`area_compare`) | new `area_perimeter:compare_areas` | 3.MD.C.6 | 2 |
-| 16 | **Missing Lengths in Rectilinear Shapes** (`missing_lengths`) | new `area_perimeter:rectilinear_missing_sides` | 3.MD.D.8 | 2 |
-| 17 | **Metres, Centimetres, Millimetres (option)** (`mm_cm_m`) | option on `measurement:length_metric` | 2.MD.A.2 | 2 |
-| 18 | **How Much Longer? (option)** (`ruler_difference`) | option on `measurement:reading_ruler` | 2.MD.A.4, M.EE.4.MD.2 | - |
-| 19 | **Minutes, Hours and Days** (`time_facts`) | new `measurement:time_facts` | 4.MD.A.1 | 2 |
-| 20 | **Timetables** (`timetables`) | new `measurement:read_timetables` | 4.MD.A.2 | 2 |
-| 21 | **Area of Triangles (option)** (`area_triangle_grid`) | option on `area_perimeter:area_triangle` | 6.G.A.1 | 1 |
-| 22 | **Compare Lengths** (`compare_lengths`) | new `measurement:compare_lengths` | 2.MD.A.4 | 1 |
-| 23 | **Measure in Metres (option)** (`metres`) | option on `measurement:reading_ruler` | 2.MD.A.1 | 1 |
-| 24 | **Calculate with Metric Measures** (`metric_calc`) | new `measurement:metric_measure_problems` | 5.MD.A.1 | 1 |
-| 25 | **Area of a Parallelogram** (`parallelogram`) | new `area_perimeter:area_parallelogram` | 6.G.A.1 | 1 |
-| 26 | **Same Area, Different Perimeter** (`same_area`) | new `area_perimeter:same_area_different_perimeter` | 3.MD.D.8 | 1 |
-| 27 | **Convert Units of Time (option)** (`time_convert`) | option on `measurement:unit_conversion_word` | 4.MD.A.1 | 1 |
-| 28 | **Conversion Tables (option)** (`conversion_table`) | option on `measurement:unit_conversions` | 4.MD.A.1 | - |
-| 29 | **Time Word Problems (option)** (`elapsed_stories`) | option on `measurement:elapsed_mixed` | 3.MD.A.1 | - |
-| 30 | **What Can We Measure?** (`measurable_attributes`) | new `comparing:what_can_we_measure` | K.MD.A.1 | - |
-| 31 | **Measure With Two Units (option)** (`measure_two_units`) | option on `shapes_early:measure_nonstandard` | 2.MD.A.2 | - |
-| 32 | **Dollars and Cents (option)** (`money_convert`) | option on `measurement:money_notation` | - | 2 |
-| 33 | **Measure Capacity with Cups** (`nonstandard_capacity`) | new `measurement:measure_capacity_cups` | - | 2 |
-| 34 | **Measure Mass with Cubes** (`nonstandard_mass`) | new `measurement:measure_mass_cubes` | - | 2 |
-| 35 | **Perimeter of Regular Polygons (option)** (`regular_polygon`) | option on `area_perimeter:perimeter` | - | 2 |
-| 36 | **The Hour for the Routine (option)** (`routine_hour`) | option on `measurement:time_sense` | M.EE.2.MD.7 | - |
-| 37 | **The 24-Hour Clock** (`time_24h_convert`) | new `measurement:twenty_four_hour_clock` | - | 2 |
-| 38 | **Estimate Area** (`area_estimate`) | new `area_perimeter:estimate_area` | - | 1 |
-| 39 | **Balanced or Not?** (`balance`) | new `measurement:balance_scales` | - | 1 |
-| 40 | **Kilometres and Metres (option)** (`km_m`) | option on `measurement:length_metric` | - | 1 |
-| 41 | **Metric and Imperial Units** (`metric_imperial`) | new `measurement:metric_imperial` | - | 1 |
-| 42 | **Miles and Kilometres** (`miles_km`) | new `measurement:miles_kilometres` | - | 1 |
-| 43 | **Recognise Notes (option)** (`money_notes`) | option on `measurement:coin_value` | - | 1 |
-| 44 | **Roman Numerals to 12** (`roman_12`) | new `measurement:roman_numerals_clock` | - | 1 |
-| 45 | **Hours, Minutes or Seconds?** (`time_units`) | new `measurement:hours_minutes_seconds` | - | 1 |
+| 3 | **Mass and Capacity Word Problems** (`mass_ops`) | new `measurement:mass_capacity_word_problems` | 3.MD.A.2, 4.MD.A.2 | 6 |
+| 4 | **Length Word Problems** (`length_ops`) | new `measurement:length_word_problems` | 2.MD.B.5, 4.MD.A.2, M.EE.2.MD.5 | 1 |
+| 5 | **Two-Step Money Problems** (`money_2step`) | new `measurement:money_two_step` | 2.MD.C.8, 4.MD.A.2 | 3 |
+| 6 | **Compare Lengths Indirectly and by Units (option)** (`order_length_tasks`) | option on `shapes_early:order_objects_length` | 1.MD.A.1, M.EE.2.MD.3, M.EE.2.MD.4 | - |
+| 7 | **Years, Months, Days, Hours** (`time_calendar`) | new `measurement:calendar_and_units` | - | 6 |
+| 8 | **First, Next, Then** (`day_order`) | new `measurement:order_events` | M.EE.1.MD.3 | 3 |
+| 9 | **Estimate with Money** (`money_estimate`) | new `measurement:estimate_with_money` | M.EE.4.NBT.3, M.EE.5.NBT.4 | 1 |
+| 10 | **Count Money (option)** (`money_uk`) | option on `measurement:money_count` | 2.MD.C.8 | 3 |
+| 11 | **Read a Centimetre Ruler (option)** (`ruler_cm`) | option on `measurement:reading_ruler` | 2.MD.A.1 | 3 |
+| 12 | **Time Words** (`time_talk`) | new `measurement:time_words` | M.EE.1.MD.3 | 3 |
+| 13 | **Add and Subtract Lengths** (`add_sub_lengths`) | new `measurement:add_subtract_lengths` | 2.MD.B.5 | 2 |
+| 14 | **Make and Compare Areas** (`area_compare`) | new `area_perimeter:compare_areas` | 3.MD.C.6 | 2 |
+| 15 | **Missing Lengths in Rectilinear Shapes** (`missing_lengths`) | new `area_perimeter:rectilinear_missing_sides` | 3.MD.D.8 | 2 |
+| 16 | **Metres, Centimetres, Millimetres (option)** (`mm_cm_m`) | option on `measurement:length_metric` | 2.MD.A.2 | 2 |
+| 17 | **How Much Longer? (option)** (`ruler_difference`) | option on `measurement:reading_ruler` | 2.MD.A.4, M.EE.4.MD.2 | - |
+| 18 | **Minutes, Hours and Days** (`time_facts`) | new `measurement:time_facts` | 4.MD.A.1 | 2 |
+| 19 | **Timetables** (`timetables`) | new `measurement:read_timetables` | 4.MD.A.2 | 2 |
+| 20 | **Area of Triangles (option)** (`area_triangle_grid`) | option on `area_perimeter:area_triangle` | 6.G.A.1 | 1 |
+| 21 | **Compare Lengths** (`compare_lengths`) | new `measurement:compare_lengths` | 2.MD.A.4 | 1 |
+| 22 | **Measure in Metres (option)** (`metres`) | option on `measurement:reading_ruler` | 2.MD.A.1 | 1 |
+| 23 | **Calculate with Metric Measures** (`metric_calc`) | new `measurement:metric_measure_problems` | 5.MD.A.1 | 1 |
+| 24 | **Area of a Parallelogram** (`parallelogram`) | new `area_perimeter:area_parallelogram` | 6.G.A.1 | 1 |
+| 25 | **Same Area, Different Perimeter** (`same_area`) | new `area_perimeter:same_area_different_perimeter` | 3.MD.D.8 | 1 |
+| 26 | **Convert Units of Time (option)** (`time_convert`) | option on `measurement:unit_conversion_word` | 4.MD.A.1 | 1 |
+| 27 | **Conversion Tables (option)** (`conversion_table`) | option on `measurement:unit_conversions` | 4.MD.A.1 | - |
+| 28 | **Time Word Problems (option)** (`elapsed_stories`) | option on `measurement:elapsed_mixed` | 3.MD.A.1 | - |
+| 29 | **What Can We Measure?** (`measurable_attributes`) | new `comparing:what_can_we_measure` | K.MD.A.1 | - |
+| 30 | **Measure With Two Units (option)** (`measure_two_units`) | option on `shapes_early:measure_nonstandard` | 2.MD.A.2 | - |
+| 31 | **Dollars and Cents (option)** (`money_convert`) | option on `measurement:money_notation` | - | 2 |
+| 32 | **Measure Capacity with Cups** (`nonstandard_capacity`) | new `measurement:measure_capacity_cups` | - | 2 |
+| 33 | **Measure Mass with Cubes** (`nonstandard_mass`) | new `measurement:measure_mass_cubes` | - | 2 |
+| 34 | **Perimeter of Regular Polygons (option)** (`regular_polygon`) | option on `area_perimeter:perimeter` | - | 2 |
+| 35 | **The Hour for the Routine (option)** (`routine_hour`) | option on `measurement:time_sense` | M.EE.2.MD.7 | - |
+| 36 | **The 24-Hour Clock** (`time_24h_convert`) | new `measurement:twenty_four_hour_clock` | - | 2 |
+| 37 | **Estimate Area** (`area_estimate`) | new `area_perimeter:estimate_area` | - | 1 |
+| 38 | **Balanced or Not?** (`balance`) | new `measurement:balance_scales` | - | 1 |
+| 39 | **Kilometres and Metres (option)** (`km_m`) | option on `measurement:length_metric` | - | 1 |
+| 40 | **Metric and Imperial Units** (`metric_imperial`) | new `measurement:metric_imperial` | - | 1 |
+| 41 | **Miles and Kilometres** (`miles_km`) | new `measurement:miles_kilometres` | - | 1 |
+| 42 | **Recognise Notes (option)** (`money_notes`) | option on `measurement:coin_value` | - | 1 |
+| 43 | **Roman Numerals to 12** (`roman_12`) | new `measurement:roman_numerals_clock` | - | 1 |
+| 44 | **Hours, Minutes or Seconds?** (`time_units`) | new `measurement:hours_minutes_seconds` | - | 1 |
 
 ### Geometry (37)
 
@@ -451,7 +450,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **K.MD.A.1** — PARTIAL. Describe measurable attributes of objects, such as length or weight. Describe several measurable attributes of a single object.  
   Taught in part by: Compare Attributes (Visual) (`comparing:compare_objects`)  
   Missing: describe several measurable attributes of one object (long, tall, heavy, holds) and tell measurable from not  
-  Build: What Can We Measure? (`measurable_attributes`); Full, Empty, Holds More (`capacity_early`)
+  Build: What Can We Measure? (`measurable_attributes`)
 - **K.MD.B.3** — PARTIAL. Classify objects into given categories; count the numbers of objects in each category and sort the categories by count.  
   Taught in part by: Sort & Count by Category (Visual) (`comparing:classify_count`)  
   Missing: classify every object into the given categories (the skill counts one kind); count each category and sort the categories by count  
@@ -678,7 +677,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **3.MD.A.2** — PARTIAL. Measure and estimate liquid volumes and masses of objects using standard units of grams (g), kilograms (kg), and liters (l). Add, subtract, multiply, or divide to solve one-step word problems involving masses or volumes that are given in the same units, e.g., by using drawings (such as a beaker with a measurement scale) to represent the problem.  
   Taught in part by: Grams, kg, Liters (Visual) (`measurement:mass_volume_liquid`)  
   Missing: estimate liquid volumes and masses; one-step word problems (+ − × ÷) with masses or volumes in the same units  
-  Build: Mass and Capacity Word Problems (`mass_ops`); Read Scales (g, kg, ml, l) (`mass_scales`); Full, Empty, Holds More (`capacity_early`)
+  Build: Mass and Capacity Word Problems (`mass_ops`); Read Scales (g, kg, ml, l) (`mass_scales`)
 - **3.MD.B.3** — PARTIAL. Draw a scaled picture graph and a scaled bar graph to represent a data set with several categories. Solve one- and two-step “how many more” and “how many less” problems using information presented in scaled bar graphs. For example, draw a bar graph in which each square in the bar graph might represent 5 pets.  
   Taught in part by: Bar Graphs (`graphs:bar_graph`); Pictographs (`graphs:pictograph`); Build a Bar Graph (`graphs:build_bar_graph`)  
   Missing: draw a scaled picture graph and a scaled bar graph (the build skills use a scale of 1)  
@@ -1082,11 +1081,12 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 *A. Describe and compare measurable attributes.*
 
 - **K.MD.A.1** — PARTIAL. Describe measurable attributes of objects, such as length or weight. Describe several measurable attributes of a single object.  
-  In part: Compare Attributes (Visual) (`comparing:compare_objects`)  
-  Missing: describe several measurable attributes of one object (long, tall, heavy, holds) and tell measurable from not → `measurable_attributes`, `capacity_early`  
+  In part: Compare Attributes (Visual) (`comparing:compare_objects`) — capacity described (full / empty / holds more): comparing:compare_capacity (build lane k2)  
+  Missing: describe several measurable attributes of one object (long, tall, heavy, holds) and tell measurable from not → `measurable_attributes`  
+  Also tagged: `comparing:compare_capacity`
 - **K.MD.A.2** — FULL. Directly compare two objects with a measurable attribute in common, to see which object has “more of”/“less of” the attribute, and describe the difference. For example, directly compare the heights of two children and describe one child as taller/shorter.  
   Taught by: Compare Attributes (Visual) (`comparing:compare_objects`); Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`)  
-  Also tagged: `comparing:compare_size`
+  Also tagged: `comparing:compare_capacity`, `comparing:compare_size`
 *B. Classify objects and count the number of objects in each category.*
 
 - **K.MD.B.3** — PARTIAL. Classify objects into given categories; count the numbers of objects in each category and sort the categories by count.  
@@ -1412,8 +1412,9 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Missing: word problems adding and subtracting time intervals (the skills are bare time lines) → `elapsed_stories`  
   Also tagged: `measurement:elapsed_30min`, `measurement:elapsed_hour`, `measurement:elapsed_15min`, `measurement:elapsed_visual_easy`, `measurement:elapsed_visual_medium`, `measurement:elapsed_visual_hard`
 - **3.MD.A.2** — PARTIAL. Measure and estimate liquid volumes and masses of objects using standard units of grams (g), kilograms (kg), and liters (l). Add, subtract, multiply, or divide to solve one-step word problems involving masses or volumes that are given in the same units, e.g., by using drawings (such as a beaker with a measurement scale) to represent the problem.  
-  In part: Grams, kg, Liters (Visual) (`measurement:mass_volume_liquid`)  
-  Missing: estimate liquid volumes and masses; one-step word problems (+ − × ÷) with masses or volumes in the same units → `mass_ops`, `mass_scales`, `capacity_early`  
+  In part: Grams, kg, Liters (Visual) (`measurement:mass_volume_liquid`) — comparing volumes without a scale: comparing:compare_capacity (build lane k2); estimating needs the scaled jug  
+  Missing: estimate liquid volumes and masses; one-step word problems (+ − × ÷) with masses or volumes in the same units → `mass_ops`, `mass_scales`  
+  Also tagged: `comparing:compare_capacity`
 *B. Represent and interpret data.*
 
 - **3.MD.B.3** — PARTIAL. Draw a scaled picture graph and a scaled bar graph to represent a data set with several categories. Solve one- and two-step “how many more” and “how many less” problems using information presented in scaled bar graphs. For example, draw a bar graph in which each square in the bar graph might represent 5 pets.  

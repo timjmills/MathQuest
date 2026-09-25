@@ -937,3 +937,92 @@ registerSkill('counting:match_same', {
         ]);
     },
 });
+
+/* ============================================================================ compare_capacity */
+
+const CAP_ICAN = 'I Can talk about how much a container holds';
+const CAP_READ = {
+    iCan: CAP_ICAN, instructionKey: 'check-level',
+    steps: ['Look at the grey water.', 'At the top: full. Halfway: half full. None: empty.', 'Check the word that matches.'],
+    say: 'It is __.', sayValues: (q) => [String(q.ans).toLowerCase()],
+};
+const capFind = (verb, dir) => ({
+    iCan: CAP_ICAN, instructionKey: `check-${verb}-${dir}`,
+    steps: verb === 'holds'
+        ? ['Look at how big each container is.', `The ${dir === 'more' ? 'bigger' : 'smaller'} one holds ${dir}.`, 'Check its box.']
+        : ['Look at the grey water in each one.', `The ${dir === 'more' ? 'higher' : 'lower'} water has ${dir}.`, 'Check its box.'],
+    say: `__ ${verb} ${dir}.`, sayValues: (q) => [String(q.ans)],
+});
+const capOrder = (verb) => ({
+    iCan: CAP_ICAN, instructionKey: `order-${verb}`,
+    steps: verb === 'holds' ? ['The smallest holds the least. Write 1.', 'The next size holds more. Write 2.', 'The biggest holds the most. Write 3.']
+        : ['The lowest water has the least. Write 1.', 'The next has more. Write 2.', 'The highest water has the most. Write 3.'],
+    say: '__ has the least.', sayValues: (q) => { const o = String(q.ans).split(/\s*,\s*/); const i = o.indexOf('1'); return i >= 0 ? [LETTERS_K2[i]] : null; },
+});
+const CAP_DEFS = { read: CAP_READ, 'holds-more': capFind('holds', 'more'), 'has-more': capFind('has', 'more'), 'order-holds': capOrder('holds') };
+
+registerSkill('comparing:compare_capacity', {
+    strings: stringsBy((t, ref) => {
+        if (CAP_DEFS[t]) return CAP_DEFS[t];
+        const o = (ref && ref.opts) || {};
+        return o.task === 'order' ? CAP_DEFS['order-holds'] : o.task === 'find' ? CAP_DEFS['holds-more'] : o.task === 'fill' ? CAP_DEFS['has-more'] : null;
+    }, CAP_READ),
+    misconceptions: ['next-word', 'half-means-any', 'more-less-swapped', 'taller-holds-more', 'order-reversed'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        const t = String(q._variant || 'read');
+        if (p.kind === 'words') {
+            const fill = Number(p.pic0 && p.pic0.fill) || 0;
+            const where = fill >= 0.99 ? 'at the very top' : fill >= 0.7 ? 'near the top' : fill >= 0.4 ? 'halfway up' : fill > 0 ? 'near the bottom' : 'not there: there is none';
+            return [
+                step('Look at the grey water.'),
+                step(`The water is ${where}.`),
+                step(`So it is ${String(q.ans).toLowerCase()}.`),
+                step(`Check "${q.ans}".`, [{ slot: 'answer', value: String(q.ans) }]),
+            ];
+        }
+        const holds = /holds/.test(t);
+        if (p.kind === 'order') {
+            const order = (p.order || []).map(Number);
+            const at = (r) => LETTERS_K2[order.indexOf(r)];
+            return [
+                step(holds ? 'Look at how big each one is.' : 'Look at the grey water in each one.'),
+                step(`${at(1)} ${holds ? 'holds' : 'has'} the least. Write 1 under ${at(1)}.`, [{ slot: `b${order.indexOf(1)}`, value: '1' }]),
+                step(`${at(2)} is next. Write 2 under ${at(2)}.`, [{ slot: `b${order.indexOf(2)}`, value: '2' }]),
+                step(`${at(3)} ${holds ? 'holds' : 'has'} the most. Write 3.`, order.map((r, i) => ({ slot: `b${i}`, value: String(r) }))),
+            ];
+        }
+        const more = /more/.test(t);
+        return [
+            step(holds ? 'Look at how big each one is.' : 'Look at the grey water in each one.'),
+            step(holds ? `${q.ans} is ${more ? 'bigger' : 'smaller'}.` : `${q.ans} has ${more ? 'higher' : 'lower'} water.`),
+            step(`${q.ans} ${holds ? 'holds' : 'has'} ${more ? 'more' : 'less'}.`),
+            step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
+        ];
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        if (p.kind === 'words') {
+            const labels = (p.words || []).map((w) => w.label);
+            const i = labels.indexOf(String(q.ans));
+            const next = labels[i + 1] !== undefined ? labels[i + 1] : labels[i - 1];
+            const half = labels.find((l) => /^Half/.test(l));
+            return chooseWrong(q, [
+                next !== undefined ? { value: next, misconception: 'next-word', explain: 'Chose the word next to the right one: read the water level roughly.' } : null,
+                half && half !== q.ans ? { value: half, misconception: 'half-means-any', explain: 'Said half full for a container that has some water, not half.' } : null,
+            ]);
+        }
+        if (p.kind === 'order') {
+            const order = (p.order || []).map(Number);
+            const rev = order.map((r) => 4 - r);
+            return chooseWrong(q, [{ value: rev.join(', '), misconception: 'order-reversed', slot: 'b0',
+                slots: Object.fromEntries(rev.map((r, i) => [`b${i}`, String(r)])), explain: 'Started with the most, not the least.' }]);
+        }
+        const c = Number(p.correct) || 0;
+        const other = LETTERS_K2[1 - c];
+        const holds = /holds/.test(String(q._variant));
+        return chooseWrong(q, [holds
+            ? { value: other, misconception: 'taller-holds-more', explain: 'Chose by height alone, or mixed up more and less.' }
+            : { value: other, misconception: 'more-less-swapped', explain: 'Mixed up more and less water.' }]);
+    },
+});

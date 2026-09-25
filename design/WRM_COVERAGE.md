@@ -22,20 +22,20 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 518 (59%), partial only 148 (17%), gap 206 (24%).
+- Covered 524 (60%), partial only 148 (17%), gap 200 (23%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 332 skills carry WRM tags. 158 proposals (116 new skills, 42 options on existing skills) would close every gap.
+- 333 skills carry WRM tags. 157 proposals (115 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
-| Reception | PK | 18 | 119 | 63 (53%) | 27 | 29 |
-| Year 1 | K | 14 | 116 | 72 (62%) | 24 | 20 |
-| Year 2 | 1 | 11 | 124 | 80 (65%) | 18 | 26 |
+| Reception | PK | 18 | 119 | 66 (55%) | 27 | 26 |
+| Year 1 | K | 14 | 116 | 74 (64%) | 24 | 18 |
+| Year 2 | 1 | 11 | 124 | 81 (65%) | 18 | 25 |
 | Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
 | Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
 | Year 5 | 4 | 15 | 136 | 81 (60%) | 22 | 33 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **518 (59%)** | **148** | **206** |
+| **All** | | **97** | **872** | **524 (60%)** | **148** | **200** |
 
 ## Source disagreements
 
@@ -320,14 +320,11 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Closes (3): Y5.B13.S2 Count through zero in 1s; Y5.B13.S3 Count through zero in multiples; Y5.B13.S5 Find the difference  
   _proposal id: negative_count_
 
-### measurement (38 proposals, 84 steps)
+### measurement (37 proposals, 78 steps)
 
 - **Read Scales (g, kg, ml, l)** — new skill `measurement:read_scales`. Teaches reading mass and capacity scales in grams, kilograms, millilitres and litres with scale steps of 1, 2, 5, 10, 100. Representation: a drawn dial or jug scale; write the reading with the unit; option: scale step.  
   Closes (7): Y2.B7.S2 Measure in grams; Y2.B7.S3 Measure in kilograms; Y2.B7.S7 Measure in litres; Y3.B7.S1 Use scales; Y3.B7.S3 Measure mass in kilograms and grams; Y3.B7.S4 Equivalent masses (kilograms and grams); Y3.B7.S8 Measure capacity and volume in litres and millilitres  
   _proposal id: mass_scales_
-- **Full, Empty, Holds More** — new skill `comparing:compare_capacity`. Teaches capacity language (full, empty, half full, nearly full) and comparing how much two containers hold. Representation: outline containers with a drawn fill line; circle full/empty or the one that holds more; option: order three.  
-  Closes (6): R.B2.S3 Compare capacity; R.B8.S3 Explore capacity; R.B8.S4 Compare capacity; Y1.B8.S4 Full and empty; Y1.B8.S5 Compare volume; Y2.B7.S5 Compare volume and capacity  
-  _proposal id: capacity_early_
 - **Mass and Capacity Word Problems** — new skill `measurement:mass_capacity_word_problems`. Teaches adding, subtracting, multiplying and dividing masses and capacities in context. Representation: picture of scales/jugs with values; write the answer with the unit.  
   Closes (6): Y2.B7.S4 Four operations with mass; Y2.B7.S8 Four operations with volume and capacity; Y3.B7.S5 Compare mass; Y3.B7.S6 Add and subtract mass; Y3.B7.S10 Compare capacity and volume; Y3.B7.S11 Add and subtract capacity and volume  
   _proposal id: mass_ops_
@@ -648,8 +645,8 @@ whatever happens to the WRM gaps.
 - **R.B2.S2** Compare mass — covered. _K.MD.A.2, M.EE.K.MD.2_  
   Skills: Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`)  
   Vocabulary: heavy, light, balance (level  
-- **R.B2.S3** Compare capacity — GAP. _K.MD.A.2, M.EE.K.MD.2_  
-  Proposal: Full, Empty, Holds More  
+- **R.B2.S3** Compare capacity — covered. _K.MD.A.2, M.EE.K.MD.2_  
+  Skills: Full, Empty, Holds More (`comparing:compare_capacity`)  
   Vocabulary: full, empty, holds more, holds less  
 - **R.B2.S4** Explore simple patterns — PARTIAL. _Beyond CCSS_  
   Partial: Shape Patterns (Visual) (`patterns:shape_pattern`), missing talking about what repeats; the skill only fills missing shapes  
@@ -777,11 +774,11 @@ whatever happens to the WRM gaps.
   Partial: Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`), missing equal mass: a level, balanced scale  
   Proposal: Balanced or Not?  
   Vocabulary: balanced, equal, cube  
-- **R.B8.S3** Explore capacity — GAP. _K.MD.A.1, M.EE.K.MD.1_  
-  Proposal: Full, Empty, Holds More  
+- **R.B8.S3** Explore capacity — covered. _K.MD.A.1, M.EE.K.MD.1_  
+  Skills: Full, Empty, Holds More (`comparing:compare_capacity`)  
   Vocabulary: full, hold, capacity, more, less  
-- **R.B8.S4** Compare capacity — GAP. _K.MD.A.2, M.EE.K.MD.2_  
-  Proposal: Full, Empty, Holds More  
+- **R.B8.S4** Compare capacity — covered. _K.MD.A.2, M.EE.K.MD.2_  
+  Skills: Full, Empty, Holds More (`comparing:compare_capacity`)  
   Vocabulary: more, less, the most, the least  
 
 #### R.B9 Spring Block 3: Growing 6, 7, 8
@@ -1322,11 +1319,11 @@ whatever happens to the WRM gaps.
   Partial: Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`), missing comparing masses by the number of units  
   Proposal: Measure Mass with Cubes  
   Vocabulary: heavier, lighter, than  
-- **Y1.B8.S4** Full and empty — GAP. _K.MD.A.1, M.EE.K.MD.1_  
-  Proposal: Full, Empty, Holds More  
+- **Y1.B8.S4** Full and empty — covered. _K.MD.A.1, M.EE.K.MD.1_  
+  Skills: Full, Empty, Holds More (`comparing:compare_capacity`)  
   Vocabulary: capacity, volume, full, empty  
-- **Y1.B8.S5** Compare volume — GAP. _K.MD.A.2, M.EE.K.MD.2_  
-  Proposal: Full, Empty, Holds More  
+- **Y1.B8.S5** Compare volume — covered. _K.MD.A.2, M.EE.K.MD.2_  
+  Skills: Full, Empty, Holds More (`comparing:compare_capacity`)  
   Vocabulary: more, less, half full  
 - **Y1.B8.S6** Measure capacity — GAP. _K.MD.A.1, K.MD.A.2, M.EE.K.MD.1, M.EE.K.MD.2_  
   Proposal: Measure Capacity with Cups  
@@ -1771,8 +1768,8 @@ whatever happens to the WRM gaps.
 - **Y2.B7.S4** Four operations with mass — GAP. _3.MD.A.2, M.EE.3.MD.2_  
   Proposal: Mass and Capacity Word Problems  
   Vocabulary: total, heavier, lighter, mass  
-- **Y2.B7.S5** Compare volume and capacity — GAP. _K.MD.A.2, 3.MD.A.2, M.EE.K.MD.2, M.EE.3.MD.2_  
-  Proposal: Full, Empty, Holds More  
+- **Y2.B7.S5** Compare volume and capacity — covered. _K.MD.A.2, 3.MD.A.2, M.EE.K.MD.2, M.EE.3.MD.2_  
+  Skills: Full, Empty, Holds More (`comparing:compare_capacity`)  
   Vocabulary: volume, capacity, full, empty  
 - **Y2.B7.S6** Measure in millilitres — covered. _3.MD.A.2, M.EE.3.MD.2_  
   Skills: Grams, kg, Liters (Visual) (`measurement:mass_volume_liquid`) {millilitres}  

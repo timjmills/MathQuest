@@ -61,6 +61,7 @@ export const SKILL_WRM = {
         { step: 'Y1.B4.S1', note: 'count to 20' },
     ],
     // Build lane k2 (2026-09-25)
+    'comparing:compare_capacity': ['R.B2.S3', 'R.B8.S3', 'R.B8.S4', 'Y1.B8.S4', 'Y1.B8.S5', 'Y2.B7.S5'],
     'counting:match_same': ['R.B1.S1', 'R.B1.S2'],
     'comparing:odd_one_out': ['R.B1.S3'],
     'comparing:compare_size': ['R.B2.S1'],
@@ -1748,14 +1749,6 @@ export const WRM_PROPOSALS = {
     },
 
     // ---- measurement
-    capacity_early: {
-        kind: 'new', skill: 'comparing:compare_capacity',
-        name: 'Full, Empty, Holds More',
-        teaches: 'capacity language (full, empty, half full, nearly full) and comparing how much two containers hold',
-        representation: 'outline containers with a drawn fill line; circle full/empty or the one that holds more; option: order three',
-        family: 'measurement',
-        steps: ['R.B2.S3', 'R.B8.S3', 'R.B8.S4', 'Y1.B8.S4', 'Y1.B8.S5', 'Y2.B7.S5'],
-    },
     balance: {
         kind: 'new', skill: 'measurement:balance_scales',
         name: 'Balanced or Not?',

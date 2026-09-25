@@ -21,17 +21,17 @@ the first entry.
 
 - **575 year rows** (Reception 67, Year 1 79, Year 2 75, Year 3 84, Year 4 89, Year 5 92, Year 6 89) → **210 representations**.
 - **MATCH 10 · PARTIAL 103 · GAP 97.**
-- The 200 PARTIAL / GAP representations are closed by 89 existing build-list entries (merged) and 53 entries added from this catalogue.
+- The 200 PARTIAL / GAP representations are closed by 88 existing build-list entries (merged) and 53 entries added from this catalogue.
 
 | Lane | Representations it owns | MATCH | PARTIAL | GAP | Entries added from the catalogue |
 |---|---|---|---|---|---|
-| `k2` | 46 | 0 | 21 | 25 | 12 |
+| `k2` | 45 | 0 | 21 | 24 | 12 |
 | `operations` | 32 | 0 | 20 | 12 | 11 |
 | `placevalue` | 17 | 0 | 9 | 8 | 9 |
 | `algebra` | 15 | 0 | 6 | 9 | 4 |
 | `fractions` | 18 | 0 | 11 | 7 | 7 |
 | `geometry` | 33 | 0 | 17 | 16 | 3 |
-| `measurement` | 9 | 0 | 7 | 2 | 2 |
+| `measurement` | 10 | 0 | 7 | 3 | 2 |
 | `timemoney` | 18 | 0 | 6 | 12 | 2 |
 | `data` | 9 | 0 | 5 | 4 | 2 |
 | `numtheory` | 3 | 0 | 1 | 2 | 1 |
@@ -172,7 +172,7 @@ the first entry.
 | V118 | Doubles / halves pictures (before → after) | R R39, Y1 R49, Y2 R94 (GAP) | 8 | PARTIAL | `number_sense:doubles_near_doubles`, `patterns:double`, `pane:dice`, `pane:fingers`, `patterns:halve` | `vis_strategy_pictures`* | `algebra` |
 | V119 | Two objects on one baseline (longer, taller) | R R10 (MATCH), R R11 (MATCH), Y1 R58 | 6 | PARTIAL | `comparing:compare_objects`, `shapes_early:order_objects_length` | `compare_lengths`, `vis_migrate_measures`* | `measurement` |
 | V120 | Non-standard units beside an object | R R12, Y1 R59 | 4 | PARTIAL | `shapes_early:measure_nonstandard` | `measure_two_units`, `vis_migrate_measures`* | `measurement` |
-| V121 | Unscaled containers (empty … full; cupfuls) | R R09, Y1 R62, Y1 R63 | 7 | GAP | `measurement:capacity` | `capacity_early`, `nonstandard_capacity` | `k2` |
+| V121 | Unscaled containers (empty … full; cupfuls) | R R09, Y1 R62, Y1 R63 | 7 | GAP | `comparing:compare_capacity`, `measurement:capacity` | `nonstandard_capacity` | `measurement` |
 | V122 | Left / right track | Y1 R65 | 1 | GAP | - | `position_map` | `geometry` |
 | V123 | Ordinal positions in a line | Y1 R68 | 1 | GAP | - | `ordinal` | `k2` |
 | V124 | Dot "pre-money" counters | Y1 R69 | 1 | PARTIAL | - | `vis_coin_options`* | `timemoney` |
@@ -352,7 +352,6 @@ Every entry of `design/BUILD_LIST.md` that draws a catalogued representation, wi
 | `teen_structure` Understand 10 and 20 (option) | `k2` | White Rose audit | V103 | 14 |
 | `vis_story_strip` First – Then – Now Story Strip | `k2` | added from visual catalogue | V115 | 13 |
 | `vis_k2_hands_on` Hands-On Card and Game Pages (low) | `k2` | added from visual catalogue | V132, V142, V143 | 8 |
-| `capacity_early` Full, Empty, Holds More | `k2` | White Rose audit | V121 | 7 |
 | `systematic_bonds` Number Bonds in Order | `k2` | White Rose audit | V112 | 4 |
 | `tens_ones_group` Count by Making Tens | `k2` | White Rose audit | V116 | 2 |
 | `ten_count_out` Count Out a Number | `k2` | White Rose audit | V101 | 1 |

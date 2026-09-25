@@ -644,9 +644,23 @@ const K2_LANE_MAKERS = {
         return { ans: letter, printAnswer: letter, answerType: 'text', text: 'Which one is the same?', _variant: t,
             cell: cellOf('picture-row', { kind: 'pick', target: { shape: 'apple', s: 0.9, sil: t === 'shadow' }, choices, correct: at }) };
     },
+    'comparing:compare_capacity': (r, i) => {
+        const form = ['read', 'holds-more', 'has-more', 'order-holds', 'read'][i % 5];
+        if (form === 'read') {
+            const words = [{ label: 'Full' }, { label: 'Half full' }, { label: 'Empty' }]; const fills = [1, 0.5, 0]; const correct = int(r, 0, 2);
+            return { ans: words[correct].label, printAnswer: words[correct].label, answerType: 'text', text: 'Is the jug full, half full or empty?', _variant: 'read',
+                cell: cellOf('picture-row', { kind: 'words', pic0: { container: 'jug', fill: fills[correct] }, words, correct }) };
+        }
+        const n = form === 'order-holds' ? 3 : 2; const at = shuffle(r, Array.from({ length: n }, (_, k) => k));
+        const choices = at.map((k) => ({ container: 'glass', fill: 0, w: 0.6 + 0.2 * k, h: 0.6 + 0.2 * k }));
+        if (n === 3) { const order = at.map((k) => k + 1); return { ans: order.join(', '), answerType: 'text', text: 'Write 1, 2, 3 under the glasses.', _variant: form, cell: cellOf('picture-row', { kind: 'order', choices, order }) }; }
+        const want = /more/.test(form) ? 1 : 0; const correct = at.indexOf(want); const letter = 'AB'[correct];
+        return { ans: letter, printAnswer: letter, answerType: 'text', text: 'Which glass holds more?', _variant: form, cell: cellOf('picture-row', { kind: 'pick', choices, correct }) };
+    },
 };
 Object.assign(REQUIRED, {
     'counting:zero_none': /none/i,
+    'comparing:compare_capacity': /water|holds|bigger/i,
     'counting:match_same': /same|outline/i,
     'comparing:odd_one_out': /not like|not belong|reason/i,
     'comparing:compare_size': /room|smallest/i,

@@ -357,7 +357,12 @@
       "dice": "D",
       "blocks": "B",
       "plates": "L",
-      "boxes": "X"
+      "boxes": "X",
+      "glass": "G",
+      "jug": "U",
+      "bucket": "K",
+      "bottle": "T",
+      "bowl": "W"
     },
     "touch": {},
     "cover": {
@@ -638,7 +643,8 @@
       "size": "Z",
       "mixed": "M",
       "shape": "H",
-      "weight": "W"
+      "weight": "W",
+      "fill": "F"
     },
     "match": {
       "same": "S",

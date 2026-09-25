@@ -291,7 +291,9 @@ export const VALUE_TOKENS = Object.freeze({
         // O6 AP1 (2026-09-25): teen_compose draws the ten as a rod and the ones as cubes
         blocks: 'B',
         // build lane k2 (2026-09-25): zero_none draws its objects on plates / in boxes
-        plates: 'L', boxes: 'X' }),
+        plates: 'L', boxes: 'X',
+        // build lane k2: compare_capacity's containers
+        glass: 'G', jug: 'U', bucket: 'K', bottle: 'T', bowl: 'W' }),
     // P12
     model: Object.freeze({ none: 'N', area: 'A', bar: 'B', circle: 'C', line: 'L', set: 'S', grid: 'G', blocks: 'K', analog: 'H', digital: 'D' }),
     labels: Object.freeze({ all: 'A', some: 'S', none: 'N' }),
@@ -322,7 +324,7 @@ export const VALUE_TOKENS = Object.freeze({
     // block 3 (2026-09-25)
     ops: Object.freeze({ '+': 'A', '-': 'S', x: 'M', '/': 'D' }),
     // block 3, lane k2 sub-range (2026-09-25)
-    attr: Object.freeze({ kind: 'K', size: 'Z', mixed: 'M', shape: 'H', weight: 'W' }),
+    attr: Object.freeze({ kind: 'K', size: 'Z', mixed: 'M', shape: 'H', weight: 'W', fill: 'F' }),
     match: Object.freeze({ same: 'S', shadow: 'W', kind: 'K' }),
     // block 7 (option-panel round 3)
     poolSize: Object.freeze({ easier: 'E', set: 'S', harder: 'H' }),

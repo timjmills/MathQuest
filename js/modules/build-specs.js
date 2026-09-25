@@ -275,9 +275,6 @@ export const WRM_SPECS = {
         ['counts 1, 0, 1 (no negatives)', 'difference 3 to −2 is 1'], ['measure-scale']),
 
     // ------------------------------------------------------------------ measurement
-    capacity_early: S(['full, empty, half full?', 'which holds more?', 'order three containers', 'nearly full / nearly empty'],
-        ['wordpic'], 'circle or write the word from a bank', 'O2 full/empty → half → order · O3 fill line marked → none · O6 containers',
-        ['a taller container always holds more', 'half full means any amount'], ['measure-scale']),
     balance: S(['heavier, lighter or balanced?', 'which side is heavier?', 'what makes it balance?', 'order by mass from balances'],
         ['wordpic'], 'tick one', 'O2 two objects → three via two balances · O3 arrow on the heavy side → none · O6 balance picture',
         ['the higher pan is heavier', 'bigger is heavier'], ['balance']),
