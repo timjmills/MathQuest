@@ -280,7 +280,7 @@ export function prepare(it, info = {}) {
     if (info.wrong && !wrong) return null;
     const isWrong = !!(wrong && info.wrong);
     const q = it.q || {};
-    const P = LINED.has(it.template) || DRAWN.has(it.template) ? null : answerParts(it, correct0);
+    let P = LINED.has(it.template) || DRAWN.has(it.template) ? null : answerParts(it, correct0);
     const correct = correct0;
     const shown = isWrong ? (P ? wrong.value : likeCorrect(wrong.value, correct)) : correct;
     const who = PUPILS[(Number(info.index) || 0) % PUPILS.length];
@@ -289,7 +289,7 @@ export function prepare(it, info = {}) {
     // The item's answer slots, and what the pupil wrote in each (critic round 3): a correct item
     // shows the RIGHT value in every slot ("10 + 30 = 40", never "40 + 40 = 40"), a wrong one the
     // wrong answer split into the same slots ("4 | 6 | 2", never "462" in every column).
-    const glue = P ? glueOf(P.display, P.parts) : null;
+    let glue = P ? glueOf(P.display, P.parts) : null;
     let shownSlots = isWrong && wrong.slots ? wrong.slots : undefined;
     let sParts = null;
     if (P) {
@@ -300,7 +300,9 @@ export function prepare(it, info = {}) {
                 || (/[;,]\s/.test(String(wrong.value)) ? String(wrong.value).split(/[;,]\s*/) : null);
             sParts = ids.map((id, i) => {
                 if (wrong.slots && wrong.slots[id] !== undefined) return String(wrong.slots[id]);
-                return split && split.length === ids.length ? split[i] : '';
+                // a part the wrong answer does not name was written right ("5, 7, 28": one
+                // group short leaves the 5 and the 7 as they were)
+                return split && split.length === ids.length ? split[i] : (i === ids.length - 1 && !split ? String(wrong.value) : P.parts[i].value);
             });
             if (sParts.every((v) => v === '')) sParts = null;
             // Parts the whole answer does not spell out (an area model's partial products under
@@ -312,12 +314,26 @@ export function prepare(it, info = {}) {
     // A place-value mat the pupil DRAWS, or a dot the pupil MARKS: the fix is the mat or the
     // line again, clean (critic round 3: a number box asked for a drawing).
     const pvKind = it.template === 'pv' && q.cell && q.cell.payload ? q.cell.payload.kind : '';
-    const redraw = pvKind === 'build' ? 'draw' : pvKind === 'line-mark' ? 'mark' : '';
-    const choice = !P && !story && !redraw ? choicesOf(it, correct, shown) : null;
+    let redraw = pvKind === 'build' ? 'draw' : pvKind === 'line-mark' ? 'mark' : '';
+    // A drawn place-value mat is fixed by writing HOW MANY disks go in each place, the mat's own
+    // structure in words ("[ ] hundreds [ ] tens [ ] ones"): a second mat would hold one item a
+    // page (critic round 3, density), and the count names exactly what the pupil must redraw.
+    const drewWork = redraw === 'draw';
+    const places = pvKind === 'build' && Array.isArray(q.cell.payload.places) ? q.cell.payload.places.map(Number) : [];
+    const PW = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands' };
+    const nBuild = Number(String(correct0).replace(/,/g, ''));
+    if (places.length >= 2 && places.every((pl) => PW[pl]) && Number.isFinite(nBuild)) {
+        P = { parts: places.map((pl, i) => ({ id: `u${i}`, value: String(Math.floor(nBuild / pl) % 10) })), display: '' };
+        glue = [''].concat(places.map((pl) => ` ${PW[pl]}`));
+        sParts = null;
+        redraw = '';
+    }
+    // a multiple-choice item keeps its own choice even when it reads as a story (word names)
+    const choice = !P && !redraw && (!story || (Array.isArray(q.options) && q.options.length >= 2)) ? choicesOf(it, correct, shown) : null;
     // ONE number written a digit per box (a column sum's answer row, a quotient, a place-value
     // chart): the fix is that number, in one box - the work above already shows it split.
     const digitSplit = !!(P && glue && P.parts.every((x) => /^\d$/.test(x.value))
-        && glue.slice(1, -1).every((g) => !g.trim() || g.trim() === ','));
+        && glue.slice(1, -1).some((g) => !g.trim()) && glue.slice(1, -1).every((g) => !g.trim() || g.trim() === ','));
     // How the fix is written (PT-ERR-2): in the item's OWN answer shape.
     let kind;
     let labels = null;
@@ -390,7 +406,7 @@ export function prepare(it, info = {}) {
         body = ungraded(body);
         drawZone = ungraded(drawZone);
         const askedFix = !!drawZone || ((kind === 'draw' || kind === 'line') && /data-ws-slot="(?:fix|x\d)/.test(body));
-        const verb = kind === 'draw' || redraw === 'draw' ? 'drew' : redraw === 'mark' ? 'marked' : 'wrote';
+        const verb = kind === 'draw' || drewWork ? 'drew' : redraw === 'mark' ? 'marked' : 'wrote';
         // A line-mark item names its number only in the page's own instruction: the finished
         // work says which number was to be marked, or it cannot be checked (critic round 3).
         // An estimate is judged against ITS rounding rule, so the rule is printed with the work
@@ -607,7 +623,8 @@ export function plan(input = {}) {
     const fit = Object.assign({}, L, { items: undefined });
     // The instruction says where the fix goes (critic round 3): written, or drawn again.
     const drawn = items.length && items.every((it) => it.thinking && (it.thinking.kind === 'draw' || it.thinking.redraw === 'draw'));
-    return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(drawn ? 'check-fix-draw' : 'check-fix-write'), grid] }], {
+    const marked = items.length && items.every((it) => it.thinking && it.thinking.redraw === 'mark');
+    return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(drawn ? 'check-fix-draw' : marked ? 'check-fix-mark' : 'check-fix-write'), grid] }], {
         meta: { items: items.length, scoreOutOf: items.length, wrongShare, fits: [Object.assign(fit, { line: fitsLine(fit) })], notes: L.note ? [L.note] : [] },
     });
 }
