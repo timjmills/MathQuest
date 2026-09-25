@@ -12,6 +12,7 @@
 
 import { SHAPES as K2_SHAPES } from '../k2kit.js';
 import { SW, INK, n2, st, counter, cross, by, opOf, num, row, col } from './kit.js';
+import { tablerHand } from './hand-art.js';
 
 /* ------------------------------------------------------------------ outline objects */
 
@@ -150,83 +151,60 @@ function dotTile(c, n, x = 0) {
 
 /* ------------------------------------------------------------------ fingers */
 
-// Our own line-art hand, palm facing the reader, drawn in mm: a palm, a cuff, four fingers and a
-// thumb, 1.5 pt outline and white fill. A RAISED finger is a long capsule; a FOLDED one is a
-// short bump over the palm, so the hand still reads as a hand. Fingers go up in the order most
-// classrooms count: index, middle, ring, little, then the thumb for 5. Each finger is 6 mm wide
-// so a pupil can touch and count it (RP-5). No nails, lines or faces (RP-7).
-const FW = 6, FGAP = 0.7;
-const PALM_W = 4 * FW + 3 * FGAP + 1.6, PALM_H = 19, CUFF_H = 5;
-const LEN = [16, 18, 16.5, 12.5];   // index, middle, ring, little (raised length above the palm)
-function hand(c, up, mirror = false) {
-    const thumbRoom = 9;
-    const w = PALM_W + thumbRoom, top = Math.max(...LEN) + 1;
-    const x0 = mirror ? 0 : thumbRoom;            // palm's left edge
-    const o = `fill="#fff" ${st(c, SW.heavy)} stroke-linejoin="round"`;
-    let body = '';
-    // Fingers: index next to the thumb.
-    for (let k = 0; k < 4; k++) {
-        const slot = mirror ? 3 - k : k;           // index sits on the thumb side
-        const fx = x0 + 0.8 + slot * (FW + FGAP);
-        const raised = up > k;
-        const len = raised ? LEN[k] : 3.4;
-        const y = top - len;
-        body += `<rect data-ws-finger="${raised ? 'up' : 'down'}" x="${n2(fx)}" y="${n2(y)}" width="${FW}" height="${n2(len + 6)}" rx="${FW / 2}" ${o}/>`;
-    }
-    // Thumb: a capsule out from the palm's side, raised at 5, else tucked across the palm.
-    const thumbUp = up >= 5;
-    const sx = mirror ? x0 + PALM_W - 2 : x0 + 2;
-    const dir = mirror ? 1 : -1;
-    const palm = `<rect x="${n2(x0)}" y="${n2(top + 1.5)}" width="${n2(PALM_W)}" height="${PALM_H}" rx="5" ${o}/>`;
-    const cuff = `<path d="M${n2(x0 + 3)} ${n2(top + 1.5 + PALM_H - 1)}L${n2(x0 + 3)} ${n2(top + 1.5 + PALM_H + CUFF_H)}M${n2(x0 + PALM_W - 3)} ${n2(top + 1.5 + PALM_H - 1)}L${n2(x0 + PALM_W - 3)} ${n2(top + 1.5 + PALM_H + CUFF_H)}" fill="none" ${st(c, SW.heavy)} stroke-linecap="round"/>`;
-    let thumb;
-    if (thumbUp) {
-        const ang = dir * 38;
-        thumb = `<rect data-ws-finger="up" x="${n2(sx - FW / 2)}" y="${n2(top + 1.5 - 4)}" width="${FW}" height="17" rx="${FW / 2}" `
-            + `transform="rotate(${ang} ${n2(sx)} ${n2(top + 12)})" ${o}/>`;
-        body = thumb + body + palm;
-    } else {
-        // Folded: a short bump out of the palm's side, like the folded fingers' bumps on top.
-        const bx = mirror ? x0 + PALM_W - FW + 2.6 : x0 - 2.6;
-        thumb = `<rect data-ws-finger="down" x="${n2(bx)}" y="${n2(top + 8)}" width="${FW}" height="10" rx="${FW / 2}" ${o}/>`;
-        body = thumb + body + palm;
-    }
-    return { w, h: top + 1.5 + PALM_H + CUFF_H, body: body + cuff };
-}
+// The hands are Tabler Icons' outline hands (MIT), rebuilt per finger in hand-art.js: raised
+// fingers are capsules, folded ones knuckle bumps, the thumb goes out only at 5, and a cuff marks
+// the wrist. Index first (owner ruling 2026-09-25). Each finger is 6 mm wide (RP-5).
 /** n fingers (1-10): one hand, or a full hand plus the rest (5 + n, the "five and" structure). */
 function fingers(c, n) {
-    if (n <= 5) return hand(c, n, false);
-    return row([hand(c, 5, false), hand(c, n - 5, true)], 3);
+    if (n <= 5) return tablerHand(c, n, false);
+    return hands(c, 5, n - 5);
 }
+/** A pair: the left hand is mirrored so both thumbs point to the middle, like two raised hands. */
+const hands = (c, a, b) => row([tablerHand(c, a, true), tablerHand(c, b, false)], 5, { align: 'bottom' });
 
 /* ------------------------------------------------------------------ rekenrek */
 
 // The rekenrek (arithmetic rack): two rows of ten beads, each row five solid then five hollow
 // (the two colours of the classroom rack as solid against hollow, LS-5). A row showing v has its
 // first v beads pushed to the LEFT and the rest to the right, with a clear gap between (NCETM
-// Mastering Number). Beads 6 mm across (RP-5; solid fill within INK-5's 7 mm).
+// Mastering Number). Beads 6.5 mm across (RP-5; solid fill within INK-5's 7 mm).
+//
+// TAKE-AWAY (−): the beads taken away are SLID RIGHT, apart from the ones kept, the way a pupil
+// moves them on a real rack, and each carries ONE clean diagonal stroke (a black line on a white
+// halo, so it reads on a solid bead too). They are taken from the end of the number, bottom row
+// first. The beads keep their solid / hollow colour, so the 5 + 5 grouping stays visible.
 function rekenrek(c, rows, x = 0) {
-    const d = 6.5, pitch = 6.8, gapMid = 10, pad = 2.5;
+    const d = 6.5, pitch = 6.8, gapMid = 10, pad = 2.5, gapTaken = 3;
     const W = 2 * pad + 10 * pitch + gapMid, rowH = 10;
     const H = rows.length * rowH + 4;
     let body = `<rect x="0" y="0" width="${n2(W)}" height="${n2(H)}" rx="3" fill="#fff" ${st(c, SW.heavy)}/>`;
-    let crossed = x;
+    // How many beads each row gives up: the last x of the number, bottom row first.
+    const taken = rows.map(() => 0);
+    for (let r = rows.length - 1, left = x; r >= 0 && left > 0; r--) { taken[r] = Math.min(rows[r], left); left -= taken[r]; }
+    const slash = (cx, cy) => {
+        const r = d * 0.4;   // just past the bead's rim, never into the next bead
+        const dd = `M${n2(cx - r)} ${n2(cy + r)}L${n2(cx + r)} ${n2(cy - r)}`;
+        return `<path d="${dd}" fill="none" stroke="#fff" stroke-width="${n2(SW.rule)}" stroke-linecap="round"/>`
+            + `<path data-ws-taken="1" d="${dd}" fill="none" ${st(c, SW.heavy)} stroke-linecap="round"/>`;
+    };
     rows.forEach((v, r) => {
         const cy = 2 + rowH / 2 + r * rowH;
+        const kept = v - taken[r];
+        // The taken beads sit just left of the beads never used (a small gap between the two).
+        const anchor = W - pad - (10 - v) * pitch - (v < 10 ? gapTaken : 0);
+        // Taken beads spread a little, so each stroke stands clear of the next (inside the rack).
+        const tp = pitch + Math.min(1.4, (gapMid - gapTaken - 2.5) / Math.max(1, taken[r] - 1));
         body += `<line x1="0" y1="${n2(cy)}" x2="${n2(W)}" y2="${n2(cy)}" ${st(c, SW.hair)}/>`;
         for (let k = 0; k < 10; k++) {
             const left = k < v;
-            const cx = left ? pad + pitch / 2 + k * pitch : W - pad - pitch / 2 - (9 - k) * pitch;
+            let cx;
+            if (k < kept) cx = pad + pitch / 2 + k * pitch;
+            else if (k < v) cx = anchor - pitch / 2 - (v - 1 - k) * tp;
+            else cx = W - pad - pitch / 2 - (9 - k) * pitch;
             body += `<g data-ws-bead="${left ? 'in' : 'out'}">${counter(c, cx, cy, d, k >= 5)}</g>`;
+            if (k >= kept && k < v) body += slash(cx, cy);
         }
     });
-    // Take-away: cross the last `x` pushed-in beads, bottom row first.
-    for (let r = rows.length - 1; r >= 0 && crossed > 0; r--) {
-        for (let k = rows[r] - 1; k >= 0 && crossed > 0; k--, crossed--) {
-            const cy = 2 + rowH / 2 + r * rowH;
-            body += cross(c, pad + pitch / 2 + k * pitch, cy, d * 1.2);
-        }
-    }
     return { w: W, h: H, body };
 }
 
@@ -310,7 +288,7 @@ export const K2_PANES = {
             // −: the hands show the start number; the pupil folds down the number taken away.
             if (op === '-') return { ...fingers(c, a), label: `${a} fingers` };
             // +: one hand for each addend (both 5 or less), side by side.
-            return { ...row([hand(c, a, false), hand(c, b, true)], 3), label: `${a} fingers and ${b} fingers` };
+            return { ...hands(c, a, b), label: `${a} fingers and ${b} fingers` };
         },
     },
     rekenrek: {
@@ -327,7 +305,7 @@ export const K2_PANES = {
             const op = opOf(p), a = num(p.a), b = num(p.b);
             const split = (n) => [Math.min(10, n), Math.max(0, n - 10)];
             if (!op) return { ...rekenrek(c, split(num(p.n))), label: `rekenrek showing ${p.n}` };
-            if (op === '-') return { ...rekenrek(c, split(a), b), label: `rekenrek showing ${a}, ${b} crossed out` };
+            if (op === '-') return { ...rekenrek(c, split(a), b), label: `rekenrek showing ${a}, ${b} slid away` };
             return { ...rekenrek(c, [a, b]), label: `rekenrek: ${a} on the top row, ${b} on the bottom row` };
         },
     },

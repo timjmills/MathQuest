@@ -29,6 +29,8 @@ const SAMPLES = [
     { op: '-', a: 12, b: 5, model: 'compare' },
     { op: '+', a: 17, b: 5, bottomUp: true },
     { kind: 'round', n: 47, place: 10 }, { kind: 'round', n: 350, place: 100 }, { kind: 'round', n: 6812, place: 1000 },
+    { kind: 'round', n: 4672, place: 100 }, { kind: 'round', n: 38415, place: 10 }, { kind: 'round', n: 1250, place: 100 },
+    { kind: 'round', n: 9960, place: 100, level: 4 }, { kind: 'round', n: 4672, place: 100, level: 0 },
     { op: '+', a: 2, b: 3, object: 'car' }, { op: '-', a: 8, b: 3, object: 'turtle' }, { n: 6, object: 'flower' }, { n: 9, object: 'block' },
 ];
 const answerOf = (p) => (p.kind === 'round' ? Math.round(p.n / p.place) * p.place
@@ -115,7 +117,8 @@ ok('array counters >= 6 mm', 2 * rMin(PANES.array.draw({ op: '*', a: 3, b: 4 }, 
 }
 {
     const html = PANES.fingers.draw({ n: 8 }, S);
-    const ws = [...html.matchAll(/data-ws-finger="up"[^>]* width="([\d.]+)"/g)].map((m) => Number(m[1]));
+    // Each finger carries its drawn width in mm (the hand is Tabler line art in a scaled group).
+    const ws = [...html.matchAll(/data-ws-finger="up"[^>]* data-ws-mm="([\d.]+)"/g)].map((m) => Number(m[1]));
     ok('fingers are 6 mm wide', ws.length === 8 && ws.every((w) => w >= 6), JSON.stringify(ws));
 }
 {
@@ -137,6 +140,22 @@ ok('hundreds bottom-up puts 1 below 91', (() => {
 })());
 ok('rounding line marks the midpoint', /data-ws-mid="1"[^>]*>45</.test(PANES['round-line'].draw({ kind: 'round', n: 47, place: 10 }, L)));
 ok('number line omits the answer label', !/>12</.test(PANES.numberline.draw({ op: '+', a: 7, b: 5 }, L)));
+{
+    // pv grid: an empty answer row on the pupil page; the key fills it.
+    const p = { op: '+', a: 3254, b: 1618 };
+    const pupil = PANES.pvgrid.draw(p, L), key = PANES.pvgrid.draw(p, { size: 'L', key: true });
+    ok('pvgrid answer row is empty on the pupil page', /data-ws-support-part="unknown"/.test(pupil) && !/data-ws-key="1"/.test(pupil));
+    ok('pvgrid key fills the answer row', (key.match(/data-ws-key="1"/g) || []).join('') !== '' && ['4', '8', '7', '2'].every((d) => new RegExp(`data-ws-key="1">${d}<`).test(key)));
+    // round-pv: the ring sits on the hundreds digit of 4,672, the underline on the tens.
+    const r = PANES['round-pv'].draw({ kind: 'round', n: 4672, place: 100, level: 4 }, L);
+    const cx = (mark) => Number(new RegExp(`data-ws-mark="${mark}" (?:cx|x1)="([\\d.]+)"`).exec(r)[1]);
+    ok('round-pv rings the hundreds column', Math.abs(cx('ring') - (1 * 14 + 7)) < 0.1);
+    ok('round-pv underlines the next digit', cx('look') > cx('ring') + 7 && cx('look') < cx('ring') + 14);
+    ok('round-pv level 4 pre-marks two grey zeros', (r.match(/data-ws-placeholder="1"/g) || []).length === 2);
+    ok('round-pv level 0 has no marks', !/data-ws-mark=/.test(PANES['round-pv'].draw({ kind: 'round', n: 4672, place: 100, level: 0 }, L)));
+    ok('round-pv key writes 4700', /data-ws-key="1">4<[\s\S]*data-ws-key="1">7</.test(PANES['round-pv'].draw({ kind: 'round', n: 4672, place: 100 }, { size: 'L', key: true })));
+    ok('round-mark rings and underlines', /data-ws-mark="ring"/.test(PANES['round-mark'].draw({ kind: 'round', n: 4672, place: 100 }, L)) && /data-ws-mark="look"/.test(PANES['round-mark'].draw({ kind: 'round', n: 4672, place: 100 }, L)));
+}
 ok('rejects out-of-range', !PANES.tenframe.accepts({ op: '+', a: 15, b: 9 }) && !PANES.base10.accepts({ n: 368 }) && !PANES.fingers.accepts({ n: 11 }));
 
 /* ---- placement + compatibility */

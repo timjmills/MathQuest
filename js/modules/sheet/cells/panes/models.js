@@ -39,11 +39,13 @@ function markedLine(c, { start, marks, answer }) {
         if (hi === lo) hi = lo + step;
     }
     const n = (hi - lo) / step;
-    const pitch = step === 1 ? by(c, { S: 6, M: 7, L: 8 }) : by(c, { S: 9, M: 10, L: 10 });
+    // A short line in tens (30 to 70 for 62 − 30) is spread to about 72 mm, so the pupil's hops
+    // of ten from an off-tick start are big enough to draw and to read (RP-51 is the minimum).
+    const pitch = step === 1 ? by(c, { S: 6, M: 7, L: 8 }) : Math.max(by(c, { S: 9, M: 10, L: 10 }), Math.min(18, by(c, { S: 64, M: 68, L: 72 }) / n));
     const pt = c.S.zonePt + 1;
     // A start that falls between two ticks (62 on a line in tens) is labelled ABOVE its dot.
     const offTick = Number.isFinite(start) && (start - lo) % step !== 0;
-    const pad = 6, axisY = offTick ? 7 + mm(pt) * 1.1 : 7;
+    const pad = 6, axisY = offTick ? 8 + mm(pt) * 1.1 : 7;
     const W = 2 * pad + n * pitch, H = axisY + 5 + mm(pt) * 1.3 + 1;
     const x = (v) => pad + ((v - lo) / step) * pitch;
     let body = `<line x1="${lo === 0 ? pad : 1}" y1="${axisY}" x2="${n2(W - 1)}" y2="${axisY}" ${st(c, SW.heavy)}/>`;
@@ -56,7 +58,10 @@ function markedLine(c, { start, marks, answer }) {
         const labelled = (step === 1 ? v % 5 === 0 : true) || v === start;
         if (labelled && v !== answer) body += text(c, x(v), axisY + 5 + mm(pt) * 0.85, String(v), { pt, weight: v === start ? 700 : 400, ref: v !== start });
     }
-    if (offTick) body += text(c, x(start), axisY - 3.2, String(start), { pt });
+    if (offTick) {
+        body += `<line x1="${n2(x(start))}" y1="${n2(axisY - 2.2)}" x2="${n2(x(start))}" y2="${n2(axisY + 2.2)}" ${st(c, SW.heavy)}/>`;
+        body += text(c, x(start), axisY - 4.4, String(start), { pt });
+    }
     if (Number.isFinite(start)) body += `<circle data-ws-start="1" cx="${n2(x(start))}" cy="${axisY}" r="1.25" ${solid(c)}/>`;
     return { w: W, h: H, body };
 }

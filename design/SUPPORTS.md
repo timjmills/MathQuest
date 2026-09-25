@@ -223,7 +223,7 @@ option or a page role yet; the allocator lane (S2) reads this section and the re
 
 | What | Where |
 |---|---|
-| Pane templates | `js/modules/sheet/cells/panes/` (`kit.js`, `k2.js`, `place.js`, `models.js`, `extras.js`, `index.js`) |
+| Pane templates | `js/modules/sheet/cells/panes/` (`kit.js`, `k2.js`, `hand-art.js`, `place.js`, `models.js`, `extras.js`, `index.js`) |
 | Registry | `PANES` in `panes/index.js` |
 | Specimen | `design/specimens/support-panes.html`, PNGs in `design/specimens/png/support-panes-*.png` (built by `node design/specimens/build-support-panes.cjs`) |
 | Unit test | `node tests/scripts/ws-panes-unit.mjs` (`--matrix` prints the table in §S4.7) |
@@ -254,6 +254,7 @@ frame beside 7 + 5, base-ten blocks under 47 + 25, a rounding line beside "Round
 | **Bar model** for part–whole and comparison, and later multiplicative structure | NCETM *The Bar Model* — <https://www.ncetm.org.uk/classroom-resources/ca-the-bar-model/> | `bar`: part–whole, compare, equal parts, share; schematic lengths (RP-72). |
 | **Bottom-up hundred chart**: "up" means more, like a number line stood up | Bay-Williams & Fletcher, *A Bottom-Up Hundred Chart*, Teaching Children Mathematics (2017) | `hundreds` has `bottomUp: true`. |
 | **Rounding**: the two multiples and the **midpoint** make "which is nearer?" visible | common intervention practice; our P9 research (`design/research/place-value-rounding.md`) | `round-line` marks the midpoint with a tall labelled tick; `round-chart` boxes the halfway row. The number itself is never plotted (pupil's work, RN-4). |
+| **Rounding with a place-value chart**: mark the rounding place and the digit to its right ("underline the place, circle / box the digit next door"; the *rounding digit* and the *decider digit*), then 5 or more rounds up | NCETM Y5 number and place value ("What is 4773 rounded to the nearest hundred?") — <https://www.ncetm.org.uk/in-the-classroom/national-curriculum-resource-tool/?topic=1693&year=1536>; NCETM KS3 core concept 1.1 *Place value, estimation and rounding* — <https://www.ncetm.org.uk/classroom-resources/secmm-11-place-value-estimation-and-rounding/>; classroom practice write-ups: Not So Wimpy Teacher *Tips for teaching students to round* — <https://notsowimpyteacher.com/2018/08/tips-for-teaching-students-to-round.html>, Maths Angel *Place value chart rounding* — <https://maths-angel.com/lessons/place-value-chart-rounding> | `round-pv`: the number in a place-value chart, a **ring** round the digit in the rounding place (named under its column), an **underline** under the digit to its right ("look here"), an optional **rule strip**, an **answer row** in the same columns. Owner wording: ring = the place you round to, underline = the digit you look at. `round-mark`: the same two marks on the problem's own numeral. |
 | **Grid paper** with place heads keeps columns aligned for pupils with motor / visual-spatial difficulties | standard SEN accommodation; our VA rules | `gridpaper`: H T O heads, 14 mm squares, start arrow over the ones. |
 | **Arrays lead to area** | CCSS 3.MD.7; NCETM | `array` (dots) and `area` (squares edge to edge) are one family. |
 | Critics of counting supports warn of **dependence on counting in ones** | ERIC EJ1166663 review (plan "Research findings") | Pictures fade by removal (H1); the "More support" preset and "Fade" (S2) step them down. |
@@ -271,7 +272,8 @@ labels).
 | **Ink** | Only #000, #fff, #949494; no dashes, opacity, gradients or filters; stroke widths from the closed set; grey strokes never under 1 pt (INK-4). |
 | **Grey (Guided)** | `ctx.ink = 'grey'` draws a pane's LINES grey (text stays black: INK-3). Pictures ignore it: an H1 picture fades by being **removed**, not greyed. |
 | **Touch / shade ≥ 6 mm** (RP-5) | Ten-frame counters 6.5–7 mm, beads 6.5 mm, dice dots 6 mm, fingers 6 mm wide, array counters 6 mm, base-ten units 6 mm, area squares ≥ 6.5 mm, hundreds-chart cells ≥ 7.5 mm. |
-| **Writing ≥ 14 mm** | Grid-paper squares are 14 mm. No other pane has a writing place — a pane never adds a second answer slot (RUBRIC C1). The step strip's check boxes are unscored (`data-ws-graded="0"`). |
+| **Writing ≥ 14 mm** | Grid-paper squares are 14 mm; the answer rows of `pvgrid` and `round-pv` are 14 mm columns, 15 mm tall at L (owner ruling 2026-09-25: "room under the chart to write the answer"). These are WORKING places (`data-ws-support-part="unknown"`, `data-ws-graded="0"`): the problem keeps its own answer blank, which is the one graded slot (RUBRIC C1). No other pane has a writing place. The step strip's check boxes are unscored. |
+| **Key** | `ctx.key` fills a pane's answer row in the key (`data-ws-key="1"`); the pupil page never carries it. |
 | **Solid fill ≤ 7 mm** (INK-5) | Counters and beads only. |
 | **Text** | Sentence at cell-text + 3 pt; labels at zone-label size or more; Andika with cv04. |
 
@@ -285,16 +287,18 @@ their touch floors, so M is only a little smaller than L.
 | `objects` | outline objects in rows of 5; − crosses out; × equal groups in rings | PK–2 | n ≤ 20; + a,b ≤ 10; − a ≤ 20; × a ≤ 5, b ≤ 6 | 4 + 3 cars | 58×42 | 54×39 | hint H1 |
 | `tenframe` | 1–2 ten frames: first number solid, second hollow (shows make-ten); − crosses out | K–2 | n ≤ 20; +/− within 20 | 7 + 5 | 56×60 | 51×55 | hint H1 |
 | `dice` | dot tiles: dice 1–6, two rows of five 7–10 | PK–1 | n 1–10; + a,b ≤ 10; − a ≤ 10 | 4 + 3 | 65×41 | 63×39 | hint H1 |
-| `fingers` | our own line-art hands; index first, thumb at 5; 6–10 = full hand + hand | PK–1 | n 1–10; + a,b ≤ 5; − shows a | 3 + 2 | 78×56 | 78×55 | hint H1 |
-| `rekenrek` | 2 rows × (5 solid + 5 hollow) beads, pushed left | K–2 | n ≤ 20; + a,b ≤ 10; − a ≤ 20 | 8 + 6 | 84×36 | 84×35 | hint H1 |
+| `fingers` | Tabler Icons outline hands (MIT, see Credits), rebuilt per finger: raised fingers up, folded ones knuckle bumps, the thumb out only at 5, a wrist cuff; **index first**; 6–10 = a full hand + the second hand the same way; a pair is mirrored so the thumbs point to the middle; 6 mm fingers | PK–1 | n 1–10; + a,b ≤ 5; − shows a | 3 + 2 | 78×58 | 78×57 | hint H1 |
+| `rekenrek` | 2 rows × (5 solid + 5 hollow) beads, pushed left; − slides the taken beads to the right, apart from the kept ones, each with ONE diagonal stroke on a white halo (bottom row first), colours kept so 5 + 5 still shows | K–2 | n ≤ 20; + a,b ≤ 10; − a ≤ 20 | 8 + 6 | 84×36 | 84×35 | hint H1 |
 | `base10` | gridded to-scale rods and ones (u = 6 mm), ones 2 wide | 1–3 | n, +, − to 99 | 47 + 25 | 84×72 | 84×71 | hint H1 |
 | `base10-quick` | RP-31 quick sketch: square, stick, open dot; one number per line | 2–4 | to 999 | 368 + 257 | 83×80 | 83×79 | hint H1 |
 | `disks` | pv.js disk mat, one per number | 2–4 | to 9,999 | 146 + 238 | 116×105 | 107×96 | hint H1 |
-| `pvgrid` | ruled chart, bold place letters, digits in columns; **no answer row** | 2–4 | to 99,999; +, −, × | 3254 + 1618 | 66×47 | 66×44 | structural |
+| `pvgrid` | ruled chart, bold place letters, digits in columns, sign in its own column; under a calculation an **empty answer row** below a heavy rule (the key fills it) | 2–4 | to 99,999; +, −, × | 3254 + 1618 | 66×62 | 66×58 | structural |
 | `hundreds` | 1–100 chart or a window of rows; start ringed; `bottomUp` option | 1–3 | +/− with answer 1–100 | 37 + 20 | 86×54 | 81×51 | structural |
 | `round-line` | two multiples, 11 ticks, midpoint tall + labelled | 3–4 | round to 10 / 100 / 1000 | 47 → 10 | 117×32 | 112×30 | hint H2 |
+| `round-pv` | the number in a place-value chart (Th H T O, wider for big numbers: M HTh TTh …); ring on the rounding place + its name; underline + "look here" on the next digit; rule strip; answer row (level 4 pre-marks the zeros in grey); `level` 0–4 or the flags `ring` `look` `rule` `answerRow` `zeros` | 3–4 | round n ≤ 9,999,999 to 10 … 1,000,000 | 4,672 → 100 (level 4) | 59×68 | 55×63 | hint H2 |
+| `round-mark` | the problem's own numeral (digits set 0.8 em apart) with the ring and the underline, no chart | 3–4 | as `round-pv` | 4,672 → 100 | 39×16 | 32×14 | hint H4 |
 | `round-chart` | the chart from one multiple to the next, stood up, halfway boxed | 3–4 | round to 10 / 100 / 1000 | 64 → 10 | 23×94 | 22×88 | hint H2 |
-| `numberline` | marked line; ones when the numbers are within 15 (5 to 15 for 7 + 5), else tens / hundreds; start dot | 1–4 | n, +, − to 1,000 | 7 + 5 | 93×31 | 83×29 | hint H3 |
+| `numberline` | marked line; ones when the numbers are within 15 (5 to 15 for 7 + 5), else tens / hundreds spread to about 72 mm so hops of ten are drawable; start dot (with its own tick and label when it falls between ticks) | 1–4 | n, +, − to 1,000 | 7 + 5 | 93×31 | 83×29 | hint H3 |
 | `openline` | empty line, one tick: the start (left for +, right for −) | 2–4 | +, − | 58 + 26 | 113×31 | 105×29 | hint H3 |
 | `array` | × rows of open counters (RP-81, 5-gap); ÷ loose counters in rows of 10 to ring | 2–4 | × to 10×10; ÷ dividend ≤ 60 | 3 × 6 | 63×42 | 63×41 | hint H1 |
 | `area` | unit squares edge to edge (RP-94 weights) | 3–4 | × to 12×12 | 4 × 7 | 54×42 | 50×39 | hint H1 |
@@ -348,11 +352,16 @@ thin alias for `tenframe` / `dice` / `numberline` / `array` panes.
 | PK–K | `objects`, `dice`, `fingers` | — | — | — | — | — |
 | 1 | `tenframe`, `rekenrek`, `dice`, `numberline` | `base10`, `hundreds` | — | — | `base10` | — |
 | 2 | `tenframe`, `rekenrek`, `numberline` | `base10` → `base10-quick`, `hundreds`, `gridpaper`, `bar` | `array` | — | `base10`, `pvgrid` | — |
-| 3 | `numberline` | `base10-quick`, `disks`, `gridpaper`, `openline`, `bar` | `array` → `area`, `bar` | `gridpaper` | `disks`, `pvgrid` | `round-line`, `round-chart` |
-| 4 | — | `disks`, `gridpaper`, `openline`, `bar` | `area`, `bar` | `gridpaper`, `area` | `disks`, `pvgrid` | `round-line` |
+| 3 | `numberline` | `base10-quick`, `disks`, `gridpaper`, `openline`, `bar` | `array` → `area`, `bar` | `gridpaper` | `disks`, `pvgrid` | `round-line`, `round-chart`, `round-pv` → `round-mark` |
+| 4 | — | `disks`, `gridpaper`, `openline`, `bar` | `area`, `bar` | `gridpaper`, `area` | `disks`, `pvgrid` | `round-line`, `round-pv` → `round-mark` |
 | any | `boxsign`, `startarrow` (stacks), `steps` | | | | | |
 
 ### S4.6 Fading
+
+**Rounding marks** fade one at a time (`round-pv` `level`): 4 ring + look here + rule + answer row
+with zeros → 3 without the zeros → 2 without the rule → 1 ring only → 0 the chart and its answer row →
+then `round-mark` (marks on the numeral) → nothing. On a Guided page the marks and lines print grey
+(`ink:'grey'`), the digits stay black.
 
 Pictures (H1) go **within two steps** after a representation's bridging step (PEDAGOGY 4.2); they do
 not turn grey. Line panes and the boxed sign / arrow (H3–H4) may print grey on a Guided page
@@ -369,39 +378,41 @@ one problem — the page mixes them **by section** (default) or problem by probl
 Why: RP-4 allows one kind of visual per cell, so two quantity pictures clash; two counting routes
 (touch dots and a picture, a line or a chart) confuse the pupil, so they clash; the extras are marks,
 not pictures, and stack with anything; grid paper and the pv grid hold digits, so touch dots sit on
-them; grid paper already has its own start arrow.
+them; grid paper already has its own start arrow. `round-pv` is a chart (group `grid`) and clashes with `pvgrid`,
+`gridpaper` and `round-mark` (it already carries the marks); `round-mark` is a mark (group `extra`).
 
-| | `objects` | `tenframe` | `dice` | `fingers` | `rekenrek` | `base10` | `base10-quick` | `disks` | `pvgrid` | `hundreds` | `round-line` | `round-chart` | `numberline` | `openline` | `array` | `area` | `gridpaper` | `bar` | `boxsign` | `startarrow` | `steps` | `touchdots` |
-|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| `objects` | — | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ |
-| `tenframe` | ✗ | — | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ |
-| `dice` | ✗ | ✗ | — | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ |
-| `fingers` | ✗ | ✗ | ✗ | — | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ |
-| `rekenrek` | ✗ | ✗ | ✗ | ✗ | — | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ |
-| `base10` | ✗ | ✗ | ✗ | ✗ | ✗ | — | ✗ | ✗ | W | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | W | ✗ | ✓ | ✓ | ✓ | ✗ |
-| `base10-quick` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | — | ✗ | W | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | W | ✗ | ✓ | ✓ | ✓ | ✗ |
-| `disks` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | — | W | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | W | ✗ | ✓ | ✓ | ✓ | ✗ |
-| `pvgrid` | ✗ | ✗ | ✗ | ✗ | ✗ | W | W | W | — | W | W | W | W | W | ✗ | ✗ | ✗ | W | ✓ | ✓ | ✓ | ✓ |
-| `hundreds` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | W | — | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | W | W | ✓ | ✓ | ✓ | ✗ |
-| `round-line` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | W | ✗ | — | ✗ | ✗ | ✗ | ✗ | ✗ | W | W | ✓ | ✓ | ✓ | ✗ |
-| `round-chart` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | W | ✗ | ✗ | — | ✗ | ✗ | ✗ | ✗ | W | W | ✓ | ✓ | ✓ | ✗ |
-| `numberline` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | W | ✗ | ✗ | ✗ | — | ✗ | ✗ | ✗ | W | W | ✓ | ✓ | ✓ | ✗ |
-| `openline` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | W | ✗ | ✗ | ✗ | ✗ | — | ✗ | ✗ | W | W | ✓ | ✓ | ✓ | ✗ |
-| `array` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | — | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ |
-| `area` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | — | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ |
-| `gridpaper` | ✗ | ✗ | ✗ | ✗ | ✗ | W | W | W | ✗ | W | W | W | W | W | ✗ | ✗ | — | W | ✓ | ✗ | ✓ | ✓ |
-| `bar` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | W | W | W | W | W | W | ✗ | ✗ | W | — | ✓ | ✓ | ✓ | ✓ |
-| `boxsign` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | ✓ |
-| `startarrow` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | — | ✓ | ✓ |
-| `steps` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ |
-| `touchdots` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| | `objects` | `tenframe` | `dice` | `fingers` | `rekenrek` | `base10` | `base10-quick` | `disks` | `pvgrid` | `hundreds` | `round-line` | `round-chart` | `round-pv` | `round-mark` | `numberline` | `openline` | `array` | `area` | `gridpaper` | `bar` | `boxsign` | `startarrow` | `steps` | `touchdots` |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| `objects` | — | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ |
+| `tenframe` | ✗ | — | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ |
+| `dice` | ✗ | ✗ | — | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ |
+| `fingers` | ✗ | ✗ | ✗ | — | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ |
+| `rekenrek` | ✗ | ✗ | ✗ | ✗ | — | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ |
+| `base10` | ✗ | ✗ | ✗ | ✗ | ✗ | — | ✗ | ✗ | W | ✗ | ✗ | ✗ | W | ✓ | ✗ | ✗ | ✗ | ✗ | W | ✗ | ✓ | ✓ | ✓ | ✗ |
+| `base10-quick` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | — | ✗ | W | ✗ | ✗ | ✗ | W | ✓ | ✗ | ✗ | ✗ | ✗ | W | ✗ | ✓ | ✓ | ✓ | ✗ |
+| `disks` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | — | W | ✗ | ✗ | ✗ | W | ✓ | ✗ | ✗ | ✗ | ✗ | W | ✗ | ✓ | ✓ | ✓ | ✗ |
+| `pvgrid` | ✗ | ✗ | ✗ | ✗ | ✗ | W | W | W | — | W | W | W | ✗ | ✓ | W | W | ✗ | ✗ | ✗ | W | ✓ | ✓ | ✓ | ✓ |
+| `hundreds` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | W | — | ✗ | ✗ | W | ✓ | ✗ | ✗ | ✗ | ✗ | W | W | ✓ | ✓ | ✓ | ✗ |
+| `round-line` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | W | ✗ | — | ✗ | W | ✓ | ✗ | ✗ | ✗ | ✗ | W | W | ✓ | ✓ | ✓ | ✗ |
+| `round-chart` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | W | ✗ | ✗ | — | W | ✓ | ✗ | ✗ | ✗ | ✗ | W | W | ✓ | ✓ | ✓ | ✗ |
+| `round-pv` | ✗ | ✗ | ✗ | ✗ | ✗ | W | W | W | ✗ | W | W | W | — | ✗ | W | W | ✗ | ✗ | ✗ | W | ✓ | ✓ | ✓ | ✓ |
+| `round-mark` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `numberline` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | W | ✗ | ✗ | ✗ | W | ✓ | — | ✗ | ✗ | ✗ | W | W | ✓ | ✓ | ✓ | ✗ |
+| `openline` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | W | ✗ | ✗ | ✗ | W | ✓ | ✗ | — | ✗ | ✗ | W | W | ✓ | ✓ | ✓ | ✗ |
+| `array` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | — | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ |
+| `area` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ | — | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ |
+| `gridpaper` | ✗ | ✗ | ✗ | ✗ | ✗ | W | W | W | ✗ | W | W | W | ✗ | ✓ | W | W | ✗ | ✗ | — | W | ✓ | ✗ | ✓ | ✓ |
+| `bar` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | W | W | W | W | W | ✓ | W | W | ✗ | ✗ | W | — | ✓ | ✓ | ✓ | ✓ |
+| `boxsign` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | ✓ |
+| `startarrow` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | — | ✓ | ✓ |
+| `steps` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ |
+| `touchdots` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
 (`startarrow` only applies to a stacked problem; the matrix says it would not clash.)
 
 ### S4.8 Open points for the owner
 
-1. **Fingers**: index first, thumb at five (the common classroom order). Some teachers count thumb
-   first; say if you want that.
+1. **Fingers**: index first, thumb at five — confirmed by the owner (2026-09-25).
 2. **Base-ten to scale** needs a 60 mm rod (6 mm ones, RP-5), so it is limited to numbers to 99;
    hundreds use the quick sketch or disks.
 3. **Sentence over the picture** repeats the problem when the pane sits beside it. The allocator may
@@ -410,3 +421,11 @@ them; grid paper already has its own start arrow.
    each a 44 px hit area when the strip becomes tappable.
 5. **Rounding panes** print only the number as their sentence (the problem already says "Round … to
    the nearest …").
+6. **Rounding answer rows**: `round-pv` and `pvgrid` give the pupil a working row under the chart; the
+   problem's own blank stays the graded answer. Say if the chart row should become the graded slot.
+
+### S4.9 Credits
+
+| Asset | Source | Licence |
+|---|---|---|
+| Counting hands (`panes/hand-art.js`) | Tabler Icons v3.48.0, outline `hand-finger`, `hand-two-fingers`, `hand-three-fingers`, `hand-stop` — <https://tabler.io/icons>, npm `@tabler/icons` (<https://cdn.jsdelivr.net/npm/@tabler/icons@3.48.0/icons/outline/hand-stop.svg>) | MIT, © 2020-2026 Paweł Kuna; notice reproduced in the file. Path data vendored (pages print offline); fingers taken one by one, the folded index and folded thumb bumps and the wrist cuff are ours in Tabler's proportions, strokes re-weighted to 2.25 pt. |
