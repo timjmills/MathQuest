@@ -2153,7 +2153,7 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     if (p.kind === 'scale') return scaleLineTwin(q, p, categoryId);
     if (!order && (!PV_TWIN_KINDS.has(p.kind) || !PV_TWIN_TYPES.has(q.answerType))) return null;
     if (p.kind === 'round' && p.mark) return null;                            // a drawn mark: the line widget's
-    if (p.kind === 'disks' && p.task !== 'count' && q.answerType !== 'number') return null;
+    if (p.kind === 'disks' && p.task !== 'count' && p.task !== 'all' && q.answerType !== 'number') return null;
     let html = '';
     let digitPt = 28;
     try {

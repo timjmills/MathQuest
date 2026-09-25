@@ -202,6 +202,11 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'line-arrow': 'Write the number the arrow points to.',
     'line-letters': 'Write the number at each letter.',
     'line-estimate': 'Estimate. Mark the number on the line.',
+    // Build lane placevalue (vis_pv_dot_disks): the new counter tasks.
+    'disk-left': 'Write the number that is left.',
+    'counters-move': 'Move each counter one place. Write the answer.',
+    'counters-all': 'Write every number the counters make. Start with the smallest.',
+    'draw-dots': 'Draw dots in the chart to show the number.',
     'sort-round': 'Write each number under what it rounds to.',
     'round-table': 'Round each number. Fill in the table.',
     estimate: 'Round each number. Then estimate.',

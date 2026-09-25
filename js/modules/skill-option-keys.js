@@ -273,7 +273,10 @@ export const VALUE_TOKENS = Object.freeze({
         find: 'F', order: 'O', collection: 'D', words: 'W', missing: 'I', numerals: 'U', hands: 'B',
         // build lane placevalue (nl_20, number_line_scales): the last letter, then digits past the
         // numeric set members (0-3)
-        mark: 'S', estimate: '4' }),
+        mark: 'S', estimate: '4',
+        // build lane placevalue (vis_pv_dot_disks, place_value_disks): crossed counters, the moves
+        // of × / ÷ 10 (every number from n counters reuses `all`)
+        take: '5', x10: '6', d10: '7' }),
     zeroPlace: Object.freeze({ none: 'N', some: 'S', always: 'A' }),
     op: Object.freeze({ x: 'M', '/': 'D', both: 'B' }),
     order: Object.freeze({ largest: 'L', scrambled: 'S',

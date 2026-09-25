@@ -258,7 +258,7 @@ match across the app **for the Year 6 use** (grade-5/6 ranges, decimals, fractio
 | # | Representation | Where (Y6) | Y3 | Y1/Y2 | Status | Existing / proposed |
 |---|---|---|---|---|---|---|
 | R04 | PV chart with counters, to 7 digits (build / read; two charts compared; family header M \| Th \| Ones) | B1 S1–S4, S6–S7; B2 S9 | R03/R04 | — | PARTIAL | `template:pv` `disks` / `build` / `compare` (letters to M); skill bands stop at 9,999 / 999,999 → add a 9,999,999 band; `groups: true` header GAP |
-| R05 | PV chart with plain unlabelled dots | B1 S1, S4, S6–S7; B8 S1–S5 | R05 | — | GAP | `disk:'value'\|'dot'` on `place_value_disks` / `pv_disks_build` |
+| R05 | PV chart with plain unlabelled dots | B1 S1, S4, S6–S7; B8 S1–S5 | R05 | — | PARTIAL | whole numbers MATCH (`labels: 'none'` on `place_value_disks` / `pv_disks_build`, vis_pv_dot_disks); to 7 digits waits for `vis_pv_bands_millions`, decimals (B8) for `vis_pv_decimal_places` |
 | R06 | PV digit chart | B1 S1–S3, S6 | R06 | — | MATCH / PARTIAL | `placevalue:pv_digit_drag`, `_pvDigitSupport` `support:'chart'`; 7-digit band (PROP) |
 | R11 | Part-whole, 2 parts (numbers, letters) | B2 S13; B7 S6, S8 | R11 | Y1 R23 | MATCH / PARTIAL | `template:bond`; letters in a part → text values |
 | R12 | Part-whole with pictures in the circles (cubes, counters, shapes) | B7 S6, S8 | R12 | Y1 R24 | GAP | bond `draw:'objects'\|'cubes'` |

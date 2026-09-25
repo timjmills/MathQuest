@@ -66,6 +66,22 @@ function labelPt(place, size) {
     return Math.max(8, Math.min(g.pt, fit));
 }
 
+/**
+ * A PLAIN DOT counter (vis_pv_dot_disks): a solid 6 mm dot with no value inside - it takes its
+ * value from the column it stands in (WRM's "counters on a place-value chart"). Solid fill within
+ * INK-5's 7 mm.
+ */
+function dotCounter(cx, cy, place) {
+    return `<circle data-pv-disk="${place}" data-pv-dot-counter="1" cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="3" fill="#000"/>`;
+}
+/** One diagonal stroke across a counter, on a white halo so it reads over a solid dot: taken away. */
+function crossOut(cx, cy, d) {
+    const r = d / 2 + 0.6;
+    const a = `x1="${(cx - r * 0.72).toFixed(2)}" y1="${(cy + r * 0.72).toFixed(2)}" x2="${(cx + r * 0.72).toFixed(2)}" y2="${(cy - r * 0.72).toFixed(2)}"`;
+    return `<line data-pv-crossed="1" ${a} stroke="#fff" stroke-width="${(2.25 * 1.9 * PT_MM).toFixed(3)}" stroke-linecap="round"/>`
+        + `<line ${a} stroke="#000" stroke-width="${(1.5 * PT_MM).toFixed(3)}" stroke-linecap="round"/>`;
+}
+
 /** One disk, centred at (cx, cy) mm. `data-pv-disk` names its place for the audit's recount. */
 function disk(cx, cy, place, size, strokePt = HAIR_PT) {
     const d = diskDiameter(place, size);
@@ -83,13 +99,16 @@ function disk(cx, cy, place, size, strokePt = HAIR_PT) {
  * @param {{places: number[], counts?: Object<number, number>|null, size?: 'S'|'M'|'L', pxPerMm?: number}} o
  * @returns {{svg: string, widthMm: number, heightMm: number}}
  */
-export function diskMatSVG({ places, counts = null, size = 'L', pxPerMm = 0, diskPt = HAIR_PT } = {}) {
+export function diskMatSVG({ places, counts = null, size = 'L', pxPerMm = 0, diskPt = HAIR_PT, dots = false, crossed = null, arrows = null } = {}) {
     const g = DISK_SIZES[size] || DISK_SIZES.L;
     const cols = (places || []).slice().sort((a, b) => b - a);
     const sides = cols.map(p => zoneSide(p, size));
     const zoneH = Math.max(...sides);
     const widthMm = sides.reduce((a, b) => a + b, 0);
-    const heightMm = g.head + zoneH;
+    // `arrows` 'left' (× 10) or 'right' (÷ 10): one arrow under each zone that holds counters, to
+    // the next zone - every counter moves one place (vis_pv_dot_disks).
+    const arrowH = arrows ? 8 : 0;
+    const heightMm = g.head + zoneH + arrowH;
     const sw = (HAIR_PT * PT_MM).toFixed(3);
     let body = '';
     let x = 0;
@@ -102,10 +121,23 @@ export function diskMatSVG({ places, counts = null, size = 'L', pxPerMm = 0, dis
             + `fill="none" stroke="#000" stroke-width="${sw}" data-pv-zone="${p}"/>`;
         const c = counts ? Math.max(0, Math.min(9, Math.floor(Number(counts[p]) || 0))) : 0;
         const pitch = diskDiameter(p, size) + 2;
+        // The LAST `crossed[p]` counters of a zone are crossed out (taken away).
+        const xk = crossed ? Math.max(0, Math.min(c, Math.floor(Number(crossed[p]) || 0))) : 0;
         for (let k = 0; k < c; k++) {
             const cx = x + 1 + pitch * (k % 3) + pitch / 2;
             const cy = g.head + 1 + pitch * Math.floor(k / 3) + pitch / 2;
-            body += disk(cx, cy, p, size, diskPt);
+            body += dots ? dotCounter(cx, cy, p) : disk(cx, cy, p, size, diskPt);
+            if (k >= c - xk) body += crossOut(cx, cy, dots ? 6 : diskDiameter(p, size));
+        }
+        if (arrows && c > 0) {
+            const i2 = arrows === 'left' ? i - 1 : i + 1;
+            if (i2 >= 0 && i2 < cols.length) {
+                const x2 = arrows === 'left' ? x - sides[i2] / 2 : x + w + sides[i2] / 2;
+                const x1 = x + w / 2, y = g.head + zoneH + arrowH / 2 + 0.5;
+                const dir = arrows === 'left' ? -1 : 1;
+                body += `<line data-pv-move="${arrows}" x1="${x1.toFixed(2)}" y1="${y.toFixed(2)}" x2="${(x2 - dir * 2.6).toFixed(2)}" y2="${y.toFixed(2)}" stroke="#000" stroke-width="${(1.5 * PT_MM).toFixed(3)}"/>`
+                    + `<path d="M${x2.toFixed(2)} ${y.toFixed(2)}L${(x2 - dir * 2.8).toFixed(2)} ${(y - 1.5).toFixed(2)}L${(x2 - dir * 2.8).toFixed(2)} ${(y + 1.5).toFixed(2)}Z" fill="#000"/>`;
+            }
         }
         x += w;
     });
@@ -704,9 +736,26 @@ register('pv', {
                 return `<div class="pv-cell">${center(scaleLineSVG({ ...base, arrow: p.n }))}${frameHTML(ctx, '____', kv, Math.max(2, floor))}</div>`;
             }
             case 'disks': {
-                const mat = diskMatSVG({ places: p.places, counts: p.counts, size: ctx.size }).svg;
-                const q = p.task === 'count' ? `${PLACE_WORD_KIT[p.place] || ''} disks: ____` : '____';
-                return `<div class="pv-cell">${center(mat)}${frameHTML(ctx, q, kv, digits)}</div>`;
+                // vis_pv_dot_disks: plain dots (`dots`), crossed counters (task take), the move
+                // arrows of × / ÷ 10 (task x10 / d10), and every number from n counters (task all).
+                const moving = p.task === 'x10' ? 'left' : p.task === 'd10' ? 'right' : null;
+                if (p.task === 'all') {
+                    const mat = diskMatSVG({ places: p.places, counts: null, size: ctx.size }).svg;
+                    const head = `<span style="font-size:${pt(m.textPt + 3)};font-weight:400;">Use</span> ${big(esc(String(p.counters)))} `
+                        + `<span style="font-size:${pt(m.textPt + 3)};font-weight:400;">counters.</span>`;
+                    const list = (p.sorted || []).map(String);
+                    const w = Math.max(2, ...list.map((v) => v.replace(/[^0-9]/g, '').length));
+                    // The numbers in a grid of boxes, three to a row, read left to right (no comma
+                    // ever starts a line).
+                    const boxes = list.map((v, i) => blank({ id: `o${i}`, kind: 'number', shape: 'box', digits: w, graded: true, order: i,
+                        scopes: ['full', 'answer-only'] }, ctx, v)).join('');
+                    return `<div class="pv-cell">${center(head)}${center(mat)}<div class="ws-eq pv-allnums" style="font-weight:700;display:grid;`
+                        + `grid-template-columns:repeat(${Math.min(3, list.length)},auto);justify-content:center;gap:2mm 5mm;">${boxes}</div></div>`;
+                }
+                const mat = diskMatSVG({ places: p.places, counts: p.counts, size: ctx.size, dots: !!p.dots, crossed: p.crossed || null, arrows: moving }).svg;
+                const frame = p.task === 'count' ? `${PLACE_WORD_KIT[p.place] || ''}${p.dots ? '' : ' disks'}: ____`
+                    : p.task === 'x10' ? `${fmt(p.n)} × 10 = ____` : p.task === 'd10' ? `${fmt(p.n)} ÷ 10 = ____` : '____';
+                return `<div class="pv-cell">${center(mat)}${frameHTML(ctx, frame, kv, digits)}</div>`;
             }
             case 'build': {
                 // The key draws the disks; finished work draws the disks of the value written.
@@ -715,7 +764,7 @@ register('pv', {
                     const v = Number(String(shownVal(ctx, 'answer', '')).replace(/[^0-9]/g, ''));
                     if (Number.isFinite(v)) counts = Object.fromEntries((p.places || []).map((pl) => [pl, Math.floor(v / pl) % 10]));
                 }
-                const mat = diskMatSVG({ places: p.places, counts, size: ctx.size, diskPt: 1.5 }).svg;
+                const mat = diskMatSVG({ places: p.places, counts, size: ctx.size, diskPt: 1.5, dots: !!p.dots }).svg;
                 return `<div class="pv-cell">${center(`<span style="font-size:${pt(m.digitPt)};font-weight:700;">${esc(fmt(p.n))}</span>`)}`
                     + `<div data-ws-slot="answer" data-ws-shape="draw">${mat}</div></div>`;
             }
@@ -747,7 +796,7 @@ register('pv', {
         const slots = { answer: { value: display, graded: true, accept: [String(value)] } };
         if (p.kind === 'expand') (p.parts || []).forEach((v, i) => { slots[`part${i}`] = { value: fmt(v), graded: true }; });
         if (p.kind === 'blanks' || p.kind === 'estimate') (p.keys || []).forEach((v, i) => { slots[`b${i}`] = { value: String(v), graded: true }; });
-        if (p.kind === 'order') (p.sorted || []).forEach((v, i) => { slots[`o${i}`] = { value: String(v), graded: true }; });
+        if (p.kind === 'order' || (p.kind === 'disks' && p.task === 'all')) (p.sorted || []).forEach((v, i) => { slots[`o${i}`] = { value: String(v), graded: true }; });
         if (p.kind === 'chart') (p.keys || []).forEach((v, i) => { slots[`d${i}`] = { value: String(v), graded: true }; });
         if (p.kind === 'scale' && p.task === 'fill') (p.targets || []).forEach((v, i) => { slots[`b${i}`] = { value: fmt(v), graded: true }; });
         if (p.kind === 'expand-line' && p.also) slots.answer.accept.push(String(p.also));

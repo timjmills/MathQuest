@@ -257,7 +257,7 @@ offered and need not be (the school is in Qatar).
 | R02 | Base-10 quick sketch (square/line/dot) | B1 S1,5,12 | MATCH | `pane:base10-quick`; draw: `template:base10` (`composing:base10_build`, `base10_build_hundreds`) |
 | R03 | Place-value counters (disks) loose/in a row | B1 S8; B2 S2–S5 | MATCH | `template:pv` kind `disks` (`placevalue:place_value_disks`); `pane:disks` |
 | R04 | H\|T\|O chart with counters (build/read) | B1 S8–S9,12; B2 S2–S5,11–18; B4 S4–S9 | MATCH / PARTIAL | `template:pv` `build` (`placevalue:pv_disks_build`); beside a calculation → wire `pane:pvgrid`/`disks` |
-| R05 | Chart with plain unlabelled dots | B1 S8–S9; B2 S5 | GAP | option `disk:'value'\|'dot'` on place_value_disks / pv_disks_build |
+| R05 | Chart with plain unlabelled dots | B1 S8–S9; B2 S5 | MATCH | `labels: 'none'` (plain dots, the column gives the value) on `placevalue:place_value_disks` / `pv_disks_build` (vis_pv_dot_disks) |
 | R06 | H\|T\|O digit chart / place heads | B1 S13; B2 S11–18 | MATCH | `_pvDigitSupport` `support:'chart'`; `template:stack` level 2 heads |
 | R07 | Bead string (100) | B1 S1 | GAP | new `pane:beadstring` (tens alternating solid/hollow) |
 | R08 | Bundles / packs of 10 and 100 | B1 S1,4,5; B2 S3–S4; B4 S1,7 | GAP | `objects` kind `bundles` (+ "100"/"10" packs) |

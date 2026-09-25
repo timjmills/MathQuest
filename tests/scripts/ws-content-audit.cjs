@@ -1591,8 +1591,21 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
                     break;
                 }
                 case 'disks': {
+                    // vis_pv_dot_disks tasks (build lane placevalue): every number from c counters,
+                    // what is left after the crossed ones, the moves of × / ÷ 10.
+                    if (pv.task === 'all') {
+                        const want = [];
+                        const ps = pv.places || [];
+                        const rec = (i, left, acc) => { if (i === ps.length - 1) { want.push(acc + left * ps[i]); return; } for (let k = left; k >= 0; k--) rec(i + 1, left - k, acc + k * ps[i]); };
+                        if (ps.length) rec(0, pv.counters, 0);
+                        const w = [...new Set(want)].sort((a, b) => a - b).join(',');
+                        if ((pv.nums || []).join(',') !== w || (it.keyParts || []).map(Number).join(',') !== w) add('pv-recompute', `${pv.counters} counters make ${w}, keyed ${(it.keyParts || []).join(', ')}`);
+                        break;
+                    }
                     const n = Object.entries(pv.counts || {}).reduce((a, [p, c]) => a + Number(p) * c, 0);
-                    const want = pv.task === 'count' ? (pv.counts || {})[pv.place] : n;
+                    const left = n - Object.entries(pv.crossed || {}).reduce((a, [p, c]) => a + Number(p) * c, 0);
+                    const want = pv.task === 'count' ? (pv.counts || {})[pv.place] : pv.task === 'take' ? left
+                        : pv.task === 'x10' ? n * 10 : pv.task === 'd10' ? n / 10 : n;
                     if (n !== pv.n || Number(ans) !== want) add('pv-recompute', `the disks make ${n}${pv.task === 'count' ? ` (${(pv.counts || {})[pv.place]} ${PV_WORD[pv.place]})` : ''}, keyed ${ans}`);
                     // answer-matches-picture: recount the circles the drawing actually has.
                     const drawn = it.drawnDisks || {};

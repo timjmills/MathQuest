@@ -279,7 +279,10 @@
       "numerals": "U",
       "hands": "B",
       "mark": "S",
-      "estimate": "4"
+      "estimate": "4",
+      "take": "5",
+      "x10": "6",
+      "d10": "7"
     },
     "zeroPlace": {
       "none": "N",

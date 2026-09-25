@@ -557,11 +557,14 @@ function genDisks(q, skill, o) {
     let { counts, n } = diskCounts(places, o);
     for (let t = 0; t < 20 && n > hi; t++) ({ counts, n } = diskCounts(places, o));
     if (n > hi) { n = randInt(10 ** (nd - 1), hi); String(n).split('').forEach((d, i) => { counts[places[i]] = Number(d); }); }
-    const screenMat = (withCounts) => diskMatSVG({ places, counts: withCounts ? counts : null, size: 'M', pxPerMm: SCREEN_PX_PER_MM }).svg;
+    // vis_pv_dot_disks: `labels: 'none'` draws plain dots that take their value from the column.
+    const dots = o.labels === 'none';
+    const screenMat = (withCounts) => diskMatSVG({ places, counts: withCounts ? counts : null, size: 'M', pxPerMm: SCREEN_PX_PER_MM, dots }).svg;
+    if (skill === 'place_value_disks' && ['take', 'x10', 'd10', 'all'].includes(o.task)) { genDiskTask(q, o, places, counts, n, dots); return; }
     if (skill === 'pv_disks_build') {
         const parts = places.map(p => `${counts[p]} ${counts[p] === 1 ? PLACE_ONE[p] : PLACE_WORD[p]}`);
         q.text = `Build the number ${fmt(n)} on the place value mat.`;
-        q.printText = `Draw ${fmt(n)} with place-value disks.`;
+        q.printText = dots ? `Draw ${fmt(n)} with dots.` : `Draw ${fmt(n)} with place-value disks.`;
         q.target = n;
         q.places = places.slice();
         q.ans = n;
@@ -571,8 +574,8 @@ function genDisks(q, skill, o) {
         q.visual = '';
         q.hint = 'Look at each digit. Draw that many disks in its place. A zero place stays empty.';
         q.skillLabel = 'Draw Place-Value Disks';
-        q.pv = { kind: 'build', n, places: places.slice() };
-        setCell(q, { kind: 'build', n, places: places.slice(), counts: { ...counts }, keyValue: q.printAnswer });
+        q.pv = { kind: 'build', n, places: places.slice(), dots };
+        setCell(q, { kind: 'build', n, places: places.slice(), counts: { ...counts }, keyValue: q.printAnswer, dots });
         return;
     }
     const task = o.task === 'count' ? 'count' : 'read';
@@ -595,7 +598,97 @@ function genDisks(q, skill, o) {
         q.hint = 'Count the disks in each zone. Write that digit in its place. An empty zone is a 0.';
         q.pv = { kind: 'disks', task, places: places.slice(), counts: { ...counts }, n };
     }
-    setCell(q, { kind: 'disks', task, places: places.slice(), counts: { ...counts }, place: q.pv.place });
+    q.pv.dots = dots;
+    setCell(q, { kind: 'disks', task, places: places.slice(), counts: { ...counts }, place: q.pv.place, dots });
+}
+
+/**
+ * vis_pv_dot_disks: the three new mat tasks of place_value_disks.
+ *   take  some counters are crossed out: write the number that is left (WRM "a counter is taken")
+ *   x10   the counters and an arrow from each zone to the next on its left: write n × 10
+ *   d10   a number ending in 0, the arrows to the right: write n ÷ 10
+ *   all   use exactly c counters on the chart: write every number they make, smallest first
+ */
+function genDiskTask(q, o, places, counts, n, dots) {
+    const task = o.task;
+    const top = places[0];
+    q.options = [];
+    q.answerType = 'number';
+    q.skillLabel = 'Place-Value Counters';
+    const mat = (m) => `<div style="text-align:center;">${diskMatSVG({ size: 'M', pxPerMm: SCREEN_PX_PER_MM, dots, ...m }).svg}</div>`;
+    if (task === 'all') {
+        // A tens and ones chart, 2 to 5 counters (3 to 6 numbers): a three-place chart with even
+        // three counters asks for ten numbers, too many for one cell.
+        const c = [2, 3, 4, 5][blockOrder(4)[slot(4)]];
+        const ps = [10, 1];
+        const nums = [];
+        const rec = (i, left, acc) => {
+            if (i === ps.length - 1) { nums.push(acc + left * ps[i]); return; }
+            for (let k = left; k >= 0; k--) rec(i + 1, left - k, acc + k * ps[i]);
+        };
+        rec(0, c, 0);
+        const sorted = [...new Set(nums)].sort((a, b) => a - b);
+        inlineBlanks(q, sorted.map(() => '___').join(', '), [sorted.map(String)], sorted.map((v) => String(v).length + 1));
+        q.text = `Use ${c} counters on the chart. Write every number you can make, smallest first: ${q.text}`;
+        q.printText = `Use ${c} counters. Write every number you can make, smallest first.`;
+        q.ans = sorted.join(', ');
+        q.printAnswer = sorted.map(fmt).join(', ');
+        q.visual = mat({ places: ps, counts: null });
+        q.hint = `Try all ${c} counters in one place, then move them one at a time.`;
+        q.pv = { kind: 'disks', task, places: ps, counters: c, nums: sorted, dots };
+        setCell(q, { kind: 'disks', task, places: ps, counters: c, sorted: sorted.map(fmt), keyValue: q.printAnswer });
+        return;
+    }
+    if (task === 'take') {
+        // Cross out 1-3 counters of one or two places, never all of the mat.
+        const withSome = places.filter((p) => counts[p] > 0);
+        const crossed = {};
+        const k = 1 + (slot(3) === 2 && withSome.length > 1 ? 1 : 0);
+        // Never every counter of the biggest place: the number left keeps its size.
+        for (const p of shuffle(withSome.slice()).slice(0, k)) {
+            const most = Math.min(3, counts[p] - (p === top ? 1 : 0));
+            if (most >= 1) crossed[p] = randInt(1, most);
+        }
+        if (!Object.keys(crossed).length) { const p = withSome[withSome.length - 1]; if (p !== top || counts[p] > 1) crossed[p] = 1; }
+        const taken = Object.entries(crossed).reduce((a, [p, c]) => a + Number(p) * c, 0);
+        if (taken >= n) { const p = withSome[withSome.length - 1]; for (const key of Object.keys(crossed)) delete crossed[key]; crossed[p] = 1; }
+        const left = n - Object.entries(crossed).reduce((a, [p, c]) => a + Number(p) * c, 0);
+        q.text = 'Some counters are crossed out. What number is left?';
+        q.printText = 'Write the number that is left.';
+        q.ans = left;
+        q.hint = 'Count only the counters that are not crossed out, place by place.';
+        q.visual = mat({ places, counts, crossed });
+        q.pv = { kind: 'disks', task, places: places.slice(), counts: { ...counts }, crossed: { ...crossed }, n, left, dots };
+        setCell(q, { kind: 'disks', task, places: places.slice(), counts: { ...counts }, crossed: { ...crossed }, n, dots, keyValue: left });
+        return;
+    }
+    // x10 / d10: the chart has one more place than the number, on the side the counters move to.
+    const up = task === 'x10';
+    let m = n, cs = { ...counts }, ps = places.slice();
+    if (up && ps.length > 3) {
+        // × 10 needs a zone to move into: a number of at most three digits (four zones at most).
+        ps = ps.slice(-3);
+        cs = Object.fromEntries(ps.map((p) => [p, counts[p] || 0]));
+        if (!cs[ps[0]]) cs[ps[0]] = randInt(1, 9);
+        m = Object.entries(cs).reduce((a, [p, c]) => a + Number(p) * c, 0);
+    }
+    if (up) ps = [ps[0] * 10, ...ps];
+    else {
+        // ÷ 10: a number whose ones zone is empty; the chart keeps its places (the ones zone receives).
+        cs = { ...counts, 1: 0 };
+        if (!Object.keys(cs).some((p) => Number(p) > 1 && cs[p] > 0)) cs[10] = randInt(1, 9);
+        m = Object.entries(cs).reduce((a, [p, c]) => a + Number(p) * c, 0);
+    }
+    const ans = up ? m * 10 : m / 10;
+    const glyph = up ? '×' : '÷';
+    q.text = `Every counter moves one place ${up ? 'left' : 'right'}. ${fmt(m)} ${glyph} 10 = ?`;
+    q.printText = `${fmt(m)} ${glyph} 10 = ____`;
+    q.ans = ans;
+    q.hint = up ? 'Each counter moves one place to the left: ones become tens, tens become hundreds.'
+        : 'Each counter moves one place to the right: tens become ones, hundreds become tens.';
+    q.visual = mat({ places: ps, counts: cs, arrows: up ? 'left' : 'right' });
+    q.pv = { kind: 'disks', task, places: ps, counts: { ...cs }, n: m, ans, dots };
+    setCell(q, { kind: 'disks', task, places: ps, counts: { ...cs }, n: m, dots, keyValue: ans });
 }
 
 function genTimesTen(q, skill, o) {

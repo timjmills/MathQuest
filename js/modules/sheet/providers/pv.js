@@ -53,7 +53,8 @@ function stringsBy(pickDef, fallbackDef) {
     const cache = new Map();
     const get = (def) => { if (!cache.has(def)) cache.set(def, strings(def)); return cache.get(def); };
     const fn = (ref = {}) => {
-        const def = (ref && ref.q && pickDef(ref.q)) || fallbackDef;
+        // The page's first item picks, else the skill's own options (a page of one task / scope).
+        const def = (ref && ref.q && pickDef(ref.q)) || (ref && ref.opts && !ref.q && pickDef({ pv: { ...ref.opts } })) || fallbackDef;
         return get(def)(ref);
     };
     fn.def = fallbackDef;
@@ -394,7 +395,7 @@ for (const id of ['more_less_10', 'more_less_100']) {
 /* =============================================================================== disks, chart, x10 */
 
 registerSkill('placevalue:place_value_disks', {
-    strings: stringsBy((q) => (pvOf(q).task === 'count' ? DISK_COUNT : null), {
+    strings: stringsBy((q) => (pvOf(q).task === 'count' ? DISK_COUNT : DISK_TASKS[pvOf(q).task] || null), {
         iCan: 'I Can read a number from place-value disks',
         instructionKey: 'disk-read',
         steps: ['Count the disks in each zone.', 'Write that digit in its place.', 'An empty zone is a 0.'],
@@ -407,6 +408,24 @@ registerSkill('placevalue:place_value_disks', {
         const counts = obj(p.counts) || {};
         const places = arr(p.places).map(Number);
         if (!places.length) return [];
+        if (p.task === 'all') {
+            const nums = arr(p.nums).map(Number);
+            return clampSteps([step(`Put all ${p.counters} counters in the biggest place: ${f(nums[nums.length - 1])}.`),
+                step('Move one counter to the next place each time.'), step(`Last, all ${p.counters} are in the ones: ${f(nums[0])}.`),
+                step(`Write them, smallest first: ${nums.map(f).join(', ')}.`, nums.map((v, i) => ({ slot: `o${i}`, value: f(v) })))]);
+        }
+        if (p.task === 'take') {
+            const crossed = obj(p.crossed) || {};
+            const taken = Object.entries(crossed).map(([pl, c]) => `${c} ${PLACE_WORD[pl]}`).join(' and ');
+            return [step(`The counters show ${f(p.n)}.`), step(`${taken} are crossed out.`), step('Count what is left, place by place.'),
+                step(`${f(p.left)} is left.`, [{ slot: 'answer', value: f(p.left) }])];
+        }
+        if (p.task === 'x10' || p.task === 'd10') {
+            const up = p.task === 'x10';
+            return [step(`The counters show ${f(p.n)}.`), step(`Every counter moves one place ${up ? 'left' : 'right'}.`),
+                step(up ? 'Ones become tens, tens become hundreds.' : 'Tens become ones, hundreds become tens.'),
+                step(`${f(p.n)} ${up ? '×' : '÷'} 10 = ${f(p.ans)}.`, [{ slot: 'answer', value: f(p.ans) }])];
+        }
         if (p.task === 'count') {
             return [step(`Find the ${PLACE_WORD[p.place]} zone.`), step(`Each disk there says ${f(p.place)}.`),
                 step(`Count them: there are ${counts[p.place]}.`), step(`Write ${counts[p.place]}.`, [{ slot: 'answer', value: String(counts[p.place]) }])];
@@ -420,6 +439,31 @@ registerSkill('placevalue:place_value_disks', {
         const counts = obj(p.counts) || {};
         const places = arr(p.places).map(Number);
         if (!places.length) return null;
+        if (p.task === 'all') {
+            const nums = arr(p.nums).map(Number);
+            // M-V16: swapped the tens and the ones of one number (41 for 14); M-C2: biggest first.
+            const k = nums.findIndex((v) => v >= 10 && Number(String(v).split('').reverse().join('')) !== v);
+            const swapped = nums.map((v, i) => (i === k ? Number(String(v).split('').reverse().join('')) : v));
+            return choose(q, [
+                k >= 0 ? { value: swapped.map(f).join(', '), misconception: 'M-V16', explain: `Swapped the tens and the ones of ${f(nums[k])}.`,
+                    slots: Object.fromEntries(swapped.map((v, i) => [`o${i}`, f(v)])) } : null,
+                { value: nums.slice().reverse().map(f).join(', '), misconception: 'M-C2', explain: 'Wrote the numbers biggest first.',
+                    slots: Object.fromEntries(nums.slice().reverse().map((v, i) => [`o${i}`, f(v)])) },
+            ]);
+        }
+        if (p.task === 'take') {
+            return choose(q, [
+                { value: p.n, misconception: 'M-V17', explain: 'Counted the crossed-out counters too.' },
+                { value: p.n - p.left, misconception: 'M-V18', explain: 'Wrote what was taken away, not what is left.' },
+            ]);
+        }
+        if (p.task === 'x10' || p.task === 'd10') {
+            const up = p.task === 'x10';
+            return choose(q, [
+                { value: up ? p.n + 10 : p.n - 10, misconception: 'M-Z5', explain: up ? 'Added 10 instead of multiplying.' : 'Took away 10 instead of dividing.' },
+                { value: up ? p.n / 10 : p.n * 10, misconception: 'M-Z4', explain: 'Moved the counters the wrong way.' },
+            ]);
+        }
         if (p.task === 'count') {
             return choose(q, [
                 { value: (counts[p.place] || 0) * p.place, misconception: 'M-V4', explain: 'Wrote what the disks are worth, not how many.' },
@@ -435,6 +479,22 @@ registerSkill('placevalue:place_value_disks', {
     },
 });
 
+// vis_pv_dot_disks (build lane placevalue): the new counter tasks.
+const DISK_TASKS = {
+    take: { iCan: 'I Can find what is left on a place-value chart', instructionKey: 'disk-left',
+        steps: ['Look at the crossed-out counters.', 'Count the counters that are left in each place.', 'Write the number that is left.'],
+        say: '__ is left.', sayValues: (q) => [q.ans] },
+    x10: { iCan: 'I Can multiply by 10 on a place-value chart', instructionKey: 'counters-move',
+        steps: ['Read the number on the chart.', 'Move every counter one place left.', 'Read the new number.'],
+        say: '__ times 10 is __.', sayValues: (q) => { const p = pvOf(q); return [p.n, q.ans]; } },
+    d10: { iCan: 'I Can divide by 10 on a place-value chart', instructionKey: 'counters-move',
+        steps: ['Read the number on the chart.', 'Move every counter one place right.', 'Read the new number.'],
+        say: '__ divided by 10 is __.', sayValues: (q) => { const p = pvOf(q); return [p.n, q.ans]; } },
+    all: { iCan: 'I Can make every number with a few counters', instructionKey: 'counters-all',
+        steps: ['Put every counter in the biggest place.', 'Move one counter to the next place.', 'Write each number. Start with the smallest.'],
+        say: 'With __ counters I can make __ numbers.', sayValues: (q) => { const p = pvOf(q); return [p.counters, arr(p.nums).length]; } },
+};
+
 const DISK_COUNT = {
     iCan: 'I Can count the disks in one place',
     instructionKey: 'disk-count',
@@ -443,8 +503,15 @@ const DISK_COUNT = {
     sayValues: (q) => [q.ans],
 };
 
+const BUILD_DOTS = {
+    iCan: 'I Can draw dots on a place-value chart for a number',
+    instructionKey: 'draw-dots',
+    steps: ['Read each digit of the number.', 'Draw that many dots in its column.', 'A zero column stays empty.'],
+    say: 'I drew __.',
+    sayValues: (q) => { const p = pvOf(q); return p.n ? [arr(p.places).map((pl) => `${digitAt(p.n, pl)} ${PLACE_WORD[pl]}`).join(', ')] : null; },
+};
 registerSkill('placevalue:pv_disks_build', {
-    strings: strings({
+    strings: stringsBy((q) => ((pvOf(q).dots || pvOf(q).labels === 'none') ? BUILD_DOTS : null), {
         iCan: 'I Can draw place-value disks for a number',
         instructionKey: 'draw-disks',
         steps: ['Read each digit of the number.', 'Draw that many disks in its zone.', 'Write the value in each disk. A zero zone stays empty.'],

@@ -698,6 +698,13 @@ function _pvRoundNl(id) {
             help: 'The halfway number printed under the middle tick. Off is the fade: the tick stays marked.' },
     ];
 }
+// vis_pv_dot_disks (build lane placevalue): counters with their value inside, or plain dots whose
+// value is the column they stand in (the chart's letters stay: they are the structure).
+const _pvCounterLook = () => ({
+    id: 'labels', label: 'The counters', type: 'enum', default: 'all', group: 'layout',
+    values: [{ v: 'all', l: 'Disks with the value inside (100, 10, 1)' }, { v: 'none', l: 'Plain dots (the column gives the value)' }],
+    help: 'Plain dots are quicker to draw and make the pupil read the column; disks say their value.',
+});
 const P9_PV_OPTIONS = {
     'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport(), _pvIdentifyResponse(), _pvRepeatDigit()],
     'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit()],
@@ -712,11 +719,16 @@ const P9_PV_OPTIONS = {
     'placevalue:order_greatest_to_least': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvOrderCount(), _pvCloseness(), _pvLengths()],
     'placevalue:place_value_disks': [_pvBand([99, 999, 9999], 999), {
         id: 'task', label: 'Task', type: 'enum', default: 'read', group: 'layout',
-        values: [{ v: 'read', l: 'Read the number from the disks' }, { v: 'count', l: "Count one place's disks" }],
-        help: 'Counting one place is the easier first step; reading the whole number comes next.',
-    }, _pvZeroPlace(false)],
+        values: [{ v: 'read', l: 'Read the number from the disks' }, { v: 'count', l: "Count one place's disks" },
+            // build lane placevalue (vis_pv_dot_disks)
+            { v: 'take', l: 'Some are crossed out: write the number left' },
+            { v: 'x10', l: 'Every counter moves left: × 10' }, { v: 'd10', l: 'Every counter moves right: ÷ 10' },
+            { v: 'all', l: 'Use 2 to 5 counters: write every number they make (tens and ones)' }],
+        help: 'Counting one place is the easier first step; reading the whole number comes next. The move tasks show the '
+            + 'counters with an arrow from each place to the next; "every number" asks for all the numbers a few counters make.',
+    }, _pvZeroPlace(false), _pvCounterLook()],
     // Draw to 999 only (owner ruling 3): nine 1,000 disks and 27 others is a poster, not a cell.
-    'placevalue:pv_disks_build': [_pvBand([99, 999], 999), _pvZeroPlace(false)],
+    'placevalue:pv_disks_build': [_pvBand([99, 999], 999), _pvZeroPlace(false), _pvCounterLook()],
     'placevalue:pv_digit_drag': [_pvBand([999, 9999, 99999, 999999], 99999), {
         id: 'source', label: 'The number is given as', type: 'enum', default: 'expanded', group: 'difficulty',
         values: [
