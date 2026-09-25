@@ -115,6 +115,8 @@ const { ROOT, chromePath, startServer, open, waitFor, listSkills, renderPrint, h
 const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 && argv[i + 1] !== undefined ? argv[i + 1] : d; };
 const has = k => argv.includes('--' + k);
+// --size S|M|L: the kit preset size (default L; LESSONS_LEARNED L1 asks for S and L).
+const KIT_SIZE = ['S', 'M', 'L'].includes(arg('size', 'L')) ? arg('size', 'L') : 'L';
 
 const TOOL = 'ws-print-lint';
 const LINTS = ['L-INK', 'L-EMOJI', 'L-FONT', 'L-SIZE', 'L-OVERFLOW', 'L-SPLIT', 'L-DENSITY', 'L-KEY', 'L-VERBS', 'L-ANSAREA', 'L-INPUT', 'L-CCSS', 'L-ANCHOR', 'L-SUPPORT'];
@@ -1669,7 +1671,7 @@ async function runApp(source) {
                     await renderPrint(page, s, { problemCount: COUNT, includeAnswerKey: true });
                     html = await legacyDocumentHtml(page);
                 } else {
-                    html = await page.evaluate(async ({ s, seed, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS }) => {
+                    html = await page.evaluate(async ({ s, seed, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS, KIT_SIZE }) => {
                         // js/modules/print-sheet.js buildSheet(req): sections carry the skills; the result has
                         // pupilHtml and keyHtml (the facsimile key, same plan).
                         const practice = role === 'independent' || role === 'more-practice';
@@ -1684,12 +1686,12 @@ async function runApp(source) {
                                 opts = { ...(opts || {}), support: [...new Set([...(def.default || []), ...want])] };
                             }
                         }
-                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId, opts }], count: practice ? COUNT : undefined }], size: 'L', look: practice ? 'ican' : 'auto', key: true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
+                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId, opts }], count: practice ? COUNT : undefined }], size: KIT_SIZE, look: practice ? 'ican' : 'auto', key: true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
                         let out;
                         try { out = await window.buildSheet(req); } catch (e) { if (e && e.unsupported) return { unsupported: e.message }; throw e; }
                         const body = [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');
                         return { doc: window.sheetDocument(body, s.label), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml };
-                    }, { s, seed, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null });
+                    }, { s, seed, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null, KIT_SIZE });
                     if (html && html.doc) { kitHalves = html; html = html.doc; }
                 }
                 if (html && html.unsupported) {

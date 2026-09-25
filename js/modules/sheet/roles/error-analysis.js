@@ -660,7 +660,10 @@ function measuredLayout(items, input) {
     for (const cols of word ? [1] : [1, 2]) {
         for (let rows = Math.floor(ceil / cols); rows >= 1; rows--) {
             const got = pick(items, cols, rows, G);
-            if (got && (!best || got.length > best.items.length)) best = { cols, rows, items: got };
+            // RUBRIC H13: the same number of items in fewer, fuller rows loses to more rows the
+            // items fill (a 2 x 1 thermometer page left 47% of each cell empty; 1 x 2 fills it).
+            const fill = got ? Math.max(...got.map((it) => heightAt(it, cols))) * rows / G : 0;
+            if (got && (!best || got.length > best.items.length || (got.length === best.items.length && fill > best.fill + 0.1))) best = { cols, rows, items: got, fill };
             if (got) break;
         }
     }

@@ -256,6 +256,8 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-judge3 .mq-fixrow{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:4mm;row-gap:2mm}
 :is(.ws-page,.ws-sheet) .mq-judge3 .mq-fixslot{margin-left:0}
 :is(.ws-page,.ws-sheet) .mq-judge3>.mq-redraw{flex:1 1 100%}
+/* the finished work and its judgement sit in the middle of the cell like every kit cell (H13: no band pinned under it) */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-eacell>.mq-judge.mq-judge3{flex:0 0 auto}
 :is(.ws-page,.ws-sheet) .mq-judge-drawn .mq-fixrow{display:contents}
 :is(.ws-page,.ws-sheet) .mq-judge-drawn .mq-fixzone{flex:0 0 100%}
 /* the key's correction is black Andika 700, even inside the pupil's grey work (a fix box per fact) */
