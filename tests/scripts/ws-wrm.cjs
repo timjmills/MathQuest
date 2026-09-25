@@ -27,7 +27,12 @@
  *              that does not exist; a step listed twice for one skill; a partial with no text; a
  *              step that is not covered and has no proposal; a proposal that lists a covered step
  *              under `steps` (move it to `improves`), names an unknown step, or proposes an id that
- *              is already a live skill.
+ *              is already a live skill; a data/curriculum/wrm-vocab.json entry for an unknown
+ *              step, or one whose words differ from the step's `vocab` in wrm-steps.json (rerun
+ *              ws-wrm-extract.cjs after ws-wrm-vocab.py).
+ *
+ * Key vocabulary per step (from the owner's Teaching Guides) is data/curriculum/wrm-vocab.json,
+ * built by tests/scripts/ws-wrm-vocab.py; the report shows each step's words.
  */
 'use strict';
 const fs = require('fs');
@@ -37,6 +42,7 @@ const { pathToFileURL } = require('url');
 const ROOT = path.resolve(__dirname, '..', '..');
 const STEPS_JSON = path.join(ROOT, 'data', 'curriculum', 'wrm-steps.json');
 const DB_JS = path.join(ROOT, 'js', 'modules', 'wrm-db.js');
+const VOCAB_JSON = path.join(ROOT, 'data', 'curriculum', 'wrm-vocab.json');
 const REPORT = path.join(ROOT, 'design', 'WRM_COVERAGE.md');
 const args = process.argv.slice(2);
 const WRITE_DB = args.includes('--write-db');
@@ -105,7 +111,7 @@ function checkInventory(inv, ccCodes, eeCodes) {
 
 /* ------------------------------------------------------------ report */
 function writeReport(ctx) {
-    const { inv, cov, props, label, ccRecs, eeRecs, std } = ctx;
+    const { inv, cov, props, label, ccRecs, eeRecs, std, vocab } = ctx;
     const out = [];
     const L = (s = '') => out.push(s);
     const sk = (k) => `${label(k)} (\`${k}\`)`;
@@ -133,6 +139,8 @@ function writeReport(ctx) {
     L();
     L(`- ${inv.meta.counts.years} years, ${inv.meta.counts.blocks} blocks, ${inv.meta.counts.steps} small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).`);
     L(`- Covered ${S.covered} (${pct(S.covered, S.total)}), partial only ${S.partial} (${pct(S.partial, S.total)}), gap ${S.gap} (${pct(S.gap, S.total)}).`);
+    const nv = Object.values(vocab).filter((v) => v.words && v.words.length).length;
+    L(`- Key vocabulary (the Teaching Guides' "Pre-teach" words, \`data/curriculum/wrm-vocab.json\`): ${nv} of ${S.total} steps, ${Object.values(vocab).reduce((a, v) => a + (v.words || []).length, 0)} words.`);
     L(`- ${Object.keys(ctx.map).length} skills carry WRM tags. ${Object.keys(props).length} proposals (${Object.values(props).filter((p) => p.kind === 'new').length} new skills, ${Object.values(props).filter((p) => p.kind === 'option').length} options on existing skills) would close every gap.`);
     L();
     L('| Year | US grade | Blocks | Steps | Covered | Partial only | Gap |');
@@ -208,6 +216,7 @@ function writeReport(ctx) {
                 if (full.length) L(`  Skills: ${full.map((h) => `${sk(h.key)}${h.note ? ` {${h.note}}` : ''}`).join('; ')}  `);
                 for (const p of s.partials) L(`  Partial: ${sk(p.key)}, missing ${p.missing}  `);
                 if (s.proposals.length) L(`  Proposal: ${s.proposals.map((id) => props[id].name).join('; ')}  `);
+                if (vocab[s.id] && vocab[s.id].words.length) L(`  Vocabulary: ${vocab[s.id].words.join(', ')}  `);
             }
             for (const p of b.supplements || []) {
                 const cov2 = p.ccss.map((c) => `${c}${ccRecs.has(c) && ccRecs.get(c).covered ? '' : ' (no skill)'}`).join(', ');
@@ -232,6 +241,16 @@ function writeReport(ctx) {
     const ccCodes = new Set(cc.standards.map((s) => s.code));
     const eeCodes = new Set(ee.essentialElements.flatMap((e) => [e.code, ...(e.subs || []).map((x) => x.code)]));
     const stepIds = checkInventory(inv, ccCodes, eeCodes);
+    let vocab = {};
+    if (fs.existsSync(VOCAB_JSON)) {
+        try { vocab = JSON.parse(fs.readFileSync(VOCAB_JSON, 'utf8')).steps || {}; } catch (e) { fail(`vocab: cannot read data/curriculum/wrm-vocab.json: ${e.message}`); }
+    }
+    const invVocab = new Map(inv.years.flatMap((y) => y.blocks.flatMap((b) => b.steps.map((s) => [s.id, s.vocab || []]))));
+    for (const [id, v] of Object.entries(vocab)) {
+        if (!stepIds.has(id)) { fail(`vocab: ${id} is not a WRM small step`); continue; }
+        if (!v || !Array.isArray(v.words)) { fail(`vocab: ${id} has no words list`); continue; }
+        if (v.words.join('|') !== invVocab.get(id).join('|')) fail(`vocab: ${id} words differ from wrm-steps.json; run \`node tests/scripts/ws-wrm-extract.cjs\``);
+    }
     const src = dbSource(inv);
     if (WRITE_DB) { fs.writeFileSync(DB_JS, src); console.log(`wrote ${path.relative(ROOT, DB_JS)}`); }
     else if (!fs.existsSync(DB_JS) || fs.readFileSync(DB_JS, 'utf8') !== src) fail('js/modules/wrm-db.js is out of date: run `node tests/scripts/ws-wrm.cjs --write-db`');
@@ -322,12 +341,14 @@ function writeReport(ctx) {
     for (const e of ee.essentialElements) for (const x of e.subs || []) if (!eeRecs.has(x.code) && eeRecs.has(e.code)) eeRecs.set(x.code, eeRecs.get(e.code));
 
     if (!structural.length && !CHECK) {
-        writeReport({ inv, cov, props, map, rev, std, ccRecs, eeRecs, label: (k) => live.get(k) || k });
+        writeReport({ inv, cov, props, map, rev, std, ccRecs, eeRecs, vocab, label: (k) => live.get(k) || k });
         console.log(`wrote ${path.relative(ROOT, REPORT)}`);
     }
     const S = cov.summary;
     console.log(`wrm: ${inv.meta.counts.years} years, ${inv.meta.counts.blocks} blocks, ${S.total} small steps; ${Object.keys(map).length} skills tagged; ${Object.keys(props).length} proposals`);
     console.log(`coverage: covered ${S.covered}/${S.total} (${pct(S.covered, S.total)}), partial only ${S.partial}, gap ${S.gap}`);
+    const nVocab = Object.values(vocab).filter((v) => v && Array.isArray(v.words) && v.words.length).length;
+    console.log(`vocabulary: ${nVocab}/${S.total} steps (${Object.values(vocab).reduce((a, v) => a + ((v && v.words) || []).length, 0)} words, data/curriculum/wrm-vocab.json)`);
     console.log(`  by year: ${inv.years.map((y) => `${y.id} ${pct((S.byYear[y.id] || {}).covered, (S.byYear[y.id] || {}).total)}`).join('  ')}`);
     if (structural.length) {
         console.log('ws-wrm: FAIL');
