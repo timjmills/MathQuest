@@ -30,8 +30,10 @@ export const blankRun = (fromColumn) => `<div class="ws-cell blankrun" style="--
  * @param {string} [opts.cls]               'facts' (hairline interiors), 'open' (tests), 'fixed'
  * @param {string} [opts.height]            an explicit grid height, e.g. '99mm'
  * @param {number[]} [opts.unlabelled]      indexes that carry no label (Model / Guided cells, CL-14)
+ * @param {string} [opts.rowsTpl]           a grid-template-rows value other than equal rows (the
+ *                                          Guided page's model row, which carries its worked trace)
  */
-export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [] } = {}) {
+export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '' } = {}) {
     const n = cols * (rows || Math.ceil(cells.length / cols));
     let k = start;
     const out = cells.map((c, i) => {
@@ -41,7 +43,7 @@ export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', 
     });
     if (cells.length < n) out.push(blankRun((cells.length % cols) + 1));
     const r = rows || Math.ceil(cells.length / cols);
-    return `<div class="ws-grid ${cls}" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${r},1fr);${height ? `height:${height};` : ''}">${out.join('')}</div>`;
+    return `<div class="ws-grid ${cls}" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:${rowsTpl || `repeat(${r},1fr)`};${height ? `height:${height};` : ''}">${out.join('')}</div>`;
 }
 
 /**

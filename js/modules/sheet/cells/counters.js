@@ -21,7 +21,7 @@
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import {
-    L, P, svg, root, box, slotValue, shapeOf, dot, cross, digitPt, textPt, squareMm, inlineBoxMm, INK, SW, n2, groupRuns,
+    L, P, svg, root, box, slotValue, shapeOf, dot, cross, digitPt, textPt, squareMm, inlineBoxMm, INK, SW, n2, groupRuns, isTwin,
 } from './k2kit.js';
 
 const MINUS = '−';
@@ -161,10 +161,14 @@ register('counters', {
         // P11 Support level 3: the answer written in grey to trace (the traced state of the slot).
         const tctx = p.traced && ctx.state === 'blank' ? Object.assign({}, ctx, { state: 'traced' }) : ctx;
         const slot = box(tctx, { value: slotValue(tctx, 'answer', kv), w: sq, h: sq, mark: 'blank' });
-        return root(ctx, 'k2-count', `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 4)};">`
-            + `<div style="flex:none;">${countPicture(ctx, p.n, p.shape, p)}</div>${slot}</div>`
+        // Round-3 re-grade: the answer box stands at ONE place in every cell (the cell's right),
+        // the objects centred in the room left of it - a box that followed each picture's width
+        // jumped about from cell to cell.
+        return root(ctx, 'k2-count', `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:${L(ctx, 4)};">`
+            + `<div style="display:flex;justify-content:center;"><div style="flex:none;">${countPicture(ctx, p.n, p.shape, p)}</div></div>${slot}</div>`
             // P11 Support level 2: a number track under the picture to point along.
-            + (p.track ? `<div style="display:flex;justify-content:center;margin-top:${L(ctx, 3)};">${trackStrip(ctx, p.track)}</div>` : ''));
+            + (p.track ? `<div style="display:flex;justify-content:center;margin-top:${L(ctx, 3)};">${trackStrip(ctx, p.track)}</div>` : ''),
+        isTwin(ctx) ? {} : { style: 'width:100%;box-sizing:border-box;' });
     },
     answerKey(p) {
         const v = p.ans;

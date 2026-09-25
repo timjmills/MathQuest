@@ -60,7 +60,9 @@ function packing(poolsIn, input) {
         shelf[id] = { k, h: Number.isFinite(h) ? h : 60, n: 0, pairs: !!pairK, band, per: pairK ? k / 2 : k };
     }
     const weights = Object.fromEntries((input.pools || []).map((p) => [p.id, p.weight || 1]));
-    const bandH = (id) => m.strip + shelf[id].h;
+    // A skill's strip opens its first shelf only: its further shelves join the same band (an
+    // empty strip between two shelves of one skill read as a blank row, H13).
+    const bandH = (id, first = true) => (first ? m.strip : 0) + shelf[id].h;
     // Page 1: one shelf per skill first (with its anchor band), then extra shelves by weight gap.
     let used = 0;
     const order = [];
@@ -75,7 +77,7 @@ function packing(poolsIn, input) {
         let cur = 0;
         for (const id of ids) {
             for (let k = 0; k < shelf[id].n; k++) {
-                const hh = bandH(id) + (k === 0 ? shelf[id].band : 0);
+                const hh = bandH(id, k === 0) + (k === 0 ? shelf[id].band : 0);
                 const budget = pages === 1 ? m.budget : mCont.budget;
                 if (cur && cur + hh > budget) { pages++; cur = 0; }
                 cur += hh;
@@ -90,7 +92,7 @@ function packing(poolsIn, input) {
         const gaps = ids.map((id) => ({ id, gap: (weights[id] || 1) / tw - (shelf[id].n * shelf[id].per) / Math.max(1, total()) }))
             .sort((a, b) => b.gap - a.gap);
         const fits = (id) => {
-            if (!A) return used + bandH(id) <= m.budget;
+            if (!A) return used + bandH(id, false) <= m.budget;
             shelf[id].n++;
             const ok = pagesOf() <= basePages;
             shelf[id].n--;
@@ -99,7 +101,7 @@ function packing(poolsIn, input) {
         const next = gaps.find((g) => fits(g.id));
         if (!next) break;
         shelf[next.id].n++;
-        used += bandH(next.id);
+        used += bandH(next.id, false);
     }
     return { ctx, m, mCont, N, ids, shelf, used, pages: basePages };
 }
@@ -128,7 +130,11 @@ export function plan(input = {}) {
             // SIDE: [twin | problem] pairs, the twin first (example, then problem).
             if (sh.pairs) chunk = chunk.flatMap((it) => (it.twin ? [it.twin, it] : [it]));
             const anchor = s === 0 && sh.band && A ? ((A.byPool[id] || {}).band || [])[0] : null;
-            if (chunk.length) shelves.push({ id, items: chunk, k: sh.k, h: sh.h, anchor, bandMm: sh.band });
+            // H13 (owner 2026-09-25): a shelf is as tall as the tallest item IT holds, not the
+            // tallest its skill could deal - a 3 x 5 chart window's row was sized for a bigger one.
+            const own = chunk.length ? hMinAt(chunk.filter((it) => !it.anchor), Math.min(sh.k, 6), ctx) : sh.h;
+            const h = Number.isFinite(own) && own > 0 ? Math.min(sh.h, own) : sh.h;
+            if (chunk.length) shelves.push({ id, items: chunk, k: sh.k, h, anchor, bandMm: sh.band });
         }
     }
     const n = shelves.reduce((a, s) => a + s.items.filter((it) => !it.anchor).length, 0);
@@ -136,20 +142,36 @@ export function plan(input = {}) {
     const pages = [];
     let cur = null;
     let start = 1;
-    const spare = p.pages > 1 ? 0 : Math.max(0, m.budget - p.used);
-    const grow = shelves.length ? Math.min(12, spare / shelves.length) : 0;
+    const used = shelves.reduce((a, sh, i) => a + (i === 0 || shelves[i - 1].id !== sh.id ? m.strip : 0) + sh.h + (sh.anchor ? sh.bandMm : 0), 0);
+    const spare = p.pages > 1 ? 0 : Math.max(0, m.budget - used);
+    // The spare height is shared into the shelves only as far as a cell keeps its drawing filling
+    // it (H13: never an empty band of 30% of a cell): a tenth of a shelf's own height at most.
+    const growOf = (sh) => (shelves.length ? Math.min(12, sh.h * 0.1, spare / shelves.length) : 0);
     for (const [i, sh] of shelves.entries()) {
-        const bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
+        const grow = growOf(sh);
+        const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
         const budget = pages.length > 1 ? p.mCont.budget : m.budget;   // the page `cur` is on
-        if (!cur || cur.used + bandH > budget) { cur = { sections: [], used: 0 }; pages.push(cur); }
+        let bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
+        let joins = !firstOfSkill && !!cur && cur.sections.length > 0 && cur.used + bandH - m.strip <= budget;
+        if (joins) bandH -= m.strip;
+        if (!cur || cur.used + bandH > budget) { cur = { sections: [], used: 0 }; pages.push(cur); joins = false; bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0); }
         const first = sh.items.find((it) => !it.anchor);
         const skill = (input.skills || []).find((s) => first && first.q && s.skillId === first.q.skillId) || {};
-        const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
         const title = STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';
         const pupil = sh.items.filter((it) => !it.anchor);
         const grid = gridPart(sh.items.map((it) => (it.anchor ? anchorPlanItem(it, Math.min(sh.k, 6)) : planItem(it, { cols: Math.min(sh.k, 6) }))), { cols: sh.k, rows: 1, cellH: sh.h + grow, labels, start });
+        if (joins) {
+            // A further shelf of the same skill on the same page: its grid under the last one.
+            const prev = cur.sections[cur.sections.length - 1];
+            prev.contents = (prev.contents || [prev.content]).concat([grid]);
+            delete prev.content;
+            start += pupil.length;
+            cur.used += bandH;
+            continue;
+        }
+        // PG-22: a skill continued on a new page repeats its title and instruction.
         const band = {
-            kind: 'band', label: firstOfSkill ? title : '', instr: firstOfSkill ? instructionText(instructionKeyOf(pupil, input.skills), pupil) : '',
+            kind: 'band', label: title, instr: instructionText(instructionKeyOf(pupil, input.skills), pupil),
         };
         // SECTIONS: the skill's worked example sits in its band, above its problems.
         if (sh.anchor) band.contents = [gridPart([anchorPlanItem(sh.anchor, 1)], { cols: 1, rows: 1, cellH: sh.bandMm, labels: 'none', start, cls: 'mq-anchorgrid' }), grid];

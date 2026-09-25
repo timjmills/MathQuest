@@ -26,7 +26,7 @@ import {
     SIZES, DEFAULT_SIZE, LOOKS, DEFAULT_LOOK,
 } from '../index.js';
 import {
-    resolveSectionLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM,
+    resolveSectionLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap,
 } from '../layout.js';
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
@@ -625,7 +625,45 @@ function sheetLayout(role, input, norm, sheetItems, tabId) {
  * Labels run on across the sheet (CL-12); a More Practice letter is a sheet of its own, so its
  * labels start at a. again by construction.
  */
-function composeSheet(role, input, norm, sheetItems, { tabId, seed, form }) {
+/**
+ * Owner ruling 2026-09-25: "some problems will need to be one column - those keep one and go at
+ * the top or the bottom of the 2- or 3-column page". A section whose problems mostly fit N
+ * columns but hold a few that only fit one (a word problem, a wide picture, a table too wide at
+ * this size) is split: the section keeps its columns for the problems that fit them, and the
+ * full-width ones follow as one group at the bottom - never interleaved, and never pulling the
+ * whole section down to one column. The group shares the section's instruction (it is not
+ * printed again on the same page). Not with step-by-step anchors (their bands are keyed by
+ * section).
+ */
+export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM } = {}) {
+    const { size, look, paper } = norm;
+    const sections = [];
+    const items = [];
+    norm.sections.forEach((sec, si) => {
+        const its = sheetItems[si] || [];
+        const keep = () => { sections.push(sec); items.push(its); };
+        if (its.length < 2 || its.some((it) => it.anchor)) return keep();
+        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols };
+        const whole = resolveSectionLayout(Object.assign({ floor: sec.floor }, base), its, paper, availableWidthMm, { size, look });
+        const one = (it) => it.fclass === 'word' || it.fclass === 'wide'
+            || itemCap(itemInfo(it, { size, look, paper, mode: 'print' })) < 2;
+        const wide = its.filter(one);
+        const narrow = its.filter((it) => !one(it));
+        if (!wide.length || !narrow.length) return keep();
+        const L = resolveSectionLayout(Object.assign({}, base, { count: narrow.length }), narrow, paper, availableWidthMm, { size, look });
+        if (L.cols <= whole.cols) return keep();
+        sections.push(Object.assign({}, sec, { floor: null }));
+        items.push(narrow);
+        sections.push(Object.assign({}, sec, { columns: 1, floor: null, splitOf: sections.length - 1 }));
+        items.push(wide);
+    });
+    return { norm: Object.assign({}, norm, { sections }), items };
+}
+
+function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
+    const split = input.anchors ? { norm: norm0, items: sheetItems0 } : splitWide(role, norm0, sheetItems0, { availableWidthMm: Number(norm0.ctxIn.availableWidthMm) || LIVE_W_MM });
+    const norm = split.norm;
+    let sheetItems = split.items;
     const { size, look } = norm;
     const level = 1;                                        // PT 1.7: Independent and More Practice
     const labelStyle = input.labels === 'none' ? 'none' : input.labels === 'tab' || input.labels === 'letter' ? input.labels
@@ -674,7 +712,12 @@ function composeSheet(role, input, norm, sheetItems, { tabId, seed, form }) {
             // gridH); every other grid carries the section's fixed height, rows x cellH, so a
             // cell is the same size on every page of the section.
             const fillByFlex = !pg.cont && lone && part.chunk.rows === L.rows && !L.blocks;
-            sections.push({ kind: 'html', html: instructionHtml(instr[part.section].key, instr[part.section].text) });
+            // A split-off full-width group under its own section on the same page shares its
+            // instruction (splitWide): the line is not printed twice.
+            const sec = norm.sections[part.section] || {};
+            const prevPart = pg.parts[pg.parts.indexOf(part) - 1];
+            const shares = sec.splitOf !== undefined && prevPart && prevPart.section === sec.splitOf;
+            if (!shares) sections.push({ kind: 'html', html: instructionHtml(instr[part.section].key, instr[part.section].text) });
             if (L.blocks && part.chunk.blocks) {
                 // S6 SECTIONS: each block is its anchor band (its own Model tab, no label, no
                 // score) and then its 3-4 problems; the labels run on across the blocks.
@@ -710,9 +753,16 @@ function composeSheet(role, input, norm, sheetItems, { tabId, seed, form }) {
         return { header: pg.cont ? cont : first, sections };
     });
 
-    const fits = layouts.map((L) => ({
+    const fits = layouts.map((L, si) => ({
         cols: L.cols, rows: L.rows, perPage: L.perPage, pages: L.pages, cellW: L.cellW, cellH: L.cellH,
-        requested: L.requested, clamped: L.clamped, note: L.note, line: fitsLine(L), cls: L.cls, digitPt: L.digitPt,
+        requested: L.requested, clamped: L.clamped,
+        // The dialog's line tells the truth about a split-off group (splitWide).
+        note: norm.sections[si].splitOf !== undefined
+            ? [`${sheetItems[si].length} problem${sheetItems[si].length === 1 ? ' is' : 's are'} too wide for ${layouts[norm.sections[si].splitOf].cols} columns: full width, at the bottom.`, L.note].filter(Boolean).join(' ')
+            : L.note,
+        line: norm.sections[si].splitOf !== undefined
+            ? `${fitsLine(L)} ${sheetItems[si].length} full-width problem${sheetItems[si].length === 1 ? '' : 's'} at the bottom.` : fitsLine(L),
+        cls: L.cls, digitPt: L.digitPt,
         hMin: L.hMin, anchorMm: L.anchorMm || 0, blocks: L.blocks || null,
     }));
     return {
