@@ -55,6 +55,11 @@ const P = {
     list: '<path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="M4.5 6h.01"/><path d="M4.5 12h.01"/><path d="M4.5 18h.01"/>',
     grid: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
     grip: '<circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/>',
+    back: '<path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/>',
+    pause: '<path d="M9 5v14"/><path d="M15 5v14"/>',
+    shuffle: '<path d="M4 7h3c4 0 6 10 10 10h3"/><path d="M4 17h3c1.5 0 2.7-1.4 3.7-3"/><path d="M13.3 10c1-1.6 2.2-3 3.7-3h3"/><path d="M18 4l3 3-3 3"/><path d="M18 14l3 3-3 3"/>',
+    up: '<path d="M12 19V5"/><path d="M6 11l6-6 6 6"/>',
+    down: '<path d="M12 5v14"/><path d="M6 13l6 6 6-6"/>',
 };
 
 export function icon(name, size = 20, extra = '') {

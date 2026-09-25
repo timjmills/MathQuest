@@ -524,17 +524,18 @@ function renderQuizList(el) {
         return;
     }
     if (!list.length) { box.innerHTML = '<p class="tv-cap" style="padding:16px 24px;">No quizzes match your search.</p>'; return; }
-    box.innerHTML = `<table class="tv-table">
-  <thead><tr><th scope="col">Name</th><th scope="col" style="width:104px;">Questions</th><th scope="col" style="width:88px;">Sections</th><th scope="col" style="width:120px;">Last edited</th><th scope="col" style="width:360px;"><span class="tv-sr">Actions</span></th></tr></thead>
-  <tbody>${list.map((t) => `<tr>
-    <td><span class="tv-cell-title">${esc(t.name || 'Untitled Quiz')}</span></td>
-    <td>${qCount(t)}</td>
-    <td>${t.sections ? t.sections.length : 1}</td>
-    <td><span class="tv-cell-sub">${esc(fmtDay(t.updatedAt || t.createdAt))}</span></td>
-    <td style="overflow:visible;"><div class="tv-row" style="justify-content:flex-end;flex-wrap:nowrap;">
+    // Below 900 px each quiz is a row card (css/teacher-quiz.css), so the name never collapses.
+    box.innerHTML = `<table class="tv-table tvq-rows">
+  <thead><tr><th scope="col">Name</th><th scope="col" style="width:104px;">Questions</th><th scope="col" style="width:88px;">Sections</th><th scope="col" style="width:120px;">Last edited</th><th scope="col" style="width:376px;"><span class="tv-sr">Actions</span></th></tr></thead>
+  <tbody>${list.map((t) => `<tr class="tvq-quiz-row">
+    <td data-label="Name"><span class="tv-cell-title">${esc(t.name || 'Untitled Quiz')}</span></td>
+    <td data-label="Questions">${qCount(t)}</td>
+    <td data-label="Sections" class="tvq-hide-narrow">${t.sections ? t.sections.length : 1}</td>
+    <td data-label="Last edited"><span class="tv-cell-sub">${esc(fmtDay(t.updatedAt || t.createdAt))}</span></td>
+    <td class="tvq-actions" style="overflow:visible;"><div class="tv-row" style="justify-content:flex-end;flex-wrap:nowrap;">
       <button type="button" class="tv-btn tv-btn-sm" data-q="edit" data-id="${esc(t.id)}">${icon('edit', 16)}<span>Edit</span></button>
-      <button type="button" class="tv-btn tv-btn-sm tv-btn-ghost" style="color:var(--tv-text);" data-q="monitor" data-id="${esc(t.id)}">${icon('eye', 16)}<span>Monitor</span></button>
-      <button type="button" class="tv-btn tv-btn-sm tv-btn-ghost" style="color:var(--tv-text);" data-q="results" data-id="${esc(t.id)}">${icon('bars', 16)}<span>Results</span></button>
+      <button type="button" class="tv-btn tv-btn-sm" data-q="monitor" data-id="${esc(t.id)}">${icon('eye', 16)}<span>Monitor</span></button>
+      <button type="button" class="tv-btn tv-btn-sm" data-q="results" data-id="${esc(t.id)}">${icon('bars', 16)}<span>Results</span></button>
       <div class="tv-menu-wrap"><button type="button" class="tv-icon-btn is-framed" data-q="menu" data-id="${esc(t.id)}" aria-label="More for ${esc(t.name || 'quiz')}" aria-expanded="${quiz.menu === t.id}">${icon('dots', 18)}</button>
         ${quiz.menu === t.id ? `<div class="tv-menu">
           <button type="button" data-q="share" data-id="${esc(t.id)}">${icon('link', 16)}<span>Copy share link</span></button>
@@ -739,37 +740,56 @@ function filteredHistory() {
     });
 }
 
+/** Session history stores pupil-facing strings ("🐉 Boss Battle", "⏸️ Exited"); show them plain. */
+function plain(s) {
+    return String(s == null ? '' : s)
+        .replace(/<[^>]*>/g, '')
+        .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u{23FF}\u{FE0F}\u{200D}]/gu, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+/** The result as a neutral tag: Stopped (left early), or the recorded word (Win, Pass ...). */
+function resultTag(r) {
+    if (r.incomplete) return '<span class="tvq-tag">Stopped</span>';
+    const word = plain(r.result) || 'Finished';
+    const good = /^(win|pass)/i.test(word);
+    return `<span class="tvq-tag${good ? ' is-strong' : ''}">${esc(word)}</span>`;
+}
+
 function renderProgress(el) {
     const rows = filteredHistory();
     const any = Array.isArray(state.sessionHistory) && state.sessionHistory.length > 0;
     const label = { today: 'Today', week: 'This week', month: 'Last 30 days' }[prog.period];
     const seg = `<div class="tv-seg" role="radiogroup" aria-label="Period" style="min-width:360px;">${[['today', 'Today'], ['week', 'This week'], ['month', 'Last 30 days']].map(([v, t]) => `<button type="button" role="radio" data-period="${v}" aria-checked="${prog.period === v}">${t}</button>`).join('')}</div>`;
-    const table = rows.length ? `<table class="tv-table">
-      <thead><tr><th scope="col" style="width:80px;">Date</th><th scope="col" style="width:64px;">Day</th><th scope="col" style="width:80px;">Time</th><th scope="col" style="width:88px;">Duration</th><th scope="col">Skill</th><th scope="col" style="width:104px;">Mode</th><th scope="col" style="width:104px;">Score</th><th scope="col" style="width:96px;">Result</th></tr></thead>
+    // One fixed column plan: the Skill column takes the free width (with an ellipsis) and never
+    // collapses; Day, start time and duration live under the date. Below 900 px each row is a card.
+    const table = rows.length ? `<table class="tv-table tvq-rows tvq-prog">
+      <thead><tr><th scope="col" style="width:176px;">Date</th><th scope="col">Skill</th><th scope="col" style="width:140px;">Mode</th><th scope="col" style="width:128px;">Score</th><th scope="col" style="width:120px;">Result</th></tr></thead>
       <tbody>${rows.map((r) => {
         let dd = r.date || '';
-        if (r.date) { try { dd = new Date(r.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); } catch (e) { /* keep raw */ } }
-        return `<tr${r.incomplete ? ' style="font-style:italic;"' : ''}><td>${esc(dd)}</td><td>${esc(r.day || '')}</td><td>${esc(r.time || '')}</td><td>${esc(r.duration || '')}</td><td><span class="tv-cell-title" style="font-weight:600;">${esc(String(r.challenge || '').replace(/<[^>]*>/g, ''))}</span></td><td>${esc(r.mode || '')}</td><td>${esc(r.score || '')}${r.percentage !== undefined ? ` <span class="tv-muted">(${esc(r.percentage)}%)</span>` : ''}</td><td>${esc(r.result || '')}</td></tr>`;
+        if (r.date) { try { dd = new Date(r.date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }); } catch (e) { /* keep raw */ } }
+        const when = [r.time, r.duration].map(plain).filter(Boolean).join(' · ');
+        const skill = plain(r.challenge) || 'Practice';
+        return `<tr>
+          <td data-label="Date"><span class="tv-cell-title">${esc(dd)}</span>${when ? `<span class="tv-cell-sub">${esc(when)}</span>` : ''}</td>
+          <td data-label="Skill"><span class="tv-cell-title" title="${esc(skill)}">${esc(skill)}</span></td>
+          <td data-label="Mode">${esc(plain(r.mode))}</td>
+          <td data-label="Score">${esc(plain(r.score))}${r.percentage !== undefined ? ` <span class="tv-muted">(${esc(r.percentage)}%)</span>` : ''}</td>
+          <td data-label="Result">${resultTag(r)}</td>
+        </tr>`;
     }).join('')}</tbody></table>`
         : `<div class="tv-empty-lg"><span class="tv-empty-icon" aria-hidden="true">${icon('chart', 22)}</span>
-            <div class="tv-h3">${any ? `No sessions ${label.toLowerCase() === 'today' ? 'today' : label === 'This week' ? 'this week' : 'in the last 30 days'}` : 'Sessions played on this device appear here'}</div>
+            <div class="tv-h3">${any ? `No sessions ${prog.period === 'today' ? 'today' : prog.period === 'week' ? 'this week' : 'in the last 30 days'}` : 'Sessions played on this device appear here'}</div>
             <p class="tv-cap">Pupils add a row each time they finish practice, a game or a worksheet in student view.</p>
-            ${any ? '' : `<button type="button" class="tv-btn tv-btn-ghost" data-tv-student>${icon('reset', 16)}<span>Switch to student view</span></button>`}</div>`;
+            ${any ? '' : `<button type="button" class="tv-btn" data-tv-student>${icon('reset', 16)}<span>Switch to student view</span></button>`}</div>`;
     el.innerHTML = `
 <header class="tv-header"><div><h1 class="tv-h1">Progress</h1><p class="tv-sub">Practice sessions played on this device.</p></div>${seg}</header>
-<section class="tv-card tv-notice"><span class="tv-notice-icon" aria-hidden="true">${icon('device', 20)}</span><div><div class="tv-h3">This device only</div><p class="tv-body">Each browser keeps its own list of the last 100 sessions. Sessions played on pupils' own tablets or other computers do not appear here.</p></div></section>
-<div class="tv-grid-2-1" style="grid-template-columns:minmax(0,2.4fr) minmax(260px,1fr);">
-  <section class="tv-card tv-flush" aria-labelledby="tvHistH">
-    <div class="tv-card-head"><div class="tv-row"><h2 class="tv-h2" id="tvHistH">Session history</h2><span class="tv-cap">${esc(label)} · ${rows.length} session${rows.length === 1 ? '' : 's'}</span></div></div>
-    <div style="overflow-x:auto;">${table}</div>
-  </section>
-  <section class="tv-card" aria-labelledby="tvWhatRowH">
-    <h2 class="tv-h2" id="tvWhatRowH">What each row shows</h2>
-    <ul class="tv-bullets"><li>Date, day and start time</li><li>How long the session took</li><li>The skill or skill set</li><li>The mode: Practice, Boss Battle, Car Race or Worksheet</li><li>Score and result</li></ul>
-    <p class="tv-cap tv-divided">No names are recorded. Clearing this browser's data removes the history.</p>
-    <p class="tv-cap">Quiz results are kept with each quiz. <button type="button" class="tv-link" data-go-quizzes style="font-size:12px;">Open Quizzes</button></p>
-  </section>
-</div>`;
+<section class="tv-card tv-notice"><span class="tv-notice-icon" aria-hidden="true">${icon('device', 20)}</span><div><div class="tv-h3">This device only</div><p class="tv-body">This browser keeps its last 100 sessions, with no names. Sessions on pupils' own tablets do not appear here. Quiz results are kept with each quiz: <button type="button" class="tv-link" data-go-quizzes>open Quizzes</button>.</p></div></section>
+<section class="tv-card tv-flush" aria-labelledby="tvHistH">
+  <div class="tv-card-head"><div class="tv-row"><h2 class="tv-h2" id="tvHistH">Session history</h2><span class="tv-cap">${esc(label)} · ${rows.length} session${rows.length === 1 ? '' : 's'}</span></div></div>
+  ${table}
+</section>`;
     if (!el.dataset.wired) {
         el.dataset.wired = '1';
         el.addEventListener('click', (e) => {

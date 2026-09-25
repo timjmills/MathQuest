@@ -2,13 +2,15 @@
 // Layer 5: depends on state, data, quiz-storage, ui-core
 
 import { SKILLS } from './data.js';
-import { loadTest, listTests, getResultsForTest, exportResultsCSV, saveResult, migrateTestToSections, getAllQuestionsFlat, getGlobalOffset, getTotalQuestionCount } from './quiz-storage.js';
+import { compressTestForURL, loadTest, listTests, getResultsForTest, exportResultsCSV, saveResult, migrateTestToSections, getAllQuestionsFlat, getGlobalOffset, getTotalQuestionCount } from './quiz-storage.js';
 import { shuffle } from './utils.js';
+import { icon, cleanLabel, copyText, fmtDay } from './teacher-ui.js';
+import { note, backHTML, goQuizzes } from './teacher-quiz-ui.js';
 
 function getSkillLabel(skillId) {
     for (const catKey in SKILLS) {
         for (const sk of SKILLS[catKey]) {
-            if (sk.v === skillId) return sk.l;
+            if (sk.v === skillId) return cleanLabel(sk.l);
         }
     }
     return skillId;
@@ -21,6 +23,53 @@ function escHtml(str) {
 }
 
 // ---- Show Results View ----
+//
+// Teacher screen (2026-09-25): drawn in the teacher style (--tv-* tokens, css/teacher-quiz.css).
+// Back sits on the left; CSV export, importing results and Google Forms live under "More"; the
+// empty state offers the pupil link. Only the teacher reaches this view (pupils see their own
+// result card in quiz-take.js, which is unchanged).
+
+export function closeQuizResults() { goQuizzes(); }
+
+function resultsRoot() {
+    const el = document.getElementById('quizResultsView');
+    if (el) el.classList.add('tvq');
+    return el;
+}
+
+/** Copy the pupil link of a quiz (the empty state's primary action). */
+export async function copyQuizLinkFromResults(testId) {
+    const test = await loadTest(testId);
+    if (!test) return;
+    const url = `${location.origin}${location.pathname}?quiz=${compressTestForURL(test)}`;
+    if (url.length > 8000) { note('This quiz is too large for a link. Export it as JSON instead.', 'error'); return; }
+    if (await copyText(url)) note('Pupil link copied', 'success');
+    else prompt('Copy this quiz link:', url);
+}
+
+const pctClass = (pct) => (pct >= 80 ? 'is-strong' : pct >= 50 ? 'is-mid' : 'is-weak');
+
+function barRow(label, pct, right, title) {
+    return `<div class="tvq-bar-row">
+      <span class="tvq-bar-label" title="${escHtml(title || label)}">${escHtml(label)}</span>
+      <span class="tvq-bar" role="img" aria-label="${escHtml(label)}: ${pct}%"><span class="tvq-bar-fill ${pctClass(pct)}" style="width:${Math.max(0, Math.min(100, pct))}%"></span></span>
+      <span class="tvq-bar-pct">${right}</span>
+    </div>`;
+}
+
+function statTiles(tiles) {
+    return `<div class="tvq-stats">${tiles.map(([v, l, cls]) => `<div class="tv-card tvq-stat"><div class="tvq-stat-val${cls ? ' ' + cls : ''}">${v}</div><div class="tv-cap">${l}</div></div>`).join('')}</div>`;
+}
+
+function summaryHTML(list, withPct) {
+    const groups = [
+        ['is-weak', 'Needs practice', list.filter(x => x.pct < 50)],
+        ['is-mid', 'Developing', list.filter(x => x.pct >= 50 && x.pct < 80)],
+        ['is-strong', 'Strong', list.filter(x => x.pct >= 80)],
+    ];
+    const rows = groups.filter(g => g[2].length).map(([cls, name, items]) => `<div class="tvq-sum-row"><span class="tvq-tag ${cls}">${name}</span><span class="tv-body">${items.map(x => escHtml(x.label) + (withPct ? ` (${x.pct}%)` : '')).join(', ')}</span></div>`);
+    return rows.length ? `<div class="tvq-summary">${rows.join('')}</div>` : '';
+}
 
 export async function showQuizResults(testId) {
     if (!testId) {
@@ -30,185 +79,112 @@ export async function showQuizResults(testId) {
 
     const test = await loadTest(testId);
     const results = await getResultsForTest(testId);
-    const container = document.getElementById('quizResultsView');
+    const container = resultsRoot();
     if (!container) return;
 
     window.showView('quizResultsView');
+    window.scrollTo(0, 0);
 
     if (!test) {
-        container.innerHTML = `
-            <div class="quiz-header">
-                <h2>Results</h2>
-                <button class="btn btn-sm btn-secondary" onclick="showView('homeView')">Back</button>
-            </div>
-            <div class="qb-empty">Quiz not found. It may have been deleted.</div>
-        `;
+        container.innerHTML = `<div class="tvq-page">
+  <div class="tvq-topline">${backHTML('Quizzes', 'closeQuizResults()')}</div>
+  <header class="tv-header"><div><h1 class="tv-h1">Results</h1><p class="tv-sub">This quiz was not found. It may have been deleted.</p></div></header>
+</div>`;
         return;
     }
 
     migrateTestToSections(test);
     const allQs = getAllQuestionsFlat(test);
-    const totalCount = allQs.length;
-
-    // Calculate analytics
     const analytics = calculateQuizAnalytics(test, allQs, results);
+    const pass = test.settings.passingScore || 70;
+    const safeId = escHtml(testId);
 
-    container.innerHTML = `
-        <div class="quiz-header">
-            <div>
-                <h2>${escHtml(test.name)} — Results</h2>
-                <span style="font-size:0.85rem;color:var(--text-dim);">${results.length} submission${results.length !== 1 ? 's' : ''}</span>
-            </div>
-            <div class="quiz-header-actions">
-                <button class="qb-toolbar-btn export" onclick="exportQuizCSV('${testId}')">Export CSV</button>
-                <button class="qb-toolbar-btn import" onclick="importStudentResultsFile('${testId}')">Import Results</button>
-                <button class="qb-toolbar-btn" onclick="exportQuizToGoogleForms('${testId}')" style="background:#4285F4;color:white;">Google Forms</button>
-                <button class="btn btn-sm btn-secondary" onclick="openMyQuizzes()">Back</button>
-            </div>
-        </div>
+    const more = `<div class="tv-menu-wrap">
+      <button type="button" class="tv-btn" aria-haspopup="true" aria-expanded="false" onclick="tvqMenu(this)">${icon('dots', 18)}<span>More</span></button>
+      <div class="tv-menu" hidden>
+        <button type="button" onclick="exportQuizCSV('${safeId}')"${results.length ? '' : ' disabled'}>${icon('download', 16)}<span>Export results (CSV)</span></button>
+        <button type="button" onclick="importStudentResultsFile('${safeId}')">${icon('upload', 16)}<span>Import pupil results</span></button>
+        <button type="button" onclick="exportQuizToGoogleForms('${safeId}')">${icon('external', 16)}<span>Export to Google Forms</span></button>
+      </div>
+    </div>`;
 
-        <div class="qr-container">
-            ${results.length > 0 ? `
-                <div class="qr-summary">
-                    <div class="qr-stat-card">
-                        <div class="qr-stat-val">${analytics.avgScore}%</div>
-                        <div class="qr-stat-label">Average Score</div>
-                    </div>
-                    <div class="qr-stat-card">
-                        <div class="qr-stat-val">${analytics.passRate}%</div>
-                        <div class="qr-stat-label">Pass Rate</div>
-                    </div>
-                    <div class="qr-stat-card">
-                        <div class="qr-stat-val">${analytics.highest}%</div>
-                        <div class="qr-stat-label">Highest</div>
-                    </div>
-                    <div class="qr-stat-card">
-                        <div class="qr-stat-val">${analytics.lowest}%</div>
-                        <div class="qr-stat-label">Lowest</div>
-                    </div>
-                </div>
+    const rows = results.map((r) => {
+        const timeMins = r.completedAt && r.startedAt ? Math.max(0, Math.round((r.completedAt - r.startedAt) / 60000)) : null;
+        const ok = r.percentage >= pass;
+        return `<tr>
+          <td data-label="Pupil"><button type="button" class="tv-cell-title tv-link-row" onclick="showStudentQuizDetail('${escHtml(r.id)}', '${safeId}')">${escHtml(r.studentName || 'Anonymous')}</button></td>
+          <td data-label="Score">${r.score}/${r.totalPoints} <span class="tv-muted">(${r.percentage}%)</span></td>
+          <td data-label="Time">${timeMins == null ? '–' : timeMins < 1 ? 'Under 1 min' : `${timeMins} min`}</td>
+          <td data-label="Date">${r.completedAt ? escHtml(fmtDay(r.completedAt)) : '–'}</td>
+          <td data-label="Result"><span class="tvq-tag ${ok ? 'is-strong' : 'is-weak'}">${ok ? 'Passed' : 'Below pass mark'}</span></td>
+        </tr>`;
+    }).join('');
 
-                <div class="qr-table-wrap">
-                    <table class="qr-table">
-                        <thead>
-                            <tr>
-                                <th>Student</th>
-                                <th>Score</th>
-                                <th>%</th>
-                                <th>Time</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${results.map(r => {
-                                const timeMins = r.completedAt && r.startedAt
-                                    ? Math.round((r.completedAt - r.startedAt) / 60000)
-                                    : '—';
-                                const date = r.completedAt ? new Date(r.completedAt).toLocaleDateString() : '—';
-                                const pass = r.percentage >= (test.settings.passingScore || 70);
-                                return `<tr onclick="showStudentQuizDetail('${r.id}', '${testId}')" style="cursor:pointer;">
-                                    <td><strong>${escHtml(r.studentName)}</strong></td>
-                                    <td>${r.score}/${r.totalPoints}</td>
-                                    <td>${r.percentage}%</td>
-                                    <td>${timeMins} min</td>
-                                    <td>${date}</td>
-                                    <td class="${pass ? 'qr-pass' : 'qr-fail'}">${pass ? 'Pass' : 'Fail'}</td>
-                                </tr>`;
-                            }).join('')}
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="qr-q-analysis">
-                    <h3 style="margin:0 0 12px;">Skill Strengths & Weaknesses</h3>
-                    <div style="font-size:0.82rem;color:var(--text-dim);margin-bottom:12px;">Skills sorted from weakest to strongest across all students</div>
-                    ${analytics.skillAnalysis.map(sa => {
-                        const isLow = sa.pct < 50;
-                        const isHigh = sa.pct >= 80;
-                        const icon = isHigh ? '<span style="color:#059669;">&#9650;</span>' : (isLow ? '<span style="color:#dc2626;">&#9660;</span>' : '<span style="color:#f97316;">&#9679;</span>');
-                        return `<div class="qr-q-bar-row">
-                            <span class="qr-q-bar-label" style="min-width:auto;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escHtml(sa.label)}">${icon} ${escHtml(sa.label)}</span>
-                            <div class="qr-q-bar-bg">
-                                <div class="qr-q-bar-fill ${isLow ? 'low' : ''}" style="width:${sa.pct}%"></div>
-                            </div>
-                            <span class="qr-q-bar-pct">${sa.pct}%</span>
-                            <span style="font-size:0.72rem;color:var(--text-dim);min-width:55px;">Q${sa.questionNums.join(',')}</span>
-                        </div>`;
-                    }).join('')}
-                    ${analytics.skillAnalysis.length > 0 ? `
-                        <div style="margin-top:16px;padding:12px;background:var(--bg-card-light);border-radius:10px;">
-                            <div style="font-weight:700;font-size:0.9rem;margin-bottom:8px;">Summary</div>
-                            ${(() => {
-                                const weak = analytics.skillAnalysis.filter(s => s.pct < 50);
-                                const strong = analytics.skillAnalysis.filter(s => s.pct >= 80);
-                                const mid = analytics.skillAnalysis.filter(s => s.pct >= 50 && s.pct < 80);
-                                let html = '';
-                                if (strong.length > 0) {
-                                    html += '<div style="margin-bottom:6px;"><span style="color:#059669;font-weight:700;">Strong areas:</span> ' + strong.map(s => escHtml(s.label) + ' (' + s.pct + '%)').join(', ') + '</div>';
-                                }
-                                if (mid.length > 0) {
-                                    html += '<div style="margin-bottom:6px;"><span style="color:#f97316;font-weight:700;">Developing:</span> ' + mid.map(s => escHtml(s.label) + ' (' + s.pct + '%)').join(', ') + '</div>';
-                                }
-                                if (weak.length > 0) {
-                                    html += '<div><span style="color:#dc2626;font-weight:700;">Needs practice:</span> ' + weak.map(s => escHtml(s.label) + ' (' + s.pct + '%)').join(', ') + '</div>';
-                                }
-                                if (!html) html = '<div style="color:var(--text-dim);">No data yet</div>';
-                                return html;
-                            })()}
-                        </div>
-                    ` : ''}
-                </div>
-
-                <div class="qr-q-analysis" style="margin-top:16px;">
-                    <h3 style="margin:0 0 12px;">Per-Question Analysis</h3>
-                    ${analytics.perQuestion.map((pq, i) => {
-                        const isLow = pq.pct < 50;
-                        const skillLabel = escHtml(getSkillLabel(allQs[i].question.skillId));
-                        return `<div class="qr-q-bar-row">
-                            <span class="qr-q-bar-label">Q${i + 1}</span>
-                            <div class="qr-q-bar-bg" title="${skillLabel}">
-                                <div class="qr-q-bar-fill ${isLow ? 'low' : ''}" style="width:${pq.pct}%"></div>
-                            </div>
-                            <span class="qr-q-bar-pct">${pq.pct}%</span>
-                        </div>`;
-                    }).join('')}
-                </div>
-            ` : `
-                <div class="qb-empty">No submissions yet. Share the quiz link with students to collect results.</div>
-            `}
-        </div>
-    `;
+    container.innerHTML = `<div class="tvq-page">
+  <div class="tvq-topline">${backHTML('Quizzes', 'closeQuizResults()')}</div>
+  <header class="tv-header">
+    <div class="tvq-title"><h1 class="tv-h1">${escHtml(test.name || 'Untitled Quiz')}</h1><p class="tv-sub">Results · ${results.length} submission${results.length !== 1 ? 's' : ''} · pass mark ${pass}%</p></div>
+    <div class="tv-header-actions">
+      <button type="button" class="tv-btn" onclick="copyQuizLinkFromResults('${safeId}')">${icon('link', 18)}<span>Copy pupil link</span></button>
+      ${more}
+    </div>
+  </header>
+  ${results.length > 0 ? `
+  ${statTiles([[analytics.avgScore + '%', 'Average score'], [analytics.passRate + '%', 'Passed'], [analytics.highest + '%', 'Highest'], [analytics.lowest + '%', 'Lowest']])}
+  <section class="tv-card tv-flush" aria-labelledby="tvqResH">
+    <div class="tv-card-head"><div class="tv-row"><h2 class="tv-h2" id="tvqResH">Pupils</h2><span class="tv-cap">Open a name to see each answer</span></div></div>
+    <table class="tv-table tvq-rows">
+      <thead><tr><th scope="col">Pupil</th><th scope="col" style="width:150px;">Score</th><th scope="col" style="width:96px;">Time</th><th scope="col" style="width:120px;">Date</th><th scope="col" style="width:170px;">Result</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </section>
+  <div class="tvq-two">
+    <section class="tv-card" aria-labelledby="tvqSkillH">
+      <div><h2 class="tv-h2" id="tvqSkillH">Skills, weakest first</h2><p class="tv-cap">Share of right answers across all pupils</p></div>
+      <div class="tvq-bars">${analytics.skillAnalysis.map(sa => barRow(sa.label, sa.pct, `${sa.pct}%`, `${sa.label} · questions ${sa.questionNums.join(', ')}`)).join('')}</div>
+      ${summaryHTML(analytics.skillAnalysis, true)}
+    </section>
+    <section class="tv-card" aria-labelledby="tvqQH">
+      <div><h2 class="tv-h2" id="tvqQH">Each question</h2><p class="tv-cap">Share of pupils who answered it right</p></div>
+      <div class="tvq-bars">${analytics.perQuestion.map((pq, i) => barRow(`Q${i + 1} · ${getSkillLabel(allQs[i].question.skillId)}`, pq.pct, `${pq.pct}%`)).join('')}</div>
+    </section>
+  </div>` : `
+  <section class="tv-card">
+    <div class="tv-empty-lg">
+      <span class="tv-empty-icon" aria-hidden="true">${icon('bars', 22)}</span>
+      <div class="tv-h3">No results yet</div>
+      <p class="tv-cap">Share the quiz link with your class. Results appear here when pupils submit on this device, or when you import their result files.</p>
+      <button type="button" class="tv-btn tv-btn-primary" onclick="copyQuizLinkFromResults('${safeId}')">${icon('link', 18)}<span>Copy pupil link</span></button>
+    </div>
+  </section>`}
+</div>`;
 }
 
 // ---- Quiz selector (when no testId provided) ----
 
 async function showQuizResultsSelector() {
-    const tests = await listTests();
-    const container = document.getElementById('quizResultsView');
+    let tests = [];
+    try { tests = await listTests(); } catch (e) { tests = []; }
+    const container = resultsRoot();
     if (!container) return;
 
     window.showView('quizResultsView');
+    tests.sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0));
 
-    container.innerHTML = `
-        <div class="quiz-header">
-            <h2>Quiz Results</h2>
-            <button class="btn btn-sm btn-secondary" onclick="showView('homeView')">Back</button>
-        </div>
-        <div class="qb-quiz-list">
-            ${tests.length === 0 ? '<div class="qb-empty">No quizzes found.</div>' :
-            tests.map(t => {
-                const qCount = t.sections ? getTotalQuestionCount(t) : (t.questions ? t.questions.length : 0);
-                return `
-                <div class="qb-quiz-item" onclick="showQuizResults('${t.id}')">
-                    <div>
-                        <div class="qb-quiz-item-name">${escHtml(t.name)}</div>
-                        <div class="qb-quiz-item-meta">${qCount} questions &middot; ${new Date(t.createdAt).toLocaleDateString()}</div>
-                    </div>
-                </div>
-            `}).join('')}
-        </div>
-    `;
+    container.innerHTML = `<div class="tvq-page">
+  <div class="tvq-topline">${backHTML('Quizzes', 'closeQuizResults()')}</div>
+  <header class="tv-header"><div><h1 class="tv-h1">Quiz results</h1><p class="tv-sub">Choose a quiz to see how pupils did.</p></div></header>
+  <section class="tv-card tv-flush" aria-label="Quizzes">
+    ${tests.length === 0 ? `<div class="tv-empty-lg"><span class="tv-empty-icon" aria-hidden="true">${icon('sheet', 22)}</span><div class="tv-h3">No quizzes yet</div><p class="tv-cap">Create a quiz first.</p></div>`
+        : `<ul class="tvq-list">${tests.map(t => {
+            const qCount = t.sections ? getTotalQuestionCount(t) : (t.questions ? t.questions.length : 0);
+            return `<li class="tvq-list-row">
+              <div class="tvq-list-main"><span class="tv-cell-title">${escHtml(t.name || 'Untitled Quiz')}</span><span class="tv-cell-sub">${qCount} question${qCount === 1 ? '' : 's'} · ${escHtml(fmtDay(t.updatedAt || t.createdAt))}</span></div>
+              <button type="button" class="tv-btn" onclick="showQuizResults('${escHtml(t.id)}')">${icon('bars', 18)}<span>Results</span></button>
+            </li>`;
+        }).join('')}</ul>`}
+  </section>
+</div>`;
 }
 
 // ---- Analytics ----
@@ -276,52 +252,40 @@ export async function showStudentQuizDetail(resultId, testId) {
     const allQs = getAllQuestionsFlat(test);
     const multiSection = test.sections.length > 1;
 
-    const container = document.getElementById('quizResultsView');
+    const container = resultsRoot();
     if (!container) return;
 
     const pass = result.percentage >= (test.settings.passingScore || 70);
     const timeMins = result.completedAt && result.startedAt
-        ? Math.round((result.completedAt - result.startedAt) / 60000)
+        ? Math.max(0, Math.round((result.completedAt - result.startedAt) / 60000))
         : 0;
 
-    // Build question table (grouped by section if multi-section)
+    const qRow = (i, q) => {
+        const a = result.answers && result.answers[i];
+        const tag = a ? (a.correct ? '<span class="tvq-tag is-strong">Right</span>' : '<span class="tvq-tag is-weak">Wrong</span>') : '<span class="tvq-tag">Skipped</span>';
+        const label = escHtml(getSkillLabel(q.skillId));
+        return `<tr>
+          <td data-label="Question">Q${i + 1}</td>
+          <td data-label="Skill"><span class="tv-cell-title tvq-plain" title="${label}">${label}</span></td>
+          <td data-label="Pupil's answer">${a ? escHtml(String(a.studentAnswer || '–')) : '–'}</td>
+          <td data-label="Right answer">${escHtml(String(q.questionData.ans))}</td>
+          <td data-label="Result">${tag}</td>
+        </tr>`;
+    };
+
     let questionTableHtml = '';
     if (multiSection) {
         for (let sIdx = 0; sIdx < test.sections.length; sIdx++) {
             const section = test.sections[sIdx];
             const sectionQs = allQs.filter(q => q.sectionIdx === sIdx);
             if (sectionQs.length === 0) continue;
-
-            questionTableHtml += `<tr><td colspan="5" style="font-weight:800;color:var(--accent-purple);padding-top:12px;border-bottom:2px solid var(--accent-purple);">${escHtml(section.label)}</td></tr>`;
-
-            for (const qItem of sectionQs) {
-                const i = qItem.globalIdx;
-                const q = qItem.question;
-                const a = result.answers && result.answers[i];
-                questionTableHtml += `<tr>
-                    <td>Q${i + 1}</td>
-                    <td>${escHtml(getSkillLabel(q.skillId))}</td>
-                    <td>${a ? escHtml(String(a.studentAnswer || '—')) : '—'}</td>
-                    <td>${escHtml(String(q.questionData.ans))}</td>
-                    <td class="${a && a.correct ? 'qr-pass' : 'qr-fail'}">${a ? (a.correct ? 'Correct' : 'Incorrect') : 'Skipped'}</td>
-                </tr>`;
-            }
+            questionTableHtml += `<tr class="tvq-section-row"><th scope="rowgroup" colspan="5">${escHtml(section.label)}</th></tr>`;
+            for (const qItem of sectionQs) questionTableHtml += qRow(qItem.globalIdx, qItem.question);
         }
     } else {
-        for (let i = 0; i < allQs.length; i++) {
-            const q = allQs[i].question;
-            const a = result.answers && result.answers[i];
-            questionTableHtml += `<tr>
-                <td>Q${i + 1}</td>
-                <td>${escHtml(getSkillLabel(q.skillId))}</td>
-                <td>${a ? escHtml(String(a.studentAnswer || '—')) : '—'}</td>
-                <td>${escHtml(String(q.questionData.ans))}</td>
-                <td class="${a && a.correct ? 'qr-pass' : 'qr-fail'}">${a ? (a.correct ? 'Correct' : 'Incorrect') : 'Skipped'}</td>
-            </tr>`;
-        }
+        for (let i = 0; i < allQs.length; i++) questionTableHtml += qRow(i, allQs[i].question);
     }
 
-    // Build student skill analysis
     const studentSkillMap = {};
     allQs.forEach((qItem, i) => {
         const skillId = qItem.question.skillId;
@@ -337,74 +301,25 @@ export async function showStudentQuizDetail(resultId, testId) {
         pct: s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0
     }));
     studentSkills.sort((a, b) => a.pct - b.pct);
-    const weak = studentSkills.filter(s => s.pct < 50);
-    const strong = studentSkills.filter(s => s.pct >= 80);
-    const mid = studentSkills.filter(s => s.pct >= 50 && s.pct < 80);
 
-    container.innerHTML = `
-        <div class="quiz-header">
-            <div>
-                <h2>${escHtml(result.studentName)}'s Results</h2>
-                <span style="font-size:0.85rem;color:var(--text-dim);">${escHtml(test.name)}</span>
-            </div>
-            <button class="btn btn-sm btn-secondary" onclick="showQuizResults('${testId}')">Back</button>
-        </div>
-        <div class="qr-container">
-            <div class="qr-summary">
-                <div class="qr-stat-card">
-                    <div class="qr-stat-val">${result.score}/${result.totalPoints}</div>
-                    <div class="qr-stat-label">Score</div>
-                </div>
-                <div class="qr-stat-card">
-                    <div class="qr-stat-val ${pass ? 'qr-pass' : 'qr-fail'}">${result.percentage}%</div>
-                    <div class="qr-stat-label">${pass ? 'Passed' : 'Failed'}</div>
-                </div>
-                <div class="qr-stat-card">
-                    <div class="qr-stat-val">${timeMins} min</div>
-                    <div class="qr-stat-label">Time Taken</div>
-                </div>
-                <div class="qr-stat-card">
-                    <div class="qr-stat-val">${result.completedAt ? new Date(result.completedAt).toLocaleDateString() : '—'}</div>
-                    <div class="qr-stat-label">Date</div>
-                </div>
-            </div>
-
-            <div class="qr-table-wrap">
-                <table class="qr-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Skill</th>
-                            <th>Student Answer</th>
-                            <th>Correct Answer</th>
-                            <th>Result</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${questionTableHtml}
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="qr-q-analysis" style="margin-top:16px;">
-                <h3 style="margin:0 0 8px;">Skill Analysis</h3>
-                ${studentSkills.map(s => {
-                    const isLow = s.pct < 50;
-                    const icon = s.pct >= 80 ? '<span style="color:#059669;">&#9650;</span>' : (isLow ? '<span style="color:#dc2626;">&#9660;</span>' : '<span style="color:#f97316;">&#9679;</span>');
-                    return '<div class="qr-q-bar-row">' +
-                        '<span class="qr-q-bar-label" style="min-width:auto;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + icon + ' ' + escHtml(s.label) + '</span>' +
-                        '<div class="qr-q-bar-bg"><div class="qr-q-bar-fill ' + (isLow ? 'low' : '') + '" style="width:' + s.pct + '%"></div></div>' +
-                        '<span class="qr-q-bar-pct">' + s.correct + '/' + s.total + '</span>' +
-                        '</div>';
-                }).join('')}
-                <div style="margin-top:12px;padding:10px;background:var(--bg-card-light);border-radius:8px;font-size:0.88rem;">
-                    ${strong.length > 0 ? '<div style="margin-bottom:4px;"><span style="color:#059669;font-weight:700;">Strong:</span> ' + strong.map(s => escHtml(s.label)).join(', ') + '</div>' : ''}
-                    ${mid.length > 0 ? '<div style="margin-bottom:4px;"><span style="color:#f97316;font-weight:700;">Developing:</span> ' + mid.map(s => escHtml(s.label)).join(', ') + '</div>' : ''}
-                    ${weak.length > 0 ? '<div><span style="color:#dc2626;font-weight:700;">Needs practice:</span> ' + weak.map(s => escHtml(s.label)).join(', ') + '</div>' : ''}
-                </div>
-            </div>
-        </div>
-    `;
+    container.innerHTML = `<div class="tvq-page">
+  <div class="tvq-topline">${backHTML('All results', `showQuizResults('${escHtml(testId)}')`)}</div>
+  <header class="tv-header"><div class="tvq-title"><h1 class="tv-h1">${escHtml(result.studentName || 'Anonymous')}</h1><p class="tv-sub">${escHtml(test.name || 'Untitled Quiz')}</p></div></header>
+  ${statTiles([[`${result.score}/${result.totalPoints}`, 'Score'], [`${result.percentage}%`, pass ? 'Passed' : 'Below pass mark', pass ? 'is-strong' : 'is-weak'], [timeMins < 1 ? 'Under 1 min' : `${timeMins} min`, 'Time taken'], [result.completedAt ? escHtml(fmtDay(result.completedAt)) : '–', 'Date']])}
+  <section class="tv-card tv-flush" aria-labelledby="tvqAnsH">
+    <div class="tv-card-head"><h2 class="tv-h2" id="tvqAnsH">Answers</h2></div>
+    <table class="tv-table tvq-rows">
+      <thead><tr><th scope="col" style="width:72px;">#</th><th scope="col">Skill</th><th scope="col" style="width:150px;">Pupil's answer</th><th scope="col" style="width:150px;">Right answer</th><th scope="col" style="width:112px;">Result</th></tr></thead>
+      <tbody>${questionTableHtml}</tbody>
+    </table>
+  </section>
+  <section class="tv-card" aria-labelledby="tvqStuSkillH">
+    <div><h2 class="tv-h2" id="tvqStuSkillH">Skills</h2><p class="tv-cap">Right answers out of questions, weakest first</p></div>
+    <div class="tvq-bars">${studentSkills.map(sk => barRow(sk.label, sk.pct, `${sk.correct}/${sk.total}`)).join('')}</div>
+    ${summaryHTML(studentSkills, false)}
+  </section>
+</div>`;
+    window.scrollTo(0, 0);
 }
 
 // ---- CSV Export ----

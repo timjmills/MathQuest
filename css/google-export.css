@@ -313,3 +313,27 @@
 .dark .google-export-btn.google-auth:hover {
     border-color: #8ab4f8;
 }
+
+/* ---- Fields (moved out of inline styles, same look) ---- */
+.gex-label { display: block; font-weight: 600; font-size: 0.9rem; }
+.gex-field {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--text-dim);
+    border-radius: 8px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 1rem;
+    margin: 6px 0 14px;
+    box-sizing: border-box;
+}
+.gex-count { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 14px; }
+.gex-cancel {
+    padding: 10px 20px;
+    border: 2px solid var(--text-dim);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-weight: 600;
+}
