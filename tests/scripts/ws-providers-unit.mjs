@@ -169,6 +169,39 @@ Object.assign(ITEM_MAKERS, {
     'composing:base10_build_hundreds': (r) => { const n = int(r, 100, 999); return { target: n, ans: n, places: [100, 10, 1] }; },
 });
 
+/* ============================================================ P10 time + money */
+// The tm items come from the REAL generator (gen-time-money.js is pure enough to run in node):
+// Math.random is the seeded stream for one item, and the page position alternates the option
+// that changes the item's shape (write / draw, the two tasks), so both paths are held.
+const { state: TM_STATE } = await import('../../js/modules/state.js');
+const { generateTimeMoneyQuestion } = await import('../../js/modules/gen-time-money.js');
+const { TM_PROVIDER_SKILLS } = await import('../../js/modules/sheet/providers/time-money.js');
+const TM_ALT = {
+    time_hour: [{}, { response: 'draw' }], time_half_hour: [{}, { response: 'draw' }], time_quarter: [{}, { response: 'draw' }],
+    time_5min: [{}, { response: 'draw' }], time_1min: [{}, { response: 'draw', stimulus: 'words' }],
+    time_analog_digital: [{}, { dir: 'to-analog' }], clock_parts: [{}, { task: 'hands' }], coin_value: [{}, { task: 'order' }],
+    money_compare: [{}, { response: 'sign' }], money_count: [{}, { kind: 'mixed' }, { kind: 'notes-coins', currency: 'qar' }],
+    elapsed_find_duration: [{}, { response: 'minutes' }], elapsed_hour: [{}, { dir: 'earlier' }, { response: 'draw' }],
+    money: [{}, { step: 25 }], money_change: [{}, {}, { step: 100 }],
+};
+const tmMaker = (skill) => {
+    let k = 0;
+    return (r) => {
+        const alts = TM_ALT[skill] || [{}];
+        const opts = alts[k % alts.length];
+        const saved = Math.random;
+        Math.random = r;
+        try {
+            Object.assign(TM_STATE, { category: 'measurement', skill, skillOptions: opts, itemIndex: k });
+            const q = {};
+            generateTimeMoneyQuestion(q, skill);
+            k++;
+            return q;
+        } finally { Math.random = saved; }
+    };
+};
+for (const key of TM_PROVIDER_SKILLS) ITEM_MAKERS[key] = tmMaker(key.split(':')[1]);
+
 /* ============================================================ skill-specific phrasing */
 
 // Phrases a skill's STEPS must never use (the critics' 2026-09-25 findings, and their kin).
@@ -321,6 +354,8 @@ function checkSkill(key, { requireStories = false } = {}) {
 
 for (const key of REGRADED_SKILLS) checkSkill(key, { requireStories: key === 'addition:add_wp_10' });
 for (const key of Object.keys(SIBLINGS)) checkSkill(key, { requireStories: /_wp_/.test(key) });
+// P10 time + money: every provider, both of its item shapes.
+for (const key of TM_PROVIDER_SKILLS) checkSkill(key);
 
 // ---- the contract seam the roles rely on
 ok(REGRADED_SKILLS.length === 24, `REGRADED_SKILLS lists ${REGRADED_SKILLS.length} skills, not 24`);
@@ -348,4 +383,4 @@ if (failures.length) {
     console.log(`ws-providers-unit: FAIL (${failures.length} of ${checks} checks)`);
     process.exit(1);
 }
-console.log(`ws-providers-unit: OK (${checks} checks, ${REGRADED_SKILLS.length} re-graded skills + ${Object.keys(SIBLINGS).length} siblings)`);
+console.log(`ws-providers-unit: OK (${checks} checks, ${REGRADED_SKILLS.length} re-graded skills + ${Object.keys(SIBLINGS).length} siblings + ${TM_PROVIDER_SKILLS.length} time and money)`);

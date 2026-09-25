@@ -122,7 +122,7 @@ const readingDefs = (ican, extraStep) => ({
 const READING = {
     time_hour: ['I Can tell time to the hour', 'The long hand on 12 means o\'clock.'],
     time_half_hour: ['I Can tell time to the half hour', 'The long hand on 6 means 30 minutes: half past.'],
-    time_quarter: ['I Can tell time to the quarter hour', 'The long hand on 3 is 15 minutes, on 9 is 45 minutes.'],
+    time_quarter: ['I Can tell time to the quarter hour', 'Long hand on 3: 15 minutes. On 9: 45 minutes.'],
     time_5min: ['I Can tell time to 5 minutes', 'Count the minutes by fives from 12.'],
     time_1min: ['I Can tell time to the minute', 'Count by fives, then on by ones.'],
 };
@@ -379,7 +379,7 @@ registerSkill('measurement:time_fives_ring', {
 });
 
 registerSkill('measurement:time_sense', {
-    strings: strings({ iCan: 'I Can tell a.m. from p.m.', instructionKey: 'am-pm',
+    strings: strings({ iCan: 'I Can choose a.m. or p.m. for a time', instructionKey: 'am-pm',
         steps: ['Read what happens and the time.', 'Morning, before 12 noon, is a.m.', 'After 12 noon is p.m. Check one box.'],
         say: '__ is in the __, so it is __.', sayValues: (q) => { const p = payloadOf(q); return [p.activity, p.ap === 'a.m.' ? 'morning' : 'afternoon or evening', p.ap]; } }),
     misconceptions: ['am-pm-swapped'],
@@ -423,6 +423,7 @@ function countWrong(q) {
     const total = sum(list);
     const c = [{ value: list.length, misconception: 'M-M1', explain: `Counted ${list.length} ${notes.length ? 'notes' : 'coins'}, not their value.` }];
     if (list.length > 1) c.push({ value: total - list[list.length - 1], misconception: 'M-M2', explain: 'Lost count and missed one.' });
+    c.push({ value: total + list[list.length - 1], misconception: 'counted-twice', explain: 'Counted the last one twice.' });
     if (notes.length) c.push({ value: sum(list.map((v) => Number(String(v)[0]))), misconception: 'M-M11', explain: 'Counted each note by its first digit.' });
     return chooseWrong(q, c);
 }
@@ -438,7 +439,7 @@ registerSkill('measurement:money_count', {
             steps: ['Count the notes.', 'Then count the coins.', 'Write the two numbers.'],
             say: '__ and __.', sayValues: (q) => { const p = payloadOf(q); return [sum(p.notes), sum(p.coins)]; } },
     }, (q) => { const p = payloadOf(q); return p.answer === 'two' ? 'two' : p.answer === 'major' ? 'notes' : 'coins'; }),
-    misconceptions: ['M-M1', 'M-M2', 'M-M5', 'M-M11'],
+    misconceptions: ['M-M1', 'M-M2', 'M-M5', 'M-M11', 'counted-twice'],
     workedSteps: countSteps,
     wrongAnswer: countWrong,
 });
@@ -476,7 +477,7 @@ function columnsWrong(q) {
     if (bad !== res && (p.cents || bad % 100 === 0)) c.push({ value: fmt(bad), misconception: p.op === '-' ? 'M-M7' : 'M-M6', slot: 'whole', slots: slotsOf(bad), explain: p.op === '-' ? 'Took the smaller digit from the larger in every column.' : 'Did not regroup a column that made 10 or more.' });
     const off = p.cents ? 10 : 100;
     const alt = p.op === '-' ? res + off : res - off;
-    if (alt > 0) c.push({ value: fmt(alt), misconception: 'M-M6', slot: 'whole', slots: slotsOf(alt), explain: p.op === '-' ? 'Regrouped but did not take the 1 away from the next column.' : 'Lost the regrouped 1.' });
+    if (alt > 0) c.push({ value: fmt(alt), misconception: p.op === '-' ? 'kept-the-one' : 'M-M6', slot: 'whole', slots: slotsOf(alt), explain: p.op === '-' ? 'Regrouped but did not take the 1 away from the next column.' : 'Lost the regrouped 1.' });
     return chooseWrong(q, c);
 }
 registerSkill('measurement:money', {
@@ -491,7 +492,7 @@ registerSkill('measurement:money_change', {
     strings: strings({ iCan: 'I Can find the change', instructionKey: 'money-change',
         steps: ['Write the money paid on top, the price under it.', 'Subtract the right column first; regroup across the zeros.', 'The answer is the change.'],
         say: '__ take away __ is __ change.', sayValues: (q) => { const p = payloadOf(q); const f = (x) => (p.cents ? money(x) : String(x / 100)); return [f(p.a), f(p.b), f(p.a - p.b)]; } }),
-    misconceptions: ['M-M6', 'M-M7'],
+    misconceptions: ['M-M6', 'M-M7', 'kept-the-one'],
     workedSteps: columnsSteps,
     wrongAnswer: columnsWrong,
 });
