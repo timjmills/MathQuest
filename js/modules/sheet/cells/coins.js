@@ -54,7 +54,7 @@ function dotsOn(p, ctx) {
 function collection(ctx, p, { compact = false, smallNotes = false, ring = null } = {}) {
     const parts = [];
     if (Array.isArray(p.notes) && p.notes.length) parts.push(noteRow(ctx, p.notes, { compact, small: smallNotes }));
-    if (Array.isArray(p.coins) && p.coins.length) parts.push(coinRow(ctx, p.coins, { dots: dotsOn(p, ctx), compact, ring, wrap: p.wrap || (p.coins.length > 6 ? 5 : (p.kind === 'count' && levelOf(ctx) >= 2 && p.coins.length <= 5 && !(p.notes || []).length ? 5 : 3)), scatter: !!p.scatter }));
+    if (Array.isArray(p.coins) && p.coins.length) parts.push(coinRow(ctx, p.coins, { dots: dotsOn(p, ctx), compact, ring, wrap: p.wrap || (p.coins.length > 6 ? 5 : (p.kind === 'count' && levelOf(ctx) >= 2 && p.coins.length <= 5 && !(p.notes || []).length ? 5 : 3)), scatter: p.scatter === 'soft' ? 'soft' : !!p.scatter }));
     return parts.join('');
 }
 
@@ -146,7 +146,7 @@ function enough(p, ctx) {
 
 function compare(p, ctx) {
     const side = (name, c) => `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 2)};">${lbl(ctx, name)}`
-        + `${collection(ctx, { coins: c.coins || [], notes: c.notes || [], dots: 'none', wrap: 3 })}</div>`;
+        + `${collection(ctx, { coins: c.coins || [], notes: c.notes || [], dots: 'none', wrap: 3, scatter: c.scatter === 'soft' ? 'soft' : !!c.scatter })}</div>`;
     if (p.response === 'sign') {
         const s = S(ctx);
         const d = s.writeMm + 2;

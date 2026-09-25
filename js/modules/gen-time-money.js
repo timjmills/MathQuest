@@ -354,7 +354,7 @@ function rankPatterns(n) {
  * One elapsed item. `mode` later | earlier | duration | start; `durs` the durations (minutes) the
  * step allows; `startStep` the minute step of the given time; `spanH` the line's length in hours.
  */
-function elapsedItem(q, skill, { mode, durs, startStep, spanH, tickStep, support = 'labels', answer = 'time', faces = null, noon = 'never', response = 'write', seeds = [], both = false }) {
+function elapsedItem(q, skill, { mode, durs, startStep, spanH, tickStep, support = 'labels', answer = 'time', faces = null, noon = 'never', response = 'write', seeds = [], both = false, numerals = null }) {
     const k = pos6();
     let total = durs[dealPerm(`${skill}:d`, durs.length)];
     // Crossing noon (TE-9): some items start before 12 and end after it, a.m. / p.m. printed.
@@ -393,7 +393,7 @@ function elapsedItem(q, skill, { mode, durs, startStep, spanH, tickStep, support
     const payload = {
         mode, start: { h: s.h, m: s.m }, end: { h: e.h, m: e.m }, total, step: tickStep,
         axis: { from: ((from % 1440) + 1440) % 1440, hours }, support, answer, ampm, response,
-        ...(faces ? { faces } : {}), ...(both ? { both: true } : {}),
+        ...(faces ? { faces } : {}), ...(both ? { both: true } : {}), ...(numerals ? { numerals } : {}),
     };
     setCell(q, 'timeline', payload, { twin: response !== 'draw' });
     const durText = fmtDuration(Math.floor(total / 60), total % 60);
@@ -491,7 +491,8 @@ function genElapsed(q, skill) {
         const vd = [];
         for (let t = vstep; t <= 180; t += vstep) vd.push(t);
         const facesOpt = ['analog', 'digital', 'mixed'].includes(o.notation) ? o.notation : 'analog';
-        elapsedItem(q, skill, { mode: 'duration', durs: vd, startStep: vstep, spanH: 3, tickStep: vstep === 30 ? 30 : vstep === 15 ? 15 : 5, support, faces: facesOpt });
+        elapsedItem(q, skill, { mode: 'duration', durs: vd, startStep: vstep, spanH: 3, tickStep: vstep === 30 ? 30 : vstep === 15 ? 15 : 5, support, faces: facesOpt,
+            numerals: facesOpt !== 'digital' && faceNumerals(o) !== 'all' ? faceNumerals(o) : null });
     }
 }
 
@@ -502,18 +503,26 @@ function genClockParts(q, skill) {
     if (o.task === 'hands') {
         const t = { h: 1 + dealPerm(`${skill}:h`, 12), m: 5 * randInt(1, 11) };
         const hourLetter = deal(`${skill}:l`, 2) === 0 ? 'A' : 'B';
-        setCell(q, 'clock', { kind: 'parts', task: 'hands', h: t.h, m: t.m, hourLetter });
+        setCell(q, 'clock', { kind: 'parts', task: 'hands', h: t.h, m: t.m, hourLetter, ...(faceNumerals(o) !== 'all' ? { numerals: faceNumerals(o) } : {}) });
         q.text = 'Which is the hour hand? Check one box.';
         choiceAnswer(q, hourLetter);
         q.hint = 'The hour hand is the short hand.';
         return;
     }
+    // O6 (AP4) "Numbers on the clock": which numbers the face prints, as on every clock skill.
+    // 3 to 5 places are always boxes to write (the task); with 12, 3, 6 and 9 only, or 12 only,
+    // the boxes come from the places that are not printed and the other places are left empty, so
+    // the pupil counts round from the nearest printed number. At `all` (the default) the item is
+    // dealt exactly as before.
+    const printed = faceNumerals(o);
+    const pool = printed === 'quarters' ? [1, 2, 4, 5, 7, 8, 10, 11] : printed === 'twelve' ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        : Array.from({ length: 12 }, (_, i) => i + 1);
     const nMiss = 3 + deal(`${skill}:n`, 3);
-    const all = shuffle(Array.from({ length: 12 }, (_, i) => i + 1));
+    const all = shuffle(pool.slice());
     const missing = all.slice(0, nMiss).sort((a, b) => a - b);
     // The 12 is always missing on one item a page: the top number pupils most often leave out.
-    if (pos6() === 0 && !missing.includes(12)) { missing.pop(); missing.push(12); missing.sort((a, b) => a - b); }
-    setCell(q, 'clock', { kind: 'parts', task: 'numerals', missing });
+    if (printed === 'all' && pos6() === 0 && !missing.includes(12)) { missing.pop(); missing.push(12); missing.sort((a, b) => a - b); }
+    setCell(q, 'clock', { kind: 'parts', task: 'numerals', missing, ...(printed !== 'all' ? { numerals: printed } : {}) });
     q.text = 'Write the missing numbers on the clock.';
     q.ans = missing.join(', ');
     q.answerType = 'text';
@@ -529,7 +538,8 @@ function genFivesRing(q, skill) {
         given.push(12);
         given.sort((a, b) => a - b);
     }
-    setCell(q, 'clock', { kind: 'fives', given });
+    // O6 (AP4): the hour numbers printed on the face; the minute boxes round it never change.
+    setCell(q, 'clock', { kind: 'fives', given, ...(faceNumerals(o) !== 'all' ? { numerals: faceNumerals(o) } : {}) });
     const vals = [];
     for (let i = 1; i <= 12; i++) if (!given.includes(i)) vals.push(i === 12 ? 0 : i * 5);
     q.text = 'Count by 5. Write the minutes round the clock.';
@@ -601,6 +611,32 @@ function scatter(list) {
         if (s.some((v, i) => i && v > s[i - 1])) return s;
     }
     return list.slice().reverse();
+}
+
+// O6 APPEARANCE (lane AP4): "Coins set out" on every coin skill that draws a collection of coins
+// to count or compare (equiv_coin_sets, enough_money, money_compare, money_notation). `largest`
+// (the default) is today's row, biggest coin first; `scrambled` scatters the same coins, so the
+// pupil must find the biggest coin before counting on. The coins and the answer never change, and
+// at the default nothing is shuffled, so an untouched page draws exactly the same random numbers.
+const coinsScattered = (o) => /^scrambled/.test(String(o.order || ''));
+/**
+ * The coins as set out: scattered when asked (and there is more than one kind to scatter). The
+ * arrangement is DEALT, not shuffled, so it draws no random number: a scattered page holds exactly
+ * the default page's coins, amounts and answers, and only their arrangement changes (P-1). The
+ * coins are laid smallest, biggest, next smallest, next biggest ..., turned by the item's place on
+ * the page so the biggest coin is not always second; never biggest first.
+ */
+function dealtScatter(coins) {
+    const c = coins.slice().sort((a, b) => b - a);
+    const zig = [];
+    for (let lo = c.length - 1, hi = 0; hi <= lo; lo--, hi++) { zig.push(c[lo]); if (hi !== lo) zig.push(c[hi]); }
+    const k = ((_at % zig.length) + zig.length) % zig.length;
+    const turned = zig.slice(k).concat(zig.slice(0, k));
+    const tidy = (l) => l.every((v, i) => !i || v <= l[i - 1]);
+    return tidy(turned) ? zig : turned;
+}
+function setOut(o, coins) {
+    return coinsScattered(o) && new Set(coins).size > 1 ? { coins: dealtScatter(coins), scatter: 'soft' } : { coins };
 }
 
 // Plain numbers have no notes of their own beyond 20 (tmkit CURRENCIES), so a Plain page of notes
@@ -772,7 +808,8 @@ function genEquivSets(q, skill) {
         target = makes ? s : s + (randInt(0, 1) ? 5 : -5) * randInt(1, 2);
         if (target > 0 && target <= band && (makes || target !== s)) break;
     }
-    setCell(q, 'coins', { kind: 'check', coins, currency: o.currency, target, makes, dots: 'none' });
+    const eqOut = setOut(o, coins);
+    setCell(q, 'coins', { kind: 'check', coins: eqOut.coins, currency: o.currency, target, makes, dots: 'none', ...(eqOut.scatter ? { scatter: eqOut.scatter } : {}) });
     q.text = 'Do the coins make the amount? Check one box.';
     choiceAnswer(q, makes ? 'Yes' : 'No');
     q.hint = 'Count the coins, biggest first. Then compare with the amount.';
@@ -834,7 +871,8 @@ function genEnough(q, skill) {
         price = enough ? s - (exact ? 0 : gap) : s + gap;
         if (price >= Math.min(10, band) && price <= band) break;
     }
-    setCell(q, 'coins', { kind: 'enough', coins, currency: o.currency, price, enough: sum(coins) >= price, dots: 'none' });
+    const enOut = setOut(o, coins);
+    setCell(q, 'coins', { kind: 'enough', coins: enOut.coins, currency: o.currency, price, enough: sum(coins) >= price, dots: 'none', ...(enOut.scatter ? { scatter: enOut.scatter } : {}) });
     q.text = 'Is there enough money? Check one box.';
     choiceAnswer(q, sum(coins) >= price ? 'Enough' : 'Not enough');
     q.hint = 'Count the coins. Is the total the same as the price, or more?';
@@ -895,7 +933,9 @@ function genMoneyNotation(q, skill) {
         const coins = [];
         let rm = minor;
         for (const v of coinVals) while (rm >= v && coins.length < 6) { coins.push(v); rm -= v; }
-        setCell(q, 'coins', { kind: 'notation', notes, coins, total: sum(notes) * 100 + sum(coins), currency: o.currency, sign: o.currency !== 'plain', dots: 'none' });
+        // Notes stay biggest first (as on money_count); only the coins are scattered.
+        const ntOut = setOut(o, coins);
+        setCell(q, 'coins', { kind: 'notation', notes, coins: ntOut.coins, total: sum(notes) * 100 + sum(coins), currency: o.currency, sign: o.currency !== 'plain', dots: 'none', ...(ntOut.scatter ? { scatter: ntOut.scatter } : {}) });
         minor = sum(coins);
     }
     q.text = 'Write the amount. Use the point.';
@@ -924,15 +964,18 @@ function genMoneyCompare(q, skill) {
     const wantA = dealPerm(`${skill}:s6`, 6) < 3;
     if ((sum(a) > sum(b)) !== wantA && sum(a) !== sum(b)) [a, b] = [b, a];
     const sa = sum(a), sb = sum(b);
+    // Each side is set out on its own (a scattered side is never simply the other reversed).
+    const sideA = setOut(o, a), sideB = setOut(o, b);
+    const sideOf = (s) => (s.scatter ? { coins: s.coins, scatter: s.scatter } : { coins: s.coins });
     if (o.response === 'sign') {
         const sign = sa > sb ? '>' : sa < sb ? '<' : '=';
-        setCell(q, 'coins', { kind: 'compare', a: { coins: a }, b: { coins: b }, response: 'sign', sign, currency: o.currency });
+        setCell(q, 'coins', { kind: 'compare', a: sideOf(sideA), b: sideOf(sideB), response: 'sign', sign, currency: o.currency });
         q.text = 'Write <, > or = in the circle.';
         q.ans = sign;
         q.answerType = 'text';
     } else {
         const more = sa > sb ? 'A' : 'B';
-        setCell(q, 'coins', { kind: 'compare', a: { coins: a }, b: { coins: b }, response: 'ring', more, currency: o.currency });
+        setCell(q, 'coins', { kind: 'compare', a: sideOf(sideA), b: sideOf(sideB), response: 'ring', more, currency: o.currency });
         q.text = 'Which has more money? Check one box.';
         choiceAnswer(q, more);
     }

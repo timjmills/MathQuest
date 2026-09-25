@@ -262,6 +262,9 @@ const _VERTICAL_COLUMN_EXEMPT_SKILLS = new Set(['add_facts', 'sub_facts']);
 //  - q.text contains a horizontal add/sub expression like "245 + 367" or "12.5 - 7.34"
 function _applyVerticalColumnInstruction(q, mappedSkill) {
     if (!q || _VERTICAL_COLUMN_EXEMPT_SKILLS.has(mappedSkill)) return;
+    // O6 (AP4): an item the teacher asked to be written ACROSS is not re-drawn as a column
+    // example (it was: "Across" on add_20_* showed "write it like this" stacked on screen).
+    if (q.notation === 'across') return;
     if (q.visual && String(q.visual).trim().length > 0) return;
     if (!q.text || typeof q.text !== 'string') return;
     if (!/\d+\s*[+−\-]\s*\d+/.test(q.text)) return;
@@ -1536,6 +1539,25 @@ function _generateLadderV2(q, skill, helpers, range) {
         q.visual = '';
         q.printFormat = 'mult-facts-horizontal';
         q.notation = 'across';
+        // O6 (AP4) "How it is written": across (the default, as before) or stacked. Stacked puts
+        // the multiple of ten on top and the one-digit number under it (70 above × 8), the column
+        // the standard algorithm will use; its carry boxes stay, since 8 × 70 carries into the
+        // hundreds. The numbers dealt are the same either way.
+        // `_optDef`: only when the skill itself declares the choice (a review pool dealing this
+        // skill has no notation of its own, and × would otherwise fall back to stacked).
+        if (_optDef('notation') && notationFor('×') === 'stacked') {
+            const top = Math.max(a, b), bot = Math.min(a, b);
+            q.a = top; q.b = bot;
+            q.text = `${top} × ${bot} = ?`;
+            // One answer width for the whole skill (the largest product, 9 × 100 = 900), so the
+            // boxes never tell the pupil how many digits this answer has (L-LEAK).
+            const payload = { operands: [top, bot], op: '*', ansDigits: 3 };
+            q.cell = { template: 'stack', v: 1, payload };
+            q.visual = _kitStackTwin(payload);
+            q.selfAnswering = true;
+            q.printFormat = 'column-mult';
+            q.notation = 'stacked';
+        }
         return true;
     }
 
@@ -2291,6 +2313,30 @@ function _applyOptionPost(q, selected, routed) {
         q.picturesOff = true;
     }
 
+    // --- O6 (AP4): add_three written STACKED ---------------------------------------------------
+    // The three numbers in one column over a rule, the answer strip two boxes wide (a sum to 20).
+    // No carry box: the sum of the column is the answer, written straight in (a grade 1 sum to
+    // 20; with a 10 on top the tens digit is that 1 plus a ten made in the ones, said aloud), and
+    // without it the column fits three across the page like every other stacked fact. The column
+    // is the numbers
+    // form of the item: the three dot groups belong to the across sentence they stand along, so a
+    // stacked item carries no picture (skill-options.js hides "Pictures" when only Stacked is ticked).
+    if (selected === 'add_three' && _optDef('notation') && notationFor('+') !== 'stacked') q.notation = 'across';
+    if (selected === 'add_three' && _optDef('notation') && notationFor('+') === 'stacked') {
+        const m3 = String(q.text || '').match(/^(\d+) \+ (\d+) \+ (\d+) = \?$/);
+        if (m3) {
+            const operands = [Number(m3[1]), Number(m3[2]), Number(m3[3])];
+            const payload = { operands, op: '+', regroup: false, heads: false, answer: 'boxes', ansDigits: 2 };
+            q.cell = { template: 'stack', v: 1, payload };
+            q.visual = _kitStackTwin(payload);
+            q.operands = operands.slice();
+            q.selfAnswering = true;
+            q.printText = 'Add.';
+            q.printFormat = 'column-add-multi';
+            q.notation = 'stacked';
+        }
+    }
+
     // --- the bar model under a story ---------------------------------------------------------
     if (_WP_RE.test(routed) && _opt('support') === 'bar' && Number.isFinite(q.a) && Number.isFinite(q.b)) {
         q.visual = `${q.visual || ''}${_barModelSVG(q.a, q.b, isAdd)}`;
@@ -2298,8 +2344,18 @@ function _applyOptionPost(q, selected, routed) {
         if (q.printFormat === 'word-plain') q.printFormat = routed.startsWith('add') ? 'word-add' : 'word-sub';
     }
 
-    // --- the column support level (ranged ids from 50 up) ------------------------------------
+    // --- O6 (AP4): a no-regrouping two-digit item written ACROSS (within 50 / 100) ------------
+    // The same sum on one line: the kit's horizontal fact, its answer zone sized to the band's
+    // widest answer. On screen the empty visual makes it the same one-line equation.
     const rm = String(routed).match(_RANGED_RE);
+    if (rm && RANGE_MAP[rm[2]] >= 50 && q.notation === 'across' && Number.isInteger(q.a) && Number.isInteger(q.b) && (isAdd || isSubOp)) {
+        const maxVal = RANGE_MAP[rm[2]];
+        q.cell = { template: 'fact', v: 1, payload: { a: q.a, b: q.b, op: isAdd ? '+' : '-', notation: 'horiz', digits: String(isAdd ? maxVal : maxVal - 1).length } };
+        q.visual = '';
+        q.printFormat = isAdd ? 'add-facts-horizontal' : 'sub-facts-horizontal';
+        return;
+    }
+    // --- the column support level (ranged ids from 50 up) ------------------------------------
     if (rm && RANGE_MAP[rm[2]] >= 50 && Number.isInteger(q.a) && Number.isInteger(q.b) && (isAdd || isSubOp) && _optDef('level')) {
         const lvl = supportLevelFor(1);
         const maxVal = RANGE_MAP[rm[2]];
@@ -2711,8 +2767,15 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // "across" is genuinely available and is honoured. From within 50 up the item is
                 // multi-digit column work and stays stacked, which is why the 50+ ids declare no
                 // notation option at all (skill-options.js).
-                const bandIsOneLineFact = maxVal <= 20;
+                // O6 (AP4, 2026-09-25): within 50 and within 100 WITHOUT regrouping the item is a
+                // two-digit sum with nothing to carry or borrow, which 2.NBT.5 works on one line
+                // (tens and ones, mentally), so "across" is honoured there too. A regrouping item,
+                // and every item from within 1,000 up, stays stacked: the regroup box sits over the
+                // next column and the columns line the places up, which a one-line item cannot
+                // carry. Those rungs keep their column whatever is ticked (notationClampedFrom).
+                const bandIsOneLineFact = maxVal <= 20 || (maxVal <= 100 && regroupType === 'no_regroup');
                 const bandNotation = bandIsOneLineFact ? notationFor(isAdd ? '+' : '−') : 'stacked';
+                if (!bandIsOneLineFact && _optDef('notation') && notationFor(isAdd ? '+' : '−') === 'across') q.notationClampedFrom = 'across';
                 q.notation = bandNotation;
                 const uniqueId = Date.now() + Math.random().toString(36).substr(2, 9);
                 if (bandNotation === 'across') {
@@ -4244,6 +4307,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // boxes, "[q] R [r]" (VA-62). On screen the two boxes are typed and compose
                 // "q R r" (data-mq-join), which is q.ans.
                 const _drPayload = { dividend, divisor };
+                // O6 (AP4) "How it is written": across (the default, "23 ÷ 5 = [ ] R [ ]") or the
+                // long-division bracket ("5 ) 23" with the quotient box on top, "R [ ]" beside it).
+                // The counters, the numbers and the two answer boxes are the same either way.
+                if (notationFor('÷') === 'bracket') { _drPayload.notation = 'bracket'; q.notation = 'bracket'; }
+                else q.notation = 'across';
                 q.printText = `Ring groups of ${divisor}.`;
                 q.cell = { template: 'remainder', v: 1, payload: _drPayload };
                 q.visual = _kitTwin('remainder', _drPayload);

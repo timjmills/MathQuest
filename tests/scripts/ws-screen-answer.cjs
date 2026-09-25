@@ -41,6 +41,11 @@ const PV = [
 const SKILLS = (arg('skills', '') || '').split(',').map(s => s.trim()).filter(Boolean);
 const LIST = SKILLS.length ? SKILLS : arg('family', '') === 'pv' ? PV : DEFAULT;
 const HOSTS = (arg('hosts', 'card,worksheet,quiz') || '').split(',');
+// --opts '{"notation":["bracket"]}' (O6, 2026-09-25): every skill in the list carries these option
+// values on every host — the set's option store for the card and the worksheet, generateQuestionFor
+// for the quiz — so a non-default appearance value is answered on screen too. The app's own
+// normalizeOptions drops a value a skill does not declare, so one --opts can serve a mixed list.
+const OPTS = arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // In the page: decide what the pupil does in one cell to give the right answer. Every target is
@@ -281,6 +286,7 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
         // over from one skill must not replace the next skill's item mid-entry
         await page.reload({ waitUntil: 'networkidle2' });
         await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS, { timeout: 30000 });
+        if (OPTS) await page.evaluate((c, k, o) => { window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, o, { silent: true }); }, c, k, OPTS);
         if (HOSTS.includes('card')) {
             await page.evaluate((c, k, seed) => {
                 if (window.__wsReseed) window.__wsReseed(seed);
@@ -336,10 +342,10 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
             await page.evaluate(() => { Array.from(document.body.children).filter(e => getComputedStyle(e).position === 'fixed' && getComputedStyle(e).zIndex === '9999').forEach(e => e.remove()); });
         }
         if (HOSTS.includes('quiz')) {
-            await page.evaluate((c, k, seed) => {
+            await page.evaluate((c, k, seed, opts) => {
                 const questions = [];
                 for (let i = 0; i < 3; i++) {
-                    const q = window.generateQuestionFor({ category: c, skill: k, seed: seed + i, itemIndex: i });
+                    const q = window.generateQuestionFor({ category: c, skill: k, seed: seed + i, itemIndex: i, ...(opts ? { opts } : {}) });
                     questions.push({ id: i, skillId: k, points: 1, questionData: window.quizQuestionData(q) });
                 }
                 const test = { id: null, name: 'Answer', sections: [{ id: 0, label: 'A', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions }],
@@ -347,7 +353,7 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
                 window.handleQuizURL(window.compressTestForURL(test));
                 const name = document.getElementById('qtStudentName'); name.value = 'A'; name.dispatchEvent(new Event('input'));
                 window.startQuizTest();
-            }, c, k, hash(s + ':quizans'));
+            }, c, k, hash(s + ':quizans'), OPTS);
             await sleep(500);
             let err = '';
             for (let i = 0; i < 3; i++) {
