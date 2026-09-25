@@ -81,6 +81,18 @@ function PLAN(rootSel, which) {
         if (sp && vis(sp)) tag(sp, { type: 'domclick' });
         return { plan, q: String(t) };
     }
+    // put the number on the line (nl-place): tap each number tile, then its tick
+    const nlpTicks = all('.mq-nlp-tick');
+    const nlpPay = q.cell && q.cell.template === 'nl-place' ? q.cell.payload : null;
+    if (nlpTicks.length && nlpPay) {
+        const tiles = Array.from(root.querySelectorAll('[data-nlp-chip]'));
+        nlpPay.chips.forEach((c, k) => {
+            if (tiles[k]) tag(tiles[k], { type: 'domclick' });
+            const t = nlpTicks.find(x => Number(x.dataset.i) === c.at);
+            if (t) tag(t, { type: 'domclick' });
+        });
+        return { plan, q: String(ans) };
+    }
     // a "Click ALL ..." list (multi-select-check): tap every right option, then its Submit
     const msc = all('.msc-opt');
     if (msc.length && Array.isArray(ans)) {

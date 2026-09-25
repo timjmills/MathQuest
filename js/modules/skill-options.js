@@ -2122,7 +2122,8 @@ Object.assign(P12_OPTIONS, {
     'conversions:ratio_tables': [_p12Max([20], 100)],
     'decimals:round_thousandths': [_p12Match([['Round to the nearest tenth', 'nearest tenth'], ['Round to the nearest hundredth', 'nearest hundredth']],
         { label: 'Round to the nearest' })],
-    'decimals:decimal_nl_drag': [_p12Match([['Place one decimal', '^Drag \\d'], ['Place several decimals', 'Drag each']],
+    // the item text is "Put 0.3 on the number line." / "Put each number on ..." (O6 AP3 nl-place)
+    'decimals:decimal_nl_drag': [_p12Match([['Place one decimal', '^Put \\d'], ['Place several decimals', '^Put each']],
         { label: 'How many to place' })],
     // Read by gen-fractions.js (_fChanged('forms')): 0 = two different values, 1 = equal pairs.
     'decimals:compare_thousandths': [formsOption([{ v: 0, l: 'Two different values (0.844 and 0.722)' },
@@ -2430,7 +2431,7 @@ Object.assign(P12_OPTIONS, {
     'integers:sub_int': [_p12Kinds('forms', 'Signs', [['5 − 3', '^\\d+ - \\d+ ='], ['5 − (−3)', '^\\d+ - \\(-'], ['−5 − 3', '^-\\d+ - \\d+'], ['−5 − (−3)', '^-\\d+ - \\(-']],
         'Subtracting a negative (5 − (−3)) is the hardest step.')],
     'integers:order_negatives': [_p12Kinds('points', 'How many numbers', [['3 or 4', '=> -?\\d+(,-?\\d+){2,3}$'], ['5 or 6', '=> -?\\d+(,-?\\d+){4,5}$']])],
-    'integers:integer_nl_drag': [_p12Match([['Place one integer', '^Drag -?\\d'], ['Place several integers', '^Drag each']])],
+    'integers:integer_nl_drag': [_p12Match([['Place one integer', '^Put [\u2212-]?\\d'], ['Place several integers', '^Put each']])],
     'integers:abs_value': [_p12Match([['|−7|', '\\|-\\d+\\|'], ['|7|', '\\|\\d+\\|'], ['Which has the greater absolute value?', 'greater absolute']])],
     'integers:opposite_numbers': [_p12Match([['The opposite of a negative', 'opposite of -'], ['The opposite of a positive', 'opposite of \\d'], ['The same distance from 0', 'same distance']])],
     'integers:ordering_rationals': [_p12Kinds('forms', 'Which numbers', [['Fractions only', 'GREATEST: [-\\d/, ]+ =>'], ['Fractions and decimals mixed', '\\d\\.\\d']])],
@@ -2822,15 +2823,17 @@ const _AP3_OPTIONS = {
     'integers:integer_nl_drag': [_ap3Ticks([['one', 'Every number: −10, −9, −8 …'], ['some', 'Every 5th number, the ends and 0'],
         ['ends', 'The two ends and 0']], 'some',
     'Which ticks carry a numeral; there is a tick at every whole number whatever you choose. With every number the '
-        + 'pupil matches each number to its numeral; with fewer he counts along the ticks. On the −5 to 5 line every '
-        + '5th becomes every 2nd.')],
+        + 'pupil finds the one unnumbered tick between its neighbours (the tick a number goes on never carries its '
+        + 'numeral); with fewer he counts along the ticks. On the −5 to 5 line every 5th becomes every 2nd.')],
     'decimals:decimal_nl_drag': [_ap3Ticks([['one', 'Every tenth: 0, 0.1, 0.2 …'], ['some', '0, 0.5 and 1'], ['ends', '0 and 1 only']], 'some',
         'Which ticks carry a numeral; there is a tick at every tenth whatever you choose. With every tenth the pupil '
-        + 'matches each decimal to its numeral; with fewer he counts the tenths.')],
+        + 'finds the unnumbered tick between its neighbours (the tick a decimal goes on never carries its numeral); '
+        + 'with fewer he counts the tenths.')],
     'fractions:fraction_nl_drag': [_ap3Ticks([['one', 'Every part: 0, 1/4, 2/4 …'], ['some', '0, the halfway tick and 1'], ['ends', '0 and 1 only']], 'one',
         'Which ticks carry a numeral; the line is always cut into equal parts. With every part numbered the pupil '
-        + 'matches each fraction to its numeral; with fewer he counts the parts. A line in thirds or fifths has no '
-        + 'halfway tick, so there "halfway" numbers 0 and 1 only.')],
+        + 'finds the unnumbered tick between its neighbours (the tick a fraction goes on never carries its numeral); '
+        + 'with fewer he counts the parts. A line in thirds or fifths has no halfway tick, so there "halfway" numbers '
+        + '0 and 1 only.')],
     'fractions:mixed_nl_drag': [_ap3Ticks([['some', 'Every whole number: 0, 1, 2, 3'], ['ends', '0 and 3 only']], 'some',
         'Which ticks carry a numeral; every whole number and every part has a tick whatever you choose. With the '
         + 'ends only the pupil counts the wholes too. (Every part is not offered: nineteen mixed numbers do not fit.)')],

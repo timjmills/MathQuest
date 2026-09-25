@@ -205,6 +205,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     // O6 lane AP3 (2026-09-25): the fraction family's kit cells (sheet/cells/frac-model.js).
     'frac-name': 'Write the fraction, or circle the model that shows it.',
     'models-complete': 'Look at the two models. Complete the number sentence.',
+    'line-mark-each': 'Mark each number on the line.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',
@@ -258,6 +259,7 @@ const SCREEN_VERB_MAP = Object.freeze([
     ['Shade every multiple of', 'Tap every multiple of'],
     ['Draw a line to match', 'Tap the two that match'],
     ['Mark the number on the line', 'Tap the number on the line'],
+    ['Mark each number on the line', 'Tap each number, then its tick on the line'],
     ['Shade the fraction', 'Tap the parts of the fraction'],
     ['Draw the hands', 'Drag the hands'],
     ['Measure the line', 'Drag the ruler to the line'],

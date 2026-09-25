@@ -135,6 +135,7 @@ export { hopSlots, sentenceOf, ONE_TICK_MAX } from './cells/hop-line.js';
 export { fracModelSVG, fracModelSize, fracModelSizedHTML, fracModelGeom, fracStackHTML, fracTwin, FRAC_MODELS, areaGrid } from './cells/frac-model.js';
 export { tickLabelSet, TICK_LABEL_VALUES } from './cells/line-labels.js';
 export { valueLineSVG, valueLineSizedHTML, valueLineWindow } from './cells/value-line.js';
+export { nlPlacePayload, nlPlaceAnswer, nlPlaceTwin } from './cells/nl-place.js';
 
 // Function tables (function_table_easy / _hard): the In / Out table, its rule helpers and the
 // screen checker every host uses (a 'make your own' table is right when every row follows the rule).

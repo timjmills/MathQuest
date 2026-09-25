@@ -8,7 +8,7 @@ import { optionsFor, normalizeOptions } from './skill-options.js';
 import { genCountByTables, genMultChart, genHopLine } from './gen-mult-patterns.js';
 const _MP_SKILLS = new Set(['count_by_tables', 'mult_chart', 'mult_chart_easy', 'mult_chart_medium', 'mult_chart_hard', 'nl_mult', 'nl_div']);
 import { stripSegStyle, stripPos } from './sheet/tokens.js';
-import { renderCell as _kitRender, fadeRung, tickLabelSet, valueLineSVG, valueLineWindow } from './sheet/index.js';
+import { renderCell as _kitRender, fadeRung, tickLabelSet, valueLineSVG, valueLineWindow, nlPlacePayload, nlPlaceAnswer, nlPlaceTwin } from './sheet/index.js';
 
 // ========================================
 // HOW IT IS WRITTEN — the `notation` option (skill-options.js)
@@ -39,6 +39,22 @@ import { renderCell as _kitRender, fadeRung, tickLabelSet, valueLineSVG, valueLi
 let _notationCursor = 0;
 let _notationItemCache = null;
 
+
+/**
+ * A place-it-on-the-line item as the kit's `nl-place` cell (O6 lane AP3 fixes): one drawing for
+ * paper, key and every screen host - the pupil taps a number, then its tick. The host grades the
+ * numbers read back from the ticks (q.ans, in the tiles' order). `nlData` stays for old links.
+ */
+function _nlKit(q) {
+    const p = nlPlacePayload(q.nlData);
+    if (!p) return;
+    q.cell = { template: 'nl-place', v: 1, payload: p };
+    q.visual = nlPlaceTwin(p);
+    q.answerType = 'text';
+    q.ans = nlPlaceAnswer(p);
+    q.options = [];
+    q.text = p.chips.length > 1 ? 'Put each number on the number line.' : `Put ${String(p.chips[0].label).replace(/^-/, '\u2212')} on the number line.`;
+}
 function _beginNotationItem() {
     _notationCursor++;
     _constantCursor++;
@@ -7092,6 +7108,7 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 q.hint = `Zero is in the middle. Negative numbers are to the LEFT of zero, positive to the RIGHT.`;
                 q.printFormat = "nl-drag";
                 q.skillLabel = isMulti ? "Drag Integers on Number Line (Multi)" : "Drag Integer on Number Line";
+                _nlKit(q);
                 return;
             } else if (intSkill === "compare_int" && Math.random() < 0.30) {
                 const threshold = rng(-Math.floor(intMax / 2), Math.floor(intMax / 2));

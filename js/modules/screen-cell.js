@@ -2074,6 +2074,92 @@ export function wireSignCircle(root, input, { onChange = null } = {}) {
     return true;
 }
 
+/** A numeral as the paper writes it: a fraction stacked over its bar (TY-7), a negative with −. */
+function _nlpNumeral(t) {
+    const m = /^(?:(\d+)\s+)?(\d+)\/(\d+)$/.exec(String(t));
+    if (!m) return esc(String(t).replace(/^-/, '−'));
+    return `${m[1] ? `<span class="mq-nlp-w">${esc(m[1])}</span>` : ''}<span class="mq-nlp-frac"><span>${esc(m[2])}</span><span class="mq-nlp-bar" aria-hidden="true"></span><span>${esc(m[3])}</span></span>`;
+}
+
+/**
+ * O6 lane AP3 fixes: "Put the number on the line" (sheet/cells/nl-place.js), the same line on every
+ * screen host. The paper's line becomes a row of tick buttons (44 px each; the row scrolls when the
+ * line is long), its numerals where the paper has them. Tap a number tile (the first unplaced one
+ * is chosen for you), then its tick: a dot and the tile's letter (or number) stand on that tick.
+ * Tap the tick again to take it off. The input holds each tile's tick read back in the tile's own
+ * form, in tile order ("2/8", "1/4, 3/4"), which is what the item's answer is.
+ */
+function _mountNlPlace(el, write, locked) {
+    const n = Number(el.dataset.nlpN);
+    const line = el.querySelector('.nlp-line');
+    if (!(n >= 1) || !line) return false;
+    let labels = {}, vals = {}, chipText = [];
+    try { labels = JSON.parse(el.dataset.nlpLabels || '{}'); vals = JSON.parse(el.dataset.nlpVals || '{}'); chipText = JSON.parse(el.dataset.nlpChiptext || '[]'); } catch (e) { return false; }
+    const fmts = String(el.dataset.nlpFmt || '').split(',');
+    const major = new Set(String(el.dataset.nlpMajor || '').split(',').filter((x) => x !== '').map(Number));
+    const chips = Array.from(el.querySelectorAll('[data-nlp-chip]'));
+    const multi = chips.length > 1;
+    const LET = ['A', 'B', 'C', 'D', 'E'];
+    const wrap = document.createElement('div');
+    wrap.className = 'mq-nlp';
+    let ticks = '';
+    for (let i = 0; i <= n; i++) {
+        const lab = labels[i] !== undefined ? String(labels[i]) : '';
+        ticks += `<button type="button" class="mq-nlp-tick${major.has(i) ? ' mq-nlp-major' : ''}" data-i="${i}" aria-label="${attr(lab ? `tick ${lab}` : `tick ${i} of ${n}`)}">`
+            + `<span class="mq-nlp-pin" aria-hidden="true"></span><span class="mq-nlp-mark" aria-hidden="true"></span><span class="mq-nlp-dot" aria-hidden="true"></span>`
+            + `<span class="mq-nlp-lab">${lab ? _nlpNumeral(lab) : ''}</span></button>`;
+    }
+    wrap.innerHTML = `<div class="mq-nlp-scroll" data-mq-scroll><div class="mq-nlp-track" role="group" style="--mq-nlp-n:${n + 1}" `
+        + `aria-label="number line: tap a number, then its tick"><span class="mq-nlp-axis" aria-hidden="true"></span>${ticks}</div></div>`;
+    line.replaceWith(wrap);
+    const tickEls = Array.from(wrap.querySelectorAll('.mq-nlp-tick'));
+    const placed = chips.map(() => null);
+    let sel = 0;
+    const cue = document.createElement('div');
+    cue.className = 'mq-buildcue';
+    cue.textContent = multi ? 'Tap a number, then tap its tick.' : 'Tap the tick where the number goes.';
+    el.appendChild(cue);
+    const paint = () => {
+        chips.forEach((c, k) => {
+            c.classList.toggle('mq-nlp-sel', k === sel && !locked());
+            c.classList.toggle('mq-nlp-used', placed[k] !== null);
+            c.setAttribute('aria-pressed', k === sel ? 'true' : 'false');
+        });
+        tickEls.forEach((t, i) => {
+            const here = placed.map((v, k) => (v === i ? k : -1)).filter((k) => k >= 0);
+            t.classList.toggle('mq-nlp-on', here.length > 0);
+            t.querySelector('.mq-nlp-pin').innerHTML = here.map((k) => (multi ? LET[k] : _nlpNumeral(chipText[k] || ''))).join(' ');
+        });
+        write(placed.every((v) => v === null) ? '' : placed.map((v, k) => (v === null ? '' : ((vals[fmts[k]] || [])[v] || ''))).join(', '));
+    };
+    const nextFree = () => { const k = placed.findIndex((v) => v === null); return k >= 0 ? k : sel; };
+    chips.forEach((c, k) => {
+        const pickChip = () => { if (locked()) return; sel = k; paint(); };
+        c.addEventListener('click', pickChip);
+        c.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); pickChip(); } });
+    });
+    tickEls.forEach((t, i) => {
+        t.addEventListener('click', () => {
+            if (locked()) return;
+            if (placed[sel] === i) { placed[sel] = null; paint(); return; }     // tap again: take it off
+            const other = placed.findIndex((v, k) => v === i && k !== sel);
+            if (other >= 0 && !multi) placed[other] = null;
+            placed[sel] = i;
+            sel = nextFree();
+            paint();
+        });
+    });
+    // a long line opens on its 0 (the middle of an integer line, the left end of 0 to 3)
+    const sc = wrap.querySelector('.mq-nlp-scroll');
+    const zero = tickEls.find((t) => String(labels[t.dataset.i]) === '0');
+    requestAnimationFrame(() => {
+        if (!sc || sc.scrollWidth <= sc.clientWidth || !zero) return;
+        sc.scrollLeft = Math.max(0, zero.offsetLeft + zero.offsetWidth / 2 - sc.clientWidth / 2);
+    });
+    paint();
+    return true;
+}
+
 /**
  * Mount the build mat of a twin (`data-mq-build`) and write its value into `input` as the pupil
  * builds - the mat IS the answer, so the pupil never retypes the number (RUBRIC H3). The mat's
@@ -2178,6 +2264,7 @@ export function mountModel(root, input, { onValue = null } = {}) {
     };
     const locked = () => !!input.disabled;
     const model = el.getAttribute('data-mq-model');
+    if (model === 'nl-place') return _mountNlPlace(el, write, locked);
     if (model === 'shade') {
         // O6 lane AP3: a fraction model to shade (sheet/cells/frac-model.js). A tap shades a part
         // (the one grey), a tap again clears it; the count of shaded parts is the answer.

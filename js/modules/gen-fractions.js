@@ -5,7 +5,7 @@ import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
 import { getSkillGrade, maxDenominatorForGrade } from './data.js';
 import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
-import { fracModelSVG, fracModelSizedHTML, fracStackHTML, fracTwin, tickLabelSet } from './sheet/index.js';
+import { fracModelSVG, fracModelSizedHTML, fracStackHTML, fracTwin, tickLabelSet, nlPlacePayload, nlPlaceAnswer, nlPlaceTwin } from './sheet/index.js';
 
 // ---- O6 APPEARANCE (lane AP3, 2026-09-25) --------------------------------------------------
 // `model` (skill-options.js, "Fraction model"): the teacher ticks the models a page draws. The
@@ -58,6 +58,21 @@ function _fNlTicks(nl, period) {
  * every denominator, so the cell keeps to one of two columns. A circle keeps its own size.
  */
 const _fWriteWhole = (kind) => (kind === 'circle' ? null : kind === 'line' ? 60 : 50);
+/**
+ * A place-it-on-the-line item as the kit's `nl-place` cell (O6 lane AP3 fixes): one drawing for
+ * paper, key and every screen host - the pupil taps a number, then its tick. The host grades the
+ * numbers read back from the ticks (q.ans, in the tiles' order). `nlData` stays for old links.
+ */
+function _nlKit(q) {
+    const p = nlPlacePayload(q.nlData);
+    if (!p) return;
+    q.cell = { template: 'nl-place', v: 1, payload: p };
+    q.visual = nlPlaceTwin(p);
+    q.answerType = 'text';
+    q.ans = nlPlaceAnswer(p);
+    q.options = [];
+    q.text = p.chips.length > 1 ? 'Put each number on the number line.' : `Put ${String(p.chips[0].label).replace(/^-/, '\u2212')} on the number line.`;
+}
 /** A migrated item: the kit's `frac-model` cell for paper and key, its twin for every screen host. */
 function _fKit(q, payload) {
     q.cell = { template: 'frac-model', v: 1, payload };
@@ -5591,6 +5606,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.hint = `The line is split into ${den} equal parts. Each tick is 1/${den}.`;
                 q.printFormat = "nl-drag";
                 q.skillLabel = isMulti ? "Drag Fractions on Number Line (Multi)" : "Drag Fraction on Number Line";
+                _nlKit(q);
                 return;
 
             } else if (fracSkill === "mixed_nl_drag") {
@@ -5639,6 +5655,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.hint = `Whole-number ticks are labeled. Between each whole there are ${den} equal parts.`;
                 q.printFormat = "nl-drag";
                 q.skillLabel = "Drag Mixed Numbers on Number Line";
+                _nlKit(q);
                 return;
 
             } else if (fracSkill === "simplify" && Math.random() < 0.25) {
@@ -7610,6 +7627,7 @@ export function generateDecimalsQuestion(q, mappedSkill, helpers) {
                 q.hint = `The line goes from 0 to 1 in tenths. Each tick is 0.1.`;
                 q.printFormat = "nl-drag";
                 q.skillLabel = isMulti ? "Drag Decimals on Number Line (Multi)" : "Drag Decimal on Number Line";
+                _nlKit(q);
                 return;
             } else if (decSkill === "number_line_decimal") {
                 // Decimals on number line

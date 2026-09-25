@@ -1245,3 +1245,29 @@ html body .problem-card .pvb-zones[data-role="zones"], html body .mq-scell .pvb-
 /* O6 AP3: a sign circle between two pictures keeps its circle when the row is tight (it never
    shrinks into an oval; the host shrinks the drawing instead) */
 html body .mq-scell input.mq-slot.mq-slot--invisual.mq-slot--circle { flex: none !important; }
+
+/* O6 AP3: "Put the number on the line" (sheet/cells/nl-place.js, screen-cell.js _mountNlPlace).
+   Black and white; every tick a 44 px button; the row scrolls when the line is long. */
+.mq-scell .mq-nlp { width: 100%; max-width: 100%; }
+.mq-scell .mq-nlp-scroll { overflow-x: auto; overflow-y: hidden; max-width: 100%; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #000 #fff; padding-bottom: 4px; }
+.mq-scell .mq-nlp-track { position: relative; display: grid; grid-template-columns: repeat(var(--mq-nlp-n), minmax(44px, 1fr));
+    min-width: calc(var(--mq-nlp-n) * 44px); margin: 0 auto; }
+.mq-scell .mq-nlp-axis { position: absolute; left: 0; right: 0; top: 55px; border-top: 3px solid #000; pointer-events: none; }
+html body .mq-scell .mq-nlp-tick { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    min-width: 44px; min-height: 112px; padding: 0; margin: 0; border: 0 !important; background: transparent !important; box-shadow: none !important;
+    color: #000 !important; cursor: pointer; font-family: "Andika", sans-serif; border-radius: 6px; }
+.mq-scell .mq-nlp-tick:focus-visible { outline: 3px solid #000; outline-offset: -3px; }
+.mq-scell .mq-nlp-pin { height: 40px; display: flex; align-items: flex-end; justify-content: center; font-weight: 700; font-size: 1.05rem; line-height: 1; padding-bottom: 2px; }
+.mq-scell .mq-nlp-mark { width: 2px; height: 16px; margin-top: 9px; background: #000; }
+.mq-scell .mq-nlp-major .mq-nlp-mark { width: 3px; height: 26px; margin-top: 4px; }
+.mq-scell .mq-nlp-major .mq-nlp-lab { margin-top: 2px; }
+.mq-scell .mq-nlp-dot { position: absolute; top: 47px; left: 50%; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: #000; display: none; }
+.mq-scell .mq-nlp-on .mq-nlp-dot { display: block; }
+.mq-scell .mq-nlp-lab { margin-top: 6px; font-weight: 700; font-size: 1.05rem; line-height: 1.1; min-height: 1.1em; display: inline-flex; align-items: center; gap: 2px; }
+.mq-scell .mq-nlp-frac { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.05; }
+.mq-scell .mq-nlp-bar { display: block; align-self: stretch; min-width: 0.9em; border-top: 2px solid #000; margin: 1px 0; }
+.mq-scell .mq-nlp-pin .mq-nlp-frac { font-size: 0.95rem; }
+.mq-scell [data-nlp-chip] { cursor: pointer; min-height: 44px; border-radius: 8px; outline-offset: 3px; }
+.mq-scell [data-nlp-chip].mq-nlp-sel { outline: 3px solid #000; }
+.mq-scell [data-nlp-chip].mq-nlp-used { opacity: 0.5; }
+.mq-scell [data-nlp-chip]:focus-visible { outline: 3px dashed #000; }
