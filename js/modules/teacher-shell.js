@@ -753,6 +753,11 @@ async function onQuizClick(e, el) {
 
 /* ================================================================= Settings */
 
+/** Which view the site opens in: 'student' (default) or 'last' (the view used last time). */
+function startRole() {
+    try { return localStorage.getItem('mathquest_start_role') === 'last' ? 'last' : 'student'; } catch (e) { return 'student'; }
+}
+
 function sw(id, on, labelId, descId) {
     return `<button type="button" class="tv-switch" role="switch" id="${id}" aria-checked="${!!on}" aria-labelledby="${labelId}"${descId ? ` aria-describedby="${descId}"` : ''}></button>`;
 }
@@ -791,6 +796,8 @@ function renderSettings(el) {
       <h2 class="tv-h2" id="tvLookH">Appearance</h2>
       <div><span class="tv-label">Theme</span>${segBtns('Theme', dark ? 'dark' : 'light', [['light', 'Light'], ['dark', 'Dark']])}</div>
       <p class="tv-cap" style="margin-top:-8px;">Worksheets always print black on white.</p>
+      <div><span class="tv-label">Open the site in</span>${segBtns('Start', startRole(), [['student', 'Student view'], ['last', 'Last view used']])}</div>
+      <p class="tv-cap" style="margin-top:-8px;">Student view is the default: switch to Teacher view each time with the toggle at the top.</p>
     </section>
     <section class="tv-card" aria-labelledby="tvPrintDefH">
       <h2 class="tv-h2" id="tvPrintDefH">Printing defaults</h2>
@@ -877,6 +884,7 @@ function onSettingsClick(e, el) {
         const dark = document.documentElement.classList.contains('dark');
         if ((d.setTheme === 'dark') !== dark) window.toggleTheme?.();
     }
+    if (d.setStart) { try { localStorage.setItem('mathquest_start_role', d.setStart); } catch (e) { /* storage off */ } }
     if (d.setSize) savePrintDefaults({ size: d.setSize });
     if (d.setPaper) savePrintDefaults({ paper: d.setPaper });
     renderSettings(el);

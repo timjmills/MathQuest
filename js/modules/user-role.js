@@ -79,7 +79,11 @@ export function loadUserRole() {
         return;
     }
     if (pupilLink) { setUserRole('student', { persist: false }); return; }
-    setUserRole(savedRole);
+    // The site opens in Student view (owner ruling 2026-09-25) unless Settings → "Open the site
+    // in" says "Last view used". The last view is still remembered either way.
+    let startRole = 'student';
+    try { startRole = localStorage.getItem('mathquest_start_role') || 'student'; } catch (e) { /* storage off */ }
+    setUserRole(startRole === 'last' ? savedRole : 'student', { persist: false });
 }
 
 export function updateUIForRole(role) {

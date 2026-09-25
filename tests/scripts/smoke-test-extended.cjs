@@ -91,7 +91,7 @@ async function setupPage(browser) {
     });
     await page.evaluate(() => {
         window.state.userRole = 'teacher';
-        try { localStorage.setItem('mathquest_user_role', 'teacher'); } catch {}
+        try { localStorage.setItem('mathquest_user_role', 'teacher'); localStorage.setItem('mathquest_start_role', 'last'); } catch {}
         // Disable banner/timer/idle stuff
         try { window.stopBannerTimer && window.stopBannerTimer(); } catch {}
         try { window.stopSessionTimer && window.stopSessionTimer(); } catch {}

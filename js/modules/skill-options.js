@@ -1038,7 +1038,7 @@ const P11_K2_OPTIONS = {
         _opsBand([50, 100], 100, { label: 'Numbers to', help: 'Which part of the hundreds chart the window is cut from.' }),
         {
             id: 'tiles', label: 'Empty boxes', type: 'enum', default: null, group: 'difficulty',
-            values: [{ v: null, l: '1 to 3, dealt' }, { v: 1, l: '1 box' }, { v: 2, l: '2 boxes' }, { v: 3, l: '3 boxes' }],
+            values: [{ v: null, l: '1 to 3, dealt' }, { v: 1, l: '1 box' }, ...[2, 3, 4, 5, 6, 7].map(n => ({ v: n, l: `${n} boxes` }))],
             help: 'How many numbers the pupil writes in each window.',
         },
     ],
