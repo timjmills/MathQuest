@@ -1242,7 +1242,69 @@ html body .mq-scell .mq-nl-track {
 /* the place-value mat's zones stay side by side (H T O is one row, never wrapped) */
 html body .problem-card .pvb-zones[data-role="zones"], html body .mq-scell .pvb-zones[data-role="zones"] { flex-wrap: nowrap !important; }
 
+/* O6 AP3: a sign circle between two pictures keeps its circle when the row is tight (it never
+   shrinks into an oval; the host shrinks the drawing instead) */
+html body .mq-scell input.mq-slot.mq-slot--invisual.mq-slot--circle { flex: none !important; }
+
+/* O6 AP3: "Put the number on the line" (sheet/cells/nl-place.js, screen-cell.js _mountNlPlace).
+   Black and white; every tick a 44 px button; the row scrolls when the line is long. */
+.mq-scell .mq-nlp { width: 100%; max-width: 100%; }
+.mq-scell .mq-nlp-scroll { overflow-x: auto; overflow-y: hidden; max-width: 100%; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #000 #fff; padding-bottom: 4px; }
+.mq-scell .mq-nlp-track { position: relative; display: grid; grid-template-columns: repeat(var(--mq-nlp-n), minmax(44px, 1fr));
+    min-width: calc(var(--mq-nlp-n) * 44px); margin: 0 auto; }
+.mq-scell .mq-nlp-axis { position: absolute; left: 0; right: 0; top: 55px; border-top: 3px solid #000; pointer-events: none; }
+html body .mq-scell .mq-nlp-tick { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    min-width: 44px; min-height: 112px; padding: 0; margin: 0; border: 0 !important; background: transparent !important; box-shadow: none !important;
+    color: #000 !important; cursor: pointer; font-family: "Andika", sans-serif; border-radius: 6px; }
+.mq-scell .mq-nlp-tick:focus-visible { outline: 3px solid #000; outline-offset: -3px; }
+.mq-scell .mq-nlp-pin { height: 40px; display: flex; align-items: flex-end; justify-content: center; font-weight: 700; font-size: 1.05rem; line-height: 1; padding-bottom: 2px; }
+.mq-scell .mq-nlp-mark { width: 2px; height: 16px; margin-top: 9px; background: #000; }
+.mq-scell .mq-nlp-major .mq-nlp-mark { width: 3px; height: 26px; margin-top: 4px; }
+.mq-scell .mq-nlp-major .mq-nlp-lab { margin-top: 2px; }
+.mq-scell .mq-nlp-dot { position: absolute; top: 47px; left: 50%; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: #000; display: none; }
+.mq-scell .mq-nlp-on .mq-nlp-dot { display: block; }
+.mq-scell .mq-nlp-lab { margin-top: 6px; font-weight: 700; font-size: 1.05rem; line-height: 1.1; min-height: 1.1em; display: inline-flex; align-items: center; gap: 2px; }
+.mq-scell .mq-nlp-frac { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.05; }
+.mq-scell .mq-nlp-bar { display: block; align-self: stretch; min-width: 0.9em; border-top: 2px solid #000; margin: 1px 0; }
+.mq-scell .mq-nlp-pin .mq-nlp-frac { font-size: 0.95rem; }
+.mq-scell [data-nlp-chip] { cursor: pointer; min-height: 44px; border-radius: 8px; outline-offset: 3px; }
+.mq-scell [data-nlp-chip].mq-nlp-sel { outline: 3px solid #000; }
+.mq-scell [data-nlp-chip].mq-nlp-used { opacity: 0.5; }
+.mq-scell [data-nlp-chip]:focus-visible { outline: 3px dashed #000; }
 /* Round on a number line (round_nl_*, 2026-09-25): the dot turns green with its (hidden) slot. */
 html body .mq-rlwrap svg circle.mq-rl-dot.mq-rl-dot--ok { fill: #1B7A43 !important; }
 html body .mq-rl:focus-visible { outline: 3px solid #1B7A43; outline-offset: 2px; border-radius: 8px; }
 html body .mq-scell .mq-rlwrap .mq-cellbox > input { width: 100% !important; height: 100% !important; border: 0 !important; margin: 0 !important; box-shadow: none !important; }
+
+/* ---- R4-1. One answer area in MAP too (owner 2026-09-26): the cell's own boxes are the inputs
+   (question-render.js _applyMapSlots); MAP's CHECK stays. */
+body.map-immersive #visualAid [data-mq-cell] > input.mq-cellslot {
+    display: block; box-sizing: border-box; width: 100%; height: 100%; min-height: 40px;
+    margin: 0; padding: 0; border: 0; border-radius: inherit; background: transparent; color: #000;
+    font-family: "Andika", sans-serif; font-size: 1em; font-weight: 700; line-height: 1;
+    text-align: center; caret-color: #000; outline: none;
+}
+body.map-immersive #visualAid [data-mq-cell]:focus-within { box-shadow: inset 0 0 0 3px #000; }
+body.map-immersive #visualAid input.mq-slot--invisual.mq-slot--box {
+    box-sizing: border-box; min-width: 48px; min-height: 44px; padding: 0 !important;
+    border: 1px solid #000 !important; border-radius: 6px !important; background: #fff !important; color: #000 !important;
+    font-family: "Andika", sans-serif; font-weight: 700; text-align: center;
+}
+body.map-immersive #visualAid input.mq-slot--invisual.mq-bsize { width: max(48px, var(--mq-bw)) !important; height: max(44px, var(--mq-bh)) !important; }
+
+/* ---- R4-2. A sentence that holds the one blank sits in the cell at the cell's size, the answer
+   input in its blank (owner 2026-09-26: no separate answer area). */
+.mq-scell .mq-legline { font-size: calc(var(--mq-digit) * 0.8); line-height: 1.5; text-align: center; font-weight: 700; }
+html body .mq-scell :is(.mq-legline, .mq-instr, #questionText) input.mq-slot.mq-slot--invisual {
+    font-size: 1em !important; height: max(44px, 1.3em) !important; vertical-align: baseline; margin: 0 0.2em !important;
+}
+/* a drawn working box of a new-skill drawing (screen-cell.js markV2Blanks): a real input, not graded */
+html body .mq-scell input.mq-workbox, html body #visualAid input.mq-workbox {
+    box-sizing: border-box; width: 2.6em; min-width: 44px; height: 1.3em; min-height: 44px; margin: 0; padding: 0; vertical-align: baseline;
+    border: 0; background: transparent; color: #000; font: inherit; font-weight: 700; text-align: center; outline: none;
+}
+html body .mq-scell input.mq-workbox:focus { box-shadow: inset 0 0 0 3px #000; }
+
+/* a start-unknown number line: the given point is where the hops land - a hollow ring, never the
+   filled start dot (round 4) */
+html body .mq-scell .mq-nl-start.mq-nl-given .mq-nl-mark::after { background: #fff !important; border: 3px solid #000; box-sizing: border-box; }

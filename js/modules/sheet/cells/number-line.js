@@ -47,6 +47,8 @@ const LINE_MM = 176;
 const PAD_MM = 5;
 /** Unit pitch (mm): the line's width over its units, never more than 16 mm. */
 const pitchOf = (units) => Math.min(16, (LINE_MM - 2 * PAD_MM - 4) / Math.max(1, units));
+/** A number as printed: the true minus (TY-3). */
+const neg = (v) => (Number(v) < 0 ? `\u2212${-Number(v)}` : String(v));
 /** Label size (pt): the zone-label token, never under 12 pt. */
 const LABEL_PT_MIN = 12;
 
@@ -87,9 +89,11 @@ function lineSVG(g, p, hopsTo, ink, from = null) {
     for (let v = t.min; v <= t.max; v++) {
         const tk = v % 5 === 0 ? 2.4 : 1.6;
         const on = !lab || lab.has(v - t.min);
-        const tag = lab ? ` data-nl-v="${v}"${on ? ' data-nl-lab="1"' : ''}` : '';
+        // a line through 0 (add_int, sub_int) writes its numerals with the true minus, so every
+        // tick carries its value for the screen's tap-to-jump line (which reads -5, not −5)
+        const tag = lab || t.min < 0 ? ` data-nl-v="${v}"${on ? ' data-nl-lab="1"' : ''}` : '';
         body += `<line x1="${X(v).toFixed(2)}" y1="${(yLine - tk).toFixed(2)}" x2="${X(v).toFixed(2)}" y2="${(yLine + tk).toFixed(2)}" stroke="${INK.ink}" stroke-width="0.265"${tag}/>`;
-        if (on) body += `<text x="${X(v).toFixed(2)}" y="${(yLine + 3 + labelMm).toFixed(2)}" text-anchor="middle" font-size="${labelMm.toFixed(2)}" font-family="Andika, sans-serif" fill="${INK.ink}">${v}</text>`;
+        if (on) body += `<text x="${X(v).toFixed(2)}" y="${(yLine + 3 + labelMm).toFixed(2)}" text-anchor="middle" font-size="${labelMm.toFixed(2)}" font-family="Andika, sans-serif" fill="${INK.ink}">${neg(v)}</text>`;
     }
     // The given point: the start, or (start missing) where the hops land. `data-nl-start` is
     // where the screen's tap-to-jump line begins.
@@ -131,9 +135,12 @@ register('number-line', {
             if (t.unknown === 'a') from = t.start;
         }
         const line = lineSVG(g, p, to, hopInk, from);
-        const bw = Math.max(g.writeMm * 2, 2 * 0.62 * g.E + 4);
+        // a negative answer is three characters wide (−12)
+        const bw = Math.max(g.writeMm * 2, (t.min < 0 ? 3 : 2) * 0.62 * g.E + 4);
         const slot = box(g, 'answer', { wMm: bw, hMm: g.stripMm, value: vals.answer || '', ink, mark: 'blank' });
-        const part = (which, v) => (t.unknown === which ? slot : `<span>${esc(v)}</span>`);
+        // a negative second number stands in brackets: 3 + (−5)
+        const part = (which, v) => (t.unknown === which ? slot
+            : `<span>${esc(which === 'b' && Number(v) < 0 ? `(${neg(v)})` : neg(v))}</span>`);
         const op = (c) => `<span style="font-weight:700;width:1em;text-align:center">${c}</span>`;
         // The answer box is IN the equation (no separate full-width Answer line).
         const eq = `<div style="display:inline-flex;align-items:center;gap:0.28em;white-space:nowrap;margin-top:0.3em">`

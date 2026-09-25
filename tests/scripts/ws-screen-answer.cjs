@@ -66,11 +66,40 @@ function PLAN(rootSel, which) {
     // answer is still given below; the working must never change the verdict.
     const nl = all('.mq-nl-tick');
     if (nl.length) {
-        const land = nl.find(t => t.querySelector('.mq-nl-lab') && t.querySelector('.mq-nl-lab').textContent.trim() === String(ans));
+        const land = nl.find(t => t.querySelector('.mq-nl-lab') && t.querySelector('.mq-nl-lab').textContent.trim().replace('\u2212', '-') === String(ans));
         if (land && !land.classList.contains('mq-nl-start')) tag(land, { type: 'click', check: 'nl' });   // + 0 has no jump
     }
     all('input.mq-opswork').slice(0, 2).forEach(w => tag(w, { type: 'text', value: '9', check: 'work' }));
 
+    // a fraction model to shade (frac-model, O6 AP3): tap as many parts as the answer counts.
+    // Dispatched on the part itself: a wedge's box centre can lie in the next wedge.
+    const shadeParts = all('.shade-target');
+    if (shadeParts.length && q.answerType === 'shade-parts') {
+        const t = Number(q.shadeTarget != null ? q.shadeTarget : ans);
+        shadeParts.slice(0, t).forEach(g => tag(g, { type: 'domclick' }));
+        // the practice card grades the shading on its own Submit (question-render.js shade-parts)
+        const sp = which.host === 'card' ? document.querySelector('.sp-submit') : null;
+        if (sp && vis(sp)) tag(sp, { type: 'domclick' });
+        return { plan, q: String(t) };
+    }
+    // put the number on the line (nl-place): tap each number tile, then its tick
+    const nlpTicks = all('.mq-nlp-tick');
+    const nlpPay = q.cell && q.cell.template === 'nl-place' ? q.cell.payload : null;
+    if (nlpTicks.length && nlpPay) {
+        const tiles = Array.from(root.querySelectorAll('[data-nlp-chip]'));
+        nlpPay.chips.forEach((c, k) => {
+            if (tiles[k]) tag(tiles[k], { type: 'domclick' });
+            const t = nlpTicks.find(x => Number(x.dataset.i) === c.at);
+            if (t) tag(t, { type: 'domclick' });
+        });
+        return { plan, q: String(ans) };
+    }
+    // a sign circle (frac-model, pv compare): tap the sign tile that is the answer
+    const signTiles = all('.mq-signtile');
+    if (signTiles.length) {
+        const hit = signTiles.find(b => b.textContent.trim() === String(ans).trim());
+        if (hit) { tag(hit, { type: 'click' }); return { plan, q: String(ans) }; }
+    }
     // Round on a number line (round_nl_*): tap the line where the number is (the dot), then
     // write the rounded number in the one visible box. The dot's slot is hidden: only a tap fills it.
     const rl = all('.mq-rl');
@@ -183,6 +212,14 @@ function PLAN(rootSel, which) {
         let vals = sets ? sets[0].map(String) : parts(ans);
         if (jn === ':' || jn === '.') vals = String(ans).split(jn);
         if (jn === ' h ') { const m = /(\d+)\s*h\s*(\d+)/.exec(String(ans)); if (m) vals = [m[1], m[2]]; }
+        // a fraction [n]/[d], a mixed number [w] [n]/[d] (frac-model): the answer's own parts
+        if (jn === '/' || jn === 'mixed') {
+            const a = String(ans).trim();
+            const m = /^(?:(\d+)\s+)?(\d+)\s*\/\s*(\d+)$/.exec(a) || (/^\d+$/.test(a) ? [a, a] : []);
+            vals = jn === '/' ? [m[2] || m[1] || '', m[3] || '1'] : [m[1] || '', m[2] || '', m[3] || ''];
+            slots.forEach((c, i) => { if (vals[i]) tag(c, { type: 'text', value: vals[i] }); });
+            return { plan, q: String(ans) };
+        }
         slots.forEach((c, i) => tag(c, { type: 'text', value: vals[i] }));
         return { plan, q: vals.join(', ') };
     }
@@ -241,7 +278,7 @@ async function run(page, sel, which) {
         if (!el) return { error: `lost target ${step.sa}` };
         await el.evaluate(e => e.scrollIntoView({ block: 'center' }));
         if (step.type === 'click') { await el.click(); await sleep(40); continue; }
-        if (step.type === 'domclick') { await el.evaluate(e => e.click()); await sleep(40); continue; }
+        if (step.type === 'domclick') { await el.evaluate(e => (e.click ? e.click() : e.dispatchEvent(new MouseEvent('click', { bubbles: true })))); await sleep(40); continue; }
         if (step.type === 'evclick') { await el.evaluate(e => e.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))); await sleep(60); continue; }
         if (step.type === 'rl') {
             // A real mouse tap on the line at the number's place (the kit's line geometry).
@@ -402,7 +439,14 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
                 const m = res.match(/Score:\s*(\d+)\/(\d+)/);
                 const ok = m && m[1] === m[2] && +m[2] > 0;
                 line.push(`worksheet ${ok ? 'ok' : 'WRONG'} (${m ? `${m[1]}/${m[2]}` : res})`);
-                if (!ok) fails.push(`${s} worksheet: ${res}`);
+                if (!ok) {
+                    // which cards: the answer type and the card's verdict class
+                    const per = await page.evaluate(() => window.state.worksheetQs.map((q, i) => {
+                        const c = document.getElementById(`ws_card_${i}`);
+                        return `${i + 1}:${q.answerType}:${c ? (c.className.match(/\b(correct|incorrect|wrong)\b/) || ['?'])[0] : '?'}`;
+                    }).join(' '));
+                    fails.push(`${s} worksheet: ${res} [${per}]`);
+                }
             }
             // the score pop-up covers the page; a pupil closes it before the next task
             await page.evaluate(() => { Array.from(document.body.children).filter(e => getComputedStyle(e).position === 'fixed' && getComputedStyle(e).zIndex === '9999').forEach(e => e.remove()); });

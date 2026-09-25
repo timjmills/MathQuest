@@ -217,6 +217,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'estimate-compatible': 'Find a near number that divides easily. Then divide.',
     'estimate-closest': 'Circle the closest estimate.',
     'estimate-reasonable': 'Estimate. Check one box: Reasonable or Not reasonable.',
+    // O6 lane AP3 (2026-09-25): the fraction family's kit cells (sheet/cells/frac-model.js).
+    'frac-name': 'Write the fraction, or circle the model that shows it.',
+    'models-complete': 'Look at the two models. Complete the number sentence.',
+    'line-mark-each': 'Mark each number on the line.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',
@@ -270,9 +274,14 @@ const SCREEN_VERB_MAP = Object.freeze([
     ['Shade every multiple of', 'Tap every multiple of'],
     ['Draw a line to match', 'Tap the two that match'],
     ['Mark the number on the line', 'Tap the number on the line'],
+    ['Mark each number on the line', 'Tap each number, then its tick on the line'],
     ['Mark the number with a dot', 'Tap the line to place the number'],
     ['Shade the fraction', 'Tap the parts of the fraction'],
     ['Draw the hands', 'Drag the hands'],
+    // round 4 (H7): the paper verbs the screen sweep (ws-screen-slots) still found
+    ['Draw the lines of symmetry', 'Tap the lines of symmetry'],
+    ['Draw disks to show', 'Tap the mat to show'],
+    ['Check the clock', 'Tap the clock'],
     ['Measure the line', 'Drag the ruler to the line'],
     ['Check one box', 'Tap one box'],
     ['Check the box', 'Tap the box'],
@@ -287,6 +296,7 @@ const SCREEN_VERB_MAP = Object.freeze([
     ['Write', 'Type'],
     ['Box', 'Tap'],
     ['Cut', 'Drag'],
+    ['Draw', 'Tap'],
     ['Sort', 'Drag'],
     ['Glue', 'Drag'],
 ]);
@@ -353,7 +363,9 @@ export function toScreenInstruction(text) {
             const before = src.slice(0, offset).replace(/[_\s]+$/, '');
             const verbPosition = before === ''
                 || /[.?!:;]$/.test(before)
-                || /\b(then|and|or)$/i.test(before);
+                || /\b(then|and|or)$/i.test(before)
+                // a sentence after an expression ("81 ? 9 = 9   Write + − × or ÷ in the circle.")
+                || (/^[A-Z]/.test(match) && /[0-9)=?]$/.test(before));
             if (!verbPosition) return match;
         }
         // Keep the case the sentence needs: a phrase mid-sentence stays lower case.

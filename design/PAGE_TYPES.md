@@ -1086,8 +1086,12 @@ row of four boxes `+ − × ÷` the pupil circles (taps on screen); the work are
 pupil writes the story's numbers into — the sign box on the left of the bottom row, a regroup row on
 top when that item can regroup, one partial-product row per digit of a 2-digit multiplier, the long
 division frame (divisor, bracket, dividend, quotient, two work rows per step, `R [ ]` when there is
-a remainder); then `Answer: [ ] ______` (the number box is the one scored place) with a three-word
-unit bank to copy the unit from. Two-step stories draw two blocks, `Step 1` and `Step 2`, each with
+a remainder); the answer written ONCE in the bottom row of the columns (the quotient row of ÷), with a label line
+beside it and a three-word label bank to copy from (round-4 critic, H8); only a ÷ story whose answer
+is not the quotient keeps a separate `Answer: [ ] ______` line. Every item of a page stands on the
+skill's tracks, and every + / − item carries the regroup row (structural, empty on the pupil page);
+× carries only when a 2-digit number is multiplied by one digit. Stories are retold in one controlled
+grammar (`tellStory`; gate `tests/scripts/ws-story-lint.mjs`). Two-step stories draw two blocks, `Step 1` and `Step 2`, each with
 its own sign row. Supports, all OFF by default (Support group; share keys 8A–8C): `wpCues` key words
 bold + underlined, `wpBank` a keyword bank box, `wpBar` a bar model with blank labels (the ranged
 stories keep their own `support: bar`). The cell is measured: a story whose work and answer fit side

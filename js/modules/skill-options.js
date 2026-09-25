@@ -2232,7 +2232,8 @@ Object.assign(P12_OPTIONS, {
     'conversions:ratio_tables': [_p12Max([20], 100)],
     'decimals:round_thousandths': [_p12Match([['Round to the nearest tenth', 'nearest tenth'], ['Round to the nearest hundredth', 'nearest hundredth']],
         { label: 'Round to the nearest' })],
-    'decimals:decimal_nl_drag': [_p12Match([['Place one decimal', '^Drag \\d'], ['Place several decimals', 'Drag each']],
+    // the item text is "Put 0.3 on the number line." / "Put each number on ..." (O6 AP3 nl-place)
+    'decimals:decimal_nl_drag': [_p12Match([['Place one decimal', '^Put \\d'], ['Place several decimals', '^Put each']],
         { label: 'How many to place' })],
     // Read by gen-fractions.js (_fChanged('forms')): 0 = two different values, 1 = equal pairs.
     'decimals:compare_thousandths': [formsOption([{ v: 0, l: 'Two different values (0.844 and 0.722)' },
@@ -2540,7 +2541,7 @@ Object.assign(P12_OPTIONS, {
     'integers:sub_int': [_p12Kinds('forms', 'Signs', [['5 − 3', '^\\d+ - \\d+ ='], ['5 − (−3)', '^\\d+ - \\(-'], ['−5 − 3', '^-\\d+ - \\d+'], ['−5 − (−3)', '^-\\d+ - \\(-']],
         'Subtracting a negative (5 − (−3)) is the hardest step.')],
     'integers:order_negatives': [_p12Kinds('points', 'How many numbers', [['3 or 4', '=> -?\\d+(,-?\\d+){2,3}$'], ['5 or 6', '=> -?\\d+(,-?\\d+){4,5}$']])],
-    'integers:integer_nl_drag': [_p12Match([['Place one integer', '^Drag -?\\d'], ['Place several integers', '^Drag each']])],
+    'integers:integer_nl_drag': [_p12Match([['Place one integer', '^Put [\u2212-]?\\d'], ['Place several integers', '^Put each']])],
     'integers:abs_value': [_p12Match([['|−7|', '\\|-\\d+\\|'], ['|7|', '\\|\\d+\\|'], ['Which has the greater absolute value?', 'greater absolute']])],
     'integers:opposite_numbers': [_p12Match([['The opposite of a negative', 'opposite of -'], ['The opposite of a positive', 'opposite of \\d'], ['The same distance from 0', 'same distance']])],
     'integers:ordering_rationals': [_p12Kinds('forms', 'Which numbers', [['Fractions only', 'GREATEST: [-\\d/, ]+ =>'], ['Fractions and decimals mixed', '\\d\\.\\d']])],
@@ -2999,33 +3000,67 @@ const _ap3Ticks = (values, dflt, help) => ({
 const _AP3_ADD_LINE = _ap3Ticks([['one', 'Every number: 0, 1, 2, 3 …'], ['some', 'Every 2nd number: 0, 2, 4 …'], ['ends', 'The two ends only']], 'one',
     'Which ticks carry a numeral. Every number has a tick and every hop is one number whatever you choose; '
     + 'the dot the pupil starts from is always numbered. Fewer numerals make the pupil count along the ticks.');
+const _AP3_MIXED = _ap3Model(['bar', 'area', 'circle', 'line'], ['bar'],
+    'Default: bars. Each mixed number is drawn as its wholes and a part (two wholes to a row), the two numbers one '
+    + 'under the other, in black and white on paper and screen; the answer is never drawn. On a number line a dot '
+    + 'marks each number. Pictures off prints numbers only.', (o) => o.pictures !== false);
+const _AP3_UNLIKE = _ap3Model(['bar', 'area', 'circle', 'line'], ['bar'],
+    'Default: bars. Both fractions are drawn on the same size of whole, each cut into its own parts, so the pupil '
+    + 'sees why a common denominator is needed; the answer is never drawn. Pictures off prints numbers only.',
+    (o) => o.pictures !== false);
+const _AP3_INT_LINE = {
+    ..._ap3Ticks([['one', 'Every number: −5, −4, −3 …'], ['some', 'Every 2nd number, 0 and the start'], ['ends', 'The two ends, 0 and the start']], 'one',
+        'Which ticks of the work line carry a numeral. Every number has a tick and every hop is one number whatever you '
+        + 'choose; 0 and the number the pupil starts from are always numbered. Fewer numerals make the pupil count '
+        + 'along the ticks.'),
+    appliesTo: (o) => !(Number(o.band) >= 50),
+};
 const _AP3_OPTIONS = {
     'fractions:identify': [_ap3Model(['area', 'bar', 'circle', 'line'], ['bar', 'circle'],
-        'Default: circles and bars, mixed, as the skill always drew. The picture on each "What fraction is shaded?" item, '
-        + 'on paper and on screen: tick one model for a page of it, or several to mix them. On a number line a dot marks '
-        + 'the fraction. The other kinds of item (pick the model, name the numerator) keep their own look.',
-        (o) => !Array.isArray(o.forms) || !o.forms.length || o.forms.includes(0))],
+        'Default: circles and bars, mixed, as the skill always drew. The pictures of the "What fraction is shaded?" and '
+        + '"Which model shows it?" items, on paper and on screen: tick one model for a page of it, or several to mix them. '
+        + 'On a number line a dot marks the fraction. "Name the numerator" items have no picture.',
+        (o) => !Array.isArray(o.forms) || !o.forms.length || o.forms.includes(0) || o.forms.includes(1))],
     'fractions:write_fraction': [_ap3Model(['area', 'bar', 'circle', 'line'], ['area', 'bar', 'circle'],
         'Default: rectangles, bars and circles, mixed. The picture the pupil writes the fraction for, on paper and on '
         + 'screen. Tick one model for a page of it. On a number line a dot marks the fraction.')],
     'fractions:shade_fraction': [_ap3Model(['area', 'bar', 'circle'], ['area', 'bar', 'circle'],
         'Default: rectangles, bars and circles, mixed. The empty picture the pupil shades, on paper and on screen. '
         + 'A number line is not offered: a pupil marks a point on a line, he does not shade it.')],
-    'fractions:compare': [_ap3Model(['bar', 'circle', 'area', 'line'], ['bar', 'circle'],
-        'Default: bars on screen and circles on paper, as the skill always drew. The two pictures on each "compare the '
-        + 'fractions" item: tick one model and both fractions are drawn that way, on the same size of whole, on paper and '
-        + 'on screen. The other kinds of item (numbers only, compare to 1/2) have no picture.',
+    'fractions:compare': [_ap3Model(['bar', 'circle', 'area', 'line'], ['bar'],
+        'Default: bars. The two pictures on each "compare the fractions" item: both fractions are drawn as the ticked '
+        + 'model on the same size of whole, on paper and on screen. Tick several to mix them. The other kinds of item '
+        + '(numbers only, compare to 1/2) have no picture.',
         (o) => !Array.isArray(o.forms) || !o.forms.length || o.forms.includes(0))],
     'fractions:equiv_frac_visual': [_ap3Model(['circle', 'bar', 'area'], ['circle'],
         'Default: circles, as the skill always drew. Both fractions are drawn as the ticked model on the same size of whole, '
-        + 'so the pupil sees they cover the same amount; the shade-it items on paper give an empty one of the same model. '
-        + 'Bars (fraction strips) are the usual picture for equivalence.')],
+        + 'so the pupil sees they cover the same amount. Bars (fraction strips) are the usual picture for equivalence.')],
     'fraction_operations:add_fractions_like': [_ap3Model(['bar', 'area', 'circle'], ['bar'],
         'Default: the skill\'s own bars. A rectangle or a circle draws each fraction of the sum that way, in black and '
         + 'white, and never draws the answer. Pictures off prints numbers only.', (o) => o.pictures !== false)],
     'fraction_operations:sub_fractions_like': [_ap3Model(['bar', 'area', 'circle'], ['bar'],
         'Default: the skill\'s own bars. A rectangle or a circle draws both fractions that way, in black and white, and '
         + 'never draws the answer. Pictures off prints numbers only.', (o) => o.pictures !== false)],
+    // #4 of the AP3 fixes: the fraction-operations picture skills, redrawn in black and white by the
+    // kit (never the answer). Bars stay the default, as the skills drew them.
+    'fraction_operations:add_mixed_like': [_AP3_MIXED],
+    'fraction_operations:sub_mixed_like': [_AP3_MIXED],
+    'fraction_operations:add_mixed_unlike': [_AP3_MIXED],
+    'fraction_operations:sub_mixed_unlike': [_AP3_MIXED],
+    'fraction_operations:add_frac_unlike': [_AP3_UNLIKE],
+    'fraction_operations:sub_frac_unlike': [_AP3_UNLIKE],
+    'fraction_operations:mult_frac_whole': [_ap3Model(['bar', 'area', 'circle'], ['bar'],
+        'Default: bars. The equal groups of the fraction ("3 groups of 2/5"), each drawn as the ticked model, in black '
+        + 'and white; the pupil counts the shaded parts. A number line is not offered: a group is not a point. '
+        + 'Pictures off prints numbers only.', (o) => o.pictures !== false)],
+    'fraction_operations:div_unit_fraction': [_ap3Model(['bar', 'area', 'circle'], ['bar'],
+        'Default: bars. The number divided, drawn as the ticked model: the wholes cut into unit-fraction parts '
+        + '(4 ÷ 1/3), or the unit fraction to cut (1/3 ÷ 2). The answer is never drawn. Pictures off prints numbers only.',
+        (o) => o.pictures !== false)],
+    // add_int / sub_int draw the same work line on paper and on screen (the kit's number-line
+    // cell) up to the ±20 band; the ±50 and ±100 bands keep their old cell, so the choice is off there.
+    'integers:add_int': [{ ..._AP3_INT_LINE }],
+    'integers:sub_int': [{ ..._AP3_INT_LINE }],
     'addition:number_line_add': [_AP3_ADD_LINE],
     'subtraction:number_line_sub': [_AP3_ADD_LINE],
     'addition:nl_add': [_AP3_ADD_LINE],
@@ -3037,15 +3072,17 @@ const _AP3_OPTIONS = {
     'integers:integer_nl_drag': [_ap3Ticks([['one', 'Every number: −10, −9, −8 …'], ['some', 'Every 5th number, the ends and 0'],
         ['ends', 'The two ends and 0']], 'some',
     'Which ticks carry a numeral; there is a tick at every whole number whatever you choose. With every number the '
-        + 'pupil matches each number to its numeral; with fewer he counts along the ticks. On the −5 to 5 line every '
-        + '5th becomes every 2nd.')],
+        + 'pupil finds the one unnumbered tick between its neighbours (the tick a number goes on never carries its '
+        + 'numeral); with fewer he counts along the ticks. On the −5 to 5 line every 5th becomes every 2nd.')],
     'decimals:decimal_nl_drag': [_ap3Ticks([['one', 'Every tenth: 0, 0.1, 0.2 …'], ['some', '0, 0.5 and 1'], ['ends', '0 and 1 only']], 'some',
         'Which ticks carry a numeral; there is a tick at every tenth whatever you choose. With every tenth the pupil '
-        + 'matches each decimal to its numeral; with fewer he counts the tenths.')],
+        + 'finds the unnumbered tick between its neighbours (the tick a decimal goes on never carries its numeral); '
+        + 'with fewer he counts the tenths.')],
     'fractions:fraction_nl_drag': [_ap3Ticks([['one', 'Every part: 0, 1/4, 2/4 …'], ['some', '0, the halfway tick and 1'], ['ends', '0 and 1 only']], 'one',
         'Which ticks carry a numeral; the line is always cut into equal parts. With every part numbered the pupil '
-        + 'matches each fraction to its numeral; with fewer he counts the parts. A line in thirds or fifths has no '
-        + 'halfway tick, so there "halfway" numbers 0 and 1 only.')],
+        + 'finds the unnumbered tick between its neighbours (the tick a fraction goes on never carries its numeral); '
+        + 'with fewer he counts the parts. A line in thirds or fifths has no halfway tick, so there "halfway" numbers '
+        + '0 and 1 only.')],
     'fractions:mixed_nl_drag': [_ap3Ticks([['some', 'Every whole number: 0, 1, 2, 3'], ['ends', '0 and 3 only']], 'some',
         'Which ticks carry a numeral; every whole number and every part has a tick whatever you choose. With the '
         + 'ends only the pupil counts the wholes too. (Every part is not offered: nineteen mixed numbers do not fit.)')],

@@ -883,6 +883,13 @@ export function generateEnhancedSkillCode() {
     if (state.shareSettings && state.shareSettings.quickStartLocked === 'locked') {
         tokens.push('Q1');
     }
+    // Help after a wrong answer (support-ladder.js): H1 worked example only, H0 none; the
+    // default ladder writes nothing, so every existing link is unchanged. An old app skips it.
+    if (typeof window !== 'undefined' && typeof window.helpMode === 'function') {
+        const hm = window.helpMode();
+        if (hm === 'worked') tokens.push('H1');
+        else if (hm === 'none') tokens.push('H0');
+    }
 
     if (tokens.length === 0) return skillsPart;
     return skillsPart + '|' + tokens.join('-');
@@ -929,6 +936,10 @@ export function parseEnhancedSkillCode(code) {
                     break;
                 case 'A':
                     result.settings.adaptive = (val === '1');
+                    break;
+                case 'H':
+                    // help after a wrong answer (support-ladder.js)
+                    result.settings.help = val === '1' ? 'worked' : val === '0' ? 'none' : 'ladder';
                     break;
             }
         }

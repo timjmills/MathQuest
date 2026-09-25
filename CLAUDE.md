@@ -46,6 +46,9 @@ outrank any general design advice or skill:
 - **Never splice a skill out of `SKILLS[category]`.** Four share-code systems index by position.
   Retire with a tombstone plus an alias in `js/modules/skill-aliases.js`.
 - **CSS changes must be additive.** Saved quizzes store old question HTML in IndexedDB.
+- **Design it right the first time:** read `design/audit/LESSONS_LEARNED.md` before building or fixing anything. It lists the
+  failure classes every critic round keeps finding (Size S ignored, wasted space, answer given away, paper ≠ screen …) with
+  the design rule and the automatic check for each, and a PRE-FLIGHT checklist every lane runs before it reports.
 - **8 or better, everywhere.** A redone skill is done only when it scores ≥ 8 on all four criteria
   of `design/audit/RUBRIC.md` on every page type and every screen host, graded by an independent critic.
 - Use `generateQuestionFor({category, skill, range, decimals, opts, seed})` for any generation

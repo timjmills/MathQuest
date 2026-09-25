@@ -2,6 +2,7 @@
 // Layer 4: depends on state, data, utils, quiz-storage, ui-core
 
 import { state } from './state.js';
+import { quizLadderWrong, drawLadder, shownOf, ladderMessage } from './support-ladder.js';
 import { SKILLS } from './data.js';
 import { shuffle } from './utils.js';
 import { saveResult, decompressTestFromURL, migrateTestToSections, getAllQuestionsFlat, getTotalQuestionCount } from './quiz-storage.js';
@@ -9,7 +10,7 @@ import { broadcastQuizJoin, broadcastQuizAnswer, broadcastQuizSubmit } from './q
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, wireCellInputs, signsFor,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank,
 } from './screen-cell.js';
 
@@ -209,7 +210,9 @@ const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlan
     'maxDots', 'places', 'allowRegroup', 'quotientRemainder', 'acceptedAnswers', 'regroup', 'notation',
     'operands', 'selfAnswering', 'printAnswer', 'a', 'b', 'op', 'ftCheck',
     // round 3: the kit cell travels with the item, so the quiz draws the paper's cell
-    'cell', 'skillId', 'categoryId'];
+    'cell', 'skillId', 'categoryId',
+    // 2026-09-26: a fraction's two forms, graded from the cell's own boxes
+    'dualFractionAnswers'];
 export function quizQuestionData(q) {
     if (!q) return null;
     const d = {
@@ -327,9 +330,13 @@ function renderQuizQuestion(qItem, flatIdx) {
 
     let feedbackHtml = '';
     if (showInstantFeedback) {
+        // The support ladder (support-ladder.js): while it climbs, a support, not the answer.
+        const lad = answer.correct ? null : shownOf(qd);
         feedbackHtml = answer.correct
             ? '<div class="qt-feedback correct">Correct!</div>'
-            : `<div class="qt-feedback incorrect">Incorrect. The answer is: ${escHtml(String(qd.ans))}</div>`;
+            : lad && lad.n && !lad.spent
+                ? `<div class="qt-feedback mq-ladder-feedback">${escHtml(ladderMessage(qd))}</div>`
+                : `<div class="qt-feedback incorrect">Incorrect. The answer is: ${escHtml(String(qd.ans))}</div>`;
     }
 
     // Always use text input — no multiple choice.
@@ -419,11 +426,23 @@ function _mountQuizCell(flatIdx) {
                 mountBuild(vis, qd, inp, (v) => { if (v) recordAnswer(flatIdx, v); });
             }
         }
-        if (vis && inp && adoptVisualBlank(vis, inp)) { area.remove(); wireSignCircle(vis, inp); }
+        if (vis && inp && adoptVisualBlank(vis, inp)) { area.remove(); wireSignCircle(vis, inp, { signs: signsFor(qd), onChange: (v) => { if (v) recordAnswer(flatIdx, v); } }); }
         else if (vis && inp && (qd.answerType === 'number' || !qd.answerType) && adoptSvgBlank(vis, inp)) area.remove();
         // several blanks in one drawing: an input in each, recorded in reading order
         else if (vis && inp && wireCellSlots(vis, inp, { onChange: (v) => { if (v.replace(/[,\s]/g, '')) recordAnswer(flatIdx, v); } })) {
             area.style.display = 'none';
+        } else if (vis && inp && area && wireCellInputs(vis, inp, qd, { onChange: (v) => { if (String(v).replace(/[,\s()]/g, '')) recordAnswer(flatIdx, v); } })) {
+            // the drawing's own inputs are the answer area (owner ruling 2026-09-26)
+            area.style.display = 'none';
+        } else if (inp && area && !(vis && vis.querySelector('input, [data-mq-cell]'))) {
+            // the sentence holds the one blank: the pupil writes in it, never in a separate
+            // answer area (owner ruling 2026-09-26)
+            const line = cellEl.parentNode && cellEl.parentNode.querySelector(':scope > .qt-question-text.mq-instr, :scope > .mq-instr');
+            if (line && adoptVisualBlank(line, inp)) {
+                area.remove();
+                // the sentence IS the problem: it sits in the cell, at the cell's size
+                if (!cellEl.textContent.trim()) { line.classList.remove('mq-instr'); line.classList.add('mq-legline'); cellEl.appendChild(line); }
+            }
         }
         if (vis) wireClozeBanks(vis);
         // a drawing with its own answer boxes (fact family, area model) answers through them: the
@@ -475,6 +494,8 @@ function _mountQuizCell(flatIdx) {
         const kind2 = cellKindFor({ ...qd2, options: [] });
         const single = document.getElementById('qtAnswerInput');
         try { wireLiveCorrect(cellEl, { q: qd2, kind: kind2, single }); } catch (e) { /* optional */ }
+        // the item's support ladder so far (support-ladder.js)
+        try { drawLadder(cellEl, qd2, { kind: kind2, categoryId: qd2.categoryId, skillId: qd2.skillId || state.quizAllQuestions[flatIdx].question.skillId }); } catch (e) { /* optional */ }
     }
     monoCell(cellEl);
     // a twin's rows wrap, never clip (round 3: the outer clocks were cut at the cell edge)
@@ -529,6 +550,19 @@ function recordAnswer(flatIdx, studentAnswer) {
     }
 
     quizAnswers[flatIdx] = { studentAnswer: String(studentAnswer), correct, timeSpent };
+    // Instant feedback only: a wrong answer climbs the item's support ladder; what it showed is kept
+    // with the answer (a short list of ids).
+    const test = state.currentQuiz;
+    if (!correct && String(studentAnswer).trim() && test && test.settings && test.settings.showFeedback === 'instant') {
+        try {
+            quizLadderWrong(qd, studentAnswer);
+            const ids = shownOf(qd).ids;
+            if (ids.length) quizAnswers[flatIdx].help = ids;
+        } catch (e) { /* never break the answer */ }
+    } else if (correct) {
+        const ids = shownOf(qd).ids;
+        if (ids.length) quizAnswers[flatIdx].help = ids;
+    }
 
     // Broadcast answer to monitor dashboard
     broadcastQuizAnswer(flatIdx, studentAnswer, correct);
