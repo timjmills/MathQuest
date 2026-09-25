@@ -158,8 +158,14 @@ export function multiAddParts(q) {
     const d = Math.max(...operands.map((n) => String(n).length));
     // The answer strip covers every digit track plus one (the sum of 2+ d-digit numbers can have
     // d + 1 digits), never the operator track: the same strip on every item of the band.
-    const strip = Math.max(d + 1, String(sum).length);
-    return { kind: 'stack', op: '+', operands, a: operands[0], b: operands[operands.length - 1], ans: sum, T: strip + 1, strip };
+    // The kit payload's own answer width (and a `regroup: false`) wins when the generator gives
+    // one (add_three stacked: sums to 20, two boxes, no carry box), so the screen draws the
+    // printed column.
+    const pay = q.cell && q.cell.template === 'stack' && q.cell.payload ? q.cell.payload : null;
+    const own = pay && Number(pay.ansDigits) > 0 ? Math.max(String(sum).length, Number(pay.ansDigits)) : 0;
+    const strip = own || Math.max(d + 1, String(sum).length);
+    return { kind: 'stack', op: '+', operands, a: operands[0], b: operands[operands.length - 1], ans: sum, T: strip + 1, strip,
+        ...(pay && pay.regroup === false ? { regroup: false } : {}) };
 }
 
 /** The print instruction of a rebuilt item: one verb (PEDAGOGY 10.1). */
@@ -1547,7 +1553,9 @@ export function ringParts(q) {
         const b = _n(q.b) != null && q.printFormat === 'div-remainders' ? _n(q.b) : m && _n(m[2]);
         if (a == null || !b || !rem) return null;
         if (Math.floor(a / b) !== Number(rem[1]) || a % b !== Number(rem[2])) return null;
-        return { kind: 'remainder', a, b, q: Number(rem[1]), r: Number(rem[2]) };
+        // O6 (AP4): the notation the generator chose (div_remainders: across or the bracket).
+        const bracket = q.notation === 'bracket' || !!(q.cell && q.cell.payload && q.cell.payload.notation === 'bracket');
+        return { kind: 'remainder', a, b, q: Number(rem[1]), r: Number(rem[2]), ...(bracket ? { notation: 'bracket' } : {}) };
     }
     const g = t.match(/(\d+)\s+counters?\b.*?\bgroups?\s+of\s+(\d+)/i);
     if ((q.printFormat === 'share-into-groups' || g) && g) {
@@ -1563,6 +1571,22 @@ export function ringCellHTML(p) {
     if (!p) return '';
     if (p.kind === 'remainder') {
         const w = Math.max(String(p.q).length, String(p.r).length, 2);
+        if (p.notation === 'bracket') {
+            // The long-division bracket, as the printed cell draws it (ops-counters.js): the
+            // quotient box over the dividend, "R [ ]" beside it, the divisor against the arc and
+            // the vinculum over the dividend. The two slots keep their order (quotient, remainder).
+            const arc = '<svg viewBox="0 0 10 40" preserveAspectRatio="none" aria-hidden="true" style="display:block;width:100%;height:100%;overflow:visible">'
+                + '<path d="M1.5 0 H10 M1.5 0 Q9 20 1.5 40" fill="none" stroke="#000" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>';
+            const at = (c, r, inner, extra = '') => `<span style="grid-column:${c};grid-row:${r};display:flex;align-items:flex-end;justify-content:center;${extra}">${inner}</span>`;
+            return (p.a <= 60 ? ringGroupsHTML(p.a, p.b) : '')
+                + `<div style="text-align:center"><div class="ws-eq mq-eq mq-remeq" data-mq-join=" R " role="group" aria-label="${attr(`${p.a} divided by ${p.b}`)}" `
+                + 'style="display:inline-grid;grid-template-columns:auto 0.55em auto auto auto;grid-template-rows:auto 1.3em;column-gap:0.15em;row-gap:0.12em;">'
+                + at(3, 1, cellSlot(w, 'quotient')) + at(4, 1, '<span class="mq-rlabel">R</span>') + at(5, 1, cellSlot(w, 'remainder'))
+                + at(1, 2, String(p.b), 'align-items:center;padding-right:0.1em;')
+                + `<span style="grid-column:2;grid-row:2;align-self:stretch;display:block">${arc}</span>`
+                + at(3, 2, String(p.a), 'align-items:center;border-top:2px solid #000;padding:0 0.15em;')
+                + '</div></div>';
+        }
         return (p.a <= 60 ? ringGroupsHTML(p.a, p.b) : '')
             + `<div class="ws-eq mq-eq mq-remeq" data-mq-join=" R " role="group" aria-label="${attr(`${p.a} divided by ${p.b}`)}">`
             + `<span>${p.a}</span><span class="o">÷</span><span>${p.b}</span><span class="o">=</span>`
@@ -1765,7 +1789,9 @@ export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
         // said once (regrade 2): a twin that prints the story itself (add_wp_10) takes a short
         // instruction, not the story again; the number line takes its jump instruction
         const said = _normText(q.text);
-        const instr = isNumberLineItem(q) ? NUMBER_LINE_INSTRUCTION
+        // `q.screenInstr`: a generator's own instruction for a twin that prints its whole sentence
+        // (add_three: "Add." over `8 + 5 + 3 = [ ]`, never the sentence twice).
+        const instr = q.screenInstr ? q.screenInstr : isNumberLineItem(q) ? NUMBER_LINE_INSTRUCTION
             : (said && said.length > 12 && _normText(q.visual).includes(said)) ? 'Read the story. Write the answer.'
                 : plainText(q.text);
         return { mode: 'kit', html: q.visual, instr, count: cells > 1 ? cells : 0 };
