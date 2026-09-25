@@ -603,26 +603,20 @@ whatever happens to the WRM gaps.
   WRM: Y2.B6.S5, Y3.B5.S8, Y3.B5.S9, Y3.B5.S12, Y3.B5 supplement "Solve 'longer by' problems using bar models", Y3.B5 supplement "Solve 'shorter by' problems using bar models"
 - **2.NBT.B.9** Explain why addition and subtraction strategies work, using place value and the properties of operations.  
   WRM: Y3.B2.S10
-- **3.MD.C.7a** Find the area of a rectangle with whole-number side lengths by tiling it, and show that the area is the same as would be found by multiplying the side lengths.  
-  WRM: Y4.B3 supplement "Area as multiplication"
 - **4.MD.C.5** Recognize angles as geometric shapes that are formed wherever two rays share a common endpoint, and understand concepts of angle measurement:  
   WRM: Y4.B12.S1, Y4.B12.S2, Y6.B12.S1
 - **5.MD.C.3** Recognize volume as an attribute of solid figures and understand concepts of volume measurement.  
   WRM: Y5.B15.S1
 - **5.MD.C.4** Measure volumes by counting unit cubes, using cubic cm, cubic in, cubic ft, and improvised units.  
   WRM: Y5.B15.S1, Y5.B15.S2, Y5.B15.S3, Y6.B10.S7
+- **5.MD.C.5c** Recognize volume as additive. Find volumes of solid figures composed of two non-overlapping right rectangular prisms by adding the volumes of the non-overlapping parts, applying this technique to solve real world problems.  
+  WRM: Y6.B10 supplement "Volume of composite solids"
 - **5.NBT.A.3a** Read and write decimals to thousandths using base-ten numerals, number names, and expanded form, e.g., 347.392 = 3 × 100 + 4 × 10 + 7 × 1 + 3 × (1/10) + 9 × (1/100) + 2 × (1/1000).  
   WRM: Y4.B9.S3, Y4.B9.S4
-- **K.CC.A.3** Write numbers from 0 to 20. Represent a number of objects with a written numeral 0-20 (with 0 representing a count of no objects).  
-  WRM: R.B3.S3, R.B5.S3, R.B7.S1, R.B7.S4, R.B9.S2, R.B11.S3, Y1.B1.S4, Y1.B1.S5, Y1.B4.S6, Y1.B4.S8, Y1.B4.S9, Y1.B4.S10
 - **K.G.B.5** Model shapes in the world by building shapes from components (e.g., sticks and clay balls) and drawing shapes.  
   WRM: R.B17.S4, Y1.B3 supplement "Build and draw shapes", Y2.B3.S4, Y3.B11.S10
-- **M.EE.2.MD.4** Order objects by length using non-standard units.  
-  WRM: Y2.B6.S3, Y2.B6.S4, Y3.B5.S7
 - **M.EE.2.MD.5** Increase or decrease length by adding or subtracting unit(s).  
   WRM: Y2.B6.S5, Y3.B5.S8, Y3.B5.S9, Y3.B5.S12, Y3.B5 supplement "Solve 'longer by' problems using bar models", Y3.B5 supplement "Solve 'shorter by' problems using bar models"
-- **M.EE.4.MD.5** Recognize angles in geometric shapes.  
-  WRM: Y4.B12.S1, Y4.B12.S2, Y6.B12.S1
 - **M.EE.5.MD.4** Determine the volume of a rectangular prism by counting units of measure (unit cubes).  
   WRM: Y5.B15.S1, Y5.B15.S2, Y5.B15.S3, Y6.B10.S7
 
@@ -1980,7 +1974,7 @@ whatever happens to the WRM gaps.
   Proposal: Make and Compare Areas  
 - **Y4.B3.S4** Compare areas — GAP. _3.MD.C.6_  
   Proposal: Make and Compare Areas  
-- _Awsaj supplement (not a WRM step):_ Area as multiplication — 3.MD.C.7, 3.MD.C.7a (no skill), 3.MD.C.7b
+- _Awsaj supplement (not a WRM step):_ Area as multiplication — 3.MD.C.7, 3.MD.C.7a, 3.MD.C.7b
 - _Awsaj supplement (not a WRM step):_ Distributive and additive area — 3.MD.C.7, 3.MD.C.7c, 3.MD.C.7d
 
 #### Y4.B4 Autumn Block 4: Multiplication and division
@@ -2819,7 +2813,7 @@ whatever happens to the WRM gaps.
   Proposal: Volume by Counting Cubes  
 - **Y6.B10.S8** Volume of a cuboid — covered. _5.MD.C.5, M.EE.5.MD.5_  
   Skills: Volume (Rectangular Prisms) (`area_perimeter:volume`)  
-- _Awsaj supplement (not a WRM step):_ Volume of composite solids — 5.MD.C.5, 5.MD.C.5c
+- _Awsaj supplement (not a WRM step):_ Volume of composite solids — 5.MD.C.5, 5.MD.C.5c (no skill)
 
 #### Y6.B11 Spring Block 6: Statistics
 
