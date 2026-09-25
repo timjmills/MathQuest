@@ -16,6 +16,9 @@ import { generateVocabularyQuestion } from './gen-vocabulary.js';
 import { resolveSkill } from './skill-aliases.js';
 import { normalizeOptions, pvRefusal, optionsFor, p12RouteFor } from './skill-options.js';
 import { registerVariantOverride } from './variant-cycler.js';
+// Every whole-number word problem is drawn as ONE cell type: the story, a small + − × ÷ row,
+// column boxes and "Answer: [ ] ____" (owner ruling 2026-09-25; word-work.js).
+import { applyWordWork } from './word-work.js';
 // Side effect: registers the measured per-skill options (Max Number, decimals, level) with
 // skill-options.js before anything asks optionsFor() — see tests/scripts/ws-options-derive.cjs.
 import './skill-options-derived.js';
@@ -270,7 +273,7 @@ export function generateQuestion() {
     const restoreSettings = applySkillSettings();
     try {
         const accept = p12Acceptor();
-        if (!accept) return p12Post(generateAliasedQuestion());
+        if (!accept) return applyWordWork(p12Post(generateAliasedQuestion()));
         // P12 ACCEPT LAYER: an option honoured by keeping only the items that have the property
         // asked for (a fraction page "denominators 2, 4 and 8" keeps the items whose fractions
         // all have those denominators). The item is simply drawn again, so the generator needs
@@ -281,7 +284,7 @@ export function generateQuestion() {
             q = generateAliasedQuestion();
             if (!q || accept(q)) break;
         }
-        return p12Post(q);
+        return applyWordWork(p12Post(q));
     } finally {
         if (restoreSettings) restoreSettings();
     }

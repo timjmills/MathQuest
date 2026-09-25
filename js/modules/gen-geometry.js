@@ -3,6 +3,20 @@ import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions, pickName } from './utils.js';
 import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG, computeTriangleAngles } from './svg-geometry.js';
 import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
+import { optionsFor } from './skill-options.js';
+
+// O6 appearance (lane AP2): the "Figure labels" choice for the skill being generated — 'all',
+// 'some' or 'none' — or `dflt` when this skill has no such control (a mixed pool, a skill without
+// it). It never consumes a random number, so an item is dealt exactly as before; only the drawing
+// changes. The choice also rides on the item's print data so the printed cell draws the same.
+function _figLabels(dflt = 'all') {
+    let def = null;
+    try { def = optionsFor(state.category, state.skill).find(o => o.id === 'labels') || null; } catch (e) { def = null; }
+    if (!def) return dflt;
+    const o = state.skillOptions;
+    const v = o && typeof o === 'object' ? o.labels : undefined;
+    return def.values.some(x => x.v === v) ? v : def.default;
+}
 
 // IXL-aligned shape style: cycle through the 6-color categorical palette.
 // Returns matched fill (saturated, 18% alpha) + stroke (full saturation).
@@ -1587,10 +1601,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const correctAns = askWhat === "sides" ? attrShape.sides : attrShape.vertices;
                 const { svg: shapeDraw, pts } = attrShape.svgFn();
 
-                // Label sides or vertices
+                // Label sides or vertices. O6 "Figure labels" (AP2): every side numbered / every
+                // corner dotted, only the first one marked (where to start), or no marks at all.
+                const _saLabels = _figLabels('all');
+                const _saMarks = _saLabels === 'none' ? 0 : _saLabels === 'some' ? 1 : pts.length;
                 let labels = '';
                 if (askWhat === "sides") {
-                    for (let i = 0; i < pts.length; i++) {
+                    for (let i = 0; i < _saMarks; i++) {
                         const p1 = pts[i];
                         const p2 = pts[(i + 1) % pts.length];
                         const mx = (p1[0] + p2[0]) / 2;
@@ -1603,7 +1620,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         labels += `<text x="${Math.round(offX)}" y="${Math.round(offY)}" text-anchor="middle" dominant-baseline="middle" fill="var(--accent-orange)" font-size="13" font-weight="800">${i + 1}</text>`;
                     }
                 } else {
-                    for (let i = 0; i < pts.length; i++) {
+                    for (let i = 0; i < _saMarks; i++) {
                         labels += `<circle cx="${Math.round(pts[i][0])}" cy="${Math.round(pts[i][1])}" r="5" fill="var(--accent-green)" stroke="white" stroke-width="1.5"/>`;
                     }
                 }
@@ -1621,7 +1638,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         ${labels}
                     </svg>
                     <div style="margin-top:8px;font-size:0.9rem;color:var(--text-bright);font-weight:600;">${attrShape.name}</div>
-                    <div style="margin-top:4px;font-size:0.85rem;color:var(--text-dim);">Count the ${askWhat === "sides" ? "numbered sides" : "green dots (vertices)"}</div>
+                    <div style="margin-top:4px;font-size:0.85rem;color:var(--text-dim);">${_saLabels === 'all'
+                        ? `Count the ${askWhat === "sides" ? "numbered sides" : "green dots (vertices)"}`
+                        : _saLabels === 'some'
+                            ? `Start at the ${askWhat === "sides" ? "side marked 1" : "dot"} and count the ${askWhat === "sides" ? "sides" : "corners (vertices)"}`
+                            : `Count the ${askWhat === "sides" ? "sides" : "corners (vertices)"}`}</div>
                 </div>`;
                 q.skillLabel = 'Attributes';
                 q.printFormat = 'geometry-attributes';
@@ -1893,7 +1914,10 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     let pgSquares = '';
                     for (let pr = 0; pr < pgFullH; pr++) {
                         for (let pc = 0; pc < pgFullW; pc++) {
-                            if (pr < pgCutH && pc >= pgFullW - pgCutW) continue;
+                            // AP2 fix: the squares follow the outline below, whose notch is the
+                            // top-LEFT block (they used to leave out the top-right block, so the
+                            // outline ran round empty space and cut through squares).
+                            if (pr < pgCutH && pc < pgFullW - pgCutW) continue;
                             const px = 1 + pc * pgSqSize;
                             const py = 1 + pr * pgSqSize;
                             pgSquares += `<rect x="${px}" y="${py}" width="${pgSqSize}" height="${pgSqSize}" fill="${COLORS.bg}" stroke="${COLORS.grid}" stroke-width="${STROKE.hair}"/>`;
@@ -1922,8 +1946,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 } else {
                     // Labeled-sides variant: clean shape (no grid), numbers on each side outside the edge.
                     // 35% of these are L-shapes with 6 labeled sides; 65% are rectangles with 4 labels.
-                    const _isL = Math.random() < 0.35;
-                    // Choose a unit scale so the shape stays within ~360px max
+                    const _isL = Math.random() < 0.35;                    // Choose a unit scale so the shape stays within ~360px max
                     const _maxPx = 360;
                     if (!_isL) {
                         const lblW = rng(3, 12);
@@ -2483,8 +2506,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.options = ["Acute", "Right", "Obtuse", "Straight"];
                 q.hint = `Acute < 90° | Right = 90° | Obtuse: 90°-180° | Straight = 180°`;
 
+                // O6 "Figure labels" (AP2): the degrees written beside the angle, or none — the
+                // pupil then names it by its look (the right-angle square mark stays).
+                const _iaLabels = _figLabels('all');
                 q.visual = `<div style="text-align:center;">
-                    ${createAngleSVG(angle, 140, true, false)}
+                    ${createAngleSVG(angle, 140, _iaLabels !== 'none', false)}
                     <div style="font-weight:700;margin:15px 0 10px;color:var(--accent-purple);">Identify This Angle</div>
                     <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:10px;">
                         <div style="padding:8px 12px;background:var(--bg-card);border-radius:6px;font-size:0.85rem;">Acute < 90°</div>
@@ -2493,7 +2519,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         <div style="padding:8px 12px;background:var(--bg-card);border-radius:6px;font-size:0.85rem;">Straight = 180°</div>
                     </div>
                 </div>`;
-                q.geometryData = { angle, type: angleType.name };
+                q.geometryData = { angle, type: angleType.name, ...(_iaLabels === 'none' ? { labels: 'none' } : {}) };
                 q.printFormat = "geometry-angles";
             } else if (geoSkill === "measure_angles") {
                 // Estimate/identify angles by reference. Students can't
@@ -3413,8 +3439,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const gridSpacing = Math.max(12, Math.floor(200 / maxCoord));
                 const gridSize = quadrantMode === "quadrant1" ? maxCoord * gridSpacing + 40 : maxCoord * 2 * gridSpacing + 40;
                 const origin = quadrantMode === "quadrant1" ? { x: 20, y: gridSize - 20 } : { x: gridSize / 2, y: gridSize / 2 };
-                // Label every N ticks to avoid crowding
-                const labelStep = maxCoord > 12 ? 4 : maxCoord > 8 ? 2 : 2;
+                // Label every N ticks to avoid crowding. O6 "Figure labels" (AP2): `all` numbers
+                // every grid line on both axes; `some` (the default) every other one, as before.
+                const _coLabels = _figLabels('some');
+                const labelStep = _coLabels === 'all' ? 1 : maxCoord > 12 ? 4 : maxCoord > 8 ? 2 : 2;
+                if (_coLabels === 'all') q.coordinateData.labelStep = 1;
                 const labelFontSize = maxCoord > 12 ? 8 : 10;
 
                 // Build SVG grid
@@ -3528,7 +3557,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         ${answerInputs}
                     </div>`;
                 }
-                q.geometryData = { points, quadrantMode, problemType, mode: problemType };
+                q.geometryData = { points, quadrantMode, problemType, mode: problemType, ...(_coLabels === 'all' ? { labelStep: 1 } : {}) };
                 // Identify-mode prints the X/Y typed-input boxes; plot-mode
                 // prints an empty grid + the target coords in q.text.
                 q.printFormat = problemType === "identify" ? "coord-input" : "geometry-coordinates";
@@ -3846,9 +3875,14 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 if (numVerts === 3) askPerimeter = false; // triangle has a diagonal — only ask side length
                 else askPerimeter = Math.random() < 0.5;
 
+                // O6 "Figure labels" (AP2): corners named with their coordinates, or by letter only
+                // (on the grid and in the question) — the pupil then reads each corner off the grid.
+                const _cpSome = _figLabels('all') === 'some';
                 let qText, ans, qHint;
                 if (askPerimeter) {
-                    qText = `Find the perimeter of the polygon with vertices ${vertices.map(v => `${v.label}(${v.x}, ${v.y})`).join(', ')}.`;
+                    qText = _cpSome
+                        ? `Find the perimeter of polygon ${vertices.map(v => v.label).join('')}.`
+                        : `Find the perimeter of the polygon with vertices ${vertices.map(v => `${v.label}(${v.x}, ${v.y})`).join(', ')}.`;
                     ans = perimeterHV;
                     qHint = `Add the side lengths: ${horizVertSides.map(s => s.length).join(' + ')} = ${perimeterHV} units.`;
                 } else {
@@ -3883,7 +3917,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const px = origin.x + v.x * gridSpacing;
                     const py = origin.y - v.y * gridSpacing;
                     return `<circle cx="${px}" cy="${py}" r="5" fill="${COLORS.wrong}"/>` +
-                           `<text x="${px + 8}" y="${py - 6}" font-family="${FONTS.sans}" font-size="13" font-weight="700" fill="${COLORS.wrong}">${v.label}(${v.x},${v.y})</text>`;
+                           `<text x="${px + 8}" y="${py - 6}" font-family="${FONTS.sans}" font-size="13" font-weight="700" fill="${COLORS.wrong}">${_cpSome ? v.label : `${v.label}(${v.x},${v.y})`}</text>`;
                 }).join('');
 
                 q.text = qText;
@@ -3905,7 +3939,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.skillLabel = "Coord Polygon";
                 q.printFormat = "coord-polygon";
-                q.coordPolygonData = { vertices, sides, askPerimeter, ans, maxCoord };
+                q.coordPolygonData = { vertices, sides, askPerimeter, ans, maxCoord, ...(_cpSome ? { labels: 'some' } : {}) };
             } else if (geoSkill === "net_surface_area") {
                 // ===== NET → SURFACE AREA (Grade 6) — Phase 5 batch 4 =====
                 // Band 221-230, G. Either:
@@ -4422,10 +4456,15 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const pxB = origin.x + B.x * gridSpacing;
                 const pyB = origin.y - B.y * gridSpacing;
                 const segment = `<line x1="${pxA}" y1="${pyA}" x2="${pxB}" y2="${pyB}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}" stroke-linecap="round"/>`;
-                const ptA = `<circle cx="${pxA}" cy="${pyA}" r="6" fill="${COLORS.wrong}" stroke="${COLORS.bg}" stroke-width="${STROKE.normal}"/><text x="${pxA + 10}" y="${pyA - 8}" font-family="${FONTS.sans}" fill="${COLORS.wrong}" font-size="13" font-weight="700">A(${A.x},${A.y})</text>`;
-                const ptB = `<circle cx="${pxB}" cy="${pyB}" r="6" fill="${COLORS.wrong}" stroke="${COLORS.bg}" stroke-width="${STROKE.normal}"/><text x="${pxB + 10}" y="${pyB - 8}" font-family="${FONTS.sans}" fill="${COLORS.wrong}" font-size="13" font-weight="700">B(${B.x},${B.y})</text>`;
+                // O6 "Figure labels" (AP2): points named with their coordinates, or by letter only.
+                const _cdSome = _figLabels('all') === 'some';
+                const _cdName = (p) => (_cdSome ? p.label : `${p.label}(${p.x},${p.y})`);
+                const ptA = `<circle cx="${pxA}" cy="${pyA}" r="6" fill="${COLORS.wrong}" stroke="${COLORS.bg}" stroke-width="${STROKE.normal}"/><text x="${pxA + 10}" y="${pyA - 8}" font-family="${FONTS.sans}" fill="${COLORS.wrong}" font-size="13" font-weight="700">${_cdName(A)}</text>`;
+                const ptB = `<circle cx="${pxB}" cy="${pyB}" r="6" fill="${COLORS.wrong}" stroke="${COLORS.bg}" stroke-width="${STROKE.normal}"/><text x="${pxB + 10}" y="${pyB - 8}" font-family="${FONTS.sans}" fill="${COLORS.wrong}" font-size="13" font-weight="700">${_cdName(B)}</text>`;
 
-                q.text = `What is the distance between A(${A.x}, ${A.y}) and B(${B.x}, ${B.y})?`;
+                q.text = _cdSome
+                    ? `What is the distance between point A and point B?`
+                    : `What is the distance between A(${A.x}, ${A.y}) and B(${B.x}, ${B.y})?`;
                 q.ans = distance;
                 q.answerType = "number";
                 q.options = shuffle([...optsSet]);
@@ -4449,7 +4488,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.skillLabel = "Distance Q1";
                 q.printFormat = "coord-distance";
-                q.coordDistanceData = { A, B, distance, sharedAxis, maxCoord };
+                q.coordDistanceData = { A, B, distance, sharedAxis, maxCoord, ...(_cdSome ? { labels: 'some' } : {}) };
             } else if (geoSkill === "classify_triangles" && Math.random() < 0.30) {
                 // Multi-select: "Click ALL the X triangles." — 4-6 triangle SVGs
                 function _triSvg(type) {

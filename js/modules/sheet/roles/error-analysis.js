@@ -285,7 +285,8 @@ export function prepare(it, info = {}) {
     const correct = correct0;
     const shown = isWrong ? (P ? wrong.value : likeCorrect(wrong.value, correct)) : correct;
     const who = PUPILS[(Number(info.index) || 0) % PUPILS.length];
-    const story = it.fclass === 'word' || it.template === 'wordpic';
+    // The word-work cell draws its own finished working (sign, columns, answer): no extra line.
+    const story = (it.fclass === 'word' || it.template === 'wordpic') && it.template !== 'word-work';
     const fp0 = it.footprint || {};
     // The item's answer slots, and what the pupil wrote in each (critic round 3): a correct item
     // shows the RIGHT value in every slot ("10 + 30 = 40", never "40 + 40 = 40"), a wrong one the

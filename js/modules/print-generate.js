@@ -1,7 +1,7 @@
 import { state } from './state.js';
 import { DOMAINS, SKILLS, isMixedMetaSkill, getSkillsForCategory, getMixedPoolSkills, getSkillsForDomain, getSkillsForGrade, getMixedSkillScope, getCategoryForSkill, getSkillPrintSize, SKILL_PRINT_SIZE, PRINT_FORMAT_SIZE, PRINT_SIZE_COLUMNS, SKILL_FULL_LABELS } from './data.js';
 import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, fracText, fractionToPercent } from './utils.js';
-import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG } from './svg-geometry.js';
+import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG, createBarGraphSVG, barGraphScale, createThermometerSVG } from './svg-geometry.js';
 import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
 import { createAnalogClockSVG, formatTime } from './svg-clock.js';
 import { getFactorPairs } from './svg-factors.js';
@@ -6106,9 +6106,10 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const dd = problem.dataData;
         const cats = dd.categories || [];
         const vals = dd.values || [];
-        const maxVal = Math.max(...vals, 5);
-        const data = cats.map((c, i) => ({ label: c, value: vals[i] || 0 }));
-        const graph = _designBarGraph({ data, max: maxVal, height: '1.4in' });
+        // O6 "Bars" (AP2): standing up or lying down, drawn by one builder on a 0-5 scale with
+        // every bar named (`.bargraph` numbered this scale 0.8, 1.7 … and named no bar).
+        const graph = createBarGraphSVG({ categories: cats, values: vals, max: 5,
+            orientation: dd.bars === 'horizontal' ? 'horizontal' : 'vertical', forPrint: true });
         return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;min-height:200px;">
             ${num}
             <div class="problem-content" style="text-align:center;">
@@ -6379,8 +6380,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const pxB = origin.x + cd.B.x * gridSpacing;
         const pyB = origin.y - cd.B.y * gridSpacing;
         const segment = `<line x1="${pxA}" y1="${pyA}" x2="${pxB}" y2="${pyB}" stroke="var(--print-ink)" stroke-width="1.8"/>`;
-        const ptA = `<circle cx="${pxA}" cy="${pyA}" r="4" fill="var(--print-ink)"/><text x="${pxA + 6}" y="${pyA - 6}" fill="var(--print-ink)" font-size="10" font-weight="700">A(${cd.A.x},${cd.A.y})</text>`;
-        const ptB = `<circle cx="${pxB}" cy="${pyB}" r="4" fill="var(--print-ink)"/><text x="${pxB + 6}" y="${pyB - 6}" fill="var(--print-ink)" font-size="10" font-weight="700">B(${cd.B.x},${cd.B.y})</text>`;
+        const ptA = `<circle cx="${pxA}" cy="${pyA}" r="4" fill="var(--print-ink)"/><text x="${pxA + 6}" y="${pyA - 6}" fill="var(--print-ink)" font-size="10" font-weight="700">${cd.labels === 'some' ? 'A' : `A(${cd.A.x},${cd.A.y})`}</text>`;
+        const ptB = `<circle cx="${pxB}" cy="${pyB}" r="4" fill="var(--print-ink)"/><text x="${pxB + 6}" y="${pyB - 6}" fill="var(--print-ink)" font-size="10" font-weight="700">${cd.labels === 'some' ? 'B' : `B(${cd.B.x},${cd.B.y})`}</text>`;
         return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
             ${num}
             <div class="problem-content">
@@ -6414,9 +6415,9 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
             svg = `<svg viewBox="0 0 ${W} ${H}" width="200" style="display:block;margin:0 auto;background:#fff;">
                 <rect x="${padX}" y="${padY}" width="${rectW}" height="${rectH}" fill="none" stroke="#333" stroke-width="2"/>
                 <text x="${W / 2}" y="${padY - 6}" text-anchor="middle" font-size="13" font-weight="700" fill="#333">${pd.sides[0]}</text>
-                <text x="${W / 2}" y="${H - padY + 16}" text-anchor="middle" font-size="13" font-weight="700" fill="#333">${pd.sides[2]}</text>
+                ${pd.labels === 'some' ? '' : `<text x="${W / 2}" y="${H - padY + 16}" text-anchor="middle" font-size="13" font-weight="700" fill="#333">${pd.sides[2]}</text>`}
                 <text x="${padX - 6}" y="${H / 2 + 4}" text-anchor="end" font-size="13" font-weight="700" fill="#333">${pd.sides[1]}</text>
-                <text x="${W - padX + 6}" y="${H / 2 + 4}" font-size="13" font-weight="700" fill="#333">${pd.sides[3]}</text>
+                ${pd.labels === 'some' ? '' : `<text x="${W - padX + 6}" y="${H / 2 + 4}" font-size="13" font-weight="700" fill="#333">${pd.sides[3]}</text>`}
             </svg>`;
         } else {
             const W = 200, H = 130;
@@ -6736,7 +6737,7 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
             const px = origin.x + v.x * gridSpacing;
             const py = origin.y - v.y * gridSpacing;
             return `<circle cx="${px}" cy="${py}" r="4" fill="var(--print-ink)"/>` +
-                   `<text x="${px + 6}" y="${py - 5}" font-size="10" font-weight="700" fill="var(--print-ink)">${v.label}(${v.x},${v.y})</text>`;
+                   `<text x="${px + 6}" y="${py - 5}" font-size="10" font-weight="700" fill="var(--print-ink)">${cp.labels === 'some' ? v.label : `${v.label}(${v.x},${v.y})`}</text>`;
         }).join('');
         return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
             ${num}
@@ -9036,7 +9037,7 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
             for (let i = 0; i <= 10; i++) {
                 gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="var(--print-rule)" stroke-width="1"/>`;
                 gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="var(--print-rule)" stroke-width="1"/>`;
-                if (i % 2 === 0) {
+                if (i % (gd.labelStep || 2) === 0) {
                     axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="13" fill="var(--print-ink-mute)">${i}</text>`;
                     if (i > 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="13" fill="var(--print-ink-mute)">${i}</text>`;
                 }
@@ -9045,7 +9046,7 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
             for (let i = -5; i <= 5; i++) {
                 gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="var(--print-rule)" stroke-width="1"/>`;
                 gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="var(--print-rule)" stroke-width="1"/>`;
-                if (i % 2 !== 0 || i === 0) {
+                if (gd.labelStep === 1 || i % 2 !== 0 || i === 0) {
                     axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="12" fill="var(--print-ink-mute)">${i}</text>`;
                     if (i !== 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="12" fill="var(--print-ink-mute)">${i}</text>`;
                 }
@@ -9116,7 +9117,7 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
             for (let i = 0; i <= 10; i++) {
                 gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="var(--print-rule)" stroke-width="1"/>`;
                 gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="var(--print-rule)" stroke-width="1"/>`;
-                if (i % 2 === 0) {
+                if (i % (gd.labelStep || 2) === 0) {
                     axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="13" fill="var(--print-ink-mute)">${i}</text>`;
                     if (i > 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="13" fill="var(--print-ink-mute)">${i}</text>`;
                 }
@@ -9125,7 +9126,7 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
             for (let i = -5; i <= 5; i++) {
                 gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="var(--print-rule)" stroke-width="1"/>`;
                 gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="var(--print-rule)" stroke-width="1"/>`;
-                if (i % 2 !== 0 || i === 0) {
+                if (gd.labelStep === 1 || i % 2 !== 0 || i === 0) {
                     axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="12" fill="var(--print-ink-mute)">${i}</text>`;
                     if (i !== 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="12" fill="var(--print-ink-mute)">${i}</text>`;
                 }
@@ -9144,9 +9145,9 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                 const labelY = p.y >= 8 ? py + 12 : py - 6;
                 const anchor = p.x >= 8 ? 'end' : 'start';
                 pointsSVG += `<text x="${labelX}" y="${labelY}" font-size="13" font-weight="bold" fill="${colors[idx]}" text-anchor="${anchor}">${p.label}</text>`;
-            } else {
-                pointsSVG += `<circle cx="${px}" cy="${py}" r="6" fill="none" stroke="${colors[idx]}" stroke-width="2" stroke-dasharray="3,3"/>`;
             }
+            // AP2 fix: a "Plot" item used to print a dashed circle AT the point to plot, which
+            // answered it; the grid is left empty, as on screen (gen-geometry.js plot mode).
         });
 
         // Build answer inputs - COMPACT
@@ -9236,10 +9237,13 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
             angleIndicator = `<path d="M ${cx + 15} ${cy} L ${cx + 15} ${cy - 15} L ${cx} ${cy - 15}" fill="none" stroke="#1565c0" stroke-width="2"/>`;
         } else if (isStraight) {
             // Straight angle arc
-            angleIndicator = `<path d="M ${cx + arcRadius} ${cy} A ${arcRadius} ${arcRadius} 0 0 1 ${cx - arcRadius} ${cy}" fill="none" stroke="#1565c0" stroke-width="2"/>`;
+            angleIndicator = `<path d="M ${cx + arcRadius} ${cy} A ${arcRadius} ${arcRadius} 0 0 0 ${cx - arcRadius} ${cy}" fill="none" stroke="#1565c0" stroke-width="2"/>`;
         } else {
             // Normal arc (counter-clockwise from horizontal to angled ray)
-            angleIndicator = `<path d="M ${cx + arcRadius} ${cy} A ${arcRadius} ${arcRadius} 0 0 1 ${arcX2} ${arcY2}" fill="none" stroke="#1565c0" stroke-width="2"/>`;
+            // AP2 fix: sweep-flag 0 is the short arc through the top (SVG y runs down); 1 drew the
+            // reflex arc underneath, so an obtuse angle read as a reflex one once its degrees
+            // were hidden (createAngleSVG made the same fix on screen).
+            angleIndicator = `<path d="M ${cx + arcRadius} ${cy} A ${arcRadius} ${arcRadius} 0 0 0 ${arcX2} ${arcY2}" fill="none" stroke="#1565c0" stroke-width="2"/>`;
         }
         
         return `
@@ -9257,7 +9261,7 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                         <!-- Vertex dot -->
                         <circle cx="${cx}" cy="${cy}" r="4" fill="#333"/>
                         <!-- Degree label below the vertex -->
-                        <text x="${cx + 15}" y="${cy + 22}" font-size="14" font-weight="bold" fill="#333">${angle}°</text>
+                        ${gd.labels === 'none' ? '' : `<text x="${cx + 15}" y="${cy + 22}" font-size="14" font-weight="bold" fill="#333">${angle}°</text>`}
                     </svg>
                     <div style="margin-top:10px;display:flex;gap:15px;flex-wrap:wrap;">
                         <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
@@ -11392,9 +11396,13 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const dd = problem.dataData;
         const categories = dd.categories || [];
         const values = dd.values || [];
-        const maxVal = Math.max(...values, 10);
-        const data = categories.map((c, i) => ({ label: c, value: values[i] || 0 }));
-        const graph = _designBarGraph({ data, max: maxVal, height: '1.6in' });
+        // O6 "Bars" (AP2): standing up or lying down, drawn in black and white by one builder on a
+        // whole-number scale (a step of 1, 2, 5 …) with every bar named. The old `.bargraph` named
+        // no bar and numbered its scale max / 6 (2.8, 5.7 …), so "Which category has the most?"
+        // could not be answered on paper.
+        const scale = barGraphScale(Math.max(...values, 1));
+        const graph = createBarGraphSVG({ categories, values, max: scale.max, ticks: scale.ticks,
+            orientation: dd.bars === 'horizontal' ? 'horizontal' : 'vertical', forPrint: true });
         return `
             <div class="worksheet-problem" style="min-height:180px;">
                 ${num}
@@ -11701,6 +11709,26 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
     }
     
     // Temperature
+    // AP2 (2026-09-25): a "What temperature is shown?" item carries its scale step (`every`, the
+    // O6 "Figure labels" choice) and prints the same thermometer as the screen card; a conversion
+    // item has no thermometer to read, so it prints the question and the answer line only (the
+    // branch below drew a 70° tube for it).
+    if (problem.printFormat === "measurement-temp" && problem.measurementData
+        && (problem.measurementData.every || problem.measurementData.direction)) {
+        const md = problem.measurementData;
+        const thermo = md.every
+            ? createThermometerSVG({ temp: md.temp, unit: md.unit, every: md.every, forPrint: true })
+            : '';
+        return `
+            <div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+                ${num}
+                <div class="problem-content" style="text-align:center;">
+                    ${thermo}
+                    <div style="font-size:0.95rem;margin:8px 0;">${text}</div>
+                    <div style="display:flex;align-items:baseline;gap:8px;"><span style="font-weight:700;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>${md.every ? md.unit : ''}</span></div>
+                </div>
+            </div>`;
+    }
     if (problem.printFormat === "measurement-temp" && problem.measurementData) {
         const md = problem.measurementData;
         const temp = md.temperature || md.temp || 70;

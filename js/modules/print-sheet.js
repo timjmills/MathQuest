@@ -232,6 +232,9 @@ function isAcrossFact(q, template) {
 /** PT 2.4 footprint classes: long procedures, one-symbol answers, word problems. */
 function footprintClass(q, template, size) {
     const f = String(q.printFormat || '');
+    // The word-work cell (every whole-number story) is MEASURED: small numbers stand in 2 columns,
+    // wider work goes to the full-width group (practice.js splitWide), never a forced one column.
+    if (template === 'word-work') return 'standard';
     if (size === 'spacious' || /word/.test(f)) return 'word';
     // The K-2 picture templates hold one small picture and one short answer: they pack like
     // one-symbol answers (2 x 4 and up), not like 6-per-page stacks.
@@ -928,6 +931,9 @@ function measureItems(items, { size, look, colsList }) {
             // where it is not, so a wide cell is shorter by design, not a collapse.
             if (it.supportsBox && it.supportsBox.plan) continue;
             if (it.colsLayout) continue;   // a role that lays the cell out per column count on purpose (Error analysis)
+            // A template that re-stacks its zones by width on purpose (the word-work cell puts
+            // its answer beside the columns at full width, under them in a column) is not a collapse.
+            if (it.footprint && it.footprint.restacks) continue;
             const m = it.measured || {};
             const base = m[cols[0]] && m[cols[0]].hMm;
             if (!base) continue;

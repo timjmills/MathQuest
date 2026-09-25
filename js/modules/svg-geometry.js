@@ -739,3 +739,134 @@ export function createLabeledRectSVG(length, width, forPrint = false) {
     return svg;
 }
 
+
+// O6 appearance (lane AP2, 2026-09-25): a bar graph standing up or LYING DOWN, for the "Bars"
+// choice of bar_graph and bar_graph_intro. Lying down, it draws the same data as the standing graph
+// of each skill — the same scale numbers (`ticks`), the same bar-end values when the standing graph
+// shows them (`valueLabels`) — turned on its side: categories down the left, the scale along the
+// bottom. The printed cell draws both orientations with it (black and white, a whole-number scale,
+// every bar named: the old print graph named no bar and numbered its scale 2.8, 5.7 …).
+// `forPrint` / mono as every builder above; print is sized to sit two to a row.
+//   { categories: string[], values: number[], max, ticks: number[], valueLabels, orientation, forPrint }
+export function createBarGraphSVG({ categories = [], values = [], max = 5, ticks = null, valueLabels = false, orientation = 'horizontal', forPrint = false } = {}) {
+    const P = _pal(forPrint);
+    const ink = P.mono ? P.ink : _C_INK;
+    const rule = P.mono ? P.rule : _C_RULE;
+    const barFill = P.mono ? P.shade() : _dtSoft(_DT_COLORS.primary);
+    const barStroke = P.mono ? P.ink : _C_PRIMARY;
+    const safeMax = Math.max(1, max);
+    const tickList = Array.isArray(ticks) && ticks.length ? ticks : Array.from({ length: safeMax + 1 }, (_, i) => i);
+    const longest = categories.reduce((m, c) => Math.max(m, String(c).length), 0);
+    // Print is sized to sit two to a row in a worksheet cell; the screen card draws it larger.
+    const fs = _isPrint(forPrint) ? 12 : 14;
+    const charW = fs * (_isPrint(forPrint) ? 0.66 : 0.6);
+    const top = 14;
+    const txt = (x, y, s, extra = '') => `<text x="${x}" y="${y}" font-size="${fs}" fill="${ink}" ${extra}>${s}</text>`;
+    let grid = '', bars = '', axes = '', W, H;
+    if (orientation === 'vertical') {
+        const plotH = _isPrint(forPrint) ? 120 : 260;
+        // A slot fits a name of up to 6 letters; a longer name (Strawberries, Basketball) is
+        // written on a slant under its bar, so five bars still sit two graphs to a row.
+        const slot = Math.max(_isPrint(forPrint) ? 44 : 80, Math.round(Math.min(longest, 6) * charW) + (_isPrint(forPrint) ? 8 : 12));
+        const slant = longest * charW > slot - 4;
+        // Room for the scale numbers, and for the first slanted name to run left of its bar.
+        const left = Math.max(16 + Math.max(...tickList.map(t => String(t).length)) * charW,
+            slant ? Math.round(longest * charW * 0.77 - slot / 2 + 6) : 0);
+        const barW = Math.round(slot * 0.62);
+        const plotW = categories.length * slot;
+        W = left + plotW + 10;
+        H = top + plotH + 30 + (slant ? Math.round(longest * charW * 0.64) : 0);
+        const yAt = v => top + plotH - (v / safeMax) * plotH;
+        for (const t of tickList) {
+            const y = yAt(t);
+            grid += `<line x1="${left}" y1="${y}" x2="${left + plotW}" y2="${y}" stroke="${rule}" stroke-width="${_DT_STROKE.hair}"/>`;
+            grid += txt(left - 6, y + fs * 0.35, t, 'text-anchor="end"');
+        }
+        categories.forEach((c, i) => {
+            const x = left + i * slot + (slot - barW) / 2;
+            const y = yAt(values[i] || 0);
+            if (values[i] > 0) bars += `<rect x="${x}" y="${y}" width="${barW}" height="${top + plotH - y}" fill="${barFill}" stroke="${barStroke}" stroke-width="${_DT_STROKE.normal}"/>`;
+            if (valueLabels) bars += txt(x + barW / 2, y - 6, values[i], 'text-anchor="middle" font-weight="700"');
+            const lx = x + barW / 2, ly = top + plotH + fs + 6;
+            bars += slant
+                ? txt(lx + fs * 0.4, ly - fs * 0.3, c, `text-anchor="end" font-weight="700" transform="rotate(-40 ${lx + fs * 0.4} ${ly - fs * 0.3})"`)
+                : txt(lx, ly, c, 'text-anchor="middle" font-weight="700"');
+        });
+        axes = `<line x1="${left}" y1="${top}" x2="${left}" y2="${top + plotH}" stroke="${ink}" stroke-width="${_DT_STROKE.bold}"/>`
+            + `<line x1="${left}" y1="${top + plotH}" x2="${left + plotW}" y2="${top + plotH}" stroke="${ink}" stroke-width="${_DT_STROKE.bold}"/>`;
+    } else {
+        const left = Math.max(_isPrint(forPrint) ? 56 : 70, Math.round(longest * charW) + 16);
+        const plotW = _isPrint(forPrint) ? 220 : 440;
+        const barH = _isPrint(forPrint) ? 26 : 40;
+        const gap = _isPrint(forPrint) ? 10 : 18;
+        const plotH = categories.length * (barH + gap) + gap;
+        W = left + plotW + (valueLabels ? 44 : 16);
+        H = top + plotH + 30;
+        const xAt = v => left + (v / safeMax) * plotW;
+        for (const t of tickList) {
+            const x = xAt(t);
+            grid += `<line x1="${x}" y1="${top}" x2="${x}" y2="${top + plotH}" stroke="${rule}" stroke-width="${_DT_STROKE.hair}"/>`;
+            grid += txt(x, top + plotH + fs + 6, t, 'text-anchor="middle"');
+        }
+        categories.forEach((c, i) => {
+            const y = top + gap + i * (barH + gap);
+            const w = Math.max(0, xAt(values[i] || 0) - left);
+            bars += txt(left - 8, y + barH / 2 + fs * 0.35, c, 'text-anchor="end" font-weight="700"');
+            if (w > 0) bars += `<rect x="${left}" y="${y}" width="${w}" height="${barH}" fill="${barFill}" stroke="${barStroke}" stroke-width="${_DT_STROKE.normal}"/>`;
+            if (valueLabels) bars += txt(left + w + 8, y + barH / 2 + fs * 0.35, values[i], 'font-weight="700"');
+        });
+        axes = `<line x1="${left}" y1="${top}" x2="${left}" y2="${top + plotH}" stroke="${ink}" stroke-width="${_DT_STROKE.bold}"/>`
+            + `<line x1="${left}" y1="${top + plotH}" x2="${left + plotW}" y2="${top + plotH}" stroke="${ink}" stroke-width="${_DT_STROKE.bold}"/>`;
+    }
+    W = Math.round(W); H = Math.round(H);
+    const kind = orientation === 'vertical' ? 'standing up' : 'lying down';
+    return `<svg class="bar-graph-${orientation}" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;max-width:${W}px;height:auto;" role="img" aria-label="Bar graph with bars ${kind}">${grid}${bars}${axes}</svg>`;
+}
+
+/** A whole-number scale for a bar graph: a step of 1, 2, 5, 10 … so that about `n` lines fit. */
+export function barGraphScale(top, n = 6) {
+    const t = Math.max(1, top);
+    const step = [1, 2, 5, 10, 20, 25, 50, 100].find(s => t / s <= n) || Math.ceil(t / n);
+    const max = Math.ceil(t / step) * step;
+    const ticks = [];
+    for (let v = 0; v <= max; v += step) ticks.push(v);
+    return { max, ticks };
+}
+
+// O6 appearance (lane AP2, 2026-09-25): a thermometer to READ, for temperature's "What
+// temperature is shown?" items (it had none on screen: the card printed the answer in large type,
+// and the print cell drew a 0-100 tube the item's -10 to 40 range did not fit). One mark for every
+// degree, a longer mark every 5, and the scale numbered every `every` degrees (5 or 10: the
+// "Figure labels" choice). The column is solid ink to the reading; black and white on paper.
+//   { temp, unit: '°C' | '°F', min = -10, max = 40, every = 5, forPrint }
+export function createThermometerSVG({ temp = 0, unit = '°C', min = -10, max = 40, every = 5, forPrint = false } = {}) {
+    const P = _pal(forPrint);
+    const ink = P.mono ? P.ink : _C_INK;
+    const paper = P.mono ? P.paper : _C_PAPER;
+    const perDeg = 6;
+    const top = 22;
+    const tubeX = 70, tubeW = 18;
+    const H0 = top + (max - min) * perDeg;       // y of the lowest mark
+    const yAt = t => H0 - (t - min) * perDeg;
+    const bulbR = 17;
+    const bulbCy = H0 + 26;
+    const H = bulbCy + bulbR + 10;
+    const W = 170;
+    let marks = '';
+    for (let t = min; t <= max; t++) {
+        const y = yAt(t);
+        const long = t % 5 === 0;
+        const len = t % 10 === 0 ? 20 : long ? 15 : 8;
+        marks += `<line x1="${tubeX + tubeW}" y1="${y}" x2="${tubeX + tubeW + len}" y2="${y}" stroke="${ink}" stroke-width="${long ? _DT_STROKE.normal : _DT_STROKE.hair}"/>`;
+        if (t % every === 0) {
+            marks += `<text x="${tubeX + tubeW + 26}" y="${y + 5}" font-size="15" font-weight="${t % 10 === 0 ? 700 : 400}" fill="${ink}">${t}</text>`;
+        }
+    }
+    const clamped = Math.max(min, Math.min(max, temp));
+    const colTop = yAt(clamped);
+    const column = `<rect x="${tubeX + 5}" y="${colTop}" width="${tubeW - 10}" height="${bulbCy - colTop}" fill="${ink}"/>`;
+    const tube = `<rect x="${tubeX}" y="${top - 12}" width="${tubeW}" height="${bulbCy - top + 12}" rx="${tubeW / 2}" fill="${paper}" stroke="${ink}" stroke-width="${_DT_STROKE.normal}"/>`;
+    const bulb = `<circle cx="${tubeX + tubeW / 2}" cy="${bulbCy}" r="${bulbR}" fill="${ink}" stroke="${ink}" stroke-width="${_DT_STROKE.normal}"/>`;
+    const unitLabel = `<text x="${tubeX - 12}" y="${top + 4}" text-anchor="end" font-size="16" font-weight="700" fill="${ink}">${unit}</text>`;
+    return `<svg class="thermometer" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;max-width:100%;height:auto;" role="img" aria-label="Thermometer in ${unit === '°F' ? 'degrees Fahrenheit' : 'degrees Celsius'}">${tube}${column}${bulb}${marks}${unitLabel}</svg>`;
+}

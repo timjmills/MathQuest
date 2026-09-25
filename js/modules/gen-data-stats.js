@@ -3,6 +3,7 @@ import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { COLORS, STROKE, FONTS, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
+import { createBarGraphSVG } from './svg-geometry.js';
 
 // P12: an option value the teacher chose for this skill (skill-options.js), else undefined.
 function _dOpt(id) {
@@ -19,6 +20,12 @@ function _dNum(id) {
     const v = _dOpt(id);
     const n = Number(v);
     return v !== null && v !== undefined && Number.isFinite(n) && n > 0 ? n : null;
+}
+
+// O6 appearance (AP2): the bar graph's "Bars" choice is "lying down" (horizontal). Unset, or on a
+// skill without the control, the graph stands up as it always has.
+function _barsLyingDown() {
+    return _dOpt('bars') === 'horizontal';
 }
 
 // generate-question.js post-strips q.options when no array element is a
@@ -831,6 +838,14 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                                 }).join('')}
                             </svg>
                         </div>`;
+                        // O6 "Bars" (AP2): the same graph lying down, the same scale and values.
+                        if (_barsLyingDown()) {
+                            q.visual = `<div style="text-align:center;">
+                            <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);font-size:1rem;">${context.icon} ${context.title}</div>
+                            <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:6px;">CCSS: 3.MD.B.3 | Bar Graph</div>
+                            ${createBarGraphSVG({ categories, values, max: maxVal, ticks: [0, Math.ceil(maxVal / 2), maxVal], valueLabels: true })}
+                        </div>`;
+                        }
                         q.text = `${context.title}: Click ALL categories with values greater than ${chosenThreshold}.`;
                         q.ans = ans;
                         q.options = _preserveOptionsForWidget(opts);
@@ -922,6 +937,17 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.dataData = { categories, values, context: context.title, questionType, type: 'bar_graph' };
                 q.printFormat = "data-bar-graph";
+                // O6 "Bars" (AP2): the same graph lying down — the categories down the left, the
+                // same scale numbers along the bottom, the same value at the end of each bar.
+                if (_barsLyingDown()) {
+                    q.visual = `<div style="text-align:center;">
+                    ${questionType === "difference" ? STUDENT_DEF_DIFFERENCE : ''}
+                    <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);font-size:1rem;">${context.icon} ${context.title}</div>
+                    <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:6px;">CCSS: ${q.ccss} | Bar Graph</div>
+                    ${createBarGraphSVG({ categories, values, max: maxVal, ticks: [0, Math.ceil(maxVal / 2), maxVal], valueLabels: true })}
+                </div>`;
+                    q.dataData.bars = 'horizontal';
+                }
 
             } else if (dataSkill === "pictograph") {
                 // Pictograph - CCSS 3.MD.B.3

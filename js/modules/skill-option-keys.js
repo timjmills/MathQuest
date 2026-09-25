@@ -82,8 +82,8 @@ export const KEY_BLOCKS = Object.freeze({
     5: Object.freeze({ owner: 'P12 every other family', status: 'assigned', keys: '5A-5M' }),
     6: Object.freeze({ owner: 'O2 easier / harder ladders (vocabulary, integers, geometry, graphs, algebra, number theory)', status: 'assigned', keys: '6A-6B' }),
     7: Object.freeze({ owner: 'option-panel round 3 (pools, function tables)', status: 'assigned', keys: '7A-7E' }),
-    8: Object.freeze({ owner: '', status: 'spare', keys: '' }),
-    9: Object.freeze({ owner: '', status: 'spare', keys: '' }),
+    8: Object.freeze({ owner: 'word problems (word-work cell, 2026-09-25)', status: 'assigned', keys: '8A-8C' }),
+    9: Object.freeze({ owner: 'O6 appearance lanes (AP1 9A-9E, AP2 9F-9J, AP3 9K-9O, AP4 9P-9T) and the options verifier (9U-9Z)', status: 'assigned', keys: '9A-9Z' }),
 });
 
 // Option id -> its multi-character key. APPEND-ONLY. Take the next letter of your OWN block.
@@ -179,6 +179,17 @@ export const MULTI_KEYS = Object.freeze({
     ftTable: '7D',       // function tables: rows and the In-number order (was tiles + order)
     ftTask: '7E',        // function tables: the task, with or without a Check row (was task + response)
     // NEXT FREE IN BLOCK 7: 7F.
+
+    // Block 8 — word problems: the keyword supports of the word-work cell (2026-09-25), all bools
+    wpCues: '8A',        // bold + underline the key words in the story
+    wpBank: '8B',        // the keyword bank box beside the story
+    wpBar: '8C',         // a bar model with blank labels under the story
+    // NEXT FREE IN BLOCK 8: 8D.
+
+    // Block 9 — O6 appearance (2026-09-25). 9F-9J: lane AP2 (figures and data). Figure labels
+    // ride on the reserved `labels` (5E).
+    bars: '9F',          // bar graphs: bars standing up (vertical) / lying down (horizontal)
+    // NEXT FREE FOR AP2: 9G (to 9J).
 });
 
 /** Every option id -> its key (one letter, or digit + letter). */
@@ -257,6 +268,8 @@ export const VALUE_TOKENS = Object.freeze({
     // P12
     model: Object.freeze({ none: 'N', area: 'A', bar: 'B', circle: 'C', line: 'L', set: 'S', grid: 'G', blocks: 'K', analog: 'H', digital: 'D' }),
     labels: Object.freeze({ all: 'A', some: 'S', none: 'N' }),
+    // block 9 (O6 appearance, AP2): bar graphs
+    bars: Object.freeze({ vertical: 'V', horizontal: 'H' }),
     precision: Object.freeze({ hour: 'H', half: 'F', quarter: 'Q', five: 'V', one: 'O' }),
     coins: Object.freeze({ p: 'P', n: 'N', d: 'D', q: 'Q' }),
     units: Object.freeze({ metric: 'M', customary: 'C', mixed: 'X' }),
@@ -346,6 +359,8 @@ export const SCALAR_ONLY = Object.freeze({
     // reserved ids (block 4): their values are allocated when they are built. (Pinned history:
     // `cover` and `mix` were built by S2 and now carry VALUE_TOKENS; `touch` rides in `support`.)
     touch: 'reserved', cover: 'reserved', mix: 'reserved', anchors: 'reserved',
+    // block 8 (word problems)
+    wpCues: 'bool', wpBank: 'bool', wpBar: 'bool',
 });
 
 /**

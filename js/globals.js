@@ -117,6 +117,8 @@ import { getWordProblemIcon } from './modules/word-problem-icons.js';
 
 // Teacher view shell (approved design 2026-09-24): sidebar + teacher screens, teacher mode only
 import { tvGo } from './modules/teacher-shell.js';
+// The word-work cell on screen: tap a sign, type in the column boxes, tap a unit word (2026-09-25).
+import './modules/word-work-screen.js';
 
 // Layer 7: Init
 import { init, checkURLParameters, setupModalListeners, bootstrap } from './modules/init.js';
