@@ -361,7 +361,9 @@ registerSkill('measurement:clock_parts', {
         hands: { iCan: 'I Can name the parts of a clock', instructionKey: 'hour-hand',
             steps: ['Look at the two hands.', 'The short hand is the hour hand.', 'Check its letter.'],
             say: 'The short hand is the hour hand. It is __.', sayValues: (q) => [payloadOf(q).hourLetter || 'A'] },
-    }, (q) => (payloadOf(q).task === 'hands' ? 'hands' : 'numerals')),
+    }, (q) => (payloadOf(q).task === 'hands' ? 'hands' : 'numerals'),
+    // The sheet header asks with no item: the hands task names itself by its print format.
+    (ref) => (ref.printFormat === 'tm-clock-hands' ? 'hands' : 'numerals')),
     misconceptions: ['counted-backwards', 'M-T3'],
     workedSteps: (q) => {
         const p = payloadOf(q);

@@ -142,6 +142,31 @@ for (const s of SIZES) {
     near(lay.cellH, s === 'L' ? 75.667 : 76, `PT 2.4 standard cell height at ${s}`, 0.01);
     eq(lay.cellW, 93, `PT 2.4 standard cell width at ${s}`);
 }
+// RUBRIC H13: a row held back by a ceiling is never stretched past FILL_CAP x its content, and
+// the grid then does not fill by flex (the spare height stays under the grid).
+{
+    const lay = L(run(12, () => plainItem(12)), 'auto', 'L', { role: 'test', ceiling: 12, target: { cols: 3, rows: 4 } });
+    ok(lay.cellH <= lay.hMin * 1.8 + 0.01 && lay.fill === false, `H13: 12 short items capped at 1.8 x hMin (cellH ${lay.cellH}, hMin ${lay.hMin}, fill ${lay.fill})`);
+}
+// RUBRIC H13: mixed heights - tall problems grouped first, rows sized to what they hold.
+{
+    const { groupByHeight, rowShape } = await import('../../js/modules/sheet/layout.js');
+    const mk = (h, id) => ({ id, measured: { 2: { hMm: h, fits: true } } });
+    const its = [mk(18, 'a'), mk(78, 'b'), mk(18, 'c'), mk(78, 'd'), mk(18, 'e'), mk(18, 'f')];
+    const g = groupByHeight(its, 2);
+    eq(g.map((x) => x.id).join(''), 'bdacef', 'H13: tallest first, order kept within each height');
+    const sh = rowShape(g, 2, 3, 75);
+    ok(sh && (() => { const f = sh.rowsTpl.split(' ').map(parseFloat); return f.length === 3 && f[0] >= 79 && f[1] >= 19 && f[1] <= 19 * 1.8 + 0.1 && f[0] > 2 * f[1]; })() && sh.heightMm <= 3 * 75 + 0.01, `H13: rows weighted by what they hold (${sh && sh.rowsTpl}, ${sh && sh.heightMm} mm)`);
+    eq(rowShape([mk(40), mk(40), mk(40), mk(40)], 2, 2, 60), null, 'H13: equal rows are left as they were');
+}
+// Page fill (owner 2026-09-25): an Independent page of SHORT problems takes more rows instead of
+// leaving an empty strip, up to DN-1's 20; a column stack keeps 12.1's grid.
+{
+    const lay = L(run(20, () => plainItem(14)), 'auto', 'L');
+    ok(lay.perPage > 6 && lay.perPage <= 20 && lay.rows * Math.min(lay.cellH, lay.hMin * 1.8) >= 0.6 * lay.gridH, `page fill: short problems fill the page (${lay.cols} x ${lay.rows}, cellH ${lay.cellH}, hMin ${lay.hMin})`);
+    const st = L(run(9, () => stackItem(3)), 'auto', 'L');
+    ok(st.perPage <= 6, `page fill: column stacks keep the 12.1 grid (${st.perPage})`);
+}
 // Long algorithm: 2 x 2, 93 x 114 / 113.5.
 {
     const lay = L(run(4, () => plainItem(40, {})).map((it) => Object.assign(it, { fclass: 'long' })));
@@ -294,7 +319,8 @@ eq(ROLE_IDS.includes('independent') && ROLE_IDS.includes('more-practice'), true,
     ok(/data-ws-instruction="add">Add\.<\/div>/.test(r.pupilPages[3]), 'PG-22: the instruction repeats on every page');
     ok(r.keyPages[0].includes('data-ws-key="name">Answer Key') && r.keyPages[0].includes('<span>Answer Key</span>'), 'AK-3: the key is marked on the Name rule and in the tab');
     ok(/Key · Form A · seed 42/.test(r.keyPages[0]), 'AK-3: the key footer');
-    ok(/height:151\.33\dmm/.test(r.pupilPages[2]), 'PT-ENG-6: a rebalanced page keeps the section\'s cell height (2 x 75.67 mm)');
+    // (a short page spends its spare height as row gaps, each row keeping the cell height)
+    ok(/height:151\.33\dmm/.test(r.pupilPages[2]) || (r.pupilPages[2].match(/ws-gridrow" style="[^"]*height:75\.6[67]\d*mm/g) || []).length === 2, 'PT-ENG-6: a rebalanced page keeps the section\'s cell height (2 x 75.67 mm)');
     ok(!/height:/.test((r.pupilPages[0].match(/<div class="ws-grid[^"]*" style="[^"]*"/) || [''])[0]), 'PG-10: page 1 fills the body by flex');
     ok(/data-ws-page="1" data-ws-paper="a4" data-ws-role="independent" data-ws-mode="print"/.test(r.pupilPages[0]), '17.1: page hooks');
     ok(/data-ws-cell="stack" data-ws-state="blank" data-ws-level="1" data-ws-answer-type="number"/.test(r.pupilPages[0]), '17.1: cell hooks');

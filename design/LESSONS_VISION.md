@@ -68,3 +68,9 @@ Every sheet's teacher footer carries the tags: skill id, grade, primary CCSS, EE
 The per-lesson data (prerequisite skills, concepts, vocabulary with pictures, the steps with their
 icons, the chant and why) lives in `js/modules/lessons/prereqs.js`, shaped to grow into the
 vertical-alignment map. Samples: `design/lesson-samples/`.
+
+## Later — intervention lessons (owner, 2026-09-25: "record it for later")
+An **intervention lesson for every White Rose Maths small step**, using the same lesson system (warm-up on
+prerequisites, minimal-words worked example, we-do, massed practice, optional mixed), tagged to the small
+step, CCSS and EE. Starts after the sample lessons are approved and the WRM small-step inventory
+(`design/WRM_ALIGNMENT_PLAN.md` phase 1) exists.

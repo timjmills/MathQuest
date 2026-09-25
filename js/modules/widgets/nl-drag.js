@@ -13,6 +13,9 @@
 //     max:        number, line maximum (e.g. 1, 10, 3)
 //     tickStep:   number, distance between ticks (e.g. 1, 0.1, 0.25)
 //     labelStep:  number?, distance between labeled major ticks (default = tickStep)
+//     labelAt:    number[]?, O6 "Numbers on the line" (lane AP3): the tick INDICES (0 = min) that
+//                 carry a numeral. When present it replaces labelStep; the print twin
+//                 (print-generate.js nl-drag) reads the same list, so both label the same ticks.
 //     mode:       "fraction" | "decimal" | "integer" | "mixed"   (display formatting)
 //     denom:      number?, display denominator for fraction/mixed (e.g. 4 for /4)
 //     targets: [
@@ -91,7 +94,7 @@ function _valuesEqual(a, b, tickStep) {
 
 // Build the static SVG (axis line, ticks, labels). Marker layer is appended
 // live and updated on each drop.
-function _buildLineSVG(min, max, tickStep, labelStep, mode, denom, geom) {
+function _buildLineSVG(min, max, tickStep, labelStep, mode, denom, geom, labelAt = null) {
     const { W, H, lineY, leftX, rightX } = geom;
     const span = max - min;
     const usable = rightX - leftX;
@@ -111,9 +114,12 @@ function _buildLineSVG(min, max, tickStep, labelStep, mode, denom, geom) {
         // A tick is a "label tick" if its value falls on labelStep
         // (modulo the tick grid). Compare integer multiples to avoid fp.
         const labelMultiplier = Math.round(labelStep / tickStep);
-        const isLabelTick = labelMultiplier > 0 && (i % labelMultiplier === 0);
-        const tickH = isLabelTick ? 12 : 6;
-        const sw = isLabelTick ? 2 : 1.2;
+        // The tick's weight follows labelStep (the line's structure: wholes, fives); `labelAt`
+        // only decides which ticks also carry a numeral (O6: the ticks never change).
+        const isMajor = labelMultiplier > 0 && (i % labelMultiplier === 0);
+        const isLabelTick = labelAt ? labelAt.has(i) : isMajor;
+        const tickH = isMajor ? 12 : 6;
+        const sw = isMajor ? 2 : 1.2;
         svg += `<line x1="${x}" y1="${lineY - tickH}" x2="${x}" y2="${lineY + tickH}" stroke="#333" stroke-width="${sw}" />`;
         if (isLabelTick) {
             const txt = _formatValue(v, mode, denom);
@@ -146,7 +152,8 @@ export function renderNlDrag(q, container) {
     const rightX = W - 40;
     const geom = { W, H, lineY, leftX, rightX };
 
-    const lineSVG = _buildLineSVG(min, max, tickStep, labelStep, mode, denom, geom);
+    const labelAt = Array.isArray(data.labelAt) ? new Set(data.labelAt.map(Number)) : null;
+    const lineSVG = _buildLineSVG(min, max, tickStep, labelStep, mode, denom, geom, labelAt);
 
     // Build palette (one chip per target). Each chip has its target value and
     // label baked in via dataset; placement state is kept in `placed` map.

@@ -130,6 +130,11 @@ import './cells/hop-line.js';
 export { tile as shapeTile, shapeAt, tileSize, TILE_SHAPES } from './cells/shapes.js';
 export { gridSlots, shadeList } from './cells/mult-grid.js';
 export { hopSlots, sentenceOf, ONE_TICK_MAX } from './cells/hop-line.js';
+// O6 appearance (lane AP3): the fraction model drawn on paper and screen, and the tick-label rule
+// every number line shares.
+export { fracModelSVG, fracModelSize, fracModelSizedHTML, fracStackHTML, FRAC_MODELS, areaGrid } from './cells/frac-model.js';
+export { tickLabelSet, TICK_LABEL_VALUES } from './cells/line-labels.js';
+export { valueLineSVG, valueLineSizedHTML, valueLineWindow } from './cells/value-line.js';
 
 // Function tables (function_table_easy / _hard): the In / Out table, its rule helpers and the
 // screen checker every host uses (a 'make your own' table is right when every row follows the rule).

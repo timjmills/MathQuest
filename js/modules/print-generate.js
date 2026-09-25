@@ -1,7 +1,7 @@
 import { state } from './state.js';
 import { DOMAINS, SKILLS, isMixedMetaSkill, getSkillsForCategory, getMixedPoolSkills, getSkillsForDomain, getSkillsForGrade, getMixedSkillScope, getCategoryForSkill, getSkillPrintSize, SKILL_PRINT_SIZE, PRINT_FORMAT_SIZE, PRINT_SIZE_COLUMNS, SKILL_FULL_LABELS } from './data.js';
 import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, fracText, fractionToPercent } from './utils.js';
-import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG, createBarGraphSVG, barGraphScale, createThermometerSVG } from './svg-geometry.js';
+import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG, createBarGraphSVG, barGraphScale, createThermometerSVG, rectBoxFor, createLabeledStepShapeSVG } from './svg-geometry.js';
 import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
 import { createAnalogClockSVG, formatTime } from './svg-clock.js';
 import { getFactorPairs } from './svg-factors.js';
@@ -21,6 +21,7 @@ import { inkHTML } from './print-ink.js';
 import {
     hasCell, renderCell, cellAnswerKey, cellGridItem, cell as kitCellBox,
     resolveCtx as kitResolveCtx, installLegacyAdapters, defaultRenderCell,
+    fracModelSizedHTML, valueLineSizedHTML,
 } from './sheet/index.js';
 import { fillSlots as kitFillSlots } from './sheet/roles/answer-key.js';
 // Two of the six default adapters borrow functions that do NOT live in this file.
@@ -81,6 +82,85 @@ function _designBarGraph({ data = [], max = 12, height = '1.6in' } = {}) {
         <div class="yaxis" style="height:${height};">${yLabels.join('')}</div>
         <div class="plot" style="height:${height};">${bars}</div>
     </div>`;
+}
+
+/**
+ * AP2 (2026-09-25): the graph a "Circle ALL the categories ..." item asks about, for the
+ * multi-select print branch (which printed the options only, so the pupil had nothing to read).
+ * Drawn in black and white from the item's own data: a bar graph (standing up or lying down, as
+ * the item's "Bars" choice says), a tally chart (tallies drawn as lines, bundles of five struck
+ * through) or a picture graph (a key, then one picture per key value). '' when the item has none.
+ */
+// AP2: a tally chart and a picture graph drawn as SVG marks, black and white, the category names
+// in the sheet's own font. The glyphs they replace ("卌", "●", "◐") are not in Andika, so they
+// printed in a fallback face (L-FONT TY-1) and the "●" in italics.
+const _ROW_H = 30, _LAB_W = 110;
+function _rowsSvg(cats, marksFor, widthOf, head = '') {
+    const w = _LAB_W + Math.max(90, ...cats.map((_, i) => widthOf(i))) + 14;
+    const top = head ? _ROW_H : 0;
+    const rows = cats.map((c, i) => `<g transform="translate(0 ${top + i * _ROW_H})">`
+        + `<text x="4" y="${_ROW_H / 2 + 5}" font-size="14" font-weight="700" fill="#000">${String(c || '').substring(0, 12)}</text>${marksFor(i)}`
+        + `<line x1="0" y1="${_ROW_H}" x2="${w}" y2="${_ROW_H}" stroke="#949494" stroke-width="0.75"/></g>`).join('');
+    return `<svg viewBox="0 0 ${w} ${top + cats.length * _ROW_H + 2}" width="${w}" style="display:block;margin:0 auto;max-width:100%;height:auto;">${head}${rows}</svg>`;
+}
+// The picture a pictograph item names in its own words ("Each ★ = 10"), drawn as a shape.
+function _pictoIcon(icon, cx, cy, r, fill = '#000') {
+    const pts = (list) => list.map(([x, y]) => `${(cx + x * r).toFixed(1)},${(cy + y * r).toFixed(1)}`).join(' ');
+    if (icon === '★') { // star
+        const p = [];
+        for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? 0.42 : 1; p.push([rr * Math.cos(a), rr * Math.sin(a)]); }
+        return `<polygon points="${pts(p)}" fill="${fill}"/>`;
+    }
+    if (icon === '■') return `<rect x="${cx - r * 0.85}" y="${cy - r * 0.85}" width="${r * 1.7}" height="${r * 1.7}" fill="${fill}"/>`;
+    if (icon === '▲') return `<polygon points="${pts([[0, -1], [0.95, 0.8], [-0.95, 0.8]])}" fill="${fill}"/>`;
+    if (icon === '♦') return `<polygon points="${pts([[0, -1], [0.75, 0], [0, 1], [-0.75, 0]])}" fill="${fill}"/>`;
+    return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}"/>`;
+}
+/** Tally marks: bundles of four struck through by a fifth, then single strokes. */
+function _tallyChartSvg(cats, vals) {
+    const tally = (n) => {
+        let s = '', x = _LAB_W;
+        for (let g = 0; g < Math.floor(n / 5); g++) {
+            for (let k = 0; k < 4; k++) s += `<line x1="${x + k * 6}" y1="6" x2="${x + k * 6}" y2="${_ROW_H - 6}" stroke="#000" stroke-width="1.5"/>`;
+            s += `<line x1="${x - 3}" y1="${_ROW_H - 8}" x2="${x + 21}" y2="8" stroke="#000" stroke-width="1.5"/>`;
+            x += 34;
+        }
+        for (let k = 0; k < n % 5; k++) s += `<line x1="${x + k * 6}" y1="6" x2="${x + k * 6}" y2="${_ROW_H - 6}" stroke="#000" stroke-width="1.5"/>`;
+        return s;
+    };
+    return _rowsSvg(cats, (i) => tally(vals[i] || 0), (i) => Math.floor((vals[i] || 0) / 5) * 34 + ((vals[i] || 0) % 5) * 6);
+}
+/** A picture graph: the key row, then one picture per `scale` (half a picture for half a key value). */
+function _pictureGraphSvg(cats, vals, scale, icon) {
+    const s = scale || 1;
+    const icons = (n) => {
+        const whole = Math.floor(n / s), half = (n % s) >= s / 2;
+        let out = '';
+        for (let k = 0; k < whole; k++) out += _pictoIcon(icon, _LAB_W + 10 + k * 22, _ROW_H / 2, 9);
+        if (half) {
+            const cx = _LAB_W + 10 + whole * 22;
+            out += `<clipPath id="pg-half-${cx}"><rect x="${cx - 10}" y="0" width="10" height="${_ROW_H}"/></clipPath><g clip-path="url(#pg-half-${cx})">${_pictoIcon(icon, cx, _ROW_H / 2, 9)}</g>`
+                + _pictoIcon(icon, cx, _ROW_H / 2, 9, 'none').replace(/fill="none"/, 'fill="none" stroke="#000" stroke-width="1"');
+        }
+        return out;
+    };
+    const head = `<text x="4" y="${_ROW_H / 2 + 5}" font-size="14" font-weight="700" fill="#000">Key:</text>`
+        + _pictoIcon(icon, 58, _ROW_H / 2, 9)
+        + `<text x="74" y="${_ROW_H / 2 + 5}" font-size="14" font-weight="700" fill="#000">= ${s}</text>`;
+    return _rowsSvg(cats, (i) => icons(vals[i] || 0), (i) => Math.ceil((vals[i] || 0) / s) * 22, head);
+}
+function _msStem(problem) {
+    const dd = problem && problem.dataData;
+    if (!dd || !Array.isArray(dd.categories) || !Array.isArray(dd.values)) return '';
+    const cats = dd.categories, vals = dd.values;
+    if (dd.type === 'bar_graph_msc') {
+        const scale = barGraphScale(Math.max(...vals, 1));
+        return createBarGraphSVG({ categories: cats, values: vals, max: scale.max, ticks: scale.ticks,
+            orientation: dd.bars === 'horizontal' ? 'horizontal' : 'vertical', forPrint: true });
+    }
+    if (dd.type === 'tally_chart_msc') return _tallyChartSvg(cats, vals);
+    if (dd.type === 'pictograph_msc') return _pictureGraphSvg(cats, vals, dd.scale || 1, dd.icon);
+    return '';
 }
 
 /** Design-edition pictograph: `.picto` block. */
@@ -5595,17 +5675,30 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
 
     // ========== MULTI-SELECT-CHECK (MAP-style "click ALL" — print as ☐ pills) ==========
     if (problem.printFormat === 'multi-select') {
+        // AP2 fix (2026-09-25): an option drawn as a picture (an angle, a shape) prints its
+        // picture — it used to print its empty label, a row of bare tick boxes — and a question
+        // about a graph prints the graph above the options (`_msStem`).
         const opts = (problem.options || []).map(o => {
             const lbl = (o && o.label != null) ? o.label : '';
-            return `<span class="opt">${lbl}</span>`;
+            // The screen's tinted angle wedge would print as a solid grey fan over the arc: dropped.
+            const pic = o && typeof o.svg === 'string' && o.svg
+                ? `<span class="ms-opt-pic" style="display:inline-block;width:17mm;max-width:100%;line-height:0;vertical-align:middle;">${o.svg
+                    .replace(/<path[^>]*class="ang-wedge"[^>]*\/>/g, '')
+                    .replace(/<svg([^>]*?)\swidth="[^"]*"/, '<svg$1').replace(/<svg([^>]*?)\sheight="[^"]*"/, '<svg$1 width="100%"')}</span>`
+                : '';
+            return `<span class="opt">${pic}${lbl}</span>`;
         }).join('');
         const optCount = (problem.options || []).length;
         const cols = optCount <= 9 ? ' cols-3' : '';
         const rawText = problem.text || '';
         const promptText = rawText.replace(/Click ALL/gi, 'Circle ALL');
+        // A generator that draws the figure the options refer to sets `printStem` (identify_angles:
+        // "Tick every obtuse angle in this shape", its corners lettered).
+        const stem = _msStem(problem) || (problem.printStem && problem.visual ? printVisualWrap(problem.visual) : '');
         return `<div class="worksheet-problem ms-print${sizeClass}" style="page-break-inside:avoid;">
             ${num}
             <div class="ms-prompt p-prompt">${promptText}</div>
+            ${stem ? `<div class="problem-visual ms-stem" style="margin:4px 0 8px;">${stem}</div>` : ''}
             <div class="opt-list${cols}">${opts}</div>
         </div>`;
     }
@@ -6409,10 +6502,12 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const pd = problem.perimeterIntroData;
         let svg = '';
         if (pd.shape === "rectangle" || pd.shape === "square") {
-            const W = 180, H = 110, padX = 40, padY = 25;
-            const rectW = W - padX * 2;
-            const rectH = H - padY * 2;
-            svg = `<svg viewBox="0 0 ${W} ${H}" width="200" style="display:block;margin:0 auto;background:#fff;">
+            // AP2: drawn to scale, as on screen (svg-geometry.js rectBoxFor).
+            const box = rectBoxFor(pd.sides[0], pd.sides[1]);
+            const padX = 40, padY = 25;
+            const rectW = box.w, rectH = box.h;
+            const W = rectW + padX * 2, H = rectH + padY * 2;
+            svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.round(W * 200 / 180)}" style="display:block;margin:0 auto;background:#fff;max-width:100%;">
                 <rect x="${padX}" y="${padY}" width="${rectW}" height="${rectH}" fill="none" stroke="#333" stroke-width="2"/>
                 <text x="${W / 2}" y="${padY - 6}" text-anchor="middle" font-size="13" font-weight="700" fill="#333">${pd.sides[0]}</text>
                 ${pd.labels === 'some' ? '' : `<text x="${W / 2}" y="${H - padY + 16}" text-anchor="middle" font-size="13" font-weight="700" fill="#333">${pd.sides[2]}</text>`}
@@ -6694,10 +6789,13 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         for (let j = 0; j <= bbH; j++) {
             gridLines += `<line x1="0" y1="${j * GRID}" x2="${bbW * GRID}" y2="${j * GRID}" stroke="#ddd" stroke-width="0.5"/>`;
         }
+        // AP2: the side lengths the screen shows, at the print grid's scale.
+        const sideLabels = (pd.labels || []).map(l => `<text x="${(l.x * scaleFactor).toFixed(1)}" y="${(l.y * scaleFactor + (l.y < 0 ? 0 : 1)).toFixed(1)}" text-anchor="${l.anchor}" font-size="12" font-weight="700" fill="#000">${l.t}</text>`).join('');
         const svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 320)}" style="display:block;margin:6px auto;background:#fff;">
             <g transform="translate(${pad},${pad})">
                 ${gridLines}
                 <polygon points="${scaledPts}" fill="none" stroke="#333" stroke-width="2"/>
+                ${sideLabels}
             </g>
         </svg>`;
         return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
@@ -7718,17 +7816,36 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
     // Fraction compare
     if (problem.printFormat === "fraction-compare" && problem.fractionData) {
         const fd = problem.fractionData;
+        // O6 `model` (lane AP3): the screen's model, by the same builder, both on one whole.
+        const cmpPic = (n, d) => (fd.model ? fracModelSizedHTML({ n, d, kind: fd.model, wholeMm: 30 }) : _designFracCirclePrint(d, n, 60));
+        if (fd.model) {
+            // Each fraction stacked over its model (as on screen), the sign box between: narrow
+            // enough for two columns.
+            const col = (n, d) => `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">${cmpPic(n, d)}${_designFracPrint(n, d, 'lg')}</div>`;
+            return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
+                        ${col(fd.num1, fd.denom1)}
+                        <span style="min-width:30px;min-height:24px;border:2px solid #333;border-radius:3px;display:inline-block;text-align:center;font-size:1.2rem;">&nbsp;</span>
+                        ${col(fd.num2, fd.denom2)}
+                    </div>
+                    <div style="margin-top: 6px; font-size: 0.85rem; color: #555;">Circle: &gt; , &lt; , or =</div>
+                </div>
+            </div>`;
+        }
 
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
                     <div class="print-frac-equation" style="gap: 8px;">
-                        ${_designFracCirclePrint(fd.denom1, fd.num1, 60)}
+                        ${cmpPic(fd.num1, fd.denom1)}
                         ${_designFracPrint(fd.num1, fd.denom1, 'lg')}
                         <span style="min-width:30px;min-height:24px;border:2px solid #333;border-radius:3px;display:inline-block;text-align:center;font-size:1.2rem;">&nbsp;</span>
                         ${_designFracPrint(fd.num2, fd.denom2, 'lg')}
-                        ${_designFracCirclePrint(fd.denom2, fd.num2, 60)}
+                        ${cmpPic(fd.num2, fd.denom2)}
                     </div>
                     <div style="margin-top: 6px; font-size: 0.85rem; color: #555;">Circle: &gt; , &lt; , or =</div>
                 </div>
@@ -8145,6 +8262,9 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const usable = rightX - leftX;
         const xFor = (v) => leftX + ((v - min) / span) * usable;
         const labelMultiplier = Math.max(1, Math.round(labelStep / tickStep));
+        // O6 "Numbers on the line" (lane AP3): the generator's explicit tick list, shared with the
+        // screen widget (widgets/nl-drag.js), replaces the label step when it is present.
+        const labelAt = Array.isArray(nl.labelAt) ? new Set(nl.labelAt.map(Number)) : null;
 
         let svg = '';
         svg += `<line x1="${leftX - 8}" y1="${lineY}" x2="${rightX + 8}" y2="${lineY}" stroke="#333" stroke-width="2.2"/>`;
@@ -8153,12 +8273,15 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         for (let i = 0; i <= totalTicks; i++) {
             const v = min + i * tickStep;
             const x = xFor(v);
-            const isLabelTick = (i % labelMultiplier === 0);
-            const tickH = isLabelTick ? 11 : 6;
-            const sw = isLabelTick ? 1.8 : 1.1;
+            // Tick weight follows labelStep (the structure); labelAt only picks the numerals.
+            const isMajor = (i % labelMultiplier === 0);
+            const isLabelTick = labelAt ? labelAt.has(i) : isMajor;
+            const tickH = isMajor ? 11 : 6;
+            const sw = isMajor ? 1.8 : 1.1;
             svg += `<line x1="${x}" y1="${lineY - tickH}" x2="${x}" y2="${lineY + tickH}" stroke="#333" stroke-width="${sw}"/>`;
             if (isLabelTick) {
-                svg += `<text x="${x}" y="${lineY + 26}" text-anchor="middle" fill="#333" font-size="12" font-weight="600">${fmt(v)}</text>`;
+                // TY-1 / TY-2: the numerals in Andika at a weight the face has (was 600, no family).
+                svg += `<text x="${x}" y="${lineY + 26}" text-anchor="middle" fill="#333" font-family="Andika, sans-serif" font-size="12" font-weight="700">${fmt(v)}</text>`;
             }
         }
 
@@ -8219,6 +8342,18 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
     if (problem.printFormat === "integer-number-line" && problem.integerData) {
         const id = problem.integerData;
         const target = id.target;
+        // O6 "Numbers on the line" (lane AP3): the generator's line, by the builder the screen used.
+        if (id.line) {
+            return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="margin-bottom:10px;font-weight:700;">What integer does the dot show?</div>
+                    ${valueLineSizedHTML({ min: id.line.min, max: id.line.max, labels: id.line.labels, mark: target })}
+                    <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;"><span style="font-weight:700;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
+                </div>
+            </div>`;
+        }
         const minVal = Math.min(-10, target - 3);
         const maxVal = Math.max(10, target + 3);
         // All integer ticks; label every 5 + zero so the line stays readable.
@@ -8226,7 +8361,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const labels = [];
         for (let v = minVal; v <= maxVal; v++) {
             ticks.push(v);
-            if (v === 0 || v % 5 === 0) labels.push({ v, label: String(v) });
+            // RP-1: never the numeral of the tick the arrow points to (it IS the answer).
+            if ((v === 0 || v % 5 === 0) && v !== target) labels.push({ v, label: String(v) });
         }
         const numline = _designNumLine({
             min: minVal,
@@ -9710,7 +9846,32 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
             </div>`;
     }
     
-    // Geometry - Composite shapes
+    // Geometry - Composite shapes. AP2 (2026-09-25): gen-geometry.js composite_shapes items print
+    // THEIR OWN shape and question — the branch after this one drew one fixed L-shape and asked
+    // for the area whatever the item was (a "Find the perimeter" item included).
+    if (problem.printFormat === "geometry-composite" && problem.geometryData && problem.geometryData.shapeType && problem.geometryData.dims) {
+        const gd = problem.geometryData;
+        const d = gd.dims;
+        const dual = problem.answerType === 'dual';
+        const figure = !dual
+            ? createLabeledStepShapeSVG(gd.shapeType === 'T' ? 'T' : 'L', d, true)
+            : gd.shapeType === 'T'
+                ? createTShapeSVG({ topWidth: d.topWidth, topHeight: d.topHeight, stemWidth: d.stemWidth, stemHeight: d.stemHeight }, true, false)
+                : createLShapeSVG({ topWidth: d.topWidth, topHeight: d.topHeight, bottomWidth: d.bottomWidth, totalHeight: d.totalHeight }, true, false);
+        // The side numbers in the sheet's own font (the builders name the screen's sans face).
+        const figureInk = figure.replace(/ font-family='[^']*'/g, '').replace(/ font-family="[^"]*"/g, '');
+        const line = (label, unit) => `<div style="display:flex;align-items:baseline;gap:8px;font-weight:700;margin-top:6px;"><span style="white-space:nowrap;">${label} =</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>${unit}</span></div>`;
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="margin-bottom:8px;">${problem.text || ''}</div>
+                    <div class="problem-visual" style="text-align:center;">${figureInk}</div>
+                    ${line('Perimeter', 'units')}
+                    ${dual ? line('Area', 'square units') : ''}
+                </div>
+            </div>`;
+    }
     if (problem.printFormat === "geometry-composite" && problem.geometryData) {
         const gd = problem.geometryData;
         let compositeSVG = '';
@@ -11479,23 +11640,13 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const categories = dd.categories || [];
         const values = dd.values || [];
         const scale = dd.scale || 2;
-        const icon = "●";
-        const halfIconChar = "◐";
-
-        const rowsHTML = categories.map((cat, i) => {
-            const numIcons = Math.floor((values[i] || 0) / scale);
-            const halfIcon = ((values[i] || 0) % scale) >= scale / 2 ? halfIconChar : "";
-            return `<span class="label">${(cat || '').substring(0, 12)}</span><span class="icons">${icon.repeat(numIcons)}${halfIcon}</span>`;
-        }).join('');
-
+        // AP2: the icons drawn as circles ("●" / "◐" are not in Andika and printed in italics
+        // from a fallback font).
         return `
             <div class="worksheet-problem" style="min-height:160px;">
                 ${num}
                 <div class="problem-content">
-                    <div class="picto">
-                        <div class="key">Key: ${icon} = ${scale}</div>
-                        ${rowsHTML}
-                    </div>
+                    ${_pictureGraphSvg(categories, values, scale, dd.icon)}
                     <div style="font-size:0.85rem;margin-top:8px;">${text}</div>
                     <div style="border-bottom:2px solid #333;padding:3px;margin-top:4px;">&nbsp;</div>
                 </div>
@@ -11608,19 +11759,9 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const categories = dd.categories || [];
         const values = dd.values || [];
         
-        const tallyMark = (n) => {
-            const groups = Math.floor(n / 5);
-            const remainder = n % 5;
-            return "卌".repeat(groups) + "|".repeat(remainder);
-        };
-        
-        const rowsHTML = categories.map((cat, i) => `
-            <div style="display:flex;border-bottom:1px solid #ddd;padding:3px 0;">
-                <span style="min-width:70px;font-size:0.8rem;">${(cat || '').substring(0, 10)}</span>
-                <span style="font-family:monospace;font-size:0.9rem;letter-spacing:2px;">${tallyMark(values[i] || 0)}</span>
-            </div>
-        `).join('');
-        
+        // AP2: tallies drawn as strokes (the "卌" glyph printed in a fallback font).
+        const rowsHTML = _tallyChartSvg(categories, values);
+
         return `
             <div class="worksheet-problem" style="min-height:140px;">
                 ${num}
@@ -11900,9 +12041,10 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const den = Math.max(2, Math.min(fd.den || 4, 12));
         const numer = Math.max(0, Math.min(fd.num || 1, den));
         // Use a clean print pie chart (matches print color palette)
-        const visual = printPieChartLight(numer, den, 90);
+        // O6 `model` (lane AP3): the model the generator drew on screen, by the same builder.
+        const visual = fd.model ? fracModelSizedHTML({ n: numer, d: den, kind: fd.model }) : printPieChartLight(numer, den, 90);
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            <div style="font-size:1rem;margin-bottom:8px;font-weight:700;">Write the fraction that is shaded.</div>
+            <div style="font-size:1rem;margin-bottom:8px;font-weight:700;">${fd.model === 'line' ? 'Write the fraction the dot shows.' : 'Write the fraction that is shaded.'}</div>
             <div style="text-align:center;margin-bottom:8px;">${visual}</div>
             <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-top:10px;">
                 <span style="font-weight:700;">Fraction:</span>
@@ -11921,7 +12063,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const den = Math.max(2, Math.min(fd.den || 4, 12));
         const numer = Math.max(0, Math.min(fd.num || 1, den));
         // Build a blank pie chart (no shaded slices) — student shades it in
-        const blankPie = printPieChartLight(0, den, 95);
+        // O6 `model` (lane AP3): the blank model the screen draws, by the same builder.
+        const blankPie = fd.model ? fracModelSizedHTML({ n: numer, d: den, kind: fd.model, blank: true }) : printPieChartLight(0, den, 95);
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
             <div style="font-size:1rem;margin-bottom:8px;font-weight:700;text-align:center;">
                 Shade <span style="display:inline-flex;flex-direction:column;align-items:center;line-height:1;vertical-align:middle;">
@@ -11958,14 +12101,20 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const circleWithFrac = (circle, frac) => `<div style="display:flex;align-items:center;gap:6px;">${circle}${frac}</div>`;
 
         // Helper: empty circle (unshaded, only division lines visible)
-        const emptyCircle = (den) => printPieChartLight(0, den, sz, '#fff', '#999');
+        const emptyCircle = (den) => (fd.model
+            ? fracModelSizedHTML({ n: 0, d: den, kind: fd.model, wholeMm: 30, blank: true })
+            : printPieChartLight(0, den, sz, '#fff', '#999'));
+        // O6 `model` (lane AP3): the screen's model, by the same builder, both on one whole.
+        const efvPie = (n, d, fill) => (fd.model
+            ? fracModelSizedHTML({ n, d, kind: fd.model, wholeMm: 30 })
+            : (fill ? printPieChartLight(n, d, sz, fill) : printPieChartLight(n, d, sz)));
 
         let inner = '';
 
         if (pt === 'both_shaded') {
             // Both circles shaded, student writes fractions and tells if equivalent
-            const c1 = printPieChartLight(fd.num1, fd.den1, sz);
-            const c2 = printPieChartLight(fd.num2, fd.den2, sz, PASTEL_COLORS.blue.fill);
+            const c1 = efvPie(fd.num1, fd.den1);
+            const c2 = efvPie(fd.num2, fd.den2, PASTEL_COLORS.blue.fill);
             const f1 = fracNotation(0, 0, true, true);
             const f2 = fracNotation(0, 0, true, true);
             inner = `<div style="font-size:0.85rem;margin-bottom:6px;font-weight:700;">Write each fraction. Are they equivalent?</div>
@@ -11976,7 +12125,7 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                 </div>`;
         } else if (pt === 'shade_second') {
             // First circle shaded with fraction, second empty for student to shade
-            const c1 = printPieChartLight(fd.num1, fd.den1, sz);
+            const c1 = efvPie(fd.num1, fd.den1);
             const c2 = emptyCircle(fd.den2);
             const f1 = fracNotation(fd.num1, fd.den1, false, false);
             const f2 = fracNotation(0, 0, true, true);
@@ -11988,8 +12137,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                 </div>`;
         } else if (pt === 'fill_numbers') {
             // Both circles shaded, student fills in fraction numbers only
-            const c1 = printPieChartLight(fd.num1, fd.den1, sz);
-            const c2 = printPieChartLight(fd.num2, fd.den2, sz, PASTEL_COLORS.blue.fill);
+            const c1 = efvPie(fd.num1, fd.den1);
+            const c2 = efvPie(fd.num2, fd.den2, PASTEL_COLORS.blue.fill);
             const f1 = fracNotation(fd.num1, fd.den1, false, false);
             const f2 = fracNotation(0, 0, true, true);
             inner = `<div style="font-size:0.85rem;margin-bottom:6px;font-weight:700;">Write the equivalent fraction shown.</div>
@@ -12000,8 +12149,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                 </div>`;
         } else if (pt === 'compare') {
             // Both shaded with fractions shown, student writes = or ≠
-            const c1 = printPieChartLight(fd.num1, fd.den1, sz);
-            const c2 = printPieChartLight(fd.num2, fd.den2, sz, PASTEL_COLORS.blue.fill);
+            const c1 = efvPie(fd.num1, fd.den1);
+            const c2 = efvPie(fd.num2, fd.den2, PASTEL_COLORS.blue.fill);
             const f1 = fracNotation(fd.num1, fd.den1, false, false);
             const f2 = fracNotation(fd.num2, fd.den2, false, false);
             inner = `<div style="font-size:0.85rem;margin-bottom:6px;font-weight:700;">Write = or \u2260. Are these equivalent?</div>
@@ -12024,8 +12173,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                 </div>`;
         } else if (pt === 'missing_number') {
             // Both circles shaded, one fraction number missing
-            const c1 = printPieChartLight(fd.num1, fd.den1, sz);
-            const c2 = printPieChartLight(fd.num2, fd.den2, sz, PASTEL_COLORS.blue.fill);
+            const c1 = efvPie(fd.num1, fd.den1);
+            const c2 = efvPie(fd.num2, fd.den2, PASTEL_COLORS.blue.fill);
             const f1 = fracNotation(fd.num1, fd.den1, false, false);
             const f2 = fracNotation(fd.num2, fd.den2, fd.missingPart === 'num2', fd.missingPart === 'den2');
             inner = `<div style="font-size:0.85rem;margin-bottom:6px;font-weight:700;">Find the missing number.</div>
@@ -13063,7 +13212,7 @@ export function generateWorksheetHTML() {
                 <div class="worksheet-problems" style="grid-template-columns: ${gridCols};gap:${gridGap};">${problemsHTML}</div>
                 ${answerKeyHTML}
                 <div class="worksheet-footer">
-                    <span class="footer-left">Maths Quest Pro</span>
+                    <span class="footer-left">Math Quest Pro</span>
                     <span class="footer-center">${numSets > 1 ? `Page ${setNum + 1}` : ''}</span>
                     <span class="footer-right">${today}</span>
                 </div>
@@ -13937,7 +14086,7 @@ async function generateWorksheetHTMLAsync() {
                 </div>
                 ${answerKeyHTML}
                 <div class="worksheet-footer">
-                    <span class="footer-left">Maths Quest Pro</span>
+                    <span class="footer-left">Math Quest Pro</span>
                     <span class="footer-center">${numSets > 1 && labelSets ? `Page ${setNum + 1}` : ''}</span>
                     <span class="footer-right">${today}</span>
                 </div>
@@ -14037,7 +14186,7 @@ export async function printWorksheet() {
    ========================================================================== */
 
 // Fallback only, for the impossible case of a page with no stylesheet links.
-const SHEET_DOC_STYLESHEETS = ['css/variables.css', 'css/base.css', 'css/ui-components.css',
+const SHEET_DOC_STYLESHEETS = ['css/brand.css', 'css/variables.css', 'css/base.css', 'css/ui-components.css',
     'css/word-problem-visuals.css', 'css/print-worksheet.css', 'css/fonts/andika.css', 'css/sheet-kit.css'];
 const SHEET_DOC_FONT_FILES = ['css/fonts/Andika-Regular.woff2', 'css/fonts/Andika-Bold.woff2'];
 

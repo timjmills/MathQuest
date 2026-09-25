@@ -470,10 +470,23 @@ function _skillName(categoryId, skillId) {
  * window: beside the button when there is room, above it or pinned to the bottom when not, and
  * a bottom sheet on a phone. The body scrolls; the header and Done never leave the screen.
  */
+/**
+ * The teacher accent as a #rrggbb hex (the option controls append alpha digits to it), read from
+ * the --tv-accent token so the popover follows css/teacher.css + css/brand.css. Falls back to the
+ * brand accent when the token is missing or not a plain hex.
+ */
+function _teacherAccent() {
+    const dark = document.documentElement.classList.contains('dark');
+    const fallback = dark ? '#B5A5F4' : '#5E3FCC';
+    try {
+        const v = getComputedStyle(document.body).getPropertyValue('--tv-accent').trim();
+        return /^#[0-9a-f]{6}$/i.test(v) ? v : fallback;
+    } catch (e) { return fallback; }
+}
+
 function _renderTeacherPopover(el) {
     const { categoryId, skillId } = _pop;
-    const dark = document.documentElement.classList.contains('dark');
-    const color = dark ? '#8c98f0' : '#3b4bc8';
+    const color = _teacherAccent();
     const defs = nameFitOptions(categoryId, skillId, offeredOptionsFor(categoryId, skillId));
     const cur = normalizeOptions(categoryId, skillId, _pop.opts);
     const handlers = {

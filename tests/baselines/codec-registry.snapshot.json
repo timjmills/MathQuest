@@ -352,7 +352,8 @@
       "shapes": "S",
       "pictures": "P",
       "frame": "F",
-      "dice": "D"
+      "dice": "D",
+      "blocks": "B"
     },
     "touch": {},
     "cover": {
@@ -515,7 +516,9 @@
     },
     "ticks": {
       "step": "S",
-      "one": "O"
+      "one": "O",
+      "some": "M",
+      "ends": "E"
     },
     "shape": {
       "box": "B",
@@ -655,5 +658,18 @@
     "wpCues": "bool",
     "wpBank": "bool",
     "wpBar": "bool"
+  },
+  "subranges": {
+    "3B-3M": "build lane k2 (BUILD_LIST.md)",
+    "3N-3Z": "build lane operations",
+    "4E-4O": "build lane placevalue",
+    "4P-4Z": "build lane algebra",
+    "6C-6P": "build lane fractions",
+    "2G-2T": "build lane geometry",
+    "7F-7S": "build lane measurement",
+    "7T-7Z": "build lane timemoney",
+    "8D-8O": "build lane data",
+    "8P-8Z": "build lane numtheory",
+    "5N-5Z": "lessons, support ladder and later waves"
   }
 }

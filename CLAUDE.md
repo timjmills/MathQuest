@@ -93,9 +93,29 @@ Every live skill is tagged with the CCSS standards it teaches and the Wisconsin 
 | `js/modules/standards.js` | `SKILL_STANDARDS` map (`'category:skill' → {ccss, ee}`) plus `standardsFor`, `skillsForStandard`, `coverage` |
 | `design/STANDARDS_COVERAGE.md` | The coverage report: which standards are covered and the gap list of skills still to make |
 
+| `js/modules/standards-audit.js` | The FULL-coverage verdicts: every CCSS standard, lettered part and EE judged full / partial / gap against every clause of its text from what the skills actually deal, the missing clauses, the proposal that closes each, and `TAG_FIXES` (mis-tags corrected) |
+| `js/modules/build-list.js`, `js/modules/build-specs.js` | THE single build list (WRM + CCSS + EE): `STANDARD_PROPOSALS`, `WRM_EXTENSIONS`, the specs of every `WRM_PROPOSALS` entry, the lanes (file ownership) and the new templates |
+| `design/BUILD_LIST.md` | Generated: every new skill and option with its spec, grouped into buildable lanes in build order |
+
 Rules: a **new skill must get a `SKILL_STANDARDS` entry** (primary CCSS first, plus its EE) in the same
-change; `node tests/scripts/ws-standards.cjs` is the gate and regenerates the coverage report. Use the
-gap list in `STANDARDS_COVERAGE.md` to choose the next skills to build.
+change; `node tests/scripts/ws-standards.cjs` is the gate (`--report` regenerates the coverage report and
+the build list). A skill cited by an audit verdict must stay tagged to that code. **Tagged is not covered:**
+`--strict` fails while any standard or EE lacks a FULL verdict (it fails today by design; do not add it to an
+all-gates-must-pass list yet). When a build-list entry is built to the 8/10 gate, tag it, flip the verdicts
+it closes to full in `standards-audit.js`, and delete the entry.
+
+### White Rose Maths small steps (the school's curriculum)
+
+| File | What it is |
+|---|---|
+| `data/curriculum/wrm-steps.json` | Every WRM year → block → small step (872), with v3 CCSS, EE, Drive file ids; rebuilt from the school site by `node tests/scripts/ws-wrm-extract.cjs --site <awsajacademymath/index.html>` |
+| `js/modules/wrm-db.js` | GENERATED compact copy (`node tests/scripts/ws-wrm.cjs --write-db`); never hand-edit |
+| `js/modules/wrm.js` | `SKILL_WRM` map (`'category:skill' → [step ids]`, `{step, partial}` for part cover) and `WRM_PROPOSALS` (the build list); `wrmFor`, `skillsForWrmStep`, `wrmCoverage` |
+| `design/WRM_COVERAGE.md` | The report: every step's skills, partial covers, and the GAP list by family |
+
+`node tests/scripts/ws-wrm.cjs` is the WRM gate. It **fails until every small step has a skill** (by
+design); run it with `--report-only` meanwhile, and do not add it to an all-gates-must-pass list yet. A
+new skill that teaches a WRM step gets a `SKILL_WRM` entry, and its step comes off `WRM_PROPOSALS`.
 
 ## Researching Skills Before Implementation
 

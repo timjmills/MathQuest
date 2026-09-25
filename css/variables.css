@@ -18,11 +18,13 @@
     --card-shadow: 0 3px 0 0 rgba(124, 92, 230, 0.12), 0 0 0 2px #E5E0F2;
     --text-on-accent: #FFFFFF;
 
-    /* Duo redesign palette (single source of truth — alongside legacy tokens above) */
-    --mq-purple: #7C5CE6;
-    --mq-purple-d: #5E3FCC;
-    --mq-purple-l: #B5A5F4;
-    --mq-purple-soft: #F4EFFF;
+    /* Duo redesign palette (single source of truth — alongside legacy tokens above).
+       The brand purple, ink, rules and radius scale point at css/brand.css, which the
+       teacher view shares; the values are unchanged. */
+    --mq-purple: var(--brand-purple);
+    --mq-purple-d: var(--brand-purple-d);
+    --mq-purple-l: var(--brand-purple-l);
+    --mq-purple-soft: var(--brand-purple-soft);
     --mq-teal: #2DD4BF;
     --mq-teal-d: #14B8A6;
     --mq-orange: #FF8A3D;
@@ -35,11 +37,11 @@
 
     --mq-bg: #EAF8F8;
     --mq-paper: #FFFFFF;
-    --mq-ink: #2B2840;
-    --mq-ink-2: #4F4B6B;
-    --mq-muted: #8B879F;
-    --mq-rule: #E5E0F2;
-    --mq-rule-2: #DDD6EE;
+    --mq-ink: var(--brand-ink);
+    --mq-ink-2: var(--brand-ink-2);
+    --mq-muted: var(--brand-muted);
+    --mq-rule: var(--brand-rule);
+    --mq-rule-2: var(--brand-rule-2);
 
     --mq-correct-bg: #C6EFD0;
     --mq-correct-border: #3FA85F;
@@ -67,10 +69,10 @@
     --mq-shadow-card: 0 4px 0 0 rgba(0, 0, 0, 0.06), 0 0 0 2px var(--mq-rule);
 
     /* Border radius scale */
-    --mq-r-sm: 10px;
-    --mq-r-md: 14px;
-    --mq-r-lg: 18px;
-    --mq-r-xl: 22px;
+    --mq-r-sm: var(--brand-r-sm);
+    --mq-r-md: var(--brand-r-md);
+    --mq-r-lg: var(--brand-r-lg);
+    --mq-r-xl: var(--brand-r-xl);
 }
 
 .dark, .dark-theme {
@@ -94,13 +96,13 @@
     --text-on-accent: #FFFFFF;
 
     /* Dark-mode remap of duo tokens */
-    --mq-paper: #2A2640;
-    --mq-ink: #F4F0FB;
-    --mq-ink-2: #CBC6E0;
-    --mq-muted: #A8A2C4;
-    --mq-rule: #3A3650;
-    --mq-rule-2: #4A4660;
-    --mq-purple-soft: #3A3258;
+    --mq-paper: var(--brand-night-card);
+    --mq-ink: var(--brand-night-ink);
+    --mq-ink-2: var(--brand-night-ink-2);
+    --mq-muted: var(--brand-night-muted);
+    --mq-rule: var(--brand-night-rule);
+    --mq-rule-2: var(--brand-night-rule-2);
+    --mq-purple-soft: var(--brand-purple-soft-dark);
 
     --mq-shadow-rule: 0 3px 0 0 #3A3650;
     --mq-shadow-card: 0 4px 0 0 rgba(0, 0, 0, 0.4), 0 0 0 2px var(--mq-rule);

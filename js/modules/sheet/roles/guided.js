@@ -39,6 +39,10 @@ import {
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
+import { FILL_CAP, groupByHeight } from '../layout.js';
+
+/** The model first, then the tries grouped by height (H13: rows hold problems of one height). */
+const ordered = (items, cols) => (items.length > 2 ? [items[0], ...groupByHeight(items.slice(1), cols)] : items);
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
@@ -59,7 +63,7 @@ export function counts(pools, input) {
     const ctx = ctxOf(input);
     const items = pools.main || [];
     const cols = bestCols(items, [AUTO_COLS[ctx.size], 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= AUTO_COLS[ctx.size]), ctx);
-    return { main: sheetFit(items, cols, ctx, input).total };
+    return { main: sheetFit(ordered(items, cols), cols, ctx, input).total };
 }
 
 /** The steps as the provider writes them: an array, or one string of lines / sentences. */
@@ -119,13 +123,19 @@ function fitRows(items, cols, ctx, input) {
     // The think line under a division fact (row 1), the Model tab clearance and the model's work
     // lines are drawn by the role, so their height is added here (the rows share one height).
     const model = items[0];
+    const h0 = hMinAt(items, cols, ctx);
+    // RUBRIC H13: a model carrying worked lines on a page of 2+ columns takes the whole first row,
+    // its lines BESIDE the drawing - under it, the lines made row 1 far taller than the tries
+    // sharing that row (a 40% empty band in each). The row holds the model only.
+    const lines = model && items.length > 1 && !thinkCueOf(model) ? workLinesOf(model) : [];
+    const span = cols > 1 && lines.length > 0;
     const extra = !model || items.length < 2 ? 0
         : thinkCueOf(model) ? 17
-        : (OWN_TOP_BAND.has(model.template) ? 0 : TAB_CLEAR_MM) + workLinesMm(workLinesOf(model), cols, m);
-    const h0 = hMinAt(items, cols, ctx);
+        : span ? TAB_CLEAR_MM + Math.max(0, workLinesMm(lines, 2, m) - h0)
+        : (OWN_TOP_BAND.has(model.template) ? 0 : TAB_CLEAR_MM) + workLinesMm(lines, cols, m);
     const h = h0 + extra;
     const rows = Math.max(1, Math.min(Math.floor(CEILING[ctx.size] / cols), Math.floor(avail / Math.max(1, h))));
-    return { rows, h, h0, avail, stepsH, steps, frame, m };
+    return { rows, h, h0, avail, stepsH, steps, frame, m, span };
 }
 
 /**
@@ -153,14 +163,24 @@ function sheetFit(items, cols, ctx, input) {
         const isFirst = pages.length === 0;
         const avail = isFirst ? first.avail : availC;
         const maxR = Math.max(1, Math.ceil((CEILING[ctx.size] - total) / cols));
+        // Each row is as tall as what IT holds (H13), so the rows that fit are counted by the sum
+        // of their own heights, page 1's first row taller by the model's trace.
+        const rowsH = (k) => {
+            let idx = total, sum = 0;
+            for (let rr = 0; rr < k; rr++) {
+                const n = isFirst && first.span && rr === 0 ? 1 : cols;
+                sum += hOf(idx, n);
+                idx += n;
+            }
+            return sum;
+        };
         let r = 1;
         for (let k = maxR; k >= 1; k--) {
-            // Page 1's first row is taller by the model's trace (its own row height, below).
-            const h = hOf(total, k * cols);
-            if (k * h + (isFirst ? extra : 0) <= avail) { r = k; break; }
+            if (rowsH(k) + (isFirst ? extra : 0) <= avail) { r = k; break; }
         }
-        pages.push({ rows: r, avail, h: hOf(total, r * cols), extra: isFirst ? extra : 0 });
-        total += r * cols;
+        const cap = r * cols - (isFirst && first.span ? cols - 1 : 0);
+        pages.push({ rows: r, avail, h: hOf(total, r * cols), extra: isFirst ? extra : 0, cap });
+        total += cap;
     }
     return Object.assign(first, { pages, rows: pages[0].rows, total: Math.min(CEILING[ctx.size], total) });
 }
@@ -269,6 +289,9 @@ const GUIDED_CSS = `<style data-mq-guided>
 :is(.ws-page,.ws-sheet) .mq-worklines{list-style:none;margin:2mm 0 0;padding:0;width:100%;font-size:var(--ws-text);line-height:1.25;text-align:center}
 :is(.ws-page,.ws-sheet) .mq-worklines li{margin:0}
 :is(.ws-page,.ws-sheet) .mq-workwrap{width:100%;display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-modelspan .mq-workwrap{flex-direction:row;justify-content:center;align-items:center;column-gap:8mm}
+:is(.ws-page,.ws-sheet) .mq-modelspan .mq-workwrap>:first-child{flex:0 1 auto;max-width:55%}
+:is(.ws-page,.ws-sheet) .mq-modelspan .mq-worklines{width:auto;max-width:45%;margin:0;text-align:left}
 :is(.ws-page,.ws-sheet) .mq-ring{display:inline-block;border:1pt solid #949494;border-radius:999px;padding:0 .2em;line-height:1.1}
 :is(.ws-page,.ws-sheet) .mq-uline{text-decoration:underline;text-decoration-color:#949494;text-decoration-thickness:1pt;text-underline-offset:.15em}
 :is(.ws-page,.ws-sheet) .mq-workeq{position:absolute;left:0;right:0;top:45%;text-align:center;font-size:var(--ws-text);font-weight:700;line-height:1.2}
@@ -454,8 +477,8 @@ export function plan(input = {}) {
     const lesson = Math.max(1, Number(input.lesson) || 1);
     const colsWanted = AUTO_COLS[ctx.size];
     const cols = bestCols(items, [colsWanted, 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= colsWanted), ctx);
-    const fit = sheetFit(items, cols, ctx, input);
-    const use = items.slice(0, Math.min(items.length, fit.total));
+    const fit = sheetFit(ordered(items, cols), cols, ctx, input);
+    const use = ordered(items, cols).slice(0, Math.min(items.length, fit.total));
     const key = instructionKeyOf(use, input.skills);
     // Critic round 2 (C4): the Guided page is labelled and scored like every other role. The
     // worked example carries the "Model" tab and is not scored; the rest run a. b. c. ...
@@ -472,7 +495,10 @@ export function plan(input = {}) {
         // tile row. Every model cell but a column stack (whose grid already starts below the tab)
         // steps its content down clear of the tab.
         const cell = stage === 'model' && !OWN_TOP_BAND.has(it.template)
-            ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-modelcell'].join(' ').trim() }) : it;
+            ? Object.assign({}, it, {
+                cellCls: [it.cellCls || '', 'mq-modelcell', fit.span ? 'mq-modelspan' : ''].join(' ').trim(),
+                cellStyle: fit.span ? [it.cellStyle || '', 'grid-column:1 / -1'].filter(Boolean).join(';') : it.cellStyle,
+            }) : it;
         return planItem(cell, { cols, level, render: fadeRender(it, stage, ans), model: stage === 'model', nolabel: stage === 'model' });
     });
     const stepsBand = () => {
@@ -487,17 +513,31 @@ export function plan(input = {}) {
     let letter = 1;
     fit.pages.forEach((pg, pi) => {
         if (from >= planItems.length) return;
-        const chunk = planItems.slice(from, from + pg.rows * cols);
+        const at = from;
+        const chunk = planItems.slice(from, from + (pg.cap || pg.rows * cols));
         from += chunk.length;
-        const rows = Math.max(1, Math.ceil(chunk.length / cols));
-        const cellH = pg.avail / Math.max(rows, pg.rows);
+        const spanHere = pi === 0 && fit.span;
+        const rows = Math.max(1, spanHere ? 1 + Math.ceil((chunk.length - 1) / cols) : Math.ceil(chunk.length / cols));
+        // RUBRIC H13: each row as tall as what IT holds (the model row with its trace), the rows
+        // sharing the page in proportion, never stretched past FILL_CAP x their content (the
+        // ceiling can stop more rows; the spare height then stays under the grid).
+        const host = use.slice(at, at + chunk.length);
+        const rowItems = (r) => (spanHere ? (r === 0 ? host.slice(0, 1) : host.slice(1 + (r - 1) * cols, 1 + r * cols)) : host.slice(r * cols, (r + 1) * cols));
+        const hsOf = (r) => rowItems(r).map((it) => { const mm = it.measured && it.measured[cols]; return mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : pg.h; });
+        const w = Array.from({ length: rows }, (_, r) => Math.max(1, ...hsOf(r)) + (r === 0 ? pg.extra || 0 : 0));
+        const mins = Array.from({ length: rows }, (_, r) => Math.max(1, Math.min(...hsOf(r))) + (r === 0 ? pg.extra || 0 : 0));
+        const sumW = w.reduce((x, y) => x + y, 0);
+        // A row stretches no further than its shortest problem allows (layout.js rowShape).
+        const kPage = Math.max(1, Math.min(FILL_CAP, (pg.avail * Math.min(1, rows / Math.max(rows, pg.rows))) / sumW));
+        const Hr = w.map((x, r) => x * Math.max(1, Math.min(kPage, (FILL_CAP * mins[r]) / x)));
+        const gridH = Hr.reduce((a, b) => a + b, 0);
+        const cellH = gridH / rows;
         const sections = [];
         if (pi === 0) sections.push({ kind: 'html', html: GUIDED_CSS });
         if (fit.steps.length) sections.push(stepsBand());
         const part = gridPart(chunk, { cols, rows, cellH, labels: labelStyleOf(ctx.look, input.labels), start: letter });
-        // The model row carries the worked trace: it takes its extra height, and the rows share
-        // the rest in proportion (every row still fills its share of the page).
-        if (pg.extra > 0 && rows > 1) part.rowsTpl = `${Math.round((pg.h + pg.extra) * 10) / 10}fr repeat(${rows - 1},${Math.round(pg.h * 10) / 10}fr)`;
+        if (spanHere) part.spanFirst = true;
+        if (rows > 1 && Math.max(...Hr) - Math.min(...Hr) >= 1) part.rowsTpl = Hr.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ');
         sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, use), content: part });
         letter += chunk.filter((p) => !p.nolabel).length;
         pages.push({ sections });

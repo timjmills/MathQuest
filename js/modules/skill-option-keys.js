@@ -86,6 +86,26 @@ export const KEY_BLOCKS = Object.freeze({
     9: Object.freeze({ owner: 'O6 appearance lanes (AP1 9A-9E, AP2 9F-9J, AP3 9K-9O, AP4 9P-9T) and the options verifier (9U-9Z)', status: 'assigned', keys: '9A-9Z' }),
 });
 
+// SUB-RANGES (2026-09-25). All ten digit blocks are allocated, but most waves used only a few of
+// their 26 letters. A later wave takes a SUB-RANGE of the unused letters inside an existing block:
+// the block's own range and owner never change (they are pinned), the sub-range lies in the same
+// digit, after the block's own keys, and never overlaps another sub-range. APPEND-ONLY, pinned by
+// ws-codec-registry like everything else. A key is valid when it lies in its block's own range OR in
+// a sub-range of that digit.
+export const KEY_SUBRANGES = Object.freeze([
+    Object.freeze({ keys: '3B-3M', owner: 'build lane k2 (BUILD_LIST.md)' }),
+    Object.freeze({ keys: '3N-3Z', owner: 'build lane operations' }),
+    Object.freeze({ keys: '4E-4O', owner: 'build lane placevalue' }),
+    Object.freeze({ keys: '4P-4Z', owner: 'build lane algebra' }),
+    Object.freeze({ keys: '6C-6P', owner: 'build lane fractions' }),
+    Object.freeze({ keys: '2G-2T', owner: 'build lane geometry' }),
+    Object.freeze({ keys: '7F-7S', owner: 'build lane measurement' }),
+    Object.freeze({ keys: '7T-7Z', owner: 'build lane timemoney' }),
+    Object.freeze({ keys: '8D-8O', owner: 'build lane data' }),
+    Object.freeze({ keys: '8P-8Z', owner: 'build lane numtheory' }),
+    Object.freeze({ keys: '5N-5Z', owner: 'lessons, support ladder and later waves' }),
+]);
+
 // Option id -> its multi-character key. APPEND-ONLY. Take the next letter of your OWN block.
 export const MULTI_KEYS = Object.freeze({
     // Block 0 — P9 place value, rounding and estimation, step 8 (place-value-rounding.md §2.5)
@@ -264,7 +284,9 @@ export const VALUE_TOKENS = Object.freeze({
     // S2 supports model (block 4): which problems carry the supports, and how clashing ones mix.
     cover: Object.freeze({ whole: 'W', needed: 'N', fade: 'F' }),
     mix: Object.freeze({ section: 'S', problem: 'P' }),
-    objects: Object.freeze({ shapes: 'S', pictures: 'P', frame: 'F', dice: 'D' }),
+    objects: Object.freeze({ shapes: 'S', pictures: 'P', frame: 'F', dice: 'D',
+        // O6 AP1 (2026-09-25): teen_compose draws the ten as a rod and the ones as cubes
+        blocks: 'B' }),
     // P12
     model: Object.freeze({ none: 'N', area: 'A', bar: 'B', circle: 'C', line: 'L', set: 'S', grid: 'G', blocks: 'K', analog: 'H', digital: 'D' }),
     labels: Object.freeze({ all: 'A', some: 'S', none: 'N' }),
@@ -288,7 +310,9 @@ export const VALUE_TOKENS = Object.freeze({
     // block 2 (2026-09-25)
     pattern: Object.freeze({ add: 'A', sub: 'S', double: 'D', times10: 'T', grow: 'G' }),
     chart: Object.freeze({ window: 'W', whole: 'F' }),
-    ticks: Object.freeze({ step: 'S', one: 'O' }),
+    ticks: Object.freeze({ step: 'S', one: 'O',
+        // O6 appearance (lane AP3): "Numbers on the line" on + / − lines, drag-onto-the-line and read-the-line items
+        some: 'M', ends: 'E' }),
     shape: Object.freeze({ box: 'B', circle: 'C', hex: 'H', mixed: 'M' }),
     // block 3 (2026-09-25)
     ops: Object.freeze({ '+': 'A', '-': 'S', x: 'M', '/': 'D' }),

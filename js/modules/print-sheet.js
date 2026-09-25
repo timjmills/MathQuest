@@ -30,8 +30,8 @@ import { kitCellSpec } from './print-generate.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
-import { renderPlan, SHEET_ENGINE_CSS, skillWords } from './sheet/roles/practice.js';
-import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt } from './sheet/layout.js';
+import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
+import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine } from './sheet/roles/lesson.js';
@@ -58,7 +58,7 @@ const RETRIES = 12;               // duplicate retries per item before a duplica
 
 /** The stylesheets a sheet document renders with, in the app's cascade order. */
 const SHEET_STYLESHEETS = Object.freeze([
-    'css/variables.css', 'css/base.css', 'css/ui-components.css', 'css/word-problem-visuals.css',
+    'css/brand.css', 'css/variables.css', 'css/base.css', 'css/ui-components.css', 'css/word-problem-visuals.css',
     'css/print-worksheet.css', 'css/fonts/andika.css', 'css/sheet-kit.css',
 ]);
 
@@ -1044,11 +1044,50 @@ function skillMeta(sk, q) {
     return meta;
 }
 
-/** One-section layout for a set of host items, exactly as the role will compute it. */
+/**
+ * A problem that only ever prints one column (a word problem, a wide picture, a three-clock row,
+ * a time line). practice.js `splitWide` puts such problems in a full-width group at the bottom
+ * of a section whose other problems keep their columns (owner ruling 2026-09-25).
+ */
+function oneColumnOnly(it, n) {
+    try { return it.fclass === 'word' || it.fclass === 'wide' || itemCap(itemInfo(it, { size: n.size, look: n.look, paper: n.paper, mode: 'print' })) < 2; } catch (e) { return false; }
+}
+
+/**
+ * One-section layout for a set of host items, exactly as the role will compute it. A practice
+ * section that mixes problems of both kinds (a review pool: Mixed Time deals clock faces and time
+ * lines) is split by the role, so its capacity is the split page's: the narrow problems in their
+ * columns, the full-width ones under them, one row each (2026-09-25, AP4: Mixed Time printed three
+ * clocks a page in one column because two of its nine skills are full width).
+ */
 function layoutOf(role, section, items, n, ctx) {
-    return resolveSectionLayout({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols }, items, ctx.paper, LIVE_W_MM, {
-        size: n.size, look: n.look, header: ctx.header,
-    });
+    const base = { role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols };
+    const opts = { size: n.size, look: n.look, header: ctx.header };
+    const whole = resolveSectionLayout(base, items, ctx.paper, LIVE_W_MM, opts);
+    if (!(role === 'independent' || role === 'more-practice') || (n.anchors && n.anchors !== 'off') || section.gridH || items.length < 2) return whole;
+    const wide = items.filter((it) => oneColumnOnly(it, n));
+    const narrow = items.filter((it) => !oneColumnOnly(it, n));
+    if (!wide.length || !narrow.length) return whole;
+    const Ln = resolveSectionLayout(Object.assign({}, base, { count: narrow.length, floor: floorOf(narrow) }), narrow, ctx.paper, LIVE_W_MM, opts);
+    if (Ln.cols <= whole.cols) return whole;
+    const Lw = resolveSectionLayout(Object.assign({}, base, { columns: 1, count: wide.length, floor: null }), wide, ctx.paper, LIVE_W_MM, opts);
+    // How many of the run a page holds: the items come in the order they are dealt (the probe is
+    // the start of the run), so the first N are counted exactly; past the probe, the probe's share
+    // of full-width problems is assumed.
+    // The narrow group's rows and the wide group's rows are drawn at their layouts' cell heights;
+    // the wide group shares the section's instruction line (paginate.js placeSections).
+    const G = Ln.gridH;
+    const hN = splitCellH(Ln), hW = splitCellH(Lw);
+    const isWide = items.map((it) => oneColumnOnly(it, n));
+    const f = wide.length / items.length;
+    let best = 1;
+    for (let N = 2; N <= 40; N++) {
+        const nw = N <= items.length ? isWide.slice(0, N).filter(Boolean).length : Math.round(N * f);
+        const nn = N - nw;
+        if (Math.ceil(nn / Ln.cols) * hN + nw * hW > G - 0.99) break;
+        best = N;
+    }
+    return Object.assign({}, Ln, { perPage: best, splitWide: true });
 }
 
 /**
@@ -1061,6 +1100,12 @@ function layoutOf(role, section, items, n, ctx) {
  */
 function floorOf(items, ctx = null) {
     const out = {};
+    // A mixed section's full-width problems are split off into a group of their own (practice.js
+    // splitWide), so they do not set the floor of the problems that keep their columns.
+    if (ctx && items.length > 1) {
+        const narrow = items.filter((it) => !oneColumnOnly(it, ctx));
+        if (narrow.length && narrow.length < items.length) items = narrow;
+    }
     for (const it of items) {
         for (const [c, m] of Object.entries(it.measured || {})) {
             const f = out[c] || (out[c] = { hMm: 0, fits: true });

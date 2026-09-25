@@ -41,6 +41,7 @@ const PV = [
 const SKILLS = (arg('skills', '') || '').split(',').map(s => s.trim()).filter(Boolean);
 const LIST = SKILLS.length ? SKILLS : arg('family', '') === 'pv' ? PV : DEFAULT;
 const HOSTS = (arg('hosts', 'card,worksheet,quiz') || '').split(',');
+const OPTS = (() => { const v = arg('opts', null); return v ? JSON.parse(v) : null; })();
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // In the page: decide what the pupil does in one cell to give the right answer. Every target is
@@ -69,6 +70,18 @@ function PLAN(rootSel, which) {
         if (land && !land.classList.contains('mq-nl-start')) tag(land, { type: 'click', check: 'nl' });   // + 0 has no jump
     }
     all('input.mq-opswork').slice(0, 2).forEach(w => tag(w, { type: 'text', value: '9', check: 'work' }));
+
+    // Round on a number line (round_nl_*): tap the line where the number is (the dot), then
+    // write the rounded number in the one visible box. The dot's slot is hidden: only a tap fills it.
+    const rl = all('.mq-rl');
+    if (rl.length && q.inlineBlanksData) {
+        const set = q.inlineBlanksData.acceptedSets[0].map(String);
+        tag(rl[0], { type: 'rl', value: String(rl[0].dataset.mqRlN) });
+        const box = all('input.ib-cell, input.mq-cellslot');
+        if (!box.length) return { error: 'round line: no box for the rounded number' };
+        tag(box[box.length - 1], { type: 'text', value: set[1] });
+        return { plan, q: set.join(', ') };
+    }
 
     // the kit's model: tap boxes of the ten frame, or + under each base-ten zone
     const model = root.querySelector('[data-mq-model]');
@@ -181,6 +194,40 @@ function PLAN(rootSel, which) {
         } else tag(one[0], { type: 'text', value: d });
         return { plan, q: d };
     }
+    // perimeter AND area (dual): one box each
+    const dual = all('input.dual-answer-input');
+    if (dual.length && q.dualAnswers) {
+        dual.forEach(c => { const v = /area/i.test(c.id) ? q.dualAnswers.area : q.dualAnswers.perimeter; tag(c, { type: 'text', value: String(v) }); });
+        return { plan, q: `P=${q.dualAnswers.perimeter}, A=${q.dualAnswers.area}` };
+    }
+    // read a point's coordinates (coord-input): ( x , y ) per point, then the card's own Check
+    const cix = all('input.ci-x');
+    if (cix.length && q.coordinateData && Array.isArray(q.coordinateData.points)) {
+        const pts = q.coordinateData.points;
+        cix.forEach(c => { const p = pts[Number(c.dataset.point)]; if (p) tag(c, { type: 'text', value: String(p.x) }); });
+        all('input.ci-y').forEach(c => { const p = pts[Number(c.dataset.point)]; if (p) tag(c, { type: 'text', value: String(p.y) }); });
+        const sub = root.querySelector('.ci-submit');
+        if (sub && which.host === 'card') tag(sub, { type: 'domclick' });
+        return { plan, q: pts.map(p => `(${p.x}, ${p.y})`).join(' ') };
+    }
+    // plot points (coord-plot): tap each lattice point, then Submit
+    const hits = all('.cp-hit');
+    if (q.answerType === 'coord-plot') {
+        const pts = Array.isArray(ans) ? ans : [ans];
+        const hitsAll = Array.from(root.querySelectorAll('.cp-hit'));
+        pts.forEach(p => { const h = hitsAll.find(c => Number(c.dataset.x) === p.x && Number(c.dataset.y) === p.y); if (h) tag(h, { type: 'evclick' }); });
+        const sub = root.querySelector('.cp-submit');
+        if (sub) tag(sub, { type: 'domclick' });
+        if (hits.length || hitsAll.length) return { plan, q: pts.map(p => `(${p.x}, ${p.y})`).join(' ') };
+    }
+    // a tick list ("Click ALL ..."): tap every right option, then Submit (multi-select-check)
+    const msc = all('.msc-opt');
+    if (msc.length && Array.isArray(ans)) {
+        ans.forEach(id => { const o = msc.find(b => b.dataset.id === String(id)); if (o) tag(o, { type: 'click' }); });
+        const sub = root.querySelector('.msc-submit');
+        if (sub) tag(sub, { type: 'domclick' });
+        return { plan, q: ans.join(', ') };
+    }
     return { error: `no answer control (${q.answerType})` };
 }
 
@@ -193,7 +240,27 @@ async function run(page, sel, which) {
         await el.evaluate(e => e.scrollIntoView({ block: 'center' }));
         if (step.type === 'click') { await el.click(); await sleep(40); continue; }
         if (step.type === 'domclick') { await el.evaluate(e => e.click()); await sleep(40); continue; }
-        await el.click({ clickCount: 3 });
+        if (step.type === 'evclick') { await el.evaluate(e => e.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))); await sleep(60); continue; }
+        if (step.type === 'rl') {
+            // A real mouse tap on the line at the number's place (the kit's line geometry).
+            const pt = await el.evaluate((e, v) => {
+                const svg = e.querySelector('svg'); const r = svg.getBoundingClientRect();
+                const w = +svg.dataset.rlW, h = +svg.dataset.rlH, pad = +svg.dataset.rlPad, len = +svg.dataset.rlLen, ax = +svg.dataset.rlAxis;
+                const lo = +e.dataset.mqRlLo, hi = +e.dataset.mqRlHi;
+                return { x: r.left + r.width * ((pad + len * (v - lo) / (hi - lo)) / w), y: r.top + r.height * (ax / h) };
+            }, Number(step.value));
+            await page.mouse.click(pt.x, pt.y);
+            await sleep(60);
+            const dotOn = await el.evaluate(e => { const d = e.querySelector('.mq-rl-dot'); return !!d && d.getAttribute('visibility') === 'visible'; });
+            if (!dotOn) {
+                const hit = await page.evaluate((x, y) => { const e = document.elementFromPoint(x, y); return e ? `${e.tagName}.${e.className && e.className.baseVal !== undefined ? e.className.baseVal : e.className}` : 'nothing'; }, pt.x, pt.y);
+                return { error: `round line: the tap at (${Math.round(pt.x)}, ${Math.round(pt.y)}) placed no dot (it hit ${hit})` };
+            }
+            continue;
+        }
+        // A box can be briefly unclickable while the worksheet scrolls to the next card: focus it
+        // instead, as a pupil's tap would, rather than abort the whole run.
+        try { await el.click({ clickCount: 3 }); } catch (e) { await el.evaluate(x => x.focus()); }
         await el.evaluate(e => { e.value = ''; });
         await page.keyboard.type(step.value, { delay: 10 });
         await el.evaluate(e => e.dispatchEvent(new Event('change', { bubbles: true })));
@@ -281,6 +348,9 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
         // over from one skill must not replace the next skill's item mid-entry
         await page.reload({ waitUntil: 'networkidle2' });
         await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS, { timeout: 30000 });
+        // --opts '{"band":10}' (O6, 2026-09-25): the skill's options in the set's option store, which
+        // the card, the online worksheet and the quiz all read, so a non-default value is answered too.
+        if (OPTS) await page.evaluate((c, k, o) => { window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, o, { silent: true }); }, c, k, OPTS);
         if (HOSTS.includes('card')) {
             await page.evaluate((c, k, seed) => {
                 if (window.__wsReseed) window.__wsReseed(seed);
@@ -336,10 +406,10 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
             await page.evaluate(() => { Array.from(document.body.children).filter(e => getComputedStyle(e).position === 'fixed' && getComputedStyle(e).zIndex === '9999').forEach(e => e.remove()); });
         }
         if (HOSTS.includes('quiz')) {
-            await page.evaluate((c, k, seed) => {
+            await page.evaluate((c, k, seed, opts) => {
                 const questions = [];
                 for (let i = 0; i < 3; i++) {
-                    const q = window.generateQuestionFor({ category: c, skill: k, seed: seed + i, itemIndex: i });
+                    const q = window.generateQuestionFor({ category: c, skill: k, seed: seed + i, itemIndex: i, ...(opts ? { opts } : {}) });
                     questions.push({ id: i, skillId: k, points: 1, questionData: window.quizQuestionData(q) });
                 }
                 const test = { id: null, name: 'Answer', sections: [{ id: 0, label: 'A', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions }],
@@ -347,7 +417,7 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
                 window.handleQuizURL(window.compressTestForURL(test));
                 const name = document.getElementById('qtStudentName'); name.value = 'A'; name.dispatchEvent(new Event('input'));
                 window.startQuizTest();
-            }, c, k, hash(s + ':quizans'));
+            }, c, k, hash(s + ':quizans'), OPTS);
             await sleep(500);
             let err = '';
             for (let i = 0; i < 3; i++) {

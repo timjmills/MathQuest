@@ -1,0 +1,61 @@
+/* ==========================================================================
+   brand.css — the shared Math Quest Pro brand tokens (2026-09-25)
+
+   ONE place for the values both sides of the app are built from, so the
+   student view (css/variables.css, --mq-*) and the teacher view
+   (css/teacher.css, --tv-*) read as one product. Neither side copies these
+   values: they point at them with var(--brand-*).
+
+   Loaded first, before variables.css and teacher.css. It only DEFINES custom
+   properties on :root and styles nothing, so on its own it changes no pixel.
+
+   Out of scope by design: the black-and-white pupil question cell. .mq-mono
+   (variables.css) remaps the --mq-* tokens to ink/paper/grey with literal
+   values, so nothing here can reach a question cell, and saved quiz HTML in
+   IndexedDB keeps rendering as it did.
+   ========================================================================== */
+:root {
+    /* ---- brand purple (the logo, primary actions, selection) ------------- */
+    --brand-purple: #7C5CE6;         /* fills: logo tile, primary button. White text 4.64:1 */
+    --brand-purple-d: #5E3FCC;       /* text/outline accent on light. 6.87:1 on white */
+    --brand-purple-dd: #4B30B0;      /* hover of the accent on light */
+    --brand-purple-l: #B5A5F4;       /* the accent on dark. 7.28:1 on --brand-night-surface */
+    --brand-purple-ll: #CFC4F8;      /* hover of the accent on dark */
+    --brand-purple-edge: #9C88F0;    /* the edge of a light-purple fill on dark */
+    --brand-purple-soft: #F4EFFF;    /* tint on light */
+    --brand-purple-soft-dark: #3A3258; /* tint on dark */
+
+    /* ---- ink and rules (purple-tinted neutrals) --------------------------- */
+    --brand-ink: #2B2840;
+    --brand-ink-2: #4F4B6B;
+    --brand-muted: #8B879F;          /* 3.46:1 on white: control edges, large text only */
+    --brand-caption: #6B6785;        /* the muted grey darkened for small text, 5.38:1 */
+    --brand-rule: #E5E0F2;
+    --brand-rule-2: #DDD6EE;
+
+    /* ---- the dark world ---------------------------------------------------- */
+    --brand-night: #1A1828;          /* page */
+    --brand-night-card: #2A2640;     /* student card */
+    --brand-night-surface: #232033;  /* teacher card: one step calmer than the student card */
+    --brand-night-rule: #3A3650;
+    --brand-night-rule-2: #4A4660;
+    --brand-night-ink: #F4F0FB;
+    --brand-night-ink-2: #CBC6E0;
+    --brand-night-muted: #A8A2C4;    /* 6.51:1 on --brand-night-surface */
+
+    /* ---- pastel touches (student operation pastels, as icon tiles) -------- */
+    --brand-peach-tile: #FFEBDC;  --brand-peach-ink: #B4541A;   /* 4.30:1: icon only (needs 3:1) */
+    --brand-mint-tile: #DDF6EC;   --brand-mint-ink: #1F7A5C;    /* 4.62:1 */
+    --brand-peach-tile-dark: #43301F; --brand-peach-ink-dark: #FFCFA8;
+    --brand-mint-tile-dark: #1E3D33;  --brand-mint-ink-dark: #A6E8C9;
+
+    /* ---- type ------------------------------------------------------------- */
+    --brand-font-display: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    /* ---- radius scale ------------------------------------------------------ */
+    --brand-r-sm: 10px;
+    --brand-r-md: 14px;
+    --brand-r-card: 16px;            /* teacher cards: between md and lg, calmer than the pupil 18 */
+    --brand-r-lg: 18px;
+    --brand-r-xl: 22px;
+}
