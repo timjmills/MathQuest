@@ -781,7 +781,7 @@ function roundNlSteps(q) {
     const place = p.lineMode === 'plotted'
         ? step(`${f(p.n)} is the dot, between ${f(lo)} and ${f(hi)}.`)
         : step(`Put a dot for ${f(p.n)} between ${f(lo)} and ${f(hi)}.`, [{ slot: 'mark', value: f(p.n) }]);
-    const decide = p.n === lo ? step(`${f(p.n)} is already a multiple of ${f(p.place)}. It stays ${f(p.n)}.`)
+    const decide = p.n === lo ? step(`It is already on a multiple of ${f(p.place)}, so it stays ${f(p.n)}.`)
         : p.n === half ? step(`${f(p.n)} is exactly halfway. Halfway rounds up.`)
             : step(`${f(p.n)} is ${p.n > half ? 'after' : 'before'} halfway, so it is nearer ${f(r)}.`);
     return [place, step(`Halfway between ${f(lo)} and ${f(hi)} is ${f(half)}.`), decide,
@@ -794,7 +794,10 @@ function roundNlWrong(q) {
     const blanks = q.answerType === 'inline-blanks';
     const explain = { 'M-R1': 'Rounded to the other end of the line.', 'M-R2': 'Rounded halfway down.',
         'M-R3': 'Changed only the digit after the place.', 'M-R4': 'Did not change the next place at a 9.', 'M-R5': 'Rounded to the wrong place.' };
-    const c = pvRoundingErrors(p.n, p.place).map((w) => ({ ...w, explain: explain[w.misconception] }));
+    // Already a multiple (owner ruling 2026-09-25): the real error is moving it to the next one.
+    const c = p.n % p.place === 0
+        ? [{ value: p.n + p.place, misconception: 'M-R1', explain: `Rounded ${f(p.n)} up to ${f(p.n + p.place)}: it was already a multiple of ${f(p.place)}.` }]
+        : pvRoundingErrors(p.n, p.place).map((w) => ({ ...w, explain: explain[w.misconception] }));
     // M-R8: the dot counted from the wrong end of the line, so it lands on the other side of
     // halfway and the number rounds the wrong way (only where the pupil places the dot).
     if (p.lineMode !== 'plotted') {
@@ -809,6 +812,11 @@ function roundNlWrong(q) {
         ...(blanks ? { slot: 'answer', slots: { mark: f(w.mark !== undefined ? w.mark : p.n), answer: f(w.value) } } : {}),
     })));
 }
+// A number already on a multiple of the place (owner ruling 2026-09-25, "yes please allow": one
+// per block of six, an exception to the family's already-rounded guard for these three skills
+// only) says so in its oral frame: "6,000 is already a multiple of 1,000, so it stays 6,000."
+const RNL_MULT_SAY = '__ is already a multiple of __, so it stays __.';
+const rnlSayValues = (q) => { const p = pvOf(q); return p.place && p.n % p.place === 0 ? [p.n, p.place, p.n] : roundSayValues(q); };
 const RNL_MARK = {
     iCan: 'I Can place a number on a number line and round it',
     instructionKey: 'mark-dot-round',
@@ -825,9 +833,15 @@ const RNL_PLOTTED = {
     say: roundSay,
     sayValues: roundSayValues,
 };
+const RNL_MARK_MULT = { ...RNL_MARK, say: RNL_MULT_SAY, sayValues: rnlSayValues };
+const RNL_PLOTTED_MULT = { ...RNL_PLOTTED, say: RNL_MULT_SAY, sayValues: rnlSayValues };
 for (const id of Object.keys(RNL_SIZE)) {
     registerSkill(`number_sense:${id}`, {
-        strings: stringsBy((q) => (pvOf(q).lineMode === 'plotted' ? RNL_PLOTTED : RNL_MARK), RNL_MARK),
+        strings: stringsBy((q) => {
+            const p = pvOf(q);
+            const mult = p.place && p.n % p.place === 0;
+            return p.lineMode === 'plotted' ? (mult ? RNL_PLOTTED_MULT : RNL_PLOTTED) : (mult ? RNL_MARK_MULT : RNL_MARK);
+        }, RNL_MARK),
         misconceptions: ['M-R1', 'M-R2', 'M-R3', 'M-R4', 'M-R5', 'M-R8'],
         workedSteps: roundNlSteps,
         wrongAnswer: roundNlWrong,
