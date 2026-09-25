@@ -1,8 +1,8 @@
 # SUPPORTS — the supports program (DRAFT)
 
-Status: **draft for owner approval.** Nothing here is wired into a skill or an option yet.
-`WORKSHEET_DESIGN_STANDARD.md` is not amended until the owner approves the S1 specimen; the
-amendments it will need are listed in §S1.12.
+Status: **S1 approved by the owner (2026-09-25), with the rulings in §S1.1 (9–11) applied.**
+Nothing here is wired into a skill or an option yet (S2 / S3). `WORKSHEET_DESIGN_STANDARD.md` is
+not amended yet; the amendments it needs are listed in §S1.12.
 
 ---
 
@@ -27,9 +27,22 @@ These supersede the standards where they differ.
    the printed coin values) and word problems. (Later elements; not in S1.)
 8. **Name.** The teacher picks in Settings: **"Touch dots"** (default) or **"Count dots"**. The
    word is used on every teacher screen and in pupil instructions; search also finds "touch
-   points". The commercial program's trademarked names are never used in code, comments, docs or
-   UI; the code says `touchdots`. The About page will carry a one-line non-affiliation notice
-   (wording at S3).
+   points". The commercial program's trademarked names are never used in code, comments or UI
+   strings built from code; the code says `touchdots`.
+   **About-page line (owner ruling, the only place the name appears):** "not affiliated with
+   TouchMath". It is recorded here only; the S3 lane adds it to the About page text.
+
+**Approval rulings (2026-09-25, on the S1 specimen):**
+
+9. **Open rings on double dots.** The ring is drawn over the numeral's stroke, so the stroke shows
+   through and a 7 or 9 reads clearly. It must survive photocopying: the ring-line and gap floors
+   hold, and a double never becomes a blob (gate: PHOTOCOPY, §S1.10). `ring: 'open'` is the
+   default; the knocked-out ring stays only as an option.
+10. **Keep the white keyline on single dots.**
+11. **Touch dots force size L.** When touch dots are on and an item's digits would fall under
+    24 pt (for example column stacks at M, 22 pt, or anything at S), **that item switches to size
+    L** (28 pt). It never falls back to the dot tile. This is a rule for the allocator lane (S2):
+    an item that carries touch dots is laid out at L whatever the sheet's preset.
 
 ### S1.2 The convention
 
@@ -73,18 +86,22 @@ Andika's stroke measures 0.085–0.095 em Regular and 0.115–0.135 em Bold. SF-
 stroke itself, so it disappears. Three sizes were built and compared (specimen §2) and run through
 the gate:
 
-| Size | Single dot | Ring (outer) | Centre dot | Ring line | Gate |
-|---|---|---|---|---|---|
-| S | 0.15 em | 0.21 em | 0.09 em | 0.028 em | passes |
-| **M (chosen)** | **0.17 em** | **0.23 em** | **0.10 em** | **0.03 em** | **passes** |
-| L | 0.19 em | 0.25 em | 0.11 em | 0.032 em | **fails** the spacing rule on 3, 4, 5 and 9 |
+| Size | Single dot | Ring (outer) | Centre dot | Centre keyline | Ring line | Gate |
+|---|---|---|---|---|---|---|
+| S | 0.15 em | 0.21 em | 0.07 em | 0.032 em | 0.028 em | fails PHOTOCOPY on 4 Bold doubles at 24 pt (gap white 47–49 %) |
+| **M (chosen)** | **0.17 em** | **0.23 em** | **0.08 em** | **0.033 em** | **0.03 em** | **passes** |
+| L | 0.19 em | 0.25 em | 0.09 em | 0.036 em | 0.032 em | **fails** the spacing rule on 3, 4, 5 and 9 |
 
-**M is the largest size that passes.** At 24 pt (em 8.47 mm): single dot 1.44 mm, ring 1.95 mm,
-centre dot 0.85 mm, ring gap 0.30 mm, ring line 0.25 mm. At 28 pt: 1.68 / 2.27 / 0.99 / 0.35 /
-0.30 mm.
+**M is the only size that passes the whole gate** (S's smaller open rings blob in Bold at 24 pt; L's marks crowd). At 24 pt (em 8.47 mm): single dot 1.44 mm, ring 1.95 mm,
+centre dot 0.68 mm, centre keyline 0.28 mm, ring gap 0.38 mm, ring line 0.25 mm; at 28 pt
+(em 9.88 mm): 1.68 / 2.27 / 0.79 / 0.33 / 0.44 / 0.30 mm. The open ring (ruling 9) needed a
+smaller centre dot than the first draft (0.10 → 0.08 em) so that the centre keyline could reach
+the photocopy floor while the stroke still visibly runs into the ring (the keyline stops 0.012 em
+short of the ring line).
 
 **Photocopy floors** (`TOUCH_DOT_FLOOR_MM`): ring gap ≥ 0.30 mm (× 1.25 in photocopy mode), ring
-line ≥ 0.25 mm, keyline ≥ 0.15 mm. Floors grow the ring outward; the centre dot never shrinks.
+line ≥ 0.25 mm, single-dot keyline ≥ 0.15 mm, centre-dot keyline ≥ 0.26 mm. Floors grow the ring
+outward; the centre dot never shrinks.
 
 ### S1.5 Ink and keyline
 
@@ -93,11 +110,13 @@ line ≥ 0.25 mm, keyline ≥ 0.15 mm. Floors grow the ring outward; the centre 
   and after a simulated photocopy it is gone; with it the dot reads as a separate round mark and
   survives as a clear bump. Cost: the keyline nicks the stroke round each dot (most visible on the
   open 4's crossbar). Accepted.
-- **Doubles are a knocked-out ring:** a white disc with a black ring line and a solid centre dot.
-  It knocks the stroke out of the gap, so the gap and the centre dot read cleanly and survive a
-  copy. The alternative (an **open** ring drawn over the stroke, `ring: 'open'`) keeps the numeral a
-  little more whole, but after a copy the stroke fills the gap and the double reads as one blob.
-  Knocked-out is the default. Cost: three rings cover much of a 7's diagonal.
+- **Doubles are an OPEN ring** (owner ruling 9): a black ring line drawn over the stroke, the
+  stroke running on into the ring, and a solid centre dot with its own white keyline so it never
+  fuses with the stroke. Either side of the stroke the gap between dot and ring stays white. After
+  the simulated poor copy every double at 24 and 28 pt, both weights, still shows its full ring
+  line, its solid centre dot and white round the gap (gate PHOTOCOPY). The knocked-out ring (a
+  white-filled ring, `ring: 'knockout'`) is kept only as an option: it hid most of a 7's
+  diagonal.
 - **Trace ink** (a faded step): the marks in the sheet's one grey; with **photocopy-safe** on,
   dotted outlines instead of grey (INK rules for traces).
 - Black, white and the one grey only. No colour, on paper or in the screen cell.
@@ -105,12 +124,17 @@ line ≥ 0.25 mm, keyline ≥ 0.15 mm. Floors grow the ring outward; the centre 
 ### S1.6 Minimum size and fallback
 
 - Touch dots need a digit of **≥ 24 pt on paper** and **≥ 40 px on screen**
-  (`touchDotsFits(size, 'pt' | 'px')`). Below that, the item **falls back to the existing cue**:
-  the dot tile for + and −, the skip strip for × and ÷ (never tiny dots).
-- On the kit's fact ladder that means L (5 columns, 28 pt) and M (6 columns, 24 pt) carry dots;
-  S (10 columns, 16 pt) falls back. Column stacks use the preset digit (L 28 pt, M 22 pt), so a
-  stack with touch dots needs L. (S2 decides whether choosing touch dots forces L or disables the
-  option with its reason.)
+  (`touchDotsFits(size, 'pt' | 'px')`). Never tiny dots.
+- **Owner ruling 11 — force L, never the tile.** When touch dots are on and an item's digits would
+  fall under 24 pt, **that item switches to size L** (28 pt). On the kit's fact ladder, L (5
+  columns, 28 pt) and M (6 columns, 24 pt) facts already qualify; a fact at 7+ columns or at the S
+  preset, and a column stack at M (22 pt) or S (16 pt), are laid out at L instead. **Allocator rule
+  (S2):** `allocateSupports` marks such an item `forceSize: 'L'`, and the layout places it with
+  L's metrics (its own section or row), so the page stays regular; the dot tile is never
+  substituted for touch dots.
+- On screen the practice card draws digits at 40 / 48 / 56 px, which qualifies. A screen host
+  whose digits are under 40 px (the online worksheet's 29 px cell) must draw a touch-dot item at
+  ≥ 40 px, the screen form of the same rule (S3 wires it).
 
 ### S1.7 Where the dots go (per operation)
 
@@ -155,7 +179,7 @@ neighbours keep the no-merge gap (gate). The overlay takes no space and changes 
 | `TOUCH_DOT_SIZES`, `TOUCH_DOT_DEFAULT` | S / M / L, default M |
 | `TOUCH_DOT_MIN`, `touchDotsFits(size, unit)` | 24 pt / 40 px |
 | `touchDotGeometry(opts)` | radii in em after the photocopy floors |
-| `touchDotsSVG(d, {em, unit, weight, ink, photocopy, size, halo, ring, counted, tappable})` | the overlay: absolute SVG, 1 × 1.15 em in CSS em, centred on the host span, no layout |
+| `touchDotsSVG(d, {em, unit, weight, ink, photocopy, size, halo, ring = 'open', counted, tappable})` | the overlay: absolute SVG, 1 × 1.15 em in CSS em, centred on the host span, no layout |
 | `touchDotsMarks(d, opts)` | the marks alone (em coordinates) for an SVG host (clock, coin) |
 | `touchDotsDigitHTML(ch, opts)` | a span's inner HTML: digit + overlay |
 | `touchDotNearest(d, x, y, counted)` | the mark a tap counts |
@@ -182,6 +206,10 @@ to host it (S3 wires it).
   - **count:** the dots make the digit, doubles first;
   - **neighbours:** every pair of digits in 0.72 em tracks, geometry at every size and pixels at the
     smallest sizes;
+  - **photocopy (no blob):** every double of 6–9, both weights, at 24 and 28 pt, drawn with its
+    numeral and put through the simulated poor copy (Gaussian blur σ 0.12 mm, anything under 60 %
+    white prints black), keeps ≥ 85 % of its ring line dark, a solid centre dot, and ≥ 50 % white
+    round the middle of the gap;
   - **layout:** a kit fact and stack have identical boxes with and without the overlay;
   - **screen:** the specimen card's targets are ≥ 44 × 44 px at 390 and 1280, taps count, extra
     taps do nothing, "Start again" clears, no horizontal scroll.
@@ -190,13 +218,11 @@ to host it (S3 wires it).
   `node design/specimens/render-touch-dots.cjs` to `touch-dots.png`, `touch-dots-digits.png` and
   `touch-dots-facts-L.png`.
 
-### S1.11 Open questions for the owner
+### S1.11 Owner decisions (resolved 2026-09-25)
 
-1. The keyline nicks the stroke round each single dot (visible on the 4). Keep it for photocopy
-   survival (recommended), or drop it for a cleaner numeral?
-2. Knocked-out rings (recommended) or open rings over the stroke (the 7 stays more whole)?
-3. Stacks with touch dots need the L preset (28 pt). Force L when touch dots are on, or disable the
-   option below L with a reason?
+1. Keyline on single dots: **kept** (ruling 10).
+2. Rings: **open** over the stroke, photocopy-safe (ruling 9).
+3. Under 24 pt: **switch the item to L**, never the tile (ruling 11).
 
 ### S1.12 Standard amendments needed after approval (not made yet)
 
