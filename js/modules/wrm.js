@@ -61,6 +61,7 @@ export const SKILL_WRM = {
         { step: 'Y1.B4.S1', note: 'count to 20' },
     ],
     // Build lane k2 (2026-09-25)
+    'comparing:sort_into_groups': ['R.B1.S4', 'R.B1.S5', 'R.B1.S6', 'Y1.B1.S1'],
     'counting:ordinal_numbers': ['Y1.B11.S5'],
     'comparing:compare_capacity': ['R.B2.S3', 'R.B8.S3', 'R.B8.S4', 'Y1.B8.S4', 'Y1.B8.S5', 'Y2.B7.S5'],
     'counting:match_same': ['R.B1.S1', 'R.B1.S2'],
@@ -1153,14 +1154,6 @@ export const WRM_PROPOSALS = {
     },
 
     // ---- counting
-    sort_groups: {
-        kind: 'new', skill: 'comparing:sort_into_groups',
-        name: 'Sort into Groups',
-        teaches: 'sorting objects by one attribute (kind, colour, size, shape) into labelled groups, then saying the sorting rule',
-        representation: 'picture tiles and two or three labelled sorting rings; write the letter of each tile in its ring; option: rule given or rule found',
-        family: 'counting',
-        steps: ['R.B1.S4', 'R.B1.S5', 'R.B1.S6', 'Y1.B1.S1'],
-    },
     subitise: {
         kind: 'new', skill: 'counting:subitise',
         name: 'Say How Many Without Counting',

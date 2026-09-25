@@ -680,9 +680,26 @@ const K2_LANE_MAKERS = {
         return { ans: labels[place - 1], printAnswer: labels[place - 1], answerType: 'text', text: `Which one is ${ord(place)}?`, _variant: 'find', ordPlace: place,
             cell: cellOf('picture-row', { kind: 'line', task: 'find', items, correct: place - 1, labels, ask: ord(place) }) };
     },
+    'comparing:sort_into_groups': (r, i) => {
+        const task = ['count', 'most', 'order', 'rule'][i % 4];
+        const n = task === 'order' ? 3 : 2;
+        const counts = task === 'count' ? Array.from({ length: n }, () => int(r, 1, 4)) : shuffle(r, [1, 2, 3]).slice(0, n);
+        const tiles = []; const groups = [];
+        counts.forEach((c, gi) => { const members = []; for (let k = 0; k < c; k++) { members.push(tiles.length); tiles.push({ shape: ['ball', 'apple', 'fish'][gi] }); } groups.push({ word: '', pic: { shape: ['ball', 'apple', 'fish'][gi] }, members }); });
+        const base = { task, model: 'rings', tiles, groups, counts };
+        if (task === 'count') return { ans: counts.join(', '), answerType: 'text', text: 'Sort. How many in each ring?', _variant: task, cell: cellOf('sort-rings', base) };
+        if (task === 'order') {
+            const sorted = counts.map((c, k) => [c, k]).sort((a, b) => a[0] - b[0]); const order = counts.map((_, k) => sorted.findIndex((x) => x[1] === k) + 1);
+            return { ans: order.join(', '), answerType: 'text', text: 'Order the rings.', _variant: task, cell: cellOf('sort-rings', Object.assign(base, { order })) };
+        }
+        if (task === 'most') { const correct = counts.indexOf(Math.max(...counts)); return { ans: 'AB'[correct], printAnswer: 'AB'[correct], answerType: 'text', text: 'Which ring has the most?', _variant: task, cell: cellOf('sort-rings', Object.assign(base, { correct })) }; }
+        const words = [{ label: 'By kind' }, { label: 'By size' }];
+        return { ans: 'By kind', printAnswer: 'By kind', answerType: 'text', text: 'How are they sorted?', _variant: task, sortAttr: 'kind', cell: cellOf('sort-rings', Object.assign(base, { words, correct: 0 })) };
+    },
 };
 Object.assign(REQUIRED, {
     'counting:zero_none': /none/i,
+    'comparing:sort_into_groups': /ring/i,
     'counting:ordinal_numbers': /flag/i,
     'comparing:what_can_we_measure': /measure/i,
     'comparing:compare_capacity': /water|holds|bigger/i,

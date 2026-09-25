@@ -8,6 +8,7 @@
 // found it on number sequences, which count ON by a step and touch nothing.
 
 import { registerSkill } from '../contract.js';
+import { SHAPES as K2_PICTURES } from '../cells/k2kit.js';
 import { num, arr, obj, countList, digitsOf, chooseWrong, strings, step, clampSteps } from './util.js';
 
 /* ========================================================================= count_objects */
@@ -1115,5 +1116,100 @@ registerSkill('counting:ordinal_numbers', {
             len + 1 - n !== n ? { value: labels[len - n], misconception: 'wrong-end', explain: 'Counted from the wrong end of the line.' } : null,
             { value: labels[n > 1 ? n - 2 : n], misconception: 'off-by-one', explain: n > 1 ? 'Counted the flag as the 1st place.' : 'Skipped the 1st place.' },
         ]);
+    },
+});
+
+/* ============================================================================ sort_into_groups */
+
+const SORT_ICAN = 'I Can sort things into groups';
+const SORT_DEFS = {
+    count: {
+        iCan: SORT_ICAN, instructionKey: 'sort-count',
+        steps: ['Look at the label on each ring.', 'Write each letter in the ring it belongs to.', 'Count each ring. Write how many.'],
+        say: 'This ring has __.', sayValues: (q) => { const c = String(q.ans).split(/\s*,\s*/); return c.length ? [c[0]] : null; },
+    },
+    most: {
+        iCan: SORT_ICAN, instructionKey: 'check-most-ring',
+        steps: ['Count each ring.', 'Find the biggest number.', 'Check the ring with the most.'],
+        say: 'Ring __ has the most.', sayValues: (q) => [String(q.ans)],
+    },
+    order: {
+        iCan: SORT_ICAN, instructionKey: 'order-rings',
+        steps: ['Count each ring.', 'The ring with the fewest gets 1.', 'Then 2, then 3 for the most.'],
+        say: 'The fewest is __.', sayValues: (q) => { const p = payloadOf(q); return Array.isArray(p.counts) ? [Math.min(...p.counts)] : null; },
+    },
+    rule: {
+        iCan: SORT_ICAN, instructionKey: 'check-sorted',
+        steps: ['Look at one ring.', 'What is the same about everything in it?', 'Check the rule that fits every ring.'],
+        say: 'They are sorted __.', sayValues: (q) => [String(q.ans).toLowerCase().replace(/^by /, 'by ')],
+    },
+};
+
+registerSkill('comparing:sort_into_groups', {
+    strings: stringsBy((t, ref) => SORT_DEFS[t] || SORT_DEFS[ref && ref.opts && ref.opts.task] || null, SORT_DEFS.count),
+    misconceptions: ['counted-a-tile-twice', 'left-one-out', 'rings-swapped', 'most-fewest-swapped', 'order-reversed', 'rule-does-not-fit'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        const groups = p.groups || [];
+        const counts = (p.counts || groups.map((g) => g.members.length)).map(Number);
+        const name = (gi) => {
+            const g = groups[gi] || {};
+            if (g.word) return `the ${g.word.toLowerCase()} ring`;
+            const sh = g.pic && K2_PICTURES[g.pic.shape];
+            return sh ? `the ${sh.plural} ring` : `ring ${gi + 1}`;
+        };
+        if (p.task === 'count') {
+            const out = [step('Look at the label on each ring.')];
+            groups.forEach((g, gi) => out.push(step(`${g.members.map((i) => LETTERS_K2[i] || '').join(', ')} go in ${name(gi)}.`)));
+            out.push(step(`Count: ${counts.join(' and ')}.`, counts.map((c, i) => ({ slot: `b${i}`, value: String(c) }))));
+            return clampSteps(out.length < 3 ? [step('Look at each picture.')].concat(out) : out);
+        }
+        if (p.task === 'order') {
+            const order = (p.order || []).map(Number);
+            return [
+                step(`Count each ring: ${counts.join(', ')}.`),
+                step(`The fewest is ${Math.min(...counts)}. It gets 1.`),
+                step(`The most is ${Math.max(...counts)}. It gets 3.`),
+                step(`Write ${order.join(', ')}.`, order.map((r, i) => ({ slot: `b${i}`, value: String(r) }))),
+            ];
+        }
+        if (p.task === 'most') {
+            return [
+                step(`Count each ring: ${counts.join(', ')}.`),
+                step(`${Math.max(...counts)} is the most.`),
+                step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
+            ];
+        }
+        return [
+            step('Look at one ring.'),
+            step(`Everything in it is the same ${String(q.sortAttr || 'kind').replace('weight', 'weight (heavy or light)')}.`),
+            step(`They are sorted ${String(q.ans).toLowerCase()}.`),
+            step(`Check "${q.ans}".`, [{ slot: 'answer', value: String(q.ans) }]),
+        ];
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        const counts = (p.counts || []).map(Number);
+        if (p.task === 'count') {
+            const plus = counts.map((c, i) => (i === 0 ? c + 1 : c));
+            const minus = counts.map((c, i) => (i === counts.length - 1 && c > 1 ? c - 1 : c));
+            const rev = counts.slice().reverse();
+            const mk = (v, m, e) => ({ value: v.join(', '), misconception: m, slot: 'b0', slots: Object.fromEntries(v.map((x, i) => [`b${i}`, String(x)])), explain: e });
+            return chooseWrong(q, [
+                mk(plus, 'counted-a-tile-twice', 'Put one picture in two rings.'),
+                minus.join(',') !== counts.join(',') ? mk(minus, 'left-one-out', 'Left one picture out of the rings.') : null,
+                rev.join(',') !== counts.join(',') ? mk(rev, 'rings-swapped', 'Wrote the counts under the wrong rings.') : null,
+            ]);
+        }
+        if (p.task === 'order') {
+            const order = (p.order || []).map(Number);
+            const rev = order.map((r) => 4 - r);
+            return chooseWrong(q, [{ value: rev.join(', '), misconception: 'order-reversed', slot: 'b0', slots: Object.fromEntries(rev.map((r, i) => [`b${i}`, String(r)])), explain: 'Started with the most, not the fewest.' }]);
+        }
+        if (p.task === 'most') {
+            return chooseWrong(q, [{ value: LETTERS_K2[counts.indexOf(Math.min(...counts))], misconception: 'most-fewest-swapped', explain: 'Chose the ring with the fewest.' }]);
+        }
+        const other = (p.words || []).map((w) => w.label).find((l) => l !== q.ans);
+        return other ? chooseWrong(q, [{ value: other, misconception: 'rule-does-not-fit', explain: 'Named a rule that does not split the rings.' }]) : null;
     },
 });

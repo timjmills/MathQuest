@@ -24,23 +24,23 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 608 live skills; 496 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 56 have no standard, with a reason (50 vocabulary games, 6 beyond grade 6).
+- Skills mapped: 609 live skills; 497 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 56 have no standard, with a reason (50 vocabulary games, 6 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
-- **Full coverage: CCSS 77 of 177 standards FULL, 89 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 104 FULL, 91 PARTIAL, 22 GAP.
-- **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
+- **Full coverage: CCSS 78 of 177 standards FULL, 88 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 105 FULL, 90 PARTIAL, 22 GAP.
+- **Essential Elements: 85 of 117 FULL, 29 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 268 entries — 125 new skills, 88 options on existing skills, 2 repairs; 156 from the White Rose audit (41 of them extended to close standards clauses), 59 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+- The one build list: 267 entries — 124 new skills, 88 options on existing skills, 2 repairs; 155 from the White Rose audit (40 of them extended to close standards clauses), 59 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
-| K | 11 / 10 / 1 of 22 (50% full) | 12 / 11 / 1 of 24 | 6 / 4 / 0 of 10 (60% full) | 21/22, 10/10 |
-| 1 | 11 / 10 / 0 of 21 (52% full) | 13 / 10 / 0 of 23 | 10 / 5 / 1 of 16 (63% full) | 21/21, 16/16 |
+| K | 12 / 9 / 1 of 22 (55% full) | 13 / 10 / 1 of 24 | 9 / 1 / 0 of 10 (90% full) | 21/22, 10/10 |
+| 1 | 11 / 10 / 0 of 21 (52% full) | 13 / 10 / 0 of 23 | 11 / 4 / 1 of 16 (69% full) | 21/21, 16/16 |
 | 2 | 12 / 10 / 4 of 26 (46% full) | 12 / 9 / 6 of 27 | 11 / 7 / 1 of 19 (58% full) | 22/26, 18/19 |
 | 3 | 12 / 13 / 0 of 25 (48% full) | 18 / 15 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
 | 4 | 14 / 13 / 1 of 28 (50% full) | 19 / 13 / 2 of 34 | 16 / 4 / 0 of 20 (80% full) | 27/28, 20/20 |
 | 5 | 10 / 14 / 2 of 26 (38% full) | 16 / 13 / 5 of 34 | 13 / 4 / 1 of 18 (72% full) | 24/26, 17/18 |
 | 6 | 7 / 19 / 3 of 29 (24% full) | 14 / 20 / 8 of 42 | 10 / 7 / 0 of 17 (59% full) | 26/29, 17/17 |
-| **All** | **77 / 89 / 11 of 177 (44% full)** | **104 / 91 / 22 of 217** | **81 / 33 / 3 of 117 (69% full)** | 166/177, 115/117 |
+| **All** | **78 / 88 / 11 of 177 (44% full)** | **105 / 90 / 22 of 217** | **85 / 29 / 3 of 117 (73% full)** | 166/177, 115/117 |
 
 ## Tag fixes made by this audit
 
@@ -315,24 +315,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 11 | **Roman Numerals** (`roman_100`) | new `placevalue:roman_numerals` | - | 1 |
 | 12 | **Roman Numerals to 1,000 (option)** (`roman_1000`) | option on `placevalue:roman_numerals` | - | 1 |
 
-### Counting and early number (13)
-
-| # | Entry | Kind | Closes standards | Closes WRM steps |
-|---|---|---|---|---|
-| 1 | **Sort into Groups** (`sort_groups`) | new `comparing:sort_into_groups` | K.MD.B.3, M.EE.K.MD.1, M.EE.K.MD.2, M.EE.K.MD.3, M.EE.1.MD.4 | 4 |
-| 2 | **Say How Many Without Counting** (`subitise`) | new `counting:subitise` | - | 7 |
-| 3 | **Count Out a Number** (`ten_count_out`) | new `counting:count_out` | K.CC.B.5, M.EE.K.CC.6, M.EE.2.NBT.2 | 1 |
-| 4 | **Count in a Circle and to 30 (option)** (`count_objects_more`) | option on `counting:count_objects` | K.CC.B.5, M.EE.2.NBT.2 | - |
-| 5 | **Count by Making Tens** (`tens_ones_group`) | new `composing:count_in_tens_groups` | 1.NBT.A.1 | 2 |
-| 6 | **Number Sense Review** (`consolidate`) | new `counting:number_sense_review` | - | 3 |
-| 7 | **Count to 120 on the Chart (option)** (`chart_120`) | option on `composing:hundreds_chart_fill` | 1.NBT.A.1 | - |
-| 8 | **Same Number After Moving (option)** (`count_conserve`) | option on `counting:count_objects` | K.CC.B.4b | - |
-| 9 | **Odd or Even by Pairing (option)** (`odd_even_pairs`) | option on `composing:odd_even` | 2.OA.C.3 | - |
-| 10 | **Understand 10 and 20 (option)** (`teen_structure`) | option on `composing:teen_compose` | - | 2 |
-| 11 | **Write the Numbers 0 to 20** (`write_numerals`) | new `counting:write_numbers_0_20` | K.CC.A.3 | - |
-| 12 | **Count in 3s** (`count_3s`) | new `patterns:count_in_3s` | - | 1 |
-| 13 | **Number Words 0 to 10 (option)** (`words_0_10`) | option on `composing:number_word_form` | - | 1 |
-
 ### Data and statistics (12)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
@@ -367,6 +349,23 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 11 | **Write Number Expressions (option)** (`write_numeric_expression`) | option on `algebra:write_expression` | 5.OA.A.2 | - |
 | 12 | **Function Machines** (`function_machine`) | new `algebra:function_machines` | - | 1 |
 | 13 | **Two Quantities That Change Together** (`two_variables`) | new `algebra:two_variable_relationships` | 6.EE.C.9 | - |
+
+### Counting and early number (12)
+
+| # | Entry | Kind | Closes standards | Closes WRM steps |
+|---|---|---|---|---|
+| 1 | **Say How Many Without Counting** (`subitise`) | new `counting:subitise` | - | 7 |
+| 2 | **Count Out a Number** (`ten_count_out`) | new `counting:count_out` | K.CC.B.5, M.EE.K.CC.6, M.EE.2.NBT.2 | 1 |
+| 3 | **Count in a Circle and to 30 (option)** (`count_objects_more`) | option on `counting:count_objects` | K.CC.B.5, M.EE.2.NBT.2 | - |
+| 4 | **Count by Making Tens** (`tens_ones_group`) | new `composing:count_in_tens_groups` | 1.NBT.A.1 | 2 |
+| 5 | **Number Sense Review** (`consolidate`) | new `counting:number_sense_review` | - | 3 |
+| 6 | **Count to 120 on the Chart (option)** (`chart_120`) | option on `composing:hundreds_chart_fill` | 1.NBT.A.1 | - |
+| 7 | **Same Number After Moving (option)** (`count_conserve`) | option on `counting:count_objects` | K.CC.B.4b | - |
+| 8 | **Odd or Even by Pairing (option)** (`odd_even_pairs`) | option on `composing:odd_even` | 2.OA.C.3 | - |
+| 9 | **Understand 10 and 20 (option)** (`teen_structure`) | option on `composing:teen_compose` | - | 2 |
+| 10 | **Write the Numbers 0 to 20** (`write_numerals`) | new `counting:write_numbers_0_20` | K.CC.A.3 | - |
+| 11 | **Count in 3s** (`count_3s`) | new `patterns:count_in_3s` | - | 1 |
+| 12 | **Number Words 0 to 10 (option)** (`words_0_10`) | option on `composing:number_word_form` | - | 1 |
 
 ### Decimals and percents (13)
 
@@ -445,10 +444,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught in part by: Number Bonds within 10 (Visual) (`composing:number_bonds`)  
   Missing: decompose one number in more than one way and record each (5 = 2 + 3 and 5 = 4 + 1)  
   Build: Number Bonds in Order (`systematic_bonds`)
-- **K.MD.B.3** — PARTIAL. Classify objects into given categories; count the numbers of objects in each category and sort the categories by count.  
-  Taught in part by: Sort & Count by Category (Visual) (`comparing:classify_count`)  
-  Missing: classify every object into the given categories (the skill counts one kind); count each category and sort the categories by count  
-  Build: Sort into Groups (`sort_groups`)
 - **K.G.A.1** — PARTIAL. Describe objects in the environment using names of shapes, and describe the relative positions of these objects using terms such as above, below, beside, in front of, behind, and next to.  
   Taught in part by: Shape Positions: Above/Below/Beside (Visual) (`shapes_early:shape_positions`)  
   Missing: name the shapes of objects in the environment; in front of, behind, next to (the skill has above, below, beside)  
@@ -468,18 +463,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught in part by: Build a Number on a Ten Frame (`composing:ten_frame_build`); Count Objects (1-20) (Visual) (`counting:count_objects`)  
   Missing: count out up to three objects from a larger set  
   Build: Count Out a Number (`ten_count_out`)
-- **M.EE.K.MD.1** — PARTIAL. Classify objects according to attributes (e.g., big/small, heavy/light).  
-  Taught in part by: Compare Attributes (Visual) (`comparing:compare_objects`)  
-  Missing: classify objects into groups by an attribute (big/small, heavy/light); the skill compares two objects  
-  Build: Sort into Groups (`sort_groups`)
-- **M.EE.K.MD.2** — PARTIAL. Classify objects according to attributes (e.g., big/small, heavy/light).  
-  Taught in part by: Compare Attributes (Visual) (`comparing:compare_objects`); Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`)  
-  Missing: classify objects into groups by an attribute; the skills compare two objects  
-  Build: Sort into Groups (`sort_groups`)
-- **M.EE.K.MD.3** — PARTIAL. Classify objects according to attributes (e.g., big/small, heavy/light).  
-  Taught in part by: Sort & Count by Category (Visual) (`comparing:classify_count`)  
-  Missing: classify by attributes (big/small, heavy/light), not only by kind  
-  Build: Sort into Groups (`sort_groups`)
 
 ### Level 1
 
@@ -535,10 +518,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught in part by: a.m. or p.m.? (`measurement:time_sense`)  
   Missing: today, yesterday and tomorrow; morning, afternoon, day and night; activities before, next and after; telling time is the same every day  
   Build: First, Next, Then (`day_order`); Time Words (`time_talk`)
-- **M.EE.1.MD.4** — PARTIAL. Organize objects into categories by sorting (e.g., color, size, shape). Count the number of objects in each category and identify the category with the most objects.  
-  Taught in part by: Picture Graph Intro (Visual) (`measurement:pictograph_intro`); Tally Charts (`graphs:tally_chart`)  
-  Missing: sort the objects into categories first (the skills start from counts)  
-  Build: Sort into Groups (`sort_groups`)
 - **M.EE.1.G.1** — GAP. Identify the relative position of objects that are on, off, in, and out.  
   Missing: relative positions on, off, in and out (the attribute skills carry this EE only through the CCSS link)  
   Build: Where Is It? Positions and Maps (`position_map`)
@@ -1081,9 +1060,8 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Also tagged: `comparing:compare_capacity`, `comparing:compare_size`
 *B. Classify objects and count the number of objects in each category.*
 
-- **K.MD.B.3** — PARTIAL. Classify objects into given categories; count the numbers of objects in each category and sort the categories by count.  
-  In part: Sort & Count by Category (Visual) (`comparing:classify_count`)  
-  Missing: classify every object into the given categories (the skill counts one kind); count each category and sort the categories by count → `sort_groups`  
+- **K.MD.B.3** — FULL. Classify objects into given categories; count the numbers of objects in each category and sort the categories by count.  
+  Taught by: Sort & Count by Category (Visual) (`comparing:classify_count`); Sort into Groups (`comparing:sort_into_groups`) — classify every object into two or three given categories, count each, the category with the most, the categories ordered by count: sort_into_groups (build lane k2)  
 #### Geometry (K.G)
 
 *A. Identify and describe shapes (squares, circles, triangles, rectangles, hexagons, cubes, cones, cylinders, and spheres).*
@@ -1895,15 +1873,12 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught by: More/Fewer/Same Groups (Visual) (`comparing:compare_groups`)  
 - **M.EE.K.OA.1** — FULL. Represent addition as “putting together” or subtraction as “taking from” in everyday activities (e.g., with objects, fingers, sounds, drawings, verbal explanations, or numbers). (CCSS K.OA.A.1)  
   Taught by: Add Within 5 with Pictures (Visual) (`addition:add_5_pictures`); Subtract Within 5 with Pictures (Visual) (`subtraction:sub_5_pictures`)  
-- **M.EE.K.MD.1** — PARTIAL. Classify objects according to attributes (e.g., big/small, heavy/light). (CCSS K.MD.A.1)  
-  In part: Compare Attributes (Visual) (`comparing:compare_objects`)  
-  Missing: classify objects into groups by an attribute (big/small, heavy/light); the skill compares two objects → `sort_groups`
-- **M.EE.K.MD.2** — PARTIAL. Classify objects according to attributes (e.g., big/small, heavy/light). (CCSS K.MD.A.2)  
-  In part: Compare Attributes (Visual) (`comparing:compare_objects`); Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`)  
-  Missing: classify objects into groups by an attribute; the skills compare two objects → `sort_groups`
-- **M.EE.K.MD.3** — PARTIAL. Classify objects according to attributes (e.g., big/small, heavy/light). (CCSS K.MD.B.3)  
-  In part: Sort & Count by Category (Visual) (`comparing:classify_count`)  
-  Missing: classify by attributes (big/small, heavy/light), not only by kind → `sort_groups`
+- **M.EE.K.MD.1** — FULL. Classify objects according to attributes (e.g., big/small, heavy/light). (CCSS K.MD.A.1)  
+  Taught by: Compare Attributes (Visual) (`comparing:compare_objects`); Sort into Groups (`comparing:sort_into_groups`) — sort by big / small and heavy / light: sort_into_groups attr size / weight (build lane k2)  
+- **M.EE.K.MD.2** — FULL. Classify objects according to attributes (e.g., big/small, heavy/light). (CCSS K.MD.A.2)  
+  Taught by: Compare Attributes (Visual) (`comparing:compare_objects`); Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`); Sort into Groups (`comparing:sort_into_groups`) — classify into groups by an attribute: sort_into_groups (build lane k2)  
+- **M.EE.K.MD.3** — FULL. Classify objects according to attributes (e.g., big/small, heavy/light). (CCSS K.MD.B.3)  
+  Taught by: Sort & Count by Category (Visual) (`comparing:classify_count`); Sort into Groups (`comparing:sort_into_groups`) — by kind, shape, size and heavy / light: sort_into_groups (build lane k2)  
 - **M.EE.K.G.2** — FULL. Match shapes of the same size and orientation, including circles, squares, rectangles, and triangles. (CCSS K.G.A.2)  
   Taught by: Identify 2D Shapes (Visual) (`shapes_early:name_2d_shapes`); Match Names to 2D Shapes (`shapes_early:shape_name_match_2d`) — matching shapes: "click all the triangles"  
 - **M.EE.K.G.3** — FULL. Match shapes of the same size and orientation, including circles, squares, rectangles, and triangles. (CCSS K.G.A.3)  
@@ -1938,9 +1913,8 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **M.EE.1.MD.3** — PARTIAL. Understand concepts of time. (CCSS 1.MD.B.3)  
   In part: a.m. or p.m.? (`measurement:time_sense`)  
   Missing: today, yesterday and tomorrow; morning, afternoon, day and night; activities before, next and after; telling time is the same every day → `day_order`, `time_talk`
-- **M.EE.1.MD.4** — PARTIAL. Organize objects into categories by sorting (e.g., color, size, shape). Count the number of objects in each category and identify the category with the most objects. (CCSS 1.MD.C.4)  
-  In part: Picture Graph Intro (Visual) (`measurement:pictograph_intro`); Tally Charts (`graphs:tally_chart`)  
-  Missing: sort the objects into categories first (the skills start from counts) → `sort_groups`
+- **M.EE.1.MD.4** — FULL. Organize objects into categories by sorting (e.g., color, size, shape). Count the number of objects in each category and identify the category with the most objects. (CCSS 1.MD.C.4)  
+  Taught by: Picture Graph Intro (Visual) (`measurement:pictograph_intro`); Tally Charts (`graphs:tally_chart`); Sort into Groups (`comparing:sort_into_groups`) — sorting the objects into categories first: sort_into_groups (build lane k2)  
 - **M.EE.1.G.1** — GAP. Identify the relative position of objects that are on, off, in, and out. (CCSS 1.G.A.1)  
   Missing: relative positions on, off, in and out (the attribute skills carry this EE only through the CCSS link) → `position_map`
 - **M.EE.1.G.2** — PARTIAL. Sort shapes of the same size and orientation including circles, squares, rectangles, and triangles. (CCSS 1.G.A.2)  

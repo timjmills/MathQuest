@@ -105,7 +105,7 @@ export const VISUALS = {
     V056: ['Y3:R56', 'Two stacked fraction lines; multi-labelled line (F, D, %)', ['vis_frac_line_modes', 'frac_nl_equiv']],
     V057: ['Y3:R57', 'Fraction of a set (objects ringed into groups)', ['vis_migrate_fraction_ops']],
     V058: ['Y3:R58', 'Data / listing table with blanks', ['table_data']],
-    V059: ['Y3:R59', 'Sorting rings and sort tables (2–5 labelled columns)', ['sort_groups', 'vis_sort_diagrams']],
+    V059: ['Y3:R59', 'Sorting rings and sort tables (2–5 labelled columns)', ['vis_sort_diagrams']],
     V060: ['Y3:R60', 'Analogue clock', ['vis_clock_options']],
     V061: ['Y3:R61', 'Roman-numeral clock face', ['roman_12', 'vis_clock_options']],
     V062: ['Y3:R62', 'Past / to half-shaded clock face', ['vis_clock_options']],

@@ -21,7 +21,7 @@ the first entry.
 
 - **575 year rows** (Reception 67, Year 1 79, Year 2 75, Year 3 84, Year 4 89, Year 5 92, Year 6 89) → **210 representations**.
 - **MATCH 11 · PARTIAL 103 · GAP 96.**
-- The 199 PARTIAL / GAP representations are closed by 87 existing build-list entries (merged) and 53 entries added from this catalogue.
+- The 199 PARTIAL / GAP representations are closed by 86 existing build-list entries (merged) and 53 entries added from this catalogue.
 
 | Lane | Representations it owns | MATCH | PARTIAL | GAP | Entries added from the catalogue |
 |---|---|---|---|---|---|
@@ -110,7 +110,7 @@ the first entry.
 | V056 | Two stacked fraction lines; multi-labelled line (F, D, %) | Y3 R56, Y4 R52 (GAP), Y4 R53, Y5 R56, Y6 R56 (GAP) | 12 | PARTIAL | `fractions:equiv_frac_nv` | `vis_frac_line_modes`*, `frac_nl_equiv` | `fractions` |
 | V057 | Fraction of a set (objects ringed into groups) | Y1 R56, Y2 R57, Y3 R57, Y5 R57 | 16 | PARTIAL | `fractions:fraction_of_set`, `patterns:halve` | `vis_migrate_fraction_ops`* | `fractions` |
 | V058 | Data / listing table with blanks | Y1 R46, Y2 R58, Y3 R58, Y4 R40, Y4 R41, Y5 R58, Y6 R58 | 69 | GAP | - | `table_data` | `data` |
-| V059 | Sorting rings and sort tables (2–5 labelled columns) | R R04, Y1 R03 (GAP), Y2 R59, Y3 R59, Y4 R42, Y5 R59, Y6 R59 | 41 | PARTIAL | `comparing:classify_count` | `sort_groups`, `vis_sort_diagrams`* | `k2` |
+| V059 | Sorting rings and sort tables (2–5 labelled columns) | R R04 (MATCH), Y1 R03 (MATCH), Y2 R59, Y3 R59, Y4 R42, Y5 R59, Y6 R59 | 41 | PARTIAL | `template:sort-rings`, `comparing:sort_into_groups`, `comparing:classify_count` | `vis_sort_diagrams`* | `k2` |
 | V060 | Analogue clock | Y1 R76 (MATCH), Y2 R60 (M/P), Y3 R60 (MATCH), Y4 R68 (MATCH), Y5 R60 (MATCH) | 19 | PARTIAL | `template:clock`, `measurement:time_hour`, `measurement:time_half_hour`, `measurement:time_5min` | `vis_clock_options`* | `timemoney` |
 | V061 | Roman-numeral clock face | Y3 R61, Y4 R72 | 5 | GAP | - | `roman_12`, `vis_clock_options`* | `timemoney` |
 | V062 | Past / to half-shaded clock face | Y2 R62, Y3 R62 | 3 | GAP | - | `vis_clock_options`* | `timemoney` |
@@ -344,7 +344,6 @@ Every entry of `design/BUILD_LIST.md` that draws a catalogued representation, wi
 | `vis_tenframe_options` Ten-Frame Options (units, frames, fills, five frame) | `k2` | added from visual catalogue | V009, V010, V103, V104, V136, V137 | 79 |
 | `vis_sort_diagrams` Sort Tables, Venn and Carroll Diagrams | `k2` | added from visual catalogue | V043, V044, V059 | 51 |
 | `vis_count_row_values` Number Tracks With Fractions, Decimals, Words and Pictures | `k2` | added from visual catalogue | V022, V093, V139, V184 | 49 |
-| `sort_groups` Sort into Groups | `k2` | White Rose audit | V059 | 41 |
 | `vis_bead_panes` Bead String and Hundred-Bead Rekenrek | `k2` | added from visual catalogue | V007, V086 | 37 |
 | `vis_cover_mark` Hidden Part (cover mark) | `k2` | added from visual catalogue | V087 | 29 |
 | `vis_chart_shade` Shade the Hundred Square (whole-chart tasks) | `k2` | added from visual catalogue | V023 | 24 |

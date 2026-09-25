@@ -44,9 +44,6 @@ export const WRM_SPECS = {
         ['stops before listing every pair', 'lists a pair twice (3,5 and 5,3 when order does not matter)'], ['data-table', 'bar-model']),
 
     // ------------------------------------------------------------------ counting
-    sort_groups: S(['sort by a given rule', 'find the rule of a sort', 'count each group and say which has most', 'order the groups by count', 'sort by big/small or heavy/light'],
-        ['wordpic', 'counters'], 'write each tile letter in its ring; write how many in each group', 'O2 2 groups → 3 groups → rule found by the pupil → order the groups · O3 first tile placed, labels with pictures → words only · O6 rings / Carroll boxes',
-        ['sorts by two attributes at once', 'leaves tiles unsorted', 'counts a tile in two rings'], ['sort-rings', 'picture-row']),
     subitise: S(['say how many (dots, dice, fingers)', 'how many on the ten frame?', 'see the two parts (3 and 2)', 'match patterns with the same number'],
         ['counters', 'tenframe'], 'write the number; write the two parts', 'O2 0-3 → 0-5 → to 10 (conceptual) · O3 screen flash time long → short; parts ringed → none · O6 dots / dice / fingers / frame',
         ['counts one by one', 'confuses 4 and 5 dice patterns', 'forgets zero is a number']),

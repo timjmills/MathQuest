@@ -3158,6 +3158,31 @@ const K2_LANE_OPTIONS = {
             help: 'What stands in the line. The line is always one kind, with a star to find on "Write the place".',
         },
     ],
+    'comparing:sort_into_groups': [
+        {
+            id: 'task', label: 'Task', type: 'enum', default: 'count', group: 'difficulty',
+            values: [{ v: 'count', l: 'Sort the pictures, write how many in each ring (default)' }, { v: 'most', l: 'Sorted: check the ring with the most' },
+                { v: 'order', l: 'Sorted: order three rings, fewest first (write 1, 2, 3)' }, { v: 'rule', l: 'Find the rule: how are they sorted?' }],
+            help: 'One task for the whole page: sort and count first; then compare the groups; then name the rule of a finished sort.',
+        },
+        {
+            id: 'attr', label: 'Sort by', type: 'enum', default: 'kind', group: 'difficulty',
+            values: [{ v: 'kind', l: 'Kind of thing (apples, balls ...) (default)' }, { v: 'shape', l: 'Shape (circles, squares ...)' },
+                { v: 'size', l: 'Size (big / small)' }, { v: 'weight', l: 'Heavy or light' }],
+            help: 'The rule the rings sort by. Size and heavy / light are always two rings (ordering three rings sorts by kind).',
+        },
+        {
+            id: 'tiles', label: 'Groups', type: 'enum', default: 2, group: 'difficulty',
+            values: [{ v: 2, l: 'Two rings (default)' }, { v: 3, l: 'Three rings' }],
+            help: 'Three rings is harder: each picture has three places it could go. (Kind or shape.)',
+        },
+        { ...levelSubset([3, 2, 1], 2, 'Level 3 places the first picture for the pupil (its letter written in its ring in grey); level 2 labels each ring with a picture; level 1 labels the rings in words only.') },
+        {
+            id: 'model', label: 'Drawn as', type: 'enum', default: 'circle', group: 'layout',
+            values: [{ v: 'circle', l: 'Sorting rings (default)' }, { v: 'grid', l: 'Boxes side by side (a sorting table)' }],
+            help: 'The same sort, in hoops or in the boxes of a table.',
+        },
+    ],
 };
 for (const [key, defs] of Object.entries(K2_LANE_OPTIONS)) SKILL_OPTIONS[key] = defs;
 // ============================ end build lane k2 ============================

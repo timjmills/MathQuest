@@ -1362,6 +1362,7 @@ function _k2LaneSkill(q, id, rng) {
         case 'compare_capacity': return _k2Capacity(q, rng);
         case 'what_can_we_measure': return _k2Measurable(q, rng);
         case 'ordinal_numbers': return _k2OrdinalLine(q, rng);
+        case 'sort_into_groups': return _k2SortGroups(q, rng);
         default: return false;
     }
 }
@@ -1851,5 +1852,133 @@ function _k2OrdinalLine(q, rng) {
     q.printFormat = 'k2-find';
     q.ordPlace = place;
     _kSetCell(q, 'picture-row', { kind: 'line', task: 'find', items, correct: place - 1, labels, ask: ord, pic, gap: band === 5 ? 3 : 4 });
+    return true;
+}
+
+/** Sort into groups: the heavy and the light things (sort by weight). */
+const K2_HEAVY = ['rock', 'brick', 'car'];
+const K2_LIGHT = ['feather', 'leaf', 'balloon'];
+const K2_RULE_WORDS = { kind: 'By kind', shape: 'By shape', size: 'By size', weight: 'By weight' };
+
+/**
+ * SORT INTO GROUPS (R.B1.S4-S6, Y1.B1.S1; K.MD.B.3 classify, count and sort the categories by
+ * count; M.EE.K.MD.1-3, M.EE.1.MD.4). Two or three labelled rings (or the boxes of a table).
+ *   count  a row of lettered tiles above the rings: sort them (the letters are written in the
+ *          rings: working, never graded), then write how many in each ring
+ *   most   the tiles are already sorted inside the rings: check the ring with the most
+ *   order  three rings, already sorted: write 1, 2, 3 under them, the fewest first
+ *   rule   the tiles are sorted, the rings unlabelled: check the rule (by kind, shape, size, weight)
+ * Options: Task, Sort by (attr: kind / shape / size / weight), Groups (tiles 2 / 3), Support level
+ * 3 (the first tile placed) / 2 (ring labels with a picture) / 1 (labels in words), Model (rings /
+ * boxes).
+ */
+function _k2SortGroups(q, rng) {
+    const task = ['count', 'most', 'order', 'rule'].includes(_kOpt('task')) ? _kOpt('task') : 'count';
+    const attr0 = ['kind', 'shape', 'size', 'weight'].includes(_kOpt('attr')) ? _kOpt('attr') : 'kind';
+    // ordering needs three groups, and big / small, heavy / light are two: ordering sorts by kind
+    const attr = task === 'order' && (attr0 === 'size' || attr0 === 'weight') ? 'kind' : attr0;
+    let nGroups = task === 'order' ? 3 : Number(_kOpt('tiles')) === 3 ? 3 : 2;
+    if (attr === 'size' || attr === 'weight') nGroups = 2;
+    const lvl = _kLevel(2);
+    const grid = _kOpt('model') === 'grid';
+    // the groups: what each one is, its label (a specimen, or a word with a small picture)
+    let defs;
+    if (attr === 'kind' || attr === 'shape') {
+        const pool = attr === 'shape' ? K2_ROW_SHAPES.filter((s) => s !== 'diamond') : K2_ROW_PICTURES.filter((s) => s !== 'star');
+        const kinds = shuffle(pool.slice()).slice(0, nGroups);
+        defs = kinds.map((sh) => ({ tile: { shape: sh, s: 0.9 }, pic: { shape: sh, s: 0.9 }, word: lvl >= 2 ? '' : K2_SHAPES[sh].plural }));
+    } else if (attr === 'size') {
+        const sh = K2_ROW_PICTURES[_kDealShuffled(K2_ROW_PICTURES.length)];
+        defs = [{ tile: { shape: sh, s: 1 }, pic: lvl >= 2 ? { shape: sh, s: 1 } : null, word: 'Big' }, { tile: { shape: sh, s: 0.5 }, pic: lvl >= 2 ? { shape: sh, s: 0.5 } : null, word: 'Small' }];
+    } else {
+        defs = [{ tiles: K2_HEAVY, pic: lvl >= 2 ? { shape: 'brick', s: 0.9 } : null, word: 'Heavy' }, { tiles: K2_LIGHT, pic: lvl >= 2 ? { shape: 'feather', s: 0.9 } : null, word: 'Light' }];
+    }
+    // how many in each group: 1-4; all different for most / order (a set of distinct counts, shuffled)
+    let counts;
+    if (task === 'most' || task === 'order') {
+        const sets = nGroups === 3 ? [[1, 2, 3], [2, 3, 4], [1, 3, 4], [1, 2, 4]] : [[1, 3], [2, 4], [1, 4], [2, 3], [3, 4], [1, 2]];
+        counts = shuffle(sets[_kDealShuffled(sets.length)].slice());
+    } else {
+        counts = defs.map(() => rng(1, nGroups === 3 ? 3 : 4));
+        if (counts.reduce((a, b) => a + b, 0) < 4) counts[0] += 1;
+    }
+    // the tiles, shuffled into a row, and which group each belongs to
+    const tiles = [];
+    const owner = [];
+    defs.forEach((d, gi) => {
+        for (let i = 0; i < counts[gi]; i++) {
+            // heavy / light: the kinds cycle, so a group of two or more is never one kind (then
+            // "by kind" would split the rings too, and the rule would not be the only answer)
+            const tile = d.tiles ? { shape: d.tiles[(i + gi) % d.tiles.length], s: 0.9 } : d.tile;
+            tiles.push(tile);
+            owner.push(gi);
+        }
+    });
+    const perm = shuffle(tiles.map((_, i) => i));
+    const tilesP = perm.map((i) => tiles[i]);
+    const ownerP = perm.map((i) => owner[i]);
+    const groups = defs.map((d, gi) => ({ pic: d.pic || null, word: d.word || '', members: ownerP.map((o, ti) => (o === gi ? ti : -1)).filter((ti) => ti >= 0) }));
+    const payload = { task, model: grid ? 'grid' : 'rings', tiles: tilesP, groups, counts, work: lvl >= 3 };
+    q.options = [];
+    q.selfAnswering = true;
+    q.skillLabel = 'Sort into Groups';
+    q.supportLevel = lvl;
+    q.sortAttr = attr;
+    q._variant = task;
+    q.printFormat = `k2-${task}`;
+    if (task === 'count') {
+        q.text = 'Count the pictures that go in each ring. How many in each ring?';
+        q.printText = 'Sort. Write how many in each ring.';
+        q.ans = counts.join(', ');
+        q.keyParts = counts.map(String);
+        q.acceptedAnswers = [counts.join(','), counts.join(' ')];
+        q.answerType = 'text';
+        q.hint = 'Look at each picture. Write its letter in the ring it belongs to. Then count each ring.';
+        q.distractorTags = { [counts.slice().reverse().join(', ')]: 'wrote the counts in the wrong rings' };
+        _kSetCell(q, 'sort-rings', payload);
+        return true;
+    }
+    if (task === 'order') {
+        const sorted = counts.map((c, i) => [c, i]).sort((a, b) => a[0] - b[0]);
+        const order = counts.map((_, i) => sorted.findIndex((x) => x[1] === i) + 1);
+        q.text = 'Write 1, 2, 3 under the rings. Start with the fewest.';
+        q.printText = 'Write 1, 2, 3 under the rings. Start with the fewest.';
+        q.ans = order.join(', ');
+        q.keyParts = order.map(String);
+        q.acceptedAnswers = [order.join(','), order.join(' ')];
+        q.answerType = 'text';
+        q.hint = 'Count each ring. The ring with the fewest gets 1.';
+        q.distractorTags = { [order.map((r) => 4 - r).join(', ')]: 'started with the most' };
+        _kSetCell(q, 'sort-rings', Object.assign(payload, { order }));
+        return true;
+    }
+    if (task === 'most') {
+        const correct = counts.indexOf(Math.max(...counts));
+        const letter = K2_LETTERS[correct];
+        q.text = 'Which ring has the most?';
+        q.printText = 'Check the ring with the most.';
+        q.ans = letter;
+        q.printAnswer = letter;
+        q.acceptedAnswers = [letter, letter.toLowerCase()];
+        q.answerType = 'text';
+        q.hint = 'Count each ring. Check the one with the biggest number.';
+        q.distractorTags = { [K2_LETTERS[counts.indexOf(Math.min(...counts))]]: 'chose the ring with the fewest' };
+        _kSetCell(q, 'sort-rings', Object.assign(payload, { correct, labels: K2_LETTERS.slice(0, counts.length) }));
+        return true;
+    }
+    // rule: the rings unlabelled, the sort given; the bank names two or three rules
+    const others = Object.keys(K2_RULE_WORDS).filter((a) => a !== attr && !(attr === 'shape' && a === 'kind') && !(attr === 'kind' && a === 'shape'));
+    const words = shuffle([attr, ...shuffle(others).slice(0, 1)]).map((a) => ({ label: K2_RULE_WORDS[a] }));
+    const correct = words.findIndex((w) => w.label === K2_RULE_WORDS[attr]);
+    const label = words[correct].label;
+    q.text = 'How are the pictures sorted?';
+    q.printText = 'How are they sorted? Check one box.';
+    q.ans = label;
+    q.printAnswer = label;
+    q.acceptedAnswers = [label, label.toLowerCase(), attr];
+    q.answerType = 'text';
+    q.hint = 'Look at one ring. What is the same about everything in it?';
+    q.distractorTags = { [words[1 - correct].label]: 'named a rule that does not split the rings' };
+    _kSetCell(q, 'sort-rings', Object.assign(payload, { words, correct, labels: words.map((w) => w.label) }));
     return true;
 }

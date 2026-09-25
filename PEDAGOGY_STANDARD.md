@@ -1270,6 +1270,10 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `count-tens` | Write how many tens. | count rods or full ten frames as tens (added 2026-09-25) |
 | `count-zero` | Count. Write how many. None is 0. | count objects on a plate, an empty one included: zero means none (build lane k2, 2026-09-25) |
 | `check-none` | Check the one with none. | find the empty plate, box or frame among three (build lane k2) |
+| `sort-count` | Sort. Write how many in each ring. | sort pictures into labelled rings, then count each ring (build lane k2) |
+| `check-most-ring` | Check the ring with the most. | compare the groups of a finished sort (build lane k2) |
+| `order-rings` | Write 1, 2, 3 under the rings. Start with the fewest. | order the groups of a finished sort by count (build lane k2) |
+| `check-sorted` | How are they sorted? Check one box. | name the rule of a finished sort (build lane k2) |
 | `check-place` | Look at the flag. Check the place shown. | ordinal numbers: find the 3rd from the start flag (build lane k2) |
 | `write-place` | Write the place of the star. Start at the flag. | ordinal numbers: write the position (4th) of a marked picture (build lane k2) |
 | `check-measure` | What can we measure? Check one box. | name a measurable attribute (long, heavy, tall, holds) against colour or name (build lane k2) |
@@ -1366,7 +1370,9 @@ On screen the action verbs are swapped by a fixed map so the instruction stays t
 Check (a box: "Check one box.") → Tap; Write → Type; Draw a line to match → Tap the two that match; Shade → Tap the parts;
 Mark → Tap the line; Draw the hands → Drag the hands; Cut / Sort / Glue → Drag; Box, Cross out, Underline,
 Trace and Color → Tap; Measure → Drag the ruler. `Check` in its verifying sense ("Check the work.") is
-unchanged. No other rewording is allowed between print and screen.
+unchanged. No other rewording is allowed between print and screen, with one whole-phrase exception
+(build lane k2, 2026-09-25): "Sort. Write how many in each ring." → "Count each kind. Type how many in
+each ring.", because the screen twin of a sort takes the counts only and has nothing to drag.
 
 ### 10.3 Vocabulary
 

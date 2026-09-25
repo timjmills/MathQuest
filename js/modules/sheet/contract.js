@@ -127,6 +127,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     // Build lane k2 (2026-09-25, design/BUILD_LIST.md): the new K-1 picture skills.
     'count-zero': 'Count. Write how many. None is 0.',
     'check-none': 'Check the one with none.',
+    'sort-count': 'Sort. Write how many in each ring.',
+    'check-most-ring': 'Check the ring with the most.',
+    'order-rings': 'Write 1, 2, 3 under the rings. Start with the fewest.',
+    'check-sorted': 'How are they sorted? Check one box.',
     'check-place': 'Look at the flag. Check the place shown.',
     'write-place': 'Write the place of the star. Start at the flag.',
     'check-measure': 'What can we measure? Check one box.',
@@ -277,6 +281,8 @@ export const BANNED_INSTRUCTION_WORDS = Object.freeze([
 // word the verb-only swap cannot. The bare verb stays below as the fallback for any string
 // outside the closed library.
 const SCREEN_VERB_MAP = Object.freeze([
+    // build lane k2: the screen twin of a sort asks for the counts only (no dragging on screen)
+    ['Sort. Write how many in each ring', 'Count each kind. Type how many in each ring'],
     ['Draw hops of the number you divide by', 'Tap the line to hop by the number you divide by'],
     ['Draw the hops on the line', 'Tap the line to make the hops'],
     ['Shade every multiple of', 'Tap every multiple of'],

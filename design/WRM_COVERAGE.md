@@ -22,20 +22,20 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 525 (60%), partial only 148 (17%), gap 199 (23%).
+- Covered 529 (61%), partial only 145 (17%), gap 198 (23%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 334 skills carry WRM tags. 156 proposals (114 new skills, 42 options on existing skills) would close every gap.
+- 335 skills carry WRM tags. 155 proposals (113 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
-| Reception | PK | 18 | 119 | 66 (55%) | 27 | 26 |
-| Year 1 | K | 14 | 116 | 75 (65%) | 24 | 17 |
+| Reception | PK | 18 | 119 | 69 (58%) | 25 | 25 |
+| Year 1 | K | 14 | 116 | 76 (66%) | 23 | 17 |
 | Year 2 | 1 | 11 | 124 | 81 (65%) | 18 | 25 |
 | Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
 | Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
 | Year 5 | 4 | 15 | 136 | 81 (60%) | 22 | 33 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **525 (60%)** | **148** | **199** |
+| **All** | | **97** | **872** | **529 (61%)** | **145** | **198** |
 
 ## Source disagreements
 
@@ -82,14 +82,11 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Closes (1): Y6.B7.S5 Formulae  
   _proposal id: formulae_
 
-### counting (8 proposals, 21 steps)
+### counting (7 proposals, 17 steps)
 
 - **Say How Many Without Counting** — new skill `counting:subitise`. Teaches perceptual subitising of 0-5 and conceptual subitising to 10 (seeing small groups inside a larger one: 3 and 2 make 5). Representation: standard dot, dice, finger and ten-frame patterns shown briefly on screen, printed as a grid; write the number; option: say the two parts.  
   Closes (7): R.B3.S2 Subitise 1, 2 and 3; R.B5.S2 Subitise 4 and 5; R.B7.S3 Subitise 0 to 5; R.B7.S8 Conceptual subitising to 5; R.B9.S10 Conceptual subitising; R.B11.S4 Conceptual subitising to 10; R.B11.S9 Make arrangements of 10  
   _proposal id: subitise_
-- **Sort into Groups** — new skill `comparing:sort_into_groups`. Teaches sorting objects by one attribute (kind, colour, size, shape) into labelled groups, then saying the sorting rule. Representation: picture tiles and two or three labelled sorting rings; write the letter of each tile in its ring; option: rule given or rule found.  
-  Closes (4): R.B1.S4 Sort objects to a type; R.B1.S5 Explore sorting techniques; R.B1.S6 Create sorting rules; Y1.B1.S1 Sort objects  
-  _proposal id: sort_groups_
 - **Number Sense Review** — new skill `counting:number_sense_review`. Teaches consolidating counting, cardinality, composition and patterns to 10 (Reception year review). Representation: a mixed page of counting, compare, compose and pattern cells drawn from the existing K skills (a review pool, not new content).  
   Closes (3): R.B13.S5 Verbal counting beyond 20; R.B18.S1 Deepen understanding; R.B18.S2 Patterns and relationships  
   _proposal id: consolidate_
@@ -618,16 +615,16 @@ whatever happens to the WRM gaps.
 - **R.B1.S3** Identify a set — covered. _Beyond CCSS_  
   Skills: Which One Does Not Belong? (`comparing:odd_one_out`)  
   Vocabulary: set, belong, go together, match  
-- **R.B1.S4** Sort objects to a type — PARTIAL. _K.MD.B.3, M.EE.K.MD.3_  
+- **R.B1.S4** Sort objects to a type — covered. _K.MD.B.3, M.EE.K.MD.3_  
+  Skills: Sort into Groups (`comparing:sort_into_groups`)  
   Partial: Sort & Count by Category (Visual) (`comparing:classify_count`), missing the sort itself: putting every object into its group; the skill only counts one kind  
-  Proposal: Sort into Groups  
   Vocabulary: sort, same, different, not  
-- **R.B1.S5** Explore sorting techniques — PARTIAL. _K.MD.B.3, M.EE.K.MD.3_  
+- **R.B1.S5** Explore sorting techniques — covered. _K.MD.B.3, M.EE.K.MD.3_  
+  Skills: Sort into Groups (`comparing:sort_into_groups`)  
   Partial: Sort & Count by Category (Visual) (`comparing:classify_count`), missing sorting by different attributes (colour, size, kind) rather than counting one shape  
-  Proposal: Sort into Groups  
   Vocabulary: sort, rule, attribute  
-- **R.B1.S6** Create sorting rules — GAP. _K.MD.B.3, M.EE.K.MD.3_  
-  Proposal: Sort into Groups  
+- **R.B1.S6** Create sorting rules — covered. _K.MD.B.3, M.EE.K.MD.3_  
+  Skills: Sort into Groups (`comparing:sort_into_groups`)  
   Vocabulary: rule, belong, odd one out  
 - **R.B1.S7** Compare amounts — covered. _K.CC.C.6, M.EE.K.CC.7_  
   Skills: More/Fewer/Same Groups (Visual) (`comparing:compare_groups`)  
@@ -1050,9 +1047,9 @@ whatever happens to the WRM gaps.
 
 #### Y1.B1 Autumn Block 1: Place value (within 10)
 
-- **Y1.B1.S1** Sort objects — PARTIAL. _K.MD.B.3, M.EE.K.MD.3_  
+- **Y1.B1.S1** Sort objects — covered. _K.MD.B.3, M.EE.K.MD.3_  
+  Skills: Sort into Groups (`comparing:sort_into_groups`)  
   Partial: Sort & Count by Category (Visual) (`comparing:classify_count`), missing sorting every object into groups by a rule; the skill counts one kind  
-  Proposal: Sort into Groups  
   Vocabulary: sort, set, attribute  
 - **Y1.B1.S2** Count objects — covered. _K.CC.B.5, M.EE.K.CC.6_  
   Skills: Count Objects (1-20) (Visual) (`counting:count_objects`) {count to 10}  

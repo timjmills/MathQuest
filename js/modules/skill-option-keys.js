@@ -259,7 +259,7 @@ export const VALUE_TOKENS = Object.freeze({
         find: 'F', order: 'O', collection: 'D', words: 'W', missing: 'I', numerals: 'U', hands: 'B',
         // build lane k2 (2026-09-25): the letters are all taken, so the digits 4-9 (the numeric
         // set values of task are 0-3; a digit is never a field's first character)
-        write: '4' }),
+        write: '4', most: '5' }),
     zeroPlace: Object.freeze({ none: 'N', some: 'S', always: 'A' }),
     op: Object.freeze({ x: 'M', '/': 'D', both: 'B' }),
     order: Object.freeze({ largest: 'L', scrambled: 'S',

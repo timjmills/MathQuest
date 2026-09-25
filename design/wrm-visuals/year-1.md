@@ -268,7 +268,7 @@ one-to-one.
 |---|---|---|---|---|---|
 | R01 | Pictured objects to count, in a row / rows of five / scattered | B1 S2; B4 S1 | **NEW** | MATCH | `template:counters` `count` (`count_objects` `orientation`, `objects`, `support: 'steps'`) |
 | R02 | Count out / ring or colour n from a larger set | B1 S3 | **NEW** | GAP | counters kind `countout` (`task: 'count-out'` on count_objects) |
-| R03 | Sorting into labelled regions / rings; name the rule | B1 S1; B3 S2, S4; B13 S2 | R59 | GAP | new `template:sort-rings` + `comparing:sort_by_rule`; count-one-kind MATCH `classify_count` |
+| R03 | Sorting into labelled regions / rings; name the rule | B1 S1; B3 S2, S4; B13 S2 | R59 | MATCH | `template:sort-rings` + `comparing:sort_into_groups` (2–3 labelled rings or boxes; sort and count, the most, order by count, name the rule); count-one-kind `classify_count` (build lane k2) |
 | R04 | Dice / domino dot patterns (subitise; domino with dots to draw) | B1 S2, S12, S14; B2 S5; B4 S2 | **NEW** | MATCH / PARTIAL | `pane:dice` (`support: 'tile'` on add / sub facts), `objects: 'dice'` on count_objects / compare_groups / add_5_pictures; domino-to-draw GAP |
 | R05 | Ten frame of counters (read, draw, match) | B1 S4, S5, S11, S14; B2 S4–S8, S15 | R09 | MATCH | `template:tenframe`, `pane:tenframe`, `objects: 'frame'` |
 | R06 | Two-tone ten frame (a bond; one set solid, one hollow; crossed out) | B2 S4–S8, S15; B5 S2, S3, S6 | R09 (part) | MATCH / PARTIAL | `pane:tenframe` solid / hollow / crossed; wired only as `support: 'frame'` on add_facts / sub_facts |
