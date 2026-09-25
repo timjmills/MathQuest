@@ -21,6 +21,87 @@
 import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions } from './skill-options.js';
 import { getSetOptions, setSetOptions, onSetOptionsChanged } from './skill-option-store.js';
 import { SKILLS } from './data.js';
+import { state } from './state.js';
+
+// ---------------------------------------------------------------------------
+// Groups and one-line help (owner, 2026-09-25: "The options should let a teacher go easier or
+// harder and give more or less support")
+// ---------------------------------------------------------------------------
+// Every panel sets its controls out under three headings, so a teacher can see at a glance which
+// control makes the page harder, which one gives more help, and which one only changes the look.
+// An option names its group itself (`group` in skill-options.js); options that predate the field
+// are placed by id.
+export const OPTION_GROUPS = [
+    { id: 'difficulty', label: 'Harder / easier' },
+    { id: 'support', label: 'Support' },
+    { id: 'layout', label: 'Layout' },
+];
+const GROUP_BY_ID = {
+    band: 'difficulty', range: 'difficulty', decimals: 'difficulty', constant: 'difficulty', regroup: 'difficulty',
+    unknown: 'difficulty', place: 'difficulty', places: 'difficulty', step: 'difficulty', dir: 'difficulty',
+    op: 'difficulty', power: 'difficulty', zeroPlace: 'difficulty', midpoint: 'difficulty', order: 'difficulty',
+    wordform: 'difficulty', simplestForm: 'difficulty',
+    level: 'support', pictures: 'support', support: 'support',
+    notation: 'layout', orientation: 'layout', response: 'layout', task: 'layout', tiles: 'layout',
+};
+export function optionGroup(def) {
+    return (def && (def.group || GROUP_BY_ID[def.id])) || 'difficulty';
+}
+
+// The ONE line shown under a control, in plain teacher English. Long `help` strings (notation,
+// support level) stay on the control as its tooltip; the panel shows this line instead.
+const SHORT_HELP = {
+    notation: 'How each problem is written. Tick more than one to mix them on the page.',
+    level: 'More support first. Tick several to fade the help down the page.',
+    constant: 'Tick one fact to drill it, or several for a mixed set.',
+    response: 'What the pupil does: work it out, or only pick the numbers the story needs.',
+    range: 'The biggest number for this skill only.',
+    decimals: 'Whole numbers or decimals, for this skill only.',
+    regroup: 'Whether the pupil has to carry or borrow.',
+    orientation: 'Stacked in columns, or written across on one line.',
+    unknown: 'Which number in the sentence is left blank.',
+    simplestForm: 'On asks for the fraction in its simplest form.',
+    pictures: 'Off gives the same problems as text only.',
+    band: 'The biggest number on the page.',
+};
+export function optionHelpLine(def) {
+    if (!def) return '';
+    if (def.helpShort) return String(def.helpShort);
+    const own = String(def.help || '');
+    // A help that fits one line of a 420 px panel (two short sentences at most) is shown as it is.
+    if (own && own.length <= 140) return own;
+    return SHORT_HELP[def.id] || own.split(/(?<=\.)\s/)[0] || '';
+}
+
+/**
+ * A control's values as the teacher should read them NOW: "Use the Max Number setting" says what
+ * that setting currently is (owner, 2026-09-25), so choosing between it and "Up to 20" is not a
+ * guess.
+ */
+function _liveDef(def) {
+    if (!def || !Array.isArray(def.values)) return def;
+    if (def.id !== 'range' && def.id !== 'decimals') return def;
+    const DP = { 0: 'whole numbers', 1: 'tenths', 2: 'hundredths', 3: 'thousandths' };
+    const now = def.id === 'range'
+        ? `Use the Max Number setting (now ${Number(state.range).toLocaleString('en-US')})`
+        : `Use the Decimals setting (now ${DP[state.decimalPlaces] || state.decimalPlaces + ' places'})`;
+    return { ...def, values: def.values.map(x => (x.v === null ? { ...x, l: now } : x)) };
+}
+
+/**
+ * Every control of a skill, set out under the three group headings (a heading only when it adds
+ * something: more than one group, or a group other than "Harder / easier"). `row(def)` draws one
+ * control with its help line.
+ */
+export function groupedOptionRowsHTML(defs, cur, row, headingStyle) {
+    const shown = defs.filter(def => !(typeof def.appliesTo === 'function' && !def.appliesTo(cur)));
+    const used = OPTION_GROUPS.filter(g => shown.some(d => optionGroup(d) === g.id));
+    const hs = headingStyle || 'font-size:0.68rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-dim);margin:10px 0 0;';
+    const heads = used.length > 1 || (used[0] && used[0].id !== 'difficulty');
+    return used.map(g => `<div class="sko-group" data-sko-group="${g.id}">`
+        + (heads ? `<div class="sko-group-head" role="heading" aria-level="3" style="${hs}">${escHTML(g.label)}</div>` : '')
+        + shown.filter(d => optionGroup(d) === g.id).map(row).join('') + '</div>').join('');
+}
 
 export function escHTML(s) {
     return String(s == null ? '' : s)
@@ -43,14 +124,16 @@ export function skillHasOfferedOptions(categoryId, skillId) {
  *                               "Sheet will be titled" line)
  */
 export function optionControlHTML(def, cur, color, h) {
+    def = _liveDef(def);
     const v = cur[def.id];
+    const tip = def.help ? ` title="${escHTML(def.help)}"` : '';
     const id = escHTML(def.id);
     const extra = h.extra ? (h.extra(def) || '') : '';
     if (def.type === 'bool') {
-        return `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.82rem;color:var(--text);">
-            <input type="checkbox" ${v ? 'checked' : ''} style="width:15px;height:15px;"
+        return `<label${tip} style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.82rem;color:var(--text);">
+            <input type="checkbox" ${v ? 'checked' : ''} style="width:15px;height:15px;flex:none;"
                 onchange="${h.set(id, 'this.checked')}">
-            <span>${escHTML(def.label)}</span>
+            <span style="min-width:0;overflow-wrap:anywhere;">${escHTML(def.label)}</span>
         </label>${extra}`;
     }
     if (def.type === 'int') {
@@ -77,7 +160,7 @@ export function optionControlHTML(def, cur, color, h) {
                         padding:${pad};border:1px solid ${on ? color : offBorder};border-radius:7px;
                         background:${on ? color + '1a' : 'transparent'};cursor:pointer;min-width:0;
                         font-size:0.8rem;color:var(--text);font-weight:${on ? '600' : '400'};">
-                <span>${escHTML(x.l)}</span>
+                <span style="min-width:0;overflow-wrap:anywhere;">${escHTML(x.l)}</span>
                 <input type="checkbox" ${on ? 'checked' : ''}
                     onchange="${h.toggle(id, i)}"
                     style="width:16px;height:16px;flex:none;accent-color:${color};cursor:pointer;margin:0;">
@@ -90,9 +173,9 @@ export function optionControlHTML(def, cur, color, h) {
         const none = !chosen.length
             ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">None ticked — any of them may appear.</div>`
             : '';
-        return `<div style="font-size:0.82rem;color:var(--text);">
+        return `<div${tip} style="font-size:0.82rem;color:var(--text);">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                <span style="flex:1;font-weight:600;">${escHTML(def.label)}</span>
+                <span style="flex:1;min-width:0;font-weight:600;overflow-wrap:anywhere;">${escHTML(def.label)}</span>
                 <button type="button" onclick="${h.all(id, true)}"
                     style="padding:2px 8px;font-size:0.7rem;border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:5px;cursor:pointer;">All</button>
                 <button type="button" onclick="${h.all(id, false)}"
@@ -107,9 +190,11 @@ export function optionControlHTML(def, cur, color, h) {
     const opts = (def.values || []).map((x, i) =>
         `<option value="${i}"${x.v === v ? ' selected' : ''}>${escHTML(x.l)}</option>`
     ).join('');
-    return `<label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text);flex-wrap:wrap;">
-        <span style="flex:1;min-width:90px;">${escHTML(def.label)}</span>
-        <select style="flex:1;min-width:120px;padding:5px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text);font-size:0.82rem;"
+    // The label sits ABOVE a full-width drop-down, so a long value ("Place-value chart (place names
+    // over the digits)") never pushes the label off a 420 px panel or is cut off itself.
+    return `<label${tip} style="display:flex;flex-direction:column;align-items:stretch;gap:4px;font-size:0.82rem;color:var(--text);min-width:0;">
+        <span style="font-weight:600;overflow-wrap:anywhere;">${escHTML(def.label)}</span>
+        <select style="width:100%;max-width:100%;min-width:0;box-sizing:border-box;padding:6px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text);font-size:0.82rem;text-overflow:ellipsis;"
             onchange="${h.set(id, 'this.value')}">${opts}</select>
     </label>${extra}`;
 }
@@ -198,13 +283,14 @@ export function skillOptionsPanelHTML(hostId, idx, categoryId, skillId, color = 
         toggle: (optId, i) => `skoEdit('${hq}',${idx},'toggle','${optId}',${i})`,
         all: (optId, all) => `skoEdit('${hq}',${idx},'all','${optId}',${all})`,
     };
-    const rows = defs.map(def => {
-        if (typeof def.appliesTo === 'function' && !def.appliesTo(cur)) return '';
-        const help = def.help ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:3px;line-height:1.35;">${escHTML(def.help)}</div>` : '';
+    const rows = groupedOptionRowsHTML(defs, cur, def => {
+        const line = optionHelpLine(def);
+        const help = line ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:3px;line-height:1.35;">${escHTML(line)}</div>` : '';
         return `<div style="padding:7px 0;border-bottom:1px solid var(--border);">${optionControlHTML(def, cur, color, handlers)}${help}</div>`;
-    }).join('');
+    });
     return `<div class="sko-panel" data-sko-host="${escHTML(hostId)}" data-sko-idx="${idx}" onclick="event.stopPropagation()"
          style="margin:4px 0 6px 0;padding:8px 12px;border-left:3px solid ${color};background:var(--bg-card-light, #f7f7fb);border-radius:0 8px 8px 0;color:var(--text);text-align:left;width:100%;box-sizing:border-box;">
+        <div style="font-size:0.85rem;font-weight:700;overflow-wrap:anywhere;">${escHTML(_skillName(categoryId, skillId))}</div>
         <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.04em;color:var(--text-dim);margin-bottom:2px;">SKILL OPTIONS — travel with this skill into every link, code and print</div>
         ${rows}
         <div style="display:flex;justify-content:flex-end;gap:8px;padding-top:8px;">
@@ -298,11 +384,11 @@ function _renderTeacherPopover(el) {
         toggle: (optId, i) => `skoEdit('popover',0,'toggle','${optId}',${i})`,
         all: (optId, all) => `skoEdit('popover',0,'all','${optId}',${all})`,
     };
-    const rows = defs.map(def => {
-        if (typeof def.appliesTo === 'function' && !def.appliesTo(cur)) return '';
-        const help = def.help ? `<p class="tv-sko-help">${escHTML(def.help)}</p>` : '';
+    const rows = groupedOptionRowsHTML(defs, cur, def => {
+        const line = optionHelpLine(def);
+        const help = line ? `<p class="tv-sko-help">${escHTML(line)}</p>` : '';
         return `<div class="tv-sko-row">${optionControlHTML(def, cur, color, handlers)}${help}</div>`;
-    }).join('');
+    }, 'font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--tv-caption);margin:14px 0 0;');
     const chosen = Object.keys(_pop.opts || {}).length ? describeOptions(categoryId, skillId, _pop.opts) : '';
     const summary = !defs.length ? 'No options to set' : (chosen || 'Standard settings');
     const name = _skillName(categoryId, skillId);
@@ -388,12 +474,14 @@ function _renderPopover() {
         toggle: (optId, i) => `skoEdit('popover',0,'toggle','${optId}',${i})`,
         all: (optId, all) => `skoEdit('popover',0,'all','${optId}',${all})`,
     };
-    const rows = defs.length ? defs.map(def => {
-        if (typeof def.appliesTo === 'function' && !def.appliesTo(cur)) return '';
-        const help = def.help ? `<div style="font-size:0.72rem;color:var(--text-dim,#666);margin-top:3px;line-height:1.35;">${escHTML(def.help)}</div>` : '';
+    const rows = defs.length ? groupedOptionRowsHTML(defs, cur, def => {
+        const line = optionHelpLine(def);
+        const help = line ? `<div style="font-size:0.72rem;color:var(--text-dim,#666);margin-top:3px;line-height:1.35;">${escHTML(line)}</div>` : '';
         return `<div style="padding:8px 0;border-bottom:1px solid var(--border,#e5e7eb);">${optionControlHTML(def, cur, color, handlers)}${help}</div>`;
-    }).join('') : '<p style="font-size:0.85rem;margin:8px 0;">This skill has nothing to choose: its generator reads none of the settings an option could change.</p>';
-    const summary = Object.keys(_pop.opts || {}).length ? describeOptions(categoryId, skillId, _pop.opts) : 'Default options';
+    }, 'font-size:0.68rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-dim,#666);margin:12px 0 0;')
+        : '<p style="font-size:0.85rem;margin:8px 0;">This skill has nothing to choose: its generator reads none of the settings an option could change.</p>';
+    // The header names the SKILL (owner, 2026-09-25); what is chosen sits under it.
+    const chosen = Object.keys(_pop.opts || {}).length ? describeOptions(categoryId, skillId, _pop.opts) : 'Standard settings';
     const narrow = window.innerWidth < 600;
     const place = (() => {
         // The rect is taken when the panel opens: the screen behind usually re-renders on every
@@ -415,7 +503,8 @@ function _renderPopover() {
     el.innerHTML = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
             <div style="flex:1;min-width:0;">
                 <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.04em;color:var(--text-dim,#666);">SKILL OPTIONS</div>
-                <div class="sko-pop-summary" style="font-size:0.85rem;font-weight:600;">${escHTML(summary)}</div>
+                <div class="sko-pop-title" style="font-size:1rem;font-weight:700;overflow-wrap:anywhere;">${escHTML(_skillName(categoryId, skillId))}</div>
+                <div class="sko-pop-summary" style="font-size:0.78rem;font-weight:500;color:var(--text-dim,#666);overflow-wrap:anywhere;">${escHTML(chosen)}</div>
             </div>
             <button type="button" onclick="closeSkillOptionsPanel()" aria-label="Close"
                 style="width:44px;height:44px;border-radius:50%;border:1px solid var(--border,#ddd);background:transparent;color:inherit;font-size:1.2rem;cursor:pointer;">&times;</button>

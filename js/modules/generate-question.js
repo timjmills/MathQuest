@@ -390,7 +390,8 @@ function generateResolvedQuestion() {
         let pool = mixedConfig.skills;
         if (mixedConfig.category === 'placevalue' || mixedConfig.category === 'number_sense') {
             const P4_STRATEGY = new Set(['make_a_ten', 'doubles_near_doubles', 'compensation']);
-            const fits = pool.filter(sk => !P4_STRATEGY.has(sk) && !pvRefusal(mixedConfig.category, sk, state.range, {}));
+            // `strict`: a review has no band of its own, so its Max Number caps every member.
+            const fits = pool.filter(sk => !P4_STRATEGY.has(sk) && !pvRefusal(mixedConfig.category, sk, state.range, {}, true));
             if (fits.length) pool = fits;
         }
         actualSkill = pick(pool);
