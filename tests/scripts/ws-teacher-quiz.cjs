@@ -52,15 +52,22 @@ const EMOJI = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u
     await sleep(300);
     check((await page.$eval('#quizNameInput', (e) => e.value)) === 'Teacher quiz check', 'builder did not take the quiz name');
 
-    // Filters: K-6 only, All visible and pressed, no emoji chrome
+    // Filters (R2): ONE row, as in the Skills library - search, a Level select (K-6 only) and a
+    // Domain select. No chip rows and no category drop-down.
     const filters = await page.evaluate(() => {
-      const grades = Array.from(document.querySelectorAll('.qb-grade-pill')).map((b) => b.dataset.qbFilterGrade);
-      const all = document.querySelector('.qb-domain-pill[data-qb-filter-domain=""]');
-      const r = all.getBoundingClientRect(); const cs = getComputedStyle(all);
-      return { grades, allVisible: r.width > 0 && r.height > 0 && cs.color !== cs.backgroundColor, allPressed: all.getAttribute('aria-pressed') };
+      const vis = (el) => !!el && el.offsetParent !== null;
+      const lv = document.getElementById('qbLevelSelect');
+      const dm = document.getElementById('qbDomainSelect');
+      return {
+        grades: lv ? [...lv.options].map((o) => o.value).filter(Boolean) : [],
+        selects: vis(lv) && vis(dm),
+        chips: [...document.querySelectorAll('.qb-grade-pill, .qb-domain-pill')].filter(vis).length,
+        category: vis(document.getElementById('qbCategorySelect')),
+      };
     });
-    check(filters.grades.join(',') === 'K,1,2,3,4,5,6', `level chips are ${filters.grades.join(',')}`);
-    check(filters.allVisible && filters.allPressed === 'true', 'the All chip is not visible and pressed');
+    check(filters.grades.join(',') === 'K,1,2,3,4,5,6', `level choices are ${filters.grades.join(',')}`);
+    check(filters.selects, 'the Level and Domain selects are not both shown');
+    check(!filters.chips && !filters.category, `a second filter mechanism is shown (chips ${filters.chips}, category ${filters.category})`);
     const chrome = await visibleText('#qbBuilderContainer .tvq-bhead') + (await visibleText('#qbBuilderContainer .tvq-filters')) + (await visibleText('#qbGridPanel'));
     check(!EMOJI.test(chrome), 'emoji in the builder chrome');
     const primaries = await page.$$eval('#qbBuilderContainer .tv-btn-primary', (b) => b.filter((x) => x.offsetParent).length);
@@ -79,9 +86,11 @@ const EMOJI = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u
     const qs = await page.evaluate(() => ({ n: document.querySelectorAll('.qb-question-card').length, cells: document.querySelectorAll('.qb-question-card .tvq-qframe .tvp-stage').length, count: document.getElementById('qbQuestionCount').textContent }));
     check(qs.n === 5 && qs.count === '5', `expected 5 questions, got ${JSON.stringify(qs)}`);
     check(qs.cells === 5, `question cards drew ${qs.cells}/5 paper cells`);
-    await click('.qb-grade-pill[data-qb-filter-grade="3"]');
-    check(await page.$eval('.qb-grade-pill[data-qb-filter-grade="3"]', (e) => e.getAttribute('aria-pressed')) === 'true', 'level chip does not press');
-    await click('.qb-grade-pill[data-qb-filter-grade="3"]');
+    await page.select('#qbLevelSelect', '3');
+    await sleep(100);
+    const lv3 = await page.evaluate(() => [...document.querySelectorAll('.qb-skill-card')].filter((c) => c.style.display !== 'none').map((c) => c.dataset.qbGrade));
+    check(lv3.length > 0 && lv3.every((g) => g === '3'), `Level 3 shows grades ${[...new Set(lv3)].join(',')}`);
+    await page.select('#qbLevelSelect', '');
     await shot('builder-1280');
     const smallB = await smallTargets('#quizBuilderView');
     check(!smallB.length, `builder targets under 44px: ${smallB.join(', ')}`);

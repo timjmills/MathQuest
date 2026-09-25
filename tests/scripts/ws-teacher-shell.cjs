@@ -217,15 +217,32 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
   await page.evaluate(() => { window.tvGo('print'); window.tvOpenPrintWith(window.skillQueue); });
   await sleep(300);
-  await page.evaluate(() => document.querySelector('[data-act="role"][data-v="independent"]').click());
+  // R2: the page types are collapsed to the chosen card + Change, so Add a skill comes first.
+  const collapsed = await page.evaluate(() => {
+    const scr = document.querySelector('#teacherMain [data-screen="print"]');
+    const add = scr.querySelector('[data-act="pick"]').getBoundingClientRect();
+    const type = scr.querySelector('.tv-ptype-now').getBoundingClientRect();
+    return { grid: !!scr.querySelector('[data-act="role"]'), change: !!scr.querySelector('[data-act="types"]'), order: add.top < type.top, addTop: add.top };
+  });
+  if (collapsed.grid || !collapsed.change) fail('Print: the page-type grid is open before Change is pressed');
+  if (!collapsed.order || collapsed.addTop > 900) fail(`Print: Add a skill is not above the page type near the top (${JSON.stringify(collapsed)})`);
+  const pickRole = (v) => { const scr = document.querySelector('#teacherMain [data-screen="print"]'); if (!scr.querySelector('[data-act="role"]')) scr.querySelector('[data-act="types"]').click(); scr.querySelector(`[data-act="role"][data-v="${v}"]`).click(); };
+  await page.evaluate(() => document.querySelector('#teacherMain [data-screen="print"] [data-act="types"]').click());
+  await sleep(100);
+  const pr0 = await page.evaluate(() => {
+    const scr = document.querySelector('#teacherMain [data-screen="print"]');
+    return {
+      chips: [...scr.querySelectorAll('.tv-ptype[data-v]')].map((b) => b.dataset.v),
+      groups: [...scr.querySelectorAll('.tv-ptype-h')].map((h) => h.textContent),
+      thumbs: scr.querySelectorAll('.tv-ptype[data-v] .tv-ptype-thumb').length,
+    };
+  });
+  await page.evaluate(pickRole, 'independent');
   await sleep(5000);
   const pr = await page.evaluate(() => {
     const what = document.querySelector('.tv-print-what').getBoundingClientRect();
     const prev = document.querySelector('.tv-preview-card').getBoundingClientRect();
     const scr = document.querySelector('#teacherMain [data-screen="print"]');
-    const chips = [...scr.querySelectorAll('.tv-ptype')].map((b) => b.dataset.v);
-    const groups = [...scr.querySelectorAll('.tv-ptype-h')].map((h) => h.textContent);
-    const thumbs = scr.querySelectorAll('.tv-ptype .tv-ptype-thumb').length;
     const frame = document.getElementById('tvPreviewFrame');
     let score = '', cells = 0;
     try {
@@ -234,15 +251,20 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
       cells = [...d.querySelectorAll('.ws-page')].reduce((n, p) => n + p.querySelectorAll('.ws-cell').length, 0);
     } catch (e) { /* */ }
     return {
-      groups, thumbs, beside: prev.left >= what.right && prev.top < 300,
-      chips, select: !!scr.querySelector('select[data-role]'), soon: /coming soon/i.test(scr.textContent),
+      beside: prev.left >= what.right && prev.top < 300,
+      fits: document.getElementById('tvFits').innerText,
+      gridClosed: !scr.querySelector('[data-act="role"]'),
+      select: !!scr.querySelector('select[data-role]'), soon: /coming soon/i.test(scr.textContent),
       classic: !!scr.querySelector('[data-act="classic"]'),
       skills: scr.querySelectorAll('.tv-set-item').length,
       score, cells,
     };
   });
   await shot('print-1280');
+  Object.assign(pr, pr0);
   if (!pr.beside) fail('Print: the preview is not beside the controls at 1280');
+  if (!pr.gridClosed) fail('Print: choosing a page type did not close the grid');
+  if (/Fits:|rows?,|per page/i.test(pr.fits) || !/^\d+ problems? on \d+ pages?/.test(pr.fits)) fail(`Print: the fits line is not one plain line ("${pr.fits}")`);
   const ROLES = ['independent', 'more-practice', 'mixed-practice', 'word-problems', 'opener', 'scripted-model', 'guided', 'pre-skill-check', 'error-analysis', 'review', 'test', 'test-b', 'fact-rows', 'fact-probe', 'true-false', 'reason-it', 'stretch'];
   if (pr.select || [...pr.chips].sort().join() !== [...ROLES].sort().join()) fail(`Print: page type cards are not every working role (${pr.chips.join()})`);
   if (pr.groups.join() !== 'Practice,Teach,Check,Facts,Thinking') fail(`Print: page type groups are ${pr.groups.join()}`);
@@ -252,26 +274,32 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   if (pr.skills !== 4) fail(`Print: expected the 4 queued skills, found ${pr.skills}`);
   if (!pr.score || pr.score !== `/${pr.cells}`) fail(`Print: Score "${pr.score}" does not count the ${pr.cells} items`);
   // A role that does not fit the skills says why on its card: fact rows for a non-fact skill.
-  await page.evaluate(() => { window.tvOpenPrintWith([{ categoryId: 'composing', skillId: 'base10_regroup' }]); document.querySelector('[data-act="role"][data-v="fact-rows"]').click(); });
+  await page.evaluate(() => { window.tvOpenPrintWith([{ categoryId: 'composing', skillId: 'base10_regroup' }]); window.tvGo('print'); });
+  await sleep(200);
+  await page.evaluate(pickRole, 'fact-rows');
   await sleep(5000);
   const unfit = await page.evaluate(() => {
     const why = document.querySelector('#teacherMain [data-screen="print"] .tv-ptype-why');
-    const card = document.querySelector('[data-act="role"][data-v="fact-rows"]');
+    const card = document.querySelector('#teacherMain [data-screen="print"] .tv-ptype.is-static');
     return { why: why ? why.textContent.trim() : '', marked: !!(card && card.classList.contains('is-unfit')) };
   });
   if (!unfit.why || !unfit.marked) fail(`Print: an unfit page type does not say why (${JSON.stringify(unfit)})`);
   // A one-page type too small for every chosen skill says so (never drops a skill quietly).
   await page.evaluate(() => {
     window.tvOpenPrintWith([['composing', 'base10_regroup'], ['addition', 'add_10_no_regroup'], ['addition', 'add_10_regroup'], ['addition', 'add_20_no_regroup']].map(([c, s]) => ({ categoryId: c, skillId: s })));
-    document.querySelector('[data-act="role"][data-v="review"]').click();
+    window.tvGo('print');
   });
+  await sleep(200);
+  await page.evaluate(pickRole, 'review');
   await sleep(6000);
   const warn = await page.evaluate(() => (document.querySelector('#tvFits .tv-fits-warn') || {}).textContent || '');
   if (!/of 4 skills fit/.test(warn)) fail(`Print: no warning when a Review page cannot hold every skill ("${warn}")`);
   await page.evaluate(() => window.tvOpenPrintWith(window.skillQueue));
   await sleep(300);
   // More Practice letter chips
-  await page.evaluate(() => document.querySelector('[data-act="role"][data-v="more-practice"]').click());
+  await page.evaluate(() => window.tvGo('print'));
+  await sleep(200);
+  await page.evaluate(pickRole, 'more-practice');
   await sleep(300);
   const chipSize = await page.evaluate(() => { const r = document.querySelector('[data-act="letter"]').getBoundingClientRect(); return [r.width, r.height]; });
   if (chipSize[0] < 44 || chipSize[1] < 44) fail(`Print: letter chips are ${chipSize.join('x')}`);

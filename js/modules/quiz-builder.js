@@ -15,7 +15,7 @@ import { shuffle } from './utils.js';
 import { saveTest, loadTest, listTests, deleteTest, exportTestJSON, importTestJSON, compressTestForURL, migrateTestToSections, getAllQuestionsFlat, getTotalQuestionCount } from './quiz-storage.js';
 import { icon, cleanLabel, levelText, copyText } from './teacher-ui.js';
 import { mountSample, mountQuestion } from './teacher-preview.js';
-import { isTeacher, note } from './teacher-quiz-ui.js';
+import { isTeacher, note, goQuizzes } from './teacher-quiz-ui.js';
 import { quizQuestionData } from './quiz-take.js';
 
 // ========= MODULE STATE =========
@@ -276,10 +276,20 @@ export async function openMyQuizzes() {
     }
 }
 
+/**
+ * Delete a quiz and its results. With no id it deletes the quiz open in the builder (More → Delete),
+ * then goes back to the Quizzes list.
+ */
 export async function confirmDeleteQuiz(id) {
-    if (!confirm('Delete this quiz and all its results?')) return;
+    const fromBuilder = !id;
+    if (fromBuilder) id = builderTest && builderTest.id;
+    if (!id) { note('This quiz is not saved yet'); return; }
+    const name = fromBuilder && builderTest ? (builderTest.name || 'this quiz') : 'this quiz';
+    if (!confirm(`Delete “${name}” and all its results?`)) return;
     await deleteTest(id);
-    openMyQuizzes();
+    if (fromBuilder) builderTest = null;
+    note('Quiz deleted');
+    if (fromBuilder && isTeacher()) goQuizzes(); else openMyQuizzes();
 }
 
 // ========= INITIALIZE: BUILD THE SKILL GRID =========
@@ -361,9 +371,39 @@ const DOMAIN_SHORT = {
     'Math Vocabulary': 'Vocabulary',
 };
 
+/**
+ * Teacher view: ONE filter row, the same as the Skills library's (search, a Level select and a
+ * Domain select). The pupil-era chip rows and the category drop-down are not drawn.
+ */
+function qbBuildTeacherFilters() {
+    const levels = document.getElementById('qbGradeFilter');
+    const domains = document.getElementById('qbDomainFilter');
+    const cat = document.getElementById('qbCategorySelect');
+    if (cat) { cat.hidden = true; cat.value = ''; }
+    qb.activeCategory = null;
+    if (domains) { domains.innerHTML = ''; domains.hidden = true; }
+    if (!levels) return;
+    const lv = ['K', 1, 2, 3, 4, 5, 6].map(g => `<option value="${g}">${levelText(g)}</option>`).join('');
+    const dm = Object.entries(DOMAINS).map(([id, d]) => `<option value="${id}">${DOMAIN_SHORT[d.name] || d.name}</option>`).join('');
+    levels.setAttribute('role', 'group');
+    levels.setAttribute('aria-label', 'Filters');
+    levels.classList.add('tvq-selects');
+    levels.innerHTML = `<label class="tv-sr" for="qbLevelSelect">Level</label><select id="qbLevelSelect" class="tv-select"><option value="">All levels</option>${lv}</select>`
+        + `<label class="tv-sr" for="qbDomainSelect">Domain</label><select id="qbDomainSelect" class="tv-select"><option value="">All domains</option>${dm}</select>`;
+    const ls = levels.querySelector('#qbLevelSelect');
+    const ds = levels.querySelector('#qbDomainSelect');
+    const cur = [...qb.activeGrades][0];
+    if (cur) ls.value = cur;
+    if (qb.activeDomain) ds.value = qb.activeDomain;
+    ls.addEventListener('change', () => { qb.activeGrades = new Set(ls.value ? [ls.value] : []); qbApplyFilters(); });
+    ds.addEventListener('change', () => { qb.activeDomain = ds.value || null; qbApplyFilters(); });
+}
+
 function qbBuildDomainPills() {
     const container = document.getElementById('qbDomainFilter');
     if (!container) return;
+    if (isTeacher()) { qbBuildTeacherFilters(); return; }
+    container.hidden = false;
 
     let html = `<span class="qb-filter-label" id="qbDomainLabel">Domain:</span>`;
     html += `<button type="button" class="qb-domain-pill active" aria-pressed="true" data-qb-filter-domain="" onclick="qbFilterDomain('')">All</button>`;
@@ -381,6 +421,10 @@ function qbBuildDomainPills() {
 function qbBuildGradePills() {
     const container = document.getElementById('qbGradeFilter');
     if (!container) return;
+    if (isTeacher()) return;   // qbBuildTeacherFilters drew the teacher's one filter row
+    container.classList.remove('tvq-selects');
+    const cat = document.getElementById('qbCategorySelect');
+    if (cat) cat.hidden = false;
 
     let html = `<span class="qb-filter-label">${isTeacher() ? 'Level' : 'Grade'}:</span>`;
     // K-6: the app has no grade 7 skills (a 7 chip filtered to nothing).
@@ -729,7 +773,7 @@ export function addSection() {
     qb.activeSection = nextIdx;
     qbRenderSectionList();
     qbUpdateCounts();
-    window.showToast('Section added', 'success');
+    note('Section added', 'success');
 }
 
 export function removeSection(sIdx) {
@@ -744,7 +788,7 @@ export function removeSection(sIdx) {
     qb.collapsedSections = {};
     qbRenderSectionList();
     qbUpdateCounts();
-    window.showToast('Section removed', 'success');
+    note('Section removed', 'success');
 }
 
 export function reorderSection(sIdx, dir) {
@@ -799,7 +843,7 @@ export function shuffleSectionQuestions(sIdx) {
     shuffle(section.questions);
     section.questions.forEach((q, i) => q.id = i);
     qbRenderSectionList();
-    window.showToast(`${section.label} shuffled`, 'success');
+    note(`${section.label} shuffled`, 'success');
 }
 
 export function moveQuestionToSection(fromSIdx, qIdx, toSIdx) {
@@ -814,7 +858,7 @@ export function moveQuestionToSection(fromSIdx, qIdx, toSIdx) {
     toSection.questions.forEach((qq, i) => qq.id = i);
     qbRenderSectionList();
     qbUpdateCounts();
-    window.showToast(`Moved to ${toSection.label}`, 'success');
+    note(`Moved to ${toSection.label}`, 'success');
 }
 
 // ========= QUESTION MANAGEMENT =========
@@ -849,7 +893,7 @@ export function addMultipleQuestions(skillId, count) {
 
     qbRenderSectionList();
     qbUpdateCounts();
-    window.showToast(`Added ${count} question${count > 1 ? 's' : ''} to ${section.label}`, 'success');
+    note(`Added ${count} question${count > 1 ? 's' : ''} to ${section.label}`, 'success');
 }
 
 export function regenerateQuizQuestion(sectionIdx, questionIdx) {
@@ -865,7 +909,7 @@ export function regenerateQuizQuestion(sectionIdx, questionIdx) {
         if (qData) {
             q.questionData = quizQuestionData(qData);
             qbRenderSectionList();
-            window.showToast('Question regenerated', 'success');
+            note('Question regenerated', 'success');
         }
     } catch (e) {
         console.warn('Failed to regenerate question', e);
@@ -893,7 +937,7 @@ export function duplicateQuizQuestion(sectionIdx, questionIdx) {
             section.questions.forEach((qq, i) => qq.id = i);
             qbRenderSectionList();
             qbUpdateCounts();
-            window.showToast('Question duplicated', 'success');
+            note('Question duplicated', 'success');
         }
     } catch (e) {
         console.warn('Failed to duplicate question', e);
@@ -999,8 +1043,13 @@ function qbRenderSectionList() {
         html += `<div class="qb-section-header-left">`;
         html += `<button type="button" class="qb-section-collapse" aria-expanded="${!isCollapsed}" aria-label="${isCollapsed ? 'Show' : 'Hide'} the questions in ${escHtml(section.label)}" onclick="event.stopPropagation();toggleSectionCollapse(${sIdx})">${isCollapsed ? icon('chevR', 16) : icon('chevD', 16)}</button>`;
         html += `<input class="qb-section-label-input" value="${escHtml(section.label)}" aria-label="Section name" onclick="event.stopPropagation()" onchange="updateSectionLabel(${sIdx}, this.value)" style="border-color:${color}">`;
-        html += `<span class="qb-section-count">${section.questions.length} Q${section.questions.length !== 1 ? 's' : ''}</span>`;
-        html += `<span class="qb-section-layout-badge">${colLabel}</span>`;
+        if (isTeacher()) {
+            const n = section.questions.length;
+            html += `<span class="qb-section-count">${n} question${n !== 1 ? 's' : ''}</span>`;
+        } else {
+            html += `<span class="qb-section-count">${section.questions.length} Q${section.questions.length !== 1 ? 's' : ''}</span>`;
+            html += `<span class="qb-section-layout-badge">${colLabel}</span>`;
+        }
         html += `</div>`;
         html += `<div class="qb-section-actions" onclick="event.stopPropagation()">`;
 
@@ -1167,10 +1216,10 @@ function qbUpdateCounts() {
     if (countEl) countEl.textContent = count;
 
     const pointsEl = document.getElementById('qbTotalPoints');
-    if (pointsEl) pointsEl.textContent = `${points} points`;
+    if (pointsEl) pointsEl.textContent = `${points} point${points !== 1 ? 's' : ''}`;
 
     const toolbarInfo = document.getElementById('qbToolbarInfo');
-    if (toolbarInfo) toolbarInfo.textContent = `${count} question${count !== 1 ? 's' : ''} \u00B7 ${points} total points`;
+    if (toolbarInfo) toolbarInfo.textContent = `${count} question${count !== 1 ? 's' : ''} \u00B7 ${points} point${points !== 1 ? 's' : ''} in all`;
 
     const countWrap = document.getElementById('qbHeaderCount');
     if (countWrap) countWrap.style.display = count > 0 ? 'flex' : 'none';
@@ -1186,6 +1235,10 @@ function qbUpdateCounts() {
 
     const resultsBtn = document.getElementById('qbResultsBtn');
     if (resultsBtn) resultsBtn.disabled = !builderTest.id;
+    const deleteBtn = document.getElementById('qbDeleteBtn');
+    if (deleteBtn) deleteBtn.disabled = !builderTest.id;
+    const jump = document.getElementById('qbQuestionJumpCount');
+    if (jump) jump.textContent = `${count} question${count !== 1 ? 's' : ''}`;
     const monitorBtn = document.getElementById('qbMonitorBtn');
     if (monitorBtn) monitorBtn.disabled = !builderTest.id || !hasQuestions;
 }
@@ -1513,7 +1566,7 @@ export async function exportQuiz() {
     a.download = (builderTest.name || 'quiz') + '.json';
     a.click();
     URL.revokeObjectURL(url);
-    window.showToast('Quiz exported!', 'success');
+    note('Quiz exported!', 'success');
 }
 
 export async function importQuizFile() {
@@ -1526,10 +1579,10 @@ export async function importQuizFile() {
         const text = await file.text();
         try {
             await importTestJSON(text);
-            window.showToast('Quiz imported!', 'success');
+            note('Quiz imported!', 'success');
             openMyQuizzes();
         } catch (err) {
-            window.showToast('Invalid quiz file', 'error');
+            note('Invalid quiz file', 'error');
         }
     };
     input.click();

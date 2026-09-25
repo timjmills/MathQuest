@@ -156,7 +156,7 @@ function shellHTML() {
       <p class="tv-cap">Options belong to the skill and travel with it. ×2 comes up twice as often as ×1.</p>
       <div class="tv-row" style="font-size:12px;">
         <span class="tv-muted" style="font-weight:600;">Also use this set:</span>
-        <button type="button" class="tv-link" data-go="print">Print</button>
+        <button type="button" class="tv-link" data-go="print" style="min-width:44px;justify-content:center;">Print</button>
         <button type="button" class="tv-link" data-go="run">Run on the board</button>
         <button type="button" class="tv-link" data-go="quizzes">Make a quiz</button>
       </div>

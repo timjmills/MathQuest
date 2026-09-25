@@ -90,6 +90,9 @@ export function renderLibraryScreen(el) {
         root.dataset.built = '1';
         wire();
     }
+    // Arriving at the Library (the sidebar link, or back from a practice) shows the skill list:
+    // Standards coverage is a view opened from here, not a place the link remembers.
+    lib.mode = 'skills';
     syncControls();
     renderResults();
     renderDetail();
@@ -482,7 +485,7 @@ function onAction(act, btn) {
             if (lib.menu) root.querySelector('#tvlDetail .tv-menu button')?.focus();
             else root.querySelector('[data-lib-act="menu"]')?.focus();
             break;
-        case 'options': openOptions(s, btn); if (!lib.menu) root.querySelector('[data-lib-act="menu"]')?.focus(); break;
+        case 'options': openOptions(s, root.querySelector('[data-lib-act="menu"]') || btn); if (!lib.menu) root.querySelector('[data-lib-act="menu"]')?.focus(); break;
         case 'link': renderDetail(); copyLink(s); break;
         case 'quiz': makeQuiz(s); break;
         default: break;

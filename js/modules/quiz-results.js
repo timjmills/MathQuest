@@ -327,7 +327,7 @@ export async function showStudentQuizDetail(resultId, testId) {
 export async function exportQuizCSV(testId) {
     const csv = await exportResultsCSV(testId);
     if (!csv) {
-        window.showToast('No results to export', 'error');
+        note('No results to export', 'error');
         return;
     }
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -337,7 +337,7 @@ export async function exportQuizCSV(testId) {
     a.download = 'quiz-results.csv';
     a.click();
     URL.revokeObjectURL(url);
-    window.showToast('CSV exported!', 'success');
+    note('CSV exported!', 'success');
 }
 
 // ---- Import Student Results ----
@@ -363,10 +363,10 @@ export function importStudentResultsFile(testId) {
             }
         }
         if (imported > 0) {
-            window.showToast(`Imported ${imported} result${imported > 1 ? 's' : ''}`, 'success');
+            note(`Imported ${imported} result${imported > 1 ? 's' : ''}`, 'success');
             showQuizResults(testId);
         } else {
-            window.showToast('No valid result files found', 'error');
+            note('No valid result files found', 'error');
         }
     };
     input.click();

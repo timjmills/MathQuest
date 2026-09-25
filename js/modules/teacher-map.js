@@ -128,7 +128,7 @@ function sampleHTML() {
     const band = sampleBand();
     const pool = m.bands.length ? bandsFor(m.tier).filter((b) => m.bands.includes(b)) : bandsFor(m.tier);
     const skills = band ? bandSkills(band) : [];
-    const pick = skills.length ? skills[m.sampleIdx % skills.length] : null;
+    const pick = skills.length ? skills[sampleAt(skills.length)] : null;
     const hit = pick ? findSkill(pick.categoryId, pick.skillId) : null;
     const dom = pick ? DOMAINS.find((d) => d[0] === getMapDomain(pick.skillId)) : null;
     return `
@@ -148,8 +148,17 @@ function drawSample() {
     const band = sampleBand();
     const skills = band ? bandSkills(band) : [];
     if (!frame || !skills.length) return;
-    const pick = skills[m.sampleIdx % skills.length];
+    const pick = skills[sampleAt(skills.length)];
     mountSample(frame, pick.categoryId, pick.skillId, undefined, Math.floor(m.sampleIdx / skills.length));
+}
+
+/**
+ * Which of a band's skills the sample shows. A band lists its skills from the ones it starts with
+ * (181-190 opens with the first multiplication facts), so the first sample is taken from the
+ * middle of the list, where the band is most typical; Another question steps on from there.
+ */
+function sampleAt(n) {
+    return (Math.floor(n / 2) + m.sampleIdx) % n;
 }
 
 function bandsSummary() {
@@ -217,8 +226,11 @@ function render() {
         <dt>Mode</dt><dd>${esc(mode[1])}</dd>
         <dt>Questions</dt><dd>${m.mode === 'unlimited' ? 'No limit' : m.count}</dd>
         <dt>Domains</dt><dd>${domainNames.length === DOMAINS.length ? 'All four' : domainNames.length ? esc(domainNames.join(', ')) : 'None'}</dd>
-        <dt>Adaptive</dt><dd>${adaptive ? 'On' : 'Off'} · <button type="button" class="tv-link" data-map-act="settings">Change</button></dd>
       </dl>
+      <div class="tv-setting tvm-adaptive">
+        <div><div class="tv-h3" id="tvmAdL">Adaptive difficulty</div><p class="tv-cap" id="tvmAdD">Questions get harder or easier as the pupil answers. The same switch as in Settings.</p></div>
+        <button type="button" class="tv-switch" role="switch" aria-checked="${adaptive}" aria-labelledby="tvmAdL" aria-describedby="tvmAdD" data-map-act="adaptive"></button>
+      </div>
       ${ok ? '' : `<p class="tv-note" role="status">${!m.domains.length ? 'Choose at least one domain.' : !m.bands.length ? 'Choose at least one RIT band.' : 'No MAP skills match these choices.'}</p>`}
       <div class="tvm-go">
         <button type="button" class="tv-btn tv-btn-primary tv-btn-block" data-map-act="start"${ok ? '' : ' aria-disabled="true"'}>${icon('play', 18)}<span>Start MAP session</span></button>
@@ -252,6 +264,14 @@ async function onAct(act) {
         case 'all-bands': m.bands = bandsFor(m.tier).slice(); changed(); refocus('[data-map-act="all-bands"]'); return;
         case 'no-bands': m.bands = []; changed(); refocus('[data-map-act="no-bands"]'); return;
         case 'settings': window.tvGo?.('settings'); return;
+        case 'adaptive': {
+            const on = !(state.adaptiveModeEnabled === true);
+            if (typeof window.setAdaptiveModeEnabled === 'function') window.setAdaptiveModeEnabled(on);
+            else state.adaptiveModeEnabled = on;
+            render();
+            refocus('[data-map-act="adaptive"]');
+            return;
+        }
         case 'another': m.sampleIdx += 1; drawSample(); return;
         default: break;
     }

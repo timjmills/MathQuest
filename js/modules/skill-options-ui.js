@@ -109,10 +109,38 @@ export function escHTML(s) {
         .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+/**
+ * A skill's NAME is its declaration (CLAUDE.md): a control whose choices would contradict it is not
+ * offered. "Subtract within 100 (No Regrouping)" gets no Regrouping control (its "Every item" would
+ * break the name), a skill named "with regrouping" none either (its "Never" would), and a
+ * "within N" skill keeps only the number ranges that stay within N.
+ */
+export function nameFitOptions(categoryId, skillId, defs) {
+    const list = SKILLS[categoryId];
+    const hit = Array.isArray(list) ? list.find(x => x && x.v === skillId) : null;
+    const name = `${hit && hit.l ? hit.l : ''} ${String(skillId).replace(/_/g, ' ')}`.toLowerCase();
+    const noRegroup = /\bno regroup|\bwithout regroup|\bno borrow|\bno carry|\bnr\b/.test(name);
+    const withRegroup = !noRegroup && /\bwith regroup|\bregrouping\)|\bwith borrow|\bwith carry/.test(name);
+    const within = name.match(/\bwithin (\d[\d,]*)/);
+    const cap = within ? Number(within[1].replace(/,/g, '')) : null;
+    const out = [];
+    for (const def of defs || []) {
+        if (def.id === 'regroup' && /regroup|carry|borrow/i.test(String(def.label || '')) && (noRegroup || withRegroup)) continue;
+        if (def.id === 'range' && cap && Array.isArray(def.values)) {
+            const values = def.values.filter(x => typeof x.v !== 'number' || x.v <= cap);
+            if (values.length < 2) continue;
+            out.push(values.length === def.values.length ? def : { ...def, values });
+            continue;
+        }
+        out.push(def);
+    }
+    return out;
+}
+
 /** True when a skill has at least one control worth showing (see offeredOptionsFor). */
 export function skillHasOfferedOptions(categoryId, skillId) {
     if (!categoryId || !skillId) return false;
-    try { return offeredOptionsFor(categoryId, skillId).length > 0; } catch (e) { return false; }
+    try { return nameFitOptions(categoryId, skillId, offeredOptionsFor(categoryId, skillId)).length > 0; } catch (e) { return false; }
 }
 
 /**
@@ -275,7 +303,7 @@ export function skillOptionsPanelHTML(hostId, idx, categoryId, skillId, color = 
     const host = _hosts.get(hostId);
     if (!host) return '';
     const e = { categoryId, skillId };
-    const defs = offeredOptionsFor(categoryId, skillId);
+    const defs = nameFitOptions(categoryId, skillId, offeredOptionsFor(categoryId, skillId));
     const cur = normalizeOptions(categoryId, skillId, _read(host, idx, e));
     const hq = _q(hostId);
     const handlers = {
@@ -318,7 +346,7 @@ export function skoEdit(hostId, idx, action, optId, raw) {
     const host = _hosts.get(hostId);
     const e = host && host.entry(idx);
     if (!e) return;
-    const defs = offeredOptionsFor(e.categoryId, e.skillId);
+    const defs = nameFitOptions(e.categoryId, e.skillId, offeredOptionsFor(e.categoryId, e.skillId));
     const next = applyOptionEdit({ ...normalizeOptions(e.categoryId, e.skillId, _read(host, idx, e)) }, defs, action, optId, raw);
     _write(host, idx, e, next);
     host.rerender();
@@ -377,7 +405,7 @@ function _renderTeacherPopover(el) {
     const { categoryId, skillId } = _pop;
     const dark = document.documentElement.classList.contains('dark');
     const color = dark ? '#8c98f0' : '#3b4bc8';
-    const defs = offeredOptionsFor(categoryId, skillId);
+    const defs = nameFitOptions(categoryId, skillId, offeredOptionsFor(categoryId, skillId));
     const cur = normalizeOptions(categoryId, skillId, _pop.opts);
     const handlers = {
         set: (optId, expr) => `skoEdit('popover',0,'set','${optId}',${expr})`,
@@ -388,7 +416,7 @@ function _renderTeacherPopover(el) {
         const line = optionHelpLine(def);
         const help = line ? `<p class="tv-sko-help">${escHTML(line)}</p>` : '';
         return `<div class="tv-sko-row">${optionControlHTML(def, cur, color, handlers)}${help}</div>`;
-    }, 'font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--tv-caption);margin:14px 0 0;');
+    }, 'font-size:13px;line-height:18px;font-weight:700;color:var(--tv-text);margin:16px 0 0;');
     const chosen = Object.keys(_pop.opts || {}).length ? describeOptions(categoryId, skillId, _pop.opts) : '';
     const summary = !defs.length ? 'No options to set' : (chosen || 'Standard settings');
     const name = _skillName(categoryId, skillId);
@@ -405,14 +433,16 @@ function _renderTeacherPopover(el) {
             <div><h2 class="tv-sko-title" id="tvSkoTitle">${escHTML(name)}</h2><p class="tv-sko-sum">${escHTML(summary)}</p></div>
             <button type="button" class="tv-icon-btn" onclick="closeSkillOptionsPanel()" aria-label="Close options"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg></button>
         </div>
+        ${canSample ? `<div class="tv-sko-sample is-pinned"><span class="tv-label" id="tvSkoSampleL">Sample question</span><div class="tvp-frame tv-sko-frame" aria-labelledby="tvSkoSampleL"></div></div>` : ''}
         <div class="tv-sko-body">
             ${defs.length ? rows : '<p class="tv-sko-none">This skill has no options.</p>'}
-            ${canSample ? `<div class="tv-sko-sample"><span class="tv-label" id="tvSkoSampleL">Sample question</span><div class="tvp-frame tv-sko-frame" aria-labelledby="tvSkoSampleL"></div></div>` : ''}
         </div>
         <div class="tv-sko-foot">
             ${defs.length ? `<button type="button" class="tv-btn" onclick="skoReset('popover',0)">Reset to default</button>` : ''}
             <button type="button" class="tv-btn tv-btn-primary" onclick="closeSkillOptionsPanel()">Done</button>
         </div>`;
+    // Teacher-styled drop-downs (the shared control draws the pupil app's inline look).
+    el.querySelectorAll('.tv-sko-body select').forEach(sel => { sel.removeAttribute('style'); sel.classList.add('tv-select'); });
     const body = el.querySelector('.tv-sko-body');
     if (body) body.scrollTop = scroll;
     if (focusAt >= 0) {
@@ -467,7 +497,7 @@ function _renderPopover() {
     if (_isTeacherView()) { _renderTeacherPopover(el); return; }
     const color = '#6d28d9';
     const { categoryId, skillId } = _pop;
-    const defs = offeredOptionsFor(categoryId, skillId);
+    const defs = nameFitOptions(categoryId, skillId, offeredOptionsFor(categoryId, skillId));
     const cur = normalizeOptions(categoryId, skillId, _pop.opts);
     const handlers = {
         set: (optId, expr) => `skoEdit('popover',0,'set','${optId}',${expr})`,
