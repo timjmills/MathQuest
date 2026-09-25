@@ -68,15 +68,41 @@ export const OPTION_KEYS = {
     tiles: 'Y',
     // P11 K-2 counting (2026-09-25): the last free letter.
     objects: 'J',
+    // P10 time + money (2026-09-25). TWO-CHARACTER KEYS: every letter is taken, so a new
+    // option's key is a BLOCK DIGIT + a letter (the key registry, js/modules/skill-option-keys.js
+    // on main, allocates the blocks: block 0 is P9's, block 1 is P10's). A field that starts with
+    // a digit followed by a letter is a two-character key; a payload whose first character is a
+    // digit NOT followed by a letter is a later format version. Encoders write two-character
+    // fields AFTER every one-letter field, so an older decoder still reads the letters it knows.
+    review: '1A',
+    stimulus: '1B',
+    words: '1C',
+    precision: '1D',
+    hours: '1E',
+    noon: '1F',
+    currency: '1G',
+    kind: '1H',
+    values: '1I',
+    paid: '1J',
+    sign: '1K',
+    gap: '1L',
+    members: '1M',
+    numerals: '1N',
 };
+/** A two-character key: a block digit and a letter (see `review` above). */
+const isEscapedKey = (k) => /^\d[A-Z]$/.test(k);
 const KEY_TO_OPTION = Object.fromEntries(Object.entries(OPTION_KEYS).map(([id, k]) => [k, id]));
 
 // String values get a one-letter token per option. APPEND-ONLY, unique within an option.
 // Integer values are written as themselves: base 36, one character, inside a set ({7, 8} -> "78",
 // {10, 11} -> "AB"); decimal digits for a single enum / int value (Max Number 1,000 -> "1000").
 export const VALUE_TOKENS = {
-    notation: { stacked: 'S', across: 'A', bracket: 'B', fraction: 'F' },
-    response: { standard: 'S', 'which-numbers': 'W', 'array-builder': 'A', write: 'R', 'circle-all': 'C' },
+    notation: { stacked: 'S', across: 'A', bracket: 'B', fraction: 'F',
+        // P10 elapsed_visual_* (appended)
+        analog: 'G', digital: 'D', mixed: 'M' },
+    response: { standard: 'S', 'which-numbers': 'W', 'array-builder': 'A', write: 'R', 'circle-all': 'C',
+        // P10 time + money (appended)
+        draw: 'D', hm: 'H', minutes: 'Z', ring: 'Y', sign: 'G' },
     regroup: { none: 'N', always: 'A', mixed: 'M' },
     orientation: { vertical: 'V', horizontal: 'H',
         // P11 count_objects arrangement (appended)
@@ -85,18 +111,39 @@ export const VALUE_TOKENS = {
     wordform: { to_number: 'N', to_words: 'W' },
     dir: { more: 'M', less: 'L', both: 'B',
         // P11 counting / comparing (appended)
-        fewer: 'F', same: 'S', mixed: 'X', forward: 'W', back: 'K' },
+        fewer: 'F', same: 'S', mixed: 'X', forward: 'W', back: 'K',
+        // P10 time + money (appended)
+        past: 'P', to: 'T', later: 'A', earlier: 'E', 'to-digital': 'G', 'to-analog': 'D' },
     task: { read: 'R', count: 'C', compute: 'P', closest: 'N', reasonable: 'E',
         // P11 compare_objects (appended)
-        length: 'L', height: 'H', thickness: 'T', all: 'A' },
+        length: 'L', height: 'H', thickness: 'T', all: 'A',
+        // P10 time + money (appended)
+        find: 'J', order: 'V', collection: 'K', words: 'Y', missing: 'Z', numerals: 'G', hands: 'B' },
     zeroPlace: { none: 'N', some: 'S', always: 'A' },
     op: { x: 'M', '/': 'D' },
     order: { largest: 'L', scrambled: 'S' },
     midpoint: { never: 'N', seeded: 'S', only: 'O' },
     support: { cut: 'C', line: 'L', none: 'N', labels: 'B', chart: 'T',
         // P11 operations hint pictures (appended)
-        tile: 'D', frame: 'R', skip: 'K', array: 'A', think: 'H', bar: 'M' },
+        tile: 'D', frame: 'R', skip: 'K', array: 'A', think: 'H', bar: 'M',
+        // P10 time + money (appended)
+        plain: 'Y', ring: 'G', pupil: 'Z', auto: 'Q', dots: 'O' },
     objects: { shapes: 'S', pictures: 'P', frame: 'F', dice: 'D' },
+    // P10 time + money (appended to the options above, and the escaped options' own tables).
+    // `response`, `support`, `dir`, `task` and `notation` gain values here (see the P10 lines
+    // appended to each below), the new options take tables of their own.
+    review: { none: 'N', some: 'S' },
+    stimulus: { clock: 'C', words: 'W' },
+    words: { numerals: 'M', past: 'P', oh: 'O' },
+    noon: { never: 'N', seeded: 'S', across: 'A' },
+    numerals: { all: 'A', quarters: 'Q', twelve: 'T' },
+    currency: { plain: 'P', qar: 'Q', usd: 'U' },
+    kind: { like: 'L', two: 'T', mixed: 'M', notes: 'N', 'notes-coins': 'C' },
+    values: { 50: 'Z' },
+    paid: { unit: 'U', note: 'N' },
+    gap: { far: 'F', near: 'N' },
+    members: { time_hour: 'H', time_half_hour: 'A', time_quarter: 'Q', time_5min: '5', time_1min: '1', time_analog_digital: 'D', time_match_clock: 'M' },
+    step: { 45: 'X' },
     // Numeric sets whose members are not all under 36: one digit per power of ten.
     power: { 10: '1', 100: '2', 1000: '3' },
     places: { 1: '0', 10: '1', 100: '2', 1000: '3', 10000: '4', 100000: '5' },
@@ -137,24 +184,26 @@ function _fromToken(optId, def, tok, inSet) {
 export function encodeOptionPayload(categoryId, skillId, opts) {
     const packed = packOptions(categoryId, skillId, opts);
     const fields = [];
+    const escaped = [];         // two-character keys go last (see OPTION_KEYS)
     for (const def of optionsFor(categoryId, skillId)) {
         if (!(def.id in packed)) continue;
         const key = OPTION_KEYS[def.id];
         if (!key) continue;
         const v = packed[def.id];
+        const out = isEscapedKey(key) ? escaped : fields;
         try {
             if (def.type === 'set') {
                 const order = (def.values || []).map(x => x.v);
                 const list = (Array.isArray(v) ? v : []).slice().sort((a, b) => order.indexOf(a) - order.indexOf(b));
-                fields.push(key + list.map(x => _setToken(def.id, x)).join(''));
+                out.push(key + list.map(x => _setToken(def.id, x)).join(''));
             } else if (def.type === 'bool') {
-                fields.push(key + (v ? '1' : '0'));
+                out.push(key + (v ? '1' : '0'));
             } else if (v !== null && v !== undefined) {
-                fields.push(key + _scalarToken(def.id, v));
+                out.push(key + _scalarToken(def.id, v));
             }
         } catch (e) { /* an unencodable value stays at its default rather than corrupting the code */ }
     }
-    return fields.join('_');
+    return fields.concat(escaped).join('_');
 }
 
 /** "~" + payload, or '' — the form every share-code writer appends to a skill reference. */
@@ -172,15 +221,18 @@ export function decodeOptionPayload(categoryId, skillId, payload) {
     let p = String(payload == null ? '' : payload).trim().toUpperCase();
     if (p.startsWith('~')) p = p.slice(1);
     if (!p) return {};
-    if (/^\d/.test(p)) return {};             // a later format version: ignore, never misread
+    // A later format version starts with a digit that is NOT followed by a letter: ignore it,
+    // never misread. A digit followed by a letter is a two-character key (P9 / P10 blocks).
+    if (/^\d(?![A-Z])/.test(p)) return {};
     const defs = optionsFor(categoryId, skillId);
     const raw = {};
     for (const field of p.split('_')) {
         if (!field) continue;
-        const optId = KEY_TO_OPTION[field[0]];
+        const klen = isEscapedKey(field.slice(0, 2)) ? 2 : 1;
+        const optId = KEY_TO_OPTION[field.slice(0, klen)];
         const def = optId && defs.find(d => d.id === optId);
         if (!def) continue;                    // an option this skill (or this app) does not know
-        const body = field.slice(1);
+        const body = field.slice(klen);
         if (def.type === 'set') {
             raw[optId] = [...body].map(t => _fromToken(optId, def, t, true)).filter(v => v !== undefined);
         } else if (def.type === 'bool') {

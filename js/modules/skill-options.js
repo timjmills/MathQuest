@@ -911,6 +911,269 @@ SKILL_OPTIONS['composing:number_word_form'] = [{
     help: 'Writing the words is harder (it is spelling too). Tick both and the page alternates.',
 }];
 
+// ===========================================================================
+// P10 · TIME + MONEY  (design/research/time-money.md §2.5, owner rulings of 2026-09-25 in §20)
+// ===========================================================================
+// One contiguous block, merged into SKILL_OPTIONS below. Every option here is READ by
+// js/modules/gen-time-money.js (the P10 generator, which gen-measurement.js hands its time and
+// money ids to); an option the generator ignores is not declared (SCC-P11). Defaults are the
+// stand-alone values (R2).
+//
+// THE OWNER'S RULINGS THESE CARRY (§20):
+//   Q1  `currency` on every money skill: Plain numbers (the DEFAULT) / Qatari riyal / US dollar.
+//       The coin drawing never changes with it (generic value circles, RP-110); only the value set
+//       (the 50 coin at QR only, Q2), the notes and the unit words do.
+//   Q4  `response`: write the time / draw the hands, on each clock-reading skill. No new skill;
+//       the hidden 30% "Set the clock" branch is gone.
+//   Q5  elapsed time: the timeline is the working line (`support`); the answer is `__ h __ min`,
+//       or total minutes (`response: minutes`, grade 4); two clock faces are `notation` on the
+//       "Time Between Two Clocks" skills.
+//   Q11 `words`: both spoken forms — "5 minutes past 2" / "five past two", and "two-oh-five".
+//       Pupils always WRITE digital.
+//   Q6, Q7, Q10, Q12 bands and coin counts, quarter past / to as separate steps, ordering within
+//       one morning by default, QR coin pages deal 25 and 50 first.
+const _tmResponse = () => ({
+    id: 'response', label: 'How the pupil answers', type: 'enum', default: 'write', group: 'layout',
+    values: [{ v: 'write', l: 'Write the time' }, { v: 'draw', l: 'Draw the hands' }],
+    help: 'One way per page. "Draw the hands" prints an empty clock face big enough to draw two hands in pencil; on screen the pupil sets the hands.',
+});
+const _tmReview = () => ({
+    id: 'review', label: 'Review earlier times', type: 'enum', default: 'none', group: 'difficulty',
+    values: [{ v: 'none', l: 'None: only this step\'s times' }, { v: 'some', l: 'Some (1 in 6 from the steps before)' }],
+    help: 'A step deals only its new clock positions. "Some" mixes in one earlier time in every six.',
+});
+const _tmFace = () => ({
+    id: 'support', label: 'Minute ring', type: 'enum', default: 'plain', group: 'support',
+    values: [{ v: 'plain', l: 'Only on Model and Guided pages' }, { v: 'ring', l: 'On every page (5, 10, 15 ... round the face)' }],
+    help: 'The ring of minute numbers is a hint: it fades on Independent pages unless you keep it here.',
+});
+const _tmStimulus = () => ({
+    id: 'stimulus', label: 'What the pupil reads', type: 'enum', default: 'clock', group: 'difficulty',
+    values: [{ v: 'clock', l: 'A clock (write) or digital time (draw)' }, { v: 'words', l: 'The time in words' }],
+    help: '"The time in words" is its own step: "twenty past 7". The pupil always writes the digital time.',
+});
+const _tmWords = () => ({
+    id: 'words', label: 'Time in words, said as', type: 'enum', default: 'numerals', group: 'difficulty',
+    values: [
+        { v: 'numerals', l: '"5 minutes past 2"' },
+        { v: 'past', l: '"five past two"' },
+        { v: 'oh', l: '"two-oh-five"' },
+    ],
+    help: 'Say it the way your class says it. The written answer is always digital (2:05).',
+});
+// The numbers printed on the clock face (P12 self-score O3): all twelve is the structural face;
+// 12, 3, 6 and 9 only, then 12 only, are the fade a pupil who reads by position works towards.
+const _tmNumerals = () => ({
+    id: 'numerals', label: 'Numbers on the clock', type: 'enum', default: 'all', group: 'support',
+    values: [{ v: 'all', l: 'All 12 numbers' }, { v: 'quarters', l: '12, 3, 6 and 9 only' }, { v: 'twelve', l: '12 only' }],
+    help: 'Fewer numbers is harder: the pupil reads the hands by their position.',
+});
+// Which coins a money page may use (P12 self-score O1): the currency's usual coins, or a chosen few.
+const _tmCoinSet = (help) => ({
+    id: 'values', label: 'Coins used', type: 'set', default: [], group: 'difficulty',
+    values: [{ v: 1, l: '1' }, { v: 5, l: '5' }, { v: 10, l: '10' }, { v: 25, l: '25' }, { v: 50, l: '50 (Qatari riyal only)' }],
+    allLabel: 'The currency\'s usual coins',
+    help: help || 'Leave all unticked for the usual coins (at Qatari riyal: 25 and 50 first). Tick a few to use only those.',
+});
+const _tmPrecision = (dflt = 5, withOne = true) => ({
+    id: 'precision', label: 'Times to the nearest', type: 'enum', default: dflt, group: 'difficulty',
+    values: [
+        { v: 60, l: 'Hour' }, { v: 30, l: 'Half hour' }, { v: 15, l: 'Quarter hour' }, { v: 5, l: '5 minutes' },
+        ...(withOne ? [{ v: 1, l: '1 minute' }] : []),
+    ],
+    help: 'The clock positions the page uses.',
+});
+const _tmDir = () => ({
+    id: 'dir', label: 'Later or earlier', type: 'enum', default: 'later', group: 'difficulty',
+    values: [{ v: 'later', l: 'Later (find the end)' }, { v: 'earlier', l: 'Earlier (find the start)' }],
+    help: '"Earlier" counts back, which is harder. One direction per page.',
+});
+const _tmSupport = () => ({
+    id: 'support', label: 'Time line', type: 'enum', default: 'labels', group: 'support',
+    values: [
+        { v: 'labels', l: 'Time line with the hours written' },
+        { v: 'pupil', l: 'Time line, the pupil writes the hours' },
+        { v: 'none', l: 'No time line' },
+    ],
+    help: 'The pupil hops the hours, then the minutes, on the line. Most support first.',
+});
+const _tmSpan = (values, dflt) => ({
+    id: 'hours', label: 'Longest time', type: 'enum', default: dflt, group: 'difficulty',
+    values: values.map(v => ({ v, l: `${v} ${v === 1 ? 'hour' : 'hours'}` })),
+    help: 'The longest time on the page. The time line is drawn this long, so it never shows where the answer is.',
+});
+const _tmStep = (values, dflt) => ({
+    id: 'step', label: 'Minutes in steps of', type: 'enum', default: dflt, group: 'difficulty',
+    values: values.map(v => ({ v, l: `${v} ${v === 1 ? 'minute' : 'minutes'}` })),
+    help: 'The minutes each time uses. 5 and 1 are harder.',
+});
+const _tmNoon = () => ({
+    id: 'noon', label: 'Cross 12 noon', type: 'enum', default: 'never', group: 'difficulty',
+    values: [{ v: 'never', l: 'Never' }, { v: 'seeded', l: 'Some items cross noon (a.m. and p.m. printed)' }],
+    help: 'Going past 12 is its own hard case: 11:30 a.m. and 2 hours is 1:30 p.m.',
+});
+const _tmCurrency = () => ({
+    id: 'currency', label: 'Currency', type: 'enum', default: 'plain', group: 'layout',
+    values: [
+        { v: 'plain', l: 'Plain numbers (coins 1, 5, 10, 25; no sign)' },
+        { v: 'qar', l: 'Qatari riyal (dirham coins 1-50; riyal notes)' },
+        { v: 'usd', l: 'US dollar (cent coins; dollar notes)' },
+    ],
+    help: 'The coins are the same plain value circles in all three. A currency adds its unit words, its notes and, at Qatari riyal, the 50 coin.',
+});
+const _tmMoneyBand = (values, dflt) => ({
+    id: 'band', label: 'Totals to', type: 'enum', default: dflt, group: 'difficulty',
+    values: values.map(v => ({ v, l: v < 100 ? String(v) : v === 100 ? '100 (one riyal or dollar)' : `${v / 100} riyals or dollars` })),
+    help: 'The biggest total on the page, counted in coin units (100 is one riyal or one dollar).',
+});
+const _tmCents = (dflt) => ({
+    id: 'step', label: 'Prices in steps of', type: 'enum', default: dflt, group: 'difficulty',
+    values: [
+        { v: 100, l: 'Whole riyals or dollars (no point)' }, { v: 25, l: '25 dirhams or cents (2.25, 4.50)' },
+        { v: 5, l: '5 dirhams or cents (3.45)' }, { v: 1, l: 'Any amount (3.47)' },
+    ],
+    help: 'Whole units first; the point comes in with 25s, then 5s, then any amount.',
+});
+const _tmRegroup = (dflt) => ({ ...regroupOption(), default: dflt, group: 'difficulty',
+    help: 'Regrouping (a column makes 10 or more, or needs to borrow across the point) is the harder step.' });
+
+const _TM_READ = ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min'];
+const P10_TM_OPTIONS = {
+    'measurement:time_hour': [_tmResponse(), _tmStimulus(), _tmWords(), _tmNumerals()],
+    'measurement:time_half_hour': [_tmResponse(), _tmReview(), _tmStimulus(), _tmWords(), _tmNumerals()],
+    'measurement:time_quarter': [_tmResponse(), {
+        id: 'dir', label: 'Quarter past or quarter to', type: 'set', default: ['past', 'to'], group: 'difficulty',
+        values: [{ v: 'past', l: 'Quarter past (:15)' }, { v: 'to', l: 'Quarter to (:45)' }],
+        allLabel: 'Both, alternating',
+        help: 'Quarter to counts back from the next hour; it is a step of its own. Tick one for a single-step page.',
+    }, _tmReview(), _tmStimulus(), _tmWords(), _tmNumerals()],
+    'measurement:time_5min': [_tmResponse(), _tmReview(), _tmFace(), _tmStimulus(), _tmWords(), _tmNumerals()],
+    'measurement:time_1min': [_tmResponse(), _tmReview(), _tmFace(), _tmStimulus(), _tmWords(), _tmNumerals()],
+    'measurement:time_analog_digital': [{
+        id: 'dir', label: 'Which way', type: 'enum', default: 'to-digital', group: 'difficulty',
+        values: [{ v: 'to-digital', l: 'Clock to digital (write the time)' }, { v: 'to-analog', l: 'Digital to clock (check one of three)' }],
+        help: 'One direction per page.',
+    }, _tmPrecision(5), _tmNumerals()],
+    'measurement:time_match_clock': [_tmPrecision(5), _tmWords(), _tmNumerals()],
+    'measurement:elapsed_hour': [_tmDir(), _tmSpan([3, 5], 3), _tmSupport(), _tmResponse()],
+    'measurement:elapsed_30min': [_tmDir(), _tmSupport()],
+    'measurement:elapsed_15min': [_tmDir(), {
+        id: 'step', label: 'How many minutes', type: 'set', default: [15], group: 'difficulty',
+        values: [{ v: 15, l: '15 minutes' }, { v: 30, l: '30 minutes' }, { v: 45, l: '45 minutes' }],
+        allLabel: '15, 30 and 45, mixed',
+        help: 'Start with 15. Tick more to mix them on one page.',
+    }, _tmSupport()],
+    'measurement:elapsed_mixed': [_tmSpan([2, 3, 5], 3), _tmStep([15, 5, 1], 15), _tmSupport(), _tmNoon()],
+    'measurement:elapsed_find_duration': [{
+        id: 'response', label: 'How the pupil answers', type: 'enum', default: 'hm', group: 'layout',
+        values: [{ v: 'hm', l: 'Hours and minutes (__ h __ min)' }, { v: 'minutes', l: 'Total minutes (grade 4)' }],
+        help: '"Total minutes" adds the conversion 1 hour = 60 minutes (4.MD.A.1).',
+    }, _tmSpan([2, 3, 5], 3), _tmStep([15, 5, 1], 15), _tmSupport(), _tmNoon()],
+    'measurement:elapsed_find_start': [_tmSpan([2, 3, 5], 3), _tmStep([15, 5, 1], 15), _tmSupport(), _tmNoon()],
+    'measurement:money_count': [_tmCurrency(), {
+        id: 'kind', label: 'What to count', type: 'enum', default: 'like', group: 'difficulty',
+        values: [
+            { v: 'like', l: 'Coins that are all the same' }, { v: 'two', l: 'Two kinds of coin' },
+            { v: 'mixed', l: 'Mixed coins' }, { v: 'notes', l: 'Notes only' },
+            { v: 'notes-coins', l: 'Notes and coins (write two numbers)' },
+        ],
+        help: 'Teach them in this order: one kind, two kinds, mixed; notes; then notes and coins. Notes and coins need a currency.',
+    }, _tmCoinSet('Leave all unticked for the usual coins (at Qatari riyal: 25 and 50 first). Tick 10 alone for "count 10s".'), _tmMoneyBand([25, 50, 100, 500, 2000, 10000, 50000], 100), {
+        id: 'tiles', label: 'Coins at most', type: 'enum', default: 6, group: 'difficulty',
+        values: [{ v: 6, l: '6 coins' }, { v: 10, l: '10 coins' }],
+        help: '6 fit a half-width cell; 10 take a full-width row.',
+    }, {
+        id: 'order', label: 'Coins set out', type: 'enum', default: 'largest', group: 'difficulty',
+        values: [{ v: 'largest', l: 'Biggest first' }, { v: 'scrambled', l: 'Scattered (the pupil starts with the biggest)' }],
+        help: 'Scattered coins are harder: the pupil has to find the biggest coin first.',
+    }, {
+        id: 'support', label: 'Count-by-five dots', type: 'enum', default: 'auto', group: 'support',
+        values: [{ v: 'auto', l: 'Only on Model and Guided pages' }, { v: 'dots', l: 'On every page' }, { v: 'none', l: 'Never' }],
+        help: 'Dots under the number on each coin, one for each 5: a hint that fades.',
+    }],
+    'measurement:money': [_tmCurrency(), _tmMoneyBand([500, 2000, 10000], 2000), _tmCents(100), _tmRegroup('none')],
+    'measurement:money_change': [_tmCurrency(), _tmMoneyBand([100, 500, 2000, 10000], 500), _tmCents(25), _tmRegroup('mixed'), {
+        id: 'paid', label: 'Paid with', type: 'enum', default: 'unit', group: 'difficulty',
+        values: [{ v: 'unit', l: 'The next whole riyal or dollar' }, { v: 'note', l: 'The next note (a 10 for 7.40)' }],
+        help: 'Change from a note is the harder step.',
+    }],
+    'measurement:equiv_coin_sets': [_tmCurrency(), _tmMoneyBand([25, 50, 100], 50), _tmCoinSet()],
+    'measurement:make_change_least_coins': [_tmCurrency(), _tmMoneyBand([25, 50, 100], 50), _tmCoinSet('The rows of the table: the currency\'s coins, or only the ones you tick. Amounts are always makeable with the smallest ticked coin.')],
+    'measurement:enough_money': [_tmCurrency(), _tmMoneyBand([25, 50, 100, 500], 100), {
+        id: 'gap', label: 'How close to the price', type: 'enum', default: 'far', group: 'difficulty',
+        values: [{ v: 'far', l: 'Far (10 or more away)' }, { v: 'near', l: 'Near (1 to 5 away)' }],
+        help: 'Near the price is harder: the pupil must count exactly.',
+    }, _tmCoinSet()],
+    'measurement:coin_value': [_tmCurrency(), {
+        id: 'task', label: 'Task', type: 'enum', default: 'find', group: 'layout',
+        values: [{ v: 'find', l: 'Find every coin worth N' }, { v: 'order', l: 'Put notes in order, least first' }],
+        help: '"Put notes in order" is the Qatari-currency workbook row; it uses the notes of the currency.',
+    }],
+    'measurement:money_notation': [_tmCurrency(), {
+        id: 'task', label: 'The pupil reads', type: 'enum', default: 'collection', group: 'difficulty',
+        values: [{ v: 'collection', l: 'Notes and coins' }, { v: 'words', l: 'The amount in words' }],
+        help: 'Words ("2 riyals 50 dirhams") come after reading notes and coins.',
+    }, {
+        id: 'sign', label: 'Print the sign before the slot (QR, $)', type: 'bool', default: true, group: 'support',
+        help: 'Only with a currency: plain numbers never carry a sign.',
+    }],
+    'measurement:money_compare': [_tmCurrency(), _tmMoneyBand([25, 50, 100], 100), {
+        id: 'response', label: 'How the pupil answers', type: 'enum', default: 'ring', group: 'layout',
+        values: [{ v: 'ring', l: 'Check the one with more' }, { v: 'sign', l: 'Write <, > or =' }],
+        help: 'Writing the sign is the next step.',
+    }, _tmCoinSet()],
+    'measurement:clock_parts': [{
+        id: 'task', label: 'Task', type: 'enum', default: 'numerals', group: 'layout',
+        values: [{ v: 'numerals', l: 'Write the missing numbers' }, { v: 'hands', l: 'Which is the hour hand?' }],
+        help: 'One task per page.',
+    }],
+    'measurement:time_fives_ring': [{
+        id: 'task', label: 'Boxes to fill', type: 'enum', default: 'missing', group: 'support',
+        values: [{ v: 'missing', l: 'Some filled in, write the rest' }, { v: 'all', l: 'All empty, write them all' }],
+        help: 'Filling every box is the fade.',
+    }],
+    'measurement:mixed_time': [{
+        id: 'members', label: 'Mix these skills', type: 'set', default: _TM_READ.slice(), group: 'difficulty',
+        values: [
+            { v: 'time_hour', l: 'Time to the hour' }, { v: 'time_half_hour', l: 'Half hour' },
+            { v: 'time_quarter', l: 'Quarter hour' }, { v: 'time_5min', l: '5 minutes' }, { v: 'time_1min', l: '1 minute' },
+            { v: 'time_analog_digital', l: 'Analog and digital' }, { v: 'time_match_clock', l: 'Find the clock' },
+        ],
+        allLabel: 'All of them',
+        help: 'The review deals only the ticked skills, each at its own options.',
+    }],
+};
+for (const id of ['order_clocks_analog_asc', 'order_clocks_analog_desc', 'order_clocks_digital_asc', 'order_clocks_digital_desc']) {
+    P10_TM_OPTIONS[`measurement:${id}`] = [{
+        id: 'tiles', label: 'How many clocks', type: 'enum', default: 3, group: 'difficulty',
+        values: [{ v: 3, l: '3' }, { v: 4, l: '4' }, { v: 5, l: '5 (sizes S and M)' }],
+        help: 'More clocks is harder. Five clocks fit a row only at sizes S and M.',
+    }, _tmPrecision(15, false), _tmNumerals(), {
+        id: 'noon', label: 'Times from', type: 'enum', default: 'never', group: 'difficulty',
+        values: [{ v: 'never', l: 'One morning or one afternoon' }, { v: 'across', l: 'Across 12 o\'clock (a.m. and p.m. printed)' }],
+        help: '12:30 comes before 1:00 in the afternoon but not at night: crossing 12 is its own step.',
+    }];
+}
+for (const id of ['elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard']) {
+    P10_TM_OPTIONS[`measurement:${id}`] = [{
+        id: 'notation', label: 'The start and end are shown on', type: 'enum', default: 'analog', group: 'difficulty',
+        values: [{ v: 'analog', l: 'Two clock faces' }, { v: 'digital', l: 'Two digital times' }, { v: 'mixed', l: 'One of each' }],
+        help: 'The pupil reads both times, then hops on the time line.',
+    }, _tmSupport()];
+}
+Object.assign(SKILL_OPTIONS, P10_TM_OPTIONS);
+
+/** The P10 ids js/modules/gen-time-money.js generates (the audit's `tm` family). */
+export const TM_SKILLS = Object.freeze([
+    ..._TM_READ, 'time_analog_digital', 'time_match_clock',
+    'order_clocks_analog_asc', 'order_clocks_analog_desc', 'order_clocks_digital_asc', 'order_clocks_digital_desc',
+    'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
+    'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard',
+    'money_count', 'money', 'equiv_coin_sets', 'enough_money', 'make_change_least_coins', 'mixed_time',
+    'clock_parts', 'time_fives_ring', 'time_sense', 'elapsed_find_start', 'coin_value', 'money_notation', 'money_change', 'money_compare',
+]);
+// ============================ end P10 · time + money ============================
+
 // Options every skill understands, whether or not it declares anything of its own.
 export const UNIVERSAL_OPTIONS = [levelOption()];
 
