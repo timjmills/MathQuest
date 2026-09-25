@@ -1269,10 +1269,13 @@ const _tmPrecision = (dflt = 5, withOne = true) => ({
     ],
     help: 'The clock positions the page uses.',
 });
+// P10 critic round 3: the skills are named "... Later or Earlier", so the default page deals both
+// (alternately); one direction per page is a choice. `both` is appended, so older values keep
+// their place in a share code.
 const _tmDir = () => ({
-    id: 'dir', label: 'Later or earlier', type: 'enum', default: 'later', group: 'difficulty',
-    values: [{ v: 'later', l: 'Later (find the end)' }, { v: 'earlier', l: 'Earlier (find the start)' }],
-    help: '"Earlier" counts back, which is harder. One direction per page.',
+    id: 'dir', label: 'Later or earlier', type: 'enum', default: 'both', group: 'difficulty',
+    values: [{ v: 'later', l: 'Later (find the end)' }, { v: 'earlier', l: 'Earlier (find the start)' }, { v: 'both', l: 'Both, mixed on the page' }],
+    help: '"Earlier" counts back, which is harder. Choose one direction for a page of it alone.',
 });
 const _tmSupport = () => ({
     id: 'support', label: 'Time line', type: 'enum', default: 'labels', group: 'support',
@@ -1346,10 +1349,10 @@ const P10_TM_OPTIONS = {
     'measurement:elapsed_hour': [_tmDir(), _tmSpan([3, 5], 3), _tmSupport(), _tmResponse()],
     'measurement:elapsed_30min': [_tmDir(), _tmSupport()],
     'measurement:elapsed_15min': [_tmDir(), {
-        id: 'step', label: 'How many minutes', type: 'set', default: [15], group: 'difficulty',
+        id: 'step', label: 'How many minutes', type: 'set', default: [15, 30, 45], group: 'difficulty',
         values: [{ v: 15, l: '15 minutes' }, { v: 30, l: '30 minutes' }, { v: 45, l: '45 minutes' }],
         allLabel: '15, 30 and 45, mixed',
-        help: 'Start with 15. Tick more to mix them on one page.',
+        help: 'The name promises all three. Tick 15 alone for a first page of it.',
     }, _tmSupport()],
     'measurement:elapsed_mixed': [_tmSpan([2, 3, 5], 3), _tmStep([15, 5, 1], 15), _tmSupport(), _tmNoon()],
     'measurement:elapsed_find_duration': [{
@@ -1419,18 +1422,21 @@ const P10_TM_OPTIONS = {
         help: 'Filling every box is the fade.',
     }],
     'measurement:mixed_time': [{
-        id: 'members', label: 'Mix these skills', type: 'set', default: _TM_READ.slice(), group: 'difficulty',
+        // Critic round 3: "Mixed time skills" was read-the-clock only. The default now mixes
+        // reading, matching and elapsed time (hours and 30 minutes later or earlier).
+        id: 'members', label: 'Mix these skills', type: 'set', default: [..._TM_READ, 'time_match_clock', 'elapsed_30min', 'elapsed_hour'], group: 'difficulty',
         values: [
             { v: 'time_hour', l: 'Time to the hour' }, { v: 'time_half_hour', l: 'Half hour' },
             { v: 'time_quarter', l: 'Quarter hour' }, { v: 'time_5min', l: '5 minutes' }, { v: 'time_1min', l: '1 minute' },
             { v: 'time_analog_digital', l: 'Analog and digital' }, { v: 'time_match_clock', l: 'Find the clock' },
+            { v: 'elapsed_30min', l: '30 minutes later or earlier' }, { v: 'elapsed_hour', l: 'Hours later or earlier' },
         ],
         allLabel: 'All of them',
         // Share-code tokens in the pool scheme (skill-options-pools.js): the category letter "M"
         // plus the member's position in SKILLS.measurement, two base-36 characters. Positions are
         // stable: a skill is never spliced out of its category.
         tokens: { time_hour: 'M00', time_half_hour: 'M01', time_quarter: 'M02', time_5min: 'M03', time_1min: 'M04',
-            time_analog_digital: 'M05', time_match_clock: 'M06' },
+            time_analog_digital: 'M05', time_match_clock: 'M06', elapsed_30min: 'M0B', elapsed_hour: 'M0C' },
         tokenWidth: 3,
         help: 'The review deals only the ticked skills, each at its own options.',
     }],
@@ -1440,7 +1446,7 @@ for (const id of ['order_clocks_analog_asc', 'order_clocks_analog_desc', 'order_
         id: 'tiles', label: 'How many clocks', type: 'enum', default: 3, group: 'difficulty',
         values: [{ v: 3, l: '3' }, { v: 4, l: '4' }, { v: 5, l: '5 (sizes S and M)' }],
         help: 'More clocks is harder. Five clocks fit a row only at sizes S and M.',
-    }, _tmPrecision(15, false), ...(id.indexOf('analog') !== -1 ? [_tmNumerals()] : []), {
+    }, _tmPrecision(id.indexOf('analog') !== -1 ? 30 : 15, false), ...(id.indexOf('analog') !== -1 ? [_tmNumerals()] : []), {
         id: 'noon', label: 'Times from', type: 'enum', default: 'never', group: 'difficulty',
         values: [{ v: 'never', l: 'One morning or one afternoon' }, { v: 'across', l: 'Across 12 o\'clock (a.m. and p.m. printed)' }],
         help: '12:30 comes before 1:00 in the afternoon but not at night: crossing 12 is its own step.',

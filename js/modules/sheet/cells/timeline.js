@@ -71,7 +71,8 @@ function line(p, ctx) {
     while (perHour * step / 60 < 5 && step < 60) step = step < 5 ? 5 : step < 15 ? 15 : step < 30 ? 30 : 60;
     const x0 = 7, y = 19, W = AXIS_MM + 14;
     const X = (t) => x0 + (t - from) * perHour / 60;
-    const zone = zonePt(ctx) * PT_MM;
+    // Hour labels a pupil reads: 11 pt at least (RUBRIC C1; critic round 3 measured 9 pt).
+    const zone = Math.max(11, zonePt(ctx)) * PT_MM;
     let s = `<line x1="${n2(x0 - 3)}" y1="${y}" x2="${n2(x0 + AXIS_MM + 3)}" y2="${y}" stroke="${INK}" stroke-width="${n2(SW.heavy)}" data-tm-axis="1"/>`;
     for (let k = 0; k <= hours * 60; k += step) {
         const hourTick = k % 60 === 0;
@@ -81,8 +82,10 @@ function line(p, ctx) {
             s += `<text x="${n2(x)}" y="${n2(y + 4 + zone)}" text-anchor="middle" font-size="${n2(zone)}" font-weight="700" font-family="Andika, 'Open Sans', sans-serif" fill="${INK}" data-tm-hourlabel="1">${hourLabel(Math.floor((from + k) / 60), p.ampm)}</text>`;
         }
     }
-    // The given time(s): a solid dot on the line (a given, never the unknown).
-    const given = p.mode === 'later' ? [toMin(p.start)] : p.mode === 'duration' ? [toMin(p.start), toMin(p.end)] : [toMin(p.end)];
+    // The given time(s): a solid dot on the line (a given, never the unknown). When the times are
+    // GIVEN AS CLOCKS (elapsed_visual_*) the line stays bare: plotting them would let the pupil
+    // skip reading the clocks (critic round 3).
+    const given = p.faces ? [] : p.mode === 'later' ? [toMin(p.start)] : p.mode === 'duration' ? [toMin(p.start), toMin(p.end)] : [toMin(p.end)];
     for (const t of given) {
         const tt = t < from ? t + 1440 : t;
         s += `<circle cx="${n2(X(tt))}" cy="${y}" r="1.3" fill="${INK}" data-tm-given="1"/>`;
@@ -98,7 +101,7 @@ function line(p, ctx) {
             const b = hop.to < from ? hop.to + 1440 : hop.to;
             const xa = X(a), xb = X(b), mid = (xa + xb) / 2, hgt = Math.min(7.5, 3 + Math.abs(xb - xa) * 0.1);
             s += `<path d="M${n2(xa)} ${n2(y - 1)}Q${n2(mid)} ${n2(y - 1 - 2 * hgt)} ${n2(xb)} ${n2(y - 1)}" fill="none" stroke="${keyed ? col : INK}" stroke-width="${n2(keyed ? SW.heavy : SW.hair)}" data-tm-hop="1"/>`;
-            labels.push({ x: mid, y: y - 1 - hgt - 1, text: keyed ? hop.label : '' });
+            labels.push({ x: mid, y: y - 1 - hgt - 1, text: keyed ? hop.label : '', boxed: lv >= 2 });
         }
         if (keyed) {
             const u = unknownAt(p);
@@ -107,10 +110,12 @@ function line(p, ctx) {
     }
     // Hop labels: small boxes above each arc (scratch, not graded, not a screen input).
     const bw = 16, bh = S(ctx).writeMm;
+    // A page that printed no hop boxes (Independent, Test) gets its key's hop labels as pencil
+    // writing, not as boxes the pupil page never had (AK-1 facsimile; critic round 3).
     const boxes = labels.map((l) => `<span style="position:absolute;left:${L(ctx, l.x - bw / 2)};top:${L(ctx, Math.max(0, l.y - bh))};line-height:0;">`
         + `<span data-ws-slot="hop" data-ws-shape="box" data-ws-graded="0" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;`
-        + `width:${L(ctx, bw)};height:${L(ctx, bh)};border:${L(ctx, 0.26)} solid ${INK};border-radius:${L(ctx, 1.25)};background:#fff;`
-        + `font-size:${P(ctx, zonePt(ctx) + 1)};font-weight:700;color:${col};">${esc(l.text)}</span></span>`).join('');
+        + `width:${L(ctx, bw)};height:${L(ctx, bh)};${l.boxed ? `border:${L(ctx, 0.26)} solid ${INK};background:#fff;` : ''}border-radius:${L(ctx, 1.25)};`
+        + `font-size:${P(ctx, Math.max(11, zonePt(ctx) + 1))};font-weight:700;color:${col};white-space:nowrap;">${esc(l.text)}</span></span>`).join('');
     // Pupil-labelled hours (TE-5): empty write-in boxes under the hour ticks.
     const hourBoxes = p.support === 'pupil' ? Array.from({ length: hours + 1 }, (_, k) => {
         const x = X(from + 60 * k);
