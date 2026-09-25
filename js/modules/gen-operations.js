@@ -6,6 +6,7 @@ import { createBase10Blocks, createCountingDots, createDotArray, createNumberLin
 import { COLORS, STROKE, FONTS, MONO, softFill, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
 import { stripSegStyle, stripPos } from './sheet/tokens.js';
+import { renderCell as _kitRender } from './sheet/index.js';
 
 // ========================================
 // HOW IT IS WRITTEN — the `notation` option (skill-options.js)
@@ -1182,7 +1183,12 @@ function _generateLadderV2(q, skill, helpers, range) {
         // many digits the answer has. The regroup row then sits over tens AND hundreds, since
         // a tens column of four addends regroups into the hundreds.
         const widest = String(k * hi).length;
-        q.visual = _wsCell(_wsStack(addends, '+', { regroup: 'add', answer: 'boxes', width: widest }));
+        // The kit's `stack` template draws it: every addend on the digit tracks, the operator
+        // in its own track, a regroup strip over the tens and hundreds (SL-12) and an answer
+        // strip exactly as wide as the largest sum (never a box under the operator).
+        const _cmPayload = { operands: addends.slice(), op: '+', regroup: 'add', heads: false, answer: 'boxes', ansDigits: widest };
+        q.cell = { template: 'stack', v: 1, payload: _cmPayload };
+        q.visual = _kitStackTwin(_cmPayload);
         // The boxes ARE the slot: no second "Answer: ____" line under them (H8).
         q.selfAnswering = true;
         q.printFormat = 'column-add-multi';
@@ -1915,11 +1921,97 @@ export function agreeWithOne(text) {
         (m, pre, adj, noun) => (_NOT_PLURAL.test(noun) ? m : `${pre}1 ${adj}${_singularOf(noun)}`));
 }
 
+// ---------------------------------------------------------------- the sheet-kit cells (P8c)
+// The skills below draw ONE cell, through the sheet kit, on paper, on the key and on screen
+// (SKILL_CELL_CONTRACT.md §10.1). `q.cell` is what print and the key read; `q.visual` is the
+// same template rendered as its screen twin, whose writing places carry the markers
+// screen-cell.js turns into inputs (data-mq-cell / data-mq-blank).
+
+/** The screen twin of a kit template: the same drawing at the host's digit size. */
+function _kitTwin(template, payload, { join = null } = {}) {
+    let html = '';
+    try {
+        html = _kitRender({ cell: { template, v: 1, payload } }, { mode: 'screen', static: true, size: 'L', look: 'ican', state: 'blank' });
+    } catch (e) { html = ''; }
+    return join === null ? html : `<div data-mq-join="${join}">${html}</div>`;
+}
+
+/**
+ * The screen twin of a stack: the kit's `.ws-stack` in a `.ws-sheet` scope, its answer strip
+ * marked so each digit box becomes an input, typed digits composing the answer (join '').
+ */
+function _kitStackTwin(payload) {
+    let html = _kitTwin('stack', payload);
+    html = html.replace(/<span class="ab([^"]*)" data-ws-seg="([a-z]+)"><i([^>]*)><\/i><\/span>/g,
+        (m, g, seg, rest) => `<span class="ab${g}" data-ws-seg="${seg}"><i${rest} data-mq-cell="1"></i></span>`);
+    return `<div class="ws-sheet mq-kit" data-mq-join="">${html}</div>`;
+}
+
+/** Digits in the largest answer a basic-operations skill can reach at this Max Number (L-LEAK). */
+function _bandDigits(skill, op, range) {
+    if (skill === 'add_facts') return 2;
+    if (skill === 'mult_facts' || op === '×') return 3;
+    if (skill === 'div_facts' || op === '÷') return 2;
+    if (op === '-' || op === '−') return String(Math.max(10, Math.min(range, 999))).length;
+    return String(Math.max(10, Math.min(2 * range, 1998))).length;
+}
+
+const _KIT_FACT_SKILLS = new Set(['add_facts', 'mult_facts', 'div_facts', 'add', 'subtract']);
+const _KIT_OP = { '+': '+', '-': '-', '−': '-', '×': '*', '÷': '/' };
+
+/**
+ * add, subtract and the three fact drills. A two-operand item of up to two digits each is a
+ * FACT (the kit's `fact` template: the operator in its own track, the true minus, no regroup
+ * boxes, one open answer zone sized to the section's widest answer), in the notation the
+ * teacher chose; a wider column item is a `stack` with the regroup strip its page asks for.
+ * Decimals and the fraction form of ÷ keep their legacy cells.
+ */
+function _applyKitFactCell(q, skill, range) {
+    if (!_KIT_FACT_SKILLS.has(skill) || !q || q.cell) return;
+    if (state.decimalPlaces > 0) return;
+    const op = _KIT_OP[q.op];
+    const a = Number(q.a), b = Number(q.b);
+    if (!op || !Number.isInteger(a) || !Number.isInteger(b) || a < 0 || b < 0) return;
+    const digits = _bandDigits(skill, q.op, range);
+    const small = String(a).length <= 2 && String(b).length <= 2;
+    if (op === '/') {
+        const not = q.notation;
+        if (not === 'fraction') return;
+        if (not === 'bracket' || q._variant === 'long') {
+            const payload = { dividend: a, divisor: b, quotient: a / b, workRows: 0 };
+            q.cell = { template: 'division', v: 1, payload };
+            return;
+        }
+        q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: 'horiz', digits } };
+        return;
+    }
+    const across = q.notation === 'across' || /horizontal/.test(String(q.printFormat || ''));
+    if (small) {
+        q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: across ? 'horiz' : 'vertical', digits } };
+        if (!across && /column-(add|sub)/.test(String(q.printFormat || ''))) {
+            // A basic fact on screen is the same vertical fact: no place heads, no regroup row
+            // (screen-cell.js draws a `facts-column-visual` item with the kit's fact markup).
+            const glyph = op === '-' ? '\u2212' : q.op;
+            q.visual = `<div class="facts-column-visual" style="text-align:center;"><div style="display:inline-block;text-align:right;">`
+                + `<div>${a}</div><div><span>${glyph}</span> ${b}</div></div></div>`;
+            q.printFormat = op === '+' ? 'add-facts-vertical' : op === '-' ? 'sub-facts-vertical' : 'mult-facts-vertical';
+            q.notation = 'stacked';
+        }
+        return;
+    }
+    if (op === '+' || op === '-') {
+        const payload = { operands: [a, b], op, heads: false, ansDigits: digits };
+        if (q.regroup === false) payload.regroup = false;
+        q.cell = { template: 'stack', v: 1, payload };
+    }
+}
+
 export function generateOperationsQuestion(q, mappedSkill, helpers) {
     // One deal per question: advance the notation cursor and clear the per-item cache, so the
     // several call sites below that ask for this item's notation all get the same answer.
     _beginNotationItem();
     const result = _generateOperationsQuestionInner(q, mappedSkill, helpers);
+    try { _applyKitFactCell(q, mappedSkill, Number((helpers && helpers.range) || state.range || 100)); } catch (e) { /* the legacy cell stays */ }
     if (q && typeof q.text === 'string') q.text = agreeWithOne(q.text);
     if (q && typeof q.printText === 'string') q.printText = agreeWithOne(q.printText);
     // Auto-add vertical-column instruction + SVG diagram to horizontal add/sub
@@ -2198,34 +2290,21 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const a = rng(1, nlMax - 2);
                 const b = rng(1, Math.min(10, nlMax - a));
                 const safeSum = a + b;
-                const tickSpacing = 280 / nlMax; // px per unit (10..290 = 280px)
-                const NL_FACE = "'Andika', sans-serif";
-                const labelSize = nlMax <= 10 ? 11 : 9;
-
-                let ticks = '';
-                for (let v = 0; v <= nlMax; v++) {
-                    const x = (10 + v * tickSpacing).toFixed(2);
-                    const tickH = v % 5 === 0 ? 8 : 6;
-                    ticks += `<line x1="${x}" y1="${30 - tickH}" x2="${x}" y2="${30 + tickH}" stroke="${COLORS.axis}" stroke-width="${STROKE.hair}"/>`;
-                    ticks += `<text x="${x}" y="50" text-anchor="middle" font-family="${NL_FACE}" fill="${COLORS.text}" font-size="${labelSize}">${v}</text>`;
-                }
-
-                // The start point: a solid dot on the first addend. Nothing else is drawn.
-                const startX = (10 + a * tickSpacing).toFixed(2);
-
                 q.text = `Use the number line: ${a} + ${b} = ?`;
                 q.ans = safeSum;
                 q.a = a; q.b = b; q.op = '+';
                 q.answerType = 'number';
                 q.hint = `Start at ${a} on the number line. Jump forward ${b} times. Where do you land?`;
                 q.options = buildNumericOptions(safeSum);
-                q.visual = `<div style="text-align:center;">
-                    <svg width="500" height="100" viewBox="0 0 300 58" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:560px;height:auto;">
-                        <line x1="10" y1="30" x2="290" y2="30" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>
-                        ${ticks}
-                        <circle cx="${startX}" cy="30" r="3.2" fill="${COLORS.axis}"/>
-                    </svg>
-                </div>`;
+                // The kit's `number-line` template: every whole number labelled at the zone-label
+                // size on a line with a minimum pitch (never shrunk), the start marked, the pupil
+                // draws the jumps and writes the sum in the box after "=". The key draws the
+                // jumps and writes the sum in that same box. The screen twin's box takes the
+                // answer input (data-mq-blank).
+                const _nlPayload = { max: nlMax, start: a, add: b };
+                q.cell = { template: 'number-line', v: 1, payload: _nlPayload };
+                q.visual = _kitTwin('number-line', _nlPayload);
+                q.printText = 'Draw the jumps. Write the answer.';
                 q.printFormat = 'number-line-visual';
                 q.startOnly = true;       // print: no jumps, no "?" on the landing tick
                 q.nlMax = nlMax;          // print: one scale per page
@@ -3031,46 +3110,17 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.answerType = "number";
                 q.hint = `How many times does ${divisor} go into ${dividend}? Estimate: ${divisor} is about ${_est}. Divide, multiply, subtract, bring down.`;
 
-                // Long division visual format
-                const dividendStr = String(dividend);
-                const divisorStr = String(divisor);
-                const quotientStr = String(quotient);
-
-                // Build step-by-step for visual
-                let stepsHTML = '';
-                let remainder = 0;
-                let partialDividend = '';
-                const digitResults = [];
-
-                for (let i = 0; i < dividendStr.length; i++) {
-                    partialDividend += dividendStr[i];
-                    const partialNum = parseInt(partialDividend);
-                    const digitQuotient = Math.floor(partialNum / divisor);
-                    const product = digitQuotient * divisor;
-                    remainder = partialNum - product;
-                    digitResults.push({ partial: partialNum, digitQ: digitQuotient, product, remainder });
-                    partialDividend = String(remainder);
-                }
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Long Division</div>
-                    <div style="display:inline-block;background:var(--bg-card);border-radius:12px;padding:20px 30px;text-align:left;">
-                        <div style="display:flex;align-items:flex-end;gap:4px;font-family:monospace;">
-                            <div style="font-size:1.3rem;font-weight:700;color:var(--text-bright);padding-right:6px;align-self:center;">${divisorStr}</div>
-                            <div style="position:relative;">
-                                <div style="font-size:1.3rem;font-weight:700;letter-spacing:6px;color:var(--accent-orange);position:absolute;top:-28px;left:2px;">?</div>
-                                <div style="border-left:3px solid var(--accent-cyan);border-top:3px solid var(--accent-cyan);padding:4px 10px 2px 10px;border-top-left-radius:6px;font-size:1.3rem;font-weight:700;letter-spacing:4px;color:var(--text-bright);">${dividendStr}</div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>`;
-                // PRINT: the screen visual is already a division bracket; declare
-                // the format (and the operands it reads) so paper gets the real
-                // bracket cell with a work grid instead of a bare "? ÷ ? = ___"
-                // line. a / b are print operands only — q.op stays unset, so the
-                // step-by-step solution builder is untouched.
-                q.printFormat = "long-division";
+                // The sheet kit's `division` template draws the bracket on paper, on the key and
+                // on screen: quotient boxes over the dividend tracks, the divisor attached to the
+                // bracket, four work rows (a two-digit quotient's divide-multiply-subtract-bring
+                // down twice), Andika at the digit size. The screen twin's quotient boxes are
+                // typed one digit each and compose the quotient (data-mq-join="").
+                const _ldPayload = { dividend, divisor, quotient, workRows: 4 };
+                q.cell = { template: 'division', v: 1, payload: _ldPayload };
+                q.visual = _kitTwin('division', _ldPayload, { join: '' });
+                // `long-div-kit`, not 'long-division': screen-cell.js redraws 'long-division'
+                // items with its own quotient-only bracket, which has no work rows.
+                q.printFormat = "long-div-kit";
                 q.a = dividend;
                 q.b = divisor;
                 q.options = buildNumericOptions(quotient);
@@ -3204,15 +3254,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     showAll: true
                 };
                 q.printFormat = "fact-family-add-sub";
-
-                // Visual for screen: the four facts, one input each, no number list.
-                q.visual = `<div style="text-align:center;">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:500px;margin:0 auto;">
-                        ${equations.map((eq, i) => `<div style="padding:14px;background:var(--bg-card);border-radius:8px;">
-                            <div style="font-size:1.4rem;">${eq.text.replace('___', '<input type="text" class="fact-family-input" data-eq="' + i + '" data-answer="' + eq.ans + '" style="width:60px;height:44px;border:2px solid currentColor;border-radius:4px;text-align:center;font-size:1.3rem;" placeholder="?">')}</div>
-                        </div>`).join('')}
-                    </div>
-                </div>`;
+                // The kit's `fact-family` template: the number bond of the three numbers, then the
+                // four facts, one unbreakable line each, one box per fact (print, key and screen).
+                // The screen twin keeps the `fact-family-input` inputs the checkers read.
+                const _ffPayload = { a: addend1, b: addend2 };
+                q.cell = { template: 'fact-family', v: 1, payload: _ffPayload };
+                q.visual = _kitTwin('fact-family', _ffPayload);
                 q.options = [];
                 return;
             }
@@ -3669,35 +3716,6 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const cols = rng(2, arrMaxCols);
                 const total = rows * cols;
 
-                let pictureSVG;
-                if (questionType === 'equal_groups') {
-                    // `rows` groups of `cols`, each group ringed, dots three to a line inside it.
-                    const gr = 9, gp = 24, gpad = 10;
-                    const per = Math.min(3, cols), lines = Math.ceil(cols / per);
-                    const gw = gpad * 2 + (per - 1) * gp + gr * 2, gh = gpad * 2 + (lines - 1) * gp + gr * 2;
-                    const across = Math.min(rows, 5), down = Math.ceil(rows / across), sep = 14;
-                    const W = across * gw + (across - 1) * sep + 4, H = down * gh + (down - 1) * sep + 4;
-                    let body = '';
-                    for (let g = 0; g < rows; g++) {
-                        const ox = 2 + (g % across) * (gw + sep), oy = 2 + Math.floor(g / across) * (gh + sep);
-                        body += `<rect x="${ox}" y="${oy}" width="${gw}" height="${gh}" rx="${Math.min(gw, gh) / 2}" fill="none" stroke="currentColor" stroke-width="2"/>`;
-                        for (let i = 0; i < cols; i++) {
-                            body += `<circle cx="${ox + gpad + gr + (i % per) * gp}" cy="${oy + gpad + gr + Math.floor(i / per) * gp}" r="${gr}" fill="currentColor"/>`;
-                        }
-                    }
-                    pictureSVG = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto;color:#000;">${body}</svg>`;
-                } else {
-                    const pitch = 34, dotR = 12, pad = 6;
-                    const W = pad * 2 + cols * pitch, H = pad * 2 + rows * pitch;
-                    let dotsStr = '';
-                    for (let r = 0; r < rows; r++) {
-                        for (let c = 0; c < cols; c++) {
-                            dotsStr += `<circle cx="${pad + pitch / 2 + c * pitch}" cy="${pad + pitch / 2 + r * pitch}" r="${dotR}" fill="currentColor"/>`;
-                        }
-                    }
-                    pictureSVG = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto;color:#000;">${dotsStr}</svg>`;
-                }
-
                 if (questionType === 'count_all') {
                     q.text = `How many dots in all?`;
                     q.ans = total;
@@ -3732,7 +3750,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.options = [];
                 }
 
-                q.visual = `<div style="text-align:center;">${pictureSVG}</div>`;
+                // The kit's `arrays` template: dots of at least 4 mm on a fixed pitch (countable
+                // at any column count), equal groups ringed in a subitisable pattern, and one box
+                // per blank, all keyed. The screen twin draws the same picture.
+                const _agPayload = { kind: questionType, rows, cols };
+                q.cell = { template: 'arrays', v: 1, payload: _agPayload };
+                q.visual = _kitTwin('arrays', _agPayload);
                 q.printFormat = 'arrays-groups';
                 q.skillLabel = 'Arrays';
                 return;
@@ -3929,35 +3952,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const rows = new Set(picked.map(x => x.i));
                     if (rows.size === 3) break;
                 }
-                const isBlank = (i, j) => picked.some(x => x.i === i && x.j === j);
                 const ordered = picked.slice().sort((a, b) => a.i - b.i || a.j - b.j);
                 const products = ordered.map(x => (r0 + x.i) * (c0 + x.j));
-
-                const cell = `width:var(--mq-mc, 13mm);height:calc(var(--mq-mc, 13mm) * 0.85);box-sizing:border-box;`
-                    + `padding:0;text-align:center;vertical-align:middle;border:0.75pt solid ${_WS_INK};`
-                    + `font-size:calc(var(--mq-mc, 13mm) * 0.42);line-height:1;white-space:nowrap;`;
-                const head = `${cell}font-weight:700;`;
-                let slot = 0;
-                let table = `<table class="mq-multchart" style="border-collapse:collapse;margin:0 auto;table-layout:fixed;`
-                    + `font-family:'Andika','Open Sans',sans-serif;color:${_WS_INK};background:#fff;">`;
-                table += `<tr><td style="${head}border-right-width:1.5pt;border-bottom-width:1.5pt;">×</td>`;
-                for (let j = 0; j < C; j++) table += `<td style="${head}border-bottom-width:1.5pt;">${c0 + j}</td>`;
-                table += `</tr>`;
-                for (let i = 0; i < R; i++) {
-                    table += `<tr><td style="${head}border-right-width:1.5pt;">${r0 + i}</td>`;
-                    for (let j = 0; j < C; j++) {
-                        if (isBlank(i, j)) {
-                            table += `<td style="${cell}border-width:1.5pt;">`
-                                + `<span class="blank-box" data-ws-slot="mc${slot++}" data-ws-shape="box" data-mq-cell="1" `
-                                + `style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;`
-                                + `font-weight:700;"></span></td>`;
-                        } else {
-                            table += `<td style="${cell}">${(r0 + i) * (c0 + j)}</td>`;
-                        }
-                    }
-                    table += `</tr>`;
-                }
-                table += `</table>`;
 
                 q.text = 'Fill in the missing products.';
                 q.printText = 'Fill in the missing products.';
@@ -3969,7 +3965,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.a = r0 + ordered[0].i; q.b = c0 + ordered[0].j; q.op = '×';
                 q.hint = `Find the row number and the column number of each empty box, and multiply. `
                     + `Or count on along the row: each step adds the row number.`;
-                q.visual = `<div class="ws-v2-cell mq-multchart-wrap" style="text-align:center;color:${_WS_INK};">${table}</div>`;
+                // The kit's `mult-chart` template: every column wide enough for three digits, so
+                // products never run together; the empty cells are the slots (data-mq-cell on
+                // screen, one input each, joined ", " as q.ans is).
+                const _mcPayload = { r0, c0, rows: R, cols: C, blanks: picked.map(x => ({ i: x.i, j: x.j })) };
+                q.cell = { template: 'mult-chart', v: 1, payload: _mcPayload };
+                q.visual = _kitTwin('mult-chart', _mcPayload);
                 q.printFormat = 'mult-chart';
                 q.skillLabel = 'Mult Chart';
                 return;
@@ -4100,12 +4101,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // divisor − 1 (so remainder = divisor − 1, the "one more would make a group"
                 // case, appears), and the counters are drawn UNGROUPED in rows of ten. The pupil
                 // rings the groups and counts what is left.
-                const divisor = rng(2, 9);
-                const quotient = rng(2, 9);
+                // Divisor and quotient 2-6 keep every picture countable (at most 41 counters, four
+                // rows of whole groups); the remainder still reaches divisor - 1.
+                const divisor = rng(2, 6);
+                const quotient = rng(2, 6);
                 const remainder = rng(1, divisor - 1);
                 const dividend = divisor * quotient + remainder;
 
-                q.text = `${dividend} ÷ ${divisor} = ?  (write your answer as "quotient R remainder" — for example, 7 R 2)`;
+                q.text = `Ring groups of ${divisor}. Write the quotient and the remainder.`;
                 q.ans = `${quotient} R ${remainder}`;
                 q.a = dividend; q.b = divisor; q.op = '÷';
                 q.answerType = "text";
@@ -4128,27 +4131,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 ];
                 q.hint = `Divide ${dividend} by ${divisor}. How many full groups of ${divisor}? What's left over? ${divisor} × ${quotient} = ${quotient * divisor}, remainder = ${dividend} - ${quotient * divisor} = ${remainder}`;
 
-                // Visual: the dividend as loose counters, rows of ten with a gap after five,
-                // nothing ringed, labelled or counted for the pupil.
-                const drPitch = 32, drR = 9, drGap = 12;
-                const drCols = Math.min(10, dividend);
-                const drRows = Math.ceil(dividend / 10);
-                const drW = 16 + drCols * drPitch + (drCols > 5 ? drGap : 0);
-                const drH = 16 + drRows * drPitch;
-                let drDots = '';
-                for (let i = 0; i < dividend; i++) {
-                    const c = i % 10, r = Math.floor(i / 10);
-                    const cx = 8 + drPitch / 2 + c * drPitch + (c >= 5 ? drGap : 0);
-                    const cy = 8 + drPitch / 2 + r * drPitch;
-                    drDots += `<circle cx="${cx}" cy="${cy}" r="${drR}" fill="none" stroke="currentColor" stroke-width="2"/>`;
-                }
-                q.printText = `Ring groups of ${divisor}. ${dividend} \u00F7 ${divisor} = ? R ?`;
-                q.visual = `<div style="text-align:center;">
-                    <svg width="${drW}" height="${drH}" viewBox="0 0 ${drW} ${drH}" style="max-width:100%;color:#000;">
-                        ${drDots}
-                    </svg>
-                </div>`;
-
+                // The kit's `remainder` template: loose open counters in rows that are a whole
+                // number of groups, 7 mm apart so every ring can be drawn, and the answer as two
+                // boxes, "[q] R [r]" (VA-62). On screen the two boxes are typed and compose
+                // "q R r" (data-mq-join), which is q.ans.
+                const _drPayload = { dividend, divisor };
+                q.printText = `Ring groups of ${divisor}.`;
+                q.cell = { template: 'remainder', v: 1, payload: _drPayload };
+                q.visual = _kitTwin('remainder', _drPayload);
                 q.printFormat = 'div-remainders';
                 q.skillLabel = 'Div Remainders';
                 q.options = [];
@@ -4258,21 +4248,24 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     if (listB.length >= 3) break;
                     if (!listA.includes(sum - y)) listB.push(y);
                 }
-                const _buildChoices = (list) => shuffle(list.map(String));
-
-                q.text = `___ + ___ = ${sum}`;
-                q.ans = [String(a), String(b)];
+                // The banks print INSIDE the cell, each under its own box, and each addend has
+                // exactly one box (the kit's `cloze-bank` template; print, key and screen). The
+                // bank order is sorted, so no position gives the answer away.
+                const banks = [listA.slice().sort((x, y) => x - y), listB.slice().sort((x, y) => x - y)];
+                q.text = `Pick one number from each bank to make ${sum}.`;
+                q.printText = 'Pick one number from each bank.';
+                q.ans = `${a}, ${b}`;
+                q.acceptedAnswers = [`${a}, ${b}`, `${a},${b}`, `${a} ${b}`];
+                q.keyParts = [String(a), String(b)];
                 q.a = a; q.b = b; q.op = '+';
-                q.clozeOptions = [
-                    _buildChoices(listA),
-                    _buildChoices(listB),
-                ];
-                q.answerType = 'inline-cloze';
+                q.answerType = 'text';
                 q.hint = `Pick two numbers that add up to ${sum}.`;
-                q.printFormat = 'inline-cloze';
+                q.printFormat = 'inline-cloze';   // the worksheet host shows the visual for this format
                 q.skillLabel = 'Pick Missing Addends';
                 q.options = [];
-                q.visual = '';
+                const _czPayload = { sum, a, b, banks };
+                q.cell = { template: 'cloze-bank', v: 1, payload: _czPayload };
+                q.visual = _kitTwin('cloze-bank', _czPayload);
                 return;
             }
 
@@ -4393,21 +4386,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const tens = rng(1, 9) * 10;
                     const ones = rng(1, 9);
                     multiplicand = tens + ones;
-                    parts = [
-                        { value: tens, width: 60, color: colors[0] },
-                        { value: ones, width: 30, color: colors[1] }
-                    ];
+                    parts = [{ value: tens }, { value: ones }];
                 } else {
                     multiplier = rng(2, 6);
                     const hundreds = rng(1, 3) * 100;
                     const tens = rng(1, 9) * 10;
                     const ones = rng(1, 9);
                     multiplicand = hundreds + tens + ones;
-                    parts = [
-                        { value: hundreds, width: 50, color: colors[0] },
-                        { value: tens, width: 35, color: colors[1] },
-                        { value: ones, width: 25, color: colors[2] }
-                    ];
+                    parts = [{ value: hundreds }, { value: tens }, { value: ones }];
                 }
                 
                 const product = multiplier * multiplicand;
@@ -4423,53 +4409,13 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // P8: the key fills every partial product and the total, in slot order.
                 q.keyParts = partialProducts.map(String).concat(String(product));
 
-                // Generate visual with colored rectangles and input boxes
-                // Use balanced box sizes based on digit count of partial products
-                const baseBoxWidth = 110; // Base width for each section (bumped from 75)
-                const rectHeight = 110; // bumped from 75
-                const uniqueIdArea = Date.now() + Math.random().toString(36).substr(2, 9);
-
-                q.visual = `<div class="area-model-container" style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--text-primary);font-size:1.05rem;">Use the model to find <span style="font-size:1.4rem;">${multiplier} × ${multiplicand}</span></div>
-                    <div style="font-style:italic;color:var(--text-secondary);margin-bottom:15px;font-size:1rem;">First, find the area of each rectangle.</div>
-
-                    <!-- Area Model Grid -->
-                    <div class="area-model-grid" style="display:inline-block;position:relative;">
-                        <!-- Top labels (place values) -->
-                        <div style="display:flex;margin-left:50px;margin-bottom:6px;">
-                            ${parts.map((p, i) => {
-                                const digitCount = partialProducts[i].toString().length;
-                                const sectionWidth = baseBoxWidth + (digitCount - 1) * 14;
-                                return `<div style="width:${sectionWidth}px;text-align:center;font-weight:700;font-size:1.4rem;">${p.value}</div>`;
-                            }).join('')}
-                        </div>
-
-                        <!-- Main grid with multiplier on left -->
-                        <div style="display:flex;align-items:center;">
-                            <div style="font-weight:700;font-size:1.7rem;margin-right:14px;width:38px;text-align:center;">${multiplier}</div>
-                            <div style="display:flex;border:2px solid #888;border-radius:4px;overflow:hidden;">
-                                ${parts.map((p, i) => {
-                                    const digitCount = partialProducts[i].toString().length;
-                                    const sectionWidth = baseBoxWidth + (digitCount - 1) * 14;
-                                    const inputWidth = 65 + digitCount * 14;
-                                    return `
-                                    <div style="width:${sectionWidth}px;height:${rectHeight}px;background:${p.color};display:flex;align-items:center;justify-content:center;${i > 0 ? 'border-left:2px solid #888;' : ''}">
-                                        <input type="text" class="area-model-input" data-area-idx="${uniqueIdArea}-part-${i}" data-answer="${partialProducts[i]}"
-                                            style="width:${inputWidth}px;height:48px;border:2px solid #fff;border-radius:6px;background:rgba(255,255,255,0.9);text-align:center;font-size:1.3rem;font-weight:700;" placeholder="">
-                                    </div>
-                                `}).join('')}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Total calculation -->
-                    <div style="margin-top:20px;font-style:italic;color:var(--text-secondary);">Then, find the total area.</div>
-                    <div class="area-model-total-row" style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.2rem;font-weight:600;">
-                        <span>${multiplier} × ${multiplicand} = </span>
-                        <input type="text" class="area-model-total" data-area-idx="${uniqueIdArea}-total" data-answer="${product}"
-                            style="width:${60 + product.toString().length * 12}px;height:40px;border:2px solid var(--accent-green);border-radius:8px;background:var(--bg-card-light);text-align:center;font-size:1.2rem;font-weight:700;">
-                    </div>
-                </div>`;
+                // The kit's `area-model` template: black line art with a minimum width (labels
+                // and part boxes never stack in a narrow column), one box per partial product
+                // and one for the total, all keyed. The screen twin keeps the
+                // `area-model-input` / `area-model-total` inputs the checkers read.
+                const _amPayload = { multiplier, parts: parts.map(p => p.value), product, uid: `am${multiplier}x${multiplicand}` };
+                q.cell = { template: 'area-model', v: 1, payload: _amPayload };
+                q.visual = _kitTwin('area-model', _amPayload);
                 q.options = [];
                 return;
             }

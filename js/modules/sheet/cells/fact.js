@@ -25,11 +25,26 @@ export { FACT_LADDER, factTab, factDigitPt, factCellHMm, FACT_AUTO_COLS };
  * @param {string} op
  * @param {{pt?: number, padTop?: number}} [opts]  pt from FACT_LADDER[columns]
  */
-export function fact(a, b, op, { pt, padTop = 2 } = {}) {
-    const A = String(a).padStart(3, ' '), B = String(b).padStart(3, ' ');
-    const r = (s, first) => [...s].map((ch, i) => `<span${i === 0 && first ? ' class="op"' : ''}>${i === 0 && first ? first : ch === ' ' ? '' : ch}</span>`).join('');
-    return { cls: 'fact', style: `--fd:${pt}pt;--fp:${padTop}mm`, html: `<div class="ws-fact">${r(A)}${r(B, opGlyph(op))}<span class="rule"></span></div>` };
+export function fact(a, b, op, { pt, padTop = 2, digits = 0 } = {}) {
+    // VA-2: the operator has a track of its OWN, left of the digit tracks, so "×12", "−10" and
+    // "÷12" never touch (the old cell padded both rows to 3 tracks and wrote the operator OVER
+    // the first, which at 0.72 em sat flush against a tens digit). The digit tracks stay 0.72 em
+    // (TY-22); their count is the widest of the two operands and the answer (VA-3: the rule spans
+    // the answer too), at least 2 so a section's facts keep one width.
+    const n = factDigitTracks(a, b, digits);
+    const A = String(a).padStart(n, ' '), B = String(b).padStart(n, ' ');
+    const r = (s) => [...s].map((ch) => `<span>${ch === ' ' ? '' : ch}</span>`).join('');
+    const html = `<div class="ws-fact" style="${factGridStyle(n)}"><span></span>${r(A)}<span class="op">${opGlyph(op)}</span>${r(B)}<span class="rule"></span></div>`;
+    return { cls: 'fact', style: `--fd:${pt}pt;--fp:${padTop}mm`, html };
 }
+
+/** The operator track (em). Wider than a digit track so the glyph clears the tens digit. */
+export const FACT_OP_TRACK_EM = 1.2;
+/** Digit tracks of a vertical fact: operands and answer, at least 2 (TY-22 keeps 0.72 em). */
+export const factDigitTracks = (a, b, n = 0) =>
+    Math.max(2, String(a).length, String(b).length, Number(n) || 0);
+/** The inline grid a vertical fact carries: one operator track, then n digit tracks. */
+export const factGridStyle = (n) => `grid-template-columns:${FACT_OP_TRACK_EM}em repeat(${n}, ${FACT_TRACK_EM}em)`;
 
 /**
  * CL-21 / CL-30: the top padding a fact cell needs so the black number tab clears the digits.
@@ -38,7 +53,7 @@ export function fact(a, b, op, { pt, padTop = 2 } = {}) {
 export const factPadTop = (labelStyle, cols) => (labelStyle === 'tab' ? (cols >= 8 ? 4.5 : 3) : 2);
 
 /** TY-31: fill of column stays between 55% and 75%; 2.16 em is the drawn width of a fact. */
-export const factWidthMm = (cols) => 2.16 * (EM_MM[factDigitPt(cols)] || 9.88);
+export const factWidthMm = (cols, n = 2) => (FACT_OP_TRACK_EM + n * FACT_TRACK_EM) * (EM_MM[factDigitPt(cols)] || 9.88);
 export const factFillOfColumn = (cols, liveWMm = 186) => factWidthMm(cols) / (liveWMm / cols);
 
 /* ------------------------------------------------------------------ registry template */
@@ -67,31 +82,41 @@ register('fact', {
         const pt = p.pt || factDigitPt(cols);
         // VA-71 / the notation option: vertical rows first, then a horizontal block.
         if (p.notation === 'horiz' || p.notation === 'horizontal') {
-            const slot = blank({ id: 'ans', kind: 'number', shape: 'line', digits: 3, graded: true, order: 0, maxLength: 3, inputmode: 'numeric', scopes: ['full', 'answer-only'] }, ctx, value);
+            const nd = Math.max(2, Number(p.digits) || 3);
+            // The key's value is written at the DIGIT size and weight, on the line, like the
+            // pupil's own digits (AK-1) - never the small bold of a caption.
+            const slot = blank({ id: 'ans', kind: 'number', shape: 'line', digits: nd, graded: true, order: 0, maxLength: nd, inputmode: 'numeric', scopes: ['full', 'answer-only'] }, ctx, value)
+                .replace(/(<span class="ws-line[^"]*" style="[^"]*)"/, `$1;font-size:1em;font-weight:${ctx.state === 'answered' || ctx.state === 'wrong' ? 700 : 400};display:inline-flex;align-items:flex-end;justify-content:center;line-height:1.1"`);
             return `<div class="ws-eq" style="--ws-digit:${pt}pt">`
                 + `<span>${p.a}</span><span class="o">${opGlyph(p.op)}</span><span>${p.b}</span><span class="o">=</span>${slot}</div>`;
         }
-        const item = fact(p.a, p.b, p.op, { pt, padTop: p.padTop !== undefined ? p.padTop : factPadTop(ctx.label && ctx.label.style, cols) });
+        const n = factDigitTracks(p.a, p.b, p.digits || String(value ?? '').length);
+        const item = fact(p.a, p.b, p.op, { pt, digits: n, padTop: p.padTop !== undefined ? p.padTop : factPadTop(ctx.label && ctx.label.style, cols) });
         // `fact()` returns a grid item, so the ladder's point size rides on the CELL. Through
         // the registry the template must stand alone, so the same value is inlined here.
-        item.html = item.html.replace('<div class="ws-fact">', `<div class="ws-fact" style="--fd:${pt}pt">`);
+        item.html = item.html.replace('<div class="ws-fact" style="', `<div class="ws-fact" style="--fd:${pt}pt;`);
         // SCC-T15 parity: the open answer zone is typed on screen, in the same place.
         if (ctx.mode === 'screen' && !ctx.static) {
             const slot = blank({
-                id: 'ans', kind: 'number', shape: 'box', digits: 3, graded: true, order: 0,
-                maxLength: 3, inputmode: 'numeric', scopes: ['full', 'answer-only'],
+                id: 'ans', kind: 'number', shape: 'box', digits: n, graded: true, order: 0,
+                maxLength: n, inputmode: 'numeric', scopes: ['full', 'answer-only'],
             }, ctx, this.answerKey(p));
-            return item.html.replace('<span class="rule"></span>', `<span class="rule"></span><span class="ws-factans">${slot}</span>`);
+            return item.html.replace('<span class="rule"></span>', `<span class="rule"></span><span class="ws-factans" style="grid-column:2 / -1">${slot}</span>`);
         }
         // The answer zone under the sum rule is open (PG-14: all spare height goes below the
-        // rule). In a non-blank state the value is stamped into it.
-        if (ctx.state === 'blank') return item.html;
-        const ink = ctx.state === 'traced' ? 'trace' : 'solid';
+        // rule). It is the same slot in every state (AK-4: the key and the pupil page carry the
+        // same slots), and a written value sits on the digit tracks, right-aligned to the ones
+        // (TY-20), so the key's digits stand under the digits of the problem.
+        const ink = ctx.state === 'blank' ? null : ctx.state === 'traced' ? 'trace' : 'solid';
+        const shown = ctx.state === 'wrong' ? (ctx.wrong && ctx.wrong.value) : value;
+        const text = ink && shown !== undefined && shown !== null ? String(shown) : '';
         // INK-3 / LS-1: a trace digit is grey, or a dotted outline when photocopy-safe.
         const cls = ink === 'trace' ? (ctx.photocopySafe ? 'ws-factans ws-dotted' : 'ws-factans ws-trace') : 'ws-factans';
-        const shown = ctx.state === 'wrong' ? (ctx.wrong && ctx.wrong.value) : value;
+        const w = Math.max(n, text.length);
+        const cells = [...text.padStart(w, ' ')].map((ch) => `<span style="text-align:center">${ch === ' ' ? '' : ch}</span>`).join('');
         return item.html.replace('<span class="rule"></span>',
-            `<span class="rule"></span><span class="${cls}" data-ws-slot="ans" data-ws-shape="open" data-ws-ink="${ink}">${shown === undefined || shown === null ? '' : shown}</span>`);
+            `<span class="rule"></span><span class="${cls}" data-ws-slot="ans" data-ws-shape="open"${ink ? ` data-ws-ink="${ink}"` : ''} `
+            + `style="grid-column:${w > n ? 1 : 2} / -1;font-weight:${ink === 'solid' ? 700 : 400};display:grid;grid-template-columns:repeat(${w}, ${FACT_TRACK_EM}em);justify-content:end;height:1.15em;line-height:1.15">${cells}</span>`);
     },
     answerKey(p) {
         const value = p.ans !== undefined ? p.ans : compute(p);
@@ -106,14 +131,15 @@ register('fact', {
             // is much wider than the vertical form and must say so.
             const em = EM_MM[pt] || (pt / 72) * 25.4;
             const digits = String(p.a).length + String(p.b).length;
-            const wMm = em * (0.55 * digits + 2 + 0.28 * 3) + blankWidth(3, ctx.size) + 8;
+            const wMm = em * (0.55 * digits + 2 + 0.28 * 3) + blankWidth(Math.max(2, Number(p.digits) || 3), ctx.size) + 8;
             return {
                 wMm: Math.ceil(wMm), hMm: factCellHMm(cols, ctx.size), measure: false,
                 factLike: false, maxCols: 4, tracks: FACT_TRACKS,
             };
         }
+        const n = factDigitTracks(p.a, p.b, p.digits || String(compute(p) ?? '').length);
         return {
-            wMm: Math.ceil(factWidthMm(cols) + 4),
+            wMm: Math.ceil(factWidthMm(cols, n) + 4),
             hMm: factCellHMm(cols, ctx.size),      // VA-70
             measure: false, factLike: true, maxCols: 10, tracks: FACT_TRACKS,
         };

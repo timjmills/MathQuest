@@ -244,6 +244,27 @@ has('var grey border', inkHTML(`<div style="border:1px solid var(--mq-muted)"></
     const legacy = inkHTML(`<div style="border:2px solid #555;border-radius:4px;background:#fff;"></div>`);
     has('legacy box keeps its radius', legacy, 'border-radius:4px');
 }
+// 27. The operations templates (P8c) draw in ink already: black, white and the one grey only,
+//     so the legacy ink pass has nothing left to change in them, in any state.
+{
+    const { renderCell } = await import('../../js/modules/sheet/index.js');
+    const T = (template, payload) => ({ cell: { template, v: 1, payload } });
+    const cells = [
+        T('division', { dividend: 715, divisor: 13 }), T('area-model', { multiplier: 4, parts: [300, 40, 5] }),
+        T('mult-chart', { r0: 8, c0: 8, blanks: [{ i: 0, j: 2 }] }), T('arrays', { kind: 'equal_groups', rows: 3, cols: 4 }),
+        T('remainder', { dividend: 19, divisor: 3 }), T('number-line', { max: 20, start: 7, add: 9 }),
+        T('fact-family', { a: 8, b: 3 }), T('cloze-bank', { sum: 12, a: 5, b: 7, banks: [[3, 5, 8], [2, 6, 7]] }),
+        T('fact', { a: 7, b: 12, op: '*' }), T('stack', { operands: [24, 66, 92, 57], op: '+', regroup: 'add' }),
+    ];
+    for (const q of cells) {
+        for (const state of ['blank', 'answered', 'traced']) {
+            const html = renderCell(q, { mode: 'print', size: 'L', state });
+            const colours = [...html.matchAll(/#[0-9a-fA-F]{3,6}\b/g)].map((m) => m[0].toLowerCase());
+            ok(`${q.cell.template} ${state}: ink, paper and the one grey`, colours.every((c) => ['#000', '#000000', '#fff', '#ffffff', '#949494'].includes(c)), colours.join(','));
+            eq(`${q.cell.template} ${state}: no residue`, inkResidue(html).length, 0);
+        }
+    }
+}
 // 25. Residue finder sees what is left.
 ok('residue finds colour', inkResidue(`<div style="color:#1565c0"></div>`).length === 1);
 
