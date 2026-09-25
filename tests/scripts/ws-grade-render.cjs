@@ -33,6 +33,10 @@
 //                pre-skill-check, word-problems, fact-rows, fact-probe, mixed-practice,
 //                true-false, reason-it, stretch. A role the skill cannot take (a fact layout for
 //                a non-fact skill) is recorded as `unsupported` with its reason, not an error.
+// --supports all|id,id   S2: every skill carries supports (all = every render-time value its
+//                Support control offers; else the listed ids it offers), on the roles and the screen
+//                hosts (the set's option store). --cover whole|needed|fade and --mix section|problem
+//                set the sheet's spread (buildSheet `coverage` / `mix`; the skill's cover / mix on screen).
 // --set c:s,c:s  the skills of ONE multi-skill sheet (Mixed practice, or a grouped Independent):
 //                rendered once under <out>/set__<first skill>+N/ with every --roles role.
 //
@@ -69,6 +73,34 @@ const ROLE_LOOK = arg('look', 'auto');
 // --anchors off|side|sections  S6 step-by-step anchor problems on the practice roles.
 const ROLE_ANCHORS = arg('anchors', 'off');
 const ROLE_PAPER = arg('paper', 'A4');
+const SUPPORTS = arg('supports', null);
+const COVER = arg('cover', null);
+const MIX = arg('mix', null);
+/** In the page: the options each skill carries under --supports (null = none). */
+function supportOptsInPage({ list, SUPPORTS, COVER, MIX }) {
+    return list.map(([cat, skill]) => {
+        if (!SUPPORTS) return null;
+        const def = window.offeredOptionsFor(cat, skill).find((d) => d.id === 'support' && d.supportsModel);
+        if (!def) return null;
+        const want = SUPPORTS === 'all' ? def.render : SUPPORTS.split(',').filter((v) => def.render.includes(v));
+        if (!want.length) return null;
+        const o = { support: [...new Set([...(def.default || []), ...want])] };
+        if (COVER) o.cover = COVER;
+        if (MIX) o.mix = MIX;
+        return o;
+    });
+}
+/** Put the --supports options in the set's option store (the screen hosts read it). */
+async function storeSupports(page, skill) {
+    if (!SUPPORTS) return;
+    const [opts] = await page.evaluate(supportOptsInPage, { list: [[skill.categoryId, skill.skillId]], SUPPORTS, COVER, MIX });
+    await page.evaluate(({ skill, opts }) => {
+        window.clearSetOptions({ silent: true });
+        if (opts) window.setSetOptions(skill.categoryId, skill.skillId, opts, { silent: true });
+    }, { skill, opts });
+}
+// --columns auto|N  the print dialog's Columns choice for every role (default Auto).
+const ROLE_COLUMNS = (() => { const v = arg('columns', 'auto'); return v === 'auto' ? 'auto' : Math.max(1, parseInt(v, 10) || 1); })();
 // Max Number for every surface. A place-value skill whose place needs more than the default 100
 // (Round to the nearest 100 needs 1,000) is refused below it, so its page is only visible here.
 const RANGE = arg('range', null);
@@ -355,11 +387,14 @@ async function renderRole(page, skill, role, dir) {
     await applyRange(page);
     const seed = hash(slug(skill) + ':' + role) % 1000000;
     const set = skill.set || [{ categoryId: skill.categoryId, skillId: skill.skillId }];
-    const built = await page.evaluate(async ({ skill, set, role, seed, count, size, look, paper, anchors }) => {
+    const supOpts = await page.evaluate(supportOptsInPage, { list: set.map((k) => [k.categoryId, k.skillId]), SUPPORTS, COVER: null, MIX: null });
+    const built = await page.evaluate(async ({ skill, set, role, seed, count, size, look, paper, anchors, supOpts, COVER, MIX, columns }) => {
         try {
+            const skills = set.map((k, i) => (supOpts[i] ? Object.assign({}, k, { opts: supOpts[i] }) : k));
             const r = await window.buildSheet({
-                role, sections: [{ skills: set, count, columns: 'auto' }],
+                role, sections: [{ skills, count, columns }],
                 size, look, paper, seed, form: 'A', key: true, anchors,
+                coverage: COVER || undefined, mix: MIX || undefined,
             });
             const title = r.title || skill.label;
             return {
@@ -370,7 +405,7 @@ async function renderRole(page, skill, role, dir) {
                 items: r.items.map(it => ({ template: it.template, fclass: it.fclass, text: it.text.slice(0, 80), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans), letter: it.letter, measured: it.measured })),
             };
         } catch (e) { return e && e.unsupported ? { unsupported: e.message } : { error: (e && e.stack) || String(e) }; }
-    }, { skill, set, role, seed, count: ROLE_COUNT, size: ROLE_SIZE, look: ROLE_LOOK, paper: ROLE_PAPER, anchors: ROLE_ANCHORS });
+    }, { skill, set, role, seed, count: ROLE_COUNT, size: ROLE_SIZE, look: ROLE_LOOK, paper: ROLE_PAPER, anchors: ROLE_ANCHORS, supOpts, COVER, MIX, columns: ROLE_COLUMNS });
     if (built.error) return { error: built.error };
     if (built.unsupported) return { unsupported: built.unsupported };
     const pdfP = path.join(dir, `${role}.pdf`);
@@ -441,6 +476,7 @@ async function renderRole(page, skill, role, dir) {
         await hideOverlays(page);
         if (!NO_SCREEN && !s.set) {
             meta.screen = {};
+            await storeSupports(page, s);
             for (const [w, h] of [[1280, 900], [820, 1180], [390, 844]]) {
                 try { meta.screen[`card-${w}`] = await renderCard(page, s, w, h, path.join(dir, `card-${w}.png`)); } catch (e) { meta.screen[`card-${w}`] = { error: e.message }; }
             }

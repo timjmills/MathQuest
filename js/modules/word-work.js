@@ -14,7 +14,7 @@
 //
 // The three keyword supports are options on the skill (Support group, all OFF by default):
 // `wpCues` bold + underline the key words, `wpBank` the keyword bank box, `wpBar` a bar model
-// with blank labels (skill-options.js WORD_WORK_OPTIONS, share keys 6A-6C).
+// with blank labels (skill-options.js WORD_WORK_OPTIONS, share keys 8A-8C).
 //
 // Layer 4 (reads state; imports the pure kit only).
 

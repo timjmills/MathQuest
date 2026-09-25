@@ -13,6 +13,8 @@ import { storiesFor } from './stories.js';
 /* ============================================================================ div_facts */
 
 registerSkill('division:div_facts', {
+    // S2: the supports this skill can draw (touch dots, cues, panes); the Support control offers these.
+    supports: Object.freeze(['touch', 'skip', 'array', 'think', 'boxsign']),
     strings: strings({
         iCan: 'I Can divide using times facts',
         instructionKey: 'divide',

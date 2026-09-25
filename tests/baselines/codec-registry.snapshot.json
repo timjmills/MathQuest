@@ -78,7 +78,14 @@
     "paid": "1J",
     "gap": "1L",
     "numerals": "1N",
-    "quarters": "1O"
+    "quarters": "1O",
+    "wordSet": "6A",
+    "most": "6B",
+    "poolSize": "7A",
+    "poolSupport": "7B",
+    "ftRules": "7C",
+    "ftTable": "7D",
+    "ftTask": "7E"
   },
   "blocks": {
     "0": {
@@ -112,14 +119,14 @@
       "keys": "5A-5M"
     },
     "6": {
-      "owner": "",
-      "status": "spare",
-      "keys": ""
+      "owner": "O2 easier / harder ladders (vocabulary, integers, geometry, graphs, algebra, number theory)",
+      "status": "assigned",
+      "keys": "6A-6B"
     },
     "7": {
-      "owner": "",
-      "status": "spare",
-      "keys": ""
+      "owner": "option-panel round 3 (pools, function tables)",
+      "status": "assigned",
+      "keys": "7A-7E"
     },
     "8": {
       "owner": "",
@@ -293,7 +300,9 @@
       "largest": "L",
       "scrambled": "S",
       "inorder": "Q",
-      "mixed": "Z"
+      "mixed": "Z",
+      "largest-dots": "D",
+      "scrambled-dots": "T"
     },
     "place": {},
     "midpoint": {
@@ -322,7 +331,16 @@
       "ring": "G",
       "pupil": "U",
       "auto": "Q",
-      "dots": "O"
+      "dots": "O",
+      "frame-bare": "S",
+      "line-bare": "X",
+      "touch": "V",
+      "touchall": "3",
+      "boxsign": "J",
+      "startarrow": "4",
+      "steps": "I",
+      "round-pv": "1",
+      "round-mark": "2"
     },
     "tiles": {},
     "objects": {
@@ -332,8 +350,15 @@
       "dice": "D"
     },
     "touch": {},
-    "cover": {},
-    "mix": {},
+    "cover": {
+      "whole": "W",
+      "needed": "N",
+      "fade": "F"
+    },
+    "mix": {
+      "section": "S",
+      "problem": "P"
+    },
     "anchors": {},
     "members": {},
     "forms": {
@@ -531,7 +556,9 @@
       "notes": "N",
       "notes-coins": "C",
       "notes100": "H",
-      "notes500": "F"
+      "notes500": "F",
+      "note": "O",
+      "both": "B"
     },
     "values": {
       "1": "1",
@@ -555,6 +582,36 @@
     "quarters": {
       "past": "P",
       "to": "T"
+    },
+    "wordSet": {},
+    "most": {},
+    "poolSize": {
+      "easier": "E",
+      "set": "S",
+      "harder": "H"
+    },
+    "poolSupport": {},
+    "ftRules": {
+      "+": "A",
+      "-": "S",
+      "x": "M",
+      "/": "D",
+      "x+": "P",
+      "x-": "N",
+      "/+": "Q",
+      "/-": "R"
+    },
+    "ftTable": {},
+    "ftTask": {
+      "outputs": "G",
+      "outputs-check": "H",
+      "rule": "Y",
+      "rule-check": "Z",
+      "inputs": "V",
+      "inputs-check": "W",
+      "mixed": "M",
+      "mixed-check": "N",
+      "make": "K"
     }
   },
   "scalarOnly": {
@@ -577,6 +634,10 @@
     "midLabel": "bool",
     "missing": "decimal",
     "rule": "bool",
-    "hours": "decimal"
+    "hours": "decimal",
+    "wordSet": "decimal",
+    "most": "decimal",
+    "ftTable": "decimal",
+    "poolSupport": "decimal"
   }
 }

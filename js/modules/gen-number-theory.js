@@ -15,7 +15,15 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
             // composites (4, 6, 8, 9, 10 to 10) for an 8-number sort, or any prime >= 7 with a
             // composite >= 12 to compare, and the dealing loops below never finished (the verifier
             // timed out at Max Number 10). The other number-theory skills keep the old floor.
-            const ntMax = Math.max(ntSkill === 'prime_composite' ? 30 : 10, Math.min(range, 200));
+            // O2 (2026-09-25): the skill's own "Numbers to" band (skill-options.js, `band`) bounds
+            // what the item ASKS ABOUT — the number factored, the numbers classified or sorted, the
+            // largest multiple written, the LCM — and replaces the Max Number, which bounded
+            // nothing it said ("Up to 10" dealt factors of 24). Unset (the default), every branch
+            // draws exactly as before. The band's values are those each branch can deal
+            // (skill-options.js _ntBand), and its accept check redraws any item still over it.
+            const ntBand = (mappedSkill !== 'mixed' && state.skillOptions && typeof state.skillOptions.band === 'number'
+                && state.skillOptions.band > 0) ? state.skillOptions.band : null;
+            const ntMax = ntBand || Math.max(ntSkill === 'prime_composite' ? 30 : 10, Math.min(range, 200));
 
             // Helper function to get all factors
             const getFactors = (n) => {
@@ -748,7 +756,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 };
                 q.printFormat = "nt-factor-tchart-drag";
             } else if (ntSkill === "multiples" && Math.random() < 0.35) {
-                const mNum = pick([3, 4, 5, 6, 7, 8, 9]);
+                const mNum = pick(ntBand ? [3, 4, 5, 6, 7, 8, 9].filter(n => n * 4 <= ntBand) : [3, 4, 5, 6, 7, 8, 9]);
                 const mMaxList = Math.max(mNum * 8, 50);
                 const mMax = Math.min(mMaxList, ntMax);
                 const allMultiples = [];
@@ -780,7 +788,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
 
                 if (problemType === "identify_multiples") {
                     // Circle all multiples from a list
-                    const num = pick([3, 4, 5, 6, 7, 8, 9]);
+                    const num = pick(ntBand ? [3, 4, 5, 6, 7, 8, 9].filter(n => n * 5 <= ntBand) : [3, 4, 5, 6, 7, 8, 9]);
                     const count = 10;
 
                     // Generate some multiples
@@ -791,7 +799,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
 
                     // Generate some non-multiples
                     const nonMultiples = [];
-                    for (let i = 1; i <= 60 && nonMultiples.length < 4; i++) {
+                    for (let i = 1; i <= Math.min(60, ntBand || 60) && nonMultiples.length < 4; i++) {
                         if (i % num !== 0 && !multiples.includes(i)) {
                             nonMultiples.push(i);
                         }
@@ -826,8 +834,8 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     q.printFormat = "nt-multiples-identify";
                 } else if (problemType === "list_multiples") {
                     // List first N multiples - now with variety (5, 8, 10, or 12)
-                    const num = pick([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
-                    const count = pick([5, 8, 10, 12]);
+                    const num = pick(ntBand ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].filter(n => n * 5 <= ntBand) : [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+                    const count = pick(ntBand ? [5, 8, 10, 12].filter(c => c * num <= ntBand) : [5, 8, 10, 12]);
                     const multiples = Array.from({length: count}, (_, i) => num * (i + 1));
 
                     q.text = `List the first ${count} multiples of ${num}`;
@@ -847,14 +855,16 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     q.printFormat = "nt-multiples";
                 } else {
                     // Fill in missing multiples in a sequence
-                    const num = pick([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
-                    const allMultiples = Array.from({length: 12}, (_, i) => num * (i + 1));
+                    const num = pick(ntBand ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].filter(n => n * 6 <= ntBand) : [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+                    // A band shortens the row to the multiples at or under it (at least 6).
+                    const seqLen = ntBand ? Math.max(6, Math.min(12, Math.floor(ntBand / num))) : 12;
+                    const allMultiples = Array.from({length: seqLen}, (_, i) => num * (i + 1));
 
                     // Show some, hide others randomly
-                    const showCount = pick([4, 5, 6]); // How many to show
+                    const showCount = ntBand ? Math.min(pick([4, 5, 6]), seqLen - 2) : pick([4, 5, 6]); // How many to show
                     const showIndices = new Set();
                     while (showIndices.size < showCount) {
-                        showIndices.add(Math.floor(Math.random() * 12));
+                        showIndices.add(Math.floor(Math.random() * seqLen));
                     }
 
                     const sequence = allMultiples.map((val, i) => ({
@@ -1092,11 +1102,14 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
             } else if (ntSkill === "lcm" && Math.random() < 0.25) {
                 // Phase 4.5 batch 10: multi-select-check variant — "Click ALL common multiples of A and B less than N"
                 const allLcmPairsMSC = [[3, 4], [4, 5], [3, 5], [4, 6], [6, 8], [5, 6], [6, 9], [3, 6], [4, 8], [2, 5]];
-                const filteredLcmMSC = allLcmPairsMSC.filter(p => p[0] <= ntMax && p[1] <= ntMax);
+                const _lcmOf = (x, y) => { let g = x, h = y; while (h) { [g, h] = [h, g % h]; } return (x * y) / g; };
+                // A band bounds the common multiples offered: the LCM and twice it fit under it.
+                const filteredLcmMSC = ntBand ? allLcmPairsMSC.filter(p => _lcmOf(p[0], p[1]) * 2 <= ntBand)
+                    : allLcmPairsMSC.filter(p => p[0] <= ntMax && p[1] <= ntMax);
                 const [aMSC, bMSC] = pick(filteredLcmMSC.length ? filteredLcmMSC : [[3, 4]]);
                 const findGCFMSC = (x, y) => { while (y) { [x, y] = [y, x % y]; } return x; };
                 const lcmMSC = (aMSC * bMSC) / findGCFMSC(aMSC, bMSC);
-                const cap = Math.max(40, Math.min(60, lcmMSC * 4));
+                const cap = ntBand ? Math.min(ntBand - 1, Math.max(lcmMSC * 2, Math.min(60, lcmMSC * 4))) : Math.max(40, Math.min(60, lcmMSC * 4));
                 // Common multiples = multiples of lcm under cap
                 const commonsMSC = [];
                 for (let m = lcmMSC; m <= cap; m += lcmMSC) commonsMSC.push(m);
@@ -1134,7 +1147,10 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
             } else if (ntSkill === "lcm") {
                 // Least Common Multiple
                 const allLcmPairs = [[3, 4], [4, 5], [3, 5], [4, 6], [6, 8], [5, 6], [6, 9], [8, 12], [7, 10], [9, 12]];
-                const filteredLcmPairs = allLcmPairs.filter(p => p[0] <= ntMax && p[1] <= ntMax);
+                const _lcmOf2 = (x, y) => { let g = x, h = y; while (h) { [g, h] = [h, g % h]; } return (x * y) / g; };
+                // A band bounds the answer, the LCM (not only the two numbers).
+                const filteredLcmPairs = ntBand ? allLcmPairs.filter(p => _lcmOf2(p[0], p[1]) <= ntBand)
+                    : allLcmPairs.filter(p => p[0] <= ntMax && p[1] <= ntMax);
                 const [a, b] = pick(filteredLcmPairs.length ? filteredLcmPairs : [[3, 4]]);
 
                 const findLCM = (x, y) => {
@@ -1243,18 +1259,22 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 const availableDivisors = (typeof selectedDivisors !== 'undefined' && selectedDivisors.length > 0)
                     ? selectedDivisors
                     : [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-                const divisor = pick(availableDivisors);
+                // A band keeps a divisor with room for four different numbers under it.
+                const bandDivisors = ntBand ? availableDivisors.filter(d => d * 8 <= ntBand) : [];
+                const divisor = pick(bandDivisors.length ? bandDivisors : availableDivisors);
 
                 // Generate 4 numbers - mix of divisible and not divisible
                 const numbers = [];
                 const numDivisible = rng(1, 3); // 1 to 3 divisible numbers
-                const dSortMultMax = Math.max(5, Math.min(Math.floor(ntMax / divisor), 99));
+                const dSortMultMax = ntBand ? Math.max(4, Math.min(Math.floor((ntBand - divisor + 1) / divisor), 99))
+                    : Math.max(5, Math.min(Math.floor(ntMax / divisor), 99));
+                const dSortMultMin = ntBand ? 2 : 5;
 
                 // Add divisible numbers
                 for (let i = 0; i < numDivisible; i++) {
                     let num;
                     do {
-                        num = divisor * rng(5, dSortMultMax);
+                        num = divisor * rng(dSortMultMin, dSortMultMax);
                     } while (numbers.includes(num));
                     numbers.push(num);
                 }
@@ -1263,7 +1283,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 for (let i = numDivisible; i < 4; i++) {
                     let num;
                     do {
-                        num = divisor * rng(5, dSortMultMax) + rng(1, divisor - 1);
+                        num = divisor * rng(dSortMultMin, dSortMultMax) + rng(1, divisor - 1);
                     } while (numbers.includes(num) || num % divisor === 0);
                     numbers.push(num);
                 }

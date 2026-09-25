@@ -46,6 +46,8 @@ const TAKE_AWAY_STEPS = [
 ];
 
 registerSkill('subtraction:sub_facts', {
+    // S2: the supports this skill can draw (touch dots, cues, panes); the Support control offers these.
+    supports: Object.freeze(['touch', 'touchall', 'tile', 'frame', 'line', 'boxsign']),
     strings: strings({
         iCan: 'I Can subtract facts to 20',
         instructionKey: 'subtract',
@@ -59,6 +61,8 @@ registerSkill('subtraction:sub_facts', {
 });
 
 registerSkill('subtraction:subtract', {
+    // S2: the supports this skill can draw (touch dots, cues, panes); the Support control offers these.
+    supports: Object.freeze(['touch', 'touchall', 'startarrow', 'boxsign']),
     strings: strings({
         iCan: 'I Can subtract within 20',
         instructionKey: 'subtract',

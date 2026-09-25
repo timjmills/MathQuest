@@ -84,6 +84,15 @@ export {
     touchDots, touchDotCount, touchDotOrder, touchDotsFits, touchDotGeometry, touchDotsMarks, touchDotsSVG,
     touchDotsDigitHTML, touchDotNearest, touchTallySVG,
 } from './touchdots.js';
+// S2 the supports model: the allocator and the drawing (design/SUPPORTS.md §S2).
+export {
+    allocateSupports, supportsForItem, alternativesOf, supportCompat, fadeTo, fadeLevel, fadeRung,
+    SUPPORT_IDS, TOUCH_IDS, CUE_IDS, TOUCH_MIN_PT, normCoverage, normMix,
+} from './supports.js';
+export {
+    withSupports, supportsOf, touchMode, touchNumbers, touchColumns, touchNumberHTML, touchDigit, touchOpts,
+    canDraw, needs as supportNeeds, panePayloadOf, supportFootprint, opKey as supportOpKey, COUNT_STEPS,
+} from './support-draw.js';
 // P9 place value + rounding: the `pv` template and the drawings the screen card shares with it.
 export {
     DISK_SIZES, diskDiameter, zoneSide, zoneCapacity, diskMatSVG, numeralTracksHTML, roundingLineSVG,

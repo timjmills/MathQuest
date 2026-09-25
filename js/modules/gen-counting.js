@@ -36,6 +36,7 @@ import { randInt, shuffle, pick } from './utils.js';
 import { MONO, MONO_STROKE } from './design-tokens.js';
 import { k2Twin, K2_SHAPES } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
+import { fadeRung } from './sheet/index.js';
 
 /* ================================================= P11 · the teacher's options (skill-options.js) */
 // The K-2 options P11_K2_OPTIONS declares (count to, objects, arrangement, support level, compare
@@ -56,7 +57,8 @@ function _kLevel(fallback = 1) {
     t = Array.isArray(t) ? t.map(Number).filter(Number.isFinite) : [];
     if (!t.length) return fallback;
     t = t.slice().sort((x, y) => y - x);
-    return t[((_kAt % t.length) + t.length) % t.length];
+    // S2: a fade down the page (sheet/supports.js fadeRung), never a cycle, on a printed page.
+    return t[fadeRung(_kAt, t.length, state.itemCount, Number.isFinite(state.itemIndex))];
 }
 /** Scattered positions (mm) for `n` objects: a jittered lattice with empty cells, never touching. */
 function _kScatter(n, rng) {
@@ -210,14 +212,15 @@ function _kShapeGrid(count, shape, { cell = 40, cols = 5, frame = false, tenGap 
 }
 
 /** A 5x2 ten frame with the first `filled` cells carrying a black counter. */
-function _kTenFrame(filled, { frames = 1, cell = 36 } = {}) {
+function _kTenFrame(filled, { frames = 1, cell = 36, rows = 2 } = {}) {
+    // rows: 1 draws a FIVE frame (make_ten "Make 5").
     const pad = 6;
     const w = 5 * cell + pad * 2;
-    const h = 2 * cell + pad * 2;
+    const h = rows * cell + pad * 2;
     const one = (from) => {
         let body = `<rect x="${K_HEAVY / 2}" y="${K_HEAVY / 2}" width="${w - K_HEAVY}" `
             + `height="${h - K_HEAVY}" fill="none" stroke="${K_INK}" stroke-width="${K_HEAVY}"/>`;
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < rows * 5; i++) {
             const x = pad + (i % 5) * cell;
             const y = pad + Math.floor(i / 5) * cell;
             body += `<rect x="${x}" y="${y}" width="${cell}" height="${cell}" fill="none" `
@@ -724,23 +727,28 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // EMPTY. One cell shape now, and the filled count is dealt so six items differ.
     // ========================================
     else if (mappedSkill === "make_ten") {
-        const filled = 1 + _kDeal(9);           // 1..9, every value on a page of six or more
-        const answer = 10 - filled;
+        // "Make" (option-panel round 3): 5 on a five frame, 10 on a ten frame (the default, and
+        // exactly the draws it made before), 20 on two ten frames with the first one full.
+        const target = [5, 20].includes(Number(_kOpt('band'))) ? Number(_kOpt('band')) : 10;
+        const filled = target === 5 ? 1 + _kDeal(4)       // 1..4
+            : target === 20 ? 11 + _kDeal(9)              // 11..19: the first frame full
+            : 1 + _kDeal(9);                              // 1..9, every value on a page of six or more
+        const answer = target - filled;
 
-        q.text = `The frame shows ${filled}. How many more make 10?`;
-        q.printText = 'Write how many more make 10.';
+        q.text = `The frame shows ${filled}. How many more make ${target}?`;
+        q.printText = `Write how many more make ${target}.`;
         q.ans = answer;
         q.answerType = "number";
-        q.hint = `Count the empty boxes. ${filled} and ${answer} make 10.`;
-        q.visual = _kCell(_kTenFrame(filled));
+        q.hint = `Count the empty boxes. ${filled} and ${answer} make ${target}.`;
+        q.visual = _kCell(target === 5 ? _kTenFrame(filled, { rows: 1 }) : _kTenFrame(filled, { frames: target === 20 ? 2 : 1 }));
         // P11 Support level 0: the number sentence alone, no frame to count the empty boxes of.
         if (_kLevel(1) === 0) {
-            q.text = `${filled} + ? = 10`;
+            q.text = `${filled} + ? = ${target}`;
             q.printText = 'Write the missing number.';
-            q.visual = _kCell(`<div style="font-size:1.6rem;font-weight:700;white-space:nowrap;">${filled} + ${_kLine(2)} = 10</div>`, null, true);
+            q.visual = _kCell(`<div style="font-size:1.6rem;font-weight:700;white-space:nowrap;">${filled} + ${_kLine(2)} = ${target}</div>`, null, true);
             q.supportLevel = 0;
         }
-        q.skillLabel = 'Make 10';
+        q.skillLabel = `Make ${target}`;
         return;
     }
 
@@ -752,7 +760,8 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // it that has exactly one blank — and are dealt.
     // ========================================
     else if (mappedSkill === "teen_compose") {
-        const ones = 1 + _kDeal(9);             // 1..9 -> 11..19, every teen on a long enough page
+        // "Teen numbers to" 15 keeps the loose ones to one row of five (option-panel round 3).
+        const ones = 1 + _kDeal(Number(_kOpt('band')) === 15 ? 5 : 9);   // 1..9 -> 11..19 (or 11..15)
         const teen = 10 + ones;
         const askTotal = _kDeal(2) === 1;
 

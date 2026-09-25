@@ -148,7 +148,10 @@ export function prepare(it, info = {}) {
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         let fix = '';
         if (kind === 'value') {
-            const fixW = Math.max({ S: 26, M: 30, L: 34 }[c.size] || 34, digits * ({ S: 6, M: 7, L: 8 }[c.size] || 8) + 6);
+            // A worded answer ("0 h 30 min", "Not enough") is sized by its characters, not its digits
+            // (critic round 3: the elapsed and enough-money keys overflowed the box).
+            const chars = /^[\d.,:]+$/.test(correct) ? digits : Math.ceil(String(correct).length * 0.62);
+            const fixW = Math.max({ S: 26, M: 30, L: 34 }[c.size] || 34, Math.max(digits, chars) * ({ S: 6, M: 7, L: 8 }[c.size] || 8) + 6);
             fix = `<span class="mq-ansslot mq-fixslot">${blank({ id: 'ea-ans', kind: 'number', shape: 'box', widthMm: fixW, graded: false }, c, slotOnly(key, 'ea-ans'))}<small>correct answer</small></span>`;
         } else if (kind === 'parts' || (kind === 'line' && !askedFix)) {
             const w = Math.max(...cParts.map((v) => String(v).length));

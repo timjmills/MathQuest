@@ -14,6 +14,7 @@ import {
 import { blank } from '../cell.js';
 import { register, getCell } from '../registry.js';
 import { stepMarks, placeDigits, singleSlotState } from '../steps.js';
+import { touchNumbers, touchNumberHTML, touchOpts, touchDigit, installCueDrawer } from '../support-draw.js';
 
 export { FACT_LADDER, factTab, factDigitPt, factCellHMm, FACT_AUTO_COLS };
 
@@ -26,7 +27,7 @@ export { FACT_LADDER, factTab, factDigitPt, factCellHMm, FACT_AUTO_COLS };
  * @param {string} op
  * @param {{pt?: number, padTop?: number}} [opts]  pt from FACT_LADDER[columns]
  */
-export function fact(a, b, op, { pt, padTop = 2, digits = 0 } = {}) {
+export function fact(a, b, op, { pt, padTop = 2, digits = 0, touch = null } = {}) {
     // VA-2: the operator has a track of its OWN, left of the digit tracks, so "×12", "−10" and
     // "÷12" never touch (the old cell padded both rows to 3 tracks and wrote the operator OVER
     // the first, which at 0.72 em sat flush against a tens digit). The digit tracks stay 0.72 em
@@ -34,8 +35,10 @@ export function fact(a, b, op, { pt, padTop = 2, digits = 0 } = {}) {
     // the answer too), at least 2 so a section's facts keep one width.
     const n = factDigitTracks(a, b, digits);
     const A = String(a).padStart(n, ' '), B = String(b).padStart(n, ' ');
-    const r = (s) => [...s].map((ch) => `<span>${ch === ' ' ? '' : ch}</span>`).join('');
-    const html = `<div class="ws-fact" style="${factGridStyle(n, b)}"><span></span>${r(A)}<span class="op">${opGlyph(op)}</span>${r(B)}<span class="rule"></span></div>`;
+    // S2: `touch` = {a, b, o}: touch dots laid over the digits of a (and / or) b (support-draw.js).
+    // The overlay takes no space, so the fact's geometry is the same with and without it.
+    const r = (s, on) => [...s].map((ch) => (ch === ' ' ? '<span></span>' : (touch && on && touchDigit(ch, true, touch.o)) || `<span>${ch}</span>`)).join('');
+    const html = `<div class="ws-fact" style="${factGridStyle(n, b)}"><span></span>${r(A, touch && touch.a)}<span class="op">${opGlyph(op)}</span>${r(B, touch && touch.b)}<span class="rule"></span></div>`;
     return { cls: 'fact', style: `--fd:${pt}pt;--fp:${padTop}mm`, html };
 }
 
@@ -105,7 +108,9 @@ export function factCue(p, { px = 0 } = {}) {
         + `role="img" aria-label="${label}" style="display:block;margin:0 auto;max-width:100%;overflow:visible;${px ? `width:${Math.round(w * px)}px;height:auto;` : ''}">${body}</svg>`;
     const dot = (x, y, r, open) => `<circle cx="${f2(x)}" cy="${f2(y)}" r="${f2(r)}" ${open ? `fill="none" stroke="${INK}" stroke-width="0.35"` : `fill="${INK}"`}/>`;
     const cross = (x, y, r) => `<path d="M${f2(x - r)} ${f2(y - r)}L${f2(x + r)} ${f2(y + r)}M${f2(x + r)} ${f2(y - r)}L${f2(x - r)} ${f2(y + r)}" stroke="${INK}" stroke-width="0.5"/>`;
-    const text = (x, y, s, pt = 3.2, anchor = 'middle') => `<text x="${f2(x)}" y="${f2(y)}" font-size="${pt}" text-anchor="${anchor}" font-family="Andika, sans-serif" fill="${INK}">${s}</text>`;
+    // `ref`: a number of an evenly printed reference scale (the number line's 0, 5, 10 ...), never
+    // an answer (SUPPORTS.md §S4.2); a lint may skip it. Text is 3 mm (8.5 pt) or more (TY-11).
+    const text = (x, y, s, pt = 3.2, anchor = 'middle', ref = false) => `<text x="${f2(x)}" y="${f2(y)}" font-size="${pt}" text-anchor="${anchor}" font-family="Andika, sans-serif" fill="${INK}"${ref ? ' data-ws-ref="1"' : ''}>${s}</text>`;
     if (kind === 'tile' || kind === 'frame') {
         const frame = kind === 'frame';
         const pitch = frame ? 4.2 : 3.6, r = frame ? 1.4 : 1.2;
@@ -150,7 +155,7 @@ export function factCue(p, { px = 0 } = {}) {
         for (let v = 0; v <= top; v++) {
             const x = 3 + v * pitch;
             body += `<line x1="${f2(x)}" y1="${v % 5 ? 3 : 2.2}" x2="${f2(x)}" y2="${v % 5 ? 5 : 5.8}" stroke="${INK}" stroke-width="${v % 5 ? 0.2 : 0.35}"/>`;
-            if (v % 5 === 0) body += text(x, 9.2, v, 2.8);
+            if (v % 5 === 0) body += text(x, 9.4, v, 3, 'middle', true);
         }
         body += dot(3 + a * pitch, 4, 1.1, false);
         return wrap(w, h, body, `number line 0 to ${top}, start at ${a}`);
@@ -179,12 +184,15 @@ export function factCue(p, { px = 0 } = {}) {
         const w = 36, h = 9;
         const body = `<rect x="0.3" y="0.3" width="${w - 0.6}" height="${h - 0.6}" rx="1.5" fill="none" stroke="${INK}" stroke-width="0.35"/>`
             + text(3, 6, `Think: ${b} ×`, 3.6, 'start')
-            + `<rect x="21.5" y="1.8" width="5.4" height="5.4" rx="0.8" fill="none" stroke="${INK}" stroke-width="0.35" stroke-dasharray="1 0.7"/>`
+            + `<rect x="21.5" y="1.8" width="5.4" height="5.4" rx="0.8" fill="none" stroke="${INK}" stroke-width="0.35"/>`
             + text(28.4, 6, `= ${a}`, 3.6, 'start');
         return wrap(w, h, body, `think ${b} times what is ${a}`);
     }
     return '';
 }
+// S2: the supports model draws the same cues round any template (support-draw.js).
+installCueDrawer(factCue);
+
 /** Height (mm) a cue adds under the fact on paper. */
 const cueHMm = (p) => {
     const m = /height="([\d.]+)mm"/.exec(factCue(p));
@@ -268,7 +276,7 @@ const wantsStack = (p) => !isAcross(p) && (p.op === '+')
 const drawsStack = (p, ctx) => wantsStack(p) && !(ctx && ctx.mode === 'screen')
     && explicitCols(p, ctx) > 0 && explicitCols(p, ctx) <= ACROSS_MAX_COLS;
 const stackPayload = (p) => ({
-    operands: [Number(p.a), Number(p.b)], op: '+', regroup: 'add',
+    operands: [Number(p.a), Number(p.b)], op: '+', regroup: 'add', ...(p.supports ? { supports: p.supports } : {}),
     ansDigits: factDigitTracks(p.a, p.b, p.digits || String(compute(p) ?? '').length),
 });
 
@@ -284,8 +292,11 @@ register('fact', {
         const pt = p.pt || factDigitPt(cols);
         // VA-71 / the notation option: vertical rows first, then a horizontal block. An across
         // fact on a page of more than 4 columns (a fact-rows page) is drawn vertical (VA-65).
+        const tn = touchNumbers(p);
+        const to = touchOpts(pt, ctx.mode === 'screen' ? 'px' : 'pt');
         if (drawsAcross(p, ctx)) {
             const nd = Math.max(2, Number(p.digits) || 3);
+            const A0 = touchNumberHTML(p.a, tn.a, to), B0 = touchNumberHTML(p.b, tn.b, to);
             // The key's value is written at the DIGIT size and weight, on the line, like the
             // pupil's own digits (AK-1) - never the small bold of a caption.
             const slot = blank({ id: 'ans', kind: 'number', shape: 'line', digits: nd, graded: true, order: 0, maxLength: nd, inputmode: 'numeric', scopes: ['full', 'answer-only'] }, ctx, value)
@@ -303,14 +314,14 @@ register('fact', {
                 // would not (the answer line itself is unchanged: SL-12, AK-4).
                 return `<div class="ws-eq ws-eq-below" style="--ws-digit:${pt}pt;${hold}flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em">`
                     + `<span style="display:flex;align-items:flex-end;gap:${ACROSS_TIGHT_GAP_EM}em;white-space:nowrap">`
-                    + `<span>${p.a}</span>${o(opGlyph(p.op), ACROSS_TIGHT_OP_EM)}<span>${p.b}</span>${o('=', ACROSS_TIGHT_OP_EM)}</span>${slot}</div>`;
+                    + `<span>${A0}</span>${o(opGlyph(p.op), ACROSS_TIGHT_OP_EM)}<span>${B0}</span>${o('=', ACROSS_TIGHT_OP_EM)}</span>${slot}</div>`;
             }
             const eq = `<div class="ws-eq" style="--ws-digit:${pt}pt">`
-                + `<span>${p.a}</span>${o(opGlyph(p.op))}<span>${p.b}</span>${o('=')}${slot}</div>`;
+                + `<span>${A0}</span>${o(opGlyph(p.op))}<span>${B0}</span>${o('=')}${slot}</div>`;
             return hold ? `<div class="ws-eq-hold" style="font-size:${pt}pt;${hold}">${eq}</div>` : eq;
         }
         const n = factDigitTracks(p.a, p.b, p.digits || String(value ?? '').length);
-        const item = fact(p.a, p.b, p.op, { pt, digits: n, padTop: p.padTop !== undefined ? p.padTop : factPadTop(ctx.label && ctx.label.style, cols) });
+        const item = fact(p.a, p.b, p.op, { pt, digits: n, padTop: p.padTop !== undefined ? p.padTop : factPadTop(ctx.label && ctx.label.style, cols), touch: tn.a || tn.b ? { ...tn, o: to } : null });
         // `fact()` returns a grid item, so the ladder's point size rides on the CELL. Through
         // the registry the template must stand alone, so the same value is inlined here.
         item.html = item.html.replace('<div class="ws-fact" style="', `<div class="ws-fact" style="--fd:${pt}pt;`);

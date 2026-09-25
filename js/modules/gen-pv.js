@@ -882,7 +882,11 @@ function genNearest(q, skill, o) {
     q.skillLabel = `Round to ${fmt(P)}`;
     q.options = [];
     q.pv = { kind: 'round', n, place: P, deal: kind, scope };
-    const support = scope === 'full' ? (o.support || 'cut') : 'cut';
+    // S2: `support` is a SET now. Its generation rungs are 'line' and 'cut' (line wins when both
+    // are ticked); the chart and the marks ('round-pv', 'round-mark') are drawn round the cell at
+    // render time. Nothing ticked (an old "none") is the bare number. A scalar is an old value.
+    const sup = Array.isArray(o.support) ? o.support : [o.support === undefined || o.support === null ? 'cut' : o.support];
+    const support = scope === 'full' ? (sup.includes('line') ? 'line' : sup.includes('cut') ? 'cut' : 'none') : 'cut';
     const strip = numeralTracksHTML(n, { cut: P, arrow: scope === 'full' || scope === 'judge' });
     if (scope === 'notation') {
         // RN-7a: find the place and the digit that decides — no rounding. Paper: underline and

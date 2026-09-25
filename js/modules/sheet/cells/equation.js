@@ -12,6 +12,7 @@ import { opGlyph, DEFAULT_SIZE, blankWidth, STRETCH_CAP } from '../tokens.js';
 import { esc, line, box, circle, blank } from '../cell.js';
 import { register } from '../registry.js';
 import { stepMarks, singleSlotState } from '../steps.js';
+import { touchNumbers, touchNumberHTML, touchOpts } from '../support-draw.js';
 
 const OP_RE = /^[+\-*x/=<>]$/;
 
@@ -90,6 +91,10 @@ register('equation', {
         // P11: a ÷ sentence written the way the teacher ticked (`notation`): the dividend over the
         // divisor on a fraction bar, or the divisor outside a long-division bracket. The unknown
         // keeps its slot wherever it sits.
+        // S2: touch dots on the GIVEN numbers (never on the unknown or the result).
+        const tn = touchNumbers(p);
+        const to = touchOpts((ctx.metrics && ctx.metrics.digitPt) || 28, ctx.mode === 'screen' ? 'px' : 'pt');
+        const num = (k) => (tn[k] ? touchNumberHTML(p[k], true, to) : esc(p[k]));
         const isDiv = p.op === '/' || p.op === '÷';
         if (isDiv && (p.notation === 'fraction' || p.notation === 'bracket')) {
             const A = u === 'a' ? slotHtml : `<span>${esc(p.a)}</span>`;
@@ -102,9 +107,9 @@ register('equation', {
             return `<div class="ws-eq" data-ws-notation="${p.notation}">${body}<span class="o">=</span>${R}</div>`;
         }
         const pieces = [
-            u === 'a' ? slotHtml : `<span>${esc(p.a)}</span>`,
+            u === 'a' ? slotHtml : `<span>${num('a')}</span>`,
             u === 'op' ? slotHtml : `<span class="o">${opGlyph(p.op)}</span>`,
-            u === 'b' ? slotHtml : `<span>${esc(p.b)}</span>`,
+            u === 'b' ? slotHtml : `<span>${num('b')}</span>`,
             `<span class="o">=</span>`,
             u === 'result' ? slotHtml : `<span>${esc(result)}</span>`,
         ];
