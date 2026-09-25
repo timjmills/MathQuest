@@ -40,6 +40,23 @@ function opt(id) {
     return !!(o && typeof o === 'object' && o[id] === true);
 }
 
+/**
+ * The digit tracks of the SKILL's largest numbers, so every item of a page stands on the same
+ * columns (round-4 critic: a 2-track and a 3-track grid on one page). The ranged stories take
+ * their band (the answer's bound); the others the Max Number (a sum may reach twice it).
+ */
+function skillTracks(skill, op) {
+    const m = /_wp_(10|20|50|100|1k|10k|100k|1m)(_plain)?$/.exec(skill);
+    const BAND = { 10: 10, 20: 20, 50: 50, 100: 100, '1k': 1000, '10k': 10000, '100k': 100000, '1m': 1000000 };
+    const o = state.skillOptions;
+    const band = o && Number(o.band) > 0 ? Number(o.band) : m ? BAND[m[1]] : 0;
+    // a difference never needs the band's own extra digit (the number taken from is rarely the band itself)
+    if (band) return String(op === '-' ? Math.max(9, band - 1) : band).length;
+    const R = Math.max(10, Number(state.range) || 100);
+    if (op === '+') return String(2 * R - 1).length;
+    return String(R).length;
+}
+
 /** The ranged stories' own "Bar model" support (`support: bar`, skill-options.js _opsBar). */
 function barSupport() {
     const o = state.skillOptions;
@@ -63,10 +80,24 @@ export function applyWordWork(q) {
     const wp = q.cell && q.cell.template === 'wordpic' && q.cell.payload ? q.cell.payload : null;
     const pic = wp && wp.pictures !== false ? { a: wp.a, b: wp.b, shape: wp.shape } : null;
     let payload = null;
+    // the story's names and nouns vary by the item's place on a page (seeded, so reproducible)
+    // (by the item's place: neighbours never share a name or a noun, P-WP-12 variety across the page)
+    const k = Number.isFinite(state.itemIndex) ? state.itemIndex * 5 : Math.floor(Math.random() * 1000);
+    const two = TWO_STEP.has(skill) || TWO_STEP.has(outer);
     try {
-        payload = wordWorkPayload(q, { hl: opt('wpCues'), kb: opt('wpBank'), bar: opt('wpBar') || barSupport(), pic, twoStep: TWO_STEP.has(skill) || TWO_STEP.has(outer), divFirst: /^remainder_/.test(skill) || /^remainder_/.test(outer) });
+        payload = wordWorkPayload(q, {
+            hl: opt('wpCues'), kb: opt('wpBank'), bar: opt('wpBar') || barSupport(), pic, twoStep: two,
+            divFirst: /^remainder_/.test(skill) || /^remainder_/.test(outer),
+            // the K picture story keeps its own (already controlled) words
+            retell: !(/^add_wp_10(_plain)?$/.test(skill) || wp), seed: k,
+        });
+        if (payload && !two && payload.steps.length === 1 && payload.steps[0].op !== '/') {
+            payload.tracks = skillTracks(skill === outer ? skill : (isWordWorkSkill(skill) ? skill : outer), payload.steps[0].op);
+        }
     } catch (e) { payload = null; }
     if (!payload) return q;
+    // the retold story is the item's text on every host (the card, the worksheet, the quiz, print)
+    q.text = payload.lines.join(' ');
     q.cell = { template: WW_TEMPLATE, v: 1, payload };
     try { q.visual = wordWorkTwin(renderCell, payload); } catch (e) { /* keep the old visual */ }
     q.answerType = 'number';
@@ -75,6 +106,8 @@ export function applyWordWork(q) {
     // not a `word*` format: the page measures the cell's columns (print-sheet.js footprintClass)
     q.printFormat = 'story-work';
     q.printText = 'Circle the sign. Write the numbers in the boxes. Solve.';
+    // the same instruction in screen verbs (PEDAGOGY 10.2): the hosts print it over the cell
+    q.screenInstr = 'Tap the sign. Type the numbers in the boxes. Solve.';
     // what the work expects, for a host that marks each box as it is filled
     q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit };
     return q;

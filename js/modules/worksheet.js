@@ -1,3 +1,4 @@
+import { worksheetLadderWrong, markTried } from './support-ladder.js';
 import { state } from './state.js';
 import { SKILLS } from './data.js';
 import { shuffle, normalizeText } from './utils.js';
@@ -1812,6 +1813,15 @@ export function checkWorksheetAnswerFromColumns(idx) {
             setTimeout(() => advanceToNextProblem(idx), 400);
         }
     } else {
+        // The support ladder (support-ladder.js): a support in this card's cell, the digits kept.
+        const lad = worksheetLadderWrong(idx, q, enteredValue);
+        if (lad && (lad.wait || !lad.spent)) {
+            card.style.background = "";
+            card.style.border = "";
+            columnInputs.forEach(input => { input.style.borderColor = ""; input.style.background = ""; });
+            wsRecordAnswer(idx, false);
+            return;
+        }
         // All filled but wrong - show incorrect styling
         card.style.background = "rgba(239,71,111,0.08)";
         card.style.border = "2px solid var(--incorrect)";
@@ -2300,6 +2310,17 @@ export function checkWorksheetAnswer(idx) {
             setTimeout(() => advanceToNextProblem(idx), 400);
         }
     } else {
+        // The support ladder (support-ladder.js): a support in this card's cell, the entry kept
+        // and marked gently. Once it is spent, the red below.
+        const lad = worksheetLadderWrong(idx, q, value);
+        if (lad && (lad.wait || !lad.spent)) {
+            if (!lad.wait) { markTried(input); wsRecordAnswer(idx, false); }
+            input.style.borderColor = "";
+            input.style.background = "";
+            card.style.background = "";
+            card.style.border = "";
+            return;
+        }
         // Wrong — show red immediately, student can erase and retry
         input.style.borderColor = "var(--incorrect)";
         input.style.background = "rgba(239,71,111,0.15)";
