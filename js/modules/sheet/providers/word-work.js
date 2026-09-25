@@ -16,14 +16,18 @@
 
 import { registerSkill } from '../contract.js';
 import { fmt, strings, step, clampSteps, chooseWrong } from './util.js';
-import { cueRanges } from '../cells/word-work.js';
+import { cueRanges, wordWorkPayload } from '../cells/word-work.js';
 
 const GLYPH = { '+': '+', '-': '−', '*': '×', '/': '÷' };
 const VERB = { '+': 'Add', '-': 'Subtract', '*': 'Multiply', '/': 'Divide' };
 /** The sign a pupil wrongly picks for each story sign (the classic confusions). */
 const WRONG_OP = { '+': '-', '-': '+', '*': '+', '/': '*' };
 
-const payloadOf = (q) => (q && q.cell && q.cell.template === 'word-work' && q.cell.payload) || null;
+/** The item's word-work payload: its cell's, else built from the item itself (a story or a bare sum). */
+function payloadOf(q) {
+    if (q && q.cell && q.cell.template === 'word-work' && q.cell.payload) return q.cell.payload;
+    try { return wordWorkPayload(q || {}, { twoStep: /multi_step/.test(String((q && q.skillId) || '')) }); } catch (e) { return null; }
+}
 
 /** The key words the story uses for its solving sign(s), in reading order. */
 function cuesOf(p) {
@@ -69,6 +73,7 @@ export function wordWorkWrong(q) {
     const names = { '+': 'Added', '-': 'Subtracted', '*': 'Multiplied', '/': 'Divided' };
     return chooseWrong(q, [{
         value: v, misconception: 'wrong-operation', slots: { answer: String(v), op: GLYPH[wop] },
+        work: wop === '-' ? `${hi} − ${lo} = {v}` : `${st.a} ${GLYPH[wop]} ${st.b} = {v}`,
         explain: `${names[wop]} when the story asks to ${VERB[st.op].toLowerCase()}.`,
     }], { rotate: false });
 }
@@ -83,7 +88,7 @@ export function wordWorkProvider(iCan, extra = {}) {
                 'Read the story two times.',
                 'Circle the sign that fits the story.',
                 'Write the numbers in the boxes. Solve.',
-                'Write the answer and the unit word.',
+                'Write the answer and its label word.',
             ],
             say: 'The answer is __ __.',
             sayValues: (q) => { const p = payloadOf(q); return p && p.unit ? [fmt(p.ans), p.unit] : null; },

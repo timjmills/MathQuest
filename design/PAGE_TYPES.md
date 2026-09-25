@@ -1079,6 +1079,23 @@ HUNDRED CHART (1-120) + band            BAR GRAPH + question band
 **Skill supplies.** `renderCell` (word-problem template: story lines, schema id, equation, answer sentence, unit word), `strings`, `workedSteps` for the Model problem, `variants[]` for unknown positions.
 **Screen.** Same zones stacked at 375 (story, picture, diagram, equation, answer). Diagram parts, equation boxes, a Level-aware sign picker (add and subtract only to Level 2) and the answer blank are inputs; decision lines are tap targets; commutative equations are accepted; Hint reads the story aloud.
 
+**The word-work cell (owner ruling 2026-09-25) — every whole-number story, on every page role and
+every screen host.** Template `word-work` (`js/modules/sheet/cells/word-work.js`), attached to the
+story skills by `js/modules/word-work.js`. Top to bottom: the story (one sentence per line); a SMALL
+row of four boxes `+ − × ÷` the pupil circles (taps on screen); the work area of COLUMN BOXES the
+pupil writes the story's numbers into — the sign box on the left of the bottom row, a regroup row on
+top when that item can regroup, one partial-product row per digit of a 2-digit multiplier, the long
+division frame (divisor, bracket, dividend, quotient, two work rows per step, `R [ ]` when there is
+a remainder); then `Answer: [ ] ______` (the number box is the one scored place) with a three-word
+unit bank to copy the unit from. Two-step stories draw two blocks, `Step 1` and `Step 2`, each with
+its own sign row. Supports, all OFF by default (Support group; share keys 8A–8C): `wpCues` key words
+bold + underlined, `wpBank` a keyword bank box, `wpBar` a bar model with blank labels (the ranged
+stories keep their own `support: bar`). The cell is measured: a story whose work and answer fit side
+by side in a 2-column cell prints 2 columns; a wider one keeps its full-width layout and goes to the
+full-width group at the bottom of the page. Key: the ringed sign, every box filled, the answer and
+unit. Error analysis shows the story worked with the wrong sign (`wrong-operation`). Instruction
+`story-work`: "Circle the sign. Write the numbers in the boxes. Solve."
+
 ### 3.8 Blank reusable template
 
 **Purpose.** All structure and no content, so a teacher can write in their own numbers.

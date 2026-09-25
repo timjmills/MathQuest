@@ -372,7 +372,7 @@ function range(from, to) { const out = []; for (let i = from; i < to; i++) out.p
 
 /* ============================================================== drawing */
 
-const BOX = { S: 8.5, M: 10, L: 12 };
+const BOX = { S: 8.5, M: 10, L: 11.5 };
 const boxMm = (ctx) => BOX[sizeOf(ctx)];
 const GAP = 0.8;
 
@@ -390,26 +390,26 @@ const tw = (ctx, mm) => (isTwin(ctx) ? `max(44px, ${L(ctx, mm)})` : L(ctx, mm));
 function wbox(ctx, { id, value = '', expect = '', w, h, pt, kind = 'digit', graded = false, small = false }) {
     const ink = value !== '' ? inkOf(ctx) : null;
     const color = ink === 'trace' ? GREY : INK;
-    const base = `box-sizing:border-box;width:${small ? L(ctx, w) : tw(ctx, w)};height:${small ? L(ctx, h) : tw(ctx, h)};border:${B(ctx, small ? 0.75 : 1)} solid ${INK};`
+    const base = `box-sizing:border-box;width:${small && !isTwin(ctx) ? L(ctx, w) : tw(ctx, w)};height:${small && !isTwin(ctx) ? L(ctx, h) : tw(ctx, h)};border:${B(ctx, small ? 0.75 : 1)} solid ${small && isTwin(ctx) ? GREY : INK};`
         + `border-radius:${L(ctx, 1)};background:#fff;font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, pt)};font-weight:700;line-height:1;color:${color};text-align:center;${KEY_FEATURES}`;
     if (isTwin(ctx)) {
         const lab = kind === 'sign' ? 'sign' : kind === 'regroup' ? 'regroup digit' : 'digit';
         return `<input type="text" class="mq-wwork${small ? ' mq-wwsmall' : ''}" data-mq-kind="${kind}" data-mq-expect="${esc(expect)}" data-ws-graded="0"`
             + ` maxlength="${kind === 'regroup' ? 2 : 1}" inputmode="${kind === 'sign' ? 'text' : 'numeric'}" autocomplete="off" spellcheck="false" tabindex="0"`
-            + ` aria-label="${lab}" style="${base}padding:0;margin:0;${small ? 'min-width:28px;min-height:28px;' : ''}">`;
+            + ` aria-label="${lab}" style="${base}padding:0;margin:0;">`;
     }
     return `<span data-ws-slot="${esc(id)}" data-ws-shape="box"${graded ? '' : ' data-ws-graded="0"'}${ink ? ` data-ws-ink="${ink}"` : ''}`
-        + ` style="display:inline-flex;align-items:center;justify-content:center;${base}">${esc(value)}</span>`;
+        + ` style="display:flex;align-items:center;justify-content:center;${base}">${esc(value)}</span>`;
 }
 
 /** The small sign row: + − × ÷, the chosen one ringed on the key. */
 function signRow(ctx, op, pick, idx) {
-    const s = boxMm(ctx) * 0.78;
+    const s = boxMm(ctx) * (isTwin(ctx) ? 0.78 : 0.72);
     const pt = textPt(ctx) + 5;
     const ink = pick && filled(ctx) ? inkOf(ctx) : null;
     const cells = OPS.map((o) => {
         const ring = ink && o === pick
-            ? `<span data-ws-ink="${ink}" style="position:absolute;left:${L(ctx, -1.6)};top:${L(ctx, -1.6)};right:${L(ctx, -1.6)};bottom:${L(ctx, -1.6)};border:${B(ctx, 1.5)} solid ${ink === 'trace' ? GREY : INK};border-radius:50%;"></span>`
+            ? `<span data-ws-ink="${ink}" style="position:absolute;left:${L(ctx, -1.6)};top:${L(ctx, -1.6)};right:${L(ctx, -1.6)};bottom:${L(ctx, -1.6)};color:${ink === 'trace' ? GREY : INK};border:${B(ctx, 1.5)} solid currentColor;border-radius:50%;"></span>`
             : '';
         const face = `display:inline-flex;align-items:center;justify-content:center;position:relative;box-sizing:border-box;width:${tw(ctx, s)};height:${tw(ctx, s)};`
             + `border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, pt)};line-height:1;padding:0;`;
@@ -418,7 +418,7 @@ function signRow(ctx, op, pick, idx) {
         }
         return `<span data-ws-slot="op${idx}-${WORD[o]}" data-ws-shape="choice" data-ws-graded="0" style="${face}">${GLYPH[o]}${ring}</span>`;
     }).join('');
-    return `<div class="mq-wwsigns" role="${isTwin(ctx) ? 'group' : 'presentation'}" aria-label="choose the sign" style="display:flex;gap:${L(ctx, 2.6)};justify-content:${isTwin(ctx) ? 'center' : 'flex-start'};padding:${L(ctx, 1.6)};">${cells}</div>`;
+    return `<div class="mq-wwsigns" role="${isTwin(ctx) ? 'group' : 'presentation'}" aria-label="choose the sign" style="display:flex;gap:${L(ctx, 2.6)};justify-content:${isTwin(ctx) ? 'center' : 'flex-start'};padding:${L(ctx, isTwin(ctx) ? 1.6 : 0.4)} ${L(ctx, 1.6)};">${cells}</div>`;
 }
 
 /** The value in a column row at track i (0 = leftmost digit track), right-aligned. */
@@ -428,7 +428,7 @@ const at = (value, T, i) => { const p = String(value).padStart(T, ' '); return p
 function columnWork(ctx, st, show, idx) {
     const { T, rows } = columnRows(show);
     const bx = boxMm(ctx), pt = digitPt(ctx);
-    const sb = bx * 0.62;
+    const sb = bx * 0.58;
     const cols = `${tw(ctx, bx)} repeat(${T}, ${tw(ctx, bx)})`;
     const expect = columnRows(st);          // what the model expects, whatever is shown
     const eRow = (id) => (expect.rows.find((r) => r.id === id) || {}).value || '';
@@ -437,7 +437,7 @@ function columnWork(ctx, st, show, idx) {
     let r = 1;
     for (const row of rows) {
         if (row.kind === 'rule') {
-            html += `<span style="grid-row:${r};grid-column:1 / -1;border-top:${B(ctx, 1.5)} solid ${INK};height:0;margin:${L(ctx, 0.6)} 0;"></span>`;
+            html += `<span style="grid-row:${r};grid-column:1 / -1;border-top:${B(ctx, 1.5)} solid ${INK};height:0;margin:${L(ctx, 0.4)} 0;"></span>`;
             r++; continue;
         }
         if (row.kind === 'carry') {
@@ -465,7 +465,7 @@ function columnWork(ctx, st, show, idx) {
         }
         r++;
     }
-    return `<div class="mq-wwcols" role="group" aria-label="column work" style="display:inline-grid;grid-template-columns:${cols};column-gap:${L(ctx, GAP)};row-gap:${L(ctx, GAP)};align-items:end;">${html}</div>`;
+    return `<div class="mq-wwcols" role="group" aria-label="column work" style="display:inline-grid;grid-template-columns:${cols};column-gap:${L(ctx, GAP)};row-gap:${L(ctx, 0.5)};align-items:end;">${html}</div>`;
 }
 
 /** The ÷ frame: divisor boxes, the bracket, dividend boxes, quotient boxes, the working, R. */
@@ -496,7 +496,7 @@ function divisionWork(ctx, st, show, idx) {
     for (let i = 0; i < Dy; i++) html += `<span style="grid-row:2;grid-column:${i + 1};">${wbox(ctx, { id: `w${idx}-dv-${i}`, value: put ? ys[i].trim() : '', expect: eys[i].trim(), w: bx, h: bx, pt })}</span>`;
     const hMm = bx + 1.6;
     html += `<span aria-hidden="true" style="grid-row:2;grid-column:${Dy + 1};align-self:stretch;display:flex;align-items:stretch;justify-content:center;">`
-        + `<svg viewBox="0 0 10 40" preserveAspectRatio="none" style="display:block;width:${L(ctx, bw)};height:${isTwin(ctx) ? '100%' : L(ctx, hMm)};overflow:visible;"><path d="M2 1 Q9 20 2 39" fill="none" stroke="${INK}" stroke-width="2.4" vector-effect="non-scaling-stroke"/></svg></span>`;
+        + `<svg viewBox="0 0 10 40" preserveAspectRatio="none" style="display:block;width:${L(ctx, bw)};height:${isTwin(ctx) ? `max(48px, ${L(ctx, hMm)})` : L(ctx, hMm)};overflow:visible;"><path d="M2 1 Q9 20 2 39" fill="none" stroke="${INK}" stroke-width="2.4" vector-effect="non-scaling-stroke"/></svg></span>`;
     html += `<span style="grid-row:2;grid-column:${c0} / span ${Dx};border-top:${B(ctx, 1.5)} solid ${INK};align-self:start;height:0;"></span>`;
     const xs = String(x).padStart(Dx, ' '), exs = String(st.top).padStart(Dx, ' ');
     for (let i = 0; i < Dx; i++) html += `<span style="grid-row:2;grid-column:${c0 + i};padding-top:${L(ctx, 0.8)};">${wbox(ctx, { id: `w${idx}-dd-${i}`, value: put ? xs[i].trim() : '', expect: exs[i].trim(), w: bx, h: bx, pt })}</span>`;
@@ -526,19 +526,33 @@ function divisionWork(ctx, st, show, idx) {
             html += `<span style="grid-row:${row};grid-column:${c0 + i};${er.minus ? `border-bottom:${B(ctx, 0.75)} solid ${INK};padding-bottom:${L(ctx, 0.6)};` : ''}">${wbox(ctx, { id: `w${idx}-wk${k}-${i}`, value: v, expect: e, w: bx, h: bx, pt })}</span>`;
         }
     });
-    return `<div class="mq-wwcols mq-wwdiv" role="group" aria-label="division work" style="display:inline-grid;grid-template-columns:${cols};column-gap:${L(ctx, GAP)};row-gap:${L(ctx, GAP)};align-items:end;">${html}</div>`;
+    return `<div class="mq-wwcols mq-wwdiv" role="group" aria-label="division work" style="display:inline-grid;grid-template-columns:${cols};column-gap:${L(ctx, GAP)};row-gap:${L(ctx, 0.5)};align-items:end;">${html}</div>`;
+}
+
+/** The width (mm) of one step's work block: the wider of its sign row and its columns. */
+function blockWidthMm(ctx, st) {
+    const bx = boxMm(ctx);
+    const signs = 4 * bx * 0.72 + 3 * 2.6 + 3.2;
+    let work;
+    if (st.op === '/') {
+        const Dx = digitsOf(st.top).length, Dy = digitsOf(st.bottom).length;
+        work = (Dx + Dy) * (bx + GAP) + bx * 0.45 + (st.top % st.bottom ? bx + 6 : 0);
+    } else {
+        work = (columnRows(st).T + 1) * (bx + GAP);
+    }
+    return Math.max(signs, work);
 }
 
 /** One step's work block: its sign row over its columns. */
 function stepBlock(ctx, st, show, pick, idx, caption) {
     const work = st.op === '/' ? divisionWork(ctx, st, show, idx) : columnWork(ctx, st, show, idx);
     const cap = caption ? `<div style="font-size:${P(ctx, zonePt(ctx))};font-weight:700;line-height:1.3;">${esc(caption)}</div>` : '';
-    return `<div class="mq-wwstep" style="display:flex;flex-direction:column;align-items:${isTwin(ctx) ? 'center' : 'flex-start'};gap:${L(ctx, 1.4)};">${cap}${signRow(ctx, st.op, pick, idx)}`
+    return `<div class="mq-wwstep" style="display:flex;flex-direction:column;align-items:${isTwin(ctx) ? 'center' : 'flex-start'};gap:${L(ctx, 1)};">${cap}${signRow(ctx, st.op, pick, idx)}`
         + `<div style="max-width:100%;overflow-x:auto;">${work}</div></div>`;
 }
 
 /** The story, the key words bold and underlined when asked (never colour, PT-WPR-6). */
-function storyHTML(ctx, p) {
+function storyHTML(ctx, p, narrow = false) {
     const ops = p.hl ? p.steps.map((s) => s.op) : [];
     const lines = p.lines.map((line) => {
         if (!ops.length) return `<div>${esc(line)}</div>`;
@@ -553,7 +567,7 @@ function storyHTML(ctx, p) {
     // a repeat of its text line (screen-cell.js hideRepeatedPrompt skips a block that holds one);
     // the host hides its own line instead (visualRepeatsText), so the story is said once, here.
     const keep = isTwin(ctx) ? '<svg aria-hidden="true" width="0" height="0" style="position:absolute;"></svg>' : '';
-    return `<div class="mq-wwstory" style="flex:1 1 auto;min-width:0;text-align:left;font-size:${P(ctx, textPt(ctx) + 2)};line-height:1.4;">${keep}${lines}</div>`;
+    return `<div class="mq-wwstory" style="flex:1 1 auto;min-width:0;text-align:left;font-size:${P(ctx, textPt(ctx) + (narrow && !isTwin(ctx) ? 0 : 2))};line-height:${narrow && !isTwin(ctx) ? 1.2 : 1.4};">${keep}${lines}</div>`;
 }
 
 /** The keyword bank box: each sign with its cue phrases (a fixed panel, the same on every item). */
@@ -570,7 +584,10 @@ function barModel(ctx, p) {
     const put = filled(ctx);
     const ink = inkOf(ctx);
     const W = 150, H = 8;
-    const lab = (v, w) => `<span data-ws-graded="0" data-ws-slot="bar" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${L(ctx, w)};height:${L(ctx, 7)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-size:${P(ctx, zonePt(ctx) + 2)};font-weight:700;padding:0 ${L(ctx, 1)};color:${ink === 'trace' ? GREY : INK};"${put && ink ? ` data-ws-ink="${ink}"` : ''}>${put ? esc(v) : ''}</span>`;
+    // A bar label is written on paper and typed on screen (scratch, never graded, SP-1 parity).
+    const lab = (v, w) => (isTwin(ctx)
+        ? `<input type="text" class="mq-wwork" data-mq-kind="number" data-mq-expect="${esc(String(v).replace(/,/g, ''))}" data-ws-graded="0" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="bar label" style="box-sizing:border-box;width:${L(ctx, Math.max(w, 16))};min-width:44px;height:max(44px, ${L(ctx, 7)});border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, zonePt(ctx) + 2)};font-weight:700;text-align:center;padding:0;">`
+        : `<span data-ws-graded="0" data-ws-slot="bar" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${L(ctx, w)};height:${L(ctx, 7)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-size:${P(ctx, zonePt(ctx) + 2)};font-weight:700;padding:0 ${L(ctx, 1)};color:${ink === 'trace' ? GREY : INK};"${put && ink ? ` data-ws-ink="${ink}"` : ''}>${put ? esc(v) : ''}</span>`);
     const seg = (w, inner, dashed) => `<span style="display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};height:${L(ctx, H + 3)};border:${B(ctx, 1)} ${dashed ? 'dashed' : 'solid'} ${INK};background:#fff;">${inner}</span>`;
     const fmt = (n) => Number(n).toLocaleString('en-US');
     const row = (inner) => `<div style="display:flex;align-items:center;">${inner}</div>`;
@@ -602,17 +619,21 @@ function barModel(ctx, p) {
 /** The K picture of the two groups (add_wp_10 with pictures on): line-art objects to count. */
 function pictureRow(ctx, pic) {
     if (!pic) return '';
-    const d = 9, pitch = d + 2.6, gap = 10;
-    const n = pic.a + pic.b;
-    const w = (n - 1) * pitch + gap + d + 2, h = d + 2;
-    let body = '';
-    for (let i = 0; i < n; i++) body += shapeOf(pic.shape).draw(1 + d / 2 + i * pitch + (i >= pic.a ? gap : 0), 1 + d / 2, d);
-    return `<div style="margin-top:${L(ctx, 1.5)};"><svg class="k2-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n2(w)} ${n2(h)}" role="img" aria-label="${pic.a} and ${pic.b} ${esc(shapeOf(pic.shape).plural)}" `
-        + `style="display:block;width:${L(ctx, w)};height:auto;max-width:100%;overflow:visible;">${body}</svg></div>`;
+    // Two groups, each its own drawing (9 mm objects, RP-20 >= 8 mm), a clear gap between them;
+    // in a narrow column the second group wraps under the first instead of shrinking (DN-10).
+    const d = 9, pitch = d + 2.2;
+    const group = (n) => {
+        const w = (n - 1) * pitch + d + 2, h = d + 2;
+        let body = '';
+        for (let i = 0; i < n; i++) body += shapeOf(pic.shape).draw(1 + d / 2 + i * pitch, 1 + d / 2, d);
+        return `<svg class="k2-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n2(w)} ${n2(h)}" aria-hidden="true" `
+            + `style="display:block;width:${L(ctx, w)};height:auto;max-width:100%;overflow:visible;">${body}</svg>`;
+    };
+    return `<div role="img" aria-label="${pic.a} and ${pic.b} ${esc(shapeOf(pic.shape).plural)}" style="display:flex;flex-wrap:wrap;gap:${L(ctx, 3)} ${L(ctx, 9)};margin-top:${L(ctx, 1.5)};">${group(pic.a)}${group(pic.b)}</div>`;
 }
 
 /** "Answer: [box] ______" and the unit-word bank under it. */
-function answerBlock(ctx, p, shown, unitShown) {
+function answerBlock(ctx, p, shown, unitShown, vertical = false) {
     const bx = boxMm(ctx);
     const tp = textPt(ctx) + 2;
     const digits = Math.max(2, ...p.steps.map((s) => Math.max(digitsOf(s.top).length, digitsOf(s.bottom).length, digitsOf(s.ans).length)));
@@ -621,18 +642,23 @@ function answerBlock(ctx, p, shown, unitShown) {
     const color = ink === 'trace' ? GREY : INK;
     const boxStyle = `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${tw(ctx, w)};height:${tw(ctx, bx + 1)};border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 1.25)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;color:${color};${KEY_FEATURES}`;
     const num = `<span data-ws-slot="answer" data-ws-shape="box"${ink ? ` data-ws-ink="${ink}"` : ''}${isTwin(ctx) ? ' data-mq-blank="box"' : ''} style="${boxStyle}">${esc(shown)}</span>`;
-    const uw = isTwin(ctx) ? 26 : { S: 28, M: 32, L: 36 }[sizeOf(ctx)];
+    const uw = isTwin(ctx) ? 26 : vertical ? { S: 20, M: 22, L: 24 }[sizeOf(ctx)] : { S: 28, M: 32, L: 36 }[sizeOf(ctx)];
     const uInk = unitShown !== '' ? inkOf(ctx) : null;
     const unit = p.unit
         ? `<span class="mq-wwunit" data-ws-slot="answer-label" data-ws-shape="line" data-ws-graded="0"${uInk ? ` data-ws-ink="${uInk}"` : ''} data-mq-expect="${esc(p.unit)}" style="display:inline-flex;align-items:flex-end;justify-content:center;box-sizing:border-box;width:${L(ctx, uw)};min-height:${L(ctx, bx * 0.8)};border-bottom:${B(ctx, 1)} solid ${INK};font-size:${P(ctx, tp)};font-weight:700;line-height:1.1;color:${uInk === 'trace' ? GREY : INK};">${esc(unitShown)}</span>`
         : '';
     const bank = p.unit && p.bank && p.bank.length
-        ? `<div class="mq-wwwords" aria-label="unit words" style="display:inline-flex;gap:${L(ctx, 1.6)};align-items:center;border:${B(ctx, 0.75)} solid ${INK};padding:${L(ctx, 0.8)} ${L(ctx, 1.8)};font-size:${P(ctx, zonePt(ctx) + 1)};line-height:1.2;">`
+        ? `<div class="mq-wwwords" aria-label="unit words" style="display:inline-flex;${vertical ? 'flex-direction:column;align-items:flex-start;' : 'align-items:center;'}gap:${L(ctx, vertical ? 0.4 : 1.6)};border:${B(ctx, 0.75)} solid ${INK};padding:${L(ctx, 0.8)} ${L(ctx, 1.8)};font-size:${P(ctx, zonePt(ctx) + 1)};line-height:1.2;">`
             + p.bank.map((wd) => (isTwin(ctx)
                 ? `<button type="button" class="mq-wwword" data-mq-word="${esc(wd)}" style="min-height:44px;min-width:44px;padding:0 ${L(ctx, 1.5)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};font:inherit;cursor:pointer;">${esc(wd)}</button>`
-                : `<span>${esc(wd)}</span>`)).join(isTwin(ctx) ? '' : `<span aria-hidden="true">·</span>`)
+                : `<span>${esc(wd)}</span>`)).join(isTwin(ctx) || vertical ? '' : `<span aria-hidden="true">·</span>`)
             + '</div>'
         : '';
+    if (vertical) {
+        // beside a narrow column stack (a 2-column page): label, box, unit line, the bank under it
+        return `<div class="mq-wwanswer" style="display:flex;flex-direction:column;align-items:flex-start;gap:${L(ctx, 1.4)};font-size:${P(ctx, tp)};">`
+            + `<span style="font-weight:700;line-height:1.1;">Answer:</span>${num}${unit}${bank}</div>`;
+    }
     return `<div class="mq-wwanswer" style="display:flex;flex-direction:column;align-items:${isTwin(ctx) ? 'center' : 'flex-start'};gap:${L(ctx, 1.6)};">`
         + `<div style="display:flex;align-items:flex-end;gap:${L(ctx, 2)};font-size:${P(ctx, tp)};flex-wrap:${isTwin(ctx) ? 'nowrap' : 'wrap'};justify-content:center;"><span style="font-weight:700;align-self:center;">Answer:</span>${num}${unit}</div>`
         + bank + '</div>';
@@ -657,19 +683,35 @@ register(WW_TEMPLATE, {
     render(p, ctx) {
         if (!p || !Array.isArray(p.steps) || !p.steps.length) return '';
         const twin = isTwin(ctx);
+        // A cell in a 2- or 3-column grid (and the screen twin) stacks its zones: story, sign
+        // row, columns, answer. A full-width cell puts the answer beside the columns, so a page
+        // at L still holds two or three stories (the page measures which fits, DN-10).
+        const narrow = twin || Number(ctx.columns || 1) >= 2;
         const put = filled(ctx);
         const sh = shownSteps(p, ctx);
         const two = p.steps.length > 1;
         const blocks = p.steps.map((st, i) => stepBlock(ctx, st, sh.steps[i], put ? sh.picks[i] : null, i, two ? `Step ${i + 1}` : '')).join('');
         const answer = answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '');
-        const head = `<div style="display:flex;gap:${L(ctx, 4)};align-items:flex-start;${twin ? 'flex-direction:column;align-items:stretch;' : ''}">${storyHTML(ctx, p)}${p.kb ? keywordBank(ctx) : ''}</div>`
+        // In a column cell the answer stands BESIDE a narrow stack (label, box, unit line, bank),
+        // so two short stories fit one above the other; a wider stack puts it underneath.
+        const cols = Math.max(1, Number(ctx.columns || 1));
+        const innerW = 186 / cols - (cols > 1 ? 9 : 10);
+        const side = !twin && narrow && !two && blockWidthMm(ctx, p.steps[0]) + 5 + { S: 20, M: 22, L: 24 }[sizeOf(ctx)] <= innerW;
+        const head = `<div style="display:flex;gap:${L(ctx, 4)};align-items:flex-start;${narrow ? 'flex-direction:column;align-items:stretch;' : ''}">${storyHTML(ctx, p, narrow)}${p.kb ? keywordBank(ctx) : ''}</div>`
             + pictureRow(ctx, p.pic) + (p.bar ? barModel(ctx, p) : '');
-        const body = twin
-            ? `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};margin-top:${L(ctx, 3)};">${two ? `<div style="display:flex;flex-wrap:wrap;gap:${L(ctx, 6)};justify-content:center;">${blocks}</div>` : blocks}${answer}</div>`
+        const body = side
+            ? `<div style="display:flex;align-items:flex-start;gap:${L(ctx, 5)};margin-top:${L(ctx, 1.2)};">${blocks}${answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', true)}</div>`
+            : narrow
+            ? `<div style="display:flex;flex-direction:column;align-items:${twin ? 'center' : 'flex-start'};gap:${L(ctx, 3)};margin-top:${L(ctx, 3)};">${two ? `<div style="display:flex;flex-wrap:wrap;gap:${L(ctx, 6)};justify-content:${twin ? 'center' : 'flex-start'};">${blocks}</div>` : blocks}${answer}</div>`
             : two
                 ? `<div style="display:flex;align-items:flex-start;gap:${L(ctx, 8)};margin-top:${L(ctx, 3)};">${blocks}<div style="margin-left:auto;align-self:flex-end;">${answer}</div></div>`
                 : `<div style="display:flex;align-items:flex-end;gap:${L(ctx, 10)};margin-top:${L(ctx, 3)};">${blocks}<div style="margin-left:auto;padding-right:${L(ctx, 4)};">${answer}</div></div>`;
-        return `<div class="mq-ww" data-ww-ops="${p.steps.map((s) => s.op).join(' ')}" style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : L(ctx, 5)};">${head}${body}</div>`;
+        // A column cell that cannot hold its answer beside the work (a wide stack, two steps) is a
+        // FULL-WIDTH item: it keeps its full-width layout's width, so the page's measurement reads
+        // it as not fitting the column and prints it in the full-width group at the bottom
+        // (practice.js splitWide) instead of a tall, half-empty column cell (RUBRIC H13).
+        const fullW = !twin && narrow && !side ? `min-width:${L(ctx, 120)};` : '';
+        return `<div class="mq-ww" data-ww-ops="${p.steps.map((s) => s.op).join(' ')}" style="width:100%;${fullW}box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : L(ctx, narrow ? 2.5 : 5)};">${head}${body}</div>`;
     },
     answerKey(p) {
         const slots = { answer: { value: String(p.ans), graded: true, accept: [Number(p.ans).toLocaleString('en-US')] } };
@@ -677,7 +719,9 @@ register(WW_TEMPLATE, {
         (p.steps || []).forEach((s, i) => { slots[`op${i}`] = { value: GLYPH[s.op], graded: false }; });
         return { value: p.ans, display: p.unit ? `${Number(p.ans).toLocaleString('en-US')} ${p.unit}` : String(p.ans), slots };
     },
-    footprint() { return { wMm: 186, hMm: null, measure: true, factLike: false, maxCols: 1 }; },
+    // Measured: a story of small numbers stands in 2 columns; one whose columns are wider than a
+    // 2-column cell is measured to one and goes in the full-width group (practice.js splitWide).
+    footprint() { return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2, restacks: true }; },
     inputs(p) {
         const out = [{ id: 'answer', kind: 'number', shape: 'box', graded: true, order: 0, inputmode: 'numeric', scopes: ['full', 'answer-only'] }];
         if (p && p.unit) out.push({ id: 'answer-label', kind: 'unit', shape: 'line', graded: false, order: 1, scopes: ['full'] });

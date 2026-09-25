@@ -72,7 +72,8 @@ export function applyWordWork(q) {
     q.answerType = 'number';
     q.options = [];
     q.selfAnswering = true;
-    q.printFormat = 'word-work';
+    // not a `word*` format: the page measures the cell's columns (print-sheet.js footprintClass)
+    q.printFormat = 'story-work';
     q.printText = 'Circle the sign. Write the numbers in the boxes. Solve.';
     // what the work expects, for a host that marks each box as it is filled
     q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit };
