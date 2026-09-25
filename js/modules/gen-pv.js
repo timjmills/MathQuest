@@ -1013,8 +1013,9 @@ function genRoundingVisual(q, skill, o) {
  * drawn for them is the support that fades (`line: plotted`).
  *
  * Edge cases are dealt, never rolled (§2.3), one of each in a block of six: a halfway number
- * (rounds up), a number that rounds up across a bigger place (9,960 -> 10,000) and a zero in a
- * middle place (40,508).
+ * (rounds up), a number that rounds up across a bigger place (9,960 -> 10,000), a zero in a
+ * middle place (40,508) and a number already on a multiple of the place (6,000 stays 6,000; owner
+ * ruling 2026-09-25, an exception to the already-rounded guard for these three skills only).
  */
 function roundNlNumber(R, P, kind) {
     const { lo, hi } = R;
@@ -1051,15 +1052,22 @@ function roundNlNumber(R, P, kind) {
             if (inRange(v) && v % P !== 0 && v % P !== P / 2) return v;
         }
     }
+    if (kind === 'multiple') {
+        // On a multiple of the place (the dot sits on the line's left end tick). A place above the
+        // number's top place has no multiple in range: a plain item then.
+        const a = Math.max(1, Math.ceil(lo / P)), b = Math.floor(hi / P);
+        if (a <= b) return randInt(a, b) * P;
+    }
     return plain();
 }
 
 function genRoundNl(q, skill, o) {
     const R = ROUND_NL[skill];
     const P = R.places.includes(Number(o.place)) ? Number(o.place) : R.dflt;
-    // (No "already a multiple" item: the family's already-rounded guard, §2.3 / the content gate's
-    // pv-band rule, keeps every item one that needs rounding.)
-    let kind = o.midpoint === 'only' ? 'mid' : ['plain', 'mid', 'across', 'zero', 'plain', 'plain'][slot(6)];
+    // Slot 4 is "already a multiple" (6,000 to the nearest 1,000 stays 6,000): owner ruling
+    // 2026-09-25, "yes please allow" - a named exception to the family's already-rounded guard,
+    // for these three skills only (ws-content-audit carries the matching exception).
+    let kind = o.midpoint === 'only' ? 'mid' : ['plain', 'mid', 'across', 'zero', 'multiple', 'plain'][slot(6)];
     if (kind === 'mid' && o.midpoint === 'never') kind = 'plain';
     const n = roundNlNumber(R, P, kind);
     const lower = Math.floor(n / P) * P;

@@ -266,6 +266,7 @@ Each must be generable and must appear in any seeded set of 6 or more for the st
 | Unit form | more than 9 ones or tens (`2 tens 15 ones`), the renamed hundred (`10 tens`) | PV-07, M-V8 |
 | More / less | crossing a decade (**29 + 1**, **70 − 1**), crossing a hundred (**95 + 10**, **104 − 10**, **960 + 100** at band 1,000), and 0 as an answer (10 − 10) | M-L2, M-L3 |
 | Round | **the midpoint** (45, 250, 3,500), **already a multiple** is excluded (guard kept), **rounds up across a place** (96 → 100, 951 → 1,000), a **zero in the deciding place** (305 to the nearest 100 → 300; 4,038 to the nearest 100 → 4,000), and **two numbers that round to the same ten** in a sort | M-R2, M-R4, M-R5 |
+| Round on a line (`round_nl_*`) | the Round row above, **plus one number already on a multiple of the place per block of six** (6,000 to the nearest 1,000 stays 6,000; the dot sits on the left end tick). Owner ruling 2026-09-25, "yes please allow": a named exception to the already-rounded guard for these three skills only (ws-content-audit carries the same exception). The Say line reads "6,000 is already a multiple of 1,000, so it stays 6,000." | M-R1 (rounded it up to the next multiple) |
 | × / ÷ 10 | a number ending in 0 (× 10 on 40), a zero in the middle (305 × 10), ÷ 10 on a number ending in 0 only (whole-number step) | M-Z1, M-Z2 |
 | Disks / blocks | an **empty zone** (0 tens), **9** in a zone (the hardest drawing), 100 exactly | RP-32: an empty zone stays empty |
 
