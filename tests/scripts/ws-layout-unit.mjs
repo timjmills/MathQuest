@@ -649,6 +649,86 @@ eq([stripPos(0, 1), stripPos(0, 3), stripPos(1, 3), stripPos(2, 3)], ['only', 'f
     ok(/data-ws-seg="last"><i[^>]*data-ws-ink="solid"[^>]*>5<\/i>/.test(key), 'SL-12: the key writes the ones digit into the last segment');
 }
 
+/* ================================================ operations templates (P8c) */
+{
+    const ctxL = (state = 'blank', extra = {}) => Object.assign({ mode: 'print', size: 'L', look: 'ican', state }, extra);
+    const T = (template, payload) => ({ cell: { template, v: 1, payload } });
+    const slotIds = (html) => [...html.matchAll(/data-ws-slot="([^"]+)"/g)].map((m) => m[1]);
+    // VA-2: a vertical fact's operator has its own track - never written over a digit track.
+    const f = renderCell(T('fact', { a: 7, b: 12, op: '*', digits: 3 }), ctxL());
+    ok(/<span class="op">×<\/span><span><\/span><span>1<\/span><span>2<\/span>/.test(f), 'VA-2: ×12 keeps an operator track and a blank hundreds track');
+    ok(/grid-template-columns:1\.2em repeat\(3, 0\.72em\)/.test(f), 'TY-22: fact digit tracks stay 0.72 em, the operator track is its own');
+    const fs = renderCell(T('fact', { a: 15, b: 13, op: '-' }), ctxL());
+    ok(fs.includes('<span class="op">−</span>') && !/>-</.test(fs), 'TY-6: subtraction draws the true minus sign');
+    eq(slotIds(f), slotIds(renderCell(T('fact', { a: 7, b: 12, op: '*', digits: 3 }), ctxL('answered'))), 'AK-4: a fact carries the same slot blank and keyed');
+    ok(/data-ws-ink="solid"[^>]*>(?:<span[^>]*><\/span>)?<span[^>]*>8<\/span><span[^>]*>4<\/span>/.test(renderCell(T('fact', { a: 7, b: 12, op: '*', digits: 3 }), ctxL('answered'))), 'AK-1: the fact key writes 84 on the digit tracks');
+    // SL-12: the answer strip spans the answer's tracks only, never the operator track.
+    const st = renderCell(T('stack', { operands: [14, 17], op: '+', regroup: false, ansDigits: 2 }), ctxL('blank', { scaffoldLevel: 2 }));
+    eq((st.match(/class="ab[^"]*" data-ws-seg=/g) || []).length, 2, 'SL-12: a 2-digit answer strip has 2 segments, none under the +');
+    ok(!/class="rg/.test(st), 'no regroup boxes on a basic fact stack when regroup is off');
+    // CM-5/6: a stack of four addends, regroup strip over the tens and hundreds.
+    const four = renderCell(T('stack', { operands: [24, 66, 92, 57], op: '+', regroup: 'add', ansDigits: 3 }), ctxL());
+    ok(['24', '66', '92'].every((n) => four.includes(`<span>${n[0]}</span><span>${n[1]}</span>`)) && four.includes('<span class="op">+</span><span></span><span>5</span><span>7</span>'), 'CM-5: every addend on the tracks, the + only on the last row');
+    eq((four.match(/class="rg[^"]*" data-ws-seg=/g) || []).length, 2, 'SL-12: the regroup strip covers tens and hundreds');
+    eq(cellAnswerKey(T('stack', { operands: [24, 66, 92, 57], op: '+' })).value, 239, 'the stack sums every addend');
+    // Long division: quotient boxes over every dividend track, four work rows, key fills both.
+    const ld = T('division', { dividend: 715, divisor: 13, quotient: 55, workRows: 4 });
+    const ldB = renderCell(ld, ctxL());
+    eq(slotIds(ldB), ['q-0', 'q-1', 'q-2'], 'VA-61: one quotient box over every dividend track');
+    ok(/Andika/.test(ldB) && !/Arial/.test(ldB), 'TY-1: the bracket is Andika');
+    const ldK = renderCell(ld, ctxL('answered'));
+    ok(/data-ws-slot="q-1"[^>]*>(<span[^>]*>)5/.test(ldK) && /data-ws-slot="q-2"[^>]*>(<span[^>]*>)5/.test(ldK), 'AK-1: the key fills the quotient boxes');
+    ok((ldK.match(/data-ws-ink="solid"/g) || []).length >= 2 + 6, 'AK-1: the key writes the work rows too');
+    eq((ldB.match(/border-bottom:0\.75pt/g) || []).length, 2 * 3, 'VA-63: a rule under each of the two subtract rows');
+    eq(cellFootprint(ld, resolveCtx(ctxL())).measure, true, 'long division is measured');
+    // Area model: minimum width (never wraps), every partial and the total keyed.
+    const am = T('area-model', { multiplier: 4, parts: [300, 40, 5] });
+    const amB = renderCell(am, ctxL());
+    ok(/flex-wrap:nowrap/.test(amB) && /white-space:nowrap/.test(amB), 'the area model never wraps');
+    eq(slotIds(amB), ['part-0', 'part-1', 'part-2', 'total'], 'one box per part and the total');
+    const amK = cellAnswerKey(am).slots;
+    eq([amK['part-0'].value, amK['part-1'].value, amK['part-2'].value, amK.total.value], ['1200', '160', '20', '1380'], 'the key has every partial product and the total');
+    // Multiplication chart: 3-digit cells never merge (nowrap + a minimum width).
+    const mc = renderCell(T('mult-chart', { r0: 9, c0: 8, blanks: [{ i: 0, j: 0 }, { i: 1, j: 3 }, { i: 3, j: 4 }] }), ctxL('answered'));
+    ok(/min-width:[\d.]+em/.test(mc) && /white-space:nowrap/.test(mc), 'chart cells have a minimum width and never wrap');
+    ok(mc.includes('>72<') && mc.includes('>110<') && mc.includes('>144<'), 'the chart key fills 3-digit products');
+    // Arrays: dots at least 4 mm, every blank a box, keyed.
+    const ar = T('arrays', { kind: 'equal_groups', rows: 3, cols: 4 });
+    const arB = renderCell(ar, ctxL());
+    const r = Math.min(...[...arB.matchAll(/<circle [^>]*r="([\d.]+)"/g)].map((m) => Number(m[1])));
+    ok(r * 2 >= 4, `RP-3: counters are at least 4 mm (${r * 2} mm)`);
+    eq(slotIds(arB), ['first', 'second', 'total'], 'three boxes, one per blank');
+    // Remainder: two slots "[q] R [r]"; rows of counters at least 6 mm apart.
+    const rm = T('remainder', { dividend: 19, divisor: 3 });
+    const rmB = renderCell(rm, ctxL());
+    eq(slotIds(rmB), ['q', 'r'], 'VA-62: quotient and remainder boxes');
+    const ys = [...new Set([...rmB.matchAll(/<circle [^>]*cy="([\d.]+)"/g)].map((m) => Number(m[1])))].sort((a, b) => a - b);
+    ok(ys.length > 1 && ys[1] - ys[0] - 2 * Number(rmB.match(/r="([\d.]+)"/)[1]) >= 6, 'H12: counter rows at least 6 mm apart');
+    ok(renderCell(rm, ctxL('wrong', { wrong: { value: '5 R 4' } })).includes('>5<') && renderCell(rm, ctxL('wrong', { wrong: { value: '5 R 4' } })).includes('>4<'), 'a wrong "q R r" is split into its two boxes');
+    // Number line: labels never under 8 pt, start marked, jumps only on the key, answer in the box.
+    const nl = T('number-line', { max: 20, start: 7, add: 9 });
+    const nlB = renderCell(nl, ctxL());
+    const fsz = Math.min(...[...nlB.matchAll(/font-size="([\d.]+)"/g)].map((m) => Number(m[1])));
+    ok(fsz >= 8 * 25.4 / 72, `TY-11: number-line labels at least 8 pt (${(fsz * 72 / 25.4).toFixed(1)} pt)`);
+    ok(nlB.includes('data-nl-start="7"') && !/<path d="M[\d.]+ [\d.]+ Q/.test(nlB), 'RP-1: the pupil line marks the start and draws no jumps');
+    const nlK = renderCell(nl, ctxL('answered'));
+    eq((nlK.match(/<path d="M[\d.]+ [\d.]+ Q/g) || []).length, 9, 'the key draws nine jumps');
+    ok(/data-ws-slot="answer"[^>]*>(<span[^>]*>)16/.test(nlK) && !/Answer:/.test(nlK), 'AK-1: the key writes 16 in the pupil\'s own box');
+    // Fact family and cloze: one box per fact / per addend, nothing wraps, the bank is in the cell.
+    const ff = renderCell(T('fact-family', { a: 8, b: 3 }), ctxL());
+    eq(slotIds(ff), ['f0', 'f1', 'f2', 'f3'], 'one box per fact');
+    ok(/grid-template-columns:auto 1em auto 1em auto;[^"]*white-space:nowrap/.test(ff), 'every fact is one unbreakable grid row');
+    const cz = renderCell(T('cloze-bank', { sum: 12, a: 5, b: 7, banks: [[3, 5, 8], [2, 6, 7]] }), ctxL());
+    eq(slotIds(cz), ['a', 'b'], 'exactly one blank per addend');
+    ok(cz.includes('<span>8</span>') && cz.includes('<span>6</span>'), 'both banks print inside the cell');
+    // Screen twins carry the markers screen-cell.js wires.
+    const tw = (q) => renderCell(q, { mode: 'screen', static: true, size: 'L', state: 'blank' });
+    ok((tw(ld).match(/data-mq-cell/g) || []).length === 3, 'division twin: three typed quotient boxes');
+    ok(/data-mq-blank="box"/.test(tw(nl)), 'number-line twin: the answer box takes the input');
+    ok(/data-mq-join=" R "/.test(tw(rm)) && (tw(rm).match(/data-mq-cell/g) || []).length === 2, 'remainder twin: two boxes joined " R "');
+    ok(/area-model-input/.test(tw(am)) && /area-model-total/.test(tw(am)), 'area-model twin keeps the checker classes');
+}
+
 /* ===================================================================== small words */
 
 eq(levelLine(['K']), 'Level K', 'HD-5: Level K');
