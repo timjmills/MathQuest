@@ -76,6 +76,18 @@ export function renderPrintScreen(el) {
     scheduleBuild(0);
 }
 
+/**
+ * Start a fresh sheet from the given skills ({categoryId, skillId, opts?, weight?}[]). Used by the
+ * Skills library's "Print"; the caller then shows this screen with tvGo('print').
+ */
+export function printSkills(skills) {
+    if (!pr) initState();
+    pr.title = '';
+    pr.sections = [newSection((skills || []).map((s) => ({ ...s })))];
+    pr.seed = freshSeed();
+    pr.view = 0;
+}
+
 /** Re-print a stored printout (Home, "Recent printouts"). */
 export async function reprint(id) {
     const rec = (readStore(PRINTS_KEY, []) || []).find((p) => p.id === id);
