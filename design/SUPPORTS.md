@@ -262,9 +262,9 @@ generation-time values of the same set). Values:
 | Id | What | Token |
 |---|---|---|
 | `touch` | touch dots, the lighter rung: count on (+), count back (−), count by (×), the tally row (÷) | V |
-| `touchall` | touch dots on every number (count all) | X |
+| `touchall` | touch dots on every number (count all) | 3 |
 | `tile` `frame` `line` `skip` `array` `think` | the P11 fact cues (fact.js `factCue`), now drawn at render time | D R L K A H |
-| `boxsign` `startarrow` `steps` | S4 extras | J S I |
+| `boxsign` `startarrow` `steps` | S4 extras | J 4 I |
 | `round-pv` `round-mark` | S4 rounding panes | 1 2 |
 
 Two more controls appear **only once a render-time support is ticked** (`appliesTo`), so a panel stays at

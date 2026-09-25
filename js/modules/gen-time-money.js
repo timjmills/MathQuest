@@ -538,33 +538,41 @@ function scatter(list) {
     return list.slice().reverse();
 }
 
+// Plain numbers have no notes of their own beyond 20 (tmkit CURRENCIES), so a Plain page of notes
+// "to 100" or "to 500" could only reach 80. A plain note is a generic value rectangle like a plain
+// coin, so Plain counts notes of 1 to 100 (option-panel round 3, OPTIONS-CRITIC-R2 §5 #16).
+const PLAIN_NOTES = [1, 5, 10, 20, 50, 100];
+
 function genMoneyCount(q, skill) {
     const o = optsOf(skill);
     const c = currencyOf(o.currency);
-    let kind = ['like', 'two', 'mixed', 'notes', 'notes100', 'notes500', 'notes-coins'].includes(o.kind) ? o.kind : 'like';
-    // The notes steps carry their own totals (MB-3): to 20, to 100, to 500 whole units.
-    const noteCap = kind === 'notes500' ? 500 : kind === 'notes100' ? 100 : 20;
-    if (kind === 'notes100' || kind === 'notes500') kind = 'notes';
+    // What to count (the old notes kinds are folded into note / both by skill-options.js).
+    const kind = ['like', 'two', 'mixed', 'note', 'both'].includes(o.kind) ? o.kind : 'like';
     const band = Number(o.band) || 100;
-    const maxN = Number(o.tiles) === 10 ? 10 : 6;
+    // Coins in a cell: six fit a half-width cell; "Totals to 500" (or an old "Coins at most: 10")
+    // deals up to ten, a full-width row.
+    const maxN = Number(o.tiles) === 10 || band >= 500 ? 10 : 6;
+    const order = String(o.order || 'largest');
     const k = pos6();
-    if (kind === 'notes' || kind === 'notes-coins') {
-        const capMajor = noteCap;
-        const notesAll = c.notes.filter((v) => v <= capMajor);
+    if (kind === 'note' || kind === 'both') {
+        // Notes total to the band in WHOLE units (the notes' own totals: to 20, 100, 500).
+        const capMajor = band;
+        const notesAll = (o.currency === 'plain' ? PLAIN_NOTES : c.notes).filter((v) => v <= capMajor);
         let notes;
-        if (k <= 1 && kind === 'notes') {
+        if (k <= 1 && kind === 'note') {
             const v = notesAll[dealPerm(`${skill}:nv`, notesAll.length)];
-            const cnt = Math.max(1, Math.min(5, Math.floor(capMajor / v), 1 + randInt(1, 4)));
+            const cnt = Math.max(1, Math.min(5, maxN, Math.floor(capMajor / v), 1 + randInt(1, 4)));
             notes = Array.from({ length: cnt }, () => v);                  // like notes: "five 10 notes"
         } else if (k === 2 && o.currency === 'qar' && capMajor >= 70) {
             notes = [50, 10, 10];                                          // the 50 -> 60 -> 70 jump (no 20 note)
         } else {
-            notes = randomCoins(notesAll, 1 + randInt(1, kind === 'notes-coins' ? 2 : 3), capMajor);
+            notes = randomCoins(notesAll, Math.min(maxN, 1 + randInt(1, kind === 'both' ? 2 : 3)), capMajor);
         }
         notes.sort((a, b) => b - a);
-        if (kind === 'notes') {
+        if (kind === 'note') {
             const total = sum(notes);
             setCell(q, 'coins', { kind: 'count', notes, coins: [], currency: o.currency, answer: 'major', total, dots: 'none' });
+            q.printFormat = 'tm-notes';
             q.text = 'Count the money. Write the total.';
             q.ans = total;
             q.answerType = 'number';
@@ -575,6 +583,7 @@ function genMoneyCount(q, skill) {
         const coins = randomCoins(coinVals, 1 + randInt(1, 3), 99);
         const total = sum(notes) * 100 + sum(coins);
         setCell(q, 'coins', { kind: 'count', notes, coins, currency: o.currency, answer: 'two', total, dots: 'none' });
+        q.printFormat = 'tm-notes-coins';
         q.text = 'Count the notes, then the coins. Write both numbers.';
         q.ans = `${sum(notes)}, ${sum(coins)}`;
         q.answerType = 'text';
@@ -605,20 +614,22 @@ function genMoneyCount(q, skill) {
         }
         if (!coins) coins = [a, b].filter((v) => v <= band);
     } else {
-        const n = randInt(3, Math.min(maxN, 3 + 3));
+        const n = randInt(3, maxN === 10 ? 9 : 6);                        // ten coins: up to nine mixed
         coins = randomCoins(vals, n, band);
         if (k === 3 && vals.includes(25) && vals.includes(10) && vals.includes(5) && band >= 75) coins = [25, 25, 10, 10, 5].slice(0, Math.min(5, maxN));   // M-M3
     }
     coins.sort((x, y) => y - x);
-    const scattered = o.order === 'scrambled';
+    const scattered = /^scrambled/.test(order);
     if (scattered && new Set(coins).size > 1) coins = scatter(coins);
     const total = sum(coins);
-    const dots = ['auto', 'dots', 'none'].includes(o.support) ? o.support : 'auto';
+    // "Coins set out": the -dots values keep the count-by-five dots on every page (an old code's
+    // `support: dots` is folded into them); otherwise they show on Model and Guided pages only.
+    const dots = /-dots$/.test(order) || o.support === 'dots' ? 'dots' : 'auto';
     setCell(q, 'coins', { kind: 'count', coins, notes: [], currency: o.currency, answer: 'minor', total, dots, ...(scattered ? { scatter: true } : {}) });
     q.text = 'Count the coins. Write the total.';
     q.ans = total;
     q.answerType = 'number';
-    q.hint = o.order === 'scrambled' ? 'Find the biggest coin first. Count on from it.' : 'Start with the biggest coin. Count on by each coin\'s value.';
+    q.hint = scattered ? 'Find the biggest coin first. Count on from it.' : 'Start with the biggest coin. Count on by each coin\'s value.';
 }
 
 /** Does a + b (or a - b) regroup in any column of the minor-unit digits? */
