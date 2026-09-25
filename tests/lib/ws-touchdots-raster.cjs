@@ -80,7 +80,8 @@ async function rasterDigit(page, ch, { weight = 400, fontPx = 100, trackEm = 0.7
     return { x: h.left, y: h.top, w: h.width, h: h.height, base: b.top };
   });
   const pad = fontPx * 0.25;
-  const clip = { x: geo.x - pad, y: geo.y - pad, width: geo.w + 2 * pad, height: geo.h + 2 * pad };
+  // integer CSS px so the device pixels map exactly back to em
+  const clip = { x: Math.floor(geo.x - pad), y: Math.floor(geo.y - pad), width: Math.ceil(geo.w + 2 * pad), height: Math.ceil(geo.h + 2 * pad) };
   const img = await grab(page, clip);
   const cxCss = geo.x + geo.w / 2, cyCss = geo.y + geo.h / 2;
   const toEm = (px, py) => ({ x: (clip.x + px / DSF - cxCss) / fontPx, y: (clip.y + py / DSF - cyCss) / fontPx });

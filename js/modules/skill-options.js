@@ -487,6 +487,7 @@ const _pvNearest = (place) => {
             ],
             help: '"Circle every number" is its own step: eight numbers, with near misses either side of halfway.',
         },
+        _pvResponseScope(),
     ];
 };
 const _pvSort = (place) => {
@@ -507,8 +508,15 @@ const _pvSort = (place) => {
             ],
             help: 'The number line runs between the two bins, so the pupil can see which end each number is nearer.',
         },
+        // Bins one apart / three bins are whole-number steps (RS-2); the decimal sorts keep two.
+        ...(place ? [_pvBins()] : []),
     ];
 };
+const _pvEstSupport = () => ({
+    id: 'support', label: 'Support', type: 'enum', default: 'rewrite', group: 'support',
+    values: [{ v: 'rewrite', l: 'A line to write the rounded numbers' }, { v: 'none', l: 'None: the estimate only' }],
+    help: 'The rewrite line holds each rounded number under the one it came from; "None" is the fade.',
+});
 const _pvTask = () => ({
     id: 'task', label: 'Task', type: 'enum', default: 'compute', group: 'layout',
     values: [
@@ -551,18 +559,105 @@ const _pvMoreLessSupport = (withChart) => ({
     help: withChart ? 'A picture to count on or back with: most support first, "None" is the fade.'
         : 'A number line to jump along: "None" is the fade.',
 });
+// ---- P9 step 8 (§19.4 step 8): the remaining options of §2.5, each read by gen-pv.js. ----
+const _pvIdentifyResponse = () => ({
+    id: 'response', label: 'How the pupil answers', type: 'enum', default: 'circle', group: 'layout',
+    values: [
+        { v: 'circle', l: 'Circle one of three place words' },
+        { v: 'bank', l: 'Write the place word from a word bank' },
+    ],
+    help: 'Circling is the first step; writing the word from a bank is the next one.',
+});
+const _pvRepeatDigit = () => ({
+    id: 'repeatDigit', label: 'A repeated digit (747: which 7?)', type: 'bool', default: false, group: 'difficulty',
+    help: 'On gives numbers with the same digit twice, so the pupil must read the underlined one.',
+});
+const _pvValueForm = () => ({
+    id: 'form', label: 'How the value is written', type: 'enum', default: 'value', group: 'layout',
+    values: [
+        { v: 'value', l: 'The value (700)' },
+        { v: 'unit', l: 'Unit form (7 hundreds)' },
+        { v: 'notation', l: 'Expanded notation (7 × 100)' },
+    ],
+    help: 'One way per page. Unit form and expanded notation name the place and the digit.',
+});
+const _pvZeroDigit = () => ({
+    id: 'zeroDigit', label: 'Ask the value of a 0', type: 'bool', default: false, group: 'difficulty',
+    help: 'On underlines a zero on some items: its value is 0, but it holds the place.',
+});
+const _pvExpandFrame = () => ({
+    id: 'frame', label: 'Answer frame', type: 'enum', default: 'boxes', group: 'support',
+    values: [
+        { v: 'boxes', l: 'One box for each place' },
+        { v: 'line', l: 'A line (300 + 5 or 300 + 0 + 5 both right)' },
+    ],
+    help: 'The boxes are the support; the line is the fade. On the line a zero part may be left out.',
+});
+const _pvExpandForm = () => ({
+    id: 'form', label: 'How the parts are written', type: 'enum', default: 'sum', group: 'layout',
+    values: [
+        { v: 'sum', l: 'Values (300 + 40 + 5)' },
+        { v: 'notation', l: 'Expanded notation (3 × 100 + 4 × 10 + 5 × 1)' },
+    ],
+    help: 'Expanded notation is the grade 4 form: the pupil writes the digit for each place.',
+});
+const _pvCloseness = () => ({
+    id: 'closeness', label: 'How close the numbers are', type: 'enum', default: 'far', group: 'difficulty',
+    values: [{ v: 'far', l: 'Far apart' }, { v: 'close', l: 'Close (same first digit)' }],
+    help: 'Close numbers share their first digit, so the pupil must look at the next place.',
+});
+const _pvLengths = () => ({
+    id: 'lengths', label: 'Digit counts', type: 'enum', default: 'equal', group: 'difficulty',
+    values: [{ v: 'equal', l: 'Same number of digits' }, { v: 'mixed', l: 'Different numbers of digits' }],
+    help: 'Different lengths teach that more digits means a bigger number.',
+});
+const _pvOrderCount = () => ({
+    id: 'count', label: 'How many numbers', type: 'enum', default: 3, group: 'difficulty',
+    values: [3, 4, 5, 6].map(v => ({ v, l: String(v) })),
+    help: 'The same count on every item of the page.',
+});
+const _pvResponseScope = () => ({
+    id: 'responseScope', label: 'What the pupil does', type: 'enum', default: 'full', group: 'layout',
+    values: [
+        { v: 'full', l: 'Round the number' },
+        { v: 'notation', l: 'Underline the place and circle the next digit (do not round)' },
+        { v: 'decision', l: 'Decide: round up or round down' },
+        { v: 'judge', l: 'Check a finished rounding (correct or fix it)' },
+    ],
+    help: 'The sub-steps before rounding, and checking a rounding, each as a page of their own.',
+});
+const _pvBins = () => ({
+    id: 'bins', label: 'The bins', type: 'enum', default: 'adjacent', group: 'difficulty',
+    values: [
+        { v: 'adjacent', l: 'Two next to each other (40 and 50)' },
+        { v: 'apart', l: 'One apart, with a Neither bin (40 and 60)' },
+        { v: 'three', l: 'Three in a row (40, 50 and 60)' },
+    ],
+    help: 'Bins one apart stop the pupil sorting by the first digit alone.',
+});
+const _pvMoreLessUnknown = () => ({
+    id: 'unknown', label: 'What is missing', type: 'enum', default: 'answer', group: 'difficulty',
+    values: [{ v: 'answer', l: 'The answer (10 more than 47 is __)' }, { v: 'start', l: 'The start (47 is 10 more than __)' }],
+    help: 'A missing start is the inverse: the pupil does the opposite of the word.',
+});
+const _pvMoreLessSupport2 = (withChart) => {
+    const d = _pvMoreLessSupport(withChart);
+    d.values = [{ v: 'strip', l: 'A strip of the hundreds chart (the number in its row or column)' }, ...d.values];
+    d.help = 'Most support first. The strip shows only the number; the pupil works out the box beside it.';
+    return d;
+};
 const P9_PV_OPTIONS = {
-    'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport()],
-    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport()],
-    'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true)],
+    'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport(), _pvIdentifyResponse(), _pvRepeatDigit()],
+    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit()],
+    'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), _pvExpandFrame(), _pvExpandForm()],
     'placevalue:combine': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), {
         id: 'order', label: 'Order of the parts', type: 'enum', default: 'largest', group: 'difficulty',
         values: [{ v: 'largest', l: 'Largest first' }, { v: 'scrambled', l: 'Scrambled (5 + 300 + 20)' }],
         help: 'Scrambled parts are harder: the pupil has to put each part in its place.',
     }],
-    'placevalue:compare': [_pvBand([99, 999, 9999, 99999, 999999], 999)],
-    'placevalue:order_least_to_greatest': [_pvBand([99, 999, 9999, 99999, 999999], 999)],
-    'placevalue:order_greatest_to_least': [_pvBand([99, 999, 9999, 99999, 999999], 999)],
+    'placevalue:compare': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvCloseness(), _pvLengths()],
+    'placevalue:order_least_to_greatest': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvOrderCount(), _pvCloseness(), _pvLengths()],
+    'placevalue:order_greatest_to_least': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvOrderCount(), _pvCloseness(), _pvLengths()],
     'placevalue:place_value_disks': [_pvBand([99, 999, 9999], 999), {
         id: 'task', label: 'Task', type: 'enum', default: 'read', group: 'layout',
         values: [{ v: 'read', l: 'Read the number from the disks' }, { v: 'count', l: "Count one place's disks" }],
@@ -570,11 +665,20 @@ const P9_PV_OPTIONS = {
     }, _pvZeroPlace(false)],
     // Draw to 999 only (owner ruling 3): nine 1,000 disks and 27 others is a poster, not a cell.
     'placevalue:pv_disks_build': [_pvBand([99, 999], 999), _pvZeroPlace(false)],
-    'placevalue:pv_digit_drag': [_pvBand([999, 9999, 99999, 999999], 99999)],
+    'placevalue:pv_digit_drag': [_pvBand([999, 9999, 99999, 999999], 99999), {
+        id: 'source', label: 'The number is given as', type: 'enum', default: 'expanded', group: 'difficulty',
+        values: [
+            { v: 'expanded', l: 'Expanded form (40,000 + 300 + 6)' },
+            { v: 'word', l: 'Words (forty thousand, three hundred six)' },
+            { v: 'numeral', l: 'A numeral with commas (copying, the easiest)' },
+        ],
+        help: 'Expanded form and words make the pupil work out each digit\'s place; a numeral is copying.',
+    }],
     'placevalue:number_word_names': [_pvBand([999, 9999, 99999, 999999], 999999)],
-    'placevalue:more_less_10': [_pvStep([1, 10], 1), _pvDir(), _pvBand([20, 50, 100, 120], 100), _pvMoreLessSupport(true)],
-    // Numbers 100-900 (2.NBT.B.8): the band is fixed at 1,000, so there is no band control.
-    'placevalue:more_less_100': [_pvStep([10, 100], 100), _pvDir(), _pvMoreLessSupport(false)],
+    'placevalue:more_less_10': [_pvStep([1, 10], 1), _pvDir(), _pvBand([20, 50, 100, 120], 100), _pvMoreLessSupport2(true), _pvMoreLessUnknown()],
+    // Numbers 100-900 (2.NBT.B.8): the band is fixed at 1,000, so there is no band control. The
+    // 1,000 step (4.NBT) is appended to the enum (SCC-P12) and works to 10,000.
+    'placevalue:more_less_100': [_pvStep([10, 100, 1000], 100), _pvDir(), _pvMoreLessSupport2(false), _pvMoreLessUnknown()],
     'placevalue:place_value_10x': [
         { id: 'op', label: 'Multiply or divide', type: 'enum', default: 'x', group: 'difficulty',
             values: [{ v: 'x', l: '× (digits move left)' }, { v: '/', l: '÷ (digits move right)' }],
@@ -585,13 +689,37 @@ const P9_PV_OPTIONS = {
         _pvBand([1000, 10000, 100000, 1000000], 10000, 'The biggest number on the page (the larger of the number and its answer).'),
         { id: 'decimals', label: 'Decimals (grade 5)', type: 'bool', default: false, group: 'difficulty',
             help: 'On gives numbers with a decimal point, such as 3.4 × 100.' },
+        { id: 'support', label: 'Support', type: 'enum', default: 'shift', group: 'support',
+            values: [{ v: 'shift', l: 'Shift chart (the digits move across the places)' }, { v: 'none', l: 'None: the equation only' }],
+            help: 'The chart shows each digit moving one place for each zero; "None" is the fade.' },
     ],
+    'placevalue:unit_form': [_pvBand([99, 999, 9999], 999), {
+        id: 'rename', label: 'More than 9 of one place', type: 'enum', default: 'standard', group: 'difficulty',
+        values: [{ v: 'standard', l: 'No (476 = 4 hundreds 7 tens 6 ones)' }, { v: 'more', l: 'Yes (476 = 47 tens 6 ones)' }],
+        help: 'Renaming (47 tens) is the idea regrouping is built on.',
+    }],
     'number_sense:rounding_visual': [
         { id: 'place', label: 'Round to the nearest', type: 'enum', default: 10, group: 'difficulty',
             values: [{ v: 10, l: '10' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }],
             help: 'The place the number is rounded to. The numbers grow to fit the place.' },
         _pvBand([100, 1000, 10000], 100, 'The biggest number on the page. It grows to fit the place when the place needs more.'),
         _pvMidpoint(true),
+        { id: 'line', label: 'The number line', type: 'enum', default: 'mark', group: 'support',
+            values: [
+                { v: 'plotted', l: 'The number is marked on the line' },
+                { v: 'mark', l: 'The pupil marks the number' },
+                { v: 'ends', l: 'The ends only (no marking)' },
+            ],
+            help: 'Most support first: the dot is drawn, then the pupil marks it, then the line alone.' },
+        { id: 'midLabel', label: 'Label the halfway tick', type: 'bool', default: false, group: 'support',
+            help: 'A hint: the halfway number is printed under the middle tick.' },
+    ],
+    'number_sense:between_tens': [_pvBand([100, 1000], 100)],
+    'number_sense:place_on_number_line': [
+        { id: 'span', label: 'The line goes from', type: 'enum', default: 10, group: 'difficulty',
+            values: [{ v: 10, l: 'One ten to the next' }, { v: 100, l: 'One hundred to the next' }, { v: 1000, l: 'One thousand to the next' }],
+            help: 'The two ends are the tens (hundreds, thousands) the number is between.' },
+        _pvBand([100, 1000, 10000], 100, 'The biggest number on the page. It grows to fit the line.'),
     ],
     'number_sense:nearest_10': _pvNearest(10),
     'number_sense:nearest_100': _pvNearest(100),
@@ -607,6 +735,17 @@ const P9_PV_OPTIONS = {
     'number_sense:round_sort_million': _pvSort(1000000),
     'number_sense:round_sort_tenths': _pvSort(0),
     'number_sense:round_sort_hundredths': _pvSort(0),
+    'number_sense:rounding_table': [
+        { id: 'places', label: 'Columns (round to the nearest)', type: 'set', default: [10, 100], group: 'difficulty',
+            values: [{ v: 10, l: '10' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }, { v: 10000, l: '10,000' }],
+            allLabel: 'All four columns',
+            help: 'One column per place. The numbers are as big as the biggest place needs.' },
+        { id: 'blank', label: 'What the pupil fills in', type: 'enum', default: 'column', group: 'layout',
+            values: [{ v: 'column', l: 'A whole column' }, { v: 'row', l: 'A whole row (one number to every place)' }],
+            help: 'A whole column or row is blank, so no answer can be read off its neighbours.' },
+    ],
+    'number_sense:estimate_sum': [_pvEstPlace(), _pvEstSupport()],
+    'number_sense:estimate_diff': [_pvEstPlace(), _pvEstSupport()],
     'number_sense:estimate_sums_diffs': [_pvEstPlace(), _pvTask()],
     'number_sense:estimate_products': [_pvEstPlace(), _pvTask()],
     'number_sense:estimate_quotient': [_pvQuotientPlace(), _pvTask()],
@@ -631,7 +770,13 @@ export function pvBandFloor(categoryId, skillId, opts) {
     const o = normalizeOptions(categoryId, skillId, opts);
     const place = pvRoundPlace(skillId, o);
     if (place) return place * 10;
-    if (skillId === 'more_less_100') return 1000;
+    if (skillId === 'more_less_100') return Number(o.step) === 1000 ? 10000 : 1000;
+    if (skillId === 'between_tens') return 100;
+    if (skillId === 'place_on_number_line') return (Number(o.span) || 10) * 10;
+    if (skillId === 'rounding_table') {
+        const ps = (Array.isArray(o.places) && o.places.length ? o.places : [10, 100]).map(Number);
+        return Math.max(...ps) * 10;
+    }
     if (skillId === 'more_less_10') return Number(o.step) === 10 ? 20 : 10;
     if (skillId === 'pv_digit_drag') return 1000;
     if (skillId === 'place_value_10x') {
@@ -956,6 +1101,140 @@ const P11_K2_OPTIONS = {
 };
 Object.assign(SKILL_OPTIONS, P11_K2_OPTIONS);
 // ============================ end P11 · K-2 options ============================
+// ===========================================================================
+// COUNT-BY · MULTIPLICATION CHART · × / ÷ NUMBER LINE · NUMBER PATTERNS  (2026-09-25)
+// ===========================================================================
+// One contiguous block, merged into SKILL_OPTIONS below (it REPLACES the earlier entries for
+// mult_chart, mult_chart_easy, nl_mult and nl_div). Every option is read by
+// js/modules/gen-mult-patterns.js, which gen-operations.js / gen-algebraic.js / gen-counting.js
+// call for these skills. The share-code keys of the new option ids (missing, pattern, rule,
+// chart, ticks, shape) are the two-character keys of skill-option-codec.js (EXT_OPTION_KEYS).
+const _cbPercent = (dflt, { nullLabel = null, help } = {}) => ({
+    id: 'missing', label: 'Numbers left blank', type: 'enum', default: dflt, group: 'support',
+    values: [...(nullLabel ? [{ v: null, l: nullLabel }] : []),
+        ...[20, 50, 70, 80, 90, 100].map(v => ({ v, l: `${v}%` }))],
+    help: help || 'How many of the numbers the pupil writes. The first number is always printed.',
+});
+const _cbTables = (from, label, titleVerb, help) => ({
+    id: 'constant', label, type: 'set', group: 'difficulty',
+    default: Array.from({ length: 13 - from }, (_, k) => k + from),
+    values: Array.from({ length: 13 - from }, (_, k) => ({ v: k + from, l: String(k + from) })),
+    allLabel: from === 1 ? 'All twelve' : `All (${from} to 12)`,
+    titleVerb,
+    help,
+});
+const _cbShape = (dflt) => ({
+    id: 'shape', label: 'Box shape', type: 'enum', default: dflt, group: 'layout',
+    values: [{ v: 'box', l: 'Boxes' }, { v: 'circle', l: 'Circles' }, { v: 'hex', l: 'Hexagons' },
+        { v: 'mixed', l: 'Circles and hexagons (younger pupils)' }],
+    help: 'The outline each number is written in. Outlines only, black and white; every shape is big enough to write in.',
+});
+const _chartBand = (dflt) => _opsBand([25, 36, 100, 144], dflt, {
+    label: 'Chart size', labels: { 25: '5 × 5', 36: '6 × 6', 100: '10 × 10', 144: '12 × 12' },
+    help: 'The part of the chart used: its largest factor is 5, 6, 10 or 12. The whole chart at 12 × 12 fills a page.',
+});
+const _chartTask = () => ({
+    id: 'task', label: 'Task', type: 'enum', default: 'fill', group: 'difficulty',
+    values: [{ v: 'fill', l: 'Fill in the missing products' },
+        { v: 'headers', l: 'Fill in the missing row and column numbers' },
+        { v: 'shade', l: 'Shade every multiple of a number' },
+        { v: 'pattern', l: 'Find the pattern in one row (write the rule)' }],
+    help: 'One task per page. Shade and pattern print every product; the pupil looks for the pattern.',
+});
+const _hopLine = (div) => [
+    div ? _cbTables(2, 'Divide by', 'Divide by', 'The size of each hop (the number you divide by). Tick one or several.')
+        : _cbTables(2, 'Hop size (tables)', 'Hops of', 'The size of each hop: the table the page practises. Tick one or several.'),
+    _opsBand([20, 50, 100, 144], 100, {
+        label: 'Line from 0 to', labels: { 20: '0 to 20', 50: '0 to 50', 100: '0 to 100', 144: '0 to 144' },
+        help: (div ? 'The longest line: the number shared is never bigger.' : 'The longest line: the product is never bigger.')
+            + ' A longer line leans on the tables that need it (0 to 144: the 9s to 12s first).',
+    }),
+    {
+        id: 'ticks', label: 'Numbers on the line', type: 'enum', default: 'step', group: 'support',
+        values: [{ v: 'step', l: 'Every hop (0, 3, 6, 9 …)' }, { v: 'one', l: 'Every number (0, 1, 2, 3 …), lines to 36' }],
+        help: 'Every number keeps the line to 0-36 so each label has room; the pupil counts every step of each hop.',
+    },
+    {
+        id: 'response', label: 'Task', type: 'enum', default: 'draw', group: 'difficulty',
+        values: [{ v: 'draw', l: div ? 'Draw the hops, write how many (12 ÷ 3 = __)' : 'Draw the hops, write the product (4 × 3 = __)' },
+            { v: 'sentence', l: div ? 'Read the hops, write the sentence (__ ÷ __ = __)' : 'Read the hops, write the sentence (__ × __ = __)' },
+            { v: 'missing', l: 'Read the hops, write the missing number' }],
+        help: 'One task per page. Draw is the hardest to start; reading the hops is the model.',
+    },
+    {
+        id: 'support', label: 'Hop numbers', type: 'enum', default: 'none', group: 'support',
+        values: [{ v: 'none', l: 'None' }, { v: 'numbers', l: 'Number each hop 1, 2, 3 …' }],
+        help: 'A number over each drawn hop (in the model and the key) so the pupil counts the hops. None is the fade.',
+    },
+];
+const CB_CHART_LINE_OPTIONS = {
+    'multiplication:count_by_tables': [
+        _cbTables(1, 'Tables', 'Count by', 'One row per ticked table, in the order below. Tick one table for a page of it, or several.'),
+        _cbPercent(50),
+        {
+            id: 'order', label: 'Order of the rows', type: 'enum', default: 'inorder', group: 'layout',
+            values: [{ v: 'inorder', l: 'In order (2, 3, 4 …)' }, { v: 'mixed', l: 'Mixed tables' }],
+            help: 'In order runs the ticked tables smallest first down the page; mixed shuffles them.',
+        },
+        _cbShape('box'),
+    ],
+    'patterns:number_patterns_rule': [
+        {
+            id: 'pattern', label: 'Pattern', type: 'set', default: ['add', 'sub'], group: 'difficulty',
+            values: [{ v: 'add', l: 'Count on (+2, +5, +10, +25, +100 …)' }, { v: 'sub', l: 'Count back (−2, −5, −10 …)' },
+                { v: 'double', l: 'Doubling and halving' }, { v: 'times10', l: '× 10 each time' },
+                { v: 'grow', l: 'Growing steps (+1, +2, +3 …)' }],
+            allLabel: 'All five, mixed',
+            help: 'Tick one kind for a page of it, or several to mix them (the pupil must find which rule each row uses).',
+        },
+        {
+            id: 'places', label: 'Start in the', type: 'set', default: [1, 10], group: 'difficulty',
+            values: [{ v: 1, l: 'Ones (start 1-9)' }, { v: 10, l: 'Tens (start 10-99)' },
+                { v: 100, l: 'Hundreds (start 100-999)' }, { v: 1000, l: 'Thousands (start 1,000-9,999)' }],
+            allLabel: 'All four',
+            help: 'Where the first number starts. A row that starts in the ones stays under 100, in the tens under 1,000, '
+                + 'in the hundreds or thousands under 10,000 (× 10 runs on to the thousands). Max Number lowers this only if you set it lower.',
+        },
+        _cbPercent(null, { nullLabel: 'None: continue it (the first 3 shown, the rest to write)',
+            help: 'None asks the pupil to continue the pattern. A percentage leaves that many numbers out ANYWHERE along the row; the first number is always printed.' }),
+        {
+            id: 'rule', label: 'Write the rule', type: 'bool', default: false, group: 'support',
+            help: 'Off prints the rule above the row ("Rule: count on by 5."). On hides it and adds a Rule box to fill.',
+        },
+        _cbShape('box'),
+    ],
+    'multiplication:mult_chart': [
+        {
+            id: 'chart', label: 'Chart', type: 'enum', default: 'window', group: 'layout',
+            values: [{ v: 'window', l: 'A window of the chart (4 rows × 5 columns)' },
+                { v: 'whole', l: 'The whole chart (up to the chart size)' }],
+            help: 'A window is a small piece cut from anywhere in the chart. The whole chart at 12 × 12 is one item per page.',
+        },
+        _chartBand(144),
+        _cbPercent(null, { nullLabel: 'A few (3 in a window, half of a whole chart)',
+            help: 'How many of the products (or, for Task: row and column numbers, the factors) are left blank. 100% is a blank chart to fill in.' }),
+        _cbTables(1, 'Tables with blanks', 'Times tables', 'Only the rows and columns of the ticked tables have blanks (tick 7 and 8 to practise those two).'),
+        _chartTask(),
+    ],
+    'multiplication:mult_chart_easy': [
+        levelSubset([2, 1, 0], 2, 'The same chart every time: level 2 leaves 2 cells to fill, level 1 leaves 6, '
+            + 'level 0 leaves 22. Level 2 never blanks the 1 row or the 1 column.'),
+        _chartBand(144),
+        _cbPercent(null, { nullLabel: 'As the support level sets it (2, 6 or 22 cells)',
+            help: 'A percentage of the chart instead of the support level\'s count. 100% is a blank chart to fill in completely.' }),
+        _cbTables(1, 'Tables with blanks', 'Times tables', 'Only the rows and columns of the ticked tables have blanks.'),
+        _chartTask(),
+    ],
+    'multiplication:nl_mult': _hopLine(false),
+    'division:nl_div': _hopLine(true),
+    'counting:number_seq_fill': [
+        ...(SKILL_OPTIONS['counting:number_seq_fill'] || []).filter(o => o.id !== 'shape'),
+        _cbShape('mixed'),
+    ],
+};
+Object.assign(SKILL_OPTIONS, CB_CHART_LINE_OPTIONS);
+// ======================= end count-by · chart · number line · patterns =======================
+
 // number_word_form: which way round (gen-algebraic.js wordFormWay() reads it; the codec has had
 // `W` since the option was specified). Words to numeral is the default: it is the lower writing
 // load, and a misspelled "fourty" would be a spelling error marked as a maths error.
@@ -967,6 +1246,80 @@ SKILL_OPTIONS['composing:number_word_form'] = [{
     help: 'Writing the words is harder (it is spelling too). Tick both and the page alternates.',
 }];
 
+// ===========================================================================
+// FUNCTION TABLES (function_table_easy / function_table_hard, 2026-09-25)
+// ===========================================================================
+// One contiguous block. Every option is READ by js/modules/gen-function-table.js (ftOptions); an
+// option the generator ignores is not declared (SCC-P11). The two skills share the schema and
+// differ only in their defaults: easy is one + / − step with small numbers, in order, filling
+// the Out column; hard is every operation, one- and two-step rules, inputs out of order, finding
+// the rule and testing it on a Check row.
+//
+// THE BAND caps every number in the table — In, Out, and the rule's own numbers — the same way
+// the place-value band does (pvCap): Max Number only lowers it when the teacher has set Max
+// Number below the band.
+const _ftOptions = (easy) => [
+    {
+        id: 'task', label: 'Task', type: 'enum', default: easy ? 'outputs' : 'rule', group: 'layout',
+        values: [
+            { v: 'outputs', l: 'Complete the table (the rule is given, write each Out)' },
+            { v: 'rule', l: 'Find the rule (every row given, write the rule)' },
+            { v: 'inputs', l: 'Find the missing In numbers (work the rule backward)' },
+            { v: 'mixed', l: 'Mixed blanks (some In and some Out missing)' },
+            { v: 'make', l: 'Make your own (the rule is given, the pupil chooses the In numbers)' },
+        ],
+        help: 'One task per page, so the instruction says one thing. "Make your own" accepts any rows that follow the rule.',
+    },
+    {
+        id: 'ops', label: 'Operations in the rule', type: 'set', default: easy ? ['+', '-'] : ['+', '-', 'x', '/'], group: 'difficulty',
+        values: [{ v: '+', l: '+ (add)' }, { v: '-', l: '− (subtract)' }, { v: 'x', l: '× (multiply)' }, { v: '/', l: '÷ (divide, exact only)' }],
+        allLabel: 'All four',
+        help: 'The page deals the ticked operations in turn. Division rules always divide exactly.',
+    },
+    {
+        id: 'step', label: 'Steps in the rule', type: 'set', default: easy ? [1] : [1, 2], group: 'difficulty',
+        values: [{ v: 1, l: 'One step (x + 7)' }, { v: 2, l: 'Two steps (x × 2 + 1)' }],
+        allLabel: 'Both, alternating',
+        help: 'A two-step rule multiplies or divides, then adds or subtracts (the ticked × ÷ and + −, or × and + when none is ticked).',
+    },
+    {
+        id: 'band', label: 'Numbers to', type: 'enum', default: easy ? 20 : 100, group: 'difficulty',
+        values: [10, 20, 50, 100, 1000].map((v) => ({ v, l: v.toLocaleString('en-US') })),
+        help: 'The biggest number anywhere in the table. Max Number only lowers it if you set Max Number below this.',
+    },
+    {
+        id: 'tiles', label: 'Rows in the table', type: 'enum', default: easy ? 4 : 3, group: 'layout',
+        values: [{ v: 3, l: '3 rows' }, { v: 4, l: '4 rows' }, { v: 5, l: '5 rows' }],
+        help: 'Three rows are enough to find a rule. More rows are more practice; a tall table '
+            + '(5 rows, a Check row and a two-step rule together) fits four tables to a page instead of six.',
+    },
+    {
+        id: 'order', label: 'In numbers', type: 'enum', default: easy ? 'inorder' : 'scrambled', group: 'difficulty',
+        values: [{ v: 'inorder', l: 'In order, smallest first' }, { v: 'scrambled', l: 'Out of order' }],
+        help: 'Out of order stops the pupil just following the Out column down: each row has to use the rule.',
+    },
+    {
+        id: 'support', label: 'Support', type: 'enum', default: 'frame', group: 'support',
+        values: [
+            { v: 'frame', l: 'Frame (the rule on each In number; the rule box x ○ □)' },
+            { v: 'line', l: 'Line (just In and Out; the rule written on a line)' },
+        ],
+        help: 'The frame is the support: completing, a middle column shows "3 + 7"; finding the rule, '
+            + 'a circle for the sign and a box for the number. The line is the fade.',
+    },
+    {
+        id: 'pictures', label: 'Function machine picture', type: 'bool', default: true, group: 'support',
+        help: 'A small In → [rule] → Out machine drawn above the table. Off prints the rule as a line.',
+    },
+    {
+        id: 'response', label: 'Check row', type: 'enum', default: easy ? 'standard' : 'check', group: 'layout',
+        values: [{ v: 'standard', l: 'No check row' }, { v: 'check', l: 'Add a Check row (a new In number to test the rule)' }],
+        help: 'The Check row gives one more In number under the table, so the pupil tests the rule on it. Not used with "Make your own".',
+    },
+];
+SKILL_OPTIONS['algebra:function_table_easy'] = _ftOptions(true);
+SKILL_OPTIONS['algebra:function_table_hard'] = _ftOptions(false);
+// ============================ end function tables ============================
 // ===========================================================================
 // P12 · EVERY OTHER FAMILY  (design/audit/OPTIONS-RUBRIC.md, 2026-09-25)
 // ===========================================================================

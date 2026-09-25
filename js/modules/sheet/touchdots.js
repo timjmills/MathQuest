@@ -104,21 +104,26 @@ export function touchDotOrder(d) {
  *   ring   outer diameter of a double's ring
  *   inner  a double's solid centre dot
  *   rw     ring stroke width
- *   halo   white keyline round a single dot (0 = none); a double's ring needs none
+ *   halo   white keyline round a single dot (0 = none)
+ *   ck     white keyline round a double's centre dot (open rings: it parts the dot from the
+ *          stroke that runs through the ring)
  * A double's ring gap (between centre dot and ring) = ring/2 - rw - inner/2.
  */
 export const TOUCH_DOT_SIZES = Object.freeze({
-    S: Object.freeze({ dot: 0.15, ring: 0.21, inner: 0.09, rw: 0.028, halo: 0.018 }),
-    M: Object.freeze({ dot: 0.17, ring: 0.23, inner: 0.10, rw: 0.03, halo: 0.018 }),
-    L: Object.freeze({ dot: 0.19, ring: 0.25, inner: 0.11, rw: 0.032, halo: 0.018 }),
+    S: Object.freeze({ dot: 0.15, ring: 0.21, inner: 0.07, rw: 0.028, halo: 0.018, ck: 0.032 }),
+    M: Object.freeze({ dot: 0.17, ring: 0.23, inner: 0.08, rw: 0.03, halo: 0.018, ck: 0.034 }),
+    L: Object.freeze({ dot: 0.19, ring: 0.25, inner: 0.09, rw: 0.032, halo: 0.018, ck: 0.036 }),
 });
 /** The chosen size (set from the specimen evidence; design/SUPPORTS.md §S1). */
 export const TOUCH_DOT_DEFAULT = 'M';
 
 /** Physical floors (mm) that keep a mark legible after a photocopy, whatever the em. */
-export const TOUCH_DOT_FLOOR_MM = Object.freeze({ gap: 0.3, rw: 0.25, halo: 0.15 });
+export const TOUCH_DOT_FLOOR_MM = Object.freeze({ gap: 0.3, rw: 0.25, halo: 0.15, ck: 0.26 });
 
-/** The minimum digit size that may carry touch dots. Below it the caller uses the dot tile. */
+/**
+ * The minimum digit size that may carry touch dots. Owner ruling 2026-09-25: an item with touch
+ * dots whose digits would fall below it is laid out at size L (28 pt) instead; never the dot tile.
+ */
 export const TOUCH_DOT_MIN = Object.freeze({ pt: 24, px: 40 });
 
 const PT_MM = 25.4 / 72;
@@ -126,7 +131,8 @@ const PX_MM = 25.4 / 96;
 
 /**
  * Can a digit of this size carry touch dots? `unit` is 'pt' (paper) or 'px' (screen).
- * Below 24 pt / 40 px the dots would be too small to touch and count: use the dot tile instead.
+ * Below 24 pt / 40 px the dots would be too small to touch and count: the item switches to size L
+ * (paper) or draws its digits at >= 40 px (screen) - see design/SUPPORTS.md §S1.6.
  */
 export function touchDotsFits(size, unit = 'pt') {
     const n = Number(size);
@@ -152,6 +158,9 @@ export function touchDotGeometry({ em = 28, unit = 'pt', size = TOUCH_DOT_DEFAUL
     return {
         dotR: s.dot / 2, innerR: s.inner / 2, ringR, rw, gap,
         halo: halo ? Math.max(s.halo, f(TOUCH_DOT_FLOOR_MM.halo)) : 0,
+        // the centre dot's keyline: >= 0.26 mm so a copy cannot fuse the dot to the stroke, and
+        // always short of the ring line by 0.012 em, so the stroke visibly runs into the ring
+        ck: Math.min(Math.max(s.ck, f(TOUCH_DOT_FLOOR_MM.ck)), gap - 0.012),
     };
 }
 
@@ -173,7 +182,7 @@ const GREY = '#949494'; // INK-1: the sheet's one grey
  * @param {boolean} [o.photocopy]    photocopy-safe: no grey fills, wider ring gaps
  * @param {'S'|'M'|'L'} [o.size]     mark size (TOUCH_DOT_SIZES)
  * @param {boolean} [o.halo=true]    white keyline round every solid dot
- * @param {'knockout'|'open'} [o.ring='knockout']  a double's ring filled white, or open over the stroke
+ * @param {'open'|'knockout'} [o.ring='open']  a double's ring open over the stroke (owner ruling), or filled white
  * @param {number[]} [o.counted]     screen: per-mark touches already made (0, 1 or 2); a touched
  *                                   part is drawn in the one grey
  * @param {boolean} [o.tappable]     screen: tag each mark with data-td-mark for a tap handler
@@ -193,11 +202,11 @@ export function touchDotsMarks(d, o = {}) {
         const tag = o.tappable ? ` data-td-mark="${i}"` : '';
         const parts = [];
         if (p.double) {
-            // A ring round a solid centre dot. By default ('knockout') the ring is a white disc
-            // with an ink edge: it knocks the glyph stroke out of the gap, so the gap and the centre
-            // dot read cleanly and survive a photocopy (specimen §2). 'open' draws the ring over the
-            // stroke instead (the stroke runs through the gap; the centre dot takes a keyline):
-            // the numeral stays more whole, but after a copy a double looks like a single blob.
+            // A ring round a solid centre dot. OWNER RULING 2026-09-25: the ring is OPEN - drawn
+            // over the stroke, so the numeral's stroke shows through it and a 7 or 9 stays whole.
+            // The centre dot carries its own white keyline (ck) so it never fuses with the stroke,
+            // and the gap either side of the stroke keeps the photocopy floor (gate: no blob).
+            // 'knockout' (a white-filled ring) remains as an option.
             // Screen: a touched part turns the one grey (a touch still to make stays black). The
             // first touch greys the centre dot, the second greys the ring; nothing grows.
             const ringInk = n >= 2 ? GREY : INK, dotInk = n >= 1 ? GREY : INK;
@@ -205,9 +214,9 @@ export function touchDotsMarks(d, o = {}) {
                 parts.push(`<circle cx="${cx}" cy="${cy}" r="${f3(g.ringR - g.rw / 2)}" fill="#fff" stroke="#000" stroke-width="${f3(g.rw * 0.6)}" stroke-dasharray="${f3(g.rw * 1.2)} ${f3(g.rw)}"/>`);
                 parts.push(`<circle cx="${cx}" cy="${cy}" r="${f3(g.innerR - g.rw * 0.3)}" fill="#fff" stroke="#000" stroke-width="${f3(g.rw * 0.6)}"/>`);
             } else {
-                const knock = o.ring !== 'open';
+                const knock = o.ring === 'knockout';
                 parts.push(`<circle cx="${cx}" cy="${cy}" r="${f3(g.ringR - g.rw / 2)}" fill="${knock ? '#fff' : 'none'}" stroke="${ringInk}" stroke-width="${f3(g.rw)}"/>`);
-                if (!knock && g.halo) parts.push(`<circle cx="${cx}" cy="${cy}" r="${f3(g.innerR + g.halo)}" fill="#fff"/>`);
+                if (!knock) parts.push(`<circle cx="${cx}" cy="${cy}" r="${f3(g.innerR + g.ck)}" fill="#fff"/>`);
                 parts.push(`<circle cx="${cx}" cy="${cy}" r="${f3(g.innerR)}" fill="${dotInk}"/>`);
             }
         } else {

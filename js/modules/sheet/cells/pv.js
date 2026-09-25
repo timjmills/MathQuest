@@ -25,6 +25,7 @@
 
 import { esc, blank } from '../cell.js';
 import { register } from '../registry.js';
+import { SIZES } from '../tokens.js';
 
 export const DISK_SIZES = {
     S: { d: 8, head: 4, pt: 9 },
@@ -54,7 +55,7 @@ export function zoneCapacity(place, size = 'L') {
     return Math.floor(inner / (d + 2)) ** 2;
 }
 
-const fmt = (v) => Number(v).toLocaleString('en-US');
+const fmt = (v) => Number(v).toLocaleString('en-US', { maximumFractionDigits: 6 });
 
 /** The label point size that fits a disk: zone-label size, shrunk for "1,000", never below 8 pt (TY-11). */
 function labelPt(place, size) {
@@ -166,21 +167,23 @@ export function numeralTracksHTML(n, { underline = 0, cut = 0, arrow = false, si
 
 /**
  * The rounding line (§13.7): a 1.5 pt axis, 11 tall ticks, ONLY the two end values labelled below
- * it, and the number to round printed above at the left. No midpoint label and no plotted dot:
- * the midpoint is a hint (H2) and the dot is the pupil's to draw (RN-4), so neither is printed
- * here — printing them is what made "which end is it closer to?" readable off today's picture.
+ * it, and the number to round printed above at the left. No midpoint label and no plotted dot by
+ * default: the midpoint is a hint (H2, `mid`) and the dot is the pupil's to draw (RN-4) — `dot`
+ * plots it only where the step gives it (RN-3, H3), and the answer key draws it with `keyDot`.
+ * Printing them unasked is what made "which end is it closer to?" readable off the old picture.
  *
- * @param {{lo: number, hi: number, n: number, lengthMm?: number, pxPerMm?: number, labelPt?: number}} o
+ * @param {{lo: number, hi: number, n: number, lengthMm?: number, pxPerMm?: number, labelPt?: number,
+ *          dot?: boolean, keyDot?: boolean, mid?: boolean, showNumber?: boolean}} o
  */
-export function roundingLineSVG({ lo, hi, n, lengthMm = 140, pxPerMm = 0, labelPt = 12 } = {}) {
+export function roundingLineSVG({ lo, hi, n, lengthMm = 140, pxPerMm = 0, labelPt = 12, dot = false, keyDot = false, mid = false, showNumber = true } = {}) {
     const pad = 9;
     const w = lengthMm + pad * 2;
     const numPt = labelPt * 1.6;
-    const top = numPt * PT_MM + 3;
+    const top = showNumber ? numPt * PT_MM + 3 : 3;
     const axisY = top + 8;
     const h = axisY + 5 + labelPt * PT_MM + 2;
-    let body = `<text x="${pad.toFixed(2)}" y="${(numPt * PT_MM).toFixed(2)}" font-size="${(numPt * PT_MM).toFixed(3)}" `
-        + `font-weight="700" fill="#000">${fmt(n)}</text>`;
+    let body = showNumber ? `<text x="${pad.toFixed(2)}" y="${(numPt * PT_MM).toFixed(2)}" font-size="${(numPt * PT_MM).toFixed(3)}" `
+        + `font-weight="700" fill="#000">${fmt(n)}</text>` : '';
     body += `<line x1="${pad}" y1="${axisY.toFixed(2)}" x2="${(pad + lengthMm).toFixed(2)}" y2="${axisY.toFixed(2)}" `
         + `stroke="#000" stroke-width="${(1.5 * PT_MM).toFixed(3)}"/>`;
     for (let i = 0; i <= 10; i++) {
@@ -189,9 +192,18 @@ export function roundingLineSVG({ lo, hi, n, lengthMm = 140, pxPerMm = 0, labelP
             + `stroke="#000" stroke-width="${(0.75 * PT_MM).toFixed(3)}"/>`;
     }
     const ly = axisY + 5 + labelPt * PT_MM * 0.8;
-    for (const [x, v] of [[pad, lo], [pad + lengthMm, hi]]) {
+    const ends = [[pad, lo], [pad + lengthMm, hi]];
+    for (const [x, v] of ends) {
         body += `<text data-pv-end="${v}" x="${x.toFixed(2)}" y="${ly.toFixed(2)}" text-anchor="middle" `
             + `font-size="${(labelPt * PT_MM).toFixed(3)}" font-weight="700" fill="#000">${fmt(v)}</text>`;
+    }
+    if (mid) {
+        body += `<text data-pv-mid="${(lo + hi) / 2}" x="${(pad + lengthMm / 2).toFixed(2)}" y="${ly.toFixed(2)}" text-anchor="middle" `
+            + `font-size="${(labelPt * PT_MM * 0.85).toFixed(3)}" font-weight="400" fill="#000">${fmt((lo + hi) / 2)}</text>`;
+    }
+    if ((dot || keyDot) && hi > lo) {
+        const x = pad + (lengthMm * (n - lo)) / (hi - lo);
+        body += `<circle data-pv-dot="${n}" cx="${x.toFixed(2)}" cy="${axisY.toFixed(2)}" r="1.25" fill="#000"/>`;
     }
     const dims = pxPerMm > 0 ? `width="${Math.round(w * pxPerMm)}" height="${Math.round(h * pxPerMm)}"`
         : `width="${w.toFixed(2)}mm" height="${h.toFixed(2)}mm"`;
@@ -208,15 +220,44 @@ export function roundingLineSVG({ lo, hi, n, lengthMm = 140, pxPerMm = 0, labelP
 //
 // The answer key is a facsimile (AK-1): state `answered` draws the SAME cell with the answer in
 // the pupil's slot — the ring on the right word, the value on the line, every box of an expanded
-// form filled (zeros included), the disks drawn in their zones, each number written in its column.
+// form filled (zeros included), the disks drawn in their zones, each number written in its column,
+// the dot on its tick, the check in the right box.
+//
+// P9 step 8 kinds: `place-bank` (the word written from a bank), `blanks` (a frame with several
+// slots: unit form, expanded notation, between two tens), `expand-line` (the unframed fade),
+// `compare`, `order`, `chart` (the chart-fill cell, §13.3), `round-notate` / `decide` / `judge`
+// (the response scopes of §2.6), `line-mark` (RN-2), `closest`, `estimate` (the two-line rewrite,
+// §13.10) and `table` (the rounding table, §13.8).
 
 const pt = (v) => `${Number(v).toFixed(1)}pt`;
 const answered = (ctx) => ctx.state === 'answered' || ctx.state === 'traced';
+/**
+ * What a slot shows: '' on the pupil page, the key in `answered` / `traced`, and in state `wrong`
+ * (the finished work of Error analysis, a True or False? statement) the provider's value for
+ * that slot. The drawings below that are not `blank()` slots — rings, ticks, chart cells, the
+ * dot — read their value here, so finished work shows in them exactly as a pupil would write it.
+ */
+function shownVal(ctx, id, key) {
+    if (ctx.state === 'wrong') {
+        const w = ctx.wrong || {};
+        const v = w.slots && w.slots[id] !== undefined ? w.slots[id] : w.value;
+        return v === undefined || v === null ? '' : String(v);
+    }
+    return answered(ctx) ? (key === undefined || key === null ? '' : String(key)) : '';
+}
+const showing = (ctx) => answered(ctx) || ctx.state === 'wrong';
 const RING = 'border:1.5pt solid #000;border-radius:999px;';
-const PLACE_WORD_KIT = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands' };
+const PLACE_WORD_KIT = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands' };
 
 function textLine(ctx, html) {
     return html ? `<div class="pv-prompt" style="font-size:${pt(ctx.metrics.textPt)};margin:0 0 2mm;">${html}</div>` : '';
+}
+
+/** Numbers and signs at the working size, words at the cell-text size (RM-27). */
+function piece(ctx, seg) {
+    return String(seg).trim().split(/\s+/).filter(Boolean).map(tok => (/^\d[\d,.]*$|^[+−×÷=≈→<>-]$/.test(tok)
+        ? `<span class="${/^\d/.test(tok) ? '' : 'o'}">${esc(tok)}</span>`
+        : `<span style="font-size:${pt(ctx.metrics.textPt + 3)};font-weight:400;padding-bottom:0.12em;">${esc(tok)}</span>`)).join('');
 }
 
 /** A frame line with the slot where the text has "____". */
@@ -226,21 +267,46 @@ function frameHTML(ctx, text, key, digits) {
     // A frame is words and numbers on one line (RM-27): numbers and signs at the working digit
     // size, words at the cell-text size, all bottom-aligned in the kit's equation row (`.ws-eq`)
     // so the writing line sits on the digits' baseline.
-    const piece = (seg) => String(seg).trim().split(/\s+/).filter(Boolean).map(tok => (/^\d[\d,.]*$|^[+\u2212\u00d7\u00f7=\u2192-]$/.test(tok)
-        ? `<span class="${/^\d/.test(tok) ? '' : 'o'}">${esc(tok)}</span>`
-        : `<span style="font-size:${pt(ctx.metrics.textPt + 3)};font-weight:400;padding-bottom:0.12em;">${esc(tok)}</span>`)).join('');
     const parts = String(text || '____').split('____');
-    const body = parts.length > 1 ? parts.map(piece).join(slot) : `${piece(text)}${slot}`;
+    const body = parts.length > 1 ? parts.map(s => piece(ctx, s)).join(slot) : `${piece(ctx, text)}${slot}`;
     return `<div class="ws-eq pv-frame" style="font-weight:700;">${body}</div>`;
+}
+
+/** A frame with several slots: each "____" is slot b0, b1 … keyed by `keys[i]`. */
+function blanksHTML(ctx, text, keys, words) {
+    const parts = String(text || '').split('____');
+    let out = '';
+    parts.forEach((seg, i) => {
+        out += piece(ctx, seg);
+        if (i < parts.length - 1) {
+            const k = keys && keys[i] !== undefined ? String(keys[i]) : '';
+            const digits = Math.max(1, k.replace(/[^0-9]/g, '').length || k.length || 1);
+            const shape = words && !/^\d/.test(k) ? 'line' : 'box';
+            out += blank({ id: `b${i}`, kind: /^\d/.test(k) ? 'number' : 'text', shape, digits: Math.max(digits, shape === 'line' ? 6 : 1),
+                graded: true, order: i, scopes: ['full', 'answer-only'] }, ctx, k);
+        }
+    });
+    return `<div class="ws-eq pv-frame pv-blanks" style="font-weight:700;flex-wrap:wrap;row-gap:2mm;">${out}</div>`;
 }
 
 /** Words or numbers printed for the pupil to ring; the key rings the right ones. */
 function ringRow(ctx, items, correct, sizePt) {
-    const on = answered(ctx) ? new Set((correct || []).map(String)) : new Set();
+    const on = ctx.state === 'wrong' ? new Set([shownVal(ctx, 'answer', '')]) : answered(ctx) ? new Set((correct || []).map(String)) : new Set();
     const cells = items.map(w => `<span class="pv-choice" data-ws-slot="choice" data-ws-shape="ring" style="display:inline-block;`
         + `padding:0.8mm 2.2mm;margin:1mm 2mm;${on.has(String(w)) ? RING : 'border:1.5pt solid transparent;'}">${esc(w)}</span>`).join('');
     return `<div class="pv-ring-row" style="font-size:${pt(sizePt || ctx.metrics.digitPt * 0.75)};font-weight:700;text-align:center;`
         + `line-height:1.6;">${cells}</div>`;
+}
+
+/** Check-box choices ("Round up / Round down", "Correct / Fix it"): the key ticks the right one. */
+function checkRow(ctx, labels, correct) {
+    // The tick goes in the box of the chosen label: the key's, or the finished work's.
+    const chosen = shownVal(ctx, 'answer', correct);
+    const cw = (SIZES[ctx.size] || SIZES.M || { checkMm: 6 }).checkMm || 6;
+    const boxes = labels.map((l, i) => `<span style="display:inline-flex;align-items:center;gap:2mm;margin:0 4mm;">`
+        + `<span class="ws-check" data-ws-slot="c${i}" data-ws-shape="check" style="width:${cw}mm;height:${cw}mm">${chosen === l ? '✓' : ''}</span>`
+        + `<span style="font-size:${pt(ctx.metrics.textPt + 2)};font-weight:700;">${esc(l)}</span></span>`).join('');
+    return `<div class="pv-checks" style="text-align:center;margin-top:2mm;">${boxes}</div>`;
 }
 
 function expandHTML(p, ctx) {
@@ -280,43 +346,179 @@ function sortHTML(p, ctx) {
         + `<div style="display:flex;border:0.75pt solid #000;font-size:${pt(z)};font-weight:700;">${cols}</div></div>`;
 }
 
+/** The chart-fill cell (§13.3): the place letters over a row of empty boxes, the source above. */
+function chartHTML(p, ctx) {
+    const places = p.places || [];
+    const keys = p.keys || [];
+    const colW = { S: 14, M: 14, L: 17 }[ctx.size] || 14;
+    const rowH = { S: 12, M: 12, L: 14 }[ctx.size] || 12;
+    const heads = places.map(pl => `<td style="border:0.75pt solid #000;width:${colW}mm;text-align:center;font-size:${pt(ctx.metrics.zonePt)};`
+        + `font-weight:700;padding:1mm 0;">${LETTER[pl] || ''}</td>`).join('');
+    const cells = places.map((pl, i) => `<td style="border:0.75pt solid #000;width:${colW}mm;height:${rowH}mm;text-align:center;`
+        + `font-size:${pt(ctx.metrics.digitPt)};font-weight:700;"><span data-ws-slot="d${i}" data-ws-shape="cell">${esc(shownVal(ctx, `d${i}`, keys[i]))}</span></td>`).join('');
+    return `${textLine(ctx, `<b style="font-size:${pt(ctx.metrics.textPt + 2)};">${esc(p.source || '')}</b>`)}`
+        + `<table class="pv-chartfill" style="border-collapse:collapse;margin:0 auto;"><tr>${heads}</tr><tr>${cells}</tr></table>`;
+}
+
+/** A wrong table answer "a; b; c" gives cell k its k-th value. */
+function tableWrong(ctx, k) {
+    const w = ctx.wrong || {};
+    if (w.slots && w.slots[`t${k}`] !== undefined) return String(w.slots[`t${k}`]);
+    const parts = String(w.value === undefined ? '' : w.value).split(/;\s*/);
+    return parts[k] !== undefined ? parts[k] : '';
+}
+
+/** The rounding table (§13.8): given cells printed, blank cells are empty boxes (keyed on the key). */
+function tableHTML(p, ctx) {
+    const places = p.places || [];
+    const rowH = (ctx.metrics.writeMm || 8) + 5;
+    const bd = 'border:0.75pt solid #000;';
+    const head = `<tr><td style="${bd}padding:1mm 3mm;font-size:${pt(ctx.metrics.zonePt)};">Number</td>`
+        + places.map(pl => `<td style="${bd}padding:1mm 3mm;font-size:${pt(ctx.metrics.zonePt)};">Nearest ${fmt(pl)}</td>`).join('') + '</tr>';
+    let k = 0;
+    const body = (p.rows || []).map((n, r) => `<tr><td style="${bd}height:${rowH}mm;padding:0 3mm;text-align:center;">${esc(n)}</td>`
+        + places.map((_, c) => {
+            const v = p.view && p.view[r] ? p.view[r][c] : null;
+            if (v !== null && v !== undefined) return `<td style="${bd}padding:0 3mm;text-align:center;">${esc(v)}</td>`;
+            const key = p.keys && p.keys[r] ? p.keys[r][c] : '';
+            const id = `t${k++}`;
+            return `<td style="${bd}min-width:22mm;padding:0 3mm;text-align:center;" data-ws-slot="${id}" data-ws-shape="cell">${esc(ctx.state === 'wrong' ? tableWrong(ctx, k - 1) : shownVal(ctx, id, key))}</td>`;
+        }).join('') + '</tr>').join('');
+    return `<table class="pv-rtable" style="border-collapse:collapse;margin:0 auto;font-size:${pt(ctx.metrics.digitPt * 0.7)};font-weight:700;">${head}${body}</table>`;
+}
+
+/** The order cell: the number cards, then one box per number (P6 §9). */
+function orderHTML(p, ctx) {
+    const cards = (p.nums || []).map(v => `<span style="display:inline-block;border:0.75pt solid #000;border-radius:2mm;padding:1mm 3mm;margin:0 2mm;">${esc(v)}</span>`).join('');
+    const digits = Math.max(...(p.sorted || ['00']).map(v => String(v).replace(/[^0-9]/g, '').length), 2);
+    const boxes = (p.sorted || []).map((v, i) => blank({ id: `o${i}`, kind: 'number', shape: 'box', digits, graded: true, order: i,
+        scopes: ['full', 'answer-only'] }, ctx, v)).join('<span class="o">,</span>');
+    return `<div style="text-align:center;font-size:${pt(ctx.metrics.digitPt * 0.8)};font-weight:700;margin-bottom:3mm;">${cards}</div>`
+        + `<div class="ws-eq pv-order" style="font-weight:700;flex-wrap:wrap;row-gap:2mm;justify-content:center;">${boxes}</div>`;
+}
+
+const keyDigits = (kv) => Math.max(2, String(kv === undefined ? '' : kv).replace(/[^0-9]/g, '').length);
+
 register('pv', {
-    render(p, ctx) {
+    render(p, ctx0) {
+        // Finished work that is RIGHT arrives as state `wrong` with the whole answer and no
+        // per-slot values: draw it as the key does, so a multi-slot cell never writes the whole
+        // answer into each of its boxes.
+        let ctx = ctx0;
+        if (ctx0.state === 'wrong') {
+            const w = ctx0.wrong || {};
+            const kvs = typeof p.keyValue === 'number' ? fmt(p.keyValue) : String(p.keyValue === undefined ? '' : p.keyValue);
+            const noSlots = !w.slots || !Object.keys(w.slots).length;
+            if (noSlots && String(w.value).replace(/,/g, '') === kvs.replace(/,/g, '')) ctx = Object.assign({}, ctx0, { state: 'answered' });
+        }
         const m = ctx.metrics;
         const numeral = (opt) => numeralTracksHTML(p.n, { ...opt, size: pt(m.digitPt) });
         const center = (h) => `<div style="text-align:center;margin:1mm 0 2mm;">${h}</div>`;
-        const kv = p.keyValue;
-        const digits = Math.max(2, String(kv === undefined ? '' : kv).replace(/[^0-9]/g, '').length);
+        const big = (h) => `<span style="font-size:${pt(m.digitPt)};font-weight:700;">${h}</span>`;
+        const kv = typeof p.keyValue === 'number' ? fmt(p.keyValue) : p.keyValue;
+        const digits = keyDigits(kv);
+        const top = p.hideNumeral ? '' : undefined;
         switch (p.kind) {
             case 'place':
-                return `<div class="pv-cell">${center(numeral({ underline: p.place }))}${ringRow(ctx, p.words || [], [kv], ctx.metrics.textPt + 2)}</div>`;
+                return `<div class="pv-cell">${top ?? center(numeral({ underline: p.place }))}${ringRow(ctx, p.words || [], [kv], ctx.metrics.textPt + 2)}</div>`;
+            case 'place-bank': {
+                const bank = `<div class="pv-bank" style="display:table;margin:0 auto 2mm;border:1.5pt solid #000;border-radius:3mm;padding:1mm 3mm;`
+                    + `font-size:${pt(m.textPt + 1)};font-weight:700;">${(p.words || []).map(esc).join('&nbsp;&nbsp;&nbsp;')}</div>`;
+                const slot = blank({ id: 'answer', kind: 'text', shape: 'line', digits: 9, graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, kv);
+                return `<div class="pv-cell">${top ?? center(numeral({ underline: p.place }))}${bank}<div style="text-align:center;">${slot}</div></div>`;
+            }
             case 'value':
-                return `<div class="pv-cell">${center(numeral({ underline: p.place }))}${frameHTML(ctx, p.frame, kv, digits)}</div>`;
+                return `<div class="pv-cell">${top ?? center(numeral({ underline: p.place }))}${frameHTML(ctx, p.frame, kv, digits)}</div>`;
+            case 'blanks': {
+                const pic = p.place && !p.hideNumeral ? center(numeral({ underline: p.place })) : '';
+                return `<div class="pv-cell">${pic}${blanksHTML(ctx, p.frame, p.keys, p.words)}</div>`;
+            }
             case 'expand':
                 return `<div class="pv-cell">${expandHTML(p, ctx)}</div>`;
+            case 'expand-line': {
+                const slot = blank({ id: 'answer', kind: 'text', shape: 'line', digits: 15, graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, kv);
+                return `<div class="pv-cell"><div class="ws-eq pv-frame" style="font-weight:700;"><span>${esc(fmt(p.n))}</span><span class="o">=</span>${slot}</div></div>`;
+            }
             case 'frame':
                 return `<div class="pv-cell">${p.showNumeral ? center(numeral({})) : ''}${frameHTML(ctx, p.frame, kv, digits)}</div>`;
+            case 'compare': {
+                const slot = blank({ id: 'answer', kind: 'sign', shape: 'circle', graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, kv);
+                return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:4mm;">`
+                    + `<span>${esc(fmt(p.a))}</span>${slot}<span>${esc(fmt(p.b))}</span></div></div>`;
+            }
+            case 'order':
+                return `<div class="pv-cell">${orderHTML(p, ctx)}</div>`;
+            case 'chart':
+                return `<div class="pv-cell">${chartHTML(p, ctx)}</div>`;
             case 'round': {
                 const slot = blank({ id: 'answer', kind: 'number', shape: 'line', digits, graded: true, order: 0,
                     scopes: ['full', 'answer-only'] }, ctx, kv);
-                const big = (h) => `<span style="font-size:${pt(m.digitPt)};font-weight:700;">${h}</span>`;
                 if (p.support === 'line') {
                     const len = { S: 120, M: 140, L: 150 }[ctx.size] || 140;
-                    return `<div class="pv-cell">${center(roundingLineSVG({ lo: p.lo, hi: p.hi, n: p.n, lengthMm: len, labelPt: m.zonePt }))}`
+                    const line = roundingLineSVG({ lo: p.lo, hi: p.hi, n: p.n, lengthMm: len, labelPt: m.zonePt, dot: !!p.dot,
+                        keyDot: !!p.mark && answered(ctx), mid: !!p.mid });
+                    return `<div class="pv-cell">${center(p.mark ? `<div data-ws-slot="mark" data-ws-shape="draw">${line}</div>` : line)}`
                         + `${frameHTML(ctx, `Round to the nearest ${fmt(p.place)}: ____`, kv, digits)}</div>`;
                 }
                 const pic = p.support === 'none' ? big(`${esc(fmt(p.n))} →`) : numeral({ cut: p.place, arrow: true });
                 return `<div class="pv-cell" style="text-align:center;white-space:nowrap;">${pic}${big(slot)}</div>`;
             }
+            case 'round-notate': {
+                // RN-7a: the strip without an answer slot; the key underlines the place's digit and
+                // rings the one after it (1.5 pt, §13.6).
+                const strip = numeralTracksHTML(p.n, { underline: showing(ctx) ? p.place : 0, size: pt(m.digitPt) });
+                const ringDigit = showing(ctx) ? `<div style="font-size:${pt(m.textPt)};margin-top:1mm;">${esc(shownVal(ctx, 'answer', kv))}</div>` : '';
+                return `<div class="pv-cell" data-ws-slot="answer" data-ws-shape="mark">${center(strip)}${ringDigit}</div>`;
+            }
+            case 'decide': {
+                const pic = p.expr ? center(big(esc(p.expr))) : center(numeral({ cut: p.place }));
+                return `<div class="pv-cell">${pic}${checkRow(ctx, p.labels || [], kv)}</div>`;
+            }
+            case 'judge': {
+                const fixed = String(kv).startsWith('Fix');
+                const work = `${numeral({ cut: p.place, arrow: true })}${big(esc(fmt(p.shown)))}`;
+                const fix = blank({ id: 'fix', kind: 'number', shape: 'box', digits: keyDigits(p.correct), graded: false, order: 2 }, ctx, fixed ? fmt(p.correct) : '');
+                return `<div class="pv-cell">${center(work)}${checkRow(ctx, ['Correct', 'Fix it'], fixed ? 'Fix it' : 'Correct')}`
+                    + `<div style="text-align:center;margin-top:1mm;">${fix}</div></div>`;
+            }
+            case 'line-mark': {
+                const len = { S: 120, M: 140, L: 150 }[ctx.size] || 140;
+                // The dot on the tick: the key's, or (finished work) the one a pupil marked wrongly.
+                const at = ctx.state === 'wrong' ? Number(String(shownVal(ctx, 'answer', '')).replace(/,/g, '')) : p.n;
+                const line = roundingLineSVG({ lo: p.lo, hi: p.hi, n: Number.isFinite(at) ? at : p.n, lengthMm: len, labelPt: m.zonePt,
+                    keyDot: showing(ctx) && Number.isFinite(at), showNumber: false });
+                return `<div class="pv-cell">${center(`<div data-ws-slot="answer" data-ws-shape="draw">${line}</div>`)}</div>`;
+            }
             case 'circle':
                 return `<div class="pv-cell">${textLine(ctx, `Rounds to <b>${esc(fmt(p.target))}</b>:`)}${ringRow(ctx, p.tiles || [], p.correct || [])}</div>`;
+            case 'closest':
+                return `<div class="pv-cell">${center(big(esc(p.expr)))}${ringRow(ctx, p.choices || [], [kv])}</div>`;
+            case 'estimate': {
+                // The two-line rewrite (RD-07, §13.10): the exact problem, then a box under each
+                // number for its rounded value, the sign printed, then "≈ ____".
+                const keys = p.keys || [];
+                const bx = (i) => blank({ id: `b${i}`, kind: 'number', shape: 'box', digits: Math.max(2, String(keys[i] || '').replace(/[^0-9]/g, '').length),
+                    graded: true, order: i, scopes: ['full', 'answer-only'] }, ctx, keys[i]);
+                const line2 = `<div style="text-align:center;"><div class="ws-eq pv-rewrite" style="font-weight:700;display:inline-flex;">${bx(0)}<span class="o">${esc(p.op)}</span>${bx(1)}`
+                    + `<span class="o">=</span>${blank({ id: 'b2', kind: 'number', shape: 'line', digits: Math.max(3, String(keys[2] || '').replace(/[^0-9]/g, '').length),
+                        graded: true, order: 2, scopes: ['full', 'answer-only'] }, ctx, keys[2])}</div></div>`;
+                return `<div class="pv-cell">${center(big(esc(p.expr)))}${line2}</div>`;
+            }
+            case 'table':
+                return `<div class="pv-cell">${tableHTML(p, ctx)}</div>`;
             case 'disks': {
                 const mat = diskMatSVG({ places: p.places, counts: p.counts, size: ctx.size }).svg;
                 const q = p.task === 'count' ? `${PLACE_WORD_KIT[p.place] || ''} disks: ____` : '____';
                 return `<div class="pv-cell">${center(mat)}${frameHTML(ctx, q, kv, digits)}</div>`;
             }
             case 'build': {
-                const mat = diskMatSVG({ places: p.places, counts: answered(ctx) ? p.counts : null, size: ctx.size, diskPt: 1.5 }).svg;
+                // The key draws the disks; finished work draws the disks of the value written.
+                let counts = answered(ctx) ? p.counts : null;
+                if (ctx.state === 'wrong') {
+                    const v = Number(String(shownVal(ctx, 'answer', '')).replace(/[^0-9]/g, ''));
+                    if (Number.isFinite(v)) counts = Object.fromEntries((p.places || []).map((pl) => [pl, Math.floor(v / pl) % 10]));
+                }
+                const mat = diskMatSVG({ places: p.places, counts, size: ctx.size, diskPt: 1.5 }).svg;
                 return `<div class="pv-cell">${center(`<span style="font-size:${pt(m.digitPt)};font-weight:700;">${esc(fmt(p.n))}</span>`)}`
                     + `<div data-ws-slot="answer" data-ws-shape="draw">${mat}</div></div>`;
             }
@@ -334,18 +536,27 @@ register('pv', {
         const display = typeof value === 'number' ? value.toLocaleString('en-US') : String(value);
         const slots = { answer: { value: display, graded: true, accept: [String(value)] } };
         if (p.kind === 'expand') (p.parts || []).forEach((v, i) => { slots[`part${i}`] = { value: fmt(v), graded: true }; });
+        if (p.kind === 'blanks' || p.kind === 'estimate') (p.keys || []).forEach((v, i) => { slots[`b${i}`] = { value: String(v), graded: true }; });
+        if (p.kind === 'order') (p.sorted || []).forEach((v, i) => { slots[`o${i}`] = { value: String(v), graded: true }; });
+        if (p.kind === 'chart') (p.keys || []).forEach((v, i) => { slots[`d${i}`] = { value: String(v), graded: true }; });
+        if (p.kind === 'expand-line' && p.also) slots.answer.accept.push(String(p.also));
         return { value, display, slots };
     },
     footprint(p, ctx) {
         const nd = String(p.n === undefined ? '' : p.n).length;
-        const wide = p.kind === 'sort' || (p.kind === 'round' && p.support === 'line')
+        const wide = p.kind === 'sort' || p.kind === 'table' || p.kind === 'line-mark' || p.kind === 'chart'
+            || (p.kind === 'round' && (p.support === 'line' || nd >= 6)) || (p.kind === 'judge' && nd >= 6)
             || ((p.kind === 'disks' || p.kind === 'build') && (p.places || []).length >= 3)
-            || (p.kind === 'expand' && (nd >= 4 || (nd === 3 && ctx.size === 'L')));
+            || (p.kind === 'expand' && (nd >= 4 || (nd === 3 && ctx.size === 'L')))
+            || ((p.kind === 'blanks' || p.kind === 'expand-line') && String(p.frame || p.n || '').length > 34)
+            || (p.kind === 'order' && (p.nums || []).length >= 5)
+            || (p.kind === 'estimate' && ctx.size === 'L' && String(p.expr || '').length > 11);
         return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2 };
     },
     inputs() { return [{ id: 'answer', kind: 'number', shape: 'line', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },
     layout(p) {
-        const wide = p && (p.kind === 'sort' || p.kind === 'disks' || p.kind === 'build' || p.support === 'line');
+        const wide = p && (p.kind === 'sort' || p.kind === 'disks' || p.kind === 'build' || p.kind === 'table' || p.kind === 'line-mark'
+            || p.kind === 'chart' || p.support === 'line');
         return { card: wide ? 'card-wide-visual' : 'card-simple', checker: 'value' };
     },
 });

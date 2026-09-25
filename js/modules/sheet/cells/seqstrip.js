@@ -17,6 +17,8 @@
 // column (five tiles are 81 mm at L, inside a 2-column cell).
 //
 // payload: {values: [n0 .. n4], blanks: [index, ...] (ascending), shown?: [..] | {index: v}}
+//   `shape` (option, 2026-09-25): 'circle' | 'hex' | 'mixed' draws the tiles as outline shapes
+//     (shapes.js); absent or 'box' is the square tile below.
 //   `shown` (Error analysis): a value printed in a tile of the finished track - a wrong given
 //   tile to find, or the pupil's finished work in a blank - in every state.
 //
@@ -25,6 +27,7 @@
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import { L, P, B, INK, GREY, root, digitPt, sizeOf, inkOf, isTwin, shownParts } from './k2kit.js';
+import { tile as shapeTile, tileSize, shapeAt } from './shapes.js';
 
 const TILE = { S: { w: 14, h: 14 }, M: { w: 14.5, h: 14.5 }, L: { w: 15, h: 15 } };
 const GAP_MM = 1.5;
@@ -34,8 +37,10 @@ export const SEQ_ROW_MAX = 5;
 /** Tiles per row: the whole track up to five, else the track wraps to two even rows. */
 const perRowOf = (n) => (n <= SEQ_ROW_MAX ? Math.max(1, n) : Math.ceil(n / 2));
 /** Width (mm) of one row of the track at this size. */
-const rowMm = (n, size) => {
-    const t = TILE[size] || TILE.L;
+const rowMm = (n, size, shape) => {
+    const t0 = TILE[size] || TILE.L;
+    // A shaped track (option `shape`, 2026-09-25): a hexagon is a little wider than a box.
+    const t = shape && shape !== 'box' ? tileSize(shape === 'mixed' ? 'hex' : shape, t0.w, t0.h) : t0;
     const k = perRowOf(n);
     return k * t.w + (k - 1) * GAP_MM;
 };
@@ -63,9 +68,20 @@ register('seqstrip', {
         const shown = shownParts(ctx, keyParts);
         const pt = Math.min(digitPt(ctx) * 0.72, 20);
         const fmt = (v) => (Number.isFinite(Number(v)) && String(v).trim() !== '' ? Number(v).toLocaleString('en-US') : String(v));
+        const shaped = p.shape && p.shape !== 'box';
         const tiles = values.map((v, i) => {
             const k = blanks.indexOf(i);
             const over = shownAt(p, i);
+            if (shaped) {
+                // Circles / hexagons (outlines only): the given numbers in a thin outline, the
+                // missing ones in a heavy one, the digits inside at the track's size.
+                const sh = shapeAt(p.shape, i);
+                const sz = tileSize(sh, t.w, t.h);
+                if (k < 0) return shapeTile(ctx, { shape: sh, w: sz.w, h: sz.h, pt, value: fmt(over !== undefined ? over : v), shown: over !== undefined });
+                const val = over !== undefined ? String(over) : shown[k];
+                const ink = over !== undefined ? 'solid' : val !== '' ? inkOf(ctx) : null;
+                return shapeTile(ctx, { shape: sh, w: sz.w, h: sz.h, pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink, heavy: true, shown: over !== undefined });
+            }
             const base = `box-sizing:border-box;flex:none;width:${L(ctx, t.w)};height:${L(ctx, t.h)};display:flex;align-items:center;`
                 + `justify-content:center;font-size:${P(ctx, pt)};font-weight:700;line-height:1;background:#fff;`;
             if (k < 0) {
@@ -85,7 +101,7 @@ register('seqstrip', {
         // first).
         const wrap = values.length > SEQ_ROW_MAX;
         return root(ctx, 'k2-seqstrip', `<div class="k2-track" data-mq-join=", " style="display:flex;flex-wrap:${wrap ? 'wrap' : 'nowrap'};justify-content:center;`
-            + `${wrap ? `max-width:${L(ctx, rowMm(values.length, size) + 0.5)};margin:0 auto;` : ''}gap:${L(ctx, GAP_MM)};">${tiles}</div>`);
+            + `${wrap ? `max-width:${L(ctx, rowMm(values.length, size, p.shape) + 0.5)};margin:0 auto;` : ''}gap:${L(ctx, GAP_MM)};">${tiles}</div>`);
     },
     answerKey(p) {
         const parts = (p.blanks || []).map((i) => String((p.values || [])[i]));
@@ -95,7 +111,7 @@ register('seqstrip', {
     },
     footprint(p, ctx) {
         // The widest row and the side pads: 81 + 8 mm for five tiles at L, so 2 columns fit.
-        const w = rowMm(((p && p.values) || []).length || SEQ_ROW_MAX, sizeOf(ctx));
+        const w = rowMm(((p && p.values) || []).length || SEQ_ROW_MAX, sizeOf(ctx), p && p.shape);
         return { wMm: Math.ceil(w + 8), hMm: null, measure: true, factLike: false, maxCols: w + 8 <= 93 ? 2 : 1 };
     },
     inputs(p) {

@@ -241,11 +241,22 @@ for (const [cat, id] of live) {
         const back = NEW.decodeOptionPayload(cat, id, payload);
         if (!eq(back, want)) fail(`${tag}: new decoder read ${JSON.stringify(back)}, want ${JSON.stringify(want)}`);
         const oldRead = OLD.decodeOptionPayload(cat, id, payload);
-        const oneLetter = stripMulti(payload);
-        // A VALUE added to a one-letter key after the deployed app was built (S2: the support set's
-        // touch dots and panes) has no token there: the deployed decoder drops that one value (the
-        // skill loads without it) and never reads it as another. So it must read exactly the new
-        // decoder's options with those values taken out.
+        // A VALUE appended to a one-letter key after the deployed build (P9's `support: strip`,
+        // `response: bank` ...) has a token the deployed decoder's table lacks: it skips that
+        // field and the option stays at its default. That is the graceful path, not a misread,
+        // so such a field is left out of what the deployed decoder must read. A token it DOES
+        // know must still read the same value (checked below, unchanged).
+        const oldKnows = (f) => {
+            const optId = Object.keys(OLD.OPTION_KEYS).find((k) => OLD.OPTION_KEYS[k] === f[0]);
+            const table = optId && OLD.VALUE_TOKENS[optId];
+            const body = f.slice(1);
+            if (!table || /^\d+$/.test(body)) return true;
+            const known = new Set(Object.values(table));
+            return body.length === 1 ? known.has(body) : true;
+        };
+        const oneLetter = stripMulti(payload).split('_').filter((f) => f && oldKnows(f)).join('_');
+        // S2: a SET field may mix known and new tokens (the support set's touch dots and panes); the
+        // deployed decoder drops the new values of it and reads the rest.
         const expectOld = oneLetter ? oldKnown(cat, id, NEW.decodeOptionPayload(cat, id, oneLetter)) : {};
         if (!eq(oldRead, expectOld)) fail(`${tag}: the DEPLOYED decoder read ${JSON.stringify(oldRead)}, want ${JSON.stringify(expectOld)}`);
         if (!oneLetter && !eq(oldRead, {})) fail(`${tag}: the DEPLOYED decoder did not load the defaults`);

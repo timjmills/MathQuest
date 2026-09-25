@@ -518,10 +518,16 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
             ? Array.from({ length: Math.max(0, Math.min(Number(section.denseMaxCols) > 0 ? Number(section.denseMaxCols) : DENSE_MAX_COLS, hardCap) - cols + 1) }, (_, k) => cols + k)
             : [cols];
         let best = { perPage: rows * cols, cols, rows };
+        // The room each cell keeps over its content: the section's own (a Test), else the
+        // LOOSEST any item's footprint asks for (`fp.denseRoom`, e.g. a count-by row, whose
+        // measured height already holds its arcs and pads), else DENSE_ROOM. A page that mixes
+        // such an item with ordinary ones therefore keeps the ordinary 1.2.
+        const room = Number(section.denseRoom) > 1 ? Number(section.denseRoom)
+            : Math.max(...infos.map((i) => (Number(i.fp.denseRoom) >= 1 ? Number(i.fp.denseRoom) : DENSE_ROOM)));
         for (const c of colOpts) {
             const pc = probe(c, c > cols);
             if (!pc.fits) continue;
-            let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (pc.hMin * (Number(section.denseRoom) > 1 ? Number(section.denseRoom) : DENSE_ROOM))), Math.floor(dCeil / c)));
+            let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (pc.hMin * room)), Math.floor(dCeil / c)));
             if (c === 2) rr = TWO_COL_ROWS.find((x) => x <= rr) || rr;
             if (rr * c > best.perPage) best = { perPage: rr * c, cols: c, rows: rr, hMin: pc.hMin };
         }

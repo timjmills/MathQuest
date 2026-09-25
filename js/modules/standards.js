@@ -210,6 +210,7 @@ export const SKILL_STANDARDS = {
     'multiplication:mult_zeros': { ccss: ['3.NBT.A.3'], ee: ['M.EE.3.NBT.3'] }, // Multiply by 10, 100 and Multiples of Ten
     'multiplication:mult_placeholder_zero': { ccss: ['4.NBT.B.5', '5.NBT.B.5'], ee: ['M.EE.5.NBT.5'] }, // Write the Placeholder Zero
     'multiplication:mult_missing_digit': { ccss: ['4.NBT.B.5'], ee: [] }, // Find the Missing Digit (Multiplication)
+    'multiplication:count_by_tables': { ccss: ['3.OA.C.7', '3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Count by 1–12 (3.OA.7 prep: skip-counting the tables)
 
     // ---- division
     'division:div_facts': { ccss: ['3.OA.C.7'], ee: ['M.EE.3.OA.6'] }, // Division Facts (1-12)
@@ -518,6 +519,7 @@ export const SKILL_STANDARDS = {
     'patterns:number_pattern': { ccss: ['4.OA.C.5'], ee: ['M.EE.4.OA.5', 'M.EE.3.OA.8', 'M.EE.5.OA.3'] }, // Number Patterns
     'patterns:pattern_relationship': { ccss: ['5.OA.B.3'], ee: ['M.EE.5.OA.3'] }, // Two Patterns, Find Relationship (Visual)
     'patterns:mixed_patterns': { ccss: [], ee: [], pool: true }, // Mixed Patterns
+    'patterns:number_patterns_rule': { ccss: ['3.OA.D.9', '4.OA.C.5'], ee: ['M.EE.3.OA.8', 'M.EE.4.OA.5'] }, // Number Patterns: Count On, Count Back, Double
 
     // ---- algebra
     'algebra:tape_diagram': { ccss: ['4.OA.A.3', '3.OA.D.8'], ee: ['M.EE.4.OA.3', 'M.EE.3.OA.7'] }, // Tape Diagrams / Bar Models (Visual)
@@ -533,7 +535,7 @@ export const SKILL_STANDARDS = {
     'algebra:combine_like_terms': { ccss: ['6.EE.A.3', '6.EE.A.4'], ee: ['M.EE.6.EE.3'] }, // Combine Like Terms
     'algebra:distributive_expr': { ccss: ['6.EE.A.3'], ee: ['M.EE.6.EE.3'] }, // Distributive Property of Expressions
     'algebra:function_table_easy': { ccss: ['4.OA.C.5', '5.OA.B.3'], ee: ['M.EE.4.OA.5', 'M.EE.5.OA.3'] }, // Function Tables - Easy (Visual)
-    'algebra:function_table_hard': { ccss: ['5.OA.B.3', '6.EE.C.9'], ee: ['M.EE.5.OA.3'] }, // Function Tables - Hard (Visual)
+    'algebra:function_table_hard': { ccss: ['4.OA.C.5', '5.OA.B.3', '6.EE.C.9'], ee: ['M.EE.4.OA.5', 'M.EE.5.OA.3'] }, // Function Tables - Hard (Visual)
     'algebra:algebra_word_mixed': { ccss: ['4.OA.A.3', '3.OA.D.8'], ee: ['M.EE.4.OA.3', 'M.EE.3.OA.7'] }, // Mixed Algebra Word Problems (Visual)
     'algebra:algebra_word_mixed_plain': { ccss: ['4.OA.A.3', '3.OA.D.8'], ee: ['M.EE.4.OA.3', 'M.EE.3.OA.7'] }, // Mixed Algebra Word Problems (No Pictures)
     'algebra:solve_eq_addsub': { ccss: ['6.EE.B.7'], ee: ['M.EE.6.EE.5-7'] }, // Solve One-Step Equations (+/−)
@@ -570,6 +572,7 @@ export const SKILL_STANDARDS = {
     'placevalue:value': { ccss: ['2.NBT.A.1', '4.NBT.A.1'], ee: ['M.EE.2.NBT.1'] }, // Value of a Digit
     'placevalue:compare': { ccss: ['2.NBT.A.4', '4.NBT.A.2', '1.NBT.B.3', 'K.CC.C.7'], ee: ['M.EE.2.NBT.4', 'M.EE.4.NBT.2', 'M.EE.1.NBT.3', 'M.EE.5.NBT.3'] }, // Compare Numbers (>, <, =)
     'placevalue:expand': { ccss: ['2.NBT.A.3', '4.NBT.A.2'], ee: ['M.EE.2.NBT.3', 'M.EE.4.NBT.2'] }, // Expanded Form
+    'placevalue:unit_form': { ccss: ['2.NBT.A.1', '2.NBT.A.3'], ee: ['M.EE.2.NBT.3'] }, // Unit Form
     'placevalue:combine': { ccss: ['2.NBT.A.3', '4.NBT.A.2'], ee: ['M.EE.2.NBT.3', 'M.EE.4.NBT.2'] }, // Standard Form
     'placevalue:order_least_to_greatest': { ccss: ['2.NBT.A.4', '4.NBT.A.2'], ee: ['M.EE.2.NBT.4', 'M.EE.4.NBT.2'] }, // Order: Least to Greatest
     'placevalue:order_greatest_to_least': { ccss: ['2.NBT.A.4', '4.NBT.A.2'], ee: ['M.EE.2.NBT.4', 'M.EE.4.NBT.2'] }, // Order: Greatest to Least
@@ -577,6 +580,8 @@ export const SKILL_STANDARDS = {
 
     // ---- number_sense
     'number_sense:rounding_visual': { ccss: ['3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Round on a Number Line
+    'number_sense:between_tens': { ccss: ['3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Find the Two Tens a Number Is Between
+    'number_sense:place_on_number_line': { ccss: ['2.MD.B.6', '3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Mark a Number on a Number Line
     'number_sense:nearest_10': { ccss: ['3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Round to Nearest 10
     'number_sense:nearest_100': { ccss: ['3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Round to Nearest 100
     'number_sense:nearest_1000': { ccss: ['4.NBT.A.3'], ee: ['M.EE.4.NBT.3'] }, // Round to Nearest 1,000

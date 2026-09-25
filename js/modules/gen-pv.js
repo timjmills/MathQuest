@@ -1,4 +1,4 @@
-// gen-pv.js — P9: place value + rounding (design/research/place-value-rounding.md, §19.4 steps 2-7)
+// gen-pv.js — P9: place value, rounding and estimation (design/research/place-value-rounding.md, §19.4 steps 2-8)
 //
 // The rewritten generators for the family's worst pages. gen-algebraic.js's rounding and place
 // value dispatchers hand these ids here first; everything this file does not claim falls
@@ -38,11 +38,12 @@ import { state } from './state.js';
 import { randInt, shuffle } from './utils.js';
 import { normalizeOptions, pvRefusal, pvRoundPlace, pvCap, pvBand } from './skill-options.js';
 import { diskMatSVG, numeralTracksHTML, roundingLineSVG } from './sheet/index.js';
-import { plainNumeralHTML, placeChartHTML, hundredsRowsHTML, hundredsWindow, pvLineSVG, moreLessLine } from './pv-support-cell.js';
+import { plainNumeralHTML, placeChartHTML, hundredsRowsHTML, hundredsWindow, pvLineSVG, moreLessLine, stripHTML, shiftChartHTML, roundingTableHTML } from './pv-support-cell.js';
+import { pvRoundingErrors } from './sheet/providers/pv.js';
 
 const PLACE_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands', 1000000: 'millions' };
 const PLACE_ONE = { 1: 'one', 10: 'ten', 100: 'hundred', 1000: 'thousand', 10000: 'ten thousand', 100000: 'hundred thousand', 1000000: 'million' };
-const fmt = (n) => Number(n).toLocaleString('en-US');
+const fmt = (n) => Number(n).toLocaleString('en-US', { maximumFractionDigits: 6 });
 const SCREEN_PX_PER_MM = 3.2;
 
 /* --------------------------------------------------------------------------- dealing */
@@ -130,6 +131,20 @@ function setCell(q, payload) {
 /* =========================================================================== PLACE VALUE */
 
 const PV_ALL_PLACES = [1, 10, 100, 1000, 10000, 100000];
+const idxOf = (place, len) => len - 1 - Math.round(Math.log10(place));
+const plural = (word, d) => (d === 1 ? word.replace(/s$/, '') : word);
+
+/**
+ * An inline-blanks item for the screen (one input per ___, left to right, SP one input per slot).
+ * `sets` are the accepted answer rows; the first is the key.
+ */
+function inlineBlanks(q, text, sets, widths) {
+    q.text = text;
+    q.answerType = 'inline-blanks';
+    q.inlineBlanksData = { acceptedSets: sets.map(r => r.map(String)), cellWidths: widths || sets[0].map(v => Math.max(2, String(v).length + 1)) };
+    q.keyParts = sets[0].map(String);
+    q.options = [];
+}
 
 function genPlace(q, skill, o) {
     const cap = capOf('placevalue', skill, o, 999);
@@ -147,64 +162,127 @@ function genPlace(q, skill, o) {
         if (t.length && t.length < PV_ALL_PLACES.length) ticked = t.filter(p => p < 10 * hi || pvCap(p * 10 - 1, state.range) >= p);
     }
     if (!ticked.length) ticked = bandPlaces;
-    const place = ticked[slot(ticked.length)];
+    let place = ticked[slot(ticked.length)];
     if (place > hi) { lo = place; hi = place * 10 - 1; nd = String(hi).length; }
-    const allPlaces = Array.from({ length: nd }, (_, i) => 10 ** i);
-    // The digit at the asked place is non-zero and appears once, so "the underlined digit" and
-    // "the 7" can never mean two different digits (PN-5's repeated digit is its own step).
+    // PN-7: the value of a zero, on about a third of items. A zero is never the leading digit, so
+    // a leading place hands its zero to a lower place.
+    const zeroAsk = skill === 'value' && !!o.zeroDigit && nd >= 2 && slot(3) === 1;
+    if (zeroAsk && place >= 10 ** (nd - 1)) place = 10 ** (_at % (nd - 1));
+    // PN-5: a repeated digit (747: which 7?), only when asked; otherwise the asked digit appears
+    // once, so "the underlined digit" and "the 7" never mean two different digits.
+    const repeat = skill === 'identify' && !!o.repeatDigit && nd >= 2;
     let n = 0;
-    for (let t = 0; t < 80; t++) {
+    for (let t = 0; t < 160; t++) {
         n = spanNumber(lo, hi);
         if (n < place) continue;
         const s = String(n);
-        const dg = s[s.length - 1 - Math.round(Math.log10(place))];
-        if (dg !== '0' && s.split('').filter(c => c === dg).length === 1) break;
+        const i = idxOf(place, s.length);
+        if (zeroAsk) {
+            if (i <= 0) continue;
+            const ds = s.split(''); ds[i] = '0';
+            const m = Number(ds.join(''));
+            if (m >= lo && m <= hi) { n = m; break; }
+            continue;
+        }
+        const dg = s[i];
+        if (dg === '0') continue;
+        const cnt = s.split('').filter(c => c === dg).length;
+        if (repeat) {
+            if (cnt >= 2) break;
+            const others = [...Array(s.length).keys()].filter(j => j !== i);
+            const ds = s.split(''); ds[others[randInt(0, others.length - 1)]] = dg;
+            const m = Number(ds.join(''));
+            if (m >= lo && m <= hi && m >= place) { n = m; break; }
+            continue;
+        }
+        if (cnt === 1) break;
     }
     const s = String(n);
-    const digit = Number(s[s.length - 1 - Math.round(Math.log10(place))]);
+    const digit = Number(s[idxOf(place, s.length)]);
     // Place-value support (a separate control, P-1): the chart names every place, the letters
     // (the `pv` template's own numeral) remind, and "none" leaves the digit's position to read.
     const support = o.support === 'chart' || o.support === 'none' ? o.support : 'labels';
     const drawNumeral = (opt) => support === 'chart' ? placeChartHTML(n, opt)
         : support === 'none' ? plainNumeralHTML(n, opt) : numeralTracksHTML(n, opt);
-    q.visual = `<div style="text-align:center;">${drawNumeral({ underline: place })}</div>`;
+    const numeralVis = `<div style="text-align:center;">${drawNumeral({ underline: place })}</div>`;
+    q.visual = numeralVis;
     const readHint = support === 'chart' ? 'Read the place name above the underlined digit.'
         : support === 'none' ? 'Count the places from the right: ones, tens, hundreds, thousands.'
             : 'Read the letter above the underlined digit.';
     const cellFor = (payload) => {
         if (support === 'labels') { setCell(q, payload); return; }
         q.cell = { template: 'pv-support', v: 1, payload: { picture: support === 'chart' ? 'chart' : 'plain', n, place,
-            base: { keyValue: q.ans, ...payload } } };
+            base: { keyValue: q.ans, ...payload, hideNumeral: true } } };
         q.printFormat = 'pv-cell';
     };
     if (skill === 'identify') {
         // Three printed place words to ring at up to 999 (PN-1 prints all three even for a 2-digit
         // number); above that, one word per place the number has.
+        const allPlaces = Array.from({ length: nd }, (_, i) => 10 ** i);
         const words = (nd <= 3 ? [1, 10, 100] : allPlaces).map(p => PLACE_WORD[p]);
-        q.text = 'Which place is the underlined digit in?';
-        q.printText = 'Circle the place of the underlined digit.';
         q.ans = PLACE_WORD[place];
-        q.answerType = 'multiple-choice';
-        q.options = words;
         q.hint = readHint;
         q.skillLabel = 'Name the Place';
-        q.pv = { kind: 'place', n, place, digit, support };
+        if (o.response === 'bank') {
+            // PN-4: the words move to a bank; the pupil copies one onto the line (a production
+            // item on paper stays a typed word on screen, never a choice).
+            q.text = 'Write the place of the underlined digit.';
+            q.printText = q.text;
+            q.answerType = 'text';
+            q.options = [];
+            q.acceptedAnswers = [PLACE_WORD[place], PLACE_WORD[place].replace(/s$/, '')];
+            q.wordBank = words.slice();
+            q.visual = `${numeralVis}<div class="pv-bank" style="margin:8px auto 0;display:table;border:2px solid #000;border-radius:10px;`
+                + `padding:4px 14px;font-weight:700;color:#000;">${words.join('&nbsp;&nbsp;&nbsp;')}</div>`;
+            q.pv = { kind: 'place', n, place, digit, support, response: 'bank', repeat };
+            cellFor({ kind: 'place-bank', n, place, words, keyValue: q.ans });
+            return;
+        }
+        q.text = 'Which place is the underlined digit in?';
+        q.printText = 'Circle the place of the underlined digit.';
+        q.answerType = 'multiple-choice';
+        q.options = words;
+        q.pv = { kind: 'place', n, place, digit, support, response: 'circle', repeat };
         cellFor({ kind: 'place', n, place, words });
-    } else {
+        return;
+    }
+    const form = o.form === 'unit' || o.form === 'notation' ? o.form : 'value';
+    q.skillLabel = 'Value of a Digit';
+    q.hint = `${readHint} That place tells you what the digit is worth.`;
+    q.printText = 'Write what the underlined digit is worth.';
+    q.pv = { kind: 'value', n, place, digit, support, form, zero: digit === 0 };
+    if (form === 'value') {
         q.text = 'What is the underlined digit worth?';
-        q.printText = 'Write what the underlined digit is worth.';
         q.ans = digit * place;
         q.answerType = 'number';
         q.options = [];
-        q.hint = `${readHint} That place tells you what the digit is worth.`;
-        q.skillLabel = 'Value of a Digit';
-        q.pv = { kind: 'value', n, place, digit, support };
         cellFor({ kind: 'value', n, place, frame: 'worth ____' });
+        return;
+    }
+    // PN-8: the same value in unit form (7 hundreds) or expanded notation (7 x 100). Two slots.
+    const word = PLACE_WORD[place];
+    if (form === 'unit') {
+        inlineBlanks(q, 'The underlined digit is worth ___ ___.', [[digit, word], [digit, plural(word, digit)], [digit, word.replace(/s$/, '')]], [2, 9]);
+        q.ans = `${digit} ${plural(word, digit)}`;
+        cellFor({ kind: 'blanks', n, place, frame: 'worth ____ ____', keys: [digit, plural(word, digit)], keyValue: q.ans });
+    } else {
+        inlineBlanks(q, 'The underlined digit is worth ___ × ___.', [[digit, place]], [2, String(place).length + 2]);
+        q.ans = `${digit} × ${fmt(place)}`;
+        cellFor({ kind: 'blanks', n, place, frame: 'worth ____ × ____', keys: [digit, fmt(place)], keyValue: q.ans });
     }
 }
 
 function wantZero(o) {
     return o.zeroPlace === 'always' || (o.zeroPlace === 'some' && slot(2) === 1);
+}
+
+/** Every order of a short list (up to 5 parts; longer lists keep the given order and its reverse). */
+function orders(list) {
+    if (list.length > 5) return [list, list.slice().reverse()];
+    if (list.length <= 1) return [list];
+    const out = [];
+    list.forEach((x, i) => orders(list.slice(0, i).concat(list.slice(i + 1))).forEach(r => out.push([x].concat(r))));
+    return out;
 }
 
 function genExpandCombine(q, skill, o) {
@@ -223,9 +301,49 @@ function genExpandCombine(q, skill, o) {
     // ONE PART PER PLACE, zeros included (§2.4 rule 1): the box count never tells the pupil how
     // many non-zero parts there are, and the key writes the zero part.
     const parts = ds.map((d, i) => d * 10 ** (ds.length - 1 - i));
+    const places = ds.map((_, i) => 10 ** (ds.length - 1 - i));
     if (skill === 'expand') {
+        const form = o.form === 'notation' ? 'notation' : 'sum';
+        const frame = o.frame === 'line' ? 'line' : 'boxes';
+        q.skillLabel = form === 'notation' ? 'Expanded Notation' : 'Expanded Form';
+        q.printText = `Write ${fmt(n)} in expanded form.`;
+        q.options = [];
+        q.visual = '';
+        q.hint = form === 'notation' ? 'Write each digit. It is multiplied by its place.'
+            : 'Write what each digit is worth. A zero holds a place: its part is 0.';
+        q.pv = { kind: 'expand', n, parts, form, frame };
+        const term = (d, p) => (form === 'notation' ? `${d} × ${fmt(p)}` : fmt(d * p));
+        if (frame === 'line') {
+            // EF-7: the frame fades to a ruled line. 300 + 5 and 300 + 0 + 5 are both right, in any
+            // order (§2.4 rule 2, owner ruling 4): the key writes the short form and names the other.
+            const all = ds.map((d, i) => term(d, places[i]));
+            const nonZero = ds.map((d, i) => (d ? term(d, places[i]) : null)).filter(Boolean);
+            const accept = new Set();
+            for (const list of [nonZero, all]) {
+                for (const ord of orders(list)) {
+                    accept.add(ord.join(' + '));
+                    accept.add(ord.map(x => x.replace(/,/g, '')).join(' + '));
+                    accept.add(ord.map(x => x.replace(/,/g, '').replace(/×/g, 'x')).join(' + '));
+                }
+            }
+            q.text = `Write ${fmt(n)} in expanded form.`;
+            q.answerType = 'text';
+            q.ans = nonZero.join(' + ');
+            q.acceptedAnswers = [...accept];
+            q.printAnswer = q.ans;
+            setCell(q, { kind: 'expand-line', n, keyValue: q.ans, also: all.length !== nonZero.length ? all.join(' + ') : '' });
+            return;
+        }
+        if (form === 'notation') {
+            // EF-8: one digit box per place, the place printed after it.
+            const frameText = ds.map((_, i) => `____ × ${fmt(places[i])}`).join(' + ');
+            inlineBlanks(q, `${fmt(n)} = ${ds.map((_, i) => `___ × ${fmt(places[i])}`).join(' + ')}`, [ds.slice()], ds.map(() => 2));
+            q.ans = ds.map((d, i) => term(d, places[i])).join(' + ');
+            q.printAnswer = q.ans;
+            setCell(q, { kind: 'blanks', n, frame: `${fmt(n)} = ${frameText}`, keys: ds.slice(), keyValue: q.ans, bigNumerals: true });
+            return;
+        }
         q.text = `Write ${fmt(n)} in expanded form.`;
-        q.printText = q.text;
         q.answerType = 'interactive';
         q.interactiveType = 'expanded';
         q.expandedNumber = n;
@@ -234,11 +352,6 @@ function genExpandCombine(q, skill, o) {
         q.expandedPlaceIdx = ds.map((_, i) => ds.length - 1 - i);
         q.ans = parts.map(fmt).join(' + ');
         q.printAnswer = q.ans;
-        q.options = [];
-        q.visual = '';
-        q.hint = 'Write what each digit is worth. A zero holds a place: its part is 0.';
-        q.skillLabel = 'Expanded Form';
-        q.pv = { kind: 'expand', n, parts };
         setCell(q, { kind: 'expand', n, parts, keyValue: q.ans });
         return;
     }
@@ -262,18 +375,77 @@ function genExpandCombine(q, skill, o) {
     setCell(q, { kind: 'frame', frame: `${expr} = ____` });
 }
 
+/** EF-9 / EF-10: unit form, and renaming more than 9 of one place (47 tens, 3 hundreds 15 tens). */
+function genUnitForm(q, skill, o) {
+    const cap = capOf('placevalue', skill, o, 999);
+    const [lo, hi] = digitSpan(cap);
+    const nd = String(hi).length;
+    let n = spanNumber(lo, hi);
+    if (slot(3) === 2 && nd >= 3) {
+        // a zero place is content (§2.3): 405 is 4 hundreds 0 tens 5 ones.
+        const ds = String(n).split(''); ds[randInt(1, ds.length - 1)] = '0'; n = Number(ds.join(''));
+    }
+    const ds = String(n).split('').map(Number);
+    const places = ds.map((_, i) => 10 ** (ds.length - 1 - i));
+    q.skillLabel = 'Unit Form';
+    q.options = [];
+    q.visual = '';
+    q.printText = 'Write the missing number.';
+    if (o.rename === 'more') {
+        // Renaming, dealt in turn: "476 = __ tens 6 ones" (47), and "3 hundreds 15 tens = __".
+        const big = places[0];
+        if (slot(2) === 0 && ds.length >= 3) {
+            const unit = 10;                               // rename everything above the ones as tens
+            const count = Math.floor(n / unit);
+            const ones = n % unit;
+            q.text = `${fmt(n)} = ___ tens ${ones} ${plural('ones', ones)}`;
+            q.ans = count;
+            q.answerType = 'number';
+            q.hint = 'Every hundred is 10 tens. Count all the tens.';
+            q.pv = { kind: 'unit', n, rename: true, counts: { 10: count, 1: ones } };
+            setCell(q, { kind: 'frame', frame: `${fmt(n)} = ____ tens ${ones} ${plural('ones', ones)}`, keyValue: count, words: true });
+            return;
+        }
+        // a hundreds (or tens) count plus 10-19 of the next place down.
+        const hiP = Math.max(10, big);
+        const loP = hiP / 10;
+        const a = randInt(1, Math.max(1, Math.min(8, Math.floor((hi - 19 * loP) / hiP))));
+        const b = randInt(10, 19);
+        const total = a * hiP + b * loP;
+        const wa = PLACE_WORD[hiP], wb = PLACE_WORD[loP];
+        q.text = `${a} ${plural(wa, a)} ${b} ${wb} = ___`;
+        q.ans = total;
+        q.answerType = 'number';
+        q.hint = `Ten ${wb} make one ${PLACE_ONE[hiP]}.`;
+        q.pv = { kind: 'unit', n: total, rename: true, counts: { [hiP]: a, [loP]: b } };
+        setCell(q, { kind: 'frame', frame: `${a} ${plural(wa, a)} ${b} ${wb} = ____`, keyValue: total, words: true });
+        return;
+    }
+    const words = places.map(p => PLACE_WORD[p]);
+    const text = `${fmt(n)} = ${words.map(w => `___ ${w}`).join(' ')}`;
+    inlineBlanks(q, text, [ds.slice()], ds.map(() => 2));
+    q.ans = ds.map((d, i) => `${d} ${words[i]}`).join(' ');
+    q.printAnswer = q.ans;
+    q.hint = 'Each digit tells how many of its place. A zero means none of that place.';
+    q.pv = { kind: 'unit', n, rename: false, counts: Object.fromEntries(places.map((p, i) => [p, ds[i]])) };
+    setCell(q, { kind: 'blanks', n, frame: `${fmt(n)} = ${words.map(w => `____ ${w}`).join(' ')}`, keys: ds.slice(), keyValue: q.ans, words: true });
+}
+
 function genMoreLess(q, skill, o) {
     const step = Number(o.step) || (skill === 'more_less_100' ? 100 : 1);
     const dir = o.dir === 'both' ? (slot(2) === 0 ? 'more' : 'less') : (o.dir || 'more');
     const cap = capOf('placevalue', skill, o, 100);
-    // Support is its own control (P-1): a hundreds chart (more_less_10 only), a number line, or
-    // nothing. It changes the picture, never the numbers dealt, except that the chart starts at 1,
-    // so an item drawn on it never asks for an answer of 0.
-    const support = o.support === 'chart' && skill === 'more_less_10' ? 'chart' : o.support === 'line' ? 'line' : 'none';
+    // Support is its own control (P-1): a strip of the hundreds chart, the chart rows, a number
+    // line, or nothing. It changes the picture, never the numbers dealt, except that a chart
+    // starts at 1, so an item drawn on it never asks for an answer of 0.
+    const support = o.support === 'chart' && skill === 'more_less_10' ? 'chart'
+        : o.support === 'line' ? 'line' : o.support === 'strip' ? 'strip' : 'none';
+    const onChart = support === 'chart' || (support === 'strip' && step <= 10);
     // The band caps BOTH the given number and the answer (§2.1). 2.NBT.B.8 keeps the hundreds
-    // step to 100-900.
-    const nLo = skill === 'more_less_100' ? 100 : (dir === 'less' ? step + (support === 'chart' ? 1 : 0) : 0);
-    const nHi = skill === 'more_less_100' ? Math.min(900, cap - (dir === 'more' ? step : 0))
+    // step to 100-900; the 1,000 step (4.NBT) works in 1,000-9,000.
+    const big = skill === 'more_less_100';
+    const nLo = big ? (step === 1000 ? 1000 : 100) : (dir === 'less' ? step + (onChart ? 1 : 0) : (onChart ? 1 : 0));
+    const nHi = big ? Math.min(step === 1000 ? 9000 : 900, cap - (dir === 'more' ? step : 0))
         : (dir === 'more' ? cap - step : cap);
     let n;
     const edge = slot(6) === 2;
@@ -286,34 +458,64 @@ function genMoreLess(q, skill, o) {
         }
     }
     n = candidates.length ? candidates[randInt(0, candidates.length - 1)] : randInt(Math.max(nLo, 1), Math.max(Math.max(nLo, 1), nHi));
-    const ans = dir === 'more' ? n + step : n - step;
-    q.text = `What is ${step} ${dir} than ${fmt(n)}?`;
-    q.printText = `${step} ${dir} than ${fmt(n)} is ____.`;
+    const result = dir === 'more' ? n + step : n - step;
+    // ML-7: the unknown START, "47 is 10 more than ____" (the inverse; M-L4).
+    const start = o.unknown === 'start';
+    const given = start ? result : n;
+    const ans = start ? n : result;
+    q.text = start ? `${fmt(result)} is ${fmt(step)} ${dir} than ___.` : `What is ${fmt(step)} ${dir} than ${fmt(n)}?`;
+    q.printText = start ? `${fmt(result)} is ${fmt(step)} ${dir} than ____.` : `${fmt(step)} ${dir} than ${fmt(n)} is ____.`;
     q.ans = ans;
     q.answerType = 'number';
     q.options = [];
     q.visual = '';
-    q.hint = step === 1 ? `Count ${dir === 'more' ? 'on' : 'back'} one.`
-        : `Only the ${PLACE_WORD[step]} digit changes, unless it goes past 9 or below 0.`;
-    q.skillLabel = skill === 'more_less_100' ? '10 or 100 More or Less' : '1 or 10 More or Less';
-    q.pv = { kind: 'moreless', n, step, dir, support };
+    q.hint = start ? `Think: which number is ${fmt(step)} ${dir === 'more' ? 'less' : 'more'} than ${fmt(result)}?`
+        : step === 1 ? `Count ${dir === 'more' ? 'on' : 'back'} one.`
+            : `Only the ${PLACE_WORD[step]} digit changes, unless it goes past 9 or below 0.`;
+    q.skillLabel = big ? '10, 100 or 1,000 More or Less' : '1 or 10 More or Less';
+    q.pv = { kind: 'moreless', n, step, dir, support, unknown: start ? 'start' : 'answer', given };
     const base = { keyValue: q.ans, kind: 'frame', frame: q.printText };
     if (support === 'chart') {
-        const rows = hundredsWindow(n, ans, cap);
+        const rows = hundredsWindow(n, result, cap);
         q.visual = `<div style="text-align:center;">${hundredsRowsHTML(rows[0], rows[1], { size: '1.05em' })}</div>`;
-        q.hint = step === 1 ? `Find ${fmt(n)} on the chart. Move one box ${dir === 'more' ? 'right' : 'left'}.`
+        q.hint = start ? q.hint : step === 1 ? `Find ${fmt(n)} on the chart. Move one box ${dir === 'more' ? 'right' : 'left'}.`
             : `Find ${fmt(n)} on the chart. Move one row ${dir === 'more' ? 'down' : 'up'}.`;
         q.cell = { template: 'pv-support', v: 1, payload: { picture: 'hchart', rows, base } };
         q.printFormat = 'pv-cell';
+    } else if (support === 'strip') {
+        // ML-1 … ML-4's H1: the chart's row (a step of 1) or column (a step of 10 or more) around
+        // the given number, the number's box outlined bold and every other box EMPTY — the strip
+        // shows where to move, never what is there.
+        const strip = stripAround(given, step, dir, start);
+        q.visual = `<div style="text-align:center;">${stripHTML(strip, { size: '1.05em' })}</div>`;
+        q.cell = { template: 'pv-support', v: 1, payload: { picture: 'strip', strip, base } };
+        q.printFormat = 'pv-cell';
     } else if (support === 'line') {
-        const line = moreLessLine(n, step);
+        const line = moreLessLine(given, step);
         q.visual = `<div style="text-align:center;">${pvLineSVG({ ticks: line.ticks, labels: line.labels, lengthMm: 110, pxPerMm: SCREEN_PX_PER_MM })}</div>`;
-        q.hint = `Each jump on the line is ${step}. Jump once ${dir === 'more' ? 'to the right' : 'to the left'} from ${fmt(n)}.`;
+        q.hint = start ? q.hint : `Each jump on the line is ${fmt(step)}. Jump once ${dir === 'more' ? 'to the right' : 'to the left'} from ${fmt(n)}.`;
         q.cell = { template: 'pv-support', v: 1, payload: { picture: 'line', ticks: line.ticks, labels: line.labels, base } };
         q.printFormat = 'pv-cell';
     } else {
         setCell(q, { kind: 'frame', frame: q.printText });
     }
+}
+
+/**
+ * The strip of a hundreds chart around `v`: a row of ten for a step of 1 (two rows when the
+ * move leaves the row), a column of three for a bigger step. Only `v` is printed.
+ * @returns {{rows: Array<Array<number|null>>, mark: number, vertical: boolean}}
+ */
+function stripAround(v, step, dir, inverse) {
+    const goesUp = (dir === 'more') !== inverse;          // the move the pupil makes, in the chart
+    if (step === 1) {
+        const rowOf = (x) => Math.floor((x - 1) / 10);
+        const r = rowOf(Math.max(1, v));
+        const other = rowOf(Math.max(1, v + (goesUp ? 1 : -1)));
+        const rs = other === r ? [r] : [Math.min(r, other), Math.max(r, other)];
+        return { rows: rs.map(rr => Array.from({ length: 10 }, (_, c) => (rr * 10 + c + 1 === v ? v : null))), mark: v, vertical: false };
+    }
+    return { rows: [[null], [v], [null]], mark: v, vertical: true };
 }
 
 function diskCounts(places, o) {
@@ -395,12 +597,17 @@ function genTimesTen(q, skill, o) {
         // Whole numbers: × keeps the product in the band; ÷ divides a multiple of the power.
         // Two items in three come from the band's top digit span, so a bigger band really deals
         // bigger numbers (Numbers to 1,000,000 with x 10: 12,345 x 10); the third is a one-digit
-        // number, the easy anchor.
+        // number, the easy anchor. Every third item from the top span has a zero inside (305 x
+        // 10, M-Z1), the edge case §2.3 names.
         let k;
         if (kMax >= 10 && slot(3) !== 0) {
             const [a, b] = digitSpan(kMax);
             const kLo = Math.max(10, a);
             k = randInt(kLo, Math.max(kLo, b));
+            if (slot(3) === 2 && k >= 100) {
+                const ds = String(k).split(''); ds[randInt(1, ds.length - 1)] = '0';
+                const k2 = Number(ds.join('')); if (k2 >= kLo) k = k2;
+            }
         } else k = randInt(1, Math.min(kMax, 9));
         if (op === 'x') { n = k; ans = k * power; } else { n = k * power; ans = k; }
     }
@@ -410,11 +617,179 @@ function genTimesTen(q, skill, o) {
     q.ans = ans;
     q.answerType = 'number';
     q.options = [];
-    q.visual = Number.isInteger(n) ? `<div style="text-align:center;">${numeralTracksHTML(n)}</div>` : '';
     q.hint = op === 'x' ? 'Each digit moves to the left, one place for each zero.' : 'Each digit moves to the right, one place for each zero.';
     q.skillLabel = 'Multiply and Divide by 10, 100, 1,000';
-    q.pv = { kind: 'x10', n, op, power };
+    const whole = Number.isInteger(n) && Number.isInteger(ans);
+    const support = o.support === 'none' || !whole ? 'none' : 'shift';
+    q.pv = { kind: 'x10', n, op, power, support };
+    if (support === 'shift') {
+        // TX-1 … TX-4: the shift chart (PV-15) — the number in the top row, an empty answer row
+        // under it, the move named on the arrow. The pupil writes the digits; the equation's line
+        // takes the answer.
+        const shift = { n, ans, label: `${glyph} ${fmt(power)}` };
+        q.visual = `<div style="text-align:center;">${shiftChartHTML(shift, { size: '1.25em' })}</div>`;
+        q.cell = { template: 'pv-support', v: 1, payload: { picture: 'shift', shift, base: { keyValue: q.ans, kind: 'frame', frame: q.printText } } };
+        q.printFormat = 'pv-cell';
+        return;
+    }
+    q.visual = Number.isInteger(n) ? `<div style="text-align:center;">${numeralTracksHTML(n)}</div>` : '';
     setCell(q, { kind: 'frame', n, showNumeral: Number.isInteger(n), frame: q.printText });
+}
+
+/* --------------------------------------------------------------------------- compare / order */
+
+/** A number with exactly `nd` digits, capped at `hi`. */
+function numberOfLength(nd, hi) {
+    const lo = nd <= 1 ? 1 : 10 ** (nd - 1);
+    return randInt(lo, Math.min(hi, 10 ** nd - 1));
+}
+
+/**
+ * Numbers for compare / order (P6 CP-8 … CP-13, OR-*): `lengths` equal (all the band's widest
+ * length) or mixed (lengths differ), `closeness` far (different first digits) or close (the same
+ * first digit, so the next place decides).
+ */
+function comparableSet(count, cap, o) {
+    const [lo, hi] = digitSpan(cap);
+    const nd = String(hi).length;
+    const mixed = o.lengths === 'mixed' && nd >= 2;
+    const close = o.closeness === 'close';
+    for (let t = 0; t < 200; t++) {
+        const out = new Set();
+        if (close && !mixed) {
+            const lead = randInt(Math.max(1, Math.floor(lo / 10 ** (nd - 1))), Math.max(1, Math.floor(hi / 10 ** (nd - 1))));
+            const base = lead * 10 ** (nd - 1);
+            for (let k = 0; out.size < count && k < 80; k++) {
+                const v = base + randInt(0, 10 ** (nd - 1) - 1);
+                if (v >= lo && v <= hi) out.add(v);
+            }
+        } else {
+            for (let k = 0; out.size < count && k < 120; k++) {
+                const len = mixed ? (out.size === 0 ? nd : randInt(Math.max(1, nd - 2), nd)) : nd;
+                let v = numberOfLength(len, hi);
+                if (close && mixed && out.size) {
+                    // Close and mixed: the shorter number starts with the longer one's digits
+                    // (345 and 34), the classic trap.
+                    const first = String([...out][0]);
+                    const cut = first.slice(0, Math.max(1, len - 1));
+                    v = Number(cut + String(randInt(0, 9)).repeat(Math.max(0, len - cut.length)).slice(0, Math.max(0, len - cut.length)));
+                    if (!(v >= 1)) v = numberOfLength(len, hi);
+                }
+                if (v <= hi) out.add(v);
+            }
+        }
+        const arr = [...out];
+        if (arr.length < count) continue;
+        const leads = arr.map(v => String(v)[0]);
+        if (!close && !mixed && new Set(leads).size < Math.min(count, 9 - Math.floor(lo / 10 ** (nd - 1)) + 1, count)) continue;
+        if (mixed && new Set(arr.map(v => String(v).length)).size < 2) continue;
+        return arr;
+    }
+    const arr = new Set();
+    while (arr.size < count) arr.add(randInt(Math.max(1, lo), hi));
+    return [...arr];
+}
+
+function genCompare(q, skill, o) {
+    const cap = capOf('placevalue', skill, o, 999);
+    let [a, b] = comparableSet(2, cap, o);
+    // One item in six is equal (the "=" case; CP-9), dealt, never rolled.
+    if (slot(6) === 5 && o.lengths !== 'mixed') b = a;
+    if (slot(2) === 1 && a !== b) [a, b] = [b, a];
+    q.text = `Compare: ${fmt(a)} ___ ${fmt(b)}`;
+    q.printText = 'Write <, > or = in the circle.';
+    q.ans = a > b ? '>' : a < b ? '<' : '=';
+    q.answerType = 'symbol';
+    q.options = ['>', '<', '='];
+    q.hint = String(a).length !== String(b).length ? 'Count the digits first. More digits is the bigger number.'
+        : 'Compare the digits from the left. The first place that is different decides.';
+    q.skillLabel = 'Compare Numbers';
+    q.visual = `<div style="display:flex;justify-content:center;align-items:center;gap:20px;color:#000;">`
+        + `<div style="font-size:2rem;font-weight:700;">${fmt(a)}</div>`
+        + `<div style="width:2.2rem;height:2.2rem;border:1.5pt solid #000;border-radius:50%;"></div>`
+        + `<div style="font-size:2rem;font-weight:700;">${fmt(b)}</div></div>`;
+    q.pv = { kind: 'compare', a, b, closeness: o.closeness || 'far', lengths: o.lengths || 'equal' };
+    setCell(q, { kind: 'compare', a, b, keyValue: q.ans });
+}
+
+function genOrder(q, skill, o) {
+    const cap = capOf('placevalue', skill, o, 999);
+    const count = [3, 4, 5, 6].includes(Number(o.count)) ? Number(o.count) : 3;
+    const nums = comparableSet(count, cap, o);
+    const isAsc = skill === 'order_least_to_greatest';
+    const sorted = [...nums].sort((x, y) => (isAsc ? x - y : y - x));
+    let shown = shuffle([...nums]);
+    if (shown.join() === sorted.join()) shown = shown.slice().reverse();
+    q.text = isAsc ? 'Put the numbers in order. Start with the least.' : 'Put the numbers in order. Start with the greatest.';
+    q.printText = isAsc ? 'Write the numbers in order. Start with the least.' : 'Write the numbers in order. Start with the greatest.';
+    q.answerType = 'interactive';
+    q.interactiveType = 'ordering';
+    q.orderMode = 'click';
+    q.orderDirection = isAsc ? 'asc' : 'desc';
+    q.orderIcon = isAsc ? 'Least → Greatest' : 'Greatest → Least';
+    q.numbers = shown;
+    q.orderingItems = q.numbers;
+    q.sortedNumbers = sorted;
+    q.ans = sorted.join(',');
+    q.printAnswer = sorted.map(fmt).join(', ');
+    q.hint = isAsc ? 'Find the smallest number first, then the next smallest, and so on.'
+        : 'Find the largest number first, then the next largest, and so on.';
+    q.options = [];
+    q.visual = '';
+    q.skillLabel = 'Ordering';
+    q.pv = { kind: 'order', nums: shown.slice(), dir: isAsc ? 'asc' : 'desc' };
+    setCell(q, { kind: 'order', nums: shown.map(fmt), sorted: sorted.map(fmt), keyValue: q.printAnswer });
+}
+
+/* --------------------------------------------------------------------------- chart fill */
+
+const ONES_W = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve',
+    'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+const TENS_W = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+function words999(n) {
+    const h = Math.floor(n / 100), r = n % 100;
+    const out = [];
+    if (h) out.push(`${ONES_W[h]} hundred`);
+    if (r) out.push(r < 20 ? ONES_W[r] : TENS_W[Math.floor(r / 10)] + (r % 10 ? `-${ONES_W[r % 10]}` : ''));
+    return out.join(' ');
+}
+/** The word name of a whole number below a million ("forty thousand, three hundred six"). */
+export function numberWords(n) {
+    if (n === 0) return 'zero';
+    const th = Math.floor(n / 1000), r = n % 1000;
+    const out = [];
+    if (th) out.push(`${words999(th)} thousand`);
+    if (r) out.push(words999(r));
+    return out.join(', ');
+}
+
+function genDigitChart(q, skill, o) {
+    const cap = capOf('placevalue', skill, o, 99999);
+    const [lo, hi] = digitSpan(cap);
+    const nd = String(hi).length;
+    // A zero place in every other item (an empty column is a wrong answer here, §13.3).
+    const ds = digitsNumber(nd, { zero: slot(2) === 1 });
+    let n = fromDigits(ds);
+    if (n < lo || n > hi) n = randInt(lo, hi);
+    const s = String(n);
+    const places = Array.from({ length: s.length }, (_, i) => 10 ** (s.length - 1 - i));
+    const source = o.source === 'word' || o.source === 'numeral' ? o.source : 'expanded';
+    const parts = s.split('').map((d, i) => Number(d) * places[i]).filter(Boolean);
+    const sourceText = source === 'word' ? numberWords(n) : source === 'numeral' ? fmt(n) : parts.map(fmt).join(' + ');
+    q.text = `Write each digit in its place in the chart: ${sourceText}`;
+    q.printText = 'Write each digit in its place in the chart.';
+    q.target = n;
+    q.places = places;
+    q.ans = n;
+    q.answerType = 'pv-digit-drag';
+    q.hint = source === 'word' ? 'Write the thousands first, then the hundreds, tens and ones. A place with nothing gets a 0.'
+        : 'Each part goes in its own place. A place with no part gets a 0.';
+    q.skillLabel = 'Place-Value Chart';
+    q.printFormat = 'pv-cell';
+    q.visual = '';
+    q.options = [];
+    q.pv = { kind: 'chart', n, places, source, sourceText };
+    setCell(q, { kind: 'chart', n, places, source: sourceText, keys: s.split(''), keyValue: fmt(n) });
 }
 
 /* =========================================================================== ROUNDING */
@@ -480,7 +855,7 @@ function genNearest(q, skill, o) {
             if (v !== T && v > 0) inside.add(v);
         }
         for (let t = 0; inside.size + outside.size < 8 && t < 80; t++) {
-            const v = randInt(Math.max(1, T - P * 2), Math.min(cap, T + P * 2));
+            const v = randInt(Math.max(Math.ceil(P / 2), T - P * 2), Math.min(cap, T + P * 2));
             if (roundTo(v, P) !== T && v % P !== 0) outside.add(v);
         }
         const tiles = [...inside, ...outside].filter(v => v > 0 && v <= cap).sort((a, b) => a - b);
@@ -491,6 +866,7 @@ function genNearest(q, skill, o) {
         q.ans = opts.filter(x => x.correct).map(x => x.id);
         q.printAnswer = opts.filter(x => x.correct).map(x => x.label).join(', ');
         q.answerType = 'multi-select-check';
+        q.circleAll = true;
         q.visual = '';
         q.hint = 'Find the two halfway numbers. Halfway rounds up.';
         q.skillLabel = `Round to ${fmt(P)}`;
@@ -501,18 +877,65 @@ function genNearest(q, skill, o) {
     const kind = dealRoundKind(o);
     const n = roundNumber(P, cap, kind, o.midpoint === 'never');
     const lower = Math.floor(n / P) * P;
-    q.text = `Round ${fmt(n)} to ${name}.`;
-    q.printText = q.text;
-    q.ans = roundTo(n, P);
-    q.answerType = 'number';
-    q.options = [];
+    const rounded = roundTo(n, P);
+    const scope = ['notation', 'decision', 'judge'].includes(o.responseScope) ? o.responseScope : 'full';
     q.skillLabel = `Round to ${fmt(P)}`;
-    q.pv = { kind: 'round', n, place: P, deal: kind };
+    q.options = [];
+    q.pv = { kind: 'round', n, place: P, deal: kind, scope };
     // S2: `support` is a SET now. Its generation rungs are 'line' and 'cut' (line wins when both
     // are ticked); the chart and the marks ('round-pv', 'round-mark') are drawn round the cell at
     // render time. Nothing ticked (an old "none") is the bare number. A scalar is an old value.
     const sup = Array.isArray(o.support) ? o.support : [o.support === undefined || o.support === null ? 'cut' : o.support];
-    const support = sup.includes('line') ? 'line' : sup.includes('cut') ? 'cut' : 'none';
+    const support = scope === 'full' ? (sup.includes('line') ? 'line' : sup.includes('cut') ? 'cut' : 'none') : 'cut';
+    const strip = numeralTracksHTML(n, { cut: P, arrow: scope === 'full' || scope === 'judge' });
+    if (scope === 'notation') {
+        // RN-7a: find the place and the digit that decides — no rounding. Paper: underline and
+        // circle on the strip; screen: the two digits typed in order.
+        const dPlace = Math.floor(n / P) % 10;
+        const dNext = Math.floor(n / (P / 10)) % 10;
+        q.printText = `Underline the ${PLACE_WORD[P]} digit. Circle the digit after it.`;
+        inlineBlanks(q, `${fmt(n)}: the ${PLACE_WORD[P]} digit is ___. The digit after it is ___.`, [[dPlace, dNext]], [2, 2]);
+        q.ans = `${dPlace}, ${dNext}`;
+        q.visual = `<div style="text-align:center;">${numeralTracksHTML(n, { cut: 0 })}</div>`;
+        q.hint = `Find the letter of the ${PLACE_WORD[P]} place. The digit after it is to its right.`;
+        q.pv.digits = [dPlace, dNext];
+        setCell(q, { kind: 'round-notate', n, place: P, keyValue: q.ans });
+        return;
+    }
+    if (scope === 'decision') {
+        // RN-7b: round up or round down? One check box, no answer slot.
+        q.text = `Round ${fmt(n)} to ${name}. Do you round up or round down?`;
+        q.printText = 'Check one box: Round up or Round down.';
+        q.answerType = 'multiple-choice';
+        q.options = ['Round up', 'Round down'];
+        q.ans = rounded > n ? 'Round up' : 'Round down';
+        q.visual = `<div style="text-align:center;">${numeralTracksHTML(n, { cut: P })}</div>`;
+        q.hint = 'Look at the digit after the cut line. 5 or more rounds up.';
+        setCell(q, { kind: 'decide', n, place: P, labels: ['Round up', 'Round down'], keyValue: q.ans });
+        return;
+    }
+    if (scope === 'judge') {
+        // RN-14: a finished rounding in black; about half are wrong, each from §14.
+        const wrongs = pvRoundingErrors(n, P);
+        const isWrong = slot(2) === 1 && wrongs.length > 0;
+        const shown = isWrong ? wrongs[Math.floor(_at / 2) % wrongs.length].value : rounded;
+        q.text = `Check: ${fmt(n)} rounded to ${name} is ${fmt(shown)}. Is it correct?`;
+        q.printText = 'Check the work. Check one box: Correct or Fix it.';
+        q.answerType = 'multiple-choice';
+        q.options = ['Correct', 'Fix it'];
+        q.ans = isWrong ? 'Fix it' : 'Correct';
+        q.printAnswer = isWrong ? `Fix it: ${fmt(rounded)}` : 'Correct';
+        q.visual = `<div style="text-align:center;">${strip}<span style="font-size:1.9em;font-weight:700;color:#000;">${fmt(shown)}</span></div>`;
+        q.hint = 'Round it yourself first. Then compare.';
+        q.pv.shown = shown;
+        q.pv.correct = rounded;
+        setCell(q, { kind: 'judge', n, place: P, shown, correct: rounded, keyValue: q.printAnswer });
+        return;
+    }
+    q.text = `Round ${fmt(n)} to ${name}.`;
+    q.printText = q.text;
+    q.ans = rounded;
+    q.answerType = 'number';
     if (support === 'line') {
         q.visual = `<div style="text-align:center;">${roundingLineSVG({ lo: lower, hi: lower + P, n, lengthMm: 120, pxPerMm: SCREEN_PX_PER_MM })}</div>`;
         q.hint = `Is ${fmt(n)} nearer the left end or the right end? Halfway rounds up.`;
@@ -522,7 +945,6 @@ function genNearest(q, skill, o) {
         q.hint = `Look at the digit after the ${PLACE_WORD[P]} place. 5 or more rounds up.`;
         setCell(q, { kind: 'round', n, place: P, support: 'none' });
     } else {
-        const strip = numeralTracksHTML(n, { cut: P, arrow: true });
         q.visual = `<div style="text-align:center;">${strip}</div>`;
         q.hint = 'Look at the digit after the cut line. 5 or more rounds up.';
         setCell(q, { kind: 'round', n, place: P, support: 'cut' });
@@ -534,18 +956,71 @@ function genRoundingVisual(q, skill, o) {
     // The band grows to fit the place ("to the nearest 1,000" needs numbers to 10,000).
     const cap = capOf('number_sense', skill, o, 100);
     const kind = dealRoundKind(o);
-    const n = roundNumber(P, cap, kind, o.midpoint === 'never');
+    // The line has 11 ticks, so the number sits on a tick: a multiple of P / 10.
+    let n = roundNumber(P, cap, kind, o.midpoint === 'never');
+    if (P >= 100) n = Math.round(n / (P / 10)) * (P / 10) || (P + P / 10);
+    if (n % P === 0) n += P / 10;
     const lower = Math.floor(n / P) * P;
+    const line = o.line === 'plotted' || o.line === 'ends' ? o.line : 'mark';
+    const mid = !!o.midLabel;
     q.text = `Round ${fmt(n)} to the nearest ${fmt(P)}.`;
-    q.printText = q.text;
+    q.printText = line === 'mark' ? `Mark ${fmt(n)} on the line. Round it to the nearest ${fmt(P)}.` : q.text;
     q.ans = roundTo(n, P);
     q.answerType = 'number';
     q.options = [];
-    q.visual = `<div style="text-align:center;">${roundingLineSVG({ lo: lower, hi: lower + P, n, lengthMm: 120, pxPerMm: SCREEN_PX_PER_MM })}</div>`;
-    q.hint = `Mark ${fmt(n)} on the line. Is it nearer the left end or the right end? Halfway rounds up.`;
+    q.visual = `<div style="text-align:center;">${roundingLineSVG({ lo: lower, hi: lower + P, n, dot: line === 'plotted', mid, lengthMm: 120, pxPerMm: SCREEN_PX_PER_MM })}</div>`;
+    q.hint = line === 'mark' ? `Mark ${fmt(n)} on the line. Is it nearer the left end or the right end? Halfway rounds up.`
+        : `Is ${fmt(n)} nearer the left end or the right end? Halfway rounds up.`;
     q.skillLabel = 'Round on a Number Line';
-    q.pv = { kind: 'round', n, place: P, deal: kind, line: [lower, lower + P] };
-    setCell(q, { kind: 'round', n, place: P, support: 'line', lo: lower, hi: lower + P });
+    q.pv = { kind: 'round', n, place: P, deal: kind, line: [lower, lower + P], lineMode: line, midLabel: mid };
+    setCell(q, { kind: 'round', n, place: P, support: 'line', lo: lower, hi: lower + P, dot: line === 'plotted', mark: line === 'mark', mid });
+}
+
+/** RN-1: the two tens a number is between. */
+function genBetweenTens(q, skill, o) {
+    const cap = capOf('number_sense', skill, o, 100);
+    let n = 0;
+    for (let t = 0; t < 40; t++) { n = randInt(11, Math.max(11, cap - 1)); if (n % 10) break; }
+    if (n % 10 === 0) n += 1;
+    // A number just past a hundred (104: 100 and 110) and a teen are content (§2.3).
+    if (slot(6) === 3 && cap >= 200) n = Math.floor(randInt(100, cap - 10) / 100) * 100 + randInt(1, 9);
+    const lo = Math.floor(n / 10) * 10, hi = lo + 10;
+    inlineBlanks(q, `${fmt(n)} is between ___ and ___.`, [[lo, hi]], [String(hi).length + 1, String(hi).length + 1]);
+    q.printText = `${fmt(n)} is between ____ and ____.`;
+    q.ans = `${fmt(lo)} and ${fmt(hi)}`;
+    q.printAnswer = q.ans;
+    q.visual = '';
+    q.hint = 'Find the ten just before the number, and the ten just after it.';
+    q.skillLabel = 'Between Two Tens';
+    q.pv = { kind: 'between', n, place: 10, lo, hi };
+    setCell(q, { kind: 'blanks', frame: `${fmt(n)} is between ____ and ____`, keys: [fmt(lo), fmt(hi)], keyValue: q.ans, words: true });
+}
+
+/** RN-2: mark a number on a line whose two ends are labelled. */
+function genPlaceOnLine(q, skill, o) {
+    const P = Number(o.span) || 10;
+    const cap = capOf('number_sense', skill, o, P * 10);
+    const tick = P / 10;
+    const lo = randInt(1, Math.max(1, Math.floor(cap / P) - 1)) * P;
+    // A tick inside the line, never an end; halfway is dealt one item in six.
+    const k = slot(6) === 1 ? 5 : randInt(1, 9);
+    const n = lo + k * tick;
+    q.text = `Mark ${fmt(n)} on the number line.`;
+    q.printText = q.text;
+    q.ans = n;
+    q.answerType = 'number-line-extended';
+    q.rangeMin = lo;
+    q.rangeMax = lo + P;
+    q.majorTickEvery = P;
+    q.minorSnap = tick;
+    q.tolerance = tick / 2 - 1e-9;
+    q.numberType = 'integer';
+    q.options = [];
+    q.visual = '';
+    q.hint = `Each small jump is ${fmt(tick)}. Count the jumps from ${fmt(lo)}.`;
+    q.skillLabel = 'Mark a Number on a Line';
+    q.pv = { kind: 'mark', n, span: P, line: [lo, lo + P] };
+    setCell(q, { kind: 'line-mark', n, lo, hi: lo + P, keyValue: fmt(n) });
 }
 
 const SORT_PLACE = { round_sort_10: 10, round_sort_100: 100, round_sort_1000: 1000, round_sort_10000: 10000,
@@ -559,63 +1034,259 @@ function genRoundSort(q, skill, o) {
     const unit = dec ? 10 ** -(dec + 1) : 1;
     const Pu = dec ? 10 : P;
     const cap = dec ? Infinity : capOf('number_sense', skill, o, P * 10);
-    // The bins: two neighbouring multiples, the upper one inside the band.
+    // RS-2: bins one apart (a Neither column) or three in a row; decimal sorts keep two adjacent.
+    const bins = dec ? 'adjacent' : (o.bins === 'apart' || o.bins === 'three' ? o.bins : 'adjacent');
+    const span = bins === 'adjacent' ? 1 : 2;              // how many places the bins cover
     const mMin = dec ? (dec === 1 ? 1 : 40) : 1;
-    const mMax = dec ? (dec === 1 ? 8 : 95) : Math.max(1, Math.floor(cap / P) - 1);
+    const mMax = dec ? (dec === 1 ? 8 : 95) : Math.max(1, Math.floor(cap / P) - span);
     const Lu = randInt(mMin, Math.max(mMin, mMax)) * Pu;
-    const mid = Lu + Pu / 2;
+    const binVals = bins === 'adjacent' ? [Lu, Lu + Pu] : bins === 'apart' ? [Lu, Lu + 2 * Pu] : [Lu, Lu + Pu, Lu + 2 * Pu];
     const count = Number(o.tiles) === 8 ? 8 : 6;
-    const nLow = count / 2;                          // an even split, dealt - never rolled
-    const low = new Set(), high = new Set();
-    if (o.midpoint !== 'never') high.add(mid);       // halfway, in every set (midpoint-seeded)
-    for (let t = 0; low.size < nLow && t < 80; t++) low.add(randInt(Lu + 1, mid - 1));
-    for (let t = 0; high.size < count - nLow && t < 80; t++) high.add(randInt(mid, Lu + Pu - 1));
-    const units = shuffle([...low, ...high]);
+    const rnd = (u) => Math.floor((u + Pu / 2) / Pu) * Pu;
+    // The numbers that can be dealt: every non-multiple from halfway below the first bin to
+    // halfway above the last (minus one), inside the band.
+    const loU = bins === 'adjacent' ? Lu + 1 : Math.max(1, Lu - Pu / 2);
+    const hiU = bins === 'adjacent' ? Lu + Pu - 1 : Math.min(dec ? Infinity : cap, Lu + 2 * Pu + Pu / 2 - 1);
+    const groups = bins === 'apart' ? [Lu, Lu + Pu, Lu + 2 * Pu] : binVals;   // apart: the middle is Neither
+    const chosen = new Set();
+    // Halfway, in every set (midpoint-seeded): the first bin's halfway number, and for three bins
+    // or a Neither column the next halfway too (the Neither trap: 45 rounds to 50, not 40).
+    if (o.midpoint !== 'never') {
+        chosen.add(Lu + Pu / 2);
+        if (bins !== 'adjacent' && Lu + Pu + Pu / 2 <= hiU) chosen.add(Lu + Pu + Pu / 2);
+    }
+    // An even split, dealt — never rolled: the groups take turns.
+    for (let g = 0, t = 0; chosen.size < count && t < 400; t++, g++) {
+        const target = groups[g % groups.length];
+        const a = Math.max(loU, target - Pu / 2), b = Math.min(hiU, target + Pu / 2 - 1);
+        if (a > b) continue;
+        const u = randInt(a, b);
+        if (u % Pu === 0) continue;
+        chosen.add(u);
+    }
+    const units = shuffle([...chosen]).slice(0, count);
     const val = (u) => dec ? +(u * unit).toFixed(dec + 1) : u;
     const label = (u, d) => dec ? (u * unit).toFixed(d) : fmt(u);
     const place = dec ? (dec === 1 ? 'tenth' : 'hundredth') : PLACE_ONE[P];
-    const isLow = (u) => u < mid;
+    const binOf = (u) => { const r = rnd(u); const i = binVals.indexOf(r); return i >= 0 ? `bin_${i}` : 'bin_neither'; };
     const ans = {};
-    units.forEach((u, i) => { ans['t' + i] = isLow(u) ? 'bin_low' : 'bin_high'; });
+    units.forEach((u, i) => { ans['t' + i] = binOf(u); });
     q.text = `Sort the numbers by what they round to (nearest ${place}).`;
     q.printText = `Write each number under what it rounds to (nearest ${place}).`;
     q.ans = ans;
     q.answerType = 'dnd-generic';
     q.dndMode = 'categorize';
     q.tiles = units.map((u, i) => ({ id: 't' + i, label: label(u, dec + 1) }));
-    q.bins = [{ id: 'bin_low', label: label(Lu, dec) }, { id: 'bin_high', label: label(Lu + Pu, dec) }];
+    q.bins = binVals.map((b, i) => ({ id: `bin_${i}`, label: label(b, dec) }));
+    if (bins === 'apart') q.bins.push({ id: 'bin_neither', label: 'Neither' });
     q.options = [];
     q.visual = '';
-    q.hint = 'Find the halfway number between the two. Halfway rounds up.';
+    q.hint = 'Find the halfway number between each pair. Halfway rounds up.';
     q.skillLabel = `Sort: nearest ${place}`;
-    const lows = units.filter(isLow).map(u => label(u, dec + 1));
-    const highs = units.filter(u => !isLow(u)).map(u => label(u, dec + 1));
-    q.printAnswer = `${q.bins[0].label}: ${lows.join(', ')} · ${q.bins[1].label}: ${highs.join(', ')}`;
+    const sorted = q.bins.map(b => units.filter(u => binOf(u) === b.id).map(u => label(u, dec + 1)));
+    q.printAnswer = q.bins.map((b, i) => `${b.label}: ${sorted[i].join(', ') || '—'}`).join(' · ');
     const support = o.support === 'line' ? 'line' : 'none';
-    q.pv = { kind: 'sort', place: P, tiles: units.map(val), bins: [val(Lu), val(Lu + Pu)], support };
+    q.pv = { kind: 'sort', place: P, tiles: units.map(val), bins: binVals.map(val), binMode: bins, support };
     const base = {
-        kind: 'sort', bank: q.tiles.map(t => t.label), bins: q.bins.map(b => `rounds to ${b.label}`),
-        rows: count / 2 + 1, sorted: [lows, highs], keyValue: q.printAnswer,
+        kind: 'sort', bank: q.tiles.map(t => t.label), bins: q.bins.map(b => (b.id === 'bin_neither' ? 'neither' : `rounds to ${b.label}`)),
+        rows: Math.max(2, ...sorted.map(l => l.length)) + 1, sorted, keyValue: q.printAnswer,
     };
     if (support === 'line') {
-        // The number line from one bin to the other: eleven ticks, only the two ends labelled, so
-        // the pupil places each number and sees which end it is nearer. Halfway is not labelled.
-        const labels = { 0: q.bins[0].label, 10: q.bins[1].label };
-        q.visual = `<div style="text-align:center;">${pvLineSVG({ ticks: 11, labels, lengthMm: 120, pxPerMm: SCREEN_PX_PER_MM })}</div>`;
-        q.hint = 'Find each number on the line. Is it nearer the left end or the right end? Halfway rounds up.';
-        q.cell = { template: 'pv-support', v: 1, payload: { picture: 'line', ticks: 11, labels, base: { keyValue: q.printAnswer, ...base } } };
+        // The number line from the first bin to the last: ten ticks a place, only the bins
+        // labelled, so the pupil places each number and sees which end it is nearer.
+        const ticks = 10 * (binVals.length === 2 && bins === 'adjacent' ? 1 : 2) + 1;
+        const labels = {};
+        binVals.forEach((b) => { labels[Math.round((b - Lu) / Pu * 10)] = label(b, dec); });
+        q.visual = `<div style="text-align:center;">${pvLineSVG({ ticks, labels, lengthMm: 120, pxPerMm: SCREEN_PX_PER_MM })}</div>`;
+        q.hint = 'Find each number on the line. Which labelled number is it nearest? Halfway rounds up.';
+        q.cell = { template: 'pv-support', v: 1, payload: { picture: 'line', ticks, labels, base: { keyValue: q.printAnswer, ...base } } };
         q.printFormat = 'pv-cell';
     } else {
         setCell(q, base);
     }
 }
 
+/** RT-1 / RT-2: the rounding table — a whole column (or a whole row) blank, never one cell. */
+function genRoundingTable(q, skill, o) {
+    let places = (Array.isArray(o.places) && o.places.length ? o.places : [10, 100]).map(Number).filter(p => [10, 100, 1000, 10000].includes(p));
+    if (!places.length) places = [10, 100];
+    places.sort((a, b) => a - b);
+    const top = places[places.length - 1];
+    const cap = capOf('number_sense', skill, o, top * 10);
+    const rowsN = 4;
+    const nums = new Set();
+    // One halfway number for the smallest place, and one chain-rounding trap (1,449: to the
+    // nearest 1,000 it is 1,000, not 2,000 — M-R6) where two places are asked.
+    const small = places[0];
+    for (let t = 0; nums.size < rowsN && t < 200; t++) {
+        let v;
+        if (nums.size === 0) v = randInt(top / small + 1, Math.floor(cap / small) - 1) * small + small / 2;
+        else if (nums.size === 1 && places.length >= 2) {
+            const P2 = places[1];
+            v = randInt(1, Math.max(1, Math.floor(cap / P2) - 1)) * P2 + P2 / 2 - small / 2;
+        } else v = randInt(top + 1, cap - 1);
+        if (v <= top || v >= cap || v % small === 0) continue;
+        nums.add(v);
+    }
+    const rows = shuffle([...nums]);
+    const blank = o.blank === 'row' ? 'row' : 'column';
+    const table = rows.map(n => places.map(p => roundTo(n, p)));
+    let text, sets, blankCells;
+    if (blank === 'column') {
+        const ci = slot(places.length);
+        const P = places[ci];
+        blankCells = rows.map((_, r) => [r, ci]);
+        sets = [rows.map((_, r) => table[r][ci])];
+        text = `Round each number to the nearest ${fmt(P)}. ${rows.map(n => `${fmt(n)}: ___`).join('  ')}`;
+        q.printText = `Round each number to the nearest ${fmt(P)}. Fill in the column.`;
+    } else {
+        const ri = slot(rows.length);
+        blankCells = places.map((_, c) => [ri, c]);
+        sets = [places.map((_, c) => table[ri][c])];
+        text = `Round ${fmt(rows[ri])}. ${places.map(p => `Nearest ${fmt(p)}: ___`).join('  ')}`;
+        q.printText = `Round ${fmt(rows[ri])} to each place. Fill in the row.`;
+    }
+    inlineBlanks(q, text, sets, sets[0].map(v => String(v).length + 2));
+    q.ans = sets[0].map(fmt).join('; ');
+    q.printAnswer = q.ans;
+    const isBlank = (r, c) => blankCells.some(([rr, cc]) => rr === r && cc === c);
+    const cellsView = rows.map((n, r) => places.map((_, c) => (isBlank(r, c) ? null : table[r][c])));
+    q.visual = `<div style="text-align:center;">${roundingTableHTML(rows, places, cellsView, { size: '1em' })}</div>`;
+    q.hint = 'Round each number from the number itself, not from the column next to it.';
+    q.skillLabel = 'Rounding Table';
+    q.pv = { kind: 'table', rows, places, blank, cells: blankCells, keys: sets[0] };
+    setCell(q, { kind: 'table', rows: rows.map(fmt), places, view: cellsView.map(r => r.map(v => (v === null ? null : fmt(v)))),
+        keys: table.map(r => r.map(fmt)), keyValue: q.ans });
+}
+
+/* =========================================================================== ESTIMATION (ES, §12) */
+
+const EST_IDS = new Set(['estimate_sum', 'estimate_diff', 'estimate_sums_diffs', 'estimate_products', 'estimate_quotient']);
+
+/** A number in [P + 1, 10P - 1] that is not a multiple of P and not halfway (no tie to argue). */
+function estOperand(P, lo, hi) {
+    for (let t = 0; t < 60; t++) {
+        const v = randInt(Math.max(P + 1, lo), Math.max(P + 1, hi));
+        if (v % P && v % P !== P / 2) return v;
+    }
+    return P + 1;
+}
+
+function genEstimate(q, skill, o) {
+    const task = skill === 'estimate_sum' || skill === 'estimate_diff' ? 'compute'
+        : (o.task === 'closest' || o.task === 'reasonable' ? o.task : 'compute');
+    let a, b, op, est, exact, P, compat = null;
+    if (skill === 'estimate_quotient') {
+        // ES-9: a nearby number the divisor goes into (compatible numbers), then divide.
+        const pf = Number(o.place) || 1;
+        const divisor = [3, 4, 5, 6, 7, 8, 9][randInt(0, 6)];
+        const off = pf === 1 ? Math.max(1, Math.ceil(divisor / 2) - 1) : Math.max(1, Math.floor(pf / 2) - 1);
+        const quotCap = pvCap(divisor * 9 * pf + off, state.range);
+        const qMax = Math.max(2, Math.min(9, Math.floor((quotCap - off) / (divisor * pf))));
+        est = randInt(2, qMax) * pf;
+        compat = divisor * est;
+        a = Math.max(1, compat + randInt(1, off) * (slot(2) ? 1 : -1));
+        if (a === compat) a += 1;
+        b = divisor;
+        op = '÷';
+        P = pf;
+        exact = a / b;
+    } else {
+        const roundTo_ = Number(o.place) || 10;
+        P = roundTo_;
+        const top = pvCap(P * 10 - 1, state.range);
+        op = skill === 'estimate_sum' ? '+' : skill === 'estimate_diff' ? '−' : skill === 'estimate_products' ? '×' : (slot(2) === 0 ? '+' : '−');
+        if (op === '×') {
+            a = estOperand(P, P + 1, top);
+            b = randInt(2, 9);
+            est = roundTo(a, P) * b;
+            exact = a * b;
+        } else {
+            for (let t = 0; t < 60; t++) {
+                a = estOperand(P, P + 1, top);
+                b = estOperand(P, P + 1, top);
+                if (op === '+') break;
+                if (a < b) [a, b] = [b, a];
+                if (roundTo(a, P) > roundTo(b, P)) break;       // the estimate is a real difference
+            }
+            est = op === '+' ? roundTo(a, P) + roundTo(b, P) : roundTo(a, P) - roundTo(b, P);
+            exact = op === '+' ? a + b : a - b;
+        }
+    }
+    const expr = `${fmt(a)} ${op} ${fmt(b)}`;
+    const placeName = op === '÷' ? '' : `the nearest ${fmt(P)}`;
+    const ra = op === '÷' ? compat : roundTo(a, P);
+    const rb = op === '÷' || op === '×' ? b : roundTo(b, P);
+    q.options = [];
+    q.visual = '';
+    q.skillLabel = { '+': 'Estimate Sums', '−': 'Estimate Differences', '×': 'Estimate Products', '÷': 'Estimate Quotients' }[op];
+    q.pv = { kind: 'estimate', task, op, a, b, place: P, est, rounded: [ra, rb] };
+    if (task === 'closest') {
+        // ES-5: three printed estimates; the distractors are one place either side, or the
+        // exact answer rounded at the wrong moment (M-G1).
+        const step = op === '×' ? P * b : op === '÷' ? P : P;
+        const cands = [est + step, est - step, est + 2 * step].filter(v => v > 0 && v !== est);
+        const choices = shuffle([est, cands[0], cands[1] !== undefined ? cands[1] : cands[2]].filter(v => v !== undefined));
+        q.text = `${expr} is closest to:`;
+        q.printText = `Circle the closest estimate. ${expr}`;
+        q.answerType = 'multiple-choice';
+        q.options = choices.map(fmt);
+        q.keepChoices = true;
+        q.ans = fmt(est);
+        q.hint = op === '÷' ? `Find a number near ${fmt(a)} that ${fmt(b)} goes into.` : `Round each number to ${placeName} first.`;
+        q.pv.choices = choices;
+        setCell(q, { kind: 'closest', expr, choices: choices.map(fmt), keyValue: q.ans });
+        return;
+    }
+    if (task === 'reasonable') {
+        // ES-6: an exact answer in black; HALF are genuinely reasonable (the true answer), dealt,
+        // never rolled — the gate holds the page to 40-60% (§17 reasonable-balance). A wrong one
+        // is off by a whole place (M-G4, a dropped or extra zero) or several of the place.
+        const reasonable = Math.floor(_at / 2) % 2 === 0;
+        const exactShown = op === '÷' ? Math.round(exact) : exact;
+        let shown = exactShown;
+        if (!reasonable) {
+            const k = Math.floor(_at / 4) % 3;
+            shown = k === 0 ? exactShown * 10 : k === 1 && exactShown >= 20 ? Math.round(exactShown / 10) : exactShown + (3 + (_at % 3)) * (op === '×' ? P * b : P);
+            if (shown === exactShown) shown = exactShown * 10;
+        }
+        q.text = `Is this answer reasonable? ${expr} ${op === '÷' ? '≈' : '='} ${fmt(shown)}`;
+        q.printText = `Estimate. Check one box: Reasonable or Not reasonable. ${expr} = ${fmt(shown)}`;
+        q.answerType = 'multiple-choice';
+        q.options = ['Reasonable', 'Not reasonable'];
+        q.ans = reasonable ? 'Reasonable' : 'Not reasonable';
+        q.hint = 'Estimate first. Is the answer close to your estimate?';
+        q.pv.shown = shown;
+        q.pv.reasonable = reasonable;
+        setCell(q, { kind: 'decide', expr: `${expr} ${op === '÷' ? '≈' : '='} ${fmt(shown)}`, labels: ['Reasonable', 'Not reasonable'], keyValue: q.ans });
+        return;
+    }
+    // Round, then compute: the two-line rewrite (RD-07) — each rounded number in a box under the
+    // one it came from, then the estimate — or, as the fade, the estimate alone.
+    const rewrite = (skill === 'estimate_sum' || skill === 'estimate_diff') ? o.support !== 'none' : false;
+    q.printText = op === '÷' ? `Estimate. ${expr}` : `Round to ${placeName}. Then estimate. ${expr}`;
+    q.hint = op === '÷' ? `Find a number near ${fmt(a)} that ${fmt(b)} goes into. Then divide.`
+        : op === '×' ? `Round ${fmt(a)} to ${placeName}. Then multiply.` : `Round each number to ${placeName}. Then ${op === '+' ? 'add' : 'subtract'}.`;
+    if (rewrite) {
+        inlineBlanks(q, `Round to ${placeName}. ${expr} ≈ ___ ${op} ___ = ___`, [[ra, rb, est]]);
+        q.ans = est;
+        q.printAnswer = `${fmt(ra)} ${op} ${fmt(rb)} = ${fmt(est)}`;
+        setCell(q, { kind: 'estimate', expr, op, keys: [fmt(ra), fmt(rb), fmt(est)], keyValue: q.printAnswer });
+        return;
+    }
+    q.text = op === '÷' ? `Estimate: ${expr} ≈ ?` : `Round to ${placeName}, then estimate: ${expr} ≈ ?`;
+    q.ans = est;
+    q.answerType = 'number';
+    setCell(q, { kind: 'frame', frame: `${expr} ≈ ____`, keyValue: est });
+}
+
 /* =========================================================================== entry points */
 
 const PV_IDS = new Set(['identify', 'value', 'expand', 'combine', 'more_less_10', 'more_less_100',
-    'place_value_disks', 'pv_disks_build', 'place_value_10x']);
+    'place_value_disks', 'pv_disks_build', 'place_value_10x', 'unit_form', 'compare',
+    'order_least_to_greatest', 'order_greatest_to_least', 'pv_digit_drag']);
 const ROUND_IDS = new Set(['rounding_visual', 'nearest_10', 'nearest_100', 'nearest_1000', 'nearest_10000',
-    'nearest_100000', 'nearest_million', ...Object.keys(SORT_PLACE)]);
+    'nearest_100000', 'nearest_million', 'between_tens', 'place_on_number_line', 'rounding_table', ...Object.keys(SORT_PLACE)]);
 
 /** Place value ids rewritten in P9. Returns true when the item was generated (or refused) here. */
 export function generatePvPlaceValue(q, skill) {
@@ -625,9 +1296,13 @@ export function generatePvPlaceValue(q, skill) {
     if (refuse(q, 'placevalue', skill, o)) return true;
     if (skill === 'identify' || skill === 'value') genPlace(q, skill, o);
     else if (skill === 'expand' || skill === 'combine') genExpandCombine(q, skill, o);
+    else if (skill === 'unit_form') genUnitForm(q, skill, o);
     else if (skill === 'more_less_10' || skill === 'more_less_100') genMoreLess(q, skill, o);
     else if (skill === 'place_value_disks' || skill === 'pv_disks_build') genDisks(q, skill, o);
     else if (skill === 'place_value_10x') genTimesTen(q, skill, o);
+    else if (skill === 'compare') genCompare(q, skill, o);
+    else if (skill === 'pv_digit_drag') genDigitChart(q, skill, o);
+    else genOrder(q, skill, o);
     return true;
 }
 
@@ -638,8 +1313,20 @@ export function generatePvRounding(q, skill) {
     const o = optsOf('number_sense', skill);
     if (refuse(q, 'number_sense', skill, o)) return true;
     if (skill === 'rounding_visual') genRoundingVisual(q, skill, o);
+    else if (skill === 'between_tens') genBetweenTens(q, skill, o);
+    else if (skill === 'place_on_number_line') genPlaceOnLine(q, skill, o);
+    else if (skill === 'rounding_table') genRoundingTable(q, skill, o);
     else if (SORT_PLACE[skill]) genRoundSort(q, skill, o);
     else genNearest(q, skill, o);
+    return true;
+}
+
+/** Estimation ids rewritten in P9 step 8 (§12). Returns true when the item was generated here. */
+export function generatePvEstimation(q, skill) {
+    if (!EST_IDS.has(skill)) return false;
+    beginItem();
+    const o = optsOf('number_sense', skill);
+    genEstimate(q, skill, o);
     return true;
 }
 

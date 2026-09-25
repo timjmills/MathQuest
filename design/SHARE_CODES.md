@@ -34,6 +34,52 @@ Every key and every value token is allocated in ONE registry, `js/modules/skill-
 | `pictures`                | `P` | `1` / `0` |
 | `band`                    | `B` | decimal digits |
 
+### Block 0: the P9 place-value keys (2026-09-25)
+
+Block 0 (`0A`–`0Q`) belongs to the P9 place-value / rounding / estimation options:
+
+| Option id | KEY | Value tokens |
+|---|---|---|
+| `repeatDigit` (identify) | `0A` | `1` / `0` |
+| `form` (value, expand) | `0B` | `V` value · `U` unit · `N` notation · `S` sum |
+| `zeroDigit` (value) | `0C` | `1` / `0` |
+| `frame` (expand) | `0D` | `B` boxes · `L` line |
+| `responseScope` (nearest_*) | `0E` | `F` full · `N` notation · `D` decision · `J` judge |
+| `bins` (round_sort_*) | `0F` | `A` adjacent · `P` one apart · `T` three |
+| `blank` (rounding_table) | `0G` | `C` column · `R` row |
+| `line` (rounding_visual) | `0H` | `P` plotted · `M` mark · `E` ends |
+| `midLabel` (rounding_visual) | `0J` | `1` / `0` |
+| `closeness` (compare, order) | `0K` | `F` far · `C` close |
+| `lengths` (compare, order) | `0L` | `E` equal · `M` mixed |
+| `count` (order) | `0M` | decimal digit |
+| `source` (pv_digit_drag) | `0N` | `W` word · `E` expanded · `N` numeral |
+| `rename` (unit_form) | `0P` | `S` standard · `M` more than 9 |
+| `span` (place_on_number_line) | `0Q` | decimal digits |
+
+Values appended to one-letter keys by P9: `response` `L` circle · `B` bank; `unknown` `T` start;
+`support` `P` strip · `F` shift · `W` rewrite.
+
+These keys live in the registry (`js/modules/skill-option-keys.js`, block 0 below) and follow its
+rules: one-letter fields are written first, and a payload made only of two-character fields gets a
+leading empty field (`~_0B…`), so an older decoder skips them as unknown keys and never reads the
+payload as a later format version. A value appended to a one-letter key (the four above) is skipped
+the same way by an older decoder: the option stays at its default.
+
+### Block 2: count by 1–12, number patterns, the multiplication chart, × / ÷ number lines (2026-09-25)
+
+| Option id | KEY | Value tokens |
+|---|---|---|
+| `missing` (numbers left blank, %) | `2A` | decimal digits — `2A50` |
+| `pattern` (number_patterns_rule) | `2B` | set: `A` add · `S` subtract · `D` double/halve · `T` × 10 · `G` growing |
+| `rule` (write the rule) | `2C` | `1` / `0` |
+| `chart` (mult_chart) | `2D` | `W` window · `F` whole |
+| `ticks` (nl_mult, nl_div) | `2E` | `S` every step · `O` every number |
+| `shape` (tile shape) | `2F` | `B` box · `C` circle · `H` hexagon · `M` circles and hexagons |
+
+Values appended to one-letter keys by block 2 (an older decoder leaves these options at their
+default): `response` `Q` draw · `Z` sentence · `X` missing; `task` `Q` fill · `Z` headers · `X` shade ·
+`J` pattern; `order` `Q` in order · `Z` mixed; `support` `Z` hop numbers.
+
 An empty set field (`C` alone) means "none ticked", which the option model reads as *no
 restriction*. A field that is absent means the option is at its default.
 
@@ -64,7 +110,7 @@ owned by one wave, 26 keys a block, and a wave takes only the next letter of its
 
 | Block | Owner | Status | Keys |
 |---|---|---|---|
-| `0` | P9 place value (second wave) | reserved | `0A`–`0Q` |
+| `0` | P9 place value (second wave) | assigned | `0A`–`0Q` (next free `0R`) |
 | `1` | P10 time and money | reserved | `1A`–`1M` (its thirteen keys, renumbered from its own `0x` scheme) |
 | `2` | count-by, patterns, multiplication chart | reserved | `2A`–`2F` (renumbered from `9A`–`9F`) |
 | `3` | function tables | reserved | none yet (value tokens only today) |

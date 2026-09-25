@@ -18,6 +18,10 @@
 //   NEIGHBOURS in a fact's 0.72 em tracks, no mark of a digit touches the next digit's ink
 //              (pixel test at the smallest sizes, every pair) and marks of two dotted neighbours
 //              keep the no-merge gap (geometry, every size)
+//   PHOTOCOPY  every double (6-9, both weights, 24 and 28 pt), drawn with its numeral and put through
+//              a simulated poor copy (blur sigma 0.12 mm, < 60 % white prints black), keeps its ring
+//              line (>= 85 % dark round it), its solid centre dot, and white in the middle of the gap
+//              (>= 50 % round it): no blob
 //   LAYOUT     a kit fact and stack render with identical boxes with and without the overlay
 const path = require('path');
 const { openRaster, setStage, grab, rasterDigit, inkMask, darkFraction, DSF } = require('../lib/ws-touchdots-raster.cjs');
@@ -51,6 +55,25 @@ function components(img, t = 128) {
     if (size < 3) n--; // ignore anti-alias specks
   }
   return n;
+}
+
+/** A poor photocopy: separable Gaussian blur of the luminance, then a darkening threshold. */
+function photocopy(img, sigma, cut) {
+  const { w, h, lum } = img;
+  const R = Math.max(1, Math.ceil(sigma * 3));
+  const k = []; let sum = 0;
+  for (let i = -R; i <= R; i++) { const v = Math.exp(-(i * i) / (2 * sigma * sigma)); k.push(v); sum += v; }
+  for (let i = 0; i < k.length; i++) k[i] /= sum;
+  const tmp = new Float64Array(w * h), out = new Array(w * h);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    let a = 0; for (let i = -R; i <= R; i++) a += k[i + R] * lum[y * w + Math.min(w - 1, Math.max(0, x + i))];
+    tmp[y * w + x] = a;
+  }
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    let a = 0; for (let i = -R; i <= R; i++) a += k[i + R] * tmp[Math.min(h - 1, Math.max(0, y + i)) * w + x];
+    out[y * w + x] = a < cut ? 0 : 255;
+  }
+  return { w, h, lum: out };
 }
 
 (async () => {
@@ -168,6 +191,45 @@ function components(img, t = 128) {
         checks += 2;
         log(`neighbour pixels w${wt} ${S.v}${S.unit}: ${o1} / ${o2}`);
         if (o1 || o2) fail(`neighbour: at ${S.v} ${S.unit} (${wt}) marks touch the next digit's ink (${o1 + o2} px)`);
+      }
+    }
+
+    // ---------------------------------------------------------------- PHOTOCOPY (no blob)
+    // The digit AND its overlay, captured at 4x, put through the same simulated poor copy as the
+    // specimen (Gaussian blur sigma 0.12 mm, then everything under 60 % white prints black). Each
+    // double must still read as a double: its ring intact, its centre dot solid, white showing
+    // between them, and the centre dot parted from the stroke by its keyline.
+    for (const wt of [400, 700]) for (const pt of [24, 28]) {
+      const fontPx = (pt * 96) / 72;
+      const geo = td.touchDotGeometry({ em: pt, unit: 'pt', size: SIZE });
+      for (let d = 6; d <= 9; d++) {
+        await setStage(page, `<span class="h ws-td" id="host" style="font-size:${fontPx}px;font-weight:${wt};width:${TRACK}em">${d}${td.touchDotsSVG(d, { em: pt, unit: 'pt', weight: wt, size: SIZE })}</span>`);
+        const rect = await page.evaluate(() => { const b = document.getElementById('host').getBoundingClientRect(); return { x: b.left, y: b.top, w: b.width, h: b.height }; });
+        const pad = fontPx * 0.3;
+        const clip = { x: Math.floor(rect.x - pad), y: Math.floor(rect.y - pad), width: Math.ceil(rect.w + 2 * pad), height: Math.ceil(rect.h + 2 * pad) };
+        const img = await grab(page, clip);
+        const pxPerEm = fontPx * DSF;
+        const sigma = (0.12 / ((pt * 25.4) / 72)) * pxPerEm;
+        const copy = photocopy(img, sigma, 0.6 * 255);
+        const cx0 = (rect.x + rect.w / 2 - clip.x) * DSF, cy0 = (rect.y + rect.h / 2 - clip.y) * DSF;
+        if (process.env.TD_DUMP) {
+          const url = await page.evaluate((a, b) => { const c = document.createElement('canvas'); c.width = a.w * 2; c.height = a.h; const g = c.getContext('2d'); const im = g.createImageData(a.w * 2, a.h); for (let y = 0; y < a.h; y++) for (let x = 0; x < a.w; x++) { const i = (y * a.w * 2 + x) * 4, j = i + a.w * 4; const v = a.lum[y * a.w + x], u = b.lum[y * a.w + x]; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[j] = im.data[j + 1] = im.data[j + 2] = u; im.data[i + 3] = im.data[j + 3] = 255; } g.putImageData(im, 0, 0); return c.toDataURL(); }, img, copy);
+          require('fs').writeFileSync(`${process.env.TD_DUMP}/copy-${d}-${wt}-${pt}.png`, Buffer.from(url.split(',')[1], 'base64'));
+        }
+        const ring = (x, y, r) => { let dark = 0; const N = 96; for (let k = 0; k < N; k++) { const X = Math.round(x + r * Math.cos((2 * Math.PI * k) / N)), Y = Math.round(y + r * Math.sin((2 * Math.PI * k) / N)); if (copy.lum[Y * copy.w + X] < 128) dark++; } return dark / N; };
+        td.touchDots(d, wt).forEach((p, i) => {
+          if (!p.double) return;
+          const x = cx0 + p.x * pxPerEm, y = cy0 + p.y * pxPerEm;
+          const ringLine = ring(x, y, (geo.ringR - geo.rw / 2) * pxPerEm);
+          // the middle of the gap between the centre dot and the ring line
+          const gapWhite = 1 - ring(x, y, ((geo.innerR + geo.ringR - geo.rw) / 2) * pxPerEm);
+          const centre = 1 - ring(x, y, geo.innerR * 0.4 * pxPerEm) === 0;
+          checks++;
+          log(`copy ${d} w${wt} ${pt}pt mark${i + 1}: ring ${(ringLine * 100).toFixed(0)}% gap-white ${(gapWhite * 100).toFixed(0)}% centre ${centre}`);
+          if (ringLine < 0.85 || gapWhite < 0.5 || !centre) {
+            fail(`photocopy: ${d} (${wt}) at ${pt} pt, double ${i + 1} blobs (ring ${(ringLine * 100).toFixed(0)}%, gap white ${(gapWhite * 100).toFixed(0)}%, centre ${centre ? 'solid' : 'lost'})`);
+          }
+        });
       }
     }
 

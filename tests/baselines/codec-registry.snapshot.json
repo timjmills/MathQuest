@@ -44,12 +44,34 @@
     "scale": "5J",
     "digits": "5K",
     "units": "5L",
-    "parts": "5M"
+    "parts": "5M",
+    "repeatDigit": "0A",
+    "form": "0B",
+    "zeroDigit": "0C",
+    "frame": "0D",
+    "responseScope": "0E",
+    "bins": "0F",
+    "blank": "0G",
+    "line": "0H",
+    "midLabel": "0J",
+    "closeness": "0K",
+    "lengths": "0L",
+    "count": "0M",
+    "source": "0N",
+    "rename": "0P",
+    "span": "0Q",
+    "missing": "2A",
+    "pattern": "2B",
+    "rule": "2C",
+    "chart": "2D",
+    "ticks": "2E",
+    "shape": "2F",
+    "ops": "3A"
   },
   "blocks": {
     "0": {
       "owner": "P9 place value (second wave)",
-      "status": "reserved",
+      "status": "assigned",
       "keys": "0A-0Q"
     },
     "1": {
@@ -59,13 +81,13 @@
     },
     "2": {
       "owner": "count-by, patterns, multiplication chart",
-      "status": "reserved",
+      "status": "assigned",
       "keys": "2A-2F"
     },
     "3": {
       "owner": "function tables",
-      "status": "reserved",
-      "keys": ""
+      "status": "assigned",
+      "keys": "3A-3A"
     },
     "4": {
       "owner": "supports",
@@ -132,7 +154,13 @@
       "which-numbers": "W",
       "array-builder": "A",
       "write": "R",
-      "circle-all": "C"
+      "circle-all": "C",
+      "circle": "L",
+      "bank": "B",
+      "draw": "Q",
+      "sentence": "Z",
+      "missing": "X",
+      "check": "K"
     },
     "range": {},
     "decimals": {},
@@ -159,7 +187,8 @@
       "answer": "A",
       "first": "F",
       "second": "S",
-      "mixed": "M"
+      "mixed": "M",
+      "start": "T"
     },
     "simplestForm": {},
     "pictures": {},
@@ -194,7 +223,16 @@
       "length": "L",
       "height": "H",
       "thickness": "T",
-      "all": "A"
+      "all": "A",
+      "fill": "Q",
+      "headers": "Z",
+      "shade": "X",
+      "pattern": "J",
+      "outputs": "G",
+      "rule": "Y",
+      "inputs": "V",
+      "mixed": "M",
+      "make": "K"
     },
     "zeroPlace": {
       "none": "N",
@@ -220,7 +258,9 @@
     },
     "order": {
       "largest": "L",
-      "scrambled": "S"
+      "scrambled": "S",
+      "inorder": "Q",
+      "mixed": "Z"
     },
     "place": {},
     "midpoint": {
@@ -241,13 +281,17 @@
       "think": "H",
       "bar": "M",
       "label": "E",
-      "touch": "P",
-      "touchall": "Q",
+      "strip": "P",
+      "shift": "F",
+      "rewrite": "W",
+      "numbers": "Z",
+      "touch": "Q",
+      "touchall": "V",
       "boxsign": "X",
       "startarrow": "S",
       "steps": "U",
       "round-pv": "O",
-      "round-mark": "Z"
+      "round-mark": "Y"
     },
     "tiles": {},
     "objects": {
@@ -348,6 +392,87 @@
       "0": "0",
       "1": "1",
       "2": "2"
+    },
+    "repeatDigit": {},
+    "form": {
+      "value": "V",
+      "unit": "U",
+      "notation": "N",
+      "sum": "S"
+    },
+    "zeroDigit": {},
+    "frame": {
+      "boxes": "B",
+      "line": "L"
+    },
+    "responseScope": {
+      "full": "F",
+      "notation": "N",
+      "decision": "D",
+      "judge": "J"
+    },
+    "bins": {
+      "adjacent": "A",
+      "apart": "P",
+      "three": "T"
+    },
+    "blank": {
+      "column": "C",
+      "row": "R"
+    },
+    "line": {
+      "plotted": "P",
+      "mark": "M",
+      "ends": "E"
+    },
+    "midLabel": {},
+    "closeness": {
+      "far": "F",
+      "close": "C"
+    },
+    "lengths": {
+      "equal": "E",
+      "mixed": "M"
+    },
+    "count": {},
+    "source": {
+      "word": "W",
+      "expanded": "E",
+      "numeral": "N"
+    },
+    "rename": {
+      "standard": "S",
+      "more": "M"
+    },
+    "span": {},
+    "missing": {},
+    "pattern": {
+      "add": "A",
+      "sub": "S",
+      "double": "D",
+      "times10": "T",
+      "grow": "G"
+    },
+    "rule": {},
+    "chart": {
+      "window": "W",
+      "whole": "F"
+    },
+    "ticks": {
+      "step": "S",
+      "one": "O"
+    },
+    "shape": {
+      "box": "B",
+      "circle": "C",
+      "hex": "H",
+      "mixed": "M"
+    },
+    "ops": {
+      "+": "A",
+      "-": "S",
+      "x": "M",
+      "/": "D"
     }
   },
   "scalarOnly": {
@@ -362,6 +487,13 @@
     "touch": "reserved",
     "cover": "reserved",
     "mix": "reserved",
-    "anchors": "reserved"
+    "anchors": "reserved",
+    "count": "decimal",
+    "span": "decimal",
+    "repeatDigit": "bool",
+    "zeroDigit": "bool",
+    "midLabel": "bool",
+    "missing": "decimal",
+    "rule": "bool"
   }
 }

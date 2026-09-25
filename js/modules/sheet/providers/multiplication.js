@@ -1,6 +1,6 @@
 // js/modules/sheet/providers/multiplication.js
 // Skill providers for multiplication: mult_facts, arrays_groups, area_model_mult (+ _hard),
-// mult_chart (+ _easy).
+// (mult_chart and mult_chart_easy: see countby.js).
 //
 // The critic's re-grade of 2026-09-25 found the generic "Read the fact. Count by the second
 // number." on arrays, charts and the area model. Each skill here teaches its own model: equal
@@ -221,88 +221,6 @@ registerSkill('multiplication:area_model_mult_hard', {
 });
 
 /* =========================================================================== mult_chart */
+// mult_chart and mult_chart_easy moved to countby.js (2026-09-25): the chart now has four tasks
+// (fill, the factors on its edges, shading multiples, a row's rule), and each needs its own words.
 
-function chartCells(q) {
-    const d = obj(q.multChartData);
-    if (d && Array.isArray(d.missingCells)) return d.missingCells.map((m) => ({ r: num(m.r), c: num(m.c), p: num(m.product) }));
-    const keys = arr(q.keyParts).map(num);
-    const [a, b] = operands(q);
-    if (!keys.length) return [];
-    // The legacy chart names only its first gap (q.a x q.b); the others are keyed by value.
-    return keys.map((p, i) => (i === 0 && Number.isFinite(a) && Number.isFinite(b) && a * b === p ? { r: a, c: b, p } : { r: NaN, c: NaN, p }));
-}
-
-function chartAnswerOf(q, list) {
-    if (Array.isArray(q.ans)) return list.map(String);
-    const sep = /,\s/.test(String(q.ans)) ? ', ' : ',';
-    return list.join(sep);
-}
-
-const CHART_STRINGS = {
-    instructionKey: 'chart-fill',
-    steps: [
-        'Put one finger on the row number.',
-        'Put another finger on the column number.',
-        'Slide them to the box where they meet.',
-        'Multiply the two numbers. Write the product there.',
-    ],
-    say: '__ times __ equals __.',
-    sayValues: (q) => { const c = chartCells(q).find((x) => Number.isFinite(x.r)); return c ? [c.r, c.c, c.p] : null; },
-};
-
-function chartSteps(q) {
-    const cells = chartCells(q);
-    if (!cells.length) return [];
-    const out = [];
-    const known = cells.filter((c) => Number.isFinite(c.r));
-    known.slice(0, 3).forEach((c) => {
-        const i = cells.indexOf(c);
-        out.push(step(`Row ${c.r}, column ${c.c}: ${c.r} × ${c.c} = ${c.p}.`, [{ slot: `cell${i}`, value: String(c.p) }]));
-    });
-    if (out.length === 1) {
-        out.unshift(step(`Find row ${known[0].r} and column ${known[0].c}.`));
-        out.push(step(`Write ${known[0].p} where they meet.`));
-    }
-    const all = cells.map((c, i) => ({ slot: `cell${i}`, value: String(c.p) }));
-    if (known.length < cells.length) out.push(step('Do the same for each empty box.', all));
-    else out.push(step('Check: count along each row by the row number.', all));
-    while (out.length < 3) out.unshift(step('Find the row number on the left edge.'));
-    return clampSteps(out);
-}
-
-function chartWrong(q) {
-    const cells = chartCells(q);
-    if (!cells.length) return null;
-    const values = cells.map((c) => c.p);
-    const c0 = cells[0];
-    const c = [];
-    if (Number.isFinite(c0.r) && c0.c > 1) {
-        const v = values.slice(); v[0] = c0.r * (c0.c - 1);
-        c.push({ value: chartAnswerOf(q, v), misconception: 'read-next-column', slot: 'cell0', slots: { cell0: String(v[0]) },
-            explain: `Wrote ${c0.r} × ${c0.c - 1}: read the column next to it.` });
-    }
-    if (Number.isFinite(c0.r)) {
-        const v = values.slice(); v[0] = c0.r + c0.c;
-        c.push({ value: chartAnswerOf(q, v), misconception: 'added', slot: 'cell0', slots: { cell0: String(v[0]) },
-            explain: `Added ${c0.r} and ${c0.c} instead of multiplying.` });
-    }
-    const last = values.length - 1;
-    const v = values.slice(); v[last] = values[last] + (Number.isFinite(cells[last].r) ? cells[last].r : 1);
-    c.push({ value: chartAnswerOf(q, v), misconception: 'read-next-column', slot: `cell${last}`, slots: { [`cell${last}`]: String(v[last]) },
-        explain: 'Read the box one column over.' });
-    return chooseWrong(q, c);
-}
-
-registerSkill('multiplication:mult_chart', {
-    strings: strings(Object.assign({ iCan: 'I Can use a multiplication chart to find products' }, CHART_STRINGS)),
-    misconceptions: ['read-next-column', 'added'],
-    workedSteps: chartSteps,
-    wrongAnswer: chartWrong,
-});
-
-registerSkill('multiplication:mult_chart_easy', {
-    strings: strings(Object.assign({ iCan: 'I Can use a multiplication chart to find products' }, CHART_STRINGS)),
-    misconceptions: ['read-next-column', 'added'],
-    workedSteps: chartSteps,
-    wrongAnswer: chartWrong,
-});

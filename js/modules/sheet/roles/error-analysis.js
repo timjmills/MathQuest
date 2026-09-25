@@ -50,8 +50,9 @@ const PUPILS = ['Sam', 'Ana', 'Leo', 'Mia', 'Omar', 'Zara'];
 const DRAWN = new Set(['base10', 'tenframe']);
 /** Templates whose answer is a choice among the item's own labels. */
 const CHOICE = new Set(['compare']);
-/** Templates that draw one fix box beside each line of the work (a fact family's four facts). */
-const LINED = new Set(['fact-family']);
+/** Templates that draw one fix box beside each line of the work (a fact family's four facts;
+ *  a function table's rows, its rule and its Check row). */
+const LINED = new Set(['fact-family', 'function-table']);
 
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1, 2];

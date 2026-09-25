@@ -29,6 +29,10 @@ export function renderMultiSelectCheck(q, container) {
     if (!container || !q || !Array.isArray(q.options)) return;
     const large = _largeTargets();
     const optClass = large ? 'msc-opt large' : 'msc-opt';
+    // TAP TO RING (P9 RN-10, "Circle every number that rounds to N"): the paper item is a row of
+    // printed numbers the pupil rings, so the screen twin draws the same black numerals and a tap
+    // draws the ring round the number — no check box (parity, RM-P-01; place-value-rounding.md §13.6).
+    const ring = !!q.circleAll;
     const total = q.options.length;
 
     const optsHtml = q.options.map(opt => {
@@ -41,7 +45,7 @@ export function renderMultiSelectCheck(q, container) {
 
     container.innerHTML = `
         <div class="msc-counter" aria-live="polite">0 of ${total} selected</div>
-        <div class="msc-grid" role="group" aria-label="Select all that apply">${optsHtml}</div>
+        <div class="msc-grid${ring ? ' msc-ring' : ''}" role="group" aria-label="${ring ? 'Tap every number to ring it' : 'Select all that apply'}">${optsHtml}</div>
         <button type="button" class="msc-submit primary-btn" disabled>Submit</button>
     `;
 

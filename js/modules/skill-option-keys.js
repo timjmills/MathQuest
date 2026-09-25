@@ -74,10 +74,10 @@ export const ONE_LETTER_KEYS = Object.freeze({
 // `status`: 'assigned' (ids below), 'reserved' (the wave owns `keys` and fills in its ids when it
 // merges — nobody else may take one), 'spare' (unallocated; claim a whole block here first).
 export const KEY_BLOCKS = Object.freeze({
-    0: Object.freeze({ owner: 'P9 place value (second wave)', status: 'reserved', keys: '0A-0Q' }),
+    0: Object.freeze({ owner: 'P9 place value (second wave)', status: 'assigned', keys: '0A-0Q' }),
     1: Object.freeze({ owner: 'P10 time and money', status: 'reserved', keys: '1A-1M' }),
-    2: Object.freeze({ owner: 'count-by, patterns, multiplication chart', status: 'reserved', keys: '2A-2F' }),
-    3: Object.freeze({ owner: 'function tables', status: 'reserved', keys: '' }),
+    2: Object.freeze({ owner: 'count-by, patterns, multiplication chart', status: 'assigned', keys: '2A-2F' }),
+    3: Object.freeze({ owner: 'function tables', status: 'assigned', keys: '3A-3A' }),
     4: Object.freeze({ owner: 'supports', status: 'assigned', keys: '4A-4D' }),
     5: Object.freeze({ owner: 'P12 every other family', status: 'assigned', keys: '5A-5M' }),
     6: Object.freeze({ owner: '', status: 'spare', keys: '' }),
@@ -88,6 +88,39 @@ export const KEY_BLOCKS = Object.freeze({
 
 // Option id -> its multi-character key. APPEND-ONLY. Take the next letter of your OWN block.
 export const MULTI_KEYS = Object.freeze({
+    // Block 0 — P9 place value, rounding and estimation, step 8 (place-value-rounding.md §2.5)
+    repeatDigit: '0A',   // identify: a repeated digit (747: which 7?)
+    form: '0B',          // value: 700 / 7 hundreds / 7 x 100; expand: sum / expanded notation
+    zeroDigit: '0C',     // value: may ask the value of a 0
+    frame: '0D',         // expand: one box per place / a ruled line
+    responseScope: '0E', // nearest_*: full / notation / decision / judge
+    bins: '0F',          // round_sort_*: adjacent / one apart / three bins
+    blank: '0G',         // rounding_table: a whole column / a whole row
+    line: '0H',          // rounding_visual: dot plotted / pupil marks / ends only
+    midLabel: '0J',      // rounding_visual: the midpoint labelled (hint H2)
+    closeness: '0K',     // compare / order: far / close
+    lengths: '0L',       // compare / order: equal / mixed digit counts
+    count: '0M',         // order: how many numbers
+    source: '0N',        // pv_digit_drag: word / expanded / numeral
+    rename: '0P',        // unit_form: standard / more than 9 of one place
+    span: '0Q',          // place_on_number_line: one ten / hundred / thousand to the next
+    // NEXT FREE IN BLOCK 0: 0R.
+
+    // Block 2 — count by 1-12, number patterns, the multiplication chart, x / ÷ hop lines (2026-09-25)
+    missing: '2A',       // count_by_tables, number_patterns_rule, mult_chart(_easy): % of numbers left blank
+    pattern: '2B',       // number_patterns_rule: add / sub / double / times10 / grow
+    rule: '2C',          // number_patterns_rule: the pupil writes the rule
+    chart: '2D',         // mult_chart: a window / the whole chart
+    ticks: '2E',         // nl_mult, nl_div: labels every step / every number
+    shape: '2F',         // count_by_tables, number_patterns_rule, number_seq_fill: box / circle / hexagon
+    // NEXT FREE IN BLOCK 2: 2G.
+
+    // Block 3 — function tables (2026-09-25). Their other options reuse one-letter keys with value
+    // tokens only (task, response, order: inorder, support); `ops` is its own key because the
+    // deployed decoder would read an unknown `op` token as an EMPTY set (every operation).
+    ops: '3A',           // function_table_easy / _hard: the operations a rule may use (+ − × ÷)
+    // NEXT FREE IN BLOCK 3: 3B.
+
     // Block 4 — SUPPORTS (S2: `cover` and `mix` are live; `touch` is unused - touch dots are
     // values of the unified `support` set; `anchors` is the sheet-level S6 request field)
     touch: '4A',
@@ -122,32 +155,50 @@ export const OPTION_KEYS = Object.freeze({ ...ONE_LETTER_KEYS, ...MULTI_KEYS });
 // own digit tokens (one per power of ten).
 export const VALUE_TOKENS = Object.freeze({
     notation: Object.freeze({ stacked: 'S', across: 'A', bracket: 'B', fraction: 'F' }),
-    response: Object.freeze({ standard: 'S', 'which-numbers': 'W', 'array-builder': 'A', write: 'R', 'circle-all': 'C' }),
+    response: Object.freeze({ standard: 'S', 'which-numbers': 'W', 'array-builder': 'A', write: 'R', 'circle-all': 'C',
+        // P9 step 8 identify
+        circle: 'L', bank: 'B',
+        // block 2 (2026-09-25): x / ÷ on a number line
+        draw: 'Q', sentence: 'Z', missing: 'X',
+        // block 3 (2026-09-25): a function table's Check row
+        check: 'K' }),
     regroup: Object.freeze({ none: 'N', always: 'A', mixed: 'M' }),
     orientation: Object.freeze({ vertical: 'V', horizontal: 'H',
         // P11 count_objects arrangement
         rows: 'R', line: 'L', scattered: 'S' }),
-    unknown: Object.freeze({ answer: 'A', first: 'F', second: 'S', mixed: 'M' }),
+    unknown: Object.freeze({ answer: 'A', first: 'F', second: 'S', mixed: 'M',
+        // P9 step 8 more / less
+        start: 'T' }),
     wordform: Object.freeze({ to_number: 'N', to_words: 'W' }),
     dir: Object.freeze({ more: 'M', less: 'L', both: 'B',
         // P11 counting / comparing
         fewer: 'F', same: 'S', mixed: 'X', forward: 'W', back: 'K' }),
     task: Object.freeze({ read: 'R', count: 'C', compute: 'P', closest: 'N', reasonable: 'E',
         // P11 compare_objects
-        length: 'L', height: 'H', thickness: 'T', all: 'A' }),
+        length: 'L', height: 'H', thickness: 'T', all: 'A',
+        // block 2 (2026-09-25): the multiplication chart
+        fill: 'Q', headers: 'Z', shade: 'X', pattern: 'J',
+        // block 3 (2026-09-25): function tables (O U I W F D left to P10 and count-by)
+        outputs: 'G', rule: 'Y', inputs: 'V', mixed: 'M', make: 'K' }),
     zeroPlace: Object.freeze({ none: 'N', some: 'S', always: 'A' }),
     op: Object.freeze({ x: 'M', '/': 'D' }),
-    order: Object.freeze({ largest: 'L', scrambled: 'S' }),
+    order: Object.freeze({ largest: 'L', scrambled: 'S',
+        // block 2 (2026-09-25): count by 1-12 rows
+        inorder: 'Q', mixed: 'Z' }),
     midpoint: Object.freeze({ never: 'N', seeded: 'S', only: 'O' }),
     support: Object.freeze({ cut: 'C', line: 'L', none: 'N', labels: 'B', chart: 'T',
         // P11 operations hint pictures
         tile: 'D', frame: 'R', skip: 'K', array: 'A', think: 'H', bar: 'M',
         // P12 (the one-label caption; it had no token, so it could not travel in a link)
         label: 'E',
+        // P9 step 8: the more/less chart strip, the x10 shift chart, the estimation rewrite line
+        strip: 'P', shift: 'F', rewrite: 'W',
+        // block 2 (2026-09-25): hop numbers on a x / ÷ number line
+        numbers: 'Z',
         // S2 supports model: `support` became the ONE multi-select set of supports (an old one-cue
         // code, "~FD", decodes to that one tick). Touch dots (two rungs) and the S4 panes.
-        touch: 'P', touchall: 'Q', boxsign: 'X', startarrow: 'S', steps: 'U',
-        'round-pv': 'O', 'round-mark': 'Z' }),
+        touch: 'Q', touchall: 'V', boxsign: 'X', startarrow: 'S', steps: 'U',
+        'round-pv': 'O', 'round-mark': 'Y' }),
     // S2 supports model (block 4): which problems carry the supports, and how clashing ones mix.
     cover: Object.freeze({ whole: 'W', needed: 'N', fade: 'F' }),
     mix: Object.freeze({ section: 'S', problem: 'P' }),
@@ -159,6 +210,24 @@ export const VALUE_TOKENS = Object.freeze({
     coins: Object.freeze({ p: 'P', n: 'N', d: 'D', q: 'Q' }),
     units: Object.freeze({ metric: 'M', customary: 'C', mixed: 'X' }),
     // Numeric sets whose members are not all under 36: one digit per power of ten.
+    // P9 step 8 (block 0)
+    form: Object.freeze({ value: 'V', unit: 'U', notation: 'N', sum: 'S' }),
+    frame: Object.freeze({ boxes: 'B', line: 'L' }),
+    responseScope: Object.freeze({ full: 'F', notation: 'N', decision: 'D', judge: 'J' }),
+    bins: Object.freeze({ adjacent: 'A', apart: 'P', three: 'T' }),
+    blank: Object.freeze({ column: 'C', row: 'R' }),
+    line: Object.freeze({ plotted: 'P', mark: 'M', ends: 'E' }),
+    closeness: Object.freeze({ far: 'F', close: 'C' }),
+    lengths: Object.freeze({ equal: 'E', mixed: 'M' }),
+    source: Object.freeze({ word: 'W', expanded: 'E', numeral: 'N' }),
+    rename: Object.freeze({ standard: 'S', more: 'M' }),
+    // block 2 (2026-09-25)
+    pattern: Object.freeze({ add: 'A', sub: 'S', double: 'D', times10: 'T', grow: 'G' }),
+    chart: Object.freeze({ window: 'W', whole: 'F' }),
+    ticks: Object.freeze({ step: 'S', one: 'O' }),
+    shape: Object.freeze({ box: 'B', circle: 'C', hex: 'H', mixed: 'M' }),
+    // block 3 (2026-09-25)
+    ops: Object.freeze({ '+': 'A', '-': 'S', x: 'M', '/': 'D' }),
     power: Object.freeze({ 10: '1', 100: '2', 1000: '3' }),
     places: Object.freeze({ 1: '0', 10: '1', 100: '2', 1000: '3', 10000: '4', 100000: '5' }),
 });
@@ -189,6 +258,10 @@ export const NUMERIC_SET_VALUES = Object.freeze({
 export const SCALAR_ONLY = Object.freeze({
     range: 'decimal', decimals: 'decimal', band: 'decimal', tiles: 'decimal', place: 'decimal',
     simplestForm: 'bool', pictures: 'bool',
+    // P9 step 8 (block 0)
+    count: 'decimal', span: 'decimal', repeatDigit: 'bool', zeroDigit: 'bool', midLabel: 'bool',
+    // block 2 (2026-09-25)
+    missing: 'decimal', rule: 'bool',
     members: 'def-tokens',   // two base-36 characters per member: its position (skill-options-pools.js)
     // reserved ids (block 4): their values are allocated when they are built. (Pinned history:
     // `cover` and `mix` were built by S2 and now carry VALUE_TOKENS; `touch` rides in `support`.)

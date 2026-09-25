@@ -897,7 +897,9 @@ function generateResolvedQuestion() {
         ];
         // Keep MC when options are non-numeric (operator symbols, text choices)
         const hasNonNumericOptions = q.options.some(o => typeof o === 'string' && isNaN(Number(o)));
-        if (!keepOptionsTypes.includes(q.answerType) && !hasNonNumericOptions) {
+        // `keepChoices`: a printed choice the pupil CIRCLES on paper (P9 "circle the closest
+        // estimate") stays a choice on screen, numeric or not (parity, RM-P-01).
+        if (!keepOptionsTypes.includes(q.answerType) && !hasNonNumericOptions && !q.keepChoices) {
             q.options = [];
             // Convert MC/choice types to text input
             if (q.answerType === 'multiple-choice' || q.answerType === 'choice' || q.answerType === 'symbol') {

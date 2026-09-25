@@ -56,7 +56,7 @@ outrank any general design advice or skill:
 
 ```bash
 node tests/scripts/ws-boot-smoke.cjs        # app boots, no console errors
-node tests/scripts/ws-code-snapshot.mjs     # share codes still decode — 591 codes / 35 categories today
+node tests/scripts/ws-code-snapshot.mjs     # share codes still decode — 594 codes / 35 categories today
 node tests/scripts/ws-catalogue.cjs         # regenerate design/SKILL_CATALOGUE.md
 node tests/scripts/ws-content-audit.cjs     # GATE: do + - x / skills match their own names?
 node tests/scripts/ws-stamp-assets.cjs      # BEFORE EVERY DEPLOY: cache-bust index.html (--check to verify)

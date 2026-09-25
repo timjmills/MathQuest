@@ -45,7 +45,7 @@
   </filter>
 </svg>
 
-<h1>Touch dots · S1 specimen (for owner approval)</h1>
+<h1>Touch dots · S1 specimen (approved 2026-09-25, with the owner's rulings applied)</h1>
 <p class="note">MathQuest's own counting dots, fitted to the default Andika digits with the open 4 (cv04) and nothing else (TY-4).
 1 to 5 carry single dots. 6 to 9 carry double dots: a solid dot inside an open ring, touched and counted twice, doubles first. 0 has none.
 The teacher's word is <b>Touch dots</b> (default) or <b>Count dots</b>. Positions are measured in the browser (<code>ws-touchdots-fit</code>)
@@ -59,14 +59,15 @@ and held on the strokes by the gate (<code>ws-touchdots</code>). Nothing here is
 Three sizes, each with and without a thin white keyline. The second line of each panel is the same digits through a simulated poor photocopy
 (toner spread about 0.12 mm, darkened): a double must still show its white gap and its centre dot.</p>
 <div class="variants" id="variants"></div>
-<p class="note" style="margin-top:12px">Doubles: a <b>knocked-out</b> ring filled white (proposed: the gap and the centre dot read cleanly, and still do after a copy) against an
-<b>open</b> ring drawn over the stroke (the numeral stays a little more whole, but after a copy the stroke fills the gap and a double reads as one blob). 28 pt, size M; second line = simulated photocopy.</p>
+<p class="note" style="margin-top:12px">Doubles. <b>Owner ruling: open rings</b>, drawn over the stroke so the numeral's stroke runs into the ring and a 7 or 9 stays whole.
+The centre dot has its own white keyline (at least 0.26 mm) and the gap keeps the photocopy floor, so after a copy the double is still a ring round a dot, not a blob
+(gate: <code>ws-touchdots</code> PHOTOCOPY). The knocked-out ring (filled white) is shown for comparison. 28 pt, size M; second line = simulated photocopy.</p>
 <div class="variants" id="rings" style="grid-template-columns:repeat(2,1fr)"></div>
 
 <h2>3 · In real fact cells (kit <code>fact()</code> and <code>stack()</code>, black and white)</h2>
 <p class="note">Cell sizes follow the kit's fact ladder: <b>L</b> = 5 columns, 28 pt; <b>M</b> = 6 columns, 24 pt; <b>S</b> = 10 columns, 16 pt.
-Touch dots need 24 pt or more on paper, so the <b>S</b> row falls back to the existing cue (dot tile for + and −, skip strip for × and ÷). Column stacks print at the
-preset's digit size (L 28 pt, M 22 pt), so a stack with touch dots needs L.</p>
+Touch dots need 24 pt or more on paper. <b>Owner ruling:</b> when touch dots are on and an item's digits would fall under 24 pt, that item <b>switches to size L</b>
+(never the dot tile). So at M the column stack (22 pt) prints at L's 28 pt, as shown; at S every touch-dot item prints at L.</p>
 <div id="facts"></div>
 
 <h2>4 · On screen: practice card at 1280 px and 390 px</h2>
@@ -85,7 +86,7 @@ Keyboard: Tab to a number, Space counts the next dot in order. Below, at 390 px:
 <script type="module">
 import {
   touchDotsSVG, touchTallySVG, TOUCH_DOT_SIZES, TOUCH_DOT_DEFAULT, touchDotsFits,
-  fact, stack, factCue,
+  fact, stack,
 } from '../../js/modules/sheet/index.js';
 
 const PX_PT = 0.75;
@@ -135,10 +136,10 @@ function dotSpan(span, o = {}) {
 // 2b · open vs knocked-out rings
 {
   const host = document.getElementById('rings');
-  for (const ring of ['knockout', 'open']) {
+  for (const ring of ['open', 'knockout']) {
     const v = document.createElement('div');
     v.className = 'variant';
-    v.innerHTML = `<h3>${ring === 'open' ? 'Open ring over the stroke' : 'Knocked-out ring, filled white (proposed)'}</h3>`
+    v.innerHTML = `<h3>${ring === 'open' ? 'Open ring over the stroke (owner ruling)' : 'Knocked-out ring, filled white (not used)'}</h3>`
       + `<div class="digits" style="font-size:28pt">${[...'6789'].map((c) => `<span>${c}</span>`).join('')}</div>`
       + `<div class="digits pc" style="font-size:28pt">${[...'6789'].map((c) => `<span>${c}</span>`).join('')}</div>`;
     host.appendChild(v);
@@ -157,22 +158,22 @@ function dotSpan(span, o = {}) {
     { a: 15, b: 3, op: '÷', dots: 'tally', cap: 'Count by 3 on the row: 3, 6, 9, 12, 15. Count the dots you touched.' },
     { a: 43, b: 25, op: '+', dots: 'stack', cap: 'Column by column: ones first, touch the dots on 5, then on 2.' },
   ];
-  const FALLBACK = { '+': 'tile', '−': 'tile', '×': 'skip', '÷': 'skip' };
-  for (const [size, pt] of [['L', 28], ['M', 24], ['S', 16]]) {
+  for (const [size, pt] of [['L', 28], ['M', 24]]) {
     const hdr = document.createElement('div');
     hdr.className = 'sizehdr';
-    hdr.textContent = `${size} · facts at ${pt} pt${touchDotsFits(pt) ? '' : ' — below 24 pt: no touch dots, the existing cue instead'}`;
+    hdr.textContent = size === 'L' ? 'L · facts at 28 pt' : 'M · facts at 24 pt; the column stack would print at 22 pt, so it switches to L (28 pt)';
     host.appendChild(hdr);
     const sheet = document.createElement('div');
     sheet.className = `ws-sheet ws-${size} ws-ican sheetbox facts`;
     const cells = ITEMS.map((it) => {
       if (it.dots === 'stack') {
-        return `<div class="ws-cell stackcell">${stack(it.a, it.b, it.op, { answer: 'open' })}</div>`;
+        // owner ruling: touch dots force L for an item whose digits would fall under 24 pt
+        const force = size !== 'L';
+        return `<div class="ws-cell stackcell${force ? ' ws-L' : ''}">${stack(it.a, it.b, it.op, { answer: 'open' })}</div>`;
       }
       const f = fact(it.a, it.b, it.op, { pt });
       let extra = '';
-      if (!touchDotsFits(pt)) extra = `<div class="ws-factcue" style="margin-top:3mm">${factCue({ cue: FALLBACK[it.op], a: it.a, b: it.b, op: it.op })}</div>`;
-      else if (it.dots === 'tally') extra = `<div class="tallyhost" style="font-size:${pt}pt;margin-top:3mm">${touchTallySVG(10, { em: pt, unit: 'pt' })}</div>`;
+      if (it.dots === 'tally') extra = `<div class="tallyhost" style="font-size:${pt}pt;margin-top:3mm">${touchTallySVG(10, { em: pt, unit: 'pt' })}</div>`;
       return `<div class="ws-cell ${f.cls}" style="${f.style}">${f.html}${extra}</div>`;
     });
     sheet.innerHTML = `<div class="ws-grid">${cells.join('')}</div>`;
@@ -190,7 +191,7 @@ function dotSpan(span, o = {}) {
         const t = Number(getComputedStyle(st).getPropertyValue('--t')) || 3;
         const spans = [...st.children].filter((c) => c.tagName === 'SPAN' && !c.classList.contains('gap') && !c.classList.contains('rule'));
         const bottom = spans.slice(t, 2 * t); // the operator row
-        if (size === 'L') bottom.forEach((s) => { if (!s.classList.contains('op')) dotSpan(s); });
+        bottom.forEach((s) => { if (!s.classList.contains('op')) dotSpan(s); });
         return;
       }
       const f = cell.querySelector('.ws-fact');

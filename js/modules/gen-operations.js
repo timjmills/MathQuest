@@ -5,6 +5,8 @@ import { DEFAULT_TABLES, getSkillGrade, maxOperandForGrade, multCapsForGrade, di
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
 import { COLORS, STROKE, FONTS, MONO, softFill, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
+import { genCountByTables, genMultChart, genHopLine } from './gen-mult-patterns.js';
+const _MP_SKILLS = new Set(['count_by_tables', 'mult_chart', 'mult_chart_easy', 'mult_chart_medium', 'mult_chart_hard', 'nl_mult', 'nl_div']);
 import { stripSegStyle, stripPos } from './sheet/tokens.js';
 import { renderCell as _kitRender, fadeRung } from './sheet/index.js';
 
@@ -2332,6 +2334,15 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
     const _selBand = (selected === 'add' || selected === 'subtract') ? Number(_opt('band')) : 0;
     const _genHelpers = _selBand ? { ...helpers, range: Math.min(Number(helpers.range) || _selBand, _selBand) } : helpers;
     let result;
+    // Count by 1-12, the multiplication chart and the x / ÷ number lines (gen-mult-patterns.js,
+    // owner requests of 2026-09-25): one generator reads every option those skills declare.
+    if (_MP_SKILLS.has(mappedSkill)) {
+        if (mappedSkill === 'count_by_tables') genCountByTables(q);
+        else if (mappedSkill === 'nl_mult' || mappedSkill === 'nl_div') genHopLine(q, mappedSkill);
+        else genMultChart(q, mappedSkill);
+        if (q && typeof q.text === 'string') q.text = agreeWithOne(q.text);
+        return q;
+    }
     if (_generateSizedMultDiv(q, selected, helpers)) result = q;
     else {
         for (let t = 0; t < 60; t++) {
@@ -2512,102 +2523,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 return q;
             }
 
-            if (mappedSkill === 'nl_mult') {
-                // P11: "Numbers to" bounds the product (the default, 100, is today's cap).
-                const maxProd = Math.min(range, Number(_opt('band')) || 100);
-                const maxHops = Math.min(6, Math.max(2, Math.floor(Math.sqrt(maxProd))));
-                const numHops = rng(2, maxHops);
-                const maxHopSize = Math.max(2, Math.min(12, Math.floor(maxProd / numHops)));
-                const hopSize = rng(2, maxHopSize);
-                const product = numHops * hopSize;
-                const nlMin = 0;
-                const nlMax = Math.ceil((product + 2) / 5) * 5 || 10;
-                const hopsArr = [];
-                for (let i = 0; i < numHops; i++) {
-                    hopsArr.push({ from: i * hopSize, to: (i + 1) * hopSize, label: `+${hopSize}` });
-                }
-                // LRU rotation across 3 sub-types (was Math.random() chain).
-                const roll = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('nl_mult', ["find_product","count_hops","find_hop_size"], [3,1,1])
-                    : (Math.random() < 0.5 ? 'find_product' : (Math.random() < 0.5 ? 'count_hops' : 'find_hop_size'));
-                q._variant = roll;
-                if (roll === 'find_product') {
-                    // Find the product
-                    q.text = `${numHops} × ${hopSize} = ?`;
-                    q.ans = product;
-                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: hopsArr, showAnswer: false, highlightEnd: product });
-                    q.hint = `Count ${numHops} hops of ${hopSize} on the number line.`;
-                } else if (roll === 'count_hops') {
-                    // Count the hops
-                    q.text = `How many hops of ${hopSize} to reach ${product}?`;
-                    q.ans = numHops;
-                    const dashedHops = hopsArr.map(h => ({ ...h, label: `+${hopSize}`, dashed: false }));
-                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: dashedHops, showAnswer: true, highlightEnd: product });
-                    q.hint = `Each hop is +${hopSize}. Count how many it takes to reach ${product}.`;
-                } else {
-                    // Find the hop size
-                    q.text = `${numHops} hops to reach ${product}. How big is each hop?`;
-                    q.ans = hopSize;
-                    const unknownHops = hopsArr.map(h => ({ ...h, label: '?', dashed: true }));
-                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: unknownHops, showAnswer: true, highlightEnd: product });
-                    q.hint = `${product} ÷ ${numHops} = ? Each hop is the same size.`;
-                }
-                q.answerType = 'number';
-                q.printFormat = 'nl-mult';
-                q.skillLabel = 'Multiplication Number Line';
-                q.a = numHops; q.b = hopSize; q.op = '×';
-                if (roll === 'count_hops') q.missing = 'a';
-                else if (roll === 'find_hop_size') q.missing = 'b';
-                return q;
-            }
-
-            if (mappedSkill === 'nl_div') {
-                // P11: "Numbers to" bounds the number shared (the default, 100, is today's cap).
-                const maxDiv = Math.min(range, Number(_opt('band')) || 100);
-                const maxDivisor = Math.max(2, Math.min(10, Math.floor(Math.sqrt(maxDiv))));
-                const divisor = rng(2, maxDivisor);
-                const maxQuotient = Math.max(2, Math.min(12, Math.floor(maxDiv / divisor)));
-                const quotient = rng(2, maxQuotient);
-                const dividend = quotient * divisor;
-                const nlMin = 0;
-                const nlMax = Math.ceil((dividend + 2) / 5) * 5 || 10;
-                const hopsArr = [];
-                for (let i = 0; i < quotient; i++) {
-                    hopsArr.push({ from: i * divisor, to: (i + 1) * divisor, label: `+${divisor}` });
-                }
-                // LRU rotation across 3 sub-types (was Math.random() chain).
-                const roll = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('nl_div', ["find_quotient","find_divisor","find_dividend"], [3,1,1])
-                    : (Math.random() < 0.5 ? 'find_quotient' : (Math.random() < 0.5 ? 'find_divisor' : 'find_dividend'));
-                q._variant = roll;
-                if (roll === 'find_quotient') {
-                    // Find the quotient
-                    q.text = `${dividend} ÷ ${divisor} = ?`;
-                    q.ans = quotient;
-                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: hopsArr, showAnswer: true, highlightEnd: dividend });
-                    q.hint = `Count how many hops of ${divisor} it takes to reach ${dividend}.`;
-                } else if (roll === 'find_divisor') {
-                    // Find the divisor
-                    q.text = `${dividend} ÷ ? = ${quotient}`;
-                    q.ans = divisor;
-                    const unknownHops = hopsArr.map(h => ({ ...h, label: '?', dashed: true }));
-                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: unknownHops, showAnswer: true, highlightEnd: dividend });
-                    q.hint = `There are ${quotient} equal hops to reach ${dividend}. How big is each hop?`;
-                } else {
-                    // Find the dividend
-                    q.text = `? ÷ ${divisor} = ${quotient}`;
-                    q.ans = dividend;
-                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: hopsArr, showAnswer: false, highlightEnd: dividend });
-                    q.hint = `${quotient} hops of ${divisor} each. Where do you land?`;
-                }
-                q.answerType = 'number';
-                q.printFormat = 'nl-div';
-                q.skillLabel = 'Division Number Line';
-                q.a = dividend; q.b = divisor; q.op = '÷';
-                if (roll === 'find_divisor') q.missing = 'b';
-                else if (roll === 'find_dividend') q.missing = 'a';
-                return q;
-            }
+            // nl_mult / nl_div: see gen-mult-patterns.js genHopLine (dispatched at the top of
+            // generateOperationsQuestion, with count_by_tables and the multiplication chart).
 
             // ========================================
             // NUMBER LINE ADD / SUB (B&W print scaffold)
@@ -4293,172 +4210,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 return;
             }
 
-            // ========================================
-            // MULTIPLICATION CHART (Visual) — a window of the 12 x 12 chart with three blanks.
-            //
-            // P8b (critic, baseline 2026-09-24): the old item drew the WHOLE chart for 1-3 blanks,
-            // in rainbow fills and monospace at ~7 pt, so three-digit products wrapped ('10/8'),
-            // white digits vanished on yellow, and 20 items took ten pages. The instruction also
-            // listed the facts ("1×9, 5×1"), which made the chart decoration.
-            //
-            // Now: 4 rows x 5 columns of the chart with their factor headers, black and white,
-            // Andika, cells sized for three digits (--mq-mc: 13 mm on paper, 48 px on screen). The
-            // blanks are three EMPTY CELLS, never named: the pupil finds the row and the column
-            // (or counts on along the row) to fill them. Each blank is a boxed slot the key fills
-            // (print-sheet.js legacyKeyFill, AK-4) and a screen input (screen-cell.js
-            // wireCellSlots), answered in reading order (q.keyParts, q.ans).
-            // ========================================
-            if (mappedSkill === "mult_chart") {
-                const R = 4, C = 5;
-                // P11: "Tables to" 5 × 5 / 10 × 10 / 12 × 12 bounds the window's factors.
-                const _mcT = { 25: 5, 100: 10 }[Number(_opt('band'))] || 12;
-                const r0 = rng(1, Math.max(1, _mcT - R + 1));
-                const c0 = rng(1, Math.max(1, _mcT - C + 1));
-                const cells = [];
-                for (let i = 0; i < R; i++) for (let j = 0; j < C; j++) cells.push({ i, j });
-                // Three blanks, no two in the same row AND no row or column left without a
-                // printed product to count on from.
-                let picked = [];
-                for (let tries = 0; tries < 50; tries++) {
-                    picked = shuffle(cells.slice()).slice(0, 3);
-                    const rows = new Set(picked.map(x => x.i));
-                    if (rows.size === 3) break;
-                }
-                const ordered = picked.slice().sort((a, b) => a.i - b.i || a.j - b.j);
-                const products = ordered.map(x => (r0 + x.i) * (c0 + x.j));
-
-                q.text = 'Fill in the missing products.';
-                q.printText = 'Fill in the missing products.';
-                q.ans = products.join(', ');
-                q.keyParts = products.map(String);
-                q.acceptedAnswers = [products.join(','), products.join(', '), products.join(' ')];
-                q.answerType = "text";
-                q.selfAnswering = true;         // the empty cells are the slots (SL-7)
-                q.a = r0 + ordered[0].i; q.b = c0 + ordered[0].j; q.op = '×';
-                q.hint = `Find the row number and the column number of each empty box, and multiply. `
-                    + `Or count on along the row: each step adds the row number.`;
-                // The kit's `mult-chart` template: every column wide enough for three digits, so
-                // products never run together; the empty cells are the slots (data-mq-cell on
-                // screen, one input each, joined ", " as q.ans is).
-                const _mcPayload = { r0, c0, rows: R, cols: C, blanks: picked.map(x => ({ i: x.i, j: x.j })) };
-                q.cell = { template: 'mult-chart', v: 1, payload: _mcPayload };
-                q.visual = _kitTwin('mult-chart', _mcPayload);
-                q.printFormat = 'mult-chart';
-                q.skillLabel = 'Mult Chart';
-                return;
-            }
-
-            // ========================================
-            // MULTIPLICATION CHART — TIERED (easy/medium/hard)
-            // 12x12 chart with N missing cells the student fills in.
-            // Live validation: correct typed value locks GREEN; wrong flashes
-            // RED. Hover tooltip on each empty input shows the multiplication
-            // problem (e.g., "Find: 7 × 10"). Auto-submits when all locked.
-            // ========================================
-            if (mappedSkill === "mult_chart_easy" || mappedSkill === "mult_chart_medium" || mappedSkill === "mult_chart_hard") {
-                const missingCount = mappedSkill === "mult_chart_easy" ? 2
-                    : mappedSkill === "mult_chart_medium" ? 6 : 22;
-                const maxN = 12;
-
-                // Pick `missingCount` unique cells. Avoid the row=1 / col=1
-                // edges only at easy tier so the puzzle isn't trivial; medium
-                // and hard tiers may pull from anywhere on the grid.
-                const allCells = [];
-                for (let r = 1; r <= maxN; r++) {
-                    for (let c = 1; c <= maxN; c++) {
-                        allCells.push({ r, c, product: r * c });
-                    }
-                }
-                const pool = mappedSkill === "mult_chart_easy"
-                    ? allCells.filter(cell => cell.r >= 2 && cell.c >= 2)
-                    : allCells;
-                const picked = shuffle(pool.slice()).slice(0, missingCount);
-                const missingSet = new Set(picked.map(c => `${c.r},${c.c}`));
-
-                // Build the 12x12 chart HTML.
-                const cellSize = '38px';
-                let table = `<table class="mc-grid"><tr><th class="mc-corner">×</th>`;
-                for (let c = 1; c <= maxN; c++) table += `<th>${c}</th>`;
-                table += `</tr>`;
-
-                for (let r = 1; r <= maxN; r++) {
-                    table += `<tr><th>${r}</th>`;
-                    for (let c = 1; c <= maxN; c++) {
-                        const product = r * c;
-                        if (missingSet.has(`${r},${c}`)) {
-                            table += `<td class="mc-cell-input"><input type="text" inputmode="numeric" maxlength="3" autocomplete="off" class="mc-input" data-row="${r}" data-col="${c}" data-answer="${product}" title="Find: ${r} × ${c}" aria-label="${r} times ${c}"></td>`;
-                        } else {
-                            table += `<td class="mc-cell-fill">${product}</td>`;
-                        }
-                    }
-                    table += `</tr>`;
-                }
-                table += `</table>`;
-
-                // Sort the missing cells (top→bottom, left→right) so the
-                // ans/hint listing is predictable.
-                const sortedMissing = picked.slice().sort((a, b) =>
-                    a.r === b.r ? a.c - b.c : a.r - b.r);
-
-                q.text = `Fill in the missing products in the multiplication chart. Hover any empty cell for a hint.`;
-                // Paper version omits the screen-only hover hint.
-                q.printText = `Fill in the missing products in the multiplication chart.`;
-                q.ans = sortedMissing.map(m => m.product).join(',');
-                q.answerType = "mult-chart-cells";
-                q.hint = sortedMissing.slice(0, 6).map(m => `${m.r} × ${m.c} = ${m.product}`).join('; ')
-                    + (sortedMissing.length > 6 ? `; …and ${sortedMissing.length - 6} more` : '');
-                q.multChartData = {
-                    missingCells: sortedMissing,
-                    missingCount,
-                };
-
-                const tierLabel = mappedSkill === "mult_chart_easy" ? "Easy"
-                    : mappedSkill === "mult_chart_medium" ? "Medium" : "Hard";
-                q.visual = `<div class="mc-wrap" style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:#1565c0;font-size:1rem;">Multiplication Chart — ${tierLabel} (${missingCount} missing)</div>
-                    <div class="mc-scroll" style="overflow-x:auto;padding:4px;">${table}</div>
-                    <div style="margin-top:6px;font-size:0.85rem;color:#555;">Type each missing product. Correct answers lock in green.</div>
-                </div>`;
-
-                q.printFormat = 'mult-chart-tier';
-                q.skillLabel = `Mult Chart - ${tierLabel}`;
-
-                // Worksheet mode can't host the live mult-chart-cells widget
-                // per-card (per-cell input listeners are wired only by
-                // question-render in MAP/practice mode). Fall back to a
-                // text-answer prompt: list the missing products in
-                // top→bottom / left→right order, comma-separated. The chart
-                // still renders, but the <input> cells are replaced by
-                // numbered blanks so students can match each blank to its
-                // position in the answer list.
-                if (state.gameMode === 'worksheet') {
-                    const productsList = sortedMissing.map(m => m.product);
-                    q.answerType = "text";
-                    q.ans = productsList.join(', ');
-                    q.text = `Find the ${missingCount} missing product${missingCount === 1 ? '' : 's'} in the multiplication chart. Type your answers in order (left→right, top→bottom), separated by commas.`;
-                    // Variants: with/without spaces, comma vs semicolon.
-                    // (normalizeText strips spaces, so spacing is handled.)
-                    q.acceptedAnswers = [
-                        productsList.join(','),
-                        productsList.join(', '),
-                        productsList.join(';'),
-                        productsList.join('; ')
-                    ];
-                    q.hint = sortedMissing.slice(0, 8).map((m, i) => `(${i + 1}) ${m.r}×${m.c} = ${m.product}`).join('; ')
-                        + (sortedMissing.length > 8 ? `; …and ${sortedMissing.length - 8} more` : '');
-                    // Replace each <input class="mc-input"> with a numbered blank
-                    // so students can identify which blank corresponds to which
-                    // position in their comma-separated answer list.
-                    if (typeof q.visual === 'string' && q.visual.indexOf('mc-input') !== -1) {
-                        let blankIdx = 0;
-                        q.visual = q.visual.replace(/<input\b[^>]*class="mc-input"[^>]*>/g, () => {
-                            blankIdx++;
-                            return `<span style="display:inline-block;min-width:32px;padding:2px 4px;border:2px dashed #999;border-radius:4px;background:#fff;font-size:0.75rem;color:#777;">(${blankIdx})</span>`;
-                        });
-                    }
-                }
-                return;
-            }
+            // MULTIPLICATION CHART (mult_chart, mult_chart_easy and the retired _medium / _hard ids):
+            // see gen-mult-patterns.js genMultChart, dispatched at the top of generateOperationsQuestion.
 
             // ========================================
             // DIVISION WITH REMAINDERS
