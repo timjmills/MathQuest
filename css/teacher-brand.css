@@ -1,0 +1,163 @@
+/* ==========================================================================
+   teacher-brand.css — the teacher view in the Math Quest Pro brand (2026-09-25)
+
+   The owner's choice from the cohesion study (design/cohesion-preview/): the
+   teacher side stays calm and professional, but speaks the student side's
+   brand. css/brand.css holds the shared tokens and css/teacher.css already
+   points its --tv-* colours at them; this sheet adds the brand MOMENTS:
+
+     1. the logo and wordmark      — the pupil nav's purple "M" tile and purple
+                                     Nunito 900 name
+     2. display type               — Nunito for headings, the sidebar, buttons
+                                     and links; body copy, tables and inputs
+                                     stay Manrope for calm reading
+     3. primary buttons            — brand purple with a soft 2px lip (the pupil
+                                     button has a 4px lip; no uppercase here)
+     4. switches                   — the purple track of the pupil Pop-ups /
+                                     Voice / Sound toggles
+     5. cards and panels           — the pupil card grammar, softened: 16px
+                                     corners, lavender outline, a 2px lip
+     6. selection                  — brand purple outline + tint (the pupil
+                                     .quick-skill-card.selected) instead of black
+     7. one pastel touch           — the three Home job icons take the pupil
+                                     operation pastels
+
+   ADDITIVE: loaded after every teacher sheet (teacher.css, teacher-library.css,
+   play-teacher.css, teacher-quiz.css). Every rule overrides an earlier one by
+   order or by an equal-or-higher selector; no earlier rule is edited. Every
+   selector is a teacher-only class (.tv-*, .tvl-*, .tvp-*, .tvq*, .tvm-*) or is
+   scoped to body.teacher-mode, so the pupil side and saved quiz HTML are never
+   reached, and nothing here touches the black-and-white question cell
+   (.mq-mono, .ws-*, .mq-cell, css/screen-cell.css, .tvp-stage samples).
+
+   Contrast (WCAG AA), light / dark:
+     primary button   #fff on #7C5CE6 4.64 · #1A1828 on #B5A5F4 8.01
+     accent text      #5E3FCC on #fff 6.87, on #F4EFFF 6.09 · #B5A5F4 on #232033 7.28, on #3A3258 5.43
+     wordmark         #7C5CE6 on #fff 4.64 (17px/900) · #B5A5F4 on #232033 7.28
+     badge            #5E3FCC on #F4EFFF 6.09 · #B5A5F4 on #3A3258 5.43
+     pressed chip     #fff on #5E3FCC 6.87 · #1A1828 on #B5A5F4 8.01
+     job icon tiles   #B4541A on #FFEBDC 4.30, #1F7A5C on #DDF6EC 4.62 (icons need 3:1)
+   ========================================================================== */
+
+body.teacher-mode {
+    --tv-display: var(--brand-font-display);
+    --tv-r-control: var(--brand-r-sm);
+    --tv-r-card: var(--brand-r-card);
+    --tv-primary: var(--brand-purple);
+    --tv-primary-edge: var(--brand-purple-d);
+    --tv-primary-hover: var(--brand-purple-d);
+    --tv-card-lip: 0 2px 0 0 var(--tv-rule);
+}
+html.dark body.teacher-mode {
+    --tv-primary: var(--brand-purple-l);
+    --tv-primary-edge: var(--brand-purple-edge);
+    --tv-primary-hover: var(--brand-purple-ll);
+    --tv-card-lip: 0 2px 0 0 rgba(0, 0, 0, .35);
+}
+
+/* ---------------------------------------------------------------- 1. logo + wordmark */
+
+.tv-brand-tile {
+    background: var(--brand-purple); color: #fff;
+    border: 2px solid var(--brand-purple-d); border-radius: 12px;
+    box-shadow: 0 2px 0 0 var(--brand-purple-d);
+    font-family: var(--tv-display); font-weight: 900;
+}
+.tv-brand-name {
+    font-family: var(--tv-display); font-weight: 900; font-size: 17px; line-height: 22px;
+    letter-spacing: -0.01em; color: var(--brand-purple);
+}
+html.dark body.teacher-mode .tv-brand-name { color: var(--brand-purple-l); }
+.tv-badge { background: var(--tv-accent-tint); border-color: transparent; color: var(--tv-accent); border-radius: 999px; padding: 0 8px; }
+
+/* ---------------------------------------------------------------- 2. display type */
+
+.tv-h1, .tv-h2, .tv-h2-sm, .tv-h3, .tv-job-title, .tv-radio-title { font-family: var(--tv-display); font-weight: 800; }
+.tv-card-head { font-family: var(--tv-display); }
+.tv-h1 { letter-spacing: -0.015em; }
+
+.tv-nav-link { border-radius: var(--tv-r-control); font-family: var(--tv-display); font-weight: 700; font-size: 15px; }
+.tv-nav-link[aria-current="page"] { font-weight: 800; }
+.tv-nav-heading { font-family: var(--tv-display); font-weight: 800; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+
+/* ---------------------------------------------------------------- 3. buttons */
+
+.tv-btn { border-radius: var(--tv-r-control); font-family: var(--tv-display); font-weight: 700; font-size: 15px; }
+.tv-btn-primary {
+    background: var(--tv-primary); border-color: var(--tv-primary-edge);
+    box-shadow: 0 2px 0 0 var(--tv-primary-edge); font-weight: 800;
+}
+.tv-btn-primary:hover { background: var(--tv-primary-hover); border-color: var(--tv-primary-edge); }
+.tv-btn-primary:active { transform: translateY(2px); box-shadow: none; }
+.tv-btn-primary[disabled], .tv-btn-primary[aria-disabled="true"] { box-shadow: none; transform: none; }
+/* Dark: the dark-text rule of teacher.css (html.dark body.teacher-mode .tv-btn-primary
+   { color: var(--tv-on-selected) }) still applies; only the fill changes. */
+html.dark body.teacher-mode .tv-btn-primary { background: var(--tv-primary); border-color: var(--tv-primary-edge); box-shadow: 0 2px 0 0 var(--brand-purple); }
+html.dark body.teacher-mode .tv-btn-primary:hover { background: var(--tv-primary-hover); }
+.tv-btn-ghost, .tv-link { font-family: var(--tv-display); font-weight: 800; }
+.tv-icon-btn { border-radius: var(--tv-r-control); }
+
+@media (prefers-reduced-motion: reduce) { .tv-btn-primary:active { transform: none; } }
+
+/* ---------------------------------------------------------------- 4. switches
+   The visible track is ::before (teacher.css, the 52x44 hit-box switch); the element
+   itself stays clear. */
+
+.tv-switch[aria-checked="true"]::before,
+.tvq-switch-btn[aria-checked="true"] .tv-switch::before { background: var(--brand-purple); border-color: var(--brand-purple); }
+.tv-switch[aria-checked="true"]::after,
+.tvq-switch-btn[aria-checked="true"] .tv-switch::after { background: #fff; }
+html.dark body.teacher-mode .tv-switch[aria-checked="true"]::before,
+html.dark body.teacher-mode .tvq-switch-btn[aria-checked="true"] .tv-switch::before { background: var(--brand-purple-l); border-color: var(--brand-purple-l); }
+html.dark body.teacher-mode .tv-switch[aria-checked="true"]::after,
+html.dark body.teacher-mode .tvq-switch-btn[aria-checked="true"] .tv-switch::after { background: var(--brand-night); }
+
+/* ---------------------------------------------------------------- 5. cards and panels */
+
+.tv-card, .tv-job { border-radius: var(--tv-r-card); box-shadow: var(--tv-card-lip); }
+.tv-card .tv-card, .tv-card .tv-empty-lg { box-shadow: none; }
+.tv-section, .tv-set-item, .tv-result, .tv-empty, .tv-radio-card, .tv-mode, .tv-opt-panel { border-radius: 12px; }
+.tv-input, .tv-select, .tv-chip, .tv-menu { border-radius: var(--tv-r-control); }
+.tv-seg { border-radius: 12px; }
+.tv-seg > button { border-radius: 9px; }
+
+/* Home job cards lift like the pupil Quick Start cards. */
+.tv-job { transition: transform 80ms ease, box-shadow 80ms ease, border-color 80ms ease; }
+.tv-job:hover { border-color: var(--brand-purple-l); box-shadow: 0 3px 0 0 var(--brand-purple-l); transform: translateY(-1px); }
+@media (prefers-reduced-motion: reduce) { .tv-job { transition: none; } .tv-job:hover { transform: none; } }
+.tv-job-icon, .tv-empty-icon, .tv-mode-icon, .tv-notice-icon { border-radius: 12px; }
+.tv-empty-icon { background: var(--tv-accent-tint); color: var(--tv-accent); }
+
+/* ---------------------------------------------------------------- 7. the pastel touch */
+
+.tv-job[data-home-go="sets"] .tv-job-icon { background: var(--brand-purple-soft); color: var(--brand-purple-d); }
+.tv-job[data-home-go="print"] .tv-job-icon { background: var(--brand-peach-tile); color: var(--brand-peach-ink); }
+.tv-job[data-home-go="run"] .tv-job-icon { background: var(--brand-mint-tile); color: var(--brand-mint-ink); }
+html.dark body.teacher-mode .tv-job[data-home-go="sets"] .tv-job-icon { background: var(--brand-purple-soft-dark); color: var(--brand-purple-l); }
+html.dark body.teacher-mode .tv-job[data-home-go="print"] .tv-job-icon { background: var(--brand-peach-tile-dark); color: var(--brand-peach-ink-dark); }
+html.dark body.teacher-mode .tv-job[data-home-go="run"] .tv-job-icon { background: var(--brand-mint-tile-dark); color: var(--brand-mint-ink-dark); }
+
+/* ---------------------------------------------------------------- 6. selection in brand purple */
+
+.tv-seg > button[aria-checked="true"] { border-color: var(--tv-accent); color: var(--tv-accent); }
+.tv-chip[aria-pressed="true"],
+.tvm-band[aria-pressed="true"] { background: var(--tv-accent); border-color: var(--tv-accent); color: #fff; }
+html.dark body.teacher-mode .tv-chip[aria-pressed="true"],
+html.dark body.teacher-mode .tvm-band[aria-pressed="true"] { color: var(--tv-on-selected); }
+#quizBuilderView.tvq .qb-domain-pill[aria-pressed="true"], #quizBuilderView.tvq .qb-grade-pill[aria-pressed="true"] {
+    border-color: var(--tv-accent) !important; background: var(--tv-accent) !important; color: #fff !important;
+}
+html.dark body.teacher-mode #quizBuilderView.tvq .qb-domain-pill[aria-pressed="true"],
+html.dark body.teacher-mode #quizBuilderView.tvq .qb-grade-pill[aria-pressed="true"] { color: var(--tv-on-selected) !important; }
+.tv-radio-card[aria-checked="true"], .tv-mode[aria-checked="true"] { border-color: var(--tv-accent); background: var(--tv-accent-tint); }
+.tv-radio-card[aria-checked="true"] .tv-radio-dot { border-color: var(--tv-accent); }
+.tv-radio-card[aria-checked="true"] .tv-radio-dot::after { background: var(--tv-accent); }
+.tv-skill-row.is-added .tv-add,
+.tvp-card.is-added .tv-add { background: var(--tv-accent); border-color: var(--tv-accent); color: #fff; }
+html.dark body.teacher-mode .tv-skill-row.is-added .tv-add,
+html.dark body.teacher-mode .tvp-card.is-added .tv-add { color: var(--tv-on-selected); }
+.tv-check[aria-checked="true"] .tv-check-box { background: var(--tv-accent); border-color: var(--tv-accent); color: #fff; }
+html.dark body.teacher-mode .tv-check[aria-checked="true"] .tv-check-box { color: var(--tv-on-selected); }
+.tv-ptype[aria-checked="true"], .tv-ptype.is-static, .tv-ptype.is-static:hover,
+.tvp-card.is-added { border-color: var(--tv-accent); box-shadow: 0 0 0 1px var(--tv-accent); }
+.tvl-thumb[aria-current="true"] { border-color: var(--tv-accent); }

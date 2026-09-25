@@ -11,12 +11,14 @@
 
 /* The quiz views are teacher screens. If one is ever opened outside teacher
    mode, give it the light teacher tokens so it still reads. */
+/* Same values as the light block of body.teacher-mode in css/teacher.css, which
+   points at the shared brand layer css/brand.css; keep the two in step. */
 body:not(.teacher-mode) .tvq {
-    --tv-page: #f6f6f4; --tv-surface: #ffffff; --tv-subtle: #f1f1ee; --tv-subtle-2: #fafaf9;
-    --tv-border: #e4e3de; --tv-rule: #eeede9; --tv-rule-soft: #f1f1ee; --tv-control: #85878c;
-    --tv-control-soft: #c9c9c4; --tv-text: #1c1d1f; --tv-text-2: #3f4247; --tv-caption: #5b5f66;
-    --tv-accent: #3b4bc8; --tv-accent-hover: #2c3aa6; --tv-accent-tint: #eef0fb;
-    --tv-selected: #1f2023; --tv-on-selected: #ffffff; --tv-danger: #b42318;
+    --tv-page: #f3f6f7; --tv-surface: #ffffff; --tv-subtle: #f1eff8; --tv-subtle-2: #faf9fd;
+    --tv-border: var(--brand-rule); --tv-rule: #edeaf5; --tv-rule-soft: #f3f1f9; --tv-control: var(--brand-muted);
+    --tv-control-soft: var(--brand-rule-2); --tv-text: var(--brand-ink); --tv-text-2: var(--brand-ink-2); --tv-caption: var(--brand-caption);
+    --tv-accent: var(--brand-purple-d); --tv-accent-hover: var(--brand-purple-dd); --tv-accent-tint: var(--brand-purple-soft);
+    --tv-selected: var(--brand-ink); --tv-on-selected: #ffffff; --tv-danger: #b42318;
     --tv-font: Manrope, system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
