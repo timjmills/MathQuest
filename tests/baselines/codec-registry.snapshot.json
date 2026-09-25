@@ -240,7 +240,14 @@
       "array": "A",
       "think": "H",
       "bar": "M",
-      "label": "E"
+      "label": "E",
+      "touch": "P",
+      "touchall": "Q",
+      "boxsign": "X",
+      "startarrow": "S",
+      "steps": "U",
+      "round-pv": "O",
+      "round-mark": "Z"
     },
     "tiles": {},
     "objects": {
@@ -250,8 +257,15 @@
       "dice": "D"
     },
     "touch": {},
-    "cover": {},
-    "mix": {},
+    "cover": {
+      "whole": "W",
+      "needed": "N",
+      "fade": "F"
+    },
+    "mix": {
+      "section": "S",
+      "problem": "P"
+    },
     "anchors": {},
     "members": {},
     "forms": {

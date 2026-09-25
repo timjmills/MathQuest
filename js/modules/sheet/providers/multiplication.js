@@ -13,6 +13,8 @@ import { storiesFor } from './stories.js';
 /* =========================================================================== mult_facts */
 
 registerSkill('multiplication:mult_facts', {
+    // S2: the supports this skill can draw (touch dots, cues, panes); the Support control offers these.
+    supports: Object.freeze(['touch', 'skip', 'array', 'boxsign']),
     strings: strings({
         iCan: 'I Can multiply facts to 12',
         instructionKey: 'multiply',

@@ -1,6 +1,7 @@
 # SUPPORTS — the supports program (DRAFT)
 
-Status: **draft for owner approval.** Nothing here is wired into a skill or an option yet.
+Status: **S1 draft for owner approval.** S2 (the supports model, below) wires supports into skills and
+options; the touch-dot glyphs themselves are unchanged from this specimen.
 `WORKSHEET_DESIGN_STANDARD.md` is not amended until the owner approves the S1 specimen; the
 amendments it will need are listed in §S1.12.
 
@@ -205,6 +206,111 @@ to host it (S3 wires it).
   SF-31/SF-32 (the fading ladder replaces "smaller number only"), SF-33/SF-34 (touch dots allowed
   for × and ÷: count-by dots and the tally row).
 - PEDAGOGY_STANDARD §4.2 / §6.3 / P-FL-17; PAGE_TYPES PT-FPR-5 / PT-FPR-10 / PT-DLG-17.
+
+
+## S2 · The supports model (one engine for every support)
+
+**Status:** built (allocator, drawing, option controls, print and screen wiring, gates). The touch-dot
+glyphs are S1's; the panes are S4's; this section is how a teacher's choice becomes a support on a
+problem.
+
+### S2.1 Owner rulings recorded here (2026-09-25) — they supersede the standards
+
+| Ruling | Supersedes |
+|---|---|
+| **Supports may be on every cell**, not the first cell only. Coverage is the teacher's: every problem, the problems that need it, or faded down the page. | P-7 ("hint scaffolds … appear in the first cell only"), SF-12 (first-cell cues), PT-IND-2 ("cells show structural supports only") — when the teacher ticks a support. With nothing ticked (the default) those rules stand unchanged. |
+| **Touch dots for × and ÷**: × dots on the factor that is not the table number (count by the table number); ÷ a tally-dot row of the section's one length (10, or 12 on a ×12 set), touched while counting by the divisor. | SF-33 / PT-FPR-10 / P-FL-17 ("never for × and ÷"), SF-32 (smaller number only: + now has count all → count on → none, − count all → count back → none). |
+| **A support level fades DOWN THE PAGE**, never cycles: {3, 2, 1} on six cells is 3, 3, 2, 2, 1, 1. | The `supportLevelFor` / `_kLevel` round-robin by item index (gen-operations.js, gen-counting.js). |
+| **Clashing supports** are shared by section (default) or problem by problem; compatible supports stack. | — |
+| **Touch-dot digits under 24 pt force size L** for that section (a stack or sentence drawn at L inside an M / S page; a fact takes the ladder, capped at 6 columns = 24 pt). | S1.11 open question 3 (answered: force L). |
+
+The standards' own text is not rewritten in this change; these rows are the record, and the S1.12
+amendment list carries them when the owner signs S1 off.
+
+### S2.2 What a teacher ticks
+
+`support` is **the one Support control** (skill-options.js `supportsOptions`): a SET of the supports the
+skill can draw. It replaced the P11 one-cue enum on the fact skills (`~FD`, dot tiles, still decodes to
+the one tick) and became a set on the rounding skills (their cut line / number line rungs stay
+generation-time values of the same set). Values:
+
+| Id | What | Token |
+|---|---|---|
+| `touch` | touch dots, the lighter rung: count on (+), count back (−), count by (×), the tally row (÷) | P |
+| `touchall` | touch dots on every number (count all) | Q |
+| `tile` `frame` `line` `skip` `array` `think` | the P11 fact cues (fact.js `factCue`), now drawn at render time | D R L K A H |
+| `boxsign` `startarrow` `steps` | S4 extras | X S U |
+| `round-pv` `round-mark` | S4 rounding panes | O Z |
+
+Two more controls appear **only once a render-time support is ticked** (`appliesTo`), so a panel stays at
+≤ 5 controls at rest: `cover` (4B: whole / needed / fade; W N F) and, when two ticked supports can clash,
+`mix` (4C: section / problem; S P). The print request carries sheet-level `coverage` and `mix` that
+override every skill's own. Default: nothing ticked, so every existing page and link is unchanged.
+
+**Declarations.** Each skill's provider declares `supports` (the list it can draw); a skill without a
+provider takes its family default (`providers/util.js FAMILY_SUPPORTS`). `ws-supports-unit` checks every
+Support control against that declaration, and every value against the codec's union table.
+
+### S2.3 The allocator (`js/modules/sheet/supports.js`, pure)
+
+`allocateSupports(items, chosen, {coverage, mix, compat})` → per item `{on, reserve, level, forceL}`.
+
+- **Alternatives.** `alternativesOf(chosen)` splits the ticks into sets that stack: supports that clash
+  with nothing ride on every alternative; clashing ones are coloured into as few groups as possible
+  ([touch, tile, boxsign] → [touch, boxsign] | [tile, boxsign]).
+- **Compatibility** `supportCompat(x, y)` is the §S4.7 matrix, with touch dots as `touchdots`, a cue as
+  the pane it draws like (tile → dice, frame → tenframe, line / skip → numberline, array, think → bar),
+  and the two touch rungs clashing with each other. Symmetric (unit-tested over every id).
+- **Mix.** `problem`: item j of a skill takes alternative j mod k. `section`: with two or more sections on
+  the page, section s takes alternative s mod k (section A touch dots, section B dot tiles, whichever
+  skill each holds; the host names the order with `mixKey`); a page of one section is dealt in equal
+  blocks. Balanced (±1) and deterministic. An item that cannot draw its alternative takes the next.
+- **Coverage.** `whole`: every item. `needed`: only items whose numbers qualify (support-draw.js
+  `needs`: a counted number of 3 or more, a column that regroups, a count of 6 or more …). `fade`: by the
+  skill's page position, first third everything, middle third the light part (count all → count on, the
+  rounding chart → the marks on the numeral, marks and structure kept, pictures gone), last third none.
+  A fade never increases down the page.
+- **Worst-case reservation.** `reserve` = everything the section's cells *could* carry that this cell does
+  not draw. It is drawn invisibly, so every cell of a section has one geometry and the answer zone never
+  moves. Supports that clash share ONE row, laid over each other (a cell keeps room for the tallest, not
+  the sum).
+- **forceL** for a touch-dot section whose digits would print under 24 pt.
+
+`fadeRung(at, k, total)` is the level fade the generators use (equal blocks with the page's count, else
+two items a rung; live play still cycles).
+
+### S2.4 Drawing (`js/modules/sheet/support-draw.js`)
+
+- The supports ride in the **render payload** (`payload.supports = {on, reserve, table?, tally?}`), like
+  Error analysis's `fix: 'draw'`, so the pupil page, the key and the measurement agree.
+- **Touch dots** on the digit spans: `fact` (vertical and across), `stack` (column by column:
+  count on = every digit but the largest in its column; count back / × = the bottom row), `equation`
+  (the given numbers only). The overlay takes no space.
+- **Round the problem** (every template, through the registry's render hook): the ÷ tally row, a cue, or a
+  pane, placed by `placePane` (beside when the cell is wide enough, else under; the sign before, the arrow
+  over the ones), joined by `attachPane`. Footprint: a support drawn round the problem makes the cell
+  measured and no narrower than its widest pane; touch dots on a fact cap it at 6 columns.
+- **Screen**: `screen-cell.js screenSupportsFor(q, kind, {index, total})` runs the same allocator for a
+  session item; `kindHTML(k, {supports})` draws touch dots on the fact / stack / equation digits and the
+  tally row, cues and extras round it (practice card and online worksheet). Rounding and counting panes
+  are print-only for now (a later screen lane).
+- **The generator no longer bakes a cue** (`gen-operations.js _applyOptionPost`): the old path wrote
+  `payload.cue` and `q.visual` (a double draw, and a legacy cell on screen). A fact the legacy path drew
+  (sub_facts) is drawn by the kit's fact template when it carries a support.
+
+### S2.5 Gates
+
+- `node tests/scripts/ws-supports-unit.mjs` — determinism, balance, clash dealing by section (one and
+  several sections, across skills) and by problem, fade monotonic and ending in none, touch forcing L,
+  compat symmetric, worst-case reservation, the touch-dot plans, no answer in a drawn support, the ÷
+  tally length, footprints, every Support control against its declaration and ≤ 5 controls at rest.
+- `ws-options-verify`: a render-time support (and `cover` / `mix`) must leave generation UNCHANGED, change
+  the printed sheet, draw on the pupil page and the key alike, and draw on the practice card.
+- `ws-print-lint --source kit --supports all|ids [--cover …] [--mix …]` adds **L-SUPPORT**: no answer
+  inside a drawn support; one ÷ tally length per section; geometry parity (one shape, one answer-slot
+  place, supports drawn or reserved); the key draws the same supports.
+- `ws-grade-render --supports all|ids [--cover …] [--mix …]` renders pages and screens with supports on.
+
 
 # MathQuest Supports
 

@@ -13,6 +13,8 @@ import { num, arr, obj, countList, digitsOf, chooseWrong, strings, step, clampSt
 /* ========================================================================= count_objects */
 
 registerSkill('counting:count_objects', {
+    // S2: the supports this skill can draw (touch dots, cues, panes); the Support control offers these.
+    supports: Object.freeze(['steps']),
     strings: strings({
         iCan: 'I Can count objects to 20',
         instructionKey: 'count-write',

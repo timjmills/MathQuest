@@ -88,7 +88,8 @@ export const KEY_BLOCKS = Object.freeze({
 
 // Option id -> its multi-character key. APPEND-ONLY. Take the next letter of your OWN block.
 export const MULTI_KEYS = Object.freeze({
-    // Block 4 — SUPPORTS (reserved ids: no skill declares them yet)
+    // Block 4 — SUPPORTS (S2: `cover` and `mix` are live; `touch` is unused - touch dots are
+    // values of the unified `support` set; `anchors` is the sheet-level S6 request field)
     touch: '4A',
     cover: '4B',
     mix: '4C',
@@ -142,7 +143,14 @@ export const VALUE_TOKENS = Object.freeze({
         // P11 operations hint pictures
         tile: 'D', frame: 'R', skip: 'K', array: 'A', think: 'H', bar: 'M',
         // P12 (the one-label caption; it had no token, so it could not travel in a link)
-        label: 'E' }),
+        label: 'E',
+        // S2 supports model: `support` became the ONE multi-select set of supports (an old one-cue
+        // code, "~FD", decodes to that one tick). Touch dots (two rungs) and the S4 panes.
+        touch: 'P', touchall: 'Q', boxsign: 'X', startarrow: 'S', steps: 'U',
+        'round-pv': 'O', 'round-mark': 'Z' }),
+    // S2 supports model (block 4): which problems carry the supports, and how clashing ones mix.
+    cover: Object.freeze({ whole: 'W', needed: 'N', fade: 'F' }),
+    mix: Object.freeze({ section: 'S', problem: 'P' }),
     objects: Object.freeze({ shapes: 'S', pictures: 'P', frame: 'F', dice: 'D' }),
     // P12
     model: Object.freeze({ none: 'N', area: 'A', bar: 'B', circle: 'C', line: 'L', set: 'S', grid: 'G', blocks: 'K', analog: 'H', digital: 'D' }),
@@ -182,7 +190,8 @@ export const SCALAR_ONLY = Object.freeze({
     range: 'decimal', decimals: 'decimal', band: 'decimal', tiles: 'decimal', place: 'decimal',
     simplestForm: 'bool', pictures: 'bool',
     members: 'def-tokens',   // two base-36 characters per member: its position (skill-options-pools.js)
-    // reserved ids (block 4): their values are allocated when they are built
+    // reserved ids (block 4): their values are allocated when they are built. (Pinned history:
+    // `cover` and `mix` were built by S2 and now carry VALUE_TOKENS; `touch` rides in `support`.)
     touch: 'reserved', cover: 'reserved', mix: 'reserved', anchors: 'reserved',
 });
 

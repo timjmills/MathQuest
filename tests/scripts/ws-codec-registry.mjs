@@ -198,6 +198,17 @@ const nonDefault = (d) => {
     const e = vs.find((v) => !eq(v, d.default));
     return e === undefined ? null : e;
 };
+const oldTokenKnown = (optId, v) => typeof v === 'number' || !!(OLD.VALUE_TOKENS[optId] && Object.prototype.hasOwnProperty.call(OLD.VALUE_TOKENS[optId], v));
+function oldKnown(cat, id, packed) {
+    const out = {};
+    let dropped = false;
+    for (const [k, v] of Object.entries(packed)) {
+        if (Array.isArray(v)) { const f = v.filter((x) => oldTokenKnown(k, x)); dropped = dropped || f.length !== v.length; out[k] = f; }
+        else if (typeof v === 'string' && !oldTokenKnown(k, v)) dropped = true;
+        else out[k] = v;
+    }
+    return dropped ? SO.packOptions(cat, id, SO.normalizeOptions(cat, id, out)) : packed;
+}
 const stripMulti = (payload) => payload.split('_').filter((f) => f && !REG.MULTI_KEY_RE.test(f)).join('_');
 let multiSkills = 0, codes = 0;
 for (const [cat, id] of live) {
@@ -231,7 +242,11 @@ for (const [cat, id] of live) {
         if (!eq(back, want)) fail(`${tag}: new decoder read ${JSON.stringify(back)}, want ${JSON.stringify(want)}`);
         const oldRead = OLD.decodeOptionPayload(cat, id, payload);
         const oneLetter = stripMulti(payload);
-        const expectOld = oneLetter ? NEW.decodeOptionPayload(cat, id, oneLetter) : {};
+        // A VALUE added to a one-letter key after the deployed app was built (S2: the support set's
+        // touch dots and panes) has no token there: the deployed decoder drops that one value (the
+        // skill loads without it) and never reads it as another. So it must read exactly the new
+        // decoder's options with those values taken out.
+        const expectOld = oneLetter ? oldKnown(cat, id, NEW.decodeOptionPayload(cat, id, oneLetter)) : {};
         if (!eq(oldRead, expectOld)) fail(`${tag}: the DEPLOYED decoder read ${JSON.stringify(oldRead)}, want ${JSON.stringify(expectOld)}`);
         if (!oneLetter && !eq(oldRead, {})) fail(`${tag}: the DEPLOYED decoder did not load the defaults`);
         // The deployed ENCODER's code for the same options (one-letter only) reads identically in both.

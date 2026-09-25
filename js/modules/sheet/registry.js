@@ -13,6 +13,15 @@ import { esc, blank } from './cell.js';
 /** @type {Map<string, CellTemplate>} */
 const TEMPLATES = new Map();
 
+// S2 SUPPORTS (design/SUPPORTS.md §S2). A payload may carry `supports` ({on, reserve}, written by
+// the allocator, supports.js): the cues, tally rows and panes drawn ROUND the problem are added
+// here, for every template, by support-draw.js, which installs itself when it loads (a hook, not
+// an import: the pane modules register templates, so importing them here would be a cycle).
+let SUPPORTS = null;
+/** support-draw.js hands in {withSupports, supportsOf, footprint}. */
+export function installSupportDrawer(api) { SUPPORTS = api || null; }
+const withoutSupports = (p) => { const o = Object.assign({}, p); delete o.supports; return o; };
+
 /**
  * @typedef {Object} CellTemplate
  * @property {(payload: Object, ctx: Object) => string} render      inner HTML only
@@ -111,7 +120,12 @@ export function renderCell(q, ctx = {}) {
     const tpl = resolveTemplate(spec.template);
     const payload = payloadFor(tpl, q, spec);
     try {
-        return tpl.render(payload, c);
+        const html = tpl.render(payload, c);
+        if (!SUPPORTS || tpl === FALLBACK || !SUPPORTS.supportsOf(payload)) return html;
+        // The problem's own footprint (without its supports) decides beside or under.
+        let fp = null;
+        try { fp = tpl.footprint ? tpl.footprint.call(tpl, withoutSupports(payload), c) : null; } catch (e) { fp = null; }
+        return SUPPORTS.withSupports(html, payload, spec.template, c, { problemWMm: (fp && fp.wMm) || 40, problemHMm: (fp && fp.hMm) || 30 });
     } catch (e) {
         return FALLBACK.render({ text: (q && q.text) || '' }, c);
     }
@@ -135,7 +149,9 @@ export function cellFootprint(q, ctx = {}) {
     const spec = (q && q.cell) || q || {};
     const tpl = resolveTemplate(spec.template);
     try {
-        return (tpl.footprint || FALLBACK.footprint).call(tpl, payloadFor(tpl, q, spec), c);
+        const payload = payloadFor(tpl, q, spec);
+        const fp = (tpl.footprint || FALLBACK.footprint).call(tpl, payload, c);
+        return SUPPORTS && tpl !== FALLBACK ? SUPPORTS.footprint(fp, payload, spec.template, c) : fp;
     } catch (e) {
         return FALLBACK.footprint();
     }

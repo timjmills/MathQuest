@@ -6,7 +6,7 @@ import { openZoomModal, ZOOM_CLICK_IS_ANSWER_TYPES } from './question-render.js'
 import { generateQuestion, generateQuestionFor } from './generate-question.js';
 import { deriveSeed } from './sheet/index.js';
 import {
-    cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
+    cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled,
@@ -1364,11 +1364,14 @@ function _wsRenderCard(grid, q, i) {
         + ` data-index="${i}" inputmode="${_slotNumeric ? 'numeric' : 'text'}" autocomplete="off" spellcheck="false"`
         + ` aria-label="answer, problem ${i + 1}" style="--mq-n:${_slotN};${answerInputStyle ? 'display:none;' : ''}">`;
     let slotInCell = false;
+    // S2: the set's ticked supports, dealt for card i of the sheet (screen-cell.js).
+    let _wsSupports = null;
+    try { _wsSupports = kind ? screenSupportsFor(q, kind, { index: i, total: state.problemCount > 0 ? state.problemCount : 10, categoryId: state.category, skillId: state.skill }) : null; } catch (e) { _wsSupports = null; }
     if (kind) {
         if (kind.kind === 'stack') {
-            questionDisplay = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill), idPrefix: `ws${i}` });
+            questionDisplay = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill), idPrefix: `ws${i}`, supports: _wsSupports });
         } else {
-            questionDisplay = kindHTML(kind, { slotHtml: inputHtml }) + (kind.kind === 'division' ? workRowsHTML(kind) : '');
+            questionDisplay = kindHTML(kind, { slotHtml: inputHtml, supports: _wsSupports }) + (kind.kind === 'division' ? workRowsHTML(kind) : '');
             slotInCell = true;
         }
     }

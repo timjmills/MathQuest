@@ -508,7 +508,11 @@ function genNearest(q, skill, o) {
     q.options = [];
     q.skillLabel = `Round to ${fmt(P)}`;
     q.pv = { kind: 'round', n, place: P, deal: kind };
-    const support = o.support || 'cut';
+    // S2: `support` is a SET now. Its generation rungs are 'line' and 'cut' (line wins when both
+    // are ticked); the chart and the marks ('round-pv', 'round-mark') are drawn round the cell at
+    // render time. Nothing ticked (an old "none") is the bare number. A scalar is an old value.
+    const sup = Array.isArray(o.support) ? o.support : [o.support === undefined || o.support === null ? 'cut' : o.support];
+    const support = sup.includes('line') ? 'line' : sup.includes('cut') ? 'cut' : 'none';
     if (support === 'line') {
         q.visual = `<div style="text-align:center;">${roundingLineSVG({ lo: lower, hi: lower + P, n, lengthMm: 120, pxPerMm: SCREEN_PX_PER_MM })}</div>`;
         q.hint = `Is ${fmt(n)} nearer the left end or the right end? Halfway rounds up.`;
