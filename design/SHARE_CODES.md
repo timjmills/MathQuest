@@ -247,3 +247,11 @@ skill takes its own options, never the pool's.
 - `node tests/scripts/ws-share-options.cjs` — codec round-trips for every live skill's options,
   old codes decode exactly as before, every live skill has a valid schema and default, and the
   end-to-end pupil test (Quick Start link and MX- code, 12 answered items, then print).
+
+## Key sub-ranges (2026-09-25)
+All ten digit blocks are allocated, but most waves used only a few letters. `KEY_SUBRANGES` in
+`js/modules/skill-option-keys.js` hands later waves a range of the UNUSED letters inside an existing block
+(after the block's own keys, never overlapping). A multi-character key is valid when it lies in its block's
+own range or in a sub-range of that digit. Sub-ranges are append-only and pinned by `ws-codec-registry`.
+Current: k2 3B–3M, operations 3N–3Z, placevalue 4E–4O, algebra 4P–4Z, fractions 6C–6P, geometry 2G–2T,
+measurement 7F–7S, timemoney 7T–7Z, data 8D–8O, numtheory 8P–8Z, lessons / support ladder / later 5N–5Z.
