@@ -38,3 +38,9 @@ relates to every other (prerequisite / builds on / leads to), with concepts and 
 - Pedagogy rules: `PEDAGOGY_STANDARD.md` (one new thing per step, scaffold fade, instruction library).
 - The quality bar: every lesson page is graded like every other page — ≥ 8 on `design/audit/RUBRIC.md`
   by an independent critic.
+
+## Later — intervention lessons (owner, 2026-09-25: "record it for later")
+An **intervention lesson for every White Rose Maths small step**, using the same lesson system (warm-up on
+prerequisites, minimal-words worked example, we-do, massed practice, optional mixed), tagged to the small
+step, CCSS and EE. Starts after the sample lessons are approved and the WRM small-step inventory
+(`design/WRM_ALIGNMENT_PLAN.md` phase 1) exists.
