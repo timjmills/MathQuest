@@ -16,6 +16,8 @@
 //   node tests/scripts/ws-grade-render.cjs --sample 24 --out tests/audit-runs/baseline
 //   node tests/scripts/ws-grade-render.cjs --count 6 --no-screen      # print only, 6 items
 //   node tests/scripts/ws-grade-render.cjs --resume                   # skip skills already rendered
+//   node tests/scripts/ws-grade-render.cjs --range 1000 --skills number_sense:nearest_100
+//                                          # at Max Number 1,000 (the print dialog's #rangeSelect)
 //   node tests/scripts/ws-grade-render.cjs --roles independent,more-practice --skills addition:add_20_regroup
 //                                          # the PAGE ENGINE (P7.2): each role through window.buildSheet
 //
@@ -58,6 +60,20 @@ const ROLE_COUNT = has('count') ? COUNT : undefined;     // roles: one page unle
 const ROLE_SIZE = arg('size', 'L');
 const ROLE_LOOK = arg('look', 'auto');
 const ROLE_PAPER = arg('paper', 'A4');
+// Max Number for every surface. A place-value skill whose place needs more than the default 100
+// (Round to the nearest 100 needs 1,000) is refused below it, so its page is only visible here.
+const RANGE = arg('range', null);
+async function applyRange(page) {
+    if (!RANGE) return;
+    await page.evaluate((v) => {
+        const sel = document.getElementById('rangeSelect');
+        if (sel) {
+            if (![...sel.options].some(o => o.value === String(v))) sel.add(new Option(String(v), String(v)));
+            sel.value = String(v);
+        }
+        if (window.state) window.state.range = Number(v);
+    }, RANGE);
+}
 
 const hash = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const slug = s => `${s.categoryId}__${s.skillId}`;
@@ -218,6 +234,7 @@ async function renderQuiz(page, skill, file) {
 async function renderPrinted(page, skill, dir) {
     await viewport(page, 1280, 900);
     await page.evaluate(seed => { if (window.__wsReseed) window.__wsReseed(seed); }, hash(slug(skill) + ':print'));
+    await applyRange(page);
     await renderPrint(page, skill, { problemCount: COUNT, includeAnswerKey: true });
     const dom = await measure(page, '#printPreviewContent');
     // The preview's "Download PDF" button (downloadPDF, print-generate.js) writes a standalone
@@ -323,6 +340,7 @@ async function printDoc(page, html, pdfPath) {
 
 async function renderRole(page, skill, role, dir) {
     await viewport(page, 1280, 900);
+    await applyRange(page);
     const seed = hash(slug(skill) + ':' + role) % 1000000;
     const built = await page.evaluate(async ({ skill, role, seed, count, size, look, paper }) => {
         try {

@@ -78,6 +78,10 @@ export {
 export { stack, stackTabStep, stackAnswerSlot } from './cells/stack.js';
 export { fact, factPadTop, factWidthMm, factFillOfColumn, factWriteMm, FACT_GEOMETRY } from './cells/fact.js';
 export { equation, equationParts, equationColumns, frac, mixed } from './cells/equation.js';
+// P9 place value + rounding: the `pv` template and the drawings the screen card shares with it.
+export {
+    DISK_SIZES, diskDiameter, zoneSide, zoneCapacity, diskMatSVG, numeralTracksHTML, roundingLineSVG,
+} from './cells/pv.js';
 
 /** Which cell templates this build carries. `legacy` is registered by `adapters.js`. */
-export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation'];
+export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv'];

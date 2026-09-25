@@ -6,6 +6,7 @@
 //   node tests/scripts/ws-content-audit.cjs                       # every audited skill
 //   node tests/scripts/ws-content-audit.cjs --family operations    # + - x / only
 //   node tests/scripts/ws-content-audit.cjs --family k2            # counting & cardinality only
+//   node tests/scripts/ws-content-audit.cjs --family pv            # place value, rounding, estimation (P9)
 //   node tests/scripts/ws-content-audit.cjs --category addition    # one category
 //   node tests/scripts/ws-content-audit.cjs --category composing   # ...including a K-2 one
 //   node tests/scripts/ws-content-audit.cjs --skill add_20_regroup # one skill
@@ -58,9 +59,13 @@ const OPS_CATS = ['addition', 'subtraction', 'multiplication', 'division'];
 // Counting & Cardinality, the owner's youngest and most vulnerable pupils. `counting_mixed` holds
 // the one domain-wide pool skill.
 const K2_CATS = ['counting', 'comparing', 'composing', 'counting_mixed'];
-const CATS = [...OPS_CATS, ...K2_CATS];
-const familyOf = cat => (OPS_CATS.includes(cat) ? 'operations' : 'k2');
-const FAMILY_CATS = { operations: OPS_CATS, k2: K2_CATS };
+// P9: place value + rounding + estimation (design/research/place-value-rounding.md §17). Declared
+// with the rest of the pv family further down; PV_CATS is hoisted here so the family table is one
+// place.
+const PV_FAMILY_CATS = ['placevalue', 'number_sense'];
+const CATS = [...OPS_CATS, ...K2_CATS, ...PV_FAMILY_CATS];
+const familyOf = cat => (OPS_CATS.includes(cat) ? 'operations' : PV_FAMILY_CATS.includes(cat) ? 'pv' : 'k2');
+const FAMILY_CATS = { operations: OPS_CATS, k2: K2_CATS, pv: PV_FAMILY_CATS };
 
 // ---------------------------------------------------------------------------
 // Reading the promise out of the name
@@ -453,7 +458,7 @@ function equationCheck(it) {
 // ---------------------------------------------------------------------------
 // Sampling (runs inside the page)
 // ---------------------------------------------------------------------------
-function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2 }) {
+function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv }) {
     // What a K-2 cell carries INSTEAD of a and b. These are the fields the generators already
     // publish so the renderers can draw the representation, and they are exactly what the
     // representation rules need, so the audit reads the item's own declaration rather than
@@ -566,6 +571,9 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2 }) {
             // (compose_whole: one distinct item in 240, and it stays one).
             if (vis) fp += `@${vis.hash}`;
         }
+        // A pv item's identity is its description plus what it prints: a sort prints the same
+        // sentence every time and its whole variation is the tiles.
+        if (pv) fp = `${text}|${printText}|${JSON.stringify(q.pv || null)}|${JSON.stringify(q.tiles || null)}|${JSON.stringify(q.numbers || null)}|${String(q.visual || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')}`;
         const item = {
             a: q.a, b: q.b, op: q.op, ans: q.ans, fp,
             fmt: q.printFormat || '(none)', type: q.answerType || '(none)',
@@ -588,6 +596,41 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2 }) {
             item.remainderShown = new RegExp(`Remainder:?\\s*${rem}\\b|(^|\\s)R\\s*${rem}(\\s|$)`).test(vis);
         }
         if (q.printText) item.printTextAll = String(q.printText).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200);
+        if (pv) {
+            const strip = (h) => String(h || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+            const vis = String(q.visual || '');
+            item.pv = q.pv || null;
+            item.printText = printText;
+            item.fullText = text;
+            item.hint = strip(q.hint);
+            item.visText = strip(vis);
+            item.refused = q.refused || '';
+            if (Array.isArray(q.options)) {
+                item.labels = q.options.map(o => String(o && typeof o === 'object' ? (o.label !== undefined ? o.label : '') : o));
+                if (q.options.some(o => o && typeof o === 'object' && 'correct' in o)) item.optCorrect = q.options.map(o => ({ label: String(o.label), correct: !!o.correct }));
+            }
+            if (Array.isArray(q.tiles)) item.tiles = q.tiles.map(t => String(t && t.label !== undefined ? t.label : t));
+            // An ordering item prints its numbers as cards, not in its sentence.
+            if (Array.isArray(q.numbers)) item.labels = (item.labels || []).concat(q.numbers.map(v => String(v)));
+            if (Array.isArray(q.bins)) {
+                item.bins = q.bins.map(b => String(b && b.label !== undefined ? b.label : b));
+                if (Array.isArray(q.tiles) && q.ans && typeof q.ans === 'object') {
+                    const binLabel = Object.fromEntries(q.bins.map(b => [b.id, String(b.label)]));
+                    item.sortPairs = q.tiles.map(t => [String(t.label), binLabel[q.ans[t.id]]]);
+                }
+            }
+            if (q.interactiveType === 'expanded' && Array.isArray(q.expandedValues)) item.expanded = { n: q.expandedNumber, values: q.expandedValues.slice() };
+            // The disks the DRAWING has, recounted from its own circles, and the line's two labels.
+            const drawn = {};
+            for (const m of vis.matchAll(/data-pv-disk="(\d+)"/g)) drawn[m[1]] = (drawn[m[1]] || 0) + 1;
+            item.drawnDisks = drawn;
+            item.lineEnds = [...vis.matchAll(/data-pv-end="([\d.]+)"/g)].map(m => parseFloat(m[1]));
+            const cp = q.cell && q.cell.template === 'pv' ? (q.cell.payload || {}) : null;
+            item.cellKind = cp ? cp.kind : '';
+            item.cellBank = cp && Array.isArray(cp.bank) ? cp.bank.length : 0;
+            out.push(item);
+            continue;
+        }
         if (!k2) { out.push(item); continue; }
 
         item.printText = printText.slice(0, 200);
@@ -937,6 +980,283 @@ function k2Rules(skill, items, live, r, F, NOTE) {
     if (!touched) NOTE('unaudited', `NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.`);
 }
 
+
+// ===========================================================================
+// THE PV FAMILY: place value, rounding and estimation (P9, design/research/place-value-rounding.md §17)
+// ===========================================================================
+// `placevalue` + `number_sense`, minus P4's three strategy ladders (make_a_ten,
+// doubles_near_doubles, compensation), which sit in number_sense but are operations content and
+// are named in PV_EXCLUDED so the coverage line says they were left out rather than passed.
+//
+// WHAT A PV NAME DECLARES. "Round to Nearest 100" declares a PLACE, and the place declares a
+// floor: a nearest-100 item is at least three digits, so the skill needs Numbers to 1,000 and
+// below that it must be REFUSED (owner ruling 2, 2026-09-24) — never dealt at a bigger number
+// than the teacher chose. "Name the Place" declares nothing numeric, so Max Number is its band,
+// and at Max Number 100 it must deal two-digit numbers (it never did: smallest seen 104).
+//
+// HOW IT IS READ. Every rewritten generator publishes `q.pv`, a plain description of the item
+// (the number, the place, the parts, the disks), and every rule below RECOMPUTES the answer from
+// that description and from what is printed — it never trusts q.ans. A skill whose name is on
+// the §17 list but whose items carry no description fails `pv-payload`: nothing about it could be
+// proved. Numbers are read off what the pupil sees (printText, the visual's text, the printed
+// choices and tiles), and the disk drawing is recounted from its own circles.
+const PV_CATS = ['placevalue', 'number_sense'];
+const PV_EXCLUDED = new Set(['make_a_ten', 'doubles_near_doubles', 'compensation']);
+const PV_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands', 1000000: 'millions' };
+const PV_PLACE_WORDS = /\b(?:ones|tens|hundreds|thousands|millions)\b/i;
+// The §17 answer-in-item list, and every id the P9 generator describes (so it must describe).
+const PV_AII = /^(?:identify|value|more_less_10|more_less_100|rounding_visual|nearest_(?:10|100|1000|10000|100000|million))$/;
+const PV_DESCRIBED = /^(?:identify|value|expand|combine|more_less_10|more_less_100|place_value_disks|pv_disks_build|place_value_10x|rounding_visual|nearest_\w+|round_sort_\w+)$/;
+const PV_OP_NAME = { '+': /\bsums?\b|\badd/, '−': /\bdiff(?:erences?)?\b|\bsubtract/, '×': /\bproducts?\b|\bmultipl/, '÷': /\bquotients?\b|\bdivi/ };
+const PV_OP_GLYPH = { '+': /\+/, '−': /[−–]|\s-\s/, '×': /×/, '÷': /÷/ };
+
+/** The place a pv NAME rounds to, or 0. The id is read first: it is the permanent declaration. */
+function pvNamePlace(id, label) {
+    const hay = `${String(id).replace(/_/g, ' ')} ${label}`.toLowerCase();
+    if (/\bhundredths?\b/.test(hay)) return 0.01;
+    if (/\btenths?\b/.test(hay)) return 0.1;
+    const m = hay.match(/nearest\s+(million|1,000,000|100,000|100000|10,000|10000|1,000|1000|100|10)\b/);
+    if (!m) return 0;
+    return m[1] === 'million' ? 1000000 : parseInt(m[1].replace(/,/g, ''), 10);
+}
+/** The Max Number a place needs: ten times the place (§2.1). Decimal places have none. */
+const pvNameFloor = (id, label) => { const P = pvNamePlace(id, label); return P >= 10 ? P * 10 : 0; };
+
+/** Round to a place, halfway up (owner ruling 6), exact for decimal places too. */
+function pvRound(n, P) {
+    const k = P < 1 ? Math.round(10 / P) : 1;
+    const nu = Math.round(n * k), pu = Math.round(P * k);
+    return (Math.floor((nu + pu / 2) / pu) * pu) / k;
+}
+const pvNums = (s) => (String(s || '').match(/\d[\d,]*(?:\.\d+)?/g) || []).map(t => parseFloat(t.replace(/,/g, ''))).filter(Number.isFinite);
+const pvDigitAt = (n, place) => Math.floor(Math.abs(n) / place) % 10;
+const PV_CAPS = /\b[A-Z]{2,}\b/;
+
+/**
+ * @param {Object} ctx {R: the Max Number the items were dealt at, refusedAt100: {floor, dealt, sample}|null,
+ *                      midpointSeeded: boolean, geom: in-page disk geometry, buildMax10k: number}
+ */
+function pvRules(skill, items, live, r, F, NOTE, ctx) {
+    const { skillId: id, label } = skill;
+    const R = ctx.R;
+    const P = pvNamePlace(id, label);
+    const mixed = skill.isMetaSkill || declaresMixedPage(id, label);
+    r.pvMaxNumber = R;
+    r.pvPlace = P || null;
+
+    // pv-refusal: below the floor the skill must return nothing at all.
+    if (ctx.refusedAt100 && ctx.refusedAt100.dealt) {
+        F('pv-band', `needs Numbers to ${ctx.refusedAt100.floor.toLocaleString('en-US')} (its place), but at Max Number 100 it still dealt ${ctx.refusedAt100.dealt} items instead of refusing: ${ctx.refusedAt100.sample.join('; ')}`);
+    }
+
+    const bad = {};
+    const add = (cls, msg) => { (bad[cls] = bad[cls] || []).push(msg); };
+    let twoDigit = 0, withPv = 0;
+    const types = new Set(), formats = new Set();
+    const live6 = [];
+    for (const it of items) {
+        if (it.error || it.empty) { live6.push(null); continue; }
+        live6.push(it);
+        types.add(it.type); formats.add(it.fmt);
+        const printedText = it.printText || it.fullText || '';
+        const printed = [printedText, it.visText, ...(it.labels || []), ...(it.tiles || []), ...(it.bins || [])].join(' ');
+        const ns = pvNums(printed);
+        const pv = it.pv;
+        if (pv) withPv++;
+
+        // ---- pv-band: nothing printed past Max Number; rounding numbers at least their place.
+        // The number the item is ABOUT counts even when its digits are printed one per track.
+        const shown = pv && Number.isFinite(pv.n) ? [...ns, pv.n] : ns;
+        const maxP = shown.length ? Math.max(...shown) : null;
+        if (maxP !== null && maxP > R) add('pv-band', `prints ${maxP.toLocaleString('en-US')} at Max Number ${R.toLocaleString('en-US')} (${printedText.slice(0, 50)})`);
+        if (maxP !== null && maxP >= 10 && maxP <= 99) twoDigit++;
+        if (pv && pv.kind === 'round' && (pv.n < pv.place || pv.n % pv.place === 0)) add('pv-band', `rounds ${pv.n} to the nearest ${pv.place}: below the place, or already rounded`);
+        if (pv && pv.kind === 'moreless') {
+            const a = pv.dir === 'more' ? pv.n + pv.step : pv.n - pv.step;
+            if (pv.n < 0 || a < 0 || pv.n > R || a > R) add('pv-band', `${pv.step} ${pv.dir} than ${pv.n} leaves 0-${R}`);
+        }
+
+        // ---- pv-place-name: the place the name declares is the place dealt.
+        if (P) {
+            const said = (printedText.match(/nearest\s+([\d,.]*\d|hundred thousand|ten thousand|hundredth|tenth|thousand|hundred|million|ten)\b/i) || [])[1];
+            const WORDP = { ten: 10, hundred: 100, thousand: 1000, 'ten thousand': 10000, 'hundred thousand': 100000, million: 1000000, tenth: 0.1, hundredth: 0.01 };
+            const saidP = said === undefined ? null : (WORDP[String(said).toLowerCase()] || parseFloat(String(said).replace(/,/g, '')));
+            if (pv && pv.place !== undefined && Math.abs(pv.place - P) > 1e-9) add('pv-place-name', `dealt the nearest ${pv.place}, the name says ${P}`);
+            else if (saidP !== null && Math.abs(saidP - P) > 1e-9) add('pv-place-name', `prints "nearest ${said}", the name says ${P}`);
+            else if (!pv && saidP === null) add('pv-place-name', `the item names no place and describes none: "${printedText.slice(0, 50)}"`);
+        }
+        if (/^estimate_/.test(id)) {
+            const hay = `${String(id).replace(/_/g, ' ')} ${label}`.toLowerCase();
+            const declared = Object.keys(PV_OP_NAME).filter(o => PV_OP_NAME[o].test(hay));
+            const seen = Object.keys(PV_OP_GLYPH).filter(o => PV_OP_GLYPH[o].test(printedText));
+            const stray = seen.filter(o => !declared.includes(o));
+            if (!seen.some(o => declared.includes(o)) || stray.length) add('pv-place-name', `"${printedText.slice(0, 50)}" is not ${declared.join(' / ')} estimation`);
+            const an = asNumber(it.ans);
+            if (typeof it.ans === 'number' && !Number.isInteger(it.ans)) add('pv-place-name', `answers ${it.ans}: an estimate to a place is a whole number`);
+            void an;
+        }
+
+        // ---- pv-recompute / pv-expanded-shape / answer-matches-picture, from the description.
+        const ans = it.ans;
+        if (pv) {
+            const s = String(pv.n);
+            switch (pv.kind) {
+                case 'place':
+                    if (pvDigitAt(pv.n, pv.place) !== pv.digit || ans !== PV_WORD[pv.place]) add('pv-recompute', `the ${pv.digit} of ${pv.n} is in the ${PV_WORD[pv.place]} place, keyed "${ans}"`);
+                    break;
+                case 'value':
+                    if (pvDigitAt(pv.n, pv.place) !== pv.digit || Number(ans) !== pv.digit * pv.place) add('pv-recompute', `the ${pv.digit} of ${pv.n} is worth ${pv.digit * pv.place}, keyed ${ans}`);
+                    break;
+                case 'combine': {
+                    const sum = (pv.parts || []).reduce((a, b) => a + b, 0);
+                    const oneDigit = (pv.parts || []).every(p => p > 0 && /^[1-9]0*$/.test(String(p)));
+                    if (sum !== pv.n || Number(ans) !== pv.n || !oneDigit) add('pv-recompute', `${(pv.parts || []).join(' + ')} = ${sum}, keyed ${ans}`);
+                    break;
+                }
+                case 'moreless': {
+                    const want = pv.dir === 'more' ? pv.n + pv.step : pv.n - pv.step;
+                    if (Number(ans) !== want) add('pv-recompute', `${pv.step} ${pv.dir} than ${pv.n} is ${want}, keyed ${ans}`);
+                    break;
+                }
+                case 'x10': {
+                    const want = pv.op === 'x' ? pv.n * pv.power : pv.n / pv.power;
+                    if (Math.abs(Number(ans) - want) > 1e-9) add('pv-recompute', `${pv.n} ${pv.op === 'x' ? '×' : '÷'} ${pv.power} = ${want}, keyed ${ans}`);
+                    const big = Math.max(Math.abs(pv.n), Math.abs(want));
+                    if (big > R) add('pv-band', `${pv.n} ${pv.op === 'x' ? '×' : '÷'} ${pv.power}: ${big} is past Max Number ${R}`);
+                    break;
+                }
+                case 'round':
+                    if (Number(ans) !== pvRound(pv.n, pv.place)) add('pv-recompute', `${pv.n} to the nearest ${pv.place} is ${pvRound(pv.n, pv.place)} (halfway up), keyed ${ans}`);
+                    break;
+                case 'disks': {
+                    const n = Object.entries(pv.counts || {}).reduce((a, [p, c]) => a + Number(p) * c, 0);
+                    const want = pv.task === 'count' ? (pv.counts || {})[pv.place] : n;
+                    if (n !== pv.n || Number(ans) !== want) add('pv-recompute', `the disks make ${n}${pv.task === 'count' ? ` (${(pv.counts || {})[pv.place]} ${PV_WORD[pv.place]})` : ''}, keyed ${ans}`);
+                    // answer-matches-picture: recount the circles the drawing actually has.
+                    const drawn = it.drawnDisks || {};
+                    for (const p of pv.places || []) {
+                        if ((drawn[p] || 0) !== pvDigitAt(n, p)) { add('answer-matches-picture', `${pv.n}: the ${PV_WORD[p]} zone draws ${drawn[p] || 0} disks, the number has ${pvDigitAt(n, p)}`); break; }
+                    }
+                    break;
+                }
+                case 'build':
+                    if (Number(ans) !== pv.n || (pv.places || []).length !== s.length) add('pv-recompute', `build ${pv.n}: keyed ${ans} on a mat of ${(pv.places || []).length} places`);
+                    break;
+                case 'circle': {
+                    const wrong = (it.optCorrect || []).filter(o => (pvRound(parseFloat(String(o.label).replace(/,/g, '')), pv.place) === pv.target) !== !!o.correct);
+                    if (wrong.length) add('pv-recompute', `rounds to ${pv.target}: ${wrong.map(o => o.label).join(', ')} keyed the wrong way`);
+                    break;
+                }
+                case 'sort': {
+                    const miss = (it.sortPairs || []).filter(([t, b]) => Math.abs(pvRound(parseFloat(String(t).replace(/,/g, '')), pv.place) - parseFloat(String(b).replace(/,/g, ''))) > 1e-9);
+                    if (miss.length) add('answer-matches-picture', `${miss.map(([t, b]) => `${t} keyed under ${b}`).join(', ')}`);
+                    if (!(it.sortPairs || []).length) add('answer-matches-picture', 'no tile is keyed to a bin');
+                    break;
+                }
+                default: break;
+            }
+            // answer-matches-picture: the rounding line's two labels are the multiples either side.
+            if (pv.kind === 'round' && it.lineEnds && it.lineEnds.length) {
+                const lo = Math.floor(pv.n / pv.place) * pv.place;
+                if (it.lineEnds.length !== 2 || it.lineEnds[0] !== lo || it.lineEnds[1] !== lo + pv.place) add('answer-matches-picture', `${pv.n}: the line is labelled ${it.lineEnds.join(' and ')}, not ${lo} and ${lo + pv.place}`);
+            }
+        }
+        // pv-expanded-shape: one part per place, zeros included, and the key writes them — read off
+        // the screen payload (expandedValues) as well as the description, so a generator that drops
+        // the zero part from the widget is caught even when its description is right.
+        if (it.expanded) {
+            const n = it.expanded.n;
+            const digits = String(n).split('').map(Number);
+            const want = digits.map((d, i) => d * 10 ** (digits.length - 1 - i));
+            const got = it.expanded.values || [];
+            const keyParts = pvNums(String(ans).replace(/\s*\+\s*/g, ' '));
+            if (got.length !== want.length || got.some((v, i) => v !== want[i])) add('pv-expanded-shape', `${n} = ${want.join(' + ')}, the boxes hold ${got.join(' + ')}`);
+            else if (keyParts.length !== want.length || keyParts.some((v, i) => v !== want[i])) add('pv-expanded-shape', `${n}: the key reads "${ans}", not ${want.join(' + ')}`);
+        }
+
+        // ---- answer-in-item (Q-8), for the §17 list.
+        if (PV_AII.test(id)) {
+            const ansStr = String(ans);
+            const ansNum = asNumber(ans);
+            const hintNums = pvNums(it.hint);
+            if ((ansNum !== null && hintNums.includes(ansNum)) || (ansNum === null && ansStr && new RegExp(`\\b${ansStr}\\b`, 'i').test(it.hint || ''))) add('answer-in-item', `the hint gives it away: "${String(it.hint).slice(0, 60)}"`);
+            if (/round (?:up|down)|closer|midpoint|shorter bar|×|=/i.test(it.visText || '')) add('answer-in-item', `the picture carries the method: "${String(it.visText).slice(0, 60)}"`);
+            if (pv && (pv.kind === 'place' || pv.kind === 'value') && PV_PLACE_WORDS.test(it.visText || '')) add('answer-in-item', `the picture names the place: "${String(it.visText).slice(0, 60)}"`);
+            if (ansNum === null && ansStr && pv && pv.kind === 'place' && new RegExp(`\\b${ansStr}\\b`, 'i').test(`${printedText} ${it.visText || ''}`)) add('answer-in-item', `"${ansStr}" is printed in the item`);
+            // The picture may print only the item's own numbers: the number, its digits, the step,
+            // and a rounding line's two ends. A midpoint label or a neighbour is the answer's method.
+            if (pv) {
+                const allowed = new Set([pv.n, pv.step, pv.place, ...String(pv.n).split('').map(Number)].filter(v => v !== undefined));
+                if (pv.kind === 'round') { const lo = Math.floor(pv.n / pv.place) * pv.place; allowed.add(lo); allowed.add(lo + pv.place); }
+                const extra = pvNums(it.visText).filter(v => !allowed.has(v));
+                if (extra.length) add('answer-in-item', `the picture prints ${extra.slice(0, 4).join(', ')} beside ${pv.n}`);
+                const printedNums = pvNums(printedText.replace(/nearest\s+[\d,]+/i, ' ')).filter(v => v !== pv.n && v !== pv.step && v !== pv.place);
+                if (ansNum !== null && printedNums.includes(ansNum)) add('answer-in-item', `the printed item holds the answer ${ansNum}: "${printedText.slice(0, 50)}"`);
+            } else if (ansNum !== null && pvNums(it.visText).includes(ansNum)) {
+                add('answer-in-item', `the picture prints the answer ${ansNum}`);
+            }
+        }
+
+        // ---- banned-verb: nothing a pencil cannot do, and no words in capitals.
+        const words = bannedPrintWords(printedText);
+        if (words.length) add('banned-verb', `"${printedText.slice(0, 60)}" (${words.join(', ')})`);
+        else if (PV_CAPS.test(printedText)) add('banned-verb', `words in capitals: "${printedText.slice(0, 60)}"`);
+
+        // ---- prints-something: a sort has its tiles and bins on paper; a build has its empty mat.
+        if (!printedText.trim() && !(it.visText || '').trim() && !it.cellKind) add('prints-something', 'nothing printable');
+        if (/^round_sort_/.test(id) && !(it.cellKind === 'sort' && it.cellBank === (it.tiles || []).length && (it.tiles || []).length >= 6 && (it.bins || []).length === 2)) {
+            add('prints-something', `the paper cell carries ${it.cellBank || 0} of ${(it.tiles || []).length} tiles and ${(it.bins || []).length} bins`);
+        }
+        if (id === 'pv_disks_build' && !(it.cellKind === 'build')) add('prints-something', 'no empty mat to draw in');
+    }
+
+    for (const [cls, list] of Object.entries(bad)) F(cls, `${list.length} of ${live} items: ${[...new Set(list)].slice(0, 4).join('; ')}`);
+
+    // "to 99" means two-digit items exist (§17 pv-band), for the place-value names that carry no place.
+    if (skill.categoryId === 'placevalue' && !mixed && !P && R === 100 && live && !twoDigit) {
+        F('pv-band', `never deals a two-digit number at Max Number 100 (band 99 is unreachable)`);
+    }
+    if (PV_DESCRIBED.test(id) && live && withPv < live) {
+        F('pv-payload', `${live - withPv} of ${live} items carry no q.pv description, so nothing about them can be recomputed`);
+    }
+    if (!PV_DESCRIBED.test(id) && live) NOTE('not-checked', 'no q.pv description (§19.4 step 8): pv-recompute and answer-in-item could not be applied; band, verbs, one-response and variety were');
+
+    // one-response (P-28): one answer type and one print format per non-mixed page.
+    if (!mixed && live && (types.size > 1 || formats.size > 1)) F('one-response', `${types.size} answer types (${[...types].join(', ')}) and ${formats.size} print formats (${[...formats].join(', ')}) on one page`);
+    if (!mixed && types.has('multi-select-check')) F('one-response', 'a multi-select item on a page whose response is "write" (circle-all is its own step, response: circle-all)');
+
+    // midpoint-seeded: every page of six carries a halfway number and a round-up-across-a-place.
+    if (ctx.midpointSeeded) {
+        const pages = [];
+        for (let i = 0; i + PAGE <= live6.length; i += PAGE) pages.push(live6.slice(i, i + PAGE));
+        let noMid = 0, noAcross = 0;
+        for (const pg of pages) {
+            if (pg.some(x => !x || !x.pv)) continue;
+            const mid = pg.some(x => x.pv.kind === 'round' ? pvRound(x.pv.n, x.pv.place) - x.pv.n === x.pv.place / 2
+                : x.pv.kind === 'sort' ? (x.pv.tiles || []).some(t => Math.abs(t - x.pv.bins[0] - x.pv.place / 2) < 1e-9) : false);
+            const across = pg.some(x => x.pv.kind !== 'round' || (Number(x.ans) > x.pv.n && Number(x.ans) % (10 * x.pv.place) === 0));
+            if (!mid) noMid++;
+            if (!across) noAcross++;
+        }
+        if (noMid) F('midpoint-seeded', `${noMid} of ${pages.length} pages of six have no number exactly halfway`);
+        if (noAcross) F('midpoint-seeded', `${noAcross} of ${pages.length} pages of six have no number that rounds up across a place (96 -> 100)`);
+    }
+
+    // disk-fits: nine disks at the size's diameter fit every zone; drawing stops at 999.
+    if ((id === 'place_value_disks' || id === 'pv_disks_build') && ctx.geom) {
+        const g = ctx.geom;
+        if (g.error) F('disk-fits', `could not measure the disk mat: ${g.error}`);
+        for (const row of g.rows || []) {
+            if (row.d < 8 || row.capacity < 9 || row.zone + 1e-6 < 3 * (row.d + 2) + 2) F('disk-fits', `${row.size} ${row.place}s: ${row.d} mm disks, zone ${row.zone} mm holds ${row.capacity}`);
+        }
+        for (const cellRow of g.cells || []) {
+            if (cellRow.minZone + 1e-6 < cellRow.need) F('disk-fits', `${cellRow.size}: the printed build mat's zones are ${cellRow.minZone} mm, nine disks need ${cellRow.need} mm`);
+        }
+        if (id === 'pv_disks_build' && ctx.buildMax10k > 999) F('disk-fits', `builds ${ctx.buildMax10k.toLocaleString('en-US')} at Max Number 10,000: drawing stops at 999 (owner ruling 3)`);
+    }
+    if (/^estimate_(sums_diffs|products|quotient)$/.test(id)) NOTE('not-checked', 'reasonable-balance: task "reasonable" is off by default (§19.4 step 8 builds its 40-60% balance)');
+}
+
 function audit(skill, items) {
     const { skillId: id, label, categoryId } = skill;
     // A category pool ("Mixed Division") deals a random playable sibling from its own category,
@@ -970,8 +1290,9 @@ function audit(skill, items) {
         if (it.error) { r.errors++; continue; }
         if (it.empty) { r.empty++; continue; }
         bump(r.formats, it.fmt); bump(r.types, it.type);
-        const shape = isOps ? shapeOf(it.fmt) : k2ShapeOf(it);
-        if (shape) bump(r.shapes, shape); else unknownFormats.add(it.fmt);
+        // The pv family has no shape table: one-response (pvRules) is its cell-shape rule.
+        const shape = isOps ? shapeOf(it.fmt) : family === 'pv' ? null : k2ShapeOf(it);
+        if (shape) bump(r.shapes, shape); else if (family !== 'pv') unknownFormats.add(it.fmt);
 
         // Does the cell's own equation balance with the answer it ships? (see equationCheck)
         const eq = equationCheck(it);
@@ -1034,7 +1355,7 @@ function audit(skill, items) {
     const F = (cls, msg) => fails.push({ cls, msg });
     const NOTE = (cls, msg) => notes.push({ cls, msg });
 
-    if (live === 0) F('empty', `generates nothing (${r.errors} threw, ${r.empty} came back empty)`);
+    if (live === 0) F('empty', `generates nothing (${r.errors} threw, ${r.empty} came back empty)${family === 'pv' ? ` at Max Number ${(skill.pvCtx || {}).R}` : ''}`);
     if (r.errors) F('throws', `${r.errors} of ${r.n} generations threw`);
 
     // The worst defect there is: the printed page and its answer key disagree. Zero tolerance,
@@ -1117,10 +1438,11 @@ function audit(skill, items) {
     if (mismatch) NOTE('name-mismatch', mismatch);
     if (r.textOverBand && !r.overBandCount) NOTE('band-text', `${r.textOverBand} of ${live} items print a number above ${band.value.toLocaleString('en-US')} in the story`);
 
-    if (!isOps && live) k2Rules(skill, items, live, r, F, NOTE);
+    if (family === 'k2' && live) k2Rules(skill, items, live, r, F, NOTE);
+    if (family === 'pv') pvRules(skill, items, live, r, F, NOTE, skill.pvCtx || { R: 100 });
     // A skill whose generator lives in another domain's file. Reported and never moved: four
     // positional share-code systems index SKILLS[category], so a move re-points every saved code.
-    if (skill.routedTo) NOTE('misfiled', `sits in the ${categoryId} category but its generator is the ${skill.routedTo} one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.`);
+    if (skill.routedTo && skill.routedTo !== categoryId) NOTE('misfiled', `sits in the ${categoryId} category but its generator is the ${skill.routedTo} one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.`);
 
     return { ...r, live, family, mixedPage, factDrill, fails, notes };
 }
@@ -1278,6 +1600,22 @@ function selfTest() {
     eq('a K-2 instruction is inside the cap', wordsIn('Draw 16 counters in the ten frames.') <= MAX_K2_INSTRUCTION_WORDS, 'true');
     eq('an operations story is not judged by it', wordsIn('There are 5 apples in the fruit basket. Layla adds 92 more. How many apples are there in all?') > MAX_K2_INSTRUCTION_WORDS, 'true');
 
+    // ---- the pv family (P9) -----------------------------------------------------------------
+    eq('pv place: nearest_100', pvNamePlace('nearest_100', 'Round to Nearest 100'), '100');
+    eq('pv place: nearest_10000 reads the id, not a shorter prefix', pvNamePlace('nearest_10000', 'Round to Nearest 10,000'), '10000');
+    eq('pv place: nearest_million', pvNamePlace('nearest_million', 'Round to Nearest 1,000,000'), '1000000');
+    eq('pv place: a sort names its place', pvNamePlace('round_sort_1000', 'Rounding Sort: Nearest 1,000'), '1000');
+    eq('pv place: tenths', pvNamePlace('round_sort_tenths', 'Rounding Sort: Nearest Tenth'), '0.1');
+    eq('pv place: a number line names none', pvNamePlace('rounding_visual', 'Round on a Number Line'), '0');
+    eq('pv floor: nearest 1,000 needs 10,000', pvNameFloor('nearest_1000', 'Round to Nearest 1,000'), '10000');
+    eq('pv floor: a decimal sort has none', pvNameFloor('round_sort_hundredths', 'Rounding Sort: Nearest Hundredth'), '0');
+    eq('pv round: halfway rounds up', pvRound(45, 10), '50');
+    eq('pv round: across a place', pvRound(96, 10), '100');
+    eq('pv round: a zero in the deciding place', pvRound(305, 100), '300');
+    eq('pv round: tenths, halfway up', pvRound(0.25, 0.1), '0.3');
+    eq('pv round: hundredths', pvRound(0.444, 0.01), '0.44');
+    eq('pv family of number_sense', familyOf('number_sense'), 'pv');
+
     if (bad.length) { console.error(`ws-content-audit: FAIL - ${bad.length} self-test(s)`); bad.forEach(b => console.error('  - ' + b)); process.exit(1); }
     console.log(`ws-content-audit: OK (self-test, ${TESTS} name-reading assertions)`);
 }
@@ -1291,7 +1629,8 @@ function selfTest() {
     }
     const app = await open({ seed: 4242 });
     await hideOverlays(app.page);
-    let skills = (await listSkills(app.page)).filter(s => CATS.includes(s.categoryId));
+    let skills = (await listSkills(app.page)).filter(s => CATS.includes(s.categoryId)
+        && !(PV_FAMILY_CATS.includes(s.categoryId) && PV_EXCLUDED.has(s.skillId)));
     if (ONLY_FAMILY) skills = skills.filter(s => FAMILY_CATS[ONLY_FAMILY].includes(s.categoryId));
     if (ONLY_CAT) skills = skills.filter(s => s.categoryId === ONLY_CAT);
     if (ONLY_SKILL) skills = skills.filter(s => s.skillId === ONLY_SKILL);
@@ -1306,7 +1645,7 @@ function selfTest() {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ws-audit-'));
     const mjs = path.join(tmp, 'skill-options.mjs');
     fs.writeFileSync(mjs, fs.readFileSync(path.join(ROOT, 'js', 'modules', 'skill-options.js')));
-    const { optionsFor } = await import(pathToFileURL(mjs).href);
+    const { optionsFor, pvBandFloor } = await import(pathToFileURL(mjs).href);
     fs.rmSync(tmp, { recursive: true, force: true });
     const withNotation = new Set(skills
         .filter(s => optionsFor(s.categoryId, s.skillId).some(o => o.id === 'notation'))
@@ -1353,6 +1692,32 @@ function selfTest() {
         if (block) for (const m of block[1].matchAll(/^\s*'([^']+)'\s*:\s*'([^']+)'/gm)) routed.set(m[1], m[2]);
     }
 
+    // The disk mat's geometry at S / M / L, read from the kit itself in the page (disk-fits), and
+    // a printed build cell at each size measured from its own zone rectangles.
+    const pvGeom = skills.some(s => s.skillId === 'pv_disks_build' || s.skillId === 'place_value_disks')
+        ? await app.page.evaluate(async () => {
+            try {
+                const kit = await import('/js/modules/sheet/index.js');
+                const rows = [];
+                for (const size of ['S', 'M', 'L']) {
+                    for (const place of [1, 10, 100, 1000]) {
+                        rows.push({ size, place, d: kit.diskDiameter(place, size), zone: kit.zoneSide(place, size), capacity: kit.zoneCapacity(place, size) });
+                    }
+                }
+                const q = window.generateQuestionFor({ category: 'placevalue', skill: 'pv_disks_build', range: 1000, decimals: 0, seed: 7, itemIndex: 0 });
+                const cells = [];
+                for (const size of ['S', 'M', 'L']) {
+                    const html = kit.renderCell(q, { mode: 'print', size, state: 'blank' });
+                    const zones = [...html.matchAll(/<rect[^>]*width="([\d.]+)"[^>]*height="([\d.]+)"[^>]*data-pv-zone="(\d+)"/g)]
+                        .map(m => Math.min(parseFloat(m[1]), parseFloat(m[2])));
+                    const need = 3 * (kit.diskDiameter(100, size) + 2) + 2;
+                    cells.push({ size, minZone: zones.length ? Math.min(...zones) : 0, need });
+                }
+                return { rows, cells };
+            } catch (e) { return { error: String(e && e.message || e) }; }
+        })
+        : null;
+
     const out = [];
     for (const s of skills) {
         const family = familyOf(s.categoryId);
@@ -1367,8 +1732,34 @@ function selfTest() {
             routedTo: routed.get(s.skillId) || null,
             hasNotationOption: withNotation.has(`${s.categoryId}:${s.skillId}`),
         };
+        const baseSeed = seedFor(`${s.categoryId}:${s.skillId}`);
+        if (family === 'pv') {
+            // TWO RUNS. At Max Number 100 (the gate's standard) a skill whose place needs more must
+            // REFUSE — every item null — and a skill that can be dealt there is judged there. A
+            // skill with a floor is then judged at its floor, the smallest Max Number that hosts
+            // its place. The floor is read off the NAME ("Nearest 1,000" needs 10,000); where the
+            // name carries no place, the skill's own declaration (pvBandFloor) says.
+            const floor = Math.max(pvNameFloor(s.skillId, s.label), pvBandFloor(s.categoryId, s.skillId, {}) || 0);
+            const R = Math.max(100, floor);
+            const at100 = await app.page.evaluate(sampleInPage, { categoryId: s.categoryId, skillId: s.skillId, n: floor > 100 ? Math.min(N, 60) : N, baseSeed, range: 100, pv: true });
+            const items = R === 100 ? at100
+                : await app.page.evaluate(sampleInPage, { categoryId: s.categoryId, skillId: s.skillId, n: N, baseSeed, range: R, pv: true });
+            const dealt = floor > 100 ? at100.filter(x => !x.error && !x.empty) : [];
+            let buildMax10k = 0;
+            if (s.skillId === 'pv_disks_build') {
+                const big = await app.page.evaluate(sampleInPage, { categoryId: s.categoryId, skillId: s.skillId, n: 60, baseSeed, range: 10000, pv: true });
+                buildMax10k = Math.max(0, ...big.filter(x => x.pv).map(x => x.pv.n));
+            }
+            skill.pvCtx = {
+                R, geom: pvGeom, buildMax10k,
+                refusedAt100: floor > 100 ? { floor, dealt: dealt.length, sample: dealt.slice(0, 3).map(x => x.fullText.slice(0, 40)) } : null,
+                midpointSeeded: optionsFor(s.categoryId, s.skillId).some(o => o.id === 'midpoint' && o.default === 'seeded'),
+            };
+            out.push({ ...skill, ...audit(skill, items) });
+            continue;
+        }
         const items = await app.page.evaluate(sampleInPage, {
-            categoryId: s.categoryId, skillId: s.skillId, n: N, baseSeed: seedFor(`${s.categoryId}:${s.skillId}`), range: 100,
+            categoryId: s.categoryId, skillId: s.skillId, n: N, baseSeed, range: 100,
             k2: family === 'k2',
         });
         out.push({ ...skill, ...audit(skill, items) });
@@ -1420,13 +1811,13 @@ function selfTest() {
     if (JSON_OUT) { fs.writeFileSync(path.resolve(ROOT, JSON_OUT), JSON.stringify(out, null, 1)); console.log('wrote', JSON_OUT); }
 
     const scope = [ONLY_FAMILY, ONLY_CAT, ONLY_SKILL].filter(Boolean).join('/')
-        || `${new Set(out.map(s => s.family)).size > 1 ? 'operations + K-2' : out[0].family}`;
+        || [...new Set(out.map(s => s.family))].map(f => ({ operations: 'operations', k2: 'K-2', pv: 'place value' })[f] || f).join(' + ');
     const noteCount = out.reduce((n, s) => n + s.notes.length, 0);
     // "lying about itself" vs "legitimately mixed": a failing skill contradicts its own name; a
     // mixed pool is held to the union of its pool's names and is counted separately, so the
     // owner can see at a glance that the mixed pools are not what is failing.
     const badMixed = bad.filter(s => s.pool).length;
-    const summary = `${out.length} ${scope} skills, ${N} items each, Max Number 100`;
+    const summary = `${out.length} ${scope} skills, ${N} items each, Max Number 100${out.some(s => s.family === 'pv') ? ' (a pv skill with a place floor also at its floor)' : ''}`;
     const split = `${bad.length - badMixed} contradict their own name, ${badMixed} of ${mixed.length} mixed pools deal outside their pool`;
     if (bad.length && !has('report-only')) {
         console.error(`\nws-content-audit: FAIL - ${bad.length} of ${summary} (${split}; ${noteCount} notes)`);
