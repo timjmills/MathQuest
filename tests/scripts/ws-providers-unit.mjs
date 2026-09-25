@@ -591,6 +591,14 @@ checkSkill('algebra:function_table_hard');
 // kit payload in q.cell, every task of each skill dealt round the 20 items.
 const cellOf = (template, payload) => ({ template, v: 1, payload });
 const K2_LANE_MAKERS = {
+    // count_objects' conservation task (task 'same'), dealt beside the plain count
+    'counting:count_objects': (r, i) => {
+        if (i % 2 === 0) { const n = int(r, 1, 30); return { ans: n, text: 'How many stars are there?', cell: cellOf('counters', { kind: 'count', n, shape: 'star', ans: n }) }; }
+        const n = int(r, 3, 10); const same = i % 4 === 1; const m = same ? n : n + (i % 8 === 3 ? -1 : 1);
+        const labels = ['Same', 'Not the same']; const correct = same ? 0 : 1;
+        return { ans: labels[correct], printAnswer: labels[correct], answerType: 'text', text: 'Do A and B have the same number of stars?', _variant: 'same',
+            cell: cellOf('counters', { kind: 'conserve', n, m, shape: 'star', posB: [], labels, correct, ans: labels[correct] }) };
+    },
     'counting:zero_none': (r, i) => {
         const task = ['count', 'count', 'find', 'compute'][i % 4];
         if (task === 'find') {

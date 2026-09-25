@@ -26,21 +26,21 @@ Sources:
 
 - Skills mapped: 609 live skills; 497 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 56 have no standard, with a reason (50 vocabulary games, 6 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
-- **Full coverage: CCSS 78 of 177 standards FULL, 88 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 105 FULL, 90 PARTIAL, 22 GAP.
+- **Full coverage: CCSS 78 of 177 standards FULL, 88 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 106 FULL, 89 PARTIAL, 22 GAP.
 - **Essential Elements: 85 of 117 FULL, 29 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 267 entries — 124 new skills, 88 options on existing skills, 2 repairs; 155 from the White Rose audit (40 of them extended to close standards clauses), 59 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+- The one build list: 265 entries — 124 new skills, 86 options on existing skills, 2 repairs; 155 from the White Rose audit (40 of them extended to close standards clauses), 57 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
-| K | 12 / 9 / 1 of 22 (55% full) | 13 / 10 / 1 of 24 | 9 / 1 / 0 of 10 (90% full) | 21/22, 10/10 |
+| K | 12 / 9 / 1 of 22 (55% full) | 14 / 9 / 1 of 24 | 9 / 1 / 0 of 10 (90% full) | 21/22, 10/10 |
 | 1 | 11 / 10 / 0 of 21 (52% full) | 13 / 10 / 0 of 23 | 11 / 4 / 1 of 16 (69% full) | 21/21, 16/16 |
 | 2 | 12 / 10 / 4 of 26 (46% full) | 12 / 9 / 6 of 27 | 11 / 7 / 1 of 19 (58% full) | 22/26, 18/19 |
 | 3 | 12 / 13 / 0 of 25 (48% full) | 18 / 15 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
 | 4 | 14 / 13 / 1 of 28 (50% full) | 19 / 13 / 2 of 34 | 16 / 4 / 0 of 20 (80% full) | 27/28, 20/20 |
 | 5 | 10 / 14 / 2 of 26 (38% full) | 16 / 13 / 5 of 34 | 13 / 4 / 1 of 18 (72% full) | 24/26, 17/18 |
 | 6 | 7 / 19 / 3 of 29 (24% full) | 14 / 20 / 8 of 42 | 10 / 7 / 0 of 17 (59% full) | 26/29, 17/17 |
-| **All** | **78 / 88 / 11 of 177 (44% full)** | **105 / 90 / 22 of 217** | **85 / 29 / 3 of 117 (73% full)** | 166/177, 115/117 |
+| **All** | **78 / 88 / 11 of 177 (44% full)** | **106 / 89 / 22 of 217** | **85 / 29 / 3 of 117 (73% full)** | 166/177, 115/117 |
 
 ## Tag fixes made by this audit
 
@@ -350,23 +350,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 12 | **Function Machines** (`function_machine`) | new `algebra:function_machines` | - | 1 |
 | 13 | **Two Quantities That Change Together** (`two_variables`) | new `algebra:two_variable_relationships` | 6.EE.C.9 | - |
 
-### Counting and early number (12)
-
-| # | Entry | Kind | Closes standards | Closes WRM steps |
-|---|---|---|---|---|
-| 1 | **Say How Many Without Counting** (`subitise`) | new `counting:subitise` | - | 7 |
-| 2 | **Count Out a Number** (`ten_count_out`) | new `counting:count_out` | K.CC.B.5, M.EE.K.CC.6, M.EE.2.NBT.2 | 1 |
-| 3 | **Count in a Circle and to 30 (option)** (`count_objects_more`) | option on `counting:count_objects` | K.CC.B.5, M.EE.2.NBT.2 | - |
-| 4 | **Count by Making Tens** (`tens_ones_group`) | new `composing:count_in_tens_groups` | 1.NBT.A.1 | 2 |
-| 5 | **Number Sense Review** (`consolidate`) | new `counting:number_sense_review` | - | 3 |
-| 6 | **Count to 120 on the Chart (option)** (`chart_120`) | option on `composing:hundreds_chart_fill` | 1.NBT.A.1 | - |
-| 7 | **Same Number After Moving (option)** (`count_conserve`) | option on `counting:count_objects` | K.CC.B.4b | - |
-| 8 | **Odd or Even by Pairing (option)** (`odd_even_pairs`) | option on `composing:odd_even` | 2.OA.C.3 | - |
-| 9 | **Understand 10 and 20 (option)** (`teen_structure`) | option on `composing:teen_compose` | - | 2 |
-| 10 | **Write the Numbers 0 to 20** (`write_numerals`) | new `counting:write_numbers_0_20` | K.CC.A.3 | - |
-| 11 | **Count in 3s** (`count_3s`) | new `patterns:count_in_3s` | - | 1 |
-| 12 | **Number Words 0 to 10 (option)** (`words_0_10`) | option on `composing:number_word_form` | - | 1 |
-
 ### Decimals and percents (13)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
@@ -384,6 +367,21 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 11 | **Decimal Sequences** (`dec_sequence`) | new `patterns:decimal_sequences` | - | 1 |
 | 12 | **Percentages: Multi-Step and Missing Values (option)** (`percent_multi`) | option on `conversions:percent_of_number` | - | 1 |
 | 13 | **Ratio and Fractions (option)** (`ratio_fraction`) | option on `conversions:ratio_intro` | - | 1 |
+
+### Counting and early number (10)
+
+| # | Entry | Kind | Closes standards | Closes WRM steps |
+|---|---|---|---|---|
+| 1 | **Say How Many Without Counting** (`subitise`) | new `counting:subitise` | - | 7 |
+| 2 | **Count Out a Number** (`ten_count_out`) | new `counting:count_out` | K.CC.B.5, M.EE.K.CC.6, M.EE.2.NBT.2 | 1 |
+| 3 | **Count by Making Tens** (`tens_ones_group`) | new `composing:count_in_tens_groups` | 1.NBT.A.1 | 2 |
+| 4 | **Number Sense Review** (`consolidate`) | new `counting:number_sense_review` | - | 3 |
+| 5 | **Count to 120 on the Chart (option)** (`chart_120`) | option on `composing:hundreds_chart_fill` | 1.NBT.A.1 | - |
+| 6 | **Odd or Even by Pairing (option)** (`odd_even_pairs`) | option on `composing:odd_even` | 2.OA.C.3 | - |
+| 7 | **Understand 10 and 20 (option)** (`teen_structure`) | option on `composing:teen_compose` | - | 2 |
+| 8 | **Write the Numbers 0 to 20** (`write_numerals`) | new `counting:write_numbers_0_20` | K.CC.A.3 | - |
+| 9 | **Count in 3s** (`count_3s`) | new `patterns:count_in_3s` | - | 1 |
+| 10 | **Number Words 0 to 10 (option)** (`words_0_10`) | option on `composing:number_word_form` | - | 1 |
 
 ### Integers (2)
 
@@ -420,18 +418,14 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught in part by: Count Objects (1-20) (Visual) (`counting:count_objects`); Zero Means None (`counting:zero_none`)  
   Missing: writing the numerals 0-20 (formation: trace, copy, write)  
   Build: Write the Numbers 0 to 20 (`write_numerals`)
-- **K.CC.B.4b** — PARTIAL. Understand that the last number name said tells the number of objects counted. The number of objects is the same regardless of their arrangement or the order in which they were counted.  
-  Taught in part by: Count Objects (1-20) (Visual) (`counting:count_objects`); Build a Number on a Ten Frame (`composing:ten_frame_build`)  
-  Missing: the number is the same whatever the arrangement or the order of counting (conservation)  
-  Build: Same Number After Moving (option) (`count_conserve`)
 - **K.CC.B.4c** — PARTIAL. Understand that each successive number name refers to a quantity that is one larger.  
   Taught in part by: Next/Before/After Number (Visual) (`counting:count_sequence`)  
   Missing: each next number name is a quantity one larger: n objects and one more, as a picture  
   Build: Add or Subtract 1 or 2 (`add_sub_1_2`)
 - **K.CC.B.5** — PARTIAL. Count to answer “how many?” questions about as many as 20 things arranged in a line, a rectangular array, or a circle, or as many as 10 things in a scattered configuration; given a number from 1–20, count out that many objects.  
   Taught in part by: Count Objects (1-20) (Visual) (`counting:count_objects`); Build a Number on a Ten Frame (`composing:ten_frame_build`); Build a Teen Number on Two Ten Frames (`composing:ten_frame_build_teen`)  
-  Missing: things arranged in a circle; given a number 1-20, count out that many from a larger group  
-  Build: Count in a Circle and to 30 (option) (`count_objects_more`); Count Out a Number (`ten_count_out`)
+  Missing: given a number 1-20, count out that many from a larger group  
+  Build: Count Out a Number (`ten_count_out`)
 - **K.CC.C.7** — PARTIAL. Compare two numbers between 1 and 10 presented as written numerals.  
   Taught in part by: Compare Numbers (>, <, =) (`placevalue:compare`)  
   Missing: two numerals between 1 and 10 (the lowest band of compare is 99)  
@@ -591,8 +585,8 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Build: Share and Make Groups (`share_group`)
 - **M.EE.2.NBT.2** — PARTIAL. Extend understanding of numbers and quantities. a. Count to answer "how many?" questions about as many as 30 things. b. Given a number from 1-30, count out that many objects. c. Name the next number in a sequence between 1 and 10.  
   Taught in part by: Count Objects (1-20) (Visual) (`counting:count_objects`); Next/Before/After Number (Visual) (`counting:count_sequence`)  
-  Missing: count 21-30 things and count out 1-30 objects (count_objects stops at 20)  
-  Build: Count in a Circle and to 30 (option) (`count_objects_more`); Count Out a Number (`ten_count_out`)
+  Missing: count out 1-30 objects from a larger group  
+  Build: Count Out a Number (`ten_count_out`)
 - **M.EE.2.NBT.5** — PARTIAL. Identify the meaning of the “+” sign (including combine, plus, add), “-” sign (including separate, subtract, take), and the “=” sign (including the same amount as, equal).  
   Taught in part by: Which Sign Makes It True? (+ − × ÷) (`number_ops_mixed:which_sign`)  
   Missing: the meaning of + (combine, plus, add), − (separate, take) and = (the same amount as) in words  
@@ -1010,15 +1004,14 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Not FULL because of its lettered parts.  
 -   **K.CC.B.4a** — FULL. When counting objects, say the number names in the standard order, pairing each object with one and only one number name and each number name with one and only one object.  
   Taught by: Count Objects (1-20) (Visual) (`counting:count_objects`) — touch-and-count support pairs each object with one number name  
--   **K.CC.B.4b** — PARTIAL. Understand that the last number name said tells the number of objects counted. The number of objects is the same regardless of their arrangement or the order in which they were counted.  
-  In part: Count Objects (1-20) (Visual) (`counting:count_objects`); Build a Number on a Ten Frame (`composing:ten_frame_build`)  
-  Missing: the number is the same whatever the arrangement or the order of counting (conservation) → `count_conserve`  
+-   **K.CC.B.4b** — FULL. Understand that the last number name said tells the number of objects counted. The number of objects is the same regardless of their arrangement or the order in which they were counted.  
+  Taught by: Count Objects (1-20) (Visual) (`counting:count_objects`); Build a Number on a Ten Frame (`composing:ten_frame_build`) — conservation: count_objects task "same" (A in rows, B moved and spread out: same number? check), build lane k2  
 -   **K.CC.B.4c** — PARTIAL. Understand that each successive number name refers to a quantity that is one larger.  
   In part: Next/Before/After Number (Visual) (`counting:count_sequence`)  
   Missing: each next number name is a quantity one larger: n objects and one more, as a picture → `add_sub_1_2`  
 - **K.CC.B.5** — PARTIAL. Count to answer “how many?” questions about as many as 20 things arranged in a line, a rectangular array, or a circle, or as many as 10 things in a scattered configuration; given a number from 1–20, count out that many objects.  
-  In part: Count Objects (1-20) (Visual) (`counting:count_objects`); Build a Number on a Ten Frame (`composing:ten_frame_build`); Build a Teen Number on Two Ten Frames (`composing:ten_frame_build_teen`)  
-  Missing: things arranged in a circle; given a number 1-20, count out that many from a larger group → `count_objects_more`, `ten_count_out`  
+  In part: Count Objects (1-20) (Visual) (`counting:count_objects`); Build a Number on a Ten Frame (`composing:ten_frame_build`); Build a Teen Number on Two Ten Frames (`composing:ten_frame_build_teen`) — up to 20 in a circle: count_objects arrangement "circle" with the start marked (build lane k2)  
+  Missing: given a number 1-20, count out that many from a larger group → `ten_count_out`  
 *C. Compare numbers.*
 
 - **K.CC.C.6** — FULL. Identify whether the number of objects in one group is greater than, less than, or equal to the number of objects in another group, e.g., by using matching and counting strategies.  
@@ -1933,8 +1926,8 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **M.EE.2.NBT.1** — FULL. Represent numbers up to 30 with objects in sets of tens and ones (e.g., ten frames, hundreds chart, columns). (CCSS 2.NBT.A.1)  
   Taught by: Build a Number with Base-10 Blocks (`composing:base10_build`); Teen Numbers: 10 + Ones (Visual) (`composing:teen_compose`)  
 - **M.EE.2.NBT.2** — PARTIAL. Extend understanding of numbers and quantities. a. Count to answer "how many?" questions about as many as 30 things. b. Given a number from 1-30, count out that many objects. c. Name the next number in a sequence between 1 and 10. (CCSS 2.NBT.A.2)  
-  In part: Count Objects (1-20) (Visual) (`counting:count_objects`); Next/Before/After Number (Visual) (`counting:count_sequence`)  
-  Missing: count 21-30 things and count out 1-30 objects (count_objects stops at 20) → `count_objects_more`, `ten_count_out`
+  In part: Count Objects (1-20) (Visual) (`counting:count_objects`); Next/Before/After Number (Visual) (`counting:count_sequence`) — count 21-30 things: count_objects band 30, rows of ten (build lane k2)  
+  Missing: count out 1-30 objects from a larger group → `ten_count_out`
 - **M.EE.2.NBT.3** — FULL. Identify numerals 1 to 30. (CCSS 2.NBT.A.3)  
   Taught by: Number Word Form (`composing:number_word_form`); Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`)  
 - **M.EE.2.NBT.4** — FULL. Compare sets of objects and numbers using accurate vocabulary (e.g., greater, more, less, equal). (CCSS 2.NBT.A.4)  

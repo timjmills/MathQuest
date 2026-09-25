@@ -39,6 +39,7 @@ const MINUS = '−';
 function countPicture(ctx, n, shape, p = {}) {
     if (p.objects === 'frame') return framePicture(ctx, n);
     if (p.objects === 'dice') return dicePicture(ctx, n);
+    if (p.layout === 'circle') return circlePicture(ctx, n, shape, p);
     if (p.layout === 'scattered' && Array.isArray(p.pos) && p.pos.length === n) {
         const d = 9;
         const w = Math.max(...p.pos.map((q) => q[0])) + d / 2 + 1, h = Math.max(...p.pos.map((q) => q[1])) + d / 2 + 1;
@@ -62,7 +63,37 @@ function countPicture(ctx, n, shape, p = {}) {
         // touch order, so Steps 1-3 (touch, count, the last number is how many) are shown.
         if (p.countMarks) body += `<text x="${n2(cx)}" y="${n2(under ? cy + d / 2 + 5 : cy + 1.4)}" text-anchor="middle" font-size="${under ? 4.6 : 3.8}" font-weight="700" font-family="Andika, sans-serif" fill="${GREY}" data-ws-ink="trace">${i + 1}</text>`;
     }
-    return svg(ctx, w, h, body, { label: `${n} ${shapeOf(shape).plural}` });
+    // build lane k2 (count to 30): at support level 2 each FULL row of ten is labelled 10 at its right
+    let wx = w;
+    if (line && p.tenMarks) {
+        for (let r = 0; r < Math.floor(n / 10); r++) {
+            body += `<text x="${n2(w + 2)}" y="${n2(0.5 + d / 2 + r * pitch + 1.6)}" font-size="4.6" font-weight="700" font-family="Andika, sans-serif" fill="${INK}">10</text>`;
+        }
+        wx = w + 8;
+    }
+    return svg(ctx, wx, h, body, { label: `${n} ${shapeOf(shape).plural}` });
+}
+
+/**
+ * Build lane k2 (K.CC.B.5 "things arranged in a circle"): n objects evenly round a circle, the
+ * first at the top. With `startMark` (support level 2) a solid pointer outside the first object
+ * marks where to start, so the pupil does not count round twice.
+ */
+function circlePicture(ctx, n, shape, p = {}) {
+    const d = 8, pitch = 11;
+    const R = Math.max(12, (n * pitch) / (2 * Math.PI));
+    const pad = 1 + d / 2 + (p.startMark ? 5 : 0);
+    const c = R + pad;
+    let body = '';
+    for (let i = 0; i < n; i++) {
+        const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+        body += shapeOf(shape).draw(c + R * Math.cos(a), c + R * Math.sin(a), d);
+    }
+    if (p.startMark) {
+        const y0 = c - R - d / 2 - 1;
+        body += `<path d="M${n2(c)} ${n2(y0)}L${n2(c - 2.2)} ${n2(y0 - 3.6)}L${n2(c + 2.2)} ${n2(y0 - 3.6)}Z" fill="${INK}"/>`;
+    }
+    return svg(ctx, 2 * c, 2 * c, body, { label: `${n} ${shapeOf(shape).plural} in a circle` });
 }
 
 /** P11: n solid counters in ten frames (5 x 2, 9 mm cells), a second frame under the first. */
@@ -341,6 +372,22 @@ function holderPicture(ctx, n, shape, p, { scale = 1, crossed = false } = {}) {
 register('counters', {
     render(p, ctx) {
         const kv = p.ans;
+        if (p.kind === 'conserve') {
+            // K.CC.B.4b: A in tidy rows of five, B spread out in another order; Same / Not the same.
+            const labels = p.labels || ['Same', 'Not the same'];
+            const on = checkedChoice(p, ctx, labels);
+            const lab = (t) => `<b style="width:${L(ctx, 7)};text-align:right;font-size:${P(ctx, digitPt(ctx) * 0.8)};line-height:1;flex:none;">${t}</b>`;
+            // Each group sits on its own mat (a thin ink outline), so a spread-out object can never
+            // be read as belonging to the other group.
+            const mat = (inner) => `<span style="display:inline-block;border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 3)};padding:${L(ctx, 2)} ${L(ctx, 3)};line-height:0;">${inner}</span>`;
+            const rowA = `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};">${lab('A')}${mat(countPicture(ctx, p.n, p.shape, { countMarks: p.marks }))}</div>`;
+            const rowB = `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};margin-top:${L(ctx, 3)};">${lab('B')}`
+                + `${mat(countPicture(ctx, p.m, p.shape, { layout: 'scattered', pos: p.posB }))}</div>`;
+            // flex-wrap: on a narrow screen the check boxes drop under the pictures, which keep their size
+            return root(ctx, 'k2-conserve', `<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:${L(ctx, 4)} ${L(ctx, 8)};">`
+                + `<div style="display:inline-block;flex:none;text-align:left;">${rowA}${rowB}</div>`
+                + choiceRow(ctx, labels.map((l) => ({ label: l })), { on, vertical: true, labelPt: textPt(ctx) + 2 }) + '</div>');
+        }
         if (p.kind === 'zero') {
             const k = pscale(ctx);
             if (p.task === 'find') {
@@ -436,7 +483,7 @@ register('counters', {
         return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2 };
     },
     inputs(p) {
-        if (p && p.kind === 'zero' && p.task === 'find') return [{ id: 'answer', kind: 'check', shape: 'check', graded: true, order: 0, scopes: ['full'] }];
+        if (p && ((p.kind === 'zero' && p.task === 'find') || p.kind === 'conserve')) return [{ id: 'answer', kind: 'check', shape: 'check', graded: true, order: 0, scopes: ['full'] }];
         return [{ id: 'answer', kind: 'number', shape: 'box', graded: true, order: 0, scopes: ['full', 'answer-only'] }];
     },
     layout() { return { card: 'card-medium-visual', checker: 'value' }; },

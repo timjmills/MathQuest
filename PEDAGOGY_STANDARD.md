@@ -1270,6 +1270,7 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `count-tens` | Write how many tens. | count rods or full ten frames as tens (added 2026-09-25) |
 | `count-zero` | Count. Write how many. None is 0. | count objects on a plate, an empty one included: zero means none (build lane k2, 2026-09-25) |
 | `check-none` | Check the one with none. | find the empty plate, box or frame among three (build lane k2) |
+| `check-same-number` | Same number? Check one box. | count A, count B, check Same or Not the same after the objects move (build lane k2) |
 | `sort-count` | Sort. Write how many in each ring. | sort pictures into labelled rings, then count each ring (build lane k2) |
 | `check-most-ring` | Check the ring with the most. | compare the groups of a finished sort (build lane k2) |
 | `order-rings` | Write 1, 2, 3 under the rings. Start with the fewest. | order the groups of a finished sort by count (build lane k2) |

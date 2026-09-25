@@ -3185,6 +3185,30 @@ const K2_LANE_OPTIONS = {
     ],
 };
 for (const [key, defs] of Object.entries(K2_LANE_OPTIONS)) SKILL_OPTIONS[key] = defs;
+
+// Options the lane adds to EXISTING K skills (build list: count_objects_more, count_conserve,
+// chart_120, hundreds_foundation, teen_structure, pictures_to_sentence, regroup_hundreds). Each
+// keeps the skill's old default, so an old page or link deals exactly what it did (R2).
+const _k2Swap = (key, id, fn) => {
+    const list = (SKILL_OPTIONS[key] || []).slice();
+    const i = list.findIndex((o) => o && o.id === id);
+    if (i >= 0) list[i] = fn(list[i]); else list.push(fn(null));
+    SKILL_OPTIONS[key] = list;
+};
+// count_objects: count to 30 (rows of ten, M.EE.2.NBT.2); objects in a circle (K.CC.B.5); the
+// "same number?" task (conservation, K.CC.B.4b).
+_k2Swap('counting:count_objects', 'band', () => _opsBand([5, 10, 20, 30], 20, { label: 'Count to',
+    labels: { 30: '30 (rows of ten)' }, help: 'The largest number on the page. To 30 draws the objects in rows of ten.' }));
+_k2Swap('counting:count_objects', 'orientation', (o) => ({ ...o,
+    values: [...o.values.filter((v) => v.v !== 'circle'), { v: 'circle', l: 'In a circle (mark where you start)' }],
+    help: 'Scattered and in a circle are the hardest: the pupil has to keep track of what he has counted '
+        + '(in a circle, where he started). Support level 2 marks the first object of a circle.' }));
+_k2Swap('counting:count_objects', 'task', () => ({
+    id: 'task', label: 'Task', type: 'enum', default: 'count', group: 'difficulty',
+    values: [{ v: 'count', l: 'How many? (default)' }, { v: 'same', l: 'Same number? (the same objects moved: check a box)' }],
+    help: 'Same number? shows two pictures, the second spread out or in another order: the number does not change when '
+        + 'objects move. Half the items really are the same. (Counted to 10 at most.)',
+}));
 // ============================ end build lane k2 ============================
 // ================ O6 · APPEARANCE: OPERATIONS, CLOCKS, MONEY  (lane AP4, 2026-09-25) ================
 // design/audit/OPTIONS-RUBRIC.md §1 O6. Each control changes how an item LOOKS — never the numbers

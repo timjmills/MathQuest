@@ -317,10 +317,15 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // The count is dealt through a shuffled permutation of 3-20 (one cell in ten a 1 or 2), so
         // a page spreads it instead of rolling six numbers that may repeat.
         // P11: "Count to" 5 / 10 / 20 (20 is the stand-alone default).
+        // Build lane k2: the "same number?" task (conservation) has its own cell.
+        if (_kOpt('task') === 'same') { _k2Conserve(q, rng); return; }
         const band = Number(_kOpt('band')) || 20;
-        const count = band <= 5 ? 1 + _kDealShuffled(5)
-            : band <= 10 ? ((_kAt % 10 === 9) ? rng(1, 2) : 3 + _kDealShuffled(8))
-                : (_kAt % 10 === 9) ? rng(1, 2) : 3 + _kDealShuffled(18);
+        const _coCircle = _kOpt('orientation') === 'circle';
+        // Build lane k2: count to 30 (11-30, rows of ten); a circle holds at most 20.
+        const count = band >= 30 && !_coCircle ? 11 + _kDealShuffled(20)
+            : band <= 5 ? 1 + _kDealShuffled(5)
+                : band <= 10 ? ((_kAt % 10 === 9) ? rng(1, 2) : 3 + _kDealShuffled(8))
+                    : (_kAt % 10 === 9) ? rng(1, 2) : 3 + _kDealShuffled(18);
         const objects = _kOpt('objects') || 'shapes';
         const shape = objects === 'pictures' ? ['ball', 'apple', 'fish'][rng(0, 2)]
             : objects === 'frame' || objects === 'dice' ? 'circle'
@@ -343,9 +348,13 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         if (objects === 'frame' || objects === 'dice') _coPayload.objects = objects;
         const layout = _kOpt('orientation') || 'rows';
         if (layout === 'line' || layout === 'scattered') _coPayload.layout = layout;
+        if (layout === 'circle' && objects !== 'frame' && objects !== 'dice') _coPayload.layout = 'circle';
+        if (band > 20 && !_coPayload.layout && objects !== 'frame' && objects !== 'dice') _coPayload.layout = 'line';   // to 30: rows of ten, every item alike
         if (layout === 'scattered' && objects !== 'frame' && objects !== 'dice') _coPayload.pos = _kScatter(count, rng);
         const lvl = _kLevel(1);
-        if (lvl >= 2) _coPayload.track = band;          // a number track 1..band to point along (hint)
+        if (lvl >= 2 && band <= 20) _coPayload.track = band;   // a number track 1..band to point along (hint)
+        if (lvl >= 2 && band > 20) _coPayload.tenMarks = true;   // to 30: each finished ten bracketed (hint)
+        if (lvl >= 2 && _coPayload.layout === 'circle') _coPayload.startMark = true;   // the first object marked (hint)
         if (lvl >= 3) _coPayload.traced = true;         // the answer written in grey to trace
         q.supportLevel = lvl;
         _kSetCell(q, 'counters', _coPayload);
@@ -1980,5 +1989,51 @@ function _k2SortGroups(q, rng) {
     q.hint = 'Look at one ring. What is the same about everything in it?';
     q.distractorTags = { [words[1 - correct].label]: 'named a rule that does not split the rings' };
     _kSetCell(q, 'sort-rings', Object.assign(payload, { words, correct, labels: words.map((w) => w.label) }));
+    return true;
+}
+
+/**
+ * SAME NUMBER AFTER MOVING (count_objects `task: 'same'`; K.CC.B.4b "the number of objects is the
+ * same regardless of their arrangement or the order in which they were counted"). A: n objects in
+ * tidy rows of five. B: the same kind, spread out in another order - the same n on half the items,
+ * n - 1 or n + 1 on the others (n - 1 spread wide is the classic trap: it LOOKS like more). Check
+ * Same or Not the same. Support level 2 numbers A's objects (grey, in counting order).
+ */
+/** Spread-out positions (mm) for conservation's group B: a wider lattice (14 mm, jitter 1.5 mm)
+ *  than _kScatter, so no two 9 mm objects ever touch; five columns keep B no wider than A. */
+function _k2Spread(n, rng) {
+    const cols = 5, rows = Math.ceil(n / cols) + 1, pitch = 14;
+    const cells = shuffle(Array.from({ length: cols * rows }, (_, i) => i)).slice(0, n);
+    const pts = cells.map((c) => [5.5 + (c % cols) * pitch + (rng(0, 30) - 15) / 10, 5.5 + Math.floor(c / cols) * pitch + (rng(0, 30) - 15) / 10]);
+    const x0 = Math.min(...pts.map((p) => p[0])) - 5.5, y0 = Math.min(...pts.map((p) => p[1])) - 5.5;
+    return pts.map(([x, y]) => [+(x - x0).toFixed(1), +(y - y0).toFixed(1)]);
+}
+
+function _k2Conserve(q, rng) {
+    const band = Math.min(10, Number(_kOpt('band')) || 10);
+    const objects = _kOpt('objects') || 'shapes';
+    const shape = objects === 'pictures' ? K2_PICTURE_KINDS[_kPageDeal('cons-shape', K2_PICTURE_KINDS.length)] : K2_COUNT_SHAPES[_kPageDeal('cons-shape', K2_COUNT_SHAPES.length)];
+    const n = 3 + _kDealShuffled(Math.max(2, band - 2));          // 3..band
+    const same = _kDealShuffled(2) === 0;
+    const m = same ? n : (n > 3 && rng(0, 1) === 0 ? n - 1 : n + 1);
+    const labels = ['Same', 'Not the same'];
+    const correct = same ? 0 : 1;
+    const plural = K2_SHAPES[shape].plural;
+    const lvl = _kLevel(1);
+    q.text = `Do A and B have the same number of ${plural}?`;
+    q.printText = 'Same number? Check one box.';
+    q.ans = labels[correct];
+    q.printAnswer = labels[correct];
+    q.acceptedAnswers = same ? ['same', 'yes'] : ['not the same', 'no', 'different'];
+    q.answerType = 'text';
+    q.options = [];
+    q.selfAnswering = true;
+    q.hint = 'Count A. Then count B. Moving them does not change how many.';
+    q.distractorTags = { [labels[1 - correct]]: m < n ? 'thought spread out means more' : 'judged by how much room they take' };
+    q._variant = 'same';
+    q.printFormat = 'k2-same';
+    q.supportLevel = lvl;
+    q.skillLabel = 'Count Objects';
+    _kSetCell(q, 'counters', { kind: 'conserve', n, m, shape, posB: _k2Spread(m, rng), labels, correct, ans: labels[correct], marks: lvl >= 2 });
     return true;
 }

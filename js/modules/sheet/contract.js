@@ -127,6 +127,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     // Build lane k2 (2026-09-25, design/BUILD_LIST.md): the new K-1 picture skills.
     'count-zero': 'Count. Write how many. None is 0.',
     'check-none': 'Check the one with none.',
+    'check-same-number': 'Same number? Check one box.',
     'sort-count': 'Sort. Write how many in each ring.',
     'check-most-ring': 'Check the ring with the most.',
     'order-rings': 'Write 1, 2, 3 under the rings. Start with the fewest.',

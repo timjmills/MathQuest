@@ -13,17 +13,39 @@ import { num, arr, obj, countList, digitsOf, chooseWrong, strings, step, clampSt
 
 /* ========================================================================= count_objects */
 
+const COUNT_WRITE = {
+    iCan: 'I Can count objects to 20',
+    instructionKey: 'count-write',
+    steps: ['Touch each one.', 'Say one number for each one you touch.', 'The last number you say is how many.', 'Write the number.'],
+    say: 'I count __.',
+};
+const COUNT_30 = Object.assign({}, COUNT_WRITE, { iCan: 'I Can count objects to 30' });
+const COUNT_SAME = {
+    iCan: 'I Can tell when two groups have the same number',
+    instructionKey: 'check-same-number',
+    steps: ['Count A. Touch each one.', 'Count B. Touch each one.', 'Same number? Check Same.', 'Moving them does not change how many.'],
+    say: 'A has __. B has __.',
+    sayValues: (q) => { const p = (q && q.cell && q.cell.payload) || {}; return Number.isFinite(p.n) && Number.isFinite(p.m) ? [p.n, p.m] : null; },
+};
+
 registerSkill('counting:count_objects', {
     // S2: the supports this skill can draw (touch dots, cues, panes); the Support control offers these.
     supports: Object.freeze(['steps']),
-    strings: strings({
-        iCan: 'I Can count objects to 20',
-        instructionKey: 'count-write',
-        steps: ['Touch each one.', 'Say one number for each one you touch.', 'The last number you say is how many.', 'Write the number.'],
-        say: 'I count __.',
-    }),
-    misconceptions: ['counted-twice', 'skipped-one', 'reversed-teen'],
+    // task 'same' (K.CC.B.4b): two groups, one moved; the instruction and steps change with it.
+    strings: stringsBy((t, ref) => (t === 'same' ? COUNT_SAME
+        : (Number(ref && ref.opts && ref.opts.band) > 20 || num(payloadOf(ref && ref.q).n) > 20) ? COUNT_30 : null), COUNT_WRITE),
+    misconceptions: ['counted-twice', 'skipped-one', 'reversed-teen', 'spread-means-more'],
     workedSteps: (q) => {
+        const p = payloadOf(q);
+        if (p.kind === 'conserve') {
+            const n = num(p.n); const m = num(p.m);
+            return [
+                step(`Count A: ${countList(1, n, 1, 10)}. A has ${n}.`),
+                step(`Count B: ${countList(1, m, 1, 10)}. B has ${m}.`),
+                step(n === m ? `${n} and ${m} are the same number.` : `${n} and ${m} are not the same number.`),
+                step(`Check "${q.ans}".`, [{ slot: 'answer', value: String(q.ans) }]),
+            ];
+        }
         const n = num(q.ans);
         if (!Number.isFinite(n)) return [];
         const thing = (/How many (\w+)/i.exec(String(q.text || '')) || [])[1] || 'objects';
@@ -35,6 +57,12 @@ registerSkill('counting:count_objects', {
         ];
     },
     wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        if (p.kind === 'conserve') {
+            const other = (p.labels || []).find((l) => l !== q.ans);
+            const spread = num(p.m) < num(p.n);
+            return other ? chooseWrong(q, [{ value: other, misconception: 'spread-means-more', explain: spread ? 'B is spread out, so it looked like more.' : 'Looked at how much room they take, not how many.' }]) : null;
+        }
         const n = num(q.ans);
         if (!Number.isFinite(n)) return null;
         const c = [];

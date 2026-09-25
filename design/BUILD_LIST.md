@@ -19,16 +19,16 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 
 ## Summary
 
-- 267 entries: **124 new skills, 88 new options, 2 repairs**, and **53 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 28 option, 1 skill, 6 migration, 1 band).
-- 155 from the White Rose audit (40 extended for standards), 59 from the standards audit.
-- They close 112 CCSS leaves and parts and 32 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
+- 265 entries: **124 new skills, 86 new options, 2 repairs**, and **53 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 28 option, 1 skill, 6 migration, 1 band).
+- 155 from the White Rose audit (40 extended for standards), 57 from the standards audit.
+- They close 111 CCSS leaves and parts and 32 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
 - The visual catalogue: 210 representations (MATCH 11, PARTIAL 103, GAP 96); every PARTIAL and GAP one is on an entry below.
 - 30 new sheet-kit templates and panes are needed; each is owned by one lane.
 - Lanes `k2` and `operations` were already building from this list: their entries keep their order and names, and the catalogue's entries are APPENDED after them.
 
 | Lane | Entries | New skills | Options | Repairs | Added from visual catalogue | Standards closed | WRM steps closed | Representations drawn | Visual reach (steps) |
 |---|---|---|---|---|---|---|---|---|---|
-| Counting and early number (K-1 pictures) (`k2`) | 27 | 8 | 7 | 0 | 12 | 13 | 18 | 49 | 443 |
+| Counting and early number (K-1 pictures) (`k2`) | 25 | 8 | 5 | 0 | 12 | 12 | 18 | 49 | 443 |
 | Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 40 | 18 | 10 | 1 | 11 | 21 | 50 | 35 | 316 |
 | Place value, rounding and estimation (the pv kit) (`placevalue`) | 21 | 4 | 8 | 0 | 9 | 9 | 36 | 23 | 327 |
 | Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 28 | 14 | 10 | 0 | 4 | 19 | 20 | 17 | 104 |
@@ -115,7 +115,7 @@ positions are share codes, so nothing is spliced and the integrator fixes the fi
    catalogue follow, in dependency-then-reach order.
 3. Lanes run in parallel; an entry whose dependency is in another lane waits for it (named in its `After` line).
 
-## Lane `k2`: Counting and early number (K-1 pictures) (27)
+## Lane `k2`: Counting and early number (K-1 pictures) (25)
 
 Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,bond,seqstrip,compare,chartwindow,base10,wordpic,count-row,k2kit}.js`, `js/modules/sheet/providers/k2.js`. Builds templates: `picture-row`, `sort-rings`.
 
@@ -157,19 +157,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 1-3 → to 10 → to 20 → to 30 · O3 objects in a line → scattered; touch dots → none · O6 objects / counters.
 - **Misconceptions:** keeps counting past n; counts an object twice.
 
-### 4. Count in a Circle and to 30 (option) — `count_objects_more`
-
-- **What:** option on `counting:count_objects`: arrangement "circle" and band 30. Grade K · family counting · source standards audit.
-- **Closes (standards):** K.CC.B.5, M.EE.2.NBT.2 · tag with CCSS K.CC.B.5, EE M.EE.2.NBT.2
-- **Closes (White Rose steps):** none
-- **Teaches:** counting up to 20 things arranged in a circle (mark the start) and up to 30 things for the EE.
-- **Problem types:** (1) how many in the circle? (mark where you start); (2) how many in the array?; (3) count to 30 in rows of ten.
-- **Representation:** Templates: `counters`.
-- **Answer:** write the number.
-- **Ladder:** O2 circle to 10 → to 20; band 30 · O3 start object marked → none · O6 circle / array / line.
-- **Misconceptions:** counts round the circle twice; loses the place after 20.
-
-### 5. Count by Making Tens — `tens_ones_group`
+### 4. Count by Making Tens — `tens_ones_group`
 
 - **What:** new skill `composing:count_in_tens_groups`. Grade K-1 · family counting · source White Rose audit.
 - **Closes (standards):** 1.NBT.A.1 · tag with CCSS K.NBT.A.1, 1.NBT.A.1, 1.NBT.B.2, EE M.EE.1.NBT.1, M.EE.1.NBT.2
@@ -181,7 +169,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 to 30 → to 50 → to 100 · O3 tens pre-ringed → first ten ringed → none · O6 objects / sticks / dots.
 - **Misconceptions:** counts every object instead of grouping; writes the ones before the tens (43 for 34).
 
-### 6. Number Sense Review — `consolidate`
+### 5. Number Sense Review — `consolidate`
 
 - **What:** new skill `counting:number_sense_review`. Grade PK · family counting · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS K.CC.A.1, EE M.EE.K.CC.1
@@ -193,7 +181,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 the pool's members at to 5 / to 10 · O3 the members' own support levels · O6 as the members.
 - **Misconceptions:** depends on the drawn member (see its skill).
 
-### 7. Part-Whole Model — `part_whole`
+### 6. Part-Whole Model — `part_whole`
 
 - **What:** new skill `composing:part_whole_model`. Grade K · family operations · source White Rose audit.
 - **Closes (standards):** K.OA.A.1 · tag with CCSS K.OA.A.1, K.OA.A.3, EE M.EE.K.OA.1
@@ -205,7 +193,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 within 5 → 10 → 20 · O3 counters in the circles → none · O6 cherry / bar.
 - **Misconceptions:** adds the whole and a part; writes 3 − 5 = 2.
 
-### 8. Count to 120 on the Chart (option) — `chart_120`
+### 7. Count to 120 on the Chart (option) — `chart_120`
 
 - **What:** option on `composing:hundreds_chart_fill`: band 120: chart windows from 100 to 120 (crossing 100). Grade 1 · family counting · source standards audit.
 - **Closes (standards):** 1.NBT.A.1 · tag with CCSS 1.NBT.A.1, EE M.EE.1.NBT.1
@@ -217,19 +205,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 90-110 → 100-120 · O3 row starts given → none · O6 window / whole chart.
 - **Misconceptions:** writes 1010 for 110; 109 → 200.
 
-### 9. Same Number After Moving (option) — `count_conserve`
-
-- **What:** option on `counting:count_objects`: task: "same number?" after the objects are moved or counted in another order. Grade K · family counting · source standards audit.
-- **Closes (standards):** K.CC.B.4b · tag with CCSS K.CC.B.4b, EE M.EE.K.CC.4
-- **Closes (White Rose steps):** none
-- **Teaches:** the last number said tells how many, and the number of objects does not change when they are moved or counted in a different order.
-- **Problem types:** (1) two pictures of the same set, one spread out: same number? tick; (2) count in a new order: how many now?; (3) which picture has the same number?.
-- **Representation:** Templates: `counters`.
-- **Answer:** tick same / not the same; write the number.
-- **Ladder:** O2 to 5 → to 10 · O3 touch dots numbered → none · O6 rows / scattered / line.
-- **Misconceptions:** spread-out objects are "more"; recounting from the other end gives a new number.
-
-### 10. How Many Hundreds? (option) — `hundreds_foundation`
+### 8. How Many Hundreds? (option) — `hundreds_foundation`
 
 - **What:** option on `composing:tens_foundation_visual`: unit "hundreds": 100, 200 … 900 as 1 … 9 hundreds (0 tens 0 ones). Grade 2 · family placevalue · source standards audit.
 - **Closes (standards):** 2.NBT.A.1b · tag with CCSS 2.NBT.A.1b, EE M.EE.2.NBT.1
@@ -241,7 +217,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 to 500 → 900 · O3 each flat labelled 100 → none · O6 flats / disks.
 - **Misconceptions:** 600 has 6 tens; writes 6 for 600.
 
-### 11. Write the Number Sentence for the Picture (option) — `pictures_to_sentence`
+### 9. Write the Number Sentence for the Picture (option) — `pictures_to_sentence`
 
 - **What:** option on `addition:add_5_pictures` (and `subtraction:sub_5_pictures`): response "write the number sentence" (the pupil writes 3 + 2 = 5 for the picture). Grade K · family operations · source standards audit.
 - **Closes (standards):** K.OA.A.1 · tag with CCSS K.OA.A.1, EE M.EE.K.OA.1
@@ -253,7 +229,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 within 5 → within 10 · O3 frame with signs printed → blank line · O6 pictures / dots / ten frame.
 - **Misconceptions:** writes the total first (5 + 3 = 2); uses + for a take-away picture.
 
-### 12. A Hundred Is Ten Tens (option) — `regroup_hundreds`
+### 10. A Hundred Is Ten Tens (option) — `regroup_hundreds`
 
 - **What:** option on `composing:base10_regroup`: band 999: trade 1 hundred for 10 tens. Grade 2 · family placevalue · source standards audit.
 - **Closes (standards):** 2.NBT.A.1a · tag with CCSS 2.NBT.A.1a, EE M.EE.2.NBT.1
@@ -265,7 +241,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 hundreds only → with tens and ones · O3 flat drawn with its ten rods → none · O6 blocks / disks.
 - **Misconceptions:** 100 = 10 ones; a trade changes the number.
 
-### 13. Understand 10 and 20 (option) — `teen_structure`
+### 11. Understand 10 and 20 (option) — `teen_structure`
 
 - **What:** option on `composing:teen_compose`: 10 and 20. Grade K · family counting · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS K.NBT.A.1, K.CC.A.3, EE -
@@ -277,7 +253,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 10 → 20 → mix with 11-19 · O3 frames drawn full → partly → none · O6 frames / rods.
 - **Misconceptions:** calls 20 "twelve"; counts the ten as 1.
 
-### 14. Write the Numbers 0 to 20 — `write_numerals`
+### 12. Write the Numbers 0 to 20 — `write_numerals`
 
 - **What:** new skill `counting:write_numbers_0_20`. Grade K · family counting · source standards audit.
 - **Closes (standards):** K.CC.A.3 · tag with CCSS K.CC.A.3, EE M.EE.2.NBT.3
@@ -289,7 +265,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 0-5 → 0-10 → 11-20 · O3 dotted trace with start dot and arrow → start dot only → empty box · O6 pictures / dots / ten frame.
 - **Misconceptions:** reverses 2, 3, 5, 7, 9; writes 31 for 13; leaves the box empty for zero.
 
-### 15. Number Bonds to 20 — `bonds_20`
+### 13. Number Bonds to 20 — `bonds_20`
 
 - **What:** new skill `composing:bonds_to_20`. Grade K · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS K.OA.A.1, 1.OA.C.6, EE M.EE.K.OA.1
@@ -305,7 +281,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 
 Your existing entries that also draw catalogued representations (build them with these pictures): `systematic_bonds` (V112); `subitise` (V102, V135); `ten_count_out` (V101); `tens_ones_group` (V116); `teen_structure` (V103).
 
-### 16. Picture Task Kinds (one more, order, which, match, pairs) — `vis_k2_picture_tasks`
+### 14. Picture Task Kinds (one more, order, which, match, pairs) — `vis_k2_picture_tasks`
 
 - **Added from visual catalogue.** option · grade PK-5 · lane `k2`.
 - **Build:** counters / compare task kinds: `plusone` (a row + one empty place to draw), `order` (order pictured groups or dominoes), `which` (tick every picture that shows n), `match` (draw one-to-one lines between two rows or cards), `ask: 'difference'` (how many more) to 20, `layout: 'pairs'` (odd / even, one left over), and pictures either side of a compare circle.
@@ -315,7 +291,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 133 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 17. Part-Whole Options (parts, values, pictures, open, chains) — `vis_bond_options`
+### 15. Part-Whole Options (parts, values, pictures, open, chains) — `vis_bond_options`
 
 - **Added from visual catalogue.** option · grade PK-5 · lane `k2`.
 - **Build:** template:bond gains `parts: 2..5`, `orientation: 'up'`, `values: 'decimal' | 'fraction' | 'text'`, `draw: 'objects' | 'cubes' | 'base10' | 'disks' | 'coins' | 'regions'` (the two-region mat), `task: 'open' | 'bond-list'` (all blank, many answers, the key shows one; a list of bonds in order) and `link` / `levels` (chained bonds, the F / D / P tree, the mixed-number partition flow). The fact-family look `facts: 'add4' | 'eight'` is asked of the operations lane (family.js).
@@ -325,7 +301,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 103 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 18. Read a Base-10 Picture (template option) — `vis_base10_read`
+### 16. Read a Base-10 Picture (template option) — `vis_base10_read`
 
 - **Added from visual catalogue.** option · grade PK-5 · lane `k2`.
 - **Build:** template:base10 gains `task: 'read'` (a to-scale picture to count, the pupil writes the number), the hundred flat and a thousand-cube symbol, `unit: 'flat'` (flat = 1 for tenths and hundredths), ring marks round groups and crossed-out blocks for take-away.
@@ -335,7 +311,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 101 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 19. New Picture Kinds: Cubes, Bundles, Number Shapes, Rods, Dominoes — `vis_object_kinds`
+### 17. New Picture Kinds: Cubes, Bundles, Number Shapes, Rods, Dominoes — `vis_object_kinds`
 
 - **Added from visual catalogue.** option · grade PK-5 · lane `k2`.
 - **Build:** pane:objects / k2kit gain line-drawn kinds: linking cubes (towers, `layout: 'staircase'`), bundles and packs printed 10 / 100 / 1,000, number shapes (plates with holes in two columns), number rods, a domino (one tile, two halves), and algebra cubes (a lettered cube + unit squares); every kind in B&W with the single grey.
@@ -345,7 +321,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 94 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 20. Ten-Frame Options (units, frames, fills, five frame) — `vis_tenframe_options`
+### 18. Ten-Frame Options (units, frames, fills, five frame) — `vis_tenframe_options`
 
 - **Added from visual catalogue.** option · grade PK-4 · lane `k2`.
 - **Build:** tenframe gains `unit: 1 | 10 | 100 | 1000 | 0.1` (place-value counters in the frame), `frames: 2 | 3`, `orientation: 'vertical'`, `fill: 'five' | 'pairs' | 'rows' | 'any'`, `mode: 'double'` (top row mirrored), `frame: 'five'` (the 1 × 5 frame) and a third, hatched set; ten_frame_build_teen moves off the legacy path.
@@ -355,7 +331,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 79 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 21. Sort Tables, Venn and Carroll Diagrams — `vis_sort_diagrams`
+### 19. Sort Tables, Venn and Carroll Diagrams — `vis_sort_diagrams`
 
 - **Added from visual catalogue.** option · grade PK-5 · lane `k2`.
 - **Build:** sort-rings gains the sort table (2–5 labelled columns), the Venn diagram (2 sets; a universal rectangle; blank labels; nested) and the Carroll diagram (2 × 2), each taking number, shape or picture tiles written in by letter.
@@ -365,7 +341,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 51 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 22. Number Tracks With Fractions, Decimals, Words and Pictures — `vis_count_row_values`
+### 20. Number Tracks With Fractions, Decimals, Words and Pictures — `vis_count_row_values`
 
 - **Added from visual catalogue.** option · grade PK-5 · lane `k2`.
 - **Build:** count-row / seqstrip tiles take fractions, decimals, words (Roman numerals) and pictures (a washing line of cards, growing counter columns for pattern terms, a fraction shape shaded one more part each tile), and a track may start below zero.
@@ -375,7 +351,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 49 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 23. Bead String and Hundred-Bead Rekenrek — `vis_bead_panes`
+### 21. Bead String and Hundred-Bead Rekenrek — `vis_bead_panes`
 
 - **Added from visual catalogue.** pane · grade PK-4 · lane `k2`.
 - **Build:** a new pane:beadstring (10, 20 or 100 beads in runs of five or ten alternating solid / hollow; `unit` 1, 0.1 or 1 %) and `rows: 1..10` on pane:rekenrek (100 beads); both answer-free supports.
@@ -385,7 +361,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 37 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 24. Hidden Part (cover mark) — `vis_cover_mark`
+### 22. Hidden Part (cover mark) — `vis_cover_mark`
 
 - **Added from visual catalogue.** pane · grade PK-5 · lane `k2`.
 - **Build:** a cover mark: an outline box with "?" laid over k items of a pane (counters, beads, a bond part, digits, part of a chart); the hidden amount is the answer; `hide: k` on the hosts.
@@ -395,7 +371,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 29 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 25. Shade the Hundred Square (whole-chart tasks) — `vis_chart_shade`
+### 23. Shade the Hundred Square (whole-chart tasks) — `vis_chart_shade`
 
 - **Added from visual catalogue.** option · grade PK-5 · lane `k2`.
 - **Build:** chartwindow gains the whole chart with `task: 'shade' | 'circle' | 'sieve'` (multiples, a second set ringed, the sieve of primes) and the cross-shaped window; patterns:skip_count_grid (algebra lane generator) moves onto it from the legacy path.
@@ -405,7 +381,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 24 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 26. First – Then – Now Story Strip — `vis_story_strip`
+### 24. First – Then – Now Story Strip — `vis_story_strip`
 
 - **Added from visual catalogue.** option · grade PK-K · lane `k2`.
 - **Build:** picture-row gains the three-panel story strip (outline panels captioned First / Then / Now, pictures or ten frames, a sentence frame under) with `unknown: 'start' | 'change' | 'result'`.
@@ -415,7 +391,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 13 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 27. Hands-On Card and Game Pages (low) — `vis_k2_hands_on`
+### 25. Hands-On Card and Game Pages (low) — `vis_k2_hands_on`
 
 - **Added from visual catalogue.** template (low priority) · grade PK · lane `k2`.
 - **Build:** printable hands-on pages that are not cells: memory / snap card sheets, a spinner or dice track game, a bingo grid of numerals; no answer key beyond the card list.

@@ -210,7 +210,8 @@
       "horizontal": "H",
       "rows": "R",
       "line": "L",
-      "scattered": "S"
+      "scattered": "S",
+      "circle": "C"
     },
     "unknown": {
       "0": "0",
@@ -280,7 +281,8 @@
       "numerals": "U",
       "hands": "B",
       "write": "4",
-      "most": "5"
+      "most": "5",
+      "same": "S"
     },
     "zeroPlace": {
       "none": "N",

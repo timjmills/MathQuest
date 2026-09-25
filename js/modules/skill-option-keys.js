@@ -238,7 +238,9 @@ export const VALUE_TOKENS = Object.freeze({
     regroup: Object.freeze({ none: 'N', always: 'A', mixed: 'M' }),
     orientation: Object.freeze({ vertical: 'V', horizontal: 'H',
         // P11 count_objects arrangement
-        rows: 'R', line: 'L', scattered: 'S' }),
+        rows: 'R', line: 'L', scattered: 'S',
+        // build lane k2: count_objects in a circle
+        circle: 'C' }),
     unknown: Object.freeze({ answer: 'A', first: 'F', second: 'S', mixed: 'M',
         // P9 step 8 more / less
         start: 'T' }),
@@ -259,7 +261,7 @@ export const VALUE_TOKENS = Object.freeze({
         find: 'F', order: 'O', collection: 'D', words: 'W', missing: 'I', numerals: 'U', hands: 'B',
         // build lane k2 (2026-09-25): the letters are all taken, so the digits 4-9 (the numeric
         // set values of task are 0-3; a digit is never a field's first character)
-        write: '4', most: '5' }),
+        write: '4', most: '5', same: 'S' }),
     zeroPlace: Object.freeze({ none: 'N', some: 'S', always: 'A' }),
     op: Object.freeze({ x: 'M', '/': 'D', both: 'B' }),
     order: Object.freeze({ largest: 'L', scrambled: 'S',
