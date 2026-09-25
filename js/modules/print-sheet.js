@@ -32,6 +32,10 @@ import { renderPlan, SHEET_ENGINE_CSS, skillWords } from './sheet/roles/practice
 import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
+import {
+    normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, easeScore, ineligibleNote,
+    blockPlan, sideItems, pickDistinct,
+} from './sheet/anchors.js';
 
 /* ======================================================================== constants */
 
@@ -86,6 +90,9 @@ function normaliseRequest(req = {}) {
         lesson: req.lesson || (req.header && req.header.lesson),
         letters: Array.isArray(req.letters) ? req.letters.map((l) => String(l).toUpperCase()).filter((l) => LETTERS.includes(l)) : null,
         photocopySafe: !!req.photocopySafe,
+        // S6: step-by-step anchor problems - 'off' | 'side' | 'sections' (only the practice roles
+        // and Mixed practice take them; 'on' means the role's default, sections).
+        anchors: ANCHOR_ROLES.includes(role) ? normaliseAnchors(req.anchors) : 'off',
     };
 }
 
@@ -817,7 +824,7 @@ function skillMeta(sk, q) {
 
 /** One-section layout for a set of host items, exactly as the role will compute it. */
 function layoutOf(role, section, items, n, ctx) {
-    return resolveSectionLayout({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense }, items, ctx.paper, LIVE_W_MM, {
+    return resolveSectionLayout({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols }, items, ctx.paper, LIVE_W_MM, {
         size: n.size, look: n.look, header: ctx.header,
     });
 }
@@ -833,6 +840,76 @@ function floorOf(items) {
         }
     }
     return out;
+}
+
+/* ================================================================ S5 / S6 anchor problems */
+
+const ANCHOR_FIRST = 6;           // candidates generated before the page capacity is known
+const ANCHOR_MAX = 48;            // candidates per skill at most (side by side on a long run)
+
+/**
+ * The worked examples of ONE skill (design/SUPPORTS.md S5-S6). Candidates are generated under
+ * their OWN seeds (never a pupil item's seed), sorted easy-first (research: easy numbers first),
+ * drawn as anchors and measured, so the page reserves a band that holds any of them.
+ * `take(pupilItems, count)` then picks examples that are none of the pupil's problems (review
+ * note 5: an anchor is a sibling item, never the same item).
+ */
+function anchorSet(sk, si, n, { variant, colsList, twinCols }) {
+    const cands = [];
+    const seen = new Set();
+    let next = 0;
+    let eligible = null;
+    const base = ((n.seed ^ 0x2545F491) + si * 65537) >>> 0;
+    const grow = (want) => {
+        const fresh = [];
+        while (cands.length < Math.min(want, ANCHOR_MAX) && next < ANCHOR_MAX * 3) {
+            const seed = (base + next * 7919) >>> 0;
+            next++;
+            let q = null;
+            try { q = generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: 0 }); } catch (e) { q = null; }
+            if (!q || seen.has(signature(q))) continue;
+            seen.add(signature(q));
+            const it = hostItem({ q, skill: sk }, si, n.size);
+            if (eligible === null) eligible = anchorEligible(it);
+            if (!eligible) return;
+            const a = anchorItem(it, { variant, twinCols });
+            cands.push(a);
+            fresh.push(a);
+        }
+        if (fresh.length) measureItems(fresh, { size: n.size, look: n.look, colsList });
+        // Easy numbers first; a stable order, so the same seed reprints the same examples.
+        cands.sort((x, y) => easeScore(x.source.q) - easeScore(y.source.q) || signature(x.source.q).localeCompare(signature(y.source.q)));
+    };
+    grow(ANCHOR_FIRST);
+    return {
+        get eligible() { return !!eligible; },
+        get items() { return cands; },
+        grow,
+        /** The band height every candidate fits in (mm). */
+        // The easiest few are the ones a page uses; a later, taller one is never picked into a
+        // band that cannot hold it (see `take` callers).
+        heightMm: (cols = 1) => Math.max(0, ...cands.slice(0, 3).map((a) => anchorHeightMm(a, cols))),
+        /** `count` examples that are none of the pupil items (cycled if the skill runs out). */
+        take(pupil, count) {
+            const sigs = new Set(pupil.filter((it) => it && it.q).map((it) => signature(it.q)));
+            const sigOf = (a) => signature(a.source.q);
+            const free = () => cands.filter((a) => !sigs.has(sigOf(a))).length;
+            if (free() < count) grow(cands.length + count - free() + 2);
+            return pickDistinct(cands, sigs, count, sigOf);
+        },
+    };
+}
+
+/** What a build did with anchors, for the dialog and the tests: the mode, each example, the notes. */
+function anchorSummary(mode, list, notes) {
+    const seen = new Set();
+    const examples = [];
+    for (const a of list) {
+        if (!a || !a.source || seen.has(a)) continue;
+        seen.add(a);
+        examples.push({ section: a.section, pool: a.pool, variant: a.anchor, skill: a.skill, text: String(a.source.q.text || ''), ans: a.source.q.ans, sig: signature(a.source.q), measured: a.measured });
+    }
+    return { mode, examples, notes: notes.slice() };
 }
 
 /**
@@ -903,6 +980,38 @@ export async function buildSheet(req = {}) {
     const layoutHeader = { tab: n.header.tab === false ? false : ['Level', 'Strand', 'Id'], title: n.header.title === false ? '' : title, titleLines: header.titleLines };
     const lctx = { paper, header: layoutHeader };
 
+    // S5 / S6: the worked examples of each section's skill, generated and measured BEFORE the
+    // page capacity is decided, so the capacity reserves their band (sections) or their half of
+    // every row (side by side). A skill with no real worked steps gets none, and the dialog says so.
+    const anchorMode = n.anchors;
+    const anchorNotes = [];
+    const instrMm = instructionMm(n.size);
+    const anchorSets = anchorMode === 'off' ? [] : n.sections.map((sec, si) => {
+        const sk = sec.skills[0];
+        const set = anchorSet(sk, si, n, anchorMode === 'side'
+            ? { variant: 'side', colsList: [1, 2], twinCols: 2 } : { variant: 'band', colsList: [1], twinCols: 4 });
+        if (!set.eligible) { anchorNotes.push(ineligibleNote(metaOf(sk).label)); return null; }
+        if (anchorMode === 'side') sec.columns = 2;
+        else { sec.maxCols = 4; sec.anchorMm = set.heightMm(1); }
+        return set;
+    });
+    /** A section's items as the layout sees them: side by side puts a twin before each. */
+    const withTwins = (si, items) => {
+        const set = anchorMode === 'side' ? anchorSets[si] : null;
+        if (!set || !set.items.length) return items;
+        return sideItems(items, items.map((_, i) => set.items[i % set.items.length]));
+    };
+    /** Pupil problems a page of this section holds, from its layout (anchors taken off). */
+    const capFromL = (sec, si, L) => {
+        if (anchorMode === 'sections' && anchorSets[si]) {
+            const body = sec.gridH ? sec.gridH + instrMm : bodyHeightMm(paper, layoutHeader);
+            return blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: body, instrMm, anchorMm: sec.anchorMm }).perPage;
+        }
+        if (anchorMode === 'side' && anchorSets[si] && anchorSets[si].items.length) return Math.max(1, Math.floor((L.cols === 1 ? Math.max(2, L.rows - (L.rows % 2)) : L.perPage) / 2));
+        return L.perPage;
+    };
+    const floorWith = (si, items) => floorOf(anchorMode === 'side' && anchorSets[si] ? items.concat(anchorSets[si].items) : items);
+
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
         const gen = generateRun(sec.skills, count, baseSeed, extra);
         return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size)], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
@@ -956,8 +1065,10 @@ export async function buildSheet(req = {}) {
         const body = bodyHeightMm(paper, layoutHeader) - 1;
         const instr = instructionMm(n.size);
         for (const members of groups.values()) {
+            // S6 sections: every member keeps room for its anchor band too.
+            const band = (si) => (anchorMode === 'sections' && anchorSets[si] ? n.sections[si].anchorMm || 0 : 0);
             const avail = body - members.length * instr;
-            const need = members.map((si) => layouts[si].hMin + 1);
+            const need = members.map((si) => layouts[si].hMin + 1 + band(si));
             const tw = members.reduce((a, si) => a + n.sections[si].group.share, 0) || 1;
             let h = members.map((si) => avail * n.sections[si].group.share / tw);
             // Every member gets at least one row; the others give up the height it lacks.
@@ -971,9 +1082,9 @@ export async function buildSheet(req = {}) {
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
-                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense },
-                    probesOf(si), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
-                out[si] = L.perPage;
+                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols },
+                    withTwins(si, probesOf(si)), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
+                out[si] = capFromL(sec, si, L);
             });
         }
         return out;
@@ -984,24 +1095,25 @@ export async function buildSheet(req = {}) {
         const probes = n.sections.map((sec, si) => {
             const base = (n.seed + si * 100003) >>> 0;
             const probe = probeRun(sec, si, base);
-            sec.floor = floorOf(probe.items);
+            sec.floor = floorWith(si, probe.items);
             return { base, probe };
         });
         probesOf = (si) => probes[si].probe.items;
-        const shared = shareRows(n.sections.map((sec, si) => layoutOf(n.role, sec, probes[si].probe.items, n, lctx)));
+        const shared = shareRows(n.sections.map((sec, si) => layoutOf(n.role, sec, withTwins(si, probes[si].probe.items), n, lctx)));
         n.sections.forEach((sec, si) => {
             const { base, probe } = probes[si];
             const pagesWanted = sec.pages || 1;
             // "A page" (or N pages) when no count is given: the page decides the count. The floor
             // only grows as items are added, so the capacity can only fall; the loop settles.
-            const pageCount = () => (shared[si] !== null ? shared[si] : layoutOf(n.role, sec, probe.items, n, lctx).perPage);
+            const pageCount = () => (shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, probe.items), n, lctx)));
             let want = sec.count || Math.min(MAX_ITEMS, pageCount() * pagesWanted);
             let items = [];
             for (let pass = 0; pass < 3; pass++) {
                 items = finalRun(sec, si, base, want, probe);
-                sec.floor = floorOf(probe.items.concat(items));
+                if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(items.length + 2);
+                sec.floor = floorWith(si, probe.items.concat(items));
                 if (sec.count) break;
-                const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, layoutOf(n.role, sec, items, n, lctx).perPage * pagesWanted);
+                const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, items), n, lctx)) * pagesWanted);
                 if (again >= want) break;
                 want = again;
             }
@@ -1017,12 +1129,15 @@ export async function buildSheet(req = {}) {
         const letterBaseOf = (si) => (L) => ((letterSeed(n.seed, L) + si * 100003) >>> 0);
         const firstProbes = n.sections.map((sec, si) => {
             const pr = probeRun(sec, si, letterBaseOf(si)(firstL));
-            sec.floor = floorOf(pr.items);
+            sec.floor = floorWith(si, pr.items);
             return pr;
         });
         probesOf = (si) => firstProbes[si].items;
-        const shared = shareRows(n.sections.map((sec, si) => layoutOf(n.role, sec, firstProbes[si].items, n, lctx)));
-        const firstLayouts = n.sections.map((sec, si) => layoutOf(n.role, sec, firstProbes[si].items, n, lctx));
+        const shared = shareRows(n.sections.map((sec, si) => layoutOf(n.role, sec, withTwins(si, firstProbes[si].items), n, lctx)));
+        const firstLayouts = n.sections.map((sec, si) => {
+            const L = layoutOf(n.role, sec, withTwins(si, firstProbes[si].items), n, lctx);
+            return Object.assign({}, L, { perPage: capFromL(sec, si, L) });
+        });
         n.sections.forEach((sec, si) => {
             const letterBase = letterBaseOf(si);
             const probes = new Map([[firstL, firstProbes[si]]]);
@@ -1043,8 +1158,9 @@ export async function buildSheet(req = {}) {
                 perLetter = letters.map(() => L0.perPage);
             }
             let byLetter = letters.map((L, k) => finalRun(sec, si, letterBase(L), perLetter[k], probeOf(L)));
-            sec.floor = floorOf([...probes.values()].flatMap((p) => p.items).concat(...byLetter));
-            const cap = shared[si] !== null ? shared[si] : layoutOf(n.role, sec, byLetter.flat(), n, lctx).perPage;
+            if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(byLetter.flat().length + 2);
+            sec.floor = floorWith(si, [...probes.values()].flatMap((p) => p.items).concat(...byLetter));
+            const cap = shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, byLetter.flat()), n, lctx));
             if (perLetter.some((c) => c > cap)) {
                 byLetter = letters.map((L, k) => (perLetter[k] > cap ? finalRun(sec, si, letterBase(L), cap, probeOf(L)) : byLetter[k]));
             }
@@ -1053,10 +1169,35 @@ export async function buildSheet(req = {}) {
         });
     }
 
+    // S6: attach the worked examples - never one of the pupil's problems (signatures differ).
+    let anchorsIn = null;
+    if (anchorMode !== 'off') {
+        const bySection = n.sections.map(() => []);
+        const bandMm = n.sections.map(() => 0);
+        n.sections.forEach((sec, si) => {
+            const set = anchorSets[si];
+            if (!set) return;
+            const mine = hostItems.filter((it) => it.section === si);
+            if (anchorMode === 'side') {
+                const tw = set.take(hostItems, mine.length);
+                mine.forEach((it, i) => { it.twin = tw[i] || null; });
+            } else {
+                // One example per block: enough for a sheet's blocks (a block holds 1-4 problems).
+                const perLetter = new Map();
+                for (const it of mine) perLetter.set(it.letter || '', (perLetter.get(it.letter || '') || 0) + 1);
+                const need = Math.min(24, Math.max(1, ...perLetter.values()));
+                bySection[si] = set.take(hostItems, need).filter((a) => anchorHeightMm(a, 1) <= sec.anchorMm + 0.05);
+                bandMm[si] = bySection[si].length ? sec.anchorMm : 0;
+            }
+        });
+        anchorsIn = { mode: anchorMode, bySection, bandMm };
+    }
+
     const input = {
         items: hostItems,
         skills,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense })),
+        anchors: anchorsIn,
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
@@ -1069,7 +1210,7 @@ export async function buildSheet(req = {}) {
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};
     const pageCount = out.pupilPages.length;
-    notes.push(...new Set((plan.meta && plan.meta.notes) || []));
+    notes.push(...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes);
     // DN-21: the dialog's "Fits:" line (it already carries the layout's own clamp note, DN-14),
     // then any note the layout line does not already say.
     const line = f0.line || '';
@@ -1089,6 +1230,7 @@ export async function buildSheet(req = {}) {
             text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy,
         })),
         gaps: out.gaps,
+        anchors: anchorSummary(anchorMode, anchorsIn ? anchorsIn.bySection.flat().concat(hostItems.map((it) => it.twin).filter(Boolean)) : [], anchorNotes),
         floors: n.sections.map((s) => s.floor || null),
         seed: n.seed,
         role: n.role,
@@ -1217,6 +1359,29 @@ async function buildRoleSheet(n, metaOf) {
         input.floors[p.id] = floorOf(probe[p.id]);
     });
 
+    // S6: Mixed practice's worked examples, one skill per pool, generated and measured before the
+    // shelves are packed (sections: one anchor band per skill; side: a twin per problem).
+    const anchorNotes = [];
+    let anchorsIn = null;
+    if (n.anchors !== 'off' && n.role === 'mixed-practice') {
+        const byPool = {};
+        pools.forEach((p, pi) => {
+            const sk = p.skills[0];
+            // The compact band (one state, steps beside): a skill's shelf band stays short.
+            const band = anchorSet(sk, pi, n, { variant: 'compact', colsList: [1], twinCols: 4 });
+            if (!band.eligible) { anchorNotes.push(ineligibleNote(metaOf(sk).label)); return; }
+            const entry = { band: band.items.slice(), bandSet: band };
+            if (n.anchors === 'side') {
+                const side = anchorSet(sk, pi + 4099, n, { variant: 'side', colsList, twinCols: 2 });
+                entry.side = side.items.slice();
+                entry.sideSet = side;
+            }
+            byPool[p.id] = entry;
+        });
+        anchorsIn = { mode: n.anchors, byPool };
+        input.anchors = anchorsIn;
+    }
+
     // 2. How many items the page needs, from the measured probe.
     const want = mod.counts(probe, input) || {};
 
@@ -1241,6 +1406,18 @@ async function buildRoleSheet(n, metaOf) {
         items = items.concat(its);
     });
     input.items = items;
+    if (anchorsIn) {
+        // Never one of the pupil's problems; a band never taller than the one the packing reserved.
+        for (const [id, e] of Object.entries(anchorsIn.byPool)) {
+            const pupil = items.filter((it) => it.pool === id);
+            const maxBand = Math.max(0, ...e.band.map((a) => anchorHeightMm(a, 1)));
+            e.band = e.bandSet.take(items, 4).filter((a) => anchorHeightMm(a, 1) <= maxBand + 0.05).slice(0, 1);
+            if (e.sideSet) {
+                const tw = e.sideSet.take(items, pupil.length);
+                pupil.forEach((it, i) => { it.twin = tw[i] || null; });
+            }
+        }
+    }
 
     if (typeof mod.supports === 'function') {
         const why = mod.supports(items);
@@ -1255,7 +1432,7 @@ async function buildRoleSheet(n, metaOf) {
     const out = renderPlan(plan, { key: n.key });
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};
-    const notes = [...new Set((plan.meta && plan.meta.notes) || [])];
+    const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes];
     const line = f0.line || '';
     return {
         pupilHtml: out.pupilHtml,
@@ -1269,6 +1446,7 @@ async function buildRoleSheet(n, metaOf) {
             thinking: it.thinking ? { isWrong: !!it.thinking.isWrong, shown: it.thinking.shown } : undefined,
         })),
         gaps: out.gaps,
+        anchors: anchorSummary(n.anchors, anchorsIn ? Object.values(anchorsIn.byPool).flatMap((e) => e.band).concat(items.map((it) => it.twin).filter(Boolean)) : [], anchorNotes),
         floors: pools.map((p) => input.floors[p.id]),
         seed: n.seed,
         role: n.role,

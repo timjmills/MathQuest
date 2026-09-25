@@ -13,6 +13,7 @@ import {
 } from '../tokens.js';
 import { blank } from '../cell.js';
 import { register, getCell } from '../registry.js';
+import { stepMarks, placeDigits, singleSlotState } from '../steps.js';
 
 export { FACT_LADDER, factTab, factDigitPt, factCellHMm, FACT_AUTO_COLS };
 
@@ -330,8 +331,12 @@ register('fact', {
         const text = ink && shown !== undefined && shown !== null ? String(shown) : '';
         // INK-3 / LS-1: a trace digit is grey, or a dotted outline when photocopy-safe.
         const cls = ink === 'trace' ? (ctx.photocopySafe ? 'ws-factans ws-dotted' : 'ws-factans ws-trace') : 'ws-factans';
-        const w = Math.max(n, text.length);
-        const cells = [...text.padStart(w, ' ')].map((ch) => `<span style="text-align:center">${ch === ' ' ? '' : ch}</span>`).join('');
+        // S5 step state (steps.js): one {ch, ink} per answer track, the newest grey (P-LC-9).
+        const st = Array.isArray(ctx.stepTracks) ? ctx.stepTracks : null;
+        const w = st ? st.length : Math.max(n, text.length);
+        const cells = st
+            ? st.map((tk) => (tk ? `<span class="${tk.ink === 'trace' ? (ctx.photocopySafe ? 'ws-dotted' : 'ws-trace') : ''}" data-ws-ink="${tk.ink}" style="text-align:center">${tk.ch}</span>` : '<span></span>')).join('')
+            : [...text.padStart(w, ' ')].map((ch) => `<span style="text-align:center">${ch === ' ' ? '' : ch}</span>`).join('');
         return item.html.replace('<span class="rule"></span>',
             `<span class="rule"></span><span class="${cls}" data-ws-slot="ans" data-ws-shape="open"${ink ? ` data-ws-ink="${ink}"` : ''} `
             + `style="grid-column:${w > n ? 1 : 2} / -1;font-weight:${ink === 'solid' ? 700 : 400};font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;display:grid;grid-template-columns:repeat(${w}, ${FACT_TRACK_EM}em);justify-content:end;height:1.15em;line-height:1.15">${cells}</span>`);
@@ -395,6 +400,20 @@ register('fact', {
         }];
     },
     layout() { return { card: 'card-simple', checker: 'value' }; },
+    /**
+     * S5 / P-LC-9: the fact after step k of `steps`. A fact drawn as a stack hands over to the
+     * stack's own step state; an across fact has one slot (blank, then grey, then black); a
+     * vertical fact writes the place marks digit by digit on its answer tracks.
+     */
+    stepState(p, steps, k, ctx) {
+        if (drawsStack(p, ctx)) return getCell('stack').stepState(stackPayload(p), steps, k, ctx);
+        const marks = stepMarks(steps, k);
+        if (drawsAcross(p, ctx)) return this.renderFact(p, Object.assign({}, ctx, { state: singleSlotState(marks) }));
+        const value = p.ans !== undefined ? p.ans : compute(p);
+        const n = factDigitTracks(p.a, p.b, p.digits || String(value ?? '').length);
+        const w = Math.max(n, String(value ?? '').length);
+        return this.renderFact(p, Object.assign({}, ctx, { state: 'blank', stepTracks: placeDigits(w, marks) }));
+    },
     /** The cell class and custom properties a fact cell carries (TY-30 ladder, CL-30 tab clearance). */
     gridItem(p, ctx) {
         if (drawsStack(p, ctx)) return { cls: '', style: '' };
