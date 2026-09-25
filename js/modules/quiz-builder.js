@@ -1,11 +1,21 @@
 // Quiz Builder — Teacher-facing test creation UI
 // 3-panel layout: Skill Grid | Preview + Add | Question List (with sections)
 // Layer 4: depends on state, data, quiz-storage, generate-question
+//
+// Teacher style (2026-09-25): the builder is drawn with the --tv-* tokens (css/teacher-quiz.css).
+// One primary action (Save quiz); Settings, Copy pupil link and Print beside it; Results, Live
+// monitor and Export JSON under "More". Filters are plain chips (All + the domains, levels K-6).
+// The preview column and every question card show the item as the black-and-white paper cell
+// of the teacher previews (teacher-preview.js), and the preview column stays visible at tablet
+// widths (it is the only way to add questions). Skills are buttons, so the keyboard reaches them.
 
 import { state } from './state.js';
 import { DOMAINS, SKILLS, GRADE_COLORS, getSkillGrade, sortByGrade, isMixedMetaSkill } from './data.js';
 import { shuffle } from './utils.js';
 import { saveTest, loadTest, listTests, deleteTest, exportTestJSON, importTestJSON, compressTestForURL, migrateTestToSections, getAllQuestionsFlat, getTotalQuestionCount } from './quiz-storage.js';
+import { icon, cleanLabel, levelText, copyText } from './teacher-ui.js';
+import { mountSample, mountQuestion } from './teacher-preview.js';
+import { isTeacher, note } from './teacher-quiz-ui.js';
 
 // ========= MODULE STATE =========
 const qb = {
@@ -21,6 +31,7 @@ const qb = {
     previewDebounceTimer: null,
     activeSection: 0,
     collapsedSections: {},
+    previewIndex: 0,        // which seeded example the teacher preview shows ("Another example")
 };
 
 let builderTest = null;
@@ -198,7 +209,19 @@ export function openQuizBuilder(testId) {
     window.showView('quizBuilderView');
 }
 
+/** A fresh builder opens with an empty preview column (no skill from the last quiz). */
+function resetPreview() {
+    qb.previewSkill = null;
+    qb.previewIndex = 0;
+    document.querySelectorAll('.qb-skill-card.previewing').forEach(c => c.classList.remove('previewing'));
+    const panel = document.getElementById('qbPreviewContent');
+    if (panel) panel.innerHTML = '<div class="qb-preview-empty">Choose a skill to see an example question. Then add as many questions as you need.</div>';
+    const addBar = document.getElementById('qbPreviewAddBar');
+    if (addBar) addBar.innerHTML = '';
+}
+
 function showBuilder() {
+    resetPreview();
     const myQuizzes = document.getElementById('qbMyQuizzesContainer');
     const builder = document.getElementById('qbBuilderContainer');
     if (myQuizzes) myQuizzes.style.display = 'none';
@@ -217,6 +240,8 @@ function showBuilder() {
 }
 
 export async function openMyQuizzes() {
+    // In the teacher view the Quizzes screen is the quiz list.
+    if (isTeacher() && window.tvGo) { closeQuizSettings(); window.tvGo('quizzes'); return; }
     const myQuizzes = document.getElementById('qbMyQuizzesContainer');
     const builder = document.getElementById('qbBuilderContainer');
     if (myQuizzes) myQuizzes.style.display = 'block';
@@ -266,7 +291,7 @@ function qbInitialize() {
     for (const [domainId, domain] of Object.entries(DOMAINS)) {
         html += `<div class="qb-domain-section" data-qb-domain="${domainId}">`;
         html += `<div class="qb-domain-header" style="border-color:${domain.color};color:${domain.color};">`;
-        html += `<span class="qb-domain-icon">${domain.icon}</span> ${domain.name}`;
+        html += `<span class="qb-domain-icon" aria-hidden="true">${domain.icon}</span> ${domain.name}`;
         html += `</div>`;
 
         for (const cat of domain.categories) {
@@ -280,7 +305,7 @@ function qbInitialize() {
 
             html += `<div class="qb-category-group" data-qb-category="${cat.id}" data-qb-domain="${domainId}">`;
             html += `<div class="qb-category-header">`;
-            html += `<span>${cat.icon}</span> ${cat.name}`;
+            html += `<span class="qb-cat-icon" aria-hidden="true">${cat.icon}</span> ${cat.name}`;
             html += `</div>`;
             html += `<div class="qb-skills-row">`;
 
@@ -294,17 +319,18 @@ function qbInitialize() {
                 const cleanLabel = rawLabel.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 const safeLabel = skill.l.toLowerCase().replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-                html += `<div class="qb-skill-card" `;
+                html += `<button type="button" class="qb-skill-card" `;
                 html += `data-qb-skill="${skill.v}" data-qb-cat="${cat.id}" data-qb-domain="${domainId}" `;
                 html += `data-qb-grade="${grade || ''}" data-qb-label="${safeLabel}" `;
                 html += `onclick="qbPreviewClick('${cat.id}','${skill.v}')" `;
                 html += `onmouseenter="qbPreviewHover('${cat.id}','${skill.v}')" `;
+                html += `onfocus="qbPreviewHover('${cat.id}','${skill.v}')" `;
                 html += `>`;
                 if (grade !== null && grade !== undefined) {
                     html += `<span class="qb-skill-grade" style="background:${gc.bg};color:${gc.text}">${grade}</span>`;
                 }
                 html += `<span class="qb-skill-name">${cleanLabel}</span>`;
-                html += `</div>`;
+                html += `</button>`;
             }
 
             html += `</div></div>`;
@@ -323,17 +349,29 @@ function qbInitialize() {
 }
 
 // ========= BUILD FILTER PILLS =========
+// Teacher view: short chip labels so all the domains fit on one row (the full name is the title).
+const DOMAIN_SHORT = {
+    'Counting & Cardinality': 'Counting',
+    'Number & Operations': 'Operations',
+    'Fractions, Decimals & Percents': 'Fractions & decimals',
+    'Geometry & Measurement': 'Geometry & measures',
+    'Data & Statistics': 'Data',
+    'Algebraic Thinking': 'Algebra',
+    'Math Vocabulary': 'Vocabulary',
+};
+
 function qbBuildDomainPills() {
     const container = document.getElementById('qbDomainFilter');
     if (!container) return;
 
-    let html = `<span class="qb-filter-label">Domain:</span>`;
-    html += `<button class="qb-domain-pill active" data-qb-filter-domain="" onclick="qbFilterDomain('')">All</button>`;
+    let html = `<span class="qb-filter-label" id="qbDomainLabel">Domain:</span>`;
+    html += `<button type="button" class="qb-domain-pill active" aria-pressed="true" data-qb-filter-domain="" onclick="qbFilterDomain('')">All</button>`;
 
     for (const [domainId, domain] of Object.entries(DOMAINS)) {
-        html += `<button class="qb-domain-pill" data-qb-filter-domain="${domainId}" `;
+        html += `<button type="button" class="qb-domain-pill" aria-pressed="false" data-qb-filter-domain="${domainId}" `;
         html += `style="--pill-bg:${domain.color}" `;
-        html += `onclick="qbFilterDomain('${domainId}')">${domain.icon} ${domain.name}</button>`;
+        const short = isTeacher() ? (DOMAIN_SHORT[domain.name] || domain.name) : domain.name;
+        html += `${short !== domain.name ? `title="${domain.name}" ` : ''}onclick="qbFilterDomain('${domainId}')"><span class="qb-pill-icon" aria-hidden="true">${domain.icon} </span>${short}</button>`;
     }
 
     container.innerHTML = html;
@@ -343,12 +381,13 @@ function qbBuildGradePills() {
     const container = document.getElementById('qbGradeFilter');
     if (!container) return;
 
-    let html = `<span class="qb-filter-label">Grade:</span>`;
-    const grades = ['K', 1, 2, 3, 4, 5, 6, 7];
+    let html = `<span class="qb-filter-label">${isTeacher() ? 'Level' : 'Grade'}:</span>`;
+    // K-6: the app has no grade 7 skills (a 7 chip filtered to nothing).
+    const grades = ['K', 1, 2, 3, 4, 5, 6];
 
     for (const g of grades) {
         const gc = GRADE_COLORS[g] || { bg: '#9E9E9E', text: '#fff' };
-        html += `<button class="qb-grade-pill" data-qb-filter-grade="${g}" `;
+        html += `<button type="button" class="qb-grade-pill" aria-pressed="false" aria-label="Level ${g}" data-qb-filter-grade="${g}" `;
         html += `style="--grade-bg:${gc.bg};--grade-text:${gc.text}" `;
         html += `onclick="qbFilterGrade('${g}')">${g}</button>`;
     }
@@ -369,7 +408,7 @@ function qbUpdateCategoryDropdown() {
             for (const cat of domain.categories) {
                 const catSkills = SKILLS[cat.id];
                 if (!catSkills || !catSkills.some(s => !isMixedMetaSkill(s.v))) continue;
-                html += `<option value="${cat.id}">${cat.icon} ${cat.name}</option>`;
+                html += `<option value="${cat.id}">${cat.name}</option>`;
             }
         }
     } else {
@@ -377,7 +416,7 @@ function qbUpdateCategoryDropdown() {
             for (const cat of domain.categories) {
                 const catSkills = SKILLS[cat.id];
                 if (!catSkills || !catSkills.some(s => !isMixedMetaSkill(s.v))) continue;
-                html += `<option value="${cat.id}">${cat.icon} ${cat.name}</option>`;
+                html += `<option value="${cat.id}">${cat.name}</option>`;
             }
         }
     }
@@ -395,6 +434,8 @@ export function qbFilterDomain(domainId) {
         const d = pill.dataset.qbFilterDomain;
         const isActive = (d === (domainId || ''));
         pill.classList.toggle('active', isActive);
+        pill.setAttribute('aria-pressed', String(isActive));
+        if (isTeacher()) { pill.style.background = ''; pill.style.borderColor = ''; return; }
         if (isActive && domainId) {
             const domain = DOMAINS[domainId];
             if (domain) {
@@ -431,6 +472,8 @@ export function qbFilterGrade(grade) {
         const g = pill.dataset.qbFilterGrade;
         const isActive = qb.activeGrades.has(g);
         pill.classList.toggle('active', isActive);
+        pill.setAttribute('aria-pressed', String(isActive));
+        if (isTeacher()) { pill.style.background = ''; pill.style.borderColor = ''; pill.style.color = ''; return; }
         if (isActive) {
             const gc = GRADE_COLORS[isNaN(g) ? g : parseInt(g)] || { bg: '#9E9E9E' };
             pill.style.background = gc.bg;
@@ -501,6 +544,7 @@ export function qbPreviewClick(categoryId, skillId) {
     clearTimeout(qb.previewDebounceTimer);
     qbGeneratePreview(categoryId, skillId);
 
+
     document.querySelectorAll('.qb-skill-card').forEach(c => c.classList.remove('previewing'));
     const card = document.querySelector(`.qb-skill-card[data-qb-skill="${skillId}"][data-qb-cat="${categoryId}"]`);
     if (card) card.classList.add('previewing');
@@ -509,6 +553,13 @@ export function qbPreviewClick(categoryId, skillId) {
 function qbGeneratePreview(categoryId, skillId) {
     const panel = document.getElementById('qbPreviewContent');
     if (!panel) return;
+    if (isTeacher()) {
+        const same = qb.previewSkill && qb.previewSkill.categoryId === categoryId && qb.previewSkill.skillId === skillId;
+        if (!same) qb.previewIndex = 0;
+        qb.previewSkill = { categoryId, skillId };
+        renderTeacherPreview(categoryId, skillId);
+        return;
+    }
 
     const cacheKey = `${categoryId}:${skillId}`;
 
@@ -531,6 +582,11 @@ function qbGeneratePreview(categoryId, skillId) {
 
 export function qbRefreshPreview() {
     if (!qb.previewSkill) return;
+    if (isTeacher()) {
+        qb.previewIndex = (qb.previewIndex + 1) % 50;
+        renderTeacherPreview(qb.previewSkill.categoryId, qb.previewSkill.skillId);
+        return;
+    }
     const { categoryId, skillId } = qb.previewSkill;
     const cacheKey = `${categoryId}:${skillId}`;
 
@@ -612,6 +668,40 @@ function renderPreview(q, categoryId, skillId) {
                 <input type="number" id="qbAddNum" value="1" min="1" class="qb-add-num-input">
                 <button class="qb-add-widget-btn" onclick="qbAddFromPreview()">+ Add</button>
             </div>
+        </div>`;
+    }
+}
+
+/** The preview column in the teacher view: the skill's sample as a paper cell, plus Add. */
+function renderTeacherPreview(categoryId, skillId) {
+    const panel = document.getElementById('qbPreviewContent');
+    if (!panel) return;
+    const skills = SKILLS[categoryId] || [];
+    const skillDef = skills.find(s => s.v === skillId);
+    const label = cleanLabel(skillDef ? skillDef.l : skillId);
+    const grade = getSkillGrade(skillId, categoryId);
+    let catName = '';
+    for (const d of Object.values(DOMAINS)) { const c = d.categories.find(x => x.id === categoryId); if (c) { catName = c.name; break; } }
+    panel.innerHTML = `<div class="tvq-prev">
+      <div><div class="tv-h3">${escHtml(label)}</div><div class="tv-skill-meta">${escHtml([grade != null ? levelText(grade) : '', catName].filter(Boolean).join(' · '))}</div></div>
+      <div class="tvp-frame tvq-prev-frame"></div>
+      <button type="button" class="tv-btn tvq-btn-sm" onclick="qbRefreshPreview()">${icon('reset', 16)}<span>Another example</span></button>
+    </div>`;
+    mountSample(panel.querySelector('.tvq-prev-frame'), categoryId, skillId, undefined, qb.previewIndex);
+
+    const addBar = document.getElementById('qbPreviewAddBar');
+    if (addBar) {
+        const targetSection = builderTest ? builderTest.sections[qb.activeSection] : null;
+        const targetLabel = targetSection ? targetSection.label : 'Problem Set A';
+        const prev = document.getElementById('qbAddNum');
+        const n = prev ? prev.value : '1';
+        addBar.innerHTML = `<div class="tvq-addbar">
+          <label class="tv-label" for="qbAddNum">How many questions</label>
+          <div class="tvq-addrow">
+            <input type="number" id="qbAddNum" value="${escHtml(n)}" min="1" max="50" class="tv-input tvq-num" inputmode="numeric">
+            <button type="button" class="tv-btn tvq-btn-accent" onclick="qbAddFromPreview()">${icon('plus', 18)}<span>Add to quiz</span></button>
+          </div>
+          <p class="tv-cap">Into ${escHtml(targetLabel)}</p>
         </div>`;
     }
 }
@@ -892,7 +982,14 @@ export function handleQbSectionDrop(e, toSIdx) {
 // ========= RENDER SECTION LIST =========
 function qbRenderSectionList() {
     const list = document.getElementById('qbQuestionList');
-    const empty = document.getElementById('qbEmptyQuestions');
+    let empty = document.getElementById('qbEmptyQuestions');
+    // A render with questions replaces the list's markup (and the empty note with it).
+    if (!empty && list) {
+        empty = document.createElement('div');
+        empty.className = 'qb-empty';
+        empty.id = 'qbEmptyQuestions';
+        empty.textContent = 'No questions yet. Choose a skill, then Add to quiz.';
+    }
     if (!list || !builderTest) return;
 
     const totalQs = getTotalQuestionCount(builderTest);
@@ -923,25 +1020,25 @@ function qbRenderSectionList() {
         // Section header
         html += `<div class="qb-section-header${isActive ? ' active' : ''}" style="--section-color:${color}" onclick="setActiveSection(${sIdx})">`;
         html += `<div class="qb-section-header-left">`;
-        html += `<button class="qb-section-collapse" onclick="event.stopPropagation();toggleSectionCollapse(${sIdx})">${isCollapsed ? '&#9654;' : '&#9660;'}</button>`;
-        html += `<input class="qb-section-label-input" value="${escHtml(section.label)}" onclick="event.stopPropagation()" onchange="updateSectionLabel(${sIdx}, this.value)" style="border-color:${color}">`;
+        html += `<button type="button" class="qb-section-collapse" aria-expanded="${!isCollapsed}" aria-label="${isCollapsed ? 'Show' : 'Hide'} the questions in ${escHtml(section.label)}" onclick="event.stopPropagation();toggleSectionCollapse(${sIdx})">${isCollapsed ? icon('chevR', 16) : icon('chevD', 16)}</button>`;
+        html += `<input class="qb-section-label-input" value="${escHtml(section.label)}" aria-label="Section name" onclick="event.stopPropagation()" onchange="updateSectionLabel(${sIdx}, this.value)" style="border-color:${color}">`;
         html += `<span class="qb-section-count">${section.questions.length} Q${section.questions.length !== 1 ? 's' : ''}</span>`;
         html += `<span class="qb-section-layout-badge">${colLabel}</span>`;
         html += `</div>`;
         html += `<div class="qb-section-actions" onclick="event.stopPropagation()">`;
 
         // Layout dropdown
-        html += `<select class="qb-section-layout-select" onchange="updateSectionLayout(${sIdx}, parseInt(this.value), this.options[this.selectedIndex].dataset.spacing)">`;
+        html += `<select class="qb-section-layout-select" aria-label="Printed layout of ${escHtml(section.label)}" onchange="updateSectionLayout(${sIdx}, parseInt(this.value), this.options[this.selectedIndex].dataset.spacing)">`;
         for (const preset of SECTION_LAYOUT_PRESETS) {
             const selected = section.layout.columns === preset.columns ? ' selected' : '';
-            html += `<option value="${preset.columns}" data-spacing="${preset.spacing}"${selected}>${preset.icon} ${preset.name}</option>`;
+            html += `<option value="${preset.columns}" data-spacing="${preset.spacing}"${selected}>${preset.name} (${preset.columns} per row)</option>`;
         }
         html += `</select>`;
 
-        html += `<button class="qb-q-btn" onclick="shuffleSectionQuestions(${sIdx})" title="Shuffle questions">&#x1f500;</button>`;
-        if (sIdx > 0) html += `<button class="qb-q-btn" onclick="reorderSection(${sIdx}, -1)" title="Move up">&#x2B06;</button>`;
-        if (sIdx < builderTest.sections.length - 1) html += `<button class="qb-q-btn" onclick="reorderSection(${sIdx}, 1)" title="Move down">&#x2B07;</button>`;
-        if (builderTest.sections.length > 1) html += `<button class="qb-q-btn danger" onclick="removeSection(${sIdx})" title="Remove section">&#x2715;</button>`;
+        html += `<button type="button" class="qb-q-btn" onclick="shuffleSectionQuestions(${sIdx})" title="Shuffle questions" aria-label="Shuffle the questions in ${escHtml(section.label)}">${icon('shuffle', 16)}</button>`;
+        if (sIdx > 0) html += `<button type="button" class="qb-q-btn" onclick="reorderSection(${sIdx}, -1)" title="Move up" aria-label="Move ${escHtml(section.label)} up">${icon('up', 16)}</button>`;
+        if (sIdx < builderTest.sections.length - 1) html += `<button type="button" class="qb-q-btn" onclick="reorderSection(${sIdx}, 1)" title="Move down" aria-label="Move ${escHtml(section.label)} down">${icon('down', 16)}</button>`;
+        if (builderTest.sections.length > 1) html += `<button type="button" class="qb-q-btn danger" onclick="removeSection(${sIdx})" title="Remove section" aria-label="Remove ${escHtml(section.label)}">${icon('trash', 16)}</button>`;
         html += `</div>`;
         html += `</div>`;
 
@@ -959,7 +1056,7 @@ function qbRenderSectionList() {
             }
 
             if (section.questions.length === 0) {
-                html += `<div class="qb-section-empty">No questions. Click skills on the left to add.</div>`;
+                html += `<div class="qb-section-empty">No questions yet. Choose a skill, then Add to quiz.</div>`;
             }
 
             html += `</div>`;
@@ -971,12 +1068,57 @@ function qbRenderSectionList() {
     }
 
     // Add Section button
-    html += `<button class="qb-add-section-btn" onclick="addSection()">+ Add Section</button>`;
+    html += `<button type="button" class="qb-add-section-btn" onclick="addSection()">${isTeacher() ? `${icon('plus', 16)}<span>Add a section</span>` : '+ Add Section'}</button>`;
 
     list.innerHTML = html;
+    if (isTeacher()) mountQuestionCells(list);
+}
+
+/** Teacher view: draw each question card's item as a black-and-white paper cell. */
+function mountQuestionCells(list) {
+    list.querySelectorAll('[data-qb-cell]').forEach((frame) => {
+        const [sIdx, qIdx] = frame.dataset.qbCell.split(':').map(Number);
+        const q = builderTest && builderTest.sections[sIdx] ? builderTest.sections[sIdx].questions[qIdx] : null;
+        if (!q || !q.questionData) return;
+        try { mountQuestion(frame, q.questionData, q.skillId); } catch (e) { /* a preview never breaks the builder */ }
+    });
+}
+
+function qbRenderQuestionCardTeacher(q, sectionIdx, localIdx, globalIdx) {
+    const label = cleanLabel(getSkillLabel(q.skillId));
+    const n = globalIdx + 1;
+    let move = '';
+    if (builderTest.sections.length > 1) {
+        move = `<select class="tv-select tvq-move" aria-label="Move question ${n} to another section" onchange="if(this.value!=='')moveQuestionToSection(${sectionIdx},${localIdx},parseInt(this.value));this.value=''">`;
+        move += `<option value="">Move to…</option>`;
+        for (let s = 0; s < builderTest.sections.length; s++) {
+            if (s !== sectionIdx) move += `<option value="${s}">${escHtml(builderTest.sections[s].label)}</option>`;
+        }
+        move += `</select>`;
+    }
+    return `<div class="qb-question-card tvq-qcard" data-section="${sectionIdx}" data-index="${localIdx}" draggable="true" ondragstart="handleQbQuestionDragStart(event,${sectionIdx},${localIdx})" ondragend="handleQbQuestionDragEnd(event)">
+  <div class="qb-q-header">
+    <span class="tvq-grip" title="Drag to move" aria-hidden="true">${icon('grip', 16)}</span>
+    <span class="qb-q-num">Q${n}</span>
+    <span class="tvq-grow"></span>
+    <label class="qb-q-points"><span class="tv-sr">Points for question ${n}</span><input type="number" class="tv-input" value="${q.points || 1}" min="1" max="100" onchange="updateQuizQuestionPoints(${sectionIdx}, ${localIdx}, parseInt(this.value))"><span aria-hidden="true">pts</span></label>
+  </div>
+  <div class="qb-q-skill">${escHtml(label)}</div>
+  <div class="tvp-frame tvq-qframe" data-qb-cell="${sectionIdx}:${localIdx}"></div>
+  <div class="tvq-qfoot">
+    <span class="tv-cap tvq-ans">Answer: <strong>${escHtml(String(q.questionData.ans))}</strong></span>
+    <div class="qb-q-actions">
+      <button type="button" class="tv-icon-btn" title="New question" aria-label="New question for Q${n}" onclick="regenerateQuizQuestion(${sectionIdx}, ${localIdx})">${icon('reset', 18)}</button>
+      <button type="button" class="tv-icon-btn" title="Duplicate" aria-label="Duplicate Q${n}" onclick="duplicateQuizQuestion(${sectionIdx}, ${localIdx})">${icon('copy', 18)}</button>
+      ${move}
+      <button type="button" class="tv-icon-btn tvq-danger" title="Remove" aria-label="Remove Q${n}" onclick="removeQuizQuestion(${sectionIdx}, ${localIdx})">${icon('trash', 18)}</button>
+    </div>
+  </div>
+</div>`;
 }
 
 function qbRenderQuestionCard(q, sectionIdx, localIdx, globalIdx) {
+    if (isTeacher()) return qbRenderQuestionCardTeacher(q, sectionIdx, localIdx, globalIdx);
     const label = getSkillLabel(q.skillId);
     const grade = getSkillGrade(q.skillId, null);
     const gc = grade != null ? (GRADE_COLORS[grade] || { bg: '#9E9E9E', text: '#fff' }) : null;
@@ -1067,6 +1209,20 @@ function qbUpdateCounts() {
 
     const resultsBtn = document.getElementById('qbResultsBtn');
     if (resultsBtn) resultsBtn.disabled = !builderTest.id;
+    const monitorBtn = document.getElementById('qbMonitorBtn');
+    if (monitorBtn) monitorBtn.disabled = !builderTest.id || !hasQuestions;
+}
+
+/** More → Results / Live monitor for the quiz being edited (saved first). */
+export async function openBuilderResults() {
+    if (!builderTest || !builderTest.id) { note('Save the quiz first'); return; }
+    window.showQuizResults(builderTest.id);
+}
+
+export async function openBuilderMonitor() {
+    if (!builderTest || getTotalQuestionCount(builderTest) === 0) return;
+    await saveQuiz();
+    window.openQuizMonitor(builderTest.id);
 }
 
 // ========= SETTINGS =========
@@ -1079,18 +1235,63 @@ export function updateQuizSetting(key, value) {
     if (!builderTest) return;
     builderTest.settings[key] = value;
     // Re-render settings if shuffle/versions changed (to show/hide dependent fields)
-    if (key === 'shuffleWithinSections') qbRenderSettings();
+    if (key === 'shuffleWithinSections') {
+        const hadFocus = document.activeElement && document.activeElement.id;
+        qbRenderSettings();
+        if (hadFocus) document.getElementById(hadFocus)?.focus();
+    }
+}
+
+let settingsReturnFocus = null;
+
+function settingsKeydown(e) {
+    const overlay = document.getElementById('quizSettingsOverlay');
+    if (!overlay || !overlay.classList.contains('active')) return;
+    if (e.key === 'Escape') { e.preventDefault(); closeQuizSettings(); return; }
+    if (e.key !== 'Tab') return;
+    // Keep Tab inside the dialog.
+    const f = Array.from(overlay.querySelectorAll('button, select, input, [tabindex]:not([tabindex="-1"])')).filter((el) => !el.disabled && el.offsetParent !== null);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
 }
 
 export function openQuizSettings() {
     const overlay = document.getElementById('quizSettingsOverlay');
-    if (overlay) overlay.classList.add('active');
+    if (!overlay) return;
+    // A child of <body>, so its scrim covers the whole window (the teacher sidebar too).
+    if (overlay.parentElement !== document.body) document.body.appendChild(overlay);
+    settingsReturnFocus = document.activeElement;
+    overlay.classList.add('active');
     qbRenderSettings();
+    document.addEventListener('keydown', settingsKeydown);
+    const first = overlay.querySelector('select, input, button');
+    if (first) first.focus();
 }
 
 export function closeQuizSettings() {
     const overlay = document.getElementById('quizSettingsOverlay');
+    const wasOpen = overlay && overlay.classList.contains('active');
     if (overlay) overlay.classList.remove('active');
+    document.removeEventListener('keydown', settingsKeydown);
+    if (wasOpen && settingsReturnFocus && settingsReturnFocus.isConnected) settingsReturnFocus.focus();
+    settingsReturnFocus = null;
+}
+
+function settingSwitch(id, key, on, label, desc) {
+    return `<button type="button" class="tvq-switch-btn" id="${id}" role="switch" aria-checked="${!!on}"
+        onclick="const v=this.getAttribute('aria-checked')!=='true';this.setAttribute('aria-checked',String(v));updateQuizSetting('${key}', v)">
+      <span class="tvq-switch-text"><span class="tv-h3">${label}</span><span class="tv-cap">${desc}</span></span><span class="tv-switch" aria-hidden="true"></span>
+    </button>`;
+}
+
+function settingSelect(id, label, onchange, options, desc) {
+    return `<div class="tvq-field">
+      <label class="tv-label" for="${id}">${label}</label>
+      <select class="tv-select" id="${id}" onchange="${onchange}"${desc ? ` aria-describedby="${id}D"` : ''}>${options}</select>
+      ${desc ? `<p class="tv-cap" id="${id}D">${desc}</p>` : ''}
+    </div>`;
 }
 
 function qbRenderSettings() {
@@ -1098,63 +1299,35 @@ function qbRenderSettings() {
     if (!container || !builderTest) return;
 
     const s = builderTest.settings;
+    const opt = (v, text, on) => `<option value="${v}"${on ? ' selected' : ''}>${text}</option>`;
+    const times = [0, 5, 10, 15, 20, 30, 45, 60];
     container.innerHTML = `
-        <div class="qb-setting-row">
-            <span class="qb-setting-label">Time Limit</span>
-            <select class="qb-setting-input" onchange="updateQuizSetting('timeLimit', this.value === '0' ? null : parseInt(this.value))">
-                <option value="0" ${!s.timeLimit ? 'selected' : ''}>No Limit</option>
-                <option value="5" ${s.timeLimit === 5 ? 'selected' : ''}>5 minutes</option>
-                <option value="10" ${s.timeLimit === 10 ? 'selected' : ''}>10 minutes</option>
-                <option value="15" ${s.timeLimit === 15 ? 'selected' : ''}>15 minutes</option>
-                <option value="20" ${s.timeLimit === 20 ? 'selected' : ''}>20 minutes</option>
-                <option value="30" ${s.timeLimit === 30 ? 'selected' : ''}>30 minutes</option>
-                <option value="45" ${s.timeLimit === 45 ? 'selected' : ''}>45 minutes</option>
-                <option value="60" ${s.timeLimit === 60 ? 'selected' : ''}>60 minutes</option>
-            </select>
+      <section class="tvq-group" aria-labelledby="qbSetOnlineH">
+        <h3 class="tvq-group-h" id="qbSetOnlineH">Taking the quiz online</h3>
+        <div class="tvq-fields">
+          ${settingSelect('qbSetTime', 'Time limit', "updateQuizSetting('timeLimit', this.value === '0' ? null : parseInt(this.value))",
+              times.map(t => opt(t, t ? `${t} minutes` : 'No limit', t ? s.timeLimit === t : !s.timeLimit)).join(''))}
+          ${settingSelect('qbSetFeedback', 'Show pupils', "updateQuizSetting('showFeedback', this.value)",
+              opt('instant', 'Right or wrong after each question', s.showFeedback === 'instant') + opt('end', 'Their answers after they submit', s.showFeedback === 'end') + opt('none', 'Their score only', s.showFeedback === 'none'))}
+          ${settingSelect('qbSetSections', 'Sections', "updateQuizSetting('sectionMode', this.value)",
+              opt('sequential', 'One section at a time', s.sectionMode === 'sequential') + opt('mixed', 'All questions mixed together', s.sectionMode === 'mixed'))}
+          <div class="tvq-field">
+            <label class="tv-label" for="qbSetPass">Pass mark</label>
+            <div class="tvq-suffix"><input type="number" class="tv-input" id="qbSetPass" value="${Number(s.passingScore) || 0}" min="0" max="100" onchange="updateQuizSetting('passingScore', Math.max(0, Math.min(100, parseInt(this.value) || 0)))"><span aria-hidden="true">%</span></div>
+          </div>
         </div>
-        <div class="qb-setting-row">
-            <span class="qb-setting-label">Section Mode (Online)</span>
-            <select class="qb-setting-input" onchange="updateQuizSetting('sectionMode', this.value)">
-                <option value="sequential" ${s.sectionMode === 'sequential' ? 'selected' : ''}>Sequential (section by section)</option>
-                <option value="mixed" ${s.sectionMode === 'mixed' ? 'selected' : ''}>Mixed (all questions shuffled)</option>
-            </select>
-        </div>
-        <div class="qb-setting-row">
-            <span class="qb-setting-label">Randomize Order</span>
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
-                <input type="checkbox" ${s.randomOrder ? 'checked' : ''} onchange="updateQuizSetting('randomOrder', this.checked)">
-                <span style="font-size:0.85rem;">Shuffle per student</span>
-            </label>
-        </div>
-        <div class="qb-setting-row">
-            <span class="qb-setting-label">Show Feedback</span>
-            <select class="qb-setting-input" onchange="updateQuizSetting('showFeedback', this.value)">
-                <option value="instant" ${s.showFeedback === 'instant' ? 'selected' : ''}>After each question</option>
-                <option value="end" ${s.showFeedback === 'end' ? 'selected' : ''}>After submission</option>
-                <option value="none" ${s.showFeedback === 'none' ? 'selected' : ''}>Score only</option>
-            </select>
-        </div>
-        <div class="qb-setting-row">
-            <span class="qb-setting-label">Passing Score</span>
-            <div style="display:flex;align-items:center;gap:6px;">
-                <input type="number" class="qb-setting-input" value="${s.passingScore}" min="0" max="100" style="width:70px;" onchange="updateQuizSetting('passingScore', parseInt(this.value))">
-                <span style="font-size:0.85rem;">%</span>
-            </div>
-        </div>
-        <div class="qb-setting-row">
-            <span class="qb-setting-label">Shuffle for Print</span>
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
-                <input type="checkbox" ${s.shuffleWithinSections ? 'checked' : ''} onchange="updateQuizSetting('shuffleWithinSections', this.checked)">
-                <span style="font-size:0.85rem;">Shuffle questions within sections</span>
-            </label>
-        </div>
-        <div class="qb-setting-row" ${!s.shuffleWithinSections ? 'style="opacity:0.4;pointer-events:none;"' : ''}>
-            <span class="qb-setting-label">Print Versions</span>
-            <select class="qb-setting-input" onchange="updateQuizSetting('printVersions', parseInt(this.value))">
-                ${[1,2,3,4,5,6].map(n => `<option value="${n}" ${s.printVersions === n ? 'selected' : ''}>${n} version${n > 1 ? 's' : ''}</option>`).join('')}
-            </select>
-        </div>
+      </section>
+      <section class="tvq-group" aria-labelledby="qbSetShuffleH">
+        <h3 class="tvq-group-h" id="qbSetShuffleH">Shuffling</h3>
+        ${settingSwitch('qbSetRandom', 'randomOrder', s.randomOrder, 'Online: a different order for each pupil', 'Each pupil gets the same questions in their own order.')}
+        ${settingSwitch('qbSetShufflePrint', 'shuffleWithinSections', s.shuffleWithinSections, 'Printed: shuffle within each section', 'Mixes the question order on paper. Sections stay in place.')}
+        ${settingSelect('qbSetVersions', 'Printed versions', "updateQuizSetting('printVersions', parseInt(this.value))",
+            [1, 2, 3, 4, 5, 6].map(n => opt(n, `${n} version${n > 1 ? 's' : ''}`, s.printVersions === n)).join(''),
+            s.shuffleWithinSections ? 'Each version has its own order and its own answer key.' : 'Turn on “Printed: shuffle within each section” to print more than one version.')}
+      </section>
     `;
+    const versions = document.getElementById('qbSetVersions');
+    if (versions && !s.shuffleWithinSections) versions.disabled = true;
 }
 
 // ========= PREVIEW MODAL =========
@@ -1323,7 +1496,7 @@ export async function saveQuiz() {
     const saved = await saveTest(builderTest);
     builderTest = saved;
     qbUpdateCounts();
-    window.showToast('Quiz saved!', 'success');
+    note(isTeacher() ? 'Quiz saved' : 'Quiz saved!', 'success');
 }
 
 export async function generateQuizLink() {
@@ -1332,15 +1505,11 @@ export async function generateQuizLink() {
     const compressed = compressTestForURL(builderTest);
     const url = window.location.origin + window.location.pathname + '?quiz=' + compressed;
     if (url.length > 8000) {
-        window.showToast('Quiz too large for URL. Use Export JSON instead.', 'error');
+        note('Quiz too large for a link. Use Export JSON instead.', 'error');
         return;
     }
-    try {
-        await navigator.clipboard.writeText(url);
-        window.showToast('Student link copied to clipboard!', 'success');
-    } catch (e) {
-        prompt('Copy this student link:', url);
-    }
+    if (await copyText(url)) note(isTeacher() ? 'Pupil link copied' : 'Student link copied to clipboard!', 'success');
+    else prompt('Copy this student link:', url);
 }
 
 export function printQuiz() {

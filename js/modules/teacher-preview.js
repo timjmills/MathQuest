@@ -205,7 +205,23 @@ export function mountSample(frame, cat, sk, opts, index = 0) {
     if (!frame) return false;
     const hit = findSkill(cat, sk);
     const name = hit ? hit.label : sk;
-    const s = sampleFor(cat, sk, opts, index);
+    return mountBuilt(frame, sampleFor(cat, sk, opts, index), name);
+}
+
+/**
+ * Draw a GIVEN generated question (not a seeded sample) as the same paper cell: the quiz
+ * builder's question cards show the exact item the quiz holds.
+ */
+export function mountQuestion(frame, q, sk) {
+    if (!frame) return false;
+    let s = { ok: false };
+    try {
+        if (q && (q.text || q.visual)) s = { ok: true, html: cellHTML(q, sk), text: plainText(q.text || '').slice(0, 160) };
+    } catch (e) { s = { ok: false }; }
+    return mountBuilt(frame, s, 'this question', 'Question');
+}
+
+function mountBuilt(frame, s, name, what = 'Sample question') {
     frame.classList.remove('is-unavailable');
     if (!s.ok) {
         frame.classList.add('is-unavailable');
@@ -215,7 +231,7 @@ export function mountSample(frame, cat, sk, opts, index = 0) {
         return false;
     }
     frame.setAttribute('role', 'img');
-    frame.setAttribute('aria-label', s.text ? `Sample question: ${s.text}` : `Sample question for ${name}`);
+    frame.setAttribute('aria-label', s.text ? `${what}: ${s.text}` : `${what} for ${name}`);
     frame.innerHTML = `<div class="tvp-stage" inert aria-hidden="true">${scopeIds(s.html)}</div>`;
     const cell = frame.querySelector('.tvp-cell');
     try {

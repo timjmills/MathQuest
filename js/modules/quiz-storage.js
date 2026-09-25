@@ -274,6 +274,9 @@ export function compressTestForURL(test) {
         })),
         st: test.settings
     };
+    // The quiz's id travels with the link, so a pupil's answers reach the teacher's Live monitor
+    // (BroadcastChannel "mathquest-quiz-<id>") and results file under the same quiz.
+    if (test.id) minimal.i = String(test.id);
     const json = JSON.stringify(minimal);
     if (typeof LZString !== 'undefined') {
         return LZString.compressToEncodedURIComponent(json);
@@ -309,9 +312,10 @@ export function decompressTestFromURL(compressed) {
         const settings = Object.assign(defaultSettings, minimal.st || {});
 
         // New format: sections via `sc`
+        const linkId = typeof minimal.i === 'string' && /^[a-z0-9]{4,32}$/i.test(minimal.i) ? minimal.i : null;
         if (minimal.sc) {
             return {
-                id: generateId(),
+                id: linkId || generateId(),
                 name: minimal.n || 'Untitled Quiz',
                 createdAt: Date.now(),
                 updatedAt: Date.now(),

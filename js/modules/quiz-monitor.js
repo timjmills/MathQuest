@@ -1,8 +1,15 @@
 // Quiz Monitor — Socrative-style live quiz monitoring dashboard
 // Layer 6: depends on state, data, quiz-storage, ui-core
+//
+// Teacher screen (2026-09-25): #quizMonitorView is drawn in the teacher style (--tv-* tokens,
+// css/teacher-quiz.css): a header with Back on the left and one primary action (Finish), three
+// switches for what the grid shows, and a neutral student x question grid. The grid re-renders
+// every 2 s but only touches the DOM when its markup changed, so keyboard focus survives.
 
 import { SKILLS } from './data.js';
 import { loadTest, listTests, getResultsForTest, migrateTestToSections, getAllQuestionsFlat, getTotalQuestionCount, compressTestForURL } from './quiz-storage.js';
+import { icon, cleanLabel, copyText, fmtDay } from './teacher-ui.js';
+import { note, backHTML, goQuizzes } from './teacher-quiz-ui.js';
 
 // ---- Module State ----
 
@@ -17,20 +24,14 @@ const mon = {
     channel: null,          // BroadcastChannel
     pollInterval: null,     // IndexedDB polling interval
     refreshInterval: null,  // UI refresh interval
-    paused: false
+    paused: false,
+    lastHTML: ''            // the last markup drawn (skip identical re-renders)
 };
-
-// ---- Question header colors (cycle through for Socrative look) ----
-const Q_COLORS = [
-    '#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#ef4444',
-    '#ec4899', '#6366f1', '#14b8a6', '#f97316', '#84cc16',
-    '#a855f7', '#0ea5e9', '#eab308', '#22c55e', '#f43f5e'
-];
 
 function getSkillLabel(skillId) {
     for (const catKey in SKILLS) {
         for (const sk of SKILLS[catKey]) {
-            if (sk.v === skillId) return sk.l;
+            if (sk.v === skillId) return cleanLabel(sk.l);
         }
     }
     return skillId;
@@ -42,42 +43,64 @@ function escHtml(str) {
     return d.innerHTML;
 }
 
+/** Leave the monitor: back to the teacher Quizzes screen, or the pupil home. */
+export function closeQuizMonitor() {
+    stopMonitoring();
+    mon.testId = null;
+    mon.test = null;
+    mon.lastHTML = '';
+    goQuizzes();
+}
+
+function monitorRoot() {
+    const view = document.getElementById('quizMonitorView');
+    if (!view) return null;
+    view.classList.add('tvq');
+    return view;
+}
+
 // ---- Open Monitor: Quiz Selector ----
 
 export async function openQuizMonitor(testId) {
+    if (!monitorRoot()) return;
     window.showView('quizMonitorView');
+    window.scrollTo(0, 0);
     if (testId) {
         startMonitoring(testId);
     } else {
+        stopMonitoring();
+        mon.test = null;
         showMonitorSelector();
     }
 }
 
 async function showMonitorSelector() {
-    const tests = await listTests();
-    const container = document.getElementById('quizMonitorView');
+    let tests = [];
+    try { tests = await listTests(); } catch (e) { tests = []; }
+    const container = monitorRoot();
     if (!container) return;
+    mon.lastHTML = '';
+    tests.sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0));
 
     container.innerHTML = `
-        <div class="qm-selector">
-            <div class="qm-selector-header">
-                <h2>Live Quiz Monitor</h2>
-                <button class="btn btn-sm btn-secondary" onclick="showView('homeView')">Back</button>
-            </div>
-            <p class="qm-selector-desc">Select a quiz to monitor student progress in real time.</p>
-            <div class="qm-quiz-list">
-                ${tests.length === 0 ? '<div class="qb-empty">No quizzes found. Create a quiz first.</div>' :
-                tests.map(t => {
-                    const qCount = t.sections ? getTotalQuestionCount(t) : (t.questions ? t.questions.length : 0);
-                    return `
-                    <div class="qm-quiz-card" onclick="openQuizMonitor('${t.id}')">
-                        <div class="qm-quiz-card-name">${escHtml(t.name)}</div>
-                        <div class="qm-quiz-card-meta">${qCount} questions &middot; ${new Date(t.createdAt).toLocaleDateString()}</div>
-                    </div>`;
-                }).join('')}
-            </div>
-        </div>
-    `;
+<div class="tvq-page">
+  <div class="tvq-topline">${backHTML('Quizzes', 'closeQuizMonitor()')}</div>
+  <header class="tv-header">
+    <div><h1 class="tv-h1">Live monitor</h1><p class="tv-sub">Choose a quiz to watch pupils answer it in real time.</p></div>
+  </header>
+  <section class="tv-card tv-flush" aria-label="Quizzes">
+    ${tests.length === 0
+        ? `<div class="tv-empty-lg"><span class="tv-empty-icon" aria-hidden="true">${icon('sheet', 22)}</span><div class="tv-h3">No quizzes yet</div><p class="tv-cap">Create a quiz first, then monitor it here.</p>
+             <button type="button" class="tv-btn tv-btn-primary" onclick="closeQuizMonitor()">${icon('plus', 18)}<span>Create a quiz</span></button></div>`
+        : `<ul class="tvq-list">${tests.map((t) => {
+            const qCount = t.sections ? getTotalQuestionCount(t) : (t.questions ? t.questions.length : 0);
+            return `<li class="tvq-list-row">
+              <div class="tvq-list-main"><span class="tv-cell-title">${escHtml(t.name || 'Untitled Quiz')}</span><span class="tv-cell-sub">${qCount} question${qCount === 1 ? '' : 's'} · ${escHtml(fmtDay(t.updatedAt || t.createdAt))}</span></div>
+              <button type="button" class="tv-btn" onclick="openQuizMonitor('${escHtml(t.id)}')">${icon('eye', 18)}<span>Monitor</span></button>
+            </li>`;
+        }).join('')}</ul>`}
+  </section>
+</div>`;
 }
 
 // ---- Start Monitoring ----
@@ -89,7 +112,7 @@ async function startMonitoring(testId) {
     mon.testId = testId;
     mon.test = await loadTest(testId);
     if (!mon.test) {
-        window.showToast('Quiz not found', 'error');
+        note('Quiz not found', 'error');
         showMonitorSelector();
         return;
     }
@@ -290,12 +313,16 @@ export function broadcastQuizSubmit(result) {
 
 // ---- Render Monitor Dashboard ----
 
+function switchHTML(key, label, on) {
+    return `<button type="button" class="tvq-switch-btn" role="switch" aria-checked="${on}" onclick="toggleMonitorOption('${key}', ${!on})"><span class="tvq-switch-label">${label}</span><span class="tv-switch" aria-hidden="true"></span></button>`;
+}
+
 function renderMonitorGrid() {
     const container = document.getElementById('quizMonitorView');
     if (!container || !mon.test) return;
 
-    // Check if we're still on monitor view
-    if (container.style.display === 'none') {
+    // Left the monitor (another view is showing): stop polling.
+    if (!container.classList.contains('active')) {
         stopMonitoring();
         return;
     }
@@ -306,7 +333,7 @@ function renderMonitorGrid() {
     const onlineCount = studentList.filter(s => s.online).length;
     const completedCount = studentList.filter(s => s.completed).length;
 
-    // Calculate per-question class totals
+    // Per-question class totals
     const classTotals = [];
     for (let q = 0; q < totalQs; q++) {
         let correct = 0;
@@ -320,58 +347,48 @@ function renderMonitorGrid() {
         classTotals.push({ correct, attempted, pct: attempted > 0 ? Math.round((correct / attempted) * 100) : null });
     }
 
-    // Class average
     const classAvg = studentList.length > 0
         ? Math.round(studentList.reduce((sum, s) => sum + s.percentage, 0) / studentList.length)
         : 0;
 
-    // Build question header cells
     let qHeaders = '';
     for (let q = 0; q < totalQs; q++) {
-        const color = Q_COLORS[q % Q_COLORS.length];
         const skillLabel = getSkillLabel(mon.allQs[q].question.skillId);
-        qHeaders += `<th class="qm-q-header" style="--q-color:${color}" title="${escHtml(skillLabel)}">
-            <div class="qm-q-num">${q + 1}</div>
-        </th>`;
+        qHeaders += `<th scope="col" class="qm-q-header" title="Q${q + 1}: ${escHtml(skillLabel)}"><span class="tv-sr">Question </span>${q + 1}</th>`;
     }
 
-    // Build student rows
     let studentRows = '';
-    for (const s of studentList) {
-        const statusDot = s.completed ? 'completed' : (s.online ? 'online' : 'offline');
-        const nameDisplay = mon.showNames ? escHtml(s.name) : `Student ${studentList.indexOf(s) + 1}`;
+    studentList.forEach((s, idx) => {
+        const status = s.completed ? 'completed' : (s.online ? 'online' : 'offline');
+        const statusText = s.completed ? 'Finished' : (s.online ? 'Answering' : 'Away');
+        const nameDisplay = mon.showNames ? escHtml(s.name) : `Pupil ${idx + 1}`;
 
         let answerCells = '';
         for (let q = 0; q < totalQs; q++) {
             const a = s.answers[q];
             if (!a || a.studentAnswer === undefined) {
-                answerCells += '<td class="qm-cell qm-cell-empty"></td>';
+                answerCells += '<td class="qm-cell qm-cell-empty"><span class="tv-sr">Not answered</span></td>';
             } else if (mon.showResponses) {
                 if (mon.showResults) {
                     answerCells += a.correct
-                        ? '<td class="qm-cell qm-cell-correct"><span class="qm-check">&#10003;</span></td>'
-                        : '<td class="qm-cell qm-cell-incorrect"><span class="qm-cross">&#10007;</span></td>';
+                        ? `<td class="qm-cell qm-cell-correct" title="${escHtml(String(a.studentAnswer))}">${icon('check', 16)}<span class="tv-sr">Right</span></td>`
+                        : `<td class="qm-cell qm-cell-incorrect" title="${escHtml(String(a.studentAnswer))}">${icon('x', 16)}<span class="tv-sr">Wrong</span></td>`;
                 } else {
-                    answerCells += '<td class="qm-cell qm-cell-answered"><span class="qm-dot-filled">&#9679;</span></td>';
+                    answerCells += '<td class="qm-cell qm-cell-answered"><span class="qm-dot" aria-hidden="true"></span><span class="tv-sr">Answered</span></td>';
                 }
             } else {
-                answerCells += '<td class="qm-cell qm-cell-hidden"></td>';
+                answerCells += '<td class="qm-cell qm-cell-hidden"><span class="tv-sr">Hidden</span></td>';
             }
         }
 
-        const scoreDisplay = mon.showResults ? `${s.percentage}%` : '—';
-
-        studentRows += `<tr class="qm-student-row">
-            <td class="qm-name-cell">
-                <span class="qm-status-dot ${statusDot}"></span>
-                <span class="qm-student-name">${nameDisplay}</span>
-            </td>
+        const scoreDisplay = mon.showResults ? `${s.percentage}%` : '<span class="tv-muted">–</span>';
+        studentRows += `<tr>
+            <th scope="row" class="qm-name-cell"><span class="qm-status ${status}" title="${statusText}" aria-hidden="true"></span><span class="qm-student-name">${nameDisplay}</span><span class="tv-sr"> (${statusText})</span></th>
             <td class="qm-score-cell">${scoreDisplay}</td>
             ${answerCells}
         </tr>`;
-    }
+    });
 
-    // Build class total row
     let totalCells = '';
     for (let q = 0; q < totalQs; q++) {
         const t = classTotals[q];
@@ -379,94 +396,69 @@ function renderMonitorGrid() {
             const cls = t.pct >= 70 ? 'high' : (t.pct >= 50 ? 'mid' : 'low');
             totalCells += `<td class="qm-total-cell qm-total-${cls}">${t.pct}%</td>`;
         } else {
-            totalCells += '<td class="qm-total-cell">—</td>';
+            totalCells += '<td class="qm-total-cell"><span class="tv-muted">–</span></td>';
         }
     }
 
-    container.innerHTML = `
-        <div class="qm-dashboard">
-            <!-- Top Bar -->
-            <div class="qm-topbar">
-                <div class="qm-topbar-left">
-                    <button class="qm-back-btn" onclick="stopMonitoring();openQuizMonitor()">&#x2190;</button>
-                    <h2 class="qm-quiz-title">${escHtml(mon.test.name)}</h2>
-                    <span class="qm-quiz-badge">${totalQs} Qs</span>
-                </div>
-                <div class="qm-topbar-right">
-                    <button class="qm-action-btn qm-btn-pause" onclick="toggleMonitorPause()">
-                        ${mon.paused ? '<span>&#9654;</span> Resume' : '<span>&#10074;&#10074;</span> Pause'}
-                    </button>
-                    <button class="qm-action-btn qm-btn-finish" onclick="finishMonitoring()">Finish Activity</button>
-                    <button class="qm-action-btn qm-btn-invite" onclick="inviteStudents()">Invite Students</button>
-                </div>
-            </div>
+    const html = `
+<div class="tvq-page">
+  <div class="tvq-topline">${backHTML('Quizzes', 'closeQuizMonitor()')}</div>
+  <header class="tv-header">
+    <div class="tvq-title">
+      <h1 class="tv-h1">${escHtml(mon.test.name || 'Untitled Quiz')}</h1>
+      <p class="tv-sub">Live monitor · ${totalQs} question${totalQs === 1 ? '' : 's'} · ${mon.paused ? 'Paused' : 'Updating every few seconds'}</p>
+    </div>
+    <div class="tv-header-actions">
+      <button type="button" class="tv-btn" onclick="inviteStudents()">${icon('link', 18)}<span>Copy pupil link</span></button>
+      <button type="button" class="tv-btn" onclick="toggleMonitorPause()" aria-pressed="${mon.paused}">${icon(mon.paused ? 'play' : 'pause', 18)}<span>${mon.paused ? 'Resume' : 'Pause'}</span></button>
+      <button type="button" class="tv-btn tv-btn-primary" onclick="finishMonitoring()">${icon('check', 18)}<span>Finish and see results</span></button>
+    </div>
+  </header>
+  <section class="tv-card tvq-monbar" aria-label="What the grid shows">
+    <div class="tvq-switches">
+      ${switchHTML('showNames', 'Show names', mon.showNames)}
+      ${switchHTML('showResponses', 'Show answers', mon.showResponses)}
+      ${switchHTML('showResults', 'Show right and wrong', mon.showResults)}
+    </div>
+    <p class="tvq-counts" aria-live="polite"><span><strong>${onlineCount}</strong> answering</span><span><strong>${completedCount}</strong> finished</span><span><strong>${studentCount}</strong> joined</span></p>
+  </section>
+  <section class="tv-card tv-flush" aria-label="Pupils and questions">
+    ${studentCount === 0 ? `
+      <div class="tv-empty-lg">
+        <span class="tv-empty-icon" aria-hidden="true">${icon('eye', 22)}</span>
+        <div class="tv-h3">Waiting for pupils</div>
+        <p class="tv-cap">Share the quiz link. Each pupil appears here as soon as they start, with a mark for every question they answer.</p>
+        <button type="button" class="tv-btn tv-btn-primary" onclick="inviteStudents()">${icon('link', 18)}<span>Copy pupil link</span></button>
+      </div>` : `
+      <div class="qm-grid-wrap">
+        <table class="qm-grid">
+          <thead><tr><th scope="col" class="qm-header-name">Pupil</th><th scope="col" class="qm-header-score">Score</th>${qHeaders}</tr></thead>
+          <tbody>${studentRows}</tbody>
+          <tfoot><tr><th scope="row" class="qm-total-label">Class</th><td class="qm-total-avg">${mon.showResults ? classAvg + '%' : '<span class="tv-muted">–</span>'}</td>${totalCells}</tr></tfoot>
+        </table>
+      </div>
+      <p class="tvq-legend tv-cap"><span><span class="qm-status online"></span> Answering</span><span><span class="qm-status completed"></span> Finished</span><span><span class="qm-status offline"></span> Away</span><span>Hover a question number for its skill.</span></p>`}
+  </section>
+</div>`;
 
-            <!-- Toggle Bar -->
-            <div class="qm-toggle-bar">
-                <label class="qm-toggle">
-                    <span>Show Names</span>
-                    <input type="checkbox" ${mon.showNames ? 'checked' : ''} onchange="toggleMonitorOption('showNames', this.checked)">
-                    <span class="qm-toggle-slider"></span>
-                </label>
-                <label class="qm-toggle">
-                    <span>Show Responses</span>
-                    <input type="checkbox" ${mon.showResponses ? 'checked' : ''} onchange="toggleMonitorOption('showResponses', this.checked)">
-                    <span class="qm-toggle-slider"></span>
-                </label>
-                <label class="qm-toggle">
-                    <span>Show Results</span>
-                    <input type="checkbox" ${mon.showResults ? 'checked' : ''} onchange="toggleMonitorOption('showResults', this.checked)">
-                    <span class="qm-toggle-slider"></span>
-                </label>
-                <div class="qm-toggle-stats">
-                    <span class="qm-stat-pill online">${onlineCount} online</span>
-                    <span class="qm-stat-pill completed">${completedCount} done</span>
-                    <span class="qm-stat-pill total">${studentCount} total</span>
-                </div>
-            </div>
-
-            <!-- Grid Table -->
-            <div class="qm-grid-wrap">
-                ${studentCount === 0 ? `
-                    <div class="qm-empty-state">
-                        <div class="qm-empty-icon">&#128100;</div>
-                        <h3>Waiting for students...</h3>
-                        <p>Share the quiz link to get started. Student responses will appear here in real time.</p>
-                        <button class="qm-action-btn qm-btn-invite" onclick="inviteStudents()" style="margin-top:12px;">Invite Students</button>
-                    </div>
-                ` : `
-                    <table class="qm-grid">
-                        <thead>
-                            <tr>
-                                <th class="qm-header-name">Student</th>
-                                <th class="qm-header-score">Score</th>
-                                ${qHeaders}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${studentRows}
-                        </tbody>
-                        <tfoot>
-                            <tr class="qm-class-total">
-                                <td class="qm-total-label">Class Total</td>
-                                <td class="qm-total-avg">${mon.showResults ? classAvg + '%' : '—'}</td>
-                                ${totalCells}
-                            </tr>
-                        </tfoot>
-                    </table>
-                `}
-            </div>
-
-            <!-- Footer -->
-            <div class="qm-footer">
-                <span>${studentCount} student${studentCount !== 1 ? 's' : ''}</span>
-                <span class="qm-footer-dot">&middot;</span>
-                <span>${completedCount} completed</span>
-                <span class="qm-footer-dot">&middot;</span>
-                <span>Auto-refreshing</span>
-            </div>
-        </div>
-    `;
+    if (html === mon.lastHTML) return;
+    // Keep keyboard focus on the same control across a re-render.
+    const act = document.activeElement;
+    let focusKey = null;
+    if (act && container.contains(act)) {
+        focusKey = act.getAttribute('onclick') || null;
+    }
+    const scroller = container.querySelector('.qm-grid-wrap');
+    const sx = scroller ? scroller.scrollLeft : 0;
+    container.innerHTML = html;
+    mon.lastHTML = html;
+    const wrap = container.querySelector('.qm-grid-wrap');
+    if (wrap && sx) wrap.scrollLeft = sx;
+    if (focusKey) {
+        const base = focusKey.replace(/,\s*(true|false)\)$/, '');
+        const next = Array.from(container.querySelectorAll('[onclick]')).find((el) => (el.getAttribute('onclick') || '').replace(/,\s*(true|false)\)$/, '') === base);
+        if (next) next.focus();
+    }
 }
 
 // ---- Monitor Actions ----
@@ -494,17 +486,11 @@ export async function inviteStudents() {
     const link = `${baseUrl}?quiz=${compressed}`;
 
     if (link.length > 8000) {
-        window.showToast('Quiz too large for URL sharing. Export JSON instead.', 'error');
+        note('This quiz is too large for a link. Export it as JSON instead.', 'error');
         return;
     }
-
-    try {
-        await navigator.clipboard.writeText(link);
-        window.showToast('Quiz link copied! Share with students.', 'success');
-    } catch (e) {
-        // Fallback: show in prompt
-        prompt('Copy this quiz link:', link);
-    }
+    if (await copyText(link)) note('Pupil link copied', 'success');
+    else prompt('Copy this quiz link:', link);
 }
 
 export function finishMonitoring() {

@@ -479,6 +479,8 @@ export async function createClassroomAssignment(courseId, formUrl, title, token)
 // ── Section 7: Export Modal UI ──────────────────────────────
 
 export function openGoogleExportModal(problems, source) {
+    // Called with nothing (or a bad value) it still opens, with nothing to export.
+    problems = Array.isArray(problems) ? problems.filter(Boolean) : [];
     pendingExportProblems = problems;
     currentExportAbort = new AbortController();
 
@@ -499,10 +501,10 @@ export function openGoogleExportModal(problems, source) {
     overlay.className = 'google-export-overlay';
     overlay.id = 'googleExportOverlay';
     overlay.innerHTML = `
-        <div class="google-export-modal">
+        <div class="google-export-modal" role="dialog" aria-modal="true" aria-labelledby="gexHeading">
             <div class="google-export-header">
-                <h3>Export to Google Forms</h3>
-                <button onclick="closeGoogleExportModal()" class="modal-close">&times;</button>
+                <h3 id="gexHeading">Export to Google Forms</h3>
+                <button type="button" onclick="closeGoogleExportModal()" class="modal-close" aria-label="Close">&times;</button>
             </div>
 
             <div class="google-export-stepper">
@@ -515,11 +517,11 @@ export function openGoogleExportModal(problems, source) {
 
             <div class="google-export-body">
                 <div id="gexConfig">
-                    <label style="font-weight:600;font-size:0.9rem;">Worksheet Title</label>
-                    <input type="text" id="gexTitle" value="${defaultTitle}" style="width:100%;padding:10px;border:2px solid var(--text-dim);border-radius:8px;background:var(--bg-card);color:var(--text-primary);font-size:1rem;margin:6px 0 14px;box-sizing:border-box;">
+                    <label class="gex-label" for="gexTitle">Form title</label>
+                    <input type="text" id="gexTitle" class="gex-field" value="${defaultTitle}">
 
-                    <label style="font-weight:600;font-size:0.9rem;">Points per Question</label>
-                    <select id="gexPoints" style="width:100%;padding:10px;border:2px solid var(--text-dim);border-radius:8px;background:var(--bg-card);color:var(--text-primary);font-size:1rem;margin:6px 0 14px;">
+                    <label class="gex-label" for="gexPoints">Points per question</label>
+                    <select id="gexPoints" class="gex-field">
                         <option value="1">1 point</option>
                         <option value="2" selected>2 points</option>
                         <option value="5">5 points</option>
@@ -527,16 +529,16 @@ export function openGoogleExportModal(problems, source) {
                     </select>
 
                     <div id="gexClassroomSection" style="display:none;">
-                        <label style="font-weight:600;font-size:0.9rem;">Assign to Google Classroom (optional)</label>
-                        <select id="gexCourse" style="width:100%;padding:10px;border:2px solid var(--text-dim);border-radius:8px;background:var(--bg-card);color:var(--text-primary);font-size:1rem;margin:6px 0 14px;">
+                        <label class="gex-label" for="gexCourse">Assign to Google Classroom (optional)</label>
+                        <select id="gexCourse" class="gex-field">
                             <option value="">-- Don't assign --</option>
                         </select>
                     </div>
 
                     ${warningHtml}
 
-                    <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:14px;">
-                        ${exportableCount} of ${problems.length} problems will be exported
+                    <div class="gex-count">
+                        ${problems.length ? `${exportableCount} of ${problems.length} problems will be exported` : 'There are no problems to export yet. Open this from a quiz or a worksheet.'}
                     </div>
                 </div>
 
@@ -549,8 +551,8 @@ export function openGoogleExportModal(problems, source) {
             </div>
 
             <div class="google-export-actions">
-                <button onclick="closeGoogleExportModal()" style="padding:10px 20px;border:2px solid var(--text-dim);border-radius:8px;background:transparent;color:var(--text-primary);cursor:pointer;font-weight:600;">Cancel</button>
-                <button id="gexActionBtn" class="google-export-btn google-auth" onclick="startGoogleExport()">
+                <button type="button" class="gex-cancel" onclick="closeGoogleExportModal()">Cancel</button>
+                <button type="button" id="gexActionBtn" class="google-export-btn google-auth" onclick="startGoogleExport()"${exportableCount ? '' : ' disabled'}>
                     Sign in with Google
                 </button>
             </div>
@@ -559,10 +561,15 @@ export function openGoogleExportModal(problems, source) {
 
     document.body.appendChild(overlay);
 
-    // Close on overlay background click
+    // Close on overlay background click, or Escape; focus starts on the title field.
     overlay.addEventListener('click', (e) => {
         if (e.target === overlay) closeGoogleExportModal();
     });
+    overlay.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { e.preventDefault(); closeGoogleExportModal(); }
+    });
+    const first = overlay.querySelector('#gexTitle');
+    if (first) first.focus();
 }
 
 export function closeGoogleExportModal() {

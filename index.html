@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="css/sheet-kit.css?v=3538b3e862">
     <!-- Teacher view (approved 2026-09-24): sidebar shell + teacher screens. Loaded last. -->
     <link rel="stylesheet" href="css/teacher.css?v=2b06c970a9">
+    <link rel="stylesheet" href="css/teacher-quiz.css">
     <link rel="stylesheet" href="css/screen-cell.css?v=ff008f4790">
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -1042,7 +1043,7 @@
         </div>
 
         <!-- Quiz Builder View -->
-        <div class="view" id="quizBuilderView">
+        <div class="view tvq" id="quizBuilderView">
             <!-- My Quizzes list (toggled by openMyQuizzes) -->
             <div id="qbMyQuizzesContainer" style="display:none;">
                 <div class="quiz-header">
@@ -1056,83 +1057,92 @@
                 <div class="qb-quiz-list" id="quizListContainer"></div>
             </div>
 
-            <!-- Builder (toggled by showBuilder) -->
+            <!-- Builder (toggled by showBuilder). Teacher style: css/teacher-quiz.css -->
             <div id="qbBuilderContainer" style="display:none;">
-                <div class="qb-view">
-                    <!-- Header -->
-                    <div class="qb-builder-header">
-                        <div style="display:flex;align-items:center;gap:10px;flex:1;">
-                            <button class="so-back-btn" onclick="openMyQuizzes()">&#x2190; Back</button>
-                            <input type="text" id="quizNameInput" value="Untitled Quiz"
-                                style="font-size:1.1rem;font-weight:800;border:none;background:transparent;color:var(--text-bright);flex:1;min-width:120px;padding:4px 8px;"
-                                onchange="updateQuizName(this.value)" placeholder="Quiz name..." aria-label="Quiz name">
-                        </div>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <button class="qb-toolbar-btn primary" onclick="saveQuiz()">Save</button>
-                            <div class="qb-header-count" id="qbHeaderCount" style="display:none;">
-                                <span>Questions:</span>
-                                <span class="qb-header-count-badge" id="qbHeaderCountBadge">0</span>
-                            </div>
-                        </div>
+                <div class="qb-view tvq-builder">
+                    <div class="tvq-topline">
+                        <button type="button" class="tv-btn tv-btn-ghost tvq-back" onclick="openMyQuizzes()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg><span>Quizzes</span></button>
                     </div>
 
+                    <!-- Header: the quiz name, then one primary action (Save quiz) -->
+                    <header class="tvq-bhead">
+                        <div class="tvq-name-wrap">
+                            <input type="text" id="quizNameInput" class="tvq-name" value="Untitled Quiz"
+                                onchange="updateQuizName(this.value)" placeholder="Quiz name" aria-label="Quiz name" maxlength="80">
+                            <p class="tv-cap" id="qbToolbarInfo">0 questions &middot; 0 total points</p>
+                        </div>
+                        <div class="tv-header-actions">
+                            <button type="button" class="tv-btn" onclick="openQuizSettings()" aria-haspopup="dialog"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h9"/><path d="M17 7h3"/><circle cx="15" cy="7" r="2"/><path d="M4 17h3"/><path d="M11 17h9"/><circle cx="9" cy="17" r="2"/></svg><span>Settings</span></button>
+                            <button type="button" class="tv-btn" id="qbShareBtn" onclick="generateQuizLink()" disabled title="Saves the quiz and copies the link pupils open"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg><span>Copy pupil link</span></button>
+                            <button type="button" class="tv-btn" id="qbPrintBtn" onclick="printQuiz()" disabled><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 8V4h10v4"/><rect x="4" y="8" width="16" height="8" rx="2"/><path d="M7 13h10v7H7z"/></svg><span>Print</span></button>
+                            <div class="tv-menu-wrap">
+                                <button type="button" class="tv-btn" aria-haspopup="true" aria-expanded="false" onclick="tvqMenu(this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg><span>More</span></button>
+                                <div class="tv-menu" hidden>
+                                    <button type="button" id="qbResultsBtn" onclick="openBuilderResults()" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 20v-6"/><path d="M12 20V8"/><path d="M18 20v-10"/></svg><span>Results</span></button>
+                                    <button type="button" id="qbMonitorBtn" onclick="openBuilderMonitor()" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span>Live monitor</span></button>
+                                    <button type="button" id="qbExportBtn" onclick="exportQuiz()" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg><span>Export JSON</span></button>
+                                </div>
+                            </div>
+                            <button type="button" class="tv-btn tv-btn-primary" onclick="saveQuiz()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Save quiz</span></button>
+                        </div>
+                    </header>
+
                     <!-- Filter Bar -->
-                    <div class="qb-filters">
-                        <div class="qb-filter-group" id="qbDomainFilter"></div>
-                        <select class="qb-category-select" id="qbCategorySelect" onchange="qbFilterCategory()" aria-label="Filter quiz skills by category">
-                            <option value="">All Categories</option>
-                        </select>
-                        <div class="qb-filter-group" id="qbGradeFilter"></div>
-                        <input type="text" class="qb-search-filter" id="qbSearchInput" placeholder="Search skills..." oninput="qbSearchInput(this.value)" aria-label="Search quiz skills">
+                    <div class="qb-filters tvq-filters">
+                        <div class="tvq-filter-row">
+                            <div class="tv-search tvq-search">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>
+                                <input type="search" class="qb-search-filter tv-input" id="qbSearchInput" placeholder="Search skills" oninput="qbSearchInput(this.value)" aria-label="Search quiz skills" autocomplete="off">
+                            </div>
+                            <select class="qb-category-select tv-select" id="qbCategorySelect" onchange="qbFilterCategory()" aria-label="Filter quiz skills by category">
+                                <option value="">All Categories</option>
+                            </select>
+                            <div class="qb-filter-group tvq-levels" id="qbGradeFilter" role="group" aria-label="Level"></div>
+                        </div>
+                        <div class="qb-filter-group tvq-domains" id="qbDomainFilter" role="group" aria-label="Domain"></div>
                     </div>
 
                     <!-- 3-panel content -->
                     <div class="qb-content">
                         <!-- Left: Skill Grid -->
-                        <div class="qb-grid-panel" id="qbGridPanel"></div>
+                        <section class="tvq-panel tvq-skills" aria-labelledby="qbSkillsH">
+                            <div class="tvq-panel-head"><h2 class="tv-h2-sm" id="qbSkillsH">Skills</h2><span class="tv-cap">Choose one to preview it</span></div>
+                            <div class="qb-grid-panel" id="qbGridPanel"></div>
+                        </section>
 
                         <!-- Middle: Preview Panel -->
-                        <div class="qb-preview-panel">
-                            <div class="qb-preview-title">Preview</div>
-                            <div id="qbPreviewContent">
+                        <section class="qb-preview-panel tvq-panel" aria-labelledby="qbPreviewH">
+                            <div class="qb-preview-title tvq-panel-head"><h2 class="tv-h2-sm" id="qbPreviewH">Preview</h2></div>
+                            <div id="qbPreviewContent" aria-live="polite">
                                 <div class="qb-preview-empty">
-                                    Hover over a skill to preview the question type. Click to add questions.
+                                    Choose a skill to see an example question. Then add as many questions as you need.
                                 </div>
                             </div>
                             <div id="qbPreviewAddBar"></div>
-                        </div>
+                        </section>
 
                         <!-- Right: Question List -->
-                        <div class="qb-question-panel">
-                            <div class="qb-questions-title">
-                                <span>Questions (<span id="qbQuestionCount">0</span>)</span>
-                                <span id="qbTotalPoints" style="font-size:0.85rem;color:var(--text-dim);">0 points</span>
+                        <section class="qb-question-panel tvq-panel" aria-labelledby="qbQuestionsH">
+                            <div class="qb-questions-title tvq-panel-head">
+                                <h2 class="tv-h2-sm" id="qbQuestionsH">Questions (<span id="qbQuestionCount">0</span>)</h2>
+                                <span id="qbTotalPoints" class="tv-cap">0 points</span>
                             </div>
                             <div class="qb-question-list" id="qbQuestionList">
-                                <div class="qb-empty" id="qbEmptyQuestions">No questions yet. Click skills on the left to add questions.</div>
+                                <div class="qb-empty" id="qbEmptyQuestions">No questions yet. Choose a skill, then Add to quiz.</div>
                             </div>
-                        </div>
+                        </section>
                     </div>
 
-                    <!-- Bottom toolbar -->
-                    <div class="qb-toolbar">
-                        <div class="qb-toolbar-info" id="qbToolbarInfo">0 questions &middot; 0 total points</div>
-                        <div class="qb-toolbar-actions">
-                            <button class="qb-toolbar-btn settings" onclick="openQuizSettings()">Settings</button>
-                            <button class="qb-toolbar-btn share" id="qbShareBtn" onclick="generateQuizLink()" disabled>Share Link</button>
-                            <button class="qb-toolbar-btn print" id="qbPrintBtn" onclick="printQuiz()" disabled>Print</button>
-                            <button class="qb-toolbar-btn export" id="qbExportBtn" onclick="exportQuiz()" disabled>Export JSON</button>
-                            <button class="qb-toolbar-btn results" id="qbResultsBtn" onclick="showQuizResults()" disabled>Results</button>
-                        </div>
-                    </div>
-
-                    <!-- Settings overlay -->
-                    <div class="qb-settings-overlay" id="quizSettingsOverlay">
-                        <div class="qb-settings-panel">
-                            <h3>Quiz Settings</h3>
-                            <div id="qbSettingsContent"></div>
-                            <div style="text-align:right;margin-top:16px;">
-                                <button class="qb-toolbar-btn primary" onclick="closeQuizSettings()">Done</button>
+                    <!-- Settings dialog -->
+                    <div class="qb-settings-overlay tvq tvq-overlay" id="quizSettingsOverlay" onclick="if(event.target===this)closeQuizSettings()">
+                        <div class="qb-settings-panel tvq-dialog" role="dialog" aria-modal="true" aria-labelledby="qbSettingsTitle">
+                            <div class="tvq-dialog-head">
+                                <h2 class="tv-h2" id="qbSettingsTitle">Quiz settings</h2>
+                                <button type="button" class="tv-icon-btn tvq-close" onclick="closeQuizSettings()" aria-label="Close quiz settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg></button>
+                            </div>
+                            <div id="qbSettingsContent" class="tvq-dialog-body"></div>
+                            <div class="tvq-dialog-foot">
+                                <button type="button" class="tv-btn tv-btn-primary" onclick="closeQuizSettings()">Done</button>
                             </div>
                         </div>
                     </div>
@@ -1146,9 +1156,12 @@
         </div>
 
         <!-- Quiz Results View (Teacher) -->
-        <div class="view" id="quizResultsView">
+        <div class="view tvq" id="quizResultsView">
             <!-- Content rendered dynamically by quiz-results.js -->
         </div>
+
+        <!-- Quiz Monitor View (Teacher): live grid of pupils x questions, drawn by quiz-monitor.js -->
+        <div class="view tvq" id="quizMonitorView"></div>
 
         <div class="view" id="learningStatsView">
             <div class="ls-view">
