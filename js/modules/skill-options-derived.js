@@ -13,10 +13,10 @@
 // A skill with {} honours none of the three; it still carries the universal level in the model
 // (skill-options.js), but no control is shown for it — see offeredOptionsFor().
 //
-// Summary: {"skills":583,"range":146,"decimals":10,"level":50,"none":388,"coarse":14,"stat":21,"unstable":24,"hang":3}
+// Summary: {"skills":583,"range":142,"decimals":10,"level":50,"none":392,"coarse":14,"stat":21,"unstable":28,"hang":3}
 import { registerDerivedOptions } from './skill-options.js';
 
-export const DERIVED_SUMMARY = {"skills":583,"range":146,"decimals":10,"level":50,"none":388,"coarse":14,"stat":21,"unstable":24,"hang":3};
+export const DERIVED_SUMMARY = {"skills":583,"range":142,"decimals":10,"level":50,"none":392,"coarse":14,"stat":21,"unstable":28,"hang":3};
 
 export const DERIVED_OPTIONS = {
     "addition:add": {},
@@ -108,11 +108,11 @@ export const DERIVED_OPTIONS = {
     "algebra_mixed:order_ops_all": {"range":[10,20,50,100]},
     "algebra_mixed:patterns_all": {"range":[10,20,50,100,1000,10000,100000,1000000]},
     "algebra_mixed:placevalue_all": {},
-    "all_mixed:all_domains_mixed": {"range":[10,50,100,1000,10000]},
+    "all_mixed:all_domains_mixed": {"mode":"unstable"},
     "all_mixed:grade_1_mixed": {"mode":"unstable"},
     "all_mixed:grade_2_mixed": {"mode":"unstable"},
     "all_mixed:grade_3_mixed": {"mode":"unstable"},
-    "all_mixed:grade_4_mixed": {"range":[10,50,100,1000,10000]},
+    "all_mixed:grade_4_mixed": {"mode":"unstable"},
     "all_mixed:grade_5_mixed": {"mode":"unstable"},
     "all_mixed:grade_6_mixed": {"mode":"unstable"},
     "all_mixed:grade_k_mixed": {"mode":"unstable"},
@@ -301,8 +301,8 @@ export const DERIVED_OPTIONS = {
     "fractions:shade_fraction": {},
     "fractions:simplify": {"mode":"stat"},
     "fractions:write_fraction": {},
-    "geo_mixed:geo_meas_all": {"range":[10,50,100,1000,10000]},
-    "geo_mixed:geometry_all": {"range":[10,50,100,1000,10000]},
+    "geo_mixed:geo_meas_all": {"mode":"unstable"},
+    "geo_mixed:geometry_all": {"mode":"unstable"},
     "geo_mixed:measurement_all": {"mode":"coarse"},
     "graphs:bar_graph": {"range":[10,50,100,1000]},
     "graphs:build_bar_graph": {},
