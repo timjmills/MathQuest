@@ -345,7 +345,7 @@ async function browserChecks() {
             const set = SKILLS.slice(0, 3).map((k) => ({ categoryId: k.split(':')[0], skillId: k.split(':')[1] }));
             for (const mode of ['sections', 'side']) await one('mixed-practice', set, mode);
             // A skill with no real worked steps: no anchor, and the dialog says so.
-            await one('independent', [{ categoryId: 'number_sense', skillId: 'nearest_10' }], 'sections');
+            await one('independent', [{ categoryId: 'fractions', skillId: 'simplify' }], 'sections');
             return out;
         }, SKILLS);
         for (const r of res) {
@@ -356,7 +356,7 @@ async function browserChecks() {
             ok(r.gaps === 0, `${what}: key gaps ${r.gaps}`);
             ok(r.tabs === r.nAnchors, `${what}: every anchor has its Model tab (${r.tabs}/${r.nAnchors})`);
             ok(!r.long.length, `${what}: step lines over 10 words: ${r.long.join(' | ')}`);
-            if (r.skills === 'nearest_10') { ok(r.nAnchors === 0 && r.notes.length === 1, `${what}: no anchor, one note (${r.notes})`); continue; }
+            if (r.skills === 'simplify') { ok(r.nAnchors === 0 && r.notes.length === 1, `${what}: no anchor, one note (${r.notes})`); continue; }
             ok(r.nAnchors > 0, `${what}: has anchors`);
             // Score: the header denominator(s) sum to the labelled problems, which are all the items.
             const sum = r.scores.reduce((a, b) => a + Number(b || 0), 0);
