@@ -12,6 +12,7 @@
 //   node tests/scripts/ws-print-lint.cjs --family redone              # the app, legacy print path (default source)
 //   node tests/scripts/ws-print-lint.cjs --skills addition:add_20_regroup,composing:base10_build
 //   node tests/scripts/ws-print-lint.cjs --source kit --family operations   # window.buildSheet (P7 kit pages)
+//   node tests/scripts/ws-print-lint.cjs --source kit --skills addition:add_20_regroup --roles guided,review,test
 //   node tests/scripts/ws-print-lint.cjs ... --report-only --json out.json --verbose
 //
 // OPTIONS
@@ -21,6 +22,7 @@
 //   --family operations|k2|redone   app sources: a family (default when no --skills: redone)
 //   --files 01,11             pack: only page files whose name starts with one of these
 //   --count N                 legacy: items per section (default 20, the print dialog's default)
+//   --roles r1,r2             kit: the page roles to lint (default independent); any role buildSheet knows
 //   --no-combined             legacy: skip the combined multi-section sheet (see below)
 //   --lints L-INK,L-KEY       only report these lints (the others still run)
 //   --json out.json           machine-readable findings for the critic loop
@@ -1453,8 +1455,11 @@ async function runApp(source) {
         }
         const COUNT = parseInt(arg('count', '20'), 10);
         console.log(`${TOOL}: source ${source}, ${skills.length} skill(s)${source === 'legacy' ? `, ${COUNT} items per section` : ''}`);
-        for (const s of skills) {
-            const id = `${s.categoryId}:${s.skillId}`;
+        // --roles (kit only): every page role buildSheet composes, per skill. A role the skill
+        // cannot take (a fact layout for a non-fact skill) is reported as n/a, not linted.
+        const kitRoles = source === 'kit' ? (arg('roles', 'independent') || 'independent').split(',').map(r => r.trim()).filter(Boolean) : [null];
+        for (const s of skills) for (const role of kitRoles) {
+            const id = `${s.categoryId}:${s.skillId}${role && role !== 'independent' ? '#' + role : ''}`;
             const seed = hash(`${s.categoryId}__${s.skillId}:print`);
             let r;
             try {
@@ -1464,20 +1469,26 @@ async function runApp(source) {
                     await renderPrint(page, s, { problemCount: COUNT, includeAnswerKey: true });
                     html = await legacyDocumentHtml(page);
                 } else {
-                    html = await page.evaluate(async ({ s, seed, COUNT }) => {
+                    html = await page.evaluate(async ({ s, seed, COUNT, role }) => {
                         // js/modules/print-sheet.js buildSheet(req): sections carry the skills; the result has
                         // pupilHtml and keyHtml (the facsimile key, same plan).
-                        const req = { role: 'independent', sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId }], count: COUNT }], size: 'L', look: 'ican', key: true, seed };
-                        const out = await window.buildSheet(req);
+                        const practice = role === 'independent' || role === 'more-practice';
+                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId }], count: practice ? COUNT : undefined }], size: 'L', look: practice ? 'ican' : 'auto', key: true, seed };
+                        let out;
+                        try { out = await window.buildSheet(req); } catch (e) { if (e && e.unsupported) return { unsupported: e.message }; throw e; }
                         const body = [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');
                         return window.sheetDocument(body, s.label);
-                    }, { s, seed, COUNT: parseInt(arg('count', '6'), 10) });
+                    }, { s, seed, COUNT: parseInt(arg('count', '6'), 10), role });
+                }
+                if (html && html.unsupported) {
+                    process.stdout.write(`  ${id}: n/a (${html.unsupported})\n`);
+                    continue;
                 }
                 r = await lintHtmlInSheetPage(app, html, id, source === 'legacy' ? 'legacy' : 'kit');
             } catch (e) {
                 r = { info: { id, mode: source, error: e.message }, findings: [{ lint: 'L-SPLIT', rule: 'RENDER', sev: 'critical', msg: `the sheet did not render: ${e.message}`, key: 'render error' }] };
             }
-            r.info.label = s.label;
+            r.info.label = s.label + (role && role !== 'independent' ? ` (${role})` : '');
             results.push(r);
             process.stdout.write(`  ${id}: ${r.info.pages ?? '?'}+${r.info.keyPages ?? '?'} pages, ${r.findings.length} finding(s)\n`);
             await hideOverlays(page);

@@ -376,15 +376,39 @@ function gridPart(part, ctx, report) {
     });
 }
 
+/** A part's content: one part, several parts in order, or static html. */
+function contentHtml(part, ctx, report) {
+    if (Array.isArray(part.contents)) return part.contents.map((p) => partHtml(p, ctx, report)).join('');
+    return part.content ? partHtml(part.content, ctx, report) : (part.html || '');
+}
+
 function partHtml(part, ctx, report) {
     switch (part.kind) {
         case 'instruction': return instruction(part.text || '');
         case 'grid': return gridPart(part, ctx, report);
         case 'say': return sayBand(part.frame || '', { size: ctx.size, digits: part.digits || 2 });
-        case 'band': return band(part.label || '', part.instr || '',
-            part.content ? partHtml(part.content, ctx, report) : (part.html || ''), { grow: !!part.grow });
-        case 'day': return dayBand(part.day, part.score,
-            part.content ? partHtml(part.content, ctx, report) : (part.html || ''));
+        case 'band': {
+            // `extra`: static html at the right end of the strip (a quadrant's own "__/4").
+            // `style`: a fixed band height on a banded page (PT-ENG-3), identical in both states.
+            const html = band(part.label || '', part.instr || '', contentHtml(part, ctx, report), { grow: !!part.grow, extra: part.extra || '' });
+            return part.style ? html.replace('<div class="ws-band', `<div style="${part.style}" class="ws-band`) : html;
+        }
+        case 'day': return dayBand(part.day, part.score, contentHtml(part, ctx, report));
+        case 'row': {
+            // Parts side by side (the Opener's Model | Steps band, Pre-skill quadrants, a probe
+            // grid beside its support strip). `widths` are CSS track sizes; the row is a flex:none
+            // block of fixed height, so it lays out identically on the pupil page and the key.
+            const parts = part.parts || [];
+            const widths = parts.map((p, i) => (part.widths && part.widths[i]) || '1fr').join(' ');
+            const cells = parts.map((p) => `<div class="mq-rowcol">${partHtml(p, ctx, report)}</div>`).join('');
+            return `<div class="mq-row ${part.cls || ''}" style="grid-template-columns:${widths};${part.height ? `height:${part.height};` : ''}${part.gap ? `column-gap:${part.gap};` : ''}${part.style || ''}">${cells}</div>`;
+        }
+        case 'col': {
+            // Parts stacked inside one column of a `row` (a probe's vertical and horizontal
+            // blocks beside the support strip), with a fixed gap between them.
+            const gap = part.gap ? `<div style="flex:none;height:${part.gap}"></div>` : '';
+            return `<div class="mq-col ${part.cls || ''}">${(part.parts || []).map((p) => partHtml(p, ctx, report)).join(gap)}</div>`;
+        }
         case 'html': return part.html || '';
         default: return '';
     }
@@ -523,6 +547,8 @@ export function answerListRows(plan) {
             });
         }
         if (part.content) walk(part.content);
+        if (Array.isArray(part.contents)) part.contents.forEach(walk);
+        if (Array.isArray(part.parts)) part.parts.forEach(walk);
     };
     const pages = plan.pages && plan.pages.length ? plan.pages : [{ sections: plan.sections || [] }];
     for (const pg of pages) for (const part of pg.sections || []) walk(part);

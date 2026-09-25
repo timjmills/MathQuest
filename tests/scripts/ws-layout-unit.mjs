@@ -1,5 +1,8 @@
-// Unit tests for the page engine: js/modules/sheet/layout.js, paginate.js and the two practice
-// roles (roles/independent.js, roles/more-practice.js). Pure node - no browser.
+// Unit tests for the page engine: js/modules/sheet/layout.js, paginate.js, the two practice
+// roles (roles/independent.js, roles/more-practice.js) and the P7.2b roles of roles/index.js
+// (opener, scripted model, guided, error analysis, review, test, pre-skill check, word problems,
+// fact rows, fact probe, mixed practice, True or False?, Reason It, Stretch), each driven through
+// the host protocol of roles/compose.js exactly as print-sheet.js drives it. Pure node.
 //
 //   node tests/scripts/ws-layout-unit.mjs
 //
@@ -26,7 +29,8 @@ import { plan as morePracticePlan, letterSeed } from '../../js/modules/sheet/rol
 import {
     renderPlan, sectionInstructionKey, instructionHtml, levelLine, estimateTitleLines,
 } from '../../js/modules/sheet/roles/practice.js';
-import { ROLE_IDS } from '../../js/modules/sheet/roles/index.js';
+import { ROLE_IDS, ROLE_MODULES, ROLE_ALIASES } from '../../js/modules/sheet/roles/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx } from '../../js/modules/sheet/index.js';
 
 let pass = 0;
 const fails = [];
@@ -319,6 +323,199 @@ eq(ROLE_IDS.includes('independent') && ROLE_IDS.includes('more-practice'), true,
     const tagged = stackRun(4).map((it, i) => Object.assign(it, { letter: i < 2 ? 'C' : 'D' }));
     const p2 = morePracticePlan({ items: tagged, skills: SKILL, seed: 1 });
     eq(p2.sheets.map((s) => s.header.tab[2]), ['Practice C', 'Practice D'], 'PT-MPR-2: tagged items print under their own letter');
+}
+
+/* ============================================================ the P7.2b roles (host protocol) */
+
+/**
+ * A host item as print-sheet.js hostItem() makes it: the SAME draw function for the pupil page,
+ * the key and the measurement, with `shown` / `ink` written into the cell's own slot through the
+ * template's `traced` / `wrong` states. `h` is the measured height at every column count.
+ */
+const hostLike = (q, h = 50) => {
+    const key = cellAnswerKey(q);
+    const ans = String(q.ans);
+    const measured = Object.fromEntries([1, 2, 3, 4, 5, 6, 8, 10].map((c) => [c, { hMm: h, fits: true }]));
+    let fp;
+    try { fp = cellFootprint(q, resolveCtx({ mode: 'print', size: 'L', look: 'ican' })); } catch (e) { fp = { wMm: 40, hMm: h }; }
+    return {
+        q, key, template: q.cell.template, legacy: false, skill: `${q.categoryId}:${q.skillId}`, answerType: 'number',
+        footprint: Object.assign({}, fp, { measure: false, maxCols: 6 }), measured, fclass: 'standard', cellCls: '',
+        canShow: () => true,
+        render: (c, { shown, ink } = {}) => {
+            let state = c.state;
+            let wrong = c.wrong;
+            if (shown !== undefined && shown !== null && shown !== '') {
+                if (ink === 'trace' && String(shown) === ans) state = 'traced';
+                else { state = 'wrong'; wrong = { value: String(shown) }; }
+            }
+            return renderCell(q, Object.assign({}, c, { state, wrong }));
+        },
+    };
+};
+const factQ = (a, b, op = '×') => ({
+    categoryId: 'multiplication', skillId: 'mult_facts', skillLabel: 'Multiplication facts', answerType: 'number',
+    text: `${a} ${op} ${b} = ?`, ans: op === '×' ? a * b : a + b, printFormat: 'mult-facts-vertical',
+    cell: { template: 'fact', v: 1, payload: { a, b, op } },
+});
+const subQ = (a, b) => Object.assign(stackQ(a, b, '-'), { categoryId: 'subtraction', skillId: 'sub_1k_regroup', skillLabel: 'Subtract within 1,000' });
+const SUB_SKILL = { categoryId: 'subtraction', skillId: 'sub_1k_regroup', label: 'Subtract within 1,000', grade: 3, instructionKey: 'subtract', iCan: 'I Can subtract within 1,000' };
+const FACT_SKILL = { categoryId: 'multiplication', skillId: 'mult_facts', label: 'Multiplication facts', grade: 3, instructionKey: 'multiply', iCan: 'I Can multiply' };
+const ADD_SKILL = Object.assign({}, SKILL[0], { iCan: 'I Can add within 1,000' });
+
+/**
+ * Drive one role through the host protocol: sources -> prepare -> counts -> plan -> render.
+ * `make(poolId, skill, i)` returns the i-th question of a pool.
+ */
+function hostPlan(roleId, skills, make, extra = {}) {
+    const mod = ROLE_MODULES[roleId];
+    const earlier = (sk, n) => (sk.skillId === 'add_1k_regroup' ? ['add_100_regroup', 'add_100_no_regroup', 'add_20_regroup', 'add_10'].map((skillId) => ({ categoryId: 'addition', skillId })).slice(0, n) : []);
+    const pools = mod.sources(skills.map((s) => ({ categoryId: s.categoryId, skillId: s.skillId, weight: s.weight })), { earlier });
+    const input = Object.assign({ items: [], skills, pools: pools.map((p) => ({ id: p.id, weight: p.weight || 1 })), ctx: { size: 'L', paper: 'A4' }, seed: 42, form: 'A', floors: {} }, extra);
+    const deal = (pool, n) => {
+        const flags = typeof mod.wrongFlags === 'function' ? mod.wrongFlags(n, 42) : [];
+        const out = [];
+        for (let i = 0; out.length < n && i < n * 3; i++) {
+            const it = hostLike(make(pool.id, pool.skills[0], i), extra.h || 50);
+            const pr = typeof mod.prepare === 'function' ? mod.prepare(it, { index: out.length, seed: 42, wrong: !!flags[out.length], size: 'L' }) : it;
+            if (!pr) continue;
+            pr.pool = pool.id;
+            pr.measured = pr.measured || it.measured;
+            out.push(pr);
+        }
+        return out;
+    };
+    const probe = Object.fromEntries(pools.map((p) => [p.id, deal(p, 8)]));
+    const want = mod.counts(probe, input);
+    input.items = pools.flatMap((p) => deal(p, want[p.id] || 0));
+    const why = typeof mod.supports === 'function' ? mod.supports(input.items) : null;
+    if (why) return { unsupported: why, input };
+    const plan = mod.plan(input);
+    return { plan, r: renderPlan(plan), input, want };
+}
+const cellsOf = (html) => (html.match(/data-ws-cell/g) || []).length;
+const addMake = (pool, sk, i) => stackQ(111 + i * 7, 222 + i * 3);
+
+eq(Object.keys(ROLE_MODULES).length, 14, 'roles/index.js carries the fourteen P7.2b role modules');
+ok(Object.keys(ROLE_MODULES).every((id) => ROLE_IDS.includes(id)), 'ROLE_IDS lists every P7.2b role');
+eq(ROLE_ALIASES.model, 'scripted-model', 'the print screen\'s "model" names the Scripted Model role');
+
+// AK-1 / PT-KEY-7 for every role: the key is the pupil page, cell for cell and page for page.
+for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'review', 'test', 'pre-skill-check', 'word-problems', 'true-false', 'reason-it', 'stretch']) {
+    const res = hostPlan(id, [ADD_SKILL], addMake);
+    ok(res.plan && res.r.pupilPages.length >= 1, `${id}: composes at least one page`);
+    eq(res.r.keyPages.length, res.r.pupilPages.length, `AK-1 ${id}: as many key pages as pupil pages`);
+    eq(res.r.keyPages.map(cellsOf), res.r.pupilPages.map(cellsOf), `AK-1 ${id}: the key has the pupil page's cells, page for page`);
+    // PT-KEY-7: a page with nothing to answer (the Scripted Model) is its own key.
+    ok(res.plan.nothingToAnswer || res.r.keyPages.every((pg) => pg.includes('Answer Key')), `AK-3 ${id}: every key page says Answer Key`);
+    ok(!res.r.pupilPages.some((pg) => /undefined|NaN|\[object Object\]/.test(pg.replace(/<style[\s\S]*?<\/style>/g, ''))), `${id}: no undefined / NaN / [object Object] printed`);
+}
+
+// PT-GDP-1: Guided - unlabelled, unscored, cell 1 traced in grey, at most 6 cells at L.
+{
+    const { plan, r } = hostPlan('guided', [ADD_SKILL], addMake);
+    ok(plan.meta.items <= 6 && plan.meta.items >= 3, 'PT 2.3: Guided at L holds 3 to 6 cells (ceiling 6)');
+    eq(plan.header.score, false, 'PT-FRM-4: Guided prints no Score');
+    ok(!/data-ws-label="letter"/.test(r.pupilHtml), 'PT-LBL-6: Guided cells are unlabelled');
+    ok(/data-ws-ink="trace"/.test(r.pupilPages[0]), 'PT-GDP-1: cell 1 carries its answer in trace grey');
+    ok(/Steps:/.test(r.pupilHtml) && /Guided Practice:/.test(r.pupilHtml), 'PT 2.3: a Steps band over the Guided Practice band');
+}
+// PT-OPN-1: the Opener bands in their fixed order; Say band on by default.
+{
+    const { plan, r } = hostPlan('opener', [ADD_SKILL], addMake);
+    const order = ['Model:', 'Steps:', 'Say:', 'Guided Practice:'].map((w) => r.pupilHtml.indexOf(`<b>${w}</b>`));
+    ok(order.every((i) => i > 0) && order.every((v, i) => !i || v > order[i - 1]), 'PT-OPN-1: Model, Steps, Say, Guided in that order');
+    eq(plan.header.score === false ? 0 : plan.header.score, plan.meta.independent, 'PT-OPN-7: Score counts the Independent rows only');
+}
+// PT-MOD-1 / PT-MOD-4: one state per step, the Say band filled in, nothing to answer.
+{
+    const { plan, r } = hostPlan('scripted-model', [ADD_SKILL], addMake);
+    ok(plan.nothingToAnswer === true, 'PT-KEY-7: the Scripted Model page is its own key');
+    ok(plan.meta.states >= 3, 'PT-MOD-1: at least three states');
+    ok(/plus/.test(r.pupilHtml) && /equals/.test(r.pupilHtml), 'PT-MOD-4: the Say band is filled for this problem');
+}
+// PT-ERR-1 / PT-TOF-1: 40 to 60% wrong; the key checks the right box on every item.
+for (const id of ['error-analysis', 'true-false']) {
+    const { plan, r } = hostPlan(id, [ADD_SKILL], addMake);
+    const share = id === 'true-false' ? plan.meta.falseShare : plan.meta.wrongShare;
+    ok(share >= 0.4 && share <= 0.6, `${id}: 40-60% of the shown answers are wrong (${share})`);
+    eq((r.keyHtml.match(/>✓</g) || []).length, plan.meta.items, `${id}: the key checks exactly one box per item`);
+    eq((r.pupilHtml.match(/>✓</g) || []).length, 0, `${id}: the pupil page checks nothing`);
+}
+eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or False?', 'HD-13: True or False? title');
+// PT-RSN-4: Reason It - A and B side by side, the key rings the right one.
+{
+    const { plan, r } = hostPlan('reason-it', [ADD_SKILL], addMake);
+    eq(plan.header.title, 'Reason It', 'HD-13: Reason It title');
+    eq((r.keyHtml.match(/outline:1\.5pt solid #000/g) || []).length, plan.meta.items, 'AK-2: the key rings one choice per item');
+    ok(plan.meta.items >= 1 && plan.meta.items <= 2, 'PT-RSN-1: at most 2 at L');
+}
+// PT-REV-3: Review mixes about a third earlier items, whole rows, one cell height.
+{
+    const { plan, r } = hostPlan('review', [ADD_SKILL], (pool, sk, i) => (pool === 'earlier' ? stackQ(12 + i, 30 + i) : stackQ(111 + i * 7, 222 + i * 3)));
+    ok(/^Review: adding/.test(plan.header.title), 'HD-13: "Review: <topic>"');
+    ok(plan.meta.earlierShare >= 0.2 && plan.meta.earlierShare <= 0.4, `PT-REV-3: earlier items are 25-35% (${plan.meta.earlierShare})`);
+    ok(/Mixed Review:/.test(r.pupilHtml), 'PT 2.8: the earlier items print under Mixed Review');
+}
+// PT-TST-1: Test B is Test A's items, re-ordered.
+{
+    const a = hostPlan('test', [ADD_SKILL], addMake);
+    const b = hostPlan('test', [ADD_SKILL], addMake, { form: 'B' });
+    const ansOf = (res) => res.plan.pages[0].sections.filter((s) => s.kind === 'grid').flatMap((g) => g.items.map((it) => it.q.ans));
+    eq(ansOf(b).slice().sort(), ansOf(a).slice().sort(), 'PT-TST-1: Form B holds the same items');
+    ok(JSON.stringify(ansOf(a)) !== JSON.stringify(ansOf(b)), 'PT-TST-1: in another order');
+    ok(/^Test B: /.test(b.plan.header.title) && b.plan.header.tab.includes('Test B'), 'HD-13 / PT-FRM-9: "Test B" title and tab');
+}
+// PT-PRE-1: four quadrants with their own small score.
+{
+    const { plan, r } = hostPlan('pre-skill-check', [ADD_SKILL], addMake);
+    eq((r.pupilHtml.match(/class="mq-quadscore"/g) || []).length, 4, 'PT-PRE-1: four quadrants, each with its own __/4');
+    eq(plan.meta.scoreOutOf, 16, 'PT-PRE-1: Score /16');
+    // A skill with one earlier skill checks one quadrant, never the same skill four times.
+    const one = hostPlan('pre-skill-check', [SUB_SKILL], (pool, sk, i) => subQ(500 + i * 11, 123 + i));
+    eq(one.plan.meta.scoreOutOf, 4, 'PT-PRE-3: a first skill checks itself once (4 items)');
+}
+// PT-STC-1..3: Stretch - no Score, a traced worked row, key rows that satisfy the check rule.
+{
+    const { plan, r } = hostPlan('stretch', [ADD_SKILL], addMake);
+    eq(plan.header.score, false, 'Stretch prints no Score (answers vary)');
+    ok(/class="mq-ex"/.test(r.pupilHtml), 'PT-STC-1: one worked row traced in grey');
+    const rows = [...r.keyHtml.matchAll(/<tr>((?:<td[^>]*><b[^>]*>\d+<\/b><\/td>){3})<\/tr>/g)].map((m) => [...m[1].matchAll(/>(\d+)<\/b>/g)].map((x) => Number(x[1])));
+    ok(rows.length >= 3 && rows.every(([x, y, z]) => x + y === z), 'PT-STC-2: every key row passes its own check');
+    ok(!/answers shown/.test(r.keyHtml.replace(/<footer[\s\S]*?<\/footer>/g, '')), 'Stretch key: no display text leaks into a check box');
+}
+// PT-WPR-1: word problems print in one column, 2 per page at L.
+{
+    const story = (pool, sk, i) => Object.assign(stackQ(3 + i, 4), { skillId: 'add_wp_10', printFormat: 'word-problem', text: `Sam has ${3 + i} apples. He gets 4 more. How many apples does Sam have now?` });
+    const { plan, r } = hostPlan('word-problems', [ADD_SKILL], story);
+    eq(plan.meta.items, 2, 'PT 3.7 v2: two word problems per page at L');
+    ok(/data-ws-instruction="story-v2"/.test(r.pupilHtml), 'PT 3.7: the story-v2 instruction');
+    ok(/>apples</.test(r.keyHtml), 'PT-WPR-8: the key writes the label word');
+}
+// PT-CMP-2: the fact layouts take fact skills only, and say why otherwise.
+{
+    ok(typeof hostPlan('fact-rows', [ADD_SKILL], addMake).unsupported === 'string', 'PT-CMP-2: Fact rows refuse a non-fact skill, with a reason');
+    ok(typeof hostPlan('fact-probe', [ADD_SKILL], addMake).unsupported === 'string', 'PT-CMP-2: the Fact probe refuses a non-fact skill');
+    const fr = hostPlan('fact-rows', [FACT_SKILL], (pool, sk, i) => factQ(2 + (i % 11), 3), { h: 30 });
+    eq(fr.plan.pages[0].sections.find((s) => s.kind === 'grid').cols, 5, 'PT-FRW-2: Fact rows Auto 5 columns at L');
+    eq(fr.plan.header.title, 'Multiply by 3', 'HD-13: the fact stub title');
+    eq(fr.plan.ctx.look, 'daily', 'PAGE_TYPES appendix 4: Fact rows default to the Daily look');
+    const fp = hostPlan('fact-probe', [FACT_SKILL], (pool, sk, i) => factQ(1 + (i % 12), 3), { h: 30 });
+    eq(fp.plan.meta.items, 20, 'PT 4.2: the probe holds 20 facts');
+    ok(Array.isArray(fp.plan.meta.strip) && fp.plan.meta.strip[0] === 3, 'PT-FPR-3: a skip-count strip for a x3 set');
+}
+// PT-MIX-1..7: Mixed practice - a shelf per skill, each with its own instruction, numbered 1..N.
+{
+    const skills4 = [ADD_SKILL, SUB_SKILL, FACT_SKILL, Object.assign({}, ADD_SKILL, { skillId: 'add_100_regroup', label: 'Add within 100' })];
+    const make = (pool, sk, i) => (sk.skillId === 'sub_1k_regroup' ? subQ(500 + i * 11, 123 + i) : sk.skillId === 'mult_facts' ? factQ(2 + i, 7)
+        : sk.skillId === 'add_100_regroup' ? Object.assign(stackQ(20 + i, 35 + i), { skillId: 'add_100_regroup' }) : stackQ(111 + i * 7, 222 + i * 3));
+    const { plan, r } = hostPlan('mixed-practice', skills4, make);
+    eq(Object.keys(plan.meta.achieved).length, 4, 'PT-MIX-4: every skill gets at least one shelf');
+    eq(plan.header.title, 'Mixed practice', 'HD-13: "Mixed practice"');
+    eq(plan.header.tab.length, 2, 'PT 5.2: the two-line tab');
+    const instr = [...r.pupilHtml.matchAll(/<b>[^<]*<\/b><span>(Add\.|Subtract\.|Multiply\.)<\/span>/g)].map((m) => m[1]);
+    ok(instr.includes('Add.') && instr.includes('Subtract.') && instr.includes('Multiply.'), 'DN-34: each skill\'s shelf carries its own instruction');
+    eq(plan.meta.scoreOutOf, plan.meta.items, 'PT-FRM-4: Score counts every problem');
 }
 
 /* ===================================================================== small words */

@@ -91,7 +91,15 @@ const compute = (p) => {
         default: return null;
     }
 };
-const tracksOf = (p) => p.T || Math.max(String((p.operands || [])[0] ?? '').length, String((p.operands || [])[1] ?? '').length) + 1;
+// The widest ROW sets the tracks, the answer row included: 6 + 5 = 11 needs a tens track under
+// the operator track, or the key's second digit has nowhere to go (VA-3, AK-1).
+const tracksOf = (p) => {
+    if (p.T) return p.T;
+    const ops = p.operands || [p.a, p.b];
+    const v = p.ans !== undefined ? p.ans : compute(p);
+    const ansLen = v !== null && v !== undefined && /^\d+$/.test(String(v)) ? String(v).length : 0;
+    return Math.max(String(ops[0] ?? '').length, String(ops[1] ?? '').length, ansLen) + 1;
+};
 
 /**
  * Which tracks carry a regroup box, so `render`, `inputs` and `answerKey` agree (SCC-T13).

@@ -67,11 +67,98 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .stack{margin-left:auto;margin-right:auto}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .ws-legacy-answer{position:absolute;left:3mm;right:3mm;bottom:1.5mm;display:block;text-align:center;font-size:var(--ws-zone);font-weight:700;line-height:1.2}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .ws-legacy-answer .ws-zone{font-size:inherit}
+/* ---- P7.2b roles (roles/compose.js). Scoped to the sheet roots; additive. ---- */
+/* INK-3: a traced value stays grey in print. css/print-worksheet.css forces every legacy
+   .worksheet-problem descendant to black under @media print; the trace is the one exception. */
+:is(.ws-page,.ws-sheet) [data-ws-ink="trace"],:is(.ws-page,.ws-sheet) .worksheet-problem .ws-trace{color:#949494!important}
+/* TY-2: Andika has 400 and 700 only. Legacy markup asks for 600 in places (visual labels, the
+   "Answer:" caption); inside a sheet it takes the 700 the face really has, never a synthetic bold. */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy :is([style*="font-weight:600"],[style*="font-weight: 600"],.visual-label){font-weight:700!important}
+/* The engine's style block (and page 2's continuation marker) sit before the first band, so the
+   kit's :first-child band rule is restated for them (BD-3: the header rule closes the header). */
+.ws-body>:is(style,.mq-cont):first-child+:is(.ws-band,.mq-row),.ws-body>style:first-child+.mq-cont+:is(.ws-band,.mq-row){margin-top:1.5mm}
+.ws-body>:is(style,.mq-cont):first-child+.ws-band,.ws-body>style:first-child+.mq-cont+.ws-band{border-top-width:var(--ws-heavy)}
+:is(.ws-page,.ws-sheet) .ws-band>.ws-grid.fixed{flex:none}
+/* a value written into a line slot sits on the rule (a key, shown work) */
+:is(.ws-page,.ws-sheet) .ws-line[data-ws-ink]{display:inline-flex;align-items:flex-end;justify-content:center;font-weight:700;line-height:1.1;padding-bottom:.6mm;font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .ws-line.ws-trace[data-ws-ink]{font-weight:400}
+/* PT-OPN-2: parts side by side in one band row (Model | Steps, quadrants, a probe and its strip) */
+:is(.ws-page,.ws-sheet) .mq-row{flex:none;display:grid;column-gap:0;margin-top:-1.5pt;min-height:0}
+:is(.ws-page,.ws-sheet) .mq-rowcol{min-width:0;min-height:0;display:flex;flex-direction:column}
+:is(.ws-page,.ws-sheet) .mq-rowcol>.ws-band{flex:1 1 auto;margin-top:0;min-height:0}
+:is(.ws-page,.ws-sheet) .mq-rowcol+.mq-rowcol>.ws-band{border-left:0}
+:is(.ws-page,.ws-sheet) .mq-rowcol>.ws-band>.ws-grid{flex:1 1 auto}
+:is(.ws-page,.ws-sheet) .mq-row.mq-proberow{margin-top:0;column-gap:4mm}
+:is(.ws-page,.ws-sheet) .mq-col{display:flex;flex-direction:column;min-height:0}
+:is(.ws-page,.ws-sheet) .mq-quadrow+.mq-quadrow{margin-top:3mm}
+:is(.ws-page,.ws-sheet) .mq-quadrow .ws-band{margin-top:0}
+:is(.ws-page,.ws-sheet) .mq-quadscore{margin-left:auto;font-weight:700;white-space:nowrap}
+/* BD-4: the Steps list. Two text columns on the Guided page (PT-GDP-2). */
+:is(.ws-page,.ws-sheet) .mq-stepsband{padding:1mm 3mm 3mm 4mm}
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps2{display:block;columns:2;column-gap:8mm}
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps2 li{break-inside:avoid;margin-bottom:2.2mm}
+:is(.ws-page,.ws-sheet) .mq-stepszone{padding:1.5mm 3mm 0 4mm;overflow:hidden}
+:is(.ws-page,.ws-sheet) .mq-steptext{width:100%;height:100%;display:flex;gap:2.5mm;align-items:flex-start;padding-top:2mm;font-size:var(--ws-text);line-height:1.3;text-align:left}
+:is(.ws-page,.ws-sheet) .mq-steptext>em{flex:none;font-style:normal;width:7mm;height:7mm;border:var(--ws-hair) solid var(--ws-ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:var(--ws-zone);font-weight:700}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-stepcell{align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-steptop{width:100%;height:calc(2 * (1.3em) + 4mm);flex:none}
+/* check-box lines and one-line sentence frames (section 6, P-TH-3) */
+:is(.ws-page,.ws-sheet) .mq-checkline{display:inline-flex;align-items:center;gap:2.5mm;white-space:nowrap;font-size:var(--ws-text);line-height:1}
+:is(.ws-page,.ws-sheet) .mq-checkline .ws-check{margin:0;vertical-align:0;flex:none}
+:is(.ws-page,.ws-sheet) .mq-frame{display:flex;align-items:flex-end;gap:1.5mm;white-space:nowrap;font-size:var(--ws-text);line-height:1.1}
+/* Error analysis and True or False?: the finished work beside the judgement (04-E mock-up) */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-thinkcell{align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-judge{width:100%;flex:1 1 auto;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:3mm;row-gap:3mm;align-items:end}
+:is(.ws-page,.ws-sheet) .mq-judge-work{min-width:0;align-self:start;display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-judge-row{display:flex;flex-direction:column;align-items:flex-start;gap:4mm;padding-bottom:1mm}
+:is(.ws-page,.ws-sheet) .mq-fixline{display:flex;flex-direction:column;align-items:flex-start;gap:1mm}
+:is(.ws-page,.ws-sheet) .mq-fixline .ws-line{margin-left:9mm}
+:is(.ws-page,.ws-sheet) .mq-judge.mq-tf{grid-template-columns:minmax(0,1fr);align-content:space-between;row-gap:5mm}
+:is(.ws-page,.ws-sheet) .mq-tf>.mq-judge-row{flex-direction:row;gap:12mm;padding:0 0 0 4mm}
+:is(.ws-page,.ws-sheet) .mq-tf>.mq-frame{justify-self:start;padding:0 0 1mm 4mm}
+/* A thinking cell draws its shown answer in the flow (it is measured with it), never over the picture. */
+:is(.ws-page,.ws-sheet) .ws-cell :is(.mq-judge-work,.mq-abbox,.mq-wpcell) .ws-legacy-answer.mq-shown{position:static;margin-top:2mm;left:auto;right:auto;bottom:auto}
+:is(.ws-page,.ws-sheet) .mq-shownline{display:flex;align-items:flex-end;gap:2mm;margin-top:2mm;font-size:var(--ws-text);line-height:1.1}
+:is(.ws-page,.ws-sheet) .mq-shownline b{font-weight:700;border-bottom:var(--ws-hair) solid var(--ws-ink);min-width:14mm;text-align:center}
+/* Reason It, "Which is correct" (09-B mock-up): two finished answers A and B, then the frames */
+:is(.ws-page,.ws-sheet) .mq-ab{width:100%;display:grid;grid-template-columns:1fr 1fr minmax(52mm,auto);column-gap:5mm;align-items:start;padding-top:2mm}
+:is(.ws-page,.ws-sheet) .mq-abbox{position:relative;min-width:0;border:var(--ws-hair) solid var(--ws-ink);padding:10mm 2mm 3mm 2mm;display:flex;flex-direction:column;align-items:center;justify-content:center}
+:is(.ws-page,.ws-sheet) .mq-abtag{position:absolute;left:0;top:0;width:8mm;height:8mm;border-right:var(--ws-hair) solid var(--ws-ink);border-bottom:var(--ws-hair) solid var(--ws-ink);display:flex;align-items:center;justify-content:center;font-size:var(--ws-text);font-weight:700;line-height:1}
+:is(.ws-page,.ws-sheet) .mq-abresp{align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;gap:6mm;padding:1mm 0 1mm}
+:is(.ws-page,.ws-sheet) .mq-abchoice{display:flex;gap:10mm;padding-left:2mm}
+:is(.ws-page,.ws-sheet) .ws-choice{display:inline-flex;align-items:center;justify-content:center;min-width:12mm;height:12mm;padding:0 1.5mm;font-size:var(--ws-digit);font-weight:700;line-height:1}
+/* Stretch (09-D mock-up): the prompt box, the results table, the closing frames */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-stretchcell{align-items:stretch;padding:4mm 5mm 4mm 9mm}
+:is(.ws-page,.ws-sheet) .mq-stretch{width:100%;display:flex;flex-direction:column;gap:5mm}
+:is(.ws-page,.ws-sheet) .mq-prompt{padding:2.5mm 5mm}
+:is(.ws-page,.ws-sheet) .mq-stretch-main{display:flex;align-items:flex-end;gap:7mm}
+:is(.ws-page,.ws-sheet) .mq-table{flex:none;border-collapse:collapse;border:var(--ws-heavy) solid var(--ws-ink)}
+:is(.ws-page,.ws-sheet) .mq-table th,:is(.ws-page,.ws-sheet) .mq-table td{border:var(--ws-hair) solid var(--ws-ink);padding:0 2mm;text-align:center;vertical-align:middle}
+:is(.ws-page,.ws-sheet) .mq-table th{height:10mm;font-size:var(--ws-zone);font-weight:700;line-height:1.1}
+:is(.ws-page,.ws-sheet) .mq-table td{height:calc(var(--ws-hw) + 3mm);min-width:28mm;font-size:var(--ws-text);line-height:1}
+:is(.ws-page,.ws-sheet) .mq-table.mq-cols3 td{width:30mm}
+:is(.ws-page,.ws-sheet) .mq-table.mq-cols2 td:first-child{width:60mm}
+:is(.ws-page,.ws-sheet) .mq-table td b{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-closing{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:6mm;padding-bottom:1mm}
+/* Word problems v2 (07-D mock-up): story box with the answer row, then the equation frame */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-wpcellbox{align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-wp{width:100%;flex:1 1 auto;display:flex;flex-direction:column;padding-left:6mm}
+:is(.ws-page,.ws-sheet) .mq-wpstory>div{white-space:normal}
+:is(.ws-page,.ws-sheet) .mq-wpcell{border:var(--ws-heavy) solid var(--ws-ink);border-radius:3mm;padding:3mm 4mm;display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-wpanswer{display:flex;align-items:flex-end;justify-content:flex-end;gap:4mm;margin-top:2mm;padding-right:4mm}
+:is(.ws-page,.ws-sheet) .mq-ansslot{display:inline-flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-ansslot small{font-size:var(--ws-zone);line-height:1.2;margin-top:.8mm}
+:is(.ws-page,.ws-sheet) .mq-wpwork{flex:1 1 auto;display:flex;align-items:flex-start;padding:8mm 0 0 4mm;font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .mq-wpwork .ws-circle{margin:0 1mm}
+/* Fact probe: horizontal facts and the skip-count strip (PT-FPR-3) */
+:is(.ws-page,.ws-sheet) .mq-hfact{width:100%;display:flex;align-items:flex-end;gap:2mm;padding-top:2mm;font-size:var(--ws-digit);line-height:1}
+:is(.ws-page,.ws-sheet) .mq-hfact .ws-line{font-size:var(--ws-digit)}
+:is(.ws-page,.ws-sheet) .mq-skipstrip{border:var(--ws-heavy) solid var(--ws-ink);border-radius:3mm;display:flex;flex-direction:column;justify-content:space-around;align-items:center;font-size:var(--ws-text);font-weight:700;line-height:1}
 `.trim();
 
-const styleBlock = () => `<style data-mq-sheet-engine>${SHEET_ENGINE_CSS}</style>`;
+export const styleBlock = () => `<style data-mq-sheet-engine>${SHEET_ENGINE_CSS}</style>`;
 /** The marker the continuation-header rules key on. Identical on the pupil page and the key. */
-const CONT_MARK = '<i class="mq-cont" hidden></i>';
+export const CONT_MARK = '<i class="mq-cont" hidden></i>';
 
 /* ============================================================================ skill words */
 
@@ -103,7 +190,7 @@ export function levelLine(grades) {
 }
 
 /** HD-30: the grade words for the teacher footer. */
-function gradeWords(grades) {
+export function gradeWords(grades) {
     const known = [...new Set((grades || []).map((g) => String(g).toUpperCase()).filter((g) => GRADE_ORDER.includes(g)))]
         .sort((a, b) => GRADE_ORDER.indexOf(a) - GRADE_ORDER.indexOf(b));
     if (!known.length) return 'Grade mixed';
@@ -185,7 +272,7 @@ function normaliseInput(input = {}) {
 }
 
 /** Which skills a set of items came from, as the metadata rows the frame needs. */
-function skillRows(input, items) {
+export function skillRows(input, items) {
     const rows = [];
     const seen = new Set();
     const add = (s) => {
@@ -206,7 +293,7 @@ function skillRows(input, items) {
 }
 
 /** The frame words for one sheet: title, tab lines, footer left. */
-function frameWords(role, input, skills, { tabId }) {
+export function frameWords(role, input, skills, { tabId }) {
     const header = input.header || {};
     const words = skills.map(skillWords);
     const titles = [...new Set(words.map((w) => w.iCan).filter(Boolean))];
@@ -229,7 +316,7 @@ function frameWords(role, input, skills, { tabId }) {
  * 12 mm continuation header (HD-20) - Name and the one-line tab, no Date, no Score, no title.
  * Checked-off parts stay off (HD-1, PT-FRM-3).
  */
-function sheetHeaders(input, words, score) {
+export function sheetHeaders(input, words, score) {
     const h = input.header || {};
     const on = (k) => h[k] !== false;
     const tab = h.tab === false ? false : words.tabLines;
@@ -246,7 +333,7 @@ function sheetHeaders(input, words, score) {
 }
 
 /** The class tokens a cell carries so `decorate()` can write its data-ws-* hooks (17.1). */
-function hookClasses(it, level) {
+export function hookClasses(it, level) {
     const q = it.q || {};
     const template = it.template || (q.cell && q.cell.template) || 'legacy';
     const at = String(it.answerType || q.answerType || '').replace(/[^a-z0-9-]/gi, '') || 'none';
@@ -279,7 +366,7 @@ function planItem(it, level, cols) {
  */
 function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, headerFirst, availableWidthMm }) {
     const layouts = sectionsIn.map((sec, si) => resolveSectionLayout(
-        { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor },
+        { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH },
         itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
     ));
     const chunksBySection = layouts.map((L, si) => paginate(itemsBySection[si].length, L));
