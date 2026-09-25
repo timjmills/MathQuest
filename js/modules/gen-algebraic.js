@@ -3,7 +3,7 @@ import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { createNumberLine } from './svg-base10.js';
 import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
-import { optionsFor } from './skill-options.js';
+import { optionsFor, pvCap } from './skill-options.js';
 import { generatePvRounding, generatePvPlaceValue, pvSpan, pvRefuse, pvOptions } from './gen-pv.js';
 import { numeralTracksHTML } from './sheet/index.js';
 
@@ -3303,9 +3303,21 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // type appears — no Math.random() picks a type any more.
             const _estAt = Number.isFinite(state.itemIndex) ? state.itemIndex : (++_estLiveCursor);
             const _estDeal = (n) => ((_estAt % n) + n) % n;
+            // One value that lands in the chosen task's branch in ALL THREE skills below (their
+            // cut points are 0.4 / 0.7, 0.4 / 0.7 and 0.5 / 0.8): 0.55 is "closest" in every one.
             const _estTaskR = () => {
                 const t = pvOptions('number_sense', estSkill).task;
-                return t === 'closest' ? 0.75 : t === 'reasonable' ? 0.95 : 0;
+                return t === 'closest' ? 0.55 : t === 'reasonable' ? 0.95 : 0;
+            };
+            // "Round to the nearest" (skill-options.js, owner 2026-09-25): the PLACE sets the
+            // number size, the way a rounding skill's band does — numbers to 10 x the place — and
+            // Max Number lowers it only when the teacher explicitly set it below (pvCap).
+            const _estPlaceRange = () => {
+                const roundTo = Number(pvOptions('number_sense', estSkill).place) || 10;
+                const top = pvCap(roundTo * 10 - 1, range);
+                const opMin = roundTo + Math.max(2, Math.floor(roundTo / 5));
+                const opMax = Math.max(opMin + roundTo, top);
+                return { roundTo, opMin, opMax, estMax: opMax };
             };
 
             // Helper: pick a rounding place AND an operand range that scales to whatever
@@ -3520,7 +3532,7 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // ========================================
             else if (estSkill === "estimate_sums_diffs") {
                 const r = _estTaskR();
-                const { roundTo, opMin, opMax } = _pickRoundPlaceAndRange();
+                const { roundTo, opMin, opMax } = _estPlaceRange();
                 const placeName = roundTo === 10 ? 'ten' : roundTo === 100 ? 'hundred' : roundTo === 1000 ? 'thousand' : roundTo === 10000 ? 'ten thousand' : roundTo === 100000 ? 'hundred thousand' : 'million';
 
                 if (r < 0.4) {
@@ -3607,17 +3619,9 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // ========================================
             else if (estSkill === "estimate_products") {
                 const r = _estTaskR();
-                // Pick rounding place for the multiplicand based on estMax.
-                // Multiplier stays a single digit (2-9) to keep mental-math friendly.
-                const places = [10];
-                if (estMax >= 200) places.push(100);
-                if (estMax >= 2000) places.push(1000);
-                if (estMax >= 20000) places.push(10000);
-                if (estMax >= 200000) places.push(100000);
-                if (estMax >= 2000000) places.push(1000000);
-                const roundTo = pick(places);
-                const aMin = roundTo + Math.max(2, Math.floor(roundTo / 5));
-                const aMax = Math.max(aMin + roundTo, Math.min(estMax, roundTo * 10 - 1));
+                // The multiplicand's rounding place is the teacher's "Round to the nearest";
+                // the multiplier stays a single digit (2-9) to keep it mental-math friendly.
+                const { roundTo, opMin: aMin, opMax: aMax } = _estPlaceRange();
 
                 if (r < 0.4) {
                     // Type 1 (40%): Round-then-multiply
@@ -3676,24 +3680,20 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // ========================================
             else if (estSkill === "estimate_quotient") {
                 const r = _estTaskR();
-                // Pick a divisor (single or 2-digit) and a dividend rounding place that scales with estMax.
-                const divisor = pick([2, 3, 4, 5, 6, 7, 8, 9]);
-                // Choose a target quotient size, then build a rounded dividend = divisor * targetQ * placeFactor
-                const placeFactors = [1, 10];
-                if (estMax >= 1000) placeFactors.push(100);
-                if (estMax >= 10000) placeFactors.push(1000);
-                if (estMax >= 100000) placeFactors.push(10000);
-                if (estMax >= 1000000) placeFactors.push(100000);
-                // P9 §2.1: the dividend is the number a "÷ within N" band bounds, so a place factor
-                // is only offered when its smallest item still fits under Max Number.
+                // The size of the estimate is the teacher's choice ("Size of the estimate",
+                // skill-options.js): ones (43 ÷ 6 ≈ 7), tens (430 ÷ 6 ≈ 70), hundreds, thousands.
+                // It SETS the dividend's size; Max Number lowers it only when the teacher explicitly
+                // set it below (pvCap).
+                const placeFactor = Number(pvOptions('number_sense', estSkill).place) || 1;
                 // With no place factor the compatible number is the nearest multiple of the
                 // divisor, so the offset stays under half the divisor: 21 ÷ 3 must never be
-                // "about 6" when 21 is itself a multiple of 3. A divisor of 2 has no such offset.
+                // "about 6" when 21 is itself a multiple of 3. A divisor of 2 has no such offset,
+                // so it is not dealt for a ones-sized estimate.
+                const divisor = pick(placeFactor === 1 ? [3, 4, 5, 6, 7, 8, 9] : [2, 3, 4, 5, 6, 7, 8, 9]);
                 const _offFor = (pf) => pf === 1 ? Math.max(0, Math.ceil(divisor / 2) - 1)
                     : Math.max(1, Math.floor(pf / 2) - 1);
-                const fitting = placeFactors.filter(pf => divisor * 2 * pf + _offFor(pf) <= estMax && (pf > 1 || divisor > 2));
-                const placeFactor = fitting.length ? pick(fitting) : 1;
-                const qMax = Math.max(2, Math.min(9, Math.floor((estMax - _offFor(placeFactor)) / (divisor * placeFactor))));
+                const quotCap = pvCap(divisor * 9 * placeFactor + _offFor(placeFactor), range);
+                const qMax = Math.max(2, Math.min(9, Math.floor((quotCap - _offFor(placeFactor)) / (divisor * placeFactor))));
                 const targetQuotient = rng(2, qMax) * placeFactor; // e.g. 4, 40, 400, 4000, 40000, 400000
                 const roundedDividend = divisor * targetQuotient; // already a "nice" number
                 // Choose a rounding place small enough that the dividend isn't already exact

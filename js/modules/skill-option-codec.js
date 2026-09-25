@@ -93,9 +93,9 @@ export const VALUE_TOKENS = {
     op: { x: 'M', '/': 'D' },
     order: { largest: 'L', scrambled: 'S' },
     midpoint: { never: 'N', seeded: 'S', only: 'O' },
-    support: { cut: 'C', line: 'L', none: 'N',
+    support: { cut: 'C', line: 'L', none: 'N', labels: 'B', chart: 'T',
         // P11 operations hint pictures (appended)
-        tile: 'T', frame: 'R', skip: 'K', array: 'A', think: 'H', bar: 'B' },
+        tile: 'D', frame: 'R', skip: 'K', array: 'A', think: 'H', bar: 'M' },
     objects: { shapes: 'S', counters: 'C', frame: 'F', dice: 'D' },
     // Numeric sets whose members are not all under 36: one digit per power of ten.
     power: { 10: '1', 100: '2', 1000: '3' },

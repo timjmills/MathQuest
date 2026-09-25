@@ -319,130 +319,217 @@ export const SKILL_OPTIONS = {
 // ===========================================================================
 // One contiguous block, merged into SKILL_OPTIONS below, so a parallel wave adding options for
 // another family never edits the same lines. Every option here is READ by js/modules/gen-pv.js
-// (the P9 generator); an option a generator ignores is not declared (SCC-P11). The rest of the
-// §2.5 table (identify `response`/`repeatDigit`, value `form`/`zeroDigit`, expand `frame` /
-// `notation`, nearest_* `responseScope`, round_sort_* `bins`, rounding_table `places`,
-// estimation `place`/`support`, the more/less `support` strip, ...) lands with its step (§19.4
-// step 8), not before.
+// (the P9 generator) or by the estimation branch of gen-algebraic.js; an option a generator
+// ignores is not declared (SCC-P11).
 //
-// THE BAND (§2.1, owner ruling 2 of 2026-09-24). `band` caps the NUMBER on the page (for more /
-// less both the given number and the answer; for x and / by 10 the larger of the two). Max
-// Number caps the band. The PLACE sets a floor: a nearest-100 item is at least three digits, so
-// "Round to the nearest 100" needs Numbers to 1,000 or more and is REFUSED below that — never
-// silently relaxed. pvBandFloor() / pvRefusal() below are the single source of that rule; the
-// generator refuses through them and the print dialog can ask them before offering a skill.
-const _pvBand = (values, dflt) => bandOption(values, dflt);
+// THE BAND (owner ruling of 2026-09-25, superseding §2.1's "Max Number caps the band"). The
+// skill's own `band` SETS the working range: "Numbers to 1,000" on "Round to the nearest 100" deals
+// three-digit numbers whatever the app's Max Number says. Max Number caps the band only when the
+// teacher has explicitly LOWERED it below the band — Max Number at its app default (100) counts as
+// "not chosen", so a stand-alone skill never refuses at defaults. pvCap() below is the single
+// source of that rule. The default band of a skill whose place needs more than 100 is its natural
+// band (nearest_100 -> to 1,000). A refusal remains only for a genuinely impossible explicit
+// choice: Max Number lowered below the place's floor (a nearest-100 item needs three digits).
+//
+// GROUPS. Every control carries `group` — 'difficulty' (Harder / easier), 'support' (Support) or
+// 'layout' (Layout) — which the panel (skill-options-ui.js) uses to set the controls out under
+// those three headings, and a one-line `help` in plain teacher English.
+
+/** Max Number's app default. At this value the Max Number setting counts as "not chosen". */
+export const APP_DEFAULT_RANGE = 100;
+
+/**
+ * The biggest number a P9 skill deals: its band, lowered only by a Max Number the teacher has
+ * explicitly set below it (any value other than the app default).
+ *
+ * `strict` is for a skill dealt as a MEMBER of a mixed review (mixed_placevalue, ...): the review
+ * has no band of its own, so its Max Number — default or not — is the only size control, and it
+ * caps every member it draws.
+ */
+export function pvCap(band, range, strict = false) {
+    const b = Number(band);
+    const r = Number(range);
+    if (!Number.isFinite(r) || r <= 0 || r >= b) return b;
+    if (r === APP_DEFAULT_RANGE && !strict) return b;
+    return r;
+}
+
+const _PV_BAND_HELP = 'The biggest number on the page. Max Number only lowers it if you set Max Number below this.';
+const _pvBand = (values, dflt, help) => ({
+    ...bandOption(values, dflt),
+    group: 'difficulty',
+    help: help || _PV_BAND_HELP,
+});
 const _pvMidpoint = (withOnly = true) => ({
-    id: 'midpoint', label: 'Exactly halfway', type: 'enum', default: 'seeded',
+    id: 'midpoint', label: 'Exactly halfway (like 350)', type: 'enum', default: 'seeded', group: 'difficulty',
     values: [
         { v: 'never', l: 'Never' },
         { v: 'seeded', l: 'At least one on every page' },
         ...(withOnly ? [{ v: 'only', l: 'Only halfway numbers (halfway rounds up)' }] : []),
     ],
-    help: 'Halfway rounds up, and is taught as its own step: "Only" gives a page of nothing else.',
+    help: 'Halfway numbers round up. "Only" gives a page of nothing else, to teach that rule on its own.',
 });
 const _pvZeroPlace = (withAlways = true) => ({
-    id: 'zeroPlace', label: 'A zero place (305, 340)', type: 'enum', default: 'none',
+    id: 'zeroPlace', label: 'A zero place (305, 340)', type: 'enum', default: 'none', group: 'difficulty',
     values: [
         { v: 'none', l: 'Never' },
         { v: 'some', l: 'Some numbers' },
         ...(withAlways ? [{ v: 'always', l: 'Every number' }] : []),
     ],
-    help: 'A zero holds a place. Framed expanded form writes the zero part: 300 + 0 + 5.',
+    help: 'A zero holds a place. It is harder: the pupil has to write or read the 0 part.',
 });
 const _pvPlaceSet = (upTo) => ({
-    id: 'places', label: 'Which place is asked', type: 'set',
+    id: 'places', label: 'Which place is asked', type: 'set', group: 'difficulty',
     default: [1, 10, 100, 1000, 10000, 100000].filter(p => p <= upTo),
     values: [
         { v: 1, l: 'Ones' }, { v: 10, l: 'Tens' }, { v: 100, l: 'Hundreds' }, { v: 1000, l: 'Thousands' },
         { v: 10000, l: 'Ten thousands' }, { v: 100000, l: 'Hundred thousands' },
     ].filter(x => x.v <= upTo),
-    allLabel: 'Every place',
-    help: 'Only places the number actually has are asked; the band decides how many it has.',
+    allLabel: 'Every place the number has',
+    help: 'Tick the places to ask about. A place bigger than "Numbers to" makes those numbers just long enough to have it.',
+});
+// Place-value support on the numeral (owner, 2026-09-25): the place letters over the digits are
+// the default; a ruled place-value chart with the place NAMES is more support, a bare numeral is
+// the fade (pv-support-cell.js draws the other two rungs, on screen and in print).
+const _pvDigitSupport = () => ({
+    id: 'support', label: 'Place-value support', type: 'enum', default: 'labels', group: 'support',
+    values: [
+        { v: 'chart', l: 'Place-value chart (place names over the digits)' },
+        { v: 'labels', l: 'Place letters over the digits (H T O)' },
+        { v: 'none', l: 'None: the number on its own' },
+    ],
+    help: 'Most support first: the chart names every place, the letters remind, "None" is the fade.',
 });
 const _PV_PLACE_BANDS = [99, 999, 9999, 99999, 999999];
 const _pvRoundBands = (place) => [100, 1000, 10000, 100000, 1000000, 10000000].filter(b => b >= place * 10);
-const _pvNearest = (place) => [
-    _pvBand(_pvRoundBands(place), place * 10),
-    {
-        id: 'support', label: 'Support', type: 'enum', default: 'cut',
-        values: [
-            { v: 'cut', l: 'Cut line (place letters over the digits)' },
-            { v: 'line', l: 'Number line (ends labelled)' },
-            { v: 'none', l: 'None' },
-        ],
-        help: 'One support per page. The place letters stay with the cut line; "None" is the fade.',
-    },
-    _pvMidpoint(true),
-    {
-        id: 'response', label: 'How the pupil answers', type: 'enum', default: 'write',
-        values: [
-            { v: 'write', l: 'Write the rounded number' },
-            { v: 'circle-all', l: 'Circle every number that rounds to N' },
-        ],
-        help: '"Circle every number that rounds to N" is its own step: eight printed numbers, with the '
-            + 'near misses either side of halfway.',
-    },
-];
-const _pvSort = () => [
-    {
-        id: 'tiles', label: 'Numbers to sort', type: 'enum', default: 6,
-        values: [{ v: 6, l: '6' }, { v: 8, l: '8' }],
-    },
-    _pvMidpoint(false),
-];
+const _pvNearest = (place) => {
+    const bands = _pvRoundBands(place);
+    return [
+        // A band with one value is a control with no choice: nearest_million only rounds numbers
+        // to 10,000,000, so it has no band control (the generator uses its natural band).
+        ...(bands.length > 1 ? [_pvBand(bands, place * 10)] : []),
+        _pvMidpoint(true),
+        {
+            id: 'support', label: 'Support', type: 'enum', default: 'cut', group: 'support',
+            values: [
+                { v: 'line', l: 'Number line (ends labelled)' },
+                { v: 'cut', l: 'Cut line (place letters over the digits)' },
+                { v: 'none', l: 'None' },
+            ],
+            help: 'One support per page. The number line shows which end is nearer; "None" is the fade.',
+        },
+        {
+            id: 'response', label: 'How the pupil answers', type: 'enum', default: 'write', group: 'layout',
+            values: [
+                { v: 'write', l: 'Write the rounded number' },
+                { v: 'circle-all', l: 'Circle every number that rounds to N' },
+            ],
+            help: '"Circle every number" is its own step: eight numbers, with near misses either side of halfway.',
+        },
+    ];
+};
+const _pvSort = (place) => {
+    const bands = place ? _pvRoundBands(place) : [];
+    return [
+        ...(bands.length > 1 ? [_pvBand(bands, place * 10)] : []),
+        {
+            id: 'tiles', label: 'Numbers to sort', type: 'enum', default: 6, group: 'layout',
+            values: [{ v: 6, l: '6' }, { v: 8, l: '8' }],
+            help: 'How many numbers go into the two bins.',
+        },
+        _pvMidpoint(false),
+        {
+            id: 'support', label: 'Support', type: 'enum', default: 'none', group: 'support',
+            values: [
+                { v: 'line', l: 'Number line from one bin to the other' },
+                { v: 'none', l: 'None' },
+            ],
+            help: 'The number line runs between the two bins, so the pupil can see which end each number is nearer.',
+        },
+    ];
+};
 const _pvTask = () => ({
-    id: 'task', label: 'Task', type: 'enum', default: 'compute',
+    id: 'task', label: 'Task', type: 'enum', default: 'compute', group: 'layout',
     values: [
         { v: 'compute', l: 'Round, then work it out' },
         { v: 'closest', l: 'Choose the closest estimate' },
         { v: 'reasonable', l: 'Is the answer reasonable?' },
     ],
-    help: 'One task per page (P-28).',
+    help: 'One task per page, so the instruction says one thing.',
+});
+// "Round to" on the estimation skills (owner, 2026-09-25). The place SETS the number size (a
+// nearest-100 estimate has three-digit numbers), the same way a rounding skill's band does.
+const _pvEstPlace = () => ({
+    id: 'place', label: 'Round to the nearest', type: 'enum', default: 10, group: 'difficulty',
+    values: [{ v: 10, l: '10 (two-digit numbers)' }, { v: 100, l: '100 (three-digit numbers)' }, { v: 1000, l: '1,000 (four-digit numbers)' }],
+    help: 'The place each number is rounded to. It also sets how big the numbers are.',
+});
+const _pvQuotientPlace = () => ({
+    id: 'place', label: 'Size of the estimate', type: 'enum', default: 1, group: 'difficulty',
+    values: [{ v: 1, l: 'Ones (43 ÷ 6 is about 7)' }, { v: 10, l: 'Tens (430 ÷ 6 is about 70)' },
+        { v: 100, l: 'Hundreds (4,300 ÷ 6 is about 700)' }, { v: 1000, l: 'Thousands (43,000 ÷ 6 is about 7,000)' }],
+    help: 'The dividend is rounded to a number the divisor goes into; this sets how big the answer is.',
+});
+const _pvStep = (values, dflt) => ({
+    id: 'step', label: 'How much more or less', type: 'enum', default: dflt, group: 'difficulty',
+    values: values.map(v => ({ v, l: String(v) })),
+    help: 'The jump the pupil adds or takes away.',
+});
+const _pvDir = () => ({
+    id: 'dir', label: 'More or less', type: 'enum', default: 'more', group: 'difficulty',
+    values: [{ v: 'more', l: 'More' }, { v: 'less', l: 'Less' }, { v: 'both', l: 'Both, alternating' }],
+    help: '"Less" is harder than "More"; "Both" mixes them so the pupil must read the word.',
+});
+const _pvMoreLessSupport = (withChart) => ({
+    id: 'support', label: 'Support', type: 'enum', default: 'none', group: 'support',
+    values: [
+        ...(withChart ? [{ v: 'chart', l: 'Hundreds chart (the rows around the number)' }] : []),
+        { v: 'line', l: 'Number line (jumps of the step)' },
+        { v: 'none', l: 'None' },
+    ],
+    help: withChart ? 'A picture to count on or back with: most support first, "None" is the fade.'
+        : 'A number line to jump along: "None" is the fade.',
 });
 const P9_PV_OPTIONS = {
-    'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000)],
-    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999)],
+    'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport()],
+    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport()],
     'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true)],
     'placevalue:combine': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), {
-        id: 'order', label: 'Order of the parts', type: 'enum', default: 'largest',
+        id: 'order', label: 'Order of the parts', type: 'enum', default: 'largest', group: 'difficulty',
         values: [{ v: 'largest', l: 'Largest first' }, { v: 'scrambled', l: 'Scrambled (5 + 300 + 20)' }],
+        help: 'Scrambled parts are harder: the pupil has to put each part in its place.',
     }],
     'placevalue:compare': [_pvBand([99, 999, 9999, 99999, 999999], 999)],
     'placevalue:order_least_to_greatest': [_pvBand([99, 999, 9999, 99999, 999999], 999)],
     'placevalue:order_greatest_to_least': [_pvBand([99, 999, 9999, 99999, 999999], 999)],
     'placevalue:place_value_disks': [_pvBand([99, 999, 9999], 999), {
-        id: 'task', label: 'Task', type: 'enum', default: 'read',
+        id: 'task', label: 'Task', type: 'enum', default: 'read', group: 'layout',
         values: [{ v: 'read', l: 'Read the number from the disks' }, { v: 'count', l: "Count one place's disks" }],
+        help: 'Counting one place is the easier first step; reading the whole number comes next.',
     }, _pvZeroPlace(false)],
     // Draw to 999 only (owner ruling 3): nine 1,000 disks and 27 others is a poster, not a cell.
     'placevalue:pv_disks_build': [_pvBand([99, 999], 999), _pvZeroPlace(false)],
     'placevalue:pv_digit_drag': [_pvBand([999, 9999, 99999, 999999], 99999)],
     'placevalue:number_word_names': [_pvBand([999, 9999, 99999, 999999], 999999)],
-    'placevalue:more_less_10': [
-        { id: 'step', label: 'How much more or less', type: 'enum', default: 1, values: [{ v: 1, l: '1' }, { v: 10, l: '10' }] },
-        { id: 'dir', label: 'More or less', type: 'enum', default: 'more',
-            values: [{ v: 'more', l: 'More' }, { v: 'less', l: 'Less' }, { v: 'both', l: 'Both, alternating' }] },
-        _pvBand([20, 50, 100, 120], 100),
-    ],
-    'placevalue:more_less_100': [
-        { id: 'step', label: 'How much more or less', type: 'enum', default: 100, values: [{ v: 10, l: '10' }, { v: 100, l: '100' }] },
-        { id: 'dir', label: 'More or less', type: 'enum', default: 'more',
-            values: [{ v: 'more', l: 'More' }, { v: 'less', l: 'Less' }, { v: 'both', l: 'Both, alternating' }] },
-        _pvBand([1000], 1000),
-    ],
+    'placevalue:more_less_10': [_pvStep([1, 10], 1), _pvDir(), _pvBand([20, 50, 100, 120], 100), _pvMoreLessSupport(true)],
+    // Numbers 100-900 (2.NBT.B.8): the band is fixed at 1,000, so there is no band control.
+    'placevalue:more_less_100': [_pvStep([10, 100], 100), _pvDir(), _pvMoreLessSupport(false)],
     'placevalue:place_value_10x': [
-        { id: 'op', label: 'Multiply or divide', type: 'enum', default: 'x',
-            values: [{ v: 'x', l: '× (digits move left)' }, { v: '/', l: '÷ (digits move right)' }] },
-        { id: 'power', label: 'By', type: 'set', default: [10],
-            values: [{ v: 10, l: '10' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }], allLabel: '10, 100 and 1,000' },
-        _pvBand([1000, 10000, 100000, 1000000], 10000),
-        { id: 'decimals', label: 'Decimals (Level 5)', type: 'bool', default: false },
+        { id: 'op', label: 'Multiply or divide', type: 'enum', default: 'x', group: 'difficulty',
+            values: [{ v: 'x', l: '× (digits move left)' }, { v: '/', l: '÷ (digits move right)' }],
+            help: 'Dividing is the harder direction: the digits move right.' },
+        { id: 'power', label: 'By', type: 'set', default: [10], group: 'difficulty',
+            values: [{ v: 10, l: '10' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }], allLabel: '10, 100 and 1,000',
+            help: 'Tick one power for a page that stays with it, or several to mix them.' },
+        _pvBand([1000, 10000, 100000, 1000000], 10000, 'The biggest number on the page (the larger of the number and its answer).'),
+        { id: 'decimals', label: 'Decimals (grade 5)', type: 'bool', default: false, group: 'difficulty',
+            help: 'On gives numbers with a decimal point, such as 3.4 × 100.' },
     ],
     'number_sense:rounding_visual': [
-        { id: 'place', label: 'Round to the nearest', type: 'enum', default: 10,
-            values: [{ v: 10, l: '10' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }] },
-        _pvBand([100, 1000, 10000], 100),
+        { id: 'place', label: 'Round to the nearest', type: 'enum', default: 10, group: 'difficulty',
+            values: [{ v: 10, l: '10' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }],
+            help: 'The place the number is rounded to. The numbers grow to fit the place.' },
+        _pvBand([100, 1000, 10000], 100, 'The biggest number on the page. It grows to fit the place when the place needs more.'),
         _pvMidpoint(true),
     ],
     'number_sense:nearest_10': _pvNearest(10),
@@ -451,17 +538,17 @@ const P9_PV_OPTIONS = {
     'number_sense:nearest_10000': _pvNearest(10000),
     'number_sense:nearest_100000': _pvNearest(100000),
     'number_sense:nearest_million': _pvNearest(1000000),
-    'number_sense:round_sort_10': _pvSort(),
-    'number_sense:round_sort_100': _pvSort(),
-    'number_sense:round_sort_1000': _pvSort(),
-    'number_sense:round_sort_10000': _pvSort(),
-    'number_sense:round_sort_100000': _pvSort(),
-    'number_sense:round_sort_million': _pvSort(),
-    'number_sense:round_sort_tenths': _pvSort(),
-    'number_sense:round_sort_hundredths': _pvSort(),
-    'number_sense:estimate_sums_diffs': [_pvTask()],
-    'number_sense:estimate_products': [_pvTask()],
-    'number_sense:estimate_quotient': [_pvTask()],
+    'number_sense:round_sort_10': _pvSort(10),
+    'number_sense:round_sort_100': _pvSort(100),
+    'number_sense:round_sort_1000': _pvSort(1000),
+    'number_sense:round_sort_10000': _pvSort(10000),
+    'number_sense:round_sort_100000': _pvSort(100000),
+    'number_sense:round_sort_million': _pvSort(1000000),
+    'number_sense:round_sort_tenths': _pvSort(0),
+    'number_sense:round_sort_hundredths': _pvSort(0),
+    'number_sense:estimate_sums_diffs': [_pvEstPlace(), _pvTask()],
+    'number_sense:estimate_products': [_pvEstPlace(), _pvTask()],
+    'number_sense:estimate_quotient': [_pvQuotientPlace(), _pvTask()],
 };
 Object.assign(SKILL_OPTIONS, P9_PV_OPTIONS);
 
@@ -475,7 +562,7 @@ export function pvRoundPlace(skillId, opts) {
 }
 
 /**
- * The smallest Max Number a P9 skill can be dealt at with these options (§2.1). 0 = no floor.
+ * The smallest band a P9 skill can be dealt at with these options. 0 = no floor.
  * The place sets it for rounding (a nearest-100 item is at least 3 digits, so it needs 1,000);
  * a step or a power sets it for more / less and x / ÷ 10.
  */
@@ -493,14 +580,30 @@ export function pvBandFloor(categoryId, skillId, opts) {
     return 0;
 }
 
-/** The refusal line when Max Number cannot host the skill, or '' when it can (VA-R-07). */
-export function pvRefusal(categoryId, skillId, range, opts) {
+/**
+ * The band a P9 skill works to with these options: its own band option, raised to the place's
+ * floor when the two disagree (rounding_visual "to the nearest 1,000" with "Numbers to 100"), or
+ * the floor alone when the skill has no band control (nearest_million, more_less_100).
+ */
+export function pvBand(categoryId, skillId, opts, fallback = 0) {
+    const o = normalizeOptions(categoryId, skillId, opts);
+    const own = Number(o.band);
+    const band = Number.isFinite(own) && own > 0 ? own : fallback;
+    return Math.max(band, pvBandFloor(categoryId, skillId, o));
+}
+
+/**
+ * The refusal line when an EXPLICITLY lowered Max Number cannot host the skill, or '' when it
+ * can. Max Number at its app default never refuses (pvCap).
+ */
+export function pvRefusal(categoryId, skillId, range, opts, strict = false) {
     const floor = pvBandFloor(categoryId, skillId, opts);
-    if (!floor || !(Number(range) < floor)) return '';
-    const what = pvRoundPlace(skillId, normalizeOptions(categoryId, skillId, opts))
-        ? `Round to the nearest ${pvRoundPlace(skillId, normalizeOptions(categoryId, skillId, opts)).toLocaleString('en-US')}`
-        : 'This skill';
-    return `${what} needs Numbers to ${floor.toLocaleString('en-US')} or more.`;
+    if (!floor) return '';
+    const cap = pvCap(pvBand(categoryId, skillId, opts), range, strict);
+    if (!(cap < floor)) return '';
+    const place = pvRoundPlace(skillId, normalizeOptions(categoryId, skillId, opts));
+    const what = place ? `Round to the nearest ${place.toLocaleString('en-US')}` : 'This skill';
+    return `${what} needs Max Number ${floor.toLocaleString('en-US')} or more.`;
 }
 // ============================ end P9 · place value + rounding ============================
 
@@ -601,14 +704,14 @@ const P11_OPS_OPTIONS = {
     'subtraction:subtract': [notationOption('-'), _opsRegroup('mixed', true), _opsUnknown('answer',
         { first: 'The number you start from (__ − 7 = 8)', second: 'The number taken away (15 − __ = 8)' })],
     'multiplication:multiply': [notationOption('x'), {
-        id: 'tiles', label: 'Digits × digits', type: 'enum', default: null,
+        id: 'tiles', label: 'Digits × digits', type: 'enum', default: null, group: 'difficulty',
         values: [{ v: null, l: 'Set by Max Number' }, { v: 11, l: '1-digit × 1-digit (7 × 8)' },
             { v: 21, l: '2-digit × 1-digit (34 × 6)' }, { v: 31, l: '3-digit × 1-digit (215 × 4)' },
             { v: 22, l: '2-digit × 2-digit (34 × 26)' }],
         help: 'This skill only: the size of the two numbers, instead of the Max Number setting.',
     }],
     'division:divide': [notationOption('/'), {
-        id: 'tiles', label: 'Digits ÷ digit', type: 'enum', default: null,
+        id: 'tiles', label: 'Digits ÷ digit', type: 'enum', default: null, group: 'difficulty',
         values: [{ v: null, l: 'Set by Max Number' }, { v: 21, l: '2-digit ÷ 1-digit (84 ÷ 4)' },
             { v: 31, l: '3-digit ÷ 1-digit (756 ÷ 7)' }, { v: 41, l: '4-digit ÷ 1-digit (5,016 ÷ 8)' },
             { v: 32, l: '3-digit ÷ 2-digit (736 ÷ 23)' }],
@@ -625,7 +728,7 @@ const P11_OPS_OPTIONS = {
 
     // --- add_column_multi: how many numbers are added ------------------------------------------
     'addition:add_column_multi': [{
-        id: 'tiles', label: 'Numbers to add', type: 'enum', default: null,
+        id: 'tiles', label: 'Numbers to add', type: 'enum', default: null, group: 'difficulty',
         values: [{ v: null, l: 'Dealt across the page (3 and 4)' }, { v: 3, l: '3 numbers' }, { v: 4, l: '4 numbers' }],
         help: 'How many numbers each column sum stacks. The column and its carry boxes stay the same.',
     }],
@@ -696,13 +799,13 @@ const P11_K2_OPTIONS = {
     'counting:count_objects': [
         _k2CountTo([5, 10, 20], 20),
         {
-            id: 'objects', label: 'Objects', type: 'enum', default: 'shapes',
+            id: 'objects', label: 'Objects', type: 'enum', default: 'shapes', group: 'support',
             values: [{ v: 'shapes', l: 'Plain shapes (one kind per item)' }, { v: 'counters', l: 'Round counters' },
                 { v: 'frame', l: 'Counters in ten frames' }, { v: 'dice', l: 'Dice patterns' }],
             help: 'What the pupil counts. Ten frames and dice let a pupil count on from a group he knows.',
         },
         {
-            id: 'orientation', label: 'Arrangement', type: 'enum', default: 'rows',
+            id: 'orientation', label: 'Arrangement', type: 'enum', default: 'rows', group: 'difficulty',
             values: [{ v: 'rows', l: 'Rows of five' }, { v: 'line', l: 'One line (ten to a row)' }, { v: 'scattered', l: 'Scattered' }],
             help: 'Scattered is the hardest: the pupil has to keep track of what he has counted.',
         },
@@ -745,15 +848,15 @@ const P11_K2_OPTIONS = {
             values: [{ v: 'more', l: 'Longer / taller / thicker' }, { v: 'fewer', l: 'Shorter / thinner' }, { v: 'mixed', l: 'Both' }],
         },
         {
-            id: 'task', label: 'What is compared', type: 'enum', default: 'all',
+            id: 'task', label: 'What is compared', type: 'enum', default: 'all', group: 'difficulty',
             values: [{ v: 'length', l: 'Length (lines)' }, { v: 'height', l: 'Height (towers)' }, { v: 'thickness', l: 'Thickness (bars)' },
                 { v: 'all', l: 'All three' }],
         },
     ],
     'comparing:classify_count': [
-        _k2CountTo([5, 10], 6),
+        _k2CountTo([3, 6, 10], 6),
         {
-            id: 'tiles', label: 'Kinds of shape', type: 'enum', default: null,
+            id: 'tiles', label: 'Kinds of shape', type: 'enum', default: null, group: 'difficulty',
             values: [{ v: null, l: '2 or 3, dealt' }, { v: 2, l: '2 kinds' }, { v: 3, l: '3 kinds' }, { v: 4, l: '4 kinds' }],
             help: 'More kinds means more to ignore while counting one of them.',
         },
@@ -769,15 +872,19 @@ const P11_K2_OPTIONS = {
     'composing:teen_compose': [levelSubset([1, 0], 1, 'Level 1 shows the full ten frame and the ones; level 0 is the number sentence alone.')],
     'composing:ten_frame_build': [_k2CountTo([5, 10], 10)],
     'composing:base10_build': [_opsBand([20, 50, 99], 99, { label: 'Numbers to', help: 'The largest number to build.' })],
-    'composing:number_word_form': [{
-        id: 'wordform', label: 'Which way round', type: 'set', default: ['to_number'],
-        values: [{ v: 'to_number', l: 'Words to numeral (write 41)' }, { v: 'to_words', l: 'Numeral to words (write forty-one)' }],
-        allLabel: 'Both ways, alternating',
-        help: 'Tick one way for a page that stays with it; tick both and the page alternates.',
-    }],
 };
 Object.assign(SKILL_OPTIONS, P11_K2_OPTIONS);
 // ============================ end P11 · K-2 options ============================
+// number_word_form: which way round (gen-algebraic.js wordFormWay() reads it; the codec has had
+// `W` since the option was specified). Words to numeral is the default: it is the lower writing
+// load, and a misspelled "fourty" would be a spelling error marked as a maths error.
+SKILL_OPTIONS['composing:number_word_form'] = [{
+    id: 'wordform', label: 'Which way round', type: 'set', default: ['to_number'], group: 'difficulty',
+    values: [{ v: 'to_number', l: 'Words to numeral (write 41)' },
+        { v: 'to_words', l: 'Numeral to words (write forty-one)' }],
+    allLabel: 'Both ways, alternating',
+    help: 'Writing the words is harder (it is spelling too). Tick both and the page alternates.',
+}];
 
 // Options every skill understands, whether or not it declares anything of its own.
 export const UNIVERSAL_OPTIONS = [levelOption()];
@@ -826,7 +933,9 @@ export function derivedEntry(categoryId, skillId) { return DERIVED[`${categoryId
 // mult_facts, Max Number 1,000 deals 882 × 2 on a page called Multiplication Facts. So a skill
 // that owns a `constant` or a `band` is never offered the measured Max Number (backlog: the
 // generators should stop reading state.range for fact drills at all).
-const OWNS_ITS_NUMBERS = new Set(['constant', 'band']);
+// A rounding / estimation `place` sets the number size the same way (numbers to 10 x the place),
+// so it owns its numbers too.
+const OWNS_ITS_NUMBERS = new Set(['constant', 'band', 'place']);
 
 function _measuredOptions(categoryId, skillId, own) {
     const d = DERIVED[`${categoryId}:${skillId}`];
@@ -1022,6 +1131,12 @@ export function factSetTitle(categoryId, skillId, opts) {
     // None ticked means "no restriction" (the set semantics at the top of this file), so it is
     // the same page as all ticked: mixed, and unnamed.
     if (!chosen.length || chosen.length === legal.length) return '';
+    // ÷: the 0 set is 0 ÷ n, never "Divide by 0" (P11, `zeroTitle` on the div_facts constant).
+    if (def.zeroTitle && chosen.includes(0)) {
+        const rest = chosen.filter(v => v !== 0);
+        return rest.length ? `${def.titleVerb || def.label} ${_joinAnd(_numberRuns(rest))}, and ${def.zeroTitle.toLowerCase()}`
+            : def.zeroTitle;
+    }
     return `${def.titleVerb || def.label} ${_joinAnd(_numberRuns(chosen))}`.trim();
 }
 

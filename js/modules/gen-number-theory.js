@@ -10,8 +10,12 @@ const STUDENT_DEF_PRIME = `<div class="student-def"><strong>Prime</strong> = a n
 export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
             // Number Theory Category - Enhanced with multi-number classification
-            const ntMax = Math.max(10, Math.min(range, 200));
             const ntSkill = mappedSkill === "mixed" ? pick(["prime_composite", "factors_identify", "factor_tchart_easy", "factor_tchart_medium", "factor_tchart_hard", "factor_links_easy", "factor_links_medium", "factor_links_hard", "multiples", "gcf_easy", "gcf_hard", "lcm", "divisibility", "divisibility_sort", "even_odd"]) : mappedSkill;
+            // Prime / composite needs numbers to at least 30: below that there are not enough
+            // composites (4, 6, 8, 9, 10 to 10) for an 8-number sort, or any prime >= 7 with a
+            // composite >= 12 to compare, and the dealing loops below never finished (the verifier
+            // timed out at Max Number 10). The other number-theory skills keep the old floor.
+            const ntMax = Math.max(ntSkill === 'prime_composite' ? 30 : 10, Math.min(range, 200));
 
             // Helper function to get all factors
             const getFactors = (n) => {
