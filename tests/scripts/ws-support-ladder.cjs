@@ -50,6 +50,9 @@ function ANSWERS(which) {
     if (t) {
         const h = Number(t[1]);
         wrong = [1, 2, 3].map((k) => `${((h - 1 + k) % 12) + 1}:${t[2]}`);
+    } else if (/^\d+(, \d+)+$/.test(a)) {
+        // one number per box (a sort's rings, an order): every box off by k
+        wrong = [1, 2, 3].map((k) => a.split(', ').map((x) => String(Number(x) + k)).join(', '));
     } else {
         const n = Number(a.replace(/,/g, ''));
         wrong = [1, 2, 3].map((k) => String(n + k));

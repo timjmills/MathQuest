@@ -747,8 +747,10 @@ registerSkill('counting:zero_none', {
             return [
                 step(`There are ${n} on the ${word}.`),
                 step(`Every one is crossed out: ${n} are taken away.`),
-                step('None are left. None is 0.'),
-                step('Write 0.', [{ slot: 'answer', value: '0' }]),
+                step('None are left.'),
+                // the numeral stays in the box (traced on the Model), never in the text: the support
+                // ladder cannot blank a 0, so the words must not give it away
+                step('Write the number for none.', [{ slot: 'answer', value: '0' }]),
             ];
         }
         const n = num(q.ans);
@@ -756,8 +758,8 @@ registerSkill('counting:zero_none', {
             return [
                 step(`Look at the ${word}.`),
                 step(`There is nothing on the ${word}.`),
-                step('Nothing is none. None is 0.'),
-                step('Write 0.', [{ slot: 'answer', value: '0' }]),
+                step('Nothing there is none.'),
+                step('Write the number for none.', [{ slot: 'answer', value: '0' }]),
             ];
         }
         return [

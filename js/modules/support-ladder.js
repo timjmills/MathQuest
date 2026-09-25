@@ -305,6 +305,15 @@ export function ladderWrong(q, value, ctx = {}) {
 }
 
 /**
+ * Every rung of this item's ladder is already shown: a further wrong answer is the host's own
+ * (red) verdict and does not count up, as on the practice card (ladderWillHelp).
+ */
+function ladderSpent(q) {
+    const e = q && typeof q === 'object' ? _entries.get(q) : null;
+    return !!(e && e.n >= e.rungs.length);
+}
+
+/**
  * Will the NEXT wrong answer on this item climb a rung (true), or is the ladder off or spent?
  * The practice card asks before it paints its wrong-answer chrome, so a ladder step is calm.
  */
@@ -821,11 +830,14 @@ export function worksheetLadderWrong(idx, q, value) {
     const v = String(value == null ? '' : value).replace(/\s+/g, '');
     const a = String(q && q.ans != null ? q.ans : '').replace(/\s+/g, '');
     const numeric = q && (q.answerType === 'number' || typeof q.ans === 'number');
-    if (!numeric && !(q && q._mqSlots) && v.length < a.length) return { wait: true };
+    const card = document.getElementById(`ws_card_${idx}`);
+    // A ticked box is a whole answer, never one being typed: "Full" is shorter than "Empty".
+    const ticked = !!(card && card.querySelector('.mq-tick-mode'));
+    if (!numeric && !ticked && !(q && q._mqSlots) && v.length < a.length) return { wait: true };
     const ctx = { categoryId: state.category, skillId: state.skill, dedupe: true };
+    if (ladderSpent(q)) return { n: _entries.get(q).n, rung: null, spent: true, repeat: false, message: '' };
     const r = ladderWrong(q, value, ctx);
     if (!r || r.spent) return r;
-    const card = document.getElementById(`ws_card_${idx}`);
     const cell = card && card.querySelector('.ws-cell');
     if (cell) drawLadder(cell, q, Object.assign({}, ctx, { message: r.message }));
     if (card) {
@@ -837,5 +849,6 @@ export function worksheetLadderWrong(idx, q, value) {
 
 /** A quiz with instant feedback (quiz-take.js): count a wrong answer on question `qd`. */
 export function quizLadderWrong(qd, value) {
+    if (ladderSpent(qd)) return { n: _entries.get(qd).n, rung: null, spent: true, repeat: false, message: '' };
     return ladderWrong(qd, value, { categoryId: qd && qd.categoryId, skillId: qd && qd.skillId, dedupe: true });
 }
