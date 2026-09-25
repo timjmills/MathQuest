@@ -735,9 +735,107 @@ export function wireTickBoxes(cellEl, q, input) {
  * @param {HTMLInputElement} input         the host's answer input
  * @returns {boolean} true when the input moved into the visual
  */
+/**
+ * One answer area (owner ruling 2026-09-26): "where they give a blank, it should not have a
+ * separate answer area". A legacy drawing or sentence that draws its ONE blank without the
+ * `data-mq-blank` marker - an `.answer-blank-inline` rule, an element holding only "___", or
+ * "___" inside a sentence - gets the marker, so adoptVisualBlank moves the host's input there.
+ * Only when the root holds exactly one such blank (several blanks are a multi-slot item, which
+ * its own twin wires). Returns the number of blanks marked (0 or 1).
+ */
+const HOST_AREAS = '.mq-answerrow, .qt-answer-area, #answerInputArea, input, select, textarea, button, .mq-sr, [data-mq-screen-only]';
+export function markLegacyBlanks(root) {
+    if (!root || typeof document === 'undefined') return 0;
+    if (root.querySelector('[data-mq-blank], [data-mq-cell]')) return 0;
+    const ok = (el) => el && !el.closest(HOST_AREAS) && !el.closest('[hidden]') && !(el.closest('svg'));
+    const v2 = markV2Blanks(root, ok);
+    if (v2) return v2;
+    const found = [];
+    root.querySelectorAll('.answer-blank-inline').forEach((el) => { if (ok(el) && !(el.textContent || '').trim()) found.push({ el, kind: 'el' }); });
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+        const t = walker.currentNode;
+        const v = t.nodeValue || '';
+        const m = v.match(/_{3,}/g);
+        if (!m || !ok(t.parentElement) || t.parentElement.closest('.answer-blank-inline')) continue;
+        if (m.length > 1) return 0;
+        found.push({ el: t.parentElement, node: t, kind: v.trim().replace(/_{3,}/, '') ? 'text' : 'leaf' });
+    }
+    if (found.length !== 1) return 0;
+    const f = found[0];
+    if (f.kind === 'el') {
+        f.el.setAttribute('data-mq-blank', 'line');
+    } else if (f.kind === 'leaf' && f.el.childNodes.length === 1) {
+        const cs = typeof getComputedStyle !== 'undefined' ? getComputedStyle(f.el) : null;
+        const boxed = cs && ['Top', 'Right', 'Bottom', 'Left'].every((k) => (parseFloat(cs[`border${k}Width`]) || 0) >= 1);
+        f.el.textContent = '';
+        f.el.setAttribute('data-mq-blank', boxed ? 'box' : 'line');
+        if (boxed) f.el.setAttribute('style', 'display:inline-block;min-width:3em;min-height:1.4em;');
+    } else {
+        const v = f.node.nodeValue;
+        const i = v.search(/_{3,}/);
+        const len = v.slice(i).match(/^_+/)[0].length;
+        const span = document.createElement('span');
+        span.className = 'mq-legblank';
+        span.setAttribute('data-mq-blank', 'line');
+        const after = f.node.splitText(i);
+        after.nodeValue = after.nodeValue.slice(len);
+        f.node.parentNode.insertBefore(span, after);
+    }
+    return 1;
+}
+
+/**
+ * The drawn blanks of a `.ws-v2-cell` visual (the new skills' legacy drawing): an empty box or
+ * rule with a border. The LAST one outside a "Say:" frame is the answer (the input goes there);
+ * any earlier one is working - a real input that is not graded; a "Say:" frame's blank is said,
+ * not typed. A round box is a sign circle.
+ */
+function markV2Blanks(root, ok) {
+    const cells = root.matches && root.matches('.ws-v2-cell') ? [root] : Array.from(root.querySelectorAll('.ws-v2-cell'));
+    if (!cells.length || typeof getComputedStyle === 'undefined') return 0;
+    const empty = (el) => !(el.textContent || '').replace(/\u00a0/g, '').trim();
+    const bordered = (el) => {
+        const cs = getComputedStyle(el);
+        const w = ['Top', 'Right', 'Bottom', 'Left'].map((k) => parseFloat(cs[`border${k}Width`]) || 0);
+        return w[2] >= 1 ? (w.every((x) => x >= 1) ? (parseFloat(cs.borderTopLeftRadius) >= el.getBoundingClientRect().width * 0.35 ? 'circle' : 'box') : 'line') : '';
+    };
+    let n = 0;
+    cells.forEach((cell) => {
+        let cands = Array.from(cell.querySelectorAll('span, div'))
+            .filter((el) => ok(el) && empty(el) && !el.querySelector('svg, img, input') && bordered(el) && el.getBoundingClientRect().width >= 12);
+        cands = cands.filter((el) => !cands.some((o) => o !== el && el.contains(o)));   // innermost
+        // a sum rule is a block with only a bottom border: drawing, never a blank
+        cands = cands.filter((el) => !(bordered(el) === 'line' && getComputedStyle(el).display === 'block'));
+        const oral = (el) => /^\s*Say:/i.test((el.parentElement && el.parentElement.textContent) || '');
+        let graded = cands.filter((el) => !oral(el));
+        // a drawn box (or circle) is the answer place when there is one; rules are then working
+        if (graded.some((el) => bordered(el) !== 'line')) graded = graded.filter((el) => bordered(el) !== 'line');
+        if (!graded.length) return;
+        const last = graded[graded.length - 1];
+        graded.slice(0, -1).forEach((el) => {
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.className = 'mq-workbox';
+            inp.setAttribute('data-mq-work', '1');
+            inp.setAttribute('inputmode', 'numeric');
+            inp.setAttribute('autocomplete', 'off');
+            inp.setAttribute('aria-label', 'working');
+            el.textContent = '';
+            el.appendChild(inp);
+        });
+        const shape = bordered(last);
+        last.textContent = '';
+        last.setAttribute('data-mq-blank', shape === 'line' ? 'line' : shape);
+        n++;
+    });
+    return n;
+}
+
 export function adoptVisualBlank(cellEl, input) {
     if (!cellEl || !input) return false;
     wireNumberLines(cellEl);
+    if (!cellEl.querySelector('[data-mq-blank]')) markLegacyBlanks(cellEl);
     const blanks = cellEl.querySelectorAll('[data-mq-blank]');
     if (blanks.length !== 1) return false;
     const blank = blanks[0];
@@ -864,7 +962,7 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
  * the last landing takes that jump back; "Start again" clears them. The jumps are working, as the
  * paper's are: the answer is still written in the equation's box.
  */
-export const NUMBER_LINE_INSTRUCTION = 'Tap the line to jump. Write the answer.';
+export const NUMBER_LINE_INSTRUCTION = 'Tap the line to jump. Type the answer.';
 
 /** Is this item the kit's number line (its instruction on screen is the jump one)? */
 export function isNumberLineItem(q) {
@@ -897,6 +995,9 @@ export function wireNumberLines(root) {
         const vals = labels.map((l) => l.s);
         const shown = labels.map((l) => l.on);
         const startIdx = Math.max(0, vals.indexOf(start));
+        // start unknown ("? − 4 = 15"): the given point is where the hops LAND, drawn hollow on
+        // paper; the screen keeps it hollow and names it (round 4: "the dot sits on the result")
+        const given = !!dot && /^#?f{3}(f{3})?$|white/i.test(String(dot.getAttribute('fill') || ''));
         ops.dataset.mqNl = '1';
         const wrap = document.createElement('div');
         wrap.className = 'mq-nl';
@@ -906,7 +1007,7 @@ export function wireNumberLines(root) {
         wrap.style.setProperty('--mq-nl-chars', String(Math.max(1, ...vals.map((v) => String(v).length))));
         wrap.innerHTML = `<div class="mq-nl-scroll" data-mq-scroll><div class="mq-nl-track" role="group" aria-label="${attr(svg.getAttribute('aria-label') || 'number line')}. Tap a number to jump to it.">`
             + '<svg class="mq-nl-arcs" aria-hidden="true" preserveAspectRatio="none"></svg><span class="mq-nl-line" aria-hidden="true"></span>'
-            + vals.map((v, i) => `<button type="button" class="mq-nl-tick${i === startIdx ? ' mq-nl-start' : ''}" data-i="${i}" aria-label="${attr(v)}${i === startIdx ? ', start' : ''}">`
+            + vals.map((v, i) => `<button type="button" class="mq-nl-tick${i === startIdx ? ' mq-nl-start' : ''}${i === startIdx && given ? ' mq-nl-given' : ''}" data-i="${i}" aria-label="${attr(v)}${i === startIdx ? (given ? ', where the hops land' : ', start') : ''}">`
                 + `<span class="mq-nl-mark" aria-hidden="true"></span><span class="mq-nl-lab">${shown[i] ? esc(String(v).replace(/^-/, '\u2212')) : ''}</span></button>`).join('')
             + '</div></div>'
             + `<div class="mq-nl-tools"><button type="button" class="mq-nl-pan" data-d="-1" aria-label="show smaller numbers">◀</button>`
@@ -1063,6 +1164,7 @@ export function releaseVisualBlank(input) {
     if (!input || !input.classList.contains('mq-slot--invisual')) return;
     input.classList.remove('mq-slot--invisual', 'mq-slot--svg', 'mq-bsize', 'mq-slot--circle');
     if (input.getAttribute('maxlength') === '1') input.removeAttribute('maxlength');
+    if (input.dataset.mqSigns) delete input.dataset.mqSigns;
     if (input.dataset.mqPrevStyle !== undefined) {
         input.setAttribute('style', input.dataset.mqPrevStyle);
         delete input.dataset.mqPrevStyle;
@@ -1337,6 +1439,38 @@ const AFTER_INK = new WeakMap();
  * Hold everything inside `root` to ink, paper and grey, now and whenever the content changes
  * (a widget mounting late, re-rendering, or toggling a state class). Idempotent per root.
  */
+/**
+ * Screen verbs inside the cell too (round 4, H7: "Mark 6,480" drawn inside a rounding twin, a
+ * widget's "Write ..." line). Every text a pupil reads in the cell - a label in a kit drawing, SVG
+ * text included - takes the print -> screen verb swap (PEDAGOGY 10.2) when it reads as a
+ * sentence (two words or more), so a shape's name ("Circle") or a lone word is never touched.
+ */
+const PAPER_VERB_HINT = /\b(Write|Circle|Mark|Draw|Shade|Check|Cross|Underline|Trace|Colou?r|Cut|Glue|Measure|Box|Sort)\b/i;
+export function screenCellVerbs(root) {
+    if (!root || typeof document === 'undefined') return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    const SHORT = { Mark: 'Tap', Write: 'Type', Circle: 'Tap', Draw: 'Tap', Shade: 'Tap', Underline: 'Tap', Trace: 'Tap' };
+    nodes.forEach((n) => {
+        const v = n.nodeValue || '';
+        if (!PAPER_VERB_HINT.test(v)) return;
+        const p = n.parentElement;
+        if (!p || p.closest('input, textarea, select, script, style, .mq-sr, [data-mq-keep-verb]')) return;
+        const words = v.trim().split(/\s+/);
+        if (words.length < 2) {
+            // a one-word verb label before its number ("Mark 6,480"): the short screen verb, never
+            // a shape's name standing alone ("Circle" under a picture)
+            const w = words[0];
+            const phrase = p.parentElement && /\d/.test(p.parentElement.textContent || '') && (p.parentElement.textContent || '').trim() !== w;
+            if (SHORT[w] && phrase) n.nodeValue = v.replace(w, SHORT[w]);
+            return;
+        }
+        const s = screenInstruction(v);
+        if (s !== v) n.nodeValue = s;
+    });
+}
+
 export function monoCell(root, { afterInk = null } = {}) {
     if (!root || typeof MutationObserver === 'undefined') return;
     if (afterInk) AFTER_INK.set(root, afterInk);
@@ -1344,6 +1478,7 @@ export function monoCell(root, { afterInk = null } = {}) {
         const obs = OBSERVERS.get(root);
         if (obs) obs.disconnect();
         try { targets.forEach(inkTree); } catch (e) { /* never break a render */ }
+        try { targets.forEach(screenCellVerbs); } catch (e) { /* never break a render */ }
         const after = AFTER_INK.get(root);
         if (after) { try { after(root); } catch (e) { /* never break a render */ } }
         if (obs) { obs.observe(root, OBS_OPTS); obs.takeRecords(); }
@@ -1646,6 +1781,8 @@ export function slotAnswerMatches(value, q) {
     if (!q) return null;
     // A function table checks each slot against the rule (a 'make your own' table has no one answer).
     if (q.ftCheck) return ftAnswerMatches(value, q.ftCheck);
+    const cv = cellInputVerdict(value, q);
+    if (typeof cv === 'boolean') return cv;
     const parts = String(value == null ? '' : value).split(/\s*(?:,|\bR\b)\s*/i).map((s) => s.trim().toLowerCase());
     const eq = (a, b) => String(a).trim().toLowerCase().replace(/,/g, '') === String(b).trim().toLowerCase().replace(/,/g, '');
     const sets = q.inlineBlanksData && Array.isArray(q.inlineBlanksData.acceptedSets) ? q.inlineBlanksData.acceptedSets : null;
@@ -1658,6 +1795,143 @@ export function slotAnswerMatches(value, q) {
     const rem = String(q.ans == null ? '' : q.ans).match(/^\s*(\d+)\s*R\s*(\d+)\s*$/i);
     if (rem && /R/i.test(String(value))) {
         return parts.length === 2 && eq(parts[0], rem[1]) && eq(parts[1], rem[2]);
+    }
+    return null;
+}
+
+/* ------------------------------------------------------------------ one answer area (2026-09-26)
+ * Owner ruling: "In problems like this where they give a blank, it should not have a separate
+ * answer area." A legacy drawing that answers through its OWN inputs - column digit boxes, a
+ * bracket division's roof, a fraction's two boxes, a number pattern's blanks, a factor table,
+ * factor links, coordinate boxes - is the answer area on every host. The online worksheet and the
+ * quiz used to draw those boxes AND their own answer field. `wireCellInputs` composes the cell's
+ * inputs, in reading order, into the host's (hidden) answer input, so the host's checker and
+ * save path keep working; `cellInputVerdict` grades the composed value where plain equality
+ * cannot (a pair list in any order, a fraction's two forms, coordinates). Working boxes (the
+ * subtraction row of a bracket division, a justification's factors) stay in the cell as working.
+ */
+const _val = (el) => String(el && el.value != null ? el.value : '').trim();
+const CELL_INPUT_RULES = [
+    { sel: 'input.column-answer-input:not(.column-carry-input)', parts: 1,
+        compose: (els) => els.map(_val).join('').replace(/^0+(?=\d)/, '') },
+    { sel: 'input.bx-roof', parts: 1, work: 'input.bx-sub, input.bx-rem:not(:last-of-type)',
+        compose: (els, root, q) => {
+            const quo = els.map(_val).join('').replace(/^0+(?=\d)/, '');
+            const rems = root.querySelectorAll('input.bx-rem');
+            const remEl = rems[rems.length - 1];      // the last step's remainder is the answer's
+            const rem = _val(remEl);
+            return /R/i.test(String(q && q.ans)) || (rem && rem !== '0') ? `${quo} R ${rem || 0}` : quo;
+        }, also: 'input.bx-rem' },
+    { sel: 'input.dual-frac-input', parts: 2, join: ', ' },
+    { sel: 'input.np-cell', join: ', ' },
+    { sel: 'input.fp-input', join: ', ' },
+    { sel: 'input.tc-input', pairs: ' × ' },
+    { sel: 'input.links-input', pairs: '×' },
+    { sel: 'input.ci-x, input.ci-y', coords: true },
+];
+
+function _cellRule(root) {
+    for (const r of CELL_INPUT_RULES) {
+        const els = Array.from(root.querySelectorAll(r.sel));
+        if (els.length) return { rule: r, els };
+    }
+    return null;
+}
+
+/** Compose a cell's own inputs into one answer string (the host's answer format). */
+function _compose(rule, els, root, q) {
+    if (rule.compose) return rule.compose(els, root, q);
+    if (rule.join) return els.map(_val).join(rule.join);
+    if (rule.pairs) {
+        const out = [];
+        for (let i = 0; i + 1 < els.length; i += 2) {
+            const a = _val(els[i]), b = _val(els[i + 1]);
+            if (a || b) out.push(`${a}${rule.pairs}${b}`);
+        }
+        return out.join(', ');
+    }
+    if (rule.coords) {
+        const xs = els.filter((e) => e.classList.contains('ci-x')), ys = els.filter((e) => e.classList.contains('ci-y'));
+        return xs.map((x, i) => `(${_val(x)}, ${_val(ys[i])})`).join(', ');
+    }
+    return els.map(_val).join(', ');
+}
+
+/** How many parts the composed answer has (the grid hosts wait for all of them). */
+function _partCount(rule, els) {
+    if (rule.parts) return rule.parts;
+    if (rule.pairs) return Math.floor(els.length / 2);
+    if (rule.coords) return 2 * els.filter((e) => e.classList.contains('ci-x')).length;
+    return els.length;
+}
+
+/**
+ * Make a legacy drawing's own inputs the answer area of a grid host (worksheet, quiz). Returns
+ * the number of answer parts (0 when the cell has no inputs this knows), and marks the host
+ * input `mq-cellslot-host`; the caller hides its answer row.
+ */
+export function wireCellInputs(root, input, q, { onChange = null } = {}) {
+    if (!root || !input || root.dataset.mqCellInputs === '1') return 0;
+    const hit = _cellRule(root);
+    if (!hit) return 0;
+    const { rule, els } = hit;
+    root.dataset.mqCellInputs = '1';
+    // working boxes stay as working (never graded here)
+    if (rule.work) root.querySelectorAll(rule.work).forEach((w) => w.setAttribute('data-mq-work', '1'));
+    const all = rule.also ? [...els, ...Array.from(root.querySelectorAll(rule.also))] : els;
+    // a saved answer comes back into the boxes (the quiz re-renders on every move)
+    const saved = String(input.value || '');
+    if (saved && (rule.join || rule.pairs)) {
+        const vals = saved.split(/\s*,\s*/).flatMap((p) => (rule.pairs ? p.split(/\s*[×x*]\s*/) : [p]));
+        els.forEach((e, i) => { if (vals[i] !== undefined && !e.value) e.value = vals[i]; });
+    } else if (saved && rule.sel.startsWith('input.column-answer-input')) {
+        const d = saved.replace(/[^0-9]/g, ''); const pad = els.length - d.length;
+        els.forEach((e, i) => { if (i >= pad && !e.value) e.value = d.charAt(i - pad); });
+    }
+    const push = (commit) => {
+        const v = _compose(rule, els, root, q);
+        input.value = v.replace(/^[\s,()]+$/, '');
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        if (commit && onChange) onChange(input.value);
+    };
+    all.forEach((e) => {
+        e.addEventListener('input', () => push(false));
+        e.addEventListener('change', () => push(true));
+    });
+    input.classList.add('mq-cellslot-host');
+    return _partCount(rule, els);
+}
+
+const _normPair = (p) => String(p).split(/\s*[×x*]\s*/i).map((t) => t.trim()).filter(Boolean).map(Number).sort((a, b) => a - b).join('x');
+const _normFrac = (s) => String(s == null ? '' : s).replace(/\s+/g, ' ').trim().toLowerCase();
+
+/**
+ * The verdict on a composed cell answer where plain equality cannot judge it, or null.
+ *   factor pairs (T-chart, links): the same pairs, in any order, either way round
+ *   a fraction's two forms: both, when the item carries them
+ *   coordinates: every point, in order
+ *   a list answer "180,190": the same numbers in the same order
+ */
+export function cellInputVerdict(value, q) {
+    if (!q) return null;
+    const v = String(value == null ? '' : value);
+    if ((q.answerType === 'tchart-cells' || q.answerType === 'factor-links') && typeof q.ans === 'string' && /[×x*]/.test(v)) {
+        const want = q.ans.split(/\s*,\s*/).filter(Boolean).map(_normPair).sort();
+        const got = v.split(/\s*,\s*/).filter(Boolean).map(_normPair).sort();
+        return want.length === got.length && want.every((p, i) => p === got[i]);
+    }
+    if (q.answerType === 'dual-fraction' && q.dualFractionAnswers && v.includes(',')) {
+        const [m, i] = v.split(/\s*,\s*/);
+        return _normFrac(m) === _normFrac(q.dualFractionAnswers.mixed) && _normFrac(i) === _normFrac(q.dualFractionAnswers.improper);
+    }
+    if (Array.isArray(q.ans) && q.ans.length && q.ans.every((p) => p && typeof p === 'object' && 'x' in p && 'y' in p)) {
+        const pts = [...v.matchAll(/\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)/g)].map((m) => [Number(m[1]), Number(m[2])]);
+        return pts.length === q.ans.length && q.ans.every((p, i) => Number(p.x) === pts[i][0] && Number(p.y) === pts[i][1]);
+    }
+    if ((q.answerType === 'text' || q.answerType === 'factor-pairs') && typeof q.ans === 'string' && q.ans.includes(',') && v.includes(',')) {
+        const a = q.ans.split(/\s*,\s*/).map((t) => t.trim().toLowerCase());
+        const b = v.split(/\s*,\s*/).map((t) => t.trim().toLowerCase());
+        return a.length === b.length && a.every((t, i) => t.replace(/,/g, '') === b[i].replace(/,/g, ''));
     }
     return null;
 }
@@ -2189,16 +2463,22 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
  * drawing write the sign into the circle's input (it can still be typed). The tiles are the
  * paper's bank of signs, drawn in ink; the host's own checker grades the input.
  */
-export function wireSignCircle(root, input, { onChange = null } = {}) {
+/** The signs a circle takes: an operation sign (+ − × ÷) or a comparison (< = >). */
+export function signsFor(q) {
+    return /^[+\-−×÷*/x]$/.test(String(q && q.ans != null ? q.ans : '').trim()) ? ['+', '−', '×', '÷'] : ['<', '=', '>'];
+}
+const SIGN_NAMES = { '<': 'less than', '>': 'greater than', '=': 'equals', '≠': 'not equal to', '+': 'plus', '−': 'minus', '×': 'times', '÷': 'divided by' };
+
+export function wireSignCircle(root, input, { onChange = null, signs = null } = {}) {
     if (!root || !input || !input.classList.contains('mq-slot--circle')) return false;
     if (root.querySelector('.mq-signbank')) return true;
     const bank = document.createElement('div');
     bank.className = 'mq-signbank';
     bank.setAttribute('role', 'group');
     bank.setAttribute('aria-label', 'signs');
-    const signs = input.dataset.mqSigns ? input.dataset.mqSigns.split(',') : ['<', '=', '>'];
-    const SIGN_NAMES = { '<': 'less than', '>': 'greater than', '=': 'equals', '≠': 'not equal to' };
-    signs.forEach((sg) => {
+    // the signs: the blank's own (data-mq-signs), else the caller's, else a comparison
+    const list = (input.dataset.mqSigns ? input.dataset.mqSigns.split(',') : null) || signs || ['<', '=', '>'];
+    list.forEach((sg) => {
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'mq-signtile';

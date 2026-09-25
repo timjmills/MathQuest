@@ -10,7 +10,7 @@ import { broadcastQuizJoin, broadcastQuizAnswer, broadcastQuizSubmit } from './q
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, wireCellInputs, signsFor,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank,
 } from './screen-cell.js';
 
@@ -210,7 +210,9 @@ const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlan
     'maxDots', 'places', 'allowRegroup', 'quotientRemainder', 'acceptedAnswers', 'regroup', 'notation',
     'operands', 'selfAnswering', 'printAnswer', 'a', 'b', 'op', 'ftCheck',
     // round 3: the kit cell travels with the item, so the quiz draws the paper's cell
-    'cell', 'skillId', 'categoryId'];
+    'cell', 'skillId', 'categoryId',
+    // 2026-09-26: a fraction's two forms, graded from the cell's own boxes
+    'dualFractionAnswers'];
 export function quizQuestionData(q) {
     if (!q) return null;
     const d = {
@@ -424,11 +426,23 @@ function _mountQuizCell(flatIdx) {
                 mountBuild(vis, qd, inp, (v) => { if (v) recordAnswer(flatIdx, v); });
             }
         }
-        if (vis && inp && adoptVisualBlank(vis, inp)) { area.remove(); wireSignCircle(vis, inp); }
+        if (vis && inp && adoptVisualBlank(vis, inp)) { area.remove(); wireSignCircle(vis, inp, { signs: signsFor(qd), onChange: (v) => { if (v) recordAnswer(flatIdx, v); } }); }
         else if (vis && inp && (qd.answerType === 'number' || !qd.answerType) && adoptSvgBlank(vis, inp)) area.remove();
         // several blanks in one drawing: an input in each, recorded in reading order
         else if (vis && inp && wireCellSlots(vis, inp, { onChange: (v) => { if (v.replace(/[,\s]/g, '')) recordAnswer(flatIdx, v); } })) {
             area.style.display = 'none';
+        } else if (vis && inp && area && wireCellInputs(vis, inp, qd, { onChange: (v) => { if (String(v).replace(/[,\s()]/g, '')) recordAnswer(flatIdx, v); } })) {
+            // the drawing's own inputs are the answer area (owner ruling 2026-09-26)
+            area.style.display = 'none';
+        } else if (inp && area && !(vis && vis.querySelector('input, [data-mq-cell]'))) {
+            // the sentence holds the one blank: the pupil writes in it, never in a separate
+            // answer area (owner ruling 2026-09-26)
+            const line = cellEl.parentNode && cellEl.parentNode.querySelector(':scope > .qt-question-text.mq-instr, :scope > .mq-instr');
+            if (line && adoptVisualBlank(line, inp)) {
+                area.remove();
+                // the sentence IS the problem: it sits in the cell, at the cell's size
+                if (!cellEl.textContent.trim()) { line.classList.remove('mq-instr'); line.classList.add('mq-legline'); cellEl.appendChild(line); }
+            }
         }
         if (vis) wireClozeBanks(vis);
         // a drawing with its own answer boxes (fact family, area model) answers through them: the
