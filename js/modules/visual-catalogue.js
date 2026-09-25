@@ -160,7 +160,7 @@ export const VISUALS = {
     V109: ['Y1:R16', 'Word-bank sentences (fewer / more / same)', ['vis_cloze_boxes']],
     V110: ['Y1:R18', 'Order pictured groups / dominoes / numbers', ['vis_k2_picture_tasks']],
     V111: ['Y1:R22', 'Number track and number line side by side', []],
-    V112: ['Y1:R26', 'Blank part-whole to fill many ways', ['vis_bond_options', 'systematic_bonds']],
+    V112: ['Y1:R26', 'Blank part-whole to fill many ways', ['vis_bond_options']],
     V113: ['Y1:R28', 'Two-colour counter rows (bonds; ratio sets)', ['vis_supports_wiring', 'vis_bond_options']],
     V114: ['Y1:R31', 'Fingers / hands (and dice, cube rows as number pictures)', ['vis_supports_wiring']],
     V115: ['Y1:R33', 'First – Then – Now story strip', ['vis_story_strip']],

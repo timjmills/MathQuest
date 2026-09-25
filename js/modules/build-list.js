@@ -123,7 +123,6 @@ export function laneFor(skillKey) {
 export const WRM_EXTENSIONS = {
     ten_count_out: { adds: 'count out 1-3 from a larger set (EE level) and count out to 30', ccss: ['K.CC.B.5'], ee: ['M.EE.K.CC.6', 'M.EE.2.NBT.2'] },
     add_sub_1_2: { adds: 'a picture level: n objects and one more / one less, "how many now?" (a quantity one larger)', ccss: ['K.CC.B.4c'], ee: ['M.EE.1.OA.5'] },
-    systematic_bonds: { adds: 'bonds of 5 at EE level; the pupil records each decomposition as an equation', ccss: ['K.OA.A.3'], ee: ['M.EE.1.NBT.4', 'M.EE.1.NBT.6', 'M.EE.2.NBT.6'] },
     shapes_world: { adds: 'name the shape of an everyday object from a bank', ccss: ['K.G.A.1'], ee: [] },
     position_map: { adds: 'in front of / behind / next to at K, and on / off / in / out at EE level', ccss: ['K.G.A.1'], ee: ['M.EE.1.G.1'] },
     shape_sort: { adds: 'the rule "flat (2-D) or solid (3-D)"; sort circles, squares, rectangles, triangles of one size (EE)', ccss: ['K.G.A.3'], ee: ['M.EE.1.G.2'] },

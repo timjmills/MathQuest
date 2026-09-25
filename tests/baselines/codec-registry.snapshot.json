@@ -169,7 +169,8 @@
       "fraction": "F",
       "analog": "G",
       "digital": "D",
-      "mixed": "M"
+      "mixed": "M",
+      "table": "T"
     },
     "level": {
       "0": "0",

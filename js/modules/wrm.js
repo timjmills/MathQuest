@@ -61,6 +61,7 @@ export const SKILL_WRM = {
         { step: 'Y1.B4.S1', note: 'count to 20' },
     ],
     // Build lane k2 (2026-09-25)
+    'composing:bonds_in_order': ['Y1.B2.S6'],
     'comparing:sort_into_groups': ['R.B1.S4', 'R.B1.S5', 'R.B1.S6', 'Y1.B1.S1'],
     'counting:ordinal_numbers': ['Y1.B11.S5'],
     'comparing:compare_capacity': ['R.B2.S3', 'R.B8.S3', 'R.B8.S4', 'Y1.B8.S4', 'Y1.B8.S5', 'Y2.B7.S5'],
@@ -2083,14 +2084,6 @@ export const WRM_PROPOSALS = {
         family: 'operations',
         steps: ['Y1.B2.S1'],
         improves: ['Y1.B2.S2'],
-    },
-    systematic_bonds: {
-        kind: 'new', skill: 'composing:bonds_in_order',
-        name: 'Number Bonds in Order',
-        teaches: 'listing all the bonds of a number systematically (0+5, 1+4, 2+3 ...) and seeing the pattern',
-        representation: 'a two-column table with the first rows filled; complete it; option: ten frame beside each row',
-        family: 'operations',
-        steps: ['Y1.B2.S6'],
     },
     equal_groups_early: {
         kind: 'new', skill: 'multiplication:make_equal_groups',

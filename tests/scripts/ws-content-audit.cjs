@@ -396,6 +396,8 @@ const K2_SHAPE_OF = {
     oddeven: ['odd-even'],
     numberline: ['fraction-number-line'],
     tiles: ['compose-fraction-tiles'],
+    // build lane k2: bonds_in_order's bond over a table (one shape, whatever the task)
+    bondtable: ['k2-bonds-fill', 'k2-bonds-missing', 'k2-bonds-pattern'],
 };
 const K2_FORMAT_SHAPE = new Map();
 for (const [shape, fmts] of Object.entries(K2_SHAPE_OF)) for (const f of fmts) K2_FORMAT_SHAPE.set(f, shape);

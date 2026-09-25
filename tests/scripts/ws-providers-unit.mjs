@@ -591,6 +591,25 @@ checkSkill('algebra:function_table_hard');
 // kit payload in q.cell, every task of each skill dealt round the 20 items.
 const cellOf = (template, payload) => ({ template, v: 1, payload });
 const K2_LANE_MAKERS = {
+    'composing:bonds_in_order': (r, i) => {
+        const task = ['fill', 'missing', 'pattern'][i % 3];
+        const n = int(r, 3, 10);
+        const down = task === 'pattern' && i % 2 === 1;
+        const rows = Array.from({ length: n + 1 }, (_, k) => { const a = down ? n - k : k; return { a, b: n - a, hide: null }; });
+        if (task === 'fill') rows.forEach((row, k) => { if (k >= 2) row.hide = 'b'; });
+        if (task === 'missing') { rows[2].hide = 'both'; rows[n].hide = 'both'; }
+        const base = { kind: 'table', task, n, rows, notation: i % 2 ? 'across' : 'table', dots: false };
+        if (task === 'pattern') {
+            const ask = i % 4 < 2 ? 'second' : 'first';
+            const labels = ['Goes up by 1', 'Goes down by 1', 'Stays the same'];
+            const correct = ((ask === 'first') !== down) ? 0 : 1;
+            return { ans: labels[correct], printAnswer: labels[correct], answerType: 'text', text: 'How does the number change?', _variant: task,
+                cell: cellOf('bond', Object.assign(base, { ask, labels, correct })) };
+        }
+        const blanks = [];
+        rows.forEach((row) => { if (row.hide === 'both') blanks.push(row.a); if (row.hide) blanks.push(row.b); });
+        return { ans: blanks.join(', '), answerType: 'text', text: `Write the bonds of ${n}.`, _variant: task, cell: cellOf('bond', base) };
+    },
     // count_objects' conservation task (task 'same'), dealt beside the plain count
     'counting:count_objects': (r, i) => {
         if (i % 2 === 0) { const n = int(r, 1, 30); return { ans: n, text: 'How many stars are there?', cell: cellOf('counters', { kind: 'count', n, shape: 'star', ans: n }) }; }
@@ -707,6 +726,7 @@ const K2_LANE_MAKERS = {
 };
 Object.assign(REQUIRED, {
     'counting:zero_none': /none/i,
+    'composing:bonds_in_order': /part|number/i,
     'comparing:sort_into_groups': /ring/i,
     'counting:ordinal_numbers': /flag/i,
     'comparing:what_can_we_measure': /measure/i,

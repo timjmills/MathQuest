@@ -1247,16 +1247,20 @@ registerSkill('comparing:sort_into_groups', {
 /* ============================================================================ bonds_in_order */
 
 const BONDS_ICAN = 'I Can find all the bonds of a number in order';
+/** Is the table listed from the whole down (n and 0 first)? */
+const bondsDown = (q) => { const r = payloadOf(q).rows || []; return r.length > 1 && r[1].a < r[0].a; };
 const BONDS_DEFS = {
     fill: {
         iCan: BONDS_ICAN, instructionKey: 'fill-bonds',
         steps: ['Start with 0 and the whole.', 'The first part goes up by 1.', 'The second part goes down by 1.', 'Check: the two parts make the whole.'],
+        stepsFor: (q) => (bondsDown(q) ? ['Start with the whole and 0.', 'The first part goes down by 1.', 'The second part goes up by 1.', 'Check: the two parts make the whole.'] : null),
         say: '__ is __ and __.',
         sayValues: (q) => { const p = payloadOf(q); const r = (p.rows || [])[1]; return r ? [p.n, r.a, r.b] : null; },
     },
     missing: {
         iCan: BONDS_ICAN, instructionKey: 'missing-bonds',
         steps: ['Read the row above the gap.', 'The first part is 1 more.', 'The second part is 1 less.', 'Write both parts.'],
+        stepsFor: (q) => (bondsDown(q) ? ['Read the row above the gap.', 'The first part is 1 less.', 'The second part is 1 more.', 'Write both parts.'] : null),
         say: '__ is __ and __.',
         sayValues: (q) => { const p = payloadOf(q); const r = (p.rows || []).find((x) => x.hide === 'both'); return r ? [p.n, r.a, r.b] : null; },
     },
@@ -1279,7 +1283,7 @@ function bondBlanks(rows) {
 }
 
 registerSkill('composing:bonds_in_order', {
-    strings: stringsBy((t, ref) => BONDS_DEFS[t] || BONDS_DEFS[ref && ref.opts && ref.opts.task] || null, BONDS_DEFS.fill),
+    strings: stringsBy((t, ref) => BONDS_DEFS[String(t).replace(/^bonds-/, '')] || BONDS_DEFS[ref && ref.opts && ref.opts.task] || null, BONDS_DEFS.fill),
     misconceptions: ['copied-first-part', 'second-goes-up', 'missed-zero', 'parts-miss-whole', 'repeated-a-row', 'up-down-swapped'],
     workedSteps: (q) => {
         const p = payloadOf(q);
@@ -1298,7 +1302,7 @@ registerSkill('composing:bonds_in_order', {
         }
         if (p.task === 'missing') {
             const hidden = rows.map((r, i) => (r.hide === 'both' ? i : -1)).filter((i) => i >= 0);
-            const out = [step(`The bonds of ${n} go 0 and ${n}, 1 and ${n - 1} ... in order.`)];
+            const out = [step(bondsDown(q) ? `The bonds of ${n} go ${n} and 0, ${n - 1} and 1 ... in order.` : `The bonds of ${n} go 0 and ${n}, 1 and ${n - 1} ... in order.`)];
             hidden.slice(0, 2).forEach((i) => out.push(step(`Row ${i + 1}: ${rows[i].a} and ${rows[i].b} make ${n}.`, marks(blanks.filter((b) => b.i === i)))));
             out.push(step('Write both parts of each missing row.', marks(blanks)));
             return clampSteps(out);
@@ -1306,9 +1310,9 @@ registerSkill('composing:bonds_in_order', {
         const first = blanks[0];
         const r0 = first ? first.r : rows[0];
         return clampSteps([
-            step(`The whole is ${n}. The first part goes up by 1.`),
+            step(`The whole is ${n}. The first part goes ${bondsDown(q) ? 'down' : 'up'} by 1.`),
             step(`${r0.a} and ${r0.b} make ${n}. Write ${r0.b}.`, first ? [{ slot: first.id, value: first.value }] : []),
-            step('Each next second part is 1 less.'),
+            step(`Each next second part is 1 ${bondsDown(q) ? 'more' : 'less'}.`),
             step(`Write ${blanks.map((b) => b.value).join(', ')}.`, marks(blanks)),
         ]);
     },

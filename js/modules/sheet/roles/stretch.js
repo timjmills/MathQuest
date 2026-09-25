@@ -34,9 +34,12 @@ const toInt = (v) => Number(String(v).replace(/,/g, ''));
 /** The open task of one question (`open(q)` default): prompt, columns, example row, key rows. */
 export function openTask(it, size = 'L') {
     const q = it.q || {};
-    const ans = answerOf(it);
-    const op = opOf(q);
-    const ops = operandsOf(q);
+    // `q.openWhole` (build lane k2): an item whose answer is a list but whose open task is a whole
+    // number's pairs (bonds_in_order: the bonds of 7) names that whole; the pairs table follows.
+    const whole = Number.isInteger(q.openWhole) && q.openWhole >= 2;
+    const ans = whole ? String(q.openWhole) : answerOf(it);
+    const op = whole ? null : opOf(q);
+    const ops = whole ? [] : operandsOf(q);
     const N = /^-?\d+$/.test(ans.replace(/,/g, '')) ? toInt(ans) : null;
     const rowsN = EMPTY_ROWS[size] || 5;
     const pairs = [];

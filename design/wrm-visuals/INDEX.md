@@ -21,7 +21,7 @@ the first entry.
 
 - **575 year rows** (Reception 67, Year 1 79, Year 2 75, Year 3 84, Year 4 89, Year 5 92, Year 6 89) → **210 representations**.
 - **MATCH 11 · PARTIAL 103 · GAP 96.**
-- The 199 PARTIAL / GAP representations are closed by 86 existing build-list entries (merged) and 53 entries added from this catalogue.
+- The 199 PARTIAL / GAP representations are closed by 85 existing build-list entries (merged) and 53 entries added from this catalogue.
 
 | Lane | Representations it owns | MATCH | PARTIAL | GAP | Entries added from the catalogue |
 |---|---|---|---|---|---|
@@ -163,7 +163,7 @@ the first entry.
 | V109 | Word-bank sentences (fewer / more / same) | Y1 R16 | 7 | PARTIAL | - | `vis_cloze_boxes`* | `operations` |
 | V110 | Order pictured groups / dominoes / numbers | Y1 R18 | 2 | PARTIAL | `template:pv` | `vis_k2_picture_tasks`* | `k2` |
 | V111 | Number track and number line side by side | Y1 R22 | 1 | MATCH | - | - | - |
-| V112 | Blank part-whole to fill many ways | Y1 R26 | 4 | PARTIAL | `template:bond` | `vis_bond_options`*, `systematic_bonds` | `k2` |
+| V112 | Blank part-whole to fill many ways | Y1 R26 | 4 | PARTIAL | `template:bond`, `composing:bonds_in_order` | `vis_bond_options`* | `k2` |
 | V113 | Two-colour counter rows (bonds; ratio sets) | R R22, Y1 R28, Y6 R28 | 13 | PARTIAL | `pane:objects`, `pane:tenframe` | `vis_supports_wiring`*, `vis_bond_options`* | `placevalue` |
 | V114 | Fingers / hands (and dice, cube rows as number pictures) | R R15, Y1 R31, Y2 R88 | 18 | PARTIAL | `pane:fingers`, `pane:dice`, `pane:objects` | `vis_supports_wiring`* | `placevalue` |
 | V115 | First – Then – Now story strip | R R45 (M/P), Y1 R33 (GAP) | 13 | PARTIAL | `template:wordpic`, `addition:add_wp_10` | `vis_story_strip`* | `k2` |
@@ -351,7 +351,6 @@ Every entry of `design/BUILD_LIST.md` that draws a catalogued representation, wi
 | `teen_structure` Understand 10 and 20 (option) | `k2` | White Rose audit | V103 | 14 |
 | `vis_story_strip` First – Then – Now Story Strip | `k2` | added from visual catalogue | V115 | 13 |
 | `vis_k2_hands_on` Hands-On Card and Game Pages (low) | `k2` | added from visual catalogue | V132, V142, V143 | 8 |
-| `systematic_bonds` Number Bonds in Order | `k2` | White Rose audit | V112 | 4 |
 | `tens_ones_group` Count by Making Tens | `k2` | White Rose audit | V116 | 2 |
 | `ten_count_out` Count Out a Number | `k2` | White Rose audit | V101 | 1 |
 | `vis_migrate_measures` Migrate Legacy Measure Visuals to B&W Kit Cells | `measurement` | added from visual catalogue | V046, V049, V050, V051, V096, V119, V120 | 56 |

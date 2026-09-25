@@ -291,7 +291,7 @@ one-to-one.
 | R23 | Part-whole (cherry), numerals; rotated (side / bottom) | B2 S2, S11–S13; B4 S4; B5 S9; B6 S5; B12 S3 | R11 | MATCH / PARTIAL | `template:bond` (`orientation` vertical / horizontal); whole-at-bottom GAP (`orientation: 'up'`) |
 | R24 | Part-whole with objects / counters / base-10 drawn in the circles | B2 S2, S11; B4 S4; B5 S6, S10; B6 S5; B12 S3 | R12 | GAP | bond `draw: 'counters' \| 'objects' \| 'base10'` |
 | R25 | Part-whole with three parts | B2 S2; B6 S5 | R13 | GAP | bond `parts: 2..5` |
-| R26 | Blank part-whole to fill many ways (digit cards; systematic) | B2 S2, S5, S11; B12 S3 | **NEW** | PARTIAL | `template:bond` (one blank); `task: 'open'` (all blank, many answers, key = one) GAP |
+| R26 | Blank part-whole to fill many ways (digit cards; systematic) | B2 S2, S5, S11; B12 S3 | **NEW** | PARTIAL | `template:bond` (one blank); every way in order: `composing:bonds_in_order` (the bond over a two-column table, build lane k2); `task: 'open'` (all blank, many answers, key = one) GAP |
 | R27 | Fact family: four additions / eight facts from a model | B2 S4, S13; B5 S9 | R11 (fact family) | PARTIAL | `template:fact-family` (2 + and 2 −); `facts: 'add4' \| 'eight'` GAP |
 | R28 | Two-colour counter rows; rows of empty circles to colour a bond each (systematic list) | B2 S1, S3, S5, S6; B5 S3 | **NEW** | PARTIAL | `pane:objects` solid / hollow (not wired on bonds); `task: 'bond-list'` on number_bonds GAP |
 | R29 | Bead string (10, 20, 50, 100; tones in 5s / 10s; part covered) | B2 S3, S7; B4 S2–S7; B6 S8; B9 S2; B12 S2, S4 | R07 | GAP | new `pane:beadstring` (solid / hollow runs, LS-5) |

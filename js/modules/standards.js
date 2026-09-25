@@ -42,6 +42,7 @@ export const SKILL_STANDARDS = {
     'counting:number_seq_fill': { ccss: ['1.NBT.A.1', 'K.CC.A.2', 'K.CC.A.1'], ee: ['M.EE.1.NBT.1', 'M.EE.2.NBT.3', 'M.EE.K.CC.1'] }, // Number Sequence: Fill Missing (Grid)
     'counting:mixed_counting': { ccss: [], ee: [], pool: true }, // Mixed Counting
     // Build lane k2 (2026-09-25)
+    'composing:bonds_in_order': { ccss: ['K.OA.A.3'], ee: ['M.EE.1.NBT.4', 'M.EE.1.NBT.6', 'M.EE.2.NBT.6'] }, // Number Bonds in Order
     'comparing:sort_into_groups': { ccss: ['K.MD.B.3'], ee: ['M.EE.K.MD.3', 'M.EE.K.MD.1', 'M.EE.K.MD.2', 'M.EE.1.MD.4'] }, // Sort into Groups
     'counting:ordinal_numbers': { ccss: [], ee: [], reason: 'Ordinal numbers (first to tenth) have no Kindergarten-Grade 6 CCSS standard; White Rose Year 1 teaches them' }, // 1st, 2nd, 3rd
     'comparing:what_can_we_measure': { ccss: ['K.MD.A.1'], ee: ['M.EE.K.MD.1'] }, // What Can We Measure?

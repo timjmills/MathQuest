@@ -24,23 +24,23 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 609 live skills; 497 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 56 have no standard, with a reason (50 vocabulary games, 6 beyond grade 6).
+- Skills mapped: 610 live skills; 498 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 56 have no standard, with a reason (50 vocabulary games, 6 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
-- **Full coverage: CCSS 78 of 177 standards FULL, 88 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 106 FULL, 89 PARTIAL, 22 GAP.
-- **Essential Elements: 85 of 117 FULL, 29 PARTIAL, 3 GAP** (tagged: 115).
+- **Full coverage: CCSS 79 of 177 standards FULL, 87 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 107 FULL, 88 PARTIAL, 22 GAP.
+- **Essential Elements: 88 of 117 FULL, 26 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 265 entries — 124 new skills, 86 options on existing skills, 2 repairs; 155 from the White Rose audit (40 of them extended to close standards clauses), 57 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+- The one build list: 264 entries — 123 new skills, 86 options on existing skills, 2 repairs; 154 from the White Rose audit (39 of them extended to close standards clauses), 57 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
-| K | 12 / 9 / 1 of 22 (55% full) | 14 / 9 / 1 of 24 | 9 / 1 / 0 of 10 (90% full) | 21/22, 10/10 |
-| 1 | 11 / 10 / 0 of 21 (52% full) | 13 / 10 / 0 of 23 | 11 / 4 / 1 of 16 (69% full) | 21/21, 16/16 |
-| 2 | 12 / 10 / 4 of 26 (46% full) | 12 / 9 / 6 of 27 | 11 / 7 / 1 of 19 (58% full) | 22/26, 18/19 |
+| K | 13 / 8 / 1 of 22 (59% full) | 15 / 8 / 1 of 24 | 9 / 1 / 0 of 10 (90% full) | 21/22, 10/10 |
+| 1 | 11 / 10 / 0 of 21 (52% full) | 13 / 10 / 0 of 23 | 13 / 2 / 1 of 16 (81% full) | 21/21, 16/16 |
+| 2 | 12 / 10 / 4 of 26 (46% full) | 12 / 9 / 6 of 27 | 12 / 6 / 1 of 19 (63% full) | 22/26, 18/19 |
 | 3 | 12 / 13 / 0 of 25 (48% full) | 18 / 15 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
 | 4 | 14 / 13 / 1 of 28 (50% full) | 19 / 13 / 2 of 34 | 16 / 4 / 0 of 20 (80% full) | 27/28, 20/20 |
 | 5 | 10 / 14 / 2 of 26 (38% full) | 16 / 13 / 5 of 34 | 13 / 4 / 1 of 18 (72% full) | 24/26, 17/18 |
 | 6 | 7 / 19 / 3 of 29 (24% full) | 14 / 20 / 8 of 42 | 10 / 7 / 0 of 17 (59% full) | 26/29, 17/17 |
-| **All** | **78 / 88 / 11 of 177 (44% full)** | **106 / 89 / 22 of 217** | **85 / 29 / 3 of 117 (73% full)** | 166/177, 115/117 |
+| **All** | **79 / 87 / 11 of 177 (45% full)** | **107 / 88 / 22 of 217** | **88 / 26 / 3 of 117 (75% full)** | 166/177, 115/117 |
 
 ## Tag fixes made by this audit
 
@@ -228,48 +228,47 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 36 | **Faces, Edges or Vertices (option)** (`shape_faces`) | option on `shapes_early:count_edges_faces_vertices` | - | 1 |
 | 37 | **3-D Shapes: Names and Properties** (`shapes_3d_props`) | new `shapes_classify:3d_shape_properties` | - | 1 |
 
-### Operations (38)
+### Operations (37)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
 |---|---|---|---|---|
 | 1 | **Share and Make Groups** (`share_group`) | new `division:share_and_group_early` | M.EE.2.OA.3 | 13 |
-| 2 | **Number Bonds in Order** (`systematic_bonds`) | new `composing:bonds_in_order` | K.OA.A.3, M.EE.1.NBT.4, M.EE.1.NBT.6, M.EE.2.NBT.6 | 1 |
-| 3 | **Spot the Pattern (+/−)** (`add_sub_patterns`) | new `addition:add_sub_patterns` | 2.NBT.B.9 | 4 |
-| 4 | **Long Multiplication and Division (4-digit)** (`long_mult`) | new `multiplication:long_multiplication_4x2` | 5.NBT.B.5 | 4 |
-| 5 | **Compare Calculations** (`compare_calcs`) | new `algebra:compare_calculations` | 5.OA.A.2, M.EE.6.EE.3 | 1 |
-| 6 | **To the Next Ten** (`add_next_10`) | new `addition:bridge_to_next_ten` | - | 4 |
-| 7 | **Add Three Numbers: Stories and Make a Ten First (option)** (`add_three_forms`) | option on `addition:add_three` | 1.OA.A.2, 1.OA.B.3 | - |
-| 8 | **Add and Subtract 10s Across 100 (option)** (`cross_100`) | option on `addition:add_sub_100s` | 2.NBT.B.7 | 2 |
-| 9 | **Multiply Three Numbers** (`mult_three`) | new `multiplication:multiply_three_numbers` | 3.OA.B.5 | 2 |
-| 10 | **Add and Subtract With a Base-10 Picture (option)** (`stack_base10_support`) | option on `addition:add_100_mixed` | 1.NBT.C.4, 2.NBT.B.7 | - |
-| 11 | **Related Times-Tables** (`tables_links`) | new `multiplication:related_tables` | - | 4 |
-| 12 | **Add and Subtract Multiples of Ten (option)** (`tens_any`) | option on `addition:add_sub_10s` | 1.NBT.C.4, 1.NBT.C.6 | - |
-| 13 | **Add or Multiply?** (`add_or_mult`) | new `algebra:add_or_multiply` | 4.OA.A.2 | 1 |
-| 14 | **Add or Subtract 1 or 2** (`add_sub_1_2`) | new `addition:add_sub_1_or_2` | K.CC.B.4c | 1 |
-| 15 | **Compare Number Sentences** (`compare_sentences`) | new `algebra:compare_number_sentences` | 1.OA.D.7 | 1 |
-| 16 | **Make Equal Groups** (`equal_groups_early`) | new `multiplication:make_equal_groups` | 2.OA.C.4 | 1 |
-| 17 | **Mental Calculation and Estimation** (`mental_estimate`) | new `number_sense:estimate_and_check` | 3.OA.D.8 | 1 |
-| 18 | **Part-Whole Model** (`part_whole`) | new `composing:part_whole_model` | K.OA.A.1 | 1 |
-| 19 | **Bonds to 100** (`bonds_100`) | new `addition:bonds_to_100` | - | 2 |
-| 20 | **Times as Many: Statements and Equations (option)** (`comparison_statements`) | option on `multiplication:mult_comparison` | 4.OA.A.1 | - |
-| 21 | **True or False Equations (repair)** (`equal_sign_repair`) | repair on `addition:equal_sign` | 1.OA.D.7 | - |
-| 22 | **Why Does It Work?** (`explain_strategy`) | new `number_sense:why_it_works` | 2.NBT.B.9 | - |
-| 23 | **Subtract Back Through Ten (option)** (`make_ten_subtract`) | option on `number_sense:make_a_ten` | 1.OA.C.6 | - |
-| 24 | **Multiply a 4-Digit Number by a 1-Digit Number (option)** (`mult_4x1`) | option on `multiplication:multiply` | 4.NBT.B.5 | - |
-| 25 | **Write the Number Sentence for the Picture (option)** (`pictures_to_sentence`) | option on `addition:add_5_pictures` | K.OA.A.1 | - |
-| 26 | **What Do +, − and = Mean? (option)** (`sign_meanings`) | option on `number_ops_mixed:which_sign` | M.EE.2.NBT.5 | - |
-| 27 | **Number Bonds to 20** (`bonds_20`) | new `composing:bonds_to_20` | - | 1 |
-| 28 | **Correspondence Problems** (`correspondence`) | new `multiplication:correspondence_problems` | - | 1 |
-| 29 | **Find the Difference** (`difference`) | new `subtraction:find_the_difference` | - | 1 |
-| 30 | **Division Using Factors** (`div_factors`) | new `division:divide_using_factors` | - | 1 |
-| 31 | **How Many Ways?** (`how_many_ways`) | new `multiplication:how_many_ways` | - | 1 |
-| 32 | **Inverse Operations (option)** (`inverse_check`) | option on `subtraction:sub_check_by_adding` | - | 1 |
-| 33 | **Reason from Known Facts** (`known_facts`) | new `multiplication:reason_from_known_facts` | - | 1 |
-| 34 | **Long Division with Remainders (option)** (`long_div_rem`) | option on `division:long_div_2digit` | - | 1 |
-| 35 | **Mental or Written?** (`make_decisions`) | new `addition:choose_a_method` | - | 1 |
-| 36 | **Mental Addition and Subtraction** (`mental_add_sub`) | new `addition:mental_strategies` | - | 1 |
-| 37 | **Multiples of 10, 100 and 1,000 (option)** (`mult_multiples`) | option on `multiplication:mult_zeros` | - | 1 |
-| 38 | **Partition to Multiply** (`informal_mult`) | new `multiplication:partition_multiply` | - | - |
+| 2 | **Spot the Pattern (+/−)** (`add_sub_patterns`) | new `addition:add_sub_patterns` | 2.NBT.B.9 | 4 |
+| 3 | **Long Multiplication and Division (4-digit)** (`long_mult`) | new `multiplication:long_multiplication_4x2` | 5.NBT.B.5 | 4 |
+| 4 | **Compare Calculations** (`compare_calcs`) | new `algebra:compare_calculations` | 5.OA.A.2, M.EE.6.EE.3 | 1 |
+| 5 | **To the Next Ten** (`add_next_10`) | new `addition:bridge_to_next_ten` | - | 4 |
+| 6 | **Add Three Numbers: Stories and Make a Ten First (option)** (`add_three_forms`) | option on `addition:add_three` | 1.OA.A.2, 1.OA.B.3 | - |
+| 7 | **Add and Subtract 10s Across 100 (option)** (`cross_100`) | option on `addition:add_sub_100s` | 2.NBT.B.7 | 2 |
+| 8 | **Multiply Three Numbers** (`mult_three`) | new `multiplication:multiply_three_numbers` | 3.OA.B.5 | 2 |
+| 9 | **Add and Subtract With a Base-10 Picture (option)** (`stack_base10_support`) | option on `addition:add_100_mixed` | 1.NBT.C.4, 2.NBT.B.7 | - |
+| 10 | **Related Times-Tables** (`tables_links`) | new `multiplication:related_tables` | - | 4 |
+| 11 | **Add and Subtract Multiples of Ten (option)** (`tens_any`) | option on `addition:add_sub_10s` | 1.NBT.C.4, 1.NBT.C.6 | - |
+| 12 | **Add or Multiply?** (`add_or_mult`) | new `algebra:add_or_multiply` | 4.OA.A.2 | 1 |
+| 13 | **Add or Subtract 1 or 2** (`add_sub_1_2`) | new `addition:add_sub_1_or_2` | K.CC.B.4c | 1 |
+| 14 | **Compare Number Sentences** (`compare_sentences`) | new `algebra:compare_number_sentences` | 1.OA.D.7 | 1 |
+| 15 | **Make Equal Groups** (`equal_groups_early`) | new `multiplication:make_equal_groups` | 2.OA.C.4 | 1 |
+| 16 | **Mental Calculation and Estimation** (`mental_estimate`) | new `number_sense:estimate_and_check` | 3.OA.D.8 | 1 |
+| 17 | **Part-Whole Model** (`part_whole`) | new `composing:part_whole_model` | K.OA.A.1 | 1 |
+| 18 | **Bonds to 100** (`bonds_100`) | new `addition:bonds_to_100` | - | 2 |
+| 19 | **Times as Many: Statements and Equations (option)** (`comparison_statements`) | option on `multiplication:mult_comparison` | 4.OA.A.1 | - |
+| 20 | **True or False Equations (repair)** (`equal_sign_repair`) | repair on `addition:equal_sign` | 1.OA.D.7 | - |
+| 21 | **Why Does It Work?** (`explain_strategy`) | new `number_sense:why_it_works` | 2.NBT.B.9 | - |
+| 22 | **Subtract Back Through Ten (option)** (`make_ten_subtract`) | option on `number_sense:make_a_ten` | 1.OA.C.6 | - |
+| 23 | **Multiply a 4-Digit Number by a 1-Digit Number (option)** (`mult_4x1`) | option on `multiplication:multiply` | 4.NBT.B.5 | - |
+| 24 | **Write the Number Sentence for the Picture (option)** (`pictures_to_sentence`) | option on `addition:add_5_pictures` | K.OA.A.1 | - |
+| 25 | **What Do +, − and = Mean? (option)** (`sign_meanings`) | option on `number_ops_mixed:which_sign` | M.EE.2.NBT.5 | - |
+| 26 | **Number Bonds to 20** (`bonds_20`) | new `composing:bonds_to_20` | - | 1 |
+| 27 | **Correspondence Problems** (`correspondence`) | new `multiplication:correspondence_problems` | - | 1 |
+| 28 | **Find the Difference** (`difference`) | new `subtraction:find_the_difference` | - | 1 |
+| 29 | **Division Using Factors** (`div_factors`) | new `division:divide_using_factors` | - | 1 |
+| 30 | **How Many Ways?** (`how_many_ways`) | new `multiplication:how_many_ways` | - | 1 |
+| 31 | **Inverse Operations (option)** (`inverse_check`) | option on `subtraction:sub_check_by_adding` | - | 1 |
+| 32 | **Reason from Known Facts** (`known_facts`) | new `multiplication:reason_from_known_facts` | - | 1 |
+| 33 | **Long Division with Remainders (option)** (`long_div_rem`) | option on `division:long_div_2digit` | - | 1 |
+| 34 | **Mental or Written?** (`make_decisions`) | new `addition:choose_a_method` | - | 1 |
+| 35 | **Mental Addition and Subtraction** (`mental_add_sub`) | new `addition:mental_strategies` | - | 1 |
+| 36 | **Multiples of 10, 100 and 1,000 (option)** (`mult_multiples`) | option on `multiplication:mult_zeros` | - | 1 |
+| 37 | **Partition to Multiply** (`informal_mult`) | new `multiplication:partition_multiply` | - | - |
 
 ### Fractions (22)
 
@@ -434,10 +433,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught in part by: Add Within 5 with Pictures (Visual) (`addition:add_5_pictures`); Subtract Within 5 with Pictures (Visual) (`subtraction:sub_5_pictures`)  
   Missing: the pupil represents the operation: writes the equation for a picture and draws a picture for an equation  
   Build: Write the Number Sentence for the Picture (option) (`pictures_to_sentence`); Part-Whole Model (`part_whole`)
-- **K.OA.A.3** — PARTIAL. Decompose numbers less than or equal to 10 into pairs in more than one way, e.g., by using objects or drawings, and record each decomposition by a drawing or equation (e.g., 5 = 2 + 3 and 5 = 4 + 1).  
-  Taught in part by: Number Bonds within 10 (Visual) (`composing:number_bonds`)  
-  Missing: decompose one number in more than one way and record each (5 = 2 + 3 and 5 = 4 + 1)  
-  Build: Number Bonds in Order (`systematic_bonds`)
 - **K.G.A.1** — PARTIAL. Describe objects in the environment using names of shapes, and describe the relative positions of these objects using terms such as above, below, beside, in front of, behind, and next to.  
   Taught in part by: Shape Positions: Above/Below/Beside (Visual) (`shapes_early:shape_positions`)  
   Missing: name the shapes of objects in the environment; in front of, behind, next to (the skill has above, below, beside)  
@@ -500,14 +495,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught in part by: Halves/Thirds/Fourths (Visual) (`shapes_early:partition_shapes`)  
   Missing: the words halves, fourths, quarters and "half of / quarter of" (the skill writes 1/2); the whole as two or four of the shares; more equal shares make smaller shares  
   Build: Halves and Quarters (`half_quarter`)
-- **M.EE.1.NBT.4** — PARTIAL. Compose quantities less than or equal to five in more than one way.  
-  Taught in part by: Number Bonds within 10 (Visual) (`composing:number_bonds`)  
-  Missing: compose quantities ≤ 5 in more than one way  
-  Build: Number Bonds in Order (`systematic_bonds`)
-- **M.EE.1.NBT.6** — PARTIAL. Decompose quantities less than or equal to five in more than one way.  
-  Taught in part by: Number Bonds within 10 (Visual) (`composing:number_bonds`)  
-  Missing: decompose quantities ≤ 5 in more than one way  
-  Build: Number Bonds in Order (`systematic_bonds`)
 - **M.EE.1.MD.3** — PARTIAL. Understand concepts of time.  
   Taught in part by: a.m. or p.m.? (`measurement:time_sense`)  
   Missing: today, yesterday and tomorrow; morning, afternoon, day and night; activities before, next and after; telling time is the same every day  
@@ -591,10 +578,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught in part by: Which Sign Makes It True? (+ − × ÷) (`number_ops_mixed:which_sign`)  
   Missing: the meaning of + (combine, plus, add), − (separate, take) and = (the same amount as) in words  
   Build: What Do +, − and = Mean? (option) (`sign_meanings`)
-- **M.EE.2.NBT.6** — PARTIAL. Using concrete models, compose and decompose numbers up to 10 in more than one way.  
-  Taught in part by: Number Bonds within 10 (Visual) (`composing:number_bonds`); Make 10 (Visual) (`composing:make_ten`)  
-  Missing: compose and decompose numbers to 10 in more than one way  
-  Build: Number Bonds in Order (`systematic_bonds`)
 - **M.EE.2.MD.3** — PARTIAL. Order objects by length using non-standard units.  
   Taught in part by: Order Objects by Length (Visual) (`shapes_early:order_objects_length`)  
   Missing: order objects by lengths measured in non-standard units  
@@ -1029,9 +1012,8 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **K.OA.A.2** — FULL. Solve addition and subtraction word problems, and add and subtract within 10, e.g., by using objects or drawings to represent the problem.  
   Taught by: Addition Word Problems (within 10) (`addition:add_wp_10`); Subtraction Word Problems (within 10) (`subtraction:sub_wp_10`); Add within 10 (`addition:add_10_mixed`); Subtract within 10 (`subtraction:sub_10_mixed`)  
   Also tagged: `addition:add_10_no_regroup`, `addition:add_wp_10_plain`, `subtraction:sub_10_no_regroup`, `subtraction:sub_wp_10_plain`
-- **K.OA.A.3** — PARTIAL. Decompose numbers less than or equal to 10 into pairs in more than one way, e.g., by using objects or drawings, and record each decomposition by a drawing or equation (e.g., 5 = 2 + 3 and 5 = 4 + 1).  
-  In part: Number Bonds within 10 (Visual) (`composing:number_bonds`)  
-  Missing: decompose one number in more than one way and record each (5 = 2 + 3 and 5 = 4 + 1) → `systematic_bonds`  
+- **K.OA.A.3** — FULL. Decompose numbers less than or equal to 10 into pairs in more than one way, e.g., by using objects or drawings, and record each decomposition by a drawing or equation (e.g., 5 = 2 + 3 and 5 = 4 + 1).  
+  Taught by: Number Bonds within 10 (Visual) (`composing:number_bonds`); Number Bonds in Order (`composing:bonds_in_order`) — every decomposition of one number, recorded in order as a table, with dots, or as equations 0 + 5 = 5: bonds_in_order (build lane k2)  
 - **K.OA.A.4** — FULL. For any number from 1 to 9, find the number that makes 10 when added to the given number, e.g., by using objects or drawings, and record the answer with a drawing or equation.  
   Taught by: Make 10 (Visual) (`composing:make_ten`)  
 - **K.OA.A.5** — FULL. Fluently add and subtract within 5.  
@@ -1893,12 +1875,10 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught by: Make 10 (Visual) (`composing:make_ten`); Build a Number on a Ten Frame (`composing:ten_frame_build`)  
 - **M.EE.1.NBT.3** — FULL. Compare two groups of 10 or fewer items when the number of items in each group is similar. (CCSS 1.NBT.B.3)  
   Taught by: More/Fewer/Same Groups (Visual) (`comparing:compare_groups`)  
-- **M.EE.1.NBT.4** — PARTIAL. Compose quantities less than or equal to five in more than one way. (CCSS 1.NBT.C.4)  
-  In part: Number Bonds within 10 (Visual) (`composing:number_bonds`)  
-  Missing: compose quantities ≤ 5 in more than one way → `systematic_bonds`
-- **M.EE.1.NBT.6** — PARTIAL. Decompose quantities less than or equal to five in more than one way. (CCSS 1.NBT.C.6)  
-  In part: Number Bonds within 10 (Visual) (`composing:number_bonds`)  
-  Missing: decompose quantities ≤ 5 in more than one way → `systematic_bonds`
+- **M.EE.1.NBT.4** — FULL. Compose quantities less than or equal to five in more than one way. (CCSS 1.NBT.C.4)  
+  Taught by: Number Bonds within 10 (Visual) (`composing:number_bonds`); Number Bonds in Order (`composing:bonds_in_order`) — every way to make 3, 4 or 5: bonds_in_order "Bonds of 3 to 5" (build lane k2)  
+- **M.EE.1.NBT.6** — FULL. Decompose quantities less than or equal to five in more than one way. (CCSS 1.NBT.C.6)  
+  Taught by: Number Bonds within 10 (Visual) (`composing:number_bonds`); Number Bonds in Order (`composing:bonds_in_order`) — every split of 3, 4 or 5: bonds_in_order "Bonds of 3 to 5" (build lane k2)  
 - **M.EE.1.MD.1** — FULL. Compare lengths to identify which is longer/shorter or taller/shorter. (CCSS 1.MD.A.1)  
   Taught by: Order Objects by Length (Visual) (`shapes_early:order_objects_length`); Compare Attributes (Visual) (`comparing:compare_objects`)  
 - **M.EE.1.MD.2** — FULL. Compare lengths to identify which is longer/shorter or taller/shorter. (CCSS 1.MD.A.2)  
@@ -1935,9 +1915,8 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **M.EE.2.NBT.5** — PARTIAL. Identify the meaning of the “+” sign (including combine, plus, add), “-” sign (including separate, subtract, take), and the “=” sign (including the same amount as, equal). (CCSS 2.NBT.B.5)  
   In part: Which Sign Makes It True? (+ − × ÷) (`number_ops_mixed:which_sign`)  
   Missing: the meaning of + (combine, plus, add), − (separate, take) and = (the same amount as) in words → `sign_meanings`
-- **M.EE.2.NBT.6** — PARTIAL. Using concrete models, compose and decompose numbers up to 10 in more than one way. (CCSS 2.NBT.B.6)  
-  In part: Number Bonds within 10 (Visual) (`composing:number_bonds`); Make 10 (Visual) (`composing:make_ten`)  
-  Missing: compose and decompose numbers to 10 in more than one way → `systematic_bonds`
+- **M.EE.2.NBT.6** — FULL. Using concrete models, compose and decompose numbers up to 10 in more than one way. (CCSS 2.NBT.B.6)  
+  Taught by: Number Bonds within 10 (Visual) (`composing:number_bonds`); Make 10 (Visual) (`composing:make_ten`); Number Bonds in Order (`composing:bonds_in_order`) — every bond of 6 to 10 in order: bonds_in_order (build lane k2)  
 - **M.EE.2.NBT.7** — FULL. Use objects, representations, and numbers (0-20) to add and subtract. (CCSS 2.NBT.B.7)  
   Taught by: Add within 10 (`addition:add_10_mixed`); Subtract within 10 (`subtraction:sub_10_mixed`); Add Within 5 with Pictures (Visual) (`addition:add_5_pictures`); Addition Facts (within 20) (`addition:add_facts`)  
 - **M.EE.2.MD.1** — FULL. Measure the length of objects using non-standard units. (CCSS 2.MD.A.1)  

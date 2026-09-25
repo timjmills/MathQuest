@@ -22,20 +22,20 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 529 (61%), partial only 145 (17%), gap 198 (23%).
+- Covered 530 (61%), partial only 145 (17%), gap 197 (23%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 335 skills carry WRM tags. 155 proposals (113 new skills, 42 options on existing skills) would close every gap.
+- 336 skills carry WRM tags. 154 proposals (112 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
 | Reception | PK | 18 | 119 | 69 (58%) | 25 | 25 |
-| Year 1 | K | 14 | 116 | 76 (66%) | 23 | 17 |
+| Year 1 | K | 14 | 116 | 77 (66%) | 23 | 16 |
 | Year 2 | 1 | 11 | 124 | 81 (65%) | 18 | 25 |
 | Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
 | Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
 | Year 5 | 4 | 15 | 136 | 81 (60%) | 22 | 33 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **529 (61%)** | **145** | **198** |
+| **All** | | **97** | **872** | **530 (61%)** | **145** | **197** |
 
 ## Source disagreements
 
@@ -443,7 +443,7 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Closes (1): Y6.B2.S4 Rules of divisibility  
   _proposal id: divisibility_rules_
 
-### operations (27 proposals, 54 steps)
+### operations (26 proposals, 53 steps)
 
 - **Share and Make Groups** — new skill `division:share_and_group_early`. Teaches sharing a small amount equally (one for you, one for me) and grouping into equal groups within 10, including odd amounts that do not share fairly. Representation: counters drawn next to plates or rings; draw them shared or grouped; write how many each / how many groups; option: fair or not fair.  
   Closes (13): R.B9.S6 Make pairs-odd and even; R.B9.S8 Double to 8 (make a double); R.B11.S10 Bonds to 10 (3 parts); R.B11.S12 Doubles to 10 (make a double); R.B11.S13 Explore even and odd; R.B14.S2 How many did I add; R.B14.S4 How many did I take away; R.B16.S1 Explore sharing; R.B16.S2 Sharing; R.B16.S3 Explore grouping; R.B16.S5 Even and odd sharing; Y1.B9.S9 Make equal groups - sharing; Y2.B5.S8 Make equal groups – sharing  
@@ -476,9 +476,6 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Closes (1): Y1.B2.S1 Introduce parts and wholes  
   Strengthens: Y1.B2.S2  
   _proposal id: part_whole_
-- **Number Bonds in Order** — new skill `composing:bonds_in_order`. Teaches listing all the bonds of a number systematically (0+5, 1+4, 2+3 ...) and seeing the pattern. Representation: a two-column table with the first rows filled; complete it; option: ten frame beside each row.  
-  Closes (1): Y1.B2.S6 Systematic number bonds within 10  
-  _proposal id: systematic_bonds_
 - **Make Equal Groups** — new skill `multiplication:make_equal_groups`. Teaches recognising, making and adding equal groups, and doubles as two equal groups. Representation: groups drawn in rings; tick equal or not, write groups of and the repeated addition.  
   Closes (1): Y2.B5.S2 Make equal groups  
   _proposal id: equal_groups_early_
@@ -1118,8 +1115,8 @@ whatever happens to the WRM gaps.
 - **Y1.B2.S5** Number bonds within 10 — covered. _K.OA.A.3_  
   Skills: Number Bonds within 10 (Visual) (`composing:number_bonds`) {bonds to 10}  
   Vocabulary: part, whole, number bond (  
-- **Y1.B2.S6** Systematic number bonds within 10 — GAP. _K.OA.A.3_  
-  Proposal: Number Bonds in Order  
+- **Y1.B2.S6** Systematic number bonds within 10 — covered. _K.OA.A.3_  
+  Skills: Number Bonds in Order (`composing:bonds_in_order`)  
   Vocabulary: bond, systematic, altogether  
 - **Y1.B2.S7** Number bonds to 10 — covered. _K.OA.A.4_  
   Skills: Number Bonds within 10 (Visual) (`composing:number_bonds`) {bonds to 10, whole = 10}; Make 10 (Visual) (`composing:make_ten`)  

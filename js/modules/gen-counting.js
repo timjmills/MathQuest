@@ -2053,8 +2053,9 @@ function _k2BondsInOrder(q, rng) {
     const lvl = _kLevel(2);
     const n = band === 5 ? 3 + _kDealShuffled(3) : 6 + _kDealShuffled(5);
     const notation = _kOpt('notation') === 'across' ? 'across' : 'table';
-    // pattern pages also list the bonds from n down to 0 (half the items), so the answer moves
-    const down = task === 'pattern' && _kDealShuffled(2) === 1;
+    // half the items list the bonds from the other end (n and 0 first): systematic from either
+    // end, and on a pattern page the answer moves
+    const down = _kDealShuffled(2) === 1;
     const rows = Array.from({ length: n + 1 }, (_, i) => { const a = down ? n - i : i; return { a, b: n - a, hide: null }; });
     const given = lvl >= 2 ? 2 : 0;
     if (task === 'fill') rows.forEach((r, i) => { if (i >= given) r.hide = 'b'; });
@@ -2064,12 +2065,13 @@ function _k2BondsInOrder(q, rng) {
         pool.slice(0, k).forEach((i) => { rows[i].hide = 'both'; });
     }
     const payload = { kind: 'table', task, n, rows, notation, dots: lvl >= 3 };
+    q.openWhole = n;   // the Stretch page: two numbers add to n, find different pairs
     q.options = [];
     q.selfAnswering = true;
     q.skillLabel = 'Number Bonds in Order';
     q.supportLevel = lvl;
     q._variant = task;
-    q.printFormat = `k2-${task}`;
+    q.printFormat = `k2-bonds-${task}`;
     if (task === 'pattern') {
         const ask = _kDealShuffled(2) === 0 ? 'second' : 'first';
         const labels = ['Goes up by 1', 'Goes down by 1', 'Stays the same'];
@@ -2095,10 +2097,11 @@ function _k2BondsInOrder(q, rng) {
     q.keyParts = blanks.map(String);
     q.acceptedAnswers = [blanks.join(','), blanks.join(' ')];
     q.answerType = 'text';
-    q.hint = 'The first part goes up by 1. The second part goes down by 1. Both parts make the whole.';
+    q.hint = down ? 'The first part goes down by 1. The second part goes up by 1. Both parts make the whole.'
+        : 'The first part goes up by 1. The second part goes down by 1. Both parts make the whole.';
     q.distractorTags = task === 'fill'
         ? { [rows.filter((r) => r.hide).map((r) => r.a).join(', ')]: 'copied the first part' }
-        : { [blanks.map((v, i) => (i % 2 === 0 ? v - 1 : v + 1)).join(', ')]: 'copied the row above' };
+        : { [rows.filter((r) => r.hide === 'both').map((r) => `${r.b}, ${r.a}`).join(', ')]: 'swapped the two parts' };
     _kSetCell(q, 'bond', payload);
     return true;
 }
