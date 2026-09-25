@@ -375,6 +375,7 @@ function gridPart(part, ctx, report) {
         unlabelled: part.unlabelled || [],
         rowsTpl: part.rowsTpl || '',
         spanFirst: !!part.spanFirst,
+        rowGap: Number(part.rowGap) || 0,
     });
 }
 

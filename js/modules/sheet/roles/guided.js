@@ -523,20 +523,21 @@ export function plan(input = {}) {
         // ceiling can stop more rows; the spare height then stays under the grid).
         const host = use.slice(at, at + chunk.length);
         const rowItems = (r) => (spanHere ? (r === 0 ? host.slice(0, 1) : host.slice(1 + (r - 1) * cols, 1 + r * cols)) : host.slice(r * cols, (r + 1) * cols));
-        const hsOf = (r) => rowItems(r).map((it) => { const mm = it.measured && it.measured[cols]; return mm && Number.isFinite(mm.hMm) ? mm.hMm : pg.h; });
+        const hsOf = (r) => rowItems(r).map((it) => { const mm = it.measured && it.measured[cols]; return mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : pg.h; });
         const w = Array.from({ length: rows }, (_, r) => Math.max(1, ...hsOf(r)) + (r === 0 ? pg.extra || 0 : 0));
         const mins = Array.from({ length: rows }, (_, r) => Math.max(1, Math.min(...hsOf(r))) + (r === 0 ? pg.extra || 0 : 0));
         const sumW = w.reduce((x, y) => x + y, 0);
         // A row stretches no further than its shortest problem allows (layout.js rowShape).
-        const kRow = Math.max(1, Math.min(FILL_CAP, ...w.map((x, r) => (FILL_CAP * mins[r]) / x)));
-        const gridH = Math.max(sumW, Math.min(pg.avail * Math.min(1, rows / Math.max(rows, pg.rows)), kRow * sumW));
+        const kPage = Math.max(1, Math.min(FILL_CAP, (pg.avail * Math.min(1, rows / Math.max(rows, pg.rows))) / sumW));
+        const Hr = w.map((x, r) => x * Math.max(1, Math.min(kPage, (FILL_CAP * mins[r]) / x)));
+        const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
         const sections = [];
         if (pi === 0) sections.push({ kind: 'html', html: GUIDED_CSS });
         if (fit.steps.length) sections.push(stepsBand());
         const part = gridPart(chunk, { cols, rows, cellH, labels: labelStyleOf(ctx.look, input.labels), start: letter });
         if (spanHere) part.spanFirst = true;
-        if (rows > 1 && Math.max(...w) - Math.min(...w) >= 1) part.rowsTpl = w.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ');
+        if (rows > 1 && Math.max(...Hr) - Math.min(...Hr) >= 1) part.rowsTpl = Hr.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ');
         sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, use), content: part });
         letter += chunk.filter((p) => !p.nolabel).length;
         pages.push({ sections });

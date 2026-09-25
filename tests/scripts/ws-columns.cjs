@@ -33,7 +33,6 @@ const ONE_COLUMN = {
     'number-line': { cols: 1, why: 'a number line needs the full width for 1 cm ticks and labels (RP number-line minimums)' },
     'hop-line': { cols: 1, why: 'a hop line needs the full width for its arcs and tick labels' },
     timeline: { cols: 1, why: 'an elapsed-time line needs the full width for its hour ticks and hops' },
-    'count-row': { cols: 1, why: 'a count-by / pattern train is one unbroken row of 6-10 boxes at the train box minimum, wider than a 2-column cell (a broken train loses the pattern)' },
     equation: { cols: { S: 3, M: 2, L: 2 }, why: 'at M / L an equation with two 2-digit numbers, a sign circle and a slot is wider than a 3-column cell at the size\'s digit height (DN-11: columns never shrink digits); 2 columns hold it' },
 };
 

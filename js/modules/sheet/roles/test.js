@@ -16,7 +16,7 @@ import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, instructionKeyOf, assemble,
     poolItems, topicOf, labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, rng, shuffle, deriveSeed,
 } from './compose.js';
-import { groupByHeight, rowShape } from '../layout.js';
+import { groupByHeight, rowShape, rowGapFor } from '../layout.js';
 
 export const ROLE_ID = 'test';
 const CEILING = { S: 20, M: 16, L: 12 };
@@ -86,6 +86,11 @@ export function plan(input = {}) {
     const shape = rowShape(items, L.cols, rows, L.cellH);
     if (shape) { sections[1].rowsTpl = shape.rowsTpl; sections[1].height = `${shape.heightMm}mm`; }
     else if (rows === L.rows && L.fill !== false) { sections[1].cls = ''; sections[1].height = ''; }
+    // A Test's count is fixed (12.1): spare page height goes between the rows, not into them.
+    if (sections[1].height) {
+        const g = rowGapFor(rows, parseFloat(sections[1].height), L.gridH);
+        if (g.gap) { sections[1].rowGap = g.gap; sections[1].height = `${g.heightMm}mm`; }
+    }
     return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, [{ sections }], {
         scaffoldLevel: 0,
         meta: { items: items.length, scoreOutOf: items.length, form, fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },

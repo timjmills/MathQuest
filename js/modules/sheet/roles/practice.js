@@ -26,7 +26,7 @@ import {
     SIZES, DEFAULT_SIZE, LOOKS, DEFAULT_LOOK,
 } from '../index.js';
 import {
-    resolveSectionLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight,
+    resolveSectionLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor,
 } from '../layout.js';
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
@@ -780,6 +780,11 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // RUBRIC H13: each row as tall as what it holds (rowShape), when the rows differ.
             const shape = part.chunk.gridMm ? { heightMm: part.chunk.gridMm, rowsTpl: part.chunk.rowsTpl || '' }
                 : its.some((it) => it.anchor) ? null : rowShape(its, L.cols, part.chunk.rows, L.cellH);
+            // A lone grid shorter than its page (the teacher's count, a capped row) spends the
+            // spare height as whitespace between its rows (grid.js rowGap), never inside cells.
+            const avail = pg.cont ? L.gridHCont : L.gridH;
+            const baseMm = shape ? shape.heightMm : fillByFlex ? 0 : part.chunk.rows * L.cellH;
+            const gap = lone && baseMm && !its.some((it) => it.anchor) ? rowGapFor(part.chunk.rows, baseMm, avail) : { gap: 0 };
             sections.push({
                 kind: 'grid',
                 cols: L.cols,
@@ -787,8 +792,9 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 labels: labelStyle,
                 start,
                 cls: fillByFlex && !shape ? '' : 'fixed',
-                height: shape ? `${shape.heightMm}mm` : fillByFlex ? '' : `${Math.round(part.chunk.rows * L.cellH * 1000) / 1000}mm`,
+                height: gap.gap ? `${gap.heightMm}mm` : shape ? `${shape.heightMm}mm` : fillByFlex ? '' : `${Math.round(part.chunk.rows * L.cellH * 1000) / 1000}mm`,
                 rowsTpl: shape ? shape.rowsTpl : '',
+                rowGap: gap.gap || 0,
                 items: its.map((it) => planItem(it, level, L.cols)),
             });
         }
