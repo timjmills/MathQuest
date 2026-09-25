@@ -364,6 +364,13 @@ Measured (Independent, L, A4, one page, Max Number 1,000; items per page without
 | count_objects · checklist | 8 | 4 |
 | nearest_100 · chart / marks | 10 | 4 / 8 |
 
+### S2.7 Not in this pass
+
+- **Clocks and coins.** P10's templates expose the minute ring (`ring`) and the US coin dots (`dots`)
+  as payload flags. Hooking touch dots to them (the ring as the count-by-5 dots, coin dots at 5¢ a
+  dot) is left for the S3 time-and-money lane: those skills' `support` sets hold the flags today as
+  generation values.
+
 ### S2.5 Gates
 
 - `node tests/scripts/ws-supports-unit.mjs` — determinism, balance, clash dealing by section (one and
@@ -765,6 +772,15 @@ label starts, and the Score denominators. Anchors add neither.
   so each skill takes its own page. Mixed practice (one compact anchor per skill) is the multi-skill
   sheet with anchors.
 - Side by side halves the problems a page holds; that is the layout's cost.
+
+**A page of several skills (2026-09-25 fix).** A grouped, page-driven section shares one page
+(`print-sheet.js shareRows`). Side by side in one column needs a PAIR of rows per member, and the
+height a member lacks is taken from several others' spare room, so the sheet no longer spills its
+last skill overleaf (the Print screen showed "Score /6" over a page holding 5). In SECTIONS mode,
+when the members' bands and one row each do not fit, every member takes the compact band; when even
+that does not fit (three skills with bands at L), the sheet runs to a second page and its Score
+counts the whole sheet (HD-2, HD-20). A skill with no worked steps prints its problems without
+twins, so a side-by-side page of such a mix shows twins beside that skill's problems only.
 
 **Not built yet.** The on-screen "Show me an example" panel (a later lane), and step states for
 the number line, arrays, counters, function tables and place value.

@@ -1250,7 +1250,24 @@ export async function buildSheet(req = {}) {
             // S6 sections: every member keeps room for its anchor band too.
             const band = (si) => (anchorMode === 'sections' && anchorSets[si] ? n.sections[si].anchorMm || 0 : 0);
             const avail = body - members.length * instr;
-            const need = members.map((si) => layouts[si].hMin + 1 + band(si));
+            // S6 side by side in ONE column: a twin sits above its problem, so a member's least is a
+            // PAIR of rows (practice.js layoutSheet pages whole pairs), not one row.
+            const pairOf = (si) => (anchorMode === 'side' && anchorSets[si] && anchorSets[si].items.length && layouts[si].cols === 1 ? 2 : 1);
+            const needOf = (si) => layouts[si].hMin * pairOf(si) + 1 + band(si);
+            let need = members.map(needOf);
+            // S6 sections: when the members' bands and one row each do not fit one page, every
+            // member takes the COMPACT band (one state, steps beside; Mixed practice's), so a page of
+            // several skills stays one page instead of spilling a section overleaf.
+            if (anchorMode === 'sections' && need.reduce((a, v) => a + v, 0) > avail) {
+                for (const si of members) {
+                    if (!anchorSets[si]) continue;
+                    const compact = anchorSet(n.sections[si].skills[0], si, n, { variant: 'compact', colsList: [1], twinCols: 4 });
+                    if (!compact.eligible || !compact.items.length) continue;
+                    anchorSets[si] = compact;
+                    n.sections[si].anchorMm = compact.heightMm(1);
+                }
+                need = members.map(needOf);
+            }
             const tw = members.reduce((a, si) => a + n.sections[si].group.share, 0) || 1;
             let h = members.map((si) => avail * n.sections[si].group.share / tw);
             // Every member gets at least one row; the others give up the height it lacks.
@@ -1258,8 +1275,16 @@ export async function buildSheet(req = {}) {
                 if (h[k] >= need[k]) continue;
                 const lack = need[k] - h[k];
                 h[k] = need[k];
-                const donors = members.map((_, j) => j).filter((j) => j !== k && h[j] - lack >= need[j]);
-                if (donors.length) h[donors.reduce((a, j) => (h[j] > h[a] ? j : a), donors[0])] -= lack;
+                // The lack is taken from the others' spare room, largest spare first, several donors
+                // if need be (one donor alone often cannot give a whole row).
+                let left = lack;
+                const donors = members.map((_, j) => j).filter((j) => j !== k && h[j] > need[j]).sort((x, y) => (h[y] - need[y]) - (h[x] - need[x]));
+                for (const j of donors) {
+                    if (left <= 0) break;
+                    const give = Math.min(left, h[j] - need[j]);
+                    h[j] -= give;
+                    left -= give;
+                }
             }
             members.forEach((si, k) => {
                 const sec = n.sections[si];

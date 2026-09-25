@@ -1884,8 +1884,8 @@ async function selfTest() {
         // L-SUPPORT runs in the rendered document (supportCheckInPage): proven on planted pages.
         {
             const page = await env.browser.newPage();
-            const cell = (sup, slotStyle = '', extra = '') => `<div class="ws-cell mqt--fact" style="position:relative;width:60mm;height:40mm">`
-                + `<div class="ws-supported"><div class="ws-pane-problem"><div class="ws-fact" style="x">7 5<span data-ws-slot="ans" style="display:block;${slotStyle}">&nbsp;</span></div></div>${sup}</div>${extra}</div>`;
+            const cell = (sup, pre = '', extra = '') => `<div class="ws-cell mqt--fact" style="position:relative;width:60mm;height:40mm">`
+                + `<div class="ws-supported">${pre}<div class="ws-pane-problem"><div class="ws-fact" style="x">7 5<span data-ws-slot="ans" style="display:block;">&nbsp;</span></div></div>${sup}</div>${extra}</div>`;
             const doc = (pupil, key) => `<html><body><section data-ws-mode="print"><div class="ws-grid">${pupil.join('')}</div></section><section data-ws-mode="key"><div class="ws-grid">${key.join('')}</div></section></body></html>`;
             const tile = '<div data-ws-support-on="tile">7 and 5</div>';
             const keyed = (c) => c.replace('&nbsp;', '12');
@@ -1893,7 +1893,7 @@ async function selfTest() {
                 ['support clean', doc([cell(tile), cell(tile)], [keyed(cell(tile)), keyed(cell(tile))]), null],
                 ['support showing the answer', doc([cell('<div data-ws-support-on="line">12</div>')], [keyed(cell('<div data-ws-support-on="line">12</div>'))]), ['L-SUPPORT', 'RP-1']],
                 ['tally rows of two lengths', doc([cell('<div data-ws-support-on="touch"><div class="ws-td-tallyrow" data-ws-tally="10"></div></div>'), cell('<div data-ws-support-on="touch"><div class="ws-td-tallyrow" data-ws-tally="12"></div></div>')], []), ['L-SUPPORT', 'S1.7']],
-                ['answer zone moves', doc([cell(tile), cell('<div data-ws-support-reserve="tile"></div>', 'margin-top:9mm')], []), ['L-SUPPORT', 'SCC-T10']],
+                ['answer zone moves', doc([cell(tile), cell('<div data-ws-support-reserve="tile"></div>', '<div style="height:9mm"></div>')], []), ['L-SUPPORT', 'SCC-T10']],
                 ['key without the supports', doc([cell(tile)], [keyed(cell(''))]), ['L-SUPPORT', 'AK-1']],
             ];
             let allOk = true;
