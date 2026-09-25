@@ -1265,6 +1265,9 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `draw-blocks-100` | Draw hundreds, tens and ones to show the number. | build a three-digit number with base-10 blocks |
 | `check-groups` | Look at the groups. Check one box. | compare two groups: more, fewer, same |
 | `how-many-left` | Write how many are left. | take away with crossed-out pictures |
+| `count-all` | Count them all. Write how many. | join two pictured groups (add within 5 with pictures; added 2026-09-25) |
+| `count-kind` | Count one kind. Write how many. | sort and count one kind in a mixed picture (added 2026-09-25) |
+| `count-tens` | Write how many tens. | count rods or full ten frames as tens (added 2026-09-25) |
 | `ring-remainder` | Circle groups of {n}. Write the quotient and the remainder. | division with a remainder, pictured (its two slots: `= [ ] R [ ]`) |
 | `ring-groups-each` | Circle groups of the number shown. Write how many groups. | `ring-groups` when the section's items do not share one {n} (added 2026-09-25, critic round 2) |
 | `ring-remainder-each` | Circle groups of the second number. Write the quotient and the remainder. | `ring-remainder` when the divisors differ (R3: "the divisor" was jargon on the page) |

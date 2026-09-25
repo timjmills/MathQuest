@@ -158,6 +158,11 @@ export const SHAPES = Object.freeze({
             return `<path d="M${pts.join('L')}Z" ${OUT()}/>`;
         },
     },
+    // O6 AP1 (2026-09-25): the fifth plain shape add_5_pictures has always dealt (its old ◆ glyph).
+    diamond: {
+        plural: 'diamonds', one: 'diamond',
+        draw: (cx, cy, d) => { const r = d / 2 - SW.heavy / 2; return `<path d="M${n2(cx)} ${n2(cy - r)}L${n2(cx + r * 0.8)} ${n2(cy)}L${n2(cx)} ${n2(cy + r)}L${n2(cx - r * 0.8)} ${n2(cy)}Z" ${OUT()}/>`; },
+    },
     // The in-house line art of the K mock-up (design/mockups/pages/05), on a 24-unit grid:
     // 1.5 pt outline, 0.75 pt interior detail, no fill, no faces (RP-20).
     ball: {

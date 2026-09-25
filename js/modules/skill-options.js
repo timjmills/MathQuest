@@ -2674,14 +2674,15 @@ Object.assign(SKILL_OPTIONS, P12_OPTIONS);
 //   blocks    base-10 blocks: a ten rod and unit cubes                   RP-30
 // It is an APPEARANCE control (group 'layout'): it never changes the numbers dealt, only what the
 // numbers are drawn with. Each skill offers only the kinds its picture can carry, its own default
-// first, marked "(default)". The generator writes the choice into the item (q.cell.payload for the
-// kit cells, the K-2 cell's own drawing for the skills still drawn by gen-counting.js), so paper,
-// key and screen draw the same picture. The default reproduces today's items exactly.
+// first, marked "(default)". The generator writes the choice into q.cell.payload and a sheet-kit
+// template draws it (every skill with this control is a kit cell since round 2), so paper, key and
+// screen draw the same picture. The default reproduces today's items exactly (add_5_pictures,
+// tens_foundation_visual, classify_count and teen_compose moved to the kit in round 2: their
+// defaults draw the same content as before, in kit form).
 //
 // Skills that keep ONE form (the drawing is the lesson): make_ten and ten_frame_build(_teen) (the
 // ten frame is what is taught and counted), hundreds_chart_fill / number_chart_fill (the chart),
-// base10_* (the blocks), number_bonds (the bond diagram), count_sequence and number_seq_fill (a
-// number path), compare_objects (its "What is compared" already picks lines, towers or bars).
+// base10_* (the blocks), count_sequence and number_seq_fill (a number path), compare_objects (its "What is compared" already picks lines, towers or bars).
 const K2_OBJECT_LABELS = Object.freeze({
     shapes: 'Plain shapes (circles, squares, triangles, stars)',
     pictures: 'Pictures (balls, apples, fish)',
@@ -2740,6 +2741,29 @@ _ap1Put('composing:teen_compose', k2ObjectsOption(['frame', 'blocks'], 'frame', 
     help: 'How the ten and the ones are drawn. The number sentence under the picture stays the same.',
     appliesTo: _ap1HasPicture,
 }), 1);
+// add_5_pictures (round 2, now the kit's counters cell): the two groups drawn as plain shapes,
+// pictures, one five frame (the first group solid, the second hollow) or two dice. Hidden with
+// Pictures off (the number sentence alone).
+_ap1Put('addition:add_5_pictures', k2ObjectsOption(['shapes', 'pictures', 'frame', 'dice'], 'shapes', {
+    labels: { shapes: 'Plain shapes (circles, squares, triangles, stars, diamonds)', pictures: 'Pictures (balls, apples, fish, flowers)',
+        frame: 'Counters in a five frame (one group solid, one hollow)', dice: 'Two dice' },
+    help: 'What the two groups are drawn with. The sum and the sentence under the picture stay the same.',
+    appliesTo: (o) => o.pictures !== false,
+}));
+// tens_foundation_visual (round 2, now the kit's counters cell): the tens as rods (base-10
+// blocks) or as full ten frames, each with its rule ("One rod is one ten." / "One full frame
+// is one ten."). Both are a ten the pupil counts as one; the count of tens is the same.
+_ap1Put('composing:tens_foundation_visual', k2ObjectsOption(['blocks', 'frame'], 'blocks', {
+    labels: { blocks: 'Rods of ten (base-10 blocks)', frame: 'Full ten frames' },
+    help: 'What one ten is drawn as. The pupil counts the tens either way.',
+}));
+// number_bonds: the bond drawn with the whole on top (RP-60, the default) or with the whole at
+// the side, the two parts stacked to its right. Same boxes, same missing box.
+_ap1Put('composing:number_bonds', {
+    id: 'orientation', label: 'How the bond is drawn', type: 'enum', default: 'vertical', group: 'layout',
+    values: [{ v: 'vertical', l: 'Whole on top, parts below (default)' }, { v: 'horizontal', l: 'Whole at the side, parts stacked' }],
+    help: 'One way for the whole page. Seeing both ways shows the whole is the whole wherever it sits.',
+});
 
 // hundreds_chart_fill (owner, 2026-09-25): "Numbers to" 10, 20, 30, 40, 50 and 100. Each chart
 // is the first N numbers in rows of ten; the window is cut from inside it (1 to 10 is its one
