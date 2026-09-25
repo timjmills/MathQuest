@@ -8,10 +8,10 @@
 //                                solid fill over 7 mm (INK-5). No count label (RP-1).
 //   takeaway  sub_5_pictures     n outline objects in one row, the first m crossed out with a bold
 //                                X, and the sentence `n − m = [ ]` under them.
-//   share     share_into_groups  n solid 5 mm counters in a LOOSE array at an 11 mm pitch (6 mm
-//                                between counters), so a pupil can ring groups of 3 to 8 with a
-//                                pencil without two rings meeting (RUBRIC H12); the columns are
-//                                chosen so a row is not a group. Under it `[ ] groups of d`.
+//   share     share_into_groups  n solid 5 mm counters in RUNS of the group size (4 mm between
+//                                two counters of a run, 9 mm between runs, 7 mm between lines),
+//                                so a pupil rings each run as one loop without two rings meeting
+//                                (RUBRIC H12). Under it `[ ] groups of d`.
 //
 // Key (AK-1): the same cell with the answer written in its box; Error analysis writes the wrong
 // value there instead (state `wrong`).
@@ -21,7 +21,7 @@
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import {
-    L, P, svg, root, box, slotValue, shapeOf, dot, cross, digitPt, textPt, squareMm, inlineBoxMm,
+    L, P, svg, root, box, slotValue, shapeOf, dot, cross, digitPt, textPt, squareMm, inlineBoxMm, groupRuns,
 } from './k2kit.js';
 
 const MINUS = '−';
@@ -59,14 +59,17 @@ export function shareColumns(n, size) {
     const pick = options.find((c) => Math.ceil(n / c) <= 4) || options[0] || 7;
     return pick;
 }
+/**
+ * The counters in RUNS of the group size (k2kit `groupRuns`, RUBRIC H12): one run is one group
+ * to ring, 4 mm between two counters of a run, 9 mm between two runs, 7 mm between lines. The
+ * 2026-09-25 regrade: in rows of 7, groups of 3 / 4 / 6 / 8 straddled two rows and could not be
+ * ringed as one loop.
+ */
 function sharePicture(ctx, n, size) {
-    const d = 5, pitch = 11;
-    const cols = Math.min(n, shareColumns(n, size));
-    const rows = Math.ceil(n / cols);
-    const w = (cols - 1) * pitch + d + 8, h = (rows - 1) * pitch + d + 8;
-    let body = '';
-    for (let i = 0; i < n; i++) body += dot(4 + d / 2 + (i % cols) * pitch, 4 + d / 2 + Math.floor(i / cols) * pitch, d);
-    return svg(ctx, w, h, body, { label: `${n} counters` });
+    const d = 5;
+    const lay = groupRuns(n, size, { d, gap: 4, runGap: 9, rowGap: 7, pad: 1 });
+    const body = lay.pts.map((c) => dot(c.cx, c.cy, d)).join('');
+    return svg(ctx, lay.w, lay.h, body, { label: `${n} counters` });
 }
 
 const eqSpan = (ctx, s) => `<span style="font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;">${esc(s)}</span>`;

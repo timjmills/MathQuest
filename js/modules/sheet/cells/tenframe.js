@@ -40,8 +40,11 @@ export function frameHTML(ctx, { frames = 1, filled = 0 } = {}) {
     const color = ink === 'trace' ? GREY : INK;
     const td = (on) => `<td style="box-sizing:border-box;width:${L(ctx, c)};height:${L(ctx, c)};padding:0;`
         + `border:${B(ctx, 0.75)} solid ${INK};text-align:center;vertical-align:middle;">`
-        + (on ? `<svg viewBox="0 0 10 10" aria-hidden="true" style="display:block;margin:auto;width:${L(ctx, c * 0.6)};height:${L(ctx, c * 0.6)};">`
-            + `<circle cx="5" cy="5" r="5" fill="${color}"/></svg>` : '')
+        // The counter is 0.6 of the cell, drawn inside its SVG box with a margin (r 4.7 of 5)
+        // and overflow visible: a circle that touched its viewport edge printed with flat
+        // bottoms in the second row (2026-09-25 regrade: "the key clips the counters").
+        + (on ? `<svg viewBox="0 0 10 10" aria-hidden="true" style="display:block;margin:auto;overflow:visible;width:${L(ctx, c * 0.64)};height:${L(ctx, c * 0.64)};">`
+            + `<circle cx="5" cy="5" r="4.7" fill="${color}"/></svg>` : '')
         + `</td>`;
     let out = '';
     for (let f = 0; f < frames; f++) {

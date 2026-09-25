@@ -3,7 +3,7 @@
 //
 //   `arrays`     an array of dots, or ringed equal groups, with "[ ] rows of [ ]. [ ] in all."
 //                (or "[ ] groups of [ ]. [ ] in all.", or "[ ] in all."), one clause per line
-//   `remainder`  loose counters to ring in groups, with "19 ÷ 3 = [ ] R [ ]"
+//   `remainder`  counters in runs of the divisor to ring, with "19 ÷ 3 = [ ] R [ ]"
 //
 // Counters are solid dots (arrays) or open circles (remainder) of at least 4 mm (RP-3: a pupil
 // counts them by touching each one), on a fixed pitch, so 40 of them are still countable and
@@ -21,6 +21,7 @@
 import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, box, esc, splitList, splitRemainder, HAIR } from './ops-common.js';
 import { INK } from '../tokens.js';
+import { groupRuns } from './k2kit.js';
 
 /* ------------------------------------------------------------------ shared drawing */
 
@@ -186,20 +187,14 @@ register('arrays', {
 /* ---------------------------------------------------------------------- remainder */
 
 function remainderCounters(g, p) {
-    const d = DOT[g.size], r = d / 2;
-    const inRow = d + 2.5;                               // centre pitch inside a row
-    const rowGap = 7;                                    // >= 6 mm between rows (H12)
-    const dv = Number(p.divisor), n = Number(p.dividend);
-    // A row is a whole number of groups (at most 12 counters), so a ring never wraps a row end.
-    const perRow = dv * Math.max(1, Math.floor(12 / dv));
-    const rows = Math.ceil(n / perRow);
-    const W = perRow * inRow + 1, H = rows * (d + rowGap) - rowGap + 2;
-    let body = '';
-    for (let i = 0; i < n; i++) {
-        const c = i % perRow, rr = Math.floor(i / perRow);
-        body += dot(0.5 + r + c * inRow, 1 + r + rr * (d + rowGap), r, true);
-    }
-    return { svg: svgMm(g, W, H, body, `${n} counters`), wMm: W };
+    const d = Math.min(DOT[g.size], 5), r = d / 2;       // >= 4 mm (RP-3), 5 mm at most
+    // RUNS of the divisor (k2kit `groupRuns`, RUBRIC H12): one run is one group to ring, 4 mm
+    // between two counters of a run, 9 mm between runs, 7 mm between lines; the last, shorter
+    // run is the remainder. (The 2026-09-25 regrade: rows of 12 at a 2.5 mm gap let a group of
+    // 5 wrap a row end, so it could not be ringed.)
+    const lay = groupRuns(Number(p.dividend), Number(p.divisor), { d, gap: 4, runGap: 9, rowGap: 7, pad: 0.5 });
+    const body = lay.pts.map((c) => dot(c.cx, c.cy, r, true)).join('');
+    return { svg: svgMm(g, lay.w, lay.h, body, `${p.dividend} counters`), wMm: lay.w };
 }
 
 const remKey = (p) => {

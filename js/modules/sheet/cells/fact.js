@@ -12,7 +12,7 @@ import {
     FACT_AUTO_COLS, EM_MM, SIZES, blankWidth,
 } from '../tokens.js';
 import { blank } from '../cell.js';
-import { register } from '../registry.js';
+import { register, getCell } from '../registry.js';
 
 export { FACT_LADDER, factTab, factDigitPt, factCellHMm, FACT_AUTO_COLS };
 
@@ -136,8 +136,29 @@ const compute = (p) => {
     }
 };
 
+/* --------------------------------------------------- basic addition with regrouping */
+
+/**
+ * VA-10 (2026-09-25 regrade): basic `add` reaches regrouped sums (19 + 19 = 38), and a sum that
+ * regroups needs its carry box. An addition fact whose band has a 3-digit answer track (the
+ * `add` band, `digits` >= 3), or whose payload says `regroup: 'add'`, is drawn as the column
+ * STACK with its regroup strip on a practice page (4 columns or fewer): a carry box over every
+ * column but the ones, on every item, so the boxes reveal nothing (VA-10). A fact-rows page
+ * (5 or more columns) is a fact drill and keeps the fact; `regroup: false` keeps it everywhere;
+ * the screen twin keeps its own column form. Addition facts within 20 (`digits` 2) are facts.
+ */
+const wantsStack = (p) => !isAcross(p) && (p.op === '+')
+    && (p.regroup === 'add' || p.regroup === true || (p.regroup === undefined && Number(p.digits) >= 3));
+const drawsStack = (p, ctx) => wantsStack(p) && !(ctx && ctx.mode === 'screen')
+    && explicitCols(p, ctx) > 0 && explicitCols(p, ctx) <= ACROSS_MAX_COLS;
+const stackPayload = (p) => ({
+    operands: [Number(p.a), Number(p.b)], op: '+', regroup: 'add',
+    ansDigits: factDigitTracks(p.a, p.b, p.digits || String(compute(p) ?? '').length),
+});
+
 register('fact', {
     render(p, ctx) {
+        if (drawsStack(p, ctx)) return getCell('stack').render(stackPayload(p), ctx);
         const value = p.ans !== undefined ? p.ans : compute(p);
         const cols = columnsOf(p, ctx);
         const pt = p.pt || factDigitPt(cols);
@@ -194,13 +215,18 @@ register('fact', {
         const cells = [...text.padStart(w, ' ')].map((ch) => `<span style="text-align:center">${ch === ' ' ? '' : ch}</span>`).join('');
         return item.html.replace('<span class="rule"></span>',
             `<span class="rule"></span><span class="${cls}" data-ws-slot="ans" data-ws-shape="open"${ink ? ` data-ws-ink="${ink}"` : ''} `
-            + `style="grid-column:${w > n ? 1 : 2} / -1;font-weight:${ink === 'solid' ? 700 : 400};display:grid;grid-template-columns:repeat(${w}, ${FACT_TRACK_EM}em);justify-content:end;height:1.15em;line-height:1.15">${cells}</span>`);
+            + `style="grid-column:${w > n ? 1 : 2} / -1;font-weight:${ink === 'solid' ? 700 : 400};font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;display:grid;grid-template-columns:repeat(${w}, ${FACT_TRACK_EM}em);justify-content:end;height:1.15em;line-height:1.15">${cells}</span>`);
     },
     answerKey(p) {
         const value = p.ans !== undefined ? p.ans : compute(p);
-        return { value, display: String(value), slots: { ans: { value: String(value), graded: true } } };
+        const slots = { ans: { value: String(value), graded: true } };
+        // A fact that may be drawn as a stack (above) keys the stack's slots too: `answerKey` has
+        // no ctx, so it cannot know which of the two drawings a page chose.
+        if (wantsStack(p)) Object.assign(slots, getCell('stack').answerKey(stackPayload(p)).slots);
+        return { value, display: String(value), slots };
     },
     footprint(p, ctx) {
+        if (drawsStack(p, ctx)) return getCell('stack').footprint(stackPayload(p), ctx);
         const cols = columnsOf(p, ctx);
         const n = factDigitTracks(p.a, p.b, p.digits || String(compute(p) ?? '').length);
         const vertW = Math.ceil(factWidthMm(cols, n, p.b) + 4);
@@ -231,6 +257,7 @@ register('fact', {
         };
     },
     inputs(p, ctx) {
+        if (drawsStack(p, ctx)) return getCell('stack').inputs(stackPayload(p), ctx);
         // SCC-T13: the shape reported is the shape `render` draws for the same arguments. The
         // vertical fact's zone is open on paper and a digit box on screen.
         const horiz = drawsAcross(p, ctx);
@@ -243,6 +270,7 @@ register('fact', {
     layout() { return { card: 'card-simple', checker: 'value' }; },
     /** The cell class and custom properties a fact cell carries (TY-30 ladder, CL-30 tab clearance). */
     gridItem(p, ctx) {
+        if (drawsStack(p, ctx)) return { cls: '', style: '' };
         const cols = columnsOf(p, ctx);
         const pt = p.pt || factDigitPt(cols);
         return { cls: 'fact', style: `--fd:${pt}pt;--fp:${p.padTop !== undefined ? p.padTop : factPadTop(ctx.label && ctx.label.style, cols)}mm` };

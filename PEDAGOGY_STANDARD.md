@@ -1203,6 +1203,7 @@ word. New strings may be added only by adding a key here.
 | `mixed-sign` | Add or subtract. Look at the _sign_. | mixed + and - |
 | `mixed-ops` | Look at the _sign_. Solve. | any mixed operations |
 | `missing` | Write the missing number. | unknowns |
+| `missing-many` | Write the missing numbers. | several unknowns in one picture (a hundreds-chart window) |
 | `trace-say` | Trace the answer. Say the steps. | Model cells |
 | `say-write` | Say the fact. Then write the answer. | fact warm-ups |
 | `rewrite-solve` | Write the problem in the grid. Then solve. | horizontal to vertical |
@@ -1265,7 +1266,7 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `check-groups` | Look at the groups. Check one box. | compare two groups: more, fewer, same |
 | `how-many-left` | Write how many are left. | take away with crossed-out pictures |
 | `ring-remainder` | Circle groups of {n}. Write how many groups and how many left. | division with a remainder, pictured |
-| `pick-parts` | Circle one number in each list to make the sum. | find two addends from lists |
+| `pick-parts` | Write one number from each list to make the sum. | find two addends from lists |
 | `fact-family` | Use the three numbers. Fill in the fact family. | addition and subtraction fact families |
 | `chart-fill` | Fill in the missing products. | multiplication chart |
 | `groups-total` | Write the groups, the number in each, and the total. | arrays and equal groups |

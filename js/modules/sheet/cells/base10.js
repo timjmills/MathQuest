@@ -46,10 +46,10 @@ function symbol(ctx, place, color) {
             + `<line x1="0.5" y1="${sw}" x2="0.5" y2="${n2(STICK_MM - SW.heavy)}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/></svg>`;
     }
     if (place === 100) {
-        return `<svg viewBox="0 0 9 9" aria-hidden="true" data-k2-sym="100" style="display:block;width:${L(ctx, 9)};height:${L(ctx, 9)};">`
+        return `<svg viewBox="0 0 9 9" aria-hidden="true" data-k2-sym="100" style="display:block;overflow:visible;width:${L(ctx, 9)};height:${L(ctx, 9)};">`
             + `<rect x="${sw / 2}" y="${sw / 2}" width="${n2(9 - SW.heavy)}" height="${n2(9 - SW.heavy)}" fill="none" stroke="${color}" stroke-width="${sw}"/></svg>`;
     }
-    return `<svg viewBox="0 0 4 4" aria-hidden="true" data-k2-sym="1" style="display:block;width:${L(ctx, 4)};height:${L(ctx, 4)};">`
+    return `<svg viewBox="0 0 4 4" aria-hidden="true" data-k2-sym="1" style="display:block;overflow:visible;width:${L(ctx, 4)};height:${L(ctx, 4)};">`
         + `<circle cx="2" cy="2" r="${n2(2 - SW.heavy / 2)}" fill="none" stroke="${color}" stroke-width="${sw}"/></svg>`;
 }
 
@@ -64,9 +64,12 @@ function legendSym(ctx, place) {
 function zoneContent(ctx, place, n, color) {
     if (!n) return '';
     const syms = Array.from({ length: n }, () => symbol(ctx, place, color)).join('');
-    // Sticks stand in one row; dots sit in rows of five (ten-frame order).
+    // Sticks stand in ONE row inside the zone (nine 1 mm sticks and their gaps are 25 mm of the
+    // 38-40 mm zone: never wrapped into a second row that pokes over the heads, 2026-09-25
+    // regrade); dots sit in rows of five (ten-frame order); hundreds wrap in rows of three.
     const wrap = place === 1 ? `display:grid;grid-template-columns:repeat(5, ${L(ctx, 4)});gap:${L(ctx, 2.5)};`
-        : `display:flex;flex-wrap:wrap;gap:${L(ctx, 2)};`;
+        : place === 10 ? `display:flex;flex-wrap:nowrap;gap:${L(ctx, 2)};`
+            : `display:grid;grid-template-columns:repeat(3, ${L(ctx, 9)});gap:${L(ctx, 1.5)};`;
     return `<div style="${wrap}justify-content:center;align-content:center;padding:${L(ctx, 3)};">${syms}</div>`;
 }
 

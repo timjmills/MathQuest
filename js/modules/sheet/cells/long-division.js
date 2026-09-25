@@ -11,10 +11,12 @@
 //           0
 //
 // Digits are Andika at the preset's digit size (TY-1, TY-10) and sit on the SAME tracks in every
-// row, so a quotient digit stands exactly over the dividend digit it belongs to. Four work rows
-// are always drawn (enough for a two-digit quotient), so the row count never tells the pupil how
-// many steps the item takes (RP-1, L-LEAK). The key writes the quotient into its boxes AND the
-// finished work into the work rows (AK-1: the key is the page, finished).
+// row, so a quotient digit stands exactly over the dividend digit it belongs to. The work rows
+// are a DIGIT GRID on the dividend's tracks (a 0.75 pt grey cell on every track, the scaffold
+// that keeps each bring-down in its column) and there are exactly two per step of the algorithm
+// (product, then difference and bring-down): 152 ÷ 19 is one step and draws two rows, never a
+// spare "−" row left empty on the key (2026-09-25 regrade). The key writes the quotient into its
+// boxes AND the finished work into the work rows (AK-1: the key is the page, finished).
 //
 // Payload: { dividend, divisor, quotient?, remainder?, workRows? }
 //
@@ -24,7 +26,8 @@ import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, inked, box, esc, HAIR, HEAVY } from './ops-common.js';
 import { INK, stripPos } from '../tokens.js';
 
-const DEFAULT_WORK_ROWS = 4;
+/** Work rows: the payload's count, else two per step of the algorithm (at least two). */
+const rowsOf = (p) => (Number(p.workRows) > 0 ? Number(p.workRows) : Math.max(2, 2 * divisionSteps(p.dividend, p.divisor).length));
 
 /** The steps of the standard algorithm: where each quotient digit sits and what is written. */
 export function divisionSteps(dividend, divisor) {
@@ -86,7 +89,7 @@ register('division', {
         const g = geo(ctx);
         const D = String(p.dividend), V = String(p.divisor);
         const n = D.length, dv = V.length;
-        const rows = p.workRows || DEFAULT_WORK_ROWS;
+        const rows = rowsOf(p);
         const trackMm = Math.max(ctx.metrics.trackMm || 0, g.writeMm * 0.8);
         const gutterMm = trackMm * 1.1;
         const k = keyOf(p);
@@ -130,8 +133,12 @@ register('division', {
             html += cell(subtract ? `<span style="font-weight:700">−</span>` : '', dv + 1, gridRow, `height:${rowH};`);
             for (let i = 0; i < n; i++) {
                 const ch = t[i] && t[i] !== ' ' ? t[i] : '';
-                html += cell(ch ? inked(ch, ink) : '', dv + 2 + i, gridRow,
-                    `height:${rowH};${subtract ? `border-bottom:${HAIR} solid ${INK.ink};` : ''}`);
+                // The digit grid: a grey cell wall on every track boundary, a grey floor under a
+                // difference row, the black subtraction rule under a product row (VA-63).
+                const grid = `border-left:${HAIR} solid ${INK.grey};${i === n - 1 ? `border-right:${HAIR} solid ${INK.grey};` : ''}`
+                    + (r === 0 ? `border-top:${HAIR} solid ${INK.grey};` : '')
+                    + `border-bottom:${HAIR} solid ${subtract ? INK.ink : INK.grey};`;
+                html += cell(ch ? inked(ch, ink) : '', dv + 2 + i, gridRow, `box-sizing:border-box;height:${rowH};${grid}`);
             }
         }
         const label = `${D} divided by ${V}`;
@@ -150,7 +157,7 @@ register('division', {
         const g = geo(ctx);
         const n = String(p.dividend).length, dv = String(p.divisor).length;
         const trackMm = Math.max(ctx.metrics.trackMm || 0, g.writeMm * 0.8);
-        const rows = p.workRows || DEFAULT_WORK_ROWS;
+        const rows = rowsOf(p);
         return {
             wMm: Math.ceil((n + dv + 1.1) * trackMm + 8),
             hMm: Math.ceil(g.stripMm + g.E * 1.3 + rows * (Math.max(g.writeMm, 6) + 1) + 6),
