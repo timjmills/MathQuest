@@ -77,11 +77,14 @@ function _shapePoints(shape, unit) {
             ].map(p => p.map(v => v.toFixed(2)).join(',')).join(' ');
         }
         case 'trapezoid': {
-            // Isosceles trapezoid (red pattern block) — 3 unit edges + 1 unit*2 top? Actually pattern-block trapezoid: half-hexagon — bottom = 2u, top = u, height = u*sqrt(3)/2 * something. Simpler: top=2u, bottom=4u, height=2u
+            // The pattern-block trapezoid: HALF of the hexagon block (side 2u). Top 2u, bottom 4u,
+            // legs 2u, height sqrt(3)u, centred on its bounding box. (It was top 2u, bottom 4u,
+            // height 2u: legs of 2.24u, which cannot fill a hexagon - geometry fix 2026-09-25.)
             const u = unit;
+            const h = u * Math.sqrt(3);
             return [
-                [-u, -u], [u, -u], [2 * u, u], [-2 * u, u]
-            ].map(p => p.join(',')).join(' ');
+                [-u, -h / 2], [u, -h / 2], [2 * u, h / 2], [-2 * u, h / 2]
+            ].map(p => p.map(v => +v.toFixed(3)).join(',')).join(' ');
         }
         case 'hexagon': {
             const r = unit * 2;
@@ -96,6 +99,21 @@ function _shapePoints(shape, unit) {
             return '0,0';
     }
 }
+
+/** A block's corners, relative to its snap origin, before its rotation: [[x, y], ...]. */
+export function blockPoints(shape, unit) {
+    return _shapePoints(shape, unit).split(' ').map(p => p.split(',').map(Number));
+}
+
+// The empty place of a block (owner bug 2026-09-25, "answer drawn"): drawing every empty place
+// as a dashed outline drew the answer - how the shape is filled. An empty place is invisible but
+// still a tap and drop target; `q.showSlots` draws the dashed outlines as a hint.
+function _emptySlotAttrs(q) {
+    return q && q.showSlots
+        ? { fill: 'rgba(0,0,0,0.04)', stroke: '#90a4ae', 'stroke-width': '1.5', 'stroke-dasharray': '6,4' }
+        : { fill: 'rgba(0,0,0,0)', stroke: 'none' };
+}
+const _attrText = (o) => Object.entries(o).map(([k, v]) => `${k}="${v}"`).join(' ');
 
 // Render a single pattern block as an inline-SVG button (palette tile).
 function _paletteTileSvg(shape, id, n, unit) {
@@ -145,8 +163,8 @@ export function renderComposeShapeBlocks(q, container) {
         .replace(/^[\s\S]*?<svg[^>]*>/i, '')
         .replace(/<\/svg>\s*$/i, '');
 
-    // Render snap-points as faint dashed shape outlines in the same shape
-    // they accept — gives the student a visual hint of what fits where.
+    // Snap-points: invisible tap / drop targets, or faint dashed outlines when q.showSlots asks
+    // for the hint (see _emptySlotAttrs).
     const snapHtml = snapPoints.map(sp => {
         const style = _BLOCK_STYLE[sp.shape] || _BLOCK_STYLE.square;
         const pts = _shapePoints(sp.shape, unit);
@@ -157,15 +175,14 @@ export function renderComposeShapeBlocks(q, container) {
                    tabindex="0" role="button"
                    aria-label="${style.label} slot, empty">
             <polygon class="csb-snap-outline" points="${pts}"
-                fill="rgba(0,0,0,0.04)" stroke="#90a4ae" stroke-width="1.5"
-                stroke-dasharray="6,4" stroke-linejoin="round"/>
+                ${_attrText(_emptySlotAttrs(q))} stroke-linejoin="round"/>
         </g>`;
     }).join('');
 
     container.innerHTML = `
         <div class="csb-host" role="application" aria-label="Compose shape by dragging blocks into target">
             <div class="csb-prompt">${_esc(q.text || '')}</div>
-            <div class="csb-hint">Drag pattern blocks into the dashed slots, or click a block then click a slot.</div>
+            <div class="csb-hint">${q.showSlots ? 'Drag the blocks into the dashed places. Or tap a block, then tap a place.' : 'Drag the blocks into the shape to fill it. Or tap a block, then tap the shape.'}</div>
 
             <div class="csb-stage">
                 <svg class="csb-target-svg" viewBox="${_esc(viewBox)}"
@@ -315,10 +332,7 @@ export function renderComposeShapeBlocks(q, container) {
             const outlinePoly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
             outlinePoly.setAttribute('class', 'csb-snap-outline');
             outlinePoly.setAttribute('points', pts);
-            outlinePoly.setAttribute('fill', 'rgba(0,0,0,0.04)');
-            outlinePoly.setAttribute('stroke', '#90a4ae');
-            outlinePoly.setAttribute('stroke-width', '1.5');
-            outlinePoly.setAttribute('stroke-dasharray', '6,4');
+            for (const [k, v] of Object.entries(_emptySlotAttrs(q))) outlinePoly.setAttribute(k, v);
             outlinePoly.setAttribute('stroke-linejoin', 'round');
             g.appendChild(outlinePoly);
             g.setAttribute('aria-label', `${style.label} slot, empty`);

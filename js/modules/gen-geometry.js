@@ -1218,22 +1218,20 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
             // points on a target outline. Many valid solutions can exist for
             // compose_hexagon (the generator picks ONE plan per question).
             if (mappedSkill === "compose_hexagon") {
-                // Pattern-block "unit" — must match the widget's default (28px).
+                // Pattern-block "unit" - must match the widget's default (28px): every block side is
+                // 2 units (widgets/compose-shape-blocks.js blockPoints).
+                // Owner bug 2026-09-25 (geometry): the hexagon was POINTY-topped while the two
+                // trapezoid places were cut straight across (a pointy hexagon cut across makes two
+                // pentagons), the trapezoid block was 2 units tall (legs 2.24, not 2), and the rhombus
+                // places were turned 60 degrees wrong. Now: a FLAT-topped hexagon of side 2u, and every
+                // place is computed from its vertices V_k (tests/scripts/ws-compose-unit.cjs proves the
+                // placed blocks tile the outline exactly).
                 const unit = 28;
-                // Hexagon is centered at (170, 110); side = unit*2 (matches block geometry).
-                // We pre-build three valid plans and pick one per question.
-                // Plan A: 6 equilateral triangles (apex meets center)
-                // Plan B: 3 blue rhombi (60°/120°)
-                // Plan C: 2 red trapezoids (top + bottom)
                 const cx = 170, cy = 110;
-                const r = unit * 2;
-
-                // Build the hexagon outline.
-                const hexPts = [];
-                for (let i = 0; i < 6; i++) {
-                    const ang = Math.PI / 3 * i - Math.PI / 2;
-                    hexPts.push(`${(cx + r * Math.cos(ang)).toFixed(2)},${(cy + r * Math.sin(ang)).toFixed(2)}`);
-                }
+                const side = unit * 2;                    // hexagon side = block side
+                const trapH = unit * Math.sqrt(3);        // trapezoid height (half the hexagon)
+                const V = (k) => [cx + side * Math.cos(Math.PI / 3 * k), cy + side * Math.sin(Math.PI / 3 * k)];
+                const hexPts = [0, 1, 2, 3, 4, 5].map(k => V(k).map(v => v.toFixed(2)).join(','));
                 const targetSvg = `<svg viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg">
                     <polygon points="${hexPts.join(' ')}" fill="#fff" stroke="#37474f" stroke-width="3" stroke-linejoin="round"/>
                 </svg>`;
@@ -1241,51 +1239,33 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const plan = pick(['triangles', 'rhombi', 'trapezoids']);
                 let snapPoints = [];
                 let palette = [];
+                const r3 = (v) => +v.toFixed(3);
 
                 if (plan === 'triangles') {
-                    // 6 triangles, each rotated to point outward from center.
-                    // Triangle apex points OUT (to the hexagon vertex); triangle
-                    // base sits along the inner edge that bisects two adjacent
-                    // hex vertices. Centroid of an equilateral triangle is at
-                    // 1/3 of the height from the base; we approximate by
-                    // placing the snap point partway from center toward the
-                    // outer vertex.
-                    for (let i = 0; i < 6; i++) {
-                        const ang = Math.PI / 3 * i - Math.PI / 2 + Math.PI / 6;
-                        const dist = r * 0.55;
-                        snapPoints.push({
-                            id: `t${i}`,
-                            shape: 'triangle',
-                            cx: cx + dist * Math.cos(ang),
-                            cy: cy + dist * Math.sin(ang),
-                            rotation: (i * 60) + 30
-                        });
+                    // Triangle k = centre, V_k, V_k+1: its centroid is (V_k + V_k+1) / 3, side / sqrt(3)
+                    // from the centre along 60k + 30 degrees; the block's apex (up at rotation 0) turns
+                    // to point at the centre: rotation 60k + 300.
+                    for (let k = 0; k < 6; k++) {
+                        const a = (60 * k + 30) * Math.PI / 180, d = side / Math.sqrt(3);
+                        snapPoints.push({ id: `t${k}`, shape: 'triangle', cx: r3(cx + d * Math.cos(a)), cy: r3(cy + d * Math.sin(a)), rotation: (60 * k + 300) % 360 });
                     }
                     palette = [{ shape: 'triangle', count: 6 }];
                 } else if (plan === 'rhombi') {
-                    // 3 rhombi at 60° apart, each centered halfway from center
-                    // to the midpoint of two adjacent hexagon vertices.
+                    // Rhombus i = centre, V_2i, V_2i+1, V_2i+2: its centre is half-way to V_2i+1, and its
+                    // short diagonal (across at rotation 0) points at V_2i+1: rotation 60(2i + 1).
                     for (let i = 0; i < 3; i++) {
-                        const ang = (i * 120) - 90;
-                        const rad = ang * Math.PI / 180;
-                        const dist = r * 0.5;
-                        snapPoints.push({
-                            id: `rh${i}`,
-                            shape: 'rhombus',
-                            cx: cx + dist * Math.cos(rad),
-                            cy: cy + dist * Math.sin(rad),
-                            rotation: ang + 90
-                        });
+                        const deg = 60 * (2 * i + 1), a = deg * Math.PI / 180;
+                        snapPoints.push({ id: `rh${i}`, shape: 'rhombus', cx: r3(cx + (side / 2) * Math.cos(a)), cy: r3(cy + (side / 2) * Math.sin(a)), rotation: deg });
                     }
                     palette = [{ shape: 'rhombus', count: 3 }];
                 } else {
-                    // 2 trapezoids — top half and bottom half of the hexagon.
-                    snapPoints.push({ id: 'tr0', shape: 'trapezoid', cx: cx, cy: cy - unit / 2, rotation: 0 });
-                    snapPoints.push({ id: 'tr1', shape: 'trapezoid', cx: cx, cy: cy + unit / 2, rotation: 180 });
+                    // Two trapezoids: the top half (short side up) and the bottom half (turned 180).
+                    snapPoints.push({ id: 'tr0', shape: 'trapezoid', cx: cx, cy: r3(cy - trapH / 2), rotation: 0 });
+                    snapPoints.push({ id: 'tr1', shape: 'trapezoid', cx: cx, cy: r3(cy + trapH / 2), rotation: 180 });
                     palette = [{ shape: 'trapezoid', count: 2 }];
                 }
 
-                q.text = `Fill the hexagon with pattern blocks. Drag each block into a slot.`;
+                q.text = `Fill the hexagon with the pattern blocks.`;
                 q.answerType = "compose-shape-blocks";
                 q.targetSvg = targetSvg;
                 q.snapPoints = snapPoints;
@@ -1293,7 +1273,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.unit = unit;
                 q.ans = `Hexagon (${plan})`;
                 q.options = [];
-                q.hint = `A hexagon can be made from 6 triangles, 3 rhombi, or 2 trapezoids. Match the slot shape!`;
+                q.hint = `Put a block in a corner of the hexagon first. The blocks must fill it with no gaps and no overlaps.`;
                 q.skillLabel = 'Compose Hexagon';
                 q.printFormat = 'compose-shape-blocks';
                 q.visual = `<div style="text-align:center;font-weight:600;color:#1565c0;">Target: Hexagon</div>`;
@@ -1327,7 +1307,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     }
                 }
 
-                q.text = `Fill the rectangle with unit squares. Drag each square into a slot.`;
+                q.text = `Fill the rectangle with the squares.`;
                 q.answerType = "compose-shape-blocks";
                 q.targetSvg = targetSvg;
                 q.snapPoints = snapPoints;
@@ -4086,7 +4066,9 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     q.text = `Which 3D shape does this net form?`;
                     q.ans = shapeName;
                     q.answerType = "multiple-choice";
-                    q.options = shuffle(["Cube", "Rectangular Prism", "Triangular Prism", "Square Pyramid"]);
+                    // A cube IS a rectangular prism: never offer "Rectangular Prism" as a WRONG name for a cube.
+                    q.options = shuffle(faceLayout === 'cube' ? ["Cube", "Cylinder", "Triangular Prism", "Square Pyramid"]
+                        : ["Cube", "Rectangular Prism", "Triangular Prism", "Square Pyramid"]);
                     if (!q.options.includes(shapeName)) {
                         q.options[q.options.length - 1] = shapeName;
                         q.options = shuffle(q.options);
@@ -4338,8 +4320,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     invalidNets = [
                         // Wrong: row of 6 random size rects (no end caps)
                         [ {kind:'rect',x:0,y:0,w:2,h:1.5}, {kind:'rect',x:2,y:0,w:1,h:1.5}, {kind:'rect',x:3,y:0,w:2,h:1.5}, {kind:'rect',x:5,y:0,w:1,h:1.5}, {kind:'rect',x:6,y:0,w:1,h:1}, {kind:'rect',x:7,y:0,w:1,h:1} ],
-                        // Wrong: 6 squares (would be cube, not rect prism)
-                        [ {kind:'square',x:1,y:0,w:1,h:1}, {kind:'square',x:0,y:1,w:1,h:1}, {kind:'square',x:1,y:1,w:1,h:1}, {kind:'square',x:2,y:1,w:1,h:1}, {kind:'square',x:3,y:1,w:1,h:1}, {kind:'square',x:1,y:2,w:1,h:1} ],
+                        // Wrong: both ends on the top edges (two tops, no bottom). (It was a cube net,
+                        // which folds into a cube - and a cube IS a rectangular prism, so the key
+                        // marked a right net wrong: owner bug class 2026-09-25.)
+                        [ {kind:'rect',x:0,y:1,w:2,h:1.5}, {kind:'rect',x:2,y:1,w:1,h:1.5}, {kind:'rect',x:3,y:1,w:2,h:1.5}, {kind:'rect',x:5,y:1,w:1,h:1.5},
+                          {kind:'rect',x:0,y:0,w:2,h:1}, {kind:'rect',x:3,y:0,w:2,h:1} ],
                         // Wrong: T-layout but with mismatched end-cap dimensions (ends are wrong size)
                         [ {kind:'rect',x:0,y:1,w:2,h:1.5}, {kind:'rect',x:2,y:1,w:1,h:1.5}, {kind:'rect',x:3,y:1,w:2,h:1.5}, {kind:'rect',x:5,y:1,w:1,h:1.5},
                           {kind:'rect',x:0,y:0,w:1,h:1}, {kind:'rect',x:0,y:2.5,w:1,h:1} ],
@@ -4376,24 +4361,28 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     ];
                 } else { // triangular_prism
                     shapeName = 'triangular prism';
+                    // Each triangle's sides equal the rectangles' width (1.5): an equilateral triangle,
+                    // height 1.5 x sqrt(3) / 2. (Its sides were 1.25, so the "valid" net did not close
+                    // into a prism: owner bug class 2026-09-25, geometry not correct.)
+                    const TP_H = 0.75 * Math.sqrt(3);
                     // Valid: 3 rectangles in a row + 2 triangles (one above first rect, one below)
                     validNets = [
                         [ {kind:'rect',x:0,y:1,w:1.5,h:2}, {kind:'rect',x:1.5,y:1,w:1.5,h:2}, {kind:'rect',x:3,y:1,w:1.5,h:2},
-                          {kind:'tri',pts:[[0,1],[1.5,1],[0.75,0]]},
-                          {kind:'tri',pts:[[0,3],[1.5,3],[0.75,4]]} ],
+                          {kind:'tri',pts:[[0,1],[1.5,1],[0.75,1-TP_H]]},
+                          {kind:'tri',pts:[[0,3],[1.5,3],[0.75,3+TP_H]]} ],
                     ];
                     invalidNets = [
                         // Wrong: 3 rectangles + only 1 triangle
                         [ {kind:'rect',x:0,y:1,w:1.5,h:2}, {kind:'rect',x:1.5,y:1,w:1.5,h:2}, {kind:'rect',x:3,y:1,w:1.5,h:2},
-                          {kind:'tri',pts:[[0,1],[1.5,1],[0.75,0]]} ],
+                          {kind:'tri',pts:[[0,1],[1.5,1],[0.75,1-TP_H]]} ],
                         // Wrong: 4 rectangles + 2 triangles (too many rects)
                         [ {kind:'rect',x:0,y:1,w:1.5,h:2}, {kind:'rect',x:1.5,y:1,w:1.5,h:2}, {kind:'rect',x:3,y:1,w:1.5,h:2}, {kind:'rect',x:4.5,y:1,w:1.5,h:2},
-                          {kind:'tri',pts:[[0,1],[1.5,1],[0.75,0]]},
-                          {kind:'tri',pts:[[0,3],[1.5,3],[0.75,4]]} ],
+                          {kind:'tri',pts:[[0,1],[1.5,1],[0.75,1-TP_H]]},
+                          {kind:'tri',pts:[[0,3],[1.5,3],[0.75,3+TP_H]]} ],
                         // Wrong: 2 rectangles + 2 triangles (too few rects for prism's 3 rect faces)
                         [ {kind:'rect',x:0,y:1,w:1.5,h:2}, {kind:'rect',x:1.5,y:1,w:1.5,h:2},
-                          {kind:'tri',pts:[[0,1],[1.5,1],[0.75,0]]},
-                          {kind:'tri',pts:[[0,3],[1.5,3],[0.75,4]]} ],
+                          {kind:'tri',pts:[[0,1],[1.5,1],[0.75,1-TP_H]]},
+                          {kind:'tri',pts:[[0,3],[1.5,3],[0.75,3+TP_H]]} ],
                     ];
                 }
 
