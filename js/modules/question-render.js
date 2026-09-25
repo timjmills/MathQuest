@@ -1707,7 +1707,8 @@ function _applyCardTwin(q, paper, visualAid, qt) {
         visualAid.dataset.mqNoZoom = '1';
         return;
     }
-    if (/data-mq-model=/.test(String(q.visual || '')) && (q.answerType === 'base10-build' || q.answerType === 'ten-frame-build')) {
+    if (/data-mq-model=/.test(String(q.visual || '')) && (q.answerType === 'base10-build' || q.answerType === 'ten-frame-build'
+        || /data-mq-model="nl-place"/.test(String(q.visual || '')))) {
         // The kit's drawn mat / frame IS the answer: tap to build (regrade H3/H6: the drag
         // widget's rods and counters were under 44 px and drag-only).
         const input = document.getElementById('answerInput');
@@ -1715,6 +1716,12 @@ function _applyCardTwin(q, paper, visualAid, qt) {
         visualAid.style.display = 'block';
         visualAid.dataset.mqNoZoom = '1';
         if (input) { input.value = ''; mountModel(visualAid, input); }
+        // a number put on the line is answered on the line: its typed line under the cell goes
+        // (the input stays, hidden, for Check; O6 AP3 nl-place)
+        if (/data-mq-model="nl-place"/.test(String(q.visual || ''))) {
+            const area = document.getElementById('answerInputArea');
+            if (area) area.style.display = 'none';
+        }
         paper.classList.add('mq-twin', 'mq-model');
         if (qt) { qt.style.cssText = ''; qt.classList.remove('mq-dup'); screenTextLine(qt); }
         return;
@@ -4898,6 +4905,12 @@ function _renderQuestionImpl() {
             mod.renderClockSet(q, host);
             mod.setOnClockSetSubmit((qq, st) => {
                 const correct = mod.checkClockSet(qq, st);
+                // the support ladder (support-ladder.js): a calm step - the hands stay, a support is drawn
+                if (!correct && typeof window.widgetLadderWrong === 'function' && window.widgetLadderWrong(qq, JSON.stringify(st))) {
+                    const h = host.querySelector('.cs-host');
+                    if (h && typeof h._csUnlock === 'function') h._csUnlock();
+                    return;
+                }
 
                 // Visual feedback: flash the clock face.
                 const csHost = host.querySelector('.cs-host');

@@ -294,6 +294,14 @@ export function saveToSessionHistory(win) {
             skillBreakdown[sid] = { a: data.attempted, c: data.correct, t: data.timeMs, l: data.label };
         }
     }
+    // The support ladder: the supports and worked steps shown after wrong answers (small counts).
+    if (state.sessionHelp && typeof state.sessionHelp === 'object') {
+        for (const [sid, h] of Object.entries(state.sessionHelp)) {
+            if (!h || !Object.keys(h).length) continue;
+            if (!skillBreakdown[sid]) skillBreakdown[sid] = { a: 0, c: 0, t: 0, l: sid };
+            skillBreakdown[sid].h = { ...h };
+        }
+    }
 
     state.sessionHistory.unshift({
         date: dateStr,
@@ -313,6 +321,7 @@ export function saveToSessionHistory(win) {
 
     // Reset session skill tracking
     state.currentSessionSkills = {};
+    state.sessionHelp = {};
 
     // Keep only last 100 entries
     if (state.sessionHistory.length > 100) {

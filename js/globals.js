@@ -23,6 +23,7 @@ import { showToast, createBackgroundShapes, loadState, saveState, saveSettings, 
 import { toggleUserRole, setUserRole, loadUserRole, updateUIForRole } from './modules/user-role.js';
 import { showView, goHome, exitGame, saveIncompleteSession, restoreSettingsUI } from './modules/navigation.js';
 import { toggleSettingsPanel, openSettingsPanel, closeSettingsPanel, setTTS, saveSettingsToStorage, loadSettingsFromStorage } from './modules/settings-panel.js';
+import { setHelpAfterWrong, helpMode } from './modules/support-ladder.js';
 import { loadFavorites, saveFavorites, addFavorite, removeFavorite, toggleFavorite, isFavorite, clearFavorites, renderFavorites, updateFavoriteCards } from './modules/favorites.js';
 import { updateNumberSectionVisibility, initDivisorGrid, toggleDivisor, toggleAllDivisors, showDivisibilityRulesChart, updateTimerForRange, renderNumbers, toggleNumber, updateNumberButtonStates, toggleAllNumbers, updateCompactNumberVisibility } from './modules/number-selection.js';
 import { updateCategoryOptions, updateBreadcrumb, updateSkillOptions, initInlineDropdowns, updateCategoryOptionsInline, updateSkillOptionsInline, updateSkillListInline, addSkillFromList, addSkillFromDropdown } from './modules/category-dropdowns.js';
@@ -48,7 +49,7 @@ import { getSetOptions, setSetOptions, clearSetOptions, describeSetOptions, snap
 import { encodeOptionPayload, decodeOptionPayload, optionSuffix } from './modules/skill-option-codec.js';
 import { optionsFor, offeredOptionsFor, describeOptions, packOptions, normalizeOptions } from './modules/skill-options.js';
 import { renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber, updateOrderingUI, setupOrderingDragHandlers, reorderSelectedNumber, checkOrderInputsFilled, checkOrderingAnswer, unifiedOrderTileClick, unifiedOrderInputChange, unifiedOrderBoxClear, setupUnifiedOrderingHandlers, renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer, liveValidateExpanded, checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily, selectNumberLineTick, checkNumberLinePlacement, selectOddEvenNumber, checkOddEvenSelection, wireBoxValidation } from './modules/question-render.js';
-import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkFractionInputAnswer, checkShadePartsAnswer, checkWordProblemAnswer, trackSkillAnswer, skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice, ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode, submitFactorPairs, submitInlineBlanks, submitTchartCells, submitMultChartCells, applyReviewOutcome, isReviewing, _celebrateCorrectAnswer } from './modules/answer-check.js';
+import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkFractionInputAnswer, checkShadePartsAnswer, checkWordProblemAnswer, trackSkillAnswer, skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice, ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode, submitFactorPairs, submitInlineBlanks, submitTchartCells, submitMultChartCells, applyReviewOutcome, isReviewing, _celebrateCorrectAnswer, widgetLadderWrong } from './modules/answer-check.js';
 import { showSolutionPopup, closeSolutionPopup, generateSolutionSteps } from './modules/solution-display.js';
 import { handleTchartDrop, removeFromTchart, hideFactorInBank, returnFactorToBank, validateTchartRow, checkTchartComplete, handleTchartCompletion, showTchartFeedback, resetTchart } from './modules/tchart-factor.js';
 import { showDivisibilityHelp, toggleDivSortNumber, dropDivSortNumber, moveNumberToBox, checkDivisibilitySortComplete, setupWorksheetDivisibilitySort, wsToggleDivSortNumber, wsMoveNumberToBox, wsCheckDivisibilitySortComplete } from './modules/divisibility-sort.js';
@@ -208,7 +209,7 @@ Object.assign(window, {
     showView, goHome, exitGame, saveIncompleteSession, restoreSettingsUI,
 
     // Settings Panel
-    toggleSettingsPanel, openSettingsPanel, closeSettingsPanel, setTTS,
+    toggleSettingsPanel, openSettingsPanel, closeSettingsPanel, setTTS, setHelpAfterWrong, helpMode,
     saveSettingsToStorage, loadSettingsFromStorage,
 
     // Favorites
@@ -297,7 +298,7 @@ Object.assign(window, {
     wireBoxValidation,
 
     // Answer Checking
-    checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkFractionInputAnswer, checkShadePartsAnswer, checkWordProblemAnswer, trackSkillAnswer,
+    checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkFractionInputAnswer, checkShadePartsAnswer, checkWordProblemAnswer, trackSkillAnswer, widgetLadderWrong,
     skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice,
     ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode,
     submitFactorPairs, submitInlineBlanks, submitTchartCells, submitMultChartCells,

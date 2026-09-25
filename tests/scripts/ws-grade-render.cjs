@@ -28,6 +28,7 @@
 //                --roles the legacy print path is skipped unless --legacy-print is also given.
 //                The item count is one page (the role's own capacity) unless --count is given.
 //                --size S|M|L, --look ican|daily and --paper A4|Letter pass through to buildSheet.
+//                --lesson '{"practicePages":1,"mixed":true}' sets the lesson packet's options (role lesson).
 //                Every role buildSheet knows is accepted (SHEET_ROLES in print-sheet.js): the two
 //                practice roles, opener, scripted-model, guided, error-analysis, review, test,
 //                pre-skill-check, word-problems, fact-rows, fact-probe, mixed-practice,
@@ -73,6 +74,8 @@ const ROLE_LOOK = arg('look', 'auto');
 // --anchors off|side|sections  S6 step-by-step anchor problems on the practice roles.
 const ROLE_ANCHORS = arg('anchors', 'off');
 const ROLE_PAPER = arg('paper', 'A4');
+// --lesson '{"practicePages":1,"mixed":true}'  the lesson packet's options (role 'lesson').
+const LESSON = arg('lesson', null) ? JSON.parse(arg('lesson', '{}')) : {};
 const SUPPORTS = arg('supports', null);
 const COVER = arg('cover', null);
 const MIX = arg('mix', null);
@@ -394,13 +397,14 @@ async function renderRole(page, skill, role, dir) {
     const seed = hash(slug(skill) + ':' + role) % 1000000;
     const set = skill.set || [{ categoryId: skill.categoryId, skillId: skill.skillId }];
     const supOpts = (await page.evaluate(supportOptsInPage, { list: set.map((k) => [k.categoryId, k.skillId]), SUPPORTS, COVER: null, MIX: null })).map(withOpts);
-    const built = await page.evaluate(async ({ skill, set, role, seed, count, size, look, paper, anchors, supOpts, COVER, MIX, columns }) => {
+    const built = await page.evaluate(async ({ skill, set, role, seed, count, size, look, paper, anchors, supOpts, COVER, MIX, columns, LESSON }) => {
         try {
             const skills = set.map((k, i) => (supOpts[i] ? Object.assign({}, k, { opts: supOpts[i] }) : k));
             const r = await window.buildSheet({
                 role, sections: [{ skills, count, columns }],
                 size, look, paper, seed, form: 'A', key: true, anchors,
                 coverage: COVER || undefined, mix: MIX || undefined,
+                ...(role === 'lesson' ? LESSON : {}),
             });
             const title = r.title || skill.label;
             return {
@@ -411,7 +415,7 @@ async function renderRole(page, skill, role, dir) {
                 items: r.items.map(it => ({ template: it.template, fclass: it.fclass, text: it.text.slice(0, 80), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans), letter: it.letter, measured: it.measured })),
             };
         } catch (e) { return e && e.unsupported ? { unsupported: e.message } : { error: (e && e.stack) || String(e) }; }
-    }, { skill, set, role, seed, count: ROLE_COUNT, size: ROLE_SIZE, look: ROLE_LOOK, paper: ROLE_PAPER, anchors: ROLE_ANCHORS, supOpts, COVER, MIX, columns: ROLE_COLUMNS });
+    }, { skill, set, role, seed, count: ROLE_COUNT, size: ROLE_SIZE, look: ROLE_LOOK, paper: ROLE_PAPER, anchors: ROLE_ANCHORS, supOpts, COVER, MIX, columns: ROLE_COLUMNS, LESSON });
     if (built.error) return { error: built.error };
     if (built.unsupported) return { unsupported: built.unsupported };
     const pdfP = path.join(dir, `${role}.pdf`);

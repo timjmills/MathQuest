@@ -58,13 +58,14 @@ import * as mixedPractice from './mixed-practice.js';
 import * as trueFalse from './true-false.js';
 import * as reasonIt from './reason-it.js';
 import * as stretch from './stretch.js';
+import * as lesson from './lesson.js';
 
 /** role id -> module. The host (`print-sheet.js` buildSheet) routes every id here. */
 export const ROLE_MODULES = Object.freeze({
     opener, 'scripted-model': scriptedModel, guided, 'error-analysis': errorAnalysis, review, test,
     'pre-skill-check': preSkillCheck, 'word-problems': wordProblems, 'fact-rows': factRows,
     'fact-probe': factProbe, 'mixed-practice': mixedPractice, 'true-false': trueFalse,
-    'reason-it': reasonIt, stretch,
+    'reason-it': reasonIt, stretch, lesson,
 });
 
 /** The names the print screens use for some roles. */

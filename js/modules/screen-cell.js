@@ -603,7 +603,13 @@ function _slotExpectations(q, count, join) {
     if (q.ftCheck) return null;                                    // a rule table has no one answer per box
     let parts;
     if (Array.isArray(q.ans)) parts = q.ans.map(String);
-    else if (join === ':' || join === '.') parts = String(q.ans).split(join);
+    else if (join === ':' || join === '.' || join === '/') parts = String(q.ans).split(join);
+    else if (join === 'mixed') {
+        // a mixed number's three boxes (frac-model.js): whole, numerator, denominator
+        const m = /^\s*(?:(\d+)\s+)?(\d+)\s*\/\s*(\d+)\s*$/.exec(String(q.ans));
+        const w = /^\s*(\d+)\s*$/.exec(String(q.ans));
+        parts = m ? [m[1] || '', m[2], m[3]] : w ? [w[1], '', ''] : null;
+    }
     else if (join === ' h ') { const m = /(\d+)\s*h\s*(\d+)/.exec(String(q.ans)); parts = m ? [m[1], m[2]] : null; }
     else if (join === '') { const d = String(q.ans == null ? '' : q.ans).replace(/[^0-9]/g, ''); parts = d.length === count ? d.split('') : null; }
     else parts = String(q.ans == null ? '' : q.ans).split(/\s*,\s*|\s+R\s+/i);
@@ -844,7 +850,10 @@ export function adoptVisualBlank(cellEl, input) {
     if (circle) {
         input.setAttribute('maxlength', '1');
         input.setAttribute('inputmode', 'text');
-        input.setAttribute('aria-label', 'sign: <, = or >');
+        // a circle that takes other signs (= or ≠, frac-model.js) names them
+        const signs = blank.getAttribute('data-mq-signs');
+        if (signs) input.dataset.mqSigns = signs;
+        input.setAttribute('aria-label', `sign: ${signs ? signs.split(',').join(' or ') : '<, = or >'}`);
     }
     if (box && !blank.classList.contains('mq-kblank')) {
         // The box is positioned by the drawing (a bond's corner boxes are absolutely placed):
@@ -894,7 +903,11 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     // remainder (the drawing says so with `data-mq-join` on an ancestor of the slots).
     const joinEl = slots[0].closest('[data-mq-join]');
     const join = joinEl ? joinEl.getAttribute('data-mq-join') : ', ';
-    const saved = String(input.value || '').split(join.trim() || ',').map((t) => t.trim());
+    // A mixed number (frac-model.js, data-mq-join="mixed"): "1 3/8" from whole, numerator and
+    // denominator, the whole or the fraction left out when its boxes are empty.
+    const mixed = join === 'mixed';
+    const splitMixed = (v) => { const m = /^\s*(?:(\d+)\s+)?(\d*)\s*\/?\s*(\d*)\s*$/.exec(String(v || '')); return m ? [m[1] || '', m[2] || '', m[3] || ''] : []; };
+    const saved = mixed ? splitMixed(input.value) : String(input.value || '').split(join.trim() || ',').map((t) => t.trim());
     const boxes = slots.map((slot, k) => {
         const el = document.createElement('input');
         el.type = 'text';
@@ -912,7 +925,12 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         slot.appendChild(el);
         return el;
     });
-    const compose = () => boxes.map((b) => (b.value || '').trim()).join(join);
+    const compose = () => {
+        const v = boxes.map((b) => (b.value || '').trim());
+        if (!mixed) return v.join(join);
+        const [w, n, d] = v;
+        return `${w}${w && (n || d) ? ' ' : ''}${n || d ? `${n}/${d}` : ''}`;
+    };
     boxes.forEach((b, k) => {
         b.addEventListener('input', () => {
             b.value = _slotChars(b.value, b.dataset.mqKind);
@@ -990,7 +1008,7 @@ export function wireNumberLines(root) {
         wrap.innerHTML = `<div class="mq-nl-scroll" data-mq-scroll><div class="mq-nl-track" role="group" aria-label="${attr(svg.getAttribute('aria-label') || 'number line')}. Tap a number to jump to it.">`
             + '<svg class="mq-nl-arcs" aria-hidden="true" preserveAspectRatio="none"></svg><span class="mq-nl-line" aria-hidden="true"></span>'
             + vals.map((v, i) => `<button type="button" class="mq-nl-tick${i === startIdx ? ' mq-nl-start' : ''}${i === startIdx && given ? ' mq-nl-given' : ''}" data-i="${i}" aria-label="${attr(v)}${i === startIdx ? (given ? ', where the hops land' : ', start') : ''}">`
-                + `<span class="mq-nl-mark" aria-hidden="true"></span><span class="mq-nl-lab">${shown[i] ? esc(v) : ''}</span></button>`).join('')
+                + `<span class="mq-nl-mark" aria-hidden="true"></span><span class="mq-nl-lab">${shown[i] ? esc(String(v).replace(/^-/, '\u2212')) : ''}</span></button>`).join('')
             + '</div></div>'
             + `<div class="mq-nl-tools"><button type="button" class="mq-nl-pan" data-d="-1" aria-label="show smaller numbers">◀</button>`
             + `<button type="button" class="mq-nl-reset">Start again</button>`
@@ -1146,6 +1164,7 @@ export function releaseVisualBlank(input) {
     if (!input || !input.classList.contains('mq-slot--invisual')) return;
     input.classList.remove('mq-slot--invisual', 'mq-slot--svg', 'mq-bsize', 'mq-slot--circle');
     if (input.getAttribute('maxlength') === '1') input.removeAttribute('maxlength');
+    if (input.dataset.mqSigns) delete input.dataset.mqSigns;
     if (input.dataset.mqPrevStyle !== undefined) {
         input.setAttribute('style', input.dataset.mqPrevStyle);
         delete input.dataset.mqPrevStyle;
@@ -1919,6 +1938,10 @@ export function cellInputVerdict(value, q) {
 
 /** Are all the slots of a multi-slot answer filled? */
 export function slotsFilled(value, count) {
+    // A time's two boxes join with ":" (the clock twin's data-mq-join): filled once the hour is in
+    // and the minutes have both digits ("12:" and "12:1" are still being typed).
+    const t = /^\s*(\d*)\s*:\s*(\d*)\s*$/.exec(String(value == null ? '' : value));
+    if (t && count === 2) return !!t[1] && t[2].length >= 2;
     const parts = String(value == null ? '' : value).split(/\s*(?:,|\bR\b)\s*/i).map((s) => s.trim());
     return parts.length >= count && parts.slice(0, count).every(Boolean);
 }
@@ -2444,7 +2467,7 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
 export function signsFor(q) {
     return /^[+\-−×÷*/x]$/.test(String(q && q.ans != null ? q.ans : '').trim()) ? ['+', '−', '×', '÷'] : ['<', '=', '>'];
 }
-const SIGN_NAMES = { '<': 'less than', '>': 'greater than', '=': 'equals', '+': 'plus', '−': 'minus', '×': 'times', '÷': 'divided by' };
+const SIGN_NAMES = { '<': 'less than', '>': 'greater than', '=': 'equals', '≠': 'not equal to', '+': 'plus', '−': 'minus', '×': 'times', '÷': 'divided by' };
 
 export function wireSignCircle(root, input, { onChange = null, signs = null } = {}) {
     if (!root || !input || !input.classList.contains('mq-slot--circle')) return false;
@@ -2453,7 +2476,9 @@ export function wireSignCircle(root, input, { onChange = null, signs = null } = 
     bank.className = 'mq-signbank';
     bank.setAttribute('role', 'group');
     bank.setAttribute('aria-label', 'signs');
-    (signs || ['<', '=', '>']).forEach((sg) => {
+    // the signs: the blank's own (data-mq-signs), else the caller's, else a comparison
+    const list = (input.dataset.mqSigns ? input.dataset.mqSigns.split(',') : null) || signs || ['<', '=', '>'];
+    list.forEach((sg) => {
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'mq-signtile';
@@ -2470,6 +2495,92 @@ export function wireSignCircle(root, input, { onChange = null, signs = null } = 
     });
     const kit = input.closest('.mq-kittwin') || root;
     kit.appendChild(bank);
+    return true;
+}
+
+/** A numeral as the paper writes it: a fraction stacked over its bar (TY-7), a negative with −. */
+function _nlpNumeral(t) {
+    const m = /^(?:(\d+)\s+)?(\d+)\/(\d+)$/.exec(String(t));
+    if (!m) return esc(String(t).replace(/^-/, '−'));
+    return `${m[1] ? `<span class="mq-nlp-w">${esc(m[1])}</span>` : ''}<span class="mq-nlp-frac"><span>${esc(m[2])}</span><span class="mq-nlp-bar" aria-hidden="true"></span><span>${esc(m[3])}</span></span>`;
+}
+
+/**
+ * O6 lane AP3 fixes: "Put the number on the line" (sheet/cells/nl-place.js), the same line on every
+ * screen host. The paper's line becomes a row of tick buttons (44 px each; the row scrolls when the
+ * line is long), its numerals where the paper has them. Tap a number tile (the first unplaced one
+ * is chosen for you), then its tick: a dot and the tile's letter (or number) stand on that tick.
+ * Tap the tick again to take it off. The input holds each tile's tick read back in the tile's own
+ * form, in tile order ("2/8", "1/4, 3/4"), which is what the item's answer is.
+ */
+function _mountNlPlace(el, write, locked) {
+    const n = Number(el.dataset.nlpN);
+    const line = el.querySelector('.nlp-line');
+    if (!(n >= 1) || !line) return false;
+    let labels = {}, vals = {}, chipText = [];
+    try { labels = JSON.parse(el.dataset.nlpLabels || '{}'); vals = JSON.parse(el.dataset.nlpVals || '{}'); chipText = JSON.parse(el.dataset.nlpChiptext || '[]'); } catch (e) { return false; }
+    const fmts = String(el.dataset.nlpFmt || '').split(',');
+    const major = new Set(String(el.dataset.nlpMajor || '').split(',').filter((x) => x !== '').map(Number));
+    const chips = Array.from(el.querySelectorAll('[data-nlp-chip]'));
+    const multi = chips.length > 1;
+    const LET = ['A', 'B', 'C', 'D', 'E'];
+    const wrap = document.createElement('div');
+    wrap.className = 'mq-nlp';
+    let ticks = '';
+    for (let i = 0; i <= n; i++) {
+        const lab = labels[i] !== undefined ? String(labels[i]) : '';
+        ticks += `<button type="button" class="mq-nlp-tick${major.has(i) ? ' mq-nlp-major' : ''}" data-i="${i}" aria-label="${attr(lab ? `tick ${lab}` : `tick ${i} of ${n}`)}">`
+            + `<span class="mq-nlp-pin" aria-hidden="true"></span><span class="mq-nlp-mark" aria-hidden="true"></span><span class="mq-nlp-dot" aria-hidden="true"></span>`
+            + `<span class="mq-nlp-lab">${lab ? _nlpNumeral(lab) : ''}</span></button>`;
+    }
+    wrap.innerHTML = `<div class="mq-nlp-scroll" data-mq-scroll><div class="mq-nlp-track" role="group" style="--mq-nlp-n:${n + 1}" `
+        + `aria-label="number line: tap a number, then its tick"><span class="mq-nlp-axis" aria-hidden="true"></span>${ticks}</div></div>`;
+    line.replaceWith(wrap);
+    const tickEls = Array.from(wrap.querySelectorAll('.mq-nlp-tick'));
+    const placed = chips.map(() => null);
+    let sel = 0;
+    const cue = document.createElement('div');
+    cue.className = 'mq-buildcue';
+    cue.textContent = multi ? 'Tap a number, then tap its tick.' : 'Tap the tick where the number goes.';
+    el.appendChild(cue);
+    const paint = () => {
+        chips.forEach((c, k) => {
+            c.classList.toggle('mq-nlp-sel', k === sel && !locked());
+            c.classList.toggle('mq-nlp-used', placed[k] !== null);
+            c.setAttribute('aria-pressed', k === sel ? 'true' : 'false');
+        });
+        tickEls.forEach((t, i) => {
+            const here = placed.map((v, k) => (v === i ? k : -1)).filter((k) => k >= 0);
+            t.classList.toggle('mq-nlp-on', here.length > 0);
+            t.querySelector('.mq-nlp-pin').innerHTML = here.map((k) => (multi ? LET[k] : _nlpNumeral(chipText[k] || ''))).join(' ');
+        });
+        write(placed.every((v) => v === null) ? '' : placed.map((v, k) => (v === null ? '' : ((vals[fmts[k]] || [])[v] || ''))).join(', '));
+    };
+    const nextFree = () => { const k = placed.findIndex((v) => v === null); return k >= 0 ? k : sel; };
+    chips.forEach((c, k) => {
+        const pickChip = () => { if (locked()) return; sel = k; paint(); };
+        c.addEventListener('click', pickChip);
+        c.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); pickChip(); } });
+    });
+    tickEls.forEach((t, i) => {
+        t.addEventListener('click', () => {
+            if (locked()) return;
+            if (placed[sel] === i) { placed[sel] = null; paint(); return; }     // tap again: take it off
+            const other = placed.findIndex((v, k) => v === i && k !== sel);
+            if (other >= 0 && !multi) placed[other] = null;
+            placed[sel] = i;
+            sel = nextFree();
+            paint();
+        });
+    });
+    // a long line opens on its 0 (the middle of an integer line, the left end of 0 to 3)
+    const sc = wrap.querySelector('.mq-nlp-scroll');
+    const zero = tickEls.find((t) => String(labels[t.dataset.i]) === '0');
+    requestAnimationFrame(() => {
+        if (!sc || sc.scrollWidth <= sc.clientWidth || !zero) return;
+        sc.scrollLeft = Math.max(0, zero.offsetLeft + zero.offsetWidth / 2 - sc.clientWidth / 2);
+    });
+    paint();
     return true;
 }
 
@@ -2577,6 +2688,35 @@ export function mountModel(root, input, { onValue = null } = {}) {
     };
     const locked = () => !!input.disabled;
     const model = el.getAttribute('data-mq-model');
+    if (model === 'nl-place') return _mountNlPlace(el, write, locked);
+    if (model === 'shade') {
+        // O6 lane AP3: a fraction model to shade (sheet/cells/frac-model.js). A tap shades a part
+        // (the one grey), a tap again clears it; the count of shaded parts is the answer.
+        const parts = Array.from(el.querySelectorAll('.shade-target'));
+        const count = () => parts.filter((g) => g.getAttribute('data-shaded') === '1').length;
+        parts.forEach((g, i) => {
+            const fillEl = g.querySelector('[data-fill-color]');
+            g.setAttribute('role', 'button');
+            g.setAttribute('tabindex', '0');
+            g.setAttribute('aria-pressed', 'false');
+            g.setAttribute('aria-label', `part ${i + 1}`);
+            const toggle = () => {
+                if (locked()) return;
+                const on = g.getAttribute('data-shaded') !== '1';
+                g.setAttribute('data-shaded', on ? '1' : '0');
+                g.setAttribute('aria-pressed', on ? 'true' : 'false');
+                if (fillEl) fillEl.setAttribute('fill', on ? (fillEl.getAttribute('data-fill-color') || GREY) : PAPER);
+                write(count());
+            };
+            g.addEventListener('click', toggle);
+            g.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); } });
+        });
+        const cue = document.createElement('div');
+        cue.className = 'mq-buildcue';
+        cue.textContent = 'Tap the parts to shade them.';
+        el.appendChild(cue);
+        return true;
+    }
     if (model === 'ten-frame') {
         const cells = Array.from(el.querySelectorAll('td'));
         const count = () => cells.filter((c) => c.dataset.on === '1').length;

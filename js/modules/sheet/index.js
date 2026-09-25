@@ -12,7 +12,7 @@
 
 /* -------------------------------------------------------------------------- tokens */
 export {
-    INK, STROKE, STROKE_WIDTHS, DASH, HATCH,
+    INK, LESSON_ACCENT, STROKE, STROKE_WIDTHS, DASH, HATCH,
     PAPER, DEFAULT_PAPER, PAGE_CHROME,
     SIZES, SIZE_IDS, DEFAULT_SIZE,
     LOOKS, LOOK_IDS, DEFAULT_LOOK,
@@ -132,9 +132,10 @@ export { gridSlots, shadeList } from './cells/mult-grid.js';
 export { hopSlots, sentenceOf, ONE_TICK_MAX } from './cells/hop-line.js';
 // O6 appearance (lane AP3): the fraction model drawn on paper and screen, and the tick-label rule
 // every number line shares.
-export { fracModelSVG, fracModelSize, fracModelSizedHTML, fracStackHTML, FRAC_MODELS, areaGrid } from './cells/frac-model.js';
+export { fracModelSVG, fracModelSize, fracModelSizedHTML, fracModelGeom, fracStackHTML, fracTwin, FRAC_MODELS, areaGrid } from './cells/frac-model.js';
 export { tickLabelSet, TICK_LABEL_VALUES } from './cells/line-labels.js';
 export { valueLineSVG, valueLineSizedHTML, valueLineWindow } from './cells/value-line.js';
+export { nlPlacePayload, nlPlaceAnswer, nlPlaceTwin } from './cells/nl-place.js';
 
 // Function tables (function_table_easy / _hard): the In / Out table, its rule helpers and the
 // screen checker every host uses (a 'make your own' table is right when every row follows the rule).

@@ -39,6 +39,36 @@ relates to every other (prerequisite / builds on / leads to), with concepts and 
 - The quality bar: every lesson page is graded like every other page — ≥ 8 on `design/audit/RUBRIC.md`
   by an independent critic.
 
+## Owner rulings recorded 2026-09-25 (first sample lessons)
+- **The I Do example is an ANCHOR CHART** the pupil keeps beside every later page: one worked
+  problem step by step (its own cell drawn at each step, newest marks grey, earlier ones black), big
+  numbered step headers each with the same icon, a chant where it helps, the `Say:` line, minimal
+  words, and it prints on its own (a wall chart too). The same step names and icons repeat beside the
+  We-do cells and as a step strip on every practice page.
+- **One accent colour on lesson pages** (INK-30 in `WORKSHEET_DESIGN_STANDARD.md`): purple
+  `#5B2A86`, chosen over reddish orange because it prints darker in greyscale; only for step numerals,
+  their circles and step icons, always with a second cue; never for answers or decoration.
+
+## First build (2026-09-25): the `lesson` page role
+`buildSheet({role: 'lesson', sections: [{skills: [skill]}], practicePages, mixed})` prints the packet
+(`js/modules/sheet/roles/lesson.js`, host `buildLesson` in `js/modules/print-sheet.js`):
+1. **Anchor chart** (no Name / Score; its own key): the worked example in 2-4 step panels, `Say:`, `Rule:`.
+2. **Lesson sheet**: `Vocabulary:` match (word to picture, key draws the lines), `Remember:` (the key
+   concept), `Warm-up:` (the prerequisite skills' own generators, lettered and scored), `Guided Practice:`
+   2-3 cells beside the chart's `Steps:` (cell 1 with the first step traced), then `Independent
+   Practice:` rows filling the page.
+3. **Practice pages** (Independent, the teacher's count) with the chart's step strip. One-line,
+   one-number items (facts, "27 → ___") take the dense grid at the most a page holds within the 12.1
+   ceiling, in whole rows of three (15 at S, else 12); taller items (column subtraction) print six a page, three across,
+   grown to at most 1.3 × their own height (H13), so a short grid stops above the footer rather
+   than drawing empty bands in every cell. The strip stays only when it keeps the page's columns
+   and capacity.
+4. **Mixed practice** (optional) with the lesson's earlier skills.
+Every sheet's teacher footer carries the tags: skill id, grade, primary CCSS, EEs (`standards.js`).
+The per-lesson data (prerequisite skills, concepts, vocabulary with pictures, the steps with their
+icons, the chant and why) lives in `js/modules/lessons/prereqs.js`, shaped to grow into the
+vertical-alignment map. Samples: `design/lesson-samples/`.
+
 ## Later — intervention lessons (owner, 2026-09-25: "record it for later")
 An **intervention lesson for every White Rose Maths small step**, using the same lesson system (warm-up on
 prerequisites, minimal-words worked example, we-do, massed practice, optional mixed), tagged to the small

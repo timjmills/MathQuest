@@ -10,7 +10,7 @@
 import { opGlyph, trackMm, SIZES, factTab, stripPos } from '../tokens.js';
 import { blank, esc } from '../cell.js';
 import { register } from '../registry.js';
-import { stepMarks, placeDigits, regroupMarks } from '../steps.js';
+import { stepMarks, placeDigits, regroupMarks, PLACE_OFFSET } from '../steps.js';
 import { touchMode, touchColumns, touchOpts, touchDigit } from '../support-draw.js';
 
 // VA-2: the leftmost track is the operator track; place names run right to left from the ones.
@@ -39,7 +39,7 @@ const PLACE_NAMES = ['O', 'T', 'H', 'Th', 'TTh', 'HTh'];
  * @param {'trace'|'solid'|null} [opts.boxInk]  with `answer: 'boxes'` and `ans`, the digits are
  *        drawn INSIDE the boxes, so a key laid over a Guided page lines up exactly (SCC-T10).
  */
-export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0, trackInk = null, touch = null } = {}) {
+export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0, trackInk = null, touch = null, strikes = null, rings = null } = {}) {
     // `a` may be an ARRAY of the rows above the operator row (three or four addends, CM-5/CM-6):
     // every one of them sits on the digit tracks with an empty operator track (VA-2).
     const tops = (Array.isArray(a) ? a : [a]).map(String);
@@ -61,6 +61,23 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
     const row = (chars, first = '', rowId = '', tRow = null) => chars.map((ch, i) => {
         if (i === 0 && first) return `<span class="op">${first}</span>`;
         const td = tRow && tRow[i] && !hole(rowId, i) ? touchDigit(ch, true, touch.o) : null;
+        // VA-23: a Model cell crosses out a regrouped top digit with a solid diagonal - 0.75 pt
+        // black, or 1 pt trace grey on the step that makes it (INK-4). It overlays the digit and
+        // takes no space, so the stack's geometry is the same in every step state.
+        // A worked step that LOOKS at a column rings its digits (the column the step reads), in
+        // trace grey on its own step and black after it; an outline takes no space.
+        const rk = rings && (rowId === 'a' || rowId === 'b') ? rings[i] : null;
+        if (!td && rk && ch !== ' ' && !hole(rowId, i)) {
+            const style = rk === 'trace' ? 'outline:1pt solid #949494' : 'outline:0.75pt solid #000';
+            return `<span><span class="ws-ring" data-ws-mark="${rk}" style="${style};outline-offset:0.06em;border-radius:45%">${glyph(ch, rowId, i)}</span></span>`;
+        }
+        const sk = rowId === 'a' && strikes ? strikes[i] : null;
+        if (!td && sk && ch !== ' ') {
+            const grey = sk === 'trace';
+            return `<span style="position:relative">${glyph(ch, rowId, i)}<svg class="ws-strike${grey ? ' ws-trace' : ''}" data-ws-ink="${grey ? 'trace' : 'solid'}" viewBox="0 0 10 10" preserveAspectRatio="none" aria-hidden="true" `
+                + `style="position:absolute;left:8%;top:12%;width:84%;height:76%;overflow:visible"><line x1="1" y1="9.5" x2="9" y2="0.5" stroke="${grey ? '#949494' : '#000'}" `
+                + `stroke-width="${grey ? '1pt' : '0.75pt'}" vector-effect="non-scaling-stroke"/></svg></span>`;
+        }
         return td || `<span>${glyph(ch, rowId, i)}</span>`;
     }).join('');
     const tr = (k) => (touch && Array.isArray(touch.rows) ? touch.rows[k] : null);
@@ -331,8 +348,21 @@ register('stack', {
         }
         const answer = p.answer || (level >= 2 ? 'boxes' : 'steps');
         const nAns = Math.min(t - 1, Math.max(1, ansDigitsOf(p)));
+        // `strike:<place>` marks cross out that top digit (VA-23); later marks keep the ink of
+        // the step that made them (black once the step is past, grey on its own step).
+        // `ring:<place>` marks ring that column's digits (a step that looks at them).
+        const strikes = [];
+        const rings = [];
+        for (const m of marks) {
+            const r = /^(strike|ring):(.+)$/.exec(m.slot);
+            if (!r || !Object.prototype.hasOwnProperty.call(PLACE_OFFSET, r[2])) continue;
+            const i = t - 1 - PLACE_OFFSET[r[2]];
+            // A ring points at the column the step LOOKS at: it belongs to that step only (grey),
+            // and is gone from the states after it, which would otherwise pile marks on a digit.
+            if (i >= 1 && i < t && (r[1] === 'strike' || m.ink === 'trace')) (r[1] === 'strike' ? strikes : rings)[i] = m.ink;
+        }
         return stack(a, b, p.op, {
-            T: t, heads, regroup, answer, trackInk, ansTracks: nAns,
+            T: t, heads, regroup, answer, trackInk, ansTracks: nAns, strikes: strikes.length ? strikes : null, rings: rings.length ? rings : null,
             regroupSlots: regroup ? Array.from({ length: t }, (_, i) => regroupSlots[i] || '<i></i>') : null,
             unknown: p.unknown || null,
         });

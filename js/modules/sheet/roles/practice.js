@@ -32,6 +32,7 @@ import { paginate, labelStarts, scoreDenominator, placeSections } from '../pagin
 import { renderSource, renderAnswerKey } from './answer-key.js';
 import { deriveSeed } from '../rng.js';
 import { ANCHOR_CSS, anchorPlanItem, sideItems, pupilCount, blockPlan, blockPages } from '../anchors.js';
+import { LESSON_CSS } from '../lesson-css.js';
 
 /* ======================================================================= engine stylesheet */
 
@@ -255,6 +256,7 @@ export const SHEET_ENGINE_CSS = `
 /* the key's correction is black Andika 700, even inside the pupil's grey work (a fix box per fact) */
 :is(.ws-page,.ws-sheet) .mq-judge-work :is([data-ws-slot^="x"],[data-ws-slot^="fix"]):is([data-ws-ink="solid"],[data-ws-ink="solid"] *),:is(.ws-page,.ws-sheet) .mq-judge-work :is([data-ws-slot^="x"],[data-ws-slot^="fix"]) :is([data-ws-ink="solid"],[data-ws-ink="solid"] *){color:#000!important;font-weight:700}
 ${ANCHOR_CSS}
+${LESSON_CSS}
 `.trim();
 
 export const styleBlock = () => `<style data-mq-sheet-engine>${SHEET_ENGINE_CSS}</style>`;
@@ -513,7 +515,8 @@ export function frameWords(role, input, skills, { tabId }) {
     const idText = ids.length > 3 ? `${ids.slice(0, 3).join(', ')} +${ids.length - 3}` : ids.join(', ');
     const codes = [...new Set(skills.flatMap((s) => String(s.ccss || '').split(/[,;]\s*/)).map((c) => c.trim()).filter(Boolean))];
     const ccss = codes.length > 9 ? `${codes.slice(0, 9).join(', ')} +${codes.length - 9}` : codes.join(', ');
-    const left = [idText, gradeWords(skills.map((s) => s.grade)), ccss].filter(Boolean).join(' · ');
+    // A lesson packet prints its own tags on every sheet (header.footerLeft, roles/lesson.js).
+    const left = (typeof header.footerLeft === 'string' && header.footerLeft) || [idText, gradeWords(skills.map((s) => s.grade)), ccss].filter(Boolean).join(' · ');
     return { title, tabLines, left, words };
 }
 
@@ -757,6 +760,9 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         const sections = [];
         if (pi === 0) sections.push({ kind: 'html', html: styleBlock() });
         if (pg.cont) sections.push({ kind: 'html', html: CONT_MARK });
+        // A lesson's step reminder strip (roles/lesson.js stripHtml) above the grid of every page;
+        // the host took its height off the section's gridH.
+        if (input.stepStrip) sections.push({ kind: 'html', html: input.stepStrip });
         const lone = pg.parts.length === 1;
         for (const part of pg.parts) {
             const L = layouts[part.section];
@@ -765,7 +771,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // PG-10 / PT-ENG-6: page 1 lets a lone full section fill the body by flex (exactly
             // gridH); every other grid carries the section's fixed height, rows x cellH, so a
             // cell is the same size on every page of the section.
-            const fillByFlex = !pg.cont && lone && part.chunk.rows === L.rows && !L.blocks && L.fill !== false;
+            // (A section whose caller capped its height, `capH`, keeps rows x cellH: it stops short.)
+            const fillByFlex = !pg.cont && lone && part.chunk.rows === L.rows && !L.blocks && L.fill !== false && !(norm.sections[part.section] || {}).capH;
             // A split-off full-width group under its own section on the same page shares its
             // instruction (splitWide): the line is not printed twice.
             const sec = norm.sections[part.section] || {};

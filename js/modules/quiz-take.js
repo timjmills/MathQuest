@@ -2,6 +2,7 @@
 // Layer 4: depends on state, data, utils, quiz-storage, ui-core
 
 import { state } from './state.js';
+import { quizLadderWrong, drawLadder, shownOf, ladderMessage } from './support-ladder.js';
 import { SKILLS } from './data.js';
 import { shuffle } from './utils.js';
 import { saveResult, decompressTestFromURL, migrateTestToSections, getAllQuestionsFlat, getTotalQuestionCount } from './quiz-storage.js';
@@ -329,9 +330,13 @@ function renderQuizQuestion(qItem, flatIdx) {
 
     let feedbackHtml = '';
     if (showInstantFeedback) {
+        // The support ladder (support-ladder.js): while it climbs, a support, not the answer.
+        const lad = answer.correct ? null : shownOf(qd);
         feedbackHtml = answer.correct
             ? '<div class="qt-feedback correct">Correct!</div>'
-            : `<div class="qt-feedback incorrect">Incorrect. The answer is: ${escHtml(String(qd.ans))}</div>`;
+            : lad && lad.n && !lad.spent
+                ? `<div class="qt-feedback mq-ladder-feedback">${escHtml(ladderMessage(qd))}</div>`
+                : `<div class="qt-feedback incorrect">Incorrect. The answer is: ${escHtml(String(qd.ans))}</div>`;
     }
 
     // Always use text input — no multiple choice.
@@ -489,6 +494,8 @@ function _mountQuizCell(flatIdx) {
         const kind2 = cellKindFor({ ...qd2, options: [] });
         const single = document.getElementById('qtAnswerInput');
         try { wireLiveCorrect(cellEl, { q: qd2, kind: kind2, single }); } catch (e) { /* optional */ }
+        // the item's support ladder so far (support-ladder.js)
+        try { drawLadder(cellEl, qd2, { kind: kind2, categoryId: qd2.categoryId, skillId: qd2.skillId || state.quizAllQuestions[flatIdx].question.skillId }); } catch (e) { /* optional */ }
     }
     monoCell(cellEl);
     // a twin's rows wrap, never clip (round 3: the outer clocks were cut at the cell edge)
@@ -543,6 +550,19 @@ function recordAnswer(flatIdx, studentAnswer) {
     }
 
     quizAnswers[flatIdx] = { studentAnswer: String(studentAnswer), correct, timeSpent };
+    // Instant feedback only: a wrong answer climbs the item's support ladder; what it showed is kept
+    // with the answer (a short list of ids).
+    const test = state.currentQuiz;
+    if (!correct && String(studentAnswer).trim() && test && test.settings && test.settings.showFeedback === 'instant') {
+        try {
+            quizLadderWrong(qd, studentAnswer);
+            const ids = shownOf(qd).ids;
+            if (ids.length) quizAnswers[flatIdx].help = ids;
+        } catch (e) { /* never break the answer */ }
+    } else if (correct) {
+        const ids = shownOf(qd).ids;
+        if (ids.length) quizAnswers[flatIdx].help = ids;
+    }
 
     // Broadcast answer to monitor dashboard
     broadcastQuizAnswer(flatIdx, studentAnswer, correct);
