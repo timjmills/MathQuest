@@ -616,7 +616,7 @@ register('pv', {
                 const rows = (p.choices || []).map((c, i) => `<div class="pv-choice" data-ws-slot="choice" data-ws-shape="ring" `
                     + `style="display:table;padding:1mm 3mm;margin:1.5mm 0;border-radius:4mm;`
                     + `${on && String(c) === on ? 'border:1.5pt solid #000;' : 'border:1.5pt solid transparent;'}">`
-                    + `<span style="display:inline-block;min-width:7mm;">${esc((p.labels || [])[i] || '')}</span><span>${esc(c).split(' ').map(w => (w.includes('-') ? `<span style="white-space:nowrap;">${w}</span>` : w)).join(' ')}</span></div>`).join('');
+                    + `<span style="display:table-cell;width:7mm;">${esc((p.labels || [])[i] || '')}</span><span style="display:table-cell;">${esc(c).split(' ').map(w => (w.includes('-') ? `<span style="white-space:nowrap;">${w}</span>` : w)).join(' ')}</span></div>`).join('');
                 return `<div class="pv-cell">${center(numeral({}))}<div class="pv-word-choices" style="display:table;margin:0 auto;font-size:${pt(m.textPt + 2)};`
                     + `font-weight:700;line-height:1.3;text-align:left;">${rows}</div></div>`;
             }
@@ -650,6 +650,12 @@ register('pv', {
             || ((p.kind === 'blanks' || p.kind === 'expand-line') && String(p.frame || p.n || '').length > 34)
             || (p.kind === 'order' && (p.nums || []).length >= 5)
             || (p.kind === 'estimate' && ctx.size === 'L' && String(p.expr || '').length > 11);
+        // A long word-name list is ONE column, never measured into two: squeezed, every name wraps
+        // to three lines and a page holds one item beside an empty column. Its height is the
+        // numeral plus four one-line names.
+        if (p.kind === 'word-choice' && wide) {
+            return { wMm: 186, hMm: { S: 62, M: 70, L: 80 }[ctx.size] || 80, measure: false, factLike: false, maxCols: 1 };
+        }
         return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2 };
     },
     inputs() { return [{ id: 'answer', kind: 'number', shape: 'line', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },
