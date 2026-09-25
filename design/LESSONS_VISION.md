@@ -59,7 +59,7 @@ relates to every other (prerequisite / builds on / leads to), with concepts and 
    Practice:` rows filling the page.
 3. **Practice pages** (Independent, the teacher's count) with the chart's step strip. One-line,
    one-number items (facts, "27 → ___") take the dense grid at the most a page holds within the 12.1
-   ceiling (16 at S, else 12); taller items (column subtraction) print six a page, three across,
+   ceiling, in whole rows of three (15 at S, else 12); taller items (column subtraction) print six a page, three across,
    grown to at most 1.3 × their own height (H13), so a short grid stops above the footer rather
    than drawing empty bands in every cell. The strip stays only when it keeps the page's columns
    and capacity.

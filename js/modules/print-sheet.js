@@ -1853,53 +1853,55 @@ async function buildLesson(n, metaOf) {
         const strip = (teach.extras || []).find((x) => x.lessonStrip);
         const h = strip && strip.measured && strip.measured[1] ? strip.measured[1].hMm + 0.5 : 0;
         const stripHtml = strip && h ? strip.render(resolveCtx({ size: n.size, look: 'ican', mode: 'print' })) : '';
-        // 12.1: six items an Independent page, up to 16 for one-number answers - a page of facts
-        // takes twelve, the dense page's own two rows of six more (PT-IND-1).
         // A rounding item ("27 -> ___") is a one-number answer on one line, like a fact.
         const oneLine = (it) => it.template === 'fact' || (it.template === 'pv' && it.kind === 'round');
         const facts = (teach.items || []).filter((it) => it.pool === 'main').every(oneLine);
-        // Six taller problems fill the page two across (cells grow to the page, H13) rather than
-        // packing into the top half of a twelve-cell grid. One-line items take the dense grid at
-        // the most a page holds within the 12.1 ceiling (16 at S, then 12); a count that spills
-        // past the pages asked for steps down, and last of all to six grown to the page.
-        const tries = (facts ? (n.size === 'S' ? [16, 12] : [12]) : []).map((k) => ({ per: k, dense: true })).concat([{ per: 6, dense: false, columns: 3 }]);
-        let per = 6;
-        let dense = false;
-        let req = null;
-        let res = null;
-        for (const t of tries) {
-            const r = Object.assign({}, common, {
+        // One-line items take the dense grid at the most a page holds within the 12.1 ceiling, in
+        // whole rows of three (15 at S, then 12). Taller problems (column subtraction) print six a
+        // page, three across, grown to at most 1.3 x their own height (the lesson rows' cap): a
+        // taller row is an empty band in every cell (H13), so the grid stops short instead.
+        const tries = (facts ? (n.size === 'S' ? [15, 12] : [12]) : []).map((k) => ({ per: k, dense: true })).concat([{ per: 6, dense: false, columns: 3 }]);
+        const make = async (t) => {
+            let req = Object.assign({}, common, {
                 role: 'independent', sections: [{ skills: [sk], count: t.per * n.practicePages, dense: t.dense, columns: t.columns }], seed: (n.seed + 7919) >>> 0,
             });
-            const out = await buildSheet(r);
-            ({ per, dense } = t);
-            req = r;
-            res = out;
-            if (out.pageCount <= n.practicePages) break;
-        }
-        // Six grown to the page grow no further than 1.3 x their own height (the lesson rows' cap):
-        // a taller row is an empty band in every cell (H13), so the grid stops short instead.
-        const f0 = res && res.fits && res.fits.sections && res.fits.sections[0];
-        if (!dense && f0 && f0.hMin > 0 && f0.rows > 0 && f0.cellH > f0.hMin * 1.3) {
-            const gridH = Math.floor(f0.rows * f0.hMin * 1.3 * 1000) / 1000;
-            req = Object.assign({}, req, { sections: [Object.assign({}, req.sections[0], { gridH, columns: f0.cols })] });
-            res = await buildSheet(req);
-        }
+            let res = await buildSheet(req);
+            const f0 = res && res.fits && res.fits.sections && res.fits.sections[0];
+            if (!t.dense && f0 && f0.hMin > 0 && f0.rows > 0 && f0.cellH > f0.hMin * 1.3) {
+                const gridH = Math.floor(f0.rows * f0.hMin * 1.3 * 1000) / 1000;
+                req = Object.assign({}, req, { sections: [Object.assign({}, req.sections[0], { gridH, columns: f0.cols })] });
+                res = await buildSheet(req);
+            }
+            return { req, res };
+        };
         // The strip goes on only where it fits without crowding the page (owner, 2026-09-25): the
-        // page with the strip keeps the columns and the capacity it has without it. A strip that
-        // would turn three columns of problems into two wide, half-empty ones is left off; the
-        // Guided band's Steps and the anchor chart still carry the steps.
-        if (stripHtml) {
-            const cols = (res.fits && res.fits.cols) || 'auto';
-            const cap = (res.fits && res.fits.perPage) || 0;
-            let withStrip = null;
+        // page with the strip keeps the columns, the page count and the items a page of it holds.
+        // A strip that would turn three columns into two wide, half-empty ones is left off.
+        const withStrip = async (t, base) => {
+            const cols = (base.res.fits && base.res.fits.cols) || 'auto';
+            const cap = Math.min((base.res.fits && base.res.fits.perPage) || 0, t.per);
+            let out = null;
             try {
-                withStrip = await buildSheet(Object.assign({}, req, {
-                    sections: [{ skills: [sk], count: per * n.practicePages, columns: cols, dense, gridH: req.sections[0].gridH }], stepStrip: { html: stripHtml, hMm: h },
+                out = await buildSheet(Object.assign({}, base.req, {
+                    sections: [Object.assign({}, base.req.sections[0], { columns: cols })], stepStrip: { html: stripHtml, hMm: h },
                 }));
-            } catch (e) { withStrip = null; }
-            if (withStrip && withStrip.fits && withStrip.fits.cols === cols && (withStrip.fits.perPage || 0) >= cap) res = withStrip;
+            } catch (e) { out = null; }
+            return out && out.fits && out.fits.cols === cols && (out.fits.perPage || 0) >= cap && out.pageCount <= base.res.pageCount ? out : null;
+        };
+        // A page with the step strip beats a fuller page without it (the strip is how the practice
+        // page points back to the anchor chart); a count that spills past the pages asked for
+        // steps down.
+        let res = null;
+        let plain = null;
+        for (const t of tries) {
+            const base = await make(t);
+            if (!plain || plain.pageCount > n.practicePages) plain = base.res;
+            if (base.res.pageCount > n.practicePages) continue;
+            const striped = stripHtml ? await withStrip(t, base) : null;
+            if (striped) { res = striped; break; }
+            if (!stripHtml) { res = base.res; break; }
         }
+        if (!res) res = plain;
         parts.push({ part: 'practice', role: 'independent', res, strip: /data-mq-lesson-strip/.test(res.pupilHtml) });
     }
 
