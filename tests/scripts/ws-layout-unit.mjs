@@ -23,6 +23,7 @@ import {
     gridHeightMm, bodyHeightMm, headerHeightMm, FULL_HEADER, factRowsCapacity, stackMaxColumns,
     stackCapacity, visualGridCapacity, resolveSectionLayout, cellWidthMm, paperOf,
 } from '../../js/modules/sheet/layout.js';
+import { groupRuns } from '../../js/modules/sheet/cells/k2kit.js';
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../../js/modules/sheet/paginate.js';
 import { plan as independentPlan } from '../../js/modules/sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from '../../js/modules/sheet/roles/more-practice.js';
@@ -716,7 +717,29 @@ eq([stripPos(0, 1), stripPos(0, 3), stripPos(1, 3), stripPos(2, 3)], ['only', 'f
     // VA-2: a vertical fact's operator has its own track - never written over a digit track.
     const f = renderCell(T('fact', { a: 7, b: 12, op: '*', digits: 3 }), ctxL());
     ok(/<span class="op">×<\/span><span><\/span><span>1<\/span><span>2<\/span>/.test(f), 'VA-2: ×12 keeps an operator track and a blank hundreds track');
-    ok(/grid-template-columns:1\.2em repeat\(3, 0\.72em\)/.test(f), 'TY-22: fact digit tracks stay 0.72 em, the operator track is its own');
+    // A 3-track band whose second operand leaves the first track empty takes the tight 0.72 em
+    // operator track (the empty track keeps it clear); a full-width operand keeps 1.2 em.
+    ok(/grid-template-columns:0\.72em repeat\(3, 0\.72em\)/.test(f), 'TY-22: fact digit tracks stay 0.72 em, the operator track is its own (tight over an empty track)');
+    ok(/grid-template-columns:1\.2em repeat\(2, 0\.72em\)/.test(renderCell(T('fact', { a: 7, b: 12, op: '+', digits: 2 }), ctxL())), 'VA-2: a 2-track fact keeps the 1.2 em operator track');
+    {
+        // Capacity: a 2-digit + 2-digit fact with a 3-digit answer band fits 5 columns at L and
+        // 6 at M (content width = 186 / cols - 6.6 mm); the answer zone keeps all 3 tracks.
+        const fa = T('fact', { a: 78, b: 96, op: '+', notation: 'vertical', digits: 3 });
+        const w5 = cellFootprint(fa, resolveCtx(ctxL('blank', { options: { factColumns: 5 } }))).wMm;
+        ok(w5 <= 186 / 5 - 0.6, `DN-16: a 3-track addition fact fits 5 columns at L (${w5} mm)`);
+        ok(/grid-template-columns:repeat\(3, 0\.72em\)/.test(renderCell(fa, ctxL('answered'))), 'SL-12: the answer zone keeps 3 tracks with the tight operator');
+        // Division across: vertical on a fact-rows page of 5+ columns (VA-65), the answer below
+        // on a 3-4 column page, beside it where it fits.
+        const dv = T('fact', { a: 60, b: 12, op: '/', notation: 'horiz', digits: 2 });
+        const at = (c, st = 'blank') => renderCell(dv, ctxL(st, { options: { factColumns: c } }));
+        ok(/class="ws-fact"/.test(at(5)) && /<span class="op">÷<\/span>/.test(at(5)), 'VA-65: a division fact on a 5-column fact-rows page is drawn vertical');
+        ok(/ws-eq-below/.test(at(3)) && !/class="ws-fact"/.test(at(3)), 'DN-22: a 3-column across fact stacks its answer below');
+        ok(!/ws-eq-below/.test(at(2)) && /class="ws-eq"/.test(at(2)), 'the answer stays beside the fact at 2 columns');
+        eq(slotIds(at(3)), slotIds(at(3, 'answered')), 'AK-4: the below form carries the same slot blank and keyed');
+        const fpAuto = cellFootprint(dv, resolveCtx(ctxL()));
+        ok(fpAuto.wMm <= 186 / 5 - 0.6 && !fpAuto.tracks, `the across footprint without a column count is its narrowest drawing (${fpAuto.wMm} mm) and not a stack`);
+        ok(/class="ws-eq"/.test(renderCell(dv, { mode: 'screen', static: true, size: 'L', state: 'blank', options: { factColumns: 6 } })), 'the screen twin keeps the across notation');
+    }
     const fs = renderCell(T('fact', { a: 15, b: 13, op: '-' }), ctxL());
     ok(fs.includes('<span class="op">−</span>') && !/>-</.test(fs), 'TY-6: subtraction draws the true minus sign');
     eq(slotIds(f), slotIds(renderCell(T('fact', { a: 7, b: 12, op: '*', digits: 3 }), ctxL('answered'))), 'AK-4: a fact carries the same slot blank and keyed');
@@ -738,7 +761,14 @@ eq([stripPos(0, 1), stripPos(0, 3), stripPos(1, 3), stripPos(2, 3)], ['only', 'f
     const ldK = renderCell(ld, ctxL('answered'));
     ok(/data-ws-slot="q-1"[^>]*>(<span[^>]*>)5/.test(ldK) && /data-ws-slot="q-2"[^>]*>(<span[^>]*>)5/.test(ldK), 'AK-1: the key fills the quotient boxes');
     ok((ldK.match(/data-ws-ink="solid"/g) || []).length >= 2 + 6, 'AK-1: the key writes the work rows too');
-    eq((ldB.match(/border-bottom:0\.75pt/g) || []).length, 2 * 3, 'VA-63: a rule under each of the two subtract rows');
+    eq((ldB.match(/border-bottom:0\.75pt solid #000000/g) || []).length, 2 * 3, 'VA-63: a black rule under each of the two subtract rows');
+    ok(/border-left:0\.75pt solid #949494/.test(ldB), 'long division: the work rows are a grey digit grid on the dividend tracks');
+    {
+        // Two work rows per step: 152 ÷ 19 is one step, 715 ÷ 13 two (no spare "−" row on the key).
+        const rowsOfLd = (h) => (h.match(/border-bottom:0\.75pt solid #000000/g) || []).length;
+        eq(rowsOfLd(renderCell(T('division', { dividend: 152, divisor: 19 }), ctxL())), 3, 'long division: 152 ÷ 19 draws one subtract row (3 tracks)');
+        eq(rowsOfLd(renderCell(T('division', { dividend: 715, divisor: 13 }), ctxL())), 2 * 3, 'long division: 715 ÷ 13 draws two subtract rows');
+    }
     eq(cellFootprint(ld, resolveCtx(ctxL())).measure, true, 'long division is measured');
     // Area model: minimum width (never wraps), every partial and the total keyed.
     const am = T('area-model', { multiplier: 4, parts: [300, 40, 5] });
@@ -757,6 +787,13 @@ eq([stripPos(0, 1), stripPos(0, 3), stripPos(1, 3), stripPos(2, 3)], ['only', 'f
     const r = Math.min(...[...arB.matchAll(/<circle [^>]*r="([\d.]+)"/g)].map((m) => Number(m[1])));
     ok(r * 2 >= 4, `RP-3: counters are at least 4 mm (${r * 2} mm)`);
     eq(slotIds(arB), ['first', 'second', 'total'], 'three boxes, one per blank');
+    {
+        // Every range-100 picture fits a 2-column cell's width (86 mm) at the RP-3 minimum pitch.
+        const widest = Math.max(...[['equal_groups', 6, 8], ['equal_groups', 6, 4], ['write_mult', 6, 8], ['count_all', 5, 7]]
+            .map(([kind, rows, cols]) => Number(renderCell(T('arrays', { kind, rows, cols }), ctxL()).match(/viewBox="0 0 ([\d.]+)/)[1])));
+        ok(widest <= 84, `arrays: the widest picture fits a 2-column cell (${widest} mm)`);
+        ok(!/There are/.test(arB) && (arB.match(/white-space:nowrap/g) || []).length === 2, 'arrays: two sentence lines, "[ ] groups of [ ]" then "[ ] in all."');
+    }
     // Remainder: two slots "[q] R [r]"; rows of counters at least 6 mm apart.
     const rm = T('remainder', { dividend: 19, divisor: 3 });
     const rmB = renderCell(rm, ctxL());
@@ -775,7 +812,19 @@ eq([stripPos(0, 1), stripPos(0, 3), stripPos(1, 3), stripPos(2, 3)], ['only', 'f
     ok(/data-ws-slot="answer"[^>]*>(<span[^>]*>)16/.test(nlK) && !/Answer:/.test(nlK), 'AK-1: the key writes 16 in the pupil\'s own box');
     // Fact family and cloze: one box per fact / per addend, nothing wraps, the bank is in the cell.
     const ff = renderCell(T('fact-family', { a: 8, b: 3 }), ctxL());
-    eq(slotIds(ff), ['f0', 'f1', 'f2', 'f3'], 'one box per fact');
+    // The pupil writes each fact: one number printed to fix the order, the other two boxes.
+    eq(slotIds(ff), ['f0b', 'f0', 'f1b', 'f1', 'f2a', 'f2', 'f3a', 'f3'], 'fact family: two boxes per fact, the anchor number printed');
+    eq(slotIds(renderCell(T('fact-family', { a: 8, b: 3, given: 'none' }), ctxL())).length, 12, 'fact family given none: every number a box');
+    eq(slotIds(renderCell(T('fact-family', { a: 8, b: 3, given: 'answer' }), ctxL())), ['f0', 'f1', 'f2', 'f3'], 'fact family given answer: one box per fact');
+    eq(Object.keys(cellAnswerKey(T('fact-family', { a: 8, b: 3 })).slots).length, 8, 'fact family: every box keyed');
+    eq(cellAnswerKey(T('fact-family', { a: 8, b: 3 })).value, '11, 11, 3, 8', 'fact family: the value is the four answers (q.ans)');
+    {
+        const wrong = { value: '11, 11, 4, 8' };
+        const pupil = renderCell(T('fact-family', { a: 8, b: 3, fix: 'line' }), ctxL('wrong', { wrong }));
+        const keyed = renderCell(T('fact-family', { a: 8, b: 3, fix: 'line' }), ctxL('wrong', { wrong, options: { fixKey: true } }));
+        eq(slotIds(pupil).filter((id) => /^x/.test(id)), ['x0', 'x1', 'x2', 'x3'], 'fact family fix: one fix box per fact (H9)');
+        ok(/data-ws-slot="x2"[^>]*>(<[^>]*>)*3</.test(keyed) && /data-ws-slot="x0"[^>]*><\/span>/.test(keyed), 'fact family fix: the key fills only the wrong fact\'s fix box');
+    }
     ok(/grid-template-columns:auto 1em auto 1em auto;[^"]*white-space:nowrap/.test(ff), 'every fact is one unbreakable grid row');
     const cz = renderCell(T('cloze-bank', { sum: 12, a: 5, b: 7, banks: [[3, 5, 8], [2, 6, 7]] }), ctxL());
     eq(slotIds(cz), ['a', 'b'], 'exactly one blank per addend');
@@ -786,6 +835,83 @@ eq([stripPos(0, 1), stripPos(0, 3), stripPos(1, 3), stripPos(2, 3)], ['only', 'f
     ok(/data-mq-blank="box"/.test(tw(nl)), 'number-line twin: the answer box takes the input');
     ok(/data-mq-join=" R "/.test(tw(rm)) && (tw(rm).match(/data-mq-cell/g) || []).length === 2, 'remainder twin: two boxes joined " R "');
     ok(/area-model-input/.test(tw(am)) && /area-model-total/.test(tw(am)), 'area-model twin keeps the checker classes');
+    // Number track: a long track wraps to two rows; `shown` prints a value in every state.
+    const sq = T('seqstrip', { values: [10, 20, 30, 40, 50], blanks: [1, 3] });
+    ok(/flex-wrap:nowrap/.test(renderCell(sq, ctxL())), 'seqstrip: five tiles stay one row');
+    ok(cellFootprint(sq, resolveCtx(ctxL())).wMm <= 93 && cellFootprint(sq, resolveCtx(ctxL())).maxCols === 2, 'seqstrip: five tiles fit a 2-column cell');
+    ok(/flex-wrap:wrap;[^"]*max-width:/.test(renderCell(T('seqstrip', { values: [2, 4, 6, 8, 10, 12, 14, 16], blanks: [2] }), ctxL())), 'seqstrip: eight tiles wrap to two rows');
+    const sqShown = renderCell(T('seqstrip', { values: [10, 20, 30, 40, 50], blanks: [1, 3], shown: { 2: 35, 3: 41 } }), ctxL());
+    ok(/data-ws-shown="1"[^>]*>35</.test(sqShown) && !/>30</.test(sqShown), 'seqstrip shown: a given tile prints the shown (wrong) value');
+    ok(/data-ws-slot="b0"[^>]*><\/span>/.test(sqShown), 'seqstrip shown: an unshown blank stays empty on the pupil page');
+    ok(/data-ws-slot="b1" data-ws-shape="box" data-ws-ink="solid" data-ws-shown="1"[^>]*>41</.test(sqShown), 'seqstrip shown: a blank holds the finished work in solid ink');
+    // Drawing-fix slot: an empty mat / frame under the work; the key fills it with the right model.
+    for (const [tpl, pay] of [['base10', { target: 34, fix: 'draw' }], ['tenframe', { target: 7, fix: 'draw' }]]) {
+        const q = T(tpl, pay);
+        const wrongPupil = renderCell(q, ctxL('wrong', { wrong: { value: tpl === 'base10' ? 43 : 6 } }));
+        const wrongKey = renderCell(q, ctxL('wrong', { wrong: { value: tpl === 'base10' ? 43 : 6 }, options: { fixKey: true } }));
+        eq(slotIds(wrongPupil), ['answer', 'fix'], `${tpl} fix: the work slot and the fix slot`);
+        ok(/Fix it:/.test(wrongPupil), `${tpl} fix: the fix zone is captioned`);
+        const fixPart = (h) => h.slice(h.indexOf('data-ws-slot="fix"'));
+        ok(!/data-k2-sym|<circle/.test(fixPart(wrongPupil)), `${tpl} fix: the fix zone is empty on the pupil page`);
+        ok(/data-k2-sym|<circle/.test(fixPart(wrongKey)), `${tpl} fix: the key draws the right model in the fix zone`);
+        eq(cellAnswerKey(q).slots.fix.value, String(pay.target), `${tpl} fix: the fix slot is keyed`);
+        ok(!/Fix it:/.test(renderCell(T(tpl, { target: pay.target }), ctxL())), `${tpl}: no fix zone without the flag`);
+    }
+    /* ---- 2026-09-25 regrade 2: template defects ---- */
+    {
+        // Ringable counters: runs of the group size, >= 4 mm between counters in a run.
+        const pts = (h) => [...h.matchAll(/<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)"/g)].map((m) => ({ x: +m[1], y: +m[2], r: +m[3] }));
+        const runsOk = (h, size) => {
+            const p = pts(h);
+            const rows = [...new Set(p.map((c) => c.y))];
+            // Within a line, gaps are either the in-run gap (>= 4 mm) or the run gap (wider).
+            return rows.every((y) => {
+                const xs = p.filter((c) => c.y === y).map((c) => c.x).sort((a, b) => a - b);
+                return xs.slice(1).every((x, k) => x - xs[k] - 2 * p[0].r >= 4 - 0.01);
+            }) && p.length > 0 && size > 0;
+        };
+        const rmPic = renderCell(T('remainder', { dividend: 23, divisor: 5 }), ctxL());
+        ok(runsOk(rmPic, 5), 'H12: remainder counters sit >= 4 mm apart in runs');
+        const lay = groupRuns(23, 5, { d: 5.5, gap: 4, runGap: 9 });
+        eq(lay.runs, 5, 'groupRuns: 23 in runs of 5 is five runs (the last the remainder)');
+        ok(lay.pts[5].cx - lay.pts[4].cx >= 9 + 5.5 - 0.01 || lay.pts[5].cy > lay.pts[4].cy, 'groupRuns: a wider gap (or a new line) between two runs');
+        ok(runsOk(renderCell(T('counters', { kind: 'share', n: 12, size: 4, ans: 3 }), ctxL()), 4), 'H12: share counters in runs of the group size');
+        // Number line: full width, labels >= 12 pt.
+        const nl10 = renderCell(T('number-line', { max: 10, start: 3, add: 4 }), ctxL());
+        const nlW = Number(nl10.match(/viewBox="0 0 ([\d.]+)/)[1]);
+        ok(nlW >= 170, `number line spans a one-column cell (${nlW} mm)`);
+        const lab = Math.min(...[...nl10.matchAll(/font-size="([\d.]+)"/g)].map((m) => Number(m[1])));
+        ok(lab * 72 / 25.4 >= 12 - 0.01, `number line labels >= 12 pt (${(lab * 72 / 25.4).toFixed(1)} pt)`);
+        const ticks = [...nl10.matchAll(/<text x="([\d.]+)"/g)].map((m) => Number(m[1]));
+        ok(ticks[1] - ticks[0] >= 10, `a 0-10 line has ticks >= 10 mm apart (${(ticks[1] - ticks[0]).toFixed(1)} mm)`);
+        // Multiplication chart: a writing box >= 14 mm at L, and the key's 3-digit product fits it.
+        const mcB = renderCell(T('mult-chart', { r0: 9, c0: 8, blanks: [{ i: 3, j: 4 }] }), ctxL());
+        const boxEm = Number(mcB.match(/data-ws-slot="mc0"[^>]*width:([\d.]+)em/)[1]);
+        ok(boxEm * 0.68 * 28 * 25.4 / 72 >= 14 - 0.05, `mult chart: the writing box is >= 14 mm at L (${(boxEm * 0.68 * 28 * 25.4 / 72).toFixed(1)} mm)`);
+        // Area model: every flex row carries the no-wrap class the worksheet CSS exempts.
+        ok((renderCell(am, ctxL()).match(/class="area-model-total-row"/g) || []).length >= 4, 'area model: its flex rows are exempt from the worksheet wrap rule');
+        // Chart window: numbers in a fixed line box; the window clears the item letter.
+        const cw = renderCell(T('chartwindow', { rows: [3, 4, 5], cols: [2, 3, 4, 5, 6], blanks: [45, 57] }), ctxL());
+        ok(/<td[^>]*><span style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;">44<\/span>/.test(cw), 'chart window: a printed number sits in a fixed line box');
+        ok(/k2-chart[^>]*margin:4\.5mm auto 0/.test(cw), 'chart window: the window clears the item letter');
+        // Word picture: the work box is named.
+        ok(/Draw or work here/.test(renderCell(T('wordpic', { lines: ['Ann has 2.', 'Ben has 3.', 'How many?'], a: 2, b: 3, shape: 'ball', unit: 'balls', ans: 5 }), ctxL())), 'word picture: the work box is labelled');
+        // Basic addition with regrouping: a practice page draws the stack with its carry strip,
+        // a fact-rows page keeps the fact.
+        const ad = T('fact', { a: 19, b: 19, op: '+', notation: 'vertical', digits: 3 });
+        ok(/class="rg/.test(renderCell(ad, ctxL('blank', { options: { factColumns: 3 } }))), 'VA-10: add within 100 on a 3-column page has a carry strip');
+        ok(/class="ws-fact"/.test(renderCell(ad, ctxL('blank', { options: { factColumns: 5 } }))), 'a fact-rows page keeps the fact');
+        ok(/class="ws-fact"/.test(renderCell(T('fact', { a: 7, b: 9, op: '+', digits: 2 }), ctxL('blank', { options: { factColumns: 3 } }))), 'an addition fact within 20 stays a fact');
+        // Cloze: the same tracks in every item; banks >= 16 pt, regular weight.
+        const czA = renderCell(T('cloze-bank', { sum: 12, a: 5, b: 7, banks: [[3, 5, 8], [2, 6, 7]] }), ctxL());
+        const czB = renderCell(T('cloze-bank', { sum: 9, a: 4, b: 5, banks: [[1, 4, 6], [2, 5, 8]] }), ctxL());
+        const widths = (h) => [...h.matchAll(/width:([\d.]+)em;flex:none/g)].map((m) => m[1]).join(',');
+        eq(widths(czA), widths(czB), 'cloze: the box, +, box, = and sum tracks are the same in every item');
+        const bankEm = Number(czA.match(/class="cz-bank"[^>]*font-size:([\d.]+)em/)[1]);
+        ok(bankEm * 28 >= 16 - 0.05 && /class="cz-bank"[^>]*font-weight:400/.test(czA), `cloze: bank numbers >= 16 pt, regular weight (${(bankEm * 28).toFixed(1)} pt)`);
+        // TY-4 on key ink.
+        ok(/data-ws-ink="solid" style="[^"]*font-feature-settings:'cv04' 1/.test(renderCell(T('remainder', { dividend: 19, divisor: 3 }), ctxL('answered'))), 'TY-4: key ink keeps "cv04"');
+    }
 }
 
 /* ===================================================================== small words */

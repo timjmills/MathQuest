@@ -10,7 +10,8 @@
 //
 // Key (AK-1): the same frame with the counters drawn, solid, 0.6 of the cell (6.6 mm at L, under
 // the INK-5 7 mm limit), top row first, left to right (RP-11). Error analysis draws the wrong
-// count there instead.
+// count there instead, and with payload `fix: 'draw'` an empty "Fix it:" frame under it for the
+// pupil to draw the number correctly (k2kit `fixDraw`).
 //
 // The screen twin names its model for the host (`data-mq-model="ten-frame"`, `data-mq-target`):
 // a host that mounts a tap-to-fill frame there lets the pupil BUILD the number rather than retype
@@ -20,7 +21,7 @@
 
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
-import { L, P, B, INK, GREY, root, digitPt, sizeOf, inkOf, isTwin, answered } from './k2kit.js';
+import { L, P, B, INK, GREY, root, digitPt, sizeOf, inkOf, isTwin, answered, fixDraw, fixFilled, fixCaption } from './k2kit.js';
 
 const CELL = { S: 10, M: 10, L: 11 };
 
@@ -39,8 +40,11 @@ export function frameHTML(ctx, { frames = 1, filled = 0 } = {}) {
     const color = ink === 'trace' ? GREY : INK;
     const td = (on) => `<td style="box-sizing:border-box;width:${L(ctx, c)};height:${L(ctx, c)};padding:0;`
         + `border:${B(ctx, 0.75)} solid ${INK};text-align:center;vertical-align:middle;">`
-        + (on ? `<svg viewBox="0 0 10 10" aria-hidden="true" style="display:block;margin:auto;width:${L(ctx, c * 0.6)};height:${L(ctx, c * 0.6)};">`
-            + `<circle cx="5" cy="5" r="5" fill="${color}"/></svg>` : '')
+        // The counter is 0.6 of the cell, drawn inside its SVG box with a margin (r 4.7 of 5)
+        // and overflow visible: a circle that touched its viewport edge printed with flat
+        // bottoms in the second row (2026-09-25 regrade: "the key clips the counters").
+        + (on ? `<svg viewBox="0 0 10 10" aria-hidden="true" style="display:block;margin:auto;overflow:visible;width:${L(ctx, c * 0.64)};height:${L(ctx, c * 0.64)};">`
+            + `<circle cx="5" cy="5" r="4.7" fill="${color}"/></svg>` : '')
         + `</td>`;
     let out = '';
     for (let f = 0; f < frames; f++) {
@@ -60,14 +64,31 @@ register('tenframe', {
     render(p, ctx) {
         const frames = p.frames || 1;
         const model = isTwin(ctx) ? ` data-mq-model="ten-frame" data-mq-target="${esc(p.target)}" data-mq-max="${10 * frames}"` : '';
-        return root(ctx, 'k2-tenframe-cell', `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 7)};">`
-            + `<span style="font-size:${P(ctx, digitPt(ctx) * 1.15)};font-weight:700;line-height:1;min-width:1.2em;">${esc(p.target)}</span>`
-            + `<div data-ws-slot="answer" data-ws-shape="draw"${model}>${frameHTML(ctx, { frames, filled: shownCount(p, ctx) })}</div></div>`);
+        const num = `<span style="font-size:${P(ctx, digitPt(ctx) * 1.15)};font-weight:700;line-height:1;min-width:1.2em;">${esc(p.target)}</span>`;
+        const work = `<div data-ws-slot="answer" data-ws-shape="draw"${model}>${frameHTML(ctx, { frames, filled: shownCount(p, ctx) })}</div>`;
+        if (!fixDraw(p, ctx)) {
+            return root(ctx, 'k2-tenframe-cell', `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 7)};">${num}${work}</div>`);
+        }
+        // The drawing-fix slot (k2kit `fixDraw`): the finished frame, and under it an EMPTY frame
+        // captioned "Fix it:" in the same column, where the pupil draws the number correctly. The
+        // key fills it with the right count; the number is printed once, beside the work.
+        const fixed = fixFilled(ctx) ? p.target : 0;
+        const fixCtx = fixed && !answered(ctx) ? Object.assign({}, ctx, { state: 'answered' }) : ctx;
+        const hole = `<span style="min-width:1.2em;visibility:hidden;font-size:${P(ctx, digitPt(ctx) * 1.15)};">${esc(p.target)}</span>`;
+        return root(ctx, 'k2-tenframe-cell', `<div style="display:grid;grid-template-columns:auto auto;align-items:center;justify-content:center;column-gap:${L(ctx, 7)};row-gap:${L(ctx, 1)};">`
+            + `${num}${work}${hole}<div style="text-align:left;">${fixCaption(ctx)}`
+            + `<div data-ws-slot="fix" data-ws-shape="draw">${frameHTML(fixCtx, { frames, filled: fixed })}</div></div></div>`);
     },
     answerKey(p) {
-        return { value: p.target, display: String(p.target), slots: { answer: { value: String(p.target), graded: true } } };
+        const slots = { answer: { value: String(p.target), graded: true } };
+        if (p.fix === 'draw') slots.fix = { value: String(p.target), graded: true };
+        return { value: p.target, display: String(p.target), slots };
     },
     footprint() { return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2 }; },
-    inputs() { return [{ id: 'answer', kind: 'drag', shape: 'draw', graded: true, order: 0, scopes: ['full'] }]; },
+    inputs(p) {
+        const out = [{ id: 'answer', kind: 'drag', shape: 'draw', graded: true, order: 0, scopes: ['full'] }];
+        if (p && p.fix === 'draw') out.push({ id: 'fix', kind: 'drag', shape: 'draw', graded: true, order: 1, scopes: ['full'] });
+        return out;
+    },
     layout() { return { card: 'card-medium-visual', checker: 'value' }; },
 });

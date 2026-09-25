@@ -26,6 +26,8 @@ export const SW = Object.freeze({ fine: 0.5 * PT_MM, hair: 0.75 * PT_MM, one: PT
 export const INK = '#000';
 export const GREY = '#949494';
 export const n2 = (v) => +Number(v).toFixed(2);
+/** TY-4 on written digits (the key's ink): the open-top 4 and tabular lining figures. */
+export const KEY_FEATURES = "font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;";
 
 export const isTwin = (ctx) => !!(ctx && ctx.options && ctx.options.twin);
 export const sizeOf = (ctx) => (SIZES[ctx && ctx.size] ? ctx.size : DEFAULT_SIZE);
@@ -55,6 +57,21 @@ export function slotValue(ctx, id, keyValue) {
     }
     return keyValue === undefined || keyValue === null ? '' : String(keyValue);
 }
+
+/**
+ * THE DRAWING-FIX SLOT (Error analysis of a build-the-number item, SKILL_CELL_CONTRACT.md).
+ * With payload `fix: 'draw'` (or `ctx.options.fix === 'draw'`) a picture template that the pupil
+ * DRAWS in (`base10`, `tenframe`) prints its finished work as usual and, under it, a second EMPTY
+ * mat or frame captioned "Fix it:", the place to draw the number correctly (slot `fix`, shape
+ * `draw`). The fix zone is filled with the right model on the key: when the cell is drawn in
+ * the `answered` / `traced` state, or when the role marks its key render with
+ * `ctx.options.fixKey` (Error analysis draws its work in state `wrong` on BOTH pages, so the state
+ * alone cannot tell the key from the pupil page).
+ */
+export const fixDraw = (p, ctx) => (p && p.fix === 'draw') || !!(ctx && ctx.options && ctx.options.fix === 'draw');
+export const fixFilled = (ctx) => !!(ctx && ctx.options && ctx.options.fixKey) || answered(ctx);
+/** The "Fix it:" caption over a fix zone, at zone-label size. */
+export const fixCaption = (ctx) => `<div style="font-size:${P(ctx, zonePt(ctx))};font-weight:700;line-height:1.5;text-align:left;">Fix it:</div>`;
 
 /** The parts of a list-valued shown answer ("78, 84"), in reading order. */
 export function shownParts(ctx, keyParts) {
@@ -90,7 +107,7 @@ export function box(ctx, { id = 'answer', value = '', w, h, mark = null, pt = nu
         + `${ink ? ` data-ws-ink="${ink}"` : ''}${hook} style="display:inline-flex;align-items:center;justify-content:center;`
         + `box-sizing:border-box;width:${L(ctx, w)};height:${L(ctx, h)};border:${B(ctx, heavy ? 1.5 : 0.75)} solid ${INK};`
         + `border-radius:${L(ctx, 1.25)};background:#fff;vertical-align:middle;font-size:${P(ctx, size)};font-weight:700;`
-        + `line-height:1;color:${color};flex:none;">${esc(value)}</span>`;
+        + `line-height:1;color:${color};flex:none;${KEY_FEATURES}">${esc(value)}</span>`;
 }
 
 /** A check box (section 6: 5 / 6 / 7 mm); `on` draws the check mark in it. */
@@ -163,6 +180,38 @@ function art(cx, cy, d, fn) {
     return `<g transform="translate(${n2(cx - d / 2)} ${n2(cy - d / 2)}) scale(${n2(s)})">${fn(o, i)}</g>`;
 }
 export const shapeOf = (id) => SHAPES[id] || SHAPES.circle;
+
+/**
+ * RINGABLE COUNTERS (RUBRIC H12, 2026-09-25 regrade): `n` counters of diameter `d` laid out in
+ * RUNS of `size` - one run is one group to ring - with at least `gap` mm between two counters of
+ * a run, a wider `runGap` between two runs on one line, and `rowGap` between lines, so a pencil
+ * ring round one run never touches another counter. The last run holds what is left over (a
+ * remainder). As many runs stand on a line as fit `maxW` mm (a 2-column cell), at least one;
+ * when that makes more than `maxLines` lines, the runs use `wideW` (a one-column cell).
+ * Returns the centres (mm, from 0,0) and the drawing's size.
+ */
+export function groupRuns(n, size, { d = 5, gap = 4, runGap = 9, rowGap = 7, maxW = 84, wideW = 176, maxLines = 4, pad = 0.5 } = {}) {
+    const k = Math.max(1, Math.floor(Number(size)) || 1);
+    const total = Math.max(0, Math.floor(Number(n)) || 0);
+    const pitch = d + gap;
+    const runW = (k - 1) * pitch + d;
+    const fit = (w) => Math.max(1, Math.floor((w - 2 * pad + runGap) / (runW + runGap)));
+    // Runs so long that the 2-column width would stack them into a tall column of more than
+    // `maxLines` lines (six runs of 6) take the full one-column width instead (`wideW`),
+    // several runs to a line; the page gives such an item a whole row (it is measured).
+    const runsAll = Math.ceil(total / k);
+    const perLine = Math.ceil(runsAll / fit(maxW)) > maxLines ? fit(wideW) : fit(maxW);
+    const runs = runsAll;
+    const lines = Math.max(1, Math.ceil(runs / perLine));
+    const pts = [];
+    for (let i = 0; i < total; i++) {
+        const run = Math.floor(i / k), inRun = i % k;
+        const line = Math.floor(run / perLine), slot = run % perLine;
+        pts.push({ cx: pad + d / 2 + slot * (runW + runGap) + inRun * pitch, cy: pad + d / 2 + line * (d + rowGap) });
+    }
+    const across = Math.min(perLine, runs || 1);
+    return { pts, w: 2 * pad + across * runW + (across - 1) * runGap, h: 2 * pad + lines * d + (lines - 1) * rowGap, runs, perLine };
+}
 
 /** A solid counter (INK-5: a solid fill is at most 7 mm across). */
 export const dot = (cx, cy, d) => `<circle cx="${n2(cx)}" cy="${n2(cy)}" r="${n2(Math.min(7, d) / 2)}" fill="${INK}"/>`;

@@ -87,11 +87,18 @@ export function slotValues(ctx, key, wrongSplit) {
 }
 
 /** A written value inside a slot, in the ink of the state. */
+/**
+ * TY-4 on key ink: a written value keeps the sheet's digit features ("cv04", the open-top 4, and
+ * tabular lining figures) on its own element, so a bold key digit is the same figure as the
+ * pupil page's (2026-09-25 regrade: key digits read as a different 1 and 4).
+ */
+export const KEY_FEATURES = "font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;";
+
 export function inked(value, ink) {
     if (value === '' || value === undefined || value === null || !ink) return '';
     return ink === 'trace'
         ? `<span class="ws-trace" data-ws-ink="trace" style="color:${INK.grey}">${esc(value)}</span>`
-        : `<span data-ws-ink="solid" style="color:${INK.ink};font-weight:700">${esc(value)}</span>`;   // AK-2
+        : `<span data-ws-ink="solid" style="color:${INK.ink};font-weight:700;${KEY_FEATURES}">${esc(value)}</span>`;   // AK-2
 }
 
 /**

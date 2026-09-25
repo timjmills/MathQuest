@@ -92,7 +92,7 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
         }).join('');
     }
     if (answer === 'traced' && ans !== null) html += pad(String(ans)).map((ch) => `<span class="ws-trace">${ch === ' ' ? '' : ch}</span>`).join('');
-    if (answer === 'solid' && ans !== null) html += pad(String(ans)).map((ch) => `<span data-ws-ink="solid">${ch === ' ' ? '' : ch}</span>`).join('');
+    if (answer === 'solid' && ans !== null) html += pad(String(ans)).map((ch) => `<span data-ws-ink="solid" style="font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums">${ch === ' ' ? '' : ch}</span>`).join('');
     if (answer === 'slots' && slots) {
         // A null slot is a track with no box (the operator track, SL-12): the strip skips it.
         const live = slots.filter((s) => s !== null && s !== undefined).length;

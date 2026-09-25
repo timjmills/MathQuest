@@ -7,10 +7,13 @@
 //        3 + 4 = [  ]               <- the answer, in the pupil's own box
 //
 // Only the start is marked (a solid dot on the first addend): the line never shows the jumps or
-// the landing point on the pupil page (RP-1). The unit pitch has a floor (6.5 mm on a 0-20 line,
-// 11 mm on 0-10) and the labels stay at the preset's zone-label size (TY-11: never under 8 pt,
-// never shrunk to fit), so the cell has a minimum width and is measured: a narrow page column
-// gets fewer cells per row, never a shrunken line (PG-20, the critic's 5 pt labels, H2).
+// the landing point on the pupil page (RP-1). The line spans the full width of a one-column cell
+// (LINE_MM, 2026-09-25 regrade: a line in 65% of the cell with 6 mm units and 9 pt labels was
+// too cramped for a Grade 1 pupil to draw jumps on): the unit pitch is the width over the units,
+// at most 16 mm, so a 0-10 line has 16 mm units and a 0-20 line 8.1 mm (the most A4 allows;
+// 10 mm units need a line of 16 or fewer). The labels are at least 12 pt (the zone-label size
+// token or 12 pt, never shrunk to fit). The line is one drawing at every column count (DN-10),
+// so the cell is one column wide.
 //
 // The key draws the jumps, one arc per unit from the start, and writes the sum in the pupil's
 // box; a wrong piece of work (Error analysis) draws the jumps to where that wrong answer landed.
@@ -24,14 +27,20 @@ import { geo, root, inkOf, slotValues, box, esc } from './ops-common.js';
 import { INK } from '../tokens.js';
 
 const PT_MM = 25.4 / 72;
-const pitchOf = (max) => (max <= 10 ? 11 : 6.5);
+/** The drawn width of every line: a one-column cell's content width (186 mm less pads). */
+const LINE_MM = 176;
+const PAD_MM = 5;
+/** Unit pitch (mm): the line's width over its units, never more than 16 mm. */
+const pitchOf = (max) => Math.min(16, (LINE_MM - 2 * PAD_MM - 4) / Math.max(1, max));
+/** Label size (pt): the zone-label token, never under 12 pt. */
+const LABEL_PT_MIN = 12;
 
 function lineSVG(g, p, jumpsTo, ink) {
     const max = Number(p.max) || 20, start = Number(p.start);
     const pitch = pitchOf(max);
-    const pad = 5, x0 = pad;
+    const pad = PAD_MM, x0 = pad;
     const W = max * pitch + pad * 2 + 4;
-    const labelMm = Math.max(8, g.zoneEm * g.pt) * PT_MM;       // zone size, >= 8 pt
+    const labelMm = Math.max(LABEL_PT_MIN, g.zoneEm * g.pt) * PT_MM;   // zone size, >= 12 pt
     const arcH = Math.min(8, pitch * 0.75);
     const yLine = arcH + 3;
     const H = yLine + 3 + labelMm * 1.25 + 1;
@@ -81,7 +90,7 @@ register('number-line', {
     footprint(p, ctx) {
         const g = geo(ctx);
         const line = lineSVG(g, p, null, null);
-        return { wMm: Math.ceil(line.wMm + 6), hMm: Math.ceil(line.hMm + g.stripMm + 6), measure: true, factLike: false, maxCols: 2 };
+        return { wMm: Math.ceil(line.wMm + 6), hMm: Math.ceil(line.hMm + g.stripMm + 6), measure: true, factLike: false, maxCols: 1 };
     },
     inputs() {
         return [{ id: 'answer', kind: 'number', shape: 'box', graded: true, order: 0, inputmode: 'numeric', scopes: ['full', 'answer-only'] }];

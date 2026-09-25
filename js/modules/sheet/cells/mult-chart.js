@@ -24,6 +24,28 @@ const NUM_EM = 0.68;
 const sortedBlanks = (p) => (p.blanks || []).slice().sort((a, b) => a.i - b.i || a.j - b.j);
 const productAt = (p, i, j) => (Number(p.r0) + i) * (Number(p.c0) + j);
 
+/** The writing box of an empty chart cell is at least this wide (mm): 14 at L (RUBRIC H9). */
+const BOX_MIN_MM = { S: 11, M: 12, L: 14 };
+/** The box's air around a written 3-digit product, and the cell's air around the box (mm). */
+const BOX_AIR_MM = 3.5;
+const CELL_AIR_MM = 2.5;
+
+/**
+ * Column width and row height (mm). Every column holds a writing box wide enough for a
+ * THREE-digit product at the chart's number size with air on both sides, never under
+ * BOX_MIN_MM, so the key's 108 stays inside its box (2026-09-25 regrade: ~10 mm boxes, and the
+ * key overran them). A chart this wide may need a whole page column; the host measures it.
+ */
+function chartGeom(g) {
+    const digits3 = 3 * 0.56 * NUM_EM * g.E;
+    const boxW = Math.max(BOX_MIN_MM[g.size] || 14, digits3 + BOX_AIR_MM);
+    const cellMm = boxW + CELL_AIR_MM;
+    // Rows are Hw + 3 mm (a 10.5 mm box at L), so a 5-row window and its cell stay under a
+    // third of the grid and a one-column page holds three charts.
+    const cellH = Math.max(g.writeMm + 3, NUM_EM * g.E * 1.35);
+    return { cellMm, cellH, boxW };
+}
+
 function keySlots(p) {
     const k = {};
     sortedBlanks(p).forEach((b, n) => { k[`mc${n}`] = String(productAt(p, b.i, b.j)); });
@@ -44,9 +66,7 @@ register('mult-chart', {
         });
         const blanks = sortedBlanks(p);
         const idOf = (i, j) => { const n = blanks.findIndex((b) => b.i === i && b.j === j); return n < 0 ? null : `mc${n}`; };
-        // Column width: three digits at the chart size, plus 3 mm of air (never under 1.5 Hw).
-        const cellMm = Math.max(3 * 0.55 * NUM_EM * g.E + 2.5, g.writeMm * 1.3);
-        const cellH = Math.max(g.writeMm + 4, NUM_EM * g.E * 1.4);
+        const { cellMm, cellH } = chartGeom(g);
         const td = (content, extra = '') => `<td style="box-sizing:border-box;width:${g.em(cellMm)};min-width:${g.em(cellMm)};height:${g.em(cellH)};`
             + `padding:0;text-align:center;vertical-align:middle;border:${HAIR} solid ${INK.ink};white-space:nowrap;${extra}">${content}</td>`;
         const num = (v, bold = false) => `<span style="font-size:${NUM_EM}em;${bold ? 'font-weight:700;' : ''}">${esc(v)}</span>`;
@@ -58,7 +78,7 @@ register('mult-chart', {
             for (let j = 0; j < C; j++) {
                 const id = idOf(i, j);
                 if (id) {
-                    rows += td(box(g, id, { wMm: cellMm - 2.5, hMm: cellH - 2.5, value: vals[id] || '', ink, mark: 'cell', scale: NUM_EM }));
+                    rows += td(box(g, id, { wMm: cellMm - CELL_AIR_MM, hMm: cellH - CELL_AIR_MM, value: vals[id] || '', ink, mark: 'cell', scale: NUM_EM }));
                 } else {
                     rows += td(num(productAt(p, i, j)));
                 }
@@ -77,8 +97,7 @@ register('mult-chart', {
     },
     footprint(p, ctx) {
         const g = geo(ctx);
-        const cellMm = Math.max(3 * 0.55 * NUM_EM * g.E + 2.5, g.writeMm * 1.3);
-        const cellH = Math.max(g.writeMm + 4, NUM_EM * g.E * 1.4);
+        const { cellMm, cellH } = chartGeom(g);
         return {
             wMm: Math.ceil(((p.cols || 5) + 1) * cellMm + 6),
             hMm: Math.ceil(((p.rows || 4) + 1) * cellH + 6),

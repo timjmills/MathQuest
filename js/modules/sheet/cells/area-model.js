@@ -24,6 +24,15 @@ import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, box, esc, splitList, HAIR } from './ops-common.js';
 import { INK } from '../tokens.js';
 
+/**
+ * The online worksheet's card CSS forces `flex-wrap: wrap !important` on every inline
+ * `display:flex` inside a problem card, except elements carrying this class (ui-components.css,
+ * "exclude area model grids which must not wrap"). Every flex row of the model carries it, so a
+ * 3-part model never wraps its label row or pushes the multiplier above the model on screen
+ * (2026-09-25 regrade, worksheet-1280), and the labels stay over their columns.
+ */
+const NOWRAP = 'area-model-total-row';
+
 const partialsOf = (p) => p.parts.map((v) => Number(p.multiplier) * Number(v));
 const productOf = (p) => (p.product !== undefined ? Number(p.product) : partialsOf(p).reduce((s, n) => s + n, 0));
 const multiplicandOf = (p) => p.parts.reduce((s, n) => s + Number(n), 0);
@@ -67,7 +76,7 @@ register('area-model', {
                 + `style="box-sizing:border-box;width:${g.em(bw)};height:${g.em(g.stripMm)};border:${HAIR} solid ${INK.ink};border-radius:${g.em(g.rMm)};background:#fff;color:${INK.ink};font:inherit;font-size:1em;text-align:center;padding:0">`
             : box(g, `part-${i}`, { wMm: bw, hMm: g.stripMm, value: vals[`part-${i}`] || '', ink, mark: null }));
         const labels = parts.map((v) => `<span style="flex:0 0 ${g.em(colMm)};text-align:center;font-weight:700">${esc(v)}</span>`).join('');
-        const rects = parts.map((v, i) => `<span style="flex:0 0 ${g.em(colMm)};height:${g.em(hMm)};box-sizing:border-box;display:flex;align-items:center;justify-content:center;`
+        const rects = parts.map((v, i) => `<span class="${NOWRAP}" style="flex:0 0 ${g.em(colMm)};height:${g.em(hMm)};box-sizing:border-box;display:flex;align-items:center;justify-content:center;`
             + `${i ? `border-left:${HAIR} solid ${INK.ink};` : ''}">${partSlot(i)}</span>`).join('');
         const mulMm = String(p.multiplier).length * 0.62 * g.E + 5;
         const totalW = boxMm(g, String(total).length + 1);
@@ -76,11 +85,11 @@ register('area-model', {
                 + `style="box-sizing:border-box;width:${g.em(totalW)};height:${g.em(g.stripMm)};border:${HAIR} solid ${INK.ink};border-radius:${g.em(g.rMm)};background:#fff;color:${INK.ink};font:inherit;font-size:1em;text-align:center;padding:0">`
             : box(g, 'total', { wMm: totalW, hMm: g.stripMm, value: vals.total || '', ink, mark: null });
         const model = `<div style="display:inline-flex;flex-direction:column;align-items:flex-start;white-space:nowrap">`
-            + `<div style="display:flex;flex-wrap:nowrap;margin-left:${g.em(mulMm)};margin-bottom:0.1em">${labels}</div>`
-            + `<div style="display:flex;flex-wrap:nowrap;align-items:center">`
+            + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;margin-left:${g.em(mulMm)};margin-bottom:0.1em">${labels}</div>`
+            + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:center">`
             + `<span style="flex:0 0 ${g.em(mulMm)};text-align:center;font-weight:700">${esc(p.multiplier)}</span>`
-            + `<span style="display:flex;flex-wrap:nowrap;border:${HAIR} solid ${INK.ink}">${rects}</span></div>`
-            + `<div style="display:flex;flex-wrap:nowrap;align-items:center;gap:0.28em;margin-top:0.45em;white-space:nowrap">`
+            + `<span class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;border:${HAIR} solid ${INK.ink}">${rects}</span></div>`
+            + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:center;gap:0.28em;margin-top:0.45em;white-space:nowrap">`
             + `<span>${esc(p.multiplier)}</span><span style="font-weight:700;width:1em;text-align:center">×</span><span>${esc(multiplicandOf(p))}</span>`
             + `<span style="font-weight:700;width:1em;text-align:center">=</span>${totalSlot}</div></div>`;
         return root(g, 'area-model', model, 'text-align:center;white-space:nowrap;', this.footprint(p, ctx).wMm);

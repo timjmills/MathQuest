@@ -6,7 +6,7 @@ import { createBase10Blocks, createCountingDots, createDotArray, createNumberLin
 import { COLORS, STROKE, FONTS, MONO, softFill, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
 import { stripSegStyle, stripPos } from './sheet/tokens.js';
-import { renderCell as _kitRender } from './sheet/index.js';
+import { renderCell as _kitRender, factCue as _factCue } from './sheet/index.js';
 
 // ========================================
 // HOW IT IS WRITTEN — the `notation` option (skill-options.js)
@@ -1146,7 +1146,9 @@ function _generateLadderV2(q, skill, helpers, range) {
     // error). §2.5's `addends` option would choose 3 or 4; until it exists the two alternate.
     if (skill === 'add_column_multi') {
         const wide = range >= 1000 && rng(0, 2) === 0;          // CM-7: three-digit addends
-        const k = 3 + (_dealRung(2) === 1 ? 1 : 0);             // CM-5 three, CM-6 four
+        // P11: `tiles` ("Numbers to add") fixes 3 or 4; unset, the two alternate (CM-5 / CM-6).
+        const _addends = Number(_opt('tiles'));
+        const k = _addends === 3 || _addends === 4 ? _addends : 3 + (_dealRung(2) === 1 ? 1 : 0);
         const lo = wide ? 100 : 10, hi = wide ? 999 : 99;
         let addends = null;
         for (let t = 0; t < 60; t++) {
@@ -1968,7 +1970,8 @@ const _KIT_OP = { '+': '+', '-': '-', '−': '-', '×': '*', '÷': '/' };
  */
 function _applyKitFactCell(q, skill, range) {
     if (!_KIT_FACT_SKILLS.has(skill) || !q || q.cell) return;
-    if (state.decimalPlaces > 0) return;
+    // P11: a fact drill is whole numbers whatever the Decimals setting, so its cell does not change with it.
+    if (state.decimalPlaces > 0 && !/_facts$/.test(skill)) return;
     const op = _KIT_OP[q.op];
     const a = Number(q.a), b = Number(q.b);
     if (!op || !Number.isInteger(a) || !Number.isInteger(b) || a < 0 || b < 0) return;
@@ -1986,6 +1989,19 @@ function _applyKitFactCell(q, skill, range) {
         return;
     }
     const across = q.notation === 'across' || /horizontal/.test(String(q.printFormat || ''));
+    // P11 (critic round 2): a stacked two-digit add / subtract item that REGROUPS is column work,
+    // not a fact: it prints on the stack template with its carry (or borrow) strip, and the screen
+    // shows the same stack, its digit boxes typed and composing the answer.
+    if (small && !across && (skill === 'add' || skill === 'subtract') && Math.max(a, b) >= 10
+        && (op === '+' ? hasCarry(a, b) : hasBorrow(a, b))) {
+        const payload = { operands: [a, b], op, heads: false, regroup: op === '+' ? 'add' : 'sub', ansDigits: digits };
+        q.cell = { template: 'stack', v: 1, payload };
+        q.visual = _kitStackTwin(payload);
+        q.selfAnswering = true;
+        q.printFormat = op === '+' ? 'column-add' : 'column-sub';
+        q.notation = 'stacked';
+        return;
+    }
     if (small) {
         q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: across ? 'horiz' : 'vertical', digits } };
         if (!across && /column-(add|sub)/.test(String(q.printFormat || ''))) {
@@ -2006,12 +2022,291 @@ function _applyKitFactCell(q, skill, range) {
     }
 }
 
+// ============================================================================================
+// P11 · THE OPTION LAYER — the + − × ÷ options skill-options.js (P11_OPS_OPTIONS) declares
+// ============================================================================================
+// Every option there is read here, so the option panel never lies (an option a generator
+// ignores is worse than no option). Four mechanisms, all driven by state.skillOptions and so
+// identical on print (buildSheet -> generateQuestionFor) and on every screen host:
+//   ROUTE   a ranged id (add_100_regroup, sub_wp_1k …) is one rung of a ladder; its `band` and
+//           `regroup` pick the rung, and the rung's own branch generates it (_routeByOptions).
+//   FILTER  `regroup` on add / subtract and `zeroPlace` (across zeros) keep an item only when it
+//           has the property asked for; the item is regenerated otherwise (_optionAccepts).
+//   READ    the fact band (`band` on the fact drills) and the digit sizes are read by the branch.
+//   POST    the hint cue, the unknown position, pictures, the bar model and the column support
+//           level are laid onto the finished item and its print cell (_applyOptionPost).
+// The DEFAULT of every option is what the skill dealt before (R2), and each mechanism does
+// nothing at its default, so an untouched skill draws exactly the same random numbers as before.
+function _optDef(id) {
+    try { return optionsFor(state.category, state.skill).find(o => o.id === id) || null; } catch (e) { return null; }
+}
+/** The value of option `id` for this item: the set's / caller's choice, else the default; undefined when not declared. */
+function _opt(id) {
+    const def = _optDef(id);
+    if (!def) return undefined;
+    const o = state.skillOptions;
+    const v = o && typeof o === 'object' && Object.prototype.hasOwnProperty.call(o, id) ? o[id] : undefined;
+    return v === undefined ? def.default : v;
+}
+const _BAND_CODE = { 10: '10', 20: '20', 50: '50', 100: '100', 1000: '1k', 10000: '10k', 100000: '100k', 1000000: '1m' };
+const _RANGED_RE = /^(add|sub)_(10|20|50|100|1k|10k|100k|1m)_(no_regroup|regroup|mixed)$/;
+const _WP_RE = /^(add|sub)_wp_(10|20|50|100|1k|10k|100k|1m)$/;
+
+function _routeByOptions(skill) {
+    let m = String(skill).match(_RANGED_RE);
+    if (m) {
+        const code = _BAND_CODE[Number(_opt('band'))] || m[2];
+        const rg = _opt('regroup');
+        const rgId = rg === 'none' ? 'no_regroup' : rg === 'always' ? 'regroup' : rg === 'mixed' ? 'mixed' : m[3];
+        return `${m[1]}_${code}_${rgId}`;
+    }
+    m = String(skill).match(_WP_RE);
+    if (m) {
+        const code = _BAND_CODE[Number(_opt('band'))] || m[2];
+        // add_wp_10 is the K picture story, generated in gen-counting.js: never routed into here.
+        if (m[1] === 'add' && code === '10') return skill;
+        return `${m[1]}_wp_${code}`;
+    }
+    return skill;
+}
+
+function _optionAccepts(q, selected, routed) {
+    if (!q || !Number.isInteger(q.a) || !Number.isInteger(q.b) || state.decimalPlaces > 0) return true;
+    const isAdd = q.op === '+';
+    if (selected === 'add' || selected === 'subtract') {
+        const rg = _opt('regroup');
+        const has = isAdd ? hasCarry(q.a, q.b) : hasBorrow(q.a, q.b);
+        // The band bounds the ANSWER: the sum for +, the number taken from for −.
+        const band = Number(_opt('band'));
+        if (band && (isAdd ? q.a + q.b : q.a) > band) return false;
+        if (rg === 'none' && has) return false;
+        if (rg === 'always' && !has) return false;
+    }
+    const m = String(routed).match(_RANGED_RE);
+    if (m && m[1] === 'sub' && RANGE_MAP[m[2]] >= 1000) {
+        const z = _opt('zeroPlace');
+        if (z === 'always' && !_subHasAcrossZero(q.a, q.b)) return false;
+        if (z === 'none' && _subHasAcrossZero(q.a, q.b)) return false;
+    }
+    return true;
+}
+
+/** The item index a page deals by (kept items), or the live cursor. */
+const _optAt = () => (Number.isFinite(state.itemIndex) ? state.itemIndex : _constantCursor);
+
+/** A part-part-whole bar under a story (the `support: bar` hint). + : whole unknown; − : a part unknown. */
+function _barModelSVG(a, b, isAdd) {
+    const whole = isAdd ? a + b : a;
+    const partA = isAdd ? a : b, partB = isAdd ? b : a - b;
+    const W = 300, x0 = 10, pw = W - 20;
+    const wA = Math.max(40, Math.min(pw - 40, Math.round(pw * partA / Math.max(1, whole))));
+    const t = (x, y, s) => `<text x="${x}" y="${y}" text-anchor="middle" font-family="Andika, sans-serif" font-size="15" fill="#000">${s}</text>`;
+    const box = (x, y, w, h, dash) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="#000" stroke-width="1.5"${dash ? ' stroke-dasharray="5 4"' : ''}/>`;
+    const fmt = (n) => Number(n).toLocaleString('en-US');
+    const body = box(x0, 6, pw, 26, !isAdd ? false : true) + t(x0 + pw / 2, 24, isAdd ? '?' : fmt(whole))
+        + box(x0, 40, wA, 26) + t(x0 + wA / 2, 58, fmt(partA))
+        + box(x0 + wA, 40, pw - wA, 26, !isAdd) + t(x0 + wA + (pw - wA) / 2, 58, isAdd ? fmt(partB) : '?');
+    return `<div class="mq-bar-model" style="margin-top:10px;text-align:center;"><svg viewBox="0 0 ${W} 72" width="${W}" height="72" `
+        + `style="max-width:100%;" role="img" aria-label="bar model">${body}</svg></div>`;
+}
+
+function _applyOptionPost(q, selected, routed) {
+    if (!q) return;
+    const isAdd = q.op === '+';
+    const isSubOp = q.op === '-' || q.op === '−';
+    const ints = Number.isInteger(q.a) && Number.isInteger(q.b) && !(state.decimalPlaces > 0);
+
+    // --- the unknown position on add / subtract --------------------------------------------
+    if ((selected === 'add' || selected === 'subtract') && ints && (isAdd || isSubOp)) {
+        let u = _opt('unknown');
+        if (u === 'mixed') u = ['answer', 'first', 'second'][((_optAt() % 3) + 3) % 3];
+        if (u === 'first' || u === 'second') {
+            const a = q.a, b = q.b, res = isAdd ? a + b : a - b, glyph = isAdd ? '+' : '−';
+            q.text = u === 'first' ? `? ${glyph} ${b} = ${res}` : `${a} ${glyph} ? = ${res}`;
+            q.ans = u === 'first' ? a : b;
+            q.missing = u === 'first' ? 'a' : 'b';
+            q.notation = 'across';
+            q.answerType = 'number';
+            q.options = buildNumericOptions(q.ans);
+            q.hint = isAdd
+                ? (u === 'first' ? `What number and ${b} make ${res}? Count on from ${b} to ${res}.` : `Start at ${a}. How many more to reach ${res}?`)
+                : (u === 'first' ? `Add back what was taken: ${res} + ${b}.` : `How many do you take from ${a} to leave ${res}? Count back.`);
+            q.printFormat = 'missing-add-sub';
+            q.visual = '';
+            const payload = { a, b, op: isAdd ? '+' : '-', result: res, unknown: u === 'first' ? 'a' : 'b', digits: String(q.ans).length };
+            q.cell = { template: 'equation', v: 1, payload };
+            q.printText = 'Write the missing number.';
+        }
+    }
+
+    // --- the fading hint cue under a fact ---------------------------------------------------
+    const cue = _opt('support');
+    const cueKinds = ['tile', 'frame', 'line', 'skip', 'array', 'think'];
+    const factHost = ['add_facts', 'sub_facts', 'mult_facts', 'div_facts'].includes(selected)
+        || (_RANGED_RE.test(routed) && RANGE_MAP[routed.match(_RANGED_RE)[2]] <= 20 && !(routed.endsWith('_10_regroup') && q.bridgeParts));
+    if (factHost && cueKinds.includes(cue) && Number.isFinite(Number(q.a)) && Number.isFinite(Number(q.b)) && q.notation !== 'fraction' && !q.bridgeWritten) {
+        const op = _KIT_OP[q.op];
+        if (op) {
+            const a = Number(q.a), b = Number(q.b);
+            if (!q.cell || q.cell.template !== 'fact') {
+                q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: q.notation === 'across' ? 'horiz' : 'vertical', digits: 2 } };
+            }
+            q.cell = { ...q.cell, payload: { ...q.cell.payload, cue } };
+            q.cueKind = cue;
+            // On screen the host redraws a `facts-column-visual` fact from its numbers alone and
+            // would drop the cue, so a cued fact is shown as its number sentence with the cue under
+            // it and the host's answer box (paper keeps the vertical fact and the cue together).
+            const base = /facts-column-visual|column-answer-input/.test(String(q.visual || '')) ? '' : (q.visual || '');
+            const svg = _factCue({ a, b, op, cue }, { px: 4.5 });
+            const w = Number((/width="(\d+)"/.exec(svg) || [])[1]) || 160;
+            // The card's stylesheet stretches a bare SVG to its width, so the cue is held at its size.
+            q.visual = `${base}<div class="mq-factcue" style="margin:10px auto 0;max-width:${w}px;text-align:center;">${svg}</div>`;
+        }
+    }
+
+    // --- pictures off (word problems, the ≤ 5 picture sums) ---------------------------------
+    if (_opt('pictures') === false) {
+        q.visual = '';
+        if (q.cell && q.cell.template === 'wordpic') q.cell = { ...q.cell, payload: { ...q.cell.payload, pictures: false } };
+        // A story prints as the plain story with a work space; a sum (add_three) prints its sentence.
+        if (/^word/.test(String(q.printFormat || '')) || _WP_RE.test(routed) || /word_problems/.test(selected)) q.printFormat = 'word-plain';
+        q.picturesOff = true;
+    }
+
+    // --- the bar model under a story ---------------------------------------------------------
+    if (_WP_RE.test(routed) && _opt('support') === 'bar' && Number.isFinite(q.a) && Number.isFinite(q.b)) {
+        q.visual = `${q.visual || ''}${_barModelSVG(q.a, q.b, isAdd)}`;
+        q.barModel = true;
+        if (q.printFormat === 'word-plain') q.printFormat = routed.startsWith('add') ? 'word-add' : 'word-sub';
+    }
+
+    // --- the column support level (ranged ids from 50 up) ------------------------------------
+    const rm = String(routed).match(_RANGED_RE);
+    if (rm && RANGE_MAP[rm[2]] >= 50 && Number.isInteger(q.a) && Number.isInteger(q.b) && (isAdd || isSubOp) && _optDef('level')) {
+        const lvl = supportLevelFor(1);
+        const maxVal = RANGE_MAP[rm[2]];
+        const payload = { operands: [q.a, q.b], op: isAdd ? '+' : '-', ansDigits: String(isAdd ? maxVal : maxVal - 1).length };
+        if (lvl >= 2) payload.heads = true;
+        if (lvl >= 3) payload.answer = 'traced';
+        q.cell = { template: 'stack', v: 1, payload };
+        q.supportLevel = lvl;
+        if (lvl >= 2) {
+            const PLACES = ['O', 'T', 'H', 'Th', 'TTh', 'HTh', 'M'];
+            const heads = PLACES.slice(0, String(Math.max(q.a, q.b, isAdd ? q.a + q.b : q.a)).length).reverse().join('  ');
+            const lead = lvl >= 3
+                ? `<div class="mq-worked" style="color:#949494;font-weight:700;margin-bottom:6px;">Worked: ${q.a.toLocaleString()} ${isAdd ? '+' : '−'} ${q.b.toLocaleString()} = ${(isAdd ? q.a + q.b : q.a - q.b).toLocaleString()}</div>`
+                : '';
+            q.visual = `<div class="mq-col-support" style="text-align:center;">${lead}`
+                + `<div class="mq-heads" style="font-weight:700;letter-spacing:0.2em;">${heads}</div>${q.visual || ''}</div>`;
+        }
+    }
+}
+
+/**
+ * × and ÷ sized by the teacher (`tiles`: 11 = 1-digit × 1-digit, 21, 31, 22; ÷ 21, 31, 41, 32)
+ * and ÷ remainders (`regroup`). Returns true when it drew the item; false leaves the legacy
+ * branch to do it (the default, "Set by Max Number", with no remainders).
+ */
+function _generateSizedMultDiv(q, skill, helpers) {
+    const { rng } = helpers;
+    if (skill === 'multiply') {
+        const d = Number(_opt('tiles'));
+        if (!d) return false;
+        const lo = (n) => (n === 1 ? 2 : 10 ** (n - 1)), hi = (n) => 10 ** n - 1;
+        const da = Math.floor(d / 10), db = d % 10;
+        const a = rng(lo(da), hi(da)), b = rng(lo(db), hi(db));
+        const ans = a * b;
+        q.a = a; q.b = b; q.op = '×'; q.ans = ans;
+        q.text = `${a} × ${b} = ?`;
+        q.answerType = 'number';
+        q.options = [];
+        q.hint = db >= 2 ? `Multiply ${a} × ${b % 10} first, then ${a} × ${Math.floor(b / 10)}0, then add the two.` : `Multiply each digit of ${a} by ${b}. Carry when needed.`;
+        if (d === 11) {
+            const not = notationFor('×');
+            q.notation = not;
+            q.cell = { template: 'fact', v: 1, payload: { a, b, op: '*', notation: not === 'across' ? 'horiz' : 'vertical', digits: 2 } };
+            q.printFormat = not === 'across' ? 'mult-facts-horizontal' : 'mult-facts-vertical';
+            q.visual = not === 'across' ? '' : `<div class="facts-column-visual" style="text-align:center;"><div style="display:inline-block;text-align:right;"><div>${a}</div><div><span>×</span> ${b}</div></div></div>`;
+        } else {
+            q.notation = 'stacked';
+            if (notationFor('×') === 'across') q.notationClampedFrom = 'across';
+            const payload = { operands: [a, b], op: '*', ansDigits: String(hi(da) * hi(db)).length };
+            q.visual = _kitStackTwin(payload);
+            // 2-digit × 2-digit needs its partial-product rows on paper: the column-mult cell.
+            if (db >= 2) q.printFormat = 'column-mult';
+            else { q.cell = { template: 'stack', v: 1, payload }; q.printFormat = 'column-mult'; }
+        }
+        q.skillLabel = 'Multiply';
+        return true;
+    }
+    if (skill === 'divide') {
+        const d = Number(_opt('tiles'));
+        const rem = _opt('regroup');
+        if (!d && (!rem || rem === 'none')) return false;
+        const nDividend = d ? Math.floor(d / 10) : 2, nDivisor = d ? d % 10 : 1;
+        const divisor = nDivisor === 1 ? rng(2, 9) : rng(11, 99);
+        const withR = rem === 'always' || (rem === 'mixed' && _optAt() % 2 === 1);
+        const lo = 10 ** (nDividend - 1), hi = 10 ** nDividend - 1;
+        let dividend = lo, quotient = 1, r = 0;
+        for (let t = 0; t < 80; t++) {
+            quotient = rng(Math.max(2, Math.ceil(lo / divisor)), Math.max(2, Math.floor(hi / divisor)));
+            r = withR ? rng(1, divisor - 1) : 0;
+            dividend = divisor * quotient + r;
+            if (dividend >= lo && dividend <= hi) break;
+        }
+        q.a = dividend; q.b = divisor; q.op = '÷';
+        q.text = `${dividend.toLocaleString()} ÷ ${divisor} = ?`;
+        q.notation = 'bracket';
+        if (notationFor('÷') !== 'bracket') q.notationClampedFrom = notationFor('÷');
+        const payload = { dividend, divisor, quotient, workRows: 4 };
+        if (withR) {
+            payload.rbox = true;
+            q.ans = `${quotient} R ${r}`;
+            q.quotientRemainder = { quotient, remainder: r };
+            q.acceptedAnswers = [`${quotient} R ${r}`, `${quotient}R${r}`, `${quotient} R${r}`, `${quotient}R ${r}`, `${quotient} r ${r}`, `${quotient}r${r}`, `${quotient} remainder ${r}`];
+            q.answerType = 'text';
+            // On screen the answer is typed as "q R r" into one box (the digit strip cannot hold it).
+            q.visual = '';
+        } else {
+            q.ans = quotient;
+            q.answerType = 'number';
+            q.visual = _kitTwin('division', payload, { join: '' });
+        }
+        q.cell = { template: 'division', v: 1, payload };
+        q.printFormat = 'long-div-kit';
+        q.options = [];
+        q.hint = withR
+            ? `How many whole groups of ${divisor} are in ${dividend}? What is left over is the remainder: less than ${divisor}.`
+            : `Divide, multiply, subtract, bring down. ${divisor} × ${quotient} = ${dividend}.`;
+        q.skillLabel = 'Divide';
+        return true;
+    }
+    return false;
+}
+
 export function generateOperationsQuestion(q, mappedSkill, helpers) {
     // One deal per question: advance the notation cursor and clear the per-item cache, so the
     // several call sites below that ask for this item's notation all get the same answer.
     _beginNotationItem();
-    const result = _generateOperationsQuestionInner(q, mappedSkill, helpers);
-    try { _applyKitFactCell(q, mappedSkill, Number((helpers && helpers.range) || state.range || 100)); } catch (e) { /* the legacy cell stays */ }
+    // P11: the option layer. `selected` is the skill the teacher configured; `routed` the rung
+    // its band / regrouping picks (the same id when those are at their defaults).
+    const selected = mappedSkill;
+    mappedSkill = _routeByOptions(mappedSkill);
+    const _init = Object.assign({}, q);
+    // Basic + and −: the band (10 / 20) caps the numbers dealt as well, so the sum filter rarely retries.
+    const _selBand = (selected === 'add' || selected === 'subtract') ? Number(_opt('band')) : 0;
+    const _genHelpers = _selBand ? { ...helpers, range: Math.min(Number(helpers.range) || _selBand, _selBand) } : helpers;
+    let result;
+    if (_generateSizedMultDiv(q, selected, helpers)) result = q;
+    else {
+        for (let t = 0; t < 60; t++) {
+            if (t) { for (const k of Object.keys(q)) delete q[k]; Object.assign(q, _init); }
+            result = _generateOperationsQuestionInner(q, mappedSkill, _genHelpers);
+            if (_optionAccepts(q, selected, mappedSkill)) break;
+        }
+    }
+    try { _applyKitFactCell(q, mappedSkill, Number((_genHelpers && _genHelpers.range) || state.range || 100)); } catch (e) { /* the legacy cell stays */ }
+    try { _applyOptionPost(q, selected, mappedSkill); } catch (e) { /* the item stands as generated */ }
     if (q && typeof q.text === 'string') q.text = agreeWithOne(q.text);
     if (q && typeof q.printText === 'string') q.printText = agreeWithOne(q.printText);
     // Auto-add vertical-column instruction + SVG diagram to horizontal add/sub
@@ -2107,9 +2402,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const nlMin = 0;
                 const nlMax = Math.ceil((sum + 2) / 5) * 5 || 10;
                 // LRU rotation across 3 sub-types (was Math.random() chain).
-                const roll = (typeof window !== 'undefined' && window.pickVariant)
+                // P11: "What is missing" fixes the sub-type; Mixed (the default) keeps the weighted rotation.
+                const _nlU = { answer: 'find_sum', first: 'find_start', second: 'find_addend' }[_opt('unknown')];
+                const roll = _nlU || ((typeof window !== 'undefined' && window.pickVariant)
                     ? window.pickVariant('nl_add', ["find_sum","find_addend","find_start"], [4,1,1])
-                    : (Math.random() < 0.5 ? 'find_sum' : (Math.random() < 0.5 ? 'find_addend' : 'find_start'));
+                    : (Math.random() < 0.5 ? 'find_sum' : (Math.random() < 0.5 ? 'find_addend' : 'find_start')));
                 q._variant = roll;
                 if (roll === 'find_sum') {
                     // Find the sum
@@ -2147,9 +2444,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const nlMin = 0;
                 const nlMax = Math.ceil((a + 2) / 5) * 5 || 10;
                 // LRU rotation across 3 sub-types (was Math.random() chain).
-                const roll = (typeof window !== 'undefined' && window.pickVariant)
+                const _nlU = { answer: 'find_diff', first: 'find_min', second: 'find_sub' }[_opt('unknown')];
+                const roll = _nlU || ((typeof window !== 'undefined' && window.pickVariant)
                     ? window.pickVariant('nl_sub', ["find_diff","find_sub","find_min"], [4,1,1])
-                    : (Math.random() < 0.5 ? 'find_diff' : (Math.random() < 0.5 ? 'find_sub' : 'find_min'));
+                    : (Math.random() < 0.5 ? 'find_diff' : (Math.random() < 0.5 ? 'find_sub' : 'find_min')));
                 q._variant = roll;
                 if (roll === 'find_diff') {
                     // Find the difference
@@ -2180,7 +2478,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             }
 
             if (mappedSkill === 'nl_mult') {
-                const maxProd = Math.min(range, 100);
+                // P11: "Numbers to" bounds the product (the default, 100, is today's cap).
+                const maxProd = Math.min(range, Number(_opt('band')) || 100);
                 const maxHops = Math.min(6, Math.max(2, Math.floor(Math.sqrt(maxProd))));
                 const numHops = rng(2, maxHops);
                 const maxHopSize = Math.max(2, Math.min(12, Math.floor(maxProd / numHops)));
@@ -2228,7 +2527,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             }
 
             if (mappedSkill === 'nl_div') {
-                const maxDiv = Math.min(range, 100);
+                // P11: "Numbers to" bounds the number shared (the default, 100, is today's cap).
+                const maxDiv = Math.min(range, Number(_opt('band')) || 100);
                 const maxDivisor = Math.max(2, Math.min(10, Math.floor(Math.sqrt(maxDiv))));
                 const divisor = rng(2, maxDivisor);
                 const maxQuotient = Math.max(2, Math.min(12, Math.floor(maxDiv / divisor)));
@@ -2915,13 +3215,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // ADD THREE (Grade 1) - Add three numbers <= 20
             // ========================================
             if (mappedSkill === "add_three") {
-                // Generate 3 numbers, each <= 10, sum <= 20
+                // Generate 3 numbers, each <= 10, sum <= 20 (P11: "Sum to" 10 / 20 bounds the sum)
+                const _a3Top = Number(_opt('band')) || 20;
                 let a, b, c;
                 do {
-                    a = rng(1, 10);
-                    b = rng(1, 10);
-                    c = rng(1, Math.min(10, 20 - a - b));
-                } while (a + b + c > 20 || c < 1);
+                    a = rng(1, Math.min(10, _a3Top - 2));
+                    b = rng(1, Math.min(10, _a3Top - 2));
+                    c = rng(1, Math.min(10, _a3Top - a - b));
+                } while (a + b + c > _a3Top || c < 1);
                 const sum = a + b + c;
 
                 q.text = `${a} + ${b} + ${c} = ?`;
@@ -3299,6 +3600,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         } else {
                             eq.displayText = eq.text;
                         }
+                        // P11: print reads eq.text (fact-family-mult-div), so the ticked notation
+                        // is written there too: the printed family matches the screen one.
+                        if (notation === 'fraction' || notation === 'bracket') eq.text = eq.displayText;
                     } else {
                         eq.displayText = eq.text;
                     }
@@ -3708,7 +4012,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // print-sheet.js legacyKeyFill); q.ans stays the total for the single-number
                 // checkers. The picture is black line art drawn at a fixed dot pitch (about
                 // 9 mm) so 40 dots are still countable, with no caption telling the pupil how.
-                const questionType = ['count_all', 'write_mult', 'equal_groups'][_dealRung(3)];
+                // P11 (critic round 2): ONE frame on every item, three slots — ___ rows of ___ (or groups of
+                // ___), ___ in all. The count-all item (one slot) is no longer dealt, so the slot set never
+                // changes from cell to cell.
+                const questionType = ['write_mult', 'equal_groups'][_dealRung(2)];
                 // Scale array size with range but cap for visual display
                 const arrMaxRows = Math.max(2, Math.min(range <= 50 ? 5 : range <= 100 ? 6 : 8, 10));
                 const arrMaxCols = Math.max(2, Math.min(range <= 50 ? 6 : range <= 100 ? 8 : 10, 12));
@@ -3940,8 +4247,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // ========================================
             if (mappedSkill === "mult_chart") {
                 const R = 4, C = 5;
-                const r0 = rng(1, 12 - R + 1);
-                const c0 = rng(1, 12 - C + 1);
+                // P11: "Tables to" 5 × 5 / 10 × 10 / 12 × 12 bounds the window's factors.
+                const _mcT = { 25: 5, 100: 10 }[Number(_opt('band'))] || 12;
+                const r0 = rng(1, Math.max(1, _mcT - R + 1));
+                const c0 = rng(1, Math.max(1, _mcT - C + 1));
                 const cells = [];
                 for (let i = 0; i < R; i++) for (let j = 0; j < C; j++) cells.push({ i, j });
                 // Three blanks, no two in the same row AND no row or column left without a
@@ -4272,7 +4581,23 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             if (mappedSkill === "missing_mult_div") {
                 // Missing Factors - Multiplication/Division
                 const positions = ['first_factor', 'second_factor', 'product', 'dividend', 'divisor', 'quotient'];
-                const position = pick(positions);
+                // P11: when the teacher ticks a ÷ notation other than Across alone, the ÷ items are
+                // DEALT on alternate cells and the ticked notations are dealt over those ÷ cells
+                // only, so every ticked notation reaches the page (three ticked: all three). The
+                // default (Across) keeps the old free pick.
+                const _mmTicked = (() => {
+                    const def = _optDef('notation');
+                    const legal = def ? def.values.map(v => v.v) : ['across'];
+                    let t = _opt('notation');
+                    if (typeof t === 'string') t = [t];
+                    t = Array.isArray(t) ? t.filter(v => legal.includes(v)) : [];
+                    return t.length ? t : legal.slice();
+                })();
+                const _mmDeal = !(_mmTicked.length === 1 && _mmTicked[0] === 'across');
+                const _mmAt = _optAt();
+                const position = !_mmDeal ? pick(positions)
+                    : (_mmAt % 2 === 0 ? pick(['dividend', 'divisor', 'quotient']) : pick(['first_factor', 'second_factor', 'product']));
+                const _mmNotation = _mmDeal ? _mmTicked[(Math.floor(_mmAt / 2) % _mmTicked.length + _mmTicked.length) % _mmTicked.length] : null;
                 // Scale factor range: for range<=100 use 2-12 (times tables), for larger ranges scale up
                 const mmFactorMax = range <= 100 ? 12 : Math.min(Math.ceil(Math.sqrt(range)), 25);
 
@@ -4321,12 +4646,13 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // inline answer-blank so the bare underscores don't render.
                 const _blankHtml = '<span class="answer-blank-inline"></span>';
                 const _textToHtml = (s) => String(s).replace(/_{3,}/g, _blankHtml);
-                if (position.includes('divid') || position === 'quotient') {
+                if (position === 'dividend' || position === 'divisor' || position === 'quotient') {
                     // NOTATION (was: one of three picked per item, so a single page held all
                     // three — catalogue mult-div-integers.md, "silent type mixing"). The
                     // teacher's choice decides it; 'across' is this skill's bare ÷ sentence.
-                    const notation = notationFor('÷') === 'across' ? 'symbol' : notationFor('÷');
-                    q.notation = notationFor('÷');
+                    const _mmN = _mmNotation || notationFor('÷');
+                    const notation = _mmN === 'across' ? 'symbol' : _mmN;
+                    q.notation = _mmN;
                     if (notation === 'fraction') {
                         const dividend = position === 'dividend' ? _blankHtml : a;
                         const divisor = position === 'divisor' ? _blankHtml : b;
@@ -4359,6 +4685,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     : `Think: What number completes this division?`;
                 q.missingNumberData = { position, a, b, c, displayText };
                 q.printFormat = "missing-factor";
+                // P11: a ÷ item written on a bracket or a fraction bar prints that way too (the kit's
+                // `equation` cell, its ÷ notation branch); Across keeps the one-line legacy cell.
+                if ((q.notation === 'bracket' || q.notation === 'fraction') && q.op === '÷') {
+                    q.cell = { template: 'equation', v: 1, payload: {
+                        a, b, op: '/', result: c, notation: q.notation, digits: String(ans).length,
+                        unknown: position === 'dividend' ? 'a' : position === 'divisor' ? 'b' : 'result',
+                    } };
+                }
                 
                 q.visual = `<div style="text-align:center;font-size:1.5rem;font-weight:600;margin:20px 0;">
                     ${displayText || text}
@@ -5699,25 +6033,29 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // ============================================================
             if (mappedSkill === "remainder_contexts") {
                 const ctxKey = pick(["buses", "boxes", "cookies", "money", "cars"]);
+                // P11: above Max Number 100 every story shares a bigger total (the measured Max
+                // Number option on this skill moved only the money story, so a printed page of six
+                // often did not change at all). At 100 and below nothing moves (R2).
+                const _rcF = range > 100 ? 4 : 1;
                 let dividend, divisor, quotient, remainder;
                 let safety = 0;
                 do {
                     if (ctxKey === "buses") {
                         divisor = pick([10, 12, 15]);
-                        dividend = rng(divisor + 3, divisor * 5 + 5);
+                        dividend = rng(divisor + 3, divisor * 5 * _rcF + 5);
                     } else if (ctxKey === "boxes") {
                         divisor = pick([4, 5, 6, 8]);
-                        dividend = rng(divisor + 2, divisor * 8 + 4);
+                        dividend = rng(divisor + 2 + (_rcF > 1 ? divisor * 8 : 0), divisor * 8 * _rcF + 4);
                     } else if (ctxKey === "cookies") {
                         divisor = pick([3, 4, 5, 6]);
-                        dividend = rng(divisor + 2, divisor * 8 + 3);
+                        dividend = rng(divisor + 2 + (_rcF > 1 ? divisor * 8 : 0), divisor * 8 * _rcF + 3);
                     } else if (ctxKey === "money") {
                         divisor = pick([3, 4, 5, 6, 8]);
                         const perPersonRange = range <= 100 ? rng(2, 12) : rng(2, 20);
                         dividend = divisor * perPersonRange + rng(1, divisor - 1);
                     } else { // cars
                         divisor = pick([4, 5]);
-                        dividend = rng(divisor + 2, divisor * 6 + 3);
+                        dividend = rng(divisor + 2 + (_rcF > 1 ? divisor * 6 : 0), divisor * 6 * _rcF + 3);
                     }
                     quotient = Math.floor(dividend / divisor);
                     remainder = dividend % divisor;
@@ -5981,10 +6319,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             else if (mappedSkill === "mixed_add_sub") ops = ["+", "-"];
             else if (mappedSkill === "mixed_mult_div") ops = ["×", "÷"];
             // Facts skills - restricted ranges for quick recall
-            else if (mappedSkill === "add_facts") { ops = ["+"]; factsMode = true; factsRange = 20; }
+            // P11: the fact band ("Facts to", skill-options.js) bounds the sum / the number you start from.
+            else if (mappedSkill === "add_facts") { ops = ["+"]; factsMode = true; factsRange = Number(_opt('band')) || 20; }
             else if (mappedSkill === "add_sub_10s") { ops = ["+", "-"]; addSub10s = true; }
             else if (mappedSkill === "add_sub_100s") { ops = ["+", "-"]; addSub100s = true; }
-            else if (mappedSkill === "sub_facts") { ops = ["-"]; factsMode = true; factsRange = 20; }
+            else if (mappedSkill === "sub_facts") { ops = ["-"]; factsMode = true; factsRange = Number(_opt('band')) || 20; }
             else if (mappedSkill === "mult_facts") { ops = ["×"]; factsMode = true; factsRange = 12; }
             else if (mappedSkill === "div_facts") { ops = ["÷"]; factsMode = true; factsRange = 12; }
             else if (mappedSkill === "add" || mappedSkill === "addition") ops = ["+"];
@@ -6081,10 +6420,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // fact so those still appear without filling a quarter of the sheet.
                     const _mixedFacts = _factsAllTicked();
                     const _trivial = _mixedFacts && _factTrivialSlot();
-                    let factC = factConstantFor(_mixedFacts ? (_trivial ? [0, 1, 10] : [2, 3, 4, 5, 6, 7, 8, 9]) : undefined);
+                    // P11: a mixed page deals only the constants the fact band can hold ("facts to 5").
+                    let factC = factConstantFor(_mixedFacts ? (_trivial ? [0, 1, 10] : [2, 3, 4, 5, 6, 7, 8, 9]).filter(c => c <= factsRange) : undefined);
                     if (factC !== null && op === "+") {
                         const hi = Math.max(0, Math.min(9, factsRange - factC));
-                        const lo = (_mixedFacts && !_trivial) ? Math.min(2, hi) : 0;
+                        // P11: under a small band ("facts to 5") a partner of 2+ would pin every sum to the band.
+                        const lo = (_mixedFacts && !_trivial) ? Math.min(factsRange >= 10 ? 2 : 1, hi) : 0;
                         const other = rng(lo, hi);
                         // The constant sits on either side, so the pupil meets 6 + 4 and 4 + 6.
                         if (rng(0, 1) === 1) { a = factC; b = other; } else { a = other; b = factC; }
@@ -6092,7 +6433,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         // "Subtract 6": the constant is what is taken away, and the minuend is
                         // large enough that the difference is never negative.
                         b = factC;
-                        a = factC + rng((_mixedFacts && !_trivial) ? 2 : 0, Math.max(0, Math.min(9, factsRange - factC)));
+                        const _sHi = Math.max(0, Math.min(9, factsRange - factC));
+                        a = factC + rng((_mixedFacts && !_trivial) ? Math.min(factsRange >= 10 ? 2 : 1, _sHi) : 0, _sHi);
                         if (a === 0) a = rng(1, factsRange);   // never print 0 − 0
                     } else {
                         // No constant option on this skill: draw the SUM first and split it, so
@@ -6133,11 +6475,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const _mixedM = factsMode && _factsAllTicked();
                     const _trivialM = _mixedM && _factTrivialSlot();
                     const _untouched = !_tables || _tables.length >= 12;
-                    const multC = factConstantFor((_mixedM && !_trivialM && _untouched) ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : _tables);
+                    // P11: "Tables to 10 × 10" (band 100) keeps both factors to 10.
+                    const _tMax = factsMode && Number(_opt('band')) === 100 ? 10 : 12;
+                    const _mNarrow = ((_mixedM && !_trivialM && _untouched) ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : (_tables || Array.from({ length: 13 }, (_, i) => i))).filter(v => v <= _tMax);
+                    const multC = factConstantFor(_tMax < 12 ? (_mNarrow.length >= 12 ? _mNarrow.slice(0, 11) : _mNarrow) : ((_mixedM && !_trivialM && _untouched) ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : _tables));
                     if (multC !== null) {
                         a = multC;
-                        b = _mixedM ? (_trivialM ? rng(0, 1) : rng(2, 12))
-                            : rng(0, 12);     // from 0, so the zero facts are actually drilled
+                        b = _mixedM ? (_trivialM ? rng(0, 1) : rng(2, _tMax))
+                            : rng(0, _tMax);     // from 0, so the zero facts are actually drilled
                     } else {
                         a = pick(_tables);
                         b = rng(1, 12);
@@ -6477,14 +6822,17 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const _mixedD = factsMode && _factsAllTicked();
                     const _trivialD = _mixedD && _factTrivialSlot();
                     const _untouchedD = !_divTables || _divTables.length >= 12;
-                    const divC = factConstantFor((_mixedD && !_trivialD && _untouchedD) ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : _divTables);
+                    // P11: "Tables to 10 × 10" (band 100) keeps the divisor and the quotient to 10.
+                    const _dMax = factsMode && Number(_opt('band')) === 100 ? 10 : 12;
+                    const _dNarrow = ((_mixedD && !_trivialD && _untouchedD) ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : (_divTables || Array.from({ length: 13 }, (_, i) => i))).filter(v => v <= _dMax);
+                    const divC = factConstantFor(_dMax < 12 ? (_dNarrow.length >= 12 ? _dNarrow.slice(0, 11) : _dNarrow) : ((_mixedD && !_trivialD && _untouchedD) ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : _divTables));
                     let divisor, result;
                     if (divC === 0) {
-                        divisor = rng(1, 12);
+                        divisor = rng(1, _dMax);
                         result = 0;
                     } else if (divC !== null) {
                         divisor = divC;
-                        result = _mixedD ? (_trivialD ? rng(0, 1) : rng(2, 12)) : rng(0, 12);
+                        result = _mixedD ? (_trivialD ? rng(0, 1) : rng(2, _dMax)) : rng(0, _dMax);
                     } else {
                         divisor = pick(_divTables);
                         result = rng(1, 12);

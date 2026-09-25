@@ -340,7 +340,8 @@ registerSkill('composing:base10_build_hundreds', {
 registerSkill('composing:hundreds_chart_fill', {
     strings: strings({
         iCan: 'I Can find missing numbers on a hundreds chart',
-        instructionKey: 'missing',
+        // A window has one to three empty cells (payload `blanks`), so the page asks for numbers.
+        instructionKey: 'missing-many',
         steps: [
             'Look left: the number before. Add 1.',
             'Look up: the number above. Add 10.',

@@ -11,10 +11,12 @@
 //           0
 //
 // Digits are Andika at the preset's digit size (TY-1, TY-10) and sit on the SAME tracks in every
-// row, so a quotient digit stands exactly over the dividend digit it belongs to. Four work rows
-// are always drawn (enough for a two-digit quotient), so the row count never tells the pupil how
-// many steps the item takes (RP-1, L-LEAK). The key writes the quotient into its boxes AND the
-// finished work into the work rows (AK-1: the key is the page, finished).
+// row, so a quotient digit stands exactly over the dividend digit it belongs to. The work rows
+// are a DIGIT GRID on the dividend's tracks (a 0.75 pt grey cell on every track, the scaffold
+// that keeps each bring-down in its column) and there are exactly two per step of the algorithm
+// (product, then difference and bring-down): 152 ÷ 19 is one step and draws two rows, never a
+// spare "−" row left empty on the key (2026-09-25 regrade). The key writes the quotient into its
+// boxes AND the finished work into the work rows (AK-1: the key is the page, finished).
 //
 // Payload: { dividend, divisor, quotient?, remainder?, workRows? }
 //
@@ -24,7 +26,8 @@ import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, inked, box, esc, HAIR, HEAVY } from './ops-common.js';
 import { INK, stripPos } from '../tokens.js';
 
-const DEFAULT_WORK_ROWS = 4;
+/** Work rows: the payload's count, else two per step of the algorithm (at least two). */
+const rowsOf = (p) => (Number(p.workRows) > 0 ? Number(p.workRows) : Math.max(2, 2 * divisionSteps(p.dividend, p.divisor).length));
 
 /** The steps of the standard algorithm: where each quotient digit sits and what is written. */
 export function divisionSteps(dividend, divisor) {
@@ -52,7 +55,9 @@ function keyOf(p) {
     const q = String(quotient).padStart(n, ' ');
     const slots = {};
     for (let i = 0; i < n; i++) slots[`q-${i}`] = q[i] === ' ' ? '' : q[i];
-    return { quotient, slots };
+    // P11: `rbox` adds an "R [ ]" slot after the quotient strip for a remainder (divide, Remainders).
+    if (p.rbox) slots.r = String(dividend - quotient * divisor);
+    return { quotient, slots, remainder: p.rbox ? dividend - quotient * divisor : null };
 }
 
 /**
@@ -86,7 +91,7 @@ register('division', {
         const g = geo(ctx);
         const D = String(p.dividend), V = String(p.divisor);
         const n = D.length, dv = V.length;
-        const rows = p.workRows || DEFAULT_WORK_ROWS;
+        const rows = rowsOf(p);
         const trackMm = Math.max(ctx.metrics.trackMm || 0, g.writeMm * 0.8);
         const gutterMm = trackMm * 1.1;
         const k = keyOf(p);
@@ -97,7 +102,8 @@ register('division', {
             for (let i = 0; i < n; i++) o[`q-${i}`] = s[i] === ' ' ? '' : s[i];
             return o;
         });
-        const cols = `grid-template-columns:repeat(${dv}, ${g.em(trackMm)}) ${g.em(gutterMm)} repeat(${n}, ${g.em(trackMm)});`;
+        const cols = `grid-template-columns:repeat(${dv}, ${g.em(trackMm)}) ${g.em(gutterMm)} repeat(${n}, ${g.em(trackMm)})`
+            + `${p.rbox ? ` ${g.em(trackMm * 0.9)} ${g.em(trackMm * 1.2)}` : ''};`;
         const cell = (content, col, row, extra = '') =>
             `<span style="grid-column:${col};grid-row:${row};display:flex;align-items:center;justify-content:center;${extra}">${content}</span>`;
         let html = '';
@@ -108,6 +114,11 @@ register('division', {
                 // A box before the quotient's first digit stays empty on the key: ungraded.
                 graded: k.slots[`q-${i}`] !== '',
             }), dv + 2 + i, 1, 'align-items:flex-end;padding-bottom:0.08em;');
+        }
+        // P11: the remainder slot, "R [ ]", on the quotient's row after the last dividend track.
+        if (p.rbox) {
+            html += cell('<span style="font-weight:700">R</span>', dv + 2 + n, 1, 'align-items:flex-end;padding-bottom:0.08em;');
+            html += cell(box(g, 'r', { wMm: trackMm, hMm: g.stripMm, value: vals.r || '', ink, mark: 'cell' }), dv + 3 + n, 1, 'align-items:flex-end;padding-bottom:0.08em;');
         }
         // Row 2: divisor, bracket, dividend. The vinculum is the top border of the dividend row.
         for (let i = 0; i < dv; i++) html += cell(esc(V[i]), i + 1, 2);
@@ -130,8 +141,12 @@ register('division', {
             html += cell(subtract ? `<span style="font-weight:700">−</span>` : '', dv + 1, gridRow, `height:${rowH};`);
             for (let i = 0; i < n; i++) {
                 const ch = t[i] && t[i] !== ' ' ? t[i] : '';
-                html += cell(ch ? inked(ch, ink) : '', dv + 2 + i, gridRow,
-                    `height:${rowH};${subtract ? `border-bottom:${HAIR} solid ${INK.ink};` : ''}`);
+                // The digit grid: a grey cell wall on every track boundary, a grey floor under a
+                // difference row, the black subtraction rule under a product row (VA-63).
+                const grid = `border-left:${HAIR} solid ${INK.grey};${i === n - 1 ? `border-right:${HAIR} solid ${INK.grey};` : ''}`
+                    + (r === 0 ? `border-top:${HAIR} solid ${INK.grey};` : '')
+                    + `border-bottom:${HAIR} solid ${subtract ? INK.ink : INK.grey};`;
+                html += cell(ch ? inked(ch, ink) : '', dv + 2 + i, gridRow, `box-sizing:border-box;height:${rowH};${grid}`);
             }
         }
         const label = `${D} divided by ${V}`;
@@ -143,6 +158,11 @@ register('division', {
         const k = keyOf(p);
         const slots = {};
         for (const [id, v] of Object.entries(k.slots)) slots[id] = { value: v, graded: v !== '' };
+        if (p.rbox) {
+            const v = `${k.quotient} R ${k.remainder}`;
+            slots.answer = { value: v, graded: true };
+            return { value: v, display: v, slots };
+        }
         slots.answer = { value: String(k.quotient), graded: true };
         return { value: k.quotient, display: String(k.quotient), slots };
     },
@@ -150,19 +170,21 @@ register('division', {
         const g = geo(ctx);
         const n = String(p.dividend).length, dv = String(p.divisor).length;
         const trackMm = Math.max(ctx.metrics.trackMm || 0, g.writeMm * 0.8);
-        const rows = p.workRows || DEFAULT_WORK_ROWS;
+        const rows = rowsOf(p);
         return {
-            wMm: Math.ceil((n + dv + 1.1) * trackMm + 8),
+            wMm: Math.ceil((n + dv + 1.1 + (p.rbox ? 2.1 : 0)) * trackMm + 8),
             hMm: Math.ceil(g.stripMm + g.E * 1.3 + rows * (Math.max(g.writeMm, 6) + 1) + 6),
             measure: true, factLike: false, maxCols: 2, tracks: n + dv + 1,
         };
     },
     inputs(p) {
         const n = String(p.dividend).length;
-        return Array.from({ length: n }, (_, i) => ({
+        const out = Array.from({ length: n }, (_, i) => ({
             id: `q-${i}`, kind: 'digit', shape: 'box', graded: true, order: i, maxLength: 1,
             inputmode: 'numeric', scopes: ['full', 'answer-only'],
         }));
+        if (p.rbox) out.push({ id: 'r', kind: 'number', shape: 'box', graded: true, order: n, maxLength: 2, inputmode: 'numeric', scopes: ['full', 'answer-only'] });
+        return out;
     },
     layout() { return { card: 'card-division', checker: 'value', requiresVisual: true }; },
 });
