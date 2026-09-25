@@ -193,7 +193,7 @@ function areaWrong(q) {
 const AREA_STRINGS = {
     instructionKey: 'multiply',
     steps: [
-        'Split each number into tens and ones.',
+        'Read the parts at the top: the number split by place.',
         'Multiply to find the area of each part.',
         'Write each product in its part of the model.',
         'Add the parts. Write the total.',

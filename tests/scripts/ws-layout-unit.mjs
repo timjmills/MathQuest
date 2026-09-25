@@ -425,8 +425,11 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
 {
     const { plan, r } = hostPlan('guided', [ADD_SKILL], addMake);
     ok(plan.meta.items >= 6 && plan.meta.items <= 12, `PT 2.3 (re-grade 2026-09-25): Guided at L fills the page, 6 to 12 cells (${plan.meta.items})`);
-    eq(plan.header.score, false, 'PT-FRM-4: Guided prints no Score');
-    ok(!/data-ws-label="letter"/.test(r.pupilHtml), 'PT-LBL-6: Guided cells are unlabelled');
+    // Critic round 2 (C4): the Guided page is lettered and scored like every other role; the
+    // worked example carries the Model tab and is not scored.
+    eq(plan.header.score, plan.meta.items - 1, 'Guided: Score counts every cell but the worked example');
+    ok(/data-ws-label="letter"/.test(r.pupilHtml), 'Guided: quiet letter labels');
+    ok(/data-ws-label="model"/.test(r.pupilPages[0]), 'Guided: the worked example carries the Model tab');
     ok(/data-ws-ink="trace"/.test(r.pupilPages[0]), 'PT-GDP-1: cell 1 carries its answer in trace grey');
     ok(/Guided Practice:/.test(r.pupilHtml), 'PT 2.3: the Guided Practice band');
     // No provider steps -> no Steps band, never the generic operation steps.
@@ -439,6 +442,44 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     const grid = plan.pages[0].sections.find((s) => s.kind === 'band' && s.label === 'Guided Practice:').content;
     ok(parseFloat(grid.height) >= 170, `Guided: the grid fills the page under the bands (${grid.height})`);
 }
+// Critic round 2: the fade traces the WORKING (carries), never a lone digit, and cues facts.
+{
+    const { traceCarries, countCueOf, thinkCueOf } = ROLE_MODULES.guided;
+    const it = { q: stackQ(47, 35), template: 'stack' };
+    const html = '<div class="ws-stack wide" style="--t:3"><span class="rg"></span><span class="rg" data-ws-seg="only"><i style="font-style:normal"></i></span><span class="rg"></span></div>';
+    ok(/data-ws-ink="trace"[^>]*>1<\/i>/.test(traceCarries(html, it)), 'Guided: 47 + 35 traces the carried ten in its regroup box');
+    ok(!/data-ws-ink="trace"/.test(traceCarries(html, { q: stackQ(41, 35), template: 'stack' })), 'Guided: no carry, nothing traced in the regroup box');
+    eq(countCueOf({ q: { categoryId: 'addition', a: 8, b: 3, op: '+', cell: { template: 'fact', payload: { a: 8, b: 3, op: '+' } } }, template: 'fact' }), 3, 'H3: an addition fact cues the smaller addend');
+    ok(/6 × __ = 24/.test(thinkCueOf({ q: { categoryId: 'division', a: 24, b: 6, op: '÷', cell: { template: 'fact', payload: { a: 24, b: 6, op: '÷', notation: 'horiz' } } }, template: 'fact' })), 'Guided: a division fact carries the missing-factor think line');
+    // A count / a fact is never partly traced: no orphan grey digit on cells 2..n.
+    const g = hostPlan('guided', [FACT_SKILL], (pool, sk, i) => factQ(2 + i, 7), { h: 40 });
+    const gcells = g.r.pupilPages[0].split('data-ws-cell=').slice(2);
+    ok(gcells.length >= 3 && gcells.every((c) => !/ws-factans ws-trace|mq-untraced/.test(c)), 'Guided: facts after the worked example carry no partial trace');
+}
+// Critic round 2: the instruction fits the slots and the section.
+{
+    const { resolveInstruction } = await import('../../js/modules/sheet/roles/practice.js');
+    eq(resolveInstruction('ring-groups', [], {}).text, 'Circle groups of the number shown. Write how many groups.', 'no single group size: never "Write how many in each group"');
+    eq(resolveInstruction('ring-remainder', [], {}).key, 'ring-remainder-each', 'div_remainders with mixed divisors keeps its task');
+    eq(resolveInstruction('missing', [{ q: { ans: '35, 56' } }, { q: { ans: '7' } }]).text, 'Write the missing numbers.', 'two blanks: the plural instruction');
+    eq(resolveInstruction('missing', [{ q: { ans: '7' } }]).text, 'Write the missing number.', 'one blank: the singular instruction');
+}
+// Critic round 2 (C3): a test of one-line facts is a dense grid.
+{
+    const t = hostPlan('test', [FACT_SKILL], (pool, sk, i) => factQ(2 + (i % 9), 7), { h: 40 });
+    ok(t.plan.meta.items >= 16 && t.plan.meta.items <= 20, `Test of facts at L: 16-20 items (${t.plan.meta.items})`);
+}
+// Critic round 2: Error analysis - pupil ink, and a fix slot of the skill's own kind.
+{
+    const { pupilInk, prepare } = ROLE_MODULES['error-analysis'];
+    ok(/class="x mq-pupil"/.test(pupilInk('<span class="x" data-ws-ink="solid">7</span>')) && /class="mq-pupil"/.test(pupilInk('<b data-ws-ink="solid">7</b>')), 'Error analysis: the shown work is marked as pupil ink');
+    const chartQ = { categoryId: 'multiplication', skillId: 'mult_chart', ans: '30, 35, 42', text: 'chart', cell: { template: 'equation', v: 1, payload: {} } };
+    const fake = { q: chartQ, template: 'mult-chart', fclass: 'standard', footprint: { wMm: 80 }, render: () => '<div>chart</div>', key: {} };
+    const p = prepare(fake, { index: 0, wrong: false });
+    const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
+    const html = p && p.render(ctx, { cols: 1 });
+    ok(html && (html.match(/data-ws-slot="ea-ans-\d"/g) || []).length === 3, 'Error analysis: a three-value answer gets one fix box per value');
+}
 // Guided Steps band: the provider's own steps, read row by row (1 2 / 3 4), never 1 3 / 2.
 {
     const { partialTrace, stepsOf } = ROLE_MODULES.guided;
@@ -446,7 +487,7 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     const pg = hostPlan('guided', [PROV_SKILL], provMake);
     ok(pg.plan.meta.steps >= 2 && /<b>Steps:<\/b>/.test(pg.r.pupilHtml) && /mq-steps-rows/.test(pg.r.pupilHtml), 'SCC 3.8: Guided prints the provider\'s own steps, row by row');
     const wp = hostPlan('word-problems', [PROV_SKILL], provMake);
-    ok(wp.plan && wp.plan.meta.items === 2, 'SCC-P19: a skill with provider stories prints Word problems');
+    ok(wp.plan && wp.plan.meta.items >= 2 && wp.plan.meta.items <= 3, 'SCC-P19: a skill with provider stories prints Word problems (2 or 3 a page)');
     ok(wp.r && /data-ws-slot="wp-label"[^>]*>[a-z]+</.test(wp.r.keyHtml), 'SCC-P19: the key writes the story\'s label word');
     eq(partialTrace('<span class="ws-trace">1</span><span class="ws-trace">4</span>'), '<span class="ws-trace"><span class="mq-untraced">1</span></span><span class="ws-trace">4</span>', 'H5: a column answer keeps its ones digit');
     eq(partialTrace('<b data-ws-ink="trace" style="x">25</b>'), '<b data-ws-ink="trace" style="x">2<span class="mq-untraced">5</span></b>', 'H5: a one-slot answer keeps its first digit');
@@ -575,17 +616,22 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
 {
     const story = (pool, sk, i) => Object.assign(stackQ(3 + i, 4), { skillId: 'add_wp_10', printFormat: 'word-problem', text: `Sam has ${3 + i} apples. He gets 4 more. How many apples does Sam have now?` });
     const { plan, r } = hostPlan('word-problems', [ADD_SKILL], story);
-    eq(plan.meta.items, 2, 'PT 3.7 v2: two word problems per page at L');
+    eq(plan.meta.items, 3, 'Critic round 2 (C3): three short stories per page at L when they fit');
     ok(/data-ws-instruction="story-v2"/.test(r.pupilHtml), 'PT 3.7: the story-v2 instruction');
-    ok(/>apples</.test(r.keyHtml), 'PT-WPR-8: the key writes the label word');
+    ok(/data-ws-slot="wp-label"[^>]*>[a-z]+</.test(r.keyHtml), 'PT-WPR-8: the key writes the label word');
+    // Critic round 2: the stories on one page never share a template and noun.
+    const stories = [...r.pupilHtml.matchAll(/<div class="ws-story mq-wpstory">([\s\S]*?)<\/div><\/div>/g)].map((m) => m[1].replace(/<[^>]*>/g, ' ').replace(/\d+/g, '#').replace(/\s+/g, ' '));
+    ok(stories.length >= 2 && new Set(stories).size === stories.length, 'word problems: no two stories on a page are the same template');
 }
 // PT-CMP-2: the fact layouts take fact skills only, and say why otherwise.
 {
     // CLAUDE.md: fact AND operations skills get the fact layouts; pictures / stories do not.
     ok(!hostPlan('fact-rows', [ADD_SKILL], addMake).unsupported, 'CLAUDE.md: Fact rows take a one-step operations skill (column addition)');
     ok(!hostPlan('fact-probe', [ADD_SKILL], addMake).unsupported, 'CLAUDE.md: the Fact probe takes a one-step operations skill');
-    const multi = (pool, sk, i) => Object.assign(stackQ(10 + i, 20 + i), { skillId: 'add_column_multi', printFormat: 'column-add-multi', text: `${10 + i} + ${20 + i} + ${30 + i} = ?`, ans: 60 + 3 * i, a: undefined, b: undefined, op: undefined });
-    ok(!hostPlan('fact-rows', [ADD_SKILL], multi).unsupported, 'Fact rows take column addition of several addends');
+    // Critic round 2: a sum of three or four addends is a procedure, not a fact row.
+    const multi = (pool, sk, i) => Object.assign(stackQ(10 + i, 20 + i), { skillId: 'add_column_multi', printFormat: 'column-add-multi', text: `${10 + i} + ${20 + i} + ${30 + i} = ?`, ans: 60 + 3 * i, a: undefined, b: undefined, op: undefined,
+        cell: { template: 'stack', v: 1, payload: { operands: [10 + i, 20 + i, 30 + i], op: '+' } } });
+    ok(typeof hostPlan('fact-rows', [ADD_SKILL], multi).unsupported === 'string', 'Fact rows refuse column addition of three or more addends, with a reason');
     const pic = (pool, sk, i) => Object.assign(stackQ(3 + i, 2), { skillId: 'number_line_add', printFormat: 'number-line-visual' });
     ok(typeof hostPlan('fact-rows', [ADD_SKILL], pic).unsupported === 'string', 'PT-CMP-2: Fact rows refuse a number-line skill, with a reason');
     ok(typeof hostPlan('fact-probe', [ADD_SKILL], storyMake).unsupported === 'string', 'PT-CMP-2: the Fact probe refuses a story skill');
@@ -593,6 +639,19 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
     eq(fr.plan.pages[0].sections.find((s) => s.kind === 'grid').cols, 5, 'PT-FRW-2: Fact rows Auto 5 columns at L');
     eq(fr.plan.header.title, 'Multiply by 3', 'HD-13: the fact stub title');
     eq(fr.plan.ctx.look, 'daily', 'PAGE_TYPES appendix 4: Fact rows default to the Daily look');
+    // Critic round 2: a TRUE fact-row page - every cell the fact template, filled to table 4.1.
+    ok(fr.plan.meta.items >= 25, `PT 4.1: Fact rows at L hold 25 facts (${fr.plan.meta.items})`);
+    ok(/class="ws-fact"/.test(fr.r.pupilHtml) && !/class="ws-stack/.test(fr.r.pupilHtml), 'PT 4.1: fact rows draw the fact template, not the Independent cell');
+    const big = hostPlan('fact-rows', [FACT_SKILL], (pool, sk, i) => factQ(12, 3 + (i % 10)), { h: 30 });
+    eq(big.plan.pages[0].sections.find((s) => s.kind === 'grid').cols, 5, 'VA-2: x12 facts keep 5 columns (the digits step down the ladder instead)');
+    const divQ = (a, b) => ({ categoryId: 'division', skillId: 'div_facts', skillLabel: 'Division facts', answerType: 'number', text: `${a * b} ÷ ${b} = ?`, ans: a, a: a * b, b, op: '÷',
+        printFormat: 'div-facts-horizontal', cell: { template: 'fact', v: 1, payload: { a: a * b, b, op: '÷', notation: 'horiz' } } });
+    const DIV_SKILL = { categoryId: 'division', skillId: 'div_facts', label: 'Division facts', grade: 3, instructionKey: 'divide', iCan: 'I Can divide' };
+    const dv = hostPlan('fact-rows', [DIV_SKILL], (pool, sk, i) => divQ(2 + (i % 9), 2 + (i % 7)), { h: 20 });
+    ok(dv.plan.meta.fits[0].across && dv.plan.meta.fits[0].cols >= 2 && dv.plan.meta.items >= 16, `PT-FRW-6/7: division facts print across, ${dv.plan.meta.items} a page`);
+    ok(/class="mq-hfact mq-across"/.test(dv.r.pupilHtml) && /data-ws-slot="answer"[^>]*>\d+</.test(dv.r.keyHtml), 'PT-FRW-7: an across fact with its answer line, filled on the key');
+    const twoDigit = hostPlan('fact-rows', [PROV_SKILL], (pool, sk, i) => Object.assign(stackQ(12 + i, 25 + i), { skillId: 'add', skillLabel: 'Addition', printFormat: 'column-add' }), { h: 30 });
+    ok(!twoDigit.unsupported && twoDigit.plan.header.title !== 'Addition facts', `HD-13: two-digit work keeps the skill's own title (${twoDigit.plan && twoDigit.plan.header.title})`);
     const fp = hostPlan('fact-probe', [FACT_SKILL], (pool, sk, i) => factQ(1 + (i % 12), 3), { h: 30 });
     eq(fp.plan.meta.items, 20, 'PT 4.2: the probe holds 20 facts');
     ok(Array.isArray(fp.plan.meta.strip) && fp.plan.meta.strip[0] === 3, 'PT-FPR-3: a skip-count strip for a x3 set');

@@ -121,7 +121,9 @@ const CEILINGS = {
     decision: { base: [12, 8, 8], name: 'Sub-skill / decision' },
     'error-analysis': { base: [6, 4, 4], name: 'Error analysis' },
     review: { base: [16, 12, 12], name: 'Review' },
-    test: { base: [20, 16, 12], name: 'Test A / B' },
+    // PT 2.9's table: facts and equations 4 x 5 = 20 at every size (45.6 mm rows); critic round 2
+    // (C3) asked for fact tests packed from the measured height, not 4 x 3 of 75 mm cells.
+    test: { base: [20, 16, 12], one: [20, 20, 20], name: 'Test A / B' },
     'pre-skill': { base: [24, 20, 16], name: 'Pre-skill check' },
     'true-false': { base: [8, 6, 4], name: 'True or False?' },
     'reason-it': { base: [4, 3, 2], name: 'Reason It' },
@@ -821,6 +823,8 @@ function wsLintPage(cfg) {
                     answered: slots.filter(slotAnswered).length, weightOk: slots.every(slotWeightOk),
                     shapes: [...new Set(slots.map(s => s.getAttribute('data-ws-shape')))],
                     item: !model && !ITEM_BANDS.test(bandLabel),
+                    // a one-line fact, equation or number track: one short answer (PT 2.9 packs 20)
+                    short: !!c.querySelector('.ws-fact, .ws-eq, .mq-hfact, .k2-seqstrip'),
                 };
             });
             let role = pg.getAttribute('data-ws-role') || '';
@@ -843,7 +847,8 @@ function wsLintPage(cfg) {
                 pageId: (footParts[2] || '').split('·').map(s => s.trim()).filter(s => /^\d\d-[A-Z]\d?$/.test(s))[0] || '',
                 w: mm(pr.width), h: mm(pr.height), padB: mm(parseFloat(cs.paddingBottom)), padT: mm(parseFloat(cs.paddingTop)),
                 footRect, cells, items: items.length,
-                oneSymbol: itemShapes.length > 0 && itemShapes.every(s => oneSymbolShapes.has(s)),
+                oneSymbol: (itemShapes.length > 0 && itemShapes.every(s => oneSymbolShapes.has(s)))
+                    || (/^test\b/.test(role) && items.length > 0 && items.every(c => c.short)),
                 slots: cells.reduce((n, c) => n + c.slots, 0), instructions: ri.instructions,
             });
         }

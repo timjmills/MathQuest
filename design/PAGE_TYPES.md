@@ -398,7 +398,7 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 ### 2.3 Guided page
 
 **Purpose.** "We do" with many repetitions while the steps stay in view.
-**Look.** I Can. Cells unlabelled, no Score.
+**Look.** I Can. Quiet letters and a Score like every other role (critic round 2, 2026-09-25); the worked example carries the `Model` tab and is not scored. The fade: cell 1 fully traced (answer and working), the rest of row 1 the first step of the working traced (a column stack's ones digit and carried ten) or the count cue (a grey dot tile for + and −, the missing-factor think line for ÷), later rows blank. A lone grey digit or half the blanks is never traced.
 
 ```
 +=======================================================================+

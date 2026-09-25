@@ -25,7 +25,7 @@
 import { generateQuestionFor } from './generate-question.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords } from './sheet/roles/practice.js';
@@ -201,6 +201,12 @@ const legacyClean = (html) => balanceDivs(String(html).replace(LEGACY_TAB_RE, ''
 /** Registered K-2 templates that pack as one-symbol answers (a ten frame, a number track, a chart window). */
 const SHORT_TEMPLATES = new Set(['tenframe', 'seqstrip', 'chartwindow']);
 
+/** A fact drawn across ("a ÷ b = ___"): the fact template in its horizontal notation. */
+function isAcrossFact(q, template) {
+    const p = (q.cell && q.cell.payload) || {};
+    return template === 'fact' && (p.notation === 'horiz' || p.notation === 'horizontal');
+}
+
 /** PT 2.4 footprint classes: long procedures, one-symbol answers, word problems. */
 function footprintClass(q, template, size) {
     const f = String(q.printFormat || '');
@@ -208,6 +214,9 @@ function footprintClass(q, template, size) {
     // The K-2 picture templates hold one small picture and one short answer: they pack like
     // one-symbol answers (2 x 4 and up), not like 6-per-page stacks.
     if (SHORT_TEMPLATES.has(template) || q.answerType === 'ten-frame-build') return 'short';
+    // A horizontal fact ("24 ÷ 6 = ___") is one line with one short answer (critic round 2, H5:
+    // six division facts filled a page, every cell 80% empty).
+    if (isAcrossFact(q, template)) return 'short';
     const operands = (q.cell && q.cell.payload && q.cell.payload.operands) || [q.a, q.b];
     if (/long-div|long_div/.test(f) || template === 'division') return 'long';
     if (/^column-mult/.test(f) && Number(operands[1]) >= 10) return 'long';
@@ -404,6 +413,31 @@ export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
 }
 
 /**
+ * The number sentence a skill's provider asks for under its picture (`strings.sentence(q)` ->
+ * {parts: ['20', '÷', '5', '=', '4'], blanks: [0, 2, 4]}), or null.
+ */
+function sentenceOf(q) {
+    try {
+        const p = getProvider(q.categoryId || '', q.skillId || '');
+        const str = typeof p.strings === 'function' ? p.strings({ categoryId: q.categoryId, skillId: q.skillId, q }) : p.strings;
+        const s = str && typeof str.sentence === 'function' ? str.sentence(q) : null;
+        return s && Array.isArray(s.parts) && s.parts.length ? s : null;
+    } catch (e) { return null; }
+}
+
+/** The sentence as write lines: every blank an ungraded line the key fills (the picture's answer is the scored slot). */
+function sentenceHtml(sf, c, ink) {
+    const blanks = new Set(sf.blanks || []);
+    // The key writes the sentence; a traced (Model / worked) cell writes it in trace grey.
+    const mode = ink === 'trace' ? 'trace' : c.state === 'answered' ? 'solid' : '';
+    return `<div class="mq-sframe">${sf.parts.map((p, i) => {
+        if (!blanks.has(i)) return `<span>${escText(String(p))}</span>`;
+        const v = mode ? escText(String(p)) : '';
+        return `<span class="ws-line${mode === 'trace' ? ' ws-trace' : ''}" data-ws-slot="sf-${i}" data-ws-shape="line" data-ws-graded="0"${v ? ` data-ws-ink="${mode}"` : ''} style="--w:${Math.max(14, String(p).length * 6 + 8)}mm">${v}</span>`;
+    }).join('')}</div>`;
+}
+
+/**
  * Turn one generated question into a host item: the question carrying its cell spec, a draw
  * function (the SAME one for the pupil page, the key and the measurement), the key, and the
  * class tokens the role writes onto the cell.
@@ -442,14 +476,20 @@ function hostItem(g, sectionIndex, size) {
      * slot can hold it, the value prints on an answer line under the cell - in both states, so
      * the geometry is still identical (AK-1).
      */
-    const render = (c, { cols = 2, shown, ink, prompt, shownSlots } = {}) => {
-        const html0 = draw(c, { cols, shown, ink, shownSlots });
+    const render = (c, { cols = 2, shown, ink, prompt, shownSlots, payload } = {}) => {
+        let html0 = draw(c, { cols, shown, ink, shownSlots, payload });
+        // SCC 3.8 `strings.sentence(q)`: a picture skill that asks for its number sentence
+        // ("20 ÷ 5 = 4" under the rings of share-into-groups) gets it as one line of write lines
+        // under the picture - never on finished work (a thinking page shows the work only).
+        const sf = sentenceOf(q0);
+        const hasShown = shown !== undefined && shown !== null && shown !== '';
+        if (sf && (!hasShown || ink === 'trace')) html0 += sentenceHtml(sf, c, hasShown ? ink : undefined);
         // The cell's own instruction line goes when the page's instruction line already says it
         // (BD-10: one instruction per section), or when the role asks (`prompt: false`: Error
         // analysis and the thinking roles print their own instruction over finished work).
         return (prompt === false || item.stripPrompt) && cellPrompt ? stripPrompt(html0) : html0;
     };
-    const draw = (c, { cols = 2, shown, ink, shownSlots } = {}) => {
+    const draw = (c, { cols = 2, shown, ink, shownSlots, payload } = {}) => {
         const hasShown = shown !== undefined && shown !== null && shown !== '';
         let st = c.state;
         let wrong = c.wrong;
@@ -459,7 +499,10 @@ function hostItem(g, sectionIndex, size) {
             else { st = 'wrong'; wrong = { value: v, slots: Object.assign({}, shownSlots || {}) }; }
         }
         const ctx = Object.assign({}, c, { state: legacy && hasShown ? 'blank' : st, wrong, columns: cols, options: Object.assign({}, c.options || {}, { factColumns: cols }) });
-        const html = legacy ? legacyClean(renderCell(q, ctx)) : renderCell(q, ctx);
+        // `payload`: a role asks the template for a variant of this cell (Error analysis asks a drawn
+        // model for its redraw zone, `fix: 'draw'`); the item itself is never changed.
+        const qd = payload && !legacy && q.cell && q.cell.payload ? Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, payload) }) }) : q;
+        const html = legacy ? legacyClean(renderCell(q, ctx)) : renderCell(qd, ctx);
         if (legacy && hasShown) {
             const v = String(shown);
             // A wrong value is written as a pupil would have written it: a place-value mat draws
@@ -508,6 +551,11 @@ function hostItem(g, sectionIndex, size) {
             const m = PROMPT_RE.exec(blankHtml);
             if (m && isGenericPrompt(m[2])) cellPrompt = m[2].trim();
         } catch (e) { cellPrompt = null; }
+    }
+    if (isAcrossFact(q, template)) {
+        // Its static footprint is the VERTICAL fact's cell height plus a stack's pads (50 mm at
+        // L), for one line about 17 mm tall: the measurement is the truth for this one.
+        fp = Object.assign({}, fp, { measure: true, hMm: null, tracks: undefined, factLike: false });
     }
     const item = {
         q, render, template, legacy,
