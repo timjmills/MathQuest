@@ -426,6 +426,7 @@ const _pvNearest = (place) => {
             ],
             help: '"Circle every number" is its own step: eight numbers, with near misses either side of halfway.',
         },
+        _pvResponseScope(),
     ];
 };
 const _pvSort = (place) => {
@@ -446,8 +447,15 @@ const _pvSort = (place) => {
             ],
             help: 'The number line runs between the two bins, so the pupil can see which end each number is nearer.',
         },
+        // Bins one apart / three bins are whole-number steps (RS-2); the decimal sorts keep two.
+        ...(place ? [_pvBins()] : []),
     ];
 };
+const _pvEstSupport = () => ({
+    id: 'support', label: 'Support', type: 'enum', default: 'rewrite', group: 'support',
+    values: [{ v: 'rewrite', l: 'A line to write the rounded numbers' }, { v: 'none', l: 'None: the estimate only' }],
+    help: 'The rewrite line holds each rounded number under the one it came from; "None" is the fade.',
+});
 const _pvTask = () => ({
     id: 'task', label: 'Task', type: 'enum', default: 'compute', group: 'layout',
     values: [
@@ -490,18 +498,105 @@ const _pvMoreLessSupport = (withChart) => ({
     help: withChart ? 'A picture to count on or back with: most support first, "None" is the fade.'
         : 'A number line to jump along: "None" is the fade.',
 });
+// ---- P9 step 8 (§19.4 step 8): the remaining options of §2.5, each read by gen-pv.js. ----
+const _pvIdentifyResponse = () => ({
+    id: 'response', label: 'How the pupil answers', type: 'enum', default: 'circle', group: 'layout',
+    values: [
+        { v: 'circle', l: 'Circle one of three place words' },
+        { v: 'bank', l: 'Write the place word from a word bank' },
+    ],
+    help: 'Circling is the first step; writing the word from a bank is the next one.',
+});
+const _pvRepeatDigit = () => ({
+    id: 'repeatDigit', label: 'A repeated digit (747: which 7?)', type: 'bool', default: false, group: 'difficulty',
+    help: 'On gives numbers with the same digit twice, so the pupil must read the underlined one.',
+});
+const _pvValueForm = () => ({
+    id: 'form', label: 'How the value is written', type: 'enum', default: 'value', group: 'layout',
+    values: [
+        { v: 'value', l: 'The value (700)' },
+        { v: 'unit', l: 'Unit form (7 hundreds)' },
+        { v: 'notation', l: 'Expanded notation (7 × 100)' },
+    ],
+    help: 'One way per page. Unit form and expanded notation name the place and the digit.',
+});
+const _pvZeroDigit = () => ({
+    id: 'zeroDigit', label: 'Ask the value of a 0', type: 'bool', default: false, group: 'difficulty',
+    help: 'On underlines a zero on some items: its value is 0, but it holds the place.',
+});
+const _pvExpandFrame = () => ({
+    id: 'frame', label: 'Answer frame', type: 'enum', default: 'boxes', group: 'support',
+    values: [
+        { v: 'boxes', l: 'One box for each place' },
+        { v: 'line', l: 'A line (300 + 5 or 300 + 0 + 5 both right)' },
+    ],
+    help: 'The boxes are the support; the line is the fade. On the line a zero part may be left out.',
+});
+const _pvExpandForm = () => ({
+    id: 'form', label: 'How the parts are written', type: 'enum', default: 'sum', group: 'layout',
+    values: [
+        { v: 'sum', l: 'Values (300 + 40 + 5)' },
+        { v: 'notation', l: 'Expanded notation (3 × 100 + 4 × 10 + 5 × 1)' },
+    ],
+    help: 'Expanded notation is the grade 4 form: the pupil writes the digit for each place.',
+});
+const _pvCloseness = () => ({
+    id: 'closeness', label: 'How close the numbers are', type: 'enum', default: 'far', group: 'difficulty',
+    values: [{ v: 'far', l: 'Far apart' }, { v: 'close', l: 'Close (same first digit)' }],
+    help: 'Close numbers share their first digit, so the pupil must look at the next place.',
+});
+const _pvLengths = () => ({
+    id: 'lengths', label: 'Digit counts', type: 'enum', default: 'equal', group: 'difficulty',
+    values: [{ v: 'equal', l: 'Same number of digits' }, { v: 'mixed', l: 'Different numbers of digits' }],
+    help: 'Different lengths teach that more digits means a bigger number.',
+});
+const _pvOrderCount = () => ({
+    id: 'count', label: 'How many numbers', type: 'enum', default: 3, group: 'difficulty',
+    values: [3, 4, 5, 6].map(v => ({ v, l: String(v) })),
+    help: 'The same count on every item of the page.',
+});
+const _pvResponseScope = () => ({
+    id: 'responseScope', label: 'What the pupil does', type: 'enum', default: 'full', group: 'layout',
+    values: [
+        { v: 'full', l: 'Round the number' },
+        { v: 'notation', l: 'Underline the place and circle the next digit (do not round)' },
+        { v: 'decision', l: 'Decide: round up or round down' },
+        { v: 'judge', l: 'Check a finished rounding (correct or fix it)' },
+    ],
+    help: 'The sub-steps before rounding, and checking a rounding, each as a page of their own.',
+});
+const _pvBins = () => ({
+    id: 'bins', label: 'The bins', type: 'enum', default: 'adjacent', group: 'difficulty',
+    values: [
+        { v: 'adjacent', l: 'Two next to each other (40 and 50)' },
+        { v: 'apart', l: 'One apart, with a Neither bin (40 and 60)' },
+        { v: 'three', l: 'Three in a row (40, 50 and 60)' },
+    ],
+    help: 'Bins one apart stop the pupil sorting by the first digit alone.',
+});
+const _pvMoreLessUnknown = () => ({
+    id: 'unknown', label: 'What is missing', type: 'enum', default: 'answer', group: 'difficulty',
+    values: [{ v: 'answer', l: 'The answer (10 more than 47 is __)' }, { v: 'start', l: 'The start (47 is 10 more than __)' }],
+    help: 'A missing start is the inverse: the pupil does the opposite of the word.',
+});
+const _pvMoreLessSupport2 = (withChart) => {
+    const d = _pvMoreLessSupport(withChart);
+    d.values = [{ v: 'strip', l: 'A strip of the hundreds chart (the number in its row or column)' }, ...d.values];
+    d.help = 'Most support first. The strip shows only the number; the pupil works out the box beside it.';
+    return d;
+};
 const P9_PV_OPTIONS = {
-    'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport()],
-    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport()],
-    'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true)],
+    'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport(), _pvIdentifyResponse(), _pvRepeatDigit()],
+    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit()],
+    'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), _pvExpandFrame(), _pvExpandForm()],
     'placevalue:combine': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), {
         id: 'order', label: 'Order of the parts', type: 'enum', default: 'largest', group: 'difficulty',
         values: [{ v: 'largest', l: 'Largest first' }, { v: 'scrambled', l: 'Scrambled (5 + 300 + 20)' }],
         help: 'Scrambled parts are harder: the pupil has to put each part in its place.',
     }],
-    'placevalue:compare': [_pvBand([99, 999, 9999, 99999, 999999], 999)],
-    'placevalue:order_least_to_greatest': [_pvBand([99, 999, 9999, 99999, 999999], 999)],
-    'placevalue:order_greatest_to_least': [_pvBand([99, 999, 9999, 99999, 999999], 999)],
+    'placevalue:compare': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvCloseness(), _pvLengths()],
+    'placevalue:order_least_to_greatest': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvOrderCount(), _pvCloseness(), _pvLengths()],
+    'placevalue:order_greatest_to_least': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvOrderCount(), _pvCloseness(), _pvLengths()],
     'placevalue:place_value_disks': [_pvBand([99, 999, 9999], 999), {
         id: 'task', label: 'Task', type: 'enum', default: 'read', group: 'layout',
         values: [{ v: 'read', l: 'Read the number from the disks' }, { v: 'count', l: "Count one place's disks" }],
@@ -509,11 +604,20 @@ const P9_PV_OPTIONS = {
     }, _pvZeroPlace(false)],
     // Draw to 999 only (owner ruling 3): nine 1,000 disks and 27 others is a poster, not a cell.
     'placevalue:pv_disks_build': [_pvBand([99, 999], 999), _pvZeroPlace(false)],
-    'placevalue:pv_digit_drag': [_pvBand([999, 9999, 99999, 999999], 99999)],
+    'placevalue:pv_digit_drag': [_pvBand([999, 9999, 99999, 999999], 99999), {
+        id: 'source', label: 'The number is given as', type: 'enum', default: 'expanded', group: 'difficulty',
+        values: [
+            { v: 'expanded', l: 'Expanded form (40,000 + 300 + 6)' },
+            { v: 'word', l: 'Words (forty thousand, three hundred six)' },
+            { v: 'numeral', l: 'A numeral with commas (copying, the easiest)' },
+        ],
+        help: 'Expanded form and words make the pupil work out each digit\'s place; a numeral is copying.',
+    }],
     'placevalue:number_word_names': [_pvBand([999, 9999, 99999, 999999], 999999)],
-    'placevalue:more_less_10': [_pvStep([1, 10], 1), _pvDir(), _pvBand([20, 50, 100, 120], 100), _pvMoreLessSupport(true)],
-    // Numbers 100-900 (2.NBT.B.8): the band is fixed at 1,000, so there is no band control.
-    'placevalue:more_less_100': [_pvStep([10, 100], 100), _pvDir(), _pvMoreLessSupport(false)],
+    'placevalue:more_less_10': [_pvStep([1, 10], 1), _pvDir(), _pvBand([20, 50, 100, 120], 100), _pvMoreLessSupport2(true), _pvMoreLessUnknown()],
+    // Numbers 100-900 (2.NBT.B.8): the band is fixed at 1,000, so there is no band control. The
+    // 1,000 step (4.NBT) is appended to the enum (SCC-P12) and works to 10,000.
+    'placevalue:more_less_100': [_pvStep([10, 100, 1000], 100), _pvDir(), _pvMoreLessSupport2(false), _pvMoreLessUnknown()],
     'placevalue:place_value_10x': [
         { id: 'op', label: 'Multiply or divide', type: 'enum', default: 'x', group: 'difficulty',
             values: [{ v: 'x', l: '× (digits move left)' }, { v: '/', l: '÷ (digits move right)' }],
@@ -524,13 +628,37 @@ const P9_PV_OPTIONS = {
         _pvBand([1000, 10000, 100000, 1000000], 10000, 'The biggest number on the page (the larger of the number and its answer).'),
         { id: 'decimals', label: 'Decimals (grade 5)', type: 'bool', default: false, group: 'difficulty',
             help: 'On gives numbers with a decimal point, such as 3.4 × 100.' },
+        { id: 'support', label: 'Support', type: 'enum', default: 'shift', group: 'support',
+            values: [{ v: 'shift', l: 'Shift chart (the digits move across the places)' }, { v: 'none', l: 'None: the equation only' }],
+            help: 'The chart shows each digit moving one place for each zero; "None" is the fade.' },
     ],
+    'placevalue:unit_form': [_pvBand([99, 999, 9999], 999), {
+        id: 'rename', label: 'More than 9 of one place', type: 'enum', default: 'standard', group: 'difficulty',
+        values: [{ v: 'standard', l: 'No (476 = 4 hundreds 7 tens 6 ones)' }, { v: 'more', l: 'Yes (476 = 47 tens 6 ones)' }],
+        help: 'Renaming (47 tens) is the idea regrouping is built on.',
+    }],
     'number_sense:rounding_visual': [
         { id: 'place', label: 'Round to the nearest', type: 'enum', default: 10, group: 'difficulty',
             values: [{ v: 10, l: '10' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }],
             help: 'The place the number is rounded to. The numbers grow to fit the place.' },
         _pvBand([100, 1000, 10000], 100, 'The biggest number on the page. It grows to fit the place when the place needs more.'),
         _pvMidpoint(true),
+        { id: 'line', label: 'The number line', type: 'enum', default: 'mark', group: 'support',
+            values: [
+                { v: 'plotted', l: 'The number is marked on the line' },
+                { v: 'mark', l: 'The pupil marks the number' },
+                { v: 'ends', l: 'The ends only (no marking)' },
+            ],
+            help: 'Most support first: the dot is drawn, then the pupil marks it, then the line alone.' },
+        { id: 'midLabel', label: 'Label the halfway tick', type: 'bool', default: false, group: 'support',
+            help: 'A hint: the halfway number is printed under the middle tick.' },
+    ],
+    'number_sense:between_tens': [_pvBand([100, 1000], 100)],
+    'number_sense:place_on_number_line': [
+        { id: 'span', label: 'The line goes from', type: 'enum', default: 10, group: 'difficulty',
+            values: [{ v: 10, l: 'One ten to the next' }, { v: 100, l: 'One hundred to the next' }, { v: 1000, l: 'One thousand to the next' }],
+            help: 'The two ends are the tens (hundreds, thousands) the number is between.' },
+        _pvBand([100, 1000, 10000], 100, 'The biggest number on the page. It grows to fit the line.'),
     ],
     'number_sense:nearest_10': _pvNearest(10),
     'number_sense:nearest_100': _pvNearest(100),
@@ -546,6 +674,17 @@ const P9_PV_OPTIONS = {
     'number_sense:round_sort_million': _pvSort(1000000),
     'number_sense:round_sort_tenths': _pvSort(0),
     'number_sense:round_sort_hundredths': _pvSort(0),
+    'number_sense:rounding_table': [
+        { id: 'places', label: 'Columns (round to the nearest)', type: 'set', default: [10, 100], group: 'difficulty',
+            values: [{ v: 10, l: '10' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }, { v: 10000, l: '10,000' }],
+            allLabel: 'All four columns',
+            help: 'One column per place. The numbers are as big as the biggest place needs.' },
+        { id: 'blank', label: 'What the pupil fills in', type: 'enum', default: 'column', group: 'layout',
+            values: [{ v: 'column', l: 'A whole column' }, { v: 'row', l: 'A whole row (one number to every place)' }],
+            help: 'A whole column or row is blank, so no answer can be read off its neighbours.' },
+    ],
+    'number_sense:estimate_sum': [_pvEstPlace(), _pvEstSupport()],
+    'number_sense:estimate_diff': [_pvEstPlace(), _pvEstSupport()],
     'number_sense:estimate_sums_diffs': [_pvEstPlace(), _pvTask()],
     'number_sense:estimate_products': [_pvEstPlace(), _pvTask()],
     'number_sense:estimate_quotient': [_pvQuotientPlace(), _pvTask()],
@@ -570,7 +709,13 @@ export function pvBandFloor(categoryId, skillId, opts) {
     const o = normalizeOptions(categoryId, skillId, opts);
     const place = pvRoundPlace(skillId, o);
     if (place) return place * 10;
-    if (skillId === 'more_less_100') return 1000;
+    if (skillId === 'more_less_100') return Number(o.step) === 1000 ? 10000 : 1000;
+    if (skillId === 'between_tens') return 100;
+    if (skillId === 'place_on_number_line') return (Number(o.span) || 10) * 10;
+    if (skillId === 'rounding_table') {
+        const ps = (Array.isArray(o.places) && o.places.length ? o.places : [10, 100]).map(Number);
+        return Math.max(...ps) * 10;
+    }
     if (skillId === 'more_less_10') return Number(o.step) === 10 ? 20 : 10;
     if (skillId === 'pv_digit_drag') return 1000;
     if (skillId === 'place_value_10x') {
@@ -1045,6 +1190,762 @@ SKILL_OPTIONS['composing:number_word_form'] = [{
     help: 'Writing the words is harder (it is spelling too). Tick both and the page alternates.',
 }];
 
+// ===========================================================================
+// P12 · EVERY OTHER FAMILY  (design/audit/OPTIONS-RUBRIC.md, 2026-09-25)
+// ===========================================================================
+// One contiguous block, merged into SKILL_OPTIONS below (P12_OPTIONS), for every live skill P9 and
+// P11 did not cover: the × / ÷ ladder steps, the number families, the fractions, decimals,
+// conversions, geometry, measurement, time, money, data, algebra, number theory and integer
+// families, and — through the pool hook below — every mixed review. Every option here is READ by
+// its generator (the "P12 OPTIONS" helpers in each gen-*.js file); defaults are the stand-alone
+// values (R2), and at its default each option leaves the generator on exactly its old path.
+//
+// NEW OPTION IDS travel in share codes under the block-5 digit + letter keys (skill-option-keys.js,
+// the one key registry): members 5A, forms 5B, denoms 5C, model 5D, labels 5E, precision 5F,
+// coins 5G, shapes 5H, points 5I, scale 5J, digits 5K, units 5L, parts 5M. Every other control reuses an existing id
+// whose meaning fits (`band`, `support`, `pictures`, `unknown`, `task`, `dir`, `tiles`, `step`,
+// `place`, `simplestForm`, `level`, `regroup`, `response`).
+
+/** A set option over a skill's item FORMS, dealt round-robin by the generator (one form per item). */
+export const formsOption = (values, { label = 'What the items ask', help, dflt } = {}) => ({
+    id: 'forms', label, type: 'set', group: 'difficulty',
+    default: dflt || values.map(x => x.v),
+    values,
+    allLabel: 'All of them, mixed',
+    help: help || 'Tick one kind for a page of it alone, or several to mix them. All ticked mixes every kind.',
+});
+/** Picture model on / off — `pictures` with its own honest help. */
+const _p12Pictures = (help, dflt = true) => ({ ...picturesOption(dflt), group: 'support', help });
+
+/** "Divide by": a set of divisors, read by gen-operations.js _p12Constant() only when changed. */
+const _p12DivBy = (lo, hi, dflt, help) => {
+    const all = Array.from({ length: hi - lo + 1 }, (_, i) => lo + i);
+    return {
+        id: 'constant', label: 'Divide by', type: 'set', group: 'difficulty',
+        default: dflt || all, values: all.map(v => ({ v, l: String(v) })),
+        allLabel: `Every divisor, ${lo} to ${hi}`, titleVerb: 'Divide by',
+        help: help || 'Tick one divisor for a page of it alone, or a few to review them together.',
+    };
+};
+const _p12Enum = (id, label, values, dflt, help, group = 'difficulty') => ({ id, label, type: 'enum', group, default: dflt, values, help });
+
+const P12_OPTIONS = {
+    // ======================= × and ÷ ladder steps (gen-operations.js, gen-counting.js) =========
+    'multiplication:dot_array_mult': [
+        _opsBand([25, 100], 100, { label: 'Rows and columns to', labels: { 25: '5 (5 × 5)', 100: '10 (10 × 10)' },
+            help: 'The most rows, and the most dots in a row. The product is at most 25 or 100.' }),
+        _p12Enum('support', 'Support', [{ v: 'label', l: 'Rows and columns written under the array' },
+            { v: 'none', l: 'None: the pupil counts the rows and the columns' }], 'label',
+        'The caption names the two factors; without it the pupil finds them in the picture.', 'support'),
+    ],
+    'multiplication:mult_properties': [
+        formsOption([{ v: 0, l: 'Order (3 × 4 = 4 × 3)' }, { v: 1, l: 'Breaking apart (6 × 7 = 6 × 5 + 6 × 2)' },
+            { v: 2, l: 'Times 1' }, { v: 3, l: 'Times 0' }], { label: 'Which property' }),
+        _p12Pictures('Off prints the question alone: no arrays and no property name (the name tells the pupil which rule to use).'),
+    ],
+    'multiplication:area_model_mult': [_p12Enum('tiles', 'Digits × digit', [
+        { v: null, l: 'Both sizes, dealt' }, { v: 21, l: '2-digit × 1-digit (4 × 36)' }, { v: 31, l: '3-digit × 1-digit (3 × 135)' }],
+    null, 'The size of the number split into parts: two parts (tens, ones) or three (hundreds, tens, ones).')],
+    'multiplication:area_model_mult_hard': [_p12Enum('tiles', 'Digits × digits', [
+        { v: null, l: 'Both grids, dealt' }, { v: 22, l: '2-digit × 2-digit (a 2 × 2 grid)' }, { v: 23, l: '2-digit × 3-digit (a 2 × 3 grid)' }],
+    null, 'The grid the pupil fills: four partial products, or six.')],
+    'multiplication:repeated_add_to_mult': [
+        _opsBand([25, 36, 100], 36, { label: 'Groups and group size to', labels: { 25: '5', 36: '6', 100: '10' },
+            help: 'The most groups and the most in a group: the product is at most 25, 36 or 100.' }),
+        _p12Pictures('Off leaves the two sentences to write, without the ringed groups.'),
+    ],
+    'multiplication:equal_or_unequal_groups': [
+        formsOption([{ v: 0, l: 'Equal groups (multiply)' }, { v: 1, l: 'Unequal groups (add)' }], { label: 'Which groups',
+            help: 'Both, mixed, is the default: the pupil has to look. One kind alone is a warm-up.' }),
+        _p12Enum('step', 'Most in a group', [{ v: 6, l: '6' }, { v: 10, l: '10' }], 6, 'Bigger groups are harder to compare by eye.'),
+    ],
+    'multiplication:mult_zeros': [formsOption([{ v: 0, l: '× 10 (6 × 10)' }, { v: 1, l: '× 100 (6 × 100)' },
+        { v: 2, l: '× a multiple of ten (6 × 40)' }], { label: 'Which kind' })],
+    'multiplication:mult_placeholder_zero': [_p12Enum('tiles', 'Top number', [
+        { v: 22, l: '2 digits (47 × 36)' }, { v: 32, l: '3 digits (215 × 36)' }], 22,
+    'The multiplier always has two digits: the step is where the second row starts.')],
+    'multiplication:mult_missing_digit': [_p12Enum('tiles', 'Top number', [
+        { v: 21, l: '2 digits (47 × 6)' }, { v: 31, l: '3 digits (215 × 6)' }], 21,
+    'A longer number has more places the missing digit can hide in.')],
+    'division:div_remainders': [_p12DivBy(2, 9, [2, 3, 4, 5, 6],
+        'The group size to ring. Above 6 the pictures get fewer groups, so every picture stays countable.')],
+    'division:box_division_easy': [
+        _p12DivBy(2, 9),
+        { ..._opsRegroup('none'), label: 'Remainders', values: [{ v: 'none', l: 'None (it shares exactly)' }, { v: 'mixed', l: 'Some items' }, { v: 'always', l: 'Every item' }],
+            help: 'A remainder is written R in the last box: 29 ÷ 4 = 7 R 1.' },
+    ],
+    'division:box_division_hard': [
+        _p12DivBy(2, 9),
+        { ..._opsRegroup('mixed'), label: 'Remainders', values: [{ v: 'none', l: 'None (it shares exactly)' }, { v: 'mixed', l: 'Some items' }, { v: 'always', l: 'Every item' }],
+            help: 'A remainder is written R in the last box: 437 ÷ 4 = 109 R 1.' },
+    ],
+    'division:area_model_div_2by1': [_p12DivBy(2, 9)],
+    'division:area_model_div_3by1': [_p12DivBy(2, 9)],
+    'division:share_into_groups': [_opsBand([12, 24], 24, { label: 'Counters to', help: 'The most counters in the picture. 12 keeps it to 2 to 4 groups.' })],
+    'division:div_equation_parts': [
+        formsOption([{ v: 0, l: 'How many in all' }, { v: 1, l: 'How many in each group' }, { v: 2, l: 'How many groups' }],
+            { label: 'Which number is asked' }),
+        _opsBand([25, 81], 81, { label: 'Numbers to', labels: { 25: '25 (groups and sizes to 5)', 81: '81 (to 9)' },
+            help: 'The largest total. Smaller totals draw fewer, smaller groups.' }),
+    ],
+    'division:remainder_too_big': [
+        formsOption([{ v: 0, l: 'Already finished (check it)' }, { v: 1, l: 'Not finished (fix it)' }], { label: 'Which work',
+            help: 'Both, mixed, is the default: the pupil has to check. "Not finished" alone practises the fix.' }),
+        _p12DivBy(3, 9),
+        _opsBand([null, 50, 100], null, { label: 'Numbers to', labels: { null: 'Any (to 119)' },
+            help: 'The largest number shared.' }),
+    ],
+    'division:div_fix_estimate': [
+        formsOption([{ v: 0, l: 'First try too big' }, { v: 1, l: 'First try too small' }], { label: 'Which mistake' }),
+        _p12Enum('tiles', 'Divisor', [{ v: 19, l: '11 to 19' }, { v: 29, l: '11 to 29' }, { v: 49, l: '11 to 49' }], 49,
+            'Smaller two-digit divisors are easier to multiply in the head.'),
+    ],
+    // The number families (the P-1 split): the band owns the number size, the level the blanks.
+    'addition:number_families_add': [
+        _opsBand([10, 20, 40, 100], 20, { help: 'The largest sum in the family, at every support level.' }),
+        levelSubset([2, 1, 0], 2, 'Level 2 leaves only each answer blank, level 1 blanks two numbers in every row, level 0 blanks the whole family. The numbers stay the same size at every level.'),
+    ],
+    'multiplication:number_families_mult': [
+        _opsBand([25, 100, 144], 25, { label: 'Tables to', labels: { 25: '5 × 5', 100: '10 × 10', 144: '12 × 12' },
+            help: 'The largest table in the family, at every support level.' }),
+        levelSubset([2, 1, 0], 2, 'Level 2 leaves only each answer blank, level 1 blanks two numbers in every row, level 0 blanks the whole family. The tables stay the same at every level.'),
+    ],
+    'number_ops_mixed:number_families_mixed': [
+        _opsBand([5, 8, 10], 5, { label: 'Numbers to', help: 'The two starting numbers of every family, at every support level.' }),
+        levelSubset([2, 1, 0], 2, 'Level 2 leaves only each answer blank, level 1 blanks two numbers in every row, level 0 blanks the whole family. The numbers stay the same size at every level.'),
+    ],
+};
+
+// The pool hook: skill-options-pools.js builds the "Which skills" control for every mixed review
+// from the dealer's own pool and registers it here, so this file stays import-free.
+let _poolOptions = null;
+/** Called once by skill-options-pools.js. */
+export function registerPoolOptions(fn) { _poolOptions = typeof fn === 'function' ? fn : null; }
+
+// The fifty vocabulary skills share one panel: which kind of item the page asks. The drag
+// matcher is not offered — it cannot sit on an online worksheet page, so a page of it alone
+// would fail there; it stays in the mix when every kind is ticked.
+let _P12_VOCAB = null;
+function _vocabOptions() {
+    if (!_P12_VOCAB) {
+        _P12_VOCAB = [{
+            id: 'forms', label: 'What the items ask', type: 'set', group: 'difficulty',
+            default: [0, 1, 2],
+            values: [{ v: 0, l: 'Which word matches the definition?' }, { v: 1, l: 'What does the word mean?' }, { v: 2, l: 'True or false?' }],
+            allLabel: 'All of them, mixed (with matching and sorting)',
+            match: ['^Which word matches', '^What does', '^True or False'],
+            help: 'Reading a definition and naming the word is the easier step; explaining a word is harder. All ticked also mixes in matching and sorting.',
+        }];
+    }
+    return _P12_VOCAB;
+}
+
+/** A skill's own declared options: its registry entry, else its mixed-pool control, else none. */
+export function ownOptionsFor(categoryId, skillId) {
+    const own = SKILL_OPTIONS[`${categoryId}:${skillId}`] || SKILL_OPTIONS[skillId];
+    if (own) return own;
+    if (categoryId === 'vocabulary' && /^vocab_grade_/.test(String(skillId))) return _vocabOptions();
+    if (_poolOptions) {
+        try { const p = _poolOptions(categoryId, skillId); if (p) return p; } catch (e) { /* no pool */ }
+    }
+    return [];
+}
+// ======================= FRACTIONS (gen-fractions.js, through generate-question.js) =========
+// Three mechanisms, none of which changes the untouched skill:
+//   `denoms`   ACCEPT: an item is kept only when every fraction on it has a ticked denominator
+//              family (generate-question.js denomAllowed); families, not single denominators,
+//              because equivalence and unlike-denominator work move inside a family (1/2 = 4/8).
+//              Each skill offers only the families its generator was measured to draw
+//              (tests/scripts/ws-measure-denoms.cjs).
+//   `forms`    VARIANT: the item forms the generator already rotates through (pickVariant), so
+//              "only find-the-missing-number" is one tick.
+//   `pictures` POST (`strip: true`): the fraction pictures come off and the same problem prints
+//              as numbers, on the skills whose words already carry the whole problem.
+const _FRAC_FAM = { 2: 'Halves, quarters, eighths', 3: 'Thirds, sixths, ninths, twelfths', 5: 'Fifths, tenths, hundredths', 7: 'Sevenths, elevenths' };
+const _p12Denoms = (fams = [2, 3, 5]) => ({
+    id: 'denoms', label: 'Denominators', type: 'set', group: 'difficulty', default: fams,
+    values: fams.map(v => ({ v, l: _FRAC_FAM[v] })),
+    allLabel: 'Every family, mixed',
+    help: 'Tick one family of denominators for a page of it alone, or several. A fraction whose '
+        + 'denominator joins two families (fifteenths) appears only when both are ticked.',
+});
+const _p12Strip = (help) => ({ ...picturesOption(true), group: 'support', strip: true,
+    help: help || 'Off prints the same problems as numbers only, without the fraction pictures. An item the pupil drags or shades keeps its picture.' });
+/** `forms` over a pickVariant() key: the values are positions in `variants`. */
+const _p12Variants = (key, variants, labels, opts = {}) => ({
+    ...formsOption(labels.map((l, i) => ({ v: i, l })), opts), variantKey: key, variants,
+});
+const _fracNvForms = (key, simplify = true) => _p12Variants(key, simplify ? ['straight', 'missing_num', 'simplify'] : ['straight', 'missing_num'],
+    ['Work it out (2/6 + 3/6 = __)', 'Find the missing number (2/6 + __/6 = 5/6)', ...(simplify ? ['Work it out and simplify'] : [])],
+    { label: 'What the items ask' });
+const _mixedNvForms = (key, simplify = true) => _p12Variants(key, simplify ? ['straight', 'missing', 'simplify'] : ['straight', 'missing'],
+    ['Work it out (2 1/3 + 1 1/3 = __)', 'Find the missing number (2 1/3 + __ = 4)', ...(simplify ? ['Work it out and simplify'] : [])],
+    { label: 'What the items ask' });
+Object.assign(P12_OPTIONS, {
+    'fractions:identify': [_p12Denoms(), _p12Variants('identify', ['standard', 'pickModel', 'partLabel'],
+        ['What fraction is shaded?', 'Pick the model that shows the fraction', 'Name the numerator or the denominator'])],
+    'fractions:write_fraction': [_p12Denoms()],
+    'fractions:shade_fraction': [_p12Denoms()],
+    'fractions:equiv_frac_visual': [_p12Denoms()],
+    'fractions:equiv_frac_nv': [_p12Denoms()],
+    'fractions:equivalent': [_p12Denoms(), _p12Variants('equivalent', ['standard', 'yesNoEquiv', 'multiSelectHalf'],
+        ['Find the missing number (1/2 = __/8)', 'Equivalent or not? (yes or no)', 'Click every fraction equal to 1/2'])],
+    'fractions:compare': [_p12Denoms([2, 3]), _p12Variants('compare', ['standard', 'numericOnly', 'compareHalf'],
+        ['Compare with fraction bars', 'Compare the numbers only', 'Compare with one half'])],
+    'fractions:simplify': [_p12Variants('simplify_main', ['standard', 'isSimplest', 'gcfStep'],
+        ['Simplify the fraction', 'Is it in simplest form? (yes or no)', 'Find the greatest common factor first'])],
+    'fractions:improper_mixed': [_p12Denoms()],
+    'fractions:mixed_improper_visual': [_p12Denoms()],
+    'fractions:compose_target_frac': [_p12Denoms()],
+    'fractions:identify_nv': [_p12Denoms([2, 3, 5, 7]), _p12Variants('identify_nv', ['type1', 'type2', 'type3'],
+        ['"6 out of 7 parts are shaded"', '"Numerator 1, denominator 2"', 'A short story (a cake cut into slices)'])],
+    'fractions:fraction_of_set': [_p12Denoms()],
+    'fractions:fraction_of_set_hard': [_p12Denoms()],
+    'fractions:fraction_of_set_nv': [_p12Denoms([2, 3, 5, 7]), _p12Variants('fraction_of_set_nv', ['type1', 'type2', 'type3'],
+        ['A unit fraction of a number (1/4 of 12)', 'Any fraction of a number (3/4 of 12)', 'A short story'])],
+    'fractions:fraction_of_set_hard_nv': [_p12Denoms(), _p12Variants('fraction_of_set_hard_nv', ['type1', 'type2', 'type3'],
+        ['A fraction of a number (4/12 of 96)', 'Find the whole (3/7 of a number is 12)', 'A short story'])],
+    'fractions:order_frac_numline': [_p12Denoms()],
+    'fractions:compare_frac_lcd': [_p12Denoms()],
+    'fractions:graph_fractions': [_p12Denoms([2, 3])],
+    'fractions:round_fractions': [_p12Denoms()],
+    'fractions:fraction_bar_ops': [_p12Denoms()],
+    'fractions:fraction_nl_drag': [_p12Denoms()],
+    'composing:fraction_number_line': [_p12Denoms()],
+    'composing:whole_as_fraction': [_p12Denoms()],
+
+    'fraction_operations:add_fractions_like': [_p12Denoms([2, 3, 5, 7]), _p12Strip()],
+    'fraction_operations:sub_fractions_like': [_p12Denoms([2, 3, 5, 7]), _p12Strip()],
+    'fraction_operations:add_mixed_like': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:sub_mixed_like': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:mult_frac_whole': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:decompose_fractions': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:frac_word_problems': [_p12Denoms()],
+    'fraction_operations:frac_word_problems_plain': [_p12Denoms()],
+    'fraction_operations:frac_10_100': [_p12Strip('Off prints the same problems as numbers only, without the tenths and hundredths grids.')],
+    'fraction_operations:add_frac_unlike': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:sub_frac_unlike': [_p12Denoms([2, 3]), _p12Strip()],
+    'fraction_operations:add_mixed_unlike': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:sub_mixed_unlike': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:add_frac_like_nv': [_p12Denoms([2, 3, 5, 7]), _fracNvForms('add_frac_like_nv')],
+    'fraction_operations:sub_frac_like_nv': [_p12Denoms([2, 3, 5, 7]), _fracNvForms('sub_frac_like_nv')],
+    'fraction_operations:add_frac_unlike_nv': [_p12Denoms(), _fracNvForms('add_frac_unlike_nv')],
+    'fraction_operations:sub_frac_unlike_nv': [_p12Denoms(), _fracNvForms('sub_frac_unlike_nv')],
+    'fraction_operations:add_mixed_like_nv': [_p12Denoms(), _mixedNvForms('add_mixed_like_nv')],
+    'fraction_operations:sub_mixed_like_nv': [_p12Denoms(), _mixedNvForms('sub_mixed_like_nv')],
+    'fraction_operations:add_mixed_unlike_nv': [_p12Denoms([2, 3]), _mixedNvForms('add_mixed_unlike_nv')],
+    'fraction_operations:sub_mixed_unlike_nv': [_p12Denoms([2, 3]), _mixedNvForms('sub_mixed_unlike_nv', false)],
+    'fraction_operations:mult_frac_whole_nv': [_p12Denoms([2, 3, 5, 7]), _p12Variants('mult_frac_whole_nv', ['straight', 'missing_whole', 'simplify'],
+        ['Work it out (5/6 × 2 = __)', 'Find the missing whole number (__ × 1/2 = 3 1/2)', 'Work it out and simplify'])],
+    'fraction_operations:decompose_frac_nv': [_p12Denoms([2, 3, 5, 7]), _p12Variants('decompose_frac_nv', ['type1', 'type2', 'type3'],
+        ['A sum of unit fractions (1/6 + 1/6 + …)', 'A sum of two fractions', 'How many unit fractions make it?'])],
+    'fraction_operations:mult_frac_frac_nv': [_p12Denoms(), _p12Variants('mult_frac_frac_nv', ['straight', 'missing', 'simplify'],
+        ['Work it out (1/2 × 2/3 = __)', 'Find the missing number', 'Work it out and simplify'])],
+    'fraction_operations:div_unit_frac_nv': [_p12Denoms(), _p12Variants('div_unit_frac_nv', ['A_straight', 'A_missing', 'B_straight', 'B_missing'],
+        ['Unit fraction ÷ whole (1/3 ÷ 2)', 'Unit fraction ÷ whole, a number missing', 'Whole ÷ unit fraction (7 ÷ 1/4)', 'Whole ÷ unit fraction, a number missing'])],
+    'fraction_operations:frac_as_div_nv': [_p12Denoms(), _p12Variants('frac_as_div_nv', ['type1', 'type2', 'type3'],
+        ['Write the division as a fraction', 'A sharing story', 'Write the result as a mixed number'])],
+    'fraction_operations:frac_as_div_word': [_p12Denoms([2, 3, 5, 7])],
+    'fraction_operations:mult_scaling_nv': [_p12Variants('mult_scaling_nv', ['type1', 'type2', 'type3'],
+        ['A fraction less than 1: is the product smaller?', 'A fraction greater than 1: is the product bigger?', 'Write >, < or ='])],
+    'fraction_operations:mult_frac_frac': [_p12Denoms([2, 3]), _p12Strip()],
+    'fraction_operations:div_unit_fraction': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:frac_as_division': [_p12Denoms([2, 5]), _p12Strip()],
+    'fraction_operations:mult_scaling': [_p12Strip('Off prints the same comparisons as numbers only, without the scaling bars.')],
+    'fraction_operations:frac_mult_word': [_p12Denoms()],
+    'fraction_operations:frac_mult_word_plain': [_p12Denoms()],
+    'fraction_operations:frac_word_mixed_plain': [_p12Denoms()],
+});
+
+// ======================= SHARED P12 CONTROLS FOR THE LEGACY GENERATORS =====================
+// Most of the families below were written before options existed and draw their numbers from
+// fixed tables. Rather than rewrite each branch, three ACCEPT controls (generate-question.js
+// p12Acceptor) keep only the items that have the property asked for, and redraw the rest:
+//   _p12Match   "What the items ask" by the item's own words (one regular expression per kind)
+//   _p12Max     "Numbers to": every number on the item, answer included, is at most the value
+//   _p12Dp      "Decimal places": every decimal on the item has a ticked number of places
+// Each value offered was checked by ws-options-verify to be drawn often enough to be found.
+const _p12Match = (pairs, opts = {}) => ({
+    ...formsOption(pairs.map(([l], i) => ({ v: i, l })), opts), match: pairs.map(([, re]) => re),
+});
+const _p12Max = (values, natural, { label = 'Numbers to', help, labels = {} } = {}) => ({
+    ..._opsBand([null, ...values], null, { label, labels: { null: `As dealt (to about ${natural.toLocaleString('en-US')})`, ...labels },
+        help: help || 'The largest number anywhere on the item, the answer included.' }),
+    group: 'difficulty', accept: 'max',
+});
+const _p12Dp = (values = [1, 2], help) => ({
+    id: 'digits', label: 'Decimal places', type: 'set', group: 'difficulty', accept: 'dp',
+    default: values,
+    values: [{ v: 1, l: 'Tenths (0.7)' }, { v: 2, l: 'Hundredths (0.25)' }, { v: 3, l: 'Thousandths (0.125)' }].filter(x => values.includes(x.v)),
+    allLabel: 'All of them, mixed',
+    help: help || 'Tick one for a page of it alone. Tenths are the easiest step.',
+});
+const _dragOrNot = (convertLabel, convertRe = '^Convert') => _p12Match([[convertLabel, convertRe],
+    ['Sort values into bins (drag)', 'Drag each']], { label: 'What the items ask',
+    help: 'The sorting items are a drag task on screen and a matching task on paper. One kind per page, or both.' });
+
+// ======================= CONVERSIONS AND DECIMALS (gen-fractions.js) =======================
+Object.assign(P12_OPTIONS, {
+    'conversions:f_to_d': [_p12Denoms([2, 5])],
+    'conversions:d_to_f': [_dragOrNot('Convert one decimal (0.75 = 3/4)')],
+    'conversions:f_to_p': [_dragOrNot('Convert one fraction (3/5 = 60%)')],
+    'conversions:p_to_f': [_p12Denoms([2, 5]), _dragOrNot('Convert one percent (75% = 3/4)')],
+    'conversions:d_to_p': [_p12Dp([1, 2], 'Tenths (0.7 = 70%) come before hundredths (0.08 = 8%).')],
+    'conversions:p_to_d': [_p12Dp([1, 2], 'Tenths (70% = 0.7) come before hundredths (8% = 0.08).')],
+    'conversions:percent_visual': [_p12Match([['What percent is shaded?', 'What percent'], ['What fraction is shaded?', 'What fraction'],
+        ['"80% is shaded": how many squares?', 'How many squares'], ['Click every grid that shows it', 'Click ALL']])],
+    'conversions:percent_of_number': [_p12Match([['What is 20% of 60?', '^What is'], ['Click every expression equal to it', 'Click ALL']]),
+        _p12Max([50], 100)],
+    'conversions:find_whole_from_pct': [_p12Match([['"16 is 40% of what number?"', 'of what number'], ['Click every value that works', 'Click ALL']])],
+    'conversions:order_fdp': [_p12Match([['Least to greatest', 'least to greatest'], ['Greatest to least', 'greatest to least']],
+        { label: 'Which order' })],
+    'conversions:ratio_intro': [_p12Variants('ratio_intro', ['standard', 'partWhole', 'equivRatio'],
+        ['Write the ratio (apples to oranges)', 'A part to the whole', 'Find the missing number (6:2 = __:6)']), _p12Max([20], 100)],
+    'conversions:unit_rate_intro': [_p12Max([20, 50], 100, { help: 'The largest total in the story (the number shared out).' })],
+    'conversions:double_num_line': [_p12Max([10, 20], 50)],
+    'conversions:equiv_ratios': [_p12Variants('equiv_ratios', ['findMissing', 'isEquiv', 'simplify'],
+        ['Find the missing value (5 : 9 = __ : 54)', 'Equivalent or not? (yes or no)', 'Write in simplest form']), _p12Max([50, 100], 100)],
+    'conversions:ratio_tables': [_p12Max([20], 100)],
+    'decimals:round_thousandths': [_p12Match([['Round to the nearest tenth', 'nearest tenth'], ['Round to the nearest hundredth', 'nearest hundredth']],
+        { label: 'Round to the nearest' })],
+    'decimals:decimal_nl_drag': [_p12Match([['Place one decimal', '^Drag \\d'], ['Place several decimals', 'Drag each']],
+        { label: 'How many to place' })],
+    // Read by gen-fractions.js (_fChanged('forms')): 0 = two different values, 1 = equal pairs.
+    'decimals:compare_thousandths': [formsOption([{ v: 0, l: 'Two different values (0.844 and 0.722)' },
+        { v: 1, l: 'The same value written two ways (0.450 and 0.45)' }],
+    { label: 'Which pairs', help: 'A trailing zero changes nothing: 0.450 = 0.45. A page of those alone teaches it; the default mixes one in four.' })],
+});
+
+/** A set option of kinds told apart by the item's words or answer (see _p12Match), any id. */
+const _p12Kinds = (id, label, pairs, help) => ({
+    ..._p12Match(pairs, { label, help: help || 'Tick one for a page of it alone, or several. All ticked mixes them.' }), id,
+});
+
+// ======================= GEOMETRY (gen-geometry.js, gen-measurement.js) ====================
+Object.assign(P12_OPTIONS, {
+    'shapes_early:name_2d_shapes': [
+        _p12Match([['Name the shape (write its name)', '^What shape'], ['Click every shape of one kind', '^Click ALL']]),
+        _p12Kinds('shapes', 'Which shapes', [['Circles and ovals', '\\b(circles?|ovals?)\\b'], ['Triangles', '\\btriangles?\\b'],
+            ['Squares and rectangles', '\\b(squares?|rectangles?)\\b'], ['Rhombuses', '\\brhomb'], ['Pentagons and hexagons', '\\b(pentagons?|hexagons?)\\b']]),
+    ],
+    'shapes_early:name_3d_shapes': [
+        _p12Match([['Name the shape (write its name)', '^What'], ['Click every shape of one kind', '^Click ALL']]),
+        _p12Kinds('shapes', 'Which shapes', [['Spheres', 'spheres?\\b'], ['Cylinders', 'cylinders?\\b'], ['Cubes', 'cubes?\\b'],
+            ['Cones', 'cones?\\b'], ['Rectangular prisms', 'rectangular prism']]),
+    ],
+    'shapes_early:shape_positions': [_p12Kinds('forms', 'Which position words', [['Above and below', '=> (Above|Below)$'],
+        ['Beside', '=> Beside$'], ['Between', '=> Between$']], 'Above and below come first; between is the hardest (two shapes to look at).')],
+    'shapes_early:shape_corners_count': [_p12Max([4, 6], 8, { label: 'Corners up to', help: 'The most corners a shape on the page has.' })],
+    'shapes_early:count_edges_faces_vertices': [
+        _p12Kinds('forms', 'What is counted', [['Faces', '\\bfaces\\b'], ['Edges', '\\bedges\\b'], ['Vertices', '\\bvertices\\b']]),
+        _p12Kinds('shapes', 'Which shapes', [['Cubes and prisms', 'cube|prism'], ['Pyramids', 'pyramid'],
+            ['Curved shapes (cylinder, cone, sphere)', 'cylinder|cone|sphere']]),
+    ],
+    'shapes_early:count_sides_vertices_2d': [
+        _p12Kinds('forms', 'What is counted', [['Sides', '\\bsides\\b'], ['Vertices', '\\bvertices\\b']]),
+        _p12Max([4, 6], 10, { label: 'Sides up to', help: 'The most sides a shape on the page has.' }),
+    ],
+    'shapes_early:measure_nonstandard': [
+        _p12Kinds('units', 'Measured with', [['Paper clips', 'paper clips'], ['Cubes', '\\bcubes\\b'], ['Crayons', 'crayons']]),
+        _p12Max([5], 8, { label: 'Lengths up to', help: 'The longest length, in units.' }),
+    ],
+    'shapes_early:compose_shapes': [_p12Kinds('shapes', 'The shape made', [['A triangle', '=> Triangle$'],
+        ['A square or a rectangle', '=> (Square|Rectangle)$'], ['A hexagon', '=> Hexagon$']])],
+    'shapes_early:compose_hexagon': [_p12Kinds('shapes', 'Blocks used', [['Triangles', '\\(triangles\\)'], ['Trapezoids', '\\(trapezoids\\)'], ['Rhombi', '\\(rhombi\\)']],
+        'Two trapezoids is the easiest fill; six triangles the most blocks to place.')],
+    'shapes_early:partition_shapes': [
+        _p12Variants('partition_shapes', ['count_parts', 'fraction_shaded'], ['How many equal parts?', 'What fraction is shaded?']),
+        _p12Kinds('parts', 'Equal parts', [['Halves', '=> (2|\\d/2)$'], ['Thirds', '=> (3|\\d/3)$'], ['Fourths', '=> (4|\\d/4)$']]),
+    ],
+    'shapes_early:shape_attributes': [_p12Match([['How many sides or vertices?', '^How many'], ['Click every shape with a property', '^Click ALL']])],
+    'shapes_early:compose_from_attributes': [_p12Kinds('forms', 'Which property', [['A number of right angles', 'have (exactly )?\\d+ right angles?\\.'],
+        ['Sides and equal sides', 'SIDES EQUAL'], ['Sides and no right angle', 'NO RIGHT ANGLES'], ['Sides and no parallel sides', 'NO PARALLEL']],
+    'One property is the easier step; two together ("3 sides and no right angle") are harder.')],
+});
+
+const _clickOrName = (nameLabel, nameRe) => _p12Match([[nameLabel, nameRe], ['Click every one of a kind', '^Click']],
+    { help: 'Writing the name is recall; clicking picks from a set. One kind per page, or both.' });
+Object.assign(P12_OPTIONS, {
+    'area_perimeter:perimeter_intro': [_p12Max([16, 24], 32, { label: 'Perimeter up to', help: 'The largest perimeter on the page.' })],
+    'area_perimeter:area_unit_squares': [_p12Variants('area_unit_squares', ['rectangle', 'L'], ['Rectangles', 'L-shapes']),
+        _p12Max([12, 24], 42, { label: 'Area up to', help: 'The most unit squares to count.' })],
+    'area_perimeter:perimeter_grid': [_p12Match([['Count the edges of a rectangle', 'outside edges\\. What'], ['Count the edges of an L-shape', 'L-shap'],
+        ['Find the perimeter of a rectangle', 'perimeter of this rectangle'], ['A composite shape', 'composite']]),
+    _p12Max([16], 36, { label: 'Perimeter up to' })],
+    'area_perimeter:perimeter': [_p12Variants('perimeter', ['standard', 'missing', 'word'], ['Find the perimeter', 'Find a missing side (the perimeter is given)', 'A story (a fence, a frame)'])],
+    'area_perimeter:area': [_p12Variants('area', ['standard', 'missing', 'word'], ['Find the area', 'Find a missing side (the area is given)', 'A story (tiling a floor)'])],
+    'area_perimeter:volume': [_p12Variants('volume', ['standard', 'missing', 'word'], ['Find the volume', 'Find a missing edge (the volume is given)', 'A story (a box, a tank)'])],
+    'area_perimeter:area_polygon_decompose': [_p12Kinds('shapes', 'Which shapes', [['L-shapes', 'L-shape'], ['U-shapes', 'U-shape'], ['T-shapes', 'T-shape']])],
+    'area_perimeter:composite_shapes': [_p12Variants('composite_shapes', ['perim_only', 'dual_pa'], ['The perimeter only', 'The perimeter and the area'])],
+    'area_perimeter:volume_composite': [_p12Kinds('shapes', 'Which solids', [['Rectangular prisms', 'rectangular pr'], ['Cubes', 'this cube']])],
+    'angles_lines:identify_angles': [_clickOrName('Name the angle (acute, right, obtuse)', '^What type'),
+        _p12Kinds('shapes', 'Which angles', [['Right', 'right|=> Right$'], ['Acute', 'acute|=> Acute$'], ['Obtuse', 'obtuse|=> Obtuse$'], ['Straight', '=> Straight$']])],
+    'angles_lines:measure_angles': [_p12Kinds('forms', 'Which angles', [['Multiples of 45° (45, 90, 135, 180)', '=> (45|90|135|180)°$'],
+        ['Multiples of 30° (30, 60, 120, 150)', '=> (30|60|120|150)°$']], 'The 45° family is the easier step: half of a right angle.')],
+    'angles_lines:identify_lines': [_clickOrName('Name the lines', '^What type'),
+        _p12Kinds('shapes', 'Which lines', [['Parallel', 'parallel|=> Parallel$'], ['Perpendicular', 'perpendic|=> Perpendicular$'], ['Intersecting', 'intersecting|=> Intersecting$']])],
+    'angles_lines:symmetry': [_p12Match([['How many lines of symmetry?', '^How many'], ['Click the shapes that have one', 'shapes that have'],
+        ['Click the lines of symmetry', 'lines of symmetry on']])],
+    'angles_lines:place_symmetry_lines': [_p12Kinds('shapes', 'Which figures', [['Letters', 'this letter'], ['Shapes', 'this (isosceles|rectangle|oval|rhombus|square|kite|equilateral)']])],
+    'angles_lines:additive_angles': [_p12Kinds('forms', 'The whole angle', [['A right angle (90°)', 'whole angle is 90°'], ['A straight angle (180°)', 'whole angle is 180°'],
+        ['A full turn (360°)', 'whole angle is 360°']], '90° is the easiest whole; a full turn the hardest.')],
+    'shapes_classify:classify_triangles': [_clickOrName('Name the triangle', '^What type'),
+        _p12Kinds('shapes', 'Classified by', [['Sides (equilateral, isosceles, scalene)', '(equilateral|isosceles|scalene)|=> (Equilateral|Isosceles|Scalene)$'],
+            ['Angles (acute, right, obtuse)', '(acute|right|obtuse) triangles|=> (Acute|Right|Obtuse)$']])],
+    'shapes_classify:classify_quads': [_p12Match([['Tick every name that fits one shape', 'categories that apply'], ['Click every shape of one kind', '^Click ALL the']])],
+    'shapes_classify:net_identify': [_p12Kinds('shapes', 'Which solids', [['Cubes and rectangular prisms', 'cube|rectangular pri'], ['Pyramids and triangular prisms', 'pyramid|triangular pris']])],
+    'shapes_classify:cross_section_3d': [_p12Kinds('forms', 'Which slice', [['Sliced across (horizontally)', 'horizontally'], ['Sliced top to bottom (vertically)', 'vertically']])],
+    'coordinates:net_surface_area': [_p12Variants('net_surface_area', ['identify', 'sa'], ['Which solid does the net make?', 'Find the surface area'])],
+    'coordinates:geo_reflect': [_p12Kinds('forms', 'Reflect over', [['The x-axis', 'x-axis'], ['The y-axis', 'y-axis']])],
+    'coordinates:geo_rotate': [_p12Kinds('forms', 'Turn', [['A half turn (180°)', '180°'], ['A quarter turn (90°)', ' 90°'], ['Three quarters (270°)', '270°']],
+        'A half turn is the easiest to see.')],
+    'coordinates:geo_translate': [_p12Kinds('forms', 'Slide', [['Right and up', 'right and \\d+ up'], ['Left and up', 'left and \\d+ up'],
+        ['Right and down', 'right and \\d+ down'], ['Left and down', 'left and \\d+ down']])],
+    'coordinates:coord_polygon': [_p12Match([['The length of one side', 'length of side'], ['The perimeter', 'perimeter']])],
+});
+
+// ======================= DATA: GRAPHS, STATISTICS, PROBABILITY (gen-data-stats.js) ==========
+const _statKinds = (word) => [
+    _p12Match([[`Find the ${word}`, '^Find the'], ['Click the data sets that match', '^Click ALL']]),
+    _p12Kinds('points', 'Numbers in the data set', [['4 or 5', ': \\d+(\\.\\d+)?(, \\d+(\\.\\d+)?){3,4} =>'], ['6 to 8', ': \\d+(\\.\\d+)?(, \\d+(\\.\\d+)?){5,7} =>']],
+        'Fewer numbers is the easier step.'),
+];
+Object.assign(P12_OPTIONS, {
+    'graphs:bar_graph': [_p12Match([['Which is the most or the least?', 'Which category has the'], ['How many for one bar?', 'How many chose'],
+        ['The difference between two bars', 'difference'], ['The total of all the bars', 'total'], ['Click the bars that match', 'Click ALL']])],
+    'graphs:pictograph': [
+        _p12Match([['Which has the most?', 'Which has the most'], ['How many for one row?', 'How many for'], ['The total', 'total'], ['Click the rows that match', 'Click ALL']]),
+        _p12Kinds('scale', 'Each picture stands for', [['2', 'Each . = 2\\)'], ['5', 'Each . = 5\\)'], ['10', 'Each . = 10\\)'], ['25', 'Each . = 25\\)']],
+            'Counting in 2s is the easiest key; 25s the hardest.'),
+    ],
+    // Read by gen-data-stats.js (_dOpt): `tiles` the bars / rows, `band` the tallest one.
+    'graphs:build_bar_graph': [_p12Enum('tiles', 'Bars to draw', [{ v: null, l: '3 or 4, dealt' }, { v: 3, l: '3' }, { v: 4, l: '4' }], null, 'More bars is more to draw.'),
+        _opsBand([5, 10], 10, { label: 'Tallest bar', help: 'The largest value a bar has to reach.' })],
+    'graphs:build_pictograph': [_p12Enum('tiles', 'Rows to draw', [{ v: null, l: '3 or 4, dealt' }, { v: 3, l: '3' }, { v: 4, l: '4' }], null, 'More rows is more to draw.'),
+        _opsBand([5, 7], 7, { label: 'Most pictures in a row', help: 'The largest value a row has to reach.' })],
+    'graphs:tally_chart': [_p12Match([['How many for one row?', 'How many tallies for'], ['Which has the most?', 'most tall'], ['The total', 'total'], ['Click the rows that match', 'Click ALL']])],
+    'graphs:line_plot': [_p12Match([['How many at one mark?', 'How many plants (were|measure)'], ['Which is the most common?', 'Which measurement is mo']])],
+    'graphs:line_plot_g2': [_p12Match([['The most common size', 'most common'], ['How many at one size?', 'wear size'], ['How many in all?', 'How many students are shown']])],
+    'graphs:line_plot_fractions': [_p12Match([['How many in all?', 'total measurements'], ['The most common measurement', 'most common'], ['How many at one mark?', 'measurements are at']])],
+    'graphs:pie_chart': [_p12Match([['What percent chose one?', 'What percent chose (?!.* OR )'], ['What percent chose two? (add them)', ' OR '],
+        ['Which part is the largest or smallest?', 'Which category has']])],
+    'data_analysis:mean': _statKinds('mean'),
+    'data_analysis:median': _statKinds('median'),
+    'data_analysis:mode': [_statKinds('mode')[0], _p12Kinds('points', 'Numbers in the data set', [['7 or 8', ': \\d+(, \\d+){6,7} =>'],
+        ['9 or 10', ': \\d+(, \\d+){8,9} =>']], 'Fewer numbers is the easier step.')],
+    'data_analysis:range': _statKinds('range'),
+    'data_analysis:box_plot_intro': [_p12Match([['The median', 'the median'], ['The minimum or maximum', 'minimum|maximum'], ['The range', 'What is the range'],
+        ['The quartiles', 'quartile|interquartile']], { help: 'The median, least and greatest come first; quartiles last.' })],
+    'data_analysis:histogram_read': [_p12Match([['The highest or lowest bar', 'highest|lowest'], ['How many in an interval?', 'between|in the interv'], ['How many in all?', 'total data']])],
+    'data_analysis:mad': [_p12Kinds('points', 'Numbers in the data set', [['4', ': \\d+(, \\d+){3} =>'], ['5 or more', ': \\d+(, \\d+){4,} =>']])],
+    'probability:probability_basic': [_p12Match([['Find the probability (a bag of marbles)', '^A (bag|jar|box)'], ['Click the events that match', 'Click ALL'],
+        ['Sort by how likely (drag)', 'Drag each']])],
+});
+
+// ======================= WORD PROBLEMS: WHAT IS MISSING (gen-operations.js) ===============
+// The story kinds each word-problem generator already rotates through (pickVariant) become the
+// teacher's "What is missing" control, added to the P11 panel. The _plain twin carries the same
+// control: it is generated by its base skill, which reads it.
+const _wpAdd = () => _p12Variants('add_word_problems', ['join', 'start_unknown', 'part_part_whole'],
+    ['The total (Sam has 5 and gets 3 more)', 'The start (Sam had some, got 3, now has 8)', 'A part (8 in all, 5 are red)'],
+    { label: 'What is missing', help: 'The total is the easiest; the start is the hardest (it has to be worked backwards).' });
+const _wpSub = () => _p12Variants('sub_word_problems', ['take_away', 'compare', 'start_unknown'],
+    ['What is left (had 9, gave away 4)', 'The difference (how many more?)', 'The start (had some, gave away 4, has 5)'],
+    { label: 'What is missing', help: 'What is left is the easiest; the start is the hardest.' });
+const _wpMul = () => _p12Variants('mult_word_problems', ['equal_groups', 'arrays', 'comparison'],
+    ['Equal groups (4 bags of 6)', 'An array (rows and columns)', 'A comparison (3 times as many)'], { label: 'The story' });
+const _wpDiv = () => _p12Variants('div_word_problems', ['equal_share', 'grouping', 'remainder'],
+    ['Sharing (24 shared by 4)', 'Grouping (how many groups of 4?)', 'A remainder to interpret'], { label: 'The story' });
+Object.assign(P12_OPTIONS, {
+    'addition:add_word_problems': [...(SKILL_OPTIONS['addition:add_word_problems'] || []), _wpAdd()],
+    'addition:add_word_problems_plain': [_wpAdd()],
+    'subtraction:sub_word_problems': [...(SKILL_OPTIONS['subtraction:sub_word_problems'] || []), _wpSub()],
+    'subtraction:sub_word_problems_plain': [_wpSub()],
+    'multiplication:mult_word_problems': [...(SKILL_OPTIONS['multiplication:mult_word_problems'] || []), _wpMul()],
+    'multiplication:mult_word_problems_plain': [_wpMul()],
+    'division:div_word_problems': [...(SKILL_OPTIONS['division:div_word_problems'] || []), _wpDiv()],
+    'division:div_word_problems_plain': [_wpDiv()],
+    'algebra:multi_step_word_plain': [_p12Variants('multi_step_word', ['add_then_sub', 'sub_then_add', 'add_then_add', 'sub_then_sub'],
+        ['Add, then take away', 'Take away, then add', 'Add twice', 'Take away twice'], { label: 'The two steps' })],
+});
+
+// ======================= FRACTION AND MEASUREMENT LEFTOVERS =================================
+Object.assign(P12_OPTIONS, {
+    'fractions:select_equiv_frac': [_p12Denoms([2, 3])],
+    // Read by gen-fractions.js (_fChanged('denoms')): the line's denominator.
+    'fractions:mixed_nl_drag': [{ ..._p12Denoms(), values: [{ v: 2, l: 'Fourths' }, { v: 3, l: 'Thirds and sixths' }, { v: 5, l: 'Fifths' }] }],
+    // Its number size is the measured Max Number control (it draws to the Max Number setting).
+    'subtraction:mixed_add_sub': [_p12Kinds('task', 'Operation', [['Adding', ' \\+ '], ['Subtracting', ' - ']], 'One operation for a warm-up; both mixed makes the pupil read the sign.')],
+    'division:mixed_mult_div': [_p12Kinds('task', 'Operation', [['Multiplying', '×'], ['Dividing', '÷']], 'One operation for a warm-up; both mixed makes the pupil read the sign.')],
+    'fractions:order_fractions': [_p12Match([['Least to greatest (write the order)', '^Order these fractions from least'],
+        ['Greatest to least (write the order)', '^Order these fractions from greatest'], ['Drag into order', '^Drag the fractions']])],
+    'fractions:benchmark_fractions': [_p12Match([['The closest benchmark (0, ¼, ½, ¾, 1)', 'closest to 0, '], ['Sort into benchmark bins (drag)', 'Drag each fraction into the bin'],
+        ['Put in order (drag)', 'Drag the fractions from'], ['Click the fractions closest to one', 'Click ALL the fractions closest']])],
+    'fraction_operations:frac_10_100_nv': [_p12Match([['Write tenths as hundredths', '^Write \\d+/10 as'], ['Find the missing numerator', 'Find the missing numerator'],
+        ['Add tenths and hundredths', '^\\d+/10 \\+ \\d+/100'], ['Click the equal fractions', '^Click ALL']])],
+    'fraction_operations:estimate_frac_ops': [_p12Kinds('task', 'Operation', [['Adding', '^Estimate: \\d+/\\d+ \\+'], ['Subtracting', '^Estimate: \\d+/\\d+ -']])],
+    'measurement:unit_conversion_word': [_p12Kinds('units', 'Units', [['Time (hours, minutes, seconds)', ' (hr|min)\\. How many (min|sec)'],
+        ['Metric (km, m, cm, kg, g)', ' (km|m|cm|kg|g|L)\\. How many'], ['Customary (yd, ft, in, lb, oz, qt, pt)', ' (mi|yd|ft|lb|gal|qt|pt)\\. How many']])],
+});
+
+// ======================= SECOND CONTROLS FOR THE MEASURED-ONLY SKILLS =======================
+// These skills already had the measured Max Number (their number size). P12 adds what the
+// items ask, so the teacher can also change the kind of work, not only the size.
+const _ops4 = [['Adding', ' \\+ '], ['Subtracting', ' - '], ['Multiplying', ' × '], ['Dividing', ' ÷ ']];
+Object.assign(P12_OPTIONS, {
+    'composing:odd_even': [_p12Match([['Odd or even? (one number)', '^Is \\d+ odd or even'], ['Click all the even or odd numbers', '^Click all'],
+        ['Which number is even or odd?', '^Which number']])],
+    'subtraction:missing_add_sub': [
+        _p12Kinds('unknown', 'What is missing', [['The answer (8 + 5 = __)', '= ___ =>'], ['A number before the = sign', '___ [+-]|[+-] ___']]),
+        _p12Kinds('task', 'Operation', [['Adding', '\\+'], ['Subtracting', ' - ']]),
+    ],
+    // Read by gen-operations.js (_p12Form): 0 = arrays, 1 = equal groups.
+    'multiplication:arrays_groups': [formsOption([{ v: 0, l: 'Arrays (rows of dots)' }, { v: 1, l: 'Equal groups (rings of dots)' }], { label: 'The picture' })],
+    'decimals:div_decimal': [_p12Variants('div_decimal', ['dec_by_whole', 'whole_by_dec', 'dec_by_dec'],
+        ['A decimal ÷ a whole number (31.6 ÷ 4)', 'A whole number ÷ a decimal (6 ÷ 0.2)', 'A decimal ÷ a decimal (1.8 ÷ 0.9)'], { label: 'Which division' })],
+    'decimals:compare_decimal': [_p12Match([['Compare two decimals', '^Compare'], ['Click the decimals that match', '^Click ALL'], ['Put in order (drag)', '^Drag']])],
+    'decimals:round_decimals': [_p12Kinds('precision', 'Round to the nearest', [['Tenth', 'nearest tenth'], ['Hundredth', 'nearest hundredth']])],
+    'decimals:order_decimals': [
+        _p12Kinds('dir', 'Order', [['Least to greatest', 'least to great'], ['Greatest to least', 'greatest to least']]),
+        _p12Match([['Write the order', '^Order'], ['Drag into order', '^Drag']]),
+    ],
+    'coordinates:coordinate_q1': [_p12Match([['Read the coordinates', '^What are the coordinates'], ['Plot the points', '^Plot']])],
+    'coordinates:coordinate_all': [_p12Match([['Read the coordinates', '^What are the coordinates'], ['Plot the points', '^Plot']])],
+    'coordinates:coordinate_graph': [_p12Match([['Read the coordinates', '^What are the coordinates'], ['Plot the points', '^Plot']])],
+    'number_ops_mixed:mixed': [_p12Kinds('task', 'Operations', _ops4, 'Tick the operations the page mixes.')],
+    'order_of_operations:three_ops_no_paren': [_p12Match([['× written first (4 × 3 − 2 + 1)', '^\\d+ × \\d+ [-+]'], ['+ written first (4 + 3 + 2 × 1)', '^\\d+ \\+ \\d+']])],
+    'order_of_operations:paren_multi': [_p12Match([['(a − b) × c + d', '^\\(\\d+ - \\d+\\) × \\d+ \\+'], ['a × (b + c) − d', '^\\d+ × \\('], ['(a + b) × (c + d)', '\\) × \\(']])],
+});
+
+// ======================= K-2 AND NUMBER-SENSE LEFTOVERS =====================================
+Object.assign(P12_OPTIONS, {
+    // Read by gen-counting.js (band) and gen-algebraic.js (_estForm).
+    'composing:ten_frame_build_teen': [_opsBand([15, 19], 19, { label: 'Teen numbers to', labels: { 15: '15 (10 and up to 5 more)' },
+        help: 'Up to 15 keeps the second frame to one row of five.' })],
+    'composing:compose_whole': [_p12Kinds('parts', 'Pieces', [['Halves, quarters and eighths', '^Use (halves and quarters|quarters and eighths|halves and quarters and eighths) '],
+        ['Thirds and sixths (and halves)', '^Use (halves and thirds and sixths|halves and sixths|thirds and sixths) ']], 'Halves and quarters are the easier pieces to fit together.')],
+    'number_sense:make_a_ten': [formsOption([{ v: 0, l: 'Add using make a ten (8 + 5 = 8 + 2 + 3)' }, { v: 1, l: 'Which shows the make-a-ten way?' }])],
+    'number_sense:doubles_near_doubles': [formsOption([{ v: 0, l: 'Doubles (6 + 6)' }, { v: 1, l: 'Doubles plus one (6 + 7)' }, { v: 2, l: 'Doubles minus one (6 + 5)' }],
+        { help: 'Doubles come first; near doubles use a double the pupil knows.' })],
+    'addition:add_sub_10s': [_p12Kinds('task', 'Operation', [['Adding tens', ' \\+ '], ['Subtracting tens', ' - ']]), _p12Max([50], 100)],
+    'addition:add_sub_100s': [_p12Kinds('task', 'Operation', [['Adding hundreds', ' \\+ '], ['Subtracting hundreds', ' - ']]), _p12Max([500], 1000)],
+    // Read by gen-counting.js add_wp_10 (the plain twin is generated there too).
+    'addition:add_wp_10_plain': [_opsBand([5, 7, 10], 10, { label: 'Total to', help: 'The largest total in a story.' })],
+    'addition:add_wp_10': [...(SKILL_OPTIONS['addition:add_wp_10'] || []), _opsBand([5, 7, 10], 10, { label: 'Total to', help: 'The largest total in a story.' })],
+});
+
+// ======================= PATTERNS, ALGEBRA, ORDER OF OPERATIONS (gen-algebraic.js) ==========
+// Each skill offers the step groups its generator really deals (measured, 120 items each).
+const _SKIP_GROUPS = {
+    wide: [['1s, 2s, 5s and 10s', '(1|2|5|10)'], ['3s, 4s and 6s', '(3|4|6)'], ['7s, 8s, 9s, 11s and 12s', '(7|8|9|11|12)']],
+    line: [['2s, 5s and 10s', '(2|5|10)'], ['3s, 4s and 6s', '(3|4|6)'], ['25s', '(25)']],
+    step: [['2s, 5s and 10s', '(2|5|10)'], ['3s and 4s', '(3|4)']],
+};
+const _skipBy = (re, groups = 'wide') => _p12Kinds('step', 'Count by', _SKIP_GROUPS[groups].map(([l, g]) => [l, re(g)]),
+    'The friendly steps (2s, 5s, 10s) come first.');
+const _seqGap = () => _p12Kinds('unknown', 'Which number is missing', [['The next number', '___ =>'], ['A number in the middle', ', ___, '],
+    ['The first number', '^Complete: ___']], 'The next number is the easiest; the first number means counting back.');
+const _orderDrag = (fillLabel, fillRe) => _p12Match([[fillLabel, fillRe], ['Put numbers in order (drag)', '^Drag the numbers']]);
+Object.assign(P12_OPTIONS, {
+    'patterns:seq_2': [_orderDrag('Fill the gap', '^Complete'), _seqGap()],
+    'patterns:seq_5': [_orderDrag('Fill the gap', '^Complete'), _seqGap()],
+    'patterns:seq_10': [_orderDrag('Fill the gap', '^Complete'), _seqGap()],
+    'patterns:count_by_fill': [_orderDrag('Fill the sequence', '^Complete the count'), _skipBy(n => `count-by-${n}s`)],
+    'patterns:skip_count_line': [_skipBy(n => `by ${n}s\\.`, 'line')],
+    'patterns:skip_count_grid': [_skipBy(n => `by ${n}s\\.`)],
+    'patterns:count_by_step_up': [_skipBy(n => `by ${n}s\\.`, 'step')],
+    'patterns:count_by_step_down': [_skipBy(n => `by ${n}s\\.`, 'step')],
+    'patterns:count_by_powers_of_10': [
+        _p12Kinds('step', 'Count by', [['10s', 'by 10s'], ['100s', 'by 100s'], ['1,000s and more', 'by \\d+,?\\d{3}s']]),
+        _p12Kinds('dir', 'Direction', [['Counting up', '^Count up'], ['Counting down', '^Count down']]),
+    ],
+    'patterns:shape_pattern': [_p12Kinds('points', 'Shapes to fill in', [['2', '=> \\w+, \\w+$'], ['3', '=> \\w+, \\w+, \\w+$']])],
+    'patterns:number_pattern': [_orderDrag('Fill in the pattern', '^Find the pattern')],
+    'patterns:pattern_relationship': [
+        _p12Match([['Name the rule between the patterns', '^Look at the two'], ['Build pattern B (drag)', '^Pattern A']]),
+        _p12Kinds('task', 'The rule', [['Add a number', '=> Add|Add \\d'], ['Multiply by a number', '=> Multiply|Multiply by']]),
+    ],
+    'algebra:tape_diagram': [_p12Kinds('forms', 'The story', [['Joining (gets more)', 'gets \\d+ more'], ['Taking away (used some)', 'used \\d+'],
+        ['How many more are needed', 'needs \\d+']])],
+    'algebra:tape_diagram_plain': [_p12Kinds('forms', 'The story', [['Joining (gets more)', 'gets \\d+ more'], ['Taking away (used some)', 'used \\d+'],
+        ['How many more are needed', 'needs \\d+']])],
+    'algebra:multi_step_word': [_p12Variants('multi_step_word', ['add_then_sub', 'sub_then_add', 'add_then_add', 'sub_then_sub'],
+        ['Add, then take away', 'Take away, then add', 'Add twice', 'Take away twice'], { label: 'The two steps' })],
+    'algebra:solve_unknown': [_p12Match([['x + a = b', 'Solve: x \\+'], ['x − a = b', 'Solve: x -'], ['ax = b', 'Solve: \\d+x ='], ['Click the values that work', '^Click ALL']])],
+    'algebra:balance_addsub': [_p12Kinds('unknown', 'Where the blank is', [['At the start (___ + 4 = 9 − 2)', 'equal: ___'], ['In the middle (12 − ___ = 3 + 4)', 'equal: \\d+ - ___'],
+        ['On the right (5 + 3 = ___ + 2)', '= ___ \\+']])],
+    'algebra:write_expression': [
+        _p12Kinds('task', 'Operation', [['Adding', 'sum of|plus'], ['Subtracting', 'minus|difference'], ['Multiplying', 'product|times'], ['Dividing', 'divided']]),
+        _p12Match([['Write the expression', '^Write an expression'], ['Click the matching expressions', '^Click ALL']]),
+    ],
+    'algebra:evaluate_expression': [_p12Match([['Evaluate one expression', '^Evaluate'], ['Click the expressions that equal it', '^Click ALL']])],
+    'algebra:evaluate_expression_hard': [_p12Match([['Evaluate one expression', '^Evaluate'], ['Click the expressions that equal it', '^Click ALL']])],
+    'algebra:inequalities': [_p12Match([['True or false?', 'true or false'], ['Drag a marker onto the line', 'Drag the marker'], ['Sort values into bins (drag)', 'Drag each value']])],
+    'algebra:combine_like_terms': [_p12Match([['Simplify (3x + 2 + 5x)', '^Simplify'], ['How many x-terms?', 'How many x-terms']])],
+    'algebra:distributive_expr': [_p12Match([['Expand a(x + b)', '\\(x \\+'], ['Expand a(x − b)', '\\(x -'], ['Factor out the greatest common factor', 'Factor out']])],
+    'algebra:solve_eq_addsub': [_p12Match([['? + a = b (a box)', 'Solve: \\? '], ['x + a = b', 'Solve: [a-z] \\+'], ['x − a = b', 'Solve: [a-z] -'],
+        ['b = x + a (turned round)', 'Solve: \\d+ = '], ['Drag the numbers that work', '^Equation']])],
+    'algebra:solve_eq_multdiv': [_p12Match([['? ÷ a = b (a box)', 'Solve: \\? ÷'], ['ax = b', 'Solve: \\d+[a-z] ='], ['a × x = b', 'Solve: \\d+ × [a-z]'],
+        ['x ÷ a = b', 'Solve: [a-z] ÷'], ['Drag the numbers that work', '^Equation']])],
+    'algebra:solve_eq_twostep': [_p12Variants('solve_eq_twostep', ['ax_plus_b', 'paren_div', 'ax_minus_b', 'var_div_plus'],
+        ['ax + b = c', '(x − b) ÷ a = c', 'ax − b = c', 'x ÷ a + b = c'], { label: 'Which form' })],
+    'algebra:write_equation': [_p12Variants('write_equation', ['number_plus', 'twice_minus', 'story_give', 'story_earn'],
+        ['"A number plus 5 is 12"', '"Twice a number minus 3 is 11"', 'A story: giving some away', 'A story: earning per hour'], { label: 'Which sentence' })],
+    'algebra:build_expr_addsub': [_p12Kinds('task', 'Operation', [['Adding', '=> [^=]*\\+'], ['Subtracting', '=> [^=]*-']])],
+    'algebra:build_expr_multdiv': [_p12Kinds('task', 'Operation', [['Multiplying', '=> [^=]*×'], ['Dividing', '=> [^=]*÷']])],
+    'order_of_operations:oop_easy': [_p12Match([['Add or subtract first in the line (4 + 6 × 2)', '^\\d+ [+-] \\d+ [×÷] \\d+ ='],
+        ['Multiply or divide first in the line (6 × 2 + 4)', '^\\d+ [×÷] \\d+ [+-] \\d+ ='], ['Click the expressions that equal it', '^Click ALL']])],
+    'order_of_operations:oop_medium': [_p12Match([['(a + b) × c', '^\\(\\d+ \\+ \\d+\\) × \\d+ ='], ['a × (b − c) + d', '× \\(\\d+ - \\d+\\) \\+'],
+        ['(a + b) ÷ c + d × e', '\\) ÷ \\d+ \\+ \\d+ ×'], ['Brackets inside brackets', '\\(\\d+ \\+ \\('], ['Click the expressions that equal it', '^Click ALL']])],
+    'order_of_operations:oop_hard': [_p12Match([['Square brackets [ ]', '\\['], ['A power, no square brackets', '^[^\\[]*$']])],
+    'order_of_operations:two_ops_no_paren': [_p12Match([['+ or − written first (4 + 6 × 2)', '^\\d+ [+-] \\d+ [×÷]'], ['× or ÷ written first (6 × 2 + 4)', '^\\d+ [×÷] \\d+ [+-]']])],
+    'order_of_operations:paren_simple': [_p12Match([['a × (b ± c)', '^\\d+ × \\('], ['(a ± b) × c', '^\\([^)]*\\) ×'], ['(a + b) ÷ c', '\\) ÷']])],
+    'order_of_operations:nested_complex': [_p12Max([20, 50], 100, { help: 'The largest number in the expression or its answer.' })],
+    'order_of_operations:exponents_simple': [_p12Kinds('forms', 'Powers', [['Squares (5²)', '²'], ['Cubes (5³)', '³']], 'Squares come first.'),
+        _p12Kinds('step', 'Steps', [['The power alone (5² = __)', '^\\d+[²³] = '], ['The power and one more step (5² + 3)', '[²³] [+-]']])],
+    'order_of_operations:compare_expressions': [_p12Match([['Compare two sides (<, > or =)', '^Compare'], ['Sort statements (drag)', '^Evaluate each side']])],
+    // ======================= INTEGERS AND NUMBER THEORY =======================
+    'integers:number_line_int': [_p12Kinds('forms', 'Which numbers', [['Positive (and 0)', '=> \\d+$'], ['Negative', '=> -\\d+$']])],
+    'integers:compare_int': [
+        _p12Match([['Compare two integers', '^Compare'], ['Click the integers that match', '^Click ALL']]),
+        _p12Kinds('shapes', 'Signs', [['Both positive', 'Compare: \\d+ ___ \\d+'], ['One negative', 'Compare: (-\\d+ ___ \\d+|\\d+ ___ -\\d+)'],
+            ['Both negative', 'Compare: -\\d+ ___ -\\d+']]),
+    ],
+    'integers:add_int': [_p12Kinds('forms', 'Signs', [['5 + 3', '^\\d+ \\+ \\d+ ='], ['5 + (−3)', '^\\d+ \\+ \\(-'], ['−5 + 3', '^-\\d+ \\+ \\d+'], ['−5 + (−3)', '^-\\d+ \\+ \\(-']],
+        'Both positive first; adding a negative is the new step.')],
+    'integers:sub_int': [_p12Kinds('forms', 'Signs', [['5 − 3', '^\\d+ - \\d+ ='], ['5 − (−3)', '^\\d+ - \\(-'], ['−5 − 3', '^-\\d+ - \\d+'], ['−5 − (−3)', '^-\\d+ - \\(-']],
+        'Subtracting a negative (5 − (−3)) is the hardest step.')],
+    'integers:order_negatives': [_p12Kinds('points', 'How many numbers', [['3 or 4', '=> -?\\d+(,-?\\d+){2,3}$'], ['5 or 6', '=> -?\\d+(,-?\\d+){4,5}$']])],
+    'integers:integer_nl_drag': [_p12Match([['Place one integer', '^Drag -?\\d'], ['Place several integers', '^Drag each']])],
+    'integers:abs_value': [_p12Match([['|−7|', '\\|-\\d+\\|'], ['|7|', '\\|\\d+\\|'], ['Which has the greater absolute value?', 'greater absolute']])],
+    'integers:opposite_numbers': [_p12Match([['The opposite of a negative', 'opposite of -'], ['The opposite of a positive', 'opposite of \\d'], ['The same distance from 0', 'same distance']])],
+    'integers:ordering_rationals': [_p12Kinds('forms', 'Which numbers', [['Fractions only', 'GREATEST: [-\\d/, ]+ =>'], ['Fractions and decimals mixed', '\\d\\.\\d']])],
+    'number_theory:prime_composite': [_p12Match([['Prime or composite?', '^Is \\d+ prime'], ['Which one is composite?', '^Which number is composite'],
+        ['Click the primes', 'Click ALL the prime'], ['Sort into prime and composite (drag)', '^Sort']])],
+    'number_theory:multiples': [_p12Match([['List the first multiples', '^List the first'], ['Circle the multiples', '^Circle all'],
+        ['Click the multiples', '^Click ALL'], ['Fill in the missing multiples', '^Fill in the missing']])],
+    'number_theory:gcf_easy': [_p12Match([['Find the greatest common factor', '^Find the'], ['Click every common factor', '^Click ALL']])],
+    'number_theory:gcf_hard': [_p12Match([['Find the greatest common factor', '^Find the'], ['Click every common factor', '^Click ALL']])],
+    'number_theory:lcm': [_p12Match([['Find the least common multiple', '^Find the LCM'], ['Click every common multiple', '^Click ALL']])],
+    'number_theory:divisibility_sort': [_p12Kinds('step', 'Divisible by', [['2, 5 or 10', 'divisible by (2|5|10)\\?'], ['3, 4 or 6', 'divisible by (3|4|6)\\?'],
+        ['7, 8 or 9', 'divisible by (7|8|9)\\?']], '2, 5 and 10 have the easiest rules (the last digit).')],
+});
+
+// ======================= MEASUREMENT, TIME, MONEY (gen-measurement.js) =====================
+// NOTE: the time rungs, elapsed rungs and clock-ordering routes just below, and the TIME AND
+// MONEY block at the end of P12, are supersedable stop-gaps (a P10 agent owns time and money).
+// ROUTES. Several measurement skills are one rung each of a ladder that lives in sibling ids
+// (time_hour … time_1min; elapsed_30min … elapsed_mixed; the four clock-ordering ids). Their
+// option picks the sibling rung, whose own branch draws the item (generate-question.js asks
+// p12RouteFor before it dispatches), so from any rung the teacher can go a step easier or harder
+// without leaving the skill. The skill's own rung is the default (R2).
+export const P12_ROUTES = {};
+/** The sibling skill id this skill's options route to, or null (its own branch). */
+export function p12RouteFor(categoryId, skillId, opts) {
+    const f = P12_ROUTES[`${categoryId}:${skillId}`];
+    if (!f || !opts || typeof opts !== 'object') return null;
+    try { return f(normalizeOptions(categoryId, skillId, opts)) || null; } catch (e) { return null; }
+}
+const _TIME_RUNGS = [['hour', 'time_hour', 'The hour (3:00)'], ['half', 'time_half_hour', 'The half hour (3:30)'],
+    ['quarter', 'time_quarter', 'The quarter hour (3:15)'], ['five', 'time_5min', '5 minutes (3:25)'], ['one', 'time_1min', '1 minute (3:27)']];
+const _timeForms = () => _p12Match([['Read the clock', 'What time does this clock show'], ['Set the clock (move the hands)', 'Set the clock']],
+    { help: 'Setting the hands is harder than reading them. One kind per page, or both.' });
+for (const [v, id] of _TIME_RUNGS) {
+    P12_OPTIONS[`measurement:${id}`] = [
+        _p12Enum('precision', 'To the nearest', _TIME_RUNGS.map(([x, , l]) => ({ v: x, l })), v,
+            'Each step down the list is one step harder: the hour, then the half hour, the quarter, 5 minutes, 1 minute.'),
+        _timeForms(),
+    ];
+    P12_ROUTES[`measurement:${id}`] = (o) => (_TIME_RUNGS.find(r => r[0] === o.precision) || [])[1];
+}
+const _ELAPSED = [[60, 'elapsed_hour', 'Whole hours'], [30, 'elapsed_30min', '30 minutes'], [15, 'elapsed_15min', '15 minutes'],
+    [0, 'elapsed_mixed', 'Hours and minutes together']];
+for (const [v, id] of _ELAPSED) {
+    P12_OPTIONS[`measurement:${id}`] = [
+        _p12Enum('step', 'Time that passes', _ELAPSED.map(([x, , l]) => ({ v: x, l })), v,
+            'The jump on the clock: whole hours are the easiest, hours and minutes together the hardest.'),
+        // The hours-and-minutes rung only counts on, so it offers no "Earlier".
+        v === 0 ? _p12Match([['Later (what time will it be?)', 'will it be'], ['Set the clock', 'Set the clock']])
+            : _p12Match([['Later (what time will it be?)', 'will it be'], ['Earlier (what time was it?)', 'was it'], ['Set the clock', 'Set the clock']],
+                { help: 'Counting back (earlier) is harder than counting on. One kind per page, or all of them.' }),
+    ];
+    P12_ROUTES[`measurement:${id}`] = (o) => (_ELAPSED.find(r => r[0] === Number(o.step)) || [])[1];
+}
+const _EV = [['half', 'elapsed_visual_easy', 'Half hours (1 hr 30 min)'], ['quarter', 'elapsed_visual_medium', 'Quarter hours (1 hr 15 min)'],
+    ['one', 'elapsed_visual_hard', 'Any minute (2 hr 7 min)']];
+for (const [v, id] of _EV) {
+    P12_OPTIONS[`measurement:${id}`] = [
+        _p12Enum('precision', 'Time passed, to the nearest', _EV.map(([x, , l]) => ({ v: x, l })), v, 'Half hours are the easiest step.'),
+        _p12Match([['How much time has passed?', 'How much time'], ['Set the clock', 'Set the clock']]),
+    ];
+    P12_ROUTES[`measurement:${id}`] = (o) => (_EV.find(r => r[0] === o.precision) || [])[1];
+}
+const _ORD = { analog: { asc: 'order_clocks_analog_asc', desc: 'order_clocks_analog_desc' }, digital: { asc: 'order_clocks_digital_asc', desc: 'order_clocks_digital_desc' } };
+for (const [model, byDir] of Object.entries(_ORD)) {
+    for (const [dir, id] of Object.entries(byDir)) {
+        P12_OPTIONS[`measurement:${id}`] = [
+            _p12Enum('dir', 'Order', [{ v: 'forward', l: 'Earliest first' }, { v: 'back', l: 'Latest first' }], dir === 'asc' ? 'forward' : 'back',
+                'Latest first is harder: the pupil counts back through the day.'),
+            _p12Enum('model', 'Clocks', [{ v: 'analog', l: 'Analog (hands)' }, { v: 'digital', l: 'Digital (numbers)' }], model,
+                'Digital clocks are easier to compare; analog clocks need reading first.', 'support'),
+        ];
+        P12_ROUTES[`measurement:${id}`] = (o) => _ORD[o.model === 'digital' ? 'digital' : 'analog'][o.dir === 'back' ? 'desc' : 'asc'];
+    }
+}
+Object.assign(P12_OPTIONS, {
+    'measurement:heavier_lighter_visual': [_p12Match([['Which is heavier?', 'heavier'], ['Which is lighter?', 'lighter']])],
+    'measurement:pictograph_intro': [_p12Match([['How many?', '^How many (?!MORE)'], ['How many more?', 'How many MORE']])],
+    'measurement:bar_graph_intro': [_p12Match([['Which has the most?', 'MOST'], ['How many?', '^How many (?!MORE)'], ['How many more?', 'How many MORE']])],
+    'measurement:reading_ruler': [_p12Kinds('parts', 'Marks read', [['Whole inches', '=> \\d+$'], ['Half inches', '=> (\\d+ )?1/2$'],
+        ['Quarter inches', '=> (\\d+ )?[13]/4$']], 'Whole inches first, then halves, then quarters.')],
+    'measurement:reading_ruler_hard': [_p12Kinds('parts', 'Marks read', [['Whole inches', '=> \\d+$'], ['Half inches', '=> (\\d+ )?1/2$'],
+        ['Quarter inches', '=> (\\d+ )?[13]/4$']], 'Whole inches first, then halves, then quarters.')],
+    'measurement:temperature': [
+        _p12Match([['Read the thermometer (°F)', 'shown\\? \\(°F\\)'], ['Read the thermometer (°C)', 'shown\\? \\(°C\\)'],
+            ['Convert between °C and °F', '^Convert'], ['Click or sort temperatures', 'Click ALL|Sort each']]),
+    ],
+    'measurement:capacity': [
+        _p12Kinds('units', 'Units', [['Customary (cups, pints, quarts, gallons)', 'cups|pints|quarts|gallons'], ['Metric (mL and L)', '\\bmL\\b|\\bL\\b|lit']]),
+        _p12Match([['Convert', '^Convert'], ['Click or sort containers', 'Click ALL|Sort each']]),
+    ],
+    'measurement:unit_conversions': [
+        _p12Kinds('units', 'Units', [['Metric (m, g, L)', 'meters|grams|liters|milli|centi|kilo'], ['Customary (ft, lb, qt)', 'feet|inches|yards|ounces|pounds|quarts|gallons|cups|pints']]),
+        _p12Match([['Convert one measurement', '^(Convert|How many)'], ['Click every equal measurement', '^Click ALL']]),
+    ],
+    'measurement:length_customary': [_p12Kinds('forms', 'Which units', [['Feet to inches', 'inches are in \\d+ feet'], ['Yards to feet', 'feet are in \\d+ yards'],
+        ['Yards to inches', 'inches are in \\d+ yards'], ['Miles to feet', 'feet are in \\d+ miles']], 'Feet to inches (× 12) and yards to feet (× 3) come first.')],
+    'measurement:length_metric': [_p12Kinds('forms', 'Which units', [['cm to mm', 'mm are in \\d+ cm'], ['m to cm', 'cm are in \\d+ m\\b'],
+        ['m to mm', 'mm are in \\d+ m\\b'], ['km to m', '\\bm are in \\d+ km']], 'cm to mm (× 10) comes first.')],
+    'measurement:mass_volume_liquid': [_p12Match([['Read the cylinder (mL)', 'graduated cylinder'], ['Read the scale (g or kg)', 'Read the scale'],
+        ['Click or sort by unit', 'Click ALL|Sort each']])],
+    'measurement:estimate_length': [_p12Match([['About how long?', 'About how long'], ['Click every reasonable estimate', 'Click ALL'], ['Sort by unit (drag)', 'Sort each']])],
+    'shapes_early:order_objects_length': [_p12Enum('tiles', 'Objects to order', [{ v: null, l: '3 or 4, dealt' }, { v: 3, l: '3' }, { v: 4, l: '4' }], null,
+        'Four objects is harder: one more comparison to make.')],
+});
+
+// ---- TIME AND MONEY (P12, SUPERSEDABLE) ---------------------------------------------------
+// A P10 agent owns the time and money skills (options, generators, clock / coin drawing). These
+// entries and the time / elapsed / clock-ordering route loops above are P12's stop-gap panels,
+// kept in one place so P10 can replace them wholesale: assigning a new entry for the same key
+// after this block supersedes it, and deleting P12_ROUTES entries turns the routes off.
+Object.assign(P12_OPTIONS, {
+    'measurement:time_analog_digital': [_p12Match([['Which analog clock shows the time?', 'Which analog clock'],
+        ['Which digital clock shows the same time?', 'Which digital clock'], ['Put the clocks in order (drag)', 'Drag the clocks']])],
+    'measurement:time_match_clock': [_p12Kinds('precision', 'Times to', [['The hour', '=> \\d+:00$'], ['The half hour', '=> \\d+:30$'],
+        ['The quarter hour', '=> \\d+:(15|45)$'], ['5 minutes', '=> \\d+:(05|10|20|25|35|40|50|55)$']])],
+    'measurement:elapsed_find_duration': [_p12Max([120, 180], 300, { label: 'Longest time', labels: { 120: '2 hours', 180: '3 hours' },
+        help: 'The longest time that passes, in minutes.' })],
+    'measurement:money_count': [_p12Match([['Count coins (cents)', 'Count the coins|cents do these'], ['Count bills (dollars)', 'Count the bills'],
+        ['Coins and bills together', 'Count all the money'], ['Click the sets that make it', 'Click ALL']])],
+    'measurement:money': [_p12Match([['Add two amounts', 'Find the total'], ['Find the change', 'You paid'], ['Click every way to make it', 'Click ALL']])],
+    'measurement:equiv_coin_sets': [_p12Max([25, 50], 100, { label: 'Amounts to', help: 'The amount in cents the coin sets must make.' })],
+    'measurement:enough_money': [_p12Match([['Enough money (yes)', '=> Yes$'], ['Not enough money', '=> No']], { label: 'Which answer',
+        help: 'Both, mixed, is the default: the pupil has to add up. One kind alone is a warm-up.' })],
+});
+
+Object.assign(SKILL_OPTIONS, P12_OPTIONS);
+// ============================ end P12 · every other family ============================
+
 // Options every skill understands, whether or not it declares anything of its own.
 export const UNIVERSAL_OPTIONS = [levelOption()];
 
@@ -1096,9 +1997,14 @@ export function derivedEntry(categoryId, skillId) { return DERIVED[`${categoryId
 // so it owns its numbers too.
 const OWNS_ITS_NUMBERS = new Set(['constant', 'band', 'place']);
 
+// P12: skills whose measured Max Number / Decimals would mislead. word_problems_mixed deals the
+// four story kinds at their own sizes, so "Up to 10" still printed 49 and "Tenths" printed whole
+// numbers (the stories have no decimal form).
+const P12_NO_MEASURED = new Set(['number_ops_mixed:word_problems_mixed', 'number_ops_mixed:word_problems_mixed_plain']);
+
 function _measuredOptions(categoryId, skillId, own) {
     const d = DERIVED[`${categoryId}:${skillId}`];
-    if (!d) return [];
+    if (!d || P12_NO_MEASURED.has(`${categoryId}:${skillId}`)) return [];
     const ids = new Set(own.map(o => o.id));
     const out = [];
     if (Array.isArray(d.range) && d.range.length > 1 && !ids.has('range') && !own.some(o => OWNS_ITS_NUMBERS.has(o.id))) {
@@ -1110,7 +2016,7 @@ function _measuredOptions(categoryId, skillId, own) {
 
 /** The option definitions for a skill: its own, then the measured ones, then the universal ones. */
 export function optionsFor(categoryId, skillId) {
-    const own = SKILL_OPTIONS[`${categoryId}:${skillId}`] || SKILL_OPTIONS[skillId] || [];
+    const own = ownOptionsFor(categoryId, skillId);
     const all = [...own, ..._measuredOptions(categoryId, skillId, own)];
     const ids = new Set(all.map(o => o.id));
     return [...all, ...UNIVERSAL_OPTIONS.filter(o => !ids.has(o.id))];
@@ -1124,7 +2030,7 @@ export function optionsFor(categoryId, skillId) {
  * teacher's screen.
  */
 export function offeredOptionsFor(categoryId, skillId) {
-    const own = SKILL_OPTIONS[`${categoryId}:${skillId}`] || SKILL_OPTIONS[skillId] || [];
+    const own = ownOptionsFor(categoryId, skillId);
     const ownIds = new Set(own.map(o => o.id));
     const d = DERIVED[`${categoryId}:${skillId}`];
     const out = [];

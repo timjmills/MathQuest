@@ -2059,3 +2059,14 @@
 }
 .map-section input[type="range"]:focus,
 .map-item-slider:focus { outline: none; }
+
+/* P9 step 8: the tap-to-add disk mat keeps its grid; large targets come from the widget size */
+.pvb-host.pvb-large .pvb-zone-stack .pvb-disk { transform: none; margin: 0; }
+.pvb-zone:focus-visible { outline: 3px solid #1976d2; outline-offset: 2px; }
+
+/* P9 step 8: "circle every number that rounds to N" - tap to ring, the paper twin (black numerals, a ring, no box) */
+.msc-grid.msc-ring { display: flex; flex-wrap: wrap; gap: 10px 14px; justify-content: center; }
+.msc-grid.msc-ring .msc-opt { background: #fff !important; color: #000 !important; border: 2px solid transparent !important; border-radius: 999px !important; min-width: 64px; min-height: 48px; padding: 4px 14px; font-family: "Andika", sans-serif; font-weight: 700; font-size: 1.6rem; box-shadow: none !important; }
+.msc-grid.msc-ring .msc-opt .msc-mark { display: none; }
+.msc-grid.msc-ring .msc-opt.selected { border-color: #000 !important; }
+.msc-grid.msc-ring .msc-opt:focus-visible { outline: 3px solid #1976d2; outline-offset: 2px; }

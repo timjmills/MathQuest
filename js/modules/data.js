@@ -229,11 +229,13 @@ export const SKILL_GRADES = {
     // Place Value (prefixed to avoid collision with fractions)
     'place_value_disks': 2, 'pv_disks_build': 2, 'pv_digit_drag': 4, 'number_word_names': 4, 'place_value_10x': 5, 'placevalue:identify': 2, 'value': 2,
     'placevalue:compare': 2, 'expand': 2, 'combine': 2,
+    'unit_form': 2,
     // Ordering skills (multi-grade K-3)
     'order_least_to_greatest': 'M', 'order_greatest_to_least': 'M',
     'order_negatives': 6,
     // Number Sense
     'rounding_visual': 3, 'nearest_10': 3, 'nearest_100': 3, 'nearest_1000': 3, 'rounding_table': 3,
+    'between_tens': 3, 'place_on_number_line': 2,
     'nearest_10000': 4, 'nearest_100000': 5, 'nearest_million': 5,
     'round_sort_10': 3, 'round_sort_100': 3,
     'round_sort_1000': 4, 'round_sort_10000': 4,
@@ -1144,6 +1146,8 @@ export const SKILLS = {
         { v: "order_least_to_greatest", l: "Order: Least to Greatest" },
         { v: "order_greatest_to_least", l: "Order: Greatest to Least" },
         { v: "mixed_placevalue", l: "Mixed Place Value" },
+        // P9 appends, 2026-09-25 (§18) — APPEND ONLY, after every existing id.
+        { v: "unit_form", l: "Unit Form (4 hundreds 7 tens 6 ones)" },
     ],
     number_sense: [
         { v: "rounding_visual", l: "Round on a Number Line" },
@@ -1171,6 +1175,9 @@ export const SKILLS = {
         { v: "doubles_near_doubles", l: "Doubles & Near Doubles" },
         { v: "compensation", l: "Compensation Strategy" },
         { v: "mixed_number_sense", l: "Mixed Rounding & Estimation" },
+        // P9 appends, 2026-09-25 (§18) — APPEND ONLY, after every existing id.
+        { v: "between_tens", l: "Find the Two Tens a Number Is Between" },
+        { v: "place_on_number_line", l: "Mark a Number on a Number Line" },
     ],
     number_theory: [
         { v: "prime_composite", l: "Prime vs Composite" },
@@ -1276,7 +1283,7 @@ export const SKILLS = {
 export function isMixedMetaSkill(v) {
     // Real playable skills that happen to start with 'mixed_' or end with '_all'
     const realPlayableSkills = new Set([
-        'mixed_add_sub', 'mixed_mult_div', 'mixed_improper_visual',
+        'mixed_add_sub', 'mixed_mult_div', 'mixed_improper_visual', 'mixed_nl_drag',
         'coordinate_all',
     ]);
     if (realPlayableSkills.has(v)) return false;
@@ -1813,6 +1820,7 @@ export const SKILL_PRINT_SIZE = {
     round_sort_10000: "wide", round_sort_100000: "wide", round_sort_million: "wide",
     round_sort_tenths: "wide", round_sort_hundredths: "wide",
     rounding_table: "medium",
+    unit_form: "standard", between_tens: "compact", place_on_number_line: "wide",
     identify: "compact",
     value: "compact",
     add_sub_10s: "compact", add_sub_100s: "compact",

@@ -462,7 +462,7 @@ function equationCheck(it) {
 // ---------------------------------------------------------------------------
 // Sampling (runs inside the page)
 // ---------------------------------------------------------------------------
-function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv }) {
+function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, opts }) {
     // What a K-2 cell carries INSTEAD of a and b. These are the fields the generators already
     // publish so the renderers can draw the representation, and they are exactly what the
     // representation rules need, so the audit reads the item's own declaration rather than
@@ -516,7 +516,7 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv }) {
     for (let i = 0; i < n; i++) {
         let q = null;
         try {
-            q = window.generateQuestionFor({ category: categoryId, skill: skillId, range, decimals: 0, seed: baseSeed + i, itemIndex: i });
+            q = window.generateQuestionFor({ category: categoryId, skill: skillId, range, decimals: 0, seed: baseSeed + i, itemIndex: i, ...(opts ? { opts } : {}) });
         } catch (e) { out.push({ error: String((e && e.message) || e) }); continue; }
         if (!q) { out.push({ empty: true }); continue; }
         const text = String(q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -625,6 +625,7 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv }) {
             item.hint = strip(q.hint);
             item.visText = strip(vis);
             item.refused = q.refused || '';
+            if (Array.isArray(q.acceptedAnswers)) item.accepted = q.acceptedAnswers.slice(0, 400).map(String);
             if (Array.isArray(q.options)) {
                 item.labels = q.options.map(o => String(o && typeof o === 'object' ? (o.label !== undefined ? o.label : '') : o));
                 if (q.options.some(o => o && typeof o === 'object' && 'correct' in o)) item.optCorrect = q.options.map(o => ({ label: String(o.label), correct: !!o.correct }));
@@ -1233,7 +1234,7 @@ const PV_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 100
 const PV_PLACE_WORDS = /\b(?:ones|tens|hundreds|thousands|millions)\b/i;
 // The §17 answer-in-item list, and every id the P9 generator describes (so it must describe).
 const PV_AII = /^(?:identify|value|more_less_10|more_less_100|rounding_visual|nearest_(?:10|100|1000|10000|100000|million))$/;
-const PV_DESCRIBED = /^(?:identify|value|expand|combine|more_less_10|more_less_100|place_value_disks|pv_disks_build|place_value_10x|rounding_visual|nearest_\w+|round_sort_\w+)$/;
+const PV_DESCRIBED = /^(?:identify|value|expand|combine|more_less_10|more_less_100|place_value_disks|pv_disks_build|place_value_10x|rounding_visual|nearest_\w+|round_sort_\w+|unit_form|compare|order_least_to_greatest|order_greatest_to_least|pv_digit_drag|rounding_table|between_tens|place_on_number_line|estimate_sum|estimate_diff|estimate_sums_diffs|estimate_products|estimate_quotient)$/;
 const PV_OP_NAME = { '+': /\bsums?\b|\badd/, '−': /\bdiff(?:erences?)?\b|\bsubtract/, '×': /\bproducts?\b|\bmultipl/, '÷': /\bquotients?\b|\bdivi/ };
 const PV_OP_GLYPH = { '+': /\+/, '−': /[−–]|\s-\s/, '×': /×/, '÷': /÷/ };
 
@@ -1300,6 +1301,7 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
         if (maxP !== null && maxP >= 10 && maxP <= 99) twoDigit++;
         if (pv && pv.kind === 'round' && (pv.n < pv.place || pv.n % pv.place === 0)) add('pv-band', `rounds ${pv.n} to the nearest ${pv.place}: below the place, or already rounded`);
         if (pv && pv.kind === 'moreless') {
+            // (with an unknown start, pv.n is still the START: the number the pupil writes)
             const a = pv.dir === 'more' ? pv.n + pv.step : pv.n - pv.step;
             if (pv.n < 0 || a < 0 || pv.n > R || a > R) add('pv-band', `${pv.step} ${pv.dir} than ${pv.n} leaves 0-${R}`);
         }
@@ -1332,9 +1334,77 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
                 case 'place':
                     if (pvDigitAt(pv.n, pv.place) !== pv.digit || ans !== PV_WORD[pv.place]) add('pv-recompute', `the ${pv.digit} of ${pv.n} is in the ${PV_WORD[pv.place]} place, keyed "${ans}"`);
                     break;
-                case 'value':
-                    if (pvDigitAt(pv.n, pv.place) !== pv.digit || Number(ans) !== pv.digit * pv.place) add('pv-recompute', `the ${pv.digit} of ${pv.n} is worth ${pv.digit * pv.place}, keyed ${ans}`);
+                case 'value': {
+                    // The value, or (form) the same value in unit form "7 hundreds" / notation "7 × 100".
+                    const want = pv.form === 'unit' ? `${pv.digit} ${pv.digit === 1 ? PV_WORD[pv.place].replace(/s$/, '') : PV_WORD[pv.place]}`
+                        : pv.form === 'notation' ? `${pv.digit} × ${pv.place.toLocaleString('en-US')}` : pv.digit * pv.place;
+                    if (pvDigitAt(pv.n, pv.place) !== pv.digit || (typeof want === 'number' ? Number(ans) !== want : String(ans) !== want)) add('pv-recompute', `the ${pv.digit} of ${pv.n} is worth ${want}, keyed ${ans}`);
                     break;
+                }
+                case 'expand': {
+                    // Every part one digit times its place; the free line (frame: line) keys the
+                    // non-zero parts and must accept the zero part too (owner ruling 4).
+                    const ds = String(pv.n).split('').map(Number);
+                    const want = ds.map((d, i) => d * 10 ** (ds.length - 1 - i));
+                    if ((pv.parts || []).join() !== want.join()) add('pv-expanded-shape', `${pv.n} = ${want.join(' + ')}, described as ${(pv.parts || []).join(' + ')}`);
+                    if (pv.frame === 'line' && pv.form !== 'notation') {
+                        const acc = (it.accepted || []).map(a => String(a).replace(/[\s,]/g, ''));
+                        const short = want.filter(Boolean).join('+');
+                        const full = want.join('+');
+                        if (!acc.includes(short) || !acc.includes(full)) add('pv-expanded-shape', `${pv.n} on a free line must accept ${short} and ${full}`);
+                    }
+                    break;
+                }
+                case 'unit': {
+                    const sum = Object.entries(pv.counts || {}).reduce((a, [p, c]) => a + Number(p) * c, 0);
+                    if (sum !== pv.n) add('pv-recompute', `unit form ${JSON.stringify(pv.counts)} makes ${sum}, not ${pv.n}`);
+                    if (pv.rename && Number(ans) !== pv.n && !Object.values(pv.counts || {}).includes(Number(ans))) add('pv-recompute', `renaming ${pv.n}: keyed ${ans}`);
+                    break;
+                }
+                case 'compare': {
+                    const want = pv.a > pv.b ? '>' : pv.a < pv.b ? '<' : '=';
+                    if (ans !== want) add('pv-recompute', `${pv.a} ${want} ${pv.b}, keyed ${ans}`);
+                    if (pv.a > R || pv.b > R) add('pv-band', `compares ${pv.a} and ${pv.b} past ${R}`);
+                    break;
+                }
+                case 'order': {
+                    const want = (pv.nums || []).slice().sort((x, y) => (pv.dir === 'asc' ? x - y : y - x)).join(',');
+                    if (String(ans) !== want) add('pv-recompute', `in order ${want}, keyed ${ans}`);
+                    break;
+                }
+                case 'chart':
+                    if (Number(ans) !== pv.n || (pv.places || []).length !== String(pv.n).length) add('pv-recompute', `chart of ${pv.n}: keyed ${ans}`);
+                    if (pv.source === 'expanded') {
+                        const parts = pvNums(pv.sourceText || '');
+                        if (parts.reduce((a, b) => a + b, 0) !== pv.n) add('pv-recompute', `the source "${pv.sourceText}" is not ${pv.n}`);
+                    }
+                    break;
+                case 'between':
+                    if (pv.lo !== Math.floor(pv.n / 10) * 10 || pv.hi !== pv.lo + 10 || !(it.keyParts || []).length || Number(it.keyParts[0]) !== pv.lo || Number(it.keyParts[1]) !== pv.hi) add('pv-recompute', `${pv.n} is between ${Math.floor(pv.n / 10) * 10} and ${Math.floor(pv.n / 10) * 10 + 10}, keyed ${ans}`);
+                    break;
+                case 'mark': {
+                    const [lo, hi] = pv.line || [];
+                    const tick = (hi - lo) / 10;
+                    if (Number(ans) !== pv.n || !(pv.n > lo && pv.n < hi) || Math.abs((pv.n - lo) / tick - Math.round((pv.n - lo) / tick)) > 1e-9) add('pv-recompute', `mark ${pv.n} on ${lo}-${hi}: not on a tick inside the line`);
+                    break;
+                }
+                case 'table': {
+                    const want = (pv.cells || []).map(([r, c]) => pvRound(pv.rows[r], pv.places[c]));
+                    if (want.join() !== (pv.keys || []).join() || !(it.keyParts || []).length || it.keyParts.map(Number).join() !== want.join()) add('pv-recompute', `table keys ${want.join(', ')}, keyed ${(it.keyParts || []).join(', ')}`);
+                    const cols = new Set((pv.cells || []).map(([, c]) => c)), rows = new Set((pv.cells || []).map(([r]) => r));
+                    if (!(cols.size === 1 && rows.size === pv.rows.length) && !(rows.size === 1 && cols.size === pv.places.length)) add('pv-recompute', 'the blank is not a whole column or a whole row');
+                    break;
+                }
+                case 'estimate': {
+                    const r = (v) => pvRound(v, pv.place);
+                    const want = pv.op === '+' ? r(pv.a) + r(pv.b) : pv.op === '−' ? r(pv.a) - r(pv.b) : pv.op === '×' ? r(pv.a) * pv.b
+                        : pv.rounded && pv.rounded[0] % pv.b === 0 && Math.abs(pv.rounded[0] - pv.a) < pv.b * pv.place ? pv.rounded[0] / pv.b : NaN;
+                    if (want !== pv.est) add('pv-recompute', `${pv.a} ${pv.op} ${pv.b} estimates to ${want}, described ${pv.est}`);
+                    if (pv.task === 'compute' && Number(String(ans).replace(/,/g, '')) !== pv.est) add('pv-recompute', `the estimate is ${pv.est}, keyed ${ans}`);
+                    if (pv.task === 'closest' && String(ans).replace(/,/g, '') !== String(pv.est)) add('pv-recompute', `the closest is ${pv.est}, keyed ${ans}`);
+                    if (pv.task === 'reasonable' && (ans === 'Reasonable') !== !!pv.reasonable) add('pv-recompute', `reasonable ${pv.reasonable}, keyed ${ans}`);
+                    break;
+                }
                 case 'combine': {
                     const sum = (pv.parts || []).reduce((a, b) => a + b, 0);
                     const oneDigit = (pv.parts || []).every(p => p > 0 && /^[1-9]0*$/.test(String(p)));
@@ -1353,9 +1423,17 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
                     if (big > R) add('pv-band', `${pv.n} ${pv.op === 'x' ? '×' : '÷'} ${pv.power}: ${big} is past its default band ${R}`);
                     break;
                 }
-                case 'round':
-                    if (Number(ans) !== pvRound(pv.n, pv.place)) add('pv-recompute', `${pv.n} to the nearest ${pv.place} is ${pvRound(pv.n, pv.place)} (halfway up), keyed ${ans}`);
+                case 'round': {
+                    const want = pvRound(pv.n, pv.place);
+                    // The response scopes of §2.6: the rounded value (full), the two digits (notation),
+                    // up or down (decision), or a judgement of a finished rounding (judge).
+                    const scope = pv.scope || 'full';
+                    if (scope === 'full' && Number(ans) !== want) add('pv-recompute', `${pv.n} to the nearest ${pv.place} is ${want} (halfway up), keyed ${ans}`);
+                    if (scope === 'decision' && ans !== (want > pv.n ? 'Round up' : 'Round down')) add('pv-recompute', `${pv.n} rounds ${want > pv.n ? 'up' : 'down'}, keyed ${ans}`);
+                    if (scope === 'judge' && ans !== (pv.shown === want ? 'Correct' : 'Fix it')) add('pv-recompute', `${pv.n} -> ${pv.shown} is ${pv.shown === want ? 'correct' : 'wrong'}, keyed ${ans}`);
+                    if (scope === 'notation' && String(ans) !== `${pvDigitAt(pv.n, pv.place)}, ${pvDigitAt(pv.n, pv.place / 10)}`) add('pv-recompute', `${pv.n}: the deciding digits are ${pvDigitAt(pv.n, pv.place)} and ${pvDigitAt(pv.n, pv.place / 10)}, keyed ${ans}`);
                     break;
+                }
                 case 'disks': {
                     const n = Object.entries(pv.counts || {}).reduce((a, [p, c]) => a + Number(p) * c, 0);
                     const want = pv.task === 'count' ? (pv.counts || {})[pv.place] : n;
@@ -1376,7 +1454,13 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
                     break;
                 }
                 case 'sort': {
-                    const miss = (it.sortPairs || []).filter(([t, b]) => Math.abs(pvRound(parseFloat(String(t).replace(/,/g, '')), pv.place) - parseFloat(String(b).replace(/,/g, ''))) > 1e-9);
+                    // A "Neither" bin (bins one apart) takes exactly the numbers that round to no bin.
+                    const binVals = (pv.bins || []).map(Number);
+                    const miss = (it.sortPairs || []).filter(([t, b]) => {
+                        const r = pvRound(parseFloat(String(t).replace(/,/g, '')), pv.place);
+                        if (/^neither$/i.test(String(b))) return binVals.some(v => Math.abs(v - r) < 1e-9);
+                        return Math.abs(r - parseFloat(String(b).replace(/,/g, ''))) > 1e-9;
+                    });
                     if (miss.length) add('answer-matches-picture', `${miss.map(([t, b]) => `${t} keyed under ${b}`).join(', ')}`);
                     if (!(it.sortPairs || []).length) add('answer-matches-picture', 'no tile is keyed to a bin');
                     break;
@@ -1409,12 +1493,15 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
             const hintNums = pvNums(it.hint);
             if ((ansNum !== null && hintNums.includes(ansNum)) || (ansNum === null && ansStr && new RegExp(`\\b${ansStr}\\b`, 'i').test(it.hint || ''))) add('answer-in-item', `the hint gives it away: "${String(it.hint).slice(0, 60)}"`);
             if (/round (?:up|down)|closer|midpoint|shorter bar|×|=/i.test(it.visText || '')) add('answer-in-item', `the picture carries the method: "${String(it.visText).slice(0, 60)}"`);
-            if (pv && (pv.kind === 'place' || pv.kind === 'value') && PV_PLACE_WORDS.test(it.visText || '')) add('answer-in-item', `the picture names the place: "${String(it.visText).slice(0, 60)}"`);
-            if (ansNum === null && ansStr && pv && pv.kind === 'place' && new RegExp(`\\b${ansStr}\\b`, 'i').test(`${printedText} ${it.visText || ''}`)) add('answer-in-item', `"${ansStr}" is printed in the item`);
+            // A word bank (response: bank, PN-4) prints every place word by design: the pupil copies one.
+            const bank = pv && pv.response === 'bank';
+            if (!bank && pv && (pv.kind === 'place' || pv.kind === 'value') && PV_PLACE_WORDS.test(it.visText || '')) add('answer-in-item', `the picture names the place: "${String(it.visText).slice(0, 60)}"`);
+            if (!bank && ansNum === null && ansStr && pv && pv.kind === 'place' && new RegExp(`\\b${ansStr}\\b`, 'i').test(`${printedText} ${it.visText || ''}`)) add('answer-in-item', `"${ansStr}" is printed in the item`);
             // The picture may print only the item's own numbers: the number, its digits, the step,
             // and a rounding line's two ends. A midpoint label or a neighbour is the answer's method.
             if (pv) {
-                const allowed = new Set([pv.n, pv.step, pv.place, ...String(pv.n).split('').map(Number)].filter(v => v !== undefined));
+                const allowed = new Set([pv.n, pv.step, pv.place, pv.given, pv.shown, ...String(pv.n).split('').map(Number)].filter(v => v !== undefined));
+                if (pv.midLabel && pv.line) allowed.add((pv.line[0] + pv.line[1]) / 2);
                 if (pv.kind === 'round') { const lo = Math.floor(pv.n / pv.place) * pv.place; allowed.add(lo); allowed.add(lo + pv.place); }
                 const extra = pvNums(it.visText).filter(v => !allowed.has(v));
                 if (extra.length) add('answer-in-item', `the picture prints ${extra.slice(0, 4).join(', ')} beside ${pv.n}`);
@@ -1432,7 +1519,7 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
 
         // ---- prints-something: a sort has its tiles and bins on paper; a build has its empty mat.
         if (!printedText.trim() && !(it.visText || '').trim() && !it.cellKind) add('prints-something', 'nothing printable');
-        if (/^round_sort_/.test(id) && !(it.cellKind === 'sort' && it.cellBank === (it.tiles || []).length && (it.tiles || []).length >= 6 && (it.bins || []).length === 2)) {
+        if (/^round_sort_/.test(id) && !(it.cellKind === 'sort' && it.cellBank === (it.tiles || []).length && (it.tiles || []).length >= 6 && (it.bins || []).length >= 2)) {
             add('prints-something', `the paper cell carries ${it.cellBank || 0} of ${(it.tiles || []).length} tiles and ${(it.bins || []).length} bins`);
         }
         if (id === 'pv_disks_build' && !(it.cellKind === 'build')) add('prints-something', 'no empty mat to draw in');
@@ -1462,7 +1549,7 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
             if (pg.some(x => !x || !x.pv)) continue;
             const mid = pg.some(x => x.pv.kind === 'round' ? pvRound(x.pv.n, x.pv.place) - x.pv.n === x.pv.place / 2
                 : x.pv.kind === 'sort' ? (x.pv.tiles || []).some(t => Math.abs(t - x.pv.bins[0] - x.pv.place / 2) < 1e-9) : false);
-            const across = pg.some(x => x.pv.kind !== 'round' || (Number(x.ans) > x.pv.n && Number(x.ans) % (10 * x.pv.place) === 0));
+            const across = pg.some(x => x.pv.kind !== 'round' || (pvRound(x.pv.n, x.pv.place) > x.pv.n && pvRound(x.pv.n, x.pv.place) % (10 * x.pv.place) === 0));
             if (!mid) noMid++;
             if (!across) noAcross++;
         }
@@ -1482,7 +1569,21 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
         }
         if (id === 'pv_disks_build' && ctx.buildMax10k > 999) F('disk-fits', `builds ${ctx.buildMax10k.toLocaleString('en-US')} at Max Number 10,000: drawing stops at 999 (owner ruling 3)`);
     }
-    if (/^estimate_(sums_diffs|products|quotient)$/.test(id)) NOTE('not-checked', 'reasonable-balance: task "reasonable" is off by default (§19.4 step 8 builds its 40-60% balance)');
+    // reasonable-balance (§17, owner Q8): with task "reasonable", 40-60% of every seeded page of
+    // six (and of the whole sample) is genuinely reasonable.
+    if (ctx.reasonable) {
+        const got = ctx.reasonable.filter(x => x && !x.error && !x.empty);
+        const yes = got.filter(x => x.ans === 'Reasonable').length;
+        const share = got.length ? yes / got.length : 0;
+        if (!got.length) F('reasonable-balance', 'task "reasonable" dealt nothing');
+        else if (share < 0.4 || share > 0.6) F('reasonable-balance', `${yes} of ${got.length} "reasonable" items are reasonable (${Math.round(share * 100)}%; 40-60% required)`);
+        const bad = got.filter(x => !x.pv || x.pv.task !== 'reasonable' || (x.ans === 'Reasonable') !== !!x.pv.reasonable);
+        if (bad.length) F('reasonable-balance', `${bad.length} items are not keyed from their own description`);
+        for (let i = 0; i + PAGE <= got.length; i += PAGE) {
+            const k = got.slice(i, i + PAGE).filter(x => x.ans === 'Reasonable').length;
+            if (k < 2 || k > 4) { F('reasonable-balance', `a page of six has ${k} reasonable answers`); break; }
+        }
+    }
 }
 
 function audit(skill, items) {
@@ -2004,8 +2105,11 @@ function selfTest() {
                 const big = await app.page.evaluate(sampleInPage, { categoryId: s.categoryId, skillId: s.skillId, n: 60, baseSeed, range: 10000, pv: true });
                 buildMax10k = Math.max(0, ...big.filter(x => x.pv).map(x => x.pv.n));
             }
+            const reasonable = optionsFor(s.categoryId, s.skillId).some(o => o.id === 'task' && (o.values || []).some(v => v.v === 'reasonable'))
+                ? await app.page.evaluate(sampleInPage, { categoryId: s.categoryId, skillId: s.skillId, n: 60, baseSeed, range: 100, pv: true, opts: { task: 'reasonable' } })
+                : null;
             skill.pvCtx = {
-                R, geom: pvGeom, buildMax10k,
+                R, geom: pvGeom, buildMax10k, reasonable,
                 refusedLow: floor > LOW ? { floor, at: LOW, dealt: dealt.length, sample: dealt.slice(0, 3).map(x => x.fullText.slice(0, 40)) } : null,
                 deadAtDefault,
                 midpointSeeded: optionsFor(s.categoryId, s.skillId).some(o => o.id === 'midpoint' && o.default === 'seeded'),

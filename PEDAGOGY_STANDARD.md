@@ -1265,7 +1265,11 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `draw-blocks-100` | Draw hundreds, tens and ones to show the number. | build a three-digit number with base-10 blocks |
 | `check-groups` | Look at the groups. Check one box. | compare two groups: more, fewer, same |
 | `how-many-left` | Write how many are left. | take away with crossed-out pictures |
-| `ring-remainder` | Circle groups of {n}. Write how many groups and how many left. | division with a remainder, pictured |
+| `ring-remainder` | Circle groups of {n}. Write the quotient and the remainder. | division with a remainder, pictured (its two slots: `= [ ] R [ ]`) |
+| `ring-groups-each` | Circle groups of the number shown. Write how many groups. | `ring-groups` when the section's items do not share one {n} (added 2026-09-25, critic round 2) |
+| `ring-remainder-each` | Circle groups of the divisor. Write the quotient and the remainder. | `ring-remainder` when the divisors differ |
+| `missing-all` | Write the missing numbers. | `missing` when any item of the section has more than one blank |
+| `story-k2` | Solve. Write the number. | Kindergarten word problems: the label word is printed |
 | `pick-parts` | Write one number from each list to make the sum. | find two addends from lists |
 | `fact-family` | Use the three numbers. Fill in the fact family. | addition and subtraction fact families |
 | `chart-fill` | Fill in the missing products. | multiplication chart |

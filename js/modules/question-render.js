@@ -6286,10 +6286,14 @@ export function checkExpandedAnswer() {
     const userValues = [];
     inputs.forEach(input => {
         const val = input.value.trim().replace(/,/g, '').replace(/\s/g, '');
-        userValues.push(parseInt(val, 10) || 0);
+        userValues.push(val === '' ? NaN : parseInt(val, 10));
     });
     const userAnswer = userValues.join(",");
-    const isCorrect = userAnswer === q.ans;
+    // P9 expand (gen-pv.js) keys "600 + 30 + 3" and carries the parts in q.expandedValues, zero
+    // parts included (§2.4): compare box by box. An empty box is not the zero part.
+    const isCorrect = Array.isArray(q.expandedValues)
+        ? userValues.length === q.expandedValues.length && q.expandedValues.every((v, i) => userValues[i] === Number(v))
+        : userAnswer === q.ans;
 
     // ===== REVIEW MODE BRANCH =====
     if (typeof state._reviewingQIndex === 'number'

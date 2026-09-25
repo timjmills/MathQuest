@@ -64,6 +64,8 @@ function seedFor(key) {
 // ---------------------------------------------------------------------------------------------
 async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange, dbg }) {
     const SO = await import('/js/modules/skill-options.js');
+    const DATA = await import('/js/modules/data.js');
+    const GQ = await import('/js/modules/generate-question.js');
     const W = window;
     const st = W.state;
     const APP_RANGE = st.range;          // 100, the app default
@@ -258,6 +260,39 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             if (v === 'circle-all' && !items.some(q => /circle every|every number|rounds? to/i.test(qText(q)))) return [[], [`"Circle every number" wording not found`]];
             return [[], []];
         },
+        // P12: "What the items ask" with word patterns — every item reads as one ticked form.
+        forms(v, items, ctx) {
+            const def = ctx.def;
+            if (!def || !Array.isArray(def.match)) return [[], []];
+            const set = Array.isArray(v) ? v : [v];
+            const res = set.map(i => new RegExp(def.match[i], 'i'));
+            const bad = items.filter(q => !res.some(re => re.test(GQ.itemMatchText(q))));
+            return [bad.length ? [`${bad.length} item(s) of an unticked kind: "${GQ.itemPlainText(bad[0]).slice(0, 50)}"`] : [], []];
+        },
+        // P12: decimal places — every decimal on the item has a ticked number of places.
+        digits(v, items, ctx) {
+            if (!ctx.def || ctx.def.accept !== 'dp') return [[], []];
+            const set = Array.isArray(v) ? v : [v];
+            const bad = items.flatMap(q => GQ.itemDecimalPlaces(q)).filter(p => !set.includes(p));
+            return [bad.length ? [`a decimal with ${bad[0]} place(s), outside {${set}}`] : [], []];
+        },
+        // P12: denominator families — every fraction on the item has a ticked family.
+        denoms(v, items) {
+            const set = Array.isArray(v) ? v : [v];
+            const bad = [];
+            for (const q of items) for (const d of GQ.itemDenominators(q)) if (!GQ.denomAllowed(d, set)) bad.push(d);
+            return [bad.length ? [`denominator outside the ticked families {${set}}: ${[...new Set(bad)].slice(0, 4)}`] : [], []];
+        },
+        // P12: a mixed review's "Which skills / topics" — every item comes from a ticked member.
+        // A topic member is a category, read back through the item's skill (window.getCategoryForSkill).
+        members(v, items) {
+            const set = Array.isArray(v) ? v : [v];
+            const withId = items.filter(q => q && q.skillId);
+            if (!withId.length) return [[], []];
+            const catOf = (id) => DATA.getCategoryForSkill(id);
+            const bad = withId.filter(q => !set.includes(q.skillId) && !set.includes(q.requestedSkillId) && !set.includes(q.poolMember) && !set.includes(catOf(q.skillId)));
+            return [bad.length ? [`${bad.length} item(s) from an unticked member (${[...new Set(bad.map(q => q.skillId))].slice(0, 3)})`] : [], []];
+        },
         task(v, items) {
             const t = items.map(q => qText(q));
             if (v === 'reasonable' && !t.some(s => /reasonable/i.test(s))) return [[`"Is it reasonable?" but no item asks it`], []];
@@ -266,7 +301,7 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         },
     };
     const runPred = (def, value, items, surface) => {
-        const fn = P[def.id];
+        const fn = (Array.isArray(def.match) ? P.forms : null) || P[def.id];
         if (!fn || !items.length) return { fails: [], warns: [], checked: false };
         const [f, w] = fn(value, items, { surface, def });
         return { fails: f, warns: w, checked: true };
@@ -288,10 +323,10 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
 
     // ---------- static (definition) checks ----------
     const statics = [];
-    const { OPTION_KEYS, EXT_OPTION_KEYS } = await import('/js/modules/skill-option-codec.js');
+    const { OPTION_KEYS } = await import('/js/modules/skill-option-codec.js');
     for (const def of defs) {
         if (!def.label) statics.push(`${def.id}: no label`);
-        if (!OPTION_KEYS[def.id] && !(EXT_OPTION_KEYS || {})[def.id]) statics.push(`${def.id}: no share-code key (the choice cannot travel in a link)`);
+        if (!OPTION_KEYS[def.id]) statics.push(`${def.id}: no share-code key (the choice cannot travel in a link)`);
         if (def.values) {
             const ls = def.values.map(x => x.l);
             if (new Set(ls).size !== ls.length) statics.push(`${def.id}: duplicate value labels`);
@@ -316,7 +351,8 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
     // Determinism: the default twice.
     const d1 = gen({}, APP_RANGE), d2 = gen({}, APP_RANGE);
     const stable = genSig(d1) === genSig(d2);
-    const coarse = (items) => items.map(q => nums(qText(q)).join(',') + '|' + JSON.stringify(q.ans === undefined ? null : q.ans) + '|' + (q.notation || q.printFormat || '') + '|' + (q.answerType || '')).join('\n');
+    // P12: the words too, not only the numbers — "Drag the digital clocks" vs "analog" is a real change.
+    const coarse = (items) => items.map(q => qText(q).replace(/\s+/g, ' ') + '|' + JSON.stringify(q.ans === undefined ? null : q.ans) + '|' + (q.notation || q.printFormat || '') + '|' + (q.answerType || '')).join('\n');
     const coarseStable = coarse(d1) === coarse(d2);
     const dflt = { [`${APP_RANGE}|${APP_DP}`]: d1 };
     const dfltAt = (r) => { const k = `${r}|${DP}`; return dflt[k] || (dflt[k] = gen({}, r)); };
@@ -441,7 +477,15 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         else if (!ps.items.length) { fail('print', 'sheet has no items'); r.checks.print = 'fail'; }
         else {
             const same = !pd.error && ps.pupil === pd.pupil && JSON.stringify(ps.items) === JSON.stringify(pd.items);
-            if (same && diff !== null) fail('print', 'printed sheet identical to the default sheet');
+            // P12: a value that KEEPS only some items (a kind, a family, a bound) prints the same
+            // sheet as the default when the default sheet already happened to satisfy it (six items,
+            // one dominant kind). That is not a dead control: generation differs and the predicate
+            // holds on the default sheet too. Reported as a warning, not a failure.
+            const _coincide = () => { const p = runPred(def, value, pd.items || [], 'print'); return p.checked && !p.fails.length && r.checks.gen === 'ok'; };
+            if (same && diff !== null) {
+                if (_coincide()) warn('print', 'printed sheet identical to the default, which already satisfies this value');
+                else fail('print', 'printed sheet identical to the default sheet');
+            }
             const pr = runPred(def, value, ps.items, 'print');
             pr.fails.forEach(m => fail('print', m)); pr.warns.forEach(m => warn('print', m));
             // Digits may sit in separate grid boxes, so compare with all white space removed, and
@@ -464,7 +508,11 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         for (const [host, list, dl] of [['worksheet', sc.worksheet, sd.worksheet], ['practice', sc.practice, sd.practice]]) {
             if (!list.length) { fail(`screen/${host}`, 'no items'); continue; }
             const dd = differs(list, dl);
-            if (dd === false) fail(`screen/${host}`, 'items identical to the default (store not honoured)');
+            if (dd === false) {
+                const p = runPred(def, value, dl, 'screen');
+                if (p.checked && !p.fails.length && r.checks.gen === 'ok') warn(`screen/${host}`, 'items identical to the default, which already satisfy this value');
+                else fail(`screen/${host}`, 'items identical to the default (store not honoured)');
+            }
             const pr = runPred(def, value, list, 'screen');
             pr.fails.forEach(m => fail(`screen/${host}`, m));
         }
@@ -512,7 +560,7 @@ function genFileFor(r) {
         }
         return out;
     });
-    const all = skills.filter(s => (!ONLY || s.skillId === ONLY) && (!CAT || s.categoryId === CAT));
+    const all = skills.filter(s => (!ONLY || ONLY.split(',').includes(s.skillId)) && (!CAT || s.categoryId === CAT));
     const todo = all.filter(s => s.nOffered > 0);
     const results = [];
     const t0 = Date.now();

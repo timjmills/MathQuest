@@ -78,6 +78,12 @@ export {
 export { stack, stackTabStep, stackAnswerSlot } from './cells/stack.js';
 export { fact, factPadTop, factWidthMm, factFillOfColumn, factWriteMm, FACT_GEOMETRY, factCue } from './cells/fact.js';
 export { equation, equationParts, equationColumns, frac, mixed } from './cells/equation.js';
+// S1 touch dots: the engine only (design/SUPPORTS.md §S1). No skill or option uses it yet.
+export {
+    TOUCH_DOTS, TOUCH_DOTS_BOLD, TOUCH_DOT_BASELINE_EM, TOUCH_DOT_SIZES, TOUCH_DOT_DEFAULT, TOUCH_DOT_MIN,
+    touchDots, touchDotCount, touchDotOrder, touchDotsFits, touchDotGeometry, touchDotsMarks, touchDotsSVG,
+    touchDotsDigitHTML, touchDotNearest, touchTallySVG,
+} from './touchdots.js';
 // P9 place value + rounding: the `pv` template and the drawings the screen card shares with it.
 export {
     DISK_SIZES, diskDiameter, zoneSide, zoneCapacity, diskMatSVG, numeralTracksHTML, roundingLineSVG,

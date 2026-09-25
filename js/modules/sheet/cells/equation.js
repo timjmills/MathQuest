@@ -11,6 +11,7 @@
 import { opGlyph, DEFAULT_SIZE, blankWidth, STRETCH_CAP } from '../tokens.js';
 import { esc, line, box, circle, blank } from '../cell.js';
 import { register } from '../registry.js';
+import { stepMarks, singleSlotState } from '../steps.js';
 
 const OP_RE = /^[+\-*x/=<>]$/;
 
@@ -133,6 +134,10 @@ register('equation', {
         }];
     },
     layout() { return { card: 'card-simple', checker: 'value' }; },
+    /** S5 / P-LC-9: one slot - blank until the step that writes it (grey), black after it. */
+    stepState(p, steps, k, ctx) {
+        return this.render(p, Object.assign({}, ctx, { state: singleSlotState(stepMarks(steps, k)) }));
+    },
 });
 
 /**

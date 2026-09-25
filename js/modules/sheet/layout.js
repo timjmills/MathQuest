@@ -354,6 +354,18 @@ function fitAt(info, cols, { size, look, availableWidthMm, auto }) {
     return { fits: true, why: '', hMin };
 }
 
+/**
+ * Does `item` fit `cols` columns with the Auto margins (DN-15)? The host folds this into a
+ * section's floor (`floor[cols].autoFits`), so an Auto layout is chosen from the whole measured
+ * sample of the skill, not from the handful of items finally kept (PT-ENG-9).
+ */
+export function autoFitsAt(item, cols, { size, look, paper, availableWidthMm } = {}) {
+    const sz = SIZES[size] ? size : DEFAULT_SIZE;
+    const lk = LOOKS[look] ? look : DEFAULT_LOOK;
+    const info = itemInfo(item, { size: sz, look: lk, paper: paperOf(paper || DEFAULT_PAPER).id, mode: 'print' });
+    return fitAt(info, cols, { size: sz, look: lk, availableWidthMm: Number(availableWidthMm) || LIVE_W_MM, auto: true }).fits;
+}
+
 /* ======================================================================== classification */
 
 /**
@@ -434,8 +446,10 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         const res = infos.map((i) => fitAt(i, c, { size, look, availableWidthMm: W, auto }));
         const f = floor && floor[c];
         return {
-            fits: res.every((r) => r.fits) && !(f && f.fits === false),
-            why: (res.find((r) => !r.fits) || {}).why || (f && f.fits === false ? 'width' : ''),
+            // An Auto probe also honours the floor's Auto fit: a column count one of the skill's
+            // measured items fails under the Auto margins is not chosen for the few items kept.
+            fits: res.every((r) => r.fits) && !(f && f.fits === false) && !(auto && f && f.autoFits === false),
+            why: (res.find((r) => !r.fits) || {}).why || (f && f.fits === false ? 'width' : f && auto && f.autoFits === false ? 'fill' : ''),
             hMin: Math.max(0, f && Number.isFinite(f.hMm) ? f.hMm : 0, ...res.map((r) => r.hMin)),
         };
     };
@@ -501,13 +515,19 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     if (section.dense && !clamped && cls !== 'word' && cls !== 'wide' && hMin > 0) {
         const dCeil = bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling;
         const colOpts = requested === 'auto'
-            ? Array.from({ length: Math.max(0, Math.min(DENSE_MAX_COLS, hardCap) - cols + 1) }, (_, k) => cols + k)
+            ? Array.from({ length: Math.max(0, Math.min(Number(section.denseMaxCols) > 0 ? Number(section.denseMaxCols) : DENSE_MAX_COLS, hardCap) - cols + 1) }, (_, k) => cols + k)
             : [cols];
         let best = { perPage: rows * cols, cols, rows };
+        // The room each cell keeps over its content: the section's own (a Test), else the
+        // LOOSEST any item's footprint asks for (`fp.denseRoom`, e.g. a count-by row, whose
+        // measured height already holds its arcs and pads), else DENSE_ROOM. A page that mixes
+        // such an item with ordinary ones therefore keeps the ordinary 1.2.
+        const room = Number(section.denseRoom) > 1 ? Number(section.denseRoom)
+            : Math.max(...infos.map((i) => (Number(i.fp.denseRoom) >= 1 ? Number(i.fp.denseRoom) : DENSE_ROOM)));
         for (const c of colOpts) {
             const pc = probe(c, c > cols);
             if (!pc.fits) continue;
-            let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (pc.hMin * DENSE_ROOM)), Math.floor(dCeil / c)));
+            let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (pc.hMin * room)), Math.floor(dCeil / c)));
             if (c === 2) rr = TWO_COL_ROWS.find((x) => x <= rr) || rr;
             if (rr * c > best.perPage) best = { perPage: rr * c, cols: c, rows: rr, hMin: pc.hMin };
         }

@@ -8,8 +8,9 @@
 // size, a line weight or a grey (SCC-T3).
 
 import { opGlyph, trackMm, SIZES, factTab, stripPos } from '../tokens.js';
-import { blank } from '../cell.js';
+import { blank, esc } from '../cell.js';
 import { register } from '../registry.js';
+import { stepMarks, placeDigits, regroupMarks } from '../steps.js';
 
 // VA-2: the leftmost track is the operator track; place names run right to left from the ones.
 const PLACE_NAMES = ['O', 'T', 'H', 'Th', 'TTh', 'HTh'];
@@ -37,7 +38,7 @@ const PLACE_NAMES = ['O', 'T', 'H', 'Th', 'TTh', 'HTh'];
  * @param {'trace'|'solid'|null} [opts.boxInk]  with `answer: 'boxes'` and `ans`, the digits are
  *        drawn INSIDE the boxes, so a key laid over a Guided page lines up exactly (SCC-T10).
  */
-export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0 } = {}) {
+export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0, trackInk = null } = {}) {
     // `a` may be an ARRAY of the rows above the operator row (three or four addends, CM-5/CM-6):
     // every one of them sits on the digit tracks with an empty operator track (VA-2).
     const tops = (Array.isArray(a) ? a : [a]).map(String);
@@ -83,14 +84,19 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
     if (answer === 'boxes') {
         // The box is structure and stays black; only the digit inside it takes the trace grey
         // (INK-3). The inline rule centres the glyph in its box - it sets no size and no ink.
+        // `trackInk` (a step state, steps.js): one {ch, ink} per track, so the newest digits are
+        // grey and the earlier ones black in the SAME boxes (P-LC-9).
         const fill = boxInk && ans !== null ? pad(String(ans)) : null;
         html += Array.from({ length: t }, (_, i) => {
             if (i < firstAns) return `<span class="ab${g}"></span>`;
-            const ch = fill && fill[i] !== ' ' ? fill[i] : '';
-            const ink = ch ? ` class="${boxInk === 'trace' ? 'ws-trace' : ''}" data-ws-ink="${boxInk}" style="display:flex;align-items:center;justify-content:center"` : '';
+            const tk = trackInk ? trackInk[i] : null;
+            const ch = tk ? tk.ch : trackInk ? '' : fill && fill[i] !== ' ' ? fill[i] : '';
+            const inkName = tk ? tk.ink : boxInk;
+            const ink = ch ? ` class="${inkName === 'trace' ? 'ws-trace' : ''}" data-ws-ink="${inkName}" style="display:flex;align-items:center;justify-content:center"` : '';
             return `<span class="ab${g}" data-ws-seg="${stripPos(i - firstAns, nAns)}"><i${ink}>${ch}</i></span>`;
         }).join('');
     }
+    if (answer === 'steps' && trackInk) html += trackInk.map((tk) => (tk ? `<span class="${tk.ink === 'trace' ? 'ws-trace' : ''}" data-ws-ink="${tk.ink}">${tk.ch}</span>` : '<span></span>')).join('');
     if (answer === 'traced' && ans !== null) html += pad(String(ans)).map((ch) => `<span class="ws-trace">${ch === ' ' ? '' : ch}</span>`).join('');
     if (answer === 'solid' && ans !== null) html += pad(String(ans)).map((ch) => `<span data-ws-ink="solid" style="font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums">${ch === ' ' ? '' : ch}</span>`).join('');
     if (answer === 'slots' && slots) {
@@ -291,6 +297,36 @@ register('stack', {
         return out;
     },
     layout(p) { return { card: 'card-column', checker: 'columns', requiresVisual: true }; },
+    /**
+     * S5 / P-LC-9: the stack as it looks after step k of `steps` (a provider's workedSteps, or
+     * the anchor's grouped steps). Place marks (`ones`, `tens`, ...) and the whole `answer` go in
+     * the answer row, `regroup:<place>` in the carry box over that place; the newest marks are
+     * grey, the earlier ones black. Same geometry as every other state of the cell (SCC-T10).
+     */
+    stepState(p, steps, k, ctx) {
+        const a = topsOf(p), b = bottomOf(p);
+        const { heads, regroup } = scaffoldOf(p, ctx);
+        const level = ctx && ctx.scaffoldLevel !== undefined ? ctx.scaffoldLevel : 1;
+        const t = tracksOf(p);
+        const marks = stepMarks(steps, k);
+        const trackInk = placeDigits(t, marks);
+        const regroupSlots = [];
+        if (regroup) {
+            for (const r of regroupMarks(marks)) {
+                const i = t - 1 - r.offset;
+                if (i < 1 || i >= t) continue;
+                const cls = r.ink === 'trace' ? 'ws-trace' : '';
+                regroupSlots[i] = `<i style="display:flex;align-items:center;justify-content:center;font-size:0.62em;line-height:1"><span class="${cls}" data-ws-ink="${r.ink}">${esc(r.value)}</span></i>`;
+            }
+        }
+        const answer = p.answer || (level >= 2 ? 'boxes' : 'steps');
+        const nAns = Math.min(t - 1, Math.max(1, ansDigitsOf(p)));
+        return stack(a, b, p.op, {
+            T: t, heads, regroup, answer, trackInk, ansTracks: nAns,
+            regroupSlots: regroup ? Array.from({ length: t }, (_, i) => regroupSlots[i] || '<i></i>') : null,
+            unknown: p.unknown || null,
+        });
+    },
 });
 
 /** The tab step a stacked section asks for at this digit size (CL-31). */

@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Touch dots · specimen S1</title>
+<!-- S1 specimen for OWNER APPROVAL (design/SUPPORTS.md §S1). Serve the repo over HTTP and open
+     /design/specimens/touch-dots.html. Rendered to PNG by design/specimens/render-touch-dots.cjs.
+     Everything inside a .ws-sheet is drawn by the real kit (css/sheet-kit.css, sheet/cells/fact.js,
+     sheet/cells/stack.js) plus the touch-dot overlay (sheet/touchdots.js). -->
+<link rel="stylesheet" href="../../css/sheet-kit.css">
+<style>
+  html, body { margin: 0; background: #fff; color: #000; }
+  body { width: 1320px; font-family: "Andika", sans-serif; font-feature-settings: "cv04" 1; padding: 24px 28px 40px; box-sizing: border-box; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { font-size: 19px; margin: 30px 0 6px; border-top: 2px solid #000; padding-top: 10px; }
+  p.note { font-size: 13px; line-height: 1.45; margin: 4px 0 10px; max-width: 1180px; }
+  .lab { font-size: 12px; line-height: 1.25; }
+  /* a digit row: kit-shaped spans (flex-centred 1 em line box in a 1.15 em box) */
+  .row { display: flex; align-items: center; gap: 10px; margin: 2px 0; }
+  .row .lab { width: 150px; flex: none; }
+  .digits { display: flex; font-feature-settings: "cv04" 1; font-variant-numeric: lining-nums tabular-nums; }
+  .digits > span { display: flex; align-items: center; justify-content: center; height: 1.15em; width: 0.95em; line-height: 1; }
+  .variants { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 18px; }
+  .variant { border: 1px solid #949494; border-radius: 6px; padding: 8px 10px; }
+  .variant h3 { font-size: 14px; margin: 0 0 4px; }
+  .variant .digits { font-size: 24pt; }
+  .pc { background: #fff; filter: url(#photocopy); }
+  /* fact cells: the kit's own grid and cells */
+  .sheetbox { width: 186mm; }
+  .facts .ws-grid { flex: none; grid-template-columns: repeat(6, 1fr); }
+  .facts .ws-cell { height: 46mm; }
+  .facts .ws-cell.stackcell { justify-content: flex-start; padding-top: 3mm; }
+  .caps { display: grid; grid-template-columns: repeat(6, 1fr); width: 186mm; margin-top: 3px; }
+  .caps div { font-size: 11px; text-align: center; padding: 0 4px; }
+  .sizehdr { font-size: 14px; font-weight: 700; margin: 12px 0 4px; }
+  .screens { display: flex; gap: 20px; align-items: flex-start; }
+  .screens iframe { border: 1px solid #949494; border-radius: 6px; background: #eef1f5; }
+</style>
+</head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- A poor photocopy: toner spreads about 0.12 mm and the copier darkens. Small white gaps close
+       first, so a ring gap that survives this survives the school copier. -->
+  <filter id="photocopy" color-interpolation-filters="sRGB">
+    <feColorMatrix type="saturate" values="0"/>
+    <feGaussianBlur stdDeviation="0.45"/>
+    <feComponentTransfer><feFuncR type="discrete" tableValues="0 0 0 1 1"/><feFuncG type="discrete" tableValues="0 0 0 1 1"/><feFuncB type="discrete" tableValues="0 0 0 1 1"/></feComponentTransfer>
+  </filter>
+</svg>
+
+<h1>Touch dots · S1 specimen (approved 2026-09-25, with the owner's rulings applied)</h1>
+<p class="note">MathQuest's own counting dots, fitted to the default Andika digits with the open 4 (cv04) and nothing else (TY-4).
+1 to 5 carry single dots. 6 to 9 carry double dots: a solid dot inside an open ring, touched and counted twice, doubles first. 0 has none.
+The teacher's word is <b>Touch dots</b> (default) or <b>Count dots</b>. Positions are measured in the browser (<code>ws-touchdots-fit</code>)
+and held on the strokes by the gate (<code>ws-touchdots</code>). Nothing here is wired into a skill yet.</p>
+
+<h2>1 · The digits at 24, 28 and 36 pt, Regular and Bold (size M, keyline on)</h2>
+<div id="digits"></div>
+
+<h2>2 · Choose the dot size (24 pt, the smallest size allowed)</h2>
+<p class="note">Andika's stroke is 0.085–0.095 em (Regular), so SF-30's 0.09 em dot is the stroke itself and disappears.
+Three sizes, each with and without a thin white keyline. The second line of each panel is the same digits through a simulated poor photocopy
+(toner spread about 0.12 mm, darkened): a double must still show its white gap and its centre dot.</p>
+<div class="variants" id="variants"></div>
+<p class="note" style="margin-top:12px">Doubles. <b>Owner ruling: open rings</b>, drawn over the stroke so the numeral's stroke runs into the ring and a 7 or 9 stays whole.
+The centre dot has its own white keyline (at least 0.26 mm) and the gap keeps the photocopy floor, so after a copy the double is still a ring round a dot, not a blob
+(gate: <code>ws-touchdots</code> PHOTOCOPY). The knocked-out ring (filled white) is shown for comparison. 28 pt, size M; second line = simulated photocopy.</p>
+<div class="variants" id="rings" style="grid-template-columns:repeat(2,1fr)"></div>
+
+<h2>3 · In real fact cells (kit <code>fact()</code> and <code>stack()</code>, black and white)</h2>
+<p class="note">Cell sizes follow the kit's fact ladder: <b>L</b> = 5 columns, 28 pt; <b>M</b> = 6 columns, 24 pt; <b>S</b> = 10 columns, 16 pt.
+Touch dots need 24 pt or more on paper. <b>Owner ruling:</b> when touch dots are on and an item's digits would fall under 24 pt, that item <b>switches to size L</b>
+(never the dot tile). So at M the column stack (22 pt) prints at L's 28 pt, as shown; at S every touch-dot item prints at L.</p>
+<div id="facts"></div>
+
+<h2>4 · On screen: practice card at 1280 px and 390 px</h2>
+<p class="note">The whole number is one tap target of at least 44 × 44 px. A tap counts the nearest dot not yet counted and turns it grey: black = still to touch, grey = counted
+(a double takes two taps: the first greys its centre dot, the second its ring). Nothing grows or moves. The count is shown quietly under the cell. "Start again" clears. No timer.
+Keyboard: Tab to a number, Space counts the next dot in order. Below, at 390 px: a fresh card; 7 × 6 after five taps (counting by 6); 3 + 5 after five taps (count all).</p>
+<div class="screens">
+  <iframe id="f1280" src="touch-dots-card.html?w=1280&amp;fact=8%2B4&amp;on=b" width="1280" height="470" title="card at 1280 px"></iframe>
+</div>
+<div class="screens" style="margin-top:14px">
+  <iframe id="f390a" src="touch-dots-card.html?w=390&amp;fact=3%2B5&amp;on=ab" width="390" height="470" title="card at 390 px"></iframe>
+  <iframe id="f390b" src="touch-dots-card.html?w=390&amp;fact=7%C3%976&amp;on=a&amp;demo=5" width="390" height="470" title="card at 390 px, counting"></iframe>
+  <iframe id="f390c" src="touch-dots-card.html?w=390&amp;fact=3%2B5&amp;on=ab&amp;demo=5" width="390" height="470" title="card at 390 px, five taps"></iframe>
+</div>
+
+<script type="module">
+import {
+  touchDotsSVG, touchTallySVG, TOUCH_DOT_SIZES, TOUCH_DOT_DEFAULT, touchDotsFits,
+  fact, stack,
+} from '../../js/modules/sheet/index.js';
+
+const PX_PT = 0.75;
+/** Lay the overlay on one kit digit span, at the span's own computed size (pt on paper). */
+function dotSpan(span, o = {}) {
+  const ch = span.textContent.trim();
+  if (!/^[0-9]$/.test(ch)) return;
+  const pt = parseFloat(getComputedStyle(span).fontSize) * PX_PT;
+  if (!touchDotsFits(pt, 'pt')) return;
+  const w = Number(getComputedStyle(span).fontWeight) || 400;
+  span.classList.add('ws-td');
+  span.style.position = 'relative';
+  span.insertAdjacentHTML('beforeend', touchDotsSVG(ch, { em: pt, unit: 'pt', weight: w, ...o }));
+}
+
+// 1 · digits
+{
+  const host = document.getElementById('digits');
+  for (const w of [400, 700]) for (const pt of [24, 28, 36]) {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `<span class="lab">${pt} pt · ${w === 400 ? 'Regular' : 'Bold'}</span>`
+      + `<span class="digits" style="font-size:${pt}pt;font-weight:${w}">${[...'0123456789'].map((c) => `<span>${c}</span>`).join('')}</span>`;
+    host.appendChild(row);
+    row.querySelectorAll('.digits > span').forEach((s) => dotSpan(s));
+  }
+}
+
+// 2 · variants
+{
+  const host = document.getElementById('variants');
+  for (const halo of [true, false]) for (const size of ['S', 'M', 'L']) {
+    const s = TOUCH_DOT_SIZES[size];
+    const v = document.createElement('div');
+    v.className = 'variant';
+    v.dataset.size = size; v.dataset.halo = halo ? '1' : '0';
+    const gate = { S: 'passes the gate', M: 'passes the gate', L: 'FAILS the spacing gate on 3, 4, 5, 9' }[size];
+    v.innerHTML = `<h3>${size}${size === TOUCH_DOT_DEFAULT ? ' (proposed)' : ''} · ${gate} · dot ${s.dot} em · ring ${s.ring} em · keyline ${halo ? 'on' : 'off'}</h3>`
+      + `<div class="digits">${[...'123456789'].map((c) => `<span>${c}</span>`).join('')}</div>`
+      + `<div class="digits pc">${[...'123456789'].map((c) => `<span>${c}</span>`).join('')}</div>`
+      + `<div class="lab">24 pt: dot ${(s.dot * 24 * 25.4 / 72).toFixed(2)} mm, ring ${(s.ring * 24 * 25.4 / 72).toFixed(2)} mm; second line = simulated photocopy</div>`;
+    host.appendChild(v);
+    v.querySelectorAll('.digits > span').forEach((sp) => dotSpan(sp, { size, halo }));
+  }
+}
+
+// 2b · open vs knocked-out rings
+{
+  const host = document.getElementById('rings');
+  for (const ring of ['open', 'knockout']) {
+    const v = document.createElement('div');
+    v.className = 'variant';
+    v.innerHTML = `<h3>${ring === 'open' ? 'Open ring over the stroke (owner ruling)' : 'Knocked-out ring, filled white (not used)'}</h3>`
+      + `<div class="digits" style="font-size:28pt">${[...'6789'].map((c) => `<span>${c}</span>`).join('')}</div>`
+      + `<div class="digits pc" style="font-size:28pt">${[...'6789'].map((c) => `<span>${c}</span>`).join('')}</div>`;
+    host.appendChild(v);
+    v.querySelectorAll('.digits > span').forEach((sp) => dotSpan(sp, { ring }));
+  }
+}
+
+// 3 · fact cells
+{
+  const host = document.getElementById('facts');
+  const ITEMS = [
+    { a: 3, b: 5, op: '+', dots: 'ab', cap: 'Count all: touch every dot on 3, then on 5.' },
+    { a: 8, b: 4, op: '+', dots: 'b', cap: 'Count on: say 8, touch the dots on 4.' },
+    { a: 9, b: 3, op: '−', dots: 'b', cap: 'Count back: say 9, touch the dots on 3.' },
+    { a: 7, b: 6, op: '×', dots: 'a', cap: 'Count by 6: touch the 7 dots, 6, 12, 18 …' },
+    { a: 15, b: 3, op: '÷', dots: 'tally', cap: 'Count by 3 on the row: 3, 6, 9, 12, 15. Count the dots you touched.' },
+    { a: 43, b: 25, op: '+', dots: 'stack', cap: 'Column by column: ones first, touch the dots on 5, then on 2.' },
+  ];
+  for (const [size, pt] of [['L', 28], ['M', 24]]) {
+    const hdr = document.createElement('div');
+    hdr.className = 'sizehdr';
+    hdr.textContent = size === 'L' ? 'L · facts at 28 pt' : 'M · facts at 24 pt; the column stack would print at 22 pt, so it switches to L (28 pt)';
+    host.appendChild(hdr);
+    const sheet = document.createElement('div');
+    sheet.className = `ws-sheet ws-${size} ws-ican sheetbox facts`;
+    const cells = ITEMS.map((it) => {
+      if (it.dots === 'stack') {
+        // owner ruling: touch dots force L for an item whose digits would fall under 24 pt
+        const force = size !== 'L';
+        return `<div class="ws-cell stackcell${force ? ' ws-L' : ''}">${stack(it.a, it.b, it.op, { answer: 'open' })}</div>`;
+      }
+      const f = fact(it.a, it.b, it.op, { pt });
+      let extra = '';
+      if (it.dots === 'tally') extra = `<div class="tallyhost" style="font-size:${pt}pt;margin-top:3mm">${touchTallySVG(10, { em: pt, unit: 'pt' })}</div>`;
+      return `<div class="ws-cell ${f.cls}" style="${f.style}">${f.html}${extra}</div>`;
+    });
+    sheet.innerHTML = `<div class="ws-grid">${cells.join('')}</div>`;
+    host.appendChild(sheet);
+    const caps = document.createElement('div');
+    caps.className = 'caps';
+    caps.innerHTML = ITEMS.map((it) => `<div>${it.cap}</div>`).join('');
+    host.appendChild(caps);
+    // lay the dots on the chosen operand(s): fact children = [empty, A tracks…, op, B tracks…, rule]
+    sheet.querySelectorAll('.ws-cell').forEach((cell, k) => {
+      const it = ITEMS[k];
+      if (it.dots === 'tally') return;
+      if (it.dots === 'stack') {
+        const st = cell.querySelector('.ws-stack');
+        const t = Number(getComputedStyle(st).getPropertyValue('--t')) || 3;
+        const spans = [...st.children].filter((c) => c.tagName === 'SPAN' && !c.classList.contains('gap') && !c.classList.contains('rule'));
+        const bottom = spans.slice(t, 2 * t); // the operator row
+        bottom.forEach((s) => { if (!s.classList.contains('op')) dotSpan(s); });
+        return;
+      }
+      const f = cell.querySelector('.ws-fact');
+      const kids = [...f.children];
+      const opIdx = kids.findIndex((c) => c.classList.contains('op'));
+      const A = kids.slice(1, opIdx), B = kids.slice(opIdx + 1, kids.length - 1);
+      if (it.dots.includes('a')) A.forEach((s) => dotSpan(s));
+      if (it.dots.includes('b')) B.forEach((s) => dotSpan(s));
+    });
+  }
+}
+
+// wait for the iframes, then say we are ready (the renderer waits for this)
+await document.fonts.ready;
+await Promise.all([...document.querySelectorAll('iframe')].map((f) => new Promise((r) => {
+  const ok = () => f.contentWindow && f.contentWindow.__ready;
+  if (ok()) return r();
+  const t = setInterval(() => { if (ok()) { clearInterval(t); r(); } }, 50);
+})));
+window.__ready = true;
+</script>
+</body></html>

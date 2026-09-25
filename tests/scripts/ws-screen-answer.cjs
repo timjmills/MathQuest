@@ -6,6 +6,7 @@
 //   node tests/scripts/ws-screen-answer.cjs                       # the 24 redone skills
 //   node tests/scripts/ws-screen-answer.cjs --skills addition:add,composing:base10_build
 //   node tests/scripts/ws-screen-answer.cjs --hosts card,quiz
+//   node tests/scripts/ws-screen-answer.cjs --family pv           # P9 place value, rounding, estimation
 //
 // Prints one line per skill and host, then `ws-screen-answer: OK` or `FAIL` (exit 1).
 const { open } = require('../lib/ws-harness.cjs');
@@ -23,8 +24,16 @@ const DEFAULT = [
     'multiplication:count_by_tables', 'patterns:number_patterns_rule', 'multiplication:mult_chart_easy',
     'multiplication:nl_mult', 'division:nl_div',
 ];
+// P9 place value / rounding / estimation (`--family pv`): one skill per response the family uses
+// (a ring, a word, boxes per place, inline blanks, the disk mat, a sign, a check box, a table).
+const PV = [
+    'placevalue:identify', 'placevalue:value', 'placevalue:expand', 'placevalue:combine', 'placevalue:unit_form',
+    'placevalue:compare', 'placevalue:more_less_10', 'placevalue:place_value_10x', 'placevalue:pv_disks_build',
+    'number_sense:nearest_100', 'number_sense:between_tens', 'number_sense:rounding_table',
+    'number_sense:estimate_sum', 'number_sense:estimate_diff',
+];
 const SKILLS = (arg('skills', '') || '').split(',').map(s => s.trim()).filter(Boolean);
-const LIST = SKILLS.length ? SKILLS : DEFAULT;
+const LIST = SKILLS.length ? SKILLS : arg('family', '') === 'pv' ? PV : DEFAULT;
 const HOSTS = (arg('hosts', 'card,worksheet,quiz') || '').split(',');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -80,6 +89,25 @@ function PLAN(rootSel, which) {
         });
         return { plan, q: String(ans) };
     }
+    // the place-value disk mat (P9 pv-build): tap each zone once per disk, then Submit. The tap
+    // is dispatched on the zone itself: a mouse click at the zone's centre would land on a disk
+    // already there and take it away, which is what the mat is meant to do.
+    const pvz = all('.pvb-zone');
+    if (pvz.length) {
+        const t = Number(q.target || ans);
+        pvz.forEach(z => { const p = Number(z.dataset.place); for (let j = 0; j < Math.floor(t / p) % 10; j++) tag(z, { type: 'domclick' }); });
+        const sub = root.querySelector('.pvb-submit');
+        if (sub) tag(sub, { type: 'domclick' });
+        return { plan, q: String(t) };
+    }
+    // a choice (a printed word to ring, "Round up / Round down", a closest estimate): tap the one
+    // whose text is the answer
+    const choice = all('.answer-btn, .ws-mc-option, .mc-option');
+    if (choice.length && (q.answerType === 'multiple-choice' || q.answerType === 'choice' || q.answerType === 'symbol')) {
+        const want = String(ans).trim().toLowerCase();
+        const hit = choice.find(b => b.textContent.trim().toLowerCase() === want);
+        if (hit) { tag(hit, { type: 'click' }); return { plan, q: String(ans) }; }
+    }
     // a printed "Check one box." list: tap the right row
     const rows = all('.mq-tickrow');
     if (rows.length && q.printAnswer) {
@@ -94,6 +122,12 @@ function PLAN(rootSel, which) {
         const d = String(ans).replace(/[^0-9]/g, '');
         const pad = digits.length - d.length;
         digits.forEach((b, i) => { if (i >= pad) tag(b, { type: 'text', value: d.charAt(i - pad) }); });
+        return { plan, q: String(ans) };
+    }
+    // expanded form (P9): one box per place, the zero part written 0
+    const ex = all('input.expanded-input-box, input.ws-expanded-input');
+    if (ex.length && Array.isArray(q.expandedValues)) {
+        ex.forEach(c => { const v = q.expandedValues[Number(c.dataset.expandedIdx)]; tag(c, { type: 'text', value: String(v) }); });
         return { plan, q: String(ans) };
     }
     // several typed cells
@@ -147,6 +181,7 @@ async function run(page, sel, which) {
         if (!el) return { error: `lost target ${step.sa}` };
         await el.evaluate(e => e.scrollIntoView({ block: 'center' }));
         if (step.type === 'click') { await el.click(); await sleep(40); continue; }
+        if (step.type === 'domclick') { await el.evaluate(e => e.click()); await sleep(40); continue; }
         await el.click({ clickCount: 3 });
         await el.evaluate(e => { e.value = ''; });
         await page.keyboard.type(step.value, { delay: 10 });

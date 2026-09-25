@@ -25,13 +25,17 @@
 import { generateQuestionFor } from './generate-question.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords } from './sheet/roles/practice.js';
-import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm } from './sheet/layout.js';
+import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
+import {
+    normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, easeScore, ineligibleNote,
+    blockPlan, sideItems, pickDistinct,
+} from './sheet/anchors.js';
 
 /* ======================================================================== constants */
 
@@ -86,6 +90,9 @@ function normaliseRequest(req = {}) {
         lesson: req.lesson || (req.header && req.header.lesson),
         letters: Array.isArray(req.letters) ? req.letters.map((l) => String(l).toUpperCase()).filter((l) => LETTERS.includes(l)) : null,
         photocopySafe: !!req.photocopySafe,
+        // S6: step-by-step anchor problems - 'off' | 'side' | 'sections' (only the practice roles
+        // and Mixed practice take them; 'on' means the role's default, sections).
+        anchors: ANCHOR_ROLES.includes(role) ? normaliseAnchors(req.anchors) : 'off',
     };
 }
 
@@ -201,6 +208,12 @@ const legacyClean = (html) => balanceDivs(String(html).replace(LEGACY_TAB_RE, ''
 /** Registered K-2 templates that pack as one-symbol answers (a ten frame, a number track, a chart window). */
 const SHORT_TEMPLATES = new Set(['tenframe', 'seqstrip', 'chartwindow']);
 
+/** A fact drawn across ("a ÷ b = ___"): the fact template in its horizontal notation. */
+function isAcrossFact(q, template) {
+    const p = (q.cell && q.cell.payload) || {};
+    return template === 'fact' && (p.notation === 'horiz' || p.notation === 'horizontal');
+}
+
 /** PT 2.4 footprint classes: long procedures, one-symbol answers, word problems. */
 function footprintClass(q, template, size) {
     const f = String(q.printFormat || '');
@@ -208,6 +221,9 @@ function footprintClass(q, template, size) {
     // The K-2 picture templates hold one small picture and one short answer: they pack like
     // one-symbol answers (2 x 4 and up), not like 6-per-page stacks.
     if (SHORT_TEMPLATES.has(template) || q.answerType === 'ten-frame-build') return 'short';
+    // A horizontal fact ("24 ÷ 6 = ___") is one line with one short answer (critic round 2, H5:
+    // six division facts filled a page, every cell 80% empty).
+    if (isAcrossFact(q, template)) return 'short';
     const operands = (q.cell && q.cell.payload && q.cell.payload.operands) || [q.a, q.b];
     if (/long-div|long_div/.test(f) || template === 'division') return 'long';
     if (/^column-mult/.test(f) && Number(operands[1]) >= 10) return 'long';
@@ -404,6 +420,31 @@ export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
 }
 
 /**
+ * The number sentence a skill's provider asks for under its picture (`strings.sentence(q)` ->
+ * {parts: ['20', '÷', '5', '=', '4'], blanks: [0, 2, 4]}), or null.
+ */
+function sentenceOf(q) {
+    try {
+        const p = getProvider(q.categoryId || '', q.skillId || '');
+        const str = typeof p.strings === 'function' ? p.strings({ categoryId: q.categoryId, skillId: q.skillId, q }) : p.strings;
+        const s = str && typeof str.sentence === 'function' ? str.sentence(q) : null;
+        return s && Array.isArray(s.parts) && s.parts.length ? s : null;
+    } catch (e) { return null; }
+}
+
+/** The sentence as write lines: every blank an ungraded line the key fills (the picture's answer is the scored slot). */
+function sentenceHtml(sf, c, ink) {
+    const blanks = new Set(sf.blanks || []);
+    // The key writes the sentence; a traced (Model / worked) cell writes it in trace grey.
+    const mode = ink === 'trace' ? 'trace' : c.state === 'answered' ? 'solid' : '';
+    return `<div class="mq-sframe">${sf.parts.map((p, i) => {
+        if (!blanks.has(i)) return `<span>${escText(String(p))}</span>`;
+        const v = mode ? escText(String(p)) : '';
+        return `<span class="ws-line${mode === 'trace' ? ' ws-trace' : ''}" data-ws-slot="sf-${i}" data-ws-shape="line" data-ws-graded="0"${v ? ` data-ws-ink="${mode}"` : ''} style="--w:${Math.max(14, String(p).length * 6 + 8)}mm">${v}</span>`;
+    }).join('')}</div>`;
+}
+
+/**
  * Turn one generated question into a host item: the question carrying its cell spec, a draw
  * function (the SAME one for the pupil page, the key and the measurement), the key, and the
  * class tokens the role writes onto the cell.
@@ -442,14 +483,20 @@ function hostItem(g, sectionIndex, size) {
      * slot can hold it, the value prints on an answer line under the cell - in both states, so
      * the geometry is still identical (AK-1).
      */
-    const render = (c, { cols = 2, shown, ink, prompt, shownSlots } = {}) => {
-        const html0 = draw(c, { cols, shown, ink, shownSlots });
+    const render = (c, { cols = 2, shown, ink, prompt, shownSlots, payload } = {}) => {
+        let html0 = draw(c, { cols, shown, ink, shownSlots, payload });
+        // SCC 3.8 `strings.sentence(q)`: a picture skill that asks for its number sentence
+        // ("20 ÷ 5 = 4" under the rings of share-into-groups) gets it as one line of write lines
+        // under the picture - never on finished work (a thinking page shows the work only).
+        const sf = sentenceOf(q0);
+        const hasShown = shown !== undefined && shown !== null && shown !== '';
+        if (sf && (!hasShown || ink === 'trace')) html0 += sentenceHtml(sf, c, hasShown ? ink : undefined);
         // The cell's own instruction line goes when the page's instruction line already says it
         // (BD-10: one instruction per section), or when the role asks (`prompt: false`: Error
         // analysis and the thinking roles print their own instruction over finished work).
         return (prompt === false || item.stripPrompt) && cellPrompt ? stripPrompt(html0) : html0;
     };
-    const draw = (c, { cols = 2, shown, ink, shownSlots } = {}) => {
+    const draw = (c, { cols = 2, shown, ink, shownSlots, payload } = {}) => {
         const hasShown = shown !== undefined && shown !== null && shown !== '';
         let st = c.state;
         let wrong = c.wrong;
@@ -459,7 +506,10 @@ function hostItem(g, sectionIndex, size) {
             else { st = 'wrong'; wrong = { value: v, slots: Object.assign({}, shownSlots || {}) }; }
         }
         const ctx = Object.assign({}, c, { state: legacy && hasShown ? 'blank' : st, wrong, columns: cols, options: Object.assign({}, c.options || {}, { factColumns: cols }) });
-        const html = legacy ? legacyClean(renderCell(q, ctx)) : renderCell(q, ctx);
+        // `payload`: a role asks the template for a variant of this cell (Error analysis asks a drawn
+        // model for its redraw zone, `fix: 'draw'`); the item itself is never changed.
+        const qd = payload && !legacy && q.cell && q.cell.payload ? Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, payload) }) }) : q;
+        const html = legacy ? legacyClean(renderCell(q, ctx)) : renderCell(qd, ctx);
         if (legacy && hasShown) {
             const v = String(shown);
             // A wrong value is written as a pupil would have written it: a place-value mat draws
@@ -508,6 +558,11 @@ function hostItem(g, sectionIndex, size) {
             const m = PROMPT_RE.exec(blankHtml);
             if (m && isGenericPrompt(m[2])) cellPrompt = m[2].trim();
         } catch (e) { cellPrompt = null; }
+    }
+    if (isAcrossFact(q, template)) {
+        // Its static footprint is the VERTICAL fact's cell height plus a stack's pads (50 mm at
+        // L), for one line about 17 mm tall: the measurement is the truth for this one.
+        fp = Object.assign({}, fp, { measure: true, hMm: null, tracks: undefined, factLike: false });
     }
     const item = {
         q, render, template, legacy,
@@ -769,22 +824,100 @@ function skillMeta(sk, q) {
 
 /** One-section layout for a set of host items, exactly as the role will compute it. */
 function layoutOf(role, section, items, n, ctx) {
-    return resolveSectionLayout({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense }, items, ctx.paper, LIVE_W_MM, {
+    return resolveSectionLayout({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols }, items, ctx.paper, LIVE_W_MM, {
         size: n.size, look: n.look, header: ctx.header,
     });
 }
 
-/** The measured worst case of a set of items, per column count: the tallest cell, and whether all fit. */
-function floorOf(items) {
+/**
+ * The measured worst case of a set of items, per column count: the tallest cell, and whether all
+ * fit. With `ctx` ({size, look, paper}) it also records whether all fit with the AUTO margins
+ * (`autoFits`, DN-15). Without it, an Auto section sized from its probe (say 3 columns, because
+ * one probed stacked item is too wide for 4 under the Auto slack) could be laid out again from
+ * the few items finally kept (all narrow facts, so 4 columns): the count was dealt for 3 columns,
+ * the grid drew 4, and a blank run appeared after the last item (PT-ENG-9, PG-15).
+ */
+function floorOf(items, ctx = null) {
     const out = {};
     for (const it of items) {
         for (const [c, m] of Object.entries(it.measured || {})) {
             const f = out[c] || (out[c] = { hMm: 0, fits: true });
             f.hMm = Math.max(f.hMm, m.hMm || 0);
             f.fits = f.fits && m.fits !== false;
+            if (ctx) f.autoFits = f.autoFits !== false && autoFitsAt(it, Number(c), { size: ctx.size, look: ctx.look, paper: ctx.paper, availableWidthMm: LIVE_W_MM });
         }
     }
     return out;
+}
+
+/* ================================================================ S5 / S6 anchor problems */
+
+const ANCHOR_FIRST = 6;           // candidates generated before the page capacity is known
+const ANCHOR_MAX = 48;            // candidates per skill at most (side by side on a long run)
+
+/**
+ * The worked examples of ONE skill (design/SUPPORTS.md S5-S6). Candidates are generated under
+ * their OWN seeds (never a pupil item's seed), sorted easy-first (research: easy numbers first),
+ * drawn as anchors and measured, so the page reserves a band that holds any of them.
+ * `take(pupilItems, count)` then picks examples that are none of the pupil's problems (review
+ * note 5: an anchor is a sibling item, never the same item).
+ */
+function anchorSet(sk, si, n, { variant, colsList, twinCols }) {
+    const cands = [];
+    const seen = new Set();
+    let next = 0;
+    let eligible = null;
+    const base = ((n.seed ^ 0x2545F491) + si * 65537) >>> 0;
+    const grow = (want) => {
+        const fresh = [];
+        while (cands.length < Math.min(want, ANCHOR_MAX) && next < ANCHOR_MAX * 3) {
+            const seed = (base + next * 7919) >>> 0;
+            next++;
+            let q = null;
+            try { q = generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: 0 }); } catch (e) { q = null; }
+            if (!q || seen.has(signature(q))) continue;
+            seen.add(signature(q));
+            const it = hostItem({ q, skill: sk }, si, n.size);
+            if (eligible === null) eligible = anchorEligible(it);
+            if (!eligible) return;
+            const a = anchorItem(it, { variant, twinCols });
+            cands.push(a);
+            fresh.push(a);
+        }
+        if (fresh.length) measureItems(fresh, { size: n.size, look: n.look, colsList });
+        // Easy numbers first; a stable order, so the same seed reprints the same examples.
+        cands.sort((x, y) => easeScore(x.source.q) - easeScore(y.source.q) || signature(x.source.q).localeCompare(signature(y.source.q)));
+    };
+    grow(ANCHOR_FIRST);
+    return {
+        get eligible() { return !!eligible; },
+        get items() { return cands; },
+        grow,
+        /** The band height every candidate fits in (mm). */
+        // The easiest few are the ones a page uses; a later, taller one is never picked into a
+        // band that cannot hold it (see `take` callers).
+        heightMm: (cols = 1) => Math.max(0, ...cands.slice(0, 3).map((a) => anchorHeightMm(a, cols))),
+        /** `count` examples that are none of the pupil items (cycled if the skill runs out). */
+        take(pupil, count) {
+            const sigs = new Set(pupil.filter((it) => it && it.q).map((it) => signature(it.q)));
+            const sigOf = (a) => signature(a.source.q);
+            const free = () => cands.filter((a) => !sigs.has(sigOf(a))).length;
+            if (free() < count) grow(cands.length + count - free() + 2);
+            return pickDistinct(cands, sigs, count, sigOf);
+        },
+    };
+}
+
+/** What a build did with anchors, for the dialog and the tests: the mode, each example, the notes. */
+function anchorSummary(mode, list, notes) {
+    const seen = new Set();
+    const examples = [];
+    for (const a of list) {
+        if (!a || !a.source || seen.has(a)) continue;
+        seen.add(a);
+        examples.push({ section: a.section, pool: a.pool, variant: a.anchor, skill: a.skill, text: String(a.source.q.text || ''), ans: a.source.q.ans, sig: signature(a.source.q), measured: a.measured });
+    }
+    return { mode, examples, notes: notes.slice() };
 }
 
 /**
@@ -855,6 +988,38 @@ export async function buildSheet(req = {}) {
     const layoutHeader = { tab: n.header.tab === false ? false : ['Level', 'Strand', 'Id'], title: n.header.title === false ? '' : title, titleLines: header.titleLines };
     const lctx = { paper, header: layoutHeader };
 
+    // S5 / S6: the worked examples of each section's skill, generated and measured BEFORE the
+    // page capacity is decided, so the capacity reserves their band (sections) or their half of
+    // every row (side by side). A skill with no real worked steps gets none, and the dialog says so.
+    const anchorMode = n.anchors;
+    const anchorNotes = [];
+    const instrMm = instructionMm(n.size);
+    const anchorSets = anchorMode === 'off' ? [] : n.sections.map((sec, si) => {
+        const sk = sec.skills[0];
+        const set = anchorSet(sk, si, n, anchorMode === 'side'
+            ? { variant: 'side', colsList: [1, 2], twinCols: 2 } : { variant: 'band', colsList: [1], twinCols: 4 });
+        if (!set.eligible) { anchorNotes.push(ineligibleNote(metaOf(sk).label)); return null; }
+        if (anchorMode === 'side') sec.columns = 2;
+        else { sec.maxCols = 4; sec.anchorMm = set.heightMm(1); }
+        return set;
+    });
+    /** A section's items as the layout sees them: side by side puts a twin before each. */
+    const withTwins = (si, items) => {
+        const set = anchorMode === 'side' ? anchorSets[si] : null;
+        if (!set || !set.items.length) return items;
+        return sideItems(items, items.map((_, i) => set.items[i % set.items.length]));
+    };
+    /** Pupil problems a page of this section holds, from its layout (anchors taken off). */
+    const capFromL = (sec, si, L) => {
+        if (anchorMode === 'sections' && anchorSets[si]) {
+            const body = sec.gridH ? sec.gridH + instrMm : bodyHeightMm(paper, layoutHeader);
+            return blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: body, instrMm, anchorMm: sec.anchorMm }).perPage;
+        }
+        if (anchorMode === 'side' && anchorSets[si] && anchorSets[si].items.length) return Math.max(1, Math.floor((L.cols === 1 ? Math.max(2, L.rows - (L.rows % 2)) : L.perPage) / 2));
+        return L.perPage;
+    };
+    const floorWith = (si, items) => floorOf(anchorMode === 'side' && anchorSets[si] ? items.concat(anchorSets[si].items) : items, n);
+
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
         const gen = generateRun(sec.skills, count, baseSeed, extra);
         return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size)], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
@@ -908,8 +1073,10 @@ export async function buildSheet(req = {}) {
         const body = bodyHeightMm(paper, layoutHeader) - 1;
         const instr = instructionMm(n.size);
         for (const members of groups.values()) {
+            // S6 sections: every member keeps room for its anchor band too.
+            const band = (si) => (anchorMode === 'sections' && anchorSets[si] ? n.sections[si].anchorMm || 0 : 0);
             const avail = body - members.length * instr;
-            const need = members.map((si) => layouts[si].hMin + 1);
+            const need = members.map((si) => layouts[si].hMin + 1 + band(si));
             const tw = members.reduce((a, si) => a + n.sections[si].group.share, 0) || 1;
             let h = members.map((si) => avail * n.sections[si].group.share / tw);
             // Every member gets at least one row; the others give up the height it lacks.
@@ -923,9 +1090,9 @@ export async function buildSheet(req = {}) {
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
-                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense },
-                    probesOf(si), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
-                out[si] = L.perPage;
+                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols },
+                    withTwins(si, probesOf(si)), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
+                out[si] = capFromL(sec, si, L);
             });
         }
         return out;
@@ -936,24 +1103,25 @@ export async function buildSheet(req = {}) {
         const probes = n.sections.map((sec, si) => {
             const base = (n.seed + si * 100003) >>> 0;
             const probe = probeRun(sec, si, base);
-            sec.floor = floorOf(probe.items);
+            sec.floor = floorWith(si, probe.items);
             return { base, probe };
         });
         probesOf = (si) => probes[si].probe.items;
-        const shared = shareRows(n.sections.map((sec, si) => layoutOf(n.role, sec, probes[si].probe.items, n, lctx)));
+        const shared = shareRows(n.sections.map((sec, si) => layoutOf(n.role, sec, withTwins(si, probes[si].probe.items), n, lctx)));
         n.sections.forEach((sec, si) => {
             const { base, probe } = probes[si];
             const pagesWanted = sec.pages || 1;
             // "A page" (or N pages) when no count is given: the page decides the count. The floor
             // only grows as items are added, so the capacity can only fall; the loop settles.
-            const pageCount = () => (shared[si] !== null ? shared[si] : layoutOf(n.role, sec, probe.items, n, lctx).perPage);
+            const pageCount = () => (shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, probe.items), n, lctx)));
             let want = sec.count || Math.min(MAX_ITEMS, pageCount() * pagesWanted);
             let items = [];
             for (let pass = 0; pass < 3; pass++) {
                 items = finalRun(sec, si, base, want, probe);
-                sec.floor = floorOf(probe.items.concat(items));
+                if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(items.length + 2);
+                sec.floor = floorWith(si, probe.items.concat(items));
                 if (sec.count) break;
-                const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, layoutOf(n.role, sec, items, n, lctx).perPage * pagesWanted);
+                const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, items), n, lctx)) * pagesWanted);
                 if (again >= want) break;
                 want = again;
             }
@@ -969,12 +1137,15 @@ export async function buildSheet(req = {}) {
         const letterBaseOf = (si) => (L) => ((letterSeed(n.seed, L) + si * 100003) >>> 0);
         const firstProbes = n.sections.map((sec, si) => {
             const pr = probeRun(sec, si, letterBaseOf(si)(firstL));
-            sec.floor = floorOf(pr.items);
+            sec.floor = floorWith(si, pr.items);
             return pr;
         });
         probesOf = (si) => firstProbes[si].items;
-        const shared = shareRows(n.sections.map((sec, si) => layoutOf(n.role, sec, firstProbes[si].items, n, lctx)));
-        const firstLayouts = n.sections.map((sec, si) => layoutOf(n.role, sec, firstProbes[si].items, n, lctx));
+        const shared = shareRows(n.sections.map((sec, si) => layoutOf(n.role, sec, withTwins(si, firstProbes[si].items), n, lctx)));
+        const firstLayouts = n.sections.map((sec, si) => {
+            const L = layoutOf(n.role, sec, withTwins(si, firstProbes[si].items), n, lctx);
+            return Object.assign({}, L, { perPage: capFromL(sec, si, L) });
+        });
         n.sections.forEach((sec, si) => {
             const letterBase = letterBaseOf(si);
             const probes = new Map([[firstL, firstProbes[si]]]);
@@ -995,8 +1166,9 @@ export async function buildSheet(req = {}) {
                 perLetter = letters.map(() => L0.perPage);
             }
             let byLetter = letters.map((L, k) => finalRun(sec, si, letterBase(L), perLetter[k], probeOf(L)));
-            sec.floor = floorOf([...probes.values()].flatMap((p) => p.items).concat(...byLetter));
-            const cap = shared[si] !== null ? shared[si] : layoutOf(n.role, sec, byLetter.flat(), n, lctx).perPage;
+            if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(byLetter.flat().length + 2);
+            sec.floor = floorWith(si, [...probes.values()].flatMap((p) => p.items).concat(...byLetter));
+            const cap = shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, byLetter.flat()), n, lctx));
             if (perLetter.some((c) => c > cap)) {
                 byLetter = letters.map((L, k) => (perLetter[k] > cap ? finalRun(sec, si, letterBase(L), cap, probeOf(L)) : byLetter[k]));
             }
@@ -1005,10 +1177,35 @@ export async function buildSheet(req = {}) {
         });
     }
 
+    // S6: attach the worked examples - never one of the pupil's problems (signatures differ).
+    let anchorsIn = null;
+    if (anchorMode !== 'off') {
+        const bySection = n.sections.map(() => []);
+        const bandMm = n.sections.map(() => 0);
+        n.sections.forEach((sec, si) => {
+            const set = anchorSets[si];
+            if (!set) return;
+            const mine = hostItems.filter((it) => it.section === si);
+            if (anchorMode === 'side') {
+                const tw = set.take(hostItems, mine.length);
+                mine.forEach((it, i) => { it.twin = tw[i] || null; });
+            } else {
+                // One example per block: enough for a sheet's blocks (a block holds 1-4 problems).
+                const perLetter = new Map();
+                for (const it of mine) perLetter.set(it.letter || '', (perLetter.get(it.letter || '') || 0) + 1);
+                const need = Math.min(24, Math.max(1, ...perLetter.values()));
+                bySection[si] = set.take(hostItems, need).filter((a) => anchorHeightMm(a, 1) <= sec.anchorMm + 0.05);
+                bandMm[si] = bySection[si].length ? sec.anchorMm : 0;
+            }
+        });
+        anchorsIn = { mode: anchorMode, bySection, bandMm };
+    }
+
     const input = {
         items: hostItems,
         skills,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense })),
+        anchors: anchorsIn,
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
@@ -1021,7 +1218,7 @@ export async function buildSheet(req = {}) {
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};
     const pageCount = out.pupilPages.length;
-    notes.push(...new Set((plan.meta && plan.meta.notes) || []));
+    notes.push(...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes);
     // DN-21: the dialog's "Fits:" line (it already carries the layout's own clamp note, DN-14),
     // then any note the layout line does not already say.
     const line = f0.line || '';
@@ -1041,6 +1238,7 @@ export async function buildSheet(req = {}) {
             text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy,
         })),
         gaps: out.gaps,
+        anchors: anchorSummary(anchorMode, anchorsIn ? anchorsIn.bySection.flat().concat(hostItems.map((it) => it.twin).filter(Boolean)) : [], anchorNotes),
         floors: n.sections.map((s) => s.floor || null),
         seed: n.seed,
         role: n.role,
@@ -1169,6 +1367,29 @@ async function buildRoleSheet(n, metaOf) {
         input.floors[p.id] = floorOf(probe[p.id]);
     });
 
+    // S6: Mixed practice's worked examples, one skill per pool, generated and measured before the
+    // shelves are packed (sections: one anchor band per skill; side: a twin per problem).
+    const anchorNotes = [];
+    let anchorsIn = null;
+    if (n.anchors !== 'off' && n.role === 'mixed-practice') {
+        const byPool = {};
+        pools.forEach((p, pi) => {
+            const sk = p.skills[0];
+            // The compact band (one state, steps beside): a skill's shelf band stays short.
+            const band = anchorSet(sk, pi, n, { variant: 'compact', colsList: [1], twinCols: 4 });
+            if (!band.eligible) { anchorNotes.push(ineligibleNote(metaOf(sk).label)); return; }
+            const entry = { band: band.items.slice(), bandSet: band };
+            if (n.anchors === 'side') {
+                const side = anchorSet(sk, pi + 4099, n, { variant: 'side', colsList, twinCols: 2 });
+                entry.side = side.items.slice();
+                entry.sideSet = side;
+            }
+            byPool[p.id] = entry;
+        });
+        anchorsIn = { mode: n.anchors, byPool };
+        input.anchors = anchorsIn;
+    }
+
     // 2. How many items the page needs, from the measured probe.
     const want = mod.counts(probe, input) || {};
 
@@ -1193,6 +1414,18 @@ async function buildRoleSheet(n, metaOf) {
         items = items.concat(its);
     });
     input.items = items;
+    if (anchorsIn) {
+        // Never one of the pupil's problems; a band never taller than the one the packing reserved.
+        for (const [id, e] of Object.entries(anchorsIn.byPool)) {
+            const pupil = items.filter((it) => it.pool === id);
+            const maxBand = Math.max(0, ...e.band.map((a) => anchorHeightMm(a, 1)));
+            e.band = e.bandSet.take(items, 4).filter((a) => anchorHeightMm(a, 1) <= maxBand + 0.05).slice(0, 1);
+            if (e.sideSet) {
+                const tw = e.sideSet.take(items, pupil.length);
+                pupil.forEach((it, i) => { it.twin = tw[i] || null; });
+            }
+        }
+    }
 
     if (typeof mod.supports === 'function') {
         const why = mod.supports(items);
@@ -1207,7 +1440,7 @@ async function buildRoleSheet(n, metaOf) {
     const out = renderPlan(plan, { key: n.key });
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};
-    const notes = [...new Set((plan.meta && plan.meta.notes) || [])];
+    const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes];
     const line = f0.line || '';
     return {
         pupilHtml: out.pupilHtml,
@@ -1221,6 +1454,7 @@ async function buildRoleSheet(n, metaOf) {
             thinking: it.thinking ? { isWrong: !!it.thinking.isWrong, shown: it.thinking.shown } : undefined,
         })),
         gaps: out.gaps,
+        anchors: anchorSummary(n.anchors, anchorsIn ? Object.values(anchorsIn.byPool).flatMap((e) => e.band).concat(items.map((it) => it.twin).filter(Boolean)) : [], anchorNotes),
         floors: pools.map((p) => input.floors[p.id]),
         seed: n.seed,
         role: n.role,

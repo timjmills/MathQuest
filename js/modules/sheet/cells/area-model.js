@@ -23,6 +23,7 @@
 import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, box, esc, splitList, HAIR } from './ops-common.js';
 import { INK } from '../tokens.js';
+import { stepMarks, slotInks, WHOLE_SLOTS } from '../steps.js';
 
 /**
  * The online worksheet's card CSS forces `flex-wrap: wrap !important` on every inline
@@ -71,10 +72,14 @@ register('area-model', {
         const hMm = g.stripMm + 8;
         const twin = g.twin;
         const uid = esc(p.uid || 'am');
+        // S5 step state (stepState below): {slot: {value, ink}} replaces the state's one ink.
+        const sv = ctx.stepVals || null;
+        const vAt = (id) => (sv ? ((sv[id] && sv[id].value) || '') : vals[id] || '');
+        const iAt = (id) => (sv ? ((sv[id] && sv[id].ink) || null) : ink);
         const partSlot = (i) => (twin
             ? `<input type="text" class="area-model-input" inputmode="numeric" autocomplete="off" data-area-idx="${uid}-part-${i}" data-answer="${partials[i]}" data-ws-slot="part-${i}" data-ws-shape="box" aria-label="area of part ${i + 1}" `
                 + `style="box-sizing:border-box;width:${g.em(bw)};height:${g.em(g.stripMm)};border:${HAIR} solid ${INK.ink};border-radius:${g.em(g.rMm)};background:#fff;color:${INK.ink};font:inherit;font-size:1em;text-align:center;padding:0">`
-            : box(g, `part-${i}`, { wMm: bw, hMm: g.stripMm, value: vals[`part-${i}`] || '', ink, mark: null }));
+            : box(g, `part-${i}`, { wMm: bw, hMm: g.stripMm, value: vAt(`part-${i}`), ink: iAt(`part-${i}`), mark: null }));
         const labels = parts.map((v) => `<span style="flex:0 0 ${g.em(colMm)};text-align:center;font-weight:700">${esc(v)}</span>`).join('');
         const rects = parts.map((v, i) => `<span class="${NOWRAP}" style="flex:0 0 ${g.em(colMm)};height:${g.em(hMm)};box-sizing:border-box;display:flex;align-items:center;justify-content:center;`
             + `${i ? `border-left:${HAIR} solid ${INK.ink};` : ''}">${partSlot(i)}</span>`).join('');
@@ -83,7 +88,7 @@ register('area-model', {
         const totalSlot = twin
             ? `<input type="text" class="area-model-total" inputmode="numeric" autocomplete="off" data-area-idx="${uid}-total" data-answer="${total}" data-ws-slot="total" data-ws-shape="box" aria-label="total" `
                 + `style="box-sizing:border-box;width:${g.em(totalW)};height:${g.em(g.stripMm)};border:${HAIR} solid ${INK.ink};border-radius:${g.em(g.rMm)};background:#fff;color:${INK.ink};font:inherit;font-size:1em;text-align:center;padding:0">`
-            : box(g, 'total', { wMm: totalW, hMm: g.stripMm, value: vals.total || '', ink, mark: null });
+            : box(g, 'total', { wMm: totalW, hMm: g.stripMm, value: vAt('total'), ink: iAt('total'), mark: null });
         const model = `<div style="display:inline-flex;flex-direction:column;align-items:flex-start;white-space:nowrap">`
             + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;margin-left:${g.em(mulMm)};margin-bottom:0.1em">${labels}</div>`
             + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:center">`
@@ -117,4 +122,13 @@ register('area-model', {
             .concat([{ id: 'total', kind: 'number', shape: 'box', graded: true, order: p.parts.length, inputmode: 'numeric', scopes: ['full', 'answer-only'] }]);
     },
     layout() { return { card: 'card-wide-visual', checker: 'area-model', requiresVisual: true }; },
+    /** S5 / P-LC-9: `part<i>` fills part box i, `total` the total box; newest grey, earlier black. */
+    stepState(p, steps, k, ctx) {
+        const sv = slotInks(stepMarks(steps, k), (slot) => {
+            const m = /^part(\d+)$/.exec(slot);
+            if (m) return `part-${m[1]}`;
+            return WHOLE_SLOTS.has(slot) ? 'total' : null;
+        });
+        return this.render(p, Object.assign({}, ctx, { state: 'blank', stepVals: sv }));
+    },
 });

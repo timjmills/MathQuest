@@ -68,7 +68,7 @@ function geom(p, ctx) {
     const shape = p.shape || 'box';
     const wide = Math.max(0, maxDigits(p) - 3) * 3;               // "1,000" needs a wider box
     const tab = look === 'arcs' && p.tab ? TAB_MM[size] + 2 : 0;
-    const baseH = S(ctx).writeMm + 3;
+    const baseH = S(ctx).writeMm + 2.5;
     let boxW = (look === 'arcs' ? PITCH[size] - GAP_MM : 14) + wide;
     let perRow = n;
     if (look === 'arcs') {
@@ -82,7 +82,7 @@ function geom(p, ctx) {
     if (fitN < perRow) perRow = Math.ceil(n / Math.ceil(n / fitN));
     if (isTwin(ctx) && perRow > TWIN_ROW) perRow = Math.ceil(n / Math.ceil(n / TWIN_ROW));
     const rows = Math.ceil(n / perRow);
-    const arcH = look === 'arcs' ? 5 : 0;
+    const arcH = look === 'arcs' ? 3.8 : 0;
     const pt = Math.min(digitPt(ctx) * 0.64, 18, (sz.w - 2) / (0.56 * Math.max(2, maxDigits(p))) * 72 / 25.4);
     return { size, n, look, shape, w: sz.w, h: sz.h, pitch, tab, perRow, rows, arcH, pt };
 }
@@ -207,7 +207,9 @@ register('count-row', {
         const g = geom(p, ctx || {});
         const w = g.tab + g.perRow * g.pitch - GAP_MM + 4;
         const h = g.rows * (g.arcH + g.h) + (g.rows - 1) * 2.5 + (p.rule ? 8 : 0) + (p.ruleBox ? g.h + 3 : 0) + 3;
-        return { wMm: Math.ceil(w), hMm: Math.ceil(h), measure: true, factLike: false, maxCols: w <= 90 ? 2 : 1 };
+        // denseRoom 1: a page of count-by rows packs one row per table, 9-12 at M (owner), each cell
+        // exactly its measured height (the arcs and the pads are already in it).
+        return { wMm: Math.ceil(w), hMm: Math.ceil(h), measure: true, factLike: false, maxCols: w <= 90 ? 2 : 1, denseRoom: 1 };
     },
     inputs(p) {
         const out = (p.blanks || []).map((_, i) => ({ id: `b${i}`, kind: 'number', shape: 'box', graded: true, order: i, inputmode: 'numeric', scopes: ['full', 'answer-only'] }));
