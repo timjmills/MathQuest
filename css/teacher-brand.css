@@ -161,3 +161,8 @@ html.dark body.teacher-mode .tv-check[aria-checked="true"] .tv-check-box { color
 .tv-ptype[aria-checked="true"], .tv-ptype.is-static, .tv-ptype.is-static:hover,
 .tvp-card.is-added { border-color: var(--tv-accent); box-shadow: 0 0 0 1px var(--tv-accent); }
 .tvl-thumb[aria-current="true"] { border-color: var(--tv-accent); }
+
+/* ---------------------------------------------------------------- print preview backdrop, dark
+   teacher.css paints the stage behind the white preview page a fixed warm grey (#d9d9d6), which
+   glared in dark mode. The page itself stays white paper. */
+html.dark body.teacher-mode .tv-preview-stage { background: var(--brand-night-rule); }
