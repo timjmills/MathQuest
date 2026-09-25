@@ -224,7 +224,7 @@ export const VALUE_TOKENS = Object.freeze({
         // block 1 P10 time + money (`all` reuses A)
         find: 'F', order: 'O', collection: 'D', words: 'W', missing: 'I', numerals: 'U', hands: 'B' }),
     zeroPlace: Object.freeze({ none: 'N', some: 'S', always: 'A' }),
-    op: Object.freeze({ x: 'M', '/': 'D' }),
+    op: Object.freeze({ x: 'M', '/': 'D', both: 'B' }),
     order: Object.freeze({ largest: 'L', scrambled: 'S',
         // block 2 (2026-09-25): count by 1-12 rows
         inorder: 'Q', mixed: 'Z',
@@ -270,7 +270,7 @@ export const VALUE_TOKENS = Object.freeze({
     bins: Object.freeze({ adjacent: 'A', apart: 'P', three: 'T' }),
     blank: Object.freeze({ column: 'C', row: 'R' }),
     line: Object.freeze({ plotted: 'P', mark: 'M', ends: 'E' }),
-    closeness: Object.freeze({ far: 'F', close: 'C' }),
+    closeness: Object.freeze({ far: 'F', close: 'C', some: 'S' }),
     lengths: Object.freeze({ equal: 'E', mixed: 'M' }),
     source: Object.freeze({ word: 'W', expanded: 'E', numeral: 'N' }),
     rename: Object.freeze({ standard: 'S', more: 'M' }),

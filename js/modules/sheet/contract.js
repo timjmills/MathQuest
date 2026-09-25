@@ -99,6 +99,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'story-v2': 'Solve. Write the number and the label.',
     'story-k': 'Show the story with lines. Write the equation.',
     'check-fix': 'Check the work. Check one box: Correct or Fix it.',
+    // Error analysis says where the fix goes (critic round 3).
+    'check-fix-write': 'Is it right? Check one box. Fix it: write the right answer.',
+    'check-fix-draw': 'Is it right? Check one box. Fix it: draw it again.',
+    'check-fix-mark': 'Is it right? Check one box. Fix it: mark it again.',
     'check-by': 'Multiply to check. Check one box: Correct or Fix it.',
     'true-false': 'Check one box: True or False. Finish the sentence.',
     spot: 'Find the mistake. Circle it. Write the correct answer.',
@@ -190,6 +194,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'round-table': 'Round each number. Fill in the table.',
     estimate: 'Round each number. Then estimate.',
     'estimate-place': 'Round each number to the nearest {place}. Then estimate.',
+    // Round-3: the product rounds ONE number (the other is a one-digit factor), and the quotient
+    // uses a compatible number, not rounding — each instruction now says what the key does.
+    'estimate-product': 'Round the bigger number to the nearest {place}. Then multiply.',
+    'estimate-compatible': 'Find a near number that divides easily. Then divide.',
     'estimate-closest': 'Circle the closest estimate.',
     'estimate-reasonable': 'Estimate. Check one box: Reasonable or Not reasonable.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).

@@ -159,20 +159,24 @@ export function stripHTML(strip, { size = '1em' } = {}) {
  * an EMPTY answer row under it — with the place letters over the columns and the move named on
  * the arrow beside it. `showAnswer` writes the answer row (the key).
  */
-export function shiftChartHTML(shift, { size = '1em', showAnswer = false } = {}) {
+export function shiftChartHTML(shift, { size = '1em', showAnswer = false, answerText = null, answerSlot = false } = {}) {
     const n = Number(shift.n), ans = Number(shift.ans);
     const width = Math.max(String(Math.trunc(n)).length, String(Math.trunc(ans)).length);
     const places = Array.from({ length: width }, (_, i) => 10 ** (width - 1 - i));
     const LET = { 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M' };
     const bd = `border:${HAIR_PT}pt solid #000;`;
     const digitRow = (v, show) => {
-        const s = String(Math.trunc(v)).padStart(width, ' ');
+        const s = String(v).padStart(width, ' ').slice(-width);
         return places.map((_, i) => `<td style="${bd}width:1.5em;height:1.5em;text-align:center;padding:0;">${show && s[i] !== ' ' ? s[i] : ''}</td>`).join('');
     };
     const heads = places.map(p => `<td style="text-align:center;font-size:0.55em;padding:0 0 0.2em;">${LET[p] || ''}</td>`).join('');
+    // The answer row: the key's digits, or finished work's (`answerText`, digits only). As the
+    // cell's ONE response (`answerSlot`) the row carries the answer slot's id.
+    const ansDigits = answerText !== null && answerText !== undefined ? String(answerText).replace(/[^0-9]/g, '') : String(Math.trunc(ans));
+    const showAns = showAnswer || (answerText !== null && answerText !== undefined);
     return `<span class="pv-shift" style="display:inline-flex;align-items:center;gap:0.5em;font-size:${size};font-weight:700;color:#000;">`
-        + `<table style="border-collapse:collapse;display:inline-table;color:#000;"><tr>${heads}</tr><tr>${digitRow(n, true)}</tr>`
-        + `<tr>${digitRow(ans, showAnswer)}</tr></table>`
+        + `<table style="border-collapse:collapse;display:inline-table;color:#000;"><tr>${heads}</tr><tr>${digitRow(Math.trunc(n), true)}</tr>`
+        + `<tr${answerSlot ? ' data-ws-slot="answer" data-ws-shape="cell"' : ''}>${digitRow(ansDigits, showAns)}</tr></table>`
         + `<span style="font-size:0.8em;white-space:nowrap;">↓ ${esc(shift.label || '')}</span></span>`;
 }
 
@@ -241,6 +245,19 @@ register('pv-support', {
             const kind = p.base && (p.base.kind === 'blanks' || p.base.kind === 'place-bank') ? p.base.kind : 'frame';
             const frame = renderCell({ template: 'pv', v: 1, payload: { ...p.base, kind, showNumeral: false, hideNumeral: true } }, ctx);
             return `<div class="pv-cell">${pic}${frame}</div>`;
+        }
+        // × / ÷ 10, 100, 1,000 on the shift chart: ONE response (round-3: the pupil filled the
+        // chart's answer row AND wrote the answer on a line). The equation is printed without a
+        // slot, "304 × 10 =", and the chart's empty bottom row is where the answer is written; the
+        // key writes it there, finished work shows its digits there.
+        if (p.picture === 'shift') {
+            const m = ctx.metrics;
+            const w = ctx.wrong || {};
+            const wrongText = ctx.state === 'wrong' ? String(w.slots && w.slots.answer !== undefined ? w.slots.answer : (w.value === undefined ? '' : w.value)) : null;
+            const eq = String((p.base && p.base.frame) || '').replace(/_+\s*$/, '').trim();
+            const eqHtml = `<div class="ws-eq pv-frame" style="font-weight:700;justify-content:center;font-size:${pt(m.digitPt)};">${esc(eq)}</div>`;
+            const chart = shiftChartHTML(p.shift || {}, { size: pt(m.digitPt * 0.8), showAnswer: answered(ctx), answerText: wrongText, answerSlot: true });
+            return `<div class="pv-cell">${eqHtml}<div style="text-align:center;margin:2mm 0 1mm;">${chart}</div></div>`;
         }
         // more / less and the sort: the picture above the `pv` cell, unchanged.
         return `<div class="pv-cell">${pic}${renderCell(baseOf(p), ctx)}</div>`;

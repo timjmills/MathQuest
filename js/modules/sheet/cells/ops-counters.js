@@ -187,16 +187,21 @@ register('arrays', {
 /* ---------------------------------------------------------------------- remainder */
 
 function remainderCounters(g, p) {
-    const d = Math.min(DOT[g.size], 5), r = d / 2;       // >= 4 mm (RP-3), 5 mm at most
+    const d = Math.min(DOT[g.size], 4.5), r = d / 2;     // >= 4 mm (RP-3); 4.5 mm keeps ten across a 2-column cell
     // RUNS of the divisor (k2kit `groupRuns`, RUBRIC H12): one run is one group to ring, 4 mm
     // between two counters of a run, 9 mm between runs, 7 mm between lines; the last, shorter
     // run is the remainder. (The 2026-09-25 regrade: rows of 12 at a 2.5 mm gap let a group of
     // 5 wrap a row end, so it could not be ringed.)
     // R3 (critic round 3): runs of the divisor drew the quotient and the remainder for the pupil
     // (9 ÷ 2 as four pairs and one on its own). A neutral array (k2kit looseArray) never does.
-    const lay = looseArray(Number(p.dividend), Number(p.divisor), { d, gap: 5, rowGap: 6, pad: 0.5, order: [8, 7, 6, 5] });
+    // R3 (lint L-DENSITY H13): up to ten across (a 2-column cell holds 77 mm) in at most THREE
+    // rows, and the picture always reserves the three rows, so every cell of a page is one height
+    // (a 1-row 9 ÷ 2 no longer sits in a row sized for a 4-row 28 ÷ 6) and six fit at L.
+    const ROWS = 3, rowGap = 6;
+    const lay = looseArray(Number(p.dividend), Number(p.divisor), { d, gap: 4, rowGap, pad: 0.5, maxCols: 10, order: [10, 9, 8, 7, 6, 5], maxRows: ROWS });
+    const h = Math.max(lay.h, 2 * 0.5 + (ROWS - 1) * (d + rowGap) + d);
     const body = lay.pts.map((c) => dot(c.cx, c.cy, r, true)).join('');
-    return { svg: svgMm(g, lay.w, lay.h, body, `${p.dividend} counters`), wMm: lay.w };
+    return { svg: svgMm(g, lay.w, h, body, `${p.dividend} counters`), wMm: lay.w };
 }
 
 const remKey = (p) => {

@@ -67,15 +67,35 @@ const PLACE_STEPS = [
     'Read the place letter above it: O, T, H or Th.',
     'The letter names the place: ones, tens, hundreds, thousands.',
 ];
+// A page of numbers below 1,000 never talks about thousands (round-3 finding).
+const PLACE_STEPS_3 = [
+    'Find the underlined digit.',
+    'Read the place letter above it: O, T or H.',
+    'The letter names the place: ones, tens or hundreds.',
+];
+const placeSteps = (q) => ((num(pvOf(q).n) || 0) < 1000 ? PLACE_STEPS_3 : PLACE_STEPS);
+const placeSay = (q) => { const p = pvOf(q); return Number.isFinite(p.digit) ? [p.digit, PLACE_WORD[p.place]] : null; };
+const PLACE_BANK = {
+    iCan: 'I Can name the place of a digit',
+    instructionKey: 'place-write',
+    steps: PLACE_STEPS.concat('Copy the place word from the bank.'),
+    say: 'The __ is in the __ place.',
+    sayValues: placeSay,
+};
+const PLACE_BANK_3 = { ...PLACE_BANK, steps: PLACE_STEPS_3.concat('Copy the place word from the bank.') };
+const PLACE_CIRCLE = {
+    iCan: 'I Can name the place of a digit',
+    instructionKey: 'place-circle',
+    steps: PLACE_STEPS.concat('Circle the place word.'),
+    say: 'The __ is in the __ place.',
+    sayValues: placeSay,
+};
+const PLACE_CIRCLE_3 = { ...PLACE_CIRCLE, steps: PLACE_STEPS_3.concat('Circle the place word.') };
 
 registerSkill('placevalue:identify', {
-    strings: stringsBy((q) => (pvOf(q).response === 'bank' ? PLACE_BANK : null), {
-        iCan: 'I Can name the place of a digit',
-        instructionKey: 'place-circle',
-        steps: PLACE_STEPS.concat('Circle the place word.'),
-        say: 'The __ is in the __ place.',
-        sayValues: (q) => { const p = pvOf(q); return Number.isFinite(p.digit) ? [p.digit, PLACE_WORD[p.place]] : null; },
-    }),
+    strings: stringsBy((q) => (pvOf(q).response === 'bank'
+        ? (placeSteps(q) === PLACE_STEPS ? PLACE_BANK : PLACE_BANK_3)
+        : (placeSteps(q) === PLACE_STEPS ? PLACE_CIRCLE : PLACE_CIRCLE_3)), PLACE_CIRCLE_3),
     misconceptions: ['M-V1', 'M-V3', 'M-V14'],
     workedSteps: (q) => {
         const p = pvOf(q);
@@ -99,18 +119,15 @@ registerSkill('placevalue:identify', {
             const other = places.find((pl) => pl !== p.place && digitAt(p.n, pl) === p.digit);
             if (other) c.push({ value: PLACE_WORD[other], misconception: 'M-V3', explain: `Named the place of the other ${p.digit}.` });
         }
-        c.push({ value: PLACE_WORD[p.place * 10] || PLACE_WORD[p.place / 10], misconception: 'M-V14', explain: 'Named the place next to it.' });
+        // M-V14: the place next to it — a neighbour the number really has, on either side, so
+        // the wrong answers differ from child to child (round-3: every child circled "hundreds").
+        for (const nb of [p.place * 10, p.place / 10]) {
+            if (places.includes(nb)) c.push({ value: PLACE_WORD[nb], misconception: 'M-V14', explain: 'Named the place next to it.' });
+        }
         return choose(q, c);
     },
 });
 
-const PLACE_BANK = {
-    iCan: 'I Can name the place of a digit',
-    instructionKey: 'place-write',
-    steps: PLACE_STEPS.concat('Copy the place word from the bank.'),
-    say: 'The __ is in the __ place.',
-    sayValues: (q) => { const p = pvOf(q); return Number.isFinite(p.digit) ? [p.digit, PLACE_WORD[p.place]] : null; },
-};
 
 function valueParts(q) {
     const p = pvOf(q);
@@ -363,7 +380,8 @@ for (const id of ['more_less_10', 'more_less_100']) {
         strings: strings({
             iCan: id === 'more_less_10' ? 'I Can find 1 more, 1 less, 10 more and 10 less' : 'I Can find 10 or 100 more and less',
             instructionKey: 'missing',
-            steps: ['Read the number and the jump: 1, 10 or 100.', 'More: that digit goes up 1. Less: it goes down 1.', 'Past 9 or 0, the next place changes too.'],
+            steps: ['Read the number, the jump and the word more or less.',
+                'More: that digit goes up 1. Less: it goes down 1.', 'Past 9 or 0, the next place changes too.'],
             say: '__ __ than __ is __.',
             sayValues: (q) => { const p = pvOf(q); return p.step ? (p.unknown === 'start' ? [p.step, p.dir, p.n, p.given] : [p.step, p.dir, p.n, q.ans]) : null; },
         }),
@@ -433,7 +451,7 @@ registerSkill('placevalue:pv_disks_build', {
         say: 'I drew __.',
         sayValues: (q) => { const p = pvOf(q); return p.n ? [arr(p.places).map((pl) => `${digitAt(p.n, pl)} ${PLACE_WORD[pl]}`).join(', ')] : null; },
     }),
-    misconceptions: ['M-V1', 'M-V13', 'M-V7'],
+    misconceptions: ['M-V1', 'M-V16', 'M-V13', 'M-V7'],
     workedSteps: (q) => {
         const p = pvOf(q);
         const places = arr(p.places).map(Number);
@@ -446,9 +464,12 @@ registerSkill('placevalue:pv_disks_build', {
         const p = pvOf(q);
         if (!p.n) return null;
         const ds = String(p.n).split('');
+        // Each error is a mat a pupil really draws, and the mat drawn IS that number (critic
+        // round 3: "every disk a ones disk" was drawn as the digit sum's own mat, 1 ten 5 ones).
+        const swapTO = ds.length >= 2 ? num(ds.slice(0, -2).concat([ds[ds.length - 1], ds[ds.length - 2]]).join('')) : null;
         return choose(q, [
-            { value: num(ds.slice().reverse().join('')), misconception: 'M-V1', explain: 'Drew the digits in the wrong zones.' },
-            { value: ds.reduce((a, d) => a + Number(d), 0), misconception: 'M-V13', explain: 'Drew every disk as a ones disk.' },
+            { value: num(ds.slice().reverse().join('')), misconception: 'M-V1', explain: 'Drew the digits in the wrong zones: read the number from the right.' },
+            swapTO !== null && swapTO !== p.n ? { value: swapTO, misconception: 'M-V16', explain: 'Swapped the tens and the ones.' } : null,
         ]);
     },
 });
@@ -515,17 +536,29 @@ registerSkill('placevalue:place_value_10x', {
     },
 });
 
+// The steps follow the number's size: a three-digit page never talks about thousands.
+const WORD_NAME_BASE = {
+    iCan: 'I Can match a number to its word name',
+    instructionKey: 'word-name',
+    say: '__ is __.',
+    sayValues: (q) => [pvOf(q).n !== undefined ? f(pvOf(q).n) : (String(q.text || '').replace(/[^\d,]/g, '') || '?'), q.ans],
+};
+const WORD_NAME_SMALL = { ...WORD_NAME_BASE,
+    steps: ['Read the hundreds digit. Say the word hundred.', 'Read the tens and ones together.', 'Find the choice with the same words.'] };
+const WORD_NAME_BIG = { ...WORD_NAME_BASE,
+    steps: ['Read the number in groups of three digits.', 'Say the thousands, then the word thousand.', 'Say the hundreds, tens and ones.'] };
+const wordNameN = (q) => { const n = num(pvOf(q).n); return Number.isFinite(n) ? n : num(String(q.text || '').replace(/[^\d]/g, '')); };
+
 registerSkill('placevalue:number_word_names', {
-    strings: strings({
-        iCan: 'I Can match a number to its word name',
-        instructionKey: 'word-name',
-        steps: ['Read the number in groups of three digits.', 'Say the thousands, then the word thousand.', 'Say the hundreds, tens and ones.'],
-        say: '__ is __.',
-        sayValues: (q) => [String(q.text || '').replace(/[^\d,]/g, '') || '?', q.ans],
-    }),
+    strings: stringsBy((q) => (wordNameN(q) < 1000 ? WORD_NAME_SMALL : WORD_NAME_BIG), WORD_NAME_BIG),
     misconceptions: ['M-V9', 'M-V10'],
-    workedSteps: (q) => [step('Read the thousands group first.'), step('Then read the hundreds, tens and ones.'),
-        step('Find the choice with the same words.'), step(`Circle: ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }])],
+    workedSteps: (q) => {
+        const n = wordNameN(q);
+        const first = n >= 1000
+            ? [step(`Read the thousands group first: ${f(Math.floor(n / 1000))} thousand.`), step(`Then read the rest: ${f(n % 1000)}.`)]
+            : [step(`Read the hundreds: ${Math.floor(n / 100)} hundred.`), step(`Then read the tens and ones: ${n % 100}.`)];
+        return [...first, step('Find the choice with the same words.'), step(`Circle: ${q.ans}`, [{ slot: 'answer', value: String(q.ans) }])];
+    },
     wrongAnswer: (q) => {
         const opts = arr(q.options).map((o) => (o && typeof o === 'object' ? o.label : o)).map(String).filter((o) => o !== String(q.ans));
         return choose(q, opts.slice(0, 2).map((o, i) => ({ value: o, misconception: i ? 'M-V10' : 'M-V9', explain: i ? 'Dropped a place.' : 'Swapped two digits.' })));
@@ -542,7 +575,7 @@ registerSkill('placevalue:compare', {
         say: '__ is __ __.',
         sayValues: (q) => { const p = pvOf(q); return p.a !== undefined ? [p.a, q.ans === '>' ? 'greater than' : q.ans === '<' ? 'less than' : 'equal to', p.b] : null; },
     }),
-    misconceptions: ['M-C1', 'M-C2'],
+    misconceptions: ['M-C1', 'M-C2', 'M-C3'],
     workedSteps: (q) => {
         const p = pvOf(q);
         if (p.a === undefined) return [];
@@ -562,10 +595,15 @@ registerSkill('placevalue:compare', {
         if (p.a === undefined) return null;
         const flip = q.ans === '>' ? '<' : q.ans === '<' ? '>' : '<';
         const lastDigits = (String(p.a).slice(-1) > String(p.b).slice(-1)) ? '>' : (String(p.a).slice(-1) < String(p.b).slice(-1) ? '<' : '=');
-        return choose(q, [
-            { value: flip, misconception: 'M-C1', explain: 'Wrote the sign the wrong way round.' },
+        const sa = String(p.a), sb = String(p.b);
+        const firstDigits = sa.length !== sb.length ? (sa[0] > sb[0] ? '>' : sa[0] < sb[0] ? '<' : null) : null;
+        // A named place error first (critic round 3: every shown mistake was the reversed sign);
+        // the reversed sign only when no place error gives a wrong sign.
+        const place = [
+            firstDigits ? { value: firstDigits, misconception: 'M-C3', explain: 'Compared the first digits, not how many digits.' } : null,
             { value: lastDigits, misconception: 'M-C2', explain: 'Compared the ones digits, not the biggest place.' },
-        ]);
+        ].filter((c) => c && c.value !== String(q.ans));
+        return choose(q, place.length ? place : [{ value: flip, misconception: 'M-C1', explain: 'Wrote the sign the wrong way round.' }]);
     },
 });
 
@@ -806,7 +844,14 @@ for (const [id, P] of SORTS) {
             if (!bins.length) return [];
             const out = bins.slice(0, 3).map((b) => step(`${b.label === 'Neither' ? 'Neither' : `Rounds to ${b.label}`}: ${arr(q.tiles).filter((t) => a[t.id] === b.id).map((t) => t.label).join(', ') || 'none'}.`));
             out.push(step('Write each number in its column.', [{ slot: 'answer', value: String(q.printAnswer || '') }]));
-            return clampSteps([step('Find the halfway numbers first.')].concat(out));
+            // Name the halfway number itself (the step the page's Steps band teaches).
+            const bv = arr(pvOf(q).bins).map(Number);
+            const dec = P < 1 ? (P === 0.1 ? 2 : 3) : 0;
+            const halves = bv.slice(1).map((b, i) => (bv[i] + b) / 2).filter((h, i) => bv[i + 1] - bv[i] <= P + 1e-9);
+            const first = halves.length
+                ? step(`Halfway between ${dec ? bv[0].toFixed(dec - 1) : f(bv[0])} and ${dec ? (bv[0] + P).toFixed(dec - 1) : f(bv[0] + P)} is ${dec ? halves[0].toFixed(dec) : f(halves[0])}. Halfway rounds up.`)
+                : step('Find the halfway numbers first. Halfway rounds up.');
+            return clampSteps([first].concat(out));
         },
         wrongAnswer: (q) => {
             const a = obj(q.ans) || {};
@@ -839,7 +884,7 @@ registerSkill('number_sense:rounding_table', {
         say: 'To the nearest __, __ is __.',
         sayValues: (q) => { const p = pvOf(q); const rows = arr(p.rows); const pl = arr(p.places); return rows.length ? [pl[0], rows[0], roundTo(rows[0], pl[0])] : null; },
     }),
-    misconceptions: ['M-R6', 'M-R5'],
+    misconceptions: ['M-R6', 'M-R5', 'M-R1'],
     workedSteps: (q) => {
         const p = pvOf(q);
         const cells = arr(p.cells);
@@ -856,12 +901,23 @@ registerSkill('number_sense:rounding_table', {
         const rows = arr(p.rows).map(Number);
         const places = arr(p.places).map(Number);
         if (!cells.length) return null;
-        // M-R6: rounded from the column before (a chain); M-R5: rounded to the next place up.
-        const chain = cells.map(([r, c]) => (c > 0 ? roundTo(roundTo(rows[r], places[c - 1]), places[c]) : roundTo(rows[r], places[c] * 10)));
-        const wrongPlace = cells.map(([r, c]) => roundTo(rows[r], places[c] * 10));
+        // M-R6: rounded from the column before (a chain: 145 -> 150 -> 200); M-R5: rounded to the
+        // place AFTER the one asked (171 to the nearest 100 written 170); M-R1: always rounded
+        // down. A cell the error does not change keeps its right value, so a table shows the one
+        // mistake a pupil really makes, never "0, 0, 1,000" (critic round 3: rounding to the next
+        // place UP turned 3-digit numbers into 0s and 1,000s).
+        const down = (n, P) => Math.floor(n / P) * P;
+        const chain = cells.map(([r, c]) => (c > 0 ? roundTo(roundTo(rows[r], places[c - 1]), places[c]) : roundTo(rows[r], places[c])));
+        const wrongPlace = cells.map(([r, c]) => (places[c] >= 100 ? roundTo(rows[r], places[c] / 10) : down(rows[r], places[c])));
+        const alwaysDown = cells.map(([r, c]) => down(rows[r], places[c]));
+        const right = cells.map(([r, c]) => roundTo(rows[r], places[c]));
+        const differs = (list) => list.some((v, i) => v !== right[i]);
         return choose(q, [
-            { value: chain.map(f).join('; '), misconception: 'M-R6', explain: 'Rounded the rounded number again.' },
-            { value: wrongPlace.map(f).join('; '), misconception: 'M-R5', explain: 'Rounded to the wrong place.' },
+            differs(chain) ? { value: chain.map(f).join('; '), misconception: 'M-R6', explain: 'Rounded the rounded number again.' } : null,
+            differs(wrongPlace) ? { value: wrongPlace.map(f).join('; '), misconception: 'M-R5', explain: 'Rounded to the wrong place.' } : null,
+            differs(alwaysDown) ? { value: alwaysDown.map(f).join('; '), misconception: 'M-R1', explain: 'Always rounded down.' } : null,
+            // every number here rounds down: the other end of the line is rounding UP each time
+            !differs(alwaysDown) ? { value: cells.map(([r, c]) => Math.ceil(rows[r] / places[c]) * places[c]).map(f).join('; '), misconception: 'M-R1', explain: 'Always rounded up.' } : null,
         ]);
     },
 });
@@ -893,7 +949,8 @@ function estimateSteps(q) {
         step(`${f(p.shown)} is ${p.reasonable ? '' : 'not '}close to ${f(p.est)}.`), step(`Check ${String(q.ans)}.`, [{ slot: 'answer', value: String(q.ans) }])];
     const rewrite = q.answerType === 'inline-blanks';
     return [step(`${f(p.a)} is about ${f(ra)}.`, rewrite ? [{ slot: 'b0', value: f(ra) }] : []),
-        step(p.op === '÷' ? `${f(ra)} is a number ${f(p.b)} goes into.` : `${f(p.b)} is about ${f(rb)}.`, rewrite ? [{ slot: 'b1', value: f(rb) }] : []),
+        step(p.op === '÷' ? `${f(ra)} is a number ${f(p.b)} goes into. Keep ${f(p.b)}.` : p.op === '×' ? `Keep ${f(p.b)}: it is one digit.` : `${f(p.b)} is about ${f(rb)}.`,
+            rewrite ? [{ slot: 'b1', value: f(rb) }] : []),
         step(`${f(ra)} ${p.op} ${f(rb)} = ${f(p.est)}.`),
         step(`Write ${f(p.est)}.`, [{ slot: rewrite ? 'b2' : 'answer', value: f(p.est) }])];
 }
@@ -905,25 +962,36 @@ function estimateWrong(q) {
     const [ra, rb] = arr(p.rounded).map(Number);
     const P = p.place;
     const exact = p.op === '+' ? p.a + p.b : p.op === '−' ? p.a - p.b : p.op === '×' ? p.a * p.b : p.a / p.b;
+    const calc = (x, y) => (p.op === '+' ? x + y : p.op === '−' ? x - y : p.op === '÷' ? x / y : x * y);
     const c = [];
     if (p.op === '÷') {
         c.push({ value: p.est * 10, misconception: 'M-G4', explain: 'Wrote an extra zero.' });
         if (p.est >= 20) c.push({ value: p.est / 10, misconception: 'M-G4', explain: 'Dropped a zero.' });
-        c.push({ value: p.est + P, misconception: 'M-G1', explain: 'Rounded the dividend to the wrong compatible number.' });
+        // Only when that quotient is clearly off: 37 ÷ 6 ≈ 7 is defensible (42 ÷ 6), so it is not
+        // a mistake to find (critic round 3).
+        if (Math.abs((p.est + P) * p.b - p.a) > p.b) c.push({ value: p.est + P, misconception: 'M-G1', explain: 'Rounded the dividend to the wrong compatible number.' });
     } else {
+        // `ab`: the two numbers the pupil wrote in the rounded-problem boxes, so the shown work of
+        // an inline item is the work THAT error produces (critic round 3: "80 + 80 = 170" named
+        // "rounded one number the wrong way" with both numbers rounded right).
         const rOfExact = roundTo(exact, p.op === '×' ? P * 10 : P);
-        c.push({ value: rOfExact, misconception: 'M-G1', explain: 'Worked out the exact answer, then rounded it.' });
-        c.push({ value: p.op === '+' ? ra + p.b : p.op === '−' ? ra - p.b : ra * p.b + 0, misconception: 'M-G2', explain: 'Rounded only one number.' });
-        if (p.op === '−') c.push({ value: rb - ra, misconception: 'M-G3', explain: 'Took the bigger number from the smaller.' });
-        if (p.op === '×') c.push({ value: p.est / 10, misconception: 'M-G4', explain: 'Dropped a zero from the product.' });
-        c.push({ value: p.est + (p.op === '×' ? P * p.b : P), misconception: 'M-R1', explain: 'Rounded one number the wrong way.' });
+        c.push({ value: rOfExact, ab: [ra, rb], misconception: 'M-G1', explain: 'Worked out the exact answer, then rounded it.' });
+        c.push({ value: calc(ra, p.b), ab: [ra, p.b], misconception: 'M-G2', explain: 'Rounded only one number.' });
+        if (p.op === '−') c.push({ value: rb - ra, ab: [rb, ra], misconception: 'M-G3', explain: 'Took the bigger number from the smaller.' });
+        if (p.op === '×') c.push({ value: p.est / 10, ab: [ra, rb], misconception: 'M-G4', explain: 'Dropped a zero from the product.' });
+        const other = ra > p.a ? ra - P : ra + P;
+        if (other > 0) c.push({ value: calc(other, rb), ab: [other, rb], misconception: 'M-R1', explain: 'Rounded one number the wrong way.' });
     }
     const asText = typeof q.ans === 'string';
-    return choose(q, c.filter((w) => Number.isInteger(w.value)).map((w) => ({
-        ...w, value: asText ? f(w.value) : w.value,
-        slots: q.answerType === 'inline-blanks' ? { b0: f(ra), b1: f(rb), b2: f(w.value) } : undefined,
-        slot: q.answerType === 'inline-blanks' ? 'b2' : 'answer',
-    })));
+    const inline = q.answerType === 'inline-blanks';
+    return choose(q, c.filter((w) => Number.isInteger(w.value) && w.value >= 0)
+        // an exact-then-rounded answer next to the rounded numbers would contradict itself
+        .filter((w) => !inline || !w.ab || w.misconception !== 'M-G1' || calc(w.ab[0], w.ab[1]) === w.value)
+        .map(({ ab, ...w }) => ({
+            ...w, value: asText ? f(w.value) : w.value,
+            slots: inline ? { b0: f((ab || [ra])[0]), b1: f((ab || [ra, rb])[1]), b2: f(w.value) } : undefined,
+            slot: inline ? 'b2' : 'answer',
+        })));
 }
 
 const EST = [
@@ -937,11 +1005,15 @@ for (const [id, iCan] of EST) {
     const main = {
         iCan,
         // The place is printed (§12, owner Q10): the key is definite only when it is.
-        instructionKey: id === 'estimate_quotient' ? 'estimate' : 'estimate-place',
+        // Each instruction says what the key does (round-3): the product rounds only the bigger
+        // number, the quotient changes the dividend to a compatible number (it does not round).
+        instructionKey: id === 'estimate_quotient' ? 'estimate-compatible' : id === 'estimate_products' ? 'estimate-product' : 'estimate-place',
         ...(id === 'estimate_quotient' ? {} : { instructionVars: (q) => ({ place: f(pvOf(q).place || 10) }) }),
         steps: id === 'estimate_quotient'
-            ? ['Find a number near the dividend that the divisor goes into.', 'Divide the easy numbers.', 'Write the estimate.']
-            : ['Round each number to the place shown.', 'Write the rounded numbers under the problem.', 'Work out the rounded problem.'],
+            ? ['Find a number near the first number that the divisor goes into.', 'Write the easy numbers in the boxes.', 'Divide the easy numbers. Write the estimate.']
+            : id === 'estimate_products'
+                ? ['Round the bigger number to the place shown.', 'Keep the one-digit number. Write both in the boxes.', 'Multiply the easy numbers. Write the estimate.']
+                : ['Round each number to the place shown.', 'Write the rounded numbers in the boxes.', 'Work out the rounded problem.'],
         say: 'About __ is about __.',
         sayValues: (q) => { const p = pvOf(q); const r = arr(p.rounded).map(Number); return p.est !== undefined ? [`${f(r[0])} ${{ '+': 'plus', '−': 'minus', '×': 'times', '÷': 'divided by' }[p.op]} ${f(r[1])}`, f(p.est)] : null; },
     };

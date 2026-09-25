@@ -234,11 +234,11 @@ export function groupRuns(n, size, { d = 5, gap = 4, runGap = 9, rowGap = 7, max
  * (d + gap across, d + rowGap down) for a pencil ring to pass between two counters, including a
  * ring that turns a row end. Same return shape as groupRuns.
  */
-export function looseArray(n, size, { d = 5, gap = 5, rowGap = 8, pad = 0.5, maxCols = 8, order = [7, 6, 5, 8] } = {}) {
+export function looseArray(n, size, { d = 5, gap = 5, rowGap = 8, pad = 0.5, maxCols = 8, order = [7, 6, 5, 8], maxRows = 4 } = {}) {
     const k = Math.max(1, Math.floor(Number(size)) || 1);
     const total = Math.max(0, Math.floor(Number(n)) || 0);
     const ok = order.filter((c) => c <= maxCols && c % k !== 0 && k % c !== 0);
-    let cols = ok.find((c) => Math.ceil(total / c) <= 4) || ok[0] || 7;
+    let cols = ok.find((c) => Math.ceil(total / c) <= maxRows) || ok[0] || 7;
     cols = Math.min(cols, Math.max(1, total));
     const pitch = d + gap, rowPitch = d + rowGap;
     const rows = Math.max(1, Math.ceil(total / cols));
