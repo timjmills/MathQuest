@@ -4,6 +4,19 @@ import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, fraction
 import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
 import { getSkillGrade, maxDenominatorForGrade } from './data.js';
 import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
+import { optionsFor } from './skill-options.js';
+
+// P12: a SET option the teacher changed from its default (skill-options.js), else null.
+function _fChanged(id) {
+    let def = null;
+    try { def = optionsFor(state.category, state.skill).find(o => o.id === id) || null; } catch (e) { def = null; }
+    const o = state.skillOptions;
+    if (!def || def.type !== 'set' || !o || !Array.isArray(o[id])) return null;
+    const legal = def.values.map(x => x.v);
+    const t = legal.filter(v => o[id].includes(v));
+    const d = legal.filter(v => (def.default || []).includes(v));
+    return t.length && !(t.length === d.length && t.every(v => d.includes(v))) ? t : null;
+}
 
 export function generateFractionsQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
@@ -13,8 +26,10 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
     // ========================================
     if (mappedSkill === 'compare_thousandths') {
         // 25% chance of an equal pair (e.g. 0.450 vs 0.45)
+        // P12: `forms` [0] different values only, [1] equal pairs only (a trailing zero changes nothing).
         let aStr, bStr, cmp;
-        if (Math.random() < 0.25) {
+        const _ctForms = _fChanged('forms');
+        if (_ctForms ? _ctForms[0] === 1 : Math.random() < 0.25) {
             const base = randInt(10, 99) / 100; // hundredths value
             aStr = base.toFixed(3);              // padded thousandths
             bStr = base.toFixed(2);              // hundredths form

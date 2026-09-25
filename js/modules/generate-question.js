@@ -300,18 +300,64 @@ export function denomAllowed(d, ticked) {
     if (!fams.size) return ticked.includes(2);
     return [...fams].every(f => ticked.includes(f));
 }
+/** The words and numbers of an item, as the pupil reads them (tags stripped, thousands commas out). */
+export function itemPlainText(q) {
+    const strip = (s) => String(s == null ? '' : s).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/−/g, '-');
+    return `${strip(q.text)} ${strip(q.printText)}`.replace(/(\d),(?=\d{3}\b)/g, '$1').replace(/\s+/g, ' ').trim();
+}
+/** Every number an item shows in its words or its answer, as absolute values. */
+export function itemNumbers(q) {
+    const ans = (typeof q.ans === 'number' || typeof q.ans === 'string') ? ` ${String(q.ans).replace(/(\d),(?=\d{3}\b)/g, '$1')}` : '';
+    return ((itemPlainText(q) + ans).match(/-?\d+(?:\.\d+)?/g) || []).map(Number).filter(Number.isFinite).map(Math.abs);
+}
+/** The decimal places of every decimal an item shows ("0.08" -> 2); whole numbers are left out. */
+export function itemDecimalPlaces(q) {
+    const ans = (typeof q.ans === 'number' || typeof q.ans === 'string') ? ` ${q.ans}` : '';
+    return ((itemPlainText(q) + ans).match(/\d+\.\d+/g) || []).map(m => m.split('.')[1].length);
+}
+/** The ticked values of a SET option when the teacher changed them from the default, else null. */
+function _p12Changed(def, v) {
+    if (!def || def.type !== 'set') return null;
+    const legal = def.values.map(x => x.v);
+    const t = Array.isArray(v) ? legal.filter(x => v.includes(x)) : [];
+    const dflt = legal.filter(x => (def.default || []).includes(x));
+    if (!t.length || (t.length === dflt.length && t.every(x => dflt.includes(x)))) return null;
+    return t;
+}
+/**
+ * The P12 accept checks for this item, from the options the skill declares:
+ *   denoms                          every fraction has a ticked denominator family
+ *   forms with `match`              the item's words match one ticked form's pattern (a skill
+ *                                   whose kinds are not a pickVariant rotation)
+ *   any enum with `accept: 'max'`   every number on the item is at most the chosen value
+ *   any set with `accept: 'dp'`     every decimal on the item has a ticked number of places
+ * Each is inactive at its default, so an untouched skill draws exactly what it drew before.
+ */
 function p12Acceptor() {
     const o = state.skillOptions;
     if (!o || typeof o !== 'object') return null;
+    const defs = optionsFor(state.category, state.skill) || [];
     const checks = [];
-    if (Array.isArray(o.denoms) && o.denoms.length) {
-        const def = (optionsFor(state.category, state.skill) || []).find(d => d.id === 'denoms');
-        if (def) {
-            const legal = def.values.map(x => x.v);
-            const ticked = legal.filter(v => o.denoms.includes(v));
-            if (ticked.length && ticked.length < legal.length) {
-                checks.push(q => itemDenominators(q).every(d => denomAllowed(d, ticked)));
+    for (const def of defs) {
+        if (!Object.prototype.hasOwnProperty.call(o, def.id)) continue;
+        const v = o[def.id];
+        if (def.id === 'denoms') {
+            const t = _p12Changed(def, v);
+            if (t) checks.push(q => itemDenominators(q).every(d => denomAllowed(d, t)));
+        } else if (def.id === 'forms' && Array.isArray(def.match)) {
+            const t = _p12Changed(def, v);
+            if (t) {
+                const res = t.map(i => new RegExp(def.match[i], 'i'));
+                checks.push(q => res.some(re => re.test(itemPlainText(q))));
             }
+        } else if (def.accept === 'max' && def.type === 'enum') {
+            const n = Number(v);
+            if (v !== null && v !== def.default && Number.isFinite(n) && n > 0) {
+                checks.push(q => itemNumbers(q).every(x => x <= n));
+            }
+        } else if (def.accept === 'dp') {
+            const t = _p12Changed(def, v);
+            if (t) checks.push(q => { const p = itemDecimalPlaces(q); return p.length > 0 && p.every(x => t.includes(x)); });
         }
     }
     return checks.length ? (q => checks.every(c => c(q))) : null;

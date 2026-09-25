@@ -260,6 +260,22 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             if (v === 'circle-all' && !items.some(q => /circle every|every number|rounds? to/i.test(qText(q)))) return [[], [`"Circle every number" wording not found`]];
             return [[], []];
         },
+        // P12: "What the items ask" with word patterns — every item reads as one ticked form.
+        forms(v, items, ctx) {
+            const def = ctx.def;
+            if (!def || !Array.isArray(def.match)) return [[], []];
+            const set = Array.isArray(v) ? v : [v];
+            const res = set.map(i => new RegExp(def.match[i], 'i'));
+            const bad = items.filter(q => !res.some(re => re.test(GQ.itemPlainText(q))));
+            return [bad.length ? [`${bad.length} item(s) of an unticked kind: "${GQ.itemPlainText(bad[0]).slice(0, 50)}"`] : [], []];
+        },
+        // P12: decimal places — every decimal on the item has a ticked number of places.
+        digits(v, items, ctx) {
+            if (!ctx.def || ctx.def.accept !== 'dp') return [[], []];
+            const set = Array.isArray(v) ? v : [v];
+            const bad = items.flatMap(q => GQ.itemDecimalPlaces(q)).filter(p => !set.includes(p));
+            return [bad.length ? [`a decimal with ${bad[0]} place(s), outside {${set}}`] : [], []];
+        },
         // P12: denominator families — every fraction on the item has a ticked family.
         denoms(v, items) {
             const set = Array.isArray(v) ? v : [v];

@@ -1159,6 +1159,65 @@ Object.assign(P12_OPTIONS, {
     'fraction_operations:frac_word_mixed_plain': [_p12Denoms()],
 });
 
+// ======================= SHARED P12 CONTROLS FOR THE LEGACY GENERATORS =====================
+// Most of the families below were written before options existed and draw their numbers from
+// fixed tables. Rather than rewrite each branch, three ACCEPT controls (generate-question.js
+// p12Acceptor) keep only the items that have the property asked for, and redraw the rest:
+//   _p12Match   "What the items ask" by the item's own words (one regular expression per kind)
+//   _p12Max     "Numbers to": every number on the item, answer included, is at most the value
+//   _p12Dp      "Decimal places": every decimal on the item has a ticked number of places
+// Each value offered was checked by ws-options-verify to be drawn often enough to be found.
+const _p12Match = (pairs, opts = {}) => ({
+    ...formsOption(pairs.map(([l], i) => ({ v: i, l })), opts), match: pairs.map(([, re]) => re),
+});
+const _p12Max = (values, natural, { label = 'Numbers to', help, labels = {} } = {}) => ({
+    ..._opsBand([null, ...values], null, { label, labels: { null: `As dealt (to about ${natural.toLocaleString('en-US')})`, ...labels },
+        help: help || 'The largest number anywhere on the item, the answer included.' }),
+    group: 'difficulty', accept: 'max',
+});
+const _p12Dp = (values = [1, 2], help) => ({
+    id: 'digits', label: 'Decimal places', type: 'set', group: 'difficulty', accept: 'dp',
+    default: values,
+    values: [{ v: 1, l: 'Tenths (0.7)' }, { v: 2, l: 'Hundredths (0.25)' }, { v: 3, l: 'Thousandths (0.125)' }].filter(x => values.includes(x.v)),
+    allLabel: 'All of them, mixed',
+    help: help || 'Tick one for a page of it alone. Tenths are the easiest step.',
+});
+const _dragOrNot = (convertLabel, convertRe = '^Convert') => _p12Match([[convertLabel, convertRe],
+    ['Sort values into bins (drag)', 'Drag each']], { label: 'What the items ask',
+    help: 'The sorting items are a drag task on screen and a matching task on paper. One kind per page, or both.' });
+
+// ======================= CONVERSIONS AND DECIMALS (gen-fractions.js) =======================
+Object.assign(P12_OPTIONS, {
+    'conversions:f_to_d': [_p12Denoms([2, 5])],
+    'conversions:d_to_f': [_dragOrNot('Convert one decimal (0.75 = 3/4)')],
+    'conversions:f_to_p': [_dragOrNot('Convert one fraction (3/5 = 60%)')],
+    'conversions:p_to_f': [_p12Denoms([2, 5]), _dragOrNot('Convert one percent (75% = 3/4)')],
+    'conversions:d_to_p': [_p12Dp([1, 2], 'Tenths (0.7 = 70%) come before hundredths (0.08 = 8%).')],
+    'conversions:p_to_d': [_p12Dp([1, 2], 'Tenths (70% = 0.7) come before hundredths (8% = 0.08).')],
+    'conversions:percent_visual': [_p12Match([['What percent is shaded?', 'What percent'], ['What fraction is shaded?', 'What fraction'],
+        ['"80% is shaded": how many squares?', 'How many squares'], ['Click every grid that shows it', 'Click ALL']])],
+    'conversions:percent_of_number': [_p12Match([['What is 20% of 60?', '^What is'], ['Click every expression equal to it', 'Click ALL']]),
+        _p12Max([50], 100)],
+    'conversions:find_whole_from_pct': [_p12Match([['"16 is 40% of what number?"', 'of what number'], ['Click every value that works', 'Click ALL']])],
+    'conversions:order_fdp': [_p12Match([['Least to greatest', 'least to greatest'], ['Greatest to least', 'greatest to least']],
+        { label: 'Which order' })],
+    'conversions:ratio_intro': [_p12Variants('ratio_intro', ['standard', 'partWhole', 'equivRatio'],
+        ['Write the ratio (apples to oranges)', 'A part to the whole', 'Find the missing number (6:2 = __:6)']), _p12Max([20], 100)],
+    'conversions:unit_rate_intro': [_p12Max([20, 50], 100, { help: 'The largest total in the story (the number shared out).' })],
+    'conversions:double_num_line': [_p12Max([10, 20], 50)],
+    'conversions:equiv_ratios': [_p12Variants('equiv_ratios', ['findMissing', 'isEquiv', 'simplify'],
+        ['Find the missing value (5 : 9 = __ : 54)', 'Equivalent or not? (yes or no)', 'Write in simplest form']), _p12Max([50, 100], 100)],
+    'conversions:ratio_tables': [_p12Max([20], 100)],
+    'decimals:round_thousandths': [_p12Match([['Round to the nearest tenth', 'nearest tenth'], ['Round to the nearest hundredth', 'nearest hundredth']],
+        { label: 'Round to the nearest' })],
+    'decimals:decimal_nl_drag': [_p12Match([['Place one decimal', '^Drag \\d'], ['Place several decimals', 'Drag each']],
+        { label: 'How many to place' })],
+    // Read by gen-fractions.js (_fChanged('forms')): 0 = two different values, 1 = equal pairs.
+    'decimals:compare_thousandths': [formsOption([{ v: 0, l: 'Two different values (0.844 and 0.722)' },
+        { v: 1, l: 'The same value written two ways (0.450 and 0.45)' }],
+    { label: 'Which pairs', help: 'A trailing zero changes nothing: 0.450 = 0.45. A page of those alone teaches it; the default mixes one in four.' })],
+});
+
 Object.assign(SKILL_OPTIONS, P12_OPTIONS);
 // ============================ end P12 · every other family ============================
 
