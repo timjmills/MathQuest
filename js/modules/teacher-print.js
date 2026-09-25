@@ -19,6 +19,7 @@ import {
     icon, esc, toast, skillCatalogue, findSkill, levelText, currentSet, savedSets, printDefaults,
     optionsSummary, optionsReadOnlyHTML, readStore, writeStore, PRINTS_KEY, fmtDay,
 } from './teacher-ui.js';
+import { tvpAttrs, infoButtonHTML } from './teacher-preview.js';
 
 const WORKING = new Set(['independent', 'more-practice']);
 const PAGE_TYPES = [
@@ -246,7 +247,7 @@ function sectionHTML(s, i) {
         const open = s.optionsOpen === String(idx) && typeof window.openSkillOptionsPanel !== 'function';
         return `<div class="tv-set-item" role="group" aria-label="${esc(label)}">
   <div class="tv-set-top">
-    <div><div class="tv-skill-name">${esc(label)}</div><div class="tv-skill-meta">${esc(summary)}</div></div>
+    <div class="tvp-name" tabindex="0"${tvpAttrs(k.categoryId, k.skillId, k.opts)}><div class="tv-skill-name">${esc(label)}${infoButtonHTML(label)}</div><div class="tv-skill-meta">${esc(summary)}</div></div>
     <button type="button" class="tv-icon-btn" data-act="remove-skill" data-sec="${i}" data-idx="${idx}" aria-label="Remove ${esc(label)} from ${name}">${icon('x', 18)}</button>
   </div>
   <div class="tv-set-tools">
@@ -293,7 +294,7 @@ function renderPickResults(i, q) {
         const hay = `${s.label} ${s.categoryName} ${s.skillId.replace(/_/g, ' ')}`.toLowerCase();
         return words.every((w) => hay.includes(w));
     }).slice(0, 40);
-    box.innerHTML = hits.length ? hits.map((s) => `<button type="button" data-act="pick-skill" data-sec="${i}" data-key="${esc(s.categoryId + '|' + s.skillId)}"><span class="tv-skill-name">${esc(s.label)}</span><br><span class="tv-skill-meta">${esc(levelText(s.level))} · ${esc(s.categoryName)}</span></button>`).join('')
+    box.innerHTML = hits.length ? hits.map((s) => `<button type="button" data-act="pick-skill" data-sec="${i}" data-key="${esc(s.categoryId + '|' + s.skillId)}"${tvpAttrs(s.categoryId, s.skillId)}><span class="tv-skill-name">${esc(s.label)}</span><br><span class="tv-skill-meta">${esc(levelText(s.level))} · ${esc(s.categoryName)}</span></button>`).join('')
         : '<p class="tv-cap" style="padding:8px 12px;">No skills match.</p>';
 }
 

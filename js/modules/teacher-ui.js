@@ -51,6 +51,9 @@ const P = {
     speaker: '<path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16 9a4 4 0 0 1 0 6"/>',
     device: '<rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/>',
     chart: '<path d="M4 4v16h16"/><path d="M8 15l3.5-3.5 3 3L19 9"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5v.01"/>',
+    list: '<path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="M4.5 6h.01"/><path d="M4.5 12h.01"/><path d="M4.5 18h.01"/>',
+    grid: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
     grip: '<circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/>',
 };
 
@@ -148,7 +151,7 @@ let catalogue = null;
 /**
  * Every offered skill: tombstones and mixed "meta" pools are left out, because they are not
  * something a teacher chooses directly.
- * @returns {{domainId, domainName, domainColor, categoryId, categoryName, categoryIcon, skillId, label, level}[]}
+ * @returns {{domainId, domainName, domainColor, categoryId, categoryName, categoryIcon, categoryDesc, skillId, label, level}[]}
  */
 export function skillCatalogue() {
     if (catalogue) return catalogue;
@@ -160,7 +163,7 @@ export function skillCatalogue() {
                 const g = getSkillGrade(sk.v, cat.id);
                 catalogue.push({
                     domainId, domainName: domain.name, domainColor: domain.color,
-                    categoryId: cat.id, categoryName: cat.name, categoryIcon: cat.icon,
+                    categoryId: cat.id, categoryName: cat.name, categoryIcon: cat.icon, categoryDesc: cat.desc || '',
                     skillId: sk.v, label: cleanLabel(sk.l),
                     level: g === null || g === undefined ? 'M' : String(g),
                 });
