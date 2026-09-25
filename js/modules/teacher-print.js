@@ -92,6 +92,8 @@ function initState() {
         title: '',
         sections: [newSection(fromQueue())],
         size: d.size, look: 'auto', paper: d.paper, photocopySafe: d.photocopySafe,
+        // S6: step-by-step anchor problems on Independent, More Practice and Mixed practice.
+        anchors: 'off',
         header: { name: true, date: true, score: true, tab: true, title: true },
         key: true,
         seed: freshSeed(),
@@ -282,6 +284,7 @@ function onClick(e) {
         case 'size': pr.size = d.v; renderSetup(); scheduleBuild(); break;
         case 'look': pr.look = d.v; renderSetup(); scheduleBuild(); break;
         case 'paper': pr.paper = d.v; renderSetup(); scheduleBuild(); break;
+        case 'anchors': pr.anchors = d.v; renderSetup(); scheduleBuild(); break;
         case 'header': pr.header[d.v] = !pr.header[d.v]; renderSetup(); scheduleBuild(); break;
         case 'key': pr.key = !pr.key; if (pr.view === 'key' && !pr.key) pr.view = 0; renderSetup(); scheduleBuild(); break;
         case 'view': pr.view = d.v === 'key' ? 'key' : Number(d.v); showPreview(); break;
@@ -574,6 +577,10 @@ function renderSetup() {
     <div class="tv-fields-2">
       <div><span class="tv-label">Paper</span>${seg('paper', pr.paper, [['A4', 'A4'], ['Letter', 'Letter']], 'Paper')}</div>
     </div>
+    <div><span class="tv-label">Anchor problems</span>${seg('anchors', pr.anchors || 'off', [['off', 'Off'], ['side', 'Side by side'], ['sections', 'Sections']], 'Anchor problems')}
+      <p class="tv-cap" style="margin-top:6px;">${pr.anchors === 'side' ? 'Side by side: a worked example beside each problem, with the same steps and easier numbers.'
+        : pr.anchors === 'sections' ? 'Sections: a worked example, then 3 or 4 problems, then the next example. Mixed practice: one example per skill.'
+            : 'Worked examples, step by step, on Independent, More Practice and Mixed practice pages. Not scored.'}</p></div>
     <div class="tv-divided">
       <span class="tv-label">Header</span>
       <div class="tv-fields-2" style="gap:4px 12px;">${check('name', 'Name')}${check('date', 'Date')}${check('score', 'Score')}${check('tab', 'Strand tab')}${check('title', 'Title')}</div>
@@ -640,6 +647,7 @@ function requestFor(s, i) {
         look: pr.look === 'daily' || pr.look === 'ican' ? pr.look : 'auto',
         paper: pr.paper,
         photocopySafe: pr.photocopySafe,
+        anchors: pr.anchors || 'off',
         header: { name: h.name, date: h.date, score: h.score, tab: h.tab ? undefined : false, title: h.title ? (pr.title.trim() || true) : false },
         key: pr.key,
         seed: (pr.seed + i * 7919) >>> 0,

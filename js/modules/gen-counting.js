@@ -907,7 +907,8 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // name; the id and the label both say teen, so the content moves).
     // ========================================
     else if (mappedSkill === "ten_frame_build_teen") {
-        const target = 11 + _kDealShuffled(9);  // 11..19, shuffled
+        // P12: `band` 15 keeps the target to 11-15 (one row of the second frame).
+        const target = 11 + (Number(_kOpt('band')) === 15 ? _kDealShuffled(5) : _kDealShuffled(9));  // 11..19, shuffled
         q.text = `Build ${target} on the ten frames.`;
         q.printText = `Draw ${target} counters in the ten frames.`;
         q.target = target;
@@ -1196,9 +1197,12 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // size is 3 to 8 and the number of groups is dealt over 2-8.
     // ========================================
     else if (mappedSkill === "share_into_groups") {
-        const groups = 2 + _kDealShuffled(7);                 // 2..8
+        // P12: `band` "Counters to" 12 keeps the picture to 12 counters and 2-4 groups; the
+        // default, 24, is the old draw.
+        const _sgCap = Number(_kOpt('band')) === 12 ? 12 : 24;
+        const groups = _sgCap === 12 ? 2 + _kDealShuffled(3) : 2 + _kDealShuffled(7);   // 2..4 | 2..8
         // At most 24 counters: four rows of a 6- or 7-wide array, so six cells fit a page.
-        const sizes = [3, 4, 5, 6, 7, 8].filter(s => s * groups >= 8 && s * groups <= 24);
+        const sizes = [3, 4, 5, 6, 7, 8].filter(s => s * groups >= 8 && s * groups <= _sgCap);
         const size = sizes.length ? sizes[rng(0, sizes.length - 1)] : 3;
         const total = size * groups;
         q.text = `There are ${total} counters. Make groups of ${size}. How many groups are there?`;
@@ -1236,7 +1240,10 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             { shape: 'star', many: 'stars', place: 'on a card', place2: 'on a page', arrive: 'are added' },
         ];
         const scene = SCENES[_kDeal(SCENES.length)];
-        const sum = 4 + _kDealShuffled(7);                    // 4..10
+        // P12: `band` "Total to" 5 or 7 (read off the raw options: the plain twin is generated here
+        // under the base id, whose own panel does not declare it). The default, 10, is the old deal.
+        const _wpBand = state.skillOptions && typeof state.skillOptions === 'object' ? Number(state.skillOptions.band) : NaN;
+        const sum = 4 + (_wpBand === 5 ? _kDealShuffled(2) : _wpBand === 7 ? _kDealShuffled(4) : _kDealShuffled(7));   // 4..10
         const a = rng(2, sum - 2);
         const b = sum - a;
         const N = scene.many;

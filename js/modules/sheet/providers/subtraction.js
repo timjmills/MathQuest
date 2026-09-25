@@ -85,7 +85,10 @@ function pictures(q) {
 }
 
 const plural = (w, n) => (n === 1 ? w : `${w}s`);
-const TAKE_AWAY_STORIES = storiesFor('-');
+// Critic round 2: Kindergarten stories - short lines about the picture's own objects, and the
+// label printed for the pupil (the role reads `story.k`).
+const TAKE_AWAY_STORIES = storiesFor('-', { k: true });
+const SHAPE_NOUNS = { circle: ['circle', 'circles'], square: ['square', 'squares'], triangle: ['triangle', 'triangles'], star: ['star', 'stars'], ball: ['ball', 'balls'], apple: ['apple', 'apples'], fish: ['fish', 'fish'] };
 
 registerSkill('subtraction:sub_5_pictures', {
     strings: strings({
@@ -120,7 +123,12 @@ registerSkill('subtraction:sub_5_pictures', {
         ]);
     },
     // The picture item names its numbers in pictureData, not in a / b.
-    stories: (q = {}, opts = {}) => { const p = pictures(q); return p ? TAKE_AWAY_STORIES(Object.assign({}, q, { a: p.n, b: p.m }), opts) : null; },
+    stories: (q = {}, opts = {}) => {
+        const p = pictures(q);
+        if (!p) return null;
+        const w = SHAPE_NOUNS[p.shape];
+        return TAKE_AWAY_STORIES(Object.assign({}, q, { a: p.n, b: p.m }), Object.assign({}, opts, w ? { unit: { one: w[0], many: w[1] } } : {}));
+    },
 });
 
 /* ====================================================================== number_line_sub */

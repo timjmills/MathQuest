@@ -66,6 +66,8 @@ const LEGACY_PRINT = !ROLES.length || has('legacy-print');
 const ROLE_COUNT = has('count') ? COUNT : undefined;     // roles: one page unless asked
 const ROLE_SIZE = arg('size', 'L');
 const ROLE_LOOK = arg('look', 'auto');
+// --anchors off|side|sections  S6 step-by-step anchor problems on the practice roles.
+const ROLE_ANCHORS = arg('anchors', 'off');
 const ROLE_PAPER = arg('paper', 'A4');
 // Max Number for every surface. A place-value skill whose place needs more than the default 100
 // (Round to the nearest 100 needs 1,000) is refused below it, so its page is only visible here.
@@ -353,22 +355,22 @@ async function renderRole(page, skill, role, dir) {
     await applyRange(page);
     const seed = hash(slug(skill) + ':' + role) % 1000000;
     const set = skill.set || [{ categoryId: skill.categoryId, skillId: skill.skillId }];
-    const built = await page.evaluate(async ({ skill, set, role, seed, count, size, look, paper }) => {
+    const built = await page.evaluate(async ({ skill, set, role, seed, count, size, look, paper, anchors }) => {
         try {
             const r = await window.buildSheet({
                 role, sections: [{ skills: set, count, columns: 'auto' }],
-                size, look, paper, seed, form: 'A', key: true,
+                size, look, paper, seed, form: 'A', key: true, anchors,
             });
             const title = r.title || skill.label;
             return {
                 pupil: window.sheetDocument(r.pupilHtml, title, { paper }),
                 key: window.sheetDocument(r.keyHtml, title + ' - Answer Key', { paper }),
                 fits: r.fits, pageCount: r.pageCount, keyPageCount: r.keyPageCount, seed: r.seed, title,
-                notes: r.notes, gaps: (r.gaps || []).slice(0, 12),
+                notes: r.notes, gaps: (r.gaps || []).slice(0, 12), anchors: r.anchors && { mode: r.anchors.mode, examples: r.anchors.examples.map((a) => ({ variant: a.variant, text: a.text, ans: String(a.ans) })), notes: r.anchors.notes },
                 items: r.items.map(it => ({ template: it.template, fclass: it.fclass, text: it.text.slice(0, 80), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans), letter: it.letter, measured: it.measured })),
             };
         } catch (e) { return e && e.unsupported ? { unsupported: e.message } : { error: (e && e.stack) || String(e) }; }
-    }, { skill, set, role, seed, count: ROLE_COUNT, size: ROLE_SIZE, look: ROLE_LOOK, paper: ROLE_PAPER });
+    }, { skill, set, role, seed, count: ROLE_COUNT, size: ROLE_SIZE, look: ROLE_LOOK, paper: ROLE_PAPER, anchors: ROLE_ANCHORS });
     if (built.error) return { error: built.error };
     if (built.unsupported) return { unsupported: built.unsupported };
     const pdfP = path.join(dir, `${role}.pdf`);

@@ -29,6 +29,20 @@ function layout(items, input, count) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Test A', title: 'Test A', score: 1 });
     // 12.1: "12; procedures 4" - a long algorithm tests on the 2 x 2 grid of its practice page.
     const long = items.some((it) => it.fclass === 'long');
+    // Critic round 2 (C3): a test of one-line facts or equations gets a dense grid of small cells
+    // (PT 2.9: 4 x 4 at 57, 4 x 5 at 45.6), its rows chosen from the MEASURED height with a
+    // little room (1.05 x the tallest cell, which already holds the pads and the answer zone), up to 20 items and 5 columns. A 4 x 3 grid of 75 mm
+    // cells left two thirds of every cell empty.
+    const oneLine = items.length && items.every((it) => it.fclass === 'short' || it.template === 'fact' || it.template === 'equation'
+        || (it.footprint && it.footprint.factLike));
+    if (oneLine && !long) {
+        return resolveSectionLayout({
+            role: 'test', columns: input.columns || 'auto', count: count || items.length,
+            target: { cols: 4, rows: { S: 5, M: 4, L: 4 }, rowsByCols: { 3: 4, 2: 4, 1: 4 } },
+            ceiling: CEILING, floor: (input.floors || {}).main,
+            dense: { S: 20, M: 20, L: 20 }, denseRoom: 1.05, denseMaxCols: 5,
+        }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
+    }
     return resolveSectionLayout({
         role: 'test', columns: input.columns || 'auto', count: count || items.length,
         target: long ? { cols: 2, rows: { S: 3, M: 2, L: 2 } } : { cols: 4, rows: { S: 5, M: 4, L: 4 }, rowsByCols: { 3: 4, 2: 4, 1: 4 } },

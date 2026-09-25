@@ -1277,7 +1277,7 @@ export const SKILLS = {
 export function isMixedMetaSkill(v) {
     // Real playable skills that happen to start with 'mixed_' or end with '_all'
     const realPlayableSkills = new Set([
-        'mixed_add_sub', 'mixed_mult_div', 'mixed_improper_visual',
+        'mixed_add_sub', 'mixed_mult_div', 'mixed_improper_visual', 'mixed_nl_drag',
         'coordinate_all',
     ]);
     if (realPlayableSkills.has(v)) return false;

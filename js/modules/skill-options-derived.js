@@ -13,13 +13,13 @@
 // A skill with {} honours none of the three; it still carries the universal level in the model
 // (skill-options.js), but no control is shown for it — see offeredOptionsFor().
 //
-// Summary: {"skills":586,"range":142,"decimals":12,"level":50,"none":395,"coarse":14,"stat":24,"unstable":29,"hang":3}
+// Summary: {"skills":586,"range":139,"decimals":10,"level":50,"none":398,"coarse":14,"stat":21,"unstable":28,"hang":3}
 import { registerDerivedOptions } from './skill-options.js';
 
-export const DERIVED_SUMMARY = {"skills":586,"range":142,"decimals":12,"level":50,"none":395,"coarse":14,"stat":24,"unstable":29,"hang":3};
+export const DERIVED_SUMMARY = {"skills":586,"range":139,"decimals":10,"level":50,"none":398,"coarse":14,"stat":21,"unstable":28,"hang":3};
 
 export const DERIVED_OPTIONS = {
-    "addition:add": {"range":[10,20,100,1000]},
+    "addition:add": {},
     "addition:add_100_mixed": {"level":[3,2,1]},
     "addition:add_100_no_regroup": {"level":[3,2,1]},
     "addition:add_100_regroup": {"level":[3,2,1]},
@@ -148,7 +148,7 @@ export const DERIVED_OPTIONS = {
     "composing:hundreds_chart_fill": {},
     "composing:make_ten": {"level":[1,0]},
     "composing:mixed_composing": {"level":[1,0]},
-    "composing:number_bonds": {"mode":"stat"},
+    "composing:number_bonds": {},
     "composing:number_word_form": {"range":[10,20,50,100,1000,10000]},
     "composing:odd_even": {"range":[10,20,50,100]},
     "composing:select_even_odd": {"range":[10,50,100]},
@@ -292,8 +292,8 @@ export const DERIVED_OPTIONS = {
     "fractions:identify_nv": {},
     "fractions:improper_mixed": {},
     "fractions:mixed_fractions": {"mode":"unstable"},
-    "fractions:mixed_improper_visual": {"mode":"stat"},
-    "fractions:mixed_nl_drag": {"mode":"unstable"},
+    "fractions:mixed_improper_visual": {},
+    "fractions:mixed_nl_drag": {},
     "fractions:order_frac_numline": {},
     "fractions:order_fractions": {},
     "fractions:round_fractions": {},
@@ -390,8 +390,8 @@ export const DERIVED_OPTIONS = {
     "number_ops_mixed:number_families_mixed": {"level":[3,2,1,0]},
     "number_ops_mixed:operations_all": {"mode":"unstable"},
     "number_ops_mixed:which_sign": {"range":[10,50,100,1000]},
-    "number_ops_mixed:word_problems_mixed": {"range":[10,100],"decimals":[0,1,2,3],"mode":"stat"},
-    "number_ops_mixed:word_problems_mixed_plain": {"range":[10,100],"decimals":[0,1,2,3],"mode":"stat"},
+    "number_ops_mixed:word_problems_mixed": {"mode":"stat"},
+    "number_ops_mixed:word_problems_mixed_plain": {"mode":"stat"},
     "number_sense:between_tens": {},
     "number_sense:compensation": {"range":[10,20,50,100]},
     "number_sense:doubles_near_doubles": {},
@@ -502,7 +502,7 @@ export const DERIVED_OPTIONS = {
     "shapes_early:shape_name_match_3d": {},
     "shapes_early:shape_positions": {},
     "subtraction:missing_add_sub": {"range":[10,100]},
-    "subtraction:mixed_add_sub": {"mode":"stat"},
+    "subtraction:mixed_add_sub": {"range":[10,20,50,100]},
     "subtraction:mixed_subtraction": {"mode":"unstable"},
     "subtraction:nl_sub": {"range":[10,100]},
     "subtraction:number_line_sub": {"range":[10,100]},
@@ -553,7 +553,7 @@ export const DERIVED_OPTIONS = {
     "subtraction:sub_wp_20_plain": {},
     "subtraction:sub_wp_50": {},
     "subtraction:sub_wp_50_plain": {},
-    "subtraction:subtract": {"range":[10,20,100]},
+    "subtraction:subtract": {},
     "subtraction:unknown_start_wp": {"range":[10,50,100]},
     "vocabulary:vocab_grade_1": {"mode":"coarse"},
     "vocabulary:vocab_grade_1_algebra": {},

@@ -474,6 +474,49 @@ for (const k of ['line-jumps', 'draw-blocks', 'draw-blocks-100', 'check-groups',
     const text = instructionFor(k, { n: 4 });
     ok(lintInstruction(text).length === 0, `library "${k}" fails the lint: ${lintInstruction(text).join('; ')}`);
 }
+// Critic round 2: the new library strings pass the lint too.
+for (const k of ['ring-groups-each', 'ring-remainder-each', 'missing-all', 'story-k2']) {
+    ok(k in INSTRUCTION_LIBRARY && lintInstruction(instructionFor(k, {})).length === 0, `library "${k}" is missing or fails the lint`);
+}
+ok(/quotient and the remainder/.test(instructionFor('ring-remainder', { n: 4 })), 'ring-remainder names the quotient and the remainder (its two slots)');
+{
+    const P = (k) => getProvider(...k.split(':'));
+    // share_into_groups: grouping stories only - "N in each ..., how many groups".
+    const sg = P('division:share_into_groups');
+    for (let i = 0; i < 12; i++) {
+        const st = sg.stories({ a: 24, b: 4, op: '÷', ans: 6 }, { seed: 7, index: i });
+        ok(st && /^grouping/.test(st.schema), `share_into_groups story ${i} is ${st && st.schema}, not grouping`);
+    }
+    const sf = sg.strings({ categoryId: 'division', skillId: 'share_into_groups' }).sentence({ a: 20, b: 5, op: '÷', ans: 4 });
+    ok(sf && sf.parts.join(' ') === '20 ÷ 5 = 4' && sf.blanks.length === 3, 'share_into_groups asks for its division sentence');
+    // div_remainders: every story interprets the remainder (left over, round up, full groups).
+    const dr = P('division:div_remainders');
+    const seenSchemas = new Set();
+    for (let i = 0; i < 9; i++) {
+        const st = dr.stories({ a: 23, b: 4, op: '÷', ans: '5 R 3', quotientRemainder: { quotient: 5, remainder: 3 } }, { seed: 3, index: i });
+        ok(st && /left over|need|fill/.test(st.question) && [3, 5, 6].includes(st.ans), `div_remainders story ${i} does not interpret the remainder: ${st && st.question}`);
+        if (st) seenSchemas.add(st.schema);
+    }
+    ok(seenSchemas.size === 3, `div_remainders rotates its three interpretations (${[...seenSchemas].join(', ')})`);
+    // One page: neighbours never share a template AND a noun (mult_facts: "rows of chairs" twice).
+    const mf = P('multiplication:mult_facts');
+    const page = [0, 1, 2].map((i) => mf.stories({ a: 3 + i, b: 4, op: '×', ans: (3 + i) * 4 }, { seed: 11, index: i }));
+    ok(new Set(page.map((s) => s.lines[0].replace(/\d+/g, '#').replace(/^[A-Z][a-z]+/, 'N'))).size === 3, 'mult_facts: three stories on a page, three contexts');
+    // sub_5_pictures: Kindergarten stories about the picture's own objects, 6 words a line at most.
+    const sp = P('subtraction:sub_5_pictures');
+    const k = sp.stories({ pictureData: { shape: 'star', n: 5, m: 2 }, ans: 3 }, { seed: 1, index: 0 });
+    ok(k && k.k && /stars?/.test(k.sentences.join(' ')) && k.sentences.every((s) => s.split(/\s+/).length <= 6), `sub_5_pictures: a short K story about stars (${k && k.sentences.join(' / ')})`);
+    // base10_build: only misconceptions whose drawing a pupil makes.
+    const bb = P('composing:base10_build');
+    for (const n of [73, 57, 31, 90]) {
+        const w = bb.wrongAnswer({ categoryId: 'composing', skillId: 'base10_build', ans: n, target: n, text: `Show ${n}`, cell: { template: 'base10', payload: { n } } });
+        ok(!w || w.misconception !== 'tens-as-ones', `base10_build ${n}: "tens drawn as ones" cannot be drawn`);
+    }
+    // add_wp_*: the wrong answer carries the pupil's number sentence for Error analysis.
+    const wp = P('addition:add_wp_10');
+    const ww = wp.wrongAnswer({ categoryId: 'addition', skillId: 'add_wp_10', a: 2, b: 6, op: '+', ans: 8, text: '2 + 6' });
+    ok(ww && /^\d+ [+−] \d+ = \d+$/.test(ww.work || ''), `add_wp_10: the wrong answer shows its working (${ww && ww.work})`);
+}
 // A registered sibling that is not in the test must still carry a real provider (every wp band).
 for (const band of ['10', '20', '50', '100', '1k', '10k', '100k', '1m']) {
     for (const [cat, op] of [['addition', 'add'], ['subtraction', 'sub']]) {

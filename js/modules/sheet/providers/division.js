@@ -16,10 +16,12 @@ registerSkill('division:div_facts', {
     strings: strings({
         iCan: 'I Can divide using times facts',
         instructionKey: 'divide',
+        // Critic round 2: a missing-factor frame is easier to read than a "times what" question,
+        // and skip counting to 121 by 11 is not practical - the times fact is the strategy.
         steps: [
-            'Think: the second number times what makes the first number?',
-            'Skip count by the second number up to the first number.',
-            'Count your skips. Write the answer.',
+            'Read the division: 24 ÷ 6.',
+            'Write the times fact with a gap: 6 × __ = 24.',
+            'Find the missing factor. It is the answer.',
         ],
         say: '__ divided by __ equals __.',
     }),
@@ -29,9 +31,9 @@ registerSkill('division:div_facts', {
         if (!Number.isFinite(a) || !Number.isFinite(b) || !b) return [];
         const quo = a / b;
         return [
-            step(`${a} ÷ ${b}: think ${b} × ? = ${a}.`),
-            step(`Count by ${b}: ${countList(b, a, b)}.`),
-            step(`That is ${quo} skips, so ${b} × ${quo} = ${a}.`),
+            step(`Read the division: ${a} ÷ ${b}.`),
+            step(`Write the times fact with a gap: ${b} × __ = ${a}.`),
+            step(`${b} × ${quo} = ${a}, so the missing factor is ${quo}.`),
             step(`Write ${quo}.`, [{ slot: 'ans', value: String(quo) }]),
         ];
     },
@@ -198,6 +200,12 @@ registerSkill('division:share_into_groups', {
             'Count the circles. Write how many groups.',
         ],
         say: '__ in groups of __ makes __ groups.',
+        // Critic round 2: the rings link to dividing through the number sentence under them.
+        sentence: (q) => {
+            const [a, b] = operands(q);
+            if (!Number.isFinite(a) || !Number.isFinite(b) || !b || a % b) return null;
+            return { parts: [String(a), '÷', String(b), '=', String(a / b)], blanks: [0, 2, 4] };
+        },
     }),
     misconceptions: ['wrote-group-size', 'counted-counters', 'one-group-short'],
     workedSteps: (q) => {
@@ -221,5 +229,6 @@ registerSkill('division:share_into_groups', {
             { value: a, misconception: 'counted-counters', explain: 'Counted all the counters, not the groups.' },
         ].filter((c) => c.value > 0));
     },
-    stories: storiesFor('÷'),
+    // Critic round 2: the skill is GROUPING (how many groups), so its stories are too.
+    stories: storiesFor('÷', { grouping: true }),
 });
