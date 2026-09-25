@@ -14,6 +14,8 @@ import {
     cellKindFor, kindHTML, instructionForKind,
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
     regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
+    clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget,
+    screenInstruction, canFitDigits, adoptSvgBlank,
 } from './screen-cell.js';
 
 // Escape HTML-significant characters so q.text strings (which may contain
@@ -1446,8 +1448,18 @@ function _applyScreenCell() {
             visualAid.style.display = 'block';
             wireStackEntry(visualAid, { autofocus: !state.hasAnswered });
         } else {
-            visualAid.innerHTML = kindHTML(kind, { slotHtml: '<span class="mq-slothost"></span>' });
+            visualAid.innerHTML = kindHTML(kind, { slotHtml: '<span class="mq-slothost"></span>' })
+                + (kind.kind === 'division' ? workRowsHTML(kind) : '');
             visualAid.style.display = 'block';
+            if (kind.kind === 'division') {
+                // Long division is worked on paper, not on a calculator (regrade 2026-09-25):
+                // the work rows under the bracket are the pupil's working space.
+                const calc = document.getElementById('calcBtn');
+                if (calc) calc.style.display = 'none';
+                if (typeof window !== 'undefined' && typeof window.hideCalculator === 'function') {
+                    try { window.hideCalculator(); } catch (e) { /* ignore */ }
+                }
+            }
             const host = visualAid.querySelector('.mq-slothost');
             if (host && input) {
                 host.replaceWith(input);
@@ -1467,8 +1479,9 @@ function _applyScreenCell() {
         }
     } else {
         paper.classList.add('mq-kind-legacy');
+        _applyCardTwin(q, paper, visualAid, qt);
         if (visualAid && visualAid.style.display !== 'none') hideScreenOnlyCaptions(visualAid);
-        if (qt) {
+        if (qt && !paper.classList.contains('mq-twin')) {
             // Said once: the instruction line stays; a copy inside the visual is hidden, or, when
             // the visual says it as part of a larger block, the line is hidden instead.
             const visualShown = visualAid && visualAid.style.display !== 'none' && visualAid.innerHTML.trim();
@@ -1485,6 +1498,11 @@ function _applyScreenCell() {
             if (!state.hasAnswered) {
                 try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); }
             }
+        } else if (typed && input && !input.disabled && (q.answerType === 'number' || !q.answerType) && adoptSvgBlank(visualAid, input)) {
+            // a chart's empty box is the slot (hundreds chart): the pupil writes in the chart
+            paper.classList.add('mq-slot-moved');
+            visualAid.dataset.mqNoZoom = '1';
+            if (!state.hasAnswered) { try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); } }
         } else if (typed && input && !input.disabled && wireCellSlots(visualAid, input)) {
             // several blanks in one drawing (a chart's empty cells): one input in each
             paper.classList.add('mq-slot-moved');
@@ -1496,16 +1514,93 @@ function _applyScreenCell() {
         }
         // A printed "Check one box." cell is tapped, not typed (PEDAGOGY 10.2, SP-3).
         if (visualAid && input && wireTickBoxes(visualAid, q, input)) paper.classList.add('mq-tick-mode');
+        if (visualAid) { wireRingGroups(visualAid); wireClozeBanks(visualAid); }
     }
     // Widgets mount late (dynamic import) and re-render on interaction: each time the cell
     // changes, the mono pass re-inks it and the repeated prompt is looked for again.
     monoCell(paper, {
         afterInk: () => {
             const va = document.getElementById('visualAid');
-            if (!kind && va && qt && hideRepeatedPrompt(va, q.text)) qt.classList.remove('mq-dup');
+            if (!kind && va && qt && !paper.classList.contains('mq-twin') && hideRepeatedPrompt(va, q.text)) qt.classList.remove('mq-dup');
+            if (!kind && va) _fitCardDigits(q, paper, va);
         },
     });
     _syncChromeCheck();
+}
+
+// RUBRIC C3: the question's digits at 56 / 48 / 40 px. A legacy drawing sized for paper is scaled
+// up as a whole (screen-cell.js fitCellDigits) until its numerals reach the card's size or it
+// fills the cell's width.
+function _fitCardDigits(q, paper, visualAid) {
+    if (!canFitDigits(q) || paper.classList.contains('mq-twin')) return;
+    if (visualAid.style.display === 'none') return;
+    const kids = Array.from(visualAid.children).filter((c) => !c.hasAttribute('data-mq-screen-only'));
+    const root = kids.length === 1 ? kids[0] : null;
+    if (!root) return;
+    fitCellDigits(root, cellDigitTarget(paper), { avail: visualAid.clientWidth });
+}
+
+// The screen twin of a paper cell whose response model the legacy card lost (regrade
+// 2026-09-25): a cloze's two boxes and lists, a sentence's inline boxes inside the cell, the
+// counters to ring for a grouping item, and a quotient-and-remainder answer in two boxes.
+function _applyCardTwin(q, paper, visualAid, qt) {
+    if (!q || !visualAid) return;
+    paper.classList.remove('mq-twin');
+    const setInstr = (text) => {
+        if (!qt) return;
+        qt.style.cssText = '';
+        qt.innerHTML = `<span class="mq-instr-text">${_escapeHtmlForQuestion(screenInstruction(text))}</span>`
+            + `<span class="mq-sr"> ${_escapeHtmlForQuestion(String(q.text || '').replace(/<[^>]*>/g, ''))}</span>`;
+    };
+    if (q.answerType === 'inline-cloze') {
+        const html = clozeHTML(q);
+        if (!html) return;
+        visualAid.innerHTML = html;
+        visualAid.style.display = 'block';
+        // Each addend box is the cloze checker's own `.cloze-cell` (it reads `.value`), so the
+        // in-card checker, its retry and its feedback work unchanged.
+        visualAid.querySelectorAll('[data-mq-cell]').forEach((slot, k) => {
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.className = 'cloze-cell mq-cellslot';
+            inp.setAttribute('data-cloze-idx', String(k));
+            inp.setAttribute('inputmode', 'numeric');
+            inp.setAttribute('autocomplete', 'off');
+            inp.setAttribute('maxlength', '3');
+            inp.setAttribute('aria-label', slot.getAttribute('data-mq-label') || `blank ${k + 1}`);
+            inp.addEventListener('input', () => { inp.value = inp.value.replace(/[^0-9]/g, ''); });
+            inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); const b = document.getElementById('clozeSubmitBtn'); if (b) b.click(); } });
+            slot.appendChild(inp);
+        });
+        paper.classList.add('mq-twin');
+        setInstr('Solve.');
+        visualAid.dataset.mqNoZoom = '1';
+        const first = visualAid.querySelector('input.cloze-cell');
+        if (first && !state.hasAnswered) { try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); } }
+        return;
+    }
+    if (q.answerType === 'inline-blanks' && qt && qt.querySelector('.ib-cell')) {
+        // The sentence with its boxes is the first line of the cell, as on paper; the
+        // instruction line above the cell says what to do.
+        const line = document.createElement('div');
+        line.className = 'mq-ibline';
+        while (qt.firstChild) line.appendChild(qt.firstChild);
+        visualAid.insertBefore(line, visualAid.firstChild);
+        visualAid.style.display = 'block';
+        paper.classList.add('mq-twin');
+        setInstr('Solve.');
+        visualAid.dataset.mqNoZoom = '1';
+        return;
+    }
+    const rp = ringParts(q);
+    if (rp) {
+        visualAid.innerHTML = ringCellHTML(rp);
+        visualAid.style.display = 'block';
+        visualAid.dataset.mqNoZoom = '1';
+        paper.classList.add('mq-twin');
+        if (rp.kind === 'remainder') setInstr(`Make groups of ${rp.b}. Write the answer.`);
+        else if (qt) screenTextLine(qt);
+    }
 }
 
 // The chrome Check (#qcCheckBtn) is shown exactly when the inline one would be usable: the
@@ -1521,7 +1616,9 @@ function _syncChromeCheck() {
         const input = document.getElementById('answerInput');
         const visualAid = document.getElementById('visualAid');
         const shown = (el) => !!el && el.style.display !== 'none' && getComputedStyle(el).display !== 'none';
-        if (paper && (paper.classList.contains('mq-slot-moved') || paper.classList.contains('mq-tick-mode'))) {
+        if (_checkProxy()) {
+            show = true;
+        } else if (paper && (paper.classList.contains('mq-slot-moved') || paper.classList.contains('mq-tick-mode'))) {
             show = !!input && !input.disabled && !!visualAid && shown(visualAid);
         } else if (shown(area) && area.querySelector('#answerInput') && area.querySelector('.mq-inline-check')) {
             show = !!input && !input.disabled;
@@ -1532,8 +1629,75 @@ function _syncChromeCheck() {
     btn.classList.toggle('mq-show', show);
 }
 
+// The in-cell Submit of a widget (a build mat, a cloze, an inline-blanks sentence) is drawn by
+// the chrome Check instead: one Check, below the cell, on every item (regrade: "no Check button",
+// "Check clipped to 'Che'"). Returns what the chrome Check should press, or null.
+function _checkProxy() {
+    const q = state.currentQ;
+    if (!q || state.hasAnswered) return null;
+    const va = document.getElementById('visualAid');
+    const find = (sel) => { const el = document.querySelector(sel); return el && !el.closest('[hidden]') ? el : null; };
+    switch (q.answerType) {
+        case 'inline-cloze': return find('#clozeSubmitBtn');
+        case 'inline-blanks': return find('#ibSubmitBtn');
+        case 'ten-frame-build': return va && va.querySelector('.tfb-submit');
+        case 'base10-build': return va && va.querySelector('.b10-submit');
+        case 'grid-fill': return va && va.querySelector('input.gf-cell') ? 'grid-fill' : null;
+        case 'area-model': return va && va.querySelector('.area-model-input, .area-model-total') ? 'area-model' : null;
+        case 'fact-family': case 'number-family':
+            return va && va.querySelector('.fact-family-input, .number-family-input') ? 'family' : null;
+        case 'col-arith': return va && va.querySelector('.colarith-submit');
+        default: return null;
+    }
+}
+
+function _pressCheckProxy(proxy) {
+    if (proxy === 'family' && typeof window.checkNumberFamilyAnswer === 'function') {
+        try { window.checkNumberFamilyAnswer(); } catch (e) { /* the family checker owns its feedback */ }
+    }
+    if (proxy === 'grid-fill' || proxy === 'area-model' || proxy === 'family') {
+        // These cells check themselves as the pupil types; Check re-reads every box and takes the
+        // pupil to the first one that is empty or wrong.
+        const va = document.getElementById('visualAid');
+        const sel = { 'grid-fill': 'input.gf-cell', 'area-model': '.area-model-input, .area-model-total', family: '.fact-family-input, .number-family-input' }[proxy];
+        const cells = va ? Array.from(va.querySelectorAll(sel)).filter((c) => !c.disabled) : [];
+        if (proxy !== 'family') cells.forEach((c) => c.dispatchEvent(new Event('input', { bubbles: true })));
+        const next = cells.find((c) => !c.value.trim() || c.classList.contains('box-wrong'));
+        const fb = document.getElementById('feedbackArea');
+        if (next) {
+            try { next.focus(); } catch (e) { /* ignore */ }
+            if (fb && !next.value.trim()) { fb.style.display = 'block'; fb.className = 'feedback-area hint'; fb.innerHTML = 'Fill in every box.'; }
+        }
+        return;
+    }
+    if (proxy && !proxy.disabled) proxy.click();
+    else if (proxy && proxy.disabled) {
+        const fb = document.getElementById('feedbackArea');
+        if (fb) { fb.style.display = 'block'; fb.className = 'feedback-area hint'; fb.innerHTML = 'Build the number first.'; }
+    }
+}
+
+let _checkProxyWired = false;
+function _wireCheckProxy() {
+    if (_checkProxyWired) return;
+    const card = document.getElementById('questionCard');
+    if (!card) return;
+    _checkProxyWired = true;
+    // Capture on the card: runs before the button's own onclick (submitAnswer), which is a no-op
+    // for these answer types.
+    card.addEventListener('click', (e) => {
+        if (!e.target.closest || !e.target.closest('#qcCheckBtn')) return;
+        const proxy = _checkProxy();
+        if (!proxy) return;
+        e.preventDefault();
+        e.stopPropagation();
+        _pressCheckProxy(proxy);
+    }, true);
+}
+
 let _chromeCheckObserver = null;
 function _watchChromeCheck() {
+    _wireCheckProxy();
     if (_chromeCheckObserver || typeof MutationObserver === 'undefined') return;
     const card = document.getElementById('questionCard');
     if (!card) return;

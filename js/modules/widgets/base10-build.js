@@ -97,7 +97,7 @@ export function renderBase10Build(q, container) {
     const places = _placesFor(target, maxPlace);
     const allowRegroup = !!q.allowRegroup;
     const large = _largeTargets();
-    const unitSize = large ? 22 : 18;
+    const unitSize = large ? 26 : 22;
 
     const promptText = q.text || `Build the number ${target.toLocaleString()}.`;
 
@@ -112,13 +112,13 @@ export function renderBase10Build(q, container) {
             </div>
             <button type="button" class="b10-palette-block" data-place="${place}"
                 draggable="true"
-                aria-label="${PLACE_LABEL[place]} block, value ${place}, draggable"
+                aria-label="Add a ${PLACE_LABEL[place].toLowerCase().replace(/s$/, '')} block, value ${place}"
                 style="background:transparent;border:2px solid transparent;padding:4px;
-                       border-radius:6px;cursor:grab;display:inline-flex;
+                       border-radius:6px;cursor:pointer;display:inline-flex;min-width:56px;min-height:56px;
                        align-items:center;justify-content:center;">
                 ${_blockSvg(place, unitSize)}
             </button>
-            <div style="font-size:0.65rem;color:var(--text-dim);">drag</div>
+            <div style="font-size:0.65rem;color:var(--text-dim);">tap to add</div>
         </div>`;
     }
 
@@ -126,13 +126,13 @@ export function renderBase10Build(q, container) {
 
     // Workmat is one big drop zone (children grouped by place visually).
     const matHtml = `<div class="b10-mat" data-role="mat"
-        style="border:3px dashed #888;border-radius:14px;min-height:170px;
-               padding:14px;background:rgba(255,255,255,0.04);
-               display:flex;flex-direction:row;flex-wrap:wrap;gap:18px;
-               align-items:flex-start;justify-content:center;">
-        ${places.map(p => `<div class="b10-zone" data-place="${p}"
-            style="display:flex;flex-direction:column;align-items:center;
-                   min-width:80px;gap:4px;">
+        style="border:2px solid #888;border-radius:0;min-height:170px;
+               padding:0;background:rgba(255,255,255,0.04);
+               display:flex;flex-direction:row;flex-wrap:nowrap;gap:0;
+               align-items:stretch;justify-content:center;">
+        ${places.map((p, i) => `<div class="b10-zone" data-place="${p}"
+            style="display:flex;flex-direction:column;align-items:center;flex:1 1 0;
+                   min-width:80px;gap:4px;padding:10px 8px;${i ? 'border-left:2px solid #888;' : ''}">
             <div class="b10-zone-label" style="font-size:0.75rem;font-weight:800;
                  color:${PLACE_COLOR[p]};text-transform:uppercase;letter-spacing:0.4px;">
                 ${PLACE_LABEL[p]}
@@ -221,6 +221,11 @@ export function renderBase10Build(q, container) {
     function refreshUI() {
         const total = getTotal();
         submit.disabled = total === 0;
+        // A host that grades the build itself (the online worksheet, the quiz) listens here: the
+        // blocks' value is the pupil's answer, so the pupil never retypes the number (RUBRIC H3).
+        if (typeof container._b10OnChange === 'function') {
+            try { container._b10OnChange(total, getCounts()); } catch (e) { /* never breaks the mat */ }
+        }
         // Update regroup buttons enabled state.
         const counts = getCounts();
         const decTen = host.querySelector('.b10-decomp-ten');
@@ -308,13 +313,17 @@ export function renderBase10Build(q, container) {
         const paletteBg = e.target.closest('.b10-palette');
 
         if (paletteBlock) {
+            // Tap-to-add (regrade 2026-09-25: drag-only mats fail touch pupils): the block goes
+            // into its own place's column at once.
             const place = parseInt(paletteBlock.dataset.place, 10);
-            if (_activeHost === host && _activeKind === 'spawn' && _activePlace === place) {
-                clearActive();
-                announce('Selection cleared.');
-            } else {
-                setActiveSpawn(paletteBlock);
-            }
+            const tgtZone = host.querySelector(`.b10-zone[data-place="${place}"]`);
+            clearActive();
+            if (tgtZone) spawnBlockInZone(place, tgtZone);
+            return;
+        }
+
+        if (placedBlock && !(_activeHost === host && _activeKind)) {
+            removeBlock(placedBlock);
             return;
         }
 
@@ -579,6 +588,7 @@ export function renderBase10Build(q, container) {
         catch (err) { console.error('onBase10BuildSubmit failed:', err); }
     });
 
+    if (container.dataset && container.dataset.b10NoSubmit === '1') submit.style.display = 'none';
     refreshUI();
 }
 

@@ -647,3 +647,254 @@ html .mq-scell.mq-mono .mq-kit .ab[data-ws-seg] > input.mq-digit:is(.box-correct
     box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, inset 1px 0 0 0 #000, var(--mq-segr), inset 0 0 0 3px #2E7D5B !important; }
 html .mq-scell.mq-mono .mq-kit .ab[data-ws-seg] > input.mq-digit:is(.box-wrong, [style*="var(--incorrect)"]) {
     box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, inset 1px 0 0 0 #000, var(--mq-segr), inset 0 0 0 3px #B73838 !important; }
+
+/* ============================================================================
+   REGRADE 2026-09-25 — the screen hosts against the critic's re-grade
+   (design/audit/runs/regrade-2026-09-25). Additive: new classes, or legacy
+   classes overridden inside the cell only.
+   ========================================================================= */
+
+/* ---- 1. Focus: ink inside the cell, the chrome colour outside it (SP-2, AX-6).
+   The purple ring used to sit inside the paper cell, 2 px off the slot, and read as a purple
+   answer box. Inside the cell the focused slot now thickens in ink; the chrome ring is drawn
+   around the whole cell, outside its border. */
+.mq-scell input:focus, .mq-scell input:focus-visible,
+.mq-scell select:focus, .mq-scell textarea:focus,
+.online-edition .problem-card.mq-wscard .mq-scell input:focus {
+    outline: 3px solid #000 !important; outline-offset: 1px !important;
+}
+.mq-scell button:focus-visible, .mq-scell [tabindex]:focus-visible,
+.mq-scell .mq-tickrow:focus-visible { outline: 3px solid #000 !important; outline-offset: 2px !important; }
+/* stack digit boxes and cell slots: the box itself thickens (a ring would cross the strip's
+   neighbours) */
+html .mq-scell .mq-kit input.mq-digit:focus, html .mq-scell .mq-kit input.mq-carry:focus,
+html .mq-scell .mq-work-area .mq-work:focus { outline: none !important; }
+html .mq-scell .mq-kit input.mq-digit:focus:not([style*="var(--"]):not(.box-correct):not(.box-wrong) { box-shadow: inset 0 0 0 3px #000 !important; }
+html .mq-scell .mq-kit .ab[data-ws-seg] > input.mq-digit:focus:not([style*="var(--"]):not(.box-correct):not(.box-wrong),
+html .mq-scell .mq-kit .rg[data-ws-seg] > input.mq-carry:focus,
+html .mq-scell .mq-work-area .mq-work:focus { box-shadow: inset 0 0 0 3px #000 !important; }
+.mq-scell [data-mq-cell] > input.mq-cellslot:focus,
+.mq-scell .mq-multchart input.mq-cellslot:focus { outline: 3px solid #000 !important; outline-offset: -4px !important; }
+#gameView #questionCard.mq-card #questionPaper.mq-qpaper:focus-within::before { box-shadow: 0 0 0 3px #5E3FCC; }
+.online-edition .problem-card.mq-wscard .ws-cell.mq-scell:focus-within,
+.qt-question-card .ws-cell.mq-scell:focus-within { box-shadow: 0 0 0 3px #5E3FCC; }
+/* an empty, centred digit slot shows no caret: in a still it reads as a divider ("a two-digit
+   grid for a one-digit answer"). The ink ring says where typing goes. */
+.mq-scell input.mq-digit, .mq-scell input.mq-slot:not(.mq-slot--text),
+.mq-scell input.mq-cellslot, .mq-scell input.gf-cell, .mq-scell input.ib-cell,
+.mq-scell input.mq-work { caret-color: transparent !important; }
+
+/* ---- 2. Kit stack refinements: the operator track holds no answer box; the regroup strip is one
+   strip; place-value heads only when asked. */
+.mq-scell .mq-kit .ws-stack .ab.mq-ab-empty { visibility: hidden; }
+.mq-scell .mq-kit .ws-stack.mq-multi .gap { height: 2px; }
+
+/* ---- 3. Touch targets >= 44 px (48 px digit inputs) on every host, inside the cell. */
+.mq-scell input.ib-cell {
+    height: max(48px, 1.25em) !important; min-width: max(56px, 1.8em) !important;
+    border: 1px solid #000 !important; border-radius: var(--mq-slot-r, 6px) !important;
+    background: #fff !important; color: #000 !important; font-weight: 400 !important;
+    vertical-align: middle !important; margin: 2px 6px !important; padding: 0 4px !important;
+}
+.mq-scell .area-model-input, .mq-scell .area-model-total,
+.mq-scell input.ca-answer-input, .mq-scell input.ca-regroup-input,
+.mq-scell input.fact-family-input, .mq-scell input.number-family-input,
+.mq-scell input.func-table-input { min-height: 48px !important; }
+.mq-scell input.ca-answer-input { min-width: 48px !important; }
+.mq-scell input.ca-regroup-input { min-width: 44px !important; min-height: 44px !important; }
+.mq-scell .colarith-host .ca-cell:has(> input.ca-answer-input),
+.mq-scell .colarith-host .ca-cell.ca-regroup { min-width: 48px; height: auto !important; }
+.mq-scell .colarith-host .ca-cell { min-width: 48px; }
+/* quiz chrome */
+#quizTakeView .qt-nav-btn { min-height: 48px; min-width: 64px; }
+#quizTakeView .qt-q-dot { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+/* the practice card's chrome row: Hint / Read / Skip / Calculator are full targets on every width */
+#gameView #questionCard.mq-card > .mq-qactions > .btn,
+#gameView #questionCard.mq-card > .mq-qactions > button { min-height: 44px !important; min-width: 44px; }
+
+/* ---- 4. The in-cell Check / Submit of a widget moves to the chrome bar (it was clipped to "Che"
+   by the cell's width, and inked black). The chrome Check proxies it (question-render.js). */
+#gameView #questionCard.mq-card #ibSubmitBtn,
+#gameView #questionCard.mq-card #clozeSubmitBtn,
+#gameView #questionCard.mq-card .tfb-submit,
+#gameView #questionCard.mq-card .b10-submit { display: none !important; }
+#gameView #questionCard.mq-card > .mq-qactions > #qcCheckBtn { white-space: nowrap; overflow: visible; }
+
+/* ---- 5. Build mats in the cell: square frames, the two-column chart, ink only. */
+.mq-scell .tfb-cell { border-radius: 0 !important; }
+.mq-scell .tfb-frame { border-radius: 0 !important; }
+.mq-scell .tfb-target, .mq-scell .b10-target { display: none !important; }      /* the instruction states it once */
+.mq-scell .b10-mat { border-radius: 0 !important; }
+.mq-scell .b10-zone-label { font-size: var(--mq-text, 20px) !important; }
+.mq-scell .tfb-toolbar button, .mq-scell .b10-toolbar button, .mq-scell .mq-ring-tools button {
+    min-height: 44px; padding: 0 18px !important; border: 1px solid #000 !important; border-radius: 6px !important;
+    background: #fff !important; color: #000 !important; font-size: calc(var(--mq-text, 20px) * 0.85) !important;
+}
+.mq-scell .b10-palette-block, .mq-scell .tfb-palette-dot { min-width: 48px !important; min-height: 48px !important; }
+
+/* ---- 6. One slot per answer: the boxed slots of a screen twin (wireCellSlots). */
+.mq-scell .mq-cellbox {
+    display: inline-block; box-sizing: border-box; vertical-align: middle;
+    width: calc(var(--mq-w, 2) * 0.62em + 0.9em); min-width: 48px; height: max(48px, 1.3em);
+    border: 1px solid #000; border-radius: var(--mq-slot-r, 6px); background: #fff;
+    margin: 0 0.12em; overflow: hidden;
+}
+.mq-scell .mq-cellbox > input.mq-cellslot {
+    font-size: 1em !important; font-weight: 400 !important; border-radius: var(--mq-slot-r, 6px) !important;
+}
+.mq-scell .mq-eq {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.25em;
+    font-size: var(--mq-digit); line-height: 1.15; margin: 6px auto;
+}
+.mq-scell .mq-eq .o { font-weight: 700; }
+.mq-scell .mq-rlabel { font-weight: 700; padding: 0 0.1em; }
+.mq-scell .mq-ibline {
+    font-size: var(--mq-text); line-height: 1.6; text-align: left; align-self: stretch; margin: 0 0 10px;
+}
+.mq-scell .mq-ibline .mq-cellbox { font-size: calc(var(--mq-digit) * 0.8); height: max(48px, 1.2em); }
+
+/* cloze twin: the equation, then the two lists in ink */
+.mq-scell .mq-cloze { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
+.mq-scell .mq-bankhead { font-size: var(--mq-text); align-self: stretch; text-align: left; }
+.mq-scell .mq-bank {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px; align-self: stretch;
+    border: 1px solid #000; border-radius: var(--mq-slot-r, 6px); padding: 8px 10px;
+}
+.mq-scell .mq-bankname { font-size: calc(var(--mq-text) * 0.85); font-weight: 700; flex: 0 0 100%; text-align: left; }
+.mq-scell .mq-banktile {
+    min-width: 56px !important; min-height: 48px !important; padding: 0 12px !important;
+    font-size: calc(var(--mq-digit) * 0.7) !important; line-height: 1;
+    background: #fff !important; color: #000 !important; border: 1px solid #000 !important; border-radius: var(--mq-slot-r, 6px) !important;
+}
+.mq-scell .mq-banktile[aria-pressed="true"] { box-shadow: inset 0 0 0 3px #000 !important; }
+
+/* grid-fill twin (and the card's widget): ink tiles, boxed blanks, rows that wrap */
+.mq-scell .mq-gridfill { display: flex; flex-direction: column; gap: 8px; align-items: center; width: 100%; }
+.mq-scell .mq-gfrow {
+    display: grid; gap: 6px; justify-content: center;
+    grid-template-columns: repeat(5, minmax(0, calc(var(--mq-digit) * 1.9)));
+    font-size: var(--mq-digit); line-height: 1; width: 100%;
+}
+.mq-scell .mq-gftile {
+    display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+    height: calc(var(--mq-digit) * 1.4); min-height: 48px;
+    border: 1px solid #000; border-radius: var(--mq-slot-r, 6px); background: #fff; color: #000;
+}
+.mq-scell .mq-gftile.mq-gfempty { border: 0; }
+.mq-scell .mq-gftile.mq-gfblank { border: 0; }
+.mq-scell .mq-gftile.mq-gfblank .mq-cellbox { width: 100%; height: 100%; margin: 0; }
+/* the card's live grid-fill widget */
+.mq-scell .gf-label, .mq-scell .gf-question-title { display: none !important; }
+.mq-scell .gf-grid {
+    display: grid !important; width: 100% !important; gap: 6px !important; justify-content: center !important;
+    grid-template-columns: repeat(5, minmax(0, calc(var(--mq-digit) * 1.9))) !important; grid-template-rows: none !important;
+}
+.mq-scell .gf-tile {
+    width: auto !important; max-width: none !important; max-height: none !important; aspect-ratio: auto !important;
+    height: calc(var(--mq-digit) * 1.4) !important; min-height: 48px;
+    font-family: "Andika", sans-serif !important; font-weight: 400 !important; font-size: var(--mq-digit) !important;
+    background: #fff !important; color: #000 !important; box-shadow: none !important;
+    border: 1px solid #000 !important; border-radius: var(--mq-slot-r, 6px) !important;
+}
+.mq-scell .gf-tile-empty { border: 0 !important; }
+.mq-scell input.gf-cell { font-size: 1em !important; min-width: 44px; min-height: 44px; }
+.mq-scell input.gf-cell::placeholder { color: transparent !important; }
+
+/* tap-to-ring grouping: counters are 44 px targets, a full group is ringed */
+.mq-scell .mq-ring { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
+.mq-scell .mq-ring-pool, .mq-scell .mq-ring-rings {
+    display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px; max-width: 560px;
+}
+.mq-scell .mq-ring-rings:empty { display: none; }
+.mq-scell button.mq-ctr {
+    position: relative; width: 44px; height: 44px; min-width: 44px !important; min-height: 44px !important;
+    padding: 0 !important; margin: 0; border: 0 !important; background: transparent !important; cursor: pointer;
+}
+.mq-scell button.mq-ctr::before {
+    content: ""; position: absolute; left: 50%; top: 50%; width: 28px; height: 28px; margin: -14px 0 0 -14px;
+    border-radius: 50%; background: #000;
+}
+.mq-scell button.mq-ctr[aria-pressed="true"]::after {
+    content: ""; position: absolute; inset: 2px; border-radius: 50%; border: 3px solid #000;
+}
+.mq-scell button.mq-ringgroup {
+    display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0;
+    padding: 4px 8px !important; min-height: 52px !important; max-width: 244px;
+    border: 2px solid #000 !important; border-radius: 999px !important; background: #fff !important; cursor: pointer;
+}
+.mq-scell .mq-ringgroup .mq-ctr { pointer-events: none; }
+.mq-scell .mq-ansline { font-size: var(--mq-text); display: flex; align-items: center; justify-content: center; gap: 10px; }
+.mq-scell .mq-anslabel { font-weight: 700; }
+.mq-scell .mq-remeq { margin-top: 4px; }
+
+/* long division: the quotient box and the work rows (VA-62) */
+.mq-scell .mq-work-area { display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 10px auto 0; font-size: calc(var(--mq-digit) * 0.7); }
+.mq-scell .mq-workrow { display: flex; align-items: center; }
+.mq-scell .mq-workrow + .mq-workrest { border-top: 2px solid #000; padding-top: 2px; }
+.mq-scell .mq-workop { width: 1em; text-align: center; font-weight: 700; }
+html .mq-scell .mq-work-area input.mq-work {
+    width: max(44px, 1.05em) !important; height: max(44px, 1.3em) !important; box-sizing: border-box; margin: 0; padding: 0;
+    font-size: 1em !important; text-align: center; border: 0 !important; border-radius: 0 !important;
+    box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, inset 1px 0 0 0 #000 !important; background: #fff !important; color: #000 !important;
+}
+html .mq-scell .mq-work-area input.mq-work:is([data-ws-seg="last"], [data-ws-seg="only"]) { box-shadow: inset 0 0 0 1px #000 !important; }
+html .mq-scell .mq-work-area input.mq-work[data-ws-seg="first"] { border-radius: var(--mq-slot-r) 0 0 var(--mq-slot-r) !important; }
+html .mq-scell .mq-work-area input.mq-work[data-ws-seg="last"] { border-radius: 0 var(--mq-slot-r) var(--mq-slot-r) 0 !important; }
+/* the bracket's tail stays inside the cell */
+.mq-scell .mq-ldiv { margin-bottom: 8px; }
+
+/* ---- 7. A scaled legacy drawing (screen-cell.js fitCellDigits) keeps its own layout box. */
+.mq-scell [data-mq-fit] { transform-origin: top center; }
+
+/* ---- 8. Andika for maths in the worksheet's hint popup; a closed popup is not on the page. */
+.problem-card.mq-wscard > .hint-popup:not(.active) { visibility: hidden; }
+.problem-card.mq-wscard > .hint-popup .hint-visual,
+.problem-card.mq-wscard > .hint-popup .hint-visual * { font-family: "Andika", sans-serif !important; }
+.problem-card.mq-wscard > .hint-popup .hint-close { font-family: "Nunito", system-ui, sans-serif; }
+
+/* ---- 9. The worksheet's number strip and wide drawings take a full row, so their digits can
+   reach 29 px (a 300 px card holds ten tiles at 18 px). */
+.online-edition .problems-grid.mq-wsgrid > .problem-card.mq-wscard.mq-span-row { grid-column: 1 / -1; }
+
+/* ---- 10. Dark theme: the paper stays white, the ink stays black (SP-2) — for the new pieces. */
+.dark .mq-scell .mq-cellbox, .dark .mq-scell .mq-gftile, .dark .mq-scell .mq-bank,
+.dark .mq-scell .mq-banktile, .dark .mq-scell button.mq-ringgroup,
+.dark-theme .mq-scell .mq-cellbox, .dark-theme .mq-scell .mq-gftile { background: #fff; color: #000; }
+.dark .qt-question-card .ws-cell.mq-scell, .dark .qt-question-card .mq-qtpaper,
+.dark .online-edition .problem-card.mq-wscard .mq-wspaper,
+.dark #gameView #questionCard.mq-card #questionPaper > #questionText { background: #fff !important; color: #000 !important; }
+/* an answer slot inside a scaled drawing takes the drawing's own digit size (the scale then
+   brings both to the host's size together) */
+.mq-scell [data-mq-fit] input.mq-slot.mq-slot--invisual:not(.mq-bond input),
+.online-edition .problem-card.mq-wscard .mq-scell [data-mq-fit] input.mq-slot.mq-slot--invisual:not(.mq-bond input),
+.qt-question-card .ws-cell.mq-scell [data-mq-fit] .qt-answer-input.mq-slot.mq-slot--invisual:not(.mq-bond input) {
+    font-size: 1em !important; height: 1.45em !important; min-height: 0 !important;
+    width: calc(var(--mq-n, 2) * 0.62em + 0.9em) !important; min-width: 1.7em !important; vertical-align: middle;
+}
+#gameView #questionCard.mq-card .colarith-submit { display: none !important; }
+.mq-scell .mq-ibline input.ib-cell { font-size: calc(var(--mq-digit) * 0.8) !important; }
+/* a build mat's own prompt repeats the instruction line; its palette captions read at cell size */
+.mq-scell .b10-prompt, .mq-scell .tfb-prompt { display: none !important; }
+.mq-scell .b10-palette-stack > div, .mq-scell .tfb-palette > div { font-size: calc(var(--mq-text, 20px) * 0.7) !important; }
+.mq-scell .b10-zone-stack { min-height: 96px !important; }
+/* number strip: five tiles a row (two rows for ten), so two- and three-digit numbers fit their
+   tiles at the host's digit size on every width */
+.mq-scell .mq-gfrow { font-size: calc(var(--mq-digit) * 0.9); }
+.mq-scell .gf-tile { font-size: calc(var(--mq-digit) * 0.9) !important; }
+/* ring twin: counters in rows of ten (the paper's 5 + 5 rows), the answer row clear of the edge */
+.mq-scell .mq-ring-pool { max-width: 484px; }
+.mq-scell .mq-ring-pool > .mq-ctr:nth-child(5n):not(:nth-child(10n)) { margin-right: 12px; }
+.mq-scell .mq-ring-pool { max-width: 496px; }
+.mq-scell .mq-ring-tools { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.mq-scell .mq-ring-tip { font-size: calc(var(--mq-text, 20px) * 0.8); }
+.mq-scell .mq-ansline { margin: 6px 0 10px; min-height: calc(var(--ws-hw, 58px) + 8px); }
+#gameView #questionCard.mq-card #questionPaper.mq-twin > #visualAid { overflow: visible; }
+.mq-scell .area-model-container > div:first-child { display: none !important; }   /* repeats the instruction line */
+/* the blank of a drawn chart holds the answer input (screen-cell.js adoptSvgBlank) */
+.mq-scell .mq-svgslot { position: relative; display: block; width: fit-content; max-width: 100%; margin: 0 auto; line-height: 0; }
+.mq-scell .mq-svgslot > svg { display: block; }
+html .mq-scell .mq-svgslot > input.mq-slot--svg {
+    box-sizing: border-box; min-width: 0 !important; min-height: 0 !important; max-width: none !important; margin: 0 !important; padding: 0 !important;
+    border: 2px solid #000 !important; border-radius: 0 !important; background: #fff !important;
+    font-size: min(var(--mq-digit), 100%) !important; line-height: 1; text-align: center;
+}

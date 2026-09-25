@@ -9,6 +9,8 @@ import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
+    screenTwin, mountBuild, wireRingGroups, wireClozeBanks, slotAnswerMatches, slotsFilled,
+    fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank,
 } from './screen-cell.js';
 
 // Build a static (non-interactive) visual for a grid-fill question so that
@@ -868,6 +870,24 @@ function _wsTidyLegacyCell(cellEl) {
     });
 }
 
+// RUBRIC C3: the online worksheet's digits are 29 px. A legacy drawing sized for paper is scaled
+// up as a whole (screen-cell.js fitCellDigits); one that cannot reach 29 px in a grid column takes
+// a full row of the grid and is fitted again.
+function _wsFitDigits(card, cellEl, q) {
+    if (!canFitDigits(q)) return;
+    const kids = Array.from(cellEl.children).filter(c => !c.classList.contains('mq-answerrow') && !c.hasAttribute('data-mq-screen-only') && !c.classList.contains('mq-sr'));
+    if (kids.length !== 1) return;
+    const root = kids[0];
+    const cs = getComputedStyle(cellEl);
+    const avail = cellEl.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+    fitCellDigits(root, cellDigitTarget(cellEl), { avail });
+    if (root.dataset.mqFitShort === '1' && !card.classList.contains('mq-span-row')) {
+        card.classList.add('mq-span-row');
+        const w = cellEl.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+        fitCellDigits(root, cellDigitTarget(cellEl), { avail: w });
+    }
+}
+
 // Render ONE worksheet card. Shared by the first render and "Load More", which used to carry two
 // copies of this block (SKILL_CELL_CONTRACT.md 8.1): they had drifted, so both now call this.
 function _wsRenderCard(grid, q, i) {
@@ -1068,6 +1088,11 @@ function _wsRenderCard(grid, q, i) {
         // The quotient / fact answer is one typed slot, not column digit boxes.
         isVerticalFormat = false;
         isFactsColumn = false;
+    } else if (kind) {
+        // A kit stack answers through its digit boxes (a multi-row sum included), whatever the
+        // legacy visual was: the column checker reads them.
+        isVerticalFormat = true;
+        isFactsColumn = false;
     }
 
     // Add appropriate card size class based on problem type
@@ -1252,6 +1277,17 @@ function _wsRenderCard(grid, q, i) {
         questionDisplay = `<div class="question-line">${q.text}</div>`;
     }
 
+    // The paper cell's screen twin (regrade 2026-09-25): a build mat, a cloze's boxes and lists,
+    // a strip's boxed blanks, a sentence's boxes, counters to ring - the model the pupil works in,
+    // never a retyped number or one line for two answers.
+    const twin = (!kind && !isMultipleChoice && !isMultiSelectCheck && !isDndGeneric && !isDragFill) ? screenTwin(q) : null;
+    if (twin) {
+        questionDisplay = twin.html;
+        q._mqTwin = twin.mode;
+        q._mqSlots = twin.count || 0;
+        if (twin.wide) card.classList.add('mq-span-row');
+    }
+
     // For vertical format, function tables, interactive types, dual answer, coordinate types, and number families - hide the main answer input
     const answerInputStyle = (isVerticalFormat || isFunctionTable || isInteractiveOrdering || isInteractiveExpanded || isTchartDrag || isDualAnswer || isCoordinateMulti || isCoordInput || isDivisibilitySort || isNumberFamily || isMultipleChoice || isMultiSelectCheck || isClockSet || isDndGeneric || isDragFill) ? 'style="display:none;"' : '';
 
@@ -1267,11 +1303,11 @@ function _wsRenderCard(grid, q, i) {
         if (kind.kind === 'stack') {
             questionDisplay = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill), idPrefix: `ws${i}` });
         } else {
-            questionDisplay = kindHTML(kind, { slotHtml: inputHtml });
+            questionDisplay = kindHTML(kind, { slotHtml: inputHtml }) + (kind.kind === 'division' ? workRowsHTML(kind) : '');
             slotInCell = true;
         }
     }
-    const instrLine = kind ? instructionForKind(kind) : '';
+    const instrLine = kind ? instructionForKind(kind) : twin ? screenInstruction(twin.instr) : '';
     const answerRow = (!slotInCell && !answerInputStyle) ? `<div class="mq-answerrow">${inputHtml}</div>` : '';
     const parkedInput = (!slotInCell && answerInputStyle) ? inputHtml : '';
 
@@ -1345,16 +1381,30 @@ function _wsRenderCard(grid, q, i) {
             const row = cellEl.querySelector(':scope > .mq-answerrow');
             const inp = row && row.querySelector(`#ws_input_${i}`);
             if (inp && adoptVisualBlank(cellEl, inp)) row.remove();
+            else if (inp && (q.answerType === 'number' || !q.answerType) && adoptSvgBlank(cellEl, inp)) row.remove();
             // several blanks in one drawing: an input in each, feeding the (hidden) card input
             else if (inp && wireCellSlots(cellEl, inp)) row.style.display = 'none';
         }
         wireStackEntry(cellEl);
+        if (twin) {
+            const inp = document.getElementById(`ws_input_${i}`);
+            wireRingGroups(cellEl);
+            wireClozeBanks(cellEl);
+            if (twin.mode === 'build' && inp) {
+                const row = cellEl.querySelector(':scope > .mq-answerrow');
+                if (row) row.style.display = 'none';
+                // a build is graded when it is right, or by Check all - never marked wrong while
+                // the pupil is still adding blocks
+                inp.dataset.mqDefer = '1';
+                mountBuild(cellEl, q, inp);
+            }
+        }
         monoCell(cellEl, {
             // a widget mounting late may print the question line again
             afterInk: (el) => {
                 const line = el.parentNode && el.parentNode.querySelector(':scope > .question-line.mq-instr');
-                if (!line) return;
-                Array.from(el.children).forEach(c => hideRepeatedPrompt(c, line.textContent));
+                if (line) Array.from(el.children).forEach(c => hideRepeatedPrompt(c, line.textContent));
+                if (!kind && !twin) _wsFitDigits(card, el, q);
             },
         });
     }
@@ -2050,6 +2100,19 @@ export function checkWorksheetAnswer(idx) {
     }
 
     const value = input.value.trim();
+    // A multi-slot twin (a cloze, a strip, q R r, a sentence's boxes) is checked once every box
+    // is filled; a build is marked when it is right and left neutral while the pupil builds.
+    const slotVerdict = value && q && q._mqSlots ? (slotsFilled(value, q._mqSlots) ? slotAnswerMatches(value, q) : 'wait') : null;
+    const deferVerdict = value && input.dataset.mqDefer === '1'
+        ? (normalizeText(value) === normalizeText(q.ans) ? true : 'wait') : null;
+    if (slotVerdict === 'wait' || deferVerdict === 'wait') {
+        input.style.borderColor = "";
+        card.style.background = "var(--bg-card)";
+        card.style.border = "";
+        card.style.boxShadow = "";
+        worksheetConfettiTriggered.delete(idx);
+        return;
+    }
     if (value === "") {
         // Reset to default if empty — allows retry after wrong
         input.style.borderColor = "transparent";
@@ -2081,7 +2144,11 @@ export function checkWorksheetAnswer(idx) {
     // Strip commas from user input before comparing
     const cleanedValue = value.replace(/,/g, "");
     let isCorrect;
-    if (isNumeric) {
+    if (typeof slotVerdict === 'boolean') {
+        isCorrect = slotVerdict;
+    } else if (deferVerdict === true) {
+        isCorrect = true;
+    } else if (isNumeric) {
         isCorrect = Number(cleanedValue) === Number(q.ans);
     } else if (isTimeSkill(state.skill)) {
         isCorrect = timeAnswersMatch(value, q.ans, state.skill);
@@ -2521,7 +2588,10 @@ export function checkAllWorksheet() {
             value = input.value;
             // Strip commas from user input before comparing
             const cleanedValue = value.replace(/,/g, "");
-            if (q.answerType === "number" || typeof q.ans === "number") {
+            const slotVerdictAll = q._mqSlots ? slotAnswerMatches(value, q) : null;
+            if (typeof slotVerdictAll === 'boolean') {
+                isCorrect = slotVerdictAll;
+            } else if (q.answerType === "number" || typeof q.ans === "number") {
                 isCorrect = Number(cleanedValue) === Number(q.ans);
             } else if (isTimeSkill(state.skill)) {
                 isCorrect = timeAnswersMatch(value, q.ans, state.skill);

@@ -23,9 +23,10 @@
 //   4. Small shared pieces: the instruction line with the print->screen verb swap (P-LG,
 //      PEDAGOGY 10.2), the true operator glyphs (TY-6), and right-to-left digit entry (SP-20).
 //
-// Layer: 4 (imports only the pure sheet kit). No window writes; no state import.
+// Layer: 4 (imports only the pure sheet kit; the build twins load their widget on demand).
+// No window writes; no state import.
 
-import { stack, opGlyph, toScreenInstruction } from './sheet/index.js';
+import { opGlyph, toScreenInstruction } from './sheet/index.js';
 
 export const INK = '#000000';
 export const PAPER = '#ffffff';
@@ -87,6 +88,8 @@ export function binaryParts(q) {
  *   division  US bracket division, quotient slot above the vinculum (VA-60, VA-61)
  */
 export function cellKindFor(q) {
+    const multi = multiAddParts(q);
+    if (multi) return multi;
     const p = binaryParts(q);
     if (!p) return null;
     const v = String(q.visual || '');
@@ -99,7 +102,9 @@ export function cellKindFor(q) {
         if (p.op === '*' && B.length > 1) return null;                         // partial products: legacy
         const T = Math.max(A.length, B.length) + 1;                          // VA-1
         if (ANS.length > T) return null;
-        return { kind: 'stack', T, ...p };
+        // The generator says whether the item regroups; a plain fact gets no regroup row (the
+        // paper prints none), so the screen does not add one either.
+        return { kind: 'stack', T, ...p, ...(q.regroup === false ? { regroup: false } : {}) };
     }
     if (v.includes('facts-column-visual')) {
         if (A.length <= 2 && B.length <= 2 && ANS.length <= 3) return { kind: 'fact', ...p };
@@ -107,6 +112,35 @@ export function cellKindFor(q) {
     }
     if (!v.trim()) return { kind: 'eq', ...p };
     return null;
+}
+
+/**
+ * Three or four numbers added in columns ("24 + 66 + 92 + 57 = ?", add_column_multi). The paper
+ * draws them stacked; so does the screen (SP-1): every operand in its own row, the operator on the
+ * last row, a regroup strip above and an answer strip sized to the sum's band. Recognised only when
+ * the item is a column item (its print format, or a stacked visual), never a plain chain.
+ */
+export function multiAddParts(q) {
+    if (!q || typeof q !== 'object') return null;
+    if (Array.isArray(q.options) && q.options.length > 0) return null;
+    if (q.answerType && q.answerType !== 'number') return null;
+    const t = plainText(q.text);
+    const m = t.match(/^(\d{1,6}(?:\s*\+\s*\d{1,6}){2,4})\s*=\s*(?:\?|_+)?\s*$/);
+    if (!m) return null;
+    const v = String(q.visual || '');
+    const column = q.printFormat === 'column-add-multi' || q.notation === 'stacked'
+        || /data-ws-seg|column|ws-stack/i.test(v);
+    if (!column) return null;
+    const operands = m[1].split('+').map((x) => Number(x.trim()));
+    if (operands.some((n) => !Number.isFinite(n))) return null;
+    const sum = operands.reduce((a, b) => a + b, 0);
+    const ans = Number(String(q.ans).replace(/,/g, ''));
+    if (ans !== sum) return null;
+    const d = Math.max(...operands.map((n) => String(n).length));
+    // The answer strip covers every digit track plus one (the sum of 2+ d-digit numbers can have
+    // d + 1 digits), never the operator track: the same strip on every item of the band.
+    const strip = Math.max(d + 1, String(sum).length);
+    return { kind: 'stack', op: '+', operands, a: operands[0], b: operands[operands.length - 1], ans: sum, T: strip + 1, strip };
 }
 
 /** The print instruction of a rebuilt item: one verb (PEDAGOGY 10.1). */
@@ -174,40 +208,76 @@ export function factHTML(k, slotHtml) {
 }
 
 /**
- * Column arithmetic (VA-1..VA-13) with the kit's own `stack()` builder: H T O heads, a regroup
- * row, the sum rule and ONE digit input under EVERY track, including the operator track, so the
- * layout never reveals the answer's length (VA-4, SP-34).
+ * Column arithmetic (VA-1..VA-13) in the kit's `.ws-stack` grid: the operands in their tracks, the
+ * operator on the bottom row (VA-2), the sum rule, an optional regroup strip, and a digit strip of
+ * inputs under the digit tracks.
  *
- * The answer inputs carry `column-answer-input` (SCC-S7): the three existing checkers — the live
- * per-box validation, the submit harvest and the worksheet checker — read them by that class, in
+ * Screen parity with the page the pupil also gets on paper (RUBRIC, regrade 2026-09-25): the
+ * operator track holds no answer box (a box under "+" reads as "write a leading 0"), the strip is
+ * sized to the answer's band - the digit tracks, plus one more only for a multi-row sum or an item
+ * whose answer really is longer - and a plain fact gets neither place-value heads nor regroup boxes
+ * when the paper prints none (`k.regroup === false`).
+ *
+ * The answer inputs carry `column-answer-input` (SCC-S7): the three existing checkers - the live
+ * per-box validation, the submit harvest and the worksheet checker - read them by that class, in
  * DOM order, left to right. They also carry `data-_col-adv-attached="1"` so the old left-to-right
  * auto-advance skips them; `wireStackEntry()` gives them the right-to-left entry of SP-20.
  * Regroup boxes are scratch space: `column-carry-input`, never graded, never auto-focused (SCC-S9).
  */
-export function stackHTML(k, { idPrefix = '', regroup = true, answerClass = 'column-answer-input' } = {}) {
-    const T = k.T || Math.max(String(k.a).length, String(k.b).length) + 1;
-    const slots = [];
-    for (let i = 0; i < T; i++) {
-        const place = PLACES[T - 1 - i] || `place ${T - i}`;
-        slots.push(`<input type="text" class="${answerClass} mq-digit" data-slot="ans-${T - 1 - i}" data-ws-slot="ans-${T - 1 - i}" data-ws-shape="box"`
-            + ` inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" spellcheck="false"`
-            + ` aria-label="answer, ${place} digit" data-_col-adv-attached="1"${idPrefix ? ` data-mq-stack="${attr(idPrefix)}"` : ''}>`);
+export function stackHTML(k, { idPrefix = '', regroup = true, answerClass = 'column-answer-input', heads = false } = {}) {
+    const operands = (Array.isArray(k.operands) && k.operands.length >= 2 ? k.operands : [k.a, k.b]).map(String);
+    const d = Math.max(...operands.map((x) => x.length));
+    const ansLen = String(k.ans != null ? k.ans : '').length;
+    // strip: the digit tracks under which the pupil writes (never the operator track)
+    const strip = k.strip || Math.max(d, ansLen);
+    const T = Math.max(k.T || 0, strip + 1, d + 1);
+    const seg = (i, n) => (n <= 1 ? 'only' : i === 0 ? 'first' : i === n - 1 ? 'last' : 'mid');
+    const tracks = (str) => [...String(str).padStart(T, ' ')];
+    const cells = [];
+    if (heads && T >= 3) {
+        for (let i = 0; i < T; i++) cells.push(`<span class="head">${i === 0 ? '' : ['O', 'T', 'H', 'Th', 'TTh', 'HTh'][T - 1 - i] || ''}</span>`);
+        cells.push('<span class="headcap"></span>');
     }
-    let rg = !regroup ? false : (k.op === '-' ? 'sub' : 'add');
-    // A regroup row needs a box to hold: an addition / 1-digit multiply of one-digit numbers has
-    // no column but the ones, and a one-digit top number has nothing to regroup from.
-    if (rg === 'add' && T < 3) rg = false;
-    if (rg === 'sub' && String(k.a).length < 2) rg = false;
-    // Place-value heads (VA-30) label columns; a one-column sum has only the ones to name.
-    const heads = T >= 3;
-    const regroupSlots = rg ? Array.from({ length: T }, (_, i) => {
-        const place = PLACES[T - 1 - i] || '';
-        return `<input type="text" class="column-carry-input mq-carry" data-ws-slot="regroup-${T - 1 - i}" data-ws-graded="0"`
-            + ` inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" tabindex="-1"`
-            + ` aria-label="regroup, ${place}" data-_col-adv-attached="1" data-_box-val-attached="1">`;
-    }) : null;
-    const inner = stack(k.a, k.b, k.op, { T, heads, regroup: rg, answer: 'slots', slots, regroupSlots });
-    return `<div class="ws-sheet mq-kit" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">${inner}</div>`;
+    // Regroup strip (VA-10): above every column except the ones for an addition (and never the
+    // operator track); above the top number's digits for a subtraction (VA-22). Absent when the
+    // item does not regroup, or has only a ones column.
+    let rg = !regroup || k.regroup === false ? false : (k.op === '-' ? 'sub' : 'add');
+    if (rg === 'add' && strip < 2) rg = false;
+    if (rg === 'sub' && operands[0].length < 2) rg = false;
+    if (rg) {
+        const all = Array.from({ length: T }, (_, i) => i);
+        const on = rg === 'add'
+            ? all.filter((i) => i > T - 1 - strip && i < T - 1)
+            : all.filter((i) => i > T - 1 - operands[0].length);
+        for (let i = 0; i < T; i++) {
+            const at = on.indexOf(i);
+            if (at < 0) { cells.push('<span class="rg"></span>'); continue; }
+            const place = PLACES[T - 1 - i] || '';
+            cells.push(`<span class="rg" data-ws-seg="${seg(at, on.length)}"><input type="text" class="column-carry-input mq-carry" data-ws-slot="regroup-${T - 1 - i}" data-ws-graded="0"`
+                + ` inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" tabindex="-1"`
+                + ` aria-label="regroup, ${place}" data-_col-adv-attached="1" data-_box-val-attached="1"></span>`);
+        }
+    }
+    operands.forEach((num, r) => {
+        const last = r === operands.length - 1;
+        tracks(num).forEach((ch, i) => {
+            if (i === 0 && last) cells.push(`<span class="op">${opGlyph(k.op)}</span>`);
+            else cells.push(`<span>${ch === ' ' ? '' : ch}</span>`);
+        });
+        if (!last) cells.push('<span class="gap"></span>');
+    });
+    cells.push('<span class="rule"></span>');
+    for (let i = 0; i < T; i++) {
+        const at = i - (T - strip);
+        if (at < 0) { cells.push('<span class="ab mq-ab-empty"></span>'); continue; }
+        const place = PLACES[T - 1 - i] || `place ${T - i}`;
+        cells.push(`<span class="ab" data-ws-seg="${seg(at, strip)}"><input type="text" class="${answerClass} mq-digit" data-slot="ans-${T - 1 - i}" data-ws-slot="ans-${T - 1 - i}" data-ws-shape="box"`
+            + ` inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" spellcheck="false"`
+            + ` aria-label="answer, ${place} digit" data-_col-adv-attached="1"${idPrefix ? ` data-mq-stack="${attr(idPrefix)}"` : ''}></span>`);
+    }
+    const label = operands.join(` ${spokenOp(k.op)} `);
+    return `<div class="ws-sheet mq-kit" role="group" aria-label="${attr(label)}">`
+        + `<div class="ws-stack${rg ? ' wide' : ''}${operands.length > 2 ? ' mq-multi' : ''}" style="--t:${T}" data-ws-slot="answer" data-ws-shape="open">${cells.join('')}</div></div>`;
 }
 
 /**
@@ -390,7 +460,9 @@ export function adoptVisualBlank(cellEl, input) {
     const blanks = cellEl.querySelectorAll('[data-mq-blank]');
     if (blanks.length !== 1) return false;
     const blank = blanks[0];
-    const box = blank.getAttribute('data-mq-blank') === 'box';
+    // A K-2 picture cell answers in a box on paper ("5 − 2 = [ ]", the sheet's equation
+    // template), whatever the legacy drawing's blank was: the screen matches the page.
+    const box = blank.getAttribute('data-mq-blank') === 'box' || !!blank.closest('.k2-cell');
     input.classList.add('mq-slot', 'mq-slot--invisual');
     input.classList.toggle('mq-slot--box', box);
     if (box) {
@@ -432,8 +504,8 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         el.setAttribute('inputmode', 'numeric');
         el.setAttribute('autocomplete', 'off');
         el.setAttribute('spellcheck', 'false');
-        el.setAttribute('maxlength', '4');
-        el.setAttribute('aria-label', `answer ${k + 1} of ${slots.length}`);
+        el.setAttribute('maxlength', String(Math.max(2, Number(slot.getAttribute('data-mq-w')) || 4)));
+        el.setAttribute('aria-label', slot.getAttribute('data-mq-label') || `answer ${k + 1} of ${slots.length}`);
         if (saved[k]) el.value = saved[k];
         slot.textContent = '';
         slot.appendChild(el);
@@ -464,7 +536,7 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
 /** Undo adoptVisualBlank on an input that outlives its cell (the practice card's #answerInput). */
 export function releaseVisualBlank(input) {
     if (!input || !input.classList.contains('mq-slot--invisual')) return;
-    input.classList.remove('mq-slot--invisual');
+    input.classList.remove('mq-slot--invisual', 'mq-slot--svg');
     if (input.dataset.mqPrevStyle !== undefined) {
         input.setAttribute('style', input.dataset.mqPrevStyle);
         delete input.dataset.mqPrevStyle;
@@ -509,7 +581,9 @@ const _normText = (s) => plainText(s).toLowerCase().replace(/[^a-z0-9]+/g, ' ').
 export function hideRepeatedPrompt(visualEl, text) {
     if (!visualEl) return false;
     const want = _normText(text);
-    if (!want || want.length < 6) return false;
+    // A sentence, not a bare number row: "52 + 63 + 49" normalises to the digits a column stack
+    // also holds, and hiding the stack as a "repeat" would empty the cell.
+    if (!want || want.length < 6 || !/[a-z]{3,}/.test(want)) return false;
     let found = false;
     visualEl.querySelectorAll('div, p, span, h1, h2, h3, h4, label, legend').forEach((el) => {
         if (el.closest('[data-mq-screen-only]') && !el.hasAttribute('data-mq-screen-only')) return;
@@ -532,7 +606,9 @@ export function visualRepeatsText(visualEl, text) {
     if (!visualEl) return false;
     const norm = (s) => plainText(s).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
     const want = norm(text);
-    if (!want || want.length < 6) return false;
+    // A sentence, not a bare number row: "52 + 63 + 49" normalises to the digits a column stack
+    // also holds, and hiding the stack as a "repeat" would empty the cell.
+    if (!want || want.length < 6 || !/[a-z]{3,}/.test(want)) return false;
     const have = norm(visualEl.textContent || '');
     return have.includes(want);
 }
@@ -774,4 +850,452 @@ const OBS_OPTS = { subtree: true, childList: true, attributes: true, attributeFi
 export function unmonoCell(root) {
     const obs = root && OBSERVERS.get(root);
     if (obs) { obs.disconnect(); OBSERVERS.delete(root); }
+}
+
+/* ================================================================== screen twins (regrade 2026-09-25)
+ *
+ * The critic's re-grade of 2026-09-25 (design/audit/runs/regrade-2026-09-25) found hosts that lose
+ * the paper's response model: a build item retyped as a number, a two-addend cloze with one
+ * answer line, a q R r answer in one text box, a strip that never renders in the quiz. Each helper
+ * below draws the paper cell's screen twin from fields the question already carries (or can be
+ * read from its text, for a quiz saved before those fields travelled), with `data-mq-cell` /
+ * `data-mq-blank` slots, so the existing slot wiring (wireCellSlots / adoptVisualBlank) and the
+ * hosts' own checkers keep working. Kit templates that emit the same markers need nothing here.
+ */
+
+const _n = (v) => { const x = Number(String(v == null ? '' : v).replace(/,/g, '')); return Number.isFinite(x) ? x : null; };
+
+/** One boxed answer slot for wireCellSlots: `w` is the digit capacity (SL-2: the section's width). */
+export function cellSlot(w = 2, label = '') {
+    const n = Math.max(1, Math.min(8, w | 0));
+    return `<span class="mq-cellbox" data-mq-cell data-mq-w="${n}" style="--mq-w:${n}"${label ? ` data-mq-label="${attr(label)}"` : ''}></span>`;
+}
+
+/** "This array shows ___ rows of ___." -> the sentence with one boxed slot per blank (SL-7). */
+export function inlineBlanksHTML(text, widths) {
+    let i = 0;
+    const html = esc(plainText(text)).replace(/_{3,}/g, () => {
+        const w = widths && widths[i] ? Math.max(1, Math.min(4, widths[i] - 1)) : 3;
+        i++;
+        return cellSlot(w);
+    });
+    return i ? `<div class="mq-ibline">${html}</div>` : '';
+}
+
+/**
+ * The inline-cloze twin (cloze_addition): `[ ] + [ ] = 6` with one box per addend, then the
+ * two number lists in ink, as on paper ("Choose one number from each list."). A tap on a list
+ * number writes it into that list's box; the box can also be typed into.
+ */
+export function clozeHTML(q) {
+    const opts = Array.isArray(q && q.clozeOptions) ? q.clozeOptions : [];
+    let i = 0;
+    const w = Math.max(1, ...opts.flat().map((v) => String(v).length));
+    const eq = esc(plainText(q && q.text)).replace(/\s([+\-−×÷=])\s/g, ' <span class="o">$1</span> ')
+        .replace(/_{3,}/g, () => cellSlot(w, `addend ${++i}`));
+    if (!i) return '';
+    const names = ['First number', 'Second number', 'Third number', 'Fourth number'];
+    const banks = opts.length
+        ? `<div class="mq-bankhead">${esc(toScreenInstruction('Choose one number from each list.'))}</div>`
+          + opts.map((list, k) => `<div class="mq-bank" data-mq-bank="${k}" role="group" aria-label="${attr(names[k] || `List ${k + 1}`)}">`
+            + `<span class="mq-bankname">${esc(names[k] || `List ${k + 1}`)}</span>`
+            + (list || []).map((v) => `<button type="button" class="mq-banktile" data-mq-bank-for="${k}" data-v="${attr(v)}">${esc(v)}</button>`).join('')
+            + '</div>').join('')
+        : '';
+    return `<div class="mq-cloze" data-mq-join=", "><div class="ws-eq mq-eq mq-clozeeq">${eq}</div>${banks}</div>`;
+}
+
+/** Wire the list tiles of a cloze twin to its boxes (after wireCellSlots made them inputs). */
+export function wireClozeBanks(root) {
+    if (!root) return;
+    root.querySelectorAll('.mq-cloze').forEach((cz) => {
+        const boxes = Array.from(cz.querySelectorAll('input.mq-cellslot, input.cloze-cell'));
+        cz.querySelectorAll('.mq-banktile').forEach((btn) => {
+            if (btn.dataset.mqWired === '1') return;
+            btn.dataset.mqWired = '1';
+            btn.addEventListener('click', () => {
+                const box = boxes[Number(btn.dataset.mqBankFor)];
+                if (!box || box.disabled) return;
+                box.value = btn.dataset.v;
+                cz.querySelectorAll(`.mq-banktile[data-mq-bank-for="${btn.dataset.mqBankFor}"]`)
+                    .forEach((b) => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
+                box.dispatchEvent(new Event('input', { bubbles: true }));
+                box.dispatchEvent(new Event('change', { bubbles: true }));
+                const next = boxes.find((b) => !b.value);
+                if (next) { try { next.focus({ preventScroll: true }); } catch (e) { /* ignore */ } }
+            });
+        });
+    });
+}
+
+/**
+ * The number strip of a grid-fill item (number_seq_fill, count_by_*): given tiles in ink, one
+ * boxed slot per missing number, wrapping to a second row on a phone instead of crushing the
+ * tiles. No range caption: "Numbers 64-73" states the first and last answers (regrade C2).
+ */
+export function gridFillHTML(q) {
+    const gf = q && q.gridFill;
+    if (!gf || !Array.isArray(gf.cells) || !gf.rows || !gf.cols) return '';
+    const by = new Map(gf.cells.map((c) => [`${c.row},${c.col}`, c]));
+    const w = Math.max(2, ...gf.cells.map((c) => String(c.value).length));
+    let rows = '';
+    for (let r = 0; r < gf.rows; r++) {
+        let tiles = '';
+        for (let c = 0; c < gf.cols; c++) {
+            const cell = by.get(`${r},${c}`);
+            if (!cell) tiles += '<span class="mq-gftile mq-gfempty"></span>';
+            else if (cell.blank) tiles += `<span class="mq-gftile mq-gfblank">${cellSlot(w, `row ${r + 1}, number ${c + 1}`)}</span>`;
+            else tiles += `<span class="mq-gftile">${esc(cell.value)}</span>`;
+        }
+        rows += `<div class="mq-gfrow" style="--mq-gfcols:${gf.cols}">${tiles}</div>`;
+    }
+    return `<div class="mq-gridfill" data-mq-join=", ">${rows}</div>`;
+}
+
+/**
+ * Tap-to-ring grouping (share_into_groups, div_remainders): the counters are tap targets; each
+ * tap puts a counter into the group being made, and a full group of `size` is ringed and moved
+ * into the row of rings. A tap on a ring opens it again. The pupil counts the rings (and the
+ * counters left over) and writes the answer in the slot, as on paper.
+ */
+export function ringGroupsHTML(total, size) {
+    const t = Math.max(0, Math.min(60, total | 0));
+    const ctr = Array.from({ length: t }, (_, i) => `<button type="button" class="mq-ctr" aria-label="counter ${i + 1}" aria-pressed="false"></button>`).join('');
+    return `<div class="mq-ring" data-mq-ring data-size="${size | 0}">`
+        + `<div class="mq-ring-pool" role="group" aria-label="counters">${ctr}</div>`
+        + '<div class="mq-ring-rings" role="group" aria-label="groups"></div>'
+        + '<div class="mq-ring-tools"><span class="mq-ring-tip">Tap counters to ring a group.</span><button type="button" class="mq-ring-reset">Start again</button></div>'
+        + '</div>';
+}
+
+export function wireRingGroups(root) {
+    if (!root) return;
+    root.querySelectorAll('[data-mq-ring]').forEach((ring) => {
+        if (ring.dataset.mqWired === '1') return;
+        ring.dataset.mqWired = '1';
+        const size = Math.max(1, Number(ring.dataset.size) || 1);
+        const pool = ring.querySelector('.mq-ring-pool');
+        const rings = ring.querySelector('.mq-ring-rings');
+        const picked = () => Array.from(pool.querySelectorAll('.mq-ctr[aria-pressed="true"]'));
+        const makeRing = (ctrs) => {
+            const g = document.createElement('button');
+            g.type = 'button';
+            g.className = 'mq-ringgroup';
+            g.setAttribute('aria-label', `a group of ${ctrs.length}. Tap to open it.`);
+            ctrs.forEach((c) => { c.setAttribute('aria-pressed', 'false'); c.tabIndex = -1; g.appendChild(c); });
+            rings.appendChild(g);
+        };
+        const open = (g) => {
+            Array.from(g.querySelectorAll('.mq-ctr')).forEach((c) => { c.tabIndex = 0; pool.appendChild(c); });
+            g.remove();
+        };
+        ring.addEventListener('click', (e) => {
+            const g = e.target.closest('.mq-ringgroup');
+            if (g && ring.contains(g)) { open(g); return; }
+            const c = e.target.closest('.mq-ctr');
+            if (c && pool.contains(c)) {
+                c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+                const p = picked();
+                if (p.length >= size) makeRing(p.slice(0, size));
+                return;
+            }
+            if (e.target.closest('.mq-ring-reset')) {
+                Array.from(rings.querySelectorAll('.mq-ringgroup')).forEach(open);
+                picked().forEach((x) => x.setAttribute('aria-pressed', 'false'));
+            }
+        });
+    });
+}
+
+/**
+ * Counters + sizes of a grouping item, read from the fields or the text the pupil reads:
+ * "There are 20 counters. Make groups of 4." / "27 ÷ 7 = ?" with a "q R r" answer.
+ */
+export function ringParts(q) {
+    if (!q) return null;
+    const t = plainText(q.text);
+    const ans = String(q.ans == null ? '' : q.ans);
+    const rem = ans.match(/^\s*(\d+)\s*R\s*(\d+)\s*$/i);
+    if (rem || q.quotientRemainder || q.printFormat === 'div-remainders') {
+        const m = t.match(/(\d+)\s*[÷/]\s*(\d+)/);
+        const a = _n(q.a) != null && q.printFormat === 'div-remainders' ? _n(q.a) : m && _n(m[1]);
+        const b = _n(q.b) != null && q.printFormat === 'div-remainders' ? _n(q.b) : m && _n(m[2]);
+        if (a == null || !b || !rem) return null;
+        if (Math.floor(a / b) !== Number(rem[1]) || a % b !== Number(rem[2])) return null;
+        return { kind: 'remainder', a, b, q: Number(rem[1]), r: Number(rem[2]) };
+    }
+    const g = t.match(/(\d+)\s+counters?\b.*?\bgroups?\s+of\s+(\d+)/i);
+    if ((q.printFormat === 'share-into-groups' || g) && g) {
+        const a = _n(g[1]), b = _n(g[2]);
+        if (!a || !b || a % b !== 0 || _n(ans) !== a / b || a > 60) return null;
+        return { kind: 'groups', a, b };
+    }
+    return null;
+}
+
+/** The cell body of a grouping twin: counters to ring, then the paper's answer slot(s). */
+export function ringCellHTML(p) {
+    if (!p) return '';
+    if (p.kind === 'remainder') {
+        const w = Math.max(String(p.q).length, String(p.r).length, 2);
+        return (p.a <= 60 ? ringGroupsHTML(p.a, p.b) : '')
+            + `<div class="ws-eq mq-eq mq-remeq" data-mq-join=" R " role="group" aria-label="${attr(`${p.a} divided by ${p.b}`)}">`
+            + `<span>${p.a}</span><span class="o">÷</span><span>${p.b}</span><span class="o">=</span>`
+            + `${cellSlot(w, 'quotient')}<span class="mq-rlabel">R</span>${cellSlot(w, 'remainder')}</div>`;
+    }
+    return ringGroupsHTML(p.a, p.b)
+        + '<div class="mq-ansline"><span class="mq-anslabel">Answer:</span> <span data-mq-blank="box"></span></div>';
+}
+
+/**
+ * Long division work rows (VA-62, the paper's "−" strips): under the bracket, one subtract row
+ * per quotient digit, each a strip as wide as the dividend. Scratch space: never graded, never
+ * auto-focused, skipped by the checkers (they read the quotient slot only).
+ */
+export function workRowsHTML(k) {
+    if (!k || k.kind !== 'division') return '';
+    const n = String(k.a).length;
+    const steps = Math.max(1, Math.min(4, String(Math.floor(k.a / k.b)).length));
+    const strip = (label) => `<div class="mq-workrow" role="group" aria-label="${attr(label)}"><span class="mq-workop">−</span>`
+        + Array.from({ length: n }, (_, i) => `<input type="text" class="mq-work" inputmode="numeric" maxlength="1" autocomplete="off" tabindex="-1" data-ws-graded="0" data-_box-val-attached="1" data-_col-adv-attached="1" aria-label="${attr(`${label}, digit ${i + 1}`)}" data-ws-seg="${n <= 1 ? 'only' : i === 0 ? 'first' : i === n - 1 ? 'last' : 'mid'}">`).join('')
+        + '</div>'
+        + `<div class="mq-workrow mq-workrest"><span class="mq-workop"></span>`
+        + Array.from({ length: n }, (_, i) => `<input type="text" class="mq-work" inputmode="numeric" maxlength="1" autocomplete="off" tabindex="-1" data-ws-graded="0" data-_box-val-attached="1" data-_col-adv-attached="1" aria-label="${attr(`${label} left over, digit ${i + 1}`)}" data-ws-seg="${n <= 1 ? 'only' : i === 0 ? 'first' : i === n - 1 ? 'last' : 'mid'}">`).join('')
+        + '</div>';
+    let rows = '';
+    for (let s = 1; s <= steps; s++) rows += strip(`working, step ${s}`);
+    return `<div class="mq-work-area" aria-label="working">${rows}</div>`;
+}
+
+/**
+ * Does a multi-slot answer (the joined values of wireCellSlots) match the item? `null` when the
+ * item is not a multi-slot item, so the caller falls back to its own checker.
+ *   - inline blanks: any of `inlineBlanksData.acceptedSets` (4 rows of 5 = 5 rows of 4)
+ *   - an array answer (cloze addends, the missing numbers of a strip): position by position
+ *   - "q R r": quotient and remainder
+ */
+export function slotAnswerMatches(value, q) {
+    if (!q) return null;
+    const parts = String(value == null ? '' : value).split(/\s*(?:,|\bR\b)\s*/i).map((s) => s.trim().toLowerCase());
+    const eq = (a, b) => String(a).trim().toLowerCase().replace(/,/g, '') === String(b).trim().toLowerCase().replace(/,/g, '');
+    const sets = q.inlineBlanksData && Array.isArray(q.inlineBlanksData.acceptedSets) ? q.inlineBlanksData.acceptedSets : null;
+    if (q.answerType === 'inline-blanks' && sets) {
+        return sets.some((set) => set.length === parts.length && set.every((v, i) => eq(v, parts[i])));
+    }
+    if (Array.isArray(q.ans)) {
+        return q.ans.length === parts.length && q.ans.every((v, i) => eq(v, parts[i]));
+    }
+    const rem = String(q.ans == null ? '' : q.ans).match(/^\s*(\d+)\s*R\s*(\d+)\s*$/i);
+    if (rem && /R/i.test(String(value))) {
+        return parts.length === 2 && eq(parts[0], rem[1]) && eq(parts[1], rem[2]);
+    }
+    return null;
+}
+
+/** Are all the slots of a multi-slot answer filled? */
+export function slotsFilled(value, count) {
+    const parts = String(value == null ? '' : value).split(/\s*(?:,|\bR\b)\s*/i).map((s) => s.trim());
+    return parts.length >= count && parts.slice(0, count).every(Boolean);
+}
+
+/* ------------------------------------------------------------------ the digit size of a cell (C3)
+ * RUBRIC C3: the question's digits are 56 / 48 / 40 px on the practice card, 29 px on the online
+ * worksheet. A legacy drawing (a bond, a picture sum, a model, a chart) was sized for paper in
+ * px or mm and reads at 20-37 px on screen. The whole drawing is scaled up - never its text alone,
+ * so the picture keeps its proportions - until its largest numerals reach the host's size or it
+ * fills the cell's width, whichever comes first. A drawing that already meets the size is left
+ * alone; nothing is ever scaled down (content never shrinks to fit).
+ */
+const NUMERAL_RE = /^[\s\d,.+\-−×÷=?<>()R]*\d[\s\d,.+\-−×÷=?<>()R]*$/;
+
+function _numeralSizes(root) {
+    const out = [];
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (w.nextNode()) {
+        const n = w.currentNode;
+        if (!n.nodeValue || !NUMERAL_RE.test(n.nodeValue)) continue;
+        const p = n.parentElement;
+        if (!p || p.closest('[data-mq-screen-only], .mq-sr, button, .mq-noscale')) continue;
+        const r = p.getBoundingClientRect();
+        if (!r.width || !r.height) continue;
+        let px = parseFloat(getComputedStyle(p).fontSize) || 0;
+        if (p instanceof SVGElement && p.getScreenCTM) {
+            const m = p.getScreenCTM();
+            if (m) px *= Math.hypot(m.a, m.b);
+        }
+        if (px) out.push(px);
+    }
+    return out;
+}
+
+function _contentWidth(root) {
+    const base = root.getBoundingClientRect();
+    let l = Infinity, r = -Infinity;
+    const els = root.querySelectorAll('*');
+    for (let i = 0; i < els.length && i < 1500; i++) {
+        const el = els[i];
+        if (el.closest('[data-mq-screen-only]')) continue;
+        const b = el.getBoundingClientRect();
+        if (!b.width || !b.height) continue;
+        // a block that only stretches to its parent says nothing about the drawing's width
+        if (b.width >= base.width - 1 && el.children.length) continue;
+        l = Math.min(l, b.left); r = Math.max(r, b.right);
+    }
+    return r > l ? r - l : base.width;
+}
+
+/**
+ * Scale a legacy drawing so its numerals reach `target` px. `avail` is the width it may take.
+ * Returns the factor applied (1 when none). Idempotent: measures from an unscaled drawing.
+ */
+export function fitCellDigits(root, target, { avail = 0, max = 2.6 } = {}) {
+    if (!root || typeof document === 'undefined' || !target) return 1;
+    root.style.removeProperty('zoom');
+    delete root.dataset.mqFit;
+    delete root.dataset.mqFitShort;
+    const sizes = _numeralSizes(root);
+    if (!sizes.length) return 1;
+    const main = Math.max(...sizes);
+    const want = target / main;
+    let f = want;
+    if (f <= 1.04) return 1;
+    const room = avail || (root.parentElement ? root.parentElement.clientWidth : root.clientWidth);
+    const wide = _contentWidth(root);
+    if (wide > 0 && room > 0) f = Math.min(f, (room - 4) / wide);
+    f = Math.min(f, max);
+    // the cell was too narrow for the host's digit size: a host that can widen the cell does
+    if (f < Math.min(want, max) * 0.9) root.dataset.mqFitShort = '1';
+    if (f <= 1.04) return 1;
+    root.style.setProperty('zoom', f.toFixed(3));
+    root.dataset.mqFit = f.toFixed(2);
+    return f;
+}
+
+// Answer types whose drawing is a live widget (drag, build, plot) or a screen twin already drawn
+// at the digit size: never scaled as a picture.
+const NO_FIT_TYPES = new Set([
+    'dnd-generic', 'drag-fill', 'nl-drag', 'hot-spot', 'image-hotspot', 'graph-builder', 'coord-plot',
+    'clock-set', 'number-line-extended', 'pv-build', 'pv-digit-drag', 'compose-fraction-tiles',
+    'compose-shape-blocks', 'build-expr', 'array-builder', 'vocab-match', 'tchart-drag',
+    'divisibility-sort', 'base10-build', 'ten-frame-build', 'grid-fill', 'inline-cloze',
+    'numpad-input', 'coin-builder', 'place-symmetry-lines', 'multi-select-check', 'odd-even-select',
+    'number-line-place', 'box-division', 'multiple-choice', 'choice', 'interactive',
+]);
+/** May this item's drawing be scaled up to the host's digit size? */
+export function canFitDigits(q) {
+    return !!q && !NO_FIT_TYPES.has(q.answerType) && !(Array.isArray(q.options) && q.options.length);
+}
+
+/** The digit size a host asks for (the cell's own --mq-digit token). */
+export function cellDigitTarget(cellEl) {
+    if (!cellEl || typeof getComputedStyle === 'undefined') return 0;
+    const v = parseFloat(getComputedStyle(cellEl).getPropertyValue('--mq-digit'));
+    return Number.isFinite(v) ? v : 0;
+}
+
+/* ------------------------------------------------------------------ one twin for the grid hosts
+ * The online worksheet and the quiz draw the cell from the question alone (the quiz from what a
+ * saved quiz stores). `screenTwin(q)` is the one decision both make: the cell's body, its
+ * instruction line, and how the answer reaches the host's input.
+ *   slots    the body holds `data-mq-cell` boxes (wireCellSlots joins them into the input)
+ *   blank    the body holds one `data-mq-blank` (adoptVisualBlank moves the input into it)
+ *   build    the body holds a build mat (mountBuild writes the mat's value into the input)
+ * null: the item keeps the host's legacy path.
+ */
+export function screenTwin(q) {
+    if (!q) return null;
+    const t = q.answerType;
+    if (t === 'inline-blanks' && /_{3,}/.test(String(q.text || ''))) {
+        const widths = q.inlineBlanksData && q.inlineBlanksData.cellWidths;
+        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths) + (q.visual || ''), instr: 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
+    }
+    if (t === 'inline-cloze' && /_{3,}/.test(String(q.text || ''))) {
+        return { mode: 'slots', html: clozeHTML(q), instr: 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
+    }
+    if (t === 'grid-fill' && q.gridFill) {
+        const html = gridFillHTML(q);
+        if (html) return { mode: 'slots', html, instr: plainText(q.text), count: q.gridFill.cells.filter((c) => c.blank).length, wide: true };
+    }
+    const rp = ringParts(q);
+    if (rp) {
+        return rp.kind === 'remainder'
+            ? { mode: 'slots', html: ringCellHTML(rp), instr: `Make groups of ${rp.b}. Write the answer.`, count: 2 }
+            : { mode: 'blank', html: ringCellHTML(rp), instr: plainText(q.text) };
+    }
+    if (t === 'base10-build' || t === 'ten-frame-build') {
+        const target = _n(q.target != null ? q.target : q.ans);
+        if (target == null) return null;
+        return { mode: 'build', html: `<div class="mq-buildhost" data-mq-build="${t}"></div>`, instr: plainText(q.text) };
+    }
+    return null;
+}
+
+/**
+ * Mount the build mat of a twin (`data-mq-build`) and write its value into `input` as the pupil
+ * builds - the mat IS the answer, so the pupil never retypes the number (RUBRIC H3). The mat's
+ * own Submit is hidden: the host's checker grades the value. Fields a saved quiz lost are rebuilt
+ * from the answer (a target of 57 needs tens and ones).
+ */
+export function mountBuild(root, q, input, onValue) {
+    const host = root && root.querySelector('[data-mq-build]');
+    if (!host || !q || !input) return false;
+    const type = host.getAttribute('data-mq-build');
+    const target = _n(q.target != null ? q.target : q.ans) || 0;
+    const qq = Object.assign({}, q, { target });
+    if (type === 'ten-frame-build' && !qq.maxDots) qq.maxDots = target > 10 ? 20 : 10;
+    if (type === 'base10-build' && !qq.maxPlace) qq.maxPlace = target >= 100 ? 100 : 10;
+    const write = (v) => {
+        const val = v ? String(v) : '';
+        if (input.value === val) return;
+        input.value = val;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        if (onValue) onValue(val);
+    };
+    if (type === 'ten-frame-build') {
+        host.dataset.tfbNoSubmit = '1';
+        host._tfbOnChange = (n) => write(n);
+        import('./widgets/ten-frame-build.js').then((mod) => mod.renderTenFrameBuild(qq, host))
+            .catch((e) => console.error('ten-frame-build twin:', e));
+    } else {
+        host.dataset.b10NoSubmit = '1';
+        host._b10OnChange = (total) => write(total);
+        import('./widgets/base10-build.js').then((mod) => mod.renderBase10Build(qq, host))
+            .catch((e) => console.error('base10-build twin:', e));
+    }
+    return true;
+}
+
+/**
+ * The empty box of a drawn chart IS the answer slot (hundreds_chart_fill: "the paper writes in the
+ * chart"). A legacy SVG chart draws one empty `<rect>` among rects that each hold a number; the
+ * host's input is laid exactly over that rect (percent of the viewBox, so it follows the drawing
+ * at any scale), and the host's separate answer row goes. Returns true when the input moved.
+ */
+export function adoptSvgBlank(visualEl, input) {
+    if (!visualEl || !input || typeof document === 'undefined') return false;
+    const svgs = visualEl.querySelectorAll('svg');
+    if (svgs.length !== 1) return false;
+    const svg = svgs[0];
+    const vb = (svg.getAttribute('viewBox') || '').split(/[\s,]+/).map(Number);
+    if (vb.length !== 4 || !(vb[2] > 0) || !(vb[3] > 0)) return false;
+    const texts = Array.from(svg.querySelectorAll('text')).map((t) => ({ x: Number(t.getAttribute('x')), y: Number(t.getAttribute('y')), s: t.textContent.trim() }));
+    const rects = Array.from(svg.querySelectorAll('rect')).map((r) => ({
+        el: r, x: Number(r.getAttribute('x')), y: Number(r.getAttribute('y')), w: Number(r.getAttribute('width')), h: Number(r.getAttribute('height')),
+    })).filter((r) => [r.x, r.y, r.w, r.h].every(Number.isFinite) && r.w > 0 && r.h > 0 && r.w < vb[2] * 0.6);
+    const holds = (r) => texts.some((t) => t.s && t.x > r.x && t.x < r.x + r.w && t.y > r.y && t.y < r.y + r.h);
+    const empty = rects.filter((r) => !holds(r));
+    if (empty.length !== 1 || rects.length - 1 < 3) return false;
+    const r = empty[0];
+    // a chart: every cell the same size as the blank one (never a bar graph or a picture)
+    if (!rects.every((o) => Math.abs(o.w - r.w) < 1 && Math.abs(o.h - r.h) < 1)) return false;
+    const wrap = document.createElement('span');
+    wrap.className = 'mq-svgslot';
+    svg.parentNode.insertBefore(wrap, svg);
+    wrap.appendChild(svg);
+    const pct = (v, d) => `${((v / d) * 100).toFixed(3)}%`;
+    input.classList.add('mq-slot', 'mq-slot--invisual', 'mq-slot--svg');
+    input.dataset.mqPrevStyle = input.getAttribute('style') || '';
+    input.style.cssText += `;position:absolute;left:${pct(r.x - vb[0], vb[2])};top:${pct(r.y - vb[1], vb[3])};width:${pct(r.w, vb[2])};height:${pct(r.h, vb[3])}`;
+    wrap.appendChild(input);
+    return true;
 }

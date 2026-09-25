@@ -16,6 +16,7 @@ import { saveTest, loadTest, listTests, deleteTest, exportTestJSON, importTestJS
 import { icon, cleanLabel, levelText, copyText } from './teacher-ui.js';
 import { mountSample, mountQuestion } from './teacher-preview.js';
 import { isTeacher, note } from './teacher-quiz-ui.js';
+import { quizQuestionData } from './quiz-take.js';
 
 // ========= MODULE STATE =========
 const qb = {
@@ -837,15 +838,7 @@ export function addMultipleQuestions(skillId, count) {
                 section.questions.push({
                     id: section.questions.length,
                     skillId: skillId,
-                    questionData: {
-                        text: qData.text,
-                        ans: qData.ans,
-                        hint: qData.hint,
-                        options: qData.options,
-                        answerType: qData.answerType,
-                        visual: qData.visual,
-                        skillLabel: qData.skillLabel
-                    },
+                    questionData: quizQuestionData(qData),
                     points: 1
                 });
             }
@@ -870,15 +863,7 @@ export function regenerateQuizQuestion(sectionIdx, questionIdx) {
     try {
         const qData = safeGenerateQuestion(catKey, q.skillId);
         if (qData) {
-            q.questionData = {
-                text: qData.text,
-                ans: qData.ans,
-                hint: qData.hint,
-                options: qData.options,
-                answerType: qData.answerType,
-                visual: qData.visual,
-                skillLabel: qData.skillLabel
-            };
+            q.questionData = quizQuestionData(qData);
             qbRenderSectionList();
             window.showToast('Question regenerated', 'success');
         }
@@ -902,15 +887,7 @@ export function duplicateQuizQuestion(sectionIdx, questionIdx) {
             section.questions.splice(questionIdx + 1, 0, {
                 id: section.questions.length,
                 skillId: q.skillId,
-                questionData: {
-                    text: qData.text,
-                    ans: qData.ans,
-                    hint: qData.hint,
-                    options: qData.options,
-                    answerType: qData.answerType,
-                    visual: qData.visual,
-                    skillLabel: qData.skillLabel
-                },
+                questionData: quizQuestionData(qData),
                 points: q.points
             });
             section.questions.forEach((qq, i) => qq.id = i);
