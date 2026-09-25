@@ -83,6 +83,18 @@ export {
     DISK_SIZES, diskDiameter, zoneSide, zoneCapacity, diskMatSVG, numeralTracksHTML, roundingLineSVG,
 } from './cells/pv.js';
 
+// The operations templates that are not a plain stack or fact (long division, area model,
+// chart window, arrays, remainder, number line, fact family, cloze bank).
+export { divisionSteps } from './cells/long-division.js';
+import './cells/area-model.js';
+import './cells/mult-chart.js';
+import './cells/ops-counters.js';
+import './cells/number-line.js';
+import './cells/family.js';
+export { factDigitTracks, factGridStyle, FACT_OP_TRACK_EM } from './cells/fact.js';
+export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'remainder', 'number-line', 'fact-family', 'cloze-bank'];
+
+
 // K-2 picture cells: counters, ten frame, base-10 mat, number bond, chart window, number track,
 // compare two groups, picture word problem. `k2Twin` draws a template's screen twin.
 export { k2Twin, SHAPES as K2_SHAPES } from './cells/k2kit.js';
@@ -97,7 +109,8 @@ import './cells/wordpic.js';
 
 /** Which cell templates this build carries. `legacy` is registered by `adapters.js`. */
 export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv',
-    'counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic'];
+    'counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic',
+    ...OPS_TEMPLATE_IDS];
 
 /* ------------------------------------------------- skill providers (register on load) */
 // The real per-skill providers (strings, workedSteps, wrongAnswer, stories). Importing the

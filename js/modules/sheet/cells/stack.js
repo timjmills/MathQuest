@@ -37,9 +37,17 @@ const PLACE_NAMES = ['O', 'T', 'H', 'Th', 'TTh', 'HTh'];
  * @param {'trace'|'solid'|null} [opts.boxInk]  with `answer: 'boxes'` and `ans`, the digits are
  *        drawn INSIDE the boxes, so a key laid over a Guided page lines up exactly (SCC-T10).
  */
-export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null } = {}) {
-    const A = String(a), B = String(b);
-    const t = T || Math.max(A.length, B.length) + 1;
+export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0 } = {}) {
+    // `a` may be an ARRAY of the rows above the operator row (three or four addends, CM-5/CM-6):
+    // every one of them sits on the digit tracks with an empty operator track (VA-2).
+    const tops = (Array.isArray(a) ? a : [a]).map(String);
+    const A = tops[0], B = String(b);
+    const t = T || Math.max(...tops.map((x) => x.length), B.length) + 1;
+    // SL-12 / VA-4: the answer strip spans the ANSWER's digit tracks only. The operator track is
+    // never a box (a run interrupted by the operator track is two strips, and a box under the
+    // operator told the pupil to write a leading 0). 0 = every track (the old shape).
+    const nAns = ansTracks > 0 ? Math.min(ansTracks, t) : t;
+    const firstAns = t - nAns;
     const pad = (s) => [...s.padStart(t, ' ')];
     // LS-8: one digit of the stack is unknown -> a short-dash digit box in its own track.
     const hole = (rowId, i) => unknown && unknown.row === rowId && unknown.index === i;
@@ -70,30 +78,41 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
                 : `<span class="rg${g}" data-ws-seg="${stripPos(k, on.length)}">${rgBox(i)}</span>`;
         }).join('');
     }
-    html += row(pad(A), '', 'a') + `<span class="gap"></span>` + row(pad(B), opGlyph(op), 'b') + `<span class="rule"></span>`;
+    html += tops.map((x, k) => row(pad(x), '', k === 0 ? 'a' : `a${k}`) + `<span class="gap"></span>`).join('')
+        + row(pad(B), opGlyph(op), 'b') + `<span class="rule"></span>`;
     if (answer === 'boxes') {
         // The box is structure and stays black; only the digit inside it takes the trace grey
         // (INK-3). The inline rule centres the glyph in its box - it sets no size and no ink.
         const fill = boxInk && ans !== null ? pad(String(ans)) : null;
         html += Array.from({ length: t }, (_, i) => {
+            if (i < firstAns) return `<span class="ab${g}"></span>`;
             const ch = fill && fill[i] !== ' ' ? fill[i] : '';
             const ink = ch ? ` class="${boxInk === 'trace' ? 'ws-trace' : ''}" data-ws-ink="${boxInk}" style="display:flex;align-items:center;justify-content:center"` : '';
-            return `<span class="ab${g}" data-ws-seg="${stripPos(i, t)}"><i${ink}>${ch}</i></span>`;
+            return `<span class="ab${g}" data-ws-seg="${stripPos(i - firstAns, nAns)}"><i${ink}>${ch}</i></span>`;
         }).join('');
     }
     if (answer === 'traced' && ans !== null) html += pad(String(ans)).map((ch) => `<span class="ws-trace">${ch === ' ' ? '' : ch}</span>`).join('');
     if (answer === 'solid' && ans !== null) html += pad(String(ans)).map((ch) => `<span data-ws-ink="solid">${ch === ' ' ? '' : ch}</span>`).join('');
-    if (answer === 'slots' && slots) html += slots.map((s, i) => `<span class="ab" data-ws-seg="${stripPos(i, slots.length)}">${s}</span>`).join('');
+    if (answer === 'slots' && slots) {
+        // A null slot is a track with no box (the operator track, SL-12): the strip skips it.
+        const live = slots.filter((s) => s !== null && s !== undefined).length;
+        let k = 0;
+        html += slots.map((s) => (s === null || s === undefined ? `<span class="ab"></span>`
+            : `<span class="ab" data-ws-seg="${stripPos(k++, live)}">${s}</span>`)).join('');
+    }
     // TY-21: any regroup scaffold forces 0.95 em tracks in both looks (the 'wide' class).
+    // TY-2: a box is drawn with <i>, which the browser italicises; nothing in a stack is italic.
+    html = html.replace(/(<i\b[^>]*?style=")/g, '$1font-style:normal;').replace(/<i(?=[ >])(?![^>]*style=)/g, '<i style="font-style:normal"');
     return `<div class="ws-stack${regroup ? ' wide' : ''}" style="--t:${t}" data-ws-slot="answer" data-ws-shape="open">${html}</div>`;
 }
 
 /* ------------------------------------------------------------------ registry template */
 
 const compute = (p) => {
-    const [a, b] = p.operands || [p.a, p.b];
+    const ops = p.operands || [p.a, p.b];
+    const [a, b] = ops;
     switch (p.op) {
-        case '+': return Number(a) + Number(b);
+        case '+': return ops.reduce((s, n) => s + Number(n), 0);
         case '-': case '−': return Number(a) - Number(b);
         case '*': case 'x': case '×': return Number(a) * Number(b);
         case '/': case '÷': return Number(b) ? Number(a) / Number(b) : null;
@@ -106,9 +125,22 @@ const tracksOf = (p) => {
     if (p.T) return p.T;
     const ops = p.operands || [p.a, p.b];
     const v = p.ans !== undefined ? p.ans : compute(p);
-    const ansLen = v !== null && v !== undefined && /^\d+$/.test(String(v)) ? String(v).length : 0;
-    return Math.max(String(ops[0] ?? '').length, String(ops[1] ?? '').length, ansLen) + 1;
+    const ansLen = Math.max(ansDigitsOf(p), v !== null && v !== undefined && /^\d+$/.test(String(v)) ? String(v).length : 0);
+    return Math.max(...ops.map((o) => String(o ?? '').length), ansLen) + 1;
 };
+/**
+ * SL-12: how many digit tracks the answer strip spans. A generator passes `ansDigits`, the
+ * digit count of the LARGEST answer its band can reach, so the strip is sized to the answer
+ * without telling the pupil this item's answer length (L-LEAK). Absent: this answer's length.
+ */
+function ansDigitsOf(p) {
+    if (p.ansDigits) return p.ansDigits;
+    const v = p.ans !== undefined ? p.ans : compute(p);
+    return v !== null && v !== undefined && /^\d+$/.test(String(v)) ? String(v).length : 0;
+}
+/** The operand rows above the operator row, and the operator row itself. */
+const topsOf = (p) => { const ops = p.operands || [p.a, p.b]; return ops.length > 2 ? ops.slice(0, -1) : ops[0]; };
+const bottomOf = (p) => { const ops = p.operands || [p.a, p.b]; return ops[ops.length - 1]; };
 
 /**
  * Which tracks carry a regroup box, so `render`, `inputs` and `answerKey` agree (SCC-T13).
@@ -155,7 +187,7 @@ const unknownSlotSpec = (u) => ({
 
 register('stack', {
     render(p, ctx) {
-        const [a, b] = p.operands || [p.a, p.b];
+        const a = topsOf(p), b = bottomOf(p);
         const value = p.ans !== undefined ? p.ans : compute(p);
         // The scaffold ladder (section 2.5) decides what is drawn, never the generator (SCC-Q10).
         const { level, heads, regroup } = scaffoldOf(p, ctx);
@@ -181,17 +213,18 @@ register('stack', {
         // VA-7: the missing digit is a slot in BOTH modes, so it is typed on screen and carries
         // its given digit on an answer key. Its printed width is B(1) = 14 mm either way.
         if (p.unknown) unknownSlot = blank(unknownSlotSpec(p.unknown), ctx, key);
+        const nAns = Math.min(t - 1, Math.max(1, ansDigitsOf(p)));
         if (screen) {
-            slots = Array.from({ length: t }, (_, i) => blank(answerSlot(i, t), ctx, key));
+            slots = Array.from({ length: t }, (_, i) => (i < t - nAns ? null : blank(answerSlot(i, t), ctx, key)));
             answer = 'slots';
             boxInk = null;
             if (regroup) {
                 regroupSlots = [];
-                for (const i of regroupTracks(regroup, t, String(a).length)) regroupSlots[i] = blank(regroupSlot(i), ctx, key);
+                for (const i of regroupTracks(regroup, t, String(Array.isArray(a) ? a[0] : a).length)) regroupSlots[i] = blank(regroupSlot(i), ctx, key);
             }
         }
         return stack(a, b, p.op, {
-            T: t, heads, regroup, answer, slots, regroupSlots, unknownSlot, boxInk,
+            T: t, heads, regroup, answer, slots, regroupSlots, unknownSlot, boxInk, ansTracks: nAns,
             grey: level === 2 && ctx.state === 'blank',
             ans: shown === undefined ? null : shown,
             unknown: p.unknown || null,
@@ -206,7 +239,8 @@ register('stack', {
         const slots = { answer: { value: digits, graded: true, accept: [display] } };
         // One graded digit slot per track, right-aligned to the ones track (TY-20).
         const padded = digits.padStart(t, ' ');
-        for (let i = 0; i < t; i++) {
+        const nAns = Math.min(t - 1, Math.max(1, ansDigitsOf(p)));
+        for (let i = t - nAns; i < t; i++) {
             slots[`ans-${i}`] = { value: padded[i] === ' ' ? '' : padded[i], graded: true };
         }
         // VA-13: regroup boxes are scratch space; never scored, on paper or on screen. Both
@@ -231,7 +265,7 @@ register('stack', {
         const digitH = (ctx.metrics.digitPt / 72) * 25.4 * 1.15;   // TY-13 digit line-height 1.15
         const hMm = (p.heads || ctx.scaffoldLevel >= 2 ? s.headsMm : 0)
             + (regroup ? (p.op === '-' ? s.headroomMm : s.regroupMm) : 0)
-            + digitH * 2 + 3 + s.answerMm;
+            + digitH * (p.operands ? Math.max(2, p.operands.length) : 2) + 3 + s.answerMm;
         return {
             wMm: Math.ceil(t * track + 6), hMm: Math.ceil(hMm), measure: false,
             factLike: false, maxCols: 3, tracks: t,
@@ -248,8 +282,9 @@ register('stack', {
         const [a] = p.operands || [p.a, p.b];
         const screen = ctx && ctx.mode === 'screen' && !ctx.static;
         const out = [];
+        const nAns = Math.min(t - 1, Math.max(1, ansDigitsOf(p)));
         if (regroup) for (const i of regroupTracks(regroup, t, String(a ?? '').length)) out.push(regroupSlot(i));
-        if (screen) for (let i = 0; i < t; i++) out.push(answerSlot(i, t));
+        if (screen) for (let i = t - nAns; i < t; i++) out.push(answerSlot(i, t));
         // On paper the answer zone under the sum rule is ONE open slot (VA-11, PG-14).
         else out.push({ id: 'answer', kind: 'number', shape: 'open', graded: true, order: 0, inputmode: 'numeric', scopes: ['full', 'answer-only'] });
         if (p.unknown) out.push(unknownSlotSpec(p.unknown));
