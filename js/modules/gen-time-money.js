@@ -418,6 +418,9 @@ function elapsedItem(q, skill, { mode, durs, startStep, spanH, tickStep, support
             q.answerType = 'text';
         }
         q.hint = back ? 'Start at the end time. Hop back the hours, then the minutes.' : 'Start at the start time. Hop the hours, then the minutes.';
+        // A page dealing later AND earlier carries one instruction for both (the cell's own
+        // Start / End label names the time to write).
+        if (both && response !== 'draw') q.text = 'Use the time line. Write the missing time.';
     }
     q.tm.ampm = ampm;
 }
