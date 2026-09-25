@@ -42,7 +42,7 @@ const RECONCILIATION = [
     'Site pacing vs Drive: every Drive small step is in the site pacing under the same block and step number, with the same title except where the school teaches money in US dollars (the pacing adds "(US: dollars & cents)"; kept as usAdaptation). The pacing also schedules 36 Awsaj-authored "committee" lessons (kept as block supplements, not WRM steps).',
     'v3 sheet vs site: the sheet says it is generated from the same data as the site, and its per-step CCSS codes are the site\'s. Its summary says "913 distinct White Rose small steps (PK4-Grade 5) plus 16 CCSS custom lessons still to be built". Drive has 872 small steps (Reception 119, Y1 116, Y2 124, Y3 134, Y4 129, Y5 136, Y6 114); the site\'s per-grade lesson lists hold 878 distinct titles (a title repeated inside Reception counts once; above-grade steps are listed in two grades) and 36 committee lessons; the sheet\'s lesson tabs have 849 rows. Neither 913 nor 16 could be reproduced from any source; the 872 Drive steps are the inventory used here.',
     'Grade rule: the site and the sheet map Reception to PK4 and WRM Year N to US grade N-1 (the Fluency folder on Drive agrees: "Year 1 = US Kindergarten"). This differs from the rule of thumb "Reception = K"; the school\'s rule is used.',
-    'Teaching Guides (Guide D): every step has one (873 files; Y6.B4.S7 has a second copy named after step 6, listed above). Every other guide title equals the Drive lesson title. Vocabulary is extracted for a sample only (data/curriculum/wrm-vocab.json).',
+    'Teaching Guides (Guide D): every step has one (873 files; Y6.B4.S7 has a second copy named after step 6, listed above). Every other guide title equals the Drive lesson title. Both Y6.B4.S7 files are Step 7 guides (their headers say so); the first is the one read for vocabulary. Key vocabulary for all 872 steps is extracted from the guides into data/curriculum/wrm-vocab.json by tests/scripts/ws-wrm-vocab.py.',
 ];
 const args = process.argv.slice(2);
 const argv = (n) => { const i = args.indexOf(`--${n}`); return i > -1 ? args[i + 1] : null; };
@@ -198,7 +198,8 @@ function main() {
                 if (lesson) step.drive.lesson = lesson.id;
                 if (guides.length) step.drive.guide = guides.length === 1 ? guides[0].id : guides.map((x) => x.id);
                 if (video) step.drive.video = video.u;
-                step.vocab = (vocab[step.id] || []).slice();
+                const v = vocab[step.id];
+                step.vocab = (Array.isArray(v) ? v : (v && v.words) || []).slice();
                 block.steps.push(step);
             }
             for (const s of supplements.values()) {
@@ -232,7 +233,7 @@ function main() {
                 power: 'the step teaches a school power standard',
                 siteTitle: 'the site pacing title where it differs from the WRM Drive file name',
                 drive: 'Drive file ids: lesson PDF, owner Teaching Guide (Guide D) PDF(s), WRM teaching video',
-                vocab: 'key vocabulary from the step\'s Teaching Guide (data/curriculum/wrm-vocab.json; empty = not yet extracted)',
+                vocab: 'key vocabulary from the step\'s Teaching Guide: the "Pre-teach" words (data/curriculum/wrm-vocab.json, which also holds meanings, stems and the key model; empty = not extracted)',
                 supplements: 'Awsaj-authored lessons placed in the block to close CCSS standards WRM does not teach; not WRM small steps',
             },
             counts: { years: years.length, blocks: blockTotal, steps: stepTotal },

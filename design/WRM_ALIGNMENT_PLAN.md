@@ -45,4 +45,6 @@ Exhaustively check the White Rose Maths (WRM) curriculum the school uses so that
 - **Crosswalk:** `js/modules/wrm.js` (`SKILL_WRM`, `WRM_PROPOSALS`) and the gate `tests/scripts/ws-wrm.cjs`,
   which writes `design/WRM_COVERAGE.md`. The gate fails today by design; use `--report-only` until the gap
   list (the phase 4 build list, grouped by family) is built.
-- Vocabulary per step (for the lessons' warm-ups) is sampled only: `data/curriculum/wrm-vocab.json`.
+- Vocabulary per step (for the lessons' warm-ups): `data/curriculum/wrm-vocab.json`, all 872 steps — each
+  Teaching Guide's "Pre-teach" words with their meanings, the lesson stems and the key model. Rebuild:
+  `python3 tests/scripts/ws-wrm-vocab.py --cache <dir>` (curl + PyMuPDF), then `ws-wrm-extract.cjs`.
