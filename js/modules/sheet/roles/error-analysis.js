@@ -117,7 +117,8 @@ export function prepare(it, info = {}) {
         : LINED.has(it.template) ? 'line'
         : CHOICE.has(it.template) && Array.isArray(payload.labels) && payload.labels.length ? 'choice'
             : partsOf(correct) && partsOf(shown) && partsOf(correct).length === partsOf(shown).length ? 'parts' : 'value';
-    const story = it.fclass === 'word' || it.template === 'wordpic';
+    // The word-work cell draws its own finished working (sign, columns, answer): no extra line.
+    const story = (it.fclass === 'word' || it.template === 'wordpic') && it.template !== 'word-work';
     const work = story ? storyWork(it, shown, wrong, isWrong) : '';
     // The key's slots: the judgement, and the fix in the slot(s) of its kind.
     const slots = { 'ea-ok': isWrong ? '' : '✓', 'ea-fix': isWrong ? '✓' : '' };

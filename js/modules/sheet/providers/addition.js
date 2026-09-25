@@ -17,6 +17,7 @@ import {
     num, arr, obj, fmt, operands, countList, digitsOf, chooseWrong, strings, step, clampSteps,
 } from './util.js';
 import { storiesFor } from './stories.js';
+import { wordWorkProvider } from './word-work.js';
 
 const PLACE = ['ones', 'tens', 'hundreds', 'thousands', 'ten thousands'];
 const PLACE_ONE = ['one', 'ten', 'hundred', 'thousand', 'ten thousand'];
@@ -365,34 +366,6 @@ registerSkill('addition:number_line_add', {
 
 const WP_BANDS = { 10: '10', 20: '20', 50: '50', 100: '100', '1k': '1,000', '10k': '10,000', '100k': '100,000', '1m': '1,000,000' };
 
-/** The unit word of a generated story ("stars"), and its singular. */
-function storyUnit(q) {
-    const text = String(q.text || '');
-    const m = [...text.matchAll(/(\d[\d,]*)\s+(?:more\s+)?([a-z]+)/gi)].map((x) => ({ n: num(x[1]), w: x[2].toLowerCase() }));
-    const asked = /How many ([a-z]+)/i.exec(text);
-    const skip = /^(more|of|and|were|was|in|to|are|is|did|does|do|remain|left)$/;
-    const plural = (asked && !skip.test(asked[1].toLowerCase()) ? asked[1].toLowerCase() : null)
-        || (m.find((x) => x.n !== 1 && !skip.test(x.w)) || {}).w;
-    if (!plural) return null;
-    const one = plural.replace(/(ch|sh|x)es$/, '$1').replace(/ies$/, 'y').replace(/s$/, '');
-    return { one, many: plural };
-}
-
-function wpSteps(q, isAdd) {
-    const [a, b] = operands(q);
-    if (!Number.isFinite(a) || !Number.isFinite(b)) return [];
-    const ans = isAdd ? a + b : a - b;
-    const u = storyUnit(q);
-    const label = u ? (ans === 1 ? u.one : u.many) : '';
-    return [
-        step('Read the story two times.'),
-        step(`Circle the numbers: ${fmt(a)} and ${fmt(b)}.`),
-        step(isAdd ? 'Two groups go together. Add.' : 'Some are taken away. Subtract.'),
-        step(`${fmt(a)} ${isAdd ? '+' : '−'} ${fmt(b)} = ${fmt(ans)}.`, [{ slot: 'equation', value: `${a}${isAdd ? '+' : '-'}${b}=${ans}` }]),
-        step(`Write ${fmt(ans)}${label ? ` ${label}` : ''}.`, [{ slot: 'answer', value: String(ans) }].concat(label ? [{ slot: 'label', value: label }] : [])),
-    ];
-}
-
 /** 52 - 18 = 46: each column takes the smaller digit from the bigger (misconception list). */
 export function smallerFromBigger(a, b) {
     const da = digitsOf(a);
@@ -402,60 +375,15 @@ export function smallerFromBigger(a, b) {
     return out;
 }
 
-function wpWrong(q, isAdd) {
-    const [a, b] = operands(q);
-    if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
-    const ans = isAdd ? a + b : a - b;
-    const u = storyUnit(q);
-    const withLabel = (c) => {
-        if (!c) return c;
-        if (u) c.label = num(c.value) === 1 ? u.one : u.many;
-        return c;
-    };
-    const big = a >= 10 && b >= 10;
-    const c = [];
-    // `work`: the number sentence the pupil wrote, which Error analysis shows to be checked.
-    const [hi, lo] = a >= b ? [a, b] : [b, a];
-    if (isAdd) {
-        c.push({ value: Math.abs(a - b), misconception: 'wrong-operation', explain: 'Subtracted in a putting-together story.', work: `${hi} − ${lo} = {v}` });
-        const col = columnAdd([a, b]);
-        if (big && col.noRegroup !== ans) c.push({ value: col.noRegroup, misconception: 'forgot-regroup', explain: 'Did not add the regrouped ten.', work: `${a} + ${b} = {v}` });
-        else if (!big) c.push({ value: ans - 1, misconception: 'counted-start', explain: 'Counted the start number again when counting on.', work: `${a} + ${b} = {v}` });
-    } else {
-        c.push({ value: a + b, misconception: 'wrong-operation', explain: 'Added in a taking-away story.', work: `${a} + ${b} = {v}` });
-        const sm = smallerFromBigger(a, b);
-        if (big && sm !== ans) c.push({ value: sm, misconception: 'smaller-from-bigger', explain: 'Took the smaller digit from the bigger digit in each column.', work: `${a} − ${b} = {v}` });
-        else if (!big) c.push({ value: ans + 1, misconception: 'counted-start', explain: 'Counted the start number when counting back.', work: `${a} − ${b} = {v}` });
-    }
-    return withLabel(chooseWrong(q, c));
-}
-
 for (const op of ['add', 'sub']) {
     const isAdd = op === 'add';
     for (const [code, band] of Object.entries(WP_BANDS)) {
-        const def = {
-            strings: strings({
-                iCan: isAdd ? `I Can solve addition stories (sums to ${band})` : `I Can solve subtraction stories (numbers to ${band})`,
-                instructionKey: 'story-v2',
-                steps: [
-                    'Read the story two times.',
-                    'Circle the numbers. Underline the question.',
-                    isAdd ? 'Do the groups go together? Add.' : 'Are some taken away? Subtract.',
-                    'Write the number and the label.',
-                ],
-                say: 'The answer is __ __.',
-                sayValues: (q) => {
-                    const [a, b] = operands(q);
-                    const u = storyUnit(q);
-                    const ans = isAdd ? a + b : a - b;
-                    return u && Number.isFinite(ans) ? [ans, ans === 1 ? u.one : u.many] : null;
-                },
-            }),
-            misconceptions: isAdd ? ['wrong-operation', 'counted-start', 'forgot-regroup'] : ['wrong-operation', 'counted-start', 'smaller-from-bigger'],
-            workedSteps: (q) => wpSteps(q, isAdd),
-            wrongAnswer: (q) => wpWrong(q, isAdd),
+        // Every story is drawn by the word-work cell (owner ruling 2026-09-25): its strings, Model
+        // steps and wrong-operation error come from the shared word-work provider; the story
+        // templates stay (the word-problem role of a non-story page still asks for them).
+        const def = wordWorkProvider(isAdd ? `I Can solve addition stories (sums to ${band})` : `I Can solve subtraction stories (numbers to ${band})`, {
             stories: storiesFor(isAdd ? '+' : '-'),
-        };
+        });
         const cat = isAdd ? 'addition' : 'subtraction';
         registerSkill(`${cat}:${op}_wp_${code}`, def);
         registerSkill(`${cat}:${op}_wp_${code}_plain`, def);

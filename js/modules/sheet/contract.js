@@ -124,6 +124,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'ring-remainder-each': 'Circle groups of the divisor. Write the quotient and the remainder.',
     'missing-all': 'Write the missing numbers.',
     'story-k2': 'Solve. Write the number.',
+    // Every whole-number word problem (owner ruling 2026-09-25): the word-work cell.
+    'story-work': 'Circle the sign. Write the numbers in the boxes. Solve.',
     'pick-parts': 'Write one number from each list to make the sum.',
     'fact-family': 'Use the three numbers. Fill in the fact family.',
     'chart-fill': 'Fill in the missing products.',

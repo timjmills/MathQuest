@@ -2232,6 +2232,34 @@ Object.assign(P12_OPTIONS, {
 Object.assign(SKILL_OPTIONS, P12_OPTIONS);
 // ============================ end P12 · every other family ============================
 
+// ===========================================================================
+// WORD WORK · the keyword supports of every whole-number word problem (2026-09-25)
+// ===========================================================================
+// Every story is drawn by the word-work cell (sheet/cells/word-work.js: story, a small + − × ÷
+// row, column boxes, "Answer: [ ] ____" with a unit bank). Its three supports are hints, so they
+// are OFF by default and fade by being switched off (owner ruling 2026-09-25). Read by
+// js/modules/word-work.js. The ranged stories (add_wp_* / sub_wp_*) already carry the bar model
+// as `support: bar` (_opsBar), so they get the two keyword supports only.
+const WORD_WORK_OPTIONS = (bar) => [
+    { id: 'wpCues', label: 'Key words', type: 'bool', default: false, group: 'support',
+        help: 'The words that point to the sign (in all, left, each, share equally) print bold and underlined.' },
+    { id: 'wpBank', label: 'Keyword bank', type: 'bool', default: false, group: 'support',
+        help: 'A small box beside each story lists the key words for + − × ÷.' },
+    ...(bar ? [{ id: 'wpBar', label: 'Bar model', type: 'bool', default: false, group: 'support',
+        help: 'A bar model under each story (parts and whole, compare, or equal parts) with empty labels to fill.' }] : []),
+];
+{
+    const own = ['addition:add_word_problems', 'subtraction:sub_word_problems', 'multiplication:mult_word_problems',
+        'division:div_word_problems', 'multiplication:mult_comparison', 'algebra:multi_step_word'];
+    const keys = [...own, ...own.map(k => `${k}_plain`), 'division:remainder_interpret', 'division:remainder_contexts', 'addition:add_wp_10'];
+    for (const op of ['add', 'sub']) for (const code of Object.keys(_OPS_BANDS)) keys.push(`${op === 'add' ? 'addition' : 'subtraction'}:${op}_wp_${code}`, `${op === 'add' ? 'addition' : 'subtraction'}:${op}_wp_${code}_plain`);
+    for (const key of new Set(keys)) {
+        const cur = SKILL_OPTIONS[key] || [];
+        const hasBar = cur.some(o => o.id === 'support' && Array.isArray(o.values) && o.values.some(v => v.v === 'bar'));
+        SKILL_OPTIONS[key] = [...cur, ...WORD_WORK_OPTIONS(!hasBar)];
+    }
+}
+
 // Options every skill understands, whether or not it declares anything of its own.
 export const UNIVERSAL_OPTIONS = [levelOption()];
 

@@ -80,7 +80,7 @@ export const KEY_BLOCKS = Object.freeze({
     3: Object.freeze({ owner: 'function tables', status: 'assigned', keys: '3A-3A' }),
     4: Object.freeze({ owner: 'supports', status: 'assigned', keys: '4A-4D' }),
     5: Object.freeze({ owner: 'P12 every other family', status: 'assigned', keys: '5A-5M' }),
-    6: Object.freeze({ owner: '', status: 'spare', keys: '' }),
+    6: Object.freeze({ owner: 'word problems (word-work cell, 2026-09-25)', status: 'assigned', keys: '6A-6C' }),
     7: Object.freeze({ owner: '', status: 'spare', keys: '' }),
     8: Object.freeze({ owner: '', status: 'spare', keys: '' }),
     9: Object.freeze({ owner: '', status: 'spare', keys: '' }),
@@ -164,6 +164,12 @@ export const MULTI_KEYS = Object.freeze({
     units: '5L',         // measurement: which units
     parts: '5M',         // equal parts, or the parts a figure is split into
     // NEXT FREE IN BLOCK 5: 5N.
+
+    // Block 6 — word problems: the keyword supports of the word-work cell (2026-09-25), all bools
+    wpCues: '6A',        // bold + underline the key words in the story
+    wpBank: '6B',        // the keyword bank box beside the story
+    wpBar: '6C',         // a bar model with blank labels under the story
+    // NEXT FREE IN BLOCK 6: 6D.
 });
 
 /** Every option id -> its key (one letter, or digit + letter). */
@@ -306,6 +312,8 @@ export const SCALAR_ONLY = Object.freeze({
     members: 'def-tokens',   // two base-36 characters per member: its position (skill-options-pools.js)
     // reserved ids (block 4): their values are allocated when they are built
     touch: 'reserved', cover: 'reserved', mix: 'reserved', anchors: 'reserved',
+    // block 6 (word problems)
+    wpCues: 'bool', wpBank: 'bool', wpBar: 'bool',
 });
 
 /**
