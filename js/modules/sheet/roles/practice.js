@@ -173,6 +173,9 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-wpspace>small{position:absolute;left:2mm;top:1mm;font-size:var(--ws-zone);line-height:1.2}
 :is(.ws-page,.ws-sheet) .mq-wpsentence{font-size:var(--ws-digit);font-weight:700;line-height:1}
 :is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpanswer{margin-top:0;padding-right:0;justify-content:flex-end;gap:6mm}
+/* INK-3: everything inside a traced slot is trace grey, the legacy key's inline-black <b> and a
+   drawn model's currentColor strokes included (print-worksheet.css forces legacy text black). */
+:is(.ws-page,.ws-sheet) [data-ws-ink="trace"] *{color:#949494!important}
 /* Guided fade: a partially traced value keeps its geometry; the untraced part is not printed. */
 :is(.ws-page,.ws-sheet) .mq-untraced{visibility:hidden}
 `.trim();
@@ -292,6 +295,25 @@ export function skillWords(skill = {}) {
     if (/^I Can work on\b/i.test(iCan)) iCan = iCanFromCategory(skill, iCan.replace(/^I Can work on\s*/i, '')) || iCan;
     const instructionKey = skill.instructionKey || str.instructionKey || 'default-write';
     return { iCan, instructionKey, strand: skill.strand || STRAND_BY_CATEGORY[skill.categoryId] || '' };
+}
+
+/**
+ * SCC-P17: the values of an instruction's placeholders ("Circle groups of {n}.") for a section,
+ * from the first item whose provider has `strings.instructionVars(q)`; {} when none has.
+ */
+export function varsOfItems(items) {
+    for (const it of items || []) {
+        const q = (it && it.q) || {};
+        try {
+            const p = getProvider(q.categoryId || '', q.skillId || '');
+            const str = typeof p.strings === 'function' ? p.strings({ categoryId: q.categoryId, skillId: q.skillId, label: q.skillLabel, q }) : p.strings;
+            if (str && typeof str.instructionVars === 'function') {
+                const v = str.instructionVars(q);
+                if (v && typeof v === 'object') return v;
+            }
+        } catch (e) { /* next */ }
+    }
+    return {};
 }
 
 /** BD-13: one section, one instruction; a mixed-operation section takes mixed-sign or mixed-ops. */
@@ -486,7 +508,7 @@ function composeSheet(role, input, norm, sheetItems, { tabId, seed, form }) {
             });
         let key = sectionInstructionKey(keys);
         let text;
-        try { text = instructionFor(key, sec.instructionVars || {}); } catch (e) { key = 'default-write'; text = INSTRUCTION_LIBRARY[key]; }
+        try { text = instructionFor(key, sec.instructionVars || varsOfItems(sheetItems[si])); } catch (e) { key = 'default-write'; text = INSTRUCTION_LIBRARY[key]; }
         return { key, text };
     });
 

@@ -66,10 +66,10 @@ export function plan(input = {}) {
     const rowsE = Math.ceil(useE.length / g.cols);
     const cellH = g.avail / Math.max(1, rowsM + rowsE);
     const labels = labelStyleOf(ctx.look, input.labels);
-    const sections = [{ kind: 'band', label: '', instr: instructionText(instructionKeyOf(useM, input.skills)),
+    const sections = [{ kind: 'band', label: '', instr: instructionText(instructionKeyOf(useM, input.skills), useM),
         content: gridPart(useM.map((it) => planItem(it, { cols: g.cols })), { cols: g.cols, rows: rowsM, cellH, labels, start: 1 }) }];
     if (useE.length) {
-        sections.push({ kind: 'band', label: 'Mixed Review:', instr: instructionText(instructionKeyOf(useE, input.skills)),
+        sections.push({ kind: 'band', label: 'Mixed Review:', instr: instructionText(instructionKeyOf(useE, input.skills), useE),
             content: gridPart(useE.map((it) => planItem(it, { cols: g.cols })), { cols: g.cols, rows: rowsE, cellH, labels, start: useM.length + 1 }) });
     }
     return assemble(ROLE_ID, input, frame, [{ sections }], {

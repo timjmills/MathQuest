@@ -55,7 +55,7 @@ export function plan(input = {}) {
     const topic = topicOf(((input.skills || [])[0] || {}).iCan || '');
     const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: `Test ${form}: ${topic}`, score: items.length });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
-    const instr = instructionPart(instructionKeyOf(items, input.skills));
+    const instr = instructionPart(instructionKeyOf(items, input.skills), items);
     const sections = [
         instr,
         gridPart(items.map((it) => planItem(it, { cols: L.cols, level: 0 })), {

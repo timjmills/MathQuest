@@ -108,13 +108,13 @@ export const PRACTICE_TARGET = Object.freeze({
 
 /**
  * Dense packing (`section.dense`): the most columns tried, the room a cell keeps over its
- * tallest content (1.35 x: the content plus a third again of writing and breathing room, so
- * CL-5's free space holds), and the per-class ceilings from 12.3's capacity tables - one-symbol
+ * tallest measured content (1.2 x: the measurement already holds the pads and the open answer
+ * zone, so a fifth again of breathing room is what CL-5 needs), and the per-class ceilings from 12.3's capacity tables - one-symbol
  * answers and facts up to 16 (12.1's one-symbol ceiling; 20 at S and M on a Test), stacked work
  * up to 12 (3 x 4), long procedures up to 6.
  */
 export const DENSE_MAX_COLS = 4;
-export const DENSE_ROOM = 1.35;
+export const DENSE_ROOM = 1.2;
 export const DENSE_CEILING = Object.freeze({
     short: Object.freeze({ S: 16, M: 16, L: 16 }),
     standard: Object.freeze({ S: 12, M: 12, L: 12 }),

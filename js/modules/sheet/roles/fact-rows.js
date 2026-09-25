@@ -110,7 +110,7 @@ export function plan(input = {}) {
     // Stretch cap 1.3 (PT-ENG-2): rows do not balloon; the spare height stays at the foot.
     const cellH = Math.min(L.gridH / rows, L.hMin * 1.3);
     const grid = gridPart(items.map((it) => planItem(it, { cols: L.cols })), { cols: L.cols, rows, cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1, cls: 'facts' });
-    return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(instructionKeyOf(items, input.skills)), grid] }], {
+    return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(instructionKeyOf(items, input.skills), items), grid] }], {
         defaultLook: DEFAULT_LOOK,
         meta: { items: items.length, scoreOutOf: items.length, fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },
     });

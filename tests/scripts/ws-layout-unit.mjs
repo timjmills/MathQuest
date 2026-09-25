@@ -397,6 +397,9 @@ function hostPlan(roleId, skills, make, extra = {}) {
 }
 const cellsOf = (html) => (html.match(/data-ws-cell/g) || []).length;
 const addMake = (pool, sk, i) => stackQ(111 + i * 7, 222 + i * 3);
+// A skill with a real provider (sheet/providers/addition.js): its own steps, Say frame and stories.
+const PROV_SKILL = { categoryId: 'addition', skillId: 'add', label: 'Addition', grade: 1, instructionKey: 'add' };
+const provMake = (pool, sk, i) => Object.assign(stackQ(12 + i, 25 + i), { skillId: 'add', skillLabel: 'Addition', printFormat: 'column-add' });
 const bigAMake = (pool, sk, i) => stackQ(333 + i * 7, 111 + i * 3);
 const storyMake = (pool, sk, i) => Object.assign(stackQ(3 + i, 4), { skillId: 'add_wp_10', printFormat: 'word-problem', text: `Sam has ${3 + i} apples. He gets 4 more. How many apples does Sam have now?` });
 
@@ -406,7 +409,8 @@ eq(ROLE_ALIASES.model, 'scripted-model', 'the print screen\'s "model" names the 
 
 // AK-1 / PT-KEY-7 for every role: the key is the pupil page, cell for cell and page for page.
 for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'review', 'test', 'pre-skill-check', 'word-problems', 'true-false', 'reason-it', 'stretch']) {
-    const res = hostPlan(id, [ADD_SKILL], id === 'word-problems' ? storyMake : id === 'error-analysis' ? bigAMake : addMake);
+    const res = id === 'scripted-model' || id === 'opener' ? hostPlan(id, [PROV_SKILL], provMake)
+        : hostPlan(id, [ADD_SKILL], id === 'word-problems' ? storyMake : id === 'error-analysis' ? bigAMake : addMake);
     if (res.unsupported) { fails.push(`${id}: unsupported (${res.unsupported})`); continue; }
     ok(res.plan && res.r.pupilPages.length >= 1, `${id}: composes at least one page`);
     eq(res.r.keyPages.length, res.r.pupilPages.length, `AK-1 ${id}: as many key pages as pupil pages`);
@@ -438,6 +442,11 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
 {
     const { partialTrace, stepsOf } = ROLE_MODULES.guided;
     eq(stepsOf([]), [], 'Guided: no items, no steps');
+    const pg = hostPlan('guided', [PROV_SKILL], provMake);
+    ok(pg.plan.meta.steps >= 2 && /<b>Steps:<\/b>/.test(pg.r.pupilHtml) && /mq-steps-rows/.test(pg.r.pupilHtml), 'SCC 3.8: Guided prints the provider\'s own steps, row by row');
+    const wp = hostPlan('word-problems', [PROV_SKILL], provMake);
+    ok(wp.plan && wp.plan.meta.items === 2, 'SCC-P19: a skill with provider stories prints Word problems');
+    ok(wp.r && /data-ws-slot="wp-label"[^>]*>[a-z]+</.test(wp.r.keyHtml), 'SCC-P19: the key writes the story\'s label word');
     eq(partialTrace('<span class="ws-trace">1</span><span class="ws-trace">4</span>'), '<span class="ws-trace"><span class="mq-untraced">1</span></span><span class="ws-trace">4</span>', 'H5: a column answer keeps its ones digit');
     eq(partialTrace('<b data-ws-ink="trace" style="x">25</b>'), '<b data-ws-ink="trace" style="x">2<span class="mq-untraced">5</span></b>', 'H5: a one-slot answer keeps its first digit');
     eq(partialTrace('<b data-ws-ink="trace">7</b>'), null, 'H5: a one-digit answer has no partial trace');
@@ -457,10 +466,10 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     const plain = L(short, 'auto', 'L');
     const dense = L(short, 'auto', 'L', { dense: true });
     ok(dense.perPage > plain.perPage && dense.perPage <= 12, `dense: more items than the 2 x 3 default, within the 12 ceiling (${plain.perPage} -> ${dense.perPage})`);
-    ok(dense.cellH >= 30 * 1.35 - 0.01, 'dense: every cell keeps 1.35 x its content');
+    ok(dense.cellH >= 30 * 1.2 - 0.01, 'dense: every cell keeps 1.2 x its measured content');
     const tall = run(6, (i) => ({ q: stackQ(11 + i, 22 + i), measured: Object.fromEntries([1, 2, 3, 4].map((c) => [c, { hMm: 70, fits: true }])), footprint: { measure: true, hMm: null, maxCols: 6 } }));
     ok(L(tall, 'auto', 'L', { dense: true }).perPage >= L(tall, 'auto', 'L').perPage, 'dense: never fewer items than the default grid');
-    ok(L(tall, 'auto', 'L', { dense: true }).cellH >= 70 * 1.35 - 0.01, 'dense: tall cells keep their room');
+    ok(L(tall, 'auto', 'L', { dense: true }).cellH >= 70 * 1.2 - 0.01, 'dense: tall cells keep their room');
     const narrow = run(20, (i) => ({ q: stackQ(11 + i, 22 + i), measured: { 1: { hMm: 30, fits: true }, 2: { hMm: 30, fits: true }, 3: { hMm: 30, fits: false }, 4: { hMm: 30, fits: false } }, footprint: { measure: true, hMm: null, maxCols: 6 } }));
     ok(L(narrow, 'auto', 'L', { dense: true }).cols <= 2, 'dense: never more columns than the measurement fits (minimum column width)');
     eq(L(short, 2, 'L', { dense: true }).cols, 2, 'dense: an explicit column count is honoured (DN-12)');
@@ -492,17 +501,20 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
 }
 // PT-OPN-1: the Opener bands in their fixed order; Say band on by default.
 {
-    const { plan, r } = hostPlan('opener', [ADD_SKILL], addMake);
+    const { plan, r } = hostPlan('opener', [PROV_SKILL], provMake);
     const order = ['Model:', 'Steps:', 'Say:', 'Guided Practice:'].map((w) => r.pupilHtml.indexOf(`<b>${w}</b>`));
     ok(order.every((i) => i > 0) && order.every((v, i) => !i || v > order[i - 1]), 'PT-OPN-1: Model, Steps, Say, Guided in that order');
     eq(plan.header.score === false ? 0 : plan.header.score, plan.meta.independent, 'PT-OPN-7: Score counts the Independent rows only');
 }
 // PT-MOD-1 / PT-MOD-4: one state per step, the Say band filled in, nothing to answer.
 {
-    const { plan, r } = hostPlan('scripted-model', [ADD_SKILL], addMake);
+    const { plan, r } = hostPlan('scripted-model', [PROV_SKILL], provMake);
     ok(plan.nothingToAnswer === true, 'PT-KEY-7: the Scripted Model page is its own key');
     ok(plan.meta.states >= 3, 'PT-MOD-1: at least three states');
-    ok(/plus/.test(r.pupilHtml) && /equals/.test(r.pupilHtml), 'PT-MOD-4: the Say band is filled for this problem');
+    ok(!/__/.test(r.pupilHtml.replace(/<style[\s\S]*?<\/style>/g, '').split('Say:')[1] || '__'), 'PT-MOD-4: the Say band is filled for this problem (provider sayFill)');
+    ok(typeof hostPlan('scripted-model', [ADD_SKILL], addMake).unsupported === 'string', 'SCC 3.8: no provider steps -> no Scripted Model page (never generic steps)');
+    const op = hostPlan('opener', [ADD_SKILL], addMake);
+    ok(op.plan && !/<b>Steps:<\/b>/.test(op.r.pupilHtml), 'SCC 3.8: the Opener prints no Steps box for a skill with no steps');
 }
 // PT-ERR-1 / PT-TOF-1: 40 to 60% wrong; the key checks the right box on every item.
 for (const id of ['error-analysis', 'true-false']) {

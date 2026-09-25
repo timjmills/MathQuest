@@ -8,8 +8,8 @@
 //   answer     one answer row: a number box and a label line, captioned "number" and "label"
 //              (the only scored place, PT-WPR-8), the label pre-filled on the key
 //
-//   Who        STORY skills only: a word-problem generator (the item's own story text) or a
-//              provider that supplies `stories`. A non-story skill is `unsupported` with its
+//   Who        STORY skills only: a provider that supplies `stories(q, {seed})` (SCC 3.8), or a
+//              word-problem generator (the item's own story text). A non-story skill is `unsupported` with its
 //              reason - pasting a bare cell under "Write the number and the label" is not a word
 //              problem page (PAGE_TYPES 10: the neutral story frame needs a declared unit word)
 //   Density    1 column always (PT-WPR-1); 2 per page at every size (12.1, v2)
@@ -19,7 +19,7 @@
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems, labelStyleOf,
     resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, esc, blank, slotKey,
-    slotOnly, operandsOf, opOf, opGlyphOf, stringsOf,
+    slotOnly, operandsOf, opOf, opGlyphOf,
 } from './compose.js';
 import { getProvider } from '../index.js';
 
@@ -43,38 +43,45 @@ const plainText = (text) => String(text || '').replace(/<br\s*\/?>/gi, ' ').repl
     .replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
 
 /**
- * The story the provider supplies for a non-story item (`stories`, on the provider or in its
- * strings): a function of the question, a list (one per item), or a template with {a} {b} {c}
- * {ans} {n} for the question's numbers. '' when the skill has none.
+ * The provider's story for one item (SCC 3.8 / SCC-P19): `stories(q, {seed})` -> Story | null,
+ * carrying THIS item's numbers, one sentence per line, with the answer's number and the unit word
+ * that agrees with it. null when the skill has no `stories` or the item cannot carry one.
  */
-export function providerStory(it, index = 0) {
+export function providerStory(it, seed) {
     const q = it.q || {};
-    let src = null;
-    try {
-        const p = getProvider(q.categoryId || '', q.skillId || '');
-        src = p && p.stories !== undefined && p.stories !== null ? p.stories : null;
-    } catch (e) { src = null; }
-    if (src === null) src = stringsOf(it).stories || null;
-    if (!src) return '';
-    let s = '';
-    try {
-        if (typeof src === 'function') s = src(q) || '';
-        else if (Array.isArray(src)) s = src.length ? String(src[index % src.length]) : '';
-        else s = String(src);
-    } catch (e) { s = ''; }
-    if (typeof s === 'object' && s) s = s.text || '';
-    const ops = operandsOf(q);
-    const ans = answerOf(it);
-    const vals = { a: ops[0], b: ops[1], c: ans, ans, n: ops[0] };
-    s = String(s).replace(/\{(a|b|c|ans|n)\}/g, (m, k) => (vals[k] === undefined ? m : String(vals[k])));
-    return /\{[a-z]+\}/.test(s) ? '' : s.trim();
+    let p = null;
+    try { p = getProvider(q.categoryId || '', q.skillId || ''); } catch (e) { p = null; }
+    if (!p || typeof p.stories !== 'function' || !Array.isArray(p.real) || !p.real.includes('stories')) return null;
+    let st = null;
+    try { st = p.stories(q, { seed }); } catch (e) { st = null; }
+    if (!st || typeof st !== 'object') return null;
+    const lines = Array.isArray(st.sentences) && st.sentences.length ? st.sentences
+        : [...(Array.isArray(st.lines) ? st.lines : []), st.question].filter(Boolean);
+    const num = st.ans !== undefined && st.ans !== null ? String(st.ans) : '';
+    if (!lines.length || !/^-?[\d,.]+$/.test(num)) return null;
+    return { lines: lines.map(String), num, label: String(st.label || ''), equation: String(st.equation || '') };
 }
 
-/** The story text of an item, from its generator or its provider; '' for a non-story item. */
-export function storyOf(it, index = 0) {
+/**
+ * The story of an item: the provider's story first (its grammar is built in), else the
+ * word-problem generator's own text; null for a non-story item.
+ */
+export function storyOf(it, seed) {
+    const own = providerStory(it, seed);
+    if (own) return own;
+    if (!isStory(it)) return null;
     const q = it.q || {};
-    if (isStory(it)) return plainText(q.printText || q.text);
-    return providerStory(it, index);
+    const text = plainText(q.printText || q.text);
+    const ans = answerOf(it) || (it.key && it.key.display !== undefined ? String(it.key.display) : '');
+    const num = (/^-?[\d,.]+/.exec(ans) || [''])[0];
+    if (!num) return null;
+    // The label word: the answer's own unit when it carries one, else the noun of the question
+    // ("How many apples ...?"), which is the word a pupil is asked to write.
+    const asked = /how many\s+(?:more\s+|fewer\s+|less\s+)?([a-z]+)/i.exec(text);
+    const label = ans.slice(num.length).trim() || (asked ? asked[1].toLowerCase() : '');
+    const ops = operandsOf(q);
+    const glyph = opGlyphOf(opOf(q));
+    return { lines: storyLines(text), num, label, equation: ops.length >= 2 && glyph ? `${ops[0]} ${glyph} ${ops[1]} = ${num}` : '' };
 }
 
 /** One sentence per line (PT-WPR-3). */
@@ -83,27 +90,17 @@ function storyLines(text) {
 }
 
 export function prepare(it, info = {}) {
-    const q = it.q || {};
-    const story = storyOf(it, info.index || 0);
-    if (!story) return null;                                 // not a story: see supports()
-    const ans = answerOf(it) || (it.key && it.key.display !== undefined ? String(it.key.display) : '');
-    const num = (/^-?[\d,.]+/.exec(ans) || [''])[0];
-    if (!num) return null;                                   // v2's answer row is a number and a label
-    // The label word: the answer's own unit when it carries one, else the noun of the question
-    // ("How many apples ...?"), which is the word a pupil is asked to write.
-    const asked = /how many\s+(?:more\s+|fewer\s+|less\s+)?([a-z]+)/i.exec(story);
-    const label = ans.slice(num.length).trim() || (asked ? asked[1].toLowerCase() : '');
-    const ops = operandsOf(q);
-    const glyph = opGlyphOf(opOf(q));
-    const sentence = ops.length >= 2 && glyph ? `${ops[0]} ${glyph} ${ops[1]} = ${num}` : '';
-    const key = slotKey({ 'wp-num': num, 'wp-label': label }, ans);
+    const st = storyOf(it, ((Number(info.seed) || 0) + (Number(info.index) || 0) * 7919) >>> 0);
+    if (!st) return null;                                    // not a story: see supports()
+    const { num, label } = st;
+    const key = slotKey({ 'wp-num': num, 'wp-label': label }, label ? `${num} ${label}` : num);
     const digits = Math.max(2, Math.min(6, num.replace(/[^0-9]/g, '').length || 2));
     const render = (c) => {
         const answered = c.state === 'answered';
         const numW = Math.max({ S: 22, M: 26, L: 30 }[c.size] || 30, digits * ({ S: 6, M: 7, L: 8 }[c.size] || 8) + 6);
         return `<div class="mq-wp mq-wp2">`
-            + `<div class="ws-story mq-wpstory">${storyLines(story).map((l) => `<div>${esc(l)}</div>`).join('')}</div>`
-            + `<div class="mq-wpspace"><small>work space</small>${answered && sentence ? `<b class="mq-wpsentence" data-ws-ink="solid">${esc(sentence)}</b>` : ''}</div>`
+            + `<div class="ws-story mq-wpstory">${st.lines.slice(0, 6).map((l) => `<div>${esc(l)}</div>`).join('')}</div>`
+            + `<div class="mq-wpspace"><small>work space</small>${answered && st.equation ? `<b class="mq-wpsentence" data-ws-ink="solid">${esc(st.equation)}</b>` : ''}</div>`
             + `<div class="mq-wpanswer">`
             + `<span class="mq-ansslot">${blank({ id: 'wp-num', kind: 'number', shape: 'box', widthMm: numW }, c, slotOnly(key, 'wp-num'))}<small>number</small></span>`
             + `<span class="mq-ansslot">${blank({ id: 'wp-label', kind: 'text', shape: 'line', widthMm: { S: 40, M: 46, L: 52 }[c.size] || 52 }, c, slotOnly(key, 'wp-label'))}<small>label</small></span>`

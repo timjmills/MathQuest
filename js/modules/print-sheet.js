@@ -362,6 +362,13 @@ export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
         return html.replace(factRows[0], cells);
     }
 
+    // 2b. A horizontal equation's own write slot ("36 ÷ 4 = ____"): one empty `.ws-slot` line or
+    // box, the value written on it.
+    const eqSlots = html.match(/<span class="ws-slot" data-ws-shape="(?:line|box)"[^>]*><\/span>/g) || [];
+    if (eqSlots.length === 1 && display && /style="[^"]*"><\/span>$/.test(eqSlots[0])) {
+        return html.replace(eqSlots[0], eqSlots[0].replace(/"><\/span>$/, `;display:inline-flex;align-items:flex-end;justify-content:center;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;">${escText(display)}</b></span>`));
+    }
+
     // 3. One "Answer:" line: a label, then a ruled blank that stretches (28+ print branches).
     const lineRe = /(Answer:\s*<\/span>\s*<span style="[^"]*border-bottom:[^"]*">)(?:&nbsp;|\s)*(<\/span>)/g;
     const lines = html.match(lineRe) || [];
@@ -409,7 +416,10 @@ function hostItem(g, sectionIndex, size) {
     // the legacy template picks its size class from it, the fact ladder its digit size.
     const key = cellAnswerKey(q);
     const scalar = (v) => (v === undefined || v === null || typeof v === 'object' ? '' : String(v));
-    const answer = scalar(q0.ans) || scalar(key && key.value);
+    // A several-part answer (a cloze's parts) is written one part per box, comma separated - the
+    // same form as the roles' answerOf (compose.js).
+    const parts = (v) => (Array.isArray(v) && v.length && v.every((x) => x !== null && typeof x !== 'object') ? v.map(String).join(', ') : '');
+    const answer = scalar(q0.ans) || parts(q0.ans) || scalar(key && key.value);
     /**
      * The draw function. `cols` is the section's final column count; `shown` is a value written
      * INTO the cell's own answer slot in both states (the finished work of Error analysis, a
@@ -623,8 +633,9 @@ function measureItems(items, { size, look, colsList }) {
                         if (el.closest('.ws-legacy-answer')) continue;
                         contentBottom = Math.max(contentBottom, er.bottom);
                         if (er.right > r.right - padR + 1 || er.left < r.left + padL - 1) fits = false;
-                        if ((ecs.overflowX === 'hidden' || ecs.overflowX === 'clip') && el.scrollWidth > el.clientWidth + 1) fits = false;
-                        if ((ecs.overflowY === 'hidden' || ecs.overflowY === 'clip') && el.scrollHeight > el.clientHeight + 1) fits = false;
+                        // A clip under 1 mm is a stroke or a line box, not hidden content.
+                        if ((ecs.overflowX === 'hidden' || ecs.overflowX === 'clip') && el.scrollWidth > el.clientWidth + PX_PER_MM) fits = false;
+                        if ((ecs.overflowY === 'hidden' || ecs.overflowY === 'clip') && el.scrollHeight > el.clientHeight + PX_PER_MM) fits = false;
                         if (el.tagName === 'svg' || el.tagName === 'IMG' || el.tagName === 'CANVAS') pics.push(er.width);
                         // A chart or table squeezed into a narrow column: its numbers touch the
                         // cell walls and run together ("100110"). A leaf of a grid or table whose
@@ -1071,6 +1082,7 @@ async function buildRoleSheet(n, metaOf) {
     const ctx = { size: n.size, look: n.look, paper: n.paper, photocopySafe: n.photocopySafe };
     const colsList = (typeof mod.measureCols === 'function' ? mod.measureCols(ctx) : [1, 2]) || [1, 2];
     const needsShow = SHOWS_WORK.has(n.role);
+    const strictShow = n.role === 'error-analysis';
     const input = {
         items: [], skills: allSkills, pools: pools.map((p) => ({ id: p.id, weight: p.weight || 1 })),
         ctx, header, form: n.form, seed: n.seed, labels: n.labels, lesson: n.lesson,
@@ -1102,7 +1114,9 @@ async function buildRoleSheet(n, metaOf) {
             for (const g of gen) {
                 if (out.length >= want) break;
                 const it = settlePrompts([hostItem(g, 0, n.size)], metaOf(g.skill).instructionKey)[0];
-                if (needsShow && pass < 3 && !it.canShow()) continue;
+                // Error analysis never falls back to an "Answer:" line under the cell: the shown work
+                // must sit in the cell's own slot, or the pupil sees two answer places (C1).
+                if (needsShow && (pass < 3 || strictShow) && !it.canShow()) continue;
                 const k = out.length;
                 const prepared = typeof mod.prepare === 'function'
                     ? mod.prepare(it, { index: k, seed: n.seed, wrong: !!flags[k], size: n.size, look: n.look })

@@ -102,7 +102,7 @@ export function plan(input = {}) {
         const gH = gridPart(hor.map((it) => planItem(it, { cols: 2 })), { cols: 2, rows: 3, cellH: hH, labels, start: 16 });
         body = { kind: 'col', gap: '6mm', parts: [gV, gH] };
     }
-    const sections = [instructionPart(instructionKeyOf(items, input.skills))];
+    const sections = [instructionPart(instructionKeyOf(items, input.skills), items)];
     if (strip) {
         const w = strip[strip.length - 1] >= 100 ? { S: 14, M: 14, L: 16 }[ctx.size] : { S: 10, M: 10, L: 12 }[ctx.size];
         const stripHtml = `<div class="mq-skipstrip" style="height:${(vRows * vH).toFixed(2)}mm">${strip.map((v) => `<span>${v}</span>`).join('')}</div>`;

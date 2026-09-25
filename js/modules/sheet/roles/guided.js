@@ -73,12 +73,31 @@ export function stepsOf(items) {
     } catch (e) { return []; }
 }
 
+/**
+ * The height of the Steps list: rows of two steps (one column for 1-2 steps), each row as tall
+ * as its longer step once wrapped (Andika about 0.5 em a character; the circle marker and the
+ * band's padding come off the column width).
+ */
+function stepsBodyMm(steps, m) {
+    const twoCols = steps.length > 2;
+    const colW = twoCols ? (186 - 7 - 8) / 2 - 9.5 : 186 - 7 - 9.5;
+    const charMm = 0.52 * m.textPt * (25.4 / 72);
+    const lines = (t) => Math.max(1, Math.ceil((String(t).length * charMm) / colW));
+    const lineMm = m.textPt * 1.3 * (25.4 / 72);
+    let h = 0;
+    for (let i = 0; i < steps.length; i += twoCols ? 2 : 1) {
+        const n = Math.max(lines(steps[i]), twoCols && steps[i + 1] ? lines(steps[i + 1]) : 1);
+        h += Math.max(m.pitch, n * lineMm) + 2.2;
+    }
+    return h;
+}
+
 /** Rows that fit under the Steps band (PT-GDP-3 teacher strip off). */
 function fitRows(items, cols, ctx, input) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Lesson 1' });
     const m = bandMetrics(ctx, layoutHeader(frame.header));
     const steps = stepsOf(items);
-    const stepsH = steps.length ? m.strip + Math.ceil(steps.length / (steps.length > 2 ? 2 : 1)) * (m.pitch + 2.2) + 4 : 0;
+    const stepsH = steps.length ? m.strip + stepsBodyMm(steps, m) + 4 : 0;
     const avail = m.budget - stepsH - m.strip;
     const h = hMinAt(items, cols, ctx);
     const rows = Math.max(1, Math.min(Math.floor(CEILING[ctx.size] / cols), Math.floor(avail / Math.max(1, h))));
@@ -152,7 +171,7 @@ export function plan(input = {}) {
         const cls = `mq-steps-rows${fit.steps.length <= 2 ? ' mq-steps-one' : ''}`;
         sections.push({ kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-stepsband">${stepsHtml(fit.steps, { cls })}</div>` });
     }
-    sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key), content: gridPart(planItems, { cols, rows, cellH, labels: 'none' }) });
+    sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, use), content: gridPart(planItems, { cols, rows, cellH, labels: 'none' }) });
     return assemble(ROLE_ID, input, frame, [{ sections }], {
         meta: {
             items: use.length, scoreOutOf: 0, steps: fit.steps.length,
