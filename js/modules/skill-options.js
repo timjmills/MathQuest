@@ -314,6 +314,196 @@ export const SKILL_OPTIONS = {
         + 'level 0 leaves 22. Level 2 never blanks the 1 row or the 1 column.')],
 };
 
+// ===========================================================================
+// P9 · PLACE VALUE + ROUNDING  (design/research/place-value-rounding.md §2.5)
+// ===========================================================================
+// One contiguous block, merged into SKILL_OPTIONS below, so a parallel wave adding options for
+// another family never edits the same lines. Every option here is READ by js/modules/gen-pv.js
+// (the P9 generator); an option a generator ignores is not declared (SCC-P11). The rest of the
+// §2.5 table (identify `response`/`repeatDigit`, value `form`/`zeroDigit`, expand `frame` /
+// `notation`, nearest_* `responseScope`, round_sort_* `bins`, rounding_table `places`,
+// estimation `place`/`support`, the more/less `support` strip, ...) lands with its step (§19.4
+// step 8), not before.
+//
+// THE BAND (§2.1, owner ruling 2 of 2026-09-24). `band` caps the NUMBER on the page (for more /
+// less both the given number and the answer; for x and / by 10 the larger of the two). Max
+// Number caps the band. The PLACE sets a floor: a nearest-100 item is at least three digits, so
+// "Round to the nearest 100" needs Numbers to 1,000 or more and is REFUSED below that — never
+// silently relaxed. pvBandFloor() / pvRefusal() below are the single source of that rule; the
+// generator refuses through them and the print dialog can ask them before offering a skill.
+const _pvBand = (values, dflt) => bandOption(values, dflt);
+const _pvMidpoint = (withOnly = true) => ({
+    id: 'midpoint', label: 'Exactly halfway', type: 'enum', default: 'seeded',
+    values: [
+        { v: 'never', l: 'Never' },
+        { v: 'seeded', l: 'At least one on every page' },
+        ...(withOnly ? [{ v: 'only', l: 'Only halfway numbers (halfway rounds up)' }] : []),
+    ],
+    help: 'Halfway rounds up, and is taught as its own step: "Only" gives a page of nothing else.',
+});
+const _pvZeroPlace = (withAlways = true) => ({
+    id: 'zeroPlace', label: 'A zero place (305, 340)', type: 'enum', default: 'none',
+    values: [
+        { v: 'none', l: 'Never' },
+        { v: 'some', l: 'Some numbers' },
+        ...(withAlways ? [{ v: 'always', l: 'Every number' }] : []),
+    ],
+    help: 'A zero holds a place. Framed expanded form writes the zero part: 300 + 0 + 5.',
+});
+const _pvPlaceSet = (upTo) => ({
+    id: 'places', label: 'Which place is asked', type: 'set',
+    default: [1, 10, 100, 1000, 10000, 100000].filter(p => p <= upTo),
+    values: [
+        { v: 1, l: 'Ones' }, { v: 10, l: 'Tens' }, { v: 100, l: 'Hundreds' }, { v: 1000, l: 'Thousands' },
+        { v: 10000, l: 'Ten thousands' }, { v: 100000, l: 'Hundred thousands' },
+    ].filter(x => x.v <= upTo),
+    allLabel: 'Every place',
+    help: 'Only places the number actually has are asked; the band decides how many it has.',
+});
+const _PV_PLACE_BANDS = [99, 999, 9999, 99999, 999999];
+const _pvRoundBands = (place) => [100, 1000, 10000, 100000, 1000000, 10000000].filter(b => b >= place * 10);
+const _pvNearest = (place) => [
+    _pvBand(_pvRoundBands(place), place * 10),
+    {
+        id: 'support', label: 'Support', type: 'enum', default: 'cut',
+        values: [
+            { v: 'cut', l: 'Cut line (place letters over the digits)' },
+            { v: 'line', l: 'Number line (ends labelled)' },
+            { v: 'none', l: 'None' },
+        ],
+        help: 'One support per page. The place letters stay with the cut line; "None" is the fade.',
+    },
+    _pvMidpoint(true),
+    {
+        id: 'response', label: 'How the pupil answers', type: 'enum', default: 'write',
+        values: [
+            { v: 'write', l: 'Write the rounded number' },
+            { v: 'circle-all', l: 'Circle every number that rounds to N' },
+        ],
+        help: '"Circle every number that rounds to N" is its own step: eight printed numbers, with the '
+            + 'near misses either side of halfway.',
+    },
+];
+const _pvSort = () => [
+    {
+        id: 'tiles', label: 'Numbers to sort', type: 'enum', default: 6,
+        values: [{ v: 6, l: '6' }, { v: 8, l: '8' }],
+    },
+    _pvMidpoint(false),
+];
+const _pvTask = () => ({
+    id: 'task', label: 'Task', type: 'enum', default: 'compute',
+    values: [
+        { v: 'compute', l: 'Round, then work it out' },
+        { v: 'closest', l: 'Choose the closest estimate' },
+        { v: 'reasonable', l: 'Is the answer reasonable?' },
+    ],
+    help: 'One task per page (P-28).',
+});
+const P9_PV_OPTIONS = {
+    'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000)],
+    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999)],
+    'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true)],
+    'placevalue:combine': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), {
+        id: 'order', label: 'Order of the parts', type: 'enum', default: 'largest',
+        values: [{ v: 'largest', l: 'Largest first' }, { v: 'scrambled', l: 'Scrambled (5 + 300 + 20)' }],
+    }],
+    'placevalue:compare': [_pvBand([99, 999, 9999, 99999, 999999], 999)],
+    'placevalue:order_least_to_greatest': [_pvBand([99, 999, 9999, 99999, 999999], 999)],
+    'placevalue:order_greatest_to_least': [_pvBand([99, 999, 9999, 99999, 999999], 999)],
+    'placevalue:place_value_disks': [_pvBand([99, 999, 9999], 999), {
+        id: 'task', label: 'Task', type: 'enum', default: 'read',
+        values: [{ v: 'read', l: 'Read the number from the disks' }, { v: 'count', l: "Count one place's disks" }],
+    }, _pvZeroPlace(false)],
+    // Draw to 999 only (owner ruling 3): nine 1,000 disks and 27 others is a poster, not a cell.
+    'placevalue:pv_disks_build': [_pvBand([99, 999], 999), _pvZeroPlace(false)],
+    'placevalue:pv_digit_drag': [_pvBand([999, 9999, 99999, 999999], 99999)],
+    'placevalue:number_word_names': [_pvBand([999, 9999, 99999, 999999], 999999)],
+    'placevalue:more_less_10': [
+        { id: 'step', label: 'How much more or less', type: 'enum', default: 1, values: [{ v: 1, l: '1' }, { v: 10, l: '10' }] },
+        { id: 'dir', label: 'More or less', type: 'enum', default: 'more',
+            values: [{ v: 'more', l: 'More' }, { v: 'less', l: 'Less' }, { v: 'both', l: 'Both, alternating' }] },
+        _pvBand([20, 50, 100, 120], 100),
+    ],
+    'placevalue:more_less_100': [
+        { id: 'step', label: 'How much more or less', type: 'enum', default: 100, values: [{ v: 10, l: '10' }, { v: 100, l: '100' }] },
+        { id: 'dir', label: 'More or less', type: 'enum', default: 'more',
+            values: [{ v: 'more', l: 'More' }, { v: 'less', l: 'Less' }, { v: 'both', l: 'Both, alternating' }] },
+        _pvBand([1000], 1000),
+    ],
+    'placevalue:place_value_10x': [
+        { id: 'op', label: 'Multiply or divide', type: 'enum', default: 'x',
+            values: [{ v: 'x', l: '× (digits move left)' }, { v: '/', l: '÷ (digits move right)' }] },
+        { id: 'power', label: 'By', type: 'set', default: [10],
+            values: [{ v: 10, l: '10' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }], allLabel: '10, 100 and 1,000' },
+        _pvBand([1000, 10000, 100000, 1000000], 10000),
+        { id: 'decimals', label: 'Decimals (Level 5)', type: 'bool', default: false },
+    ],
+    'number_sense:rounding_visual': [
+        { id: 'place', label: 'Round to the nearest', type: 'enum', default: 10,
+            values: [{ v: 10, l: '10' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }] },
+        _pvBand([100, 1000, 10000], 100),
+        _pvMidpoint(true),
+    ],
+    'number_sense:nearest_10': _pvNearest(10),
+    'number_sense:nearest_100': _pvNearest(100),
+    'number_sense:nearest_1000': _pvNearest(1000),
+    'number_sense:nearest_10000': _pvNearest(10000),
+    'number_sense:nearest_100000': _pvNearest(100000),
+    'number_sense:nearest_million': _pvNearest(1000000),
+    'number_sense:round_sort_10': _pvSort(),
+    'number_sense:round_sort_100': _pvSort(),
+    'number_sense:round_sort_1000': _pvSort(),
+    'number_sense:round_sort_10000': _pvSort(),
+    'number_sense:round_sort_100000': _pvSort(),
+    'number_sense:round_sort_million': _pvSort(),
+    'number_sense:round_sort_tenths': _pvSort(),
+    'number_sense:round_sort_hundredths': _pvSort(),
+    'number_sense:estimate_sums_diffs': [_pvTask()],
+    'number_sense:estimate_products': [_pvTask()],
+    'number_sense:estimate_quotient': [_pvTask()],
+};
+Object.assign(SKILL_OPTIONS, P9_PV_OPTIONS);
+
+// The place a P9 skill rounds to, read off its id (the id IS its place, owner ruling 5).
+const _PV_ID_PLACE = { '10': 10, '100': 100, '1000': 1000, '10000': 10000, '100000': 100000, million: 1000000 };
+export function pvRoundPlace(skillId, opts) {
+    const m = String(skillId).match(/^(?:nearest|round_sort)_(10|100|1000|10000|100000|million)$/);
+    if (m) return _PV_ID_PLACE[m[1]];
+    if (skillId === 'rounding_visual') return Number((opts && opts.place) || 10);
+    return 0;
+}
+
+/**
+ * The smallest Max Number a P9 skill can be dealt at with these options (§2.1). 0 = no floor.
+ * The place sets it for rounding (a nearest-100 item is at least 3 digits, so it needs 1,000);
+ * a step or a power sets it for more / less and x / ÷ 10.
+ */
+export function pvBandFloor(categoryId, skillId, opts) {
+    const o = normalizeOptions(categoryId, skillId, opts);
+    const place = pvRoundPlace(skillId, o);
+    if (place) return place * 10;
+    if (skillId === 'more_less_100') return 1000;
+    if (skillId === 'more_less_10') return Number(o.step) === 10 ? 20 : 10;
+    if (skillId === 'pv_digit_drag') return 1000;
+    if (skillId === 'place_value_10x') {
+        const powers = (Array.isArray(o.power) && o.power.length ? o.power : [10]).map(Number);
+        return Math.max(...powers) * 10;
+    }
+    return 0;
+}
+
+/** The refusal line when Max Number cannot host the skill, or '' when it can (VA-R-07). */
+export function pvRefusal(categoryId, skillId, range, opts) {
+    const floor = pvBandFloor(categoryId, skillId, opts);
+    if (!floor || !(Number(range) < floor)) return '';
+    const what = pvRoundPlace(skillId, normalizeOptions(categoryId, skillId, opts))
+        ? `Round to the nearest ${pvRoundPlace(skillId, normalizeOptions(categoryId, skillId, opts)).toLocaleString('en-US')}`
+        : 'This skill';
+    return `${what} needs Numbers to ${floor.toLocaleString('en-US')} or more.`;
+}
+// ============================ end P9 · place value + rounding ============================
+
 // Options every skill understands, whether or not it declares anything of its own.
 export const UNIVERSAL_OPTIONS = [levelOption()];
 

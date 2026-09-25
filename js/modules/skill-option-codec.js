@@ -53,6 +53,19 @@ export const OPTION_KEYS = {
     simplestForm: 'S',
     pictures: 'P',
     band: 'B',
+    // P9 place value + rounding (2026-09-25)
+    step: 'T',
+    dir: 'I',
+    task: 'K',
+    zeroPlace: 'Z',
+    op: 'X',
+    power: 'E',
+    places: 'A',
+    order: 'V',
+    place: 'Q',
+    midpoint: 'H',
+    support: 'F',
+    tiles: 'Y',
 };
 const KEY_TO_OPTION = Object.fromEntries(Object.entries(OPTION_KEYS).map(([id, k]) => [k, id]));
 
@@ -61,14 +74,26 @@ const KEY_TO_OPTION = Object.fromEntries(Object.entries(OPTION_KEYS).map(([id, k
 // {10, 11} -> "AB"); decimal digits for a single enum / int value (Max Number 1,000 -> "1000").
 export const VALUE_TOKENS = {
     notation: { stacked: 'S', across: 'A', bracket: 'B', fraction: 'F' },
-    response: { standard: 'S', 'which-numbers': 'W', 'array-builder': 'A' },
+    response: { standard: 'S', 'which-numbers': 'W', 'array-builder': 'A', write: 'R', 'circle-all': 'C' },
     regroup: { none: 'N', always: 'A', mixed: 'M' },
     orientation: { vertical: 'V', horizontal: 'H' },
     unknown: { answer: 'A', first: 'F', second: 'S', mixed: 'M' },
     wordform: { to_number: 'N', to_words: 'W' },
+    dir: { more: 'M', less: 'L', both: 'B' },
+    task: { read: 'R', count: 'C', compute: 'P', closest: 'N', reasonable: 'E' },
+    zeroPlace: { none: 'N', some: 'S', always: 'A' },
+    op: { x: 'M', '/': 'D' },
+    order: { largest: 'L', scrambled: 'S' },
+    midpoint: { never: 'N', seeded: 'S', only: 'O' },
+    support: { cut: 'C', line: 'L', none: 'N' },
+    // Numeric sets whose members are not all under 36: one digit per power of ten.
+    power: { 10: '1', 100: '2', 1000: '3' },
+    places: { 1: '0', 10: '1', 100: '2', 1000: '3', 10000: '4', 100000: '5' },
 };
 
 function _setToken(optId, v) {
+    const own = VALUE_TOKENS[optId] && VALUE_TOKENS[optId][v];
+    if (own) return own;
     if (typeof v === 'number' && Number.isInteger(v) && v >= 0 && v < 36) return v.toString(36).toUpperCase();
     const t = VALUE_TOKENS[optId] && VALUE_TOKENS[optId][v];
     if (t) return t;
@@ -86,7 +111,8 @@ function _fromToken(optId, def, tok, inSet) {
     const tokens = VALUE_TOKENS[optId];
     if (tokens) {
         const hit = Object.entries(tokens).find(([, t]) => t === tok);
-        if (hit) return hit[0];
+        // A numeric set's token map is keyed by the number (object keys are strings).
+        if (hit) return /^\d+$/.test(hit[0]) && (def.values || []).some(x => x.v === Number(hit[0])) ? Number(hit[0]) : hit[0];
     }
     const n = inSet ? parseInt(tok, 36) : (/^\d+$/.test(tok) ? parseInt(tok, 10) : NaN);
     return Number.isFinite(n) ? n : undefined;

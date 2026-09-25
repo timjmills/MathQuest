@@ -381,12 +381,22 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     const role = section.role || 'independent';
     const W = Number(availableWidthMm) || LIVE_W_MM;
     const header = ctx.header || FULL_HEADER;
-    const G = gridHeightMm(paper, size, header);
-    const Gc = gridHeightMm(paper, size, header, { cont: true });
+    // A banded role (Guided, Review, the thinking pages ...) hands in the height its grid really
+    // has once its strips and bands are taken off; a grid role leaves it to the header formula.
+    const gridOverride = Number(section.gridH) > 0 ? Number(section.gridH) : 0;
+    const G = gridOverride || gridHeightMm(paper, size, header);
+    const Gc = gridOverride || gridHeightMm(paper, size, header, { cont: true });
     const infos = (items || []).map((it) => itemInfo(it, { size, look, paper: paperOf(paper).id, mode: 'print' }));
     const cls = sectionClass(infos);
-    const target = PRACTICE_TARGET[cls];
-    const ceiling = PRACTICE_CEILING[cls][size];
+    // A role's own grid (PT 2.3, 2.7, 2.9, 6.1 ...) overrides the Independent targets and ceiling:
+    //   section.target  = {cols, rows: N | {S, M, L}, rowsByCols?: {[cols]: N}}
+    //   section.ceiling = N | {S, M, L}        section.autoCap / section.maxCols = N
+    const bySize = (v) => (v && typeof v === 'object' ? v : { S: v, M: v, L: v });
+    const target = section.target && section.target.cols
+        ? { cols: section.target.cols, rows: bySize(section.target.rows || 3), rowsByCols: section.target.rowsByCols || null }
+        : PRACTICE_TARGET[cls];
+    const ceiling = section.ceiling !== undefined && section.ceiling !== null
+        ? (bySize(section.ceiling)[size] || PRACTICE_CEILING[cls][size]) : PRACTICE_CEILING[cls][size];
     const roleCols = ROLE_COLUMNS[role] || ROLE_COLUMNS.independent;
     const requested = section.columns === undefined || section.columns === null || section.columns === 'auto' || section.columns === 0
         ? 'auto' : Math.max(1, Math.min(10, Math.floor(Number(section.columns)) || 1));
@@ -394,8 +404,11 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
 
     // The section's column cap: the role's, then every item's own (`maxCols`, a hard cap
     // before the digit-aware clamp). Word problems and wide rows are one column (PT-WPR-1).
-    const hardCap = cls === 'word' || cls === 'wide' ? 1 : Math.min(roleCols.cap, ...infos.map((i) => i.fp.maxCols || 6));
-    const autoCap = typeof roleCols.auto === 'object' ? (roleCols.auto[size] || roleCols.auto[look] || 2) : roleCols.auto;
+    const hardCap = cls === 'word' || cls === 'wide' ? 1
+        : Math.min(roleCols.cap, Number(section.maxCols) || 10, ...infos.map((i) => i.fp.maxCols || 6));
+    const autoCap = Number(section.autoCap) > 0 ? Number(section.autoCap)
+        : section.target && section.target.cols ? section.target.cols
+        : typeof roleCols.auto === 'object' ? (roleCols.auto[size] || roleCols.auto[look] || 2) : roleCols.auto;
 
     // `section.floor[cols] = {hMm, fits}`: the worst case the host measured over a wider sample of
     // the section's skills than the items finally kept. Folding it in keeps the page capacity a
@@ -445,7 +458,8 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         notes.push('A problem is wider than its cell even in 1 column.');
     }
     const hard = Math.max(1, Math.floor((G - SAFETY_H_MM) / Math.max(1, hMin)));
-    const targetRows = cols === (target && target.cols) ? target.rows[size] : (EXPLICIT_TARGET_ROWS[cols] || cols);
+    const targetRows = cols === (target && target.cols) ? target.rows[size]
+        : (target && target.rowsByCols && target.rowsByCols[cols]) || (EXPLICIT_TARGET_ROWS[cols] || cols);
     let rows = Math.min(targetRows, hard);
     // CL-2: a two-column grid takes one of the permitted shapes.
     if (cols === 2) rows = TWO_COL_ROWS.find((r) => r <= rows) || 1;

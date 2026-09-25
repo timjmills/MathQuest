@@ -3,7 +3,7 @@
 // Layer 0: Foundation
 import { state } from './modules/state.js';
 import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, normalizeText, fracText, fractionToPercent } from './modules/utils.js';
-import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, DEFAULT_TABLES, getDomainByCategory, getCategoryInfo, SKILL_TIME_CATEGORY, GRADE_COLORS, SKILL_GRADES, getSkillGrade, gradeCircleHTML, gradeCircleText, sortByGrade, SKILL_PRINT_SIZE, PRINT_SIZE_COLUMNS, getSkillPrintSize, SKILL_FULL_LABELS, getMixedSkillCount, isMixedMetaSkill } from './modules/data.js';
+import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, DEFAULT_TABLES, getDomainByCategory, getCategoryInfo, SKILL_TIME_CATEGORY, GRADE_COLORS, SKILL_GRADES, getSkillGrade, gradeCircleHTML, gradeCircleText, sortByGrade, SKILL_PRINT_SIZE, PRINT_SIZE_COLUMNS, getSkillPrintSize, SKILL_FULL_LABELS, getMixedSkillCount, isMixedMetaSkill, getMixedPoolSkills } from './modules/data.js';
 
 // Layer 1: Storage & SVG helpers
 import { setCookie, getCookie, loadPersistentData, savePersistentData } from './modules/storage.js';
@@ -150,7 +150,7 @@ Object.assign(window, {
     getDomainByCategory, getCategoryInfo, SKILL_TIME_CATEGORY,
     GRADE_COLORS, SKILL_GRADES, getSkillGrade, gradeCircleHTML, gradeCircleText, sortByGrade,
     SKILL_PRINT_SIZE, PRINT_SIZE_COLUMNS, getSkillPrintSize,
-    SKILL_FULL_LABELS, getMixedSkillCount, isMixedMetaSkill,
+    SKILL_FULL_LABELS, getMixedSkillCount, isMixedMetaSkill, getMixedPoolSkills,
 
     // Utils
     randInt, shuffle, pick, buildNumericOptions, simplifyFraction, normalizeText,

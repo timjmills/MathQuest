@@ -281,7 +281,8 @@ Line style and corner shape carry meaning. They are never decorative, and a styl
 | **Dashed** (long dash) | 0.75 pt, 3 mm on / 2 mm off | **Cut here** | Cut lines, tile outlines and card outlines on hands-on pages, practice strips and 2-up sheets |
 | **Dashed box** (short dash) | 0.75 pt, 1.5 mm on / 1 mm off, on a digit-box outline only | **The unknown digit** inside a stacked problem | The missing-digit box (section 6, VA-7) |
 | **Solid shape vs hollow shape** | Solid black vs 0.75 pt outline | Two sets | Counters for addend 1 vs addend 2; series 1 vs series 2 |
-| **Square corners** (radius 0) | | Structure: a place with a rule about what goes in it | Frames, cells, answer boxes, digit boxes, tables, tabs |
+| **Square corners** (radius 0) | | Structure: the page's own frame | Cell frames, grid dividers, band strips, tables, tabs, the header score / strand box |
+| **Slightly rounded** (slot radius 1 / 1.25 / 1.5 mm at S / M / L, SL-11) | | A place to WRITE | Answer boxes, digit boxes and digit strips, regroup / carry strips, the missing-digit box, checkboxes, time boxes, stand-alone write-in boxes |
 | **Rounded corners** (radius 3 mm; 1 mm on objects under 8 mm) | | Something to read or think with, or a number object | Story box, Steps box, vocabulary box, think box, skip-count strip, number-track boxes, flashcard cells, fact-family trio box, dot tile, generic notes |
 
 - **LS-1** Dotted lines are always 1 pt round dots at 1.2 mm pitch, black or grey.
@@ -289,9 +290,9 @@ Line style and corner shape carry meaning. They are never decorative, and a styl
 - **LS-3** A dashed line, and the dashed outline of a tile or card, always means **cut**: a line across the page or the closed outline of a tile or card. The first cut line on a page carries a scissors glyph (in-house line art). The unknown quantity in a diagram is a solid square-cornered box or bar with a zone-label `?` in its top-left corner, never a dashed shape.
 - **LS-4** These two meanings hold on every page type, on paper and on screen. A lint finds any dashed stroke that is neither tagged as a cut line (`data-ws-cut`) nor the outline of a missing-digit slot (`data-ws-shape="box-unknown"`).
 - **LS-5** Two sets in one drawing are solid vs hollow. A third set, when unavoidable, is a hollow shape with a centre dot. Sets are never told apart by grey level.
-- **LS-6** A rounded box is never a place for a final answer. A square box, a line or a circle is. The think box (SF-40) is rounded for this reason.
+- **LS-6** A **3 mm** rounded container is never a place for a final answer. A writing box (slot radius, at most 1.5 mm), a line or a circle is. The think box (SF-40) carries the 3 mm radius for this reason. The two radii never meet: a container is at least 3 mm, a writing box at most 1.5 mm (owner ruling 2026-09-25, SL-11).
 - **LS-7** Arrows: 1.5 pt shaft, solid triangular head 2.5 x 2 mm. A dotted arrow models a move the pupil will make; a solid arrow is given information.
-- **LS-8** **Dashed box = the unknown digit** (owner ruling 2026-09-19). In a missing-digit item, where one digit inside a stacked problem is unknown, that digit's place is a square-cornered digit box with a short-dash outline (0.75 pt, 1.5 mm on / 1 mm off). The dash tells it apart from the solid regroup and carry boxes, which share its shape and sit in the same stack (VA-10, VA-21). It is the only dashed shape that is not a cut line: it is always a closed box of digit-box size inside a stack, it never carries the scissors glyph, and the short dash is never used for anything else. An unknown quantity in a diagram stays a solid box marked `?` (LS-3).
+- **LS-8** **Dashed box = the unknown digit** (owner ruling 2026-09-19). In a missing-digit item, where one digit inside a stacked problem is unknown, that digit's place is a digit box (slot radius, SL-11) with a short-dash outline (0.75 pt, 1.5 mm on / 1 mm off). The dash tells it apart from the solid regroup and carry boxes, which share its shape and sit in the same stack (VA-10, VA-21). It is the only dashed shape that is not a cut line: it is always a closed box of digit-box size inside a stack, it never carries the scissors glyph, and the short dash is never used for anything else. An unknown quantity in a diagram stays a solid box marked `?` (LS-3).
 
 ---
 
@@ -302,16 +303,17 @@ The shape of the slot tells the pupil what kind of answer goes in it. One answer
 | Slot | Shape | Size (S / M / L) | Means | `data-ws-shape` |
 |---|---|---|---|---|
 | Line | Baseline rule, 0.75 pt | Width B(n); clear height Hw above it | A number | `line` |
-| Digit box | Square-cornered box, 0.75 pt | Track - 1 mm wide (min 4.4) x Hw tall; stand-alone missing-number box B(n) x (Hw + 2) | One digit, or a missing number inside an expression | `box` |
-| Answer square | Square box, 0.75 pt | 16 / 20 / 24 mm | A count beside a picture (K counting) | `box` |
+| Digit box | Box, 0.75 pt, slot radius (SL-11) | Stand-alone missing-number box B(n) x (Hw + 2). A ROW of digit boxes is always a digit strip (next row) | One digit, or a missing number inside an expression | `box` |
+| Digit strip | ONE box, 0.75 pt, slot radius at its two ends, a 0.75 pt divider on every track boundary (SL-12) | One segment per track, each exactly one track wide; answer strip 7.2 / 9.6 / 12 mm tall, regroup strip 6 / 7 / 8 mm | A row of digits: the answer row of a Model / Guided stack, the regroup row, a quotient row, a place-value write-in row | `box` per segment, `data-ws-seg` = `first` / `mid` / `last` / `only` |
+| Answer square | Square box, 0.75 pt, slot radius | 16 / 20 / 24 mm | A count beside a picture (K counting) | `box` |
 | Circle | Circle, 0.75 pt | Diameter Hw + 2 mm | A sign: `+ − × ÷` or `< = >` | `circle` |
 | Fraction bar | 1.5 pt bar with open writing zone above and below | Bar width B(2); each zone Hw tall; total 2 Hw + 2 mm | A fraction | `fraction` |
 | Mixed-number box | Tall square box (whole) beside a fraction bar | Whole box B(1) x (2 Hw + 2); gap 2 mm; then fraction bar | A mixed number | `mixed` |
-| Time | Two boxes with a printed colon between | Each 16 / 18 / 20 mm x (Hw + 2); colon in a 5 mm gap | A time `__:__` | `time` |
+| Time | Two boxes (slot radius) with a printed colon between | Each 16 / 18 / 20 mm x (Hw + 2); colon in a 5 mm gap | A time `__:__` | `time` |
 | Number + unit word | Line followed by the pre-printed unit word at cell-text size | Line B(n); 2 mm gap; word | A quantity with its label | `unit` |
 | Number + label (faded) | Short line then long line | B(n) then 40 / 46 / 52 mm | Word-problem v2: pupil writes number and label | `unit-open` |
-| Missing-digit box | Square-cornered box, **dashed** 0.75 pt (short dash: 1.5 mm on / 1 mm off, LS-8) | Track - 1 mm wide (min 4.4) x Hw tall | The one unknown digit inside a stacked problem | `box-unknown` |
-| Checkbox | Hollow square, 0.75 pt | 5 / 6 / 7 mm | A decision: check one box | `check` |
+| Missing-digit box | Box, slot radius, **dashed** 0.75 pt (short dash: 1.5 mm on / 1 mm off, LS-8) | Track - 1 mm wide (min 4.4) x Hw tall | The one unknown digit inside a stacked problem | `box-unknown` |
+| Checkbox | Hollow square, 0.75 pt, slot radius | 5 / 6 / 7 mm | A decision: check one box | `check` |
 | Words to circle | Printed options in a spaced row or stacked | Gap between options >= 8 mm; each option's ring area >= Hw + 4 tall | A choice among printed words, numerals or pictures | `choice` |
 | Equation frame | Lines for numbers, circles for signs: `__ O __ = __` | Lines B(n), circles as above | A number sentence | each part is its own slot: `line` and `circle` |
 
@@ -336,9 +338,12 @@ B(n, size) = max(14, ceil(n x 0.75 x Hw + 2 + s))   mm
 - **SL-5** A word-problem answer blank always has the unit word pre-printed after it (correctly pluralised). Pupils never have to compose the label except on the faded v2 form.
 - **SL-6** Blanks are drawn as ruled lines or boxes, never as underscore characters.
 - **SL-7** Exactly one slot type per cell answer, and the slot type matches the question's answer type (the mapping lives in `design/SKILL_CELL_CONTRACT.md`). A production item is never converted into "words to circle" unless the item is a choice on paper too.
-- **SL-8** A rounded container, a grey shape or a dotted shape is never an answer slot (LS-6). The black line, box or circle is the only place a scored answer goes.
+- **SL-8** A 3 mm rounded container, a grey shape or a dotted shape is never an answer slot (LS-6). The black line, box or circle is the only place a scored answer goes.
 - **SL-9** Generic-coin totals are plain numbers on a line: no currency sign, no unit word. A currency sign may be pre-printed beside a blank only inside a word problem whose story text uses that currency.
 - **SL-10** A missing-digit box is dashed and every regroup, carry and headroom box is solid, so the two are never confused in one stack (LS-8, VA-7). The dashed box is a scored answer slot; the solid boxes above the stack are scratch space (VA-13).
+- **SL-11** **Slot radius** (owner ruling 2026-09-25: "the square boxes should be slightly rounded"). Every writing box - digit box, digit strip, answer box, regroup / carry strip, missing-digit box, checkbox, time box, stand-alone write-in box - has a corner radius of **1 / 1.25 / 1.5 mm at S / M / L** (`SLOT.slotRadiusMm`, CSS `--ws-slot-r`). The cell frame, the grid dividers, band strips, tables, tabs and the header score / strand box stay square (radius 0): they are the page, not a place to write. On screen the same boxes round at 0.15 x the digit size (min 4 px, `--mq-slot-r`).
+- **SL-12** **Digit strip** (owner ruling 2026-09-25: "they could be one box actually with dividers between them"). A row of digit boxes is ONE rounded outline with a 0.75 pt divider on every track boundary, never a row of separate boxes with gaps. Each segment is exactly one track wide (the column pitch of the digits above it), so every divider sits between two place-value columns and place value still lines up. Only the two ends are rounded; only the last segment draws a right edge, so no divider doubles. A run of boxes interrupted by a non-box track (the operator track, a decimal point) is two strips. Heights: the **answer strip is 7.2 / 9.6 / 12 mm** (1.2 x Hw, was a Hw-tall box; it fits the 8 / 10 / 12 mm answer row, VA-4), the **regroup strip is 6 / 7 / 8 mm** (was a 5 / 6 / 7 mm carry box; it fills the 6 / 7 / 8 mm regroup row). Widths grow from track - 1 mm to the full track (4.4 / 6.4 / 8.4 mm to 5.4 / 7.4 / 9.4 mm at the 0.95 em regroup track). No row height changes, so no page capacity changes (section 13). The answer key writes each digit inside its own segment (AK-2).
+- **SL-13** On screen the strip is still one input per digit, each input a full-track target of at least 44 px (SP-10): the strip's outline and dividers are drawn on the inputs, keyed on `data-ws-seg`, so markup saved before the ruling (no `data-ws-seg`) keeps its separate boxes.
 
 ---
 
@@ -632,9 +637,9 @@ Minimum cell height (mm), I Can / Daily:
  ( ) [ ] [ ] [ ]            <- answer digit boxes ("ones box" first), Model and Guided only
 ```
 
-- **VA-10** **Carry box**: square-cornered, solid 0.75 pt, width = track - 1 mm, height 5 / 6 / 7 mm, in a regroup row of 6 / 7 / 8 mm. One above **every column except the ones**, whether or not that column regroups, so the boxes reveal nothing. Black in Model, grey 1 pt in Guided, and present as black structural boxes in Independent when "regroup boxes" is on.
-- **VA-11** **Ones box**: in Model and Guided cells the answer row shows one digit box per track (0.75 pt, track - 1 mm x Hw). The first Model cell links the ones answer box and the carry box above the tens with a dotted arrow pair (hint) to show "write the ones here, regroup the ten there". Independent cells have an open answer row.
-- **VA-12** Any regroup row forces 0.95 em tracks (TY-21). Box widths are therefore 4.4 / 6.4 / 8.4 mm.
+- **VA-10** **Carry box**: one segment of the regroup strip (SL-12): solid 0.75 pt, slot radius at the strip's ends, width = one track, height 6 / 7 / 8 mm, in a regroup row of 6 / 7 / 8 mm. One above **every column except the ones**, whether or not that column regroups, so the boxes reveal nothing. Black in Model, grey 1 pt in Guided, and present as black structural boxes in Independent when "regroup boxes" is on.
+- **VA-11** **Ones box**: in Model and Guided cells the answer row is one answer strip with a segment per track (SL-12: 0.75 pt, one track x 1.2 Hw). The first Model cell links the ones answer box and the carry box above the tens with a dotted arrow pair (hint) to show "write the ones here, regroup the ten there". Independent cells have an open answer row.
+- **VA-12** Any regroup row forces 0.95 em tracks (TY-21). Strip segments are therefore one 0.95 em track wide: 5.4 / 7.4 / 9.4 mm (the old separate boxes were track - 1 mm, 4.4 / 6.4 / 8.4 mm).
 - **VA-13** Regroup boxes are scratch space: never scored, never marked on screen, never auto-focused (SP-23).
 
 ### 10.3 Subtraction: Tens / Ones boxes, including across zeros

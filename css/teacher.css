@@ -822,3 +822,22 @@ body.teacher-mode #adaptiveLevelChip { display: none !important; }
 /* Dark mode: the online worksheet kept a white page behind dark cards. */
 html.dark body.teacher-mode #worksheetView.online-edition { background: var(--tv-page); color: var(--tv-text); }
 html.dark body.teacher-mode #worksheetView.online-edition .game-header { background: var(--tv-surface); border-color: var(--tv-border); color: var(--tv-text); }
+
+/* Page-type picker, every working role (2026-09-25 merge): quiet groups of compact cards. */
+.tv-ptype-groups { display: flex; flex-direction: column; gap: 12px; }
+.tv-ptype-group { display: flex; flex-direction: column; gap: 6px; }
+.tv-ptype-h { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--tv-caption); }
+.tv-ptype-groups .tv-ptypes { grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 6px; }
+.tv-ptype-groups .tv-ptype { min-height: 60px; padding: 8px 10px; gap: 10px; }
+.tv-ptype-groups .tv-ptype .tv-radio-title { font-size: 13px; line-height: 18px; }
+.tv-ptype-thumb { flex: none; color: var(--tv-text-2); }
+.tv-ptype[aria-checked="true"] .tv-ptype-thumb { color: var(--tv-text); }
+.tv-ptype.is-unfit { border-style: dashed; }
+.tv-ptype-why {
+    display: flex; align-items: flex-start; gap: 8px; margin: 8px 0 0; padding: 10px 12px;
+    border: 1px solid var(--tv-border); border-radius: 8px; background: var(--tv-subtle-2);
+    font-size: 13px; line-height: 18px; font-weight: 500; color: var(--tv-text);
+}
+.tv-ptype-why svg { flex: none; margin-top: 1px; color: var(--tv-caption); }
+.tv-fits-warn { display: flex; align-items: flex-start; gap: 8px; margin-top: 8px; padding: 8px 10px; border: 1px solid var(--tv-border); border-radius: 8px; background: var(--tv-subtle-2); color: var(--tv-text); }
+.tv-fits-warn svg { flex: none; color: var(--tv-caption); }

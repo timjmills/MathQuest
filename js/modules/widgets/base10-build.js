@@ -181,10 +181,9 @@ export function renderBase10Build(q, container) {
                 ${paletteBlocks}
             </div>
             ${regroupHtml}
-            <div class="b10-counter" aria-live="polite"
-                 style="text-align:center;margin-top:10px;font-weight:600;color:var(--text-dim);">
-                Total: 0
-            </div>
+            <!-- No live "Total: N" readout: it let the pupil add blocks until the total
+                 matched the target, which turns place value into trial and error
+                 (baseline 2026-09-24, base10_build C2). The value is checked on Submit. -->
             <div class="b10-toolbar" style="display:flex;justify-content:center;gap:10px;margin-top:10px;">
                 <button type="button" class="b10-clear secondary-btn">Clear</button>
                 <button type="button" class="b10-submit primary-btn" disabled>Submit</button>
@@ -199,7 +198,6 @@ export function renderBase10Build(q, container) {
     const palette = host.querySelector('[data-role="palette"]');
     const submit = host.querySelector('.b10-submit');
     const clearBtn = host.querySelector('.b10-clear');
-    const counter = host.querySelector('.b10-counter');
     const live = host.querySelector('.b10-live');
     let locked = false;
     const blockCounters = Object.fromEntries(places.map(p => [p, 0]));
@@ -222,7 +220,6 @@ export function renderBase10Build(q, container) {
 
     function refreshUI() {
         const total = getTotal();
-        counter.textContent = `Total: ${total.toLocaleString()}`;
         submit.disabled = total === 0;
         // Update regroup buttons enabled state.
         const counts = getCounts();

@@ -586,3 +586,64 @@ html .mq-scell.mq-mono input.flash-correct { box-shadow: 0 0 0 2px #2E7D5B !impo
 .qt-question-card .qt-q-header .qt-flag-btn { min-height: 44px; min-width: 64px; }
 .qt-question-card .qt-feedback { max-width: 720px; margin-left: auto; margin-right: auto; }
 .dark .qt-question-card .ws-cell.mq-scell .qt-answer-input { background: #fff; }
+
+/* ---------------------------------------------------------------- P8b: drawn K-2 pictures
+   The number bond (RP-60) and the take-away strip size themselves from --mq-bond / --mq-pic
+   (18 mm / 10 mm on paper). On screen: a 72 px bond box (64 px on a phone) and 44 px counters
+   (RUBRIC C1: objects >= 40 px). An answer blank drawn inside the visual takes the host's input
+   (screen-cell.js adoptVisualBlank): the bond's empty box IS the input, square, its own size. */
+.mq-scell { --mq-bond: 72px; --mq-pic: 44px; }
+@media (max-width: 480px) { .mq-scell { --mq-bond: 64px; } }
+.mq-scell .mq-bond { margin: 4px auto; }
+.mq-scell .mq-bond input.mq-slot.mq-slot--invisual,
+.online-edition .problem-card.mq-wscard .mq-scell .mq-bond input.mq-slot.mq-slot--invisual,
+.qt-question-card .ws-cell.mq-scell .mq-bond .qt-answer-input.mq-slot.mq-slot--invisual {
+    width: var(--mq-bond) !important; height: var(--mq-bond) !important;
+    min-width: 0 !important; min-height: 0 !important;
+    padding: 0 !important; border-width: 1px !important; border-radius: 0 !important;
+    font-size: calc(var(--mq-bond) * 0.52) !important; font-weight: 700; line-height: 1;
+    text-align: center; background: #fff;
+}
+/* a line blank after "=": the input sits on the equation's baseline */
+.mq-scell input.mq-slot.mq-slot--invisual:not(.mq-slot--box) { vertical-align: baseline; margin-left: 0.2em; }
+
+/* P8b: the multiplication-chart window. Cells sized for three digits (--mq-mc: 13 mm on paper;
+   52 px here, 48 px on a phone), rows at least 44 px (C1 touch targets). Each empty cell holds
+   its own input (screen-cell.js wireCellSlots): the cell is the slot, as on paper. */
+.mq-scell { --mq-mc: 52px; }
+@media (max-width: 480px) { .mq-scell { --mq-mc: 48px; } }
+.mq-scell .mq-multchart td { height: max(44px, calc(var(--mq-mc) * 0.85)) !important; }
+.mq-scell [data-mq-cell] > input.mq-cellslot,
+.mq-scell .mq-multchart input.mq-cellslot {
+    display: block; box-sizing: border-box; width: 100%; height: 100%; min-height: 44px;
+    margin: 0; padding: 0; border: 0; border-radius: 0; background: #fff; color: #000;
+    font-family: "Andika", sans-serif; font-size: 1em; font-weight: 700; line-height: 1;
+    text-align: center; caret-color: #000; outline: none;
+}
+.mq-scell [data-mq-cell] > input.mq-cellslot:focus { outline: 3px solid #5E3FCC; outline-offset: -3px; }
+/* ---------------------------------------------------------------- writing-box radius + digit strip
+   SL-11 / SL-12 (owner ruling 2026-09-25), the screen twin of css/sheet-kit.css: every writing box
+   is slightly rounded, and a row of stack digit inputs is ONE strip - a rounded outline with a 1 px
+   divider on every track boundary. Each input is still one digit and one full-track (>= 44 px)
+   target; only the drawing changes. The strip is drawn with inset shadows so the transparent
+   target border keeps its size, and keyed on `data-ws-seg`, which only new markup carries (saved
+   quiz HTML keeps its separate boxes). */
+.mq-scell { --mq-slot-r: max(4px, calc(var(--mq-digit) * 0.15)); }
+html .mq-scell input.ws-input--box, html .mq-scell input.mq-slot.mq-slot--box,
+html .mq-scell .ws-box, html .mq-scell .ws-check { border-radius: var(--mq-slot-r) !important; }
+html .mq-scell .mq-kit :is(.ab, .rg)[data-ws-seg] { --mq-segr: 0 0 0 0 transparent; }
+html .mq-scell .mq-kit :is(.ab, .rg):is([data-ws-seg="last"], [data-ws-seg="only"]) { --mq-segr: inset -1px 0 0 0 #000; }
+html .mq-scell .mq-kit .ab[data-ws-seg] > input.mq-digit,
+html .mq-scell .mq-kit .rg[data-ws-seg] > input.mq-carry {
+    border-left-width: 0 !important; border-right-width: 0 !important;
+    box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, inset 1px 0 0 0 #000, var(--mq-segr) !important;
+    border-radius: 0 !important;
+}
+html .mq-scell .mq-kit :is(.ab[data-ws-seg="first"] > input.mq-digit, .rg[data-ws-seg="first"] > input.mq-carry) { border-radius: var(--mq-slot-r) 0 0 var(--mq-slot-r) !important; }
+html .mq-scell .mq-kit :is(.ab[data-ws-seg="last"] > input.mq-digit, .rg[data-ws-seg="last"] > input.mq-carry) { border-radius: 0 var(--mq-slot-r) var(--mq-slot-r) 0 !important; }
+html .mq-scell .mq-kit :is(.ab[data-ws-seg="only"] > input.mq-digit, .rg[data-ws-seg="only"] > input.mq-carry) { border-radius: var(--mq-slot-r) !important; }
+/* marked digits in a strip (SP-30): the strip lines stay, the coloured band sits inside them */
+html .mq-scell.mq-mono .mq-kit .ab[data-ws-seg] > input.mq-digit:is(.box-correct, [style*="var(--correct)"]) {
+    box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, inset 1px 0 0 0 #000, var(--mq-segr), inset 0 0 0 3px #2E7D5B !important; }
+html .mq-scell.mq-mono .mq-kit .ab[data-ws-seg] > input.mq-digit:is(.box-wrong, [style*="var(--incorrect)"]) {
+    box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, inset 1px 0 0 0 #000, var(--mq-segr), inset 0 0 0 3px #B73838 !important; }

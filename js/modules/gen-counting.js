@@ -176,6 +176,71 @@ function _kShapeGrid(count, shape, { cell = 40, cols = 5, frame = false, tenGap 
         + `style="display:block;margin:0 auto;">${body}</svg>`, w, h, rows };
 }
 
+/**
+ * A number bond (RP-60): the whole box above, two part boxes below, joined by 0.75 pt lines.
+ * Square-cornered writing boxes, side `--mq-bond` (18 mm on paper, the middle of RP-60's
+ * 14 / 16 / 20 mm; screen-cell.css re-declares it in px). The whole box has a 1.5 pt border, the
+ * parts 0.75 pt. The unknown box is EMPTY and solid, never dashed (LS-3), and it carries the
+ * slot markers two consumers read: `blank-box` + `data-ws-slot` / `data-ws-shape="box"` (the
+ * print key writes the answer into it, print-sheet.js legacyKeyFill) and `data-mq-blank` (the
+ * screen hosts put the answer input in its place, screen-cell.js adoptVisualBlank).
+ * `unknown` is 'A' (left part), 'B' (right part) or 'whole'.
+ */
+function _kBond(total, partA, partB, unknown) {
+    // Geometry in box units B: three columns B wide with 0.6 B between them, two rows with 0.9 B.
+    const W = 4.2, H = 2.9;
+    const box = (col, row, value, heavy, empty) => {
+        const pos = `position:absolute;left:calc(var(--mq-bond, 18mm) * ${(col * 1.6).toFixed(1)});`
+            + `top:calc(var(--mq-bond, 18mm) * ${(row * 1.9).toFixed(1)});`;
+        const shape = `width:var(--mq-bond, 18mm);height:var(--mq-bond, 18mm);box-sizing:border-box;`
+            + `border:${heavy ? '1.5pt' : '0.75pt'} solid ${K_INK};border-radius:0;background:#fff;`
+            + `display:inline-flex;align-items:center;justify-content:center;`
+            + `font-family:${K_FONT};font-weight:700;font-size:calc(var(--mq-bond, 18mm) * 0.52);line-height:1;color:${K_INK};`;
+        return empty
+            ? `<span class="blank-box" data-ws-slot="answer" data-ws-shape="box" data-mq-blank="box" style="${pos}${shape}"></span>`
+            : `<span class="mq-bond-box" style="${pos}${shape}">${value}</span>`;
+    };
+    // Lines from the bottom middle of the whole to the top middle of each part (box units).
+    const line = (x2) => `<line x1="2.1" y1="1" x2="${x2}" y2="1.9" stroke="${K_INK}" `
+        + `stroke-width="1" vector-effect="non-scaling-stroke" stroke-linecap="round"/>`;
+    return `<div class="mq-bond" role="img" aria-label="number bond" style="position:relative;display:inline-block;`
+        + `width:calc(var(--mq-bond, 18mm) * ${W});height:calc(var(--mq-bond, 18mm) * ${H});margin:2mm auto;vertical-align:top;">`
+        + `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true" `
+        + `style="position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;">${line(0.5)}${line(3.7)}</svg>`
+        + box(1, 0, total, true, unknown === 'whole')
+        + box(0, 1, partA, false, unknown === 'A')
+        + box(2, 1, partB, false, unknown === 'B')
+        + `</div>`;
+}
+
+/**
+ * P8b: a take-away strip — `n` counters of one K_SHAPES shape in a row, the first `m` crossed out
+ * with a bold X drawn through the whole object. Every counter is an OUTLINE (a filled 9 mm
+ * counter is over the INK-5 7 mm limit, and the X must read against what it crosses). Sized by
+ * `--mq-pic` (10 mm on paper, section 11.2 counting size; screen-cell.css re-declares it in px),
+ * so print and screen draw the same picture.
+ */
+function _kTakeAwayStrip(n, m, shapeIdx) {
+    const shape = K_SHAPES[shapeIdx] || K_SHAPES[0];
+    const pitch = 48, s = 17;                    // user units per counter; the shape's radius
+    const w = n * pitch, h = pitch;
+    let body = '';
+    for (let i = 0; i < n; i++) {
+        const cx = pitch * i + pitch / 2, cy = h / 2;
+        // the outline form of the counter (K_SHAPES' circle is solid; here it is drawn open)
+        body += shape.name === 'counter'
+            ? `<circle cx="${cx}" cy="${cy}" r="${s}" fill="none" stroke="${K_INK}" stroke-width="${K_HEAVY}"/>`
+            : shape.draw(cx, cy, s);
+        if (i < m) {
+            const d = s + 4;
+            body += `<path d="M${cx - d} ${cy - d} L${cx + d} ${cy + d} M${cx + d} ${cy - d} L${cx - d} ${cy + d}" `
+                + `stroke="${K_INK}" stroke-width="3.5" stroke-linecap="round" fill="none"/>`;
+        }
+    }
+    return `<svg class="mq-takeaway" viewBox="0 0 ${w} ${h}" role="img" aria-label="${n} ${shape.plural}, ${m} crossed out" `
+        + `style="display:inline-block;width:calc(var(--mq-pic, 10mm) * ${n});height:var(--mq-pic, 10mm);overflow:visible;">${body}</svg>`;
+}
+
 /** A 5x2 ten frame with the first `filled` cells carrying a black counter. */
 function _kTenFrame(filled, { frames = 1, cell = 36 } = {}) {
     const pad = 6;
@@ -607,50 +672,50 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
 
     // ========================================
     // NUMBER BONDS (Grade K) — "within 10", so the whole is 2-10 and the parts are whole numbers.
-    // One cell shape: the bond diagram, with the missing part an empty dashed circle. The old
-    // ten-frame variant asked the pupil to "fill the ten-frame to 9" on an item whose answer was
-    // 9, in a seventeen-word cell; the drag ten frame lives in ten_frame_build.
+    // One cell shape: the bond (RP-60) — the whole box above, two part boxes below, joined by
+    // hair lines. The unknown is the EMPTY box and it is the item's one answer slot, on paper
+    // (the key writes the answer into it) and on screen (the input takes its place).
+    //
+    // P8 (critic, baseline 2026-09-24): the old cell only ever hid a part, drew 6 mm circles, and
+    // dealt the answer 1 on six items of twenty (every whole of 2 answers 1, and a uniform part
+    // below a small whole piles up on 1). Now a third of the items hide the WHOLE, and the answer
+    // is dealt first, through a shuffled permutation, so a page spreads it across 1-9 (part) and
+    // 2-10 (whole) instead of letting it fall where the whole happens to put it.
     // ========================================
     else if (mappedSkill === "number_bonds") {
-        const total = rng(2, 10);
-        const partA = rng(1, total - 1);
-        const partB = total - partA;
-        // Deal which side is missing, so a page asks for both.
-        const missingPart = _kDeal(2) === 0 ? "A" : "B";
-        const answer = missingPart === "A" ? partA : partB;
-        const shownPart = missingPart === "A" ? partB : partA;
-
-        const svgW = 230, svgH = 168;
-        const topCx = 115, topCy = 38, botLeftCx = 62, botRightCx = 168, botCy = 124, circR = 32;
-        const circle = (cx, cy, label, unknown) =>
-            `<circle cx="${cx}" cy="${cy}" r="${circR}" fill="none" stroke="${K_INK}" `
-            + `stroke-width="${K_HEAVY}"/>`   // the unknown part is the EMPTY one, drawn solid (RP-60, LS-3)
-            + (unknown ? '' : `<text x="${cx}" y="${cy + 9}" text-anchor="middle" font-family="${K_FONT}" `
-                + `font-size="26" font-weight="700" fill="${K_INK}">${label}</text>`);
+        const unknown = ['A', 'B', 'whole'][_kDeal(3)];
+        let total, partA, partB, answer;
+        if (unknown === 'whole') {
+            total = 3 + _kDealShuffled(8);                // 3..10: a whole of 2 is only 1 + 1
+            partA = rng(1, total - 1);
+            partB = total - partA;
+            answer = total;
+        } else {
+            answer = 1 + _kDealShuffled(9);               // 1..9, each once per nine items
+            total = rng(answer + 1, 10);
+            const shown = total - answer;
+            partA = unknown === 'A' ? answer : shown;
+            partB = unknown === 'B' ? answer : shown;
+        }
 
         // Written part + part = whole rather than whole = part + part. Both are number-bond
         // sentences and the diagram is the cell either way; this order is the one
         // ws-content-audit can read as an equation, so the answer key is checked on every item
         // instead of being taken on trust.
-        q.text = `${missingPart === "A" ? "?" : partA} + ${missingPart === "B" ? "?" : partB} = ${total}`;
-        q.printText = 'Write the missing part.';
-        // The empty part of the bond IS the answer slot (RP-60), so paper gets no second
+        q.text = unknown === 'whole' ? `${partA} + ${partB} = ?`
+            : `${unknown === 'A' ? '?' : partA} + ${unknown === 'B' ? '?' : partB} = ${total}`;
+        // One instruction for every item of the section (missing part or missing whole).
+        q.printText = 'Write the missing number.';
+        // The empty box of the bond IS the answer slot (RP-60), so paper gets no second
         // "Answer:" rule under the diagram (SL-7: one slot per item).
         q.selfAnswering = true;
         q.ans = answer;
         q.answerType = "number";
-        q.hint = `${total} splits into two parts. One part is ${shownPart}. `
-            + `Count on from ${shownPart} to ${total} to find the other part.`;
-        q.visual = _kCell(
-            `<svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW, 240)}" style="display:block;margin:0 auto;">`
-            + `<line x1="${topCx}" y1="${topCy + circR}" x2="${botLeftCx}" y2="${botCy - circR}" `
-            + `stroke="${K_INK}" stroke-width="${K_HEAVY}" stroke-linecap="round"/>`
-            + `<line x1="${topCx}" y1="${topCy + circR}" x2="${botRightCx}" y2="${botCy - circR}" `
-            + `stroke="${K_INK}" stroke-width="${K_HEAVY}" stroke-linecap="round"/>`
-            + circle(topCx, topCy, total, false)
-            + circle(botLeftCx, botCy, partA, missingPart === "A")
-            + circle(botRightCx, botCy, partB, missingPart === "B")
-            + `</svg>`);
+        q.hint = unknown === 'whole'
+            ? `The two parts are ${partA} and ${partB}. Put them together to find the whole.`
+            : `${total} splits into two parts. One part is ${total - answer}. `
+                + `Count on from ${total - answer} to ${total} to find the other part.`;
+        q.visual = _kCell(_kBond(total, partA, partB, unknown));
         q.skillLabel = 'Number Bonds';
         return;
     }
@@ -959,48 +1024,35 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // SUB 5 PICTURES (Grade K) — take away from a group of at most 5, the taken ones crossed out.
     // ========================================
     else if (mappedSkill === "sub_5_pictures") {
-        const counterSet = ["●", "■", "▲", "★", "◆"];
-        const counter = pick(counterSet);
+        // P8b: the counters are DRAWN (SVG outlines from K_SHAPES), never font glyphs. The ★ / ■
+        // characters printed in whatever face carried them (DejaVu, Liberation: L-FONT, and ★ is
+        // an L-EMOJI pictograph), and a solid black glyph hid the cross-out drawn over it.
+        const shapeIdx = _kDeal(K_SHAPES.length);
         // P8: one cell in six is an edge case — take away 0, or take away all of them — the two
         // facts a within-5 page otherwise never deals (critic, baseline 2026-09-24).
         const n = randInt(2, 5);
         const m = (_kAt % 6 === 5) ? (randInt(0, 1) ? n : 0) : randInt(1, n - 1);
         const remain = n - m;
 
-        // A bold X through each taken-away picture (black over a white halo), not a line-through.
-        const crossX = `<svg viewBox="0 0 10 10" preserveAspectRatio="none" style="position:absolute;left:-8%;top:-8%;width:116%;height:116%;overflow:visible;">`
-            + `<path d="M1 1 L9 9 M9 1 L1 9" stroke="#fff" stroke-width="5" vector-effect="non-scaling-stroke" stroke-linecap="round" fill="none"/>`
-            + `<path d="M1 1 L9 9 M9 1 L1 9" stroke="${K_INK}" stroke-width="2.4" vector-effect="non-scaling-stroke" stroke-linecap="round" fill="none"/></svg>`;
-        let pics = '';
-        for (let i = 0; i < n; i++) {
-            const crossed = i < m;
-            pics += `<span style="font-size:1.9rem;display:inline-block;position:relative;margin:0 4px;color:${K_INK};">`
-                + `${counter}${crossed ? crossX : ''}</span>`;
-        }
-
-        const optsSet = new Set([remain]);
-        while (optsSet.size < 3) {
-            const cand = remain + (Math.random() < 0.5 ? -1 : 1) * randInt(1, 2);
-            if (cand >= 0 && cand <= 5) optsSet.add(cand);
-        }
-        if (optsSet.size < 3) { for (let v = 0; v <= 5 && optsSet.size < 3; v++) optsSet.add(v); }
-
-        const mcOptions = shuffle([...optsSet]);
         q.text = `Start with ${n}, take away ${m}. How many are left?`;
-        q.printText = 'Count the ones not crossed out.';
+        // "Count the ones not crossed out" used "ones", a place-value word, for a K pupil.
+        q.printText = 'Write how many are left.';
         q.ans = remain;
-        q.answerType = "multiple-choice";
-        q.options = mcOptions;
+        // A production item: the pupil writes the number (SP-3), on paper and on screen.
+        q.answerType = "number";
+        q.options = [];
+        q.selfAnswering = true;     // the equation's box is the one slot (SL-7)
         q.hint = `Count only the ones that are NOT crossed out. ${n} − ${m} = ${remain}.`;
+        const strip = _kTakeAwayStrip(n, m, shapeIdx);
         q.visual = _kCell(
-            `<div style="display:inline-block;border:${K_HEAVY}px solid ${K_INK};border-radius:10px;padding:12px 16px;">`
-            + `<div style="line-height:1.1;">${pics}</div>`
-            + `<div style="margin-top:10px;font-size:1.2rem;font-weight:700;">${n} − ${m} = `
-            + `<span style="display:inline-block;min-width:2.2em;border-bottom:${K_HEAVY}px solid ${K_INK};">&nbsp;</span></div>`
+            `<div style="display:inline-block;padding:4px 8px;">`
+            + `<div style="line-height:0;">${strip}</div>`
+            + `<div style="margin-top:10px;font-size:1.6rem;font-weight:700;">${n} − ${m} = `
+            + `<span data-mq-blank="line" style="display:inline-block;min-width:1.6em;border-bottom:${K_HEAVY}px solid ${K_INK};">&nbsp;</span></div>`
             + `</div>`);
         q.skillLabel = "Sub ≤5 Pics";
         q.printFormat = "sub-5-pictures";
-        q.pictureData = { emoji: counter, n, m, remain, mcOptions };
+        q.pictureData = { shape: K_SHAPES[shapeIdx].name, n, m, remain, strip };
         return;
     }
 

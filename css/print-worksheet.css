@@ -2885,3 +2885,27 @@
         white-space: normal !important;
     }
 }
+
+/* ---- SL-11 / SL-12 (owner ruling 2026-09-25): legacy regroup rows become ONE digit strip ----
+   A rounded outline with a hairline divider on every column boundary. Each box widens across half
+   of the 6 px column gap on each side, so neighbouring boxes meet exactly at the mid-gap and every
+   divider sits between two digit columns. A run is broken by any non-box track (the operator track
+   or a decimal point), and each run gets its own rounded ends. Additive: old saved HTML carries the
+   same `.rg-box` markup and simply draws the new strip. */
+.print-edition .stack-row.regroup-top .rg-box,
+.print-edition .stack-row.regroup-bot .rg-box {
+    width: calc(100% + 6px);
+    margin-left: -3px;
+    height: 1em;
+    justify-self: stretch;
+    border: 0.75pt solid var(--print-ink, #000);
+    border-right-width: 0;
+    border-radius: 0;
+}
+.print-edition .stack-row :not(.rg-box) + .rg-box { border-top-left-radius: 1.25mm; border-bottom-left-radius: 1.25mm; }
+.print-edition .stack-row .rg-box:last-child,
+.print-edition .stack-row .rg-box:has(+ :not(.rg-box)) {
+    border-right-width: 0.75pt; border-top-right-radius: 1.25mm; border-bottom-right-radius: 1.25mm;
+}
+/* Stand-alone write-in boxes of the legacy print path: slightly rounded, never square (SL-11). */
+.print-edition .eq .blank-box, .print-edition .factfam .row .blank-box { border-radius: 1.25mm; }

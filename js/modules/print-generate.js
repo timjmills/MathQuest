@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, isMixedMetaSkill, getSkillsForCategory, getSkillsForDomain, getSkillsForGrade, getMixedSkillScope, getCategoryForSkill, getSkillPrintSize, SKILL_PRINT_SIZE, PRINT_FORMAT_SIZE, PRINT_SIZE_COLUMNS, SKILL_FULL_LABELS } from './data.js';
+import { DOMAINS, SKILLS, isMixedMetaSkill, getSkillsForCategory, getMixedPoolSkills, getSkillsForDomain, getSkillsForGrade, getMixedSkillScope, getCategoryForSkill, getSkillPrintSize, SKILL_PRINT_SIZE, PRINT_FORMAT_SIZE, PRINT_SIZE_COLUMNS, SKILL_FULL_LABELS } from './data.js';
 import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, fracText, fractionToPercent } from './utils.js';
 import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG } from './svg-geometry.js';
 import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
@@ -9,7 +9,7 @@ import { generateQuestion } from './generate-question.js';
 // The sheet kit owns every printed millimetre, point size, stroke width and ink
 // value (WORKSHEET_DESIGN_STANDARD.md). tokens.js is a pure module with no
 // imports of its own, so pulling it in here adds no cycle.
-import { blankWidth, SIZES, STROKE, INK, EM_MM } from './sheet/tokens.js';
+import { blankWidth, SIZES, STROKE, INK, EM_MM, SLOT, slotRadiusMm, stripSegStyle, stripPos } from './sheet/tokens.js';
 // The ink pass every printed cell goes through (INK-1..INK-5). Pure, no imports of its own.
 import { inkHTML } from './print-ink.js';
 // The rest of the kit, for the STRANGLER HOOK at the top of formatProblemForPrint
@@ -657,7 +657,7 @@ export function generatePrintProblem() {
         if (playable.length === 0) continue;
         for (const s of catSkills) {
             if (s.v.startsWith('mixed_') && s.v !== 'mixed') {
-                printCategoryMixedSkills[s.v] = { category: catId, skills: playable };
+                printCategoryMixedSkills[s.v] = { category: catId, skills: getMixedPoolSkills(catId, s.v) };
             }
         }
     }
@@ -4019,11 +4019,15 @@ function wsStackHTML(a, b, op, pt, o = {}) {
         html += `<span style="grid-column:2 / -1;height:1mm;border-top:${STROKE.hair}pt solid #000;"></span>`;
     }
     if (regroup) {
-        const box = `<i style="display:block;width:calc(${trackEm}em - 1mm);height:${size.carryMm}mm;`
-            + `border:${STROKE.hair}pt solid #000;"></i>`;
+        // SL-12: the regroup boxes are ONE digit strip - a rounded outline, a hairline divider on
+        // every track boundary, each segment a full track wide so it sits over its column.
+        const on = [];
+        for (let i = 0; i < T; i++) if (regroup === 'sub' ? i > T - 1 - A.length : (i > 0 && i < T - 1)) on.push(i);
+        const seg = (k) => `<i data-ws-seg="${stripPos(k, on.length)}" style="display:block;width:100%;`
+            + `height:${SLOT.carryStripMm[WS_SIZE]}mm;${stripSegStyle(stripPos(k, on.length), { r: slotRadiusMm(WS_SIZE) })}"></i>`;
         for (let i = 0; i < T; i++) {
-            const on = regroup === 'sub' ? i > T - 1 - A.length : (i > 0 && i < T - 1);
-            html += `<span style="height:${size.regroupMm}mm;display:flex;align-items:flex-start;justify-content:center;">${on ? box : ''}</span>`;
+            const k = on.indexOf(i);
+            html += `<span style="height:${size.regroupMm}mm;display:flex;align-items:flex-start;justify-content:center;">${k < 0 ? '' : seg(k)}</span>`;
         }
     }
     html += A.padStart(T, ' ').split('').map(ch => cell(ch)).join('');
@@ -4033,6 +4037,27 @@ function wsStackHTML(a, b, op, pt, o = {}) {
     return `<div class="${o.cls || 'ws-stack-legacy'}" data-ws-slot="answer" data-ws-shape="open" style="font-size:${pt}pt;line-height:1;display:grid;`
         + `grid-template-columns:repeat(${T},${trackEm}em);justify-content:center;`
         + `font-variant-numeric:lining-nums tabular-nums;color:#000;">${html}</div>`;
+}
+
+/**
+ * SL-12 (owner ruling 2026-09-25): a row of digit boxes drawn as ONE digit strip - a rounded
+ * outline with a hairline divider between every two segments. Each segment is `segW` wide (the
+ * column pitch of the digits it sits under or over), so the dividers land on the column
+ * boundaries and place value still lines up. Used by the legacy handlers that drew a row of
+ * separate boxes with gaps between them.
+ *
+ * @param {number} n        segments
+ * @param {Object} o
+ * @param {string} o.segW   one segment's width (CSS length) = the column pitch
+ * @param {string} o.h      strip height (CSS length)
+ * @param {string} [o.attrs] extra attributes on each segment (e.g. a slot marker)
+ */
+function slotStripHTML(n, { segW, h, attrs = '' } = {}) {
+    const r = slotRadiusMm(WS_SIZE);
+    return `<span data-ws-strip="${n}" style="display:inline-flex;vertical-align:top;">`
+        + Array.from({ length: n }, (_, k) => `<span data-ws-seg="${stripPos(k, n)}"${attrs} style="display:block;`
+            + `box-sizing:border-box;width:${segW};height:${h};background:#fff;${stripSegStyle(stripPos(k, n), { r })}"></span>`).join('')
+        + `</span>`;
 }
 
 // One vertical fact: T = 3 tracks of 0.72 em, ones digit right-aligned,
@@ -5981,25 +6006,29 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
 
     if (problem.printFormat === 'sub-5-pictures' && problem.pictureData) {
         const pd = problem.pictureData;
-        let pics = '';
-        // P8: a crossed-out picture carries a bold X through the whole object — a black X over a
-        // white halo, so it reads on a solid black glyph and on the paper around it. The old
-        // strike was a text line-through that sat along the top edge of the glyph, black on
-        // black, and was barely visible (critic, baseline 2026-09-24).
-        const crossX = `<svg viewBox="0 0 10 10" preserveAspectRatio="none" style="position:absolute;left:-8%;top:-8%;width:116%;height:116%;overflow:visible;">`
-            + `<path d="M1 1 L9 9 M9 1 L1 9" stroke="#fff" stroke-width="5" vector-effect="non-scaling-stroke" stroke-linecap="round" fill="none"/>`
-            + `<path d="M1 1 L9 9 M9 1 L1 9" stroke="#000" stroke-width="2.4" vector-effect="non-scaling-stroke" stroke-linecap="round" fill="none"/></svg>`;
-        for (let i = 0; i < pd.n; i++) {
-            const isCrossed = i < pd.m;
-            pics += `<span style="font-size:3rem;line-height:1;display:inline-block;position:relative;margin:0 1.2mm;color:#000;">`
-                + `${pd.emoji}${isCrossed ? crossX : ''}</span>`;
+        // P8b: the counters are the generator's own SVG strip (outlined shapes, a bold X through
+        // each one taken away), never font glyphs: ★ / ■ printed in DejaVu / Liberation, not
+        // Andika (L-FONT), and ★ is a pictograph (L-EMOJI). The slot is ONE box after "=", the
+        // box the answer key writes into (print-sheet.js legacyKeyFill, AK-4). An item saved
+        // before P8b carries no strip and keeps the old glyph drawing.
+        let pics = pd.strip ? `<span style="--mq-pic:10mm;display:inline-block;">${pd.strip}</span>` : '';
+        if (!pics) {
+            const crossX = `<svg viewBox="0 0 10 10" preserveAspectRatio="none" style="position:absolute;left:-8%;top:-8%;width:116%;height:116%;overflow:visible;">`
+                + `<path d="M1 1 L9 9 M9 1 L1 9" stroke="#000" stroke-width="2.4" vector-effect="non-scaling-stroke" stroke-linecap="round" fill="none"/></svg>`;
+            for (let i = 0; i < pd.n; i++) {
+                pics += `<span style="font-size:3rem;line-height:1;display:inline-block;position:relative;margin:0 1.2mm;color:#000;">`
+                    + `${pd.emoji}${i < pd.m ? crossX : ''}</span>`;
+            }
         }
+        const slot = `<span class="blank-box" data-ws-slot="answer" data-ws-shape="box" style="display:inline-block;`
+            + `width:14mm;height:12mm;border:1.5pt solid #000;border-radius:0;background:#fff;vertical-align:middle;`
+            + `text-align:center;line-height:12mm;margin-left:2mm;"></span>`;
         return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
             ${num}
             <div class="problem-content">
                 <div class="p-prompt" style="${WS_FACE}font-size:13pt;margin-bottom:2mm;">${problem.text || ''}</div>
-                <div style="text-align:center;margin:2mm 0;">${pics}</div>
-                <div style="text-align:center;font-size:22pt;${WS_FACE}">${pd.n} − ${pd.m} = ${wsAnswerLine(1)}</div>
+                <div style="text-align:center;margin:3mm 0;line-height:0;">${pics}</div>
+                <div style="text-align:center;font-size:22pt;${WS_FACE}">${pd.n} − ${pd.m} =${slot}</div>
             </div>
         </div>`;
     }
@@ -6988,28 +7017,26 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
     }
 
     // ========== WORD PROBLEMS WITH VISUAL (word-problem format from gen-operations) ==========
+    //
+    // P8b (mixed_division critic): this branch hand-rolled its own "1." heading (every cell on a
+    // kit page printed "1." under the kit's own letter), a grey rule, a dashed "SHOW YOUR WORK"
+    // box and an "ANSWER" box whose labels were CSS pseudo-elements at 6.5 pt. Inside a kit cell
+    // the answer box collapsed to its padding and the label stood one letter per line
+    // ("S H O W  Y O U R ..."). Now: the shared problem head (the kit strips it), the story at
+    // reading size, a work space outlined in the single grey (a place to draw, not a slot), and
+    // ONE "Answer:" rule the key writes into (print-sheet.js legacyKeyFill, AK-4).
     if (problem.printFormat === 'word-problem') {
         const wpText = problem.text || '';
-        const showLabel = showSkillLabels && !!skillLabel;
-        // Detect "no picture" word problems \u2014 these get the bigger WORK box.
         const skillId = problem.skillId || problem.skill || '';
         const hasVisualMarkup = /<svg|<img/i.test(wpText);
         const isNoPicture = /_(no_pic|plain|word_problems_no_pic|word_problems)$/.test(skillId)
             || (!hasVisualMarkup && /word/i.test(skillId));
-
-        // Choose answer affordance: large WORK box for "no picture", standard ans-box otherwise.
-        const answerHtml = isNoPicture
-            ? `<div class="ans-box work-box" style="height:1.2in;"></div>`
-            : `<div class="ans-box"></div>`;
-
-        return `<div class="worksheet-problem ws-problem-spacious" style="padding:14px 16px;page-break-inside:avoid;">
-            <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;border-bottom:2px solid #eee;padding-bottom:6px;">
-                <span style="font-weight:700;font-size:1.05rem;">${index + 1}.</span>
-                ${showLabel ? `<span style="font-size:0.7rem;color:#888;">${skillLabel}</span>` : ''}
-            </div>
-            <div class="p-prompt">${wpText}</div>
-            <div class="work-area" style="min-height:0.7in;"></div>
-            ${answerHtml}
+        const workMm = isNoPicture ? 30 : 22;
+        return `<div class="worksheet-problem ws-problem-spacious" style="page-break-inside:avoid;">
+            ${num}
+            <div class="p-prompt" style="font-size:1.1rem;line-height:1.6;margin-bottom:3mm;">${wpText}</div>
+            <div style="display:block;width:100%;box-sizing:border-box;min-height:${workMm}mm;border:0.75pt solid #949494;"></div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:4mm;"><span style="font-weight:700;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:1.5pt solid #000;min-height:1.4em;">&nbsp;</span></div>
         </div>`;
     }
 
@@ -7298,10 +7325,9 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const boxGap = 3;
         const totalWidth = (dividendLen + 1) * (boxWidth + boxGap);
         
-        // Create quotient answer boxes (aligned right over dividend)
-        const quotientBoxes = Array.from({length: ansLen}, () => 
-            `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #555;border-radius:4px;background:#fff;"></div>`
-        ).join('');
+        // Create quotient answer boxes (aligned right over dividend). SL-12: one digit strip, a
+        // segment per dividend column (box + gap wide), so each divider sits between two columns.
+        const quotientBoxes = slotStripHTML(ansLen, { segW: `${boxWidth + boxGap}px`, h: `${boxWidth + 4}px` });
         
         // Create dividend digit boxes
         const dividendBoxes = a.toString().split('').map(d => 
@@ -7322,11 +7348,9 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                         `<div style="width:${boxWidth}px;height:${boxWidth - 6}px;border-bottom:2px solid #333;"></div>`
                     ).join('')}
                 </div>
-                <!-- Difference row (result after subtraction) -->
-                <div style="display:flex;gap:${boxGap}px;margin-left:20px;">
-                    ${Array.from({length: dividendLen + 1}, () => 
-                        `<div style="width:${boxWidth}px;height:${boxWidth - 4}px;border:1px dashed #ccc;border-radius:2px;"></div>`
-                    ).join('')}
+                <!-- Difference row (result after subtraction): SL-12 one digit strip -->
+                <div style="margin-left:${20 - boxGap / 2}px;">
+                    ${slotStripHTML(dividendLen + 1, { segW: `${boxWidth + boxGap}px`, h: `${boxWidth + 2}px` })}
                 </div>`;
             
             // Bring down arrow indicator (except last row)
@@ -7355,7 +7379,7 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                             <!-- Division bracket and dividend -->
                             <div style="display:flex;flex-direction:column;">
                                 <!-- Quotient boxes (answer) -->
-                                <div style="display:flex;gap:${boxGap}px;justify-content:flex-end;padding-right:${boxGap}px;margin-bottom:4px;">
+                                <div style="display:flex;justify-content:flex-end;padding-right:${boxGap / 2}px;margin-bottom:4px;">
                                     ${quotientBoxes}
                                 </div>
                                 
@@ -7950,8 +7974,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                         <div style="font-size:1.3rem;font-weight:700;padding-top:25px;">${dd.divisor}</div>
                         <div style="border-left:2.5px solid #333;border-top:2.5px solid #333;padding:5px 10px;border-radius:0 8px 0 0;">
                             <!-- Quotient boxes -->
-                            <div style="display:flex;gap:3px;margin-bottom:5px;">
-                                ${Array(quotientLen).fill(0).map(() => `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #555;border-radius:4px;background:#fff;"></div>`).join('')}
+                            <div style="display:flex;margin-bottom:5px;">
+                                ${slotStripHTML(quotientLen, { segW: `${boxWidth + 3}px`, h: `${boxWidth + 4}px` })}
                             </div>
                             <!-- Dividend -->
                             <div style="font-size:1.3rem;font-weight:700;letter-spacing:3px;">${dividendStr}</div>
@@ -12413,20 +12437,21 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
             10000: '#c2185b', 100000: '#00796b', 1000000: '#f9a825'
         };
         const colWidth = places.length >= 6 ? 64 : 80;
-        const colsHtml = places.map(p => `
+        // SL-12: the write-in boxes are ONE digit strip under the place heads - a rounded outline
+        // with a divider between every two places, each segment one place column wide.
+        const colsHtml = places.map((p, k) => `
             <div style="display:flex;flex-direction:column;align-items:center;width:${colWidth}px;">
                 <div style="font-size:0.65rem;font-weight:700;color:${placeColors[p]};
                      text-transform:uppercase;letter-spacing:0.3px;text-align:center;line-height:1.1;
                      margin-bottom:3px;min-height:2.2em;">${placeLabels[p]}</div>
                 <div style="font-size:0.8rem;font-weight:800;color:${placeColors[p]};
                      margin-bottom:5px;">${placeShort[p]}</div>
-                <div style="border:2px dashed ${placeColors[p]};border-radius:8px;
-                     width:100%;height:60px;background:#fff;"></div>
+                <div data-ws-seg="${stripPos(k, places.length)}" style="box-sizing:border-box;width:100%;height:60px;background:#fff;${stripSegStyle(stripPos(k, places.length), { r: slotRadiusMm(WS_SIZE) })}"></div>
             </div>`).join('');
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">${num}<div class="problem-content">
             <div style="font-size:1rem;margin-bottom:6px;">Write each digit of <strong style="font-size:1.3rem;color:#7b1fa2;">${target.toLocaleString()}</strong> in the matching place value column.</div>
-            <div style="display:flex;gap:8px;margin-top:8px;justify-content:center;flex-wrap:nowrap;
-                 max-width:${Math.min(720, places.length * (colWidth + 8) + 20)}px;margin-left:auto;margin-right:auto;">
+            <div style="display:flex;gap:0;margin-top:8px;justify-content:center;flex-wrap:nowrap;
+                 max-width:${Math.min(720, places.length * colWidth + 20)}px;margin-left:auto;margin-right:auto;">
                 ${colsHtml}
             </div>
         </div></div>`;

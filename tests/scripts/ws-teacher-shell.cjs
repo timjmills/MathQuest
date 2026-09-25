@@ -224,6 +224,8 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
     const prev = document.querySelector('.tv-preview-card').getBoundingClientRect();
     const scr = document.querySelector('#teacherMain [data-screen="print"]');
     const chips = [...scr.querySelectorAll('.tv-ptype')].map((b) => b.dataset.v);
+    const groups = [...scr.querySelectorAll('.tv-ptype-h')].map((h) => h.textContent);
+    const thumbs = scr.querySelectorAll('.tv-ptype .tv-ptype-thumb').length;
     const frame = document.getElementById('tvPreviewFrame');
     let score = '', cells = 0;
     try {
@@ -232,7 +234,7 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
       cells = [...d.querySelectorAll('.ws-page')].reduce((n, p) => n + p.querySelectorAll('.ws-cell').length, 0);
     } catch (e) { /* */ }
     return {
-      beside: prev.left >= what.right && prev.top < 300,
+      groups, thumbs, beside: prev.left >= what.right && prev.top < 300,
       chips, select: !!scr.querySelector('select[data-role]'), soon: /coming soon/i.test(scr.textContent),
       classic: !!scr.querySelector('[data-act="classic"]'),
       skills: scr.querySelectorAll('.tv-set-item').length,
@@ -241,11 +243,33 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   });
   await shot('print-1280');
   if (!pr.beside) fail('Print: the preview is not beside the controls at 1280');
-  if (pr.select || pr.chips.join() !== 'independent,more-practice') fail(`Print: page type is not the two working cards (${pr.chips.join()})`);
+  const ROLES = ['independent', 'more-practice', 'mixed-practice', 'word-problems', 'opener', 'scripted-model', 'guided', 'pre-skill-check', 'error-analysis', 'review', 'test', 'test-b', 'fact-rows', 'fact-probe', 'true-false', 'reason-it', 'stretch'];
+  if (pr.select || [...pr.chips].sort().join() !== [...ROLES].sort().join()) fail(`Print: page type cards are not every working role (${pr.chips.join()})`);
+  if (pr.groups.join() !== 'Practice,Teach,Check,Facts,Thinking') fail(`Print: page type groups are ${pr.groups.join()}`);
+  if (pr.thumbs !== pr.chips.length) fail('Print: a page type card has no thumbnail');
   if (pr.soon) fail('Print: "coming soon" entries are still shown');
   if (pr.classic) fail('Print: the Classic print dialog button is still there');
   if (pr.skills !== 4) fail(`Print: expected the 4 queued skills, found ${pr.skills}`);
   if (!pr.score || pr.score !== `/${pr.cells}`) fail(`Print: Score "${pr.score}" does not count the ${pr.cells} items`);
+  // A role that does not fit the skills says why on its card: fact rows for a non-fact skill.
+  await page.evaluate(() => { window.tvOpenPrintWith([{ categoryId: 'composing', skillId: 'base10_regroup' }]); document.querySelector('[data-act="role"][data-v="fact-rows"]').click(); });
+  await sleep(5000);
+  const unfit = await page.evaluate(() => {
+    const why = document.querySelector('#teacherMain [data-screen="print"] .tv-ptype-why');
+    const card = document.querySelector('[data-act="role"][data-v="fact-rows"]');
+    return { why: why ? why.textContent.trim() : '', marked: !!(card && card.classList.contains('is-unfit')) };
+  });
+  if (!unfit.why || !unfit.marked) fail(`Print: an unfit page type does not say why (${JSON.stringify(unfit)})`);
+  // A one-page type too small for every chosen skill says so (never drops a skill quietly).
+  await page.evaluate(() => {
+    window.tvOpenPrintWith([['composing', 'base10_regroup'], ['addition', 'add_10_no_regroup'], ['addition', 'add_10_regroup'], ['addition', 'add_20_no_regroup']].map(([c, s]) => ({ categoryId: c, skillId: s })));
+    document.querySelector('[data-act="role"][data-v="review"]').click();
+  });
+  await sleep(6000);
+  const warn = await page.evaluate(() => (document.querySelector('#tvFits .tv-fits-warn') || {}).textContent || '');
+  if (!/of 4 skills fit/.test(warn)) fail(`Print: no warning when a Review page cannot hold every skill ("${warn}")`);
+  await page.evaluate(() => window.tvOpenPrintWith(window.skillQueue));
+  await sleep(300);
   // More Practice letter chips
   await page.evaluate(() => document.querySelector('[data-act="role"][data-v="more-practice"]').click());
   await sleep(300);

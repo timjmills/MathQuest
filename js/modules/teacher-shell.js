@@ -1,9 +1,12 @@
 // teacher-shell.js — the teacher view shell (approved design, 2026-09-24).
 //
-// In teacher mode (body.teacher-mode) a fixed sidebar replaces the pupil nav bar, and seven
+// In teacher mode (body.teacher-mode) a fixed sidebar replaces the pupil nav bar, and nine
 // teacher screens live in #teacherMain: Home, Send a skill set, Print worksheets, Run practice,
-// Quizzes, Settings and Progress. The Library links open the EXISTING views (Skills Navigator,
-// quiz builder, MAP selector) to the right of the sidebar. Student mode is untouched.
+// Skills library, Quizzes, MAP tests, Settings and Progress. The Skills library and MAP tests
+// screens (teacher-library.js, teacher-map.js) replace the legacy Skills Navigator and MAP
+// selector for teachers: a teacher who lands on either legacy view is routed to its screen
+// (REPLACED_VIEWS). Other legacy views (the quiz builder, games) still open to the right of the
+// sidebar. Student mode is untouched.
 //
 // How it coexists with the legacy views without editing them:
 //   - `body.tv-on-screen` means a teacher screen is showing; teacher.css then hides #homeView
@@ -27,9 +30,14 @@ import {
 } from './teacher-ui.js';
 import { renderSetsScreen, openSavedSet, startNewSet, currentSetName } from './teacher-sets.js';
 import { renderPrintScreen, recentPrintouts, reprint, printoutMeta, openPrintWith } from './teacher-print.js';
+import { renderLibraryScreen } from './teacher-library.js';
+import { renderMapScreen } from './teacher-map.js';
 import { installPreview, tvpAttrs, infoButtonHTML, modeAttrs, mountSample } from './teacher-preview.js';
 
-const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progress'];
+const SCREENS = ['home', 'sets', 'print', 'run', 'library', 'quizzes', 'map', 'settings', 'progress'];
+// Legacy views a teacher is routed away from, to the teacher screen that replaces them
+// (the legacy views stay for their old entry points; pupils never reach the navigator).
+const REPLACED_VIEWS = { skillsOrganizerView: 'library', mapSelectorView: 'map' };
 const PLAY_VIEWS = new Set(['gameView', 'worksheetView', 'quizTakeView', 'mapSessionView']);
 const LIB_FOR_VIEW = {
     skillsOrganizerView: 'library', quizBuilderView: 'quizzes', quizResultsView: 'quizzes', quizMonitorView: 'quizzes',
@@ -63,8 +71,6 @@ export function tvGo(key) {
     if (!isTeacher()) return;
     closeLegacyOverlays();
     if (key === 'student') { switchToStudent(); return; }
-    if (key === 'library') { window.openSkillsOrganizer?.(); return; }
-    if (key === 'map') { window.openMapTest?.(); return; }
     if (!SCREENS.includes(key)) key = 'home';
     current = key;
     try { sessionStorage.setItem(SCREEN_KEY, key); } catch (e) { /* private mode */ }
@@ -169,6 +175,7 @@ function onViewChangeInner() {
         return;
     }
     const id = activeViewId();
+    if (REPLACED_VIEWS[id] && !BOARD_WINDOW) { tvGo(REPLACED_VIEWS[id]); return; }
     if (id === 'homeView' || !id) {
         if (!document.body.classList.contains('tv-on-screen')) showScreen(current);
         document.body.classList.remove('tv-play', 'tv-bigboard');
@@ -908,6 +915,8 @@ const RENDER = {
     sets: renderSetsScreen,
     print: renderPrintScreen,
     run: renderRun,
+    library: renderLibraryScreen,
+    map: renderMapScreen,
     quizzes: renderQuizzes,
     settings: renderSettings,
     progress: renderProgress,

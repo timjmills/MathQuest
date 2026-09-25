@@ -1,0 +1,26 @@
+<!doctype html>
+<!-- Dev page: the sheet kit's stack at S / M / L with the SL-11 slot radius and the SL-12 digit
+     strip (regroup strip, answer strip, grey Guided strip, key fill, missing-digit box). Open over
+     HTTP (`npx serve .`), or let tests/scripts/ws-slot-strip-shot.cjs screenshot it. -->
+<html><head><meta charset="utf-8"><title>Slot strip (SL-11, SL-12)</title>
+<link rel="stylesheet" href="../../css/sheet-kit.css">
+<style>body{margin:0;background:#fff}.row{display:flex;gap:6mm;padding:4mm;align-items:flex-start}.ws-sheet{width:auto;max-width:none;display:block}.box{border:0.75pt solid #000;padding:3mm}</style>
+</head><body><div id="out"></div>
+<script type="module">
+import { stack } from '../../js/modules/sheet/cells/stack.js';
+import { blank } from '../../js/modules/sheet/cell.js';
+const out = document.getElementById('out');
+for (const sz of ['S', 'M', 'L']) {
+    const cells = [
+        stack(468, 357, '+', { T: 4, regroup: 'add', answer: 'boxes' }),
+        stack(468, 357, '+', { T: 4, regroup: 'add', answer: 'boxes', grey: true }),
+        stack(468, 357, '+', { T: 4, regroup: 'add', answer: 'boxes', ans: 825, boxInk: 'solid' }),
+        stack(302, 45, '-', { T: 4, regroup: 'sub', answer: 'open' }),
+        stack(47, 25, '+', { T: 3, regroup: 'add', answer: 'open', unknown: { row: 'a', index: 2 } }),
+        `<div class="ws-eq"><span>7</span><span class="o">+</span>${blank({ shape: 'box', digits: 1 }, { mode: 'print', size: sz })}<span class="o">=</span><span>12</span></div>`
+            + `<div style="margin-top:3mm">${blank({ shape: 'check' }, { mode: 'print', size: sz })} ${blank({ shape: 'time' }, { mode: 'print', size: sz })}</div>`,
+    ];
+    out.insertAdjacentHTML('beforeend', `<div class="ws-sheet ws-${sz} ws-ican"><div class="row">${cells.map((c) => `<div class="box">${c}</div>`).join('')}</div></div>`);
+}
+document.body.dataset.ready = '1';
+</script></body></html>
