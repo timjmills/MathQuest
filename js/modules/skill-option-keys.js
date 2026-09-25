@@ -210,7 +210,24 @@ export const MULTI_KEYS = Object.freeze({
     // ride on the reserved `labels` (5E).
     bars: '9F',          // bar graphs: bars standing up (vertical) / lying down (horizontal)
     // NEXT FREE FOR AP2: 9G (to 9J).
+
+    // Block 4, sub-range 4E-4O — build lane placevalue (design/BUILD_LIST.md, 2026-09-25).
+    // THE SUPPORT SET'S SECOND FIELD. `support` (F) has used 30 of its 36 one-character tokens, and
+    // the picture panes wired as supports (vis_supports_wiring) need more than the six left. A value
+    // whose token is in VALUE_TOKENS.supportMore is written in THIS field instead (SPILL_KEYS below):
+    // "~FV_4EC" is touch dots and the rekenrek. It is not an option of its own - no skill declares
+    // it; the codec reads it back into `support`. The deployed decoder skips the field (an unknown
+    // digit + letter key), so an old app drops those supports and never misreads them.
+    supportMore: '4E',
+    // NEXT FREE IN SUB-RANGE 4E-4O: 4F.
 });
+
+/**
+ * A SET option whose values outgrew one field: parent option id -> the id whose key and token table
+ * carry the rest (skill-option-codec.js writes a value into the field whose table holds its token,
+ * and reads both fields back into the parent). APPEND-ONLY.
+ */
+export const SPILL_KEYS = Object.freeze({ support: 'supportMore' });
 
 /** Every option id -> its key (one letter, or digit + letter). */
 export const OPTION_KEYS = Object.freeze({ ...ONE_LETTER_KEYS, ...MULTI_KEYS });
@@ -253,7 +270,10 @@ export const VALUE_TOKENS = Object.freeze({
         // block 3 (2026-09-25): function tables (O U I W F D left to P10 and count-by)
         outputs: 'G', rule: 'Y', inputs: 'V', mixed: 'M', make: 'K',
         // block 1 P10 time + money (`all` reuses A)
-        find: 'F', order: 'O', collection: 'D', words: 'W', missing: 'I', numerals: 'U', hands: 'B' }),
+        find: 'F', order: 'O', collection: 'D', words: 'W', missing: 'I', numerals: 'U', hands: 'B',
+        // build lane placevalue (nl_20, number_line_scales): the last letter, then digits past the
+        // numeric set members (0-3)
+        mark: 'S', estimate: '4' }),
     zeroPlace: Object.freeze({ none: 'N', some: 'S', always: 'A' }),
     op: Object.freeze({ x: 'M', '/': 'D', both: 'B' }),
     order: Object.freeze({ largest: 'L', scrambled: 'S',
@@ -281,6 +301,10 @@ export const VALUE_TOKENS = Object.freeze({
         // payload never starts with one).
         touch: 'V', touchall: '3', boxsign: 'J', startarrow: '4', steps: 'I',
         'round-pv': '1', 'round-mark': '2' }),
+    // The support set's second field (4E, SPILL_KEYS): the S4 picture panes wired as supports
+    // (build lane placevalue, vis_supports_wiring). Every letter and digit is free here.
+    supportMore: Object.freeze({ objects: 'A', fingers: 'B', rekenrek: 'C', base10: 'D', 'base10-quick': 'E', disks: 'F',
+        pvgrid: 'G', hundreds: 'H', openline: 'I', gridpaper: 'J' }),
     // S2 supports model (block 4): which problems carry the supports, and how clashing ones mix.
     cover: Object.freeze({ whole: 'W', needed: 'N', fade: 'F' }),
     mix: Object.freeze({ section: 'S', problem: 'P' }),

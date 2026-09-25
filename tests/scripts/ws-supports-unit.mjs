@@ -173,7 +173,8 @@ ok('compat values', S.SUPPORT_IDS.every((x) => S.SUPPORT_IDS.every((y) => ['ok',
 /* ---------------------------------------------------------------- the Support controls */
 {
     let checked = 0;
-    const union = REG.tokenUnion('support');
+    // The support set spills into a second field (skill-option-keys.js SPILL_KEYS): either table.
+    const union = { ...(REG.SPILL_KEYS && REG.SPILL_KEYS.support ? REG.tokenUnion(REG.SPILL_KEYS.support) : {}), ...REG.tokenUnion('support') };
     for (const [cat, list] of Object.entries(DATA.SKILLS)) {
         if (!Array.isArray(list)) continue;
         for (const sk of list) {

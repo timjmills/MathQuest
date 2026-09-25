@@ -359,6 +359,17 @@ const PV_MAKERS = {
     'number_sense:rounding_visual': (r) => { const n = nonMultiple(r, 11, 99, 10); return { pv: { kind: 'round', n, place: 10, line: [Math.floor(n / 10) * 10, Math.floor(n / 10) * 10 + 10] }, ans: rnd(n, 10) }; },
     'number_sense:between_tens': (r) => { const n = nonMultiple(r, 11, 99, 10); const lo = Math.floor(n / 10) * 10; return { pv: { kind: 'between', n, place: 10, lo, hi: lo + 10 }, ans: `${lo} and ${lo + 10}`, answerType: 'inline-blanks' }; },
     'number_sense:place_on_number_line': (r) => { const lo = int(r, 1, 9) * 100; const n = lo + int(r, 1, 9) * 10; return { pv: { kind: 'mark', n, span: 100, line: [lo, lo + 100] }, ans: n }; },
+    // Build lane placevalue (nl_20): read the arrow, mark, estimate, and A, B, C along the line.
+    'number_sense:number_line_scales': (r, i) => {
+        const step = pick(r, [1, 10, 100]); const lo = int(r, 0, 9) * 10 * step; const hi = lo + 10 * step;
+        const task = ['read', 'mark', 'fill', 'estimate'][i % 4];
+        if (task === 'fill') {
+            const ks = [int(r, 1, 3), int(r, 4, 6), int(r, 7, 9)]; const targets = ks.map((k) => lo + k * step);
+            return { pv: { kind: 'scale', task, lo, hi, step, labels: 'some', targets, n: targets[0] }, ans: targets.join(', '), keyParts: targets.map(String), answerType: 'inline-blanks' };
+        }
+        const n = lo + pick(r, [1, 2, 3, 4, 6, 7, 8, 9]) * step;
+        return { pv: { kind: 'scale', task, lo, hi, step, labels: 'some', n }, ans: n, answerType: task === 'read' ? 'number' : 'inline-blanks' };
+    },
     // Round on a number line to thousands and beyond: the dot placed by the pupil (inline blanks,
     // the dot then the rounded number) or shown; halfway and a multiple are dealt among them.
     ...Object.fromEntries([['round_nl_thousands', 1000, 9999, [10, 100, 1000, 10000]],

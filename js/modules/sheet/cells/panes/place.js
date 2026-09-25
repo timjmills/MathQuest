@@ -49,27 +49,32 @@ function blocks(c, n) {
 /* ------------------------------------------------------------------ base-ten quick sketch (RP-31) */
 
 // Open square = hundred, stick = ten, open dot = one, all 1.5 pt. The page prints the key once.
-function quick(c, n) {
+// FIXED PLACE ZONES (vis_supports_wiring, 2026-09-25): hundreds in a block three wide (up to three
+// rows), tens as up to nine sticks, ones two wide - each place in its own zone, as wide as nine of
+// that place needs, so every sketch of a page is one width (the picture stands in the same place in
+// every cell, and the zone never tells how many there are), and two numbers' sketches stacked one
+// over the other line up hundreds under hundreds. `digits` is the page's number size (2 or 3).
+function quick(c, n, digits = String(Math.floor(Math.abs(n))).length) {
     const h = Math.floor(n / 100), t = Math.floor((n % 100) / 10), o = n % 10;
-    const SQ = 11, STICK = 20, DOT = 5.5;
-    const H = Math.max(STICK, h ? SQ : 0, o ? 5 * 6.5 - 1 : 0);
+    const SQ = 11, PH = SQ + 2.5, STICK = 20, TP = 4, DOT = 5.5, OP = 6.5, GAP = 4;
+    const hasH = digits >= 3 || h > 0, hasT = digits >= 2 || t > 0;
+    const wH = hasH ? 3 * PH - 2.5 : 0, wT = hasT ? 9 * TP : 0, wO = OP + DOT;
+    const H = Math.max(STICK, h ? Math.ceil(h / 3) * PH - 2.5 : 0, o ? Math.ceil(o / 2) * OP - 1 : 0);
     let body = '', x = 0;
     for (let k = 0; k < h; k++) {
-        body += `<rect data-ws-block="100" x="${n2(x)}" y="${n2(H - SQ)}" width="${SQ}" height="${SQ}" fill="none" ${st(c, SW.heavy)}/>`;
-        x += SQ + 2.5;
+        const r = Math.floor(k / 3), cc = k % 3;
+        body += `<rect data-ws-block="100" x="${n2(x + cc * PH)}" y="${n2(H - SQ - r * PH)}" width="${SQ}" height="${SQ}" fill="none" ${st(c, SW.heavy)}/>`;
     }
-    if (h && (t || o)) x += 2;
+    if (hasH) x += wH + GAP;
     for (let k = 0; k < t; k++) {
-        body += `<line data-ws-block="10" x1="${n2(x + 1)}" y1="${n2(H - STICK)}" x2="${n2(x + 1)}" y2="${n2(H)}" ${st(c, SW.heavy)} stroke-linecap="round"/>`;
-        x += 4;
+        body += `<line data-ws-block="10" x1="${n2(x + 1 + k * TP)}" y1="${n2(H - STICK)}" x2="${n2(x + 1 + k * TP)}" y2="${n2(H)}" ${st(c, SW.heavy)} stroke-linecap="round"/>`;
     }
-    if (t && o) x += 3;
+    if (hasT) x += wT + GAP;
     for (let k = 0; k < o; k++) {
-        const cx = x + DOT / 2 + (k % 2) * 6.5, cy = H - DOT / 2 - Math.floor(k / 2) * 6.5;
+        const cx = x + DOT / 2 + (k % 2) * OP, cy = H - DOT / 2 - Math.floor(k / 2) * OP;
         body += `<circle data-ws-block="1" cx="${n2(cx)}" cy="${n2(cy)}" r="${n2(DOT / 2 - SW.heavy / 2)}" fill="#fff" ${st(c, SW.heavy)}/>`;
     }
-    if (o) x += (o > 1 ? 6.5 : 0) + DOT;
-    return { w: Math.max(4, x), h: H, body };
+    return { w: x + wO, h: H, body };
 }
 
 /* ------------------------------------------------------------------ disks (reuses pv.js) */
@@ -364,9 +369,10 @@ export const PLACE_PANES = {
         geom(p, c) {
             const op = opOf(p), a = num(p.a), b = num(p.b);
             if (!op) return { ...quick(c, num(p.n)), label: `quick sketch of ${p.n}` };
-            if (op === '-') return { ...quick(c, a), label: `quick sketch of ${a}` };
-            // One sketch over the other: each number keeps its own line (and the pane its width).
-            return { ...col([quick(c, a), quick(c, b)], 5), label: `quick sketches of ${a} and ${b}` };
+            const digits = String(Math.max(a, b)).length;
+            if (op === '-') return { ...quick(c, a, digits), label: `quick sketch of ${a}` };
+            // One sketch over the other, in the same place zones (hundreds under hundreds).
+            return { ...col([quick(c, a, digits), quick(c, b, digits)], 7), label: `quick sketches of ${a} and ${b}` };
         },
     },
     disks: {

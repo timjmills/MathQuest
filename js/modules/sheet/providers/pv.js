@@ -905,6 +905,92 @@ registerSkill('number_sense:place_on_number_line', {
     },
 });
 
+/* ============================================ nl_20: numbers on a number line (build lane placevalue) */
+
+const SCALE_DEFS = {
+    read: {
+        iCan: 'I Can read a number on a number line',
+        instructionKey: 'line-arrow',
+        steps: ['Read the numbers on the line.', 'Find how much each jump is.', 'Count the jumps to the arrow.', 'Write the number.'],
+        say: 'The arrow points to __.',
+    },
+    mark: {
+        iCan: 'I Can mark a number on a number line',
+        instructionKey: 'line-mark',
+        steps: ['Read the numbers on the line.', 'Find how much each jump is.', 'Count the jumps to the number.', 'Mark it with a dot.'],
+        say: '__ is here.',
+    },
+    fill: {
+        iCan: 'I Can count along a number line',
+        instructionKey: 'line-letters',
+        steps: ['Read the numbers on the line.', 'Find how much each jump is.', 'Count on to each letter.', 'Write the number.'],
+        say: 'A is __.',
+    },
+    estimate: {
+        iCan: 'I Can estimate where a number goes on a line',
+        instructionKey: 'line-estimate',
+        steps: ['Read the two end numbers.', 'Find halfway.', 'Is the number before or after halfway?', 'Mark about where it goes.'],
+        say: '__ is about here.',
+    },
+};
+for (const d of Object.values(SCALE_DEFS)) d.sayValues = (q) => { const p = pvOf(q); return [p.task === 'fill' ? arr(p.targets)[0] : p.n]; };
+
+registerSkill('number_sense:number_line_scales', {
+    // The task is the page's (one task a page): the first item's, else the skill's own option.
+    strings: (() => {
+        const by = Object.fromEntries(Object.entries(SCALE_DEFS).map(([k, d]) => [k, strings(d)]));
+        const fn = (ref = {}) => {
+            const t = (ref.q && pvOf(ref.q).task) || (ref.opts && ref.opts.task) || 'read';
+            return (by[t] || by.read)(ref);
+        };
+        fn.def = SCALE_DEFS.read;
+        return fn;
+    })(),
+    misconceptions: ['M-N1', 'M-N2', 'M-N3'],
+    workedSteps: (q) => {
+        const p = pvOf(q);
+        if (!Number.isFinite(Number(p.step))) return [];
+        const lo = Number(p.lo), hi = Number(p.hi), st = Number(p.step);
+        if (p.task === 'estimate') {
+            const mid = (lo + hi) / 2;
+            return [step(`The line goes from ${f(lo)} to ${f(hi)}.`), step(`Halfway is ${f(mid)}.`),
+                step(`${f(p.n)} is ${p.n < mid ? 'before' : p.n > mid ? 'after' : 'at'} halfway.`), step(`Mark ${f(p.n)} about there.`, [{ slot: 'answer', value: f(p.n) }])];
+        }
+        if (p.task === 'fill') {
+            const ts = arr(p.targets).map(Number);
+            return clampSteps([step(`The line goes from ${f(lo)} to ${f(hi)}.`), step(`Each jump is ${f(st)}.`),
+                ...ts.map((v, i) => step(`${'ABC'[i]} is ${Math.round((v - lo) / st)} jumps from ${f(lo)}: ${f(v)}.`, [{ slot: `b${i}`, value: f(v) }]))]);
+        }
+        const k = Math.floor((p.n - lo) / st + 1e-9);
+        const at = Math.round((lo + k * st) * 1e6) / 1e6;
+        const last = p.task === 'mark' ? step(`Mark ${f(p.n)}.`, [{ slot: 'answer', value: f(p.n) }]) : step(`The arrow points to ${f(p.n)}.`, [{ slot: 'answer', value: f(p.n) }]);
+        const count = step(`Count ${k} jump${k === 1 ? '' : 's'} from ${f(lo)}${p.half ? ` to ${f(at)}` : ''}.`);
+        return [step(`The line goes from ${f(lo)} to ${f(hi)}.`), step(`Each jump is ${f(st)}.`), count,
+            ...(p.half ? [step(`The arrow is halfway to ${f(at + st)}.`)] : []), last];
+    },
+    wrongAnswer: (q) => {
+        const p = pvOf(q);
+        const lo = Number(p.lo), st = Number(p.step);
+        if (!Number.isFinite(st)) return null;
+        if (p.task === 'fill') {
+            const ts = arr(p.targets).map(Number);
+            const k = ts.map((v) => Math.round((v - lo) / st));
+            const ones = ts.map((v, i) => lo + k[i]);
+            const c = [];
+            if (st > 1) c.push({ value: ones.map(f).join(', '), misconception: 'M-N2', explain: 'Counted every jump as 1.', slots: Object.fromEntries(ones.map((v, i) => [`b${i}`, f(v)])) });
+            const off = ts.map((v) => v + st);
+            c.push({ value: off.map(f).join(', '), misconception: 'M-N1', explain: 'Counted the first tick as a jump.', slots: Object.fromEntries(off.map((v, i) => [`b${i}`, f(v)])) });
+            return choose(q, c);
+        }
+        const k = Math.round((p.n - lo) / st);
+        const c = [{ value: p.n + st, misconception: 'M-N1', explain: 'Counted the ticks, not the jumps: one jump too many.' }];
+        if (st > 1 && !p.half) c.push({ value: lo + k, misconception: 'M-N2', explain: 'Counted every jump as 1.' });
+        if (p.half) c.push({ value: p.n - st / 2 + 1, misconception: 'M-N3', explain: 'Read halfway along a jump as one more.' });
+        c.push({ value: p.n - st, misconception: 'M-N1', explain: 'Stopped one jump short.' });
+        return choose(q, c);
+    },
+});
+
 const SORTS = [['round_sort_10', 10], ['round_sort_100', 100], ['round_sort_1000', 1000], ['round_sort_10000', 10000],
     ['round_sort_100000', 100000], ['round_sort_million', 1000000], ['round_sort_tenths', 0.1], ['round_sort_hundredths', 0.01]];
 for (const [id, P] of SORTS) {
@@ -1116,4 +1202,6 @@ export const PV_PROVIDER_IDS = Object.freeze([
     ...SORTS.map(([s]) => `number_sense:${s}`),
     ...Object.keys(RNL_SIZE).map((s) => `number_sense:${s}`),
     ...EST.map(([s]) => `number_sense:${s}`),
+    // build lane placevalue
+    'number_sense:number_line_scales',
 ]);

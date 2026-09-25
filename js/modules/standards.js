@@ -595,6 +595,9 @@ export const SKILL_STANDARDS = {
     'number_sense:round_nl_thousands': { ccss: ['4.NBT.A.3'], ee: ['M.EE.4.NBT.3'] }, // Round on a Number Line: Thousands
     'number_sense:round_nl_ten_thousands': { ccss: ['4.NBT.A.3'], ee: ['M.EE.4.NBT.3'] }, // Round on a Number Line: Ten Thousands
     'number_sense:round_nl_hundred_thousands': { ccss: ['4.NBT.A.3'], ee: ['M.EE.4.NBT.3'] }, // Round on a Number Line: Hundred Thousands
+    // Build lane placevalue (design/BUILD_LIST.md nl_20)
+    'number_sense:number_line_scales': { ccss: ['2.MD.B.6', 'K.CC.A.2', 'K.CC.A.3', '1.NBT.A.1', '2.NBT.A.1', '3.NBT.A.1', '4.NBT.A.2'],
+        ee: ['M.EE.2.MD.6', 'M.EE.1.NBT.1', 'M.EE.2.NBT.1', 'M.EE.3.NBT.1', 'M.EE.4.NBT.2'] }, // Numbers on a Number Line
     'number_sense:nearest_10': { ccss: ['3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Round to Nearest 10
     'number_sense:nearest_100': { ccss: ['3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Round to Nearest 100
     'number_sense:nearest_1000': { ccss: ['4.NBT.A.3'], ee: ['M.EE.4.NBT.3'] }, // Round to Nearest 1,000

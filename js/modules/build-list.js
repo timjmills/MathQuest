@@ -846,10 +846,6 @@ export const VISUAL_BUILDS = {
         files: ['js/modules/sheet/cells/word-work.js (unowned today; this entry takes it)'], after: [] }),
 
     // ------------------------------------------------------------------ place value
-    vis_supports_wiring: V({ lane: 'placevalue', kind: 'wiring', name: 'Wire the Built Picture Panes as Supports',
-        build: 'the panes already drawn but never offered become `support` values: rekenrek, fingers, dice, base10-quick, disks, pvgrid, openline, bar, gridpaper, hundreds, base10 and objects (solid / hollow two sets). DECLARATIONS ONLY: append the pane ids to FAMILY_SUPPORTS (providers/util.js) and to the providers\' own `supports` arrays (append-only, one id per line, in every lane\'s provider), check each pane\'s `accepts` on its hosts, and run ws-supports-unit. It does NOT edit answer-check.js (the support-ladder work), sheet/supports.js or support-draw.js (the S2 allocator); it lands after S2',
-        hosts: ['addition:add_facts', 'subtraction:sub_facts', 'composing:number_bonds', 'placevalue:place_value_disks', 'addition:nl_add'], templates: [], newTemplates: [],
-        files: ['js/modules/sheet/providers/util.js (FAMILY_SUPPORTS)', 'js/modules/sheet/providers/*.js (supports arrays, append-only)'], after: [] }),
     vis_pv_decimal_places: V({ lane: 'placevalue', kind: 'template', name: 'Decimal Places in the Place-Value Chart',
         build: 'pv.js gains the places below the ones (Tth, Hth, Thth), the decimal point on the column line, counters 0.1 / 0.01 / 0.001 (also fraction-labelled 1/10 …), decimal digit-chart heads, and decimal bands on place_value_disks, pv_disks_build, value, expand and compare — the dependency of every decimal place-value entry in the fractions lane',
         hosts: ['placevalue:place_value_disks', 'placevalue:pv_disks_build', 'placevalue:value', 'placevalue:expand', 'placevalue:compare'], templates: ['pv', 'pv-support'], newTemplates: [],

@@ -1038,6 +1038,9 @@ export const SKILL_WRM = {
     'number_sense:round_nl_thousands': ['Y4.B1.S16', 'Y4.B1.S17'],
     'number_sense:round_nl_ten_thousands': ['Y5.B1.S13'],
     'number_sense:round_nl_hundred_thousands': ['Y5.B1.S14'],
+    // Build lane placevalue (BUILD_LIST nl_20)
+    'number_sense:number_line_scales': ['Y1.B1.S15', 'Y1.B4.S8', 'Y1.B4.S9', 'Y1.B4.S10', 'Y1.B6.S6', 'Y1.B6.S7', 'Y1.B12.S4', 'Y2.B1.S9',
+        'Y2.B1.S10', 'Y2.B1.S11', 'Y3.B1.S3', 'Y3.B1.S10', 'Y3.B1.S11', 'Y4.B1.S3', 'Y4.B1.S9', 'Y4.B1.S10', 'Y5.B1.S9'],
     'number_sense:round_sort_100': ['Y4.B1.S15'],
     'number_sense:round_sort_1000': ['Y4.B1.S16'],
     'number_sense:round_sort_10000': ['Y5.B1.S13'],
@@ -2354,14 +2357,6 @@ export const WRM_PROPOSALS = {
         representation: 'band options 10 and 20 on placevalue:compare and the two order skills, a ten-frame or tens-and-ones picture support level',
         family: 'placevalue',
         steps: ['Y1.B1.S12', 'Y1.B1.S13', 'Y1.B1.S14', 'Y1.B4.S11', 'Y1.B4.S12', 'Y2.B1.S12'],
-    },
-    nl_20: {
-        kind: 'new', skill: 'number_sense:number_line_scales',
-        name: 'Numbers on a Number Line (any scale)',
-        teaches: 'the number line as a counting and place-value tool: count along, find, place and estimate numbers on 0-20, 0-50, 0-100, 0-1,000, 0-10,000 and 0-1,000,000 lines, counting in 1s, 10s, 100s ... and with only some ticks labelled',
-        representation: 'a drawn number line with some ticks labelled; write the number at the arrow, or mark a number; option: scale; option: estimate on a line with only the ends marked',
-        family: 'placevalue',
-        steps: ['Y1.B1.S15', 'Y1.B4.S8', 'Y1.B4.S9', 'Y1.B4.S10', 'Y1.B6.S6', 'Y1.B6.S7', 'Y1.B12.S4', 'Y2.B1.S9', 'Y2.B1.S10', 'Y2.B1.S11', 'Y3.B1.S3', 'Y3.B1.S10', 'Y3.B1.S11', 'Y4.B1.S3', 'Y4.B1.S9', 'Y4.B1.S10', 'Y5.B1.S9'],
     },
     flex_partition: {
         kind: 'new', skill: 'placevalue:flexible_partition',

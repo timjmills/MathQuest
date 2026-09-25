@@ -77,6 +77,8 @@ function PLAN(rootSel, which) {
     if (rl.length && q.inlineBlanksData) {
         const set = q.inlineBlanksData.acceptedSets[0].map(String);
         tag(rl[0], { type: 'rl', value: String(rl[0].dataset.mqRlN) });
+        // A line with only the dot to place (number_line_scales mark / estimate): the tap is the answer.
+        if (set.length === 1) return { plan, q: set[0] };
         const box = all('input.ib-cell, input.mq-cellslot');
         if (!box.length) return { error: 'round line: no box for the rounded number' };
         tag(box[box.length - 1], { type: 'text', value: set[1] });

@@ -287,7 +287,7 @@ adds the **drawing** each one needs.
 | R12 | Non-standard units beside an object (cube train, paperclip chain, blocks) | B10 S2, S4; B8 S2 | PARTIAL | `shapes_early:measure_nonstandard` (legacy (C)) → kit cell, `orientation` h / v |
 | R13 | Dot plate: 0–10 dots in varied arrangements, flashed | B3 S2; B5 S2; B7 S3, S6; B9 S1; B11 S4, S7 | PARTIAL | `pane:dice` / `counters` `objects: 'dice'` (dice 1–6; 7–10 as rows of five) → proposed `counting:subitise` `arrangement`, round plate |
 | R14 | Two-part dot plate (groups apart / two colours); ring the parts | B7 S7–S8; B9 S10; B11 S4 | GAP | subitise `parts: true` (solid vs hollow, LS-5), `task: 'ring-parts'` |
-| R15 | Fingers (one hand, 5 + n on two hands, fist = 0) | B3 S2; B5 S2–S3; B7 S3–S4; B9 S7; B11 S1, S3, S11; B14 S1, S3 | PARTIAL | `pane:fingers` (1–10, not wired; no 0) → `fingers` value in the `objects` control |
+| R15 | Fingers (one hand, 5 + n on two hands, fist = 0) | B3 S2; B5 S2–S3; B7 S3–S4; B9 S7; B11 S1, S3, S11; B14 S1, S3 | MATCH | `pane:fingers` (1–10: one hand, 5 + n on two hands) as a `support` value on − within 10 (vis_supports_wiring); a count of 0 has no picture |
 | R16 | Dice faces 1–6 | B3 S2; B5 S1–S2; B7 S3; B9 S1, S7; B11 S7, S12 | MATCH | `counters` `objects: 'dice'`, `compare` dice, `pane:dice` |
 | R17 | Five frame (1×5) with counters | B3 S3; B5 S2–S6; B7 S1, S4 | MATCH / PARTIAL | `make_ten` "Make 5", `add_5_pictures` / `sub_5_pictures` `objects: 'frame'`; build task has no five frame → `frame: 'five'` on `ten_frame_build` |
 | R18 | Ten frame (2×5) filled five-wise; egg box of 10 | B9 S2–S4; B11 S1, S3, S5–S6, S8; B13 S1; B18 S1 | MATCH | `template:tenframe` (`ten_frame_build`), `counters` `objects: 'frame'`, `pane:tenframe` (= Y3 R09) |

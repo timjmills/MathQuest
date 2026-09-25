@@ -1150,6 +1150,108 @@ function genPlaceOnLine(q, skill, o) {
     setCell(q, { kind: 'line-mark', n, lo, hi: lo + P, keyValue: fmt(n) });
 }
 
+/* --------------------------------------------------------------------------- nl_20: scales */
+
+/**
+ * The line of number_line_scales (BUILD_LIST nl_20): the WHOLE line runs 0 to the band in ten
+ * jumps (0 to 50 in 5s; 0 to 20 in twenty jumps of 1), a WINDOW is ten jumps of a hundredth of the
+ * band (40 to 50 in 1s, 300 to 400 in 10s; 1s on the lines to 20 and 50).
+ */
+export const SCALE_BANDS = [20, 50, 100, 1000, 10000, 1000000, 10000000];
+const r6 = (v) => Math.round(v * 1e6) / 1e6;
+export function scaleLineOf(band, chart, pick = (lo, hi) => randInt(lo, hi), decimals = 0) {
+    const B = SCALE_BANDS.includes(Number(band)) ? Number(band) : 100;
+    // Decimal jumps (tenths, hundredths, thousandths): ten jumps from a multiple of ten jumps - 0 to
+    // 1 in tenths on the whole line, 3 to 4 or 0.2 to 0.3 on a part of it - below the band.
+    const d = [1, 2, 3].includes(Number(decimals)) ? Number(decimals) : 0;
+    if (d) {
+        const S = 10 ** d, span = 10;
+        // Tenths to 100, hundredths to 10, thousandths to 1: at most four digits a number (43.7, 6.25, 0.384).
+        const top = Math.max(1, Math.floor((Math.min(B, 1000 / S) * S) / span) - 1);
+        const loI = chart === 'window' ? pick(0, top) * span : 0;
+        return { lo: r6(loI / S), hi: r6((loI + span) / S), step: r6(1 / S), decimals: d };
+    }
+    if (chart !== 'window') return B === 20 ? { lo: 0, hi: 20, step: 1 } : { lo: 0, hi: B, step: B / 10 };
+    // A part of the line: ten jumps of a hundredth of the band (of 1 on the lines to 20 and 50).
+    const step = B <= 50 ? 1 : B / 100;
+    const span = 10 * step;
+    const lo = pick(0, Math.max(0, B / span - 1)) * span;
+    return { lo, hi: lo + span, step };
+}
+/** The tick indexes that carry a number on a line of n jumps (never an asked one). */
+export function scaleLabelled(n, labels) {
+    const out = new Set([0, n]);
+    if (labels === 'some') for (let i = 1; i < n; i++) if (n > 10 ? i % 5 === 0 : i === n / 2) out.add(i);
+    return out;
+}
+const SCALE_TASKS = ['read', 'mark', 'fill', 'estimate'];
+
+function genScaleLine(q, skill, o) {
+    const task = SCALE_TASKS.includes(o.task) ? o.task : 'read';
+    // An estimate line has no inner ticks: its ends, or its ends and halfway ('some').
+    const labels = task === 'estimate' ? (o.ticks === 'ends' ? 'ends' : 'some') : (['step', 'some', 'ends'].includes(o.ticks) ? o.ticks : 'some');
+    // A member of a mixed review takes the biggest line its review's Max Number allows.
+    const band = inReview(skill) ? (SCALE_BANDS.filter((b) => b <= rangeCap(skill, Number(o.band) || 100)).pop() || 20) : o.band;
+    const { lo, hi, step } = scaleLineOf(band, o.chart, undefined, o.decimals);
+    const dec = [1, 2, 3].includes(Number(o.decimals)) ? Number(o.decimals) : 0;
+    const n = Math.round((hi - lo) / step);
+    // The asked ticks: never an end, never a labelled tick (with every tick labelled, any inner one).
+    const fixed = labels === 'step' ? new Set([0, n]) : scaleLabelled(n, labels);
+    const free = Array.from({ length: n - 1 }, (_, i) => i + 1).filter((i) => !fixed.has(i));
+    const order = blockOrder(free.length);
+    const val = (i) => r6(lo + i * step);
+    q.options = [];
+    q.visual = '';
+    q.skillLabel = 'Numbers on a Number Line';
+    const jumps = `The line counts in ${fmt(step)}s.`;
+    if (task === 'fill') {
+        // Three ticks, never three side by side on a line of ten (the pupil counts on from a label).
+        let ks = [];
+        for (let t = 0; t < 30; t++) {
+            ks = shuffle(free.slice()).slice(0, 3).sort((a, b) => a - b);
+            if (ks.length < 3 || !(ks[1] === ks[0] + 1 && ks[2] === ks[1] + 1)) break;
+        }
+        const targets = ks.map(val);
+        inlineBlanks(q, 'A ___ B ___ C ___', [targets.map(String)], targets.map((v) => String(v).length + 1));
+        q.text = `What numbers are at A, B and C? ${q.text}`;
+        q.printText = 'Write the number at each letter.';
+        q.ans = targets.map(fmt).join(', ');
+        q.printAnswer = targets.map((v, i) => `${'ABC'[i]} ${fmt(v)}`).join(', ');
+        q.hint = `${jumps} Count on from a number you know.`;
+        q.pv = { kind: 'scale', task, lo, hi, step, labels, targets, n: targets[0], decimals: dec };
+        setCell(q, { kind: 'scale', task, lo, hi, step, labels, targets, n: targets[0], keyValue: q.ans });
+        return;
+    }
+    const k = free[order[slot(free.length)]];
+    // Edge case (WRM Y4 "arrows between ticks"): one read item in six points HALFWAY along a jump
+    // of an even size (45 on a line in tens), never past the band's last jump.
+    const half = task === 'read' && !dec && step % 2 === 0 && slot(6) === 4 && k < n;
+    const v = half ? val(k) + step / 2 : val(k);
+    q.ans = v;
+    q.pv = { kind: 'scale', task, lo, hi, step, labels, n: v, decimals: dec, half };
+    if (task === 'read') {
+        q.text = 'What number does the arrow point to?';
+        q.printText = 'Write the number the arrow points to.';
+        q.answerType = 'number';
+        q.hint = half ? `${jumps} The arrow is halfway along a jump.` : `${jumps} Count the jumps from ${fmt(lo)} to the arrow.`;
+        setCell(q, { kind: 'scale', task, lo, hi, step, labels, n: v, keyValue: v });
+        return;
+    }
+    // mark / estimate: on screen the paper's own line is ONE tap target (screen-cell.js
+    // scaleLineTwin, the round-line tap machinery): a tap puts the dot there and writes the number
+    // into the item's one slot - the number itself when the tap is within the tolerance: half a
+    // jump for a mark on a tick, one jump for an estimate.
+    const est = task === 'estimate';
+    inlineBlanks(q, `Tap the line to mark ${fmt(v)}: ___`, [[String(v)]], [String(v).length + 1]);
+    q.text = est ? `Tap about where ${fmt(v)} goes on the line. ___` : `Tap ${fmt(v)} on the number line. ___`;
+    q.printText = est ? `Estimate. Mark ${fmt(v)} on the line.` : `Mark ${fmt(v)} on the number line.`;
+    q.ans = v;
+    q.nlMark = { n: v, lo, hi, tol: est ? step : step / 2 };
+    q.hint = est ? `Halfway is ${fmt(r6((lo + hi) / 2))}. Is ${fmt(v)} before or after halfway?` : `${jumps} Count the jumps from ${fmt(lo)}.`;
+    q.printAnswer = fmt(v);
+    setCell(q, { kind: 'scale', task, lo, hi, step, labels, n: v, keyValue: fmt(v) });
+}
+
 const SORT_PLACE = { round_sort_10: 10, round_sort_100: 100, round_sort_1000: 1000, round_sort_10000: 10000,
     round_sort_100000: 100000, round_sort_million: 1000000, round_sort_tenths: 0.1, round_sort_hundredths: 0.01 };
 
@@ -1439,7 +1541,9 @@ const PV_IDS = new Set(['identify', 'value', 'expand', 'combine', 'more_less_10'
     'order_least_to_greatest', 'order_greatest_to_least', 'pv_digit_drag']);
 const ROUND_IDS = new Set(['rounding_visual', 'nearest_10', 'nearest_100', 'nearest_1000', 'nearest_10000',
     'nearest_100000', 'nearest_million', 'between_tens', 'place_on_number_line', 'rounding_table', ...Object.keys(SORT_PLACE),
-    ...Object.keys(ROUND_NL)]);
+    ...Object.keys(ROUND_NL),
+    // build lane placevalue (BUILD_LIST nl_20)
+    'number_line_scales']);
 
 /** Place value ids rewritten in P9. Returns true when the item was generated (or refused) here. */
 export function generatePvPlaceValue(q, skill) {
@@ -1468,6 +1572,7 @@ export function generatePvRounding(q, skill) {
     if (skill === 'rounding_visual') genRoundingVisual(q, skill, o);
     else if (skill === 'between_tens') genBetweenTens(q, skill, o);
     else if (skill === 'place_on_number_line') genPlaceOnLine(q, skill, o);
+    else if (skill === 'number_line_scales') genScaleLine(q, skill, o);
     else if (skill === 'rounding_table') genRoundingTable(q, skill, o);
     else if (ROUND_NL[skill]) genRoundNl(q, skill, o);
     else if (SORT_PLACE[skill]) genRoundSort(q, skill, o);

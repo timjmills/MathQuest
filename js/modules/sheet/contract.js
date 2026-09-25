@@ -198,6 +198,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     // Round on a number line to thousands and beyond (2026-09-25): place the dot, then round.
     'mark-dot-round': 'Mark the number with a dot. Round it to the nearest {place}.',
     'between-tens': 'Write the two tens the number is between.',
+    // Build lane placevalue (nl_20, numbers on a number line of any scale).
+    'line-arrow': 'Write the number the arrow points to.',
+    'line-letters': 'Write the number at each letter.',
+    'line-estimate': 'Estimate. Mark the number on the line.',
     'sort-round': 'Write each number under what it rounds to.',
     'round-table': 'Round each number. Fill in the table.',
     estimate: 'Round each number. Then estimate.',

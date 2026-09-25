@@ -95,7 +95,7 @@ export {
 } from './support-draw.js';
 // P9 place value + rounding: the `pv` template and the drawings the screen card shares with it.
 export {
-    DISK_SIZES, diskDiameter, zoneSide, zoneCapacity, diskMatSVG, numeralTracksHTML, roundingLineSVG,
+    DISK_SIZES, diskDiameter, zoneSide, zoneCapacity, diskMatSVG, numeralTracksHTML, roundingLineSVG, scaleLineSVG,
 } from './cells/pv.js';
 
 // The operations templates that are not a plain stack or fact (long division, area model,

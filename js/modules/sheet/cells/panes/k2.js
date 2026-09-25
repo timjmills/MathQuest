@@ -58,11 +58,13 @@ export const OBJECTS = Object.freeze({ ...K2_SHAPES, ...NEW_OBJECTS });
 export const OBJECT_IDS = Object.freeze(Object.keys(OBJECTS));
 
 /** n objects in rows of five (RP-21: item + 3 mm pitch), the last `x` crossed out. */
-function objectGroup(c, kind, n, x = 0) {
+function objectGroup(c, kind, n, x = 0, minRows = 1) {
     const d = by(c, { S: 10, M: 11, L: 12 });
     const pitch = d + 3;
     const draw = (OBJECTS[kind] || OBJECTS.circle).draw;
-    const rows = Math.max(1, Math.ceil(n / 5));
+    // `minRows`: the rows the page's biggest group needs, so every cell's picture is one height
+    // and the problems stand at one height in every cell (vis_supports_wiring).
+    const rows = Math.max(1, minRows, Math.ceil(n / 5));
     const across = Math.min(5, Math.max(1, n));
     let body = '';
     for (let i = 0; i < n; i++) {
@@ -70,7 +72,10 @@ function objectGroup(c, kind, n, x = 0) {
         body += `<g data-ws-count="1">${draw(cx, cy, d)}</g>`;
         if (i >= n - x) body += cross(c, cx, cy, d * 0.95);
     }
-    return { w: (across - 1) * pitch + d, h: (rows - 1) * pitch + d, body };
+    // Always five across wide (vis_supports_wiring, 2026-09-25): every problem of a page draws the
+    // picture in one place (under the problem), whatever its count - a narrow group of 3 used to
+    // stand BESIDE its problem while a group of 7 stood under the next one.
+    return { w: 4 * pitch + d, h: (rows - 1) * pitch + d, body, across };
 }
 
 /** a groups of b, each in its own rounded ring (RP-82: same arrangement in every group). */
@@ -230,12 +235,13 @@ export const K2_PANES = {
             const op = opOf(p), a = num(p.a), b = num(p.b);
             const name = OBJECTS[kind].plural;
             if (!op) return { ...objectGroup(c, kind, num(p.n)), label: `${p.n} ${name}` };
-            if (op === '-') return { ...objectGroup(c, kind, a, b), label: `${a} ${name}, ${b} crossed out` };
+            if (op === '-') return { ...objectGroup(c, kind, a, b, a <= 10 ? 2 : 4), label: `${a} ${name}, ${b} crossed out` };
             if (op === '*') return { ...objectEqualGroups(c, kind, a, b), label: `${a} groups of ${b} ${name}` };
-            // Side by side while both groups are small; otherwise one group over the other, so
-            // the picture stays about 70 mm wide and readable in a half-width cell and on a phone.
-            const g = [objectGroup(c, kind, a), objectGroup(c, kind, b)];
-            return { ...(a <= 3 && b <= 3 ? row(g, 10, { align: 'top' }) : col(g, 6)), label: `${a} ${name} and ${b} ${name}` };
+            // One group over the other, always (every cell of a page alike), with a gap between
+            // the two groups well over the 3 mm inside one, so 3 + 7 reads as two groups, never as
+            // rows of 3, 5 and 2.
+            const g = [objectGroup(c, kind, a, 0, 2), objectGroup(c, kind, b, 0, 2)];
+            return { ...col(g, 9), label: `${a} ${name} and ${b} ${name}` };
         },
     },
     tenframe: {
@@ -286,7 +292,9 @@ export const K2_PANES = {
             const op = opOf(p), a = num(p.a), b = num(p.b);
             if (!op) return { ...fingers(c, num(p.n)), label: `${p.n} fingers` };
             // −: the hands show the start number; the pupil folds down the number taken away.
-            if (op === '-') return { ...fingers(c, a), label: `${a} fingers` };
+            // Always two hands wide (a start of 6-10 needs both), so every problem of a page puts
+            // its hands in the same place, under the problem (vis_supports_wiring).
+            if (op === '-') { const f = fingers(c, a); return { ...f, w: Math.max(f.w, fingers(c, 10).w), label: `${a} fingers` }; }
             // +: one hand for each addend (both 5 or less), side by side.
             return { ...hands(c, a, b), label: `${a} fingers and ${b} fingers` };
         },

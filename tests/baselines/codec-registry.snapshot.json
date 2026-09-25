@@ -89,7 +89,8 @@
     "wpCues": "8A",
     "wpBank": "8B",
     "wpBar": "8C",
-    "bars": "9F"
+    "bars": "9F",
+    "supportMore": "4E"
   },
   "blocks": {
     "0": {
@@ -276,7 +277,9 @@
       "words": "W",
       "missing": "I",
       "numerals": "U",
-      "hands": "B"
+      "hands": "B",
+      "mark": "S",
+      "estimate": "4"
     },
     "zeroPlace": {
       "none": "N",
@@ -628,6 +631,18 @@
     "bars": {
       "vertical": "V",
       "horizontal": "H"
+    },
+    "supportMore": {
+      "objects": "A",
+      "fingers": "B",
+      "rekenrek": "C",
+      "base10": "D",
+      "base10-quick": "E",
+      "disks": "F",
+      "pvgrid": "G",
+      "hundreds": "H",
+      "openline": "I",
+      "gridpaper": "J"
     }
   },
   "scalarOnly": {

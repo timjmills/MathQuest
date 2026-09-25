@@ -255,3 +255,23 @@ All ten digit blocks are allocated, but most waves used only a few letters. `KEY
 own range or in a sub-range of that digit. Sub-ranges are append-only and pinned by `ws-codec-registry`.
 Current: k2 3B–3M, operations 3N–3Z, placevalue 4E–4O, algebra 4P–4Z, fractions 6C–6P, geometry 2G–2T,
 measurement 7F–7S, timemoney 7T–7Z, data 8D–8O, numtheory 8P–8Z, lessons / support ladder / later 5N–5Z.
+
+## A set that outgrew one field: the spill key (2026-09-25)
+A value token is ONE character of `A–Z 0–9`, so one option id holds at most 36 values. The unified
+`support` set (`F`) had used 30 when the S4 picture panes were wired as supports (build lane
+placevalue, `vis_supports_wiring`). `SPILL_KEYS` in `js/modules/skill-option-keys.js` names, for such a
+set, a SECOND field whose key and token table carry the rest: `support` → `supportMore` (`4E`, the
+placevalue sub-range). A value whose token is in `VALUE_TOKENS.supportMore` is written there, after
+the one-letter fields; the rest stay in `F`, which is left out when empty.
+
+| Code | Reads |
+|---|---|
+| `~FV_4EC` | touch dots (count on) and the rekenrek |
+| `~_4EG` | the place-value grid alone (the leading empty field: no one-letter field) |
+
+`supportMore` is not an option: no skill declares it. The codec reads both fields back into `support`
+(in either order, merged in the definition's order). The deployed decoder skips `4E` (an unknown
+digit + letter key), so an old app drops those supports and never misreads them. `supportMore`
+tokens: objects `A` · fingers `B` · rekenrek `C` · base10 `D` · base10-quick `E` · disks `F` ·
+pvgrid `G` · hundreds `H` · openline `I` · gridpaper `J`. `ws-codec-registry` round-trips a spilled
+value alone and beside an own-field value for every skill whose set spills.

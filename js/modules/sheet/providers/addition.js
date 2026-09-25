@@ -109,7 +109,13 @@ function factWrong(q, slot = 'ans') {
 
 registerSkill('addition:add_facts', {
     // S2: the supports this skill can draw (touch dots, cues, panes); the Support control offers these.
-    supports: Object.freeze(['touch', 'touchall', 'tile', 'frame', 'line', 'boxsign']),
+    supports: Object.freeze(['touch', 'touchall', 'tile', 'frame', 'line', 'boxsign',
+        // vis_supports_wiring (build lane placevalue): the picture panes, one id per line.
+        'objects',
+        'fingers',
+        'rekenrek',
+        'bar',
+    ]),
     strings: strings({
         iCan: 'I Can add facts to 20',
         instructionKey: 'add',
@@ -154,7 +160,15 @@ function columnWrong(q, addends) {
 
 registerSkill('addition:add', {
     // S2: the supports this skill can draw (touch dots, cues, panes); the Support control offers these.
-    supports: Object.freeze(['touch', 'touchall', 'startarrow', 'boxsign']),
+    supports: Object.freeze(['touch', 'touchall', 'startarrow', 'boxsign',
+        // vis_supports_wiring (build lane placevalue): the picture panes, one id per line.
+        'objects',
+        'fingers',
+        'rekenrek',
+        'bar',
+        'hundreds',
+        'base10',
+    ]),
     strings: strings({
         // R3 (critic round 3): basic `add` is grade 1, within 20 (1.OA.6), and every item of
         // the band is a fact (gen-operations.js _applyKitFactCell), so the title, the steps and

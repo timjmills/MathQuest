@@ -22,20 +22,20 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
+- Covered 530 (61%), partial only 138 (16%), gap 204 (23%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 328 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 329 skills carry WRM tags. 161 proposals (119 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
 | Reception | PK | 18 | 119 | 58 (49%) | 28 | 33 |
-| Year 1 | K | 14 | 116 | 72 (62%) | 24 | 20 |
-| Year 2 | 1 | 11 | 124 | 80 (65%) | 18 | 26 |
-| Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
-| Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
-| Year 5 | 4 | 15 | 136 | 81 (60%) | 22 | 33 |
+| Year 1 | K | 14 | 116 | 79 (68%) | 20 | 17 |
+| Year 2 | 1 | 11 | 124 | 83 (67%) | 15 | 26 |
+| Year 3 | 2 | 12 | 134 | 81 (60%) | 22 | 31 |
+| Year 4 | 3 | 14 | 129 | 84 (65%) | 16 | 29 |
+| Year 5 | 4 | 15 | 136 | 82 (60%) | 22 | 32 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **513 (59%)** | **149** | **210** |
+| **All** | | **97** | **872** | **530 (61%)** | **138** | **204** |
 
 ## Source disagreements
 
@@ -553,11 +553,8 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Closes (1): Y6.B6.S1 Add or multiply  
   _proposal id: add_or_mult_
 
-### placevalue (8 proposals, 33 steps)
+### placevalue (7 proposals, 16 steps)
 
-- **Numbers on a Number Line (any scale)** — new skill `number_sense:number_line_scales`. Teaches the number line as a counting and place-value tool: count along, find, place and estimate numbers on 0-20, 0-50, 0-100, 0-1,000, 0-10,000 and 0-1,000,000 lines, counting in 1s, 10s, 100s ... and with only some ticks labelled. Representation: a drawn number line with some ticks labelled; write the number at the arrow, or mark a number; option: scale; option: estimate on a line with only the ends marked.  
-  Closes (17): Y1.B1.S15 The number line; Y1.B4.S8 The number line to 20; Y1.B4.S9 Use a number line to 20; Y1.B4.S10 Estimate on a number line to 20; Y1.B6.S6 The number line to 50; Y1.B6.S7 Estimate on a number line to 50; Y1.B12.S4 The number line to 100; Y2.B1.S9 10s on the number line to 100; Y2.B1.S10 10s and 1s on the number line to 100; Y2.B1.S11 Estimate numbers on a number line; Y3.B1.S3 Number line to 100; Y3.B1.S10 Number line to 1,000; Y3.B1.S11 Estimate on a number line to 1,000; Y4.B1.S3 Number line to 1,000; Y4.B1.S9 Number line to 10,000; Y4.B1.S10 Estimate on a number line to 10,000; Y5.B1.S9 Number line to 1,000,000  
-  _proposal id: nl_20_
 - **Compare Numbers to 10 and 20 (option)** — option on `placevalue:compare`: band 10/20 and pictures. Teaches comparing and ordering numbers and groups of objects within 10 and 20 (and tens-and-ones pictures to 100) with <, >, = and the words greater than / less than / equal to (the lowest band today is 99). Representation: band options 10 and 20 on placevalue:compare and the two order skills, a ten-frame or tens-and-ones picture support level.  
   Closes (6): Y1.B1.S12 Less than, greater than, equal to; Y1.B1.S13 Compare numbers; Y1.B1.S14 Order objects and numbers; Y1.B4.S11 Compare numbers to 20; Y1.B4.S12 Order numbers to 20; Y2.B1.S12 Compare objects  
   _proposal id: compare_small_
@@ -1116,8 +1113,8 @@ whatever happens to the WRM gaps.
   Partial: Order: Least to Greatest (`placevalue:order_least_to_greatest`), missing ordering objects and numbers within 10  
   Proposal: Compare Numbers to 10 and 20 (option)  
   Vocabulary: smallest, greatest, in order  
-- **Y1.B1.S15** The number line — GAP. _K.CC.A.2_  
-  Proposal: Numbers on a Number Line (any scale)  
+- **Y1.B1.S15** The number line — covered. _K.CC.A.2_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Vocabulary: number line, greater than, jump  
 
 #### Y1.B2 Autumn Block 2: Addition and subtraction (within 10)
@@ -1223,15 +1220,15 @@ whatever happens to the WRM gaps.
 - **Y1.B4.S7** 1 more and 1 less — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {to 20}; 1 More, 1 Less, 10 More, 10 Less (`placevalue:more_less_10`) {1 more and 1 less, numbers to 20}  
   Vocabulary: more, less, before, after  
-- **Y1.B4.S8** The number line to 20 — GAP. _K.CC.A.3_  
-  Proposal: Numbers on a Number Line (any scale)  
+- **Y1.B4.S8** The number line to 20 — covered. _K.CC.A.3_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Vocabulary: number line, start point, end point  
-- **Y1.B4.S9** Use a number line to 20 — PARTIAL. _K.CC.A.3_  
+- **Y1.B4.S9** Use a number line to 20 — covered. _K.CC.A.3_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Partial: Number Line Addition (B&W) (`addition:number_line_add`), missing using the line to count on and back (the skill is addition only)  
-  Proposal: Numbers on a Number Line (any scale)  
   Vocabulary: more, less, forwards, backwards  
-- **Y1.B4.S10** Estimate on a number line to 20 — GAP. _K.CC.A.3_  
-  Proposal: Numbers on a Number Line (any scale)  
+- **Y1.B4.S10** Estimate on a number line to 20 — covered. _K.CC.A.3_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Vocabulary: estimate, halfway, closer  
 - **Y1.B4.S11** Compare numbers to 20 — PARTIAL. _K.CC.C.7, 1.NBT.B.3, M.EE.1.NBT.3_  
   Partial: Compare Numbers (>, <, =) (`placevalue:compare`), missing numbers within 20 (the lowest band is 99)  
@@ -1297,13 +1294,13 @@ whatever happens to the WRM gaps.
 - **Y1.B6.S5** Partition into tens and ones — covered. _K.NBT.A.1, 1.NBT.B.2, M.EE.1.NBT.2_  
   Skills: Build a Number with Base-10 Blocks (`composing:base10_build`) {numbers to 50}; Unit Form (4 hundreds 7 tens 6 ones) (`placevalue:unit_form`)  
   Vocabulary: partition, tens, ones  
-- **Y1.B6.S6** The number line to 50 — PARTIAL. _K.CC.A.2, 1.NBT.A.1, M.EE.1.NBT.1_  
+- **Y1.B6.S6** The number line to 50 — covered. _K.CC.A.2, 1.NBT.A.1, M.EE.1.NBT.1_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing a whole 0-50 line counted in tens then ones (the skill's line spans one ten)  
-  Proposal: Numbers on a Number Line (any scale)  
   Vocabulary: number line, start point, end point  
-- **Y1.B6.S7** Estimate on a number line to 50 — PARTIAL. _K.CC.A.2, 1.NBT.A.1, M.EE.1.NBT.1_  
+- **Y1.B6.S7** Estimate on a number line to 50 — covered. _K.CC.A.2, 1.NBT.A.1, M.EE.1.NBT.1_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing estimating on a line with only the ends marked  
-  Proposal: Numbers on a Number Line (any scale)  
   Vocabulary: estimate, midpoint, closer to  
 - **Y1.B6.S8** 1 more, 1 less — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: 1 More, 1 Less, 10 More, 10 Less (`placevalue:more_less_10`) {1 more, 1 less, numbers to 50}  
@@ -1436,9 +1433,9 @@ whatever happens to the WRM gaps.
 - **Y1.B12.S3** Partition into tens and ones — covered. _K.NBT.A.1, 1.NBT.B.2, M.EE.1.NBT.2_  
   Skills: Build a Number with Base-10 Blocks (`composing:base10_build`); Unit Form (4 hundreds 7 tens 6 ones) (`placevalue:unit_form`) {band 99}  
   Vocabulary: partition, tens, ones  
-- **Y1.B12.S4** The number line to 100 — PARTIAL. _K.CC.A.2, 1.NBT.A.1, M.EE.1.NBT.1_  
+- **Y1.B12.S4** The number line to 100 — covered. _K.CC.A.2, 1.NBT.A.1, M.EE.1.NBT.1_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing a whole 0-100 line counted in tens then ones (the skill's line spans one ten)  
-  Proposal: Numbers on a Number Line (any scale)  
   Vocabulary: number line, interval, estimate  
 - **Y1.B12.S5** 1 more, 1 less — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: 1 More, 1 Less, 10 More, 10 Less (`placevalue:more_less_10`) {1 more, 1 less}  
@@ -1514,17 +1511,17 @@ whatever happens to the WRM gaps.
 - **Y2.B1.S8** Write numbers to 100 in expanded form — covered. _1.NBT.B.2, 2.NBT.A.3, M.EE.1.NBT.2, M.EE.2.NBT.3_  
   Skills: Expanded Form (`placevalue:expand`) {band 99}; Standard Form (`placevalue:combine`) {band 99}  
   Vocabulary: expanded form, plus, is equal to, value  
-- **Y2.B1.S9** 10s on the number line to 100 — PARTIAL. _1.NBT.A.1, 2.MD.B.6, M.EE.1.NBT.1, M.EE.2.MD.6_  
+- **Y2.B1.S9** 10s on the number line to 100 — covered. _1.NBT.A.1, 2.MD.B.6, M.EE.1.NBT.1, M.EE.2.MD.6_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing counting in 10s along a line marked in tens  
-  Proposal: Numbers on a Number Line (any scale)  
   Vocabulary: interval, start, end, multiple of 10  
-- **Y2.B1.S10** 10s and 1s on the number line to 100 — PARTIAL. _1.NBT.A.1, 2.MD.B.6, M.EE.1.NBT.1, M.EE.2.MD.6_  
+- **Y2.B1.S10** 10s and 1s on the number line to 100 — covered. _1.NBT.A.1, 2.MD.B.6, M.EE.1.NBT.1, M.EE.2.MD.6_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing a whole 0-100 line counted in tens then ones (the skill's line spans one ten)  
-  Proposal: Numbers on a Number Line (any scale)  
   Vocabulary: between, count on, interval  
-- **Y2.B1.S11** Estimate numbers on a number line — PARTIAL. _1.NBT.A.1, 2.MD.B.6, M.EE.1.NBT.1, M.EE.2.MD.6_  
+- **Y2.B1.S11** Estimate numbers on a number line — covered. _1.NBT.A.1, 2.MD.B.6, M.EE.1.NBT.1, M.EE.2.MD.6_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing estimating on a line with only the ends marked  
-  Proposal: Numbers on a Number Line (any scale)  
   Vocabulary: estimate, interval, halfway  
 - **Y2.B1.S12** Compare objects — PARTIAL. _1.NBT.B.3, M.EE.1.NBT.3_  
   Partial: More/Fewer/Same Groups (Visual) (`comparing:compare_groups`), missing comparing groups of objects to 100 (tens and ones pictures)  
@@ -1927,9 +1924,9 @@ whatever happens to the WRM gaps.
   Partial: Build a Number with Base-10 Blocks (`composing:base10_build`), missing partitioning in more than one way  
   Proposal: Partition Numbers Flexibly  
   Vocabulary: partition, whole, part  
-- **Y3.B1.S3** Number line to 100 — PARTIAL. _2.MD.B.6, 2.NBT.A.1, M.EE.2.MD.6, M.EE.2.NBT.1_  
+- **Y3.B1.S3** Number line to 100 — covered. _2.MD.B.6, 2.NBT.A.1, M.EE.2.MD.6, M.EE.2.NBT.1_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing a whole 0-100 line counted in tens then ones (the skill's line spans one ten)  
-  Proposal: Numbers on a Number Line (any scale)  
   Vocabulary: interval, division, estimate  
 - **Y3.B1.S4** Hundreds — PARTIAL. _2.NBT.A.1, M.EE.2.NBT.1_  
   Partial: Build 3-Digit Numbers with Flats (`composing:base10_build_hundreds`), missing counting in hundreds; 100 as ten tens  
@@ -1950,12 +1947,12 @@ whatever happens to the WRM gaps.
 - **Y3.B1.S9** Find 1, 10 or 100 more or less — covered. _2.NBT.B.8_  
   Skills: 10 More, 10 Less, 100 More, 100 Less (`placevalue:more_less_100`) {1, 10 and 100}  
   Vocabulary: more, less, column, exchange  
-- **Y3.B1.S10** Number line to 1,000 — PARTIAL. _2.MD.B.6, 2.NBT.A.1, M.EE.2.MD.6, M.EE.2.NBT.1_  
+- **Y3.B1.S10** Number line to 1,000 — covered. _2.MD.B.6, 2.NBT.A.1, M.EE.2.MD.6, M.EE.2.NBT.1_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing a 0-1,000 line (the skill's lines are to 100)  
-  Proposal: Numbers on a Number Line (any scale)  
   Vocabulary: start point, end point, interval  
-- **Y3.B1.S11** Estimate on a number line to 1,000 — GAP. _2.MD.B.6, 2.NBT.A.1, M.EE.2.MD.6, M.EE.2.NBT.1_  
-  Proposal: Numbers on a Number Line (any scale)  
+- **Y3.B1.S11** Estimate on a number line to 1,000 — covered. _2.MD.B.6, 2.NBT.A.1, M.EE.2.MD.6, M.EE.2.NBT.1_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Vocabulary: estimate, halfway, midpoint, closer to  
 - **Y3.B1.S12** Compare numbers to 1,000 — covered. _2.NBT.A.4, M.EE.2.NBT.4_  
   Skills: Compare Numbers (>, <, =) (`placevalue:compare`) {band 999}  
@@ -2401,9 +2398,9 @@ whatever happens to the WRM gaps.
 - **Y4.B1.S2** Partition numbers to 1,000 — covered. _2.NBT.A.1, 2.NBT.A.3, M.EE.2.NBT.1, M.EE.2.NBT.3_  
   Skills: Expanded Form (`placevalue:expand`) {band 999}; Unit Form (4 hundreds 7 tens 6 ones) (`placevalue:unit_form`) {band 999}  
   Vocabulary: partition, hundreds, tens, ones, place holder  
-- **Y4.B1.S3** Number line to 1,000 — PARTIAL. _2.MD.B.6, 2.NBT.A.1, M.EE.2.MD.6, M.EE.2.NBT.1_  
+- **Y4.B1.S3** Number line to 1,000 — covered. _2.MD.B.6, 2.NBT.A.1, M.EE.2.MD.6, M.EE.2.NBT.1_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing a 0-1,000 line  
-  Proposal: Numbers on a Number Line (any scale)  
   Vocabulary: interval, start, end point, difference, midpoint  
 - **Y4.B1.S4** Thousands — PARTIAL. _4.NBT.A.1, 4.NBT.A.2, M.EE.4.NBT.2_  
   Partial: Read Place-Value Disks (`placevalue:place_value_disks`), missing 1,000 as ten hundreds; counting in thousands  
@@ -2421,12 +2418,12 @@ whatever happens to the WRM gaps.
 - **Y4.B1.S8** Find 1, 10, 100, 1,000 more or less — covered. _2.NBT.B.8, 4.NBT.A.1_  
   Skills: 10 More, 10 Less, 100 More, 100 Less (`placevalue:more_less_100`) {1, 10, 100 and 1,000}  
   Vocabulary: column, exchange, placeholder  
-- **Y4.B1.S9** Number line to 10,000 — PARTIAL. _3.NBT.A.1, M.EE.3.NBT.1_  
+- **Y4.B1.S9** Number line to 10,000 — covered. _3.NBT.A.1, M.EE.3.NBT.1_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing a 0-10,000 line  
-  Proposal: Numbers on a Number Line (any scale)  
   Vocabulary: interval, divisions, midpoint  
-- **Y4.B1.S10** Estimate on a number line to 10,000 — GAP. _3.NBT.A.1, M.EE.3.NBT.1_  
-  Proposal: Numbers on a Number Line (any scale)  
+- **Y4.B1.S10** Estimate on a number line to 10,000 — covered. _3.NBT.A.1, M.EE.3.NBT.1_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Vocabulary: midpoint, estimate, closer  
 - **Y4.B1.S11** Compare numbers to 10,000 — covered. _4.NBT.A.2, M.EE.4.NBT.2_  
   Skills: Compare Numbers (>, <, =) (`placevalue:compare`) {band 9999}  
@@ -2881,8 +2878,8 @@ whatever happens to the WRM gaps.
 - **Y5.B1.S8** Partition numbers to 1,000,000 — covered. _4.NBT.A.2, M.EE.4.NBT.2_  
   Skills: Expanded Form (`placevalue:expand`) {band 999999}; Standard Form (`placevalue:combine`)  
   Vocabulary: partition, value, exchange  
-- **Y5.B1.S9** Number line to 1,000,000 — GAP. _4.NBT.A.2, M.EE.4.NBT.2_  
-  Proposal: Numbers on a Number Line (any scale)  
+- **Y5.B1.S9** Number line to 1,000,000 — covered. _4.NBT.A.2, M.EE.4.NBT.2_  
+  Skills: Numbers on a Number Line (`number_sense:number_line_scales`)  
   Vocabulary: interval, start, end point, midpoint  
 - **Y5.B1.S10** Compare and order numbers to 100,000 — covered. _4.NBT.A.2, M.EE.4.NBT.2_  
   Skills: Compare Numbers (>, <, =) (`placevalue:compare`) {band 99999}; Order: Least to Greatest (`placevalue:order_least_to_greatest`) {band 99999}  

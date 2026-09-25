@@ -265,8 +265,8 @@ Rows R01–R84 keep the Year 3 ids; **R85–R101 are new in Year 2**.
 | R09 | Ten frame of counters (fill, pairs, two / three sets) | B1 S1–S3, S12, S14–S16; B2 S1–S2, S6–S7, S10–S11; B5 S2–S3, S12 | MATCH / PARTIAL | `template:tenframe`, `pane:tenframe` (two sets; `fill:'pairs'`, three sets, groups-per-frame PARTIAL) |
 | R11 | Part-whole (cherry), numbers | B1 S5–S8; B2 S2, S6, S9–S10, S12, S15, S17–S18, S21; B4 S3, S9; B8 S1 | MATCH | `template:bond`, `template:fact-family` |
 | R12 | Part-whole rotated / pictures or words in circles | B1 S5–S8; B4 S3 | PARTIAL / GAP | bond `orientation:'horizontal'` exists; bottom / `draw:'base10'\|'coins'` / words GAP |
-| R17 | Number line, end-labelled — label / read arrow / place | B1 S9–S10, S13–S14 | PARTIAL | `pv` `line-mark`; `ticks` (one / some / ends) on `nl_add`/`nl_sub`; proposed `number_sense:read_number_line` |
-| R18 | Estimate on a number line (no interior labels) | B1 S11 | PARTIAL | `pane:round-line`, `pv` `estimate`; `ticks:'none'` proposal |
+| R17 | Number line, end-labelled — label / read arrow / place | B1 S9–S10, S13–S14 | MATCH | `number_sense:number_line_scales` (nl_20): `task` read / mark / write at A, B, C; `ticks` every / some / ends |
+| R18 | Estimate on a number line (no interior labels) | B1 S11 | MATCH | `number_sense:number_line_scales` (nl_20) `task: 'estimate'` |
 | R19 | Skip-count / grouping hops on a line | B1 S16; B5 S7, S10, S14, S16 | MATCH | `template:hop-line` (`nl_mult`, `nl_div`, `skip_count_line`, `ticks`) |
 | R20 | Open number line (labelled hops, blank end boxes) | B2 S19; B4 S9 | PARTIAL | `pane:openline` (not wired); `line:'open'` on `nl_add`/`nl_sub`/`money_change` |
 | R21 | Bridging split under the addend / subtrahend | B2 S6, S9–S10, S12 | GAP | mark pane `split` |
@@ -316,10 +316,10 @@ Rows R01–R84 keep the Year 3 ids; **R85–R101 are new in Year 2**.
 | R80 | Turns (quarter / half / three-quarter / full; clockwise) | B11 S3–S5 | GAP | `angles_lines:turns` |
 | R81 | Digit / number / word cards | B1 S1, S5–S6, S13; B5 S16; B9 S5 | PARTIAL | `template:cloze-bank` |
 | R82 | Grouped-object pictures for stories | throughout | PARTIAL | `pane:objects`, `template:wordpic` (K), `template:word-work` |
-| **R85** | **Rekenrek, 20 beads** (two rows of ten, 5 / 5; read, show, take away) | B1 S1, S5, S7; B2 S1–S2, S6, S9–S10 | PARTIAL | `pane:rekenrek` (≤ 20, K–2) — not wired as `support` on bonds / add-sub within 20 |
+| **R85** | **Rekenrek, 20 beads** (two rows of ten, 5 / 5; read, show, take away) | B1 S1, S5, S7; B2 S1–S2, S6, S9–S10 | MATCH | `pane:rekenrek` (≤ 20) as a `support` value (vis_supports_wiring) on + / − facts and within 10 / 20; take away slides the beads off |
 | **R86** | **Rekenrek, 100 beads** (ten rows) | B1 S2, S5, S7–S8, S15–S16; B2 S4–S5, S8–S12, S14 | GAP | `rows: 1..10` on `pane:rekenrek` |
 | **R87** | **Covered / hidden part** (hand or book over beads, splat over bags, box over an array, hidden coins or ribbon) | B1 S3; B2 S1–S2, S4, S8; B4 S5; B5 S6, S13; B8 S13 | GAP | a `cover` mark (outline box laid over part of a pane; the pupil finds the hidden amount) |
-| **R88** | Dice faces, fingers, cube rows as number pictures | B1 S1; B5 S2, S15 | PARTIAL | `pane:dice`, `pane:fingers` (≤ 10, K–1), `pane:objects` — not wired |
+| **R88** | Dice faces, fingers, cube rows as number pictures | B1 S1; B5 S2, S15 | MATCH | `support` values (vis_supports_wiring): dot tiles (`tile`, `pane:dice`), `pane:fingers` (− within 10), `pane:objects` (+ / − within 10 and 20) |
 | **R89** | **Number shapes** (tiles with holes in two columns; odd sticks out) | B5 S3, S12 | GAP | `objects` kind `numbershape` |
 | **R90** | **Ones vs tens parallel pictures** (3 cubes + 5 cubes / 3 rods + 5 rods) | B2 S3–S4 | GAP | `unit:'one'\|'ten'` picture pair on `add_sub_10s` (sibling of R10 / R39) |
 | **R91** | **Total grid** (3 × 3 numbers or symbols, row / column totals) | B2 S7, S14 | GAP | `template:total-grid` |

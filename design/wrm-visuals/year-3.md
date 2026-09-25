@@ -269,8 +269,8 @@ offered and need not be (the school is in Qatar).
 | R14 | Part-whole with fractions (whole 1, n/n) | B6 S4; B8 S2–S3 | GAP | bond `values:'fraction'` (stacked fractions, TY-7) |
 | R15 | Split-and-operate part-whole (× / ÷ arrows) | B4 S4–S5,7–8 | GAP | new `template:split-op` |
 | R16 | Area model | (B4 S4–S5 alternative) | MATCH | `template:area-model` (`multiplication:area_model_mult`, `division:area_model_div_2by1`) |
-| R17 | Number line, end-labelled, intervals to label / arrows to read / place | B1 S3,10; B7 S1 | PARTIAL | `pv` `line-mark` (`number_sense:place_on_number_line`); new skill `number_sense:read_number_line` |
-| R18 | Estimate on a number line (no/mid ticks) | B1 S11; B2 S20 | PARTIAL | `pane:round-line`, `pv` `estimate`; `ticks` option on read_number_line |
+| R17 | Number line, end-labelled, intervals to label / arrows to read / place | B1 S3,10; B7 S1 | MATCH | `number_sense:number_line_scales` (nl_20) (and `number_sense:place_on_number_line`) |
+| R18 | Estimate on a number line (no/mid ticks) | B1 S11; B2 S20 | MATCH | `number_sense:number_line_scales` (nl_20) `task: 'estimate'`, `ticks` ends / ends and halfway |
 | R19 | Skip-count line / multiplication hops | B3 S6,10; B4 S9 | MATCH | `template:hop-line` (`nl_mult`, `nl_div`, `ticks`, `response`, `support` hop numbers); remainder landing PARTIAL |
 | R20 | Open number line with labelled hops (bridge 10/100, count on/back) | B2 S6–S9,19,21; B9 S4–S5 | PARTIAL | `pane:openline` (not wired); `template:number-line` is 0–20 ticked → `line:'open'` option on nl_add/nl_sub/money_change |
 | R21 | Bridging split under the sum (6 → 2 + 4) | B2 S6,8 | GAP | new mark pane `split` (support value on add/sub 1k) |

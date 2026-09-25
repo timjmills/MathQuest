@@ -20,14 +20,14 @@ the first entry.
 ## Summary
 
 - **575 year rows** (Reception 67, Year 1 79, Year 2 75, Year 3 84, Year 4 89, Year 5 92, Year 6 89) → **210 representations**.
-- **MATCH 6 · PARTIAL 103 · GAP 101.**
-- The 204 PARTIAL / GAP representations are closed by 93 existing build-list entries (merged) and 53 entries added from this catalogue.
+- **MATCH 8 · PARTIAL 101 · GAP 101.**
+- The 202 PARTIAL / GAP representations are closed by 92 existing build-list entries (merged) and 52 entries added from this catalogue.
 
 | Lane | Representations it owns | MATCH | PARTIAL | GAP | Entries added from the catalogue |
 |---|---|---|---|---|---|
-| `k2` | 50 | 0 | 21 | 29 | 12 |
+| `k2` | 51 | 0 | 22 | 29 | 12 |
 | `operations` | 32 | 0 | 20 | 12 | 11 |
-| `placevalue` | 17 | 0 | 9 | 8 | 9 |
+| `placevalue` | 14 | 0 | 6 | 8 | 8 |
 | `algebra` | 15 | 0 | 6 | 9 | 4 |
 | `fractions` | 18 | 0 | 11 | 7 | 7 |
 | `geometry` | 33 | 0 | 17 | 16 | 3 |
@@ -38,7 +38,6 @@ the first entry.
 
 ## Cross-cutting findings
 
-- **Picture panes built but never offered as supports (rekenrek, fingers, dice, base10-quick, disks, pvgrid, openline, bar, gridpaper, hundreds, base10, objects)** → `vis_supports_wiring` (lane `placevalue`): V001, V003, V004, V020, V025, V085, V102, V113, V114.
 - **Legacy colour → B&W: Migrate Legacy Shape and Angle Visuals to B&W Kit Cells** → `vis_migrate_shapes` (lane `geometry`): V074, V075, V076, V078, V079, V148, V200.
 - **Legacy colour → B&W: Migrate Legacy Area and Volume Visuals to B&W Kit Cells** → `vis_migrate_area_volume` (lane `geometry`): V052, V162, V206.
 - **Legacy colour → B&W: Migrate Legacy Coordinate Visuals to the B&W Coordinate Grid** → `vis_migrate_coordinates` (lane `geometry`): V171, V172, V207.
@@ -52,10 +51,10 @@ the first entry.
 
 | Id | Representation | Year rows | Steps | Status | Have today | Build | Lane |
 |---|---|---|---|---|---|---|---|
-| V001 | Base-10 blocks to scale, read (hundreds flat, thousand cube, flat = 1) | Y1 R43 (M/P), Y2 R01, Y3 R01, Y4 R01, Y5 R01 | 81 | PARTIAL | `template:base10`, `composing:base10_build`, `pane:base10` | `vis_base10_read`*, `vis_supports_wiring`* | `k2` |
+| V001 | Base-10 blocks to scale, read (hundreds flat, thousand cube, flat = 1) | Y1 R43 (M/P), Y2 R01, Y3 R01, Y4 R01, Y5 R01 | 81 | PARTIAL | `template:base10`, `composing:base10_build`, `pane:base10` | `vis_base10_read`* | `k2` |
 | V002 | Base-10 quick sketch (square, line, dot) | Y3 R02 | 3 | MATCH | `pane:base10-quick`, `template:base10`, `composing:base10_build`, `composing:base10_build_hundreds` | - | - |
-| V003 | Place-value counters loose / in a row (to 999,999) | Y3 R03 (MATCH), Y4 R03 (M/P), Y5 R03 (M/P) | 27 | PARTIAL | `template:pv`, `placevalue:place_value_disks`, `pane:disks` | `vis_pv_bands_millions`*, `vis_supports_wiring`* | `placevalue` |
-| V004 | Place-value chart with counters, build / read (to 7 digits) | Y2 R04, Y3 R04 (M/P), Y5 R04, Y6 R04 | 62 | PARTIAL | `pane:pvgrid`, `template:pv`, `placevalue:pv_disks_build` | `vis_pv_bands_millions`*, `vis_supports_wiring`* | `placevalue` |
+| V003 | Place-value counters loose / in a row (to 999,999) | Y3 R03 (MATCH), Y4 R03 (M/P), Y5 R03 (M/P) | 27 | PARTIAL | `template:pv`, `placevalue:place_value_disks`, `pane:disks` | `vis_pv_bands_millions`* | `placevalue` |
+| V004 | Place-value chart with counters, build / read (to 7 digits) | Y2 R04, Y3 R04 (M/P), Y5 R04, Y6 R04 | 62 | PARTIAL | `pane:pvgrid`, `template:pv`, `placevalue:pv_disks_build` | `vis_pv_bands_millions`* | `placevalue` |
 | V005 | Place-value chart with plain unlabelled dots | Y3 R05, Y4 R04, Y5 R05, Y6 R05 | 39 | GAP | `placevalue:pv_disks_build`, `placevalue:place_value_disks` | `vis_pv_dot_disks`* | `placevalue` |
 | V006 | Place-value digit chart / place heads (to Thth, to millions) | Y2 R06 (MATCH), Y3 R06 (MATCH), Y4 R05 (MATCH), Y5 R06 (M/P), Y6 R06 (M/P) | 21 | PARTIAL | `template:stack`, `placevalue:place_value_10x`, `placevalue:pv_digit_drag` | `vis_pv_decimal_places`*, `vis_pv_bands_millions`* | `placevalue` |
 | V007 | Bead string (10, 20, 100; tenths, 1 %) | R R33, Y1 R29 (GAP), Y3 R07 (GAP), Y4 R29 (GAP), Y5 R07 (GAP) | 20 | PARTIAL | `pane:rekenrek` | `vis_bead_panes`* | `k2` |
@@ -68,15 +67,15 @@ the first entry.
 | V014 | Part-whole with fractions; F / D / P tree | Y3 R14, Y4 R58, Y6 R14 | 10 | GAP | - | `vis_bond_options`* | `k2` |
 | V015 | Split-and-operate part-whole (× / ÷ arrows under each part) | Y3 R15, Y4 R11, Y5 R15, Y6 R15 | 10 | GAP | - | `vis_split_op`* | `operations` |
 | V016 | Area model (2 × 2, 2 × 3; counters inside; adjust strip) | Y3 R16 (MATCH), Y5 R16, Y6 R16 (M/P) | 7 | PARTIAL | `template:area-model`, `multiplication:area_model_mult`, `division:area_model_div_2by1`, `multiplication:area_model_mult_hard` | `vis_area_model_rows`* | `operations` |
-| V017 | Number line, end-labelled: label, read arrows, place (to 10,000,000 and 0.001) | Y1 R20, Y2 R17, Y3 R17, Y4 R12, Y5 R17, Y6 R17 | 30 | PARTIAL | `number_sense:place_on_number_line`, `addition:nl_add`, `subtraction:nl_sub`, `decimals:decimal_nl_drag` | `nl_20` | `placevalue` |
-| V018 | Estimate / rounding line (ends, midpoint, bounds; decimals) | Y1 R21 (GAP), Y2 R18, Y3 R18, Y4 R13, Y4 R14 (M/P), Y5 R18, Y5 N5-30 (M/P), Y6 R18 (M/P) | 29 | PARTIAL | `pane:round-line`, `template:pv`, `number_sense:rounding_visual`, `number_sense:round_nl_thousands`, `decimals:round_decimals` | `nl_20`, `vis_round_line_decimals`* | `placevalue` |
+| V017 | Number line, end-labelled: label, read arrows, place (to 10,000,000 and 0.001) | Y1 R20 (MATCH), Y2 R17 (MATCH), Y3 R17 (MATCH), Y4 R12 (MATCH), Y5 R17 (MATCH), Y6 R17 | 30 | PARTIAL | `number_sense:number_line_scales`, `number_sense:place_on_number_line`, `decimals:decimal_nl_drag` | `vis_value_line_vertical`*, `vis_double_scale`*, `vis_frac_line_modes`* | `placevalue` |
+| V018 | Estimate / rounding line (ends, midpoint, bounds; decimals) | Y1 R21 (MATCH), Y2 R18 (MATCH), Y3 R18 (MATCH), Y4 R13, Y4 R14 (M/P), Y5 R18, Y5 N5-30 (M/P), Y6 R18 (M/P) | 29 | PARTIAL | `number_sense:number_line_scales`, `pane:round-line`, `template:pv`, `number_sense:rounding_visual`, `number_sense:round_nl_thousands`, `decimals:round_decimals` | `vis_round_line_decimals`*, `vis_frac_line_modes`* | `placevalue` |
 | V019 | Skip-count / equal-jump line | Y1 R50 (MATCH), Y2 R19 (MATCH), Y3 R19 (MATCH), Y5 R19 | 13 | PARTIAL | `template:count-row`, `patterns:count_by_fill`, `multiplication:count_by_tables`, `patterns:seq_2`, `template:hop-line`, `multiplication:nl_mult`, `division:nl_div`, `patterns:skip_count_line` | `vis_hop_line_options`* | `operations` |
-| V020 | Open number line with labelled hops (bridge, compensate, fractions) | Y1 R19 (MATCH), Y2 R20, Y3 R20, Y4 R18, Y5 R20, Y6 R20 (GAP) | 32 | PARTIAL | `template:number-line`, `addition:nl_add`, `subtraction:nl_sub`, `pane:openline`, `measurement:money_change` | `vis_open_line`*, `vis_supports_wiring`*, `vis_frac_line_modes`* | `operations` |
+| V020 | Open number line with labelled hops (bridge, compensate, fractions) | Y1 R19 (MATCH), Y2 R20, Y3 R20, Y4 R18, Y5 R20, Y6 R20 (GAP) | 32 | PARTIAL | `template:number-line`, `addition:nl_add`, `subtraction:nl_sub`, `pane:openline`, `measurement:money_change` | `vis_open_line`*, `vis_frac_line_modes`* | `operations` |
 | V021 | Bridging split under the second number | Y2 R21, Y3 R21, Y5 R21 | 7 | GAP | - | `vis_split_mark`* | `operations` |
 | V022 | Number track / sequence boxes (fractions, decimals, below zero) | R R25 (MATCH), R R40 (MATCH), Y1 R10 (MATCH), Y2 R22 (MATCH), Y3 R22 (MATCH), Y4 R08 (MATCH), Y5 R22 (M/P), Y6 R22 (M/P) | 45 | PARTIAL | `template:seqstrip`, `counting:number_seq_fill`, `counting:count_sequence`, `template:count-row`, `patterns:count_by_fill`, `multiplication:count_by_tables`, `patterns:count_by_powers_of_10` | `vis_count_row_values`* | `k2` |
 | V023 | Hundred square: shade multiples, circle, sieve | R R36 (MATCH), Y1 R47 (M/P), Y2 R23, Y3 R23, Y4 R26, Y5 R23, Y6 R23 | 24 | PARTIAL | `template:chartwindow`, `composing:hundreds_chart_fill`, `pane:hundreds`, `patterns:skip_count_grid` | `vis_chart_shade`* | `k2` |
 | V024 | 10 × 10 square: two-tone complement, hundredths, percent | Y2 R24 (GAP), Y3 R24 (GAP), Y4 R27, Y5 N5-05, Y6 R24 | 22 | PARTIAL | `conversions:percent_visual`, `fraction_operations:frac_10_100` | `vis_hundred_square`* | `fractions` |
-| V025 | Bar model part-whole (numbers, fractions, letters, degrees) | Y1 R36, Y2 R25, Y3 R25, Y4 R20, Y5 R25, Y6 R25 | 57 | PARTIAL | `pane:bar`, `algebra:tape_diagram`, `template:word-work` | `vis_bar_family`*, `vis_supports_wiring`* | `operations` |
+| V025 | Bar model part-whole (numbers, fractions, letters, degrees) | Y1 R36, Y2 R25, Y3 R25, Y4 R20, Y5 R25, Y6 R25 | 57 | PARTIAL | `pane:bar`, `algebra:tape_diagram`, `template:word-work` | `vis_bar_family`* | `operations` |
 | V026 | Comparison bars (difference; sum and difference brace) | Y2 R26 (M/P), Y3 R26 (M/P), Y4 R21 (M/P), Y5 R26 (M/P), Y6 R26 (PARTIAL / GAP) | 21 | PARTIAL | - | `vis_bar_family`*, `pairs_values` | `operations` |
 | V027 | Equal-parts bar (fraction of an amount, find the whole) | Y1 R57, Y2 R27, Y3 R27, Y4 R22, Y5 R27, Y6 R27 | 31 | GAP | `division:share_into_groups`, `division:div_equation_parts`, `division:div_facts` | `vis_bar_family`*, `frac_find_whole` | `operations` |
 | V028 | Scaling / ratio bar (1 box vs n boxes; a : b rows) | Y2 R28, Y3 R28, Y6 R28 | 8 | GAP | `multiplication:mult_comparison`, `conversions:ratio_intro`, `conversions:equiv_ratios`, `conversions:ratio_tables` | `vis_bar_family`*, `comparison_statements`, `ratio_problems` | `operations` |
@@ -136,7 +135,7 @@ the first entry.
 | V082 | Grouped-object pictures for word problems | Y1 R35 (MATCH), Y2 R82, Y3 R82, Y5 R82, Y6 R82 | 70+ | PARTIAL | `template:wordpic`, `addition:add_wp_10`, `template:word-work`, `pane:objects` | `vis_word_pictures`* | `operations` |
 | V083 | Journey / distance line (towns, km segments) | Y3 R83 | 1 | GAP | - | `vis_bar_family`* | `operations` |
 | V084 | Path / maze grid of operations | Y3 R84 | 1 | GAP | - | `vis_reasoning_frames`* | `algebra` |
-| V085 | Rekenrek, 20 beads | Y1 R30, Y2 R85 | 10 | PARTIAL | `pane:rekenrek` | `vis_supports_wiring`* | `placevalue` |
+| V085 | Rekenrek, 20 beads | Y1 R30, Y2 R85 | 10 | MATCH | `pane:rekenrek`, `addition:add_facts`, `subtraction:sub_facts`, `subtraction:subtract` | - | - |
 | V086 | Rekenrek, 100 beads (ten rows) | Y2 R86 (GAP), Y4 R28 | 17 | PARTIAL | `pane:rekenrek` | `vis_bead_panes`* | `k2` |
 | V087 | Covered / hidden part (cloth, hand, splat) | R R46, Y1 R32, Y2 R87, Y4 R86, Y5 R87, Y6 R87 | 29 | GAP | - | `vis_cover_mark`* | `k2` |
 | V088 | Number shapes / number pieces (plates with holes) | R R31, Y2 R89, Y4 R31 | 13 | GAP | - | `vis_object_kinds`* | `k2` |
@@ -153,7 +152,7 @@ the first entry.
 | V099 | Moves and routes on a grid | Y1 R66, Y2 R101 | 3 | GAP | - | `movement` | `geometry` |
 | V100 | Pictured objects to count (row, rows of five, scattered) | R R67, Y1 R01 | 2+ | MATCH | `counting:count_objects`, `template:counters` | - | - |
 | V101 | Count out / ring n from a larger set | Y1 R02 | 1 | GAP | - | `ten_count_out` | `k2` |
-| V102 | Dice, domino and dot-plate patterns | R R13, R R16 (MATCH), R R34, Y1 R04 (M/P) | 20 | PARTIAL | `pane:dice` | `subitise`, `vis_object_kinds`*, `vis_supports_wiring`* | `k2` |
+| V102 | Dice, domino and dot-plate patterns | R R13, R R16 (MATCH), R R34, Y1 R04 (M/P) | 20 | PARTIAL | `pane:dice` | `subitise`, `vis_object_kinds`* | `k2` |
 | V103 | Two / three ten frames (teens, 30) | R R35 (M/P), Y1 R07 | 14 | PARTIAL | `composing:ten_frame_build_teen`, `composing:teen_compose`, `counting:count_objects` | `vis_tenframe_options`*, `teen_structure` | `k2` |
 | V104 | Ten frame doubles, vertical / pair-wise fill | R R19, Y1 R08 | 8 | GAP | - | `vis_tenframe_options`* | `k2` |
 | V105 | Numeral ↔ word ↔ quantity matching | R R27 (GAP), Y1 R09 | 10 | PARTIAL | `counting:count_objects`, `composing:number_word_form` | `words_0_10`, `vis_k2_picture_tasks`* | `algebra` |
@@ -164,8 +163,8 @@ the first entry.
 | V110 | Order pictured groups / dominoes / numbers | Y1 R18 | 2 | PARTIAL | `template:pv` | `vis_k2_picture_tasks`* | `k2` |
 | V111 | Number track and number line side by side | Y1 R22 | 1 | MATCH | - | - | - |
 | V112 | Blank part-whole to fill many ways | Y1 R26 | 4 | PARTIAL | `template:bond` | `vis_bond_options`*, `systematic_bonds` | `k2` |
-| V113 | Two-colour counter rows (bonds; ratio sets) | R R22, Y1 R28, Y6 R28 | 13 | PARTIAL | `pane:objects`, `pane:tenframe` | `vis_supports_wiring`*, `vis_bond_options`* | `placevalue` |
-| V114 | Fingers / hands (and dice, cube rows as number pictures) | R R15, Y1 R31, Y2 R88 | 18 | PARTIAL | `pane:fingers`, `pane:dice`, `pane:objects` | `vis_supports_wiring`* | `placevalue` |
+| V113 | Two-colour counter rows (bonds; ratio sets) | R R22, Y1 R28, Y6 R28 | 13 | PARTIAL | `pane:objects`, `pane:tenframe` | `vis_bond_options`* | `k2` |
+| V114 | Fingers / hands (and dice, cube rows as number pictures) | R R15, Y1 R31, Y2 R88 | 18 | MATCH | `pane:fingers`, `pane:dice`, `pane:objects` | - | - |
 | V115 | First – Then – Now story strip | R R45 (M/P), Y1 R33 (GAP) | 13 | PARTIAL | `template:wordpic`, `addition:add_wp_10` | `vis_story_strip`* | `k2` |
 | V116 | Ring groups of ten in a scattered set | Y1 R45 | 2 | GAP | - | `tens_ones_group` | `k2` |
 | V117 | "Which pictures show n?" across representations | Y1 R48, Y5 R48 | 7 | GAP | - | `vis_k2_picture_tasks`* | `k2` |
@@ -289,15 +288,15 @@ Every entry of `design/BUILD_LIST.md` that draws a catalogued representation, wi
 | `two_way` Two-Way Tables | `data` | White Rose audit | V073 | 3 |
 | `block_diagram` Block Diagrams | `data` | White Rose audit | V097 | 1 |
 | `vis_mean_levelling` The Mean as Levelling | `data` | added from visual catalogue | V199 | 1 |
+| `vis_frac_line_modes` Fraction Line Modes (past 1, hops, blocks, two lines) | `fractions` | added from visual catalogue | V017, V018, V020, V055, V056 | 113 |
 | `vis_frac_bar_modes` Fraction Bar Modes (stack, wholes, split, cross, braces) | `fractions` | added from visual catalogue | V032, V054, V164, V166 | 78 |
 | `vis_migrate_fraction_ops` Migrate Legacy Fraction Visuals to B&W Kit Cells | `fractions` | added from visual catalogue | V054, V055, V057, V165 | 74 |
-| `vis_frac_line_modes` Fraction Line Modes (past 1, hops, blocks, two lines) | `fractions` | added from visual catalogue | V020, V055, V056 | 61 |
+| `vis_double_scale` Double and Triple Number Lines | `fractions` | added from visual catalogue | V017, V048 | 47 |
 | `decimal_pv` Tenths and Hundredths in a Place-Value Chart | `fractions` | White Rose audit | V166, V167 | 40 |
 | `thousandths_pv` Thousandths (option) | `fractions` | White Rose audit | V167 | 39 |
 | `frac_find_whole` Fraction of an Amount: Find the Whole (option) | `fractions` | White Rose audit | V027 | 31 |
 | `vis_frac_area_modes` Fraction Area Modes (two-way split, several wholes, regions) | `fractions` | added from visual catalogue | V053, V194, V209 | 28 |
 | `vis_hundred_square` Hundred Square as One Whole (and the thousand square) | `fractions` | added from visual catalogue | V024, V176 | 23 |
-| `vis_double_scale` Double and Triple Number Lines | `fractions` | added from visual catalogue | V048 | 20 |
 | `frac_nl_equiv` Equivalent Fractions on a Number Line (option) | `fractions` | White Rose audit | V056 | 12 |
 | `vis_operator_arcs` Operator Arcs (pane) | `fractions` | added from visual catalogue | V187 | 12 |
 | `percent_multi` Percentages: Multi-Step and Missing Values (option) | `fractions` | White Rose audit | V196 | 11 |
@@ -395,16 +394,14 @@ Every entry of `design/BUILD_LIST.md` that draws a catalogued representation, wi
 | `div_factors` Division Using Factors | `operations` | White Rose audit | V192 | 2 |
 | `mult_three` Multiply Three Numbers | `operations` | White Rose audit | V158 | 1 |
 | `known_facts` Reason from Known Facts | `operations` | White Rose audit | V193 | 1 |
-| `vis_supports_wiring` Wire the Built Picture Panes as Supports | `placevalue` | added from visual catalogue | V001, V003, V004, V020, V025, V085, V102, V113, V114 | 239 |
 | `vis_pv_bands_millions` Widen Place Value to 7 Digits (millions) | `placevalue` | added from visual catalogue | V003, V004, V006, V175, V186 | 86 |
 | `vis_pv_dot_disks` Plain Dots and Crossed Counters on the Chart | `placevalue` | added from visual catalogue | V005, V032 | 65 |
 | `vis_pv_decimal_places` Decimal Places in the Place-Value Chart | `placevalue` | added from visual catalogue | V006, V167 | 56 |
-| `nl_20` Numbers on a Number Line (any scale) | `placevalue` | White Rose audit | V017, V018 | 56 |
 | `vis_pv_exchange` Place-Value Chart Beside the Method (exchanges) | `placevalue` | added from visual catalogue | V031 | 38 |
+| `vis_value_line_vertical` Vertical Number Line Through Zero | `placevalue` | added from visual catalogue | V017, V096, V179 | 36 |
 | `vis_round_line_decimals` Rounding Lines for Decimals | `placevalue` | added from visual catalogue | V018 | 29 |
 | `vis_gattegno` Gattegno Chart | `placevalue` | added from visual catalogue | V155 | 16 |
 | `vis_more_less_table` "−n \| Number \| +n" Table | `placevalue` | added from visual catalogue | V035 | 8 |
-| `vis_value_line_vertical` Vertical Number Line Through Zero | `placevalue` | added from visual catalogue | V096, V179 | 7 |
 | `roman_100` Roman Numerals | `placevalue` | White Rose audit | V174 | 3 |
 | `roman_1000` Roman Numerals to 1,000 (option) | `placevalue` | White Rose audit | V174 | 3 |
 | `vis_coin_options` Coin Options: Dot Counters, Count-On Track, Chart, Price Tags | `timemoney` | added from visual catalogue | V068, V069, V124, V125 | 43 |

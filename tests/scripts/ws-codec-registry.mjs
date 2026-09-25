@@ -192,7 +192,9 @@ for (const [cat, id] of live) {
             for (const [v, t] of Object.entries(d.tokens)) if (!/^[A-Z0-9]+$/.test(String(t)) || String(t).length !== (d.tokenWidth || 1)) fail(`${where}: own token "${t}" for ${v}`);
             continue;
         }
-        const u = REG.tokenUnion(d.id);
+        // A set that spills into a second field (SPILL_KEYS) may take its token from either table.
+        const spill = REG.SPILL_KEYS && REG.SPILL_KEYS[d.id];
+        const u = { ...(spill ? REG.tokenUnion(spill) : {}), ...REG.tokenUnion(d.id) };
         for (const x of d.values || []) {
             if (typeof x.v === 'string' && !(x.v in u)) fail(`${where}: value "${x.v}" has no token`);
             if (typeof x.v === 'number' && d.type === 'set' && !(String(x.v) in u)) fail(`${where}: set member ${x.v} is not in NUMERIC_SET_VALUES.${d.id}`);
@@ -226,7 +228,7 @@ function oldKnown(cat, id, packed) {
     return dropped ? SO.packOptions(cat, id, SO.normalizeOptions(cat, id, out)) : packed;
 }
 const stripMulti = (payload) => payload.split('_').filter((f) => f && !REG.MULTI_KEY_RE.test(f)).join('_');
-let multiSkills = 0, codes = 0;
+let multiSkills = 0, codes = 0, spillCases = 0;
 for (const [cat, id] of live) {
     const defs = SO.optionsFor(cat, id);
     const multi = defs.filter((d) => REG.MULTI_KEY_RE.test(REG.OPTION_KEYS[d.id] || ''));
@@ -245,6 +247,20 @@ for (const [cat, id] of live) {
         const all = {};
         for (const d of defs) { const v = nonDefault(d); if (v !== null) all[d.id] = v; }
         cases.push(all);
+    }
+    // A set that spills into a second field (SPILL_KEYS): a spilled value alone ("~_4EC"), and
+    // beside a value of the option's own field ("~FV_4EC").
+    for (const d of defs) {
+        const sp = REG.SPILL_KEYS && REG.SPILL_KEYS[d.id];
+        if (!sp || d.type !== 'set') continue;
+        const vs = (d.values || []).map((x) => x.v);
+        const more = vs.filter((v) => REG.VALUE_TOKENS[sp] && v in REG.VALUE_TOKENS[sp] && !(REG.VALUE_TOKENS[d.id] && v in REG.VALUE_TOKENS[d.id]));
+        const mine = vs.filter((v) => !more.includes(v));
+        if (!more.length) continue;
+        spillCases++;
+        cases.push({ [d.id]: [more[0]] });
+        if (more.length > 1) cases.push({ [d.id]: more.slice(0, 3) });
+        if (mine.length) cases.push({ [d.id]: [mine[0], more[more.length - 1]].sort((a, b) => vs.indexOf(a) - vs.indexOf(b)) });
     }
     for (const opts of cases) {
         const want = SO.packOptions(cat, id, SO.normalizeOptions(cat, id, opts));
@@ -304,7 +320,7 @@ for (const [cat, id] of live) {
 /* ------------------------------------------------------------------ report */
 console.log(`registry: ${Object.keys(REG.ONE_LETTER_KEYS).length} one-letter keys, ${Object.keys(REG.MULTI_KEYS).length} digit + letter keys, `
     + `${Object.keys(REG.OPTION_KEYS).filter((id) => Object.keys(REG.tokenUnion(id)).length).length} union token tables`);
-console.log(`live: ${live.length} skills, ${defCount} option defs; ${multiSkills} skills carry a digit + letter key; ${codes} codes read by both decoders`);
+console.log(`live: ${live.length} skills, ${defCount} option defs; ${multiSkills} skills carry a digit + letter key; ${spillCases} sets spill into a second field; ${codes} codes read by both decoders`);
 for (const n of notes) console.log(n);
 if (fails.length) {
     for (const f of fails) console.log('  FAIL ' + f);

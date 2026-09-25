@@ -226,6 +226,77 @@ export function roundingLineSVG({ lo, hi, n, lengthMm = 140, pxPerMm = 0, labelP
         + `role="img" aria-label="Number line" style="display:block;margin:0 auto;max-width:100%;font-family:'Andika',sans-serif;">${body}</svg>`;
 }
 
+/* ------------------------------------------------------------------ the scale line (nl_20) */
+
+/**
+ * A number line of equal steps (number_sense:number_line_scales, BUILD_LIST nl_20): 10 or 20
+ * intervals from `lo` to `hi`, a tick at every step, SOME ticks labelled (`labels`: 'step' every
+ * tick but the asked ones, 'some' the ends and the middle — every fifth tick on a line of 20 —,
+ * 'ends' the ends only). The asked number is NEVER labelled (RP-1): `arrow` draws a solid arrow
+ * down to its tick (read it), `letters` put A, B, C over theirs (write them), `dot` is the key's
+ * dot (mark it). `ticks: false` draws only the two end ticks (estimate where a number goes).
+ * Labelled ticks are 5 mm at 1.5 pt, the others 3 mm at 0.75 pt (RP-50); labels at 12 pt or more,
+ * Andika 700; the line grows (to 172 mm) so that no two labels touch.
+ */
+export function scaleLineSVG({ lo, hi, step, labels = 'some', arrow = null, letters = [], dot = null, ticks = true,
+    lengthMm = 140, labelPt = 12, pxPerMm = 0, tapDot = false } = {}) {
+    const n = Math.max(1, Math.round((hi - lo) / step));
+    const LP = Math.max(12, labelPt);
+    const val = (i) => Math.round((lo + i * step) * 1e6) / 1e6;
+    const asked = new Set([arrow, ...letters.map((l) => l.v)].filter((v) => v !== null && v !== undefined).map(Number));
+    const labelled = (i) => {
+        if (i === 0 || i === n) return true;
+        if (!ticks) return labels === 'some' && i === n / 2;      // an estimate line: ends, or ends and halfway
+        if (labels === 'step') return !asked.has(val(i));
+        if (labels === 'some') return n % 10 === 0 && n > 10 ? i % 5 === 0 : i === n / 2;
+        return false;
+    };
+    const chars = Math.max(...[lo, hi].map((v) => fmt(v).length));
+    const lw = chars * 0.56 * LP * PT_MM;
+    const need = labels === 'step' ? (lw + 1.5) * n : 0;
+    const len = Math.min(172, Math.max(lengthMm, need));
+    const pad = Math.max(5, lw / 2 + 1);
+    const top = arrow !== null || letters.length ? 11 : 3;
+    const axisY = top + 3;
+    const w = len + 2 * pad;
+    // Every tick numbered and the numbers wider than a jump: every other number drops to a second
+    // row, so no two numbers touch (a staggered scale, as on a ruler).
+    const stagger = labels === 'step' && lw > 0.75 * (len / n);
+    const h = axisY + 3 + LP * PT_MM * (stagger ? 2.3 : 1.2) + 1;
+    const X = (v) => pad + (len * (v - lo)) / (hi - lo);
+    const sw = (p) => (p * PT_MM).toFixed(3);
+    let body = `<line x1="${pad.toFixed(2)}" y1="${axisY}" x2="${(pad + len).toFixed(2)}" y2="${axisY}" stroke="#000" stroke-width="${sw(1.5)}"/>`;
+    for (let i = 0; i <= n; i++) {
+        if (!ticks && !labelled(i)) continue;
+        const x = X(val(i)).toFixed(2);
+        const big = labelled(i);
+        const t = big ? 2.5 : 1.5;
+        body += `<line data-pv-tick="${val(i)}" x1="${x}" y1="${(axisY - t).toFixed(2)}" x2="${x}" y2="${(axisY + t).toFixed(2)}" stroke="#000" stroke-width="${sw(big ? 1.5 : 0.75)}"/>`;
+        if (big) {
+            const row = stagger && i % 2 === 1 ? LP * PT_MM * 1.1 : 0;
+            body += `<text data-ws-ref="1" data-pv-label="${val(i)}" x="${x}" y="${(axisY + 3 + LP * PT_MM * 0.85 + row).toFixed(2)}" text-anchor="middle" `
+                + `font-size="${(LP * PT_MM).toFixed(3)}" font-weight="700" fill="#000">${fmt(val(i))}</text>`;
+        }
+    }
+    // The arrow: a 1.5 pt stem and a solid head (well under 7 mm, INK-5) ending just over the tick.
+    const downArrow = (x, y0) => `<line x1="${x.toFixed(2)}" y1="${y0.toFixed(2)}" x2="${x.toFixed(2)}" y2="${(axisY - 4.4).toFixed(2)}" stroke="#000" stroke-width="${sw(1.5)}"/>`
+        + `<path d="M${(x - 1.4).toFixed(2)} ${(axisY - 4.6).toFixed(2)}L${(x + 1.4).toFixed(2)} ${(axisY - 4.6).toFixed(2)}L${x.toFixed(2)} ${(axisY - 2.6).toFixed(2)}Z" fill="#000"/>`;
+    if (arrow !== null && arrow !== undefined) body += `<g data-pv-arrow="1">${downArrow(X(arrow), 0.5)}</g>`;
+    for (const l of letters) {
+        const x = X(l.v);
+        body += `<text data-pv-letter="${esc(l.l)}" x="${x.toFixed(2)}" y="${(LP * PT_MM * 0.8).toFixed(2)}" text-anchor="middle" `
+            + `font-size="${(LP * PT_MM).toFixed(3)}" font-weight="700" fill="#000">${esc(l.l)}</text>`;
+        body += downArrow(x, LP * PT_MM + 0.8);
+    }
+    if (dot !== null && dot !== undefined) body += `<circle data-pv-dot="${dot}" cx="${X(dot).toFixed(2)}" cy="${axisY}" r="1.6" fill="#000"/>`;
+    // The screen's tap-to-place dot (screen-cell.js, the round-line tap machinery): hidden until tapped.
+    if (tapDot) body += `<circle class="mq-rl-dot" data-ws-feedback="dot" cx="-20" cy="${axisY}" r="2" fill="#000" visibility="hidden"/>`;
+    const geo = tapDot ? ` data-rl-w="${w.toFixed(3)}" data-rl-h="${h.toFixed(3)}" data-rl-pad="${pad.toFixed(3)}" data-rl-len="${len}" data-rl-axis="${axisY}"` : '';
+    const dims = pxPerMm > 0 ? `width="${Math.round(w * pxPerMm)}" height="${Math.round(h * pxPerMm)}"` : `width="${w.toFixed(2)}mm" height="${h.toFixed(2)}mm"`;
+    return `<svg class="pv-scale-line" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w.toFixed(2)} ${h.toFixed(2)}" ${dims}${geo} `
+        + `role="img" aria-label="Number line from ${fmt(lo)} to ${fmt(hi)}" style="display:block;margin:0 auto;max-width:100%;height:auto;font-family:'Andika',sans-serif;">${body}</svg>`;
+}
+
 /* =========================================================================== the `pv` template */
 
 // One template for the family's cells, switched on `payload.kind` (the payload is plain data,
@@ -611,6 +682,27 @@ register('pv', {
             }
             case 'table':
                 return `<div class="pv-cell">${tableHTML(p, ctx)}</div>`;
+            case 'scale': {
+                // nl_20 (number_sense:number_line_scales): read the arrow, write the lettered
+                // numbers, mark a number, or estimate where it goes on a line with only its ends.
+                const len = { S: 120, M: 140, L: 150 }[ctx.size] || 140;
+                const task = p.task || 'read';
+                const base = { lo: p.lo, hi: p.hi, step: p.step, labels: p.labels, lengthMm: len, labelPt: m.zonePt };
+                if (task === 'mark' || task === 'estimate') {
+                    const w = ctx.state === 'wrong' ? Number(String(shownVal(ctx, 'answer', '')).replace(/,/g, '')) : p.n;
+                    const line = scaleLineSVG({ ...base, ticks: task !== 'estimate', dot: showing(ctx) && Number.isFinite(w) ? w : null });
+                    const head = `<span style="font-size:${pt(m.textPt + 3)};font-weight:400;">Mark</span> ${big(esc(fmt(p.n)))}`;
+                    return `<div class="pv-cell">${center(head)}${center(`<div data-ws-slot="answer" data-ws-shape="draw">${line}</div>`)}</div>`;
+                }
+                if (task === 'fill') {
+                    const letters = (p.targets || []).map((v, i) => ({ v, l: 'ABC'[i] }));
+                    const frame = letters.map((l) => `${l.l} ____`).join('   ');
+                    const floor = Math.max(...[p.lo, p.hi].map((v) => String(Math.abs(Math.round(v))).length));
+                    return `<div class="pv-cell">${center(scaleLineSVG({ ...base, letters }))}${blanksHTML(ctx, frame, (p.targets || []).map(fmt), false, floor)}</div>`;
+                }
+                const floor = Math.max(...[p.lo, p.hi].map((v) => String(Math.abs(Math.round(v))).length));
+                return `<div class="pv-cell">${center(scaleLineSVG({ ...base, arrow: p.n }))}${frameHTML(ctx, '____', kv, Math.max(2, floor))}</div>`;
+            }
             case 'disks': {
                 const mat = diskMatSVG({ places: p.places, counts: p.counts, size: ctx.size }).svg;
                 const q = p.task === 'count' ? `${PLACE_WORD_KIT[p.place] || ''} disks: ____` : '____';
@@ -657,12 +749,13 @@ register('pv', {
         if (p.kind === 'blanks' || p.kind === 'estimate') (p.keys || []).forEach((v, i) => { slots[`b${i}`] = { value: String(v), graded: true }; });
         if (p.kind === 'order') (p.sorted || []).forEach((v, i) => { slots[`o${i}`] = { value: String(v), graded: true }; });
         if (p.kind === 'chart') (p.keys || []).forEach((v, i) => { slots[`d${i}`] = { value: String(v), graded: true }; });
+        if (p.kind === 'scale' && p.task === 'fill') (p.targets || []).forEach((v, i) => { slots[`b${i}`] = { value: fmt(v), graded: true }; });
         if (p.kind === 'expand-line' && p.also) slots.answer.accept.push(String(p.also));
         return { value, display, slots };
     },
     footprint(p, ctx) {
         const nd = String(p.n === undefined ? '' : p.n).length;
-        const wide = p.kind === 'sort' || p.kind === 'table' || p.kind === 'line-mark' || p.kind === 'chart'
+        const wide = p.kind === 'sort' || p.kind === 'table' || p.kind === 'line-mark' || p.kind === 'chart' || p.kind === 'scale'
             || (p.kind === 'word-choice' && Math.max(0, ...(p.choices || []).map(c => String(c).length)) > 30)
             || (p.kind === 'round' && (p.support === 'line' || nd >= 6)) || (p.kind === 'judge' && nd >= 6)
             || ((p.kind === 'disks' || p.kind === 'build') && (p.places || []).length >= 3)
@@ -680,7 +773,7 @@ register('pv', {
     },
     inputs() { return [{ id: 'answer', kind: 'number', shape: 'line', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },
     layout(p) {
-        const wide = p && (p.kind === 'sort' || p.kind === 'disks' || p.kind === 'build' || p.kind === 'table' || p.kind === 'line-mark'
+        const wide = p && (p.kind === 'sort' || p.kind === 'disks' || p.kind === 'build' || p.kind === 'table' || p.kind === 'line-mark' || p.kind === 'scale'
             || p.kind === 'chart' || p.support === 'line');
         return { card: wide ? 'card-wide-visual' : 'card-simple', checker: 'value' };
     },

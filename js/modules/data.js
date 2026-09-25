@@ -243,6 +243,7 @@ export const SKILL_GRADES = {
     'rounding_visual': 3, 'nearest_10': 3, 'nearest_100': 3, 'nearest_1000': 3, 'rounding_table': 3,
     'between_tens': 3, 'place_on_number_line': 2,
     'round_nl_thousands': 4, 'round_nl_ten_thousands': 4, 'round_nl_hundred_thousands': 4,
+    'number_line_scales': 'M',
     'nearest_10000': 4, 'nearest_100000': 5, 'nearest_million': 5,
     'round_sort_10': 3, 'round_sort_100': 3,
     'round_sort_1000': 4, 'round_sort_10000': 4,
@@ -1200,6 +1201,8 @@ export const SKILLS = {
         { v: "round_nl_thousands", l: "Round on a Number Line: Thousands" },
         { v: "round_nl_ten_thousands", l: "Round on a Number Line: Ten Thousands" },
         { v: "round_nl_hundred_thousands", l: "Round on a Number Line: Hundred Thousands" },
+        // Build lane placevalue (design/BUILD_LIST.md, 2026-09-25) — APPEND ONLY.
+        { v: "number_line_scales", l: "Numbers on a Number Line" },
     ],
     number_theory: [
         { v: "prime_composite", l: "Prime vs Composite" },
@@ -1850,6 +1853,7 @@ export const SKILL_PRINT_SIZE = {
     rounding_table: "medium",
     unit_form: "standard", between_tens: "compact", place_on_number_line: "wide",
     round_nl_thousands: "wide", round_nl_ten_thousands: "wide", round_nl_hundred_thousands: "wide",
+    number_line_scales: "wide",
     identify: "compact",
     value: "compact",
     add_sub_10s: "compact", add_sub_100s: "compact",

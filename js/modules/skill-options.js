@@ -91,6 +91,13 @@ export const SUPPORT_LABELS = Object.freeze({
     steps: 'Step checklist',
     'round-pv': 'Place-value chart: ring the place, underline the next digit',
     'round-mark': 'Ring and underline on the number itself',
+    // vis_supports_wiring (build lane placevalue, 2026-09-25): the S4 picture panes as supports.
+    objects: 'Pictures of objects to count', fingers: 'Fingers (hands showing each number)',
+    rekenrek: 'Rekenrek (bead rack, rows of 5 and 5)', bar: 'Bar model (the whole and its parts)',
+    base10: 'Base-ten blocks, to scale', 'base10-quick': 'Base-ten quick sketch (square, stick, dot)',
+    disks: 'Place-value counters in a chart', pvgrid: 'Place-value grid with an empty answer row',
+    gridpaper: 'Squared paper with place heads', hundreds: 'Hundreds chart (the start number ringed)',
+    openline: 'Open number line (start marked)',
 });
 // The supports that are marks, not pictures: they stack with anything (§S4.7), so ticking one
 // beside another support never needs the Mix control.
@@ -804,6 +811,38 @@ const P9_PV_OPTIONS = {
 };
 Object.assign(SKILL_OPTIONS, P9_PV_OPTIONS);
 
+// ===========================================================================
+// BUILD LANE placevalue (design/BUILD_LIST.md, 2026-09-25) — append-only block
+// ===========================================================================
+// Read by js/modules/gen-pv.js. Ids reuse the registry's keys with new value tokens where the
+// meaning fits (task: mark S, estimate 4).
+const PV_LANE_OPTIONS = {
+    // nl_20: numbers on a number line of any scale. One task a page (P-28): the instruction and
+    // the answer shape are the task's.
+    'number_sense:number_line_scales': [
+        _pvBand([20, 50, 100, 1000, 10000, 1000000, 10000000], 100, 'The end of the whole line. A part of the line is ten jumps of a hundredth of it: 40 to 50 on a line to 100.'),
+        { id: 'chart', label: 'The line', type: 'enum', default: 'whole', group: 'difficulty',
+            values: [{ v: 'whole', l: 'The whole line (0 to 100 in 10s; 0 to 20 in 1s)' },
+                { v: 'window', l: 'Part of the line (40 to 50 in 1s)' }],
+            help: 'The whole line counts in tens of its end number; a part of it counts in ones of the next place down.' },
+        { id: 'task', label: 'Task', type: 'enum', default: 'read', group: 'layout',
+            values: [{ v: 'read', l: 'Read the number at the arrow' }, { v: 'mark', l: 'Mark a number on the line' },
+                { v: 'fill', l: 'Count along: write the numbers at A, B and C' },
+                { v: 'estimate', l: 'Estimate: mark a number on a line with only its ends' }],
+            help: 'One task a page. Estimating has no ticks to count: the pupil uses halfway and the ends.' },
+        { id: 'decimals', label: 'Jumps of', type: 'enum', default: 0, group: 'difficulty',
+            values: [{ v: 0, l: 'Whole numbers (as the line sets them)' }, { v: 1, l: 'Tenths (0 to 1, or 3 to 4)' },
+                { v: 2, l: 'Hundredths (0.2 to 0.3)' }, { v: 3, l: 'Thousandths (0.25 to 0.26)' }],
+            help: 'Decimal jumps: ten jumps of a tenth, a hundredth or a thousandth. "Numbers to" still bounds the numbers.' },
+        { id: 'ticks', label: 'Numbers on the line', type: 'enum', default: 'some', group: 'support',
+            values: [{ v: 'step', l: 'Every tick (but the ones asked)' }, { v: 'some', l: 'The ends and the middle' },
+                { v: 'ends', l: 'The ends only' }],
+            help: 'Most support first: every tick numbered, then the ends and the middle, then the ends. The number asked is never printed. '
+                + 'An estimate line has no inner ticks: it shows its ends, or its ends and halfway.' },
+    ],
+};
+Object.assign(SKILL_OPTIONS, PV_LANE_OPTIONS);
+
 // The place a P9 skill rounds to, read off its id (the id IS its place, owner ruling 5).
 const _PV_ID_PLACE = { '10': 10, '100': 100, '1000': 1000, '10000': 10000, '100000': 100000, million: 1000000 };
 export function pvRoundPlace(skillId, opts) {
@@ -922,8 +961,32 @@ const _opsUnknown = (dflt = 'answer', { answer = 'The answer (8 + 7 = __)', firs
 });
 // The + / − fact cue: one HINT picture under the fact, faded to None. Structure (the fact's own
 // rule and answer zone) never changes.
-const _opsAddCue = (withTile = true, sub = false) => supportsOptions(
-    ['touch', 'touchall', ...(withTile ? ['tile'] : []), 'frame', 'line', 'boxsign'],
+// vis_supports_wiring (build lane placevalue): the picture panes a fact within 20 can carry, only
+// where the page's numbers fit them (a support that cannot draw most items leaves empty cells):
+// objects and the rekenrek take numbers to 10 on each side of +, and a start to 20 for −; the hands
+// show a start to 10 (the pupil folds down the number taken away); the bar model takes any fact.
+const _opsFactPictures = (sub, max = 20) => [
+    ...(sub || max <= 10 ? ['objects'] : []), ...(sub && max <= 10 ? ['fingers'] : []),
+    ...(sub || max <= 10 ? ['rekenrek'] : []), 'bar'];
+// The panes a column + / − can carry, by the skill's band, where every item of the band fits them
+// on a well-filled page: an open number line to 100; the place-value grid to 100,000; the start
+// arrow and the step checklist at every band. For − only (the picture is the number you start
+// from, the pupil crosses out and trades): base-ten blocks to scale to 100, the quick sketch to
+// 1,000 and place-value counters to 10,000, each in fixed place zones. (Two numbers' pictures
+// stacked beside a sum left two problems a page; the counters for + are the exchange chart,
+// vis_pv_exchange.)
+const _opsColumnSupports = (max, sub = false) => [
+    ...(max <= 100 ? ['openline'] : []), ...(sub && max <= 100 ? ['base10'] : []),
+    ...(sub && max > 100 && max <= 1000 ? ['base10-quick'] : []), ...(sub && max > 100 && max <= 10000 ? ['disks'] : []),
+    ...(max <= 100000 ? ['pvgrid'] : []), 'startarrow', 'steps'];
+// The hundreds chart beside a fact within 20: two or three rows of the chart, the start ringed.
+const _opsFactChart = (max) => (max <= 20 ? ['hundreds'] : []);
+// Base-ten blocks to scale beside a fact of the teens (14 − 6: one ten and four ones).
+const _opsFactBlocks = (max) => (max > 10 && max <= 20 ? ['base10'] : []);
+const _opsAddCue = (withTile = true, sub = false, max = null) => supportsOptions(
+    // The fact drills (withTile) deal single-digit facts, so every picture fits them.
+    ['touch', 'touchall', ...(withTile ? ['tile'] : []), 'frame', 'line', 'boxsign', ..._opsFactPictures(sub, withTile ? 10 : max || 20),
+        ...(withTile ? [] : [..._opsFactChart(max || 20), ..._opsFactBlocks(max || 20)])],
     { labels: sub ? { touch: 'Touch dots: count back (on the number taken away)' } : { touch: 'Touch dots: count on (on the smaller number)' } });
 const _opsMulCue = (div = false) => supportsOptions(
     ['touch', 'skip', 'array', ...(div ? ['think'] : []), 'boxsign'],
@@ -968,10 +1031,10 @@ const P11_OPS_OPTIONS = {
     // --- the four basic skills: regrouping and the unknown position ----------------------------
     // Basic + and − are grade 1 (1.OA.6, within 20): the band is 10 or 20, the sum / the number taken from.
     'addition:add': [notationOption('+'), _opsBand([10, 20], 20, { help: _OPS_BAND_HELP.add }), _opsRegroup('mixed'), _opsUnknown(),
-        ...supportsOptions(['touch', 'touchall', 'startarrow', 'boxsign'], { labels: { touch: 'Touch dots: count on (on the smaller number)' } })],
+        ...supportsOptions(['touch', 'touchall', 'startarrow', 'boxsign', ..._opsFactPictures(false), 'hundreds', 'base10'], { labels: { touch: 'Touch dots: count on (on the smaller number)' } })],
     'subtraction:subtract': [notationOption('-'), _opsBand([10, 20], 20, { help: _OPS_BAND_HELP.sub }), _opsRegroup('mixed', true), _opsUnknown('answer',
         { answer: 'The answer (15 − 7 = __)', first: 'The number you start from (__ − 7 = 8)', second: 'The number taken away (15 − __ = 8)' }),
-        ...supportsOptions(['touch', 'touchall', 'startarrow', 'boxsign'], { labels: { touch: 'Touch dots: count back (on the number taken away)' } })],
+        ...supportsOptions(['touch', 'touchall', 'startarrow', 'boxsign', ..._opsFactPictures(true), 'hundreds', 'base10'], { labels: { touch: 'Touch dots: count back (on the number taken away)' } })],
     'multiplication:multiply': [notationOption('x'), {
         // `ownsNumbers`: this control IS the skill's number size, so the measured Max Number is
         // not shown beside it (OPTIONS-CRITIC-R2 §5 #8 / #17: two size controls, and "Up to 100"
@@ -1077,11 +1140,13 @@ for (const op of ['add', 'sub']) {
                 opts.unshift(notationOption(op === 'add' ? '+' : '-'));
                 opts.push(bridging ? levelSubset([3, 2, 1], 1,
                     'Level 3 draws the two ten frames beside the split, level 2 the split frame alone '
-                    + '(write both parts, then the answer), level 1 the answer only.') : _opsAddCue(false, op === 'sub'));
+                    + '(write both parts, then the answer), level 1 the answer only.') : _opsAddCue(false, op === 'sub', max));
                 if (!bridging) opts.push(...opts.pop());
             } else {
                 // The column support level draws on column work only (a band of 50 or more).
                 opts.push({ ..._opsColumnLevel(), appliesTo: cur => !(Number(cur.band) <= 20) });
+                // vis_supports_wiring: the picture panes and marks a column + / − can carry.
+                opts.push(...supportsOptions(_opsColumnSupports(max, op === 'sub')));
                 if (op === 'sub' && max >= 1000 && rg !== 'no_regroup') {
                     opts.push({
                         ..._opsAcrossZeros(rg === 'regroup'),

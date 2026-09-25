@@ -603,6 +603,38 @@ them; grid paper already has its own start arrow. `round-pv` is a chart (group `
 6. **Rounding answer rows**: `round-pv` and `pvgrid` give the pupil a working row under the chart; the
    problem's own blank stays the graded answer. Say if the chart row should become the graded slot.
 
+### S4.10 Wired as supports (build lane placevalue, `vis_supports_wiring`, 2026-09-25)
+
+The picture panes are now `support` values (the S2 set), offered only where every item of the skill's
+band fits the pane on a well-filled page (a support that cannot draw most items leaves cells empty,
+and one too wide for a two-column cell leaves two problems a page):
+
+| Skills | Panes offered |
+|---|---|
+| `addition:add_facts`, + within 10 (`add_10_*`) | `objects`, `rekenrek`, `bar` |
+| `subtraction:sub_facts`, − within 20 (`sub_20_*`) | `objects`, `rekenrek`, `bar` (+ `hundreds`, `base10` on the within-20 ids) |
+| − within 10 (`sub_10_no_regroup`, `sub_10_mixed`) | `objects`, `fingers`, `rekenrek`, `bar`, `hundreds` |
+| `addition:add`, + within 20 (`add_20_*`) | `bar`, `hundreds`, `base10` |
+| `subtraction:subtract` | `objects`, `rekenrek`, `bar`, `hundreds`, `base10` |
+| column + / − to 100 (`*_50_*`, `*_100_*`) | `openline`, `pvgrid`, `startarrow`, `steps`; − also `base10` |
+| column + / − to 1,000 / 10,000 / 100,000 / 1,000,000 | `pvgrid` (to 100,000), `startarrow`, `steps`; − also `base10-quick` (to 1,000) and `disks` (to 10,000) |
+
+The providers and the family defaults (`providers/util.js FAMILY_SUPPORTS`) declare every pane the skill
+CAN draw (a superset of what is offered). The values travel in share codes through the spill key `4E`
+(`design/SHARE_CODES.md`). Two pane drawings changed so a page draws every cell alike: the `objects`
+pane is always five across wide, its two groups stacked with a 9 mm gap, each group as tall as the
+page's biggest (a group of 3 no longer stands beside its problem while a group of 7 stands under the
+next one); the `fingers` pane for − is always two hands wide; the `base10-quick` sketch has fixed
+place zones (hundreds three wide, nine sticks, ones two wide), so every sketch is one width and two
+numbers stack hundreds under hundreds.
+
+**Not offered yet, and why.** `gridpaper` (the column skills are already stacked on a grid; it doubles
+the working place), `bar`, `hundreds` and `base10` beside a column sum (two problems a page), the quick
+sketch and the counters beside a column SUM (two numbers' pictures stacked: two problems a page — the
+counters for + are the exchange chart, `vis_pv_exchange`), `fingers` on + (the pane takes addends to 5
+only), `dice` (the `tile` value already draws it), and the place-value, number-line and part-whole
+templates (`pv`, `number-line`, `bond`): `support-draw.js panePayloadOf` reads no pane payload from them.
+
 ### S4.9 Credits
 
 | Asset | Source | Licence |

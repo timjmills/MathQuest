@@ -39,7 +39,7 @@
 // unknown key to the deployed decoder; the encoder writes those fields LAST, behind a leading empty
 // field when there is no one-letter field ("~_5A12"), so the payload never starts with a digit.
 import { optionsFor, normalizeOptions, packOptions } from './skill-options.js';
-import { OPTION_KEYS, VALUE_TOKENS, MULTI_KEY_RE } from './skill-option-keys.js';
+import { OPTION_KEYS, VALUE_TOKENS, MULTI_KEY_RE, SPILL_KEYS } from './skill-option-keys.js';
 
 export const OPTION_PAYLOAD_VERSION = 1;
 
@@ -48,6 +48,15 @@ export const OPTION_PAYLOAD_VERSION = 1;
 // Re-exported so existing callers keep importing them from here.
 export { OPTION_KEYS, VALUE_TOKENS };
 const KEY_TO_OPTION = Object.fromEntries(Object.entries(OPTION_KEYS).map(([id, k]) => [k, id]));
+// A set whose values outgrew one field (skill-option-keys.js SPILL_KEYS): the spill id -> its parent.
+const SPILL_PARENT = Object.fromEntries(Object.entries(SPILL_KEYS || {}).map(([parent, spill]) => [spill, parent]));
+/** Does `v` of set option `optId` travel in the spill field (its token is in the spill table)? */
+const _spills = (optId, v) => {
+    const sp = SPILL_KEYS && SPILL_KEYS[optId];
+    if (!sp) return false;
+    const own = VALUE_TOKENS[optId];
+    return !(own && Object.prototype.hasOwnProperty.call(own, v)) && !!(VALUE_TOKENS[sp] && Object.prototype.hasOwnProperty.call(VALUE_TOKENS[sp], v));
+};
 /** True for a multi-character (digit + letter) key. */
 const _isMultiKey = (k) => typeof k === 'string' && k.length === 2 && MULTI_KEY_RE.test(k);
 
@@ -111,6 +120,17 @@ export function encodeOptionPayload(categoryId, skillId, opts) {
                     out.push(key + toks.join(''));
                     continue;
                 }
+                // A value whose token lives in the set's SPILL table goes in the spill field
+                // (written after the one-letter fields); the rest stay in the option's own field,
+                // which is left out when it would be empty.
+                const spill = SPILL_KEYS && SPILL_KEYS[def.id];
+                if (spill && list.some(x => _spills(def.id, x))) {
+                    const mine = list.filter(x => !_spills(def.id, x));
+                    const more = list.filter(x => _spills(def.id, x)).map(x => VALUE_TOKENS[spill][x]);
+                    if (mine.length) out.push(key + mine.map(x => _setToken(def.id, x)).join(''));
+                    multi.push(OPTION_KEYS[spill] + more.join(''));
+                    continue;
+                }
                 out.push(key + list.map(x => _setToken(def.id, x)).join(''));
             } else if (def.type === 'bool') {
                 out.push(key + (v ? '1' : '0'));
@@ -151,10 +171,24 @@ export function decodeOptionPayload(categoryId, skillId, payload) {
         if (!field) continue;                  // the leading empty field of "~_5A…"
         // A digit then a letter is a multi-character key (skill-option-keys.js); else one letter.
         const keyLen = MULTI_KEY_RE.test(field) ? 2 : 1;
-        const optId = KEY_TO_OPTION[field.slice(0, keyLen)];
+        const fieldId = KEY_TO_OPTION[field.slice(0, keyLen)];
+        // A spill field (SPILL_KEYS) carries more values of its parent set, read with its own table.
+        const optId = SPILL_PARENT[fieldId] || fieldId;
         const def = optId && defs.find(d => d.id === optId);
         if (!def) continue;                    // an option this skill (or this app) does not know
         const body = field.slice(keyLen);
+        // (Only a SET spills: the same id as an enum - the story skills' one-value `support` - reads
+        // its own field as before, and ignores a stray spill field.)
+        if (SPILL_PARENT[fieldId] && def.type !== 'set') continue;
+        if (def.type === 'set' && (SPILL_PARENT[fieldId] || (SPILL_KEYS && SPILL_KEYS[optId]))) {
+            const vals = [...body].map(t => _fromToken(fieldId, def, t, true)).filter(v => v !== undefined);
+            // The two fields of one set may come in either order: merge them.
+            // (in the definition's order, as one field would have held them)
+            const order = (def.values || []).map(x => x.v);
+            raw[optId] = (Array.isArray(raw[optId]) ? raw[optId] : []).concat(vals)
+                .sort((x, y) => order.indexOf(x) - order.indexOf(y));
+            continue;
+        }
         if (def.tokens) {
             const w = def.tokenWidth || 1;
             const byTok = {};

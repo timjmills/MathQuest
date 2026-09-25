@@ -285,8 +285,8 @@ one-to-one.
 | R17 | Compare circle (< > =) between numbers / pictures / collections | B1 S12–S13; B4 S11; B8 S7; B12 S6–S7; B13 S3–S4 | R34 | MATCH | `template:equation` `_circle`, `template:pv` `compare` (band 99+ → PARTIAL within 10 / 20), coins `compare` |
 | R18 | Order pictured groups / dominoes / numbers (greatest / smallest; frames to draw) | B1 S14; B4 S12 | R13 (Y3 B1 S13) | PARTIAL | numbers `template:pv` `order` (band 99+); pictured groups GAP (counters kind `order`) |
 | R19 | Number line with hops (+ forward, − back; start ringed; jump unknown) | B2 S9, S16, S17; B5 S1, S7, S10 | R20 (ticked) | MATCH | `template:number-line` (`nl_add`, `nl_sub`, `number_line_add/sub`, `unknown`, `ticks`) |
-| R20 | Number line to read / label / ring on (0–10, 0–20, 0–50, 0–100; end-labelled; arrows) | B1 S15; B4 S8–S9; B6 S6; B12 S4 | R17 | PARTIAL | `pv` `line-mark`, `place_on_number_line` (widget), value-line look; new `number_sense:read_number_line` with K bands |
-| R21 | Estimate on an unmarked line (ends only / ends + midpoint) | B4 S10; B6 S7; B12 S4, S7 | R18 | GAP | `read_number_line` `ticks: 'none' \| 'mid'`, `task: 'estimate'` |
+| R20 | Number line to read / label / ring on (0–10, 0–20, 0–50, 0–100; end-labelled; arrows) | B1 S15; B4 S8–S9; B6 S6; B12 S4 | R17 | MATCH | `number_sense:number_line_scales` (nl_20): lines to 20 / 50 / 100, a part of the line (0–10), `task` read the arrow / mark / write at A, B, C; `ticks` every / some / ends |
+| R21 | Estimate on an unmarked line (ends only / ends + midpoint) | B4 S10; B6 S7; B12 S4, S7 | R18 | MATCH | `number_sense:number_line_scales` (nl_20) `task: 'estimate'` (no inner ticks; `ticks` ends / ends and halfway) |
 | R22 | Number track and number line side by side (contrast) | B6 S6 | **NEW** | MATCH | `seqstrip` + `number-line` on a Model page |
 | R23 | Part-whole (cherry), numerals; rotated (side / bottom) | B2 S2, S11–S13; B4 S4; B5 S9; B6 S5; B12 S3 | R11 | MATCH / PARTIAL | `template:bond` (`orientation` vertical / horizontal); whole-at-bottom GAP (`orientation: 'up'`) |
 | R24 | Part-whole with objects / counters / base-10 drawn in the circles | B2 S2, S11; B4 S4; B5 S6, S10; B6 S5; B12 S3 | R12 | GAP | bond `draw: 'counters' \| 'objects' \| 'base10'` |
@@ -295,8 +295,8 @@ one-to-one.
 | R27 | Fact family: four additions / eight facts from a model | B2 S4, S13; B5 S9 | R11 (fact family) | PARTIAL | `template:fact-family` (2 + and 2 −); `facts: 'add4' \| 'eight'` GAP |
 | R28 | Two-colour counter rows; rows of empty circles to colour a bond each (systematic list) | B2 S1, S3, S5, S6; B5 S3 | **NEW** | PARTIAL | `pane:objects` solid / hollow (not wired on bonds); `task: 'bond-list'` on number_bonds GAP |
 | R29 | Bead string (10, 20, 50, 100; tones in 5s / 10s; part covered) | B2 S3, S7; B4 S2–S7; B6 S8; B9 S2; B12 S2, S4 | R07 | GAP | new `pane:beadstring` (solid / hollow runs, LS-5) |
-| R30 | Rekenrek (two rows of 10 beads) | B2 S9; B4 S12 | **NEW** | PARTIAL | `pane:rekenrek` exists; not a `support` value on any skill |
-| R31 | Fingers / hands | B2 S7; B4 S2, S6; B9 S3 | **NEW** | PARTIAL | `pane:fingers` exists; not wired |
+| R30 | Rekenrek (two rows of 10 beads) | B2 S9; B4 S12 | **NEW** | MATCH | `pane:rekenrek` as a `support` value (vis_supports_wiring): `addition:add_facts`, `subtraction:sub_facts`, `subtraction:subtract`, + / − within 10 and 20 |
+| R31 | Fingers / hands | B2 S7; B4 S2, S6; B9 S3 | **NEW** | MATCH | `pane:fingers` as a `support` value (vis_supports_wiring) on − within 10 (`subtraction:sub_10_*`: the start on the hands, the pupil folds down the number taken away) |
 | R32 | Hidden part (hand over beads, closed hand, blot over objects, bag / cup) | B2 S7, S9, S11; B13 S4 | **NEW** | GAP | counters / bead-string `hide: k` (an outline cover box with "?" over k items; the missing part is the answer) |
 | R33 | First – Then – Now three-panel story strip (pictures or ten frames; middle panel hidden) | B2 S3, S4, S9, S14, S15; B5 S1, S7, S10 | **NEW** | GAP | new `template:story-strip` (three outline panels, captions First / Then / Now, a sentence under) |
 | R34 | Take away: crossed-out pictures / counters / cubes | B2 S14–S15; B5 S6–S7 | R32 | MATCH / PARTIAL | counters `takeaway` (≤ 10), `pane:tenframe` / `pane:objects` crosses; crossed-out base-10 GAP |

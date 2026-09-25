@@ -1358,7 +1358,7 @@ const PV_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 100
 const PV_PLACE_WORDS = /\b(?:ones|tens|hundreds|thousands|millions)\b/i;
 // The §17 answer-in-item list, and every id the P9 generator describes (so it must describe).
 const PV_AII = /^(?:identify|value|more_less_10|more_less_100|rounding_visual|nearest_(?:10|100|1000|10000|100000|million))$/;
-const PV_DESCRIBED = /^(?:identify|value|expand|combine|more_less_10|more_less_100|place_value_disks|pv_disks_build|place_value_10x|rounding_visual|nearest_\w+|round_sort_\w+|unit_form|compare|order_least_to_greatest|order_greatest_to_least|pv_digit_drag|rounding_table|between_tens|place_on_number_line|round_nl_\w+|estimate_sum|estimate_diff|estimate_sums_diffs|estimate_products|estimate_quotient)$/;
+const PV_DESCRIBED = /^(?:identify|value|expand|combine|more_less_10|more_less_100|place_value_disks|pv_disks_build|place_value_10x|rounding_visual|nearest_\w+|round_sort_\w+|unit_form|compare|order_least_to_greatest|order_greatest_to_least|pv_digit_drag|rounding_table|between_tens|place_on_number_line|round_nl_\w+|estimate_sum|estimate_diff|estimate_sums_diffs|estimate_products|estimate_quotient|number_line_scales)$/;
 const PV_OP_NAME = { '+': /\bsums?\b|\badd/, '−': /\bdiff(?:erences?)?\b|\bsubtract/, '×': /\bproducts?\b|\bmultipl/, '÷': /\bquotients?\b|\bdivi/ };
 const PV_OP_GLYPH = { '+': /\+/, '−': /[−–]|\s-\s/, '×': /×/, '÷': /÷/ };
 
@@ -1519,6 +1519,20 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
                     const [lo, hi] = pv.line || [];
                     const tick = (hi - lo) / 10;
                     if (Number(ans) !== pv.n || !(pv.n > lo && pv.n < hi) || Math.abs((pv.n - lo) / tick - Math.round((pv.n - lo) / tick)) > 1e-9) add('pv-recompute', `mark ${pv.n} on ${lo}-${hi}: not on a tick inside the line`);
+                    break;
+                }
+                case 'scale': {
+                    // number_line_scales (BUILD_LIST nl_20): every asked number on an inner tick of
+                    // its line, the key the number itself (or A, B, C in order), nothing past the band.
+                    // (a read item may point halfway along a jump: "arrows between ticks")
+                    const unit = pv.half ? pv.step / 2 : pv.step;
+                    const onTick = (v) => v > pv.lo && v < pv.hi && Math.abs((v - pv.lo) / unit - Math.round((v - pv.lo) / unit)) < 1e-6;
+                    const asked = pv.task === 'fill' ? (pv.targets || []) : [pv.n];
+                    if (!asked.length || !asked.every(onTick)) add('pv-recompute', `${asked.join(', ')} is not on an inner tick of ${pv.lo}-${pv.hi} in ${pv.step}s`);
+                    if (pv.task === 'fill') {
+                        if (!(it.keyParts || []).length || it.keyParts.map(Number).join() !== asked.join()) add('pv-recompute', `A, B, C are ${asked.join(', ')}, keyed ${(it.keyParts || []).join(', ')}`);
+                    } else if (Number(String(ans).replace(/,/g, '')) !== pv.n) add('pv-recompute', `the line asks ${pv.n}, keyed ${ans}`);
+                    if (pv.hi > R * 1.0001 && R >= 20) add('pv-band', `a line to ${pv.hi} past ${R}`);
                     break;
                 }
                 case 'table': {

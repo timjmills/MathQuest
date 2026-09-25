@@ -24,12 +24,12 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 601 live skills; 492 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 602 live skills; 493 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
 - **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 275 entries — 132 new skills, 88 options on existing skills, 2 repairs; 162 from the White Rose audit (42 of them extended to close standards clauses), 60 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+- The one build list: 273 entries — 131 new skills, 88 options on existing skills, 2 repairs; 161 from the White Rose audit (42 of them extended to close standards clauses), 60 from this audit, 52 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
@@ -323,23 +323,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 21 | **Partition the Whole** (`frac_whole_partition`) | new `fractions:partition_the_whole` | - | 1 |
 | 22 | **Subtract from a Mixed Number: Break the Whole (option)** (`sub_break_whole`) | option on `fraction_operations:sub_mixed_like` | - | 1 |
 
-### Place value (12)
-
-| # | Entry | Kind | Closes standards | Closes WRM steps |
-|---|---|---|---|---|
-| 1 | **Numbers on a Number Line (any scale)** (`nl_20`) | new `number_sense:number_line_scales` | - | 17 |
-| 2 | **Compare Numbers to 10 and 20 (option)** (`compare_small`) | option on `placevalue:compare` | K.CC.C.7, M.EE.4.NBT.2, M.EE.5.NBT.1 | 6 |
-| 3 | **Powers of Ten With Exponents (option)** (`pv10_exponents`) | option on `placevalue:place_value_10x` | 5.NBT.A.2, M.EE.5.NBT.2 | - |
-| 4 | **Ten Times the Place to the Right (option)** (`value_ten_times`) | option on `placevalue:value` | 4.NBT.A.1, 5.NBT.A.1 | - |
-| 5 | **Numbers to 10,000,000 (option)** (`big_numbers`) | option on `placevalue:pv_digit_drag` | - | 3 |
-| 6 | **Multiply and Divide Decimals: Missing Values (option)** (`dec_missing`) | option on `placevalue:place_value_10x` | 5.NBT.A.2 | 1 |
-| 7 | **Partition Numbers Flexibly** (`flex_partition`) | new `placevalue:flexible_partition` | - | 3 |
-| 8 | **How Many Hundreds? (option)** (`hundreds_foundation`) | option on `composing:tens_foundation_visual` | 2.NBT.A.1b | - |
-| 9 | **A Hundred Is Ten Tens (option)** (`regroup_hundreds`) | option on `composing:base10_regroup` | 2.NBT.A.1a | - |
-| 10 | **10,000 and 100,000 More or Less (option)** (`pv_more_less_big`) | option on `placevalue:more_less_100` | - | 1 |
-| 11 | **Roman Numerals** (`roman_100`) | new `placevalue:roman_numerals` | - | 1 |
-| 12 | **Roman Numerals to 1,000 (option)** (`roman_1000`) | option on `placevalue:roman_numerals` | - | 1 |
-
 ### Data and statistics (12)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
@@ -392,6 +375,22 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 11 | **Decimal Sequences** (`dec_sequence`) | new `patterns:decimal_sequences` | - | 1 |
 | 12 | **Percentages: Multi-Step and Missing Values (option)** (`percent_multi`) | option on `conversions:percent_of_number` | - | 1 |
 | 13 | **Ratio and Fractions (option)** (`ratio_fraction`) | option on `conversions:ratio_intro` | - | 1 |
+
+### Place value (11)
+
+| # | Entry | Kind | Closes standards | Closes WRM steps |
+|---|---|---|---|---|
+| 1 | **Compare Numbers to 10 and 20 (option)** (`compare_small`) | option on `placevalue:compare` | K.CC.C.7, M.EE.4.NBT.2, M.EE.5.NBT.1 | 6 |
+| 2 | **Powers of Ten With Exponents (option)** (`pv10_exponents`) | option on `placevalue:place_value_10x` | 5.NBT.A.2, M.EE.5.NBT.2 | - |
+| 3 | **Ten Times the Place to the Right (option)** (`value_ten_times`) | option on `placevalue:value` | 4.NBT.A.1, 5.NBT.A.1 | - |
+| 4 | **Numbers to 10,000,000 (option)** (`big_numbers`) | option on `placevalue:pv_digit_drag` | - | 3 |
+| 5 | **Multiply and Divide Decimals: Missing Values (option)** (`dec_missing`) | option on `placevalue:place_value_10x` | 5.NBT.A.2 | 1 |
+| 6 | **Partition Numbers Flexibly** (`flex_partition`) | new `placevalue:flexible_partition` | - | 3 |
+| 7 | **How Many Hundreds? (option)** (`hundreds_foundation`) | option on `composing:tens_foundation_visual` | 2.NBT.A.1b | - |
+| 8 | **A Hundred Is Ten Tens (option)** (`regroup_hundreds`) | option on `composing:base10_regroup` | 2.NBT.A.1a | - |
+| 9 | **10,000 and 100,000 More or Less (option)** (`pv_more_less_big`) | option on `placevalue:more_less_100` | - | 1 |
+| 10 | **Roman Numerals** (`roman_100`) | new `placevalue:roman_numerals` | - | 1 |
+| 11 | **Roman Numerals to 1,000 (option)** (`roman_1000`) | option on `placevalue:roman_numerals` | - | 1 |
 
 ### Integers (2)
 
@@ -1033,9 +1032,11 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught by: Count by 10s (`patterns:seq_10`); Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`); Hundreds Chart - Find the Missing Number (Visual) (`composing:hundreds_chart_fill`) — by tens: seq_10; by ones to 100: number_seq_fill (step 1, to 100) and the hundreds chart  
 - **K.CC.A.2** — FULL. Count forward beginning from a given number within the known sequence (instead of having to begin at 1).  
   Taught by: Next/Before/After Number (Visual) (`counting:count_sequence`); Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`)  
+  Also tagged: `number_sense:number_line_scales`
 - **K.CC.A.3** — PARTIAL. Write numbers from 0 to 20. Represent a number of objects with a written numeral 0-20 (with 0 representing a count of no objects).  
   In part: Count Objects (1-20) (Visual) (`counting:count_objects`)  
   Missing: writing the numerals 0-20 (formation: trace, copy, write); zero as the numeral for a count of no objects (count_objects starts at 1) → `write_numerals`, `zero`  
+  Also tagged: `number_sense:number_line_scales`
 *B. Count to tell the number of objects.*
 
 - **K.CC.B.4** — PARTIAL (from its parts). Understand the relationship between numbers and quantities; connect counting to cardinality.  
@@ -1161,6 +1162,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **1.NBT.A.1** — PARTIAL. Count to 120, starting at any number less than 120. In this range, read and write numerals and represent a number of objects with a written numeral.  
   In part: Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`); Hundreds Chart - Find the Missing Number (Visual) (`composing:hundreds_chart_fill`)  
   Missing: counting across 100 to 120 on a chart; writing the numeral for a counted set above 20 → `chart_120`, `tens_ones_group`  
+  Also tagged: `number_sense:number_line_scales`
 *B. Understand place value.*
 
 - **1.NBT.B.2** — FULL. Understand that the two digits of a two-digit number represent amounts of tens and ones. Understand the following as special cases:  
@@ -1247,7 +1249,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **2.NBT.A.1** — PARTIAL. Understand that the three digits of a three-digit number represent amounts of hundreds, tens, and ones; e.g., 706 equals 7 hundreds, 0 tens, and 6 ones. Understand the following as special cases:  
   Taught by: Build 3-Digit Numbers with Flats (`composing:base10_build_hundreds`); Read Place-Value Disks (`placevalue:place_value_disks`); Unit Form (4 hundreds 7 tens 6 ones) (`placevalue:unit_form`) — own clause: three digits are hundreds, tens, ones (706 = 7 hundreds 0 tens 6 ones)  
   Not FULL because of its lettered parts.  
-  Also tagged: `composing:base10_build`, `placevalue:pv_disks_build`, `placevalue:identify`, `placevalue:value`
+  Also tagged: `composing:base10_build`, `placevalue:pv_disks_build`, `placevalue:identify`, `placevalue:value`, `number_sense:number_line_scales`
 -   **2.NBT.A.1a** — GAP. 100 can be thought of as a bundle of ten tens — called a “hundred.”  
   Missing: 100 as a bundle of ten tens (composing:base10_regroup trades a ten for ten ones only: its tag was removed) → `regroup_hundreds`  
 -   **2.NBT.A.1b** — GAP. The numbers 100, 200, 300, 400, 500, 600, 700, 800, 900 refer to one, two, three, four, five, six, seven, eight, or nine hundreds (and 0 tens and 0 ones).  
@@ -1295,7 +1297,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Missing: addition and subtraction word problems about lengths in the same units, with ruler drawings → `length_ops`, `add_sub_lengths`  
 - **2.MD.B.6** — FULL. Represent whole numbers as lengths from 0 on a number line diagram with equally spaced points corresponding to the numbers 0, 1, 2, ..., and represent whole-number sums and differences within 100 on a number line diagram.  
   Taught by: Addition Number Line (Visual) (`addition:nl_add`); Subtraction Number Line (Visual) (`subtraction:nl_sub`); Mark a Number on a Number Line (`number_sense:place_on_number_line`)  
-  Also tagged: `addition:number_line_add`, `subtraction:number_line_sub`
+  Also tagged: `addition:number_line_add`, `subtraction:number_line_sub`, `number_sense:number_line_scales`
 *C. Work with time and money.*
 
 - **2.MD.C.7** — FULL. Tell and write time from analog and digital clocks to the nearest five minutes, using a.m. and p.m.  
@@ -1374,7 +1376,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **3.NBT.A.1** — FULL. Use place value understanding to round whole numbers to the nearest 10 or 100.  
   Taught by: Round to Nearest 10 (`number_sense:nearest_10`); Round to Nearest 100 (`number_sense:nearest_100`); Round on a Number Line (`number_sense:rounding_visual`)  
-  Also tagged: `number_sense:between_tens`, `number_sense:place_on_number_line`, `number_sense:round_sort_10`, `number_sense:round_sort_100`, `number_sense:estimate_sum`, `number_sense:estimate_diff`, `number_sense:estimate_sums_diffs`, `number_sense:rounding_table`
+  Also tagged: `number_sense:between_tens`, `number_sense:place_on_number_line`, `number_sense:number_line_scales`, `number_sense:round_sort_10`, `number_sense:round_sort_100`, `number_sense:estimate_sum`, `number_sense:estimate_diff`, `number_sense:estimate_sums_diffs`, `number_sense:rounding_table`
 - **3.NBT.A.2** — FULL. Fluently add and subtract within 1000 using strategies and algorithms based on place value, properties of operations, and/or the relationship between addition and subtraction.  
   Taught by: Add within 1,000 (`addition:add_1k_mixed`); Subtract within 1,000 (`subtraction:sub_1k_mixed`)  
   Also tagged: `addition:add_1k_no_regroup`, `addition:add_1k_regroup`, `addition:add_wp_1k`, `addition:add_wp_1k_plain`, `addition:add_missing_digit`, `subtraction:sub_1k_no_regroup`, `subtraction:sub_1k_regroup`, `subtraction:sub_wp_1k`, `subtraction:sub_wp_1k_plain`, `subtraction:sub_across_zeros`, `subtraction:sub_missing_digit`, `subtraction:sub_check_by_adding`, `algebra:tape_diagram`, `algebra:tape_diagram_plain`
@@ -1502,7 +1504,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Missing: a digit is worth ten times what it is worth in the place to its right (700 ÷ 70 = 10) → `value_ten_times`  
 - **4.NBT.A.2** — FULL. Read and write multi-digit whole numbers using base-ten numerals, number names, and expanded form. Compare two multi-digit numbers based on meanings of the digits in each place, using >, =, and < symbols to record the results of comparisons.  
   Taught by: Choose the Word Name (`placevalue:number_word_names`); Expanded Form (`placevalue:expand`); Compare Numbers (>, <, =) (`placevalue:compare`); Standard Form (`placevalue:combine`)  
-  Also tagged: `composing:number_chart_fill`, `placevalue:pv_digit_drag`, `placevalue:order_least_to_greatest`, `placevalue:order_greatest_to_least`
+  Also tagged: `composing:number_chart_fill`, `placevalue:pv_digit_drag`, `placevalue:order_least_to_greatest`, `placevalue:order_greatest_to_least`, `number_sense:number_line_scales`
 - **4.NBT.A.3** — FULL. Use place value understanding to round multi-digit whole numbers to any place.  
   Taught by: Round to Nearest 1,000 (`number_sense:nearest_1000`); Round to Nearest 10,000 (`number_sense:nearest_10000`); Round to Nearest 100,000 (`number_sense:nearest_100000`); Round on a Number Line: Thousands (`number_sense:round_nl_thousands`)  
   Also tagged: `number_sense:round_nl_ten_thousands`, `number_sense:round_nl_hundred_thousands`, `number_sense:nearest_million`, `number_sense:round_sort_1000`, `number_sense:round_sort_10000`, `number_sense:round_sort_100000`, `number_sense:round_sort_million`, `number_sense:estimate_products`

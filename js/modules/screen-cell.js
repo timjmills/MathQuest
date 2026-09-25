@@ -27,7 +27,7 @@
 // widget on demand).
 // No window writes; no state import.
 
-import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
+import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, renderCell, resolveCtx, getProvider, roundingLineSVG, scaleLineSVG } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
 import {
     supportsForItem, canDraw, supportNeeds, touchNumbers, touchColumns, touchNumberHTML, touchOpts, touchDigit,
@@ -784,6 +784,8 @@ function _slotChars(v, kind) {
     const glyph = (t) => t.replace(/[*xX]/g, '×').replace(/[/:]/g, '÷').replace(/-/g, '−');
     if (kind === 'sign') { const m = glyph(String(v)).match(/[+−×÷]/g); return m ? m[m.length - 1] : ''; }
     if (kind === 'rule') return glyph(String(v)).replace(/[^0-9+−×÷ ]/g, '');
+    // A decimal box (a number line counting in tenths, build lane placevalue): digits and one point.
+    if (kind === 'decimal') return String(v).replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
     return String(v).replace(/[^0-9]/g, '');
 }
 
@@ -804,7 +806,7 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         // A function table's sign circle and rule line take signs (data-mq-kind): every other box digits.
         const kind = slot.getAttribute('data-mq-kind') || '';
         if (kind) el.dataset.mqKind = kind;
-        el.setAttribute('inputmode', kind ? 'text' : 'numeric');
+        el.setAttribute('inputmode', kind === 'decimal' ? 'decimal' : kind ? 'text' : 'numeric');
         el.setAttribute('autocomplete', 'off');
         el.setAttribute('spellcheck', 'false');
         el.setAttribute('maxlength', String(Math.max(2, Number(slot.getAttribute('data-mq-w')) || 4)));
@@ -1916,7 +1918,9 @@ export function fitTwinRows(root) {
  * `data-mq-cell` boxes (wireCellSlots joins them in reading order). The instruction line is the
  * skill's own print instruction with its verb swapped (P-LG, PEDAGOGY 10.2).
  */
-const PV_TWIN_KINDS = new Set(['frame', 'value', 'compare', 'round', 'expand-line', 'place-bank', 'disks', 'estimate', 'blanks', 'chart']);
+const PV_TWIN_KINDS = new Set(['frame', 'value', 'compare', 'round', 'expand-line', 'place-bank', 'disks', 'estimate', 'blanks', 'chart',
+    // build lane placevalue: the number line of any scale (read the arrow; the lettered numbers)
+    'scale']);
 const PV_TWIN_TYPES = new Set(['number', 'text', 'symbol', 'inline-blanks', 'pv-digit-drag', '', undefined]);
 
 function _categoriesOf(skillId, given) {
@@ -1995,6 +1999,63 @@ function roundLineTwin(q, p, categoryId) {
     _wireRoundLines();
     const instr = printInstructionFor(q, categoryId) || plainText(q.text);
     return { mode: 'slots', html, instr, count: 2, kit: 'pv' };
+}
+
+/* ------------------------------------------------------------------ numbers on a number line
+ * The screen twin of number_line_scales (build lane placevalue, nl_20): the kit's scale line drawn
+ * SHORTER with BIGGER numbers (the paper line is 150 mm; scaled to a phone its 12 pt labels read
+ * at 6 px), then the paper's answer: one line slot (read the arrow) or the three lettered boxes
+ * (A, B, C). Mark and estimate items place a dot on the line widget instead (answerType
+ * number-line-extended), so they have no twin here.
+ */
+function scaleLineTwin(q, p, categoryId) {
+    const lo = Number(p.lo), hi = Number(p.hi), st = Number(p.step);
+    if (![lo, hi, st].every(Number.isFinite) || !(hi > lo)) return null;
+    const task = p.task || 'read';
+    const chars = Math.max(_fmtN(lo).length, _fmtN(hi).length);
+    // A line in tenths (or finer): its boxes take a decimal point.
+    const decimal = !Number.isInteger(st) || !Number.isInteger(lo);
+    const slot = (w, label) => (decimal ? cellSlot(w, label).replace('<span class="mq-cellbox" data-mq-cell', '<span class="mq-cellbox" data-mq-cell data-mq-kind="decimal"') : cellSlot(w, label));
+    if (task === 'mark' || task === 'estimate') {
+        // The paper line, one tap target: the tap writes the number into the hidden slot.
+        const n = Number(p.n);
+        const tol = q.nlMark && Number.isFinite(Number(q.nlMark.tol)) ? Number(q.nlMark.tol) : st / 2;
+        const svg = scaleLineSVG({ lo, hi, step: st, labels: p.labels, ticks: task !== 'estimate', lengthMm: 110, labelPt: 18, pxPerMm: 3.2, tapDot: true })
+            .replace('max-width:100%;', 'max-width:100%;width:100%;');
+        const html = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin mq-rlwrap" data-mq-kit="pv" data-mq-kind="scale">`
+            + `<div class="mq-rl-num" style="text-align:center;font-weight:700;"><span style="font-size:calc(var(--mq-digit) * 0.55);font-weight:400;">Mark</span> `
+            + `<span style="font-size:calc(var(--mq-digit));">${esc(_fmtN(n))}</span></div>`
+            + `<div class="mq-rl" role="slider" tabindex="0" aria-label="${attr(`Number line from ${_fmtN(lo)} to ${_fmtN(hi)}. Tap to place ${_fmtN(n)}.`)}" `
+            + `aria-valuemin="${lo}" aria-valuemax="${hi}" data-mq-rl-lo="${lo}" data-mq-rl-hi="${hi}" data-mq-rl-n="${n}" data-mq-rl-tol="${tol}" `
+            + `style="cursor:pointer;touch-action:manipulation;margin:2mm 0;">${svg}</div>`
+            + `<span class="mq-rl-dotslot" data-mq-rl-dot style="display:none;">${slot(Math.max(2, chars + 1), 'the dot')}</span></div>`;
+        _wireRoundLines();
+        const instr = printInstructionFor(q, categoryId) || plainText(q.text);
+        return { mode: 'slots', html, instr, count: 1, kit: 'pv' };
+    }
+    if (task !== 'read' && task !== 'fill') return null;
+    // Numbers at 18 pt on a 110 mm line; every tick numbered, too wide for a jump, staggers.
+    const fitPt = 18;
+    const letters = task === 'fill' ? (p.targets || []).map((v, i) => ({ v: Number(v), l: 'ABC'[i] })) : [];
+    const svg = scaleLineSVG({ lo, hi, step: st, labels: p.labels, arrow: task === 'read' ? Number(p.n) : null, letters,
+        lengthMm: 110, labelPt: Math.max(12, Math.min(20, fitPt)), pxPerMm: 3.2 })
+        .replace('max-width:100%;', 'max-width:100%;width:100%;');
+    const w = Math.max(2, chars + (decimal ? 1 : 0));
+    let answer, mode;
+    if (task === 'read') {
+        answer = `<div class="ws-eq" style="justify-content:center;"><span class="mq-kblank mq-kblank--line" data-mq-blank="line"></span></div>`;
+        mode = 'blank';
+    } else {
+        answer = `<div class="ws-eq" style="justify-content:center;font-weight:700;flex-wrap:wrap;column-gap:0.4em;row-gap:2mm;">`
+            + letters.map((l) => `<span style="display:inline-flex;align-items:center;gap:0.25em;white-space:nowrap;">`
+                + `<span style="font-size:calc(var(--mq-digit) * 0.7);">${l.l}</span>${slot(w, `the number at ${l.l}`)}</span>`).join('')
+            + '</div>';
+        mode = 'slots';
+    }
+    const html = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="pv" data-mq-kind="scale">`
+        + `<div style="margin:1mm 0 3mm;">${svg}</div>${answer}</div>`;
+    const instr = printInstructionFor(q, categoryId) || plainText(q.text);
+    return { mode, html, instr, count: mode === 'slots' ? letters.length : 0, kit: 'pv' };
 }
 
 let _rlWired = false;
@@ -2089,6 +2150,7 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     // quiz drew an empty cell); the card and the worksheet keep their tap-to-order widget.
     const order = p.kind === 'order' && typedOrder;
     if (p.kind === 'round' && p.tapMark && q.answerType === 'inline-blanks') return roundLineTwin(q, p, categoryId);
+    if (p.kind === 'scale') return scaleLineTwin(q, p, categoryId);
     if (!order && (!PV_TWIN_KINDS.has(p.kind) || !PV_TWIN_TYPES.has(q.answerType))) return null;
     if (p.kind === 'round' && p.mark) return null;                            // a drawn mark: the line widget's
     if (p.kind === 'disks' && p.task !== 'count' && q.answerType !== 'number') return null;
