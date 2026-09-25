@@ -6,9 +6,15 @@
 // Each section is one buildSheet request (a section carries its own page type), and the
 // pupil pages of every section print first, then every answer key.
 //
-// Page types that work today: every role buildSheet composes (WORKING below). The rest are
-// listed, disabled, as "coming soon". Anything not covered here stays reachable through the
-// classic print dialog (window.openPrintSettings).
+// Page types: every role buildSheet composes (WORKING below), chosen from picture cards grouped
+// Practice / Teach / Check / Facts / Thinking. A role that does not fit the chosen skills (the
+// fact layouts need a fact skill) says why on its card, from buildSheet's `unsupported` error.
+//
+// The classic print dialog is retired for teachers: every teacher path that opened it
+// (openSimplePrintDialog, openPrintSettings, the Library's Print) lands here instead, with its
+// skills loaded (openPrintWith / printSkills). What only the old engine can do - an auto-layout
+// worksheet with worked solutions, "fill blank spaces", grouping by maths strand, versions - and
+// the Google Forms export live under Page setup. Black and white.
 //
 // INTEGRATION POINT (skill options): as on the Send screen, a skill row's Options button calls
 // window.openSkillOptionsPanel(categoryId, skillId, anchorEl, {opts, onChange}) when installed;
@@ -20,6 +26,9 @@ import {
     optionsSummary, optionsReadOnlyHTML, readStore, writeStore, PRINTS_KEY, fmtDay,
 } from './teacher-ui.js';
 import { tvpAttrs, infoButtonHTML } from './teacher-preview.js';
+import { skillHasOfferedOptions } from './skill-options-ui.js';
+import { generateQuestionFor } from './generate-question.js';
+import { getSetOptions } from './skill-option-store.js';
 
 // The page types buildSheet composes (print-sheet.js SHEET_ROLES). Anything else is listed,
 // disabled, as "coming soon".
@@ -27,6 +36,36 @@ const WORKING = new Set([
     'opener', 'scripted-model', 'guided', 'independent', 'more-practice', 'error-analysis', 'review', 'test', 'test-b',
     'pre-skill-check', 'word-problems', 'fact-rows', 'fact-probe', 'mixed-practice', 'true-false', 'reason-it', 'stretch',
 ]);
+// The picker: every working role as a picture card, in quiet groups. [role, name, one line]
+const PAGE_GROUPS = [
+    ['Practice', [
+        ['independent', 'Independent', 'Practice alone, with a score.'],
+        ['more-practice', 'More Practice', 'Pages A, B, C… new numbers each.'],
+        ['mixed-practice', 'Mixed practice', 'Several skills on one page.'],
+        ['word-problems', 'Word problems', 'Stories with room to work.'],
+    ]],
+    ['Teach', [
+        ['opener', 'Lesson opener', 'A warm-up to start the lesson.'],
+        ['scripted-model', 'Scripted model', 'Worked examples and what to say.'],
+        ['guided', 'Guided', 'Help that fades item by item.'],
+    ]],
+    ['Check', [
+        ['pre-skill-check', 'Pre-skill check', 'Ready for this skill?'],
+        ['error-analysis', 'Check it', 'Find and fix the mistake.'],
+        ['review', 'Review', 'Earlier skills, spaced out.'],
+        ['test', 'Test A', 'A scored test.'],
+        ['test-b', 'Test B', 'The same test, new numbers.'],
+    ]],
+    ['Facts', [
+        ['fact-rows', 'Fact rows', 'Rows of facts to drill.'],
+        ['fact-probe', 'Fact probe', 'A quick timed fact check.'],
+    ]],
+    ['Thinking', [
+        ['true-false', 'True or False?', 'Decide, then circle.'],
+        ['reason-it', 'Reason It', 'Explain in words or pictures.'],
+        ['stretch', 'Stretch', 'One harder problem to think about.'],
+    ]],
+].map(([g, list]) => [g, list.filter(([v]) => WORKING.has(v))]).filter(([, list]) => list.length);
 const PAGE_TYPES = [
     ['Lesson', [['lesson-packet', 'Lesson packet'], ['opener', 'Lesson opener'], ['scripted-model', 'Scripted model'], ['guided', 'Guided'], ['independent', 'Independent'], ['more-practice', 'More Practice'], ['error-analysis', 'Error analysis (Check it)'], ['review', 'Review'], ['test', 'Test A'], ['test-b', 'Test B'], ['pre-skill-check', 'Pre-skill check']]],
     ['Practice', [['computation', 'Computation grid'], ['word-problems', 'Word problems'], ['visual-grid', 'Visual grid']]],
@@ -58,11 +97,23 @@ function initState() {
         seed: freshSeed(),
         view: 0,          // page index, or 'key'
         versions: 1,
+        // The classic mixed worksheet (legacy engine): its own extras.
+        classic: { count: 20, sets: 1, worked: false, fill: false, strand: false, open: false },
     };
 }
 function freshSeed() { return Math.floor(Math.random() * 900000) + 100000; }
 function fromQueue() {
-    return currentSet().map((s) => ({ categoryId: s.categoryId, skillId: s.skillId, opts: s.opts, weight: s.weight > 1 ? s.weight : 1 }));
+    return currentSet().map((s) => ({ categoryId: s.categoryId, skillId: s.skillId, opts: optsOf(s), weight: s.weight > 1 ? s.weight : 1 }));
+}
+/**
+ * A skill's options: its own, else the set's (skill-option-store: what the Library, Mixed
+ * settings and Quick Start panels write). The classic dialog seeded itself the same way.
+ */
+function optsOf(k) {
+    if (k.opts && typeof k.opts === 'object' && Object.keys(k.opts).length) return k.opts;
+    let set = {};
+    try { set = getSetOptions(k.categoryId, k.skillId) || {}; } catch (e) { set = {}; }
+    return Object.keys(set).length ? set : undefined;
 }
 
 /* ================================================================= public */
@@ -80,6 +131,22 @@ export function renderPrintScreen(el) {
     renderWhat();
     renderSetup();
     scheduleBuild(0);
+}
+
+/**
+ * Load skills into the Print screen (the classic print entry points call this through
+ * window.tvOpenPrintWith, then show the screen). Accepts queue items or dialog entries:
+ * {categoryId, skillId, opts?, weight?}. An empty list keeps what is there.
+ */
+export function openPrintWith(list) {
+    const skills = (Array.isArray(list) ? list : [])
+        .filter((k) => k && k.categoryId && k.skillId && findSkill(k.categoryId, k.skillId))
+        .map((k) => ({ categoryId: k.categoryId, skillId: k.skillId, opts: optsOf(k), weight: k.weight > 1 ? k.weight : 1 }));
+    if (!pr) initState();
+    if (!skills.length) return;
+    pr.sections = [newSection(skills)];
+    pr.seed = freshSeed();
+    pr.view = 0;
 }
 
 /**
@@ -125,12 +192,9 @@ function shellHTML() {
     <h1 class="tv-h1">Print worksheets</h1>
     <p class="tv-sub">Choose skills and a page type. Every page prints with its answer key.</p>
   </div>
-  <div class="tv-header-actions">
-    <button type="button" class="tv-btn tv-btn-ghost" data-act="classic">${icon('print', 18)}<span>Classic print dialog</span></button>
-  </div>
 </header>
 <div class="tv-print-grid">
-  <section class="tv-card" aria-labelledby="tvWhatH">
+  <section class="tv-card tv-print-what" aria-labelledby="tvWhatH">
     <h2 class="tv-h2" id="tvWhatH">What to print</h2>
     <div>
       <label class="tv-label" for="tvSheetTitle">Sheet title</label>
@@ -180,7 +244,10 @@ function onClick(e) {
     if (!b || !root.contains(b)) return;
     const d = b.dataset;
     switch (d.act) {
-        case 'classic': window.openPrintSettings?.(); break;
+        case 'role': { const s = sec(d.sec); if (s.role !== d.v) { s.role = d.v; renderWhat(); scheduleBuild(); } break; }
+        case 'classic-build': buildClassic(); break;
+        case 'classic-forms': exportForms(); break;
+        case 'classic-opt': pr.classic[d.v] = !pr.classic[d.v]; renderSetup(); break;
         case 'add-section': pr.sections.push(newSection()); renderWhat(); break;
         case 'letter': {
             const s = sec(d.sec);
@@ -231,6 +298,7 @@ function onChange(e) {
     if (d.role !== undefined) { sec(d.role).role = t.value; renderWhat(); scheduleBuild(); }
     else if (d.cols !== undefined) { sec(d.cols).columns = t.value === 'auto' ? 'auto' : Number(t.value); scheduleBuild(); }
     else if (d.pages !== undefined) { sec(d.pages).pages = Number(t.value); scheduleBuild(); }
+    else if (d.classic !== undefined) { pr.classic[d.classic] = Number(t.value); }
 }
 
 /* ================================================================= what to print */
@@ -243,9 +311,14 @@ function renderWhat() {
 function sectionHTML(s, i) {
     const name = `Section ${String.fromCharCode(65 + i)}`;
     const sub = `${ROLE_NAME[s.role] || ''}${s.role === 'more-practice' ? ` · ${s.letters.length} page${s.letters.length === 1 ? '' : 's'}` : s.role === 'independent' ? ` · ${s.pages} page${s.pages === 1 ? '' : 's'}` : ''}`;
-    const typeOptions = PAGE_TYPES.map(([g, list]) => `<optgroup label="${g}">${list.map(([v, l]) => WORKING.has(v)
-        ? `<option value="${v}"${s.role === v ? ' selected' : ''}>${l}</option>`
-        : `<option value="${v}" disabled title="Coming soon">${l} (coming soon)</option>`).join('')}</optgroup>`).join('');
+    const bad = s.unsupported && s.unsupported.role === s.role ? s.unsupported.why : '';
+    const typeCards = PAGE_GROUPS.map(([g, list]) => `<div class="tv-ptype-group" role="group" aria-label="${g}"><span class="tv-ptype-h">${g}</span><div class="tv-ptypes">${list.map(([v, l, text]) => {
+        const on = s.role === v;
+        const why = on && bad ? bad : '';
+        return `<button type="button" class="tv-ptype${why ? ' is-unfit' : ''}" role="radio" aria-checked="${on}" data-act="role" data-sec="${i}" data-v="${v}"${why ? ` aria-describedby="tvRoleWhy${i}"` : ''}>
+      ${pageThumb(v)}<span><span class="tv-radio-title">${l}</span><span class="tv-radio-text">${text}</span></span></button>`;
+    }).join('')}</div></div>`).join('');
+    const whyNote = bad ? `<p class="tv-ptype-why" id="tvRoleWhy${i}" role="status">${icon('info', 16)}<span>${esc(bad)}</span></p>` : '';
     const cols = ['auto', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((c) => `<option value="${c}"${String(s.columns) === String(c) ? ' selected' : ''}>${c === 'auto' ? 'Auto' : c}</option>`).join('');
     const pagesPart = s.role === 'more-practice' ? `
   <div>
@@ -253,7 +326,7 @@ function sectionHTML(s, i) {
     <div class="tv-chips tv-letters" role="group" aria-labelledby="tvLetters${i}">${LETTERS.map((L) => `<button type="button" class="tv-chip tv-chip-sm" data-act="letter" data-sec="${i}" data-letter="${L}" aria-pressed="${s.letters.includes(L)}" aria-label="Practice ${L}">${L}</button>`).join('')}</div>
     <p class="tv-cap" style="margin-top:6px;">One page per letter, each with its own numbers.</p>
   </div>` : s.role !== 'independent' ? '' : `
-  <div style="max-width:160px;">
+  <div>
     <label class="tv-label" for="tvPages${i}">Pages</label>
     <select id="tvPages${i}" class="tv-select" data-pages="${i}">${[1, 2, 3, 4, 5].map((n) => `<option value="${n}"${s.pages === n ? ' selected' : ''}>${n}</option>`).join('')}</select>
   </div>`;
@@ -268,7 +341,7 @@ function sectionHTML(s, i) {
     <button type="button" class="tv-icon-btn" data-act="remove-skill" data-sec="${i}" data-idx="${idx}" aria-label="Remove ${esc(label)} from ${name}">${icon('x', 18)}</button>
   </div>
   <div class="tv-set-tools">
-    <button type="button" class="tv-opt-btn" data-act="skill-options" data-sec="${i}" data-idx="${idx}" aria-expanded="${open}" aria-label="Options for ${esc(label)}">${icon('sliders', 16)}<span>Options</span></button>
+    ${skillHasOfferedOptions(k.categoryId, k.skillId) ? `<button type="button" class="tv-opt-btn" data-act="skill-options" data-sec="${i}" data-idx="${idx}" aria-expanded="${open}" aria-label="Options for ${esc(label)}">${icon('sliders', 16)}<span>Options</span></button>` : ''}
     <span class="tv-cap">${hit ? esc(levelText(hit.level)) + ' · ' + esc(hit.categoryName) : ''}</span>
   </div>
   ${open ? `<div class="tv-opt-panel">${optionsReadOnlyHTML(k.categoryId, k.skillId, k.opts)}</div>` : ''}
@@ -288,11 +361,13 @@ function sectionHTML(s, i) {
     <div><h3 class="tv-h3" id="tvSecH${i}">${name}</h3><div class="tv-cap">${esc(sub)}</div></div>
     <div class="tv-menu-wrap"><button type="button" class="tv-icon-btn" data-act="menu" data-menu="more" data-sec="${i}" aria-label="More actions for ${name}" aria-expanded="${s.menu === 'more'}">${icon('dots', 18)}</button>${moreMenu}</div>
   </div>
-  <div class="tv-fields-type">
-    <div><label class="tv-label" for="tvRole${i}">Page type</label><select id="tvRole${i}" class="tv-select" data-role="${i}">${typeOptions}</select></div>
-    <div><label class="tv-label" for="tvCols${i}">Columns</label><select id="tvCols${i}" class="tv-select" data-cols="${i}">${cols}</select></div>
+  <div>
+    <span class="tv-label" id="tvRoleL${i}">Page type</span>
+    <div class="tv-ptype-groups" role="radiogroup" aria-labelledby="tvRoleL${i}">${typeCards}</div>
+    ${whyNote}
   </div>
-  ${pagesPart}
+  ${s.role === 'more-practice' ? `<div class="tv-fields-cols"><div><label class="tv-label" for="tvCols${i}">Columns</label><select id="tvCols${i}" class="tv-select" data-cols="${i}">${cols}</select></div></div>${pagesPart}`
+        : `<div class="tv-fields-cols"><div><label class="tv-label" for="tvCols${i}">Columns</label><select id="tvCols${i}" class="tv-select" data-cols="${i}">${cols}</select></div>${pagesPart}</div>`}
   <div>${skills || '<p class="tv-empty">No skills in this section yet.</p>'}</div>
   <div class="tv-row">
     <button type="button" class="tv-btn tv-btn-ghost" data-act="pick" data-sec="${i}" aria-expanded="${!!s.picking}">${icon('plus', 16)}<span>Add a skill</span></button>
@@ -300,6 +375,152 @@ function sectionHTML(s, i) {
   </div>
   ${s.picking ? `<div class="tv-search"><label class="tv-sr" for="tvPick${i}">Find a skill</label>${icon('search', 18)}<input id="tvPick${i}" class="tv-input" type="search" data-pick="${i}" placeholder="Search skills" autocomplete="off"></div><div class="tv-pick-results" id="tvPickRes${i}"><p class="tv-cap" style="padding:8px 12px;">Type to search.</p></div>` : ''}
 </div>`;
+}
+
+/**
+ * A small black-and-white schematic of a page type (decorative: the card names it). Every page
+ * is a sheet with a header line; what sits under the header tells the page types apart.
+ */
+function pageThumb(role) {
+    const W = 34, H = 44;
+    const line = (x1, y1, x2, y2, w = 1) => `<path d="M${x1} ${y1}H${x2}${y2 !== y1 ? `V${y2}` : ''}" stroke="currentColor" stroke-width="${w}" fill="none"/>`;
+    const box = (x, y, w, h, extra = '') => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="1" fill="none" stroke="currentColor" stroke-width=".9"${extra}/>`;
+    const grid = (x, y, w, h, cols, rows) => {
+        let g = box(x, y, w, h);
+        for (let c = 1; c < cols; c++) g += `<path d="M${x + (w * c) / cols} ${y}v${h}" stroke="currentColor" stroke-width=".7"/>`;
+        for (let r = 1; r < rows; r++) g += `<path d="M${x} ${y + (h * r) / rows}h${w}" stroke="currentColor" stroke-width=".7"/>`;
+        return g;
+    };
+    const tag = (t, x = 26, y = 3) => `<rect x="${x}" y="${y}" width="6" height="6" rx="1" fill="currentColor"/><text x="${x + 3}" y="${y + 5}" text-anchor="middle" font-size="5.5" font-weight="700" font-family="system-ui,sans-serif" fill="var(--tv-surface)">${t}</text>`;
+    const txt = (y, n = 3, w = 24) => Array.from({ length: n }, (_, k) => line(4, y + k * 3, 4 + (k === n - 1 ? w * 0.6 : w), y + k * 3, .8)).join('');
+    let body = '';
+    switch (role) {
+        case 'more-practice': body = `${tag('A', 4, 3)}${grid(4, 12, 26, 28, 2, 2)}`; break;
+        case 'mixed-practice': body = `${grid(4, 11, 26, 12, 3, 1)}${line(4, 26, 30, 26, .6)}${grid(4, 28, 26, 12, 2, 1)}`; break;
+        case 'word-problems': body = `${txt(12, 3)}${box(4, 21, 26, 6)}${txt(30, 3)}${box(4, 38, 26, 3)}`; break;
+        case 'opener': body = `${box(4, 11, 26, 12)}<text x="17" y="20" text-anchor="middle" font-size="7" font-weight="700" font-family="system-ui,sans-serif" fill="currentColor">?</text>${grid(4, 27, 26, 13, 2, 1)}`; break;
+        case 'scripted-model': body = [11, 27].map((y) => `${box(4, y, 12, 12)}${line(18, y + 2, 30, y + 2, .8)}${line(18, y + 5, 30, y + 5, .8)}${line(18, y + 8, 26, y + 8, .8)}`).join(''); break;
+        case 'guided': body = `${grid(4, 11, 26, 29, 2, 2)}<path d="M7 16h7M7 19h5" stroke="currentColor" stroke-width=".8" stroke-dasharray="1.2 1"/><path d="M20 16h7" stroke="currentColor" stroke-width=".8" stroke-dasharray="1.2 1.6"/>`; break;
+        case 'pre-skill-check': body = [12, 19, 26, 33].map((y) => `${box(4, y, 4, 4)}${line(11, y + 2, 29, y + 2, .8)}`).join(''); break;
+        case 'error-analysis': body = `${grid(4, 11, 26, 29, 1, 2)}<path d="M20 15l5 5M25 15l-5 5" stroke="currentColor" stroke-width="1.1"/>${line(8, 17, 16, 17, .8)}`; break;
+        case 'review': body = `${grid(4, 11, 12, 13, 1, 1)}${grid(18, 11, 12, 13, 1, 1)}${grid(4, 27, 26, 13, 3, 1)}`; break;
+        case 'test': body = `${tag('A')}${grid(4, 12, 26, 28, 2, 3)}`; break;
+        case 'test-b': body = `${tag('B')}${grid(4, 12, 26, 28, 2, 3)}`; break;
+        case 'fact-rows': body = Array.from({ length: 8 }, (_, k) => line(4, 12 + k * 3.8, 30, 12 + k * 3.8, .7)).join(''); break;
+        case 'fact-probe': body = grid(4, 11, 26, 29, 5, 6); break;
+        case 'true-false': body = [12, 22, 32].map((y) => `${line(4, y + 2, 20, y + 2, .8)}${box(22, y, 3.5, 4)}${box(26.5, y, 3.5, 4)}`).join(''); break;
+        case 'reason-it': body = `${box(4, 11, 26, 9)}${line(4, 25, 30, 25, .7)}${line(4, 30, 30, 30, .7)}${line(4, 35, 30, 35, .7)}${line(4, 40, 22, 40, .7)}`; break;
+        case 'stretch': body = `${box(4, 11, 26, 29)}<path d="M9 34l5-6 4 3 6-9" stroke="currentColor" stroke-width="1" fill="none"/>`; break;
+        default: body = grid(4, 11, 26, 29, 2, 3);
+    }
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true" class="tv-ptype-thumb">
+  <rect x=".5" y=".5" width="${W - 1}" height="${H - 1}" rx="2" fill="var(--tv-surface)" stroke="currentColor"/>
+  ${line(4, 5, 16, 5, 1.1)}${line(4, 8, 22, 8, .7)}${body}
+</svg>`;
+}
+
+/* ================================================================= classic mixed worksheet
+   The older automatic layout, for what the sheet kit does not do yet: several skills mixed on one
+   sheet with worked solutions, filling empty space, grouping by maths strand, and versions. It
+   runs the legacy engine (generateWorksheetFromSections) directly, in black and white, and opens
+   its preview with a teacher toolbar. */
+
+function classicSections() {
+    return pr.sections.filter((s) => s.skills.length).map((s, i) => ({
+        label: `Section ${String.fromCharCode(65 + i)}`,
+        columns: s.columns === 'auto' ? 0 : Number(s.columns) || 0,
+        problemCount: pr.classic.count,
+        countMode: 'problems',
+        pageCount: 1,
+        groupByType: true,
+        skills: s.skills.map((k) => {
+            const hit = findSkill(k.categoryId, k.skillId);
+            return {
+                categoryId: k.categoryId, skillId: k.skillId,
+                skillLabel: hit ? hit.label : k.skillId, categoryName: hit ? hit.categoryName : k.categoryId, categoryIcon: '',
+                opts: k.opts && typeof k.opts === 'object' ? k.opts : {}, weight: k.weight > 1 ? k.weight : 1,
+            };
+        }),
+    }));
+}
+
+async function buildClassic() {
+    const sections = classicSections();
+    if (!sections.length) { toast('Add a skill first'); return; }
+    if (typeof window.generateWorksheetFromSections !== 'function') { toast('The auto-layout worksheet is not available'); return; }
+    const c = pr.classic;
+    // The legacy engine reads these switches from window (and the old dialog's boxes, if built).
+    const before = { fill: window.printFillBlanks, strand: window.printGroupByStrand };
+    const boxes = { fill: document.getElementById('printFillBlanks'), strand: document.getElementById('printGroupByStrand') };
+    const boxWas = { fill: boxes.fill ? boxes.fill.checked : null, strand: boxes.strand ? boxes.strand.checked : null };
+    window.printFillBlanks = !!c.fill;
+    window.printGroupByStrand = !!c.strand;
+    if (boxes.fill) boxes.fill.checked = !!c.fill;
+    if (boxes.strand) boxes.strand.checked = !!c.strand;
+    try {
+        await window.generateWorksheetFromSections(sections, c.sets || 1, pr.title.trim(), 'greyscale', pr.key, !!c.worked, true);
+        teacherPreviewBar();
+    } catch (e) {
+        console.warn('[teacher-print] mixed worksheet failed', e);
+        toast('Could not build the auto-layout worksheet');
+    } finally {
+        window.printFillBlanks = before.fill;
+        window.printGroupByStrand = before.strand;
+        if (boxes.fill) boxes.fill.checked = boxWas.fill;
+        if (boxes.strand) boxes.strand.checked = boxWas.strand;
+    }
+}
+
+/** The classic preview's own toolbar is pupil-app chrome; teacher mode shows this one instead. */
+function teacherPreviewBar() {
+    const box = document.getElementById('printPreviewContainer');
+    if (!box) return;
+    let bar = box.querySelector('.tv-classic-bar');
+    if (!bar) {
+        bar = document.createElement('div');
+        bar.className = 'tv-classic-bar';
+        bar.setAttribute('role', 'toolbar');
+        bar.setAttribute('aria-label', 'Auto-layout worksheet');
+        box.insertBefore(bar, box.firstChild);
+        bar.addEventListener('click', (e) => {
+            const b = e.target.closest('button');
+            if (!b) return;
+            if (b.dataset.cb === 'back') {
+                box.style.display = 'none';
+                document.body.style.overflow = '';
+                root?.querySelector('[data-act="classic-build"]')?.focus();
+            } else if (b.dataset.cb === 'print') window.printWorksheet?.();
+            else if (b.dataset.cb === 'pdf') window.downloadPDF?.();
+        });
+    }
+    bar.innerHTML = `<div class="tv-row" style="flex-wrap:nowrap;min-width:0;">
+    <button type="button" class="tv-btn" data-cb="back">${icon('arrow', 18, ' style="transform:rotate(180deg)"')}<span>Back to Print worksheets</span></button>
+    <span class="tv-h3" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Auto-layout worksheet</span></div>
+  <div class="tv-row"><button type="button" class="tv-btn" data-cb="pdf">${icon('download', 18)}<span>Download PDF</span></button>
+    <button type="button" class="tv-btn tv-btn-primary" data-cb="print">${icon('print', 18)}<span>Print</span></button></div>`;
+    // The container stops being inert a microtask after it shows (teacher-shell syncInert).
+    setTimeout(() => { try { bar.querySelector('[data-cb="print"]').focus(); } catch (e) { /* */ } }, 0);
+}
+
+/** Google Forms: the same mixed problems, handed to the existing export dialog. */
+function exportForms() {
+    const sections = classicSections();
+    if (!sections.length) { toast('Add a skill first'); return; }
+    if (typeof window.openGoogleExportModal !== 'function') { toast('Google Forms export is not available'); return; }
+    const problems = [];
+    let n = 0;
+    for (const sec of sections) {
+        for (let i = 0; i < pr.classic.count; i++) {
+            const k = sec.skills[i % sec.skills.length];
+            try {
+                const q = generateQuestionFor({ category: k.categoryId, skill: k.skillId, opts: k.opts, seed: (pr.seed + n * 7919) >>> 0, itemIndex: n });
+                if (q && (q.text || q.visual)) problems.push({ ...q, skillLabel: q.skillLabel || k.skillLabel });
+            } catch (e) { /* skip an item that will not generate */ }
+            n++;
+        }
+    }
+    if (!problems.length) { toast('Could not make any questions'); return; }
+    window.openGoogleExportModal(problems, 'print');
 }
 
 function renderPickResults(i, q) {
@@ -352,7 +573,6 @@ function renderSetup() {
       <p class="tv-cap" style="margin-top:6px;">${pr.look === 'daily' ? 'Daily: a light header for everyday practice.' : 'I Can: the title states the goal. Auto uses each page type\'s own look (Daily on fact rows, fact probes and Mixed practice).'}</p></div>
     <div class="tv-fields-2">
       <div><span class="tv-label">Paper</span>${seg('paper', pr.paper, [['A4', 'A4'], ['Letter', 'Letter']], 'Paper')}</div>
-      <div><label class="tv-label" for="tvVersions">Versions</label><select id="tvVersions" class="tv-select"><option selected>1 version</option><option disabled title="Coming soon">5 versions (coming soon)</option><option disabled title="Coming soon">10 versions (coming soon)</option></select></div>
     </div>
     <div class="tv-divided">
       <span class="tv-label">Header</span>
@@ -367,7 +587,36 @@ function renderSetup() {
     <button type="button" class="tv-btn tv-btn-primary tv-btn-block" data-act="print"${pages ? '' : ' aria-disabled="true"'}>${icon('print', 18)}<span>${printLabel}</span></button>
     <button type="button" class="tv-btn tv-btn-block" data-act="open-tab"${pages ? '' : ' aria-disabled="true"'}>${icon('external', 18)}<span>Open in a new tab</span></button>
     <button type="button" class="tv-btn tv-btn-ghost" data-act="new-numbers" style="align-self:center;">${icon('reset', 16)}<span>New numbers</span></button>
-  </div>`;
+  </div>
+  ${classicHTML()}`;
+    const det = box.querySelector('.tv-extras');
+    if (det) det.addEventListener('toggle', () => { pr.classic.open = det.open; });
+}
+
+function classicHTML() {
+    const c = pr.classic;
+    const has = pr.sections.some((s) => s.skills.length);
+    const opt = (key, label) => `<button type="button" class="tv-check" role="checkbox" aria-checked="${!!c[key]}" data-act="classic-opt" data-v="${key}"><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span><span>${label}</span></button>`;
+    const sel = (key, label, list) => `<div><label class="tv-label" for="tvClassic_${key}">${label}</label><select id="tvClassic_${key}" class="tv-select" data-classic="${key}">${list.map(([v, t]) => `<option value="${v}"${c[key] === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>`;
+    return `<details class="tv-extras"${c.open ? ' open' : ''}>
+    <summary>${icon('chevR', 16)}<span>Auto-layout worksheet and Google Forms</span></summary>
+    <div class="tv-extras-body">
+      <p class="tv-cap">The older automatic layout: all the skills above on one sheet, in black and white, with worked solutions, versions and more.</p>
+      <div class="tv-fields-2">
+        ${sel('count', 'Problems per section', [[10, '10'], [15, '15'], [20, '20'], [30, '30'], [40, '40'], [50, '50']])}
+        ${sel('sets', 'Versions', [[1, '1 version'], [2, '2 versions'], [5, '5 versions'], [10, '10 versions']])}
+      </div>
+      <div style="display:flex;flex-direction:column;">
+        ${opt('worked', 'Worked solutions in the answer key')}
+        ${opt('fill', 'Fill empty space with more problems')}
+        ${opt('strand', 'Group problems by maths strand')}
+      </div>
+      <div class="tv-row">
+        <button type="button" class="tv-btn" data-act="classic-build"${has ? '' : ' aria-disabled="true"'}>${icon('sheet', 18)}<span>Build auto-layout worksheet</span></button>
+        <button type="button" class="tv-btn" data-act="classic-forms"${has ? '' : ' aria-disabled="true"'}>${icon('upload', 18)}<span>Export to Google Forms</span></button>
+      </div>
+    </div>
+  </details>`;
 }
 
 /* ================================================================= build + preview */
@@ -398,13 +647,15 @@ function requestFor(s, i) {
 }
 
 function currentReq() {
-    return { paper: pr.paper, parts: pr.sections.map((s, i) => (s.skills.length ? requestFor(s, i) : null)).filter(Boolean) };
+    const idx = pr.sections.map((s, i) => (s.skills.length ? i : -1)).filter((i) => i >= 0);
+    return { paper: pr.paper, parts: idx.map((i) => requestFor(pr.sections[i], i)), idx };
 }
 
 async function buildAll(req) {
     const out = { parts: [], pupilHtml: '', keyHtml: '', pages: [], keyPages: 0 };
-    for (const r of req.parts) {
-        const res = await buildSheet(r);
+    for (const [ri, r] of req.parts.entries()) {
+        let res;
+        try { res = await buildSheet(r); } catch (e) { if (e && typeof e === 'object') e.sectionIndex = req.idx ? req.idx[ri] : ri; throw e; }
         out.parts.push({ res, role: r.role, letters: r.letters });
         out.pupilHtml += res.pupilHtml;
         out.keyHtml += res.keyHtml || '';
@@ -443,6 +694,7 @@ async function runBuild() {
         const built = await buildAll(req);
         if (token !== buildToken) return;
         last = built;
+        if (pr.sections.some((x) => x.unsupported)) { pr.sections.forEach((x) => { x.unsupported = null; }); renderWhat(); }
         last.req = req;
         if (pr.view !== 'key' && pr.view >= last.pages.length) pr.view = 0;
         if (pr.view === 'key' && !pr.key) pr.view = 0;
@@ -450,14 +702,28 @@ async function runBuild() {
             const note = p.res.fits && p.res.fits.note ? p.res.fits.note.replace(/^\s*Fits:\s*/i, '') : `${p.res.pageCount} page${p.res.pageCount === 1 ? '' : 's'}`;
             return built.parts.length > 1 ? `Section ${String.fromCharCode(65 + i)}: ${note}` : note;
         }).join(' ');
-        root.querySelector('#tvFits').innerHTML = `<strong>Fits:</strong> ${esc(fits)}`;
+        // A one-page type sized by its tallest item can hold fewer cells than there are skills:
+        // say so, rather than let a chosen skill quietly miss the sheet.
+        const short = built.parts.map((p, i) => {
+            const asked = new Set((req.parts[i].sections[0].skills || []).map((k) => `${k.categoryId}:${k.skillId}`));
+            const got = new Set((p.res.items || []).map((it) => it && it.skill).filter(Boolean));
+            const n = [...asked].filter((k) => got.has(k)).length;
+            if (!p.res.items || n >= asked.size) return '';
+            return `Only ${n} of ${asked.size} skills fit on ${ROLE_NAME[p.role] || 'this page type'}${built.parts.length > 1 ? ` (Section ${String.fromCharCode(65 + (req.idx ? req.idx[i] : i))})` : ''}. Independent, More Practice and Mixed practice fit every skill.`;
+        }).filter(Boolean);
+        root.querySelector('#tvFits').innerHTML = `<strong>Fits:</strong> ${esc(fits)}${short.length ? `<span class="tv-fits-warn">${icon('info', 16)}<span>${esc(short.join(' '))}</span></span>` : ''}`;
         renderTabs(); renderSetup(); showPreview();
     } catch (e) {
         if (token !== buildToken) return;
         console.warn('[teacher-print] build failed', e);
         last = null;
-        // A page type a skill cannot take says why (the fact layouts need a fact skill).
-        msg.textContent = e && e.unsupported ? `${e.message}` : 'This page could not be built. Try another page type or use the classic print dialog.';
+        // A page type a skill cannot take says why, on its card (the fact layouts need a fact skill).
+        if (e && e.unsupported) {
+            const si = Number.isInteger(e.sectionIndex) ? e.sectionIndex : 0;
+            if (pr.sections[si]) pr.sections[si].unsupported = { role: pr.sections[si].role, why: e.message };
+            renderWhat();
+        }
+        msg.textContent = e && e.unsupported ? `${e.message}` : 'This page could not be built. Try another page type, or the auto-layout worksheet under Page setup.';
         msg.hidden = false;
         root.querySelector('#tvStage').dataset.state = 'error';
         root.querySelector('#tvFits').innerHTML = '';
@@ -520,7 +786,11 @@ function fitPreview() {
     if (!stage || !box || !frame || !stage.clientWidth) return;
     const { w, h } = pageDims();
     const avail = stage.clientWidth - 32;
-    const s = Math.min(1, avail / w);
+    // Beside the controls (desktop) the whole page stays in view: fit the height too.
+    const sticky = getComputedStyle(stage.closest('.tv-preview-card') || stage).position === 'sticky';
+    const tabs = root.querySelector('#tvPageTabs');
+    const availH = window.innerHeight - 48 - 32 - (tabs && !tabs.hidden ? tabs.offsetHeight + 12 : 0) - 40;
+    const s = Math.min(1, avail / w, sticky && availH > 240 ? availH / h : 1);
     frame.style.transform = `scale(${s})`;
     box.style.width = Math.round(w * s) + 'px';
     box.style.height = Math.round(h * s) + 'px';

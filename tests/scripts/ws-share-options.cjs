@@ -339,8 +339,23 @@ async function e2e() {
     }
     await tp.evaluate(() => { const m = document.getElementById('mixedSettingsModal'); if (m) m.style.display = 'none'; });
 
-    // ---- print the mixed set: every printed x item is x7 or x8 ----
-    await tp.evaluate(() => window.printFromQueue());
+    // ---- print the mixed set from the teacher view: the classic dialog is retired there, so
+    // Print opens the Print worksheets screen, with the set's options on its skills ----
+    await tp.evaluate(() => { window.printSections = []; window.printFromQueue(); });
+    await waitFor(tp, () => !!document.querySelector('#teacherMain [data-screen="print"].is-active'), 10000, 'Print screen');
+    await waitFor(tp, () => { try { return document.getElementById('tvPreviewFrame').contentDocument.querySelectorAll('.ws-cell').length > 0; } catch (e) { return false; } }, 30000, 'Print screen preview');
+    const screenPrinted = await tp.evaluate(() => {
+        const d = document.getElementById('tvPreviewFrame').contentDocument;
+        return (d.body.innerText.replace(/\s+/g, ' ').match(/\d+\s*×\s*\d+/g) || []);
+    });
+    const summaries = await tp.evaluate(() => [...document.querySelectorAll('#teacherMain [data-screen="print"] .tv-set-item')].map(e => e.textContent.replace(/\s+/g, ' ').trim()));
+    check(summaries.some(t => /Multiplication Facts/.test(t) && /7/.test(t) && /8/.test(t)), `Print screen: the set's x7/x8 options are not on the skill: ${JSON.stringify(summaries)}`);
+    check(screenPrinted.filter(t => !MULT_OK(t)).length === 0, `Print screen: printed x items not x7/x8: ${screenPrinted.join(' | ')}`);
+    log(`Print screen: ${screenPrinted.length} x items on the page — ${screenPrinted.join(', ')}`);
+
+    // ---- the classic dialog (still the pupil-side path) is seeded the same way: every printed
+    // x item is x7 or x8 ----
+    await tp.evaluate(() => { const go = window.tvOpenPrintWith; window.tvOpenPrintWith = undefined; try { window.printFromQueue(); } finally { window.tvOpenPrintWith = go; } });
     await waitFor(tp, () => Array.isArray(window.printSections) && window.printSections.length > 0, 10000, 'print dialog');
     const seeded = await tp.evaluate(() => window.printSections.flatMap(s => s.skills).map(s => ({ id: s.skillId, opts: s.opts || {} })));
     const multSeed = seeded.find(s => s.id === 'mult_facts');

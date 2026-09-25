@@ -20,6 +20,7 @@
 // by supplying read / write.
 import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions } from './skill-options.js';
 import { getSetOptions, setSetOptions, onSetOptionsChanged } from './skill-option-store.js';
+import { SKILLS } from './data.js';
 
 export function escHTML(s) {
     return String(s == null ? '' : s)
@@ -269,6 +270,103 @@ function _popHostRegister() {
 }
 _popHostRegister();
 
+function _isTeacherView() {
+    return typeof document !== 'undefined' && !!document.body && document.body.classList.contains('teacher-mode');
+}
+
+function _skillName(categoryId, skillId) {
+    const list = SKILLS[categoryId];
+    const hit = Array.isArray(list) ? list.find(s => s && s.v === skillId) : null;
+    return hit && hit.l ? hit.l : skillId;
+}
+
+/**
+ * The teacher view's popover: the skill's name, what is chosen now, the controls, a live
+ * sample of the skill with these choices (teacher-preview.js, through window.tvMountSample),
+ * and Reset / Done. Drawn with the teacher tokens (teacher.css .tv-sko). It stays inside the
+ * window: beside the button when there is room, above it or pinned to the bottom when not, and
+ * a bottom sheet on a phone. The body scrolls; the header and Done never leave the screen.
+ */
+function _renderTeacherPopover(el) {
+    const { categoryId, skillId } = _pop;
+    const dark = document.documentElement.classList.contains('dark');
+    const color = dark ? '#8c98f0' : '#3b4bc8';
+    const defs = offeredOptionsFor(categoryId, skillId);
+    const cur = normalizeOptions(categoryId, skillId, _pop.opts);
+    const handlers = {
+        set: (optId, expr) => `skoEdit('popover',0,'set','${optId}',${expr})`,
+        toggle: (optId, i) => `skoEdit('popover',0,'toggle','${optId}',${i})`,
+        all: (optId, all) => `skoEdit('popover',0,'all','${optId}',${all})`,
+    };
+    const rows = defs.map(def => {
+        if (typeof def.appliesTo === 'function' && !def.appliesTo(cur)) return '';
+        const help = def.help ? `<p class="tv-sko-help">${escHTML(def.help)}</p>` : '';
+        return `<div class="tv-sko-row">${optionControlHTML(def, cur, color, handlers)}${help}</div>`;
+    }).join('');
+    const chosen = Object.keys(_pop.opts || {}).length ? describeOptions(categoryId, skillId, _pop.opts) : '';
+    const summary = !defs.length ? 'No options to set' : (chosen || 'Standard settings');
+    const name = _skillName(categoryId, skillId);
+    const canSample = typeof window.tvMountSample === 'function';
+    // Keep the body's scroll position across re-renders (each change redraws the popover).
+    const oldBody = el.querySelector('.tv-sko-body');
+    const scroll = oldBody ? oldBody.scrollTop : 0;
+    const FOCUSABLE = 'input, select, button';
+    const focusAt = el.contains(document.activeElement) ? [...el.querySelectorAll(FOCUSABLE)].indexOf(document.activeElement) : -1;
+    el.className = 'tv-sko';
+    el.setAttribute('aria-labelledby', 'tvSkoTitle');
+    el.removeAttribute('aria-label');
+    el.innerHTML = `<div class="tv-sko-head">
+            <div><h2 class="tv-sko-title" id="tvSkoTitle">${escHTML(name)}</h2><p class="tv-sko-sum">${escHTML(summary)}</p></div>
+            <button type="button" class="tv-icon-btn" onclick="closeSkillOptionsPanel()" aria-label="Close options"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg></button>
+        </div>
+        <div class="tv-sko-body">
+            ${defs.length ? rows : '<p class="tv-sko-none">This skill has no options.</p>'}
+            ${canSample ? `<div class="tv-sko-sample"><span class="tv-label" id="tvSkoSampleL">Sample question</span><div class="tvp-frame tv-sko-frame" aria-labelledby="tvSkoSampleL"></div></div>` : ''}
+        </div>
+        <div class="tv-sko-foot">
+            ${defs.length ? `<button type="button" class="tv-btn" onclick="skoReset('popover',0)">Reset to default</button>` : ''}
+            <button type="button" class="tv-btn tv-btn-primary" onclick="closeSkillOptionsPanel()">Done</button>
+        </div>`;
+    const body = el.querySelector('.tv-sko-body');
+    if (body) body.scrollTop = scroll;
+    if (focusAt >= 0) {
+        const again = el.querySelectorAll(FOCUSABLE)[focusAt];
+        if (again) { try { again.focus({ preventScroll: true }); } catch (e) { /* */ } }
+    }
+    if (canSample) {
+        try { window.tvMountSample(el.querySelector('.tv-sko-frame'), categoryId, skillId, _pop.opts); } catch (e) { /* a sample never breaks the editor */ }
+    }
+    _placeTeacherPopover(el);
+}
+
+function _placeTeacherPopover(el) {
+    const vw = document.documentElement.clientWidth || window.innerWidth;
+    const vh = window.innerHeight;
+    const r = _pop.rect;
+    el.style.cssText = '';
+    if (vw < 600 || !r || (!r.width && !r.height)) {
+        el.classList.add('is-sheet');
+        el.style.maxHeight = Math.round(vh * 0.85) + 'px';
+        return;
+    }
+    // Never over the sidebar: the popover belongs to the screen that opened it.
+    const side = document.querySelector('#teacherApp .tv-side');
+    const sr = side ? side.getBoundingClientRect() : null;
+    const minLeft = (sr && sr.width && getComputedStyle(side).display !== 'none' ? sr.right : 0) + 12;
+    const w = Math.min(440, vw - minLeft - 12);
+    el.style.width = w + 'px';
+    el.style.maxHeight = (vh - 24) + 'px';
+    el.style.left = '0px';
+    el.style.top = '0px';
+    const h = Math.min(el.offsetHeight, vh - 24);
+    const left = Math.max(minLeft, Math.min(vw - w - 12, r.left));
+    let top = r.bottom + 8;
+    if (top + h > vh - 12) top = r.top - 8 - h;               // above the button
+    if (top < 12) top = Math.max(12, vh - 12 - h);            // or pinned to the bottom edge
+    el.style.left = Math.round(left) + 'px';
+    el.style.top = Math.round(top) + 'px';
+}
+
 function _renderPopover() {
     if (!_pop || typeof document === 'undefined') return;
     let el = document.getElementById('skillOptionsPopover');
@@ -280,6 +378,7 @@ function _renderPopover() {
         el.addEventListener('click', (e) => e.stopPropagation());
         document.body.appendChild(el);
     }
+    if (_isTeacherView()) { _renderTeacherPopover(el); return; }
     const color = '#6d28d9';
     const { categoryId, skillId } = _pop;
     const defs = offeredOptionsFor(categoryId, skillId);
@@ -354,6 +453,11 @@ export function openSkillOptionsPanel(categoryId, skillId, anchorEl, ctx = {}) {
     const rect = anchorEl && anchorEl.getBoundingClientRect ? anchorEl.getBoundingClientRect() : null;
     _pop = { categoryId, skillId, anchor: anchorEl || null, rect, onChange: ctx.onChange, opts: packOptions(categoryId, skillId, ctx.opts || {}) };
     _renderPopover();
+    if (_isTeacherView()) {
+        // Keyboard users land in the editor; Done / Esc hand focus back to the Options button.
+        const first = document.querySelector('#skillOptionsPopover .tv-sko-body input, #skillOptionsPopover .tv-sko-body select, #skillOptionsPopover .tv-sko-body button, #skillOptionsPopover .tv-sko-foot .tv-btn-primary');
+        if (first) { try { first.focus({ preventScroll: true }); } catch (e) { /* */ } }
+    }
     setTimeout(() => {
         document.addEventListener('mousedown', _popOutside, true);
         document.addEventListener('keydown', _popKey, true);
@@ -361,7 +465,15 @@ export function openSkillOptionsPanel(categoryId, skillId, anchorEl, ctx = {}) {
 }
 
 export function closeSkillOptionsPanel() {
+    const back = _pop && _pop.anchor;
+    const hadFocus = !!(typeof document !== 'undefined' && document.activeElement && document.activeElement.closest && document.activeElement.closest('#skillOptionsPopover'));
     _pop = null;
+    // The screen behind may have redrawn the button that opened the panel: find its twin.
+    let target = back;
+    if (back && !back.isConnected && back.getAttribute && back.getAttribute('aria-label')) {
+        target = document.querySelector(`button[aria-label="${CSS.escape(back.getAttribute('aria-label'))}"]`);
+    }
+    if (hadFocus && target && target.isConnected && typeof target.focus === 'function') { try { target.focus({ preventScroll: true }); } catch (e) { /* */ } }
     const el = typeof document !== 'undefined' && document.getElementById('skillOptionsPopover');
     if (el) el.remove();
     if (typeof document !== 'undefined') {

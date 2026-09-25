@@ -1019,12 +1019,22 @@ async function buildRoleSheet(n, metaOf) {
 
     // 3. The final items: the probe again when it already holds them (same seeds, same items),
     //    else a fresh deal for the final count (the role's wrong/right pattern depends on it).
+    //    A pool of several skills is dealt skill by skill, so the FIRST w probe items can all be
+    //    one skill's: take each skill's share of w (dealSkills) from its own probe items instead,
+    //    so every skill the page has room for is on it.
+    const coverSlice = (p, list, w) => {
+        if (!p.skills || p.skills.length < 2) return list.slice(0, w);
+        const need = new Map();
+        for (const s of dealSkills(p.skills, w)) { const k = `${s.categoryId}:${s.skillId}`; need.set(k, (need.get(k) || 0) + 1); }
+        const used = new Map();
+        const out = list.filter((it) => { const u = used.get(it.skill) || 0; if (u >= (need.get(it.skill) || 0)) return false; used.set(it.skill, u + 1); return true; });
+        return out.length === w ? out : null;
+    };
     let items = [];
     pools.forEach((p, pi) => {
         const w = Math.max(0, Math.min(MAX_ITEMS, Math.floor(Number(want[p.id]) || 0)));
-        let its;
-        if (w <= probe[p.id].length && !mod.wrongFlags) its = probe[p.id].slice(0, w);
-        else { its = dealPool(p, pi, w); measure(its); }
+        let its = w <= probe[p.id].length && !mod.wrongFlags ? coverSlice(p, probe[p.id], w) : null;
+        if (!its) { its = dealPool(p, pi, w); measure(its); }
         items = items.concat(its);
     });
     input.items = items;

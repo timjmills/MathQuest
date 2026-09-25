@@ -26,13 +26,13 @@ import { populateVoicePicker, setSelectedVoiceURI, testSelectedVoice, getSelecte
 import { isSfxEnabled } from './sfx.js';
 import {
     icon, esc, toast, copyText, fmtDay, savedSets, findSkill, levelText, levelsSummary, currentSet,
-    loadSetIntoQueue, skillCatalogue, optionsSummary, readStore, writeStore, PRINT_DEFAULTS_KEY, printDefaults,
+    loadSetIntoQueue, skillCatalogue, optionsSummary, readStore, writeStore, PRINT_DEFAULTS_KEY, printDefaults, pupilCode,
 } from './teacher-ui.js';
-import { renderSetsScreen, openSavedSet, startNewSet } from './teacher-sets.js';
-import { renderPrintScreen, recentPrintouts, reprint, printoutMeta } from './teacher-print.js';
+import { renderSetsScreen, openSavedSet, startNewSet, currentSetName } from './teacher-sets.js';
+import { renderPrintScreen, recentPrintouts, reprint, printoutMeta, openPrintWith } from './teacher-print.js';
 import { renderLibraryScreen } from './teacher-library.js';
 import { renderMapScreen } from './teacher-map.js';
-import { installPreview, tvpAttrs, infoButtonHTML, modeAttrs } from './teacher-preview.js';
+import { installPreview, tvpAttrs, infoButtonHTML, modeAttrs, mountSample } from './teacher-preview.js';
 
 const SCREENS = ['home', 'sets', 'print', 'run', 'library', 'quizzes', 'map', 'settings', 'progress'];
 // Legacy views a teacher is routed away from, to the teacher screen that replaces them
@@ -69,6 +69,7 @@ function activeViewId() {
 /** Show a teacher screen (or open a Library view). Exposed as window.tvGo. */
 export function tvGo(key) {
     if (!isTeacher()) return;
+    closeLegacyOverlays();
     if (key === 'student') { switchToStudent(); return; }
     if (!SCREENS.includes(key)) key = 'home';
     current = key;
@@ -94,10 +95,81 @@ function showScreen(key) {
     } catch (e) {
         console.error('[teacher-shell] could not render', key, e);
     }
+    syncInert();
     window.scrollTo(0, 0);
 }
 
+/* ================================================================= legacy overlays + focus
+   The pupil app's panels and modals still live in the page. In teacher mode none of them may
+   hold keyboard focus while hidden (the off-screen Advanced Settings panel used to take Tab
+   straight out of the teacher app), and moving between teacher screens closes any that are
+   open, so a modal is never left behind a screen it no longer belongs to. */
+
+const LEGACY_OVERLAYS = ['settingsPanelOverlay', 'mixedSettingsModal', 'playMixedPopup', 'studentChoiceModal',
+    'addSkillsModal', 'progressModal', 'myStatsModal', 'simplePrintModal', 'googleExportOverlay', 'printPreviewContainer',
+    'printProgressOverlay', 'tvBoardOverlay'];
+
+function shown(el) {
+    if (!el || !el.isConnected) return false;
+    const cs = getComputedStyle(el);
+    return cs.display !== 'none' && cs.visibility !== 'hidden';
+}
+
+function setInert(el, on) {
+    if (!el) return;
+    if (on) {
+        if (!el.inert) { el.inert = true; el.dataset.tvInert = '1'; }
+    } else if (el.dataset.tvInert) {
+        el.inert = false;
+        delete el.dataset.tvInert;
+    }
+}
+
+/** Keep hidden legacy UI out of the tab order, and the teacher app out of it behind an open modal. */
+function syncInert() {
+    const teacher = isTeacher() && !BOARD_WINDOW;
+    const panel = document.getElementById('settingsPanel');
+    const panelOpen = !!(panel && panel.classList.contains('active'));
+    setInert(panel, teacher && !panelOpen);
+    setInert(document.getElementById('homeView'), teacher && document.body.classList.contains('tv-on-screen'));
+    let modalOpen = panelOpen;
+    for (const id of LEGACY_OVERLAYS) {
+        const el = document.getElementById(id);
+        if (!el || id === 'settingsPanelOverlay') continue;
+        const open = shown(el);
+        if (open) modalOpen = true;
+        setInert(el, teacher && !open);
+    }
+    setInert(document.getElementById('settingsPanelOverlay'), teacher && !panelOpen);
+    setInert(document.getElementById('teacherApp'), teacher && modalOpen);
+}
+
+/** Close every legacy panel or modal that is open (tvGo calls this before it moves). */
+function closeLegacyOverlays() {
+    const w = window;
+    const byId = (id) => document.getElementById(id);
+    const tryCall = (fn) => { try { if (typeof fn === 'function') fn(); } catch (e) { /* a legacy close never blocks navigation */ } };
+    if (byId('settingsPanel')?.classList.contains('active')) tryCall(w.closeSettingsPanel);
+    if (shown(byId('simplePrintModal'))) tryCall(w.closeSimplePrintModal);
+    if (shown(byId('mixedSettingsModal'))) byId('mixedSettingsModal').style.display = 'none';
+    if (shown(byId('playMixedPopup'))) tryCall(w.closePlayMixedPopup);
+    if (shown(byId('studentChoiceModal'))) byId('studentChoiceModal').style.display = 'none';
+    if (shown(byId('addSkillsModal'))) tryCall(w.closeAddSkillsModal);
+    if (shown(byId('myStatsModal'))) tryCall(w.closeMyStats);
+    byId('progressModal')?.classList.remove('active');
+    if (shown(byId('googleExportOverlay'))) tryCall(w.closeGoogleExportModal);
+    const pv = byId('printPreviewContainer');
+    if (shown(pv)) { pv.style.display = 'none'; document.body.style.overflow = ''; }
+    tryCall(w.closeSkillOptionsPanel);
+    byId('tvBoardOverlay')?.remove();
+}
+
 function onViewChange() {
+    onViewChangeInner();
+    syncInert();
+}
+
+function onViewChangeInner() {
     if (!isTeacher()) {
         document.body.classList.remove('tv-on-screen', 'tv-play', 'tv-bigboard');
         return;
@@ -122,6 +194,7 @@ function onRoleChange() {
     } else {
         document.body.classList.remove('tv-on-screen', 'tv-play', 'tv-bigboard');
     }
+    syncInert();
 }
 
 function switchToStudent() {
@@ -135,6 +208,30 @@ function start() {
     started = true;
     if (BOARD_WINDOW) document.body.classList.add('tv-board');
     installPreview();
+    // Hooks for modules that must not import the teacher view: the skill options popover draws
+    // a live sample, and the classic print entry points open the Print screen instead.
+    window.tvMountSample = mountSample;
+    window.tvOpenPrintWith = (skills) => { openPrintWith(skills); tvGo('print'); };
+
+    // A legacy panel or modal opening or closing re-decides what may take focus.
+    let inertPending = false;
+    const inertObs = new MutationObserver(() => {
+        if (inertPending) return;
+        inertPending = true;
+        queueMicrotask(() => { inertPending = false; syncInert(); });
+    });
+    const watchOverlays = () => {
+        for (const id of ['settingsPanel', ...LEGACY_OVERLAYS]) {
+            const el = document.getElementById(id);
+            if (el && !el.dataset.tvWatched) { el.dataset.tvWatched = '1'; inertObs.observe(el, { attributes: true, attributeFilter: ['class', 'style'] }); }
+        }
+    };
+    watchOverlays();
+    // Some overlays are created on first use (the print dialog, the Google export).
+    new MutationObserver((records) => {
+        const hit = (list) => [...list].some((n) => n.nodeType === 1 && LEGACY_OVERLAYS.includes(n.id));
+        if (records.some((r) => hit(r.addedNodes) || hit(r.removedNodes))) { watchOverlays(); syncInert(); }
+    }).observe(document.body, { childList: true });
 
     document.getElementById('teacherApp')?.addEventListener('click', (e) => {
         const a = e.target.closest('[data-tv-go]');
@@ -185,7 +282,7 @@ function renderHome(el) {
         const lv = levelsSummary(s.skills);
         return `<tr>
   <td><button type="button" class="tv-cell-title tv-link-row" data-open-set="${esc(s.id)}">${esc(s.name || 'Untitled set')}</button><span class="tv-cell-sub">${n} skill${n === 1 ? '' : 's'}${lv ? ' · ' + esc(lv) : ''}</span></td>
-  <td>${s.code ? `<code class="tv-code" title="${esc(s.code)}">${esc(s.code)}</code><span class="tv-cell-sub" style="margin-top:2px;">${s.type === 'qs' ? 'Quick Start link' : 'Direct link'}</span>` : '<span class="tv-cell-sub">No link yet</span>'}</td>
+  <td>${s.code ? `<code class="tv-code" title="${esc(pupilCode(s.code))}">${esc(pupilCode(s.code))}</code><span class="tv-cell-sub" style="margin-top:2px;">${s.type === 'qs' ? 'Quick Start link' : 'Direct link'}</span>` : '<span class="tv-cell-sub">No link yet</span>'}</td>
   <td><span class="tv-cell-sub">${esc(fmtDay(s.lastUsed || s.createdAt))}</span></td>
   <td style="text-align:right;padding:0 16px 0 0;overflow:visible;">${s.link ? `<button type="button" class="tv-icon-btn" data-copy-set="${esc(s.id)}" aria-label="Copy the link for ${esc(s.name || 'this set')}">${icon('copy', 18)}</button>` : ''}</td>
 </tr>`;
@@ -450,6 +547,35 @@ function startPractice() {
         if (before) loadSetIntoQueue({ skills: before });
     }
     if (run.mode === 'board') document.body.classList.add('tv-bigboard');
+    labelTheGame(runTitle(skills));
+}
+
+/** What the teacher chose, in words: the set's name, else its skills. */
+function runTitle(skills) {
+    const labels = skills.map((k) => (findSkill(k.categoryId, k.skillId) || {}).label || k.skillId);
+    if (run.source === 'set') {
+        const name = run.setId === '__current' ? currentSetName() : ((savedSets().find((s) => s.id === run.setId) || {}).name || '');
+        if (name && name.trim()) return name.trim();
+    }
+    if (labels.length <= 3) return labels.join(' · ');
+    return `${labels.slice(0, 2).join(' · ')} + ${labels.length - 2} more`;
+}
+
+/**
+ * The game header names the chosen set. startGame labels it from the pupil category picker,
+ * which reads "Mixed Mode (All Categories)" for any set of skills.
+ */
+function labelTheGame(title) {
+    if (!title) return;
+    const apply = () => {
+        const topic = document.getElementById('gameTopicDisplay');
+        if (topic) topic.textContent = title;
+        const pill = document.getElementById('worksheetSkillPill');
+        if (pill && activeViewId() === 'worksheetView') pill.textContent = title;
+    };
+    apply();
+    setTimeout(apply, 0);
+    setTimeout(apply, 300);
 }
 
 function openBoardWindow() {

@@ -753,6 +753,19 @@ document.addEventListener('click', function(e) {
 
 // ========== PRINT DIALOG ==========
 export function openSimplePrintDialog(skills) {
+    // Called with no list (an old entry point): print what is in the skill queue.
+    if (!Array.isArray(skills)) {
+        skills = (Array.isArray(window.skillQueue) ? window.skillQueue : []).map(s => ({
+            categoryId: s.categoryId, skillId: s.skillId, skillLabel: s.skillLabel || s.skillId,
+            categoryIcon: s.categoryIcon || '📚', categoryName: s.categoryName || s.categoryId, opts: s.opts,
+        }));
+    }
+    // Teacher view: this dialog is retired there. The Print worksheets screen opens instead, with
+    // these skills loaded; it carries every option this dialog had. Student mode is unchanged.
+    if (document.body && document.body.classList.contains('teacher-mode') && typeof window.tvOpenPrintWith === 'function') {
+        window.tvOpenPrintWith(skills);
+        return;
+    }
     let modal = document.getElementById('simplePrintModal');
     if (!modal) {
         modal = document.createElement('div');
