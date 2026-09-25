@@ -15,8 +15,11 @@
 //                                   three products), numbered in reading order; the key fills
 //                                   only the wrong ones
 //                a choice           the item's own choice labels with check boxes (compare)
-//                a drawing          a redraw zone: the skill's model drawn empty (base-10
-//                                   blocks, ten frame), asked of the template as `fix: 'draw'`
+//                a drawing          a redraw zone under the work (base-10 blocks, ten frame),
+//                                   drawn by the template: `ctx.options.fix = 'draw'` (SCC 2.4.1)
+//                a fact family      a fix box beside each fact, drawn by the template: `fix: 'line'`
+//                The work is drawn in state `wrong` on both pages, so the key render sets
+//                `ctx.options.fixKey` and the template fills its fix place only there (SCC-T21)
 //   Wrong      40 to 60% of the shown answers are wrong (PT-ERR-1), each a REAL misconception
 //              from the skill's `wrongAnswer(q)`. An item flagged wrong that has none is skipped
 //              (the host deals another); a skill with no real wrong answer at all is
@@ -47,6 +50,8 @@ const PUPILS = ['Sam', 'Ana', 'Leo', 'Mia', 'Omar', 'Zara'];
 const DRAWN = new Set(['base10', 'tenframe']);
 /** Templates whose answer is a choice among the item's own labels. */
 const CHOICE = new Set(['compare']);
+/** Templates that draw one fix box beside each line of the work (a fact family's four facts). */
+const LINED = new Set(['fact-family']);
 
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1, 2];
@@ -67,6 +72,8 @@ export function realWrongOf(it) {
 export function pupilInk(html) {
     return String(html).replace(/<([a-z][a-z0-9]*)\b([^>]*?)\sdata-ws-ink="solid"([^>]*)>/gi, (m, tag, pre, post) => {
         const attrs = `${pre} data-ws-ink="solid"${post}`;
+        // A template's own fix place (a fix box per fact, the redraw zone) is the KEY's ink.
+        if (/data-ws-slot="(?:x\d+|fix)/.test(attrs)) return m;
         if (/\sclass="/.test(attrs)) return `<${tag}${attrs.replace(/\sclass="([^"]*)"/, ' class="$1 mq-pupil"')}>`;
         return `<${tag} class="mq-pupil"${attrs}>`;
     });
@@ -99,12 +106,14 @@ export function prepare(it, info = {}) {
     if (info.wrong && !wrong) return null;
     const isWrong = !!(wrong && info.wrong);
     // A story keeps its judgement beside it (its text wraps); a wide picture puts it underneath.
-    const wide = it.fclass === 'wide' || (it.fclass !== 'word' && it.template !== 'wordpic' && Number((it.footprint || {}).wMm) > 110);
+    const wide = it.fclass === 'wide' || (it.fclass !== 'word' && it.template !== 'wordpic' && Number((it.footprint || {}).wMm) > 95);
     const shown = isWrong ? wrong.value : correct;
     const who = PUPILS[(Number(info.index) || 0) % PUPILS.length];
     const q = it.q || {};
     const payload = (q.cell && q.cell.payload) || {};
+    // SCC 2.4.1 / SCC-T21: the templates that draw their OWN fix place (a redraw zone, a box per fact).
     const kind = DRAWN.has(it.template) ? 'draw'
+        : LINED.has(it.template) ? 'line'
         : CHOICE.has(it.template) && Array.isArray(payload.labels) && payload.labels.length ? 'choice'
             : partsOf(correct) && partsOf(shown) && partsOf(correct).length === partsOf(shown).length ? 'parts' : 'value';
     const story = it.fclass === 'word' || it.template === 'wordpic';
@@ -114,7 +123,7 @@ export function prepare(it, info = {}) {
     const cParts = partsOf(correct) || [];
     const sParts = partsOf(shown) || [];
     if (kind === 'value') slots['ea-ans'] = isWrong ? correct : '';
-    if (kind === 'parts') cParts.forEach((v, i) => { slots[`ea-ans-${i}`] = isWrong && sParts[i] !== v ? v : ''; });
+    if (kind === 'parts' || kind === 'line') cParts.forEach((v, i) => { slots[`ea-ans-${i}`] = isWrong && sParts[i] !== v ? v : ''; });
     if (kind === 'choice') payload.labels.forEach((lab, i) => { slots[`ea-pick-${i}`] = isWrong && i === (payload.correct || 0) ? '✓' : ''; });
     const key = slotKey(slots, correct);
     const digits = Math.max(2, Math.min(6, correct.replace(/[^0-9]/g, '').length || 2));
@@ -122,25 +131,30 @@ export function prepare(it, info = {}) {
         const stack = wide || kind === 'draw' || (Number(o.cols) || 1) >= 2;
         let body = '';
         try {
-            body = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, {
+            // The work is drawn in state `wrong` on BOTH pages, so a key render says so itself
+            // (`options.fixKey`), and the template fills its fix place only there.
+            const fixOpts = kind === 'draw' || kind === 'line' ? { fix: kind, fixKey: c.state === 'answered' && isWrong } : {};
+            body = it.render(Object.assign({}, c, { state: 'blank', options: Object.assign({}, c.options || {}, fixOpts) }), Object.assign({}, o, {
                 shown, prompt: false, shownSlots: isWrong && wrong.slots ? wrong.slots : undefined,
-                payload: kind === 'draw' ? { fix: 'draw' } : undefined,
             }));
         } catch (e) { body = ''; }
-        const askedFix = kind === 'draw' && /data-ws-slot="fix/.test(body);
+        // A template's own fix places are judged with the item's one point (PT-ERR-2), like the
+        // role's fix box: ungraded, so a correct item's empty fix place is not a missing answer.
+        body = body.replace(/(data-ws-slot="(?:x\d+|fix)")(?![^>]*data-ws-graded)/g, '$1 data-ws-graded="0"');
+        const askedFix = (kind === 'draw' || kind === 'line') && /data-ws-slot="(?:fix|x\d)/.test(body);
         const shownWork = `<div class="mq-judge-work"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}">${esc(who)} wrote:</span>${kind === 'choice' || kind === 'draw' ? body : pupilInk(body)}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         let fix = '';
         if (kind === 'value') {
             const fixW = Math.max({ S: 26, M: 30, L: 34 }[c.size] || 34, digits * ({ S: 6, M: 7, L: 8 }[c.size] || 8) + 6);
             fix = `<span class="mq-ansslot mq-fixslot">${blank({ id: 'ea-ans', kind: 'number', shape: 'box', widthMm: fixW, graded: false }, c, slotOnly(key, 'ea-ans'))}<small>correct answer</small></span>`;
-        } else if (kind === 'parts') {
+        } else if (kind === 'parts' || (kind === 'line' && !askedFix)) {
             const w = Math.max(...cParts.map((v) => String(v).length));
             const fixW = Math.max({ S: 18, M: 20, L: 22 }[c.size] || 22, w * ({ S: 6, M: 7, L: 8 }[c.size] || 8) + 6);
             fix = `<span class="mq-fixes mq-fixslot">${cParts.map((v, i) => `<span class="mq-ansslot">${blank({ id: `ea-ans-${i}`, kind: 'number', shape: 'box', widthMm: fixW, graded: false }, c, slotOnly(key, `ea-ans-${i}`))}<small>${ORD[i] || i + 1}</small></span>`).join('')}</span>`;
         } else if (kind === 'choice') {
             fix = `<span class="mq-fixchoice mq-fixslot">${payload.labels.map((lab, i) => checkLine(`ea-pick-${i}`, String(lab), c, key, { graded: false })).join('')}</span>`;
-        } else if (!askedFix) {
+        } else if (kind === 'draw' && !askedFix) {
             // The redraw zone: the skill's own model, empty on the pupil page and drawn right on
             // the key of a wrong item. (A template that draws its own `fix: 'draw'` zone keeps it.)
             let zone = '';
@@ -164,7 +178,7 @@ export function prepare(it, info = {}) {
         // own single column (PT-WPR-1).
         footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: Math.min(2, (it.footprint && it.footprint.maxCols) || 2) }),
         fclass: it.fclass === 'word' || it.fclass === 'wide' ? it.fclass : 'standard', thinking: { shown, correct, isWrong, basis: wrong ? wrong.basis : '', kind },
-        cellCls: [it.cellCls || '', 'mq-thinkcell'].join(' ').trim(),
+        cellCls: [it.cellCls || '', 'mq-thinkcell mq-eacell'].join(' ').trim(),
     });
 }
 
@@ -199,7 +213,9 @@ function staticLayout(items, input) {
     }, items, ctx.paper, LIVE_W_MM, opts);
 }
 
-const heightAt = (it, cols) => { const m = it.measured && it.measured[cols]; return m && Number.isFinite(m.hMm) && m.fits !== false ? m.hMm + 1 : Infinity; };
+// + 4 mm: the grid's rules and the band edge come out of the row, and a measured cell is rounded
+// to 0.1 mm (a mult chart at 112 mm in a 113 mm row overflowed by 3.5 mm).
+const heightAt = (it, cols) => { const m = it.measured && it.measured[cols]; return m && Number.isFinite(m.hMm) && m.fits !== false ? m.hMm + 4 : Infinity; };
 
 /**
  * Choose n items (in order) that fit `rows` rows of `cols` columns, about half of them wrong

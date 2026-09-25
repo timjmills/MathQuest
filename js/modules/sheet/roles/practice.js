@@ -198,7 +198,8 @@ export const SHEET_ENGINE_CSS = `
 /* Error analysis: what the pupil wrote is shown in "pupil writing" (trace grey, tagged), so it is
    never confused with the printed numbers (critic round 2, C1). */
 :is(.ws-page,.ws-sheet) .mq-pupiltag{position:absolute;left:8mm;top:1mm;font-size:var(--ws-zone);line-height:1.2;font-style:normal;white-space:nowrap}
-:is(.ws-page,.ws-sheet) .mq-pupiltag.mq-pupiltag-flow{position:static;align-self:flex-start;margin:0 0 1mm 4mm}
+/* the "<name> wrote:" tag sits on the letter's line; the work starts under it */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-eacell{padding-top:calc(var(--ws-zone) * 1.2 + 2.5mm)}
 :is(.ws-page,.ws-sheet) .mq-pupil,:is(.ws-page,.ws-sheet) .mq-pupil *{color:#949494!important}
 :is(.ws-page,.ws-sheet) .mq-klabel{display:inline-flex;align-items:center;min-height:calc(var(--ws-hw) + 4mm);font-size:var(--ws-text)}
 :is(.ws-page,.ws-sheet) .mq-pupilwork{font-size:var(--ws-digit);line-height:1.1;white-space:nowrap}
