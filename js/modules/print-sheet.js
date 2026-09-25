@@ -23,6 +23,8 @@
 // app's print branches.
 
 import { generateQuestionFor } from './generate-question.js';
+import { factSetTitle, optionsFor, normalizeOptions } from './skill-options.js';
+import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill } from './data.js';
 import { kitCellSpec } from './print-generate.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider } from './sheet/index.js';
@@ -36,7 +38,6 @@ import {
     normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, easeScore, ineligibleNote,
     blockPlan, sideItems, pickDistinct,
 } from './sheet/anchors.js';
-import { optionsFor, normalizeOptions } from './skill-options.js';
 import {
     allocateSupports, alternativesOf, TOUCH_IDS, normCoverage, normMix, TOUCH_MIN_PT,
     canDraw, supportNeeds, supportOpKey as opKey,
@@ -977,14 +978,47 @@ function primaryCcss(sk) {
     try { return standardsMod ? standardsMod.primaryStandard(sk.categoryId, sk.skillId, { short: true }) : ''; } catch (e) { return ''; }
 }
 
+/**
+ * The "I Can" title a fact drill's OPTIONS give it (P-31, OPTIONS-CRITIC-R2 §5 #15), or '' to
+ * keep the skill's own. A ticked fact set names the page ("I Can add 6"), and a fact band other
+ * than the default is said too ("I Can add 6 (facts to 10)", "I Can add facts to 10").
+ * factSetTitle() owns the set's name, so the header, the cell label and the key agree.
+ */
+function optionTitle(sk, baseICan) {
+    let set = '', bandDef = null, band;
+    try {
+        set = factSetTitle(sk.categoryId, sk.skillId, sk.opts || {});
+        if (set || optionsFor(sk.categoryId, sk.skillId).some((d) => d.id === 'constant')) {
+            bandDef = optionsFor(sk.categoryId, sk.skillId).find((d) => d.id === 'band') || null;
+            band = bandDef ? normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {}).band : undefined;
+        }
+    } catch (e) { return ''; }
+    const bandMoved = bandDef && band !== undefined && band !== null && band !== bandDef.default;
+    const hit = bandMoved ? (bandDef.values || []).find((x) => x.v === band) : null;
+    const bandPhrase = hit ? `${String(bandDef.label).toLowerCase()} ${hit.l}` : '';
+    if (set) return `I Can ${set.charAt(0).toLowerCase()}${set.slice(1)}${bandPhrase ? ` (${bandPhrase})` : ''}`;
+    if (!bandPhrase) return '';
+    // A mixed page: the skill's own title with its default bound swapped for the chosen one
+    // ("I Can add facts to 20" -> "to 10"; the ×/÷ tables name their largest factor).
+    const tok = (v) => (v === 144 ? '12' : v === 100 && bandDef.default === 144 ? '10' : String(v));
+    const re = new RegExp(`\\bto ${tok(bandDef.default)}\\b`);
+    return re.test(baseICan) ? baseICan.replace(re, `to ${tok(band)}`) : `${baseICan} (${bandPhrase})`;
+}
+
 /** Skill metadata the frame prints: label, level, and the strings the role reads. */
 function skillMeta(sk, q) {
-    const label = SKILL_FULL_LABELS[sk.skillId] || (q && q.skillLabel) || sk.skillId;
+    // A ranged + / − id whose band (or regrouping, on a _mixed id) is set below its own name
+    // deals a lower rung: the page is titled and labelled by that rung, never by a band it is not
+    // printing (OPTIONS-CRITIC-R2 §5 #15). Every other skill names itself.
+    let nameId = sk.skillId;
+    try { nameId = opsRoutedSkill(sk.categoryId, sk.skillId, sk.opts || {}) || sk.skillId; } catch (e) { nameId = sk.skillId; }
+    if (nameId !== sk.skillId && !SKILL_FULL_LABELS[nameId]) nameId = sk.skillId;
+    const label = SKILL_FULL_LABELS[nameId] || (q && q.skillLabel) || sk.skillId;
     let grade = null;
     try { grade = getSkillGrade(sk.skillId, sk.categoryId); } catch (e) { grade = null; }
     const meta = { categoryId: sk.categoryId, skillId: sk.skillId, label, grade: grade === null || grade === undefined ? '' : String(grade), ccss: sk.ccss || primaryCcss(sk) };
-    const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta));
-    meta.iCan = sk.iCan || words.iCan;
+    const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, { skillId: nameId }));
+    meta.iCan = sk.iCan || optionTitle(sk, words.iCan) || words.iCan;
     meta.instructionKey = q ? instructionKeyFor(q, words) : words.instructionKey;
     return meta;
 }

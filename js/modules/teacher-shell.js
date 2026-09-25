@@ -184,6 +184,8 @@ function onViewChangeInner() {
     document.body.classList.remove('tv-on-screen');
     document.body.classList.toggle('tv-play', PLAY_VIEWS.has(id));
     if (!PLAY_VIEWS.has(id)) document.body.classList.remove('tv-bigboard');
+    // The board window (?board=1) shows its game as the whole-class Board display.
+    else if (BOARD_WINDOW && id === 'gameView') document.body.classList.add('tv-bigboard');
     setNavCurrent(LIB_FOR_VIEW[id] || '');
 }
 
@@ -403,8 +405,6 @@ function renderRun(el) {
     const ttsOn = !!state.ttsEnabled;
     const adaptiveOn = !!state.adaptiveModeEnabled;
     const practising = skills.length ? (skills.length === 1 ? ((findSkill(skills[0].categoryId, skills[0].skillId) || {}).label || '1 skill') : `${skills.length} skills, mixed`) : 'Nothing yet';
-    const qs = Array.isArray(window.customQuickSkills) ? window.customQuickSkills : [];
-    const qsLocked = typeof window.isQuickStartLocked === 'function' ? window.isQuickStartLocked() : false;
     el.innerHTML = `
 <header class="tv-header"><div><h1 class="tv-h1">Run practice</h1><p class="tv-sub">Put practice up on the classroom board. Pupils' game view looks the same as today.</p></div></header>
 <div class="tv-run-grid">
@@ -451,16 +451,6 @@ function renderRun(el) {
         <button type="button" class="tv-btn tv-btn-block" data-run-act="board"${skills.length ? '' : ' aria-disabled="true"'}>${icon('external', 18)}<span>Open board view in new window</span></button>
         <p class="tv-cap" style="text-align:center;">Board view fills the screen and hides your teacher tools.</p>
       </div>
-    </section>
-    <section class="tv-card" aria-labelledby="tvQsH">
-      <div class="tv-row" style="justify-content:space-between;"><h2 class="tv-h2-sm" id="tvQsH">Pupil start screen</h2><span class="tv-cap">${qsLocked ? 'Locked' : 'Unlocked'}</span></div>
-      <p class="tv-cap" style="margin-top:-8px;">The Quick Start cards pupils see in student view on this device.</p>
-      <p class="tv-body" style="color:var(--tv-text);">${qs.length ? esc(qs.map((q) => q.shortName || (findSkill(q.categoryId, q.skillId) || {}).label || q.skillId).join(', ')) : 'No cards'}</p>
-      <div class="tv-row">
-        <button type="button" class="tv-btn tv-btn-sm" data-run-act="qs-use"${currentSet().length ? '' : ' aria-disabled="true"'} title="Put the current set's skills on the pupil start screen">${icon('upload', 16)}<span>Use current set</span></button>
-        <button type="button" class="tv-btn tv-btn-sm" data-run-act="qs-lock" aria-pressed="${qsLocked}">${icon(qsLocked ? 'unlock' : 'lock', 16)}<span>${qsLocked ? 'Unlock' : 'Lock'}</span></button>
-      </div>
-      <button type="button" class="tv-btn tv-btn-ghost" data-run-act="qs-reset" style="align-self:flex-start;">${icon('reset', 16)}<span>Reset to default</span></button>
     </section>
   </div>
 </div>`;
@@ -509,15 +499,6 @@ function onRunClick(e, el) {
         }
         case 'start': startPractice(); break;
         case 'board': openBoardWindow(); break;
-        case 'qs-use': {
-            const code = window.generateSkillCode ? window.generateSkillCode() : '';
-            if (!code || code === '---') { toast('Add skills to the current set first'); return; }
-            window.setQuickSkillsFromCode?.(code);
-            renderRun(el);
-            break;
-        }
-        case 'qs-lock': window.toggleQuickStartLock?.(); renderRun(el); break;
-        case 'qs-reset': window.resetQuickSkillsToDefault?.(); renderRun(el); break;
         default: break;
     }
 }
@@ -628,12 +609,28 @@ async function renderQuizzes(el) {
 </section>`;
         el.addEventListener('click', (e) => onQuizClick(e, el));
         el.querySelector('#tvQuizSearch').addEventListener('input', (e) => { quiz.query = e.target.value.trim().toLowerCase(); renderQuizList(el); });
+        // Close the row menu on a click outside it. The row re-renders on the opening click, so
+        // that click's target is already detached by the time it bubbles here: ignore it.
         document.addEventListener('click', (e) => {
-            if (quiz.menu && !e.target.closest('#teacherMain [data-screen="quizzes"] .tv-menu-wrap')) { quiz.menu = ''; renderQuizList(el); }
+            if (!quiz.menu || !e.target.isConnected) return;
+            if (!e.target.closest('#teacherMain [data-screen="quizzes"] .tv-menu-wrap')) { quiz.menu = ''; renderQuizList(el); }
+        });
+        el.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape' || !quiz.menu) return;
+            const id = quiz.menu;
+            quiz.menu = '';
+            renderQuizList(el);
+            focusQuizMenuBtn(el, id);
+            e.stopPropagation();
         });
     }
     try { quiz.tests = await listTests(); } catch (e) { quiz.tests = []; }
     renderQuizList(el);
+}
+
+function focusQuizMenuBtn(el, id) {
+    const btn = [...el.querySelectorAll('#tvQuizList [data-q="menu"]')].find((b) => b.dataset.id === id);
+    if (btn) btn.focus();
 }
 
 function qCount(t) {
@@ -706,7 +703,14 @@ async function onQuizClick(e, el) {
         case 'edit': window.openQuizBuilder?.(id); break;
         case 'monitor': window.openQuizMonitor?.(id); break;
         case 'results': window.showQuizResults?.(id); break;
-        case 'menu': quiz.menu = quiz.menu === id ? '' : id; renderQuizList(el); break;
+        case 'menu': {
+            e.stopPropagation();
+            quiz.menu = quiz.menu === id ? '' : id;
+            renderQuizList(el);
+            if (quiz.menu) el.querySelector('#tvQuizList .tv-menu button')?.focus();
+            else focusQuizMenuBtn(el, id);
+            break;
+        }
         case 'share': {
             quiz.menu = ''; renderQuizList(el);
             const t = await loadTest(id);
@@ -749,6 +753,11 @@ async function onQuizClick(e, el) {
 
 /* ================================================================= Settings */
 
+/** Which view the site opens in: 'student' (default) or 'last' (the view used last time). */
+function startRole() {
+    try { return localStorage.getItem('mathquest_start_role') === 'last' ? 'last' : 'student'; } catch (e) { return 'student'; }
+}
+
 function sw(id, on, labelId, descId) {
     return `<button type="button" class="tv-switch" role="switch" id="${id}" aria-checked="${!!on}" aria-labelledby="${labelId}"${descId ? ` aria-describedby="${descId}"` : ''}></button>`;
 }
@@ -780,12 +789,15 @@ function renderSettings(el) {
       <div class="tv-setting tv-divided"><div><div class="tv-h3" id="tvPopL">Celebration pop-ups</div><p class="tv-cap">Short messages for streaks and badges.</p></div>${sw('tvPopups', state.celebrationsEnabled, 'tvPopL')}</div>
       <div class="tv-setting tv-divided"><div><div class="tv-h3" id="tvSfxL">Sound effects</div><p class="tv-cap">A sound for right and wrong answers.</p></div>${sw('tvSfx', isSfxEnabled(), 'tvSfxL')}</div>
     </section>
+    ${pupilStartHTML()}
   </div>
   <div class="tv-col">
     <section class="tv-card" aria-labelledby="tvLookH">
       <h2 class="tv-h2" id="tvLookH">Appearance</h2>
       <div><span class="tv-label">Theme</span>${segBtns('Theme', dark ? 'dark' : 'light', [['light', 'Light'], ['dark', 'Dark']])}</div>
       <p class="tv-cap" style="margin-top:-8px;">Worksheets always print black on white.</p>
+      <div><span class="tv-label">Open the site in</span>${segBtns('Start', startRole(), [['student', 'Student view'], ['last', 'Last view used']])}</div>
+      <p class="tv-cap" style="margin-top:-8px;">Student view is the default: switch to Teacher view each time with the toggle at the top.</p>
     </section>
     <section class="tv-card" aria-labelledby="tvPrintDefH">
       <h2 class="tv-h2" id="tvPrintDefH">Printing defaults</h2>
@@ -814,6 +826,26 @@ function renderSettings(el) {
     }
 }
 
+/**
+ * The Quick Start cards pupils see in student view on this device. A device setting, so it lives
+ * in Settings (it used to sit on Run practice, a second job for that screen).
+ */
+function pupilStartHTML() {
+    const qs = Array.isArray(window.customQuickSkills) ? window.customQuickSkills : [];
+    const locked = typeof window.isQuickStartLocked === 'function' ? window.isQuickStartLocked() : false;
+    const names = qs.map((q) => q.shortName || (findSkill(q.categoryId, q.skillId) || {}).label || q.skillId);
+    return `<section class="tv-card" aria-labelledby="tvQsH">
+      <div class="tv-row" style="justify-content:space-between;"><h2 class="tv-h2" id="tvQsH">Pupil start screen</h2><span class="tv-cap">${locked ? 'Locked' : 'Unlocked'}</span></div>
+      <p class="tv-cap" style="margin-top:-8px;">The Quick Start cards pupils see in student view on this device.${locked ? ' Locked: pupils cannot change them.' : ''}</p>
+      <p class="tv-body" style="color:var(--tv-text);">${names.length ? esc(names.join(', ')) : 'No cards'}</p>
+      <div class="tv-row">
+        <button type="button" class="tv-btn tv-btn-sm" data-set-act="qs-use"${currentSet().length ? '' : ' aria-disabled="true"'} title="Put the current set's skills on the pupil start screen">${icon('upload', 16)}<span>Use current set</span></button>
+        <button type="button" class="tv-btn tv-btn-sm" data-set-act="qs-lock" aria-pressed="${locked}">${icon(locked ? 'unlock' : 'lock', 16)}<span>${locked ? 'Unlock' : 'Lock'}</span></button>
+        <button type="button" class="tv-btn tv-btn-sm tv-btn-ghost" data-set-act="qs-reset">${icon('reset', 16)}<span>Reset to default</span></button>
+      </div>
+    </section>`;
+}
+
 function savePrintDefaults(patch) {
     writeStore(PRINT_DEFAULTS_KEY, { ...printDefaults(), ...patch });
 }
@@ -837,11 +869,22 @@ function onSettingsClick(e, el) {
         default: break;
     }
     if (d.setAct === 'test-voice') { testSelectedVoice(); return; }
+    if (d.setAct === 'qs-use') {
+        if (b.getAttribute('aria-disabled') === 'true') { toast('Add skills to the current set first'); return; }
+        const code = window.generateSkillCode ? window.generateSkillCode() : '';
+        if (!code || code === '---') { toast('Add skills to the current set first'); return; }
+        window.setQuickSkillsFromCode?.(code);
+        toast('The pupil start screen now shows the current set');
+    }
+    if (d.setAct === 'qs-lock') window.toggleQuickStartLock?.();
+    if (d.setAct === 'qs-reset') { window.resetQuickSkillsToDefault?.(); toast('The pupil start screen is back to its default cards'); }
+    if (d.setAct && d.setAct.startsWith('qs-')) { renderSettings(el); el.querySelector(`[data-set-act="${d.setAct}"]`)?.focus(); return; }
     if (d.setAct === 'reset-adaptive') { window.confirmResetAdaptiveLevels?.(); return; }
     if (d.setTheme) {
         const dark = document.documentElement.classList.contains('dark');
         if ((d.setTheme === 'dark') !== dark) window.toggleTheme?.();
     }
+    if (d.setStart) { try { localStorage.setItem('mathquest_start_role', d.setStart); } catch (e) { /* storage off */ } }
     if (d.setSize) savePrintDefaults({ size: d.setSize });
     if (d.setPaper) savePrintDefaults({ paper: d.setPaper });
     renderSettings(el);

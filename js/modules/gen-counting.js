@@ -831,13 +831,13 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // it in its row or its column, so the pupil always has one to count on from (across: one
         // more; down: ten more). The window and the gaps are dealt, so a page is never six
         // centre cells read off their left neighbour.
-        // P11: "Numbers to" 50 / 100 (the chart's rows) and "Empty boxes" 1 / 2 / 3 (default dealt).
+        // P11: "Numbers to" 50 / 100 (the chart's rows) and "Empty boxes" 1 to 7 (default 1 to 3, dealt).
         const r0 = rng(0, Number(_kOpt('band')) === 50 ? 2 : 7);
         const c0 = rng(0, 5);
         const rows = [r0, r0 + 1, r0 + 2];
         const cols = [0, 1, 2, 3, 4].map(k => c0 + k);
         const _hcWant = Number(_kOpt('tiles'));
-        const want = [1, 2, 3].includes(_hcWant) ? _hcWant : [1, 2, 2, 3][_kDeal(4)];
+        const want = [1, 2, 3, 4, 5, 6, 7].includes(_hcWant) ? _hcWant : [1, 2, 2, 3][_kDeal(4)];
         const at = (i) => rows[Math.floor(i / 5)] * 10 + cols[i % 5] + 1;
         const neighbours = (i) => {
             const r = Math.floor(i / 5), c = i % 5, out = [];
@@ -848,7 +848,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             return out;
         };
         let pickIdx = [];
-        for (let t = 0; t < 60; t++) {
+        for (let t = 0; t < 400; t++) {
             const cand = shuffle(Array.from({ length: 15 }, (_, i) => i)).slice(0, want);
             const set = new Set(cand);
             // every gap keeps a printed neighbour, and no two gaps sit side by side in a row
@@ -857,7 +857,8 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             pickIdx = cand;
             break;
         }
-        if (!pickIdx.length) pickIdx = [rng(0, 14)];
+        // Fallback (never expected): a checkerboard of gaps honours both rules at any count to 7.
+        if (!pickIdx.length) pickIdx = shuffle([0, 2, 4, 6, 8, 10, 12, 14]).slice(0, want);
         const blanks = pickIdx.sort((x, y) => x - y).map(at);
         q.chartWindow = { rows, cols };
         q.chartData = { target: blanks[0], targets: blanks.slice() };

@@ -774,6 +774,7 @@ function _wsDfReveal(q, host) {
 }
 
 export function initWorksheet() {
+    if (typeof window !== 'undefined' && typeof window.syncPlayChrome === 'function') window.syncPlayChrome();
     showView("worksheetView");
     // Scroll to top so the worksheet starts at the beginning
     window.scrollTo(0, 0);
@@ -1383,9 +1384,10 @@ function _wsRenderCard(grid, q, i) {
     const hintVisual = q.hintVisual ? `<div class="hint-visual">${q.hintVisual}</div>` : '';
     const baseHint = q.hint || 'Think about this problem step by step.';
     const opHint = _wsOpHint(q);
-    const hintText = opHint
+    let hintText = opHint
         ? `${opHint}<div style="margin-top:6px;">${baseHint}</div>`
         : baseHint;
+    if (_wsTeacherLaunch()) hintText = String(hintText).replace(/💡\s*/g, '');
 
     // Determine if this card has visual content that may need magnification
     const hasVisualContent = !!(q.visual && (
@@ -1398,14 +1400,17 @@ function _wsRenderCard(grid, q, i) {
         isFraction
     ));
 
+    // Teacher-launched (Run practice): the tools are plain words, shown only on the cell in use
+    // (css/play-teacher.css), so a page of 20 cells no longer carries 60 coloured buttons.
+    const _tl = _wsTeacherLaunch();
     const magnifyBtn = hasVisualContent
-        ? `<button class="ws-magnify-btn" type="button" onclick="wsMagnifyCard(${i})" title="Tap to zoom" aria-label="Enlarge problem ${i + 1}">&#128269;</button>`
+        ? `<button class="ws-magnify-btn" type="button" onclick="wsMagnifyCard(${i})" title="Tap to zoom" aria-label="Enlarge problem ${i + 1}">${_tl ? 'Zoom' : '&#128269;'}</button>`
         : '';
 
     // Per-card Skip: grays out the card, marks q._skipped = true,
     // excluded from total in checkAllWorksheet. Universal across all
     // worksheet skills, all answer types.
-    const skipBtnHtml = `<button class="ws-skip-btn" type="button" onclick="wsSkipCard(${i})" title="Skip this problem (no penalty)">⏭ Skip</button>`;
+    const skipBtnHtml = `<button class="ws-skip-btn" type="button" onclick="wsSkipCard(${i})" title="Skip this problem (no penalty)">${_tl ? 'Skip' : '⏭ Skip'}</button>`;
 
     // One card template for every item (owner ruling 2026-09-24): a slim chrome bar (number,
     // Read, Hint, Skip — colour, 44 px targets) and the black-and-white paper cell. The skill
@@ -1417,14 +1422,14 @@ function _wsRenderCard(grid, q, i) {
             <span class="mq-wsbadge" data-ws-feedback aria-hidden="true"></span>
             <span class="mq-grow"></span>
             ${magnifyBtn}
-            <button class="ws-tts-btn" type="button" onclick="wsSpeak(${i})" title="Read problem aloud" aria-label="Read problem ${i + 1} aloud">&#x1F50A;</button>
-            <button class="hint-btn" type="button" onclick="toggleHint(${i})" title="Show hint" aria-label="Hint for problem ${i + 1}">? Hint</button>
+            <button class="ws-tts-btn" type="button" onclick="wsSpeak(${i})" title="Read problem aloud" aria-label="Read problem ${i + 1} aloud">${_tl ? 'Read' : '&#x1F50A;'}</button>
+            <button class="hint-btn" type="button" onclick="toggleHint(${i})" title="Show hint" aria-label="Hint for problem ${i + 1}">${_tl ? 'Hint' : '? Hint'}</button>
             ${skipBtnHtml}
         </div>
         <div class="hint-popup" id="hint_popup_${i}">
-            <button class="hint-close" onclick="closeHint(${i})">×</button>
+            <button class="hint-close" onclick="closeHint(${i})" aria-label="Close hint">×</button>
             <div class="hint-content">
-                <div class="hint-title">💡 Hint</div>
+                <div class="hint-title">${_tl ? 'Hint' : '💡 Hint'}</div>
                 <div>${hintText}</div>
                 ${hintVisual}
             </div>
@@ -2146,6 +2151,11 @@ function wsRecordAnswer(idx, isCorrect) {
     }
 }
 
+/** Was this worksheet launched by a teacher (Run practice, MAP)? The pupil page is unchanged. */
+function _wsTeacherLaunch() {
+    return typeof document !== 'undefined' && !!document.body && document.body.classList.contains('teacher-mode');
+}
+
 // Per-card Skip — grays the card, marks q._skipped, excludes from scoring.
 // No penalty: not correct, not incorrect, just removed from the total.
 // Toggleable so a student who skipped can come back and answer.
@@ -2158,7 +2168,7 @@ export function wsSkipCard(idx) {
         q._skipped = false;
         card.classList.remove('ws-skipped');
         const btn = card.querySelector('.ws-skip-btn');
-        if (btn) btn.textContent = '⏭ Skip';
+        if (btn) btn.textContent = _wsTeacherLaunch() ? 'Skip' : '⏭ Skip';
         // Re-enable inputs.
         card.querySelectorAll('input').forEach(el => { el.disabled = false; });
         return;
@@ -2166,7 +2176,7 @@ export function wsSkipCard(idx) {
     q._skipped = true;
     card.classList.add('ws-skipped');
     const btn = card.querySelector('.ws-skip-btn');
-    if (btn) btn.textContent = '↩ Undo Skip';
+    if (btn) btn.textContent = _wsTeacherLaunch() ? 'Undo skip' : '↩ Undo Skip';
     // Disable inputs (CSS pointer-events also blocks, but disable is belt+braces).
     card.querySelectorAll('input').forEach(el => { el.disabled = true; });
 }
@@ -3076,6 +3086,37 @@ export function showWorksheetScore(correct, total, isPassing, skipped = 0) {
     const bannerColor = isPassing
         ? "linear-gradient(135deg, #06D6A0, #00BFA5)"
         : "linear-gradient(135deg, #EF476F, #C1121F)";
+
+    if (_wsTeacherLaunch()) {
+        // Teacher-launched: a calm result card. "Review answers" closes it so the marked cells
+        // can be gone through with the class.
+        overlay.className = 'mq-wsres-teacher';
+        overlay.style.cssText = '';
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-modal', 'true');
+        overlay.setAttribute('aria-labelledby', 'wsResTitle');
+        overlay.innerHTML = `
+        <div class="mq-wsres-card">
+            <div class="mq-wsres-eyebrow">Worksheet checked</div>
+            <h3 class="mq-wsres-title" id="wsResTitle">${correct} of ${total} correct</h3>
+            <div class="mq-wsres-pct">${percentage}%${skipped > 0 ? ` · ${skipped} skipped` : ''}</div>
+            <p class="mq-wsres-desc">${_wsEscAttr((document.getElementById('worksheetSkillPill') || {}).textContent || '')}</p>
+            <div class="mq-wsres-foot">
+                <button type="button" class="mq-wsres-btn" id="wsHomeBtn">Close worksheet</button>
+                <button type="button" class="mq-wsres-btn" id="wsPlayAgainBtn">New sheet</button>
+                <button type="button" class="mq-wsres-btn is-primary" id="wsReviewBtn">Review answers</button>
+            </div>
+        </div>`;
+        document.body.appendChild(overlay);
+        const close = () => { overlay.remove(); document.removeEventListener('keydown', onKey); };
+        const onKey = (e) => { if (e.key === 'Escape') close(); };
+        document.addEventListener('keydown', onKey);
+        overlay.querySelector('#wsReviewBtn').onclick = close;
+        overlay.querySelector('#wsPlayAgainBtn').onclick = () => { close(); newWorksheet(); };
+        overlay.querySelector('#wsHomeBtn').onclick = () => { close(); showView('homeView'); };
+        try { overlay.querySelector('#wsReviewBtn').focus({ preventScroll: true }); } catch (e) { /* ignore */ }
+        return;
+    }
 
     const emoji = isPassing ? "🎉" : "📚";
     const message = isPassing ? "Great Job!" : "Keep Practicing!";

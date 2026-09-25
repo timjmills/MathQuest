@@ -4,7 +4,7 @@ import { randInt, shuffle, pick, buildNumericOptions, pickName, pickTwoNames, pi
 import { DEFAULT_TABLES, getSkillGrade, maxOperandForGrade, multCapsForGrade, divCapsForGrade } from './data.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
 import { COLORS, STROKE, FONTS, MONO, softFill, categoricalFill } from './design-tokens.js';
-import { optionsFor } from './skill-options.js';
+import { optionsFor, normalizeOptions } from './skill-options.js';
 import { genCountByTables, genMultChart, genHopLine } from './gen-mult-patterns.js';
 const _MP_SKILLS = new Set(['count_by_tables', 'mult_chart', 'mult_chart_easy', 'mult_chart_medium', 'mult_chart_hard', 'nl_mult', 'nl_div']);
 import { stripSegStyle, stripPos } from './sheet/tokens.js';
@@ -1329,7 +1329,12 @@ function _generateLadderV2(q, skill, helpers, range) {
         // end. So the rung set is drawn from at least 400 and grows with Max Number from there.
         // The name declares no band, so nothing is promised and then broken (the content gate
         // agrees: `sub_across_zeros` has no band to exceed).
-        const band = Math.max(400, range);
+        // P11 (OPTIONS-CRITIC-R2 §5 #18): the skill's own "Start numbers to" band bounds the
+        // minuend. 500 is the old default page (drawn to 400, minuends to 408); 1,000 stops below
+        // the thousands rungs (whose 1,0xx minuends would pass it); 10,000 keeps them all. With no
+        // option declared (an old caller) the page grows with Max Number as it always did.
+        const _azBand = Number(_opt('band'));
+        const band = _azBand ? ({ 500: 400, 1000: 999, 10000: 10000 }[_azBand] || 400) : Math.max(400, range);
         const build = () => {
             const rungs = [];
             if (band >= 100) rungs.push('whole-hundred');           // SZ-2   100 − 47, 400 − 157
@@ -2107,22 +2112,59 @@ const _BAND_CODE = { 10: '10', 20: '20', 50: '50', 100: '100', 1000: '1k', 10000
 const _RANGED_RE = /^(add|sub)_(10|20|50|100|1k|10k|100k|1m)_(no_regroup|regroup|mixed)$/;
 const _WP_RE = /^(add|sub)_wp_(10|20|50|100|1k|10k|100k|1m)$/;
 
-function _routeByOptions(skill) {
+/**
+ * The band code a ranged id may route to: the chosen band, but never above the id's own ("within
+ * N" is the id's promise, OPTIONS-CRITIC-R2 §5 #1). The panel offers only bands at or below it;
+ * this clamps a raw value that reached the generator unnormalised (an old saved set).
+ */
+function _bandCodeAtMost(ownCode, get = _opt) {
+    const b = Number(get('band'));
+    const code = _BAND_CODE[b];
+    return code && b <= RANGE_MAP[ownCode] ? code : ownCode;
+}
+
+function _routeByOptions(skill, get = _opt) {
     let m = String(skill).match(_RANGED_RE);
     if (m) {
-        const code = _BAND_CODE[Number(_opt('band'))] || m[2];
-        const rg = _opt('regroup');
-        const rgId = rg === 'none' ? 'no_regroup' : rg === 'always' ? 'regroup' : rg === 'mixed' ? 'mixed' : m[3];
+        const code = _bandCodeAtMost(m[2], get);
+        // `regroup` is declared only on the _mixed ids above 10 (skill-options.js): elsewhere _opt
+        // answers undefined and the id's own regrouping stands, whatever an old code carried.
+        const rg = get('regroup');
+        let rgId = rg === 'none' ? 'no_regroup' : rg === 'always' ? 'regroup' : rg === 'mixed' ? 'mixed' : m[3];
+        // Band 10 reached from a higher id never lands on the bridging rung (answers 11 to 18):
+        // within 10 nothing regroups. Only add_10_regroup / sub_10_regroup ARE that rung.
+        if (code === '10' && m[2] !== '10' && rgId !== 'no_regroup') rgId = 'mixed';
         return `${m[1]}_${code}_${rgId}`;
     }
     m = String(skill).match(_WP_RE);
     if (m) {
-        const code = _BAND_CODE[Number(_opt('band'))] || m[2];
+        const code = _bandCodeAtMost(m[2], get);
         // add_wp_10 is the K picture story, generated in gen-counting.js: never routed into here.
         if (m[1] === 'add' && code === '10') return skill;
         return `${m[1]}_wp_${code}`;
     }
     return skill;
+}
+
+/**
+ * The rung a ranged + / − id really deals with these options (pure: no state), e.g.
+ * add_100_regroup with band 50 -> add_50_regroup. The sheet header names THAT rung, so a page
+ * whose band is below the id's own is titled by what it prints (OPTIONS-CRITIC-R2 §5 #15).
+ * Any other skill comes back unchanged.
+ */
+export function opsRoutedSkill(categoryId, skillId, opts) {
+    const id = String(skillId || '');
+    if (!_RANGED_RE.test(id) && !_WP_RE.test(id.replace(/_plain$/, ''))) return id;
+    let declared, n;
+    try {
+        declared = new Set(optionsFor(categoryId, id).map(o => o.id));
+        n = normalizeOptions(categoryId, id, opts || {});
+    } catch (e) { return id; }
+    const get = (k) => (declared.has(k) ? n[k] : undefined);
+    const plain = /_plain$/.test(id);
+    const routed = _routeByOptions(plain ? id.replace(/_plain$/, '') : id, get);
+    if (!plain) return routed;
+    return routed !== id.replace(/_plain$/, '') ? `${routed}_plain` : id;
 }
 
 function _optionAccepts(q, selected, routed) {
@@ -2138,7 +2180,8 @@ function _optionAccepts(q, selected, routed) {
         if (rg === 'always' && !has) return false;
     }
     const m = String(routed).match(_RANGED_RE);
-    if (m && m[1] === 'sub' && RANGE_MAP[m[2]] >= 1000) {
+    // Across zeros needs a borrow: on a no-regrouping rung it is not asked (the panel hides it).
+    if (m && m[1] === 'sub' && RANGE_MAP[m[2]] >= 1000 && m[3] !== 'no_regroup') {
         const z = _opt('zeroPlace');
         if (z === 'always' && !_subHasAcrossZero(q.a, q.b)) return false;
         if (z === 'none' && _subHasAcrossZero(q.a, q.b)) return false;

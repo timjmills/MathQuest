@@ -135,8 +135,12 @@ body:not(.teacher-mode) .view.tvq { background: var(--tv-page); border-radius: 1
 .tvq-switch-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .tvq-switch-text .tv-h3, .tvq-switch-text .tvq-switch-label { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--tv-text); }
 .tvq-switch-btn .tv-switch { pointer-events: none; }
-.tvq-switch-btn[aria-checked="true"] .tv-switch { justify-content: flex-end; background: var(--tv-selected); border-color: var(--tv-selected); }
-.tvq-switch-btn[aria-checked="true"] .tv-switch::after { background: var(--tv-on-selected); }
+/* The switch's aria-checked lives on the whole-row button. Draw the ON state the same way the
+   bare .tv-switch does (css/teacher.css): a 44×24 track on ::before, the 52×44 hit box clear. */
+.tvq-switch-btn .tv-switch { background: transparent; border-color: transparent; }
+.tvq-switch-btn[aria-checked="true"] .tv-switch { background: transparent; border-color: transparent; }
+.tvq-switch-btn[aria-checked="true"] .tv-switch::before { background: var(--tv-selected); border-color: var(--tv-selected); }
+.tvq-switch-btn[aria-checked="true"] .tv-switch::after { left: 26px; background: var(--tv-on-selected); }
 
 /* ---------------------------------------------------------------- Live monitor */
 
@@ -485,3 +489,28 @@ body.teacher-mode .google-export-btn.google-auth:hover { border-color: var(--tv-
     #teacherMain [data-screen="progress"] .tv-header > .tv-seg { min-width: 0 !important; width: 100%; }
 }
 #teacherMain [data-screen="progress"] [data-go-quizzes] { display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; margin: -12px 0; vertical-align: middle; }
+
+/* R2 quiz builder: ONE filter row (search + Level + Domain, as in the Skills library). */
+#quizBuilderView.tvq .qb-filter-group.tvq-selects { display: flex; flex-wrap: wrap; gap: 12px; flex: 0 1 auto; }
+#quizBuilderView.tvq .tvq-selects .tv-select { width: 200px; max-width: 100%; }
+#quizBuilderView.tvq .qb-category-select[hidden], #quizBuilderView.tvq .qb-filter-group[hidden] { display: none; }
+@media (max-width: 640px) {
+    #quizBuilderView.tvq .qb-filter-group.tvq-selects { width: 100%; }
+    #quizBuilderView.tvq .tvq-selects .tv-select { flex: 1 1 140px; width: auto; }
+}
+
+/* R2 quiz builder, narrow screens: a sticky bar names the question count and jumps to the list. */
+.tvq-qjump { display: none; }
+@media (max-width: 1100px) {
+    #quizBuilderView.tvq .tvq-qjump {
+        position: sticky; bottom: 12px; z-index: 5; display: flex; align-items: center; gap: 12px;
+        width: 100%; min-height: 48px; margin: 12px 0 0; padding: 0 16px; cursor: pointer;
+        border: 1px solid var(--tv-border); border-radius: 12px; background: var(--tv-surface); color: var(--tv-text);
+        font: 600 14px/20px var(--tv-font); text-align: left; box-shadow: 0 6px 20px rgba(20, 20, 30, .14);
+    }
+    #quizBuilderView.tvq .tvq-qjump .tvq-qjump-n { margin-left: auto; color: var(--tv-text-2); font-weight: 500; }
+    #quizBuilderView.tvq .tvq-qjump svg { flex: none; }
+    #quizBuilderView.tvq .tvq-qjump:hover { border-color: var(--tv-control); }
+    html.dark #quizBuilderView.tvq .tvq-qjump { box-shadow: 0 6px 20px rgba(0, 0, 0, .45); }
+    #quizBuilderView.tvq .qb-question-panel { scroll-margin-top: 16px; }
+}
