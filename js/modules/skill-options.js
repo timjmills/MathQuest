@@ -69,6 +69,67 @@ export const constantOption = (max, label, titleVerb) => ({
     help: 'Tick one fact set to drill it on its own, or several to build a cumulative set. All ticked is mixed.',
 });
 
+// ---------------------------------------------------------------------------
+// S2 · THE SUPPORTS MODEL (design/SUPPORTS.md §S2)
+// ---------------------------------------------------------------------------
+// `support` is the ONE Support control of a skill that has the supports model: a SET of the
+// supports the skill can draw (its provider's `supports` declaration, or the family default in
+// sheet/providers/util.js; ws-supports-unit checks the two agree). Every value is drawn AT RENDER
+// TIME round the problem the generator made (sheet/support-draw.js): the generated items are the
+// same with or without a support, so the pupil page, the key and the screen all draw the same
+// thing. Nothing ticked (the default) is no support, so every existing page and link is unchanged.
+// An old code that carried one cue ("~FD", dot tiles) decodes to that one tick.
+//
+// `cover` (where the supports go on the page) and `mix` (how two supports that clash on one
+// problem are shared out) appear only once a support is ticked. The print screen can set both for
+// a whole sheet; on its own a skill carries them into a link.
+export const SUPPORT_LABELS = Object.freeze({
+    touch: 'Touch dots: count on', touchall: 'Touch dots: count all',
+    tile: 'Dot tiles (one dot for each)', frame: 'Ten frames', line: 'Number line 0 to 20',
+    skip: 'Skip-count strip (3, 6, 9 …)', array: 'Dot array', think: 'Think box (4 × __ = 28)',
+    boxsign: 'The sign in a box, named', startarrow: 'Start arrow over the ones column',
+    steps: 'Step checklist',
+    'round-pv': 'Place-value chart: ring the place, underline the next digit',
+    'round-mark': 'Ring and underline on the number itself',
+});
+// The supports that are marks, not pictures: they stack with anything (§S4.7), so ticking one
+// beside another support never needs the Mix control.
+const _SUPPORT_MARKS = new Set(['boxsign', 'startarrow', 'steps', 'round-mark']);
+const _supportTicks = (o) => (Array.isArray(o && o.support) ? o.support : []).filter(v => SUPPORT_LABELS[v]);
+/** The unified Support set. `labels` overrides the wording per skill (count back, count by). */
+export const supportsOption = (values, { help, labels = {}, render = null, dflt = [] } = {}) => ({
+    id: 'support', label: 'Support', type: 'set', default: dflt.slice(), group: 'support',
+    supportsModel: true,
+    // The values drawn at render time (the rest, on a rounding skill, are its generation rungs).
+    render: (render || values).slice(),
+    values: values.map(v => ({ v, l: labels[v] || SUPPORT_LABELS[v] || v })),
+    allLabel: 'Every support',
+    help: help || 'Tick the help to draw on each problem, on paper and on screen. Supports that cannot '
+        + 'share a problem are shared out by section or problem by problem. None ticked is the fade.',
+    helpShort: 'Tick the help each problem carries. None ticked is no help.',
+});
+export const supportCoverOption = (render = null) => ({
+    id: 'cover', label: 'Which problems get it', type: 'enum', default: 'whole', group: 'support',
+    values: [{ v: 'whole', l: 'Every problem' }, { v: 'needed', l: 'Only the problems that need it' },
+        { v: 'fade', l: 'Fade down the page (all, then less, then none)' }],
+    help: '"Need it" skips the easy ones (a count of 1 or 2, a column that does not regroup). "Fade" '
+        + 'gives the first third everything, the middle third the light part, the last third none.',
+    appliesTo: (o) => _supportTicks(o).some(v => !render || render.includes(v)),
+});
+export const supportMixOption = (render = null) => ({
+    id: 'mix', label: 'Supports that clash', type: 'enum', default: 'section', group: 'support',
+    values: [{ v: 'section', l: 'Section by section' }, { v: 'problem', l: 'Problem by problem' }],
+    help: 'Two supports that cannot share a problem (touch dots and dot tiles) take turns: section A '
+        + 'one and section B the other, or alternating problem by problem.',
+    appliesTo: (o) => _supportTicks(o).filter(v => !_SUPPORT_MARKS.has(v) && (!render || render.includes(v))).length >= 2,
+});
+/** The three controls of the supports model, for a skill's option list. */
+export const supportsOptions = (values, o = {}) => {
+    const render = o.render || values;
+    const canClash = render.filter(v => !_SUPPORT_MARKS.has(v)).length >= 2;
+    return [supportsOption(values, o), supportCoverOption(o.render), ...(canClash ? [supportMixOption(o.render)] : [])];
+};
+
 // Scaffold level replaces the easy / medium / hard twin skills (owner ruling 2026-09-19).
 // 3 = worked and traced, 2 = hints shown, 1 = structure only, 0 = bare.
 // Support level is a SET for the same reason as notation (owner, 2026-09-20): "multiple support
@@ -422,15 +483,15 @@ const _pvNearest = (place) => {
         // to 10,000,000, so it has no band control (the generator uses its natural band).
         ...(bands.length > 1 ? [_pvBand(bands, place * 10)] : []),
         _pvMidpoint(true),
-        {
-            id: 'support', label: 'Support', type: 'enum', default: 'cut', group: 'support',
-            values: [
-                { v: 'line', l: 'Number line (ends labelled)' },
-                { v: 'cut', l: 'Cut line (place letters over the digits)' },
-                { v: 'none', l: 'None' },
-            ],
-            help: 'One support per page. The number line shows which end is nearer; "None" is the fade.',
-        },
+        // S2: the rounding supports are one set. "Cut line" and "Number line" are the generator's
+        // own rungs (the cell it draws, as before: "~FL" still means the number line); the chart
+        // and the marks are drawn round the problem at render time. None ticked is the fade.
+        ...supportsOptions(['cut', 'line', 'round-pv', 'round-mark'], {
+            dflt: ['cut'], render: ['round-pv', 'round-mark'],
+            labels: { cut: 'Cut line (place letters over the digits)', line: 'Number line (ends labelled)' },
+            help: 'The cut line and the number line change the problem\'s own drawing (tick one). The chart '
+                + 'and the marks are drawn beside it. None ticked is the fade.',
+        }),
         {
             id: 'response', label: 'How the pupil answers', type: 'enum', default: 'write', group: 'layout',
             values: [
@@ -813,26 +874,13 @@ const _opsUnknown = (dflt = 'answer', { answer = 'The answer (8 + 7 = __)', firs
 });
 // The + / − fact cue: one HINT picture under the fact, faded to None. Structure (the fact's own
 // rule and answer zone) never changes.
-const _opsAddCue = (withTile = true) => ({
-    id: 'support', label: 'Picture support', type: 'enum', default: 'none',
-    values: [
-        { v: 'none', l: 'None' },
-        ...(withTile ? [{ v: 'tile', l: 'Dot tiles (one dot for each)' }] : []),
-        { v: 'frame', l: 'Ten frames' },
-        { v: 'line', l: 'Number line 0 to 20' },
-    ],
-    help: 'A hint drawn under every fact on the page, in print and on screen. None is the fade.',
-});
-const _opsMulCue = (div = false) => ({
-    id: 'support', label: 'Picture support', type: 'enum', default: 'none',
-    values: [
-        { v: 'none', l: 'None' },
-        { v: 'skip', l: div ? 'Skip-count strip of the number you divide by' : 'Skip-count strip (3, 6, 9 …)' },
-        { v: 'array', l: 'Dot array' },
-        ...(div ? [{ v: 'think', l: 'Think box (4 × __ = 28)' }] : []),
-    ],
-    help: 'A hint drawn under every fact on the page, in print and on screen. None is the fade.',
-});
+const _opsAddCue = (withTile = true, sub = false) => supportsOptions(
+    ['touch', 'touchall', ...(withTile ? ['tile'] : []), 'frame', 'line', 'boxsign'],
+    { labels: sub ? { touch: 'Touch dots: count back (on the number taken away)' } : { touch: 'Touch dots: count on (on the smaller number)' } });
+const _opsMulCue = (div = false) => supportsOptions(
+    ['touch', 'skip', 'array', ...(div ? ['think'] : []), 'boxsign'],
+    { labels: { touch: div ? 'Touch dots: a row to touch while counting by' : 'Touch dots: count by (on one factor)',
+        skip: div ? 'Skip-count strip of the number you divide by' : 'Skip-count strip (3, 6, 9 …)' } });
 const _opsFactBand = (sub = false) => ({ ..._opsBand([5, 10, 12, 15, 20], 20, {
     label: 'Facts to',
     help: sub
@@ -858,22 +906,24 @@ const _opsBar = () => ({
 
 const P11_OPS_OPTIONS = {
     // --- fact drills: the band and a fading picture cue sit beside the fact set -----------------
-    'addition:add_facts': [constantOption(13, 'Add'), notationOption('+'), _opsFactBand(), _opsAddCue()],
-    'subtraction:sub_facts': [constantOption(13, 'Subtract'), notationOption('-'), _opsFactBand(true), _opsAddCue()],
-    'multiplication:mult_facts': [constantOption(12, 'Times', 'Multiply by'), notationOption('x'), _opsTableBand(), _opsMulCue(false)],
+    'addition:add_facts': [constantOption(13, 'Add'), notationOption('+'), _opsFactBand(), ..._opsAddCue()],
+    'subtraction:sub_facts': [constantOption(13, 'Subtract'), notationOption('-'), _opsFactBand(true), ..._opsAddCue(true, true)],
+    'multiplication:mult_facts': [constantOption(12, 'Times', 'Multiply by'), notationOption('x'), _opsTableBand(), ..._opsMulCue(false)],
     // Dividing BY 0 is undefined, so the 0 box is the zero facts it really deals: 0 ÷ n.
     'division:div_facts': [(() => {
         const c = constantOption(12, 'Divide by');
         c.values = c.values.map(x => (x.v === 0 ? { v: 0, l: '0 (zero shared: 0 ÷ n)' } : x));
         c.zeroTitle = 'Zero divided by a number';
         return c;
-    })(), notationOption('/'), _opsTableBand(), _opsMulCue(true)],
+    })(), notationOption('/'), _opsTableBand(), ..._opsMulCue(true)],
 
     // --- the four basic skills: regrouping and the unknown position ----------------------------
     // Basic + and − are grade 1 (1.OA.6, within 20): the band is 10 or 20, the sum / the number taken from.
-    'addition:add': [notationOption('+'), _opsBand([10, 20], 20, { help: _OPS_BAND_HELP.add }), _opsRegroup('mixed'), _opsUnknown()],
+    'addition:add': [notationOption('+'), _opsBand([10, 20], 20, { help: _OPS_BAND_HELP.add }), _opsRegroup('mixed'), _opsUnknown(),
+        ...supportsOptions(['touch', 'touchall', 'startarrow', 'boxsign'], { labels: { touch: 'Touch dots: count on (on the smaller number)' } })],
     'subtraction:subtract': [notationOption('-'), _opsBand([10, 20], 20, { help: _OPS_BAND_HELP.sub }), _opsRegroup('mixed', true), _opsUnknown('answer',
-        { answer: 'The answer (15 − 7 = __)', first: 'The number you start from (__ − 7 = 8)', second: 'The number taken away (15 − __ = 8)' })],
+        { answer: 'The answer (15 − 7 = __)', first: 'The number you start from (__ − 7 = 8)', second: 'The number taken away (15 − __ = 8)' }),
+        ...supportsOptions(['touch', 'touchall', 'startarrow', 'boxsign'], { labels: { touch: 'Touch dots: count back (on the number taken away)' } })],
     'multiplication:multiply': [notationOption('x'), {
         // `ownsNumbers`: this control IS the skill's number size, so the measured Max Number is
         // not shown beside it (OPTIONS-CRITIC-R2 §5 #8 / #17: two size controls, and "Up to 100"
@@ -911,7 +961,8 @@ const P11_OPS_OPTIONS = {
         id: 'tiles', label: 'Numbers to add', type: 'enum', default: null, group: 'difficulty',
         values: [{ v: null, l: 'Dealt across the page (3 and 4)' }, { v: 3, l: '3 numbers' }, { v: 4, l: '4 numbers' }],
         help: 'How many numbers each column sum stacks. The column and its carry boxes stay the same.',
-    }],
+    }, ...supportsOptions(['touch', 'touchall', 'startarrow', 'steps'], { labels: {
+        touch: 'Touch dots: count on, column by column', touchall: 'Touch dots: count all, column by column' } })],
 
     // --- the tables: how far the chart and the number lines reach -------------------------------
     'multiplication:mult_chart': [_opsBand([25, 100, 144], 144, {
@@ -978,7 +1029,8 @@ for (const op of ['add', 'sub']) {
                 opts.unshift(notationOption(op === 'add' ? '+' : '-'));
                 opts.push(bridging ? levelSubset([3, 2, 1], 1,
                     'Level 3 draws the two ten frames beside the split, level 2 the split frame alone '
-                    + '(write both parts, then the answer), level 1 the answer only.') : _opsAddCue(false));
+                    + '(write both parts, then the answer), level 1 the answer only.') : _opsAddCue(false, op === 'sub'));
+                if (!bridging) opts.push(...opts.pop());
             } else {
                 // The column support level draws on column work only (a band of 50 or more).
                 opts.push({ ..._opsColumnLevel(), appliesTo: cur => !(Number(cur.band) <= 20) });
@@ -1028,6 +1080,10 @@ const P11_K2_OPTIONS = {
         },
         levelSubset([3, 2, 1], 1, 'Level 3 writes the answer in grey to trace, level 2 prints a number track '
             + '1 to 20 under the picture to point along, level 1 is the picture alone.'),
+        // S2: the counting checklist beside the picture (point, say, the last number is how many).
+        ...supportsOptions(['steps'], { labels: { steps: 'Counting checklist (point, say, last number)' },
+            help: 'A three-step checklist beside each picture: point to each one, say one number for each, '
+                + 'the last number is how many. It never shows the number.' }),
     ],
     'counting:count_sequence': [
         _k2CountTo([10, 20, 100], 20),

@@ -107,6 +107,8 @@ function factWrong(q, slot = 'ans') {
 }
 
 registerSkill('addition:add_facts', {
+    // S2: the supports this skill can draw (touch dots, cues, panes); the Support control offers these.
+    supports: Object.freeze(['touch', 'touchall', 'tile', 'frame', 'line', 'boxsign']),
     strings: strings({
         iCan: 'I Can add facts to 20',
         instructionKey: 'add',
@@ -150,6 +152,8 @@ function columnWrong(q, addends) {
 }
 
 registerSkill('addition:add', {
+    // S2: the supports this skill can draw (touch dots, cues, panes); the Support control offers these.
+    supports: Object.freeze(['touch', 'touchall', 'startarrow', 'boxsign']),
     strings: strings({
         iCan: 'I Can add tens and ones in columns',
         instructionKey: 'add',
@@ -177,6 +181,8 @@ const multiAddends = (q) => {
 };
 
 registerSkill('addition:add_column_multi', {
+    // S2: the supports this skill can draw (touch dots, cues, panes); the Support control offers these.
+    supports: Object.freeze(['touch', 'touchall', 'startarrow', 'steps']),
     strings: strings({
         iCan: 'I Can add three or four numbers in columns',
         instructionKey: 'add',

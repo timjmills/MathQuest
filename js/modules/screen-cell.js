@@ -27,6 +27,11 @@
 // No window writes; no state import.
 
 import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches } from './sheet/index.js';
+import { optionsFor } from './skill-options.js';
+import {
+    supportsForItem, canDraw, supportNeeds, touchNumbers, touchColumns, touchNumberHTML, touchOpts, touchDigit,
+    withSupports, supportOpKey as opKey,
+} from './sheet/index.js';
 
 export const INK = '#000000';
 export const PAPER = '#ffffff';
@@ -193,8 +198,11 @@ export function screenTextLine(el) {
  * @param {string} slotHtml  the answer slot (an <input>), or a placeholder host span
  */
 export function equationHTML(k, slotHtml) {
+    // S2: touch dots on the given numbers (k.supports, screenSupportsFor).
+    const tn = k.supports ? touchNumbers({ a: k.a, b: k.b, op: k.op, supports: k.supports }) : { a: false, b: false };
+    const to = touchOpts(40, 'px');
     return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
-        + `<span>${k.a}</span><span class="o">${opGlyph(k.op)}</span><span>${k.b}</span><span class="o">=</span>`
+        + `<span>${touchNumberHTML(k.a, tn.a, to)}</span><span class="o">${opGlyph(k.op)}</span><span>${touchNumberHTML(k.b, tn.b, to)}</span><span class="o">=</span>`
         + `<span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
 }
 
@@ -204,9 +212,12 @@ export function factHTML(k, slotHtml) {
     // tracks, so "×12" never touches; the digit tracks cover both operands and the answer.
     const n = factDigitTracks(k.a, k.b, String(k.ans != null ? k.ans : '').length);
     const A = String(k.a).padStart(n, ' '), B = String(k.b).padStart(n, ' ');
-    const row = (s) => [...s].map((ch) => `<span>${ch === ' ' ? '' : ch}</span>`).join('');
+    // S2: touch dots on the digits of the touched number (k.supports, screenSupportsFor).
+    const tn = k.supports ? touchNumbers({ a: k.a, b: k.b, op: k.op, supports: k.supports }) : { a: false, b: false };
+    const to = touchOpts(40, 'px');
+    const row = (s, on) => [...s].map((ch) => (ch === ' ' ? '<span></span>' : (on && touchDigit(ch, true, to)) || `<span>${ch}</span>`)).join('');
     return `<div class="ws-sheet mq-kit"><div class="ws-fact mq-fact" style="${factGridStyle(n)}" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
-        + `<span></span>${row(A)}<span class="op">${opGlyph(k.op)}</span>${row(B)}<span class="rule"></span>`
+        + `<span></span>${row(A, tn.a)}<span class="op">${opGlyph(k.op)}</span>${row(B, tn.b)}<span class="rule"></span>`
         + `<span class="ws-factans mq-factans">${slotHtml || ''}</span></div></div>`;
 }
 
@@ -289,11 +300,15 @@ export function stackHTML(k, { idPrefix = '', regroup = true, answerClass = 'col
                 + ` aria-label="regroup, ${place}" data-_col-adv-attached="1" data-_box-val-attached="1"></span>`);
         }
     }
+    // S2: touch dots column by column (k.supports, screenSupportsFor).
+    const tmode = k.supports ? (k.supports.on.includes('touchall') ? 'all' : k.supports.on.includes('touch') ? 'on' : null) : null;
+    const tdRows = tmode ? touchColumns(operands, T, k.op, tmode) : null;
+    const to = touchOpts(40, 'px');
     operands.forEach((num, r) => {
         const last = r === operands.length - 1;
         tracks(num).forEach((ch, i) => {
             if (i === 0 && last) cells.push(`<span class="op">${opGlyph(k.op)}</span>`);
-            else cells.push(`<span>${ch === ' ' ? '' : ch}</span>`);
+            else cells.push((tdRows && tdRows[r][i] && touchDigit(ch, true, to)) || `<span>${ch === ' ' ? '' : ch}</span>`);
         });
         if (!last) cells.push('<span class="gap"></span>');
     });
@@ -329,13 +344,55 @@ function spokenOp(op) {
 }
 
 /** The kit drawing for a kind, with the answer slot the host supplies. */
-export function kindHTML(k, { slotHtml = '', idPrefix = '', regroup = true, answerClass = 'column-answer-input' } = {}) {
+export function kindHTML(k, { slotHtml = '', idPrefix = '', regroup = true, answerClass = 'column-answer-input', supports = null } = {}) {
     if (!k) return '';
-    if (k.kind === 'eq') return equationHTML(k, slotHtml);
-    if (k.kind === 'fact') return factHTML(k, slotHtml);
-    if (k.kind === 'division') return divisionHTML(k, slotHtml);
-    if (k.kind === 'stack') return stackHTML(k, { idPrefix, regroup, answerClass });
-    return '';
+    // S2: the item's supports (screenSupportsFor): touch dots on the digits, and the cues, tally
+    // row and panes drawn round the problem by the same code as paper (support-draw.js).
+    const kk = supports && supports.on && supports.on.length ? Object.assign({}, k, { supports }) : k;
+    let html = '';
+    if (kk.kind === 'eq') html = equationHTML(kk, slotHtml);
+    else if (kk.kind === 'fact') html = factHTML(kk, slotHtml);
+    else if (kk.kind === 'division') html = divisionHTML(kk, slotHtml);
+    else if (kk.kind === 'stack') html = stackHTML(kk, { idPrefix, regroup, answerClass });
+    if (!html || kk === k) return html;
+    const p = { a: k.a, b: k.b, op: k.op, operands: k.operands, supports: { ...supports, reserve: [] } };
+    return withSupports(html, p, SCREEN_TEMPLATE[k.kind] || 'fact', { mode: 'screen', size: 'L', metrics: { digitPt: 28 } }, { problemWMm: 60, problemHMm: 40 });
+}
+
+/* ------------------------------------------------------------------ S2 supports on screen */
+
+const SCREEN_TEMPLATE = { eq: 'equation', fact: 'fact', stack: 'stack', division: 'division' };
+
+/**
+ * The supports one screen item carries (design/SUPPORTS.md §S2): its skill's ticked `support`
+ * values (q.skillOptions, the set's options) that this kind can draw, dealt by the same allocator
+ * as paper for item `index` of a session of `total` (so a fade and a problem-by-problem mix work
+ * on the online worksheet and in live practice). null when there is none.
+ */
+export function screenSupportsFor(q, k, { index = 0, total = 1, categoryId = '', skillId = '', options = null } = {}) {
+    if (!q || !k) return null;
+    const o = q.skillOptions || options || {};
+    let def = null;
+    try { def = optionsFor(q.categoryId || categoryId, q.requestedSkillId || q.skillId || skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
+    if (!def && skillId) try { def = optionsFor(categoryId, skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
+    if (!def) return null;
+    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
+    if (!chosen.length) return null;
+    const template = SCREEN_TEMPLATE[k.kind];
+    if (!template) return null;
+    const p = { a: k.a, b: k.b, op: k.op, operands: k.operands };
+    const can = chosen.filter((id) => canDraw(id, p, template));
+    if (!can.length) return null;
+    const need = Object.fromEntries(can.map((id) => [id, supportNeeds(id, p, template)]));
+    const r = supportsForItem(chosen, { index, total, coverage: o.cover || 'whole', mix: o.mix || 'section', can, need });
+    if (!r.on.length) return null;
+    const out = { on: r.on };
+    if (opKey(k.op) === '/') out.tally = Number(o.band) >= 144 ? 12 : 10;
+    if (opKey(k.op) === '*' && Array.isArray(o.constant)) {
+        const cs = o.constant;
+        if (cs.includes(k.a) !== cs.includes(k.b)) out.table = cs.includes(k.a) ? k.a : k.b;
+    }
+    return out;
 }
 
 /**
@@ -1717,4 +1774,23 @@ export function wireDrawnAnswers(cellEl, input, { onChange = null } = {}) {
     });
     input.classList.add('mq-cellslot-host');
     return fam.length || 1;
+}
+
+/**
+ * S2: the supports of a two-number fact the screen host draws with its legacy visual (no kit kind):
+ * the cues, the ÷ tally row and the extras, as HTML to put under that visual. Touch dots need the
+ * kit's digit spans, so they are drawn only on a kit kind. '' when there is nothing to add.
+ */
+export function screenSupportExtrasHTML(q, opts = {}) {
+    if (!q) return '';
+    const p = binaryParts(Object.assign({}, q, { options: [] })) || (Number.isFinite(Number(q.a)) && Number.isFinite(Number(q.b)) && OP_NORM[q.op] ? { a: Number(q.a), b: Number(q.b), op: OP_NORM[q.op] } : null);
+    if (!p) return '';
+    const k = { kind: 'eq', a: p.a, b: p.b, op: p.op };
+    const sup = screenSupportsFor(q, k, opts);
+    if (!sup) return '';
+    const on = sup.on.filter((id) => !(id === 'touch' || id === 'touchall') || opKey(p.op) === '/');
+    if (!on.length) return '';
+    const html = withSupports('<span class="mq-sup-anchor"></span>', { a: p.a, b: p.b, op: p.op, supports: { ...sup, on, reserve: [] } }, 'equation',
+        { mode: 'screen', size: 'L', metrics: { digitPt: 28 } }, { problemWMm: 0, problemHMm: 0 });
+    return `<div class="ws-sheet mq-kit mq-sup-extra" style="margin-top:10px">${html}</div>`;
 }

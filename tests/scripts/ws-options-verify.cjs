@@ -27,6 +27,14 @@
 //   (d) TRIP   optionSuffix() -> decodeOptionPayload() gives back exactly packOptions(value):
 //              the value survives a share link / MX- code.
 //
+// S2 SUPPORTS (design/SUPPORTS.md §S2). A value of the unified `support` set that is drawn at
+// RENDER time (touch dots, a cue, a pane: `def.render`), and the `cover` / `mix` controls that
+// shape them, must NOT change generation (the pupil page, the key and the screen draw supports
+// round the same items). They are checked on PRINT (the sheet differs and carries the support
+// markup, `data-ws-support-on` or touch dots) and on SCREEN (the practice card draws them), and
+// generation is checked to be UNCHANGED. `cover` / `mix` are tried with a support ticked (they
+// only appear then), against that same support at its default spread.
+//
 // plus STATIC checks on the definition itself (label, legal default, codec key, no duplicate
 // value labels) — the machine-checkable part of O5.
 //
@@ -355,14 +363,34 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
     // ---------- the values to try ----------
     const defs = W.offeredOptionsFor(categoryId, skillId);
     const tries = [];
+    const supDef = defs.find(d => d.id === 'support' && d.supportsModel);
+    const supportBase = (defId) => {
+        if (!supDef) return null;
+        const keep = (supDef.default || []).filter(v => !supDef.render.includes(v));
+        if (defId === 'cover') return { support: [...keep, supDef.render[0]] };
+        const clashing = supDef.render.filter(v => !['boxsign', 'startarrow', 'steps', 'round-mark'].includes(v));
+        return { support: [...keep, ...clashing.slice(0, 2)] };
+    };
     for (const def of defs) {
+        if (supDef && (def.id === 'cover' || def.id === 'mix')) {
+            const base = supportBase(def.id);
+            for (const x of def.values) if (JSON.stringify(x.v) !== JSON.stringify(def.default)) tries.push({ def, value: x.v, vl: x.l, base, renderOnly: true });
+            continue;
+        }
         if (def.type === 'bool') { tries.push({ def, value: !def.default }); continue; }
         if (def.type === 'int') { tries.push({ def, value: def.min }, { def, value: def.max }); continue; }
         if (def.type === 'enum') { for (const x of def.values) if (JSON.stringify(x.v) !== JSON.stringify(def.default)) tries.push({ def, value: x.v, vl: x.l }); continue; }
         if (def.type === 'set') {
             const all = def.values.map(x => x.v);
-            for (const x of def.values) if (JSON.stringify([x.v]) !== JSON.stringify(def.default)) tries.push({ def, value: [x.v], vl: x.l });
-            if (all.length > 1 && JSON.stringify(all) !== JSON.stringify(def.default)) tries.push({ def, value: all, vl: def.allLabel || 'all' });
+            const ro = (list) => !!(def.supportsModel && list.every(v => def.render.includes(v)));
+            // A render-time support is tried ON TOP of the default ticks (a rounding skill keeps its
+            // cut line), so the generation rungs are unchanged and only the drawing is under test.
+            for (const x of def.values) {
+                if (JSON.stringify([x.v]) === JSON.stringify(def.default)) continue;
+                if (ro([x.v])) tries.push({ def, value: [...new Set([...(def.default || []), x.v])], vl: x.l, renderOnly: true });
+                else tries.push({ def, value: [x.v], vl: x.l });
+            }
+            if (all.length > 1 && JSON.stringify(all) !== JSON.stringify(def.default)) tries.push({ def, value: all, vl: def.allLabel || 'all', renderOnly: ro(all) });
         }
     }
 
@@ -375,7 +403,8 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         if (def.values) {
             const ls = def.values.map(x => x.l);
             if (new Set(ls).size !== ls.length) statics.push(`${def.id}: duplicate value labels`);
-            if (def.values.length < 2) statics.push(`${def.id}: only one value — a control with no choice`);
+            // A support set of one value is still a choice: one tick box, on or off.
+            if (def.values.length < 2 && !(def.type === 'set' && def.supportsModel)) statics.push(`${def.id}: only one value — a control with no choice`);
             const legal = def.values.map(x => JSON.stringify(x.v));
             const dflt = def.type === 'set' ? def.default : [def.default];
             if (def.type === 'set' ? !dflt.every(d => legal.includes(JSON.stringify(d))) : !legal.includes(JSON.stringify(def.default))) statics.push(`${def.id}: default ${JSON.stringify(def.default)} is not one of its values`);
@@ -413,7 +442,8 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         let res;
         try {
             const r = await W.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId, skillId, opts }], count: 6, columns: 'auto' }], seed: baseSeed, key: true });
-            res = { items: r.items.map(i => ({ text: i.text, ans: i.ans })), pupil: normVisual(r.pupilHtml), key: plain(r.keyHtml).replace(/(\d),(?=\d{3}\b)/g, '$1'), pupilText: plain(r.pupilHtml).replace(/(\d),(?=\d{3}\b)/g, '$1'), title: plain(r.pupilHtml).slice(0, 400) };
+            const marksIn = (html) => { const d = document.createElement('div'); d.innerHTML = html; return d.querySelectorAll('[data-ws-support-on], .ws-td-svg').length; };
+            res = { pupilMarks: marksIn(r.pupilHtml), keyMarks: marksIn(r.keyHtml), items: r.items.map(i => ({ text: i.text, ans: i.ans })), pupil: normVisual(r.pupilHtml), key: plain(r.keyHtml).replace(/(\d),(?=\d{3}\b)/g, '$1'), pupilText: plain(r.pupilHtml).replace(/(\d),(?=\d{3}\b)/g, '$1'), title: plain(r.pupilHtml).slice(0, 400) };
         } catch (e) { res = { error: String(e && e.message || e) }; }
         finally { st.range = saved; st.decimalPlaces = savedDp; }
         sheetCache[key] = res;
@@ -443,13 +473,23 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
                 try { q = W.generateQuestion(); } catch (e) { q = null; }
                 if (q) res.practice.push(q);
             }
-            // one real render into the question card
+            // one real render into the question card (S2: three, counting the supports drawn)
             try {
                 if (res.practice[0]) {
-                    st.currentQ = res.practice[0];
-                    W.renderQuestion();
-                    const card = document.getElementById('questionCard');
-                    res.render = card ? { ok: card.textContent.trim().length > 0 || !!card.querySelector('svg,input,button') } : { ok: false, why: 'no #questionCard' };
+                    const savedHist = st.questionHistory;
+                    res.supportMarks = 0; res.kit = false;
+                    for (let k = 0; k < Math.min(3, res.practice.length); k++) {
+                        st.currentQ = res.practice[k];
+                        st.questionHistory = Array.from({ length: k }, () => ({}));
+                        W.renderQuestion();
+                        const card = document.getElementById('questionCard');
+                        if (k === 0) res.render = card ? { ok: card.textContent.trim().length > 0 || !!card.querySelector('svg,input,button') } : { ok: false, why: 'no #questionCard' };
+                        if (card) {
+                            res.supportMarks += card.querySelectorAll('[data-ws-support-on], .ws-td-svg').length;
+                            res.kit = res.kit || !!card.querySelector('.mq-kit');
+                        }
+                    }
+                    st.questionHistory = savedHist;
                 }
             } catch (e) { res.render = { ok: false, why: String(e && e.message || e) }; }
         } finally {
@@ -465,7 +505,7 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
     const results = [];
     for (const t of tries) {
         const { def, value } = t;
-        const opts = { [def.id]: value };
+        const opts = Object.assign({}, t.base || {}, { [def.id]: value });
         if (dbg) console.log(`[verify] ${categoryId}:${skillId} ${def.id}=${JSON.stringify(value)}`);
         const r = { option: def.id, label: def.label, value, valueLabel: t.vl || String(value), fails: [], warns: [], checks: {} };
         const fail = (surface, msg) => r.fails.push(`${surface}: ${msg}`);
@@ -497,7 +537,12 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         let diff = differs(items, base);
         const errs = items.filter(q => q.__error);
         if (errs.length) fail('gen', `${errs.length} item(s) threw: ${errs[0].__error}`);
-        if (!ownSetting && (!items.length || diff === false)) {
+        if (t.renderOnly) {
+            // S2: a render-time support never changes the generated items.
+            if (!items.length) fail('gen', 'no items');
+            else if (diff === true) fail('gen', 'a render-time support changed the generated items (it must only be drawn round them)');
+            r.checks.gen = r.fails.some(f => f.startsWith('gen:')) ? 'fail' : 'ok';
+        } else if (!ownSetting && (!items.length || diff === false)) {
             const bigItems = gen(opts, bigRange);
             const bigDiff = bigItems.length ? differs(bigItems, dfltAt(bigRange)) : false;
             if (bigItems.length && bigDiff) {
@@ -506,7 +551,8 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
                 range = bigRange; items = bigItems; base = dfltAt(bigRange); diff = true;
             }
         }
-        if (!items.length) { fail('gen', 'no items at any Max Number'); r.checks.gen = 'fail'; }
+        if (t.renderOnly) { /* checked above */ }
+        else if (!items.length) { fail('gen', 'no items at any Max Number'); r.checks.gen = 'fail'; }
         else {
             if (diff === false) fail('gen', 'items identical to the default (the control does nothing)');
             if (diff === null) warn('gen', 'generator not reproducible; difference not checkable, predicate only');
@@ -517,7 +563,7 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         }
 
         // (b) print
-        const ps = await sheet(opts, range), pd = await sheet({}, range);
+        const ps = await sheet(opts, range), pd = await sheet(t.base || {}, range);
         if (ps.error) { fail('print', `buildSheet threw: ${ps.error}`); r.checks.print = 'fail'; }
         else if (!ps.items.length) { fail('print', 'sheet has no items'); r.checks.print = 'fail'; }
         else {
@@ -527,7 +573,15 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             // one dominant kind). That is not a dead control: generation differs and the predicate
             // holds on the default sheet too. Reported as a warning, not a failure.
             const _coincide = () => { const p = runPred(def, value, pd.items || [], 'print'); return p.checked && !p.fails.length && r.checks.gen === 'ok'; };
-            if (same && diff !== null) {
+            if (t.renderOnly) {
+                const marks = (ps.pupilMarks || 0);
+                if (same) {
+                    if (def.id === 'cover' || def.id === 'mix') warn('print', 'printed sheet identical to the default spread (every item already qualified / no clash dealt)');
+                    else fail('print', 'the support is not drawn: printed sheet identical to the default');
+                }
+                if (def.id === 'support' && !marks) fail('print', 'no support drawn on the pupil page ([data-ws-support-on] / touch dots)');
+                if (def.id === 'support' && (ps.keyMarks || 0) !== marks) fail('print', `the key draws ${ps.keyMarks} supports, the pupil page ${marks}`);
+            } else if (same && diff !== null) {
                 if (_coincide()) warn('print', 'printed sheet identical to the default, which already satisfies this value');
                 else fail('print', 'printed sheet identical to the default sheet');
             }
@@ -550,6 +604,18 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
 
         // (c) screen
         const sc = screen(opts, range), sd = screenDflt(range);
+        if (t.renderOnly) {
+            if (!sc.practice.length) fail('screen/practice', 'no items');
+            if (def.id === 'support' && !sc.supportMarks) {
+                const drawsOnScreen = sc.kit && value.some(v => ['touch', 'touchall', 'tile', 'frame', 'line', 'skip', 'array', 'think', 'boxsign', 'startarrow'].includes(v));
+                if (drawsOnScreen) fail('screen/card', 'the support is not drawn on the practice card');
+                else warn('screen/card', 'this screen host does not draw the support yet (print only)');
+            }
+            if (sc.render && !sc.render.ok) fail('screen/card', `render failed: ${sc.render.why || 'empty card'}`);
+            r.checks.screen = r.fails.some(f => f.startsWith('screen')) ? 'fail' : 'ok';
+            results.push(r);
+            continue;
+        }
         for (const [host, list, dl] of [['worksheet', sc.worksheet, sd.worksheet], ['practice', sc.practice, sd.practice]]) {
             if (!list.length) { fail(`screen/${host}`, 'no items'); continue; }
             const dd = differs(list, dl);

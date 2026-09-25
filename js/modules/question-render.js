@@ -11,7 +11,7 @@ import {
     buildRetryMessage,
 } from './widget-retry.js';
 import {
-    cellKindFor, kindHTML, instructionForKind,
+    cellKindFor, kindHTML, instructionForKind, screenSupportsFor, screenSupportExtrasHTML,
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
     regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
     clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget, isNumberLineItem, NUMBER_LINE_INSTRUCTION,
@@ -1454,11 +1454,11 @@ function _applyScreenCell() {
         if (kind.kind === 'stack') {
             // The legacy column visual already answers through digit boxes; the kit stack keeps
             // that path (column-answer-input) and adds heads, regroup boxes and SP-20 entry.
-            visualAid.innerHTML = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill) });
+            visualAid.innerHTML = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill), supports: _supportsOf(q, kind) });
             visualAid.style.display = 'block';
             wireStackEntry(visualAid, { autofocus: !state.hasAnswered });
         } else {
-            visualAid.innerHTML = kindHTML(kind, { slotHtml: '<span class="mq-slothost"></span>' })
+            visualAid.innerHTML = kindHTML(kind, { slotHtml: '<span class="mq-slothost"></span>', supports: _supportsOf(q, kind) })
                 + (kind.kind === 'division' ? workRowsHTML(kind) : '');
             visualAid.style.display = 'block';
             const host = visualAid.querySelector('.mq-slothost');
@@ -1482,6 +1482,11 @@ function _applyScreenCell() {
         paper.classList.add('mq-kind-legacy');
         _applyCardTwin(q, paper, visualAid, qt);
         if (visualAid && visualAid.style.display !== 'none') hideScreenOnlyCaptions(visualAid);
+        // S2: a legacy-drawn fact still carries its ticked cues, tally row and extras under its visual.
+        if (visualAid) {
+            const extra = _legacySupportsHTML(q);
+            if (extra) { visualAid.insertAdjacentHTML('beforeend', extra); visualAid.style.display = 'block'; }
+        }
         if (qt && !paper.classList.contains('mq-twin')) {
             // Said once: the instruction line stays; a copy inside the visual is hidden, or, when
             // the visual says it as part of a larger block, the line is hidden instead.
@@ -7198,3 +7203,24 @@ export function checkOddEvenSelection() {
     }
 }
 
+/**
+ * S2: the supports this practice item carries (screen-cell.js screenSupportsFor): the set's
+ * ticked supports, dealt for this question of the session so a fade or a problem-by-problem mix
+ * works in live play too.
+ */
+function _supportsOf(q, kind) {
+    try {
+        const index = Array.isArray(state.questionHistory) ? state.questionHistory.length : 0;
+        return screenSupportsFor(q, kind, { index, total: state.problemCount > 0 ? state.problemCount : 20,
+            categoryId: state.category, skillId: state.skill, options: state.skillOptions || (state.skillOptionsBySkill || {})[`${state.category}:${state.skill}`] || null });
+    } catch (e) { return null; }
+}
+
+/** S2: the supports of a practice item the kit does not redraw (screen-cell.js screenSupportExtrasHTML). */
+function _legacySupportsHTML(q) {
+    try {
+        const index = Array.isArray(state.questionHistory) ? state.questionHistory.length : 0;
+        return screenSupportExtrasHTML(q, { index, total: state.problemCount > 0 ? state.problemCount : 20,
+            categoryId: state.category, skillId: state.skill, options: state.skillOptions || (state.skillOptionsBySkill || {})[`${state.category}:${state.skill}`] || null });
+    } catch (e) { return ''; }
+}

@@ -38,6 +38,10 @@ import {
     normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, easeScore, ineligibleNote,
     blockPlan, sideItems, pickDistinct,
 } from './sheet/anchors.js';
+import {
+    allocateSupports, alternativesOf, TOUCH_IDS, normCoverage, normMix, TOUCH_MIN_PT,
+    canDraw, supportNeeds, supportOpKey as opKey,
+} from './sheet/index.js';
 
 /* ======================================================================== constants */
 
@@ -95,6 +99,10 @@ function normaliseRequest(req = {}) {
         // S6: step-by-step anchor problems - 'off' | 'side' | 'sections' (only the practice roles
         // and Mixed practice take them; 'on' means the role's default, sections).
         anchors: ANCHOR_ROLES.includes(role) ? normaliseAnchors(req.anchors) : 'off',
+        // S2: how the supports each skill carries are spread over the sheet. null = each skill's
+        // own `cover` / `mix` option (the default: every problem, clashing supports by section).
+        coverage: req.coverage ? normCoverage(req.coverage) : null,
+        mix: req.mix ? normMix(req.mix) : null,
     };
 }
 
@@ -129,8 +137,13 @@ function dealSkills(skills, count) {
  * reprints the same page); a duplicate retries under `baseSeed + i + 7919 * k`. `itemIndex`
  * counts only the items of that skill that were KEPT (generateQuestionFor's contract).
  */
-function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map() } = {}) {
+function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map(), itemCount = null } = {}) {
     const slots = dealSkills(skills, startIndex + count).slice(startIndex);
+    // S2: a ticked support LEVEL fades down the page. With the section's count known it is dealt
+    // in equal blocks of that count; otherwise two items a level (supports.js fadeRung). The same
+    // count for the probe and the final run, so an item is the same item in both.
+    const perSkill = itemCount ? new Map(dealSkills(skills, itemCount).map((s) => [`${s.categoryId}:${s.skillId}`, 0])) : null;
+    if (perSkill) for (const s of dealSkills(skills, itemCount)) { const k = `${s.categoryId}:${s.skillId}`; perSkill.set(k, perSkill.get(k) + 1); }
     const out = [];
     slots.forEach((sk, j) => {
         const i = startIndex + j;
@@ -140,7 +153,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         for (let k = 0; k <= RETRIES; k++) {
             const seed = (baseSeed + i + 7919 * k) >>> 0;
             let cand = null;
-            try { cand = generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex }); } catch (e) { cand = null; }
+            try { cand = generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex, itemCount: perSkill ? perSkill.get(key) : undefined }); } catch (e) { cand = null; }
             if (!cand) continue;
             q = cand;
             if (!seen.has(signature(cand))) break;
@@ -446,14 +459,147 @@ function sentenceHtml(sf, c, ink) {
     }).join('')}</div>`;
 }
 
+/* ============================================================= S2 · the supports model */
+
+/**
+ * The supports one item COULD carry (design/SUPPORTS.md §S2): the render-time values of its
+ * skill's unified `support` set that this item's cell can draw. null when there are none. The item
+ * is measured with all of them (the worst case); the allocator later says which it draws, and the
+ * rest are drawn invisibly, so the geometry never changes between measurement and print.
+ */
+function supportPlanFor(sk, q, template, size, mix = null) {
+    if (!sk || !q || !q.cell || template === 'legacy') return null;
+    let def = null;
+    try { def = optionsFor(sk.categoryId, sk.skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
+    if (!def) return null;
+    const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
+    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
+    if (!chosen.length) return null;
+    const p = q.cell.payload || {};
+    let worst = chosen.filter((id) => canDraw(id, p, template));
+    if (!worst.length) return null;
+    // Section by section across a page of several sections, a section only ever carries ITS
+    // alternative (supports.js deals mixKey % alternatives), so that is all it keeps room for.
+    const mixMode = n_mix(mix) || o.mix || 'section';
+    if (mix && mix.count >= 2 && mixMode === 'section') {
+        const alts = alternativesOf(chosen);
+        if (alts.length > 1) {
+            const alt = alts[(Number.isFinite(mix.alt) ? mix.alt : mix.key) % alts.length];
+            worst = worst.filter((x) => alt.includes(x));
+            if (!worst.length) return null;
+        }
+    }
+    const need = Object.fromEntries(worst.map((id) => [id, supportNeeds(id, p, template)]));
+    const touch = worst.some((x) => TOUCH_IDS.includes(x));
+    // Touch dots need 24 pt digits: a stack or a sentence at M / S is drawn at L (owner ruling); a
+    // fact takes the fact ladder, capped at 6 columns (24 pt) by its footprint.
+    const forceL = touch && template !== 'fact' && (SIZES[size] || SIZES.L).digitPt < TOUCH_MIN_PT;
+    const extra = {};
+    const op = opKey(p.op);
+    if (op === '*' && Array.isArray(o.constant)) {
+        const a = Number(p.a), b = Number(p.b), cs = o.constant;
+        if (cs.includes(a) !== cs.includes(b)) extra.table = cs.includes(a) ? a : b;
+    }
+    // ÷: the tally row is the same length for every item of the section: 12 on a 12s set.
+    if (op === '/') extra.tally = Number(o.band) >= 144 ? 12 : 10;
+    return {
+        chosen, worst, need, forceL, extra,
+        cover: o.cover || 'whole', mix: o.mix || 'section',
+    };
+}
+
+/**
+ * S2: one section of one skill whose ticked supports clash, mixed by section, split into one
+ * sub-section per alternative (dealt like a grouped section: counts by share, or a page shared).
+ */
+function splitBySupports(sec, gi, n) {
+    if (sec.group || !sec.skills || sec.skills.length !== 1) return [sec];
+    const sk = sec.skills[0];
+    let def = null;
+    try { def = optionsFor(sk.categoryId, sk.skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
+    if (!def) return [sec];
+    const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
+    if ((n.mix || o.mix || 'section') !== 'section') return [sec];
+    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
+    const alts = alternativesOf(chosen);
+    // Up to four alternatives. A page-driven split is checked once its parts are measured (buildSheet
+    // undoes it when one row of each does not fit a page, or when it holds fewer problems than the
+    // one section). Beyond four the alternatives are dealt in blocks inside the one section.
+    if (alts.length < 2 || alts.length > 4) return [sec];
+    const k = alts.length;
+    const counts = sec.count ? alts.map((_, i) => Math.floor(sec.count / k) + (i < sec.count % k ? 1 : 0)) : null;
+    return alts.map((_, i) => Object.assign({}, sec, {
+        count: counts ? counts[i] || null : null,
+        group: { id: `sup${gi}`, share: 1 / k },
+        supportAlt: i,
+    })).filter((x) => !counts || x.count);
+}
+
+/** The sheet-level mix, when the request sets one. */
+const n_mix = (mix) => (mix && mix.sheet) || null;
+
+/** A fact cell spec for a two-number fact the legacy path draws, when its skill ticks a support. */
+const KIT_OP = { '+': '+', '-': '-', '−': '-', '×': '*', 'x': '*', '*': '*', '÷': '/', '/': '/' };
+function supportFactSpec(sk, q) {
+    if (!sk || !q || !Number.isInteger(Number(q.a)) || !Number.isInteger(Number(q.b)) || !KIT_OP[q.op]) return null;
+    if (q.notation === 'fraction' || String(q.a).length > 2 || String(q.b).length > 2 || (q.answerType && q.answerType !== 'number')) return null;
+    let def = null;
+    try { def = optionsFor(sk.categoryId, sk.skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
+    if (!def) return null;
+    const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
+    if (!(Array.isArray(o.support) ? o.support : []).some((v) => def.render.includes(v))) return null;
+    const op = KIT_OP[q.op];
+    return { template: 'fact', payload: { a: Number(q.a), b: Number(q.b), op, notation: q.notation === 'across' ? 'horiz' : 'vertical', digits: 2 } };
+}
+
+/**
+ * Deal the supports over a sheet's items (supports.js allocateSupports), in page order, grouped
+ * by section (a Mixed practice shelf is its pool). Writes each item's box, which its draw reads.
+ */
+function allocateHostSupports(items, n) {
+    const list = items.filter((it) => it && it.supportsBox && it.supportsBox.plan);
+    if (!list.length) return;
+    // A More Practice set's letters are ONE sheet (coordinator, 2026-09-25): a skill fades down the
+    // whole set, and its section is dealt across the letters, A before B.
+    const skillKey = (it) => it.skill;
+    const chosen = {}, cover = {}, mix = {};
+    for (const it of list) {
+        const pl = it.supportsBox.plan;
+        chosen[skillKey(it)] = pl.chosen;
+        cover[skillKey(it)] = n.coverage || pl.cover;
+        mix[skillKey(it)] = n.mix || pl.mix;
+    }
+    // A section is a section of the sheet (every More Practice letter of it), or a Mixed practice
+    // pool.
+    const keys = new Map();
+    const keyOf = (it) => {
+        const k = it.pool !== undefined && it.pool !== null ? `p${it.pool}` : `s${it.section || 0}`;
+        if (!keys.has(k)) keys.set(k, keys.size);
+        return keys.get(k);
+    };
+    const alloc = allocateSupports(list.map((it) => ({
+        section: keyOf(it), skill: skillKey(it), can: it.supportsBox.plan.worst, need: it.supportsBox.plan.need, mixKey: it.supportsBox.mixKey,
+    })), chosen, { coverage: cover, mix });
+    list.forEach((it, i) => {
+        const b = it.supportsBox;
+        const r = alloc[i];
+        // Everything the item could carry that it does not draw is reserved (drawn invisibly).
+        const reserve = b.plan.worst.filter((x) => !r.on.includes(x));
+        b.cur = Object.assign({}, b.plan.extra, { on: r.on, reserve });
+        b.level = r.level;
+    });
+}
+
 /**
  * Turn one generated question into a host item: the question carrying its cell spec, a draw
  * function (the SAME one for the pupil page, the key and the measurement), the key, and the
  * class tokens the role writes onto the cell.
  */
-function hostItem(g, sectionIndex, size) {
+function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = null } = {}) {
     const q0 = g.q;
-    const resolved = kitCellSpec(q0);                 // a registered template, or null -> legacy
+    // S2: a legacy-drawn fact (sub_facts' vertical fact) that carries supports is drawn by the kit's
+    // fact template, which can draw them - the same upgrade the old fact cue made in the generator.
+    const resolved = kitCellSpec(q0) || (withSupports ? supportFactSpec(g.skill, q0) : null);
     const q = Object.assign({}, q0);
     let template;
     if (resolved) {
@@ -468,6 +614,13 @@ function hostItem(g, sectionIndex, size) {
     }
     const legacy = template === 'legacy';
     const printSize = getSkillPrintSize(q0.skillId || '', q0.printFormat || '');
+    // S2: the supports this item may carry. Until the sheet is allocated it draws the worst case
+    // (every support it could carry), which is what it is measured at; the allocation then swaps
+    // what it does not draw for invisible reserve, so the geometry is the one measured.
+    const supportsBox = { plan: withSupports ? supportPlanFor(g.skill, q, template, size, mix) : null, cur: null, level: 3, mixKey: mix ? mix.key : undefined };
+    if (supportsBox.plan) supportsBox.cur = Object.assign({}, supportsBox.plan.extra, { on: supportsBox.plan.worst.slice(), reserve: [] });
+    const forceL = !!(supportsBox.plan && supportsBox.plan.forceL);
+    const atL = (c) => (forceL && c.size !== 'L' ? Object.assign({}, c, { size: 'L', metrics: resolveCtx({ size: 'L', look: c.look }).metrics }) : c);
     // The draw function. `cols` is the section's final column count, handed in by the role:
     // the legacy template picks its size class from it, the fact ladder its digit size.
     const key = cellAnswerKey(q);
@@ -507,11 +660,18 @@ function hostItem(g, sectionIndex, size) {
             if (ink === 'trace' && v === answer) st = 'traced';
             else { st = 'wrong'; wrong = { value: v, slots: Object.assign({}, shownSlots || {}) }; }
         }
-        const ctx = Object.assign({}, c, { state: legacy && hasShown ? 'blank' : st, wrong, columns: cols, options: Object.assign({}, c.options || {}, { factColumns: cols }) });
+        const ctx = Object.assign({}, atL(c), { state: legacy && hasShown ? 'blank' : st, wrong, columns: cols, options: Object.assign({}, c.options || {}, { factColumns: cols }) });
         // `payload`: a role asks the template for a variant of this cell (Error analysis asks a drawn
-        // model for its redraw zone, `fix: 'draw'`); the item itself is never changed.
-        const qd = payload && !legacy && q.cell && q.cell.payload ? Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, payload) }) }) : q;
-        const html = legacy ? legacyClean(renderCell(q, ctx)) : renderCell(qd, ctx);
+        // model for its redraw zone, `fix: 'draw'`); the item itself is never changed. S2: the
+        // item's supports ride in the payload the same way (`supports`), so the pupil page, the key
+        // and the measurement all draw what the allocator dealt.
+        const sp = !legacy && supportsBox.cur ? { supports: supportsBox.cur } : null;
+        const pl = sp ? Object.assign({}, sp, payload || {}) : payload;
+        const qd = pl && !legacy && q.cell && q.cell.payload ? Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, pl) }) }) : q;
+        // S2: touch dots need 24 pt digits, so a forced section draws its problems at L inside a
+        // smaller page (the preset's custom properties re-set on a wrapper; the page stays M / S).
+        const html0 = legacy ? legacyClean(renderCell(q, ctx)) : renderCell(qd, ctx);
+        const html = forceL && c.size !== 'L' ? `<div class="ws-L" data-ws-force-size="L">${html0}</div>` : html0;
         if (legacy && hasShown) {
             const v = String(shown);
             // A wrong value is written as a pupil would have written it: a place-value mat draws
@@ -540,7 +700,8 @@ function hostItem(g, sectionIndex, size) {
         return showable;
     };
     let fp;
-    try { fp = cellFootprint(q, resolveCtx({ mode: 'print', size, look: 'ican' })); } catch (e) { fp = { wMm: 93, hMm: null, measure: true, maxCols: 2 }; }
+    const qFoot = supportsBox.cur ? Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { supports: supportsBox.cur }) }) }) : q;
+    try { fp = cellFootprint(qFoot, resolveCtx({ mode: 'print', size: forceL ? 'L' : size, look: 'ican' })); } catch (e) { fp = { wMm: 93, hMm: null, measure: true, maxCols: 2 }; }
     if (legacy) {
         // SCC-A6: a legacy cell is sized by measurement. Its size class caps the columns only for
         // word problems (PT-WPR-1); everything else is decided by what the measurement shows.
@@ -580,6 +741,8 @@ function hostItem(g, sectionIndex, size) {
         cellCls: legacy ? 'mq-legacy' : '',
         key,
         canShow,
+        // S2: the supports box (shared by every clone a role makes of this item) and what it holds.
+        supportsBox,
     };
     return item;
 }
@@ -761,6 +924,9 @@ function measureItems(items, { size, look, colsList }) {
         // collapsed, and that column count does not fit (DN-10: content never shrinks or
         // re-arranges to fit). A wrapped line of text costs a few mm and is not a collapse.
         for (const it of items) {
+            // S2: a support stands BESIDE its problem where the cell is wide enough and under it
+            // where it is not, so a wide cell is shorter by design, not a collapse.
+            if (it.supportsBox && it.supportsBox.plan) continue;
             const m = it.measured || {};
             const base = m[cols[0]] && m[cols[0]].hMm;
             if (!base) continue;
@@ -912,7 +1078,7 @@ function anchorSet(sk, si, n, { variant, colsList, twinCols }) {
             try { q = generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: 0 }); } catch (e) { q = null; }
             if (!q || seen.has(signature(q))) continue;
             seen.add(signature(q));
-            const it = hostItem({ q, skill: sk }, si, n.size);
+            const it = hostItem({ q, skill: sk }, si, n.size, { supports: false });
             if (eligible === null) eligible = anchorEligible(it);
             if (!eligible) return;
             const a = anchorItem(it, { variant, twinCols });
@@ -1014,6 +1180,12 @@ export async function buildSheet(req = {}) {
             group: { id: gi, share: tw > 0 ? w[i] / tw : 1 / sec.skills.length },
         })).filter((x) => !dealt || x.count);
     });
+    // S2: a sheet of ONE section whose skill ticks supports that clash, mixed section by section,
+    // becomes one sub-section per alternative (section A touch dots, section B dot tiles). Each
+    // sub-section lays out and reserves room for its OWN support only, so a page is as full as it
+    // is without supports, less that support's own size.
+    const unsplit = n.sections;
+    if (n.sections.length === 1 && n.role === 'independent' && n.anchors === 'off') n.sections = n.sections.flatMap((sec, gi) => splitBySupports(sec, gi, n));
 
     const skills = n.sections.flatMap((s) => s.skills.map(metaOf));
     const titles = [...new Set(skills.map((s) => s.iCan))];
@@ -1056,8 +1228,9 @@ export async function buildSheet(req = {}) {
     const floorWith = (si, items) => floorOf(anchorMode === 'side' && anchorSets[si] ? items.concat(anchorSets[si].items) : items, n);
 
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
-        const gen = generateRun(sec.skills, count, baseSeed, extra);
-        return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size)], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
+        const gen = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null }, extra));
+        const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix, alt: sec.supportAlt };
+        return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size, { mix })], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
     };
 
     const notes = [];
@@ -1111,7 +1284,24 @@ export async function buildSheet(req = {}) {
             // S6 sections: every member keeps room for its anchor band too.
             const band = (si) => (anchorMode === 'sections' && anchorSets[si] ? n.sections[si].anchorMm || 0 : 0);
             const avail = body - members.length * instr;
-            const need = members.map((si) => layouts[si].hMin + 1 + band(si));
+            // S6 side by side in ONE column: a twin sits above its problem, so a member's least is a
+            // PAIR of rows (practice.js layoutSheet pages whole pairs), not one row.
+            const pairOf = (si) => (anchorMode === 'side' && anchorSets[si] && anchorSets[si].items.length && layouts[si].cols === 1 ? 2 : 1);
+            const needOf = (si) => layouts[si].hMin * pairOf(si) + 1 + band(si);
+            let need = members.map(needOf);
+            // S6 sections: when the members' bands and one row each do not fit one page, every
+            // member takes the COMPACT band (one state, steps beside; Mixed practice's), so a page of
+            // several skills stays one page instead of spilling a section overleaf.
+            if (anchorMode === 'sections' && need.reduce((a, v) => a + v, 0) > avail) {
+                for (const si of members) {
+                    if (!anchorSets[si]) continue;
+                    const compact = anchorSet(n.sections[si].skills[0], si, n, { variant: 'compact', colsList: [1], twinCols: 4 });
+                    if (!compact.eligible || !compact.items.length) continue;
+                    anchorSets[si] = compact;
+                    n.sections[si].anchorMm = compact.heightMm(1);
+                }
+                need = members.map(needOf);
+            }
             const tw = members.reduce((a, si) => a + n.sections[si].group.share, 0) || 1;
             let h = members.map((si) => avail * n.sections[si].group.share / tw);
             // Every member gets at least one row; the others give up the height it lacks.
@@ -1119,8 +1309,16 @@ export async function buildSheet(req = {}) {
                 if (h[k] >= need[k]) continue;
                 const lack = need[k] - h[k];
                 h[k] = need[k];
-                const donors = members.map((_, j) => j).filter((j) => j !== k && h[j] - lack >= need[j]);
-                if (donors.length) h[donors.reduce((a, j) => (h[j] > h[a] ? j : a), donors[0])] -= lack;
+                // The lack is taken from the others' spare room, largest spare first, several donors
+                // if need be (one donor alone often cannot give a whole row).
+                let left = lack;
+                const donors = members.map((_, j) => j).filter((j) => j !== k && h[j] > need[j]).sort((x, y) => (h[y] - need[y]) - (h[x] - need[x]));
+                for (const j of donors) {
+                    if (left <= 0) break;
+                    const give = Math.min(left, h[j] - need[j]);
+                    h[j] -= give;
+                    left -= give;
+                }
             }
             members.forEach((si, k) => {
                 const sec = n.sections[si];
@@ -1135,12 +1333,38 @@ export async function buildSheet(req = {}) {
     let probesOf = () => [];
 
     if (n.role === 'independent') {
-        const probes = n.sections.map((sec, si) => {
+        const makeProbes = () => n.sections.map((sec, si) => {
             const base = (n.seed + si * 100003) >>> 0;
             const probe = probeRun(sec, si, base);
             sec.floor = floorWith(si, probe.items);
             return { base, probe };
         });
+        let probes = makeProbes();
+        // S2: the sub-sections of a support split share the page. When one row of each does not
+        // fit one page, the split is undone: the alternatives are dealt in blocks in one section.
+        if (n.sections !== unsplit && n.sections.some((sec) => !sec.count)) {
+            const body = bodyHeightMm(paper, layoutHeader) - 1;
+            // One row of each at its TALLEST column count: a supported cell is shorter where its
+            // support stands beside it, and the shared page may pick a narrower column.
+            const tallest = (sec) => Math.max(0, ...Object.values(sec.floor || {}).filter((f) => f && f.fits !== false).map((f) => f.hMm || 0));
+            const need = n.sections.reduce((a, sec, si) => a + instrMm + Math.max(tallest(sec), layoutOf(n.role, sec, probes[si].probe.items, n, lctx).hMin) + 1, 0);
+            let undo = need > body;
+            if (!undo) {
+                // Keep the split only when it holds at least as many problems as the one section
+                // (two instruction lines and two part-rows can cost more than the reserve saves).
+                const splitSecs = n.sections;
+                const splitProbes = probes;
+                probesOf = (si) => splitProbes[si].probe.items;
+                const splitCap = shareRows(splitSecs.map((sec, si) => layoutOf(n.role, sec, splitProbes[si].probe.items, n, lctx)))
+                    .reduce((a, v) => a + (v || 0), 0);
+                n.sections = unsplit.map((sec) => Object.assign({}, sec));
+                const one = makeProbes();
+                const oneCap = capFromL(n.sections[0], 0, layoutOf(n.role, n.sections[0], one[0].probe.items, n, lctx));
+                if (oneCap >= splitCap) probes = one;
+                else { n.sections = splitSecs; probes = splitProbes; }
+            }
+            if (undo) { n.sections = unsplit.map((sec) => Object.assign({}, sec)); probes = makeProbes(); }
+        }
         probesOf = (si) => probes[si].probe.items;
         const shared = shareRows(n.sections.map((sec, si) => layoutOf(n.role, sec, withTwins(si, probes[si].probe.items), n, lctx)));
         n.sections.forEach((sec, si) => {
@@ -1235,6 +1459,9 @@ export async function buildSheet(req = {}) {
         });
         anchorsIn = { mode: anchorMode, bySection, bandMm };
     }
+
+    // S2: deal the supports over the finished sheet (page order), before it is drawn.
+    allocateHostSupports(hostItems, n);
 
     const input = {
         items: hostItems,
@@ -1373,7 +1600,7 @@ async function buildRoleSheet(n, metaOf) {
             next += batch;
             for (const g of gen) {
                 if (out.length >= want) break;
-                const it = settlePrompts([hostItem(g, 0, n.size)], metaOf(g.skill).instructionKey)[0];
+                const it = settlePrompts([hostItem(g, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
                 // Error analysis never falls back to an "Answer:" line under the cell: the shown work
                 // must sit in the cell's own slot, or the pupil sees two answer places (C1).
                 if (needsShow && (pass < 3 || strictShow) && !it.canShow()) continue;
@@ -1449,6 +1676,8 @@ async function buildRoleSheet(n, metaOf) {
         items = items.concat(its);
     });
     input.items = items;
+    // S2: deal the supports over the page's items (a pool of Mixed practice is its own section).
+    allocateHostSupports(items, n);
     if (anchorsIn) {
         // Never one of the pupil's problems; a band never taller than the one the packing reserved.
         for (const [id, e] of Object.entries(anchorsIn.byPool)) {

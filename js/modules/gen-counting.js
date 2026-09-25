@@ -36,6 +36,7 @@ import { randInt, shuffle, pick } from './utils.js';
 import { MONO, MONO_STROKE } from './design-tokens.js';
 import { k2Twin, K2_SHAPES } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
+import { fadeRung } from './sheet/index.js';
 
 /* ================================================= P11 · the teacher's options (skill-options.js) */
 // The K-2 options P11_K2_OPTIONS declares (count to, objects, arrangement, support level, compare
@@ -56,7 +57,8 @@ function _kLevel(fallback = 1) {
     t = Array.isArray(t) ? t.map(Number).filter(Number.isFinite) : [];
     if (!t.length) return fallback;
     t = t.slice().sort((x, y) => y - x);
-    return t[((_kAt % t.length) + t.length) % t.length];
+    // S2: a fade down the page (sheet/supports.js fadeRung), never a cycle, on a printed page.
+    return t[fadeRung(_kAt, t.length, state.itemCount, Number.isFinite(state.itemIndex))];
 }
 /** Scattered positions (mm) for `n` objects: a jittered lattice with empty cells, never touching. */
 function _kScatter(n, rng) {

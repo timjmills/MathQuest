@@ -198,6 +198,17 @@ const nonDefault = (d) => {
     const e = vs.find((v) => !eq(v, d.default));
     return e === undefined ? null : e;
 };
+const oldTokenKnown = (optId, v) => typeof v === 'number' || !!(OLD.VALUE_TOKENS[optId] && Object.prototype.hasOwnProperty.call(OLD.VALUE_TOKENS[optId], v));
+function oldKnown(cat, id, packed) {
+    const out = {};
+    let dropped = false;
+    for (const [k, v] of Object.entries(packed)) {
+        if (Array.isArray(v)) { const f = v.filter((x) => oldTokenKnown(k, x)); dropped = dropped || f.length !== v.length; out[k] = f; }
+        else if (typeof v === 'string' && !oldTokenKnown(k, v)) dropped = true;
+        else out[k] = v;
+    }
+    return dropped ? SO.packOptions(cat, id, SO.normalizeOptions(cat, id, out)) : packed;
+}
 const stripMulti = (payload) => payload.split('_').filter((f) => f && !REG.MULTI_KEY_RE.test(f)).join('_');
 let multiSkills = 0, codes = 0;
 for (const [cat, id] of live) {
@@ -244,7 +255,9 @@ for (const [cat, id] of live) {
             return body.length === 1 ? known.has(body) : true;
         };
         const oneLetter = stripMulti(payload).split('_').filter((f) => f && oldKnows(f)).join('_');
-        const expectOld = oneLetter ? NEW.decodeOptionPayload(cat, id, oneLetter) : {};
+        // S2: a SET field may mix known and new tokens (the support set's touch dots and panes); the
+        // deployed decoder drops the new values of it and reads the rest.
+        const expectOld = oneLetter ? oldKnown(cat, id, NEW.decodeOptionPayload(cat, id, oneLetter)) : {};
         if (!eq(oldRead, expectOld)) fail(`${tag}: the DEPLOYED decoder read ${JSON.stringify(oldRead)}, want ${JSON.stringify(expectOld)}`);
         if (!oneLetter && !eq(oldRead, {})) fail(`${tag}: the DEPLOYED decoder did not load the defaults`);
         // The deployed ENCODER's code for the same options (one-letter only) reads identically in both.

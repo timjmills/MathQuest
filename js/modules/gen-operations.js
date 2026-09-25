@@ -8,7 +8,7 @@ import { optionsFor, normalizeOptions } from './skill-options.js';
 import { genCountByTables, genMultChart, genHopLine } from './gen-mult-patterns.js';
 const _MP_SKILLS = new Set(['count_by_tables', 'mult_chart', 'mult_chart_easy', 'mult_chart_medium', 'mult_chart_hard', 'nl_mult', 'nl_div']);
 import { stripSegStyle, stripPos } from './sheet/tokens.js';
-import { renderCell as _kitRender, factCue as _factCue } from './sheet/index.js';
+import { renderCell as _kitRender, fadeRung } from './sheet/index.js';
 
 // ========================================
 // HOW IT IS WRITTEN — the `notation` option (skill-options.js)
@@ -200,7 +200,8 @@ function supportLevelFor(fallback = 1) {
     if (!ticked.length) ticked = [fallback];
     ticked = ticked.slice().sort((x, y) => y - x);   // most support first (P-4.2)
     const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _constantCursor;
-    return ticked[((at % ticked.length) + ticked.length) % ticked.length];
+    // S2 (owner ruling 2026-09-25): a FADE DOWN THE PAGE, not a cycle (sheet/supports.js fadeRung).
+    return ticked[fadeRung(at, ticked.length, state.itemCount, Number.isFinite(state.itemIndex))];
 }
 
 // ========================================
@@ -2236,30 +2237,12 @@ function _applyOptionPost(q, selected, routed) {
         }
     }
 
-    // --- the fading hint cue under a fact ---------------------------------------------------
-    const cue = _opt('support');
-    const cueKinds = ['tile', 'frame', 'line', 'skip', 'array', 'think'];
-    const factHost = ['add_facts', 'sub_facts', 'mult_facts', 'div_facts'].includes(selected)
-        || (_RANGED_RE.test(routed) && RANGE_MAP[routed.match(_RANGED_RE)[2]] <= 20 && !(routed.endsWith('_10_regroup') && q.bridgeParts));
-    if (factHost && cueKinds.includes(cue) && Number.isFinite(Number(q.a)) && Number.isFinite(Number(q.b)) && q.notation !== 'fraction' && !q.bridgeWritten) {
-        const op = _KIT_OP[q.op];
-        if (op) {
-            const a = Number(q.a), b = Number(q.b);
-            if (!q.cell || q.cell.template !== 'fact') {
-                q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: q.notation === 'across' ? 'horiz' : 'vertical', digits: 2 } };
-            }
-            q.cell = { ...q.cell, payload: { ...q.cell.payload, cue } };
-            q.cueKind = cue;
-            // On screen the host redraws a `facts-column-visual` fact from its numbers alone and
-            // would drop the cue, so a cued fact is shown as its number sentence with the cue under
-            // it and the host's answer box (paper keeps the vertical fact and the cue together).
-            const base = /facts-column-visual|column-answer-input/.test(String(q.visual || '')) ? '' : (q.visual || '');
-            const svg = _factCue({ a, b, op, cue }, { px: 4.5 });
-            const w = Number((/width="(\d+)"/.exec(svg) || [])[1]) || 160;
-            // The card's stylesheet stretches a bare SVG to its width, so the cue is held at its size.
-            q.visual = `${base}<div class="mq-factcue" style="margin:10px auto 0;max-width:${w}px;text-align:center;">${svg}</div>`;
-        }
-    }
+    // --- the hint cue under a fact: NOT drawn here any more (S2, design/SUPPORTS.md §S2) --------
+    // `support` is the unified set of supports, drawn at RENDER time round the problem the
+    // generator made (sheet/support-draw.js, via the allocator in print-sheet.js and the screen
+    // hosts). Baking a cue into `q.cell.payload.cue` and `q.visual` here drew it twice and turned a
+    // cued fact into a legacy cell on screen; the generated item is now the same with or without a
+    // support, so the pupil page, the key and the screen agree.
 
     // --- pictures off (word problems, the ≤ 5 picture sums) ---------------------------------
     if (_opt('pictures') === false) {
