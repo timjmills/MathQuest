@@ -172,6 +172,20 @@ export const SHAPES = Object.freeze({
         plural: 'fish', one: 'fish',
         draw: (cx, cy, d) => art(cx, cy, d, (o, i) => `<path d="M1.6 12C5 2.6 13.5 2.4 17.6 10.4L22.4 5.2L22.4 18.8L17.6 13.6C13.5 21.6 5 21.4 1.6 12Z" ${o}/><path d="M8.8 6.4C10.6 9.8 10.6 14.2 8.8 17.6" ${i}/><circle cx="5.6" cy="10.2" r="0.9" fill="${INK}"/>`),
     },
+    // O6 AP1 (2026-09-25): a fourth picture, so "Sort & Count" can deal four kinds of picture.
+    // Five round petals round a centre on a short stem with one leaf; one outline path per part.
+    flower: {
+        plural: 'flowers', one: 'flower',
+        draw: (cx, cy, d) => art(cx, cy, d, (o, i) => {
+            let petals = '';
+            for (let k = 0; k < 5; k++) {
+                const a = -Math.PI / 2 + k * 2 * Math.PI / 5;
+                petals += `<circle cx="${n2(12 + 4.6 * Math.cos(a))}" cy="${n2(9.2 + 4.6 * Math.sin(a))}" r="3.3" ${o}/>`;
+            }
+            return `<path d="M12 14.4V23.2" ${o}/><path d="M12 20.2C13.4 17.6 16.4 16.8 18.6 17.4C17.6 19.8 14.6 20.8 12 20.2Z" ${i}/>`
+                + `${petals}<circle cx="12" cy="9.2" r="2.4" ${o}/>`;
+        }),
+    },
 });
 function art(cx, cy, d, fn) {
     const s = d / 24;

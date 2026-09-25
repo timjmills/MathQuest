@@ -785,7 +785,7 @@ function p8Rules(items, F) {
  *                     printed neighbours show the step, and the skill deals several steps
  */
 const K2_PICTURE_SKILLS = new Set(['count_objects', 'number_seq_fill', 'compare_groups', 'number_bonds', 'base10_build',
-    'hundreds_chart_fill', 'ten_frame_build', 'share_into_groups', 'add_wp_10', 'sub_5_pictures']);
+    'hundreds_chart_fill', 'ten_frame_build', 'share_into_groups', 'add_wp_10', 'sub_5_pictures', 'number_chart_fill']);
 function pictureRules(items, F) {
     const live = items.filter(it => it && !it.error && !it.empty);
     if (!live.length) return;
@@ -820,7 +820,11 @@ function pictureRules(items, F) {
             const rows = p.rows || [], cols = p.cols || [], blanks = (p.blanks || []).map(Number);
             const inWin = (n) => rows.includes(Math.floor((n - 1) / 10)) && cols.includes((n - 1) % 10);
             const key = (it.keyParts || [String(it.ans)]).map(Number);
-            if (rows.length !== 3 || cols.length !== 5 || rows.some(r => r < 0 || r > 9) || cols.some(c => c < 0 || c > 9)) bad.push('the window is not 3 x 5 on the chart');
+            // 2026-09-25 (owner): a window is 1 to 3 consecutive chart rows (the chart to 10 is its
+            // one row; number_chart_fill runs past row 9) by 5 columns (4 on number_chart_fill), or by the whole row of 10.
+            const consecutive = (a) => a.every((v, i) => !i || v === a[i - 1] + 1);
+            if (rows.length < 1 || rows.length > 3 || !(cols.length === 4 || cols.length === 5 || cols.length === 10) || !consecutive(rows) || !consecutive(cols)
+                || rows.some(r => r < 0 || r > 999) || cols.some(c => c < 0 || c > 9)) bad.push(`the window is not 1-3 rows x 4, 5 or 10 columns of the chart (${rows.length} x ${cols.length})`);
             if (!blanks.length || blanks.some(b => !inWin(b))) bad.push(`a gap outside its window (${blanks.join(', ')})`);
             if (key.join(',') !== blanks.slice().sort((a, b) => a - b).join(',')) bad.push(`the key ${key.join(', ')} is not the gaps ${blanks.join(', ')} in reading order`);
             for (const b of blanks) {
@@ -831,7 +835,8 @@ function pictureRules(items, F) {
             }
         }
         if (bad.length) F('chart-window', `${bad.length} chart windows are wrong: ${show(bad)}`);
-        if (chart.length >= 20 && spots.size < 8) F('chart-window', `the gaps sit in only ${spots.size} of the window's 15 places across ${chart.length} items: deal them over the window`);
+        const places = Math.max(...chart.map(it => ((it.cellP || {}).rows || []).length * ((it.cellP || {}).cols || []).length));
+        if (chart.length >= 20 && spots.size < Math.min(8, places - 2)) F('chart-window', `the gaps sit in only ${spots.size} of the window's ${places} places across ${chart.length} items: deal them over the window`);
     }
     // seq-track
     const seq = live.filter(it => it.cellT === 'seqstrip');

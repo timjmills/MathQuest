@@ -347,7 +347,8 @@
       "shapes": "S",
       "pictures": "P",
       "frame": "F",
-      "dice": "D"
+      "dice": "D",
+      "blocks": "B"
     },
     "touch": {},
     "cover": {

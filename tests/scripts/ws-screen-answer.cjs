@@ -41,6 +41,7 @@ const PV = [
 const SKILLS = (arg('skills', '') || '').split(',').map(s => s.trim()).filter(Boolean);
 const LIST = SKILLS.length ? SKILLS : arg('family', '') === 'pv' ? PV : DEFAULT;
 const HOSTS = (arg('hosts', 'card,worksheet,quiz') || '').split(',');
+const OPTS = (() => { const v = arg('opts', null); return v ? JSON.parse(v) : null; })();
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // In the page: decide what the pupil does in one cell to give the right answer. Every target is
@@ -281,6 +282,9 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
         // over from one skill must not replace the next skill's item mid-entry
         await page.reload({ waitUntil: 'networkidle2' });
         await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS, { timeout: 30000 });
+        // --opts '{"band":10}' (O6, 2026-09-25): the skill's options in the set's option store, which
+        // the card, the online worksheet and the quiz all read, so a non-default value is answered too.
+        if (OPTS) await page.evaluate((c, k, o) => { window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, o, { silent: true }); }, c, k, OPTS);
         if (HOSTS.includes('card')) {
             await page.evaluate((c, k, seed) => {
                 if (window.__wsReseed) window.__wsReseed(seed);

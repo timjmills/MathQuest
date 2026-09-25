@@ -337,7 +337,31 @@ registerSkill('composing:base10_build_hundreds', {
     wrongAnswer: blockWrong,
 });
 
-/* ===================================================================== hundreds_chart_fill */
+/* ================================================== hundreds_chart_fill, number_chart_fill */
+
+/**
+ * The worked steps of a chart window, reading only the numbers the WINDOW prints (2026-09-25:
+ * a window of one row, the chart to 10, has no number above or below; a steps line naming one
+ * pointed the pupil at a number that is not on the page). `t` is the first gap.
+ */
+function chartSteps(q) {
+    const t = num(Array.isArray(q.keyParts) && q.keyParts.length ? q.keyParts[0] : q.ans);
+    if (!Number.isFinite(t)) return [];
+    const win = obj(q.chartWindow);
+    const gaps = new Set((Array.isArray(q.keyParts) ? q.keyParts : [q.ans]).map(num));
+    const shows = (n) => {
+        if (gaps.has(n) || n < 1) return false;
+        if (!win || !Array.isArray(win.rows) || !Array.isArray(win.cols)) return true;
+        return win.rows.includes(Math.floor((n - 1) / 10)) && win.cols.includes((n - 1) % 10);
+    };
+    const out = [];
+    if ((t - 1) % 10 !== 0 && shows(t - 1)) out.push(step(`The number before is ${t - 1}. One more is ${t}.`));
+    if (shows(t - 10)) out.push(step(`The number above is ${t - 10}. Ten more is ${t}.`));
+    if (out.length < 2 && shows(t + 10)) out.push(step(`The number below is ${t + 10}. Ten less is ${t}.`));
+    if (out.length < 2 && t % 10 !== 0 && shows(t + 1)) out.push(step(`The number after is ${t + 1}. One less is ${t}.`));
+    out.push(step(`Write ${t}.`, [{ slot: 'answer', value: String(t) }]));
+    return out;
+}
 
 registerSkill('composing:hundreds_chart_fill', {
     strings: strings({
@@ -352,23 +376,40 @@ registerSkill('composing:hundreds_chart_fill', {
         say: 'The missing number is __.',
     }),
     misconceptions: ['wrong-row', 'reversed-digits', 'one-less'],
-    workedSteps: (q) => {
-        const t = num(q.ans);
-        if (!Number.isFinite(t)) return [];
-        const out = [];
-        if ((t - 1) % 10 !== 0) out.push(step(`The number before is ${t - 1}. One more is ${t}.`));
-        if (t > 10) out.push(step(`The number above is ${t - 10}. Ten more is ${t}.`));
-        if (out.length < 2 && t <= 90) out.push(step(`The number below is ${t + 10}. Ten less is ${t}.`));
-        if (out.length < 2 && t % 10 !== 0) out.push(step(`The number after is ${t + 1}. One less is ${t}.`));
-        out.push(step(`Write ${t}.`, [{ slot: 'answer', value: String(t) }]));
-        return out;
-    },
+    workedSteps: chartSteps,
     wrongAnswer: (q) => {
         const t = num(q.ans);
         if (!Number.isFinite(t)) return null;
         const c = [{ value: t <= 90 ? t + 10 : t - 10, misconception: 'wrong-row', explain: 'Read the number from the wrong row.' }];
         const rev = num(String(t).split('').reverse().join(''));
         if (t >= 10 && t < 100 && t % 10 && rev !== t) c.push({ value: rev, misconception: 'reversed-digits', explain: `Wrote the digits of ${t} the wrong way round.` });
+        c.push({ value: t - 1, misconception: 'one-less', explain: 'Wrote the number before, not the missing number.' });
+        return chooseWrong(q, c);
+    },
+});
+
+// The same window cut from the chart of the hundreds and the thousands (owner, 2026-09-25).
+// Its real errors: the number from the wrong row (ten off), the number before, and a place-value
+// slip in a number with a zero inside it (1,005 written 105: the zero dropped).
+registerSkill('composing:number_chart_fill', {
+    strings: strings({
+        iCan: 'I Can find missing numbers on a number chart',
+        instructionKey: 'missing-many',
+        steps: [
+            'Look left: the number before. Add 1.',
+            'Look up: the number above. Add 10.',
+            'Both ways give the same number. Write it.',
+        ],
+        say: 'The missing number is __.',
+    }),
+    misconceptions: ['wrong-row', 'dropped-zero', 'one-less'],
+    workedSteps: chartSteps,
+    wrongAnswer: (q) => {
+        const t = num(q.ans);
+        if (!Number.isFinite(t)) return null;
+        const c = [{ value: t + 10, misconception: 'wrong-row', explain: 'Read the number from the wrong row.' }];
+        const s = String(t);
+        if (/\d0\d/.test(s)) c.push({ value: num(s.replace(/0(?=\d)/, '')), misconception: 'dropped-zero', explain: `Left out the zero in ${t}.` });
         c.push({ value: t - 1, misconception: 'one-less', explain: 'Wrote the number before, not the missing number.' });
         return chooseWrong(q, c);
     },

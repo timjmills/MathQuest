@@ -80,7 +80,7 @@ function framePicture(ctx, n) {
 }
 
 /** P11: n pips as dice faces of up to six (17 = 6 + 6 + 5), each face the standard pattern. */
-function dicePicture(ctx, n) {
+export function dicePicture(ctx, n) {
     const s = 14, gap = 3;
     const faces = [];
     for (let left = n; left > 0; left -= 6) faces.push(Math.min(6, left));
@@ -107,6 +107,25 @@ function trackStrip(ctx, top) {
             + `font-family="Andika, sans-serif" fill="${INK}">${k}</text>`;
     }
     return svg(ctx, t * cw + 1, h + 1, body, { label: `number track 1 to ${t}` });
+}
+
+/**
+ * O6 AP1 "Objects: Counters in a five frame" (sub_5_pictures): the take-away in a FIVE frame
+ * (1 x 5, 12 mm cells, border 1.5 pt, interior 0.75 pt), n HOLLOW counters filled from the left
+ * (RP-11 set B, so the bold X of a taken counter reads on it), the first m crossed out.
+ */
+function takeawayFrame(ctx, n, m) {
+    const c = 12, w = 5 * c, h = c, o = SW.heavy / 2;
+    let body = `<path d="M${n2(o)} ${n2(o)}h${w}v${h}h${-w}Z" fill="none" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`;
+    let grid = '';
+    for (let k = 1; k < 5; k++) grid += `M${n2(o + k * c)} ${n2(o)}v${h}`;
+    body += `<path d="${grid}" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}"/>`;
+    for (let i = 0; i < n; i++) {
+        const cx = o + (i + 0.5) * c, cy = o + c / 2;
+        body += shapeOf('circle').draw(cx, cy, 8);
+        if (i < m) body += cross(cx, cy, 8);
+    }
+    return svg(ctx, w + 2 * o, h + 2 * o, body, { label: `${n} counters in a five frame, ${m} crossed out` });
 }
 
 function takeawayPicture(ctx, n, m, shape) {
@@ -154,7 +173,7 @@ register('counters', {
             // R3: `crossOnKey` (a story's work space) draws the objects uncrossed for the pupil, who
             // does the take-away; the key shows the crosses.
             const crossed = p.crossOnKey && ctx.state === 'blank' ? 0 : p.m;
-            return root(ctx, 'k2-takeaway', `<div style="display:flex;justify-content:center;">${takeawayPicture(ctx, p.n, crossed, p.shape)}</div>`
+            return root(ctx, 'k2-takeaway', `<div style="display:flex;justify-content:center;">${p.objects === 'frame' ? takeawayFrame(ctx, p.n, crossed) : takeawayPicture(ctx, p.n, crossed, p.shape)}</div>`
                 + `<div class="ws-eq" style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 1.5)};margin-top:${L(ctx, 5)};white-space:nowrap;">`
                 + `${eqSpan(ctx, p.n)}${opSpan(ctx, MINUS)}${eqSpan(ctx, p.m)}${opSpan(ctx, '=')}${slot}</div>`);
         }
