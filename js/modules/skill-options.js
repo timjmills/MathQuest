@@ -504,6 +504,281 @@ export function pvRefusal(categoryId, skillId, range, opts) {
 }
 // ============================ end P9 · place value + rounding ============================
 
+// ===========================================================================
+// P11 · OPERATIONS OPTIONS  (+ − × ÷ — design/audit/OPTIONS-AUDIT.md §3, gen-operations.js)
+// ===========================================================================
+// One contiguous block, merged into SKILL_OPTIONS below and overriding the older entries for the
+// same skills in the table above. Every option here is READ by js/modules/gen-operations.js (the
+// "OPTION LAYER" section near its dispatcher). Defaults are the stand-alone values (R2): each is
+// what the skill dealt before the option existed, so an untouched skill, an old share code and a
+// saved set all print exactly what they printed before.
+//
+// Ids are reused where the meaning fits, because the share codec has one letter per option id and
+// only one letter left: `band` (a number bound), `regroup` (never / mixed / always — also the
+// remainder control on ÷, where "regrouping" is the remainder), `zeroPlace` (across zeros),
+// `support` (the one HINT picture a page carries, which fades to None), `tiles` (how many — addends,
+// or digits × digits written 21 for "2-digit × 1-digit"), `unknown`, `pictures`, `level`.
+const _OPS_BANDS = { '10': 10, '20': 20, '50': 50, '100': 100, '1k': 1000, '10k': 10000, '100k': 100000, '1m': 1000000 };
+const _opsBand = (values, dflt, { label = 'Numbers to', help, labels = {} } = {}) => ({
+    id: 'band', label, type: 'enum', default: dflt,
+    values: values.map(v => ({ v, l: labels[v] || (v === null ? 'As the support level sets it' : v.toLocaleString('en-US')) })),
+    help: help || 'Bounds the answer (the sum, the number you start from, the product or the number '
+        + 'shared), never the numbers you start from.',
+});
+const _opsRegroup = (dflt, sub = false) => ({
+    id: 'regroup', label: sub ? 'Regrouping (borrowing)' : 'Regrouping (carrying)', type: 'enum', default: dflt,
+    values: [{ v: 'none', l: 'Never' }, { v: 'mixed', l: 'Some items' }, { v: 'always', l: 'Every item' }],
+    help: sub ? 'Whether the ones column has to borrow. The regroup boxes stay on the page either way.'
+        : 'Whether a column carries. The regroup boxes stay on the page either way.',
+});
+const _opsAcrossZeros = () => ({
+    id: 'zeroPlace', label: 'Across zeros (5,003 − 2,847)', type: 'enum', default: 'some',
+    values: [{ v: 'none', l: 'Never' }, { v: 'some', l: 'Now and then' }, { v: 'always', l: 'Every item' }],
+    help: 'A zero in the number you start from, with a digit under it, so the borrow crosses the zero.',
+});
+const _opsUnknown = (dflt = 'answer', { first = 'The first number (__ + 7 = 15)', second = 'The second number (8 + __ = 15)' } = {}) => ({
+    id: 'unknown', label: 'What is missing', type: 'enum', default: dflt,
+    values: [{ v: 'answer', l: 'The answer (8 + 7 = __)' }, { v: 'first', l: first }, { v: 'second', l: second },
+        { v: 'mixed', l: 'Mixed' }],
+    help: 'One position per page, or Mixed. The missing number is a box in the number sentence.',
+});
+// The + / − fact cue: one HINT picture under the fact, faded to None. Structure (the fact's own
+// rule and answer zone) never changes.
+const _opsAddCue = (withTile = true) => ({
+    id: 'support', label: 'Picture support', type: 'enum', default: 'none',
+    values: [
+        { v: 'none', l: 'None' },
+        ...(withTile ? [{ v: 'tile', l: 'Dot tiles (one dot for each)' }] : []),
+        { v: 'frame', l: 'Ten frames' },
+        { v: 'line', l: 'Number line 0 to 20' },
+    ],
+    help: 'A hint drawn under every fact on the page, in print and on screen. None is the fade.',
+});
+const _opsMulCue = (div = false) => ({
+    id: 'support', label: 'Picture support', type: 'enum', default: 'none',
+    values: [
+        { v: 'none', l: 'None' },
+        { v: 'skip', l: div ? 'Skip-count strip of the number you divide by' : 'Skip-count strip (3, 6, 9 …)' },
+        { v: 'array', l: 'Dot array' },
+        ...(div ? [{ v: 'think', l: 'Think box (4 × __ = 28)' }] : []),
+    ],
+    help: 'A hint drawn under every fact on the page, in print and on screen. None is the fade.',
+});
+const _opsFactBand = () => _opsBand([5, 10, 12, 18, 20], 20, {
+    label: 'Facts to',
+    help: 'The largest sum (or the largest number you start from, for −). Independent of the fact '
+        + 'set: "Add 6, facts to 10". A fact set larger than the band is left out.',
+});
+const _opsTableBand = () => _opsBand([100, 144], 144, {
+    label: 'Tables to', labels: { 100: '10 × 10', 144: '12 × 12' },
+    help: 'Up to the 10s table or the whole 12s table: the largest product (or number shared) is 100 or 144.',
+});
+const _opsColumnLevel = () => levelSubset([3, 2, 1], 1,
+    'Level 3 writes each answer in grey to trace (a worked example), level 2 adds the place-value '
+    + 'heads over the columns, level 1 is the bare column. The regroup boxes stay at every level.');
+const _opsPictures = () => ({ ...picturesOption(true), help: 'Off gives the same stories as text only, with a work space.' });
+const _opsBar = () => ({
+    id: 'support', label: 'Bar model', type: 'enum', default: 'none',
+    values: [{ v: 'none', l: 'None' }, { v: 'bar', l: 'Bar model under the story (whole and parts)' }],
+    help: 'A part-part-whole bar drawn under every story, the unknown part left empty. None is the fade.',
+});
+
+const P11_OPS_OPTIONS = {
+    // --- fact drills: the band and a fading picture cue sit beside the fact set -----------------
+    'addition:add_facts': [constantOption(13, 'Add'), notationOption('+'), _opsFactBand(), _opsAddCue()],
+    'subtraction:sub_facts': [constantOption(13, 'Subtract'), notationOption('-'), _opsFactBand(), _opsAddCue()],
+    'multiplication:mult_facts': [constantOption(12, 'Times', 'Multiply by'), notationOption('x'), _opsTableBand(), _opsMulCue(false)],
+    // Dividing BY 0 is undefined, so the 0 box is the zero facts it really deals: 0 ÷ n.
+    'division:div_facts': [(() => {
+        const c = constantOption(12, 'Divide by');
+        c.values = c.values.map(x => (x.v === 0 ? { v: 0, l: '0 (zero shared: 0 ÷ n)' } : x));
+        c.zeroTitle = 'Zero divided by a number';
+        return c;
+    })(), notationOption('/'), _opsTableBand(), _opsMulCue(true)],
+
+    // --- the four basic skills: regrouping and the unknown position ----------------------------
+    'addition:add': [notationOption('+'), _opsRegroup('mixed'), _opsUnknown()],
+    'subtraction:subtract': [notationOption('-'), _opsRegroup('mixed', true), _opsUnknown('answer',
+        { first: 'The number you start from (__ − 7 = 8)', second: 'The number taken away (15 − __ = 8)' })],
+    'multiplication:multiply': [notationOption('x'), {
+        id: 'tiles', label: 'Digits × digits', type: 'enum', default: null,
+        values: [{ v: null, l: 'Set by Max Number' }, { v: 11, l: '1-digit × 1-digit (7 × 8)' },
+            { v: 21, l: '2-digit × 1-digit (34 × 6)' }, { v: 31, l: '3-digit × 1-digit (215 × 4)' },
+            { v: 22, l: '2-digit × 2-digit (34 × 26)' }],
+        help: 'This skill only: the size of the two numbers, instead of the Max Number setting.',
+    }],
+    'division:divide': [notationOption('/'), {
+        id: 'tiles', label: 'Digits ÷ digit', type: 'enum', default: null,
+        values: [{ v: null, l: 'Set by Max Number' }, { v: 21, l: '2-digit ÷ 1-digit (84 ÷ 4)' },
+            { v: 31, l: '3-digit ÷ 1-digit (756 ÷ 7)' }, { v: 41, l: '4-digit ÷ 1-digit (5,016 ÷ 8)' },
+            { v: 32, l: '3-digit ÷ 2-digit (736 ÷ 23)' }],
+        help: 'This skill only: the size of the number shared and the divisor, instead of Max Number.',
+    }, {
+        id: 'regroup', label: 'Remainders', type: 'enum', default: 'none',
+        values: [{ v: 'none', l: 'None (it shares exactly)' }, { v: 'mixed', l: 'Some items' }, { v: 'always', l: 'Every item' }],
+        help: 'A remainder is written R: 29 ÷ 4 = 7 R 1.',
+    }],
+
+    // --- the number lines: which number is missing ---------------------------------------------
+    'addition:nl_add': [_opsUnknown('mixed', { first: 'The start (__ + 5 = 12)', second: 'The jump (7 + __ = 12)' })],
+    'subtraction:nl_sub': [_opsUnknown('mixed', { first: 'The start (__ − 5 = 7)', second: 'The jump back (12 − __ = 7)' })],
+
+    // --- add_column_multi: how many numbers are added ------------------------------------------
+    'addition:add_column_multi': [{
+        id: 'tiles', label: 'Numbers to add', type: 'enum', default: null,
+        values: [{ v: null, l: 'Dealt across the page (3 and 4)' }, { v: 3, l: '3 numbers' }, { v: 4, l: '4 numbers' }],
+        help: 'How many numbers each column sum stacks. The column and its carry boxes stay the same.',
+    }],
+
+    // --- ÷ notation: every ticked way really prints ---------------------------------------------
+    'division:missing_mult_div': [notationOption('/')],
+    'multiplication:mult_div_fact_family': [notationOption('/')],
+
+    // --- word problems: pictures on the stories that have them ----------------------------------
+    'addition:add_word_problems': [responseOption(), _opsPictures()],
+    'subtraction:sub_word_problems': [responseOption(), _opsPictures()],
+    'addition:add_5_pictures': [{ ...picturesOption(true), help: 'Off writes the same sums as numbers only.' }],
+    'subtraction:sub_5_pictures': [{ ...picturesOption(true), help: 'Off writes the same take-away as numbers only.' }],
+    'addition:add_wp_10': [{ ...picturesOption(true), help: 'Off prints the same story with no picture row.' }],
+};
+
+// The 48 ranged ids (add_/sub_ × 8 bands × never / always / mixed) are ONE ladder per operation:
+// each id is a band and a regrouping choice, so from any of them the teacher can move one step in
+// either direction without leaving the skill (the id he picked is the default, R2). Within 10 and
+// 20 the item is a one-line fact (notation + a fading picture cue); from 50 up it is column work
+// (a support level: traced, heads, bare). Within 10 WITH regrouping is the bridging-ten rung, whose
+// own support level (split frame, ten frames) already exists.
+for (const op of ['add', 'sub']) {
+    const cat = op === 'add' ? 'addition' : 'subtraction';
+    for (const [code, max] of Object.entries(_OPS_BANDS)) {
+        for (const rg of ['no_regroup', 'regroup', 'mixed']) {
+            const id = `${op}_${code}_${rg}`;
+            const dfltRg = rg === 'no_regroup' ? 'none' : rg === 'regroup' ? 'always' : 'mixed';
+            const bridging = max === 10 && rg === 'regroup';
+            // "To 10" with every item regrouping is the bridging rung (answers 11 to 18), so only
+            // that rung offers it; elsewhere Every-item regrouping starts at 20.
+            const bands = Object.values(_OPS_BANDS).filter(b => b !== 10 || rg !== 'regroup' || bridging);
+            const opts = [_opsBand(bands, max, bridging ? {
+                labels: { 10: '10 — bridging ten (9 + 5, answers 11 to 18)' },
+            } : {}), _opsRegroup(dfltRg, op === 'sub')];
+            if (max <= 20) {
+                opts.unshift(notationOption(op === 'add' ? '+' : '-'));
+                opts.push(bridging ? levelSubset([3, 2, 1], 1,
+                    'Level 3 draws the two ten frames beside the split, level 2 the split frame alone '
+                    + '(write both parts, then the answer), level 1 the answer only.') : _opsAddCue(false));
+            } else {
+                opts.push(_opsColumnLevel());
+                if (op === 'sub' && max >= 1000 && rg !== 'no_regroup') opts.push(_opsAcrossZeros());
+            }
+            P11_OPS_OPTIONS[`${cat}:${id}`] = opts;
+        }
+    }
+    // Word problems by band: one ladder too. The picture twins (_plain) keep the band only, because
+    // their pictures are removed after generation. Pictures exist on the stories to 100.
+    for (const [code, max] of Object.entries(_OPS_BANDS)) {
+        if (op === 'add' && max === 10) continue;      // add_wp_10 is the K picture story (gen-counting.js)
+        const bands = Object.values(_OPS_BANDS).filter(b => b >= 20 || (op === 'sub' && b === 10));
+        const band = _opsBand(bands, max, { help: 'Bounds the answer of every story (the total, or the number you start from).' });
+        P11_OPS_OPTIONS[`${cat}:${op}_wp_${code}`] = [band, ...(max <= 100 ? [_opsPictures()] : []), _opsBar()];
+        P11_OPS_OPTIONS[`${cat}:${op}_wp_${code}_plain`] = [band, _opsBar()];
+    }
+}
+Object.assign(SKILL_OPTIONS, P11_OPS_OPTIONS);
+// ============================ end P11 · operations options ============================
+
+// ===========================================================================
+// P11 · K-2 COUNTING / COMPARING / COMPOSING OPTIONS  (gen-counting.js)
+// ===========================================================================
+// Read by js/modules/gen-counting.js (its `_kOpt()` reads) and drawn by the kit's counters /
+// compare templates. Defaults reproduce the stand-alone page (R2).
+const _k2CountTo = (values, dflt) => _opsBand(values, dflt, { label: 'Count to', help: 'The largest number on the page.' });
+const P11_K2_OPTIONS = {
+    'counting:count_objects': [
+        _k2CountTo([5, 10, 20], 20),
+        {
+            id: 'objects', label: 'Objects', type: 'enum', default: 'shapes',
+            values: [{ v: 'shapes', l: 'Plain shapes (one kind per item)' }, { v: 'counters', l: 'Round counters' },
+                { v: 'frame', l: 'Counters in ten frames' }, { v: 'dice', l: 'Dice patterns' }],
+            help: 'What the pupil counts. Ten frames and dice let a pupil count on from a group he knows.',
+        },
+        {
+            id: 'orientation', label: 'Arrangement', type: 'enum', default: 'rows',
+            values: [{ v: 'rows', l: 'Rows of five' }, { v: 'line', l: 'One line (ten to a row)' }, { v: 'scattered', l: 'Scattered' }],
+            help: 'Scattered is the hardest: the pupil has to keep track of what he has counted.',
+        },
+        levelSubset([3, 2, 1], 1, 'Level 3 writes the answer in grey to trace, level 2 prints a number track '
+            + '1 to 20 under the picture to point along, level 1 is the picture alone.'),
+    ],
+    'counting:count_sequence': [
+        _k2CountTo([10, 20, 100], 20),
+        {
+            id: 'dir', label: 'Which number', type: 'enum', default: 'mixed',
+            values: [{ v: 'forward', l: 'The number after' }, { v: 'back', l: 'The number before' }, { v: 'mixed', l: 'After, before and between' }],
+            help: 'After is counting on, before is counting back: one per page, or all three.',
+        },
+        levelSubset([1, 0], 1, 'Level 1 shows the five-box number path with the gap; level 0 is the question alone.'),
+    ],
+    'counting:number_seq_fill': [
+        {
+            id: 'step', label: 'Count by', type: 'enum', default: null,
+            values: [{ v: null, l: 'Mixed (set by Max Number)' }, { v: 1, l: '1s' }, { v: 2, l: '2s' }, { v: 5, l: '5s' }, { v: 10, l: '10s' }],
+            help: 'One step for the whole page, or dealt across it.',
+        },
+        {
+            id: 'dir', label: 'Direction', type: 'enum', default: 'mixed',
+            values: [{ v: 'forward', l: 'Counting on' }, { v: 'back', l: 'Counting back' }, { v: 'mixed', l: 'Mostly on, some back' }],
+        },
+    ],
+    'comparing:compare_groups': [
+        {
+            id: 'dir', label: 'Compare by', type: 'enum', default: 'mixed',
+            values: [{ v: 'more', l: 'Which has more?' }, { v: 'fewer', l: 'Which has fewer?' }, { v: 'same', l: 'Same or not the same?' },
+                { v: 'mixed', l: 'One of the three per page' }],
+            help: 'One question for the whole page (P-28).',
+        },
+        _k2CountTo([5, 10], 10),
+        levelSubset([2, 1], 1, 'Level 2 writes how many under each group (compare the numbers); level 1 leaves the pupil to match one to one.'),
+    ],
+    'comparing:compare_objects': [
+        {
+            id: 'dir', label: 'Compare by', type: 'enum', default: 'mixed',
+            values: [{ v: 'more', l: 'Longer / taller / thicker' }, { v: 'fewer', l: 'Shorter / thinner' }, { v: 'mixed', l: 'Both' }],
+        },
+        {
+            id: 'task', label: 'What is compared', type: 'enum', default: 'all',
+            values: [{ v: 'length', l: 'Length (lines)' }, { v: 'height', l: 'Height (towers)' }, { v: 'thickness', l: 'Thickness (bars)' },
+                { v: 'all', l: 'All three' }],
+        },
+    ],
+    'comparing:classify_count': [
+        _k2CountTo([5, 10], 6),
+        {
+            id: 'tiles', label: 'Kinds of shape', type: 'enum', default: null,
+            values: [{ v: null, l: '2 or 3, dealt' }, { v: 2, l: '2 kinds' }, { v: 3, l: '3 kinds' }, { v: 4, l: '4 kinds' }],
+            help: 'More kinds means more to ignore while counting one of them.',
+        },
+    ],
+    'composing:number_bonds': [
+        _opsBand([5, 10, 20], 10, { label: 'Bonds to', help: 'The largest whole.' }),
+        {
+            id: 'unknown', label: 'What is missing', type: 'enum', default: 'mixed',
+            values: [{ v: 'answer', l: 'The whole' }, { v: 'first', l: 'The first part' }, { v: 'second', l: 'The second part' }, { v: 'mixed', l: 'Mixed' }],
+        },
+    ],
+    'composing:make_ten': [levelSubset([1, 0], 1, 'Level 1 shows the ten frame; level 0 is the number sentence alone (6 + __ = 10).')],
+    'composing:teen_compose': [levelSubset([1, 0], 1, 'Level 1 shows the full ten frame and the ones; level 0 is the number sentence alone.')],
+    'composing:ten_frame_build': [_k2CountTo([5, 10], 10)],
+    'composing:base10_build': [_opsBand([20, 50, 99], 99, { label: 'Numbers to', help: 'The largest number to build.' })],
+    'composing:number_word_form': [{
+        id: 'wordform', label: 'Which way round', type: 'set', default: ['to_number'],
+        values: [{ v: 'to_number', l: 'Words to numeral (write 41)' }, { v: 'to_words', l: 'Numeral to words (write forty-one)' }],
+        allLabel: 'Both ways, alternating',
+        help: 'Tick one way for a page that stays with it; tick both and the page alternates.',
+    }],
+};
+Object.assign(SKILL_OPTIONS, P11_K2_OPTIONS);
+// ============================ end P11 · K-2 options ============================
+
 // Options every skill understands, whether or not it declares anything of its own.
 export const UNIVERSAL_OPTIONS = [levelOption()];
 
