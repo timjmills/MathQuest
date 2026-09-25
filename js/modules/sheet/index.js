@@ -83,5 +83,16 @@ export {
     DISK_SIZES, diskDiameter, zoneSide, zoneCapacity, diskMatSVG, numeralTracksHTML, roundingLineSVG,
 } from './cells/pv.js';
 
+// The operations templates that are not a plain stack or fact (long division, area model,
+// chart window, arrays, remainder, number line, fact family, cloze bank).
+export { divisionSteps } from './cells/long-division.js';
+import './cells/area-model.js';
+import './cells/mult-chart.js';
+import './cells/counters.js';
+import './cells/number-line.js';
+import './cells/family.js';
+export { factDigitTracks, factGridStyle, FACT_OP_TRACK_EM } from './cells/fact.js';
+export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'remainder', 'number-line', 'fact-family', 'cloze-bank'];
+
 /** Which cell templates this build carries. `legacy` is registered by `adapters.js`. */
-export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv'];
+export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv', ...OPS_TEMPLATE_IDS];
