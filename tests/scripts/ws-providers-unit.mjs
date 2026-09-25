@@ -586,6 +586,33 @@ REQUIRED['algebra:function_table_hard'] = /rule/i;
 checkSkill('algebra:function_table_easy');
 checkSkill('algebra:function_table_hard');
 
+/* ============================================================ build lane k2 (2026-09-25) */
+// The new K-1 picture skills (design/BUILD_LIST.md lane k2): items in the generator's shape, the
+// kit payload in q.cell, every task of each skill dealt round the 20 items.
+const cellOf = (template, payload) => ({ template, v: 1, payload });
+const K2_LANE_MAKERS = {
+    'counting:zero_none': (r, i) => {
+        const task = ['count', 'count', 'find', 'compute'][i % 4];
+        if (task === 'find') {
+            const at = int(r, 0, 2); const a = int(r, 1, 4); const counts = [a, a + 1, a + 1]; counts[at] = 0;
+            const letter = 'ABC'[at];
+            return { ans: letter, printAnswer: letter, answerType: 'text', text: 'Which plate has none?', _variant: 'find',
+                cell: cellOf('counters', { kind: 'zero', task, objects: 'plates', shape: 'apple', counts, correct: at, ans: letter }) };
+        }
+        if (task === 'compute') {
+            const n = int(r, 1, 5);
+            return { ans: 0, a: n, b: n, text: `Take them all away. ${n} − ${n} = ?`, _variant: 'compute',
+                cell: cellOf('counters', { kind: 'zero', task, objects: 'plates', shape: 'apple', n, ans: 0 }) };
+        }
+        const n = i % 3 === 0 ? 0 : int(r, 1, 5);
+        return { ans: n, text: 'How many are on the plate?', _variant: 'count', cell: cellOf('counters', { kind: 'zero', task, objects: 'plates', shape: 'apple', n, ans: n }) };
+    },
+};
+Object.assign(REQUIRED, {
+    'counting:zero_none': /none/i,
+});
+for (const [key, mk] of Object.entries(K2_LANE_MAKERS)) { let k = 0; ITEM_MAKERS[key] = (r) => mk(r, k++); checkSkill(key); }
+
 // ---- the contract seam the roles rely on
 ok(REGRADED_SKILLS.length === 24, `REGRADED_SKILLS lists ${REGRADED_SKILLS.length} skills, not 24`);
 let threw = false;

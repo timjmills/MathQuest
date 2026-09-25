@@ -24,12 +24,12 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 601 live skills; 492 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 602 live skills; 493 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
 - **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 222 entries — 132 new skills, 88 options on existing skills, 2 repairs; 162 from the White Rose audit (42 of them extended to close standards clauses), 60 from this audit.
+- The one build list: 221 entries — 131 new skills, 88 options on existing skills, 2 repairs; 161 from the White Rose audit (41 of them extended to close standards clauses), 60 from this audit.
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
@@ -274,28 +274,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 37 | **Multiples of 10, 100 and 1,000 (option)** (`mult_multiples`) | option on `multiplication:mult_zeros` | - | 1 |
 | 38 | **Partition to Multiply** (`informal_mult`) | new `multiplication:partition_multiply` | - | - |
 
-### Counting and early number (17)
-
-| # | Entry | Kind | Closes standards | Closes WRM steps |
-|---|---|---|---|---|
-| 1 | **Sort into Groups** (`sort_groups`) | new `comparing:sort_into_groups` | K.MD.B.3, M.EE.K.MD.1, M.EE.K.MD.2, M.EE.K.MD.3, M.EE.1.MD.4 | 4 |
-| 2 | **Say How Many Without Counting** (`subitise`) | new `counting:subitise` | - | 7 |
-| 3 | **Count Out a Number** (`ten_count_out`) | new `counting:count_out` | K.CC.B.5, M.EE.K.CC.6, M.EE.2.NBT.2 | 1 |
-| 4 | **Count in a Circle and to 30 (option)** (`count_objects_more`) | option on `counting:count_objects` | K.CC.B.5, M.EE.2.NBT.2 | - |
-| 5 | **Count by Making Tens** (`tens_ones_group`) | new `composing:count_in_tens_groups` | 1.NBT.A.1 | 2 |
-| 6 | **Number Sense Review** (`consolidate`) | new `counting:number_sense_review` | - | 3 |
-| 7 | **Zero Means None** (`zero`) | new `counting:zero_none` | K.CC.A.3 | 1 |
-| 8 | **Count to 120 on the Chart (option)** (`chart_120`) | option on `composing:hundreds_chart_fill` | 1.NBT.A.1 | - |
-| 9 | **Same Number After Moving (option)** (`count_conserve`) | option on `counting:count_objects` | K.CC.B.4b | - |
-| 10 | **Match the Same** (`match_same`) | new `counting:match_same` | - | 2 |
-| 11 | **Odd or Even by Pairing (option)** (`odd_even_pairs`) | option on `composing:odd_even` | 2.OA.C.3 | - |
-| 12 | **Understand 10 and 20 (option)** (`teen_structure`) | option on `composing:teen_compose` | - | 2 |
-| 13 | **Write the Numbers 0 to 20** (`write_numerals`) | new `counting:write_numbers_0_20` | K.CC.A.3 | - |
-| 14 | **Count in 3s** (`count_3s`) | new `patterns:count_in_3s` | - | 1 |
-| 15 | **Which One Does Not Belong?** (`odd_one_out`) | new `comparing:odd_one_out` | - | 1 |
-| 16 | **1st, 2nd, 3rd** (`ordinal`) | new `counting:ordinal_numbers` | - | 1 |
-| 17 | **Number Words 0 to 10 (option)** (`words_0_10`) | option on `composing:number_word_form` | - | 1 |
-
 ### Fractions (22)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
@@ -322,6 +300,27 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 20 | **Understand the Whole** (`frac_whole`) | new `fractions:understand_the_whole` | - | 1 |
 | 21 | **Partition the Whole** (`frac_whole_partition`) | new `fractions:partition_the_whole` | - | 1 |
 | 22 | **Subtract from a Mixed Number: Break the Whole (option)** (`sub_break_whole`) | option on `fraction_operations:sub_mixed_like` | - | 1 |
+
+### Counting and early number (16)
+
+| # | Entry | Kind | Closes standards | Closes WRM steps |
+|---|---|---|---|---|
+| 1 | **Sort into Groups** (`sort_groups`) | new `comparing:sort_into_groups` | K.MD.B.3, M.EE.K.MD.1, M.EE.K.MD.2, M.EE.K.MD.3, M.EE.1.MD.4 | 4 |
+| 2 | **Say How Many Without Counting** (`subitise`) | new `counting:subitise` | - | 7 |
+| 3 | **Count Out a Number** (`ten_count_out`) | new `counting:count_out` | K.CC.B.5, M.EE.K.CC.6, M.EE.2.NBT.2 | 1 |
+| 4 | **Count in a Circle and to 30 (option)** (`count_objects_more`) | option on `counting:count_objects` | K.CC.B.5, M.EE.2.NBT.2 | - |
+| 5 | **Count by Making Tens** (`tens_ones_group`) | new `composing:count_in_tens_groups` | 1.NBT.A.1 | 2 |
+| 6 | **Number Sense Review** (`consolidate`) | new `counting:number_sense_review` | - | 3 |
+| 7 | **Count to 120 on the Chart (option)** (`chart_120`) | option on `composing:hundreds_chart_fill` | 1.NBT.A.1 | - |
+| 8 | **Same Number After Moving (option)** (`count_conserve`) | option on `counting:count_objects` | K.CC.B.4b | - |
+| 9 | **Match the Same** (`match_same`) | new `counting:match_same` | - | 2 |
+| 10 | **Odd or Even by Pairing (option)** (`odd_even_pairs`) | option on `composing:odd_even` | 2.OA.C.3 | - |
+| 11 | **Understand 10 and 20 (option)** (`teen_structure`) | option on `composing:teen_compose` | - | 2 |
+| 12 | **Write the Numbers 0 to 20** (`write_numerals`) | new `counting:write_numbers_0_20` | K.CC.A.3 | - |
+| 13 | **Count in 3s** (`count_3s`) | new `patterns:count_in_3s` | - | 1 |
+| 14 | **Which One Does Not Belong?** (`odd_one_out`) | new `comparing:odd_one_out` | - | 1 |
+| 15 | **1st, 2nd, 3rd** (`ordinal`) | new `counting:ordinal_numbers` | - | 1 |
+| 16 | **Number Words 0 to 10 (option)** (`words_0_10`) | option on `composing:number_word_form` | - | 1 |
 
 ### Place value (12)
 
@@ -425,9 +424,9 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 ### Level K
 
 - **K.CC.A.3** — PARTIAL. Write numbers from 0 to 20. Represent a number of objects with a written numeral 0-20 (with 0 representing a count of no objects).  
-  Taught in part by: Count Objects (1-20) (Visual) (`counting:count_objects`)  
-  Missing: writing the numerals 0-20 (formation: trace, copy, write); zero as the numeral for a count of no objects (count_objects starts at 1)  
-  Build: Write the Numbers 0 to 20 (`write_numerals`); Zero Means None (`zero`)
+  Taught in part by: Count Objects (1-20) (Visual) (`counting:count_objects`); Zero Means None (`counting:zero_none`)  
+  Missing: writing the numerals 0-20 (formation: trace, copy, write)  
+  Build: Write the Numbers 0 to 20 (`write_numerals`)
 - **K.CC.B.4b** — PARTIAL. Understand that the last number name said tells the number of objects counted. The number of objects is the same regardless of their arrangement or the order in which they were counted.  
   Taught in part by: Count Objects (1-20) (Visual) (`counting:count_objects`); Build a Number on a Ten Frame (`composing:ten_frame_build`)  
   Missing: the number is the same whatever the arrangement or the order of counting (conservation)  
@@ -1034,8 +1033,8 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **K.CC.A.2** — FULL. Count forward beginning from a given number within the known sequence (instead of having to begin at 1).  
   Taught by: Next/Before/After Number (Visual) (`counting:count_sequence`); Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`)  
 - **K.CC.A.3** — PARTIAL. Write numbers from 0 to 20. Represent a number of objects with a written numeral 0-20 (with 0 representing a count of no objects).  
-  In part: Count Objects (1-20) (Visual) (`counting:count_objects`)  
-  Missing: writing the numerals 0-20 (formation: trace, copy, write); zero as the numeral for a count of no objects (count_objects starts at 1) → `write_numerals`, `zero`  
+  In part: Count Objects (1-20) (Visual) (`counting:count_objects`); Zero Means None (`counting:zero_none`) — zero as the numeral for none: counting:zero_none (build lane k2)  
+  Missing: writing the numerals 0-20 (formation: trace, copy, write) → `write_numerals`  
 *B. Count to tell the number of objects.*
 
 - **K.CC.B.4** — PARTIAL (from its parts). Understand the relationship between numbers and quantities; connect counting to cardinality.  

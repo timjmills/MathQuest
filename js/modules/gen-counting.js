@@ -1399,6 +1399,7 @@ function _k2Zero(q, rng) {
         q.hint = `Look for the ${word} with nothing ${prep.split(' ')[0]} it. None is zero.`;
         q.distractorTags = { [['A', 'B', 'C'][fewest]]: 'chose the one with the fewest, not none' };
         q._variant = 'find';
+        q.printFormat = 'k2-find';
         _kSetCell(q, 'counters', { kind: 'zero', task: 'find', objects: holder, shape, counts, correct: at, ans: letter });
         return true;
     }
@@ -1412,6 +1413,7 @@ function _k2Zero(q, rng) {
         q.hint = 'Every one is crossed out. None are left. None is zero.';
         q.distractorTags = { [n]: 'wrote how many there were, not how many are left' };
         q._variant = 'compute';
+        q.printFormat = 'k2-compute';
         _kSetCell(q, 'counters', { kind: 'zero', task: 'compute', objects: holder, shape, n, ans: 0 });
         return true;
     }
@@ -1425,6 +1427,7 @@ function _k2Zero(q, rng) {
     q.hint = n === 0 ? `There is nothing ${prep} ${word}. None is zero. Write 0.` : 'Touch each one as you count. The last number you say is how many.';
     q.distractorTags = n === 0 ? { 1: 'wrote 1 for an empty set' } : { [n + 1]: 'counted one object twice' };
     q._variant = 'count';
+    q.printFormat = 'k2-count';
     const payload = { kind: 'zero', task: 'count', objects: holder, shape, n, ans: n };
     const lvl = _kLevel(1);
     if (lvl >= 2) payload.track = band;

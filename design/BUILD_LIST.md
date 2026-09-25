@@ -16,14 +16,14 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 
 ## Summary
 
-- 222 entries: **132 new skills, 88 new options, 2 repairs**.
-- 162 from the White Rose audit (42 extended for standards), 60 from the standards audit.
+- 221 entries: **131 new skills, 88 new options, 2 repairs**.
+- 161 from the White Rose audit (41 extended for standards), 60 from the standards audit.
 - They close 114 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
 - 14 new sheet-kit templates are needed; each is owned by one lane.
 
 | Lane | Entries | New skills | Options | Repairs | Standards closed | WRM steps closed |
 |---|---|---|---|---|---|---|
-| Counting and early number (K-1 pictures) (`k2`) | 23 | 16 | 7 | 0 | 20 | 34 |
+| Counting and early number (K-1 pictures) (`k2`) | 22 | 15 | 7 | 0 | 20 | 33 |
 | Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 29 | 18 | 10 | 1 | 21 | 50 |
 | Place value, rounding and estimation (the pv kit) (`placevalue`) | 12 | 4 | 8 | 0 | 9 | 36 |
 | Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 24 | 14 | 10 | 0 | 19 | 20 |
@@ -90,7 +90,7 @@ positions are share codes, so nothing is spliced and the integrator fixes the fi
    (standards closed × 2 + White Rose steps closed).
 3. Lanes run in parallel; an entry whose dependency is in another lane waits for it (named in its `After` line).
 
-## Lane `k2`: Counting and early number (K-1 pictures) (23)
+## Lane `k2`: Counting and early number (K-1 pictures) (22)
 
 Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,bond,seqstrip,compare,chartwindow,base10,wordpic,count-row,k2kit}.js`, `js/modules/sheet/providers/k2.js`. Builds templates: `picture-row`, `sort-rings`.
 
@@ -205,20 +205,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 within 5 → 10 → 20 · O3 counters in the circles → none · O6 cherry / bar.
 - **Misconceptions:** adds the whole and a part; writes 3 − 5 = 2.
 
-### 10. Zero Means None — `zero`
-
-- **What:** new skill `counting:zero_none`. Grade PK · family counting · source White Rose audit.
-- **Closes (standards):** K.CC.A.3 · tag with CCSS K.CC.A.3, K.CC.B.4, EE M.EE.K.CC.4
-- **Closes (White Rose steps):** R.B7.S1
-- **Teaches:** zero as the count of an empty set, and writing 0.
-- **Extended for the standards:** writing 0 as the numeral for an empty set on the same page as 1-5 counts.
-- **Problem types:** (1) how many? (including none); (2) write 0 for an empty set; (3) which plate has none?; (4) take all away: how many are left?.
-- **Representation:** pictures of plates/boxes with some or no objects; write how many, including 0. Templates: `counters`, `wordpic`.
-- **Answer:** write the number, 0 included.
-- **Ladder:** O2 0-3 → 0-5 → 0-10 · O3 empty plate shaded → plain · O6 plates / boxes / ten frames.
-- **Misconceptions:** writes nothing for zero; writes 1 for an empty set; reads 0 as the letter O.
-
-### 11. Count to 120 on the Chart (option) — `chart_120`
+### 10. Count to 120 on the Chart (option) — `chart_120`
 
 - **What:** option on `composing:hundreds_chart_fill`: band 120: chart windows from 100 to 120 (crossing 100). Grade 1 · family counting · source standards audit.
 - **Closes (standards):** 1.NBT.A.1 · tag with CCSS 1.NBT.A.1, EE M.EE.1.NBT.1
@@ -230,7 +217,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 90-110 → 100-120 · O3 row starts given → none · O6 window / whole chart.
 - **Misconceptions:** writes 1010 for 110; 109 → 200.
 
-### 12. Same Number After Moving (option) — `count_conserve`
+### 11. Same Number After Moving (option) — `count_conserve`
 
 - **What:** option on `counting:count_objects`: task: "same number?" after the objects are moved or counted in another order. Grade K · family counting · source standards audit.
 - **Closes (standards):** K.CC.B.4b · tag with CCSS K.CC.B.4b, EE M.EE.K.CC.4
@@ -242,7 +229,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 to 5 → to 10 · O3 touch dots numbered → none · O6 rows / scattered / line.
 - **Misconceptions:** spread-out objects are "more"; recounting from the other end gives a new number.
 
-### 13. How Many Hundreds? (option) — `hundreds_foundation`
+### 12. How Many Hundreds? (option) — `hundreds_foundation`
 
 - **What:** option on `composing:tens_foundation_visual`: unit "hundreds": 100, 200 … 900 as 1 … 9 hundreds (0 tens 0 ones). Grade 2 · family placevalue · source standards audit.
 - **Closes (standards):** 2.NBT.A.1b · tag with CCSS 2.NBT.A.1b, EE M.EE.2.NBT.1
@@ -254,7 +241,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 to 500 → 900 · O3 each flat labelled 100 → none · O6 flats / disks.
 - **Misconceptions:** 600 has 6 tens; writes 6 for 600.
 
-### 14. Match the Same — `match_same`
+### 13. Match the Same — `match_same`
 
 - **What:** new skill `counting:match_same`. Grade PK · family counting · source White Rose audit.
 - **Closes (standards):** none not already full
@@ -266,7 +253,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 2 → 3 → 4 pairs; identical → same kind different look · O3 first pair joined → none · O6 objects / shapes.
 - **Misconceptions:** matches by colour or size instead of kind; uses one picture twice.
 
-### 15. What Can We Measure? — `measurable_attributes`
+### 14. What Can We Measure? — `measurable_attributes`
 
 - **What:** new skill `comparing:what_can_we_measure`. Grade K · family measurement · source standards audit.
 - **Closes (standards):** K.MD.A.1 · tag with CCSS K.MD.A.1, EE M.EE.K.MD.1
@@ -278,7 +265,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 two attributes (long, heavy) → four (tall, holds) · O3 icons beside each word → words only · O6 objects.
 - **Misconceptions:** colour is something we measure; only length can be measured.
 
-### 16. Write the Number Sentence for the Picture (option) — `pictures_to_sentence`
+### 15. Write the Number Sentence for the Picture (option) — `pictures_to_sentence`
 
 - **What:** option on `addition:add_5_pictures` (and `subtraction:sub_5_pictures`): response "write the number sentence" (the pupil writes 3 + 2 = 5 for the picture). Grade K · family operations · source standards audit.
 - **Closes (standards):** K.OA.A.1 · tag with CCSS K.OA.A.1, EE M.EE.K.OA.1
@@ -290,7 +277,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 within 5 → within 10 · O3 frame with signs printed → blank line · O6 pictures / dots / ten frame.
 - **Misconceptions:** writes the total first (5 + 3 = 2); uses + for a take-away picture.
 
-### 17. A Hundred Is Ten Tens (option) — `regroup_hundreds`
+### 16. A Hundred Is Ten Tens (option) — `regroup_hundreds`
 
 - **What:** option on `composing:base10_regroup`: band 999: trade 1 hundred for 10 tens. Grade 2 · family placevalue · source standards audit.
 - **Closes (standards):** 2.NBT.A.1a · tag with CCSS 2.NBT.A.1a, EE M.EE.2.NBT.1
@@ -302,7 +289,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 hundreds only → with tens and ones · O3 flat drawn with its ten rods → none · O6 blocks / disks.
 - **Misconceptions:** 100 = 10 ones; a trade changes the number.
 
-### 18. Understand 10 and 20 (option) — `teen_structure`
+### 17. Understand 10 and 20 (option) — `teen_structure`
 
 - **What:** option on `composing:teen_compose`: 10 and 20. Grade K · family counting · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS K.NBT.A.1, K.CC.A.3, EE -
@@ -314,7 +301,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 10 → 20 → mix with 11-19 · O3 frames drawn full → partly → none · O6 frames / rods.
 - **Misconceptions:** calls 20 "twelve"; counts the ten as 1.
 
-### 19. Write the Numbers 0 to 20 — `write_numerals`
+### 18. Write the Numbers 0 to 20 — `write_numerals`
 
 - **What:** new skill `counting:write_numbers_0_20`. Grade K · family counting · source standards audit.
 - **Closes (standards):** K.CC.A.3 · tag with CCSS K.CC.A.3, EE M.EE.2.NBT.3
@@ -325,9 +312,8 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Answer:** the written numeral in a large box (handwriting on paper; on screen the pupil types or taps the digit keypad).
 - **Ladder:** O2 0-5 → 0-10 → 11-20 · O3 dotted trace with start dot and arrow → start dot only → empty box · O6 pictures / dots / ten frame.
 - **Misconceptions:** reverses 2, 3, 5, 7, 9; writes 31 for 13; leaves the box empty for zero.
-- **After:** `zero`.
 
-### 20. Number Bonds to 20 — `bonds_20`
+### 19. Number Bonds to 20 — `bonds_20`
 
 - **What:** new skill `composing:bonds_to_20`. Grade K · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS K.OA.A.1, 1.OA.C.6, EE M.EE.K.OA.1
@@ -339,7 +325,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 bonds to 10 → to 20 → within 20 · O3 two frames → none · O6 frames / bond.
 - **Misconceptions:** 13 + 7 = 10; answers 3 for 20 − 7.
 
-### 21. Big and Small — `compare_size`
+### 20. Big and Small — `compare_size`
 
 - **What:** new skill `comparing:compare_size`. Grade PK · family measurement · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS K.MD.A.2, EE M.EE.K.MD.2
@@ -351,7 +337,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 two → three objects · O3 base line drawn → none · O6 objects.
 - **Misconceptions:** compares height only; picks the busier picture.
 
-### 22. Which One Does Not Belong? — `odd_one_out`
+### 21. Which One Does Not Belong? — `odd_one_out`
 
 - **What:** new skill `comparing:odd_one_out`. Grade PK · family counting · source White Rose audit.
 - **Closes (standards):** none not already full
@@ -363,7 +349,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 kind → colour-free attribute (size, shape) → two attributes · O3 reason bank shown → none · O6 objects / shapes.
 - **Misconceptions:** chooses by position (always the last); picks a reason that fits every picture.
 
-### 23. 1st, 2nd, 3rd — `ordinal`
+### 22. 1st, 2nd, 3rd — `ordinal`
 
 - **What:** new skill `counting:ordinal_numbers`. Grade K · family counting · source White Rose audit.
 - **Closes (standards):** none not already full

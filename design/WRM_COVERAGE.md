@@ -22,20 +22,20 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
+- Covered 514 (59%), partial only 149 (17%), gap 209 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 328 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 329 skills carry WRM tags. 161 proposals (119 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
-| Reception | PK | 18 | 119 | 58 (49%) | 28 | 33 |
+| Reception | PK | 18 | 119 | 59 (50%) | 28 | 32 |
 | Year 1 | K | 14 | 116 | 72 (62%) | 24 | 20 |
 | Year 2 | 1 | 11 | 124 | 80 (65%) | 18 | 26 |
 | Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
 | Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
 | Year 5 | 4 | 15 | 136 | 81 (60%) | 22 | 33 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **513 (59%)** | **149** | **210** |
+| **All** | | **97** | **872** | **514 (59%)** | **149** | **209** |
 
 ## Source disagreements
 
@@ -82,7 +82,7 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Closes (1): Y6.B7.S5 Formulae  
   _proposal id: formulae_
 
-### counting (12 proposals, 26 steps)
+### counting (11 proposals, 25 steps)
 
 - **Say How Many Without Counting** — new skill `counting:subitise`. Teaches perceptual subitising of 0-5 and conceptual subitising to 10 (seeing small groups inside a larger one: 3 and 2 make 5). Representation: standard dot, dice, finger and ten-frame patterns shown briefly on screen, printed as a grid; write the number; option: say the two parts.  
   Closes (7): R.B3.S2 Subitise 1, 2 and 3; R.B5.S2 Subitise 4 and 5; R.B7.S3 Subitise 0 to 5; R.B7.S8 Conceptual subitising to 5; R.B9.S10 Conceptual subitising; R.B11.S4 Conceptual subitising to 10; R.B11.S9 Make arrangements of 10  
@@ -105,9 +105,6 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
 - **Which One Does Not Belong?** — new skill `comparing:odd_one_out`. Teaches identifying a set: objects that belong together because they share one attribute. Representation: a row of four line drawings; circle the one that is not in the set, say why.  
   Closes (1): R.B1.S3 Identify a set  
   _proposal id: odd_one_out_
-- **Zero Means None** — new skill `counting:zero_none`. Teaches zero as the count of an empty set, and writing 0. Representation: pictures of plates/boxes with some or no objects; write how many, including 0.  
-  Closes (1): R.B7.S1 Introduce zero  
-  _proposal id: zero_
 - **Number Words 0 to 10 (option)** — option on `composing:number_word_form`: words 0-10. Teaches reading and writing the number words zero to ten (the skill starts at 10). Representation: a band option "0 to 10" on the existing skill: numeral to word and word to numeral.  
   Closes (1): Y1.B1.S5 Recognise numbers as words  
   _proposal id: words_0_10_
@@ -754,8 +751,8 @@ whatever happens to the WRM gaps.
 
 #### R.B7 Spring Block 1: Alive in 5
 
-- **R.B7.S1** Introduce zero — GAP. _K.CC.A.3, K.CC.B.4, M.EE.K.CC.4_  
-  Proposal: Zero Means None  
+- **R.B7.S1** Introduce zero — covered. _K.CC.A.3, K.CC.B.4, M.EE.K.CC.4_  
+  Skills: Zero Means None (`counting:zero_none`)  
   Vocabulary: zero, none, all gone  
 - **R.B7.S2** Find 0 to 5 — covered. _K.CC.B.4, K.CC.B.5, M.EE.K.CC.4, M.EE.K.CC.6_  
   Skills: Count Objects (1-20) (Visual) (`counting:count_objects`) {count to 5}  

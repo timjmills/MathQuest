@@ -353,7 +353,9 @@
       "pictures": "P",
       "frame": "F",
       "dice": "D",
-      "blocks": "B"
+      "blocks": "B",
+      "plates": "L",
+      "boxes": "X"
     },
     "touch": {},
     "cover": {

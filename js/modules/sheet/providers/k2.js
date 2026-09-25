@@ -648,11 +648,25 @@ registerSkill('composing:ten_frame_build_teen', {
 /** The kit payload of an item, or {}. */
 const payloadOf = (q) => (q && q.cell && q.cell.payload && typeof q.cell.payload === 'object' ? q.cell.payload : {});
 
-/** strings() chosen per item (a task changes the instruction), with a fixed fallback. */
+/**
+ * The task (problem type) a reference is about: the item's payload, else the page's first item
+ * as the page engine describes it (`printFormat: 'k2-<task>'`, print-sheet skillMeta passes the
+ * first item's printFormat), else the skill's options. '' when none says.
+ */
+export function k2TaskOf(ref = {}) {
+    const q = ref && ref.q;
+    const fromQ = q && (payloadOf(q).task || q._variant);
+    if (fromQ) return String(fromQ);
+    const pf = /^k2-([\w-]+)$/.exec(String((ref && (ref.printFormat || (q && q.printFormat))) || ''));
+    if (pf) return pf[1];
+    return String((ref && ref.opts && ref.opts.task) || '');
+}
+
+/** strings() chosen per task (a task changes the instruction), with a fixed fallback. */
 function stringsBy(pickDef, fallbackDef) {
     const cache = new Map();
     const get = (def) => { if (!cache.has(def)) cache.set(def, strings(def)); return cache.get(def); };
-    const fn = (ref = {}) => get((ref && ref.q && pickDef(ref.q)) || fallbackDef)(ref);
+    const fn = (ref = {}) => get(pickDef(k2TaskOf(ref), ref) || fallbackDef)(ref);
     fn.def = fallbackDef;
     return fn;
 }
@@ -684,10 +698,7 @@ const ZERO_LEFT = {
 };
 
 registerSkill('counting:zero_none', {
-    strings: stringsBy((q) => {
-        const t = payloadOf(q).task || q._variant;
-        return t === 'find' ? ZERO_FIND : t === 'compute' ? ZERO_LEFT : ZERO_COUNT;
-    }, ZERO_COUNT),
+    strings: stringsBy((t) => (t === 'find' ? ZERO_FIND : t === 'compute' ? ZERO_LEFT : ZERO_COUNT), ZERO_COUNT),
     misconceptions: ['wrote-one-for-none', 'skipped-one', 'counted-twice', 'chose-fewest', 'wrote-the-start'],
     workedSteps: (q) => {
         const p = payloadOf(q);

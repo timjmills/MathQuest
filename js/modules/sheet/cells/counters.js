@@ -317,7 +317,7 @@ function holderPicture(ctx, n, shape, p, { scale = 1, crossed = false } = {}) {
         }
         return svg(ctx, 5 * c + 2 * o, 2 * c + 2 * o, body, { label: 'a ten frame' });
     }
-    const R = 22 * s, inner = 18.6 * s, pitch = 9 * s, d = 7.2 * s, pad = 1;
+    const R = 25 * s, inner = 21.5 * s, pitch = 10.4 * s, d = 8.6 * s, pad = 1;
     const box = p.objects === 'boxes';
     const W = 2 * R + 2 * pad, H = box ? 1.64 * R + 2 * pad : W;
     const cx0 = W / 2, cy0 = H / 2;
@@ -343,11 +343,11 @@ register('counters', {
         const kv = p.ans;
         if (p.kind === 'zero') {
             const k = pscale(ctx);
-            if (p.task === 'which') {
+            if (p.task === 'find') {
                 // Three holders tagged A, B, C, one of them empty: check the one with none.
                 const on = checkedChoice(p, ctx, LETTERS.slice(0, (p.counts || []).length));
-                const choices = (p.counts || []).map((n, i) => ({ pic: holderPicture(ctx, n, p.shape, p, { scale: 0.62 * k }), label: LETTERS[i] }));
-                return root(ctx, 'k2-zero', choiceRow(ctx, choices, { on, gapMm: 5 }));
+                const choices = (p.counts || []).map((n, i) => ({ pic: holderPicture(ctx, n, p.shape, p, { scale: 0.72 * k }), label: LETTERS[i] }));
+                return root(ctx, "k2-zero", choiceRow(ctx, choices, { on, gapMm: 9 }));
             }
             if (p.task === 'takeaway') {
                 const b = inlineBoxMm(ctx, 1);
@@ -436,7 +436,7 @@ register('counters', {
         return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2 };
     },
     inputs(p) {
-        if (p && p.kind === 'zero' && p.task === 'which') return [{ id: 'answer', kind: 'check', shape: 'check', graded: true, order: 0, scopes: ['full'] }];
+        if (p && p.kind === 'zero' && p.task === 'find') return [{ id: 'answer', kind: 'check', shape: 'check', graded: true, order: 0, scopes: ['full'] }];
         return [{ id: 'answer', kind: 'number', shape: 'box', graded: true, order: 0, scopes: ['full', 'answer-only'] }];
     },
     layout() { return { card: 'card-medium-visual', checker: 'value' }; },
