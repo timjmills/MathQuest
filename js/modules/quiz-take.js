@@ -9,7 +9,7 @@ import { broadcastQuizJoin, broadcastQuizAnswer, broadcastQuizSubmit } from './q
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank,
 } from './screen-cell.js';
 
@@ -101,6 +101,7 @@ export function startQuizTest() {
     const test = state.currentQuiz;
     if (!test) return;
 
+    _quizWorking.clear();
     const nameInput = document.getElementById('qtStudentName');
     const studentName = nameInput ? nameInput.value.trim() : 'Anonymous';
     if (!studentName) return;
@@ -223,12 +224,17 @@ export function quizQuestionData(q) {
 
 // ---- Render Quiz Interface ----
 
+const _quizWorking = new Map();
+
 function renderQuizInterface() {
     const test = state.currentQuiz;
     if (!test) return;
 
     const container = document.getElementById('quizTakeView');
     if (!container) return;
+    // the pupil's working (number-line jumps, long-division digits) survives the re-render
+    const prevCell = container.querySelector('.qt-cell[data-flat-idx]');
+    if (prevCell) _quizWorking.set(prevCell.dataset.flatIdx, saveWorking(prevCell));
 
     const allQs = state.quizAllQuestions;
     const total = allQs.length;
@@ -458,6 +464,7 @@ function _mountQuizCell(flatIdx) {
         });
         wireStackEntry(cellEl, { autofocus: !saved });
     }
+    restoreWorking(cellEl, _quizWorking.get(String(flatIdx)));
     monoCell(cellEl);
 }
 

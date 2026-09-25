@@ -930,3 +930,182 @@ html .mq-scell .mq-svgslot > input.mq-slot--svg {
 /* a kit twin's writing box is a full touch target (H6) - except the digits of a quotient strip,
    which must stay over their dividend digits */
 .mq-scell [data-mq-cell]:not([data-mq-join=""] [data-mq-cell]) { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+
+/* ============================================================================
+   REGRADE 2 — 2026-09-25 (design/audit/runs/regrade2-2026-09-25). Additive.
+   ========================================================================= */
+
+/* ---- R2-1. The online worksheet is a real grid (worksheet.js layoutWorksheetGrid): as many
+   equal columns as the widest card allows at 29 px digits; the legacy full-width card classes
+   no longer span the row; the cards of a row share one height and the paper fills its card. */
+.online-edition .problems-grid.mq-wsgrid.mq-wsfit {
+    grid-template-columns: repeat(var(--mq-wscols, 3), minmax(0, 1fr));
+    align-items: stretch;
+}
+.online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard { grid-column: auto; min-width: 0; min-height: 0; height: auto; align-self: stretch; }
+.online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard.mq-span-row { grid-column: 1 / -1; }
+.online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard > .mq-wspaper { flex: 1 1 auto; display: flex; flex-direction: column; }
+.online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard > .mq-wspaper > .ws-cell.mq-scell { flex: 1 1 auto; justify-content: center; }
+
+/* ---- R2-3. Long division (the kit's bracket twin, screen-cell.js wireOpsWork): every digit place
+   is a >= 44 px target on every host (0.81 em tracks at 57 px), and the working rows under the
+   dividend are one-digit boxes the pupil writes in. A narrow cell scrolls inside itself (H6
+   allows it); the page never does. */
+.mq-scell .ws-ops-division.mq-opsdiv { font-size: max(var(--mq-digit, 40px), 57px) !important; max-width: none; }
+.mq-scell .ws-ops-division.mq-opsdiv [data-mq-cell] > input.mq-cellslot { min-height: 44px; }
+html .mq-scell .ws-ops-division input.mq-opswork {
+    display: block; box-sizing: border-box; width: 100% !important; height: calc(100% - 8px) !important; min-width: 0 !important; min-height: 0 !important;
+    margin: 0 !important; padding: 0 !important; border: 0 !important; border-radius: var(--mq-slot-r, 6px) !important;
+    background: #fff !important; color: #000 !important; box-shadow: inset 0 0 0 1px #949494 !important;
+    font-family: "Andika", sans-serif !important; font-size: 0.9em !important; font-weight: 400 !important; line-height: 1; text-align: center;
+    caret-color: transparent !important; outline: none;
+}
+html .mq-scell .ws-ops-division input.mq-opswork:focus { box-shadow: inset 0 0 0 3px #000 !important; outline: none !important; }
+.mq-scell .ws-ops-division.mq-opsdiv [role="group"] > span { min-width: 0; }
+/* a quotient strip that scrolls sideways in a phone cell keeps its bracket whole */
+#gameView #questionCard.mq-card #questionPaper.mq-kind-legacy #visualAid:has(.mq-opsdiv) { overflow-x: auto; }
+
+/* ---- R2-14. One border on a focused slot: the ink ring is the slot's own line thickened, never a
+   second outline drawn 1 px outside it (it read as a doubled border). The chrome ring stays on
+   the whole cell (:focus-within). */
+.mq-scell input.mq-slot:focus, .mq-scell input.mq-slot:focus-visible,
+.mq-scell [data-mq-cell] > input.mq-cellslot:focus, .mq-scell .mq-multchart input.mq-cellslot:focus,
+.online-edition .problem-card.mq-wscard .mq-scell input.mq-slot:focus,
+.qt-question-card .ws-cell.mq-scell .qt-answer-input.mq-slot:focus { outline: none !important; }
+html .mq-scell input.mq-slot.mq-slot--box:focus:not(.box-correct):not(.box-wrong):not([style*="var(--"]),
+html .mq-scell [data-mq-cell] > input.mq-cellslot:focus:not(.box-correct):not(.box-wrong):not([style*="var(--"]) { box-shadow: inset 0 0 0 2px #000 !important; }
+html .mq-scell input.mq-slot:not(.mq-slot--box):focus:not(.box-correct):not(.box-wrong):not([style*="var(--"]) { box-shadow: 0 2px 0 0 #000 !important; }
+
+/* ---- R2-15. Screen digits are the paper's digits (TY-4): form controls do not inherit the
+   cell's font features, so a typed 4 closed. Every control in the cell takes the kit's set. */
+.mq-scell input, .mq-scell textarea, .mq-scell button, .mq-scell select {
+    font-feature-settings: "cv04" 1 !important; font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* ---- R2-16. The adaptive difficulty chip ("L3 · Addition") is a teacher's number; on the pupil's
+   card it read as the sheet's Level and contradicted it ("Level 1" on paper). */
+body.student-mode #gameView .adaptive-level-chip { display: none !important; }
+
+/* ---- R2-17. Stack digit tracks are 48 px at least on every width (the drawn strip read 43 px). */
+.mq-scell .mq-kit .ws-stack, .mq-scell .mq-kit .ws-stack.wide { --ws-track: max(0.95em, 48px); }
+html .mq-scell .mq-kit input.mq-digit, html .mq-scell .mq-kit input.mq-carry { min-width: 48px !important; }
+
+/* ---- R2-11. A "Check one box." box is itself a 44 px target on every host (it was 26-32 px inside
+   a 44 px row). */
+.mq-scell .mq-tickrow { min-height: 48px; gap: 12px; }
+.mq-scell .mq-tickbox { width: 44px !important; height: 44px !important; min-width: 44px !important; min-height: 44px !important; flex: none !important; box-sizing: border-box; }
+
+/* ---- R2-2. Counters to ring are drawn as the paper draws them: even rows of seven, no gap after
+   every fifth (a 5-gap contradicted "groups of 4"; the pupil makes the groups, the picture does
+   not suggest them). The answer frame is the paper's "[ ] groups of N". */
+.mq-scell .mq-ring-pool { max-width: calc(7 * 44px + 6 * 4px); }
+.mq-scell .mq-ring-pool > .mq-ctr:nth-child(5n):not(:nth-child(10n)) { margin-right: 0; }
+.mq-scell .mq-groupsof { font-size: var(--mq-text); gap: 12px; }
+.mq-scell .mq-groupsof .mq-anslabel { font-weight: 400; }
+.mq-scell .mq-groupsof .mq-ansn { font-size: var(--mq-digit); line-height: 1; }
+
+/* ---- R2-18. The number bond's digits are the host's digit size (56 / 48 / 40 px on the card):
+   the bond box is digit / 0.52 (bond.js draws its digits at 0.52 of the box). */
+.mq-scell { --mq-bond: max(72px, calc(var(--mq-digit, 40px) / 0.52)); }
+@media (max-width: 480px) { .mq-scell { --mq-bond: max(64px, min(calc(var(--mq-digit, 40px) / 0.52), calc((100vw - 76px) / 4.2))); } }
+.mq-scell.mq-grid-cell { --mq-bond: 72px; }
+
+/* ---- R2-4. The number line on screen (screen-cell.js wireNumberLines): tick buttons with labels at
+   the cell's text size, 44 px wide below 1024 px (the line scrolls inside the cell when it is
+   longer than the cell), jump arcs drawn above the line, the equation at the host's digit size. */
+.mq-scell { --mq-nl-min: 44px; --mq-nl-lab: var(--mq-text, 20px); }
+@media (min-width: 1024px) { .mq-scell { --mq-nl-min: 32px; } }
+.mq-scell .ws-ops-number-line[data-mq-nl] { font-size: var(--mq-digit, 40px) !important; width: 100%; max-width: 100%; overflow: visible; padding-bottom: 4px; }
+.mq-scell .mq-nl { width: 100%; max-width: 100%; margin: 0 auto 0.25em; font-size: var(--mq-nl-lab); line-height: 1.2; }
+.mq-scell .mq-nl-scroll { width: 100%; overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; }
+.mq-scell .mq-nl-track {
+    position: relative; display: grid; margin: 0 auto;
+    grid-template-columns: repeat(var(--mq-nl-n, 11), minmax(var(--mq-nl-min), 1fr));
+    width: max(100%, calc(var(--mq-nl-n, 11) * var(--mq-nl-min))); max-width: calc(var(--mq-nl-n, 11) * 64px);
+    padding-top: 2.6em;
+}
+.mq-scell svg.mq-nl-arcs { position: absolute; left: 0; top: 0; width: 100% !important; max-width: none !important; height: calc(2.6em + 12px) !important; overflow: visible; pointer-events: none; }
+.mq-scell .mq-nl-line { position: absolute; left: 0; right: 0; top: calc(2.6em + 12px); height: 0; border-top: 2px solid #000; pointer-events: none; }
+.mq-scell .mq-nl-line::after {
+    content: ""; position: absolute; right: 0; top: -7px; width: 0; height: 0;
+    border-left: 10px solid #000; border-top: 6px solid transparent; border-bottom: 6px solid transparent;
+}
+.mq-scell button.mq-nl-tick {
+    position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    min-width: 0 !important; min-height: 64px !important; margin: 0; padding: 0 !important;
+    background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important;
+    color: #000 !important; font-size: 1em !important; font-weight: 400; line-height: 1.2; cursor: pointer;
+}
+.mq-scell .mq-nl-mark { position: relative; display: block; width: 2px; height: 24px; background: #000; flex: none; }
+.mq-scell .mq-nl-start .mq-nl-mark::after, .mq-scell .mq-nl-land .mq-nl-mark::after {
+    content: ""; position: absolute; left: 50%; top: 12px; width: 16px; height: 16px; margin: -8px 0 0 -8px;
+    border-radius: 50%; box-sizing: border-box;
+}
+.mq-scell .mq-nl-start .mq-nl-mark::after { background: #000; }
+.mq-scell .mq-nl-land .mq-nl-mark::after { width: 22px; height: 22px; margin: -11px 0 0 -11px; background: #fff; border: 3px solid #000; }
+.mq-scell .mq-nl-lab { display: block; margin-top: 4px; white-space: nowrap; }
+.mq-scell .mq-nl-tick[aria-pressed="true"] .mq-nl-lab { font-weight: 700; }
+.mq-scell button.mq-nl-tick:focus-visible { outline: 3px solid #000 !important; outline-offset: -3px !important; }
+.mq-scell .mq-nl-tools { display: flex; justify-content: center; margin-top: 6px; }
+.mq-scell .mq-nl-tools button {
+    min-height: 44px; padding: 0 18px !important; border: 1px solid #000 !important; border-radius: 6px !important;
+    background: #fff !important; color: #000 !important; font-size: calc(var(--mq-text, 20px) * 0.85) !important;
+}
+/* the equation under the line, and its answer box, never clip */
+.mq-scell .ws-ops-number-line[data-mq-nl] > div:last-child { overflow: visible; padding-bottom: 6px; }
+
+/* ---- R2-12. How to build: a black-and-white cue under a tap-to-build model. */
+.mq-scell .mq-buildcue { font-size: var(--mq-text, 20px); line-height: 1.3; color: #000; text-align: center; margin: 8px auto 0; }
+
+/* ---- R2-13. A word problem's open "work" rectangle is for pencil working; a screen cannot be
+   drawn on, so the empty box only competed with the answer box. The answer box stays. */
+.mq-scell .k2-wordpic [data-ws-slot="work"][data-ws-graded="0"] { display: none !important; }
+.mq-scell .k2-wordpic [data-ws-slot="answer"] { flex: none; }
+.mq-scell .mq-nl-tools { gap: 12px; align-items: center; }
+.mq-scell .mq-nl-tools button.mq-nl-pan { display: none; min-width: 48px; padding: 0 !important; }
+.mq-scell .mq-nl-scrolls .mq-nl-tools button.mq-nl-pan { display: inline-flex; align-items: center; justify-content: center; }
+@media (min-width: 1024px) { .mq-scell.mq-grid-cell { --mq-nl-min: 22px; } }
+
+/* ---- R2-5. The cloze with banks: write boxes, each bank printed under its box for reference (as on
+   paper). The row never clips: it is sized to the cell on a phone and may wrap; bank numbers read
+   at 0.8 of the digit size (they were 13-18 px). */
+.mq-scell .ws-ops-cloze-bank { font-size: min(var(--mq-digit, 40px), calc((100vw - 68px) / 9)) !important; max-width: 100%; }
+.mq-scell.mq-grid-cell .ws-ops-cloze-bank, .mq-scell .mq-grid-cell .ws-ops-cloze-bank { font-size: var(--mq-digit, 29px) !important; }
+.mq-scell .ws-ops-cloze-bank > div { flex-wrap: wrap; justify-content: center; row-gap: 0.3em; white-space: normal !important; max-width: 100%; }
+.mq-scell .ws-ops-cloze-bank > div > span > span:not([data-mq-cell]) { font-size: 0.72em !important; font-weight: 400 !important; gap: 0.35em !important; }
+
+/* ---- R2-6. The worksheet card is a .problem-card, whose legacy rule wraps every inline flex row
+   (ui-components.css "Scale inline flex/grid layouts within cards"). Inside a kit drawing that broke
+   the drawing itself: an area model's column labels wrapped and its multiplier jumped above the model.
+   A kit drawing keeps its own rows; the grid gives the card the width it needs (layoutWorksheetGrid). */
+html body .problem-card.mq-wscard.mq-wscard .mq-scell :is(.ws-ops, .k2-twin, .k2-cell) [style*="display:flex"]:not([style*="flex-wrap:wrap"]),
+html body .problem-card.mq-wscard.mq-wscard .mq-scell :is(.ws-ops, .k2-twin, .k2-cell) [style*="display:inline-flex"]:not([style*="flex-wrap:wrap"]) { flex-wrap: nowrap !important; }
+html body .problem-card.mq-wscard.mq-wscard .mq-scell .ws-ops-cloze-bank > div { flex-wrap: wrap !important; }
+.mq-scell .ws-ops-cloze-bank [data-mq-cell] { height: max(1.215em, 50px) !important; min-width: max(1.721em, 56px) !important; }
+.mq-scell.mq-grid-cell .ws-ops-cloze-bank > div > span > span:not([data-mq-cell]), .mq-scell .mq-grid-cell .ws-ops-cloze-bank > div > span > span:not([data-mq-cell]) { font-size: 0.86em !important; }
+
+/* ---- R2-7. A fact's operator sits at the left of its own track, clear of the digits ("× 10", never
+   "×10"); the tracks of a sheet are one set (screen-cell.js unifyFactTracks). */
+.mq-scell .mq-kit .ws-fact > .op { justify-content: flex-start; padding-left: 0.05em; }
+
+/* ---- R2-8/9. The online worksheet draws the K-2 kit twins larger: pictures and objects
+   about 30 px, strip numerals 29 px (they were 20-22 px at 3.1 px per mm). */
+.mq-scell.mq-grid-cell { --mq-k2: 4.2px; }
+
+/* ---- R2-9. A K-2 kit box adopted by the answer input keeps the paper box's shape (a count's square),
+   at least 48 px; a count's objects and its box share a row that wraps on a phone, never clips. */
+html body .mq-scell.mq-scell.mq-scell input.mq-slot.mq-slot--invisual.mq-slot--box.mq-bsize {
+    width: max(48px, var(--mq-bw)) !important; height: max(48px, var(--mq-bh)) !important; min-width: 48px !important; min-height: 48px !important; max-width: 100%;
+    font-size: min(var(--mq-digit, 40px), calc(max(48px, var(--mq-bh)) * 0.78)) !important; padding: 0 !important; line-height: 1;
+}
+.mq-scell .k2-count > div[style*="display:flex"] { flex-wrap: wrap; row-gap: 12px; max-width: 100%; }
+html body .problem-card.mq-wscard.mq-wscard .mq-scell .k2-cell.k2-count > div[style*="display:flex"] { flex-wrap: wrap !important; }
+
+/* ---- R2-10. "q R r" stays on one line on a phone: the equation is sized to the cell. Counters
+   in rows of seven fit a phone cell, rows start at the left as on paper. */
+.mq-scell .mq-remeq { flex-wrap: nowrap !important; font-size: min(var(--mq-digit, 40px), calc((100vw - 68px) / 8.6)); gap: 0.2em; }
+.mq-scell .mq-remeq .mq-cellbox { width: calc(var(--mq-w, 2) * 0.62em + 0.5em); margin: 0 0.06em; }
+.mq-scell.mq-grid-cell .mq-remeq, .mq-scell .mq-grid-cell .mq-remeq { font-size: var(--mq-digit, 29px); }
+.mq-scell .mq-ring-pool { gap: 2px; width: min(100%, calc(7 * 44px + 6 * 2px)); max-width: calc(7 * 44px + 6 * 2px); justify-content: flex-start; margin: 0 auto; }
+.mq-scell .mq-ring-tip { font-size: var(--mq-text, 20px); }
+.mq-scell .k2-wordpic > div:last-child { justify-content: center !important; }
