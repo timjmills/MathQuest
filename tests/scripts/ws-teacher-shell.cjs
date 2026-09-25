@@ -138,11 +138,16 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
     const dr = done ? done.getBoundingClientRect() : null;
     const atDone = dr ? document.elementFromPoint(dr.left + dr.width / 2, dr.top + dr.height / 2) : null;
     const accent = getComputedStyle(document.body).getPropertyValue('--tv-accent').trim();
+    // The primary-button fill (css/teacher-brand.css --tv-primary, the brand purple) as rgb().
+    const probe = document.createElement('div');
+    probe.style.background = 'var(--tv-primary)'; document.body.appendChild(probe);
+    const primaryBg = getComputedStyle(probe).backgroundColor; probe.remove();
     return {
       open: true,
       inside: r.left >= 0 && r.top >= 0 && r.right <= vw + 0.5 && r.bottom <= vh + 0.5,
       doneVisible: !!(done && atDone && done.contains(atDone)),
       doneBg: done ? getComputedStyle(done).backgroundColor : '',
+      primaryBg,
       accent,
       title: (el.querySelector('.tv-sko-title') || {}).textContent || '',
       sample: !!el.querySelector('.tv-sko-frame .tvp-stage'),
@@ -155,7 +160,7 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   else {
     if (!pop.inside) fail('the options popover is not inside the viewport at 820');
     if (!pop.doneVisible) fail('Done is not visible on the options popover at 820');
-    if (pop.doneBg !== 'rgb(59, 75, 200)') fail(`Done is not the teacher accent (${pop.doneBg})`);
+    if (pop.doneBg !== 'rgb(124, 92, 230)' || pop.doneBg !== pop.primaryBg) fail(`Done is not the brand primary purple (${pop.doneBg}; --tv-primary ${pop.primaryBg})`);
     if (!/Multiplication Facts/.test(pop.title)) fail(`the popover is not headed by the skill name ("${pop.title}")`);
     if (!pop.sample) fail('the popover draws no sample');
     if (pop.jargon) fail('the popover still uses developer wording');

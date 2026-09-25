@@ -13063,7 +13063,7 @@ export function generateWorksheetHTML() {
                 <div class="worksheet-problems" style="grid-template-columns: ${gridCols};gap:${gridGap};">${problemsHTML}</div>
                 ${answerKeyHTML}
                 <div class="worksheet-footer">
-                    <span class="footer-left">Maths Quest Pro</span>
+                    <span class="footer-left">Math Quest Pro</span>
                     <span class="footer-center">${numSets > 1 ? `Page ${setNum + 1}` : ''}</span>
                     <span class="footer-right">${today}</span>
                 </div>
@@ -13937,7 +13937,7 @@ async function generateWorksheetHTMLAsync() {
                 </div>
                 ${answerKeyHTML}
                 <div class="worksheet-footer">
-                    <span class="footer-left">Maths Quest Pro</span>
+                    <span class="footer-left">Math Quest Pro</span>
                     <span class="footer-center">${numSets > 1 && labelSets ? `Page ${setNum + 1}` : ''}</span>
                     <span class="footer-right">${today}</span>
                 </div>
@@ -14037,7 +14037,7 @@ export async function printWorksheet() {
    ========================================================================== */
 
 // Fallback only, for the impossible case of a page with no stylesheet links.
-const SHEET_DOC_STYLESHEETS = ['css/variables.css', 'css/base.css', 'css/ui-components.css',
+const SHEET_DOC_STYLESHEETS = ['css/brand.css', 'css/variables.css', 'css/base.css', 'css/ui-components.css',
     'css/word-problem-visuals.css', 'css/print-worksheet.css', 'css/fonts/andika.css', 'css/sheet-kit.css'];
 const SHEET_DOC_FONT_FILES = ['css/fonts/Andika-Regular.woff2', 'css/fonts/Andika-Bold.woff2'];
 
