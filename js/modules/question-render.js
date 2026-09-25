@@ -14,7 +14,7 @@ import {
     cellKindFor, kindHTML, instructionForKind,
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
     regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
-    clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget,
+    clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget, isNumberLineItem, NUMBER_LINE_INSTRUCTION,
     screenInstruction, canFitDigits, adoptSvgBlank, mountModel,
 } from './screen-cell.js';
 
@@ -1432,7 +1432,7 @@ function _applyScreenCell() {
 
     // The practice card is one column: the paper is the layout (SP-12 widths).
     card.classList.remove('layout-visual-left', 'layout-pv-disks', 'layout-fnl', 'qc-bundled-side-by-side');
-    if (_WIDE_TYPES.has(q.answerType)) card.classList.add('mq-wide');
+    if (_WIDE_TYPES.has(q.answerType) || isNumberLineItem(q)) card.classList.add('mq-wide');
 
     const visualAid = document.getElementById('visualAid');
     const input = document.getElementById('answerInput');
@@ -1488,6 +1488,14 @@ function _applyScreenCell() {
             const visualShown = visualAid && visualAid.style.display !== 'none' && visualAid.innerHTML.trim();
             if (visualShown && !hideRepeatedPrompt(visualAid, q.text) && visualRepeatsText(visualAid, q.text)) qt.classList.add('mq-dup');
             if (!qt.classList.contains('mq-dup')) screenTextLine(qt);
+        }
+        // the number line is jumped on screen (regrade 2): its instruction says so, and no longer
+        // repeats the equation drawn under the line
+        if (qt && isNumberLineItem(q)) {
+            qt.classList.remove('mq-dup');
+            qt.style.cssText = '';
+            qt.innerHTML = `<span class="mq-instr-text">${_escapeHtmlForQuestion(NUMBER_LINE_INSTRUCTION)}</span>`
+                + `<span class="mq-sr"> ${_escapeHtmlForQuestion(String(q.text || '').replace(/<[^>]*>/g, ''))}</span>`;
         }
         if (input && input.closest('#answerInputArea')) _styleSlot(input, q, 'line');
         // One slot per answer (SL-7): a visual that draws its own blank ("5 − 2 = ___", a

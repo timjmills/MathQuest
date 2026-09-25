@@ -42,6 +42,16 @@ function PLAN(rootSel, which) {
     const parts = (ans) => (Array.isArray(ans) ? ans.map(String) : String(ans).split(/\s*,\s*|\s+R\s+/i)).map(s => s.trim());
     const ans = q.ans;
 
+    // Working first, as a pupil does it (regrade 2): jump on the number line to the answer's
+    // tick (run() then checks an arc was drawn), and write in long division's working rows. The
+    // answer is still given below; the working must never change the verdict.
+    const nl = all('.mq-nl-tick');
+    if (nl.length) {
+        const land = nl.find(t => t.querySelector('.mq-nl-lab') && t.querySelector('.mq-nl-lab').textContent.trim() === String(ans));
+        if (land && !land.classList.contains('mq-nl-start')) tag(land, { type: 'click', check: 'nl' });   // + 0 has no jump
+    }
+    all('input.mq-opswork').slice(0, 2).forEach(w => tag(w, { type: 'text', value: '9', check: 'work' }));
+
     // the kit's model: tap boxes of the ten frame, or + under each base-ten zone
     const model = root.querySelector('[data-mq-model]');
     if (model && model.dataset.mqBuilt === '1') {
@@ -138,6 +148,14 @@ async function run(page, sel, which) {
         await el.evaluate(e => { e.value = ''; });
         await page.keyboard.type(step.value, { delay: 10 });
         await el.evaluate(e => e.dispatchEvent(new Event('change', { bubbles: true })));
+    }
+    if (r.plan.some(s => s.check === 'nl')) {
+        const arcs = await page.evaluate(s => document.querySelectorAll(`${s} .mq-nl-arcs path`).length, sel);
+        if (!arcs) return { error: 'tap-to-jump drew no arc' };
+    }
+    if (r.plan.some(s => s.check === 'work')) {
+        const kept = await page.evaluate(s => Array.from(document.querySelectorAll(`${s} input.mq-opswork`)).filter(i => i.value === '9').length, sel);
+        if (!kept) return { error: 'long-division working rows did not take a digit' };
     }
     return r;
 }

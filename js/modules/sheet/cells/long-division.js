@@ -55,7 +55,9 @@ function keyOf(p) {
     const q = String(quotient).padStart(n, ' ');
     const slots = {};
     for (let i = 0; i < n; i++) slots[`q-${i}`] = q[i] === ' ' ? '' : q[i];
-    return { quotient, slots };
+    // P11: `rbox` adds an "R [ ]" slot after the quotient strip for a remainder (divide, Remainders).
+    if (p.rbox) slots.r = String(dividend - quotient * divisor);
+    return { quotient, slots, remainder: p.rbox ? dividend - quotient * divisor : null };
 }
 
 /**
@@ -100,7 +102,8 @@ register('division', {
             for (let i = 0; i < n; i++) o[`q-${i}`] = s[i] === ' ' ? '' : s[i];
             return o;
         });
-        const cols = `grid-template-columns:repeat(${dv}, ${g.em(trackMm)}) ${g.em(gutterMm)} repeat(${n}, ${g.em(trackMm)});`;
+        const cols = `grid-template-columns:repeat(${dv}, ${g.em(trackMm)}) ${g.em(gutterMm)} repeat(${n}, ${g.em(trackMm)})`
+            + `${p.rbox ? ` ${g.em(trackMm * 0.9)} ${g.em(trackMm * 1.2)}` : ''};`;
         const cell = (content, col, row, extra = '') =>
             `<span style="grid-column:${col};grid-row:${row};display:flex;align-items:center;justify-content:center;${extra}">${content}</span>`;
         let html = '';
@@ -111,6 +114,11 @@ register('division', {
                 // A box before the quotient's first digit stays empty on the key: ungraded.
                 graded: k.slots[`q-${i}`] !== '',
             }), dv + 2 + i, 1, 'align-items:flex-end;padding-bottom:0.08em;');
+        }
+        // P11: the remainder slot, "R [ ]", on the quotient's row after the last dividend track.
+        if (p.rbox) {
+            html += cell('<span style="font-weight:700">R</span>', dv + 2 + n, 1, 'align-items:flex-end;padding-bottom:0.08em;');
+            html += cell(box(g, 'r', { wMm: trackMm, hMm: g.stripMm, value: vals.r || '', ink, mark: 'cell' }), dv + 3 + n, 1, 'align-items:flex-end;padding-bottom:0.08em;');
         }
         // Row 2: divisor, bracket, dividend. The vinculum is the top border of the dividend row.
         for (let i = 0; i < dv; i++) html += cell(esc(V[i]), i + 1, 2);
@@ -150,6 +158,11 @@ register('division', {
         const k = keyOf(p);
         const slots = {};
         for (const [id, v] of Object.entries(k.slots)) slots[id] = { value: v, graded: v !== '' };
+        if (p.rbox) {
+            const v = `${k.quotient} R ${k.remainder}`;
+            slots.answer = { value: v, graded: true };
+            return { value: v, display: v, slots };
+        }
         slots.answer = { value: String(k.quotient), graded: true };
         return { value: k.quotient, display: String(k.quotient), slots };
     },
@@ -159,17 +172,19 @@ register('division', {
         const trackMm = Math.max(ctx.metrics.trackMm || 0, g.writeMm * 0.8);
         const rows = rowsOf(p);
         return {
-            wMm: Math.ceil((n + dv + 1.1) * trackMm + 8),
+            wMm: Math.ceil((n + dv + 1.1 + (p.rbox ? 2.1 : 0)) * trackMm + 8),
             hMm: Math.ceil(g.stripMm + g.E * 1.3 + rows * (Math.max(g.writeMm, 6) + 1) + 6),
             measure: true, factLike: false, maxCols: 2, tracks: n + dv + 1,
         };
     },
     inputs(p) {
         const n = String(p.dividend).length;
-        return Array.from({ length: n }, (_, i) => ({
+        const out = Array.from({ length: n }, (_, i) => ({
             id: `q-${i}`, kind: 'digit', shape: 'box', graded: true, order: i, maxLength: 1,
             inputmode: 'numeric', scopes: ['full', 'answer-only'],
         }));
+        if (p.rbox) out.push({ id: 'r', kind: 'number', shape: 'box', graded: true, order: n, maxLength: 2, inputmode: 'numeric', scopes: ['full', 'answer-only'] });
+        return out;
     },
     layout() { return { card: 'card-division', checker: 'value', requiresVisual: true }; },
 });

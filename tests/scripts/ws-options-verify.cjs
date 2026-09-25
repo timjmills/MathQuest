@@ -134,7 +134,10 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             const bad = [];
             for (const q of items) {
                 const f = factOf(q); if (!f) continue;
-                const ok = (opKind === '-' || opKind === '/') ? set.includes(f.b) : (set.includes(f.a) || set.includes(f.b));
+                // ÷: the 0 set is 0 ÷ n (dividing BY 0 is undefined), so a ticked 0 is honoured by
+                // a zero dividend (skill-options.js div_facts, "0 (zero shared: 0 ÷ n)").
+                const ok = (opKind === '/' && set.includes(0) && f.a === 0)
+                    || ((opKind === '-' || opKind === '/') ? set.includes(f.b) : (set.includes(f.a) || set.includes(f.b)));
                 if (!ok) bad.push(`${f.a} ${f.op} ${f.b}`);
             }
             return [bad.length ? [`fact outside the ticked set {${set}}: ${bad.slice(0, 3).join(', ')}`] : [], []];

@@ -66,6 +66,8 @@ export const OPTION_KEYS = {
     midpoint: 'H',
     support: 'F',
     tiles: 'Y',
+    // P11 K-2 counting (2026-09-25): the last free letter.
+    objects: 'J',
 };
 const KEY_TO_OPTION = Object.fromEntries(Object.entries(OPTION_KEYS).map(([id, k]) => [k, id]));
 
@@ -76,16 +78,25 @@ export const VALUE_TOKENS = {
     notation: { stacked: 'S', across: 'A', bracket: 'B', fraction: 'F' },
     response: { standard: 'S', 'which-numbers': 'W', 'array-builder': 'A', write: 'R', 'circle-all': 'C' },
     regroup: { none: 'N', always: 'A', mixed: 'M' },
-    orientation: { vertical: 'V', horizontal: 'H' },
+    orientation: { vertical: 'V', horizontal: 'H',
+        // P11 count_objects arrangement (appended)
+        rows: 'R', line: 'L', scattered: 'S' },
     unknown: { answer: 'A', first: 'F', second: 'S', mixed: 'M' },
     wordform: { to_number: 'N', to_words: 'W' },
-    dir: { more: 'M', less: 'L', both: 'B' },
-    task: { read: 'R', count: 'C', compute: 'P', closest: 'N', reasonable: 'E' },
+    dir: { more: 'M', less: 'L', both: 'B',
+        // P11 counting / comparing (appended)
+        fewer: 'F', same: 'S', mixed: 'X', forward: 'W', back: 'K' },
+    task: { read: 'R', count: 'C', compute: 'P', closest: 'N', reasonable: 'E',
+        // P11 compare_objects (appended)
+        length: 'L', height: 'H', thickness: 'T', all: 'A' },
     zeroPlace: { none: 'N', some: 'S', always: 'A' },
     op: { x: 'M', '/': 'D' },
     order: { largest: 'L', scrambled: 'S' },
     midpoint: { never: 'N', seeded: 'S', only: 'O' },
-    support: { cut: 'C', line: 'L', none: 'N', labels: 'B', chart: 'T' },
+    support: { cut: 'C', line: 'L', none: 'N', labels: 'B', chart: 'T',
+        // P11 operations hint pictures (appended)
+        tile: 'D', frame: 'R', skip: 'K', array: 'A', think: 'H', bar: 'M' },
+    objects: { shapes: 'S', pictures: 'P', frame: 'F', dice: 'D' },
     // Numeric sets whose members are not all under 36: one digit per power of ten.
     power: { 10: '1', 100: '2', 1000: '3' },
     places: { 1: '0', 10: '1', 100: '2', 1000: '3', 10000: '4', 100000: '5' },
