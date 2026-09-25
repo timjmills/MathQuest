@@ -24,9 +24,15 @@
 
 const PLACE_LABEL = {
     1: 'Ones', 10: 'Tens', 100: 'Hundreds', 1000: 'Thousands',
-    10000: 'Ten Thousands', 100000: 'Hundred Thousands', 1000000: 'Millions'
+    10000: 'Ten Thousands', 100000: 'Hundred Thousands', 1000000: 'Millions',
+    0.1: 'Tenths', 0.01: 'Hundredths', 0.001: 'Thousandths'
 };
-const LETTER = { 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M' };
+const LETTER = { 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M',
+    0.1: 'Tth', 0.01: 'Hth', 0.001: 'Thth' };
+// vis_pv_decimal_places: a mat may carry tenths / hundredths / thousandths zones (q.places holds
+// 0.1, 0.01, 0.001). Values are then worked in whole thousandths, never in floats.
+const _dp = (places) => Math.max(0, ...places.map((p) => (p < 1 ? Math.round(-Math.log10(p)) : 0)));
+const _fix = (v, d) => Number(Number(v).toFixed(d));
 const MAX_PER_ZONE = 9;
 const DISK_PX = 48;          // >= 44 px touch target (WCAG 2.5.5), and room for "1,000"
 const GAP_PX = 6;
@@ -52,21 +58,33 @@ function _placesForTarget(target) {
 }
 
 function _digitAtPlace(num, place) {
-    return Math.floor(num / place) % 10;
+    return Math.floor(Math.round(num * 1000) / Math.round(place * 1000)) % 10;
 }
 
-function _diskHtml(place, idx, px) {
-    const label = Number(place).toLocaleString('en-US');
-    const fontSize = Math.round(px * (label.length >= 5 ? 0.2 : label.length === 3 ? 0.3 : label.length === 4 ? 0.24 : 0.36));
+/** The digit q.target holds in `place` (decimal places included) - the hosts' checker uses it. */
+export function pvDigitAt(q, place) {
+    return _digitAtPlace(Math.max(0, Number(q && q.target) || 0), place);
+}
+
+function _diskHtml(place, idx, px, fraction = false) {
+    let label = place < 1 ? String(place) : Number(place).toLocaleString('en-US');
+    let fontSize = Math.round(px * (label.length >= 5 ? 0.2 : label.length === 3 ? 0.3 : label.length === 4 ? 0.24 : 0.36));
+    if (fraction && place < 1) {
+        // R61: the counter named as a fraction (1 over 10 / 100 / 1000), as the paper draws it.
+        const den = String(Math.round(1 / place));
+        fontSize = Math.round(px * (den.length >= 4 ? 0.2 : 0.24));
+        label = `<span style="display:inline-flex;flex-direction:column;align-items:center;line-height:1;">`
+            + `<span>1</span><span style="border-top:1.5px solid #000;padding-top:1px;">${den}</span></span>`;
+    }
     return `<button type="button" class="pvb-disk" data-place="${place}" data-disk-idx="${idx}"
-        aria-label="${PLACE_LABEL[place]} disk, value ${label}. Tap to take it away."
+        aria-label="${PLACE_LABEL[place]} disk, value ${place < 1 ? String(place) : Number(place).toLocaleString('en-US')}. Tap to take it away."
         style="width:${px}px;height:${px}px;min-width:44px;min-height:44px;border-radius:50%;background:#fff;color:#000;
                font-family:'Andika',sans-serif;font-weight:700;font-size:${fontSize}px;border:2px solid #000;
                box-shadow:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
                padding:0;margin:0;line-height:1;">${label}</button>`;
 }
 
-function _zoneHtml(place, i, px, cols = 3, width = 0) {
+function _zoneHtml(place, i, px, cols = 3, width = 0, point = false) {
     // Round 3 (H2 / H6 at 390 px): the three zones must fit the cell side by side. A narrow cell
     // gives each zone its share of the width and fewer disks per row (the zone grows down),
     // never smaller disks than a touch target.
@@ -79,6 +97,7 @@ function _zoneHtml(place, i, px, cols = 3, width = 0) {
             aria-label="${PLACE_LABEL[place]} zone, empty. Tap to add a ${PLACE_LABEL[place].toLowerCase()} disk."
             style="box-sizing:border-box;width:${side}px;height:${cols === 3 ? side : tall}px;border:2px solid #000;${i ? 'border-left:none;' : ''}
                    border-radius:0;background:#fff;cursor:pointer;padding:${GAP_PX}px;position:relative;">
+            ${point ? `<span class="pvb-point" aria-hidden="true" style="position:absolute;left:-8px;bottom:-8px;width:14px;height:14px;border-radius:50%;background:#000;"></span>` : ''}
             <div class="pvb-zone-stack" data-place="${place}"
                  style="display:grid;grid-template-columns:repeat(${cols},${px}px);grid-auto-rows:${px}px;gap:${GAP_PX}px;justify-content:center;"></div>
         </div>
@@ -87,10 +106,12 @@ function _zoneHtml(place, i, px, cols = 3, width = 0) {
 
 export function renderPvDisksBuild(q, container) {
     if (!container || !q) return;
-    const target = Math.max(0, Math.floor(q.target || 0));
     const places = (Array.isArray(q.places) && q.places.length)
         ? q.places.slice().sort((a, b) => b - a)
-        : _placesForTarget(target);
+        : _placesForTarget(Math.floor(q.target || 0));
+    const dp = _dp(places);
+    const target = dp ? _fix(Math.max(0, Number(q.target) || 0), dp) : Math.max(0, Math.floor(q.target || 0));
+    const targetText = dp ? ((q.pv && q.pv.s) || target.toFixed(dp)) : target.toLocaleString('en-US');
     const large = _largeTargets();
     let px = large ? 56 : DISK_PX;
     // the width the mat may take (the cell's content box); three disks a row when they fit
@@ -111,10 +132,10 @@ export function renderPvDisksBuild(q, container) {
              aria-label="Place-value disk mat. Tap a zone to add a disk. Tap a disk to take it away."
              style="background:#fff;color:#000;font-family:'Andika',sans-serif;">
             <div class="pvb-target" style="text-align:center;font-weight:700;font-size:2.4rem;
-                 color:#000;margin-bottom:10px;letter-spacing:1px;">${target.toLocaleString('en-US')}</div>
+                 color:#000;margin-bottom:10px;letter-spacing:1px;">${_esc(targetText)}</div>
             <div class="pvb-zones" data-role="zones"
                  style="display:flex;flex-wrap:nowrap;justify-content:center;width:100%;overflow-x:auto;">
-                ${places.map((p, i) => _zoneHtml(p, i, px, cols, zoneW)).join('')}
+                ${places.map((p, i) => _zoneHtml(p, i, px, cols, zoneW, p < 1 && places[i - 1] === 1)).join('')}
             </div>
             <div class="pvb-howto" style="text-align:center;font-size:0.95rem;color:#000;margin-top:8px;">
                 Tap a zone to add a disk. Tap a disk to take it away.</div>
@@ -161,12 +182,13 @@ export function renderPvDisksBuild(q, container) {
         // The grid hosts' twin (screen-cell.js mountBuild): the mat IS the answer - its value is
         // written into the host's input as the pupil builds (no Submit on those hosts).
         if (typeof container._pvOnChange === 'function') {
-            try { container._pvOnChange(Object.keys(counts).reduce((v, pl) => v + (counts[pl] | 0) * Number(pl), 0)); } catch (e) { /* host's */ }
+            const v = Object.keys(counts).reduce((t, pl) => t + (counts[pl] | 0) * Math.round(Number(pl) * 1000), 0) / 1000;
+            try { container._pvOnChange(dp ? _fix(v, dp) : v); } catch (e) { /* host's */ }
         }
     }
 
     function addDisk(zoneEl) {
-        const place = parseInt(zoneEl.dataset.place, 10);
+        const place = Number(zoneEl.dataset.place);
         const stack = zoneEl.querySelector('.pvb-zone-stack');
         if (!stack) return;
         if (stack.querySelectorAll('.pvb-disk').length >= MAX_PER_ZONE) {
@@ -175,14 +197,14 @@ export function renderPvDisksBuild(q, container) {
         }
         diskCounters[place] = (diskCounters[place] || 0) + 1;
         const wrapper = document.createElement('div');
-        wrapper.innerHTML = _diskHtml(place, diskCounters[place], px).trim();
+        wrapper.innerHTML = _diskHtml(place, diskCounters[place], px, !!(q.pv && q.pv.fraction)).trim();
         stack.appendChild(wrapper.firstElementChild);
         announce(`${PLACE_LABEL[place]} disk added.`);
         refreshCountsUI();
     }
 
     function removeDisk(diskEl) {
-        const place = parseInt(diskEl.dataset.place, 10);
+        const place = Number(diskEl.dataset.place);
         if (diskEl.parentNode) diskEl.parentNode.removeChild(diskEl);
         announce(`${PLACE_LABEL[place]} disk taken away.`);
         refreshCountsUI();
@@ -248,10 +270,10 @@ export function renderPvDisksBuild(q, container) {
 // we only render places we asked about, but guarded for safety).
 export function checkPvDisksBuild(q, counts) {
     if (!q || !counts || typeof counts !== 'object') return false;
-    const target = Math.max(0, Math.floor(q.target || 0));
+    const target = Math.max(0, Number(q.target) || 0);
     const places = (Array.isArray(q.places) && q.places.length)
         ? q.places.slice()
-        : _placesForTarget(target);
+        : _placesForTarget(Math.floor(target));
     for (const p of places) {
         const expected = _digitAtPlace(target, p);
         const actual = counts[p] | 0;

@@ -19,10 +19,10 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 
 ## Summary
 
-- 272 entries: **131 new skills, 88 new options, 2 repairs**, and **51 added from the visual catalogue** (0 wiring, 10 template, 6 pane, 27 option, 1 skill, 6 migration, 1 band).
+- 271 entries: **131 new skills, 88 new options, 2 repairs**, and **50 added from the visual catalogue** (0 wiring, 9 template, 6 pane, 27 option, 1 skill, 6 migration, 1 band).
 - 161 from the White Rose audit (42 extended for standards), 60 from the standards audit.
 - They close 114 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
-- The visual catalogue: 210 representations (MATCH 8, PARTIAL 102, GAP 100); every PARTIAL and GAP one is on an entry below.
+- The visual catalogue: 210 representations (MATCH 9, PARTIAL 102, GAP 99); every PARTIAL and GAP one is on an entry below.
 - 30 new sheet-kit templates and panes are needed; each is owned by one lane.
 - Lanes `k2` and `operations` were already building from this list: their entries keep their order and names, and the catalogue's entries are APPENDED after them.
 
@@ -30,7 +30,7 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 |---|---|---|---|---|---|---|---|---|---|
 | Counting and early number (K-1 pictures) (`k2`) | 35 | 16 | 7 | 0 | 12 | 20 | 34 | 55 | 454 |
 | Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 40 | 18 | 10 | 1 | 11 | 21 | 50 | 35 | 316 |
-| Place value, rounding and estimation (the pv kit) (`placevalue`) | 18 | 3 | 8 | 0 | 7 | 9 | 19 | 15 | 169 |
+| Place value, rounding and estimation (the pv kit) (`placevalue`) | 17 | 3 | 8 | 0 | 6 | 9 | 19 | 14 | 160 |
 | Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 28 | 14 | 10 | 0 | 4 | 19 | 20 | 17 | 104 |
 | Fractions, decimals, conversions, ratio (`fractions`) | 45 | 17 | 21 | 0 | 7 | 19 | 49 | 25 | 274 |
 | Geometry, area, volume, coordinates (`geometry`) | 46 | 30 | 12 | 1 | 3 | 35 | 78 | 33 | 144 |
@@ -997,21 +997,11 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 7 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-## Lane `placevalue`: Place value, rounding and estimation (the pv kit) (18)
+## Lane `placevalue`: Place value, rounding and estimation (the pv kit) (17)
 
 Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels,gattegno}.js`, `js/modules/pv-support-cell.js`, `js/modules/sheet/providers/pv.js`, `js/modules/sheet/cells/panes/{place,extras,pv-exchange}.js`. Builds templates: `gattegno`, `pv-exchange`.
 
-### 1. Decimal Places in the Place-Value Chart — `vis_pv_decimal_places`
-
-- **Added from visual catalogue.** template · grade 1-5 · lane `placevalue`.
-- **Build:** pv.js gains the places below the ones (Tth, Hth, Thth), the decimal point on the column line, counters 0.1 / 0.01 / 0.001 (also fraction-labelled 1/10 …), decimal digit-chart heads, and decimal bands on place_value_disks, pv_disks_build, value, expand and compare — the dependency of every decimal place-value entry in the fractions lane.
-- **Offered on:** `placevalue:place_value_disks`, `placevalue:pv_disks_build`, `placevalue:value`, `placevalue:expand`, `placevalue:compare`.
-- **Templates:** `pv`, `pv-support`. **Files:** `js/modules/sheet/cells/pv.js`, `js/modules/pv-support-cell.js`.
-- **Draws (visual catalogue):** V005 Place-value chart with plain unlabelled dots; V006 Place-value digit chart / place heads (to Thth, to millions); V167 Decimal place-value chart and counters (Tth, Hth, Thth).
-- **Reach:** 78 White Rose small steps use these pictures.
-- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
-
-### 2. Place-Value Chart Beside the Method (exchanges) — `vis_pv_exchange`
+### 1. Place-Value Chart Beside the Method (exchanges) — `vis_pv_exchange`
 
 - **Added from visual catalogue.** pane · grade 1-5 · lane `placevalue`.
 - **Build:** a new pane:pv-exchange drawn beside a written method: counters in a chart with the exchange ring and arrow for +, crossing out for −, n repeated rows for ×, sharing rows or grouping rings for ÷, with decimal places; a support value on the column skills.
@@ -1019,10 +1009,9 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Templates:** -; new or owned: `pv-exchange`. **Files:** `js/modules/sheet/cells/panes/pv-exchange.js`.
 - **Draws (visual catalogue):** V031 Place-value chart beside the method with exchanges (+ − × ÷, decimals).
 - **Reach:** 38 White Rose small steps use these pictures.
-- **After:** `vis_pv_decimal_places`.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 3. Vertical Number Line Through Zero — `vis_value_line_vertical`
+### 2. Vertical Number Line Through Zero — `vis_value_line_vertical`
 
 - **Added from visual catalogue.** option · grade K-5 · lane `placevalue`.
 - **Build:** value-line gains `orientation: 'vertical'` (a lift panel, a sea-level scale) and a thermometer look (`line: 'thermometer'`) through zero.
@@ -1032,7 +1021,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Reach:** 36 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 4. Rounding Lines for Decimals — `vis_round_line_decimals`
+### 3. Rounding Lines for Decimals — `vis_round_line_decimals`
 
 - **Added from visual catalogue.** option · grade K-5 · lane `placevalue`.
 - **Build:** round-line / round-chart / round-pv take decimals (to 1 and 2 dp) and `hops: 'bounds'` (hops to each bound, bounds circled) and `task: 'ends'`.
@@ -1042,7 +1031,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Reach:** 29 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 5. Gattegno Chart — `vis_gattegno`
+### 4. Gattegno Chart — `vis_gattegno`
 
 - **Added from visual catalogue.** template · grade 3-5 · lane `placevalue`.
 - **Build:** a new gattegno template: rows 1–9 × powers of ten (including decimal rows), `task: 'read' | 'ring' | 'shift'` (× 10 = one row up), offered as a support on place_value_10x and more_less_*.
@@ -1052,7 +1041,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Reach:** 16 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 6. Compare Numbers to 10 and 20 (option) — `compare_small`
+### 5. Compare Numbers to 10 and 20 (option) — `compare_small`
 
 - **What:** option on `placevalue:compare`: band 10/20 and pictures. Grade K-1 · family placevalue · source White Rose audit.
 - **Closes (standards):** K.CC.C.7, M.EE.4.NBT.2, M.EE.5.NBT.1 · tag with CCSS K.CC.C.6, K.CC.C.7, 1.NBT.B.3, EE M.EE.K.CC.7, M.EE.1.NBT.3, M.EE.4.NBT.2, M.EE.5.NBT.1
@@ -1065,7 +1054,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Ladder:** O2 to 10 → 20 → 99 · O3 pictures (frames / tens and ones) → numbers · O6 frames / rods / numbers.
 - **Misconceptions:** the sign points to the bigger number; compares ones before tens.
 
-### 7. "−n | Number | +n" Table — `vis_more_less_table`
+### 6. "−n | Number | +n" Table — `vis_more_less_table`
 
 - **Added from visual catalogue.** option · grade K-2 · lane `placevalue`.
 - **Build:** `layout: 'table' | 'strip'` on more_less_10 / 100: a row of three boxes (n less, the number, n more).
@@ -1075,7 +1064,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Reach:** 8 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 8. Powers of Ten With Exponents (option) — `pv10_exponents`
+### 7. Powers of Ten With Exponents (option) — `pv10_exponents`
 
 - **What:** option on `placevalue:place_value_10x`: notation "powers written with exponents" (× 10³) and task "compare powers of ten by counting zeros". Grade 5 · family placevalue · source standards audit.
 - **Closes (standards):** 5.NBT.A.2, M.EE.5.NBT.2 · tag with CCSS 5.NBT.A.2, EE M.EE.5.NBT.2
@@ -1087,7 +1076,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Ladder:** O2 whole numbers → decimals → divide · O3 shift arrows → none · O6 chart / plain.
 - **Misconceptions:** 10³ = 30; moves the point the wrong way when dividing.
 
-### 9. Roman Numerals — `roman_100`
+### 8. Roman Numerals — `roman_100`
 
 - **What:** new skill `placevalue:roman_numerals`. Grade 3 · family placevalue · source White Rose audit.
 - **Closes (standards):** none not already full
@@ -1100,7 +1089,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Misconceptions:** IIII for 4; XL = 60.
 - **Visual catalogue:** also draws V174 Roman numerals (reach 3 steps).
 
-### 10. Roman Numerals to 1,000 (option) — `roman_1000`
+### 9. Roman Numerals to 1,000 (option) — `roman_1000`
 
 - **What:** option on `placevalue:roman_numerals`: to 1,000. Grade 4 · family placevalue · source White Rose audit.
 - **Closes (standards):** none not already full
@@ -1114,7 +1103,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **After:** `roman_100`.
 - **Visual catalogue:** also draws V174 Roman numerals (reach 3 steps).
 
-### 11. Round Decimals to the Nearest Whole (option) — `round_whole`
+### 10. Round Decimals to the Nearest Whole (option) — `round_whole`
 
 - **What:** option on `decimals:round_decimals`: nearest whole. Grade 3-4 · family decimals · source White Rose audit.
 - **Closes (standards):** 5.NBT.A.4 · tag with CCSS 4.NF.C.6, 5.NBT.A.4, EE M.EE.5.NBT.4
@@ -1127,7 +1116,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Misconceptions:** rounds to the nearest tenth instead; rounds 2.45 up because of the 5.
 - **After:** `vis_round_line_decimals`.
 
-### 12. Ten Times the Place to the Right (option) — `value_ten_times`
+### 11. Ten Times the Place to the Right (option) — `value_ten_times`
 
 - **What:** option on `placevalue:value`: form "ten times / one tenth": compare the value of the same digit in two places (the 7 in 700 is 10 times the 7 in 70; 700 ÷ 70 = 10). Grade 4-5 · family placevalue · source standards audit.
 - **Closes (standards):** 4.NBT.A.1, 5.NBT.A.1 · tag with CCSS 4.NBT.A.1, 5.NBT.A.1, EE -
@@ -1139,7 +1128,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Ladder:** O2 adjacent places → two places apart → decimals (Grade 5) · O3 chart with the shift arrows → none · O6 chart / numbers.
 - **Misconceptions:** the value is the digit; answers "one more place" instead of ×10.
 
-### 13. Numbers to 10,000,000 (option) — `big_numbers`
+### 12. Numbers to 10,000,000 (option) — `big_numbers`
 
 - **What:** option on `placevalue:pv_digit_drag`: to 10,000,000. Grade 5 · family placevalue · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 5.NBT.A.1, 4.NBT.A.2, EE M.EE.5.NBT.1, M.EE.4.NBT.2
@@ -1151,7 +1140,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Ladder:** O2 1,000,000 → 10,000,000 · O3 place-value headings → none · O6 chart.
 - **Misconceptions:** misses a zero; groups digits wrongly.
 
-### 14. Widen Place Value to 7 Digits (millions) — `vis_pv_bands_millions`
+### 13. Widen Place Value to 7 Digits (millions) — `vis_pv_bands_millions`
 
 - **Added from visual catalogue.** band · grade 1-5 · lane `placevalue`.
 - **Build:** bands 99,999 / 999,999 / 9,999,999 on place_value_disks, pv_disks_build, compare, expand, value and number_word_names; period heads (Millions | Thousands | Ones, H T O under each, commas in threes); million bands on rounding_visual / round_nl_*; the odometer digit display. pv_digit_drag's band is `big_numbers`.
@@ -1162,7 +1151,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **After:** `big_numbers`.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 15. Multiply and Divide Decimals: Missing Values (option) — `dec_missing`
+### 14. Multiply and Divide Decimals: Missing Values (option) — `dec_missing`
 
 - **What:** option on `placevalue:place_value_10x`: missing number. Grade 4 · family placevalue · source White Rose audit.
 - **Closes (standards):** 5.NBT.A.2 · tag with CCSS 5.NBT.A.2, EE M.EE.5.NBT.2
@@ -1174,7 +1163,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Ladder:** O2 × → ÷ → mixed · O3 shift arrows → none · O6 chart.
 - **Misconceptions:** adds zeros to decimals (3.4 × 10 = 3.40); shifts the wrong way.
 
-### 16. Partition Numbers Flexibly — `flex_partition`
+### 15. Partition Numbers Flexibly — `flex_partition`
 
 - **What:** new skill `placevalue:flexible_partition`. Grade 1-3 · family placevalue · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 1.NBT.B.2, 2.NBT.A.3, 4.NBT.A.2, 2.NBT.A.1, EE M.EE.1.NBT.2, M.EE.2.NBT.3, M.EE.4.NBT.2, M.EE.2.NBT.1
@@ -1186,7 +1175,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Ladder:** O2 2-digit → 3 → 4 · O3 base-10 picture → none · O6 cherry / bar.
 - **Misconceptions:** only standard partitions; partitions into digits (45 = 4 + 5).
 
-### 17. Mental Calculation and Estimation — `mental_estimate`
+### 16. Mental Calculation and Estimation — `mental_estimate`
 
 - **What:** new skill `number_sense:estimate_and_check`. Grade 5 · family operations · source White Rose audit.
 - **Closes (standards):** 3.OA.D.8 · tag with CCSS 5.OA.A.2, 4.NBT.A.3, EE M.EE.4.NBT.3
@@ -1198,7 +1187,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 - **Ladder:** O2 + − → × ÷ · O3 rounding line → none · O6 plain.
 - **Misconceptions:** rounds every number up; accepts an answer ten times too big.
 
-### 18. 10,000 and 100,000 More or Less (option) — `pv_more_less_big`
+### 17. 10,000 and 100,000 More or Less (option) — `pv_more_less_big`
 
 - **What:** option on `placevalue:more_less_100`: 10,000 and 100,000. Grade 4 · family placevalue · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 4.NBT.A.1, EE -
@@ -1590,7 +1579,6 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Answer:** write the decimal / the parts.
 - **Ladder:** O2 tenths → hundredths → flexible · O3 chart headings with counters → headings only → none · O6 counters / base-10 (flat = 1) / chart.
 - **Misconceptions:** writes 0.6 for 6 hundredths; thinks 0.36 has 36 tenths.
-- **After:** `vis_pv_decimal_places` (lane `placevalue`).
 - **Visual catalogue:** also draws V166 Tenths pictured (bar, frame, 0–1 line); V167 Decimal place-value chart and counters (Tth, Hth, Thth) (reach 40 steps).
 
 ### 4. Thousandths (option) — `thousandths_pv`
@@ -1605,7 +1593,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Answer:** write the decimal, fraction, words (bank) or expanded form.
 - **Ladder:** O2 x/1000 → mixed places → words and expanded · O3 chart headings → none · O6 chart / counters.
 - **Misconceptions:** 0.034 read as thirty-four tenths; writes 0.34 for 34 thousandths.
-- **After:** `decimal_pv`, `vis_pv_decimal_places` (lane `placevalue`).
+- **After:** `decimal_pv`.
 - **Visual catalogue:** also draws V167 Decimal place-value chart and counters (Tth, Hth, Thth) (reach 39 steps).
 
 ### 5. Fraction of an Amount: Find the Whole (option) — `frac_find_whole`
@@ -1805,7 +1793,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Answer:** write the value or the digit.
 - **Ladder:** O2 within 1 → integer parts → zeros inside · O3 chart headings → none · O6 chart / expanded.
 - **Misconceptions:** ignores a zero place; reads the decimal part as a whole number.
-- **After:** `decimal_pv`, `vis_pv_decimal_places` (lane `placevalue`).
+- **After:** `decimal_pv`.
 
 ### 21. Compare Fractions of the Same Whole (option) — `frac_same_whole`
 
@@ -1870,7 +1858,6 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Answer:** write <, > or =.
 - **Ladder:** O2 tenths → hundredths → mixed · O3 squares shaded → outline → none · O6 squares / strips.
 - **Misconceptions:** 0.45 > 0.5 because 45 > 5; more digits means bigger.
-- **After:** `vis_pv_decimal_places` (lane `placevalue`).
 
 ### 26. Decimal Operations With Models (option) — `decimal_models`
 
@@ -1883,7 +1870,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Answer:** write the answer in the column (the model is support).
 - **Ladder:** O2 tenths → hundredths → crossing 1 · O3 model with exchanges drawn → model only → none · O6 hundred squares / counters.
 - **Misconceptions:** lines up the right-hand digits, not the points; 0.3 + 0.45 = 0.48.
-- **After:** `decimal_pv`, `vis_pv_decimal_places` (lane `placevalue`).
+- **After:** `decimal_pv`.
 
 ### 27. Make a Whole with Decimals — `decimal_whole`
 

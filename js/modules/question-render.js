@@ -3682,13 +3682,13 @@ function _renderQuestionImpl() {
                 const allCorrect = mod.checkPvDisksBuild(qq, counts);
 
                 // Per-zone correctness paint + count of wrong zones.
-                const target = Math.max(0, Math.floor(qq.target || 0));
                 const places = (Array.isArray(qq.places) && qq.places.length)
                     ? qq.places.slice()
                     : [];
                 let wrongCount = 0;
                 places.forEach(p => {
-                    const expected = Math.floor(target / p) % 10;
+                    // decimal places (0.1, 0.01) included: the widget reads its own digits
+                    const expected = mod.pvDigitAt(qq, p);
                     const stack = host.querySelector(`.pvb-zone-stack[data-place="${p}"]`);
                     if (!stack) return;
                     const disks = stack.querySelectorAll('.pvb-disk');

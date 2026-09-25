@@ -846,10 +846,6 @@ export const VISUAL_BUILDS = {
         files: ['js/modules/sheet/cells/word-work.js (unowned today; this entry takes it)'], after: [] }),
 
     // ------------------------------------------------------------------ place value
-    vis_pv_decimal_places: V({ lane: 'placevalue', kind: 'template', name: 'Decimal Places in the Place-Value Chart',
-        build: 'pv.js gains the places below the ones (Tth, Hth, Thth), the decimal point on the column line, counters 0.1 / 0.01 / 0.001 (also fraction-labelled 1/10 …), decimal digit-chart heads, and decimal bands on place_value_disks, pv_disks_build, value, expand and compare — the dependency of every decimal place-value entry in the fractions lane',
-        hosts: ['placevalue:place_value_disks', 'placevalue:pv_disks_build', 'placevalue:value', 'placevalue:expand', 'placevalue:compare'], templates: ['pv', 'pv-support'], newTemplates: [],
-        files: ['js/modules/sheet/cells/pv.js', 'js/modules/pv-support-cell.js'], after: [] }),
     vis_pv_bands_millions: V({ lane: 'placevalue', kind: 'band', name: 'Widen Place Value to 7 Digits (millions)',
         build: 'bands 99,999 / 999,999 / 9,999,999 on place_value_disks, pv_disks_build, compare, expand, value and number_word_names; period heads (Millions | Thousands | Ones, H T O under each, commas in threes); million bands on rounding_visual / round_nl_*; the odometer digit display. pv_digit_drag\'s band is `big_numbers`',
         hosts: ['placevalue:place_value_disks', 'placevalue:pv_disks_build', 'placevalue:compare', 'placevalue:expand', 'placevalue:number_word_names', 'number_sense:rounding_visual'], templates: ['pv'], newTemplates: [],
@@ -857,7 +853,7 @@ export const VISUAL_BUILDS = {
     vis_pv_exchange: V({ lane: 'placevalue', kind: 'pane', name: 'Place-Value Chart Beside the Method (exchanges)',
         build: 'a new pane:pv-exchange drawn beside a written method: counters in a chart with the exchange ring and arrow for +, crossing out for −, n repeated rows for ×, sharing rows or grouping rings for ÷, with decimal places; a support value on the column skills',
         hosts: ['addition:add_10k_mixed', 'multiplication:multiply', 'division:long_div_2digit', 'decimals:add_decimal'], templates: [], newTemplates: ['pv-exchange'],
-        files: ['js/modules/sheet/cells/panes/pv-exchange.js'], after: ['vis_pv_decimal_places'] }),
+        files: ['js/modules/sheet/cells/panes/pv-exchange.js'], after: [] }),
     vis_gattegno: V({ lane: 'placevalue', kind: 'template', name: 'Gattegno Chart',
         build: 'a new gattegno template: rows 1–9 × powers of ten (including decimal rows), `task: \'read\' | \'ring\' | \'shift\'` (× 10 = one row up), offered as a support on place_value_10x and more_less_*',
         hosts: ['placevalue:place_value_10x', 'placevalue:more_less_100'], templates: [], newTemplates: ['gattegno'],
@@ -983,8 +979,6 @@ export const VISUAL_BUILDS = {
 
 /** Extra dependencies of existing entries (never in a frozen lane): the option waits for the drawing it rides on. */
 export const VISUAL_AFTER = {
-    decimal_pv: ['vis_pv_decimal_places'], dec_pv_within1: ['vis_pv_decimal_places'], thousandths_pv: ['vis_pv_decimal_places'],
-    dec_compare_model: ['vis_pv_decimal_places'], decimal_models: ['vis_pv_decimal_places'],
     round_whole: ['vis_round_line_decimals'],
     frac_beyond_1: ['vis_frac_bar_modes'], frac_compare_gt1: ['vis_frac_bar_modes'], mult_mixed_int: ['vis_frac_bar_modes'], sub_break_whole: ['vis_frac_bar_modes'],
     frac_nl_equiv: ['vis_frac_line_modes'], frac_count: ['vis_frac_line_modes'],

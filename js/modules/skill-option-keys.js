@@ -219,7 +219,9 @@ export const MULTI_KEYS = Object.freeze({
     // it; the codec reads it back into `support`. The deployed decoder skips the field (an unknown
     // digit + letter key), so an old app drops those supports and never misreads them.
     supportMore: '4E',
-    // NEXT FREE IN SUB-RANGE 4E-4O: 4F.
+    // vis_pv_decimal_places (build lane placevalue): decimal counters named 0.1 or 1/10.
+    counterLabel: '4F',
+    // NEXT FREE IN SUB-RANGE 4E-4O: 4G.
 });
 
 /**
@@ -317,6 +319,7 @@ export const VALUE_TOKENS = Object.freeze({
     // P12
     model: Object.freeze({ none: 'N', area: 'A', bar: 'B', circle: 'C', line: 'L', set: 'S', grid: 'G', blocks: 'K', analog: 'H', digital: 'D' }),
     labels: Object.freeze({ all: 'A', some: 'S', none: 'N' }),
+    counterLabel: Object.freeze({ decimal: 'D', fraction: 'F' }),
     // block 9 (O6 appearance, AP2): bar graphs
     bars: Object.freeze({ vertical: 'V', horizontal: 'H' }),
     precision: Object.freeze({ hour: 'H', half: 'F', quarter: 'Q', five: 'V', one: 'O' }),

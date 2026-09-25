@@ -339,8 +339,8 @@ match across the app.
 | R57 | Fraction bars with parts crossed out, across wholes | B7 S13–S15 | R32 | — | GAP | fraction-bar `cross: k` |
 | R58 | Fraction part-whole (whole 1, a whole number or a mixed number) | B7 S3, S11, S14–S15 | R14 | — | GAP | bond `values:'fraction'` |
 | R59 | Tenths pictured: bar of 10, ten frame, bundle of 10, 0–1 line, ribbon on a 0–1 m scale | B8 S1–S4 | — | — | **NEW** · PARTIAL | `frac-model` bar / line (d = 10); `decimal_nl_drag`; decimal labelling GAP |
-| R60 | Decimal PV chart (Ones \| Tenths \| Hundredths, point on the line) — build, read, compare, order, exchange | B8 S2–S3, S5–S6, S9–S10; B9 S3–S6, S8 | — | — | **NEW** · GAP | decimal places on `template:pv` (`disks`, `build`, `compare`, `order`, `expand`) |
-| R61 | Decimal PV counters (0.1, 0.01) and fraction counters (1/10, 1/100) | B8 S1, S8–S9; B9 S1, S4 | — | — | **NEW** · GAP | as R60 (disk labels 0.1 / 0.01) |
+| R60 | Decimal PV chart (Ones \| Tenths \| Hundredths, point on the line) — build, read, compare, order, exchange | B8 S2–S3, S5–S6, S9–S10; B9 S3–S6, S8 | — | — | MATCH | `decimals` 1–3 on `place_value_disks` / `pv_disks_build` / `value` / `expand` / `compare` (vis_pv_decimal_places): O · Tth | Hth | Thth zones, the point a heavy dot on the O / Tth line, disks 0.1 / 0.01 / 0.001 or `counterLabel: 'fraction'` (1/10 …), plain dots (`labels: 'none'`), digit charts (`support: 'chart'`); order: `decimals:order_decimals`; the exchange diagram is `vis_pv_exchange` (its own row) |
+| R61 | Decimal PV counters (0.1, 0.01) and fraction counters (1/10, 1/100) | B8 S1, S8–S9; B9 S1, S4 | — | — | MATCH | as R60: disks 0.1 / 0.01, or `counterLabel: 'fraction'` (1/10, 1/100) |
 | R62 | Sum-to-1 grid (every row and column totals 1) | B9 S2 | — | — | **NEW** · GAP | low (stretch page) |
 | R63 | Coins and notes (count, write £.pp, draw, compare collections, change) | B10 S1–S3, S5 | R68 | R70 | MATCH | `template:coins` (`answer:'two'`, `currency`), `money_notation`, `money_compare`, `money-columns` |
 | R64 | Price tags, price lists, ticket tables, receipts | B10 S4–S6 | R69 | — | PARTIAL | `template:word-work`; tables → R41 |

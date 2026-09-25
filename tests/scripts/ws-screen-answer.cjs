@@ -145,7 +145,7 @@ function PLAN(rootSel, which) {
     const pvz = all('.pvb-zone');
     if (pvz.length) {
         const t = Number(q.target || ans);
-        pvz.forEach(z => { const p = Number(z.dataset.place); for (let j = 0; j < Math.floor(t / p) % 10; j++) tag(z, { type: 'domclick' }); });
+        pvz.forEach(z => { const p = Number(z.dataset.place); for (let j = 0; j < Math.floor(Math.round(t * 1000) / Math.round(p * 1000)) % 10; j++) tag(z, { type: 'domclick' }); });
         const sub = root.querySelector('.pvb-submit');
         if (sub) tag(sub, { type: 'domclick' });
         return { plan, q: String(t) };

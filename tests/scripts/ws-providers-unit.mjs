@@ -320,14 +320,22 @@ const pvPlaceItem = (r, extra = {}) => {
     const n = int(r, 101, 999); const place = pick(r, [1, 10, 100]);
     return { n, place, digit: dAt(n, place), ...extra };
 };
+// vis_pv_decimal_places: every fifth item of the decimal-capable skills has decimal places, so the
+// decimal strings, worked steps and wrong answers are held to the same checks.
+const decItem = (r) => { const w = int(r, 0, 9); const t = int(r, 1, 9), h = int(r, 0, 9); const s = `${w}.${t}${h}`; return { s, n: Number(s), w, t, h }; };
 const PV_MAKERS = {
     'placevalue:identify': (r, i) => { const p = pvPlaceItem(r); return { pv: { kind: 'place', ...p, support: 'labels', response: i % 2 ? 'bank' : 'circle' }, ans: PWORD[p.place], answerType: i % 2 ? 'text' : 'multiple-choice', options: ['ones', 'tens', 'hundreds'] }; },
     'placevalue:value': (r, i) => {
+        if (i % 5 === 4) { const d = decItem(r); const place = pick(r, [0.1, 0.01]); const digit = place === 0.1 ? d.t : d.h;
+            return { pv: { kind: 'value', n: d.n, s: d.s, place, digit, support: 'labels', form: 'value', decimals: 2 }, ans: Number((digit * place).toFixed(2)), answerType: 'number' }; }
         const p = pvPlaceItem(r); const form = ['value', 'value', 'unit', 'notation'][i % 4];
         const ans = form === 'value' ? p.digit * p.place : form === 'unit' ? `${p.digit} ${p.digit === 1 ? PWORD[p.place].replace(/s$/, '') : PWORD[p.place]}` : `${p.digit} × ${p.place}`;
         return { pv: { kind: 'value', ...p, support: 'labels', form }, ans, answerType: form === 'value' ? 'number' : 'inline-blanks' };
     },
     'placevalue:expand': (r, i) => {
+        if (i % 5 === 4) { const d = decItem(r); const places = d.w ? [1, 0.1, 0.01] : [0.1, 0.01]; const ds = d.w ? [d.w, d.t, d.h] : [d.t, d.h];
+            const parts = ds.map((x, k) => Number((x * places[k]).toFixed(2)));
+            return { pv: { kind: 'expand', n: d.n, s: d.s, parts, form: 'sum', frame: 'boxes', decimals: 2, places }, ans: parts.join(' + '), answerType: 'inline-blanks' }; }
         const n = i % 3 === 1 ? int(r, 1, 9) * 100 + int(r, 1, 9) : int(r, 111, 999); const ds = String(n).split('').map(Number);
         const parts = ds.map((d, k) => d * 10 ** (ds.length - 1 - k)); const line = i % 4 === 3;
         return { pv: { kind: 'expand', n, parts, form: 'sum', frame: line ? 'line' : 'boxes' }, ans: (line ? parts.filter(Boolean) : parts).join(' + ') };
@@ -345,15 +353,22 @@ const PV_MAKERS = {
     },
     'placevalue:more_less_100': (r) => { const step = pick(r, [10, 100]); const dir = pick(r, ['more', 'less']); const n = int(r, 150, 850); return { pv: { kind: 'moreless', n, step, dir, support: 'none', unknown: 'answer', given: n }, ans: dir === 'more' ? n + step : n - step }; },
     'placevalue:place_value_disks': (r, i) => {
+        if (i % 5 === 4) { const d = decItem(r); const places = [1, 0.1, 0.01]; const counts = { 1: d.w, 0.1: d.t, 0.01: d.h };
+            return { pv: { kind: 'disks', task: 'read', places, counts, n: d.n, s: d.s, decimals: 2 }, ans: d.n }; }
         const places = [100, 10, 1]; const counts = { 100: int(r, 1, 9), 10: i % 3 ? int(r, 0, 9) : 0, 1: int(r, 1, 9) };
         const n = 100 * counts[100] + 10 * counts[10] + counts[1]; const count = i % 4 === 3;
         return { pv: count ? { kind: 'disks', task: 'count', places, counts, n, place: 100 } : { kind: 'disks', task: 'read', places, counts, n }, ans: count ? counts[100] : n };
     },
-    'placevalue:pv_disks_build': (r) => { const n = int(r, 101, 999); return { pv: { kind: 'build', n, places: [100, 10, 1] }, ans: n, printAnswer: `${dAt(n, 100)} hundreds` }; },
+    'placevalue:pv_disks_build': (r, i) => {
+        if (i % 5 === 4) { const d = decItem(r); return { pv: { kind: 'build', n: d.n, s: d.s, places: [1, 0.1, 0.01], decimals: 2 }, ans: d.n, printAnswer: `${d.w} ones` }; }
+        const n = int(r, 101, 999); return { pv: { kind: 'build', n, places: [100, 10, 1] }, ans: n, printAnswer: `${dAt(n, 100)} hundreds` }; },
     'placevalue:pv_digit_drag': (r, i) => { const n = i % 2 ? int(r, 10, 99) * 1000 + int(r, 1, 9) : int(r, 10000, 99999); return { pv: { kind: 'chart', n, places: [10000, 1000, 100, 10, 1], source: 'expanded', sourceText: String(n) }, ans: n }; },
     'placevalue:place_value_10x': (r, i) => { const power = pick(r, [10, 100, 1000]); const k = i % 3 === 0 ? int(r, 101, 909) : int(r, 2, 99); const op = i % 2 ? '/' : 'x'; return { pv: { kind: 'x10', n: op === 'x' ? k : k * power, op, power, support: 'shift' }, ans: op === 'x' ? k * power : k }; },
     'placevalue:number_word_names': (r) => { const n = int(r, 1000, 99999); return { text: `Which is the word name for ${n}?`, ans: 'the name', options: ['the name', 'a swapped name', 'a dropped name'], answerType: 'choice' }; },
-    'placevalue:compare': (r) => { const a = int(r, 100, 999); const b = int(r, 100, 999); return { pv: { kind: 'compare', a, b }, ans: a > b ? '>' : a < b ? '<' : '=' }; },
+    'placevalue:compare': (r, i) => {
+        if (i % 5 === 4) { const as = `0.${int(r, 1, 9)}`; const bs = `${as}${int(r, 1, 9)}`; const a = Number(as), b = Number(bs);
+            return { pv: { kind: 'compare', a, b, as, bs, decimals: 2 }, ans: a > b ? '>' : a < b ? '<' : '=' }; }
+        const a = int(r, 100, 999); const b = int(r, 100, 999); return { pv: { kind: 'compare', a, b }, ans: a > b ? '>' : a < b ? '<' : '=' }; },
     'placevalue:order_least_to_greatest': (r) => { const nums = [int(r, 10, 99), int(r, 100, 499), int(r, 500, 999)]; return { pv: { kind: 'order', nums, dir: 'asc' }, ans: nums.slice().sort((a, b) => a - b).join(',') }; },
     'placevalue:order_greatest_to_least': (r) => { const nums = [int(r, 10, 99), int(r, 100, 499), int(r, 500, 999)]; return { pv: { kind: 'order', nums, dir: 'desc' }, ans: nums.slice().sort((a, b) => b - a).join(',') }; },
     'number_sense:rounding_visual': (r) => { const n = nonMultiple(r, 11, 99, 10); return { pv: { kind: 'round', n, place: 10, line: [Math.floor(n / 10) * 10, Math.floor(n / 10) * 10 + 10] }, ans: rnd(n, 10) }; },

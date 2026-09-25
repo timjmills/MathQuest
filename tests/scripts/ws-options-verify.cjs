@@ -379,7 +379,10 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         }
         if (def.type === 'bool') { tries.push({ def, value: !def.default }); continue; }
         if (def.type === 'int') { tries.push({ def, value: def.min }, { def, value: def.max }); continue; }
-        if (def.type === 'enum') { for (const x of def.values) if (JSON.stringify(x.v) !== JSON.stringify(def.default)) tries.push({ def, value: x.v, vl: x.l }); continue; }
+        // A control that only APPLIES under another setting (decimal counters named as fractions
+        // need decimal places) declares `verifyBase`: it is tried on that base and compared with
+        // the base itself, never with a default where it cannot apply.
+        if (def.type === 'enum') { for (const x of def.values) if (JSON.stringify(x.v) !== JSON.stringify(def.default)) tries.push({ def, value: x.v, vl: x.l, ...(def.verifyBase ? { base: def.verifyBase } : {}) }); continue; }
         if (def.type === 'set') {
             const all = def.values.map(x => x.v);
             const ro = (list) => !!(def.supportsModel && list.every(v => def.render.includes(v)));
@@ -533,7 +536,7 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         if (def.id === 'decimals' && value === APP_DP) DP = other(def.values.map(x => x.v), value) ?? 1;
         r.base = { range, decimals: DP };
         let items = gen(opts, range);
-        let base = dfltAt(range);
+        let base = t.base && !t.renderOnly ? gen(t.base, range) : dfltAt(range);
         let diff = differs(items, base);
         const errs = items.filter(q => q.__error);
         if (errs.length) fail('gen', `${errs.length} item(s) threw: ${errs[0].__error}`);
@@ -603,7 +606,7 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         }
 
         // (c) screen
-        const sc = screen(opts, range), sd = screenDflt(range);
+        const sc = screen(opts, range), sd = t.base && !t.renderOnly ? screen(t.base, range) : screenDflt(range);
         if (t.renderOnly) {
             if (!sc.practice.length) fail('screen/practice', 'no items');
             if (def.id === 'support' && !sc.supportMarks) {

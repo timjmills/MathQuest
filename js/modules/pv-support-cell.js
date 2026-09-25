@@ -20,14 +20,20 @@
 // Pure module (SCC-01): no window, no state, no DOM, no Math.random. Ink only (INK-1): black lines
 // on white, no fill, no colour. Lines are solid (a dash means "cut", LS-3).
 
-import { register, renderCell, cellAnswerKey, cellFootprint, cellInputs, esc } from './sheet/index.js';
+import { register, renderCell, cellAnswerKey, cellFootprint, cellInputs, esc, numberCols, samePlace } from './sheet/index.js';
 
 const PT_MM = 25.4 / 72;
 const HAIR_PT = 0.75;
 const AXIS_PT = 1.5;
 const fmt = (v) => Number(v).toLocaleString('en-US', { maximumFractionDigits: 6 });
 const PLACE_NAME = { 1: 'Ones', 10: 'Tens', 100: 'Hundreds', 1000: 'Thousands', 10000: 'Ten thousands',
-    100000: 'Hundred thousands', 1000000: 'Millions' };
+    100000: 'Hundred thousands', 1000000: 'Millions',
+    // vis_pv_decimal_places (build lane placevalue)
+    0.1: 'Tenths', 0.01: 'Hundredths', 0.001: 'Thousandths' };
+/** A number's columns (sheet/cells/pv.js numberCols): whole numbers as before, decimals kept. */
+const colsOf = (n) => numberCols(typeof n === 'string' && n.includes('.') ? n
+    : Number.isInteger(Number(n)) ? Math.floor(Math.abs(Number(n) || 0)) : Number(n));
+const ul = (d) => `<span style="display:inline-block;line-height:1;border-bottom:0.08em solid #000;padding:0 0.04em 0.04em;">${d}</span>`;
 
 /* --------------------------------------------------------------------------- the numeral */
 
@@ -36,15 +42,11 @@ const PLACE_NAME = { 1: 'Ones', 10: 'Tens', 100: 'Hundreds', 1000: 'Thousands', 
  * the place off the digit's position alone.
  */
 export function plainNumeralHTML(n, { underline = 0, size = '1.9em' } = {}) {
-    const s = String(Math.floor(Math.abs(Number(n) || 0)));
     let out = '';
-    for (let i = 0; i < s.length; i++) {
-        const place = 10 ** (s.length - 1 - i);
-        const d = place === underline
-            ? `<span style="display:inline-block;line-height:1;border-bottom:0.08em solid #000;padding:0 0.04em 0.04em;">${s[i]}</span>`
-            : s[i];
-        out += d;
-        if (place >= 1000 && Math.round(Math.log10(place)) % 3 === 0) out += ',';
+    for (const c of colsOf(n)) {
+        if (c.comma) out += ',';
+        else if (c.point) out += '.';
+        else out += underline && samePlace(c.place, underline) ? ul(c.digit) : c.digit;
     }
     return `<span class="pv-plain" style="display:inline-block;font-size:${size};font-weight:700;color:#000;white-space:nowrap;">${out}</span>`;
 }
@@ -54,15 +56,18 @@ export function plainNumeralHTML(n, { underline = 0, size = '1.9em' } = {}) {
  * one digit per box. The asked digit is underlined, as on the other two rungs.
  */
 export function placeChartHTML(n, { underline = 0, size = '1.9em' } = {}) {
-    const s = String(Math.floor(Math.abs(Number(n) || 0)));
-    const places = Array.from({ length: s.length }, (_, i) => 10 ** (s.length - 1 - i));
+    // A decimal's point stands ON the line between the ones and the tenths (a heavy dot at the
+    // foot of that column line), never in a column of its own.
+    const cols = colsOf(n).filter((c) => !c.comma);
+    const pointAfter = cols.findIndex((c) => c.point) - 1;
+    const digitsCols = cols.filter((c) => !c.point);
     const bd = `border:${HAIR_PT}pt solid #000;`;
-    const heads = places.map(p => `<td style="${bd}padding:0.15em 0.3em;font-size:0.36em;font-weight:700;text-align:center;`
-        + `line-height:1.2;white-space:normal;width:3.2em;">${PLACE_NAME[p] || fmt(p)}</td>`).join('');
-    const digits = places.map((p, i) => `<td style="${bd}padding:0.05em 0.2em;text-align:center;line-height:1.15;">`
-        + (p === underline
-            ? `<span style="display:inline-block;line-height:1;border-bottom:0.08em solid #000;padding:0 0.04em 0.04em;">${s[i]}</span>`
-            : s[i]) + '</td>').join('');
+    const heads = digitsCols.map(c => `<td style="${bd}padding:0.15em 0.3em;font-size:0.36em;font-weight:700;text-align:center;`
+        + `line-height:1.2;white-space:normal;width:3.2em;">${PLACE_NAME[c.place] || fmt(c.place)}</td>`).join('');
+    const digits = digitsCols.map((c, i) => `<td style="${bd}padding:0.05em 0.2em;text-align:center;line-height:1.15;position:relative;">`
+        + (underline && samePlace(c.place, underline) ? ul(c.digit) : c.digit)
+        + (i === pointAfter ? '<span data-pv-point="1" style="position:absolute;right:-0.12em;bottom:0.08em;width:0.22em;height:0.22em;border-radius:50%;background:#000;"></span>' : '')
+        + '</td>').join('');
     return `<span class="pv-chart" style="display:inline-block;font-size:${size};font-weight:700;color:#000;">`
         + `<table style="border-collapse:collapse;display:inline-table;color:#000;"><tr>${heads}</tr><tr>${digits}</tr></table></span>`;
 }

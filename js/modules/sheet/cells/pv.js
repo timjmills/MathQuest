@@ -35,17 +35,49 @@ export const DISK_SIZES = {
 
 const PT_MM = 25.4 / 72;
 const HAIR_PT = 0.75;
-const LETTER = { 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M' };
+const LETTER = { 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M',
+    // vis_pv_decimal_places (build lane placevalue): the places below the ones
+    0.1: 'Tth', 0.01: 'Hth', 0.001: 'Thth' };
+export const PV_LETTER = LETTER;
+/** The decimal places, largest first (vis_pv_decimal_places). */
+export const DECIMAL_PLACES = Object.freeze([0.1, 0.01, 0.001]);
+/** Two places are the same place (a decimal place is a float). */
+export const samePlace = (a, b) => Number(a) === Number(b) || Math.abs(Number(a) - Number(b)) < 1e-12;
+
+/**
+ * The columns of a numeral, left to right: `{place, digit}` for each digit, `{comma}` after the
+ * thousands (millions …) digit and `{point}` after the ones when the number has decimal places.
+ * `n` is a number or a numeric string; a string keeps its trailing zeros ("3.40" has a hundredths
+ * column), so a page of two-place decimals prints two places on every item.
+ */
+export function numberCols(n) {
+    const raw = typeof n === 'string' ? n.replace(/,/g, '').replace(/^-/, '') : String(Math.abs(Number(n) || 0));
+    const [ip0, fp = ''] = raw.split('.');
+    const ip = String(Number(ip0) || 0);
+    const cols = [];
+    for (let i = 0; i < ip.length; i++) {
+        const place = 10 ** (ip.length - 1 - i);
+        cols.push({ place, digit: ip[i] });
+        if (place >= 1000 && Math.round(Math.log10(place)) % 3 === 0) cols.push({ comma: true });
+    }
+    if (fp) {
+        cols.push({ point: true });
+        for (let j = 0; j < fp.length; j++) cols.push({ place: DECIMAL_PLACES[j] || 10 ** -(j + 1), digit: fp[j] });
+    }
+    return cols;
+}
 
 /** The disk diameter for a place at a size: thousands and up are 2 mm wider ("1,000"). */
-export function diskDiameter(place, size = 'L') {
+export function diskDiameter(place, size = 'L', fraction = false) {
     const g = DISK_SIZES[size] || DISK_SIZES.L;
-    return place >= 1000 ? g.d + 2 : g.d;
+    // "1,000" and "0.001" need 2 mm more to keep their label at 8 pt or more (TY-11); so does a
+    // fraction-named 1/100 (its "100" under the bar, R61).
+    return place >= 1000 || place < 0.01 || (fraction && place < 0.1) ? g.d + 2 : g.d;
 }
 
 /** The side of one square zone: 3 x (d + 2) + 2 mm (§13.4). */
-export function zoneSide(place, size = 'L') {
-    return 3 * (diskDiameter(place, size) + 2) + 2;
+export function zoneSide(place, size = 'L', fraction = false) {
+    return 3 * (diskDiameter(place, size, fraction) + 2) + 2;
 }
 
 /** How many disks one zone holds at its pitch — nine, by construction; checked by the audit. */
@@ -83,13 +115,39 @@ function crossOut(cx, cy, d) {
 }
 
 /** One disk, centred at (cx, cy) mm. `data-pv-disk` names its place for the audit's recount. */
-function disk(cx, cy, place, size, strokePt = HAIR_PT) {
-    const d = diskDiameter(place, size);
+function disk(cx, cy, place, size, strokePt = HAIR_PT, fraction = false) {
+    const d = diskDiameter(place, size, fraction);
     const pt = labelPt(place, size);
-    return `<circle data-pv-disk="${place}" cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="${(d / 2).toFixed(2)}" `
-        + `fill="none" stroke="#000" stroke-width="${(strokePt * PT_MM).toFixed(3)}"/>`
+    const ring = `<circle data-pv-disk="${place}" cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="${(d / 2).toFixed(2)}" `
+        + `fill="none" stroke="#000" stroke-width="${(strokePt * PT_MM).toFixed(3)}"/>`;
+    if (fraction && place < 1) {
+        // R61: the counter named as a fraction - 1 over 10 / 100 / 1000, stacked, 8 pt, a hairline bar.
+        const den = String(Math.round(1 / place));
+        const fp = 8, h = fp * PT_MM;
+        const bw = den.length * 0.56 * h + 0.6;
+        return ring
+            + `<text x="${cx.toFixed(2)}" y="${(cy - 0.5).toFixed(2)}" text-anchor="middle" font-size="${h.toFixed(3)}" font-weight="700" fill="#000">1</text>`
+            + `<line x1="${(cx - bw / 2).toFixed(2)}" x2="${(cx + bw / 2).toFixed(2)}" y1="${(cy + 0.2).toFixed(2)}" y2="${(cy + 0.2).toFixed(2)}" stroke="#000" stroke-width="${(HAIR_PT * PT_MM).toFixed(3)}"/>`
+            + `<text x="${cx.toFixed(2)}" y="${(cy + 0.9 + h * 0.72).toFixed(2)}" text-anchor="middle" font-size="${h.toFixed(3)}" font-weight="700" fill="#000">${den}</text>`;
+    }
+    return ring
         + `<text x="${cx.toFixed(2)}" y="${(cy + pt * PT_MM * 0.36).toFixed(2)}" text-anchor="middle" `
         + `font-size="${(pt * PT_MM).toFixed(3)}" font-weight="700" fill="#000">${fmt(place)}</text>`;
+}
+
+/**
+ * The mat as a cell draws it. On paper, and on a screen for up to three zones, it is the one
+ * drawing. A SCREEN mat of four or more zones (O . Tth Hth Thth, Th H T O) is too wide for a
+ * phone card at full disk size, so the screen gets two drawings and a width rule shows one: three
+ * disks across per zone on a wide card, two across (five down) under 600 px (additive CSS).
+ */
+function screenMat(ctx, p, opts) {
+    const wide = diskMatSVG(opts).svg;
+    if (!((ctx && ctx.mode === 'screen') || p.onScreen) || (p.places || []).length < 4) return wide;
+    // the narrow twin may shrink a little to the card's width (never the paper drawing)
+    const narrow = diskMatSVG({ ...opts, across: 2 }).svg.replace('max-width:none;', 'max-width:100%;height:auto;');
+    return `<style>.pv-mat-narrow{display:none}@media (max-width:600px){.pv-mat-wide{display:none}.pv-mat-narrow{display:block}}</style>`
+        + `<div class="pv-mat-wide">${wide}</div><div class="pv-mat-narrow">${narrow}</div>`;
 }
 
 /**
@@ -99,11 +157,14 @@ function disk(cx, cy, place, size, strokePt = HAIR_PT) {
  * @param {{places: number[], counts?: Object<number, number>|null, size?: 'S'|'M'|'L', pxPerMm?: number}} o
  * @returns {{svg: string, widthMm: number, heightMm: number}}
  */
-export function diskMatSVG({ places, counts = null, size = 'L', pxPerMm = 0, diskPt = HAIR_PT, dots = false, crossed = null, arrows = null } = {}) {
+export function diskMatSVG({ places, counts = null, size = 'L', pxPerMm = 0, diskPt = HAIR_PT, dots = false, crossed = null, arrows = null, fraction = false, across = 3 } = {}) {
     const g = DISK_SIZES[size] || DISK_SIZES.L;
     const cols = (places || []).slice().sort((a, b) => b - a);
-    const sides = cols.map(p => zoneSide(p, size));
-    const zoneH = Math.max(...sides);
+    // `across` 2 (a phone screen, four or more zones): each zone is two disks wide and five tall,
+    // so the mat keeps its disks at full size in a narrow card instead of shrinking them.
+    const per = across === 2 ? 2 : 3;
+    const sides = cols.map(p => (per === 3 ? zoneSide(p, size, fraction) : per * (diskDiameter(p, size, fraction) + 2) + 2));
+    const zoneH = per === 3 ? Math.max(...sides) : Math.max(...cols.map((p) => Math.ceil(9 / per) * (diskDiameter(p, size, fraction) + 2) + 2));
     const widthMm = sides.reduce((a, b) => a + b, 0);
     // `arrows` 'left' (× 10) or 'right' (÷ 10): one arrow under each zone that holds counters, to
     // the next zone - every counter moves one place (vis_pv_dot_disks).
@@ -120,14 +181,14 @@ export function diskMatSVG({ places, counts = null, size = 'L', pxPerMm = 0, dis
         body += `<rect x="${x.toFixed(2)}" y="${g.head.toFixed(2)}" width="${w.toFixed(2)}" height="${zoneH.toFixed(2)}" `
             + `fill="none" stroke="#000" stroke-width="${sw}" data-pv-zone="${p}"/>`;
         const c = counts ? Math.max(0, Math.min(9, Math.floor(Number(counts[p]) || 0))) : 0;
-        const pitch = diskDiameter(p, size) + 2;
+        const pitch = diskDiameter(p, size, fraction) + 2;
         // The LAST `crossed[p]` counters of a zone are crossed out (taken away).
         const xk = crossed ? Math.max(0, Math.min(c, Math.floor(Number(crossed[p]) || 0))) : 0;
         for (let k = 0; k < c; k++) {
-            const cx = x + 1 + pitch * (k % 3) + pitch / 2;
-            const cy = g.head + 1 + pitch * Math.floor(k / 3) + pitch / 2;
-            body += dots ? dotCounter(cx, cy, p) : disk(cx, cy, p, size, diskPt);
-            if (k >= c - xk) body += crossOut(cx, cy, dots ? 6 : diskDiameter(p, size));
+            const cx = x + 1 + pitch * (k % per) + pitch / 2;
+            const cy = g.head + 1 + pitch * Math.floor(k / per) + pitch / 2;
+            body += dots ? dotCounter(cx, cy, p) : disk(cx, cy, p, size, diskPt, fraction);
+            if (k >= c - xk) body += crossOut(cx, cy, dots ? 6 : diskDiameter(p, size, fraction));
         }
         if (arrows && c > 0) {
             const i2 = arrows === 'left' ? i - 1 : i + 1;
@@ -138,6 +199,11 @@ export function diskMatSVG({ places, counts = null, size = 'L', pxPerMm = 0, dis
                 body += `<line data-pv-move="${arrows}" x1="${x1.toFixed(2)}" y1="${y.toFixed(2)}" x2="${(x2 - dir * 2.6).toFixed(2)}" y2="${y.toFixed(2)}" stroke="#000" stroke-width="${(1.5 * PT_MM).toFixed(3)}"/>`
                     + `<path d="M${x2.toFixed(2)} ${y.toFixed(2)}L${(x2 - dir * 2.8).toFixed(2)} ${(y - 1.5).toFixed(2)}L${(x2 - dir * 2.8).toFixed(2)} ${(y + 1.5).toFixed(2)}Z" fill="#000"/>`;
             }
+        }
+        // The decimal point stands ON the line between the ones and the tenths: a heavy dot at
+        // the foot of that line (vis_pv_decimal_places).
+        if (samePlace(p, 1) && cols[i + 1] !== undefined && samePlace(cols[i + 1], 0.1)) {
+            body += `<circle data-pv-point="1" cx="${(x + w).toFixed(2)}" cy="${(g.head + zoneH - 2.2).toFixed(2)}" r="1.3" fill="#000"/>`;
         }
         x += w;
     });
@@ -170,22 +236,18 @@ export function diskMatSVG({ places, counts = null, size = 'L', pxPerMm = 0, dis
  * @param {number} n  a whole number >= 0
  */
 export function numeralTracksHTML(n, { underline = 0, cut = 0, arrow = false, size = '1.9em', heads: showHeads = true } = {}) {
-    const s = String(Math.floor(Math.abs(Number(n) || 0)));
-    const cols = [];
-    for (let i = 0; i < s.length; i++) {
-        const place = 10 ** (s.length - 1 - i);
-        cols.push({ place, digit: s[i] });
-        // The comma track sits after the thousands, millions ... digit.
-        if (place >= 1000 && Math.round(Math.log10(place)) % 3 === 0) cols.push({ comma: true });
-    }
+    // A whole number is its integer part (as before); a decimal (vis_pv_decimal_places) keeps its
+    // places, the point on its own narrow track after the ones.
+    const cols = typeof n === 'string' && n.includes('.') ? numberCols(n)
+        : numberCols(Number.isInteger(Number(n)) ? Math.floor(Math.abs(Number(n) || 0)) : Number(n));
     const cutPt = 1.5;
-    const cutAt = (c) => cut && c.place === cut;
+    const cutAt = (c) => cut && !c.comma && !c.point && samePlace(c.place, cut);
     const td = (inner, style = '') => `<td style="padding:0;text-align:center;${style}">${inner}</td>`;
-    const heads = cols.map(c => c.comma ? td('', 'width:0.3em;')
+    const heads = cols.map(c => c.comma || c.point ? td('', 'width:0.3em;')
         : td(LETTER[c.place] || '', `width:2.2em;font-size:0.42em;line-height:1.6;font-weight:${cutAt(c) ? 700 : 400};`
             + (cutAt(c) ? `border-right:${cutPt}pt solid #000;` : ''))).join('');
-    const digits = cols.map(c => c.comma ? td(',', 'width:0.3em;')
-        : td(c.place === underline
+    const digits = cols.map(c => c.comma ? td(',', 'width:0.3em;') : c.point ? td('.', 'width:0.3em;')
+        : td(underline && samePlace(c.place, underline)
             ? `<span style="display:inline-block;line-height:1;border-bottom:0.08em solid #000;padding:0 0.04em 0.04em;">${c.digit}</span>` : c.digit,
             'width:0.95em;line-height:1.15;' + (cutAt(c) ? `border-right:${cutPt}pt solid #000;` : ''))).join('');
     const table = `<table class="pv-tracks" style="border-collapse:collapse;display:inline-table;vertical-align:bottom;`
@@ -420,6 +482,18 @@ function blanksHTML(ctx, text, keys, words, floor = 0) {
     // The slots and the words between them ("____ and ____") stay on ONE line: a wrap that left
     // "and" at a line end and the second slot alone on the next read as two separate answers.
     let out = piece(ctx, parts[0]);
+    const NOWRAP = 'display:inline-flex;align-items:flex-end;flex-wrap:nowrap;white-space:nowrap;column-gap:0.2em;';
+    if (slots.length > 1 && parts.slice(1, slots.length).some((seg) => /\+/.test(seg))) {
+        // An expanded form (3.47 = ____ × 1 + ____ × 0.1 + ____ × 0.01) is a SUM of terms: each
+        // slot keeps its "× place" beside it, and the frame may wrap only before a "+" - one
+        // unbroken group ran off a narrow card (the quiz), clipping the first and last boxes.
+        parts.slice(1).forEach((seg, i) => {
+            const [head, ...rest] = seg.split('+');
+            out += `<span class="pv-slotgroup" style="${NOWRAP}">${slots[i]}${head.trim() ? piece(ctx, head) : ''}</span>`;
+            if (rest.length) out += piece(ctx, '+' + rest.join('+'));
+        });
+        return `<div class="ws-eq pv-frame pv-blanks" style="font-weight:700;flex-wrap:wrap;row-gap:2mm;">${out}</div>`;
+    }
     if (slots.length) {
         let grp = '';
         parts.slice(1).forEach((seg, i) => {
@@ -633,7 +707,8 @@ register('pv', {
             case 'compare': {
                 const slot = blank({ id: 'answer', kind: 'sign', shape: 'circle', graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, kv);
                 return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:4mm;">`
-                    + `<span>${esc(fmt(p.a))}</span>${slot}<span>${esc(fmt(p.b))}</span></div></div>`;
+                    // (a decimal arrives as its string, so 0.50 keeps its zero)
+                    + `<span>${esc(typeof p.a === 'string' ? p.a : fmt(p.a))}</span>${slot}<span>${esc(typeof p.b === 'string' ? p.b : fmt(p.b))}</span></div></div>`;
             }
             case 'order':
                 return `<div class="pv-cell">${orderHTML(p, ctx)}</div>`;
@@ -752,7 +827,7 @@ register('pv', {
                     return `<div class="pv-cell">${center(head)}${center(mat)}<div class="ws-eq pv-allnums" style="font-weight:700;display:grid;`
                         + `grid-template-columns:repeat(${Math.min(3, list.length)},auto);justify-content:center;gap:2mm 5mm;">${boxes}</div></div>`;
                 }
-                const mat = diskMatSVG({ places: p.places, counts: p.counts, size: ctx.size, dots: !!p.dots, crossed: p.crossed || null, arrows: moving }).svg;
+                const mat = screenMat(ctx, p, { places: p.places, counts: p.counts, size: ctx.size, dots: !!p.dots, crossed: p.crossed || null, arrows: moving, fraction: !!p.fraction });
                 const frame = p.task === 'count' ? `${PLACE_WORD_KIT[p.place] || ''}${p.dots ? '' : ' disks'}: ____`
                     : p.task === 'x10' ? `${fmt(p.n)} × 10 = ____` : p.task === 'd10' ? `${fmt(p.n)} ÷ 10 = ____` : '____';
                 return `<div class="pv-cell">${center(mat)}${frameHTML(ctx, frame, kv, digits)}</div>`;
@@ -761,11 +836,20 @@ register('pv', {
                 // The key draws the disks; finished work draws the disks of the value written.
                 let counts = answered(ctx) ? p.counts : null;
                 if (ctx.state === 'wrong') {
-                    const v = Number(String(shownVal(ctx, 'answer', '')).replace(/[^0-9]/g, ''));
-                    if (Number.isFinite(v)) counts = Object.fromEntries((p.places || []).map((pl) => [pl, Math.floor(v / pl) % 10]));
+                    // decimal places kept: 5.4 draws 5 ones and 4 tenths (worked in thousandths)
+                    const v = Number(String(shownVal(ctx, 'answer', '')).replace(/[^0-9.]/g, ''));
+                    if (Number.isFinite(v)) counts = Object.fromEntries((p.places || []).map((pl) => [pl, Math.floor(Math.round(v * 1000) / Math.round(pl * 1000)) % 10]));
                 }
-                const mat = diskMatSVG({ places: p.places, counts, size: ctx.size, diskPt: 1.5, dots: !!p.dots }).svg;
-                return `<div class="pv-cell">${center(`<span style="font-size:${pt(m.digitPt)};font-weight:700;">${esc(fmt(p.n))}</span>`)}`
+                const mat = screenMat(ctx, p, { places: p.places, counts, size: ctx.size, diskPt: 1.5, dots: !!p.dots, fraction: !!p.fraction });
+                const numeralSpan = `<span style="font-size:${pt(m.digitPt)};font-weight:700;">${esc(fmt(p.n))}</span>`;
+                // A mat of three or more zones fills a full-width cell: the number stands BESIDE it
+                // (not over it), so the row is one mat tall and a page holds more rows (L2).
+                if ((p.places || []).length >= 3) {
+                    return `<div class="pv-cell" style="display:flex;align-items:center;justify-content:center;gap:10mm;">`
+                        + `<div style="min-width:24mm;text-align:right;">${numeralSpan}</div>`
+                        + `<div data-ws-slot="answer" data-ws-shape="draw">${mat}</div></div>`;
+                }
+                return `<div class="pv-cell">${center(numeralSpan)}`
                     + `<div data-ws-slot="answer" data-ws-shape="draw">${mat}</div></div>`;
             }
             case 'word-choice': {
@@ -818,7 +902,12 @@ register('pv', {
         if (p.kind === 'word-choice' && wide) {
             return { wMm: 186, hMm: { S: 62, M: 70, L: 80 }[ctx.size] || 80, measure: false, factLike: false, maxCols: 1 };
         }
-        return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2 };
+        // A full-width mat (three or more zones) or scale line takes one row more at size S than at
+        // M and L (5 against 4: the smaller drawing buys a row, LESSONS L1). At S it is the 'wide'
+        // class (5 rows); at M and L the one-column grid (4 rows) - 'wide' there would drop L to 3
+        // rows and leave a third of every cell empty (L2).
+        const fclass = ctx.size === 'S' && wide && (p.kind === 'scale' || ((p.kind === 'disks' || p.kind === 'build') && (p.places || []).length >= 3)) ? 'wide' : undefined;
+        return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2, ...(fclass ? { fclass } : {}) };
     },
     inputs() { return [{ id: 'answer', kind: 'number', shape: 'line', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },
     layout(p) {

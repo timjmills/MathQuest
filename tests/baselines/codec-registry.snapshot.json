@@ -90,7 +90,8 @@
     "wpBank": "8B",
     "wpBar": "8C",
     "bars": "9F",
-    "supportMore": "4E"
+    "supportMore": "4E",
+    "counterLabel": "4F"
   },
   "blocks": {
     "0": {
@@ -646,6 +647,10 @@
       "hundreds": "H",
       "openline": "I",
       "gridpaper": "J"
+    },
+    "counterLabel": {
+      "decimal": "D",
+      "fraction": "F"
     }
   },
   "scalarOnly": {

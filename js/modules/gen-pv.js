@@ -43,8 +43,32 @@ import { diskMatSVG, numeralTracksHTML, roundingLineSVG } from './sheet/index.js
 import { plainNumeralHTML, placeChartHTML, hundredsRowsHTML, hundredsWindow, pvLineSVG, moreLessLine, stripHTML, shiftChartHTML, roundingTableHTML } from './pv-support-cell.js';
 import { pvRoundingErrors } from './sheet/providers/pv.js';
 
-const PLACE_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands', 1000000: 'millions' };
-const PLACE_ONE = { 1: 'one', 10: 'ten', 100: 'hundred', 1000: 'thousand', 10000: 'ten thousand', 100000: 'hundred thousand', 1000000: 'million' };
+const PLACE_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands', 1000000: 'millions',
+    0.1: 'tenths', 0.01: 'hundredths', 0.001: 'thousandths' };
+const PLACE_ONE = { 1: 'one', 10: 'ten', 100: 'hundred', 1000: 'thousand', 10000: 'ten thousand', 100000: 'hundred thousand', 1000000: 'million',
+    0.1: 'tenth', 0.01: 'hundredth', 0.001: 'thousandth' };
+
+/* ----------------------------------------------------- decimal places (vis_pv_decimal_places) */
+
+const DEC_PLACES = [0.1, 0.01, 0.001];
+/** The decimal places a skill's `decimals` option asks for (0: whole numbers, the band decides). */
+const decOf = (o) => ([1, 2, 3].includes(Number(o && o.decimals)) ? Number(o.decimals) : 0);
+/** A value rounded to its decimal places (0.1 * 4 is 0.4, never 0.4000000000000001). */
+const dround = (v, d = 6) => Number(Number(v).toFixed(d));
+/**
+ * A decimal of `d` places: ONE whole digit, or 0 (within 1) on one item in three; every decimal
+ * digit 1-9, except a zero in a middle place when asked (never the last: 3.40 would print as
+ * 3.4). Returns the string (it keeps the places), the number, and its digits by place.
+ */
+function decimalNumber(d, { zero = false, whole = null, fr: given = null } = {}) {
+    const w = whole !== null ? whole : (slot(3) === 0 ? 0 : randInt(1, 9));
+    const fr = given ? given.slice() : Array.from({ length: d }, () => randInt(1, 9));
+    if (!given && zero && d >= 2) fr[randInt(0, d - 2)] = 0;
+    const s = `${w}.${fr.join('')}`;
+    const digits = { 1: w };
+    fr.forEach((dg, j) => { digits[DEC_PLACES[j]] = dg; });
+    return { s, n: Number(s), w, fr, digits, places: [1, ...DEC_PLACES.slice(0, d)] };
+}
 const fmt = (n) => Number(n).toLocaleString('en-US', { maximumFractionDigits: 6 });
 const SCREEN_PX_PER_MM = 3.2;
 
@@ -164,6 +188,7 @@ function inlineBlanks(q, text, sets, widths) {
 }
 
 function genPlace(q, skill, o) {
+    if (skill === 'value' && decOf(o)) { genDecimalValue(q, o); return; }
     const cap = capOf('placevalue', skill, o, 999);
     let [lo, hi] = digitSpan(cap);
     let nd = String(hi).length;
@@ -291,6 +316,56 @@ function genPlace(q, skill, o) {
     }
 }
 
+/** value with decimal places: what the underlined tenths / hundredths / thousandths digit is worth. */
+function genDecimalValue(q, o) {
+    const d = decOf(o);
+    // PN-7 carried over: the value of a zero, on about a third of items, in a middle place.
+    const zeroAsk = !!o.zeroDigit && d >= 2 && slot(3) === 1;
+    const place = zeroAsk ? DEC_PLACES[randInt(0, d - 2)] : DEC_PLACES[blockOrder(d)[slot(d)]];
+    let num = decimalNumber(d);
+    if (zeroAsk) {
+        const fr = num.fr.slice();
+        fr[DEC_PLACES.indexOf(place)] = 0;
+        num = decimalNumber(d, { whole: num.w, fr });
+    }
+    const { s, n } = num;
+    const digit = num.digits[place];
+    const support = o.support === 'chart' || o.support === 'none' ? o.support : 'labels';
+    const drawNumeral = (opt) => (support === 'chart' ? placeChartHTML(s, opt) : support === 'none' ? plainNumeralHTML(s, opt) : numeralTracksHTML(s, opt));
+    q.visual = `<div style="text-align:center;">${drawNumeral({ underline: place })}</div>`;
+    const form = o.form === 'unit' || o.form === 'notation' ? o.form : 'value';
+    q.skillLabel = 'Value of a Digit';
+    q.hint = support === 'chart' ? 'Read the place name above the underlined digit. That place tells you what the digit is worth.'
+        : support === 'none' ? 'Count the places after the point: tenths, hundredths, thousandths.'
+            : 'Read the letters above the underlined digit: Tth, Hth or Thth. That place tells you what it is worth.';
+    q.printText = 'Write what the underlined digit is worth.';
+    q.pv = { kind: 'value', n, s, place, digit, support, form, zero: digit === 0, decimals: d };
+    const cellFor = (payload) => {
+        if (support === 'labels') { setCell(q, payload); return; }
+        q.cell = { template: 'pv-support', v: 1, payload: { picture: support === 'chart' ? 'chart' : 'plain', n: s, place,
+            base: { keyValue: q.ans, ...payload, hideNumeral: true } } };
+        q.printFormat = 'pv-cell';
+    };
+    const word = PLACE_WORD[place];
+    if (form === 'value') {
+        q.text = 'What is the underlined digit worth?';
+        q.ans = dround(digit * place, d);
+        q.answerType = 'number';
+        q.options = [];
+        cellFor({ kind: 'value', n: s, place, frame: 'worth ____' });
+        return;
+    }
+    if (form === 'unit') {
+        inlineBlanks(q, 'The underlined digit is worth ___ ___.', [[digit, word], [digit, plural(word, digit)], [digit, word.replace(/s$/, '')]], [2, 11]);
+        q.ans = `${digit} ${plural(word, digit)}`;
+        cellFor({ kind: 'blanks', n: s, place, frame: 'worth ____ ____', keys: [digit, plural(word, digit)], keyValue: q.ans });
+    } else {
+        inlineBlanks(q, 'The underlined digit is worth ___ × ___.', [[digit, String(place)]], [2, String(place).length + 2]);
+        q.ans = `${digit} × ${place}`;
+        cellFor({ kind: 'blanks', n: s, place, frame: 'worth ____ × ____', keys: [digit, String(place)], keyValue: q.ans });
+    }
+}
+
 function wantZero(o) {
     return o.zeroPlace === 'always' || (o.zeroPlace === 'some' && slot(2) === 1);
 }
@@ -305,6 +380,7 @@ function orders(list) {
 }
 
 function genExpandCombine(q, skill, o) {
+    if (skill === 'expand' && decOf(o)) { genDecimalExpand(q, o); return; }
     const cap = capOf('placevalue', skill, o, 999);
     const [lo, hi] = digitSpan(cap);
     const nd = String(hi).length;
@@ -392,6 +468,60 @@ function genExpandCombine(q, skill, o) {
     q.skillLabel = 'Standard Form';
     q.pv = { kind: 'combine', n, parts: shown };
     setCell(q, { kind: 'frame', frame: `${expr} = ____` });
+}
+
+/**
+ * expand with decimal places (vis_pv_decimal_places): 3.47 = 3 + 0.4 + 0.07, one box per place (a
+ * zero place included: 3.07 = 3 + 0 + 0.07); a number within 1 has no whole part (0.47 = 0.4 +
+ * 0.07). `form: notation` writes each digit times its place (3 × 1 + 4 × 0.1 + 7 × 0.01); `frame:
+ * line` fades the boxes to a ruled line.
+ */
+function genDecimalExpand(q, o) {
+    const d = decOf(o);
+    const num = decimalNumber(d, { zero: wantZero(o) });
+    const { s, n } = num;
+    const places = num.w ? num.places : num.places.slice(1);
+    const ds = places.map((p) => num.digits[p]);
+    const parts = ds.map((dg, i) => dround(dg * places[i], d));
+    const form = o.form === 'notation' ? 'notation' : 'sum';
+    const frame = o.frame === 'line' ? 'line' : 'boxes';
+    q.skillLabel = form === 'notation' ? 'Expanded Notation' : 'Expanded Form';
+    q.printText = `Write ${s} in expanded form.`;
+    q.options = [];
+    q.visual = '';
+    q.hint = form === 'notation' ? 'Write each digit. It is multiplied by its place: 1, 0.1, 0.01.'
+        : 'Write what each digit is worth: 0.4 is 4 tenths. A zero holds a place: its part is 0.';
+    q.pv = { kind: 'expand', n, s, parts, form, frame, decimals: d, places };
+    const term = (dg, p) => (form === 'notation' ? `${dg} × ${p}` : String(dround(dg * p, d)));
+    if (frame === 'line') {
+        const all = ds.map((dg, i) => term(dg, places[i]));
+        const nonZero = ds.map((dg, i) => (dg ? term(dg, places[i]) : null)).filter(Boolean);
+        const accept = new Set();
+        for (const list of [nonZero, all]) {
+            for (const ord of orders(list)) { accept.add(ord.join(' + ')); accept.add(ord.map((x) => x.replace(/×/g, 'x')).join(' + ')); }
+        }
+        q.text = `Write ${s} in expanded form.`;
+        q.answerType = 'text';
+        q.ans = nonZero.join(' + ');
+        q.acceptedAnswers = [...accept];
+        q.printAnswer = q.ans;
+        setCell(q, { kind: 'expand-line', n: s, keyValue: q.ans, also: all.length !== nonZero.length ? all.join(' + ') : '' });
+        return;
+    }
+    if (form === 'notation') {
+        const frameText = places.map((p) => `____ × ${p}`).join(' + ');
+        inlineBlanks(q, `${s} = ${places.map((p) => `___ × ${p}`).join(' + ')}`, [ds.map(String)], ds.map(() => 2));
+        q.ans = ds.map((dg, i) => term(dg, places[i])).join(' + ');
+        q.printAnswer = q.ans;
+        setCell(q, { kind: 'blanks', n: s, frame: `${s} = ${frameText}`, keys: ds.map(String), keyValue: q.ans, bigNumerals: true });
+        return;
+    }
+    // One box per place, in the kit's blanks frame (typed into the same boxes on screen).
+    const keys = parts.map(String);
+    inlineBlanks(q, `${s} = ${parts.map(() => '___').join(' + ')}`, [keys], keys.map((k) => k.length + 1));
+    q.ans = keys.join(' + ');
+    q.printAnswer = q.ans;
+    setCell(q, { kind: 'blanks', n: s, frame: `${s} = ${parts.map(() => '____').join(' + ')}`, keys, keyValue: q.ans });
 }
 
 /** EF-9 / EF-10: unit form, and renaming more than 9 of one place (47 tens, 3 hundreds 15 tens). */
@@ -553,18 +683,38 @@ function genDisks(q, skill, o) {
     const cap = Math.min(capOf('placevalue', skill, o, 999), skill === 'pv_disks_build' ? 999 : 9999);
     const [, hi] = digitSpan(cap);
     const nd = String(hi).length;
-    const places = Array.from({ length: nd }, (_, i) => 10 ** (nd - 1 - i));
+    let places = Array.from({ length: nd }, (_, i) => 10 ** (nd - 1 - i));
     let { counts, n } = diskCounts(places, o);
     for (let t = 0; t < 20 && n > hi; t++) ({ counts, n } = diskCounts(places, o));
     if (n > hi) { n = randInt(10 ** (nd - 1), hi); String(n).split('').forEach((d, i) => { counts[places[i]] = Number(d); }); }
+    // vis_pv_decimal_places: a decimal of 1-3 places on an O | Tth | Hth | Thth mat, the point on the
+    // line after the ones (a number within 1 leaves the ones zone empty). The band then has no say.
+    const dec = decOf(o);
+    let ns = null;
+    if (dec && ['read', 'count', undefined, ''].includes(o.task || '')) {
+        const num = decimalNumber(dec, { zero: o.zeroPlace === 'some' && slot(2) === 1 });
+        places = num.places.slice();
+        counts = { ...num.digits };
+        n = num.n;
+        ns = num.s;
+    } else if (dec && skill === 'pv_disks_build') {
+        const num = decimalNumber(Math.min(2, dec), { zero: o.zeroPlace === 'some' && slot(2) === 1 });
+        places = num.places.slice();
+        counts = { ...num.digits };
+        n = num.n;
+        ns = num.s;
+    }
+    const nText = ns || fmt(n);
+    // R61: decimal disks may be named as fractions (1/10, 1/100, 1/1000) - `counterLabel`.
+    const frac = !!ns && o.counterLabel === 'fraction' && o.labels !== 'none';
     // vis_pv_dot_disks: `labels: 'none'` draws plain dots that take their value from the column.
     const dots = o.labels === 'none';
-    const screenMat = (withCounts) => diskMatSVG({ places, counts: withCounts ? counts : null, size: 'M', pxPerMm: SCREEN_PX_PER_MM, dots }).svg;
+    const screenMat = (withCounts) => diskMatSVG({ places, counts: withCounts ? counts : null, size: 'M', pxPerMm: SCREEN_PX_PER_MM, dots, fraction: frac }).svg;
     if (skill === 'place_value_disks' && ['take', 'x10', 'd10', 'all'].includes(o.task)) { genDiskTask(q, o, places, counts, n, dots); return; }
     if (skill === 'pv_disks_build') {
         const parts = places.map(p => `${counts[p]} ${counts[p] === 1 ? PLACE_ONE[p] : PLACE_WORD[p]}`);
-        q.text = `Build the number ${fmt(n)} on the place value mat.`;
-        q.printText = dots ? `Draw ${fmt(n)} with dots.` : `Draw ${fmt(n)} with place-value disks.`;
+        q.text = `Build the number ${nText} on the place value mat.`;
+        q.printText = dots ? `Draw ${nText} with dots.` : `Draw ${nText} with place-value disks.`;
         q.target = n;
         q.places = places.slice();
         q.ans = n;
@@ -574,8 +724,8 @@ function genDisks(q, skill, o) {
         q.visual = '';
         q.hint = 'Look at each digit. Draw that many disks in its place. A zero place stays empty.';
         q.skillLabel = 'Draw Place-Value Disks';
-        q.pv = { kind: 'build', n, places: places.slice(), dots };
-        setCell(q, { kind: 'build', n, places: places.slice(), counts: { ...counts }, keyValue: q.printAnswer, dots });
+        q.pv = { kind: 'build', n, places: places.slice(), dots, decimals: ns ? dec : 0, s: ns, fraction: frac };
+        setCell(q, { kind: 'build', n: ns || n, places: places.slice(), counts: { ...counts }, keyValue: q.printAnswer, dots, ...(frac ? { fraction: true } : {}) });
         return;
     }
     const task = o.task === 'count' ? 'count' : 'read';
@@ -599,7 +749,8 @@ function genDisks(q, skill, o) {
         q.pv = { kind: 'disks', task, places: places.slice(), counts: { ...counts }, n };
     }
     q.pv.dots = dots;
-    setCell(q, { kind: 'disks', task, places: places.slice(), counts: { ...counts }, place: q.pv.place, dots });
+    if (ns) { q.pv.decimals = dec; q.pv.s = ns; q.pv.fraction = frac; }
+    setCell(q, { kind: 'disks', task, places: places.slice(), counts: { ...counts }, place: q.pv.place, dots, ...(ns ? { n: ns } : {}), ...(frac ? { fraction: true } : {}) });
 }
 
 /**
@@ -809,7 +960,47 @@ function comparableSet(count, cap, o) {
     return [...arr];
 }
 
+/**
+ * compare with decimal places (vis_pv_decimal_places): the pairs that teach, dealt in turn - the
+ * first decimal place decides; the last place decides; the SHORTER number is bigger (0.5 and 0.45:
+ * "longer is bigger" is the error); the whole parts differ; equal with a trailing zero (0.5 = 0.50).
+ */
+function genDecimalCompare(q, o) {
+    const d = decOf(o);
+    const a0 = decimalNumber(d);
+    const w = a0.w, fr = a0.fr.slice();
+    let a = a0.s, b;
+    const kind = [0, 1, 2, 3, 0, 4][slot(6)];
+    if (kind === 1 && d >= 2) {
+        const f2 = fr.slice(); const j = d - 1; f2[j] = f2[j] === 9 ? 8 : f2[j] + 1; b = `${w}.${f2.join('')}`;
+    } else if (kind === 2 && d >= 2) {
+        b = `${w}.${fr[0] === 9 ? 8 : fr[0] + 1}`;
+    } else if (kind === 3) {
+        b = `${w === 9 ? 8 : w + 1}.${fr.map(() => randInt(1, 9)).join('')}`;
+    } else if (kind === 4) {
+        b = `${w}.${fr.join('')}0`;
+    } else {
+        const f2 = fr.slice(); f2[0] = f2[0] === 1 ? 2 : f2[0] - 1; b = `${w}.${f2.join('')}`;
+    }
+    if (slot(2) === 1) [a, b] = [b, a];
+    const na = Number(a), nb = Number(b);
+    q.text = `Compare: ${a} ___ ${b}`;
+    q.printText = 'Write <, > or = in the circle.';
+    q.ans = na > nb ? '>' : na < nb ? '<' : '=';
+    q.answerType = 'symbol';
+    q.options = ['>', '<', '='];
+    q.hint = 'Line up the points. Compare the digits from the left: ones, then tenths, then hundredths.';
+    q.skillLabel = 'Compare Decimals';
+    q.visual = `<div style="display:flex;justify-content:center;align-items:center;gap:20px;color:#000;">`
+        + `<div style="font-size:2rem;font-weight:700;">${a}</div>`
+        + `<div style="width:2.2rem;height:2.2rem;border:1.5pt solid #000;border-radius:50%;"></div>`
+        + `<div style="font-size:2rem;font-weight:700;">${b}</div></div>`;
+    q.pv = { kind: 'compare', a: na, b: nb, as: a, bs: b, decimals: d, closeness: 'close', lengths: a.length === b.length ? 'equal' : 'mixed' };
+    setCell(q, { kind: 'compare', a, b, keyValue: q.ans });
+}
+
 function genCompare(q, skill, o) {
+    if (decOf(o)) { genDecimalCompare(q, o); return; }
     const cap = capOf('placevalue', skill, o, 999);
     let [a, b] = comparableSet(2, cap, o);
     // One item in six is equal (the "=" case; CP-9), dealt, never rolled.

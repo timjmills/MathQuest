@@ -705,19 +705,37 @@ const _pvCounterLook = () => ({
     values: [{ v: 'all', l: 'Disks with the value inside (100, 10, 1)' }, { v: 'none', l: 'Plain dots (the column gives the value)' }],
     help: 'Plain dots are quicker to draw and make the pupil read the column; disks say their value.',
 });
+// vis_pv_decimal_places (build lane placevalue): numbers with tenths, hundredths or thousandths,
+// one whole digit (or none: within 1). With decimal places on, the whole-number band steps aside.
+const _PV_DEC_LABELS = { 0: 'Whole numbers (Numbers to sets them)', 1: 'Tenths (3.4)', 2: 'Hundredths (3.47)', 3: 'Thousandths (3.472)' };
+const _pvDecimals = (max = 3, appliesTo = null) => ({
+    id: 'decimals', label: 'Decimal places', type: 'enum', default: 0, group: 'difficulty',
+    values: [0, 1, 2, 3].filter((v) => v <= max).map((v) => ({ v, l: _PV_DEC_LABELS[v] })),
+    help: 'Decimal numbers have one whole digit (3.47), or none (0.47, within 1). The decimal point stands on the line after the ones.',
+    ...(appliesTo ? { appliesTo } : {}),
+});
+// R61: decimal counters named as decimals (0.1, 0.01) or as fractions (1/10, 1/100, 1/1000).
+const _pvCounterName = () => ({
+    id: 'counterLabel', label: 'Decimal counters say', type: 'enum', default: 'decimal', group: 'appearance',
+    values: [{ v: 'decimal', l: 'Decimals (0.1, 0.01, 0.001)' }, { v: 'fraction', l: 'Fractions (1/10, 1/100, 1/1000)' }],
+    help: 'Fraction names link a tenth disk to 1/10; decimal names match the number written.',
+    appliesTo: (o) => Number(o.decimals) > 0 && o.labels !== 'none',
+    verifyBase: { decimals: 2 },
+});
+const _noDec = (def) => ({ ...def, appliesTo: (o) => !(Number(o.decimals) > 0) && (!def.appliesTo || def.appliesTo(o)) });
 const P9_PV_OPTIONS = {
     'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport(), _pvIdentifyResponse(), _pvRepeatDigit()],
-    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit()],
-    'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), _pvExpandFrame(), _pvExpandForm()],
+    'placevalue:value': [_noDec(_pvBand(_PV_PLACE_BANDS, 999)), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit(), _pvDecimals()],
+    'placevalue:expand': [_noDec(_pvBand(_PV_PLACE_BANDS, 999)), _pvZeroPlace(true), _pvExpandFrame(), _pvExpandForm(), _pvDecimals()],
     'placevalue:combine': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), {
         id: 'order', label: 'Order of the parts', type: 'enum', default: 'largest', group: 'difficulty',
         values: [{ v: 'largest', l: 'Largest first' }, { v: 'scrambled', l: 'Scrambled (5 + 300 + 20)' }],
         help: 'Scrambled parts are harder: the pupil has to put each part in its place.',
     }],
-    'placevalue:compare': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvCloseness(), _pvLengths()],
+    'placevalue:compare': [_noDec(_pvBand([99, 999, 9999, 99999, 999999], 999)), _noDec(_pvCloseness()), _noDec(_pvLengths()), _pvDecimals()],
     'placevalue:order_least_to_greatest': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvOrderCount(), _pvCloseness(), _pvLengths()],
     'placevalue:order_greatest_to_least': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvOrderCount(), _pvCloseness(), _pvLengths()],
-    'placevalue:place_value_disks': [_pvBand([99, 999, 9999], 999), {
+    'placevalue:place_value_disks': [_noDec(_pvBand([99, 999, 9999], 999)), {
         id: 'task', label: 'Task', type: 'enum', default: 'read', group: 'layout',
         values: [{ v: 'read', l: 'Read the number from the disks' }, { v: 'count', l: "Count one place's disks" },
             // build lane placevalue (vis_pv_dot_disks)
@@ -726,9 +744,10 @@ const P9_PV_OPTIONS = {
             { v: 'all', l: 'Use 2 to 5 counters: write every number they make (tens and ones)' }],
         help: 'Counting one place is the easier first step; reading the whole number comes next. The move tasks show the '
             + 'counters with an arrow from each place to the next; "every number" asks for all the numbers a few counters make.',
-    }, _pvZeroPlace(false), _pvCounterLook()],
+    }, _pvZeroPlace(false), _pvCounterLook(), _pvDecimals(3, (o) => !o.task || o.task === 'read' || o.task === 'count'),
+    { ..._pvCounterName(), appliesTo: (o) => Number(o.decimals) > 0 && o.labels !== 'none' && (!o.task || o.task === 'read' || o.task === 'count') }],
     // Draw to 999 only (owner ruling 3): nine 1,000 disks and 27 others is a poster, not a cell.
-    'placevalue:pv_disks_build': [_pvBand([99, 999], 999), _pvZeroPlace(false), _pvCounterLook()],
+    'placevalue:pv_disks_build': [_noDec(_pvBand([99, 999], 999)), _pvZeroPlace(false), _pvCounterLook(), _pvDecimals(2), _pvCounterName()],
     'placevalue:pv_digit_drag': [_pvBand([999, 9999, 99999, 999999], 99999), {
         id: 'source', label: 'The number is given as', type: 'enum', default: 'expanded', group: 'difficulty',
         values: [

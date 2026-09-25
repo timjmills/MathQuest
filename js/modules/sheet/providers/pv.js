@@ -13,11 +13,20 @@
 import { registerSkill } from '../contract.js';
 import { num, fmt, obj, arr, chooseWrong, strings, step, clampSteps } from './util.js';
 
-const PLACE_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands', 1000000: 'millions' };
-const LETTER = { 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M' };
-const f = (v) => fmt(Number(v));
+const PLACE_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands', 1000000: 'millions',
+    0.1: 'tenths', 0.01: 'hundredths', 0.001: 'thousandths' };
+const LETTER = { 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M', 0.1: 'Tth', 0.01: 'Hth', 0.001: 'Thth' };
+// A decimal part is worked to six places, so 3 x 0.1 prints 0.3, never 0.30000000000000004.
+const f = (v) => fmt(Number(Number(v).toFixed(6)));
+const r6 = (v) => Number(Number(v).toFixed(6));
+/** vis_pv_decimal_places: does this item (or page's options) carry decimal places? */
+const isDec = (q) => Number(pvOf(q).decimals) > 0;
+/** The number written as the item shows it (3.40 keeps its zero). */
+const shown = (p) => (p.s !== undefined && p.s !== null ? String(p.s) : f(p.n));
+/** The number the digits `ds` make in `places` (largest first) - a decimal point stays put. */
+const onPlaces = (ds, places) => r6(ds.reduce((a, d, i) => a + d * places[i], 0));
 const pvOf = (q) => obj(q && q.pv) || {};
-const digitAt = (n, place) => Math.floor(Math.abs(n) / place) % 10;
+const digitAt = (n, place) => Math.floor(Math.round(Math.abs(n) * 1000) / Math.round(place * 1000)) % 10;
 const roundTo = (n, P) => Math.floor((n + P / 2) / P) * P;          // halfway rounds up (owner ruling 6)
 const placesOf = (n) => { const s = String(Math.trunc(Math.abs(n))); return Array.from({ length: s.length }, (_, i) => 10 ** (s.length - 1 - i)); };
 const ansNum = (q) => num(q.ans);
@@ -132,11 +141,19 @@ registerSkill('placevalue:identify', {
 
 function valueParts(q) {
     const p = pvOf(q);
-    return p.place ? { ...p, value: p.digit * p.place, word: PLACE_WORD[p.place] } : null;
+    return p.place ? { ...p, value: r6(p.digit * p.place), word: PLACE_WORD[p.place] } : null;
 }
 
+const VALUE_DEC = {
+    iCan: 'I Can write the value of a digit after the point',
+    instructionKey: 'digit-value',
+    steps: ['Find the underlined digit and its place.', 'After the point: tenths, then hundredths, then thousandths.', 'Multiply the digit by its place: 7 hundredths is 0.07.'],
+    say: 'The __ is worth __.',
+    sayValues: (q) => { const v = valueParts(q); return v ? [v.digit, f(v.value)] : null; },
+};
+
 registerSkill('placevalue:value', {
-    strings: strings({
+    strings: stringsBy((q) => (isDec(q) ? VALUE_DEC : null), {
         iCan: 'I Can write the value of a digit',
         instructionKey: 'digit-value',
         steps: ['Find the underlined digit and its place.', 'The place says what one of it is worth.', 'Multiply the digit by its place: 7 hundreds is 700.'],
@@ -169,23 +186,83 @@ registerSkill('placevalue:value', {
         return choose(q, [
             { value: v.digit, misconception: 'M-V2', explain: 'Wrote the digit, not what it is worth.' },
             { value: v.digit === 0 ? v.place : v.place, misconception: v.digit === 0 ? 'M-V5' : 'M-V4', explain: v.digit === 0 ? 'Gave the zero the value of its place.' : 'Wrote the place, not the value.' },
-            { value: v.digit * (v.place * 10), misconception: 'M-V14', explain: 'Used the place next to it.' },
+            { value: r6(v.digit * (v.place * 10)), misconception: 'M-V14', explain: 'Used the place next to it.' },
         ]);
     },
 });
 
 /* =============================================================================== expanded / standard / unit */
 
+/* vis_pv_decimal_places: 3.47 = 3 + 0.4 + 0.07 (sum) or 3 × 1 + 4 × 0.1 + 7 × 0.01 (notation). */
+const EXPAND_DEC = {
+    iCan: 'I Can write a decimal in expanded form',
+    instructionKey: 'expanded',
+    steps: ['Start with the digit on the left.', 'Write what each digit is worth: 4 tenths is 0.4.', 'A zero holds its place: its part is 0.', 'Put + between the parts.'],
+    say: '__ is __.',
+    sayValues: (q) => { const p = pvOf(q); return p.n !== undefined ? [shown(p), arr(p.parts).map(Number).filter(Boolean).map(f).join(' plus ')] : null; },
+};
+const EXPAND_DEC_NOTATION = {
+    iCan: 'I Can write a decimal in expanded notation',
+    instructionKey: 'expanded',
+    steps: ['Start with the digit on the left.', 'Write each digit in its box.', 'The box is multiplied by its place: 4 × 0.1.'],
+    say: '__ is __.',
+    sayValues: EXPAND_DEC.sayValues,
+};
+function expandDecSteps(q) {
+    const p = pvOf(q);
+    const places = arr(p.places).map(Number);
+    const parts = arr(p.parts).map(Number);
+    if (!places.length) return [];
+    const ds = places.map((pl) => digitAt(p.n, pl));
+    const note = p.form === 'notation';
+    const line = p.frame === 'line';
+    const out = places.slice(0, 4).map((pl, i) => step(`The ${ds[i]} is in the ${PLACE_WORD[pl]} place: ${note ? `${ds[i]} × ${f(pl)}` : f(parts[i])}.`,
+        line ? [] : [{ slot: `b${i}`, value: note ? String(ds[i]) : f(parts[i]) }]));
+    const k = places.length - 1;
+    out.push(step(`So ${shown(p)} = ${String(q.ans)}.`, line ? [{ slot: 'answer', value: String(q.ans) }]
+        : [{ slot: `b${k}`, value: note ? String(ds[k]) : f(parts[k]) }]));
+    return clampSteps(out.length >= 3 ? out : [step(`Read ${shown(p)}.`)].concat(out));
+}
+function expandDecWrong(q) {
+    const p = pvOf(q);
+    const places = arr(p.places).map(Number);
+    const parts = arr(p.parts).map(Number);
+    if (!places.length) return null;
+    const ds = places.map((pl) => digitAt(p.n, pl));
+    const join = (list) => list.join(' + ');
+    if (p.form === 'notation') {
+        const up = places.map((pl) => r6(pl * 10));
+        return choose(q, [
+            { value: ds.map((d, i) => `${d} × ${f(up[i])}`).join(' + '), misconception: 'M-V14', explain: 'Moved every digit one place up: tenths read as ones.',
+                slots: Object.fromEntries(ds.map((d, i) => [`b${i}`, String(d)])) },
+            { value: parts.map((v, i) => `${f(v)} × ${f(places[i])}`).join(' + '), misconception: 'M-V6', explain: 'Wrote the value in the box, then multiplied by the place again.',
+                slots: Object.fromEntries(parts.map((v, i) => [`b${i}`, f(v)])) },
+        ]);
+    }
+    const line = p.frame === 'line';
+    const c = [];
+    // M-V6: the digits, not their worth (3.47 = 3 + 4 + 7).
+    const dsS = ds.map(String);
+    c.push({ value: join(line ? dsS.filter((d) => d !== '0') : dsS), misconception: 'M-V6', explain: 'Wrote the digits, not what they are worth.',
+        slots: line ? { answer: join(dsS.filter((d) => d !== '0')) } : Object.fromEntries(dsS.map((d, i) => [`b${i}`, d])) });
+    // M-D3: every decimal part one place too small (0.4 written 0.04).
+    const small = parts.map((v, i) => (places[i] < 1 ? r6(v / 10) : v));
+    c.push({ value: join(small.filter((v) => !line || v).map(f)), misconception: 'M-D3', explain: 'Put each decimal digit one place too far right.',
+        slots: line ? { answer: join(small.filter(Boolean).map(f)) } : Object.fromEntries(small.map((v, i) => [`b${i}`, f(v)])) });
+    return choose(q, c);
+}
+
 registerSkill('placevalue:expand', {
-    strings: stringsBy((q) => (pvOf(q).form === 'notation' ? EXPAND_NOTATION : null), {
+    strings: stringsBy((q) => (isDec(q) ? (pvOf(q).form === 'notation' ? EXPAND_DEC_NOTATION : EXPAND_DEC) : pvOf(q).form === 'notation' ? EXPAND_NOTATION : null), {
         iCan: 'I Can write a number in expanded form',
         instructionKey: 'expanded',
         steps: ['Start with the digit on the left.', 'Write what each digit is worth.', 'A zero holds its place: its part is 0.', 'Put + between the parts.'],
         say: '__ is __.',
         sayValues: (q) => { const p = pvOf(q); return p.n ? [p.n, (p.parts || []).filter(Boolean).map(f).join(' plus ')] : null; },
     }),
-    misconceptions: ['M-V6', 'M-V5', 'M-V7', 'M-V14'],
+    misconceptions: ['M-V6', 'M-V5', 'M-V7', 'M-V14', 'M-D3'],
     workedSteps: (q) => {
+        if (isDec(q)) return expandDecSteps(q);
         const p = pvOf(q);
         const parts = arr(p.parts).map(Number);
         if (!parts.length) return [];
@@ -198,6 +275,7 @@ registerSkill('placevalue:expand', {
         return clampSteps(out.length >= 3 ? out : [step(`Read ${f(p.n)}.`)].concat(out));
     },
     wrongAnswer: (q) => {
+        if (isDec(q)) return expandDecWrong(q);
         const p = pvOf(q);
         const parts = arr(p.parts).map(Number);
         if (!parts.length) return null;
@@ -394,8 +472,16 @@ for (const id of ['more_less_10', 'more_less_100']) {
 
 /* =============================================================================== disks, chart, x10 */
 
+const DISK_READ_DEC = {
+    iCan: 'I Can read a decimal from place-value disks',
+    instructionKey: 'disk-read',
+    steps: ['Count the disks in each zone.', 'Write that digit in its place. An empty zone is a 0.', 'Write the point after the ones.'],
+    say: '__ is __.',
+    sayValues: (q) => { const p = pvOf(q); return p.places ? [arr(p.places).map((pl) => `${(p.counts || {})[pl]} ${PLACE_WORD[pl]}`).join(', '), shown(p)] : null; },
+};
+
 registerSkill('placevalue:place_value_disks', {
-    strings: stringsBy((q) => (pvOf(q).task === 'count' ? DISK_COUNT : DISK_TASKS[pvOf(q).task] || null), {
+    strings: stringsBy((q) => (pvOf(q).task === 'count' ? DISK_COUNT : DISK_TASKS[pvOf(q).task] || (isDec(q) ? DISK_READ_DEC : null)), {
         iCan: 'I Can read a number from place-value disks',
         instructionKey: 'disk-read',
         steps: ['Count the disks in each zone.', 'Write that digit in its place.', 'An empty zone is a 0.'],
@@ -431,7 +517,7 @@ registerSkill('placevalue:place_value_disks', {
                 step(`Count them: there are ${counts[p.place]}.`), step(`Write ${counts[p.place]}.`, [{ slot: 'answer', value: String(counts[p.place]) }])];
         }
         const out = places.slice(0, 4).map((pl) => step(`${PLACE_WORD[pl]}: ${counts[pl] || 0} disks, so the digit is ${counts[pl] || 0}.`));
-        out.push(step(`Write ${f(p.n)}.`, [{ slot: 'answer', value: f(p.n) }]));
+        out.push(step(`Write ${shown(p)}.`, [{ slot: 'answer', value: shown(p) }]));
         return clampSteps(out.length >= 3 ? out : [step('Look at each zone.')].concat(out));
     },
     wrongAnswer: (q) => {
@@ -466,11 +552,21 @@ registerSkill('placevalue:place_value_disks', {
         }
         if (p.task === 'count') {
             return choose(q, [
-                { value: (counts[p.place] || 0) * p.place, misconception: 'M-V4', explain: 'Wrote what the disks are worth, not how many.' },
+                { value: r6((counts[p.place] || 0) * p.place), misconception: 'M-V4', explain: 'Wrote what the disks are worth, not how many.' },
                 { value: places.reduce((a, pl) => a + (counts[pl] || 0), 0), misconception: 'M-V11', explain: 'Counted every disk on the mat.' },
             ]);
         }
         const ds = places.map((pl) => counts[pl] || 0);
+        if (isDec(q)) {
+            // the digits kept in their zones, the point after the ones: every wrong number is a
+            // number the pupil really reads off this mat
+            const nz = ds.filter((d) => d > 0);
+            return choose(q, [
+                { value: ds.reduce((a, b) => a + b, 0), misconception: 'M-V11', explain: 'Added the disk counts.' },
+                nz.length < ds.length ? { value: onPlaces(nz.concat(Array(ds.length - nz.length).fill(0)), places), misconception: 'M-V7', explain: 'Left out the empty zone, so the digits slid up a place.' } : null,
+                { value: onPlaces(ds.slice().reverse(), places), misconception: 'M-V1', explain: 'Read the zones from the right.' },
+            ]);
+        }
         return choose(q, [
             { value: ds.reduce((a, b) => a + b, 0), misconception: 'M-V11', explain: 'Added the disk counts.' },
             { value: num(ds.filter((d) => d > 0).join('')), misconception: 'M-V7', explain: 'Left out the empty zone.' },
@@ -523,13 +619,24 @@ registerSkill('placevalue:pv_disks_build', {
         const p = pvOf(q);
         const places = arr(p.places).map(Number);
         if (!places.length) return [];
-        const out = places.map((pl) => step(`${digitAt(p.n, pl)} in the ${PLACE_WORD[pl]}: draw ${digitAt(p.n, pl)} disks marked ${f(pl)}.`));
-        out.push(step(`The mat shows ${f(p.n)}.`, [{ slot: 'answer', value: String(q.printAnswer || f(p.n)) }]));
+        const mark = (pl) => (p.fraction && pl < 1 ? `1/${Math.round(1 / pl)}` : f(pl));
+        const out = places.map((pl) => step(`${digitAt(p.n, pl)} in the ${PLACE_WORD[pl]}: draw ${digitAt(p.n, pl)} ${p.dots ? 'dots' : `disks marked ${mark(pl)}`}.`));
+        out.push(step(`The mat shows ${shown(p)}.`, [{ slot: 'answer', value: String(q.printAnswer || shown(p)) }]));
         return clampSteps(out.length >= 3 ? out : [step(`Read ${f(p.n)}.`)].concat(out));
     },
     wrongAnswer: (q) => {
         const p = pvOf(q);
         if (!p.n) return null;
+        if (isDec(q)) {
+            const places = arr(p.places).map(Number);
+            const dg = places.map((pl) => digitAt(p.n, pl));
+            const sw = dg.slice(); if (sw.length >= 2) [sw[sw.length - 1], sw[sw.length - 2]] = [sw[sw.length - 2], sw[sw.length - 1]];
+            const swapped = onPlaces(sw, places);
+            return choose(q, [
+                { value: onPlaces(dg.slice().reverse(), places), misconception: 'M-V1', explain: 'Drew the digits in the wrong zones: read the number from the right.' },
+                swapped !== r6(p.n) ? { value: swapped, misconception: 'M-V16', explain: 'Swapped the last two places.' } : null,
+            ]);
+        }
         const ds = String(p.n).split('');
         // Each error is a mat a pupil really draws, and the mat drawn IS that number (critic
         // round 3: "every disk a ones disk" was drawn as the digit sum's own mat, 1 ten 5 ones).
@@ -634,18 +741,49 @@ registerSkill('placevalue:number_word_names', {
 
 /* =============================================================================== compare / order */
 
+/* vis_pv_decimal_places: comparing decimals. "More digits is bigger" is the very error here
+ * (0.45 < 0.5), so the steps line up the points and compare place by place. */
+const cmpWord = (q) => (q.ans === '>' ? 'greater than' : q.ans === '<' ? 'less than' : 'equal to');
+const COMPARE_DEC = {
+    iCan: 'I Can compare decimals with <, > and =',
+    instructionKey: 'compare',
+    steps: ['Line up the points. Compare the ones first.', 'Then the tenths, then the hundredths: the first different digit decides.', 'More digits is not bigger: 0.5 > 0.45. A zero on the end changes nothing.'],
+    say: '__ is __ __.',
+    sayValues: (q) => { const p = pvOf(q); return p.as !== undefined ? [p.as, cmpWord(q), p.bs] : null; },
+};
+/** The two decimals written to the same number of places (5.6 and 5.59 -> 5.60 and 5.59). */
+function padDec(p) {
+    const [aw, af = ''] = String(p.as).split('.');
+    const [bw, bf = ''] = String(p.bs).split('.');
+    const n = Math.max(af.length, bf.length);
+    return { aw, bw, af: af.padEnd(n, '0'), bf: bf.padEnd(n, '0') };
+}
+const DEC_PLACE_NAMES = ['tenths', 'hundredths', 'thousandths', 'ten-thousandths'];
+
 registerSkill('placevalue:compare', {
-    strings: strings({
+    strings: stringsBy((q) => (isDec(q) ? COMPARE_DEC : null), {
         iCan: 'I Can compare numbers with <, > and =',
         instructionKey: 'compare',
         steps: ['Count the digits: more digits is bigger.', 'Same length: compare from the left place.', 'The first different digit decides.'],
         say: '__ is __ __.',
-        sayValues: (q) => { const p = pvOf(q); return p.a !== undefined ? [p.a, q.ans === '>' ? 'greater than' : q.ans === '<' ? 'less than' : 'equal to', p.b] : null; },
+        sayValues: (q) => { const p = pvOf(q); return p.a !== undefined ? [p.a, cmpWord(q), p.b] : null; },
     }),
-    misconceptions: ['M-C1', 'M-C2', 'M-C3'],
+    misconceptions: ['M-C1', 'M-C2', 'M-C3', 'M-D1'],
     workedSteps: (q) => {
         const p = pvOf(q);
         if (p.a === undefined) return [];
+        if (isDec(q) && p.as !== undefined) {
+            const d = padDec(p);
+            let why;
+            if (d.aw !== d.bw) why = `The ones differ: ${d.aw} and ${d.bw}.`;
+            else {
+                const i = [...d.af].findIndex((c, k) => c !== d.bf[k]);
+                why = i < 0 ? `Written to the same places they are ${d.aw}.${d.af} and ${d.bw}.${d.bf}: every digit is the same.`
+                    : `The first different digits are ${d.af[i]} and ${d.bf[i]}, in the ${DEC_PLACE_NAMES[i]}.`;
+            }
+            return [step(`Line up the points: ${d.aw}.${d.af} and ${d.bw}.${d.bf}.`), step(why),
+                step(`${p.as} ${q.ans} ${p.bs}.`, [{ slot: 'answer', value: String(q.ans) }])];
+        }
         const la = String(p.a).length, lb = String(p.b).length;
         let why;
         if (la !== lb) why = `${f(la > lb ? p.a : p.b)} has more digits.`;
@@ -661,6 +799,18 @@ registerSkill('placevalue:compare', {
         const p = pvOf(q);
         if (p.a === undefined) return null;
         const flip = q.ans === '>' ? '<' : q.ans === '<' ? '>' : '<';
+        if (isDec(q) && p.as !== undefined) {
+            // M-D1: "longer is bigger" - read the parts after the point as whole numbers (45 > 5).
+            const [aw, af = ''] = String(p.as).split('.');
+            const [bw, bf = ''] = String(p.bs).split('.');
+            const asWhole = aw !== bw ? null : (Number(af) > Number(bf) ? '>' : Number(af) < Number(bf) ? '<' : '=');
+            const longer = String(p.as).length > String(p.bs).length ? '>' : String(p.as).length < String(p.bs).length ? '<' : null;
+            const cands = [
+                asWhole ? { value: asWhole, misconception: 'M-D1', explain: 'Read the digits after the point as a whole number: more digits looked bigger.' } : null,
+                longer ? { value: longer, misconception: 'M-D1', explain: 'Took the longer number as the bigger one.' } : null,
+            ].filter((c) => c && c.value !== String(q.ans));
+            return choose(q, cands.length ? [cands[0]] : [{ value: flip, misconception: 'M-C1', explain: 'Wrote the sign the wrong way round.' }]);
+        }
         const lastDigits = (String(p.a).slice(-1) > String(p.b).slice(-1)) ? '>' : (String(p.a).slice(-1) < String(p.b).slice(-1) ? '<' : '=');
         const sa = String(p.a), sb = String(p.b);
         const firstDigits = sa.length !== sb.length ? (sa[0] > sb[0] ? '>' : sa[0] < sb[0] ? '<' : null) : null;

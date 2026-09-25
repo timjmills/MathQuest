@@ -20,16 +20,16 @@ the first entry.
 ## Summary
 
 - **575 year rows** (Reception 67, Year 1 79, Year 2 75, Year 3 84, Year 4 89, Year 5 92, Year 6 89) → **210 representations**.
-- **MATCH 8 · PARTIAL 102 · GAP 100.**
-- The 202 PARTIAL / GAP representations are closed by 92 existing build-list entries (merged) and 51 entries added from this catalogue.
+- **MATCH 9 · PARTIAL 102 · GAP 99.**
+- The 201 PARTIAL / GAP representations are closed by 92 existing build-list entries (merged) and 50 entries added from this catalogue.
 
 | Lane | Representations it owns | MATCH | PARTIAL | GAP | Entries added from the catalogue |
 |---|---|---|---|---|---|
 | `k2` | 51 | 0 | 22 | 29 | 12 |
 | `operations` | 32 | 0 | 20 | 12 | 11 |
-| `placevalue` | 14 | 0 | 7 | 7 | 7 |
+| `placevalue` | 13 | 0 | 7 | 6 | 6 |
 | `algebra` | 15 | 0 | 6 | 9 | 4 |
-| `fractions` | 18 | 0 | 11 | 7 | 7 |
+| `fractions` | 19 | 1 | 11 | 7 | 7 |
 | `geometry` | 33 | 0 | 17 | 16 | 3 |
 | `measurement` | 9 | 0 | 7 | 2 | 2 |
 | `timemoney` | 18 | 0 | 6 | 12 | 2 |
@@ -45,7 +45,6 @@ the first entry.
 - **Legacy colour → B&W: Migrate Legacy Fraction Visuals to B&W Kit Cells** → `vis_migrate_fraction_ops` (lane `fractions`): V054, V055, V057, V165.
 - **Legacy colour → B&W: Migrate Legacy Graphs to B&W Kit Cells** → `vis_migrate_graphs` (lane `data`): V070, V071, V072, V198.
 - **Widening band: 7-digit / millions place value** → `vis_pv_bands_millions` (lane `placevalue`): V003, V004, V005, V006, V175, V186.
-- **Widening band: decimals to thousandths in the place-value chart** → `vis_pv_decimal_places` (lane `placevalue`): V005, V006, V167.
 
 ## The catalogue
 
@@ -55,8 +54,8 @@ the first entry.
 | V002 | Base-10 quick sketch (square, line, dot) | Y3 R02 | 3 | MATCH | `pane:base10-quick`, `template:base10`, `composing:base10_build`, `composing:base10_build_hundreds` | - | - |
 | V003 | Place-value counters loose / in a row (to 999,999) | Y3 R03 (MATCH), Y4 R03 (M/P), Y5 R03 (M/P) | 27 | PARTIAL | `template:pv`, `placevalue:place_value_disks`, `pane:disks` | `vis_pv_bands_millions`* | `placevalue` |
 | V004 | Place-value chart with counters, build / read (to 7 digits) | Y2 R04, Y3 R04 (M/P), Y5 R04, Y6 R04 | 62 | PARTIAL | `pane:pvgrid`, `template:pv`, `placevalue:pv_disks_build` | `vis_pv_bands_millions`* | `placevalue` |
-| V005 | Place-value chart with plain unlabelled dots | Y3 R05 (MATCH), Y4 R04 (MATCH), Y5 R05, Y6 R05 | 39 | PARTIAL | `placevalue:place_value_disks`, `placevalue:pv_disks_build` | `vis_pv_decimal_places`*, `vis_pv_bands_millions`* | `placevalue` |
-| V006 | Place-value digit chart / place heads (to Thth, to millions) | Y2 R06 (MATCH), Y3 R06 (MATCH), Y4 R05 (MATCH), Y5 R06 (M/P), Y6 R06 (M/P) | 21 | PARTIAL | `template:stack`, `placevalue:place_value_10x`, `placevalue:pv_digit_drag` | `vis_pv_decimal_places`*, `vis_pv_bands_millions`* | `placevalue` |
+| V005 | Place-value chart with plain unlabelled dots | Y3 R05 (MATCH), Y4 R04 (MATCH), Y5 R05 (MATCH), Y6 R05 | 39 | PARTIAL | `placevalue:place_value_disks`, `placevalue:pv_disks_build` | `vis_pv_bands_millions`* | `placevalue` |
+| V006 | Place-value digit chart / place heads (to Thth, to millions) | Y2 R06 (MATCH), Y3 R06 (MATCH), Y4 R05 (MATCH), Y5 R06 (MATCH), Y6 R06 (M/P) | 21 | PARTIAL | `template:stack`, `placevalue:place_value_10x`, `placevalue:pv_digit_drag` | `vis_pv_bands_millions`* | `placevalue` |
 | V007 | Bead string (10, 20, 100; tenths, 1 %) | R R33, Y1 R29 (GAP), Y3 R07 (GAP), Y4 R29 (GAP), Y5 R07 (GAP) | 20 | PARTIAL | `pane:rekenrek` | `vis_bead_panes`* | `k2` |
 | V008 | Bundles / packs of 10, 100, 1,000 | Y1 R44, Y2 R08, Y3 R08, Y4 R02 | 26 | GAP | - | `vis_object_kinds`* | `k2` |
 | V009 | Ten frame of counters | R R18 (MATCH), Y1 R05 (MATCH), Y1 R06 (M/P), Y2 R09 (M/P), Y3 R09 (MATCH) | 40 | PARTIAL | `template:tenframe`, `composing:ten_frame_build`, `pane:tenframe` | `vis_tenframe_options`* | `k2` |
@@ -217,7 +216,7 @@ the first entry.
 | V164 | Mixed numbers / improper fractions across several wholes | Y4 R50 | 9 | PARTIAL | `fractions:mixed_improper_visual`, `fractions:improper_mixed` | `vis_frac_bar_modes`*, `frac_beyond_1` | `fractions` |
 | V165 | Fraction counters ringed into wholes | Y4 R56 | 1 | GAP | `template:counters`, `fractions:improper_mixed` | `vis_migrate_fraction_ops`* | `fractions` |
 | V166 | Tenths pictured (bar, frame, 0–1 line) | Y4 R59 | 4 | PARTIAL | `decimals:decimal_nl_drag` | `vis_frac_bar_modes`*, `decimal_pv` | `fractions` |
-| V167 | Decimal place-value chart and counters (Tth, Hth, Thth) | Y4 R60, Y4 R61, Y5 N5-03, Y6 N01 | 39 | GAP | `template:pv`, `placevalue:expand`, `placevalue:place_value_disks`, `placevalue:pv_disks_build`, `placevalue:value` | `vis_pv_decimal_places`*, `decimal_pv`, `thousandths_pv` | `placevalue` |
+| V167 | Decimal place-value chart and counters (Tth, Hth, Thth) | Y4 R60, Y4 R61, Y5 N5-03, Y6 N01 | 39 | MATCH | `placevalue:place_value_disks`, `placevalue:pv_disks_build`, `placevalue:value`, `placevalue:expand` | `decimal_pv`, `thousandths_pv` | `fractions` |
 | V168 | 24-hour displays | Y4 R69 | 2 | GAP | - | `time_24h_convert`, `vis_clock_options`* | `timemoney` |
 | V169 | Representation triangle (numeral, words, Roman) | Y4 R73 | 1 | GAP | - | `vis_reasoning_frames`* | `algebra` |
 | V170 | Line graph | Y4 R82, Y5 N5-19, Y6 N21 | 5 | GAP | - | `line_graph` | `data` |
@@ -395,7 +394,6 @@ Every entry of `design/BUILD_LIST.md` that draws a catalogued representation, wi
 | `mult_three` Multiply Three Numbers | `operations` | White Rose audit | V158 | 1 |
 | `known_facts` Reason from Known Facts | `operations` | White Rose audit | V193 | 1 |
 | `vis_pv_bands_millions` Widen Place Value to 7 Digits (millions) | `placevalue` | added from visual catalogue | V003, V004, V005, V006, V175, V186 | 94 |
-| `vis_pv_decimal_places` Decimal Places in the Place-Value Chart | `placevalue` | added from visual catalogue | V005, V006, V167 | 78 |
 | `vis_pv_exchange` Place-Value Chart Beside the Method (exchanges) | `placevalue` | added from visual catalogue | V031 | 38 |
 | `vis_value_line_vertical` Vertical Number Line Through Zero | `placevalue` | added from visual catalogue | V017, V096, V179 | 36 |
 | `vis_round_line_decimals` Rounding Lines for Decimals | `placevalue` | added from visual catalogue | V018 | 29 |

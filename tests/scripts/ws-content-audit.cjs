@@ -1354,7 +1354,8 @@ function k2Rules(skill, items, live, r, F, NOTE) {
 // choices and tiles), and the disk drawing is recounted from its own circles.
 const PV_CATS = ['placevalue', 'number_sense'];
 const PV_EXCLUDED = new Set(['make_a_ten', 'doubles_near_doubles', 'compensation']);
-const PV_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands', 1000000: 'millions' };
+const PV_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands', 1000000: 'millions',
+    0.1: 'tenths', 0.01: 'hundredths', 0.001: 'thousandths' };
 const PV_PLACE_WORDS = /\b(?:ones|tens|hundreds|thousands|millions)\b/i;
 // The §17 answer-in-item list, and every id the P9 generator describes (so it must describe).
 const PV_AII = /^(?:identify|value|more_less_10|more_less_100|rounding_visual|nearest_(?:10|100|1000|10000|100000|million))$/;
@@ -1381,7 +1382,8 @@ function pvRound(n, P) {
     return (Math.floor((nu + pu / 2) / pu) * pu) / k;
 }
 const pvNums = (s) => (String(s || '').match(/\d[\d,]*(?:\.\d+)?/g) || []).map(t => parseFloat(t.replace(/,/g, ''))).filter(Number.isFinite);
-const pvDigitAt = (n, place) => Math.floor(Math.abs(n) / place) % 10;
+// (a decimal place divides in millionths: 3.47 / 0.01 is 347, never 346.99999…)
+const pvDigitAt = (n, place) => Math.floor(Math.round((Math.abs(n) / place) * 1e6) / 1e6) % 10;
 const PV_CAPS = /\b[A-Z]{2,}\b/;
 
 /**
@@ -1470,11 +1472,19 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
                 case 'value': {
                     // The value, or (form) the same value in unit form "7 hundreds" / notation "7 × 100".
                     const want = pv.form === 'unit' ? `${pv.digit} ${pv.digit === 1 ? PV_WORD[pv.place].replace(/s$/, '') : PV_WORD[pv.place]}`
-                        : pv.form === 'notation' ? `${pv.digit} × ${pv.place.toLocaleString('en-US')}` : pv.digit * pv.place;
+                        : pv.form === 'notation' ? `${pv.digit} × ${pv.place.toLocaleString('en-US')}` : Math.round(pv.digit * pv.place * 1e6) / 1e6;
                     if (pvDigitAt(pv.n, pv.place) !== pv.digit || (typeof want === 'number' ? Number(ans) !== want : String(ans) !== want)) add('pv-recompute', `the ${pv.digit} of ${pv.n} is worth ${want}, keyed ${ans}`);
                     break;
                 }
                 case 'expand': {
+                    if (pv.decimals) {
+                        // vis_pv_decimal_places: one part per place of the number's string, zero parts included.
+                        const [ip, fp] = String(pv.s).split('.');
+                        const want = [...(Number(ip) ? [Number(ip)] : []), ...fp.split('').map((dg, j) => Math.round(Number(dg) * 10 ** -(j + 1) * 1e6) / 1e6)];
+                        if ((pv.parts || []).join() !== want.join()) add('pv-expanded-shape', `${pv.s} = ${want.join(' + ')}, described as ${(pv.parts || []).join(' + ')}`);
+                        if (Math.abs(want.reduce((a, b) => a + b, 0) - pv.n) > 1e-9) add('pv-recompute', `${want.join(' + ')} is not ${pv.s}`);
+                        break;
+                    }
                     // Every part one digit times its place; the free line (frame: line) keys the
                     // non-zero parts and must accept the zero part too (owner ruling 4).
                     const ds = String(pv.n).split('').map(Number);
@@ -1602,7 +1612,8 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
                         if ((pv.nums || []).join(',') !== w || (it.keyParts || []).map(Number).join(',') !== w) add('pv-recompute', `${pv.counters} counters make ${w}, keyed ${(it.keyParts || []).join(', ')}`);
                         break;
                     }
-                    const n = Object.entries(pv.counts || {}).reduce((a, [p, c]) => a + Number(p) * c, 0);
+                    // (decimal places: counted in millionths, so 3 + 0.4 + 0.07 is 3.47 exactly)
+                    const n = Math.round(Object.entries(pv.counts || {}).reduce((a, [p, c]) => a + Number(p) * c, 0) * 1e6) / 1e6;
                     const left = n - Object.entries(pv.crossed || {}).reduce((a, [p, c]) => a + Number(p) * c, 0);
                     const want = pv.task === 'count' ? (pv.counts || {})[pv.place] : pv.task === 'take' ? left
                         : pv.task === 'x10' ? n * 10 : pv.task === 'd10' ? n / 10 : n;

@@ -2455,7 +2455,8 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     try {
         const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
         digitPt = (ctx.metrics && ctx.metrics.digitPt) || 28;
-        html = renderCell(Object.assign({}, q, { cell: { template: 'pv', payload: p, v: 1 } }), ctx);
+        // `onScreen`: a wide place-value mat draws its narrow phone twin too (pv.js screenMat).
+        html = renderCell(Object.assign({}, q, { cell: { template: 'pv', payload: { ...p, onScreen: true }, v: 1 } }), ctx);
     } catch (e) { return null; }
     if (!html || /data-ws-refused/.test(html)) return null;
     const tpl = document.createElement('template');
@@ -2501,10 +2502,13 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
         mode = 'slots';
     } else if (inline && sets && sets[0] && sets[0].length === slots.length) {
         slots.forEach((s, k) => {
-            const w = Math.max(2, Math.min(8, String(sets[0][k]).replace(/[^0-9]/g, '').length));
+            // a decimal part (0.4 in 3.47 = 3 + 0.4 + 0.07) keeps its point: a decimal box
+            const dec = sets.some((set) => /\./.test(String(set && set[k])));
+            const w = Math.max(2, Math.min(8, String(sets[0][k]).replace(dec ? /[^0-9.]/g : /[^0-9]/g, '').length));
             const t = document.createElement('template');
             t.innerHTML = cellSlot(w, `answer ${k + 1} of ${slots.length}`);
             const box = t.content.firstChild;
+            if (dec) { box.setAttribute('data-mq-kind', 'decimal'); box.setAttribute('inputmode', 'decimal'); }
             if (s.getAttribute('data-ws-shape') === 'line') box.classList.add('mq-cellbox--line');
             s.replaceWith(box);
         });

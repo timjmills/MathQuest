@@ -754,7 +754,9 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         answerType: q.answerType || '',
         visual: !!q.visual,
         footprint: fp,
-        fclass: footprintClass(q, template, printSize),
+        // A kit footprint may name its own class (a full-width mat or scale line is 'wide': 5 / 4 / 3
+        // rows at S / M / L, LESSONS L1), else the class is read from the item.
+        fclass: (fp && fp.fclass) || footprintClass(q, template, printSize),
         cellCls: legacy ? 'mq-legacy' : '',
         key,
         canShow,
