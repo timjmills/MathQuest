@@ -234,7 +234,9 @@ function writeReport(cov, cc, ee, skillLabel, mapStats) {
     const labels = new Map(live.map((s) => [s.key, s.l]));
     const map = std.SKILL_STANDARDS;
     const ccCodes = new Set(cc.standards.map((s) => s.code));
-    const eeCodes = new Set(ee.essentialElements.map((e) => e.code));
+    // A skill may name an EE or one of its lettered sub-parts (P10: the school workbook's Qatari
+    // currency row is the sub-part M.EE.4.MD.5.d).
+    const eeCodes = new Set(ee.essentialElements.flatMap((e) => [e.code, ...(e.subs || []).map((x) => x.code)]));
     const stats = { live: live.length, withCcss: 0, approx: 0, pools: 0, reasoned: 0, vocab: 0 };
     for (const s of live) {
         const e = map[s.key];

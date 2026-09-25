@@ -22,7 +22,7 @@
   "codeFormat": "Codes exactly as the Wisconsin document prints them: M.EE.<grade>.<domain>.<number>; a range (M.EE.6.EE.1-2) is one Essential Element linked to several standards. Sub-parts use .a/.b as in the owner workbook.",
   "counts": {
    "essentialElements": 117,
-   "subParts": 15,
+   "subParts": 18,
    "byGrade": {
     "K": 10,
     "1": 16,
@@ -693,7 +693,12 @@
     {
      "letter": "c",
      "code": "M.EE.1.MD.3.c",
-     "text": "Identify activities that come before, next, and after. d. Demonstrate an understanding that telling time is the same every day."
+     "text": "Identify activities that come before, next, and after."
+    },
+    {
+     "letter": "d",
+     "code": "M.EE.1.MD.3.d",
+     "text": "Demonstrate an understanding that telling time is the same every day."
     }
    ],
    "notes": [],
@@ -2205,7 +2210,12 @@
     {
      "letter": "c",
      "code": "M.EE.4.MD.2.c",
-     "text": "Use standard measurement to compare lengths of objects. d. Identify coins including penny, nickel, dime, quarter and their values."
+     "text": "Use standard measurement to compare lengths of objects."
+    },
+    {
+     "letter": "d",
+     "code": "M.EE.4.MD.2.d",
+     "text": "Identify coins including penny, nickel, dime, quarter and their values."
     }
    ],
    "notes": [],
@@ -2302,7 +2312,15 @@
    "domainCode": "MD",
    "domainName": "Measurement and Data",
    "text": "Recognize angles in geometric shapes.",
-   "subs": [],
+   "subs": [
+    {
+     "letter": "d",
+     "code": "M.EE.4.MD.5.d",
+     "text": "Identify and use Qatari currency in various denominations.",
+     "source": "ccee-2024-xlsx",
+     "note": "School workbook row: the planning workbook prints it under M.EE.4.MD.5 (angles); kept as its own code so money skills at Qatari riyal can be tagged to it (P10 ruling Q13)."
+    }
+   ],
    "notes": [],
    "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
    "linkedWi": [
