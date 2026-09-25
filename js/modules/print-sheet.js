@@ -442,21 +442,21 @@ function hostItem(g, sectionIndex, size) {
      * slot can hold it, the value prints on an answer line under the cell - in both states, so
      * the geometry is still identical (AK-1).
      */
-    const render = (c, { cols = 2, shown, ink, prompt } = {}) => {
-        const html0 = draw(c, { cols, shown, ink });
+    const render = (c, { cols = 2, shown, ink, prompt, shownSlots } = {}) => {
+        const html0 = draw(c, { cols, shown, ink, shownSlots });
         // The cell's own instruction line goes when the page's instruction line already says it
         // (BD-10: one instruction per section), or when the role asks (`prompt: false`: Error
         // analysis and the thinking roles print their own instruction over finished work).
         return (prompt === false || item.stripPrompt) && cellPrompt ? stripPrompt(html0) : html0;
     };
-    const draw = (c, { cols = 2, shown, ink } = {}) => {
+    const draw = (c, { cols = 2, shown, ink, shownSlots } = {}) => {
         const hasShown = shown !== undefined && shown !== null && shown !== '';
         let st = c.state;
         let wrong = c.wrong;
         if (hasShown) {
             const v = String(shown);
             if (ink === 'trace' && v === answer) st = 'traced';
-            else { st = 'wrong'; wrong = { value: v, slots: {} }; }
+            else { st = 'wrong'; wrong = { value: v, slots: Object.assign({}, shownSlots || {}) }; }
         }
         const ctx = Object.assign({}, c, { state: legacy && hasShown ? 'blank' : st, wrong, columns: cols, options: Object.assign({}, c.options || {}, { factColumns: cols }) });
         const html = legacy ? legacyClean(renderCell(q, ctx)) : renderCell(q, ctx);
@@ -602,6 +602,12 @@ function ensureEngineStyle(doc) {
  *         or is a picture drawn narrower than it is at one column (DN-10: content never shrinks
  *         with columns)
  */
+/** Why a column count did not fit, kept on the item (the dialog note and the tests read it). */
+function why(it, c, reason) {
+    it.measureWhy = it.measureWhy || {};
+    if (!it.measureWhy[c]) it.measureWhy[c] = String(reason).slice(0, 80);
+}
+
 function measureItems(items, { size, look, colsList }) {
     if (typeof document === 'undefined' || !document.body || !items.length) return;
     ensureEngineStyle(document);
@@ -614,6 +620,7 @@ function measureItems(items, { size, look, colsList }) {
     const root = host.firstChild;
     const cols = [...new Set([1, ...colsList])].sort((a, b) => a - b);
     const baseW = new Map();          // item -> Map(svg index -> width at 1 column)
+    const baseLeaves = new Map();     // item -> widths of its grid / table leaves at 1 column
     try {
         for (const c of cols) {
             const { inner } = cellWidthMm(c, LIVE_W_MM, look);
@@ -635,6 +642,7 @@ function measureItems(items, { size, look, colsList }) {
                     let contentBottom = r.top;
                     let stampH = 0;
                     const pics = [];
+                    const leaves = [];
                     for (const el of cell.querySelectorAll('*')) {
                         const er = el.getBoundingClientRect();
                         if (!er.width && !er.height) continue;
@@ -645,21 +653,27 @@ function measureItems(items, { size, look, colsList }) {
                         }
                         if (el.closest('.ws-legacy-answer')) continue;
                         contentBottom = Math.max(contentBottom, er.bottom);
-                        if (er.right > r.right - padR + 1 || er.left < r.left + padL - 1) fits = false;
+                        if (er.right > r.right - padR + 1 || er.left < r.left + padL - 1) { fits = false; why(it, c, `x ${el.tagName}.${el.className} +${((er.right - (r.right - padR)) / PX_PER_MM).toFixed(1)}mm w${(er.width / PX_PER_MM).toFixed(1)} of ${((r.width - padL - padR) / PX_PER_MM).toFixed(1)}`); }
                         // A clip under 1 mm is a stroke or a line box, not hidden content.
-                        if ((ecs.overflowX === 'hidden' || ecs.overflowX === 'clip') && el.scrollWidth > el.clientWidth + PX_PER_MM) fits = false;
-                        if ((ecs.overflowY === 'hidden' || ecs.overflowY === 'clip') && el.scrollHeight > el.clientHeight + PX_PER_MM) fits = false;
+                        if ((ecs.overflowX === 'hidden' || ecs.overflowX === 'clip') && el.scrollWidth > el.clientWidth + PX_PER_MM) { fits = false; why(it, c, `ox ${el.tagName}.${el.className}`); }
+                        if ((ecs.overflowY === 'hidden' || ecs.overflowY === 'clip') && el.scrollHeight > el.clientHeight + PX_PER_MM) { fits = false; why(it, c, `oy ${el.tagName}.${el.className}`); }
                         if (el.tagName === 'svg' || el.tagName === 'IMG' || el.tagName === 'CANVAS') pics.push(er.width);
                         // A chart or table squeezed into a narrow column: its numbers touch the
-                        // cell walls and run together ("100110"). A leaf of a grid or table whose
-                        // text fills its own box is cramped (only checked narrower than 1 column).
-                        if (c !== cols[0] && !el.children.length && el.textContent.trim().length >= 2) {
+                        // cell walls and run together ("100110"). A leaf of a grid or table is
+                        // cramped when it is narrower than it is at one column AND its text now
+                        // fills it (a box drawn exactly two digits wide at every width is not).
+                        if (state === 'blank' && !el.children.length && el.textContent.trim().length >= 2) {
                             const pd = el.parentElement ? getComputedStyle(el.parentElement).display : '';
                             if (/grid|table/.test(pd) || /table-cell/.test(ecs.display)) {
-                                const rg = document.createRange();
-                                rg.selectNodeContents(el);
-                                const tw = rg.getBoundingClientRect().width;
-                                if (tw > er.width - 0.8 * PX_PER_MM) fits = false;
+                                const k = leaves.length;
+                                leaves.push(er.width);
+                                const w1 = (baseLeaves.get(it) || [])[k];
+                                if (c !== cols[0] && w1 && er.width < w1 * 0.9) {
+                                    const rg = document.createRange();
+                                    rg.selectNodeContents(el);
+                                    const tw = rg.getBoundingClientRect().width;
+                                    if (tw > er.width - 0.8 * PX_PER_MM) { fits = false; why(it, c, `cramp ${el.tagName} ${el.textContent.trim()}`); }
+                                }
                             }
                         }
                     }
@@ -667,7 +681,7 @@ function measureItems(items, { size, look, colsList }) {
                     // (AK-1); its line is reserved under the content so it never covers it.
                     if (stampH) hPx = Math.max(hPx, contentBottom - r.top + 1 * PX_PER_MM + stampH + 1.5 * PX_PER_MM);
                     if (state === 'blank') {
-                        if (c === cols[0]) baseW.set(it, pics);
+                        if (c === cols[0]) { baseW.set(it, pics); baseLeaves.set(it, leaves); }
                         else {
                             // DN-10: a picture never shrinks to fit a narrower column. A registered
                             // visual is held to that exactly; a legacy picture declares no minimum
@@ -675,7 +689,7 @@ function measureItems(items, { size, look, colsList }) {
                             // scale-down of up to 10% is read as the same picture.
                             const tol = it.legacy ? 0.9 : 0.98;
                             const b = baseW.get(it) || [];
-                            if (pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) fits = false;
+                            if (pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) { fits = false; why(it, c, 'shrunk picture'); }
                         }
                     }
                     best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits };
@@ -694,7 +708,7 @@ function measureItems(items, { size, look, colsList }) {
             const base = m[cols[0]] && m[cols[0]].hMm;
             if (!base) continue;
             for (const c of cols.slice(1)) {
-                if (m[c] && m[c].hMm > base * 1.3 && m[c].hMm - base > 12) m[c].fits = false;
+                if (m[c] && m[c].hMm > base * 1.3 && m[c].hMm - base > 12) { m[c].fits = false; why(it, c, 'reflow'); }
             }
         }
     } finally {
@@ -909,7 +923,7 @@ export async function buildSheet(req = {}) {
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
-                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH },
+                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense },
                     probesOf(si), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
                 out[si] = L.perPage;
             });
@@ -1024,7 +1038,7 @@ export async function buildSheet(req = {}) {
         fits,
         items: hostItems.map((it) => ({
             skill: it.skill, section: it.section, letter: it.letter, template: it.template,
-            text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured,
+            text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy,
         })),
         gaps: out.gaps,
         floors: n.sections.map((s) => s.floor || null),
@@ -1203,7 +1217,7 @@ async function buildRoleSheet(n, metaOf) {
         fits: { cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: out.pupilPages.length, note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '), sections: fitsList },
         items: items.map((it) => ({
             skill: it.skill, section: 0, pool: it.pool, template: it.template,
-            text: String((it.q && it.q.text) || ''), ans: it.q && it.q.ans, fclass: it.fclass, measured: it.measured,
+            text: String((it.q && it.q.text) || ''), ans: it.q && it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy,
             thinking: it.thinking ? { isWrong: !!it.thinking.isWrong, shown: it.thinking.shown } : undefined,
         })),
         gaps: out.gaps,

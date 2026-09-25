@@ -165,6 +165,10 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-judge2>.mq-judge-row{align-self:start;gap:4mm;padding:1mm 1mm 1mm 0}
 :is(.ws-page,.ws-sheet) .mq-fixrow{display:flex;flex-direction:column;align-items:flex-start;gap:2mm}
 :is(.ws-page,.ws-sheet) .mq-fixslot{margin-left:9mm}
+:is(.ws-page,.ws-sheet) .mq-judge.mq-judge2.mq-judge-stack{grid-template-columns:minmax(0,1fr);row-gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-judge-stack>.mq-judge-row{flex-direction:row;align-items:flex-start;gap:10mm;padding-left:4mm}
+:is(.ws-page,.ws-sheet) .mq-judge-stack .mq-fixrow{flex-direction:row;align-items:flex-start;gap:4mm}
+:is(.ws-page,.ws-sheet) .mq-judge-stack .mq-fixslot{margin-left:0}
 :is(.ws-page,.ws-sheet) .mq-fixslot .ws-box,:is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpanswer .ws-box{height:calc(var(--ws-hw) + 4mm);min-height:calc(var(--ws-hw) + 4mm);display:inline-flex;align-items:center;justify-content:center;font-size:var(--ws-digit);font-weight:700;line-height:1}
 /* Word problems v2: story, work space, answer row - square corners on paper. */
 :is(.ws-page,.ws-sheet) .mq-wp.mq-wp2{padding-left:6mm;gap:3mm}

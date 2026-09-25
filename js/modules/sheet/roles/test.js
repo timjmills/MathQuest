@@ -34,7 +34,7 @@ function layout(items, input, count) {
         target: long ? { cols: 2, rows: { S: 3, M: 2, L: 2 } } : { cols: 4, rows: { S: 5, M: 4, L: 4 }, rowsByCols: { 3: 4, 2: 4, 1: 4 } },
         ceiling: long ? { S: 6, M: 4, L: 4 } : CEILING, floor: (input.floors || {}).main,
         // Cells sized to the problems (layout.js dense packing): a test of one-line facts in
-        // 57 mm cells left ~70% of every cell empty. Up to DN-1's 20 responses (16 at L).
+        // 57 mm cells left ~70% of every cell empty. Never above 12.1's 20 / 16 / 12.
         dense: long ? false : DENSE,
     }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
 }

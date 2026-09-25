@@ -56,16 +56,18 @@ export function prepare(it, info = {}) {
     // correct instead (that is how a page ended up with every answer right).
     if (info.wrong && !wrong) return null;
     const isWrong = !!(wrong && info.wrong);
+    // A wide picture (a number line, a chart) leaves no room beside it: the judgement goes under it.
+    const stack = it.fclass === 'wide' || Number((it.footprint || {}).wMm) > 110;
     const shown = isWrong ? wrong.value : correct;
     const digits = Math.max(2, Math.min(6, correct.replace(/[^0-9]/g, '').length || 2));
     const key = slotKey({ 'ea-ok': isWrong ? '' : '✓', 'ea-fix': isWrong ? '✓' : '', 'ea-ans': isWrong ? correct : '' }, correct);
     const render = (c, o = {}) => {
-        const work = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { shown, prompt: false }));
+        const work = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { shown, prompt: false, shownSlots: isWrong && wrong.slots ? wrong.slots : undefined }));
         // The pupil's writing place: a square box at the size's writing height, as wide as the
         // answer needs (and never less than a comfortable 2-digit box), captioned so it cannot
         // be confused with the finished work's own slot.
         const fixW = Math.max({ S: 26, M: 30, L: 34 }[c.size] || 34, digits * ({ S: 6, M: 7, L: 8 }[c.size] || 8) + 6);
-        return `<div class="mq-judge mq-judge2">`
+        return `<div class="mq-judge mq-judge2${stack ? ' mq-judge-stack' : ''}">`
             + `<div class="mq-judge-work">${work}</div>`
             + judgeGroup('ea-judge', `${checkLine('ea-ok', JUDGE_LABELS.correct, c, key, { graded: false })}`
                 + `<span class="mq-fixrow">${checkLine('ea-fix', JUDGE_LABELS.fixIt, c, key, { graded: false })}`
