@@ -107,10 +107,22 @@ import './cells/seqstrip.js';
 import './cells/compare.js';
 import './cells/wordpic.js';
 
+// P10 time + money (design/research/time-money.md §13): the clock face, the elapsed-time line,
+// coins and notes, money in columns. The drawing helpers are shared with the generator's twins.
+import './cells/clock.js';
+import './cells/timeline.js';
+import './cells/coins.js';
+import './cells/money-columns.js';
+export {
+    COIN_D, CURRENCIES, currencyOf, unitWord, fmtMoney, fmtTime, fmtDuration, toMin, fromMin, ampmOf,
+} from './cells/tmkit.js';
+export { amountText } from './cells/coins.js';
+export const TM_TEMPLATE_IDS = ['clock', 'timeline', 'coins', 'money-columns'];
+
 /** Which cell templates this build carries. `legacy` is registered by `adapters.js`. */
 export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv',
     'counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic',
-    ...OPS_TEMPLATE_IDS];
+    ...OPS_TEMPLATE_IDS, ...TM_TEMPLATE_IDS];
 
 /* ------------------------------------------------- skill providers (register on load) */
 // The real per-skill providers (strings, workedSteps, wrongAnswer, stories). Importing the
