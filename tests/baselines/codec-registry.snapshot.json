@@ -85,7 +85,8 @@
     "poolSupport": "7B",
     "ftRules": "7C",
     "ftTable": "7D",
-    "ftTask": "7E"
+    "ftTask": "7E",
+    "bars": "9F"
   },
   "blocks": {
     "0": {
@@ -612,6 +613,10 @@
       "mixed": "M",
       "mixed-check": "N",
       "make": "K"
+    },
+    "bars": {
+      "vertical": "V",
+      "horizontal": "H"
     }
   },
   "scalarOnly": {

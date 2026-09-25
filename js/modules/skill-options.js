@@ -2643,6 +2643,77 @@ const _o2Add = (key, ...defs) => {
 ].forEach(([key, ...defs]) => _o2Add(key, ...defs));
 // ============================ end O2 · easier / harder ladder ============================
 
+// ======================= O6 · APPEARANCE: FIGURES AND DATA  (lane AP2, 2026-09-25) =========
+// design/audit/OPTIONS-RUBRIC.md §1 O6. Each control changes how the figure LOOKS — never the
+// numbers dealt (O2) or the Support level (O3) — and the generator draws the choice into the item
+// itself, so the screen card (q.visual) and the printed cell (the legacy print handler, which reads
+// the same choice off the item's data) change together. The default of every control draws exactly
+// what the skill drew before, so an old link or saved page is unchanged.
+//
+//   `labels` (5E)  "Figure labels": the numbers written ON the figure — side lengths, the angle's
+//                  degrees, axis numbers, point names, ruler and thermometer numbers, the counting
+//                  numbers under a measured object. "Some" always leaves enough to solve (the other
+//                  sides follow from equal sides; the unnumbered inches follow by counting on).
+//                  "None" is offered only where the pupil does not need the numbers to answer
+//                  (naming an angle by its look, counting units or sides themselves).
+//   `bars`   (9F)  "Bars": a bar graph drawn standing up or lying down. Both are read the same way,
+//                  so both teach the skill (CCSS 2.MD.10 / 3.MD.3 show both).
+// Graph-versus-table is NOT offered: every graph skill here is named for reading its graph
+// (picture graph, bar graph, line plot, histogram, box plot), and a table would remove the graph
+// the skill teaches (see the AP2 lane report).
+const _AP2_DEFAULT = ' (default)';
+const _ap2Labels = (values, dflt, words, help, helpShort) => ({
+    id: 'labels', label: 'Figure labels', type: 'enum', group: 'layout', default: dflt,
+    values: values.map(v => ({ v, l: words[v] + (v === dflt ? _AP2_DEFAULT : '') })),
+    help, helpShort: helpShort || 'How many numbers are written on the figure.',
+});
+const _ap2Bars = () => ({
+    id: 'bars', label: 'Bars', type: 'enum', group: 'layout', default: 'vertical',
+    values: [{ v: 'vertical', l: 'Standing up (vertical)' + _AP2_DEFAULT }, { v: 'horizontal', l: 'Lying down (horizontal)' }],
+    help: 'The same graph turned on its side: the categories go down the left and the scale runs along the bottom. The numbers and the question do not change.',
+    helpShort: 'Bars standing up, or lying down.',
+});
+const _AP2_SIDES = { all: 'Every side labelled', some: 'One length and one width (the pupil uses equal sides)' };
+const _AP2_COUNT_UNITS = { all: 'Every unit numbered (1, 2, 3 …)', some: 'Only the first unit numbered', none: 'No numbers: the pupil counts' };
+const _AP2_AXES = { all: 'Every number on the axes', some: 'Every other number on the axes' };
+const _AP2_POINTS = { all: 'Points named with their coordinates: A(3, 2)', some: 'Points named by letter only: A' };
+[
+    ['shapes_early:measure_nonstandard', _ap2Labels(['all', 'some', 'none'], 'all', _AP2_COUNT_UNITS,
+        'The numbers under the units. Fewer numbers leaves more of the counting to the pupil; the units are always drawn.')],
+    ['shapes_early:shape_attributes', _ap2Labels(['all', 'some', 'none'], 'all',
+        { all: 'Every side numbered, every corner dotted', some: 'Only the first side or corner marked', none: 'No marks: the pupil counts' },
+        'The numbers on the sides (or the dots on the corners) of a "How many" shape. Fewer marks leaves the counting to the pupil. The click-every-shape items have no marks.')],
+    ['area_perimeter:perimeter_intro', _ap2Labels(['all', 'some'], 'all', _AP2_SIDES,
+        'Some labels one length and one width of a rectangle or square; the pupil knows the opposite sides are equal. A triangle keeps all three sides, since none can be worked out.')],
+    ['angles_lines:identify_angles', _ap2Labels(['all', 'none'], 'all',
+        { all: 'The angle\'s degrees written', none: 'No degrees: name it by its look' },
+        'The degree number beside the angle. Without it the pupil names the angle by comparing it with a square corner (the right-angle mark stays).')],
+    ['coordinates:coordinate_q1', _ap2Labels(['all', 'some'], 'some', _AP2_AXES,
+        'The numbers along the x- and y-axes. Every number is the easier step; every other number means counting on from a numbered line.')],
+    ['coordinates:coordinate_all', _ap2Labels(['all', 'some'], 'some', _AP2_AXES,
+        'The numbers along the x- and y-axes, negatives included. Every number is the easier step.')],
+    ['coordinates:coordinate_graph', _ap2Labels(['all', 'some'], 'some', _AP2_AXES,
+        'The numbers along the x- and y-axes. Every number is the easier step.')],
+    ['coordinates:coord_distance_q1', _ap2Labels(['all', 'some'], 'all', _AP2_POINTS,
+        'How the points are named, on the grid and in the question. By letter only, the pupil reads each point\'s position off the grid before finding the distance.',
+        'Points named with coordinates, or by letter only.')],
+    ['coordinates:coord_polygon', _ap2Labels(['all', 'some'], 'all', _AP2_POINTS,
+        'How the corners are named, on the grid and in the question. By letter only, the pupil reads each corner\'s position off the grid before finding a side or the perimeter.',
+        'Corners named with coordinates, or by letter only.')],
+    ['measurement:reading_ruler', _ap2Labels(['all', 'some'], 'all',
+        { all: 'Every inch numbered', some: 'Every other inch numbered (0, 2, 4, 6)' },
+        'The numbers under the inch marks. With every other inch numbered the pupil counts on from a numbered mark; the tick marks do not change.')],
+    ['measurement:reading_ruler_hard', _ap2Labels(['all', 'some'], 'all',
+        { all: 'Every inch numbered', some: 'Every other inch numbered (0, 2, 4, 6)' },
+        'The numbers under the inch marks. With every other inch numbered the pupil counts on from a numbered mark; the tick marks do not change.')],
+    ['measurement:temperature', _ap2Labels(['all', 'some'], 'all',
+        { all: 'Every 5 degrees numbered', some: 'Every 10 degrees numbered' },
+        'The numbers on the thermometer scale for the "What temperature is shown?" items. There is a mark for every degree either way.')],
+    ['graphs:bar_graph', _ap2Bars()],
+    ['measurement:bar_graph_intro', _ap2Bars()],
+].forEach(([key, ...defs]) => _o2Add(key, ...defs));
+// ============================ end O6 · appearance: figures and data (AP2) ===================
+
 Object.assign(SKILL_OPTIONS, P12_OPTIONS);
 // ============================ end P12 · every other family ============================
 
