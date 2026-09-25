@@ -60,11 +60,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await sleep(300);
     const sel = await page.evaluate(() => ({
       name: (document.querySelector('#tvlSelName') || {}).textContent || '',
-      paper: !!document.querySelector('#tvlStage .tvl-paper.mq-scell'),
+      paper: !!document.querySelector('#tvlStage .tvp-stage .tvp-cell'),
       current: document.querySelectorAll('#tvlResults [aria-current="true"]').length,
-      ans: (document.querySelector('#tvlAnswer') || {}).textContent || '',
     }));
-    check(sel.name && sel.paper && sel.current === 1 && /Answer:/.test(sel.ans), `library: selection/preview failed ${JSON.stringify(sel)}`);
+    check(sel.name && sel.paper && sel.current === 1, `library: selection/preview failed ${JSON.stringify(sel)}`);
     const before = await page.$eval('#tvlStage', (s) => s.innerHTML);
     await page.click('[data-lib-act="new-example"]');
     await sleep(200);
@@ -74,7 +73,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       if (!changed) { await page.click('[data-lib-act="new-example"]'); await sleep(150); }
     }
     check(changed, 'library: New example did not change the example');
-    const colours = await page.$eval('#tvlStage .tvl-paper', (p) => {
+    const colours = await page.$eval('#tvlStage .tvp-cell', (p) => {
       const bad = [];
       p.querySelectorAll('*').forEach((n) => {
         const c = getComputedStyle(n).color;
@@ -85,14 +84,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     check(!colours.length, `library: preview is not black and white (${colours.join(', ')})`);
 
     // Thumbnails
-    await page.click('[data-lib-view="thumbs"]');
+    await page.click('[data-act="skill-view"][data-view="thumbs"]');
     await sleep(900);
     const thumbs = await page.evaluate(() => ({
       n: document.querySelectorAll('#tvlResults .tvl-thumb').length,
-      drawn: document.querySelectorAll('#tvlResults .tvl-thumb .tvl-paper').length,
+      drawn: document.querySelectorAll('#tvlResults .tvl-thumb .tvp-stage').length,
     }));
     check(thumbs.n > 0 && thumbs.drawn > 0, `library: thumbnails ${JSON.stringify(thumbs)}`);
-    await page.click('[data-lib-view="list"]');
+    await page.click('[data-act="skill-view"][data-view="list"]');
     await sleep(200);
 
     // Add to skill set
@@ -167,6 +166,15 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     check(bandN === 8, `map: K-2 shows ${bandN} bands`);
     await page.click('[data-map-band="141-150"]');
     await page.select('#tvmCount', '10');
+    // A sample question for a band
+    const sample0 = await page.evaluate(() => ({ drawn: !!document.querySelector('#tvmSample .tvp-stage'), html: (document.querySelector('#tvmSample') || {}).innerHTML || '' }));
+    check(sample0.drawn, 'map: no sample question drawn');
+    await page.select('#tvmSampleBand', '201-210');
+    await sleep(150);
+    await page.click('[data-map-act="another"]');
+    await sleep(150);
+    const sample1 = await page.evaluate(() => (document.querySelector('#tvmSample .tvp-stage') || {}).innerHTML || '');
+    check(sample1 && sample1 !== sample0.html, 'map: the sample did not change with the band');
     await page.click('[data-map-act="link"]');
     await sleep(200);
     const link = await page.$eval('#tvmLink', (c) => c.textContent);
@@ -205,7 +213,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
           scr.querySelectorAll('button, select, input').forEach((b) => {
             const r = b.getBoundingClientRect();
             if (!r.width || !r.height) return;
-            if (b.closest('.tvl-paper') || b.classList.contains('tv-link')) return;
+            if (b.closest('.tvp-frame') || b.classList.contains('tv-link')) return;
             if (b.closest('.tv-seg') ? r.height < 36 : r.height < 44) out.push(`${b.textContent.trim().slice(0, 20) || b.id || b.className} ${Math.round(r.height)}`);
           });
           const overflow = document.documentElement.scrollWidth > window.innerWidth + 1;

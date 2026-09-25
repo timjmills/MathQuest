@@ -12,10 +12,11 @@
 // MAP — the link, the session and the results — is unchanged.
 
 import { state } from './state.js';
-import { getMapSkillsForBands, getMapDomain } from './data.js';
+import { getMapSkillsForBands, getMapDomain, getCategoryForSkill } from './data.js';
 import { startMapSession } from './map-engine.js';
 import { generateMapShareLink } from './map-mode-ui.js';
-import { icon, esc, toast, copyText, readStore, writeStore } from './teacher-ui.js';
+import { icon, esc, toast, copyText, readStore, writeStore, findSkill } from './teacher-ui.js';
+import { mountSample } from './teacher-preview.js';
 
 const UI_KEY = 'mq_teacher_map_ui';
 
@@ -47,6 +48,8 @@ const m = {
     domains: DOMAINS.map((d) => d[0]),
     bandsOpen: false,
     link: '',
+    sampleBand: '',     // the band the sample question is drawn from ('' = the middle chosen band)
+    sampleIdx: 0,       // steps through that band's skills ("Another question")
 };
 
 (function restore() {
@@ -107,6 +110,48 @@ function applyToState() {
     seenTier = m.tier;
 }
 
+/** The band the sample comes from: the teacher's pick if still chosen, else the middle chosen band. */
+function sampleBand() {
+    const pool = m.bands.length ? bandsFor(m.tier).filter((b) => m.bands.includes(b)) : bandsFor(m.tier);
+    if (pool.includes(m.sampleBand)) return m.sampleBand;
+    return pool[Math.floor((pool.length - 1) / 2)] || '';
+}
+
+/** The MAP skills a band offers under the chosen domains, as {categoryId, skillId}. */
+function bandSkills(band) {
+    let ids = [];
+    try { ids = getMapSkillsForBands([band], m.tier).filter((id) => m.domains.includes(getMapDomain(id))); } catch (e) { ids = []; }
+    return ids.map((id) => ({ categoryId: getCategoryForSkill(id), skillId: id })).filter((x) => x.categoryId);
+}
+
+function sampleHTML() {
+    const band = sampleBand();
+    const pool = m.bands.length ? bandsFor(m.tier).filter((b) => m.bands.includes(b)) : bandsFor(m.tier);
+    const skills = band ? bandSkills(band) : [];
+    const pick = skills.length ? skills[m.sampleIdx % skills.length] : null;
+    const hit = pick ? findSkill(pick.categoryId, pick.skillId) : null;
+    const dom = pick ? DOMAINS.find((d) => d[0] === getMapDomain(pick.skillId)) : null;
+    return `
+    <section class="tv-card" aria-labelledby="tvmSampleH">
+      <div class="tvm-sample-head"><h2 class="tv-h2" id="tvmSampleH">Sample question</h2>
+        <div><label class="tv-sr" for="tvmSampleBand">Band</label><select id="tvmSampleBand" class="tv-select">${pool.map((b) => `<option value="${b}"${b === band ? ' selected' : ''}>RIT ${bandText(b)}</option>`).join('')}</select></div></div>
+      <p class="tv-cap" style="margin-top:-8px;">RIT is the MAP score scale: a higher band means harder questions. This is one question pupils could meet in the band.</p>
+      ${pick ? `<div class="tvp-frame tvm-sample" id="tvmSample"></div>
+      <div class="tvm-sample-foot"><p class="tv-cap">${esc(hit ? hit.label : pick.skillId)}${dom ? ` · ${esc(dom[1])}` : ''}</p>
+        <button type="button" class="tv-btn tv-btn-ghost" data-map-act="another">${icon('reset', 16)}<span>Another question</span></button></div>`
+        : '<p class="tv-empty">No questions in this band for the chosen domains.</p>'}
+    </section>`;
+}
+
+function drawSample() {
+    const frame = root.querySelector('#tvmSample');
+    const band = sampleBand();
+    const skills = band ? bandSkills(band) : [];
+    if (!frame || !skills.length) return;
+    const pick = skills[m.sampleIdx % skills.length];
+    mountSample(frame, pick.categoryId, pick.skillId, undefined, Math.floor(m.sampleIdx / skills.length));
+}
+
 function bandsSummary() {
     const all = bandsFor(m.tier);
     if (!m.bands.length) return 'No bands chosen';
@@ -154,7 +199,7 @@ function render() {
       </div>
       <div class="tv-divided">
         <div class="tvm-bands-head">
-          <div><span class="tv-label" style="margin:0;">RIT bands</span><p class="tv-body">${esc(bandsSummary())}</p></div>
+          <div><span class="tv-label" style="margin:0;">RIT bands</span><p class="tv-body">${esc(bandsSummary())}</p><p class="tv-cap">Bands of the MAP score scale. Pupils get questions from the bands you choose.</p></div>
           <button type="button" class="tv-btn tv-btn-sm" data-map-act="bands" aria-expanded="${m.bandsOpen}" aria-controls="tvmBands">${m.bandsOpen ? 'Done' : 'Choose bands'}</button>
         </div>
         <div id="tvmBands" class="tvm-bands-panel"${m.bandsOpen ? '' : ' hidden'}>
@@ -176,7 +221,7 @@ function render() {
       </dl>
       ${ok ? '' : `<p class="tv-note" role="status">${!m.domains.length ? 'Choose at least one domain.' : !m.bands.length ? 'Choose at least one RIT band.' : 'No MAP skills match these choices.'}</p>`}
       <div class="tvm-go">
-        <button type="button" class="tv-btn tv-btn-primary tv-btn-block" data-map-act="start"${ok ? '' : ' aria-disabled="true"'}>${icon('play', 18)}<span>Start on this screen</span></button>
+        <button type="button" class="tv-btn tv-btn-primary tv-btn-block" data-map-act="start"${ok ? '' : ' aria-disabled="true"'}>${icon('play', 18)}<span>Start MAP session</span></button>
         <button type="button" class="tv-btn tv-btn-block" data-map-act="link"${ok ? '' : ' aria-disabled="true"'}>${icon('link', 18)}<span>Create pupil link</span></button>
       </div>
       ${m.link ? `<div class="tv-result" role="status">
@@ -186,8 +231,10 @@ function render() {
       </div>` : ''}
       <button type="button" class="tv-btn tv-btn-ghost" data-map-act="print" style="align-self:flex-start;"${ok ? '' : ' aria-disabled="true"'}>${icon('print', 16)}<span>Print as a worksheet</span></button>
     </section>
+    ${sampleHTML()}
   </div>
 </div>`;
+    drawSample();
 }
 
 /* ================================================================= actions */
@@ -205,6 +252,7 @@ async function onAct(act) {
         case 'all-bands': m.bands = bandsFor(m.tier).slice(); changed(); refocus('[data-map-act="all-bands"]'); return;
         case 'no-bands': m.bands = []; changed(); refocus('[data-map-act="no-bands"]'); return;
         case 'settings': window.tvGo?.('settings'); return;
+        case 'another': m.sampleIdx += 1; drawSample(); return;
         default: break;
     }
     if (!ready()) { toast(!m.domains.length ? 'Choose at least one domain' : 'Choose at least one RIT band'); return; }
@@ -255,6 +303,10 @@ function wire() {
         if (d.mapAct) onAct(d.mapAct);
     });
     root.addEventListener('change', (e) => {
+        if (e.target.id === 'tvmSampleBand') {
+            m.sampleBand = e.target.value; m.sampleIdx = 0; render(); refocus('#tvmSampleBand');
+            return;
+        }
         if (e.target.id !== 'tvmCount') return;
         m.count = Number(e.target.value) || defaultCount(m.tier);
         changed();

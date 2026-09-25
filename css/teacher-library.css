@@ -7,8 +7,8 @@
 
    Scoped to #teacherApp (.tvl-* library, .tvm-* MAP). The legacy Skills
    Navigator and MAP selector keep their own stylesheets for pupils. The
-   example drawn in the library is the black-and-white paper cell
-   (.tvl-paper + screen-cell.css .mq-scell): paper-white in both themes.
+   examples are the shared previews of teacher-preview.js (.tvp-frame): the
+   black-and-white paper cell, paper-white in both themes.
    ========================================================================== */
 
 /* ---------------------------------------------------------------- Skills library */
@@ -22,8 +22,7 @@
 .tvl-bar .tv-input, .tvl-bar .tv-select { height: 44px; }
 .tvl-head-tools { flex-wrap: nowrap; gap: 12px; }
 .tvl-head-tools .tv-btn-ghost { height: 44px; }
-.tvl-view { min-width: 216px; }
-.tvl-view > button { height: 36px; }
+.tvl-view .tvp-viewseg > button { height: 36px; }
 .tvl-results .tv-card-head { min-height: 60px; }
 
 .tvl-grid {
@@ -69,15 +68,7 @@
 }
 .tvl-thumb:hover { border-color: var(--tv-control-soft); }
 .tvl-thumb[aria-current="true"] { border: 1.5px solid var(--tv-selected); }
-.tvl-thumb-stage {
-    display: block; position: relative; height: 124px; margin-bottom: 8px; overflow: hidden;
-    border-radius: 6px; background: #fff; border: 1px solid var(--tv-rule);
-}
-.tvl-thumb-inner {
-    position: absolute; left: 0; top: 0; width: 200%;
-    transform: scale(.5); transform-origin: top left;
-    display: flex; justify-content: center; padding: 12px;
-}
+.tvl-thumb .tvp-thumb { display: block; margin-bottom: 8px; }
 .tvl-thumb-name { font-size: 14px; line-height: 20px; font-weight: 600; padding: 0 4px; }
 .tvl-thumb-meta { font-size: 12px; line-height: 16px; font-weight: 500; color: var(--tv-caption); padding: 0 4px; }
 .tvl-more { display: flex; justify-content: center; padding: 16px 0 4px; }
@@ -89,12 +80,7 @@
 .tvl-prev { display: flex; flex-direction: column; gap: 8px; }
 .tvl-prev-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .tvl-prev-head .tv-btn-ghost { height: 44px; }
-.tvl-stage {
-    display: flex; justify-content: center; align-items: flex-start;
-    min-height: 160px; max-height: 360px; overflow: auto;
-    padding: 16px; border-radius: 8px;
-    background: #fff; border: 1px solid var(--tv-border);
-}
+.tvl-stage { height: 280px; }
 .tvl-actions { display: flex; flex-direction: column; gap: 8px; }
 .tvl-actions-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px; gap: 8px; }
 .tvl-actions-row .tv-btn { width: 100%; min-width: 0; padding: 0 12px; }
@@ -105,35 +91,6 @@
 .tvl-actions .tv-menu button { height: 44px; }
 /* The actions sit at the foot of the panel: the menu opens upwards, so it is never below the fold. */
 .tvl-actions .tv-menu { top: auto; bottom: calc(100% + 4px); }
-
-/* The paper cell: white paper and black ink in light and dark theme alike. */
-.tvl-paper {
-    --mq-digit: 32px; --mq-text: 18px;
-    display: inline-flex; flex-direction: column; align-items: stretch; gap: 8px;
-    max-width: 100%; padding: 0; background: #fff; color: #000;
-    font-size: 18px; line-height: 1.35;
-}
-.tvl-paper .tvl-instr { text-align: left; font-size: 18px; line-height: 26px; color: #000; }
-.tvl-paper .tvl-cell {
-    display: flex; justify-content: center; align-items: center;
-    min-width: 200px; max-width: 100%; padding: 16px 20px;
-    background: #fff; border: 1px solid #000;
-}
-.tvl-paper .tvl-cell:only-child { min-width: 200px; }
-.tvl-paper svg { max-width: 100%; height: auto; }
-.tvl-paper img { max-width: 100%; height: auto; }
-.tvl-paper .tvl-slot {
-    display: inline-block; width: 2.4em; height: 1.2em; vertical-align: bottom;
-    border-bottom: 2px solid #000;
-}
-.tvl-paper.tvl-kind-fact .tvl-slot, .tvl-paper.tvl-kind-division .tvl-slot { width: 1.6em; height: 1.4em; border: 1px solid #000; }
-.tvl-paper input { pointer-events: none; }
-.tvl-paper.is-thumb { gap: 12px; }
-.tvl-paper.tvl-printed { display: block; width: max-content; max-width: none; }
-.tvl-paper.tvl-printed .ws-sheet { background: #fff; }
-/* One cell on its own: it takes the width of its drawing, and the stage scales it to fit. */
-.tvl-paper.tvl-printed .ws-cell { width: max-content !important; min-width: 0; max-width: none !important; height: auto !important; overflow: visible !important; }
-.tvl-noprev { padding: 24px 8px; text-align: center; }
 
 /* ---------------------------------------------------------------- MAP tests */
 
@@ -164,6 +121,11 @@
 .tvm-go { display: flex; flex-direction: column; gap: 8px; }
 #teacherApp .tvm-grid .tv-btn-ghost { height: 44px; }
 #teacherApp .tvm-grid .tv-link { min-height: 24px; }
+.tvm-sample-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.tvm-sample-head .tv-select { height: 44px; min-width: 150px; }
+.tvm-sample { height: 240px; }
+.tvm-sample-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.tvm-sample-foot .tv-cap { min-width: 0; }
 
 /* ---------------------------------------------------------------- narrower screens */
 
