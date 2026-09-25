@@ -53,7 +53,9 @@ function packing(poolsIn, input) {
     const m0 = bandMetrics(ctx, layoutHeader(frame.header));
     const m = Object.assign({}, m0, { budget: m0.budget - stripMmOf(input) });
     const mCont = bandMetrics(ctx, layoutHeader(frame.header), { cont: true });
-    const N = AUTO_N[ctx.look][ctx.size];
+    // A lesson packet's Mixed page keeps the L lattice (6) at M: a 3-across shelf of stacks, never
+    // 2 half-empty cells (lessons r1, H13 width).
+    const N = [4, 6, 8, 10].includes(Number(input.latticeN)) ? Number(input.latticeN) : AUTO_N[ctx.look][ctx.size];
     const ids = Object.keys(poolsIn).filter((id) => (poolsIn[id] || []).length);
     const shelf = {};
     const A = input.anchors && input.anchors.byPool ? input.anchors : null;

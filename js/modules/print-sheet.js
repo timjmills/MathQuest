@@ -124,6 +124,8 @@ function normaliseRequest(req = {}) {
         stepStrip: req.stepStrip && req.stepStrip.html && Number(req.stepStrip.hMm) > 0 ? { html: String(req.stepStrip.html), hMm: Number(req.stepStrip.hMm) } : null,
         // The strand tab's last line, when a packet names its part ("Practice 1", lessons r1).
         tabId: typeof req.tabId === 'string' && req.tabId.trim() ? req.tabId.trim().slice(0, 16) : '',
+        // Mixed practice's unit lattice, when a packet fixes it (lessons r1).
+        latticeN: [4, 6, 8, 10].includes(Number(req.latticeN)) ? Number(req.latticeN) : 0,
     };
 }
 
@@ -1666,6 +1668,7 @@ async function buildRoleSheet(n, metaOf) {
         stepStrip: n.stepStrip ? n.stepStrip.html : '',
         stepStripMm: n.stepStrip ? n.stepStrip.hMm : 0,
         fill: !!n.stepStrip,
+        latticeN: n.latticeN || 0,
     };
 
     /**
@@ -1887,7 +1890,7 @@ async function buildLesson(n, metaOf) {
     // One-line answers: the engine fills the page (PAGE FILL, DN-1) - one frame, no row gaps,
     // because the count is the page's own. Taller problems: 12.1's six a page, 2 x 3, each cell
     // with its working space and Check line.
-    const section = facts ? { skills: [practiceSk], pages: 0, noCap: true, dense: { S: 15, M: 15, L: 15 } } : { skills: [practiceSk], count: 0, columns: 2, noCap: true };
+    const section = facts ? { skills: [practiceSk], pages: 0, noCap: true, dense: { S: 16, M: 16, L: 15 } } : { skills: [practiceSk], count: 0, columns: 2, noCap: true };
     const practiceReq = (pages, withStrip) => Object.assign({}, common, {
         role: 'independent', tabId: `Practice ${lessonNo}`,
         sections: [facts ? Object.assign({}, section, { pages }) : Object.assign({}, section, { count: 6 * pages })],
@@ -1907,7 +1910,7 @@ async function buildLesson(n, metaOf) {
         const withSkills = data && data.mixWith ? data.mixWith.map(skillRef) : earlierSkills(sk, 2);
         const res = await buildSheet(Object.assign({}, common, {
             // The lesson's own look (I Can) unless the teacher chose Daily for the packet.
-            role: 'mixed-practice', look: n.lookAsked === 'daily' ? 'daily' : 'ican', sections: [{ skills: [practiceSk, ...withSkills] }],
+            role: 'mixed-practice', look: n.lookAsked === 'daily' ? 'daily' : 'ican', sections: [{ skills: [practiceSk, ...withSkills] }], latticeN: 6,
             seed: (n.seed + 15838) >>> 0,
             stepStrip: stripHtml ? { html: stripHtml, hMm: stripH } : undefined,
         }));

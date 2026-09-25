@@ -48,9 +48,11 @@ print(json.dumps(pages))
 
 function sheetCheck(page) {
     return page.evaluate(() => {
-        const out = { pages: 0, problems: [], bands: [], fonts: {} };
+        const out = { pages: 0, problems: [], bands: [], stats: [], fonts: {} };
         document.querySelectorAll('.ws-page').forEach((pg, i) => {
             out.pages++;
+            const stat = { page: i + 1, cells: 0, labelled: pg.querySelectorAll('[data-ws-label], .ws-letter').length, maxBand: 0, blank: 0 };
+            out.stats.push(stat);
             const body = pg.querySelector('.ws-body');
             if (body && body.scrollHeight > body.clientHeight + 1) out.problems.push(`page ${i + 1}: the body overflows by ${((body.scrollHeight - body.clientHeight) * 25.4 / 96).toFixed(1)} mm`);
             pg.querySelectorAll('.ws-cell').forEach((c, k) => {
@@ -65,7 +67,8 @@ function sheetCheck(page) {
                     if (st.visibility === 'hidden' || st.display === 'none') continue;
                     const r = d.getBoundingClientRect();
                     if (!r.width || !r.height) continue;
-                    const leaf = !d.children.length || d instanceof SVGElement || /^(svg|img)$/i.test(d.tagName);
+                    // An answer slot or zone is the pupil's writing space: it counts as content.
+                    const leaf = !d.children.length || d instanceof SVGElement || /^(svg|img)$/i.test(d.tagName) || d.hasAttribute('data-ws-slot');
                     const bordered = parseFloat(st.borderTopWidth) || parseFloat(st.borderBottomWidth);
                     if (!leaf && !bordered && !(d.textContent || '').trim()) continue;
                     if (!leaf && !bordered) continue;
@@ -74,6 +77,8 @@ function sheetCheck(page) {
                 if (!box || cr.height < 40 || cr.width < 40) return;
                 const v = Math.max(box.t - cr.top, cr.bottom - box.b, 0) / cr.height;
                 const h = Math.max(box.l - cr.left, cr.right - box.r, 0) / cr.width;
+                stat.cells++;
+                stat.maxBand = Math.max(stat.maxBand, Math.round(Math.max(v, h) * 100));
                 if (v >= 0.3 || h >= 0.3) out.bands.push(`page ${i + 1} cell ${k + 1}: empty band ${Math.round(Math.max(v, h) * 100)}% ${v >= h ? 'tall' : 'wide'} (${(cr.width * 25.4 / 96).toFixed(0)} x ${(cr.height * 25.4 / 96).toFixed(0)} mm)`);
             });
             // The page's own blank: the body below its last band.
@@ -82,6 +87,7 @@ function sheetCheck(page) {
                 const kids = [...body.children].filter((x) => x.getBoundingClientRect().height > 0);
                 const last = kids.length ? Math.max(...kids.map((x) => x.getBoundingClientRect().bottom)) : br.top;
                 const blank = (br.bottom - last) / br.height;
+                stat.blank = Math.round(Math.max(0, blank) * 100);
                 if (blank > 0.08) out.bands.push(`page ${i + 1}: ${Math.round(blank * 100)}% of the body blank at the bottom`);
             }
             for (const el of pg.querySelectorAll('*')) {
@@ -144,6 +150,7 @@ async function printDoc(page, html, pdfPath) {
             console.log(`${l.dir} ${size}: ${built.pageCount} pages + ${built.keyPageCount} key; ${[...checkP.problems, ...checkK.problems].length} layout problems; fonts ${Object.keys(checkP.fonts).join(',')}`);
             for (const p of [...checkP.problems, ...checkK.problems.map((x) => `key ${x}`)].slice(0, 12)) console.log(`   ${p}`);
             for (const b of checkP.bands.slice(0, 16)) console.log(`   H13? ${b}`);
+            if (has('stats')) for (const st of checkP.stats) console.log(`   p${st.page}: ${st.labelled} lettered items, ${st.cells} cells, largest empty band ${st.maxBand}%, body blank at foot ${st.blank}%`);
             summary.push({ lesson: l.dir, size, pages: built.pageCount, keyPages: built.keyPageCount, problems: checkP.problems.length + checkK.problems.length });
             if (has('copy') && size === 'L') {
                 const dest = path.join(ROOT, 'design', 'lesson-samples', l.dir);
