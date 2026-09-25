@@ -10,7 +10,7 @@
 // Pure module (SCC-01): no window, no DOM, no Math.random.
 
 import { registerSkill } from '../contract.js';
-import { chooseWrong, strings, step, obj } from './util.js';
+import { chooseWrong, strings, step, clampSteps, obj } from './util.js';
 
 const payloadOf = (q) => (q && q.cell && q.cell.payload) || obj(q && q.payload) || {};
 const LETTERS = ['A', 'B', 'C', 'D'];
@@ -135,3 +135,151 @@ registerSkill('shapes_early:compose_shapes', {
 
 /** The build-lane geometry skills that carry a real provider. */
 export const GEO_PROVIDER_SKILLS = Object.freeze(['shapes_early:compose_shapes']);
+
+/* ============================================================ the area and perimeter family */
+// The figure items (shape-grid kind `figure`, gen-geo-kit.js). The misconception bank:
+//   M-AP1  added the sides for an area (found the perimeter)       M-AP2  multiplied for a perimeter
+//   M-AP3  added one length and one width only                    M-AP4  missed a row of squares
+//   M-AP5  forgot to halve (a triangle)                            M-AP6  missed a side of a composite
+//   M-AP7  multiplied the outside lengths of a composite            M-AP8  used the whole perimeter for
+//                                                                          one length and one width
+
+const figOf = (q) => payloadOf(q);
+const askOf = (q, id) => (figOf(q).ask || []).find((a) => a.id === id);
+const unitOf = (q) => figOf(q).unit || '';
+const sidesOf = (q) => {
+    const poly = figOf(q).poly || [];
+    return poly.map((A, i) => { const B = poly[(i + 1) % poly.length]; return Math.round(Math.hypot(B[0] - A[0], B[1] - A[1]) * 100) / 100; });
+};
+const bboxWH = (poly) => { const xs = poly.map((v) => v[0]), ys = poly.map((v) => v[1]); return [Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)]; };
+const givenNumber = (q) => Number(((figOf(q).given || [])[0] || '').replace(/^[^=]*=\s*/, '').replace(/[^0-9.].*$/, ''));
+
+function figSteps(q) {
+    const p = figOf(q);
+    const sides = sidesOf(q), u = unitOf(q);
+    const out = [];
+    const a = askOf(q, 'area'), per = askOf(q, 'perimeter'), side = askOf(q, 'side');
+    if (p.grid === 'squares' && a) {
+        const [w, h] = bboxWH(p.poly || []);
+        out.push(step('Touch each unit square once as you count.'));
+        out.push(step((p.poly || []).length === 4 ? `There are ${h} rows of ${w} squares.` : 'Count the squares row by row.'));
+        out.push(step(`There are ${a.ans} squares. Write ${a.ans}.`, [{ slot: 'area', value: String(a.ans) }]));
+        return out;
+    }
+    if (p.grid === 'squares' && per) {
+        out.push(step('Start at a corner. Count the unit edges round the outside.'));
+        out.push(step(`The sides are ${sides.join(', ')} units.`));
+        out.push(step(`${sides.join(' + ')} = ${per.ans}. Write ${per.ans}.`, [{ slot: 'perimeter', value: String(per.ans) }]));
+        return out;
+    }
+    if (p.height && a) {
+        const b = ((p.edges || [])[0] || {}).v, h = p.height.v;
+        out.push(step(`The base is ${b} ${u}. The height is ${h} ${u}.`));
+        out.push(step(`${b} × ${h} = ${b * h}.`));
+        out.push(step(`Half of ${b * h} is ${a.ans}. Write ${a.ans}.`, [{ slot: 'area', value: String(a.ans) }]));
+        return out;
+    }
+    if (side) {
+        const byPerimeter = /Perimeter/.test((p.given || [])[0] || '');
+        const known = (p.edges || []).find((e) => e.show !== false && e.v !== '?');
+        const G = givenNumber(q), kv = known ? known.v : 0;
+        out.push(step(`Find the side marked ?. The ${byPerimeter ? 'perimeter' : 'area'} is ${G}.`));
+        if (byPerimeter) {
+            out.push(step(`One length and one width make half the perimeter: ${G} ÷ 2 = ${G / 2}.`));
+            out.push(step(`${G / 2} − ${kv} = ${side.ans}.`, [{ slot: 'side', value: String(side.ans) }]));
+        } else {
+            out.push(step(`Area = length × width, so ${kv} × ? = ${G}.`));
+            out.push(step(`${G} ÷ ${kv} = ${side.ans}.`, [{ slot: 'side', value: String(side.ans) }]));
+        }
+        return out;
+    }
+    const marks = [];
+    out.push(step(`Read every side: ${sides.join(', ')} ${u}.`));
+    if (per) {
+        out.push(step(`Add all ${sides.length} sides: ${sides.join(' + ')} = ${per.ans}.`));
+        marks.push({ slot: 'perimeter', value: String(per.ans) });
+    }
+    if (a) {
+        if ((p.poly || []).length === 4) {
+            const [w, h] = bboxWH(p.poly);
+            out.push(step(`Area = length × width = ${w} × ${h} = ${a.ans}.`));
+        } else {
+            out.push(step('Split the shape into two rectangles along the dotted line.'));
+            out.push(step(`Find each area and add them: ${a.ans}.`));
+        }
+        marks.push({ slot: 'area', value: String(a.ans) });
+    }
+    out.push(step(`Write ${marks.map((m) => m.value).join(' and ')}.`, marks));
+    return clampSteps(out);
+}
+
+function figWrong(q) {
+    const p = figOf(q);
+    const sides = sidesOf(q);
+    const a = askOf(q, 'area'), per = askOf(q, 'perimeter'), side = askOf(q, 'side');
+    const both = !!(a && per);
+    const one = (id, v, misconception, explain) => (both
+        ? { value: id === 'area' ? `${per.ans}, ${v}` : `${v}, ${a.ans}`, slot: id,
+            slots: { perimeter: String(id === 'perimeter' ? v : per.ans), area: String(id === 'area' ? v : a.ans) }, misconception, explain }
+        : { value: v, slot: id, misconception, explain });
+    const c = [];
+    if (side) {
+        const known = (p.edges || []).find((e) => e.show !== false && e.v !== '?');
+        const G = givenNumber(q), kv = known ? known.v : 0;
+        if (/Perimeter/.test((p.given || [])[0] || '')) c.push(one('side', G - kv, 'M-AP8', 'Took the side away from the whole perimeter, not from half of it.'));
+        else c.push(one('side', G - kv, 'M-AP2', 'Took the side away from the area; the area is length × width, so divide.'));
+        return chooseWrong(q, c);
+    }
+    if (p.height && a) {
+        c.push(one('area', a.ans * 2, 'M-AP5', 'Multiplied the base by the height but did not halve it.'));
+        return chooseWrong(q, c);
+    }
+    const [w, h] = bboxWH(p.poly || []);
+    if (a) {
+        if (p.grid === 'squares') c.push(one('area', a.ans - w, 'M-AP4', 'Missed a row of squares.'));
+        else if ((p.poly || []).length > 4) c.push(one('area', w * h, 'M-AP7', 'Multiplied the outside lengths: the cut-out part was counted too.'));
+        c.push(one('area', sides.reduce((s, v) => s + v, 0), 'M-AP1', 'Added the sides: that is the perimeter, not the area.'));
+    }
+    if (per) {
+        c.push(one('perimeter', w + h, 'M-AP3', 'Added one length and one width only: the other sides were left out.'));
+        if ((p.poly || []).length > 4) c.push(one('perimeter', per.ans - Math.min(...sides), 'M-AP6', 'Missed one of the short sides.'));
+        else c.push(one('perimeter', w * h, 'M-AP2', 'Multiplied the sides: that is the area, not the perimeter.'));
+    }
+    return chooseWrong(q, c);
+}
+
+const FIG_DEFS = {
+    area_unit_squares: { iCan: 'I Can find area by counting unit squares', instructionKey: 'count-squares',
+        steps: ['Touch each square once.', 'Count row by row.', 'Write how many squares.'], say: 'The area is __ square units.',
+        sayValues: (q) => [askOf(q, 'area').ans] },
+    perimeter_grid: { iCan: 'I Can find perimeter by counting units', instructionKey: 'count-edges',
+        steps: ['Start at a corner.', 'Count each unit edge round the outside.', 'Stop where you started. Write the number.'], say: 'The perimeter is __.',
+        sayValues: (q) => [`${q.ans} ${unitOf(q) || 'units'}`] },
+    perimeter: { iCan: 'I Can find the perimeter of a rectangle', instructionKey: 'perimeter-or-side',
+        steps: ['Find the length of every side.', 'Opposite sides are the same length.', 'Add all four sides.'], say: 'The answer is __.',
+        sayValues: (q) => [`${q.ans} ${unitOf(q)}`.trim()] },
+    area: { iCan: 'I Can find the area of a rectangle', instructionKey: 'area-or-side',
+        steps: ['Find the length and the width.', 'Multiply the length by the width.', 'Write the area in square units.'], say: 'The answer is __.',
+        sayValues: (q) => [q.ans] },
+    area_perimeter: { iCan: 'I Can find the perimeter and the area', instructionKey: 'area-perimeter',
+        steps: ['Perimeter: add all the sides.', 'Area: multiply the length by the width.', 'Write each in its box.'], say: 'The perimeter is __. The area is __.',
+        sayValues: (q) => String(q.ans).split(', ') },
+    composite_shapes: { iCan: 'I Can find the perimeter of a composite shape', instructionKey: 'composite-perimeter',
+        steps: ['Find the length of every side.', 'Work out a side with no number from the sides opposite it.', 'Add all the sides.'], say: 'The perimeter is __.',
+        sayValues: (q) => [String(q.ans).split(', ')[0]] },
+    area_polygon_decompose: { iCan: 'I Can find the area of a shape by splitting it', instructionKey: 'composite-area',
+        steps: ['Split the shape into two rectangles.', 'Find the area of each rectangle.', 'Add the two areas.'], say: 'The area is __.',
+        sayValues: (q) => [q.ans] },
+    area_triangle: { iCan: 'I Can find the area of a triangle', instructionKey: 'triangle-area',
+        steps: ['Find the base and the height.', 'Multiply the base by the height.', 'Halve it.'], say: 'The area is __.',
+        sayValues: (q) => [q.ans] },
+};
+for (const [id, def] of Object.entries(FIG_DEFS)) {
+    registerSkill(`area_perimeter:${id}`, {
+        strings: strings(def),
+        misconceptions: ['M-AP1', 'M-AP2', 'M-AP3', 'M-AP4', 'M-AP5', 'M-AP6', 'M-AP7', 'M-AP8'],
+        workedSteps: (q) => clampSteps(figSteps(q)),
+        wrongAnswer: figWrong,
+    });
+}
+export const GEO_FIGURE_SKILLS = Object.freeze(Object.keys(FIG_DEFS).map((id) => `area_perimeter:${id}`));

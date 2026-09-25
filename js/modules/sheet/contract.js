@@ -221,6 +221,15 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'compose-name': 'Check the name of the shape the pieces make.',
     'compose-name-write': 'Write the name of the shape the pieces make.',
     'compose-pieces': 'Check the pieces that make the shape.',
+    // Build lane geometry: the area and perimeter family on the shape-grid figure.
+    'count-squares': 'Count the unit squares. Write the area.',
+    'count-edges': 'Count the units round the outside. Write the perimeter.',
+    'perimeter-or-side': 'Find the perimeter, or the missing side.',
+    'area-or-side': 'Find the area, or the missing side.',
+    'area-perimeter': 'Write the perimeter and the area.',
+    'composite-perimeter': 'Add all the sides. Write the perimeter.',
+    'composite-area': 'Split the shape into rectangles. Write the area.',
+    'triangle-area': 'Multiply the base by the height. Halve it. Write the area.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',
