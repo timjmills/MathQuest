@@ -66,7 +66,7 @@ function PLAN(rootSel, which) {
     // answer is still given below; the working must never change the verdict.
     const nl = all('.mq-nl-tick');
     if (nl.length) {
-        const land = nl.find(t => t.querySelector('.mq-nl-lab') && t.querySelector('.mq-nl-lab').textContent.trim() === String(ans));
+        const land = nl.find(t => t.querySelector('.mq-nl-lab') && t.querySelector('.mq-nl-lab').textContent.trim().replace('\u2212', '-') === String(ans));
         if (land && !land.classList.contains('mq-nl-start')) tag(land, { type: 'click', check: 'nl' });   // + 0 has no jump
     }
     all('input.mq-opswork').slice(0, 2).forEach(w => tag(w, { type: 'text', value: '9', check: 'work' }));

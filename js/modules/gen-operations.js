@@ -2057,6 +2057,28 @@ function _nlKitItem(q, { a, b, op, unknown = 'result', range = 20 }) {
     return q;
 }
 
+/**
+ * add_int / sub_int on the kit's `number-line` cell (O6 lane AP3 fixes): the SAME work line on
+ * paper, in the key and on every screen host (the screen line is tap-to-jump), so its numerals
+ * option is honest on both. The window runs through 0, the start and the answer, one hop per
+ * number; a sum that needs more than 32 numbers (the ±50 and ±100 bands) keeps its old cell -
+ * one hop per number would be under 5 mm. The item's text is unchanged (the Signs option reads it).
+ */
+function _intLineKit(q, a, b, op) {
+    const end = op === '+' ? a + b : a - b;
+    const min = Math.min(a, end, 0) - 1, max = Math.max(a, end, 0) + 1;
+    if (max - min > 32) return;
+    const payload = { min, max, start: a, add: b, op, unknown: 'result' };
+    const tv = _opt('ticks');
+    if (tv === 'some' || tv === 'ends') payload.ticks = tv;
+    q.cell = { template: 'number-line', v: 1, payload };
+    q.visual = _kitTwin('number-line', payload);
+    q.printText = 'Draw the jumps. Write the answer.';
+    q.printFormat = 'number-line-visual';
+    q.startOnly = true;
+    q.nlMax = max;
+}
+
 const _KIT_FACT_SKILLS = new Set(['add_facts', 'mult_facts', 'div_facts', 'add', 'subtract']);
 const _KIT_OP = { '+': '+', '-': '-', '−': '-', '×': '*', '÷': '/' };
 
@@ -7230,6 +7252,7 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 q.integerData = { a, b, result, op: '+' };
                 q.a = a; q.b = b; q.op = '+';
                 q.printFormat = "integer-add";
+                _intLineKit(q, a, b, '+');
             } else if (intSkill === "sub_int") {
                 // Subtracting integers - scale with range
                 const intSubMax = intBand || Math.max(10, Math.floor(intMax * 0.75));
@@ -7257,6 +7280,7 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 q.integerData = { a, b, result, op: '-' };
                 q.a = a; q.b = b; q.op = '-';
                 q.printFormat = "integer-sub";
+                _intLineKit(q, a, b, '-');
             }
             return;
 }

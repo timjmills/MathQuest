@@ -2931,6 +2931,13 @@ const _AP3_UNLIKE = _ap3Model(['bar', 'area', 'circle', 'line'], ['bar'],
     'Default: bars. Both fractions are drawn on the same size of whole, each cut into its own parts, so the pupil '
     + 'sees why a common denominator is needed; the answer is never drawn. Pictures off prints numbers only.',
     (o) => o.pictures !== false);
+const _AP3_INT_LINE = {
+    ..._ap3Ticks([['one', 'Every number: −5, −4, −3 …'], ['some', 'Every 2nd number, 0 and the start'], ['ends', 'The two ends, 0 and the start']], 'one',
+        'Which ticks of the work line carry a numeral. Every number has a tick and every hop is one number whatever you '
+        + 'choose; 0 and the number the pupil starts from are always numbered. Fewer numerals make the pupil count '
+        + 'along the ticks.'),
+    appliesTo: (o) => !(Number(o.band) >= 50),
+};
 const _AP3_OPTIONS = {
     'fractions:identify': [_ap3Model(['area', 'bar', 'circle', 'line'], ['bar', 'circle'],
         'Default: circles and bars, mixed, as the skill always drew. The pictures of the "What fraction is shaded?" and '
@@ -2973,6 +2980,10 @@ const _AP3_OPTIONS = {
         'Default: bars. The number divided, drawn as the ticked model: the wholes cut into unit-fraction parts '
         + '(4 ÷ 1/3), or the unit fraction to cut (1/3 ÷ 2). The answer is never drawn. Pictures off prints numbers only.',
         (o) => o.pictures !== false)],
+    // add_int / sub_int draw the same work line on paper and on screen (the kit's number-line
+    // cell) up to the ±20 band; the ±50 and ±100 bands keep their old cell, so the choice is off there.
+    'integers:add_int': [{ ..._AP3_INT_LINE }],
+    'integers:sub_int': [{ ..._AP3_INT_LINE }],
     'addition:number_line_add': [_AP3_ADD_LINE],
     'subtraction:number_line_sub': [_AP3_ADD_LINE],
     'addition:nl_add': [_AP3_ADD_LINE],
