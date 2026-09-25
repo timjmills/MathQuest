@@ -33,7 +33,7 @@ export const CCSS_AUDIT = {
     // ================================================================ Kindergarten
     'K.CC.A.1': F(['patterns:seq_10', 'counting:number_seq_fill', 'composing:hundreds_chart_fill'], 'by tens: seq_10; by ones to 100: number_seq_fill (step 1, to 100) and the hundreds chart'),
     'K.CC.A.2': F(['counting:count_sequence', 'counting:number_seq_fill']),
-    'K.CC.A.3': P(['counting:count_objects'], ['writing the numerals 0-20 (formation: trace, copy, write)', 'zero as the numeral for a count of no objects (count_objects starts at 1)'], ['write_numerals', 'zero']),
+    'K.CC.A.3': P(['counting:count_objects', 'counting:zero_none'], ['writing the numerals 0-20 (formation: trace, copy, write)'], ['write_numerals'], 'zero as the numeral for none: counting:zero_none (build lane k2)'),
     'K.CC.B.4a': F(['counting:count_objects'], 'touch-and-count support pairs each object with one number name'),
     'K.CC.B.4b': P(['counting:count_objects', 'composing:ten_frame_build'], ['the number is the same whatever the arrangement or the order of counting (conservation)'], ['count_conserve']),
     'K.CC.B.4c': P(['counting:count_sequence'], ['each next number name is a quantity one larger: n objects and one more, as a picture'], ['add_sub_1_2']),

@@ -638,3 +638,120 @@ registerSkill('composing:ten_frame_build_teen', {
     workedSteps: frameSteps,
     wrongAnswer: frameWrong,
 });
+
+/* ================================================================================================
+ * BUILD LANE k2 (2026-09-25, design/BUILD_LIST.md lane k2): the new K-1 skills.
+ * Each item carries its kit payload (q.cell.payload), so every member reads that first and falls
+ * back to the item's own fields; a step never names a strategy the skill does not use.
+ * ================================================================================================ */
+
+/** The kit payload of an item, or {}. */
+const payloadOf = (q) => (q && q.cell && q.cell.payload && typeof q.cell.payload === 'object' ? q.cell.payload : {});
+
+/** strings() chosen per item (a task changes the instruction), with a fixed fallback. */
+function stringsBy(pickDef, fallbackDef) {
+    const cache = new Map();
+    const get = (def) => { if (!cache.has(def)) cache.set(def, strings(def)); return cache.get(def); };
+    const fn = (ref = {}) => get((ref && ref.q && pickDef(ref.q)) || fallbackDef)(ref);
+    fn.def = fallbackDef;
+    return fn;
+}
+
+const HOLDER = { plates: 'plate', boxes: 'box', frame: 'ten frame' };
+
+/* ============================================================================ zero_none */
+
+const ZERO_COUNT = {
+    iCan: 'I Can write 0 when there are none',
+    instructionKey: 'count-zero',
+    steps: ['Look at the plate.', 'Count each one you see.', 'Nothing there? That is none. Write 0.'],
+    say: 'There are __.',
+    sayValues: (q) => { const n = num(q.ans); return Number.isFinite(n) ? [n === 0 ? '0. None' : n] : null; },
+};
+const ZERO_FIND = {
+    iCan: 'I Can write 0 when there are none',
+    instructionKey: 'check-none',
+    steps: ['Look at each one.', 'Find the one with nothing in it.', 'None is 0. Check that one.'],
+    say: '__ has none.',
+    sayValues: (q) => [String(q.ans)],
+};
+const ZERO_LEFT = {
+    iCan: 'I Can write 0 when there are none',
+    instructionKey: 'how-many-left',
+    steps: ['Every one is crossed out.', 'Look for one that is not crossed out.', 'None are left. Write 0.'],
+    say: '__ take away __ is 0.',
+    sayValues: (q) => { const n = num(payloadOf(q).n); return Number.isFinite(n) ? [n, n] : null; },
+};
+
+registerSkill('counting:zero_none', {
+    strings: stringsBy((q) => {
+        const t = payloadOf(q).task || q._variant;
+        return t === 'find' ? ZERO_FIND : t === 'compute' ? ZERO_LEFT : ZERO_COUNT;
+    }, ZERO_COUNT),
+    misconceptions: ['wrote-one-for-none', 'skipped-one', 'counted-twice', 'chose-fewest', 'wrote-the-start'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        const word = HOLDER[p.objects] || 'plate';
+        const t = p.task || q._variant;
+        if (t === 'find') {
+            const counts = Array.isArray(p.counts) ? p.counts : [];
+            return [
+                step(`Look at ${['A', 'B', 'C'].slice(0, counts.length).join(', ')}.`),
+                step(counts.map((c, i) => `${['A', 'B', 'C'][i]} has ${c}`).join('. ') + '.'),
+                step(`${q.ans} has nothing in it. That is none.`),
+                step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
+            ];
+        }
+        if (t === 'compute') {
+            const n = num(p.n);
+            return [
+                step(`There are ${n} on the ${word}.`),
+                step(`Every one is crossed out: ${n} are taken away.`),
+                step('None are left. None is 0.'),
+                step('Write 0.', [{ slot: 'answer', value: '0' }]),
+            ];
+        }
+        const n = num(q.ans);
+        if (n === 0) {
+            return [
+                step(`Look at the ${word}.`),
+                step(`There is nothing on the ${word}.`),
+                step('Nothing is none. None is 0.'),
+                step('Write 0.', [{ slot: 'answer', value: '0' }]),
+            ];
+        }
+        return [
+            step(`Touch each one on the ${word}.`),
+            step(`Count: ${countList(1, n, 1, 10)}.`),
+            step(`The last number is ${n}.`),
+            step(`Write ${n}.`, [{ slot: 'answer', value: String(n) }]),
+        ];
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        const t = p.task || q._variant;
+        if (t === 'find') {
+            const counts = Array.isArray(p.counts) ? p.counts : [];
+            const nz = counts.map((c, i) => [c, i]).filter(([c]) => c > 0).sort((x, y) => x[0] - y[0]);
+            return chooseWrong(q, nz.slice(0, 1).map(([c, i]) => ({ value: ['A', 'B', 'C'][i], misconception: 'chose-fewest',
+                slot: 'answer', explain: `Chose the one with the fewest (${c}), not the one with none.` })), { rotate: false });
+        }
+        if (t === 'compute') {
+            const n = num(p.n);
+            return chooseWrong(q, [
+                { value: n, misconception: 'wrote-the-start', explain: `Wrote ${n}, how many there were, not how many are left.` },
+                { value: 1, misconception: 'wrote-one-for-none', explain: 'Wrote 1 when none are left.' },
+            ]);
+        }
+        const n = num(q.ans);
+        if (n === 0) {
+            return chooseWrong(q, [
+                { value: 1, misconception: 'wrote-one-for-none', explain: 'Wrote 1 for an empty plate: none is 0.' },
+            ]);
+        }
+        return chooseWrong(q, [
+            { value: n + 1, misconception: 'counted-twice', explain: 'Touched one object two times.' },
+            n > 1 ? { value: n - 1, misconception: 'skipped-one', explain: 'Missed one object.' } : null,
+        ]);
+    },
+});

@@ -124,6 +124,9 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'count-all': 'Count them all. Write how many.',
     'count-kind': 'Count one kind. Write how many.',
     'count-tens': 'Write how many tens.',
+    // Build lane k2 (2026-09-25, design/BUILD_LIST.md): the new K-1 picture skills.
+    'count-zero': 'Count. Write how many. None is 0.',
+    'check-none': 'Check the one with none.',
     'ring-remainder': 'Circle groups of {n}. Write the quotient and the remainder.',
     // 2026-09-25 critic round 2: the same tasks when the section's items do not share one {n}
     // (each cell prints its own group size / divisor). Their fallback used to be `groups-of`,

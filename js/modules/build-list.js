@@ -103,7 +103,6 @@ export function laneFor(skillKey) {
 // scope goes on that proposal (one entry on the build list, not two). `adds` is the scope; the codes
 // are the standards it then closes.
 export const WRM_EXTENSIONS = {
-    zero: { adds: 'writing 0 as the numeral for an empty set on the same page as 1-5 counts', ccss: ['K.CC.A.3'], ee: [] },
     ten_count_out: { adds: 'count out 1-3 from a larger set (EE level) and count out to 30', ccss: ['K.CC.B.5'], ee: ['M.EE.K.CC.6', 'M.EE.2.NBT.2'] },
     add_sub_1_2: { adds: 'a picture level: n objects and one more / one less, "how many now?" (a quantity one larger)', ccss: ['K.CC.B.4c'], ee: ['M.EE.1.OA.5'] },
     systematic_bonds: { adds: 'bonds of 5 at EE level; the pupil records each decomposition as an equation', ccss: ['K.OA.A.3'], ee: ['M.EE.1.NBT.4', 'M.EE.1.NBT.6', 'M.EE.2.NBT.6'] },
@@ -161,7 +160,7 @@ export const STANDARD_PROPOSALS = {
         answer: 'the written numeral in a large box (handwriting on paper; on screen the pupil types or taps the digit keypad)',
         ladder: 'O2 0-5 → 0-10 → 11-20 · O3 dotted trace with start dot and arrow → start dot only → empty box · O6 pictures / dots / ten frame',
         misconceptions: ['reverses 2, 3, 5, 7, 9', 'writes 31 for 13', 'leaves the box empty for zero'],
-        wrmSteps: [], after: ['zero'],
+        wrmSteps: [], after: [],
     }),
     count_conserve: P({
         kind: 'option', skill: 'counting:count_objects', option: 'task: "same number?" after the objects are moved or counted in another order',

@@ -3004,6 +3004,37 @@ const WORD_WORK_OPTIONS = (bar) => [
     }
 }
 
+// ===========================================================================
+// BUILD LANE k2 · COUNTING AND EARLY NUMBER (2026-09-25, design/BUILD_LIST.md lane k2)
+// ===========================================================================
+// The new K-1 skills and the options on existing K skills. Every control moves ONE thing (P-1):
+// the number range (difficulty), the task (the problem type, one per page), the support level
+// (hints that fade; the structure stays) and the picture (appearance). Each default is the
+// stand-alone value (R2). Share keys: the existing one-letter keys (band B, objects J, task K,
+// level L, tiles Y, orientation O, response R, model 5D, place Q) with new value tokens only.
+const K2_LANE_OPTIONS = {
+    'counting:zero_none': [
+        _opsBand([3, 5, 10], 5, { label: 'Count to', labels: { 3: '0 to 3', 5: '0 to 5', 10: '0 to 10' },
+            help: 'The most objects on a plate. A third of the items are empty (0) at every range.' }),
+        {
+            id: 'task', label: 'Task', type: 'enum', default: 'count', group: 'difficulty',
+            values: [{ v: 'count', l: 'How many? (0 for none) (default)' }, { v: 'find', l: 'Which one has none? (check a box)' },
+                { v: 'compute', l: 'Take them all away (5 − 5 = 0)' }],
+            help: 'One task for the whole page. "How many?" writes a number, 0 included; "Which one has none?" checks the empty '
+                + 'one of three; "Take them all away" crosses out every object and writes what is left.',
+        },
+        { ...levelSubset([2, 1], 1, 'Level 2 prints a number track 0 to the top number under each picture (0 comes first); '
+            + 'level 1 is the picture alone.'), appliesTo: (o) => !o.task || o.task === 'count' },
+        {
+            id: 'objects', label: 'Objects', type: 'enum', default: 'plates', group: 'layout',
+            values: [{ v: 'plates', l: 'Pictures on plates (default)' }, { v: 'boxes', l: 'Pictures in boxes' }, { v: 'frame', l: 'Counters in a ten frame' }],
+            help: 'What holds the objects. An empty plate, an empty box or an empty ten frame is 0.',
+        },
+    ],
+};
+for (const [key, defs] of Object.entries(K2_LANE_OPTIONS)) SKILL_OPTIONS[key] = defs;
+// ============================ end build lane k2 ============================
+
 // Options every skill understands, whether or not it declares anything of its own.
 export const UNIVERSAL_OPTIONS = [levelOption()];
 

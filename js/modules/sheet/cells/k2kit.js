@@ -191,12 +191,113 @@ export const SHAPES = Object.freeze({
                 + `${petals}<circle cx="12" cy="9.2" r="2.4" ${o}/>`;
         }),
     },
+    // Build lane k2 (2026-09-25): the pictures the match / sort / odd-one-out / size / heavy-light
+    // skills need, on the same 24-unit grid (1.5 pt outline, 0.75 pt interior detail, no fill but
+    // paper, no faces, no text). `h` is a 1.5 pt stroke with no fill (a handle, a stem, a string).
+    car: {
+        plural: 'cars', one: 'car',
+        draw: (cx, cy, d) => art(cx, cy, d, (o, i) => `<path d="M1.8 16V12.4Q1.8 10.6 3.6 10.6H6.6L9.4 6.2H15.6L18.6 10.6H20.4Q22.2 10.6 22.2 12.4V16Z" ${o}/>`
+            + `<path d="M12.3 6.6V10.6M3.2 10.6H21" ${i}/><circle cx="7" cy="16.6" r="2.7" ${o}/><circle cx="17" cy="16.6" r="2.7" ${o}/>`),
+    },
+    house: {
+        plural: 'houses', one: 'house',
+        draw: (cx, cy, d) => art(cx, cy, d, (o, i) => `<path d="M5.4 10.2H18.6V22H5.4Z" ${o}/><path d="M2.6 11.2L12 2.6L21.4 11.2Z" ${o}/>`
+            + `<path d="M10.2 22V16.2H13.8V22M15.4 13.2H17.4V15.2H15.4Z" ${i}/>`),
+    },
+    tree: {
+        plural: 'trees', one: 'tree',
+        draw: (cx, cy, d) => art(cx, cy, d, (o, i) => `<path d="M10.4 15H13.6V22.6H10.4Z" ${o}/><circle cx="12" cy="9.6" r="7.4" ${o}/>`
+            + `<path d="M12 15.4V11.4M12 12.6L9.6 10.4M12 13.4L14.6 11" ${i}/>`),
+    },
+    boat: {
+        plural: 'boats', one: 'boat',
+        draw: (cx, cy, d) => art(cx, cy, d, (o, i, h) => `<path d="M12 15V2.4" ${h}/><path d="M12.9 3.6L19.4 13.4H12.9Z" ${o}/>`
+            + `<path d="M2 15H22L18.6 21H5.4Z" ${o}/><path d="M4.2 18H19.8" ${i}/>`),
+    },
+    cup: {
+        plural: 'cups', one: 'cup',
+        draw: (cx, cy, d) => art(cx, cy, d, (o, i, h) => `<path d="M16 9.2Q21 9.2 21 12.6Q21 16 16 16" ${h}/>`
+            + `<path d="M4.4 6.4H16.2V16.4Q16.2 20.4 12.2 20.4H8.4Q4.4 20.4 4.4 16.4Z" ${o}/><path d="M3 22.2H17.6" ${h}/>`),
+    },
+    hat: {
+        plural: 'hats', one: 'hat',
+        draw: (cx, cy, d) => art(cx, cy, d, (o, i) => `<path d="M6.4 16.6V9Q6.4 5.6 9.8 5.6H14.2Q17.6 5.6 17.6 9V16.6Z" ${o}/>`
+            + `<path d="M1.8 17.2Q12 21.8 22.2 17.2Q12 13.6 1.8 17.2Z" ${o}/><path d="M6.4 12.8H17.6" ${i}/>`),
+    },
+    leaf: {
+        plural: 'leaves', one: 'leaf',
+        draw: (cx, cy, d) => art(cx, cy, d, (o, i, h) => `<path d="M11.4 20.6L8.6 23.4" ${h}/>`
+            + `<path d="M11.4 20.6Q2.6 16.4 4.8 8.8Q8 2.4 20.2 2Q21.4 13.4 11.4 20.6Z" ${o}/>`
+            + `<path d="M11.4 20.6Q12.6 11.8 18.2 4.6M9.6 14.2L13.8 13.4M8.8 10L14.6 9.6" ${i}/>`),
+    },
+    feather: {
+        plural: 'feathers', one: 'feather',
+        draw: (cx, cy, d) => art(cx, cy, d, (o, i, h) => `<path d="M6.2 19.6Q3.6 10.8 10.6 5Q15.8 1.2 20.4 1.8Q20.6 7.4 16.4 12.8Q11.8 18.6 6.2 19.6Z" ${o}/>`
+            + `<path d="M3 22.8L17.6 5" ${h}/><path d="M9.6 14.6L7.4 12.6M12.2 11.4L10.6 8.6M14.6 8.6L13.8 5.8M11 13L15.4 14.2M13.6 9.8L17.8 10.4" ${i}/>`),
+    },
+    rock: {
+        plural: 'rocks', one: 'rock',
+        draw: (cx, cy, d) => art(cx, cy, d, (o, i) => `<path d="M2.6 18.2Q2 12.2 6.6 9Q8.8 5.2 13.8 6.2Q19.6 6.6 21.2 12.2Q22.6 18.6 17.6 19.8H5.8Q2.8 19.8 2.6 18.2Z" ${o}/>`
+            + `<path d="M8.6 12.4Q10.6 11 12.2 13.2M15 10.2Q16.6 10.6 17.2 12.4" ${i}/>`),
+    },
+    balloon: {
+        plural: 'balloons', one: 'balloon',
+        draw: (cx, cy, d) => art(cx, cy, d, (o, i, h) => `<path d="M12 18.8Q9.8 21 12.2 23.4" ${h}/>`
+            + `<path d="M12 1.8Q19.2 1.8 19.2 9.4Q19.2 15.6 12 17.4Q4.8 15.6 4.8 9.4Q4.8 1.8 12 1.8Z" ${o}/>`
+            + `<path d="M10.8 17.2H13.2L12 18.8Z" ${o}/><path d="M8.2 6.6Q9 4.6 11 4.2" ${i}/>`),
+    },
+    heart: {
+        plural: 'hearts', one: 'heart',
+        draw: (cx, cy, d) => art(cx, cy, d, (o) => `<path d="M12 21Q2.4 14.4 2.4 8.4Q2.4 3.4 7.4 3.4Q10.4 3.4 12 6.6Q13.6 3.4 16.6 3.4Q21.6 3.4 21.6 8.4Q21.6 14.4 12 21Z" ${o}/>`),
+    },
+    moon: {
+        plural: 'moons', one: 'moon',
+        draw: (cx, cy, d) => art(cx, cy, d, (o) => `<path d="M14.6 1.8C5.6 2.8 2 8.6 2 12C2 16 5.4 21.6 14.6 22.2C9.8 19.4 8 15.8 8 12C8 8.2 9.8 4.4 14.6 1.8Z" ${o}/>`),
+    },
+    brick: {
+        plural: 'bricks', one: 'brick',
+        draw: (cx, cy, d) => art(cx, cy, d, (o, i) => `<path d="M1.6 8.4H22.4V17.6H1.6Z" ${o}/>`
+            + `<path d="M1.6 13H22.4M8.6 8.4V13M16 8.4V13M5 13V17.6M12.2 13V17.6M19.4 13V17.6" ${i}/>`),
+    },
+    sock: {
+        plural: 'socks', one: 'sock',
+        draw: (cx, cy, d) => art(cx, cy, d, (o, i) => `<path d="M7.6 1.8H15.6V13.2L19.4 16.8Q21.4 19 19.8 21Q18 22.8 15.6 21.2L8.8 15.6Q7.6 14.6 7.6 13Z" ${o}/>`
+            + `<path d="M7.6 5.2H15.6" ${i}/>`),
+    },
 });
+
+/**
+ * The paint of one picture. `o` outlines a part (paper inside), `i` draws interior detail, `h` a
+ * heavy stroke with no fill (a handle, a stem, a string). With `sil` the whole picture is a
+ * SILHOUETTE: every part filled in the single grey with no stroke (INK-3 (a): a shaded shape; no
+ * grey stroke is drawn, so INK-4 does not arise), interior detail dropped.
+ */
+let _sil = false;
 function art(cx, cy, d, fn) {
     const s = d / 24;
-    const o = `fill="#fff" stroke="${INK}" stroke-width="${n2(SW.heavy / s)}" stroke-linejoin="round" stroke-linecap="round"`;
-    const i = `fill="none" stroke="${INK}" stroke-width="${n2(SW.hair / s)}" stroke-linecap="round" stroke-linejoin="round"`;
-    return `<g transform="translate(${n2(cx - d / 2)} ${n2(cy - d / 2)}) scale(${n2(s)})">${fn(o, i)}</g>`;
+    const sil = _sil;
+    const o = sil ? `fill="${GREY}" stroke="none"`
+        : `fill="#fff" stroke="${INK}" stroke-width="${n2(SW.heavy / s)}" stroke-linejoin="round" stroke-linecap="round"`;
+    const i = sil ? 'fill="none" stroke="none"'
+        : `fill="none" stroke="${INK}" stroke-width="${n2(SW.hair / s)}" stroke-linecap="round" stroke-linejoin="round"`;
+    // A silhouette keeps its heavy strokes (a handle, a string) as 1 pt grey lines (INK-4).
+    const h = sil ? `fill="none" stroke="${GREY}" stroke-width="${n2(SW.one / s)}" stroke-linecap="round"`
+        : `fill="none" stroke="${INK}" stroke-width="${n2(SW.heavy / s)}" stroke-linecap="round" stroke-linejoin="round"`;
+    return `<g transform="translate(${n2(cx - d / 2)} ${n2(cy - d / 2)}) scale(${n2(s)})">${fn(o, i, h)}</g>`;
+}
+
+/**
+ * A picture drawn as a grey SILHOUETTE (match the picture to its shadow). Works for every entry of
+ * SHAPES: the plain shapes and the line art alike are recoloured, never redrawn, so the shadow is
+ * exactly the outline of the picture it matches.
+ */
+export function silhouette(id, cx, cy, d) {
+    _sil = true;
+    let out;
+    try { out = shapeOf(id).draw(cx, cy, d); } finally { _sil = false; }
+    // the plain shapes (circle, square, ...) do not go through art(): recolour their outline
+    return out.replace(/fill="#fff" stroke="#000" stroke-width="[\d.]+"/g, `fill="${GREY}" stroke="none"`)
+        .replace(/fill="#000"/g, `fill="${GREY}"`);
 }
 export const shapeOf = (id) => SHAPES[id] || SHAPES.circle;
 
@@ -261,6 +362,77 @@ export const cross = (cx, cy, d) => {
     return `<path d="M${n2(cx - r)} ${n2(cy - r)}L${n2(cx + r)} ${n2(cy + r)}M${n2(cx + r)} ${n2(cy - r)}L${n2(cx - r)} ${n2(cy + r)}" `
         + `stroke="${INK}" stroke-width="${n2(SW.rule)}" stroke-linecap="round" fill="none"/>`;
 };
+
+/* ------------------------------------------------------------------ build lane k2 (2026-09-25) */
+
+/** Picture scale per size (O6: the drawings scale with S / M / L, the text and slots already do). */
+export const pscale = (ctx) => ({ S: 0.8, M: 0.9, L: 1 })[sizeOf(ctx)] || 1;
+
+/** The letters that tag the choices of a picture row (A, B, C ...). */
+export const LETTERS = Object.freeze(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']);
+
+/**
+ * Which choice a state checks: the key's (`p.correct`), the wrong work's (ctx.wrong.value names a
+ * letter or a label), or none on the pupil page.
+ */
+export function checkedChoice(p, ctx, labels) {
+    if (ctx.state === 'blank') return -1;
+    if (ctx.state === 'wrong') {
+        const w = String((ctx.wrong && ctx.wrong.value) || '').trim().toLowerCase();
+        const i = (labels || []).findIndex((v) => String(v).toLowerCase() === w);
+        return i >= 0 ? i : ((p.correct || 0) + 1) % Math.max(2, (labels || []).length);
+    }
+    return p.correct || 0;
+}
+
+/**
+ * THE CHECK-BOX CHOICE ROW (P-TH-11, a check box is the response; never multiple choice on
+ * screen only, SP-3): each choice is a picture (or a word) with its label, and a check box UNDER
+ * it. The whole row is ONE answer slot (`data-ws-slot="answer"`, shape check), so the key checks
+ * one box (AK-2) and Error analysis checks the wrong one.
+ *
+ * THE SCREEN TWIN needs nothing new: each choice is a div of exactly two spans - [the picture and
+ * its label] then [the empty bordered box] - which is the shape screen-cell.js `wireTickBoxes`
+ * turns into one tap target per choice (the picture is part of the target). The host's answer is
+ * the choice's label (`q.printAnswer`).
+ *
+ * choices: [{pic: html, label: 'A'}], on: the checked index (-1 none), vertical: a list of word
+ * choices (a bank), each box on the right of its word (the compare cell's form).
+ */
+export function choiceRow(ctx, choices, { on = -1, gapMm = 7, vertical = false, labelPt = null, labelW = null } = {}) {
+    const lp = labelPt || textPt(ctx) + 2;
+    const cols = choices.map((c, i) => {
+        const box = checkBox(ctx, { id: `c${i}`, on: on === i, slot: false });
+        if (vertical) {
+            return `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};margin:${L(ctx, 1.5)} 0;">`
+                + `<span style="flex:none;${labelW ? `width:${L(ctx, labelW)};` : ''}display:inline-flex;align-items:center;gap:${L(ctx, 2)};white-space:nowrap;text-align:left;font-size:${P(ctx, lp)};">`
+                + `${c.pic || ''}${esc(c.label)}</span>${box}</div>`;
+        }
+        return `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 2)};">`
+            + `<span style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 1.5)};font-size:${P(ctx, lp)};font-weight:700;line-height:1;">`
+            + `${c.pic || ''}${esc(c.label)}</span>${box}</div>`;
+    }).join('');
+    const ink = on >= 0 ? ` data-ws-ink="${ctx.state === 'traced' ? 'trace' : 'solid'}"` : '';
+    return `<div class="k2-choices" data-ws-slot="answer" data-ws-shape="check"${ink} style="display:${vertical ? 'inline-block' : 'flex'};`
+        + `${vertical ? 'text-align:left;' : `justify-content:center;align-items:flex-end;gap:${L(ctx, gapMm)};flex-wrap:wrap;`}">${cols}</div>`;
+}
+
+/**
+ * A number track `from`..`to` (at most 21 boxes) drawn as ONE path, so no box is counted as an
+ * object (the count_objects hint strip, starting at 0 for "zero means none").
+ */
+export function numberTrack(ctx, from, to, { maxW = 90 } = {}) {
+    const t = Math.max(1, to - from + 1);
+    const cw = Math.min(6.5, maxW / t), h = 6.5;
+    let d = `M0.5 0.5h${n2(t * cw)}v${h}h${n2(-t * cw)}Z`;
+    for (let k = 1; k < t; k++) d += `M${n2(0.5 + k * cw)} 0.5v${h}`;
+    let body = `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}"/>`;
+    for (let k = 0; k < t; k++) {
+        body += `<text x="${n2(0.5 + (k + 0.5) * cw)}" y="${n2(0.5 + h * 0.7)}" text-anchor="middle" font-size="${n2(Math.min(3.4, cw * 0.62))}" `
+            + `font-family="Andika, sans-serif" fill="${INK}">${from + k}</text>`;
+    }
+    return svg(ctx, t * cw + 1, h + 1, body, { label: `number track ${from} to ${to}` });
+}
 
 /* ------------------------------------------------------------------ the screen twin */
 

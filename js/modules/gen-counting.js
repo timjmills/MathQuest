@@ -1317,6 +1317,15 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         return;
     }
 
+    // ================================================================================
+    // BUILD LANE k2 (2026-09-25, design/BUILD_LIST.md lane k2). Each new skill hands its item to
+    // a sheet-kit template (q.cell) and its screen twin (q.visual), one drawing on paper, key and
+    // the three screen hosts. Every teacher choice is an option (skill-options.js K2_LANE_OPTIONS).
+    // ================================================================================
+    else if (_k2LaneSkill(q, mappedSkill, rng)) {
+        return;
+    }
+
     // Fallback
     else {
         q.text = `1 + 1 = ?`;
@@ -1327,4 +1336,99 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         q.visual = _kCell(_kShapeGrid(2, K_SHAPES[0], { cell: 44 }).svg);
         return;
     }
+}
+
+/* ================================================================================================
+ * BUILD LANE k2 (2026-09-25): the new K-1 skills of design/BUILD_LIST.md, lane k2.
+ *
+ * Each one is ONE cell shape per page (P-28): the task, the picture kind and the number range are
+ * the teacher's options (K2_LANE_OPTIONS in skill-options.js), each defaulting to the stand-alone
+ * value (R2). What a teacher does not choose is DEALT (round-robin off the page index, through a
+ * shuffled permutation where counting order would let a pupil copy a pattern), never rolled six
+ * times. The response is a number in a box, a check box under a picture or a word, or a row of
+ * number boxes - never a screen-only multiple choice (P-29, SP-3).
+ * ================================================================================================ */
+
+/** The holders "zero means none" draws its objects in: the noun the question uses. */
+const K2_HOLDER_WORD = { plates: 'plate', boxes: 'box', frame: 'ten frame' };
+const K2_HOLDER_PREP = { plates: 'on the', boxes: 'in the', frame: 'in the' };
+
+function _k2LaneSkill(q, id, rng) {
+    switch (id) {
+        case 'zero_none': return _k2Zero(q, rng);
+        default: return false;
+    }
+}
+
+/**
+ * ZERO MEANS NONE (R.B7.S1; K.CC.A.3 "represent a count of no objects with 0"). A plate, a box or
+ * a ten frame holding 0 to `Count to` objects; a third of a page's items are EMPTY, dealt through a
+ * shuffled permutation so the empty ones are not every third cell.
+ *   count     How many are on the plate? The K answer square; 0 is written for none.
+ *   find      Three holders A, B, C, one empty: check the one with none.
+ *   compute   Every object crossed out: n − n = [ ]. Take them all away: none are left.
+ * Support level 2 prints a number track 0 to `Count to` under the picture (0 is on it, first).
+ */
+function _k2Zero(q, rng) {
+    const band = Number(_kOpt('band')) || 5;
+    const holder = ['plates', 'boxes', 'frame'].includes(_kOpt('objects')) ? _kOpt('objects') : 'plates';
+    const task = ['count', 'find', 'compute'].includes(_kOpt('task')) ? _kOpt('task') : 'count';
+    const shape = holder === 'frame' ? 'circle' : K2_PICTURE_KINDS[_kPageDeal('zero-shape', K2_PICTURE_KINDS.length)];
+    const word = K2_HOLDER_WORD[holder], prep = K2_HOLDER_PREP[holder];
+    const nonzero = () => 1 + _kDealShuffled(band);
+    q.options = [];
+    q.selfAnswering = true;
+    q.skillLabel = 'Zero Means None';
+    if (task === 'find') {
+        // one empty holder among three, at a dealt place; the other two hold different counts
+        const at = _kDealShuffled(3);
+        const a = rng(1, band);
+        let b = rng(1, Math.max(1, band - 1));
+        if (b >= a) b = Math.min(band, b + 1);
+        const counts = [0, 0, 0];
+        let k = 0;
+        for (let i = 0; i < 3; i++) if (i !== at) counts[i] = [a, b][k++];
+        const letter = ['A', 'B', 'C'][at];
+        const fewest = counts.indexOf(Math.min(...counts.filter((c) => c > 0)));
+        q.text = `Which ${word} has none?`;
+        q.printText = `Check the ${word} with none.`;
+        q.ans = letter;
+        q.printAnswer = letter;
+        q.acceptedAnswers = [letter, letter.toLowerCase()];
+        q.answerType = 'text';
+        q.hint = `Look for the ${word} with nothing ${prep.split(' ')[0]} it. None is zero.`;
+        q.distractorTags = { [['A', 'B', 'C'][fewest]]: 'chose the one with the fewest, not none' };
+        q._variant = 'find';
+        _kSetCell(q, 'counters', { kind: 'zero', task: 'find', objects: holder, shape, counts, correct: at, ans: letter });
+        return true;
+    }
+    if (task === 'compute') {
+        const n = nonzero();
+        q.text = `Take them all away. ${n} − ${n} = ?`;
+        q.printText = 'Write how many are left.';
+        q.ans = 0;
+        q.a = n; q.b = n;
+        q.answerType = 'number';
+        q.hint = 'Every one is crossed out. None are left. None is zero.';
+        q.distractorTags = { [n]: 'wrote how many there were, not how many are left' };
+        q._variant = 'compute';
+        _kSetCell(q, 'counters', { kind: 'zero', task: 'compute', objects: holder, shape, n, ans: 0 });
+        return true;
+    }
+    // count: a third of the page is empty (R.B7.S1: zero is a count like any other)
+    const empty = _kDealShuffled(3) === 0;
+    const n = empty ? 0 : nonzero();
+    q.text = `How many are ${prep} ${word}?`;
+    q.printText = 'Count. Write how many. None is 0.';
+    q.ans = n;
+    q.answerType = 'number';
+    q.hint = n === 0 ? `There is nothing ${prep} ${word}. None is zero. Write 0.` : 'Touch each one as you count. The last number you say is how many.';
+    q.distractorTags = n === 0 ? { 1: 'wrote 1 for an empty set' } : { [n + 1]: 'counted one object twice' };
+    q._variant = 'count';
+    const payload = { kind: 'zero', task: 'count', objects: holder, shape, n, ans: n };
+    const lvl = _kLevel(1);
+    if (lvl >= 2) payload.track = band;
+    q.supportLevel = lvl;
+    _kSetCell(q, 'counters', payload);
+    return true;
 }

@@ -286,7 +286,9 @@ export const VALUE_TOKENS = Object.freeze({
     mix: Object.freeze({ section: 'S', problem: 'P' }),
     objects: Object.freeze({ shapes: 'S', pictures: 'P', frame: 'F', dice: 'D',
         // O6 AP1 (2026-09-25): teen_compose draws the ten as a rod and the ones as cubes
-        blocks: 'B' }),
+        blocks: 'B',
+        // build lane k2 (2026-09-25): zero_none draws its objects on plates / in boxes
+        plates: 'L', boxes: 'X' }),
     // P12
     model: Object.freeze({ none: 'N', area: 'A', bar: 'B', circle: 'C', line: 'L', set: 'S', grid: 'G', blocks: 'K', analog: 'H', digital: 'D' }),
     labels: Object.freeze({ all: 'A', some: 'S', none: 'N' }),

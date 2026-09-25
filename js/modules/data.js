@@ -26,6 +26,8 @@ export const SKILL_GRADES = {
     'count_objects': 'K', 'count_sequence': 'K',
     'compare_groups': 'K', 'compare_objects': 'K', 'classify_count': 'K',
     'number_bonds': 'K', 'make_ten': 'K', 'teen_compose': 'K',
+    // Build lane k2 (2026-09-25, design/BUILD_LIST.md). PK skills are Level K (GRADE_COLORS has no PK).
+    'zero_none': 'K',
     // Phase 5 batch 1: K-2 MAP early-band skills
     'add_5_pictures': 'K', 'sub_5_pictures': 'K',
     'heavier_lighter_visual': 'K', 'pictograph_intro': 'K',
@@ -547,6 +549,8 @@ export const SKILLS = {
         { v: "count_sequence", l: "Next/Before/After Number (Visual)" },
         { v: "number_seq_fill", l: "Number Sequence: Fill Missing (Grid)" },
         { v: "mixed_counting", l: "Mixed Counting" },
+        // Build lane k2 (2026-09-25) — APPEND ONLY, after every existing id.
+        { v: "zero_none", l: "Zero Means None" },
     ],
     comparing: [
         { v: "compare_groups", l: "More/Fewer/Same Groups (Visual)" },
@@ -1569,6 +1573,8 @@ export const SKILL_TIME_CATEGORY = {
     arrays_groups: "quick", compare_decimal: "quick", compare_numbers: "quick",
     // New K-3 skills (quick)
     count_objects: "quick", count_sequence: "quick", compare_groups: "quick",
+    // Build lane k2 (2026-09-25)
+    zero_none: "quick",
     compare_objects: "quick", classify_count: "quick", number_bonds: "quick", make_ten: "quick",
     teen_compose: "quick", odd_even: "quick", number_word_form: "quick",
     // MAP gap fills (Phase 6)
@@ -1841,6 +1847,8 @@ export const SKILL_PRINT_SIZE = {
     equal_sign: "compact",
     more_less_10: "medium", more_less_100: "medium",
     count_objects: "compact", count_sequence: "compact",
+    // Build lane k2 (2026-09-25)
+    zero_none: "compact",
     compare_groups: "compact", compare_objects: "compact",
     nearest_10: "medium", nearest_100: "medium", nearest_1000: "medium",
     nearest_10000: "medium", nearest_100000: "medium", nearest_million: "medium",

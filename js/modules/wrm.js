@@ -60,6 +60,8 @@ export const SKILL_WRM = {
         { step: 'Y1.B1.S3', partial: 'counting out a given number from a larger group' },
         { step: 'Y1.B4.S1', note: 'count to 20' },
     ],
+    // Build lane k2 (2026-09-25)
+    'counting:zero_none': ['R.B7.S1'],
     'counting:count_sequence': [
         { step: 'R.B3.S4', note: 'the number after, to 10' },
         { step: 'R.B3.S5', note: 'the number before, to 10' },
@@ -1177,14 +1179,6 @@ export const WRM_PROPOSALS = {
         representation: 'standard dot, dice, finger and ten-frame patterns shown briefly on screen, printed as a grid; write the number; option: say the two parts',
         family: 'counting',
         steps: ['R.B3.S2', 'R.B5.S2', 'R.B7.S3', 'R.B7.S8', 'R.B9.S10', 'R.B11.S4', 'R.B11.S9'],
-    },
-    zero: {
-        kind: 'new', skill: 'counting:zero_none',
-        name: 'Zero Means None',
-        teaches: 'zero as the count of an empty set, and writing 0',
-        representation: 'pictures of plates/boxes with some or no objects; write how many, including 0',
-        family: 'counting',
-        steps: ['R.B7.S1'],
     },
     consolidate: {
         kind: 'new', skill: 'counting:number_sense_review',

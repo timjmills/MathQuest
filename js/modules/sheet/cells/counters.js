@@ -24,6 +24,7 @@ import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import {
     L, P, B, svg, root, box, slotValue, shapeOf, dot, cross, digitPt, textPt, squareMm, inlineBoxMm, INK, GREY, SW, n2, groupRuns, isTwin, looseArray,
+    pscale, checkedChoice, choiceRow, LETTERS, numberTrack,
 } from './k2kit.js';
 
 const MINUS = '−';
@@ -164,6 +165,7 @@ function sharePicture(ctx, n, size) {
 }
 
 const eqSpan = (ctx, s) => `<span style="font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;">${esc(s)}</span>`;
+const eqRowOf = (ctx, parts) => `<div class="ws-eq" style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 1.5)};margin-top:${L(ctx, 5)};white-space:nowrap;">${parts.join('')}</div>`;
 const opSpan = (ctx, s) => `<span style="display:inline-block;width:1em;text-align:center;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;">${s}</span>`;
 
 /* ---------------------------------------------------- O6 AP1 migrations (2026-09-25, round 2)
@@ -292,9 +294,75 @@ function teenBlocks(ctx, ones) {
     return svg(ctx, w, h, body, { label: `a rod of ten and ${ones} cubes` });
 }
 
+/* ---------------------------------------------------- build lane k2 (2026-09-25): zero means none
+ * zero_none: a PLATE (a round plate seen from above: a 1.5 pt rim and a 0.75 pt inner ring), a BOX
+ * (an open box seen from above: a 1.5 pt wall and a 0.75 pt inner edge) or a TEN FRAME, holding 0
+ * to 10 objects in centred rows of at most four (rows of 2-4 at a 9 mm pitch, never touching the
+ * rim). An empty plate is a real item: the pupil writes 0 (R.B7.S1). Nothing labels the count.
+ */
+const PLATE_ROWS = { 0: [], 1: [1], 2: [2], 3: [3], 4: [2, 2], 5: [3, 2], 6: [3, 3], 7: [2, 3, 2], 8: [3, 2, 3], 9: [3, 3, 3], 10: [3, 4, 3] };
+function holderPicture(ctx, n, shape, p, { scale = 1, crossed = false } = {}) {
+    const s = scale;
+    if (p.objects === 'frame') {
+        const c = 9 * s, o = SW.heavy / 2;
+        let body = `<path d="M${n2(o)} ${n2(o)}h${n2(5 * c)}v${n2(2 * c)}h${n2(-5 * c)}Z" fill="none" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`;
+        let g = '';
+        for (let k = 1; k < 5; k++) g += `M${n2(o + k * c)} ${n2(o)}v${n2(2 * c)}`;
+        g += `M${n2(o)} ${n2(o + c)}h${n2(5 * c)}`;
+        body += `<path d="${g}" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}"/>`;
+        for (let i = 0; i < Math.min(10, n); i++) {
+            const cx = o + (i % 5 + 0.5) * c, cy = o + (Math.floor(i / 5) + 0.5) * c;
+            body += dot(cx, cy, 6 * s);
+            if (crossed) body += cross(cx, cy, 6 * s);
+        }
+        return svg(ctx, 5 * c + 2 * o, 2 * c + 2 * o, body, { label: 'a ten frame' });
+    }
+    const R = 22 * s, inner = 18.6 * s, pitch = 9 * s, d = 7.2 * s, pad = 1;
+    const box = p.objects === 'boxes';
+    const W = 2 * R + 2 * pad, H = box ? 1.64 * R + 2 * pad : W;
+    const cx0 = W / 2, cy0 = H / 2;
+    let body = box
+        ? `<rect x="${n2(pad)}" y="${n2(pad)}" width="${n2(2 * R)}" height="${n2(1.64 * R)}" rx="${n2(1.5 * s)}" fill="#fff" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`
+            + `<rect x="${n2(pad + 3.2 * s)}" y="${n2(pad + 3.2 * s)}" width="${n2(2 * R - 6.4 * s)}" height="${n2(1.64 * R - 6.4 * s)}" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}"/>`
+        : `<circle cx="${n2(cx0)}" cy="${n2(cy0)}" r="${n2(R)}" fill="#fff" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`
+            + `<circle cx="${n2(cx0)}" cy="${n2(cy0)}" r="${n2(inner)}" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}"/>`;
+    const rows = PLATE_ROWS[Math.max(0, Math.min(10, n))] || [];
+    rows.forEach((k, r) => {
+        const y = cy0 + (r - (rows.length - 1) / 2) * pitch;
+        for (let j = 0; j < k; j++) {
+            const x = cx0 + (j - (k - 1) / 2) * pitch;
+            body += shapeOf(shape).draw(x, y, d);
+            if (crossed) body += cross(x, y, d);
+        }
+    });
+    return svg(ctx, W, H, body, { label: box ? 'a box' : 'a plate' });
+}
+
 register('counters', {
     render(p, ctx) {
         const kv = p.ans;
+        if (p.kind === 'zero') {
+            const k = pscale(ctx);
+            if (p.task === 'which') {
+                // Three holders tagged A, B, C, one of them empty: check the one with none.
+                const on = checkedChoice(p, ctx, LETTERS.slice(0, (p.counts || []).length));
+                const choices = (p.counts || []).map((n, i) => ({ pic: holderPicture(ctx, n, p.shape, p, { scale: 0.62 * k }), label: LETTERS[i] }));
+                return root(ctx, 'k2-zero', choiceRow(ctx, choices, { on, gapMm: 5 }));
+            }
+            if (p.task === 'takeaway') {
+                const b = inlineBoxMm(ctx, 1);
+                const slot = box(ctx, { value: slotValue(ctx, 'answer', kv), w: b.w, h: b.h, mark: 'blank' });
+                return root(ctx, 'k2-zero', `<div style="display:flex;justify-content:center;">${holderPicture(ctx, p.n, p.shape, p, { scale: k, crossed: true })}</div>`
+                    + eqRowOf(ctx, [eqSpan(ctx, p.n), opSpan(ctx, MINUS), eqSpan(ctx, p.n), opSpan(ctx, '='), slot]));
+            }
+            const sq = squareMm(ctx);
+            const tctx = p.traced && ctx.state === 'blank' ? Object.assign({}, ctx, { state: 'traced' }) : ctx;
+            const slot = box(tctx, { value: slotValue(tctx, 'answer', kv), w: sq, h: sq, mark: 'blank' });
+            return root(ctx, 'k2-zero', `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:${L(ctx, 4)};">`
+                + `<div style="display:flex;justify-content:center;"><div style="flex:none;">${holderPicture(ctx, p.n, p.shape, p, { scale: k })}</div></div>${slot}</div>`
+                + (p.track ? `<div style="display:flex;justify-content:center;margin-top:${L(ctx, 3)};">${numberTrack(ctx, 0, p.track)}</div>` : ''),
+            isTwin(ctx) ? {} : { style: 'width:100%;box-sizing:border-box;' });
+        }
         if (p.kind === 'takeaway') {
             const b = inlineBoxMm(ctx, 1);
             const slot = box(ctx, { value: slotValue(ctx, 'answer', kv), w: b.w, h: b.h, mark: 'blank' });
@@ -367,7 +435,10 @@ register('counters', {
     footprint(p) {
         return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2 };
     },
-    inputs() { return [{ id: 'answer', kind: 'number', shape: 'box', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },
+    inputs(p) {
+        if (p && p.kind === 'zero' && p.task === 'which') return [{ id: 'answer', kind: 'check', shape: 'check', graded: true, order: 0, scopes: ['full'] }];
+        return [{ id: 'answer', kind: 'number', shape: 'box', graded: true, order: 0, scopes: ['full', 'answer-only'] }];
+    },
     layout() { return { card: 'card-medium-visual', checker: 'value' }; },
 });
 

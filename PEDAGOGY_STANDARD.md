@@ -1268,6 +1268,8 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `count-all` | Count them all. Write how many. | join two pictured groups (add within 5 with pictures; added 2026-09-25) |
 | `count-kind` | Count one kind. Write how many. | sort and count one kind in a mixed picture (added 2026-09-25) |
 | `count-tens` | Write how many tens. | count rods or full ten frames as tens (added 2026-09-25) |
+| `count-zero` | Count. Write how many. None is 0. | count objects on a plate, an empty one included: zero means none (build lane k2, 2026-09-25) |
+| `check-none` | Check the one with none. | find the empty plate, box or frame among three (build lane k2) |
 | `ring-remainder` | Circle groups of {n}. Write the quotient and the remainder. | division with a remainder, pictured (its two slots: `= [ ] R [ ]`) |
 | `ring-groups-each` | Circle groups of the number shown. Write how many groups. | `ring-groups` when the section's items do not share one {n} (added 2026-09-25, critic round 2) |
 | `ring-remainder-each` | Circle groups of the second number. Write the quotient and the remainder. | `ring-remainder` when the divisors differ (R3: "the divisor" was jargon on the page) |
