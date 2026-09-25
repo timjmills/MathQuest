@@ -101,7 +101,8 @@ export const PRACTICE_CEILING = Object.freeze({
 export const PRACTICE_TARGET = Object.freeze({
     standard: Object.freeze({ cols: 2, rows: Object.freeze({ S: 3, M: 3, L: 3 }) }),
     long: Object.freeze({ cols: 2, rows: Object.freeze({ S: 2, M: 2, L: 2 }) }),
-    short: Object.freeze({ cols: 2, rows: Object.freeze({ S: 8, M: 5, L: 4 }) }),
+    // A one-column short cell (a number line with its equation) holds 5 to a page (owner, 2026-09-25).
+    short: Object.freeze({ cols: 2, rows: Object.freeze({ S: 8, M: 5, L: 4 }), rowsByCols: Object.freeze({ 1: 5 }) }),
     wide: Object.freeze({ cols: 1, rows: Object.freeze({ S: 5, M: 4, L: 3 }) }),
     word: Object.freeze({ cols: 1, rows: Object.freeze({ S: 4, M: 3, L: 3 }) }),
 });
@@ -309,6 +310,21 @@ export function itemInfo(item, ctx = {}) {
     return { fp: fp || { wMm: 93, hMm: null, measure: true, maxCols: 2 }, fclass: it.fclass || '', measured: it.measured || null };
 }
 
+/**
+ * The column cap of one item. A footprint's `maxCols` is its author's guess at L; a MEASURED cell
+ * (`measure: true`, measured by the host at every column count the layout may choose) is capped
+ * by the measurement instead - the widest count at which nothing overflowed, clipped, shrank or
+ * reflowed (DN-10). Owner 2026-09-25: "when on two columns it goes smaller and moves to two
+ * columns" - a rounding table at S was held to one column by a guess made for L.
+ */
+export function itemCap(info) {
+    const { fp, measured } = info;
+    const cap = fp.maxCols || 6;
+    if (!fp.measure || !measured) return cap;
+    const ok = Object.entries(measured).filter(([, m]) => m && m.fits !== false && Number.isFinite(m.hMm)).map(([c]) => Number(c));
+    return ok.length ? Math.max(...ok) : cap;
+}
+
 /** The tallest cell a column count needs, from the static footprint (PG-11's hMin). */
 function staticHMin(fp, size) {
     const s = SIZES[size] || SIZES[DEFAULT_SIZE];
@@ -332,7 +348,7 @@ function fitAt(info, cols, { size, look, availableWidthMm, auto }) {
     const m = measured && measured[cols];
     let hMin = staticHMin(fp, size);
     if (m && Number.isFinite(m.hMm)) hMin = fp.measure || fp.hMm == null ? m.hMm : Math.max(hMin, m.hMm);
-    const maxCols = fp.maxCols || 6;
+    const maxCols = m && fp.measure ? Math.max(cols, itemCap(info)) : fp.maxCols || 6;
     if (cols > maxCols) return { fits: false, why: 'cap', hMin };
     // The host's measurement is the truth about overflow, clipping and shrinking (DN-10).
     if (m && m.fits === false) return { fits: false, why: 'width', hMin };
@@ -432,7 +448,7 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     // The section's column cap: the role's, then every item's own (`maxCols`, a hard cap
     // before the digit-aware clamp). Word problems and wide rows are one column (PT-WPR-1).
     const hardCap = cls === 'word' || cls === 'wide' ? 1
-        : Math.min(roleCols.cap, Number(section.maxCols) || 10, ...infos.map((i) => i.fp.maxCols || 6));
+        : Math.min(roleCols.cap, Number(section.maxCols) || 10, ...infos.map(itemCap));
     const autoCap = Number(section.autoCap) > 0 ? Number(section.autoCap)
         : section.target && section.target.cols ? section.target.cols
         : typeof roleCols.auto === 'object' ? (roleCols.auto[size] || roleCols.auto[look] || 2) : roleCols.auto;
@@ -513,7 +529,11 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     // (12.3's capacity tables; never above DN-1's 20 scored responses at L). The teacher's
     // explicit column count is never overridden (DN-12), and it only ever ADDS items.
     if (section.dense && !clamped && cls !== 'word' && cls !== 'wide' && hMin > 0) {
-        const dCeil = bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling;
+        // 12.1: a role that states its own ceiling (a Test: 20 / 16 / 12) is never packed past it,
+        // however dense it asks to be (round-3 re-grade: a Test printed 20 facts at L under a
+        // "At most 12 problems" note).
+        const dCeil0 = bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling;
+        const dCeil = section.ceiling !== undefined && section.ceiling !== null ? Math.min(dCeil0, ceiling) : dCeil0;
         const colOpts = requested === 'auto'
             ? Array.from({ length: Math.max(0, Math.min(Number(section.denseMaxCols) > 0 ? Number(section.denseMaxCols) : DENSE_MAX_COLS, hardCap) - cols + 1) }, (_, k) => cols + k)
             : [cols];
@@ -534,6 +554,11 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         if (best.perPage > rows * cols) {
             cols = best.cols;
             rows = best.rows;
+            // The note says what the page prints: a practice ceiling the dense tables go past
+            // (one-symbol answers up to 16, 12.1) is not reported as the page's limit.
+            if (rows * cols > ceiling) {
+                for (let k = notes.length - 1; k >= 0; k--) if (/^At most \d+ problems/.test(notes[k])) notes.splice(k, 1);
+            }
             notes.push(`Dense: ${cols} x ${rows}, cells sized to the problems.`);
         }
     }

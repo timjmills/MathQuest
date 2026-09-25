@@ -139,12 +139,12 @@ const MIXED_WORD_SKILLS = {
  *                               widget per card) still applies.
  * @returns {object|null} the question, or null if the skill generated nothing
  */
-export function generateQuestionFor({ category, skill, range, decimals, opts, seed, itemIndex, adaptive = false, gameMode } = {}) {
+export function generateQuestionFor({ category, skill, range, decimals, opts, seed, itemIndex, itemCount, adaptive = false, gameMode } = {}) {
     const saved = {
         category: state.category, skill: state.skill, range: state.range,
         decimalPlaces: state.decimalPlaces, gameMode: state.gameMode, isMixedMode: state.isMixedMode,
         skillOptions: state.skillOptions, fixedDifficulty: state.fixedDifficulty,
-        selectedNumbers: state.selectedNumbers, itemIndex: state.itemIndex,
+        selectedNumbers: state.selectedNumbers, itemIndex: state.itemIndex, itemCount: state.itemCount,
     };
     const restoreRandom = seed === undefined ? null : seedRandom(seed);
     try {
@@ -166,6 +166,9 @@ export function generateQuestionFor({ category, skill, range, decimals, opts, se
         // come out 3/2/1 instead of 2/2/2. Callers that do not track an index may omit it; the
         // generator then falls back to its own counter.
         state.itemIndex = Number.isFinite(itemIndex) ? itemIndex : undefined;
+        // S2: how many items of this skill the page holds, so a ticked support level FADES down the
+        // page in equal blocks (most support first) instead of cycling. Optional.
+        state.itemCount = Number.isFinite(itemCount) && itemCount > 0 ? itemCount : undefined;
         if (!state.selectedNumbers || !state.selectedNumbers.length) {
             state.selectedNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
         }

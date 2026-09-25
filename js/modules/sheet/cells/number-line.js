@@ -1,24 +1,29 @@
 // js/modules/sheet/cells/number-line.js
-// Addition on a number line, template id `number-line`.
+// Addition and subtraction on a number line, template id `number-line`
+// (number_line_add, number_line_sub, nl_add, nl_sub).
 //
-//        ⌒  ⌒  ⌒  ⌒                <- the jumps: drawn by the PUPIL; the key draws them
+//        ⌒  ⌒  ⌒  ⌒                <- ONE HOP PER NUMBER: drawn by the PUPIL; the key draws them
 //   ├──┼──●──┼──┼──┼──┼──┼──┼──┤→
-//   0  1  2  3  4  5  6  7  8  9 10  <- every whole number labelled, at the zone-label size
-//        3 + 4 = [  ]               <- the answer, in the pupil's own box
+//   0  1  2  3  4  5  6  7  8  9 10  <- EVERY whole number ticked and labelled, at the zone size
+//        3 + 4 = [  ]               <- the answer box IN the equation (any of its three numbers)
 //
-// Only the start is marked (a solid dot on the first addend): the line never shows the jumps or
-// the landing point on the pupil page (RP-1). The line spans the full width of a one-column cell
-// (LINE_MM, 2026-09-25 regrade: a line in 65% of the cell with 6 mm units and 9 pt labels was
-// too cramped for a Grade 1 pupil to draw jumps on): the unit pitch is the width over the units,
-// at most 16 mm, so a 0-10 line has 16 mm units and a 0-20 line 8.1 mm (the most A4 allows;
-// 10 mm units need a line of 16 or fewer). The labels are at least 12 pt (the zone-label size
-// token or 12 pt, never shrunk to fit). The line is one drawing at every column count (DN-10),
-// so the cell is one column wide.
+// Only the given point is marked (a solid dot on the start, or an open ring on the landing point
+// when the start is the missing number): the line never shows the jumps or the answer on the
+// pupil page (RP-1). The hops are a hint scaffold: a Guided cell (scaffold level 2-3) shows them
+// in trace grey, and they fade after it. The line spans the full width of a one-column cell
+// (LINE_MM): the unit pitch is the width over the units, at most 16 mm, so the window is only as
+// long as the item needs (0-10, 0-20, or a window of about 15 numbers around a bigger jump) and
+// every numeral fits at 12 pt or more (never shrunk to fit). The line is one drawing at every
+// column count (DN-10), so the cell is one column wide.
 //
-// The key draws the jumps, one arc per unit from the start, and writes the sum in the pupil's
-// box; a wrong piece of work (Error analysis) draws the jumps to where that wrong answer landed.
+// Owner request (2026-09-25): unit hops the pupil counts, every number labelled, the answer slot
+// in the equation (14 − [ ] = 11) instead of a separate Answer line, and the cell sized to its
+// content, so five problems fit a page.
 //
-// Payload: { max: 10|20, start, add }
+// The key draws the hops, one arc per unit from the start, and writes the answer in the pupil's
+// box; a wrong piece of work (Error analysis) draws the hops to where that wrong answer landed.
+//
+// Payload: { max, start, add, op?: '+'|'-', unknown?: 'result'|'a'|'b', min?: 0 }
 //
 // Pure module (SCC-01).
 
@@ -31,39 +36,59 @@ const PT_MM = 25.4 / 72;
 const LINE_MM = 176;
 const PAD_MM = 5;
 /** Unit pitch (mm): the line's width over its units, never more than 16 mm. */
-const pitchOf = (max) => Math.min(16, (LINE_MM - 2 * PAD_MM - 4) / Math.max(1, max));
+const pitchOf = (units) => Math.min(16, (LINE_MM - 2 * PAD_MM - 4) / Math.max(1, units));
 /** Label size (pt): the zone-label token, never under 12 pt. */
 const LABEL_PT_MIN = 12;
 
-function lineSVG(g, p, jumpsTo, ink) {
-    const max = Number(p.max) || 20, start = Number(p.start);
-    const pitch = pitchOf(max);
+/** The item's numbers: start, how many (the unit hops), the operation, the missing number. */
+function partsOf(p) {
+    const start = Number(p.start), add = Number(p.add);
+    const op = p.op === '-' || p.op === '−' ? '-' : '+';
+    const end = op === '+' ? start + add : start - add;
+    const unknown = ['a', 'b'].includes(p.unknown) ? p.unknown : 'result';
+    const min = Number.isFinite(Number(p.min)) ? Number(p.min) : 0;
+    const max = Number(p.max) || 20;
+    return { start, add, op, end, unknown, min, max, ans: unknown === 'a' ? start : unknown === 'b' ? add : end };
+}
+
+/**
+ * The line. `from` is where drawn hops start (the given start, or a written start), `hopsTo`
+ * where they end (null: none drawn), in `ink`.
+ */
+function lineSVG(g, p, hopsTo, ink, from = null) {
+    const t = partsOf(p);
+    const units = t.max - t.min;
+    const pitch = pitchOf(units);
     const pad = PAD_MM, x0 = pad;
-    const W = max * pitch + pad * 2 + 4;
+    const W = units * pitch + pad * 2 + 4;
     const labelMm = Math.max(LABEL_PT_MIN, g.zoneEm * g.pt) * PT_MM;   // zone size, >= 12 pt
     const arcH = Math.min(8, pitch * 0.75);
     const yLine = arcH + 3;
     const H = yLine + 3 + labelMm * 1.25 + 1;
-    const X = (v) => x0 + v * pitch;
-    let body = `<line x1="${(x0 - 2).toFixed(2)}" y1="${yLine}" x2="${(X(max) + 3).toFixed(2)}" y2="${yLine}" stroke="${INK.ink}" stroke-width="0.53"/>`;
-    body += `<path d="M${(X(max) + 4.5).toFixed(2)} ${yLine} l-2.4 -1.3 v2.6 z" fill="${INK.ink}"/>`;
-    for (let v = 0; v <= max; v++) {
-        const t = v % 5 === 0 ? 2.4 : 1.6;
-        body += `<line x1="${X(v).toFixed(2)}" y1="${(yLine - t).toFixed(2)}" x2="${X(v).toFixed(2)}" y2="${(yLine + t).toFixed(2)}" stroke="${INK.ink}" stroke-width="0.265"/>`;
+    const X = (v) => x0 + (v - t.min) * pitch;
+    let body = `<line x1="${(x0 - 2).toFixed(2)}" y1="${yLine}" x2="${(X(t.max) + 3).toFixed(2)}" y2="${yLine}" stroke="${INK.ink}" stroke-width="0.53"/>`;
+    body += `<path d="M${(X(t.max) + 4.5).toFixed(2)} ${yLine} l-2.4 -1.3 v2.6 z" fill="${INK.ink}"/>`;
+    for (let v = t.min; v <= t.max; v++) {
+        const tk = v % 5 === 0 ? 2.4 : 1.6;
+        body += `<line x1="${X(v).toFixed(2)}" y1="${(yLine - tk).toFixed(2)}" x2="${X(v).toFixed(2)}" y2="${(yLine + tk).toFixed(2)}" stroke="${INK.ink}" stroke-width="0.265"/>`;
         body += `<text x="${X(v).toFixed(2)}" y="${(yLine + 3 + labelMm).toFixed(2)}" text-anchor="middle" font-size="${labelMm.toFixed(2)}" font-family="Andika, sans-serif" fill="${INK.ink}">${v}</text>`;
     }
-    body += `<circle cx="${X(start).toFixed(2)}" cy="${yLine}" r="1.4" fill="${INK.ink}" data-nl-start="${start}"/>`;
-    if (jumpsTo !== null && ink) {
+    // The given point: the start, or (start missing) where the hops land. `data-nl-start` is
+    // where the screen's tap-to-jump line begins.
+    if (t.unknown === 'a') body += `<circle cx="${X(t.end).toFixed(2)}" cy="${yLine}" r="1.4" fill="#fff" stroke="${INK.ink}" stroke-width="0.4" data-nl-start="${t.end}"/>`;
+    else body += `<circle cx="${X(t.start).toFixed(2)}" cy="${yLine}" r="1.4" fill="${INK.ink}" data-nl-start="${t.start}"/>`;
+    if (hopsTo !== null && ink) {
         const colour = ink === 'trace' ? INK.grey : INK.ink;
-        const end = Math.max(0, Math.min(max, jumpsTo));
-        const dir = end >= start ? 1 : -1;
-        for (let v = start; v !== end; v += dir) {
+        const s0 = from === null ? t.start : from;
+        const end = Math.max(t.min, Math.min(t.max, hopsTo));
+        const dir = end >= s0 ? 1 : -1;
+        for (let v = Math.max(t.min, Math.min(t.max, s0)); v !== end; v += dir) {
             const a = X(v), b = X(v + dir);
             body += `<path d="M${a.toFixed(2)} ${(yLine - 0.6).toFixed(2)} Q${((a + b) / 2).toFixed(2)} ${(yLine - arcH * 1.3).toFixed(2)} ${b.toFixed(2)} ${(yLine - 0.6).toFixed(2)}" fill="none" stroke="${colour}" stroke-width="0.4" data-ws-ink="${ink}"/>`;
         }
         body += `<circle cx="${X(end).toFixed(2)}" cy="${yLine}" r="1.1" fill="none" stroke="${colour}" stroke-width="0.4"/>`;
     }
-    const svg = `<svg viewBox="0 0 ${W.toFixed(2)} ${H.toFixed(2)}" role="img" aria-label="number line from 0 to ${max}, start at ${start}" `
+    const svg = `<svg viewBox="0 0 ${W.toFixed(2)} ${H.toFixed(2)}" role="img" aria-label="number line from ${t.min} to ${t.max}${t.unknown === 'a' ? '' : `, start at ${t.start}`}" `
         + `style="display:block;margin:0 auto;width:${g.em(W)};height:${g.screen ? 'auto' : g.em(H)};max-width:${g.screen ? '100%' : 'none'};overflow:visible">${body}</svg>`;
     return { svg, wMm: W, hMm: H };
 }
@@ -72,20 +97,34 @@ register('number-line', {
     render(p, ctx) {
         const g = geo(ctx);
         const ink = inkOf(ctx);
-        const sum = Number(p.start) + Number(p.add);
-        const vals = slotValues(ctx, { answer: String(sum) }, (w) => ({ answer: String(w).trim() }));
+        const t = partsOf(p);
+        const vals = slotValues(ctx, { answer: String(t.ans) }, (w) => ({ answer: String(w).trim() }));
         const shown = vals.answer !== undefined && vals.answer !== '' ? Number(vals.answer) : null;
-        const line = lineSVG(g, p, Number.isFinite(shown) ? shown : null, ink);
+        // The drawn hops follow the WRITTEN answer (a wrong one lands where it says): the landing
+        // point, the jump from the start, or the hops from a written start to the given end.
+        let to = null, from = null, hopInk = ink;
+        if (Number.isFinite(shown)) {
+            if (t.unknown === 'result') to = shown;
+            else if (t.unknown === 'b') to = t.op === '+' ? t.start + shown : t.start - shown;
+            else { from = shown; to = t.end; }
+        } else if (!g.twin && ctx && Number(ctx.scaffoldLevel) >= 2) {
+            // The hint: a Guided cell shows the unit hops in grey before anything is written.
+            to = t.end; hopInk = 'trace';
+            if (t.unknown === 'a') from = t.start;
+        }
+        const line = lineSVG(g, p, to, hopInk, from);
         const bw = Math.max(g.writeMm * 2, 2 * 0.62 * g.E + 4);
+        const slot = box(g, 'answer', { wMm: bw, hMm: g.stripMm, value: vals.answer || '', ink, mark: 'blank' });
+        const part = (which, v) => (t.unknown === which ? slot : `<span>${esc(v)}</span>`);
+        const op = (c) => `<span style="font-weight:700;width:1em;text-align:center">${c}</span>`;
+        // The answer box is IN the equation (no separate full-width Answer line).
         const eq = `<div style="display:inline-flex;align-items:center;gap:0.28em;white-space:nowrap;margin-top:0.3em">`
-            + `<span>${esc(p.start)}</span><span style="font-weight:700;width:1em;text-align:center">+</span><span>${esc(p.add)}</span>`
-            + `<span style="font-weight:700;width:1em;text-align:center">=</span>`
-            + box(g, 'answer', { wMm: bw, hMm: g.stripMm, value: vals.answer || '', ink, mark: 'blank' }) + '</div>';
+            + part('a', t.start) + op(t.op === '+' ? '+' : '−') + part('b', t.add) + op('=') + part('result', t.end) + '</div>';
         return root(g, 'number-line', `${line.svg}${eq}`, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
     answerKey(p) {
-        const sum = Number(p.start) + Number(p.add);
-        return { value: sum, display: String(sum), slots: { answer: { value: String(sum), graded: true } } };
+        const t = partsOf(p);
+        return { value: t.ans, display: String(t.ans), slots: { answer: { value: String(t.ans), graded: true } } };
     },
     footprint(p, ctx) {
         const g = geo(ctx);

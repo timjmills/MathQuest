@@ -6,10 +6,10 @@ import { openZoomModal, ZOOM_CLICK_IS_ANSWER_TYPES } from './question-render.js'
 import { generateQuestion, generateQuestionFor } from './generate-question.js';
 import { deriveSeed } from './sheet/index.js';
 import {
-    cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
+    cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
 } from './screen-cell.js';
 
@@ -539,7 +539,35 @@ function mountWorksheetDnd(q, idx, host) {
         }
         host.dataset.dndIdx = String(idx);
         mod.renderDndGeneric(q, host);
+        _wsProxyDndSubmit(idx, host);
     }).catch(err => console.error('Failed to load dnd-generic widget for worksheet:', err));
+}
+
+// Round 3 (H4): the widget's grey Submit sat inside the black-and-white cell. It stays in the
+// widget (the widget enables it when every tile is placed, and grades through it) but is hidden;
+// a Check in the card's chrome bar presses it. Controls live outside the cell.
+function _wsProxyDndSubmit(idx, host) {
+    const card = document.getElementById(`ws_card_${idx}`);
+    const bar = card && card.querySelector('.mq-wsbar');
+    if (!bar || !host) return;
+    host.classList.add('mq-dnd-proxied');
+    if (bar.querySelector('.mq-wscheck')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mq-wscheck';
+    btn.textContent = 'Check';
+    btn.title = 'Check this problem';
+    btn.setAttribute('aria-label', `Check problem ${idx + 1}`);
+    btn.addEventListener('click', () => {
+        const sub = host.querySelector('.dnd-submit');
+        if (sub && !sub.disabled) { sub.click(); return; }
+        let fb = host.querySelector('.ws-dnd-feedback');
+        if (!fb) { fb = document.createElement('div'); fb.className = 'ws-dnd-feedback'; host.appendChild(fb); }
+        fb.style.cssText = 'margin-top:8px;font-weight:600;text-align:center;';
+        fb.textContent = 'Put every number in a box first.';
+    });
+    const skip = bar.querySelector('.ws-skip-btn');
+    bar.insertBefore(btn, skip || null);
 }
 
 // Submit-callback adapter for dnd-generic. Stores the per-card verdict and
@@ -840,7 +868,8 @@ function _wsHeaderPill() {
     let label = '';
     const mixed = /mixed|_all$/.test(String(state.skill || '')) || String(state.category || '').includes('mixed');
     if (mixed) label = 'Mixed practice';
-    else if (typeof window !== 'undefined' && typeof window.getSkillLabelForQuestion === 'function') {
+    else label = skillDisplayLabel(state.category, state.skill);
+    if (!label && !mixed && typeof window !== 'undefined' && typeof window.getSkillLabelForQuestion === 'function') {
         try { label = window.getSkillLabelForQuestion(state.skill) || ''; } catch (e) { label = ''; }
     }
     if (!label && state.worksheetQs[0]) label = state.worksheetQs[0].skillLabel || '';
@@ -926,7 +955,7 @@ export function layoutWorksheetGrid(grid) {
     unifyFactTracks(grid);
     const cards = Array.from(grid.querySelectorAll(':scope > .problem-card.mq-wscard'));
     if (!cards.length) return;
-    cards.forEach(c => c.classList.remove('mq-span-row'));
+    cards.forEach(c => c.classList.toggle('mq-span-row', c.dataset.mqSpan === '1'));   // a pv mat keeps its row (round 3)
     const w = grid.clientWidth;
     const maxCols = w >= 960 ? 3 : w >= 620 ? 2 : 1;
     for (let cols = maxCols; cols >= 1; cols--) {
@@ -1347,7 +1376,7 @@ function _wsRenderCard(grid, q, i) {
     // The paper cell's screen twin (regrade 2026-09-25): a build mat, a cloze's boxes and lists,
     // a strip's boxed blanks, a sentence's boxes, counters to ring - the model the pupil works in,
     // never a retyped number or one line for two answers.
-    const twin = (!kind && !isMultipleChoice && !isMultiSelectCheck && !isDndGeneric && !isDragFill) ? screenTwin(q) : null;
+    const twin = (!kind && !isMultipleChoice && !isMultiSelectCheck && !isDndGeneric && !isDragFill) ? screenTwin(q, { categoryId: q.categoryId || state.category }) : null;
     if (twin) {
         questionDisplay = twin.html;
         q._mqTwin = twin.mode;
@@ -1365,11 +1394,14 @@ function _wsRenderCard(grid, q, i) {
         + ` data-index="${i}" inputmode="${_slotNumeric ? 'numeric' : 'text'}" autocomplete="off" spellcheck="false"`
         + ` aria-label="answer, problem ${i + 1}" style="--mq-n:${_slotN};${answerInputStyle ? 'display:none;' : ''}">`;
     let slotInCell = false;
+    // S2: the set's ticked supports, dealt for card i of the sheet (screen-cell.js).
+    let _wsSupports = null;
+    try { _wsSupports = kind ? screenSupportsFor(q, kind, { index: i, total: state.problemCount > 0 ? state.problemCount : 10, categoryId: state.category, skillId: state.skill }) : null; } catch (e) { _wsSupports = null; }
     if (kind) {
         if (kind.kind === 'stack') {
-            questionDisplay = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill), idPrefix: `ws${i}` });
+            questionDisplay = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill), idPrefix: `ws${i}`, supports: _wsSupports });
         } else {
-            questionDisplay = kindHTML(kind, { slotHtml: inputHtml }) + (kind.kind === 'division' ? workRowsHTML(kind) : '');
+            questionDisplay = kindHTML(kind, { slotHtml: inputHtml, supports: _wsSupports }) + (kind.kind === 'division' ? workRowsHTML(kind) : '');
             slotInCell = true;
         }
     }
@@ -1447,15 +1479,17 @@ function _wsRenderCard(grid, q, i) {
         if (!kind) wireTickBoxes(cellEl, q, document.getElementById(`ws_input_${i}`));
         // One slot per answer (SL-7): the visual's own blank takes the input; the separate
         // answer row under the cell then goes.
-        if (!kind && answerRow && !(q.options && q.options.length)) {
+        if (!kind && answerRow && (!(q.options && q.options.length) || (twin && twin.kit))) {
             const row = cellEl.querySelector(':scope > .mq-answerrow');
             const inp = row && row.querySelector(`#ws_input_${i}`);
-            if (inp && adoptVisualBlank(cellEl, inp)) row.remove();
+            if (inp && adoptVisualBlank(cellEl, inp)) { row.remove(); wireSignCircle(cellEl, inp); }
             else if (inp && (q.answerType === 'number' || !q.answerType) && adoptSvgBlank(cellEl, inp)) row.remove();
             // several blanks in one drawing: an input in each, feeding the (hidden) card input
             else if (inp && wireCellSlots(cellEl, inp)) row.style.display = 'none';
         }
         wireStackEntry(cellEl);
+        // green as soon as it is right (owner request 2026-09-25): digit, regroup and answer boxes
+        try { wireLiveCorrect(cellEl, { q, kind, single: document.getElementById(`ws_input_${i}`) }); } catch (e) { /* optional */ }
         {
             // a drawing with its own answer boxes (fact family, area model): those boxes are the
             // slots; the card's own input is fed from them and its line is not drawn (H8)
@@ -1471,6 +1505,8 @@ function _wsRenderCard(grid, q, i) {
             const inp = document.getElementById(`ws_input_${i}`);
             wireRingGroups(cellEl);
             wireClozeBanks(cellEl);
+            // the place-value mat needs three zones side by side: its card takes the whole row (round 3)
+            if (twin.mode === 'build' && q.answerType === 'pv-build') { card.classList.add('mq-span-row'); card.dataset.mqSpan = '1'; }
             if ((twin.mode === 'build' || twin.mode === 'model') && inp) {
                 const row = cellEl.querySelector(':scope > .mq-answerrow');
                 if (row) row.style.display = 'none';
@@ -1487,6 +1523,7 @@ function _wsRenderCard(grid, q, i) {
                 const line = el.parentNode && el.parentNode.querySelector(':scope > .question-line.mq-instr');
                 if (line) Array.from(el.children).forEach(c => hideRepeatedPrompt(c, line.textContent));
                 if (!kind) _wsFitDigits(card, el, q);
+                if (!kind) fitTwinRows(el);          // a twin's rows wrap, never clip (round 3)
             },
         });
     }

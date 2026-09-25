@@ -53,6 +53,10 @@ function cellMm(n, size) {
  */
 function rowMm(n, size) {
     if (n >= 12) return { S: 12, M: 12.5, L: 13 }[size];
+    // R3 (critic round 3): a 4 x 5 window in 14 mm rows was a hair too tall for three charts to
+    // a page, so two stood in cells with a 45% empty band. 12.5 mm rows (still taller than the
+    // writing height) fit three rows of windows.
+    if (n <= 6) return { S: 12, M: 12, L: 12.5 }[size];
     return cellMm(n, size);
 }
 

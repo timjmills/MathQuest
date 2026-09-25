@@ -24,6 +24,10 @@
 //   --count N                 legacy: items per section (default 20, the print dialog's default)
 //   --roles r1,r2             kit: the page roles to lint (default independent); any role buildSheet knows
 //   --anchors side|sections   kit: print with step-by-step anchor problems (S6); adds L-ANCHOR
+//   --supports all|id,id      kit: print every skill with supports on (S2): `all` ticks every
+//                             render-time support its Support control offers; adds L-SUPPORT
+//   --cover whole|needed|fade kit, with --supports: the sheet's coverage (default whole)
+//   --mix section|problem     kit, with --supports: how clashing supports are shared (default section)
 //   --no-combined             legacy: skip the combined multi-section sheet (see below)
 //   --lints L-INK,L-KEY       only report these lints (the others still run)
 //   --json out.json           machine-readable findings for the critic loop
@@ -84,6 +88,12 @@
 //   L-ANCHOR   S6 / PT-LBL-6 (kit, with --anchors side|sections): every step-by-step anchor cell carries
 //              the outlined Model tab, no letter or tab label and no answer slot (anchors are unscored),
 //              and draws identically on the key.
+//   L-SUPPORT  S2 (kit, with --supports): no answer inside a support (a number the key adds to a cell
+//              appears in no text of its [data-ws-support-on] parts, reference scales excepted); every
+//              ÷ tally-dot row of a section has the same length (never the quotient); GEOMETRY PARITY:
+//              in a section, cells of one shape put their answer slot in the same place whether their
+//              supports are drawn or only reserved (the answer zone never moves); the key draws the
+//              same supports as the pupil page.
 //
 // DETERMINISM. The app runs with a seeded Math.random, reseeded per skill from hash(category:skill)
 // exactly as ws-grade-render does, so the same tree prints the same items and this gate's output is
@@ -104,7 +114,88 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 && argv[
 const has = k => argv.includes('--' + k);
 
 const TOOL = 'ws-print-lint';
-const LINTS = ['L-INK', 'L-EMOJI', 'L-FONT', 'L-SIZE', 'L-OVERFLOW', 'L-SPLIT', 'L-DENSITY', 'L-KEY', 'L-VERBS', 'L-ANSAREA', 'L-INPUT', 'L-CCSS', 'L-ANCHOR'];
+const LINTS = ['L-INK', 'L-EMOJI', 'L-FONT', 'L-SIZE', 'L-OVERFLOW', 'L-SPLIT', 'L-DENSITY', 'L-KEY', 'L-VERBS', 'L-ANSAREA', 'L-INPUT', 'L-CCSS', 'L-ANCHOR', 'L-SUPPORT'];
+
+/**
+ * L-SUPPORT (S2): runs IN the rendered sheet document (the page lintHtmlInSheetPage prints from).
+ * Returns findings. Serialised by page.evaluate, so it uses nothing from this file.
+ */
+function supportCheckInPage() {
+    const out = [];
+    const MM = 96 / 25.4;
+    const pages = (mode) => Array.from(document.querySelectorAll(`[data-ws-mode="${mode}"]`));
+    const cellsOf = (mode) => pages(mode).flatMap((p) => Array.from(p.querySelectorAll('.ws-cell'))).filter((c) => !/mq-anchorcell/.test(c.className));
+    const P = cellsOf('print'), K = cellsOf('key');
+    const nums = (t) => (String(t).replace(/(\d),(?=\d{3}\b)/g, '$1').match(/\d+/g) || []);
+    // Text nodes joined by spaces: digits written one per track still read as one number only
+    // when they share a text node's neighbours, never glued to the next box's text.
+    const words = (el) => {
+        const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+        const out = [];
+        let n;
+        while ((n = w.nextNode())) out.push(n.nodeValue);
+        return out.join(' ');
+    };
+    const textOf = (el) => {
+        const c = el.cloneNode(true);
+        c.querySelectorAll('[data-ws-ref], [aria-hidden="true"]').forEach((x) => x.remove());
+        return words(c);
+    };
+    // 1. no answer inside a support
+    P.forEach((cell, i) => {
+        const sup = Array.from(cell.querySelectorAll('[data-ws-support-on]'));
+        if (!sup.length) return;
+        const k = K[i];
+        if (!k) return;
+        const pn = nums(words(cell)), kn = nums(words(k));
+        const left = pn.slice();
+        const answers = [];
+        for (const n of kn) { const j = left.indexOf(n); if (j >= 0) left.splice(j, 1); else answers.push(n); }
+        // a column answer written one digit per track reads as one number in the key's text
+        for (const el of sup) {
+            const t = nums(textOf(el));
+            const hit = answers.find((a) => a.length && t.includes(a) && !nums(textOf(cell.querySelector('.ws-pane-problem') || document.createElement('i'))).includes(a));
+            if (hit) out.push({ lint: 'L-SUPPORT', rule: 'RP-1', sev: 'critical', msg: `cell ${i + 1}: the ${el.getAttribute('data-ws-support-on')} support shows the answer ${hit}`, key: 'support answer' });
+        }
+    });
+    // 2. the ÷ tally rows of a grid are one length
+    const grids = Array.from(document.querySelectorAll('[data-ws-mode="print"] .ws-grid'));
+    grids.forEach((g, gi) => {
+        const rows = Array.from(g.querySelectorAll('.ws-td-tallyrow'));
+        const lens = [...new Set(rows.map((r) => `${r.getAttribute('data-ws-tally')}:${r.querySelectorAll('.ws-td-mark').length}`))];
+        if (lens.length > 1) out.push({ lint: 'L-SUPPORT', rule: 'S1.7', sev: 'major', msg: `section grid ${gi + 1}: the ÷ tally rows differ in length (${lens.join(', ')})`, key: 'tally length' });
+    });
+    // 3. geometry parity: one shape, one answer-slot place, supports drawn or reserved
+    grids.forEach((g, gi) => {
+        const seen = new Map();
+        for (const cell of Array.from(g.querySelectorAll('.ws-cell'))) {
+            if (!cell.querySelector('.ws-supported, [data-ws-support-reserve]')) continue;
+            const slot = cell.querySelector('[data-ws-slot]');
+            if (!slot) continue;
+            const prob = cell.querySelector('.ws-fact, .ws-stack, .ws-eq, .ws-pane-problem');
+            // One SHAPE: the same template and the same drawn problem box (to 0.5 mm). A cell whose
+            // own problem is wider sits differently in any centred cell, support or none.
+            const pb = prob ? prob.getBoundingClientRect() : null;
+            const half = (v) => Math.round((v / MM) * 2) / 2;
+            const sig = [...(cell.className.match(/mqt--[\w-]+/) || [''])].join('') + '|' + (prob ? prob.getAttribute('style') || '' : '') + '|' + (prob ? prob.children.length : 0)
+                + '|' + (pb ? `${half(pb.width)}x${half(pb.height)}` : '');
+            const cr = cell.getBoundingClientRect(), sr = slot.getBoundingClientRect();
+            const off = [(sr.left - cr.left) / MM, (sr.top - cr.top) / MM];
+            const drawn = !!cell.querySelector('[data-ws-support-on]');
+            if (!seen.has(sig)) { seen.set(sig, { off, drawn }); continue; }
+            const s0 = seen.get(sig);
+            if (Math.abs(s0.off[0] - off[0]) > 0.6 || Math.abs(s0.off[1] - off[1]) > 0.6) {
+                out.push({ lint: 'L-SUPPORT', rule: 'SCC-T10', sev: 'major', msg: `section grid ${gi + 1}: the answer zone moves between cells of one shape (${s0.off.map((v) => v.toFixed(1))} vs ${off.map((v) => v.toFixed(1))} mm, supports ${s0.drawn ? 'drawn' : 'reserved'} / ${drawn ? 'drawn' : 'reserved'})`, key: 'support parity' });
+                break;
+            }
+        }
+    });
+    // 4. the key draws the same supports
+    const tag = (cs) => cs.map((c) => Array.from(c.querySelectorAll('[data-ws-support-on]')).map((e) => e.getAttribute('data-ws-support-on')).join('+') + `#${c.querySelectorAll('.ws-td-svg').length}`).join(',');
+    if (K.length && tag(P) !== tag(K)) out.push({ lint: "L-SUPPORT", rule: "AK-1", sev: "critical", msg: `the key draws the supports differently from the pupil page (${P.length} / ${K.length} cells; ${tag(P).slice(0, 60)} vs ${tag(K).slice(0, 60)})`, key: "support key" });
+    const count = P.filter((c) => c.querySelector('[data-ws-support-on], .ws-td-svg')).length;
+    return { findings: out, supported: count };
+}
 
 /**
  * L-ANCHOR (S6, PT-LBL-6): the anchor cells of a kit document, read from its HTML. Each anchor
@@ -608,6 +699,38 @@ function wsLintPage(cfg) {
                 if (!r.width || !r.height) continue;
                 const over = Math.max(r.right - cr.right, cr.left - r.left, r.bottom - cr.bottom, cr.top - r.top);
                 if (over > TOL) { F('L-OVERFLOW', 'PG-12', 'major', d, `sticks out of its cell by ${mm(over)} mm (cell ${mm(cr.width)} x ${mm(cr.height)} mm) (PG-12, CL-1)`, 'out of cell'); break; }
+            }
+        }
+        /* L-DENSITY H13 (RUBRIC hard cap, owner 2026-09-25): a kit cell whose drawing leaves one empty
+           band of 30% or more of the cell's height (or width) - a row sized for a taller item than it
+           holds. The content box is every visible in-flow descendant (absolutely placed labels, tabs
+           and the key's answer stamp excluded); the band is measured inside the cell's padding. */
+        if (!isLegacy) {
+            for (const c of ri.cells) {
+                if (c.classList.contains('blankrun') || c.closest('.mq-anchorgrid') || c.querySelector('[data-ws-anchor]')) continue;
+                const cr = c.getBoundingClientRect();
+                if (cr.height < 12 * PX || cr.width < 12 * PX) continue;
+                const cs = getComputedStyle(c);
+                const inner = { t: cr.top + parseFloat(cs.paddingTop), b: cr.bottom - parseFloat(cs.paddingBottom), l: cr.left + parseFloat(cs.paddingLeft), r: cr.right - parseFloat(cs.paddingRight) };
+                let box = null;
+                for (const d of c.querySelectorAll('*')) {
+                    if (!visible(d)) continue;
+                    if (d.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab, .ws-legacy-answer')) continue;
+                    if (getComputedStyle(d).position === 'absolute') continue;
+                    const r = d.getBoundingClientRect();
+                    if (!r.width || !r.height) continue;
+                    if (d.children.length && !(d instanceof SVGElement) && !d.textContent.trim() && !/^(svg|img|canvas)$/i.test(d.tagName)) {
+                        const bs = getComputedStyle(d);
+                        if (!(parseFloat(bs.borderTopWidth) || parseFloat(bs.borderBottomWidth))) continue;
+                    }
+                    box = box ? { t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom), l: Math.min(box.l, r.left), r: Math.max(box.r, r.right) } : { t: r.top, b: r.bottom, l: r.left, r: r.right };
+                }
+                if (!box) continue;
+                const H = cr.height, W = cr.width;
+                const vBand = Math.max(box.t - inner.t, inner.b - box.b, 0);
+                const hBand = Math.max(box.l - inner.l, inner.r - box.r, 0);
+                if (vBand >= 0.3 * H) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(vBand)} mm tall in a ${mm(H)} mm cell (${Math.round((vBand / H) * 100)}%): the row is sized for a taller item than it holds (RUBRIC H13)`, 'empty band in cell');
+                else if (hBand >= 0.3 * W) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(hBand)} mm wide in a ${mm(W)} mm cell (${Math.round((hBand / W) * 100)}%): the content is pinned to one side (RUBRIC H13)`, 'empty band in cell');
             }
         }
         if (!isLegacy) {
@@ -1467,7 +1590,13 @@ async function lintHtmlInSheetPage(app, html, id, mode) {
         await sheet.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
         // a sheet linted without its own stylesheets or fonts measures nothing real
         if (failed.length) throw new Error(`the document's stylesheet / font requests failed: ${failed.slice(0, 3).join(', ')}`);
-        return await lintDocument(sheet, { id, mode });
+        const res = await lintDocument(sheet, { id, mode });
+        if (mode === 'kit' && arg('supports', null)) {
+            const sr = await sheet.evaluate(supportCheckInPage);
+            res.findings.push(...sr.findings);
+            res.info.supported = sr.supported;
+        }
+        return res;
     } finally { await sheet.close(); }
 }
 
@@ -1500,16 +1629,25 @@ async function runApp(source) {
                     await renderPrint(page, s, { problemCount: COUNT, includeAnswerKey: true });
                     html = await legacyDocumentHtml(page);
                 } else {
-                    html = await page.evaluate(async ({ s, seed, COUNT, role, ANCHORS }) => {
+                    html = await page.evaluate(async ({ s, seed, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX }) => {
                         // js/modules/print-sheet.js buildSheet(req): sections carry the skills; the result has
                         // pupilHtml and keyHtml (the facsimile key, same plan).
                         const practice = role === 'independent' || role === 'more-practice';
-                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId }], count: practice ? COUNT : undefined }], size: 'L', look: practice ? 'ican' : 'auto', key: true, seed, anchors: ANCHORS };
+                        // S2: --supports ticks the skill's supports (all = every render-time value offered).
+                        let opts;
+                        if (SUPPORTS) {
+                            const def = window.offeredOptionsFor(s.categoryId, s.skillId).find((d) => d.id === 'support' && d.supportsModel);
+                            if (def) {
+                                const want = SUPPORTS === 'all' ? def.render : SUPPORTS.split(',').filter((v) => def.render.includes(v));
+                                opts = { support: [...new Set([...(def.default || []), ...want])] };
+                            }
+                        }
+                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId, opts }], count: practice ? COUNT : undefined }], size: 'L', look: practice ? 'ican' : 'auto', key: true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
                         let out;
                         try { out = await window.buildSheet(req); } catch (e) { if (e && e.unsupported) return { unsupported: e.message }; throw e; }
                         const body = [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');
                         return { doc: window.sheetDocument(body, s.label), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml };
-                    }, { s, seed, COUNT: parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off') });
+                    }, { s, seed, COUNT: parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null) });
                     if (html && html.doc) { kitHalves = html; html = html.doc; }
                 }
                 if (html && html.unsupported) {
@@ -1660,6 +1798,13 @@ const SELF_TESTS = [
         p1.querySelector('.ws-foot b').textContent = '1/2'; p2.querySelector('.ws-foot b').textContent = '2/2';
         [...p1.querySelectorAll('[data-ws-cell]')].slice(2).forEach(c => c.remove());
     } },
+    { name: 'empty band under a cell drawing (H13)', expect: ['L-DENSITY', 'H13'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.style.justifyContent = 'flex-start';
+        c.insertAdjacentHTML('afterbegin', '<div style="height:1mm"></div>');
+        const g = c.closest('.ws-grid');
+        if (g) g.style.gridTemplateRows = `${Math.max(3 * c.getBoundingClientRect().height, 60 * 96 / 25.4)}px repeat(20, auto)`;
+    } },
     { name: 'eight items on an Independent page', expect: ['L-DENSITY', 'DN-1'], fn: () => {
         const p1 = document.querySelector('.ws-page');
         p1.setAttribute('data-ws-role', 'independent');
@@ -1720,6 +1865,7 @@ async function selfTest() {
     const env = await launchBare();
     const bad = [];
     let asserts = 0;
+    let supportCovered = false;
     // 11-A (the plain sheet) and 11-I (its facsimile key): a pupil page and its key, both approved
     const prepare = async () => {
         const page = await env.browser.newPage();
@@ -1774,6 +1920,33 @@ async function selfTest() {
                 else bad.push(`${t.name}: expected ${e.join(' ')}, got ${groupFindings(r.findings).map(g => `${g.lint} ${g.rule}`).join(', ') || 'nothing'}`);
             }
         }
+        // L-SUPPORT runs in the rendered document (supportCheckInPage): proven on planted pages.
+        {
+            const page = await env.browser.newPage();
+            const cell = (sup, pre = '', extra = '') => `<div class="ws-cell mqt--fact" style="position:relative;width:60mm;height:40mm">`
+                + `<div class="ws-supported">${pre}<div class="ws-pane-problem"><div class="ws-fact" style="x">7 5<span data-ws-slot="ans" style="display:block;">&nbsp;</span></div></div>${sup}</div>${extra}</div>`;
+            const doc = (pupil, key) => `<html><body><section data-ws-mode="print"><div class="ws-grid">${pupil.join('')}</div></section><section data-ws-mode="key"><div class="ws-grid">${key.join('')}</div></section></body></html>`;
+            const tile = '<div data-ws-support-on="tile">7 and 5</div>';
+            const keyed = (c) => c.replace('&nbsp;', '12');
+            const cases = [
+                ['support clean', doc([cell(tile), cell(tile)], [keyed(cell(tile)), keyed(cell(tile))]), null],
+                ['support showing the answer', doc([cell('<div data-ws-support-on="line">12</div>')], [keyed(cell('<div data-ws-support-on="line">12</div>'))]), ['L-SUPPORT', 'RP-1']],
+                ['tally rows of two lengths', doc([cell('<div data-ws-support-on="touch"><div class="ws-td-tallyrow" data-ws-tally="10"></div></div>'), cell('<div data-ws-support-on="touch"><div class="ws-td-tallyrow" data-ws-tally="12"></div></div>')], []), ['L-SUPPORT', 'S1.7']],
+                ['answer zone moves', doc([cell(tile), cell('<div data-ws-support-reserve="tile"></div>', '<div style="height:9mm"></div>')], []), ['L-SUPPORT', 'SCC-T10']],
+                ['key without the supports', doc([cell(tile)], [keyed(cell(''))]), ['L-SUPPORT', 'AK-1']],
+            ];
+            let allOk = true;
+            for (const [name, html, want] of cases) {
+                asserts++;
+                await page.setContent(html);
+                const f = (await page.evaluate(supportCheckInPage)).findings;
+                const hit = want ? f.some(x => x.lint === want[0] && x.rule === want[1]) : !f.length;
+                if (hit) console.log(`  ok   ${name}: ${want ? want.join(' ') + ' fired' : '0 findings'}`);
+                else { allOk = false; bad.push(`${name}: expected ${want ? want.join(' ') : 'no findings'}, got ${f.map(x => `${x.lint} ${x.rule} ${x.msg}`).join(', ') || 'nothing'}`); }
+            }
+            await page.close();
+            if (allOk) supportCovered = true;
+        }
     } finally { await env.close(); }
     const lintsCovered = new Set(SELF_TESTS.flatMap(t => (Array.isArray(t.expect[0]) ? t.expect : [t.expect]).map(e => e[0])));
     {
@@ -1797,6 +1970,7 @@ async function selfTest() {
         }
         if (allOk) lintsCovered.add('L-ANCHOR');
     }
+    if (supportCovered) lintsCovered.add('L-SUPPORT');
     const uncovered = LINTS.filter(l => !lintsCovered.has(l));
     if (uncovered.length) bad.push(`lints with no self-test: ${uncovered.join(', ')}`);
     if (bad.length) { console.error(`${TOOL}: FAIL - ${bad.length} self-test(s)`); bad.forEach(b => console.error('  - ' + b)); process.exit(1); }

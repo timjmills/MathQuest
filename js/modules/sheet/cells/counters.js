@@ -21,7 +21,7 @@
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import {
-    L, P, svg, root, box, slotValue, shapeOf, dot, cross, digitPt, textPt, squareMm, inlineBoxMm, INK, SW, n2, groupRuns,
+    L, P, svg, root, box, slotValue, shapeOf, dot, cross, digitPt, textPt, squareMm, inlineBoxMm, INK, GREY, SW, n2, groupRuns, isTwin, looseArray,
 } from './k2kit.js';
 
 const MINUS = '−';
@@ -48,11 +48,16 @@ function countPicture(ctx, n, shape, p = {}) {
     const cols = Math.min(per, Math.max(1, n));
     const rows = Math.ceil(n / per);
     const w = (cols - 1) * pitch + d + 1;
-    const h = (rows - 1) * pitch + d + 1 + (!line && rows > 2 ? gap : 0);
+    const under = p.countMarks && rows === 1;   // R3: a one-row Model counts in numerals UNDER its objects
+    const h = (rows - 1) * pitch + d + 1 + (!line && rows > 2 ? gap : 0) + (under ? 5.5 : 0);
     let body = '';
     for (let i = 0; i < n; i++) {
         const r = Math.floor(i / per);
-        body += shapeOf(shape).draw(0.5 + d / 2 + (i % per) * pitch, 0.5 + d / 2 + r * pitch + (!line && r >= 2 ? gap : 0), d);
+        const cx = 0.5 + d / 2 + (i % per) * pitch, cy = 0.5 + d / 2 + r * pitch + (!line && r >= 2 ? gap : 0);
+        body += shapeOf(shape).draw(cx, cy, d);
+        // R3 (critic round 3): the worked Model counts in grey, one number on each object in
+        // touch order, so Steps 1-3 (touch, count, the last number is how many) are shown.
+        if (p.countMarks) body += `<text x="${n2(cx)}" y="${n2(under ? cy + d / 2 + 5 : cy + 1.4)}" text-anchor="middle" font-size="${under ? 4.6 : 3.8}" font-weight="700" font-family="Andika, sans-serif" fill="${GREY}" data-ws-ink="trace">${i + 1}</text>`;
     }
     return svg(ctx, w, h, body, { label: `${n} ${shapeOf(shape).plural}` });
 }
@@ -130,7 +135,9 @@ export function shareColumns(n, size) {
  */
 function sharePicture(ctx, n, size) {
     const d = 5;
-    const lay = groupRuns(n, size, { d, gap: 4, runGap: 9, rowGap: 7, pad: 1 });
+    // R3 (critic round 3): runs of the group size WERE the groups, so the answer showed without a
+    // ring drawn. A neutral array (k2kit looseArray) leaves the grouping to the pupil.
+    const lay = looseArray(n, size, { d, gap: 5, rowGap: 8, pad: 1 });
     const body = lay.pts.map((c) => dot(c.cx, c.cy, d)).join('');
     return svg(ctx, lay.w, lay.h, body, { label: `${n} counters` });
 }
@@ -144,7 +151,10 @@ register('counters', {
         if (p.kind === 'takeaway') {
             const b = inlineBoxMm(ctx, 1);
             const slot = box(ctx, { value: slotValue(ctx, 'answer', kv), w: b.w, h: b.h, mark: 'blank' });
-            return root(ctx, 'k2-takeaway', `<div style="display:flex;justify-content:center;">${takeawayPicture(ctx, p.n, p.m, p.shape)}</div>`
+            // R3: `crossOnKey` (a story's work space) draws the objects uncrossed for the pupil, who
+            // does the take-away; the key shows the crosses.
+            const crossed = p.crossOnKey && ctx.state === 'blank' ? 0 : p.m;
+            return root(ctx, 'k2-takeaway', `<div style="display:flex;justify-content:center;">${takeawayPicture(ctx, p.n, crossed, p.shape)}</div>`
                 + `<div class="ws-eq" style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 1.5)};margin-top:${L(ctx, 5)};white-space:nowrap;">`
                 + `${eqSpan(ctx, p.n)}${opSpan(ctx, MINUS)}${eqSpan(ctx, p.m)}${opSpan(ctx, '=')}${slot}</div>`);
         }
@@ -161,10 +171,15 @@ register('counters', {
         // P11 Support level 3: the answer written in grey to trace (the traced state of the slot).
         const tctx = p.traced && ctx.state === 'blank' ? Object.assign({}, ctx, { state: 'traced' }) : ctx;
         const slot = box(tctx, { value: slotValue(tctx, 'answer', kv), w: sq, h: sq, mark: 'blank' });
-        return root(ctx, 'k2-count', `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 4)};">`
-            + `<div style="flex:none;">${countPicture(ctx, p.n, p.shape, p)}</div>${slot}</div>`
+        // Round-3 re-grade: the answer box stands at ONE place in every cell (the cell's right),
+        // the objects centred in the room left of it - a box that followed each picture's width
+        // jumped about from cell to cell.
+        const pp = ctx.state === 'traced' && !p.objects && p.layout !== 'scattered' ? Object.assign({}, p, { countMarks: true }) : p;
+        return root(ctx, 'k2-count', `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:${L(ctx, 4)};">`
+            + `<div style="display:flex;justify-content:center;"><div style="flex:none;">${countPicture(ctx, p.n, p.shape, pp)}</div></div>${slot}</div>`
             // P11 Support level 2: a number track under the picture to point along.
-            + (p.track ? `<div style="display:flex;justify-content:center;margin-top:${L(ctx, 3)};">${trackStrip(ctx, p.track)}</div>` : ''));
+            + (p.track ? `<div style="display:flex;justify-content:center;margin-top:${L(ctx, 3)};">${trackStrip(ctx, p.track)}</div>` : ''),
+        isTwin(ctx) ? {} : { style: 'width:100%;box-sizing:border-box;' });
     },
     answerKey(p) {
         const v = p.ans;

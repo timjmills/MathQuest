@@ -11,6 +11,7 @@ import { opGlyph, trackMm, SIZES, factTab, stripPos } from '../tokens.js';
 import { blank, esc } from '../cell.js';
 import { register } from '../registry.js';
 import { stepMarks, placeDigits, regroupMarks } from '../steps.js';
+import { touchMode, touchColumns, touchOpts, touchDigit } from '../support-draw.js';
 
 // VA-2: the leftmost track is the operator track; place names run right to left from the ones.
 const PLACE_NAMES = ['O', 'T', 'H', 'Th', 'TTh', 'HTh'];
@@ -38,7 +39,7 @@ const PLACE_NAMES = ['O', 'T', 'H', 'Th', 'TTh', 'HTh'];
  * @param {'trace'|'solid'|null} [opts.boxInk]  with `answer: 'boxes'` and `ans`, the digits are
  *        drawn INSIDE the boxes, so a key laid over a Guided page lines up exactly (SCC-T10).
  */
-export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0, trackInk = null } = {}) {
+export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0, trackInk = null, touch = null } = {}) {
     // `a` may be an ARRAY of the rows above the operator row (three or four addends, CM-5/CM-6):
     // every one of them sits on the digit tracks with an empty operator track (VA-2).
     const tops = (Array.isArray(a) ? a : [a]).map(String);
@@ -55,8 +56,14 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
     const glyph = (ch, rowId, i) => (hole(rowId, i)
         ? (unknownSlot || `<span class="ws-box ws-box--unknown" data-ws-slot="d-${rowId}-${i}" data-ws-shape="box-unknown"></span>`)
         : ch === ' ' ? '' : ch);
-    const row = (chars, first = '', rowId = '') => chars.map((ch, i) =>
-        `<span${i === 0 && first ? ' class="op"' : ''}>${i === 0 && first ? first : glyph(ch, rowId, i)}</span>`).join('');
+    // S2: `touch` = {rows: [one boolean per track, per operand row], o}: touch dots on those digits,
+    // column by column (support-draw.js touchColumns). The overlay takes no space.
+    const row = (chars, first = '', rowId = '', tRow = null) => chars.map((ch, i) => {
+        if (i === 0 && first) return `<span class="op">${first}</span>`;
+        const td = tRow && tRow[i] && !hole(rowId, i) ? touchDigit(ch, true, touch.o) : null;
+        return td || `<span>${glyph(ch, rowId, i)}</span>`;
+    }).join('');
+    const tr = (k) => (touch && Array.isArray(touch.rows) ? touch.rows[k] : null);
     const g = grey ? ' ws-grey' : '';
     // On screen the carry box is a real (ungraded) input in the same track; on paper it is the
     // empty box VA-10 asks for.
@@ -79,8 +86,8 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
                 : `<span class="rg${g}" data-ws-seg="${stripPos(k, on.length)}">${rgBox(i)}</span>`;
         }).join('');
     }
-    html += tops.map((x, k) => row(pad(x), '', k === 0 ? 'a' : `a${k}`) + `<span class="gap"></span>`).join('')
-        + row(pad(B), opGlyph(op), 'b') + `<span class="rule"></span>`;
+    html += tops.map((x, k) => row(pad(x), '', k === 0 ? 'a' : `a${k}`, tr(k)) + `<span class="gap"></span>`).join('')
+        + row(pad(B), opGlyph(op), 'b', tr(tops.length)) + `<span class="rule"></span>`;
     if (answer === 'boxes') {
         // The box is structure and stays black; only the digit inside it takes the trace grey
         // (INK-3). The inline rule centres the glyph in its box - it sets no size and no ink.
@@ -229,8 +236,11 @@ register('stack', {
                 for (const i of regroupTracks(regroup, t, String(Array.isArray(a) ? a[0] : a).length)) regroupSlots[i] = blank(regroupSlot(i), ctx, key);
             }
         }
+        const tm = touchMode(p);
+        const rowsTd = tm ? touchColumns([...(Array.isArray(a) ? a : [a]), b], t, p.op, tm) : null;
         return stack(a, b, p.op, {
             T: t, heads, regroup, answer, slots, regroupSlots, unknownSlot, boxInk, ansTracks: nAns,
+            touch: rowsTd ? { rows: rowsTd, o: touchOpts(ctx.metrics ? ctx.metrics.digitPt : 28, ctx.mode === 'screen' ? 'px' : 'pt') } : null,
             grey: level === 2 && ctx.state === 'blank',
             ans: shown === undefined ? null : shown,
             unknown: p.unknown || null,

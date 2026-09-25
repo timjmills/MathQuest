@@ -373,6 +373,7 @@ function gridPart(part, ctx, report) {
         cls: part.cls || '',
         height: part.height || '',
         unlabelled: part.unlabelled || [],
+        rowsTpl: part.rowsTpl || '',
     });
 }
 

@@ -23,7 +23,9 @@ import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import { L, P, B, INK, GREY, root, digitPt, sizeOf, inkOf, isTwin, answered, fixDraw, fixFilled, fixCaption } from './k2kit.js';
 
-const CELL = { S: 10, M: 10, L: 11 };
+// R3 (critic round 3): 10-11 mm boxes left the lower half of every cell empty and a small frame to
+// draw in; 11-12.5 mm boxes (a 62.5 mm frame at L beside its number) still fit a 2-column cell.
+const CELL = { S: 11, M: 12, L: 12.5 };
 
 /** How many counters the frame shows in this state. */
 function shownCount(p, ctx) {

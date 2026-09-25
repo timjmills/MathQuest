@@ -333,7 +333,14 @@
       "auto": "Q",
       "dots": "O",
       "frame-bare": "S",
-      "line-bare": "X"
+      "line-bare": "X",
+      "touch": "V",
+      "touchall": "3",
+      "boxsign": "J",
+      "startarrow": "4",
+      "steps": "I",
+      "round-pv": "1",
+      "round-mark": "2"
     },
     "tiles": {},
     "objects": {
@@ -343,8 +350,15 @@
       "dice": "D"
     },
     "touch": {},
-    "cover": {},
-    "mix": {},
+    "cover": {
+      "whole": "W",
+      "needed": "N",
+      "fade": "F"
+    },
+    "mix": {
+      "section": "S",
+      "problem": "P"
+    },
     "anchors": {},
     "members": {},
     "forms": {

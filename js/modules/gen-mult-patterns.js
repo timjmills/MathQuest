@@ -82,10 +82,16 @@ const pctCount = (pct, n) => (pct >= 100 ? n : Math.max(1, Math.min(n, Math.roun
 let _lastTable = null;
 
 export function genCountByTables(q) {
-    const tables = ticked('constant', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]).slice().sort((a, b) => a - b);
+    let tables = ticked('constant', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]).slice().sort((a, b) => a - b);
     const idx = itemAt();
+    // R3 (critic round 3): with every table ticked (untouched) a page of five rows was the 1s to
+    // the 5s in order, and counting by 1 is not practice. Untouched, the page deals 2 to 12 in a
+    // shuffled round, so any page samples across the tables its title names; a teacher who
+    // ticks tables keeps the order option.
+    const untouched = tables.length === 12;
+    if (untouched) tables = tables.filter((v) => v >= 2);
     let t;
-    if (opt('order') === 'mixed' && tables.length > 1) {
+    if ((untouched || opt('order') === 'mixed') && tables.length > 1) {
         // Mixed: every ticked table once in a shuffled round, then the next round.
         const round = Math.floor(idx / tables.length);
         const order = tables.slice();
@@ -271,7 +277,10 @@ export function genNumberPatterns(q) {
 /* ================================================================== multiplication chart */
 
 const CHART_T = { 25: 5, 36: 6, 100: 10, 144: 12 };
-const LEVEL_COUNT = { 2: 2, 1: 6, 0: 22 };
+// R3 (critic round 3): two holes in a 12 x 12 chart was a whole A4 page for two answers, and
+// two holes are filled from their neighbours (pattern completion), not by using the chart. The
+// most supported level now leaves 8 products to find, then 16, then 30.
+const LEVEL_COUNT = { 2: 8, 1: 16, 0: 30 };
 
 /** The support level of a mult_chart_easy item (a retired twin id names its own). */
 function chartLevel(skill) {

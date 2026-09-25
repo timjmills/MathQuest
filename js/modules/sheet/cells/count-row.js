@@ -45,7 +45,8 @@ import { tile, tileSize, shapeAt } from './shapes.js';
 /** The widest box pitch of an 'arcs' row (mm), and the narrowest box a size may print. */
 const PITCH = { S: 13.5, M: 14, L: 15.5 };
 const MIN_BOX = { S: 11, M: 11.5, L: 14 };
-const TAB_MM = { S: 10, M: 10.5, L: 11 };
+// R3: wide enough for a two-digit step ("12" ran out of the pentagon at 11 mm).
+const TAB_MM = { S: 12, M: 12.5, L: 13.5 };
 const GAP_MM = 1.5;
 /** The width a one-column cell gives its content (186 mm less the cell's pads). */
 const LIVE_MM = 172;
@@ -66,7 +67,10 @@ function geom(p, ctx) {
     const n = (p.values || []).length || 1;
     const look = p.look === 'train' ? 'train' : 'arcs';
     const shape = p.shape || 'box';
-    const wide = Math.max(0, maxDigits(p) - 3) * 3;               // "1,000" needs a wider box
+    // "1,000" needs a wider box; R3 (critic round 3): on a pattern track so does a 3-digit number
+    // (152, 227), which filled a 14 mm tile edge to edge in the key's bold. A count-by row keeps
+    // one box width for every table, so the rows of a page line up.
+    const wide = Math.max(0, maxDigits(p) - (look === 'train' ? 2 : 3)) * 3;
     const tab = look === 'arcs' && p.tab ? TAB_MM[size] + 2 : 0;
     const baseH = S(ctx).writeMm + 2.5;
     let boxW = (look === 'arcs' ? PITCH[size] - GAP_MM : 14) + wide;

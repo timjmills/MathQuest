@@ -277,7 +277,8 @@ const FORBIDDEN = {
 // The key idea each skill's steps must name.
 const REQUIRED = {
     'addition:add_facts': /count on|make 10/i,
-    'addition:add': /ones/i,
+    // R3: basic add is within 20 (1.OA.6), every item a fact counted on - no column steps.
+    'addition:add': /count on/i,
     'addition:add_column_multi': /column/i,
     'addition:add_sub_fact_family': /whole/i,
     'addition:cloze_addition': /list/i,
@@ -597,8 +598,10 @@ ok(/quotient and the remainder/.test(instructionFor('ring-remainder', { n: 4 }))
         const st = sg.stories({ a: 24, b: 4, op: '÷', ans: 6 }, { seed: 7, index: i });
         ok(st && /^grouping/.test(st.schema), `share_into_groups story ${i} is ${st && st.schema}, not grouping`);
     }
-    const sf = sg.strings({ categoryId: 'division', skillId: 'share_into_groups' }).sentence({ a: 20, b: 5, op: '÷', ans: 4 });
-    ok(sf && sf.parts.join(' ') === '20 ÷ 5 = 4' && sf.blanks.length === 3, 'share_into_groups asks for its division sentence');
+    // R3 (critic round 3): the "___ ÷ ___ = ___" line asked for the number of groups a second
+    // time beside the box (H8, a doubled slot). The box is the one answer place: no sentence.
+    const sgs = sg.strings({ categoryId: 'division', skillId: 'share_into_groups' });
+    ok(typeof sgs.sentence !== 'function', 'share_into_groups has ONE answer place (no second division sentence)');
     // div_remainders: every story interprets the remainder (left over, round up, full groups).
     const dr = P('division:div_remainders');
     const seenSchemas = new Set();

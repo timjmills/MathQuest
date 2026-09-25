@@ -11,11 +11,11 @@ import {
     buildRetryMessage,
 } from './widget-retry.js';
 import {
-    cellKindFor, kindHTML, instructionForKind,
+    cellKindFor, kindHTML, instructionForKind, screenSupportsFor, screenSupportExtrasHTML,
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
     regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
     clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget, isNumberLineItem, NUMBER_LINE_INSTRUCTION,
-    screenInstruction, canFitDigits, adoptSvgBlank, mountModel,
+    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect,
 } from './screen-cell.js';
 
 // Escape HTML-significant characters so q.text strings (which may contain
@@ -1376,6 +1376,7 @@ function _restoreAnswerSlot() {
     const area = document.getElementById('answerInputArea');
     if (input && area && !area.contains(input)) area.insertBefore(input, area.firstChild);
     releaseVisualBlank(input);
+    unwireLiveCorrect(input);
     if (input) {
         input.classList.remove('mq-slot', 'mq-slot--box', 'mq-slot--text');
         input.style.removeProperty('--mq-n');
@@ -1454,11 +1455,11 @@ function _applyScreenCell() {
         if (kind.kind === 'stack') {
             // The legacy column visual already answers through digit boxes; the kit stack keeps
             // that path (column-answer-input) and adds heads, regroup boxes and SP-20 entry.
-            visualAid.innerHTML = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill) });
+            visualAid.innerHTML = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill), supports: _supportsOf(q, kind) });
             visualAid.style.display = 'block';
             wireStackEntry(visualAid, { autofocus: !state.hasAnswered });
         } else {
-            visualAid.innerHTML = kindHTML(kind, { slotHtml: '<span class="mq-slothost"></span>' })
+            visualAid.innerHTML = kindHTML(kind, { slotHtml: '<span class="mq-slothost"></span>', supports: _supportsOf(q, kind) })
                 + (kind.kind === 'division' ? workRowsHTML(kind) : '');
             visualAid.style.display = 'block';
             const host = visualAid.querySelector('.mq-slothost');
@@ -1482,6 +1483,11 @@ function _applyScreenCell() {
         paper.classList.add('mq-kind-legacy');
         _applyCardTwin(q, paper, visualAid, qt);
         if (visualAid && visualAid.style.display !== 'none') hideScreenOnlyCaptions(visualAid);
+        // S2: a legacy-drawn fact still carries its ticked cues, tally row and extras under its visual.
+        if (visualAid) {
+            const extra = _legacySupportsHTML(q);
+            if (extra) { visualAid.insertAdjacentHTML('beforeend', extra); visualAid.style.display = 'block'; }
+        }
         if (qt && !paper.classList.contains('mq-twin')) {
             // Said once: the instruction line stays; a copy inside the visual is hidden, or, when
             // the visual says it as part of a larger block, the line is hidden instead.
@@ -1525,6 +1531,9 @@ function _applyScreenCell() {
         if (visualAid && input && wireTickBoxes(visualAid, q, input)) paper.classList.add('mq-tick-mode');
         if (visualAid) { wireRingGroups(visualAid); wireClozeBanks(visualAid); }
     }
+    // Green as soon as it is right (owner request 2026-09-25): every digit box, regroup box and
+    // answer slot of the cell marks itself when its value is the one it should hold.
+    try { wireLiveCorrect(paper, { q, kind, single: input }); } catch (e) { /* marking is optional */ }
     // Widgets mount late (dynamic import) and re-render on interaction: each time the cell
     // changes, the mono pass re-inks it and the repeated prompt is looked for again.
     monoCell(paper, {
@@ -1532,6 +1541,7 @@ function _applyScreenCell() {
             const va = document.getElementById('visualAid');
             if (!kind && va && qt && !paper.classList.contains('mq-twin') && hideRepeatedPrompt(va, q.text)) qt.classList.remove('mq-dup');
             if (!kind && va) _fitCardDigits(q, paper, va);
+            if (!kind && va) fitTwinRows(va);      // a twin's rows wrap, never clip (round 3)
         },
     });
     _syncChromeCheck();
@@ -1561,6 +1571,44 @@ function _applyCardTwin(q, paper, visualAid, qt) {
         qt.innerHTML = `<span class="mq-instr-text">${_escapeHtmlForQuestion(screenInstruction(text))}</span>`
             + `<span class="mq-sr"> ${_escapeHtmlForQuestion(String(q.text || '').replace(/<[^>]*>/g, ''))}</span>`;
     };
+    // The kit's own cell (round 3): an item whose paper cell is drawn by the kit alone (estimate,
+    // round, value, compare, combine, more / less) is drawn the same on the card, with the answer
+    // slot where the paper pupil writes. One slot: the generic pass below moves #answerInput into
+    // it. Several (an estimate's rewrite): the card's own inline-blank boxes move into them, so
+    // submitInlineBlanks keeps reading them.
+    const kt = kitCellTwin(q, { categoryId: state.category });
+    if (kt) {
+        const ib = q.answerType === 'inline-blanks' && qt ? Array.from(qt.querySelectorAll('.ib-cell')) : [];
+        if (kt.mode === 'slots' && ib.length !== kt.count) return;
+        visualAid.innerHTML = kt.html;
+        visualAid.style.display = 'block';
+        visualAid.dataset.mqNoZoom = '1';
+        visualAid.querySelectorAll('[data-mq-cell]').forEach((slot, k) => {
+            if (!ib[k]) return;
+            ib[k].classList.add('mq-cellslot');
+            slot.appendChild(ib[k]);
+            slot.removeAttribute('data-mq-cell');      // wired here: the generic slot pass leaves it
+        });
+        paper.classList.add('mq-twin');
+        setInstr(kt.instr);
+        if (ib[0] && !state.hasAnswered) { try { ib[0].focus({ preventScroll: true }); } catch (e) { ib[0].focus(); } }
+        // A sign circle answers in the circle on every host (round 3: "three hosts, three response
+        // modes"): the choice buttons under the cell give way to the paper's bank of signs, which
+        // writes into the circle; the chrome Check grades it.
+        const input = document.getElementById('answerInput');
+        if (visualAid.querySelector('[data-mq-blank="circle"]') && input && !input.disabled) {
+            const opts = document.getElementById('answerOptions');
+            if (opts) opts.style.display = 'none';
+            const area = document.getElementById('answerInputArea');
+            if (area) area.style.display = '';
+            input.style.display = '';
+            if (adoptVisualBlank(visualAid, input)) {
+                paper.classList.add('mq-slot-moved');
+                wireSignCircle(visualAid, input);
+            }
+        }
+        return;
+    }
     if (q.answerType === 'inline-cloze') {
         const html = clozeHTML(q);
         if (!html) return;
@@ -1598,7 +1646,8 @@ function _applyCardTwin(q, paper, visualAid, qt) {
         visualAid.insertBefore(line, visualAid.firstChild);
         visualAid.style.display = 'block';
         paper.classList.add('mq-twin');
-        setInstr('Solve.');
+        // the skill's own print instruction, verb swapped (round 3: "'Solve.' tells the pupil nothing")
+        setInstr(q.screenInstr || printInstructionFor(q, state.category) || 'Solve.');
         visualAid.dataset.mqNoZoom = '1';
         return;
     }
@@ -1659,6 +1708,8 @@ function _checkProxy() {
     if (!q || state.hasAnswered) return null;
     const va = document.getElementById('visualAid');
     const find = (sel) => { const el = document.querySelector(sel); return el && !el.closest('[hidden]') ? el : null; };
+    // the kit's place-value chart twin (round 3): its digit boxes feed #answerInput; Check grades it
+    if (q.answerType === 'pv-digit-drag' && va && va.querySelector('.mq-kittwin')) return 'kit';
     switch (q.answerType) {
         case 'inline-cloze': return find('#clozeSubmitBtn');
         case 'inline-blanks': return find('#ibSubmitBtn');
@@ -1669,17 +1720,24 @@ function _checkProxy() {
         case 'fact-family': case 'number-family':
             return va && va.querySelector('.fact-family-input, .number-family-input') ? 'family' : null;
         case 'col-arith': return va && va.querySelector('.colarith-submit');
+        // round 3 (H4): the sort / order widget's grey Submit is hidden in the cell; Check presses it
+        case 'dnd-generic': return va && va.querySelector('.dnd-submit');
+        case 'pv-build': return va && va.querySelector('.pvb-submit');
+        case 'pv-digit-drag': return va && va.querySelector('.pvdd-submit');
+        case 'number-line-extended': return va && va.querySelector('.nle-submit');
         default: return null;
     }
 }
 
 function _pressCheckProxy(proxy) {
-    if (proxy === 'model') {
+    if (proxy === 'model' || proxy === 'kit') {
         const input = document.getElementById('answerInput');
         const v = input ? String(input.value || '').trim() : '';
-        if (!v) {
+        const va = document.getElementById('visualAid');
+        const empty = proxy === 'kit' && va && Array.from(va.querySelectorAll('input.mq-cellslot')).some((b) => !String(b.value || '').trim());
+        if (!v || empty) {
             const fb = document.getElementById('feedbackArea');
-            if (fb) { fb.style.display = 'block'; fb.className = 'feedback-area hint'; fb.innerHTML = 'Build the number first.'; }
+            if (fb) { fb.style.display = 'block'; fb.className = 'feedback-area hint'; fb.innerHTML = proxy === 'kit' ? 'Fill in every box.' : 'Build the number first.'; }
             return;
         }
         if (typeof window.checkAnswer === 'function') window.checkAnswer(v);
@@ -1706,7 +1764,10 @@ function _pressCheckProxy(proxy) {
     if (proxy && !proxy.disabled) proxy.click();
     else if (proxy && proxy.disabled) {
         const fb = document.getElementById('feedbackArea');
-        if (fb) { fb.style.display = 'block'; fb.className = 'feedback-area hint'; fb.innerHTML = 'Build the number first.'; }
+        const msg = proxy.classList && proxy.classList.contains('dnd-submit') ? 'Put every number in a box first.'
+            : proxy.classList && proxy.classList.contains('nle-submit') ? 'Mark the number on the line first.'
+                : proxy.classList && proxy.classList.contains('pvdd-submit') ? 'Put every digit in the chart first.' : 'Build the number first.';
+        if (fb) { fb.style.display = 'block'; fb.className = 'feedback-area hint'; fb.innerHTML = msg; }
     }
 }
 
@@ -1832,7 +1893,7 @@ function _renderQuestionImpl() {
     // 1-indexed position instead of the live qCount.
     const _reviewIdx = (typeof state._reviewingQIndex === 'number') ? state._reviewingQIndex : -1;
     const _qDisplay = _reviewIdx >= 0 ? (_reviewIdx + 1) : state.qCount;
-    document.getElementById("qNum").innerText = `Q${_qDisplay}`;
+    document.getElementById("qNum").innerText = `Q${Math.max(1, _qDisplay || 0)}`;   // never "Q0" (round 3)
 
     // Display skill label — merge with question number as a pill
     const skillLabelEl = document.getElementById("skillLabel");
@@ -1846,7 +1907,8 @@ function _renderQuestionImpl() {
         // 12-letter pupil abbreviation ("Add ≤20 NR").
         const _plain = _teacher && typeof window !== 'undefined' && typeof window.plainSkillLabel === 'function'
             ? window.plainSkillLabel(_itemCat, _itemSkill) : '';
-        const label = _plain || q.skillLabel || (typeof window !== 'undefined' && window.getSkillLabelForQuestion ? window.getSkillLabelForQuestion(state.skill) : '');
+        // otherwise the skill's own name, never a truncated short label (round 3: 'Find the Sta')
+        const label = _plain || skillDisplayLabel(_itemCat, _itemSkill) || q.skillLabel || (typeof window !== 'undefined' && window.getSkillLabelForQuestion ? window.getSkillLabelForQuestion(state.skill) : '');
         if (label) {
             let _grade = getSkillGrade(_itemSkill, _itemCat);
             if (_grade === null || _grade === undefined) _grade = getSkillGrade(state.skill, state.category);
@@ -7198,3 +7260,24 @@ export function checkOddEvenSelection() {
     }
 }
 
+/**
+ * S2: the supports this practice item carries (screen-cell.js screenSupportsFor): the set's
+ * ticked supports, dealt for this question of the session so a fade or a problem-by-problem mix
+ * works in live play too.
+ */
+function _supportsOf(q, kind) {
+    try {
+        const index = Array.isArray(state.questionHistory) ? state.questionHistory.length : 0;
+        return screenSupportsFor(q, kind, { index, total: state.problemCount > 0 ? state.problemCount : 20,
+            categoryId: state.category, skillId: state.skill, options: state.skillOptions || (state.skillOptionsBySkill || {})[`${state.category}:${state.skill}`] || null });
+    } catch (e) { return null; }
+}
+
+/** S2: the supports of a practice item the kit does not redraw (screen-cell.js screenSupportExtrasHTML). */
+function _legacySupportsHTML(q) {
+    try {
+        const index = Array.isArray(state.questionHistory) ? state.questionHistory.length : 0;
+        return screenSupportExtrasHTML(q, { index, total: state.problemCount > 0 ? state.problemCount : 20,
+            categoryId: state.category, skillId: state.skill, options: state.skillOptions || (state.skillOptionsBySkill || {})[`${state.category}:${state.skill}`] || null });
+    } catch (e) { return ''; }
+}

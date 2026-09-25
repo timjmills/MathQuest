@@ -133,3 +133,6 @@ html, body { margin: 0; padding: 0; background: #d9d9d9; }
 .ws-frac { display: inline-flex; flex-direction: column; align-items: center; font-size: var(--ws-frac); line-height: 1.05; vertical-align: middle; margin: 0 .15em; }
 .ws-frac span:first-child { border-bottom: var(--ws-heavy) solid var(--ws-ink); padding: 0 .2em .05em; } .ws-frac span:last-child { padding: .05em .2em 0; }
 .ws-zone { font-size: var(--ws-zone); } .ws-center { text-align: center; } .ws-svg { display: block; }
+/* RUBRIC H13 (owner 2026-09-25): a cell's drawing sits in the middle of its cell, never pinned to
+   the top over an empty band (the app's css/sheet-kit.css carries the same rule). */
+.ws-page .ws-grid > .ws-cell:not(.blankrun) { justify-content: safe center; }

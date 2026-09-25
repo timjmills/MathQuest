@@ -213,6 +213,26 @@ export function groupRuns(n, size, { d = 5, gap = 4, runGap = 9, rowGap = 7, max
     return { pts, w: 2 * pad + across * runW + (across - 1) * runGap, h: 2 * pad + lines * d + (lines - 1) * rowGap, runs, perLine };
 }
 
+/**
+ * R3 (critic round 3): counters in a NEUTRAL array, so the picture never makes the groups for the
+ * pupil. Rows are `cols` long where `cols` is chosen so a row is never a whole number of groups
+ * and a group is never a whole number of rows (7, 6, 5 or 8 across); the pitch is wide enough
+ * (d + gap across, d + rowGap down) for a pencil ring to pass between two counters, including a
+ * ring that turns a row end. Same return shape as groupRuns.
+ */
+export function looseArray(n, size, { d = 5, gap = 5, rowGap = 8, pad = 0.5, maxCols = 8, order = [7, 6, 5, 8] } = {}) {
+    const k = Math.max(1, Math.floor(Number(size)) || 1);
+    const total = Math.max(0, Math.floor(Number(n)) || 0);
+    const ok = order.filter((c) => c <= maxCols && c % k !== 0 && k % c !== 0);
+    let cols = ok.find((c) => Math.ceil(total / c) <= 4) || ok[0] || 7;
+    cols = Math.min(cols, Math.max(1, total));
+    const pitch = d + gap, rowPitch = d + rowGap;
+    const rows = Math.max(1, Math.ceil(total / cols));
+    const pts = [];
+    for (let i = 0; i < total; i++) pts.push({ cx: pad + d / 2 + (i % cols) * pitch, cy: pad + d / 2 + Math.floor(i / cols) * rowPitch });
+    return { pts, w: 2 * pad + (cols - 1) * pitch + d, h: 2 * pad + (rows - 1) * rowPitch + d, cols, rows };
+}
+
 /** A solid counter (INK-5: a solid fill is at most 7 mm across). */
 export const dot = (cx, cy, d) => `<circle cx="${n2(cx)}" cy="${n2(cy)}" r="${n2(Math.min(7, d) / 2)}" fill="${INK}"/>`;
 

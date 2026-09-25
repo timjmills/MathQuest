@@ -142,7 +142,8 @@ export const MULTI_KEYS = Object.freeze({
     ops: '3A',           // function_table_easy / _hard: the operations a rule may use (+ − × ÷)
     // NEXT FREE IN BLOCK 3: 3B.
 
-    // Block 4 — SUPPORTS (reserved ids: no skill declares them yet)
+    // Block 4 — SUPPORTS (S2: `cover` and `mix` are live; `touch` is unused - touch dots are
+    // values of the unified `support` set; `anchors` is the sheet-level S6 request field)
     touch: '4A',
     cover: '4B',
     mix: '4C',
@@ -242,7 +243,16 @@ export const VALUE_TOKENS = Object.freeze({
         // block 1 P10 time + money: the minute ring, the time line's labels, the coin dots
         plain: 'Y', ring: 'G', pupil: 'U', auto: 'Q', dots: 'O',
         // block 7 function tables: the frame or line without the machine picture
-        'frame-bare': 'S', 'line-bare': 'X' }),
+        'frame-bare': 'S', 'line-bare': 'X',
+        // S2 supports model: `support` became the ONE multi-select set of supports (an old one-cue
+        // code, "~FD", decodes to that one tick). Touch dots (two rungs) and the S4 panes. The
+        // letters left were I J V; the rest take digits (never a field's first character, so a
+        // payload never starts with one).
+        touch: 'V', touchall: '3', boxsign: 'J', startarrow: '4', steps: 'I',
+        'round-pv': '1', 'round-mark': '2' }),
+    // S2 supports model (block 4): which problems carry the supports, and how clashing ones mix.
+    cover: Object.freeze({ whole: 'W', needed: 'N', fade: 'F' }),
+    mix: Object.freeze({ section: 'S', problem: 'P' }),
     objects: Object.freeze({ shapes: 'S', pictures: 'P', frame: 'F', dice: 'D' }),
     // P12
     model: Object.freeze({ none: 'N', area: 'A', bar: 'B', circle: 'C', line: 'L', set: 'S', grid: 'G', blocks: 'K', analog: 'H', digital: 'D' }),
@@ -333,7 +343,8 @@ export const SCALAR_ONLY = Object.freeze({
     // block 7: rows × 10 + order (31 … 52); a member support level 0-2
     ftTable: 'decimal', poolSupport: 'decimal',
     members: 'def-tokens',   // two base-36 characters per member: its position (skill-options-pools.js)
-    // reserved ids (block 4): their values are allocated when they are built
+    // reserved ids (block 4): their values are allocated when they are built. (Pinned history:
+    // `cover` and `mix` were built by S2 and now carry VALUE_TOKENS; `touch` rides in `support`.)
     touch: 'reserved', cover: 'reserved', mix: 'reserved', anchors: 'reserved',
 });
 

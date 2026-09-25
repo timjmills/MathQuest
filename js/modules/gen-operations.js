@@ -8,7 +8,7 @@ import { optionsFor, normalizeOptions } from './skill-options.js';
 import { genCountByTables, genMultChart, genHopLine } from './gen-mult-patterns.js';
 const _MP_SKILLS = new Set(['count_by_tables', 'mult_chart', 'mult_chart_easy', 'mult_chart_medium', 'mult_chart_hard', 'nl_mult', 'nl_div']);
 import { stripSegStyle, stripPos } from './sheet/tokens.js';
-import { renderCell as _kitRender, factCue as _factCue } from './sheet/index.js';
+import { renderCell as _kitRender, fadeRung } from './sheet/index.js';
 
 // ========================================
 // HOW IT IS WRITTEN — the `notation` option (skill-options.js)
@@ -200,7 +200,8 @@ function supportLevelFor(fallback = 1) {
     if (!ticked.length) ticked = [fallback];
     ticked = ticked.slice().sort((x, y) => y - x);   // most support first (P-4.2)
     const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _constantCursor;
-    return ticked[((at % ticked.length) + ticked.length) % ticked.length];
+    // S2 (owner ruling 2026-09-25): a FADE DOWN THE PAGE, not a cycle (sheet/supports.js fadeRung).
+    return ticked[fadeRung(at, ticked.length, state.itemCount, Number.isFinite(state.itemIndex))];
 }
 
 // ========================================
@@ -1981,6 +1982,39 @@ function _bandDigits(skill, op, range) {
     return String(Math.max(10, Math.min(2 * range, 1998))).length;
 }
 
+/**
+ * The + / − number-line items (nl_add, nl_sub, number_line_add, number_line_sub) on the kit's
+ * `number-line` cell (owner request 2026-09-25): ONE HOP PER NUMBER, every whole number ticked and
+ * labelled, the window only as long as the item needs (0-10, 0-20, else about 15 numbers around
+ * the jump), and the answer box IN the equation. `unknown` 'result' | 'a' | 'b'.
+ */
+function _nlKitItem(q, { a, b, op, unknown = 'result', range = 20 }) {
+    const end = op === '+' ? a + b : a - b;
+    const lo0 = Math.min(a, end), hi0 = Math.max(a, end);
+    let min = 0, max;
+    if (hi0 <= 10 && range <= 10) max = 10;
+    else if (hi0 <= 20) max = 20;
+    else {
+        min = Math.max(0, Math.floor((lo0 - 2) / 5) * 5);
+        max = Math.max(min + 15, Math.ceil((hi0 + 1) / 5) * 5);
+    }
+    const payload = { min, max, start: a, add: b, op, unknown };
+    const glyph = op === '+' ? '+' : '\u2212';
+    q.text = unknown === 'a' ? `? ${glyph} ${b} = ${end}` : unknown === 'b' ? `${a} ${glyph} ? = ${end}` : `${a} ${glyph} ${b} = ?`;
+    q.ans = unknown === 'a' ? a : unknown === 'b' ? b : end;
+    q.a = a; q.b = b; q.op = op === '+' ? '+' : '-';
+    if (unknown === 'a') q.missing = 'a'; else if (unknown === 'b') q.missing = 'b';
+    q.answerType = 'number';
+    q.options = buildNumericOptions(q.ans);
+    q.cell = { template: 'number-line', v: 1, payload };
+    q.visual = _kitTwin('number-line', payload);
+    q.printText = unknown === 'result' ? 'Draw the jumps. Write the answer.' : 'Draw the jumps. Write the missing number.';
+    q.printFormat = 'number-line-visual';
+    q.startOnly = true;
+    q.nlMax = max;
+    return q;
+}
+
 const _KIT_FACT_SKILLS = new Set(['add_facts', 'mult_facts', 'div_facts', 'add', 'subtract']);
 const _KIT_OP = { '+': '+', '-': '-', '−': '-', '×': '*', '÷': '/' };
 
@@ -2015,7 +2049,12 @@ function _applyKitFactCell(q, skill, range) {
     // P11 (critic round 2): a stacked two-digit add / subtract item that REGROUPS is column work,
     // not a fact: it prints on the stack template with its carry (or borrow) strip, and the screen
     // shows the same stack, its digit boxes typed and composing the answer.
-    if (small && !across && (skill === 'add' || skill === 'subtract') && Math.max(a, b) >= 10
+    // R3 (critic round 3): ONE template per section. Within 20 (the grade-1 band of `add` and
+    // `subtract`, 1.OA.6) every item is a fact: the regroup strip on only the items that happened
+    // to regroup made two typesettings on one page and pushed a column algorithm onto facts the
+    // steps teach by counting on / back. Only a band past 20 is column work, on every item.
+    const _band = Number((() => { try { return _opt('band'); } catch (e) { return 0; } })()) || range;
+    if (small && !across && (skill === 'add' || skill === 'subtract') && _band > 20 && Math.max(a, b) >= 10
         && (op === '+' ? hasCarry(a, b) : hasBorrow(a, b))) {
         const payload = { operands: [a, b], op, heads: false, regroup: op === '+' ? 'add' : 'sub', ansDigits: digits };
         q.cell = { template: 'stack', v: 1, payload };
@@ -2236,30 +2275,12 @@ function _applyOptionPost(q, selected, routed) {
         }
     }
 
-    // --- the fading hint cue under a fact ---------------------------------------------------
-    const cue = _opt('support');
-    const cueKinds = ['tile', 'frame', 'line', 'skip', 'array', 'think'];
-    const factHost = ['add_facts', 'sub_facts', 'mult_facts', 'div_facts'].includes(selected)
-        || (_RANGED_RE.test(routed) && RANGE_MAP[routed.match(_RANGED_RE)[2]] <= 20 && !(routed.endsWith('_10_regroup') && q.bridgeParts));
-    if (factHost && cueKinds.includes(cue) && Number.isFinite(Number(q.a)) && Number.isFinite(Number(q.b)) && q.notation !== 'fraction' && !q.bridgeWritten) {
-        const op = _KIT_OP[q.op];
-        if (op) {
-            const a = Number(q.a), b = Number(q.b);
-            if (!q.cell || q.cell.template !== 'fact') {
-                q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: q.notation === 'across' ? 'horiz' : 'vertical', digits: 2 } };
-            }
-            q.cell = { ...q.cell, payload: { ...q.cell.payload, cue } };
-            q.cueKind = cue;
-            // On screen the host redraws a `facts-column-visual` fact from its numbers alone and
-            // would drop the cue, so a cued fact is shown as its number sentence with the cue under
-            // it and the host's answer box (paper keeps the vertical fact and the cue together).
-            const base = /facts-column-visual|column-answer-input/.test(String(q.visual || '')) ? '' : (q.visual || '');
-            const svg = _factCue({ a, b, op, cue }, { px: 4.5 });
-            const w = Number((/width="(\d+)"/.exec(svg) || [])[1]) || 160;
-            // The card's stylesheet stretches a bare SVG to its width, so the cue is held at its size.
-            q.visual = `${base}<div class="mq-factcue" style="margin:10px auto 0;max-width:${w}px;text-align:center;">${svg}</div>`;
-        }
-    }
+    // --- the hint cue under a fact: NOT drawn here any more (S2, design/SUPPORTS.md §S2) --------
+    // `support` is the unified set of supports, drawn at RENDER time round the problem the
+    // generator made (sheet/support-draw.js, via the allocator in print-sheet.js and the screen
+    // hosts). Baking a cue into `q.cell.payload.cue` and `q.visual` here drew it twice and turned a
+    // cued fact into a legacy cell on screen; the generated item is now the same with or without a
+    // support, so the pupil page, the key and the screen agree.
 
     // --- pictures off (word problems, the ≤ 5 picture sums) ---------------------------------
     if (_opt('pictures') === false) {
@@ -2501,12 +2522,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // NUMBER LINE SKILLS (nl_add, nl_sub, nl_mult, nl_div)
             // ========================================
             if (mappedSkill === 'nl_add') {
-                const maxSum = Math.min(range, 100);
-                const b = rng(1, Math.max(1, Math.floor(maxSum / 2)));
+                // Owner request (2026-09-25): the kit's number line, one hop per number, so the
+                // jump is at most 10 (a count of humps) and the line labels every number.
+                const maxSum = Math.max(10, Math.min(range, 100));
+                const b = rng(2, Math.min(10, maxSum - 1));
                 const a = rng(1, Math.max(1, maxSum - b));
-                const sum = a + b;
-                const nlMin = 0;
-                const nlMax = Math.ceil((sum + 2) / 5) * 5 || 10;
                 // LRU rotation across 3 sub-types (was Math.random() chain).
                 // P11: "What is missing" fixes the sub-type; Mixed (the default) keeps the weighted rotation.
                 const _nlU = { answer: 'find_sum', first: 'find_start', second: 'find_addend' }[_opt('unknown')];
@@ -2514,72 +2534,30 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     ? window.pickVariant('nl_add', ["find_sum","find_addend","find_start"], [4,1,1])
                     : (Math.random() < 0.5 ? 'find_sum' : (Math.random() < 0.5 ? 'find_addend' : 'find_start')));
                 q._variant = roll;
-                if (roll === 'find_sum') {
-                    // Find the sum
-                    q.text = `${a} + ${b} = ?`;
-                    q.ans = sum;
-                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: [{ from: a, to: sum, label: `+${b}` }], showAnswer: false, highlightEnd: sum });
-                    q.hint = `Start at ${a} on the number line and jump forward ${b}.`;
-                } else if (roll === 'find_addend') {
-                    // Find the addend
-                    q.text = `${a} + ? = ${sum}`;
-                    q.ans = b;
-                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: [{ from: a, to: sum, label: '?', dashed: true }], showAnswer: true, highlightEnd: sum });
-                    q.hint = `Start at ${a}. How many jumps to reach ${sum}?`;
-                } else {
-                    // Find the start
-                    q.text = `? + ${b} = ${sum}`;
-                    q.ans = a;
-                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: [{ from: a, to: sum, label: `+${b}` }], showAnswer: true, highlightEnd: a });
-                    q.hint = `The number line shows a jump of +${b} ending at ${sum}. Where did it start?`;
-                }
-                q.answerType = 'number';
-                q.printFormat = 'nl-add';
+                _nlKitItem(q, { a, b, op: '+', unknown: roll === 'find_addend' ? 'b' : roll === 'find_start' ? 'a' : 'result', range });
+                q.hint = roll === 'find_sum' ? `Start at ${a}. Hop ${b} times, one number each hop. Where do you land?`
+                    : roll === 'find_addend' ? `Start at ${a}. Hop one number at a time to ${a + b}. Count the hops.`
+                        : `Hop back ${b} times from ${a + b}. Where did it start?`;
                 q.skillLabel = 'Addition Number Line';
-                q.a = a; q.b = b; q.op = '+';
-                if (roll === 'find_addend') q.missing = 'b';
-                else if (roll === 'find_start') q.missing = 'a';
                 return q;
             }
 
             if (mappedSkill === 'nl_sub') {
-                const maxVal = Math.min(range, 100);
-                const a = rng(2, maxVal);
-                const b = rng(1, a - 1);
+                const maxVal = Math.max(10, Math.min(range, 100));
+                const a = rng(3, maxVal);
+                const b = rng(1, Math.min(10, a - 1));
                 const diff = a - b;
-                const nlMin = 0;
-                const nlMax = Math.ceil((a + 2) / 5) * 5 || 10;
                 // LRU rotation across 3 sub-types (was Math.random() chain).
                 const _nlU = { answer: 'find_diff', first: 'find_min', second: 'find_sub' }[_opt('unknown')];
                 const roll = _nlU || ((typeof window !== 'undefined' && window.pickVariant)
                     ? window.pickVariant('nl_sub', ["find_diff","find_sub","find_min"], [4,1,1])
                     : (Math.random() < 0.5 ? 'find_diff' : (Math.random() < 0.5 ? 'find_sub' : 'find_min')));
                 q._variant = roll;
-                if (roll === 'find_diff') {
-                    // Find the difference
-                    q.text = `${a} − ${b} = ?`;
-                    q.ans = diff;
-                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: [{ from: a, to: diff, label: `−${b}` }], showAnswer: false, highlightEnd: diff });
-                    q.hint = `Start at ${a} on the number line and jump back ${b}.`;
-                } else if (roll === 'find_sub') {
-                    // Find the subtrahend
-                    q.text = `${a} − ? = ${diff}`;
-                    q.ans = b;
-                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: [{ from: a, to: diff, label: '?', dashed: true }], showAnswer: true, highlightEnd: diff });
-                    q.hint = `Start at ${a}. How many jumps back to reach ${diff}?`;
-                } else {
-                    // Find the minuend
-                    q.text = `? − ${b} = ${diff}`;
-                    q.ans = a;
-                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: [{ from: a, to: diff, label: `−${b}` }], showAnswer: true, highlightEnd: a });
-                    q.hint = `The jump is −${b} and lands at ${diff}. Where did it start?`;
-                }
-                q.answerType = 'number';
-                q.printFormat = 'nl-sub';
+                _nlKitItem(q, { a, b, op: '-', unknown: roll === 'find_sub' ? 'b' : roll === 'find_min' ? 'a' : 'result', range });
+                q.hint = roll === 'find_diff' ? `Start at ${a}. Hop back ${b} times, one number each hop. Where do you land?`
+                    : roll === 'find_sub' ? `Start at ${a}. Hop back one number at a time to ${diff}. Count the hops.`
+                        : `Hop forward ${b} times from ${diff}. That is where it started.`;
                 q.skillLabel = 'Subtraction Number Line';
-                q.a = a; q.b = b; q.op = '-';
-                if (roll === 'find_sub') q.missing = 'b';
-                else if (roll === 'find_min') q.missing = 'a';
                 return q;
             }
 
@@ -2590,95 +2568,30 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // NUMBER LINE ADD / SUB (B&W print scaffold)
             // ========================================
             if (mappedSkill === 'number_line_add') {
-                // P8: START-POINT-ONLY number line (critic, baseline 2026-09-24). The old line
-                // pre-drew every jump and put the arrowhead on the sum, so the picture WAS the
-                // answer and the pupil never jumped. Now only the start is marked; the pupil
-                // draws the jumps and writes where they land. One scale per page — 0-10 below
-                // Max Number 20, else 0-20, every whole number labelled in Andika — so the
-                // routine is the same on every item (the old 0-10 / 0-14 / 0-25 / 0-30 lines
-                // labelled by 1, 2 or 5 changed item to item, ~7 pt Arial). "Within the line"
-                // bounds the SUM, never the addends.
+                // P8: START-POINT-ONLY number line: only the start is marked; the pupil draws the
+                // hops (one per number) and writes where they land. One scale per page - 0-10
+                // below Max Number 20, else 0-20, every whole number labelled in Andika. "Within
+                // the line" bounds the SUM, never the addends.
                 const nlMax = range <= 10 ? 10 : 20;
                 const a = rng(1, nlMax - 2);
                 const b = rng(1, Math.min(10, nlMax - a));
-                const safeSum = a + b;
+                _nlKitItem(q, { a, b, op: '+', unknown: 'result', range: nlMax });
                 q.text = `Use the number line: ${a} + ${b} = ?`;
-                q.ans = safeSum;
-                q.a = a; q.b = b; q.op = '+';
-                q.answerType = 'number';
                 q.hint = `Start at ${a} on the number line. Jump forward ${b} times. Where do you land?`;
-                q.options = buildNumericOptions(safeSum);
-                // The kit's `number-line` template: every whole number labelled at the zone-label
-                // size on a line with a minimum pitch (never shrunk), the start marked, the pupil
-                // draws the jumps and writes the sum in the box after "=". The key draws the
-                // jumps and writes the sum in that same box. The screen twin's box takes the
-                // answer input (data-mq-blank).
-                const _nlPayload = { max: nlMax, start: a, add: b };
-                q.cell = { template: 'number-line', v: 1, payload: _nlPayload };
-                q.visual = _kitTwin('number-line', _nlPayload);
-                q.printText = 'Draw the jumps. Write the answer.';
-                q.printFormat = 'number-line-visual';
-                q.startOnly = true;       // print: no jumps, no "?" on the landing tick
-                q.nlMax = nlMax;          // print: one scale per page
                 q.skillLabel = 'Number Line Addition';
                 return;
             }
 
             if (mappedSkill === 'number_line_sub') {
-                const a = rng(5, Math.min(25, range));
-                const b = rng(1, a - 1);
-                const diff = a - b;
-                const nlMax = Math.ceil((a + 2) / 5) * 5 || 10;
-                const tickSpacing = 280 / nlMax;
-
-                // Build ticks and labels (hide answer label so student must figure it out)
-                let ticks = '';
-                for (let v = 0; v <= nlMax; v++) {
-                    const x = 10 + v * tickSpacing;
-                    const isMajor = v % 5 === 0 || nlMax <= 15;
-                    const tickH = isMajor ? 8 : 4;
-                    ticks += `<line x1="${x}" y1="${30 - tickH}" x2="${x}" y2="${30 + tickH}" stroke="${COLORS.axis}" stroke-width="${STROKE.hair}"/>`;
-                    if (isMajor) {
-                        if (v === diff) {
-                            ticks += `<text x="${x}" y="48" text-anchor="middle" font-family='${FONTS.sans}' fill="${COLORS.text}" font-size="10" font-weight="bold">?</text>`;
-                        } else {
-                            ticks += `<text x="${x}" y="48" text-anchor="middle" font-family='${FONTS.sans}' fill="${COLORS.text}" font-size="10">${v}</text>`;
-                        }
-                    }
-                }
-
-                // Build hop arcs (right to left)
-                let hops = '';
-                for (let i = 0; i < b; i++) {
-                    const x1 = 10 + (a - i) * tickSpacing;
-                    const x2 = 10 + (a - i - 1) * tickSpacing;
-                    const midX = (x1 + x2) / 2;
-                    const isLast = i === b - 1;
-                    hops += `<path d="M ${x1},30 Q ${midX},12 ${x2},30" fill="none" stroke="${COLORS.primary}" stroke-width="${STROKE.normal}"/>`;
-                    if (isLast) {
-                        // Arrowhead on final hop (pointing left)
-                        hops += `<polygon points="${x2 - 3},25 ${x2 + 3},25 ${x2},31" fill="${COLORS.primary}"/>`;
-                    }
-                }
-
-                // Start dot
-                const startX = 10 + a * tickSpacing;
-
+                // Owner request (2026-09-25): the kit's number line (was a coloured legacy SVG
+                // labelled by 5s with its hops drawn): 0-10 or 0-20, every number labelled, only
+                // the start marked, the pupil hops back one number at a time.
+                const nlMax = range <= 10 ? 10 : 20;
+                const a = rng(Math.min(5, nlMax - 1), nlMax);
+                const b = rng(1, Math.min(10, a - 1));
+                _nlKitItem(q, { a, b, op: '-', unknown: 'result', range: nlMax });
                 q.text = `Use the number line: ${a} \u2212 ${b} = ?`;
-                q.ans = diff;
-                q.a = a; q.b = b; q.op = '-';
-                q.answerType = 'number';
                 q.hint = `Start at ${a} on the number line. Jump backward ${b} times. Where do you land?`;
-                q.options = buildNumericOptions(diff);
-                q.visual = `<div style="text-align:center;">
-                    <svg width="500" height="90" viewBox="0 0 300 55" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:560px;height:auto;">
-                        <line x1="10" y1="30" x2="290" y2="30" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>
-                        ${ticks}
-                        <circle cx="${startX}" cy="30" r="3" fill="${COLORS.primary}"/>
-                        ${hops}
-                    </svg>
-                </div>`;
-                q.printFormat = 'number-line-visual';
                 q.skillLabel = 'Number Line Subtraction';
                 return;
             }
@@ -4050,8 +3963,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // P12: `forms` deals arrays only or groups only when the teacher narrows it.
                 const questionType = ['write_mult', 'equal_groups'][_p12Form(() => _dealRung(2))];
                 // Scale array size with range but cap for visual display
-                const arrMaxRows = Math.max(2, Math.min(range <= 50 ? 5 : range <= 100 ? 6 : 8, 10));
-                const arrMaxCols = Math.max(2, Math.min(range <= 50 ? 6 : range <= 100 ? 8 : 10, 12));
+                // R3 (critic round 3): 2.OA.4 bounds arrays at 5 rows and 5 columns, whatever the
+                // Max Number (5 x 7 and 6 x 4 were dealt at range 100).
+                const arrMaxRows = 5;
+                const arrMaxCols = 5;
                 const rows = rng(2, arrMaxRows);
                 const cols = rng(2, arrMaxCols);
                 const total = rows * cols;
@@ -4067,9 +3982,15 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // Three inline blanks. For an ARRAY the first two are commutative (rows of
                     // cols, or cols of rows, both describe it); for ringed GROUPS the order is
                     // fixed — so many groups, so many in each.
+                    // R3: one sentence with no full stop between the blanks, so a wrapped line
+                    // never starts with a stray '.' on screen; the screen instruction says what
+                    // the three boxes are for (it was a bare "Solve.").
                     q.text = isGroups
-                        ? `There are ___ groups of ___. ___ in all.`
-                        : `This array shows ___ rows of ___. ___ in all.`;
+                        ? `___ groups of ___ make ___ in all.`
+                        : `___ rows of ___ make ___ in all.`;
+                    q.screenInstr = isGroups
+                        ? 'Write the groups, the number in each group, and the total.'
+                        : 'Write the rows, the number in each row, and the total.';
                     // q.ans stays the product so the single-number worksheet paths still work;
                     // the per-blank acceptance lives in q.inlineBlanksData.
                     q.ans = total;
@@ -6346,7 +6267,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             if (op === "×") {
                 // Determine if this is a basic fact (12×12 or less) or needs column multiplication
                 // For ranges 10, 20, 50, 100: use basic 12×12 tables
-                const useFullTables = [10, 20, 50, 100].includes(range);
+                const useFullTables = factsMode || [10, 20, 50, 100].includes(range); // R3: the fact band wins over Max Number (768 × 5 on a facts page)
                 // NOTATION (CONTRACT 2). Column multiplication is not a notation choice: beyond
                 // 12 × 12 the item needs partial-product rows, so it stays stacked.
                 const _multAsked = notationFor('×');
@@ -6514,7 +6435,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 }
             } else if (op === "÷") {
                 // For ranges 10, 20, 50, 100: ignore range and use full 12×12 tables
-                const useFullTables = [10, 20, 50, 100].includes(range);
+                const useFullTables = factsMode || [10, 20, 50, 100].includes(range); // R3: the fact band wins over Max Number (768 × 5 on a facts page)
 
                 // NOTATION (was: 50/50 coin toss between the bracket and a bare sentence, so one
                 // page mixed them). The teacher's choice now decides it. A multi-digit dividend

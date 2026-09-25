@@ -66,17 +66,21 @@ function _diskHtml(place, idx, px) {
                padding:0;margin:0;line-height:1;">${label}</button>`;
 }
 
-function _zoneHtml(place, i, px) {
-    const side = 3 * px + 4 * GAP_PX;
+function _zoneHtml(place, i, px, cols = 3, width = 0) {
+    // Round 3 (H2 / H6 at 390 px): the three zones must fit the cell side by side. A narrow cell
+    // gives each zone its share of the width and fewer disks per row (the zone grows down),
+    // never smaller disks than a touch target.
+    const side = width || (cols * px + (cols + 1) * GAP_PX);
+    const tall = Math.max(side, Math.ceil(9 / cols) * (px + GAP_PX) + GAP_PX);
     return `<div class="pvb-col" data-place="${place}" style="display:flex;flex-direction:column;align-items:stretch;">
         <div class="pvb-zone-label" aria-hidden="true" style="text-align:center;font-family:'Andika',sans-serif;font-weight:700;
              font-size:1.35rem;color:#000;line-height:1.3;">${LETTER[place] || ''}</div>
         <div class="pvb-zone" data-place="${place}" role="button" tabindex="0"
             aria-label="${PLACE_LABEL[place]} zone, empty. Tap to add a ${PLACE_LABEL[place].toLowerCase()} disk."
-            style="box-sizing:border-box;width:${side}px;height:${side}px;border:2px solid #000;${i ? 'border-left:none;' : ''}
+            style="box-sizing:border-box;width:${side}px;height:${cols === 3 ? side : tall}px;border:2px solid #000;${i ? 'border-left:none;' : ''}
                    border-radius:0;background:#fff;cursor:pointer;padding:${GAP_PX}px;position:relative;">
             <div class="pvb-zone-stack" data-place="${place}"
-                 style="display:grid;grid-template-columns:repeat(3,${px}px);grid-auto-rows:${px}px;gap:${GAP_PX}px;"></div>
+                 style="display:grid;grid-template-columns:repeat(${cols},${px}px);grid-auto-rows:${px}px;gap:${GAP_PX}px;justify-content:center;"></div>
         </div>
     </div>`;
 }
@@ -88,7 +92,19 @@ export function renderPvDisksBuild(q, container) {
         ? q.places.slice().sort((a, b) => b - a)
         : _placesForTarget(target);
     const large = _largeTargets();
-    const px = large ? 56 : DISK_PX;
+    let px = large ? 56 : DISK_PX;
+    // the width the mat may take (the cell's content box); three disks a row when they fit
+    const avail = Math.max(0, (container.clientWidth || (container.parentElement && container.parentElement.clientWidth) || 0) - 4);
+    let cols = 3;
+    let zoneW = 0;
+    if (avail > 0 && places.length) {
+        const per = Math.floor(avail / places.length);
+        if (per < 3 * px + 4 * GAP_PX) {
+            zoneW = per;
+            cols = Math.max(1, Math.min(3, Math.floor((per - GAP_PX) / (44 + GAP_PX))));
+            px = Math.max(44, Math.min(px, Math.floor((per - (cols + 1) * GAP_PX - 4) / cols)));
+        }
+    }
 
     container.innerHTML = `
         <div class="pvb-host${large ? ' pvb-large' : ''}" role="application"
@@ -97,8 +113,8 @@ export function renderPvDisksBuild(q, container) {
             <div class="pvb-target" style="text-align:center;font-weight:700;font-size:2.4rem;
                  color:#000;margin-bottom:10px;letter-spacing:1px;">${target.toLocaleString('en-US')}</div>
             <div class="pvb-zones" data-role="zones"
-                 style="display:flex;justify-content:center;width:100%;overflow-x:auto;">
-                ${places.map((p, i) => _zoneHtml(p, i, px)).join('')}
+                 style="display:flex;flex-wrap:nowrap;justify-content:center;width:100%;overflow-x:auto;">
+                ${places.map((p, i) => _zoneHtml(p, i, px, cols, zoneW)).join('')}
             </div>
             <div class="pvb-howto" style="text-align:center;font-size:0.95rem;color:#000;margin-top:8px;">
                 Tap a zone to add a disk. Tap a disk to take it away.</div>
@@ -139,8 +155,14 @@ export function renderPvDisksBuild(q, container) {
                     `${PLACE_LABEL[p]} zone, ${n === 0 ? 'empty' : n + (n === 1 ? ' disk' : ' disks')}. Tap to add a ${PLACE_LABEL[p].toLowerCase()} disk.`);
             }
         });
-        const total = Object.values(getCounts()).reduce((a, b) => a + b, 0);
+        const counts = getCounts();
+        const total = Object.values(counts).reduce((a, b) => a + b, 0);
         submit.disabled = locked || total === 0;
+        // The grid hosts' twin (screen-cell.js mountBuild): the mat IS the answer - its value is
+        // written into the host's input as the pupil builds (no Submit on those hosts).
+        if (typeof container._pvOnChange === 'function') {
+            try { container._pvOnChange(Object.keys(counts).reduce((v, pl) => v + (counts[pl] | 0) * Number(pl), 0)); } catch (e) { /* host's */ }
+        }
     }
 
     function addDisk(zoneEl) {
@@ -209,6 +231,7 @@ export function renderPvDisksBuild(q, container) {
     container._pvLock = lockWidget;
     container._pvUnlockForRetry = unlockForRetry;
 
+    if (container.dataset.pvbNoSubmit === '1') submit.remove();
     submit.addEventListener('click', () => {
         if (submit.disabled || locked) return;
         submit.disabled = true;

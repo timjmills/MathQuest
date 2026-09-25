@@ -363,6 +363,56 @@ async function browserChecks() {
             ok(r.labelled === r.items && sum === r.items, `${what}: Score ${r.scores.join('+')} and ${r.labelled} labels for ${r.items} problems`);
         }
         ok(res.length >= 26, `browser: ${res.length} builds`);
+
+        // The PRINT SCREEN's own request (teacher-print.js requestFor: pages 1, columns auto, the
+        // header on, opts {}), Side by side: (a) every pupil problem of a skill with worked steps
+        // stands beside ITS OWN worked twin, rows of [twin | problem], on every page; (b) the Score
+        // on a sheet's first page counts the pupil problems of that sheet only, and a page-driven
+        // sheet ("a page") stays one page, so the Score is the problems the teacher sees.
+        const screen = await app.page.evaluate(async () => {
+            const req = (role, skills, anchors) => ({
+                role, letters: role === 'more-practice' ? ['A', 'B'] : undefined, anchors, key: true, seed: 835139, size: 'L', look: 'auto', paper: 'A4',
+                header: { name: true, date: true, score: true, tab: undefined, title: true },
+                sections: [{ skills: skills.map(([categoryId, skillId]) => ({ categoryId, skillId, opts: {} })), columns: 'auto', pages: role === 'independent' ? 1 : undefined }],
+            });
+            const read = async (r) => {
+                const out = await window.buildSheet(r);
+                const d = document.createElement('div');
+                d.innerHTML = out.pupilHtml;
+                const pages = [...d.querySelectorAll('[data-ws-page]')].map((pg) => ({
+                    score: Number(((pg.querySelector('.ws-field.score b') || {}).textContent || '').replace(/\D/g, '')) || null,
+                    grids: [...pg.querySelectorAll('.ws-grid')].map((g) => [...g.children].filter((c) => c.classList.contains('ws-cell'))
+                        .map((c) => (/mq-anchorcell/.test(c.className) ? 'M' : 'p')).join('')),
+                }));
+                return { pages, count: out.pageCount };
+            };
+            const out = [];
+            for (const sk of [['addition', 'add_facts'], ['subtraction', 'subtract'], ['addition', 'add_column_multi']]) {
+                for (const role of ['independent', 'more-practice']) out.push({ what: `${role} side ${sk[1]}`, one: true, ...(await read(req(role, [sk], 'side'))) });
+            }
+            out.push({ what: 'independent side, 3 skills (one without worked steps)', grouped: true,
+                ...(await read(req('independent', [['addition', 'add_facts'], ['addition', 'add_20_no_regroup'], ['subtraction', 'sub_facts']], 'side'))) });
+            return out;
+        });
+        for (const r of screen) {
+            const grids = r.pages.flatMap((pg) => pg.grids);
+            if (r.one) {
+                ok(grids.every((g) => /^(Mp)+$/.test(g)), `${r.what}: every problem beside its own worked twin (${grids.join(' / ')})`);
+            } else {
+                // A skill without worked steps has no twin; every other problem still has its own.
+                ok(grids.every((g) => /^(Mp)+$/.test(g) || /^p+$/.test(g)), `${r.what}: pairs or a skill without steps (${grids.join(' / ')})`);
+                ok(r.count === 1, `${r.what}: "a page" stays one page (${r.count})`);
+            }
+            // Sheets: each page with a Score starts a sheet; the sheet runs to the next Score.
+            let sheet = null;
+            const sheets = [];
+            for (const pg of r.pages) {
+                if (pg.score !== null) { sheet = { score: pg.score, pupil: 0 }; sheets.push(sheet); }
+                if (sheet) sheet.pupil += pg.grids.join('').replace(/M/g, '').length;
+            }
+            ok(sheets.length > 0 && sheets.every((s) => s.score === s.pupil), `${r.what}: Score counts the sheet's pupil problems only (${sheets.map((s) => `/${s.score} for ${s.pupil}`).join(', ')})`);
+            if (r.one || r.grouped) ok(r.pages.every((pg) => pg.score === null || pg.score === pg.grids.join('').replace(/M/g, '').length || r.pages.length > sheets.length), `${r.what}: page-1 Score equals the problems on it`);
+        }
     } finally {
         await app.close();
     }
