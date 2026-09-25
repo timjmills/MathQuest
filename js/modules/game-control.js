@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { SKILLS, DOMAINS, CALCULATOR_SKILLS } from './data.js';
+import { isTeacherLaunch, syncPlayChrome, syncBoard } from './launch-chrome.js';
 
 let _fullscreenHandler = null;
 
@@ -555,6 +556,9 @@ export function startGame() {
         window.setupTabDetection();
     }
 
+    // Teacher-launched views get plain-word controls; a pupil keeps the pupil labels.
+    syncPlayChrome();
+
     if (state.gameMode === "worksheet") {
         initWorksheet();
         // Fullscreen prompt (student mode only)
@@ -844,6 +848,9 @@ export function nextQuestion() {
             && state.currentQ
             && ['practice', 'boss', 'race'].includes(state.gameMode)
             && state.mapMode !== true
+            // A teacher-launched session (Run practice, the board) never opens it by itself:
+            // the teacher opens it from "Show me how" when the class needs it.
+            && !isTeacherLaunch()
             && window.shouldShowPreview(state.skill)) {
             try {
                 window.showWorkedPreview(state.skill, state.currentQ);
@@ -867,6 +874,10 @@ export function nextQuestion() {
 
     // Update goal progress display for new question
     updateGoalProgress();
+
+    // Teacher-launched: plain labels, and the Board display stage follows the question.
+    syncPlayChrome();
+    syncBoard();
 }
 
 // Get a readable skill label for displaying on questions
