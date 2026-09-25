@@ -936,6 +936,7 @@ Items per page. "By table" means the computed capacity in 12.3. A ceiling is nev
 
 - **DN-1** Reference densities above about 40 responses per page were judged too dense for these pupils; outside fact layouts no page exceeds 20 scored responses at L.
 - **DN-2** Every cell passes CL-5 (40% free) at every capacity in this section.
+- **DN-1a** (2026-09-25, `design/audit/LESSONS_LEARNED.md` L1) A kit Independent / More Practice page packed to its problems' measured size (dense packing) holds up to **20 / 16 / 12** standard problems at S / M / L (the Test row), and may take one more column at S than at L where the problem's own width allows it (12.3's stacked-arithmetic table). Size S never prints the grid of L.
 
 ### 12.2 The column x size rule
 

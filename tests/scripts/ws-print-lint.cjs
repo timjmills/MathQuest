@@ -23,6 +23,7 @@
 //   --files 01,11             pack: only page files whose name starts with one of these
 //   --count N                 legacy: items per section (default 20, the print dialog's default)
 //   --roles r1,r2             kit: the page roles to lint (default independent); any role buildSheet knows
+//   --size S|M|L              kit: the print size of every sheet (default L; LESSONS_LEARNED L1/L2 run S and L)
 //   --count auto|N            kit practice roles: the problem count (default auto, as the print screen);
 //                             auto also turns on L-DENSITY PAGEFILL (an empty strip over 20% of a page)
 //   --anchors side|sections   kit: print with step-by-step anchor problems (S6); adds L-ANCHOR
@@ -1391,8 +1392,9 @@ function lintKitGeometry(dom, pdf, info, F) {
                 const its = p.cells.filter(x => x.item);
                 if (its.length && gh > 0 && its.every(x => x.rect[3] <= gh / 4.5)) c = { n: Math.max(c.n, 20), name: `${c.name} (short problems, DN-1)` };
                 // 12.3's capacity tables (layout.js DENSE_CEILING): a kit page packed to its
-                // problems' measured size holds up to 12 standard problems (3 x 4).
-                else if (info.mode === 'kit') c = { n: Math.max(c.n, 12), name: `${c.name} (12.3 dense capacity)` };
+                // problems' measured size holds up to 20 / 16 / 12 standard problems at S / M / L
+                // (DN-1a, LESSONS_LEARNED L1: S no longer prints L's 3 x 4).
+                else if (info.mode === 'kit') c = { n: Math.max(c.n, { S: 20, M: 16, L: 12 }[p.size] || 12), name: `${c.name} (12.3 dense capacity)` };
             }
             if (c && p.items > c.n) F('L-DENSITY', 'DN-1', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} items; the ${c.name} ceiling at size ${p.size} is ${c.n} (section 12.1)`, `over ceiling ${p.role}`);
             if (p.role && !c) info.notes.push(`page ${p.idx}: role "${p.role}" has no ceiling in this gate`);
@@ -1669,7 +1671,7 @@ async function runApp(source) {
                     await renderPrint(page, s, { problemCount: COUNT, includeAnswerKey: true });
                     html = await legacyDocumentHtml(page);
                 } else {
-                    html = await page.evaluate(async ({ s, seed, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS }) => {
+                    html = await page.evaluate(async ({ s, seed, SIZE, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS }) => {
                         // js/modules/print-sheet.js buildSheet(req): sections carry the skills; the result has
                         // pupilHtml and keyHtml (the facsimile key, same plan).
                         const practice = role === 'independent' || role === 'more-practice';
@@ -1684,12 +1686,12 @@ async function runApp(source) {
                                 opts = { ...(opts || {}), support: [...new Set([...(def.default || []), ...want])] };
                             }
                         }
-                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId, opts }], count: practice ? COUNT : undefined }], size: 'L', look: practice ? 'ican' : 'auto', key: true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
+                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId, opts }], count: practice ? COUNT : undefined }], size: SIZE, look: practice ? 'ican' : 'auto', key: true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
                         let out;
                         try { out = await window.buildSheet(req); } catch (e) { if (e && e.unsupported) return { unsupported: e.message }; throw e; }
                         const body = [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');
                         return { doc: window.sheetDocument(body, s.label), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml };
-                    }, { s, seed, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null });
+                    }, { s, seed, SIZE: arg('size', 'L'), COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null });
                     if (html && html.doc) { kitHalves = html; html = html.doc; }
                 }
                 if (html && html.unsupported) {

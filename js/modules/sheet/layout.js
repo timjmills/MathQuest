@@ -115,6 +115,12 @@ export const PRACTICE_TARGET = Object.freeze({
  * up to 12 (3 x 4), long procedures up to 6.
  */
 export const DENSE_MAX_COLS = 4;
+/**
+ * LESSONS_LEARNED L1 (Size S ignored): the same cap at every size gave S the grid of L. Below L a
+ * cell's content is smaller, so dense packing may try one more column at S (a column only an item
+ * whose own width allows it reaches: layout.itemCap), and holds more standard problems a page.
+ */
+export const DENSE_MAX_COLS_AT = Object.freeze({ S: 5, M: 4, L: 4 });
 /** RUBRIC H13: a cell is never stretched past this multiple of its tallest measured content. */
 export const FILL_CAP = 1.8;
 /** Page fill: the practice roles take more rows when less than this share of the grid is used. */
@@ -125,7 +131,8 @@ const FILL_ROLES = new Set(['independent', 'more-practice']);
 export const DENSE_ROOM = 1.2;
 export const DENSE_CEILING = Object.freeze({
     short: Object.freeze({ S: 16, M: 16, L: 16 }),
-    standard: Object.freeze({ S: 12, M: 12, L: 12 }),
+    // L1: 12 at every size printed a 3 x 4 page of tiny two-digit stacks at S; S and M hold more.
+    standard: Object.freeze({ S: 20, M: 16, L: 12 }),
     long: Object.freeze({ S: 6, M: 6, L: 4 }),
 });
 
@@ -314,7 +321,7 @@ export function itemInfo(item, ctx = {}) {
     if (!fp && it.q) {
         try { fp = cellFootprint(it.q, ctx); } catch (e) { fp = null; }
     }
-    return { fp: fp || { wMm: 93, hMm: null, measure: true, maxCols: 2 }, fclass: it.fclass || '', measured: it.measured || null };
+    return { fp: fp || { wMm: 93, hMm: null, measure: true, maxCols: 2 }, fclass: it.fclass || '', measured: it.measured || null, size: ctx.size || it.size || '' };
 }
 
 /**
@@ -327,10 +334,24 @@ export function itemInfo(item, ctx = {}) {
 export function itemCap(info) {
     const { fp, measured } = info;
     const cap = fp.maxCols || 6;
+    // LESSONS_LEARNED L1 (size S ignored): a STATIC footprint's width is computed at the sheet's
+    // size (a stack's tracks from ctx.metrics), but its `maxCols` is the author's guess at L, so a
+    // two-digit stack was held to 3 columns at S as at L. Below L the width decides: as many
+    // columns as the footprint's own width allows (at most 6); fitAt's width and digit-aware
+    // clamps (VA-6, DN-15) still apply to the count chosen. L keeps the author's cap.
+    if (staticWidth(fp) && info.size && info.size !== 'L') {
+        const byWidth = Math.floor((LIVE_W_MM + GAP_W_MM) / (fp.wMm + GAP_W_MM + SAFETY_W_MM));
+        return Math.max(cap, Math.min(6, byWidth));
+    }
     if (!fp.measure || !measured) return cap;
     const ok = Object.entries(measured).filter(([, m]) => m && m.fits !== false && Number.isFinite(m.hMm)).map(([c]) => Number(c));
     return ok.length ? Math.max(...ok) : cap;
 }
+
+/** A footprint whose width the template computes (not measured by the host, not a fact ladder). */
+const staticWidth = (fp) => !!fp && !fp.measure && !fp.factLike && Number.isFinite(fp.wMm);
+/** The room a cell's frame and pads take beside its footprint width, in mm (a grid column). */
+const GAP_W_MM = 6;
 
 /** The tallest cell a column count needs, from the static footprint (PG-11's hMin). */
 function staticHMin(fp, size) {
@@ -355,7 +376,7 @@ function fitAt(info, cols, { size, look, availableWidthMm, auto }) {
     const m = measured && measured[cols];
     let hMin = staticHMin(fp, size);
     if (m && Number.isFinite(m.hMm)) hMin = fp.measure || fp.hMm == null ? m.hMm : Math.max(hMin, m.hMm);
-    const maxCols = m && fp.measure ? Math.max(cols, itemCap(info)) : fp.maxCols || 6;
+    const maxCols = m && fp.measure ? Math.max(cols, itemCap(info)) : staticWidth(fp) ? itemCap(info) : fp.maxCols || 6;
     if (cols > maxCols) return { fits: false, why: 'cap', hMin };
     // The host's measurement is the truth about overflow, clipping and shrinking (DN-10).
     if (m && m.fits === false) return { fits: false, why: 'width', hMin };
@@ -564,7 +585,7 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         const dCeil0 = bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling;
         const dCeil = section.ceiling !== undefined && section.ceiling !== null ? Math.min(dCeil0, ceiling) : dCeil0;
         const colOpts = requested === 'auto'
-            ? Array.from({ length: Math.max(0, Math.min(Number(section.denseMaxCols) > 0 ? Number(section.denseMaxCols) : DENSE_MAX_COLS, hardCap) - cols + 1) }, (_, k) => cols + k)
+            ? Array.from({ length: Math.max(0, Math.min(Number(section.denseMaxCols) > 0 ? Number(section.denseMaxCols) : DENSE_MAX_COLS_AT[size] || DENSE_MAX_COLS, hardCap) - cols + 1) }, (_, k) => cols + k)
             : [cols];
         let best = { perPage: rows * cols, cols, rows };
         // The room each cell keeps over its content: the section's own (a Test), else the
@@ -573,14 +594,21 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         // such an item with ordinary ones therefore keeps the ordinary 1.2.
         const room = Number(section.denseRoom) > 1 ? Number(section.denseRoom)
             : Math.max(...infos.map((i) => (Number(i.fp.denseRoom) >= 1 ? Number(i.fp.denseRoom) : DENSE_ROOM)));
+        // RUBRIC H13 across the cell: the side band a static-width problem (a stack) leaves at c
+        // columns, centred. At the same count a page, the grid with the narrower bands wins (L1:
+        // two-digit stacks at S in 4 columns left 30% of every cell empty on each side; 5 x 4
+        // holds the same 20 at 26%).
+        const staticWs = infos.filter((i) => staticWidth(i.fp)).map((i) => i.fp.wMm);
+        const sideBand = (c) => (staticWs.length === infos.length ? (1 - Math.min(1, Math.max(...staticWs) / cellWidthMm(c, W, look).inner)) / 2 : 0);
         for (const c of colOpts) {
             const pc = probe(c, c > cols);
             if (!pc.fits) continue;
             let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (pc.hMin * room)), Math.floor(dCeil / c)));
             if (c === 2) rr = TWO_COL_ROWS.find((x) => x <= rr) || rr;
-            if (rr * c > best.perPage) best = { perPage: rr * c, cols: c, rows: rr, hMin: pc.hMin };
+            const tie = rr * c === best.perPage && best.cols !== c && sideBand(best.cols) >= 0.25 && sideBand(c) < sideBand(best.cols);
+            if (rr * c > best.perPage || tie) best = { perPage: rr * c, cols: c, rows: rr, hMin: pc.hMin };
         }
-        if (best.perPage > rows * cols) {
+        if (best.perPage > rows * cols || (best.perPage === rows * cols && best.cols !== cols)) {
             cols = best.cols;
             rows = best.rows;
             // The note says what the page prints: a practice ceiling the dense tables go past

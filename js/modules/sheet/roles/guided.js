@@ -90,7 +90,7 @@ const kindOf = (it) => {
     return `${(it && it.template) || ''}:${p.kind || ''}:${generalStepsOf(it).join('|')}`;
 };
 
-export function pageSet(items0, ctx, kind = null) {
+export function pageSet(items0, ctx, kind = null, input = null, fixedCols = 0) {
     const wanted = AUTO_COLS[ctx.size];
     const options = [wanted, 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= wanted);
     // Guided practice practises what the Model shows (round-4 re-grade, mixed_placevalue: a place
@@ -108,21 +108,40 @@ export function pageSet(items0, ctx, kind = null) {
     const same = items0.filter((it) => kindOf(it) === top);
     const cut = kind !== null ? kind !== '' : same.length >= MIN_ITEMS && same.length < items0.length;
     const items = cut ? same : items0;
-    const cols = bestCols(items, options, ctx);
+    let cols = bestCols(items, options, ctx);
+    let use = items;
     for (const c of options) {
         if (c <= cols) break;
         const keep = items.filter((it) => fitsAt([it], c, ctx));
-        if (keep.length >= MIN_ITEMS && keep.length * 2 >= items.length) return { cols: c, items: keep, kind: cut ? top : '' };
+        if (keep.length >= MIN_ITEMS && keep.length * 2 >= items.length) { cols = c; use = keep; break; }
     }
-    return { cols, items, kind: cut ? top : '' };
+    // The plan keeps the column count counts() chose (its deal is a prefix of the probe).
+    if (fixedCols > 0 && fixedCols <= cols && fitsAt(use, fixedCols, ctx)) return { cols: fixedCols, items: use, kind: cut ? top : '' };
+    // LESSONS_LEARNED L1/L2: the widest grid is not always the fullest page. More columns under a
+    // spanning Model cost a whole row to the Model, and the page ceiling then trims the rest (size
+    // S: a 4-column compare page held the Model and 4 tries, 45% of it blank, where 2 columns hold
+    // the Model and 7). Of the column counts every item fits, take the one whose FIRST page holds
+    // the most; a tie keeps the wider grid.
+    if (input) {
+        let bestN = -1, bestC = cols;
+        // Never down to one full-width column when two fit (a compare row alone in a 186 mm cell).
+        for (const c of options.filter((x) => x <= cols && (x > 1 || cols === 1) && fitsAt(use, x, ctx))) {
+            const f = sheetFit(ordered(use, c), c, ctx, input, use.length < items0.length ? use.length : Infinity);
+            const n = Math.min(f.pages[0].cap, f.total);
+            if (n > bestN) { bestN = n; bestC = c; }
+        }
+        cols = bestC;
+    }
+    return { cols, items: use, kind: cut ? top : '' };
 }
 
 export function counts(pools, input) {
     const ctx = ctxOf(input);
     const all = pools.main || [];
-    const { cols, items, kind } = pageSet(all, ctx);
-    // plan() cuts its (prefix) deal to the same kind of problem.
+    const { cols, items, kind } = pageSet(all, ctx, null, input);
+    // plan() cuts its (prefix) deal to the same kind of problem, on the same grid.
     input.guidedKind = kind;
+    input.guidedCols = cols;
     const cut = items.length < all.length;
     const total = sheetFit(ordered(items, cols), cols, ctx, input, cut ? items.length : Infinity).total;
     if (items.length === all.length) return { main: total };
@@ -334,6 +353,8 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
         if (keepRows >= 1 || pages.length === 1) {
             const r = Math.max(1, keepRows + (spanCut ? 1 : 0));
             const cap = Math.max(1, r * cols - spanCut);
+            // Page 1 at its last row: nothing more to trim (the total is clipped on return).
+            if (cap >= pg.cap) break;
             total -= pg.cap - cap;
             pg.rows = r;
             pg.cap = cap;
@@ -668,7 +689,8 @@ function fadeRender(it, stage, ans, { hint = true } = {}) {
 export function plan(input = {}) {
     const ctx = ctxOf(input);
     const lesson = Math.max(1, Number(input.lesson) || 1);
-    const { cols, items } = pageSet(poolItems(input, 'main'), ctx, typeof input.guidedKind === 'string' ? input.guidedKind : null);
+    const { cols, items } = pageSet(poolItems(input, 'main'), ctx, typeof input.guidedKind === 'string' ? input.guidedKind : null,
+        Number(input.guidedCols) > 0 ? null : input, Number(input.guidedCols) || 0);
     const fit = sheetFit(ordered(items, cols), cols, ctx, input, items.length);
     const use = ordered(items, cols).slice(0, Math.min(items.length, fit.total));
     const key = instructionKeyOf(use, input.skills);

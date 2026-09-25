@@ -26,7 +26,7 @@ import {
     esc, blank, getProvider, instructionFor, INSTRUCTION_LIBRARY, JUDGE_LABELS,
     SIZES, DEFAULT_SIZE, LOOKS, DEFAULT_LOOK, deriveSeed, rng, shuffle,
 } from '../index.js';
-import { paperOf, bodyHeightMm, instructionMm, resolveSectionLayout, fitsLine, LIVE_W_MM } from '../layout.js';
+import { paperOf, bodyHeightMm, instructionMm, resolveSectionLayout, fitsLine, LIVE_W_MM, itemCap } from '../layout.js';
 import {
     skillWords, levelLine, gradeWords, instructionHtml, estimateTitleLines, styleBlock, hookClasses,
     STRAND_BY_CATEGORY, sectionInstructionKey, resolveInstruction, varsOfItems,
@@ -159,7 +159,17 @@ export function fitsAt(items, cols, ctx) {
         // The item's own column cap first (a word problem is one column, PT-WPR-1, however
         // narrow its wrapped text measures), then the host's measurement (DN-10).
         const fp = it.footprint || {};
-        if (fp.maxCols && cols > fp.maxCols) return false;
+        // The item's cap at THIS size (LESSONS_LEARNED L1: S printed the grid of L). Below L a
+        // static-width cell's computed width decides, and a measured cell its measurement (the
+        // widest count at which nothing overflowed, clipped or shrank, DN-10) - layout.itemCap,
+        // as the practice roles already do. L, and a full-width template (maxCols 1: a number
+        // line, a story), keep the author's cap.
+        const size = (ctx && ctx.size) || '';
+        const staticW = !fp.measure && !fp.factLike && Number.isFinite(fp.wMm);
+        const below = size && size !== 'L' && fp.maxCols > 1;
+        const cap = fp.maxCols && below && (staticW || (fp.measure && it.measured))
+            ? itemCap({ fp, measured: staticW ? null : it.measured, size }) : fp.maxCols;
+        if (cap && cols > cap) return false;
         if (cols > 1 && (it.fclass === 'word' || it.fclass === 'wide')) return false;
         const m = it.measured && it.measured[cols];
         return m ? m.fits !== false : true;
