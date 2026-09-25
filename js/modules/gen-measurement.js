@@ -1142,7 +1142,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.options = [];
                 q.hint = res === 1 ? 'Follow the arrow down to the ruler. Read the number under the long mark.'
                     : res === 2 ? 'Find the inch number before the arrow. A mark between two numbers is a half inch.'
-                        : 'Find the inch number before the arrow. Count the small spaces after it: each is 1/4 inch.';
+                        : 'Find the inch number before the arrow. Count the small spaces after it: each is a quarter inch.';
                 q.measurementData = { meas, res, ans };
                 q.printFormat = 'reading-ruler';
                 q.skillLabel = 'Ruler';

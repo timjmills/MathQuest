@@ -80,6 +80,14 @@ export function inchText(x, res = 4) {
     const f = `${r / g}/${res / g}`;
     return w ? `${w} ${f}` : f;
 }
+/** A length in inches as it is said: 3 inches, half an inch, 2 and three quarters inches. */
+export function inchWords(x) {
+    const q4 = Math.round(x * 4);
+    const w = Math.floor(q4 / 4), r = q4 % 4;
+    if (!r) return `${w} inch${w === 1 ? '' : 'es'}`;
+    if (!w) return ['', 'a quarter of an inch', 'half an inch', 'three quarters of an inch'][r];
+    return `${w} and ${['', 'a quarter', 'a half', 'three quarters'][r]} inches`;
+}
 const mixedSlots = (text) => {
     const m = /^\s*(\d+)?\s*(?:(\d+)\/(\d+))?\s*$/.exec(text) || [];
     return { w: m[1] || '', n: m[2] || '', d: m[3] || '' };
@@ -123,8 +131,8 @@ function rulerSteps(q) {
     if (parts.n) marks.push({ slot: 'n', value: parts.n }, { slot: 'd', value: parts.d });
     return [
         step(k ? `The arrow is after the ${w} inch mark.` : `The arrow points to the long mark with ${w} under it.`),
-        k ? step(`Each small space is 1/${res} inch. Count ${k} space${k > 1 ? 's' : ''} after ${w}.`) : step('There are no small spaces to count.'),
-        step(`Write ${ans}.`, marks),
+        k ? step(`Each small space is ${res === 2 ? 'a half' : 'a quarter'} inch. Count ${k} space${k > 1 ? 's' : ''} after ${w}.`) : step('There are no small spaces to count.'),
+        step(parts.n ? `Write ${parts.w ? `${parts.w}, then ` : ''}${parts.n} over ${parts.d}.` : `Write ${parts.w}.`, marks),
     ];
 }
 
@@ -132,8 +140,16 @@ const rulerStrings = (iCan) => strings({
     iCan,
     instructionKey: 'read-ruler',
     steps: ['Find the arrow. Follow it down to the ruler.', 'Find the inch number just before it.', 'Count the small spaces after that number.'],
-    say: 'The arrow points to __ inches.',
-    sayValues: (q) => { const p = payloadOf(q); return [inchText(Number(p.meas), Number(p.res) === 1 ? 1 : 4)]; },
+    say: 'The arrow points to __.',
+    // said in words (a slash fraction is never printed, TY-7)
+    sayValues: (q) => [inchWords(Number(payloadOf(q).meas))],
+    // the steps follow the ruler on the page: a whole-inch ruler has no small spaces to count
+    stepsFor: (q) => {
+        const res = Number(payloadOf(q).res) || 1;
+        if (res === 1) return ['Find the arrow. Follow it down to the ruler.', 'Find the long mark it points to.', 'Read the number under that mark.'];
+        return ['Find the arrow. Follow it down to the ruler.', 'Find the inch number just before it.',
+            `Each small space is ${res === 2 ? 'a half' : 'a quarter'} inch.`, 'Count the small spaces after that number.'];
+    },
 });
 registerSkill('measurement:reading_ruler', {
     strings: rulerStrings('I Can read a ruler to the inch'),
@@ -282,8 +298,30 @@ function barSay(q) {
 }
 
 const DATA_MISCONCEPTIONS = ['M-D1', 'M-D2', 'M-D3', 'M-D4', 'M-D5', 'M-D6'];
+/** The Steps band from the page's own item: its display and what it asks (L6). */
+function dataStepsFor(q) {
+    const p = payloadOf(q);
+    const a = p.ask || {};
+    const kind = displayOf(q);
+    const unit = kind === 'bar-graph' ? 'bar' : 'row';
+    const scale = Number(p.scale) || 1;
+    const read = kind === 'pictograph' ? (scale === 1 ? 'Count the pictures. One picture is one.' : `Count the pictures by ${scale}s.`)
+        : kind === 'tally-chart' ? 'Count the bundles by 5s, then the single marks.' : 'Follow the end of the bar to the scale.';
+    const first = kind === 'pictograph' && scale > 1 ? ['Read the key: what one picture stands for.'] : [];
+    switch (a.kind) {
+        case 'most': case 'least':
+            return first.concat([`Look at all the ${unit}s.`, `Find the ${a.kind === 'most' ? 'longest' : 'shortest'} ${unit}.`, 'Check the box for it.']);
+        case 'more':
+            return first.concat([`Find the two ${unit}s the question names.`, read, 'Subtract the smaller number from the bigger one.']);
+        case 'total':
+            return first.concat([`Read every ${unit}. ${read}`, 'Add all the numbers.']);
+        default:
+            return first.concat([`Find the ${unit} the question names.`, read]);
+    }
+}
+
 const dataProvider = (iCan, instructionKey, steps, extra = []) => ({
-    strings: strings({ iCan, instructionKey, steps, say: 'The graph shows __.', sayValues: barSay }),
+    strings: strings({ iCan, instructionKey, steps, say: 'The graph shows __.', sayValues: barSay, stepsFor: dataStepsFor }),
     misconceptions: DATA_MISCONCEPTIONS.concat(extra),
     workedSteps: (q) => clampSteps(barSteps(q)),
     wrongAnswer: barWrong,

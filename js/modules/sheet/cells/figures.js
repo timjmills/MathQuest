@@ -28,6 +28,7 @@
 
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
+import { blankWidth } from '../tokens.js';
 import {
     L, P, B, INK, GREY, SW, PT_MM, n2, isTwin, sizeOf, S, digitPt, textPt, zonePt, box, svg, root, shapeOf,
 } from './k2kit.js';
@@ -153,12 +154,13 @@ function rulerSlot(p, ctx) {
     const val = (id) => partValue(ctx, id, key, splitMixed);
     const h = S(ctx).writeMm + 2;
     const fb = S(ctx).writeMm + 1;
+    // a whole-number answer leaves the fraction boxes out of the key (never "0/4"), and "3/4"
+    // leaves the whole box empty: those boxes are not graded (AK-2). Error analysis shows the
+    // pupil's finished work on both pages, so there the work decides which boxes hold a number.
+    const shown = ctx.state === 'wrong' ? (splitMixed(val('w') + (val('n') ? ` ${val('n')}/${val('d')}` : '')) || key) : key;
     const one = (id, w, hh) => {
-        const graded = id === 'w' ? key.w !== '' : key.n !== '';
-        // a whole-number answer leaves the fraction boxes out of the key (never "0/4"), and
-        // "3/4" leaves the whole box empty: those boxes are not graded (AK-2)
-        const b = box(ctx, { id, value: val(id), w, h: hh, mark: 'cell', graded });
-        return b;
+        const graded = id === 'w' ? shown.w !== '' : shown.n !== '';
+        return box(ctx, { id, value: val(id), w, h: hh, mark: 'cell', graded });
     };
     const frac = `<span style="display:inline-flex;flex-direction:column;align-items:center;flex:none;">${one('n', 12, fb)}`
         + `<span aria-hidden="true" style="display:block;align-self:stretch;min-width:${L(ctx, 12)};border-top:${B(ctx, 1.5)} solid ${INK};margin:${L(ctx, 0.8)} 0;"></span>`
@@ -207,9 +209,9 @@ export function barGraphSVG(p, ctx) {
     const n = Math.max(1, cats.length);
     const step = Number(p.step) || 1, top = Number(p.top) || Math.max(...vals, 1);
     // The screen twin is drawn smaller than paper by its host (a phone, a worksheet card), so it
-    // takes the S plot and labels a third larger: the numbers stay readable at 390 px.
-    const [pw0, ph0] = isTwin(ctx) ? PLOT.S : (PLOT[sizeOf(ctx)] || PLOT.L);
-    const zPt = zonePt(ctx) * (isTwin(ctx) ? 1.35 : 1), zMm = zPt * PT_MM;
+    // takes the M plot and labels nearly half as large again: the numbers stay readable at 390 px.
+    const [pw0, ph0] = isTwin(ctx) ? PLOT.M : (PLOT[sizeOf(ctx)] || PLOT.L);
+    const zPt = zonePt(ctx) * (isTwin(ctx) ? 1.45 : 1), zMm = zPt * PT_MM;
     const steps = [];
     for (let v = 0; v <= top + 1e-9; v += step) steps.push(+v.toFixed(6));
     const hint = levelOf(ctx) >= 2 && p.ask && p.ask.kind === 'value' && Number.isInteger(p.ask.i) ? p.ask.i : -1;
@@ -294,18 +296,20 @@ function dataCell(name, draw) {
         render(p, ctx) {
             const g = draw(p, ctx);
             const cats = (p.categories || []).map(String);
+            // the screen twin is drawn smaller than paper: its words a third larger (as its labels)
+            const tw = isTwin(ctx) ? 1.35 : 1;
             let answer;
             if (asksBar(p)) {
-                answer = `<div style="margin-top:${L(ctx, 3)};">${words(ctx, 'Check one box.', { pt: zonePt(ctx) })}</div>`
-                    + `<div style="margin-top:${L(ctx, 1)};">${tickList(ctx, cats, { on: tickedIndex(ctx, cats, p.answer), id: 'answer' })}</div>`;
+                answer = `<div style="margin-top:${L(ctx, 3)};">${words(ctx, 'Check one box.', { pt: zonePt(ctx) * tw })}</div>`
+                    + `<div style="margin-top:${L(ctx, 1)};">${tickList(ctx, cats, { on: tickedIndex(ctx, cats, p.answer), id: 'answer', pt: (textPt(ctx) + 1) * tw })}</div>`;
             } else {
                 const digits = Math.max(1, String(p.answer).length);
                 answer = `<div style="margin-top:${L(ctx, 4)};">${numberSlot(ctx, 'answer', p.answer, { digits })}</div>`;
             }
             const ask = `<div class="fg-ask" style="flex:1 1 ${L(ctx, 40)};min-width:${L(ctx, 40)};max-width:${L(ctx, 70)};text-align:left;">`
-                + `<div class="fg-title" style="font-size:${P(ctx, textPt(ctx))};font-weight:700;line-height:1.25;margin-bottom:${L(ctx, 3)};">${esc(p.title || '')}</div>`
-                + `<div style="font-size:${P(ctx, textPt(ctx))};font-weight:400;line-height:1.3;white-space:normal;">${esc(p.question || '')}</div>${answer}</div>`;
-            return root(ctx, `fg-${name}`, `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 6)};${isTwin(ctx) ? 'flex-wrap:wrap;' : ''}">`
+                + `<div class="fg-title" style="font-size:${P(ctx, textPt(ctx) * tw)};font-weight:700;line-height:1.25;margin-bottom:${L(ctx, 3)};">${esc(p.title || '')}</div>`
+                + `<div style="font-size:${P(ctx, textPt(ctx) * tw)};font-weight:400;line-height:1.3;white-space:normal;">${esc(p.question || '')}</div>${answer}</div>`;
+            return root(ctx, `fg-${name}`, `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 6)};flex-wrap:wrap;">`
                 + `<div style="flex:none;max-width:100%;">${g.html}</div>${ask}</div>`);
         },
         answerKey(p) {
@@ -332,7 +336,7 @@ dataCell('bar-graph', barGraphSVG);
  */
 function rowTable(p, ctx, { markW, rowH, head2, cell, foot = null }) {
     const cats = (p.categories || []).map(String);
-    const zPt = zonePt(ctx) * (isTwin(ctx) ? 1.35 : 1), zMm = zPt * PT_MM;
+    const zPt = zonePt(ctx) * (isTwin(ctx) ? 1.45 : 1), zMm = zPt * PT_MM;
     const labW = Math.max(...cats.map((c) => textW(c, zPt)), textW(p.catTitle || '', zPt)) + 5;
     const m = SW.heavy / 2;
     const headH = zMm * 1.9;
@@ -487,9 +491,13 @@ register('perimeter-shape', {
         return { value: Number(p.ans), display: `${p.ans} ${p.unit || ''}`.trim(), slots: { answer: { value: String(p.ans), graded: true } } };
     },
     footprint(p, ctx) {
+        // the drawing or the "Perimeter = [ ] cm" line, whichever is wider, and a margin (like
+        // frac-model): a Model cell then sits beside its worked steps without an empty band
         const f = perimeterSVG(p || {}, ctx || {});
-        const wMm = Math.ceil(Math.max(f.W, 60) + 10);
-        return { wMm: wMm <= 88 ? 93 : 186, hMm: null, measure: true, factLike: false, maxCols: wMm <= 88 ? 2 : 1 };
+        const sentence = textW('Perimeter =', textPt(ctx || {})) + blankWidth(Math.max(2, String((p || {}).ans).length), sizeOf(ctx || {}))
+            + textW(` ${(p || {}).unit || ''}`, textPt(ctx || {})) + 6;
+        const wMm = Math.ceil(Math.max(f.W, sentence) + 8);
+        return { wMm, hMm: null, measure: true, factLike: false, maxCols: wMm <= 88 ? 2 : 1 };
     },
     inputs() { return [{ id: 'answer', kind: 'number', shape: 'box', graded: true, order: 0, inputmode: 'numeric', scopes: ['full', 'answer-only'] }]; },
     layout() { return { card: 'card-medium-visual', checker: 'value', requiresVisual: true }; },
