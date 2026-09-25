@@ -15,8 +15,8 @@
 const SVG_SIZE = 240;
 const CENTER = SVG_SIZE / 2;          // 120
 const RADIUS = 110;
-const HOUR_HAND_LEN = 55;
-const MIN_HAND_LEN = 88;
+const HOUR_HAND_LEN = 51;     // RP-101: 0.46 R
+const MIN_HAND_LEN = 86;      // RP-101: 0.78 R
 
 function _largeTargets() {
     try {
@@ -92,10 +92,11 @@ function _snapMinute(angleDeg, snap) {
     return m;
 }
 
-function _hourFromAngle(angleDeg) {
-    // 360 / 12 = 30 deg per hour. Round to nearest hour for the dial,
-    // since hour-hand drag UX is "pick an hour".
-    let h = Math.round(angleDeg / 30) % 12;
+function _hourFromAngle(angleDeg, minute = 0) {
+    // 360 / 12 = 30 deg per hour. The hour hand of h:m sits at 30h + 0.5m (RP-101), so the hour
+    // a pointer means is the one whose hand position is nearest: at 3:45 the hand is 3/4 of the
+    // way to 4 and must still read 3 (P10 fix: plain rounding read it as 4).
+    let h = Math.round((angleDeg - minute * 0.5) / 30) % 12;
     if (h < 0) h += 12;
     return h;
 }
@@ -116,7 +117,7 @@ export function renderClockSet(q, container) {
     const numerals = [];
     for (let i = 1; i <= 12; i++) {
         const a = (i * 30 - 90) * Math.PI / 180;
-        const r = RADIUS - 22;
+        const r = RADIUS * 0.66;   // RP-100: numerals on 0.66 R, as on the paper face
         const x = CENTER + r * Math.cos(a);
         const y = CENTER + r * Math.sin(a);
         numerals.push(`<text class="cs-numeral" x="${x}" y="${y}">${i}</text>`);
@@ -156,6 +157,11 @@ export function renderClockSet(q, container) {
                     aria-label="Minute hand"
                     aria-valuemin="0" aria-valuemax="59"
                     aria-valuenow="${minute}" aria-valuetext="${minute} minutes"/>
+                <!-- P10: wide invisible grab lines (a 44 px target at the widget's 240 px size) -->
+                <line data-hit="hour" class="cs-hit cs-hit-hour" x1="${CENTER}" y1="${CENTER}" x2="${CENTER}" y2="${CENTER - HOUR_HAND_LEN}"
+                    stroke="transparent" stroke-width="44" stroke-linecap="round" aria-hidden="true"/>
+                <line data-hit="minute" class="cs-hit cs-hit-minute" x1="${CENTER}" y1="${CENTER - 62}" x2="${CENTER}" y2="${CENTER - MIN_HAND_LEN}"
+                    stroke="transparent" stroke-width="44" stroke-linecap="round" aria-hidden="true"/>
                 <circle class="cs-pivot" cx="${CENTER}" cy="${CENTER}" r="5"/>
             </svg>
             ${digitalHtml}
@@ -199,6 +205,12 @@ export function renderClockSet(q, container) {
         const mAngle = _minuteAngleDeg(minute);
         const hEnd = _handEnd(hAngle, HOUR_HAND_LEN);
         const mEnd = _handEnd(mAngle, MIN_HAND_LEN);
+        const hHit = container.querySelector('.cs-hit-hour'), mHit = container.querySelector('.cs-hit-minute');
+        if (hHit) { hHit.setAttribute('x2', hEnd.x); hHit.setAttribute('y2', hEnd.y); }
+        if (mHit) {
+            const mIn = _handEnd(mAngle, 62);
+            mHit.setAttribute('x1', mIn.x); mHit.setAttribute('y1', mIn.y); mHit.setAttribute('x2', mEnd.x); mHit.setAttribute('y2', mEnd.y);
+        }
         hourHand.setAttribute('x2', hEnd.x);
         hourHand.setAttribute('y2', hEnd.y);
         minuteHand.setAttribute('x2', mEnd.x);
@@ -250,7 +262,7 @@ export function renderClockSet(q, container) {
         if (dx === 0 && dy === 0) return;
         const angle = _pointerAngle(dx, dy);
         if (dragging.hand === 'hour') {
-            const newHour = _hourFromAngle(angle);
+            const newHour = _hourFromAngle(angle, minute);
             if (newHour !== hour) setHour(newHour, { silent: true });
         } else {
             const newMin = _snapMinute(angle, minuteSnap);
@@ -269,11 +281,22 @@ export function renderClockSet(q, container) {
 
     svg.addEventListener('pointerdown', (e) => {
         if (locked) return;
-        const handEl = e.target.closest('.cs-hand');
-        if (!handEl) return;
+        // P10: grab a hand (or its wide grab line), or TAP the face: a tap near the rim sets the
+        // minute hand there, a tap inside sets the hour hand, and the pupil can drag on from it.
+        let which = null;
+        const hit = e.target.closest('.cs-hand, .cs-hit');
+        if (hit) which = (hit.dataset.hand || hit.dataset.hit) === 'hour' ? 'hour' : 'minute';
+        else {
+            const p = pointerSvgPoint(e);
+            const dx = p.x - CENTER, dy = p.y - CENTER, r = Math.hypot(dx, dy);
+            if (r > RADIUS + 4 || r < 8) return;
+            which = r > 70 ? 'minute' : 'hour';
+            const angle = _pointerAngle(dx, dy);
+            if (which === 'hour') setHour(_hourFromAngle(angle, minute)); else setMinute(_snapMinute(angle, minuteSnap));
+        }
         e.preventDefault();
+        const handEl = which === 'hour' ? hourHand : minuteHand;
         handEl.focus();
-        const which = handEl.dataset.hand === 'hour' ? 'hour' : 'minute';
         dragging = { hand: which, pointerId: e.pointerId };
         try { svg.setPointerCapture(e.pointerId); } catch (_) { /* */ }
         window.addEventListener('pointermove', onPointerMove);

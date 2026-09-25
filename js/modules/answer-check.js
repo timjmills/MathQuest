@@ -553,8 +553,8 @@ function parseClockTime(str) {
     // Strip AM/PM variants (3:45 PM, 3:45pm, 3:45 p.m.)
     str = str.replace(/\s*(a\.?\s*m\.?|p\.?\s*m\.?)\s*$/i, '').trim();
 
-    // "H:MM" or "HH:MM"
-    let m = str.match(/^(\d{1,2}):(\d{2})$/);
+    // "H:MM" or "HH:MM" (P10: "7:5" from the two-box time slot is 7:05, spec §0 rule 6)
+    let m = str.match(/^(\d{1,2}):(\d{1,2})$/);
     if (m) {
         let h = parseInt(m[1]) % 12 || 12;
         return { hours: h, minutes: parseInt(m[2]) };
@@ -605,6 +605,19 @@ function parseDuration(str) {
 export function timeAnswersMatch(userAns, correctAns, skill) {
     // Quick exact match first (handles MC clicks where option text === q.ans)
     if (normalizeText(userAns) === normalizeText(correctAns)) return true;
+
+    // P10: an hours-and-minutes answer ("1 h 15 min", from the `[ ] h [ ] min` slot, which
+    // composes "1 h 15") compares as a duration whatever the skill.
+    const hm = (v) => {
+        const t = String(v == null ? '' : v).trim().toLowerCase();
+        const x = t.match(/^(\d+)\s*h(?:ours?|rs?)?\s*(?:(\d+)\s*(?:m|min|mins|minutes?)?)?$/);
+        return x ? parseInt(x[1], 10) * 60 + (x[2] ? parseInt(x[2], 10) : 0) : null;
+    };
+    const wantHm = hm(correctAns);
+    if (wantHm !== null) {
+        const got = hm(userAns);
+        return got !== null && got === wantHm;
+    }
 
     if (isDurationSkill(skill)) {
         // Duration: "1 hour" = "1:00" = "60 minutes" = "60"
