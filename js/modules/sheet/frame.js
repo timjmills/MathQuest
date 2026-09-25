@@ -7,6 +7,7 @@
 
 import { DEFAULT_LOOK, DEFAULT_SIZE, blankWidth } from './tokens.js';
 import { esc } from './cell.js';
+import { escText } from './frac-text.js';
 
 /* --------------------------------------------------------------- header parts (HD-1) */
 
@@ -39,7 +40,7 @@ export const strandTab = (lines) =>
  * `note` is the optional trailing detail set at weight 400 on the same baseline.
  */
 export const pageTitle = (text, note = '') =>
-    (text ? `<div class="ws-title">${esc(text)}${note ? `<small>${esc(note)}</small>` : ''}</div>` : '');
+    (text ? `<div class="ws-title">${escText(text)}${note ? `<small>${esc(note)}</small>` : ''}</div>` : '');
 
 /**
  * The teacher footer (HD-30): the ONLY place grade and CCSS codes appear. Left skill ids,
@@ -123,7 +124,7 @@ export function sayBand(frame, { size = DEFAULT_SIZE, digits = 2 } = {}) {
     let inner = '';
     parts.forEach((part, i) => {
         if (i) inner += `<span class="ws-line" style="--w:${w}mm" data-ws-slot="say-${i}" data-ws-shape="line" data-ws-graded="0"></span>`;
-        if (part) inner += `<span>${esc(part)}</span>`;
+        if (part) inner += `<span>${escText(part)}</span>`;
     });
     return `<div class="ws-band ws-band--say" data-ws-band="say"><div class="ws-strip ws-strip--say">`
         + `<b>Say:</b><span class="ws-sayframe"><span class="ws-q">“</span>${inner}<span class="ws-q">”</span></span>`

@@ -7,6 +7,7 @@
 //
 // Pure module (SCC-01): no `window`, no DOM, no `Math.random`.
 
+import { escText } from './frac-text.js';
 import {
     SIZES, DEFAULT_SIZE, LOOKS, DEFAULT_LOOK, SLOT, blankWidth, resolveCtx, TAB_LADDER, factTab,
 } from './tokens.js';
@@ -157,20 +158,20 @@ export function blank(slot, ctx = {}, key = null) {
         case 'none':
             return '';
         case 'box':
-            return `<span class="ws-box${traced}" style="--w:${w}mm"${a}>${esc(value)}</span>`;
+            return `<span class="ws-box${traced}" style="--w:${w}mm"${a}>${escText(value)}</span>`;
         case 'box-unknown':   // LS-8: short dash, the only dashed shape that is not a cut line
-            return `<span class="ws-box ws-box--unknown${traced}" style="--w:${w}mm"${a}>${esc(value)}</span>`;
+            return `<span class="ws-box ws-box--unknown${traced}" style="--w:${w}mm"${a}>${escText(value)}</span>`;
         case 'circle':        // a sign: + - x / or < = >
-            return `<span class="ws-circle${traced}"${a}>${esc(value)}</span>`;
+            return `<span class="ws-circle${traced}"${a}>${escText(value)}</span>`;
         case 'check': {
             // Section 6: the checkbox is 5 / 6 / 7 mm. The stylesheet's `.ws-check` is a flat
             // 5 mm (it came from the mock-up, which only ever drew one size), so the size the
             // preset asks for is carried here, from SIZES, until the stylesheet reads a token.
             const cw = (SIZES[c.size] || SIZES[DEFAULT_SIZE]).checkMm;
-            return `<span class="ws-check${traced}" style="width:${cw}mm;height:${cw}mm"${a}>${esc(value)}</span>`;
+            return `<span class="ws-check${traced}" style="width:${cw}mm;height:${cw}mm"${a}>${escText(value)}</span>`;
         }
         case 'choice':
-            return `<span class="ws-choice${traced}"${a}>${esc(slot.text || value)}</span>`;
+            return `<span class="ws-choice${traced}"${a}>${escText(slot.text || value)}</span>`;
         case 'fraction':
             return `<span class="ws-slotfrac${traced}"${a}><span></span><span></span></span>`;
         case 'mixed':
@@ -182,16 +183,16 @@ export function blank(slot, ctx = {}, key = null) {
                 + `<b>:</b><span class="ws-box" style="--w:${tw}mm"></span></span>`;
         }
         case 'unit':
-            return `<span class="ws-line${traced}" style="--w:${w}mm"${a}>${esc(value)}</span>`
+            return `<span class="ws-line${traced}" style="--w:${w}mm"${a}>${escText(value)}</span>`
                 + (slot.unitWord ? `<span class="ws-unitword">${esc(slot.unitWord)}</span>` : '');
         case 'unit-open':
-            return `<span class="ws-line${traced}" style="--w:${w}mm"${a}>${esc(value)}</span>`
+            return `<span class="ws-line${traced}" style="--w:${w}mm"${a}>${escText(value)}</span>`
                 + `<span class="ws-line ws-line--label" style="--w:${SLOT.unitOpenLineMm[c.size]}mm" data-ws-slot="${attr((slot.id || 'answer') + '-label')}" data-ws-shape="line"></span>`;
         case 'open':          // the open answer zone under a sum rule: ruled by the cell, not here
-            return `<span class="ws-open${traced}"${a}>${esc(value)}</span>`;
+            return `<span class="ws-open${traced}"${a}>${escText(value)}</span>`;
         case 'line':
         default:
-            return `<span class="ws-line${traced}" style="--w:${w}mm"${a}>${esc(value)}</span>`;
+            return `<span class="ws-line${traced}" style="--w:${w}mm"${a}>${escText(value)}</span>`;
     }
 }
 

@@ -22,7 +22,7 @@
 
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems, labelStyleOf,
-    resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, esc, blank, slotKey,
+    resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, esc, escText, blank, slotKey,
     slotOnly, operandsOf, opOf, opGlyphOf,
 } from './compose.js';
 import { getProvider } from '../index.js';
@@ -183,7 +183,7 @@ export function prepare(it, info = {}) {
             ? `<span class="mq-ansslot"><span class="mq-klabel">${esc(nounOf(st))}</span></span>`
             : `<span class="mq-ansslot">${blank({ id: 'wp-label', kind: 'text', shape: 'line', widthMm: { S: 40, M: 46, L: 52 }[c.size] || 52 }, c, slotOnly(key, 'wp-label'))}<small>label</small></span>`;
         return `<div class="mq-wp mq-wp2${kLevel ? ' mq-wpk' : ''}${model && WIDE_MODELS.has(it.template) ? ' mq-wpunder' : ''}">`
-            + `<div class="ws-story mq-wpstory">${st.lines.slice(0, 6).map((l) => `<div>${esc(l)}</div>`).join('')}</div>`
+            + `<div class="ws-story mq-wpstory">${st.lines.slice(0, 6).map((l) => `<div>${escText(l)}</div>`).join('')}</div>`
             + space
             + `<div class="mq-wpanswer">`
             + `<span class="mq-ansslot">${blank({ id: 'wp-num', kind: 'number', shape: 'box', widthMm: numW }, c, slotOnly(key, 'wp-num'))}<small>number</small></span>`

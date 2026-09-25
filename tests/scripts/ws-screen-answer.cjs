@@ -210,6 +210,36 @@ function PLAN(rootSel, which) {
         let vals = sets ? sets[0].map(String) : parts(ans);
         if (jn === ':' || jn === '.') vals = String(ans).split(jn);
         if (jn === ' h ') { const m = /(\d+)\s*h\s*(\d+)/.exec(String(ans)); if (m) vals = [m[1], m[2]]; }
+        // boxes inside written terms (frac-model "1/[ ] + 1/[ ]"): each box takes the part of its
+        // term that the term's template (data-mq-tpl) leaves open
+        // terms of several named places (frac-model "1 [ ]/4", "[ ] [ ]/[ ]"): q.ans split by the
+        // join, each term read through its wrapper's template, one value per box in reading order
+        const namedT = (c) => { const t = c.parentElement && c.parentElement.closest('[data-mq-tpl]'); return t && /\{[wnd]\}/.test(t.getAttribute('data-mq-tpl')) ? t : null; };
+        if (slots.some(namedT)) {
+            const jn2 = (slots[0].closest('[data-mq-join]') || { getAttribute: () => ', ' }).getAttribute('data-mq-join');
+            const list = String(ans).split(jn2.trim() || ',').map(t => t.trim());
+            const groups = [];
+            slots.forEach(c => { const t = namedT(c); const g = groups[groups.length - 1]; if (g && g.el === t && t) g.cs.push(c); else groups.push({ el: t, cs: [c] }); });
+            groups.forEach((g, gi) => {
+                const tpl = g.el ? g.el.getAttribute('data-mq-tpl') : '{w}';
+                const re = new RegExp('^\\s*' + tpl.replace(/[.*+?^$()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s*').replace(/\{[wnd]\}/g, '(\\d*)') + '\\s*$');
+                const m = re.exec(list[gi] || '') || (/^\d+$/.test(list[gi] || '') && /^\{w\}/.test(tpl) ? [list[gi], list[gi]] : []);
+                g.cs.forEach((c, j) => { if (m[j + 1]) tag(c, { type: 'text', value: m[j + 1] }); });
+            });
+            return { plan, q: String(ans) };
+        }
+        if (slots.some(c => c.closest('[data-mq-tpl]'))) {
+            const terms = String(ans).split('+').map(t => t.trim());
+            slots.forEach((c, i) => {
+                const t = c.closest('[data-mq-tpl]');
+                const [pre, post] = String(t ? t.getAttribute('data-mq-tpl') : '{}').split('{}');
+                let x = terms[i] || '';
+                if (pre && x.startsWith(pre)) x = x.slice(pre.length);
+                if (post && x.endsWith(post)) x = x.slice(0, -post.length);
+                tag(c, { type: 'text', value: x });
+            });
+            return { plan, q: String(ans) };
+        }
         // a fraction [n]/[d], a mixed number [w] [n]/[d] (frac-model): the answer's own parts
         if (jn === '/' || jn === 'mixed') {
             const a = String(ans).trim();

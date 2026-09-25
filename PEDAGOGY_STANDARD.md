@@ -1316,6 +1316,10 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `frac-name` | Write the fraction, or circle the model that shows it. | identify fractions: write the fraction a model shows, or pick the model (A-D) that shows a fraction (added 2026-09-25, O6 lane AP3) |
 | `models-complete` | Look at the two models. Complete the number sentence. | equivalent fractions with two models: the missing fraction, number, or = / ≠ (added 2026-09-25, O6 lane AP3) |
 | `line-mark-each` | Mark each number on the line. | put fractions, mixed numbers, decimals or integers on a number line: a dot on the tick, and the number's letter when there are several (added 2026-09-25, O6 lane AP3) |
+| `unit-fractions` | Write each shaded part as a unit fraction. | decompose a fraction into unit fractions under its model: 4/6 = 1/[ ] + 1/[ ] + 1/[ ] + 1/[ ] (added 2026-09-25, fractions lane) |
+| `share-fraction` | Share equally. Write how much each one gets. | a fraction as division: a wholes shared by b, the wholes drawn cut into b parts (added 2026-09-25, fractions lane) |
+| `scaling-compare` | Do _not_ multiply. Write <, > or = in the circle. | multiplication as scaling: compare a fraction times a number with the number (added 2026-09-25, fractions lane) |
+| `story-fraction` | Read the story. Write the answer. | a fraction word problem: the story over its number sentence, the answer in the fraction boxes (added 2026-09-25, fractions lane) |
 | `default-write` | Solve. Write the answer. | default adapter: skills with no provider, number or text answer |
 | `default-circle` | Circle the answer. | default adapter: choice items |
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |

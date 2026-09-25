@@ -35,7 +35,7 @@
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, bestCols, planItem, gridPart, instructionKeyOf,
     instructionText, stepsHtml, assemble, poolItems, answerOf, stringsOf, labelStyleOf, opOf, operandsOf,
-    providerWorkedSteps, esc,
+    providerWorkedSteps, esc, escText,
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
@@ -283,7 +283,7 @@ function workLinesMm(lines, cols, m) {
 }
 
 const workHtml = (lines) => (lines.length
-    ? `<ul class="mq-worklines ws-trace" data-ws-ink="trace">${lines.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '');
+    ? `<ul class="mq-worklines ws-trace" data-ws-ink="trace">${lines.map((t) => `<li>${escText(t)}</li>`).join('')}</ul>` : '');
 
 const GUIDED_CSS = `<style data-mq-guided>
 :is(.ws-page,.ws-sheet) .mq-worklines{list-style:none;margin:2mm 0 0;padding:0;width:100%;font-size:var(--ws-text);line-height:1.25;text-align:center}

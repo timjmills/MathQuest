@@ -19,7 +19,7 @@
 import {
     page, instruction, band, sayBand, grid, dayBand,
     renderCell, cellAnswerKey, cellGridItem, hasCell,
-    resolveCtx, esc,
+    resolveCtx, esc, escText,
 } from '../index.js';
 
 /* ------------------------------------------------------------------ the plan (data only) */
@@ -269,7 +269,7 @@ export function workingHtml(item, ctx) {
     return steps.map((s, i) => {
         const marks = Array.isArray(s.marks) && s.marks.length
             ? ` <b>${esc(s.marks.map((m) => num(m.value)).filter(Boolean).join('  '))}</b>` : '';
-        return `<div data-ws-ink="solid">${i + 1}. ${esc(s.text || '')}${marks}</div>`;
+        return `<div data-ws-ink="solid">${i + 1}. ${escText(s.text || '')}${marks}</div>`;
     }).join('');
 }
 
@@ -287,7 +287,7 @@ export function keyStamp(text, ctx) {
     if (!text) return '';
     return `<div class="ws-keystamp" data-ws-key="words" style="position:absolute;left:2mm;right:2mm;`
         + `bottom:1.5mm;font-size:${ctx.metrics.zonePt}pt;line-height:1.15;font-weight:700;`
-        + `text-align:center" data-ws-ink="solid">${esc(text)}</div>`;
+        + `text-align:center" data-ws-ink="solid">${escText(text)}</div>`;
 }
 
 /** What the stamp says: the role's own wording first, then the key's display value. */

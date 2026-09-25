@@ -128,6 +128,8 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-abtag{position:absolute;left:0;top:0;width:8mm;height:8mm;border-right:var(--ws-hair) solid var(--ws-ink);border-bottom:var(--ws-hair) solid var(--ws-ink);display:flex;align-items:center;justify-content:center;font-size:var(--ws-text);font-weight:700;line-height:1}
 :is(.ws-page,.ws-sheet) .mq-abresp{align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;gap:6mm;padding:1mm 0 1mm}
 :is(.ws-page,.ws-sheet) .mq-abchoice{display:flex;gap:10mm;padding-left:2mm}
+:is(.ws-page,.ws-sheet) .mq-ab.mq-ab--wide{grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-ab.mq-ab--wide .mq-abresp{grid-column:2;grid-row:1 / span 2}
 :is(.ws-page,.ws-sheet) .ws-choice{display:inline-flex;align-items:center;justify-content:center;min-width:12mm;height:12mm;padding:0 1.5mm;font-size:var(--ws-digit);font-weight:700;line-height:1}
 /* Stretch (09-D mock-up): the prompt box, the results table, the closing frames */
 :is(.ws-page,.ws-sheet) .ws-cell.mq-stretchcell{align-items:stretch;padding:4mm 5mm 4mm 9mm}

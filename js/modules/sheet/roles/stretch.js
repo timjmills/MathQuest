@@ -20,8 +20,9 @@
 
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, planItem, gridPart, instructionPart, assemble, poolItems,
-    answerOf, opOf, operandsOf, esc, blank, writeLine, checkLine, slotKey,    judgeGroup,
+    answerOf, opOf, operandsOf, esc, escText, blank, writeLine, checkLine, slotKey,    judgeGroup,
 } from './compose.js';
+import { getProvider } from '../index.js';
 
 export const ROLE_ID = 'stretch';
 
@@ -34,6 +35,15 @@ const toInt = (v) => Number(String(v).replace(/,/g, ''));
 /** The open task of one question (`open(q)` default): prompt, columns, example row, key rows. */
 export function openTask(it, size = 'L') {
     const q = it.q || {};
+    // A provider's own open task (`open(q, {rows})`, contract 4.7) comes first: a fraction skill
+    // asks for equivalent fractions or pairs that make a sum, not the whole-number pairs below.
+    try {
+        const p = getProvider(q.categoryId || '', q.skillId || '');
+        if (p && p.real.includes('open') && typeof p.open === 'function') {
+            const t = p.open(q, { rows: EMPTY_ROWS[size] || 5 });
+            if (t && Array.isArray(t.columns) && Array.isArray(t.keyRows)) return Object.assign({ rule: '', basic: false, total: Infinity }, t);
+        }
+    } catch (e) { /* the default task */ }
     const ans = answerOf(it);
     const op = opOf(q);
     const ops = operandsOf(q);
@@ -107,18 +117,18 @@ export function prepare(it, info = {}) {
     const key = slotKey(slots, task.keyRows.length ? `${Math.min(nRows, task.keyRows.length) + 1} answers shown` : 'Answers vary');
     const render = (c) => {
         const head = `<tr>${task.columns.map((h) => `<th>${esc(h)}</th>`).join('')}</tr>`;
-        const ex = `<tr class="mq-ex">${task.example.map((v) => `<td><span class="ws-trace" data-ws-ink="trace">${esc(String(v))}</span></td>`).join('')}</tr>`;
+        const ex = `<tr class="mq-ex">${task.example.map((v) => `<td><span class="ws-trace" data-ws-ink="trace">${escText(String(v))}</span></td>`).join('')}</tr>`;
         let body = '';
         for (let r = 0; r < nRows; r++) {
             body += `<tr>${task.columns.map((_, col) => {
                 const v = c.state === 'answered' ? slots[`st-${r}-${col}`] : undefined;
                 // A "problems like this one" table (basic) has no single right entry: its cells and
                 // count are open answers, drawn but not graded, and the key says "Answers vary".
-                return `<td data-ws-slot="st-${r}-${col}" data-ws-shape="open"${task.basic ? ' data-ws-graded="0"' : ''}>${v !== undefined && v !== '' ? `<b data-ws-ink="solid">${esc(String(v))}</b>` : ''}</td>`;
+                return `<td data-ws-slot="st-${r}-${col}" data-ws-shape="open"${task.basic ? ' data-ws-graded="0"' : ''}>${v !== undefined && v !== '' ? `<b data-ws-ink="solid">${escText(String(v))}</b>` : ''}</td>`;
             }).join('')}</tr>`;
         }
         return `<div class="mq-stretch">`
-            + `<div class="ws-story mq-prompt">${task.prompt.map((l) => `<div>${esc(l)}</div>`).join('')}</div>`
+            + `<div class="ws-story mq-prompt">${task.prompt.map((l) => `<div>${escText(l)}</div>`).join('')}</div>`
             + `<div class="mq-stretch-main"><table class="mq-table mq-cols${task.columns.length}">${head}${ex}${body}</table>`
             + `<div class="mq-closing"><div class="mq-frame">I found ${writeLine('st-found', c, key, 2, { graded: !task.basic })} answers.</div>`
             + judgeGroup('st-judge', `${checkLine('st-more', 'There are more.', c, key, { graded: false })}${checkLine('st-all', 'I found them all.', c, key, { graded: false })}`, 'mq-stjudge')

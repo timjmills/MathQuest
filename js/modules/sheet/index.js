@@ -33,6 +33,7 @@ export {
     cell, cutLine, blank, line, box, circle, check, unknownBox,
     renderCellBox, gradeSlots,
 } from './cell.js';
+export { escText, inlineFrac } from './frac-text.js';
 
 /* --------------------------------------------------------------------------- frame */
 export {

@@ -15,6 +15,7 @@ import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, bestCols, planItem, gridPart, instructionKeyOf,
     instructionText, assemble, poolItems, topicOf, labelStyleOf,
 } from './compose.js';
+import { FILL_CAP } from '../layout.js';
 
 export const ROLE_ID = 'review';
 const CEILING = { S: 16, M: 12, L: 12 };
@@ -28,10 +29,8 @@ export const sources = (skills, { earlier }) => {
 };
 export const measureCols = () => [1, 2, 3, 4];
 
-function geometry(pools, input) {
+function geometryOf(main, earlier, input) {
     const ctx = ctxOf(input);
-    const main = pools.main || [];
-    const earlier = pools.earlier || [];
     const all = main.concat(earlier);
     const cols = bestCols(all, [AUTO_COLS[ctx.size], 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= AUTO_COLS[ctx.size]), ctx);
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Review 1', title: 'Review', score: 1 });
@@ -43,6 +42,24 @@ function geometry(pools, input) {
     let eRows = bands === 2 && rows >= 2 ? Math.max(1, Math.round(rows / 3)) : 0;
     if (bands === 2 && rows < 2) eRows = 0;
     return { cols, rows, eRows, mRows: rows - eRows, avail, h, ctx };
+}
+
+/**
+ * The page's grid. The earlier step's items share the page only when they do not cost the skill
+ * its own page: an earlier item that measures taller (or wider) than the skill's own (a legacy
+ * picture beside a kit cell) would set ONE cell height and column count for the whole page and
+ * leave the skill's cells mostly empty (RUBRIC H13), so the page is then the skill's alone.
+ */
+function geometry(pools, input) {
+    const main = pools.main || [];
+    // an earlier step still printed through the legacy path (its old markup, not a kit cell) does
+    // not join a kit skill's review page: its cells would break the page's look and its key
+    const earlier = (pools.earlier || []).some((it) => it && it.legacy) && !main.some((it) => it && it.legacy) ? [] : (pools.earlier || []);
+    const own = geometryOf(main, [], input);
+    if (!earlier.length) return own;
+    const mixed = geometryOf(main, earlier, input);
+    if (!mixed.eRows || mixed.cols < own.cols || mixed.h > own.h * 1.3 + 2) return own;
+    return mixed;
 }
 
 export function counts(pools, input) {
@@ -64,7 +81,8 @@ export function plan(input = {}) {
     const frame = frameOf({ skills: mainSkills.length ? mainSkills : input.skills || [], input, tabId: `Review ${n0}`, title: `Review: ${topic}`, score: n });
     const rowsM = Math.ceil(useM.length / g.cols);
     const rowsE = Math.ceil(useE.length / g.cols);
-    const cellH = g.avail / Math.max(1, rowsM + rowsE);
+    // rows fill the page, but a cell is never stretched past FILL_CAP x what it holds (RUBRIC H13)
+    const cellH = Math.min(g.avail / Math.max(1, rowsM + rowsE), Number.isFinite(g.h) && g.h > 0 ? g.h * FILL_CAP : Infinity);
     const labels = labelStyleOf(ctx.look, input.labels);
     const sections = [{ kind: 'band', label: '', instr: instructionText(instructionKeyOf(useM, input.skills), useM),
         content: gridPart(useM.map((it) => planItem(it, { cols: g.cols })), { cols: g.cols, rows: rowsM, cellH, labels, start: 1 }) }];

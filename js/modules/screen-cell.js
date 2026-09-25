@@ -594,7 +594,7 @@ export function stackExpectations(k) {
 }
 
 /** The value each of a multi-slot answer's boxes should hold (reading order), or null. */
-function _slotExpectations(q, count, join) {
+function _slotExpectations(q, count, join, tpls = null, terms = null) {
     if (!q || !count) return null;
     const sets = q.inlineBlanksData && Array.isArray(q.inlineBlanksData.acceptedSets) ? q.inlineBlanksData.acceptedSets : null;
     if (q.answerType === 'inline-blanks' && sets) {
@@ -611,6 +611,34 @@ function _slotExpectations(q, count, join) {
         parts = m ? [m[1] || '', m[2], m[3]] : w ? [w[1], '', ''] : null;
     }
     else if (join === ' h ') { const m = /(\d+)\s*h\s*(\d+)/.exec(String(q.ans)); parts = m ? [m[1], m[2]] : null; }
+    else if (terms && terms.length) {
+        // boxes grouped into terms (frac-model "1 [ ]/4, [ ] [ ]/4 ..."): each term of q.ans read
+        // through its template, one value per box
+        const list = String(q.ans).split(join.trim() || ',').map((t) => t.trim());
+        if (list.length !== terms.length) return null;
+        parts = [];
+        for (let i = 0; i < terms.length; i++) {
+            const tpl = terms[i].tpl;
+            if (!tpl) { parts.push(list[i]); continue; }
+            const re = new RegExp('^\\s*' + tpl.replace(/[.*+?^$()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s*').replace(/\{[wnd]\}/g, '(\\d*)') + '\\s*$');
+            // a whole number in a mixed number's boxes: the whole box alone
+            const m = re.exec(list[i]) || (/^\d+$/.test(list[i]) && /^\{w\}/.test(tpl) ? [list[i], list[i]] : null);
+            if (!m) return null;
+            for (let j = 0; j < terms[i].count; j++) parts.push(m[j + 1] || '');
+        }
+    }
+    else if (join.trim() === '+' && tpls && tpls.some(Boolean)) {
+        // boxes inside written terms (frac-model.js "1/[ ] + 1/[ ]"): each box expects the part of
+        // its term that its template leaves open
+        const terms = String(q.ans).split('+').map((t) => t.trim());
+        parts = terms.length === count ? terms.map((t, k) => {
+            const [pre, post] = String(tpls[k] || '{}').split('{}');
+            let x = t;
+            if (pre && x.startsWith(pre)) x = x.slice(pre.length);
+            if (post && x.endsWith(post)) x = x.slice(0, -post.length);
+            return x;
+        }) : null;
+    }
     else if (join === '') { const d = String(q.ans == null ? '' : q.ans).replace(/[^0-9]/g, ''); parts = d.length === count ? d.split('') : null; }
     else parts = String(q.ans == null ? '' : q.ans).split(/\s*,\s*|\s+R\s+/i);
     if (!parts || parts.length !== count) return null;
@@ -645,7 +673,14 @@ export function wireLiveCorrect(root, { q = null, kind = null, single = null } =
     if (boxes.length) {
         const joinEl = boxes[0].closest('[data-mq-join]');
         const join = joinEl ? joinEl.getAttribute('data-mq-join') : ', ';
-        const exp = _slotExpectations(q, boxes.length, join);
+        // boxes grouped into named-place terms ({w} {n} {d}), in reading order
+        const named = (b) => { const t = b.parentElement && b.parentElement.closest('[data-mq-tpl]'); return t && /\{[wnd]\}/.test(t.getAttribute('data-mq-tpl') || '') ? t : null; };
+        let terms = null;
+        if (boxes.some(named)) {
+            terms = [];
+            boxes.forEach((b) => { const t = named(b); const last = terms[terms.length - 1]; if (last && last.el === t && t) last.count++; else terms.push({ el: t, tpl: t ? t.getAttribute('data-mq-tpl') : '', count: 1 }); });
+        }
+        const exp = _slotExpectations(q, boxes.length, join, boxes.map((b) => { const t = b.closest('[data-mq-tpl]'); return t ? t.getAttribute('data-mq-tpl') : ''; }), terms);
         if (exp) boxes.forEach((b, k) => { if (_liveBind(b, exp[k])) n++; });
     }
     // 3. the host's one answer place: the whole value, never a prefix
@@ -809,7 +844,36 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     // denominator, the whole or the fraction left out when its boxes are empty.
     const mixed = join === 'mixed';
     const splitMixed = (v) => { const m = /^\s*(?:(\d+)\s+)?(\d*)\s*\/?\s*(\d*)\s*$/.exec(String(v || '')); return m ? [m[1] || '', m[2] || '', m[3] || ''] : []; };
-    const saved = mixed ? splitMixed(input.value) : String(input.value || '').split(join.trim() || ',').map((t) => t.trim());
+    // A box may stand for one number INSIDE a written term (frac-model.js: "1/[ ]" composes
+    // "1/6"): `data-mq-tpl` holds the term with {} where the box's value goes.
+    const tpls = slots.map((sl) => sl.getAttribute('data-mq-tpl') || '');
+    const unTpl = (t, v) => {
+        if (!t) return v;
+        const [pre, post] = t.split('{}');
+        let x = String(v || '');
+        if (pre && x.startsWith(pre)) x = x.slice(pre.length);
+        if (post && x.endsWith(post)) x = x.slice(0, -post.length);
+        return x;
+    };
+    // A TERM of several boxes (frac-model.js: "1 [ ]/4", "[ ]/[ ]" among others): the term's wrapper
+    // carries `data-mq-tpl` with named places ({w} {n} {d}) and each box its `data-mq-part`; the
+    // term composes from its own boxes, and the terms join with `join`.
+    const termOf = slots.map((sl) => { const t = sl.parentElement && sl.parentElement.closest('[data-mq-tpl]'); return t && /\{[wnd]\}/.test(t.getAttribute('data-mq-tpl') || '') ? t : null; });
+    const grouped = termOf.some(Boolean);
+    const groups = [];
+    if (grouped) slots.forEach((sl, k) => { const t = termOf[k]; let g = groups.find((x) => x.el === t); if (!g) { g = { el: t, ks: [] }; groups.push(g); } g.ks.push(k); });
+    const tplRe = (tpl) => new RegExp('^\\s*' + tpl.replace(/[.*+?^$()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s*').replace(/\{[wnd]\}/g, '(\\d*)') + '\\s*$');
+    const savedGrouped = () => {
+        const out = [];
+        const terms = String(input.value || '').split(join.trim() || ',').map((t) => t.trim());
+        groups.forEach((g, gi) => {
+            const tpl = g.el ? g.el.getAttribute('data-mq-tpl') : '{}';
+            const m = g.el ? (tplRe(tpl).exec(terms[gi] || '') || (/^\d+$/.test(terms[gi] || '') && /^\{w\}/.test(tpl) ? [terms[gi], terms[gi]] : null)) : null;
+            g.ks.forEach((k, j) => { out[k] = m ? (m[j + 1] || '') : (g.el ? '' : terms[gi] || ''); });
+        });
+        return out;
+    };
+    const saved = mixed ? splitMixed(input.value) : grouped ? savedGrouped() : String(input.value || '').split(join.trim() || ',').map((t, k) => unTpl(tpls[k], t.trim()));
     const boxes = slots.map((slot, k) => {
         const el = document.createElement('input');
         el.type = 'text';
@@ -829,6 +893,16 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     });
     const compose = () => {
         const v = boxes.map((b) => (b.value || '').trim());
+        if (!mixed && grouped) {
+            return groups.map((g) => {
+                if (!g.el) return g.ks.map((k) => v[k]).join('');
+                const vals = {};
+                g.ks.forEach((k) => { vals[slots[k].getAttribute('data-mq-part') || 'n'] = v[k]; });
+                if (!g.ks.some((k) => v[k])) return '';
+                return g.el.getAttribute('data-mq-tpl').replace(/\{([wnd])\}/g, (m, id) => vals[id] || '').replace(/^\s+|\s+$/g, '').replace(/\s*\/\s*$/, '');
+            }).join(join);
+        }
+        if (!mixed && tpls.some(Boolean)) return v.map((x, k) => (tpls[k] && x ? tpls[k].replace('{}', x) : x)).join(join);
         if (!mixed) return v.join(join);
         const [w, n, d] = v;
         return `${w}${w && (n || d) ? ' ' : ''}${n || d ? `${n}/${d}` : ''}`;

@@ -15,7 +15,7 @@
 
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, providerWorkedSteps,
-    generalSteps, oralFrameOf, assemble, poolItems, answerOf, instructionText, esc,
+    generalSteps, oralFrameOf, assemble, poolItems, answerOf, instructionText, esc, escText,
 } from './compose.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
@@ -59,12 +59,17 @@ export function plan(input = {}) {
     const perFirst = Math.max(1, Math.floor((m.budget - m.strip - m.say) / H));
     const perCont = Math.max(1, Math.floor((mCont.budget - m.strip - m.say) / H));
     const ans = answerOf(it);
-    const stepText = (i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${esc(steps[i])}</span></div>`;
+    const stepText = (i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${escText(steps[i])}</span></div>`;
+    // A state before the last is the problem part-way through: its empty boxes are not answers yet
+    // (the page is traced, not scored), so they are marked ungraded and the key leaves them empty.
+    const ungraded = (html) => html.replace(/(<[^>]*\sdata-ws-slot="[^"]*")(?![^>]*data-ws-graded)/g, '$1 data-ws-graded="0"');
     const stateItem = (i) => planItem(it, {
         cols, level: 3, nolabel: true,
-        render: (c, o) => (cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')
-            + it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o,
-                i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {})),
+        render: (c, o) => {
+            const cell = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o,
+                i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {}));
+            return (cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '') + (i === steps.length - 1 ? cell : ungraded(cell));
+        },
     });
     const textItem = (i) => ({
         render: () => stepText(i),

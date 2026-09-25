@@ -38,7 +38,10 @@ export function prepare(it, info = {}) {
     const digits = Math.max(2, Math.min(6, correct.replace(/[^0-9]/g, '').length || 2));
     const key = slotKey({ 'ri-a': aRight ? 'A' : '', 'ri-b': aRight ? '' : 'B', 'ri-who': right, 'ri-ans': correct }, `${right}: ${correct}`);
     const work = (c, o, v) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: 3, shown: v, prompt: false }));
-    const render = (c, o = {}) => `<div class="mq-ab">`
+    // A cell wider than one of the two side-by-side boxes (a row of fraction models, a long
+    // sentence) stacks A over B instead, so neither finished solution sticks out of its box (PG-12).
+    const wide = Number((it.footprint || {}).wMm) > 56;
+    const render = (c, o = {}) => `<div class="mq-ab${wide ? ' mq-ab--wide' : ''}">`
         + `<div class="mq-abbox"><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value)}</div>`
         + `<div class="mq-abbox"><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct)}</div>`
         + `<div class="mq-abresp">`
@@ -49,7 +52,9 @@ export function prepare(it, info = {}) {
     return Object.assign({}, it, {
         render, key, measured: null, drawsAnswer: true,
         footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: 1 }),
-        fclass: 'standard', thinking: { correct, wrong: wrong.value, right },
+        // a stacked (wide) pair is twice as tall as a side-by-side one: the section keeps one row
+        // height for all (no packing by height), so the tall pair is never squeezed (PG-12)
+        fclass: wide ? 'wide' : 'standard', thinking: { correct, wrong: wrong.value, right },
         cellCls: [it.cellCls || '', 'mq-thinkcell'].join(' ').trim(),
     });
 }

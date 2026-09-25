@@ -23,7 +23,7 @@
 //   ink    'trace' writes it in trace grey (a Model or first Guided cell, scaffold level 3)
 
 import {
-    esc, blank, getProvider, instructionFor, INSTRUCTION_LIBRARY, JUDGE_LABELS,
+    esc, escText, blank, getProvider, instructionFor, INSTRUCTION_LIBRARY, JUDGE_LABELS,
     SIZES, DEFAULT_SIZE, LOOKS, DEFAULT_LOOK, deriveSeed, rng, shuffle,
 } from '../index.js';
 import { paperOf, bodyHeightMm, instructionMm, resolveSectionLayout, fitsLine, LIVE_W_MM } from '../layout.js';
@@ -32,7 +32,7 @@ import {
     STRAND_BY_CATEGORY, sectionInstructionKey, resolveInstruction, varsOfItems,
 } from './practice.js';
 
-export { esc, blank, instructionHtml, styleBlock, deriveSeed, rng, shuffle, resolveSectionLayout, fitsLine, LIVE_W_MM };
+export { esc, escText, blank, instructionHtml, styleBlock, deriveSeed, rng, shuffle, resolveSectionLayout, fitsLine, LIVE_W_MM };
 
 /* ======================================================================= the context */
 
@@ -423,7 +423,7 @@ export function instructionVarsOf(items) {
 
 /** A check box with its label, on one line (section 6: box 5 / 6 / 7 mm). */
 export function checkLine(id, text, ctx, key, { graded = true } = {}) {
-    return `<span class="mq-checkline">${blank({ id, kind: 'check', shape: 'check', graded }, ctx, slotOnly(key, id))}<span>${esc(text)}</span></span>`;
+    return `<span class="mq-checkline">${blank({ id, kind: 'check', shape: 'check', graded }, ctx, slotOnly(key, id))}<span>${escText(text)}</span></span>`;
 }
 
 /** A write line of `digits` width (B(n)). */
@@ -453,7 +453,7 @@ export function slotOnly(key, id) {
 
 /** The Steps list with outlined circle markers (BD-4). */
 export const stepsHtml = (list, { cls = '' } = {}) =>
-    `<ol class="ws-steps ${cls}">${list.map((s, i) => `<li><em>${i + 1}</em><span>${esc(s)}</span></li>`).join('')}</ol>`;
+    `<ol class="ws-steps ${cls}">${list.map((s, i) => `<li><em>${i + 1}</em><span>${escText(s)}</span></li>`).join('')}</ol>`;
 
 /** Slot-key helper: {slots: {id: {value}}} with an overall display. */
 export function slotKey(slots, display = '') {

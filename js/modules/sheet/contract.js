@@ -212,6 +212,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'frac-name': 'Write the fraction, or circle the model that shows it.',
     'models-complete': 'Look at the two models. Complete the number sentence.',
     'line-mark-each': 'Mark each number on the line.',
+    'unit-fractions': 'Write each shaded part as a unit fraction.',
+    'share-fraction': 'Share equally. Write how much each one gets.',
+    'scaling-compare': 'Do _not_ multiply. Write <, > or = in the circle.',
+    'story-fraction': 'Read the story. Write the answer.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',

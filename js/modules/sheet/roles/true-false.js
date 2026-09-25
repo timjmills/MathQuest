@@ -17,7 +17,7 @@ import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems,
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, wrongPattern,
     checkLine, writeLine, slotKey, judgeGroup,
-    esc, operandsOf, opOf, opGlyphOf,
+    esc, escText, operandsOf, opOf, opGlyphOf,
 } from './compose.js';
 
 export const ROLE_ID = 'true-false';
@@ -44,7 +44,7 @@ export function prepare(it, info = {}) {
         return `<div class="mq-judge mq-tf">`
             + `<div class="mq-judge-work">${work}</div>`
             + judgeGroup('tf-judge', `${checkLine('tf-true', 'True', c, key, { graded: false })}${checkLine('tf-false', 'False', c, key, { graded: false })}`)
-            + `<div class="mq-frame">${esc(stem)}${writeLine('tf-ans', c, key, digits)}.</div>`
+            + `<div class="mq-frame">${escText(stem)}${writeLine('tf-ans', c, key, digits)}.</div>`
             + `</div>`;
     };
     return Object.assign({}, it, {

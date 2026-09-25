@@ -249,6 +249,9 @@ function footprintClass(q, template, size) {
     // The word-work cell (every whole-number story) is MEASURED: small numbers stand in 2 columns,
     // wider work goes to the full-width group (practice.js splitWide), never a forced one column.
     if (template === 'word-work') return 'standard';
+    // A fraction story (frac-model with `story`) is measured the same way: one column by its own
+    // footprint, rows sized to what it holds, never the word class's one-a-page.
+    if (template === 'frac-model') return 'standard';
     if (size === 'spacious' || /word/.test(f)) return 'word';
     // The K-2 picture templates hold one small picture and one short answer: they pack like
     // one-symbol answers (2 x 4 and up), not like 6-per-page stacks.
