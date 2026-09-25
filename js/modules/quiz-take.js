@@ -9,6 +9,8 @@ import { broadcastQuizJoin, broadcastQuizAnswer, broadcastQuizSubmit } from './q
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt, adoptVisualBlank, wireCellSlots,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML,
+    fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank,
 } from './screen-cell.js';
 
 let quizTimerInterval = null;
@@ -197,6 +199,28 @@ function updateQuizTimer() {
     }
 }
 
+// ---- What a quiz stores for one question ----
+// The fields the screen cell needs to draw the paper's response model travel with the question
+// (regrade 2026-09-25: a saved quiz kept only text / ans / visual, so a number strip never drew, a
+// cloze lost its lists, and a build was retyped as a number). Everything is plain data, small,
+// and optional: a quiz saved before this reads exactly as it did.
+const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlanksData', 'target', 'maxPlace',
+    'maxDots', 'places', 'allowRegroup', 'quotientRemainder', 'acceptedAnswers', 'regroup', 'notation',
+    'operands', 'selfAnswering', 'printAnswer', 'a', 'b', 'op'];
+export function quizQuestionData(q) {
+    if (!q) return null;
+    const d = {
+        text: q.text, ans: q.ans, hint: q.hint, options: q.options,
+        answerType: q.answerType, visual: q.visual, skillLabel: q.skillLabel,
+    };
+    for (const k of QUIZ_CELL_FIELDS) {
+        const v = q[k];
+        if (v === undefined || v === null || typeof v === 'function') continue;
+        try { d[k] = JSON.parse(JSON.stringify(v)); } catch (e) { /* not plain data: leave it */ }
+    }
+    return d;
+}
+
 // ---- Render Quiz Interface ----
 
 function renderQuizInterface() {
@@ -305,7 +329,8 @@ function renderQuizQuestion(qItem, flatIdx) {
     // black-and-white Andika cell. A fact, a column stack or a bracket division is drawn by the
     // sheet kit with the answer slot where the pupil writes on paper; any other item keeps its
     // visual inside the same cell. The header (number, skill, Flag) and the feedback are chrome.
-    const kind = cellKindFor({ text: qd.text, ans: qd.ans, answerType: qd.answerType, options: [], visual: qd.visual, printFormat: qd.printFormat });
+    const kind = cellKindFor({ ...qd, options: [] });
+    const twin = kind ? null : screenTwin(qd);
     const numeric = qd.answerType === 'number' || typeof qd.ans === 'number' || (!!kind);
     const n = numeric ? answerDigits(qd) : Math.max(4, Math.min(16, String(qd.ans == null ? '' : qd.ans).length + 2));
     const shape = kind && (kind.kind === 'fact' || kind.kind === 'division') ? ' mq-slot--box' : '';
@@ -324,8 +349,13 @@ function renderQuizQuestion(qItem, flatIdx) {
         cellBody = kindHTML(kind, { regroup: regroupFor(q.skillId), answerClass: 'mq-qt-digit' }) + hidden;
         instrHtml = instructionForKind(kind);
     } else if (kind) {
-        cellBody = kindHTML(kind, { slotHtml: inputHtml });
+        cellBody = kindHTML(kind, { slotHtml: inputHtml }) + (kind.kind === 'division' ? workRowsHTML(kind) : '');
         instrHtml = instructionForKind(kind);
+    } else if (twin) {
+        // the paper cell's screen twin: the model the pupil works in, with the answer slot(s)
+        cellBody = `<div class="qt-visual-aid mq-twin">${twin.html}</div>`
+            + `<div class="qt-answer-area"${twin.mode === 'build' || twin.mode === 'model' ? ' style="display:none"' : ''}>${inputHtml}</div>`;
+        instrHtml = escHtml(screenInstruction(twin.instr));
     } else {
         cellBody = `<div class="qt-question-text">${qd.text || ''}</div>`
             + (qd.visual ? `<div class="qt-visual-aid">${qd.visual}</div>` : '')
@@ -370,10 +400,39 @@ function _mountQuizCell(flatIdx) {
         // One slot per answer (SL-7): the visual's own blank takes the answer input.
         const area = cellEl.querySelector(':scope > .qt-answer-area');
         const inp = area && area.querySelector('#qtAnswerInput');
+        const qd = state.quizAllQuestions[flatIdx].question.questionData;
+        if (vis && vis.classList.contains('mq-twin') && inp) {
+            wireRingGroups(vis);
+            if (vis.querySelector('[data-mq-model]')) {
+                mountModel(vis, inp, { onValue: (v) => { if (v) recordAnswer(flatIdx, v); } });
+                const saved = String(inp.value || '');
+                if (saved) inp.dataset.mqSaved = saved;
+            } else if (vis.querySelector('[data-mq-build]')) {
+                mountBuild(vis, qd, inp, (v) => { if (v) recordAnswer(flatIdx, v); });
+            }
+        }
         if (vis && inp && adoptVisualBlank(vis, inp)) area.remove();
+        else if (vis && inp && (qd.answerType === 'number' || !qd.answerType) && adoptSvgBlank(vis, inp)) area.remove();
         // several blanks in one drawing: an input in each, recorded in reading order
         else if (vis && inp && wireCellSlots(vis, inp, { onChange: (v) => { if (v.replace(/[,\s]/g, '')) recordAnswer(flatIdx, v); } })) {
             area.style.display = 'none';
+        }
+        if (vis) wireClozeBanks(vis);
+        // a drawing with its own answer boxes (fact family, area model) answers through them: the
+        // answer line under it is not drawn (H8)
+        if (vis && inp && area && area.isConnected && wireDrawnAnswers(vis, inp, { onChange: (v) => { if (v.replace(/[,\s]/g, '')) recordAnswer(flatIdx, v); } })) {
+            area.style.display = 'none';
+        }
+        // a printed "Check one box." list is tapped (SP-3)
+        if (vis && inp && area && area.isConnected && wireTickBoxes(vis, qd, inp)) {
+            area.style.display = 'none';
+            inp.addEventListener('input', () => { if (inp.value) recordAnswer(flatIdx, inp.value); });
+        }
+        // RUBRIC C3: a legacy drawing sized for paper is scaled up to the cell's digit size
+        if (vis && !vis.classList.contains('mq-twin') && canFitDigits(qd)) {
+            const fit = () => fitCellDigits(vis, cellDigitTarget(cellEl), { avail: cellEl.clientWidth - 24 });
+            fit();
+            setTimeout(() => { if (vis.isConnected) fit(); }, 120);
         }
     }
     const boxes = Array.from(cellEl.querySelectorAll('input.mq-qt-digit'));
@@ -431,8 +490,13 @@ function recordAnswer(flatIdx, studentAnswer) {
     let correct = false;
     const sNorm = String(studentAnswer).trim().toLowerCase();
     const aNorm = String(qd.ans).trim().toLowerCase();
+    const slotVerdict = slotAnswerMatches(studentAnswer, qd);
 
-    if (sNorm === aNorm) {
+    if (typeof slotVerdict === 'boolean') {
+        correct = slotVerdict;
+    } else if (Array.isArray(qd.acceptedAnswers) && qd.acceptedAnswers.some(a => String(a).trim().toLowerCase() === sNorm)) {
+        correct = true;
+    } else if (sNorm === aNorm) {
         correct = true;
     } else {
         // Numeric comparison

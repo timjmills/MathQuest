@@ -57,7 +57,7 @@ export function renderTenFrameBuild(q, container) {
         return `<button type="button" class="tfb-cell" data-cell-idx="${globalIdx}"
             role="gridcell" aria-label="Cell ${globalIdx + 1} of ${totalCells}, empty"
             style="width:${cellSize}px;height:${cellSize}px;border:2px solid #555;
-                   background:#fafafa;border-radius:6px;padding:0;display:flex;
+                   background:#fafafa;border-radius:0;padding:0;display:flex;
                    align-items:center;justify-content:center;cursor:pointer;
                    box-sizing:border-box;"></button>`;
     }
@@ -73,7 +73,7 @@ export function renderTenFrameBuild(q, container) {
         return `<div class="tfb-frame" role="grid" aria-label="Ten frame ${frameIdx + 1}"
             style="display:grid;grid-template-columns:repeat(5,${cellSize}px);
                    grid-template-rows:repeat(2,${cellSize}px);gap:4px;
-                   padding:6px;background:#fff;border:3px solid #333;border-radius:8px;">
+                   padding:6px;background:#fff;border:3px solid #333;border-radius:0;">
             ${cells}
         </div>`;
     }
@@ -86,7 +86,7 @@ export function renderTenFrameBuild(q, container) {
     const paletteDotHtml = `<button type="button" class="tfb-palette-dot"
         draggable="true"
         aria-label="Counter, draggable"
-        style="width:${dotR * 2 + 8}px;height:${dotR * 2 + 8}px;border-radius:50%;
+        style="width:${Math.max(48, dotR * 2 + 8)}px;height:${Math.max(48, dotR * 2 + 8)}px;border-radius:50%;
                background:${DOT_COLOR};border:3px solid rgba(255,255,255,0.55);
                box-shadow:0 3px 8px rgba(0,0,0,0.20);cursor:grab;padding:0;"></button>`;
 
@@ -111,7 +111,7 @@ export function renderTenFrameBuild(q, container) {
                 <div style="font-size:0.78rem;font-weight:700;color:var(--text-dim);
                      letter-spacing:0.4px;text-transform:uppercase;">Counters</div>
                 ${paletteDotHtml}
-                <div style="font-size:0.7rem;color:var(--text-dim);">drag</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">tap a box, or drag</div>
             </div>
             <!-- No running "N of target placed" readout: it counted for the pupil and
                  restated the target, so the build became "click until the numbers match"
@@ -142,6 +142,11 @@ export function renderTenFrameBuild(q, container) {
     function refreshUI() {
         const n = getPlacedCount();
         submit.disabled = n === 0;
+        // A host that grades the build itself (the online worksheet, the quiz) listens here: the
+        // count is the pupil's answer, so the pupil never retypes the number (RUBRIC H3).
+        if (typeof container._tfbOnChange === 'function') {
+            try { container._tfbOnChange(n); } catch (e) { /* a listener never breaks the mat */ }
+        }
     }
 
     function clearActive() {
@@ -214,7 +219,16 @@ export function renderTenFrameBuild(q, container) {
             return;
         }
 
-        // 2) Click an in-cell dot: pick it up to move/remove.
+        // 2) Tap-to-fill (regrade 2026-09-25: drag-only mats fail touch pupils): with nothing
+        //    picked up, a tap on a filled box takes its counter away.
+        if (placedDot && !(_activeHost === host && _activeKind)) {
+            removeDotFromCell(placedDot.closest('.tfb-cell'));
+            announce('Counter removed.');
+            refreshUI();
+            return;
+        }
+
+        // 2b) Click an in-cell dot while one is picked up: pick this one instead.
         if (placedDot) {
             const owningCell = placedDot.closest('.tfb-cell');
             if (_activeHost === host && _activeEl && _activeEl === placedDot) {
@@ -230,7 +244,11 @@ export function renderTenFrameBuild(q, container) {
 
         // 3) Click an empty cell: place spawn or move existing.
         if (cell && !cell.classList.contains('tfb-filled')) {
-            if (_activeHost !== host) return;
+            if (_activeHost !== host || !_activeKind) {
+                // tap-to-fill: a tap on an empty box puts a counter in it
+                if (placeDotInCell(cell)) { announce('Counter placed.'); refreshUI(); }
+                return;
+            }
             if (_activeKind === 'spawn') {
                 if (placeDotInCell(cell)) {
                     cell.classList.add('tfb-cell-flash');
@@ -430,6 +448,7 @@ export function renderTenFrameBuild(q, container) {
         catch (err) { console.error('onTenFrameBuildSubmit failed:', err); }
     });
 
+    if (container.dataset && container.dataset.tfbNoSubmit === '1') submit.style.display = 'none';
     refreshUI();
 }
 

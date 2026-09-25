@@ -211,7 +211,9 @@ async function renderQuiz(page, skill, file) {
             for (let i = 0; i < 3; i++) {
                 const q = window.generateQuestionFor({ category: skill.categoryId, skill: skill.skillId, seed: seed + i, itemIndex: i });
                 if (!q) continue;
-                questions.push({ id: i, skillId: skill.skillId, points: 1, questionData: { text: q.text, ans: q.ans, hint: q.hint, options: q.options, answerType: q.answerType, visual: q.visual, skillLabel: q.skillLabel } });
+                // what the quiz builder stores (quiz-take.js quizQuestionData), so the quiz renders as a real one
+                const qd = window.quizQuestionData ? window.quizQuestionData(q) : { text: q.text, ans: q.ans, hint: q.hint, options: q.options, answerType: q.answerType, visual: q.visual, skillLabel: q.skillLabel };
+                questions.push({ id: i, skillId: skill.skillId, points: 1, questionData: qd });
             }
             if (!questions.length) return { error: 'no quiz questions' };
             const test = {

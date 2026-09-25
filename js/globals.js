@@ -77,7 +77,7 @@ import { exportPrintToGoogleForms, exportQuizToGoogleForms, openGoogleExportModa
 // Quiz System
 import { initQuizDB, saveTest, loadTest, listTests, deleteTest, saveResult, getResultsForTest, exportTestJSON, importTestJSON, exportResultsCSV, compressTestForURL, decompressTestFromURL, migrateTestToSections, getAllQuestionsFlat, getGlobalOffset, getTotalQuestionCount } from './modules/quiz-storage.js';
 import { openQuizBuilder, openMyQuizzes, confirmDeleteQuiz, handleQuizSkillSearch, selectQuizSkill, addSelectedQuestions, addQuizQuestion, addMultipleQuestions, regenerateQuizQuestion, duplicateQuizQuestion, removeQuizQuestion, updateQuizQuestionPoints, updateQuizName, updateQuizSetting, openQuizSettings, closeQuizSettings, saveQuiz, generateQuizLink, printQuiz, exportQuiz, importQuizFile, qbFilterDomain, qbFilterCategory, qbFilterGrade, qbSearchInput, qbPreviewHover, qbPreviewClick, qbRefreshPreview, qbAddFromPreview, addSection, removeSection, reorderSection, setActiveSection, updateSectionLayout, updateSectionLabel, updateSectionInstructions, toggleSectionCollapse, shuffleSectionQuestions, moveQuestionToSection, openQuizPreview, closeQuizPreview, switchPreviewTab, handleQbQuestionDragStart, handleQbQuestionDragEnd, handleQbSectionDragOver, handleQbSectionDragLeave, handleQbSectionDrop, openBuilderResults, openBuilderMonitor } from './modules/quiz-builder.js';
-import { handleQuizURL, startQuizTest, submitQuizMC, submitQuizTextAnswer, navigateQuizQuestion, jumpToQuizQuestion, flagQuizQuestion, showQuizReview, jumpFromReview, backFromReview, submitQuiz, downloadQuizStudentResults } from './modules/quiz-take.js';
+import { quizQuestionData, handleQuizURL, startQuizTest, submitQuizMC, submitQuizTextAnswer, navigateQuizQuestion, jumpToQuizQuestion, flagQuizQuestion, showQuizReview, jumpFromReview, backFromReview, submitQuiz, downloadQuizStudentResults } from './modules/quiz-take.js';
 import { showQuizResults, showStudentQuizDetail, exportQuizCSV, importStudentResultsFile, printQuizTest, closeQuizResults, copyQuizLinkFromResults } from './modules/quiz-results.js';
 import { tvqMenu } from './modules/teacher-quiz-ui.js';
 import { openQuizMonitor, stopMonitoring, toggleMonitorPause, toggleMonitorOption, inviteStudents, finishMonitoring, closeQuizMonitor } from './modules/quiz-monitor.js';
@@ -441,7 +441,7 @@ Object.assign(window, {
     handleQbQuestionDragStart, handleQbQuestionDragEnd,
     handleQbSectionDragOver, handleQbSectionDragLeave, handleQbSectionDrop, openBuilderResults, openBuilderMonitor,
     openQuizPreview, closeQuizPreview, switchPreviewTab,
-    handleQuizURL, startQuizTest, submitQuizMC, submitQuizTextAnswer,
+    quizQuestionData, handleQuizURL, startQuizTest, submitQuizMC, submitQuizTextAnswer,
     navigateQuizQuestion, jumpToQuizQuestion, flagQuizQuestion,
     showQuizReview, jumpFromReview, backFromReview, submitQuiz, downloadQuizStudentResults,
     showQuizResults, showStudentQuizDetail, exportQuizCSV, importStudentResultsFile, printQuizTest, closeQuizResults, copyQuizLinkFromResults, tvqMenu,
