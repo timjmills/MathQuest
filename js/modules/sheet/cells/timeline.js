@@ -139,7 +139,9 @@ function faces(p, ctx) {
     const D = faceDiameter(ctx, { small: true });
     const pic = (t, name) => {
         const analog = p.faces === 'analog' || (p.faces === 'mixed' && name === 'Start');
-        const face = analog ? faceSVG(ctx, { D, hands: true, hour: t.h, minute: t.m, label: `${name} clock` }) : readout(ctx, fmtTime(t.h, t.m));
+        // O6 (AP4): `numerals` quarters / twelve leaves the other hour numbers off both faces.
+        const missing = p.numerals === 'quarters' ? [1, 2, 4, 5, 7, 8, 10, 11] : p.numerals === 'twelve' ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] : [];
+        const face = analog ? faceSVG(ctx, { D, hands: true, hour: t.h, minute: t.m, label: `${name} clock`, ...(missing.length ? { missing } : {}) }) : readout(ctx, fmtTime(t.h, t.m));
         return `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 1)};">${words(ctx, `<b>${name}</b>`)}${face}`
             + `${p.ampm ? words(ctx, ampmOf(t), { pt: zonePt(ctx), bold: true }) : ''}</div>`;
     };

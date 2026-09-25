@@ -35,6 +35,8 @@ export const SKILL_GRADES = {
     'base10_build': 1, 'base10_regroup': 2, 'base10_build_hundreds': 2,
     // Phase 5 batch 2: mid-band MAP skills
     'hundreds_chart_fill': 1, 'unknown_start_wp': 2,
+    // O6 AP1 (owner, 2026-09-25): the chart of the hundreds (Grade 2) and the thousands (Grades 3-4)
+    'number_chart_fill': 'M',
     'count_edges_faces_vertices': 2, 'coord_distance_q1': 5,
     'count_sides_vertices_2d': "M",
     // Phase 5 batch 3: mid-to-high band MAP skills
@@ -240,6 +242,7 @@ export const SKILL_GRADES = {
     // Number Sense
     'rounding_visual': 3, 'nearest_10': 3, 'nearest_100': 3, 'nearest_1000': 3, 'rounding_table': 3,
     'between_tens': 3, 'place_on_number_line': 2,
+    'round_nl_thousands': 4, 'round_nl_ten_thousands': 4, 'round_nl_hundred_thousands': 4,
     'nearest_10000': 4, 'nearest_100000': 5, 'nearest_million': 5,
     'round_sort_10': 3, 'round_sort_100': 3,
     'round_sort_1000': 4, 'round_sort_10000': 4,
@@ -572,6 +575,8 @@ export const SKILLS = {
         { v: "whole_as_fraction", l: "Whole Numbers as Fractions (Visual)" },
         { v: "compose_whole", l: "Compose 1 Whole from Unit Fractions" },
         { v: "mixed_composing", l: "Mixed Number Sense" },
+        // APPENDED (owner, 2026-09-25): never splice above it — share codes index by position.
+        { v: "number_chart_fill", l: "Number Chart - Find the Missing Number (to 1,000 and beyond)" },
     ],
     counting_mixed: [
         { v: "counting_all", l: "All Counting & Cardinality" },
@@ -1191,6 +1196,10 @@ export const SKILLS = {
         // P9 appends, 2026-09-25 (§18) — APPEND ONLY, after every existing id.
         { v: "between_tens", l: "Find the Two Tens a Number Is Between" },
         { v: "place_on_number_line", l: "Mark a Number on a Number Line" },
+        // Owner request 2026-09-25 (round on number lines to the thousands and beyond) — APPEND ONLY.
+        { v: "round_nl_thousands", l: "Round on a Number Line: Thousands" },
+        { v: "round_nl_ten_thousands", l: "Round on a Number Line: Ten Thousands" },
+        { v: "round_nl_hundred_thousands", l: "Round on a Number Line: Hundred Thousands" },
     ],
     number_theory: [
         { v: "prime_composite", l: "Prime vs Composite" },
@@ -1327,6 +1336,9 @@ export function getSkillsForCategory(categoryId) {
  */
 const MIXED_POOL_EXCLUDE = {
     mixed_subtraction: ['mixed_add_sub'],
+    // "Mixed Number Sense" is the K-2 review; the chart to 10,000 was appended after it and is
+    // not one of the skills it reviews (its pool stays what it was).
+    mixed_composing: ['number_chart_fill'],
     mixed_division: ['mixed_mult_div', 'missing_mult_div'],
 };
 export function getMixedPoolSkills(categoryId, mixedSkillId) {
@@ -1573,7 +1585,7 @@ export const SKILL_TIME_CATEGORY = {
     heavier_lighter_visual: "quick", pictograph_intro: "quick",
     tens_foundation_visual: "quick", bar_graph_intro: "quick", shape_corners_count: "quick",
     // Phase 5 batch 2: mid-band MAP skills
-    hundreds_chart_fill: "quick", unknown_start_wp: "extended",
+    hundreds_chart_fill: "quick", unknown_start_wp: "extended", number_chart_fill: "quick",
     count_edges_faces_vertices: "quick", coord_distance_q1: "quick",
     count_sides_vertices_2d: "quick",
     // Phase 5 batch 3: mid-to-high band MAP skills
@@ -1837,6 +1849,7 @@ export const SKILL_PRINT_SIZE = {
     round_sort_tenths: "wide", round_sort_hundredths: "wide",
     rounding_table: "medium",
     unit_form: "standard", between_tens: "compact", place_on_number_line: "wide",
+    round_nl_thousands: "wide", round_nl_ten_thousands: "wide", round_nl_hundred_thousands: "wide",
     identify: "compact",
     value: "compact",
     add_sub_10s: "compact", add_sub_100s: "compact",
@@ -1969,7 +1982,7 @@ export const SKILL_PRINT_SIZE = {
     heavier_lighter_visual: "compact", pictograph_intro: "medium",
     tens_foundation_visual: "medium", bar_graph_intro: "wide", shape_corners_count: "medium",
     // Phase 5 batch 2: mid-band MAP skills
-    hundreds_chart_fill: "medium", unknown_start_wp: "spacious",
+    hundreds_chart_fill: "medium", unknown_start_wp: "spacious", number_chart_fill: "medium",
     count_edges_faces_vertices: "medium", coord_distance_q1: "wide",
     count_sides_vertices_2d: "medium",
     // Phase 5 batch 3: mid-to-high band MAP skills

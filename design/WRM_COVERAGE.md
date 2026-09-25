@@ -23,7 +23,8 @@ Sources:
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
 - Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
-- 325 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
+- 328 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -55,7 +56,7 @@ Where the Drive folders, the site pacing, the v3 crosswalk and our standards dat
 - Site pacing vs Drive: every Drive small step is in the site pacing under the same block and step number, with the same title except where the school teaches money in US dollars (the pacing adds "(US: dollars & cents)"; kept as usAdaptation). The pacing also schedules 36 Awsaj-authored "committee" lessons (kept as block supplements, not WRM steps).
 - v3 sheet vs site: the sheet says it is generated from the same data as the site, and its per-step CCSS codes are the site's. Its summary says "913 distinct White Rose small steps (PK4-Grade 5) plus 16 CCSS custom lessons still to be built". Drive has 872 small steps (Reception 119, Y1 116, Y2 124, Y3 134, Y4 129, Y5 136, Y6 114); the site's per-grade lesson lists hold 878 distinct titles (a title repeated inside Reception counts once; above-grade steps are listed in two grades) and 36 committee lessons; the sheet's lesson tabs have 849 rows. Neither 913 nor 16 could be reproduced from any source; the 872 Drive steps are the inventory used here.
 - Grade rule: the site and the sheet map Reception to PK4 and WRM Year N to US grade N-1 (the Fluency folder on Drive agrees: "Year 1 = US Kindergarten"). This differs from the rule of thumb "Reception = K"; the school's rule is used.
-- Teaching Guides (Guide D): every step has one (873 files; Y6.B4.S7 has a second copy named after step 6, listed above). Every other guide title equals the Drive lesson title. Vocabulary is extracted for a sample only (data/curriculum/wrm-vocab.json).
+- Teaching Guides (Guide D): every step has one (873 files; Y6.B4.S7 has a second copy named after step 6, listed above). Every other guide title equals the Drive lesson title. Both Y6.B4.S7 files are Step 7 guides (their headers say so); the first is the one read for vocabulary. Key vocabulary for all 872 steps is extracted from the guides into data/curriculum/wrm-vocab.json by tests/scripts/ws-wrm-vocab.py.
 
 ## GAP LIST: the build list, by family
 
@@ -603,26 +604,20 @@ whatever happens to the WRM gaps.
   WRM: Y2.B6.S5, Y3.B5.S8, Y3.B5.S9, Y3.B5.S12, Y3.B5 supplement "Solve 'longer by' problems using bar models", Y3.B5 supplement "Solve 'shorter by' problems using bar models"
 - **2.NBT.B.9** Explain why addition and subtraction strategies work, using place value and the properties of operations.  
   WRM: Y3.B2.S10
-- **3.MD.C.7a** Find the area of a rectangle with whole-number side lengths by tiling it, and show that the area is the same as would be found by multiplying the side lengths.  
-  WRM: Y4.B3 supplement "Area as multiplication"
 - **4.MD.C.5** Recognize angles as geometric shapes that are formed wherever two rays share a common endpoint, and understand concepts of angle measurement:  
   WRM: Y4.B12.S1, Y4.B12.S2, Y6.B12.S1
 - **5.MD.C.3** Recognize volume as an attribute of solid figures and understand concepts of volume measurement.  
   WRM: Y5.B15.S1
 - **5.MD.C.4** Measure volumes by counting unit cubes, using cubic cm, cubic in, cubic ft, and improvised units.  
   WRM: Y5.B15.S1, Y5.B15.S2, Y5.B15.S3, Y6.B10.S7
+- **5.MD.C.5c** Recognize volume as additive. Find volumes of solid figures composed of two non-overlapping right rectangular prisms by adding the volumes of the non-overlapping parts, applying this technique to solve real world problems.  
+  WRM: Y6.B10 supplement "Volume of composite solids"
 - **5.NBT.A.3a** Read and write decimals to thousandths using base-ten numerals, number names, and expanded form, e.g., 347.392 = 3 × 100 + 4 × 10 + 7 × 1 + 3 × (1/10) + 9 × (1/100) + 2 × (1/1000).  
   WRM: Y4.B9.S3, Y4.B9.S4
-- **K.CC.A.3** Write numbers from 0 to 20. Represent a number of objects with a written numeral 0-20 (with 0 representing a count of no objects).  
-  WRM: R.B3.S3, R.B5.S3, R.B7.S1, R.B7.S4, R.B9.S2, R.B11.S3, Y1.B1.S4, Y1.B1.S5, Y1.B4.S6, Y1.B4.S8, Y1.B4.S9, Y1.B4.S10
 - **K.G.B.5** Model shapes in the world by building shapes from components (e.g., sticks and clay balls) and drawing shapes.  
   WRM: R.B17.S4, Y1.B3 supplement "Build and draw shapes", Y2.B3.S4, Y3.B11.S10
-- **M.EE.2.MD.4** Order objects by length using non-standard units.  
-  WRM: Y2.B6.S3, Y2.B6.S4, Y3.B5.S7
 - **M.EE.2.MD.5** Increase or decrease length by adding or subtracting unit(s).  
   WRM: Y2.B6.S5, Y3.B5.S8, Y3.B5.S9, Y3.B5.S12, Y3.B5 supplement "Solve 'longer by' problems using bar models", Y3.B5 supplement "Solve 'shorter by' problems using bar models"
-- **M.EE.4.MD.5** Recognize angles in geometric shapes.  
-  WRM: Y4.B12.S1, Y4.B12.S2, Y6.B12.S1
 - **M.EE.5.MD.4** Determine the volume of a rectangular prism by counting units of measure (unit cubes).  
   WRM: Y5.B15.S1, Y5.B15.S2, Y5.B15.S3, Y6.B10.S7
 
@@ -634,321 +629,440 @@ whatever happens to the WRM gaps.
 
 - **R.B1.S1** Match objects — GAP. _Beyond CCSS_  
   Proposal: Match the Same  
+  Vocabulary: match, same, different  
 - **R.B1.S2** Match pictures and objects — GAP. _Beyond CCSS_  
   Proposal: Match the Same  
+  Vocabulary: match, same, different  
 - **R.B1.S3** Identify a set — GAP. _Beyond CCSS_  
   Proposal: Which One Does Not Belong?  
+  Vocabulary: set, belong, go together, match  
 - **R.B1.S4** Sort objects to a type — PARTIAL. _K.MD.B.3, M.EE.K.MD.3_  
   Partial: Sort & Count by Category (Visual) (`comparing:classify_count`), missing the sort itself: putting every object into its group; the skill only counts one kind  
   Proposal: Sort into Groups  
+  Vocabulary: sort, same, different, not  
 - **R.B1.S5** Explore sorting techniques — PARTIAL. _K.MD.B.3, M.EE.K.MD.3_  
   Partial: Sort & Count by Category (Visual) (`comparing:classify_count`), missing sorting by different attributes (colour, size, kind) rather than counting one shape  
   Proposal: Sort into Groups  
+  Vocabulary: sort, rule, attribute  
 - **R.B1.S6** Create sorting rules — GAP. _K.MD.B.3, M.EE.K.MD.3_  
   Proposal: Sort into Groups  
+  Vocabulary: rule, belong, odd one out  
 - **R.B1.S7** Compare amounts — covered. _K.CC.C.6, M.EE.K.CC.7_  
   Skills: More/Fewer/Same Groups (Visual) (`comparing:compare_groups`)  
+  Vocabulary: more, fewer, the same  
 
 #### R.B2 Autumn Block 2: Talk about measure and patterns
 
 - **R.B2.S1** Compare size — PARTIAL. _K.MD.A.2, M.EE.K.MD.2_  
   Partial: Compare Attributes (Visual) (`comparing:compare_objects`), missing overall size (big/small); the skill compares length, height and thickness only  
   Proposal: Big and Small  
+  Vocabulary: big, small, bigger, smaller  
 - **R.B2.S2** Compare mass — covered. _K.MD.A.2, M.EE.K.MD.2_  
   Skills: Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`)  
+  Vocabulary: heavy, light, balance (level  
 - **R.B2.S3** Compare capacity — GAP. _K.MD.A.2, M.EE.K.MD.2_  
   Proposal: Full, Empty, Holds More  
+  Vocabulary: full, empty, holds more, holds less  
 - **R.B2.S4** Explore simple patterns — PARTIAL. _Beyond CCSS_  
   Partial: Shape Patterns (Visual) (`patterns:shape_pattern`), missing talking about what repeats; the skill only fills missing shapes  
   Proposal: Make a Pattern  
+  Vocabulary: pattern, spotty, stripy  
 - **R.B2.S5** Copy and continue simple patterns — covered. _Beyond CCSS_  
   Skills: Shape Patterns (Visual) (`patterns:shape_pattern`)  
+  Vocabulary: copy, continue, comes next  
 - **R.B2.S6** Create simple patterns — GAP. _Beyond CCSS_  
   Proposal: Make a Pattern  
+  Vocabulary: pattern, create, make, mistake  
 
 #### R.B3 Autumn Block 3: It's me 1, 2, 3
 
 - **R.B3.S1** Find 1, 2 and 3 — covered. _K.CC.B.4, K.CC.B.5, M.EE.K.CC.4, M.EE.K.CC.6_  
   Skills: Count Objects (1-20) (Visual) (`counting:count_objects`) {count to 5}  
+  Vocabulary: how many, altogether, match  
 - **R.B3.S2** Subitise 1, 2 and 3 — PARTIAL. _K.CC.B.5, M.EE.K.CC.6_  
   Partial: Count Objects (1-20) (Visual) (`counting:count_objects`), missing recognition at a glance (dice patterns are counted one by one, not subitised)  
   Proposal: Say How Many Without Counting  
+  Vocabulary: dot, how many, subitise  
 - **R.B3.S3** Represent 1, 2 and 3 — covered. _K.CC.A.3, K.CC.B.5, M.EE.K.CC.6_  
   Skills: Build a Number on a Ten Frame (`composing:ten_frame_build`) {count to 5}  
+  Vocabulary: altogether, represent, show, each  
 - **R.B3.S4** 1 more — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {the number after, to 10}  
+  Vocabulary: more, 1 more, after  
 - **R.B3.S5** 1 less — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {the number before, to 10}  
+  Vocabulary: less, 1 less, before  
 - **R.B3.S6** Composition of 1, 2 and 3 — covered. _K.OA.A.3_  
   Skills: Number Bonds within 10 (Visual) (`composing:number_bonds`) {bonds to 5}  
+  Vocabulary: part, whole, altogether  
 
 #### R.B4 Autumn Block 4: Circles and triangles
 
 - **R.B4.S1** Identify and name circles and triangles — covered. _K.G.A.2, M.EE.K.G.2_  
   Skills: Identify 2D Shapes (Visual) (`shapes_early:name_2d_shapes`)  
+  Vocabulary: round, side, corner, flat  
 - **R.B4.S2** Compare circles and triangles — PARTIAL. _K.G.B.4_  
   Partial: Shapes by Attributes (Visual) (`shapes_early:shape_attributes`), missing comparing two shapes side by side; curved and straight sides  
   Proposal: Same and Different Shapes  
+  Vocabulary: side, corner, round, sort  
 - **R.B4.S3** Shapes in the environment — GAP. _K.G.A.1_  
   Proposal: Shapes Around Us  
+  Vocabulary: round, straight side, corner  
 - **R.B4.S4** Describe position — covered. _K.G.A.1_  
   Skills: Shape Positions: Above/Below/Beside (Visual) (`shapes_early:shape_positions`)  
+  Vocabulary: under, in, behind  
 
 #### R.B5 Autumn Block 5: 1, 2, 3, 4, 5
 
 - **R.B5.S1** Find 4 and 5 — covered. _K.CC.B.4, K.CC.B.5, M.EE.K.CC.4, M.EE.K.CC.6_  
   Skills: Count Objects (1-20) (Visual) (`counting:count_objects`) {count to 5}  
+  Vocabulary: count, altogether, same amount  
 - **R.B5.S2** Subitise 4 and 5 — PARTIAL. _K.CC.B.5, M.EE.K.CC.6_  
   Partial: Count Objects (1-20) (Visual) (`counting:count_objects`), missing recognition at a glance  
   Proposal: Say How Many Without Counting  
+  Vocabulary: subitise, without counting, arrangement  
 - **R.B5.S3** Represent 4 and 5 — covered. _K.CC.A.3, K.CC.B.5, M.EE.K.CC.6_  
   Skills: Build a Number on a Ten Frame (`composing:ten_frame_build`) {count to 5}  
+  Vocabulary: altogether, the same, full  
 - **R.B5.S4** 1 more — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {the number after}  
+  Vocabulary: more, next  
 - **R.B5.S5** 1 less — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {the number before}  
+  Vocabulary: less, take away, before  
 - **R.B5.S6** Composition of 4 and 5 — covered. _K.OA.A.3_  
   Skills: Number Bonds within 10 (Visual) (`composing:number_bonds`) {bonds to 5}  
+  Vocabulary: part, whole, altogether  
 - **R.B5.S7** Composition of 1 - 5 — covered. _K.OA.A.3_  
   Skills: Number Bonds within 10 (Visual) (`composing:number_bonds`) {bonds to 5}  
+  Vocabulary: part, whole, inside, outside  
 
 #### R.B6 Autumn Block 6: Shapes with 4 sides
 
 - **R.B6.S1** Identify and name shapes with 4 sides — covered. _K.G.A.2, M.EE.K.G.2_  
   Skills: Identify 2D Shapes (Visual) (`shapes_early:name_2d_shapes`)  
+  Vocabulary: side, corner, straight  
 - **R.B6.S2** Combine shapes with 4 sides — covered. _K.G.B.6_  
   Skills: Combine Shapes (Visual) (`shapes_early:compose_shapes`)  
+  Vocabulary: combine, join, fold, inside  
 - **R.B6.S3** Shapes in the environment — GAP. _K.G.A.1_  
   Proposal: Shapes Around Us  
+  Vocabulary: square, rectangle, corner  
 - **R.B6.S4** My day and night — GAP. _Beyond CCSS_  
   Proposal: First, Next, Then  
+  Vocabulary: day, night, first, then  
 
 #### R.B7 Spring Block 1: Alive in 5
 
 - **R.B7.S1** Introduce zero — GAP. _K.CC.A.3, K.CC.B.4, M.EE.K.CC.4_  
   Proposal: Zero Means None  
+  Vocabulary: zero, none, all gone  
 - **R.B7.S2** Find 0 to 5 — covered. _K.CC.B.4, K.CC.B.5, M.EE.K.CC.4, M.EE.K.CC.6_  
   Skills: Count Objects (1-20) (Visual) (`counting:count_objects`) {count to 5}  
+  Vocabulary: how many, zero, match, same  
 - **R.B7.S3** Subitise 0 to 5 — PARTIAL. _K.CC.B.5, M.EE.K.CC.6_  
   Partial: Count Objects (1-20) (Visual) (`counting:count_objects`), missing recognition at a glance; zero  
   Proposal: Say How Many Without Counting  
+  Vocabulary: subitise, how many, zero  
 - **R.B7.S4** Represent 0 to 5 — covered. _K.CC.A.3, K.CC.B.5, M.EE.K.CC.6_  
   Skills: Build a Number on a Ten Frame (`composing:ten_frame_build`) {count to 5}  
+  Vocabulary: represent, numeral, altogether  
 - **R.B7.S5** 1 more — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {the number after}  
+  Vocabulary: 1 more, after, now  
 - **R.B7.S6** 1 less — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {the number before}  
+  Vocabulary: 1 less, before, take away  
 - **R.B7.S7** Composition — covered. _K.OA.A.3_  
   Skills: Number Bonds within 10 (Visual) (`composing:number_bonds`) {bonds to 5}  
+  Vocabulary: whole, part, altogether  
 - **R.B7.S8** Conceptual subitising to 5 — GAP. _K.CC.B.5, K.OA.A.3, M.EE.K.CC.6_  
   Proposal: Say How Many Without Counting  
+  Vocabulary: subitise, group, altogether  
 
 #### R.B8 Spring Block 2: Mass and capacity
 
 - **R.B8.S1** Compare mass — covered. _K.MD.A.2, M.EE.K.MD.2_  
   Skills: Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`)  
+  Vocabulary: heavier, lighter, balance scale  
 - **R.B8.S2** Find a balance — PARTIAL. _K.MD.A.2, M.EE.K.MD.2_  
   Partial: Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`), missing equal mass: a level, balanced scale  
   Proposal: Balanced or Not?  
+  Vocabulary: balanced, equal, cube  
 - **R.B8.S3** Explore capacity — GAP. _K.MD.A.1, M.EE.K.MD.1_  
   Proposal: Full, Empty, Holds More  
+  Vocabulary: full, hold, capacity, more, less  
 - **R.B8.S4** Compare capacity — GAP. _K.MD.A.2, M.EE.K.MD.2_  
   Proposal: Full, Empty, Holds More  
+  Vocabulary: more, less, the most, the least  
 
 #### R.B9 Spring Block 3: Growing 6, 7, 8
 
 - **R.B9.S1** Find 6, 7 and 8 — covered. _K.CC.B.4, K.CC.B.5, M.EE.K.CC.4, M.EE.K.CC.6_  
   Skills: Count Objects (1-20) (Visual) (`counting:count_objects`) {count to 10}  
+  Vocabulary: how many, altogether, the same  
 - **R.B9.S2** Represent 6, 7 and 8 — covered. _K.CC.A.3, K.CC.B.5, M.EE.K.CC.6_  
   Skills: Build a Number on a Ten Frame (`composing:ten_frame_build`) {count to 10}  
+  Vocabulary: represent, show, ten frame, row  
 - **R.B9.S3** 1 more — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {the number after}  
+  Vocabulary: more, 1 more, after  
 - **R.B9.S4** 1 less — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {the number before}  
+  Vocabulary: less, 1 less, before  
 - **R.B9.S5** Composition of 6, 7 and 8 — covered. _K.OA.A.3_  
   Skills: Number Bonds within 10 (Visual) (`composing:number_bonds`) {bonds to 10}  
+  Vocabulary: part, whole, altogether  
 - **R.B9.S6** Make pairs-odd and even — PARTIAL. _Beyond CCSS_  
   Partial: Odd or Even? (Visual) (`composing:odd_even`), missing making pairs of objects to see odd and even; the skill names odd or even numbers  
   Proposal: Share and Make Groups  
+  Vocabulary: pair, partner, even, odd  
 - **R.B9.S7** Double to 8 (find a double) — covered. _K.OA.A.1, M.EE.K.OA.1_  
   Skills: Doubles & Near Doubles (`number_sense:doubles_near_doubles`)  
+  Vocabulary: double, the same, twice  
 - **R.B9.S8** Double to 8 (make a double) — PARTIAL. _K.OA.A.1, M.EE.K.OA.1_  
   Partial: Doubling (`patterns:double`), missing building a double with objects to 8; the skill is double facts to 100  
   Proposal: Share and Make Groups  
+  Vocabulary: make, build, the same again, double  
 - **R.B9.S9** Combine 2 groups — covered. _K.OA.A.1, K.OA.A.2, M.EE.K.OA.1_  
   Skills: Add Within 5 with Pictures (Visual) (`addition:add_5_pictures`); Addition Word Problems (within 10) (`addition:add_wp_10`)  
+  Vocabulary: group, altogether, make  
 - **R.B9.S10** Conceptual subitising — GAP. _K.CC.B.5, K.OA.A.3, M.EE.K.CC.6_  
   Proposal: Say How Many Without Counting  
+  Vocabulary: part, whole, altogether  
 
 #### R.B10 Spring Block 4: Length, height and time
 
 - **R.B10.S1** Explore length — covered. _K.MD.A.1, M.EE.K.MD.1_  
   Skills: Compare Attributes (Visual) (`comparing:compare_objects`) {length}  
+  Vocabulary: long, short, length  
 - **R.B10.S2** Compare length — covered. _K.MD.A.2, M.EE.K.MD.2_  
   Skills: Compare Attributes (Visual) (`comparing:compare_objects`) {length}  
+  Vocabulary: longer than, shorter than, same length as  
 - **R.B10.S3** Explore height — covered. _K.MD.A.1, M.EE.K.MD.1_  
   Skills: Compare Attributes (Visual) (`comparing:compare_objects`) {height}  
+  Vocabulary: height, tall, short  
 - **R.B10.S4** Compare height — covered. _K.MD.A.2, M.EE.K.MD.2_  
   Skills: Compare Attributes (Visual) (`comparing:compare_objects`) {height}  
+  Vocabulary: taller, shorter, tallest, shortest  
 - **R.B10.S5** Talk about time — GAP. _Beyond CCSS_  
   Proposal: Time Words  
+  Vocabulary: timer, yesterday, tomorrow  
 - **R.B10.S6** Order and sequence time — GAP. _Beyond CCSS_  
   Proposal: First, Next, Then  
+  Vocabulary: first, next, then, finally  
 
 #### R.B11 Spring Block 5: Building 9 and 10
 
 - **R.B11.S1** Find 9 and 10 — covered. _K.CC.B.4, K.CC.B.5, M.EE.K.CC.4, M.EE.K.CC.6_  
   Skills: Count Objects (1-20) (Visual) (`counting:count_objects`) {count to 10}  
+  Vocabulary: nine, ten, altogether  
 - **R.B11.S2** Compare numbers to 10 — covered. _K.CC.C.6, K.CC.C.7, M.EE.K.CC.7_  
   Skills: More/Fewer/Same Groups (Visual) (`comparing:compare_groups`) {count to 10}; Compare Numbers (>, <, =) (`placevalue:compare`) {numbers to 10}  
+  Vocabulary: more, fewer, the same  
 - **R.B11.S3** Represent 9 and 10 — covered. _K.CC.A.3, K.CC.B.5, M.EE.K.CC.6_  
   Skills: Build a Number on a Ten Frame (`composing:ten_frame_build`) {count to 10}  
+  Vocabulary: ten frame, bead string, altogether  
 - **R.B11.S4** Conceptual subitising to 10 — GAP. _K.CC.B.5, K.OA.A.3, M.EE.K.CC.6_  
   Proposal: Say How Many Without Counting  
+  Vocabulary: subitise, part, whole  
 - **R.B11.S5** 1 more — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {the number after}  
+  Vocabulary: more, 1 more, after  
 - **R.B11.S6** 1 less — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {the number before}  
+  Vocabulary: less, 1 less, before  
 - **R.B11.S7** Composition to 10 — covered. _K.OA.A.3_  
   Skills: Number Bonds within 10 (Visual) (`composing:number_bonds`) {bonds to 10}  
+  Vocabulary: whole, part, altogether  
 - **R.B11.S8** Bonds to 10 (2 parts) — covered. _K.OA.A.3, K.OA.A.4_  
   Skills: Number Bonds within 10 (Visual) (`composing:number_bonds`) {bonds to 10}; Make 10 (Visual) (`composing:make_ten`)  
+  Vocabulary: whole, part, bond to 10  
 - **R.B11.S9** Make arrangements of 10 — PARTIAL. _K.CC.B.5, K.OA.A.3, M.EE.K.CC.6_  
   Partial: Build a Number on a Ten Frame (`composing:ten_frame_build`), missing different arrangements of 10 (5 and 5, 4 and 6) seen as the same 10  
   Proposal: Say How Many Without Counting  
+  Vocabulary: altogether, arrangement, the same  
 - **R.B11.S10** Bonds to 10 (3 parts) — PARTIAL. _K.OA.A.1, K.OA.A.4, M.EE.K.OA.1_  
   Partial: Add Three Numbers (≤20) (`addition:add_three`), missing three parts that make 10  
   Proposal: Share and Make Groups  
+  Vocabulary: part, altogether, none, zero  
 - **R.B11.S11** Doubles to 10 (find a double) — covered. _K.OA.A.1, M.EE.K.OA.1_  
   Skills: Doubles & Near Doubles (`number_sense:doubles_near_doubles`)  
+  Vocabulary: double, the same, equal, not a double  
 - **R.B11.S12** Doubles to 10 (make a double) — PARTIAL. _K.OA.A.1, M.EE.K.OA.1_  
   Partial: Doubling (`patterns:double`), missing building a double with objects to 10  
   Proposal: Share and Make Groups  
+  Vocabulary: make a double, the same, equal, pair-wise  
 - **R.B11.S13** Explore even and odd — PARTIAL. _Beyond CCSS_  
   Partial: Odd or Even? (Visual) (`composing:odd_even`), missing making pairs to see odd and even  
   Proposal: Share and Make Groups  
+  Vocabulary: even, odd, partner  
 
 #### R.B12 Spring Block 6: Explore 3-D shapes
 
 - **R.B12.S1** Recognise and name 3-D shapes — covered. _K.G.A.2, K.G.A.3, M.EE.K.G.2, M.EE.K.G.3_  
   Skills: Identify 3D Shapes (Visual) (`shapes_early:name_3d_shapes`); Match Names to 3D Shapes (`shapes_early:shape_name_match_3d`)  
+  Vocabulary: solid, flat face, curved surface, the shape names on cards  
 - **R.B12.S2** Find 2-D shapes within 3-D shapes — GAP. _K.G.A.3, K.G.B.4, M.EE.K.G.3_  
   Proposal: What Can This Shape Do?  
+  Vocabulary: face, flat, print, footprint  
 - **R.B12.S3** Use 3-D shapes for tasks — GAP. _K.G.B.4_  
   Proposal: What Can This Shape Do?  
+  Vocabulary: roll, stack, flat face, curved surface  
 - **R.B12.S4** 3-D shapes in the environment — GAP. _K.G.A.1_  
   Proposal: Shapes Around Us  
+  Vocabulary: cylinder, cube, solid  
 - **R.B12.S5** Identify more complex patterns — covered. _Beyond CCSS_  
   Skills: Shape Patterns (Visual) (`patterns:shape_pattern`)  
+  Vocabulary: pattern, repeat, the unit, the part that repeats  
 - **R.B12.S6** Copy and continue patterns — covered. _Beyond CCSS_  
   Skills: Shape Patterns (Visual) (`patterns:shape_pattern`)  
+  Vocabulary: copy, continue, repeats  
 - **R.B12.S7** Patterns in the environment — PARTIAL. _Beyond CCSS_  
   Partial: Shape Patterns (Visual) (`patterns:shape_pattern`), missing patterns in real objects and scenes  
   Proposal: Make a Pattern  
+  Vocabulary: pattern, notice, repeat  
 
 #### R.B13 Summer Block 1: To 20 and beyond
 
 - **R.B13.S1** Build numbers beyond 10 (10 -13) — covered. _K.CC.B.5, K.NBT.A.1, M.EE.K.CC.6_  
   Skills: Teen Numbers: 10 + Ones (Visual) (`composing:teen_compose`) {to 15}; Build a Teen Number on Two Ten Frames (`composing:ten_frame_build_teen`)  
+  Vocabulary: ten, and, altogether  
 - **R.B13.S2** Continue patterns beyond 10 (10-13) — covered. _K.CC.A.2, K.CC.B.4, M.EE.K.CC.4_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {to 20}; Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`) {count by 1s, to 20}  
+  Vocabulary: after, next, pattern  
 - **R.B13.S3** Build numbers beyond 10 (14-20) — covered. _K.CC.B.5, K.NBT.A.1, M.EE.K.CC.6_  
   Skills: Teen Numbers: 10 + Ones (Visual) (`composing:teen_compose`); Build a Teen Number on Two Ten Frames (`composing:ten_frame_build_teen`)  
+  Vocabulary: ten, and, more  
 - **R.B13.S4** Continue patterns beyond 10 (14-20) — covered. _K.CC.A.2, K.CC.B.4, M.EE.K.CC.4_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {to 20}; Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`) {count by 1s, to 20}  
+  Vocabulary: after, before, missing  
 - **R.B13.S5** Verbal counting beyond 20 — PARTIAL. _K.CC.A.1, M.EE.K.CC.1_  
   Partial: Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`), missing saying the counting sequence aloud past 20; the skill fills a written track  
   Proposal: Number Sense Review  
+  Vocabulary: count on, after, altogether  
 - **R.B13.S6** Verbal counting patterns — covered. _K.CC.A.1, K.CC.A.2, M.EE.K.CC.1_  
   Skills: Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`); Count by 10s (`patterns:seq_10`)  
+  Vocabulary: after, before, pattern  
 
 #### R.B14 Summer Block 2: How many now?
 
 - **R.B14.S1** Add more — covered. _K.OA.A.1, K.OA.A.2, M.EE.K.OA.1_  
   Skills: Add Within 5 with Pictures (Visual) (`addition:add_5_pictures`); Addition Word Problems (within 10) (`addition:add_wp_10`)  
+  Vocabulary: more, now, altogether  
 - **R.B14.S2** How many did I add — PARTIAL. _K.OA.A.1, K.OA.A.2, M.EE.K.OA.1_  
   Partial: Addition Word Problems (within 10) (`addition:add_wp_10`), missing finding how many were added (change unknown); the skill asks for the total  
   Proposal: Share and Make Groups  
+  Vocabulary: added, how many, altogether, now  
 - **R.B14.S3** Take away — covered. _K.OA.A.1, K.OA.A.2, M.EE.K.OA.1_  
   Skills: Subtract Within 5 with Pictures (Visual) (`subtraction:sub_5_pictures`); Subtraction Word Problems (within 10) (`subtraction:sub_wp_10`)  
+  Vocabulary: take away, left, now  
 - **R.B14.S4** How many did I take away — PARTIAL. _K.OA.A.1, K.OA.A.2, M.EE.K.OA.1_  
   Partial: Subtraction Word Problems (within 10) (`subtraction:sub_wp_10`), missing finding how many were taken away (change unknown)  
   Proposal: Share and Make Groups  
+  Vocabulary: first, now, taken away  
 
 #### R.B15 Summer Block 3: Manipulate, compose and decompose
 
 - **R.B15.S1** Select shapes for a purpose — PARTIAL. _K.G.B.4_  
   Partial: Shapes by Attributes (Visual) (`shapes_early:shape_attributes`), missing choosing a shape for a purpose (it rolls, it stacks, it fits)  
   Proposal: What Can This Shape Do?  
+  Vocabulary: belong, doesn’t belong, because  
 - **R.B15.S2** Rotate shapes — PARTIAL. _K.G.A.2, M.EE.K.G.2_  
   Partial: Identify 2D Shapes (Visual) (`shapes_early:name_2d_shapes`), missing recognising a shape when it is turned  
   Proposal: Same and Different Shapes  
+  Vocabulary: rotate, turn, fit, match  
 - **R.B15.S3** Manipulate shapes — covered. _K.G.B.6_  
   Skills: Combine Shapes (Visual) (`shapes_early:compose_shapes`)  
+  Vocabulary: turn, flip, fit  
 - **R.B15.S4** Explain shape arrangements — PARTIAL. _K.G.B.6_  
   Partial: Combine Shapes (Visual) (`shapes_early:compose_shapes`), missing explaining an arrangement of shapes  
   Proposal: Copy and Build  
+  Vocabulary: next to, above, behind, between … and  
 - **R.B15.S5** Compose shapes — covered. _K.G.B.6_  
   Skills: Combine Shapes (Visual) (`shapes_early:compose_shapes`); Compose a Hexagon from Pattern Blocks (`shapes_early:compose_hexagon`)  
+  Vocabulary: compose, make, fit, piece  
 - **R.B15.S6** Decompose shapes — PARTIAL. _K.G.B.6_  
   Partial: Combine Shapes (Visual) (`shapes_early:compose_shapes`), missing decomposing: finding the shapes inside a shape  
   Proposal: Copy and Build  
+  Vocabulary: decompose, separate, fold, cut  
 - **R.B15.S7** Copy 2-D shape pictures — GAP. _K.G.B.6_  
   Proposal: Copy and Build  
+  Vocabulary: copy, same place, turn  
 - **R.B15.S8** Find 2-D shapes within 3-D shapes — GAP. _K.G.A.3, K.G.B.4, M.EE.K.G.3_  
   Proposal: What Can This Shape Do?  
+  Vocabulary: face, flat, solid  
 
 #### R.B16 Summer Block 4: Sharing and grouping
 
 - **R.B16.S1** Explore sharing — GAP. _Beyond CCSS_  
   Proposal: Share and Make Groups  
+  Vocabulary: share, fair, equal, unfair  
 - **R.B16.S2** Sharing — PARTIAL. _Beyond CCSS_  
   Partial: Make Equal Groups to Divide (Visual) (`division:share_into_groups`), missing sharing one at a time (how many each); the skill makes groups of a size, and works to 20  
   Proposal: Share and Make Groups  
+  Vocabulary: share equally, each, left over  
 - **R.B16.S3** Explore grouping — GAP. _Beyond CCSS_  
   Proposal: Share and Make Groups  
+  Vocabulary: group, groups of 2, altogether  
 - **R.B16.S4** Grouping — covered. _Beyond CCSS_  
   Skills: Make Equal Groups to Divide (Visual) (`division:share_into_groups`)  
+  Vocabulary: groups of 3, altogether, left over  
 - **R.B16.S5** Even and odd sharing — PARTIAL. _Beyond CCSS_  
   Partial: Odd or Even? (Visual) (`composing:odd_even`), missing sharing an amount between two and seeing it is fair (even) or not (odd)  
   Proposal: Share and Make Groups  
+  Vocabulary: share, even, odd  
 - **R.B16.S6** Play with and build doubles — covered. _K.OA.A.1, M.EE.K.OA.1_  
   Skills: Doubles & Near Doubles (`number_sense:doubles_near_doubles`)  
+  Vocabulary: double, altogether  
 
 #### R.B17 Summer Block 5: Visualise, build and map
 
 - **R.B17.S1** Identify units of repeating patterns — PARTIAL. _Beyond CCSS_  
   Partial: Shape Patterns (Visual) (`patterns:shape_pattern`), missing circling the unit that repeats  
   Proposal: Make a Pattern  
+  Vocabulary: pattern, repeat, unit  
 - **R.B17.S2** Create own pattern rules — GAP. _Beyond CCSS_  
   Proposal: Make a Pattern  
+  Vocabulary: rule, my rule is, again  
 - **R.B17.S3** Explore own pattern rules — GAP. _Beyond CCSS_  
   Proposal: Make a Pattern  
+  Vocabulary: pattern, rule, unit of repeat  
 - **R.B17.S4** Replicate and build scenes and constructions — GAP. _K.G.B.5_  
   Proposal: Copy and Build  
+  Vocabulary: opposite, in between, behind, in front of  
 - **R.B17.S5** Visualise from different positions — GAP. _Beyond CCSS_  
   Proposal: Copy and Build  
+  Vocabulary: in front of, behind, next to  
 - **R.B17.S6** Describe positions — covered. _K.G.A.1_  
   Skills: Shape Positions: Above/Below/Beside (Visual) (`shapes_early:shape_positions`)  
+  Vocabulary: the new ones, above, in between  
 - **R.B17.S7** Give instructions to build — PARTIAL. _K.G.A.1_  
   Partial: Shape Positions: Above/Below/Beside (Visual) (`shapes_early:shape_positions`), missing giving instructions to build (first, next, on top of)  
   Proposal: Where Is It? Positions and Maps  
+  Vocabulary: next to, under, inside, on top of  
 - **R.B17.S8** Explore mapping — GAP. _Beyond CCSS_  
   Proposal: Where Is It? Positions and Maps  
+  Vocabulary: map, from above, next to, above, below  
 - **R.B17.S9** Represent maps with models — GAP. _Beyond CCSS_  
   Proposal: Where Is It? Positions and Maps  
+  Vocabulary: map, model, position, positioned, next to  
 - **R.B17.S10** Create own maps from familiar places — GAP. _Beyond CCSS_  
   Proposal: Where Is It? Positions and Maps  
+  Vocabulary: map, landmark, route, first, next, then, finally  
 - **R.B17.S11** Create own maps and plans from story situations — GAP. _Beyond CCSS_  
   Proposal: Where Is It? Positions and Maps  
+  Vocabulary: map, plan, route, journey, landmark  
 
 #### R.B18 Summer Block 6: Make connections
 
 - **R.B18.S1** Deepen understanding — GAP. _Beyond CCSS_  
   Proposal: Number Sense Review  
+  Vocabulary: float, sink, afloat, predict, strategy  
 - **R.B18.S2** Patterns and relationships — PARTIAL. _Beyond CCSS_  
   Partial: Shape Patterns (Visual) (`patterns:shape_pattern`), missing relationships between numbers (1 more, doubles, bonds) seen as patterns  
   Proposal: Number Sense Review  
+  Vocabulary: measure the same as, double, check  
 
 ### Year 1 (US grade K)
 
@@ -957,93 +1071,130 @@ whatever happens to the WRM gaps.
 - **Y1.B1.S1** Sort objects — PARTIAL. _K.MD.B.3, M.EE.K.MD.3_  
   Partial: Sort & Count by Category (Visual) (`comparing:classify_count`), missing sorting every object into groups by a rule; the skill counts one kind  
   Proposal: Sort into Groups  
+  Vocabulary: sort, set, attribute  
 - **Y1.B1.S2** Count objects — covered. _K.CC.B.5, M.EE.K.CC.6_  
   Skills: Count Objects (1-20) (Visual) (`counting:count_objects`) {count to 10}  
+  Vocabulary: count, total, last  
 - **Y1.B1.S3** Count objects from a larger group — PARTIAL. _K.CC.B.5, M.EE.K.CC.6_  
   Partial: Count Objects (1-20) (Visual) (`counting:count_objects`), missing counting out a given number from a larger group  
   Proposal: Count Out a Number  
+  Vocabulary: count out, altogether, left  
 - **Y1.B1.S4** Represent objects — covered. _K.CC.A.3, K.CC.B.4, M.EE.K.CC.4_  
   Skills: Build a Number on a Ten Frame (`composing:ten_frame_build`) {count to 10}  
+  Vocabulary: represent, ten frame, numeral  
 - **Y1.B1.S5** Recognise numbers as words — PARTIAL. _K.CC.A.3, 2.NBT.A.3, M.EE.2.NBT.3_  
   Partial: Number Word Form (`composing:number_word_form`), missing number words 0 to 9 (the skill starts at 10)  
   Proposal: Number Words 0 to 10 (option)  
+  Vocabulary: numeral, word, match  
 - **Y1.B1.S6** Count on from any number — covered. _K.CC.A.2_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`); Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`) {count by 1s, counting on}  
+  Vocabulary: count on, the number after, start from  
 - **Y1.B1.S7** 1 more — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {the number after}; 1 More, 1 Less, 10 More, 10 Less (`placevalue:more_less_10`) {1 more}  
+  Vocabulary: more, 1 more  
 - **Y1.B1.S8** Count backwards within 10 — covered. _K.CC.A.1, M.EE.K.CC.1_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {the number before}; Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`) {counting back}  
+  Vocabulary: backwards, before, smaller  
 - **Y1.B1.S9** 1 less — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {the number before}; 1 More, 1 Less, 10 More, 10 Less (`placevalue:more_less_10`) {1 less}  
+  Vocabulary: less, before, count back  
 - **Y1.B1.S10** Compare groups by matching — covered. _K.CC.C.6, M.EE.K.CC.7_  
   Skills: More/Fewer/Same Groups (Visual) (`comparing:compare_groups`) {level 1: match one to one}  
+  Vocabulary: match, each, enough  
 - **Y1.B1.S11** Fewer, more, same — covered. _K.CC.C.6, M.EE.K.CC.7_  
   Skills: More/Fewer/Same Groups (Visual) (`comparing:compare_groups`)  
+  Vocabulary: fewer, more, same  
 - **Y1.B1.S12** Less than, greater than, equal to — PARTIAL. _K.CC.C.6, K.CC.C.7, M.EE.K.CC.7_  
   Partial: More/Fewer/Same Groups (Visual) (`comparing:compare_groups`), missing the symbols <, > and = and the words greater than / less than  
   Proposal: Compare Numbers to 10 and 20 (option)  
+  Vocabulary: less than, greater than, equal to  
 - **Y1.B1.S13** Compare numbers — PARTIAL. _K.CC.C.7_  
   Partial: Compare Numbers (>, <, =) (`placevalue:compare`), missing numbers within 10 (the lowest band is 99)  
   Proposal: Compare Numbers to 10 and 20 (option)  
+  Vocabulary: greater than, less than, equal to  
 - **Y1.B1.S14** Order objects and numbers — PARTIAL. _K.CC.C.6, K.CC.C.7, M.EE.K.CC.7_  
   Partial: Order: Least to Greatest (`placevalue:order_least_to_greatest`), missing ordering objects and numbers within 10  
   Proposal: Compare Numbers to 10 and 20 (option)  
+  Vocabulary: smallest, greatest, in order  
 - **Y1.B1.S15** The number line — GAP. _K.CC.A.2_  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: number line, greater than, jump  
 
 #### Y1.B2 Autumn Block 2: Addition and subtraction (within 10)
 
 - **Y1.B2.S1** Introduce parts and wholes — GAP. _K.OA.A.1, M.EE.K.OA.1_  
   Proposal: Part-Whole Model  
+  Vocabulary: whole, part, altogether  
 - **Y1.B2.S2** Part-whole model — covered. _K.OA.A.3_  
   Skills: Number Bonds within 10 (Visual) (`composing:number_bonds`)  
   Partial: Number Families (Add & Subtract) (`addition:number_families_add`), missing the part-whole diagram itself  
   Proposal: Part-Whole Model  
+  Vocabulary: whole, part, altogether  
 - **Y1.B2.S3** Write number sentences — covered. _K.OA.A.1, M.EE.K.OA.1_  
   Skills: Add Within 5 with Pictures (Visual) (`addition:add_5_pictures`); Subtract Within 5 with Pictures (Visual) (`subtraction:sub_5_pictures`)  
+  Vocabulary: plus (+), is equal to (, altogether  
 - **Y1.B2.S4** Fact families - addition facts — covered. _K.OA.A.1, K.OA.A.3, 1.OA.B.3, M.EE.K.OA.1_  
   Skills: Addition Fact Families (`addition:add_sub_fact_family`); Number Families (Add & Subtract) (`addition:number_families_add`)  
+  Vocabulary: part, whole, fact family  
 - **Y1.B2.S5** Number bonds within 10 — covered. _K.OA.A.3_  
   Skills: Number Bonds within 10 (Visual) (`composing:number_bonds`) {bonds to 10}  
+  Vocabulary: part, whole, number bond (  
 - **Y1.B2.S6** Systematic number bonds within 10 — GAP. _K.OA.A.3_  
   Proposal: Number Bonds in Order  
+  Vocabulary: bond, systematic, altogether  
 - **Y1.B2.S7** Number bonds to 10 — covered. _K.OA.A.4_  
   Skills: Number Bonds within 10 (Visual) (`composing:number_bonds`) {bonds to 10, whole = 10}; Make 10 (Visual) (`composing:make_ten`)  
+  Vocabulary: bond, part, whole, altogether  
 - **Y1.B2.S8** Addition - add together — covered. _K.OA.A.1, M.EE.K.OA.1_  
   Skills: Add Within 5 with Pictures (Visual) (`addition:add_5_pictures`); Add within 10 (`addition:add_10_mixed`)  
+  Vocabulary: part, whole, altogether, in total  
 - **Y1.B2.S9** Addition - add more — covered. _K.OA.A.2_  
   Skills: Addition Word Problems (within 10) (`addition:add_wp_10`); Number Line Addition (B&W) (`addition:number_line_add`)  
+  Vocabulary: more, add, altogether  
 - **Y1.B2.S10** Addition problems — covered. _K.OA.A.2_  
   Skills: Addition Word Problems (within 10) (`addition:add_wp_10`); Addition Word Problems (within 10, No Pictures) (`addition:add_wp_10_plain`)  
+  Vocabulary: altogether, in total, now, number bond  
 - **Y1.B2.S11** Find a part — covered. _K.OA.A.3_  
   Skills: Number Bonds within 10 (Visual) (`composing:number_bonds`) {missing part}  
+  Vocabulary: whole, part, the other part  
 - **Y1.B2.S12** Subtraction - find a part — covered. _K.OA.A.1, M.EE.K.OA.1_  
   Skills: Number Bonds within 10 (Visual) (`composing:number_bonds`) {missing part}; Missing Numbers (+/−) (`subtraction:missing_add_sub`)  
+  Vocabulary: minus, subtract, whole, part  
 - **Y1.B2.S13** Fact families - the eight facts — covered. _K.OA.A.1, 1.OA.B.3, 1.OA.B.4, M.EE.K.OA.1_  
   Skills: Addition Fact Families (`addition:add_sub_fact_family`); Number Families (Add & Subtract) (`addition:number_families_add`); Is It a Fact Family? (+/−) (`addition:fact_family_sort`)  
+  Vocabulary: whole, part, fact family  
 - **Y1.B2.S14** Subtraction - take away cross out (How many left ) — covered. _K.OA.A.1, M.EE.K.OA.1_  
   Skills: Subtract Within 5 with Pictures (Visual) (`subtraction:sub_5_pictures`)  
+  Vocabulary: take away, left, whole  
 - **Y1.B2.S15** Subtraction - take away (How many left ) — covered. _K.OA.A.2_  
   Skills: Subtract within 10 (`subtraction:sub_10_mixed`); Subtraction Word Problems (within 10) (`subtraction:sub_wp_10`)  
+  Vocabulary: take away, left, altogether  
 - **Y1.B2.S16** Subtraction on a number line — covered. _K.OA.A.1, M.EE.K.OA.1_  
   Skills: Subtraction Number Line (Visual) (`subtraction:nl_sub`); Number Line Subtraction (B&W) (`subtraction:number_line_sub`)  
+  Vocabulary: start, jump back, land on  
 - **Y1.B2.S17** Add or subtract 1 or 2 — PARTIAL. _K.OA.A.5_  
   Partial: Add within 10 (`addition:add_10_mixed`), missing adding or subtracting only 1 or 2 (counting on or back by 1 or 2)  
   Proposal: Add or Subtract 1 or 2  
+  Vocabulary: more, fewer, less, jump forward, jump back  
 
 #### Y1.B3 Autumn Block 3: Shape
 
 - **Y1.B3.S1** Recognise and name 3-D shapes — covered. _K.G.A.2, K.G.A.3, M.EE.K.G.2, M.EE.K.G.3_  
   Skills: Identify 3D Shapes (Visual) (`shapes_early:name_3d_shapes`); Match Names to 3D Shapes (`shapes_early:shape_name_match_3d`)  
+  Vocabulary: face, curved surface, cube, cuboid  
 - **Y1.B3.S2** Sort 3-D shapes — GAP. _K.G.A.2, K.G.B.4, M.EE.K.G.2_  
   Proposal: Sort 2-D and 3-D Shapes  
+  Vocabulary: sort, flat face, curved surface  
 - **Y1.B3.S3** Recognise and name 2-D shapes — covered. _K.G.A.2, K.G.A.3, M.EE.K.G.2, M.EE.K.G.3_  
   Skills: Identify 2D Shapes (Visual) (`shapes_early:name_2d_shapes`); Match Names to 2D Shapes (`shapes_early:shape_name_match_2d`)  
+  Vocabulary: circle, triangle, square, rectangle, side, vertex, corner, flat  
 - **Y1.B3.S4** Sort 2-D shapes — PARTIAL. _K.G.A.2, K.G.B.4, M.EE.K.G.2_  
   Partial: Find Shapes by Attributes (Multi-Select) (`shapes_early:compose_from_attributes`), missing sorting into groups by a rule; the skill selects by two attributes  
   Proposal: Sort 2-D and 3-D Shapes  
+  Vocabulary: sort, group, side  
 - **Y1.B3.S5** Patterns with 2-D and 3-D shapes — covered. _K.G.A.2, M.EE.K.G.2_  
   Skills: Shape Patterns (Visual) (`patterns:shape_pattern`)  
+  Vocabulary: repeating pattern, next, repeat  
 - _Awsaj supplement (not a WRM step):_ Build and draw shapes — K.G.B.5 (no skill)
 - _Awsaj supplement (not a WRM step):_ Compose shapes from smaller shapes — K.G.B.6
 
@@ -1051,210 +1202,289 @@ whatever happens to the WRM gaps.
 
 - **Y1.B4.S1** Count within 20 — covered. _K.CC.B.5, M.EE.K.CC.6_  
   Skills: Count Objects (1-20) (Visual) (`counting:count_objects`) {count to 20}  
+  Vocabulary: ten, ones, next, -teen  
 - **Y1.B4.S2** Understand 10 — PARTIAL. _K.NBT.A.1_  
   Partial: Build a Number on a Ten Frame (`composing:ten_frame_build`), missing 10 as one ten (a full frame is one ten)  
   Proposal: Understand 10 and 20 (option)  
+  Vocabulary: ten frame, full, ones, ten  
 - **Y1.B4.S3** Understand 11, 12 and 13 — covered. _K.NBT.A.1_  
   Skills: Teen Numbers: 10 + Ones (Visual) (`composing:teen_compose`) {to 15}; Build a Teen Number on Two Ten Frames (`composing:ten_frame_build_teen`)  
+  Vocabulary: eleven, twelve, thirteen, tens, ones  
 - **Y1.B4.S4** Understand 14, 15 and 16 — covered. _K.NBT.A.1_  
   Skills: Teen Numbers: 10 + Ones (Visual) (`composing:teen_compose`); Build a Teen Number on Two Ten Frames (`composing:ten_frame_build_teen`)  
+  Vocabulary: ten, ones, full  
 - **Y1.B4.S5** Understand 17, 18 and 19 — covered. _K.NBT.A.1_  
   Skills: Teen Numbers: 10 + Ones (Visual) (`composing:teen_compose`); Build a Teen Number on Two Ten Frames (`composing:ten_frame_build_teen`)  
+  Vocabulary: full ten, ones, empty space  
 - **Y1.B4.S6** Understand 20 — PARTIAL. _K.CC.A.3, K.NBT.A.1_  
   Partial: Build a Teen Number on Two Ten Frames (`composing:ten_frame_build_teen`), missing 20 as two full tens  
   Proposal: Understand 10 and 20 (option)  
+  Vocabulary: ten, twenty  
 - **Y1.B4.S7** 1 more and 1 less — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: Next/Before/After Number (Visual) (`counting:count_sequence`) {to 20}; 1 More, 1 Less, 10 More, 10 Less (`placevalue:more_less_10`) {1 more and 1 less, numbers to 20}  
+  Vocabulary: more, less, before, after  
 - **Y1.B4.S8** The number line to 20 — GAP. _K.CC.A.3_  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: number line, start point, end point  
 - **Y1.B4.S9** Use a number line to 20 — PARTIAL. _K.CC.A.3_  
   Partial: Number Line Addition (B&W) (`addition:number_line_add`), missing using the line to count on and back (the skill is addition only)  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: more, less, forwards, backwards  
 - **Y1.B4.S10** Estimate on a number line to 20 — GAP. _K.CC.A.3_  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: estimate, halfway, closer  
 - **Y1.B4.S11** Compare numbers to 20 — PARTIAL. _K.CC.C.7, 1.NBT.B.3, M.EE.1.NBT.3_  
   Partial: Compare Numbers (>, <, =) (`placevalue:compare`), missing numbers within 20 (the lowest band is 99)  
   Proposal: Compare Numbers to 10 and 20 (option)  
+  Vocabulary: greater than, less than, equal to  
 - **Y1.B4.S12** Order numbers to 20 — PARTIAL. _K.CC.C.7, 1.NBT.B.3, M.EE.1.NBT.3_  
   Partial: Order: Least to Greatest (`placevalue:order_least_to_greatest`), missing numbers within 20  
   Proposal: Compare Numbers to 10 and 20 (option)  
+  Vocabulary: greatest, smallest, order  
 
 #### Y1.B5 Spring Block 2: Addition and subtraction (within 20)
 
 - **Y1.B5.S1** Add by counting on within 20 — covered. _K.OA.A.1, 1.OA.C.6, M.EE.K.OA.1_  
   Skills: Add within 20 (`addition:add_20_mixed`); Number Line Addition (B&W) (`addition:number_line_add`)  
+  Vocabulary: count on, altogether, more  
 - **Y1.B5.S2** Add ones using number bonds — covered. _K.OA.A.1, 1.OA.C.6, M.EE.K.OA.1_  
   Skills: Add — Bridging Ten (sums 11–18) (`addition:add_10_regroup`); Make a Ten Strategy (`number_sense:make_a_ten`)  
+  Vocabulary: number bond, whole, ten  
 - **Y1.B5.S3** Find and make number bonds to 20 — PARTIAL. _K.OA.A.1, 1.OA.C.6, M.EE.K.OA.1_  
   Partial: Make 10 (Visual) (`composing:make_ten`), missing bonds to 20 (make 20 fills a second ten frame; bonds like 13 + 7)  
   Proposal: Number Bonds to 20  
+  Vocabulary: number bond, altogether, whole  
 - **Y1.B5.S4** Doubles — covered. _K.OA.A.1, 1.OA.C.6, M.EE.K.OA.1_  
   Skills: Doubles & Near Doubles (`number_sense:doubles_near_doubles`)  
+  Vocabulary: double, equal, total  
 - **Y1.B5.S5** Near doubles — covered. _K.OA.A.1, 1.OA.C.6, M.EE.K.OA.1_  
   Skills: Doubles & Near Doubles (`number_sense:doubles_near_doubles`)  
+  Vocabulary: near double, 1 more, 1 less  
 - **Y1.B5.S6** Subtract ones using number bonds — covered. _K.OA.A.1, 1.OA.C.6, M.EE.K.OA.1_  
   Skills: Subtract — Bridging Ten (minuends 11–18) (`subtraction:sub_10_regroup`)  
   Partial: Make a Ten Strategy (`number_sense:make_a_ten`), missing subtracting through 10 using bonds  
   Proposal: Number Bonds to 20  
+  Vocabulary: number bond, part, whole, ones  
 - **Y1.B5.S7** Subtraction - counting back — covered. _K.OA.A.1, 1.OA.C.5, M.EE.K.OA.1, M.EE.1.OA.5_  
   Skills: Subtraction Number Line (Visual) (`subtraction:nl_sub`); Number Line Subtraction (B&W) (`subtraction:number_line_sub`)  
+  Vocabulary: subtract, count back, jump  
 - **Y1.B5.S8** Subtraction - finding the difference — PARTIAL. _K.OA.A.1, 1.OA.C.5, M.EE.K.OA.1, M.EE.1.OA.5_  
   Partial: How Many More/Fewer? (Visual) (`addition:comparison_word`), missing finding the difference by comparing two bars or a number line  
   Proposal: Find the Difference  
+  Vocabulary: difference, more, fewer  
 - **Y1.B5.S9** Related facts — covered. _K.OA.A.1, 1.OA.B.4, M.EE.K.OA.1_  
   Skills: Addition Fact Families (`addition:add_sub_fact_family`); Number Families (Add & Subtract) (`addition:number_families_add`)  
+  Vocabulary: whole, part, fact family  
 - **Y1.B5.S10** Missing number problems — covered. _K.OA.A.1, 1.OA.D.8, M.EE.K.OA.1_  
   Skills: Pick the Missing Addends (`addition:cloze_addition`); Missing Numbers (+/−) (`subtraction:missing_add_sub`)  
+  Vocabulary: altogether, part, number sentence  
 
 #### Y1.B6 Spring Block 3: Place value (within 50)
 
 - **Y1.B6.S1** Count from 20 to 50 — covered. _K.CC.A.1, 1.NBT.A.1, M.EE.K.CC.1, M.EE.1.NBT.1_  
   Skills: Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`) {count by 1s, to 50}; Hundreds Chart - Find the Missing Number (Visual) (`composing:hundreds_chart_fill`) {numbers to 50}  
+  Vocabulary: before, after, forwards, backwards  
 - **Y1.B6.S2** 20, 30, 40 and 50 — covered. _K.CC.A.1, 1.NBT.B.2, M.EE.K.CC.1, M.EE.1.NBT.2_  
   Skills: How Many Tens? (Visual) (`composing:tens_foundation_visual`) {tens to 50}; Count by 10s (`patterns:seq_10`)  
+  Vocabulary: ones, ten, tens  
 - **Y1.B6.S3** Count by making groups of tens — PARTIAL. _K.NBT.A.1, 1.NBT.A.1, M.EE.1.NBT.1_  
   Partial: How Many Tens? (Visual) (`composing:tens_foundation_visual`), missing counting a large set by making groups of ten  
   Proposal: Count by Making Tens  
+  Vocabulary: group, ten, altogether, in total  
 - **Y1.B6.S4** Groups of tens and ones — covered. _K.NBT.A.1, 1.NBT.B.2, M.EE.1.NBT.2_  
   Skills: Build a Number with Base-10 Blocks (`composing:base10_build`) {numbers to 50}  
+  Vocabulary: tens, ones, in total, altogether  
 - **Y1.B6.S5** Partition into tens and ones — covered. _K.NBT.A.1, 1.NBT.B.2, M.EE.1.NBT.2_  
   Skills: Build a Number with Base-10 Blocks (`composing:base10_build`) {numbers to 50}; Unit Form (4 hundreds 7 tens 6 ones) (`placevalue:unit_form`)  
+  Vocabulary: partition, tens, ones  
 - **Y1.B6.S6** The number line to 50 — PARTIAL. _K.CC.A.2, 1.NBT.A.1, M.EE.1.NBT.1_  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing a whole 0-50 line counted in tens then ones (the skill's line spans one ten)  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: number line, start point, end point  
 - **Y1.B6.S7** Estimate on a number line to 50 — PARTIAL. _K.CC.A.2, 1.NBT.A.1, M.EE.1.NBT.1_  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing estimating on a line with only the ends marked  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: estimate, midpoint, closer to  
 - **Y1.B6.S8** 1 more, 1 less — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: 1 More, 1 Less, 10 More, 10 Less (`placevalue:more_less_10`) {1 more, 1 less, numbers to 50}  
+  Vocabulary: more, less, before, after  
 
 #### Y1.B7 Spring Block 4: Length and Height
 
 - **Y1.B7.S1** Compare lengths and heights — covered. _K.MD.A.1, K.MD.A.2, 1.MD.A.1, M.EE.K.MD.1, M.EE.K.MD.2, M.EE.1.MD.1_  
   Skills: Compare Attributes (Visual) (`comparing:compare_objects`) {length and height}; Order Objects by Length (Visual) (`shapes_early:order_objects_length`)  
+  Vocabulary: longer, shorter, taller, equal, the same  
 - **Y1.B7.S2** Measure length using objects — covered. _K.MD.A.1, 1.MD.A.2, M.EE.K.MD.1, M.EE.1.MD.2_  
   Skills: Measure with Non-Standard Units (Visual) (`shapes_early:measure_nonstandard`)  
+  Vocabulary: unit, end to end, same  
 - **Y1.B7.S3** Measure length in centimetres — PARTIAL. _K.MD.A.1, 2.MD.A.1, M.EE.K.MD.1, M.EE.2.MD.1_  
   Partial: Reading a Ruler (Visual) (`measurement:reading_ruler`), missing a centimetre ruler (the skill reads inches only)  
   Proposal: Read a Centimetre Ruler (option)  
+  Vocabulary: centimetre, cm, ruler, lined up with 0  
 
 #### Y1.B8 Spring Block 5: Mass and volume
 
 - **Y1.B8.S1** Heavier and lighter — covered. _K.MD.A.2, M.EE.K.MD.2_  
   Skills: Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`)  
+  Vocabulary: heavier, lighter, balance scale, mass  
 - **Y1.B8.S2** Measure mass — GAP. _K.MD.A.1, K.MD.A.2, M.EE.K.MD.1, M.EE.K.MD.2_  
   Proposal: Measure Mass with Cubes  
+  Vocabulary: mass, balance, level, cube  
 - **Y1.B8.S3** Compare mass — PARTIAL. _K.MD.A.2, M.EE.K.MD.2_  
   Partial: Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`), missing comparing masses by the number of units  
   Proposal: Measure Mass with Cubes  
+  Vocabulary: heavier, lighter, than  
 - **Y1.B8.S4** Full and empty — GAP. _K.MD.A.1, M.EE.K.MD.1_  
   Proposal: Full, Empty, Holds More  
+  Vocabulary: capacity, volume, full, empty  
 - **Y1.B8.S5** Compare volume — GAP. _K.MD.A.2, M.EE.K.MD.2_  
   Proposal: Full, Empty, Holds More  
+  Vocabulary: more, less, half full  
 - **Y1.B8.S6** Measure capacity — GAP. _K.MD.A.1, K.MD.A.2, M.EE.K.MD.1, M.EE.K.MD.2_  
   Proposal: Measure Capacity with Cups  
+  Vocabulary: capacity, full, unit  
 - **Y1.B8.S7** Compare capacity — GAP. _K.MD.A.2, M.EE.K.MD.2_  
   Proposal: Measure Capacity with Cups  
+  Vocabulary: capacity, greater, same unit  
 
 #### Y1.B9 Summer Block 1: Multiplication and division
 
 - **Y1.B9.S1** Count in 2s — covered. _2.OA.C.3, M.EE.2.OA.3_  
   Skills: Count by 2s (`patterns:seq_2`); Skip Counting Number Line (Visual) (`patterns:skip_count_line`) {by 2s}  
+  Vocabulary: pair, altogether, even  
 - **Y1.B9.S2** Count in 10s — covered. _K.CC.A.1, 2.NBT.A.2, M.EE.K.CC.1, M.EE.2.NBT.2_  
   Skills: Count by 10s (`patterns:seq_10`)  
+  Vocabulary: ten frame, altogether, total  
 - **Y1.B9.S3** Count in 5s — covered. _2.NBT.A.2, M.EE.2.NBT.2_  
   Skills: Count by 5s (`patterns:seq_5`)  
+  Vocabulary: groups of 5, altogether, count in 5s  
 - **Y1.B9.S4** Recognise equal groups — covered. _K.OA.A.1, 3.OA.A.1, M.EE.K.OA.1, M.EE.3.OA.1_  
   Skills: Equal Groups or Not? (Visual) (`multiplication:equal_or_unequal_groups`)  
+  Vocabulary: equal groups, unequal  
 - **Y1.B9.S5** Add equal groups — covered. _K.OA.A.1, 3.OA.A.1, M.EE.K.OA.1, M.EE.3.OA.1_  
   Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {groups}; Write Repeated Addition as Multiplication (Visual) (`multiplication:repeated_add_to_mult`)  
+  Vocabulary: equal groups, altogether, number sentence  
 - **Y1.B9.S6** Make arrays — covered. _K.OA.A.1, 2.OA.C.4, M.EE.K.OA.1, M.EE.2.OA.4_  
   Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {arrays}; Dot Array Multiplication (B&W) (`multiplication:dot_array_mult`)  
+  Vocabulary: array, row, column  
 - **Y1.B9.S7** Make doubles — covered. _K.OA.A.1, 1.OA.C.6, M.EE.K.OA.1_  
   Skills: Doubling (`patterns:double`); Doubles & Near Doubles (`number_sense:doubles_near_doubles`)  
+  Vocabulary: double, altogether  
 - **Y1.B9.S8** Make equal groups - grouping — covered. _3.OA.A.2, M.EE.3.OA.2_  
   Skills: Make Equal Groups to Divide (Visual) (`division:share_into_groups`)  
+  Vocabulary: grouping, equal groups, altogether  
 - **Y1.B9.S9** Make equal groups - sharing — PARTIAL. _3.OA.A.2, M.EE.3.OA.2_  
   Partial: Make Equal Groups to Divide (Visual) (`division:share_into_groups`), missing sharing one at a time between a given number of groups (how many in each)  
   Proposal: Share and Make Groups  
+  Vocabulary: share, in each group  
 
 #### Y1.B10 Summer Block 2: Fractions
 
 - **Y1.B10.S1** Recognise a half of an object or a shape — covered. _1.G.A.3, M.EE.1.G.3_  
   Skills: Halves/Thirds/Fourths (Visual) (`shapes_early:partition_shapes`) {halves}  
+  Vocabulary: whole, half, equal  
 - **Y1.B10.S2** Find a half of an object or a shape — covered. _1.G.A.3, M.EE.1.G.3_  
   Skills: Shade the Fraction (`fractions:shade_fraction`) {1/2}  
+  Vocabulary: whole, half, equal  
 - **Y1.B10.S3** Recognise a half of a quantity — PARTIAL. _1.G.A.3, M.EE.1.G.3_  
   Partial: Fraction of a Set (Visual) (`fractions:fraction_of_set`), missing recognising whether a set is split into two equal groups  
   Proposal: Halves and Quarters  
+  Vocabulary: whole, half, equal groups  
 - **Y1.B10.S4** Find a half of a quantity — covered. _1.G.A.3, M.EE.1.G.3_  
   Skills: Fraction of a Set (Visual) (`fractions:fraction_of_set`) {1/2}; Halving (`patterns:halve`)  
+  Vocabulary: half, altogether, equal groups  
 - **Y1.B10.S5** Recognise a quarter of an object or a shape — covered. _1.G.A.3, M.EE.1.G.3_  
   Skills: Halves/Thirds/Fourths (Visual) (`shapes_early:partition_shapes`) {fourths}  
+  Vocabulary: whole, quarter, equal parts  
 - **Y1.B10.S6** Find a quarter of an object or a shape — covered. _1.G.A.3, M.EE.1.G.3_  
   Skills: Shade the Fraction (`fractions:shade_fraction`) {1/4}  
+  Vocabulary: whole, equal parts, quarter  
 - **Y1.B10.S7** Recognise a quarter of a quantity — PARTIAL. _1.G.A.3, M.EE.1.G.3_  
   Partial: Fraction of a Set (Visual) (`fractions:fraction_of_set`), missing recognising a set split into four equal groups  
   Proposal: Halves and Quarters  
+  Vocabulary: whole, equal groups, quarter  
 - **Y1.B10.S8** Find a quarter of a quantity — covered. _1.G.A.3, M.EE.1.G.3_  
   Skills: Fraction of a Set (Visual) (`fractions:fraction_of_set`) {1/4}  
+  Vocabulary: quarter, share equally, altogether  
 
 #### Y1.B11 Summer Block 3: Position and direction
 
 - **Y1.B11.S1** Describe turns — GAP. _K.G.A.1_  
   Proposal: Whole, Half and Quarter Turns  
+  Vocabulary: turn, quarter turn, half turn, full turn  
 - **Y1.B11.S2** Describe position - left and right — GAP. _K.G.A.1_  
   Proposal: Where Is It? Positions and Maps  
+  Vocabulary: left, right  
 - **Y1.B11.S3** Describe position - forwards and backwards — GAP. _K.G.A.1_  
   Proposal: Where Is It? Positions and Maps  
+  Vocabulary: forwards, backwards  
 - **Y1.B11.S4** Describe position - above and below — covered. _K.G.A.1_  
   Skills: Shape Positions: Above/Below/Beside (Visual) (`shapes_early:shape_positions`)  
+  Vocabulary: above, below  
 - **Y1.B11.S5** Ordinal numbers — GAP. _Beyond CCSS_  
   Proposal: 1st, 2nd, 3rd  
+  Vocabulary: first, last, position  
 
 #### Y1.B12 Summer Block 4: Place value (within 100)
 
 - **Y1.B12.S1** Count from 50 to 100 — covered. _K.CC.A.1, 1.NBT.A.1, M.EE.K.CC.1, M.EE.1.NBT.1_  
   Skills: Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`) {count by 1s, to 100}; Hundreds Chart - Find the Missing Number (Visual) (`composing:hundreds_chart_fill`)  
+  Vocabulary: after, before, forwards, backwards  
 - **Y1.B12.S2** Tens to 100 — covered. _K.CC.A.1, 1.NBT.B.2, M.EE.K.CC.1, M.EE.1.NBT.2_  
   Skills: How Many Tens? (Visual) (`composing:tens_foundation_visual`) {tens to 90}; Count by 10s (`patterns:seq_10`)  
+  Vocabulary: ten, equal to, multiple of 10  
 - **Y1.B12.S3** Partition into tens and ones — covered. _K.NBT.A.1, 1.NBT.B.2, M.EE.1.NBT.2_  
   Skills: Build a Number with Base-10 Blocks (`composing:base10_build`); Unit Form (4 hundreds 7 tens 6 ones) (`placevalue:unit_form`) {band 99}  
+  Vocabulary: partition, tens, ones  
 - **Y1.B12.S4** The number line to 100 — PARTIAL. _K.CC.A.2, 1.NBT.A.1, M.EE.1.NBT.1_  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing a whole 0-100 line counted in tens then ones (the skill's line spans one ten)  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: number line, interval, estimate  
 - **Y1.B12.S5** 1 more, 1 less — covered. _K.CC.B.4, M.EE.K.CC.4_  
   Skills: 1 More, 1 Less, 10 More, 10 Less (`placevalue:more_less_10`) {1 more, 1 less}  
+  Vocabulary: 1 more, 1 less, regroup  
 - **Y1.B12.S6** Compare numbers with the same number of tens — covered. _1.NBT.B.2, 1.NBT.B.3, M.EE.1.NBT.2, M.EE.1.NBT.3_  
   Skills: Compare Numbers (>, <, =) (`placevalue:compare`) {band 99}  
+  Vocabulary: greater than (>), less than (<), equal to (, ones  
 - **Y1.B12.S7** Compare any two numbers — covered. _1.NBT.B.3, M.EE.1.NBT.3_  
   Skills: Compare Numbers (>, <, =) (`placevalue:compare`) {band 99}  
+  Vocabulary: greater than (>), less than (<), equal to (  
 
 #### Y1.B13 Summer Block 5: Money
 
 - **Y1.B13.S1** Unitising — covered. _2.MD.C.8, M.EE.2.MD.8_  
   Skills: Coins and Notes by Value (`measurement:coin_value`)  
+  Vocabulary: value, unitise, coin  
 - **Y1.B13.S2** Recognise coins — covered. _2.MD.C.8, M.EE.2.MD.8_  
   Skills: Coins and Notes by Value (`measurement:coin_value`)  
+  Vocabulary: coin, value, pence, pounds  
 - **Y1.B13.S3** Recognise notes — GAP. _2.MD.C.8, M.EE.2.MD.8_  
   Proposal: Recognise Notes (option)  
+  Vocabulary: note, value, pounds  
 - **Y1.B13.S4** Count in coins — covered. _K.CC.A.1, 2.MD.C.8, M.EE.K.CC.1, M.EE.2.MD.8_  
   Skills: Count Coins and Notes (`measurement:money_count`)  
+  Vocabulary: value, count in, total  
 
 #### Y1.B14 Summer Block 6: Time
 
 - **Y1.B14.S1** Before and after — GAP. _1.MD.B.3, M.EE.1.MD.3_  
   Proposal: First, Next, Then  
+  Vocabulary: before, after, first, finally  
 - **Y1.B14.S2** Days of the week — GAP. _Beyond CCSS_  
   Proposal: Time Words  
+  Vocabulary: week, weekend, before, after  
 - **Y1.B14.S3** Months of the year — GAP. _Beyond CCSS_  
   Proposal: Time Words  
+  Vocabulary: month, year, before, after  
 - **Y1.B14.S4** Hours, minutes and seconds — GAP. _1.MD.B.3, M.EE.1.MD.3_  
   Proposal: Hours, Minutes or Seconds?  
+  Vocabulary: second, minute, hour  
 - **Y1.B14.S5** Tell the time to the hour — covered. _1.MD.B.3, M.EE.1.MD.3_  
   Skills: Time to the Hour (`measurement:time_hour`)  
+  Vocabulary: hour hand, minute hand, o’clock  
 - **Y1.B14.S6** Tell the time to the half hour — covered. _1.MD.B.3, M.EE.1.MD.3_  
   Skills: Time to Half Hour (`measurement:time_half_hour`)  
+  Vocabulary: half past, hour hand, minute hand  
 
 ### Year 2 (US grade 1)
 
@@ -1262,304 +1492,428 @@ whatever happens to the WRM gaps.
 
 - **Y2.B1.S1** Numbers to 20 — covered. _1.NBT.B.2, M.EE.1.NBT.2_  
   Skills: Teen Numbers: 10 + Ones (Visual) (`composing:teen_compose`); Build a Number with Base-10 Blocks (`composing:base10_build`) {numbers to 20}  
+  Vocabulary: ten, ones, teen  
 - **Y2.B1.S2** Count objects to 100 by making 10s — GAP. _1.NBT.A.1, 1.NBT.B.2, M.EE.1.NBT.1, M.EE.1.NBT.2_  
   Proposal: Count by Making Tens  
+  Vocabulary: group, ten, ones, more  
 - **Y2.B1.S3** Recognise tens and ones — covered. _1.NBT.B.2, M.EE.1.NBT.2_  
   Skills: How Many Tens? (Visual) (`composing:tens_foundation_visual`); Build a Number with Base-10 Blocks (`composing:base10_build`)  
+  Vocabulary: ten, ones, represent  
 - **Y2.B1.S4** Use a place value chart — covered. _1.NBT.B.2, M.EE.1.NBT.2_  
   Skills: Name the Place (`placevalue:identify`) {band 99}; Value of a Digit (`placevalue:value`) {band 99}  
+  Vocabulary: column, digit, represent  
 - **Y2.B1.S5** Partition numbers to 100 — covered. _1.NBT.B.2, M.EE.1.NBT.2_  
   Skills: Expanded Form (`placevalue:expand`) {band 99}; Unit Form (4 hundreds 7 tens 6 ones) (`placevalue:unit_form`) {band 99}  
+  Vocabulary: tens, ones, part, whole  
 - **Y2.B1.S6** Write numbers to 100 in words — covered. _1.NBT.A.1, 2.NBT.A.3, M.EE.1.NBT.1, M.EE.2.NBT.3_  
   Skills: Number Word Form (`composing:number_word_form`) {Max Number 100}  
+  Vocabulary: numeral, word, tens word, ones word  
 - **Y2.B1.S7** Flexibly partition numbers to 100 — GAP. _1.NBT.B.2, M.EE.1.NBT.2_  
   Proposal: Partition Numbers Flexibly  
+  Vocabulary: partition, unbundle, part-whole  
 - **Y2.B1.S8** Write numbers to 100 in expanded form — covered. _1.NBT.B.2, 2.NBT.A.3, M.EE.1.NBT.2, M.EE.2.NBT.3_  
   Skills: Expanded Form (`placevalue:expand`) {band 99}; Standard Form (`placevalue:combine`) {band 99}  
+  Vocabulary: expanded form, plus, is equal to, value  
 - **Y2.B1.S9** 10s on the number line to 100 — PARTIAL. _1.NBT.A.1, 2.MD.B.6, M.EE.1.NBT.1, M.EE.2.MD.6_  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing counting in 10s along a line marked in tens  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: interval, start, end, multiple of 10  
 - **Y2.B1.S10** 10s and 1s on the number line to 100 — PARTIAL. _1.NBT.A.1, 2.MD.B.6, M.EE.1.NBT.1, M.EE.2.MD.6_  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing a whole 0-100 line counted in tens then ones (the skill's line spans one ten)  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: between, count on, interval  
 - **Y2.B1.S11** Estimate numbers on a number line — PARTIAL. _1.NBT.A.1, 2.MD.B.6, M.EE.1.NBT.1, M.EE.2.MD.6_  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing estimating on a line with only the ends marked  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: estimate, interval, halfway  
 - **Y2.B1.S12** Compare objects — PARTIAL. _1.NBT.B.3, M.EE.1.NBT.3_  
   Partial: More/Fewer/Same Groups (Visual) (`comparing:compare_groups`), missing comparing groups of objects to 100 (tens and ones pictures)  
   Proposal: Compare Numbers to 10 and 20 (option)  
+  Vocabulary: greater than, less than, equal to  
 - **Y2.B1.S13** Compare numbers — covered. _1.NBT.B.3, M.EE.1.NBT.3_  
   Skills: Compare Numbers (>, <, =) (`placevalue:compare`) {band 99}  
+  Vocabulary: greater than, less than, equal to  
 - **Y2.B1.S14** Order objects and numbers — covered. _1.NBT.B.3, M.EE.1.NBT.3_  
   Skills: Order: Least to Greatest (`placevalue:order_least_to_greatest`) {band 99}; Order: Greatest to Least (`placevalue:order_greatest_to_least`) {band 99}  
+  Vocabulary: smallest, greatest, order  
 - **Y2.B1.S15** Count in 2s, 5s and 10s — covered. _1.NBT.A.1, 2.NBT.A.2, M.EE.1.NBT.1, M.EE.2.NBT.2_  
   Skills: Count by 2s (`patterns:seq_2`); Count by 5s (`patterns:seq_5`); Count by 10s (`patterns:seq_10`)  
+  Vocabulary: count in 2s, 5s, 10s, forwards, backwards  
 - **Y2.B1.S16** Count in 3s — PARTIAL. _1.NBT.A.1, M.EE.1.NBT.1_  
   Partial: Count Up by Step (Grid) (`patterns:count_by_step_up`), missing counting in 3s from 0 as a counting sequence (the skill steps from any number)  
   Proposal: Count in 3s  
+  Vocabulary: count in 3s, equal groups, altogether  
 - _Awsaj supplement (not a WRM step):_ Count on to 120 — 1.NBT.A.1
 
 #### Y2.B2 Autumn Block 2: Addition and subtraction
 
 - **Y2.B2.S1** Bonds to 10 — covered. _1.OA.C.6, K.OA.A.4_  
   Skills: Number Bonds within 10 (Visual) (`composing:number_bonds`) {bonds to 10}; Make 10 (Visual) (`composing:make_ten`)  
+  Vocabulary: bond to 10, altogether, how many more  
 - **Y2.B2.S2** Fact families - addition and subtraction bonds within 20 — covered. _1.OA.B.3, 1.OA.B.4, 1.OA.C.6_  
   Skills: Addition Fact Families (`addition:add_sub_fact_family`); Number Families (Add & Subtract) (`addition:number_families_add`)  
+  Vocabulary: whole, part, fact family  
 - **Y2.B2.S3** Related facts — covered. _1.OA.B.3, 1.OA.B.4_  
   Skills: Number Families (Add & Subtract) (`addition:number_families_add`); Is It a Fact Family? (+/−) (`addition:fact_family_sort`)  
+  Vocabulary: ten, related fact, so  
 - **Y2.B2.S4** Bonds to 100 (tens) — PARTIAL. _1.NBT.B.2, 1.NBT.C.4, K.OA.A.4, M.EE.1.NBT.2, M.EE.1.NBT.4_  
   Partial: Add & Subtract by 10s (`addition:add_sub_10s`), missing bonds of tens to 100 (30 + 70) from bonds to 10  
   Proposal: Bonds to 100  
+  Vocabulary: ten, hundred, bond to 100  
 - **Y2.B2.S5** Add and subtract 1s — covered. _1.OA.C.5, 1.OA.C.6, M.EE.1.OA.5_  
   Skills: Number Line Addition (B&W) (`addition:number_line_add`); Number Line Subtraction (B&W) (`subtraction:number_line_sub`)  
+  Vocabulary: ones, tens, 1 more, 1 less  
 - **Y2.B2.S6** Add by making 10 — covered. _1.OA.B.3, 1.OA.C.6_  
   Skills: Add — Bridging Ten (sums 11–18) (`addition:add_10_regroup`); Make a Ten Strategy (`number_sense:make_a_ten`)  
+  Vocabulary: partition, number bond, make 10  
 - **Y2.B2.S7** Add three 1-digit numbers — covered. _1.OA.A.2, M.EE.1.OA.2_  
   Skills: Add Three Numbers (≤20) (`addition:add_three`)  
+  Vocabulary: bond to 10, partition, altogether  
 - **Y2.B2.S8** Add to the next 10 — GAP. _1.NBT.C.4, 1.OA.C.6, M.EE.1.NBT.4_  
   Proposal: To the Next Ten  
+  Vocabulary: bond to 10, ones, next 10  
 - **Y2.B2.S9** Add across a 10 — covered. _1.NBT.C.4, 1.OA.C.6, M.EE.1.NBT.4_  
   Skills: Add within 50 (With Regrouping) (`addition:add_50_regroup`)  
   Partial: Make a Ten Strategy (`number_sense:make_a_ten`), missing bridging 10 in a 2-digit number (38 + 5)  
   Proposal: To the Next Ten  
+  Vocabulary: bond to 10, partition, across a ten  
 - **Y2.B2.S10** Subtract across 10 — covered. _1.OA.C.6_  
   Skills: Subtract — Bridging Ten (minuends 11–18) (`subtraction:sub_10_regroup`)  
+  Vocabulary: partition, get to 10, less than  
 - **Y2.B2.S11** Subtract from a 10 — GAP. _1.OA.C.6, 2.NBT.B.5, M.EE.2.NBT.5_  
   Proposal: To the Next Ten  
+  Vocabulary: bond to 10, multiple of 10, ten fewer  
 - **Y2.B2.S12** Subtract a 1-digit number from a 2-digit number (across a 10) — covered. _1.OA.C.6, 2.NBT.B.5, M.EE.2.NBT.5_  
   Skills: Subtract within 50 (With Regrouping) (`subtraction:sub_50_regroup`); Subtract within 100 (With Regrouping) (`subtraction:sub_100_regroup`)  
+  Vocabulary: partition, bridge, cross a ten, exchange  
 - **Y2.B2.S13** 10 more, 10 less — covered. _1.NBT.C.5_  
   Skills: 1 More, 1 Less, 10 More, 10 Less (`placevalue:more_less_10`) {10 more and 10 less}  
+  Vocabulary: ten more, ten less, stays the same  
 - **Y2.B2.S14** Add and subtract 10s — covered. _1.NBT.C.4, 1.NBT.C.6, M.EE.1.NBT.4, M.EE.1.NBT.6_  
   Skills: Add & Subtract by 10s (`addition:add_sub_10s`)  
+  Vocabulary: add 20, subtract 30, stays the same  
 - **Y2.B2.S15** Add two 2-digit numbers (not across a 10) — covered. _1.NBT.C.4, M.EE.1.NBT.4_  
   Skills: Add within 100 (No Regrouping) (`addition:add_100_no_regroup`)  
+  Vocabulary: tens, ones, altogether  
 - **Y2.B2.S16** Add two 2-digit numbers (across a 10) — covered. _1.NBT.C.4, M.EE.1.NBT.4_  
   Skills: Add within 100 (With Regrouping) (`addition:add_100_regroup`)  
+  Vocabulary: exchange, regroup, altogether  
 - **Y2.B2.S17** Subtract two 2-digit numbers (not across a 10) — covered. _1.NBT.C.6, 2.NBT.B.5, M.EE.1.NBT.6, M.EE.2.NBT.5_  
   Skills: Subtract within 100 (No Regrouping) (`subtraction:sub_100_no_regroup`)  
+  Vocabulary: tens, ones, subtract  
 - **Y2.B2.S18** Subtract two 2-digit numbers (across a 10) — covered. _1.NBT.C.6, 2.NBT.B.5, M.EE.1.NBT.6, M.EE.2.NBT.5_  
   Skills: Subtract within 100 (With Regrouping) (`subtraction:sub_100_regroup`)  
+  Vocabulary: exchange, not enough, ones, tens columns  
 - **Y2.B2.S19** Mixed addition and subtraction — covered. _1.NBT.C.4, 1.OA.A.1, M.EE.1.NBT.4, M.EE.1.OA.1_  
   Skills: Addition Word Problems (within 100) (`addition:add_wp_100`); Subtraction Word Problems (within 100) (`subtraction:sub_wp_100`); Mixed Addition & Subtraction (`subtraction:mixed_add_sub`)  
+  Vocabulary: add (+), subtract (−), exchange  
 - **Y2.B2.S20** Compare number sentences — PARTIAL. _1.OA.D.7, M.EE.1.OA.7_  
   Partial: True/False Equations (Visual) (`addition:equal_sign`), missing comparing two number sentences with <, > or = (the skill judges true/false)  
   Proposal: Compare Number Sentences  
+  Vocabulary: greater than (>), less than (<), equal to (  
 - **Y2.B2.S21** Missing number problems — covered. _1.OA.D.8_  
   Skills: Pick the Missing Addends (`addition:cloze_addition`); Missing Numbers (+/−) (`subtraction:missing_add_sub`)  
+  Vocabulary: is equal to, partition, missing number  
 
 #### Y2.B3 Autumn Block 3: Shape
 
 - **Y2.B3.S1** Recognise 2-D and 3-D shapes — covered. _1.G.A.1, M.EE.1.G.1_  
   Skills: Identify 2D Shapes (Visual) (`shapes_early:name_2d_shapes`); Identify 3D Shapes (Visual) (`shapes_early:name_3d_shapes`)  
+  Vocabulary: flat, solid, 2-D, 3-D  
 - **Y2.B3.S2** Count sides on 2-D shapes — covered. _1.G.A.1, M.EE.1.G.1_  
   Skills: Count Sides & Vertices on 2D Shape (Visual) (`shapes_early:count_sides_vertices_2d`) {sides}  
+  Vocabulary: side, straight, 2-D shape  
 - **Y2.B3.S3** Count vertices on 2-D shapes — covered. _1.G.A.1, M.EE.1.G.1_  
   Skills: Count Corners on a Shape (Visual) (`shapes_early:shape_corners_count`); Count Sides & Vertices on 2D Shape (Visual) (`shapes_early:count_sides_vertices_2d`) {vertices}  
+  Vocabulary: vertex, vertices, side  
 - **Y2.B3.S4** Draw 2-D shapes — GAP. _1.G.A.1, 2.G.A.1, K.G.B.5, M.EE.1.G.1, M.EE.2.G.1_  
   Proposal: Draw 2-D Shapes  
+  Vocabulary: side, vertex, straight  
 - **Y2.B3.S5** Lines of symmetry on shapes — covered. _1.G.A.1, 4.G.A.3, M.EE.1.G.1, M.EE.4.G.3_  
   Skills: Lines of Symmetry (`angles_lines:symmetry`); Draw Lines of Symmetry (`angles_lines:place_symmetry_lines`)  
+  Vocabulary: symmetrical, vertical, line of symmetry  
 - **Y2.B3.S6** Use lines of symmetry to complete shapes — GAP. _1.G.A.1, 4.G.A.3, M.EE.1.G.1, M.EE.4.G.3_  
   Proposal: Complete the Symmetric Shape  
+  Vocabulary: mirror line, vertex, reflection  
 - **Y2.B3.S7** Sort 2-D shapes — PARTIAL. _1.G.A.1, K.G.B.4, M.EE.1.G.1_  
   Partial: Find Shapes by Attributes (Multi-Select) (`shapes_early:compose_from_attributes`), missing sorting into labelled groups  
   Proposal: Sort 2-D and 3-D Shapes  
+  Vocabulary: sort, group, property  
 - **Y2.B3.S8** Count faces on 3-D shapes — PARTIAL. _1.G.A.1, 2.G.A.1, M.EE.1.G.1, M.EE.2.G.1_  
   Partial: Count Edges, Faces & Vertices on 3D Shape (Visual) (`shapes_early:count_edges_faces_vertices`), missing faces only, one property per page  
   Proposal: Faces, Edges or Vertices (option)  
+  Vocabulary: face, flat, curved surface  
 - **Y2.B3.S9** Count edges on 3-D shapes — covered. _1.G.A.1, 2.G.A.1, M.EE.1.G.1, M.EE.2.G.1_  
   Skills: Count Edges, Faces & Vertices on 3D Shape (Visual) (`shapes_early:count_edges_faces_vertices`)  
+  Vocabulary: edge, face, vertex  
 - **Y2.B3.S10** Count vertices on 3-D shapes — covered. _1.G.A.1, 2.G.A.1, M.EE.1.G.1, M.EE.2.G.1_  
   Skills: Count Edges, Faces & Vertices on 3D Shape (Visual) (`shapes_early:count_edges_faces_vertices`)  
+  Vocabulary: vertex, edge, face  
 - **Y2.B3.S11** Sort 3-D shapes — GAP. _1.G.A.1, K.G.B.4, M.EE.1.G.1_  
   Proposal: Sort 2-D and 3-D Shapes  
+  Vocabulary: sort, property, curved surface, odd one out  
 - **Y2.B3.S12** Make patterns with 2-D and 3-D shapes — covered. _K.G.A.2, M.EE.K.G.2_  
   Skills: Shape Patterns (Visual) (`patterns:shape_pattern`)  
+  Vocabulary: pattern, repeat, symmetrical  
 - _Awsaj supplement (not a WRM step):_ Compose and recompose shapes — 1.G.A.2
 
 #### Y2.B4 Spring Block 1: Money
 
 - **Y2.B4.S1** Count money - pence — covered. _2.MD.C.8, M.EE.2.MD.8_  
   Skills: Count Coins and Notes (`measurement:money_count`); Coins and Notes by Value (`measurement:coin_value`)  
+  Vocabulary: coin, value, worth, total  
 - **Y2.B4.S2** Count money - pounds (notes and coins) — PARTIAL. _2.MD.C.8, M.EE.2.MD.8_  
   Partial: Count Coins and Notes (`measurement:money_count`), missing counting notes  
   Proposal: Count Money (option)  
+  Vocabulary: note, coin, value / £  
 - **Y2.B4.S3** Count money - pounds and pence — PARTIAL. _2.MD.C.8, M.EE.2.MD.8_  
   Partial: Count Coins and Notes (`measurement:money_count`), missing counting notes and coins together as dollars and cents  
   Proposal: Count Money (option)  
+  Vocabulary: pound, pence, value, total  
 - **Y2.B4.S4** Choose notes and coins — covered. _2.MD.C.8, M.EE.2.MD.8_  
   Skills: Make an Amount With the Fewest Coins (`measurement:make_change_least_coins`)  
+  Vocabulary: coin, note, value, choose, make  
 - **Y2.B4.S5** Make the same amount — covered. _2.MD.C.8, M.EE.2.MD.8_  
   Skills: Do the Coins Make the Amount? (`measurement:equiv_coin_sets`)  
+  Vocabulary: value, worth the same, swap  
 - **Y2.B4.S6** Compare amounts of money — covered. _1.NBT.B.3, 2.MD.C.8, M.EE.1.NBT.3, M.EE.2.MD.8_  
   Skills: Which Has More Money? (`measurement:money_compare`)  
+  Vocabulary: greater than, less than, value  
 - **Y2.B4.S7** Calculate with money — covered. _2.MD.C.8, M.EE.2.MD.8_  
   Skills: Add Money (`measurement:money`); Is There Enough Money? (`measurement:enough_money`)  
+  Vocabulary: total, difference, altogether  
 - **Y2.B4.S8** Make a pound — PARTIAL. _2.MD.C.8, M.EE.2.MD.8_  
   Partial: Do the Coins Make the Amount? (`measurement:equiv_coin_sets`), missing making exactly one dollar (100 cents) in different ways  
   Proposal: Count Money (option)  
+  Vocabulary: pound, pence, equivalent  
 - **Y2.B4.S9** Find change — covered. _1.OA.A.1, 2.MD.C.8, M.EE.1.OA.1, M.EE.2.MD.8_  
   Skills: Find the Change (`measurement:money_change`)  
+  Vocabulary: change, pound, cost  
 - **Y2.B4.S10** Two-step problems — GAP. _2.MD.C.8, 2.OA.A.1, M.EE.2.MD.8_  
   Proposal: Two-Step Money Problems  
+  Vocabulary: total, difference, change, less than  
 
 #### Y2.B5 Spring Block 2: Multiplication and division
 
 - **Y2.B5.S1** Recognise equal groups — covered. _3.OA.A.1, M.EE.3.OA.1_  
   Skills: Equal Groups or Not? (Visual) (`multiplication:equal_or_unequal_groups`)  
+  Vocabulary: equal groups, unequal, in each group  
 - **Y2.B5.S2** Make equal groups — GAP. _3.OA.A.1, M.EE.3.OA.1_  
   Proposal: Make Equal Groups  
+  Vocabulary: group, equal groups, groups of  
 - **Y2.B5.S3** Add equal groups — covered. _2.OA.C.4, 3.OA.A.1, M.EE.2.OA.4, M.EE.3.OA.1_  
   Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {groups}; Write Repeated Addition as Multiplication (Visual) (`multiplication:repeated_add_to_mult`)  
+  Vocabulary: equal groups, altogether, add  
 - **Y2.B5.S4** Introduce the multiplication symbol — covered. _3.OA.A.1, M.EE.3.OA.1_  
   Skills: Write Repeated Addition as Multiplication (Visual) (`multiplication:repeated_add_to_mult`)  
+  Vocabulary: equal groups, repeated addition, multiply / ×  
 - **Y2.B5.S5** Multiplication sentences — covered. _3.OA.A.1, M.EE.3.OA.1_  
   Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`)  
+  Vocabulary: lots of, multiply / ×, total, altogether  
 - **Y2.B5.S6** Use arrays — covered. _2.OA.C.4, 3.OA.A.1, M.EE.2.OA.4, M.EE.3.OA.1_  
   Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {arrays}; Dot Array Multiplication (B&W) (`multiplication:dot_array_mult`)  
+  Vocabulary: row, column, array  
 - **Y2.B5.S7** Make equal groups – grouping — covered. _3.OA.A.2, M.EE.3.OA.2_  
   Skills: Make Equal Groups to Divide (Visual) (`division:share_into_groups`)  
+  Vocabulary: altogether, equal groups, divided by (÷)  
 - **Y2.B5.S8** Make equal groups – sharing — PARTIAL. _3.OA.A.2, M.EE.3.OA.2_  
   Partial: Make Equal Groups to Divide (Visual) (`division:share_into_groups`), missing sharing into a given number of groups (how many in each)  
   Proposal: Share and Make Groups  
+  Vocabulary: share, equal groups, in each group  
 - **Y2.B5.S9** The 2 times-table — covered. _2.OA.C.3, 3.OA.C.7, M.EE.2.OA.3, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 2}; Count by 1–12 (`multiplication:count_by_tables`) {2}  
+  Vocabulary: times, multiply, array, even  
 - **Y2.B5.S10** Divide by 2 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 2}  
+  Vocabulary: divide / ÷, grouping, sharing  
 - **Y2.B5.S11** Doubling and halving — covered. _2.OA.C.3, 3.OA.A.1, 3.OA.A.2, M.EE.2.OA.3, M.EE.3.OA.1, M.EE.3.OA.2_  
   Skills: Doubling (`patterns:double`); Halving (`patterns:halve`)  
+  Vocabulary: double, half, inverse  
 - **Y2.B5.S12** Odd and even numbers — covered. _2.OA.C.3, M.EE.2.OA.3_  
   Skills: Odd or Even? (Visual) (`composing:odd_even`); Circle the Even or Odd Numbers (MAP) (`composing:select_even_odd`)  
+  Vocabulary: even, odd, groups of two  
 - **Y2.B5.S13** The 10 times-table — covered. _2.NBT.A.2, 3.OA.C.7, M.EE.2.NBT.2, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 10}; Count by 1–12 (`multiplication:count_by_tables`) {10}  
+  Vocabulary: groups of ten, ten times as much, altogether  
 - **Y2.B5.S14** Divide by 10 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 10}  
+  Vocabulary: group, share, ten  
 - **Y2.B5.S15** The 5 times-table — covered. _2.NBT.A.2, 3.OA.C.7, M.EE.2.NBT.2, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 5}; Count by 1–12 (`multiplication:count_by_tables`) {5}  
+  Vocabulary: lots of, groups of, multiple, times-table  
 - **Y2.B5.S16** Divide by 5 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 5}  
+  Vocabulary: divide, grouping, sharing  
 - **Y2.B5.S17** The 5 and 10 times-tables — covered. _2.NBT.A.2, 3.OA.C.7, M.EE.2.NBT.2, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {tables 5 and 10}; Multiplication Chart - Fill the Missing Cells (`multiplication:mult_chart_easy`)  
+  Vocabulary: double, both, equivalent, equal  
 
 #### Y2.B6 Spring Block 3: Length and height
 
 - **Y2.B6.S1** Measure in centimetres — PARTIAL. _1.MD.A.2, 2.MD.A.1, M.EE.1.MD.2, M.EE.2.MD.1_  
   Partial: Reading a Ruler (Visual) (`measurement:reading_ruler`), missing a centimetre ruler (the skill reads inches only)  
   Proposal: Read a Centimetre Ruler (option)  
+  Vocabulary: ruler, centimetre (cm), length, height  
 - **Y2.B6.S2** Measure in metres — GAP. _1.MD.A.2, 2.MD.A.1, M.EE.1.MD.2, M.EE.2.MD.1_  
   Proposal: Measure in Metres (option)  
+  Vocabulary: metre (m), metre stick, longer, shorter than 1 m  
 - **Y2.B6.S3** Compare lengths and heights — covered. _1.MD.A.1, 2.MD.A.4, M.EE.1.MD.1, M.EE.2.MD.4_  
   Skills: Compare Attributes (Visual) (`comparing:compare_objects`); Order Objects by Length (Visual) (`shapes_early:order_objects_length`)  
+  Vocabulary: longer, shorter, taller, compare  
 - **Y2.B6.S4** Order lengths and heights — covered. _1.MD.A.1, 2.MD.A.4, M.EE.1.MD.1, M.EE.2.MD.4_  
   Skills: Order Objects by Length (Visual) (`shapes_early:order_objects_length`)  
+  Vocabulary: longest, shortest, tallest  
 - **Y2.B6.S5** Four operations with lengths and heights — GAP. _2.MD.B.5, M.EE.2.MD.5_  
   Proposal: Length Word Problems  
+  Vocabulary: altogether, difference, how much longer, twice as tall, half as tall  
 
 #### Y2.B7 Spring Block 4: Mass, capacity and temperature
 
 - **Y2.B7.S1** Compare mass — covered. _K.MD.A.2, M.EE.K.MD.2_  
   Skills: Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`)  
+  Vocabulary: mass, heavier, lighter, equal, same mass  
 - **Y2.B7.S2** Measure in grams — PARTIAL. _3.MD.A.2, M.EE.3.MD.2_  
   Partial: Grams, kg, Liters (Visual) (`measurement:mass_volume_liquid`), missing reading a scale in grams with different scale steps  
   Proposal: Read Scales (g, kg, ml, l)  
+  Vocabulary: gram (g), scale, pointer, arrow  
 - **Y2.B7.S3** Measure in kilograms — PARTIAL. _3.MD.A.2, M.EE.3.MD.2_  
   Partial: Grams, kg, Liters (Visual) (`measurement:mass_volume_liquid`), missing reading a scale in kilograms  
   Proposal: Read Scales (g, kg, ml, l)  
+  Vocabulary: kilogram (kg), heavier, interval  
 - **Y2.B7.S4** Four operations with mass — GAP. _3.MD.A.2, M.EE.3.MD.2_  
   Proposal: Mass and Capacity Word Problems  
+  Vocabulary: total, heavier, lighter, mass  
 - **Y2.B7.S5** Compare volume and capacity — GAP. _K.MD.A.2, 3.MD.A.2, M.EE.K.MD.2, M.EE.3.MD.2_  
   Proposal: Full, Empty, Holds More  
+  Vocabulary: volume, capacity, full, empty  
 - **Y2.B7.S6** Measure in millilitres — covered. _3.MD.A.2, M.EE.3.MD.2_  
   Skills: Grams, kg, Liters (Visual) (`measurement:mass_volume_liquid`) {millilitres}  
+  Vocabulary: capacity, volume, millilitre (ml)  
 - **Y2.B7.S7** Measure in litres — PARTIAL. _3.MD.A.2, M.EE.3.MD.2_  
   Partial: Grams, kg, Liters (Visual) (`measurement:mass_volume_liquid`), missing reading a jug in litres  
   Proposal: Read Scales (g, kg, ml, l)  
+  Vocabulary: litre (l), capacity, volume  
 - **Y2.B7.S8** Four operations with volume and capacity — GAP. _3.MD.A.2, M.EE.3.MD.2_  
   Proposal: Mass and Capacity Word Problems  
+  Vocabulary: total, difference, scale  
 - **Y2.B7.S9** Temperature — covered. _Beyond CCSS_  
   Skills: Temperature (°C/°F) (`measurement:temperature`) {Read the thermometer (°C)}  
+  Vocabulary: temperature, °C, warmer, colder, interval  
 
 #### Y2.B8 Summer Block 1: Fractions
 
 - **Y2.B8.S1** Introduction to parts and whole — GAP. _1.G.A.3, M.EE.1.G.3_  
   Proposal: Equal and Unequal Parts  
+  Vocabulary: whole, part  
 - **Y2.B8.S2** Equal and unequal parts — GAP. _1.G.A.3, M.EE.1.G.3_  
   Proposal: Equal and Unequal Parts  
+  Vocabulary: part, equal, unequal  
 - **Y2.B8.S3** Recognise a half — covered. _1.G.A.3, M.EE.1.G.3_  
   Skills: Halves/Thirds/Fourths (Visual) (`shapes_early:partition_shapes`) {halves}  
+  Vocabulary: half, equal, whole  
 - **Y2.B8.S4** Find a half — covered. _1.G.A.3, M.EE.1.G.3_  
   Skills: Shade the Fraction (`fractions:shade_fraction`) {1/2}; Fraction of a Set (Visual) (`fractions:fraction_of_set`) {1/2}  
+  Vocabulary: half, share equally, altogether  
 - **Y2.B8.S5** Recognise a quarter — covered. _1.G.A.3, M.EE.1.G.3_  
   Skills: Halves/Thirds/Fourths (Visual) (`shapes_early:partition_shapes`) {fourths}  
+  Vocabulary: quarter, equal parts, whole  
 - **Y2.B8.S6** Find a quarter — covered. _1.G.A.3, M.EE.1.G.3_  
   Skills: Shade the Fraction (`fractions:shade_fraction`) {1/4}; Fraction of a Set (Visual) (`fractions:fraction_of_set`) {1/4}  
+  Vocabulary: quarter, equal groups, altogether  
 - **Y2.B8.S7** Recognise a third — covered. _2.G.A.3_  
   Skills: Halves/Thirds/Fourths (Visual) (`shapes_early:partition_shapes`) {thirds}  
+  Vocabulary: third, equal parts, whole  
 - **Y2.B8.S8** Find a third — covered. _2.G.A.3_  
   Skills: Shade the Fraction (`fractions:shade_fraction`) {1/3}; Fraction of a Set (Visual) (`fractions:fraction_of_set`) {1/3}  
+  Vocabulary: third, equal groups, in each  
 - **Y2.B8.S9** Find the whole — GAP. _1.G.A.3, M.EE.1.G.3_  
   Proposal: Equal and Unequal Parts  
+  Vocabulary: part, whole, equal parts  
 - **Y2.B8.S10** Unit fractions — covered. _1.G.A.3, 3.NF.A.1, M.EE.1.G.3, M.EE.3.NF.1_  
   Skills: Identify Fractions (Visual) (`fractions:identify`); Write the Fraction Shown (`fractions:write_fraction`)  
+  Vocabulary: equal parts, unit fraction, numerator  
 - **Y2.B8.S11** Non-unit fractions — covered. _3.NF.A.1, M.EE.3.NF.1_  
   Skills: Write the Fraction Shown (`fractions:write_fraction`); Shade the Fraction (`fractions:shade_fraction`)  
+  Vocabulary: non-unit fraction, numerator, whole  
 - **Y2.B8.S12** Recognise the equivalence of a half and two quarters — covered. _1.G.A.3, 3.NF.A.3b, M.EE.1.G.3, M.EE.3.NF.3_  
   Skills: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`) {halves and quarters}  
+  Vocabulary: equivalent, half, quarters  
 - **Y2.B8.S13** Recognise three-quarters — covered. _1.G.A.3, M.EE.1.G.3_  
   Skills: Identify Fractions (Visual) (`fractions:identify`) {3/4}; Write the Fraction Shown (`fractions:write_fraction`)  
+  Vocabulary: quarters, numerator, denominator  
 - **Y2.B8.S14** Find three-quarters — covered. _3.NF.A.1, M.EE.3.NF.1_  
   Skills: Shade the Fraction (`fractions:shade_fraction`) {3/4}; Fraction of a Set (Visual) (`fractions:fraction_of_set`) {3/4}  
+  Vocabulary: quarter, three-quarters, equal groups  
 - **Y2.B8.S15** Count in fractions up to a whole — GAP. _3.NF.A.1, 3.NF.A.3c, M.EE.3.NF.1, M.EE.3.NF.3_  
   Proposal: Count in Fractions  
+  Vocabulary: numerator, denominator, whole  
 
 #### Y2.B9 Summer Block 2: Time
 
 - **Y2.B9.S1** O'clock and half past — covered. _1.MD.B.3, M.EE.1.MD.3_  
   Skills: Time to the Hour (`measurement:time_hour`); Time to Half Hour (`measurement:time_half_hour`)  
+  Vocabulary: o'clock, half past, hour hand  
 - **Y2.B9.S2** Quarter past and quarter to — covered. _2.MD.C.7, M.EE.2.MD.7_  
   Skills: Time to Quarter Hour (`measurement:time_quarter`)  
+  Vocabulary: quarter past, quarter to, to  
 - **Y2.B9.S3** Tell time past the hour — covered. _2.MD.C.7, M.EE.2.MD.7_  
   Skills: Time to 5 Minutes (`measurement:time_5min`)  
+  Vocabulary: minute hand, past, quarter past  
 - **Y2.B9.S4** Tell time to the hour — covered. _2.MD.C.7, M.EE.2.MD.7_  
   Skills: Time to 5 Minutes (`measurement:time_5min`)  
+  Vocabulary: to, quarter to, next hour  
 - **Y2.B9.S5** Tell the time to 5 minutes — covered. _2.MD.C.7, M.EE.2.MD.7_  
   Skills: Time to 5 Minutes (`measurement:time_5min`); Count the Minutes by Fives (`measurement:time_fives_ring`)  
+  Vocabulary: minutes past, minutes to, minute hand  
 - **Y2.B9.S6** Minutes in an hour — GAP. _1.MD.B.3, 4.MD.A.1, M.EE.1.MD.3, M.EE.4.MD.1_  
   Proposal: Minutes, Hours and Days  
+  Vocabulary: hour, quarter of an hour, half an hour  
 - **Y2.B9.S7** Hours in a day — GAP. _1.MD.B.3, M.EE.1.MD.3_  
   Proposal: Minutes, Hours and Days  
+  Vocabulary: hour, midnight, noon  
 
 #### Y2.B10 Summer Block 3: Statistics
 
 - **Y2.B10.S1** Make tally charts — covered. _1.MD.C.4, M.EE.1.MD.4_  
   Skills: Tally Charts (`graphs:tally_chart`)  
+  Vocabulary: tally mark, five-bar gate, total  
 - **Y2.B10.S2** Tables — GAP. _1.MD.C.4, M.EE.1.MD.4_  
   Proposal: Tables  
+  Vocabulary: table, total, row  
 - **Y2.B10.S3** Block diagrams — GAP. _1.MD.C.4, 2.MD.D.10, M.EE.1.MD.4, M.EE.2.MD.10_  
   Proposal: Block Diagrams  
+  Vocabulary: block diagram, scale, column  
 - **Y2.B10.S4** Draw pictograms (1-1) — covered. _1.MD.C.4, 2.MD.D.10, M.EE.1.MD.4, M.EE.2.MD.10_  
   Skills: Build a Pictograph (`graphs:build_pictograph`) {each picture = 1}  
+  Vocabulary: pictogram, key, symbol  
 - **Y2.B10.S5** Interpret pictograms (1-1) — covered. _1.MD.C.4, 2.MD.D.10, M.EE.1.MD.4, M.EE.2.MD.10_  
   Skills: Picture Graph Intro (Visual) (`measurement:pictograph_intro`)  
+  Vocabulary: total, more, fewer, altogether  
 - **Y2.B10.S6** Draw pictograms (2, 5 and 10) — PARTIAL. _2.MD.D.10, 3.MD.B.3, M.EE.2.MD.10, M.EE.3.MD.3_  
   Partial: Build a Pictograph (`graphs:build_pictograph`), missing a key where one picture stands for 2, 5 or 10  
   Proposal: Pictograms with a Key (option)  
+  Vocabulary: key, represents, stands for, half a symbol  
 - **Y2.B10.S7** Interpret pictograms (2, 5 and 10) — covered. _2.MD.D.10, 3.MD.B.3, M.EE.2.MD.10, M.EE.3.MD.3_  
   Skills: Pictographs (`graphs:pictograph`)  
+  Vocabulary: key, represents, difference, total  
 
 #### Y2.B11 Summer Block 4: Position and direction
 
 - **Y2.B11.S1** Language of position — covered. _K.G.A.1_  
   Skills: Shape Positions: Above/Below/Beside (Visual) (`shapes_early:shape_positions`)  
+  Vocabulary: left, right, above, below, between  
 - **Y2.B11.S2** Describe movement — GAP. _K.G.A.1_  
   Proposal: Describe Movement  
+  Vocabulary: forwards, backwards, up, down, squares  
 - **Y2.B11.S3** Describe turns — GAP. _K.G.A.1_  
   Proposal: Whole, Half and Quarter Turns  
+  Vocabulary: turn, full turn, clockwise, anticlockwise  
 - **Y2.B11.S4** Describe movement and turns — GAP. _K.G.A.1_  
   Proposal: Describe Movement  
+  Vocabulary: forwards, backwards, left turn, right turn  
 - **Y2.B11.S5** Shape patterns with turns — GAP. _1.G.A.1, M.EE.1.G.1_  
   Proposal: Shape Patterns with Turns  
+  Vocabulary: turn, clockwise, anticlockwise  
 
 ### Year 3 (US grade 2)
 
@@ -1567,88 +1921,124 @@ whatever happens to the WRM gaps.
 
 - **Y3.B1.S1** Represent numbers to 100 — covered. _2.NBT.A.1, M.EE.2.NBT.1_  
   Skills: Build a Number with Base-10 Blocks (`composing:base10_build`); Unit Form (4 hundreds 7 tens 6 ones) (`placevalue:unit_form`) {band 99}  
+  Vocabulary: tens, ones, exchange  
 - **Y3.B1.S2** Partition numbers to 100 — covered. _2.NBT.A.1, 1.NBT.B.2, M.EE.2.NBT.1, M.EE.1.NBT.2_  
   Skills: Expanded Form (`placevalue:expand`) {band 99}  
   Partial: Build a Number with Base-10 Blocks (`composing:base10_build`), missing partitioning in more than one way  
   Proposal: Partition Numbers Flexibly  
+  Vocabulary: partition, whole, part  
 - **Y3.B1.S3** Number line to 100 — PARTIAL. _2.MD.B.6, 2.NBT.A.1, M.EE.2.MD.6, M.EE.2.NBT.1_  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing a whole 0-100 line counted in tens then ones (the skill's line spans one ten)  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: interval, division, estimate  
 - **Y3.B1.S4** Hundreds — PARTIAL. _2.NBT.A.1, M.EE.2.NBT.1_  
   Partial: Build 3-Digit Numbers with Flats (`composing:base10_build_hundreds`), missing counting in hundreds; 100 as ten tens  
   Proposal: Count in 50s, 100s and 1,000s (option)  
+  Vocabulary: hundred, ten, unitise  
 - **Y3.B1.S5** Represent numbers to 1,000 — covered. _2.NBT.A.1, 2.NBT.A.3, M.EE.2.NBT.1, M.EE.2.NBT.3_  
   Skills: Build 3-Digit Numbers with Flats (`composing:base10_build_hundreds`); Read Place-Value Disks (`placevalue:place_value_disks`) {band 999}  
+  Vocabulary: hundred, ten, ones, add numeral  
 - **Y3.B1.S6** Partition numbers to 1,000 — covered. _2.NBT.A.1, 2.NBT.A.3, M.EE.2.NBT.1, M.EE.2.NBT.3_  
   Skills: Expanded Form (`placevalue:expand`) {band 999}; Unit Form (4 hundreds 7 tens 6 ones) (`placevalue:unit_form`) {band 999}  
+  Vocabulary: part, whole, partition  
 - **Y3.B1.S7** Flexible partitioning of numbers to 1,000 — GAP. _2.NBT.A.3, M.EE.2.NBT.3_  
   Proposal: Partition Numbers Flexibly  
+  Vocabulary: partition, exchange, the whole  
 - **Y3.B1.S8** Hundreds, tens and ones — covered. _2.NBT.A.1, M.EE.2.NBT.1_  
   Skills: Name the Place (`placevalue:identify`) {band 999}; Value of a Digit (`placevalue:value`) {band 999}; Unit Form (4 hundreds 7 tens 6 ones) (`placevalue:unit_form`) {band 999}  
+  Vocabulary: hundreds, tens, ones, place value counter, column  
 - **Y3.B1.S9** Find 1, 10 or 100 more or less — covered. _2.NBT.B.8_  
   Skills: 10 More, 10 Less, 100 More, 100 Less (`placevalue:more_less_100`) {1, 10 and 100}  
+  Vocabulary: more, less, column, exchange  
 - **Y3.B1.S10** Number line to 1,000 — PARTIAL. _2.MD.B.6, 2.NBT.A.1, M.EE.2.MD.6, M.EE.2.NBT.1_  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing a 0-1,000 line (the skill's lines are to 100)  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: start point, end point, interval  
 - **Y3.B1.S11** Estimate on a number line to 1,000 — GAP. _2.MD.B.6, 2.NBT.A.1, M.EE.2.MD.6, M.EE.2.NBT.1_  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: estimate, halfway, midpoint, closer to  
 - **Y3.B1.S12** Compare numbers to 1,000 — covered. _2.NBT.A.4, M.EE.2.NBT.4_  
   Skills: Compare Numbers (>, <, =) (`placevalue:compare`) {band 999}  
+  Vocabulary: greater than, less than, equal to  
 - **Y3.B1.S13** Order numbers to 1,000 — covered. _2.NBT.A.4, M.EE.2.NBT.4_  
   Skills: Order: Least to Greatest (`placevalue:order_least_to_greatest`) {band 999}; Order: Greatest to Least (`placevalue:order_greatest_to_least`) {band 999}  
+  Vocabulary: greatest, smallest, ascending, descending  
 - **Y3.B1.S14** Count in 50s — GAP. _2.NBT.A.2, M.EE.2.NBT.2_  
   Proposal: Count in 50s, 100s and 1,000s (option)  
+  Vocabulary: multiple of 50, 50 more, 50 less  
 
 #### Y3.B2 Autumn Block 2: Addition and subtraction
 
 - **Y3.B2.S1** Apply number bonds within 10 — covered. _2.OA.B.2_  
   Skills: Addition Facts (within 20) (`addition:add_facts`); Subtraction Facts (within 20) (`subtraction:sub_facts`)  
+  Vocabulary: number bond, ones, tens  
 - **Y3.B2.S2** Add and subtract 1s — PARTIAL. _2.NBT.B.5, M.EE.2.NBT.5_  
   Partial: Add within 100 (No Regrouping) (`addition:add_100_no_regroup`), missing adding and subtracting only ones to a 2- or 3-digit number mentally  
   Proposal: Spot the Pattern (+/−)  
+  Vocabulary: ones, tens, hundreds column, exchange  
 - **Y3.B2.S3** Add and subtract 10s — covered. _2.NBT.B.5, 2.NBT.B.8, M.EE.2.NBT.5_  
   Skills: Add & Subtract by 10s (`addition:add_sub_10s`); 10 More, 10 Less, 100 More, 100 Less (`placevalue:more_less_100`) {10 more, 10 less}  
+  Vocabulary: tens, increase, decrease  
 - **Y3.B2.S4** Add and subtract 100s — covered. _2.NBT.B.7, 2.NBT.B.8, M.EE.2.NBT.7_  
   Skills: Add & Subtract by 100s (`addition:add_sub_100s`)  
+  Vocabulary: hundred, column, multiple of 100  
 - **Y3.B2.S5** Spot the pattern — GAP. _2.NBT.B.5, 2.NBT.B.8, M.EE.2.NBT.5_  
   Proposal: Spot the Pattern (+/−)  
+  Vocabulary: column, changes, stays the same  
 - **Y3.B2.S6** Add 1s across a 10 — PARTIAL. _2.NBT.B.5, M.EE.2.NBT.5_  
   Partial: Make a Ten Strategy (`number_sense:make_a_ten`), missing adding ones across a ten in a 2- or 3-digit number (68 + 5)  
   Proposal: To the Next Ten  
+  Vocabulary: partition, multiple of 10, bridge  
 - **Y3.B2.S7** Add 10s across a 100 — GAP. _2.NBT.B.7, M.EE.2.NBT.7_  
   Proposal: Add and Subtract 10s Across 100 (option)  
+  Vocabulary: multiple of 100, bridge, cross, partition  
 - **Y3.B2.S8** Subtract 1s across a 10 — PARTIAL. _2.NBT.B.5, M.EE.2.NBT.5_  
   Partial: Subtract within 50 (With Regrouping) (`subtraction:sub_50_regroup`), missing subtracting ones across a ten mentally (43 − 5)  
   Proposal: To the Next Ten  
+  Vocabulary: multiple of 10, partition, previous  
 - **Y3.B2.S9** Subtract 10s across a 100 — GAP. _2.NBT.B.7, M.EE.2.NBT.7_  
   Proposal: Add and Subtract 10s Across 100 (option)  
+  Vocabulary: multiple of 100, previous, partition  
 - **Y3.B2.S10** Make connections — PARTIAL. _2.NBT.B.5, 2.NBT.B.9, M.EE.2.NBT.5_  
   Partial: Compensation Strategy (`number_sense:compensation`), missing explaining links between facts, place value and the column method (2.NBT.B.9)  
   Proposal: Spot the Pattern (+/−)  
+  Vocabulary: ones, tens, hundreds, fact family, part, whole  
 - **Y3.B2.S11** Add two numbers (no exchange) — covered. _2.NBT.B.7, M.EE.2.NBT.7_  
   Skills: Add within 1,000 (No Regrouping) (`addition:add_1k_no_regroup`)  
+  Vocabulary: column, sum, total, altogether  
 - **Y3.B2.S12** Subtract two numbers (no exchange) — covered. _2.NBT.B.7, M.EE.2.NBT.7_  
   Skills: Subtract within 1,000 (No Regrouping) (`subtraction:sub_1k_no_regroup`)  
+  Vocabulary: minus, difference, how many more, exchange  
 - **Y3.B2.S13** Add two numbers (across a 10) — covered. _2.NBT.B.7, M.EE.2.NBT.7_  
   Skills: Add within 1,000 (With Regrouping) (`addition:add_1k_regroup`)  
+  Vocabulary: exchange, carry, ones, tens, hundreds  
 - **Y3.B2.S14** Add two numbers (across a 100) — covered. _2.NBT.B.7, M.EE.2.NBT.7_  
   Skills: Add within 1,000 (With Regrouping) (`addition:add_1k_regroup`)  
+  Vocabulary: exchange, hundred, carry  
 - **Y3.B2.S15** Subtract two numbers (across a 10) — covered. _2.NBT.B.7, M.EE.2.NBT.7_  
   Skills: Subtract within 1,000 (With Regrouping) (`subtraction:sub_1k_regroup`)  
+  Vocabulary: exchange, regroup, enough  
 - **Y3.B2.S16** Subtract two numbers (across a 100) — covered. _2.NBT.B.7, M.EE.2.NBT.7_  
   Skills: Subtract within 1,000 (With Regrouping) (`subtraction:sub_1k_regroup`); Subtract Across Zeros (`subtraction:sub_across_zeros`)  
+  Vocabulary: exchange, hundred → tens, two exchanges  
 - **Y3.B2.S17** Add 2-digit and 3-digit numbers — covered. _2.NBT.B.7, M.EE.2.NBT.7_  
   Skills: Add within 1,000 (`addition:add_1k_mixed`)  
+  Vocabulary: place value, column, exchange  
 - **Y3.B2.S18** Subtract a 2-digit number from a 3-digit number — covered. _2.NBT.B.7, M.EE.2.NBT.7_  
   Skills: Subtract within 1,000 (`subtraction:sub_1k_mixed`)  
+  Vocabulary: exchange, column, difference  
 - **Y3.B2.S19** Complements to 100 — GAP. _2.NBT.B.5, M.EE.2.NBT.5_  
   Proposal: Bonds to 100  
+  Vocabulary: complement, bond, tens, ones  
 - **Y3.B2.S20** Estimate answers — covered. _2.NBT.B.7, 3.NBT.A.1, M.EE.2.NBT.7, M.EE.3.NBT.1_  
   Skills: Estimate Sums (`number_sense:estimate_sum`); Estimate Sums & Differences (`number_sense:estimate_sums_diffs`)  
+  Vocabulary: estimate, approximate, about, nearest  
 - **Y3.B2.S21** Inverse operations — covered. _2.NBT.B.7, 3.NBT.A.2, M.EE.2.NBT.7, M.EE.3.NBT.2_  
   Skills: Check a Subtraction by Adding (`subtraction:sub_check_by_adding`)  
+  Vocabulary: inverse, commutative, whole, part  
 - **Y3.B2.S22** Make decisions — GAP. _2.NBT.B.5, 2.NBT.B.7, M.EE.2.NBT.5, M.EE.2.NBT.7_  
   Proposal: Mental or Written?  
+  Vocabulary: altogether, difference, efficient  
 - _Awsaj supplement (not a WRM step):_ Add up to four two-digit numbers — 2.NBT.B.6
 - _Awsaj supplement (not a WRM step):_ Solve one-step word problems using bar models — 2.OA.A.1
 - _Awsaj supplement (not a WRM step):_ Solve two-step word problems identifying both operations — 2.OA.A.1
@@ -1657,92 +2047,130 @@ whatever happens to the WRM gaps.
 
 - **Y3.B3.S1** Multiplication - equal groups — covered. _2.OA.C.4, 3.OA.A.1, M.EE.2.OA.4, M.EE.3.OA.1_  
   Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {groups}; Write Repeated Addition as Multiplication (Visual) (`multiplication:repeated_add_to_mult`)  
+  Vocabulary: equal groups, unequal  
 - **Y3.B3.S2** Use arrays — covered. _2.OA.C.4, M.EE.2.OA.4_  
   Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {arrays}; Dot Array Multiplication (B&W) (`multiplication:dot_array_mult`)  
+  Vocabulary: row, column, array  
 - **Y3.B3.S3** Multiples of 2 — PARTIAL. _2.OA.C.3, 2.OA.C.4, M.EE.2.OA.3, M.EE.2.OA.4_  
   Partial: Multiples of a Number (`number_theory:multiples`), missing multiples of 2 as even numbers to 100  
   Proposal: Multiples of 2, 5 and 10 (option)  
+  Vocabulary: multiple of 2, even, ones digit  
 - **Y3.B3.S4** Multiples of 5 and 10 — PARTIAL. _2.NBT.A.2, 2.OA.C.4, M.EE.2.NBT.2, M.EE.2.OA.4_  
   Partial: Multiples of a Number (`number_theory:multiples`), missing multiples of 5 and 10 at Grade 2  
   Proposal: Multiples of 2, 5 and 10 (option)  
+  Vocabulary: multiple, ones column, both  
 - **Y3.B3.S5** Sharing and grouping — covered. _3.OA.A.2, M.EE.3.OA.2_  
   Skills: Division Word Problems (`division:div_word_problems`); Make Equal Groups to Divide (Visual) (`division:share_into_groups`)  
+  Vocabulary: share, group, altogether  
 - **Y3.B3.S6** Multiply by 3 — covered. _2.OA.C.4, 3.OA.A.1, 3.OA.C.7, M.EE.2.OA.4, M.EE.3.OA.1, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 3}  
+  Vocabulary: lots of, groups of, multiply by 3, altogether  
 - **Y3.B3.S7** Divide by 3 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 3}  
+  Vocabulary: share, group, divide (÷)  
 - **Y3.B3.S8** The 3 times-table — covered. _2.OA.C.4, 3.OA.C.7, M.EE.2.OA.4, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 3}; Count by 1–12 (`multiplication:count_by_tables`) {3}  
+  Vocabulary: groups of 3, multiple, product  
 - **Y3.B3.S9** Multiply by 4 — covered. _2.OA.C.4, 3.OA.A.1, 3.OA.C.7, M.EE.2.OA.4, M.EE.3.OA.1, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 4}  
+  Vocabulary: equal groups, repeated addition, product  
 - **Y3.B3.S10** Divide by 4 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 4}  
+  Vocabulary: share, group, in each  
 - **Y3.B3.S11** The 4 times-table — covered. _2.OA.C.4, 3.OA.C.7, M.EE.2.OA.4, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 4}; Count by 1–12 (`multiplication:count_by_tables`) {4}  
+  Vocabulary: array, multiple of 4, double  
 - **Y3.B3.S12** Multiply by 8 — covered. _3.OA.A.1, 3.OA.C.7, M.EE.3.OA.1, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 8}  
+  Vocabulary: multiple of 8, lots of, groups of, double  
 - **Y3.B3.S13** Divide by 8 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 8}  
+  Vocabulary: share, group, divide  
 - **Y3.B3.S14** The 8 times-table — covered. _3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 8}; Count by 1–12 (`multiplication:count_by_tables`) {8}  
+  Vocabulary: eights, multiple, double  
 - **Y3.B3.S15** The 2, 4 and 8 times-tables — PARTIAL. _3.OA.B.5, 3.OA.C.7, M.EE.3.OA.6_  
   Partial: Multiplication Facts (1-12) (`multiplication:mult_facts`), missing the doubling link between the 2, 4 and 8 tables  
   Proposal: Related Times-Tables  
+  Vocabulary: double, multiple, times- table  
 - _Awsaj supplement (not a WRM step):_ Odd and even numbers — 2.OA.C.3
 
 #### Y3.B4 Spring Block 1: Multiplication and division B
 
 - **Y3.B4.S1** Multiples of 10 — covered. _2.NBT.A.2, 3.NBT.A.3, M.EE.2.NBT.2, M.EE.3.NBT.3_  
   Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`) {× 10}; Count by 10s (`patterns:seq_10`)  
+  Vocabulary: multiple of 10, ten times the size, tens counter  
 - **Y3.B4.S2** Related calculations — covered. _3.NBT.A.3, 3.OA.B.5, M.EE.3.NBT.3_  
   Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`)  
+  Vocabulary: ones, tens, related calculation  
 - **Y3.B4.S3** Reasoning about multiplication — covered. _2.OA.C.4, 3.OA.B.5, M.EE.2.OA.4_  
   Skills: Multiplication Properties (Visual) (`multiplication:mult_properties`)  
+  Vocabulary: commutative, factor, lots of  
 - **Y3.B4.S4** Multiply a 2-digit number by a 1-digit number - no exchange — covered. _3.OA.B.5, 4.NBT.B.5_  
   Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`)  
+  Vocabulary: partition, multiple, recombine  
 - **Y3.B4.S5** Multiply a 2-digit number by a 1-digit number - with exchange — covered. _3.OA.B.5, 4.NBT.B.5_  
   Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`)  
+  Vocabulary: partition, exchange, partial product  
 - **Y3.B4.S6** Link multiplication and division — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Fact Families (`multiplication:mult_div_fact_family`); Missing Factors (×/÷) (`division:missing_mult_div`)  
+  Vocabulary: array, related fact, unitise  
 - **Y3.B4.S7** Divide a 2-digit number by a 1-digit number - no exchange — covered. _3.OA.A.2, 4.NBT.B.6, M.EE.3.OA.2_  
   Skills: Box Method Division (2÷1 digit) (`division:box_division_easy`); Area Model Division (2÷1 digit) (`division:area_model_div_2by1`)  
+  Vocabulary: partition, tens, ones, divide (share)  
 - **Y3.B4.S8** Divide a 2-digit number by a 1-digit number - flexible partitioning — covered. _3.OA.A.2, 4.NBT.B.6, M.EE.3.OA.2_  
   Skills: Area Model Division (2÷1 digit) (`division:area_model_div_2by1`)  
+  Vocabulary: partition, flexible partition, multiple  
 - **Y3.B4.S9** Divide a 2-digit number by a 1-digit number - with remainders — covered. _3.OA.A.2, 4.NBT.B.6, M.EE.3.OA.2_  
   Skills: Division with Remainders (Visual) (`division:div_remainders`)  
+  Vocabulary: remainder, divisor, exchange  
 - **Y3.B4.S10** Scaling — covered. _3.OA.A.1, 4.OA.A.1, M.EE.3.OA.1, M.EE.4.OA.1_  
   Skills: Times as Many Word Problems (Visual) (`multiplication:mult_comparison`)  
+  Vocabulary: twice, times as many, scale  
 - **Y3.B4.S11** How many ways — GAP. _3.OA.A.3_  
   Proposal: How Many Ways?  
+  Vocabulary: combination, systematic, table  
 
 #### Y3.B5 Spring Block 2: Length and perimeter
 
 - **Y3.B5.S1** Measure in metres and centimetres — PARTIAL. _2.MD.A.1, 2.MD.A.2, 4.MD.A.1, M.EE.2.MD.1, M.EE.4.MD.1_  
   Partial: Metric Length (mm/cm/m/km) (`measurement:length_metric`), missing measuring in m and cm with a mixed answer (1 m 25 cm)  
   Proposal: Metres, Centimetres, Millimetres (option)  
+  Vocabulary: length, centimetre (cm) and metre (m), metre  
 - **Y3.B5.S2** Measure in millimetres — PARTIAL. _2.MD.A.1, M.EE.2.MD.1_  
   Partial: Reading a Ruler (Visual) (`measurement:reading_ruler`), missing a ruler in millimetres  
   Proposal: Read a Centimetre Ruler (option)  
+  Vocabulary: millimetre (mm), interval, mark, smaller, greater  
 - **Y3.B5.S3** Measure in centimetres and millimetres — GAP. _2.MD.A.1, 2.MD.A.2, 4.MD.A.1, M.EE.2.MD.1, M.EE.4.MD.1_  
   Proposal: Metres, Centimetres, Millimetres (option)  
+  Vocabulary: centimetre (cm), millimetre (mm), exact  
 - **Y3.B5.S4** Metres, centimetres and millimetres — covered. _2.MD.A.1, 4.MD.A.1, M.EE.2.MD.1, M.EE.4.MD.1_  
   Skills: Metric Length (mm/cm/m/km) (`measurement:length_metric`)  
+  Vocabulary: millimetre (mm), centimetre (cm), metre (m)  
 - **Y3.B5.S5** Equivalent lengths (metres and centimetres) — covered. _2.MD.A.1, 4.MD.A.1, M.EE.2.MD.1, M.EE.4.MD.1_  
   Skills: Metric Length (mm/cm/m/km) (`measurement:length_metric`) {m and cm}  
+  Vocabulary: equivalent, convert, partition  
 - **Y3.B5.S6** Equivalent lengths (centimetres and millimetres) — covered. _2.MD.A.1, 4.MD.A.1, M.EE.2.MD.1, M.EE.4.MD.1_  
   Skills: Metric Length (mm/cm/m/km) (`measurement:length_metric`) {cm and mm}  
+  Vocabulary: millimetre (mm), centimetre (cm), equivalent  
 - **Y3.B5.S7** Compare lengths — GAP. _2.MD.A.4, M.EE.2.MD.4_  
   Proposal: Compare Lengths  
+  Vocabulary: compare, longer, shorter, tallest, shortest, order  
 - **Y3.B5.S8** Add lengths — GAP. _2.MD.B.5, M.EE.2.MD.5_  
   Proposal: Add and Subtract Lengths  
+  Vocabulary: convert, total, altogether  
 - **Y3.B5.S9** Subtract lengths — GAP. _2.MD.B.5, M.EE.2.MD.5_  
   Proposal: Add and Subtract Lengths  
+  Vocabulary: difference, convert, shorter, longer  
 - **Y3.B5.S10** What is perimeter — covered. _2.MD.A.1, 3.MD.D.8, M.EE.2.MD.1_  
   Skills: Perimeter Intro - Sum the Sides (Visual) (`area_perimeter:perimeter_intro`)  
+  Vocabulary: perimeter, edge, closed  
 - **Y3.B5.S11** Measure perimeter — covered. _2.MD.A.1, 3.MD.D.8, M.EE.2.MD.1_  
   Skills: Perimeter - Grid Counting (Visual) (`area_perimeter:perimeter_grid`)  
+  Vocabulary: measure, side, total  
 - **Y3.B5.S12** Calculate perimeter — covered. _2.MD.B.5, 3.MD.D.8, M.EE.2.MD.5_  
   Skills: Perimeter Only (`area_perimeter:perimeter`)  
+  Vocabulary: perimeter, opposite sides, equal  
 - _Awsaj supplement (not a WRM step):_ Measure and estimate in inches and feet — 2.MD.A.3
 - _Awsaj supplement (not a WRM step):_ Measure lengths of a set of objects to the nearest whole unit — 2.MD.D.9
 - _Awsaj supplement (not a WRM step):_ Record the measurement data in a table — 2.MD.D.9
@@ -1754,154 +2182,214 @@ whatever happens to the WRM gaps.
 
 - **Y3.B6.S1** Understand the denominators of unit fractions — covered. _2.G.A.3, 3.NF.A.1, M.EE.3.NF.1_  
   Skills: Identify Fractions (Visual) (`fractions:identify`); Write the Fraction Shown (`fractions:write_fraction`)  
+  Vocabulary: whole, equal parts, denominator  
 - **Y3.B6.S2** Compare and order unit fractions — covered. _3.NF.A.1, 3.NF.A.3d, M.EE.3.NF.1, M.EE.3.NF.3_  
   Skills: Compare Fractions (>, <, =) (`fractions:compare`) {unit fractions}; Order Fractions (`fractions:order_fractions`)  
+  Vocabulary: denominator, compare, whole  
 - **Y3.B6.S3** Understand the numerators of non-unit fractions — covered. _2.G.A.3, 3.NF.A.1, M.EE.3.NF.1_  
   Skills: Write the Fraction Shown (`fractions:write_fraction`); Shade the Fraction (`fractions:shade_fraction`)  
+  Vocabulary: numerator, denominator, non-unit  
 - **Y3.B6.S4** Understand the whole — PARTIAL. _2.G.A.3, 3.NF.A.1, M.EE.3.NF.1_  
   Partial: Compose 1 Whole from Unit Fractions (`composing:compose_whole`), missing how many parts make one whole for any denominator  
   Proposal: Understand the Whole  
+  Vocabulary: whole, denominator, equivalent  
 - **Y3.B6.S5** Compare and order non-unit fractions — covered. _3.NF.A.1, 3.NF.A.3d, M.EE.3.NF.1, M.EE.3.NF.3_  
   Skills: Compare Fractions (>, <, =) (`fractions:compare`) {same denominator}; Order Fractions (`fractions:order_fractions`)  
+  Vocabulary: numerator, denominator, compare  
 - **Y3.B6.S6** Fractions and scales — GAP. _2.G.A.3_  
   Proposal: Fractions and Scales  
+  Vocabulary: equal parts, denominator, numerator  
 - **Y3.B6.S7** Fractions on a number line — covered. _2.MD.B.6, 3.NF.A.2, M.EE.2.MD.6, M.EE.3.NF.2_  
   Skills: Fractions on Number Line (Visual) (`composing:fraction_number_line`); Place Fractions on Number Line (`fractions:graph_fractions`)  
+  Vocabulary: interval, marker, equal parts  
 - **Y3.B6.S8** Count in fractions on a number line — GAP. _3.NF.A.2, M.EE.3.NF.2_  
   Proposal: Count in Fractions  
+  Vocabulary: interval, denominator, endpoint  
 - **Y3.B6.S9** Equivalent fractions on a number line — PARTIAL. _3.NF.A.2, 3.NF.A.3a, M.EE.3.NF.2, M.EE.3.NF.3_  
   Partial: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`), missing equivalent fractions shown on two number lines  
   Proposal: Count in Fractions  
+  Vocabulary: equivalent, in line with, equal in length  
 - **Y3.B6.S10** Equivalent fractions as bar models — covered. _3.NF.A.3b, M.EE.3.NF.3_  
   Skills: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`)  
+  Vocabulary: equivalent, equal parts, same length  
 
 #### Y3.B7 Spring Block 4: Mass and capacity
 
 - **Y3.B7.S1** Use scales — PARTIAL. _3.MD.A.2, M.EE.3.MD.2_  
   Partial: Grams, kg, Liters (Visual) (`measurement:mass_volume_liquid`), missing reading scales with different intervals  
   Proposal: Read Scales (g, kg, ml, l)  
+  Vocabulary: interval, equal parts, scale  
 - **Y3.B7.S2** Measure mass in grams — covered. _3.MD.A.2, M.EE.3.MD.2_  
   Skills: Grams, kg, Liters (Visual) (`measurement:mass_volume_liquid`) {grams}  
+  Vocabulary: mass, gram (g), interval  
 - **Y3.B7.S3** Measure mass in kilograms and grams — PARTIAL. _3.MD.A.2, M.EE.3.MD.2_  
   Partial: Grams, kg, Liters (Visual) (`measurement:mass_volume_liquid`), missing mixed kg and g readings  
   Proposal: Read Scales (g, kg, ml, l)  
+  Vocabulary: kilogram (kg), gram (g), equivalent  
 - **Y3.B7.S4** Equivalent masses (kilograms and grams) — PARTIAL. _3.MD.A.2, 4.MD.A.1, M.EE.3.MD.2, M.EE.4.MD.1_  
   Partial: Measurement Conversions (Visual) (`measurement:unit_conversions`), missing kilograms and grams, including mixed units (1 kg 250 g)  
   Proposal: Read Scales (g, kg, ml, l)  
+  Vocabulary: kilogram, equivalent  
 - **Y3.B7.S5** Compare mass — PARTIAL. _K.MD.A.2, M.EE.K.MD.2_  
   Partial: Heavier or Lighter? (Visual) (`measurement:heavier_lighter_visual`), missing comparing masses in g and kg  
   Proposal: Mass and Capacity Word Problems  
+  Vocabulary: heavier, lighter  
 - **Y3.B7.S6** Add and subtract mass — GAP. _3.MD.A.2, M.EE.3.MD.2_  
   Proposal: Mass and Capacity Word Problems  
+  Vocabulary: total, difference, heavier  
 - **Y3.B7.S7** Measure capacity and volume in millilitres — covered. _3.MD.A.2, M.EE.3.MD.2_  
   Skills: Grams, kg, Liters (Visual) (`measurement:mass_volume_liquid`) {millilitres}  
+  Vocabulary: volume, capacity, interval  
 - **Y3.B7.S8** Measure capacity and volume in litres and millilitres — PARTIAL. _3.MD.A.2, M.EE.3.MD.2_  
   Partial: Grams, kg, Liters (Visual) (`measurement:mass_volume_liquid`), missing mixed l and ml readings  
   Proposal: Read Scales (g, kg, ml, l)  
+  Vocabulary: interval, litre, millilitre, level  
 - **Y3.B7.S9** Equivalent capacities and volumes (litres and millilitres) — covered. _3.MD.A.2, 4.MD.A.1, M.EE.3.MD.2, M.EE.4.MD.1_  
   Skills: Capacity/Volume Units (`measurement:capacity`) {L and mL}  
+  Vocabulary: equivalent, number bond, fraction of a litre  
 - **Y3.B7.S10** Compare capacity and volume — GAP. _K.MD.A.2, M.EE.K.MD.2_  
   Proposal: Mass and Capacity Word Problems  
+  Vocabulary: capacity, volume, convert  
 - **Y3.B7.S11** Add and subtract capacity and volume — GAP. _3.MD.A.2, M.EE.3.MD.2_  
   Proposal: Mass and Capacity Word Problems  
+  Vocabulary: total, difference, part- whole  
 
 #### Y3.B8 Summer Block 1: Fractions B
 
 - **Y3.B8.S1** Add fractions — covered. _4.NF.B.3, M.EE.4.NF.3_  
   Skills: Add Fractions (Like Denom) (Visual) (`fraction_operations:add_fractions_like`); Add Fractions (Like Denom) (No Visuals) (`fraction_operations:add_frac_like_nv`)  
+  Vocabulary: numerator, denominator, altogether  
 - **Y3.B8.S2** Subtract fractions — covered. _4.NF.B.3, M.EE.4.NF.3_  
   Skills: Subtract Fractions (Like Denom) (Visual) (`fraction_operations:sub_fractions_like`); Subtract Fractions (Like Denom) (No Visuals) (`fraction_operations:sub_frac_like_nv`)  
+  Vocabulary: subtract, take away, difference, left  
 - **Y3.B8.S3** Partition the whole — GAP. _4.NF.B.3, M.EE.4.NF.3_  
   Proposal: Partition the Whole  
+  Vocabulary: whole, partition, complement  
 - **Y3.B8.S4** Unit fractions of a set of objects — covered. _3.NF.A.1, 3.OA.A.2, M.EE.3.NF.1, M.EE.3.OA.2_  
   Skills: Fraction of a Set (Visual) (`fractions:fraction_of_set`) {unit fractions}  
+  Vocabulary: whole, equal parts, divide  
 - **Y3.B8.S5** Non-unit fractions of a set of objects — covered. _3.NF.A.1, 3.OA.A.2, M.EE.3.NF.1, M.EE.3.OA.2_  
   Skills: Fraction of a Set (Visual) (`fractions:fraction_of_set`); Fraction of a Set (No Visuals) (`fractions:fraction_of_set_nv`)  
+  Vocabulary: denominator, numerator, equal parts  
 - **Y3.B8.S6** Reasoning with fractions of an amount — PARTIAL. _3.NF.A.1, 3.OA.A.3, M.EE.3.NF.1_  
   Partial: Fraction of a Set - Hard (Visual) (`fractions:fraction_of_set_hard`), missing reasoning and word problems with fractions of amounts (bar model)  
   Proposal: Fraction of an Amount Problems  
+  Vocabulary: the rest, remaining, the whole, left over  
 
 #### Y3.B9 Summer Block 2: Money
 
 - **Y3.B9.S1** Pounds and pence — covered. _2.MD.C.8, M.EE.2.MD.8_  
   Skills: Count Coins and Notes (`measurement:money_count`); Write an Amount of Money (`measurement:money_notation`)  
+  Vocabulary: pound (£), pence (p), value  
 - **Y3.B9.S2** Convert pounds and pence — GAP. _2.MD.C.8, M.EE.2.MD.8_  
   Proposal: Dollars and Cents (option)  
+  Vocabulary: convert, leftover, hundred (100)  
 - **Y3.B9.S3** Add money — covered. _2.MD.C.8, M.EE.2.MD.8_  
   Skills: Add Money (`measurement:money`)  
+  Vocabulary: pound (£), pence (p), altogether  
 - **Y3.B9.S4** Subtract money — PARTIAL. _2.MD.C.8, M.EE.2.MD.8_  
   Partial: Find the Change (`measurement:money_change`), missing subtracting two prices that are not change from a payment  
   Proposal: Two-Step Money Problems  
+  Vocabulary: subtract, exchange, difference  
 - **Y3.B9.S5** Find change — covered. _2.MD.C.8, M.EE.2.MD.8_  
   Skills: Find the Change (`measurement:money_change`)  
+  Vocabulary: change, difference, exchange  
 
 #### Y3.B10 Summer Block 3: Time
 
 - **Y3.B10.S1** Roman numerals to 12 — GAP. _Beyond CCSS_  
   Proposal: Roman Numerals to 12  
+  Vocabulary: numeral, before, after  
 - **Y3.B10.S2** Tell the time to 5 minutes — covered. _2.MD.C.7, M.EE.2.MD.7_  
   Skills: Time to 5 Minutes (`measurement:time_5min`)  
+  Vocabulary: past, to, quarter past, half past  
 - **Y3.B10.S3** Tell the time to the minute — covered. _2.MD.C.7, 3.MD.A.1, M.EE.2.MD.7, M.EE.3.MD.1_  
   Skills: Time to the Minute (`measurement:time_1min`)  
+  Vocabulary: minute mark, past, to  
 - **Y3.B10.S4** Read time on a digital clock — covered. _2.MD.C.7, M.EE.2.MD.7_  
   Skills: Analog and Digital Time (`measurement:time_analog_digital`)  
+  Vocabulary: digital clock, analogue clock, colon  
 - **Y3.B10.S5** Use a.m. and p.m — covered. _2.MD.C.7, M.EE.2.MD.7_  
   Skills: a.m. or p.m.? (`measurement:time_sense`)  
+  Vocabulary: a.m., p.m., noon, midday, midnight  
 - **Y3.B10.S6** Years, months and days — GAP. _2.MD.C.7, M.EE.2.MD.7_  
   Proposal: Years, Months, Days, Hours  
+  Vocabulary: month, year, leap year, calendar  
 - **Y3.B10.S7** Days and hours — GAP. _2.MD.C.7, M.EE.2.MD.7_  
   Proposal: Years, Months, Days, Hours  
+  Vocabulary: hour, midnight, noon, midday, a.m., p.m.  
 - **Y3.B10.S8** Hours and minutes - use start and end times — covered. _2.MD.C.7, 3.MD.A.1, M.EE.2.MD.7, M.EE.3.MD.1_  
   Skills: Hours and Minutes Later (`measurement:elapsed_mixed`); How Long From Start to End? (`measurement:elapsed_find_duration`); Find the Start Time (`measurement:elapsed_find_start`)  
+  Vocabulary: duration, start time, end time  
 - **Y3.B10.S9** Hours and minutes - use durations — covered. _2.MD.C.7, 3.MD.A.1, M.EE.2.MD.7, M.EE.3.MD.1_  
   Skills: Hours and Minutes Later (`measurement:elapsed_mixed`); How Long From Start to End? (`measurement:elapsed_find_duration`)  
+  Vocabulary: duration, count on, count back  
 - **Y3.B10.S10** Minutes and seconds — GAP. _2.MD.C.7, M.EE.2.MD.7_  
   Proposal: Years, Months, Days, Hours  
+  Vocabulary: second, minute, convert  
 - **Y3.B10.S11** Units of time — GAP. _2.MD.C.7, M.EE.2.MD.7_  
   Proposal: Years, Months, Days, Hours  
+  Vocabulary: unit of time, sensible, appropriate, convert  
 - **Y3.B10.S12** Solve problems with time — covered. _2.MD.C.7, 3.MD.A.1, M.EE.2.MD.7, M.EE.3.MD.1_  
   Skills: How Long From Start to End? (`measurement:elapsed_find_duration`); Find the Start Time (`measurement:elapsed_find_start`)  
+  Vocabulary: duration, convert, count on  
 
 #### Y3.B11 Summer Block 4: Shape
 
 - **Y3.B11.S1** Turns and angles — GAP. _2.G.A.1, M.EE.2.G.1_  
   Proposal: Turns and Angles  
+  Vocabulary: angle, clockwise, anticlockwise, turn  
 - **Y3.B11.S2** Right angles — PARTIAL. _2.G.A.1, 4.G.A.2, M.EE.2.G.1, M.EE.4.G.2_  
   Partial: Identify Angles (`angles_lines:identify_angles`), missing recognising a right angle as a quarter turn in shapes and around the room  
   Proposal: Turns and Angles  
+  Vocabulary: angle, right angle, quarter turn  
 - **Y3.B11.S3** Compare angles — GAP. _2.G.A.1, M.EE.2.G.1_  
   Proposal: Turns and Angles  
+  Vocabulary: acute, obtuse  
 - **Y3.B11.S4** Measure and draw accurately — PARTIAL. _2.MD.A.1, 3.MD.B.4, M.EE.2.MD.1, M.EE.3.MD.4_  
   Partial: Reading a Ruler (Visual) (`measurement:reading_ruler`), missing drawing a line of a given length; measuring in mm  
   Proposal: Measure and Draw Accurately  
+  Vocabulary: centimetre (cm), millimetre (mm), line up  
 - **Y3.B11.S5** Horizontal and vertical — GAP. _2.G.A.1, M.EE.2.G.1_  
   Proposal: Horizontal and Vertical Lines  
+  Vocabulary: horizontal, vertical, horizon  
 - **Y3.B11.S6** Parallel and perpendicular — covered. _2.G.A.1, 4.G.A.1, M.EE.2.G.1, M.EE.4.G.1_  
   Skills: Identify Lines (∥, ⊥) (`angles_lines:identify_lines`)  
+  Vocabulary: parallel, perpendicular  
 - **Y3.B11.S7** Recognise and describe 2-D shapes — covered. _2.G.A.1, K.G.A.2, M.EE.2.G.1, M.EE.K.G.2_  
   Skills: Identify 2D Shapes (Visual) (`shapes_early:name_2d_shapes`); Count Sides & Vertices on 2D Shape (Visual) (`shapes_early:count_sides_vertices_2d`)  
+  Vocabulary: side, vertex, closed  
 - **Y3.B11.S8** Draw polygons — GAP. _2.G.A.1, M.EE.2.G.1_  
   Proposal: Draw 2-D Shapes  
+  Vocabulary: polygon, vertex, side  
 - **Y3.B11.S9** Recognise and describe 3-D shapes — covered. _2.G.A.1, 1.G.A.1, M.EE.2.G.1, M.EE.1.G.1_  
   Skills: Identify 3D Shapes (Visual) (`shapes_early:name_3d_shapes`); Count Edges, Faces & Vertices on 3D Shape (Visual) (`shapes_early:count_edges_faces_vertices`)  
+  Vocabulary: face, edge, vertex  
 - **Y3.B11.S10** Make 3-D shapes — GAP. _2.G.A.1, 1.G.A.1, K.G.B.5, 1.G.A.2, M.EE.2.G.1, M.EE.1.G.1, M.EE.1.G.2_  
   Proposal: Make 3-D Shapes  
+  Vocabulary: edge, face, vertex  
 
 #### Y3.B12 Summer Block 5: Statistics
 
 - **Y3.B12.S1** Interpret pictograms — covered. _2.MD.D.10, M.EE.2.MD.10_  
   Skills: Pictographs (`graphs:pictograph`)  
+  Vocabulary: pictogram, key, symbol  
 - **Y3.B12.S2** Draw pictograms — PARTIAL. _2.MD.D.10, M.EE.2.MD.10_  
   Partial: Build a Pictograph (`graphs:build_pictograph`), missing a key where one picture stands for 2, 5 or 10  
   Proposal: Pictograms with a Key (option)  
+  Vocabulary: key, symbol  
 - **Y3.B12.S3** Interpret bar charts — covered. _2.MD.D.10, M.EE.2.MD.10_  
   Skills: Bar Graph Intro (Visual) (`measurement:bar_graph_intro`); Bar Graphs (`graphs:bar_graph`)  
+  Vocabulary: scale, bar  
 - **Y3.B12.S4** Draw bar charts — covered. _2.MD.D.10, M.EE.2.MD.10_  
   Skills: Build a Bar Graph (`graphs:build_bar_graph`)  
+  Vocabulary: scale, axis, frequency, total  
 - **Y3.B12.S5** Collect and represent data — GAP. _2.MD.D.10, M.EE.2.MD.10_  
   Proposal: Collect and Represent Data  
+  Vocabulary: collect, tally, represent, key  
 - **Y3.B12.S6** Two-way tables — GAP. _2.MD.D.10, M.EE.2.MD.10_  
   Proposal: Two-Way Tables  
+  Vocabulary: row, column, total  
 
 ### Year 4 (US grade 3)
 
@@ -1909,110 +2397,154 @@ whatever happens to the WRM gaps.
 
 - **Y4.B1.S1** Represent numbers to 1,000 — covered. _2.NBT.A.1, 2.NBT.A.3, M.EE.2.NBT.1, M.EE.2.NBT.3_  
   Skills: Build 3-Digit Numbers with Flats (`composing:base10_build_hundreds`); Read Place-Value Disks (`placevalue:place_value_disks`) {band 999}; Unit Form (4 hundreds 7 tens 6 ones) (`placevalue:unit_form`) {band 999}  
+  Vocabulary: value, place value, placeholder zero  
 - **Y4.B1.S2** Partition numbers to 1,000 — covered. _2.NBT.A.1, 2.NBT.A.3, M.EE.2.NBT.1, M.EE.2.NBT.3_  
   Skills: Expanded Form (`placevalue:expand`) {band 999}; Unit Form (4 hundreds 7 tens 6 ones) (`placevalue:unit_form`) {band 999}  
+  Vocabulary: partition, hundreds, tens, ones, place holder  
 - **Y4.B1.S3** Number line to 1,000 — PARTIAL. _2.MD.B.6, 2.NBT.A.1, M.EE.2.MD.6, M.EE.2.NBT.1_  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing a 0-1,000 line  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: interval, start, end point, difference, midpoint  
 - **Y4.B1.S4** Thousands — PARTIAL. _4.NBT.A.1, 4.NBT.A.2, M.EE.4.NBT.2_  
   Partial: Read Place-Value Disks (`placevalue:place_value_disks`), missing 1,000 as ten hundreds; counting in thousands  
   Proposal: Count in 50s, 100s and 1,000s (option)  
+  Vocabulary: thousand, multiple of 1,000, unitise  
 - **Y4.B1.S5** Represent numbers to 10,000 — covered. _4.NBT.A.2, M.EE.4.NBT.2_  
   Skills: Read Place-Value Disks (`placevalue:place_value_disks`) {band 9999}; Write the Digits in a Place-Value Chart (`placevalue:pv_digit_drag`) {band 9999}  
+  Vocabulary: digit, value, column, placeholder  
 - **Y4.B1.S6** Partition numbers to 10,000 — covered. _4.NBT.A.2, M.EE.4.NBT.2_  
   Skills: Expanded Form (`placevalue:expand`) {band 9999}; Standard Form (`placevalue:combine`) {band 9999}  
+  Vocabulary: partition, digit, value  
 - **Y4.B1.S7** Flexible partitioning of numbers to 10,000 — GAP. _4.NBT.A.2, M.EE.4.NBT.2_  
   Proposal: Partition Numbers Flexibly  
+  Vocabulary: exchange, flexible, non-standard, total  
 - **Y4.B1.S8** Find 1, 10, 100, 1,000 more or less — covered. _2.NBT.B.8, 4.NBT.A.1_  
   Skills: 10 More, 10 Less, 100 More, 100 Less (`placevalue:more_less_100`) {1, 10, 100 and 1,000}  
+  Vocabulary: column, exchange, placeholder  
 - **Y4.B1.S9** Number line to 10,000 — PARTIAL. _3.NBT.A.1, M.EE.3.NBT.1_  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing a 0-10,000 line  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: interval, divisions, midpoint  
 - **Y4.B1.S10** Estimate on a number line to 10,000 — GAP. _3.NBT.A.1, M.EE.3.NBT.1_  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: midpoint, estimate, closer  
 - **Y4.B1.S11** Compare numbers to 10,000 — covered. _4.NBT.A.2, M.EE.4.NBT.2_  
   Skills: Compare Numbers (>, <, =) (`placevalue:compare`) {band 9999}  
+  Vocabulary: compare, greater than, less than  
 - **Y4.B1.S12** Order numbers to 10,000 — covered. _4.NBT.A.2, M.EE.4.NBT.2_  
   Skills: Order: Least to Greatest (`placevalue:order_least_to_greatest`) {band 9999}; Order: Greatest to Least (`placevalue:order_greatest_to_least`) {band 9999}  
+  Vocabulary: order, ascending, descending  
 - **Y4.B1.S13** Roman numerals — GAP. _Beyond CCSS_  
   Proposal: Roman Numerals  
+  Vocabulary: symbol, value, represents  
 - **Y4.B1.S14** Round to the nearest 10 — covered. _3.NBT.A.1, M.EE.3.NBT.1_  
   Skills: Round on a Number Line (`number_sense:rounding_visual`); Round to Nearest 10 (`number_sense:nearest_10`)  
+  Vocabulary: multiple of 10, nearest, round  
 - **Y4.B1.S15** Round to the nearest 100 — covered. _3.NBT.A.1, M.EE.3.NBT.1_  
   Skills: Round to Nearest 100 (`number_sense:nearest_100`); Rounding Sort: Nearest 100 (`number_sense:round_sort_100`)  
+  Vocabulary: multiple of 100, between, nearer, closer  
 - **Y4.B1.S16** Round to the nearest 1,000 — covered. _3.NBT.A.1, 4.NBT.A.3, M.EE.3.NBT.1, M.EE.4.NBT.3_  
-  Skills: Round to Nearest 1,000 (`number_sense:nearest_1000`); Rounding Sort: Nearest 1,000 (`number_sense:round_sort_1000`)  
+  Skills: Round to Nearest 1,000 (`number_sense:nearest_1000`); Round on a Number Line: Thousands (`number_sense:round_nl_thousands`); Rounding Sort: Nearest 1,000 (`number_sense:round_sort_1000`)  
+  Vocabulary: multiple of 1,000, between, nearer, closer  
 - **Y4.B1.S17** Round to the nearest 10, 100 or 1,000 — covered. _3.NBT.A.1, 4.NBT.A.3, M.EE.3.NBT.1, M.EE.4.NBT.3_  
-  Skills: Rounding Table (`number_sense:rounding_table`)  
+  Skills: Round on a Number Line: Thousands (`number_sense:round_nl_thousands`); Rounding Table (`number_sense:rounding_table`)  
+  Vocabulary: multiple, nearest, round  
 
 #### Y4.B2 Autumn Block 2: Addition and subtraction
 
 - **Y4.B2.S1** Add and subtract 1s, 10s, 100s and 1,000s — PARTIAL. _3.NBT.A.2, M.EE.3.NBT.2_  
   Partial: Add & Subtract by 100s (`addition:add_sub_100s`), missing adding and subtracting 1s, 10s, 100s and 1,000s to 4-digit numbers  
   Proposal: Spot the Pattern (+/−)  
+  Vocabulary: place value, column, exchange  
 - **Y4.B2.S2** Add up to two 4-digit numbers - no exchange — covered. _3.NBT.A.2, 4.NBT.B.4, M.EE.3.NBT.2, M.EE.4.NBT.4_  
   Skills: Add within 10,000 (No Regrouping) (`addition:add_10k_no_regroup`)  
+  Vocabulary: column, exchange, placeholder  
 - **Y4.B2.S3** Add two 4-digit numbers - one exchange — covered. _3.NBT.A.2, 4.NBT.B.4, M.EE.3.NBT.2, M.EE.4.NBT.4_  
   Skills: Add within 10,000 (With Regrouping) (`addition:add_10k_regroup`)  
+  Vocabulary: exchange, place value, carry  
 - **Y4.B2.S4** Add two 4-digit numbers - more than one exchange — covered. _3.NBT.A.2, 4.NBT.B.4, M.EE.3.NBT.2, M.EE.4.NBT.4_  
   Skills: Add within 10,000 (With Regrouping) (`addition:add_10k_regroup`)  
+  Vocabulary: exchange, column, carried  
 - **Y4.B2.S5** Subtract two 4-digit numbers - no exchange — covered. _3.NBT.A.2, 4.NBT.B.4, M.EE.3.NBT.2, M.EE.4.NBT.4_  
   Skills: Subtract within 10,000 (No Regrouping) (`subtraction:sub_10k_no_regroup`)  
+  Vocabulary: column, place value, difference  
 - **Y4.B2.S6** Subtract two 4-digit numbers - one exchange — covered. _3.NBT.A.2, 4.NBT.B.4, M.EE.3.NBT.2, M.EE.4.NBT.4_  
   Skills: Subtract within 10,000 (With Regrouping) (`subtraction:sub_10k_regroup`)  
+  Vocabulary: exchange, difference, column  
 - **Y4.B2.S7** Subtract two 4-digit numbers - more than one exchange — covered. _3.NBT.A.2, 4.NBT.B.4, M.EE.3.NBT.2, M.EE.4.NBT.4_  
   Skills: Subtract within 10,000 (With Regrouping) (`subtraction:sub_10k_regroup`); Subtract Across Zeros (`subtraction:sub_across_zeros`)  
+  Vocabulary: exchange, difference, column  
 - **Y4.B2.S8** Efficient subtraction — covered. _3.NBT.A.2, M.EE.3.NBT.2_  
   Skills: Compensation Strategy (`number_sense:compensation`)  
+  Vocabulary: difference, adjust, efficient  
 - **Y4.B2.S9** Estimate answers — covered. _3.NBT.A.1, 3.NBT.A.2, M.EE.3.NBT.1, M.EE.3.NBT.2_  
   Skills: Estimate Sums & Differences (`number_sense:estimate_sums_diffs`) {nearest 100 or 1,000}  
+  Vocabulary: estimate, round, accurate  
 - **Y4.B2.S10** Checking strategies — covered. _3.NBT.A.2, M.EE.3.NBT.2_  
   Skills: Check a Subtraction by Adding (`subtraction:sub_check_by_adding`)  
+  Vocabulary: inverse, part, whole, estimate  
 
 #### Y4.B3 Autumn Block 3: Area
 
 - **Y4.B3.S1** What is area — covered. _3.MD.C.5_  
   Skills: Area - Unit Square Counting (Visual) (`area_perimeter:area_unit_squares`)  
+  Vocabulary: area, cover, square unit  
 - **Y4.B3.S2** Count squares — covered. _3.MD.C.6, 2.G.A.2_  
   Skills: Area - Unit Square Counting (Visual) (`area_perimeter:area_unit_squares`)  
+  Vocabulary: square, row, total  
 - **Y4.B3.S3** Make shapes — PARTIAL. _3.MD.C.5, 3.MD.C.6_  
   Partial: Compose a Rectangle from Squares (`shapes_early:compose_rect_from_squares`), missing making different shapes with the same area  
   Proposal: Make and Compare Areas  
+  Vocabulary: area, rectilinear, joined  
 - **Y4.B3.S4** Compare areas — GAP. _3.MD.C.6_  
   Proposal: Make and Compare Areas  
-- _Awsaj supplement (not a WRM step):_ Area as multiplication — 3.MD.C.7, 3.MD.C.7a (no skill), 3.MD.C.7b
+  Vocabulary: area, greater area, equal area  
+- _Awsaj supplement (not a WRM step):_ Area as multiplication — 3.MD.C.7, 3.MD.C.7a, 3.MD.C.7b
 - _Awsaj supplement (not a WRM step):_ Distributive and additive area — 3.MD.C.7, 3.MD.C.7c, 3.MD.C.7d
 
 #### Y4.B4 Autumn Block 4: Multiplication and division
 
 - **Y4.B4.S1** Multiples of 3 — covered. _3.OA.C.7, 4.OA.B.4, M.EE.3.OA.6, M.EE.4.OA.4_  
   Skills: Count by 1–12 (`multiplication:count_by_tables`) {3}; Multiples of a Number (`number_theory:multiples`) {3}  
+  Vocabulary: multiple, multiply, total  
 - **Y4.B4.S2** Multiply and divide by 6 — covered. _3.OA.B.5, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 6}; Division Facts (1-12) (`division:div_facts`) {divide by 6}  
+  Vocabulary: array, group, share, double  
 - **Y4.B4.S3** 6 times-table and division facts — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 6}; Multiplication Fact Families (`multiplication:mult_div_fact_family`)  
+  Vocabulary: fact family, inverse, multiple  
 - **Y4.B4.S4** Multiply and divide by 9 — covered. _3.OA.B.5, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 9}; Division Facts (1-12) (`division:div_facts`) {divide by 9}  
+  Vocabulary: multiply, divide, array  
 - **Y4.B4.S5** 9 times-table and division facts — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 9}; Multiplication Fact Families (`multiplication:mult_div_fact_family`)  
+  Vocabulary: multiple, digit, sum of digits  
 - **Y4.B4.S6** The 3, 6 and 9 times-tables — PARTIAL. _3.OA.C.7, 3.OA.D.9, M.EE.3.OA.6, M.EE.3.OA.8_  
   Partial: Multiplication Chart (Visual) (`multiplication:mult_chart`), missing the links between the 3, 6 and 9 tables  
   Proposal: Related Times-Tables  
+  Vocabulary: multiple, double, treble  
 - **Y4.B4.S7** Multiply and divide by 7 — covered. _3.OA.B.5, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 7}; Division Facts (1-12) (`division:div_facts`) {divide by 7}  
+  Vocabulary: groups of, altogether, partition  
 - **Y4.B4.S8** 7 times-table and division facts — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 7}; Multiplication Fact Families (`multiplication:mult_div_fact_family`)  
+  Vocabulary: fact family, inverse, derive  
 - **Y4.B4.S9** 11 times-table and division facts — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 11}; Division Facts (1-12) (`division:div_facts`) {divide by 11}  
+  Vocabulary: partition, multiple, reverse  
 - **Y4.B4.S10** 12 times-table and division facts — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 12}; Division Facts (1-12) (`division:div_facts`) {divide by 12}  
+  Vocabulary: partition, double, exchange  
 - **Y4.B4.S11** Multiply by 1 and 0 — covered. _3.OA.B.5_  
   Skills: Multiplication Properties (Visual) (`multiplication:mult_properties`)  
+  Vocabulary: factor, product, commutative  
 - **Y4.B4.S12** Divide a number by 1 and itself — PARTIAL. _3.OA.B.5, 3.OA.B.6_  
   Partial: Multiplication Properties (Visual) (`multiplication:mult_properties`), missing dividing a number by 1 and by itself  
   Proposal: Multiply Three Numbers  
+  Vocabulary: inverse, commutative, itself  
 - **Y4.B4.S13** Multiply three numbers — GAP. _3.OA.B.5_  
   Proposal: Multiply Three Numbers  
+  Vocabulary: factor, product, commutative  
 - _Awsaj supplement (not a WRM step):_ Patterns on the multiplication table — 3.OA.D.9, 3.OA.C.7
 - _Awsaj supplement (not a WRM step):_ Two-step word problems with the four operations — 3.OA.D.8
 
@@ -2020,203 +2552,283 @@ whatever happens to the WRM gaps.
 
 - **Y4.B5.S1** Factor pairs — covered. _3.OA.A.4, 4.OA.B.4, M.EE.4.OA.4_  
   Skills: Identify Factors (Circle All) (`number_theory:factors_identify`); Factor T-Chart - Easy (Visual) (`number_theory:factor_tchart_easy`)  
+  Vocabulary: factor, product, factor pair  
 - **Y4.B5.S2** Use factor pairs — covered. _3.OA.B.5, 4.OA.B.4, M.EE.4.OA.4_  
   Skills: Factor Links - Easy (Visual) (`number_theory:factor_links_easy`)  
   Partial: Multiplication Properties (Visual) (`multiplication:mult_properties`), missing using factor pairs to multiply mentally (12 × 5 = 6 × 2 × 5)  
   Proposal: Multiply Three Numbers  
+  Vocabulary: split, any order, partition  
 - **Y4.B5.S3** Multiply by 10 — covered. _3.NBT.A.3, 4.NBT.A.1, M.EE.3.NBT.3_  
   Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`) {× 10}; Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {× 10}  
+  Vocabulary: 10 times the size, place value, placeholder  
 - **Y4.B5.S4** Multiply by 100 — covered. _3.NBT.A.3, 4.NBT.A.1, M.EE.3.NBT.3_  
   Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`) {× 100}; Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {× 100}  
+  Vocabulary: 100 times the size, scaling, placeholder  
 - **Y4.B5.S5** Divide by 10 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {÷ 10}  
+  Vocabulary: divide, tenth, one-tenth the size  
 - **Y4.B5.S6** Divide by 100 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {÷ 100}  
+  Vocabulary: divide, hundredth, one-hundredth the size  
 - **Y4.B5.S7** Related facts – multiplication and division — PARTIAL. _3.NBT.A.3, 3.OA.B.6, M.EE.3.NBT.3_  
   Partial: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`), missing related facts both ways (3 × 4 = 12 so 30 × 4 = 120 and 120 ÷ 4 = 30)  
   Proposal: Related Times-Tables  
+  Vocabulary: array, scale, related fact  
 - **Y4.B5.S8** Informal written methods for multiplication — covered. _3.OA.B.5, 4.NBT.B.5_  
   Skills: Area Model Multiplication (`multiplication:area_model_mult`)  
   Partial: Basic Multiplication (`multiplication:multiply`), missing partitioning in a written layout  
   Proposal: Partition to Multiply  
+  Vocabulary: partition, recombine, repeated addition  
 - **Y4.B5.S9** Multiply a 2-digit number by a 1-digit number — covered. _3.NBT.A.3, 4.NBT.B.5, M.EE.3.NBT.3_  
   Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`)  
+  Vocabulary: partition, partial product, exchange  
 - **Y4.B5.S10** Multiply a 3-digit number by a 1-digit number — covered. _4.NBT.B.5_  
   Skills: Basic Multiplication (`multiplication:multiply`) {3-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`)  
+  Vocabulary: exchange, place value, product  
 - **Y4.B5.S11** Divide a 2-digit number by a 1-digit number (1) — covered. _3.OA.B.5, 4.NBT.B.6_  
   Skills: Box Method Division (2÷1 digit) (`division:box_division_easy`); Area Model Division (2÷1 digit) (`division:area_model_div_2by1`)  
+  Vocabulary: share equally, exchange, partition  
 - **Y4.B5.S12** Divide a 2-digit number by a 1-digit number (2) — covered. _3.OA.B.5, 4.NBT.B.6_  
   Skills: Division with Remainders (Visual) (`division:div_remainders`); Box Method Division (2÷1 digit) (`division:box_division_easy`)  
+  Vocabulary: remainder, exchange, partition  
 - **Y4.B5.S13** Divide a 3-digit number by a 1-digit number — covered. _4.NBT.B.6_  
   Skills: Box Method Division (3÷1 digit) (`division:box_division_hard`); Area Model Division (3÷1 digit) (`division:area_model_div_3by1`)  
+  Vocabulary: partition, multiple, remainder  
 - **Y4.B5.S14** Correspondence problems — GAP. _3.OA.A.3, 3.OA.D.8, M.EE.3.OA.7_  
   Proposal: Correspondence Problems  
+  Vocabulary: combination, possibilities, table  
 - **Y4.B5.S15** Efficient multiplication — PARTIAL. _3.OA.B.5_  
   Partial: Multiplication Properties (Visual) (`multiplication:mult_properties`), missing choosing an efficient strategy: doubling, near multiples, factor pairs  
   Proposal: Related Times-Tables  
+  Vocabulary: efficient, partition, factor  
 
 #### Y4.B6 Spring Block 2: Length and perimeter
 
 - **Y4.B6.S1** Measure in kilometres and metres — PARTIAL. _4.MD.A.1, M.EE.4.MD.1_  
   Partial: Metric Length (mm/cm/m/km) (`measurement:length_metric`), missing a sense of 1 km and mixed km and m measures (2 km 300 m)  
   Proposal: Kilometres and Metres (option)  
+  Vocabulary: kilometre, distance, abbreviation  
 - **Y4.B6.S2** Equivalent lengths (kilometres and metres) — covered. _4.MD.A.1, M.EE.4.MD.1_  
   Skills: Metric Length (mm/cm/m/km) (`measurement:length_metric`) {km and m}  
+  Vocabulary: convert, equivalent, ×1,000, ÷1,000  
 - **Y4.B6.S3** Perimeter on a grid — covered. _3.MD.D.8_  
   Skills: Perimeter - Grid Counting (Visual) (`area_perimeter:perimeter_grid`)  
+  Vocabulary: perimeter, side length, rectilinear  
 - **Y4.B6.S4** Perimeter of a rectangle — covered. _3.MD.D.8_  
   Skills: Perimeter Only (`area_perimeter:perimeter`) {rectangles}  
+  Vocabulary: length, width, opposite sides  
 - **Y4.B6.S5** Perimeter of rectilinear shapes — covered. _3.MD.D.8_  
   Skills: Perimeter - Grid Counting (Visual) (`area_perimeter:perimeter_grid`) {L-shapes}  
+  Vocabulary: perimeter, rectilinear, side  
 - **Y4.B6.S6** Find missing lengths in rectilinear shapes — GAP. _3.MD.D.8_  
   Proposal: Missing Lengths in Rectilinear Shapes  
+  Vocabulary: opposite sides, horizontal, vertical, part, whole  
 - **Y4.B6.S7** Calculate the perimeter of rectilinear shapes — PARTIAL. _3.MD.D.8_  
   Partial: Perimeter - Grid Counting (Visual) (`area_perimeter:perimeter_grid`), missing rectilinear shapes with side lengths given, not on a grid  
   Proposal: Missing Lengths in Rectilinear Shapes  
+  Vocabulary: perimeter, side, rectilinear  
 - **Y4.B6.S8** Perimeter of regular polygons — GAP. _3.MD.D.8_  
   Proposal: Perimeter of Regular Polygons (option)  
+  Vocabulary: regular, polygon, perimeter  
 - **Y4.B6.S9** Perimeter of polygons — covered. _3.MD.D.8_  
   Skills: Perimeter Intro - Sum the Sides (Visual) (`area_perimeter:perimeter_intro`)  
+  Vocabulary: perimeter, regular, irregular  
 - _Awsaj supplement (not a WRM step):_ Measure and estimate mass and liquid volume (g, kg, ml, l) — 3.MD.A.2
 
 #### Y4.B7 Spring Block 3: Fractions
 
 - **Y4.B7.S1** Understand the whole — covered. _3.NF.A.1, M.EE.3.NF.1_  
   Skills: Whole Numbers as Fractions (Visual) (`composing:whole_as_fraction`); Compose 1 Whole from Unit Fractions (`composing:compose_whole`)  
+  Vocabulary: whole, equal parts, denominator  
 - **Y4.B7.S2** Count beyond 1 — GAP. _3.NF.A.1, M.EE.3.NF.1_  
   Proposal: Fractions Beyond 1  
+  Vocabulary: interval, mixed number, integer  
 - **Y4.B7.S3** Partition a mixed number — GAP. _3.NF.A.1, 4.NF.B.3, M.EE.3.NF.1, M.EE.4.NF.3_  
   Proposal: Fractions Beyond 1  
+  Vocabulary: partition, mixed number, fractional part  
 - **Y4.B7.S4** Number lines with mixed numbers — covered. _3.NF.A.2, M.EE.3.NF.2_  
   Skills: Fractions on Number Line (Visual) (`composing:fraction_number_line`)  
+  Vocabulary: interval, mixed number, midpoint  
 - **Y4.B7.S5** Compare and order mixed numbers — PARTIAL. _3.NF.A.3, 4.NF.A.2, M.EE.3.NF.3, M.EE.4.NF.2_  
   Partial: Compare Fractions (>, <, =) (`fractions:compare`), missing comparing and ordering mixed numbers  
   Proposal: Fractions Beyond 1  
+  Vocabulary: whole number, numerator, compare  
 - **Y4.B7.S6** Understand improper fractions — covered. _3.NF.A.1, 3.NF.A.3c, M.EE.3.NF.1, M.EE.3.NF.3_  
   Skills: Improper ↔ Mixed Numbers (`fractions:improper_mixed`); Mixed ↔ Improper (Visual Pizza) (`fractions:mixed_improper_visual`)  
+  Vocabulary: numerator, denominator, improper fraction  
 - **Y4.B7.S7** Convert mixed numbers to improper fractions — covered. _3.NF.A.1, 4.NF.B.3b, M.EE.3.NF.1, M.EE.4.NF.3_  
   Skills: Improper ↔ Mixed Numbers (`fractions:improper_mixed`)  
+  Vocabulary: mixed number, integer, improper fraction  
 - **Y4.B7.S8** Convert improper fractions to mixed numbers — covered. _3.NF.A.1, 4.NF.B.3b, M.EE.3.NF.1, M.EE.4.NF.3_  
   Skills: Improper ↔ Mixed Numbers (`fractions:improper_mixed`)  
+  Vocabulary: whole, remaining, leftover, mixed number  
 - **Y4.B7.S9** Equivalent fractions on a number line — PARTIAL. _3.NF.A.2, 3.NF.A.3a, M.EE.3.NF.2, M.EE.3.NF.3_  
   Partial: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`), missing equivalent fractions on number lines  
   Proposal: Count in Fractions  
+  Vocabulary: equivalent, equal parts, divisions, line up (align)  
 - **Y4.B7.S10** Equivalent fraction families — covered. _3.NF.A.3b, 4.NF.A.1, M.EE.3.NF.3, M.EE.4.NF.1_  
   Skills: Equivalent Fractions (No Visuals) (`fractions:equiv_frac_nv`); Equivalent Fractions (`fractions:equivalent`)  
+  Vocabulary: equivalent, split equally, fraction family  
 - **Y4.B7.S11** Add two or more fractions — PARTIAL. _3.NF.A.1, 4.NF.B.3, M.EE.3.NF.1, M.EE.4.NF.3_  
   Partial: Add Fractions (Like Denom) (Visual) (`fraction_operations:add_fractions_like`), missing three or more addends, totals past 1  
   Proposal: Add and Subtract More Fractions (option)  
+  Vocabulary: denominator, numerator, mixed number  
 - **Y4.B7.S12** Add fractions and mixed numbers — covered. _3.NF.A.1, 4.NF.B.3, M.EE.3.NF.1, M.EE.4.NF.3_  
   Skills: Add Mixed Numbers (Like Denom) (Visual) (`fraction_operations:add_mixed_like`)  
+  Vocabulary: mixed number, partition, improper fraction  
 - **Y4.B7.S13** Subtract two fractions — covered. _3.NF.A.1, 4.NF.B.3, M.EE.3.NF.1, M.EE.4.NF.3_  
   Skills: Subtract Fractions (Like Denom) (Visual) (`fraction_operations:sub_fractions_like`); Subtract Fractions (Like Denom) (No Visuals) (`fraction_operations:sub_frac_like_nv`)  
+  Vocabulary: numerator, denominator  
 - **Y4.B7.S14** Subtract from whole amounts — GAP. _3.NF.A.1, 4.NF.B.3, M.EE.3.NF.1, M.EE.4.NF.3_  
   Proposal: Add and Subtract More Fractions (option)  
+  Vocabulary: whole, improper fraction, remaining  
 - **Y4.B7.S15** Subtract from mixed numbers — covered. _3.NF.A.1, 4.NF.B.3, M.EE.3.NF.1, M.EE.4.NF.3_  
   Skills: Subtract Mixed Numbers (Like Denom) (Visual) (`fraction_operations:sub_mixed_like`)  
+  Vocabulary: mixed number, partition, exchange  
 - _Awsaj supplement (not a WRM step):_ Partition shapes into equal areas — 3.G.A.2
 
 #### Y4.B8 Spring Block 4: Decimals A
 
 - **Y4.B8.S1** Tenths as fractions — covered. _3.NF.A.1, M.EE.3.NF.1_  
   Skills: Write the Fraction Shown (`fractions:write_fraction`) {tenths}; Fractions /10 as /100 (Visual) (`fraction_operations:frac_10_100`)  
+  Vocabulary: tenth, equal parts, whole  
 - **Y4.B8.S2** Tenths as decimals — covered. _3.NF.A.1, 4.NF.C.6, M.EE.3.NF.1_  
   Skills: Fraction → Decimal (`conversions:f_to_d`) {tenths}; Decimal → Fraction (`conversions:d_to_f`)  
+  Vocabulary: decimal point, tenths, decimal  
 - **Y4.B8.S3** Tenths on a place value chart — GAP. _3.NF.A.1, 4.NF.C.6, M.EE.3.NF.1_  
   Proposal: Tenths and Hundredths in a Place-Value Chart  
+  Vocabulary: tenth, tenths column, exchange  
 - **Y4.B8.S4** Tenths on a number line — covered. _3.NF.A.2, 4.NF.C.6, M.EE.3.NF.2_  
   Skills: Place Decimals on a Number Line (`decimals:decimal_nl_drag`)  
+  Vocabulary: interval, start, end point  
 - **Y4.B8.S5** Divide a 1-digit number by 10 — covered. _4.NF.C.6, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {÷ 10, decimals on}  
+  Vocabulary: tenth, divide by 10, placeholder  
 - **Y4.B8.S6** Divide a 2-digit number by 10 — covered. _4.NF.C.6, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {÷ 10, decimals on}  
+  Vocabulary: partition, tenths, one place right  
 - **Y4.B8.S7** Hundredths as fractions — covered. _3.NF.A.1, 4.NF.C.5, M.EE.3.NF.1_  
   Skills: Fractions /10 as /100 (Visual) (`fraction_operations:frac_10_100`)  
+  Vocabulary: hundredth, tenth, equal to  
 - **Y4.B8.S8** Hundredths as decimals — covered. _3.NF.A.1, 4.NF.C.6, M.EE.3.NF.1_  
   Skills: Fraction → Decimal (`conversions:f_to_d`) {hundredths}; Decimal → Fraction (`conversions:d_to_f`)  
+  Vocabulary: hundredth, tenth, decimal number  
 - **Y4.B8.S9** Hundredths on a place value chart — GAP. _3.NF.A.1, 4.NF.C.6, M.EE.3.NF.1_  
   Proposal: Tenths and Hundredths in a Place-Value Chart  
+  Vocabulary: tenths, hundredths, exchange  
 - **Y4.B8.S10** Divide a 1- or 2-digit number by 100 — covered. _4.NF.C.6, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {÷ 100, decimals on}  
+  Vocabulary: divide by 100, place, right  
 
 #### Y4.B9 Summer Block 1: Decimals B
 
 - **Y4.B9.S1** Make a whole with tenths — GAP. _3.NF.A.1, 4.NF.C.6, M.EE.3.NF.1_  
   Proposal: Make a Whole with Decimals  
+  Vocabulary: tenth, whole, bond  
 - **Y4.B9.S2** Make a whole with hundredths — GAP. _3.NF.A.1, 4.NF.C.6, M.EE.3.NF.1_  
   Proposal: Make a Whole with Decimals  
+  Vocabulary: hundredth, column, bond  
 - **Y4.B9.S3** Partition decimals — GAP. _4.NF.C.6, 5.NBT.A.3a, M.EE.5.NBT.3_  
   Proposal: Tenths and Hundredths in a Place-Value Chart  
+  Vocabulary: tenth, hundredth, partition  
 - **Y4.B9.S4** Flexibly partition decimals — GAP. _4.NF.C.6, 5.NBT.A.3a, M.EE.5.NBT.3_  
   Proposal: Tenths and Hundredths in a Place-Value Chart  
+  Vocabulary: flexible partition, exchange, whole  
 - **Y4.B9.S5** Compare decimals — covered. _4.NF.C.7_  
   Skills: Comparing Decimals (`decimals:compare_decimal`)  
+  Vocabulary: greater than (>), less than (<), place value column  
 - **Y4.B9.S6** Order decimals — covered. _4.NF.C.7_  
   Skills: Order Decimals (`decimals:order_decimals`)  
+  Vocabulary: ascending, descending, greatest, smallest  
 - **Y4.B9.S7** Round to the nearest whole number — GAP. _4.NF.C.6, 5.NBT.A.4, M.EE.5.NBT.4_  
   Proposal: Round Decimals to the Nearest Whole (option)  
+  Vocabulary: round, whole number, integer, tenth  
 - **Y4.B9.S8** Halves and quarters as decimals — covered. _3.NF.A.1, 4.NF.C.6, M.EE.3.NF.1_  
   Skills: Fraction → Decimal (`conversions:f_to_d`) {halves and quarters}  
+  Vocabulary: hundredth, equivalent, decimal  
 
 #### Y4.B10 Summer Block 2: Money
 
 - **Y4.B10.S1** Write money using decimals — covered. _4.MD.A.2, 4.NF.C.6, M.EE.4.MD.2_  
   Skills: Write an Amount of Money (`measurement:money_notation`)  
+  Vocabulary: pound (£), pence (p), hundredth  
 - **Y4.B10.S2** Convert between pounds and pence — GAP. _2.MD.C.8, 4.MD.A.1, M.EE.2.MD.8, M.EE.4.MD.1_  
   Proposal: Dollars and Cents (option)  
+  Vocabulary: convert, pound (£), pence (p)  
 - **Y4.B10.S3** Compare amounts of money — covered. _2.MD.C.8, M.EE.2.MD.8_  
   Skills: Which Has More Money? (`measurement:money_compare`)  
+  Vocabulary: greater than, less than, ascending, descending  
 - **Y4.B10.S4** Estimate with money — GAP. _3.NBT.A.1, 4.MD.A.2, M.EE.3.NBT.1, M.EE.4.MD.2_  
   Proposal: Estimate with Money  
+  Vocabulary: estimate, approximate, midpoint  
 - **Y4.B10.S5** Calculate with money — covered. _3.OA.D.8, 4.MD.A.2, M.EE.3.OA.7, M.EE.4.MD.2_  
   Skills: Add Money (`measurement:money`); Find the Change (`measurement:money_change`)  
+  Vocabulary: partition, exchange, change  
 - **Y4.B10.S6** Solve problems with money — GAP. _2.MD.C.8, 4.MD.A.2, M.EE.2.MD.8, M.EE.4.MD.2_  
   Proposal: Two-Step Money Problems  
+  Vocabulary: difference, total, treble, share  
 
 #### Y4.B11 Summer Block 3: Time
 
 - **Y4.B11.S1** Years, months, weeks and days — GAP. _3.MD.A.1, M.EE.3.MD.1_  
   Proposal: Years, Months, Days, Hours  
+  Vocabulary: convert, leap year, factor  
 - **Y4.B11.S2** Hours, minutes and seconds — GAP. _3.MD.A.1, M.EE.3.MD.1_  
   Proposal: Years, Months, Days, Hours  
+  Vocabulary: convert, duration, factor  
 - **Y4.B11.S3** Convert between analogue and digital times — covered. _3.MD.A.1, M.EE.3.MD.1_  
   Skills: Analog and Digital Time (`measurement:time_analog_digital`)  
+  Vocabulary: analogue, digital, am, pm  
 - **Y4.B11.S4** Convert to the 24 hour clock — GAP. _3.MD.A.1, M.EE.3.MD.1_  
   Proposal: The 24-Hour Clock  
+  Vocabulary: 24-hour clock, midnight, midday, noon  
 - **Y4.B11.S5** Convert from the 24 hour clock — GAP. _3.MD.A.1, M.EE.3.MD.1_  
   Proposal: The 24-Hour Clock  
+  Vocabulary: am, pm, convert  
 
 #### Y4.B12 Summer Block 4: Shape
 
 - **Y4.B12.S1** Understand angles as turns — GAP. _4.MD.C.5, M.EE.4.MD.5_  
   Proposal: Turns and Angles  
+  Vocabulary: clockwise, anticlockwise, quarter, half, three-quarter, full turn  
 - **Y4.B12.S2** Identify angles — covered. _3.G.A.1, 4.MD.C.5, M.EE.3.G.1, M.EE.4.MD.5_  
   Skills: Identify Angles (`angles_lines:identify_angles`)  
+  Vocabulary: right angle, acute, obtuse  
 - **Y4.B12.S3** Compare and order angles — PARTIAL. _3.G.A.1, M.EE.3.G.1_  
   Partial: Identify Angles (`angles_lines:identify_angles`), missing comparing and ordering angles by size  
   Proposal: Turns and Angles  
+  Vocabulary: greater, smaller, order  
 - **Y4.B12.S4** Triangles — covered. _3.G.A.1, M.EE.3.G.1_  
   Skills: Classify Triangles (`shapes_classify:classify_triangles`)  
+  Vocabulary: equilateral, isosceles, scalene, vertex  
 - **Y4.B12.S5** Quadrilaterals — covered. _3.G.A.1, 5.G.B.3, M.EE.3.G.1, M.EE.5.G.3_  
   Skills: Classify Quadrilaterals (`shapes_classify:classify_quads`); Circle the Quadrilaterals (`shapes_classify:hotspot_quads`)  
+  Vocabulary: parallel, perpendicular, quadrilateral, vertex  
 - **Y4.B12.S6** Polygons — GAP. _3.G.A.1, M.EE.3.G.1_  
   Proposal: Regular and Irregular Polygons  
+  Vocabulary: polygon, regular, vertex  
 - **Y4.B12.S7** Lines of symmetry — covered. _3.G.A.1, 4.G.A.3, M.EE.3.G.1, M.EE.4.G.3_  
   Skills: Lines of Symmetry (`angles_lines:symmetry`); Draw Lines of Symmetry (`angles_lines:place_symmetry_lines`)  
+  Vocabulary: line of symmetry, reflection, diagonal  
 - **Y4.B12.S8** Complete a symmetric figure — GAP. _3.G.A.1, 4.G.A.3, M.EE.3.G.1, M.EE.4.G.3_  
   Proposal: Complete the Symmetric Shape  
+  Vocabulary: mirror line, vertex, reflect  
 
 #### Y4.B13 Summer Block 5: Statistics
 
 - **Y4.B13.S1** Interpret charts — covered. _3.MD.B.3, M.EE.3.MD.3_  
   Skills: Bar Graphs (`graphs:bar_graph`); Pictographs (`graphs:pictograph`)  
+  Vocabulary: key, scale, interval  
 - **Y4.B13.S2** Comparison, sum and difference — PARTIAL. _3.MD.B.3, M.EE.3.MD.3_  
   Partial: Bar Graphs (`graphs:bar_graph`), missing comparison, sum and difference questions across a chart  
   Proposal: Line Graphs  
+  Vocabulary: scale, key, difference, total  
 - **Y4.B13.S3** Interpret line graphs — GAP. _5.G.A.2, M.EE.5.G.2_  
   Proposal: Line Graphs  
+  Vocabulary: horizontal axis, vertical axis, estimate, increase, decrease  
 - **Y4.B13.S4** Draw line graphs — GAP. _5.G.A.2, M.EE.5.G.2_  
   Proposal: Line Graphs  
+  Vocabulary: scale, interval, plot  
 - _Awsaj supplement (not a WRM step):_ Build a line plot from inch measurements — 3.MD.B.4
 - _Awsaj supplement (not a WRM step):_ Measure to the half and quarter inch — 3.MD.B.4
 
@@ -2224,16 +2836,21 @@ whatever happens to the WRM gaps.
 
 - **Y4.B14.S1** Describe position using coordinates — covered. _5.G.A.1, M.EE.5.G.1_  
   Skills: Coordinates (Quadrant I) (`coordinates:coordinate_q1`)  
+  Vocabulary: horizontal, vertical, coordinates  
 - **Y4.B14.S2** Plot coordinates — covered. _5.G.A.1, 5.G.A.2, M.EE.5.G.1, M.EE.5.G.2_  
   Skills: Coordinates (Quadrant I) (`coordinates:coordinate_q1`)  
+  Vocabulary: x-axis, y-axis, coordinate, plot  
 - **Y4.B14.S3** Draw 2-D shapes on a grid — PARTIAL. _3.G.A.1, 5.G.A.1, M.EE.3.G.1, M.EE.5.G.1_  
   Partial: Polygon on Coord Grid (Side Lengths/Perimeter) (`coordinates:coord_polygon`), missing drawing a 2-D shape by plotting its vertices and finding a missing vertex  
   Proposal: Translate on a Grid  
+  Vocabulary: vertex, polygon, quadrilateral, join  
 - **Y4.B14.S4** Translate on a grid — PARTIAL. _5.G.A.1, M.EE.5.G.1_  
   Partial: Translations (Visual, MC) (`coordinates:geo_translate`), missing the skill is multiple choice in four quadrants; drawing the image in the first quadrant  
   Proposal: Translate on a Grid  
+  Vocabulary: translate, vertex, coordinates  
 - **Y4.B14.S5** Describe translation on a grid — covered. _5.G.A.1, M.EE.5.G.1_  
   Skills: Translations (Visual, MC) (`coordinates:geo_translate`)  
+  Vocabulary: translation, vertex, describe  
 
 ### Year 5 (US grade 4)
 
@@ -2241,79 +2858,111 @@ whatever happens to the WRM gaps.
 
 - **Y5.B1.S1** Roman numerals to 1,000 — GAP. _Beyond CCSS_  
   Proposal: Roman Numerals to 1,000 (option)  
+  Vocabulary: numeral, additive, subtractive  
 - **Y5.B1.S2** Numbers to 10,000 — covered. _4.NBT.A.2, M.EE.4.NBT.2_  
   Skills: Write the Digits in a Place-Value Chart (`placevalue:pv_digit_drag`) {band 9999}; Expanded Form (`placevalue:expand`) {band 9999}  
+  Vocabulary: digit, value, placeholder zero  
 - **Y5.B1.S3** Numbers to 100,000 — covered. _4.NBT.A.2, M.EE.4.NBT.2_  
   Skills: Write the Digits in a Place-Value Chart (`placevalue:pv_digit_drag`) {band 99999}  
+  Vocabulary: ten thousands, place value, placeholder zero  
 - **Y5.B1.S4** Numbers to 1,000,000 — covered. _4.NBT.A.2, M.EE.4.NBT.2_  
   Skills: Write the Digits in a Place-Value Chart (`placevalue:pv_digit_drag`) {band 999999}  
+  Vocabulary: hundred thousands, million, placeholder zero  
 - **Y5.B1.S5** Read and write numbers to 1,000,000 — covered. _4.NBT.A.2, M.EE.4.NBT.2_  
   Skills: Choose the Word Name (`placevalue:number_word_names`) {band 999999}  
+  Vocabulary: comma, placeholder zero, and  
 - **Y5.B1.S6** Powers of 10 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`)  
+  Vocabulary: column, row, ten times the size, one-tenth  
 - **Y5.B1.S7** 10 100 1,000 10,000 100,000 more or less — PARTIAL. _4.NBT.A.1_  
   Partial: 10 More, 10 Less, 100 More, 100 Less (`placevalue:more_less_100`), missing 10,000 and 100,000 more or less  
   Proposal: 10,000 and 100,000 More or Less (option)  
+  Vocabulary: place, more, less, exchange  
 - **Y5.B1.S8** Partition numbers to 1,000,000 — covered. _4.NBT.A.2, M.EE.4.NBT.2_  
   Skills: Expanded Form (`placevalue:expand`) {band 999999}; Standard Form (`placevalue:combine`)  
+  Vocabulary: partition, value, exchange  
 - **Y5.B1.S9** Number line to 1,000,000 — GAP. _4.NBT.A.2, M.EE.4.NBT.2_  
   Proposal: Numbers on a Number Line (any scale)  
+  Vocabulary: interval, start, end point, midpoint  
 - **Y5.B1.S10** Compare and order numbers to 100,000 — covered. _4.NBT.A.2, M.EE.4.NBT.2_  
   Skills: Compare Numbers (>, <, =) (`placevalue:compare`) {band 99999}; Order: Least to Greatest (`placevalue:order_least_to_greatest`) {band 99999}  
+  Vocabulary: compare, order, ascending, descending  
 - **Y5.B1.S11** Compare and order numbers to 1,000,000 — covered. _4.NBT.A.2, M.EE.4.NBT.2_  
   Skills: Compare Numbers (>, <, =) (`placevalue:compare`) {band 999999}; Order: Least to Greatest (`placevalue:order_least_to_greatest`) {band 999999}  
+  Vocabulary: greater than (>), less than (<), ascending, descending  
 - **Y5.B1.S12** Round to the nearest 10, 100 or 1,000 — covered. _4.NBT.A.3, M.EE.4.NBT.3_  
   Skills: Round to Nearest 1,000 (`number_sense:nearest_1000`); Rounding Table (`number_sense:rounding_table`)  
+  Vocabulary: round to the nearest, multiple, previous, next multiple, halfway  
 - **Y5.B1.S13** Round within 100,000 — covered. _4.NBT.A.3, M.EE.4.NBT.3_  
-  Skills: Round to Nearest 10,000 (`number_sense:nearest_10000`); Rounding Sort: Nearest 10,000 (`number_sense:round_sort_10000`)  
+  Skills: Round to Nearest 10,000 (`number_sense:nearest_10000`); Round on a Number Line: Ten Thousands (`number_sense:round_nl_ten_thousands`); Rounding Sort: Nearest 10,000 (`number_sense:round_sort_10000`)  
+  Vocabulary: multiple, previous, next, nearest  
 - **Y5.B1.S14** Round within 1,000,000 — covered. _4.NBT.A.3, M.EE.4.NBT.3_  
-  Skills: Round to Nearest 100,000 (`number_sense:nearest_100000`); Rounding Sort: Nearest 100,000 (`number_sense:round_sort_100000`)  
+  Skills: Round to Nearest 100,000 (`number_sense:nearest_100000`); Round on a Number Line: Hundred Thousands (`number_sense:round_nl_hundred_thousands`); Rounding Sort: Nearest 100,000 (`number_sense:round_sort_100000`)  
+  Vocabulary: multiple of 100,000, midpoint, nearest  
 
 #### Y5.B2 Autumn Block 2: Addition and subtraction
 
 - **Y5.B2.S1** Mental strategies — GAP. _4.NBT.B.4, M.EE.4.NBT.4_  
   Proposal: Mental Addition and Subtraction  
+  Vocabulary: partition, compensate, adjust, sum, difference  
 - **Y5.B2.S2** Add whole numbers with more than four digits — covered. _4.NBT.B.4, M.EE.4.NBT.4_  
   Skills: Add within 100,000 (With Regrouping) (`addition:add_100k_regroup`); Add within 1,000,000 (`addition:add_1m_mixed`)  
+  Vocabulary: sum, exchange, column  
 - **Y5.B2.S3** Subtract whole numbers with more than four digits — covered. _4.NBT.B.4, M.EE.4.NBT.4_  
   Skills: Subtract within 100,000 (With Regrouping) (`subtraction:sub_100k_regroup`); Subtract within 1,000,000 (`subtraction:sub_1m_mixed`)  
+  Vocabulary: exchange, column, digit  
 - **Y5.B2.S4** Round to check answers — covered. _4.NBT.A.3, 4.NBT.B.4, M.EE.4.NBT.3, M.EE.4.NBT.4_  
   Skills: Estimate Sums & Differences (`number_sense:estimate_sums_diffs`) {nearest 1,000}  
+  Vocabulary: estimate, approximate (≈), round, reasonable  
 - **Y5.B2.S5** Inverse operations (addition and subtraction) — PARTIAL. _4.NBT.B.4, M.EE.4.NBT.4_  
   Partial: Check a Subtraction by Adding (`subtraction:sub_check_by_adding`), missing 5- and 6-digit numbers; checking addition by subtracting  
   Proposal: Inverse Operations (option)  
+  Vocabulary: part, whole, inverse  
 - **Y5.B2.S6** Multi-step addition and subtraction problems — covered. _4.NBT.B.4, 4.OA.A.3, M.EE.4.NBT.4, M.EE.4.OA.3_  
   Skills: Tape Diagrams / Bar Models (Visual) (`algebra:tape_diagram`); Multi-Step Word Problems (Visual) (`algebra:multi_step_word`)  
+  Vocabulary: difference, sum, altogether, fewer than  
 - **Y5.B2.S7** Compare calculations — GAP. _4.NBT.B.4, M.EE.4.NBT.4_  
   Proposal: Compare Calculations  
+  Vocabulary: greater than, less than, equal to  
 - **Y5.B2.S8** Find missing numbers — covered. _4.OA.A.3, M.EE.4.OA.3_  
   Skills: Missing Numbers (+/−) (`subtraction:missing_add_sub`); Missing Addend or Missing Factor? (`number_ops_mixed:missing_factor_or_addend`)  
+  Vocabulary: inverse, total, difference  
 
 #### Y5.B3 Autumn Block 3: Multiplication and division A
 
 - **Y5.B3.S1** Multiples — covered. _4.OA.B.4, M.EE.4.OA.4_  
   Skills: Multiples of a Number (`number_theory:multiples`)  
+  Vocabulary: multiple, times-table, digit sum  
 - **Y5.B3.S2** Common multiples — PARTIAL. _4.OA.B.4, 6.NS.B.4, M.EE.4.OA.4_  
   Partial: Least Common Multiple (`number_theory:lcm`), missing listing all the common multiples, not only the least  
   Proposal: Common Multiples and Common Factors (option)  
+  Vocabulary: multiple, common, common multiple  
 - **Y5.B3.S3** Factors — covered. _4.OA.B.4, M.EE.4.OA.4_  
   Skills: Identify Factors (Circle All) (`number_theory:factors_identify`); Factor T-Chart - Medium (Visual) (`number_theory:factor_tchart_medium`)  
+  Vocabulary: factor, factor pair, product  
 - **Y5.B3.S4** Common factors — PARTIAL. _4.OA.B.4, 6.NS.B.4, M.EE.4.OA.4_  
   Partial: Greatest Common Factor (Easy) (`number_theory:gcf_easy`), missing listing all the common factors, not only the greatest  
   Proposal: Common Multiples and Common Factors (option)  
+  Vocabulary: factor, common, common factor  
 - **Y5.B3.S5** Prime numbers — covered. _4.OA.B.4, M.EE.4.OA.4_  
   Skills: Prime vs Composite (`number_theory:prime_composite`)  
+  Vocabulary: factor, prime, composite  
 - **Y5.B3.S6** Square numbers — PARTIAL. _6.EE.A.1, M.EE.6.EE.1-2_  
   Partial: Level 7: Exponents (`order_of_operations:exponents_simple`), missing square numbers as square arrays; recognising squares  
   Proposal: Square and Cube Numbers  
+  Vocabulary: square number, integer, squared (32)  
 - **Y5.B3.S7** Cube numbers — GAP. _6.EE.A.1, M.EE.6.EE.1-2_  
   Proposal: Square and Cube Numbers  
+  Vocabulary: cube number, cubed, the small 3  
 - **Y5.B3.S8** Multiply by 10, 100 and 1,000 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {×}  
+  Vocabulary: digit, place value, placeholder zero  
 - **Y5.B3.S9** Divide by 10, 100 and 1,000 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {÷}  
+  Vocabulary: divide, tenth, inverse  
 - **Y5.B3.S10** Multiples of 10, 100 and 1,000 — GAP. _4.OA.B.4, M.EE.4.OA.4_  
   Proposal: Multiples of 10, 100 and 1,000 (option)  
+  Vocabulary: factor pair, placeholder zero, times the size, greater  
 - _Awsaj supplement (not a WRM step):_ Find emergent features (e.g., units digit cycle) — 4.OA.C.5
 - _Awsaj supplement (not a WRM step):_ Follow a given rule to extend a number pattern — 4.OA.C.5
 - _Awsaj supplement (not a WRM step):_ Multiplicative comparison: times as many — 4.OA.A.1
@@ -2322,251 +2971,351 @@ whatever happens to the WRM gaps.
 
 - **Y5.B4.S1** Find fractions equivalent to a unit fraction — covered. _4.NF.A.1, M.EE.4.NF.1_  
   Skills: Equivalent Fractions (No Visuals) (`fractions:equiv_frac_nv`); Equivalent Fractions (`fractions:equivalent`)  
+  Vocabulary: unit fraction, equivalent, numerator, denominator  
 - **Y5.B4.S2** Find fractions equivalent to a non-unit fraction — covered. _4.NF.A.1, M.EE.4.NF.1_  
   Skills: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`); Equivalent Fractions (`fractions:equivalent`)  
+  Vocabulary: non-unit fraction, numerator, denominator  
 - **Y5.B4.S3** Recognise equivalent fractions — covered. _4.NF.A.1, M.EE.4.NF.1_  
   Skills: Circle the Equivalent Fractions (MAP) (`fractions:select_equiv_frac`); Equivalent Fractions (`fractions:equivalent`)  
+  Vocabulary: equivalent, common factor, common multiple  
 - **Y5.B4.S4** Convert improper fractions to mixed numbers — covered. _4.NF.B.3, M.EE.4.NF.3_  
   Skills: Improper ↔ Mixed Numbers (`fractions:improper_mixed`); Mixed ↔ Improper (Visual Pizza) (`fractions:mixed_improper_visual`)  
+  Vocabulary: improper fraction, mixed number, remaining  
 - **Y5.B4.S5** Convert mixed numbers to improper fractions — covered. _4.NF.B.3, M.EE.4.NF.3_  
   Skills: Improper ↔ Mixed Numbers (`fractions:improper_mixed`); Mixed ↔ Improper (Visual Pizza) (`fractions:mixed_improper_visual`)  
+  Vocabulary: mixed number, improper fraction, exchange  
 - **Y5.B4.S6** Compare fractions less than 1 — covered. _4.NF.A.2, M.EE.4.NF.2_  
   Skills: Compare Fractions (>, <, =) (`fractions:compare`); Compare Fractions (LCD) (`fractions:compare_frac_lcd`)  
+  Vocabulary: compare, equivalent, denominator  
 - **Y5.B4.S7** Order fractions less than 1 — covered. _4.NF.A.2, M.EE.4.NF.2_  
   Skills: Order Fractions (`fractions:order_fractions`)  
+  Vocabulary: order, ascending, descending  
 - **Y5.B4.S8** Compare and order fractions greater than 1 — GAP. _4.NF.A.2, M.EE.4.NF.2_  
   Proposal: Compare and Order Fractions Greater Than 1 (option)  
+  Vocabulary: numerator, denominator, equivalent  
 - **Y5.B4.S9** Add and subtract fractions with the same denominator — covered. _4.NF.B.3, M.EE.4.NF.3_  
   Skills: Add Fractions (Like Denom) (Visual) (`fraction_operations:add_fractions_like`); Subtract Fractions (Like Denom) (Visual) (`fraction_operations:sub_fractions_like`)  
+  Vocabulary: numerator, denominator  
 - **Y5.B4.S10** Add fractions within 1 — covered. _4.NF.B.3, M.EE.4.NF.3_  
   Skills: Add Fractions (Unlike Denom) (Visual) (`fraction_operations:add_frac_unlike`) {related denominators, total within 1}  
+  Vocabulary: denominator, equivalent, common denominator  
 - **Y5.B4.S11** Add fractions with total greater than 1 — covered. _4.NF.B.3, M.EE.4.NF.3_  
   Skills: Add Fractions (Like Denom) (Visual) (`fraction_operations:add_fractions_like`); Add Fractions (Unlike Denom) (Visual) (`fraction_operations:add_frac_unlike`)  
+  Vocabulary: common denominator, improper fraction, mixed number  
 - **Y5.B4.S12** Add to a mixed number — covered. _4.NF.B.3, M.EE.4.NF.3_  
   Skills: Add Mixed Numbers (Like Denom) (Visual) (`fraction_operations:add_mixed_like`); Add Mixed Numbers (Unlike Denom) (Visual) (`fraction_operations:add_mixed_unlike`)  
+  Vocabulary: mixed number, whole part, denominator  
 - **Y5.B4.S13** Add two mixed numbers — covered. _4.NF.B.3, M.EE.4.NF.3_  
   Skills: Add Mixed Numbers (Like Denom) (Visual) (`fraction_operations:add_mixed_like`); Add Mixed Numbers (Unlike Denom) (Visual) (`fraction_operations:add_mixed_unlike`)  
+  Vocabulary: partition, improper fraction, recombine  
 - **Y5.B4.S14** Subtract fractions — covered. _4.NF.B.3, M.EE.4.NF.3_  
   Skills: Subtract Fractions (Like Denom) (Visual) (`fraction_operations:sub_fractions_like`); Subtract Fractions (Unlike Denom) (Visual) (`fraction_operations:sub_frac_unlike`)  
+  Vocabulary: denominator, common denominator, improper fraction  
 - **Y5.B4.S15** Subtract from a mixed number — covered. _4.NF.B.3, M.EE.4.NF.3_  
   Skills: Subtract Mixed Numbers (Like Denom) (Visual) (`fraction_operations:sub_mixed_like`); Subtract Mixed Numbers (Unlike Denom) (Visual) (`fraction_operations:sub_mixed_unlike`)  
+  Vocabulary: partition, mixed number, common denominator  
 - **Y5.B4.S16** Subtract from a mixed number - breaking the whole — PARTIAL. _4.NF.B.3, M.EE.4.NF.3_  
   Partial: Subtract Mixed Numbers (Like Denom) (Visual) (`fraction_operations:sub_mixed_like`), missing a page that always exchanges a whole  
   Proposal: Subtract from a Mixed Number: Break the Whole (option)  
+  Vocabulary: break the whole, common denominator, partition  
 - **Y5.B4.S17** Subtract two mixed numbers — covered. _4.NF.B.3, M.EE.4.NF.3_  
   Skills: Subtract Mixed Numbers (Like Denom) (Visual) (`fraction_operations:sub_mixed_like`); Subtract Mixed Numbers (Unlike Denom) (Visual) (`fraction_operations:sub_mixed_unlike`)  
+  Vocabulary: partition, break the whole, efficient  
 
 #### Y5.B5 Spring Block 1: Multiplication and division B
 
 - **Y5.B5.S1** Multiply up to a 4-digit number by a 1-digit number — PARTIAL. _4.NBT.B.5_  
   Partial: Basic Multiplication (`multiplication:multiply`), missing 4-digit × 1-digit (the largest size is 3-digit × 1-digit)  
   Proposal: Long Multiplication and Division (4-digit)  
+  Vocabulary: column, exchange, estimate  
 - **Y5.B5.S2** Multiply a 2-digit number by a 2-digit number (area model) — covered. _4.NBT.B.5_  
   Skills: Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`) {2 × 2}  
+  Vocabulary: partition, area model, partial product, total product  
 - **Y5.B5.S3** Multiply a 2-digit number by a 2-digit number — covered. _4.NBT.B.5_  
   Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 2-digit}; Write the Placeholder Zero (`multiplication:mult_placeholder_zero`)  
+  Vocabulary: partial product, place holder, exchange  
 - **Y5.B5.S4** Multiply a 3-digit number by a 2-digit number — covered. _5.NBT.B.5, M.EE.5.NBT.5_  
   Skills: Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`) {2 × 3}; Write the Placeholder Zero (`multiplication:mult_placeholder_zero`)  
+  Vocabulary: place holder, exchange  
 - **Y5.B5.S5** Multiply a 4-digit number by a 2-digit number — PARTIAL. _5.NBT.B.5, M.EE.5.NBT.5_  
   Partial: Write the Placeholder Zero (`multiplication:mult_placeholder_zero`), missing a 4-digit by 2-digit long multiplication worked to the end  
   Proposal: Long Multiplication and Division (4-digit)  
+  Vocabulary: partial product, placeholder, exchange  
 - **Y5.B5.S6** Solve problems with multiplication — covered. _4.OA.A.3, M.EE.4.OA.3_  
   Skills: Mixed Word Problems (+−×÷) (Visual) (`number_ops_mixed:word_problems_mixed`); Multi-Step Word Problems (Visual) (`algebra:multi_step_word`)  
+  Vocabulary: efficient, factor pair, adjust  
 - **Y5.B5.S7** Short division — covered. _4.NBT.B.6_  
   Skills: Box Method Division (3÷1 digit) (`division:box_division_hard`); Zero in the Quotient (`division:div_zero_in_quotient`)  
+  Vocabulary: exchange, greatest place value, short division, bus stop  
 - **Y5.B5.S8** Divide a 4-digit number by a 1-digit number — PARTIAL. _4.NBT.B.6_  
   Partial: Box Method Division (3÷1 digit) (`division:box_division_hard`), missing 4-digit dividends  
   Proposal: Long Multiplication and Division (4-digit)  
+  Vocabulary: exchange, placeholder, thousands column  
 - **Y5.B5.S9** Divide with remainders — covered. _4.NBT.B.6_  
   Skills: Division with Remainders (Visual) (`division:div_remainders`); Box Method Division (3÷1 digit) (`division:box_division_hard`); Is the Remainder Finished? (`division:remainder_too_big`)  
+  Vocabulary: remainder, exchange, divisor  
 - **Y5.B5.S10** Efficient division — PARTIAL. _4.NBT.B.6_  
   Partial: Area Model Division (3÷1 digit) (`division:area_model_div_3by1`), missing choosing an efficient method (factors, known facts, partitioning)  
   Proposal: Long Multiplication and Division (4-digit)  
+  Vocabulary: factor, factor pair, efficient  
 - **Y5.B5.S11** Solve problems with multiplication and division — covered. _4.OA.A.2, 4.OA.A.3, M.EE.4.OA.2, M.EE.4.OA.3_  
   Skills: Times as Many Word Problems (Visual) (`multiplication:mult_comparison`); Interpret the Remainder (Word Problems) (`division:remainder_interpret`); Mixed Word Problems (+−×÷) (Visual) (`number_ops_mixed:word_problems_mixed`)  
+  Vocabulary: operation, remainder, altogether  
 
 #### Y5.B6 Spring Block 2: Fractions B
 
 - **Y5.B6.S1** Multiply a unit fraction by an integer — covered. _4.NF.B.4_  
   Skills: Fraction × Whole Number (Visual) (`fraction_operations:mult_frac_whole`) {unit fractions}  
+  Vocabulary: numerator, denominator, integer  
 - **Y5.B6.S2** Multiply a non-unit fraction by an integer — covered. _4.NF.B.4_  
   Skills: Fraction × Whole Number (Visual) (`fraction_operations:mult_frac_whole`); Fraction × Whole Number (No Visuals) (`fraction_operations:mult_frac_whole_nv`)  
+  Vocabulary: numerator, denominator, integer  
 - **Y5.B6.S3** Multiply a mixed number by an integer — GAP. _4.NF.B.4_  
   Proposal: Multiply a Mixed Number by an Integer (option)  
+  Vocabulary: mixed number, partition, integer  
 - **Y5.B6.S4** Calculate a fraction of a quantity — covered. _4.NF.B.4_  
   Skills: Fraction of a Set (Visual) (`fractions:fraction_of_set`); Fraction of a Set (No Visuals) (`fractions:fraction_of_set_nv`)  
+  Vocabulary: denominator, numerator, unit fraction  
 - **Y5.B6.S5** Fraction of an amount — covered. _4.NF.B.4_  
   Skills: Fraction of a Set - Hard (Visual) (`fractions:fraction_of_set_hard`); Fraction of a Set - Hard (No Visuals) (`fractions:fraction_of_set_hard_nv`)  
+  Vocabulary: denominator, numerator, non- unit fraction  
 - **Y5.B6.S6** Find the whole — covered. _4.NF.B.4_  
   Skills: Fraction of a Set - Hard (No Visuals) (`fractions:fraction_of_set_hard_nv`) {find the whole}  
+  Vocabulary: the whole, one equal part, find the whole  
 - **Y5.B6.S7** Use fractions as operators — GAP. _4.NF.B.4_  
   Proposal: Fractions as Operators  
+  Vocabulary: operator, of, efficient  
 
 #### Y5.B7 Spring Block 3: Decimals and percentages
 
 - **Y5.B7.S1** Decimals up to 2 decimal places — covered. _4.NF.C.6_  
   Skills: Place Decimals on a Number Line (`decimals:decimal_nl_drag`); Decimal → Fraction (`conversions:d_to_f`)  
+  Vocabulary: tenths (0.1), hundredths (0.01), placeholder  
 - **Y5.B7.S2** Equivalent fractions and decimals (tenths) — covered. _4.NF.C.6_  
   Skills: Fraction → Decimal (`conversions:f_to_d`) {tenths}; Decimal → Fraction (`conversions:d_to_f`)  
+  Vocabulary: tenths, equivalent, mixed number  
 - **Y5.B7.S3** Equivalent fractions and decimals (hundredths) — covered. _4.NF.C.6_  
   Skills: Fractions /10 as /100 (Visual) (`fraction_operations:frac_10_100`); Fraction → Decimal (`conversions:f_to_d`) {hundredths}  
+  Vocabulary: hundredth, tenth, decimal place  
 - **Y5.B7.S4** Equivalent fractions and decimals — covered. _4.NF.C.6_  
   Skills: Fraction → Decimal (`conversions:f_to_d`); Decimal → Fraction (`conversions:d_to_f`)  
+  Vocabulary: equivalent, numerator, denominator  
 - **Y5.B7.S5** Thousandths as fractions — PARTIAL. _4.NF.C.6, 5.NBT.A.3, M.EE.5.NBT.3_  
   Partial: Decimal → Fraction (`conversions:d_to_f`), missing thousandths as fractions (x/1000)  
   Proposal: Thousandths (option)  
+  Vocabulary: thousandth, partition, equivalent  
 - **Y5.B7.S6** Thousandths as decimals — PARTIAL. _4.NBT.A.1, 5.NBT.A.3, M.EE.5.NBT.3_  
   Partial: Compare Decimals to Thousandths (`decimals:compare_thousandths`), missing writing thousandths as decimals  
   Proposal: Thousandths (option)  
+  Vocabulary: thousandths place, placeholder zero, partition  
 - **Y5.B7.S7** Thousandths on a place value chart — GAP. _4.NBT.A.1, 5.NBT.A.3, M.EE.5.NBT.3_  
   Proposal: Thousandths (option)  
+  Vocabulary: thousandth, column, partition  
 - **Y5.B7.S8** Order and compare decimals (same number of decimal places) — covered. _4.NF.C.7, 5.NBT.A.3, M.EE.5.NBT.3_  
   Skills: Comparing Decimals (`decimals:compare_decimal`); Order Decimals (`decimals:order_decimals`)  
+  Vocabulary: compare, ascending, descending  
 - **Y5.B7.S9** Order and compare any decimals with up to 3 decimal places — covered. _4.NF.C.7, 5.NBT.A.3, M.EE.5.NBT.3_  
   Skills: Compare Decimals to Thousandths (`decimals:compare_thousandths`); Order Decimals (`decimals:order_decimals`)  
+  Vocabulary: tenths, hundredths, thousandths, placeholder zero  
 - **Y5.B7.S10** Round to the nearest whole number — GAP. _5.NBT.A.4, M.EE.5.NBT.4_  
   Proposal: Round Decimals to the Nearest Whole (option)  
+  Vocabulary: round, whole number, integer, halfway (midpoint)  
 - **Y5.B7.S11** Round to 1 decimal place — covered. _5.NBT.A.4, M.EE.5.NBT.4_  
   Skills: Round Thousandths (`decimals:round_thousandths`) {nearest tenth}; Rounding Sort: Nearest Tenth (`number_sense:round_sort_tenths`)  
+  Vocabulary: tenth, nearest, placeholder zero  
 - **Y5.B7.S12** Understand percentages — covered. _4.NF.C.6, 6.RP.A.3_  
   Skills: Percent Grid (Visual) (`conversions:percent_visual`)  
+  Vocabulary: per cent, value, total  
 - **Y5.B7.S13** Percentages as fractions — covered. _4.NF.C.6, 6.RP.A.3_  
   Skills: Fraction → Percent (`conversions:f_to_p`); Percent → Fraction (`conversions:p_to_f`)  
+  Vocabulary: per cent, numerator, denominator  
 - **Y5.B7.S14** Percentages as decimals — covered. _4.NF.C.6, 6.RP.A.3_  
   Skills: Decimal → Percent (`conversions:d_to_p`); Percent → Decimal (`conversions:p_to_d`)  
+  Vocabulary: per cent, tenth, hundredth  
 - **Y5.B7.S15** Equivalent fractions, decimals and percentages — covered. _4.NF.C.5, 4.NF.C.6, 6.RP.A.3_  
   Skills: Fraction → Percent (`conversions:f_to_p`); Decimal → Percent (`conversions:d_to_p`); Order Fractions, Decimals & Percents (`conversions:order_fdp`)  
+  Vocabulary: equivalent, hundredth, denominator  
 
 #### Y5.B8 Spring Block 4: Perimeter and area
 
 - **Y5.B8.S1** Perimeter of rectangles — covered. _4.MD.A.3, 3.MD.D.8, M.EE.4.MD.3_  
   Skills: Perimeter Only (`area_perimeter:perimeter`) {rectangles}  
+  Vocabulary: perimeter, length, width  
 - **Y5.B8.S2** Perimeter of rectilinear shapes — covered. _3.MD.D.8_  
   Skills: Composite Shapes (L, T, U) (`area_perimeter:composite_shapes`) {perimeter}  
+  Vocabulary: rectilinear, perimeter, unknown side  
 - **Y5.B8.S3** Perimeter of polygons — PARTIAL. _3.MD.D.8_  
   Partial: Perimeter Intro - Sum the Sides (Visual) (`area_perimeter:perimeter_intro`), missing perimeter of any polygon from its side lengths  
   Proposal: Perimeter of Regular Polygons (option)  
+  Vocabulary: perimeter, regular, irregular  
 - **Y5.B8.S4** Area of rectangles — covered. _4.MD.A.3, 3.MD.C.7, M.EE.4.MD.3_  
   Skills: Area Only (`area_perimeter:area`) {rectangles}  
+  Vocabulary: area, square centimetre (cm²), length, width  
 - **Y5.B8.S5** Area of compound shapes — covered. _4.MD.A.3, 3.MD.C.7, M.EE.4.MD.3_  
   Skills: Decompose Polygon Area (L/T/U) (`area_perimeter:area_polygon_decompose`); Composite Shapes (L, T, U) (`area_perimeter:composite_shapes`)  
+  Vocabulary: compound shape, partition, area  
 - **Y5.B8.S6** Estimate area — GAP. _3.MD.C.6_  
   Proposal: Estimate Area  
+  Vocabulary: estimate, whole square, part, half square  
 
 #### Y5.B9 Spring Block 5: Statistics
 
 - **Y5.B9.S1** Draw line graphs — GAP. _5.G.A.2, M.EE.5.G.2_  
   Proposal: Line Graphs  
+  Vocabulary: axis, interval, plot  
 - **Y5.B9.S2** Read and interpret line graphs — GAP. _5.G.A.2, M.EE.5.G.2_  
   Proposal: Line Graphs  
+  Vocabulary: read off, difference, estimate  
 - **Y5.B9.S3** Read and interpret tables — GAP. _4.OA.A.3, M.EE.4.OA.3_  
   Proposal: Tables  
+  Vocabulary: data, row, column  
 - **Y5.B9.S4** Two-way tables — GAP. _4.OA.A.3, M.EE.4.OA.3_  
   Proposal: Two-Way Tables  
+  Vocabulary: two-way table, row, column  
 - **Y5.B9.S5** Read and interpret timetables — GAP. _4.MD.A.2, M.EE.4.MD.2_  
   Proposal: Timetables  
+  Vocabulary: timetable, service, duration  
 - _Awsaj supplement (not a WRM step):_ Line plots with fractions — 4.MD.B.4
 
 #### Y5.B10 Summer Block 1: Shape
 
 - **Y5.B10.S1** Understand and use degrees — covered. _4.MD.C.6, M.EE.4.MD.6_  
   Skills: Identify Angles (`angles_lines:identify_angles`); Measure/Estimate Angles (`angles_lines:measure_angles`)  
+  Vocabulary: angle, degree (°), clockwise, anti-clockwise  
 - **Y5.B10.S2** Classify angles — covered. _4.G.A.1, M.EE.4.G.1_  
   Skills: Identify Angles (`angles_lines:identify_angles`)  
+  Vocabulary: acute, obtuse, reflex  
 - **Y5.B10.S3** Estimate angles — PARTIAL. _4.MD.C.6, M.EE.4.MD.6_  
   Partial: Measure/Estimate Angles (`angles_lines:measure_angles`), missing estimating an angle before measuring  
   Proposal: Draw Angles and Lines  
+  Vocabulary: estimate, benchmark, approximately  
 - **Y5.B10.S4** Measure angles up to 180° — covered. _4.MD.C.6, M.EE.4.MD.6_  
   Skills: Measure/Estimate Angles (`angles_lines:measure_angles`)  
+  Vocabulary: protractor, origin, baseline, degree (°)  
 - **Y5.B10.S5** Draw lines and angles accurately — GAP. _4.G.A.1, 4.MD.C.6, M.EE.4.G.1, M.EE.4.MD.6_  
   Proposal: Draw Angles and Lines  
+  Vocabulary: origin, centre point, zero line, inner, outer scale  
 - **Y5.B10.S6** Calculate angles around a point — PARTIAL. _4.MD.C.7_  
   Partial: Two Angles Sum (Visual) (`angles_lines:additive_angles`), missing angles around a point sum to 360°  
   Proposal: Angles Around a Point and on a Line (option)  
+  Vocabulary: full turn, sum, degree (°)  
 - **Y5.B10.S7** Calculate angles on a straight line — PARTIAL. _4.MD.C.7_  
   Partial: Two Angles Sum (Visual) (`angles_lines:additive_angles`), missing angles on a straight line sum to 180°  
   Proposal: Angles Around a Point and on a Line (option)  
+  Vocabulary: straight line, half turn, adjacent, sum  
 - **Y5.B10.S8** Lengths and angles in shapes — GAP. _4.G.A.2, 4.MD.C.7, M.EE.4.G.2_  
   Proposal: Lengths and Angles in Shapes  
+  Vocabulary: interior angle, diagonal, compose  
 - **Y5.B10.S9** Regular and irregular polygons — GAP. _4.G.A.2, 5.G.B.3, M.EE.4.G.2, M.EE.5.G.3_  
   Proposal: Regular and Irregular Polygons  
+  Vocabulary: polygon, regular, irregular  
 - **Y5.B10.S10** 3-D shapes — PARTIAL. _1.G.A.1, M.EE.1.G.1_  
   Partial: Count Edges, Faces & Vertices on 3D Shape (Visual) (`shapes_early:count_edges_faces_vertices`), missing naming prisms and pyramids and matching 2-D views  
   Proposal: 3-D Shapes: Names and Properties  
+  Vocabulary: face, edge, vertex  
 
 #### Y5.B11 Summer Block 2: Position and direction
 
 - **Y5.B11.S1** Read and plot coordinates — covered. _4.G.A.1, 5.G.A.1, M.EE.4.G.1, M.EE.5.G.1_  
   Skills: Coordinates (Quadrant I) (`coordinates:coordinate_q1`)  
+  Vocabulary: axis, coordinate, x-coordinate, y-coordinate  
 - **Y5.B11.S2** Problem solving with coordinates — PARTIAL. _4.G.A.1, 5.G.A.1, M.EE.4.G.1, M.EE.5.G.1_  
   Partial: Polygon on Coord Grid (Side Lengths/Perimeter) (`coordinates:coord_polygon`), missing finding a missing vertex of a shape from coordinates  
   Proposal: Translate on a Grid  
+  Vocabulary: coordinate, vertex, axis  
 - **Y5.B11.S3** Translation — covered. _4.G.A.1, 5.G.A.1, M.EE.4.G.1, M.EE.5.G.1_  
   Skills: Translations (Visual, MC) (`coordinates:geo_translate`)  
+  Vocabulary: translate, squares, left, right, up, down  
 - **Y5.B11.S4** Translation with coordinates — PARTIAL. _4.G.A.1, 5.G.A.1, M.EE.4.G.1, M.EE.5.G.1_  
   Partial: Translations (Visual, MC) (`coordinates:geo_translate`), missing writing the new coordinates after a translation  
   Proposal: Translate on a Grid  
+  Vocabulary: translate, coordinate, vertex  
 - **Y5.B11.S5** Lines of symmetry — covered. _4.G.A.3, M.EE.4.G.3_  
   Skills: Lines of Symmetry (`angles_lines:symmetry`); Draw Lines of Symmetry (`angles_lines:place_symmetry_lines`)  
+  Vocabulary: line of symmetry, vertical, horizontal, diagonal  
 - **Y5.B11.S6** Reflection in horizontal and vertical lines — PARTIAL. _4.G.A.1, 5.G.A.1, M.EE.4.G.1, M.EE.5.G.1_  
   Partial: Reflections (Visual, MC) (`coordinates:geo_reflect`), missing reflecting in a horizontal or vertical line on a square grid by drawing  
   Proposal: Reflect on a Grid  
+  Vocabulary: reflect, mirror line, vertex, horizontal, vertical  
 
 #### Y5.B12 Summer Block 3: Decimals
 
 - **Y5.B12.S1** Use known facts to add and subtract decimals within 1 — GAP. _4.NBT.B.4, 5.NBT.B.7, M.EE.4.NBT.4, M.EE.5.NBT.7_  
   Proposal: Decimals from Known Facts  
+  Vocabulary: tenths, hundredths, exchange  
 - **Y5.B12.S2** Complements to 1 — GAP. _5.NBT.B.7, M.EE.5.NBT.7_  
   Proposal: Decimals from Known Facts  
+  Vocabulary: whole, complement, hundredths  
 - **Y5.B12.S3** Add and subtract decimals across 1 — covered. _4.NBT.B.4, 5.NBT.B.7, M.EE.4.NBT.4, M.EE.5.NBT.7_  
   Skills: Adding Decimals (`decimals:add_decimal`); Subtracting Decimals (`decimals:sub_decimal`)  
+  Vocabulary: bridge, cross 1, partition, complement  
 - **Y5.B12.S4** Add decimals with the same number of decimal places — covered. _4.NBT.B.4, 5.NBT.B.7, M.EE.4.NBT.4, M.EE.5.NBT.7_  
   Skills: Adding Decimals (`decimals:add_decimal`)  
+  Vocabulary: tenths, hundredths, exchange  
 - **Y5.B12.S5** Subtract decimals with the same number of decimal places — covered. _4.NBT.B.4, 5.NBT.B.7, M.EE.4.NBT.4, M.EE.5.NBT.7_  
   Skills: Subtracting Decimals (`decimals:sub_decimal`)  
+  Vocabulary: tenths, hundredths, exchange  
 - **Y5.B12.S6** Add decimals with different numbers of decimal places — covered. _4.NBT.B.4, 5.NBT.B.7, M.EE.4.NBT.4, M.EE.5.NBT.7_  
   Skills: Adding Decimals (`decimals:add_decimal`) {different decimal places}  
+  Vocabulary: placeholder, hundredths, exchange  
 - **Y5.B12.S7** Subtract decimals with different numbers of decimal places — covered. _4.NBT.B.4, 5.NBT.B.7, M.EE.4.NBT.4, M.EE.5.NBT.7_  
   Skills: Subtracting Decimals (`decimals:sub_decimal`) {different decimal places}  
+  Vocabulary: decimal place, placeholder, exchange  
 - **Y5.B12.S8** Efficient strategies for adding and subtracting decimals — GAP. _4.NBT.B.4, 5.NBT.B.7, M.EE.4.NBT.4, M.EE.5.NBT.7_  
   Proposal: Decimals from Known Facts  
+  Vocabulary: efficient, strategy, adjust, compensate  
 - **Y5.B12.S9** Decimal sequences — GAP. _4.OA.C.5, 5.NBT.B.7, M.EE.4.OA.5, M.EE.5.NBT.7_  
   Proposal: Decimal Sequences  
+  Vocabulary: sequence, term, rule, increasing, decreasing  
 - **Y5.B12.S10** Multiply by 10, 100 and 1,000 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {×, decimals on}  
+  Vocabulary: times greater, place, column, placeholder zero  
 - **Y5.B12.S11** Divide by 10, 100 and 1,000 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {÷, decimals on}  
+  Vocabulary: divide, placeholder zero, to the right  
 - **Y5.B12.S12** Multiply and divide decimals - missing values — GAP. _5.NBT.A.2, M.EE.5.NBT.2_  
   Proposal: Multiply and Divide Decimals: Missing Values (option)  
+  Vocabulary: inverse, missing value, to the left  
 
 #### Y5.B13 Summer Block 4: Negative numbers
 
 - **Y5.B13.S1** Understand negative numbers — covered. _6.NS.C.6, M.EE.6.NS.6_  
   Skills: Number Lines with Negatives (`integers:number_line_int`); Place Integers on a Number Line (`integers:integer_nl_drag`)  
+  Vocabulary: negative, positive, scale, interval  
 - **Y5.B13.S2** Count through zero in 1s — GAP. _6.NS.C.6, M.EE.6.NS.6_  
   Proposal: Count Through Zero  
+  Vocabulary: negative, positive, count on  
 - **Y5.B13.S3** Count through zero in multiples — GAP. _6.NS.C.6, M.EE.6.NS.6_  
   Proposal: Count Through Zero  
+  Vocabulary: multiple, interval, mirror  
 - **Y5.B13.S4** Compare and order negative numbers — covered. _6.NS.C.7, M.EE.6.NS.7_  
   Skills: Comparing Integers (`integers:compare_int`); Order Integers: Least to Greatest (`integers:order_negatives`)  
+  Vocabulary: greater than, less than, ascending, descending  
 - **Y5.B13.S5** Find the difference — PARTIAL. _6.NS.C.7, M.EE.6.NS.7_  
   Partial: Subtracting Integers (`integers:sub_int`), missing finding the difference between a positive and a negative number on a number line  
   Proposal: Count Through Zero  
+  Vocabulary: difference, negative, distance to zero  
 
 #### Y5.B14 Summer Block 5: Converting units
 
 - **Y5.B14.S1** Kilograms and kilometres — covered. _4.MD.A.1, M.EE.4.MD.1_  
   Skills: Measurement Conversions (Visual) (`measurement:unit_conversions`); Metric Length (mm/cm/m/km) (`measurement:length_metric`) {km and m}  
+  Vocabulary: kilo, convert, mass (kg — how heavy) vs distance (km — how far)  
 - **Y5.B14.S2** Millimetres and millilitres — covered. _4.MD.A.1, M.EE.4.MD.1_  
   Skills: Capacity/Volume Units (`measurement:capacity`) {mL}; Metric Length (mm/cm/m/km) (`measurement:length_metric`) {mm}  
+  Vocabulary: milli, millimetre (mm), millilitre (ml)  
 - **Y5.B14.S3** Convert units of length — covered. _4.MD.A.1, 5.MD.A.1, M.EE.4.MD.1, M.EE.5.MD.1_  
   Skills: Metric Length (mm/cm/m/km) (`measurement:length_metric`); Unit Conversion Word Problems (`measurement:unit_conversion_word`)  
+  Vocabulary: centi-, centimetre (cm), convert  
 - **Y5.B14.S4** Convert between metric and imperial units — GAP. _4.MD.A.1, M.EE.4.MD.1_  
   Proposal: Metric and Imperial Units  
+  Vocabulary: metric, imperial, approximately (≈)  
 - **Y5.B14.S5** Convert units of time — GAP. _4.MD.A.1, M.EE.4.MD.1_  
   Proposal: Convert Units of Time (option)  
+  Vocabulary: convert, remainder, leap year  
 - **Y5.B14.S6** Calculate with timetables — GAP. _4.MD.A.2, M.EE.4.MD.2_  
   Proposal: Timetables  
+  Vocabulary: timetable, duration  
 - _Awsaj supplement (not a WRM step):_ Customary capacity: cups, pints, quarts and gallons — 4.MD.A.1
 - _Awsaj supplement (not a WRM step):_ Customary length and weight - inches, feet, yards, ounces and pounds — 4.MD.A.1
 - _Awsaj supplement (not a WRM step):_ Measurement word problems: distance, time, mass, money and capacity — 4.MD.A.2
@@ -2575,13 +3324,17 @@ whatever happens to the WRM gaps.
 
 - **Y5.B15.S1** Cubic centimetres — GAP. _5.MD.C.3, 5.MD.C.4, M.EE.5.MD.3, M.EE.5.MD.4_  
   Proposal: Volume by Counting Cubes  
+  Vocabulary: volume, cubic centimetre (cm³)  
 - **Y5.B15.S2** Compare volume — GAP. _5.MD.C.4, M.EE.5.MD.4_  
   Proposal: Volume by Counting Cubes  
+  Vocabulary: volume, layer  
 - **Y5.B15.S3** Estimate volume — GAP. _5.MD.C.4, M.EE.5.MD.4_  
   Proposal: Volume by Counting Cubes  
+  Vocabulary: estimate, layer  
 - **Y5.B15.S4** Estimate capacity — PARTIAL. _3.MD.A.2, M.EE.3.MD.2_  
   Partial: Capacity/Volume Units (`measurement:capacity`), missing estimating capacity in ml and l  
   Proposal: Volume by Counting Cubes  
+  Vocabulary: capacity, volume, approximately  
 
 ### Year 6 (US grade 5)
 
@@ -2589,170 +3342,236 @@ whatever happens to the WRM gaps.
 
 - **Y6.B1.S1** Numbers to 1,000,000 — covered. _5.NBT.A.1, 4.NBT.A.2, M.EE.5.NBT.1, M.EE.4.NBT.2_  
   Skills: Write the Digits in a Place-Value Chart (`placevalue:pv_digit_drag`) {band 999999}; Choose the Word Name (`placevalue:number_word_names`)  
+  Vocabulary: column, place value, placeholder, partition  
 - **Y6.B1.S2** Numbers to 10,000,000 — GAP. _5.NBT.A.1, 4.NBT.A.2, M.EE.5.NBT.1, M.EE.4.NBT.2_  
   Proposal: Numbers to 10,000,000 (option)  
+  Vocabulary: million, digit, placeholder zero  
 - **Y6.B1.S3** Read and write numbers to 10,000,000 — GAP. _5.NBT.A.1, 4.NBT.A.2, M.EE.5.NBT.1, M.EE.4.NBT.2_  
   Proposal: Numbers to 10,000,000 (option)  
+  Vocabulary: millions, thousands, ones, placeholder, comma  
 - **Y6.B1.S4** Powers of 10 — covered. _5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`)  
+  Vocabulary: power of 10, times the size, one-tenth the size  
 - **Y6.B1.S5** Number line to 10,000,000 — GAP. _5.NBT.A.1, M.EE.5.NBT.1_  
   Proposal: Numbers to 10,000,000 (option)  
+  Vocabulary: interval, difference, midpoint  
 - **Y6.B1.S6** Compare and order any integers — covered. _4.NBT.A.2, M.EE.4.NBT.2_  
   Skills: Order Integers: Least to Greatest (`integers:order_negatives`); Compare Numbers (>, <, =) (`placevalue:compare`) {band 999999}; Order: Least to Greatest (`placevalue:order_least_to_greatest`)  
+  Vocabulary: greater than, less than, ascending, descending  
 - **Y6.B1.S7** Round any integer — covered. _4.NBT.A.3, M.EE.4.NBT.3_  
   Skills: Round to Nearest 100,000 (`number_sense:nearest_100000`); Round to Nearest 1,000,000 (`number_sense:nearest_million`); Rounding Sort: Nearest 1,000,000 (`number_sense:round_sort_million`)  
+  Vocabulary: multiple, previous, next, round  
 - **Y6.B1.S8** Negative numbers — covered. _6.NS.C.6, 6.NS.C.7, M.EE.6.NS.6, M.EE.6.NS.7_  
   Skills: Number Lines with Negatives (`integers:number_line_int`); Comparing Integers (`integers:compare_int`); Order Integers: Least to Greatest (`integers:order_negatives`)  
+  Vocabulary: negative, difference, interval  
 
 #### Y6.B2 Autumn Block 2: Addition, subtraction, multiplication and division
 
 - **Y6.B2.S1** Add and subtract integers — covered. _4.NBT.B.4, M.EE.4.NBT.4_  
   Skills: Add within 1,000,000 (`addition:add_1m_mixed`); Subtract within 1,000,000 (`subtraction:sub_1m_mixed`)  
+  Vocabulary: integer, exchange, column  
 - **Y6.B2.S2** Common factors — PARTIAL. _4.OA.B.4, 6.NS.B.4, M.EE.4.OA.4_  
   Partial: Greatest Common Factor (Easy) (`number_theory:gcf_easy`), missing listing all common factors  
   Proposal: Common Multiples and Common Factors (option)  
+  Vocabulary: factor, common, pair  
 - **Y6.B2.S3** Common multiples — PARTIAL. _4.OA.B.4, 6.NS.B.4, M.EE.4.OA.4_  
   Partial: Least Common Multiple (`number_theory:lcm`), missing listing all common multiples  
   Proposal: Common Multiples and Common Factors (option)  
+  Vocabulary: multiple, common, common multiple  
 - **Y6.B2.S4** Rules of divisibility — PARTIAL. _4.OA.B.4, M.EE.4.OA.4_  
   Partial: Divisibility Sort (`number_theory:divisibility_sort`), missing stating and applying the divisibility rules  
   Proposal: Rules of Divisibility (option)  
+  Vocabulary: divisible, digit sum, ones digit  
 - **Y6.B2.S5** Primes to 100 — covered. _4.OA.B.4, M.EE.4.OA.4_  
   Skills: Prime vs Composite (`number_theory:prime_composite`)  
+  Vocabulary: factor, prime, composite  
 - **Y6.B2.S6** Square and cube numbers — GAP. _6.EE.A.1, M.EE.6.EE.1-2_  
   Proposal: Square and Cube Numbers  
+  Vocabulary: square number, cube number, squared, cubed  
 - **Y6.B2.S7** Multiply up to a 4-digit number by a 2-digit number — covered. _5.NBT.B.5, M.EE.5.NBT.5_  
   Skills: Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`)  
   Partial: Write the Placeholder Zero (`multiplication:mult_placeholder_zero`), missing the whole 4-digit by 2-digit calculation  
   Proposal: Long Multiplication and Division (4-digit)  
+  Vocabulary: partial product, placeholder zero, exchange  
 - **Y6.B2.S8** Solve problems with multiplication — covered. _5.NBT.B.5, 4.OA.A.3, M.EE.5.NBT.5, M.EE.4.OA.3_  
   Skills: Mixed Word Problems (+−×÷) (Visual) (`number_ops_mixed:word_problems_mixed`); Multi-Step Word Problems (Visual) (`algebra:multi_step_word`)  
+  Vocabulary: factor, adjust, efficient  
 - **Y6.B2.S9** Short division — covered. _5.NBT.B.6, M.EE.5.NBT.6_  
   Skills: Box Method Division (3÷1 digit) (`division:box_division_hard`); Zero in the Quotient (`division:div_zero_in_quotient`)  
+  Vocabulary: divisor, remainder, exchange  
 - **Y6.B2.S10** Division using factors — GAP. _5.NBT.B.6, 3.OA.B.5, M.EE.5.NBT.6_  
   Proposal: Division Using Factors  
+  Vocabulary: factor, factor pair, partition  
 - **Y6.B2.S11** Introduction to long division — covered. _5.NBT.B.6, M.EE.5.NBT.6_  
   Skills: Divide by 2-Digit Numbers (Visual) (`division:long_div_2digit`); Fix the Estimate (Long Division) (`division:div_fix_estimate`)  
+  Vocabulary: multiple, exchange, bring down  
 - **Y6.B2.S12** Long division with remainders — PARTIAL. _5.NBT.B.6, M.EE.5.NBT.6_  
   Partial: Divide by 2-Digit Numbers (Visual) (`division:long_div_2digit`), missing remainders written as r, a fraction or a decimal  
   Proposal: Long Division with Remainders (option)  
+  Vocabulary: remainder, round up, round down  
 - **Y6.B2.S13** Solve problems with division — covered. _5.NBT.B.6, 4.OA.A.3, M.EE.5.NBT.6, M.EE.4.OA.3_  
   Skills: Interpret the Remainder (Word Problems) (`division:remainder_interpret`); Remainder Contexts (Buses, Boxes, Cookies, Money, Cars) (`division:remainder_contexts`)  
+  Vocabulary: partition, divisor, remainder  
 - **Y6.B2.S14** Solve multi-step problems — covered. _4.OA.A.3, M.EE.4.OA.3_  
   Skills: Mixed Word Problems (+−×÷) (Visual) (`number_ops_mixed:word_problems_mixed`); Multi-Step Word Problems (Visual) (`algebra:multi_step_word`); Multi-Step Word Problems (No Pictures) (`algebra:multi_step_word_plain`)  
+  Vocabulary: step, altogether, spare, left  
 - **Y6.B2.S15** Order of operations — covered. _5.OA.A.1_  
   Skills: OoO Medium: Parentheses (`order_of_operations:oop_medium`); Level 1: Two Operations (`order_of_operations:two_ops_no_paren`); Level 4: Simple Parentheses (`order_of_operations:paren_simple`)  
+  Vocabulary: operation, priority, brackets  
 - **Y6.B2.S16** Mental calculations and estimation — PARTIAL. _5.OA.A.2, 4.NBT.A.3, M.EE.4.NBT.3_  
   Partial: Estimate Products (`number_sense:estimate_products`), missing estimating and checking with all four operations  
   Proposal: Mental Calculation and Estimation  
+  Vocabulary: estimate, round, efficient, adjust  
 - **Y6.B2.S17** Reason from known facts — GAP. _5.NBT.B.5, 3.OA.B.5, M.EE.5.NBT.5_  
   Proposal: Reason from Known Facts  
+  Vocabulary: known fact, related fact, derive, adjust  
 
 #### Y6.B3 Autumn Block 3: Fractions A
 
 - **Y6.B3.S1** Equivalent fractions and simplifying — covered. _4.NF.A.1, M.EE.4.NF.1_  
   Skills: Equivalent Fractions (`fractions:equivalent`); Simplify Fractions (`fractions:simplify`)  
+  Vocabulary: simplify, simplest form, common factor  
 - **Y6.B3.S2** Equivalent fractions on a number line — GAP. _4.NF.A.1, M.EE.4.NF.1_  
   Proposal: Equivalent Fractions on a Number Line (option)  
+  Vocabulary: equivalent, interval, simplify  
 - **Y6.B3.S3** Compare and order (denominator) — covered. _4.NF.A.2, M.EE.4.NF.2_  
   Skills: Order Fractions (`fractions:order_fractions`); Compare Fractions (LCD) (`fractions:compare_frac_lcd`)  
+  Vocabulary: numerator, denominator, common denominator  
 - **Y6.B3.S4** Compare and order (numerator) — GAP. _4.NF.A.2, M.EE.4.NF.2_  
   Proposal: Compare Fractions by Numerator (option)  
+  Vocabulary: numerator, denominator, common numerator  
 - **Y6.B3.S5** Add and subtract simple fractions — covered. _5.NF.A.1, M.EE.5.NF.1_  
   Skills: Add Fractions (Unlike Denom) (Visual) (`fraction_operations:add_frac_unlike`); Subtract Fractions (Unlike Denom) (Visual) (`fraction_operations:sub_frac_unlike`)  
+  Vocabulary: common denominator, equivalent, simplify  
 - **Y6.B3.S6** Add and subtract any two fractions — covered. _5.NF.A.1, M.EE.5.NF.1_  
   Skills: Add Fractions (Unlike Denom) (No Visuals) (`fraction_operations:add_frac_unlike_nv`); Subtract Fractions (Unlike Denom) (No Visuals) (`fraction_operations:sub_frac_unlike_nv`)  
+  Vocabulary: common denominator, lowest common multiple, equivalent  
 - **Y6.B3.S7** Add mixed numbers — covered. _5.NF.A.1, M.EE.5.NF.1_  
   Skills: Add Mixed Numbers (Unlike Denom) (Visual) (`fraction_operations:add_mixed_unlike`); Add Mixed Numbers (Unlike Denom) (No Visuals) (`fraction_operations:add_mixed_unlike_nv`)  
+  Vocabulary: mixed number, improper fraction, regroup  
 - **Y6.B3.S8** Subtract mixed numbers — covered. _5.NF.A.1, M.EE.5.NF.1_  
   Skills: Subtract Mixed Numbers (Unlike Denom) (Visual) (`fraction_operations:sub_mixed_unlike`); Subtract Mixed Numbers (Unlike Denom) (No Visuals) (`fraction_operations:sub_mixed_unlike_nv`)  
+  Vocabulary: like fractions, break the whole, improper fraction  
 - **Y6.B3.S9** Multi-step problems — PARTIAL. _5.NF.A.2_  
   Partial: Fraction Word Problems (+/−) (Visual) (`fraction_operations:frac_word_problems`), missing multi-step problems with unlike denominators  
   Proposal: Multi-Step Fraction Problems  
+  Vocabulary: left, remaining, more than, difference, altogether  
 - _Awsaj supplement (not a WRM step):_ Multiplication as scaling — 5.NF.B.5, 5.NF.B.5a, 5.NF.B.5b
 
 #### Y6.B4 Autumn Block 4: Fractions B
 
 - **Y6.B4.S1** Multiply fractions by integers — covered. _5.NF.B.4_  
   Skills: Fraction × Whole Number (Visual) (`fraction_operations:mult_frac_whole`); Fraction × Whole Number (No Visuals) (`fraction_operations:mult_frac_whole_nv`)  
+  Vocabulary: numerator, denominator, integer  
 - **Y6.B4.S2** Multiply fractions by fractions — covered. _5.NF.B.4_  
   Skills: Fraction × Fraction (No Visuals) (`fraction_operations:mult_frac_frac_nv`); Fraction × Fraction (Visual) (`fraction_operations:mult_frac_frac`)  
+  Vocabulary: of, overlap, simplify  
 - **Y6.B4.S3** Divide a fraction by an integer — covered. _5.NF.B.7_  
   Skills: Divide with Unit Fractions (No Visuals) (`fraction_operations:div_unit_frac_nv`); Divide with Unit Fractions (Visual) (`fraction_operations:div_unit_fraction`) {fraction ÷ whole}  
+  Vocabulary: numerator, denominator, unitise  
 - **Y6.B4.S4** Divide any fraction by an integer — PARTIAL. _5.NF.B.7_  
   Partial: Divide with Unit Fractions (No Visuals) (`fraction_operations:div_unit_frac_nv`), missing a non-unit fraction divided by an integer (4/5 ÷ 3)  
   Proposal: Mixed Fraction Questions  
+  Vocabulary: numerator, denominator, re-partition  
 - **Y6.B4.S5** Mixed questions with fractions — GAP. _5.NF.B.6_  
   Proposal: Mixed Fraction Questions  
+  Vocabulary: perimeter, area, share equally  
 - **Y6.B4.S6** Fraction of an amount — covered. _5.NF.B.4_  
   Skills: Fraction of a Set - Hard (Visual) (`fractions:fraction_of_set_hard`); Fraction of a Set - Hard (No Visuals) (`fractions:fraction_of_set_hard_nv`)  
+  Vocabulary: denominator, numerator, each part  
 - **Y6.B4.S7** Fraction of an amount - find the whole — PARTIAL. _5.NF.B.4_  
   Partial: Fraction of a Set - Hard (No Visuals) (`fractions:fraction_of_set_hard_nv`), missing a page of find-the-whole only, with a bar model  
   Proposal: Fraction of an Amount: Find the Whole (option)  
+  Vocabulary: whole, numerator, denominator  
 - _Awsaj supplement (not a WRM step):_ Divide a whole number by a unit fraction — 5.NF.B.7, 5.NF.B.7b, 5.NF.B.7c
 
 #### Y6.B5 Autumn Block 5: Converting units
 
 - **Y6.B5.S1** Metric measures — covered. _5.MD.A.1, M.EE.5.MD.1_  
   Skills: Measurement Conversions (Visual) (`measurement:unit_conversions`); Metric Length (mm/cm/m/km) (`measurement:length_metric`)  
+  Vocabulary: length, mass, capacity  
 - **Y6.B5.S2** Convert metric measures — covered. _5.MD.A.1, 4.MD.A.1, M.EE.5.MD.1, M.EE.4.MD.1_  
   Skills: Capacity/Volume Units (`measurement:capacity`); Metric Length (mm/cm/m/km) (`measurement:length_metric`)  
+  Vocabulary: convert, milli-, centi-  
 - **Y6.B5.S3** Calculate with metric measures — GAP. _5.MD.A.1, M.EE.5.MD.1_  
   Proposal: Calculate with Metric Measures  
+  Vocabulary: total, times as much, how much left  
 - **Y6.B5.S4** Miles and kilometres — GAP. _5.MD.A.1, M.EE.5.MD.1_  
   Proposal: Miles and Kilometres  
+  Vocabulary: mile, ≈, scale  
 - **Y6.B5.S5** Imperial measures — covered. _5.MD.A.1, M.EE.5.MD.1_  
   Skills: Measurement Conversions (Visual) (`measurement:unit_conversions`); Customary Length (in/ft/yd/mi) (`measurement:length_customary`)  
+  Vocabulary: imperial, foot, inch, ounce, pound, stone, pint, gallon  
 
 #### Y6.B6 Spring Block 1: Ratio
 
 - **Y6.B6.S1** Add or multiply — GAP. _5.NF.B.5, 4.OA.A.2, M.EE.4.OA.2_  
   Proposal: Add or Multiply?  
+  Vocabulary: additive, multiplicative, times the size  
 - **Y6.B6.S2** Use ratio language — covered. _6.RP.A.1, M.EE.6.RP.1_  
   Skills: Write Ratios (a:b) (`conversions:ratio_intro`)  
+  Vocabulary: for every, ratio, common factor  
 - **Y6.B6.S3** Introduction to the ratio symbol — covered. _6.RP.A.1, M.EE.6.RP.1_  
   Skills: Write Ratios (a:b) (`conversions:ratio_intro`); Equivalent Ratios (`conversions:equiv_ratios`)  
+  Vocabulary: ratio, colon ( : ), order  
 - **Y6.B6.S4** Ratio and fractions — PARTIAL. _6.RP.A.1, M.EE.6.RP.1_  
   Partial: Write Ratios (a:b) (`conversions:ratio_intro`), missing linking a ratio to fractions of the whole  
   Proposal: Ratio and Fractions (option)  
+  Vocabulary: ratio, fraction, whole  
 - **Y6.B6.S5** Scale drawing — GAP. _6.RP.A.3_  
   Proposal: Scale Drawing and Scale Factors  
+  Vocabulary: scale drawing, proportion, represents  
 - **Y6.B6.S6** Use scale factors — PARTIAL. _5.NF.B.5, 6.RP.A.3_  
   Partial: Multiplication as Scaling (Visual) (`fraction_operations:mult_scaling`), missing scale factors applied to shapes and lengths  
   Proposal: Scale Drawing and Scale Factors  
+  Vocabulary: enlarge, scale factor, original  
 - **Y6.B6.S7** Similar shapes — GAP. _6.RP.A.3_  
   Proposal: Scale Drawing and Scale Factors  
+  Vocabulary: similar, corresponding, proportion  
 - **Y6.B6.S8** Ratio problems — covered. _6.RP.A.3_  
   Skills: Equivalent Ratios (`conversions:equiv_ratios`); Ratio Tables (Find Missing Value) (`conversions:ratio_tables`)  
+  Vocabulary: ratio, part, scale  
 - **Y6.B6.S9** Proportion problems — covered. _6.RP.A.3_  
   Skills: Compute Unit Rates (`conversions:unit_rate_intro`); Double Number Lines (Visual) (`conversions:double_num_line`)  
+  Vocabulary: proportion, double number line, per, each  
 - **Y6.B6.S10** Recipes — PARTIAL. _6.RP.A.3_  
   Partial: Ratio Tables (Find Missing Value) (`conversions:ratio_tables`), missing recipes: scaling a list of ingredients up or down  
   Proposal: Ratio and Proportion Problems  
+  Vocabulary: scale, tbsp, tsp, per portion  
 
 #### Y6.B7 Spring Block 2: Algebra
 
 - **Y6.B7.S1** 1-step function machines — covered. _5.OA.A.2_  
   Skills: Function Tables - Easy (Visual) (`algebra:function_table_easy`)  
+  Vocabulary: input, output, function  
 - **Y6.B7.S2** 2-step function machines — PARTIAL. _5.OA.A.2_  
   Partial: Function Tables - Hard (Visual) (`algebra:function_table_hard`), missing two operations in sequence and working backwards  
   Proposal: Function Machines  
+  Vocabulary: function, inverse, in order  
 - **Y6.B7.S3** Form expressions — covered. _6.EE.A.2a_  
   Skills: Write Expressions from Words (`algebra:write_expression`)  
+  Vocabulary: expression, coefficient, simplify  
 - **Y6.B7.S4** Substitution — covered. _6.EE.A.2c_  
   Skills: Evaluate Expressions (Easy) (`algebra:evaluate_expression`); Evaluate Expressions (Multi-Step) (`algebra:evaluate_expression_hard`)  
+  Vocabulary: substitute, expression, value  
 - **Y6.B7.S5** Formulae — GAP. _5.OA.A.2, 6.EE.A.2c_  
   Proposal: Formulae  
+  Vocabulary: formula, variable, represents  
 - **Y6.B7.S6** Form equations — covered. _6.EE.B.6, 6.EE.B.7, M.EE.6.EE.5-7_  
   Skills: Write Equations from Words (`algebra:write_equation`)  
+  Vocabulary: expression, equation, equals  
 - **Y6.B7.S7** Solve 1-step equations — covered. _6.EE.B.7, M.EE.6.EE.5-7_  
   Skills: Solve One-Step Equations (+/−) (`algebra:solve_eq_addsub`); Solve One-Step Equations (×/÷) (`algebra:solve_eq_multdiv`)  
+  Vocabulary: balanced, inverse, solve  
 - **Y6.B7.S8** Solve 2-step equations — covered. _3.OA.D.8, M.EE.3.OA.7_  
   Skills: Solve Two-Step Equations (`algebra:solve_eq_twostep`)  
+  Vocabulary: equation, inverse, both sides  
 - **Y6.B7.S9** Find pairs of values — GAP. _4.OA.B.4, 6.EE.B.6, M.EE.4.OA.4, M.EE.6.EE.5-7_  
   Proposal: Pairs of Values and Two Unknowns  
+  Vocabulary: unknown, integer, systematic  
 - **Y6.B7.S10** Solve problems with two unknowns — GAP. _3.OA.D.8, M.EE.3.OA.7_  
   Proposal: Pairs of Values and Two Unknowns  
+  Vocabulary: sum, difference, unknown  
 - _Awsaj supplement (not a WRM step):_ Form ordered pairs from corresponding terms — 5.OA.B.3
 - _Awsaj supplement (not a WRM step):_ Generate two sequences using two different rules — 5.OA.B.3
 
@@ -2761,120 +3580,168 @@ whatever happens to the WRM gaps.
 - **Y6.B8.S1** Place value within 1 — PARTIAL. _5.NBT.A.1, 5.NBT.A.3, M.EE.5.NBT.1, M.EE.5.NBT.3_  
   Partial: Compare Decimals to Thousandths (`decimals:compare_thousandths`), missing the value of each digit within 1  
   Proposal: Decimal Place Value (option)  
+  Vocabulary: tenths, hundredths, thousandths  
 - **Y6.B8.S2** Place value – integers and decimals — GAP. _5.NBT.A.1, 5.NBT.A.3, M.EE.5.NBT.1, M.EE.5.NBT.3_  
   Proposal: Decimal Place Value (option)  
+  Vocabulary: tenths, hundredths, thousandths  
 - **Y6.B8.S3** Round decimals — covered. _5.NBT.A.4, M.EE.5.NBT.4_  
   Skills: Round Decimals (Visual) (`decimals:round_decimals`); Round Thousandths (`decimals:round_thousandths`)  
+  Vocabulary: round, nearest, previous, next, midpoint  
 - **Y6.B8.S4** Add and subtract decimals — covered. _5.NBT.B.7, M.EE.5.NBT.7_  
   Skills: Adding Decimals (`decimals:add_decimal`); Subtracting Decimals (`decimals:sub_decimal`)  
+  Vocabulary: exchange, column, placeholder  
 - **Y6.B8.S5** Multiply by 10, 100 and 1,000 — covered. _5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {×, decimals on}  
+  Vocabulary: times the size, place, placeholder  
 - **Y6.B8.S6** Divide by 10, 100 and 1,000 — covered. _5.NBT.A.2, 5.NBT.B.7, M.EE.5.NBT.2, M.EE.5.NBT.7_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {÷, decimals on}  
+  Vocabulary: tenth, hundredth, place  
 - **Y6.B8.S7** Multiply decimals by integers — covered. _5.NBT.B.7, M.EE.5.NBT.7_  
   Skills: Multiplying Decimals (`decimals:mult_decimal`) {decimal × whole number}  
+  Vocabulary: tenth, hundredth, exchange, integer  
 - **Y6.B8.S8** Divide decimals by integers — covered. _5.NBT.B.7, M.EE.5.NBT.7_  
   Skills: Dividing Decimals (`decimals:div_decimal`) {decimal ÷ whole number}  
+  Vocabulary: integer, tenths, hundredths, exchange  
 - **Y6.B8.S9** Multiply and divide decimals in context — GAP. _5.NBT.B.7, M.EE.5.NBT.7_  
   Proposal: Multiply and Divide Decimals in Context (option)  
+  Vocabulary: whole, parts, unknown  
 
 #### Y6.B9 Spring Block 4: Fractions, decimals and percentages
 
 - **Y6.B9.S1** Decimal and fraction equivalents — covered. _5.NF.B.3, 4.NF.C.6_  
   Skills: Fraction → Decimal (`conversions:f_to_d`); Decimal → Fraction (`conversions:d_to_f`)  
+  Vocabulary: equivalent, denominator, tenth, hundredth  
 - **Y6.B9.S2** Fractions as division — covered. _5.NF.B.3_  
   Skills: Fraction as Division (No Visuals) (`fraction_operations:frac_as_div_nv`); Fraction as Division (a/b = a÷b) (Visual) (`fraction_operations:frac_as_division`)  
+  Vocabulary: divide, share, exchange, recurring  
 - **Y6.B9.S3** Understand percentages — covered. _6.RP.A.3_  
   Skills: Percent Grid (Visual) (`conversions:percent_visual`)  
+  Vocabulary: per cent, percentage, %  
 - **Y6.B9.S4** Fractions to percentages — covered. _6.RP.A.3_  
   Skills: Fraction → Percent (`conversions:f_to_p`)  
+  Vocabulary: equivalent fraction, denominator, convert  
 - **Y6.B9.S5** Equivalent fractions, decimals and percentages — covered. _4.NF.C.6, 6.RP.A.3_  
   Skills: Fraction → Percent (`conversions:f_to_p`); Percent → Fraction (`conversions:p_to_f`); Decimal → Percent (`conversions:d_to_p`)  
+  Vocabulary: percent, equivalent, hundredths  
 - **Y6.B9.S6** Order fractions, decimals and percentages — covered. _4.NF.A.2, 6.RP.A.3, M.EE.4.NF.2_  
   Skills: Order Fractions, Decimals & Percents (`conversions:order_fdp`)  
+  Vocabulary: order, ascending, descending  
 - **Y6.B9.S7** Percentage of an amount – one step — covered. _6.RP.A.3_  
   Skills: Percent of a Number (`conversions:percent_of_number`)  
+  Vocabulary: percentage, the whole, divide  
 - **Y6.B9.S8** Percentage of an amount – multi-step — GAP. _6.RP.A.3_  
   Proposal: Percentages: Multi-Step and Missing Values (option)  
+  Vocabulary: made up of, combine, efficient  
 - **Y6.B9.S9** Percentages – missing values — covered. _6.RP.A.3_  
   Skills: Find the Whole from Percent (`conversions:find_whole_from_pct`)  
   Partial: Percent of a Number (`conversions:percent_of_number`), missing finding the percentage itself (12 is what percent of 40)  
   Proposal: Percentages: Multi-Step and Missing Values (option)  
+  Vocabulary: whole, percentage, lots of  
 
 #### Y6.B10 Spring Block 5: Area, perimeter and volume
 
 - **Y6.B10.S1** Shapes - same area — GAP. _3.MD.D.8_  
   Proposal: Same Area, Different Perimeter  
+  Vocabulary: area, square unit (cm²), factor pair  
 - **Y6.B10.S2** Area and perimeter — covered. _3.MD.D.8, 4.MD.A.3, M.EE.4.MD.3_  
   Skills: Area AND Perimeter (`area_perimeter:area_perimeter`)  
+  Vocabulary: area, perimeter, rectilinear  
 - **Y6.B10.S3** Area of a triangle – counting squares — GAP. _3.MD.C.6_  
   Proposal: Area of Triangles (option)  
+  Vocabulary: full square, half square, right-angled triangle  
 - **Y6.B10.S4** Area of a right-angled triangle — covered. _3.MD.C.7_  
   Skills: Area of a Triangle (b×h÷2) (`area_perimeter:area_triangle`)  
+  Vocabulary: base, perpendicular height, enclose  
 - **Y6.B10.S5** Area of any triangle — covered. _3.MD.C.7_  
   Skills: Area of a Triangle (b×h÷2) (`area_perimeter:area_triangle`)  
+  Vocabulary: base, perpendicular, perpendicular height  
 - **Y6.B10.S6** Area of a parallelogram — GAP. _3.MD.C.7_  
   Proposal: Area of a Parallelogram  
+  Vocabulary: base, perpendicular height, slant side  
 - **Y6.B10.S7** Volume - counting cubes — GAP. _5.MD.C.4, M.EE.5.MD.4_  
   Proposal: Volume by Counting Cubes  
+  Vocabulary: volume, layer, cubic centimetre (cm³)  
 - **Y6.B10.S8** Volume of a cuboid — covered. _5.MD.C.5, M.EE.5.MD.5_  
   Skills: Volume (Rectangular Prisms) (`area_perimeter:volume`)  
-- _Awsaj supplement (not a WRM step):_ Volume of composite solids — 5.MD.C.5, 5.MD.C.5c
+  Vocabulary: volume, layer, cubic cm (cm³)  
+- _Awsaj supplement (not a WRM step):_ Volume of composite solids — 5.MD.C.5, 5.MD.C.5c (no skill)
 
 #### Y6.B11 Spring Block 6: Statistics
 
 - **Y6.B11.S1** Line graphs — GAP. _5.G.A.2, M.EE.5.G.2_  
   Proposal: Line Graphs  
+  Vocabulary: axis, interval, estimate, key  
 - **Y6.B11.S2** Dual bar charts — GAP. _3.MD.B.3, M.EE.3.MD.3_  
   Proposal: Dual Bar Charts  
+  Vocabulary: key, interval, difference  
 - **Y6.B11.S3** Read and interpret pie charts — PARTIAL. _6.RP.A.3_  
   Partial: Pie Charts (`graphs:pie_chart`), missing reading fractions of the whole from a pie chart; the skill is tagged approximately  
   Proposal: Pie Charts  
+  Vocabulary: whole, sector, fraction of the whole  
 - **Y6.B11.S4** Pie charts with percentages — GAP. _6.RP.A.3_  
   Proposal: Pie Charts  
+  Vocabulary: percentage, total, sector  
 - **Y6.B11.S5** Draw pie charts — GAP. _4.MD.C.6, 6.RP.A.3, M.EE.4.MD.6_  
   Proposal: Pie Charts  
+  Vocabulary: angle, degrees (°), turn, sector  
 - **Y6.B11.S6** The mean — covered. _5.MD.B.2, M.EE.5.MD.2_  
   Skills: Mean (Average) (`data_analysis:mean`)  
+  Vocabulary: mean, total, items  
 - _Awsaj supplement (not a WRM step):_ Fraction line plots — 5.MD.B.2
 
 #### Y6.B12 Summer Block 1: Shape
 
 - **Y6.B12.S1** Measure and classify angles — covered. _4.MD.C.5, 4.MD.C.6, M.EE.4.MD.5, M.EE.4.MD.6_  
   Skills: Identify Angles (`angles_lines:identify_angles`); Measure/Estimate Angles (`angles_lines:measure_angles`)  
+  Vocabulary: acute, obtuse, reflex, origin  
 - **Y6.B12.S2** Calculate angles — covered. _4.MD.C.7_  
   Skills: Two Angles Sum (Visual) (`angles_lines:additive_angles`)  
+  Vocabulary: adjacent, sum, sector  
 - **Y6.B12.S3** Vertically opposite angles — GAP. _4.MD.C.7_  
   Proposal: Angle Rules  
+  Vocabulary: intersect, vertically opposite, equal  
 - **Y6.B12.S4** Angles in a triangle — GAP. _4.MD.C.7_  
   Proposal: Angle Rules  
+  Vocabulary: interior angle, sum, right angle  
 - **Y6.B12.S5** Angles in a triangle – special cases — GAP. _4.G.A.2, 4.MD.C.7, M.EE.4.G.2_  
   Proposal: Angle Rules  
+  Vocabulary: isosceles, equilateral, base angles  
 - **Y6.B12.S6** Angles in a triangle – missing angles — GAP. _4.MD.C.7_  
   Proposal: Angle Rules  
+  Vocabulary: angles on a line, angles at a point, vertically opposite  
 - **Y6.B12.S7** Angles in quadrilaterals — GAP. _4.MD.C.7_  
   Proposal: Angle Rules  
+  Vocabulary: interior angle, sum, opposite angles  
 - **Y6.B12.S8** Angles in polygons — GAP. _4.MD.C.7_  
   Proposal: Angle Rules  
+  Vocabulary: polygon, vertex, regular  
 - **Y6.B12.S9** Circles — GAP. _Beyond CCSS_  
   Proposal: Parts of a Circle  
+  Vocabulary: centre, radius, diameter, circumference  
 - **Y6.B12.S10** Draw shapes accurately — GAP. _4.G.A.1, 4.MD.C.6, M.EE.4.G.1, M.EE.4.MD.6_  
   Proposal: Draw Shapes Accurately  
+  Vocabulary: base, perpendicular height, protractor, accurate  
 - **Y6.B12.S11** Nets of 3-D shapes — covered. _6.G.A.4_  
   Skills: Identify Net of 3D Shape (Visual) (`shapes_classify:net_identify`)  
+  Vocabulary: net, face, edge  
 - _Awsaj supplement (not a WRM step):_ Classify two-dimensional figures in a hierarchy — 5.G.B.3, 5.G.B.4
 
 #### Y6.B13 Summer Block 2: Position and direction
 
 - **Y6.B13.S1** The first quadrant — covered. _5.G.A.1, 5.G.A.2, M.EE.5.G.1, M.EE.5.G.2_  
   Skills: Coordinates (Quadrant I) (`coordinates:coordinate_q1`); Coordinate Graphing (`coordinates:coordinate_graph`)  
+  Vocabulary: axis, coordinates, origin  
 - **Y6.B13.S2** Read and plot points in four quadrants — covered. _5.G.A.1, M.EE.5.G.1_  
   Skills: Coordinates (All 4 Quadrants) (`coordinates:coordinate_all`)  
+  Vocabulary: negative, quadrant, axis  
 - **Y6.B13.S3** Solve problems with coordinates — PARTIAL. _5.G.A.2, M.EE.5.G.2_  
   Partial: Polygon on Coord Grid (Side Lengths/Perimeter) (`coordinates:coord_polygon`), missing missing vertices and coordinates problems in four quadrants  
   Proposal: Coordinates in Four Quadrants (option)  
+  Vocabulary: vertex, horizontal, vertical  
 - **Y6.B13.S4** Translations — covered. _5.G.A.1, M.EE.5.G.1_  
   Skills: Translations (Visual, MC) (`coordinates:geo_translate`)  
+  Vocabulary: translate, vertex, corresponding  
 - **Y6.B13.S5** Reflections — covered. _5.G.A.1, M.EE.5.G.1_  
   Skills: Reflections (Visual, MC) (`coordinates:geo_reflect`)  
+  Vocabulary: reflection, mirror line, axis, distance  
 

@@ -337,7 +337,31 @@ registerSkill('composing:base10_build_hundreds', {
     wrongAnswer: blockWrong,
 });
 
-/* ===================================================================== hundreds_chart_fill */
+/* ================================================== hundreds_chart_fill, number_chart_fill */
+
+/**
+ * The worked steps of a chart window, reading only the numbers the WINDOW prints (2026-09-25:
+ * a window of one row, the chart to 10, has no number above or below; a steps line naming one
+ * pointed the pupil at a number that is not on the page). `t` is the first gap.
+ */
+function chartSteps(q) {
+    const t = num(Array.isArray(q.keyParts) && q.keyParts.length ? q.keyParts[0] : q.ans);
+    if (!Number.isFinite(t)) return [];
+    const win = obj(q.chartWindow);
+    const gaps = new Set((Array.isArray(q.keyParts) ? q.keyParts : [q.ans]).map(num));
+    const shows = (n) => {
+        if (gaps.has(n) || n < 1) return false;
+        if (!win || !Array.isArray(win.rows) || !Array.isArray(win.cols)) return true;
+        return win.rows.includes(Math.floor((n - 1) / 10)) && win.cols.includes((n - 1) % 10);
+    };
+    const out = [];
+    if ((t - 1) % 10 !== 0 && shows(t - 1)) out.push(step(`The number before is ${t - 1}. One more is ${t}.`));
+    if (shows(t - 10)) out.push(step(`The number above is ${t - 10}. Ten more is ${t}.`));
+    if (out.length < 2 && shows(t + 10)) out.push(step(`The number below is ${t + 10}. Ten less is ${t}.`));
+    if (out.length < 2 && t % 10 !== 0 && shows(t + 1)) out.push(step(`The number after is ${t + 1}. One less is ${t}.`));
+    out.push(step(`Write ${t}.`, [{ slot: 'answer', value: String(t) }]));
+    return out;
+}
 
 registerSkill('composing:hundreds_chart_fill', {
     strings: strings({
@@ -352,17 +376,7 @@ registerSkill('composing:hundreds_chart_fill', {
         say: 'The missing number is __.',
     }),
     misconceptions: ['wrong-row', 'reversed-digits', 'one-less'],
-    workedSteps: (q) => {
-        const t = num(q.ans);
-        if (!Number.isFinite(t)) return [];
-        const out = [];
-        if ((t - 1) % 10 !== 0) out.push(step(`The number before is ${t - 1}. One more is ${t}.`));
-        if (t > 10) out.push(step(`The number above is ${t - 10}. Ten more is ${t}.`));
-        if (out.length < 2 && t <= 90) out.push(step(`The number below is ${t + 10}. Ten less is ${t}.`));
-        if (out.length < 2 && t % 10 !== 0) out.push(step(`The number after is ${t + 1}. One less is ${t}.`));
-        out.push(step(`Write ${t}.`, [{ slot: 'answer', value: String(t) }]));
-        return out;
-    },
+    workedSteps: chartSteps,
     wrongAnswer: (q) => {
         const t = num(q.ans);
         if (!Number.isFinite(t)) return null;
@@ -371,6 +385,185 @@ registerSkill('composing:hundreds_chart_fill', {
         if (t >= 10 && t < 100 && t % 10 && rev !== t) c.push({ value: rev, misconception: 'reversed-digits', explain: `Wrote the digits of ${t} the wrong way round.` });
         c.push({ value: t - 1, misconception: 'one-less', explain: 'Wrote the number before, not the missing number.' });
         return chooseWrong(q, c);
+    },
+});
+
+// The same window cut from the chart of the hundreds and the thousands (owner, 2026-09-25).
+// Its real errors: the number from the wrong row (ten off), the number before, and a place-value
+// slip in a number with a zero inside it (1,005 written 105: the zero dropped).
+registerSkill('composing:number_chart_fill', {
+    strings: strings({
+        iCan: 'I Can find missing numbers on a number chart',
+        instructionKey: 'missing-many',
+        steps: [
+            'Look left: the number before. Add 1.',
+            'Look up: the number above. Add 10.',
+            'Both ways give the same number. Write it.',
+        ],
+        say: 'The missing number is __.',
+    }),
+    misconceptions: ['wrong-row', 'dropped-zero', 'one-less'],
+    workedSteps: chartSteps,
+    wrongAnswer: (q) => {
+        const t = num(q.ans);
+        if (!Number.isFinite(t)) return null;
+        const c = [{ value: t + 10, misconception: 'wrong-row', explain: 'Read the number from the wrong row.' }];
+        const s = String(t);
+        if (/\d0\d/.test(s)) c.push({ value: num(s.replace(/0(?=\d)/, '')), misconception: 'dropped-zero', explain: `Left out the zero in ${t}.` });
+        c.push({ value: t - 1, misconception: 'one-less', explain: 'Wrote the number before, not the missing number.' });
+        return chooseWrong(q, c);
+    },
+});
+
+/* ============================ add_5_pictures, tens_foundation_visual, classify_count, teen_compose */
+// O6 AP1 round 2 (2026-09-25): these four moved from gen-counting.js HTML to the kit's `counters`
+// cell (kinds join / tens / sort / teen), so they carry real providers: their own "I Can", a
+// library instruction, steps a K pupil can follow, and the two real errors of each.
+
+/** The payload of a kit `counters` item, when it is of `kind`. */
+const counterPay = (q, kind) => {
+    const c = obj(q && q.cell);
+    const p = c && c.template === 'counters' ? obj(c.payload) : null;
+    return p && p.kind === kind ? p : null;
+};
+const NOUN = { circle: 'circles', square: 'squares', triangle: 'triangles', star: 'stars', diamond: 'diamonds',
+    ball: 'balls', apple: 'apples', fish: 'fish', flower: 'flowers' };
+
+registerSkill('addition:add_5_pictures', {
+    strings: strings({
+        iCan: 'I Can add within 5 with pictures',
+        instructionKey: 'count-all',
+        steps: [
+            'Count the first group.',
+            'Keep counting into the second group.',
+            'The last number you say is how many in all.',
+            'Write it in the box.',
+        ],
+        say: '__ and __ make __.',
+        sayValues: (q) => { const p = counterPay(q, 'join'); return p ? [p.n, p.m, p.n + p.m] : null; },
+    }),
+    misconceptions: ['counted-one-group', 'counted-twice'],
+    workedSteps: (q) => {
+        const p = counterPay(q, 'join');
+        if (!p) return [];
+        const t = p.n + p.m;
+        return [
+            step(`Count the first group: ${countList(1, p.n)}.`),
+            step(`Keep counting: ${countList(p.n + 1, t)}.`),
+            step(`${p.n} and ${p.m} make ${t}. Write ${t}.`, [{ slot: 'answer', value: String(t) }]),
+        ];
+    },
+    wrongAnswer: (q) => {
+        const p = counterPay(q, 'join');
+        if (!p) return null;
+        return chooseWrong(q, [
+            { value: Math.max(p.n, p.m), misconception: 'counted-one-group', explain: 'Counted only one group.' },
+            { value: p.n + p.m + 1, misconception: 'counted-twice', explain: 'Counted one picture two times.' },
+        ]);
+    },
+});
+
+registerSkill('composing:tens_foundation_visual', {
+    strings: strings({
+        iCan: 'I Can count tens',
+        instructionKey: 'count-tens',
+        steps: [
+            'Read the rule: one rod is one ten.',
+            'Touch each rod. Say one ten for each.',
+            'Write how many tens.',
+        ],
+        say: 'There are __ tens.',
+        sayValues: (q) => { const p = counterPay(q, 'tens'); return p ? [p.n] : null; },
+    }),
+    misconceptions: ['wrote-the-value', 'counted-twice'],
+    workedSteps: (q) => {
+        const p = counterPay(q, 'tens');
+        if (!p) return [];
+        const thing = p.objects === 'frame' ? 'full frame' : 'rod';
+        return [
+            step(`One ${thing} is one ten.`),
+            step(`Count the ${thing}s: ${countList(1, p.n)}.`),
+            step(`${p.n} ten${p.n === 1 ? '' : 's'}. Write ${p.n}.`, [{ slot: 'answer', value: String(p.n) }]),
+        ];
+    },
+    wrongAnswer: (q) => {
+        const p = counterPay(q, 'tens');
+        if (!p) return null;
+        return chooseWrong(q, [
+            { value: p.n * 10, misconception: 'wrote-the-value', explain: `Wrote the value, ${p.n * 10}, not how many tens.` },
+            { value: p.n + 1, misconception: 'counted-twice', explain: 'Counted one ten two times.' },
+        ]);
+    },
+});
+
+registerSkill('comparing:classify_count', {
+    strings: strings({
+        iCan: 'I Can sort and count one kind',
+        instructionKey: 'count-kind',
+        steps: [
+            'Look at the box: it shows the kind to count.',
+            'Touch only that kind. Say one number for each.',
+            'Write how many.',
+        ],
+        say: 'There are __ __.',
+        sayValues: (q) => { const p = counterPay(q, 'sort'); return p ? [p.ans, NOUN[p.asked] || 'of them'] : null; },
+    }),
+    misconceptions: ['counted-every-object', 'counted-other-kind'],
+    workedSteps: (q) => {
+        const p = counterPay(q, 'sort');
+        if (!p) return [];
+        const noun = NOUN[p.asked] || 'objects';
+        return [
+            step(`The box shows ${noun}.`),
+            step(`Touch only the ${noun}: ${countList(1, p.ans)}.`),
+            step(`Write ${p.ans}.`, [{ slot: 'answer', value: String(p.ans) }]),
+        ];
+    },
+    wrongAnswer: (q) => {
+        const p = counterPay(q, 'sort');
+        if (!p) return null;
+        const bag = arr(p.bag) || [];
+        const other = bag.filter((s) => s !== p.asked);
+        const kinds = [...new Set(other)];
+        const c = [{ value: bag.length, misconception: 'counted-every-object', explain: 'Counted every object, not only one kind.' }];
+        if (kinds.length) c.push({ value: other.filter((s) => s === kinds[0]).length, misconception: 'counted-other-kind', explain: 'Counted a different kind.' });
+        return chooseWrong(q, c);
+    },
+});
+
+registerSkill('composing:teen_compose', {
+    strings: strings({
+        iCan: 'I Can make teen numbers: 10 and some ones',
+        instructionKey: 'missing',
+        steps: [
+            'The full ten frame is 10.',
+            'Count the ones outside the frame.',
+            '10 and the ones make the teen number.',
+            'Write the missing number.',
+        ],
+        say: '10 and __ make __.',
+        sayValues: (q) => { const p = counterPay(q, 'teen'); return p ? [p.ones, 10 + p.ones] : null; },
+    }),
+    misconceptions: ['wrote-ones-for-teen', 'wrote-teen-for-ones'],
+    workedSteps: (q) => {
+        const p = counterPay(q, 'teen');
+        if (!p) return [];
+        const ten = p.objects === 'blocks' ? 'The rod is 10.' : 'The full frame is 10.';
+        return [
+            step(ten),
+            step(`Count the ones: ${countList(1, p.ones)}.`),
+            step(`10 and ${p.ones} make ${10 + p.ones}.`),
+            step(`Write ${p.ans}.`, [{ slot: 'answer', value: String(p.ans) }]),
+        ];
+    },
+    wrongAnswer: (q) => {
+        const p = counterPay(q, 'teen');
+        if (!p) return null;
+        return chooseWrong(q, p.askTotal
+            ? [{ value: p.ones, misconception: 'wrote-ones-for-teen', explain: 'Wrote only the ones, not 10 and the ones.' },
+                { value: 10 + p.ones + 1, misconception: 'wrote-teen-for-ones', explain: 'Counted one more than there are.' }]
+            : [{ value: 10 + p.ones, misconception: 'wrote-teen-for-ones', explain: 'Wrote the whole teen number, not the ones.' },
+                { value: p.ones + 1, misconception: 'wrote-ones-for-teen', explain: 'Counted one loose counter two times.' }]);
     },
 });
 

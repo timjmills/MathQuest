@@ -705,10 +705,10 @@ function showBoardCode() {
     const code = pupilCode(ui.result.code);
     const parts = code.split('-').filter(Boolean);
     const name = (ui.name || '').trim() || autoName(snapshotCurrentSet());
-    let host = 'the Maths Quest start screen';
+    let host = 'the Math Quest Pro start screen';
     try { host = new URL(ui.result.link).host || host; } catch (e) { /* keep the words */ }
     ov.innerHTML = `<div class="tv-boardcode-card">
-  <p class="tv-boardcode-kicker">Maths Quest</p>
+  <p class="tv-boardcode-kicker">Math Quest Pro</p>
   <h2 class="tv-boardcode-name" id="tvBoardName">${esc(name)}</h2>
   <ol class="tv-boardcode-steps">
     <li>1. Go to <strong>${esc(host)}</strong></li>

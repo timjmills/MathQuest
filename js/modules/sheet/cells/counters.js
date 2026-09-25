@@ -8,6 +8,8 @@
 //                                solid fill over 7 mm (INK-5). No count label (RP-1).
 //   takeaway  sub_5_pictures     n outline objects in one row, the first m crossed out with a bold
 //                                X, and the sentence `n − m = [ ]` under them.
+//   join / tens / sort / teen    add_5_pictures, tens_foundation_visual, classify_count and
+//                                teen_compose (O6 AP1 round 2, see "AP1 migrations" below).
 //   share     share_into_groups  n solid 5 mm counters in RUNS of the group size (4 mm between
 //                                two counters of a run, 9 mm between runs, 7 mm between lines),
 //                                so a pupil rings each run as one loop without two rings meeting
@@ -21,7 +23,7 @@
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import {
-    L, P, svg, root, box, slotValue, shapeOf, dot, cross, digitPt, textPt, squareMm, inlineBoxMm, INK, GREY, SW, n2, groupRuns, isTwin, looseArray,
+    L, P, B, svg, root, box, slotValue, shapeOf, dot, cross, digitPt, textPt, squareMm, inlineBoxMm, INK, GREY, SW, n2, groupRuns, isTwin, looseArray,
 } from './k2kit.js';
 
 const MINUS = '−';
@@ -80,7 +82,7 @@ function framePicture(ctx, n) {
 }
 
 /** P11: n pips as dice faces of up to six (17 = 6 + 6 + 5), each face the standard pattern. */
-function dicePicture(ctx, n) {
+export function dicePicture(ctx, n) {
     const s = 14, gap = 3;
     const faces = [];
     for (let left = n; left > 0; left -= 6) faces.push(Math.min(6, left));
@@ -107,6 +109,25 @@ function trackStrip(ctx, top) {
             + `font-family="Andika, sans-serif" fill="${INK}">${k}</text>`;
     }
     return svg(ctx, t * cw + 1, h + 1, body, { label: `number track 1 to ${t}` });
+}
+
+/**
+ * O6 AP1 "Objects: Counters in a five frame" (sub_5_pictures): the take-away in a FIVE frame
+ * (1 x 5, 12 mm cells, border 1.5 pt, interior 0.75 pt), n HOLLOW counters filled from the left
+ * (RP-11 set B, so the bold X of a taken counter reads on it), the first m crossed out.
+ */
+function takeawayFrame(ctx, n, m) {
+    const c = 12, w = 5 * c, h = c, o = SW.heavy / 2;
+    let body = `<path d="M${n2(o)} ${n2(o)}h${w}v${h}h${-w}Z" fill="none" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`;
+    let grid = '';
+    for (let k = 1; k < 5; k++) grid += `M${n2(o + k * c)} ${n2(o)}v${h}`;
+    body += `<path d="${grid}" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}"/>`;
+    for (let i = 0; i < n; i++) {
+        const cx = o + (i + 0.5) * c, cy = o + c / 2;
+        body += shapeOf('circle').draw(cx, cy, 8);
+        if (i < m) body += cross(cx, cy, 8);
+    }
+    return svg(ctx, w + 2 * o, h + 2 * o, body, { label: `${n} counters in a five frame, ${m} crossed out` });
 }
 
 function takeawayPicture(ctx, n, m, shape) {
@@ -145,6 +166,132 @@ function sharePicture(ctx, n, size) {
 const eqSpan = (ctx, s) => `<span style="font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;">${esc(s)}</span>`;
 const opSpan = (ctx, s) => `<span style="display:inline-block;width:1em;text-align:center;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;">${s}</span>`;
 
+/* ---------------------------------------------------- O6 AP1 migrations (2026-09-25, round 2)
+ * Four K-2 skills that were drawn by gen-counting.js HTML (printed by the legacy path) are drawn
+ * here, so paper, key and screen are one drawing and the picture-kind choice reaches all three:
+ *   join   add_5_pictures          two groups joined by +, then `n + m = [ ]`
+ *   tens   tens_foundation_visual  n rods of ten (or n full ten frames), then `[ ] tens`
+ *   sort   classify_count          a key box with the kind to count, a mixed bag, the answer square
+ *   teen   teen_compose            a full ten and loose ones, then `10 + n = [ ]` / `10 + [ ] = t`
+ * Every object is outline or a solid counter under 7 mm (INK-5); nothing prints the answer (RP-1).
+ */
+
+/** `k` objects of one kind in one row (10 mm, 3 mm apart, RP-21). */
+function objectRow(ctx, k, shape) {
+    const d = 10, pitch = 13;
+    let body = '';
+    for (let i = 0; i < k; i++) body += shapeOf(shape).draw(1 + d / 2 + i * pitch, 1 + d / 2, d);
+    return svg(ctx, Math.max(1, k) * pitch - 3 + 2, d + 2, body, { label: `${k} ${shapeOf(shape).plural}` });
+}
+
+/** A five frame (12 mm cells) holding `a` solid counters then `b` hollow ones (RP-11 set A / set B). */
+function partFrame(ctx, a, b) {
+    const c = 12, o = SW.heavy / 2;
+    let body = `<path d="M${n2(o)} ${n2(o)}h${5 * c}v${c}h${-5 * c}Z" fill="none" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`;
+    let grid = '';
+    for (let k = 1; k < 5; k++) grid += `M${n2(o + k * c)} ${n2(o)}v${c}`;
+    body += `<path d="${grid}" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}"/>`;
+    for (let i = 0; i < a + b; i++) {
+        const cx = o + (i + 0.5) * c, cy = o + c / 2;
+        body += i < a ? dot(cx, cy, 6.5) : shapeOf('circle').draw(cx, cy, 7);
+    }
+    return svg(ctx, 5 * c + 2 * o, c + 2 * o, body, { label: `${a} and ${b} counters in a five frame` });
+}
+
+function joinPicture(ctx, p) {
+    const plus = opSpan(ctx, '+');
+    if (p.objects === 'frame') return partFrame(ctx, p.n, p.m);
+    const part = (k) => (p.objects === 'dice' ? dicePicture(ctx, k) : objectRow(ctx, k, p.shape));
+    return `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 3)};white-space:nowrap;">`
+        + `<div style="flex:none;">${part(p.n)}</div>${plus}<div style="flex:none;">${part(p.m)}</div></div>`;
+}
+
+/** n rods of ten, gridded (RP-30: u x 10u at u = 3.5 mm, the L unit; 0.5 pt unit lines), 4 mm apart. */
+function rodsPicture(ctx, n) {
+    const u = 3.5, gap = 4, o = SW.heavy / 2;
+    let body = '';
+    for (let i = 0; i < n; i++) {
+        const x = o + i * (u + gap);
+        body += `<rect x="${n2(x)}" y="${n2(o)}" width="${n2(u)}" height="${n2(10 * u)}" fill="#fff" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`;
+        let d = '';
+        for (let j = 1; j < 10; j++) d += `M${n2(x)} ${n2(o + j * u)}h${n2(u)}`;
+        body += `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${n2(SW.fine)}"/>`;
+    }
+    return svg(ctx, n * (u + gap) - gap + 2 * o, 10 * u + 2 * o, body, { label: `${n} rods of ten` });
+}
+
+/** n FULL ten frames (5 mm cells, 3.6 mm solid counters), three to a row. */
+function fullFrames(ctx, n) {
+    const c = 5, o = SW.heavy / 2, gapX = 4, gapY = 2.5, per = 3;
+    const fw = 5 * c, fh = 2 * c;
+    let body = '';
+    for (let f = 0; f < n; f++) {
+        const ox = o + (f % per) * (fw + gapX), oy = o + Math.floor(f / per) * (fh + gapY);
+        body += `<path d="M${n2(ox)} ${n2(oy)}h${fw}v${fh}h${-fw}Z" fill="none" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`;
+        let g = '';
+        for (let k = 1; k < 5; k++) g += `M${n2(ox + k * c)} ${n2(oy)}v${fh}`;
+        g += `M${n2(ox)} ${n2(oy + c)}h${fw}`;
+        body += `<path d="${g}" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}"/>`;
+        for (let i = 0; i < 10; i++) body += dot(ox + (i % 5 + 0.5) * c, oy + (Math.floor(i / 5) + 0.5) * c, 3.6);
+    }
+    const cols = Math.min(per, Math.max(1, n)), rows = Math.ceil(n / per);
+    return svg(ctx, cols * (fw + gapX) - gapX + 2 * o, rows * (fh + gapY) - gapY + 2 * o, body, { label: `${n} full ten frames` });
+}
+
+/** The rule a tens cell carries (BD-10: a rule reminder, never the instruction). */
+const ruleBox = (ctx, text) => `<div style="display:inline-block;border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 2.5)};`
+    + `padding:${L(ctx, 1)} ${L(ctx, 3)};font-size:${P(ctx, textPt(ctx))};line-height:1.3;">${esc(text)}</div>`;
+
+/** classify_count: the mixed bag in rows of five (RP-21; 9 mm objects, 12 mm pitch). */
+function bagPicture(ctx, bag) {
+    const d = 9, pitch = 12, cols = Math.min(5, bag.length), rows = Math.ceil(bag.length / cols);
+    let body = '';
+    bag.forEach((s, i) => { body += shapeOf(s).draw(0.5 + d / 2 + (i % cols) * pitch, 0.5 + d / 2 + Math.floor(i / cols) * pitch, d); });
+    return svg(ctx, (cols - 1) * pitch + d + 1, (rows - 1) * pitch + d + 1, body, { label: `${bag.length} mixed objects` });
+}
+/** The key: one specimen of the kind to count in a box (the referent of "Count only the stars"). */
+function keySpecimen(ctx, s) {
+    const w = 14, o = SW.heavy / 2;
+    const body = `<rect x="${n2(o)}" y="${n2(o)}" width="${n2(w - 2 * o)}" height="${n2(w - 2 * o)}" rx="2" fill="none" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`
+        + shapeOf(s).draw(w / 2, w / 2, 9);
+    return svg(ctx, w, w, body, { label: `count the ${shapeOf(s).plural}` });
+}
+
+/** teen_compose: a full ten frame over the loose ones, on the frame's own 9 mm columns. */
+function teenFrame(ctx, ones) {
+    const c = 9, o = SW.heavy / 2, gap = 4;
+    const rows = Math.ceil(ones / 5);
+    let body = `<path d="M${n2(o)} ${n2(o)}h${5 * c}v${2 * c}h${-5 * c}Z" fill="none" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`;
+    let g = '';
+    for (let k = 1; k < 5; k++) g += `M${n2(o + k * c)} ${n2(o)}v${2 * c}`;
+    g += `M${n2(o)} ${n2(o + c)}h${5 * c}`;
+    body += `<path d="${g}" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}"/>`;
+    for (let i = 0; i < 10; i++) body += dot(o + (i % 5 + 0.5) * c, o + (Math.floor(i / 5) + 0.5) * c, 6);
+    const top = o + 2 * c + gap;
+    for (let i = 0; i < ones; i++) body += dot(o + (i % 5 + 0.5) * c, top + (Math.floor(i / 5) + 0.5) * c, 6);
+    return svg(ctx, 5 * c + 2 * o, 2 * c + gap + rows * c + 2 * o, body, { label: `a full ten frame and ${ones} counters` });
+}
+/**
+ * teen_compose "blocks": one rod of ten (4 mm units, upright: 40 mm, the height of the ten frame
+ * and two rows of ones, so the page keeps its density) and the ones as cubes the size of one unit
+ * of the rod, 2 wide, standing on the rod's baseline.
+ */
+function teenBlocks(ctx, ones) {
+    const u = 4, o = SW.heavy / 2, gapX = 7, pitch = u + 1.5;
+    const cubeRows = Math.ceil(ones / 2);
+    const w = u + gapX + Math.min(2, ones) * pitch - 1.5 + 2 * o, h = 10 * u + 2 * o;
+    let body = `<rect x="${n2(o)}" y="${n2(o)}" width="${u}" height="${10 * u}" fill="#fff" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`;
+    let d = '';
+    for (let j = 1; j < 10; j++) d += `M${n2(o)} ${n2(o + j * u)}h${u}`;
+    body += `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}"/>`;
+    // the cubes stand on the rod's baseline
+    const y0 = o + 10 * u - (cubeRows * pitch - 1.5);
+    for (let i = 0; i < ones; i++) {
+        body += `<rect x="${n2(o + u + gapX + (i % 2) * pitch)}" y="${n2(y0 + Math.floor(i / 2) * pitch)}" width="${u}" height="${u}" fill="#fff" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`;
+    }
+    return svg(ctx, w, h, body, { label: `a rod of ten and ${ones} cubes` });
+}
+
 register('counters', {
     render(p, ctx) {
         const kv = p.ans;
@@ -154,7 +301,7 @@ register('counters', {
             // R3: `crossOnKey` (a story's work space) draws the objects uncrossed for the pupil, who
             // does the take-away; the key shows the crosses.
             const crossed = p.crossOnKey && ctx.state === 'blank' ? 0 : p.m;
-            return root(ctx, 'k2-takeaway', `<div style="display:flex;justify-content:center;">${takeawayPicture(ctx, p.n, crossed, p.shape)}</div>`
+            return root(ctx, 'k2-takeaway', `<div style="display:flex;justify-content:center;">${p.objects === 'frame' ? takeawayFrame(ctx, p.n, crossed) : takeawayPicture(ctx, p.n, crossed, p.shape)}</div>`
                 + `<div class="ws-eq" style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 1.5)};margin-top:${L(ctx, 5)};white-space:nowrap;">`
                 + `${eqSpan(ctx, p.n)}${opSpan(ctx, MINUS)}${eqSpan(ctx, p.m)}${opSpan(ctx, '=')}${slot}</div>`);
         }
@@ -165,6 +312,38 @@ register('counters', {
                 + `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 2.5)};margin-top:${L(ctx, 4)};`
                 + `font-size:${P(ctx, textPt(ctx) + 3)};white-space:nowrap;">${slot}<span>groups of</span>`
                 + `<span style="font-size:${P(ctx, digitPt(ctx))};font-weight:700;">${esc(p.size)}</span></div>`);
+        }
+        const eqRow = (parts) => `<div class="ws-eq" style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 1.5)};margin-top:${L(ctx, 5)};white-space:nowrap;">${parts.join('')}</div>`;
+        if (p.kind === 'join') {
+            const b = inlineBoxMm(ctx, 1);
+            const slot = box(ctx, { value: slotValue(ctx, 'answer', kv), w: b.w, h: b.h, mark: 'blank' });
+            return root(ctx, 'k2-join', `<div style="display:flex;justify-content:center;">${joinPicture(ctx, p)}</div>`
+                + eqRow([eqSpan(ctx, p.n), opSpan(ctx, '+'), eqSpan(ctx, p.m), opSpan(ctx, '='), slot]));
+        }
+        if (p.kind === 'tens') {
+            const b = inlineBoxMm(ctx, 1);
+            const slot = box(ctx, { value: slotValue(ctx, 'answer', kv), w: b.w, h: b.h, mark: 'blank' });
+            const frames = p.objects === 'frame';
+            return root(ctx, 'k2-tens', `<div>${ruleBox(ctx, frames ? 'One full frame is one ten.' : 'One rod is one ten.')}</div>`
+                + `<div style="display:flex;justify-content:center;margin-top:${L(ctx, 2)};">${frames ? fullFrames(ctx, p.n) : rodsPicture(ctx, p.n)}</div>`
+                + `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 2.5)};margin-top:${L(ctx, 3)};`
+                + `font-size:${P(ctx, textPt(ctx) + 3)};white-space:nowrap;">${slot}<span>tens</span></div>`);
+        }
+        if (p.kind === 'sort') {
+            const sq = squareMm(ctx);
+            const slot = box(ctx, { value: slotValue(ctx, 'answer', kv), w: sq, h: sq, mark: 'blank' });
+            return root(ctx, 'k2-sort', `<div style="display:flex;justify-content:center;margin-bottom:${L(ctx, 3)};">${keySpecimen(ctx, p.asked)}</div>`
+                + `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:${L(ctx, 4)};">`
+                + `<div style="display:flex;justify-content:center;"><div style="flex:none;">${bagPicture(ctx, p.bag || [])}</div></div>${slot}</div>`,
+            isTwin(ctx) ? {} : { style: 'width:100%;box-sizing:border-box;' });
+        }
+        if (p.kind === 'teen') {
+            const b = inlineBoxMm(ctx, 2);
+            const slot = box(ctx, { value: slotValue(ctx, 'answer', kv), w: b.w, h: b.h, mark: 'blank' });
+            const sentence = p.askTotal ? [eqSpan(ctx, 10), opSpan(ctx, '+'), eqSpan(ctx, p.ones), opSpan(ctx, '='), slot]
+                : [eqSpan(ctx, 10), opSpan(ctx, '+'), slot, opSpan(ctx, '='), eqSpan(ctx, 10 + p.ones)];
+            return root(ctx, 'k2-teen', `<div style="display:flex;justify-content:center;">${p.objects === 'blocks' ? teenBlocks(ctx, p.ones) : teenFrame(ctx, p.ones)}</div>`
+                + eqRow(sentence));
         }
         // count
         const sq = squareMm(ctx);

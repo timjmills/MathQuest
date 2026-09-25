@@ -634,6 +634,22 @@ function generateResolvedQuestion() {
             const m = state.skillOptions && Array.isArray(state.skillOptions.members) ? state.skillOptions.members : null;
             const members = m && m.length ? pool.filter(sk => m.includes(sk)) : pool.filter(sk => /^time_(hour|half_hour|quarter|5min|1min)$/.test(sk));
             if (members.length) pool = members;
+            // AP4 (2026-09-25): the full-width members (a row of three clocks to choose from, a time
+            // line) are spread through the deal, not dealt last: a page that holds five problems
+            // then shows clocks AND the other kinds, the review it promises, and the page keeps its
+            // columns for the clocks with the wide rows under them (print-sheet.js layoutOf).
+            {
+                const wideM = (sk) => sk === 'time_match_clock' || /^elapsed_/.test(sk);
+                const nar = pool.filter((sk) => !wideM(sk)), wid = pool.filter(wideM);
+                if (nar.length && wid.length) {
+                    const spread = [];
+                    for (let i = 0, w = 0, k = 0; i < pool.length; i++) {
+                        if (w < wid.length && (i + 1) * wid.length >= (w + 1) * pool.length) spread.push(wid[w++]);
+                        else spread.push(nar[k++]);
+                    }
+                    pool = spread;
+                }
+            }
             actualSkill = Number.isFinite(state.itemIndex) ? pool[state.itemIndex % pool.length] : pick(pool);
         } else {
             actualSkill = pick(pool);

@@ -785,7 +785,7 @@ function p8Rules(items, F) {
  *                     printed neighbours show the step, and the skill deals several steps
  */
 const K2_PICTURE_SKILLS = new Set(['count_objects', 'number_seq_fill', 'compare_groups', 'number_bonds', 'base10_build',
-    'hundreds_chart_fill', 'ten_frame_build', 'share_into_groups', 'add_wp_10', 'sub_5_pictures']);
+    'hundreds_chart_fill', 'ten_frame_build', 'share_into_groups', 'add_wp_10', 'sub_5_pictures', 'number_chart_fill']);
 function pictureRules(items, F) {
     const live = items.filter(it => it && !it.error && !it.empty);
     if (!live.length) return;
@@ -820,7 +820,11 @@ function pictureRules(items, F) {
             const rows = p.rows || [], cols = p.cols || [], blanks = (p.blanks || []).map(Number);
             const inWin = (n) => rows.includes(Math.floor((n - 1) / 10)) && cols.includes((n - 1) % 10);
             const key = (it.keyParts || [String(it.ans)]).map(Number);
-            if (rows.length !== 3 || cols.length !== 5 || rows.some(r => r < 0 || r > 9) || cols.some(c => c < 0 || c > 9)) bad.push('the window is not 3 x 5 on the chart');
+            // 2026-09-25 (owner): a window is 1 to 3 consecutive chart rows (the chart to 10 is its
+            // one row; number_chart_fill runs past row 9) by 5 columns (4 on number_chart_fill), or by the whole row of 10.
+            const consecutive = (a) => a.every((v, i) => !i || v === a[i - 1] + 1);
+            if (rows.length < 1 || rows.length > 3 || !(cols.length === 4 || cols.length === 5 || cols.length === 10) || !consecutive(rows) || !consecutive(cols)
+                || rows.some(r => r < 0 || r > 999) || cols.some(c => c < 0 || c > 9)) bad.push(`the window is not 1-3 rows x 4, 5 or 10 columns of the chart (${rows.length} x ${cols.length})`);
             if (!blanks.length || blanks.some(b => !inWin(b))) bad.push(`a gap outside its window (${blanks.join(', ')})`);
             if (key.join(',') !== blanks.slice().sort((a, b) => a - b).join(',')) bad.push(`the key ${key.join(', ')} is not the gaps ${blanks.join(', ')} in reading order`);
             for (const b of blanks) {
@@ -831,7 +835,8 @@ function pictureRules(items, F) {
             }
         }
         if (bad.length) F('chart-window', `${bad.length} chart windows are wrong: ${show(bad)}`);
-        if (chart.length >= 20 && spots.size < 8) F('chart-window', `the gaps sit in only ${spots.size} of the window's 15 places across ${chart.length} items: deal them over the window`);
+        const places = Math.max(...chart.map(it => ((it.cellP || {}).rows || []).length * ((it.cellP || {}).cols || []).length));
+        if (chart.length >= 20 && spots.size < Math.min(8, places - 2)) F('chart-window', `the gaps sit in only ${spots.size} of the window's ${places} places across ${chart.length} items: deal them over the window`);
     }
     // seq-track
     const seq = live.filter(it => it.cellT === 'seqstrip');
@@ -1353,7 +1358,7 @@ const PV_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 100
 const PV_PLACE_WORDS = /\b(?:ones|tens|hundreds|thousands|millions)\b/i;
 // The §17 answer-in-item list, and every id the P9 generator describes (so it must describe).
 const PV_AII = /^(?:identify|value|more_less_10|more_less_100|rounding_visual|nearest_(?:10|100|1000|10000|100000|million))$/;
-const PV_DESCRIBED = /^(?:identify|value|expand|combine|more_less_10|more_less_100|place_value_disks|pv_disks_build|place_value_10x|rounding_visual|nearest_\w+|round_sort_\w+|unit_form|compare|order_least_to_greatest|order_greatest_to_least|pv_digit_drag|rounding_table|between_tens|place_on_number_line|estimate_sum|estimate_diff|estimate_sums_diffs|estimate_products|estimate_quotient)$/;
+const PV_DESCRIBED = /^(?:identify|value|expand|combine|more_less_10|more_less_100|place_value_disks|pv_disks_build|place_value_10x|rounding_visual|nearest_\w+|round_sort_\w+|unit_form|compare|order_least_to_greatest|order_greatest_to_least|pv_digit_drag|rounding_table|between_tens|place_on_number_line|round_nl_\w+|estimate_sum|estimate_diff|estimate_sums_diffs|estimate_products|estimate_quotient)$/;
 const PV_OP_NAME = { '+': /\bsums?\b|\badd/, '−': /\bdiff(?:erences?)?\b|\bsubtract/, '×': /\bproducts?\b|\bmultipl/, '÷': /\bquotients?\b|\bdivi/ };
 const PV_OP_GLYPH = { '+': /\+/, '−': /[−–]|\s-\s/, '×': /×/, '÷': /÷/ };
 
@@ -1420,7 +1425,14 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
         const maxP = shown.length ? Math.max(...shown) : null;
         if (maxP !== null && maxP > R) add('pv-band', `prints ${maxP.toLocaleString('en-US')} past its default band ${R.toLocaleString('en-US')} (${printedText.slice(0, 50)})`);
         if (maxP !== null && maxP >= 10 && maxP <= 99) twoDigit++;
-        if (pv && pv.kind === 'round' && (pv.n < pv.place || pv.n % pv.place === 0)) add('pv-band', `rounds ${pv.n} to the nearest ${pv.place}: below the place, or already rounded`);
+        // NAMED EXCEPTION (owner ruling 2026-09-25, "yes please allow"): the three round-on-a-
+        // number-line skills deal ONE "already a multiple" item per block of six (6,000 to the
+        // nearest 1,000 stays 6,000), and their "Round to" option offers the place one above the
+        // number's own top place (4,650 to the nearest 10,000). Only those two cases are allowed,
+        // only for these ids; every other skill keeps the already-rounded rule.
+        const RNL_EXCEPT = new Set(['round_nl_thousands', 'round_nl_ten_thousands', 'round_nl_hundred_thousands']);
+        const rnlOk = pv && RNL_EXCEPT.has(id) && (pv.n % pv.place === 0 || pv.place === 10 ** String(Math.trunc(pv.n)).length);
+        if (pv && pv.kind === 'round' && !rnlOk && (pv.n < pv.place || pv.n % pv.place === 0)) add('pv-band', `rounds ${pv.n} to the nearest ${pv.place}: below the place, or already rounded`);
         if (pv && pv.kind === 'moreless') {
             // (with an unknown start, pv.n is still the START: the number the pupil writes)
             const a = pv.dir === 'more' ? pv.n + pv.step : pv.n - pv.step;
@@ -1553,6 +1565,15 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
                     if (scope === 'decision' && ans !== (want > pv.n ? 'Round up' : 'Round down')) add('pv-recompute', `${pv.n} rounds ${want > pv.n ? 'up' : 'down'}, keyed ${ans}`);
                     if (scope === 'judge' && ans !== (pv.shown === want ? 'Correct' : 'Fix it')) add('pv-recompute', `${pv.n} -> ${pv.shown} is ${pv.shown === want ? 'correct' : 'wrong'}, keyed ${ans}`);
                     if (scope === 'notation' && String(ans) !== `${pvDigitAt(pv.n, pv.place)}, ${pvDigitAt(pv.n, pv.place / 10)}`) add('pv-recompute', `${pv.n}: the deciding digits are ${pvDigitAt(pv.n, pv.place)} and ${pvDigitAt(pv.n, pv.place / 10)}, keyed ${ans}`);
+                    // Round on a number line to thousands and beyond: the NAME is the number's size
+                    // (4 / 5 / 6 digits), and the line runs from one multiple of the place to the next
+                    // with the number on it.
+                    const nlSize = { round_nl_thousands: 4, round_nl_ten_thousands: 5, round_nl_hundred_thousands: 6 }[id];
+                    if (nlSize && String(Math.trunc(pv.n)).length !== nlSize) add('pv-band', `${pv.n} is not a ${nlSize}-digit number (the skill's name)`);
+                    if (nlSize && Array.isArray(pv.line)) {
+                        const [a, b] = pv.line;
+                        if (!(a % pv.place === 0 && b - a === pv.place && a <= pv.n && pv.n <= b)) add('pv-recompute', `the line ${a}-${b} is not the two multiples of ${pv.place} around ${pv.n}`);
+                    }
                     break;
                 }
                 case 'disks': {

@@ -870,3 +870,58 @@ export function createThermometerSVG({ temp = 0, unit = '°C', min = -10, max = 
     const unitLabel = `<text x="${tubeX - 12}" y="${top + 4}" text-anchor="end" font-size="16" font-weight="700" fill="${ink}">${unit}</text>`;
     return `<svg class="thermometer" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;max-width:100%;height:auto;" role="img" aria-label="Thermometer in ${unit === '°F' ? 'degrees Fahrenheit' : 'degrees Celsius'}">${tube}${column}${bulb}${marks}${unitLabel}</svg>`;
 }
+
+/**
+ * AP2 (2026-09-25): the drawn size of a labelled rectangle whose sides are `len` (across) by
+ * `wid` (up), in the same proportion as its numbers, inside `maxW` x `maxH` and never thinner
+ * than `minSide` (a 10 by 2 rectangle still has room for its labels). A square is drawn square.
+ */
+export function rectBoxFor(len, wid, { maxW = 120, maxH = 80, minSide = 28 } = {}) {
+    const l = Math.max(1, Number(len) || 1), w = Math.max(1, Number(wid) || 1);
+    const u = Math.min(maxW / l, maxH / w);
+    return { w: Math.round(Math.max(minSide, l * u)), h: Math.round(Math.max(minSide, w * u)) };
+}
+
+/**
+ * AP2 (2026-09-25): the labelled L- or T-shape of composite_shapes' "Find the perimeter" items,
+ * every outside side numbered, drawn to scale — the printed twin of the generator's screen
+ * figure (the print cell used to draw one fixed shape whatever the item said).
+ *   kind 'L': dims { lFW, lFH, lCW, lCH }  (a full lFW x lFH block, its top-right lCW x lCH cut out)
+ *   kind 'T': dims { tTW, tTH, tSW, tSH }  (a tTW x tTH bar, a tSW x tSH stem centred under it)
+ */
+export function createLabeledStepShapeSVG(kind, dims, forPrint = false) {
+    const P = _pal(forPrint);
+    const ink = P.mono ? P.ink : _C_INK;
+    const stroke = P.mono ? P.ink : _C_PRIMARY;
+    const fill = P.mono ? 'none' : _dtSoft(_DT_COLORS.primary);
+    const pad = 34;
+    const fs = 15;
+    const t = (x, y, s, anchor = 'middle') => `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" fill="${ink}" font-size="${fs}" font-weight="700" text-anchor="${anchor}" dominant-baseline="middle">${s}</text>`;
+    let pts, labels, W, H;
+    if (kind === 'T') {
+        const { tTW, tTH, tSW, tSH } = dims;
+        const u = Math.min(200 / tTW, 150 / (tTH + tSH));
+        const TW = tTW * u, TH = tTH * u, SW = tSW * u, SH = tSH * u, sh = (TW - SW) / 2;
+        W = TW + pad * 2; H = TH + SH + pad * 2;
+        const o = pad;
+        pts = [[o, o], [o + TW, o], [o + TW, o + TH], [o + TW - sh, o + TH], [o + TW - sh, o + TH + SH], [o + sh, o + TH + SH], [o + sh, o + TH], [o, o + TH]];
+        const shelf = (tTW - tSW) / 2;
+        labels = t(o + TW / 2, o - 12, tTW) + t(o + TW + 8, o + TH / 2, tTH, 'start')
+            + t(o + TW - sh / 2, o + TH + 12, shelf) + t(o + TW - sh + 8, o + TH + SH / 2, tSH, 'start')
+            + t(o + TW / 2, o + TH + SH + 14, tSW) + t(o + sh - 8, o + TH + SH / 2, tSH, 'end')
+            + t(o + sh / 2, o + TH + 12, shelf) + t(o - 8, o + TH / 2, tTH, 'end');
+    } else {
+        const { lFW, lFH, lCW, lCH } = dims;
+        const u = Math.min(200 / lFW, 150 / lFH);
+        const FW = lFW * u, FH = lFH * u, CW = lCW * u, CH = lCH * u;
+        W = FW + pad * 2; H = FH + pad * 2;
+        const o = pad;
+        pts = [[o, o], [o + FW - CW, o], [o + FW - CW, o + CH], [o + FW, o + CH], [o + FW, o + FH], [o, o + FH]];
+        labels = t(o + (FW - CW) / 2, o - 12, lFW - lCW) + t(o + FW - CW + 8, o + CH / 2, lCH, 'start')
+            + t(o + FW - CW / 2, o + CH - 12, lCW) + t(o + FW + 8, o + CH + (FH - CH) / 2, lFH - lCH, 'start')
+            + t(o + FW / 2, o + FH + 14, lFW) + t(o - 8, o + FH / 2, lFH, 'end');
+    }
+    W = Math.round(W); H = Math.round(H);
+    const poly = `<polygon points="${pts.map(p => p.map(v => v.toFixed(1)).join(',')).join(' ')}" fill="${fill}" stroke="${stroke}" stroke-width="${P.sw(_DT_STROKE.bold)}" stroke-linejoin="round"/>`;
+    return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block;margin:0 auto;max-width:100%;height:auto;" role="img" aria-label="${kind === 'T' ? 'T' : 'L'}-shape with its sides labelled">${poly}${labels}</svg>`;
+}

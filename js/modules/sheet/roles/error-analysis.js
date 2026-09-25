@@ -352,7 +352,11 @@ export function prepare(it, info = {}) {
     // The key's slots: the judgement, and the fix in EVERY slot of its kind (critic round 3: a key
     // that fills only the changed boxes leaves a pupil slot unanswered, and "blank" reads as 0).
     const slots = { 'ea-ok': isWrong ? '' : '✓', 'ea-fix': isWrong ? '✓' : '' };
-    if (kind === 'value' || kind === 'text') slots['ea-ans'] = isWrong ? correct : '';
+    // The fix is written the way the item writes its own numbers: "1,000,000" beside an item that
+    // prints "981,156", never "1000000" (critic round 3).
+    const commas = /\d,\d{3}/.test(`${q.printText || ''} ${q.text || ''} ${q.printAnswer || ''}`);
+    const fixText = commas && /^\d{4,}$/.test(String(correct)) ? Number(correct).toLocaleString('en-US') : correct;
+    if (kind === 'value' || kind === 'text') slots['ea-ans'] = isWrong ? fixText : '';
     if (kind === 'parts') P.parts.forEach((x, i) => { slots[`ea-ans-${i}`] = isWrong ? x.value : ''; });
     if (kind === 'line') (partsOfList(correct) || []).forEach((v, i) => { slots[`ea-ans-${i}`] = isWrong ? v : ''; });
     if (kind === 'choice') choice.labels.forEach((lab, i) => { slots[`ea-pick-${i}`] = isWrong && i === choice.correct ? '✓' : ''; });
@@ -620,7 +624,7 @@ export function plan(input = {}) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Check it', score: items.length });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
     const grid = gridPart(items.map((it) => planItem(it, { cols: L.cols })), { cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
-    if (rows === L.rows) { grid.cls = ''; grid.height = ''; }
+    if (rows === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
     const wrongShare = items.length ? items.filter((it) => it.thinking && it.thinking.isWrong).length / items.length : 0;
     const fit = Object.assign({}, L, { items: undefined });
     // The instruction says where the fix goes (critic round 3): written, or drawn again.
