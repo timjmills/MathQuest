@@ -184,6 +184,8 @@ function onViewChangeInner() {
     document.body.classList.remove('tv-on-screen');
     document.body.classList.toggle('tv-play', PLAY_VIEWS.has(id));
     if (!PLAY_VIEWS.has(id)) document.body.classList.remove('tv-bigboard');
+    // The board window (?board=1) shows its game as the whole-class Board display.
+    else if (BOARD_WINDOW && id === 'gameView') document.body.classList.add('tv-bigboard');
     setNavCurrent(LIB_FOR_VIEW[id] || '');
 }
 

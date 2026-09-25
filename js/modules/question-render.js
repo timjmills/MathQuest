@@ -1837,10 +1837,22 @@ function _renderQuestionImpl() {
     // Display skill label — merge with question number as a pill
     const skillLabelEl = document.getElementById("skillLabel");
     if (skillLabelEl) {
-        const label = q.skillLabel || (typeof window !== 'undefined' && window.getSkillLabelForQuestion ? window.getSkillLabelForQuestion(state.skill) : '');
+        // The item's own skill: in a mixed set state.skill is the pool ('custom_mixed'), whose
+        // grade is 'M', so every item used to wear an "M" whatever its real level.
+        const _itemSkill = q.skillId || state.skill;
+        const _itemCat = q.poolMember || q.categoryId || state.category;
+        const _teacher = typeof document !== 'undefined' && document.body.classList.contains('teacher-mode');
+        // Teacher-launched: the plain skill label ("Add within 20 (No Regrouping)"), never the
+        // 12-letter pupil abbreviation ("Add ≤20 NR").
+        const _plain = _teacher && typeof window !== 'undefined' && typeof window.plainSkillLabel === 'function'
+            ? window.plainSkillLabel(_itemCat, _itemSkill) : '';
+        const label = _plain || q.skillLabel || (typeof window !== 'undefined' && window.getSkillLabelForQuestion ? window.getSkillLabelForQuestion(state.skill) : '');
         if (label) {
-            const gc = gradeCircleHTML(getSkillGrade(state.skill, state.category));
-            skillLabelEl.innerHTML = gc ? gc + ' ' + label : label;
+            let _grade = getSkillGrade(_itemSkill, _itemCat);
+            if (_grade === null || _grade === undefined) _grade = getSkillGrade(state.skill, state.category);
+            const gc = _teacher ? '' : gradeCircleHTML(_grade);
+            if (_teacher) skillLabelEl.textContent = label;
+            else skillLabelEl.innerHTML = gc ? gc + ' ' + label : label;
         } else {
             skillLabelEl.textContent = '';
         }
