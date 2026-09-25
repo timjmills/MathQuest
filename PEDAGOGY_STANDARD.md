@@ -1259,6 +1259,16 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `cut-sort` | Cut. Sort. Glue. | hands-on sorts |
 | `cut-order` | Cut. Put in order. Glue. | hands-on ordering |
 | `find-color` | Find every {n}. Color it. | find-and-color |
+| `line-jumps` | Draw the jumps on the line. Write the answer. | number-line addition and subtraction (added 2026-09-25) |
+| `draw-blocks` | Draw tens and ones to show the number. | build a number with base-10 blocks (one vocabulary: tens and ones) |
+| `draw-blocks-100` | Draw hundreds, tens and ones to show the number. | build a three-digit number with base-10 blocks |
+| `check-groups` | Look at the groups. Check one box. | compare two groups: more, fewer, same |
+| `how-many-left` | Write how many are left. | take away with crossed-out pictures |
+| `ring-remainder` | Circle groups of {n}. Write how many groups and how many left. | division with a remainder, pictured |
+| `pick-parts` | Circle one number in each list to make the sum. | find two addends from lists |
+| `fact-family` | Use the three numbers. Fill in the fact family. | addition and subtraction fact families |
+| `chart-fill` | Fill in the missing products. | multiplication chart |
+| `groups-total` | Write the groups, the number in each, and the total. | arrays and equal groups |
 | `default-write` | Solve. Write the answer. | default adapter: skills with no provider, number or text answer |
 | `default-circle` | Circle the answer. | default adapter: choice items |
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |

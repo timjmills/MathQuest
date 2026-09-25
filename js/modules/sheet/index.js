@@ -83,5 +83,26 @@ export {
     DISK_SIZES, diskDiameter, zoneSide, zoneCapacity, diskMatSVG, numeralTracksHTML, roundingLineSVG,
 } from './cells/pv.js';
 
+// K-2 picture cells: counters, ten frame, base-10 mat, number bond, chart window, number track,
+// compare two groups, picture word problem. `k2Twin` draws a template's screen twin.
+export { k2Twin, SHAPES as K2_SHAPES } from './cells/k2kit.js';
+export { shareColumns } from './cells/counters.js';
+export { base10Counts } from './cells/base10.js';
+import './cells/tenframe.js';
+import './cells/bond.js';
+import './cells/chartwindow.js';
+import './cells/seqstrip.js';
+import './cells/compare.js';
+import './cells/wordpic.js';
+
 /** Which cell templates this build carries. `legacy` is registered by `adapters.js`. */
-export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv'];
+export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv',
+    'counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic'];
+
+/* ------------------------------------------------- skill providers (register on load) */
+// The real per-skill providers (strings, workedSteps, wrongAnswer, stories). Importing the
+// barrel registers them once; a skill without one keeps the default adapters.
+export {
+    REGRADED_SKILLS, storiesFor, STORY_NOUNS, STORY_NAMES, STORY_TEMPLATES, nounFor,
+    columnAdd, lineSteps, longDivision,
+} from './providers/index.js';
