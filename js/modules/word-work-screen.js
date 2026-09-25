@@ -77,7 +77,17 @@ function onClick(e) {
 
 function onInput(e) {
     const el = e.target;
-    if (!el || !el.classList || !el.classList.contains('mq-wwork')) return;
+    if (!el || !el.classList) return;
+    // the answer row's digit boxes are the host's inputs (it composes the answer): the digit each
+    // one expects is on its box, and a right digit turns green at once like every other box
+    const box = el.classList.contains('mq-cellslot') && el.parentElement && el.parentElement.classList.contains('mq-wwans') ? el.parentElement : null;
+    if (box) {
+        const want = box.getAttribute('data-mq-expect') || '';
+        const v = String(el.value).replace(/[^0-9]/g, '');
+        el.classList.toggle('mq-live-correct', v !== '' && want !== '' && v === want);
+        return;
+    }
+    if (!el.classList.contains('mq-wwork')) return;
     const kind = el.getAttribute('data-mq-kind');
     const v = kind === 'sign' ? SIGN(el.value) : String(el.value).replace(/[^0-9]/g, '').slice(kind === 'regroup' ? -2 : kind === 'number' ? -8 : -1);
     if (v !== el.value) el.value = v;

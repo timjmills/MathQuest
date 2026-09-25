@@ -1497,10 +1497,13 @@ function _applyScreenCell() {
         }
         // the number line is jumped on screen (regrade 2): its instruction says so, and no longer
         // repeats the equation drawn under the line
-        if (qt && isNumberLineItem(q)) {
+        // A word-work story prints its story inside the cell: the line above it is the task
+        // (round-4 critic: the card had no instruction), in screen verbs.
+        const _wwInstr = q.cell && q.cell.template === 'word-work' && q.screenInstr ? screenInstruction(q.screenInstr) : '';
+        if (qt && (isNumberLineItem(q) || _wwInstr)) {
             qt.classList.remove('mq-dup');
             qt.style.cssText = '';
-            qt.innerHTML = `<span class="mq-instr-text">${_escapeHtmlForQuestion(NUMBER_LINE_INSTRUCTION)}</span>`
+            qt.innerHTML = `<span class="mq-instr-text">${_escapeHtmlForQuestion(_wwInstr || NUMBER_LINE_INSTRUCTION)}</span>`
                 + `<span class="mq-sr"> ${_escapeHtmlForQuestion(String(q.text || '').replace(/<[^>]*>/g, ''))}</span>`;
         }
         if (input && input.closest('#answerInputArea')) _styleSlot(input, q, 'line');
