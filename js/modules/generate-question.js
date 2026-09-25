@@ -18,6 +18,20 @@ import { normalizeOptions, pvRefusal } from './skill-options.js';
 // Side effect: registers the measured per-skill options (Max Number, decimals, level) with
 // skill-options.js before anything asks optionsFor() — see tests/scripts/ws-options-derive.cjs.
 import './skill-options-derived.js';
+// Side effect: registers the "Which skills" control of every mixed review (P12).
+import './skill-options-pools.js';
+
+// P12: a mixed review's `members` choice narrows its pool. Only a real narrowing filters: at the
+// default (every member ticked) and with none ticked the pool is untouched, so an untouched review
+// deals exactly the same random picks as before. Falls back to the whole pool if the filter would
+// leave nothing (a stale code naming only retired members).
+function narrowPool(pool) {
+    const o = state.skillOptions;
+    const m = o && Array.isArray(o.members) ? o.members : null;
+    if (!m || !m.length) return pool;
+    const out = pool.filter(s => m.includes(s));
+    return out.length ? out : pool;
+}
 
 // Plain (no-picture) word problem variants - map to base skill for generation
 const PLAIN_WORD_SKILLS = {
@@ -269,7 +283,7 @@ function generateResolvedQuestion() {
 
     // Resolve mixed word problem skills → pick a random component sub-skill
     if (MIXED_WORD_SKILLS[state.skill]) {
-        state.skill = pick(MIXED_WORD_SKILLS[state.skill]);
+        state.skill = pick(narrowPool(MIXED_WORD_SKILLS[state.skill]));
     }
 
     // Map new categories to legacy category handling
@@ -371,6 +385,7 @@ function generateResolvedQuestion() {
     // Check if this is a mixed skill and resolve it
     let actualSkill = state.skill;
     let forcedMappedCategory = null;
+    let poolPlainSkill = null;
 
     // Domain-level _all, grade-level, and all_domains_mixed → force all_mixed recursive path
     // EXCLUSIONS: real concrete skills that happen to end in "_all" (e.g.
@@ -387,7 +402,7 @@ function generateResolvedQuestion() {
         // P9 §2.5 the pool rule: a place-value / rounding review never draws a member Max Number
         // cannot host (it would be refused), and "Mixed Rounding & Estimation" never draws P4's
         // three strategy ladders (make a ten, doubles, compensation) onto a rounding page.
-        let pool = mixedConfig.skills;
+        let pool = narrowPool(mixedConfig.skills);
         if (mixedConfig.category === 'placevalue' || mixedConfig.category === 'number_sense') {
             const P4_STRATEGY = new Set(['make_a_ten', 'doubles_near_doubles', 'compensation']);
             // `strict`: a review has no band of its own, so its Max Number caps every member.
@@ -400,6 +415,9 @@ function generateResolvedQuestion() {
         // Re-apply plain/mixed-word resolution since the resolved skill may be
         // a _plain variant or a _word_mixed meta-skill that needs further resolution
         if (PLAIN_WORD_SKILLS.hasOwnProperty(actualSkill)) {
+            // P12: remember the plain member, so its item is stripped of pictures below exactly as
+            // the plain skill is on its own (a "Which skills" page of only the plain stories).
+            poolPlainSkill = actualSkill;
             actualSkill = PLAIN_WORD_SKILLS[actualSkill];
         }
         if (MIXED_WORD_SKILLS[actualSkill]) {
@@ -593,6 +611,8 @@ function generateResolvedQuestion() {
                 categoriesToUse = domainCategories[originalCategory] || categoriesToUse;
             }
 
+            // P12: the "Which topics" choice of a grade / "_all" review narrows its categories.
+            categoriesToUse = narrowPool(categoriesToUse);
             let allSkillsFlattened = [];
             categoriesToUse.forEach(cat => {
                 if (categorySkillMap[cat]) {
@@ -693,6 +713,16 @@ function generateResolvedQuestion() {
                 q.answerType = 'text';
             }
         }
+    }
+
+    // P12: a plain word-problem member drawn by a mixed pool prints plain, like the skill itself.
+    if (poolPlainSkill && !isPlainWord) {
+        q.visual = '';
+        if (q.cell && q.cell.template === 'wordpic' && q.cell.payload) {
+            q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { pictures: false }) });
+        }
+        q.printFormat = 'word-plain';
+        q.skillId = poolPlainSkill;
     }
 
     // Plain word problems: strip visuals and restore original skill on state

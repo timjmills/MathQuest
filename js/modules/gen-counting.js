@@ -1196,9 +1196,12 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // size is 3 to 8 and the number of groups is dealt over 2-8.
     // ========================================
     else if (mappedSkill === "share_into_groups") {
-        const groups = 2 + _kDealShuffled(7);                 // 2..8
+        // P12: `band` "Counters to" 12 keeps the picture to 12 counters and 2-4 groups; the
+        // default, 24, is the old draw.
+        const _sgCap = Number(_kOpt('band')) === 12 ? 12 : 24;
+        const groups = _sgCap === 12 ? 2 + _kDealShuffled(3) : 2 + _kDealShuffled(7);   // 2..4 | 2..8
         // At most 24 counters: four rows of a 6- or 7-wide array, so six cells fit a page.
-        const sizes = [3, 4, 5, 6, 7, 8].filter(s => s * groups >= 8 && s * groups <= 24);
+        const sizes = [3, 4, 5, 6, 7, 8].filter(s => s * groups >= 8 && s * groups <= _sgCap);
         const size = sizes.length ? sizes[rng(0, sizes.length - 1)] : 3;
         const total = size * groups;
         q.text = `There are ${total} counters. Make groups of ${size}. How many groups are there?`;

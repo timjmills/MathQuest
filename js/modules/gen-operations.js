@@ -1206,7 +1206,9 @@ function _generateLadderV2(q, skill, helpers, range) {
         const isMul = skill === 'mult_missing_digit';
         let a, b, total, opSym, kitOp;
         if (isMul) {
-            a = rng(12, 98); b = rng(2, 9); total = a * b; opSym = '×'; kitOp = '*';
+            // P12: `tiles` 31 makes the top number three digits (the default, 21, is two).
+            a = Number(_opt('tiles')) === 31 ? rng(102, 989) : rng(12, 98);
+            b = rng(2, 9); total = a * b; opSym = '×'; kitOp = '*';
         } else if (isAdd) {
             // A floor of half the band: a missing digit inside "7 + 9" is not column work.
             const band = Math.max(100, Math.min(range, 1000));
@@ -1436,7 +1438,11 @@ function _generateLadderV2(q, skill, helpers, range) {
     // MF-3. An ADDITION expression inside a multiplication cell — the bridging step P-8 allows
     // exactly once, and the reason it cannot live on a multiplication drill (P-28).
     if (skill === 'repeated_add_to_mult') {
-        const g = rng(2, 6), s = rng(2, 6);
+        // P12: `band` (products to 25 / 36 / 100) sets the largest group count and group size;
+        // `pictures` off leaves only the two frames (the adding and the multiplying).
+        const _fMax = { 25: 5, 36: 6, 100: 10 }[Number(_opt('band'))] || 6;
+        const g = rng(2, _fMax), s = rng(2, _fMax);
+        const _pics = _opt('pictures') !== false;
         const product = g * s;
         q.text = `${Array(g).fill(s).join(' + ')} = ${g} × ${s} = ?`;
         q.printText = 'Write the adding as multiplying.';   // the two frames are in the cell
@@ -1447,7 +1453,7 @@ function _generateLadderV2(q, skill, helpers, range) {
         q.skillLabel = 'Adding as Multiplying';
         q.hint = `${g} groups of ${s}. Adding ${s} ${g} times is the same as ${g} × ${s}.`;
         q.visual = _wsCell(
-            _wsGroups(Array(g).fill(s))
+            (_pics ? _wsGroups(Array(g).fill(s)) : '')
             + `<div style="margin-top:10px;font-size:1.35rem;">${Array(g).fill(s).join(' + ')} = ${_wsLine(3)}</div>`
             + `<div style="margin-top:6px;font-size:1.35rem;">${g} × ${s} = ${_wsLine(3)}</div>`,
             `Say: ${g} groups of ${s}. ${g} times ${s} equals ___ .`);
@@ -1459,8 +1465,9 @@ function _generateLadderV2(q, skill, helpers, range) {
     // other half of the reason this is its own id.
     if (skill === 'equal_or_unequal_groups') {
         const g = rng(2, 5);
-        const s = rng(2, 6);
-        const equal = _dealRung(2) === 0;
+        // P12: `step` is the most counters in a group (6 or 10); `forms` deals equal / unequal.
+        const s = rng(2, Number(_opt('step')) === 10 ? 10 : 6);
+        const equal = _p12Form(() => _dealRung(2)) === 0;
         const counts = Array(g).fill(s);
         if (!equal) {
             // The non-example MOVES counters between two rings instead of adding or removing
@@ -1501,7 +1508,7 @@ function _generateLadderV2(q, skill, helpers, range) {
     // every reference site — which is why it could not be an option on a fact drill.
     if (skill === 'mult_zeros') {
         const n = rng(2, 9);
-        const form = _dealRung(3);
+        const form = _p12Form(() => _dealRung(3));     // P12: `forms` × 10 / × 100 / × tens
         let a, b, hint;
         if (form === 0) { a = n; b = 10; hint = `${n} × 1 = ${n}, so ${n} × 10 is ${n} tens = ${n * 10}.`; }
         else if (form === 1) { a = n; b = 100; hint = `${n} × 1 = ${n}, so ${n} × 100 is ${n} hundreds = ${n * 100}.`; }
@@ -1529,7 +1536,8 @@ function _generateLadderV2(q, skill, helpers, range) {
     // error, and this step exists for it alone. The answer is 0 every time, on purpose: the step
     // is about WHERE the row starts, not about the product.
     if (skill === 'mult_placeholder_zero') {
-        const a = rng(13, 89);
+        // P12: `tiles` 32 makes the top number three digits (215 × 36); 22 (default) is 2 × 2.
+        const a = Number(_opt('tiles')) === 32 ? rng(102, 989) : rng(13, 89);
         // The ones digit runs 2 … 9: a multiplier ending in 0 has no second row to start, and
         // one ending in 1 makes the printed first row a copy of the top number, which reads as
         // if nothing had been multiplied at all.
@@ -1606,10 +1614,12 @@ function _generateLadderV2(q, skill, helpers, range) {
     // is which number means what, not a quotient, so the cell teaches the vocabulary M-D4 (the
     // dividend and divisor swapped) comes from.
     if (skill === 'div_equation_parts') {
-        const s = rng(2, 9);
-        const g = rng(2, 9);
+        // P12: `band` is the largest total (group count and size to 5 for 25, to 9 for 81).
+        const _dpMax = Number(_opt('band')) === 25 ? 5 : 9;
+        const s = rng(2, _dpMax);
+        const g = rng(2, _dpMax);
         const total = s * g;
-        const ask = _dealRung(3);
+        const ask = _p12Form(() => _dealRung(3));     // P12: `forms` which number is asked
         const wording = ['how many there are in all', 'how many are in each group', 'how many groups there are'];
         const answers = [total, s, g];
         q.text = `In ${total} ÷ ${s} = ${g}, which number tells ${wording[ask]}? Write it.`;
@@ -1676,11 +1686,15 @@ function _generateLadderV2(q, skill, helpers, range) {
     // DF-27. A `judge` cell built on M-D3: a remainder that is not finished because it is still
     // at least as big as the divisor. Half the items are already correct (P-10).
     if (skill === 'remainder_too_big') {
-        const d = rng(3, 9);
-        const trueQ = rng(2, 12);
+        // P12: a narrowed `constant` ("Divide by") picks the divisor; `forms` deals finished /
+        // not finished; `band` bounds the number shared (the quotient shrinks to fit).
+        const d = _p12Constant() || rng(3, 9);
+        const _rtbBand = Number(_opt('band')) || 0;
+        const _rtbMaxQ = _rtbBand ? Math.max(2, Math.min(12, Math.floor((_rtbBand - (d - 1)) / d))) : 12;
+        const trueQ = rng(2, _rtbMaxQ);
         const r = rng(1, d - 1);
         const dividend = d * trueQ + r;
-        const isRight = _dealRung(2) === 0;
+        const isRight = _p12Form(() => _dealRung(2)) === 0;
         const shownQ = isRight ? trueQ : trueQ - 1;
         const shownR = isRight ? r : r + d;             // still adds up, but is not finished
         q.text = `${dividend} ÷ ${d} = ${shownQ} R ${shownR}. Is the remainder finished? Write the finished answer.`;
@@ -1752,12 +1766,14 @@ function _generateLadderV2(q, skill, helpers, range) {
     // product will not fit) or too small (what is left is still a whole group), and the pupil
     // writes the digit that works. Two-digit divisors, so the estimate is a real decision.
     if (skill === 'div_fix_estimate') {
-        const divisor = rng(11, 49);
+        // P12: `tiles` is the largest divisor (19 or 29 for smaller numbers; 49 by default) and
+        // `forms` deals the too-big / too-small first try.
+        const divisor = rng(11, Number(_opt('tiles')) || 49);
         // 2 … 8, so the first attempt is 1 … 9 either way. An estimate is ONE DIGIT of the
         // quotient: "45 × 10 = 450" is not an estimate any pupil could write in the box.
         const quotient = rng(2, 8);
         const dividend = divisor * quotient;
-        const tooBig = _dealRung(2) === 0;
+        const tooBig = _p12Form(() => _dealRung(2)) === 0;
         const tried = tooBig ? quotient + 1 : quotient - 1;
         const prod = divisor * tried;
         q.text = tooBig
@@ -2048,6 +2064,42 @@ function _opt(id) {
     const v = o && typeof o === 'object' && Object.prototype.hasOwnProperty.call(o, id) ? o[id] : undefined;
     return v === undefined ? def.default : v;
 }
+// ---- P12 OPTIONS (skill-options.js P12 block: the × / ÷ ladder steps and the number families) ----
+// Same rule as the layer above: each helper returns "not chosen" at the option's default, so the
+// untouched skill takes its old branch and draws the same random numbers as before.
+/** A SET option the teacher CHANGED from its default: the ticked values, else null (untouched,
+ *  or none ticked, which means "no restriction"). */
+function _p12Narrowed(id) {
+    const def = _optDef(id);
+    if (!def || def.type !== 'set') return null;
+    const legal = def.values.map(x => x.v);
+    let t = _opt(id);
+    if (typeof t === 'number' || typeof t === 'string') t = [t];
+    t = Array.isArray(t) ? legal.filter(v => t.includes(v)) : [];
+    const dflt = legal.filter(v => (def.default || []).includes(v));
+    if (!t.length || (t.length === dflt.length && t.every(v => dflt.includes(v)))) return null;
+    return t;
+}
+/** Which item form to draw: `forms` narrowed deals the ticked forms round-robin, else `dflt()`. */
+function _p12Form(dflt) {
+    const f = _p12Narrowed('forms');
+    return f ? f[_dealRung(f.length)] : dflt();
+}
+/**
+ * The number-family band. The support level routes these skills to a retired branch id
+ * (skill-aliases.js SKILL_VARIANTS), so `_opt` cannot see the merged skill's definition from
+ * inside the branch; the value is read straight off the item's options instead.
+ */
+function _p12FamilyBand(merged, dflt, legal) {
+    const o = state.skillOptions;
+    const v = o && typeof o === 'object' ? Number(o.band) : NaN;
+    return legal.includes(v) ? v : dflt;
+}
+/** A divisor / factor from a narrowed `constant` ("Divide by"), else null. */
+function _p12Constant() {
+    return _p12Narrowed('constant') ? factConstantFor() : null;
+}
+
 const _BAND_CODE = { 10: '10', 20: '20', 50: '50', 100: '100', 1000: '1k', 10000: '10k', 100000: '100k', 1000000: '1m' };
 const _RANGED_RE = /^(add|sub)_(10|20|50|100|1k|10k|100k|1m)_(no_regroup|regroup|mixed)$/;
 const _WP_RE = /^(add|sub)_wp_(10|20|50|100|1k|10k|100k|1m)$/;
@@ -2675,8 +2727,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // DOT ARRAY MULTIPLICATION (B&W print scaffold)
             // ========================================
             if (mappedSkill === 'dot_array_mult') {
-                const rows = rng(2, Math.min(10, range));
-                const cols = rng(2, Math.min(10, range));
+                // P12: `band` 25 keeps rows and columns to 5 (the default, 100, runs them to 10);
+                // `support` 'none' drops the "rows × columns" caption so the pupil counts both.
+                const _daMax = Number(_opt('band')) === 25 ? 5 : 10;
+                const _daBare = _opt('support') === 'none';
+                const rows = rng(2, Math.min(_daMax, range));
+                const cols = rng(2, Math.min(_daMax, range));
                 const product = rows * cols;
                 // Bumped from r=4/spacing=20 \u2014 at the previous size the dots
                 // were tiny pinpricks in the visual-left layout's wide left
@@ -2717,6 +2773,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     </svg>
                     <div style="margin-top:6px;font-size:0.95rem;color:${COLORS.text};font-weight:600;">${rows} rows \u00d7 ${cols} columns</div>
                 </div>`;
+                if (_daBare) {
+                    // P12 support 'none': the pupil counts the rows and the columns himself.
+                    q.text = 'How many dots are in the array? Write the multiplication.';
+                    q.hint = 'Count the rows, then the dots in one row. Multiply rows by dots in a row.';
+                    q.visual = q.visual.replace(/<div style="margin-top:6px;[^>]*>[^<]*<\/div>/, '');
+                }
                 q.printFormat = 'dot-array-visual';
                 q.skillLabel = 'Dot Array Multiplication';
                 return;
@@ -3053,12 +3115,16 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const isHard = mappedSkill === "box_division_hard";
                 // Easy: 2-digit ÷ 1-digit, no remainder.  Hard: 3-digit ÷ 1-digit, ~30% may have remainder.
                 const numDigits = isHard ? 3 : 2;
-                const allowRemainder = isHard && Math.random() < 0.3;
+                // P12: `regroup` (Remainders: none / some / every item) and a changed `constant`
+                // ("Divide by"). At their defaults the old draw is unchanged.
+                const _bdRg = _opt('regroup');
+                const allowRemainder = _bdRg === 'always' ? true : _bdRg === 'none' ? false : Math.random() < 0.3;
+                const _bdDiv = _p12Constant();
 
                 let divisor, dividend, quotient, remainder;
                 let attempts = 0;
                 do {
-                    divisor = rng(2, 9); // single-digit divisor 2-9
+                    divisor = _bdDiv || rng(2, 9); // single-digit divisor 2-9
                     if (allowRemainder) {
                         // Pick any dividend in the digit range; remainder will fall out naturally.
                         const minD = isHard ? 100 : 10;
@@ -3646,8 +3712,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const isMedium = mappedSkill === "number_families_add_med";
                 const isHard = mappedSkill === "number_families_add_hard";
                 
-                // Generate appropriate numbers based on range
-                const maxNum = Math.min(range, isEasy ? 10 : isMedium ? 20 : 50);
+                // P12 (the P-1 split): `band` bounds the SUM at every support level ("Numbers to
+                // 20" = each addend to 10, so the sum is at most 20), and the level (the branch)
+                // owns only which boxes are blank. The default, 20, is the old level-2 draw.
+                const maxNum = Math.max(1, Math.floor(_p12FamilyBand('number_families_add', 20, [10, 20, 40, 100]) / 2));
                 const addend1 = rng(1, maxNum);
                 const addend2 = rng(1, maxNum);
                 const sum = addend1 + addend2;
@@ -3751,8 +3819,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const isMedium = mappedSkill === "number_families_mult_med";
                 const isHard = mappedSkill === "number_families_mult_hard";
                 
-                // Generate factors based on difficulty
-                const maxFactor = isEasy ? 5 : isMedium ? 10 : 12;
+                // P12 (the P-1 split): `band` is the largest table (5 × 5, 10 × 10, 12 × 12) at every
+                // support level; the level (the branch) owns only which boxes are blank.
+                const maxFactor = { 25: 5, 100: 10, 144: 12 }[_p12FamilyBand('number_families_mult', 25, [25, 100, 144])] || 5;
                 const factor1 = rng(2, maxFactor);
                 const factor2 = rng(2, maxFactor);
                 const product = factor1 * factor2;
@@ -3862,7 +3931,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const isHard = mappedSkill === "number_families_mixed_hard";
                 
                 // Pick two numbers that work well for all operations
-                const maxNum = isEasy ? 5 : isMedium ? 8 : 10;
+                // P12 (the P-1 split): `band` owns the number size at every support level, and the
+                // level (the branch) owns only which boxes are blank. Read off the raw options:
+                // the level router has swapped state.skill to a retired branch id by now.
+                const maxNum = _p12FamilyBand('number_families_mixed', 5, [5, 8, 10]);
                 const a = rng(2, maxNum);
                 const b = rng(2, maxNum);
                 const sum = a + b;
@@ -4072,7 +4144,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // MULTIPLICATION PROPERTIES
             // ========================================
             if (mappedSkill === "mult_properties") {
-                const propType = pick(['commutative', 'distributive', 'identity', 'zero']);
+                // P12: `forms` picks which properties are dealt (0 order, 1 distributive,
+                // 2 identity, 3 zero); untouched, one is picked at random as before.
+                const _mpTypes = ['commutative', 'distributive', 'identity', 'zero'];
+                const _mpForms = _p12Narrowed('forms');
+                const propType = _mpForms ? _mpTypes[_mpForms[_dealRung(_mpForms.length)]] : pick(_mpTypes);
 
                 if (propType === 'commutative') {
                     const a = rng(2, 9);
@@ -4225,6 +4301,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     </div>`;
                 }
 
+                // P12: `pictures` off prints the question alone, without the arrays and the
+                // property's name (the name is a hint: it tells the pupil which rule to use).
+                if (_opt('pictures') === false) q.visual = '';
                 q.printFormat = 'mult-properties';
                 q.skillLabel = 'Mult Properties';
                 return;
@@ -4412,8 +4491,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // rings the groups and counts what is left.
                 // Divisor and quotient 2-6 keep every picture countable (at most 41 counters, four
                 // rows of whole groups); the remainder still reaches divisor - 1.
-                const divisor = rng(2, 6);
-                const quotient = rng(2, 6);
+                // P12: a changed `constant` ("Divide by", 2-9) picks the divisor; above 6 the
+                // quotient shrinks so the picture stays at 41 counters or fewer.
+                const divisor = _p12Constant() || rng(2, 6);
+                const quotient = rng(2, Math.max(2, Math.min(6, Math.floor((41 - (divisor - 1)) / divisor))));
                 const remainder = rng(1, divisor - 1);
                 const dividend = divisor * quotient + remainder;
 
@@ -4707,7 +4788,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // Type 1: single digit × 2-digit (e.g., 4 × 16)
                 // Type 2: single digit × 3-digit (e.g., 3 × 135)
                 // LRU rotation across the two problem-size variants.
-                const problemType = (typeof window !== 'undefined' && window.pickVariant)
+                // P12: `tiles` 21 / 31 fixes the size (2- or 3-digit × 1-digit); unset, both rotate.
+                const _amT = Number(_opt('tiles'));
+                const problemType = _amT === 21 ? '2digit' : _amT === 31 ? '3digit'
+                    : (typeof window !== 'undefined' && window.pickVariant)
                     ? window.pickVariant('area_model_mult', ['2digit', '3digit'], [3, 2])
                     : (Math.random() < 0.6 ? '2digit' : '3digit');
                 q._variant = problemType;
@@ -4758,7 +4842,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             if (mappedSkill === "area_model_mult_hard") {
                 // Type: 2-digit × 2-digit (2×2 grid) or 2-digit × 3-digit (2×3 grid)
                 // LRU-rotated so students see both grid sizes in a fair pattern.
-                const problemType = (typeof window !== 'undefined' && window.pickVariant)
+                // P12: `tiles` 22 / 23 fixes the grid (2 × 2 or 2 × 3); unset, both rotate.
+                const _amhT = Number(_opt('tiles'));
+                const problemType = _amhT === 22 ? '2x2' : _amhT === 23 ? '2x3'
+                    : (typeof window !== 'undefined' && window.pickVariant)
                     ? window.pickVariant('area_model_mult_hard', ['2x2', '2x3'], [3, 2])
                     : (Math.random() < 0.6 ? '2x2' : '2x3');
                 q._variant = problemType;
@@ -4898,7 +4985,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     [45, 9], [54, 9], [63, 9], [72, 9], [81, 9], [90, 9], [99, 9]
                 ];
                 
-                const [dividend, divisor] = pick(friendlyProblems);
+                // P12: a changed `constant` ("Divide by") keeps only the problems with that divisor.
+                const _am2 = _p12Narrowed('constant');
+                const _am2List = _am2 ? friendlyProblems.filter(p => _am2.includes(p[1])) : [];
+                const [dividend, divisor] = pick(_am2List.length ? _am2List : friendlyProblems);
                 const quotient = dividend / divisor;
                 
                 // Split into friendly parts (largest multiple of divisor*10 that fits, plus remainder)
@@ -4997,7 +5087,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     [234, 9, 180, 54], [261, 9, 180, 81], [279, 9, 270, 9], [297, 9, 270, 27]
                 ];
                 
-                const problem = pick(friendlyProblems);
+                // P12: a changed `constant` ("Divide by") keeps only the problems with that divisor.
+                const _am3 = _p12Narrowed('constant');
+                const _am3List = _am3 ? friendlyProblems.filter(p => _am3.includes(p[1])) : [];
+                const problem = pick(_am3List.length ? _am3List : friendlyProblems);
                 const dividend = problem[0];
                 const divisor = problem[1];
                 const part1 = problem[2];

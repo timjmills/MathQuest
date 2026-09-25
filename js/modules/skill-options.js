@@ -911,6 +911,150 @@ SKILL_OPTIONS['composing:number_word_form'] = [{
     help: 'Writing the words is harder (it is spelling too). Tick both and the page alternates.',
 }];
 
+// ===========================================================================
+// P12 · EVERY OTHER FAMILY  (design/audit/OPTIONS-RUBRIC.md, 2026-09-25)
+// ===========================================================================
+// One contiguous block, merged into SKILL_OPTIONS below (P12_OPTIONS), for every live skill P9 and
+// P11 did not cover: the × / ÷ ladder steps, the number families, the fractions, decimals,
+// conversions, geometry, measurement, time, money, data, algebra, number theory and integer
+// families, and — through the pool hook below — every mixed review. Every option here is READ by
+// its generator (the "P12 OPTIONS" helpers in each gen-*.js file); defaults are the stand-alone
+// values (R2), and at its default each option leaves the generator on exactly its old path.
+//
+// NEW OPTION IDS travel in share codes under the two-character "X" keys (skill-option-codec.js,
+// OPTION_KEYS): members XA, forms XB, denoms XC, model XD, labels XE, precision XF, coins XG,
+// shapes XH, points XI, scale XJ, digits XK, units XL. Every other control reuses an existing id
+// whose meaning fits (`band`, `support`, `pictures`, `unknown`, `task`, `dir`, `tiles`, `step`,
+// `place`, `simplestForm`, `level`, `regroup`, `response`).
+
+/** A set option over a skill's item FORMS, dealt round-robin by the generator (one form per item). */
+export const formsOption = (values, { label = 'What the items ask', help, dflt } = {}) => ({
+    id: 'forms', label, type: 'set', group: 'difficulty',
+    default: dflt || values.map(x => x.v),
+    values,
+    allLabel: 'All of them, mixed',
+    help: help || 'Tick one kind for a page of it alone, or several to mix them. All ticked mixes every kind.',
+});
+/** Picture model on / off — `pictures` with its own honest help. */
+const _p12Pictures = (help, dflt = true) => ({ ...picturesOption(dflt), group: 'support', help });
+
+/** "Divide by": a set of divisors, read by gen-operations.js _p12Constant() only when changed. */
+const _p12DivBy = (lo, hi, dflt, help) => {
+    const all = Array.from({ length: hi - lo + 1 }, (_, i) => lo + i);
+    return {
+        id: 'constant', label: 'Divide by', type: 'set', group: 'difficulty',
+        default: dflt || all, values: all.map(v => ({ v, l: String(v) })),
+        allLabel: `Every divisor, ${lo} to ${hi}`, titleVerb: 'Divide by',
+        help: help || 'Tick one divisor for a page of it alone, or a few to review them together.',
+    };
+};
+const _p12Enum = (id, label, values, dflt, help, group = 'difficulty') => ({ id, label, type: 'enum', group, default: dflt, values, help });
+
+const P12_OPTIONS = {
+    // ======================= × and ÷ ladder steps (gen-operations.js, gen-counting.js) =========
+    'multiplication:dot_array_mult': [
+        _opsBand([25, 100], 100, { label: 'Rows and columns to', labels: { 25: '5 (5 × 5)', 100: '10 (10 × 10)' },
+            help: 'The most rows, and the most dots in a row. The product is at most 25 or 100.' }),
+        _p12Enum('support', 'Support', [{ v: 'label', l: 'Rows and columns written under the array' },
+            { v: 'none', l: 'None: the pupil counts the rows and the columns' }], 'label',
+        'The caption names the two factors; without it the pupil finds them in the picture.', 'support'),
+    ],
+    'multiplication:mult_properties': [
+        formsOption([{ v: 0, l: 'Order (3 × 4 = 4 × 3)' }, { v: 1, l: 'Breaking apart (6 × 7 = 6 × 5 + 6 × 2)' },
+            { v: 2, l: 'Times 1' }, { v: 3, l: 'Times 0' }], { label: 'Which property' }),
+        _p12Pictures('Off prints the question alone: no arrays and no property name (the name tells the pupil which rule to use).'),
+    ],
+    'multiplication:area_model_mult': [_p12Enum('tiles', 'Digits × digit', [
+        { v: null, l: 'Both sizes, dealt' }, { v: 21, l: '2-digit × 1-digit (4 × 36)' }, { v: 31, l: '3-digit × 1-digit (3 × 135)' }],
+    null, 'The size of the number split into parts: two parts (tens, ones) or three (hundreds, tens, ones).')],
+    'multiplication:area_model_mult_hard': [_p12Enum('tiles', 'Digits × digits', [
+        { v: null, l: 'Both grids, dealt' }, { v: 22, l: '2-digit × 2-digit (a 2 × 2 grid)' }, { v: 23, l: '2-digit × 3-digit (a 2 × 3 grid)' }],
+    null, 'The grid the pupil fills: four partial products, or six.')],
+    'multiplication:repeated_add_to_mult': [
+        _opsBand([25, 36, 100], 36, { label: 'Groups and group size to', labels: { 25: '5', 36: '6', 100: '10' },
+            help: 'The most groups and the most in a group: the product is at most 25, 36 or 100.' }),
+        _p12Pictures('Off leaves the two sentences to write, without the ringed groups.'),
+    ],
+    'multiplication:equal_or_unequal_groups': [
+        formsOption([{ v: 0, l: 'Equal groups (multiply)' }, { v: 1, l: 'Unequal groups (add)' }], { label: 'Which groups',
+            help: 'Both, mixed, is the default: the pupil has to look. One kind alone is a warm-up.' }),
+        _p12Enum('step', 'Most in a group', [{ v: 6, l: '6' }, { v: 10, l: '10' }], 6, 'Bigger groups are harder to compare by eye.'),
+    ],
+    'multiplication:mult_zeros': [formsOption([{ v: 0, l: '× 10 (6 × 10)' }, { v: 1, l: '× 100 (6 × 100)' },
+        { v: 2, l: '× a multiple of ten (6 × 40)' }], { label: 'Which kind' })],
+    'multiplication:mult_placeholder_zero': [_p12Enum('tiles', 'Top number', [
+        { v: 22, l: '2 digits (47 × 36)' }, { v: 32, l: '3 digits (215 × 36)' }], 22,
+    'The multiplier always has two digits: the step is where the second row starts.')],
+    'multiplication:mult_missing_digit': [_p12Enum('tiles', 'Top number', [
+        { v: 21, l: '2 digits (47 × 6)' }, { v: 31, l: '3 digits (215 × 6)' }], 21,
+    'A longer number has more places the missing digit can hide in.')],
+    'division:div_remainders': [_p12DivBy(2, 9, [2, 3, 4, 5, 6],
+        'The group size to ring. Above 6 the pictures get fewer groups, so every picture stays countable.')],
+    'division:box_division_easy': [
+        _p12DivBy(2, 9),
+        { ..._opsRegroup('none'), label: 'Remainders', values: [{ v: 'none', l: 'None (it shares exactly)' }, { v: 'mixed', l: 'Some items' }, { v: 'always', l: 'Every item' }],
+            help: 'A remainder is written R in the last box: 29 ÷ 4 = 7 R 1.' },
+    ],
+    'division:box_division_hard': [
+        _p12DivBy(2, 9),
+        { ..._opsRegroup('mixed'), label: 'Remainders', values: [{ v: 'none', l: 'None (it shares exactly)' }, { v: 'mixed', l: 'Some items' }, { v: 'always', l: 'Every item' }],
+            help: 'A remainder is written R in the last box: 437 ÷ 4 = 109 R 1.' },
+    ],
+    'division:area_model_div_2by1': [_p12DivBy(2, 9)],
+    'division:area_model_div_3by1': [_p12DivBy(2, 9)],
+    'division:share_into_groups': [_opsBand([12, 24], 24, { label: 'Counters to', help: 'The most counters in the picture. 12 keeps it to 2 to 4 groups.' })],
+    'division:div_equation_parts': [
+        formsOption([{ v: 0, l: 'How many in all' }, { v: 1, l: 'How many in each group' }, { v: 2, l: 'How many groups' }],
+            { label: 'Which number is asked' }),
+        _opsBand([25, 81], 81, { label: 'Numbers to', labels: { 25: '25 (groups and sizes to 5)', 81: '81 (to 9)' },
+            help: 'The largest total. Smaller totals draw fewer, smaller groups.' }),
+    ],
+    'division:remainder_too_big': [
+        formsOption([{ v: 0, l: 'Already finished (check it)' }, { v: 1, l: 'Not finished (fix it)' }], { label: 'Which work',
+            help: 'Both, mixed, is the default: the pupil has to check. "Not finished" alone practises the fix.' }),
+        _p12DivBy(3, 9),
+        _opsBand([null, 50, 100], null, { label: 'Numbers to', labels: { null: 'Any (to 119)' },
+            help: 'The largest number shared.' }),
+    ],
+    'division:div_fix_estimate': [
+        formsOption([{ v: 0, l: 'First try too big' }, { v: 1, l: 'First try too small' }], { label: 'Which mistake' }),
+        _p12Enum('tiles', 'Divisor', [{ v: 19, l: '11 to 19' }, { v: 29, l: '11 to 29' }, { v: 49, l: '11 to 49' }], 49,
+            'Smaller two-digit divisors are easier to multiply in the head.'),
+    ],
+    // The number families (the P-1 split): the band owns the number size, the level the blanks.
+    'addition:number_families_add': [
+        _opsBand([10, 20, 40, 100], 20, { help: 'The largest sum in the family, at every support level.' }),
+        levelSubset([2, 1, 0], 2, 'Level 2 leaves only each answer blank, level 1 blanks two numbers in every row, level 0 blanks the whole family. The numbers stay the same size at every level.'),
+    ],
+    'multiplication:number_families_mult': [
+        _opsBand([25, 100, 144], 25, { label: 'Tables to', labels: { 25: '5 × 5', 100: '10 × 10', 144: '12 × 12' },
+            help: 'The largest table in the family, at every support level.' }),
+        levelSubset([2, 1, 0], 2, 'Level 2 leaves only each answer blank, level 1 blanks two numbers in every row, level 0 blanks the whole family. The tables stay the same at every level.'),
+    ],
+    'number_ops_mixed:number_families_mixed': [
+        _opsBand([5, 8, 10], 5, { label: 'Numbers to', help: 'The two starting numbers of every family, at every support level.' }),
+        levelSubset([2, 1, 0], 2, 'Level 2 leaves only each answer blank, level 1 blanks two numbers in every row, level 0 blanks the whole family. The numbers stay the same size at every level.'),
+    ],
+};
+
+// The pool hook: skill-options-pools.js builds the "Which skills" control for every mixed review
+// from the dealer's own pool and registers it here, so this file stays import-free.
+let _poolOptions = null;
+/** Called once by skill-options-pools.js. */
+export function registerPoolOptions(fn) { _poolOptions = typeof fn === 'function' ? fn : null; }
+
+/** A skill's own declared options: its registry entry, else its mixed-pool control, else none. */
+export function ownOptionsFor(categoryId, skillId) {
+    const own = SKILL_OPTIONS[`${categoryId}:${skillId}`] || SKILL_OPTIONS[skillId];
+    if (own) return own;
+    if (_poolOptions) {
+        try { const p = _poolOptions(categoryId, skillId); if (p) return p; } catch (e) { /* no pool */ }
+    }
+    return [];
+}
+Object.assign(SKILL_OPTIONS, P12_OPTIONS);
+// ============================ end P12 · every other family ============================
+
 // Options every skill understands, whether or not it declares anything of its own.
 export const UNIVERSAL_OPTIONS = [levelOption()];
 
@@ -976,7 +1120,7 @@ function _measuredOptions(categoryId, skillId, own) {
 
 /** The option definitions for a skill: its own, then the measured ones, then the universal ones. */
 export function optionsFor(categoryId, skillId) {
-    const own = SKILL_OPTIONS[`${categoryId}:${skillId}`] || SKILL_OPTIONS[skillId] || [];
+    const own = ownOptionsFor(categoryId, skillId);
     const all = [...own, ..._measuredOptions(categoryId, skillId, own)];
     const ids = new Set(all.map(o => o.id));
     return [...all, ...UNIVERSAL_OPTIONS.filter(o => !ids.has(o.id))];
@@ -990,7 +1134,7 @@ export function optionsFor(categoryId, skillId) {
  * teacher's screen.
  */
 export function offeredOptionsFor(categoryId, skillId) {
-    const own = SKILL_OPTIONS[`${categoryId}:${skillId}`] || SKILL_OPTIONS[skillId] || [];
+    const own = ownOptionsFor(categoryId, skillId);
     const ownIds = new Set(own.map(o => o.id));
     const d = DERIVED[`${categoryId}:${skillId}`];
     const out = [];

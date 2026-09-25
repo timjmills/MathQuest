@@ -9,35 +9,30 @@ What it checks, per skill and per value of every option the teacher is shown (`o
 | | |
 |---|---|
 | Live skills | 583 |
-| Skills with at least one option shown | 198 |
-| Skills with NO option shown | 385 |
-| Option values checked | 895 |
-| Values passing every surface | 881 |
-| Values failing | 14 |
+| Skills with at least one option shown | 288 |
+| Skills with NO option shown | 295 |
+| Option values checked | 1795 |
+| Values passing every surface | 1791 |
+| Values failing | 4 |
 | … of which gated behind Max Number | 0 |
-| Failing surface counts (a value can fail several) | gen 2 · print 11 · screen 5 · trip 0 |
-| Skills whose every option value passes | 191 / 198 |
+| Failing surface counts (a value can fail several) | gen 0 · print 4 · screen 3 · trip 0 |
+| Skills whose every option value passes | 286 / 288 |
 
 ## Failures by generator file
 
-### gen-operations.js — 7 skill(s), 14 value(s)
+### gen-counting.js — 1 skill(s), 1 value(s)
 
 | Skill | Option = value | Failure |
 |---|---|---|
-| `addition:add_10_regroup` | level = `[0]` | print: printed sheet identical to the default sheet |
-| `subtraction:sub_10_regroup` | level = `[0]` | print: printed sheet identical to the default sheet |
-| `multiplication:mult_div_fact_family` | notation = `["bracket"]` | print: printed sheet identical to the default sheet |
-| `multiplication:mult_div_fact_family` | notation = `["fraction"]` | print: printed sheet identical to the default sheet |
-| `multiplication:mult_div_fact_family` | notation = `["across","bracket","fraction"]` | print: printed sheet identical to the default sheet |
-| `division:div_facts` | constant = `[0]` | gen: fact outside the ticked set {0}: 0 ÷ 9, 0 ÷ 2, 0 ÷ 4<br>print: fact outside the ticked set {0}: 0 ÷ 9, 0 ÷ 2, 0 ÷ 4<br>screen/worksheet: fact outside the ticked set {0}: 0 ÷ 9, 0 ÷ 2, 0 ÷ 4<br>screen/practice: fact outside the ticked set {0}: 0 ÷ 5, 0 ÷ 4, 0 ÷ 4 |
-| `division:remainder_contexts` | range = `100` | print: printed sheet identical to the default sheet |
-| `division:remainder_contexts` | range = `1000` | print: printed sheet identical to the default sheet |
-| `division:missing_mult_div` | notation = `["bracket"]` | print: printed sheet identical to the default sheet |
-| `division:missing_mult_div` | notation = `["fraction"]` | print: printed sheet identical to the default sheet |
-| `division:missing_mult_div` | notation = `["across","bracket","fraction"]` | gen: no item written "across" (got /fraction)<br>gen: no item written "bracket" (got /fraction)<br>print: printed sheet identical to the default sheet<br>screen/worksheet: no item written "across" (got /fraction)<br>screen/worksheet: no item written "bracket" (got /fraction) |
-| `number_ops_mixed:word_problems_mixed` | decimals = `1` | screen/practice: no number with 1 decimal place(s) |
-| `number_ops_mixed:word_problems_mixed` | decimals = `2` | screen/practice: no number with 2 decimal place(s) |
-| `number_ops_mixed:word_problems_mixed` | decimals = `3` | screen/practice: no number with 3 decimal place(s) |
+| `counting:mixed_counting` | level = `[0]` | print: printed sheet identical to the default sheet |
+
+### gen-operations.js — 1 skill(s), 3 value(s)
+
+| Skill | Option = value | Failure |
+|---|---|---|
+| `number_ops_mixed:word_problems_mixed` | decimals = `1` | print: no number with 1 decimal place(s)<br>screen/practice: no number with 1 decimal place(s) |
+| `number_ops_mixed:word_problems_mixed` | decimals = `2` | print: no number with 2 decimal place(s)<br>screen/practice: no number with 2 decimal place(s) |
+| `number_ops_mixed:word_problems_mixed` | decimals = `3` | print: no number with 3 decimal place(s)<br>screen/practice: no number with 3 decimal place(s) |
 
 ## Warnings (not failures)
 
@@ -45,6 +40,59 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 
 | Skill | Option = value | Warning |
 |---|---|---|
+| `counting:count_objects` | band = `5` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `counting:count_objects` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "20") |
+| `counting:count_objects` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "20") |
+| `counting:number_seq_fill` | step = `1` | print: 4/6 answer(s) not found in the key text (e.g. "59, 60") |
+| `counting:number_seq_fill` | step = `2` | print: 4/6 answer(s) not found in the key text (e.g. "58, 60") |
+| `counting:number_seq_fill` | step = `5` | print: 4/6 answer(s) not found in the key text (e.g. "37, 42") |
+| `counting:number_seq_fill` | step = `10` | print: 4/6 answer(s) not found in the key text (e.g. "34, 44") |
+| `counting:number_seq_fill` | dir = `"forward"` | print: 4/6 answer(s) not found in the key text (e.g. "58, 60") |
+| `counting:number_seq_fill` | dir = `"back"` | print: 4/6 answer(s) not found in the key text (e.g. "62, 60") |
+| `counting:number_seq_fill` | range = `10` | print: 4/6 answer(s) not found in the key text (e.g. "3, 4") |
+| `counting:number_seq_fill` | range = `20` | print: 4/6 answer(s) not found in the key text (e.g. "7, 8") |
+| `counting:number_seq_fill` | range = `50` | print: 4/6 answer(s) not found in the key text (e.g. "19, 21") |
+| `counting:number_seq_fill` | range = `100` | print: 4/6 answer(s) not found in the key text (e.g. "38, 40") |
+| `counting:number_seq_fill` | range = `1000` | print: 3/6 answer(s) not found in the key text (e.g. "601, 501") |
+| `counting:mixed_counting` | range = `10` | gen: "Up to 10" but the answer reaches 18 and the numbers 18<br>print: "Up to 10" but the answer reaches 15 and the numbers null<br>print: 1/6 answer(s) not found in the key text (e.g. "2, 4") |
+| `counting:mixed_counting` | range = `20` | print: 1/6 answer(s) not found in the key text (e.g. "6, 10") |
+| `counting:mixed_counting` | range = `50` | print: 1/6 answer(s) not found in the key text (e.g. "9, 13") |
+| `counting:mixed_counting` | range = `100` | print: 1/6 answer(s) not found in the key text (e.g. "15, 19") |
+| `counting:mixed_counting` | range = `1000` | print: 1/6 answer(s) not found in the key text (e.g. "124, 134") |
+| `counting:mixed_counting` | level = `[3]` | print: 3/6 answer(s) not found in the key text (e.g. "14") |
+| `counting:mixed_counting` | level = `[2]` | print: 1/6 answer(s) not found in the key text (e.g. "15, 19") |
+| `counting:mixed_counting` | level = `[0]` | print: 1/6 answer(s) not found in the key text (e.g. "15, 19") |
+| `counting:mixed_counting` | level = `[3,2,1,0]` | print: 3/6 answer(s) not found in the key text (e.g. "14") |
+| `comparing:compare_groups` | dir = `"more"` | print: 4/6 answer(s) not found in the key text (e.g. "B") |
+| `comparing:compare_groups` | dir = `"fewer"` | print: 2/6 answer(s) not found in the key text (e.g. "B") |
+| `comparing:compare_groups` | dir = `"same"` | print: 6/6 answer(s) not found in the key text (e.g. "not the same") |
+| `comparing:compare_groups` | band = `5` | print: 3/6 answer(s) not found in the key text (e.g. "same") |
+| `comparing:compare_groups` | level = `[2]` | print: 3/6 answer(s) not found in the key text (e.g. "same") |
+| `comparing:compare_groups` | level = `[2,1]` | print: 3/6 answer(s) not found in the key text (e.g. "same") |
+| `comparing:compare_objects` | dir = `"more"` | print: 3/6 answer(s) not found in the key text (e.g. "B") |
+| `comparing:compare_objects` | dir = `"fewer"` | print: 3/6 answer(s) not found in the key text (e.g. "B") |
+| `comparing:compare_objects` | task = `"length"` | print: 2/6 answer(s) not found in the key text (e.g. "B") |
+| `comparing:compare_objects` | task = `"height"` | print: 2/6 answer(s) not found in the key text (e.g. "B") |
+| `comparing:compare_objects` | task = `"thickness"` | print: 2/6 answer(s) not found in the key text (e.g. "B") |
+| `comparing:mixed_comparing` | level = `[2]` | print: 3/6 answer(s) not found in the key text (e.g. "B") |
+| `comparing:mixed_comparing` | level = `[2,1]` | print: 3/6 answer(s) not found in the key text (e.g. "B") |
+| `composing:number_bonds` | band = `5` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `composing:number_bonds` | unknown = `"first"` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `composing:number_bonds` | unknown = `"second"` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `composing:tens_foundation_visual` | band = `50` | gen: band 50 never used: largest number 5<br>print: band 50 never used: largest number 5<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `composing:hundreds_chart_fill` | band = `50` | print: 5/6 answer(s) not found in the key text (e.g. "26, 28") |
+| `composing:hundreds_chart_fill` | tiles = `2` | print: 6/6 answer(s) not found in the key text (e.g. "76, 79") |
+| `composing:hundreds_chart_fill` | tiles = `3` | print: 6/6 answer(s) not found in the key text (e.g. "76, 79, 88") |
+| `composing:ten_frame_build` | band = `5` | print: 6/6 answer(s) not found in the key text (e.g. "1") |
+| `composing:base10_build` | band = `20` | print: 6/6 answer(s) not found in the key text (e.g. "14") |
+| `composing:base10_build` | band = `50` | print: 6/6 answer(s) not found in the key text (e.g. "27") |
+| `composing:base10_regroup` | band = `50` | print: 6/6 answer(s) not found in the key text (e.g. "24") |
+| `composing:base10_build_hundreds` | band = `500` | print: 6/6 answer(s) not found in the key text (e.g. "263") |
+| `composing:mixed_composing` | level = `[0]` | print: 4/6 answer(s) not found in the key text (e.g. "20") |
+| `composing:mixed_composing` | level = `[1,0]` | print: 4/6 answer(s) not found in the key text (e.g. "20") |
+| `counting_mixed:counting_all` | range = `10` | gen: "Up to 10" but the answer reaches 327 and the numbers 327<br>print: "Up to 10" but the answer reaches 16 and the numbers 16<br>print: 3/6 answer(s) not found in the key text (e.g. "5, 3") |
+| `counting_mixed:counting_all` | range = `20` | gen: "Up to 20" but the answer reaches 327 and the numbers 327<br>print: 3/6 answer(s) not found in the key text (e.g. "11, 7") |
+| `counting_mixed:counting_all` | range = `100` | gen: "Up to 100" but the answer reaches 327 and the numbers 327<br>print: 3/6 answer(s) not found in the key text (e.g. "50, 40") |
 | `addition:add_facts` | constant = `[0]` | print: sheet is not titled "Add 0" (P-31) |
 | `addition:add_facts` | constant = `[1]` | print: sheet is not titled "Add 1" (P-31) |
 | `addition:add_facts` | constant = `[2]` | print: sheet is not titled "Add 2" (P-31) |
@@ -59,12 +107,53 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `addition:add_facts` | constant = `[11]` | print: sheet is not titled "Add 11" (P-31) |
 | `addition:add_facts` | constant = `[12]` | print: sheet is not titled "Add 12" (P-31) |
 | `addition:add_facts` | constant = `[13]` | print: sheet is not titled "Add 13" (P-31) |
-| `addition:add_word_problems_plain` | range = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `addition:add_sub_fact_family` | range = `10` | print: 6/6 answer(s) not found in the key text (e.g. "10, 10, 2, 8") |
 | `addition:add_sub_fact_family` | range = `100` | print: 6/6 answer(s) not found in the key text (e.g. "19, 19, 2, 17") |
 | `addition:comparison_word` | range = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
-| `addition:nl_add` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only |
+| `addition:add_10_mixed` | support = `"line"` | print: 2/6 answer(s) not found in the key text (e.g. "10") |
+| `addition:add_50_no_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "38") |
+| `addition:add_50_no_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "38") |
+| `addition:add_50_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "50") |
+| `addition:add_50_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "50") |
+| `addition:add_50_mixed` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "17") |
+| `addition:add_50_mixed` | level = `[3,2,1]` | print: 1/6 answer(s) not found in the key text (e.g. "17") |
+| `addition:add_100_no_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "44") |
+| `addition:add_100_no_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "44") |
+| `addition:add_100_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "34") |
+| `addition:add_100_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "34") |
+| `addition:add_100_mixed` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "43") |
+| `addition:add_100_mixed` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "43") |
+| `addition:add_1k_no_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "846") |
+| `addition:add_1k_no_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "846") |
+| `addition:add_1k_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "635") |
+| `addition:add_1k_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "635") |
+| `addition:add_1k_mixed` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "113") |
+| `addition:add_1k_mixed` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "113") |
+| `addition:add_10k_no_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "9795") |
+| `addition:add_10k_no_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "9795") |
+| `addition:add_10k_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "8322") |
+| `addition:add_10k_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "8322") |
+| `addition:add_10k_mixed` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "6136") |
+| `addition:add_10k_mixed` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "6136") |
+| `addition:add_100k_no_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "95083") |
+| `addition:add_100k_no_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "95083") |
+| `addition:add_100k_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "62451") |
+| `addition:add_100k_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "62451") |
+| `addition:add_100k_mixed` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "78742") |
+| `addition:add_100k_mixed` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "78742") |
+| `addition:add_1m_no_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "591839") |
+| `addition:add_1m_no_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "591839") |
+| `addition:add_1m_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "512735") |
+| `addition:add_1m_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "512735") |
+| `addition:add_1m_mixed` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "279689") |
+| `addition:add_1m_mixed` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "279689") |
+| `addition:nl_add` | unknown = `"answer"` | gen: generator not reproducible; difference not checkable, predicate only |
+| `addition:nl_add` | unknown = `"first"` | gen: generator not reproducible; difference not checkable, predicate only |
+| `addition:nl_add` | unknown = `"second"` | gen: generator not reproducible; difference not checkable, predicate only |
+| `addition:nl_add` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `addition:nl_add` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only |
+| `addition:cloze_addition` | range = `10` | print: 6/6 answer(s) not found in the key text (e.g. "5, 5") |
+| `addition:cloze_addition` | range = `100` | print: 6/6 answer(s) not found in the key text (e.g. "9, 9") |
 | `addition:fact_family_sort` | range = `10` | gen: "Up to 10" but the answer reaches null and the numbers 13<br>print: "Up to 10" but the answer reaches null and the numbers 13 |
 | `subtraction:sub_facts` | constant = `[0]` | print: sheet is not titled "Subtract 0" (P-31) |
 | `subtraction:sub_facts` | constant = `[1]` | print: sheet is not titled "Subtract 1" (P-31) |
@@ -80,12 +169,87 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `subtraction:sub_facts` | constant = `[11]` | print: sheet is not titled "Subtract 11" (P-31) |
 | `subtraction:sub_facts` | constant = `[12]` | print: sheet is not titled "Subtract 12" (P-31) |
 | `subtraction:sub_facts` | constant = `[13]` | print: sheet is not titled "Subtract 13" (P-31) |
-| `subtraction:subtract` | range = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
-| `subtraction:sub_word_problems` | range = `20` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_facts` | band = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:subtract` | band = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_word_problems` | range = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `subtraction:missing_add_sub` | range = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_5_pictures` | pictures = `false` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `subtraction:unknown_start_wp` | range = `10` | gen: "Up to 10" but the answer reaches 16 and the numbers 19<br>print: "Up to 10" but the answer reaches 16 and the numbers 13 |
 | `subtraction:sub_10_mixed` | notation = `["across"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `subtraction:sub_10_mixed` | notation = `["stacked","across"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_10_mixed` | support = `"frame"` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_10_mixed` | support = `"line"` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_20_no_regroup` | band = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_20_no_regroup` | regroup = `"always"` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_50_no_regroup` | band = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_50_no_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "11") |
+| `subtraction:sub_50_no_regroup` | level = `[3,2,1]` | print: 1/6 answer(s) not found in the key text (e.g. "12") |
+| `subtraction:sub_50_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "9") |
+| `subtraction:sub_50_regroup` | level = `[3,2,1]` | print: 1/6 answer(s) not found in the key text (e.g. "16") |
+| `subtraction:sub_50_mixed` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "2") |
+| `subtraction:sub_50_mixed` | level = `[3,2,1]` | print: 1/6 answer(s) not found in the key text (e.g. "22") |
+| `subtraction:sub_100_no_regroup` | band = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_100_no_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "24") |
+| `subtraction:sub_100_no_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "24") |
+| `subtraction:sub_100_regroup` | band = `20` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_100_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "19") |
+| `subtraction:sub_100_regroup` | level = `[3,2,1]` | print: 1/6 answer(s) not found in the key text (e.g. "19") |
+| `subtraction:sub_100_mixed` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "18") |
+| `subtraction:sub_100_mixed` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "18") |
+| `subtraction:sub_1k_no_regroup` | band = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_1k_no_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "71") |
+| `subtraction:sub_1k_no_regroup` | level = `[3,2,1]` | print: 1/6 answer(s) not found in the key text (e.g. "320") |
+| `subtraction:sub_1k_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "284") |
+| `subtraction:sub_1k_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "284") |
+| `subtraction:sub_1k_mixed` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "146") |
+| `subtraction:sub_1k_mixed` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "146") |
+| `subtraction:sub_10k_no_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "4015") |
+| `subtraction:sub_10k_no_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "4015") |
+| `subtraction:sub_10k_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "1289") |
+| `subtraction:sub_10k_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "1289") |
+| `subtraction:sub_10k_mixed` | band = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_10k_mixed` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "1322") |
+| `subtraction:sub_10k_mixed` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "1322") |
+| `subtraction:sub_100k_no_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "13301") |
+| `subtraction:sub_100k_no_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "13301") |
+| `subtraction:sub_100k_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "7608") |
+| `subtraction:sub_100k_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "7608") |
+| `subtraction:sub_100k_mixed` | band = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_100k_mixed` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "85942") |
+| `subtraction:sub_100k_mixed` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "85942") |
+| `subtraction:sub_1m_no_regroup` | band = `20` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_1m_no_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "500063") |
+| `subtraction:sub_1m_no_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "500063") |
+| `subtraction:sub_1m_regroup` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "76708") |
+| `subtraction:sub_1m_regroup` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "76708") |
+| `subtraction:sub_1m_mixed` | level = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "35727") |
+| `subtraction:sub_1m_mixed` | level = `[3,2,1]` | print: 2/6 answer(s) not found in the key text (e.g. "35727") |
+| `subtraction:sub_wp_10` | pictures = `false` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_10` | support = `"bar"` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_10_plain` | band = `20` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_10_plain` | band = `50` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_20` | band = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_20` | band = `100` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_20` | pictures = `false` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_20` | support = `"bar"` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_50` | band = `10` | print: 2/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_50_plain` | band = `10` | print: 3/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_100` | band = `10` | print: 2/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_100` | band = `20` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_100_plain` | band = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_1k` | band = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_1k` | band = `20` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_1k_plain` | band = `10` | print: 2/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_10k` | band = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_10k_plain` | band = `10` | print: 2/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_10k_plain` | band = `20` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_100k` | band = `50` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_100k` | band = `100` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_1m_plain` | band = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:sub_wp_1m_plain` | band = `20` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `subtraction:nl_sub` | unknown = `"answer"` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:nl_sub` | unknown = `"first"` | gen: generator not reproducible; difference not checkable, predicate only |
+| `subtraction:nl_sub` | unknown = `"second"` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `subtraction:nl_sub` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `subtraction:nl_sub` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only |
 | `subtraction:sub_across_zeros` | range = `100` | gen: "Up to 100" but the answer reaches 319 and the numbers 408<br>print: "Up to 100" but the answer reaches 319 and the numbers 408 |
@@ -105,7 +269,9 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `multiplication:mult_facts` | constant = `[11]` | print: sheet is not titled "Multiply by 11" (P-31) |
 | `multiplication:mult_facts` | constant = `[12]` | print: sheet is not titled "Multiply by 12" (P-31) |
 | `multiplication:arrays_groups` | range = `10` | gen: "Up to 10" but the answer reaches 25 and the numbers null<br>print: "Up to 10" but the answer reaches 25 and the numbers null |
-| `division:div_facts` | constant = `[0]` | print: sheet is not titled "Divide by 0" (P-31) |
+| `multiplication:mult_chart` | band = `25` | print: 6/6 answer(s) not found in the key text (e.g. "3, 16, 25") |
+| `multiplication:mult_chart` | band = `100` | print: 6/6 answer(s) not found in the key text (e.g. "28, 56, 72") |
+| `division:div_facts` | constant = `[0]` | print: sheet is not titled "Zero divided by a number" (P-31) |
 | `division:div_facts` | constant = `[1]` | print: sheet is not titled "Divide by 1" (P-31) |
 | `division:div_facts` | constant = `[2]` | print: sheet is not titled "Divide by 2" (P-31) |
 | `division:div_facts` | constant = `[3]` | print: sheet is not titled "Divide by 3" (P-31) |
@@ -118,6 +284,7 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `division:div_facts` | constant = `[10]` | print: sheet is not titled "Divide by 10" (P-31) |
 | `division:div_facts` | constant = `[11]` | print: sheet is not titled "Divide by 11" (P-31) |
 | `division:div_facts` | constant = `[12]` | print: sheet is not titled "Divide by 12" (P-31) |
+| `division:div_facts` | notation = `["bracket"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `division:divide` | notation = `["bracket"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `division:divide` | notation = `["fraction"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `division:divide` | notation = `["across","bracket","fraction"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
@@ -125,13 +292,11 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `division:remainder_interpret` | range = `100` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `division:remainder_interpret` | range = `1000` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `division:remainder_contexts` | range = `100` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
-| `division:remainder_contexts` | range = `1000` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
-| `division:missing_mult_div` | notation = `["bracket"]` | gen: 11/12 items overruled to  (multi-digit exception) |
-| `division:missing_mult_div` | notation = `["fraction"]` | gen: 11/12 items overruled to  (multi-digit exception) |
-| `division:nl_div` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only |
-| `division:nl_div` | range = `20` | gen: generator not reproducible; difference not checkable, predicate only |
-| `division:nl_div` | range = `50` | gen: generator not reproducible; difference not checkable, predicate only |
-| `division:nl_div` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:missing_mult_div` | notation = `["bracket"]` | gen: 6/12 items overruled to  (multi-digit exception) |
+| `division:missing_mult_div` | notation = `["fraction"]` | gen: 6/12 items overruled to  (multi-digit exception) |
+| `division:missing_mult_div` | notation = `["across","bracket","fraction"]` | gen: 6/12 items overruled to  (multi-digit exception) |
+| `division:nl_div` | band = `20` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:nl_div` | band = `50` | gen: generator not reproducible; difference not checkable, predicate only |
 | `division:mixed_mult_div` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 100" but the answer reaches 107 and the numbers 264 |
 | `division:mixed_mult_div` | range = `1000` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 1000" but the answer reaches 4075 and the numbers 8150 |
 | `division:div_zero_in_quotient` | range = `100` | gen: "Up to 100" but the answer reaches 405 and the numbers 912<br>print: "Up to 100" but the answer reaches 405 and the numbers 912 |
@@ -139,15 +304,15 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `number_ops_mixed:mixed` | range = `10` | gen: "Up to 10" but the answer reaches 42 and the numbers 55<br>print: "Up to 10" but the answer reaches 42 and the numbers 55 |
 | `number_ops_mixed:mixed` | range = `20` | gen: "Up to 20" but the answer reaches 42 and the numbers 55<br>print: "Up to 20" but the answer reaches 42 and the numbers 55 |
 | `number_ops_mixed:mixed` | range = `50` | gen: "Up to 50" but the answer reaches 68 and the numbers 55 |
-| `number_ops_mixed:word_problems_mixed` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 10" but the answer reaches 30 and the numbers 49<br>print: "Up to 10" but the answer reaches 13 and the numbers 49 |
+| `number_ops_mixed:word_problems_mixed` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 10" but the answer reaches 30 and the numbers 49 |
 | `number_ops_mixed:word_problems_mixed` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only |
 | `number_ops_mixed:word_problems_mixed` | decimals = `0` | gen: generator not reproducible; difference not checkable, predicate only |
 | `number_ops_mixed:word_problems_mixed` | decimals = `1` | gen: generator not reproducible; difference not checkable, predicate only |
 | `number_ops_mixed:word_problems_mixed` | decimals = `2` | gen: generator not reproducible; difference not checkable, predicate only |
 | `number_ops_mixed:word_problems_mixed` | decimals = `3` | gen: generator not reproducible; difference not checkable, predicate only |
-| `number_ops_mixed:word_problems_mixed_plain` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 10" but the answer reaches 18 and the numbers 49<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `number_ops_mixed:word_problems_mixed_plain` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 10" but the answer reaches 14 and the numbers 49 |
 | `number_ops_mixed:word_problems_mixed_plain` | range = `100` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
-| `number_ops_mixed:word_problems_mixed_plain` | decimals = `0` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `number_ops_mixed:word_problems_mixed_plain` | decimals = `0` | gen: generator not reproducible; difference not checkable, predicate only |
 | `number_ops_mixed:word_problems_mixed_plain` | decimals = `1` | gen: generator not reproducible; difference not checkable, predicate only |
 | `number_ops_mixed:word_problems_mixed_plain` | decimals = `2` | gen: generator not reproducible; difference not checkable, predicate only |
 | `number_ops_mixed:word_problems_mixed_plain` | decimals = `3` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
@@ -204,7 +369,6 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `patterns:seq_10` | range = `1000000` | gen: generator not reproducible; difference not checkable, predicate only |
 | `patterns:halve` | range = `10` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `patterns:halve` | range = `20` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
-| `patterns:halve` | range = `50` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `patterns:halve` | range = `100` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `patterns:number_pattern` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only |
 | `patterns:number_pattern` | range = `20` | gen: generator not reproducible; difference not checkable, predicate only |
@@ -303,66 +467,156 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 
 | Skill | Generator | Options shown | Values | Fail | Surfaces failing |
 |---|---|---|---|---|---|
-| `counting:number_seq_fill` | gen-counting.js | range | 5 | 0 |  |
+| `counting:count_objects` | gen-counting.js | band, objects, orientation, level | 10 | 0 |  |
+| `counting:count_sequence` | gen-counting.js | band, dir, level | 6 | 0 |  |
+| `counting:number_seq_fill` | gen-counting.js | step, dir, range | 11 | 0 |  |
+| `counting:mixed_counting` | gen-counting.js | range, level | 9 | 1 | print |
+| `comparing:compare_groups` | gen-counting.js | dir, band, level | 6 | 0 |  |
+| `comparing:compare_objects` | gen-counting.js | dir, task | 5 | 0 |  |
+| `comparing:classify_count` | gen-counting.js | band, tiles | 5 | 0 |  |
+| `comparing:mixed_comparing` | gen-counting.js | level | 2 | 0 |  |
+| `composing:number_bonds` | gen-counting.js | band, unknown | 5 | 0 |  |
+| `composing:make_ten` | gen-counting.js | level | 2 | 0 |  |
+| `composing:teen_compose` | gen-counting.js | level | 2 | 0 |  |
+| `composing:tens_foundation_visual` | gen-counting.js | band | 1 | 0 |  |
+| `composing:hundreds_chart_fill` | gen-counting.js | band, tiles | 4 | 0 |  |
+| `composing:ten_frame_build` | gen-counting.js | band | 1 | 0 |  |
+| `composing:base10_build` | gen-counting.js | band | 2 | 0 |  |
+| `composing:base10_regroup` | gen-counting.js | band | 1 | 0 |  |
+| `composing:base10_build_hundreds` | gen-counting.js | band | 1 | 0 |  |
 | `composing:odd_even` | gen-counting.js | range | 4 | 0 |  |
 | `composing:select_even_odd` | gen-counting.js | range | 3 | 0 |  |
 | `composing:number_word_form` | gen-counting.js | wordform, range | 8 | 0 |  |
-| `addition:add_facts` | gen-operations.js | constant, notation | 16 | 0 |  |
-| `addition:add` | gen-operations.js | notation, range | 4 | 0 |  |
-| `addition:add_word_problems` | gen-operations.js | response, range | 5 | 0 |  |
+| `composing:mixed_composing` | gen-counting.js | level | 2 | 0 |  |
+| `counting_mixed:counting_all` | (counting_mixed) | range | 3 | 0 |  |
+| `addition:add_facts` | gen-operations.js | constant, notation, band, support | 23 | 0 |  |
+| `addition:add` | gen-operations.js | notation, band, regroup, unknown | 8 | 0 |  |
+| `addition:add_word_problems` | gen-operations.js | response, pictures, range | 6 | 0 |  |
 | `addition:add_word_problems_plain` | gen-operations.js | range | 4 | 0 |  |
 | `addition:add_sub_fact_family` | gen-operations.js | range | 2 | 0 |  |
 | `addition:number_families_add` | gen-operations.js | level | 3 | 0 |  |
+| `addition:add_three` | gen-operations.js | band, pictures | 2 | 0 |  |
 | `addition:comparison_word` | gen-operations.js | response, range | 3 | 0 |  |
 | `addition:equal_sign` | gen-operations.js | range | 2 | 0 |  |
-| `addition:add_10_no_regroup` | gen-operations.js | notation | 2 | 0 |  |
-| `addition:add_10_regroup` | gen-operations.js | notation, level | 6 | 1 | print |
-| `addition:add_10_mixed` | gen-operations.js | notation | 2 | 0 |  |
-| `addition:add_20_no_regroup` | gen-operations.js | notation | 2 | 0 |  |
-| `addition:add_20_regroup` | gen-operations.js | notation | 2 | 0 |  |
-| `addition:add_20_mixed` | gen-operations.js | notation | 2 | 0 |  |
-| `addition:nl_add` | gen-operations.js | range | 2 | 0 |  |
+| `addition:add_5_pictures` | gen-operations.js | pictures | 1 | 0 |  |
+| `addition:add_10_no_regroup` | gen-operations.js | notation, band, regroup, support | 13 | 0 |  |
+| `addition:add_10_regroup` | gen-operations.js | notation, band, regroup, level | 14 | 0 |  |
+| `addition:add_10_mixed` | gen-operations.js | notation, band, regroup, support | 13 | 0 |  |
+| `addition:add_20_no_regroup` | gen-operations.js | notation, band, regroup, support | 13 | 0 |  |
+| `addition:add_20_regroup` | gen-operations.js | notation, band, regroup, support | 12 | 0 |  |
+| `addition:add_20_mixed` | gen-operations.js | notation, band, regroup, support | 13 | 0 |  |
+| `addition:add_50_no_regroup` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `addition:add_50_regroup` | gen-operations.js | band, regroup, level | 11 | 0 |  |
+| `addition:add_50_mixed` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `addition:add_100_no_regroup` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `addition:add_100_regroup` | gen-operations.js | band, regroup, level | 11 | 0 |  |
+| `addition:add_100_mixed` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `addition:add_1k_no_regroup` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `addition:add_1k_regroup` | gen-operations.js | band, regroup, level | 11 | 0 |  |
+| `addition:add_1k_mixed` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `addition:add_10k_no_regroup` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `addition:add_10k_regroup` | gen-operations.js | band, regroup, level | 11 | 0 |  |
+| `addition:add_10k_mixed` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `addition:add_100k_no_regroup` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `addition:add_100k_regroup` | gen-operations.js | band, regroup, level | 11 | 0 |  |
+| `addition:add_100k_mixed` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `addition:add_1m_no_regroup` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `addition:add_1m_regroup` | gen-operations.js | band, regroup, level | 11 | 0 |  |
+| `addition:add_1m_mixed` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `addition:add_wp_10` | gen-operations.js | pictures | 1 | 0 |  |
+| `addition:add_wp_20` | gen-operations.js | band, pictures, support | 8 | 0 |  |
+| `addition:add_wp_20_plain` | gen-operations.js | band | 6 | 0 |  |
+| `addition:add_wp_50` | gen-operations.js | band, pictures, support | 8 | 0 |  |
+| `addition:add_wp_50_plain` | gen-operations.js | band | 6 | 0 |  |
+| `addition:add_wp_100` | gen-operations.js | band, pictures, support | 8 | 0 |  |
+| `addition:add_wp_100_plain` | gen-operations.js | band | 6 | 0 |  |
+| `addition:add_wp_1k` | gen-operations.js | band, support | 7 | 0 |  |
+| `addition:add_wp_1k_plain` | gen-operations.js | band | 6 | 0 |  |
+| `addition:add_wp_10k` | gen-operations.js | band, support | 7 | 0 |  |
+| `addition:add_wp_10k_plain` | gen-operations.js | band | 6 | 0 |  |
+| `addition:add_wp_100k` | gen-operations.js | band, support | 7 | 0 |  |
+| `addition:add_wp_100k_plain` | gen-operations.js | band | 6 | 0 |  |
+| `addition:add_wp_1m` | gen-operations.js | band, support | 7 | 0 |  |
+| `addition:add_wp_1m_plain` | gen-operations.js | band | 6 | 0 |  |
+| `addition:nl_add` | gen-operations.js | unknown, range | 5 | 0 |  |
 | `addition:number_line_add` | gen-operations.js | range | 2 | 0 |  |
 | `addition:cloze_addition` | gen-operations.js | range | 2 | 0 |  |
+| `addition:add_column_multi` | gen-operations.js | tiles | 2 | 0 |  |
 | `addition:add_missing_digit` | gen-operations.js | range | 2 | 0 |  |
 | `addition:fact_family_sort` | gen-operations.js | range | 2 | 0 |  |
-| `subtraction:sub_facts` | gen-operations.js | constant, notation | 16 | 0 |  |
-| `subtraction:subtract` | gen-operations.js | notation, range | 4 | 0 |  |
-| `subtraction:sub_word_problems` | gen-operations.js | response, range | 5 | 0 |  |
+| `subtraction:sub_facts` | gen-operations.js | constant, notation, band, support | 23 | 0 |  |
+| `subtraction:subtract` | gen-operations.js | notation, band, regroup, unknown | 8 | 0 |  |
+| `subtraction:sub_word_problems` | gen-operations.js | response, pictures, range | 6 | 0 |  |
 | `subtraction:sub_word_problems_plain` | gen-operations.js | range | 4 | 0 |  |
 | `subtraction:missing_add_sub` | gen-operations.js | range | 2 | 0 |  |
+| `subtraction:sub_5_pictures` | gen-operations.js | pictures | 1 | 0 |  |
 | `subtraction:unknown_start_wp` | gen-operations.js | range | 3 | 0 |  |
-| `subtraction:sub_10_no_regroup` | gen-operations.js | notation | 2 | 0 |  |
-| `subtraction:sub_10_regroup` | gen-operations.js | notation, level | 6 | 1 | print |
-| `subtraction:sub_10_mixed` | gen-operations.js | notation | 2 | 0 |  |
-| `subtraction:sub_20_no_regroup` | gen-operations.js | notation | 2 | 0 |  |
-| `subtraction:sub_20_regroup` | gen-operations.js | notation | 2 | 0 |  |
-| `subtraction:sub_20_mixed` | gen-operations.js | notation | 2 | 0 |  |
-| `subtraction:nl_sub` | gen-operations.js | range | 2 | 0 |  |
+| `subtraction:sub_10_no_regroup` | gen-operations.js | notation, band, regroup, support | 13 | 0 |  |
+| `subtraction:sub_10_regroup` | gen-operations.js | notation, band, regroup, level | 14 | 0 |  |
+| `subtraction:sub_10_mixed` | gen-operations.js | notation, band, regroup, support | 13 | 0 |  |
+| `subtraction:sub_20_no_regroup` | gen-operations.js | notation, band, regroup, support | 13 | 0 |  |
+| `subtraction:sub_20_regroup` | gen-operations.js | notation, band, regroup, support | 12 | 0 |  |
+| `subtraction:sub_20_mixed` | gen-operations.js | notation, band, regroup, support | 13 | 0 |  |
+| `subtraction:sub_50_no_regroup` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `subtraction:sub_50_regroup` | gen-operations.js | band, regroup, level | 11 | 0 |  |
+| `subtraction:sub_50_mixed` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `subtraction:sub_100_no_regroup` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `subtraction:sub_100_regroup` | gen-operations.js | band, regroup, level | 11 | 0 |  |
+| `subtraction:sub_100_mixed` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `subtraction:sub_1k_no_regroup` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `subtraction:sub_1k_regroup` | gen-operations.js | band, regroup, level, zeroPlace | 13 | 0 |  |
+| `subtraction:sub_1k_mixed` | gen-operations.js | band, regroup, level, zeroPlace | 13 | 0 |  |
+| `subtraction:sub_10k_no_regroup` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `subtraction:sub_10k_regroup` | gen-operations.js | band, regroup, level, zeroPlace | 13 | 0 |  |
+| `subtraction:sub_10k_mixed` | gen-operations.js | band, regroup, level, zeroPlace | 13 | 0 |  |
+| `subtraction:sub_100k_no_regroup` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `subtraction:sub_100k_regroup` | gen-operations.js | band, regroup, level, zeroPlace | 13 | 0 |  |
+| `subtraction:sub_100k_mixed` | gen-operations.js | band, regroup, level, zeroPlace | 13 | 0 |  |
+| `subtraction:sub_1m_no_regroup` | gen-operations.js | band, regroup, level | 12 | 0 |  |
+| `subtraction:sub_1m_regroup` | gen-operations.js | band, regroup, level, zeroPlace | 13 | 0 |  |
+| `subtraction:sub_1m_mixed` | gen-operations.js | band, regroup, level, zeroPlace | 13 | 0 |  |
+| `subtraction:sub_wp_10` | gen-operations.js | band, pictures, support | 9 | 0 |  |
+| `subtraction:sub_wp_10_plain` | gen-operations.js | band | 7 | 0 |  |
+| `subtraction:sub_wp_20` | gen-operations.js | band, pictures, support | 9 | 0 |  |
+| `subtraction:sub_wp_20_plain` | gen-operations.js | band | 7 | 0 |  |
+| `subtraction:sub_wp_50` | gen-operations.js | band, pictures, support | 9 | 0 |  |
+| `subtraction:sub_wp_50_plain` | gen-operations.js | band | 7 | 0 |  |
+| `subtraction:sub_wp_100` | gen-operations.js | band, pictures, support | 9 | 0 |  |
+| `subtraction:sub_wp_100_plain` | gen-operations.js | band | 7 | 0 |  |
+| `subtraction:sub_wp_1k` | gen-operations.js | band, support | 8 | 0 |  |
+| `subtraction:sub_wp_1k_plain` | gen-operations.js | band | 7 | 0 |  |
+| `subtraction:sub_wp_10k` | gen-operations.js | band, support | 8 | 0 |  |
+| `subtraction:sub_wp_10k_plain` | gen-operations.js | band | 7 | 0 |  |
+| `subtraction:sub_wp_100k` | gen-operations.js | band, support | 8 | 0 |  |
+| `subtraction:sub_wp_100k_plain` | gen-operations.js | band | 7 | 0 |  |
+| `subtraction:sub_wp_1m` | gen-operations.js | band, support | 8 | 0 |  |
+| `subtraction:sub_wp_1m_plain` | gen-operations.js | band | 7 | 0 |  |
+| `subtraction:nl_sub` | gen-operations.js | unknown, range | 5 | 0 |  |
 | `subtraction:number_line_sub` | gen-operations.js | range | 2 | 0 |  |
 | `subtraction:sub_across_zeros` | gen-operations.js | range | 3 | 0 |  |
 | `subtraction:sub_missing_digit` | gen-operations.js | range | 2 | 0 |  |
 | `subtraction:sub_check_by_adding` | gen-operations.js | range | 2 | 0 |  |
-| `multiplication:mult_facts` | gen-operations.js | constant, notation | 15 | 0 |  |
-| `multiplication:multiply` | gen-operations.js | notation, range | 4 | 0 |  |
+| `multiplication:mult_facts` | gen-operations.js | constant, notation, band, support | 18 | 0 |  |
+| `multiplication:multiply` | gen-operations.js | notation, tiles, range | 8 | 0 |  |
 | `multiplication:arrays_groups` | gen-operations.js | range | 2 | 0 |  |
 | `multiplication:mult_word_problems` | gen-operations.js | response, range | 4 | 0 |  |
 | `multiplication:mult_word_problems_plain` | gen-operations.js | range | 2 | 0 |  |
 | `multiplication:mult_comparison` | gen-operations.js | response, range | 6 | 0 |  |
 | `multiplication:mult_comparison_plain` | gen-operations.js | range | 5 | 0 |  |
-| `multiplication:mult_div_fact_family` | gen-operations.js | notation | 3 | 3 | print |
+| `multiplication:mult_div_fact_family` | gen-operations.js | notation | 3 | 0 |  |
 | `multiplication:number_families_mult` | gen-operations.js | level | 3 | 0 |  |
+| `multiplication:mult_chart` | gen-operations.js | band | 2 | 0 |  |
 | `multiplication:mult_chart_easy` | gen-operations.js | level | 3 | 0 |  |
-| `multiplication:nl_mult` | gen-operations.js | range | 3 | 0 |  |
-| `division:div_facts` | gen-operations.js | constant, notation | 16 | 1 | gen, print, screen/worksheet, screen/practice |
-| `division:divide` | gen-operations.js | notation, range | 5 | 0 |  |
+| `multiplication:nl_mult` | gen-operations.js | band | 2 | 0 |  |
+| `division:div_facts` | gen-operations.js | constant, notation, band, support | 20 | 0 |  |
+| `division:divide` | gen-operations.js | notation, tiles, regroup, range | 11 | 0 |  |
 | `division:div_word_problems` | gen-operations.js | response, range | 3 | 0 |  |
 | `division:div_word_problems_plain` | gen-operations.js | range | 2 | 0 |  |
 | `division:remainder_interpret` | gen-operations.js | range | 2 | 0 |  |
-| `division:remainder_contexts` | gen-operations.js | range | 2 | 2 | print |
+| `division:remainder_contexts` | gen-operations.js | range | 2 | 0 |  |
 | `division:long_div_2digit` | gen-operations.js | range | 2 | 0 |  |
-| `division:missing_mult_div` | gen-operations.js | notation, range | 5 | 3 | print, gen, screen/worksheet |
-| `division:nl_div` | gen-operations.js | range | 4 | 0 |  |
+| `division:missing_mult_div` | gen-operations.js | notation, range | 5 | 0 |  |
+| `division:nl_div` | gen-operations.js | band | 2 | 0 |  |
 | `division:mixed_mult_div` | gen-operations.js | range | 2 | 0 |  |
 | `division:div_zero_in_quotient` | gen-operations.js | range | 2 | 0 |  |
 | `division:div_check_by_multiplying` | gen-operations.js | range | 2 | 0 |  |
@@ -373,7 +627,7 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `integers:order_negatives` | gen-operations.js | range | 4 | 0 |  |
 | `integers:mixed_integers` | gen-operations.js | range | 4 | 0 |  |
 | `number_ops_mixed:mixed` | gen-operations.js | range, decimals | 12 | 0 |  |
-| `number_ops_mixed:word_problems_mixed` | gen-operations.js | range, decimals | 6 | 3 | screen/practice |
+| `number_ops_mixed:word_problems_mixed` | gen-operations.js | range, decimals | 6 | 3 | print, screen/practice |
 | `number_ops_mixed:word_problems_mixed_plain` | gen-operations.js | range, decimals | 6 | 0 |  |
 | `number_ops_mixed:number_families_mixed` | gen-operations.js | level | 3 | 0 |  |
 | `number_ops_mixed:which_sign` | gen-operations.js | range | 4 | 0 |  |
@@ -508,13 +762,10 @@ These skills show the teacher no Options control at all. See OPTIONS-AUDIT.md fo
 
 | Category | Count | Skills |
 |---|---|---|
-| counting | 3 | `count_objects` `count_sequence` `mixed_counting` |
-| comparing | 4 | `compare_groups` `compare_objects` `classify_count` `mixed_comparing` |
-| composing | 14 | `number_bonds` `make_ten` `teen_compose` `tens_foundation_visual` `hundreds_chart_fill` `ten_frame_build` `ten_frame_build_teen` `base10_build` `base10_regroup` `base10_build_hundreds` `fraction_number_line` `whole_as_fraction` `compose_whole` `mixed_composing` |
-| counting_mixed | 1 | `counting_all` |
-| addition | 40 | `add_sub_10s` `add_sub_100s` `add_three` `add_5_pictures` `add_50_no_regroup` `add_50_regroup` `add_50_mixed` `add_100_no_regroup` `add_100_regroup` `add_100_mixed` `add_1k_no_regroup` `add_1k_regroup` `add_1k_mixed` `add_10k_no_regroup` `add_10k_regroup` `add_10k_mixed` `add_100k_no_regroup` `add_100k_regroup` `add_100k_mixed` `add_1m_no_regroup` `add_1m_regroup` `add_1m_mixed` `add_wp_10` `add_wp_10_plain` `add_wp_20` `add_wp_20_plain` `add_wp_50` `add_wp_50_plain` `add_wp_100` `add_wp_100_plain` `add_wp_1k` `add_wp_1k_plain` `add_wp_10k` `add_wp_10k_plain` `add_wp_100k` `add_wp_100k_plain` `add_wp_1m` `add_wp_1m_plain` `mixed_addition` `add_column_multi` |
-| subtraction | 37 | `sub_5_pictures` `sub_50_no_regroup` `sub_50_regroup` `sub_50_mixed` `sub_100_no_regroup` `sub_100_regroup` `sub_100_mixed` `sub_1k_no_regroup` `sub_1k_regroup` `sub_1k_mixed` `sub_10k_no_regroup` `sub_10k_regroup` `sub_10k_mixed` `sub_100k_no_regroup` `sub_100k_regroup` `sub_100k_mixed` `sub_1m_no_regroup` `sub_1m_regroup` `sub_1m_mixed` `sub_wp_10` `sub_wp_10_plain` `sub_wp_20` `sub_wp_20_plain` `sub_wp_50` `sub_wp_50_plain` `sub_wp_100` `sub_wp_100_plain` `sub_wp_1k` `sub_wp_1k_plain` `sub_wp_10k` `sub_wp_10k_plain` `sub_wp_100k` `sub_wp_100k_plain` `sub_wp_1m` `sub_wp_1m_plain` `mixed_add_sub` `mixed_subtraction` |
-| multiplication | 11 | `dot_array_mult` `mult_properties` `area_model_mult` `area_model_mult_hard` `mult_chart` `mixed_multiplication` `repeated_add_to_mult` `equal_or_unequal_groups` `mult_zeros` `mult_placeholder_zero` `mult_missing_digit` |
+| composing | 4 | `ten_frame_build_teen` `fraction_number_line` `whole_as_fraction` `compose_whole` |
+| addition | 4 | `add_sub_10s` `add_sub_100s` `add_wp_10_plain` `mixed_addition` |
+| subtraction | 2 | `mixed_add_sub` `mixed_subtraction` |
+| multiplication | 10 | `dot_array_mult` `mult_properties` `area_model_mult` `area_model_mult_hard` `mixed_multiplication` `repeated_add_to_mult` `equal_or_unequal_groups` `mult_zeros` `mult_placeholder_zero` `mult_missing_digit` |
 | division | 10 | `div_remainders` `box_division_easy` `box_division_hard` `area_model_div_2by1` `area_model_div_3by1` `mixed_division` `share_into_groups` `div_equation_parts` `remainder_too_big` `div_fix_estimate` |
 | integers | 4 | `integer_nl_drag` `abs_value` `opposite_numbers` `ordering_rationals` |
 | number_ops_mixed | 1 | `operations_all` |
