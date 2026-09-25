@@ -72,15 +72,20 @@ function shapeEl(s, k, ox, oy, attrs) {
 
 // The picture's largest box (mm) at S / M / L: the 2-D shape minimum is 30 / 36 / 42 (RP 11.2),
 // a picture may grow to 1.25 x (RP-3).
-const PIC = { S: { w: 42, h: 32 }, M: { w: 48, h: 36 }, L: { w: 54, h: 42 } };
+const PIC = { S: { w: 46, h: 27 }, M: { w: 62, h: 36 }, L: { w: 70, h: 42 } };
+// A check box a K pupil ticks is 6 mm or more at every size (regrade 5: 4.8 mm at S).
+const CHECK_MIN_MM = 6;
+function tick(ctx, o) {
+    const side = Math.max(CHECK_MIN_MM, S(ctx).checkMm);
+    return checkBox(ctx, o).replace(/width:[^;]+;height:[^;]+;/, `width:${L(ctx, side)};height:${L(ctx, side)};`);
+}
 // The which-pieces cell is one column wide: the shape (tw x th) over three sets of pieces (each at
 // most w x h), sized so three cells fit an A4 page at L (a cell about 75 mm tall).
 const PIECES = { S: { w: 46, h: 20, tw: 36, th: 24 }, M: { w: 50, h: 22, tw: 40, th: 26 }, L: { w: 54, h: 24, tw: 44, th: 28 } };
 const PAD = 1.5;
 // The name task's column: a half page at M and L, a third at S (RP 11.2: a 2-D shape is 30 mm at S,
-// so three fit across and Size S really packs more on a page, L1). INSIDE = the room in the cell.
+// so three fit across and Size S really packs more on a page, L1).
 const NAME_COL = { S: { wMm: 62, maxCols: 3 }, M: { wMm: 93, maxCols: 2 }, L: { wMm: 93, maxCols: 2 } };
-const INSIDE = { S: 56, M: 84, L: 84 };
 
 /* ------------------------------------------------------------------ pieces */
 
@@ -90,6 +95,9 @@ function joinedPicture(p, ctx, { dots, maxW = null }) {
     const b = bboxOf(parts);
     const box0 = PIC[sizeOf(ctx)];
     const k = Math.min((maxW || box0.w) / (b.x1 - b.x0 || 1), box0.h / (b.y1 - b.y0 || 1));
+    return { html: joinedSVG(p, ctx, parts, b, k, dots), w: (b.x1 - b.x0) * k + 2 * PAD, h: (b.y1 - b.y0) * k + 2 * PAD };
+}
+function joinedSVG(p, ctx, parts, b, k, dots) {
     const w = (b.x1 - b.x0) * k + 2 * PAD, h = (b.y1 - b.y0) * k + 2 * PAD;
     const ox = PAD - b.x0 * k, oy = PAD - b.y0 * k;
     let body = parts.map((s, i) => shapeEl(s, k, ox, oy, ` data-ws-piece="${i}"`)).join('');
@@ -131,19 +139,13 @@ function namesToCheck(p, ctx) {
     const at = on ? names.indexOf(on) : -1;
     // The rows stretch to the longest name, so the boxes stand in one column. Each row is one label
     // span + one box span: the shape wireTickBoxes turns into a tap target on screen.
-    const rows = names.map((nm, i) => `<div style="display:flex;align-items:center;justify-content:space-between;gap:${L(ctx, 3)};margin:${L(ctx, 1)} 0;">`
+    const rows = names.map((nm, i) => `<div style="display:flex;align-items:center;justify-content:space-between;gap:${L(ctx, 3)};margin:${L(ctx, sizeOf(ctx) === 'S' ? 0.5 : 1)} 0;">`
         + `<span style="font-size:${P(ctx, namePt(ctx))};font-weight:700;line-height:1.2;text-align:left;white-space:nowrap;${PRINTED}">${esc(nm)}</span>`
-        + checkBox(tctx, { id: `choice${i}`, on: i === at, slot: false }) + `</div>`).join('');
+        + tick(tctx, { id: `choice${i}`, on: i === at, slot: false }) + `</div>`).join('');
     const ink = at >= 0 ? ` data-ws-ink="${tctx.state === 'traced' ? 'trace' : 'solid'}"` : '';
     return `<div class="sg-names" data-ws-slot="choice" data-ws-shape="check"${ink} style="display:inline-flex;flex-direction:column;align-items:stretch;">${rows}</div>`;
 }
 const namePt = (ctx) => textPt(ctx) + 2;
-/** The width (mm) a list of names takes: the longest name at the list size, the gap, the box. */
-function listWidth(p, ctx) {
-    const chars = Math.max(4, ...(p.names || []).map((n) => String(n).length));
-    return chars * 0.55 * namePt(ctx) * PT_MM + 3 + S(ctx).checkMm + 2;
-}
-
 /** Label-from-bank: the names in a rounded bank (something to read), then the writing box. */
 function bankAndBox(p, ctx) {
     const value = shownName(p, ctx);
@@ -161,12 +163,13 @@ function composeName(p, ctx) {
     // Side by side when the picture keeps most of its size beside the names in its column (the
     // inside of a 93 mm half-page column at M and L, of a 62 mm third at S); else the names go
     // under the picture.
+    // The picture stands in a box of the same height in every cell, the names under it, so the
+    // answer is in the same place in every cell of a page (regrade 5: it moved with the picture).
     const box0 = PIC[sizeOf(ctx)];
-    const beside = Math.min(box0.w, INSIDE[sizeOf(ctx)] - 6 - (write ? 46 : listWidth(p, ctx)));
-    const side = beside >= 0.8 * box0.w;
-    const pic = joinedPicture(p, ctx, { dots: dotsFor(p, ctx), maxW: side ? beside : box0.w });
-    return root(ctx, 'sg-compose', `<div style="display:flex;flex-direction:${side ? 'row' : 'column'};align-items:center;justify-content:center;`
-        + `gap:${L(ctx, side ? 6 : 3)};flex-wrap:nowrap;"><div style="line-height:0;">${pic}</div><div>${right}</div></div>`);
+    const pic = joinedPicture(p, ctx, { dots: dotsFor(p, ctx), maxW: box0.w });
+    return root(ctx, 'sg-compose', `<div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:${L(ctx, 3)};">`
+        + `<div style="line-height:0;height:${L(ctx, box0.h + 2 * PAD)};display:flex;align-items:flex-end;justify-content:center;">${pic.html}</div>`
+        + `<div>${right}</div></div>`);
 }
 
 /* ------------------------------------------------------------------ which pieces */
@@ -220,7 +223,7 @@ function composePieces(p, ctx) {
             + `<div style="line-height:0;">${pic}</div>`
             // one label span + one box span: the shape wireTickBoxes turns into a tap target
             + `<div style="display:flex;align-items:center;gap:${L(ctx, 2)};"><span style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;${PRINTED}">${letters[i]}</span>`
-            + checkBox(traceCtx, { id: `choice${i}`, on: i === on, slot: false }) + `</div></div>`;
+            + tick(traceCtx, { id: `choice${i}`, on: i === on, slot: false }) + `</div></div>`;
     }).join('');
     const ink = on >= 0 ? ` data-ws-ink="${traceCtx.state === 'traced' ? 'trace' : 'solid'}"` : '';
     return root(ctx, 'sg-which', `<div style="line-height:0;margin-bottom:${L(ctx, -1)};">${shape}</div>`

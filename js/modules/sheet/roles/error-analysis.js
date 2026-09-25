@@ -244,6 +244,11 @@ function choicesOf(it, correct, shown) {
     if ((CHOICE.has(it.template) || payload.kind === 'word-choice') && Array.isArray(payload.labels) && payload.labels.length) {
         return { labels: payload.labels.map(String), correct: Number(payload.correct) || 0 };
     }
+    // A cell whose answer is checked from its own short list (a name bank, geometry lane) names the
+    // list in `payload.fixChoices`: the fix is checking the right one, never writing it out.
+    if (Array.isArray(payload.fixChoices) && payload.fixChoices.map(String).includes(String(correct))) {
+        return { labels: payload.fixChoices.map(String), correct: payload.fixChoices.map(String).indexOf(String(correct)), checked: true };
+    }
     if (/^\d[\d,.]*$/.test(correct)) return null;
     const opts = Array.isArray(q.options) ? q.options.filter((o) => o !== null && typeof o !== 'object').map(String) : [];
     const i = opts.indexOf(correct);
@@ -412,7 +417,7 @@ export function prepare(it, info = {}) {
         body = ungraded(body);
         drawZone = ungraded(drawZone);
         const askedFix = !!drawZone || ((kind === 'draw' || kind === 'line') && /data-ws-slot="(?:fix|x\d)/.test(body));
-        const verb = kind === 'draw' || drewWork ? 'drew' : redraw === 'mark' ? 'marked' : 'wrote';
+        const verb = kind === 'draw' || drewWork ? 'drew' : redraw === 'mark' ? 'marked' : kind === 'choice' && choice.checked ? 'chose' : 'wrote';
         // A line-mark item names its number only in the page's own instruction: the finished
         // work says which number was to be marked, or it cannot be checked (critic round 3).
         // An estimate is judged against ITS rounding rule, so the rule is printed with the work

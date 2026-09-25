@@ -226,9 +226,16 @@ export function compositionsFor({ groups = null, n = 2 } = {}) {
  * One composition turned and flipped, moved so its outline starts at (0, 0).
  * `pick(list)` and `int(lo, hi)` are the caller's (seeded) random helpers.
  */
-export function dealComposition(list, { pick, int }) {
+export function dealComposition(list, { pick, int, wide = false }) {
     const c = pick(list);
-    const rot = pick(TURNS[c.family]);
+    // `wide`: only the turns that leave the whole shape at least as wide as it is tall (a shape is
+    // named whatever way it turns, K.G.2, so the picture lies wide in its cell and fills it)
+    let turns = TURNS[c.family];
+    if (wide) {
+        const w = turns.filter((r) => { const b = bbox([transformShape(c.target, r, false)]); return b.x1 - b.x0 >= (b.y1 - b.y0) * 0.95; });
+        if (w.length) turns = w;
+    }
+    const rot = pick(turns);
     const flip = int(0, 1) === 1;
     const target0 = transformShape(c.target, rot, flip);
     const parts0 = c.parts.map((s) => transformShape(s, rot, flip));
@@ -241,14 +248,28 @@ export function dealComposition(list, { pick, int }) {
 }
 
 /** Three names for the bank: the answer, the name of a piece when that is wrong, a near name. */
-export function nameBank(answer, pieceNames, { shuffle }) {
+export function nameBank(answer, pieceNames, { shuffle, allowed = null }) {
+    // `allowed`: the names the page may print (a kindergarten page offers only the K names, K.G.2)
+    const ok = (nm) => isWrongName(nm, answer) && (!allowed || allowed.includes(nm));
     const wrong = [];
-    for (const nm of pieceNames) if (isWrongName(nm, answer) && !wrong.includes(nm)) { wrong.push(nm); break; }
+    for (const nm of pieceNames) if (ok(nm) && !wrong.includes(nm)) { wrong.push(nm); break; }
     for (const nm of NEAR[answer] || []) {
         if (wrong.length >= 2) break;
-        if (isWrongName(nm, answer) && !wrong.includes(nm)) wrong.push(nm);
+        if (ok(nm) && !wrong.includes(nm)) wrong.push(nm);
+    }
+    for (const nm of allowed || []) {
+        if (wrong.length >= 2) break;
+        if (ok(nm) && !wrong.includes(nm)) wrong.push(nm);
     }
     return shuffle([answer, ...wrong.slice(0, 2)]);
+}
+
+/** The shape names a kindergarten page uses (K.G.2); a ticked grade-1 kind adds its own names. */
+export const K_NAMES = Object.freeze(['triangle', 'square', 'rectangle', 'hexagon', 'circle']);
+export function namesFor(list) {
+    const out = K_NAMES.slice();
+    for (const c of list) if (!out.includes(c.target.name)) out.push(c.target.name);
+    return out;
 }
 
 /**

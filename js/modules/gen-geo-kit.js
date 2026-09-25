@@ -280,6 +280,90 @@ export function areaFigure(q, variant, maxDim) {
     });
 }
 
+/* ============================================================ perimeter_intro */
+
+/**
+ * Perimeter Intro (3.MD.D.8, sum the sides). Kinds (option `shapes`, 5H): 0 a rectangle or a
+ * square, 1 a triangle, 2 a shape with 5 or 6 sides (a house-shaped pentagon, an L-shaped
+ * hexagon). A page deals them by position, three four-sided shapes to two triangles to one
+ * polygon by default, so every page mixes in a shape that is not a rectangle. Every figure is
+ * drawn to scale in the shape-grid figure cell; "Perimeter up to" (band) bounds the answer.
+ * The payload also carries `shape`, `sides`, `show` and `ans` for the skill's provider
+ * (sheet/providers/figures.js), and its answer slot is `answer`.
+ * Support level 2 prints the grey addition frame "___ + ___ + ___ + ___ =" (a hint), level 3
+ * the answer in grey to trace.
+ */
+export function perimeterIntroFigure(q) {
+    geoBegin();
+    const lvl = geoLevel(1);
+    const ticked = geoOpt('shapes');
+    const kinds = Array.isArray(ticked) && ticked.length ? ticked.map(Number) : [0, 1, 2];
+    const order = [0, 1, 0, 2, 0, 1].filter((k) => kinds.includes(k));
+    const pool = order.length ? order : kinds;
+    const kind = pool[geoDeal('pintro-kind', pool.length)];
+    // "Perimeter up to" bounds the answer and sets the side lengths: a longest side of about a
+    // quarter of it (sides to 10 at the default 40, to 25 at 100)
+    const band = Number(geoOpt('band')) || 40;
+    const cap = Math.max(5, Math.min(25, Math.floor(band / 4)));
+    const unit = pick(['cm', 'm']);
+    const labels = labelsOpt('all');
+    let poly, sides, shape, edges;
+    for (let tries = 0; tries < 80; tries++) {
+        if (kind === 1) {
+            // three different-looking whole-number sides, the longest along the bottom
+            const a = randInt(3, cap - 1), b = randInt(3, cap - 1);
+            const cMax = Math.min(cap, a + b - 1), cMin = Math.max(3, Math.abs(a - b) + 1);
+            const c = cMin <= cMax ? randInt(cMin, cMax) : a;
+            const [base, right, left] = [a, b, c].sort((x, y) => y - x);
+            // the apex from the three lengths (law of cosines); never a sliver
+            const x = (base * base + left * left - right * right) / (2 * base);
+            const hgt = Math.sqrt(Math.max(0, left * left - x * x));
+            if (hgt < base * 0.3) continue;
+            poly = [[x, 0], [base, hgt], [0, hgt]];
+            sides = [right, base, left];                      // poly[0]->[1] right, [1]->[2] base, [2]->[0] left
+            shape = 'triangle';
+            edges = sides.map((v, i) => ({ i, v, show: true }));
+        } else if (kind === 2) {
+            if (Math.random() < 0.5) {
+                // a house: a w x h wall under a roof of two equal sides r
+                const w = 2 * randInt(2, Math.max(2, Math.floor(cap / 2) - 1)), h = randInt(2, Math.max(2, cap - 4)), r = randInt(w / 2 + 1, w / 2 + 3);
+                const rh = Math.sqrt(r * r - (w / 2) * (w / 2));
+                poly = [[w / 2, 0], [w, rh], [w, rh + h], [0, rh + h], [0, rh]];
+                sides = [r, h, w, h, r];
+                shape = 'pentagon';
+            } else {
+                const Wd = randInt(4, Math.max(4, cap - 2)), H = randInt(4, Math.max(4, cap - 3)), cw = randInt(2, Wd - 2), ch = randInt(2, H - 2);
+                poly = lPoly(Wd, H, cw, ch);
+                sides = poly.map((_, i) => edgeLen(poly, i));
+                shape = 'hexagon';
+            }
+            edges = sides.map((v, i) => ({ i, v, show: true }));
+        } else {
+            const square = Math.random() < 0.3;
+            const l = randInt(2, cap);
+            let w = square ? l : randInt(2, cap - 1);
+            if (!square && w === l) w = l === 2 ? 3 : l - 1;
+            poly = rectPoly(l, w);
+            sides = [l, w, l, w];
+            shape = square ? 'square' : 'rectangle';
+            // Figure labels "some": one length and one width (the pupil uses the equal sides)
+            edges = sides.map((v, i) => ({ i, v, show: labels !== 'some' || i < 2 }));
+        }
+        if (sides.reduce((s, v) => s + v, 0) <= band) break;
+    }
+    const ans = sides.reduce((s, v) => s + v, 0);
+    const show = edges.map((e) => e.show !== false);
+    return finish(q, {
+        kind: 'figure', poly, grid: 'none', unit, edges,
+        ask: [{ id: 'answer', label: 'Perimeter', unit, ans }],
+        frame: sides.length, ...supportOf(lvl),
+        shape, sides, show, ans,
+    }, {
+        text: 'What is the perimeter?', ans, printFormat: 'perimeter-intro', skillLabel: 'Perimeter Intro',
+        hint: show.every(Boolean) ? 'Add the lengths of all the sides.' : 'A side with no number is as long as the side opposite it. Add all the sides.',
+    });
+}
+
 /* ============================================================ the word problems of perimeter and area */
 
 const NAMES = ['Maria', 'Liam', 'Aisha', 'Noah', 'Sofia', 'Owen', 'Omar', 'Lena'];

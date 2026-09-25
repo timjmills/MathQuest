@@ -281,6 +281,11 @@ const svgs = (html) => [...String(html).matchAll(/<svg\b[^>]*class="([^"]*)"[^>]
             // the screen answers in the same cell: check boxes by the names, or the box to write in
             if (p.response === 'write' ? !/data-mq-blank=/.test(it.visual) : ((it.visual.match(/data-k2-check=/g) || []).length !== (p.names || []).length)) bad(it, 'the screen twin does not carry the paper\'s answer places');
             if ((it.options || []).length) bad(it, 'the host would add choice buttons beside the cell');
+            // K.G.2: a page with the default kinds prints kindergarten names only (regrade 5)
+            const K = ['triangle', 'square', 'rectangle', 'hexagon', 'circle'];
+            if (!(SETS[it.si] || {}).shapes) for (const nm of p.names || []) if (!K.includes(nm)) bad(it, `K the default page offers "${nm}", not a kindergarten name`);
+            // an error-analysis page fixes the name by checking it from the same bank
+            if (JSON.stringify(p.fixChoices || []) !== JSON.stringify(p.names || [])) bad(it, 'EA the fix list is not the bank');
             for (const [where, html] of [['pupil page', it.pupil], ['screen twin', it.visual]]) {
                 if (drawnShapes(html).some((s) => s.target)) bad(it, `UNDRAWN the ${where} draws the target`);
                 const pics = svgs(html).filter((x) => /sg-pieces/.test(x.cls));

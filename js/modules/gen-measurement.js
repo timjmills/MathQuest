@@ -7,6 +7,7 @@ import { createAnalogClockSVG, createDigitalClockHTML, addTime, subtractTime, fo
 import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 import { isTimeMoneySkill, generateTimeMoneyQuestion } from './gen-time-money.js';
 import { k2Twin } from './sheet/index.js';
+import { perimeterIntroFigure } from './gen-geo-kit.js';
 
 // O6 appearance (lane AP2): the value of an appearance control (`labels`, `bars`) for the skill
 // being generated, or `dflt` when the skill has no such control. It never consumes a random
@@ -902,46 +903,17 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
             // labels: some" labels one length and one width of a rectangle or square (the other two
             // follow from equal opposite sides); a triangle keeps all three.
             if (mappedSkill === "perimeter_intro") {
-                const shapeRoll = Math.random();
-                let shape, sides, sideLabels;
-                if (shapeRoll < 0.55) {
-                    shape = "rectangle";
-                    const w = randInt(2, 9);
-                    let l = randInt(2, 10);
-                    if (l === w) l = w + 1;
-                    sides = [l, w, l, w];                    // top, left, bottom, right
-                    sideLabels = { length: l, width: w };
-                } else if (shapeRoll < 0.75) {
-                    shape = "square";
-                    const e = randInt(2, 9);
-                    sides = [e, e, e, e];
-                    sideLabels = { side: e };
-                } else {
-                    shape = "triangle";
-                    // three different-looking sides, the longest along the bottom
-                    const a = randInt(3, 9), b = randInt(3, 9);
-                    const cMax = Math.min(10, a + b - 1), cMin = Math.max(3, Math.abs(a - b) + 1);
-                    const c = cMin <= cMax ? randInt(cMin, cMax) : a;
-                    const t = [a, b, c].sort((x, y) => y - x);
-                    sides = [t[0], t[1], t[2]];              // base, right, left
-                    sideLabels = { a: t[0], b: t[1], c: t[2] };
-                }
-                const ans = sides.reduce((x, y) => x + y, 0);
-                const unit = pick(['cm', 'm']);
-                const some = _mLook('labels', 'all') === 'some' && shape !== 'triangle';
-                const show = sides.map((_, i) => !some || i < 2);
-                const payload = { shape, sides, show, unit, ans };
-                q.cell = { template: 'perimeter-shape', v: 1, payload };
-                q.visual = k2Twin('perimeter-shape', payload);
-                q.text = `What is the perimeter?`;
+                // Build lane geometry (regrade 5): the shape-grid figure cell (gen-geo-kit.js), drawn
+                // to the page's size, with rectangles, triangles and 5- or 6-sided shapes (option
+                // "Which shapes"), Support levels and the "Perimeter up to" bound.
+                perimeterIntroFigure(q);
                 q.screenInstr = 'Add the lengths of all the sides. Write the perimeter.';
-                q.ans = ans;
-                q.answerType = "number";
-                q.options = [];
-                q.hint = some ? 'A side with no number is as long as the side opposite it. Add all the sides.' : 'Add the lengths of all the sides.';
-                q.skillLabel = "Perimeter Intro";
-                q.printFormat = "perimeter-intro";
-                q.perimeterIntroData = { shape, sides, sideLabels, ans, unit, ...(some ? { labels: 'some' } : {}) };
+                const p = q.cell.payload;
+                // the legacy print path draws a rectangle or a triangle only; a 5- or 6-sided shape
+                // is a kit cell alone
+                if (['rectangle', 'square', 'triangle'].includes(p.shape)) {
+                    q.perimeterIntroData = { shape: p.shape, sides: p.sides, ans: p.ans, unit: p.unit, ...(p.show.every(Boolean) ? {} : { labels: 'some' }) };
+                }
                 return;
             }
 

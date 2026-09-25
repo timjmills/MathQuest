@@ -7,7 +7,7 @@ import { optionsFor } from './skill-options.js';
 import { k2Twin, COMPOSE_LETTERS } from './sheet/index.js';
 import { geoOpt, geoBegin, geoDeal, geoLevel, areaUnitSquares, perimeterGrid, perimeterFigure, areaFigure,
     areaPerimeterFigure, compositeFigure, decomposeFigure, triangleFigure, storyFigure } from './gen-geo-kit.js';
-import { compositionsFor, dealComposition, decoyPieceSets, nameBank, corners, transformShape } from './geo-compose.js';
+import { compositionsFor, dealComposition, decoyPieceSets, nameBank, namesFor, corners, transformShape } from './geo-compose.js';
 
 // O6 appearance (lane AP2): the "Figure labels" choice for the skill being generated — 'all',
 // 'some' or 'none' — or `dflt` when this skill has no such control (a mixed pool, a skill without
@@ -53,7 +53,7 @@ function _composeShapes(q) {
     // One composition per item, in a page-long order, so six items show six different builds
     // where the ticked kinds allow it.
     const pickDealt = (arr) => (arr === list ? arr[_geoDeal(`compose:${n}:${list.length}`, list.length)] : pick(arr));
-    const deal = dealComposition(list, { pick: pickDealt, int: randInt });
+    const deal = dealComposition(list, { pick: pickDealt, int: randInt, wide: true });
     const lvl = _geoLevel(1);
     const answer = deal.target.name;
     const pieceNames = deal.parts.map(s => s.name);
@@ -78,12 +78,15 @@ function _composeShapes(q) {
     } else {
         const response = _geoOpt('response') === 'write' ? 'write' : 'check';
         const count = Number(_geoOpt('count')) === 3 ? 3 : 2;
-        const names = nameBank(answer, pieceNames, { shuffle }).slice(0, count);
+        const names = nameBank(answer, pieceNames, { shuffle, allowed: namesFor(list) }).slice(0, count);
         if (!names.includes(answer)) names[names.length - 1] = answer;
         const bank = shuffle(names);
         payload = {
             kind: 'compose', task: 'name', comp: deal.id, parts: deal.parts, target: deal.target,
             corners: corners(deal.target), names: bank, answer, response, dots: lvl >= 2, traced: lvl >= 3,
+            // an error-analysis page fixes a wrong name by checking the right one from the bank (a
+            // K pupil never writes "trapezoid" on a line; regrade 5)
+            fixChoices: bank.slice(),
         };
         q.text = 'What shape do the pieces make?';
         q.ans = answer;

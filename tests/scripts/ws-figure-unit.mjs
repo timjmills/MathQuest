@@ -40,6 +40,7 @@ const builders = {
     composite_dual: (q) => kit.compositeFigure(q, 'dual_pa', 14),
     decompose: (q) => kit.decomposeFigure(q, 12),
     triangle: (q) => kit.triangleFigure(q, 12),
+    perimeter_intro: (q) => kit.perimeterIntroFigure(q),
 };
 
 const len = (A, B) => Math.hypot(B[0] - A[0], B[1] - A[1]);
@@ -79,7 +80,7 @@ for (const [name, build] of Object.entries(builders)) {
         const area = p.height ? len(poly[1], poly[2]) * Math.abs(p.height.to[1] - p.height.from[1]) / 2 : shoelace(poly);
         for (const a of p.ask) {
             if (a.id === 'area' && Math.abs(a.ans - area) > 1e-9) fail(name, `area ${a.ans} but the outline gives ${area}`);
-            if (a.id === 'perimeter' && Math.abs(a.ans - per) > 1e-9) fail(name, `perimeter ${a.ans} but the outline gives ${per}`);
+            if ((a.id === 'perimeter' || a.id === 'answer') && Math.abs(a.ans - per) > 1e-9) fail(name, `perimeter ${a.ans} but the outline gives ${per}`);
             if (a.id === 'side') {
                 const e = p.edges.find((x) => x.v === '?');
                 if (!e || Math.abs(len(poly[e.i], poly[(e.i + 1) % poly.length]) - a.ans) > 1e-9) fail(name, `missing side ${a.ans} is not the side marked ?`);

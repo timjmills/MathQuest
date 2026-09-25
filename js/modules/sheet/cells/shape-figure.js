@@ -33,7 +33,7 @@
 
 import { esc } from '../cell.js';
 import { blankWidth } from '../tokens.js';
-import { L, P, INK, GREY, SW, PT_MM, n2, isTwin, sizeOf, S, digitPt, textPt, box, svg } from './k2kit.js';
+import { L, P, B, INK, GREY, SW, PT_MM, n2, isTwin, sizeOf, S, digitPt, textPt, box, svg } from './k2kit.js';
 
 const FONT = `font-family="Andika, 'Open Sans', sans-serif"`;
 const textW = (s, pt) => String(s).length * pt * PT_MM * 0.58;
@@ -91,7 +91,7 @@ function layoutLabels(cands, segs) {
         }
         if (!best) {
             const d = 11, cx = c.mx + c.nx * (d + c.w / 2), cy = c.my + c.ny * (d + c.h / 2);
-            best = { ...c, x: cx, y: cy, box: [cx - c.w / 2, cy - c.h / 2, cx + c.w / 2, cy + c.h / 2] };
+            best = { ...c, x: cx, y: cy, box: [cx - c.w / 2, cy - c.h / 2, cx + c.w / 2, cy + c.h / 2], forced: true };
         }
         placed.push(best);
     }
@@ -123,7 +123,8 @@ export function figureSVG(p, ctx) {
     let k = onGrid ? SQUARE[size] : Math.min(FIG[size].w / (wU || 1), FIG[size].h / (hU || 1));
     const k0 = k;
     let P2, labels, hF, hT, hSide, bx1, by1, bx2, by2;
-    for (let tries = 0; tries < 6; tries++) {
+    let grown = 0;
+    for (let tries = 0; tries < 10; tries++) {
         P2 = poly.map(([x, y]) => [(x - x0) * k, (y - y0) * k]);
         const cw = signedArea(P2) > 0;      // y down: positive = clockwise on the page
         const segs = P2.map((A, i) => [A, P2[(i + 1) % P2.length]]);
@@ -159,7 +160,11 @@ export function figureSVG(p, ctx) {
             bx1 = Math.min(bx1, lb.x - lb.w / 2); bx2 = Math.max(bx2, lb.x + lb.w / 2);
             by1 = Math.min(by1, lb.y - lb.h / 2); by2 = Math.max(by2, lb.y + lb.h / 2);
         }
-        if (onGrid || bx2 - bx1 + 3 <= FIT_W[size] || k <= k0 * 0.6) break;
+        if (onGrid) break;
+        // a label with no clear place (a narrow notch): the figure grows, while it still fits the
+        // cell, so its inner corners have room (never past 1.6 x)
+        if (labels.some((lb) => lb.forced) && grown < 4 && (bx2 - bx1) * 1.12 + 3 <= FIT_W[size]) { k *= 1.12; grown++; continue; }
+        if (bx2 - bx1 + 3 <= FIT_W[size] || k <= k0 * 0.6) break;
         k = Math.max(k0 * 0.6, k * Math.min(0.92, (FIT_W[size] - 3 - (bx2 - bx1 - wU * k)) / (wU * k)));
     }
     const pad = 1.5, ox = -bx1 + pad, oy = -by1 + pad;
@@ -258,8 +263,13 @@ export function renderFigure(p, ctx, root) {
     const unitLine = drawn && p.unit && !unitOnLabels(p) && shownLabels(p)
         ? `<div class="sg-units" style="font-size:${P(ctx, textPt(ctx))};line-height:1.25;">All lengths are in ${esc(p.unit)}.</div>` : '';
     const given = (p.given || []).map((g) => `<div class="sg-given" style="font-size:${P(ctx, textPt(ctx))};font-weight:700;line-height:1.25;">${esc(g)}</div>`).join('');
-    const formula = p.formula && hintsOn(p, ctx)
-        ? `<div class="sg-formula" data-ws-hint="formula" style="font-size:${P(ctx, textPt(ctx))};line-height:1.25;color:${GREY};">${esc(p.formula)}</div>` : '';
+    // HINT: the grey formula line, or an addition frame of grey ruled lines, one for each side
+    // (`frame`: the number of sides; scratch space, never a scored slot)
+    const rule = `<span style="display:inline-block;width:${L(ctx, 8)};height:${L(ctx, S(ctx).writeMm - 2)};border-bottom:${B(ctx, 0.75)} solid ${GREY};"></span>`;
+    const formula = !hintsOn(p, ctx) ? ''
+        : p.frame ? `<div class="sg-formula" data-ws-hint="frame" style="display:flex;align-items:flex-end;gap:${L(ctx, 1.2)};font-size:${P(ctx, textPt(ctx))};line-height:1;color:${GREY};">`
+            + Array.from({ length: p.frame }, () => rule).join('<span>+</span>') + '<span>=</span></div>'
+        : p.formula ? `<div class="sg-formula" data-ws-hint="formula" style="font-size:${P(ctx, textPt(ctx))};line-height:1.25;color:${GREY};">${esc(p.formula)}</div>` : '';
     const several = (p.ask || []).length > 1;
     const asks = (p.ask || []).map((a) => answerLine(p, ctx, a, several)).join('');
     const join = several ? ' data-mq-join=", "' : '';
