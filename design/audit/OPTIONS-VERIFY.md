@@ -8,17 +8,23 @@ What it checks, per skill and per value of every option the teacher is shown (`o
 
 | | |
 |---|---|
-| Live skills | 583 |
-| Skills with at least one option shown | 577 |
-| Skills with NO option shown | 6 |
-| Option values checked | 3735 |
-| Values passing every surface | 3735 |
-| Values failing | 0 |
+| Live skills | 596 |
+| Skills with at least one option shown | 589 |
+| Skills with NO option shown | 7 |
+| Option values checked | 4043 |
+| Values passing every surface | 4042 |
+| Values failing | 1 |
 | … of which gated behind Max Number | 0 |
 | Failing surface counts (a value can fail several) | gen 0 · print 0 · screen 0 · trip 0 |
-| Skills whose every option value passes | 577 / 577 |
+| Skills whose every option value passes | 588 / 589 |
 
 ## Failures by generator file
+
+### gen-operations.js — 1 skill(s), 1 value(s)
+
+| Skill | Option = value | Failure |
+|---|---|---|
+| `multiplication:mult_chart_easy` | * = `"*"` | verifier: timed out after 60000 ms |
 
 ## Warnings (not failures)
 
@@ -35,6 +41,9 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `counting:number_seq_fill` | step = `10` | print: 4/6 answer(s) not found in the key text (e.g. "34, 44") |
 | `counting:number_seq_fill` | dir = `"forward"` | print: 4/6 answer(s) not found in the key text (e.g. "58, 60") |
 | `counting:number_seq_fill` | dir = `"back"` | print: 4/6 answer(s) not found in the key text (e.g. "62, 60") |
+| `counting:number_seq_fill` | shape = `"box"` | print: 4/6 answer(s) not found in the key text (e.g. "38, 40") |
+| `counting:number_seq_fill` | shape = `"circle"` | print: 4/6 answer(s) not found in the key text (e.g. "38, 40") |
+| `counting:number_seq_fill` | shape = `"hex"` | print: 4/6 answer(s) not found in the key text (e.g. "38, 40") |
 | `counting:number_seq_fill` | range = `10` | print: 4/6 answer(s) not found in the key text (e.g. "3, 4") |
 | `counting:number_seq_fill` | range = `20` | print: 4/6 answer(s) not found in the key text (e.g. "7, 8") |
 | `counting:number_seq_fill` | range = `50` | print: 4/6 answer(s) not found in the key text (e.g. "19, 21") |
@@ -384,8 +393,42 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `multiplication:area_model_mult` | tiles = `31` | gen: generator not reproducible; difference not checkable, predicate only |
 | `multiplication:area_model_mult_hard` | tiles = `22` | gen: generator not reproducible; difference not checkable, predicate only |
 | `multiplication:area_model_mult_hard` | tiles = `23` | gen: generator not reproducible; difference not checkable, predicate only |
-| `multiplication:mult_chart` | band = `25` | print: 6/6 answer(s) not found in the key text (e.g. "3, 16, 25") |
-| `multiplication:mult_chart` | band = `100` | print: 6/6 answer(s) not found in the key text (e.g. "28, 56, 72") |
+| `multiplication:mult_chart` | chart = `"whole"` | print: 6/6 answer(s) not found in the key text (e.g. "1, 3, 4, 5, 8, 9, 11, 2, 10, 14, 16, 18, 20, 22, 6, 9, 18, 30, 36, 16, 20, 24, 32, 44, 48, 15, 30, 35, 45, 55, 6, 12, 42, 66, 7, 28, 35, 42, 63, 77, 24, 48, 72, 80, 88, 96, 18, 36, 45, 54, 63, 99, 108, 20, 40, 50, 70, 80, 90, 110, 120, 11, 55, 99, 110, 121, 60, 72, 96, 108, 120, 144") |
+| `multiplication:mult_chart` | band = `25` | print: 6/6 answer(s) not found in the key text (e.g. "6, 15, 12") |
+| `multiplication:mult_chart` | band = `36` | print: 6/6 answer(s) not found in the key text (e.g. "6, 15, 12") |
+| `multiplication:mult_chart` | band = `100` | print: 6/6 answer(s) not found in the key text (e.g. "15, 30, 21") |
+| `multiplication:mult_chart` | missing = `20` | print: 6/6 answer(s) not found in the key text (e.g. "18, 7, 35, 24") |
+| `multiplication:mult_chart` | missing = `50` | print: 6/6 answer(s) not found in the key text (e.g. "6, 12, 18, 30, 7, 14, 35, 24, 40, 9") |
+| `multiplication:mult_chart` | missing = `70` | print: 6/6 answer(s) not found in the key text (e.g. "6, 12, 18, 30, 7, 14, 28, 35, 16, 24, 32, 40, 9, 36") |
+| `multiplication:mult_chart` | missing = `80` | print: 6/6 answer(s) not found in the key text (e.g. "6, 12, 18, 24, 30, 7, 14, 28, 35, 8, 16, 24, 32, 40, 9, 36") |
+| `multiplication:mult_chart` | missing = `90` | print: 6/6 answer(s) not found in the key text (e.g. "6, 12, 18, 24, 30, 7, 14, 28, 35, 8, 16, 24, 32, 40, 9, 18, 27, 36") |
+| `multiplication:mult_chart` | missing = `100` | print: 6/6 answer(s) not found in the key text (e.g. "6, 12, 18, 24, 30, 7, 14, 21, 28, 35, 8, 16, 24, 32, 40, 9, 18, 27, 36, 45") |
+| `multiplication:mult_chart` | constant = `[1]` | print: 6/6 answer(s) not found in the key text (e.g. "6, 7, 8")<br>print: sheet is not titled "Times tables 1" (P-31) |
+| `multiplication:mult_chart` | constant = `[2]` | print: 6/6 answer(s) not found in the key text (e.g. "12, 14, 16")<br>print: sheet is not titled "Times tables 2" (P-31) |
+| `multiplication:mult_chart` | constant = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "18, 21, 24")<br>print: sheet is not titled "Times tables 3" (P-31) |
+| `multiplication:mult_chart` | constant = `[4]` | print: 6/6 answer(s) not found in the key text (e.g. "24, 28, 32")<br>print: sheet is not titled "Times tables 4" (P-31) |
+| `multiplication:mult_chart` | constant = `[5]` | print: 6/6 answer(s) not found in the key text (e.g. "30, 35, 40")<br>print: sheet is not titled "Times tables 5" (P-31) |
+| `multiplication:mult_chart` | constant = `[6]` | print: 6/6 answer(s) not found in the key text (e.g. "60, 42, 48")<br>print: sheet is not titled "Times tables 6" (P-31) |
+| `multiplication:mult_chart` | constant = `[7]` | print: 6/6 answer(s) not found in the key text (e.g. "42, 49, 56")<br>print: sheet is not titled "Times tables 7" (P-31) |
+| `multiplication:mult_chart` | constant = `[8]` | print: 6/6 answer(s) not found in the key text (e.g. "48, 56, 72")<br>print: sheet is not titled "Times tables 8" (P-31) |
+| `multiplication:mult_chart` | constant = `[9]` | print: 6/6 answer(s) not found in the key text (e.g. "54, 63, 72")<br>print: sheet is not titled "Times tables 9" (P-31) |
+| `multiplication:mult_chart` | constant = `[10]` | print: 6/6 answer(s) not found in the key text (e.g. "60, 70, 80")<br>print: sheet is not titled "Times tables 10" (P-31) |
+| `multiplication:mult_chart` | constant = `[11]` | print: 6/6 answer(s) not found in the key text (e.g. "66, 77, 88")<br>print: sheet is not titled "Times tables 11" (P-31) |
+| `multiplication:mult_chart` | constant = `[12]` | print: 6/6 answer(s) not found in the key text (e.g. "72, 84, 96")<br>print: sheet is not titled "Times tables 12" (P-31) |
+| `multiplication:mult_chart` | task = `"headers"` | print: 6/6 answer(s) not found in the key text (e.g. "6, 8") |
+| `multiplication:mult_chart` | task = `"pattern"` | print: 6/6 answer(s) not found in the key text (e.g. "7, 9, 1") |
+| `multiplication:nl_mult` | constant = `[2]` | print: sheet is not titled "Hops of 2" (P-31) |
+| `multiplication:nl_mult` | constant = `[3]` | print: sheet is not titled "Hops of 3" (P-31) |
+| `multiplication:nl_mult` | constant = `[4]` | print: sheet is not titled "Hops of 4" (P-31) |
+| `multiplication:nl_mult` | constant = `[5]` | print: sheet is not titled "Hops of 5" (P-31) |
+| `multiplication:nl_mult` | constant = `[6]` | print: sheet is not titled "Hops of 6" (P-31) |
+| `multiplication:nl_mult` | constant = `[7]` | print: sheet is not titled "Hops of 7" (P-31) |
+| `multiplication:nl_mult` | constant = `[8]` | print: sheet is not titled "Hops of 8" (P-31) |
+| `multiplication:nl_mult` | constant = `[9]` | print: sheet is not titled "Hops of 9" (P-31) |
+| `multiplication:nl_mult` | constant = `[10]` | print: sheet is not titled "Hops of 10" (P-31) |
+| `multiplication:nl_mult` | constant = `[11]` | print: sheet is not titled "Hops of 11" (P-31) |
+| `multiplication:nl_mult` | constant = `[12]` | print: sheet is not titled "Hops of 12" (P-31) |
+| `multiplication:nl_mult` | response = `"sentence"` | print: 6/6 answer(s) not found in the key text (e.g. "5, 5, 25") |
 | `multiplication:mixed_multiplication` | members = `["mult_facts"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `multiplication:mixed_multiplication` | members = `["multiply"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `multiplication:mixed_multiplication` | members = `["arrays_groups"]` | gen: generator not reproducible; difference not checkable, predicate only |
@@ -399,15 +442,37 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `multiplication:mixed_multiplication` | members = `["area_model_mult_hard"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `multiplication:mixed_multiplication` | members = `["mult_div_fact_family"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `multiplication:mixed_multiplication` | members = `["number_families_mult"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `multiplication:mixed_multiplication` | members = `["mult_chart"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 6/6 answer(s) not found in the key text (e.g. "36, 35, 27") |
-| `multiplication:mixed_multiplication` | members = `["mult_chart_easy"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `multiplication:mixed_multiplication` | members = `["mult_chart"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 6/6 answer(s) not found in the key text (e.g. "3, 10, 30") |
+| `multiplication:mixed_multiplication` | members = `["mult_chart_easy"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 6/6 answer(s) not found in the key text (e.g. "12, 21, 42, 16, 45, 88") |
 | `multiplication:mixed_multiplication` | members = `["nl_mult"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `multiplication:mixed_multiplication` | members = `["repeated_add_to_mult"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `multiplication:mixed_multiplication` | members = `["equal_or_unequal_groups"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `multiplication:mixed_multiplication` | members = `["mult_zeros"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `multiplication:mixed_multiplication` | members = `["mult_placeholder_zero"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `multiplication:mixed_multiplication` | members = `["mult_missing_digit"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 4/6 answer(s) not found in the key text (e.g. "6") |
+| `multiplication:mixed_multiplication` | members = `["count_by_tables"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 6/6 answer(s) not found in the key text (e.g. "2, 5, 7, 9, 11, 12") |
 | `multiplication:mult_missing_digit` | tiles = `31` | print: 2/6 answer(s) not found in the key text (e.g. "4") |
+| `multiplication:count_by_tables` | constant = `[1]` | print: 6/6 answer(s) not found in the key text (e.g. "3, 5, 6, 9, 11, 12")<br>print: sheet is not titled "Count by 1" (P-31) |
+| `multiplication:count_by_tables` | constant = `[2]` | print: 6/6 answer(s) not found in the key text (e.g. "6, 10, 12, 18, 22, 24")<br>print: sheet is not titled "Count by 2" (P-31) |
+| `multiplication:count_by_tables` | constant = `[3]` | print: 6/6 answer(s) not found in the key text (e.g. "9, 15, 18, 27, 33, 36")<br>print: sheet is not titled "Count by 3" (P-31) |
+| `multiplication:count_by_tables` | constant = `[4]` | print: 6/6 answer(s) not found in the key text (e.g. "12, 20, 24, 36, 44, 48")<br>print: sheet is not titled "Count by 4" (P-31) |
+| `multiplication:count_by_tables` | constant = `[5]` | print: 6/6 answer(s) not found in the key text (e.g. "15, 25, 30, 45, 55, 60")<br>print: sheet is not titled "Count by 5" (P-31) |
+| `multiplication:count_by_tables` | constant = `[6]` | print: 6/6 answer(s) not found in the key text (e.g. "18, 30, 36, 54, 66, 72")<br>print: sheet is not titled "Count by 6" (P-31) |
+| `multiplication:count_by_tables` | constant = `[7]` | print: 6/6 answer(s) not found in the key text (e.g. "21, 35, 42, 63, 77, 84")<br>print: sheet is not titled "Count by 7" (P-31) |
+| `multiplication:count_by_tables` | constant = `[8]` | print: 6/6 answer(s) not found in the key text (e.g. "24, 40, 48, 72, 88, 96")<br>print: sheet is not titled "Count by 8" (P-31) |
+| `multiplication:count_by_tables` | constant = `[9]` | print: 6/6 answer(s) not found in the key text (e.g. "27, 45, 54, 81, 99, 108")<br>print: sheet is not titled "Count by 9" (P-31) |
+| `multiplication:count_by_tables` | constant = `[10]` | print: 6/6 answer(s) not found in the key text (e.g. "30, 50, 60, 90, 110, 120")<br>print: sheet is not titled "Count by 10" (P-31) |
+| `multiplication:count_by_tables` | constant = `[11]` | print: 6/6 answer(s) not found in the key text (e.g. "33, 55, 66, 99, 121, 132")<br>print: sheet is not titled "Count by 11" (P-31) |
+| `multiplication:count_by_tables` | constant = `[12]` | print: 6/6 answer(s) not found in the key text (e.g. "36, 60, 72, 108, 132, 144")<br>print: sheet is not titled "Count by 12" (P-31) |
+| `multiplication:count_by_tables` | missing = `20` | print: 6/6 answer(s) not found in the key text (e.g. "7, 11") |
+| `multiplication:count_by_tables` | missing = `70` | print: 6/6 answer(s) not found in the key text (e.g. "3, 4, 6, 7, 8, 9, 10, 11") |
+| `multiplication:count_by_tables` | missing = `80` | print: 6/6 answer(s) not found in the key text (e.g. "3, 4, 5, 6, 8, 9, 10, 11, 12") |
+| `multiplication:count_by_tables` | missing = `90` | print: 6/6 answer(s) not found in the key text (e.g. "2, 4, 5, 6, 7, 8, 9, 10, 11, 12") |
+| `multiplication:count_by_tables` | missing = `100` | print: 6/6 answer(s) not found in the key text (e.g. "2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12") |
+| `multiplication:count_by_tables` | order = `"mixed"` | print: 6/6 answer(s) not found in the key text (e.g. "21, 35, 42, 63, 77, 84") |
+| `multiplication:count_by_tables` | shape = `"circle"` | print: 6/6 answer(s) not found in the key text (e.g. "3, 5, 6, 9, 11, 12") |
+| `multiplication:count_by_tables` | shape = `"hex"` | print: 6/6 answer(s) not found in the key text (e.g. "3, 5, 6, 9, 11, 12") |
+| `multiplication:count_by_tables` | shape = `"mixed"` | print: 6/6 answer(s) not found in the key text (e.g. "3, 5, 6, 9, 11, 12") |
 | `division:div_facts` | constant = `[0]` | print: sheet is not titled "Zero divided by a number" (P-31) |
 | `division:div_facts` | constant = `[1]` | print: sheet is not titled "Divide by 1" (P-31) |
 | `division:div_facts` | constant = `[2]` | print: sheet is not titled "Divide by 2" (P-31) |
@@ -472,8 +537,18 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `division:missing_mult_div` | notation = `["bracket"]` | gen: 6/12 items overruled to  (multi-digit exception) |
 | `division:missing_mult_div` | notation = `["fraction"]` | gen: 6/12 items overruled to  (multi-digit exception) |
 | `division:missing_mult_div` | notation = `["across","bracket","fraction"]` | gen: 6/12 items overruled to  (multi-digit exception) |
-| `division:nl_div` | band = `20` | gen: generator not reproducible; difference not checkable, predicate only |
-| `division:nl_div` | band = `50` | gen: generator not reproducible; difference not checkable, predicate only |
+| `division:nl_div` | constant = `[2]` | print: sheet is not titled "Divide by 2" (P-31) |
+| `division:nl_div` | constant = `[3]` | print: sheet is not titled "Divide by 3" (P-31) |
+| `division:nl_div` | constant = `[4]` | print: sheet is not titled "Divide by 4" (P-31) |
+| `division:nl_div` | constant = `[5]` | print: sheet is not titled "Divide by 5" (P-31) |
+| `division:nl_div` | constant = `[6]` | print: sheet is not titled "Divide by 6" (P-31) |
+| `division:nl_div` | constant = `[7]` | print: sheet is not titled "Divide by 7" (P-31) |
+| `division:nl_div` | constant = `[8]` | print: sheet is not titled "Divide by 8" (P-31) |
+| `division:nl_div` | constant = `[9]` | print: sheet is not titled "Divide by 9" (P-31) |
+| `division:nl_div` | constant = `[10]` | print: sheet is not titled "Divide by 10" (P-31) |
+| `division:nl_div` | constant = `[11]` | print: sheet is not titled "Divide by 11" (P-31) |
+| `division:nl_div` | constant = `[12]` | print: sheet is not titled "Divide by 12" (P-31) |
+| `division:nl_div` | response = `"sentence"` | print: 6/6 answer(s) not found in the key text (e.g. "20, 5, 4") |
 | `division:mixed_division` | members = `["div_facts"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `division:mixed_division` | members = `["divide"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `division:mixed_division` | members = `["div_remainders"]` | gen: generator not reproducible; difference not checkable, predicate only |
@@ -520,7 +595,7 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `number_ops_mixed:word_problems_mixed_plain` | members = `["mult_comparison"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `number_ops_mixed:operations_all` | members = `["addition"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `number_ops_mixed:operations_all` | members = `["subtraction"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `number_ops_mixed:operations_all` | members = `["multiplication"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `number_ops_mixed:operations_all` | members = `["multiplication"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "9, 22, 32, 48, 5, 18") |
 | `number_ops_mixed:operations_all` | members = `["division"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `number_ops_mixed:operations_all` | members = `["integers"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `number_ops_mixed:which_sign` | range = `10` | gen: "Up to 10" but the answer reaches null and the numbers 20<br>print: "Up to 10" but the answer reaches null and the numbers 20 |
@@ -773,27 +848,130 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `coordinates:mixed_coordinates` | members = `["geo_reflect"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `coordinates:mixed_coordinates` | members = `["geo_rotate"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `coordinates:mixed_coordinates` | members = `["geo_translate"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `measurement:time_analog_digital` | dir = `"to-analog"` | print: 4/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:time_match_clock` | precision = `60` | print: 4/6 answer(s) not found in the key text (e.g. "C") |
+| `measurement:time_match_clock` | precision = `30` | print: 4/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:time_match_clock` | precision = `15` | print: 4/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:time_match_clock` | precision = `1` | print: 4/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:time_match_clock` | words = `"past"` | print: 4/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:time_match_clock` | words = `"oh"` | print: 4/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:time_match_clock` | numerals = `"quarters"` | print: 4/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:time_match_clock` | numerals = `"twelve"` | print: 4/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:order_clocks_analog_asc` | tiles = `4` | print: 6/6 answer(s) not found in the key text (e.g. "4, 2, 1, 3") |
+| `measurement:order_clocks_analog_asc` | tiles = `5` | print: 6/6 answer(s) not found in the key text (e.g. "4, 2, 1, 3, 5") |
+| `measurement:order_clocks_analog_asc` | precision = `60` | print: 6/6 answer(s) not found in the key text (e.g. "3, 1, 2") |
+| `measurement:order_clocks_analog_asc` | precision = `30` | print: 6/6 answer(s) not found in the key text (e.g. "3, 2, 1") |
+| `measurement:order_clocks_analog_asc` | precision = `5` | print: 6/6 answer(s) not found in the key text (e.g. "2, 3, 1") |
+| `measurement:order_clocks_analog_asc` | numerals = `"quarters"` | print: 6/6 answer(s) not found in the key text (e.g. "3, 2, 1") |
+| `measurement:order_clocks_analog_asc` | numerals = `"twelve"` | print: 6/6 answer(s) not found in the key text (e.g. "3, 2, 1") |
+| `measurement:order_clocks_analog_asc` | noon = `"across"` | print: 6/6 answer(s) not found in the key text (e.g. "3, 1, 2") |
+| `measurement:order_clocks_analog_desc` | tiles = `4` | print: 6/6 answer(s) not found in the key text (e.g. "1, 4, 3, 2") |
+| `measurement:order_clocks_analog_desc` | tiles = `5` | print: 6/6 answer(s) not found in the key text (e.g. "1, 5, 4, 2, 3") |
+| `measurement:order_clocks_analog_desc` | precision = `60` | print: 6/6 answer(s) not found in the key text (e.g. "2, 1, 3") |
+| `measurement:order_clocks_analog_desc` | precision = `30` | print: 6/6 answer(s) not found in the key text (e.g. "1, 3, 2") |
+| `measurement:order_clocks_analog_desc` | precision = `5` | print: 6/6 answer(s) not found in the key text (e.g. "3, 2, 1") |
+| `measurement:order_clocks_analog_desc` | numerals = `"quarters"` | print: 6/6 answer(s) not found in the key text (e.g. "1, 3, 2") |
+| `measurement:order_clocks_analog_desc` | numerals = `"twelve"` | print: 6/6 answer(s) not found in the key text (e.g. "1, 3, 2") |
+| `measurement:order_clocks_analog_desc` | noon = `"across"` | print: 6/6 answer(s) not found in the key text (e.g. "3, 2, 1") |
+| `measurement:order_clocks_digital_asc` | tiles = `4` | print: 6/6 answer(s) not found in the key text (e.g. "3, 2, 1, 4") |
+| `measurement:order_clocks_digital_asc` | tiles = `5` | print: 6/6 answer(s) not found in the key text (e.g. "3, 2, 1, 4, 5") |
+| `measurement:order_clocks_digital_asc` | precision = `60` | print: 6/6 answer(s) not found in the key text (e.g. "3, 2, 1") |
+| `measurement:order_clocks_digital_asc` | precision = `30` | print: 6/6 answer(s) not found in the key text (e.g. "3, 1, 2") |
+| `measurement:order_clocks_digital_asc` | precision = `5` | print: 6/6 answer(s) not found in the key text (e.g. "1, 3, 2") |
+| `measurement:order_clocks_digital_asc` | noon = `"across"` | print: 6/6 answer(s) not found in the key text (e.g. "3, 2, 1") |
+| `measurement:order_clocks_digital_desc` | tiles = `4` | print: 6/6 answer(s) not found in the key text (e.g. "3, 2, 4, 1") |
+| `measurement:order_clocks_digital_desc` | tiles = `5` | print: 6/6 answer(s) not found in the key text (e.g. "1, 2, 3, 5, 4") |
+| `measurement:order_clocks_digital_desc` | precision = `60` | print: 6/6 answer(s) not found in the key text (e.g. "1, 3, 2") |
+| `measurement:order_clocks_digital_desc` | precision = `30` | print: 6/6 answer(s) not found in the key text (e.g. "2, 3, 1") |
+| `measurement:order_clocks_digital_desc` | precision = `5` | print: 6/6 answer(s) not found in the key text (e.g. "2, 1, 3") |
+| `measurement:order_clocks_digital_desc` | noon = `"across"` | print: 6/6 answer(s) not found in the key text (e.g. "2, 1, 3") |
+| `measurement:elapsed_visual_easy` | notation = `"digital"` | gen: items carry no notation to check |
+| `measurement:elapsed_visual_easy` | notation = `"mixed"` | gen: items carry no notation to check |
+| `measurement:elapsed_visual_medium` | notation = `"digital"` | gen: items carry no notation to check |
+| `measurement:elapsed_visual_medium` | notation = `"mixed"` | gen: items carry no notation to check |
+| `measurement:elapsed_visual_hard` | notation = `"digital"` | gen: items carry no notation to check |
+| `measurement:elapsed_visual_hard` | notation = `"mixed"` | gen: items carry no notation to check |
 | `measurement:pictograph_intro` | forms = `[0]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `measurement:bar_graph_intro` | forms = `[1]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `measurement:reading_ruler` | parts = `[0]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `measurement:reading_ruler_hard` | parts = `[0]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
-| `measurement:money_count` | range = `10` | gen: "Up to 10" but the answer reaches 105 and the numbers null<br>print: "Up to 10" but the answer reaches 81 and the numbers null |
-| `measurement:money_count` | range = `20` | gen: "Up to 20" but the answer reaches 105 and the numbers null<br>print: "Up to 20" but the answer reaches 81 and the numbers null |
-| `measurement:money_count` | range = `50` | gen: "Up to 50" but the answer reaches 120 and the numbers null<br>print: "Up to 50" but the answer reaches 81 and the numbers null |
-| `measurement:money_count` | range = `100` | gen: "Up to 100" but the answer reaches 240 and the numbers null<br>print: "Up to 100" but the answer reaches 166 and the numbers null |
+| `measurement:money_count` | kind = `"notes-coins"` | print: 6/6 answer(s) not found in the key text (e.g. "11, 41") |
+| `measurement:money_count` | values = `[1]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `measurement:money` | band = `500` | gen: band 500 never used: largest number 5<br>print: band 500 never used: largest number 5 |
+| `measurement:money` | band = `10000` | gen: band 10000 never used: largest number 94<br>print: band 10000 never used: largest number 66 |
+| `measurement:equiv_coin_sets` | currency = `"qar"` | print: 6/6 answer(s) not found in the key text (e.g. "No") |
+| `measurement:equiv_coin_sets` | currency = `"usd"` | print: 6/6 answer(s) not found in the key text (e.g. "No") |
+| `measurement:equiv_coin_sets` | band = `25` | print: 6/6 answer(s) not found in the key text (e.g. "No") |
+| `measurement:equiv_coin_sets` | band = `100` | print: 6/6 answer(s) not found in the key text (e.g. "No") |
+| `measurement:equiv_coin_sets` | values = `[1]` | print: 6/6 answer(s) not found in the key text (e.g. "No") |
+| `measurement:equiv_coin_sets` | values = `[5]` | print: 6/6 answer(s) not found in the key text (e.g. "No") |
+| `measurement:equiv_coin_sets` | values = `[10]` | print: 6/6 answer(s) not found in the key text (e.g. "No") |
+| `measurement:equiv_coin_sets` | values = `[25]` | print: 6/6 answer(s) not found in the key text (e.g. "No") |
+| `measurement:enough_money` | currency = `"qar"` | print: 6/6 answer(s) not found in the key text (e.g. "Not enough") |
+| `measurement:enough_money` | currency = `"usd"` | print: 6/6 answer(s) not found in the key text (e.g. "Not enough") |
+| `measurement:enough_money` | band = `25` | print: 6/6 answer(s) not found in the key text (e.g. "Not enough") |
+| `measurement:enough_money` | band = `50` | print: 6/6 answer(s) not found in the key text (e.g. "Not enough") |
+| `measurement:enough_money` | band = `500` | print: 6/6 answer(s) not found in the key text (e.g. "Not enough") |
+| `measurement:enough_money` | gap = `"near"` | print: 6/6 answer(s) not found in the key text (e.g. "Not enough") |
+| `measurement:enough_money` | values = `[1]` | print: 6/6 answer(s) not found in the key text (e.g. "Not enough") |
+| `measurement:enough_money` | values = `[5]` | print: 6/6 answer(s) not found in the key text (e.g. "Not enough") |
+| `measurement:enough_money` | values = `[10]` | print: 6/6 answer(s) not found in the key text (e.g. "Not enough") |
+| `measurement:enough_money` | values = `[25]` | print: 6/6 answer(s) not found in the key text (e.g. "Not enough") |
+| `measurement:make_change_least_coins` | currency = `"qar"` | print: 6/6 answer(s) not found in the key text (e.g. "1, 0, 0, 0, 0") |
+| `measurement:make_change_least_coins` | currency = `"usd"` | print: 6/6 answer(s) not found in the key text (e.g. "2, 0, 0, 0") |
+| `measurement:make_change_least_coins` | band = `25` | print: 6/6 answer(s) not found in the key text (e.g. "1, 0, 0, 0") |
+| `measurement:make_change_least_coins` | band = `100` | print: 6/6 answer(s) not found in the key text (e.g. "4, 0, 0, 0") |
 | `measurement:unit_conversions` | units = `[0]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `measurement:mixed_measurement` | members = `["time_match_clock"]` | print: 4/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:mixed_measurement` | members = `["order_clocks_analog_asc"]` | print: 6/6 answer(s) not found in the key text (e.g. "2, 1, 3") |
+| `measurement:mixed_measurement` | members = `["order_clocks_analog_desc"]` | print: 6/6 answer(s) not found in the key text (e.g. "2, 3, 1") |
+| `measurement:mixed_measurement` | members = `["order_clocks_digital_asc"]` | print: 6/6 answer(s) not found in the key text (e.g. "2, 1, 3") |
+| `measurement:mixed_measurement` | members = `["order_clocks_digital_desc"]` | print: 6/6 answer(s) not found in the key text (e.g. "2, 3, 1") |
 | `measurement:mixed_measurement` | members = `["pictograph_intro"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `measurement:mixed_measurement` | members = `["equiv_coin_sets"]` | print: 6/6 answer(s) not found in the key text (e.g. "Yes") |
+| `measurement:mixed_measurement` | members = `["enough_money"]` | print: 6/6 answer(s) not found in the key text (e.g. "Enough") |
+| `measurement:mixed_measurement` | members = `["make_change_least_coins"]` | print: 6/6 answer(s) not found in the key text (e.g. "2, 0, 0, 0") |
+| `measurement:mixed_measurement` | members = `["clock_parts"]` | print: 6/6 answer(s) not found in the key text (e.g. "1, 8, 10, 12") |
+| `measurement:mixed_measurement` | members = `["time_fives_ring"]` | print: 6/6 answer(s) not found in the key text (e.g. "5, 10, 15, 20, 35, 40, 55") |
+| `measurement:mixed_measurement` | members = `["time_sense"]` | print: 6/6 answer(s) not found in the key text (e.g. "p.m.") |
+| `measurement:mixed_measurement` | members = `["money_compare"]` | print: 5/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:mixed_time` | members = `["time_match_clock"]` | print: 4/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:clock_parts` | task = `"hands"` | print: 3/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:time_fives_ring` | task = `"all"` | print: 6/6 answer(s) not found in the key text (e.g. "5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 0") |
+| `measurement:coin_value` | task = `"order"` | print: 6/6 answer(s) not found in the key text (e.g. "1, 4, 3, 2") |
+| `measurement:money_change` | band = `100` | gen: band 100 never used: largest number 0.75<br>print: band 100 never used: largest number 0.75 |
+| `measurement:money_change` | band = `2000` | gen: band 2000 never used: largest number 1<br>print: band 2000 never used: largest number 1 |
+| `measurement:money_change` | band = `10000` | gen: band 10000 never used: largest number 1<br>print: band 10000 never used: largest number 1 |
+| `measurement:money_compare` | currency = `"qar"` | print: 5/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:money_compare` | band = `25` | print: 3/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:money_compare` | band = `50` | print: 4/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:money_compare` | values = `[1]` | print: 3/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:money_compare` | values = `[5]` | print: 3/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:money_compare` | values = `[10]` | print: 3/6 answer(s) not found in the key text (e.g. "B") |
+| `measurement:money_compare` | values = `[25]` | print: 2/6 answer(s) not found in the key text (e.g. "B") |
 | `geo_mixed:geometry_all` | members = `["shapes_early"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `geo_mixed:geometry_all` | members = `["area_perimeter"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `geo_mixed:geometry_all` | members = `["angles_lines"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `geo_mixed:geometry_all` | members = `["shapes_classify"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `geo_mixed:geometry_all` | members = `["coordinates"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `geo_mixed:measurement_all` | members = `["time_match_clock"]` | print: 4/6 answer(s) not found in the key text (e.g. "C") |
+| `geo_mixed:measurement_all` | members = `["order_clocks_analog_asc"]` | print: 6/6 answer(s) not found in the key text (e.g. "2, 1, 3") |
+| `geo_mixed:measurement_all` | members = `["order_clocks_analog_desc"]` | print: 6/6 answer(s) not found in the key text (e.g. "2, 3, 1") |
+| `geo_mixed:measurement_all` | members = `["order_clocks_digital_asc"]` | print: 6/6 answer(s) not found in the key text (e.g. "2, 1, 3") |
+| `geo_mixed:measurement_all` | members = `["order_clocks_digital_desc"]` | print: 6/6 answer(s) not found in the key text (e.g. "2, 3, 1") |
+| `geo_mixed:measurement_all` | members = `["equiv_coin_sets"]` | print: 6/6 answer(s) not found in the key text (e.g. "No") |
+| `geo_mixed:measurement_all` | members = `["enough_money"]` | print: 6/6 answer(s) not found in the key text (e.g. "Not enough") |
+| `geo_mixed:measurement_all` | members = `["make_change_least_coins"]` | print: 6/6 answer(s) not found in the key text (e.g. "2, 0, 0, 0") |
+| `geo_mixed:measurement_all` | members = `["clock_parts"]` | print: 6/6 answer(s) not found in the key text (e.g. "1, 8, 12") |
+| `geo_mixed:measurement_all` | members = `["time_fives_ring"]` | print: 6/6 answer(s) not found in the key text (e.g. "15, 20, 25, 30, 40, 45, 50, 55") |
+| `geo_mixed:measurement_all` | members = `["time_sense"]` | print: 6/6 answer(s) not found in the key text (e.g. "a.m.") |
+| `geo_mixed:measurement_all` | members = `["money_compare"]` | print: 5/6 answer(s) not found in the key text (e.g. "B") |
 | `geo_mixed:geo_meas_all` | members = `["shapes_early"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `geo_mixed:geo_meas_all` | members = `["area_perimeter"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `geo_mixed:geo_meas_all` | members = `["angles_lines"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `geo_mixed:geo_meas_all` | members = `["shapes_classify"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `geo_mixed:geo_meas_all` | members = `["coordinates"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
-| `geo_mixed:geo_meas_all` | members = `["measurement"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `geo_mixed:geo_meas_all` | members = `["measurement"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 2/6 answer(s) not found in the key text (e.g. "2, 3, 1") |
 | `graphs:line_plot_g2` | forms = `[1]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `graphs:line_plot_fractions` | forms = `[2]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `data_analysis:mixed_data_analysis` | range = `10` | gen: "Up to 10" but the answer reaches 15 and the numbers 12<br>print: "Up to 10" but the answer reaches 15 and the numbers 12 |
@@ -840,6 +1018,26 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `patterns:number_pattern` | range = `100000` | gen: generator not reproducible; difference not checkable, predicate only |
 | `patterns:number_pattern` | range = `1000000` | gen: generator not reproducible; difference not checkable, predicate only |
 | `patterns:pattern_relationship` | forms = `[0]` | print: printed sheet identical to the default, which already satisfies this value |
+| `patterns:mixed_patterns` | members = `["number_patterns_rule"]` | print: 5/6 answer(s) not found in the key text (e.g. "35, 45, 55, 65, 75") |
+| `patterns:number_patterns_rule` | pattern = `["add"]` | print: 6/6 answer(s) not found in the key text (e.g. "36, 46, 56, 66, 76") |
+| `patterns:number_patterns_rule` | pattern = `["sub"]` | print: 6/6 answer(s) not found in the key text (e.g. "60, 57, 54, 51, 48") |
+| `patterns:number_patterns_rule` | pattern = `["double"]` | print: 4/6 answer(s) not found in the key text (e.g. "136, 272, 544") |
+| `patterns:number_patterns_rule` | pattern = `["grow"]` | print: 6/6 answer(s) not found in the key text (e.g. "18, 26, 36") |
+| `patterns:number_patterns_rule` | pattern = `["add","sub","double","times10","grow"]` | print: 5/6 answer(s) not found in the key text (e.g. "36, 46, 56, 66, 76") |
+| `patterns:number_patterns_rule` | places = `[1]` | print: 6/6 answer(s) not found in the key text (e.g. "36, 46, 56, 66, 76") |
+| `patterns:number_patterns_rule` | places = `[10]` | print: 6/6 answer(s) not found in the key text (e.g. "136, 161, 186, 211, 236") |
+| `patterns:number_patterns_rule` | places = `[100]` | print: 6/6 answer(s) not found in the key text (e.g. "911, 1011, 1111, 1211, 1311") |
+| `patterns:number_patterns_rule` | places = `[1000]` | print: 6/6 answer(s) not found in the key text (e.g. "5137, 6137, 7137, 8137, 9137") |
+| `patterns:number_patterns_rule` | places = `[1,10,100,1000]` | print: 6/6 answer(s) not found in the key text (e.g. "36, 46, 56, 66, 76") |
+| `patterns:number_patterns_rule` | missing = `50` | print: 6/6 answer(s) not found in the key text (e.g. "26, 36, 56, 76") |
+| `patterns:number_patterns_rule` | missing = `70` | print: 6/6 answer(s) not found in the key text (e.g. "16, 36, 46, 56, 76") |
+| `patterns:number_patterns_rule` | missing = `80` | print: 6/6 answer(s) not found in the key text (e.g. "16, 26, 36, 56, 66, 76") |
+| `patterns:number_patterns_rule` | missing = `90` | print: 6/6 answer(s) not found in the key text (e.g. "16, 26, 36, 56, 66, 76") |
+| `patterns:number_patterns_rule` | missing = `100` | print: 6/6 answer(s) not found in the key text (e.g. "16, 26, 36, 46, 56, 66, 76") |
+| `patterns:number_patterns_rule` | rule = `true` | print: 6/6 answer(s) not found in the key text (e.g. "36, 46, 56, 66, 76, 10") |
+| `patterns:number_patterns_rule` | shape = `"circle"` | print: 6/6 answer(s) not found in the key text (e.g. "36, 46, 56, 66, 76") |
+| `patterns:number_patterns_rule` | shape = `"hex"` | print: 6/6 answer(s) not found in the key text (e.g. "36, 46, 56, 66, 76") |
+| `patterns:number_patterns_rule` | shape = `"mixed"` | print: 6/6 answer(s) not found in the key text (e.g. "36, 46, 56, 66, 76") |
 | `algebra:tape_diagram` | range = `10` | gen: "Up to 10" but the answer reaches 20 and the numbers 20<br>print: "Up to 10" but the answer reaches 20 and the numbers 20 |
 | `algebra:tape_diagram` | range = `20` | gen: "Up to 20" but the answer reaches 35 and the numbers 35<br>print: "Up to 20" but the answer reaches 35 and the numbers 34 |
 | `algebra:tape_diagram` | range = `50` | gen: "Up to 50" but the answer reaches 79 and the numbers 81<br>print: "Up to 50" but the answer reaches 79 and the numbers 76 |
@@ -857,7 +1055,47 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `algebra:evaluate_expression` | range = `20` | gen: "Up to 20" but the answer reaches 144 and the numbers 24<br>print: "Up to 20" but the answer reaches 80 and the numbers 24 |
 | `algebra:evaluate_expression_hard` | forms = `[0]` | print: printed sheet identical to the default, which already satisfies this value<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `algebra:inequalities` | range = `10` | gen: "Up to 10" but the answer reaches 20 and the numbers 20<br>print: "Up to 10" but the answer reaches 20 and the numbers 20 |
-| `algebra:function_table_easy` | range = `10` | gen: "Up to 10" but the answer reaches 20 and the numbers 11<br>print: "Up to 10" but the answer reaches 15 and the numbers 11 |
+| `algebra:function_table_easy` | task = `"rule"` | print: 6/6 answer(s) not found in the key text (e.g. "+, 5") |
+| `algebra:function_table_easy` | task = `"inputs"` | print: 6/6 answer(s) not found in the key text (e.g. "3, 7, 9, 12") |
+| `algebra:function_table_easy` | task = `"mixed"` | print: 6/6 answer(s) not found in the key text (e.g. "8, 7, 9, 17") |
+| `algebra:function_table_easy` | task = `"make"` | print: 6/6 answer(s) not found in the key text (e.g. "3, 8, 7, 12, 9, 14, 12, 17") |
+| `algebra:function_table_easy` | ops = `["+"]` | print: ticked but never dealt: +<br>print: 6/6 answer(s) not found in the key text (e.g. "8, 12, 14, 17") |
+| `algebra:function_table_easy` | ops = `["-"]` | print: ticked but never dealt: -<br>print: 6/6 answer(s) not found in the key text (e.g. "3, 7, 8, 11") |
+| `algebra:function_table_easy` | ops = `["x"]` | print: ticked but never dealt: x<br>print: 6/6 answer(s) not found in the key text (e.g. "3, 6, 9, 15") |
+| `algebra:function_table_easy` | ops = `["/"]` | print: ticked but never dealt: /<br>print: 6/6 answer(s) not found in the key text (e.g. "1, 2, 3, 5") |
+| `algebra:function_table_easy` | ops = `["+","-","x","/"]` | print: ticked but never dealt: +,-,x,/<br>print: 6/6 answer(s) not found in the key text (e.g. "8, 12, 14, 17") |
+| `algebra:function_table_easy` | step = `[2]` | print: 6/6 answer(s) not found in the key text (e.g. "6, 9, 12, 18") |
+| `algebra:function_table_easy` | step = `[1,2]` | print: 6/6 answer(s) not found in the key text (e.g. "8, 12, 14, 17") |
+| `algebra:function_table_easy` | band = `10` | print: 6/6 answer(s) not found in the key text (e.g. "4, 5, 7, 9") |
+| `algebra:function_table_easy` | band = `50` | print: 6/6 answer(s) not found in the key text (e.g. "12, 15, 22, 28") |
+| `algebra:function_table_easy` | band = `100` | print: 6/6 answer(s) not found in the key text (e.g. "28, 32, 65, 86") |
+| `algebra:function_table_easy` | band = `1000` | print: 6/6 answer(s) not found in the key text (e.g. "144, 258, 300, 524") |
+| `algebra:function_table_easy` | tiles = `3` | print: 6/6 answer(s) not found in the key text (e.g. "8, 12, 17") |
+| `algebra:function_table_easy` | tiles = `5` | print: 6/6 answer(s) not found in the key text (e.g. "8, 12, 13, 14, 17") |
+| `algebra:function_table_easy` | order = `"scrambled"` | print: 6/6 answer(s) not found in the key text (e.g. "17, 12, 8, 14") |
+| `algebra:function_table_easy` | support = `"line"` | print: 6/6 answer(s) not found in the key text (e.g. "8, 12, 14, 17") |
+| `algebra:function_table_easy` | pictures = `false` | print: 6/6 answer(s) not found in the key text (e.g. "8, 12, 14, 17") |
+| `algebra:function_table_easy` | response = `"check"` | print: 6/6 answer(s) not found in the key text (e.g. "8, 12, 14, 17, 13") |
+| `algebra:function_table_hard` | task = `"outputs"` | print: 6/6 answer(s) not found in the key text (e.g. "38, 23, 46, 63") |
+| `algebra:function_table_hard` | task = `"inputs"` | print: 6/6 answer(s) not found in the key text (e.g. "34, 19, 42, 63") |
+| `algebra:function_table_hard` | task = `"mixed"` | print: 6/6 answer(s) not found in the key text (e.g. "34, 23, 46, 63") |
+| `algebra:function_table_hard` | task = `"make"` | print: 6/6 answer(s) not found in the key text (e.g. "34, 38, 19, 23, 42, 46") |
+| `algebra:function_table_hard` | ops = `["+"]` | print: ticked but never dealt: +<br>print: 6/6 answer(s) not found in the key text (e.g. "+, 4, 63") |
+| `algebra:function_table_hard` | ops = `["-"]` | print: ticked but never dealt: -<br>print: 6/6 answer(s) not found in the key text (e.g. "−, 4, 49") |
+| `algebra:function_table_hard` | ops = `["x"]` | print: ticked but never dealt: x<br>print: 6/6 answer(s) not found in the key text (e.g. "×, 3, 78") |
+| `algebra:function_table_hard` | ops = `["/"]` | print: ticked but never dealt: /<br>print: 6/6 answer(s) not found in the key text (e.g. "÷, 3, 26") |
+| `algebra:function_table_hard` | step = `[1]` | print: 6/6 answer(s) not found in the key text (e.g. "+, 4, 63") |
+| `algebra:function_table_hard` | step = `[2]` | print: 6/6 answer(s) not found in the key text (e.g. "×, 3, +, 8, 14") |
+| `algebra:function_table_hard` | band = `10` | print: 6/6 answer(s) not found in the key text (e.g. "+, 1, 5") |
+| `algebra:function_table_hard` | band = `20` | print: 6/6 answer(s) not found in the key text (e.g. "+, 2, 10") |
+| `algebra:function_table_hard` | band = `50` | print: 6/6 answer(s) not found in the key text (e.g. "+, 3, 34") |
+| `algebra:function_table_hard` | band = `1000` | print: 6/6 answer(s) not found in the key text (e.g. "+, 40, 615") |
+| `algebra:function_table_hard` | tiles = `4` | print: 6/6 answer(s) not found in the key text (e.g. "+, 4, 95") |
+| `algebra:function_table_hard` | tiles = `5` | print: 6/6 answer(s) not found in the key text (e.g. "+, 4, 42") |
+| `algebra:function_table_hard` | order = `"inorder"` | print: 6/6 answer(s) not found in the key text (e.g. "+, 4, 63") |
+| `algebra:function_table_hard` | support = `"line"` | print: 6/6 answer(s) not found in the key text (e.g. "+ 4, 63") |
+| `algebra:function_table_hard` | pictures = `false` | print: 6/6 answer(s) not found in the key text (e.g. "+, 4, 63") |
+| `algebra:function_table_hard` | response = `"standard"` | print: 6/6 answer(s) not found in the key text (e.g. "+, 4") |
 | `algebra:algebra_word_mixed` | members = `["tape_diagram"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `algebra:algebra_word_mixed` | members = `["multi_step_word"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `algebra:algebra_word_mixed` | range = `10` | gen: generator not reproducible; difference not checkable, predicate only<br>gen: "Up to 10" but the answer reaches 35 and the numbers 43<br>print: "Up to 10" but the answer reaches 23 and the numbers 27 |
@@ -891,8 +1129,8 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `algebra:mixed_algebra` | members = `["inequalities"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `algebra:mixed_algebra` | members = `["combine_like_terms"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `algebra:mixed_algebra` | members = `["distributive_expr"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `algebra:mixed_algebra` | members = `["function_table_easy"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `algebra:mixed_algebra` | members = `["function_table_hard"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra:mixed_algebra` | members = `["function_table_easy"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 6/6 answer(s) not found in the key text (e.g. "10, 11, 17, 18") |
+| `algebra:mixed_algebra` | members = `["function_table_hard"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 6/6 answer(s) not found in the key text (e.g. "+, 19, 97") |
 | `algebra:mixed_algebra` | members = `["algebra_word_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `algebra:mixed_algebra` | members = `["algebra_word_mixed_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `algebra:mixed_algebra` | members = `["solve_eq_addsub"]` | gen: generator not reproducible; difference not checkable, predicate only |
@@ -934,25 +1172,56 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `placevalue:identify` | places = `[100000]` | print: 6/6 answer(s) not found in the key text (e.g. "hundred thousands") |
 | `placevalue:identify` | support = `"chart"` | print: 6/6 answer(s) not found in the key text (e.g. "ones") |
 | `placevalue:identify` | support = `"none"` | print: 6/6 answer(s) not found in the key text (e.g. "ones") |
+| `placevalue:identify` | repeatDigit = `true` | print: 6/6 answer(s) not found in the key text (e.g. "ones") |
 | `placevalue:value` | band = `99` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
-| `placevalue:mixed_placevalue` | members = `["more_less_10"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `placevalue:mixed_placevalue` | members = `["place_value_disks"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `placevalue:mixed_placevalue` | members = `["pv_disks_build"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 6/6 answer(s) not found in the key text (e.g. "59") |
-| `placevalue:mixed_placevalue` | members = `["number_word_names"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `placevalue:mixed_placevalue` | members = `["place_value_10x"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `placevalue:mixed_placevalue` | members = `["identify"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 6/6 answer(s) not found in the key text (e.g. "ones") |
-| `placevalue:mixed_placevalue` | members = `["value"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `placevalue:mixed_placevalue` | members = `["compare"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `placevalue:mixed_placevalue` | members = `["expand"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `placevalue:mixed_placevalue` | members = `["combine"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `placevalue:mixed_placevalue` | members = `["order_least_to_greatest"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `placevalue:mixed_placevalue` | members = `["order_greatest_to_least"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `number_sense:estimate_sum` | range = `10` | gen: "Up to 10" but the answer reaches 40 and the numbers 22<br>print: "Up to 10" but the answer reaches 40 and the numbers 22 |
+| `placevalue:order_least_to_greatest` | count = `4` | print: 6/6 answer(s) not found in the key text (e.g. "331,500,889,914") |
+| `placevalue:order_least_to_greatest` | count = `5` | print: 6/6 answer(s) not found in the key text (e.g. "116,203,515,866,907") |
+| `placevalue:order_least_to_greatest` | count = `6` | print: 6/6 answer(s) not found in the key text (e.g. "181,389,516,640,829,989") |
+| `placevalue:order_least_to_greatest` | closeness = `"close"` | print: 6/6 answer(s) not found in the key text (e.g. "823,871,874") |
+| `placevalue:order_least_to_greatest` | lengths = `"mixed"` | print: 6/6 answer(s) not found in the key text (e.g. "7,500,873") |
+| `placevalue:order_greatest_to_least` | count = `4` | print: 6/6 answer(s) not found in the key text (e.g. "988,770,628,411") |
+| `placevalue:order_greatest_to_least` | count = `5` | print: 6/6 answer(s) not found in the key text (e.g. "988,770,628,426,325") |
+| `placevalue:order_greatest_to_least` | count = `6` | print: 6/6 answer(s) not found in the key text (e.g. "749,689,522,451,352,165") |
+| `placevalue:order_greatest_to_least` | closeness = `"close"` | print: 6/6 answer(s) not found in the key text (e.g. "484,482,444") |
+| `placevalue:order_greatest_to_least` | lengths = `"mixed"` | print: 3/6 answer(s) not found in the key text (e.g. "840,448,41") |
+| `placevalue:mixed_placevalue` | members = `["pv_disks_build"]` | print: 6/6 answer(s) not found in the key text (e.g. "59") |
+| `placevalue:mixed_placevalue` | members = `["identify"]` | print: 6/6 answer(s) not found in the key text (e.g. "ones") |
+| `number_sense:nearest_10` | responseScope = `"decision"` | print: 6/6 answer(s) not found in the key text (e.g. "Round down") |
+| `number_sense:nearest_10` | responseScope = `"judge"` | print: 6/6 answer(s) not found in the key text (e.g. "Correct") |
+| `number_sense:nearest_100` | responseScope = `"decision"` | print: 6/6 answer(s) not found in the key text (e.g. "Round down") |
+| `number_sense:nearest_100` | responseScope = `"judge"` | print: 6/6 answer(s) not found in the key text (e.g. "Correct") |
+| `number_sense:nearest_1000` | responseScope = `"decision"` | print: 6/6 answer(s) not found in the key text (e.g. "Round up") |
+| `number_sense:nearest_1000` | responseScope = `"judge"` | print: 6/6 answer(s) not found in the key text (e.g. "Correct") |
+| `number_sense:nearest_10000` | responseScope = `"decision"` | print: 6/6 answer(s) not found in the key text (e.g. "Round up") |
+| `number_sense:nearest_10000` | responseScope = `"judge"` | print: 6/6 answer(s) not found in the key text (e.g. "Correct") |
+| `number_sense:nearest_100000` | responseScope = `"decision"` | print: 6/6 answer(s) not found in the key text (e.g. "Round down") |
+| `number_sense:nearest_100000` | responseScope = `"judge"` | print: 6/6 answer(s) not found in the key text (e.g. "Correct") |
+| `number_sense:nearest_million` | responseScope = `"decision"` | print: 6/6 answer(s) not found in the key text (e.g. "Round down") |
+| `number_sense:nearest_million` | responseScope = `"judge"` | print: 6/6 answer(s) not found in the key text (e.g. "Correct") |
+| `number_sense:estimate_sums_diffs` | task = `"closest"` | print: 6/6 answer(s) not found in the key text (e.g. "120") |
+| `number_sense:estimate_sums_diffs` | task = `"reasonable"` | print: 6/6 answer(s) not found in the key text (e.g. "Reasonable") |
+| `number_sense:estimate_products` | task = `"closest"` | print: 6/6 answer(s) not found in the key text (e.g. "240") |
+| `number_sense:estimate_products` | task = `"reasonable"` | print: 6/6 answer(s) not found in the key text (e.g. "Reasonable") |
+| `number_sense:estimate_quotient` | task = `"closest"` | print: 6/6 answer(s) not found in the key text (e.g. "6") |
+| `number_sense:estimate_quotient` | task = `"reasonable"` | print: 6/6 answer(s) not found in the key text (e.g. "Reasonable") |
+| `number_sense:rounding_table` | places = `[10]` | print: 6/6 answer(s) not found in the key text (e.g. "100; 30; 20; 60") |
+| `number_sense:rounding_table` | places = `[100]` | print: 6/6 answer(s) not found in the key text (e.g. "500; 700; 300; 1,000") |
+| `number_sense:rounding_table` | places = `[1000]` | print: 6/6 answer(s) not found in the key text (e.g. "5,000; 7,000; 3,000; 10,000") |
+| `number_sense:rounding_table` | places = `[10000]` | print: 6/6 answer(s) not found in the key text (e.g. "50,000; 70,000; 30,000; 100,000") |
+| `number_sense:rounding_table` | places = `[10,100,1000,10000]` | print: 6/6 answer(s) not found in the key text (e.g. "50,050; 70,250; 23,650; 97,030") |
+| `number_sense:rounding_table` | blank = `"row"` | print: 6/6 answer(s) not found in the key text (e.g. "500; 500") |
 | `number_sense:compensation` | range = `10` | gen: "Up to 10" but the answer reaches 100 and the numbers 97<br>print: "Up to 10" but the answer reaches 42 and the numbers 61 |
 | `number_sense:compensation` | range = `20` | gen: "Up to 20" but the answer reaches 100 and the numbers 97<br>print: "Up to 20" but the answer reaches 42 and the numbers 61 |
 | `number_sense:compensation` | range = `50` | gen: "Up to 50" but the answer reaches 100 and the numbers 97 |
-| `number_sense:mixed_number_sense` | range = `10` | gen: "Up to 10" but the answer reaches 90 and the numbers 22 |
-| `number_sense:mixed_number_sense` | range = `20` | gen: "Up to 20" but the answer reaches 90 and the numbers 22 |
+| `number_sense:mixed_number_sense` | members = `["place_on_number_line"]` | print: 6/6 answer(s) not found in the key text (e.g. "62") |
+| `number_sense:mixed_number_sense` | range = `10` | gen: "Up to 10" but the answer reaches 90 and the numbers 11<br>print: "Up to 10" but the answer reaches 80 and the numbers 11 |
+| `number_sense:mixed_number_sense` | range = `10000` | print: 1/6 answer(s) not found in the key text (e.g. "400; 500; 500; 400") |
+| `number_sense:mixed_number_sense` | range = `100000` | print: 1/6 answer(s) not found in the key text (e.g. "400; 500; 500; 400") |
+| `number_sense:mixed_number_sense` | range = `1000000` | print: 1/6 answer(s) not found in the key text (e.g. "400; 500; 500; 400") |
+| `number_sense:place_on_number_line` | span = `100` | print: 6/6 answer(s) not found in the key text (e.g. "480") |
+| `number_sense:place_on_number_line` | span = `1000` | print: 6/6 answer(s) not found in the key text (e.g. "4800") |
+| `number_sense:place_on_number_line` | band = `1000` | print: 6/6 answer(s) not found in the key text (e.g. "408") |
+| `number_sense:place_on_number_line` | band = `10000` | print: 6/6 answer(s) not found in the key text (e.g. "4038") |
 | `number_theory:prime_composite` | range = `10` | gen: "Up to 10" but the answer reaches 20 and the numbers 20<br>print: "Up to 10" but the answer reaches 20 and the numbers 20 |
 | `number_theory:factors_identify` | range = `10` | gen: "Up to 10" but the answer reaches null and the numbers 12<br>print: "Up to 10" but the answer reaches null and the numbers 12 |
 | `number_theory:factor_tchart_easy` | range = `10` | gen: "Up to 10" but the answer reaches null and the numbers 12<br>print: "Up to 10" but the answer reaches null and the numbers 12 |
@@ -964,9 +1233,10 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `number_theory:multiples` | range = `10` | gen: "Up to 10" but the answer reaches null and the numbers 12 |
 | `number_theory:gcf_hard` | range = `10` | gen: "Up to 10" but the answer reaches 12 and the numbers 36<br>print: "Up to 10" but the answer reaches 12 and the numbers 36 |
 | `number_theory:lcm` | range = `10` | gen: "Up to 10" but the answer reaches 70 and the numbers 41<br>print: "Up to 10" but the answer reaches 30 and the numbers 61 |
-| `algebra_mixed:patterns_all` | range = `10` | gen: "Up to 10" but the answer reaches 170000 and the numbers 32<br>print: "Up to 10" but the answer reaches 37 and the numbers 32 |
-| `algebra_mixed:patterns_all` | range = `20` | gen: "Up to 20" but the answer reaches 170000 and the numbers 34<br>print: "Up to 20" but the answer reaches 44 and the numbers 34 |
-| `algebra_mixed:patterns_all` | range = `50` | gen: "Up to 50" but the answer reaches 170000 and the numbers 54<br>print: "Up to 50" but the answer reaches 64 and the numbers 54 |
+| `algebra_mixed:patterns_all` | members = `["number_patterns_rule"]` | print: 6/6 answer(s) not found in the key text (e.g. "20, 25, 30, 35, 40") |
+| `algebra_mixed:patterns_all` | range = `10` | gen: "Up to 10" but the answer reaches 37 and the numbers 32<br>print: "Up to 10" but the answer reaches 37 and the numbers 32 |
+| `algebra_mixed:patterns_all` | range = `20` | gen: "Up to 20" but the answer reaches 44 and the numbers 34<br>print: "Up to 20" but the answer reaches 44 and the numbers 34 |
+| `algebra_mixed:patterns_all` | range = `50` | gen: "Up to 50" but the answer reaches 64 and the numbers 54<br>print: "Up to 50" but the answer reaches 64 and the numbers 54 |
 | `algebra_mixed:algebra_all` | members = `["tape_diagram"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `algebra_mixed:algebra_all` | members = `["tape_diagram_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `algebra_mixed:algebra_all` | members = `["multi_step_word"]` | gen: generator not reproducible; difference not checkable, predicate only |
@@ -979,8 +1249,8 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `algebra_mixed:algebra_all` | members = `["inequalities"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `algebra_mixed:algebra_all` | members = `["combine_like_terms"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `algebra_mixed:algebra_all` | members = `["distributive_expr"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `algebra_mixed:algebra_all` | members = `["function_table_easy"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `algebra_mixed:algebra_all` | members = `["function_table_hard"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `algebra_mixed:algebra_all` | members = `["function_table_easy"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 6/6 answer(s) not found in the key text (e.g. "7, 10, 11, 12") |
+| `algebra_mixed:algebra_all` | members = `["function_table_hard"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 6/6 answer(s) not found in the key text (e.g. "+, 14, 68") |
 | `algebra_mixed:algebra_all` | members = `["algebra_word_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `algebra_mixed:algebra_all` | members = `["algebra_word_mixed_plain"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `algebra_mixed:algebra_all` | members = `["solve_eq_addsub"]` | gen: generator not reproducible; difference not checkable, predicate only |
@@ -995,42 +1265,74 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `algebra_mixed:order_ops_all` | range = `100` | gen: "Up to 100" but the answer reaches 9261 and the numbers 216<br>print: "Up to 100" but the answer reaches 615 and the numbers 216 |
 | `algebra_mixed:placevalue_all` | members = `["pv_disks_build"]` | print: 6/6 answer(s) not found in the key text (e.g. "799") |
 | `algebra_mixed:placevalue_all` | members = `["identify"]` | print: 6/6 answer(s) not found in the key text (e.g. "ones") |
-| `algebra_mixed:algebraic_all` | members = `["placevalue"]` | print: 2/6 answer(s) not found in the key text (e.g. "624") |
-| `all_mixed:all_domains_mixed` | members = `["counting"]` | print: 1/6 answer(s) not found in the key text (e.g. "50, 40") |
-| `all_mixed:all_domains_mixed` | members = `["composing"]` | print: 3/6 answer(s) not found in the key text (e.g. "85") |
-| `all_mixed:all_domains_mixed` | members = `["placevalue"]` | print: 1/6 answer(s) not found in the key text (e.g. "tens") |
+| `algebra_mixed:placevalue_all` | members = `["order_least_to_greatest"]` | print: 6/6 answer(s) not found in the key text (e.g. "717,823,993") |
+| `algebra_mixed:placevalue_all` | members = `["order_greatest_to_least"]` | print: 6/6 answer(s) not found in the key text (e.g. "993,823,717") |
+| `algebra_mixed:number_sense_all` | members = `["rounding_table"]` | print: 6/6 answer(s) not found in the key text (e.g. "390; 920; 750; 480") |
+| `algebra_mixed:number_sense_all` | members = `["place_on_number_line"]` | print: 6/6 answer(s) not found in the key text (e.g. "37") |
+| `algebra_mixed:algebraic_all` | members = `["patterns"]` | print: 1/6 answer(s) not found in the key text (e.g. "18, 16, 14, 12, 10") |
+| `algebra_mixed:algebraic_all` | members = `["placevalue"]` | print: 2/6 answer(s) not found in the key text (e.g. "ones") |
+| `all_mixed:all_domains_mixed` | members = `["counting"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "50, 40") |
+| `all_mixed:all_domains_mixed` | members = `["comparing"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "B") |
+| `all_mixed:all_domains_mixed` | members = `["composing"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 3/6 answer(s) not found in the key text (e.g. "85") |
+| `all_mixed:all_domains_mixed` | members = `["addition"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["subtraction"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["multiplication"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "18, 24, 40") |
+| `all_mixed:all_domains_mixed` | members = `["division"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["integers"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["fractions"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["fraction_operations"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["decimals"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["conversions"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["shapes_early"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["area_perimeter"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["angles_lines"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["shapes_classify"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["coordinates"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["measurement"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 2/6 answer(s) not found in the key text (e.g. "5, 20, 25, 40, 45, 50") |
+| `all_mixed:all_domains_mixed` | members = `["graphs"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["data_analysis"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["probability"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["patterns"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "15, 19, 23, 27, 31") |
+| `all_mixed:all_domains_mixed` | members = `["algebra"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 2/6 answer(s) not found in the key text (e.g. "0, 1, 4, 8") |
+| `all_mixed:all_domains_mixed` | members = `["order_of_operations"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["placevalue"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 2/6 answer(s) not found in the key text (e.g. "220,380,873") |
+| `all_mixed:all_domains_mixed` | members = `["number_sense"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["number_theory"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:all_domains_mixed` | members = `["vocabulary"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_k_mixed` | members = `["comparing"]` | print: 4/6 answer(s) not found in the key text (e.g. "same") |
-| `all_mixed:grade_k_mixed` | members = `["subtraction"]` | print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `all_mixed:grade_k_mixed` | members = `["subtraction"]` | print: 2/6 answer(s) not found in the key text (e.g. "1") |
 | `all_mixed:grade_1_mixed` | members = `["composing"]` | print: 6/6 answer(s) not found in the key text (e.g. "82, 86") |
+| `all_mixed:grade_1_mixed` | members = `["measurement"]` | print: 3/6 answer(s) not found in the key text (e.g. "2, 3, 1") |
 | `all_mixed:grade_2_mixed` | members = `["composing"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 5/6 answer(s) not found in the key text (e.g. "576") |
 | `all_mixed:grade_2_mixed` | members = `["addition"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_2_mixed` | members = `["subtraction"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_2_mixed` | members = `["multiplication"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_2_mixed` | members = `["number_ops_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_2_mixed` | members = `["shapes_early"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
-| `all_mixed:grade_2_mixed` | members = `["measurement"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_2_mixed` | members = `["measurement"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 2/6 answer(s) not found in the key text (e.g. "1, 3, 2") |
 | `all_mixed:grade_2_mixed` | members = `["graphs"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_2_mixed` | members = `["patterns"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_2_mixed` | members = `["placevalue"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 2/6 answer(s) not found in the key text (e.g. "589") |
-| `all_mixed:grade_2_mixed` | members = `["number_sense"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_2_mixed` | members = `["number_sense"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "87") |
 | `all_mixed:grade_2_mixed` | members = `["vocabulary"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_3_mixed` | members = `["composing"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_3_mixed` | members = `["addition"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_3_mixed` | members = `["subtraction"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `all_mixed:grade_3_mixed` | members = `["multiplication"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "30, 16, 27") |
+| `all_mixed:grade_3_mixed` | members = `["multiplication"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "60, 144") |
 | `all_mixed:grade_3_mixed` | members = `["division"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `all_mixed:grade_3_mixed` | members = `["number_ops_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `all_mixed:grade_3_mixed` | members = `["fractions"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 3/6 answer(s) not found in the key text (e.g. "1") |
+| `all_mixed:grade_3_mixed` | members = `["fractions"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 2/6 answer(s) not found in the key text (e.g. "1") |
 | `all_mixed:grade_3_mixed` | members = `["area_perimeter"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_3_mixed` | members = `["shapes_classify"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_3_mixed` | members = `["measurement"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_3_mixed` | members = `["graphs"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
+| `all_mixed:grade_3_mixed` | members = `["patterns"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 6/6 answer(s) not found in the key text (e.g. "14, 18, 22, 26, 30") |
 | `all_mixed:grade_3_mixed` | members = `["algebra"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `all_mixed:grade_3_mixed` | members = `["number_sense"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_3_mixed` | members = `["number_sense"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 2/6 answer(s) not found in the key text (e.g. "150; 260; 560; 410") |
 | `all_mixed:grade_3_mixed` | members = `["vocabulary"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_4_mixed` | members = `["addition"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_4_mixed` | members = `["subtraction"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `all_mixed:grade_4_mixed` | members = `["multiplication"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_4_mixed` | members = `["multiplication"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 2/6 answer(s) not found in the key text (e.g. "3, 12, 24, 7, 81, 22") |
 | `all_mixed:grade_4_mixed` | members = `["division"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_4_mixed` | members = `["number_ops_mixed"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_4_mixed` | members = `["fractions"]` | gen: generator not reproducible; difference not checkable, predicate only |
@@ -1043,7 +1345,7 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `all_mixed:grade_4_mixed` | members = `["measurement"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_4_mixed` | members = `["graphs"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_4_mixed` | members = `["patterns"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `all_mixed:grade_4_mixed` | members = `["algebra"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_4_mixed` | members = `["algebra"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 2/6 answer(s) not found in the key text (e.g. "4, 5, 7, 11") |
 | `all_mixed:grade_4_mixed` | members = `["order_of_operations"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_4_mixed` | members = `["placevalue"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_4_mixed` | members = `["number_sense"]` | gen: generator not reproducible; difference not checkable, predicate only |
@@ -1051,7 +1353,7 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `all_mixed:grade_4_mixed` | members = `["vocabulary"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_5_mixed` | members = `["addition"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_5_mixed` | members = `["subtraction"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `all_mixed:grade_5_mixed` | members = `["multiplication"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["multiplication"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 2/6 answer(s) not found in the key text (e.g. "3, 10, 12, 15, 36, 4, 20, 32, 36, 30, 50, 18, 48, 60, 7, 36, 81, 44, 66, 12, 84, 96") |
 | `all_mixed:grade_5_mixed` | members = `["division"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_5_mixed` | members = `["fraction_operations"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 1/6 answer(s) not found in the key text (e.g. "1") |
 | `all_mixed:grade_5_mixed` | members = `["decimals"]` | gen: generator not reproducible; difference not checkable, predicate only |
@@ -1061,7 +1363,7 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `all_mixed:grade_5_mixed` | members = `["graphs"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_5_mixed` | members = `["data_analysis"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_5_mixed` | members = `["patterns"]` | gen: generator not reproducible; difference not checkable, predicate only |
-| `all_mixed:grade_5_mixed` | members = `["algebra"]` | gen: generator not reproducible; difference not checkable, predicate only |
+| `all_mixed:grade_5_mixed` | members = `["algebra"]` | gen: generator not reproducible; difference not checkable, predicate only<br>print: 3/6 answer(s) not found in the key text (e.g. "+, 1, 52") |
 | `all_mixed:grade_5_mixed` | members = `["order_of_operations"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_5_mixed` | members = `["placevalue"]` | gen: generator not reproducible; difference not checkable, predicate only |
 | `all_mixed:grade_5_mixed` | members = `["number_sense"]` | gen: generator not reproducible; difference not checkable, predicate only |
@@ -1085,7 +1387,7 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 |---|---|---|---|---|---|
 | `counting:count_objects` | gen-counting.js | band, objects, orientation, level | 10 | 0 |  |
 | `counting:count_sequence` | gen-counting.js | band, dir, level | 6 | 0 |  |
-| `counting:number_seq_fill` | gen-counting.js | step, dir, range | 11 | 0 |  |
+| `counting:number_seq_fill` | gen-counting.js | step, dir, shape, range | 14 | 0 |  |
 | `counting:mixed_counting` | gen-counting.js | members, range, level | 12 | 0 |  |
 | `comparing:compare_groups` | gen-counting.js | dir, band, level | 6 | 0 |  |
 | `comparing:compare_objects` | gen-counting.js | dir, task | 5 | 0 |  |
@@ -1235,15 +1537,16 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `multiplication:area_model_mult_hard` | gen-operations.js | tiles | 2 | 0 |  |
 | `multiplication:mult_div_fact_family` | gen-operations.js | notation | 3 | 0 |  |
 | `multiplication:number_families_mult` | gen-operations.js | band, level | 5 | 0 |  |
-| `multiplication:mult_chart` | gen-operations.js | band | 2 | 0 |  |
-| `multiplication:mult_chart_easy` | gen-operations.js | level | 3 | 0 |  |
-| `multiplication:nl_mult` | gen-operations.js | band | 2 | 0 |  |
-| `multiplication:mixed_multiplication` | gen-operations.js | members | 21 | 0 |  |
+| `multiplication:mult_chart` | gen-operations.js | chart, band, missing, constant, task | 25 | 0 |  |
+| `multiplication:mult_chart_easy` | gen-operations.js |  | 1 | 1 | verifier |
+| `multiplication:nl_mult` | gen-operations.js | constant, band, ticks, response, support | 18 | 0 |  |
+| `multiplication:mixed_multiplication` | gen-operations.js | members | 22 | 0 |  |
 | `multiplication:repeated_add_to_mult` | gen-operations.js | band, pictures | 3 | 0 |  |
 | `multiplication:equal_or_unequal_groups` | gen-operations.js | forms, step | 3 | 0 |  |
 | `multiplication:mult_zeros` | gen-operations.js | forms | 3 | 0 |  |
 | `multiplication:mult_placeholder_zero` | gen-operations.js | tiles | 1 | 0 |  |
 | `multiplication:mult_missing_digit` | gen-operations.js | tiles | 1 | 0 |  |
+| `multiplication:count_by_tables` | gen-operations.js | constant, missing, order, shape | 21 | 0 |  |
 | `division:div_facts` | gen-operations.js | constant, notation, band, support | 20 | 0 |  |
 | `division:divide` | gen-operations.js | notation, tiles, regroup, range | 11 | 0 |  |
 | `division:div_remainders` | gen-operations.js | constant | 9 | 0 |  |
@@ -1257,7 +1560,7 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `division:area_model_div_3by1` | gen-operations.js | constant | 8 | 0 |  |
 | `division:long_div_2digit` | gen-operations.js | range | 2 | 0 |  |
 | `division:missing_mult_div` | gen-operations.js | notation, range | 5 | 0 |  |
-| `division:nl_div` | gen-operations.js | band | 2 | 0 |  |
+| `division:nl_div` | gen-operations.js | constant, band, ticks, response, support | 18 | 0 |  |
 | `division:mixed_mult_div` | gen-operations.js | task, range | 4 | 0 |  |
 | `division:mixed_division` | gen-operations.js | members | 19 | 0 |  |
 | `division:share_into_groups` | gen-operations.js | band | 1 | 0 |  |
@@ -1429,35 +1732,35 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `coordinates:geo_rotate` | gen-geometry.js | forms | 3 | 0 |  |
 | `coordinates:geo_translate` | gen-geometry.js | forms | 4 | 0 |  |
 | `coordinates:mixed_coordinates` | gen-geometry.js | members | 9 | 0 |  |
-| `measurement:time_hour` | gen-measurement.js | precision, forms | 6 | 0 |  |
-| `measurement:time_half_hour` | gen-measurement.js | precision, forms | 6 | 0 |  |
-| `measurement:time_quarter` | gen-measurement.js | precision, forms | 6 | 0 |  |
-| `measurement:time_5min` | gen-measurement.js | precision, forms | 6 | 0 |  |
-| `measurement:time_1min` | gen-measurement.js | precision, forms | 6 | 0 |  |
-| `measurement:time_analog_digital` | gen-measurement.js | forms | 3 | 0 |  |
-| `measurement:time_match_clock` | gen-measurement.js | precision | 4 | 0 |  |
-| `measurement:order_clocks_analog_asc` | gen-measurement.js | dir, model | 2 | 0 |  |
-| `measurement:order_clocks_analog_desc` | gen-measurement.js | dir, model | 2 | 0 |  |
-| `measurement:order_clocks_digital_asc` | gen-measurement.js | dir, model | 2 | 0 |  |
-| `measurement:order_clocks_digital_desc` | gen-measurement.js | dir, model | 2 | 0 |  |
-| `measurement:elapsed_30min` | gen-measurement.js | step, forms | 6 | 0 |  |
-| `measurement:elapsed_hour` | gen-measurement.js | step, forms | 6 | 0 |  |
-| `measurement:elapsed_15min` | gen-measurement.js | step, forms | 6 | 0 |  |
-| `measurement:elapsed_mixed` | gen-measurement.js | step, forms | 5 | 0 |  |
-| `measurement:elapsed_find_duration` | gen-measurement.js | band | 2 | 0 |  |
-| `measurement:elapsed_visual_easy` | gen-measurement.js | precision, forms | 4 | 0 |  |
-| `measurement:elapsed_visual_medium` | gen-measurement.js | precision, forms | 4 | 0 |  |
-| `measurement:elapsed_visual_hard` | gen-measurement.js | precision, forms | 4 | 0 |  |
+| `measurement:time_hour` | gen-measurement.js | response, stimulus, numerals | 6 | 0 |  |
+| `measurement:time_half_hour` | gen-measurement.js | response, review, stimulus, numerals | 7 | 0 |  |
+| `measurement:time_quarter` | gen-measurement.js | response, quarters, review, stimulus, numerals | 9 | 0 |  |
+| `measurement:time_5min` | gen-measurement.js | response, review, support, stimulus, numerals | 8 | 0 |  |
+| `measurement:time_1min` | gen-measurement.js | response, review, support, stimulus, numerals | 8 | 0 |  |
+| `measurement:time_analog_digital` | gen-measurement.js | dir, precision, numerals | 7 | 0 |  |
+| `measurement:time_match_clock` | gen-measurement.js | precision, words, numerals | 8 | 0 |  |
+| `measurement:order_clocks_analog_asc` | gen-measurement.js | tiles, precision, numerals, noon | 8 | 0 |  |
+| `measurement:order_clocks_analog_desc` | gen-measurement.js | tiles, precision, numerals, noon | 8 | 0 |  |
+| `measurement:order_clocks_digital_asc` | gen-measurement.js | tiles, precision, noon | 6 | 0 |  |
+| `measurement:order_clocks_digital_desc` | gen-measurement.js | tiles, precision, noon | 6 | 0 |  |
+| `measurement:elapsed_30min` | gen-measurement.js | dir, support | 3 | 0 |  |
+| `measurement:elapsed_hour` | gen-measurement.js | dir, hours, support, response | 5 | 0 |  |
+| `measurement:elapsed_15min` | gen-measurement.js | dir, step, support | 6 | 0 |  |
+| `measurement:elapsed_mixed` | gen-measurement.js | hours, step, support, noon | 7 | 0 |  |
+| `measurement:elapsed_find_duration` | gen-measurement.js | response, hours, step, support, noon | 8 | 0 |  |
+| `measurement:elapsed_visual_easy` | gen-measurement.js | notation, support | 4 | 0 |  |
+| `measurement:elapsed_visual_medium` | gen-measurement.js | notation, support | 4 | 0 |  |
+| `measurement:elapsed_visual_hard` | gen-measurement.js | notation, support | 4 | 0 |  |
 | `measurement:heavier_lighter_visual` | gen-measurement.js | forms | 2 | 0 |  |
 | `measurement:pictograph_intro` | gen-measurement.js | forms | 2 | 0 |  |
 | `measurement:bar_graph_intro` | gen-measurement.js | forms | 3 | 0 |  |
 | `measurement:reading_ruler` | gen-measurement.js | parts | 3 | 0 |  |
 | `measurement:reading_ruler_hard` | gen-measurement.js | parts | 3 | 0 |  |
-| `measurement:money_count` | gen-measurement.js | forms, range | 8 | 0 |  |
-| `measurement:money` | gen-measurement.js | forms | 3 | 0 |  |
-| `measurement:equiv_coin_sets` | gen-measurement.js | band | 2 | 0 |  |
-| `measurement:enough_money` | gen-measurement.js | forms | 2 | 0 |  |
-| `measurement:make_change_least_coins` | gen-measurement.js | range | 4 | 0 |  |
+| `measurement:money_count` | gen-measurement.js | currency, kind, values, band, tiles, order, support | 17 | 0 |  |
+| `measurement:money` | gen-measurement.js | currency, band, step, regroup | 9 | 0 |  |
+| `measurement:equiv_coin_sets` | gen-measurement.js | currency, band, values | 8 | 0 |  |
+| `measurement:enough_money` | gen-measurement.js | currency, band, gap, values | 10 | 0 |  |
+| `measurement:make_change_least_coins` | gen-measurement.js | currency, band, values | 8 | 0 |  |
 | `measurement:temperature` | gen-measurement.js | forms | 4 | 0 |  |
 | `measurement:capacity` | gen-measurement.js | units, forms | 4 | 0 |  |
 | `measurement:unit_conversions` | gen-measurement.js | units, forms | 4 | 0 |  |
@@ -1466,10 +1769,17 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `measurement:unit_conversion_word` | gen-measurement.js | units | 3 | 0 |  |
 | `measurement:mass_volume_liquid` | gen-measurement.js | forms | 3 | 0 |  |
 | `measurement:estimate_length` | gen-measurement.js | forms | 3 | 0 |  |
-| `measurement:mixed_measurement` | gen-measurement.js | members | 37 | 0 |  |
-| `measurement:mixed_time` | gen-measurement.js | members | 15 | 0 |  |
+| `measurement:mixed_measurement` | gen-measurement.js | members | 45 | 0 |  |
+| `measurement:mixed_time` | gen-measurement.js | members | 8 | 0 |  |
+| `measurement:clock_parts` | gen-measurement.js | task | 1 | 0 |  |
+| `measurement:time_fives_ring` | gen-measurement.js | task | 1 | 0 |  |
+| `measurement:elapsed_find_start` | gen-measurement.js | hours, step, support, noon | 7 | 0 |  |
+| `measurement:coin_value` | gen-measurement.js | currency, task | 3 | 0 |  |
+| `measurement:money_notation` | gen-measurement.js | currency, task | 3 | 0 |  |
+| `measurement:money_change` | gen-measurement.js | currency, band, step, regroup, paid | 11 | 0 |  |
+| `measurement:money_compare` | gen-measurement.js | currency, band, response, values | 8 | 0 |  |
 | `geo_mixed:geometry_all` | (geo_mixed) | members | 5 | 0 |  |
-| `geo_mixed:measurement_all` | (geo_mixed) | members | 37 | 0 |  |
+| `geo_mixed:measurement_all` | (geo_mixed) | members | 45 | 0 |  |
 | `geo_mixed:geo_meas_all` | (geo_mixed) | members | 6 | 0 |  |
 | `graphs:bar_graph` | gen-data-stats.js | forms, range | 9 | 0 |  |
 | `graphs:build_bar_graph` | gen-data-stats.js | tiles, band | 3 | 0 |  |
@@ -1505,7 +1815,8 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `patterns:shape_pattern` | gen-algebraic.js | points | 2 | 0 |  |
 | `patterns:number_pattern` | gen-algebraic.js | forms, range | 10 | 0 |  |
 | `patterns:pattern_relationship` | gen-algebraic.js | forms, task, range | 8 | 0 |  |
-| `patterns:mixed_patterns` | gen-algebraic.js | members | 14 | 0 |  |
+| `patterns:mixed_patterns` | gen-algebraic.js | members | 15 | 0 |  |
+| `patterns:number_patterns_rule` | gen-algebraic.js | pattern, places, missing, rule, shape | 21 | 0 |  |
 | `algebra:tape_diagram` | gen-algebraic.js | forms, range | 7 | 0 |  |
 | `algebra:tape_diagram_plain` | gen-algebraic.js | forms, range | 7 | 0 |  |
 | `algebra:multi_step_word` | gen-algebraic.js | forms, range | 7 | 0 |  |
@@ -1518,8 +1829,8 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `algebra:inequalities` | gen-algebraic.js | forms, range | 6 | 0 |  |
 | `algebra:combine_like_terms` | gen-algebraic.js | forms | 2 | 0 |  |
 | `algebra:distributive_expr` | gen-algebraic.js | forms | 3 | 0 |  |
-| `algebra:function_table_easy` | gen-algebraic.js | range | 8 | 0 |  |
-| `algebra:function_table_hard` | gen-algebraic.js | range | 8 | 0 |  |
+| `algebra:function_table_easy` | gen-algebraic.js | task, ops, step, band, tiles, order, support, pictures, response | 21 | 0 |  |
+| `algebra:function_table_hard` | gen-algebraic.js | task, ops, step, band, tiles, order, support, pictures, response | 20 | 0 |  |
 | `algebra:algebra_word_mixed` | gen-algebraic.js | members, range | 5 | 0 |  |
 | `algebra:algebra_word_mixed_plain` | gen-algebraic.js | range | 4 | 0 |  |
 | `algebra:solve_eq_addsub` | gen-algebraic.js | forms, range | 8 | 0 |  |
@@ -1541,46 +1852,49 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `order_of_operations:exponents_simple` | gen-algebraic.js | forms, step, range | 8 | 0 |  |
 | `order_of_operations:compare_expressions` | gen-algebraic.js | forms | 2 | 0 |  |
 | `order_of_operations:mixed_order_ops` | gen-algebraic.js | members, range | 15 | 0 |  |
-| `placevalue:more_less_10` | gen-pv.js | step, dir, band, support | 8 | 0 |  |
-| `placevalue:more_less_100` | gen-pv.js | step, dir, support | 4 | 0 |  |
+| `placevalue:more_less_10` | gen-pv.js | step, dir, band, support, unknown | 10 | 0 |  |
+| `placevalue:more_less_100` | gen-pv.js | step, dir, support, unknown | 7 | 0 |  |
 | `placevalue:place_value_disks` | gen-pv.js | band, task, zeroPlace | 4 | 0 |  |
 | `placevalue:pv_disks_build` | gen-pv.js | band, zeroPlace | 2 | 0 |  |
-| `placevalue:pv_digit_drag` | gen-pv.js | band | 3 | 0 |  |
+| `placevalue:pv_digit_drag` | gen-pv.js | band, source | 5 | 0 |  |
 | `placevalue:number_word_names` | gen-pv.js | band | 3 | 0 |  |
-| `placevalue:place_value_10x` | gen-pv.js | op, power, band, decimals | 8 | 0 |  |
-| `placevalue:identify` | gen-pv.js | band, places, support | 12 | 0 |  |
-| `placevalue:value` | gen-pv.js | band, support | 6 | 0 |  |
-| `placevalue:compare` | gen-pv.js | band | 4 | 0 |  |
-| `placevalue:expand` | gen-pv.js | band, zeroPlace | 6 | 0 |  |
+| `placevalue:place_value_10x` | gen-pv.js | op, power, band, decimals, support | 9 | 0 |  |
+| `placevalue:identify` | gen-pv.js | band, places, support, response, repeatDigit | 14 | 0 |  |
+| `placevalue:value` | gen-pv.js | band, support, form, zeroDigit | 9 | 0 |  |
+| `placevalue:compare` | gen-pv.js | band, closeness, lengths | 6 | 0 |  |
+| `placevalue:expand` | gen-pv.js | band, zeroPlace, frame, form | 8 | 0 |  |
 | `placevalue:combine` | gen-pv.js | band, zeroPlace, order | 7 | 0 |  |
-| `placevalue:order_least_to_greatest` | gen-pv.js | band | 4 | 0 |  |
-| `placevalue:order_greatest_to_least` | gen-pv.js | band | 4 | 0 |  |
-| `placevalue:mixed_placevalue` | gen-algebraic.js | members | 12 | 0 |  |
-| `number_sense:rounding_visual` | gen-pv.js | place, band, midpoint | 6 | 0 |  |
-| `number_sense:nearest_10` | gen-pv.js | band, midpoint, support, response | 10 | 0 |  |
-| `number_sense:nearest_100` | gen-pv.js | band, midpoint, support, response | 9 | 0 |  |
-| `number_sense:nearest_1000` | gen-pv.js | band, midpoint, support, response | 8 | 0 |  |
-| `number_sense:nearest_10000` | gen-pv.js | band, midpoint, support, response | 7 | 0 |  |
-| `number_sense:nearest_100000` | gen-pv.js | band, midpoint, support, response | 6 | 0 |  |
-| `number_sense:nearest_million` | gen-pv.js | midpoint, support, response | 5 | 0 |  |
-| `number_sense:round_sort_10` | gen-pv.js | band, tiles, midpoint, support | 8 | 0 |  |
-| `number_sense:round_sort_100` | gen-pv.js | band, tiles, midpoint, support | 7 | 0 |  |
-| `number_sense:round_sort_1000` | gen-pv.js | band, tiles, midpoint, support | 6 | 0 |  |
-| `number_sense:round_sort_10000` | gen-pv.js | band, tiles, midpoint, support | 5 | 0 |  |
-| `number_sense:round_sort_100000` | gen-pv.js | band, tiles, midpoint, support | 4 | 0 |  |
-| `number_sense:round_sort_million` | gen-pv.js | tiles, midpoint, support | 3 | 0 |  |
+| `placevalue:order_least_to_greatest` | gen-pv.js | band, count, closeness, lengths | 9 | 0 |  |
+| `placevalue:order_greatest_to_least` | gen-pv.js | band, count, closeness, lengths | 9 | 0 |  |
+| `placevalue:mixed_placevalue` | gen-algebraic.js | members | 13 | 0 |  |
+| `placevalue:unit_form` | gen-pv.js | band, rename | 3 | 0 |  |
+| `number_sense:rounding_visual` | gen-pv.js | place, band, midpoint, line, midLabel | 9 | 0 |  |
+| `number_sense:nearest_10` | gen-pv.js | band, midpoint, support, response, responseScope | 13 | 0 |  |
+| `number_sense:nearest_100` | gen-pv.js | band, midpoint, support, response, responseScope | 12 | 0 |  |
+| `number_sense:nearest_1000` | gen-pv.js | band, midpoint, support, response, responseScope | 11 | 0 |  |
+| `number_sense:nearest_10000` | gen-pv.js | band, midpoint, support, response, responseScope | 10 | 0 |  |
+| `number_sense:nearest_100000` | gen-pv.js | band, midpoint, support, response, responseScope | 9 | 0 |  |
+| `number_sense:nearest_million` | gen-pv.js | midpoint, support, response, responseScope | 8 | 0 |  |
+| `number_sense:round_sort_10` | gen-pv.js | band, tiles, midpoint, support, bins | 10 | 0 |  |
+| `number_sense:round_sort_100` | gen-pv.js | band, tiles, midpoint, support, bins | 9 | 0 |  |
+| `number_sense:round_sort_1000` | gen-pv.js | band, tiles, midpoint, support, bins | 8 | 0 |  |
+| `number_sense:round_sort_10000` | gen-pv.js | band, tiles, midpoint, support, bins | 7 | 0 |  |
+| `number_sense:round_sort_100000` | gen-pv.js | band, tiles, midpoint, support, bins | 6 | 0 |  |
+| `number_sense:round_sort_million` | gen-pv.js | tiles, midpoint, support, bins | 5 | 0 |  |
 | `number_sense:round_sort_tenths` | gen-pv.js | tiles, midpoint, support | 3 | 0 |  |
 | `number_sense:round_sort_hundredths` | gen-pv.js | tiles, midpoint, support | 3 | 0 |  |
-| `number_sense:estimate_sum` | gen-algebraic.js | range | 7 | 0 |  |
-| `number_sense:estimate_diff` | gen-algebraic.js | range | 7 | 0 |  |
+| `number_sense:estimate_sum` | gen-pv.js | place, support | 3 | 0 |  |
+| `number_sense:estimate_diff` | gen-pv.js | place, support | 3 | 0 |  |
 | `number_sense:estimate_sums_diffs` | gen-pv.js | place, task | 4 | 0 |  |
 | `number_sense:estimate_products` | gen-pv.js | place, task | 4 | 0 |  |
 | `number_sense:estimate_quotient` | gen-pv.js | place, task | 5 | 0 |  |
-| `number_sense:rounding_table` | gen-algebraic.js | range | 6 | 0 |  |
+| `number_sense:rounding_table` | gen-pv.js | places, blank | 6 | 0 |  |
 | `number_sense:make_a_ten` | gen-algebraic.js | forms | 2 | 0 |  |
 | `number_sense:doubles_near_doubles` | gen-algebraic.js | forms | 3 | 0 |  |
 | `number_sense:compensation` | gen-algebraic.js | range | 4 | 0 |  |
-| `number_sense:mixed_number_sense` | gen-algebraic.js | members, range | 19 | 0 |  |
+| `number_sense:mixed_number_sense` | gen-algebraic.js | members, range | 20 | 0 |  |
+| `number_sense:between_tens` | gen-pv.js | band | 1 | 0 |  |
+| `number_sense:place_on_number_line` | gen-pv.js | span, band | 4 | 0 |  |
 | `number_theory:prime_composite` | gen-number-theory.js | forms, range | 7 | 0 |  |
 | `number_theory:factors_identify` | gen-number-theory.js | range | 4 | 0 |  |
 | `number_theory:factor_tchart_easy` | gen-number-theory.js | range | 3 | 0 |  |
@@ -1595,18 +1909,18 @@ Soft predicates: Max Number bounds, overruled notation, answers the key text sea
 | `number_theory:lcm` | gen-number-theory.js | forms, range | 4 | 0 |  |
 | `number_theory:divisibility_sort` | gen-number-theory.js | step, range | 5 | 0 |  |
 | `number_theory:mixed_number_theory` | gen-number-theory.js | members | 13 | 0 |  |
-| `algebra_mixed:patterns_all` | (algebra_mixed) | members, range | 22 | 0 |  |
+| `algebra_mixed:patterns_all` | (algebra_mixed) | members, range | 23 | 0 |  |
 | `algebra_mixed:algebra_all` | (algebra_mixed) | members | 22 | 0 |  |
 | `algebra_mixed:order_ops_all` | (algebra_mixed) | members, range | 15 | 0 |  |
-| `algebra_mixed:placevalue_all` | (algebra_mixed) | members | 14 | 0 |  |
-| `algebra_mixed:number_sense_all` | (algebra_mixed) | members | 24 | 0 |  |
+| `algebra_mixed:placevalue_all` | (algebra_mixed) | members | 15 | 0 |  |
+| `algebra_mixed:number_sense_all` | (algebra_mixed) | members | 26 | 0 |  |
 | `algebra_mixed:number_theory_all` | (algebra_mixed) | members | 13 | 0 |  |
 | `algebra_mixed:algebraic_all` | (algebra_mixed) | members | 6 | 0 |  |
 | `all_mixed:all_domains_mixed` | (all_mixed) | members | 28 | 0 |  |
 | `all_mixed:grade_k_mixed` | (all_mixed) | members | 8 | 0 |  |
 | `all_mixed:grade_1_mixed` | (all_mixed) | members | 9 | 0 |  |
 | `all_mixed:grade_2_mixed` | (all_mixed) | members | 12 | 0 |  |
-| `all_mixed:grade_3_mixed` | (all_mixed) | members | 14 | 0 |  |
+| `all_mixed:grade_3_mixed` | (all_mixed) | members | 15 | 0 |  |
 | `all_mixed:grade_4_mixed` | (all_mixed) | members | 21 | 0 |  |
 | `all_mixed:grade_5_mixed` | (all_mixed) | members | 17 | 0 |  |
 | `all_mixed:grade_6_mixed` | (all_mixed) | members | 12 | 0 |  |
@@ -1669,5 +1983,6 @@ These skills show the teacher no Options control at all. See OPTIONS-AUDIT.md fo
 |---|---|---|
 | shapes_early | 3 | `shape_name_match_2d` `shape_name_match_3d` `compose_rect_from_squares` |
 | shapes_classify | 1 | `hotspot_quads` |
+| measurement | 1 | `time_sense` |
 | data_analysis | 1 | `statistical_question` |
 | probability | 1 | `mixed_probability` |
