@@ -66,6 +66,7 @@ function current() {
         blocks,
         tokens,
         scalarOnly: { ...REG.SCALAR_ONLY },
+        subranges: Object.fromEntries((REG.KEY_SUBRANGES || []).map((sr) => [sr.keys, sr.owner])),
     };
 }
 const now = current();
@@ -86,6 +87,7 @@ function compareFlat(section, a, b) {
 compareFlat('oneLetterKeys', base.oneLetterKeys, now.oneLetterKeys);
 compareFlat('multiKeys', base.multiKeys, now.multiKeys);
 compareFlat('scalarOnly', base.scalarOnly, now.scalarOnly);
+compareFlat('subranges', base.subranges || {}, now.subranges);
 // A block may move from 'reserved' / 'spare' to 'assigned' (its wave merged) and gain keys, but its
 // owner never changes once set, and an assigned block never goes back.
 for (const [d, b] of Object.entries(base.blocks)) {
@@ -105,7 +107,8 @@ for (const id of Object.keys(now.tokens)) if (!(id in base.tokens)) added.push(`
 if (PIN && !fails.length) {
     // Append only: every pinned entry is kept as it was; new ones are added.
     const merged = JSON.parse(JSON.stringify(base));
-    for (const s of ['oneLetterKeys', 'multiKeys', 'scalarOnly']) for (const [k, v] of Object.entries(now[s])) if (!(k in merged[s])) merged[s][k] = v;
+    merged.subranges = merged.subranges || {};
+    for (const s of ['oneLetterKeys', 'multiKeys', 'scalarOnly', 'subranges']) for (const [k, v] of Object.entries(now[s])) if (!(k in merged[s])) merged[s][k] = v;
     for (const [d, b] of Object.entries(now.blocks)) merged.blocks[d] = b;
     for (const [id, tab] of Object.entries(now.tokens)) {
         merged.tokens[id] = merged.tokens[id] || {};
@@ -136,7 +139,20 @@ for (const [id, k] of Object.entries(REG.MULTI_KEYS)) {
     const b = REG.KEY_BLOCKS[k[0]];
     if (!b || b.status !== 'assigned') fail(`${id} = ${k}: block ${k[0]} is ${b ? b.status : 'missing'}, not assigned`);
     const r = b && rangeOf(b.keys);
-    if (b && b.status === 'assigned' && (!r || k[1] < r.from || k[1] > r.to)) fail(`${id} = ${k} lies outside block ${k[0]}'s declared keys ${b && b.keys}`);
+    const inSub = (REG.KEY_SUBRANGES || []).some((sr) => { const q = rangeOf(sr.keys); return q && q.d === k[0] && k[1] >= q.from && k[1] <= q.to; });
+    if (b && b.status === 'assigned' && !inSub && (!r || k[1] < r.from || k[1] > r.to)) fail(`${id} = ${k} lies outside block ${k[0]}'s declared keys ${b && b.keys} and every sub-range`);
+}
+// Sub-ranges: well-formed, after their block's own keys, never overlapping one another.
+{
+    const seen = [];
+    for (const sr of (REG.KEY_SUBRANGES || [])) {
+        const q = rangeOf(sr.keys);
+        if (!q) { fail(`sub-range "${sr.keys}" is not a range like 3B-3M`); continue; }
+        const b = REG.KEY_BLOCKS[q.d], r = b && rangeOf(b.keys);
+        if (r && q.from <= r.to) fail(`sub-range ${sr.keys} overlaps block ${q.d}'s own keys ${b.keys}`);
+        for (const o of seen) if (o.d === q.d && !(q.to < o.from || q.from > o.to)) fail(`sub-range ${sr.keys} overlaps another sub-range`);
+        seen.push(q);
+    }
 }
 for (const [d, b] of Object.entries(REG.KEY_BLOCKS)) {
     if (!/^\d$/.test(d)) fail(`block "${d}" is not a digit`);

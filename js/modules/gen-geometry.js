@@ -1625,7 +1625,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     }
                 }
 
-                q.text = `How many ${askWhat} does a ${attrShape.name.toLowerCase()} have?`;
+                q.text = `How many ${askWhat} does ${/^[aeiou]/i.test(attrShape.name) ? "an" : "a"} ${attrShape.name.toLowerCase()} have?`;
                 q.ans = correctAns;
                 q.answerType = "number";
                 q.options = buildNumericOptions(correctAns);
@@ -1639,7 +1639,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     </svg>
                     <div style="margin-top:8px;font-size:0.9rem;color:var(--text-bright);font-weight:600;">${attrShape.name}</div>
                     <div style="margin-top:4px;font-size:0.85rem;color:var(--text-dim);">${_saLabels === 'all'
-                        ? `Count the ${askWhat === "sides" ? "numbered sides" : "green dots (vertices)"}`
+                        ? `Count the ${askWhat === "sides" ? "numbered sides" : "dots (vertices)"}`
                         : _saLabels === 'some'
                             ? `Start at the ${askWhat === "sides" ? "side marked 1" : "dot"} and count the ${askWhat === "sides" ? "sides" : "corners (vertices)"}`
                             : `Count the ${askWhat === "sides" ? "sides" : "corners (vertices)"}`}</div>
@@ -2024,7 +2024,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                                      + `L ${_ox} ${_oy}`;
                         // Labels positioned outside each side
                         const _lblTopLeft   = `<text x="${_ox + (_W - _CW) / 2}" y="${_oy - 14}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideTopLeft}</text>`;
-                        const _lblStepDown  = `<text x="${_ox + (_W - _CW) - 18}" y="${_oy + _CH / 2 + 8}" text-anchor="end" font-size="22" font-weight="800" fill="${COLORS.text}">${sideStepDown}</text>`;
+                        const _lblStepDown  = `<text x="${_ox + (_W - _CW) + 12}" y="${_oy + _CH / 2 + 8}" text-anchor="start" font-size="22" font-weight="800" fill="${COLORS.text}">${sideStepDown}</text>`;
                         const _lblStepRight = `<text x="${_ox + (_W - _CW) + _CW / 2}" y="${_oy + _CH - 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideStepRight}</text>`;
                         const _lblRight     = `<text x="${_ox + _W + 22}" y="${_oy + _CH + (_H - _CH) / 2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideRight}</text>`;
                         const _lblBottom    = `<text x="${_ox + _W / 2}" y="${_oy + _H + 36}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideBottom}</text>`;
@@ -2335,7 +2335,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 }
                 function _angleSvg(deg, rotateDeg) {
                     const r = 36;
-                    const cx = 50, cy = 60;
+                    const cx = 50, cy = 50;   // AP2: the vertex at the centre, so no turn pushes a ray out of the box
                     // Second ray sits `deg` degrees CCW from the horizontal
                     // right ray. Previously this was `(180 - deg)`, which drew
                     // the SUPPLEMENTARY angle — labelled-obtuse rays rendered
@@ -2353,7 +2353,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const wedgeEndX = cx + wedgeR * Math.cos(rad);
                     const wedgeEndY = cy - wedgeR * Math.sin(rad);
                     const wedgeLargeArc = deg > 180 ? 1 : 0;
-                    const interiorWedge = `<path d="M ${cx} ${cy} L ${(cx + wedgeR).toFixed(1)} ${cy} A ${wedgeR} ${wedgeR} 0 ${wedgeLargeArc} 0 ${wedgeEndX.toFixed(1)} ${wedgeEndY.toFixed(1)} Z" fill="${COLORS.fill[1] || '#43a047'}" fill-opacity="0.22" stroke="none"/>`;
+                    const interiorWedge = `<path d="M ${cx} ${cy} L ${(cx + wedgeR).toFixed(1)} ${cy} A ${wedgeR} ${wedgeR} 0 ${wedgeLargeArc} 0 ${wedgeEndX.toFixed(1)} ${wedgeEndY.toFixed(1)} Z" fill="${COLORS.fill[1] || '#43a047'}" fill-opacity="0.22" stroke="none" class="ang-wedge"/>`;
                     // IXL convention: rays + arc share the angle color; right-angle marker is red.
                     let arc = '';
                     if (deg === 90) {
@@ -2365,7 +2365,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         arc = `<path d="M ${cx + 14} ${cy} A 14 14 0 ${largeArc} 0 ${arcEndX.toFixed(1)} ${arcEndY.toFixed(1)}" fill="none" stroke="${COLORS.primary}" stroke-width="${STROKE.normal}"/>`;
                     }
                     const rot = rotateDeg || 0;
-                    return `<svg viewBox="0 0 100 80" width="90" height="72">
+                    return `<svg viewBox="0 0 100 100" width="90" height="90">
                         <g transform="rotate(${rot} ${cx} ${cy})">
                             ${interiorWedge}
                             <line x1="${cx}" y1="${cy}" x2="${(cx + r).toFixed(1)}" y2="${cy}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
@@ -2467,26 +2467,22 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 // Explicit width/height: without them, the inline-block wrapper
                 // (.hs-bg-wrap) can collapse an unsized SVG to zero width — the
                 // polygon then renders invisibly and the student sees nothing.
-                const bgSvg = `<svg viewBox="0 0 300 200" width="400" height="267" xmlns="http://www.w3.org/2000/svg"><polygon points="${points}" fill="${_ps.fill}" stroke="${_ps.stroke}" stroke-width="${_ps.strokeWidth}"/>${labels}</svg>`;
-                const hotSpots = angles.map(a => ({
-                    id: a.id,
-                    shape: 'circle',
-                    cx: a.x,
-                    cy: a.y,
-                    r: 28,
-                    label: `Vertex ${labelLetters[angles.indexOf(a)]}`
-                }));
+                // AP2 (2026-09-25): the pupil ticks the LETTERS of the corners (Angle A … D) under
+                // the lettered shape. This was a hot-spot (tap the corner) that only the practice
+                // card could mount: the online worksheet drew an empty box with an answer line, and
+                // paper had no answer place. A tick list mounts on every host and prints as one.
+                const bgSvg = `<svg viewBox="0 0 300 200" width="300" height="200" style="max-width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg"><polygon points="${points}" fill="${_ps.fill}" stroke="${_ps.stroke}" stroke-width="${_ps.strokeWidth}"/>${labels}</svg>`;
                 const ans = angles.filter(a => a.type === target).map(a => a.id);
                 q.text = `Click ALL the ${target} angles in this shape.`;
-                q.answerType = 'hot-spot';
-                q.backgroundSvg = bgSvg;
-                q.hotSpots = hotSpots;
+                q.answerType = 'multi-select-check';
+                q.options = angles.map((a, i) => ({ id: a.id, label: `Angle ${labelLetters[i]}`, correct: a.type === target }));
+                q.visual = `<div style="text-align:center;">${bgSvg}</div>`;
+                q.printStem = true;
                 q.ans = ans;
-                q.selectMode = 'multi';
                 q.hint = target === 'right' ? 'Right angles measure exactly 90° (a square corner).'
                     : target === 'obtuse' ? 'Obtuse angles are greater than 90° (look wider than a square corner).'
                     : 'Acute angles are less than 90° (look narrower than a square corner).';
-                q.printFormat = 'hot-spot';
+                q.printFormat = 'multi-select';
                 q.skillLabel = 'Identify Angles';
                 return;
             } else if (geoSkill === "identify_angles") {
@@ -3829,7 +3825,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.skillLabel = "Decompose Area";
                 q.printFormat = "area-polygon-decompose";
-                q.polygonDecomposeData = { shapeKind, polygon, totalArea, bbW, bbH, GRID, dimsTxt };
+                // AP2 (2026-09-25): the side labels travel with the item, so the printed cell
+                // numbers the same sides as the screen (it printed the bare grid shape).
+                const sideLabelList = [...sideLabels.matchAll(/<text x="([-\d.]+)" y="([-\d.]+)"(?: text-anchor="(\w+)")?[^>]*>([^<]+)<\/text>/g)]
+                    .map(m => ({ x: Number(m[1]), y: Number(m[2]), anchor: m[3] || 'start', t: m[4] }));
+                q.polygonDecomposeData = { shapeKind, polygon, totalArea, bbW, bbH, GRID, dimsTxt, labels: sideLabelList };
             } else if (geoSkill === "coord_polygon") {
                 // ===== POLYGON ON COORD GRID (Grade 6) — Phase 5 batch 4 =====
                 // Band 221-230, G. 3 or 4 vertices in Q1 with horizontal/vertical sides only.
@@ -4873,7 +4873,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                                     + `L ${_ox + _W} ${_oy + _H} `
                                     + `L ${_ox} ${_oy + _H} Z`;
                         const _T1 = `<text x="${_ox + (_W - _CW) / 2}" y="${_oy - 14}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sTopLeft}</text>`;
-                        const _T2 = `<text x="${_ox + (_W - _CW) - 18}" y="${_oy + _CH / 2 + 8}" text-anchor="end" font-size="22" font-weight="800" fill="${COLORS.text}">${sStepDn}</text>`;
+                        const _T2 = `<text x="${_ox + (_W - _CW) + 12}" y="${_oy + _CH / 2 + 8}" text-anchor="start" font-size="22" font-weight="800" fill="${COLORS.text}">${sStepDn}</text>`;
                         const _T3 = `<text x="${_ox + (_W - _CW) + _CW / 2}" y="${_oy + _CH - 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sStepRt}</text>`;
                         const _T4 = `<text x="${_ox + _W + 22}" y="${_oy + _CH + (_H - _CH) / 2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sRight}</text>`;
                         const _T5 = `<text x="${_ox + _W / 2}" y="${_oy + _H + 36}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sBottom}</text>`;

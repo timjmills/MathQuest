@@ -1425,7 +1425,14 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
         const maxP = shown.length ? Math.max(...shown) : null;
         if (maxP !== null && maxP > R) add('pv-band', `prints ${maxP.toLocaleString('en-US')} past its default band ${R.toLocaleString('en-US')} (${printedText.slice(0, 50)})`);
         if (maxP !== null && maxP >= 10 && maxP <= 99) twoDigit++;
-        if (pv && pv.kind === 'round' && (pv.n < pv.place || pv.n % pv.place === 0)) add('pv-band', `rounds ${pv.n} to the nearest ${pv.place}: below the place, or already rounded`);
+        // NAMED EXCEPTION (owner ruling 2026-09-25, "yes please allow"): the three round-on-a-
+        // number-line skills deal ONE "already a multiple" item per block of six (6,000 to the
+        // nearest 1,000 stays 6,000), and their "Round to" option offers the place one above the
+        // number's own top place (4,650 to the nearest 10,000). Only those two cases are allowed,
+        // only for these ids; every other skill keeps the already-rounded rule.
+        const RNL_EXCEPT = new Set(['round_nl_thousands', 'round_nl_ten_thousands', 'round_nl_hundred_thousands']);
+        const rnlOk = pv && RNL_EXCEPT.has(id) && (pv.n % pv.place === 0 || pv.place === 10 ** String(Math.trunc(pv.n)).length);
+        if (pv && pv.kind === 'round' && !rnlOk && (pv.n < pv.place || pv.n % pv.place === 0)) add('pv-band', `rounds ${pv.n} to the nearest ${pv.place}: below the place, or already rounded`);
         if (pv && pv.kind === 'moreless') {
             // (with an unknown start, pv.n is still the START: the number the pupil writes)
             const a = pv.dir === 'more' ? pv.n + pv.step : pv.n - pv.step;

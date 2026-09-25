@@ -6,7 +6,7 @@ import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { createAnalogClockSVG, createDigitalClockHTML, addTime, subtractTime, formatTime, timeToWords, generateTimeDistractors, createMagnifiableClock, createClockChoiceWithMagnify } from './svg-clock.js';
 import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 import { isTimeMoneySkill, generateTimeMoneyQuestion } from './gen-time-money.js';
-import { createBarGraphSVG, createThermometerSVG } from './svg-geometry.js';
+import { createBarGraphSVG, createThermometerSVG, rectBoxFor } from './svg-geometry.js';
 
 // O6 appearance (lane AP2): the value of an appearance control (`labels`, `bars`) for the skill
 // being generated, or `dflt` when the skill has no such control. It never consumes a random
@@ -981,10 +981,13 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 const _piShow = (i) => _piLabels !== 'some' || shape === 'triangle' || i < 2;
                 let svg = '';
                 if (shape === "rectangle" || shape === "square") {
-                    const W = 180, H = 110, padX = 40, padY = 25;
-                    const rectW = W - padX * 2;
-                    const rectH = H - padY * 2;
-                    svg = `<svg viewBox="0 0 ${W} ${H}" width="220" style="display:block;margin:0 auto;background:#fff;">
+                    // AP2: drawn to scale (a 10 by 3 rectangle is long and thin, a square is square),
+                    // so with "some" labels the pupil can SEE which sides are equal.
+                    const box = rectBoxFor(sides[0], sides[1]);
+                    const padX = 40, padY = 25;
+                    const rectW = box.w, rectH = box.h;
+                    const W = rectW + padX * 2, H = rectH + padY * 2;
+                    svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.round(W * 220 / 180)}" style="display:block;margin:0 auto;background:#fff;max-width:100%;">
                         <rect x="${padX}" y="${padY}" width="${rectW}" height="${rectH}" fill="${softFill(COLORS.primary)}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}"/>
                         <text x="${W / 2}" y="${padY - 6}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[0]}</text>
                         ${_piShow(2) ? `<text x="${W / 2}" y="${H - padY + 16}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[2]}</text>` : ''}
@@ -1253,7 +1256,22 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                         rrOptions.add(rrCandText);
                     }
                 }
-                q.options = shuffle([...rrOptions]);
+                // AP2 (2026-09-25): the pupil WRITES the length, on screen as on paper. The card
+                // used to turn this production item into four buttons (the paper page asks for a
+                // written answer; PEDAGOGY P-LG), so the offers are kept as named errors instead:
+                // they still feed error-analysis and Reason It pages.
+                shuffle([...rrOptions]);   // still drawn, so a seeded page deals the same items as before
+                q.options = [];
+                q.distractorTags = {};
+                for (const cand of rrOptions) {
+                    if (cand === rrAnswerText) continue;
+                    const toNum = (s) => String(s).split(' ').reduce((t, p) => t + (p.includes('/') ? Number(p.split('/')[0]) / Number(p.split('/')[1]) : Number(p)), 0);
+                    const off = toNum(cand) - rrMeasurement;
+                    q.distractorTags[cand] = Math.abs(off) === 0.25 ? 'Read the small mark next to the arrow instead of the one it points to.'
+                        : Math.abs(off) === 0.5 ? 'Counted a half inch too ' + (off > 0 ? 'far' : 'short') + '.'
+                        : off > 0 ? 'Read the next inch number after the arrow, not the one before it.'
+                        : 'Counted one inch too few.';
+                }
 
                 // Build B&W ruler SVG with clear tick marks
                 const _rrLabels = _mLook('labels', 'all');
