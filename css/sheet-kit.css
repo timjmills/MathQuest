@@ -284,3 +284,11 @@
    its cell, never pinned to the top over an empty band. `safe` keeps an over-tall cell top-aligned
    (never clipped above the letter). Print pages only; the screen hosts keep their own layout. */
 .ws-page .ws-grid > .ws-cell:not(.blankrun) { justify-content: safe center; }
+/* ---------- O6 appearance, lane AP3 (2026-09-25): a fraction model at the sheet's size preset ----------
+   A legacy cell prints the generator's markup, so a fraction model (sheet/cells/frac-model.js
+   fracModelSizedHTML) carries its S, M and L drawings, each at its true size with true stroke widths;
+   the page's preset shows its own. Outside a sheet (the screen hosts) the L drawing shows. */
+.mq-fm > svg[data-fm-size] { display: none !important; }
+.mq-fm > svg[data-fm-size="L"] { display: block !important; margin: 0 auto; }
+.ws-S .mq-fm > svg[data-fm-size="L"], .ws-M .mq-fm > svg[data-fm-size="L"] { display: none !important; }
+.ws-S .mq-fm > svg[data-fm-size="S"], .ws-M .mq-fm > svg[data-fm-size="M"] { display: block !important; margin: 0 auto; }

@@ -2894,6 +2894,88 @@ SKILL_OPTIONS['composing:number_chart_fill'] = [
 ];
 // ============================ end O6 · AP1 · K-2 picture kind ============================
 
+// O6 APPEARANCE · FRACTION MODELS AND NUMBER LINES  (lane AP3, 2026-09-25)
+// ===========================================================================
+// design/audit/OPTIONS-RUBRIC.md O6: "how an item looks", never the number size or the help.
+// Appended to the skill's own panel under Layout ("only changes the look"). Each value changes
+// the printed cell AND the screen, through one builder used by both:
+//   model  "Fraction model" - gen-fractions.js _fModelPick -> sheet/cells/frac-model.js (screen
+//          q.visual; print: the legacy handler draws fractionData.model / prints q.visual).
+//          Offered only for the models a skill can honestly draw: a pupil does not SHADE a line.
+//   ticks  "Numbers on the line" - which ticks carry a numeral (sheet/cells/line-labels.js); the
+//          ticks themselves never move (P-1). + / − jump lines: number-line.js via
+//          gen-operations.js _nlKitItem. Drag onto the line: nlData.labelAt, read by
+//          widgets/nl-drag.js and the print twin. number_line_int: sheet/cells/value-line.js.
+// Each default is what the skill drew before (R2), so an untouched skill and every old link draw
+// the same items. Share-code keys: `model` 5D (reserved for exactly this); `ticks` 2E, the id and
+// vocabulary nl_mult / nl_div already use ('one' = every number), with two new tokens.
+const _AP3_MODEL = { area: 'Rectangle (area model)', bar: 'Bar (fraction strip)', circle: 'Circle', line: 'Number line 0 to 1 (a dot marks it)' };
+const _ap3Model = (values, dflt, help, appliesTo = null) => ({
+    id: 'model', label: 'Fraction model', type: 'set', group: 'layout', default: dflt,
+    values: values.map(v => ({ v, l: _AP3_MODEL[v] })), allLabel: 'Every model, mixed', help,
+    ...(appliesTo ? { appliesTo } : {}),
+});
+const _ap3Ticks = (values, dflt, help) => ({
+    id: 'ticks', label: 'Numbers on the line', type: 'enum', default: dflt, group: 'layout',
+    values: values.map(([v, l]) => ({ v, l: v === dflt ? `${l} (default)` : l })), help,
+});
+const _AP3_ADD_LINE = _ap3Ticks([['one', 'Every number: 0, 1, 2, 3 …'], ['some', 'Every 2nd number: 0, 2, 4 …'], ['ends', 'The two ends only']], 'one',
+    'Which ticks carry a numeral. Every number has a tick and every hop is one number whatever you choose; '
+    + 'the dot the pupil starts from is always numbered. Fewer numerals make the pupil count along the ticks.');
+const _AP3_OPTIONS = {
+    'fractions:identify': [_ap3Model(['area', 'bar', 'circle', 'line'], ['bar', 'circle'],
+        'Default: circles and bars, mixed, as the skill always drew. The picture on each "What fraction is shaded?" item, '
+        + 'on paper and on screen: tick one model for a page of it, or several to mix them. On a number line a dot marks '
+        + 'the fraction. The other kinds of item (pick the model, name the numerator) keep their own look.',
+        (o) => !Array.isArray(o.forms) || !o.forms.length || o.forms.includes(0))],
+    'fractions:write_fraction': [_ap3Model(['area', 'bar', 'circle', 'line'], ['area', 'bar', 'circle'],
+        'Default: rectangles, bars and circles, mixed. The picture the pupil writes the fraction for, on paper and on '
+        + 'screen. Tick one model for a page of it. On a number line a dot marks the fraction.')],
+    'fractions:shade_fraction': [_ap3Model(['area', 'bar', 'circle'], ['area', 'bar', 'circle'],
+        'Default: rectangles, bars and circles, mixed. The empty picture the pupil shades, on paper and on screen. '
+        + 'A number line is not offered: a pupil marks a point on a line, he does not shade it.')],
+    'fractions:compare': [_ap3Model(['bar', 'circle', 'area', 'line'], ['bar', 'circle'],
+        'Default: bars on screen and circles on paper, as the skill always drew. The two pictures on each "compare the '
+        + 'fractions" item: tick one model and both fractions are drawn that way, on the same size of whole, on paper and '
+        + 'on screen. The other kinds of item (numbers only, compare to 1/2) have no picture.',
+        (o) => !Array.isArray(o.forms) || !o.forms.length || o.forms.includes(0))],
+    'fractions:equiv_frac_visual': [_ap3Model(['circle', 'bar', 'area'], ['circle'],
+        'Default: circles, as the skill always drew. Both fractions are drawn as the ticked model on the same size of whole, '
+        + 'so the pupil sees they cover the same amount; the shade-it items on paper give an empty one of the same model. '
+        + 'Bars (fraction strips) are the usual picture for equivalence.')],
+    'fraction_operations:add_fractions_like': [_ap3Model(['bar', 'area', 'circle'], ['bar'],
+        'Default: the skill\'s own bars. A rectangle or a circle draws each fraction of the sum that way, in black and '
+        + 'white, and never draws the answer. Pictures off prints numbers only.', (o) => o.pictures !== false)],
+    'fraction_operations:sub_fractions_like': [_ap3Model(['bar', 'area', 'circle'], ['bar'],
+        'Default: the skill\'s own bars. A rectangle or a circle draws both fractions that way, in black and white, and '
+        + 'never draws the answer. Pictures off prints numbers only.', (o) => o.pictures !== false)],
+    'addition:number_line_add': [_AP3_ADD_LINE],
+    'subtraction:number_line_sub': [_AP3_ADD_LINE],
+    'addition:nl_add': [_AP3_ADD_LINE],
+    'subtraction:nl_sub': [_AP3_ADD_LINE],
+    'integers:number_line_int': [_ap3Ticks([['one', 'Every number but the marked one'], ['some', 'Every 5th number: −10, −5, 0, 5, 10'],
+        ['ends', 'The two ends and 0']], 'some',
+    'Which ticks carry a numeral; the marked number is never numbered. Every 5th is the line the skill always drew. '
+        + 'Every number and the ends draw a line of 20 with a tick at every whole number, so the pupil counts from a numeral.')],
+    'integers:integer_nl_drag': [_ap3Ticks([['one', 'Every number: −10, −9, −8 …'], ['some', 'Every 5th number, the ends and 0'],
+        ['ends', 'The two ends and 0']], 'some',
+    'Which ticks carry a numeral; there is a tick at every whole number whatever you choose. With every number the '
+        + 'pupil matches each number to its numeral; with fewer he counts along the ticks. On the −5 to 5 line every '
+        + '5th becomes every 2nd.')],
+    'decimals:decimal_nl_drag': [_ap3Ticks([['one', 'Every tenth: 0, 0.1, 0.2 …'], ['some', '0, 0.5 and 1'], ['ends', '0 and 1 only']], 'some',
+        'Which ticks carry a numeral; there is a tick at every tenth whatever you choose. With every tenth the pupil '
+        + 'matches each decimal to its numeral; with fewer he counts the tenths.')],
+    'fractions:fraction_nl_drag': [_ap3Ticks([['one', 'Every part: 0, 1/4, 2/4 …'], ['some', '0, the halfway tick and 1'], ['ends', '0 and 1 only']], 'one',
+        'Which ticks carry a numeral; the line is always cut into equal parts. With every part numbered the pupil '
+        + 'matches each fraction to its numeral; with fewer he counts the parts. A line in thirds or fifths has no '
+        + 'halfway tick, so there "halfway" numbers 0 and 1 only.')],
+    'fractions:mixed_nl_drag': [_ap3Ticks([['some', 'Every whole number: 0, 1, 2, 3'], ['ends', '0 and 3 only']], 'some',
+        'Which ticks carry a numeral; every whole number and every part has a tick whatever you choose. With the '
+        + 'ends only the pupil counts the wholes too. (Every part is not offered: nineteen mixed numbers do not fit.)')],
+};
+for (const [key, defs] of Object.entries(_AP3_OPTIONS)) SKILL_OPTIONS[key] = [...(SKILL_OPTIONS[key] || []), ...defs];
+// ============================ end O6 · fraction models and number lines ============================
+
 // ===========================================================================
 // WORD WORK · the keyword supports of every whole-number word problem (2026-09-25)
 // ===========================================================================

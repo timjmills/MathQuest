@@ -8,7 +8,7 @@ import { optionsFor, normalizeOptions } from './skill-options.js';
 import { genCountByTables, genMultChart, genHopLine } from './gen-mult-patterns.js';
 const _MP_SKILLS = new Set(['count_by_tables', 'mult_chart', 'mult_chart_easy', 'mult_chart_medium', 'mult_chart_hard', 'nl_mult', 'nl_div']);
 import { stripSegStyle, stripPos } from './sheet/tokens.js';
-import { renderCell as _kitRender, fadeRung } from './sheet/index.js';
+import { renderCell as _kitRender, fadeRung, tickLabelSet, valueLineSVG, valueLineWindow } from './sheet/index.js';
 
 // ========================================
 // HOW IT IS WRITTEN — the `notation` option (skill-options.js)
@@ -1999,6 +1999,10 @@ function _nlKitItem(q, { a, b, op, unknown = 'result', range = 20 }) {
         max = Math.max(min + 15, Math.ceil((hi0 + 1) / 5) * 5);
     }
     const payload = { min, max, start: a, add: b, op, unknown };
+    // O6 (lane AP3): "Numbers on the line". Every number stays the default (owner, 2026-09-25);
+    // a changed value thins the NUMERALS only - the ticks and the unit hops stay (number-line.js).
+    const _nlTicks = _opt('ticks');
+    if (_nlTicks === 'some' || _nlTicks === 'ends') payload.ticks = _nlTicks;
     const glyph = op === '+' ? '+' : '\u2212';
     q.text = unknown === 'a' ? `? ${glyph} ${b} = ${end}` : unknown === 'b' ? `${a} ${glyph} ? = ${end}` : `${a} ${glyph} ${b} = ?`;
     q.ans = unknown === 'a' ? a : unknown === 'b' ? b : end;
@@ -7028,6 +7032,20 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(target);
                 q.integerData = { target };
                 q.printFormat = "integer-number-line";
+                // O6 "Numbers on the line" (lane AP3). 'some' (the default) is the line above, as it
+                // always was. 'one' / 'ends' draw ONE line for screen and paper (sheet/cells/value-line.js):
+                // a tick at every whole number in a 20-unit window, the numerals line-labels.js chooses,
+                // never the marked number's own (RP-1). The print handler reads integerData.line.
+                const _intTicks = _opt('ticks');
+                if (_intTicks === 'one' || _intTicks === 'ends') {
+                    const win = valueLineWindow(target);
+                    const N = win.max - win.min;
+                    const zero = win.min <= 0 && win.max >= 0 ? -win.min : null;
+                    const labels = tickLabelSet(N, _intTicks, { zero, hide: [target - win.min] }).map((i) => win.min + i);
+                    q.visual = `<div class="mq-value-visual" style="text-align:center;">${valueLineSVG({ min: win.min, max: win.max, labels, mark: target, size: 'L' }).svg}</div>`;
+                    q.text = `What integer does the dot show?`;
+                    q.integerData = { target, line: { min: win.min, max: win.max, labels } };
+                }
             } else if (intSkill === "integer_nl_drag") {
                 // Drag-onto-number-line — integers on [-10, 10] with whole-number ticks.
                 // ~35% multi-target so single-marker stays the dominant flow.
@@ -7056,9 +7074,21 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 q.nlData = {
                     min: lineMin, max: lineMax, tickStep: 1, labelStep: 5,
                     mode: 'integer',
-                    ...(intBand && intBand !== 10 ? { labelStep: intBand <= 5 ? 1 : 5 } : {}),
                     targets,
                 };
+                // O6 "Numbers on the line" (lane AP3): the ONE control of the numerals (P-1), so the
+                // band no longer changes them (it labelled every number at −5 to 5). 'some', the
+                // default, is every 5th number (every 2nd on the −5 to 5 line), the ends and 0 -
+                // on the −10 to 10 and −20 to 20 lines exactly what labelStep 5 always drew, so
+                // those items are unchanged and carry no labelAt.
+                {
+                    const tv = ['one', 'some', 'ends'].includes(_opt('ticks')) ? _opt('ticks') : 'some';
+                    const N = lineMax - lineMin;
+                    const set = tickLabelSet(N, tv, { zero: -lineMin });
+                    const old = [];
+                    for (let i = 0; i <= N; i++) if (i % 5 === 0) old.push(i);
+                    if (!(old.length === set.length && old.every((x, k) => x === set[k]))) q.nlData.labelAt = set;
+                }
                 q.hint = `Zero is in the middle. Negative numbers are to the LEFT of zero, positive to the RIGHT.`;
                 q.printFormat = "nl-drag";
                 q.skillLabel = isMulti ? "Drag Integers on Number Line (Multi)" : "Drag Integer on Number Line";

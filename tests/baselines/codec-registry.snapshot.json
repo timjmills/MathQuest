@@ -516,7 +516,9 @@
     },
     "ticks": {
       "step": "S",
-      "one": "O"
+      "one": "O",
+      "some": "M",
+      "ends": "E"
     },
     "shape": {
       "box": "B",

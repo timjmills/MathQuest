@@ -21,6 +21,7 @@ import { inkHTML } from './print-ink.js';
 import {
     hasCell, renderCell, cellAnswerKey, cellGridItem, cell as kitCellBox,
     resolveCtx as kitResolveCtx, installLegacyAdapters, defaultRenderCell,
+    fracModelSizedHTML, valueLineSizedHTML,
 } from './sheet/index.js';
 import { fillSlots as kitFillSlots } from './sheet/roles/answer-key.js';
 // Two of the six default adapters borrow functions that do NOT live in this file.
@@ -7718,17 +7719,36 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
     // Fraction compare
     if (problem.printFormat === "fraction-compare" && problem.fractionData) {
         const fd = problem.fractionData;
+        // O6 `model` (lane AP3): the screen's model, by the same builder, both on one whole.
+        const cmpPic = (n, d) => (fd.model ? fracModelSizedHTML({ n, d, kind: fd.model, wholeMm: 30 }) : _designFracCirclePrint(d, n, 60));
+        if (fd.model) {
+            // Each fraction stacked over its model (as on screen), the sign box between: narrow
+            // enough for two columns.
+            const col = (n, d) => `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">${cmpPic(n, d)}${_designFracPrint(n, d, 'lg')}</div>`;
+            return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
+                        ${col(fd.num1, fd.denom1)}
+                        <span style="min-width:30px;min-height:24px;border:2px solid #333;border-radius:3px;display:inline-block;text-align:center;font-size:1.2rem;">&nbsp;</span>
+                        ${col(fd.num2, fd.denom2)}
+                    </div>
+                    <div style="margin-top: 6px; font-size: 0.85rem; color: #555;">Circle: &gt; , &lt; , or =</div>
+                </div>
+            </div>`;
+        }
 
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
                     <div class="print-frac-equation" style="gap: 8px;">
-                        ${_designFracCirclePrint(fd.denom1, fd.num1, 60)}
+                        ${cmpPic(fd.num1, fd.denom1)}
                         ${_designFracPrint(fd.num1, fd.denom1, 'lg')}
                         <span style="min-width:30px;min-height:24px;border:2px solid #333;border-radius:3px;display:inline-block;text-align:center;font-size:1.2rem;">&nbsp;</span>
                         ${_designFracPrint(fd.num2, fd.denom2, 'lg')}
-                        ${_designFracCirclePrint(fd.denom2, fd.num2, 60)}
+                        ${cmpPic(fd.num2, fd.denom2)}
                     </div>
                     <div style="margin-top: 6px; font-size: 0.85rem; color: #555;">Circle: &gt; , &lt; , or =</div>
                 </div>
@@ -8145,6 +8165,9 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const usable = rightX - leftX;
         const xFor = (v) => leftX + ((v - min) / span) * usable;
         const labelMultiplier = Math.max(1, Math.round(labelStep / tickStep));
+        // O6 "Numbers on the line" (lane AP3): the generator's explicit tick list, shared with the
+        // screen widget (widgets/nl-drag.js), replaces the label step when it is present.
+        const labelAt = Array.isArray(nl.labelAt) ? new Set(nl.labelAt.map(Number)) : null;
 
         let svg = '';
         svg += `<line x1="${leftX - 8}" y1="${lineY}" x2="${rightX + 8}" y2="${lineY}" stroke="#333" stroke-width="2.2"/>`;
@@ -8153,12 +8176,15 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         for (let i = 0; i <= totalTicks; i++) {
             const v = min + i * tickStep;
             const x = xFor(v);
-            const isLabelTick = (i % labelMultiplier === 0);
-            const tickH = isLabelTick ? 11 : 6;
-            const sw = isLabelTick ? 1.8 : 1.1;
+            // Tick weight follows labelStep (the structure); labelAt only picks the numerals.
+            const isMajor = (i % labelMultiplier === 0);
+            const isLabelTick = labelAt ? labelAt.has(i) : isMajor;
+            const tickH = isMajor ? 11 : 6;
+            const sw = isMajor ? 1.8 : 1.1;
             svg += `<line x1="${x}" y1="${lineY - tickH}" x2="${x}" y2="${lineY + tickH}" stroke="#333" stroke-width="${sw}"/>`;
             if (isLabelTick) {
-                svg += `<text x="${x}" y="${lineY + 26}" text-anchor="middle" fill="#333" font-size="12" font-weight="600">${fmt(v)}</text>`;
+                // TY-1 / TY-2: the numerals in Andika at a weight the face has (was 600, no family).
+                svg += `<text x="${x}" y="${lineY + 26}" text-anchor="middle" fill="#333" font-family="Andika, sans-serif" font-size="12" font-weight="700">${fmt(v)}</text>`;
             }
         }
 
@@ -8219,6 +8245,18 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
     if (problem.printFormat === "integer-number-line" && problem.integerData) {
         const id = problem.integerData;
         const target = id.target;
+        // O6 "Numbers on the line" (lane AP3): the generator's line, by the builder the screen used.
+        if (id.line) {
+            return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="margin-bottom:10px;font-weight:700;">What integer does the dot show?</div>
+                    ${valueLineSizedHTML({ min: id.line.min, max: id.line.max, labels: id.line.labels, mark: target })}
+                    <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;"><span style="font-weight:700;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
+                </div>
+            </div>`;
+        }
         const minVal = Math.min(-10, target - 3);
         const maxVal = Math.max(10, target + 3);
         // All integer ticks; label every 5 + zero so the line stays readable.
@@ -8226,7 +8264,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const labels = [];
         for (let v = minVal; v <= maxVal; v++) {
             ticks.push(v);
-            if (v === 0 || v % 5 === 0) labels.push({ v, label: String(v) });
+            // RP-1: never the numeral of the tick the arrow points to (it IS the answer).
+            if ((v === 0 || v % 5 === 0) && v !== target) labels.push({ v, label: String(v) });
         }
         const numline = _designNumLine({
             min: minVal,
@@ -11900,9 +11939,10 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const den = Math.max(2, Math.min(fd.den || 4, 12));
         const numer = Math.max(0, Math.min(fd.num || 1, den));
         // Use a clean print pie chart (matches print color palette)
-        const visual = printPieChartLight(numer, den, 90);
+        // O6 `model` (lane AP3): the model the generator drew on screen, by the same builder.
+        const visual = fd.model ? fracModelSizedHTML({ n: numer, d: den, kind: fd.model }) : printPieChartLight(numer, den, 90);
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            <div style="font-size:1rem;margin-bottom:8px;font-weight:700;">Write the fraction that is shaded.</div>
+            <div style="font-size:1rem;margin-bottom:8px;font-weight:700;">${fd.model === 'line' ? 'Write the fraction the dot shows.' : 'Write the fraction that is shaded.'}</div>
             <div style="text-align:center;margin-bottom:8px;">${visual}</div>
             <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-top:10px;">
                 <span style="font-weight:700;">Fraction:</span>
@@ -11921,7 +11961,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const den = Math.max(2, Math.min(fd.den || 4, 12));
         const numer = Math.max(0, Math.min(fd.num || 1, den));
         // Build a blank pie chart (no shaded slices) — student shades it in
-        const blankPie = printPieChartLight(0, den, 95);
+        // O6 `model` (lane AP3): the blank model the screen draws, by the same builder.
+        const blankPie = fd.model ? fracModelSizedHTML({ n: numer, d: den, kind: fd.model, blank: true }) : printPieChartLight(0, den, 95);
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
             <div style="font-size:1rem;margin-bottom:8px;font-weight:700;text-align:center;">
                 Shade <span style="display:inline-flex;flex-direction:column;align-items:center;line-height:1;vertical-align:middle;">
@@ -11958,14 +11999,20 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const circleWithFrac = (circle, frac) => `<div style="display:flex;align-items:center;gap:6px;">${circle}${frac}</div>`;
 
         // Helper: empty circle (unshaded, only division lines visible)
-        const emptyCircle = (den) => printPieChartLight(0, den, sz, '#fff', '#999');
+        const emptyCircle = (den) => (fd.model
+            ? fracModelSizedHTML({ n: 0, d: den, kind: fd.model, wholeMm: 30, blank: true })
+            : printPieChartLight(0, den, sz, '#fff', '#999'));
+        // O6 `model` (lane AP3): the screen's model, by the same builder, both on one whole.
+        const efvPie = (n, d, fill) => (fd.model
+            ? fracModelSizedHTML({ n, d, kind: fd.model, wholeMm: 30 })
+            : (fill ? printPieChartLight(n, d, sz, fill) : printPieChartLight(n, d, sz)));
 
         let inner = '';
 
         if (pt === 'both_shaded') {
             // Both circles shaded, student writes fractions and tells if equivalent
-            const c1 = printPieChartLight(fd.num1, fd.den1, sz);
-            const c2 = printPieChartLight(fd.num2, fd.den2, sz, PASTEL_COLORS.blue.fill);
+            const c1 = efvPie(fd.num1, fd.den1);
+            const c2 = efvPie(fd.num2, fd.den2, PASTEL_COLORS.blue.fill);
             const f1 = fracNotation(0, 0, true, true);
             const f2 = fracNotation(0, 0, true, true);
             inner = `<div style="font-size:0.85rem;margin-bottom:6px;font-weight:700;">Write each fraction. Are they equivalent?</div>
@@ -11976,7 +12023,7 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                 </div>`;
         } else if (pt === 'shade_second') {
             // First circle shaded with fraction, second empty for student to shade
-            const c1 = printPieChartLight(fd.num1, fd.den1, sz);
+            const c1 = efvPie(fd.num1, fd.den1);
             const c2 = emptyCircle(fd.den2);
             const f1 = fracNotation(fd.num1, fd.den1, false, false);
             const f2 = fracNotation(0, 0, true, true);
@@ -11988,8 +12035,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                 </div>`;
         } else if (pt === 'fill_numbers') {
             // Both circles shaded, student fills in fraction numbers only
-            const c1 = printPieChartLight(fd.num1, fd.den1, sz);
-            const c2 = printPieChartLight(fd.num2, fd.den2, sz, PASTEL_COLORS.blue.fill);
+            const c1 = efvPie(fd.num1, fd.den1);
+            const c2 = efvPie(fd.num2, fd.den2, PASTEL_COLORS.blue.fill);
             const f1 = fracNotation(fd.num1, fd.den1, false, false);
             const f2 = fracNotation(0, 0, true, true);
             inner = `<div style="font-size:0.85rem;margin-bottom:6px;font-weight:700;">Write the equivalent fraction shown.</div>
@@ -12000,8 +12047,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                 </div>`;
         } else if (pt === 'compare') {
             // Both shaded with fractions shown, student writes = or ≠
-            const c1 = printPieChartLight(fd.num1, fd.den1, sz);
-            const c2 = printPieChartLight(fd.num2, fd.den2, sz, PASTEL_COLORS.blue.fill);
+            const c1 = efvPie(fd.num1, fd.den1);
+            const c2 = efvPie(fd.num2, fd.den2, PASTEL_COLORS.blue.fill);
             const f1 = fracNotation(fd.num1, fd.den1, false, false);
             const f2 = fracNotation(fd.num2, fd.den2, false, false);
             inner = `<div style="font-size:0.85rem;margin-bottom:6px;font-weight:700;">Write = or \u2260. Are these equivalent?</div>
@@ -12024,8 +12071,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                 </div>`;
         } else if (pt === 'missing_number') {
             // Both circles shaded, one fraction number missing
-            const c1 = printPieChartLight(fd.num1, fd.den1, sz);
-            const c2 = printPieChartLight(fd.num2, fd.den2, sz, PASTEL_COLORS.blue.fill);
+            const c1 = efvPie(fd.num1, fd.den1);
+            const c2 = efvPie(fd.num2, fd.den2, PASTEL_COLORS.blue.fill);
             const f1 = fracNotation(fd.num1, fd.den1, false, false);
             const f2 = fracNotation(fd.num2, fd.den2, fd.missingPart === 'num2', fd.missingPart === 'den2');
             inner = `<div style="font-size:0.85rem;margin-bottom:6px;font-weight:700;">Find the missing number.</div>
