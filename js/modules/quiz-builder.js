@@ -182,7 +182,10 @@ function safeGenerateQuestion(categoryId, skillId) {
         state.isMixedMode = false;
         state.gameMode = 'practice';
         state.fixedDifficulty = true;   // a printed/previewed set is the skill the teacher picked
-        return window.generateQuestion();
+        const q = window.generateQuestion();
+        // the quiz draws the skill's paper cell: its instruction is looked up by category + skill
+        if (q && typeof q === 'object' && !q.categoryId) q.categoryId = categoryId;
+        return q;
     } catch (e) {
         console.warn('QB preview generation failed for', categoryId, skillId, e);
         return null;
