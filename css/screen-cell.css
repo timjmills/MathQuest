@@ -1109,3 +1109,135 @@ html body .problem-card.mq-wscard.mq-wscard .mq-scell .k2-cell.k2-count > div[st
 .mq-scell .mq-ring-pool { gap: 2px; width: min(100%, calc(7 * 44px + 6 * 2px)); max-width: calc(7 * 44px + 6 * 2px); justify-content: flex-start; margin: 0 auto; }
 .mq-scell .mq-ring-tip { font-size: var(--mq-text, 20px); }
 .mq-scell .k2-wordpic > div:last-child { justify-content: center !important; }
+
+/* ---- R3-1. The kit cell's screen twin (screen-cell.js kitCellTwin): the paper's pv cell drawn at
+   the host's digit size - the problem sits IN the cell, the slot where the paper pupil writes
+   (after "=", after the arrow, in the circle, in the rewrite's boxes). */
+.mq-scell .mq-kit.mq-kittwin { font-size: var(--mq-digit); color: #000; text-align: center; max-width: 100%;
+    --ws-digit: var(--mq-digit); --ws-text: var(--mq-text); --ws-zone: var(--mq-text); }
+.mq-scell .mq-kittwin .pv-cell { display: block; max-width: 100%; margin: 4px auto; }
+.mq-scell .mq-kittwin .ws-eq { flex-wrap: wrap; row-gap: 8px; align-items: center; justify-content: center; max-width: 100%; }
+.mq-scell .mq-kittwin .pv-numeral { max-width: 100%; }
+.mq-scell .mq-kittwin .pv-tracks td { line-height: 1.15; }
+/* a slot not taken by an input (a card answering with buttons) still reads as the paper's slot */
+.mq-scell .mq-kittwin .mq-kblank { display: inline-block; vertical-align: baseline; }
+.mq-scell .mq-kittwin .mq-kblank--line { width: 2.6em; height: 1em; border-bottom: 2px solid #000; }
+.mq-scell .mq-kittwin .mq-kblank--box { width: 2em; height: 1.2em; border: 1px solid #000; border-radius: var(--mq-slot-r, 6px); }
+.mq-scell .mq-kittwin .mq-kblank--circle { width: 1.25em; height: 1.25em; border: 2px solid #000; border-radius: 50%; vertical-align: middle; }
+/* the host input in the slot: a line is 2 px ink on the baseline, a box is closed on four sides */
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle) {
+    border-width: 0 0 2px 0 !important; border-color: #000 !important; border-radius: 0 !important;
+    height: max(48px, 1.15em) !important; font-size: 1em !important; background: #fff !important; color: #000 !important;
+    width: calc(var(--mq-n, 3) * 0.62em + 0.9em) !important; min-width: max(64px, 2.4em) !important; max-width: 100%;
+}
+html body .mq-scell.mq-scell.mq-scell input.mq-slot.mq-slot--invisual.mq-slot--circle.mq-slot--circle.mq-slot--circle {
+    width: max(52px, 1.3em) !important; height: max(52px, 1.3em) !important; min-width: 0 !important; min-height: 0 !important;
+    padding: 0 !important; border: 2px solid #000 !important; border-radius: 50% !important;
+    font-size: calc(var(--mq-digit) * 0.8) !important; font-weight: 700; line-height: 1; text-align: center;
+    background: #fff !important; color: #000 !important; vertical-align: middle; margin: 0 0.1em !important; box-sizing: border-box;
+}
+.mq-scell .mq-kittwin .mq-cellbox { vertical-align: middle; font-size: 1em; height: max(48px, 1.25em); width: max(52px, calc(var(--mq-w, 2) * 0.62em + 0.6em)); min-width: 0; margin: 0; }
+.mq-scell .mq-kittwin .pv-rewrite { flex-wrap: nowrap !important; }
+.mq-scell .mq-kittwin .mq-cellbox.mq-cellbox--line { border-width: 0 0 2px 0; border-radius: 0; }
+.mq-scell .mq-kittwin .mq-cellbox > input { font-size: 1em !important; }
+/* the paper's bank of signs: tap one to write it in the circle (black and white, 48 px) */
+.mq-scell .mq-signbank { display: flex; justify-content: center; gap: 12px; margin: 12px auto 2px; }
+html body .mq-scell .mq-signbank .mq-signtile {
+    min-width: 56px; min-height: 52px; padding: 0 12px; margin: 0;
+    border: 1px solid #000 !important; border-radius: var(--mq-slot-r, 6px) !important;
+    background: #fff !important; color: #000 !important; box-shadow: none !important;
+    font-family: "Andika", sans-serif !important; font-size: calc(var(--mq-digit) * 0.7) !important; font-weight: 700; line-height: 1;
+    cursor: pointer;
+}
+@media (max-width: 480px) { .mq-scell .mq-kittwin .ws-eq { gap: 0.18em; } }
+
+/* ---- R3-3. The focus ring belongs on the input, never on the cell's border (the cell drew an
+   indigo ring whenever anything inside it had focus). */
+html body #gameView #questionCard.mq-card #questionPaper.mq-qpaper:focus-within::before { box-shadow: none !important; }
+html body .online-edition .problem-card.mq-wscard .ws-cell.mq-scell:focus-within,
+html body .qt-question-card .ws-cell.mq-scell:focus-within { box-shadow: none !important; }
+
+/* ---- R3-3b. A slot box's input never paints over the box's rounded border (clock / h:min / money
+   / timeline boxes lost their corners and side edges to the input's square white fill); round
+   slots (a number track's circles) stay round. The box draws the border; the input is the target. */
+html body .mq-scell [data-mq-cell] > input.mq-cellslot { background: transparent !important; border-radius: inherit !important; }
+/* a shaped slot (a number track's circle or hexagon) shows focus in its own shape: the outline
+   thickens; a square ring is never drawn over a round or six-sided slot */
+html body .mq-scell .k2-shape [data-mq-cell] > input.mq-cellslot:focus { outline: none !important; box-shadow: none !important; }
+html body .mq-scell .k2-shape:not(.k2-shape-hex):focus-within > [data-mq-cell] { box-shadow: inset 0 0 0 2px #000; }
+html body .mq-scell .k2-shape-hex:focus-within polygon { stroke-width: 6.4 !important; }
+
+/* ---- R3-5. Drag / sort widgets inside the cell are paper: Andika, black and white, no chrome.
+   No speaker per tile (Read is in the chrome bar), no mouse-instruction line (the instruction line
+   says what to do), bin names as plain bold words (not black pills), tiles as white boxes with an
+   ink outline, and the grey Submit hidden - the chrome Check presses it (card) or the card bar's
+   Check (worksheet). */
+html body .mq-scell .dnd-tts-btn { display: none !important; }
+html body .mq-scell .dnd-hint { display: none !important; }
+html body .mq-scell .dnd-host,
+html body .mq-scell .dnd-host * { font-family: "Andika", sans-serif !important; }
+html body .mq-scell .dnd-bin-label,
+html body .mq-scell .dnd-bin-label > span {
+    background: #fff !important; color: #000 !important; border: 0 !important; box-shadow: none !important;
+    font-weight: 700 !important; font-size: var(--mq-text, 20px) !important;
+}
+html body .mq-scell .dnd-tile {
+    background: #fff !important; color: #000 !important; border: 1px solid #000 !important; box-shadow: none !important;
+    min-height: 48px !important; min-width: 56px; font-size: calc(var(--mq-digit, 40px) * 0.6) !important; font-weight: 700 !important;
+    border-radius: var(--mq-slot-r, 6px) !important;
+}
+html body .mq-scell .dnd-bin, html body .mq-scell .dnd-slot {
+    background: #fff !important; border-color: #000 !important; box-shadow: none !important;
+}
+html body #questionPaper.mq-scell .dnd-submit,
+html body .mq-scell .dnd-host.mq-dnd-proxied .dnd-submit { display: none !important; }
+.mq-wsbar .mq-wscheck {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 44px; height: 44px; padding: 0 12px; border-radius: 12px; border: 0;
+    background: var(--mq-orange, #FF8A3D); color: #fff; box-shadow: none;
+    font-family: "Nunito", system-ui, sans-serif; font-size: 0.9rem; font-weight: 800; line-height: 1; cursor: pointer;
+}
+.mq-wsbar .mq-wscheck:focus-visible { outline: 3px solid #000; outline-offset: 2px; }
+/* the disk mat, the digit chart and the number line on the card: their Submit is the chrome Check
+   (question-render.js _checkProxy); the mouse-instruction line goes; Clear is an ink button */
+html body #questionPaper.mq-scell :is(.pvb-submit, .pvdd-submit, .nle-submit) { display: none !important; }
+html body .mq-scell .nle-instr { display: none !important; }
+html body .mq-scell :is(.pvb-clear, .pvdd-clear) {
+    min-height: 44px !important; min-width: 64px; padding: 0 14px !important;
+    background: #fff !important; color: #000 !important; border: 1px solid #000 !important; box-shadow: none !important;
+    border-radius: var(--mq-slot-r, 6px) !important; font-family: "Andika", sans-serif !important;
+    font-size: var(--mq-text, 18px) !important; font-weight: 700 !important;
+}
+html body .mq-scell :is(.nle-host, .pvb-host, .pvdd-host, .pvb-root, .pvdd-root) text,
+html body .mq-scell :is(.nle-host, .pvb-host, .pvdd-host, .pvb-root, .pvdd-root) { font-family: "Andika", sans-serif !important; }
+
+/* ---- R3-G. Green as soon as it is right (owner request 2026-09-25; screen-cell.js
+   wireLiveCorrect): a digit box, a regroup box or an answer slot whose value is the one it should
+   hold. A feedback mark (SP-30), so the one colour the cell allows; the digit stays ink (AA on the
+   pale fill). No motion, so nothing to reduce. */
+html body .mq-scell input.mq-live-correct,
+html body .mq-scell .mq-kit input.mq-digit.mq-live-correct,
+html body .mq-scell .mq-kit input.mq-carry.mq-live-correct {
+    background: #E3F4EA !important; color: #000 !important;
+    border-color: #1B7A43 !important;
+    box-shadow: inset 0 0 0 3px #1B7A43 !important;
+}
+html body .mq-scell [data-mq-cell]:has(> input.mq-live-correct),
+html body .mq-scell .mq-cellbox:has(> input.mq-live-correct) { border-color: #1B7A43 !important; background: #E3F4EA !important; }
+html body .mq-scell.mq-scell .mq-kit :is(.ab, .rg)[data-ws-seg] > input.mq-live-correct.mq-live-correct {
+    background: #E3F4EA !important; box-shadow: inset 0 0 0 3px #1B7A43 !important;
+}
+/* the place-value chart twin: each column's cell holds one digit box */
+.mq-scell .mq-kittwin .pv-chartfill td { padding: 2px !important; }
+.mq-scell .mq-kittwin .mq-cellbox.mq-cellbox--chart { width: max(48px, 1.1em); height: max(52px, 1.3em); margin: 0 auto; display: block; }
+@media (max-width: 480px) { .mq-scell .mq-kittwin .pv-chartfill td { width: auto !important; } }
+
+/* ---- R3-4b. A number line's tick is at least as wide as its label plus a gap, so labels never run
+   together ("10152025..."); a longer line scrolls inside the cell, as before. */
+html body .mq-scell .mq-nl-track {
+    grid-template-columns: repeat(var(--mq-nl-n, 11), minmax(max(var(--mq-nl-min), calc(var(--mq-nl-chars, 2) * 0.62em + 0.7em)), 1fr)) !important;
+    width: max(100%, calc(var(--mq-nl-n, 11) * max(var(--mq-nl-min), calc(var(--mq-nl-chars, 2) * 0.62em + 0.7em)))) !important;
+    max-width: max(100%, calc(var(--mq-nl-n, 11) * 64px)) !important;
+}
+/* the place-value mat's zones stay side by side (H T O is one row, never wrapped) */
+html body .problem-card .pvb-zones[data-role="zones"], html body .mq-scell .pvb-zones[data-role="zones"] { flex-wrap: nowrap !important; }

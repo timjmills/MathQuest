@@ -9,7 +9,7 @@ import { broadcastQuizJoin, broadcastQuizAnswer, broadcastQuizSubmit } from './q
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank,
 } from './screen-cell.js';
 
@@ -207,7 +207,9 @@ function updateQuizTimer() {
 // and optional: a quiz saved before this reads exactly as it did.
 const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlanksData', 'target', 'maxPlace',
     'maxDots', 'places', 'allowRegroup', 'quotientRemainder', 'acceptedAnswers', 'regroup', 'notation',
-    'operands', 'selfAnswering', 'printAnswer', 'a', 'b', 'op', 'ftCheck'];
+    'operands', 'selfAnswering', 'printAnswer', 'a', 'b', 'op', 'ftCheck',
+    // round 3: the kit cell travels with the item, so the quiz draws the paper's cell
+    'cell', 'skillId', 'categoryId'];
 export function quizQuestionData(q) {
     if (!q) return null;
     const d = {
@@ -318,7 +320,7 @@ function renderQuizInterface() {
 function renderQuizQuestion(qItem, flatIdx) {
     const q = qItem.question;
     const qd = q.questionData;
-    const label = qd.skillLabel || getSkillLabel(q.skillId);
+    const label = skillDisplayLabel(qd.categoryId, q.skillId) || qd.skillLabel || getSkillLabel(q.skillId);
     const answer = quizAnswers[flatIdx];
     const test = state.currentQuiz;
     const showInstantFeedback = test.settings.showFeedback === 'instant' && answer.studentAnswer !== '';
@@ -336,7 +338,7 @@ function renderQuizQuestion(qItem, flatIdx) {
     // sheet kit with the answer slot where the pupil writes on paper; any other item keeps its
     // visual inside the same cell. The header (number, skill, Flag) and the feedback are chrome.
     const kind = cellKindFor({ ...qd, options: [] });
-    const twin = kind ? null : screenTwin(qd);
+    const twin = kind ? null : screenTwin({ ...qd, skillId: qd.skillId || q.skillId }, { typedOrder: true });
     const numeric = qd.answerType === 'number' || typeof qd.ans === 'number' || (!!kind);
     const n = numeric ? answerDigits(qd) : Math.max(4, Math.min(16, String(qd.ans == null ? '' : qd.ans).length + 2));
     const shape = kind && (kind.kind === 'fact' || kind.kind === 'division') ? ' mq-slot--box' : '';
@@ -417,7 +419,7 @@ function _mountQuizCell(flatIdx) {
                 mountBuild(vis, qd, inp, (v) => { if (v) recordAnswer(flatIdx, v); });
             }
         }
-        if (vis && inp && adoptVisualBlank(vis, inp)) area.remove();
+        if (vis && inp && adoptVisualBlank(vis, inp)) { area.remove(); wireSignCircle(vis, inp); }
         else if (vis && inp && (qd.answerType === 'number' || !qd.answerType) && adoptSvgBlank(vis, inp)) area.remove();
         // several blanks in one drawing: an input in each, recorded in reading order
         else if (vis && inp && wireCellSlots(vis, inp, { onChange: (v) => { if (v.replace(/[,\s]/g, '')) recordAnswer(flatIdx, v); } })) {
@@ -465,7 +467,19 @@ function _mountQuizCell(flatIdx) {
         wireStackEntry(cellEl, { autofocus: !saved });
     }
     restoreWorking(cellEl, _quizWorking.get(String(flatIdx)));
+    // Green as soon as it is right (owner request 2026-09-25) - only when the quiz shows feedback
+    // as the pupil goes: a test without instant feedback keeps its answers secret.
+    const test = state.currentQuiz;
+    if (test && test.settings && test.settings.showFeedback === 'instant') {
+        const qd2 = state.quizAllQuestions[flatIdx].question.questionData;
+        const kind2 = cellKindFor({ ...qd2, options: [] });
+        const single = document.getElementById('qtAnswerInput');
+        try { wireLiveCorrect(cellEl, { q: qd2, kind: kind2, single }); } catch (e) { /* optional */ }
+    }
     monoCell(cellEl);
+    // a twin's rows wrap, never clip (round 3: the outer clocks were cut at the cell edge)
+    fitTwinRows(cellEl);
+    setTimeout(() => { if (cellEl.isConnected) fitTwinRows(cellEl); }, 150);
 }
 
 function restoreAnswer(flatIdx) {

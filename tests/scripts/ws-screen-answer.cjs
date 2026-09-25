@@ -209,6 +209,65 @@ async function run(page, sel, which) {
     return r;
 }
 
+const has = k => process.argv.includes('--' + k);
+
+// The live green mark (screen-cell.js wireLiveCorrect), typed with the keyboard as a pupil does.
+async function liveGreen(page) {
+    const fails = [];
+    const green = (sel) => page.evaluate((s) => { const el = document.querySelector(s); return el ? el.classList.contains('mq-live-correct') : null; }, sel);
+    const typeInto = async (sel, text) => {
+        await page.evaluate((s) => { const el = document.querySelector(s); if (el) { el.value = ''; el.focus(); } }, sel);
+        await page.keyboard.type(text, { delay: 15 });
+        await sleep(60);
+    };
+    const expect = (label, got, want) => { if (got !== want) fails.push(`live green: ${label}: ${got === null ? 'no such input' : got ? 'green' : 'not green'}, want ${want ? 'green' : 'not green'}`); };
+    await page.reload({ waitUntil: 'networkidle2' });
+    await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS, { timeout: 30000 });
+    // 1. a column addition that regroups: 47 + 38 = 85 (a ten is carried into the tens)
+    await page.evaluate(() => {
+        const st = window.state; st.quizMode = false; st.category = 'addition'; st.skill = 'add'; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false;
+        window.showView('gameView');
+        st.currentQ = { text: '47 + 38 = ?', ans: 85, answerType: 'number', options: [], hint: '', regroup: true,
+            visual: '<div>Column Addition</div><input class="column-answer-input">' };
+        window.renderQuestion();
+    });
+    await sleep(400);
+    const carry = '#questionPaper input.mq-carry[data-ws-slot="regroup-1"]';
+    const ones = '#questionPaper input.mq-digit[data-ws-slot="ans-0"]';
+    const tens = '#questionPaper input.mq-digit[data-ws-slot="ans-1"]';
+    await typeInto(carry, '2'); expect('regroup box, wrong digit 2', await green(carry), false);
+    await typeInto(carry, '1'); expect('regroup box, right digit 1', await green(carry), true);
+    await typeInto(ones, '5'); expect('ones digit 5', await green(ones), true);
+    await typeInto(tens, '7'); expect('tens digit 7 (wrong)', await green(tens), false);
+    // 2. a whole-number slot: 6 + 7 = [ ] turns green only at "13", never at "1"
+    await page.evaluate(() => {
+        const st = window.state; st.hasAnswered = false;
+        st.currentQ = { text: '6 + 7 = ?', ans: 13, answerType: 'number', options: [], hint: '', visual: '' };
+        window.renderQuestion();
+    });
+    await sleep(400);
+    await typeInto('#answerInput', '1'); expect('whole answer, prefix "1" of 13', await green('#answerInput'), false);
+    await page.keyboard.type('3', { delay: 15 }); await sleep(60);
+    expect('whole answer "13"', await green('#answerInput'), true);
+    await typeInto('#answerInput', '14'); expect('whole answer "14" (wrong)', await green('#answerInput'), false);
+    // 3. a quiz: secret without instant feedback, green with it
+    for (const fb of ['end', 'instant']) {
+        await page.evaluate((fb) => {
+            const q = { text: '6 + 7 = ?', ans: 13, answerType: 'number', options: [], hint: '', visual: '' };
+            const test = { id: null, name: 'Live', sections: [{ id: 0, label: 'A', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions: [{ id: 0, skillId: 'add', points: 1, questionData: window.quizQuestionData(q) }] }],
+                settings: { timeLimit: null, randomOrder: false, showFeedback: fb, allowRetry: false, passingScore: 70, sectionMode: 'sequential', shuffleWithinSections: false, printVersions: 1 } };
+            window.handleQuizURL(window.compressTestForURL(test));
+            const name = document.getElementById('qtStudentName'); name.value = 'A'; name.dispatchEvent(new Event('input'));
+            window.startQuizTest();
+        }, fb);
+        await sleep(500);
+        await typeInto('#qtAnswerInput', '13');
+        expect(`quiz with ${fb} feedback, "13"`, await green('#qtAnswerInput'), fb === 'instant');
+        await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) {} });
+    }
+    return fails;
+}
+
 const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 
 (async () => {
@@ -310,6 +369,14 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
             await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) {} });
         }
         console.log(`${s.padEnd(34)} ${line.join(' | ')}`);
+    }
+    // Green as soon as it is right (owner request 2026-09-25): a regroup box turns green on its
+    // digit, a whole-number slot only once the whole number is in (never on a correct prefix),
+    // nothing turns green for a wrong value, and a quiz without instant feedback stays secret.
+    if (!has('no-live')) {
+        const live = await liveGreen(page);
+        console.log(`${'live green (card, quiz)'.padEnd(34)} ${live.length ? 'FAIL' : 'ok'}`);
+        fails.push(...live);
     }
     if (app.problems.length) fails.push(...app.problems.slice(0, 8).map(p => `[${p.type}] ${p.text}`));
     await app.close();

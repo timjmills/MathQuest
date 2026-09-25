@@ -23,10 +23,12 @@
 //   4. Small shared pieces: the instruction line with the print->screen verb swap (P-LG,
 //      PEDAGOGY 10.2), the true operator glyphs (TY-6), and right-to-left digit entry (SP-20).
 //
-// Layer: 4 (imports only the pure sheet kit; the build twins load their widget on demand).
+// Layer: 4 (imports the pure sheet kit and data.js's skill table; the build twins load their
+// widget on demand).
 // No window writes; no state import.
 
-import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches } from './sheet/index.js';
+import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, renderCell, resolveCtx, getProvider } from './sheet/index.js';
+import { SKILLS } from './data.js';
 
 export const INK = '#000000';
 export const PAPER = '#ffffff';
@@ -106,6 +108,18 @@ export function cellKindFor(q) {
         // paper prints none), so the screen does not add one either.
         return { kind: 'stack', T, ...p, ...(q.regroup === false ? { regroup: false } : {}) };
     }
+    // Round 3 ("cards 1, 3, 6: the cell is empty except a short underline"): a generator that
+    // names its kit cell (q.cell) is drawn from it even when its legacy visual is not recognised.
+    const cellT = q.cell && q.cell.template;
+    const pay = (q.cell && q.cell.payload) || {};
+    if (cellT === 'stack' && p.op !== '/' && !(p.op === '*' && B.length > 1)) {
+        const T = Math.max(A.length, B.length) + 1;
+        if (ANS.length <= T) {
+            const noRegroup = q.regroup === false || pay.regroup === false || pay.regroup === 'none';
+            return { kind: 'stack', T, ...p, ...(noRegroup ? { regroup: false } : {}) };
+        }
+    }
+    if (cellT === 'fact' && pay.notation === 'vertical' && A.length <= 2 && B.length <= 2 && ANS.length <= 3) return { kind: 'fact', ...p };
     if (v.includes('facts-column-visual')) {
         if (A.length <= 2 && B.length <= 2 && ANS.length <= 3) return { kind: 'fact', ...p };
         return null;
@@ -183,7 +197,29 @@ export function screenTextLine(el) {
         if (!n.nodeValue || !n.nodeValue.trim()) continue;
         let v = screenGlyphs(n.nodeValue);
         if (first) { v = screenInstruction(v); first = false; }
+        else {
+            // Round 3 (H7, "Count the coins. Write the total." on the card): a later node can hold
+            // a second sentence's verb. It is swapped only after a sentence break INSIDE the node -
+            // the sentinel keeps a word at the node's start (a noun after a vocabulary link, "in
+            // the circle") from reading as a verb position.
+            const s = screenInstruction('\u0001 ' + v);
+            if (s.startsWith('\u0001 ')) v = s.slice(2);
+        }
         if (v !== n.nodeValue) n.nodeValue = v;
+    }
+    // A paper phrase split across a vocabulary link ("<Check> one box.") is swapped on the whole
+    // line; the line keeps its text, the link goes (a screen verb has no paper glossary entry).
+    const whole = el.textContent || '';
+    const swapped = screenInstruction(whole);
+    if (swapped !== whole && el.querySelector('.mq-vocab, a, span') && !el.querySelector('input, select, button, textarea, svg, img')) {
+        const sr = el.querySelector(':scope > .mq-sr');
+        if (!sr) el.textContent = swapped;
+        else {
+            const head = Array.from(el.childNodes).filter((c) => c !== sr);
+            const text = head.map((c) => c.textContent).join('');
+            const t2 = screenInstruction(text);
+            if (t2 !== text) { head.forEach((c) => c.remove()); el.insertBefore(document.createTextNode(t2), sr); }
+        }
     }
 }
 
@@ -410,6 +446,150 @@ export function wireStackEntry(root, { autofocus = false } = {}) {
     });
 }
 
+/* ------------------------------------------------------------------ green as soon as it is right
+ * Owner request (2026-09-25): "If a cell is correct it should immediately turn green - including
+ * regrouping cells and answer cells. If the cell is just one digit, then that digit; if the cell
+ * is the whole number, wait until the correct digits are all in." Each writing place learns the
+ * value it should hold; as the pupil types, a place whose value IS that value gets
+ * `mq-live-correct` (a feedback mark, SP-30 - the only colour allowed in the cell). A correct
+ * prefix of a whole number is never green; a wrong value is never red while typing (wrong is
+ * only shown by Check, which keeps today's marking). A regroup box that should stay empty stays
+ * neutral whatever is typed. The expected values live in a WeakMap, never in the page's markup.
+ */
+const LIVE_EXPECT = new WeakMap();
+const _liveNorm = (v) => String(v == null ? '' : v).replace(/[,\s]/g, '').replace(/[−–]/g, '-').replace(/[×xX*]/g, '×').toLowerCase();
+
+function _liveMark(el) {
+    const want = LIVE_EXPECT.get(el);
+    if (!want) return;
+    const v = _liveNorm(el.value);
+    el.classList.toggle('mq-live-correct', v !== '' && want.some((w) => _liveNorm(w) === v));
+}
+
+function _liveBind(el, expected) {
+    const list = (Array.isArray(expected) ? expected : [expected]).map((w) => String(w == null ? '' : w)).filter((w) => w !== '');
+    if (!el || !list.length) return false;
+    LIVE_EXPECT.set(el, list);
+    if (el.dataset.mqLive !== '1') {
+        el.dataset.mqLive = '1';
+        el.addEventListener('input', () => _liveMark(el));
+        el.addEventListener('change', () => _liveMark(el));
+    }
+    _liveMark(el);
+    return true;
+}
+
+/** Stop marking an input that outlives its cell (the practice card's #answerInput). */
+export function unwireLiveCorrect(el) {
+    if (!el) return;
+    LIVE_EXPECT.delete(el);
+    el.classList.remove('mq-live-correct');
+}
+
+/**
+ * The digit each box of a kit stack should hold: answer digits by column (0 = ones), and the
+ * regroup boxes that should hold something - a carry of an addition or a 1-digit multiplication,
+ * the new top digit of a subtraction's regrouped column ("12" over a 2, "9" over a 0 that was
+ * borrowed through). A regroup box whose column does not regroup is absent (it stays neutral).
+ */
+export function stackExpectations(k) {
+    const out = { ans: {}, regroup: {} };
+    if (!k) return out;
+    const ans = String(k.ans != null ? k.ans : '').replace(/[^0-9]/g, '');
+    [...ans].reverse().forEach((ch, c) => { out.ans[c] = ch; });
+    const operands = (Array.isArray(k.operands) && k.operands.length >= 2 ? k.operands : [k.a, k.b]).map((x) => String(x));
+    const digitAt = (s, c) => { const i = s.length - 1 - c; return i >= 0 ? Number(s[i]) : 0; };
+    const width = Math.max(...operands.map((s) => s.length));
+    if (k.op === '+') {
+        let carry = 0;
+        for (let c = 0; c < width; c++) {
+            const sum = operands.reduce((t, s) => t + digitAt(s, c), 0) + carry;
+            carry = Math.floor(sum / 10);
+            if (carry > 0) out.regroup[c + 1] = String(carry);
+        }
+    } else if (k.op === '*' && operands.length === 2) {
+        const [top, by] = String(operands[0]).length >= String(operands[1]).length ? operands : [operands[1], operands[0]];
+        if (by.length === 1) {
+            let carry = 0;
+            for (let c = 0; c < top.length; c++) {
+                const p = digitAt(top, c) * Number(by) + carry;
+                carry = Math.floor(p / 10);
+                if (carry > 0 && c + 1 < top.length) out.regroup[c + 1] = String(carry);
+            }
+        }
+    } else if (k.op === '-' && operands.length === 2) {
+        const [top, bot] = operands;
+        let borrow = 0;
+        for (let c = 0; c < top.length; c++) {
+            let cur = digitAt(top, c) - borrow;
+            borrow = 0;
+            if (cur < digitAt(bot, c)) { cur += 10; borrow = 1; }
+            if (cur !== digitAt(top, c)) out.regroup[c] = String(cur);
+        }
+    }
+    return out;
+}
+
+/** The value each of a multi-slot answer's boxes should hold (reading order), or null. */
+function _slotExpectations(q, count, join) {
+    if (!q || !count) return null;
+    const sets = q.inlineBlanksData && Array.isArray(q.inlineBlanksData.acceptedSets) ? q.inlineBlanksData.acceptedSets : null;
+    if (q.answerType === 'inline-blanks' && sets) {
+        return Array.from({ length: count }, (_, k) => sets.filter((s) => s.length === count).map((s) => String(s[k])));
+    }
+    if (q.ftCheck) return null;                                    // a rule table has no one answer per box
+    let parts;
+    if (Array.isArray(q.ans)) parts = q.ans.map(String);
+    else if (join === ':' || join === '.') parts = String(q.ans).split(join);
+    else if (join === ' h ') { const m = /(\d+)\s*h\s*(\d+)/.exec(String(q.ans)); parts = m ? [m[1], m[2]] : null; }
+    else if (join === '') { const d = String(q.ans == null ? '' : q.ans).replace(/[^0-9]/g, ''); parts = d.length === count ? d.split('') : null; }
+    else parts = String(q.ans == null ? '' : q.ans).split(/\s*,\s*|\s+R\s+/i);
+    if (!parts || parts.length !== count) return null;
+    return parts.map((p) => [p.trim()]);
+}
+
+/**
+ * Wire the live green mark in one cell. `kind` is the kit kind the host drew (a stack's digit
+ * and regroup boxes), `single` the host's own answer input when the cell answers in one place
+ * (green only once the WHOLE value is right). Returns the number of places wired.
+ */
+export function wireLiveCorrect(root, { q = null, kind = null, single = null } = {}) {
+    if (!root || !q) return 0;
+    let n = 0;
+    // 1. a kit stack: each answer digit, each regroup box that should hold something
+    const stk = root.querySelector('.ws-stack');
+    if (stk && kind && kind.kind === 'stack') {
+        const ex = stackExpectations(kind);
+        stk.querySelectorAll('input.mq-digit').forEach((inp) => {
+            const col = Number(String(inp.getAttribute('data-ws-slot') || '').replace('ans-', ''));
+            if (Number.isFinite(col) && ex.ans[col] !== undefined && _liveBind(inp, ex.ans[col])) n++;
+        });
+        stk.querySelectorAll('input.mq-carry').forEach((inp) => {
+            const col = Number(String(inp.getAttribute('data-ws-slot') || '').replace('regroup-', ''));
+            if (Number.isFinite(col) && ex.regroup[col] !== undefined && _liveBind(inp, ex.regroup[col])) n++;
+        });
+    }
+    // 2. several boxes in one drawing (a time, an amount, a strip, a sentence's boxes)
+    const cellslots = Array.from(root.querySelectorAll('input.mq-cellslot:not(.cloze-cell)'));
+    const ibs = cellslots.length ? [] : Array.from(root.querySelectorAll('input.ib-cell'));
+    const boxes = cellslots.length ? cellslots : ibs;
+    if (boxes.length) {
+        const joinEl = boxes[0].closest('[data-mq-join]');
+        const join = joinEl ? joinEl.getAttribute('data-mq-join') : ', ';
+        const exp = _slotExpectations(q, boxes.length, join);
+        if (exp) boxes.forEach((b, k) => { if (_liveBind(b, exp[k])) n++; });
+    }
+    // 3. the host's one answer place: the whole value, never a prefix
+    if (single && !single.classList.contains('mq-cellslot-host') && single.type !== 'hidden') {
+        const a = q.ans;
+        const whole = a != null && typeof a !== 'object' ? [String(a)] : [];
+        if (Array.isArray(q.acceptedAnswers)) q.acceptedAnswers.forEach((x) => { if (x != null && typeof x !== 'object') whole.push(String(x)); });
+        if (typeof a === 'number' && Number.isInteger(a)) whole.push(a.toLocaleString('en-US'));
+        if (whole.length && _liveBind(single, whole)) n++;
+    }
+    return n;
+}
+
 /* ------------------------------------------------------------------ check boxes -> tap (P-29) */
 
 const CHECK_SVG = '<svg class="mq-tickmark" viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 10.5l4.2 4.2L16.5 5.5" fill="none" stroke="#000" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -494,10 +674,18 @@ export function adoptVisualBlank(cellEl, input) {
     const blank = blanks[0];
     // A K-2 picture cell answers in a box on paper ("5 − 2 = [ ]", the sheet's equation
     // template), whatever the legacy drawing's blank was: the screen matches the page.
-    const box = blank.getAttribute('data-mq-blank') === 'box' || !!blank.closest('.k2-cell');
+    const circle = blank.getAttribute('data-mq-blank') === 'circle';
+    const box = !circle && (blank.getAttribute('data-mq-blank') === 'box' || !!blank.closest('.k2-cell'));
     input.classList.add('mq-slot', 'mq-slot--invisual');
     input.classList.toggle('mq-slot--box', box);
-    if (box) {
+    // a sign circle (the kit twin of "Write <, > or = in the circle.") keeps the paper's circle
+    input.classList.toggle('mq-slot--circle', circle);
+    if (circle) {
+        input.setAttribute('maxlength', '1');
+        input.setAttribute('inputmode', 'text');
+        input.setAttribute('aria-label', 'sign: <, = or >');
+    }
+    if (box && !blank.classList.contains('mq-kblank')) {
         // The box is positioned by the drawing (a bond's corner boxes are absolutely placed):
         // the input inherits the box's own placement and size, and draws its border.
         input.dataset.mqPrevStyle = input.getAttribute('style') || '';
@@ -625,6 +813,8 @@ export function wireNumberLines(root) {
         wrap.className = 'mq-nl';
         wrap.setAttribute('data-mq-nl', '');
         wrap.style.setProperty('--mq-nl-n', String(vals.length));
+        // a tick is never narrower than its label (round 3: "10152025..." ran together)
+        wrap.style.setProperty('--mq-nl-chars', String(Math.max(1, ...vals.map((v) => String(v).length))));
         wrap.innerHTML = `<div class="mq-nl-scroll" data-mq-scroll><div class="mq-nl-track" role="group" aria-label="${attr(svg.getAttribute('aria-label') || 'number line')}. Tap a number to jump to it.">`
             + '<svg class="mq-nl-arcs" aria-hidden="true" preserveAspectRatio="none"></svg><span class="mq-nl-line" aria-hidden="true"></span>'
             + vals.map((v, i) => `<button type="button" class="mq-nl-tick${i === startIdx ? ' mq-nl-start' : ''}" data-i="${i}" aria-label="${attr(v)}${i === startIdx ? ', start' : ''}">`
@@ -782,7 +972,8 @@ export function wireOpsWork(root) {
 /** Undo adoptVisualBlank on an input that outlives its cell (the practice card's #answerInput). */
 export function releaseVisualBlank(input) {
     if (!input || !input.classList.contains('mq-slot--invisual')) return;
-    input.classList.remove('mq-slot--invisual', 'mq-slot--svg', 'mq-bsize');
+    input.classList.remove('mq-slot--invisual', 'mq-slot--svg', 'mq-bsize', 'mq-slot--circle');
+    if (input.getAttribute('maxlength') === '1') input.removeAttribute('maxlength');
     if (input.dataset.mqPrevStyle !== undefined) {
         input.setAttribute('style', input.dataset.mqPrevStyle);
         delete input.dataset.mqPrevStyle;
@@ -1476,12 +1667,14 @@ export function cellDigitTarget(cellEl) {
  *   build    the body holds a build mat (mountBuild writes the mat's value into the input)
  * null: the item keeps the host's legacy path.
  */
-export function screenTwin(q) {
+export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
     if (!q) return null;
+    const kt = kitCellTwin(q, { categoryId, typedOrder });
+    if (kt) return kt;
     const t = q.answerType;
     if (t === 'inline-blanks' && /_{3,}/.test(String(q.text || ''))) {
         const widths = q.inlineBlanksData && q.inlineBlanksData.cellWidths;
-        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths) + (q.visual || ''), instr: 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
+        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths) + (q.visual || ''), instr: printInstructionFor(q, categoryId) || 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
     }
     if (t === 'inline-cloze' && /_{3,}/.test(String(q.text || ''))) {
         return { mode: 'slots', html: clozeHTML(q), instr: 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
@@ -1512,12 +1705,288 @@ export function screenTwin(q) {
                 : plainText(q.text);
         return { mode: 'kit', html: q.visual, instr, count: cells > 1 ? cells : 0 };
     }
+    // the place-value disk mat (round 3: the worksheet and quiz drew an empty cell for pv_disks_build)
+    if (t === 'pv-build') {
+        const target = _n(q.target != null ? q.target : q.ans);
+        if (target == null) return null;
+        return { mode: 'build', html: `<div class="mq-buildhost" data-mq-build="pv-build"></div>`, instr: printInstructionFor(q, categoryId) || plainText(q.text) };
+    }
     if (t === 'base10-build' || t === 'ten-frame-build') {
         const target = _n(q.target != null ? q.target : q.ans);
         if (target == null) return null;
         return { mode: 'build', html: `<div class="mq-buildhost" data-mq-build="${t}"></div>`, instr: plainText(q.text) };
     }
     return null;
+}
+
+/* ------------------------------------------------------------------ a twin never clips (round 3)
+ * The kit twins draw in paper millimetres (`calc(var(--mq-k2) * n)`) and lay their rows out as
+ * centred, non-wrapping flex rows. In a cell narrower than the paper cell (a phone, a quiz
+ * column, three digital clocks at 1280) such a row ran off BOTH edges: "9:45" lost its first
+ * digit, only the middle clock showed, "Start" read "rt". The cell clips (overflow hidden), so
+ * the pupil lost information (H2).
+ *
+ * `fitTwinRows(root)` measures every flex row of a twin against the cell: a row whose items do
+ * not fit wraps (its items keep their size and order, the row gains a row gap), and when a single
+ * item is still wider than the cell the whole drawing's millimetre is reduced until it fits, never
+ * below a floor that keeps numerals legible. Idempotent; run after mount and after a re-render.
+ */
+const K2_FLOOR_PX = 2.4;
+
+function _rowOverflows(el, box) {
+    const r = el.getBoundingClientRect();
+    if (r.width <= 0) return false;
+    const left = Math.max(r.left, box.left), right = Math.min(r.right, box.right);
+    for (const c of el.children) {
+        const cr = c.getBoundingClientRect();
+        if (cr.width <= 0) continue;
+        if (cr.left < left - 1 || cr.right > right + 1) return true;
+    }
+    return false;
+}
+
+export function fitTwinRows(root) {
+    if (!root || typeof getComputedStyle === 'undefined') return false;
+    const twins = root.matches && root.matches('.k2-twin') ? [root] : Array.from(root.querySelectorAll('.k2-twin'));
+    let changed = false;
+    // Long division (round 3, 390 px: "the fourth digit column is clipped"): the divisor's tracks
+    // hold printed digits, not inputs, so in a narrow cell they close up to the digit's own width;
+    // the dividend's tracks keep their >= 44 px targets.
+    root.querySelectorAll('.ws-ops-division [role="group"]').forEach((g) => {
+        if (g.dataset.mqNarrow === '1') return;
+        const cell = g.closest('.mq-scell, .ws-cell, #visualAid') || g.parentElement;
+        if (!cell || g.getBoundingClientRect().width <= cell.getBoundingClientRect().width - 4) return;
+        const cols = g.style.gridTemplateColumns || '';
+        const m = /^repeat\((\d+),\s*([\d.]+)em\)\s+([\d.]+em)\s+(.*)$/.exec(cols);
+        if (!m) return;
+        g.style.gridTemplateColumns = `repeat(${m[1]}, 0.6em) ${m[3]} ${m[4]}`;
+        g.dataset.mqNarrow = '1';
+        changed = true;
+    });
+    twins.forEach((twin) => {
+        const cell = twin.closest('.mq-scell, .ws-cell, #visualAid') || twin.parentElement;
+        if (!cell) return;
+        const box = cell.getBoundingClientRect();
+        if (box.width <= 0) return;
+        // A clock face is read, so it keeps a reading size (about 120 px) - the row wraps instead
+        // of shrinking three faces to 100 px each on a phone.
+        if (twin.getAttribute('data-mq-template') === 'clock' && twin.dataset.mqClockMin !== '1') {
+            twin.dataset.mqClockMin = '1';
+            const faces = Array.from(twin.querySelectorAll('svg.k2-svg')).map((s) => s.getBoundingClientRect().width).filter((w) => w > 0);
+            const face = faces.length ? Math.min(...faces) : 0;
+            if (face > 0 && face < 120 && box.width >= 150) {
+                const cur = parseFloat(getComputedStyle(twin).getPropertyValue('--mq-k2')) || 3.4;
+                twin.style.setProperty('--mq-k2', `${(cur * Math.min(1.6, 124 / face)).toFixed(2)}px`);
+                changed = true;
+            }
+        }
+        const rows = Array.from(twin.querySelectorAll('div, span')).filter((el) => {
+            const cs = getComputedStyle(el);
+            return (cs.display === 'flex' || cs.display === 'inline-flex') && !/column/.test(cs.flexDirection) && el.children.length > 1;
+        });
+        rows.forEach((row) => {
+            if (row.dataset.mqWrapped === '1' || !_rowOverflows(row, box)) return;
+            row.style.setProperty('flex-wrap', 'wrap', 'important');
+            row.style.setProperty('white-space', 'normal', 'important');
+            row.style.setProperty('justify-content', 'center', 'important');
+            if (!row.style.rowGap) row.style.rowGap = 'calc(var(--mq-k2, 3.4px) * 3)';
+            row.style.maxWidth = '100%';
+            row.dataset.mqWrapped = '1';
+            changed = true;
+        });
+        // one item still wider than the cell: the drawing's millimetre shrinks to fit
+        const tw = twin.scrollWidth;
+        const avail = Math.min(box.width, twin.parentElement ? twin.parentElement.clientWidth || box.width : box.width) - 8;
+        const over = Array.from(twin.querySelectorAll('*')).reduce((m, el) => {
+            const r = el.getBoundingClientRect();
+            return Math.max(m, r.right - box.right, box.left - r.left);
+        }, 0);
+        if (over > 1 || tw > avail + 1) {
+            const cur = parseFloat(getComputedStyle(twin).getPropertyValue('--mq-k2')) || 3.4;
+            const need = Math.max(tw, avail + 2 * over);
+            const k = Math.max(K2_FLOOR_PX, cur * (avail / need));
+            if (k < cur - 0.01) { twin.style.setProperty('--mq-k2', `${k.toFixed(2)}px`); changed = true; }
+        }
+    });
+    return changed;
+}
+
+/* ------------------------------------------------------------------ the kit cell's screen twin
+ * Round-3 grades (worksheet / quiz / card, H2 / C3): a generator that emits `q.cell` (the P9
+ * place-value family: estimation, rounding, value, compare, combine, more / less) often has NO
+ * legacy visual - the paper cell is drawn by the kit alone. The grid hosts then drew an empty box
+ * with a lone underline and the problem only in the small instruction line.
+ *
+ * The screen draws the SAME kit cell as paper (SP-1): `renderCell` in its blank state, with the
+ * paper's point sizes rewritten against the host's digit token (so the digits reach 56 / 48 / 40
+ * px on the card and 29 px on the worksheet), and the paper's writing places turned into the
+ * host's slots at the paper position: one answer slot becomes a `data-mq-blank` (adoptVisualBlank
+ * moves the host's own input there - after "=", after the arrow, in the circle), several become
+ * `data-mq-cell` boxes (wireCellSlots joins them in reading order). The instruction line is the
+ * skill's own print instruction with its verb swapped (P-LG, PEDAGOGY 10.2).
+ */
+const PV_TWIN_KINDS = new Set(['frame', 'value', 'compare', 'round', 'expand-line', 'place-bank', 'disks', 'estimate', 'blanks', 'chart']);
+const PV_TWIN_TYPES = new Set(['number', 'text', 'symbol', 'inline-blanks', 'pv-digit-drag', '', undefined]);
+
+function _categoriesOf(skillId, given) {
+    if (given) return [given];
+    return Object.entries(SKILLS || {})
+        .filter(([, list]) => Array.isArray(list) && list.some((s) => s && s.v === skillId))
+        .map(([cat]) => cat);
+}
+
+/** The skill's print instruction (its provider's controlled string), or ''. */
+export function printInstructionFor(q, categoryId = '') {
+    const skillId = (q && (q.skillId || q.skill)) || '';
+    if (!skillId) return '';
+    for (const cat of _categoriesOf(skillId, categoryId || q.categoryId || q.category || '')) {
+        try {
+            const p = getProvider(cat, skillId);
+            if (!p || !p.real || !p.real.includes('strings')) continue;
+            const s = typeof p.strings === 'function' ? p.strings({ categoryId: cat, skillId, q }) : p.strings;
+            if (s && typeof s.instruction === 'string' && s.instruction) return s.instruction;
+        } catch (e) { /* next category */ }
+    }
+    return '';
+}
+
+/**
+ * The skill's name for the chrome pill (round 3: "Compare Frac" on a whole-number compare, "Find
+ * the Sta", "Est Product"): the skill's own label in its category, a trailing "(…)" note dropped.
+ * '' when the category does not hold the skill (a mixed session), so the caller keeps its own.
+ */
+export function skillDisplayLabel(categoryId, skillId) {
+    if (!categoryId || !skillId) return '';
+    const list = SKILLS && SKILLS[categoryId];
+    const hit = Array.isArray(list) ? list.find((s) => s && s.v === skillId) : null;
+    if (!hit || !hit.l) return '';
+    const l = String(hit.l).replace(/\s*\([^)]*\)\s*$/, '').trim();
+    return l || String(hit.l);
+}
+
+/** Paper point sizes -> the host's digit token (a digit is 1 × --mq-digit on every host). */
+function _screenSizes(html, digitPt) {
+    return String(html).replace(/font-size:\s*([\d.]+)pt/g, (m, v) => {
+        const r = Number(v) / digitPt;
+        return Number.isFinite(r) && r > 0 ? `font-size:calc(var(--mq-digit) * ${r.toFixed(3)})` : m;
+    });
+}
+
+/**
+ * The screen twin of a kit-drawn cell, or null when the item has no kit cell this can draw.
+ * @returns {{mode: 'blank'|'slots', html: string, instr: string, count: number, kit: string}|null}
+ */
+export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
+    const c = q && q.cell;
+    if (!c || c.template !== 'pv' || !c.payload || typeof c.payload !== 'object') return null;
+    if (typeof document === 'undefined') return null;
+    const p = c.payload;
+    // An order item is typed into the paper's boxes where the host has no ordering widget (the
+    // quiz drew an empty cell); the card and the worksheet keep their tap-to-order widget.
+    const order = p.kind === 'order' && typedOrder;
+    if (!order && (!PV_TWIN_KINDS.has(p.kind) || !PV_TWIN_TYPES.has(q.answerType))) return null;
+    if (p.kind === 'round' && p.mark) return null;                            // a drawn mark: the line widget's
+    if (p.kind === 'disks' && p.task !== 'count' && q.answerType !== 'number') return null;
+    let html = '';
+    let digitPt = 28;
+    try {
+        const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
+        digitPt = (ctx.metrics && ctx.metrics.digitPt) || 28;
+        html = renderCell(Object.assign({}, q, { cell: { template: 'pv', payload: p, v: 1 } }), ctx);
+    } catch (e) { return null; }
+    if (!html || /data-ws-refused/.test(html)) return null;
+    const tpl = document.createElement('template');
+    tpl.innerHTML = _screenSizes(html, digitPt);
+    const slots = Array.from(tpl.content.querySelectorAll('[data-ws-slot]'))
+        .filter((s) => s.getAttribute('data-ws-graded') !== '0');
+    const chart = p.kind === 'chart';
+    if (!slots.length || slots.some((s) => !(chart ? /^cell$/ : /^(line|box|circle)$/).test(s.getAttribute('data-ws-shape') || ''))) return null;
+    const inline = q.answerType === 'inline-blanks';
+    const sets = q.inlineBlanksData && Array.isArray(q.inlineBlanksData.acceptedSets) ? q.inlineBlanksData.acceptedSets : null;
+    let mode;
+    if (slots.length === 1 && !inline) {
+        const s = slots[0];
+        const shape = s.getAttribute('data-ws-shape');
+        const b = document.createElement('span');
+        b.className = `mq-kblank mq-kblank--${shape}`;
+        b.setAttribute('data-mq-blank', shape === 'line' ? 'line' : shape === 'circle' ? 'circle' : 'box');
+        s.replaceWith(b);
+        mode = 'blank';
+    } else if (order) {
+        const row = tpl.content.querySelector('.pv-order');
+        if (!row) return null;
+        row.setAttribute('data-mq-join', ',');
+        slots.forEach((s, k) => {
+            const t = document.createElement('template');
+            t.innerHTML = cellSlot(Math.max(2, String((p.sorted || [])[k] || '').length), `number ${k + 1} of ${slots.length}`);
+            s.replaceWith(t.content.firstChild);
+        });
+        mode = 'slots';
+    } else if (chart) {
+        // the place-value chart: one digit per column, written in the chart (the paper's cells);
+        // the digits join into the number, left to right (data-mq-join="")
+        const table = tpl.content.querySelector('table');
+        if (!table) return null;
+        table.setAttribute('data-mq-join', '');
+        slots.forEach((s, k) => {
+            const t = document.createElement('template');
+            t.innerHTML = cellSlot(1, `digit ${k + 1} of ${slots.length}`);
+            const box = t.content.firstChild;
+            box.classList.add('mq-cellbox--chart');
+            s.replaceWith(box);
+        });
+        mode = 'slots';
+    } else if (inline && sets && sets[0] && sets[0].length === slots.length) {
+        slots.forEach((s, k) => {
+            const w = Math.max(2, Math.min(8, String(sets[0][k]).replace(/[^0-9]/g, '').length));
+            const t = document.createElement('template');
+            t.innerHTML = cellSlot(w, `answer ${k + 1} of ${slots.length}`);
+            const box = t.content.firstChild;
+            if (s.getAttribute('data-ws-shape') === 'line') box.classList.add('mq-cellbox--line');
+            s.replaceWith(box);
+        });
+        mode = 'slots';
+    } else {
+        return null;
+    }
+    const wrap = document.createElement('div');
+    wrap.appendChild(tpl.content);
+    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="pv" data-mq-kind="${attr(p.kind)}">${wrap.innerHTML}</div>`;
+    const instr = printInstructionFor(q, categoryId) || plainText(q.text);
+    // a chart's digits make ONE number: the host checks the number, not a list of parts
+    return { mode, html: body, instr, count: mode === 'slots' && !chart && !order ? slots.length : 0, kit: 'pv' };
+}
+
+/**
+ * A sign circle is tapped, not typed on a phone keyboard (SP-3 / H3): three sign tiles under the
+ * drawing write the sign into the circle's input (it can still be typed). The tiles are the
+ * paper's bank of signs, drawn in ink; the host's own checker grades the input.
+ */
+export function wireSignCircle(root, input, { onChange = null } = {}) {
+    if (!root || !input || !input.classList.contains('mq-slot--circle')) return false;
+    if (root.querySelector('.mq-signbank')) return true;
+    const bank = document.createElement('div');
+    bank.className = 'mq-signbank';
+    bank.setAttribute('role', 'group');
+    bank.setAttribute('aria-label', 'signs');
+    ['<', '=', '>'].forEach((sg) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'mq-signtile';
+        b.textContent = sg;
+        b.setAttribute('aria-label', sg === '<' ? 'less than' : sg === '>' ? 'greater than' : 'equals');
+        b.addEventListener('click', () => {
+            if (input.disabled || input.readOnly) return;
+            input.value = sg;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+            if (onChange) onChange(sg);
+        });
+        bank.appendChild(b);
+    });
+    const kit = input.closest('.mq-kittwin') || root;
+    kit.appendChild(bank);
+    return true;
 }
 
 /**
@@ -1541,7 +2010,12 @@ export function mountBuild(root, q, input, onValue) {
         input.dispatchEvent(new Event('input', { bubbles: true }));
         if (onValue) onValue(val);
     };
-    if (type === 'ten-frame-build') {
+    if (type === 'pv-build') {
+        host.dataset.pvbNoSubmit = '1';
+        host._pvOnChange = (v) => write(v);
+        import('./widgets/pv-disks-build.js').then((mod) => mod.renderPvDisksBuild(qq, host))
+            .catch((e) => console.error('pv-build twin:', e));
+    } else if (type === 'ten-frame-build') {
         host.dataset.tfbNoSubmit = '1';
         host._tfbOnChange = (n) => write(n);
         import('./widgets/ten-frame-build.js').then((mod) => mod.renderTenFrameBuild(qq, host))
