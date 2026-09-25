@@ -78,7 +78,12 @@
     "paid": "1J",
     "gap": "1L",
     "numerals": "1N",
-    "quarters": "1O"
+    "quarters": "1O",
+    "poolSize": "6A",
+    "poolSupport": "6B",
+    "ftRules": "6C",
+    "ftTable": "6D",
+    "ftTask": "6E"
   },
   "blocks": {
     "0": {
@@ -112,9 +117,9 @@
       "keys": "5A-5M"
     },
     "6": {
-      "owner": "",
-      "status": "spare",
-      "keys": ""
+      "owner": "option-panel round 3 (pools, function tables)",
+      "status": "assigned",
+      "keys": "6A-6E"
     },
     "7": {
       "owner": "",
@@ -293,7 +298,9 @@
       "largest": "L",
       "scrambled": "S",
       "inorder": "Q",
-      "mixed": "Z"
+      "mixed": "Z",
+      "largest-dots": "D",
+      "scrambled-dots": "T"
     },
     "place": {},
     "midpoint": {
@@ -322,7 +329,9 @@
       "ring": "G",
       "pupil": "U",
       "auto": "Q",
-      "dots": "O"
+      "dots": "O",
+      "frame-bare": "S",
+      "line-bare": "X"
     },
     "tiles": {},
     "objects": {
@@ -531,7 +540,9 @@
       "notes": "N",
       "notes-coins": "C",
       "notes100": "H",
-      "notes500": "F"
+      "notes500": "F",
+      "note": "O",
+      "both": "B"
     },
     "values": {
       "1": "1",
@@ -555,6 +566,34 @@
     "quarters": {
       "past": "P",
       "to": "T"
+    },
+    "poolSize": {
+      "easier": "E",
+      "set": "S",
+      "harder": "H"
+    },
+    "poolSupport": {},
+    "ftRules": {
+      "+": "A",
+      "-": "S",
+      "x": "M",
+      "/": "D",
+      "x+": "P",
+      "x-": "N",
+      "/+": "Q",
+      "/-": "R"
+    },
+    "ftTable": {},
+    "ftTask": {
+      "outputs": "G",
+      "outputs-check": "H",
+      "rule": "Y",
+      "rule-check": "Z",
+      "inputs": "V",
+      "inputs-check": "W",
+      "mixed": "M",
+      "mixed-check": "N",
+      "make": "K"
     }
   },
   "scalarOnly": {
@@ -577,6 +616,8 @@
     "midLabel": "bool",
     "missing": "decimal",
     "rule": "bool",
-    "hours": "decimal"
+    "hours": "decimal",
+    "ftTable": "decimal",
+    "poolSupport": "decimal"
   }
 }

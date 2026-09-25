@@ -82,7 +82,8 @@ function _liveDef(def) {
     if (!def || !Array.isArray(def.values)) return def;
     if (def.id !== 'range' && def.id !== 'decimals') return def;
     const DP = { 0: 'whole numbers', 1: 'tenths', 2: 'hundredths', 3: 'thousandths' };
-    const now = def.id === 'range'
+    // A def may name its own null value (a decimals skill deals decimals whatever the setting says).
+    const now = def.nullLabel ? String(def.nullLabel) : def.id === 'range'
         ? `Use the Max Number setting (now ${Number(state.range).toLocaleString('en-US')})`
         : `Use the Decimals setting (now ${DP[state.decimalPlaces] || state.decimalPlaces + ' places'})`;
     return { ...def, values: def.values.map(x => (x.v === null ? { ...x, l: now } : x)) };
@@ -192,11 +193,77 @@ export function optionControlHTML(def, cur, color, h) {
     ).join('');
     // The label sits ABOVE a full-width drop-down, so a long value ("Place-value chart (place names
     // over the digits)") never pushes the label off a 420 px panel or is cut off itself.
+    // A chosen value too long for the drop-down (a phone-width panel cuts it with "…") is written
+    // out in full on a line under it (OPTIONS-CRITIC-R2 §5 #21). The line starts hidden and
+    // revealOverflowingChoices() shows it only when the value really is cut, measured on screen.
+    const chosen = (def.values || []).find(x => x.v === v);
+    const full = chosen ? `<span class="sko-chosen" data-sko-chosen hidden style="font-size:0.76rem;line-height:1.35;color:var(--text);overflow-wrap:anywhere;">${escHTML(chosen.l)}</span>` : '';
     return `<label${tip} style="display:flex;flex-direction:column;align-items:stretch;gap:4px;font-size:0.82rem;color:var(--text);min-width:0;">
         <span style="font-weight:600;overflow-wrap:anywhere;">${escHTML(def.label)}</span>
         <select style="width:100%;max-width:100%;min-width:0;box-sizing:border-box;padding:6px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text);font-size:0.82rem;text-overflow:ellipsis;"
-            onchange="${h.set(id, 'this.value')}">${opts}</select>
+            onchange="${h.set(id, 'this.value')}">${opts}</select>${full}
     </label>${extra}`;
+}
+
+let _measureCtx = null;
+/**
+ * Show the full-label line under every drop-down whose chosen value does not fit in it. The width
+ * a <select> leaves for its text is its content box less the arrow; the text is measured in the
+ * select's own font. Safe to call on any subtree, any number of times.
+ */
+export function revealOverflowingChoices(root) {
+    if (!root || typeof document === 'undefined' || !root.querySelectorAll) return;
+    try {
+        if (!_measureCtx) _measureCtx = document.createElement('canvas').getContext('2d');
+    } catch (e) { _measureCtx = null; }
+    for (const sel of root.querySelectorAll('select')) {
+        const line = sel.parentElement && sel.parentElement.querySelector(':scope > [data-sko-chosen]');
+        if (!line) continue;
+        const opt = sel.options[sel.selectedIndex];
+        if (!opt || !sel.clientWidth) { line.hidden = true; continue; }
+        const cs = getComputedStyle(sel);
+        let w = opt.text.length * parseFloat(cs.fontSize) * 0.55;   // a fallback when there is no canvas
+        if (_measureCtx) {
+            _measureCtx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+            w = _measureCtx.measureText(opt.text).width;
+        }
+        const room = sel.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - 22;
+        line.hidden = !(w > room);
+    }
+}
+/** Reveal the full-label lines on every open panel once the browser has laid it out. */
+function _revealSoon() {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    const run = () => { for (const el of document.querySelectorAll('.sko-panel, #skillOptionsPopover')) revealOverflowingChoices(el); };
+    if (typeof window.requestAnimationFrame === 'function') window.requestAnimationFrame(run); else setTimeout(run, 0);
+}
+
+/**
+ * The live sample, tidied for a popover: a legacy printed item (a stacked sum, an expanded-form
+ * row) takes the PRINT stylesheet's rules (`.print-edition`), so its column rule sits under the
+ * numbers instead of the item header's rule sitting over them, and the header (the item number
+ * only) and the printed item's own box edge are dropped; then the drawing is scaled down to the frame so it never overflows it
+ * (OPTIONS-CRITIC-R2 §5 #23).
+ */
+function _tidySample(frame) {
+    if (!frame) return;
+    for (const p of frame.querySelectorAll('.tvp-printed')) {
+        p.classList.add('print-edition');
+        // The printed item's own box edge is the page's; the sample frame is the box here.
+        for (const w of p.querySelectorAll('.worksheet-problem')) { w.style.border = 'none'; w.style.boxShadow = 'none'; }
+        for (const h of p.querySelectorAll('.p-head, .problem-header')) {
+            if (!String(h.textContent || '').replace(/\s+/g, '').replace(/^\d+\.$/, '')) h.style.display = 'none';
+        }
+    }
+    const stage = frame.querySelector(':scope > .tvp-stage');
+    if (!stage) return;
+    stage.style.transform = 'translate(-50%, -50%)';
+    const w = Math.max(stage.scrollWidth, stage.offsetWidth, 1);
+    const h = Math.max(stage.scrollHeight, stage.offsetHeight, 1);
+    const fw = frame.clientWidth - 12, fh = frame.clientHeight - 12;
+    if (fw <= 0 || fh <= 0) return;
+    const k = Math.min(1, fw / w, fh / h);
+    stage.style.transform = `translate(-50%, -50%) scale(${k.toFixed(4)})`;
 }
 
 /** Apply one control change to a full option object. Shared by every host and the print dialog. */
@@ -312,6 +379,7 @@ export function skoToggle(hostId, idx) {
     const key = `${hostId}|${e.categoryId}:${e.skillId}`;
     _open = _open === key ? null : key;
     host.rerender();
+    _revealSoon();
 }
 
 export function skoEdit(hostId, idx, action, optId, raw) {
@@ -322,6 +390,7 @@ export function skoEdit(hostId, idx, action, optId, raw) {
     const next = applyOptionEdit({ ...normalizeOptions(e.categoryId, e.skillId, _read(host, idx, e)) }, defs, action, optId, raw);
     _write(host, idx, e, next);
     host.rerender();
+    _revealSoon();
 }
 
 export function skoReset(hostId, idx) {
@@ -405,7 +474,7 @@ function _renderTeacherPopover(el) {
             <div><h2 class="tv-sko-title" id="tvSkoTitle">${escHTML(name)}</h2><p class="tv-sko-sum">${escHTML(summary)}</p></div>
             <button type="button" class="tv-icon-btn" onclick="closeSkillOptionsPanel()" aria-label="Close options"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg></button>
         </div>
-        <div class="tv-sko-body">
+        <div class="tv-sko-body" style="overflow-x:hidden;">
             ${defs.length ? rows : '<p class="tv-sko-none">This skill has no options.</p>'}
             ${canSample ? `<div class="tv-sko-sample"><span class="tv-label" id="tvSkoSampleL">Sample question</span><div class="tvp-frame tv-sko-frame" aria-labelledby="tvSkoSampleL"></div></div>` : ''}
         </div>
@@ -420,9 +489,16 @@ function _renderTeacherPopover(el) {
         if (again) { try { again.focus({ preventScroll: true }); } catch (e) { /* */ } }
     }
     if (canSample) {
-        try { window.tvMountSample(el.querySelector('.tv-sko-frame'), categoryId, skillId, _pop.opts); } catch (e) { /* a sample never breaks the editor */ }
+        const frame = el.querySelector('.tv-sko-frame');
+        try {
+            window.tvMountSample(frame, categoryId, skillId, _pop.opts);
+            _tidySample(frame);
+            // The preview re-fits itself once its styles settle; tidy again after it.
+            setTimeout(() => { if (frame.isConnected) _tidySample(frame); }, 950);
+        } catch (e) { /* a sample never breaks the editor */ }
     }
     _placeTeacherPopover(el);
+    revealOverflowingChoices(el);
 }
 
 function _placeTeacherPopover(el) {
@@ -516,6 +592,7 @@ function _renderPopover() {
             <button type="button" onclick="closeSkillOptionsPanel()"
                 style="min-height:44px;padding:0 18px;font-size:0.85rem;border:none;background:${color};color:#fff;border-radius:8px;cursor:pointer;font-weight:700;">Done</button>
         </div>`;
+    revealOverflowingChoices(el);
 }
 
 function _popOutside(e) {

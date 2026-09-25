@@ -19,8 +19,9 @@ import { registerVariantOverride } from './variant-cycler.js';
 // Side effect: registers the measured per-skill options (Max Number, decimals, level) with
 // skill-options.js before anything asks optionsFor() — see tests/scripts/ws-options-derive.cjs.
 import './skill-options-derived.js';
-// Side effect: registers the "Which skills" control of every mixed review (P12).
-import './skill-options-pools.js';
+// Side effect: registers the "Which skills" control of every mixed review (P12), and the review's
+// own pitch / support (option-panel round 3), which poolMemberOptions() hands to each member.
+import { poolMemberOptions } from './skill-options-pools.js';
 
 // P12: "What the items ask" (`forms` with a `variantKey`, skill-options.js formsOption). When the
 // teacher has ticked some of a skill's item forms, pickVariant() for that key deals only those,
@@ -57,6 +58,29 @@ function narrowPool(pool) {
     if (def && def.values.every(x => m.includes(x.v))) return pool;
     const out = pool.filter(s => m.includes(s));
     return out.length ? out : pool;
+}
+
+// Option-panel round 3: a review's "Numbers, for the whole review" / "Support, for the whole
+// review" (skill-options-pools.js). When either is set, the member is dealt as a skill of its own,
+// with its own options moved one step (or its support level set), exactly as generateQuestionFor
+// would deal it; null (the controls at their defaults, or nothing to move on this member) leaves
+// the member to the ordinary pool path, so an untouched review is unchanged.
+function tunedPoolMember(memberCat, member) {
+    const tuned = poolMemberOptions(state.skillOptions, memberCat, member, lookupSetOptions(memberCat, member));
+    if (!tuned) return null;
+    const saved = { category: state.category, skill: state.skill, skillOptions: state.skillOptions };
+    state.category = memberCat;
+    state.skill = member;
+    state.skillOptions = tuned;
+    try {
+        const q = generateQuestion();
+        if (q) { q.poolMember = member; q.skillId = q.skillId || member; }
+        return q || null;
+    } finally {
+        state.category = saved.category;
+        state.skill = saved.skill;
+        state.skillOptions = saved.skillOptions;
+    }
 }
 
 // Plain (no-picture) word problem variants - map to base skill for generation
@@ -448,6 +472,20 @@ function generateResolvedQuestion() {
     if (MIXED_WORD_SKILLS[state.skill]) {
         state.skill = pick(narrowPool(MIXED_WORD_SKILLS[state.skill]));
         wordMember = state.skill;
+        // A word pool's pitch / support: the story kind dealt on its own category's options.
+        // The plain pool deals the member's plain twin, so its pictures come off exactly as they
+        // do on that skill's own page.
+        if (state.skillOptions && (state.skillOptions.poolSize || state.skillOptions.poolSupport != null)) {
+            const memberCat = getCategoryForSkill(wordMember);
+            const plainTwin = isPlainWord && PLAIN_WORD_SKILLS[wordMember + '_plain'] ? wordMember + '_plain' : wordMember;
+            const tq = memberCat ? tunedPoolMember(memberCat, plainTwin) : null;
+            if (tq) {
+                state.skill = isPlainWord ? originalPlainSkill : mixedWordSkill;
+                tq.skillId = state.skill;          // as the untuned word pool labels its items
+                if (typeof _restoreAdaptive === 'function') _restoreAdaptive();
+                return tq;
+            }
+        }
     }
 
     // Map new categories to legacy category handling
@@ -588,6 +626,13 @@ function generateResolvedQuestion() {
         }
         poolMember = actualSkill;
         console.log(`Mixed skill ${state.skill} resolved to: ${actualSkill}`);
+        {
+            const tq = tunedPoolMember(mixedConfig.category, actualSkill);
+            if (tq) {
+                if (typeof _restoreAdaptive === 'function') _restoreAdaptive();
+                return tq;
+            }
+        }
 
         // Re-apply plain/mixed-word resolution since the resolved skill may be
         // a _plain variant or a _word_mixed meta-skill that needs further resolution
@@ -869,7 +914,8 @@ function generateResolvedQuestion() {
             // The picked skill takes ITS OWN options from the set (lookupSetOptions), not the
             // pool's: options normalised for all_mixed / custom_mixed say nothing about it.
             const poolOptions = state.skillOptions;
-            state.skillOptions = undefined;
+            // ... unless the review's own pitch / support moves them (option-panel round 3).
+            state.skillOptions = poolMemberOptions(poolOptions, targetCategory, targetSkill, lookupSetOptions(targetCategory, targetSkill)) || undefined;
             let recursiveQ;
             try { recursiveQ = generateQuestion(); } finally { state.skillOptions = poolOptions; }
             Object.assign(q, recursiveQ);

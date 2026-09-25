@@ -80,7 +80,7 @@ export const KEY_BLOCKS = Object.freeze({
     3: Object.freeze({ owner: 'function tables', status: 'assigned', keys: '3A-3A' }),
     4: Object.freeze({ owner: 'supports', status: 'assigned', keys: '4A-4D' }),
     5: Object.freeze({ owner: 'P12 every other family', status: 'assigned', keys: '5A-5M' }),
-    6: Object.freeze({ owner: '', status: 'spare', keys: '' }),
+    6: Object.freeze({ owner: 'option-panel round 3 (pools, function tables)', status: 'assigned', keys: '6A-6E' }),
     7: Object.freeze({ owner: '', status: 'spare', keys: '' }),
     8: Object.freeze({ owner: '', status: 'spare', keys: '' }),
     9: Object.freeze({ owner: '', status: 'spare', keys: '' }),
@@ -164,6 +164,14 @@ export const MULTI_KEYS = Object.freeze({
     units: '5L',         // measurement: which units
     parts: '5M',         // equal parts, or the parts a figure is split into
     // NEXT FREE IN BLOCK 5: 5N.
+
+    // Block 6 — option-panel round 3 (design/audit/OPTIONS-CRITIC-R2.md §5 #7, #20)
+    poolSize: '6A',      // mixed pools: every member one step easier / as set / harder
+    poolSupport: '6B',   // mixed pools: every member's support level (2 / 1 / 0), or as set
+    ftRules: '6C',       // function tables: the rule kinds, one- and two-step (was ops + step)
+    ftTable: '6D',       // function tables: rows and the In-number order (was tiles + order)
+    ftTask: '6E',        // function tables: the task, with or without a Check row (was task + response)
+    // NEXT FREE IN BLOCK 6: 6F.
 });
 
 /** Every option id -> its key (one letter, or digit + letter). */
@@ -212,7 +220,9 @@ export const VALUE_TOKENS = Object.freeze({
     op: Object.freeze({ x: 'M', '/': 'D' }),
     order: Object.freeze({ largest: 'L', scrambled: 'S',
         // block 2 (2026-09-25): count by 1-12 rows
-        inorder: 'Q', mixed: 'Z' }),
+        inorder: 'Q', mixed: 'Z',
+        // block 6 money_count: the coins set out, with the count-by-five dots on every page
+        'largest-dots': 'D', 'scrambled-dots': 'T' }),
     midpoint: Object.freeze({ never: 'N', seeded: 'S', only: 'O' }),
     support: Object.freeze({ cut: 'C', line: 'L', none: 'N', labels: 'B', chart: 'T',
         // P11 operations hint pictures
@@ -224,7 +234,9 @@ export const VALUE_TOKENS = Object.freeze({
         // block 2 (2026-09-25): hop numbers on a x / ÷ number line
         numbers: 'Z',
         // block 1 P10 time + money: the minute ring, the time line's labels, the coin dots
-        plain: 'Y', ring: 'G', pupil: 'U', auto: 'Q', dots: 'O' }),
+        plain: 'Y', ring: 'G', pupil: 'U', auto: 'Q', dots: 'O',
+        // block 6 function tables: the frame or line without the machine picture
+        'frame-bare': 'S', 'line-bare': 'X' }),
     objects: Object.freeze({ shapes: 'S', pictures: 'P', frame: 'F', dice: 'D' }),
     // P12
     model: Object.freeze({ none: 'N', area: 'A', bar: 'B', circle: 'C', line: 'L', set: 'S', grid: 'G', blocks: 'K', analog: 'H', digital: 'D' }),
@@ -251,13 +263,20 @@ export const VALUE_TOKENS = Object.freeze({
     shape: Object.freeze({ box: 'B', circle: 'C', hex: 'H', mixed: 'M' }),
     // block 3 (2026-09-25)
     ops: Object.freeze({ '+': 'A', '-': 'S', x: 'M', '/': 'D' }),
+    // block 6 (option-panel round 3)
+    poolSize: Object.freeze({ easier: 'E', set: 'S', harder: 'H' }),
+    ftRules: Object.freeze({ '+': 'A', '-': 'S', x: 'M', '/': 'D', 'x+': 'P', 'x-': 'N', '/+': 'Q', '/-': 'R' }),
+    ftTask: Object.freeze({ outputs: 'G', 'outputs-check': 'H', rule: 'Y', 'rule-check': 'Z', inputs: 'V', 'inputs-check': 'W',
+        mixed: 'M', 'mixed-check': 'N', make: 'K' }),
     // block 1 (P10 time + money)
     review: Object.freeze({ none: 'N', some: 'S' }),
     stimulus: Object.freeze({ clock: 'C', words: 'W', 'words-past': 'P', 'words-oh': 'O' }),
     words: Object.freeze({ numerals: 'M', past: 'P', oh: 'O' }),
     noon: Object.freeze({ never: 'N', seeded: 'S', across: 'A' }),
     currency: Object.freeze({ plain: 'P', qar: 'Q', usd: 'U' }),
-    kind: Object.freeze({ like: 'L', two: 'T', mixed: 'M', notes: 'N', 'notes-coins': 'C', notes100: 'H', notes500: 'F' }),
+    kind: Object.freeze({ like: 'L', two: 'T', mixed: 'M', notes: 'N', 'notes-coins': 'C', notes100: 'H', notes500: 'F',
+        // block 6: notes / notes and coins totalled by "Totals to" (the old notes kinds fold into these)
+        note: 'O', both: 'B' }),
     paid: Object.freeze({ unit: 'U', note: 'N' }),
     gap: Object.freeze({ far: 'F', near: 'N' }),
     numerals: Object.freeze({ all: 'A', quarters: 'Q', twelve: 'T' }),
@@ -303,6 +322,8 @@ export const SCALAR_ONLY = Object.freeze({
     missing: 'decimal', rule: 'bool',
     // block 1 (P10): the longest elapsed time, in minutes
     hours: 'decimal',
+    // block 6: rows × 10 + order (31 … 52); a member support level 0-2
+    ftTable: 'decimal', poolSupport: 'decimal',
     members: 'def-tokens',   // two base-36 characters per member: its position (skill-options-pools.js)
     // reserved ids (block 4): their values are allocated when they are built
     touch: 'reserved', cover: 'reserved', mix: 'reserved', anchors: 'reserved',
