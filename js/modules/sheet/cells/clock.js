@@ -34,7 +34,7 @@ import { register } from '../registry.js';
 import {
     L, P, INK, GREY, esc, isTwin, sizeOf, S, textPt, digitPt, zonePt, box, checkBox, levelOf,
     faceSVG, faceDiameter, readout, timeSlot, words, row, tickList, tickedIndex, splitTime, splitList, partValue,
-    fmtTime, h12,
+    fmtTime, h12, numeralAt, numeralMm,
 } from './tmkit.js';
 
 const LETTERS = ['A', 'B', 'C', 'D', 'E'];
@@ -152,13 +152,20 @@ function parts(p, ctx) {
         return cellRoot(ctx, 'tm-parts', `${face}${words(ctx, 'The hour hand is:', { pt: textPt(ctx) })}${tickList(ctx, labels, { on, vertical: false })}`);
     }
     const missing = (p.missing || []).map(Number);
-    const face = faceSVG(ctx, { D, hands: false, missing, label: 'clock face with numbers missing' });
-    const R = D / 2, pad = 1.5 * 0.35278, W = D + 2 * pad, c = W / 2;
-    const bw = S(ctx).writeMm + 1;
+    // Critic round 3: on a 50 mm face the write-in boxes overlapped each other and covered the
+    // printed numerals. The face is bigger (the cell is half a page wide) and each box stands on
+    // its own numeral's place, inside the tick ring, a box's width from its neighbours.
+    const Dp = { S: 56, M: 62, L: 66 }[sizeOf(ctx)];
+    const face = faceSVG(ctx, { D: Dp, hands: false, missing, label: 'clock face with numbers missing' });
+    const R = Dp / 2, pad = 1.5 * 0.35278, W = Dp + 2 * pad, c = W / 2;
+    const bw = Math.min(S(ctx).writeMm + 1, 9.5);
+    const numMm = numeralMm(ctx, Dp);
     const kv = Object.fromEntries(missing.map((v, i) => [`n${i}`, String(v)]));
     const holes = missing.map((v, i) => {
+        const at = numeralAt(v, R, numMm);
+        const rb = Math.min(at.r, 0.845 * R - 0.6 - bw * 0.62);
         const a = (v * 30 - 90) * Math.PI / 180;
-        const x = c + 0.64 * R * Math.cos(a) - bw / 2, y = c + 0.64 * R * Math.sin(a) - bw / 2;
+        const x = c + rb * Math.cos(a) - bw / 2, y = c + rb * Math.sin(a) - bw / 2;
         return `<span style="position:absolute;left:${L(ctx, x)};top:${L(ctx, y)};">`
             + box(ctx, { id: `n${i}`, value: partValue(ctx, `n${i}`, kv, splitList('n')), w: bw, h: bw, mark: 'cell', pt: zonePt(ctx) + 2 }) + `</span>`;
     }).join('');
@@ -168,10 +175,16 @@ function parts(p, ctx) {
 
 function fives(p, ctx) {
     const size = sizeOf(ctx);
-    const D = { S: 30, M: 34, L: 38 }[size];
+    // Critic round 3: a 30 mm face with the numerals crowding and the boxes off their hours. The
+    // face is bigger, and each box is centred on its hour's own angle at one clear gap from the
+    // rim, measured along that angle (a box is wider than tall, so the 3 and 9 boxes sit farther
+    // out than the 12 and 6 boxes, and every box keeps the same 2.5 mm from the face).
+    const D = { S: 40, M: 44, L: 48 }[size];
     const bw = { S: 12, M: 13, L: 15 }[size];
     const bh = S(ctx).writeMm + 1;
-    const Rr = { S: 25, M: 29, L: 33 }[size];
+    const gap = 2.5;
+    const rOf = (i) => { const a = (i * 30 - 90) * Math.PI / 180; return D / 2 + gap + (bw / 2) * Math.abs(Math.cos(a)) + (bh / 2) * Math.abs(Math.sin(a)); };
+    const Rr = Math.max(...Array.from({ length: 12 }, (_, k) => rOf(k + 1)));
     const W = 2 * (Rr + bw / 2) + 2;
     const c = W / 2;
     const face = faceSVG(ctx, { D, hands: false, label: 'clock face' });
@@ -182,7 +195,7 @@ function fives(p, ctx) {
     const boxes = [];
     for (let i = 1; i <= 12; i++) {
         const a = (i * 30 - 90) * Math.PI / 180;
-        const x = c + Rr * Math.cos(a) - bw / 2, y = c + Rr * Math.sin(a) - bh / 2;
+        const x = c + rOf(i) * Math.cos(a) - bw / 2, y = c + rOf(i) * Math.sin(a) - bh / 2;
         const v = i === 12 ? 0 : i * 5;
         const k = blanks.indexOf(i);
         const inner = k < 0

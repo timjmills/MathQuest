@@ -97,18 +97,58 @@ export function faceDiameter(ctx, { precision = 5, draw = false, choose = false,
     return { S: 36, M: 42, L: 50 }[size];
 }
 
-const HAND_HOUR = 0.46, HAND_MIN = 0.78;
+// Critic round 3 (H2): the minute hand at 0.78 R ran through the 12 / 3 / 6 / 9 numerals and the
+// numerals touched the five-minute ticks. The numerals now sit packed against the tick ring
+// (`NUM_OUT`, each placed by its own box), the ticks are shorter, and BOTH hands stop inside the
+// numerals' inner edge, the hour hand clearly the shorter (0.62 of the minute hand) and heavier.
+const HAND_HOUR = 0.32, HAND_MIN = 0.52;
+const TICK_IN5 = 0.845, TICK_IN1 = 0.87, NUM_OUT = 0.81;
+/** Andika 700 digit advance and the half height of a lining digit, in em. */
+const DIGIT_EM = 0.56, HALF_H_EM = 0.36;
 
-/** A hand from the centre at `deg` (0 = 12 o'clock, clockwise), with a solid arrow tip (RP-101). */
-function hand(cx, cy, deg, len, wPt, color, attrs = '') {
+/** The numeral size of a face (RP-100, never below the 11 pt a pupil must read, RUBRIC C1). */
+export const numeralMm = (ctx, D) => Math.max(0.105 * D, 11 * PT_MM, zonePt(ctx) * PT_MM);
+
+/**
+ * Where numeral `i` sits on a face of radius R: its box (half width hw, half height hh) packed
+ * against the circle NUM_OUT R, so a two-digit 10 or 11 moves in exactly as far as it needs and
+ * never touches a tick. Returns the centre offset from the face centre.
+ */
+export function numeralAt(i, R, numMm) {
+    const a = (i * 30 - 90) * Math.PI / 180;
+    const hw = String(i).length * DIGIT_EM * numMm / 2, hh = HALF_H_EM * numMm;
+    const radial = hw * Math.abs(Math.cos(a)) + hh * Math.abs(Math.sin(a));
+    const r = NUM_OUT * R - radial;
+    return { x: r * Math.cos(a), y: r * Math.sin(a), r, inner: r - radial };
+}
+
+/** A hand from (cx, cy) at `deg` (0 = 12 o'clock, clockwise), with a solid arrow tip (RP-101). */
+function hand(cx, cy, deg, len, wPt, color, attrs = '', headK = 1.25) {
     const a = (deg - 90) * Math.PI / 180;
     const w = wPt * PT_MM;
     const tip = w * 2.6;                          // the arrow head's length
     const ex = cx + (len - tip) * Math.cos(a), ey = cy + (len - tip) * Math.sin(a);
     const tx = cx + len * Math.cos(a), ty = cy + len * Math.sin(a);
-    const px = -Math.sin(a) * w * 1.25, py = Math.cos(a) * w * 1.25;
+    const px = -Math.sin(a) * w * headK, py = Math.cos(a) * w * headK;
     return `<g${attrs}><line x1="${n2(cx)}" y1="${n2(cy)}" x2="${n2(ex)}" y2="${n2(ey)}" stroke="${color}" stroke-width="${n2(w)}" stroke-linecap="round"/>`
         + `<path d="M${n2(tx)} ${n2(ty)}L${n2(ex + px)} ${n2(ey + py)}L${n2(ex - px)} ${n2(ey - py)}Z" fill="${color}"/></g>`;
+}
+
+/**
+ * Two hands that point (nearly) the same way are drawn apart, never one over the other (critic
+ * round 3, H2: at 12:00, 3:15, 9:50 or 10:55 the hour hand hid under the minute hand). Each hand
+ * keeps its exact angle; the pair is slid sideways, perpendicular to the hands, until the hour
+ * hand's arrow head clears the minute hand by 0.6 mm. Returns the two sideways offsets (mm).
+ */
+function handSpread(hourDeg, minDeg, R) {
+    let d = ((minDeg - hourDeg) % 360 + 540) % 360 - 180;          // -180 .. 180
+    if (Math.abs(d) > 30) return { h: 0, m: 0 };
+    const need = 1.25 * 2.25 * PT_MM + 0.75 * PT_MM + 0.6;          // hour head half-width + minute half-width + gap
+    const have = HAND_HOUR * R * Math.sin(Math.abs(d) * Math.PI / 180);
+    const extra = Math.max(0, need - have);
+    if (!extra) return { h: 0, m: 0 };
+    const s = d >= 0 ? 1 : -1;                                     // the minute hand is clockwise of the hour hand
+    return { h: -s * extra / 2, m: s * extra / 2 };
 }
 
 /**
@@ -131,9 +171,9 @@ export function faceSVG(ctx, o = {}) {
     const pad = o.ring ? R * 0.34 : (o.guides && o.guideLabels ? R * 0.28 : SW.heavy);
     const W = D + 2 * pad;
     const c = W / 2;
-    const numPt = Math.max(0.12 * D / PT_MM, zonePt(ctx));
-    const numMm = numPt * PT_MM;
+    const numMm = numeralMm(ctx, D);
     let s = '';
+    let pivot = 1;
     if (o.half) s += `<path d="M${n2(c)} ${n2(c - 0.9 * R)}A${n2(0.9 * R)} ${n2(0.9 * R)} 0 0 1 ${n2(c)} ${n2(c + 0.9 * R)}Z" fill="${GREY}" data-tm-hint="half"/>`;
     s += `<circle cx="${n2(c)}" cy="${n2(c)}" r="${n2(R - SW.heavy / 2)}" fill="${o.half ? 'none' : '#fff'}" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`;
     s += `<circle cx="${n2(c)}" cy="${n2(c)}" r="${n2(0.9 * R)}" fill="none" stroke="${INK}" stroke-width="${n2(SW.fine)}"/>`;
@@ -142,7 +182,7 @@ export function faceSVG(ctx, o = {}) {
         const five = i % 5 === 0;
         if (!five && !o.ticks1) continue;
         const a = (i * 6 - 90) * Math.PI / 180;
-        const r1 = 0.9 * R, r2 = (five ? 0.8 : 0.85) * R;
+        const r1 = 0.9 * R, r2 = (five ? TICK_IN5 : TICK_IN1) * R;
         ticks += `<line x1="${n2(c + r1 * Math.cos(a))}" y1="${n2(c + r1 * Math.sin(a))}" x2="${n2(c + r2 * Math.cos(a))}" y2="${n2(c + r2 * Math.sin(a))}" `
             + `stroke="${INK}" stroke-width="${n2(five ? SW.hair : SW.fine)}"/>`;
     }
@@ -150,9 +190,8 @@ export function faceSVG(ctx, o = {}) {
     const missing = new Set((o.missing || []).map(Number));
     for (let i = 1; i <= 12; i++) {
         if (missing.has(i)) continue;
-        const a = (i * 30 - 90) * Math.PI / 180;
-        const r = 0.66 * R;
-        s += `<text x="${n2(c + r * Math.cos(a))}" y="${n2(c + r * Math.sin(a) + numMm * 0.36)}" text-anchor="middle" `
+        const at = numeralAt(i, R, numMm);
+        s += `<text x="${n2(c + at.x)}" y="${n2(c + at.y + numMm * HALF_H_EM)}" text-anchor="middle" `
             + `font-size="${n2(numMm)}" font-weight="700" font-family="Andika, 'Open Sans', sans-serif" fill="${INK}" data-tm-numeral="${i}">${i}</text>`;
     }
     if (o.ring) {
@@ -182,9 +221,15 @@ export function faceSVG(ctx, o = {}) {
         const h = Number(o.hour) % 12, m = Number(o.minute) || 0;
         const col = o.handColor || INK;
         const hourCol = o.hands === 'hour-grey' ? GREY : col;
-        // RP-101: the hour hand at 30h + 0.5m; the minute hand drawn on top (12:00 overlaps).
-        s += hand(c, c, 30 * h + 0.5 * m, HAND_HOUR * R, 2.25, hourCol, ` data-tm-hand="hour" data-tm-deg="${n2(30 * h + 0.5 * m)}"`);
-        if (o.hands !== 'hour-grey') s += hand(c, c, 6 * m, HAND_MIN * R, 1.5, col, ` data-tm-hand="minute" data-tm-deg="${n2(6 * m)}"`);
+        // RP-101: the hour hand at 30h + 0.5m. Hands that nearly coincide are slid apart
+        // sideways (handSpread), so a pupil always sees two hands.
+        const hd = 30 * h + 0.5 * m, md = 6 * m;
+        const sp = o.hands === 'hour-grey' ? { h: 0, m: 0 } : handSpread(hd, md, R);
+        const side = (deg, off) => { const a = (deg - 90) * Math.PI / 180; return [c - Math.sin(a) * off, c + Math.cos(a) * off]; };
+        const [hx, hy] = side(hd, sp.h), [mx, my] = side(md, sp.m);
+        pivot = Math.max(1, Math.abs(sp.h) + 0.35, Math.abs(sp.m) + 0.35);
+        s += hand(hx, hy, hd, HAND_HOUR * R, 2.25, hourCol, ` data-tm-hand="hour" data-tm-deg="${n2(hd)}"`);
+        if (o.hands !== 'hour-grey') s += hand(mx, my, md, HAND_MIN * R, 1.5, col, ` data-tm-hand="minute" data-tm-deg="${n2(md)}"`);
         if (Array.isArray(o.labelHands)) {
             const put = (deg, len, txt) => {
                 const a = (deg - 90) * Math.PI / 180;
@@ -196,7 +241,7 @@ export function faceSVG(ctx, o = {}) {
             s += put(30 * h + 0.5 * m, HAND_HOUR * R * 0.62, o.labelHands[0]) + put(6 * m, HAND_MIN * R * 0.7, o.labelHands[1]);
         }
     }
-    s += `<circle cx="${n2(c)}" cy="${n2(c)}" r="1" fill="${INK}"/>`;
+    s += `<circle cx="${n2(c)}" cy="${n2(c)}" r="${n2(pivot)}" fill="${INK}"/>`;
     return svg(ctx, W, W, s, { cls: 'tm-face', label: o.label || 'clock face' });
 }
 
@@ -347,16 +392,19 @@ export function coinSVG(ctx, v, { dots = false, compact = false, dashed = false 
  * One generic note (RP-115, ruling Q1/Q3): an upright rounded rectangle 26 x 60 mm, 1.5 pt
  * outline, 0.5 pt inset border, the value in the centre and in two opposite corners.
  */
-export function noteSVG(ctx, v, { compact = false } = {}) {
-    const k = compact ? 0.8 : sizeOf(ctx) === 'S' ? 0.85 : 1;
+export function noteSVG(ctx, v, { compact = false, small = false } = {}) {
+    // `small` (critic round 3: a 60 mm note left one item on a page): 0.6, 16 x 36 mm, still
+    // taller than the biggest coin, so a note never reads as a coin.
+    const k = small ? 0.6 : compact ? 0.8 : sizeOf(ctx) === 'S' ? 0.85 : 1;
     const w = 26 * k, h = 60 * k;
     const big = Math.min(digitPt(ctx) * PT_MM * 1.05, (w - 5) / (0.62 * String(v).length));
-    const small = zonePt(ctx) * PT_MM;
+    const corner = Math.max(zonePt(ctx) * PT_MM * (small ? 0.8 : 1), 2.6);
+    const inset = small ? 3.2 : 4;
     let s = `<rect x="${n2(SW.heavy / 2)}" y="${n2(SW.heavy / 2)}" width="${n2(w - SW.heavy)}" height="${n2(h - SW.heavy)}" rx="2.5" fill="#fff" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`
         + `<rect x="2.2" y="2.2" width="${n2(w - 4.4)}" height="${n2(h - 4.4)}" rx="1.5" fill="none" stroke="${INK}" stroke-width="${n2(SW.fine)}"/>`
         + `<text x="${n2(w / 2)}" y="${n2(h / 2 + big * 0.35)}" text-anchor="middle" font-size="${n2(big)}" font-weight="700" font-family="Andika, 'Open Sans', sans-serif" fill="${INK}">${v}</text>`
-        + `<text x="4" y="${n2(4 + small)}" font-size="${n2(small)}" font-weight="700" font-family="Andika, 'Open Sans', sans-serif" fill="${INK}">${v}</text>`
-        + `<text x="${n2(w - 4)}" y="${n2(h - 4)}" text-anchor="end" font-size="${n2(small)}" font-weight="700" font-family="Andika, 'Open Sans', sans-serif" fill="${INK}">${v}</text>`;
+        + `<text x="${n2(inset)}" y="${n2(inset + corner * 0.85)}" font-size="${n2(corner)}" font-weight="700" font-family="Andika, 'Open Sans', sans-serif" fill="${INK}">${v}</text>`
+        + `<text x="${n2(w - inset)}" y="${n2(h - inset)}" text-anchor="end" font-size="${n2(corner)}" font-weight="700" font-family="Andika, 'Open Sans', sans-serif" fill="${INK}">${v}</text>`;
     return svg(ctx, w, h, s, { cls: 'tm-note', label: `note worth ${v}`, attrs: ` data-tm-note="${v}"` });
 }
 
@@ -366,10 +414,15 @@ export function noteSVG(ctx, v, { compact = false } = {}) {
  * screen twin of touching each coin with a pencil (ruling: "coins you tap to count"). The mark
  * shows no number, so tapping never gives the total away.
  */
-export function coinRow(ctx, values, { dots = false, compact = false, wrap = 6, scatter = false } = {}) {
+export function coinRow(ctx, values, { dots = false, compact = false, wrap = 6, scatter = false, ring = null } = {}) {
     const twin = isTwin(ctx);
     const one = (v) => {
-        const c = coinSVG(ctx, v, { dots, compact });
+        let c = coinSVG(ctx, v, { dots, compact });
+        // `ring(v)`: the key's pencil circle round a coin the pupil was asked to circle.
+        if (ring && ring(v)) {
+            c = `<span data-tm-ring="1" data-ws-ink="${ctx.state === 'traced' ? 'trace' : 'solid'}" style="display:inline-block;line-height:0;padding:${L(ctx, 1)};`
+                + `border:${B(ctx, 1.5)} solid ${ctx.state === 'traced' ? GREY : INK};border-radius:50%;margin:${L(ctx, -1.8)};">${c}</span>`;
+        }
         return twin
             ? `<label class="tm-cointap" style="display:inline-block;position:relative;line-height:0;flex:none;"><input type="checkbox" class="tm-cointap-in" aria-label="coin worth ${v}: tap when counted">${c}<span class="tm-cointap-mark" aria-hidden="true"></span></label>`
             : `<span style="display:inline-block;line-height:0;flex:none;">${c}</span>`;
@@ -385,16 +438,16 @@ export function coinRow(ctx, values, { dots = false, compact = false, wrap = 6, 
 }
 
 /** A row of notes, highest value first, 3 mm gaps. */
-export function noteRow(ctx, values, { compact = false } = {}) {
+export function noteRow(ctx, values, { compact = false, small = false } = {}) {
     return `<div class="tm-notes" data-tm-notes="${esc(values.join(','))}" style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 3)};flex-wrap:wrap;">`
-        + values.map((v) => `<span style="display:inline-block;line-height:0;flex:none;">${noteSVG(ctx, v, { compact })}</span>`).join('') + `</div>`;
+        + values.map((v) => `<span style="display:inline-block;line-height:0;flex:none;">${noteSVG(ctx, v, { compact, small })}</span>`).join('') + `</div>`;
 }
 
 /** A price tag: a rounded label with the price, drawn like a luggage tag (no colour). */
 export function priceTag(ctx, text) {
     return `<span class="tm-price" data-tm-price="${esc(text)}" style="display:inline-flex;align-items:center;gap:${L(ctx, 1.5)};border:${B(ctx, 1.5)} solid ${INK};`
         + `border-radius:${L(ctx, 3)};padding:${L(ctx, 1.5)} ${L(ctx, 3)};font-size:${P(ctx, digitPt(ctx) * 0.9)};font-weight:700;line-height:1;background:#fff;">`
-        + `<span aria-hidden="true" style="display:inline-block;width:${L(ctx, 2.4)};height:${L(ctx, 2.4)};border:${B(ctx, 1)} solid ${INK};border-radius:50%;"></span>${esc(text)}</span>`;
+        + `${esc(text)}</span>`;
 }
 
 /* ================================================================ currency words (§2.4) */

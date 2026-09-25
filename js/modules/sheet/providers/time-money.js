@@ -41,12 +41,17 @@ const LETTERS = ['A', 'B', 'C', 'D', 'E'];
  * or latest first; notes or coins). `choose(q)` names one of the `defs` by key; the first def is
  * the default, used when the role asks with no item.
  */
-function stringsBy(defs, choose) {
+function stringsBy(defs, choose, chooseRef = null) {
     const fns = Object.fromEntries(Object.entries(defs).map(([k, d]) => [k, strings(d)]));
     const first = Object.keys(defs)[0];
     const fn = (ref = {}) => {
         let k = first;
-        try { if (ref && ref.q) k = choose(ref.q) || first; } catch (e) { k = first; }
+        // `chooseRef(ref)`: a role that asks with no item (the sheet header) still names the
+        // item's kind through `ref.printFormat` (money_count: coins, notes, or both).
+        try {
+            if (ref && ref.q) k = choose(ref.q) || first;
+            else if (ref && chooseRef) k = chooseRef(ref) || first;
+        } catch (e) { k = first; }
         const out = (fns[k] || fns[first])(ref);
         const sayFill = out.sayFill;
         out.sayFill = (item) => { let kk = first; try { kk = choose(item) || first; } catch (e) { /* default */ } return (fns[kk] || fns[first])({}).sayFill(item) || sayFill(item); };
@@ -69,6 +74,7 @@ function readWrong(q) {
     if (m > 0 && m < 10) c.push({ value: `${h12(h)}:${m}0`, misconception: 'M-T6', explain: `Dropped the zero: ${m} minutes is written 0${m}.` });
     if (m >= 55) c.push({ value: T(h + 1, 0), misconception: 'M-T7', explain: 'Read the time as the next o\'clock: the long hand has not reached 12.' });
     if (m === 0) c.push({ value: T(h, 12), misconception: 'M-T1', explain: 'Read the 12 under the long hand as 12 minutes.' });
+    if (m % 5 !== 0 && Math.floor(m / 5) > 0) c.push({ value: T(h, Math.floor(m / 5)), misconception: 'M-T1', explain: `Read the number the long hand has passed (${Math.floor(m / 5)}) as the minutes.` });
     return chooseWrong(q, c.map((x) => Object.assign(x, { slot: 'minute', slots: timeSlots(x.value) })));
 }
 
@@ -101,7 +107,8 @@ function drawWrong(q) {
     if (m % 5 === 0 && m / 5 !== h % 12) c.push({ value: obj2(m === 0 ? 12 : m / 5, (h % 12) * 5), misconception: 'M-T3', explain: 'Swapped the hands: the long hand shows the hour.' });
     if (m > 0) c.push({ value: obj2(h + 1, m), misconception: 'M-T2', explain: `Put the short hand past ${h12(h + 1)}, not past ${h12(h)}.` });
     if (m === 15 || m === 45) c.push({ value: obj2(h, 60 - m), misconception: 'M-T4', explain: 'Put the long hand on the other quarter.' });
-    if (m === 0) c.push({ value: obj2(h, h12(h) * 5 % 60), misconception: 'M-T1', explain: 'Put the long hand on the hour number too.' });
+    if (m === 0 && h12(h) !== 12) c.push({ value: obj2(h, h12(h) * 5 % 60), misconception: 'M-T1', explain: 'Put the long hand on the hour number too.' });
+    if (m === 0) c.push({ value: obj2(h + 1, 0), misconception: 'M-T2', explain: `Put the short hand on ${h12(h + 1)}, the next number, not on ${h12(h)}.` });
     const w = chooseWrong(q, c.map((x) => Object.assign(x, { slot: 'hands', slots: { hands: T(x.value.hour, x.value.minute) }, display: T(x.value.hour, x.value.minute) })));
     return w;
 }
@@ -307,21 +314,37 @@ const ELAPSED = {
     elapsed_visual_medium: ['I Can find the time between two clocks', 'elapsed-how-long'],
     elapsed_visual_hard: ['I Can find the time between two clocks', 'elapsed-how-long'],
 };
+// The hops a step's items really make (critic round 3: "hop the hours first" on a 30-minute page,
+// "then hop the minutes" on a whole-hours page): minutes only, hours only, or both.
+const HOPS = { elapsed_30min: 'min', elapsed_15min: 'min', elapsed_hour: 'hours' };
+const hopSteps = (id, back) => {
+    const b = back ? 'back ' : '';
+    if (HOPS[id] === 'min') return [`Hop ${b}the minutes along the line.`, 'Write the time where you land.'];
+    if (HOPS[id] === 'hours') return [`Hop ${b}one hour at a time.`, 'Write the time where you land.'];
+    return [`Hop ${b}the hours first.`, `Then hop ${b}the minutes. Write where you land.`];
+};
 for (const [id, [ican, key]] of Object.entries(ELAPSED)) {
+    const sayEnd = (q) => { const p = payloadOf(q); return [T(p.start.h, p.start.m), T(p.end.h, p.end.m)]; };
     const defs = {
         end: { iCan: ican, instructionKey: 'elapsed-end',
-            steps: ['Put your pencil on the start time.', 'Hop the hours first.', 'Then hop the minutes. Write where you land.'],
-            say: 'Start at __. The end is __.', sayValues: (q) => { const p = payloadOf(q); return [T(p.start.h, p.start.m), T(p.end.h, p.end.m)]; } },
-        start: { iCan: key === 'elapsed-start' ? ican : ican, instructionKey: 'elapsed-start',
-            steps: ['Put your pencil on the end time.', 'Hop back the hours first.', 'Then hop back the minutes. Write where you land.'],
+            steps: ['Put your pencil on the start time.', ...hopSteps(id, false)],
+            say: 'Start at __. The end is __.', sayValues: sayEnd },
+        start: { iCan: ican, instructionKey: 'elapsed-start',
+            steps: ['Put your pencil on the end time.', ...hopSteps(id, true)],
             say: 'Count back from __. The start is __.', sayValues: (q) => { const p = payloadOf(q); return [T(p.end.h, p.end.m), T(p.start.h, p.start.m)]; } },
+        // A page that deals later AND earlier (`dir: both`): one instruction for both directions.
+        either: { iCan: ican, instructionKey: 'elapsed-missing',
+            steps: ['Find the time you are given.', ...hopSteps(id, false).map((s) => s.replace('Hop the', 'Hop on or back the').replace('Hop one', 'Hop on or back one'))],
+            say: 'From __ to __.', sayValues: sayEnd },
         dur: { iCan: ican, instructionKey: 'elapsed-how-long',
             steps: ['Put your pencil on the start time.', 'Hop to the end: the hours first, then the minutes.', 'Add the hops.'],
             say: 'From __ to __ is __.', sayValues: (q) => { const p = payloadOf(q); return [T(p.start.h, p.start.m), T(p.end.h, p.end.m), p.answer === 'minutes' ? `${p.total} minutes` : dur(p.total)]; } },
     };
-    const order = key === 'elapsed-start' ? { start: defs.start, end: defs.end, dur: defs.dur } : key === 'elapsed-how-long' ? { dur: defs.dur, end: defs.end, start: defs.start } : { end: defs.end, start: defs.start, dur: defs.dur };
+    const order = key === 'elapsed-start' ? { start: defs.start, end: defs.end, dur: defs.dur, either: defs.either }
+        : key === 'elapsed-how-long' ? { dur: defs.dur, end: defs.end, start: defs.start, either: defs.either }
+            : { end: defs.end, start: defs.start, dur: defs.dur, either: defs.either };
     registerSkill(`measurement:${id}`, {
-        strings: stringsBy(order, (q) => { const m = payloadOf(q).mode; return m === 'duration' ? 'dur' : m === 'later' ? 'end' : 'start'; }),
+        strings: stringsBy(order, (q) => { const p = payloadOf(q); const m = p.mode; return m === 'duration' ? 'dur' : p.both ? 'either' : m === 'later' ? 'end' : 'start'; }),
         misconceptions: ['M-E1', 'M-E2', 'M-E3', 'M-E4', 'M-E5', 'M-E6'],
         workedSteps: elapsedSteps,
         wrongAnswer: elapsedWrong,
@@ -438,7 +461,10 @@ registerSkill('measurement:money_count', {
         two: { iCan: 'I Can count notes and coins', instructionKey: 'money-two',
             steps: ['Count the notes.', 'Then count the coins.', 'Write the two numbers.'],
             say: '__ and __.', sayValues: (q) => { const p = payloadOf(q); return [sum(p.notes), sum(p.coins)]; } },
-    }, (q) => { const p = payloadOf(q); return p.answer === 'two' ? 'two' : p.answer === 'major' ? 'notes' : 'coins'; }),
+    }, (q) => { const p = payloadOf(q); return p.answer === 'two' ? 'two' : p.answer === 'major' ? 'notes' : 'coins'; },
+    // The sheet header asks with the first item's printFormat only (gen-time-money.js sets
+    // tm-notes / tm-notes-coins), so a page of notes is titled and instructed for notes.
+    (ref) => (ref.printFormat === 'tm-notes-coins' ? 'two' : ref.printFormat === 'tm-notes' ? 'notes' : 'coins')),
     misconceptions: ['M-M1', 'M-M2', 'M-M5', 'M-M11', 'counted-twice'],
     workedSteps: countSteps,
     wrongAnswer: countWrong,
@@ -480,21 +506,75 @@ function columnsWrong(q) {
     if (alt > 0) c.push({ value: fmt(alt), misconception: p.op === '-' ? 'kept-the-one' : 'M-M6', slot: 'whole', slots: slotsOf(alt), explain: p.op === '-' ? 'Regrouped but did not take the 1 away from the next column.' : 'Lost the regrouped 1.' });
     return chooseWrong(q, c);
 }
+/*
+ * Shopping stories for the word-problem role (critic round 3, H11: "no stories yet" on Add Money).
+ * RP-116 / SL-9 let a currency sign and word stand in STORY text and beside the story's blank, so
+ * a story names its money even at Plain numbers (there it reads in dollars, the coin set 1, 5, 10,
+ * 25 being the US one); Qatari riyal reads QR / riyals. The numbers are the item's own.
+ */
+const SHOP = ['book', 'kite', 'ball', 'cap', 'lunch box', 'toy car', 'pencil case', 'puzzle', 'water bottle', 'scarf'];
+const SHOPPERS = ['Mia', 'Omar', 'Lena', 'Ravi', 'Ana', 'Kofi', 'Yuki', 'Zara', 'Leo', 'Noor'];
+function moneyStories(op) {
+    return (q = {}, opts = {}) => {
+        const p = payloadOf(q);
+        if (!Number.isFinite(p.a) || !Number.isFinite(p.b) || p.b <= 0) return null;
+        const res = op === '-' ? p.a - p.b : p.a + p.b;
+        if (res <= 0) return null;
+        const qar = p.currency === 'qar';
+        const unit = qar ? { one: 'riyal', many: 'riyals' } : { one: 'dollar', many: 'dollars' };
+        const amt = (x) => (qar ? 'QR ' : '$') + (p.cents ? money(x) : String(x / 100));
+        const k = Number.isInteger(opts.index) && opts.index >= 0 ? opts.index : Math.abs(Number(opts.seed) || 0);
+        const name = SHOPPERS[(k * 3 + Math.floor(p.a / 100)) % SHOPPERS.length];
+        const i1 = SHOP[(k * 2) % SHOP.length], i2 = SHOP[(k * 2 + 1) % SHOP.length];
+        const ans = p.cents ? money(res) : res / 100;
+        let lines, question, work;
+        if (op === '-') {
+            lines = [`${name} buys a ${i1} for ${amt(p.b)}.`, `${name} pays with ${amt(p.a)}.`];
+            question = `How much change does ${name} get?`;
+            work = `${amt(p.a)} − ${amt(p.b)} = ${amt(res)}`;
+        } else {
+            lines = [`${name} buys a ${i1} for ${amt(p.a)}.`, `${name} buys a ${i2} for ${amt(p.b)}.`];
+            question = `How much does ${name} spend?`;
+            work = `${amt(p.a)} + ${amt(p.b)} = ${amt(res)}`;
+        }
+        const label = ans === 1 ? unit.one : unit.many;
+        return {
+            schema: op === '-' ? 'separate' : 'join', op, lines, question, sentences: lines.concat(question),
+            ans, label, unit, answerText: `${ans} ${label}`, equation: work, work, say: `The answer is ${ans} ${label}.`, names: [name],
+        };
+    };
+}
+const colStrings = (op) => {
+    const add = op === '+';
+    const say = add ? '__ and __ make __.' : '__ take away __ is __ change.';
+    const sayValues = (q) => { const p = payloadOf(q); const f = (x) => (p.cents ? money(x) : String(x / 100)); return [f(p.a), f(p.b), f(add ? p.a + p.b : p.a - p.b)]; };
+    const base = add
+        ? { iCan: 'I Can add money', instructionKey: 'money-add' }
+        : { iCan: 'I Can find the change', instructionKey: 'money-change' };
+    // The steps name the point only on a page that has one (critic round 3: "line up the points"
+    // over whole-unit prices).
+    return stringsBy({
+        whole: Object.assign({}, base, { say, sayValues, steps: add
+            ? ['Line up the ones under the ones.', 'Add the ones first; regroup 10 if you need to.', 'Add the next column. That is the total.']
+            : ['Write the money paid on top, the price under it.', 'Subtract the ones first; regroup if you need to.', 'The answer is the change.'] }),
+        point: Object.assign({}, base, { say, sayValues, steps: add
+            ? ['Line up the points.', 'Add the right column first; regroup 10 if you need to.', 'Bring the point down into the answer.']
+            : ['Write the money paid on top, the price under it.', 'Subtract the right column first; regroup across the zeros.', 'Bring the point down. That is the change.'] }),
+    }, (q) => (payloadOf(q).cents ? 'point' : 'whole'));
+};
 registerSkill('measurement:money', {
-    strings: strings({ iCan: 'I Can add money', instructionKey: 'money-add',
-        steps: ['Line up the points (or the ones).', 'Add the right column first; regroup 10 if you need to.', 'Bring the point down into the answer.'],
-        say: '__ and __ make __.', sayValues: (q) => { const p = payloadOf(q); const f = (x) => (p.cents ? money(x) : String(x / 100)); return [f(p.a), f(p.b), f(p.a + p.b)]; } }),
+    strings: colStrings('+'),
     misconceptions: ['M-M6'],
     workedSteps: columnsSteps,
     wrongAnswer: columnsWrong,
+    stories: moneyStories('+'),
 });
 registerSkill('measurement:money_change', {
-    strings: strings({ iCan: 'I Can find the change', instructionKey: 'money-change',
-        steps: ['Write the money paid on top, the price under it.', 'Subtract the right column first; regroup across the zeros.', 'The answer is the change.'],
-        say: '__ take away __ is __ change.', sayValues: (q) => { const p = payloadOf(q); const f = (x) => (p.cents ? money(x) : String(x / 100)); return [f(p.a), f(p.b), f(p.a - p.b)]; } }),
+    strings: colStrings('-'),
     misconceptions: ['M-M6', 'M-M7', 'kept-the-one'],
     workedSteps: columnsSteps,
     wrongAnswer: columnsWrong,
+    stories: moneyStories('-'),
 });
 
 registerSkill('measurement:equiv_coin_sets', {

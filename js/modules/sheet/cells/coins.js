@@ -51,10 +51,10 @@ function dotsOn(p, ctx) {
 }
 
 /** The collection: notes row above, coins row below (MB-4). */
-function collection(ctx, p, { compact = false } = {}) {
+function collection(ctx, p, { compact = false, smallNotes = false, ring = null } = {}) {
     const parts = [];
-    if (Array.isArray(p.notes) && p.notes.length) parts.push(noteRow(ctx, p.notes, { compact }));
-    if (Array.isArray(p.coins) && p.coins.length) parts.push(coinRow(ctx, p.coins, { dots: dotsOn(p, ctx), compact, wrap: p.wrap || (p.coins.length > 6 ? 5 : (p.kind === 'count' && levelOf(ctx) >= 2 && p.coins.length <= 5 && !(p.notes || []).length ? 5 : 3)), scatter: !!p.scatter }));
+    if (Array.isArray(p.notes) && p.notes.length) parts.push(noteRow(ctx, p.notes, { compact, small: smallNotes }));
+    if (Array.isArray(p.coins) && p.coins.length) parts.push(coinRow(ctx, p.coins, { dots: dotsOn(p, ctx), compact, ring, wrap: p.wrap || (p.coins.length > 6 ? 5 : (p.kind === 'count' && levelOf(ctx) >= 2 && p.coins.length <= 5 && !(p.notes || []).length ? 5 : 3)), scatter: !!p.scatter }));
     return parts.join('');
 }
 
@@ -98,8 +98,14 @@ function count(p, ctx) {
 
 function find(p, ctx) {
     const unit = unitWord(p.currency, p.target);
-    const head = lbl(ctx, `Worth ${p.target}${unit ? ` ${esc(unit)}` : ''}:`);
-    return cellRoot(ctx, 'tm-find', `${collection(ctx, Object.assign({}, p, { dots: 'none', wrap: 5 }))}`
+    const head = lbl(ctx, `Coins worth ${p.target}${unit ? ` ${esc(unit)}` : ''}:`);
+    // The key circles every coin worth the target (critic round 3: the key gave only the count).
+    const keyed = ctx.state === 'answered' || ctx.state === 'traced';
+    const ring = keyed ? (v) => v === p.target : null;
+    const field = `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 5)};">`
+        + collection(ctx, Object.assign({}, p, { coins: [], dots: 'none' }), { smallNotes: true })
+        + collection(ctx, Object.assign({}, p, { notes: [], dots: 'none', wrap: p.wrap || 4 }), { ring }) + `</div>`;
+    return cellRoot(ctx, 'tm-find', `${field}`
         + row(ctx, head + numberSlot(ctx, 'answer', p.count, { digits: 2, unit: p.count === 1 ? 'coin' : 'coins', mark: 'blank' }), { gap: 3 }));
 }
 
@@ -166,7 +172,7 @@ function check(p, ctx) {
 
 function notation(p, ctx) {
     const c = currencyOf(p.currency);
-    const top = p.words ? words(ctx, `<b>${esc(p.words)}</b>`, { pt: textPt(ctx) + 2 }) : collection(ctx, p);
+    const top = p.words ? words(ctx, `<b>${esc(p.words)}</b>`, { pt: textPt(ctx) + 2 }) : collection(ctx, p, { smallNotes: true });
     const sign = p.sign && c.sign ? c.sign : '';
     const nWhole = Math.max(1, String(Math.floor(p.total / 100)).length);
     return cellRoot(ctx, 'tm-notation', `${top}${row(ctx, moneySlot(ctx, fmtMoney(p.total), { nWhole, sign }), { gap: 3 })}`);

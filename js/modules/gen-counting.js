@@ -210,14 +210,15 @@ function _kShapeGrid(count, shape, { cell = 40, cols = 5, frame = false, tenGap 
 }
 
 /** A 5x2 ten frame with the first `filled` cells carrying a black counter. */
-function _kTenFrame(filled, { frames = 1, cell = 36 } = {}) {
+function _kTenFrame(filled, { frames = 1, cell = 36, rows = 2 } = {}) {
+    // rows: 1 draws a FIVE frame (make_ten "Make 5").
     const pad = 6;
     const w = 5 * cell + pad * 2;
-    const h = 2 * cell + pad * 2;
+    const h = rows * cell + pad * 2;
     const one = (from) => {
         let body = `<rect x="${K_HEAVY / 2}" y="${K_HEAVY / 2}" width="${w - K_HEAVY}" `
             + `height="${h - K_HEAVY}" fill="none" stroke="${K_INK}" stroke-width="${K_HEAVY}"/>`;
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < rows * 5; i++) {
             const x = pad + (i % 5) * cell;
             const y = pad + Math.floor(i / 5) * cell;
             body += `<rect x="${x}" y="${y}" width="${cell}" height="${cell}" fill="none" `
@@ -724,23 +725,28 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // EMPTY. One cell shape now, and the filled count is dealt so six items differ.
     // ========================================
     else if (mappedSkill === "make_ten") {
-        const filled = 1 + _kDeal(9);           // 1..9, every value on a page of six or more
-        const answer = 10 - filled;
+        // "Make" (option-panel round 3): 5 on a five frame, 10 on a ten frame (the default, and
+        // exactly the draws it made before), 20 on two ten frames with the first one full.
+        const target = [5, 20].includes(Number(_kOpt('band'))) ? Number(_kOpt('band')) : 10;
+        const filled = target === 5 ? 1 + _kDeal(4)       // 1..4
+            : target === 20 ? 11 + _kDeal(9)              // 11..19: the first frame full
+            : 1 + _kDeal(9);                              // 1..9, every value on a page of six or more
+        const answer = target - filled;
 
-        q.text = `The frame shows ${filled}. How many more make 10?`;
-        q.printText = 'Write how many more make 10.';
+        q.text = `The frame shows ${filled}. How many more make ${target}?`;
+        q.printText = `Write how many more make ${target}.`;
         q.ans = answer;
         q.answerType = "number";
-        q.hint = `Count the empty boxes. ${filled} and ${answer} make 10.`;
-        q.visual = _kCell(_kTenFrame(filled));
+        q.hint = `Count the empty boxes. ${filled} and ${answer} make ${target}.`;
+        q.visual = _kCell(target === 5 ? _kTenFrame(filled, { rows: 1 }) : _kTenFrame(filled, { frames: target === 20 ? 2 : 1 }));
         // P11 Support level 0: the number sentence alone, no frame to count the empty boxes of.
         if (_kLevel(1) === 0) {
-            q.text = `${filled} + ? = 10`;
+            q.text = `${filled} + ? = ${target}`;
             q.printText = 'Write the missing number.';
-            q.visual = _kCell(`<div style="font-size:1.6rem;font-weight:700;white-space:nowrap;">${filled} + ${_kLine(2)} = 10</div>`, null, true);
+            q.visual = _kCell(`<div style="font-size:1.6rem;font-weight:700;white-space:nowrap;">${filled} + ${_kLine(2)} = ${target}</div>`, null, true);
             q.supportLevel = 0;
         }
-        q.skillLabel = 'Make 10';
+        q.skillLabel = `Make ${target}`;
         return;
     }
 
@@ -752,7 +758,8 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // it that has exactly one blank — and are dealt.
     // ========================================
     else if (mappedSkill === "teen_compose") {
-        const ones = 1 + _kDeal(9);             // 1..9 -> 11..19, every teen on a long enough page
+        // "Teen numbers to" 15 keeps the loose ones to one row of five (option-panel round 3).
+        const ones = 1 + _kDeal(Number(_kOpt('band')) === 15 ? 5 : 9);   // 1..9 -> 11..19 (or 11..15)
         const teen = 10 + ones;
         const askTotal = _kDeal(2) === 1;
 
@@ -829,13 +836,13 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // it in its row or its column, so the pupil always has one to count on from (across: one
         // more; down: ten more). The window and the gaps are dealt, so a page is never six
         // centre cells read off their left neighbour.
-        // P11: "Numbers to" 50 / 100 (the chart's rows) and "Empty boxes" 1 / 2 / 3 (default dealt).
+        // P11: "Numbers to" 50 / 100 (the chart's rows) and "Empty boxes" 1 to 7 (default 1 to 3, dealt).
         const r0 = rng(0, Number(_kOpt('band')) === 50 ? 2 : 7);
         const c0 = rng(0, 5);
         const rows = [r0, r0 + 1, r0 + 2];
         const cols = [0, 1, 2, 3, 4].map(k => c0 + k);
         const _hcWant = Number(_kOpt('tiles'));
-        const want = [1, 2, 3].includes(_hcWant) ? _hcWant : [1, 2, 2, 3][_kDeal(4)];
+        const want = [1, 2, 3, 4, 5, 6, 7].includes(_hcWant) ? _hcWant : [1, 2, 2, 3][_kDeal(4)];
         const at = (i) => rows[Math.floor(i / 5)] * 10 + cols[i % 5] + 1;
         const neighbours = (i) => {
             const r = Math.floor(i / 5), c = i % 5, out = [];
@@ -846,7 +853,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             return out;
         };
         let pickIdx = [];
-        for (let t = 0; t < 60; t++) {
+        for (let t = 0; t < 400; t++) {
             const cand = shuffle(Array.from({ length: 15 }, (_, i) => i)).slice(0, want);
             const set = new Set(cand);
             // every gap keeps a printed neighbour, and no two gaps sit side by side in a row
@@ -855,7 +862,8 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             pickIdx = cand;
             break;
         }
-        if (!pickIdx.length) pickIdx = [rng(0, 14)];
+        // Fallback (never expected): a checkerboard of gaps honours both rules at any count to 7.
+        if (!pickIdx.length) pickIdx = shuffle([0, 2, 4, 6, 8, 10, 12, 14]).slice(0, want);
         const blanks = pickIdx.sort((x, y) => x - y).map(at);
         q.chartWindow = { rows, cols };
         q.chartData = { target: blanks[0], targets: blanks.slice() };

@@ -16,6 +16,37 @@ import { generateQuestion } from './generate-question.js';
 import { renderQuestion } from './question-render.js';
 
 const DOMAINS_ORDER = ['OA', 'NO', 'MD', 'G'];
+// The banner names the item's domain in words ("Now: NO" read as the word "no").
+const DOMAIN_WORDS = { OA: 'Operations & Algebra', NO: 'Number & Operations', MD: 'Measurement & Data', G: 'Geometry' };
+
+/** A MAP session a teacher started (MAP tests screen): calm session controls, plain words. */
+const teacherLaunch = () => typeof document !== 'undefined' && !!document.body && document.body.classList.contains('teacher-mode');
+
+/**
+ * Where a session control goes. For a teacher, into the session banner (left: End session and
+ * the item count; right: the mode and Audio), so nothing floats over the banner. For a pupil,
+ * the floating pill it always was; css/map-mode.css keeps the banner's text clear of it.
+ */
+function mountSessionControl(btn, side) {
+    const banner = teacherLaunch() && document.querySelector('#mapSessionView .map-session-banner');
+    if (!banner) { document.body.appendChild(btn); return; }
+    banner.classList.add('has-controls');
+    let group = banner.querySelector(`.map-banner-${side}`);
+    if (!group) {
+        group = document.createElement('div');
+        group.className = `map-banner-${side}`;
+        if (side === 'left') {
+            const item = document.getElementById('mapItemNum')?.parentElement;
+            banner.insertBefore(group, banner.firstChild);
+            if (item && item.parentElement === banner) group.appendChild(item);
+        } else {
+            const tag = document.getElementById('mapModeTag');
+            banner.appendChild(group);
+            if (tag && tag.parentElement === banner) group.appendChild(tag);
+        }
+    }
+    if (side === 'left') group.insertBefore(btn, group.firstChild); else group.appendChild(btn);
+}
 
 // Install a passive click listener that records the last real DOM click time.
 // Used by the rapid-guess gate to differentiate a real student click from a
@@ -187,7 +218,8 @@ export function startMapSession(opts) {
     }
     const modeTag = document.getElementById('mapModeTag');
     if (modeTag) {
-        modeTag.textContent = String(state.mapSessionMode).toUpperCase();
+        const _m = String(state.mapSessionMode);
+        modeTag.textContent = teacherLaunch() ? _m.charAt(0).toUpperCase() + _m.slice(1) : _m.toUpperCase();
         modeTag.className = 'map-mode-tag ' + state.mapSessionMode;
     }
 
@@ -348,7 +380,7 @@ export function nextMapItem() {
     const itemNum = document.getElementById('mapItemNum');
     if (itemNum) itemNum.textContent = String(state.mapItemCount + 1);
     const dr = document.getElementById('mapDomainRotation');
-    if (dr) dr.textContent = `Now: ${q._mapDomain || '—'}`;
+    if (dr) dr.textContent = DOMAIN_WORDS[q._mapDomain] || q._mapDomain || '';
 
     try {
         renderQuestion();
@@ -364,6 +396,8 @@ export function nextMapItem() {
 
     // Refresh the navigator strip — current item just changed.
     renderMapNavBar();
+    // Teacher-launched: plain-word controls on the borrowed question card.
+    if (typeof window !== 'undefined' && typeof window.syncPlayChrome === 'function') window.syncPlayChrome();
 
     // Stamp render time for rapid-guess detection (only set after a real
     // renderQuestion call — programmatic test bypass leaves this at 0 so
@@ -1182,9 +1216,11 @@ function injectMapAudioToggle() {
     btn.className = 'map-audio-toggle';
     btn.title = 'Toggle audio (read questions aloud)';
     btn.setAttribute('aria-label', 'Toggle audio');
+    const teacher = teacherLaunch();
     const updateBtn = () => {
         const on = !!state.ttsEnabled;
-        btn.innerHTML = on ? '🔊 Audio' : '🔇 Audio';
+        if (teacher) btn.textContent = on ? 'Audio on' : 'Audio off';
+        else btn.innerHTML = on ? '🔊 Audio' : '🔇 Audio';
         btn.classList.toggle('audio-on', on);
         btn.classList.toggle('audio-off', !on);
         btn.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -1204,7 +1240,7 @@ function injectMapAudioToggle() {
         }
     });
     updateBtn();
-    document.body.appendChild(btn);
+    mountSessionControl(btn, 'right');
 }
 
 function removeMapAudioToggle() {
@@ -1224,12 +1260,12 @@ function injectMapEndButton() {
     btn.type = 'button';
     btn.className = 'map-end-btn';
     btn.title = 'End session and see your results so far';
-    btn.textContent = '🏁 End Session';
+    btn.textContent = teacherLaunch() ? 'End session' : '🏁 End Session';
     btn.addEventListener('click', () => {
         const confirmed = window.confirm('End the session now and see your summary so far?');
         if (confirmed) finalizeMapSession();
     });
-    document.body.appendChild(btn);
+    mountSessionControl(btn, 'left');
 }
 
 function removeMapEndButton() {

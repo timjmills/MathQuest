@@ -326,7 +326,7 @@ async function runOneSkill(page, target) {
         await page.evaluate(() => {
             // prevent fullscreen prompt etc.
             window.state.userRole = 'teacher';
-            try { localStorage.setItem('mathquest_user_role', 'teacher'); } catch {}
+            try { localStorage.setItem('mathquest_user_role', 'teacher'); localStorage.setItem('mathquest_start_role', 'last'); } catch {}
         });
 
         for (const target of SKILLS) {
