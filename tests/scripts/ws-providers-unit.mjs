@@ -30,6 +30,7 @@ import {
 import { REGRADED_SKILLS, STORY_NOUNS } from '../../js/modules/sheet/providers/index.js';
 import { rng, int, pick, shuffle, deriveSeed } from '../../js/modules/sheet/rng.js';
 import { sameAnswer } from '../../js/modules/sheet/providers/util.js';
+import { applyRule, ftSlots } from '../../js/modules/sheet/index.js';
 
 const failures = [];
 let checks = 0;
@@ -321,6 +322,33 @@ function checkSkill(key, { requireStories = false } = {}) {
 
 for (const key of REGRADED_SKILLS) checkSkill(key, { requireStories: key === 'addition:add_wp_10' });
 for (const key of Object.keys(SIBLINGS)) checkSkill(key, { requireStories: /_wp_/.test(key) });
+
+/* ============================================================ function tables (2026-09-25) */
+// Items in the generator's shape: q.cell = {template: 'function-table', payload}, q.ans the slots
+// joined ", ". Every task is dealt, with one- and two-step rules, frame and line supports.
+function ftItem(r, tasks, twoStep) {
+    const task = pick(r, tasks);
+    const two = twoStep && int(r, 0, 1) === 1;
+    const rule = two ? [{ op: pick(r, ['x', '/']), n: int(r, 2, 5) }, { op: pick(r, ['+', '-']), n: int(r, 1, 6) }]
+        : [{ op: pick(r, twoStep ? ['+', '-', 'x', '/'] : ['+', '-']), n: int(r, 2, 9) }];
+    const pool = [];
+    for (let x = 1; x <= 100; x++) { const y = applyRule(rule, x); if (Number.isFinite(y) && y >= 0 && y <= 100 && (rule[0].op !== '/' || x % rule[0].n === 0)) pool.push(x); }
+    const xs = shuffle(r, pool).slice(0, 5);
+    const rows = xs.slice(0, twoStep ? 3 : 4).map((x) => ({ x, y: applyRule(rule, x), hide: null }));
+    rows.forEach((row, i) => {
+        row.hide = task === 'outputs' ? 'out' : task === 'inputs' ? 'in' : task === 'make' ? 'both' : task === 'mixed' ? (i % 2 ? 'in' : 'out') : null;
+    });
+    const check = twoStep && task !== 'make' ? { x: xs[4], y: applyRule(rule, xs[4]) } : null;
+    const payload = { task, rule, rows, check, support: int(r, 0, 1) ? 'line' : 'frame', machine: true };
+    const ans = ftSlots(payload).map((sl) => sl.value).join(', ');
+    return { cell: { template: 'function-table', v: 1, payload }, ftCheck: payload, ans, answerType: 'text', text: 'Use the rule.' };
+}
+ITEM_MAKERS['algebra:function_table_easy'] = (r) => ftItem(r, ['outputs', 'inputs', 'mixed', 'make', 'outputs'], false);
+ITEM_MAKERS['algebra:function_table_hard'] = (r) => ftItem(r, ['rule', 'rule', 'inputs', 'mixed', 'outputs'], true);
+REQUIRED['algebra:function_table_easy'] = /rule/i;
+REQUIRED['algebra:function_table_hard'] = /rule/i;
+checkSkill('algebra:function_table_easy');
+checkSkill('algebra:function_table_hard');
 
 // ---- the contract seam the roles rely on
 ok(REGRADED_SKILLS.length === 24, `REGRADED_SKILLS lists ${REGRADED_SKILLS.length} skills, not 24`);

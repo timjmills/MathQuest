@@ -121,6 +121,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'fact-family': 'Use the three numbers. Fill in the fact family.',
     'chart-fill': 'Fill in the missing products.',
     'groups-total': 'Write the groups, the number in each, and the total.',
+    // Function tables (2026-09-25): the four table tasks the rule-given 'table' string does not say.
+    'table-rule': 'Find the rule. Write the rule.',
+    'table-in': 'Use the rule backward. Write each In number.',
+    'table-make': 'Write your own In numbers. Use the rule for Out.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',

@@ -79,8 +79,8 @@ const url = require('url');
         { id: 'number_pattern', gen: algMod.generatePatternsQuestion, modes: ['order'] },
         { id: 'pattern_relationship', gen: algMod.generatePatternsQuestion, modes: ['order'] },
         // Algebraic — categorize
-        { id: 'function_table_easy', gen: algMod.generatePatternsQuestion, modes: ['categorize'] },
-        { id: 'function_table_hard', gen: algMod.generatePatternsQuestion, modes: ['categorize'] },
+        // function_table_easy / _hard: the 30% "sort the pairs" diversion was retired 2026-09-25
+        // (the tables are one kit cell now, gen-function-table.js).
         { id: 'inequalities', gen: algMod.generateAlgebraQuestion, modes: ['categorize'] },
         { id: 'solve_eq_addsub', gen: algMod.generateAlgebraQuestion, modes: ['categorize'] },
         { id: 'solve_eq_multdiv', gen: algMod.generateAlgebraQuestion, modes: ['categorize'] },

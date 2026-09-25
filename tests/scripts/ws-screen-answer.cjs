@@ -19,6 +19,8 @@ const DEFAULT = [
     'multiplication:mult_facts', 'multiplication:arrays_groups', 'multiplication:area_model_mult',
     'multiplication:mult_chart', 'division:div_facts', 'division:div_remainders', 'division:long_div_2digit',
     'division:share_into_groups',
+    // function tables (2026-09-25): one box per blank, a sign typed into the rule circle
+    'algebra:function_table_easy', 'algebra:function_table_hard',
 ];
 const SKILLS = (arg('skills', '') || '').split(',').map(s => s.trim()).filter(Boolean);
 const LIST = SKILLS.length ? SKILLS : DEFAULT;

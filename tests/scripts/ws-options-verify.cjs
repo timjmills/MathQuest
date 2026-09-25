@@ -92,8 +92,18 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         const m = plain(q.text).replace(/(\d),(?=\d{3}\b)/g, '$1').match(/(-?\d+(?:\.\d+)?)\s*([+\-×x÷\/*])\s*(-?\d+(?:\.\d+)?)/);
         return m ? { a: Number(m[1]), b: Number(m[3]), op: m[2] } : null;
     };
+    // A function table (gen-function-table.js) carries its numbers in the cell payload, not the text.
+    const ftP = (q) => (q && q.cell && q.cell.template === 'function-table' && q.cell.payload) || null;
+    const ftNums = (q) => {
+        const p = ftP(q); if (!p) return [];
+        const out = [];
+        for (const r of p.rows || []) out.push(r.x, r.y);
+        if (p.check) out.push(p.check.x, p.check.y);
+        for (const s of p.rule || []) out.push(s.n);
+        return out;
+    };
     const pageNums = (q) => {
-        const out = nums(qText(q));
+        const out = nums(qText(q)).concat(ftNums(q));
         if (q.pv) { if (Number.isFinite(q.pv.n)) out.push(q.pv.n); if (Array.isArray(q.pv.tiles)) out.push(...q.pv.tiles); }
         const a = ansNum(q); if (a !== null) out.push(a);
         return out.map(Math.abs);
@@ -186,6 +196,13 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             return [f, w];
         },
         step(v, items) {
+            if (items.some(ftP)) {
+                const set = Array.isArray(v) ? v : [v];
+                const got = items.map(ftP).filter(Boolean).map(p => p.rule.length);
+                const bad = got.filter(n => !set.includes(n));
+                const miss = set.filter(n => !got.includes(n));
+                return [[...(bad.length ? [`rules with ${bad[0]} step(s), not ticked`] : []), ...(miss.length ? [`no ${miss[0]}-step rule dealt`] : [])], []];
+            }
             const bad = [];
             for (const q of items) {
                 const a = ansNum(q); const t = nums(qText(q));
@@ -204,6 +221,16 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             return [[], []];
         },
         op(v, items) {
+            if (items.some(ftP)) {
+                // a function table: every rule uses only ticked operations (a two-step rule may
+                // bring in × or + when none of that kind is ticked: skill-options.js help)
+                const set = Array.isArray(v) ? v : [v];
+                const bad = [];
+                for (const q of items) { const p = ftP(q); if (p && p.rule.length === 1 && !set.includes(p.rule[0].op)) bad.push(p.rule[0].op); }
+                const seen = new Set(items.map(ftP).filter(Boolean).flatMap(p => p.rule.map(r => r.op)));
+                const miss = set.filter(o => !seen.has(o));
+                return [bad.length ? [`one-step rule with an unticked operation: ${bad.slice(0, 3)}`] : [], miss.length ? [`ticked but never dealt: ${miss}`] : []];
+            }
             const want = v === '/' ? '÷' : '×';
             const t = items.map(q => qText(q));
             const bad = t.filter(s => /[×÷]/.test(s) && !s.includes(want));
@@ -227,6 +254,10 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             return [bad.length ? [`place outside {${set}}: ${bad.slice(0, 3)}`] : [], []];
         },
         tiles(v, items) {
+            if (items.some(ftP)) {
+                const bad = items.map(ftP).filter(p => p && p.rows.length !== Number(v)).map(p => p.rows.length);
+                return [bad.length ? [`${v} rows asked, got ${bad.slice(0, 3)}`] : [], []];
+            }
             const bad = items.filter(q => q.pv && Array.isArray(q.pv.tiles) && q.pv.tiles.length !== Number(v)).map(q => q.pv.tiles.length);
             return [bad.length ? [`${v} tiles asked, got ${bad.slice(0, 3)}`] : [], []];
         },
@@ -258,7 +289,19 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             if (v === 'circle-all' && !items.some(q => /circle every|every number|rounds? to/i.test(qText(q)))) return [[], [`"Circle every number" wording not found`]];
             return [[], []];
         },
+        order(v, items) {
+            const ps = items.map(ftP).filter(Boolean);
+            if (!ps.length) return [[], []];
+            const asc = (p) => p.rows.every((r, i) => i === 0 || r.x > p.rows[i - 1].x);
+            const bad = ps.filter(p => (v === 'ordered') !== asc(p)).length;
+            return [bad ? [`${bad} table(s) not ${v === 'ordered' ? 'in order' : 'out of order'}`] : [], []];
+        },
         task(v, items) {
+            const ps = items.map(ftP).filter(Boolean);
+            if (ps.length) {
+                const bad = ps.filter(p => p.task !== v).length;
+                return [bad ? [`${bad} table(s) not "${v}"`] : [], []];
+            }
             const t = items.map(q => qText(q));
             if (v === 'reasonable' && !t.some(s => /reasonable/i.test(s))) return [[`"Is it reasonable?" but no item asks it`], []];
             if (v === 'closest' && !t.some(s => /closest|best estimate|nearest estimate/i.test(s))) return [[`"Closest estimate" but no item asks it`], []];

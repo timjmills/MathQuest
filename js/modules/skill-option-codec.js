@@ -76,7 +76,9 @@ const KEY_TO_OPTION = Object.fromEntries(Object.entries(OPTION_KEYS).map(([id, k
 // {10, 11} -> "AB"); decimal digits for a single enum / int value (Max Number 1,000 -> "1000").
 export const VALUE_TOKENS = {
     notation: { stacked: 'S', across: 'A', bracket: 'B', fraction: 'F' },
-    response: { standard: 'S', 'which-numbers': 'W', 'array-builder': 'A', write: 'R', 'circle-all': 'C' },
+    response: { standard: 'S', 'which-numbers': 'W', 'array-builder': 'A', write: 'R', 'circle-all': 'C',
+        // function tables (appended 2026-09-25): add a Check row
+        check: 'K' },
     regroup: { none: 'N', always: 'A', mixed: 'M' },
     orientation: { vertical: 'V', horizontal: 'H',
         // P11 count_objects arrangement (appended)
@@ -88,10 +90,17 @@ export const VALUE_TOKENS = {
         fewer: 'F', same: 'S', mixed: 'X', forward: 'W', back: 'K' },
     task: { read: 'R', count: 'C', compute: 'P', closest: 'N', reasonable: 'E',
         // P11 compare_objects (appended)
-        length: 'L', height: 'H', thickness: 'T', all: 'A' },
+        length: 'L', height: 'H', thickness: 'T', all: 'A',
+        // function tables (appended 2026-09-25)
+        // (O U I W F D are taken by the time-and-money and count-by task values: not reused)
+        outputs: 'Q', rule: 'Y', inputs: 'V', mixed: 'Z', make: 'K' },
     zeroPlace: { none: 'N', some: 'S', always: 'A' },
-    op: { x: 'M', '/': 'D' },
-    order: { largest: 'L', scrambled: 'S' },
+    op: { x: 'M', '/': 'D',
+        // function tables (appended 2026-09-25): the rule's + and − (the op set there is + − × ÷)
+        '+': 'A', '-': 'S' },
+    order: { largest: 'L', scrambled: 'S',
+        // function tables (appended 2026-09-25): In numbers smallest first
+        ordered: 'O' },
     midpoint: { never: 'N', seeded: 'S', only: 'O' },
     support: { cut: 'C', line: 'L', none: 'N', labels: 'B', chart: 'T',
         // P11 operations hint pictures (appended)

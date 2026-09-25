@@ -6,6 +6,7 @@ import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 import { optionsFor, pvCap } from './skill-options.js';
 import { generatePvRounding, generatePvPlaceValue, pvSpan, pvRefuse, pvOptions } from './gen-pv.js';
 import { numeralTracksHTML } from './sheet/index.js';
+import { generateFunctionTable } from './gen-function-table.js';
 
 // ===========================================================================
 // THE ODD / EVEN SORT ON PAPER
@@ -1271,50 +1272,11 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = 'Pattern Relationship';
                 return;
             }
-            // Phase 4.5 batch 2: dnd-categorize for function_table — sort 4-5 input/output pairs by "follows rule"
-            if ((patternSkill === "function_table_easy" || patternSkill === "function_table_hard") && Math.random() < 0.30) {
-                const ftRules = [
-                    { name: 'Add 5', fn: x => x + 5 },
-                    { name: 'Add 10', fn: x => x + 10 },
-                    { name: 'Subtract 3', fn: x => x - 3 },
-                    { name: 'Multiply by 2', fn: x => x * 2 },
-                    { name: 'Multiply by 3', fn: x => x * 3 },
-                    { name: 'Multiply by 4', fn: x => x * 4 }
-                ];
-                const rule = pick(ftRules);
-                const totalCount = patternSkill === "function_table_hard" ? pick([5, 6]) : pick([4, 5]);
-                const inputs = [];
-                const seenIn = new Set();
-                let safety = 0;
-                while (inputs.length < totalCount && safety < 100) {
-                    safety++;
-                    const v = rng(2, Math.min(20, Math.max(10, Math.floor(range / 5))));
-                    if (!seenIn.has(v)) { seenIn.add(v); inputs.push(v); }
-                }
-                const correctCount = Math.max(2, Math.floor(totalCount / 2));
-                const correctIdx = new Set(shuffle(inputs.map((_, i) => i)).slice(0, correctCount));
-                const pairs = inputs.map((inVal, i) => {
-                    const isCorrect = correctIdx.has(i);
-                    const outVal = isCorrect ? rule.fn(inVal) : rule.fn(inVal) + pick([1, -1, 2, -2]);
-                    return { inVal, outVal, isCorrect };
-                });
-                const tilesArr = shuffle(pairs);
-                const tiles = tilesArr.map((p, i) => ({ id: 't' + i, label: `${p.inVal} → ${p.outVal}` }));
-                const ans = {};
-                tilesArr.forEach((p, i) => { ans['t' + i] = p.isCorrect ? 'binYes' : 'binNo'; });
-                q.text = `The rule is "${rule.name}". Drag each pair into the correct bin.`;
-                q.ans = ans;
-                q.answerType = 'dnd-generic';
-                q.dndMode = 'categorize';
-                q.tiles = tiles;
-                q.bins = [
-                    { id: 'binYes', label: 'Follows the rule' },
-                    { id: 'binNo', label: 'Does NOT follow the rule' }
-                ];
-                q.hint = `Apply "${rule.name}" to each input. If the output matches, it follows the rule.`;
-                q.options = [];
-                q.printFormat = 'dnd-generic';
-                q.skillLabel = patternSkill === "function_table_hard" ? 'Function Table' : 'Function Table';
+            // Function tables (owner request 2026-09-25): one kit cell, drawn the same on paper, on the
+            // key and on screen, every choice made by the skill's options (gen-function-table.js).
+            // Replaces the 30% "drag each pair into a bin" diversion and the colour IN/OUT table.
+            if (patternSkill === "function_table_easy" || patternSkill === "function_table_hard") {
+                generateFunctionTable(q, patternSkill);
                 return;
             }
 
@@ -1800,132 +1762,9 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                     </div>`;
                 }
             } else if (patternSkill === "function_table_easy" || patternSkill === "function_table_hard") {
-                // Function Tables - vertical IN/OUT table with rule at bottom
-                // Add/subtract amounts based on range: within 20, 25, 50, 100, 200
-                let addSubRules = [];
-                if (range <= 20) {
-                    for (let n = 2; n <= 10; n++) addSubRules.push({ name: `Add ${n}`, fn: x => x + n, sub: n });
-                    for (let n = 2; n <= 5; n++) addSubRules.push({ name: `Subtract ${n}`, fn: x => x - n, sub: n });
-                } else if (range <= 50) {
-                    for (let n = 2; n <= 20; n++) addSubRules.push({ name: `Add ${n}`, fn: x => x + n, sub: n });
-                    for (let n = 2; n <= 15; n++) addSubRules.push({ name: `Subtract ${n}`, fn: x => x - n, sub: n });
-                } else if (range <= 100) {
-                    const addAmounts = [5, 7, 9, 10, 11, 12, 15, 18, 20, 25, 30, 35, 40, 45, 50];
-                    const subAmounts = [5, 7, 10, 12, 15, 20, 25, 30];
-                    addAmounts.forEach(n => addSubRules.push({ name: `Add ${n}`, fn: x => x + n, sub: n }));
-                    subAmounts.forEach(n => addSubRules.push({ name: `Subtract ${n}`, fn: x => x - n, sub: n }));
-                } else if (range <= 200) {
-                    const addAmounts = [10, 15, 20, 25, 30, 40, 50, 60, 75, 80, 90, 100];
-                    const subAmounts = [10, 15, 20, 25, 30, 40, 50];
-                    addAmounts.forEach(n => addSubRules.push({ name: `Add ${n}`, fn: x => x + n, sub: n }));
-                    subAmounts.forEach(n => addSubRules.push({ name: `Subtract ${n}`, fn: x => x - n, sub: n }));
-                } else {
-                    const addAmounts = [25, 50, 75, 100, 125, 150, 175, 200];
-                    const subAmounts = [25, 50, 75, 100, 150];
-                    addAmounts.forEach(n => addSubRules.push({ name: `Add ${n}`, fn: x => x + n, sub: n }));
-                    subAmounts.forEach(n => addSubRules.push({ name: `Subtract ${n}`, fn: x => x - n, sub: n }));
-                }
-
-                // Add multiply rules for smaller ranges
-                const multiplyRules = [];
-                if (range <= 100) {
-                    multiplyRules.push({ name: "Multiply by 2", fn: x => x * 2 });
-                    multiplyRules.push({ name: "Multiply by 3", fn: x => x * 3 });
-                    multiplyRules.push({ name: "Multiply by 4", fn: x => x * 4 });
-                    multiplyRules.push({ name: "Multiply by 5", fn: x => x * 5 });
-                }
-
-                const allRules = [...addSubRules, ...multiplyRules];
-                const rule = pick(allRules);
-
-                // Generate 5 random IN values based on range (larger numbers allowed)
-                const inValues = [];
-                const usedVals = new Set();
-                const isSubtract = rule.name.includes("Subtract");
-                const subAmount = rule.sub || 0;
-
-                // Determine IN value range
-                const minIn = isSubtract ? Math.max(subAmount + 5, 10) : 1;
-                const maxIn = Math.min(range, isSubtract ? range : range * 0.8);
-
-                while (inValues.length < 5) {
-                    const val = rng(minIn, Math.max(minIn + 10, maxIn));
-                    if (!usedVals.has(val)) {
-                        usedVals.add(val);
-                        inValues.push(val);
-                    }
-                }
-                inValues.sort((a, b) => a - b);
-                const outValues = inValues.map(x => rule.fn(x));
-
-                // Number of missing OUT values based on difficulty
-                const missingCount = patternSkill === "function_table_hard" ? 5 : pick([1, 2]);
-
-                // Pick which indices are missing
-                const allIndices = [0, 1, 2, 3, 4];
-                const missingIndices = shuffle(allIndices).slice(0, missingCount);
-
-                // Answer is comma-separated list of missing OUT values (in table order)
-                const missingAnswers = [];
-                for (let i = 0; i < 5; i++) {
-                    if (missingIndices.includes(i)) {
-                        missingAnswers.push(outValues[i]);
-                    }
-                }
-
-                if (missingCount === 1) {
-                    q.ans = missingAnswers[0];
-                    q.text = `Function Table: What is the OUT value for IN = ${inValues[missingIndices[0]]}?`;
-                } else {
-                    q.answerType = "text";
-                    q.ans = missingAnswers.join(", ");
-                    q.text = `Function Table: Fill in the missing OUT values (top to bottom, comma-separated)`;
-                }
-                q.hint = `Apply the rule "${rule.name}" to each IN value. Example: ${inValues[0]} \u2192 ${outValues[0]}`;
-
-                // Store expected answers for validation
-                q.functionTableAnswers = missingIndices.map(i => outValues[i]);
-                q.functionTableMissingIndices = missingIndices.sort((a, b) => a - b);
-
-                // Generate unique ID for this function table
-                const funcTableId = Date.now() + Math.random().toString(36).substr(2, 9);
-
-                // Build table rows with input fields for missing values
-                const tableRows = inValues.map((inVal, i) => {
-                    const isMissing = missingIndices.includes(i);
-                    const outCell = isMissing
-                        ? `<td style="padding:4px;border:2px solid var(--text-primary);text-align:center;min-width:60px;">
-                            <input type="text" class="func-table-input" data-func-table="${funcTableId}" data-row="${i}"
-                                style="width:50px;height:32px;border:2px solid var(--accent-cyan);border-radius:6px;
-                                text-align:center;font-size:1rem;font-weight:700;font-family:inherit;
-                                background:var(--bg-card-light);color:var(--text-primary);"
-                                placeholder="">
-                           </td>`
-                        : `<td style="padding:10px 25px;border:2px solid var(--text-primary);text-align:center;min-width:60px;">${outValues[i]}</td>`;
-                    return `<tr>
-                        <td style="padding:10px 25px;border:2px solid var(--text-primary);text-align:center;min-width:60px;">${inVal}</td>
-                        ${outCell}
-                    </tr>`;
-                }).join('');
-
-                q.visual = `<!-- Function Table -->
-                <div style="text-align:center;">
-                    <table style="margin:0 auto;border-collapse:collapse;font-size:1.1rem;border:2px solid var(--text-primary);">
-                        <tr>
-                            <th style="padding:10px 25px;border:2px solid var(--text-primary);background:var(--bg-card);font-weight:800;min-width:60px;">IN</th>
-                            <th style="padding:10px 25px;border:2px solid var(--text-primary);background:var(--bg-card);font-weight:800;min-width:60px;">OUT</th>
-                        </tr>
-                        ${tableRows}
-                        <tr>
-                            <td colspan="2" style="padding:10px 20px;border:2px solid var(--text-primary);background:var(--bg-card);font-weight:700;text-align:center;">
-                                <span style="color:var(--text-secondary);">Rule:</span> <span style="display:inline-block;min-width:120px;border-bottom:2px solid var(--text-primary);margin-left:8px;">&nbsp;</span>
-                            </td>
-                        </tr>
-                    </table>
-                </div>`;
-
-                // No multiple choice - answers go in the table inputs
-                q.options = [];
+                // Function tables: one kit cell (gen-function-table.js). Reached only through a
+                // path that skipped the early return above; kept so the chain stays whole.
+                generateFunctionTable(q, patternSkill);
             } else if (patternSkill === "double" || patternSkill === "halve") {
                 // Doubling and Halving skills (moved from separate category)
                 const maxForDouble = range;

@@ -911,6 +911,81 @@ SKILL_OPTIONS['composing:number_word_form'] = [{
     help: 'Writing the words is harder (it is spelling too). Tick both and the page alternates.',
 }];
 
+// ===========================================================================
+// FUNCTION TABLES (function_table_easy / function_table_hard, 2026-09-25)
+// ===========================================================================
+// One contiguous block. Every option is READ by js/modules/gen-function-table.js (ftOptions); an
+// option the generator ignores is not declared (SCC-P11). The two skills share the schema and
+// differ only in their defaults: easy is one + / − step with small numbers, in order, filling
+// the Out column; hard is every operation, one- and two-step rules, inputs out of order, finding
+// the rule and testing it on a Check row.
+//
+// THE BAND caps every number in the table — In, Out, and the rule's own numbers — the same way
+// the place-value band does (pvCap): Max Number only lowers it when the teacher has set Max
+// Number below the band.
+const _ftOptions = (easy) => [
+    {
+        id: 'task', label: 'Task', type: 'enum', default: easy ? 'outputs' : 'rule', group: 'layout',
+        values: [
+            { v: 'outputs', l: 'Complete the table (the rule is given, write each Out)' },
+            { v: 'rule', l: 'Find the rule (every row given, write the rule)' },
+            { v: 'inputs', l: 'Find the missing In numbers (work the rule backward)' },
+            { v: 'mixed', l: 'Mixed blanks (some In and some Out missing)' },
+            { v: 'make', l: 'Make your own (the rule is given, the pupil chooses the In numbers)' },
+        ],
+        help: 'One task per page, so the instruction says one thing. "Make your own" accepts any rows that follow the rule.',
+    },
+    {
+        id: 'op', label: 'Operations in the rule', type: 'set', default: easy ? ['+', '-'] : ['+', '-', 'x', '/'], group: 'difficulty',
+        values: [{ v: '+', l: '+ (add)' }, { v: '-', l: '− (subtract)' }, { v: 'x', l: '× (multiply)' }, { v: '/', l: '÷ (divide, exact only)' }],
+        allLabel: 'All four',
+        help: 'The page deals the ticked operations in turn. Division rules always divide exactly.',
+    },
+    {
+        id: 'step', label: 'Steps in the rule', type: 'set', default: easy ? [1] : [1, 2], group: 'difficulty',
+        values: [{ v: 1, l: 'One step (x + 7)' }, { v: 2, l: 'Two steps (x × 2 + 1)' }],
+        allLabel: 'Both, alternating',
+        help: 'A two-step rule multiplies or divides, then adds or subtracts (the ticked × ÷ and + −, or × and + when none is ticked).',
+    },
+    {
+        id: 'band', label: 'Numbers to', type: 'enum', default: easy ? 20 : 100, group: 'difficulty',
+        values: [10, 20, 50, 100, 1000].map((v) => ({ v, l: v.toLocaleString('en-US') })),
+        help: 'The biggest number anywhere in the table. Max Number only lowers it if you set Max Number below this.',
+    },
+    {
+        id: 'tiles', label: 'Rows in the table', type: 'enum', default: easy ? 4 : 3, group: 'layout',
+        values: [{ v: 3, l: '3 rows' }, { v: 4, l: '4 rows' }, { v: 5, l: '5 rows' }],
+        help: 'Three rows are enough to find a rule. More rows are more practice; a tall table '
+            + '(5 rows, a Check row and a two-step rule together) fits four tables to a page instead of six.',
+    },
+    {
+        id: 'order', label: 'In numbers', type: 'enum', default: easy ? 'ordered' : 'scrambled', group: 'difficulty',
+        values: [{ v: 'ordered', l: 'In order, smallest first' }, { v: 'scrambled', l: 'Out of order' }],
+        help: 'Out of order stops the pupil just following the Out column down: each row has to use the rule.',
+    },
+    {
+        id: 'support', label: 'Support', type: 'enum', default: 'frame', group: 'support',
+        values: [
+            { v: 'frame', l: 'Frame (the rule on each In number; the rule box x ○ □)' },
+            { v: 'line', l: 'Line (just In and Out; the rule written on a line)' },
+        ],
+        help: 'The frame is the support: completing, a middle column shows "3 + 7"; finding the rule, '
+            + 'a circle for the sign and a box for the number. The line is the fade.',
+    },
+    {
+        id: 'pictures', label: 'Function machine picture', type: 'bool', default: true, group: 'support',
+        help: 'A small In → [rule] → Out machine drawn above the table. Off prints the rule as a line.',
+    },
+    {
+        id: 'response', label: 'Check row', type: 'enum', default: easy ? 'standard' : 'check', group: 'layout',
+        values: [{ v: 'standard', l: 'No check row' }, { v: 'check', l: 'Add a Check row (a new In number to test the rule)' }],
+        help: 'The Check row gives one more In number under the table, so the pupil tests the rule on it. Not used with "Make your own".',
+    },
+];
+SKILL_OPTIONS['algebra:function_table_easy'] = _ftOptions(true);
+SKILL_OPTIONS['algebra:function_table_hard'] = _ftOptions(false);
+// ============================ end function tables ============================
+
 // Options every skill understands, whether or not it declares anything of its own.
 export const UNIVERSAL_OPTIONS = [levelOption()];
 

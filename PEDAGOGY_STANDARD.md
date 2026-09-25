@@ -1270,6 +1270,9 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `fact-family` | Use the three numbers. Fill in the fact family. | addition and subtraction fact families |
 | `chart-fill` | Fill in the missing products. | multiplication chart |
 | `groups-total` | Write the groups, the number in each, and the total. | arrays and equal groups |
+| `table-rule` | Find the rule. Write the rule. | function table: every row given, the rule unknown (added 2026-09-25) |
+| `table-in` | Use the rule backward. Write each In number. | function table: the In numbers missing |
+| `table-make` | Write your own In numbers. Use the rule for Out. | function table: the pupil makes the rows |
 | `default-write` | Solve. Write the answer. | default adapter: skills with no provider, number or text answer |
 | `default-circle` | Circle the answer. | default adapter: choice items |
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |

@@ -63,9 +63,12 @@ const K2_CATS = ['counting', 'comparing', 'composing', 'counting_mixed'];
 // with the rest of the pv family further down; PV_CATS is hoisted here so the family table is one
 // place.
 const PV_FAMILY_CATS = ['placevalue', 'number_sense'];
-const CATS = [...OPS_CATS, ...K2_CATS, ...PV_FAMILY_CATS];
-const familyOf = cat => (OPS_CATS.includes(cat) ? 'operations' : PV_FAMILY_CATS.includes(cat) ? 'pv' : 'k2');
-const FAMILY_CATS = { operations: OPS_CATS, k2: K2_CATS, pv: PV_FAMILY_CATS };
+// Function tables (2026-09-25): the two algebra skills only, judged by ftRules() below.
+const FT_CATS = ['algebra'];
+const FT_SKILLS = new Set(['function_table_easy', 'function_table_hard']);
+const CATS = [...OPS_CATS, ...K2_CATS, ...PV_FAMILY_CATS, ...FT_CATS];
+const familyOf = cat => (OPS_CATS.includes(cat) ? 'operations' : PV_FAMILY_CATS.includes(cat) ? 'pv' : FT_CATS.includes(cat) ? 'ftable' : 'k2');
+const FAMILY_CATS = { operations: OPS_CATS, k2: K2_CATS, pv: PV_FAMILY_CATS, ftable: FT_CATS };
 
 // ---------------------------------------------------------------------------
 // Reading the promise out of the name
@@ -827,6 +830,90 @@ function seedFor(key) {
     let h = 2166136261;
     for (let i = 0; i < key.length; i++) { h ^= key.charCodeAt(i); h = Math.imul(h, 16777619); }
     return (h >>> 0) % 1000000;
+}
+
+// ---------------------------------------------------------------------------
+// Function tables (function_table_easy / _hard, 2026-09-25)
+// ---------------------------------------------------------------------------
+// Sampled over every task and both rule lengths, at each band. Written from the NAME of the
+// representation, independently of the kit's helpers: a function table is a rule and rows it
+// sends In -> Out, so
+//   ft-row        every row (and the Check row) satisfies the rule
+//   ft-whole      no negative number and no inexact ÷ anywhere, intermediate steps included
+//   ft-band       every number of the table is inside "Numbers to N"
+//   ft-unique     "find the rule" shows >= 2 rows and exactly ONE rule of the rule space fits them
+//                 (+k, −k, ×k, ÷k, ×a ± b, ÷a ± b), so it is never ambiguous between + and ×
+//   ft-key        q.ans is the table's blanks in reading order, then the rule, then the Check
+//   ft-distinct   no In number repeats, and the Check In is a new one
+const FT_STEP = (v, s) => {
+    if (s.op === '+') return v + s.n;
+    if (s.op === '-') return v - s.n;
+    if (s.op === 'x') return v * s.n;
+    if (s.op === '/') return v / s.n;
+    return NaN;
+};
+function ftTrace(rule, x) {
+    const seen = [x];
+    let v = x;
+    for (const s of rule) { v = FT_STEP(v, s); seen.push(v); }
+    return seen;
+}
+function ftFits(rule, pairs) {
+    return pairs.every(([x, y]) => { const t = ftTrace(rule, x); return t.every(v => Number.isInteger(v) && v >= 0) && t[t.length - 1] === y; });
+}
+function ftRuleCount(pairs, cap) {
+    let n = 0;
+    const one = [], two = [];
+    for (let k = 1; k <= cap; k++) one.push([{ op: '+', n: k }], [{ op: '-', n: k }]);
+    for (let k = 2; k <= 12; k++) one.push([{ op: 'x', n: k }], [{ op: '/', n: k }]);
+    for (let a = 2; a <= 12; a++) for (let b = 1; b <= Math.min(cap, 100); b++) for (const m of ['x', '/']) for (const ad of ['+', '-']) two.push([{ op: m, n: a }, { op: ad, n: b }]);
+    for (const r of one.concat(two)) if (ftFits(r, pairs)) n++;
+    return n;
+}
+const FT_GLYPHS = { '+': '+', '-': '−', x: '×', '/': '÷' };
+function ftExpectedAns(p) {
+    const out = [];
+    p.rows.forEach(r => {
+        if (r.hide === 'in' || r.hide === 'both') out.push(String(r.x));
+        if (r.hide === 'out' || r.hide === 'both') out.push(String(r.y));
+    });
+    if (p.task === 'rule') {
+        if (p.support === 'line') out.push(p.rule.map(s => `${FT_GLYPHS[s.op]} ${s.n}`).join(' '));
+        else p.rule.forEach(s => out.push(FT_GLYPHS[s.op], String(s.n)));
+    }
+    if (p.check) out.push(String(p.check.y));
+    return out.join(', ');
+}
+function ftRules(samples) {
+    const fails = [], notes = [];
+    const F = (cls, msg) => fails.push({ cls, msg });
+    const bad = { row: [], whole: [], band: [], unique: [], key: [], distinct: [] };
+    let live = 0;
+    for (const { q, band } of samples) {
+        const p = q && q.cell && q.cell.template === 'function-table' ? q.cell.payload : null;
+        if (!p) { bad.key.push(`no function-table cell (${q && q.printFormat})`); continue; }
+        live++;
+        const tag = `${p.rule.map(s => FT_GLYPHS[s.op] + s.n).join('')} ${p.task}`;
+        const pairs = p.rows.map(r => [r.x, r.y]).concat(p.check ? [[p.check.x, p.check.y]] : []);
+        for (const [x, y] of pairs) {
+            const t = ftTrace(p.rule, x);
+            if (t[t.length - 1] !== y) bad.row.push(`${tag}: ${x} -> ${y}`);
+            if (!t.every(v => Number.isInteger(v) && v >= 0)) bad.whole.push(`${tag}: ${t.join(' -> ')}`);
+            if (t.some(v => v > band) || p.rule.some(s => s.n > band)) bad.band.push(`${tag}: ${t.join(' -> ')} over ${band}`);
+        }
+        if (p.task === 'rule') {
+            const shown = p.rows.filter(r => !r.hide).map(r => [r.x, r.y]);
+            const n = shown.length >= 2 ? ftRuleCount(shown, band) : 0;
+            if (shown.length < 2 || n !== 1) bad.unique.push(`${tag}: ${shown.length} rows, ${n} rules fit`);
+        }
+        if (String(q.ans) !== ftExpectedAns(p)) bad.key.push(`${tag}: ans "${q.ans}" vs "${ftExpectedAns(p)}"`);
+        const xs = p.rows.map(r => r.x);
+        if (new Set(xs).size !== xs.length || (p.check && xs.includes(p.check.x))) bad.distinct.push(`${tag}: ${xs.join(',')}${p.check ? ' check ' + p.check.x : ''}`);
+    }
+    for (const [k, list] of Object.entries(bad)) if (list.length) F(`ft-${k}`, `${list.length} of ${live}: ${list.slice(0, 3).join(' | ')}`);
+    const tasks = new Set(samples.map(x => x.q && x.q.cell && x.q.cell.payload && x.q.cell.payload.task));
+    notes.push({ cls: 'ft-sampled', msg: `${live} tables over tasks ${[...tasks].join(', ')}` });
+    return { fails, notes, live };
 }
 
 // ---------------------------------------------------------------------------
@@ -1760,7 +1847,8 @@ function selfTest() {
     const app = await open({ seed: 4242 });
     await hideOverlays(app.page);
     let skills = (await listSkills(app.page)).filter(s => CATS.includes(s.categoryId)
-        && !(PV_FAMILY_CATS.includes(s.categoryId) && PV_EXCLUDED.has(s.skillId)));
+        && !(PV_FAMILY_CATS.includes(s.categoryId) && PV_EXCLUDED.has(s.skillId))
+        && !(FT_CATS.includes(s.categoryId) && !FT_SKILLS.has(s.skillId)));
     if (ONLY_FAMILY) skills = skills.filter(s => FAMILY_CATS[ONLY_FAMILY].includes(s.categoryId));
     if (ONLY_CAT) skills = skills.filter(s => s.categoryId === ONLY_CAT);
     if (ONLY_SKILL) skills = skills.filter(s => s.skillId === ONLY_SKILL);
@@ -1870,6 +1958,29 @@ function selfTest() {
             hasNotationOption: withNotation.has(`${s.categoryId}:${s.skillId}`),
         };
         const baseSeed = seedFor(`${s.categoryId}:${s.skillId}`);
+        if (family === 'ftable') {
+            const samples = await app.page.evaluate(({ categoryId, skillId, n, baseSeed }) => {
+                const out = [];
+                const combos = [];
+                for (const task of ['outputs', 'rule', 'inputs', 'mixed', 'make']) {
+                    for (const band of [10, 20, 100, 1000]) combos.push({ task, band, op: ['+', '-', 'x', '/'], step: [1, 2], response: 'check' });
+                }
+                combos.push({});                                     // the skill's own defaults
+                const per = Math.max(2, Math.ceil(n / combos.length));
+                combos.forEach((opts, c) => {
+                    for (let i = 0; i < per; i++) {
+                        try {
+                            const q = window.generateQuestionFor({ category: categoryId, skill: skillId, range: 100, decimals: 0, opts, seed: baseSeed + c * 1000 + i, itemIndex: i });
+                            const band = opts.band || (q.cell && q.cell.payload ? (skillId === 'function_table_hard' ? 100 : 20) : 0);
+                            out.push({ q: { ans: q.ans, cell: q.cell, printFormat: q.printFormat }, band });
+                        } catch (e) { out.push({ q: null, band: 0 }); }
+                    }
+                });
+                return out;
+            }, { categoryId: s.categoryId, skillId: s.skillId, n: N, baseSeed });
+            out.push({ ...skill, ...ftRules(samples), family });
+            continue;
+        }
         if (family === 'pv') {
             // TWO RUNS. At Max Number 100 (the app default, "not chosen") every skill DEALS and is
             // judged against its default band R (owner ruling 2026-09-25). A skill with a floor is
@@ -1950,7 +2061,7 @@ function selfTest() {
     if (JSON_OUT) { fs.writeFileSync(path.resolve(ROOT, JSON_OUT), JSON.stringify(out, null, 1)); console.log('wrote', JSON_OUT); }
 
     const scope = [ONLY_FAMILY, ONLY_CAT, ONLY_SKILL].filter(Boolean).join('/')
-        || [...new Set(out.map(s => s.family))].map(f => ({ operations: 'operations', k2: 'K-2', pv: 'place value' })[f] || f).join(' + ');
+        || [...new Set(out.map(s => s.family))].map(f => ({ operations: 'operations', k2: 'K-2', pv: 'place value', ftable: 'function table' })[f] || f).join(' + ');
     const noteCount = out.reduce((n, s) => n + s.notes.length, 0);
     // "lying about itself" vs "legitimately mixed": a failing skill contradicts its own name; a
     // mixed pool is held to the union of its pool's names and is counted separately, so the

@@ -26,7 +26,7 @@
 // Layer: 4 (imports only the pure sheet kit; the build twins load their widget on demand).
 // No window writes; no state import.
 
-import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle } from './sheet/index.js';
+import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches } from './sheet/index.js';
 
 export const INK = '#000000';
 export const PAPER = '#ffffff';
@@ -528,6 +528,14 @@ export function adoptVisualBlank(cellEl, input) {
  * @param {{onChange?: function(string): void}} [opts]
  * @returns {boolean} true when the cell's slots were wired
  */
+/** What a typed slot keeps: digits; a sign circle one sign (as its glyph); a rule line signs and digits. */
+function _slotChars(v, kind) {
+    const glyph = (t) => t.replace(/[*xX]/g, '×').replace(/[/:]/g, '÷').replace(/-/g, '−');
+    if (kind === 'sign') { const m = glyph(String(v)).match(/[+−×÷]/g); return m ? m[m.length - 1] : ''; }
+    if (kind === 'rule') return glyph(String(v)).replace(/[^0-9+−×÷ ]/g, '');
+    return String(v).replace(/[^0-9]/g, '');
+}
+
 export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     if (!cellEl || !input) return false;
     wireOpsWork(cellEl);
@@ -542,7 +550,10 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         const el = document.createElement('input');
         el.type = 'text';
         el.className = 'mq-cellslot';
-        el.setAttribute('inputmode', 'numeric');
+        // A function table's sign circle and rule line take signs (data-mq-kind): every other box digits.
+        const kind = slot.getAttribute('data-mq-kind') || '';
+        if (kind) el.dataset.mqKind = kind;
+        el.setAttribute('inputmode', kind ? 'text' : 'numeric');
         el.setAttribute('autocomplete', 'off');
         el.setAttribute('spellcheck', 'false');
         el.setAttribute('maxlength', String(Math.max(2, Number(slot.getAttribute('data-mq-w')) || 4)));
@@ -555,7 +566,7 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     const compose = () => boxes.map((b) => (b.value || '').trim()).join(join);
     boxes.forEach((b, k) => {
         b.addEventListener('input', () => {
-            b.value = b.value.replace(/[^0-9]/g, '');
+            b.value = _slotChars(b.value, b.dataset.mqKind);
             input.value = compose();
             input.dispatchEvent(new Event('input', { bubbles: true }));
         });
@@ -1335,6 +1346,8 @@ export function workRowsHTML(k) {
  */
 export function slotAnswerMatches(value, q) {
     if (!q) return null;
+    // A function table checks each slot against the rule (a 'make your own' table has no one answer).
+    if (q.ftCheck) return ftAnswerMatches(value, q.ftCheck);
     const parts = String(value == null ? '' : value).split(/\s*(?:,|\bR\b)\s*/i).map((s) => s.trim().toLowerCase());
     const eq = (a, b) => String(a).trim().toLowerCase().replace(/,/g, '') === String(b).trim().toLowerCase().replace(/,/g, '');
     const sets = q.inlineBlanksData && Array.isArray(q.inlineBlanksData.acceptedSets) ? q.inlineBlanksData.acceptedSets : null;

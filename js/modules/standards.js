@@ -533,7 +533,7 @@ export const SKILL_STANDARDS = {
     'algebra:combine_like_terms': { ccss: ['6.EE.A.3', '6.EE.A.4'], ee: ['M.EE.6.EE.3'] }, // Combine Like Terms
     'algebra:distributive_expr': { ccss: ['6.EE.A.3'], ee: ['M.EE.6.EE.3'] }, // Distributive Property of Expressions
     'algebra:function_table_easy': { ccss: ['4.OA.C.5', '5.OA.B.3'], ee: ['M.EE.4.OA.5', 'M.EE.5.OA.3'] }, // Function Tables - Easy (Visual)
-    'algebra:function_table_hard': { ccss: ['5.OA.B.3', '6.EE.C.9'], ee: ['M.EE.5.OA.3'] }, // Function Tables - Hard (Visual)
+    'algebra:function_table_hard': { ccss: ['4.OA.C.5', '5.OA.B.3', '6.EE.C.9'], ee: ['M.EE.4.OA.5', 'M.EE.5.OA.3'] }, // Function Tables - Hard (Visual)
     'algebra:algebra_word_mixed': { ccss: ['4.OA.A.3', '3.OA.D.8'], ee: ['M.EE.4.OA.3', 'M.EE.3.OA.7'] }, // Mixed Algebra Word Problems (Visual)
     'algebra:algebra_word_mixed_plain': { ccss: ['4.OA.A.3', '3.OA.D.8'], ee: ['M.EE.4.OA.3', 'M.EE.3.OA.7'] }, // Mixed Algebra Word Problems (No Pictures)
     'algebra:solve_eq_addsub': { ccss: ['6.EE.B.7'], ee: ['M.EE.6.EE.5-7'] }, // Solve One-Step Equations (+/−)

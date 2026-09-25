@@ -207,7 +207,7 @@ function updateQuizTimer() {
 // and optional: a quiz saved before this reads exactly as it did.
 const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlanksData', 'target', 'maxPlace',
     'maxDots', 'places', 'allowRegroup', 'quotientRemainder', 'acceptedAnswers', 'regroup', 'notation',
-    'operands', 'selfAnswering', 'printAnswer', 'a', 'b', 'op'];
+    'operands', 'selfAnswering', 'printAnswer', 'a', 'b', 'op', 'ftCheck'];
 export function quizQuestionData(q) {
     if (!q) return null;
     const d = {
