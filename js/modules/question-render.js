@@ -1647,7 +1647,7 @@ function _applyCardTwin(q, paper, visualAid, qt) {
         visualAid.style.display = 'block';
         paper.classList.add('mq-twin');
         // the skill's own print instruction, verb swapped (round 3: "'Solve.' tells the pupil nothing")
-        setInstr(printInstructionFor(q, state.category) || 'Solve.');
+        setInstr(q.screenInstr || printInstructionFor(q, state.category) || 'Solve.');
         visualAid.dataset.mqNoZoom = '1';
         return;
     }

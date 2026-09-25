@@ -89,11 +89,26 @@ register('area-model', {
             ? `<input type="text" class="area-model-total" inputmode="numeric" autocomplete="off" data-area-idx="${uid}-total" data-answer="${total}" data-ws-slot="total" data-ws-shape="box" aria-label="total" `
                 + `style="box-sizing:border-box;width:${g.em(totalW)};height:${g.em(g.stripMm)};border:${HAIR} solid ${INK.ink};border-radius:${g.em(g.rMm)};background:#fff;color:${INK.ink};font:inherit;font-size:1em;text-align:center;padding:0">`
             : box(g, 'total', { wMm: totalW, hMm: g.stripMm, value: vAt('total'), ink: iAt('total'), mark: null });
-        const model = `<div style="display:inline-flex;flex-direction:column;align-items:flex-start;white-space:nowrap">`
+        // R3 (critic round 3): on paper the parts are ADDED on a work row under the model -
+        // "___ + ___ + ___" with one line per part - so the pupil has somewhere to add the
+        // partial products before writing the total (the key writes them in). The screen twin
+        // keeps its own total input and no work row.
+        const workRow = twin || parts.length < 2 ? '' : `<div class="${NOWRAP}" data-mq-amwork="1" style="display:flex;flex-wrap:nowrap;align-items:flex-end;gap:0.28em;margin-top:0.45em;margin-left:${g.em(mulMm)}">`
+            + parts.map((_, i) => {
+                // A step-by-step anchor (stepVals) fills the part boxes one step at a time; its
+                // work row stays empty so each step shows one new value.
+                const v = sv ? '' : vAt(`part-${i}`);
+                const wink = iAt(`part-${i}`);
+                const fill = v && wink ? `<span data-ws-ink="${wink}" style="font-weight:${wink === 'trace' ? 400 : 700};color:${wink === 'trace' ? INK.grey : INK.ink}">${esc(v)}</span>` : '';
+                return `${i ? '<span style="font-weight:700;width:1em;text-align:center">+</span>' : ''}`
+                    + `<span style="display:inline-flex;justify-content:center;align-items:flex-end;width:${g.em(bw)};height:${g.em(g.stripMm)};border-bottom:${HAIR} solid ${INK.ink};line-height:1.1">${fill}</span>`;
+            }).join('') + '</div>';
+        const model = `<div style="display:inline-flex;flex-direction:column;align-items:flex-start;white-space:nowrap${twin ? '' : `;padding-top:${g.em(3)}`}">`
             + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;margin-left:${g.em(mulMm)};margin-bottom:0.1em">${labels}</div>`
             + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:center">`
             + `<span style="flex:0 0 ${g.em(mulMm)};text-align:center;font-weight:700">${esc(p.multiplier)}</span>`
             + `<span class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;border:${HAIR} solid ${INK.ink}">${rects}</span></div>`
+            + workRow
             + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:center;gap:0.28em;margin-top:0.45em;white-space:nowrap">`
             + `<span>${esc(p.multiplier)}</span><span style="font-weight:700;width:1em;text-align:center">×</span><span>${esc(multiplicandOf(p))}</span>`
             + `<span style="font-weight:700;width:1em;text-align:center">=</span>${totalSlot}</div></div>`;
@@ -111,9 +126,10 @@ register('area-model', {
         const partials = partialsOf(p);
         const bw = boxMm(g, Math.max(...partials.map((v) => String(v).length)));
         const colMm = bw + 6;
+        const work = !g.twin && p.parts.length >= 2 ? g.stripMm + 0.45 * g.E + 3 : 0;   // R3: the work row + top pad
         return {
-            wMm: Math.ceil(p.parts.length * colMm + String(p.multiplier).length * 0.62 * g.E + 12),
-            hMm: Math.ceil(g.E * 1.2 + g.stripMm + 8 + g.stripMm + 10),
+            wMm: Math.ceil(Math.max(p.parts.length * colMm, p.parts.length * (bw + g.E)) + String(p.multiplier).length * 0.62 * g.E + 12),
+            hMm: Math.ceil(g.E * 1.2 + g.stripMm + 8 + g.stripMm + 10 + work),
             measure: true, factLike: false, maxCols: 2,
         };
     },

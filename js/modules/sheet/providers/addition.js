@@ -155,15 +155,20 @@ registerSkill('addition:add', {
     // S2: the supports this skill can draw (touch dots, cues, panes); the Support control offers these.
     supports: Object.freeze(['touch', 'touchall', 'startarrow', 'boxsign']),
     strings: strings({
-        iCan: 'I Can add tens and ones in columns',
+        // R3 (critic round 3): basic `add` is grade 1, within 20 (1.OA.6), and every item of
+        // the band is a fact (gen-operations.js _applyKitFactCell), so the title, the steps and
+        // the worked example are the count-on fact's, not the column algorithm's.
+        iCan: 'I Can add within 20',
         instructionKey: 'add',
-        steps: ['Add the ones.', '10 ones or more? Regroup 10 ones as 1 ten.', 'Add the tens.', 'Write the sum.'],
+        steps: ['Start with the bigger number.', 'Count on the smaller number.', 'Write the sum.'],
         say: '__ plus __ equals __.',
     }),
     misconceptions: ['forgot-regroup', 'whole-column-total', 'misaligned', 'subtracted'],
     workedSteps: (q) => {
         const ops = operands(q);
         if (ops.length < 2) return [];
+        const tpl = q && q.cell && q.cell.template;
+        if (tpl !== 'stack' && ops[0] + ops[1] <= 20) return factSteps(ops[0], ops[1]);
         const col = columnAdd(ops.slice(0, 2));
         return clampSteps([step('Line up the digits: ones under ones, tens under tens.')].concat(col.steps).concat(step(`The sum is ${fmt(col.sum)}.`, [{ slot: 'answer', value: String(col.sum) }])));
     },
@@ -365,6 +370,35 @@ registerSkill('addition:number_line_add', {
         ]);
     },
     stories: storiesFor('+'),
+});
+
+/* ============================================================================ nl_add */
+// Owner request (2026-09-25): nl_add draws on the kit's number line, as number_line_add, one hop
+// per number; its missing number can be the sum, the jump or the start.
+registerSkill('addition:nl_add', {
+    strings: strings({
+        iCan: 'I Can add by hopping on a number line',
+        instructionKey: 'line-jumps',
+        steps: [
+            'Find the first number on the line.',
+            'Hop to the right, one number each hop.',
+            'Count the hops. Write the missing number.',
+        ],
+        say: '__ plus __ equals __.',
+    }),
+    misconceptions: ['counted-start', 'jumped-wrong-way'],
+    workedSteps: (q) => {
+        const [a, b] = operands(q);
+        return Number.isFinite(a) && Number.isFinite(b) ? lineSteps(a, b, 1) : [];
+    },
+    wrongAnswer: (q) => {
+        const [a, b] = operands(q);
+        if (!Number.isFinite(a) || !Number.isFinite(b) || q.missing) return null;
+        return chooseWrong(q, [
+            { value: a + b - 1, misconception: 'counted-start', explain: `Counted ${a}, the start, as the first hop.` },
+            { value: a - b, misconception: 'jumped-wrong-way', explain: 'Hopped to the left, not the right.' },
+        ]);
+    },
 });
 
 /* ====================================================================== word problems */

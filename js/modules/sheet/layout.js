@@ -101,7 +101,8 @@ export const PRACTICE_CEILING = Object.freeze({
 export const PRACTICE_TARGET = Object.freeze({
     standard: Object.freeze({ cols: 2, rows: Object.freeze({ S: 3, M: 3, L: 3 }) }),
     long: Object.freeze({ cols: 2, rows: Object.freeze({ S: 2, M: 2, L: 2 }) }),
-    short: Object.freeze({ cols: 2, rows: Object.freeze({ S: 8, M: 5, L: 4 }) }),
+    // A one-column short cell (a number line with its equation) holds 5 to a page (owner, 2026-09-25).
+    short: Object.freeze({ cols: 2, rows: Object.freeze({ S: 8, M: 5, L: 4 }), rowsByCols: Object.freeze({ 1: 5 }) }),
     wide: Object.freeze({ cols: 1, rows: Object.freeze({ S: 5, M: 4, L: 3 }) }),
     word: Object.freeze({ cols: 1, rows: Object.freeze({ S: 4, M: 3, L: 3 }) }),
 });

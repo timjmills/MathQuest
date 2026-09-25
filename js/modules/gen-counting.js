@@ -1086,8 +1086,14 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // the two edge facts a within-5 page otherwise never shows: take away none (m = 0) and
         // take away all (the answer 0).
         const shape = K2_COUNT_SHAPES[_kDeal(K2_COUNT_SHAPES.length)];
-        const remain = _kDealShuffled(5);                 // 0..4
-        const n = rng(Math.max(2, remain), 5);
+        // R3 (critic round 3): "take away 0" came up on a fifth of the items (three of six on a
+        // worksheet). Now each edge fact is ONE slot in ten - take away all (answer 0) and take
+        // away none (m = 0) - and every other item takes at least one away and leaves 1 to 4.
+        const _sv = _kDealShuffled(10);
+        let remain, n;
+        if (_sv === 0) { remain = 0; n = rng(2, 5); }
+        else if (_sv === 1) { n = 5; remain = 5; }        // take none from 5: the one answer 5, so no answer tops 1 in 5
+        else { remain = 1 + ((_sv - 2) % 4); n = rng(remain + 1, 5); }
         const m = n - remain;
         q.text = `Start with ${n}, take away ${m}. How many are left?`;
         q.printText = 'Write how many are left.';

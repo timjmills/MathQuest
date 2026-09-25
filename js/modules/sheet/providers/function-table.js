@@ -45,7 +45,7 @@ const BY_TASK = {
     rule: {
         iCan: 'I Can find the rule of a table',
         instructionKey: 'table-rule',
-        steps: ['Look at how each In number changes to its Out.', 'Test + and × on every row, not just one.', 'Write the rule that works for all the rows.'],
+        steps: ['Look at how each In number changes to its Out.', 'Test +, −, × and ÷ on every row, not just one.', 'Write the rule that works for all the rows.'],
     },
     inputs: {
         iCan: 'I Can work a rule backward to find the In number',

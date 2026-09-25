@@ -98,8 +98,12 @@ const MODEL_TEMPLATES = new Set(['area-model', 'number-line', 'counters', 'divis
  *  a grouping picture of 20 counters would leave one story on the page.) */
 const hasModel = (it) => MODEL_TEMPLATES.has(it.template) && typeof it.render === 'function'
     && (it.template !== 'counters' || ((((it.q || {}).cell || {}).payload || {}).kind === 'takeaway'));
-/** Models wider than the work space beside an answer column: the answer row goes under them. */
-const WIDE_MODELS = new Set(['number-line', 'division']);
+/**
+ * Models wider than the work space beside an answer column: the answer row goes under them.
+ * R3 (critic round 3): not long division - its frame is about 60 mm wide, so the answer column
+ * stands beside it; under it the story was one to a page with a 30 mm dead band (H5).
+ */
+const WIDE_MODELS = new Set(['number-line']);
 
 /**
  * A model cell without its own equation row: the story's number box is the one answer place, so
@@ -160,7 +164,9 @@ export function prepare(it, info = {}) {
         let space = '';
         if (model) {
             let m = '';
-            try { m = modelOnly(it.render(c, { cols: 1, prompt: false }), it.template); } catch (e) { m = ''; }
+            // R3: a take-away picture is drawn uncrossed on the pupil page (the pupil crosses out).
+            const mp = it.template === 'counters' ? { payload: { crossOnKey: true } } : {};
+            try { m = modelOnly(it.render(c, Object.assign({ cols: 1, prompt: false }, mp)), it.template); } catch (e) { m = ''; }
             if (m) space = `<div class="mq-wpspace mq-wpmodel"><small>work space</small><div>${m}${answered && st.equation ? `<b class="mq-wpsentence" data-ws-ink="solid">${esc(st.work || st.equation)}</b>` : ''}</div></div>`;
         }
         if (!space) space = `<div class="mq-wpspace"><small>work space</small>${answered && st.equation ? `<b class="mq-wpsentence" data-ws-ink="solid">${esc(st.work || st.equation)}</b>` : ''}</div>`;

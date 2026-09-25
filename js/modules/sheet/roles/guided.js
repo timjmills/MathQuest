@@ -382,6 +382,14 @@ export function countCueOf(it) {
     return n >= 1 && n <= 10 ? n : null;
 }
 
+/** The fact row (1 top, 2 bottom) whose number the count cue pictures. */
+export function countCueRow(it) {
+    const q = it.q || {};
+    const o = operandsOf(q);
+    if (opOf(q) === 'subtract') return 2;
+    return o.length >= 2 && o[1] <= o[0] ? 2 : 1;
+}
+
 /**
  * The think line of a division fact (the Steps' missing-factor frame, PT-FPR-7's think box):
  * "6 × __ = 24" in trace grey under the fact; on the worked example the factor is filled in.
@@ -399,7 +407,9 @@ export function thinkCueOf(it, filled = false) {
 function withCue(html, it, stage) {
     if (stage === 'blank') return html;
     const n = countCueOf(it);
-    if (n) return `<div class="mq-cuewrap">${html}<span class="mq-cue">${dotTile(n)}</span></div>`;
+    // R3: the tile sits beside the number it pictures - the second row when that is the smaller
+    // addend or the number taken away (critic round 3: it sat beside the top number).
+    if (n) return `<div class="mq-cuewrap">${html}<span class="mq-cue${countCueRow(it) === 2 ? ' mq-cue-b' : ''}">${dotTile(n)}</span></div>`;
     const think = thinkCueOf(it, stage === 'model');
     return think ? `<div class="mq-cuecol">${html}${think}</div>` : html;
 }

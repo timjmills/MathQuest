@@ -293,7 +293,10 @@ export function storiesFor(op, cfg = {}) {
         if (!body) return null;
         const u = body.unit || unit;
         const answer = body.ans !== undefined ? body.ans : ans;
-        const label = nounFor(u, answer);
+        // R3 (critic round 3): a Kindergarten label is PRINTED beside the box, so it is the
+        // question's own word ("How many stars are left?" -> "stars") whatever the answer; a
+        // singular label only when the answer is 1 gave that answer away.
+        const label = cfg.k ? u.many : nounFor(u, answer);
         const equation = rem
             ? `${fmt(a)} ÷ ${fmt(b)} = ${fmt(quo)} R ${fmt(rem)}`
             : `${fmt(a)} ${GLYPH[op]} ${fmt(b)} = ${fmt(ans)}`;

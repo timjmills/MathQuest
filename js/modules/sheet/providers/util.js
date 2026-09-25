@@ -171,6 +171,11 @@ export function strings(def) {
             say: def.say,
             oralFrame: def.say,
         };
+        // R3: steps written from the page's own worked example (item 1), so an example number
+        // in the Steps band is the Model's, never a fixed "24 ÷ 6" beside a 24 ÷ 12 model.
+        if (q && typeof def.stepsFor === 'function') {
+            try { const st = def.stepsFor(q); if (Array.isArray(st) && st.length) out.steps = st.slice(); } catch (e) { /* keep the fixed steps */ }
+        }
         out.sayFill = (item) => sayFill(def, item);
         if (def.instructionVars) out.instructionVars = def.instructionVars;
         if (def.whatsNew) out.whatsNew = def.whatsNew;
