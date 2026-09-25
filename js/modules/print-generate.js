@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, isMixedMetaSkill, getSkillsForCategory, getSkillsForDomain, getSkillsForGrade, getMixedSkillScope, getCategoryForSkill, getSkillPrintSize, SKILL_PRINT_SIZE, PRINT_FORMAT_SIZE, PRINT_SIZE_COLUMNS, SKILL_FULL_LABELS } from './data.js';
+import { DOMAINS, SKILLS, isMixedMetaSkill, getSkillsForCategory, getMixedPoolSkills, getSkillsForDomain, getSkillsForGrade, getMixedSkillScope, getCategoryForSkill, getSkillPrintSize, SKILL_PRINT_SIZE, PRINT_FORMAT_SIZE, PRINT_SIZE_COLUMNS, SKILL_FULL_LABELS } from './data.js';
 import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, fracText, fractionToPercent } from './utils.js';
 import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG } from './svg-geometry.js';
 import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
@@ -657,7 +657,7 @@ export function generatePrintProblem() {
         if (playable.length === 0) continue;
         for (const s of catSkills) {
             if (s.v.startsWith('mixed_') && s.v !== 'mixed') {
-                printCategoryMixedSkills[s.v] = { category: catId, skills: playable };
+                printCategoryMixedSkills[s.v] = { category: catId, skills: getMixedPoolSkills(catId, s.v) };
             }
         }
     }
@@ -5981,25 +5981,29 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
 
     if (problem.printFormat === 'sub-5-pictures' && problem.pictureData) {
         const pd = problem.pictureData;
-        let pics = '';
-        // P8: a crossed-out picture carries a bold X through the whole object — a black X over a
-        // white halo, so it reads on a solid black glyph and on the paper around it. The old
-        // strike was a text line-through that sat along the top edge of the glyph, black on
-        // black, and was barely visible (critic, baseline 2026-09-24).
-        const crossX = `<svg viewBox="0 0 10 10" preserveAspectRatio="none" style="position:absolute;left:-8%;top:-8%;width:116%;height:116%;overflow:visible;">`
-            + `<path d="M1 1 L9 9 M9 1 L1 9" stroke="#fff" stroke-width="5" vector-effect="non-scaling-stroke" stroke-linecap="round" fill="none"/>`
-            + `<path d="M1 1 L9 9 M9 1 L1 9" stroke="#000" stroke-width="2.4" vector-effect="non-scaling-stroke" stroke-linecap="round" fill="none"/></svg>`;
-        for (let i = 0; i < pd.n; i++) {
-            const isCrossed = i < pd.m;
-            pics += `<span style="font-size:3rem;line-height:1;display:inline-block;position:relative;margin:0 1.2mm;color:#000;">`
-                + `${pd.emoji}${isCrossed ? crossX : ''}</span>`;
+        // P8b: the counters are the generator's own SVG strip (outlined shapes, a bold X through
+        // each one taken away), never font glyphs: ★ / ■ printed in DejaVu / Liberation, not
+        // Andika (L-FONT), and ★ is a pictograph (L-EMOJI). The slot is ONE box after "=", the
+        // box the answer key writes into (print-sheet.js legacyKeyFill, AK-4). An item saved
+        // before P8b carries no strip and keeps the old glyph drawing.
+        let pics = pd.strip ? `<span style="--mq-pic:10mm;display:inline-block;">${pd.strip}</span>` : '';
+        if (!pics) {
+            const crossX = `<svg viewBox="0 0 10 10" preserveAspectRatio="none" style="position:absolute;left:-8%;top:-8%;width:116%;height:116%;overflow:visible;">`
+                + `<path d="M1 1 L9 9 M9 1 L1 9" stroke="#000" stroke-width="2.4" vector-effect="non-scaling-stroke" stroke-linecap="round" fill="none"/></svg>`;
+            for (let i = 0; i < pd.n; i++) {
+                pics += `<span style="font-size:3rem;line-height:1;display:inline-block;position:relative;margin:0 1.2mm;color:#000;">`
+                    + `${pd.emoji}${i < pd.m ? crossX : ''}</span>`;
+            }
         }
+        const slot = `<span class="blank-box" data-ws-slot="answer" data-ws-shape="box" style="display:inline-block;`
+            + `width:14mm;height:12mm;border:1.5pt solid #000;border-radius:0;background:#fff;vertical-align:middle;`
+            + `text-align:center;line-height:12mm;margin-left:2mm;"></span>`;
         return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
             ${num}
             <div class="problem-content">
                 <div class="p-prompt" style="${WS_FACE}font-size:13pt;margin-bottom:2mm;">${problem.text || ''}</div>
-                <div style="text-align:center;margin:2mm 0;">${pics}</div>
-                <div style="text-align:center;font-size:22pt;${WS_FACE}">${pd.n} − ${pd.m} = ${wsAnswerLine(1)}</div>
+                <div style="text-align:center;margin:3mm 0;line-height:0;">${pics}</div>
+                <div style="text-align:center;font-size:22pt;${WS_FACE}">${pd.n} − ${pd.m} =${slot}</div>
             </div>
         </div>`;
     }
@@ -6988,28 +6992,26 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
     }
 
     // ========== WORD PROBLEMS WITH VISUAL (word-problem format from gen-operations) ==========
+    //
+    // P8b (mixed_division critic): this branch hand-rolled its own "1." heading (every cell on a
+    // kit page printed "1." under the kit's own letter), a grey rule, a dashed "SHOW YOUR WORK"
+    // box and an "ANSWER" box whose labels were CSS pseudo-elements at 6.5 pt. Inside a kit cell
+    // the answer box collapsed to its padding and the label stood one letter per line
+    // ("S H O W  Y O U R ..."). Now: the shared problem head (the kit strips it), the story at
+    // reading size, a work space outlined in the single grey (a place to draw, not a slot), and
+    // ONE "Answer:" rule the key writes into (print-sheet.js legacyKeyFill, AK-4).
     if (problem.printFormat === 'word-problem') {
         const wpText = problem.text || '';
-        const showLabel = showSkillLabels && !!skillLabel;
-        // Detect "no picture" word problems \u2014 these get the bigger WORK box.
         const skillId = problem.skillId || problem.skill || '';
         const hasVisualMarkup = /<svg|<img/i.test(wpText);
         const isNoPicture = /_(no_pic|plain|word_problems_no_pic|word_problems)$/.test(skillId)
             || (!hasVisualMarkup && /word/i.test(skillId));
-
-        // Choose answer affordance: large WORK box for "no picture", standard ans-box otherwise.
-        const answerHtml = isNoPicture
-            ? `<div class="ans-box work-box" style="height:1.2in;"></div>`
-            : `<div class="ans-box"></div>`;
-
-        return `<div class="worksheet-problem ws-problem-spacious" style="padding:14px 16px;page-break-inside:avoid;">
-            <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;border-bottom:2px solid #eee;padding-bottom:6px;">
-                <span style="font-weight:700;font-size:1.05rem;">${index + 1}.</span>
-                ${showLabel ? `<span style="font-size:0.7rem;color:#888;">${skillLabel}</span>` : ''}
-            </div>
-            <div class="p-prompt">${wpText}</div>
-            <div class="work-area" style="min-height:0.7in;"></div>
-            ${answerHtml}
+        const workMm = isNoPicture ? 30 : 22;
+        return `<div class="worksheet-problem ws-problem-spacious" style="page-break-inside:avoid;">
+            ${num}
+            <div class="p-prompt" style="font-size:1.1rem;line-height:1.6;margin-bottom:3mm;">${wpText}</div>
+            <div style="display:block;width:100%;box-sizing:border-box;min-height:${workMm}mm;border:0.75pt solid #949494;"></div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:4mm;"><span style="font-weight:700;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:1.5pt solid #000;min-height:1.4em;">&nbsp;</span></div>
         </div>`;
     }
 

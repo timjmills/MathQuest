@@ -8,7 +8,7 @@ import { saveResult, decompressTestFromURL, migrateTestToSections, getAllQuestio
 import { broadcastQuizJoin, broadcastQuizAnswer, broadcastQuizSubmit } from './quiz-monitor.js';
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
-    hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt,
+    hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt, adoptVisualBlank, wireCellSlots,
 } from './screen-cell.js';
 
 let quizTimerInterval = null;
@@ -366,6 +366,14 @@ function _mountQuizCell(flatIdx) {
                 cellEl.parentNode.insertBefore(textEl, cellEl);
                 screenTextLine(textEl);
             }
+        }
+        // One slot per answer (SL-7): the visual's own blank takes the answer input.
+        const area = cellEl.querySelector(':scope > .qt-answer-area');
+        const inp = area && area.querySelector('#qtAnswerInput');
+        if (vis && inp && adoptVisualBlank(vis, inp)) area.remove();
+        // several blanks in one drawing: an input in each, recorded in reading order
+        else if (vis && inp && wireCellSlots(vis, inp, { onChange: (v) => { if (v.replace(/[,\s]/g, '')) recordAnswer(flatIdx, v); } })) {
+            area.style.display = 'none';
         }
     }
     const boxes = Array.from(cellEl.querySelectorAll('input.mq-qt-digit'));

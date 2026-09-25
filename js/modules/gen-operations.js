@@ -950,7 +950,14 @@ const _WS_TRACK = '1.3em';
 
 const _wsCell = (inner, note) => `<div class="ws-v2-cell" style="text-align:center;color:${_WS_INK};`
     + `font-family:'Andika','Open Sans',sans-serif;">${inner}`
-    + `${note ? `<div style="margin-top:10px;font-size:0.95rem;line-height:1.4;">${note}</div>` : ''}</div>`;
+    + `${note ? `<div style="margin-top:10px;font-size:0.95rem;line-height:1.4;">${_wsSayGaps(note)}</div>` : ''}</div>`;
+/**
+ * P8b: the gaps of a spoken frame ("Say: ___ times ___ equals ___ .") are drawn as short hair
+ * rules, not typed underscores (SL-6: a blank is a rule or a box, never "___"). They are gaps to
+ * SAY, so they are thinner and shorter than a writing line.
+ */
+const _wsSayGaps = (note) => String(note).replace(/_{3,}/g,
+    () => `<span style="display:inline-block;width:2.2em;border-bottom:0.75pt solid ${_WS_INK};vertical-align:baseline;">&nbsp;</span>`);
 
 /** An answer rule the pupil writes a number on (section 6: a line means "write a number"). */
 const _wsLine = (chars = 3) => `<span style="display:inline-block;min-width:${(chars * 0.95).toFixed(2)}em;`
@@ -1641,9 +1648,12 @@ function _generateLadderV2(q, skill, helpers, range) {
         const isRight = _dealRung(2) === 0;
         const shownQ = isRight ? trueQ : trueQ - 1;
         const shownR = isRight ? r : r + d;             // still adds up, but is not finished
-        q.text = `${dividend} ÷ ${d} = ${shownQ} R ${shownR}. Is the remainder finished? Write the correct answer.`;
-        q.printText = 'Is the remainder finished? Write the correct answer.';   // the cell draws it
+        q.text = `${dividend} ÷ ${d} = ${shownQ} R ${shownR}. Is the remainder finished? Write the finished answer.`;
+        q.printText = 'Is the remainder finished? Write the finished answer.';   // the cell draws it
         q.ans = `${trueQ} R ${r}`;
+        // P8b: one answer, two boxes (quotient, remainder), each filled on the key (AK-2).
+        q.keyParts = [String(trueQ), String(r)];
+        q.selfAnswering = true;
         q.acceptedAnswers = [`${trueQ} R ${r}`, `${trueQ}r${r}`, `${trueQ} r ${r}`, `${trueQ} remainder ${r}`];
         q.a = dividend; q.b = d; q.op = '÷';
         q.answerType = 'text';
@@ -1651,12 +1661,20 @@ function _generateLadderV2(q, skill, helpers, range) {
         q.hint = isRight
             ? `${r} is smaller than ${d}, so no more groups can be made. It is finished.`
             : `${shownR} is bigger than ${d}, so one more group of ${d} still fits. ${shownQ} + 1 = ${trueQ}, and ${shownR} − ${d} = ${r}.`;
+        // P8b: the cell overflowed its grid cell by 46 mm on paper (a rule box, the work, a
+        // Correct / Fix it tick list, a "_ R _" line, a Say band AND the generic "Answer:" line),
+        // which let the black grid show through (L-OVERFLOW, L-INK). It is one answer, so it
+        // gets one slot: the finished answer, written into two boxes with the R between them.
+        // A work that is already finished is copied; one that is not is fixed. The tick list
+        // asked the same question a second time, and the key could fill only one of the two.
+        const _rBox = (id) => `<span class="blank-box" data-ws-slot="${id}" data-ws-shape="box" data-mq-cell="1" style="display:inline-block;`
+            + `width:14mm;height:12mm;border:1.5pt solid ${_WS_INK};border-radius:0;background:#fff;vertical-align:middle;`
+            + `text-align:center;line-height:12mm;"></span>`;
         q.visual = _wsCell(
             _wsRuleBox('The remainder must be smaller than the divisor.')
             + `<div style="font-size:1.7rem;font-weight:700;">${dividend} ÷ ${d} = ${shownQ} R ${shownR}</div>`
-            + _wsTickList(['Correct', 'Fix it'])
-            + `<div style="margin-top:8px;font-size:1.25rem;">${_wsLine(3)} R ${_wsLine(2)}</div>`,
-            `Say: ___ is bigger than ___ , so it is not finished.`);
+            + `<div data-mq-join=" R " style="margin-top:10px;font-size:1.4rem;font-weight:700;display:inline-flex;align-items:center;gap:3mm;">`
+            + `${dividend} ÷ ${d} = ${_rBox('rq')} R ${_rBox('rr')}</div>`);
         q.printFormat = 'remainder-judge';
         q.responseScope = 'judge';
         return true;
@@ -1860,6 +1878,7 @@ function _singularOf(word) {
     if (_IE_PLURALS.test(w)) return w.slice(0, -1);
     if (/[^aeiou]ies$/i.test(w)) return w.slice(0, -3) + (w.slice(-3) === 'IES' ? 'Y' : 'y');
     if (/(xes|sses|shes|ches|zzes)$/i.test(w)) return w.slice(0, -2);
+    if (/(shelves|halves|wolves|calves|leaves|loaves)$/i.test(w)) return w.slice(0, -3) + 'f';
     if (/(tomatoes|potatoes|heroes|echoes)$/i.test(w)) return w.slice(0, -2);
     return w.slice(0, -1);
 }
@@ -3855,116 +3874,75 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             }
 
             // ========================================
-            // MULTIPLICATION CHART (12x12 grid with blanks)
+            // MULTIPLICATION CHART (Visual) — a window of the 12 x 12 chart with three blanks.
+            //
+            // P8b (critic, baseline 2026-09-24): the old item drew the WHOLE chart for 1-3 blanks,
+            // in rainbow fills and monospace at ~7 pt, so three-digit products wrapped ('10/8'),
+            // white digits vanished on yellow, and 20 items took ten pages. The instruction also
+            // listed the facts ("1×9, 5×1"), which made the chart decoration.
+            //
+            // Now: 4 rows x 5 columns of the chart with their factor headers, black and white,
+            // Andika, cells sized for three digits (--mq-mc: 13 mm on paper, 48 px on screen). The
+            // blanks are three EMPTY CELLS, never named: the pupil finds the row and the column
+            // (or counts on along the row) to fill them. Each blank is a boxed slot the key fills
+            // (print-sheet.js legacyKeyFill, AK-4) and a screen input (screen-cell.js
+            // wireCellSlots), answered in reading order (q.keyParts, q.ans).
             // ========================================
             if (mappedSkill === "mult_chart") {
-                const maxN = 12;
-                // Pick 1-3 blank cells for the student to fill
-                const numBlanks = rng(1, 3);
-                const blanks = [];
-                const usedKeys = new Set();
-                while (blanks.length < numBlanks) {
-                    const r = rng(1, maxN);
-                    const c = rng(1, maxN);
-                    const key = `${r},${c}`;
-                    if (!usedKeys.has(key)) {
-                        usedKeys.add(key);
-                        blanks.push({ row: r, col: c, ans: r * c });
-                    }
+                const R = 4, C = 5;
+                const r0 = rng(1, 12 - R + 1);
+                const c0 = rng(1, 12 - C + 1);
+                const cells = [];
+                for (let i = 0; i < R; i++) for (let j = 0; j < C; j++) cells.push({ i, j });
+                // Three blanks, no two in the same row AND no row or column left without a
+                // printed product to count on from.
+                let picked = [];
+                for (let tries = 0; tries < 50; tries++) {
+                    picked = shuffle(cells.slice()).slice(0, 3);
+                    const rows = new Set(picked.map(x => x.i));
+                    if (rows.size === 3) break;
                 }
+                const isBlank = (i, j) => picked.some(x => x.i === i && x.j === j);
+                const ordered = picked.slice().sort((a, b) => a.i - b.i || a.j - b.j);
+                const products = ordered.map(x => (r0 + x.i) * (c0 + x.j));
 
-                // Color function: maps product (1-144) to a gradient color
-                const getColor = (product) => {
-                    const t = (product - 1) / 143; // 0..1
-                    // Rainbow: blue→cyan→green→yellow→orange→red→pink
-                    const stops = [
-                        [0.00, 66,133,244],  // blue
-                        [0.15, 38,198,218],  // cyan
-                        [0.30, 76,175,80],   // green
-                        [0.50, 255,235,59],  // yellow
-                        [0.70, 255,152,0],   // orange
-                        [0.85, 244,67,54],   // red
-                        [1.00, 233,30,99]    // pink
-                    ];
-                    let lo = stops[0], hi = stops[stops.length - 1];
-                    for (let i = 0; i < stops.length - 1; i++) {
-                        if (t >= stops[i][0] && t <= stops[i + 1][0]) {
-                            lo = stops[i]; hi = stops[i + 1]; break;
-                        }
-                    }
-                    const f = (t - lo[0]) / (hi[0] - lo[0] || 1);
-                    const r2 = Math.round(lo[1] + f * (hi[1] - lo[1]));
-                    const g2 = Math.round(lo[2] + f * (hi[2] - lo[2]));
-                    const b2 = Math.round(lo[3] + f * (hi[3] - lo[3]));
-                    return `rgb(${r2},${g2},${b2})`;
-                };
-
-                // Build HTML table
-                const cellSize = 'min(2.2rem, 5.5vw)';
-                const fontSize = 'min(0.7rem, 2.2vw)';
-                let table = `<table style="border-collapse:collapse;margin:0 auto;font-family:monospace;text-align:center;">`;
-                // Header row: × | 1 | 2 | ... | 12
-                table += `<tr><td style="width:${cellSize};height:${cellSize};font-size:${fontSize};font-weight:700;background:var(--bg-card);color:var(--text-bright);border:1px solid var(--bg-card-light);">×</td>`;
-                for (let c = 1; c <= maxN; c++) {
-                    table += `<td style="width:${cellSize};height:${cellSize};font-size:${fontSize};font-weight:700;background:var(--bg-card);color:var(--text-bright);border:1px solid var(--bg-card-light);">${c}</td>`;
-                }
+                const cell = `width:var(--mq-mc, 13mm);height:calc(var(--mq-mc, 13mm) * 0.85);box-sizing:border-box;`
+                    + `padding:0;text-align:center;vertical-align:middle;border:0.75pt solid ${_WS_INK};`
+                    + `font-size:calc(var(--mq-mc, 13mm) * 0.42);line-height:1;white-space:nowrap;`;
+                const head = `${cell}font-weight:700;`;
+                let slot = 0;
+                let table = `<table class="mq-multchart" style="border-collapse:collapse;margin:0 auto;table-layout:fixed;`
+                    + `font-family:'Andika','Open Sans',sans-serif;color:${_WS_INK};background:#fff;">`;
+                table += `<tr><td style="${head}border-right-width:1.5pt;border-bottom-width:1.5pt;">×</td>`;
+                for (let j = 0; j < C; j++) table += `<td style="${head}border-bottom-width:1.5pt;">${c0 + j}</td>`;
                 table += `</tr>`;
-
-                // Data rows
-                for (let r = 1; r <= maxN; r++) {
-                    table += `<tr><td style="width:${cellSize};height:${cellSize};font-size:${fontSize};font-weight:700;background:var(--bg-card);color:var(--text-bright);border:1px solid var(--bg-card-light);">${r}</td>`;
-                    for (let c = 1; c <= maxN; c++) {
-                        const product = r * c;
-                        const isBlank = blanks.some(b => b.row === r && b.col === c);
-                        const bg = getColor(product);
-                        // Determine text color based on brightness
-                        const t = (product - 1) / 143;
-                        const txtColor = (t > 0.35 && t < 0.6) ? '#333' : '#fff';
-
-                        if (isBlank) {
-                            const idx = blanks.findIndex(b => b.row === r && b.col === c);
-                            // Single blank → keep showing "?" (the right-side
-                            // input holds the answer). Multi-blank → render an
-                            // INLINE typable input here. All multi-blank cells
-                            // share the same data-multi-answer so the student
-                            // can put any correct value in any box (order-free).
-                            if (numBlanks > 1) {
-                                const allAnsCsv = blanks.map(b => b.ans).join(',');
-                                table += `<td style="width:${cellSize};height:${cellSize};padding:0;background:var(--bg-world);border:2px solid var(--accent-orange);" title="Find: ${r} × ${c}"><input type="text" inputmode="numeric" class="np-cell" data-i="${idx}" data-multi-answer="${allAnsCsv}" maxlength="4" autocomplete="off" placeholder="?" style="width:100%;height:100%;border:0;background:transparent;text-align:center;font-weight:800;font-size:${fontSize};color:var(--accent-orange);outline:none;padding:0;"></td>`;
-                            } else {
-                                table += `<td style="width:${cellSize};height:${cellSize};font-size:${fontSize};font-weight:700;background:var(--bg-world);border:2px solid var(--accent-orange);color:var(--accent-orange);cursor:default;" title="Find: ${r} × ${c}">?</td>`;
-                            }
+                for (let i = 0; i < R; i++) {
+                    table += `<tr><td style="${head}border-right-width:1.5pt;">${r0 + i}</td>`;
+                    for (let j = 0; j < C; j++) {
+                        if (isBlank(i, j)) {
+                            table += `<td style="${cell}border-width:1.5pt;">`
+                                + `<span class="blank-box" data-ws-slot="mc${slot++}" data-ws-shape="box" data-mq-cell="1" `
+                                + `style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;`
+                                + `font-weight:700;"></span></td>`;
                         } else {
-                            table += `<td style="width:${cellSize};height:${cellSize};font-size:${fontSize};font-weight:600;background:${bg};color:${txtColor};border:1px solid rgba(255,255,255,0.15);">${product}</td>`;
+                            table += `<td style="${cell}">${(r0 + i) * (c0 + j)}</td>`;
                         }
                     }
                     table += `</tr>`;
                 }
                 table += `</table>`;
 
-                // Set question text and answer
-                if (numBlanks === 1) {
-                    const b = blanks[0];
-                    q.text = `Look at the multiplication chart. What is ${b.row} × ${b.col}?`;
-                    q.ans = b.ans;
-                    q.a = b.row; q.b = b.col; q.op = '×';
-                    q.answerType = "number";
-                    q.hint = `Find row ${b.row} and column ${b.col} on the chart. The answer is ${b.row} × ${b.col} = ${b.ans}`;
-                } else {
-                    // Multiple blanks: answer is comma-separated in row,col order
-                    blanks.sort((a, b) => a.row === b.row ? a.col - b.col : a.row - b.row);
-                    const parts = blanks.map(b => `${b.row}×${b.col}`);
-                    q.text = `Fill in the missing products: ${parts.join(', ')}`;
-                    q.ans = blanks.map(b => b.ans).join(', ');
-                    q.answerType = "text";
-                    q.hint = blanks.map(b => `${b.row} × ${b.col} = ${b.ans}`).join('; ');
-                }
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1rem;">Multiplication Chart</div>
-                    <div style="overflow-x:auto;padding:4px;">${table}</div>
-                    <div style="margin-top:6px;font-size:0.8rem;color:var(--text-dim);">Find the ? cells</div>
-                </div>`;
+                q.text = 'Fill in the missing products.';
+                q.printText = 'Fill in the missing products.';
+                q.ans = products.join(', ');
+                q.keyParts = products.map(String);
+                q.acceptedAnswers = [products.join(','), products.join(', '), products.join(' ')];
+                q.answerType = "text";
+                q.selfAnswering = true;         // the empty cells are the slots (SL-7)
+                q.a = r0 + ordered[0].i; q.b = c0 + ordered[0].j; q.op = '×';
+                q.hint = `Find the row number and the column number of each empty box, and multiply. `
+                    + `Or count on along the row: each step adds the row number.`;
+                q.visual = `<div class="ws-v2-cell mq-multchart-wrap" style="text-align:center;color:${_WS_INK};">${table}</div>`;
                 q.printFormat = 'mult-chart';
                 q.skillLabel = 'Mult Chart';
                 return;
@@ -5707,14 +5685,15 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 } else if (variant === "drop") {
                     // Full groups only — DROP the remainder
                     const ctxs = [
-                        { item: 'cards', container: 'complete decks', per: divisor },
-                        { item: 'cookies', container: 'full boxes', per: divisor },
-                        { item: 'eggs', container: 'full cartons', per: divisor },
-                        { item: 'pencils', container: 'full packs', per: divisor },
+                        { item: 'cards', container: 'complete decks', one: 'deck', per: divisor },
+                        { item: 'cookies', container: 'full boxes', one: 'box', per: divisor },
+                        { item: 'eggs', container: 'full cartons', one: 'carton', per: divisor },
+                        { item: 'pencils', container: 'full packs', one: 'pack', per: divisor },
                     ];
                     const c = pick(ctxs);
                     answer = quotient;
-                    txt = `${nameRI} has ${dividend} ${c.item}. Each pack holds exactly ${c.per}. How many ${c.container} can ${nameRI} fill?`;
+                    // P8b: "Each pack holds ... How many full cartons" named two containers.
+                    txt = `${nameRI} has ${dividend} ${c.item}. Each ${c.one} holds exactly ${c.per}. How many ${c.container} can ${nameRI} fill?`;
                     hintMsg = `${dividend} ÷ ${divisor} = ${quotient} remainder ${remainder}. Only complete groups count, so the leftover ${remainder} doesn't make a full pack. Answer: ${quotient}.`;
                 } else {
                     // Use the remainder itself
@@ -5870,7 +5849,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 const recipients = ['friends', 'boxes', 'bags', 'plates', 'shelves', 'children'];
                 const recipient = pick(recipients);
-                const recipientSingular = recipient.endsWith('ren') ? 'child' : recipient.slice(0, -1);
+                const recipientSingular = recipient.endsWith('ren') ? 'child' : _singularOf(recipient);   // P8b: not "boxe" / "shelve"
 
                 if (roll === 'equal_share') {
                     // Type 1: Equal sharing — "X items among Y friends, how many each?"
@@ -5913,7 +5892,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     answer = groups;
                     const containers = ['bags', 'boxes', 'packs', 'bundles', 'groups'];
                     const container = pick(containers);
-                    const containerSingular = container.slice(0, -1);
+                    const containerSingular = _singularOf(container);
                     let groupingTemplates;
                     if (scenario.category === 'money') {
                         groupingTemplates = [
@@ -5974,39 +5953,28 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.ans = answer;
                 q.a = total; q.b = groups; q.op = '÷';
 
-                // Create equal groups visual
-                const vizGroups = (roll < 0.40 || roll >= 0.85) ? groups : groups;
-                const vizPerGroup = (roll < 0.40 || roll >= 0.85) ? perGroup : perGroup;
-                const groupVisuals = [];
-                for (let g = 0; g < Math.min(vizGroups, 5); g++) {
-                    const groupItems = Array(Math.min(vizPerGroup, 6)).fill(scenario.item).join('');
-                    groupVisuals.push(`<div class="equal-group" style="font-size:1.1rem;letter-spacing:2px;color:#000;">${groupItems}</div>`);
-                }
-
-                // [worksheet-feedback] Visual caption noun must MATCH the noun used
-                // in the problem text (rate/measure/array-inverse branches use nouns
-                // like "miles" or "pages" that differ from scenario.unit "rock samples").
-                // Extract the dominant noun from q.text by matching the first noun
-                // following the leading total count (allowing commas in the number).
-                let _vizCaptionNoun = scenario.name;
-                if (typeof q.text === 'string') {
-                    const _totalStr = total.toLocaleString().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    const _re = new RegExp(`${_totalStr}\\s+([a-z][a-z ]*?)(?=\\s+(?:in|into|to|among|equally|onto|on|across|that|with|by|per)\\b|[.?!,])`, 'i');
-                    const _m = q.text.match(_re);
-                    if (_m && _m[1]) {
-                        _vizCaptionNoun = _m[1].trim();
+                // P8b (mixed_division critic): the picture drew min(groups, 5) groups of
+                // min(perGroup, 6) items under a caption "36 books in 6 equal groups" — a picture
+                // of 30 books for a story about 36, a caption that stated the answer on every
+                // grouping item, and an equation builder that prefilled the divisor with the
+                // answer. The picture is now the TOTAL, drawn ungrouped in rows of ten (the pupil
+                // makes the groups), and only when it is small enough to count (<= 100).
+                if (total <= 100) {
+                    const pitch = 22, r = 7;
+                    const cols = Math.min(10, total), rows = Math.ceil(total / 10);
+                    let dots = '';
+                    for (let k = 0; k < total; k++) {
+                        const cx = pitch * (k % 10) + pitch / 2 + (k % 10 >= 5 ? 6 : 0);
+                        const cy = pitch * Math.floor(k / 10) + pitch / 2;
+                        dots += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${_WS_INK}" stroke-width="1.5"/>`;
                     }
+                    const w = cols * pitch + (cols > 5 ? 6 : 0), h = rows * pitch;
+                    q.visual = `<div class="word-problem-visual" style="text-align:center;">`
+                        + `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="${total} counters" `
+                        + `style="display:block;margin:6px auto;max-width:100%;height:auto;">${dots}</svg></div>`;
+                } else {
+                    q.visual = '';
                 }
-
-                q.visual = `<div class="word-problem-visual">
-                    <div style="text-align:center;margin-bottom:10px;">
-                        <div style="font-size:0.9rem;color:#666;margin-bottom:8px;">${total} ${_vizCaptionNoun} in ${vizGroups} equal groups:</div>
-                    </div>
-                    <div class="equal-groups-visual">
-                        ${groupVisuals.join('')}
-                    </div>
-                    ${_equationBuilderHTML(total, vizGroups)}
-                </div>`;
 
                 q.options = buildNumericOptions(answer);
 

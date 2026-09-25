@@ -113,10 +113,9 @@ export function renderTenFrameBuild(q, container) {
                 ${paletteDotHtml}
                 <div style="font-size:0.7rem;color:var(--text-dim);">drag</div>
             </div>
-            <div class="tfb-counter" aria-live="polite"
-                 style="text-align:center;margin-top:10px;font-weight:600;color:var(--text-dim);">
-                0 of ${target} placed.
-            </div>
+            <!-- No running "N of target placed" readout: it counted for the pupil and
+                 restated the target, so the build became "click until the numbers match"
+                 (baseline 2026-09-24, ten_frame_build C2). The pupil counts the frame. -->
             <div class="tfb-toolbar" style="display:flex;justify-content:center;gap:10px;margin-top:10px;">
                 <button type="button" class="tfb-clear secondary-btn">Clear</button>
                 <button type="button" class="tfb-submit primary-btn" disabled>Submit</button>
@@ -131,7 +130,6 @@ export function renderTenFrameBuild(q, container) {
     const palette = host.querySelector('[data-role="palette"]');
     const submit = host.querySelector('.tfb-submit');
     const clearBtn = host.querySelector('.tfb-clear');
-    const counter = host.querySelector('.tfb-counter');
     const live = host.querySelector('.tfb-live');
     let locked = false;
 
@@ -143,7 +141,6 @@ export function renderTenFrameBuild(q, container) {
 
     function refreshUI() {
         const n = getPlacedCount();
-        counter.textContent = `${n} of ${target} placed.`;
         submit.disabled = n === 0;
     }
 

@@ -1291,6 +1291,24 @@ export function getSkillsForCategory(categoryId) {
     return skills.filter(s => !isMixedMetaSkill(s.v)).map(s => s.v);
 }
 
+/**
+ * The pool a category-level mixed skill (`mixed_division`, ...) deals from: the category's
+ * playable skills, minus the siblings whose NAMES promise an operation the mixed skill's own name
+ * does not. "Mixed Division" drew from "Mixed Multiplication & Division" and "Missing Factors
+ * (×/÷)" and so dealt "9 × 8 = ___" (critic, P8): a skill's name is its declaration, so the fix
+ * is the pool, not an exemption. Both screen play (generate-question.js) and the legacy print
+ * dispatcher (print-generate.js) build their pools here, and ws-content-audit reads it back.
+ */
+const MIXED_POOL_EXCLUDE = {
+    mixed_subtraction: ['mixed_add_sub'],
+    mixed_division: ['mixed_mult_div', 'missing_mult_div'],
+};
+export function getMixedPoolSkills(categoryId, mixedSkillId) {
+    const out = getSkillsForCategory(categoryId);
+    const drop = MIXED_POOL_EXCLUDE[mixedSkillId];
+    return drop ? out.filter(v => !drop.includes(v)) : out;
+}
+
 /** Get all non-mixed skill IDs for a domain (across all its categories) */
 export function getSkillsForDomain(domainId) {
     const domain = DOMAINS[domainId];
@@ -2326,7 +2344,7 @@ export function getMixedSkillCount(skillId) {
     // Single-category mixed_ skills (e.g., mixed_patterns → patterns category)
     if (skillId.startsWith('mixed_')) {
         const base = skillId.replace('mixed_', '');
-        const catSkills = getSkillsForCategory(base);
+        const catSkills = getMixedPoolSkills(base, skillId);
         if (catSkills.length > 0) return catSkills.length;
     }
 
