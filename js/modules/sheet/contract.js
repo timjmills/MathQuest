@@ -99,6 +99,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'story-v2': 'Solve. Write the number and the label.',
     'story-k': 'Show the story with lines. Write the equation.',
     'check-fix': 'Check the work. Check one box: Correct or Fix it.',
+    // Error analysis says where the fix goes (critic round 3).
+    'check-fix-write': 'Is it right? Check one box. Fix it: write the right answer.',
+    'check-fix-draw': 'Is it right? Check one box. Fix it: draw it again.',
+    'check-fix-mark': 'Is it right? Check one box. Fix it: mark it again.',
     'check-by': 'Multiply to check. Check one box: Correct or Fix it.',
     'true-false': 'Check one box: True or False. Finish the sentence.',
     spot: 'Find the mistake. Circle it. Write the correct answer.',

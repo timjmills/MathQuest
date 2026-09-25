@@ -141,9 +141,18 @@ function wrongAnswer(q) {
     if (p.task === 'rule') {
         const [a, b] = p.rows;
         // + for ×: read the rule off the first row as "add the gap"
+        // The Check row of a wrong rule is the WRONG rule done to the Check In (critic round 3:
+        // a Check value worked with the right rule contradicted the wrong rule written above it).
+        const withCheck = (repl, wrongRule) => {
+            if (!p.check || p.support === 'line') return repl;
+            const y = applyRule(wrongRule, p.check.x);
+            if (Number.isFinite(y) && y >= 0) repl.chk = y;
+            return repl;
+        };
         if (a.y > a.x && !(rule.length === 1 && rule[0].op === '+')) {
             const repl = p.support === 'line' ? { rule: `+ ${a.y - a.x}` } : { s0: '+', n0: a.y - a.x };
             if (rule.length === 2 && p.support !== 'line') { repl.s1 = FT_GLYPH[rule[1].op]; repl.n1 = rule[1].n; }
+            withCheck(repl, [{ op: '+', n: a.y - a.x }].concat(rule.length === 2 ? [rule[1]] : []));
             c.push(mk(repl, 'add-for-times', `Found the gap on one row (${a.x} to ${a.y}) and wrote + ${a.y - a.x}; it does not work for In ${b.x}.`, p.support === 'line' ? 'rule' : 'n0'));
         }
         // the gap between neighbouring Outs, read as the rule (the first pair whose gap is not the rule)
@@ -155,6 +164,7 @@ function wrongAnswer(q) {
         if (gap > 0) {
             const repl = p.support === 'line' ? { rule: `+ ${gap}` } : { s0: '+', n0: gap };
             if (rule.length === 2 && p.support !== 'line') { repl.s1 = FT_GLYPH[rule[1].op]; repl.n1 = rule[1].n; }
+            withCheck(repl, [{ op: '+', n: gap }].concat(rule.length === 2 ? [rule[1]] : []));
             c.push(mk(repl, 'neighbour-outputs', `Looked only down the Out column and wrote + ${gap}, the gap between two Outs.`, p.support === 'line' ? 'rule' : 'n0'));
         }
         // the Check row: the rule done to the Out of the row above
