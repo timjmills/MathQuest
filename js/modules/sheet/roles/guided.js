@@ -213,7 +213,7 @@ const DRAWN_MARKS = {
         const rowsOn = new Set((p.blanks || []).map(([i]) => i + 1));
         const colsOn = new Set((p.blanks || []).map(([, j]) => j + 1));
         if (!rowsOn.size) return html;
-        const ring = 'box-shadow:inset 0 0 0 2pt #949494;border-radius:1.5mm;';
+        const ring = 'outline:2pt solid #949494;outline-offset:-2.5pt;border-radius:1.5mm;';
         let r = -1;
         return html.replace(/<tr>([\s\S]*?)<\/tr>/g, (m, inner) => {
             r++;
