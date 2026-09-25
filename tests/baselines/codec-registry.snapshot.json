@@ -85,7 +85,10 @@
     "poolSupport": "7B",
     "ftRules": "7C",
     "ftTable": "7D",
-    "ftTask": "7E"
+    "ftTask": "7E",
+    "wpCues": "8A",
+    "wpBank": "8B",
+    "wpBar": "8C"
   },
   "blocks": {
     "0": {
@@ -129,9 +132,9 @@
       "keys": "7A-7E"
     },
     "8": {
-      "owner": "",
-      "status": "spare",
-      "keys": ""
+      "owner": "word problems (word-work cell, 2026-09-25)",
+      "status": "assigned",
+      "keys": "8A-8C"
     },
     "9": {
       "owner": "",
@@ -612,7 +615,10 @@
       "mixed": "M",
       "mixed-check": "N",
       "make": "K"
-    }
+    },
+    "wpCues": {},
+    "wpBank": {},
+    "wpBar": {}
   },
   "scalarOnly": {
     "range": "decimal",
@@ -638,6 +644,9 @@
     "wordSet": "decimal",
     "most": "decimal",
     "ftTable": "decimal",
-    "poolSupport": "decimal"
+    "poolSupport": "decimal",
+    "wpCues": "bool",
+    "wpBank": "bool",
+    "wpBar": "bool"
   }
 }

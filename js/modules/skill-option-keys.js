@@ -82,7 +82,7 @@ export const KEY_BLOCKS = Object.freeze({
     5: Object.freeze({ owner: 'P12 every other family', status: 'assigned', keys: '5A-5M' }),
     6: Object.freeze({ owner: 'O2 easier / harder ladders (vocabulary, integers, geometry, graphs, algebra, number theory)', status: 'assigned', keys: '6A-6B' }),
     7: Object.freeze({ owner: 'option-panel round 3 (pools, function tables)', status: 'assigned', keys: '7A-7E' }),
-    8: Object.freeze({ owner: '', status: 'spare', keys: '' }),
+    8: Object.freeze({ owner: 'word problems (word-work cell, 2026-09-25)', status: 'assigned', keys: '8A-8C' }),
     9: Object.freeze({ owner: '', status: 'spare', keys: '' }),
 });
 
@@ -179,6 +179,12 @@ export const MULTI_KEYS = Object.freeze({
     ftTable: '7D',       // function tables: rows and the In-number order (was tiles + order)
     ftTask: '7E',        // function tables: the task, with or without a Check row (was task + response)
     // NEXT FREE IN BLOCK 7: 7F.
+
+    // Block 8 — word problems: the keyword supports of the word-work cell (2026-09-25), all bools
+    wpCues: '8A',        // bold + underline the key words in the story
+    wpBank: '8B',        // the keyword bank box beside the story
+    wpBar: '8C',         // a bar model with blank labels under the story
+    // NEXT FREE IN BLOCK 8: 8D.
 });
 
 /** Every option id -> its key (one letter, or digit + letter). */
@@ -346,6 +352,8 @@ export const SCALAR_ONLY = Object.freeze({
     // reserved ids (block 4): their values are allocated when they are built. (Pinned history:
     // `cover` and `mix` were built by S2 and now carry VALUE_TOKENS; `touch` rides in `support`.)
     touch: 'reserved', cover: 'reserved', mix: 'reserved', anchors: 'reserved',
+    // block 8 (word problems)
+    wpCues: 'bool', wpBank: 'bool', wpBar: 'bool',
 });
 
 /**
