@@ -9,7 +9,7 @@ import { generateQuestion } from './generate-question.js';
 // The sheet kit owns every printed millimetre, point size, stroke width and ink
 // value (WORKSHEET_DESIGN_STANDARD.md). tokens.js is a pure module with no
 // imports of its own, so pulling it in here adds no cycle.
-import { blankWidth, SIZES, STROKE, INK, EM_MM } from './sheet/tokens.js';
+import { blankWidth, SIZES, STROKE, INK, EM_MM, SLOT, slotRadiusMm, stripSegStyle, stripPos } from './sheet/tokens.js';
 // The ink pass every printed cell goes through (INK-1..INK-5). Pure, no imports of its own.
 import { inkHTML } from './print-ink.js';
 // The rest of the kit, for the STRANGLER HOOK at the top of formatProblemForPrint
@@ -4019,11 +4019,15 @@ function wsStackHTML(a, b, op, pt, o = {}) {
         html += `<span style="grid-column:2 / -1;height:1mm;border-top:${STROKE.hair}pt solid #000;"></span>`;
     }
     if (regroup) {
-        const box = `<i style="display:block;width:calc(${trackEm}em - 1mm);height:${size.carryMm}mm;`
-            + `border:${STROKE.hair}pt solid #000;"></i>`;
+        // SL-12: the regroup boxes are ONE digit strip - a rounded outline, a hairline divider on
+        // every track boundary, each segment a full track wide so it sits over its column.
+        const on = [];
+        for (let i = 0; i < T; i++) if (regroup === 'sub' ? i > T - 1 - A.length : (i > 0 && i < T - 1)) on.push(i);
+        const seg = (k) => `<i data-ws-seg="${stripPos(k, on.length)}" style="display:block;width:100%;`
+            + `height:${SLOT.carryStripMm[WS_SIZE]}mm;${stripSegStyle(stripPos(k, on.length), { r: slotRadiusMm(WS_SIZE) })}"></i>`;
         for (let i = 0; i < T; i++) {
-            const on = regroup === 'sub' ? i > T - 1 - A.length : (i > 0 && i < T - 1);
-            html += `<span style="height:${size.regroupMm}mm;display:flex;align-items:flex-start;justify-content:center;">${on ? box : ''}</span>`;
+            const k = on.indexOf(i);
+            html += `<span style="height:${size.regroupMm}mm;display:flex;align-items:flex-start;justify-content:center;">${k < 0 ? '' : seg(k)}</span>`;
         }
     }
     html += A.padStart(T, ' ').split('').map(ch => cell(ch)).join('');
@@ -4033,6 +4037,27 @@ function wsStackHTML(a, b, op, pt, o = {}) {
     return `<div class="${o.cls || 'ws-stack-legacy'}" data-ws-slot="answer" data-ws-shape="open" style="font-size:${pt}pt;line-height:1;display:grid;`
         + `grid-template-columns:repeat(${T},${trackEm}em);justify-content:center;`
         + `font-variant-numeric:lining-nums tabular-nums;color:#000;">${html}</div>`;
+}
+
+/**
+ * SL-12 (owner ruling 2026-09-25): a row of digit boxes drawn as ONE digit strip - a rounded
+ * outline with a hairline divider between every two segments. Each segment is `segW` wide (the
+ * column pitch of the digits it sits under or over), so the dividers land on the column
+ * boundaries and place value still lines up. Used by the legacy handlers that drew a row of
+ * separate boxes with gaps between them.
+ *
+ * @param {number} n        segments
+ * @param {Object} o
+ * @param {string} o.segW   one segment's width (CSS length) = the column pitch
+ * @param {string} o.h      strip height (CSS length)
+ * @param {string} [o.attrs] extra attributes on each segment (e.g. a slot marker)
+ */
+function slotStripHTML(n, { segW, h, attrs = '' } = {}) {
+    const r = slotRadiusMm(WS_SIZE);
+    return `<span data-ws-strip="${n}" style="display:inline-flex;vertical-align:top;">`
+        + Array.from({ length: n }, (_, k) => `<span data-ws-seg="${stripPos(k, n)}"${attrs} style="display:block;`
+            + `box-sizing:border-box;width:${segW};height:${h};background:#fff;${stripSegStyle(stripPos(k, n), { r })}"></span>`).join('')
+        + `</span>`;
 }
 
 // One vertical fact: T = 3 tracks of 0.72 em, ones digit right-aligned,
@@ -7300,10 +7325,9 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const boxGap = 3;
         const totalWidth = (dividendLen + 1) * (boxWidth + boxGap);
         
-        // Create quotient answer boxes (aligned right over dividend)
-        const quotientBoxes = Array.from({length: ansLen}, () => 
-            `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #555;border-radius:4px;background:#fff;"></div>`
-        ).join('');
+        // Create quotient answer boxes (aligned right over dividend). SL-12: one digit strip, a
+        // segment per dividend column (box + gap wide), so each divider sits between two columns.
+        const quotientBoxes = slotStripHTML(ansLen, { segW: `${boxWidth + boxGap}px`, h: `${boxWidth + 4}px` });
         
         // Create dividend digit boxes
         const dividendBoxes = a.toString().split('').map(d => 
@@ -7324,11 +7348,9 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                         `<div style="width:${boxWidth}px;height:${boxWidth - 6}px;border-bottom:2px solid #333;"></div>`
                     ).join('')}
                 </div>
-                <!-- Difference row (result after subtraction) -->
-                <div style="display:flex;gap:${boxGap}px;margin-left:20px;">
-                    ${Array.from({length: dividendLen + 1}, () => 
-                        `<div style="width:${boxWidth}px;height:${boxWidth - 4}px;border:1px dashed #ccc;border-radius:2px;"></div>`
-                    ).join('')}
+                <!-- Difference row (result after subtraction): SL-12 one digit strip -->
+                <div style="margin-left:${20 - boxGap / 2}px;">
+                    ${slotStripHTML(dividendLen + 1, { segW: `${boxWidth + boxGap}px`, h: `${boxWidth + 2}px` })}
                 </div>`;
             
             // Bring down arrow indicator (except last row)
@@ -7357,7 +7379,7 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                             <!-- Division bracket and dividend -->
                             <div style="display:flex;flex-direction:column;">
                                 <!-- Quotient boxes (answer) -->
-                                <div style="display:flex;gap:${boxGap}px;justify-content:flex-end;padding-right:${boxGap}px;margin-bottom:4px;">
+                                <div style="display:flex;justify-content:flex-end;padding-right:${boxGap / 2}px;margin-bottom:4px;">
                                     ${quotientBoxes}
                                 </div>
                                 
@@ -7952,8 +7974,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                         <div style="font-size:1.3rem;font-weight:700;padding-top:25px;">${dd.divisor}</div>
                         <div style="border-left:2.5px solid #333;border-top:2.5px solid #333;padding:5px 10px;border-radius:0 8px 0 0;">
                             <!-- Quotient boxes -->
-                            <div style="display:flex;gap:3px;margin-bottom:5px;">
-                                ${Array(quotientLen).fill(0).map(() => `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #555;border-radius:4px;background:#fff;"></div>`).join('')}
+                            <div style="display:flex;margin-bottom:5px;">
+                                ${slotStripHTML(quotientLen, { segW: `${boxWidth + 3}px`, h: `${boxWidth + 4}px` })}
                             </div>
                             <!-- Dividend -->
                             <div style="font-size:1.3rem;font-weight:700;letter-spacing:3px;">${dividendStr}</div>
@@ -12415,20 +12437,21 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
             10000: '#c2185b', 100000: '#00796b', 1000000: '#f9a825'
         };
         const colWidth = places.length >= 6 ? 64 : 80;
-        const colsHtml = places.map(p => `
+        // SL-12: the write-in boxes are ONE digit strip under the place heads - a rounded outline
+        // with a divider between every two places, each segment one place column wide.
+        const colsHtml = places.map((p, k) => `
             <div style="display:flex;flex-direction:column;align-items:center;width:${colWidth}px;">
                 <div style="font-size:0.65rem;font-weight:700;color:${placeColors[p]};
                      text-transform:uppercase;letter-spacing:0.3px;text-align:center;line-height:1.1;
                      margin-bottom:3px;min-height:2.2em;">${placeLabels[p]}</div>
                 <div style="font-size:0.8rem;font-weight:800;color:${placeColors[p]};
                      margin-bottom:5px;">${placeShort[p]}</div>
-                <div style="border:2px dashed ${placeColors[p]};border-radius:8px;
-                     width:100%;height:60px;background:#fff;"></div>
+                <div data-ws-seg="${stripPos(k, places.length)}" style="box-sizing:border-box;width:100%;height:60px;background:#fff;${stripSegStyle(stripPos(k, places.length), { r: slotRadiusMm(WS_SIZE) })}"></div>
             </div>`).join('');
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">${num}<div class="problem-content">
             <div style="font-size:1rem;margin-bottom:6px;">Write each digit of <strong style="font-size:1.3rem;color:#7b1fa2;">${target.toLocaleString()}</strong> in the matching place value column.</div>
-            <div style="display:flex;gap:8px;margin-top:8px;justify-content:center;flex-wrap:nowrap;
-                 max-width:${Math.min(720, places.length * (colWidth + 8) + 20)}px;margin-left:auto;margin-right:auto;">
+            <div style="display:flex;gap:0;margin-top:8px;justify-content:center;flex-wrap:nowrap;
+                 max-width:${Math.min(720, places.length * colWidth + 20)}px;margin-left:auto;margin-right:auto;">
                 ${colsHtml}
             </div>
         </div></div>`;

@@ -244,3 +244,29 @@
 :is(.ws-page, .ws-sheet) .pv-cell .ws-line { text-align: center; line-height: var(--ws-hw); vertical-align: bottom; }
 :is(.ws-page, .ws-sheet) .pv-cell .ws-box[data-ws-ink],
 :is(.ws-page, .ws-sheet) .pv-cell .ws-line[data-ws-ink] { font-size: .8em; }
+
+/* ---------- writing-box radius and the digit strip (SL-11, SL-12; owner ruling 2026-09-25) ----------
+   Every WRITING box is slightly rounded (1 / 1.25 / 1.5 mm at S / M / L). The cell frame, the grid
+   dividers and the header boxes are structure and stay square. A row of digit boxes is ONE strip: a
+   rounded outline with a hairline divider on every track boundary, each segment exactly one track
+   wide, so the dividers sit on the place-value columns above. Markup that predates the ruling (no
+   `data-ws-seg`) keeps its old separate boxes: these rules only key off the new attribute, and the
+   radius on the plain slot shapes is a cosmetic change that moves nothing (saved quiz HTML). */
+.ws-S { --ws-slot-r: 1mm;    --ws-dstrip: 7.2mm; --ws-rstrip: 6mm; }
+.ws-M { --ws-slot-r: 1.25mm; --ws-dstrip: 9.6mm; --ws-rstrip: 7mm; }
+.ws-L { --ws-slot-r: 1.5mm;  --ws-dstrip: 12mm;  --ws-rstrip: 8mm; }
+:is(.ws-page, .ws-sheet) :is(.ws-box, .ws-check) { border-radius: var(--ws-slot-r, 1.25mm); }
+:is(.ws-page, .ws-sheet) .ws-slottime .ws-box, :is(.ws-page, .ws-sheet) .ws-slotmixed .ws-box { border-radius: var(--ws-slot-r, 1.25mm); }
+:is(.ws-page, .ws-sheet) .ws-stack :is(.rg, .ab)[data-ws-seg] { justify-content: stretch; }
+:is(.ws-page, .ws-sheet) .ws-stack :is(.rg, .ab)[data-ws-seg] > i {
+    width: 100%; border: var(--ws-hair) solid var(--ws-ink); border-right-width: 0; border-radius: 0; }
+:is(.ws-page, .ws-sheet) .ws-stack .rg[data-ws-seg] > i { height: var(--ws-rstrip, var(--ws-regroup)); }
+:is(.ws-page, .ws-sheet) .ws-stack .ab[data-ws-seg] > i { height: var(--ws-dstrip, var(--ws-hw)); }
+:is(.ws-page, .ws-sheet) .ws-stack :is(.rg, .ab)[data-ws-seg="first"] > i { border-radius: var(--ws-slot-r, 1.25mm) 0 0 var(--ws-slot-r, 1.25mm); }
+:is(.ws-page, .ws-sheet) .ws-stack :is(.rg, .ab)[data-ws-seg="last"] > i { border-right-width: var(--ws-hair); border-radius: 0 var(--ws-slot-r, 1.25mm) var(--ws-slot-r, 1.25mm) 0; }
+:is(.ws-page, .ws-sheet) .ws-stack :is(.rg, .ab)[data-ws-seg="only"] > i { border-right-width: var(--ws-hair); border-radius: var(--ws-slot-r, 1.25mm); }
+/* Guided (SF-10): the strip greys at 1 pt, still without doubled lines between segments. */
+:is(.ws-page, .ws-sheet) .ws-stack .ws-grey[data-ws-seg] > i { border-width: 1pt 0 1pt 1pt !important; }
+:is(.ws-page, .ws-sheet) .ws-stack .ws-grey:is([data-ws-seg="last"], [data-ws-seg="only"]) > i { border-right-width: 1pt !important; }
+/* A missing-digit box and a stand-alone digit box inside a stack keep their own outline (LS-8). */
+:is(.ws-page, .ws-sheet) .ws-stack .ws-box--unknown { border-radius: var(--ws-slot-r, 1.25mm); }

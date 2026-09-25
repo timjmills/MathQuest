@@ -5,6 +5,7 @@ import { DEFAULT_TABLES, getSkillGrade, maxOperandForGrade, multCapsForGrade, di
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
 import { COLORS, STROKE, FONTS, MONO, softFill, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
+import { stripSegStyle, stripPos } from './sheet/tokens.js';
 
 // ========================================
 // HOW IT IS WRITTEN — the `notation` option (skill-options.js)
@@ -947,6 +948,15 @@ const LADDER_V2_SKILLS = new Set([
 // screen cell in the ink the printed sheet uses, so the pupil meets ONE drawing.
 const _WS_INK = MONO.ink;
 const _WS_TRACK = '1.3em';
+// SL-11 (owner ruling 2026-09-25): every writing box is slightly rounded - about 1.25 mm on
+// paper at this cell's digit size - while frames and dividers stay square.
+const _WS_SLOT_R = '0.18em';
+/**
+ * SL-12: one segment of a DIGIT STRIP. A row of digit boxes is one rounded outline with a thin
+ * divider on every track boundary; each segment is a full track wide, so every divider sits
+ * between two place-value columns of the numbers above it.
+ */
+const _wsSeg = (pos) => stripSegStyle(pos, { r: _WS_SLOT_R, w: '1.5px', dw: '1px', color: _WS_INK });
 
 const _wsCell = (inner, note) => `<div class="ws-v2-cell" style="text-align:center;color:${_WS_INK};`
     + `font-family:'Andika','Open Sans',sans-serif;">${inner}`
@@ -964,10 +974,10 @@ const _wsLine = (chars = 3) => `<span style="display:inline-block;min-width:${(c
     + `border-bottom:1.5px solid ${_WS_INK};">&nbsp;</span>`;
 /** A digit box: structure that says "one digit goes here". */
 const _wsBox = () => `<span style="display:inline-block;width:1.15em;height:1.35em;`
-    + `border:1.5px solid ${_WS_INK};vertical-align:-0.35em;"></span>`;
+    + `border:1.5px solid ${_WS_INK};border-radius:${_WS_SLOT_R};vertical-align:-0.35em;"></span>`;
 /** LS-8: dashed means UNKNOWN, the one exception to "dashed means cut". */
 const _wsUnknownBox = () => `<span style="display:inline-block;width:1.15em;height:1.35em;`
-    + `border:1.5px dashed ${_WS_INK};vertical-align:-0.35em;"></span>`;
+    + `border:1.5px dashed ${_WS_INK};border-radius:${_WS_SLOT_R};vertical-align:-0.35em;"></span>`;
 /** A circle: the slot shape that says "write a SIGN here", never a number (section 6). */
 const _wsCircle = () => `<span style="display:inline-block;width:1.5em;height:1.5em;border-radius:50%;`
     + `border:1.5px solid ${_WS_INK};vertical-align:-0.4em;"></span>`;
@@ -980,7 +990,7 @@ function _wsTickList(labels) {
     return `<div style="display:inline-block;text-align:left;margin-top:8px;">` + labels.map(l =>
         `<div style="display:flex;align-items:center;gap:10px;margin:4px 0;font-size:1rem;">`
         + `<span style="min-width:5.5em;">${l}</span>`
-        + `<span style="display:inline-block;width:1.1em;height:1.1em;border:1.5px solid ${_WS_INK};"></span>`
+        + `<span style="display:inline-block;width:1.1em;height:1.1em;border:1.5px solid ${_WS_INK};border-radius:${_WS_SLOT_R};"></span>`
         + `</div>`).join('') + `</div>`;
 }
 
@@ -1033,22 +1043,39 @@ function _wsStack(rows, opSymbol, opts = {}) {
     const pad = (s) => String(s).padStart(t, ' ').split('');
     const cell = (ch) => `<span style="display:inline-block;width:${_WS_TRACK};text-align:center;">${ch === ' ' ? '&nbsp;' : ch}</span>`;
     const holeCell = () => `<span style="display:inline-block;width:${_WS_TRACK};text-align:center;">`
-        + `<span style="display:inline-block;width:0.85em;height:1.15em;border:1.5px dashed ${_WS_INK};"></span></span>`;
-    const boxCell = () => `<span style="display:inline-block;width:${_WS_TRACK};text-align:center;">`
-        + `<span style="display:inline-block;width:0.85em;height:1.15em;border:1.5px solid ${_WS_INK};"></span></span>`;
-    const ansBox = () => `<span style="display:inline-block;width:${_WS_TRACK};text-align:center;">`
-        + `<span data-ws-box="1" style="display:inline-block;width:0.85em;height:1.15em;border:1.5px solid ${_WS_INK};vertical-align:top;"></span></span>`;
-    const smallBox = () => `<span style="display:inline-block;width:${_WS_TRACK};text-align:center;">`
-        + `<span style="display:inline-block;width:0.7em;height:0.75em;border:1px solid ${_WS_INK};"></span></span>`;
+        + `<span style="display:inline-block;width:0.85em;height:1.15em;border:1.5px dashed ${_WS_INK};border-radius:${_WS_SLOT_R};"></span></span>`;
+    // SL-12: every box row is ONE digit strip - a segment is a whole track (1.3em) wide, so the
+    // dividers fall on the track boundaries. Answer segments are 1.4em tall (was a 0.85 x 1.15em
+    // box), regroup segments 0.9em (was 0.7 x 0.75em). `vertical-align:top` keeps the row's
+    // line box from growing under the taller box.
+    const boxCell = (pos) => `<span data-ws-seg="${pos}" style="display:inline-block;box-sizing:border-box;width:${_WS_TRACK};`
+        + `height:1.4em;vertical-align:top;${_wsSeg(pos)}"></span>`;
+    // The answer box keeps `data-ws-box="1"` and stays empty, because the page engine's key
+    // (print-sheet.js `legacyKeyFill`) finds it by exactly that; its own line-height centres the
+    // digit the key writes into it.
+    const ansBox = (pos) => `<span data-ws-box="1" data-ws-seg="${pos}" style="display:inline-block;box-sizing:border-box;`
+        + `width:${_WS_TRACK};height:1.4em;line-height:1.4em;text-align:center;vertical-align:top;${_wsSeg(pos)}"></span>`;
+    const smallBox = (pos) => `<span data-ws-seg="${pos}" style="display:inline-block;box-sizing:border-box;width:${_WS_TRACK};`
+        + `height:0.9em;vertical-align:top;${_wsSeg(pos)}"></span>`;
     const blankTrack = () => `<span style="display:inline-block;width:${_WS_TRACK};">&nbsp;</span>`;
 
     const line = (html) => `<div style="white-space:nowrap;line-height:1.25;">${html}</div>`;
     let out = '';
+    // A strip row: `on(i)` says which tracks hold a box; each contiguous run is one strip.
+    const stripRow = (on, draw, blank = blankTrack) => {
+        const flags = Array.from({ length: t }, (_, i) => !!on(i));
+        return flags.map((f, i) => {
+            if (!f) return blank(i);
+            let a = i; while (a > 0 && flags[a - 1]) a--;
+            let b = i; while (b < t - 1 && flags[b + 1]) b++;
+            return draw(stripPos(i - a, b - a + 1));
+        }).join('');
+    };
     if (regroup === 'add') {
-        out += line(Array.from({ length: t }, (_, i) => (i > 0 && i < t - 1) ? smallBox() : blankTrack()).join(''));
+        out += line(stripRow((i) => i > 0 && i < t - 1, smallBox));
     } else if (regroup === 'sub') {
         const topLen = rs[0].length;
-        out += line(Array.from({ length: t }, (_, i) => (i > t - 1 - topLen) ? smallBox() : blankTrack()).join(''));
+        out += line(stripRow((i) => i > t - 1 - topLen, smallBox));
     }
     rs.forEach((r, ri) => {
         const chars = pad(r);
@@ -1060,9 +1087,9 @@ function _wsStack(rows, opSymbol, opts = {}) {
     out += `<div style="border-bottom:2.25px solid ${_WS_INK};width:${(t * 1.3).toFixed(2)}em;margin:3px 0;"></div>`;
     for (const e of extra) {
         const chars = pad(e.text === undefined ? '' : e.text);
-        out += line(chars.map((ch, i) => e.ink === 'box'
-            ? (ch === '#' ? boxCell() : blankTrack())
-            : cell(i === 0 ? (e.op || ' ') : ch)).join(''));
+        out += line(e.ink === 'box'
+            ? stripRow((i) => chars[i] === '#', boxCell)
+            : chars.map((ch, i) => cell(i === 0 ? (e.op || ' ') : ch)).join(''));
         if (e.rule) out += `<div style="border-bottom:2.25px solid ${_WS_INK};width:${(t * 1.3).toFixed(2)}em;margin:3px 0;"></div>`;
     }
     if (total !== null) out += line(pad(total).map((ch, i) => cell(i === 0 ? ' ' : ch)).join(''));
@@ -1070,7 +1097,7 @@ function _wsStack(rows, opSymbol, opts = {}) {
     // (print-sheet.js `legacyKeyFill`) writes each digit into its own box instead of stamping
     // the answer under the cell.
     else if (answer === 'boxes') out += `<div data-ws-slot="answer" data-ws-shape="boxes" style="white-space:nowrap;line-height:1.25;">`
-        + Array.from({ length: t }, (_, i) => i === 0 ? blankTrack() : ansBox()).join('') + `</div>`;
+        + stripRow((i) => i > 0, ansBox) + `</div>`;
     return `<div style="display:inline-block;text-align:right;font-size:1.7rem;font-weight:700;`
         + `letter-spacing:0;font-variant-numeric:tabular-nums;">${out}</div>`;
 }

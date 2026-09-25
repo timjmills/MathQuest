@@ -254,7 +254,47 @@ export const SLOT = Object.freeze({
     choiceGapMm: 8,
     cornerRadiusMm: 3,     // LS: rounded = something to read or think with
     smallCornerRadiusMm: 1,
+    // SL-11 (owner ruling 2026-09-25): every WRITING box - digit box, answer box, regroup /
+    // carry box, missing-digit box, check box, time box, stand-alone write-in box - has a small
+    // corner radius, scaled with size. The cell frame, grid dividers, header boxes and tables
+    // stay square; the 3 mm container radius above stays reserved for things to read.
+    slotRadiusMm: Object.freeze({ S: 1, M: 1.25, L: 1.5 }),
+    // SL-12: a row of digit boxes is ONE digit strip: a rounded outline with a hairline
+    // divider on every track boundary, each segment exactly one track wide, so the dividers
+    // sit on the place-value columns of the numbers above. Heights, ~20% up on the old boxes:
+    digitStripMm: Object.freeze({ S: 7.2, M: 9.6, L: 12 }),   // answer strip (was Hw 6 / 8 / 10)
+    carryStripMm: Object.freeze({ S: 6, M: 7, L: 8 }),        // regroup strip (was 5 / 6 / 7) = the regroup row
 });
+
+/** SL-11: the writing-box corner radius for a size preset, in mm. */
+export const slotRadiusMm = (size = DEFAULT_SIZE) => SLOT.slotRadiusMm[size] || SLOT.slotRadiusMm[DEFAULT_SIZE];
+
+/**
+ * SL-12: one segment of a digit strip, as inline CSS. `pos` is where the segment sits in its
+ * run: 'only' (a strip of one), 'first', 'mid' or 'last'. Every segment draws its top and bottom
+ * edge; the first also draws the left edge, every other segment's left edge IS the divider; only
+ * the last draws the right edge. So no two lines ever double, and each divider lands exactly on
+ * the boundary between two tracks.
+ *
+ * @param {'only'|'first'|'mid'|'last'} pos
+ * @param {Object} [o]
+ * @param {number|string} [o.r]   corner radius (a number is mm)
+ * @param {number|string} [o.w]   stroke width (a number is pt); default the hairline
+ * @param {number|string} [o.dw]  divider width, when thinner than the outline (default = w)
+ * @param {string} [o.color]      default ink
+ */
+export function stripSegStyle(pos, { r = slotRadiusMm(), w = STROKE.hair, dw = null, color = '#000' } = {}) {
+    const R = typeof r === 'number' ? `${r}mm` : r;
+    const W = typeof w === 'number' ? `${w}pt` : w;
+    const D = dw === null ? W : typeof dw === 'number' ? `${dw}pt` : dw;
+    const left = pos === 'only' || pos === 'first';
+    const right = pos === 'only' || pos === 'last';
+    const radius = `${left ? R : 0} ${right ? R : 0} ${right ? R : 0} ${left ? R : 0}`;
+    return `border:${W} solid ${color};border-left-width:${left ? W : D};border-right-width:${right ? W : 0};border-radius:${radius};`;
+}
+
+/** The segment position of index `k` in a run of `n` (SL-12). */
+export const stripPos = (k, n) => (n <= 1 ? 'only' : k === 0 ? 'first' : k === n - 1 ? 'last' : 'mid');
 
 // Section 6 shape keys, printed as `data-ws-shape`.
 export const SHAPES = Object.freeze([
@@ -334,7 +374,7 @@ export default {
     EM_MM, trackMm, trackEmFor, trackFloorMm, SEPARATOR_EM,
     FACT_LADDER, FACT_AUTO_COLS, FACT_PROBE_COLS, FACT_PROBE_XL_PT, FACT_CELL_H_MM, factDigitPt, factCellHMm,
     TAB_LADDER, factTab, tabWidthFactor, MODEL_TAB_W_MM, DAY_TAB_H_MM, LABEL_STYLES,
-    blankWidth, MIN_BLANK_MM, SLOT, SHAPES,
+    blankWidth, MIN_BLANK_MM, SLOT, SHAPES, slotRadiusMm, stripSegStyle, stripPos,
     PERMITTED_GRIDS, FULL_WIDTH_ROWS, FACT_GRID_COLS, STRETCH_CAP, MIN_FREE_CELL_AREA,
     resolveCtx, metricsFor,
 };

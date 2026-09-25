@@ -7,7 +7,7 @@
 // Pure module (SCC-01). A template draws inner HTML only (SCC-T5) and never chooses a type
 // size, a line weight or a grey (SCC-T3).
 
-import { opGlyph, trackMm, SIZES, factTab } from '../tokens.js';
+import { opGlyph, trackMm, SIZES, factTab, stripPos } from '../tokens.js';
 import { blank } from '../cell.js';
 import { register } from '../registry.js';
 
@@ -59,8 +59,17 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
     // VA-10: one carry box above EVERY column except the ones, whether or not that column
     // regroups, so the boxes reveal nothing. VA-22: subtraction boxes come from the top
     // number's digits only, never from the answer.
-    if (regroup === 'add') html += Array.from({ length: t }, (_, i) => `<span class="rg${g}">${i > 0 && i < t - 1 ? rgBox(i) : ''}</span>`).join('');
-    if (regroup === 'sub') html += Array.from({ length: t }, (_, i) => `<span class="rg${g}">${i > t - 1 - A.length ? rgBox(i) : ''}</span>`).join('');
+    // SL-12: the boxes of one row are ONE digit strip - a rounded outline with a divider on
+    // every track boundary. `data-ws-seg` says where each track sits in the strip; the
+    // stylesheet draws the outline, the dividers and the end radii from it (print and screen).
+    if (regroup) {
+        const on = regroupTracks(regroup, t, A.length);
+        html += Array.from({ length: t }, (_, i) => {
+            const k = on.indexOf(i);
+            return k < 0 ? `<span class="rg${g}"></span>`
+                : `<span class="rg${g}" data-ws-seg="${stripPos(k, on.length)}">${rgBox(i)}</span>`;
+        }).join('');
+    }
     html += row(pad(A), '', 'a') + `<span class="gap"></span>` + row(pad(B), opGlyph(op), 'b') + `<span class="rule"></span>`;
     if (answer === 'boxes') {
         // The box is structure and stays black; only the digit inside it takes the trace grey
@@ -69,12 +78,12 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
         html += Array.from({ length: t }, (_, i) => {
             const ch = fill && fill[i] !== ' ' ? fill[i] : '';
             const ink = ch ? ` class="${boxInk === 'trace' ? 'ws-trace' : ''}" data-ws-ink="${boxInk}" style="display:flex;align-items:center;justify-content:center"` : '';
-            return `<span class="ab${g}"><i${ink}>${ch}</i></span>`;
+            return `<span class="ab${g}" data-ws-seg="${stripPos(i, t)}"><i${ink}>${ch}</i></span>`;
         }).join('');
     }
     if (answer === 'traced' && ans !== null) html += pad(String(ans)).map((ch) => `<span class="ws-trace">${ch === ' ' ? '' : ch}</span>`).join('');
     if (answer === 'solid' && ans !== null) html += pad(String(ans)).map((ch) => `<span data-ws-ink="solid">${ch === ' ' ? '' : ch}</span>`).join('');
-    if (answer === 'slots' && slots) html += slots.map((s) => `<span class="ab">${s}</span>`).join('');
+    if (answer === 'slots' && slots) html += slots.map((s, i) => `<span class="ab" data-ws-seg="${stripPos(i, slots.length)}">${s}</span>`).join('');
     // TY-21: any regroup scaffold forces 0.95 em tracks in both looks (the 'wide' class).
     return `<div class="ws-stack${regroup ? ' wide' : ''}" style="--t:${t}" data-ws-slot="answer" data-ws-shape="open">${html}</div>`;
 }
