@@ -181,6 +181,40 @@ function PLAN(rootSel, which) {
         } else tag(one[0], { type: 'text', value: d });
         return { plan, q: d };
     }
+    // perimeter AND area (dual): one box each
+    const dual = all('input.dual-answer-input');
+    if (dual.length && q.dualAnswers) {
+        dual.forEach(c => { const v = /area/i.test(c.id) ? q.dualAnswers.area : q.dualAnswers.perimeter; tag(c, { type: 'text', value: String(v) }); });
+        return { plan, q: `P=${q.dualAnswers.perimeter}, A=${q.dualAnswers.area}` };
+    }
+    // read a point's coordinates (coord-input): ( x , y ) per point, then the card's own Check
+    const cix = all('input.ci-x');
+    if (cix.length && q.coordinateData && Array.isArray(q.coordinateData.points)) {
+        const pts = q.coordinateData.points;
+        cix.forEach(c => { const p = pts[Number(c.dataset.point)]; if (p) tag(c, { type: 'text', value: String(p.x) }); });
+        all('input.ci-y').forEach(c => { const p = pts[Number(c.dataset.point)]; if (p) tag(c, { type: 'text', value: String(p.y) }); });
+        const sub = root.querySelector('.ci-submit');
+        if (sub && which.host === 'card') tag(sub, { type: 'domclick' });
+        return { plan, q: pts.map(p => `(${p.x}, ${p.y})`).join(' ') };
+    }
+    // plot points (coord-plot): tap each lattice point, then Submit
+    const hits = all('.cp-hit');
+    if (q.answerType === 'coord-plot') {
+        const pts = Array.isArray(ans) ? ans : [ans];
+        const hitsAll = Array.from(root.querySelectorAll('.cp-hit'));
+        pts.forEach(p => { const h = hitsAll.find(c => Number(c.dataset.x) === p.x && Number(c.dataset.y) === p.y); if (h) tag(h, { type: 'evclick' }); });
+        const sub = root.querySelector('.cp-submit');
+        if (sub) tag(sub, { type: 'domclick' });
+        if (hits.length || hitsAll.length) return { plan, q: pts.map(p => `(${p.x}, ${p.y})`).join(' ') };
+    }
+    // a tick list ("Click ALL ..."): tap every right option, then Submit (multi-select-check)
+    const msc = all('.msc-opt');
+    if (msc.length && Array.isArray(ans)) {
+        ans.forEach(id => { const o = msc.find(b => b.dataset.id === String(id)); if (o) tag(o, { type: 'click' }); });
+        const sub = root.querySelector('.msc-submit');
+        if (sub) tag(sub, { type: 'domclick' });
+        return { plan, q: ans.join(', ') };
+    }
     return { error: `no answer control (${q.answerType})` };
 }
 
@@ -193,7 +227,10 @@ async function run(page, sel, which) {
         await el.evaluate(e => e.scrollIntoView({ block: 'center' }));
         if (step.type === 'click') { await el.click(); await sleep(40); continue; }
         if (step.type === 'domclick') { await el.evaluate(e => e.click()); await sleep(40); continue; }
-        await el.click({ clickCount: 3 });
+        if (step.type === 'evclick') { await el.evaluate(e => e.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))); await sleep(60); continue; }
+        // A box can be briefly unclickable while the worksheet scrolls to the next card: focus it
+        // instead, as a pupil's tap would, rather than abort the whole run.
+        try { await el.click({ clickCount: 3 }); } catch (e) { await el.evaluate(x => x.focus()); }
         await el.evaluate(e => { e.value = ''; });
         await page.keyboard.type(step.value, { delay: 10 });
         await el.evaluate(e => e.dispatchEvent(new Event('change', { bubbles: true })));
