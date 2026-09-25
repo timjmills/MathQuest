@@ -8,7 +8,7 @@ import { optionsFor, normalizeOptions } from './skill-options.js';
 import { genCountByTables, genMultChart, genHopLine } from './gen-mult-patterns.js';
 const _MP_SKILLS = new Set(['count_by_tables', 'mult_chart', 'mult_chart_easy', 'mult_chart_medium', 'mult_chart_hard', 'nl_mult', 'nl_div']);
 import { stripSegStyle, stripPos } from './sheet/tokens.js';
-import { renderCell as _kitRender, fadeRung, tickLabelSet, valueLineSVG, valueLineWindow } from './sheet/index.js';
+import { renderCell as _kitRender, fadeRung, tickLabelSet, valueLineSVG, valueLineWindow, nlPlacePayload, nlPlaceAnswer, nlPlaceTwin } from './sheet/index.js';
 
 // ========================================
 // HOW IT IS WRITTEN — the `notation` option (skill-options.js)
@@ -39,6 +39,22 @@ import { renderCell as _kitRender, fadeRung, tickLabelSet, valueLineSVG, valueLi
 let _notationCursor = 0;
 let _notationItemCache = null;
 
+
+/**
+ * A place-it-on-the-line item as the kit's `nl-place` cell (O6 lane AP3 fixes): one drawing for
+ * paper, key and every screen host - the pupil taps a number, then its tick. The host grades the
+ * numbers read back from the ticks (q.ans, in the tiles' order). `nlData` stays for old links.
+ */
+function _nlKit(q) {
+    const p = nlPlacePayload(q.nlData);
+    if (!p) return;
+    q.cell = { template: 'nl-place', v: 1, payload: p };
+    q.visual = nlPlaceTwin(p);
+    q.answerType = 'text';
+    q.ans = nlPlaceAnswer(p);
+    q.options = [];
+    q.text = p.chips.length > 1 ? 'Put each number on the number line.' : `Put ${String(p.chips[0].label).replace(/^-/, '\u2212')} on the number line.`;
+}
 function _beginNotationItem() {
     _notationCursor++;
     _constantCursor++;
@@ -2039,6 +2055,28 @@ function _nlKitItem(q, { a, b, op, unknown = 'result', range = 20 }) {
     q.startOnly = true;
     q.nlMax = max;
     return q;
+}
+
+/**
+ * add_int / sub_int on the kit's `number-line` cell (O6 lane AP3 fixes): the SAME work line on
+ * paper, in the key and on every screen host (the screen line is tap-to-jump), so its numerals
+ * option is honest on both. The window runs through 0, the start and the answer, one hop per
+ * number; a sum that needs more than 32 numbers (the ±50 and ±100 bands) keeps its old cell -
+ * one hop per number would be under 5 mm. The item's text is unchanged (the Signs option reads it).
+ */
+function _intLineKit(q, a, b, op) {
+    const end = op === '+' ? a + b : a - b;
+    const min = Math.min(a, end, 0) - 1, max = Math.max(a, end, 0) + 1;
+    if (max - min > 32) return;
+    const payload = { min, max, start: a, add: b, op, unknown: 'result' };
+    const tv = _opt('ticks');
+    if (tv === 'some' || tv === 'ends') payload.ticks = tv;
+    q.cell = { template: 'number-line', v: 1, payload };
+    q.visual = _kitTwin('number-line', payload);
+    q.printText = 'Draw the jumps. Write the answer.';
+    q.printFormat = 'number-line-visual';
+    q.startOnly = true;
+    q.nlMax = max;
 }
 
 const _KIT_FACT_SKILLS = new Set(['add_facts', 'mult_facts', 'div_facts', 'add', 'subtract']);
@@ -7120,6 +7158,7 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 q.hint = `Zero is in the middle. Negative numbers are to the LEFT of zero, positive to the RIGHT.`;
                 q.printFormat = "nl-drag";
                 q.skillLabel = isMulti ? "Drag Integers on Number Line (Multi)" : "Drag Integer on Number Line";
+                _nlKit(q);
                 return;
             } else if (intSkill === "compare_int" && Math.random() < 0.30) {
                 const threshold = rng(-Math.floor(intMax / 2), Math.floor(intMax / 2));
@@ -7213,6 +7252,7 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 q.integerData = { a, b, result, op: '+' };
                 q.a = a; q.b = b; q.op = '+';
                 q.printFormat = "integer-add";
+                _intLineKit(q, a, b, '+');
             } else if (intSkill === "sub_int") {
                 // Subtracting integers - scale with range
                 const intSubMax = intBand || Math.max(10, Math.floor(intMax * 0.75));
@@ -7240,6 +7280,7 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 q.integerData = { a, b, result, op: '-' };
                 q.a = a; q.b = b; q.op = '-';
                 q.printFormat = "integer-sub";
+                _intLineKit(q, a, b, '-');
             }
             return;
 }

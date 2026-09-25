@@ -22,6 +22,8 @@ import './function-table.js';
 import './countby.js';
 import './pv.js';
 import './word-work.js';
+import './fractions.js';
+import './nl-place.js';
 // last: registers only skills no other provider has claimed
 import './legacy-wrong.js';
 

@@ -784,3 +784,75 @@ twins, so a side-by-side page of such a mix shows twins beside that skill's prob
 
 **Not built yet.** The on-screen "Show me an example" panel (a later lane), and step states for
 the number line, arrays, counters, function tables and place value.
+
+## S9 · The support ladder for wrong answers (on screen)
+
+Owner, 2026-09-25: "if an answer goes wrong, that is where to include one of our supports, and each
+time they get it wrong you can either add more / different approach to supports."
+`js/modules/support-ladder.js`; gate `tests/scripts/ws-support-ladder.cjs`.
+
+**Where.** The practice card, each online worksheet card, and a quiz ONLY when its feedback is
+"instant". Never a test-style quiz (feedback at the end), never boss / race / MAP.
+
+**The ladder, per item** (keyed by the question object, so the next item starts clean):
+
+| Wrong answer | What happens |
+|---|---|
+| 1st | The entry stays, marked gently (grey dashed underline, selected so typing replaces it; no red flash, no shake). The skill's FIRST support is drawn in the cell: the first id its provider declares (`supports`, S2) that this item can draw. |
+| 2nd | A DIFFERENT approach: the first declared support of another kind (touch dots / picture / mark or checklist). It is added; when it clashes with the first (S4.7: two ways of counting on one problem) it takes the first's place. |
+| 3rd | The worked steps for THIS item (the provider's `workedSteps`, else the generic steps), black and white, with the Say: line. A **Listen** button reads the Say: line when Voice is on. |
+| 4th+ | Spent: the host's own behaviour (the card's Show Solution, the worksheet's red, the quiz's "The answer is"). |
+
+Items the kit does not draw get their own supports: a clock face gets its minute ring (the payload
+flag `ring: 'on'`) and then a clock checklist; a count gets the counting checklist and then the same
+count in ten frames.
+
+**No answer in a support (S8).** Pictures draw the given numbers only. The worked steps blank every
+answer value the provider marks (`___`), and a count that runs up to the answer is cut
+("Count on 2: 7, …"); the Say: line keeps the given numbers and blanks the answer.
+
+**The teacher's setting.** Settings → "Help after a wrong answer": support ladder (default) / worked
+example only / none. Saved per device (cookie `mathquest_help`); a Direct Play link carries a
+non-default choice in its settings suffix (`H1` worked example only, `H0` none; the default writes
+nothing, so existing links are unchanged and an old app skips the token). No option key was needed.
+A set whose Support level is 0 only ("nothing given") has its supports off: its ladder is the worked
+example alone.
+
+**Session data.** `state.sessionHelp` → the session history's per-skill `h`
+(`{touch: 2, tile: 1, worked: 1}`: times each was shown); a quiz answer keeps `help` (the ids shown).
+
+**Host hooks** (kept minimal; the screen-hosts lane owns these files): `answer-check.js` checkAnswer's
+wrong branch → `practiceLadderWrong`; `worksheet.js` checkWorksheetAnswer /
+checkWorksheetAnswerFromColumns wrong branches → `worksheetLadderWrong` (it waits while a word or a
+fraction is still shorter than its answer); `quiz-take.js` recordAnswer → `quizLadderWrong`, the
+instant feedback line, and `drawLadder` after the cell mounts. `screen-cell.js` `slotsFilled` now
+reads a time's two boxes (`h:mm`), so a clock item on the online worksheet is checked live.
+
+### S9.1 Round 2 (coordinator review, 2026-09-25)
+
+- **Placement and size.** Touch dots, the boxed sign and the start arrow are drawn IN the kit cell.
+  The dot tile / ten frame is drawn as counters BESIDE the number it stands for: a vertical fact
+  gets a column of frames level with its rows (the rows grow to the frame's height), a horizontal
+  fact a frame under each number; a subtraction's minuend frame crosses out the ones taken away
+  (white-edged crosses). Frames are at least 78 px tall (26 px counters, 6.9 mm: RP-5). When the
+  cell has no room beside the fact, or a number is over 10, the frames go under the problem. Every
+  other picture is its S4 pane at L (marks and checklists at M) with `--mq-k2` at least 3.8 px
+  (4.4 px from 600 px wide); a pane wider than a phone's cell is drawn at a smaller millimetre,
+  never cut off.
+- **No competing chrome mid-ladder.** On a ladder step: no red flash, no shake, no "Keep trying"
+  or "Timer paused" toast (the timer still pauses), no "Next →" under the feedback (the card's own
+  Skip stays), no Solution button, no hint popup. Adaptive level changes are HELD while the ladder
+  climbs and recorded when the item ends (a right answer, a skip, the next item).
+- **Fonts.** The worked panel, its Say: line and the worksheet's ladder line are Andika, ink on
+  paper, with the single grey.
+- **Every card checker.** checkAnswer (typed, choice, word-work), the fraction boxes, box division,
+  perimeter + area, the inline blanks (rounding on a number line) and the draw-the-hands clock
+  (`widgetLadderWrong`; the widget unlocks for another try, its face gains the minute ring, then
+  the checklist). The word-work cell's ladder is its own keyword supports: key words bold and
+  underlined, then the bar model (or the key-word box on a two-step story). Rounding gets the
+  skill's rounding panes; box division and coins their checklists; a skill with no support of its
+  own gets the worked steps alone.
+- **Count worked step.** A count from 1 up to the answer ("Count: 1, 2, 3 ... 18.") becomes
+  "Count: say one number for each one."
+- **Gate.** `ws-support-ladder` (the four skills on all three hosts, at 1280 and 390 with
+  `--shots`) and `ws-support-ladder --wide` (15 skills, one per family and every card checker).
