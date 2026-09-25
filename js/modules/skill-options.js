@@ -2282,19 +2282,27 @@ const _statKinds = (word) => [
         'Fewer numbers is the easier step.'),
 ];
 Object.assign(P12_OPTIONS, {
-    'graphs:bar_graph': [_p12Match([['Which is the most or the least?', 'Which category has the'], ['How many for one bar?', 'How many chose'],
-        ['The difference between two bars', 'difference'], ['The total of all the bars', 'total'], ['Click the bars that match', 'Click ALL']])],
+    // AP2 round 3: the questions are in each graph's own words; the click-all form is gone (a list
+    // on paper). The generator reads the ticked forms itself (gen-data-stats.js _dSet).
+    'graphs:bar_graph': [_p12Match([['Which is the most or the least?', 'the (most|fewest)'], ['How many for one bar?', '^How many (?!more )(?!.*in all\\?)'],
+        ['How many more? (two bars)', '^How many more '], ['The total of all the bars', 'in all\\?']])],
+    // AP2 round 3: the questions are in each graph's own words (the click-all form is gone, a list
+    // on paper, and "How many more?" takes its place); the key is printed in the graph, so the
+    // scale is read by the generator itself (gen-data-stats.js), not matched in the words.
     'graphs:pictograph': [
-        _p12Match([['Which has the most?', 'Which has the most'], ['How many for one row?', 'How many for'], ['The total', 'total'], ['Click the rows that match', 'Click ALL']]),
-        _p12Kinds('scale', 'Each picture stands for', [['2', 'Each . = 2\\)'], ['5', 'Each . = 5\\)'], ['10', 'Each . = 10\\)'], ['25', 'Each . = 25\\)']],
-            'Counting in 2s is the easiest key; 25s the hardest.'),
+        _p12Match([['Which has the most or the least?', 'the (most|fewest)'], ['How many for one row?', '^How many (?!more )(?!.*in all\\?)'],
+            ['The total', 'in all\\?'], ['How many more? (two rows)', '^How many more ']]),
+        { id: 'scale', label: 'Each picture stands for', type: 'set', group: 'difficulty', default: [0, 1, 2, 3],
+            values: [{ v: 0, l: '2' }, { v: 1, l: '5' }, { v: 2, l: '10' }, { v: 3, l: '25' }], allLabel: 'All of them, mixed',
+            help: 'Counting in 2s is the easiest key; 25s the hardest. Untouched, the Max Number chooses.' },
     ],
     // Read by gen-data-stats.js (_dOpt): `tiles` the bars / rows, `band` the tallest one.
     'graphs:build_bar_graph': [_p12Enum('tiles', 'Bars to draw', [{ v: null, l: '3 or 4, dealt' }, { v: 3, l: '3' }, { v: 4, l: '4' }], null, 'More bars is more to draw.'),
         _opsBand([5, 10], 10, { label: 'Tallest bar', help: 'The largest value a bar has to reach.' })],
     'graphs:build_pictograph': [_p12Enum('tiles', 'Rows to draw', [{ v: null, l: '3 or 4, dealt' }, { v: 3, l: '3' }, { v: 4, l: '4' }], null, 'More rows is more to draw.'),
         _opsBand([5, 7], 7, { label: 'Most pictures in a row', help: 'The largest value a row has to reach.' })],
-    'graphs:tally_chart': [_p12Match([['How many for one row?', 'How many tallies for'], ['Which has the most?', 'most tall'], ['The total', 'total'], ['Click the rows that match', 'Click ALL']])],
+    'graphs:tally_chart': [_p12Match([['How many for one row?', '^How many (?!more )(?!.*in all\\?)'], ['Which has the most or the least?', 'the (most|fewest)'],
+        ['The total', 'in all\\?'], ['How many more? (two rows)', '^How many more ']])],
     'graphs:line_plot': [_p12Match([['How many at one mark?', 'How many plants (were|measure)'], ['Which is the most common?', 'Which measurement is mo']])],
     'graphs:line_plot_g2': [_p12Match([['The most common size', 'most common'], ['How many at one size?', 'wear size'], ['How many in all?', 'How many students are shown']])],
     'graphs:line_plot_fractions': [_p12Match([['How many in all?', 'total measurements'], ['The most common measurement', 'most common'], ['How many at one mark?', 'measurements are at']])],
@@ -2523,13 +2531,16 @@ Object.assign(P12_OPTIONS, {
     'measurement:heavier_lighter_visual': [_p12Match([['Which is heavier?', 'heavier'], ['Which is lighter?', 'lighter']])],
     'measurement:pictograph_intro': [_p12Match([['How many?', '^How many (?!MORE)'], ['How many more?', 'How many MORE']])],
     'measurement:bar_graph_intro': [_p12Match([['Which has the most?', 'MOST'], ['How many?', '^How many (?!MORE)'], ['How many more?', 'How many MORE']])],
-    'measurement:reading_ruler': [_p12Kinds('parts', 'Marks read', [['Whole inches', '=> \\d+$'], ['Half inches', '=> (\\d+ )?1/2$'],
-        ['Quarter inches', '=> (\\d+ )?[13]/4$']], 'Whole inches first, then halves, then quarters.')],
+    // AP2 round 3: reading to the whole inch is the Grade 2 step (2.MD.A.1), so it is the default;
+    // halves and quarters are the next steps. The ruler carries only the marks the page reads.
+    'measurement:reading_ruler': [{ ..._p12Kinds('parts', 'Marks read', [['Whole inches', '=> \\d+$'], ['Half inches', '=> (\\d+ )?1/2$'],
+        ['Quarter inches', '=> (\\d+ )?[13]/4$']], 'Whole inches first, then halves, then quarters.'), default: [0] }],
     'measurement:reading_ruler_hard': [_p12Kinds('parts', 'Marks read', [['Whole inches', '=> \\d+$'], ['Half inches', '=> (\\d+ )?1/2$'],
         ['Quarter inches', '=> (\\d+ )?[13]/4$']], 'Whole inches first, then halves, then quarters.')],
     'measurement:temperature': [
-        _p12Match([['Read the thermometer (°F)', 'shown\\? \\(°F\\)'], ['Read the thermometer (°C)', 'shown\\? \\(°C\\)'],
-            ['Convert between °C and °F', '^Convert'], ['Click or sort temperatures', 'Click ALL|Sort each']]),
+        // AP2 round 3: one task, read the thermometer (the conversions and the click / sort items
+        // are gone). The generator reads the ticked units itself (gen-measurement.js _mSet).
+        _p12Match([['Read the thermometer (°F)', 'in °F\\?'], ['Read the thermometer (°C)', 'in °C\\?']], { label: 'Degrees' }),
     ],
     'measurement:capacity': [
         _p12Kinds('units', 'Units', [['Customary (cups, pints, quarts, gallons)', 'cups|pints|quarts|gallons'], ['Metric (mL and L)', '\\bmL\\b|\\bL\\b|lit']]),

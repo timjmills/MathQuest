@@ -3,7 +3,7 @@ import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { COLORS, STROKE, FONTS, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
-import { createBarGraphSVG } from './svg-geometry.js';
+import { k2Twin } from './sheet/index.js';
 
 // P12: an option value the teacher chose for this skill (skill-options.js), else undefined.
 function _dOpt(id) {
@@ -26,6 +26,85 @@ function _dNum(id) {
 // skill without the control, the graph stands up as it always has.
 function _barsLyingDown() {
     return _dOpt('bars') === 'horizontal';
+}
+
+// AP2 round 3: the values ticked in a SET option (`forms`) for this skill, its default when none
+// is ticked, or null when the skill has no such option.
+function _dSet(id) {
+    let def = null;
+    try { def = optionsFor(state.category, state.skill).find(o => o.id === id) || null; } catch (e) { def = null; }
+    if (!def || def.type !== 'set') return null;
+    const o = state.skillOptions;
+    const v = o && typeof o === 'object' ? o[id] : undefined;
+    const legal = def.values.map(x => x.v);
+    const t = Array.isArray(v) ? legal.filter(x => v.includes(x)) : [];
+    if (t.length) return t;
+    const d = Array.isArray(def.default) ? legal.filter(x => def.default.includes(x)) : [];
+    return d.length ? d : legal;
+}
+
+// AP2 round 3 (critic round 4: "Weather This Week" was a context with no meaning; names were cut
+// short and turned): what each bar graph is about, its axis titles in words, and its questions in
+// the context's own words. Names are at most 9 letters, so they stand level under a bar.
+const BAR_CONTEXTS = [
+    { title: 'Favorite Pets', icon: 'fish', cats: ['Dogs', 'Cats', 'Fish', 'Birds', 'Rabbits'], cat: 'Pet', val: 'Number of children',
+        value: c => `How many children chose ${c.toLowerCase()}?`, more: (a, b) => `How many more children chose ${a.toLowerCase()} than ${b.toLowerCase()}?`,
+        most: 'Which pet did the most children choose?', least: 'Which pet did the fewest children choose?', total: 'How many children chose a pet in all?' },
+    { title: 'Sports We Play', icon: 'ball', cats: ['Soccer', 'Tennis', 'Running', 'Swimming', 'Baseball'], cat: 'Sport', val: 'Number of children',
+        value: c => `How many children chose ${c.toLowerCase()}?`, more: (a, b) => `How many more children chose ${a.toLowerCase()} than ${b.toLowerCase()}?`,
+        most: 'Which sport did the most children choose?', least: 'Which sport did the fewest children choose?', total: 'How many children chose a sport in all?' },
+    { title: 'Favorite Fruits', icon: 'apple', cats: ['Apples', 'Pears', 'Grapes', 'Plums', 'Mangoes'], cat: 'Fruit', val: 'Number of children',
+        value: c => `How many children chose ${c.toLowerCase()}?`, more: (a, b) => `How many more children chose ${a.toLowerCase()} than ${b.toLowerCase()}?`,
+        most: 'Which fruit did the most children choose?', least: 'Which fruit did the fewest children choose?', total: 'How many children chose a fruit in all?' },
+    { title: 'Books We Read', icon: 'star', cats: ['January', 'February', 'March', 'April', 'May'], cat: 'Month', val: 'Number of books',
+        value: c => `How many books were read in ${c}?`, more: (a, b) => `How many more books were read in ${a} than in ${b}?`,
+        most: 'In which month were the most books read?', least: 'In which month were the fewest books read?', total: 'How many books were read in all?' },
+    { title: 'Cars We Counted', icon: 'star', cats: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], cat: 'Day', val: 'Number of cars',
+        value: c => `How many cars were counted on ${c}?`, more: (a, b) => `How many more cars were counted on ${a} than on ${b}?`,
+        most: 'On which day were the most cars counted?', least: 'On which day were the fewest cars counted?', total: 'How many cars were counted in all?' },
+];
+
+// AP2 round 3: one question about a data display (bar graph, pictograph, tally chart), in the
+// context's own words. `kind` is most | least | value | more | total; `redeal()` deals a fresh
+// set of values. "Which has the most / least?" is never a tie (its answer is one check box), and
+// "How many more?" compares two different values, the larger first.
+function _dataAsk(kind, context, categories, values, redeal, step) {
+    let vals = values.slice();
+    if (kind === 'most' || kind === 'least') {
+        const ext = () => (kind === 'least' ? Math.min(...vals) : Math.max(...vals));
+        for (let t = 0; t < 30 && vals.filter(v => v === ext()).length > 1; t++) vals = redeal();
+        const e = ext();
+        const at = vals.map((v, i) => (v === e ? i : -1)).filter(i => i >= 0);
+        for (const i of at.slice(1)) vals[i] = kind === 'least' ? vals[i] + step : Math.max(step, vals[i] - step);
+    }
+    if (Math.max(...vals) === Math.min(...vals)) vals[0] += step;
+    const n = categories.length;
+    if (kind === 'most' || kind === 'least') {
+        const v = kind === 'most' ? Math.max(...vals) : Math.min(...vals);
+        const ans = categories[vals.indexOf(v)];
+        return { vals, ask: { kind }, text: kind === 'most' ? context.most : context.least, ans };
+    }
+    if (kind === 'more') {
+        let i = randInt(0, n - 1), j = randInt(0, n - 1), guard = 0;
+        while ((j === i || vals[j] === vals[i]) && guard++ < 40) { i = randInt(0, n - 1); j = randInt(0, n - 1); }
+        if (vals[i] < vals[j]) [i, j] = [j, i];
+        return { vals, ask: { kind, i, j }, text: context.more(categories[i], categories[j]), ans: vals[i] - vals[j] };
+    }
+    if (kind === 'total') return { vals, ask: { kind }, text: context.total, ans: vals.reduce((x, y) => x + y, 0) };
+    const i = randInt(0, n - 1);
+    return { vals, ask: { kind: 'value', i }, text: context.value(categories[i]), ans: vals[i] };
+}
+
+// AP2 round 3: write a data display's kit cell and the answer fields every host reads.
+function _dataCell(q, template, payload, { screenInstr = 'Use the graph. Answer the question.' } = {}) {
+    q.cell = { template, v: 1, payload };
+    q.visual = k2Twin(template, payload);
+    q.text = payload.question;
+    q.screenInstr = screenInstr;
+    q.ans = payload.answer;
+    q.options = [];
+    if (typeof payload.answer === 'string') { q.answerType = 'text'; q.selfAnswering = true; q.printAnswer = payload.answer; }
+    else q.answerType = 'number';
 }
 
 // generate-question.js post-strips q.options when no array element is a
@@ -777,275 +856,68 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "data-range";
 
             } else if (dataSkill === "bar_graph") {
-                // Bar Graph - CCSS 3.MD.B.3
-                const context = pick(contexts);
+                // Bar Graph - CCSS 3.MD.B.3. AP2 round 3 (critic round 4): a kit cell
+                // (sheet/cells/figures.js `bar-graph`), drawn the same on paper, in the key and on the
+                // three screen hosts. A FULL numbered scale (a grid line and a number on every step of
+                // 1, 2, 5 or 10) with every value ON a step, axis titles in words, grey bars and no
+                // number over any bar, so the graph is read, never copied. The question sits beside
+                // the graph in the same cell; a bar answer is one check box (most and least are never
+                // a tie), a number answer one box. The click-all variant is gone (a list on paper).
+                const context = pick(BAR_CONTEXTS);
                 const numBars = _dNum('tiles') || pick([4, 5]);
-                const categories = context.categories.slice(0, numBars);
+                const categories = context.cats.slice(0, numBars);
                 const barMax = _dNum('most') || Math.max(5, Math.min(Math.ceil(dataMax / 5), 50));
-                const values = categories.map(() => rng(2, barMax));
-                const maxVal = Math.max(...values);
-
-                // Phase 4.5 batch 6 — multi-select-check variant: "Click ALL bars > X"
-                if (Math.random() < 0.20) {
-                    // Pick a threshold so a non-trivial subset (1..numBars-1) of values is above it
-                    const sortedVals = [...values].sort((a, b) => a - b);
-                    // Try thresholds from middle outward
-                    let chosenThreshold = null;
-                    const tryOrder = [Math.floor(numBars / 2), 1, numBars - 2, 0, numBars - 1];
-                    for (const ti of tryOrder) {
-                        const t = sortedVals[ti];
-                        const above = values.filter(v => v > t).length;
-                        if (above >= 1 && above < numBars) { chosenThreshold = t; break; }
-                    }
-                    if (chosenThreshold !== null) {
-                        const opts = categories.map((cat, i) => ({
-                            id: 'opt' + i,
-                            label: cat,   // AP2: the value is read off the graph, never printed on the option
-                            correct: values[i] > chosenThreshold,
-                        }));
-                        const ans = opts.filter(o => o.correct).map(o => o.id);
-                        // Build the same visual as the original branch — sized big within viewport
-                        const barWidth = 56;
-                        const barGap = 22;
-                        const graphHeight = 200;
-                        const graphWidth = categories.length * (barWidth + barGap) + 80;
-                        const scale = (graphHeight - 36) / maxVal;
-                        // Rotate labels when any category name is long
-                        const longLabel = categories.some(c => c.length > 6);
-                        const labelRotate = longLabel ? -25 : 0;
-                        q.visual = `<div style="text-align:center;">
-                            <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);font-size:1rem;">${context.icon} ${context.title}</div>
-                            <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:6px;">CCSS: 3.MD.B.3 | Bar Graph</div>
-                            <svg viewBox="0 0 ${graphWidth} ${graphHeight + (longLabel ? 80 : 50)}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;max-width:900px;max-height:60vh;height:auto;background:${COLORS.bg};">
-                                <line x1="55" y1="10" x2="55" y2="${graphHeight}" stroke="${COLORS.axis}" stroke-width="${STROKE.bold}"/>
-                                <line x1="55" y1="${graphHeight}" x2="${graphWidth - 10}" y2="${graphHeight}" stroke="${COLORS.axis}" stroke-width="${STROKE.bold}"/>
-                                ${[0, Math.ceil(maxVal/2), maxVal].map((val) => `
-                                    <text x="50" y="${graphHeight - val * scale + 5}" font-family='${FONTS.sans}' font-size="12" font-weight="400" fill="${COLORS.text}" text-anchor="end">${val}</text>
-                                    <line x1="53" y1="${graphHeight - val * scale}" x2="${graphWidth - 10}" y2="${graphHeight - val * scale}" stroke="${COLORS.grid}" stroke-width="${STROKE.hair}"/>
-                                `).join('')}
-                                ${values.map((v, i) => {
-                                    const x = 70 + i * (barWidth + barGap);
-                                    const barHeight = v * scale;
-                                    const labelY = graphHeight + (longLabel ? 18 : 18);
-                                    const shouldRotate = longLabel || categories[i].length > 6;
-                                    const labelTransform = shouldRotate ? `transform="rotate(${labelRotate || -25} ${x + barWidth/2} ${labelY})"` : '';
-                                    return `
-                                        <rect x="${x}" y="${graphHeight - barHeight}" width="${barWidth}" height="${barHeight}"
-                                              fill="${COLORS.primary}" stroke="${COLORS.primary}" stroke-width="${STROKE.normal}"/>
-                                        <text x="${x + barWidth/2}" y="${graphHeight - barHeight - 6}" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}" text-anchor="middle">${v}</text>
-                                        <text x="${x + barWidth/2}" y="${labelY}" font-family='${FONTS.sans}' font-size="12" font-weight="400" fill="${COLORS.text}" text-anchor="${shouldRotate ? 'end' : 'middle'}" ${labelTransform}>${categories[i]}</text>
-                                    `;
-                                }).join('')}
-                            </svg>
-                        </div>`;
-                        // O6 "Bars" (AP2): the same graph lying down, the same scale and values.
-                        if (_barsLyingDown()) {
-                            q.visual = `<div style="text-align:center;">
-                            <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);font-size:1rem;">${context.icon} ${context.title}</div>
-                            <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:6px;">CCSS: 3.MD.B.3 | Bar Graph</div>
-                            ${createBarGraphSVG({ categories, values, max: maxVal, ticks: [0, Math.ceil(maxVal / 2), maxVal], valueLabels: true })}
-                        </div>`;
-                        }
-                        q.text = `${context.title}: Click ALL categories with values greater than ${chosenThreshold}.`;
-                        q.ans = ans;
-                        q.options = _preserveOptionsForWidget(opts);
-                        q.answerType = 'multi-select-check';
-                        q.hint = `Read each bar's height and compare to ${chosenThreshold}.`;
-                        q.printFormat = 'multi-select';
-                        q.skillLabel = 'Bar Graph';
-                        q.ccss = '3.MD.B.3';
-                        q.dataData = { categories, values, context: context.title, threshold: chosenThreshold, type: 'bar_graph_msc', ...(_barsLyingDown() ? { bars: 'horizontal' } : {}) };
-                        return;
-                    }
-                }
-
-                const questionTypes = ["which_highest", "which_lowest", "specific_value", "total", "difference"];
-                const questionType = pick(questionTypes);
-
+                const step = barMax <= 10 ? 1 : barMax <= 20 ? 2 : barMax <= 50 ? 5 : 10;
+                const kMax = Math.max(2, Math.floor(barMax / step));
+                const forms = _dSet('forms') || [0, 1, 2, 3];
+                const kind = [pick(['most', 'least']), 'value', 'more', 'total'][pick(forms)] || 'value';
+                const deal = () => categories.map(() => step * rng(1, kMax));
+                const d = _dataAsk(kind, context, categories, deal(), deal, step);
+                const values = d.vals;
+                const top = step * (Math.ceil(Math.max(...values) / step) + 1);
+                const ask = d.ask;
+                const horizontal = _barsLyingDown();
+                const payload = { title: context.title, categories, values, step, top, orientation: horizontal ? 'horizontal' : 'vertical',
+                    catTitle: context.cat, valTitle: context.val, ask, question: d.text, answer: d.ans };
+                _dataCell(q, 'bar-graph', payload);
                 q.ccss = "3.MD.B.3";
-
-                if (questionType === "which_highest") {
-                    const maxIdx = values.indexOf(Math.max(...values));
-                    q.ans = categories[maxIdx];
-                    q.answerType = "choice";
-                    q.options = categories;
-                    q.text = `${context.title}: Which category has the most?`;
-                } else if (questionType === "which_lowest") {
-                    const minIdx = values.indexOf(Math.min(...values));
-                    q.ans = categories[minIdx];
-                    q.answerType = "choice";
-                    q.options = categories;
-                    q.text = `${context.title}: Which category has the least?`;
-                } else if (questionType === "specific_value") {
-                    const idx = rng(0, categories.length - 1);
-                    q.ans = values[idx];
-                    q.text = `${context.title}: How many chose ${categories[idx]}?`;
-                    q.options = buildNumericOptions(q.ans);
-                } else if (questionType === "total") {
-                    q.ans = values.reduce((a, b) => a + b, 0);
-                    q.text = `${context.title}: What is the total of all responses?`;
-                    q.options = buildNumericOptions(q.ans);
-                } else {
-                    const idx1 = rng(0, categories.length - 1);
-                    let idx2 = rng(0, categories.length - 1);
-                    while (idx2 === idx1) idx2 = rng(0, categories.length - 1);
-                    q.ans = Math.abs(values[idx1] - values[idx2]);
-                    q.text = `${context.title}: What is the difference between ${categories[idx1]} and ${categories[idx2]}?`;
-                    q.options = buildNumericOptions(q.ans);
-                }
-
-                q.hint = `Read the bar graph carefully! Each bar shows a different value.`;
-
-                // Create SVG bar graph — sized big within viewport
-                const barWidth = 95; // bumped from 70
-                const barGap = 38; // bumped from 30
-                const graphHeight = 330; // bumped from 260
-                const graphWidth = categories.length * (barWidth + barGap) + 100;
-                const scale = (graphHeight - 36) / maxVal;
-                const longLabel = categories.some(c => c.length > 6);
-                const labelRotate = longLabel ? -25 : 0;
-
-                q.visual = `<div style="text-align:center;">
-                    ${questionType === "difference" ? STUDENT_DEF_DIFFERENCE : ''}
-                    <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);font-size:1rem;">${context.icon} ${context.title}</div>
-                    <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:6px;">CCSS: ${q.ccss} | Bar Graph</div>
-                    <svg viewBox="0 0 ${graphWidth} ${graphHeight + (longLabel ? 80 : 50)}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;max-width:900px;max-height:60vh;height:auto;background:${COLORS.bg};">
-                        <!-- Y-axis -->
-                        <line x1="55" y1="10" x2="55" y2="${graphHeight}" stroke="${COLORS.axis}" stroke-width="${STROKE.bold}"/>
-                        <!-- X-axis -->
-                        <line x1="55" y1="${graphHeight}" x2="${graphWidth - 10}" y2="${graphHeight}" stroke="${COLORS.axis}" stroke-width="${STROKE.bold}"/>
-                        <!-- Y-axis labels & hairline grid -->
-                        ${[0, Math.ceil(maxVal/2), maxVal].map((val, i) => `
-                            <text x="50" y="${graphHeight - val * scale + 5}" font-family='${FONTS.sans}' font-size="12" font-weight="400" fill="${COLORS.text}" text-anchor="end">${val}</text>
-                            <line x1="53" y1="${graphHeight - val * scale}" x2="${graphWidth - 10}" y2="${graphHeight - val * scale}" stroke="${COLORS.grid}" stroke-width="${STROKE.hair}"/>
-                        `).join('')}
-                        <!-- Bars (single primary color) -->
-                        ${values.map((v, i) => {
-                            const x = 70 + i * (barWidth + barGap);
-                            const barHeight = v * scale;
-                            const labelY = graphHeight + 18;
-                            const shouldRotate = longLabel || categories[i].length > 6;
-                            const labelTransform = shouldRotate ? `transform="rotate(${labelRotate || -25} ${x + barWidth/2} ${labelY})"` : '';
-                            return `
-                                <rect x="${x}" y="${graphHeight - barHeight}" width="${barWidth}" height="${barHeight}"
-                                      fill="${COLORS.primary}" stroke="${COLORS.primary}" stroke-width="${STROKE.normal}"/>
-                                <text x="${x + barWidth/2}" y="${graphHeight - barHeight - 6}" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}" text-anchor="middle">${v}</text>
-                                <text x="${x + barWidth/2}" y="${labelY}" font-family='${FONTS.sans}' font-size="12" font-weight="400" fill="${COLORS.text}" text-anchor="${shouldRotate ? 'end' : 'middle'}" ${labelTransform}>${categories[i]}</text>
-                            `;
-                        }).join('')}
-                    </svg>
-                </div>`;
-                q.dataData = { categories, values, context: context.title, questionType, type: 'bar_graph' };
+                q.hint = horizontal ? 'Follow the end of each bar down to the numbers along the bottom.'
+                    : 'Follow the top of each bar across to the numbers up the side.';
+                const legacyType = { most: 'which_highest', least: 'which_lowest', value: 'specific_value', more: 'difference', total: 'total' }[ask.kind];
+                q.dataData = { categories, values, context: context.title, questionType: legacyType, type: 'bar_graph', ...(horizontal ? { bars: 'horizontal' } : {}) };
                 q.printFormat = "data-bar-graph";
-                // O6 "Bars" (AP2): the same graph lying down — the categories down the left, the
-                // same scale numbers along the bottom, the same value at the end of each bar.
-                if (_barsLyingDown()) {
-                    q.visual = `<div style="text-align:center;">
-                    ${questionType === "difference" ? STUDENT_DEF_DIFFERENCE : ''}
-                    <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);font-size:1rem;">${context.icon} ${context.title}</div>
-                    <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:6px;">CCSS: ${q.ccss} | Bar Graph</div>
-                    ${createBarGraphSVG({ categories, values, max: maxVal, ticks: [0, Math.ceil(maxVal / 2), maxVal], valueLabels: true })}
-                </div>`;
-                    q.dataData.bars = 'horizontal';
-                }
+                q.skillLabel = 'Bar Graph';
 
             } else if (dataSkill === "pictograph") {
-                // Pictograph - CCSS 3.MD.B.3
-                const context = pick(contexts);
+                // Pictograph - CCSS 3.MD.B.3. AP2 round 3 (critic round 4, the bar graph's defects): a
+                // kit cell (sheet/cells/figures.js `pictograph`), drawn the same on paper, in the key and
+                // on the three screen hosts: in-house pictures in a ruled table, the key printed under
+                // it (RP-132), the question beside it in the context's own words, one box or one check
+                // box. The click-all variant is gone (a list on paper).
+                const context = pick(BAR_CONTEXTS);
                 const numRows = _dNum('tiles') || pick([3, 4, 5]);
-                const categories = context.categories.slice(0, numRows);
-                const scaleOpts = range >= 100 ? [2, 5, 10, 25] : range >= 50 ? [2, 5, 10] : [2, 5];
-                const scale = pick(scaleOpts);
+                const categories = context.cats.slice(0, numRows);
+                const _sc = _dOpt('scale');   // the teacher's ticked scales, else by the Max Number
+                const ticked = Array.isArray(_sc) && _sc.length ? _sc : null;
+                const scaleOpts = ticked ? ticked.map(i => [2, 5, 10, 25][i]).filter(Boolean)
+                    : (range >= 100 ? [2, 5, 10, 25] : range >= 50 ? [2, 5, 10] : [2, 5]);
+                const scale = pick(scaleOpts.length ? scaleOpts : [2, 5]);
                 const pictoMax = Math.max(2, Math.min(Math.ceil(dataMax / scale), 8));
-                const values = categories.map(() => rng(1, pictoMax) * scale);
-                const icons = ["\u2605", "\u25CF", "\u25A0", "\u25B2", "\u2666"];
-                const icon = pick(icons);
-
-                // Phase 4.5 batch 6 (completion) — multi-select-check variant: "Click ALL categories with more than N items"
-                if (Math.random() < 0.20) {
-                    const sortedVals = [...values].sort((a, b) => a - b);
-                    let chosenThreshold = null;
-                    const tryOrder = [Math.floor(numRows / 2), 1, numRows - 2, 0, numRows - 1];
-                    for (const ti of tryOrder) {
-                        if (ti < 0 || ti >= sortedVals.length) continue;
-                        const t = sortedVals[ti];
-                        const above = values.filter(v => v > t).length;
-                        if (above >= 1 && above < numRows) { chosenThreshold = t; break; }
-                    }
-                    if (chosenThreshold !== null) {
-                        const opts = categories.map((cat, i) => ({
-                            id: 'opt' + i,
-                            label: cat,   // AP2: the value is read off the graph, never printed on the option
-                            correct: values[i] > chosenThreshold,
-                        }));
-                        const ans = opts.filter(o => o.correct).map(o => o.id);
-                        q.visual = `<div style="text-align:center;">
-                            <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
-                            <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: 3.MD.B.3 | Pictograph</div>
-                            <div style="background:var(--bg-card);padding:10px 14px;border-radius:12px;display:inline-block;text-align:left;max-width:720px;width:100%;box-sizing:border-box;">
-                                <div style="font-weight:600;margin-bottom:6px;text-align:center;padding:5px;background:var(--bg-card-light);border-radius:6px;font-size:0.95rem;">Key: ${icon} = ${scale}</div>
-                                ${categories.map((cat, i) => {
-                                    const numIcons = values[i] / scale;
-                                    return `<div style="display:flex;align-items:center;gap:10px;padding:4px 0;border-bottom:1px solid var(--border-light);">
-                                        <span style="width:90px;font-weight:600;font-size:0.95rem;">${cat}</span>
-                                        <span style="font-size:1.5rem;letter-spacing:5px;line-height:1;">${icon.repeat(numIcons)}</span>
-                                    </div>`;
-                                }).join('')}
-                            </div>
-                        </div>`;
-                        q.text = `${context.title}: Click ALL categories with more than ${chosenThreshold} (Each ${icon} = ${scale}).`;
-                        q.ans = ans;
-                        q.options = _preserveOptionsForWidget(opts);
-                        q.answerType = 'multi-select-check';
-                        q.hint = `Count each row's symbols and multiply by ${scale}, then compare to ${chosenThreshold}.`;
-                        q.printFormat = 'multi-select';
-                        q.skillLabel = 'Pictograph';
-                        q.ccss = '3.MD.B.3';
-                        q.dataData = { categories, values, scale, icon, context: context.title, threshold: chosenThreshold, type: 'pictograph_msc' };
-                        return;
-                    }
-                }
-
-                const questionType = pick(["specific_value", "total", "which_most"]);
+                const deal = () => categories.map(() => rng(1, pictoMax) * scale);
+                const forms = _dSet('forms') || [0, 1, 2, 3];
+                const kind = [pick(['most', 'least']), 'value', 'total', 'more'][pick(forms)] || 'value';
+                const d = _dataAsk(kind, context, categories, deal(), deal, scale);
+                // an in-house line picture for the context (RP-20); never a plain square, which reads
+                // as a check box beside the answer's check boxes
+                const icon = context.icon || 'star';
+                const payload = { title: context.title, categories, values: d.vals, scale, icon, catTitle: context.cat, valTitle: context.val,
+                    ask: d.ask, question: d.text, answer: d.ans };
+                _dataCell(q, 'pictograph', payload);
                 q.ccss = "3.MD.B.3";
-
-                if (questionType === "specific_value") {
-                    const idx = rng(0, categories.length - 1);
-                    q.ans = values[idx];
-                    q.text = `${context.title}: How many for ${categories[idx]}? (Each ${icon} = ${scale})`;
-                    q.options = buildNumericOptions(q.ans);
-                } else if (questionType === "total") {
-                    q.ans = values.reduce((a, b) => a + b, 0);
-                    q.text = `${context.title}: What is the total? (Each ${icon} = ${scale})`;
-                    q.options = buildNumericOptions(q.ans);
-                } else {
-                    const maxIdx = values.indexOf(Math.max(...values));
-                    q.ans = categories[maxIdx];
-                    q.answerType = "choice";
-                    q.options = categories;
-                    q.text = `${context.title}: Which has the most? (Each ${icon} = ${scale})`;
-                }
-
-                q.hint = `Count the symbols and multiply by ${scale}!`;
-
-                // Create pictograph
-                const maxIcons = Math.ceil(Math.max(...values) / scale);
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
-                    <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss} | Pictograph</div>
-                    <div style="background:var(--bg-card);padding:14px 18px;border-radius:14px;display:inline-block;text-align:left;max-width:720px;width:100%;box-sizing:border-box;">
-                        <div style="font-weight:600;margin-bottom:10px;text-align:center;padding:8px;background:var(--bg-card-light);border-radius:8px;font-size:1.15rem;">Key: ${icon} = ${scale}</div>
-                        ${categories.map((cat, i) => {
-                            const numIcons = values[i] / scale;
-                            return `<div style="display:flex;align-items:center;gap:14px;padding:8px 0;border-bottom:1px solid var(--border-light);">
-                                <span style="width:150px;font-weight:600;font-size:1.4rem;">${cat}</span>
-                                <span style="font-size:2.9rem;letter-spacing:9px;line-height:1;">${icon.repeat(numIcons)}</span>
-                            </div>`;
-                        }).join('')}
-                    </div>
-                </div>`;
-                q.dataData = { categories, values, scale, icon, context: context.title, type: 'pictograph' };
+                q.hint = `Count the pictures in the row. Each picture stands for ${scale}: count by ${scale}s.`;
+                q.dataData = { categories, values: d.vals, scale, icon, context: context.title, type: 'pictograph' };
                 q.printFormat = "data-pictograph";
+                q.skillLabel = 'Pictograph';
 
             } else if (dataSkill === "line_plot") {
                 // Line Plot with fractions - CCSS 4.MD.B.4, 5.MD.B.2
@@ -1137,121 +1009,27 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "data-line-plot";
 
             } else if (dataSkill === "tally_chart") {
-                // Tally Chart - CCSS 3.MD.B.3
-                const context = pick(contexts);
+                // Tally Chart - CCSS 1.MD.C.4. AP2 round 3 (critic round 4, the bar graph's defects): a
+                // kit cell (sheet/cells/figures.js `tally-chart`), drawn the same on paper, in the key
+                // and on the three screen hosts: tally marks in a ruled table (RP-22, a diagonal fifth),
+                // the question beside it in the context's own words, one box or one check box. The
+                // click-all variant is gone (a list on paper).
+                const context = pick(BAR_CONTEXTS);
                 const numRows = _dNum('tiles') || pick([3, 4, 5]);
-                const categories = context.categories.slice(0, numRows);
+                const categories = context.cats.slice(0, numRows);
                 const _tMost = _dNum('most');
-                const values = categories.map(() => (_tMost ? rng(_tMost <= 5 ? 1 : 3, _tMost) : rng(3, 15)));
-
-                // Phase 4.5 batch 6 (completion) — multi-select-check variant: "Click ALL categories with at least N tallies"
-                if (Math.random() < 0.20) {
-                    const sortedVals = [...values].sort((a, b) => a - b);
-                    let chosenThreshold = null;
-                    const tryOrder = [Math.floor(numRows / 2), 1, numRows - 2, 0, numRows - 1];
-                    for (const ti of tryOrder) {
-                        if (ti < 0 || ti >= sortedVals.length) continue;
-                        const t = sortedVals[ti];
-                        const above = values.filter(v => v >= t).length;
-                        if (above >= 1 && above < numRows) { chosenThreshold = t; break; }
-                    }
-                    if (chosenThreshold !== null) {
-                        const opts = categories.map((cat, i) => ({
-                            id: 'opt' + i,
-                            label: cat,   // AP2: the value is read off the graph, never printed on the option
-                            correct: values[i] >= chosenThreshold,
-                        }));
-                        const ans = opts.filter(o => o.correct).map(o => o.id);
-                        // Reuse the tally-mark renderer (re-declared in scope to keep variant self-contained)
-                        const makeTallyV = (n) => {
-                            const groups = Math.floor(n / 5);
-                            const extras = n % 5;
-                            let result = '';
-                            for (let i = 0; i < groups; i++) {
-                                result += '<span style="position:relative;margin-right:10px;"><span style="letter-spacing:-2px;">||||</span><span style="position:absolute;left:0;top:50%;transform:rotate(-20deg);width:100%;">―</span></span>';
-                            }
-                            result += '<span style="letter-spacing:-2px;">' + '|'.repeat(extras) + '</span>';
-                            return result;
-                        };
-                        q.visual = `<div style="text-align:center;">
-                            <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
-                            <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: 3.MD.B.3 | Tally Chart</div>
-                            <div style="background:var(--bg-card);padding:10px 14px;border-radius:12px;display:inline-block;max-width:720px;width:100%;box-sizing:border-box;">
-                                <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;font-weight:600;padding-bottom:6px;border-bottom:2px solid var(--border-light);margin-bottom:4px;font-size:1rem;">
-                                    <span>Category</span><span>Tallies</span>
-                                </div>
-                                ${categories.map((cat, i) => `
-                                    <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-light);">
-                                        <span style="font-weight:600;font-size:1rem;">${cat}</span>
-                                        <span style="font-size:1.4rem;color:${chartColors[i % chartColors.length]};line-height:1;">${makeTallyV(values[i])}</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>`;
-                        q.text = `${context.title}: Click ALL categories with at least ${chosenThreshold} tallies.`;
-                        q.ans = ans;
-                        q.options = _preserveOptionsForWidget(opts);
-                        q.answerType = 'multi-select-check';
-                        q.hint = `Each "||||" group with a slash equals 5. Count tallies per row and compare to ${chosenThreshold}.`;
-                        q.printFormat = 'multi-select';
-                        q.skillLabel = 'Tally Chart';
-                        q.ccss = '3.MD.B.3';
-                        q.dataData = { categories, values, context: context.title, threshold: chosenThreshold, type: 'tally_chart_msc' };
-                        return;
-                    }
-                }
-
-                const questionType = pick(["specific_value", "total", "which_most"]);
-                q.ccss = "3.MD.B.3";
-
-                if (questionType === "specific_value") {
-                    const idx = rng(0, categories.length - 1);
-                    q.ans = values[idx];
-                    q.text = `${context.title}: How many tallies for ${categories[idx]}?`;
-                    q.options = buildNumericOptions(q.ans);
-                } else if (questionType === "total") {
-                    q.ans = values.reduce((a, b) => a + b, 0);
-                    q.text = `${context.title}: What is the total of all tallies?`;
-                    q.options = buildNumericOptions(q.ans);
-                } else {
-                    const maxIdx = values.indexOf(Math.max(...values));
-                    q.ans = categories[maxIdx];
-                    q.answerType = "choice";
-                    q.options = categories;
-                    q.text = `${context.title}: Which has the most tallies?`;
-                }
-
-                q.hint = `Remember: |||| (crossed) = 5. Count groups of 5 plus extras!`;
-
-                // Create tally marks
-                const makeTally = (n) => {
-                    const groups = Math.floor(n / 5);
-                    const extras = n % 5;
-                    let result = '';
-                    for (let i = 0; i < groups; i++) {
-                        result += '<span style="position:relative;margin-right:10px;"><span style="letter-spacing:-2px;">||||</span><span style="position:absolute;left:0;top:50%;transform:rotate(-20deg);width:100%;">―</span></span>';
-                    }
-                    result += '<span style="letter-spacing:-2px;">' + '|'.repeat(extras) + '</span>';
-                    return result;
-                };
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
-                    <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss} | Tally Chart</div>
-                    <div style="background:var(--bg-card);padding:14px 18px;border-radius:14px;display:inline-block;max-width:720px;width:100%;box-sizing:border-box;">
-                        <div style="display:grid;grid-template-columns:140px 1fr;gap:10px;font-weight:600;padding-bottom:8px;border-bottom:2px solid var(--border-light);margin-bottom:6px;font-size:1.15rem;">
-                            <span>Category</span><span>Tallies</span>
-                        </div>
-                        ${categories.map((cat, i) => `
-                            <div style="display:grid;grid-template-columns:140px 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-light);">
-                                <span style="font-weight:600;font-size:1.4rem;">${cat}</span>
-                                <span style="font-size:2.6rem;color:${chartColors[i % chartColors.length]};line-height:1;">${makeTally(values[i])}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>`;
-                q.dataData = { categories, values, context: context.title, type: 'tally_chart' };
+                const deal = () => categories.map(() => (_tMost ? rng(_tMost <= 5 ? 1 : 3, _tMost) : rng(3, 15)));
+                const forms = _dSet('forms') || [0, 1, 2, 3];
+                const kind = ['value', pick(['most', 'least']), 'total', 'more'][pick(forms)] || 'value';
+                const d = _dataAsk(kind, context, categories, deal(), deal, 1);
+                const payload = { title: context.title, categories, values: d.vals, catTitle: context.cat, valTitle: 'Tally',
+                    ask: d.ask, question: d.text, answer: d.ans };
+                _dataCell(q, 'tally-chart', payload, { screenInstr: 'Use the tally chart. Answer the question.' });
+                q.ccss = "1.MD.C.4";
+                q.hint = 'A bundle with a line across is 5. Count the bundles by 5s, then count on the single marks.';
+                q.dataData = { categories, values: d.vals, context: context.title, type: 'tally_chart' };
                 q.printFormat = "data-tally";
+                q.skillLabel = 'Tally Chart';
 
             } else if (dataSkill === "pie_chart") {
                 // Pie Chart - CCSS 5.MD.B.2

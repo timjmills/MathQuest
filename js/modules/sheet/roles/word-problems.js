@@ -140,8 +140,8 @@ export function prepare(it, info = {}) {
     // it is: story, sign row, column boxes and the answer with its unit bank.
     if (it.template === 'word-work') {
         return Object.assign({}, it, {
-            render: (c, o = {}) => it.render(c, Object.assign({}, o, { cols: 1 })),
-            measured: null, footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: 1, size: 'spacious' }),
+            render: (c, o = {}) => it.render(c, o),
+            measured: null, footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: 2 }),
             fclass: 'word', story: true, wordWork: true,
         });
     }
@@ -209,6 +209,9 @@ export function supports(items) {
 function layout(items, input) {
     const ctx = ctxOf(input);
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Lesson 1', score: 1 });
+    // PT-WPR-1 and the 12.1 ceiling (3 / 3 / 4 at L / M / S): one column. The word-work cell reads
+    // left to right in it (story and sign row | columns and answer), three stories to a page at L.
+    // (On the Independent, Test and Guided pages the same cell stands in 2 columns where it fits.)
     return resolveSectionLayout({
         role: ROLE_ID, columns: 1, count: items.length,
         target: { cols: 1, rows: PER_PAGE }, ceiling: PER_PAGE, floor: (input.floors || {}).main,
@@ -224,8 +227,9 @@ export function plan(input = {}) {
     const items = all.slice(0, L.perPage);
     const lesson = Math.max(1, Number(input.lesson) || 1);
     const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: items.length });
-    const grid = gridPart(items.map((it) => planItem(it, { cols: 1 })), { cols: 1, rows: items.length, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
-    if (items.length === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
+    const cols = Math.max(1, L.cols || 1);
+    const grid = gridPart(items.map((it) => planItem(it, { cols })), { cols, rows: Math.ceil(items.length / cols), cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
+    if (Math.ceil(items.length / cols) === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
     // Kindergarten stories print their label: the pupil writes the number only.
     const instr = items.length && items.every((it) => it.wordWork) ? 'story-work'
         : items.length && items.every((it) => it.kStory) ? 'story-k2' : 'story-v2';

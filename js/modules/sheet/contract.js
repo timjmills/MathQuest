@@ -212,6 +212,11 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'frac-name': 'Write the fraction, or circle the model that shows it.',
     'models-complete': 'Look at the two models. Complete the number sentence.',
     'line-mark-each': 'Mark each number on the line.',
+    // O6 lane AP2 round 3 (2026-09-25): the figure and data cells moved to the kit.
+    'read-thermometer': 'Read the thermometer. Write the temperature.',
+    'read-ruler': 'Read the ruler. Write the number the arrow points to.',
+    'add-sides': 'Add the lengths of all the sides. Write the perimeter.',
+    tally: 'Use the tally chart. Answer the questions.',
     // Build lane geometry (2026-09-25): Combine Shapes on the kit shape-grid cell.
     'compose-name': 'Check the name of the shape the pieces make.',
     'compose-name-write': 'Write the name of the shape the pieces make.',
@@ -273,6 +278,10 @@ const SCREEN_VERB_MAP = Object.freeze([
     ['Mark the number with a dot', 'Tap the line to place the number'],
     ['Shade the fraction', 'Tap the parts of the fraction'],
     ['Draw the hands', 'Drag the hands'],
+    // round 4 (H7): the paper verbs the screen sweep (ws-screen-slots) still found
+    ['Draw the lines of symmetry', 'Tap the lines of symmetry'],
+    ['Draw disks to show', 'Tap the mat to show'],
+    ['Check the clock', 'Tap the clock'],
     ['Measure the line', 'Drag the ruler to the line'],
     ['Check one box', 'Tap one box'],
     ['Check the box', 'Tap the box'],
@@ -287,6 +296,7 @@ const SCREEN_VERB_MAP = Object.freeze([
     ['Write', 'Type'],
     ['Box', 'Tap'],
     ['Cut', 'Drag'],
+    ['Draw', 'Tap'],
     ['Sort', 'Drag'],
     ['Glue', 'Drag'],
 ]);
@@ -353,7 +363,9 @@ export function toScreenInstruction(text) {
             const before = src.slice(0, offset).replace(/[_\s]+$/, '');
             const verbPosition = before === ''
                 || /[.?!:;]$/.test(before)
-                || /\b(then|and|or)$/i.test(before);
+                || /\b(then|and|or)$/i.test(before)
+                // a sentence after an expression ("81 ? 9 = 9   Write + − × or ÷ in the circle.")
+                || (/^[A-Z]/.test(match) && /[0-9)=?]$/.test(before));
             if (!verbPosition) return match;
         }
         // Keep the case the sentence needs: a phrase mid-sentence stays lower case.
