@@ -1270,6 +1270,7 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `ring-remainder-each` | Circle groups of the second number. Write the quotient and the remainder. | `ring-remainder` when the divisors differ (R3: "the divisor" was jargon on the page) |
 | `missing-all` | Write the missing numbers. | `missing` when any item of the section has more than one blank |
 | `story-k2` | Solve. Write the number. | Kindergarten word problems: the label word is printed |
+| `story-work` | Circle the sign. Write the numbers in the boxes. Solve. | every whole-number word problem: the word-work cell (sign row, column boxes, answer and unit bank; owner ruling 2026-09-25) |
 | `pick-parts` | Write one number from each list to make the sum. | find two addends from lists |
 | `fact-family` | Use the three numbers. Fill in the fact family. | addition and subtraction fact families |
 | `chart-fill` | Fill in the missing products. | multiplication chart |

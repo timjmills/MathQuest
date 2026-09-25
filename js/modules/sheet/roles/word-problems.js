@@ -136,6 +136,15 @@ export function prepare(it, info = {}) {
     // The K picture word problem (`wordpic` template) IS a word-problem cell: story, countable
     // picture, work box and one number box with its label word. It prints as it is - the role
     // never prints its story a second time.
+    // The word-work cell (every whole-number story, owner ruling 2026-09-25) is the page's cell as
+    // it is: story, sign row, column boxes and the answer with its unit bank.
+    if (it.template === 'word-work') {
+        return Object.assign({}, it, {
+            render: (c, o = {}) => it.render(c, Object.assign({}, o, { cols: 1 })),
+            measured: null, footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: 1, size: 'spacious' }),
+            fclass: 'word', story: true, wordWork: true,
+        });
+    }
     if (it.template === 'wordpic') {
         return Object.assign({}, it, {
             render: (c, o = {}) => it.render(c, Object.assign({}, o, { cols: 1 })),
@@ -218,7 +227,8 @@ export function plan(input = {}) {
     const grid = gridPart(items.map((it) => planItem(it, { cols: 1 })), { cols: 1, rows: items.length, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
     if (items.length === L.rows) { grid.cls = ''; grid.height = ''; }
     // Kindergarten stories print their label: the pupil writes the number only.
-    const instr = items.length && items.every((it) => it.kStory) ? 'story-k2' : 'story-v2';
+    const instr = items.length && items.every((it) => it.wordWork) ? 'story-work'
+        : items.length && items.every((it) => it.kStory) ? 'story-k2' : 'story-v2';
     return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(instr), grid] }], {
         meta: { items: items.length, scoreOutOf: items.length, stories: items.length, fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },
     });

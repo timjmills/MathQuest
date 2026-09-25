@@ -6,6 +6,19 @@ import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { createAnalogClockSVG, createDigitalClockHTML, addTime, subtractTime, formatTime, timeToWords, generateTimeDistractors, createMagnifiableClock, createClockChoiceWithMagnify } from './svg-clock.js';
 import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 import { isTimeMoneySkill, generateTimeMoneyQuestion } from './gen-time-money.js';
+import { createBarGraphSVG, createThermometerSVG } from './svg-geometry.js';
+
+// O6 appearance (lane AP2): the value of an appearance control (`labels`, `bars`) for the skill
+// being generated, or `dflt` when the skill has no such control. It never consumes a random
+// number: the item is dealt exactly as before and only its drawing changes.
+function _mLook(id, dflt) {
+    let def = null;
+    try { def = optionsFor(state.category, state.skill).find(o => o.id === id) || null; } catch (e) { def = null; }
+    if (!def) return dflt;
+    const o = state.skillOptions;
+    const v = o && typeof o === 'object' ? o[id] : undefined;
+    return def.values.some(x => x.v === v) ? v : def.default;
+}
 
 // ── Regrouping/carry-box helper for multi-digit unit conversion multiplications ──
 // Used when converting from a larger unit to a smaller one (e.g. m→cm, lb→oz)
@@ -181,11 +194,12 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 for (let i = 0; i < unitCount; i++) {
                     unitsSvg += unit.drawUnit(15 + i * unit.unitW, 50);
                 }
-                // Tick marks
+                // Tick marks. O6 "Figure labels" (AP2): every unit numbered, the first only, or none.
+                const _nsLabels = _mLook('labels', 'all');
                 let ticks = '';
                 for (let i = 0; i <= unitCount; i++) {
                     ticks += `<line x1="${15 + i * unit.unitW}" y1="${unit.name === 'cubes' ? 72 : 62}" x2="${15 + i * unit.unitW}" y2="${unit.name === 'cubes' ? 78 : 68}" stroke="var(--text-dim)" stroke-width="${STROKE.hair}"/>`;
-                    if (i > 0) {
+                    if (i > 0 && (_nsLabels === 'all' || (_nsLabels === 'some' && i === 1))) {
                         ticks += `<text x="${15 + i * unit.unitW - unit.unitW / 2}" y="${unit.name === 'cubes' ? 88 : 78}" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--text-dim)" font-size="10">${i}</text>`;
                     }
                 }
@@ -914,6 +928,16 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Bar Graph Intro";
                 q.printFormat = "bar-graph-intro";
                 q.dataData = { title: theme.title, categories: cats, values: counts, scale: 1 };
+                // O6 "Bars" (AP2): the same graph lying down — the categories down the left, the
+                // scale 0 to 5 along the bottom. Screen and print draw it with one builder.
+                if (_mLook('bars', 'vertical') === 'horizontal') {
+                    q.hint = `Look at how long each bar is. The numbers along the bottom tell you how many.`;
+                    q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">${theme.title}</div>
+                    ${createBarGraphSVG({ categories: cats, values: counts, max: 5 })}
+                </div>`;
+                    q.dataData.bars = 'horizontal';
+                }
                 return;
             }
 
@@ -950,7 +974,11 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     ans = a + b + c;
                 }
 
-                // Build SVG
+                // Build SVG. O6 "Figure labels" (AP2): `some` labels one length (top) and one width
+                // (left) of a rectangle or square — the bottom and right follow from equal opposite
+                // sides. A triangle keeps all three (none can be worked out).
+                const _piLabels = _mLook('labels', 'all');
+                const _piShow = (i) => _piLabels !== 'some' || shape === 'triangle' || i < 2;
                 let svg = '';
                 if (shape === "rectangle" || shape === "square") {
                     const W = 180, H = 110, padX = 40, padY = 25;
@@ -959,9 +987,9 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     svg = `<svg viewBox="0 0 ${W} ${H}" width="220" style="display:block;margin:0 auto;background:#fff;">
                         <rect x="${padX}" y="${padY}" width="${rectW}" height="${rectH}" fill="${softFill(COLORS.primary)}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}"/>
                         <text x="${W / 2}" y="${padY - 6}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[0]}</text>
-                        <text x="${W / 2}" y="${H - padY + 16}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[2]}</text>
+                        ${_piShow(2) ? `<text x="${W / 2}" y="${H - padY + 16}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[2]}</text>` : ''}
                         <text x="${padX - 6}" y="${H / 2 + 4}" text-anchor="end" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[1]}</text>
-                        <text x="${W - padX + 6}" y="${H / 2 + 4}" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[3]}</text>
+                        ${_piShow(3) ? `<text x="${W - padX + 6}" y="${H / 2 + 4}" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[3]}</text>` : ''}
                     </svg>`;
                 } else {
                     // Triangle (isoceles-ish layout)
@@ -990,7 +1018,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.skillLabel = "Perimeter Intro";
                 q.printFormat = "perimeter-intro";
-                q.perimeterIntroData = { shape, sides, sideLabels, ans };
+                q.perimeterIntroData = { shape, sides, sideLabels, ans, ...(_piLabels === 'some' ? { labels: 'some' } : {}) };
                 return;
             }
 
@@ -1228,6 +1256,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.options = shuffle([...rrOptions]);
 
                 // Build B&W ruler SVG with clear tick marks
+                const _rrLabels = _mLook('labels', 'all');
                 let rrTicks = '';
                 // Heavy ruler edge line at top
                 rrTicks += `<line x1="${rrPad}" y1="${rrRulerY}" x2="${rrPad + rrRulerLen * rrPxPerInch}" y2="${rrRulerY}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
@@ -1238,7 +1267,8 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     else if (ri % 2 === 0) { rrTickH = 28; rrTickW = 1; }     // half-inch — medium
                     else { rrTickH = 17; rrTickW = STROKE.hair; }                      // quarter-inch — short
                     rrTicks += `<line x1="${rrTickX}" y1="${rrRulerY}" x2="${rrTickX}" y2="${rrRulerY + rrTickH}" stroke="${COLORS.axis}" stroke-width="${rrTickW}"/>`;
-                    if (ri % 4 === 0) {
+                    // O6 "Figure labels" (AP2): every inch numbered, or every other inch (0, 2, 4, 6).
+                    if (ri % 4 === 0 && (_rrLabels !== 'some' || (ri / 4) % 2 === 0)) {
                         rrTicks += `<text x="${rrTickX}" y="${rrRulerY + 70}" text-anchor="middle" font-size="22" font-family='${FONTS.sans}' font-weight="bold" fill="${COLORS.axis}">${ri / 4}</text>`;
                     }
                 }
@@ -1333,13 +1363,17 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     const unit = pick(["°C", "°F"]);
                     q.ans = temp;
                     q.text = `What temperature is shown? (${unit})`;
-                    q.hint = `Find the line where the red liquid stops, then read the number next to it on the scale.`;
+                    q.hint = `Find where the dark column stops. Start at the nearest number below it and count up one degree for each small mark.`;
 
+                    // AP2 (2026-09-25): a thermometer to read. The card used to print the answer
+                    // itself in large type ("23°C") above the answer box. O6 "Figure labels": the
+                    // scale numbered every 5 degrees, or every 10 (a mark for every degree either way).
+                    const every = _mLook('labels', 'all') === 'some' ? 10 : 5;
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Temperature</div>
-                        <div style="font-size:2rem;font-weight:700;color:${temp < 0 ? '#3498db' : temp > 30 ? '#e74c3c' : '#27ae60'};">${temp}${unit}</div>
+                        ${createThermometerSVG({ temp, unit, every })}
                     </div>`;
-                    q.measurementData = { temp, unit };
+                    q.measurementData = { temp, unit, every };
                 } else {
                     const celsius = rng(0, 40);
                     const fahrenheit = Math.round(celsius * 9 / 5 + 32);
