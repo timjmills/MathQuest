@@ -27,6 +27,7 @@ import {
 } from './teacher-ui.js';
 import { renderSetsScreen, openSavedSet, startNewSet } from './teacher-sets.js';
 import { renderPrintScreen, recentPrintouts, reprint, printoutMeta } from './teacher-print.js';
+import { installPreview, tvpAttrs, infoButtonHTML, modeAttrs } from './teacher-preview.js';
 
 const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progress'];
 const PLAY_VIEWS = new Set(['gameView', 'worksheetView', 'quizTakeView', 'mapSessionView']);
@@ -126,6 +127,7 @@ function start() {
     if (started) return;
     started = true;
     if (BOARD_WINDOW) document.body.classList.add('tv-board');
+    installPreview();
 
     document.getElementById('teacherApp')?.addEventListener('click', (e) => {
         const a = e.target.closest('[data-tv-go]');
@@ -286,12 +288,13 @@ function renderRun(el) {
     ${skills.length ? `<div class="tv-pills" role="list" aria-label="Skills in this set">${skills.map((k) => {
         const hit = findSkill(k.categoryId, k.skillId);
         const sum = optionsSummary(k.categoryId, k.skillId, k.opts);
-        return `<span class="tv-pill" role="listitem">${esc(hit ? hit.label : k.skillId)}${sum ? `<small>· ${esc(sum)}</small>` : ''}${k.weight > 1 ? `<strong>×${k.weight}</strong>` : ''}</span>`;
+        const label = hit ? hit.label : k.skillId;
+        return `<span class="tv-pill" role="listitem" tabindex="0"${tvpAttrs(k.categoryId, k.skillId, k.opts)}>${esc(label)}${sum ? `<small>· ${esc(sum)}</small>` : ''}${k.weight > 1 ? `<strong>×${k.weight}</strong>` : ''}${infoButtonHTML(label)}</span>`;
     }).join('')}</div>` : '<p class="tv-empty">This set has no skills yet. Build one in “Send a skill set”.</p>'}`;
     const oneChoice = `
     <div><label class="tv-label" for="tvRunOne">Skill</label>
       <div class="tv-search">${icon('search', 18)}<input id="tvRunOne" class="tv-input" type="search" placeholder="Search, e.g. Subtract Across Zeros" autocomplete="off" value="${esc(run.oneQuery)}"></div></div>
-    ${run.one ? `<div class="tv-pills"><span class="tv-pill">${esc((findSkill(run.one.categoryId, run.one.skillId) || {}).label || run.one.skillId)}<small>· ${esc(levelText((findSkill(run.one.categoryId, run.one.skillId) || {}).level || 'M'))}</small></span></div>` : ''}
+    ${run.one ? `<div class="tv-pills"><span class="tv-pill" tabindex="0"${tvpAttrs(run.one.categoryId, run.one.skillId)}>${esc((findSkill(run.one.categoryId, run.one.skillId) || {}).label || run.one.skillId)}<small>· ${esc(levelText((findSkill(run.one.categoryId, run.one.skillId) || {}).level || 'M'))}</small>${infoButtonHTML((findSkill(run.one.categoryId, run.one.skillId) || {}).label || run.one.skillId)}</span></div>` : ''}
     <div class="tv-pick-results" id="tvRunOneRes"${run.oneQuery ? '' : ' hidden'}></div>`;
     const ttsOn = !!state.ttsEnabled;
     const adaptiveOn = !!state.adaptiveModeEnabled;
@@ -313,11 +316,14 @@ function renderRun(el) {
     <section class="tv-card" aria-labelledby="tvModeH">
       <h2 class="tv-h2" id="tvModeH">How to play</h2>
       <div class="tv-modes" role="radiogroup" aria-labelledby="tvModeH">${MODES.map(([v, ic, t, d]) => `
+        <div class="tvp-mode-wrap"${modeAttrs(v, skills[0] && skills[0].categoryId, skills[0] && skills[0].skillId, skills[0] && skills[0].opts)}>
         <button type="button" class="tv-mode" role="radio" aria-checked="${run.mode === v}" data-run-mode="${v}">
           <span class="tv-mode-icon" aria-hidden="true">${icon(ic, 20)}</span>
           <span><span class="tv-radio-title">${t}</span><span class="tv-radio-text" style="margin-top:4px;">${d}</span></span>
           <span class="tv-mode-tick" aria-hidden="true">${icon('check', 18)}</span>
-        </button>`).join('')}
+        </button>
+        ${infoButtonHTML(t, 'what pupils see in')}
+        </div>`).join('')}
       </div>
     </section>
   </div>
@@ -379,7 +385,7 @@ function renderRunOneResults(el) {
         const hay = `${s.label} ${s.categoryName} ${s.skillId.replace(/_/g, ' ')}`.toLowerCase();
         return words.every((w) => hay.includes(w));
     }).slice(0, 30);
-    box.innerHTML = hits.length ? hits.map((s) => `<button type="button" data-run-one="${esc(s.categoryId + '|' + s.skillId)}"><span class="tv-skill-name">${esc(s.label)}</span><br><span class="tv-skill-meta">${esc(levelText(s.level))} · ${esc(s.categoryName)}</span></button>`).join('')
+    box.innerHTML = hits.length ? hits.map((s) => `<button type="button" data-run-one="${esc(s.categoryId + '|' + s.skillId)}"${tvpAttrs(s.categoryId, s.skillId)}><span class="tv-skill-name">${esc(s.label)}</span><br><span class="tv-skill-meta">${esc(levelText(s.level))} · ${esc(s.categoryName)}</span></button>`).join('')
         : '<p class="tv-cap" style="padding:8px 12px;">No skills match.</p>';
 }
 

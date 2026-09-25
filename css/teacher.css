@@ -504,3 +504,133 @@ body.teacher-mode.tv-bigboard #gameView { zoom: 1.35; }
 @media (max-width: 1180px) {
     .tv-job .tv-btn { max-width: 100%; padding: 0 12px; white-space: normal; text-align: left; line-height: 18px; }
 }
+
+/* ---------------------------------------------------------------- Skill previews (teacher-preview.js)
+   The List | Thumbnails toggle, the thumbnail grid and the floating hover preview. A sample is the
+   practice card's black-and-white paper cell (screen-cell.css), drawn small: its frame stays paper
+   white in dark mode too, as the cell does on the pupil side. */
+
+.tvp-head-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.tvp-viewseg { display: inline-grid; gap: 2px; padding: 3px; border-radius: 9px; }
+.tvp-viewseg > button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 30px; padding: 0 10px; font-size: 13px; }
+.tvp-viewseg > button svg { flex: none; color: var(--tv-caption); }
+.tvp-viewseg > button[aria-checked="true"] svg { color: var(--tv-text); }
+
+.tv-panel-body.tvp-thumbs-body { padding: 16px; }
+.tvp-group { display: flex; align-items: baseline; gap: 8px; margin: 20px 4px 10px; font-size: 13px; line-height: 20px; font-weight: 700; color: var(--tv-text); }
+.tvp-group:first-child { margin-top: 0; }
+.tvp-group-domain { font-size: 12px; font-weight: 500; color: var(--tv-caption); }
+.tvp-group .tv-tree-count { margin-left: auto; font-size: 12px; font-weight: 600; color: var(--tv-caption); font-variant-numeric: tabular-nums; }
+.tvp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 12px; }
+.tvp-card {
+    display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 8px 8px 10px;
+    border: 1px solid var(--tv-border); border-radius: 10px; background: var(--tv-surface);
+}
+.tvp-card:hover { border-color: var(--tv-control-soft); }
+.tvp-card.is-added { border-color: var(--tv-selected); box-shadow: 0 0 0 1px var(--tv-selected); }
+.tvp-card-body { display: flex; align-items: flex-start; gap: 8px; padding: 0 2px; }
+.tvp-card-text { flex: 1; min-width: 0; }
+.tvp-clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tvp-card .tv-add {
+    display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; flex: none; padding: 0; border-radius: 8px; cursor: pointer;
+    border: 1px solid var(--tv-control-soft); background: var(--tv-surface); color: var(--tv-text);
+}
+.tvp-card .tv-add:hover { border-color: var(--tv-control); }
+.tvp-card.is-added .tv-add { border-color: var(--tv-selected); background: var(--tv-selected); color: var(--tv-on-selected); }
+.tvp-more { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; padding: 20px 0 8px; }
+
+/* The sample frame: paper, scaled to fit. */
+.tvp-frame { position: relative; overflow: hidden; background: #fff; border: 1px solid var(--tv-border); border-radius: 8px; }
+.tvp-thumb { height: 128px; }
+.tvp-stage {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); transform-origin: center center;
+    width: max-content; max-width: 400px; padding: 10px; pointer-events: none;
+}
+.tvp-stage .tvp-cell { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 0; text-align: center; }
+.tvp-stage .tvp-instr, .tvp-stage .tvp-q { font-size: var(--mq-text); line-height: 1.3; max-width: 360px; }
+.tvp-stage .tvp-visual { max-width: 400px; }
+.tvp-stage .tvp-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 360px; }
+.tvp-stage .tvp-opt { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 40px; padding: 4px 12px; border: 1px solid #000; border-radius: 6px; font-size: var(--mq-text); }
+.tvp-stage .tvp-answerrow { display: flex; justify-content: center; }
+.tvp-frame.is-unavailable { display: flex; align-items: center; justify-content: center; background: var(--tv-subtle-2); }
+.tvp-unavail { display: flex; flex-direction: column; align-items: center; gap: 6px; font-family: var(--tv-font); font-size: 12px; line-height: 16px; font-weight: 600; color: var(--tv-caption); }
+
+/* The floating preview (a child of <body>, so it carries its own box model and font). */
+.tvp-pop {
+    position: fixed; left: 0; top: 0; z-index: 100000; box-sizing: border-box;
+    width: 344px; max-width: calc(100vw - 16px); padding: 12px;
+    display: flex; flex-direction: column; gap: 12px;
+    background: var(--tv-surface); border: 1px solid var(--tv-border); border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(20, 20, 30, .14);
+    font-family: var(--tv-font); color: var(--tv-text); pointer-events: none;
+}
+.tvp-pop[hidden] { display: none; }
+.tvp-pop *, .tvp-pop *::before, .tvp-pop *::after { box-sizing: border-box; }
+html.dark body.teacher-mode .tvp-pop { box-shadow: 0 12px 32px rgba(0, 0, 0, .5); }
+.tvp-pop-frame { height: 192px; }
+.tvp-pop-body { padding: 0 4px 2px; }
+.tvp-pop-title { font-size: 14px; line-height: 20px; font-weight: 700; color: var(--tv-text); }
+.tvp-pop-desc { margin: 4px 0 0; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--tv-text-2); }
+.tvp-pop-opts { margin: 8px 0 0; padding: 6px 8px; border-radius: 6px; background: var(--tv-accent-tint); font-size: 12px; line-height: 16px; font-weight: 500; color: var(--tv-text); }
+.tvp-pop-opts span { font-weight: 700; margin-right: 4px; }
+
+/* Triggers: the skill name in a set is focusable so the keyboard reaches its preview. */
+.tvp-name { border-radius: 6px; }
+.tv-pill[data-tvp], .tvp-name[data-tvp] { cursor: default; }
+
+/* The (i) button: only on a touch screen. html.tvp-touch is set by teacher-preview.js from
+   (any-hover) and then from the pointer actually used, so a touch laptop gets it when touched. */
+.tvp-info {
+    display: none; align-items: center; justify-content: center; width: 32px; height: 32px; flex: none; padding: 0;
+    border: 0; border-radius: 8px; background: transparent; color: var(--tv-caption); cursor: pointer; vertical-align: middle;
+}
+.tvp-info[aria-expanded="true"] { background: var(--tv-accent-tint); color: var(--tv-accent); }
+html.tvp-touch .tvp-info { display: inline-flex; }
+html.tvp-touch .tv-skill-row .tvp-info { margin-left: auto; }
+html.tvp-touch .tv-skill-name .tvp-info { width: 28px; height: 28px; margin: -4px 0 -4px 4px; }
+html.tvp-touch .tv-pill .tvp-info { width: 28px; height: 28px; margin: -4px -6px -4px 0; }
+
+/* Types of practice: "what pupils see" schematics (Run practice mode cards, the Send Mode picker).
+   Neutral chrome in the teacher palette; the paper cells hold the chosen skill's sample item. */
+.tvp-mode-wrap { position: relative; display: flex; min-width: 0; }
+.tvp-mode-wrap > .tv-mode { flex: 1; min-width: 0; }
+.tvp-mode-wrap > .tvp-info { position: absolute; right: 8px; bottom: 8px; }
+.tvp-mode-frame { background: var(--tv-subtle); }
+.tvp-mode { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 8px; padding: 10px; font-family: var(--tv-font); }
+.tvp-mtop { display: flex; align-items: center; gap: 6px; min-height: 20px; }
+.tvp-mgrow { flex: 1; }
+.tvp-mchip {
+    display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 10px; white-space: nowrap;
+    background: var(--tv-surface); border: 1px solid var(--tv-border); color: var(--tv-text-2); font-size: 10px; font-weight: 700;
+}
+.tvp-mchip.is-dark { background: rgba(255, 255, 255, .10); border-color: rgba(255, 255, 255, .22); color: #fff; }
+.tvp-mbar { flex: 1; height: 8px; border-radius: 4px; background: var(--tv-surface); border: 1px solid var(--tv-border); overflow: hidden; }
+.tvp-mbar > span { display: block; height: 100%; background: var(--tv-text-2); }
+.tvp-mcell { flex: 1; min-height: 0; border-radius: 6px; }
+.tvp-mbtns { display: flex; align-items: center; gap: 6px; }
+.tvp-mbtns > span { width: 40px; height: 16px; border-radius: 5px; background: var(--tv-surface); border: 1px solid var(--tv-border); }
+.tvp-mbtns > span.tvp-mgrow { background: none; border: 0; }
+.tvp-mbtns > span.is-primary { margin-left: auto; width: 56px; background: var(--tv-accent); border-color: var(--tv-accent); }
+.tvp-mbtns > span.is-wide { margin: 0 auto; width: 88px; }
+.tvp-marena { display: flex; align-items: center; justify-content: center; gap: 18px; min-height: 28px; }
+.tvp-mhero { width: 22px; height: 22px; border-radius: 11px; background: var(--tv-accent); }
+.tvp-mboss { width: 28px; height: 28px; border-radius: 7px; background: var(--tv-text-2); }
+.tvp-mvs { font-size: 10px; font-weight: 700; color: var(--tv-caption); }
+.tvp-mlanes { display: flex; flex-direction: column; gap: 4px; }
+.tvp-mlane { display: flex; align-items: center; gap: 6px; }
+.tvp-mlane-l { width: 26px; font-size: 10px; font-weight: 700; color: var(--tv-text-2); }
+.tvp-mtrack { position: relative; flex: 1; height: 14px; border-radius: 7px; background: var(--tv-surface); border: 1px solid var(--tv-border); }
+.tvp-mcar { position: absolute; top: 50%; width: 18px; height: 9px; border-radius: 3px; background: var(--tv-text-2); transform: translate(-50%, -50%); }
+.tvp-mcar.is-you { background: var(--tv-accent); }
+.tvp-mflag { width: 3px; height: 16px; border-radius: 1px; background: var(--tv-text); }
+.tvp-mwsgrid { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 6px; }
+.tvp-mwscard { position: relative; display: flex; min-height: 0; padding: 12px 3px 3px; border-radius: 6px; background: var(--tv-surface); border: 1px solid var(--tv-border); }
+.tvp-mwscard .tvp-mcell { border-radius: 4px; }
+.tvp-mnum { position: absolute; left: 5px; top: 1px; font-size: 9px; line-height: 11px; font-weight: 700; color: var(--tv-text-2); }
+.tvp-mboard { position: absolute; inset: 6px; display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 8px; background: #1f2023; }
+.tvp-mcell-big { border-color: #1f2023; }
+html.tvp-touch .tv-label .tvp-info { width: 24px; height: 24px; margin: -4px 0 -4px 4px; }
+/* Six items side by side: each mini cell drops its instruction line so the item itself reads. */
+.tvp-mwscard { padding-top: 11px; }
+.tvp-mwscard .tvp-stage { padding: 4px; }
+.tvp-mwscard .tvp-instr { display: none; }

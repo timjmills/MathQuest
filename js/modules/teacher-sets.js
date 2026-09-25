@@ -5,6 +5,10 @@
 //   3 Send to pupils  Direct / Quick Start link, built by the EXISTING code generator in
 //                     skill-codes.js (generateShareableLink via state.shareSettings)
 //
+// Step 1 shows the catalogue as a List (the domain -> category tree) or as Thumbnails (a grid of
+// cards, each drawing one real sample item of the skill; teacher-preview.js). The choice is kept
+// per device. Hovering or focusing a skill row, or a skill in the set, shows its sample larger.
+//
 // Sets the teacher saves or sends are kept on this device in localStorage 'mq_teacher_sets'
 // (see teacher-ui.js), which is what Home's "Your skill sets" lists.
 //
@@ -21,9 +25,13 @@ import {
     removeFromCurrentSet, loadSetIntoQueue, snapshotCurrentSet, savedSets, writeSets, optionsSummary,
     optionsReadOnlyHTML, readStore, writeStore,
 } from './teacher-ui.js';
+import {
+    skillView, setSkillView, viewToggleHTML, lazyThumbs, tvpAttrs, infoButtonHTML, installPreview, modeAttrs,
+} from './teacher-preview.js';
 
 const LEVELS = ['K', '1', '2', '3', '4', '5', '6'];
 const UI_KEY = 'mq_teacher_sets_ui';
+const THUMB_PAGE = 48;   // thumbnail cards rendered at a time; "Show more" adds another page
 
 const ui = {
     query: '',
@@ -37,6 +45,8 @@ const ui = {
     lock: false,
     result: null,        // {link, code}
     menu: false,
+    view: skillView(),   // 'list' | 'thumbs' (per device)
+    thumbLimit: THUMB_PAGE,
 };
 
 (function restore() {
@@ -55,6 +65,7 @@ let root = null;
 
 export function renderSetsScreen(el) {
     root = el;
+    installPreview();
     if (!root.dataset.built) {
         root.innerHTML = shellHTML();
         root.dataset.built = '1';
@@ -108,7 +119,10 @@ function shellHTML() {
 <div class="tv-sets-grid">
   <section class="tv-card tv-flush tv-panel" aria-labelledby="tvChooseH">
     <div class="tv-panel-head">
-      <div class="tv-step"><span class="tv-step-num" aria-hidden="true">1</span><h2 class="tv-h2" id="tvChooseH">Choose skills</h2></div>
+      <div class="tvp-head-row">
+        <div class="tv-step"><span class="tv-step-num" aria-hidden="true">1</span><h2 class="tv-h2" id="tvChooseH">Choose skills</h2></div>
+        <div id="tvViewSeg"></div>
+      </div>
       <div class="tv-search">
         <label class="tv-sr" for="tvSkillSearch">Search skills</label>
         ${icon('search', 18)}
@@ -157,7 +171,7 @@ function wire() {
     let t = null;
     search.addEventListener('input', () => {
         clearTimeout(t);
-        t = setTimeout(() => { ui.query = search.value.trim(); renderBrowser(); }, 120);
+        t = setTimeout(() => { ui.query = search.value.trim(); ui.thumbLimit = THUMB_PAGE; renderBrowser(); }, 120);
     });
     root.querySelector('#tvSetName').addEventListener('input', (e) => { ui.name = e.target.value; });
 
@@ -168,6 +182,7 @@ function wire() {
         if (d.level) {
             const i = ui.levels.indexOf(d.level);
             if (i >= 0) ui.levels.splice(i, 1); else ui.levels.push(d.level);
+            ui.thumbLimit = THUMB_PAGE;
             persist();
             renderBrowser();
             return;
@@ -179,10 +194,21 @@ function wire() {
             const has = currentSet().some((s) => s.categoryId === cat && s.skillId === sk);
             if (has) removeFromCurrentSet(cat, sk); else addToCurrentSet(cat, sk);
             ui.result = null;
-            renderBrowser(); renderSet(); renderSend();
+            // The thumbnail grid is updated in place, so its drawn samples stay put.
+            if (ui.view === 'thumbs') syncAdded(); else renderBrowser();
+            renderSet(); renderSend();
             return;
         }
         switch (d.act) {
+            case 'skill-view':
+                if (d.view === ui.view) return;
+                ui.view = d.view === 'thumbs' ? 'thumbs' : 'list';
+                ui.thumbLimit = THUMB_PAGE;
+                setSkillView(ui.view);
+                renderBrowser();
+                root.querySelector(`[data-act="skill-view"][data-view="${ui.view}"]`)?.focus();
+                break;
+            case 'more-thumbs': ui.thumbLimit += THUMB_PAGE; renderBrowser(); break;
             case 'add-shown': addShown(); break;
             case 'clear':
                 if (!currentSet().length) return;
@@ -276,6 +302,9 @@ function renderBrowser() {
     root.querySelector('#tvLevelCaption').textContent = !picked.length ? 'Showing all levels'
         : picked.length === 1 ? `Showing Level ${picked[0]}` : `Showing Levels ${picked.slice(0, -1).join(', ')} and ${picked[picked.length - 1]}`;
 
+    const seg = root.querySelector('#tvViewSeg');
+    if (seg) seg.innerHTML = viewToggleHTML(ui.view);
+    box.classList.toggle('tvp-thumbs-body', ui.view === 'thumbs');
     const searching = !!ui.query;
     const shown = shownSkills();
     const inSet = new Set(currentSet().map((s) => `${s.categoryId}|${s.skillId}`));
@@ -283,6 +312,7 @@ function renderBrowser() {
         box.innerHTML = `<p class="tv-empty" style="margin:12px;">No skills match${ui.query ? ` “${esc(ui.query)}”` : ''}${ui.levels.length ? ' at the chosen levels' : ''}.</p>`;
         return;
     }
+    if (ui.view === 'thumbs') { renderThumbs(box, shown, inSet); return; }
     let html = '';
     for (const [domainId, domain] of Object.entries(DOMAINS)) {
         const dSkills = shown.filter((s) => s.domainId === domainId);
@@ -300,9 +330,10 @@ function renderBrowser() {
             for (const s of cSkills) {
                 const k = `${s.categoryId}|${s.skillId}`;
                 const added = inSet.has(k);
-                html += `<div class="tv-skill-row${added ? ' is-added' : ''}">
-  <button type="button" class="tv-add" data-add="${esc(k)}" aria-pressed="${added}" aria-label="${added ? 'Remove' : 'Add'} ${esc(s.label)} ${added ? 'from' : 'to'} the set">${icon(added ? 'check' : 'plus', 16)}</button>
-  <div style="min-width:0;"><div class="tv-skill-name">${esc(s.label)}</div><div class="tv-skill-meta">${esc(levelText(s.level))} · ${esc(s.categoryName)}</div></div>
+                html += `<div class="tv-skill-row${added ? ' is-added' : ''}"${tvpAttrs(s.categoryId, s.skillId)}>
+  ${addButtonHTML(s, added)}
+  <div style="min-width:0;" data-tvp-anchor><div class="tv-skill-name">${esc(s.label)}</div><div class="tv-skill-meta">${esc(levelText(s.level))} · ${esc(s.categoryName)}</div></div>
+  ${infoButtonHTML(s.label)}
 </div>`;
             }
         }
@@ -310,7 +341,68 @@ function renderBrowser() {
     box.innerHTML = html;
 }
 
+function addButtonHTML(s, added) {
+    const k = `${s.categoryId}|${s.skillId}`;
+    return `<button type="button" class="tv-add" data-add="${esc(k)}" aria-pressed="${added}" aria-label="${added ? 'Remove' : 'Add'} ${esc(s.label)} ${added ? 'from' : 'to'} the set">${icon(added ? 'check' : 'plus', 16)}</button>`;
+}
+
+/**
+ * Thumbnails: a grid of cards, grouped under category headings, each with one real sample item
+ * (drawn lazily as it scrolls into view). Only `ui.thumbLimit` cards are built at a time.
+ */
+function renderThumbs(box, shown, inSet) {
+    const list = shown.slice(0, ui.thumbLimit);
+    let html = '';
+    let group = '';
+    let open = false;
+    for (const s of list) {
+        const g = `${s.domainId}/${s.categoryId}`;
+        if (g !== group) {
+            if (open) html += '</div>';
+            group = g;
+            const n = shown.filter((x) => x.domainId === s.domainId && x.categoryId === s.categoryId).length;
+            html += `<h3 class="tvp-group"><span>${esc(s.categoryName)}</span><span class="tvp-group-domain">${esc(s.domainName)}</span><span class="tv-tree-count">${n}</span></h3><div class="tvp-grid" role="list">`;
+            open = true;
+        }
+        const added = inSet.has(`${s.categoryId}|${s.skillId}`);
+        html += `<div class="tvp-card${added ? ' is-added' : ''}" role="listitem" data-card="${esc(`${s.categoryId}|${s.skillId}`)}">
+  <div class="tvp-frame tvp-thumb" data-tvp-lazy="${esc(`${s.categoryId}|${s.skillId}`)}" role="img" aria-label="Sample question for ${esc(s.label)}"></div>
+  <div class="tvp-card-body">
+    <div class="tvp-card-text"><div class="tv-skill-name tvp-clamp" title="${esc(s.label)}">${esc(s.label)}</div><div class="tv-skill-meta">${esc(levelText(s.level))} · ${esc(s.categoryName)}</div></div>
+    ${addButtonHTML(s, added)}
+  </div>
+</div>`;
+    }
+    if (open) html += '</div>';
+    const left = shown.length - list.length;
+    html += left > 0
+        ? `<div class="tvp-more"><span class="tv-cap">Showing ${list.length} of ${shown.length} skills</span><button type="button" class="tv-btn tv-btn-sm" data-act="more-thumbs">${icon('plus', 16)}<span>Show ${Math.min(left, THUMB_PAGE)} more</span></button></div>`
+        : `<div class="tvp-more"><span class="tv-cap">${shown.length} skill${shown.length === 1 ? '' : 's'}</span></div>`;
+    box.innerHTML = html;
+    lazyThumbs(box, box);
+}
+
+/** Thumbnails: reflect the set on the cards without redrawing them. */
+function syncAdded() {
+    const box = root.querySelector('#tvBrowser');
+    if (!box) return;
+    const inSet = new Set(currentSet().map((s) => `${s.categoryId}|${s.skillId}`));
+    box.querySelectorAll('.tvp-card').forEach((card) => {
+        const k = card.dataset.card;
+        const added = inSet.has(k);
+        card.classList.toggle('is-added', added);
+        const b = card.querySelector('[data-add]');
+        if (!b) return;
+        const hit = findSkill(...k.split('|'));
+        const label = hit ? hit.label : k;
+        b.setAttribute('aria-pressed', String(added));
+        b.setAttribute('aria-label', `${added ? 'Remove' : 'Add'} ${label} ${added ? 'from' : 'to'} the set`);
+        b.innerHTML = icon(added ? 'check' : 'plus', 16);
+    });
+}
+
 function visibleInBrowser() {
+    if (ui.view === 'thumbs') return shownSkills().slice(0, ui.thumbLimit);
     const searching = !!ui.query;
     return shownSkills().filter((s) => searching || (ui.open[s.domainId] && ui.open[`${s.domainId}/${s.categoryId}`]));
 }
@@ -349,7 +441,7 @@ function renderSet() {
         const open = ui.optionsOpen === k && typeof window.openSkillOptionsPanel !== 'function';
         return `<div class="tv-set-item" role="group" aria-label="${esc(label)}">
   <div class="tv-set-top">
-    <div><div class="tv-skill-name">${esc(label)}</div><div class="tv-skill-meta">${esc(summary)}</div></div>
+    <div class="tvp-name" tabindex="0"${tvpAttrs(s.categoryId, s.skillId, s.opts)}><div class="tv-skill-name">${esc(label)}${infoButtonHTML(label)}</div><div class="tv-skill-meta">${esc(summary)}</div></div>
     <button type="button" class="tv-icon-btn" data-act="remove" data-key="${esc(k)}" aria-label="Remove ${esc(label)}">${icon('x', 18)}</button>
   </div>
   <div class="tv-set-tools">
@@ -397,7 +489,10 @@ const SEND_FIELDS = [
 
 function selectHTML(field, label, opts) {
     const v = ui.send[field];
-    return `<div><label class="tv-label" for="tvSend_${field}">${label}</label><select id="tvSend_${field}" class="tv-select" data-send="${field}">${opts.map(([val, text]) => `<option value="${val}"${String(v) === val ? ' selected' : ''}>${text}</option>`).join('')}</select></div>`;
+    // The Mode picker shows "what pupils see" for the chosen mode, with the set's first skill.
+    const first = currentSet()[0];
+    const mode = field === 'gameMode' ? modeAttrs(String(v), first && first.categoryId, first && first.skillId, first && first.opts) : '';
+    return `<div${mode}><label class="tv-label" for="tvSend_${field}">${label}${mode ? infoButtonHTML(label === 'Mode' ? 'this mode' : label, 'what pupils see in') : ''}</label><select id="tvSend_${field}" class="tv-select" data-send="${field}">${opts.map(([val, text]) => `<option value="${val}"${String(v) === val ? ' selected' : ''}>${text}</option>`).join('')}</select></div>`;
 }
 
 function checkHTML(label) {
