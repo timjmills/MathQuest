@@ -591,6 +591,9 @@ export const SKILL_STANDARDS = {
     'number_sense:rounding_visual': { ccss: ['3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Round on a Number Line
     'number_sense:between_tens': { ccss: ['3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Find the Two Tens a Number Is Between
     'number_sense:place_on_number_line': { ccss: ['2.MD.B.6', '3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Mark a Number on a Number Line
+    'number_sense:round_nl_thousands': { ccss: ['4.NBT.A.3'], ee: ['M.EE.4.NBT.3'] }, // Round on a Number Line: Thousands
+    'number_sense:round_nl_ten_thousands': { ccss: ['4.NBT.A.3'], ee: ['M.EE.4.NBT.3'] }, // Round on a Number Line: Ten Thousands
+    'number_sense:round_nl_hundred_thousands': { ccss: ['4.NBT.A.3'], ee: ['M.EE.4.NBT.3'] }, // Round on a Number Line: Hundred Thousands
     'number_sense:nearest_10': { ccss: ['3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Round to Nearest 10
     'number_sense:nearest_100': { ccss: ['3.NBT.A.1'], ee: ['M.EE.3.NBT.1'] }, // Round to Nearest 100
     'number_sense:nearest_1000': { ccss: ['4.NBT.A.3'], ee: ['M.EE.4.NBT.3'] }, // Round to Nearest 1,000

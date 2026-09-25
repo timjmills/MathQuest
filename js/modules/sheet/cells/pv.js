@@ -175,8 +175,11 @@ export function numeralTracksHTML(n, { underline = 0, cut = 0, arrow = false, si
  * @param {{lo: number, hi: number, n: number, lengthMm?: number, pxPerMm?: number, labelPt?: number,
  *          dot?: boolean, keyDot?: boolean, mid?: boolean, showNumber?: boolean}} o
  */
-export function roundingLineSVG({ lo, hi, n, lengthMm = 140, pxPerMm = 0, labelPt = 12, dot = false, keyDot = false, mid = false, showNumber = true } = {}) {
-    const pad = 9;
+export function roundingLineSVG({ lo, hi, n, lengthMm = 140, pxPerMm = 0, labelPt = 12, dot = false, keyDot = false, mid = false, showNumber = true, tapDot = false } = {}) {
+    // The side margin holds half an end label: "600,000" at 12 pt is ~16 mm wide, and a fixed
+    // 9 mm margin cut its first digits off (round-on-a-number-line skills, 2026-09-25).
+    const labelMm = Math.max(fmt(lo).length, fmt(hi).length) * 0.56 * Math.max(12, labelPt) * PT_MM;
+    const pad = Math.max(9, labelMm / 2 + 1);
     const w = lengthMm + pad * 2;
     const numPt = labelPt * 1.6;
     const top = showNumber ? numPt * PT_MM + 3 : 3;
@@ -204,16 +207,22 @@ export function roundingLineSVG({ lo, hi, n, lengthMm = 140, pxPerMm = 0, labelP
             + `font-size="${(endPt * PT_MM).toFixed(3)}" font-weight="700" fill="#000">${fmt(v)}</text>`;
     }
     if (mid) {
+        // The halfway label is read, so it keeps the type minimum and the labels' weight; it sits
+        // under the marked (taller) halfway tick.
         body += `<text data-pv-mid="${(lo + hi) / 2}" x="${(pad + lengthMm / 2).toFixed(2)}" y="${ly.toFixed(2)}" text-anchor="middle" `
-            + `font-size="${(labelPt * PT_MM * 0.85).toFixed(3)}" font-weight="400" fill="#000">${fmt((lo + hi) / 2)}</text>`;
+            + `font-size="${(endPt * PT_MM).toFixed(3)}" font-weight="700" fill="#000">${fmt((lo + hi) / 2)}</text>`;
     }
     if ((dot || keyDot) && hi > lo) {
         const x = pad + (lengthMm * (n - lo)) / (hi - lo);
-        body += `<circle data-pv-dot="${n}" cx="${x.toFixed(2)}" cy="${axisY.toFixed(2)}" r="1.25" fill="#000"/>`;
+        body += `<circle data-pv-dot="${n}" cx="${x.toFixed(2)}" cy="${axisY.toFixed(2)}" r="1.5" fill="#000"/>`;
     }
+    // The screen's tap-to-place dot (screen-cell.js): hidden until the pupil taps the line.
+    // (data-ws-feedback: its colour is the live-green feedback, so the screen's ink pass leaves it.)
+    if (tapDot) body += `<circle class="mq-rl-dot" data-ws-feedback="dot" cx="-20" cy="${axisY.toFixed(2)}" r="2" fill="#000" visibility="hidden"/>`;
+    const geo = tapDot ? ` data-rl-w="${w.toFixed(3)}" data-rl-h="${h.toFixed(3)}" data-rl-pad="${pad.toFixed(3)}" data-rl-len="${lengthMm}" data-rl-axis="${axisY.toFixed(3)}"` : '';
     const dims = pxPerMm > 0 ? `width="${Math.round(w * pxPerMm)}" height="${Math.round(h * pxPerMm)}"`
         : `width="${w.toFixed(2)}mm" height="${h.toFixed(2)}mm"`;
-    return `<svg class="pv-round-line" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w.toFixed(2)} ${h.toFixed(2)}" ${dims} `
+    return `<svg class="pv-round-line" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w.toFixed(2)} ${h.toFixed(2)}" ${dims}${geo} `
         + `role="img" aria-label="Number line" style="display:block;margin:0 auto;max-width:100%;font-family:'Andika',sans-serif;">${body}</svg>`;
 }
 
@@ -530,14 +539,25 @@ register('pv', {
             case 'round': {
                 // One slot width for every item with numbers this long (a rounded number has at most
                 // one more digit), so the line never tells which items round up into a new place.
-                const rDigits = Math.max(digits, String(Math.trunc(Math.abs(Number(p.n) || 0))).length + 1);
+                // (On a line the widest bound is the line's top end, which only some items reach
+                // - 1,000,000 - so the number's own length sets it there.)
+                const nLen = String(Math.trunc(Math.abs(Number(p.n) || 0))).length + 1;
+                const rDigits = p.support === 'line' ? nLen : Math.max(digits, nLen);
                 const slot = blank({ id: 'answer', kind: 'number', shape: 'line', digits: rDigits, graded: true, order: 0,
                     scopes: ['full', 'answer-only'] }, ctx, kv);
                 if (p.support === 'line') {
                     const len = { S: 120, M: 140, L: 150 }[ctx.size] || 140;
-                    const line = roundingLineSVG({ lo: p.lo, hi: p.hi, n: p.n, lengthMm: len, labelPt: m.zonePt, dot: !!p.dot,
-                        keyDot: !!p.mark && answered(ctx), mid: !!p.mid });
-                    return `<div class="pv-cell">${center(p.mark ? `<div data-ws-slot="mark" data-ws-shape="draw">${line}</div>` : line)}`
+                    // Finished work (Error analysis) shows the pupil's own dot: where the provider
+                    // says it went (a misplaced dot), else on the number.
+                    const w = ctx.state === 'wrong' ? (ctx.wrong || {}) : null;
+                    const wMark = w && w.slots && w.slots.mark !== undefined ? Number(String(w.slots.mark).replace(/,/g, '')) : NaN;
+                    const dotAt = Number.isFinite(wMark) ? wMark : p.n;
+                    const line = roundingLineSVG({ lo: p.lo, hi: p.hi, n: dotAt, lengthMm: len, labelPt: m.zonePt, dot: !!p.dot,
+                        keyDot: !!p.mark && (answered(ctx) || ctx.state === 'wrong'), mid: !!p.mid, showNumber: !p.markWord });
+                    // "Mark 6,480": the number to place, in big digits over the line (the page's
+                    // instruction line is shared by every item, so each cell names its own number).
+                    const head = p.markWord ? center(`<span style="font-size:${pt(m.textPt + 3)};font-weight:400;">Mark</span> ${big(esc(fmt(p.n)))}`) : '';
+                    return `<div class="pv-cell">${head}${center(p.mark ? `<div data-ws-slot="mark" data-ws-shape="draw">${line}</div>` : line)}`
                         + `${frameHTML(ctx, `Round to the nearest ${fmt(p.place)}: ____`, kv, rDigits)}</div>`;
                 }
                 const pic = p.support === 'none' ? big(`${esc(fmt(p.n))} →`) : numeral({ cut: p.place, arrow: true });

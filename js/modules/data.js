@@ -240,6 +240,7 @@ export const SKILL_GRADES = {
     // Number Sense
     'rounding_visual': 3, 'nearest_10': 3, 'nearest_100': 3, 'nearest_1000': 3, 'rounding_table': 3,
     'between_tens': 3, 'place_on_number_line': 2,
+    'round_nl_thousands': 4, 'round_nl_ten_thousands': 4, 'round_nl_hundred_thousands': 4,
     'nearest_10000': 4, 'nearest_100000': 5, 'nearest_million': 5,
     'round_sort_10': 3, 'round_sort_100': 3,
     'round_sort_1000': 4, 'round_sort_10000': 4,
@@ -1191,6 +1192,10 @@ export const SKILLS = {
         // P9 appends, 2026-09-25 (§18) — APPEND ONLY, after every existing id.
         { v: "between_tens", l: "Find the Two Tens a Number Is Between" },
         { v: "place_on_number_line", l: "Mark a Number on a Number Line" },
+        // Owner request 2026-09-25 (round on number lines to the thousands and beyond) — APPEND ONLY.
+        { v: "round_nl_thousands", l: "Round on a Number Line: Thousands" },
+        { v: "round_nl_ten_thousands", l: "Round on a Number Line: Ten Thousands" },
+        { v: "round_nl_hundred_thousands", l: "Round on a Number Line: Hundred Thousands" },
     ],
     number_theory: [
         { v: "prime_composite", l: "Prime vs Composite" },
@@ -1837,6 +1842,7 @@ export const SKILL_PRINT_SIZE = {
     round_sort_tenths: "wide", round_sort_hundredths: "wide",
     rounding_table: "medium",
     unit_form: "standard", between_tens: "compact", place_on_number_line: "wide",
+    round_nl_thousands: "wide", round_nl_ten_thousands: "wide", round_nl_hundred_thousands: "wide",
     identify: "compact",
     value: "compact",
     add_sub_10s: "compact", add_sub_100s: "compact",

@@ -27,7 +27,7 @@
 // widget on demand).
 // No window writes; no state import.
 
-import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, renderCell, resolveCtx, getProvider } from './sheet/index.js';
+import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
 import {
     supportsForItem, canDraw, supportNeeds, touchNumbers, touchColumns, touchNumberHTML, touchOpts, touchDigit,
@@ -1929,6 +1929,119 @@ function _screenSizes(html, digitPt) {
     });
 }
 
+/* ------------------------------------------------------------------ round on a number line
+ * The screen twin of "Mark 6,480 with a dot. Round it to the nearest 1,000." (round_nl_*, owner
+ * 2026-09-25): the kit's rounding line, drawn to the cell's width, is ONE tap target; a tap puts
+ * the dot where it lands and writes the number there into the item's first (hidden) slot - the
+ * number itself when the tap is within half a small tick of it (`q.nlMark.tol`), so a pupil is
+ * not asked for pixel precision. The second slot takes the rounded number. The two slots join into
+ * the host's own answer ("6480, 6000") and every host checks it against the item's accepted set,
+ * so the dot and the rounding are both marked; live green colours the dot and the box on their
+ * own. Arrow keys move the dot by one hundredth of the line (keyboard access).
+ */
+const _fmtN = (v) => Number(v).toLocaleString('en-US', { maximumFractionDigits: 6 });
+
+function roundLineTwin(q, p, categoryId) {
+    const n = Number(p.n), lo = Number(p.lo), hi = Number(p.hi);
+    if (![n, lo, hi].every(Number.isFinite) || !(hi > lo)) return null;
+    const tol = q.nlMark && Number.isFinite(Number(q.nlMark.tol)) ? Number(q.nlMark.tol) : (hi - lo) / 20;
+    const svg = roundingLineSVG({ lo, hi, n, lengthMm: 100, labelPt: 20, mid: !!p.mid, showNumber: false, tapDot: true, pxPerMm: 3.2 })
+        .replace('max-width:100%;', 'max-width:100%;width:100%;height:auto;');
+    const wDot = Math.max(2, String(Math.round(hi)).length);
+    const html = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin mq-rlwrap" data-mq-kit="pv" data-mq-kind="round-line">`
+        + `<div class="mq-rl-num" style="text-align:center;font-weight:700;"><span style="font-size:calc(var(--mq-digit) * 0.55);font-weight:400;">Mark</span> `
+        + `<span style="font-size:calc(var(--mq-digit));">${esc(_fmtN(n))}</span></div>`
+        + `<div class="mq-rl" role="slider" tabindex="0" aria-label="${attr(`Number line from ${_fmtN(lo)} to ${_fmtN(hi)}. Tap to place ${_fmtN(n)}.`)}" `
+        + `aria-valuemin="${lo}" aria-valuemax="${hi}" data-mq-rl-lo="${lo}" data-mq-rl-hi="${hi}" data-mq-rl-n="${n}" data-mq-rl-tol="${tol}" `
+        + `style="cursor:pointer;touch-action:manipulation;margin:2mm 0;">${svg}</div>`
+        + `<span class="mq-rl-dotslot" data-mq-rl-dot style="display:none;">${cellSlot(wDot, 'the dot')}</span>`
+        + `<div class="ws-eq mq-rl-eq" style="justify-content:center;font-weight:700;flex-wrap:wrap;column-gap:0.3em;">`
+        + `<span style="font-size:calc(var(--mq-digit) * 0.55);font-weight:400;">Round to the nearest</span>`
+        + `<span style="font-size:calc(var(--mq-digit) * 0.7);">${esc(_fmtN(p.place))}:</span>${cellSlot(Math.max(2, String(Math.round(hi)).length), 'the rounded number')}</div></div>`;
+    _wireRoundLines();
+    const instr = printInstructionFor(q, categoryId) || plainText(q.text);
+    return { mode: 'slots', html, instr, count: 2, kit: 'pv' };
+}
+
+let _rlWired = false;
+function _rlPlace(host, v, { exact = false } = {}) {
+    const lo = Number(host.dataset.mqRlLo), hi = Number(host.dataset.mqRlHi), n = Number(host.dataset.mqRlN);
+    const tol = Number(host.dataset.mqRlTol) || (hi - lo) / 20;
+    const wrap = host.closest('.mq-rlwrap');
+    const input = wrap && wrap.querySelector('[data-mq-rl-dot] input');
+    const svg = host.querySelector('svg');
+    const dot = svg && svg.querySelector('.mq-rl-dot');
+    if (!svg || !dot) return;
+    if (input && (input.disabled || input.readOnly) && !exact) return;          // answered: the line is still
+    const step = (hi - lo) / 100;
+    let val = !exact && Math.abs(v - n) <= tol + 1e-9 ? n : Math.round(v / step) * step;
+    val = Math.min(hi, Math.max(lo, Math.round(val * 1e6) / 1e6));
+    const pad = Number(svg.dataset.rlPad), len = Number(svg.dataset.rlLen);
+    dot.setAttribute('cx', (pad + (len * (val - lo)) / (hi - lo)).toFixed(2));
+    dot.setAttribute('visibility', 'visible');
+    host.dataset.mqRlCur = String(val);
+    host.setAttribute('aria-valuenow', String(val));
+    if (input && !exact) {
+        input.value = String(val);
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    // Live green (where the host shows it) marks the dot itself: the slot it writes is hidden.
+    dot.classList.toggle('mq-rl-dot--ok', !!(input && input.classList.contains('mq-live-correct')));
+}
+/** Draw the dot of every round line under `root` from its slot's saved value (a quiz revisit). */
+function _rlSync(root) {
+    if (!root || !root.querySelectorAll) return;
+    const hosts = root.matches && root.matches('.mq-rl') ? [root] : Array.from(root.querySelectorAll('.mq-rl'));
+    hosts.forEach((host) => {
+        const wrap = host.closest('.mq-rlwrap');
+        const input = wrap && wrap.querySelector('[data-mq-rl-dot] input');
+        const v = input ? Number(String(input.value || '').replace(/,/g, '')) : NaN;
+        if (input && input.value && Number.isFinite(v)) _rlPlace(host, v, { exact: true });
+    });
+}
+function _wireRoundLines() {
+    if (_rlWired || typeof document === 'undefined' || !document.addEventListener) return;
+    _rlWired = true;
+    document.addEventListener('click', (e) => {
+        const host = e.target && e.target.closest ? e.target.closest('.mq-rl') : null;
+        if (!host) return;
+        const svg = host.querySelector('svg');
+        if (!svg) return;
+        const r = svg.getBoundingClientRect();
+        const w = Number(svg.dataset.rlW), pad = Number(svg.dataset.rlPad), len = Number(svg.dataset.rlLen);
+        if (!(r.width > 0) || !(w > 0) || !(len > 0)) return;
+        const x = ((e.clientX - r.left) / r.width) * w;
+        const t = Math.min(1, Math.max(0, (x - pad) / len));
+        const lo = Number(host.dataset.mqRlLo), hi = Number(host.dataset.mqRlHi);
+        _rlPlace(host, lo + t * (hi - lo));
+    });
+    document.addEventListener('keydown', (e) => {
+        const host = e.target && e.target.classList && e.target.classList.contains('mq-rl') ? e.target : null;
+        if (!host || !/^Arrow(Left|Right|Up|Down)$|^Home$|^End$/.test(e.key)) return;
+        e.preventDefault();
+        const lo = Number(host.dataset.mqRlLo), hi = Number(host.dataset.mqRlHi);
+        const cur = host.dataset.mqRlCur !== undefined ? Number(host.dataset.mqRlCur) : (lo + hi) / 2;
+        const step = (hi - lo) / 100;
+        const v = e.key === 'Home' ? lo : e.key === 'End' ? hi : cur + (/Left|Down/.test(e.key) ? -step : step);
+        // A key press places exactly (no snap to the number): the pupil moves the dot there.
+        const lo2 = Math.min(hi, Math.max(lo, v));
+        const n = Number(host.dataset.mqRlN), tol = Number(host.dataset.mqRlTol);
+        _rlPlace(host, Math.abs(lo2 - n) <= tol / 2 ? n : lo2);
+    });
+    if (typeof MutationObserver !== 'undefined' && document.body) {
+        new MutationObserver((muts) => {
+            for (const m of muts) {
+                for (const nd of m.addedNodes) {
+                    if (nd.nodeType === 1 && ((nd.matches && nd.matches('.mq-rlwrap')) || (nd.querySelector && nd.querySelector('.mq-rlwrap')))) {
+                        setTimeout(() => _rlSync(nd), 0);
+                    }
+                }
+            }
+        }).observe(document.body, { childList: true, subtree: true });
+    }
+}
+
 /**
  * The screen twin of a kit-drawn cell, or null when the item has no kit cell this can draw.
  * @returns {{mode: 'blank'|'slots', html: string, instr: string, count: number, kit: string}|null}
@@ -1941,6 +2054,7 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     // An order item is typed into the paper's boxes where the host has no ordering widget (the
     // quiz drew an empty cell); the card and the worksheet keep their tap-to-order widget.
     const order = p.kind === 'order' && typedOrder;
+    if (p.kind === 'round' && p.tapMark && q.answerType === 'inline-blanks') return roundLineTwin(q, p, categoryId);
     if (!order && (!PV_TWIN_KINDS.has(p.kind) || !PV_TWIN_TYPES.has(q.answerType))) return null;
     if (p.kind === 'round' && p.mark) return null;                            // a drawn mark: the line widget's
     if (p.kind === 'disks' && p.task !== 'count' && q.answerType !== 'number') return null;
