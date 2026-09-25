@@ -14,7 +14,7 @@ import { generateNumberTheoryQuestion } from './gen-number-theory.js';
 import { generateCountingQuestion } from './gen-counting.js';
 import { generateVocabularyQuestion } from './gen-vocabulary.js';
 import { resolveSkill } from './skill-aliases.js';
-import { normalizeOptions, pvRefusal, optionsFor } from './skill-options.js';
+import { normalizeOptions, pvRefusal, optionsFor, p12RouteFor } from './skill-options.js';
 import { registerVariantOverride } from './variant-cycler.js';
 // Side effect: registers the measured per-skill options (Max Number, decimals, level) with
 // skill-options.js before anything asks optionsFor() — see tests/scripts/ws-options-derive.cjs.
@@ -305,6 +305,12 @@ export function itemPlainText(q) {
     const strip = (s) => String(s == null ? '' : s).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/−/g, '-');
     return `${strip(q.text)} ${strip(q.printText)}`.replace(/(\d),(?=\d{3}\b)/g, '$1').replace(/\s+/g, ' ').trim();
 }
+/** What a `forms` pattern is matched against: the item's words, then " => " and its answer, so a
+ *  kind can be told by its answer too ("Above", "Hexagon (triangles)"). */
+export function itemMatchText(q) {
+    const a = (typeof q.ans === 'number' || typeof q.ans === 'string') ? String(q.ans) : '';
+    return `${itemPlainText(q)} => ${a}`;
+}
 /** Every number an item shows in its words or its answer, as absolute values. */
 export function itemNumbers(q) {
     const ans = (typeof q.ans === 'number' || typeof q.ans === 'string') ? ` ${String(q.ans).replace(/(\d),(?=\d{3}\b)/g, '$1')}` : '';
@@ -344,11 +350,11 @@ function p12Acceptor() {
         if (def.id === 'denoms') {
             const t = _p12Changed(def, v);
             if (t) checks.push(q => itemDenominators(q).every(d => denomAllowed(d, t)));
-        } else if (def.id === 'forms' && Array.isArray(def.match)) {
+        } else if (def.type === 'set' && Array.isArray(def.match)) {
             const t = _p12Changed(def, v);
             if (t) {
                 const res = t.map(i => new RegExp(def.match[i], 'i'));
-                checks.push(q => res.some(re => re.test(itemPlainText(q))));
+                checks.push(q => res.some(re => re.test(itemMatchText(q))));
             }
         } else if (def.accept === 'max' && def.type === 'enum') {
             const n = Number(v);
@@ -587,7 +593,14 @@ function generateResolvedQuestion() {
 
     // Get the mapped category and skill
     let mappedCategory = categoryMapping[state.category] || state.category;
-    const mappedSkill = skillMapping[actualSkill] || actualSkill;
+    let mappedSkill = skillMapping[actualSkill] || actualSkill;
+    // P12 ROUTE: a skill whose option picks a sibling rung ("To the nearest" on time_hour picks the
+    // quarter-hour branch). The rung's own branch draws the item; the item keeps the skill's id.
+    // Only for the skill itself: a pool member's options are the pool's, not its own.
+    if (actualSkill === state.skill) {
+        const routed = p12RouteFor(state.category, actualSkill, state.skillOptions);
+        if (routed && routed !== actualSkill) mappedSkill = skillMapping[routed] || routed;
+    }
 
     // Force all_mixed for domain/grade level mixed skills
     if (forcedMappedCategory) {

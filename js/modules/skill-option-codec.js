@@ -95,6 +95,7 @@ export const OPTION_KEYS = {
     scale: 'XJ',         // data, measurement: the scale step
     digits: 'XK',        // how many digits (area models, box division)
     units: 'XL',         // measurement: which units
+    parts: 'XM',         // equal parts (halves / thirds / fourths), or the parts a figure is split into
 };
 const KEY_TO_OPTION = Object.fromEntries(Object.entries(OPTION_KEYS).map(([id, k]) => [k, id]));
 /** True for a two-character extended key (see above). */
@@ -127,7 +128,7 @@ export const VALUE_TOKENS = {
         tile: 'D', frame: 'R', skip: 'K', array: 'A', think: 'H', bar: 'M' },
     objects: { shapes: 'S', pictures: 'P', frame: 'F', dice: 'D' },
     // P12 (appended). String-valued P12 options; numeric ones are written as themselves.
-    model: { none: 'N', area: 'A', bar: 'B', circle: 'C', line: 'L', set: 'S', grid: 'G', blocks: 'K' },
+    model: { none: 'N', area: 'A', bar: 'B', circle: 'C', line: 'L', set: 'S', grid: 'G', blocks: 'K', analog: 'H', digital: 'D' },
     labels: { all: 'A', some: 'S', none: 'N' },
     precision: { hour: 'H', half: 'F', quarter: 'Q', five: 'V', one: 'O' },
     coins: { p: 'P', n: 'N', d: 'D', q: 'Q' },

@@ -266,7 +266,7 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             if (!def || !Array.isArray(def.match)) return [[], []];
             const set = Array.isArray(v) ? v : [v];
             const res = set.map(i => new RegExp(def.match[i], 'i'));
-            const bad = items.filter(q => !res.some(re => re.test(GQ.itemPlainText(q))));
+            const bad = items.filter(q => !res.some(re => re.test(GQ.itemMatchText(q))));
             return [bad.length ? [`${bad.length} item(s) of an unticked kind: "${GQ.itemPlainText(bad[0]).slice(0, 50)}"`] : [], []];
         },
         // P12: decimal places — every decimal on the item has a ticked number of places.
@@ -301,7 +301,7 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         },
     };
     const runPred = (def, value, items, surface) => {
-        const fn = P[def.id];
+        const fn = (Array.isArray(def.match) ? P.forms : null) || P[def.id];
         if (!fn || !items.length) return { fails: [], warns: [], checked: false };
         const [f, w] = fn(value, items, { surface, def });
         return { fails: f, warns: w, checked: true };
@@ -351,7 +351,8 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
     // Determinism: the default twice.
     const d1 = gen({}, APP_RANGE), d2 = gen({}, APP_RANGE);
     const stable = genSig(d1) === genSig(d2);
-    const coarse = (items) => items.map(q => nums(qText(q)).join(',') + '|' + JSON.stringify(q.ans === undefined ? null : q.ans) + '|' + (q.notation || q.printFormat || '') + '|' + (q.answerType || '')).join('\n');
+    // P12: the words too, not only the numbers — "Drag the digital clocks" vs "analog" is a real change.
+    const coarse = (items) => items.map(q => qText(q).replace(/\s+/g, ' ') + '|' + JSON.stringify(q.ans === undefined ? null : q.ans) + '|' + (q.notation || q.printFormat || '') + '|' + (q.answerType || '')).join('\n');
     const coarseStable = coarse(d1) === coarse(d2);
     const dflt = { [`${APP_RANGE}|${APP_DP}`]: d1 };
     const dfltAt = (r) => { const k = `${r}|${DP}`; return dflt[k] || (dflt[k] = gen({}, r)); };

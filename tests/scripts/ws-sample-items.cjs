@@ -9,13 +9,25 @@ const { open } = require('../lib/ws-harness.cjs');
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 (async () => {
     const app = await open({ seed: 7 });
-    const out = await app.page.evaluate(({ cat, skill, n, opts, fields }) => {
+    const out = await app.page.evaluate(({ dist, cat, skill, n, opts, fields }) => {
         const plain = (s) => { const d = document.createElement('div'); d.innerHTML = String(s == null ? '' : s); return d.textContent.replace(/\s+/g, ' ').trim(); };
         const res = [];
         for (const [c, list] of Object.entries(window.SKILLS)) {
             if (!Array.isArray(list) || (cat && c !== cat)) continue;
             for (const s of list) {
                 if (s.retired || (skill && s.v !== skill)) continue;
+                if (dist) {
+                    // --dist: how often each answer and each opening of the question occurs.
+                    const A = {}, T = {};
+                    for (let i = 0; i < dist; i++) {
+                        let q; try { q = window.generateQuestionFor({ category: c, skill: s.v, range: 100, decimals: 0, opts, seed: 3000 + i, itemIndex: i % 6 }); } catch (e) { continue; }
+                        const a = typeof q.ans === 'object' ? 'obj' : String(q.ans); A[a] = (A[a] || 0) + 1;
+                        const t = plain(q.text).replace(/\d+/g, '#').slice(0, 38); T[t] = (T[t] || 0) + 1;
+                    }
+                    const top = (o) => Object.entries(o).sort((x, y) => y[1] - x[1]).slice(0, 14).map(([k, v]) => `${k}:${v}`).join(' | ');
+                    res.push(`== ${c}:${s.v}\n   ANS  ${top(A)}\n   TEXT ${top(T)}`);
+                    continue;
+                }
                 const rows = [];
                 for (let i = 0; i < n; i++) {
                     let q; try { q = window.generateQuestionFor({ category: c, skill: s.v, range: 100, decimals: 0, opts, seed: 1000 + i, itemIndex: i }); } catch (e) { rows.push('THROW ' + e.message); continue; }
@@ -26,7 +38,7 @@ const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 
             }
         }
         return res.join('\n');
-    }, { cat: arg('category', null), skill: arg('skill', null), n: parseInt(arg('n', '3'), 10), opts: JSON.parse(arg('opts', 'null')), fields: (arg('fields', '') || '').split(',').filter(Boolean) });
+    }, { dist: parseInt(arg('dist', '0'), 10), cat: arg('category', null), skill: arg('skill', null), n: parseInt(arg('n', '3'), 10), opts: JSON.parse(arg('opts', 'null')), fields: (arg('fields', '') || '').split(',').filter(Boolean) });
     console.log(out);
     await app.close();
 })();

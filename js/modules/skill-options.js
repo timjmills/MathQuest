@@ -1218,6 +1218,154 @@ Object.assign(P12_OPTIONS, {
     { label: 'Which pairs', help: 'A trailing zero changes nothing: 0.450 = 0.45. A page of those alone teaches it; the default mixes one in four.' })],
 });
 
+/** A set option of kinds told apart by the item's words or answer (see _p12Match), any id. */
+const _p12Kinds = (id, label, pairs, help) => ({
+    ..._p12Match(pairs, { label, help: help || 'Tick one for a page of it alone, or several. All ticked mixes them.' }), id,
+});
+
+// ======================= GEOMETRY (gen-geometry.js, gen-measurement.js) ====================
+Object.assign(P12_OPTIONS, {
+    'shapes_early:name_2d_shapes': [
+        _p12Match([['Name the shape (write its name)', '^What shape'], ['Click every shape of one kind', '^Click ALL']]),
+        _p12Kinds('shapes', 'Which shapes', [['Circles and ovals', '\\b(circles?|ovals?)\\b'], ['Triangles', '\\btriangles?\\b'],
+            ['Squares and rectangles', '\\b(squares?|rectangles?)\\b'], ['Rhombuses', '\\brhomb'], ['Pentagons and hexagons', '\\b(pentagons?|hexagons?)\\b']]),
+    ],
+    'shapes_early:name_3d_shapes': [
+        _p12Match([['Name the shape (write its name)', '^What'], ['Click every shape of one kind', '^Click ALL']]),
+        _p12Kinds('shapes', 'Which shapes', [['Spheres', 'spheres?\\b'], ['Cylinders', 'cylinders?\\b'], ['Cubes', 'cubes?\\b'],
+            ['Cones', 'cones?\\b'], ['Rectangular prisms', 'rectangular prism']]),
+    ],
+    'shapes_early:shape_positions': [_p12Kinds('forms', 'Which position words', [['Above and below', '=> (Above|Below)$'],
+        ['Beside', '=> Beside$'], ['Between', '=> Between$']], 'Above and below come first; between is the hardest (two shapes to look at).')],
+    'shapes_early:shape_corners_count': [_p12Max([4, 6], 8, { label: 'Corners up to', help: 'The most corners a shape on the page has.' })],
+    'shapes_early:count_edges_faces_vertices': [
+        _p12Kinds('forms', 'What is counted', [['Faces', '\\bfaces\\b'], ['Edges', '\\bedges\\b'], ['Vertices', '\\bvertices\\b']]),
+        _p12Kinds('shapes', 'Which shapes', [['Cubes and prisms', 'cube|prism'], ['Pyramids', 'pyramid'],
+            ['Curved shapes (cylinder, cone, sphere)', 'cylinder|cone|sphere']]),
+    ],
+    'shapes_early:count_sides_vertices_2d': [
+        _p12Kinds('forms', 'What is counted', [['Sides', '\\bsides\\b'], ['Vertices', '\\bvertices\\b']]),
+        _p12Max([4, 6], 10, { label: 'Sides up to', help: 'The most sides a shape on the page has.' }),
+    ],
+    'shapes_early:measure_nonstandard': [
+        _p12Kinds('units', 'Measured with', [['Paper clips', 'paper clips'], ['Cubes', '\\bcubes\\b'], ['Crayons', 'crayons']]),
+        _p12Max([5], 8, { label: 'Lengths up to', help: 'The longest length, in units.' }),
+    ],
+    'shapes_early:compose_shapes': [_p12Kinds('shapes', 'The shape made', [['A triangle', '=> Triangle$'],
+        ['A square or a rectangle', '=> (Square|Rectangle)$'], ['A hexagon', '=> Hexagon$']])],
+    'shapes_early:compose_hexagon': [_p12Kinds('shapes', 'Blocks used', [['Triangles', '\\(triangles\\)'], ['Trapezoids', '\\(trapezoids\\)'], ['Rhombi', '\\(rhombi\\)']],
+        'Two trapezoids is the easiest fill; six triangles the most blocks to place.')],
+    'shapes_early:partition_shapes': [
+        _p12Variants('partition_shapes', ['count_parts', 'fraction_shaded'], ['How many equal parts?', 'What fraction is shaded?']),
+        _p12Kinds('parts', 'Equal parts', [['Halves', '=> (2|\\d/2)$'], ['Thirds', '=> (3|\\d/3)$'], ['Fourths', '=> (4|\\d/4)$']]),
+    ],
+    'shapes_early:shape_attributes': [_p12Match([['How many sides or vertices?', '^How many'], ['Click every shape with a property', '^Click ALL']])],
+    'shapes_early:compose_from_attributes': [_p12Kinds('forms', 'Which property', [['Right angles', 'right angle'],
+        ['Number of sides', 'have (exactly )?\\d+ sides(?! AND)'], ['Parallel sides', 'parallel']])],
+});
+
+// ======================= MEASUREMENT, TIME, MONEY (gen-measurement.js) =====================
+// ROUTES. Several measurement skills are one rung each of a ladder that lives in sibling ids
+// (time_hour … time_1min; elapsed_30min … elapsed_mixed; the four clock-ordering ids). Their
+// option picks the sibling rung, whose own branch draws the item (generate-question.js asks
+// p12RouteFor before it dispatches), so from any rung the teacher can go a step easier or harder
+// without leaving the skill. The skill's own rung is the default (R2).
+export const P12_ROUTES = {};
+/** The sibling skill id this skill's options route to, or null (its own branch). */
+export function p12RouteFor(categoryId, skillId, opts) {
+    const f = P12_ROUTES[`${categoryId}:${skillId}`];
+    if (!f || !opts || typeof opts !== 'object') return null;
+    try { return f(normalizeOptions(categoryId, skillId, opts)) || null; } catch (e) { return null; }
+}
+const _TIME_RUNGS = [['hour', 'time_hour', 'The hour (3:00)'], ['half', 'time_half_hour', 'The half hour (3:30)'],
+    ['quarter', 'time_quarter', 'The quarter hour (3:15)'], ['five', 'time_5min', '5 minutes (3:25)'], ['one', 'time_1min', '1 minute (3:27)']];
+const _timeForms = () => _p12Match([['Read the clock', 'What time does this clock show'], ['Set the clock (move the hands)', 'Set the clock']],
+    { help: 'Setting the hands is harder than reading them. One kind per page, or both.' });
+for (const [v, id] of _TIME_RUNGS) {
+    P12_OPTIONS[`measurement:${id}`] = [
+        _p12Enum('precision', 'To the nearest', _TIME_RUNGS.map(([x, , l]) => ({ v: x, l })), v,
+            'Each step down the list is one step harder: the hour, then the half hour, the quarter, 5 minutes, 1 minute.'),
+        _timeForms(),
+    ];
+    P12_ROUTES[`measurement:${id}`] = (o) => (_TIME_RUNGS.find(r => r[0] === o.precision) || [])[1];
+}
+const _ELAPSED = [[60, 'elapsed_hour', 'Whole hours'], [30, 'elapsed_30min', '30 minutes'], [15, 'elapsed_15min', '15 minutes'],
+    [0, 'elapsed_mixed', 'Hours and minutes together']];
+for (const [v, id] of _ELAPSED) {
+    P12_OPTIONS[`measurement:${id}`] = [
+        _p12Enum('step', 'Time that passes', _ELAPSED.map(([x, , l]) => ({ v: x, l })), v,
+            'The jump on the clock: whole hours are the easiest, hours and minutes together the hardest.'),
+        // The hours-and-minutes rung only counts on, so it offers no "Earlier".
+        v === 0 ? _p12Match([['Later (what time will it be?)', 'will it be'], ['Set the clock', 'Set the clock']])
+            : _p12Match([['Later (what time will it be?)', 'will it be'], ['Earlier (what time was it?)', 'was it'], ['Set the clock', 'Set the clock']],
+                { help: 'Counting back (earlier) is harder than counting on. One kind per page, or all of them.' }),
+    ];
+    P12_ROUTES[`measurement:${id}`] = (o) => (_ELAPSED.find(r => r[0] === Number(o.step)) || [])[1];
+}
+const _EV = [['half', 'elapsed_visual_easy', 'Half hours (1 hr 30 min)'], ['quarter', 'elapsed_visual_medium', 'Quarter hours (1 hr 15 min)'],
+    ['one', 'elapsed_visual_hard', 'Any minute (2 hr 7 min)']];
+for (const [v, id] of _EV) {
+    P12_OPTIONS[`measurement:${id}`] = [
+        _p12Enum('precision', 'Time passed, to the nearest', _EV.map(([x, , l]) => ({ v: x, l })), v, 'Half hours are the easiest step.'),
+        _p12Match([['How much time has passed?', 'How much time'], ['Set the clock', 'Set the clock']]),
+    ];
+    P12_ROUTES[`measurement:${id}`] = (o) => (_EV.find(r => r[0] === o.precision) || [])[1];
+}
+const _ORD = { analog: { asc: 'order_clocks_analog_asc', desc: 'order_clocks_analog_desc' }, digital: { asc: 'order_clocks_digital_asc', desc: 'order_clocks_digital_desc' } };
+for (const [model, byDir] of Object.entries(_ORD)) {
+    for (const [dir, id] of Object.entries(byDir)) {
+        P12_OPTIONS[`measurement:${id}`] = [
+            _p12Enum('dir', 'Order', [{ v: 'forward', l: 'Earliest first' }, { v: 'back', l: 'Latest first' }], dir === 'asc' ? 'forward' : 'back',
+                'Latest first is harder: the pupil counts back through the day.'),
+            _p12Enum('model', 'Clocks', [{ v: 'analog', l: 'Analog (hands)' }, { v: 'digital', l: 'Digital (numbers)' }], model,
+                'Digital clocks are easier to compare; analog clocks need reading first.', 'support'),
+        ];
+        P12_ROUTES[`measurement:${id}`] = (o) => _ORD[o.model === 'digital' ? 'digital' : 'analog'][o.dir === 'back' ? 'desc' : 'asc'];
+    }
+}
+Object.assign(P12_OPTIONS, {
+    'measurement:time_analog_digital': [_p12Match([['Which analog clock shows the time?', 'Which analog clock'],
+        ['Which digital clock shows the same time?', 'Which digital clock'], ['Put the clocks in order (drag)', 'Drag the clocks']])],
+    'measurement:time_match_clock': [_p12Kinds('precision', 'Times to', [['The hour', '=> \\d+:00$'], ['The half hour', '=> \\d+:30$'],
+        ['The quarter hour', '=> \\d+:(15|45)$'], ['5 minutes', '=> \\d+:(05|10|20|25|35|40|50|55)$']])],
+    'measurement:elapsed_find_duration': [_p12Max([120, 180], 300, { label: 'Longest time', labels: { 120: '2 hours', 180: '3 hours' },
+        help: 'The longest time that passes, in minutes.' })],
+    'measurement:heavier_lighter_visual': [_p12Match([['Which is heavier?', 'heavier'], ['Which is lighter?', 'lighter']])],
+    'measurement:pictograph_intro': [_p12Match([['How many?', '^How many (?!MORE)'], ['How many more?', 'How many MORE']])],
+    'measurement:bar_graph_intro': [_p12Match([['Which has the most?', 'MOST'], ['How many?', '^How many (?!MORE)'], ['How many more?', 'How many MORE']])],
+    'measurement:reading_ruler': [_p12Kinds('parts', 'Marks read', [['Whole inches', '=> \\d+$'], ['Half inches', '=> (\\d+ )?1/2$'],
+        ['Quarter inches', '=> (\\d+ )?[13]/4$']], 'Whole inches first, then halves, then quarters.')],
+    'measurement:reading_ruler_hard': [_p12Kinds('parts', 'Marks read', [['Whole inches', '=> \\d+$'], ['Half inches', '=> (\\d+ )?1/2$'],
+        ['Quarter inches', '=> (\\d+ )?[13]/4$']], 'Whole inches first, then halves, then quarters.')],
+    'measurement:money_count': [_p12Match([['Count coins (cents)', 'Count the coins|cents do these'], ['Count bills (dollars)', 'Count the bills'],
+        ['Coins and bills together', 'Count all the money'], ['Click the sets that make it', 'Click ALL']])],
+    'measurement:money': [_p12Match([['Add two amounts', 'Find the total'], ['Find the change', 'You paid'], ['Click every way to make it', 'Click ALL']])],
+    'measurement:equiv_coin_sets': [_p12Max([25, 50], 100, { label: 'Amounts to', help: 'The amount in cents the coin sets must make.' })],
+    'measurement:enough_money': [_p12Match([['Enough money (yes)', '=> Yes$'], ['Not enough money', '=> No']], { label: 'Which answer',
+        help: 'Both, mixed, is the default: the pupil has to add up. One kind alone is a warm-up.' })],
+    'measurement:temperature': [
+        _p12Match([['Read the thermometer (°F)', 'shown\\? \\(°F\\)'], ['Read the thermometer (°C)', 'shown\\? \\(°C\\)'],
+            ['Convert between °C and °F', '^Convert'], ['Click or sort temperatures', 'Click ALL|Sort each']]),
+    ],
+    'measurement:capacity': [
+        _p12Kinds('units', 'Units', [['Customary (cups, pints, quarts, gallons)', 'cups|pints|quarts|gallons'], ['Metric (mL and L)', '\\bmL\\b|\\bL\\b|lit']]),
+        _p12Match([['Convert', '^Convert'], ['Click or sort containers', 'Click ALL|Sort each']]),
+    ],
+    'measurement:unit_conversions': [
+        _p12Kinds('units', 'Units', [['Metric (m, g, L)', 'meters|grams|liters|milli|centi|kilo'], ['Customary (ft, lb, qt)', 'feet|inches|yards|ounces|pounds|quarts|gallons|cups|pints']]),
+        _p12Match([['Convert one measurement', '^(Convert|How many)'], ['Click every equal measurement', '^Click ALL']]),
+    ],
+    'measurement:length_customary': [_p12Kinds('forms', 'Which units', [['Feet to inches', 'inches are in \\d+ feet'], ['Yards to feet', 'feet are in \\d+ yards'],
+        ['Yards to inches', 'inches are in \\d+ yards'], ['Miles to feet', 'feet are in \\d+ miles']], 'Feet to inches (× 12) and yards to feet (× 3) come first.')],
+    'measurement:length_metric': [_p12Kinds('forms', 'Which units', [['cm to mm', 'mm are in \\d+ cm'], ['m to cm', 'cm are in \\d+ m\\b'],
+        ['m to mm', 'mm are in \\d+ m\\b'], ['km to m', '\\bm are in \\d+ km']], 'cm to mm (× 10) comes first.')],
+    'measurement:mass_volume_liquid': [_p12Match([['Read the cylinder (mL)', 'graduated cylinder'], ['Read the scale (g or kg)', 'Read the scale'],
+        ['Click or sort by unit', 'Click ALL|Sort each']])],
+    'measurement:estimate_length': [_p12Match([['About how long?', 'About how long'], ['Click every reasonable estimate', 'Click ALL'], ['Sort by unit (drag)', 'Sort each']])],
+    'shapes_early:order_objects_length': [_p12Enum('tiles', 'Objects to order', [{ v: null, l: '3 or 4, dealt' }, { v: 3, l: '3' }, { v: 4, l: '4' }], null,
+        'Four objects is harder: one more comparison to make.')],
+});
+
 Object.assign(SKILL_OPTIONS, P12_OPTIONS);
 // ============================ end P12 · every other family ============================
 
