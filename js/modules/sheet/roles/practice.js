@@ -175,13 +175,58 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpstory{border-radius:0}
 :is(.ws-page,.ws-sheet) .mq-wpspace{position:relative;flex:1 1 auto;min-height:30mm;border:var(--ws-hair) solid var(--ws-ink);display:flex;align-items:center;justify-content:center}
 :is(.ws-page,.ws-sheet) .mq-wpspace>small{position:absolute;left:2mm;top:1mm;font-size:var(--ws-zone);line-height:1.2}
-:is(.ws-page,.ws-sheet) .mq-wpsentence{font-size:var(--ws-digit);font-weight:700;line-height:1}
+:is(.ws-page,.ws-sheet) .mq-wpsentence{font-size:calc(var(--ws-text) * 1.35);font-weight:700;line-height:1.15;text-align:center;padding:0 2mm}
 :is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpanswer{margin-top:0;padding-right:0;justify-content:flex-end;gap:6mm}
 /* INK-3: everything inside a traced slot is trace grey, the legacy key's inline-black <b> and a
    drawn model's currentColor strokes included (print-worksheet.css forces legacy text black). */
 :is(.ws-page,.ws-sheet) [data-ws-ink="trace"] *{color:#949494!important}
 /* Guided fade: a partially traced value keeps its geometry; the untraced part is not printed. */
 :is(.ws-page,.ws-sheet) .mq-untraced{visibility:hidden}
+/* ---- critic round 2 (2026-09-25) ---- */
+/* AK-1 facsimile: a key answer is Andika 700 and keeps the sheet's open 4 (cv04, TY-4) however deep
+   it sits (a legacy key style or an inline font shorthand reset it, and the 4 closed). cv01 is NOT
+   set: TY-4 (owner ruling 2026-09-19) rejects it, so the bold face keeps its own flagged 1. */
+:is(.ws-page,.ws-sheet) :is(b,strong,th,.ws-tab,[data-ws-ink="solid"],[data-ws-ink="solid"] *,.ws-legacy-answer,.ws-legacy-answer *){font-feature-settings:"cv04" 1}
+.ws-key [data-ws-ink="solid"]:not(.mq-pupil):not(:is(.mq-pupil,.mq-judge-work,.mq-abbox,.mq-tf) *){font-weight:700}
+/* Guided cells: the count cue of a level-2 cell (H3), grey, beside the fact. */
+:is(.ws-page,.ws-sheet) .mq-cuewrap{display:flex;align-items:flex-start;justify-content:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-cue{display:flex;flex-direction:column;gap:1mm;padding-top:1mm}
+:is(.ws-page,.ws-sheet) .mq-cue svg{display:block}
+:is(.ws-page,.ws-sheet) .mq-cuecol{width:100%;display:flex;flex-direction:column;align-items:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-thinkcue{font-size:var(--ws-text);line-height:1.2;white-space:nowrap;border:1pt solid #949494;border-radius:2mm;padding:1mm 3mm}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-modelcell{padding-top:calc(var(--ws-tab,6mm) + 1.5mm)}
+/* Error analysis: what the pupil wrote is shown in "pupil writing" (trace grey, tagged), so it is
+   never confused with the printed numbers (critic round 2, C1). */
+:is(.ws-page,.ws-sheet) .mq-pupiltag{position:absolute;left:8mm;top:1mm;font-size:var(--ws-zone);line-height:1.2;font-style:normal;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-pupiltag.mq-pupiltag-flow{position:static;align-self:flex-start;margin:0 0 1mm 4mm}
+:is(.ws-page,.ws-sheet) .mq-pupil,:is(.ws-page,.ws-sheet) .mq-pupil *{color:#949494!important}
+:is(.ws-page,.ws-sheet) .mq-klabel{display:inline-flex;align-items:center;min-height:calc(var(--ws-hw) + 4mm);font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .mq-pupilwork{font-size:var(--ws-digit);line-height:1.1;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixes{display:flex;gap:3mm;flex-wrap:wrap}
+:is(.ws-page,.ws-sheet) .mq-redraw{display:flex;flex-direction:column;align-items:flex-start;gap:1mm}
+:is(.ws-page,.ws-sheet) .mq-redraw>small{font-size:var(--ws-zone);line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-fixchoice{display:flex;flex-direction:column;gap:2mm}
+/* VA-2: the operator keeps to the left of its own track, clear of a two-digit bottom number. */
+:is(.ws-page,.ws-sheet) .ws-fact>.op{justify-content:flex-start}
+/* Fact rows across form (PT-FRW-7) and the division sentence frame under a picture. */
+:is(.ws-page,.ws-sheet) .mq-hfact.mq-across{justify-content:flex-start;padding-top:1mm}
+:is(.ws-page,.ws-sheet) .mq-hfact.mq-across>span{white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-sframe{display:flex;align-items:flex-end;justify-content:center;gap:1.5mm;margin-top:1mm;font-size:var(--ws-text);line-height:1.1;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-sframe .ws-line{height:7mm}
+/* Word problems: the skill's named model in the work space, a picture row for K. */
+/* The answer column sits BESIDE the work space, at its foot, so a story with its model fits three
+   (or two) to a page instead of one: story across the top, work space left, number and label right. */
+:is(.ws-page,.ws-sheet) .mq-wp.mq-wp2{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto 1fr;column-gap:4mm;row-gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2>.mq-wpstory{grid-column:1 / -1;padding-top:2mm;padding-bottom:2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2>.mq-wpspace{grid-column:1;grid-row:2;min-height:20mm}
+:is(.ws-page,.ws-sheet) .mq-wp2>.mq-wpanswer{grid-column:2;grid-row:2;flex-direction:column;align-items:flex-end;justify-content:flex-end;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpk>.mq-wpanswer{flex-direction:row;align-items:flex-start;gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpk>.mq-wpanswer .mq-ansslot small:empty{display:none}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpunder{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpunder>.mq-wpanswer{grid-column:1;grid-row:3;flex-direction:row;align-items:flex-end}
+:is(.ws-page,.ws-sheet) .mq-wpspace.mq-wpmodel{align-items:stretch;justify-content:center;padding:6mm 2mm 2mm}
+:is(.ws-page,.ws-sheet) .mq-wpspace.mq-wpmodel>div{width:100%;display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-wppics{display:flex;flex-wrap:wrap;gap:3mm;justify-content:center;align-items:center;padding:2mm}
 `.trim();
 
 export const styleBlock = () => `<style data-mq-sheet-engine>${SHEET_ENGINE_CSS}</style>`;
@@ -317,16 +362,34 @@ export function varsOfItems(items) {
 
 /** A key with a placeholder, when the section has no single value for it: the nearest plain key. */
 export const PLACEHOLDER_FALLBACK = Object.freeze({
-    'skip-count': 'missing', 'ring-groups': 'groups-of', 'ring-remainder': 'groups-of',
+    'skip-count': 'missing', 'ring-groups': 'ring-groups-each', 'ring-remainder': 'ring-remainder-each',
 });
 
 /** The printed instruction of a section: its key with the items' {n}, or the plain fallback. */
 export function resolveInstruction(key, items, vars) {
     const v = vars || varsOfItems(items);
+    key = pluralKey(key, items);
     try { return { key, text: instructionFor(key, v) }; } catch (e) { /* placeholder left */ }
-    const fb = PLACEHOLDER_FALLBACK[key];
+    const fb = pluralKey(PLACEHOLDER_FALLBACK[key], items);
     if (fb) { try { return { key: fb, text: instructionFor(fb, {}) }; } catch (e) { /* fall through */ } }
     return { key: 'default-write', text: INSTRUCTION_LIBRARY['default-write'] };
+}
+
+/** How many blanks an item asks for: the parts of its answer ("35, 56" is two). */
+function blanksOf(it) {
+    const q = (it && it.q) || {};
+    if (Array.isArray(q.ans)) return q.ans.length;
+    const a = typeof q.ans === 'string' ? q.ans : '';
+    return /,\s/.test(a) ? a.split(/,\s*/).length : 1;
+}
+
+/**
+ * Critic round 2: "Write the missing number." over windows and tracks with two or three blanks.
+ * A section in which any item has more than one blank takes the plural string.
+ */
+function pluralKey(key, items) {
+    if (key !== 'missing') return key;
+    return (items || []).some((it) => blanksOf(it) > 1) ? 'missing-all' : key;
 }
 
 /** One item's placeholder values, from its provider's `strings.instructionVars(q)`; {} when none. */

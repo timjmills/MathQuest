@@ -130,6 +130,9 @@ export function chooseWrong(q, candidates, { rotate = true } = {}) {
             slot,
             slots,
             explain: c.explain || '',
+            // The pupil's written working behind the wrong answer ("7 − 4 = 3" for a story), when
+            // the candidate names it: Error analysis shows it to be checked (critic round 2).
+            ...(c.work ? { work: String(c.work).replace(/\{v\}/g, answerText(v)) } : {}),
         };
     }
     return null;
@@ -173,6 +176,8 @@ export function strings(def) {
         if (def.whatsNew) out.whatsNew = def.whatsNew;
         if (def.vocabulary) out.vocabulary = def.vocabulary;
         if (def.rule) out.rule = def.rule;
+        if (typeof def.sentence === 'function') out.sentence = def.sentence;
+        if (typeof def.instructionPlural === 'function') out.instructionPlural = def.instructionPlural;
         return out;
     };
     fn.def = def;

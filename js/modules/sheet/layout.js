@@ -501,13 +501,13 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     if (section.dense && !clamped && cls !== 'word' && cls !== 'wide' && hMin > 0) {
         const dCeil = bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling;
         const colOpts = requested === 'auto'
-            ? Array.from({ length: Math.max(0, Math.min(DENSE_MAX_COLS, hardCap) - cols + 1) }, (_, k) => cols + k)
+            ? Array.from({ length: Math.max(0, Math.min(Number(section.denseMaxCols) > 0 ? Number(section.denseMaxCols) : DENSE_MAX_COLS, hardCap) - cols + 1) }, (_, k) => cols + k)
             : [cols];
         let best = { perPage: rows * cols, cols, rows };
         for (const c of colOpts) {
             const pc = probe(c, c > cols);
             if (!pc.fits) continue;
-            let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (pc.hMin * DENSE_ROOM)), Math.floor(dCeil / c)));
+            let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (pc.hMin * (Number(section.denseRoom) > 1 ? Number(section.denseRoom) : DENSE_ROOM))), Math.floor(dCeil / c)));
             if (c === 2) rr = TWO_COL_ROWS.find((x) => x <= rr) || rr;
             if (rr * c > best.perPage) best = { perPage: rr * c, cols: c, rows: rr, hMin: pc.hMin };
         }

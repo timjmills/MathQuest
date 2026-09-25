@@ -876,6 +876,23 @@ word-problem ladder (`add_wp_*`, `sub_wp_*`) and for every skill whose item carr
 can hold (facts, `add`, `subtract`, number lines, `sub_5_pictures`, `mult_facts`, area models,
 `div_facts`, `long_div_2digit`, `share_into_groups`, `div_remainders`).
 
+**Critic round 2 additions (2026-09-25).**
+- `stories(q, {seed, index, unit})`: with `index` (the item's place on the page) the template and the
+  noun ROTATE from a page-wide start drawn from `seed`, so one page never repeats a context. `unit`
+  names the noun (a picture skill's own objects). A story may carry `work` (the worked sentence the key
+  prints, "23 ÷ 4 = 5 R 3, so 6 cars") and `k: true` (a Kindergarten story: the role prints the label
+  word and the pupil writes the number only). Division providers choose the story KIND: grouping only
+  for `share_into_groups`; `remainder` stories interpret the left-over (how many left, round up, full
+  groups); `div_facts` / `long_div_2digit` mix grouping and sharing.
+- `strings.sentence(q)` -> `{parts, blanks}`: the number sentence a picture skill asks for under its
+  picture (`share_into_groups`: `__ ÷ __ = __`). The host draws it as ungraded write lines, filled on the
+  key, never on finished work.
+- `wrongAnswer(q).work`: the pupil's written working behind the wrong value ("7 − 4 = 3" for a story),
+  which Error analysis shows to be checked instead of a bare answer.
+- Error analysis asks a DRAWN model (`base10`, `tenframe`) for its redraw zone through the render
+  option `payload: {fix: 'draw'}`; a template that answers with a `data-ws-slot="fix…"` zone keeps it,
+  otherwise the role draws the skill's model empty beside the work as the redraw zone.
+
 The instruction library gained ten keys with these providers (`line-jumps`, `draw-blocks`,
 `draw-blocks-100`, `check-groups`, `how-many-left`, `ring-remainder`, `pick-parts`, `fact-family`,
 `chart-fill`, `groups-total`), added in `contract.js` and in PEDAGOGY_STANDARD.md 10.1 together.

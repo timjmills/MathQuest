@@ -115,7 +115,14 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'draw-blocks-100': 'Draw hundreds, tens and ones to show the number.',
     'check-groups': 'Look at the groups. Check one box.',
     'how-many-left': 'Write how many are left.',
-    'ring-remainder': 'Circle groups of {n}. Write how many groups and how many left.',
+    'ring-remainder': 'Circle groups of {n}. Write the quotient and the remainder.',
+    // 2026-09-25 critic round 2: the same tasks when the section's items do not share one {n}
+    // (each cell prints its own group size / divisor). Their fallback used to be `groups-of`,
+    // which asks for a group size the page already prints.
+    'ring-groups-each': 'Circle groups of the number shown. Write how many groups.',
+    'ring-remainder-each': 'Circle groups of the divisor. Write the quotient and the remainder.',
+    'missing-all': 'Write the missing numbers.',
+    'story-k2': 'Solve. Write the number.',
     'pick-parts': 'Circle one number in each list to make the sum.',
     'fact-family': 'Use the three numbers. Fill in the fact family.',
     'chart-fill': 'Fill in the missing products.',

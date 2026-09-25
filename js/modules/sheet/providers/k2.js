@@ -298,11 +298,9 @@ function blockWrong(q) {
         const cnt = Object.assign({}, B.count, { 1: 0 });
         c.push({ value: value(cnt), misconception: 'left-out-ones', slot: 'ones', slots: slotsOf(cnt), explain: 'Drew the tens but not the ones.' });
     }
-    if (t > 0) {
-        const cnt = Object.assign({}, B.count, { 10: 0, 1: o + t });
-        c.push({ value: value(cnt), misconception: 'tens-as-ones', slot: 'tens', slots: slotsOf(cnt),
-            explain: `Drew ${t} ones for the tens digit.` });
-    }
+    // Critic round 2: "tens drawn as ones" (57 as 12) cannot be SHOWN - the model of a value is
+    // drawn canonically, so it printed as "1 ten 2 ones", which no pupil draws for 57. Only errors
+    // whose drawing is the pupil's are offered: the swapped digits and the missing ones.
     return chooseWrong(q, c);
 }
 
@@ -314,7 +312,7 @@ registerSkill('composing:base10_build', {
         say: '__ tens and __ ones is __.',
         sayValues: (q) => { const B = blocks(q); return B ? [B.count[10] || 0, B.count[1] || 0, B.n] : null; },
     }),
-    misconceptions: ['swapped-tens-ones', 'left-out-ones', 'tens-as-ones'],
+    misconceptions: ['swapped-tens-ones', 'left-out-ones'],
     workedSteps: blockSteps,
     wrongAnswer: blockWrong,
 });
@@ -332,7 +330,7 @@ registerSkill('composing:base10_build_hundreds', {
         say: '__ hundreds, __ tens and __ ones is __.',
         sayValues: (q) => { const B = blocks(q); return B ? [B.count[100] || 0, B.count[10] || 0, B.count[1] || 0, B.n] : null; },
     }),
-    misconceptions: ['swapped-tens-ones', 'swapped-hundreds-tens', 'left-out-ones', 'tens-as-ones'],
+    misconceptions: ['swapped-tens-ones', 'swapped-hundreds-tens', 'left-out-ones'],
     workedSteps: blockSteps,
     wrongAnswer: blockWrong,
 });
