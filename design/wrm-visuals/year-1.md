@@ -333,7 +333,7 @@ one-to-one.
 | R65 | Left / right track (one row of cells, shapes, moves) | B11 S2 | **NEW** | GAP | new `template:position-track` + `geometry_position:left_right` |
 | R66 | Grid map with a facing arrow (forwards / backwards / left / right; routes) | B11 S3 | **NEW** | GAP | new `template:grid-map` + `geometry_position:directions` |
 | R67 | Above / below: 3 × 3 shape grid, lettered cube tower, column of circles by clues | B11 S4 | **NEW** | PARTIAL | `shapes_early:shape_positions` (legacy) → `grid-map` `task: 'describe'`, `tower` layout |
-| R68 | Ordinal positions in a line (1st … last; ring / underline / tick) | B11 S5 | **NEW** | GAP | new `counting:ordinal_position` on a counters row with a start marker |
+| R68 | Ordinal positions in a line (1st … last; ring / underline / tick) | B11 S5 | **NEW** | MATCH | `counting:ordinal_numbers` (`template:picture-row` kind `line`: a start flag and 3 / 5 / 10 pictures; check the place shown, or write the place of the star; numbers under the places as the support) (build lane k2) |
 | R69 | Dot "pre-money" counters (1 / 2 / 5 / 10 dots in a circle) | B13 S1 | **NEW** | PARTIAL | coins count-by-five dots hint (RP-114); `face: 'dots'` GAP |
 | R70 | Coins and notes: count, find by value, compare, order | B13 S2–S4 | R68 | MATCH | `template:coins` (`count`, `find`, `compare`, `order`), `currency` plain / QAR / USD; realistic look out of scope (RP-110) |
 | R71 | Number track above a row of equal coins (count on in 2s / 5s / 10s) | B13 S4 | **NEW** | PARTIAL | coins count-on boxes (RP-113) are a fading hint; `track: 'task'` GAP |

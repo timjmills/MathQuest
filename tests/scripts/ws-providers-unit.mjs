@@ -668,9 +668,22 @@ const K2_LANE_MAKERS = {
         const words = shuffle(r, [{ label: lab }, { label: 'What colour' }]); const correct = words.findIndex((w) => w.label === lab);
         return { ans: lab, printAnswer: lab, answerType: 'text', text: 'What can we measure?', _variant: 'which', measureAttr: attr, cell: cellOf('picture-row', { kind: 'words', pic0: { shape: 'rock' }, words, correct }) };
     },
+    'counting:ordinal_numbers': (r, i) => {
+        const len = [3, 5, 10][i % 3]; const place = int(r, 1, len);
+        const ord = (n) => { const t = n % 100; return t >= 11 && t <= 13 ? `${n}th` : `${n}${{ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th'}`; };
+        if (i % 2) {
+            const items = Array.from({ length: len }, (_, k) => ({ shape: k === place - 1 ? 'star' : 'ball' }));
+            return { ans: ord(place), answerType: 'text', text: 'What place is the star in?', _variant: 'write', ordPlace: place, cell: cellOf('picture-row', { kind: 'line', task: 'write', items, target: place - 1, ans: ord(place) }) };
+        }
+        const labels = 'ABCDEFGHIJ'.split('').slice(0, len);
+        const items = Array.from({ length: len }, () => ({ shape: 'ball' }));
+        return { ans: labels[place - 1], printAnswer: labels[place - 1], answerType: 'text', text: `Which one is ${ord(place)}?`, _variant: 'find', ordPlace: place,
+            cell: cellOf('picture-row', { kind: 'line', task: 'find', items, correct: place - 1, labels, ask: ord(place) }) };
+    },
 };
 Object.assign(REQUIRED, {
     'counting:zero_none': /none/i,
+    'counting:ordinal_numbers': /flag/i,
     'comparing:what_can_we_measure': /measure/i,
     'comparing:compare_capacity': /water|holds|bigger/i,
     'counting:match_same': /same|outline/i,

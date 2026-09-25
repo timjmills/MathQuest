@@ -20,12 +20,12 @@ the first entry.
 ## Summary
 
 - **575 year rows** (Reception 67, Year 1 79, Year 2 75, Year 3 84, Year 4 89, Year 5 92, Year 6 89) → **210 representations**.
-- **MATCH 10 · PARTIAL 103 · GAP 97.**
-- The 200 PARTIAL / GAP representations are closed by 88 existing build-list entries (merged) and 53 entries added from this catalogue.
+- **MATCH 11 · PARTIAL 103 · GAP 96.**
+- The 199 PARTIAL / GAP representations are closed by 87 existing build-list entries (merged) and 53 entries added from this catalogue.
 
 | Lane | Representations it owns | MATCH | PARTIAL | GAP | Entries added from the catalogue |
 |---|---|---|---|---|---|
-| `k2` | 45 | 0 | 21 | 24 | 12 |
+| `k2` | 44 | 0 | 21 | 23 | 12 |
 | `operations` | 32 | 0 | 20 | 12 | 11 |
 | `placevalue` | 17 | 0 | 9 | 8 | 9 |
 | `algebra` | 15 | 0 | 6 | 9 | 4 |
@@ -174,7 +174,7 @@ the first entry.
 | V120 | Non-standard units beside an object | R R12, Y1 R59 | 4 | PARTIAL | `shapes_early:measure_nonstandard` | `measure_two_units`, `vis_migrate_measures`* | `measurement` |
 | V121 | Unscaled containers (empty … full; cupfuls) | R R09, Y1 R62, Y1 R63 | 7 | GAP | `comparing:compare_capacity`, `measurement:capacity` | `nonstandard_capacity` | `measurement` |
 | V122 | Left / right track | Y1 R65 | 1 | GAP | - | `position_map` | `geometry` |
-| V123 | Ordinal positions in a line | Y1 R68 | 1 | GAP | - | `ordinal` | `k2` |
+| V123 | Ordinal positions in a line | Y1 R68 | 1 | MATCH | `counting:ordinal_numbers`, `template:picture-row` | - | - |
 | V124 | Dot "pre-money" counters | Y1 R69 | 1 | PARTIAL | - | `vis_coin_options`* | `timemoney` |
 | V125 | Number track above a row of equal coins | Y1 R71 | 1 | PARTIAL | - | `vis_coin_options`* | `timemoney` |
 | V126 | Sequence picture cards (first, next, finally) | R R64, Y1 R72 | 3 | GAP | - | `day_order` | `timemoney` |
@@ -355,7 +355,6 @@ Every entry of `design/BUILD_LIST.md` that draws a catalogued representation, wi
 | `systematic_bonds` Number Bonds in Order | `k2` | White Rose audit | V112 | 4 |
 | `tens_ones_group` Count by Making Tens | `k2` | White Rose audit | V116 | 2 |
 | `ten_count_out` Count Out a Number | `k2` | White Rose audit | V101 | 1 |
-| `ordinal` 1st, 2nd, 3rd | `k2` | White Rose audit | V123 | 1 |
 | `vis_migrate_measures` Migrate Legacy Measure Visuals to B&W Kit Cells | `measurement` | added from visual catalogue | V046, V049, V050, V051, V096, V119, V120 | 56 |
 | `mass_scales` Read Scales (g, kg, ml, l) | `measurement` | White Rose audit | V049, V051 | 22 |
 | `ruler_cm` Read a Centimetre Ruler (option) | `measurement` | White Rose audit | V046 | 14 |

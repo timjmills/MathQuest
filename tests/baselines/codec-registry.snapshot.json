@@ -278,7 +278,8 @@
       "words": "W",
       "missing": "I",
       "numerals": "U",
-      "hands": "B"
+      "hands": "B",
+      "write": "4"
     },
     "zeroPlace": {
       "none": "N",

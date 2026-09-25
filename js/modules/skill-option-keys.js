@@ -256,7 +256,10 @@ export const VALUE_TOKENS = Object.freeze({
         // block 3 (2026-09-25): function tables (O U I W F D left to P10 and count-by)
         outputs: 'G', rule: 'Y', inputs: 'V', mixed: 'M', make: 'K',
         // block 1 P10 time + money (`all` reuses A)
-        find: 'F', order: 'O', collection: 'D', words: 'W', missing: 'I', numerals: 'U', hands: 'B' }),
+        find: 'F', order: 'O', collection: 'D', words: 'W', missing: 'I', numerals: 'U', hands: 'B',
+        // build lane k2 (2026-09-25): the letters are all taken, so the digits 4-9 (the numeric
+        // set values of task are 0-3; a digit is never a field's first character)
+        write: '4' }),
     zeroPlace: Object.freeze({ none: 'N', some: 'S', always: 'A' }),
     op: Object.freeze({ x: 'M', '/': 'D', both: 'B' }),
     order: Object.freeze({ largest: 'L', scrambled: 'S',

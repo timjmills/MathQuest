@@ -1361,6 +1361,7 @@ function _k2LaneSkill(q, id, rng) {
         case 'match_same': return _k2MatchSame(q, rng);
         case 'compare_capacity': return _k2Capacity(q, rng);
         case 'what_can_we_measure': return _k2Measurable(q, rng);
+        case 'ordinal_numbers': return _k2OrdinalLine(q, rng);
         default: return false;
     }
 }
@@ -1788,5 +1789,67 @@ function _k2Measurable(q, rng) {
         kind: 'words', pic0: obj, words, correct, labels: words.map((w) => w.label), pic: 19,
         icons: task === 'tool' || lvl >= 2, iconSize: task === 'tool' ? 11 : 6.5, caption: task === 'tool' ? m.q : null,
     });
+    return true;
+}
+
+/** 1 -> '1st', 2 -> '2nd', 3 -> '3rd', 4 -> '4th' ... 11-13 -> 'th'. */
+function _k2Ordinal(n) {
+    const t = n % 100;
+    if (t >= 11 && t <= 13) return `${n}th`;
+    return `${n}${{ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th'}`;
+}
+const K2_ORD_WORDS = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth'];
+
+/**
+ * 1st, 2nd, 3rd (Y1.B11.S5: ordinal numbers). A start flag at the left and a line of 3, 5 or 10
+ * pictures; the places are counted from the flag.
+ *   find   the place is printed over the line ("3rd"): check the picture in that place
+ *   write  one picture is a star: write its place ("4th")
+ * Options: Places to (band 3 / 5 / 10), Task, Support level 2 (the numbers 1, 2, 3 under the
+ * places) / 1 (the flag only), Objects (pictures / shapes).
+ */
+function _k2OrdinalLine(q, rng) {
+    const band = [3, 5, 10].includes(Number(_kOpt('band'))) ? Number(_kOpt('band')) : 5;
+    const task = _kOpt('task') === 'write' ? 'write' : 'find';
+    const pool = _kOpt('objects') === 'shapes' ? K2_ROW_SHAPES.filter((s) => s !== 'star') : K2_ROW_PICTURES.filter((s) => s !== 'star');
+    const kind = pool[_kDealShuffled(pool.length)];
+    const place = 1 + _kDealShuffled(band);                   // 1-based place from the flag
+    const lvl = _kLevel(1);
+    const ord = _k2Ordinal(place);
+    const pic = band === 10 ? 12 : band === 5 ? 11.5 : 17;
+    q.options = [];
+    q.selfAnswering = true;
+    q.skillLabel = '1st, 2nd, 3rd';
+    q.supportLevel = lvl;
+    if (task === 'write') {
+        const items = Array.from({ length: band }, (_, i) => ({ shape: i === place - 1 ? 'star' : kind, s: 0.9 }));
+        q.text = `The line starts at the flag. What place is the star in?`;
+        q.printText = 'Write the place of the star. Start at the flag.';
+        q.ans = ord;
+        q.acceptedAnswers = [ord, String(place), K2_ORD_WORDS[place - 1]];
+        q.answerType = 'text';
+        q.hint = 'Start at the flag. Count: 1st, 2nd, 3rd ... until you reach the star.';
+        q.distractorTags = { [_k2Ordinal(band + 1 - place)]: 'counted from the wrong end' };
+        q._variant = 'write';
+        q.printFormat = 'k2-write';
+        q.ordPlace = place;
+        _kSetCell(q, 'picture-row', { kind: 'line', task: 'write', items, target: place - 1, ans: ord, numbers: lvl >= 2, pic, gap: band === 5 ? 3 : 4 });
+        return true;
+    }
+    const items = Array.from({ length: band }, () => ({ shape: kind, s: 0.9 }));
+    const labels = lvl >= 2 ? items.map((_, i) => String(i + 1)) : K2_LETTERS.concat(['G', 'H', 'I', 'J']).slice(0, band);
+    const label = labels[place - 1];
+    q.text = `The line starts at the flag. Which one is ${ord}?`;
+    q.printText = 'Look at the flag. Check the place shown.';
+    q.ans = label;
+    q.printAnswer = label;
+    q.acceptedAnswers = [label, String(label).toLowerCase()];
+    q.answerType = 'text';
+    q.hint = `Start at the flag. Count 1st, 2nd, 3rd ... Stop at ${ord}.`;
+    q.distractorTags = { [labels[band - place]]: 'counted from the wrong end' };
+    q._variant = 'find';
+    q.printFormat = 'k2-find';
+    q.ordPlace = place;
+    _kSetCell(q, 'picture-row', { kind: 'line', task: 'find', items, correct: place - 1, labels, ask: ord, pic, gap: band === 5 ? 3 : 4 });
     return true;
 }

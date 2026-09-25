@@ -171,7 +171,7 @@ export const VISUALS = {
     V120: ['Y1:R59', 'Non-standard units beside an object', ['measure_two_units', 'vis_migrate_measures']],
     V121: ['Y1:R62', 'Unscaled containers (empty … full; cupfuls)', ['nonstandard_capacity']],
     V122: ['Y1:R65', 'Left / right track', ['position_map']],
-    V123: ['Y1:R68', 'Ordinal positions in a line', ['ordinal']],
+    V123: ['Y1:R68', 'Ordinal positions in a line', []],
     V124: ['Y1:R69', 'Dot "pre-money" counters', ['vis_coin_options']],
     V125: ['Y1:R71', 'Number track above a row of equal coins', ['vis_coin_options']],
     V126: ['Y1:R72', 'Sequence picture cards (first, next, finally)', ['day_order']],

@@ -220,7 +220,7 @@ register('picture-row', {
 
         if (p.kind === 'line') {
             const items = p.items || [];
-            const gap = 4 * k;
+            const gap = (p.gap || 4) * k;
             const flag = startFlag(ctx, bh * 0.9);
             if (p.task === 'write') {
                 const b = inlineBoxMm(ctx, 3);
@@ -234,7 +234,9 @@ register('picture-row', {
             const labels = labelsOf(p, items.length);
             const on = checkedChoice(p, ctx, labels);
             const choices = items.map((s, i) => ({ pic: picture(ctx, s, bw, bh), label: labels[i] }));
-            return root(ctx, 'k2-prow', `<div style="display:flex;align-items:flex-start;justify-content:center;gap:${L(ctx, gap)};">`
+            // the place asked for, printed once over the line ("3rd"): the item's own question
+            const ask = p.ask ? `<div style="font-size:${P(ctx, digitPt(ctx) * 0.9)};font-weight:700;line-height:1;margin-bottom:${L(ctx, 3)};">${esc(p.ask)}</div>` : '';
+            return root(ctx, 'k2-prow', `${ask}<div style="display:flex;align-items:flex-start;justify-content:center;gap:${L(ctx, gap)};">`
                 + `<div style="flex:none;padding-top:${L(ctx, 0.4)};">${flag}</div>${choiceRow(ctx, choices, { on, gapMm: gap })}</div>`);
         }
 

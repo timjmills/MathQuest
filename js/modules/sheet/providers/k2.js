@@ -1071,3 +1071,49 @@ registerSkill('comparing:what_can_we_measure', {
         })));
     },
 });
+
+/* ============================================================================ ordinal_numbers */
+
+const ORD = (n) => { const t = n % 100; return t >= 11 && t <= 13 ? `${n}th` : `${n}${{ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th'}`; };
+const ORD_ICAN = 'I Can use 1st, 2nd, 3rd to say a place';
+const ORD_FIND = {
+    iCan: ORD_ICAN, instructionKey: 'check-place',
+    steps: ['Start at the flag.', 'Count the places: 1st, 2nd, 3rd ...', 'Stop at the place shown. Check that one.'],
+    say: 'This one is __.', sayValues: (q) => (q.ordPlace ? [ORD(q.ordPlace)] : null),
+};
+const ORD_WRITE = {
+    iCan: ORD_ICAN, instructionKey: 'write-place',
+    steps: ['Start at the flag.', 'Count the places: 1st, 2nd, 3rd ...', 'Stop at the star. Write its place.'],
+    say: 'The star is __.', sayValues: (q) => [String(q.ans)],
+};
+
+registerSkill('counting:ordinal_numbers', {
+    strings: stringsBy((t, ref) => (t === 'write' || (ref && ref.opts && ref.opts.task === 'write') ? ORD_WRITE : null), ORD_FIND),
+    misconceptions: ['wrong-end', 'off-by-one', 'wrong-suffix'],
+    workedSteps: (q) => {
+        const n = Number(q.ordPlace) || 1;
+        const counted = Array.from({ length: Math.min(n, 4) }, (_, i) => ORD(i + 1)).join(', ') + (n > 4 ? ` ... ${ORD(n)}` : '');
+        if (q._variant === 'write') {
+            return [step('Start at the flag.'), step(`Count: ${counted}.`), step(`The star is ${ORD(n)}.`), step(`Write ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }])];
+        }
+        return [step('Start at the flag.'), step(`Count: ${counted}.`), step(`${q.ans} is ${ORD(n)}.`), step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }])];
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        const n = Number(q.ordPlace) || 1;
+        const len = (p.items || []).length || n;
+        if (q._variant === 'write') {
+            const bad = n % 10 === 1 && n !== 11 ? `${n}th` : n % 10 === 2 && n !== 12 ? `${n}th` : n % 10 === 3 && n !== 13 ? `${n}th` : null;
+            return chooseWrong(q, [
+                len + 1 - n !== n ? { value: ORD(len + 1 - n), misconception: 'wrong-end', explain: 'Counted from the wrong end of the line.' } : null,
+                n > 1 ? { value: ORD(n - 1), misconception: 'off-by-one', explain: 'Did not count the first place.' } : { value: ORD(n + 1), misconception: 'off-by-one', explain: 'Counted the flag as a place.' },
+                bad ? { value: bad, misconception: 'wrong-suffix', explain: `Wrote ${bad}: the right ending is ${ORD(n)}.` } : null,
+            ]);
+        }
+        const labels = Array.isArray(p.labels) ? p.labels : [];
+        return chooseWrong(q, [
+            len + 1 - n !== n ? { value: labels[len - n], misconception: 'wrong-end', explain: 'Counted from the wrong end of the line.' } : null,
+            { value: labels[n > 1 ? n - 2 : n], misconception: 'off-by-one', explain: n > 1 ? 'Counted the flag as the 1st place.' : 'Skipped the 1st place.' },
+        ]);
+    },
+});

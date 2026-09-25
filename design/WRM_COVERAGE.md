@@ -22,20 +22,20 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 524 (60%), partial only 148 (17%), gap 200 (23%).
+- Covered 525 (60%), partial only 148 (17%), gap 199 (23%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 333 skills carry WRM tags. 157 proposals (115 new skills, 42 options on existing skills) would close every gap.
+- 334 skills carry WRM tags. 156 proposals (114 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
 | Reception | PK | 18 | 119 | 66 (55%) | 27 | 26 |
-| Year 1 | K | 14 | 116 | 74 (64%) | 24 | 18 |
+| Year 1 | K | 14 | 116 | 75 (65%) | 24 | 17 |
 | Year 2 | 1 | 11 | 124 | 81 (65%) | 18 | 25 |
 | Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
 | Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
 | Year 5 | 4 | 15 | 136 | 81 (60%) | 22 | 33 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **524 (60%)** | **148** | **200** |
+| **All** | | **97** | **872** | **525 (60%)** | **148** | **199** |
 
 ## Source disagreements
 
@@ -82,7 +82,7 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Closes (1): Y6.B7.S5 Formulae  
   _proposal id: formulae_
 
-### counting (9 proposals, 22 steps)
+### counting (8 proposals, 21 steps)
 
 - **Say How Many Without Counting** — new skill `counting:subitise`. Teaches perceptual subitising of 0-5 and conceptual subitising to 10 (seeing small groups inside a larger one: 3 and 2 make 5). Representation: standard dot, dice, finger and ten-frame patterns shown briefly on screen, printed as a grid; write the number; option: say the two parts.  
   Closes (7): R.B3.S2 Subitise 1, 2 and 3; R.B5.S2 Subitise 4 and 5; R.B7.S3 Subitise 0 to 5; R.B7.S8 Conceptual subitising to 5; R.B9.S10 Conceptual subitising; R.B11.S4 Conceptual subitising to 10; R.B11.S9 Make arrangements of 10  
@@ -102,9 +102,6 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
 - **Number Words 0 to 10 (option)** — option on `composing:number_word_form`: words 0-10. Teaches reading and writing the number words zero to ten (the skill starts at 10). Representation: a band option "0 to 10" on the existing skill: numeral to word and word to numeral.  
   Closes (1): Y1.B1.S5 Recognise numbers as words  
   _proposal id: words_0_10_
-- **1st, 2nd, 3rd** — new skill `counting:ordinal_numbers`. Teaches ordinal numbers (first to tenth) and their abbreviations for position in a line. Representation: a line of line-drawn children or objects with a start flag; circle the 3rd, write the position of the star.  
-  Closes (1): Y1.B11.S5 Ordinal numbers  
-  _proposal id: ordinal_
 - **Count Out a Number** — new skill `counting:count_out`. Teaches counting out a given number of objects from a larger group (give me 7). Representation: a drawn group of 10-20 objects; circle exactly the number asked.  
   Closes (1): Y1.B1.S3 Count objects from a larger group  
   _proposal id: ten_count_out_
@@ -1406,8 +1403,8 @@ whatever happens to the WRM gaps.
 - **Y1.B11.S4** Describe position - above and below — covered. _K.G.A.1_  
   Skills: Shape Positions: Above/Below/Beside (Visual) (`shapes_early:shape_positions`)  
   Vocabulary: above, below  
-- **Y1.B11.S5** Ordinal numbers — GAP. _Beyond CCSS_  
-  Proposal: 1st, 2nd, 3rd  
+- **Y1.B11.S5** Ordinal numbers — covered. _Beyond CCSS_  
+  Skills: 1st, 2nd, 3rd (`counting:ordinal_numbers`)  
   Vocabulary: first, last, position  
 
 #### Y1.B12 Summer Block 4: Place value (within 100)

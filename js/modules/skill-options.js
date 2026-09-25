@@ -3143,6 +3143,21 @@ const K2_LANE_OPTIONS = {
         { ...levelSubset([2, 1], 1, 'Level 2 draws a small picture beside each word (an arrow for long, a weight for heavy, a jug for holds); level 1 prints the words alone. (The word task only: the tools are always pictured.)'),
             appliesTo: (o) => o.task !== 'find' },
     ],
+    'counting:ordinal_numbers': [
+        _opsBand([3, 5, 10], 5, { label: 'Places to', labels: { 3: '1st to 3rd (three in the line)', 5: '1st to 5th (five in the line)', 10: '1st to 10th (ten in the line)' },
+            help: 'How long the line is: 1st to 3rd first, then to 5th, then to 10th (a whole row, one item a row).' }),
+        {
+            id: 'task', label: 'Task', type: 'enum', default: 'find', group: 'difficulty',
+            values: [{ v: 'find', l: 'Check the one in the place shown (3rd) (default)' }, { v: 'write', l: 'Write the place of the star (4th)' }],
+            help: 'One task for the whole page: find the place first, then write it (the pupil writes 1st, 2nd, 3rd ...).',
+        },
+        { ...levelSubset([2, 1], 1, 'Level 2 prints 1, 2, 3 ... under the places (the boxes are numbered); level 1 keeps only the start flag.') },
+        {
+            id: 'objects', label: 'Objects', type: 'enum', default: 'pictures', group: 'layout',
+            values: [{ v: 'pictures', l: 'Pictures (ball, car, fish ...) (default)' }, { v: 'shapes', l: 'Plain shapes (circle, square, triangle ...)' }],
+            help: 'What stands in the line. The line is always one kind, with a star to find on "Write the place".',
+        },
+    ],
 };
 for (const [key, defs] of Object.entries(K2_LANE_OPTIONS)) SKILL_OPTIONS[key] = defs;
 // ============================ end build lane k2 ============================

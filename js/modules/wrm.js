@@ -61,6 +61,7 @@ export const SKILL_WRM = {
         { step: 'Y1.B4.S1', note: 'count to 20' },
     ],
     // Build lane k2 (2026-09-25)
+    'counting:ordinal_numbers': ['Y1.B11.S5'],
     'comparing:compare_capacity': ['R.B2.S3', 'R.B8.S3', 'R.B8.S4', 'Y1.B8.S4', 'Y1.B8.S5', 'Y2.B7.S5'],
     'counting:match_same': ['R.B1.S1', 'R.B1.S2'],
     'comparing:odd_one_out': ['R.B1.S3'],
@@ -1191,14 +1192,6 @@ export const WRM_PROPOSALS = {
         representation: 'band values "exactly 10" and "20" on teen_compose with one and two full ten frames',
         family: 'counting',
         steps: ['Y1.B4.S2', 'Y1.B4.S6'],
-    },
-    ordinal: {
-        kind: 'new', skill: 'counting:ordinal_numbers',
-        name: '1st, 2nd, 3rd',
-        teaches: 'ordinal numbers (first to tenth) and their abbreviations for position in a line',
-        representation: 'a line of line-drawn children or objects with a start flag; circle the 3rd, write the position of the star',
-        family: 'counting',
-        steps: ['Y1.B11.S5'],
     },
     ten_count_out: {
         kind: 'new', skill: 'counting:count_out',

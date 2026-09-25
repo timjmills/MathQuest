@@ -24,12 +24,12 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 607 live skills; 496 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 55 have no standard, with a reason (50 vocabulary games, 5 beyond grade 6).
+- Skills mapped: 608 live skills; 496 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 56 have no standard, with a reason (50 vocabulary games, 6 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
 - **Full coverage: CCSS 77 of 177 standards FULL, 89 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 104 FULL, 91 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 269 entries â€” 126 new skills, 88 options on existing skills, 2 repairs; 157 from the White Rose audit (41 of them extended to close standards clauses), 59 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+- The one build list: 268 entries â€” 125 new skills, 88 options on existing skills, 2 repairs; 156 from the White Rose audit (41 of them extended to close standards clauses), 59 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
@@ -315,7 +315,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership â
 | 11 | **Roman Numerals** (`roman_100`) | new `placevalue:roman_numerals` | - | 1 |
 | 12 | **Roman Numerals to 1,000 (option)** (`roman_1000`) | option on `placevalue:roman_numerals` | - | 1 |
 
-### Counting and early number (14)
+### Counting and early number (13)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
 |---|---|---|---|---|
@@ -331,8 +331,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership â
 | 10 | **Understand 10 and 20 (option)** (`teen_structure`) | option on `composing:teen_compose` | - | 2 |
 | 11 | **Write the Numbers 0 to 20** (`write_numerals`) | new `counting:write_numbers_0_20` | K.CC.A.3 | - |
 | 12 | **Count in 3s** (`count_3s`) | new `patterns:count_in_3s` | - | 1 |
-| 13 | **1st, 2nd, 3rd** (`ordinal`) | new `counting:ordinal_numbers` | - | 1 |
-| 14 | **Number Words 0 to 10 (option)** (`words_0_10`) | option on `composing:number_word_form` | - | 1 |
+| 13 | **Number Words 0 to 10 (option)** (`words_0_10`) | option on `composing:number_word_form` | - | 1 |
 
 ### Data and statistics (12)
 
