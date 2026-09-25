@@ -306,6 +306,10 @@ export const FROZEN_SKILL_CODES = {
     "measurement:clock_parts": "UW", "measurement:time_fives_ring": "UX", "measurement:time_sense": "UY",
     "measurement:elapsed_find_start": "UZ", "measurement:coin_value": "U2", "measurement:money_notation": "U3",
     "measurement:money_change": "U4", "measurement:money_compare": "U5",
+    // ---- 2026-09-25 appends (owner): round on a number line to thousands and beyond. APPEND ONLY. ----
+    // Pinned at the codes the auto assigner gave them.
+    "number_sense:round_nl_thousands": "U6", "number_sense:round_nl_ten_thousands": "U7",
+    "number_sense:round_nl_hundred_thousands": "U8",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and
@@ -498,6 +502,8 @@ export const FROZEN_CATEGORY_ORDER = {
         "make_a_ten", "doubles_near_doubles", "compensation", "mixed_number_sense",
         // P9 appends, 2026-09-25 — APPEND ONLY.
         "between_tens", "place_on_number_line",
+        // 2026-09-25 appends (owner: round on a number line to thousands and beyond) — APPEND ONLY.
+        "round_nl_thousands", "round_nl_ten_thousands", "round_nl_hundred_thousands",
     ],
     "number_theory": [
         "prime_composite", "factors_identify", "factor_tchart_easy", "factor_tchart_medium", "factor_tchart_hard",

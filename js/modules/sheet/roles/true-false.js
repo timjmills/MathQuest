@@ -76,7 +76,7 @@ export function plan(input = {}) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'True or False', title: 'True or False?', score: items.length });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
     const grid = gridPart(items.map((it) => planItem(it, { cols: L.cols })), { cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
-    if (rows === L.rows) { grid.cls = ''; grid.height = ''; }
+    if (rows === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
     const falseShare = items.length ? items.filter((it) => it.thinking && it.thinking.isWrong).length / items.length : 0;
     return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart('true-false'), grid] }], {
         meta: { items: items.length, scoreOutOf: items.length, falseShare, fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },

@@ -225,7 +225,7 @@ export function plan(input = {}) {
     const lesson = Math.max(1, Number(input.lesson) || 1);
     const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: items.length });
     const grid = gridPart(items.map((it) => planItem(it, { cols: 1 })), { cols: 1, rows: items.length, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
-    if (items.length === L.rows) { grid.cls = ''; grid.height = ''; }
+    if (items.length === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
     // Kindergarten stories print their label: the pupil writes the number only.
     const instr = items.length && items.every((it) => it.wordWork) ? 'story-work'
         : items.length && items.every((it) => it.kStory) ? 'story-k2' : 'story-v2';

@@ -264,7 +264,9 @@ export const VALUE_TOKENS = Object.freeze({
     // S2 supports model (block 4): which problems carry the supports, and how clashing ones mix.
     cover: Object.freeze({ whole: 'W', needed: 'N', fade: 'F' }),
     mix: Object.freeze({ section: 'S', problem: 'P' }),
-    objects: Object.freeze({ shapes: 'S', pictures: 'P', frame: 'F', dice: 'D' }),
+    objects: Object.freeze({ shapes: 'S', pictures: 'P', frame: 'F', dice: 'D',
+        // O6 AP1 (2026-09-25): teen_compose draws the ten as a rod and the ones as cubes
+        blocks: 'B' }),
     // P12
     model: Object.freeze({ none: 'N', area: 'A', bar: 'B', circle: 'C', line: 'L', set: 'S', grid: 'G', blocks: 'K', analog: 'H', digital: 'D' }),
     labels: Object.freeze({ all: 'A', some: 'S', none: 'N' }),
@@ -288,7 +290,9 @@ export const VALUE_TOKENS = Object.freeze({
     // block 2 (2026-09-25)
     pattern: Object.freeze({ add: 'A', sub: 'S', double: 'D', times10: 'T', grow: 'G' }),
     chart: Object.freeze({ window: 'W', whole: 'F' }),
-    ticks: Object.freeze({ step: 'S', one: 'O' }),
+    ticks: Object.freeze({ step: 'S', one: 'O',
+        // O6 appearance (lane AP3): "Numbers on the line" on + / − lines, drag-onto-the-line and read-the-line items
+        some: 'M', ends: 'E' }),
     shape: Object.freeze({ box: 'B', circle: 'C', hex: 'H', mixed: 'M' }),
     // block 3 (2026-09-25)
     ops: Object.freeze({ '+': 'A', '-': 'S', x: 'M', '/': 'D' }),
