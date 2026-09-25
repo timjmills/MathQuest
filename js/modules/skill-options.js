@@ -767,6 +767,14 @@ export function pvRefusal(categoryId, skillId, range, opts, strict = false) {
 // `support` (the one HINT picture a page carries, which fades to None), `tiles` (how many — addends,
 // or digits × digits written 21 for "2-digit × 1-digit"), `unknown`, `pictures`, `level`.
 const _OPS_BANDS = { '10': 10, '20': 20, '50': 50, '100': 100, '1k': 1000, '10k': 10000, '100k': 100000, '1m': 1000000 };
+// One honest help sentence per operation (OPTIONS-CRITIC-R2 §5 #22): a + page is told about
+// sums, a − page about the number it starts from, never the four-operation catch-all.
+const _OPS_BAND_HELP = {
+    add: 'The largest sum on the page (the answer). The numbers added are smaller.',
+    sub: 'The largest number you start from (the first number). The answer is always smaller.',
+    add_wp: 'The largest total in a story (the answer).',
+    sub_wp: 'The largest number a story starts from. The answer is always smaller.',
+};
 const _opsBand = (values, dflt, { label = 'Numbers to', help, labels = {} } = {}) => ({
     id: 'band', label, type: 'enum', default: dflt,
     values: values.map(v => ({ v, l: labels[v] || (v === null ? 'As the support level sets it' : v.toLocaleString('en-US')) })),
@@ -812,11 +820,15 @@ const _opsMulCue = (div = false) => ({
     ],
     help: 'A hint drawn under every fact on the page, in print and on screen. None is the fade.',
 });
-const _opsFactBand = () => ({ ..._opsBand([5, 10, 12, 15, 20], 20, {
+const _opsFactBand = (sub = false) => ({ ..._opsBand([5, 10, 12, 15, 20], 20, {
     label: 'Facts to',
-    help: 'The largest sum (or the largest number you start from, for −). Independent of the fact '
-        + 'set: "Add 6, facts to 10". A fact set larger than the band is left out.',
-}), helpShort: 'The largest answer (for −, the largest number you start from). Single-digit facts never pass 18.' });
+    help: sub
+        ? 'The largest number you start from. Independent of the fact set: "Subtract 6, facts to 10". '
+            + 'A fact set larger than the band is left out.'
+        : 'The largest sum. Independent of the fact set: "Add 6, facts to 10". A fact set larger '
+            + 'than the band is left out.',
+}), helpShort: sub ? 'The largest number you start from. Single-digit facts never pass 18.'
+    : 'The largest sum. Single-digit facts never pass 18.' });
 const _opsTableBand = () => _opsBand([100, 144], 144, {
     label: 'Tables to', labels: { 100: '10 × 10', 144: '12 × 12' },
     help: 'Up to the 10s table or the whole 12s table: the largest product (or number shared) is 100 or 144.',
@@ -834,7 +846,7 @@ const _opsBar = () => ({
 const P11_OPS_OPTIONS = {
     // --- fact drills: the band and a fading picture cue sit beside the fact set -----------------
     'addition:add_facts': [constantOption(13, 'Add'), notationOption('+'), _opsFactBand(), _opsAddCue()],
-    'subtraction:sub_facts': [constantOption(13, 'Subtract'), notationOption('-'), _opsFactBand(), _opsAddCue()],
+    'subtraction:sub_facts': [constantOption(13, 'Subtract'), notationOption('-'), _opsFactBand(true), _opsAddCue()],
     'multiplication:mult_facts': [constantOption(12, 'Times', 'Multiply by'), notationOption('x'), _opsTableBand(), _opsMulCue(false)],
     // Dividing BY 0 is undefined, so the 0 box is the zero facts it really deals: 0 ÷ n.
     'division:div_facts': [(() => {
@@ -846,22 +858,27 @@ const P11_OPS_OPTIONS = {
 
     // --- the four basic skills: regrouping and the unknown position ----------------------------
     // Basic + and − are grade 1 (1.OA.6, within 20): the band is 10 or 20, the sum / the number taken from.
-    'addition:add': [notationOption('+'), _opsBand([10, 20], 20), _opsRegroup('mixed'), _opsUnknown()],
-    'subtraction:subtract': [notationOption('-'), _opsBand([10, 20], 20), _opsRegroup('mixed', true), _opsUnknown('answer',
+    'addition:add': [notationOption('+'), _opsBand([10, 20], 20, { help: _OPS_BAND_HELP.add }), _opsRegroup('mixed'), _opsUnknown()],
+    'subtraction:subtract': [notationOption('-'), _opsBand([10, 20], 20, { help: _OPS_BAND_HELP.sub }), _opsRegroup('mixed', true), _opsUnknown('answer',
         { answer: 'The answer (15 − 7 = __)', first: 'The number you start from (__ − 7 = 8)', second: 'The number taken away (15 − __ = 8)' })],
     'multiplication:multiply': [notationOption('x'), {
-        id: 'tiles', label: 'Digits × digits', type: 'enum', default: null, group: 'difficulty',
-        values: [{ v: null, l: 'Set by Max Number' }, { v: 11, l: '1-digit × 1-digit (7 × 8)' },
+        // `ownsNumbers`: this control IS the skill's number size, so the measured Max Number is
+        // not shown beside it (OPTIONS-CRITIC-R2 §5 #8 / #17: two size controls, and "Up to 100"
+        // dealt 12 × 11 = 132). It stays in the model, so an old share code still decodes.
+        id: 'tiles', label: 'Digits × digits', type: 'enum', default: null, group: 'difficulty', ownsNumbers: true,
+        values: [{ v: null, l: 'Tables facts to 12 × 12 (follows Max Number)' }, { v: 11, l: '1-digit × 1-digit (7 × 8)' },
             { v: 21, l: '2-digit × 1-digit (34 × 6)' }, { v: 31, l: '3-digit × 1-digit (215 × 4)' },
             { v: 22, l: '2-digit × 2-digit (34 × 26)' }],
-        help: 'This skill only: the size of the two numbers, instead of the Max Number setting.',
+        help: 'The size of the two numbers you multiply. The first choice deals the times-table facts '
+            + '(products to 144), or bigger numbers when the Max Number setting is 1,000 or more.',
     }],
     'division:divide': [notationOption('/'), {
-        id: 'tiles', label: 'Digits ÷ digit', type: 'enum', default: null, group: 'difficulty',
-        values: [{ v: null, l: 'Set by Max Number' }, { v: 21, l: '2-digit ÷ 1-digit (84 ÷ 4)' },
+        id: 'tiles', label: 'Digits ÷ digit', type: 'enum', default: null, group: 'difficulty', ownsNumbers: true,
+        values: [{ v: null, l: 'Tables facts to 144 ÷ 12 (follows Max Number)' }, { v: 21, l: '2-digit ÷ 1-digit (84 ÷ 4)' },
             { v: 31, l: '3-digit ÷ 1-digit (756 ÷ 7)' }, { v: 41, l: '4-digit ÷ 1-digit (5,016 ÷ 8)' },
             { v: 32, l: '3-digit ÷ 2-digit (736 ÷ 23)' }],
-        help: 'This skill only: the size of the number shared and the divisor, instead of Max Number.',
+        help: 'The size of the number you share and the number you divide by. The first choice deals '
+            + 'the times-table facts backwards (numbers shared to 144).',
     }, {
         id: 'regroup', label: 'Remainders', type: 'enum', default: 'none',
         values: [{ v: 'none', l: 'None (it shares exactly)' }, { v: 'mixed', l: 'Some items' }, { v: 'always', l: 'Every item' }],
@@ -901,48 +918,76 @@ const P11_OPS_OPTIONS = {
     'addition:add_5_pictures': [{ ...picturesOption(true), help: 'Off writes the same sums as numbers only.' }],
     'subtraction:sub_5_pictures': [{ ...picturesOption(true), help: 'Off writes the same take-away as numbers only.' }],
     'addition:add_wp_10': [{ ...picturesOption(true), help: 'Off prints the same story with no picture row.' }],
+
+    // --- across zeros: its own bound on the number you start from (OPTIONS-CRITIC-R2 §5 #18) ----
+    // The measured "Up to 100" dealt 408 − 89: a borrow can only travel through a zero from 100
+    // up, so the skill draws from at least 400. Its own band says what it really deals and bounds
+    // the minuend (the answer-side number of −); owning a band hides the measured Max Number.
+    'subtraction:sub_across_zeros': [_opsBand([500, 1000, 10000], 500, {
+        label: 'Start numbers to',
+        labels: { 500: '500 (304 − 126)', 1000: '1,000 (905 − 367)', 10000: '10,000 (5,003 − 2,847)' },
+        help: 'The largest number you start from. Every item still borrows across a zero.',
+    })],
 };
 
-// The 48 ranged ids (add_/sub_ × 8 bands × never / always / mixed) are ONE ladder per operation:
-// each id is a band and a regrouping choice, so from any of them the teacher can move one step in
-// either direction without leaving the skill (the id he picked is the default, R2). Within 10 and
-// 20 the item is a one-line fact (notation + a fading picture cue); from 50 up it is column work
-// (a support level: traced, heads, bare). Within 10 WITH regrouping is the bridging-ten rung, whose
-// own support level (split frame, ten frames) already exists.
+// The 48 ranged ids (add_/sub_ × 8 bands × never / always / mixed). Each id NAMES its band and,
+// for _no_regroup / _regroup, its regrouping; the option panel may never contradict the name
+// (OPTIONS-CRITIC-R2 §5 #1-#3; "within N" bounds the answer):
+//   - `band` offers only the bands AT OR BELOW the id's own ("Add within 50" -> 10 / 20 / 50).
+//     The next id up is the harder step. A band with one value left is no control, so it is dropped.
+//   - `regroup` is offered only on the _mixed ids (the ids whose name leaves it open), and not
+//     within 10, where no item can regroup and stay within 10 (bridging ten is its own id,
+//     add_10_regroup / sub_10_regroup, whose numbers run 11 to 18).
+//   - Across zeros shows only while it can happen: regrouping on, and a band of 1,000 or more.
+// A hidden value in an old share code decodes to the id's own value (normalizeOptions keeps only
+// listed values, and every hidden band is above the id's own, so its own band is also the nearest
+// one); gen-operations.js clamps a raw, unnormalised value the same way.
+// Within 10 and 20 the item is a one-line fact (notation + a fading picture cue); from 50 up it is
+// column work (a support level: traced, heads, bare).
 for (const op of ['add', 'sub']) {
     const cat = op === 'add' ? 'addition' : 'subtraction';
     for (const [code, max] of Object.entries(_OPS_BANDS)) {
         for (const rg of ['no_regroup', 'regroup', 'mixed']) {
             const id = `${op}_${code}_${rg}`;
-            const dfltRg = rg === 'no_regroup' ? 'none' : rg === 'regroup' ? 'always' : 'mixed';
             const bridging = max === 10 && rg === 'regroup';
-            // "To 10" with every item regrouping is the bridging rung (answers 11 to 18), so only
-            // that rung offers it; elsewhere Every-item regrouping starts at 20.
-            const bands = Object.values(_OPS_BANDS).filter(b => b !== 10 || rg !== 'regroup' || bridging);
-            const opts = [_opsBand(bands, max, bridging ? {
-                labels: { 10: '10 — bridging ten (9 + 5, answers 11 to 18)' },
-            } : {}), _opsRegroup(dfltRg, op === 'sub')];
+            // Every item regrouping within 10 is only the bridging rung, never a lower band.
+            const bands = Object.values(_OPS_BANDS).filter(b => b <= max && (b !== 10 || rg !== 'regroup'));
+            const opts = [];
+            if (bands.length > 1) opts.push(_opsBand(bands, max, { help: _OPS_BAND_HELP[op] }));
+            if (rg === 'mixed' && max > 10) {
+                opts.push({
+                    ..._opsRegroup('mixed', op === 'sub'),
+                    // At a band of 10 no item can regroup and stay within 10.
+                    appliesTo: cur => !(Number(cur.band) <= 10),
+                });
+            }
             if (max <= 20) {
                 opts.unshift(notationOption(op === 'add' ? '+' : '-'));
                 opts.push(bridging ? levelSubset([3, 2, 1], 1,
                     'Level 3 draws the two ten frames beside the split, level 2 the split frame alone '
                     + '(write both parts, then the answer), level 1 the answer only.') : _opsAddCue(false));
             } else {
-                opts.push(_opsColumnLevel());
-                if (op === 'sub' && max >= 1000 && rg !== 'no_regroup') opts.push(_opsAcrossZeros(rg === 'regroup'));
+                // The column support level draws on column work only (a band of 50 or more).
+                opts.push({ ..._opsColumnLevel(), appliesTo: cur => !(Number(cur.band) <= 20) });
+                if (op === 'sub' && max >= 1000 && rg !== 'no_regroup') {
+                    opts.push({
+                        ..._opsAcrossZeros(rg === 'regroup'),
+                        appliesTo: cur => cur.regroup !== 'none' && !(Number(cur.band) < 1000),
+                    });
+                }
             }
             P11_OPS_OPTIONS[`${cat}:${id}`] = opts;
         }
     }
-    // Word problems by band: one ladder too. The no-picture twins (_plain) keep the band only:
-    // generate-question.js strips their visual after generation, so a bar model could not reach
-    // them. Pictures exist on the stories to 100; the bar model on every band.
+    // Word problems by band: one ladder too, bands at or below the id's own. The no-picture twins
+    // (_plain) keep the band only: generate-question.js strips their visual after generation, so a
+    // bar model could not reach them. Pictures exist on the stories to 100; the bar model on every band.
     for (const [code, max] of Object.entries(_OPS_BANDS)) {
         if (op === 'add' && max === 10) continue;      // add_wp_10 is the K picture story (gen-counting.js)
-        const bands = Object.values(_OPS_BANDS).filter(b => b >= 20 || (op === 'sub' && b === 10));
-        const band = _opsBand(bands, max, { help: 'Bounds the answer of every story (the total, or the number you start from).' });
-        P11_OPS_OPTIONS[`${cat}:${op}_wp_${code}`] = [band, ...(max <= 100 ? [_opsPictures()] : []), _opsBar()];
-        P11_OPS_OPTIONS[`${cat}:${op}_wp_${code}_plain`] = [band];
+        const bands = Object.values(_OPS_BANDS).filter(b => b <= max && (b >= 20 || (op === 'sub' && b === 10)));
+        const band = bands.length > 1 ? [_opsBand(bands, max, { help: _OPS_BAND_HELP[`${op}_wp`] })] : [];
+        P11_OPS_OPTIONS[`${cat}:${op}_wp_${code}`] = [...band, ...(max <= 100 ? [_opsPictures()] : []), _opsBar()];
+        P11_OPS_OPTIONS[`${cat}:${op}_wp_${code}_plain`] = band;
     }
 }
 Object.assign(SKILL_OPTIONS, P11_OPS_OPTIONS);
@@ -1038,7 +1083,7 @@ const P11_K2_OPTIONS = {
         _opsBand([50, 100], 100, { label: 'Numbers to', help: 'Which part of the hundreds chart the window is cut from.' }),
         {
             id: 'tiles', label: 'Empty boxes', type: 'enum', default: null, group: 'difficulty',
-            values: [{ v: null, l: '1 to 3, dealt' }, { v: 1, l: '1 box' }, { v: 2, l: '2 boxes' }, { v: 3, l: '3 boxes' }],
+            values: [{ v: null, l: '1 to 3, dealt' }, { v: 1, l: '1 box' }, ...[2, 3, 4, 5, 6, 7].map(n => ({ v: n, l: `${n} boxes` }))],
             help: 'How many numbers the pupil writes in each window.',
         },
     ],
@@ -1673,8 +1718,44 @@ export function registerPoolOptions(fn) { _poolOptions = typeof fn === 'function
 // The fifty vocabulary skills share one panel: which kind of item the page asks. The drag
 // matcher is not offered — it cannot sit on an online worksheet page, so a page of it alone
 // would fail there; it stays in the mix when every kind is ticked.
+// O2 (2026-09-25): the easier / harder ladder the fifty panels lacked.
+//   wordSet  how many words the page draws from — the first 6 / 10 / 16 of the skill's list, which
+//            data-vocabulary.js keeps core-first (Count, Number, Zero … before Ten Frame, Number
+//            Bond), or every word. Read by gen-vocabulary.js. A value is offered only when the
+//            list is longer than it (VOCAB_LIST_SIZE).
+// A smaller pick list ("2 or 3 answers") was tried and withdrawn: the printed item is written, not
+// picked, so it changed the screen and not the paper (OPTIONS-RUBRIC OC3).
+export const VOCAB_LIST_SIZE = Object.freeze({
+    K: 100, 1: 100, 2: 100, 3: 102, 4: 100, 5: 100, 6: 125,
+    K_operations: 7, K_counting: 33, K_geometry: 25, K_data: 7, K_algebra: 6, K_measurement: 22,
+    '1_operations': 23, '1_counting': 21, '1_geometry': 19, '1_data': 9, '1_algebra': 10, '1_measurement': 18,
+    '2_operations': 27, '2_counting': 14, '2_fractions': 6, '2_geometry': 15, '2_data': 6, '2_algebra': 10, '2_measurement': 22,
+    '3_operations': 24, '3_fractions': 16, '3_geometry': 18, '3_data': 10, '3_algebra': 15, '3_measurement': 19,
+    '4_operations': 15, '4_fractions': 24, '4_geometry': 21, '4_data': 10, '4_algebra': 15, '4_measurement': 15,
+    '5_operations': 15, '5_fractions': 25, '5_geometry': 21, '5_data': 10, '5_algebra': 15, '5_measurement': 14,
+    '6_operations': 16, '6_fractions': 25, '6_geometry': 29, '6_data': 21, '6_algebra': 21, '6_measurement': 10,
+});
+const _vocabWordSet = (size) => {
+    const vals = [6, 10, 16].filter(n => n < size);
+    if (!vals.length) return null;
+    return {
+        id: 'wordSet', label: 'Words on the page', type: 'enum', group: 'difficulty', default: null,
+        values: [{ v: null, l: `Every word on the list (${size})` }, ...vals.map(n => ({ v: n, l: `The first ${n} (the core words)` }))],
+        help: 'Fewer words is the easier step: the same words come back more often. The list starts with the core words.',
+    };
+};
 let _P12_VOCAB = null;
-function _vocabOptions() {
+const _VOCAB_BY_SIZE = {};
+function _vocabOptions(skillId) {
+    const m = String(skillId).match(/^vocab_grade_(k|\d)(?:_(\w+))?$/i);
+    const key = m ? (m[1].toUpperCase() + (m[2] ? '_' + m[2] : '')) : '';
+    const size = VOCAB_LIST_SIZE[key] || 0;
+    if (!_VOCAB_BY_SIZE[size]) {
+        _VOCAB_BY_SIZE[size] = [..._vocabForms(), _vocabWordSet(size)].filter(Boolean);
+    }
+    return _VOCAB_BY_SIZE[size];
+}
+function _vocabForms() {
     if (!_P12_VOCAB) {
         _P12_VOCAB = [{
             id: 'forms', label: 'What the items ask', type: 'set', group: 'difficulty',
@@ -1692,7 +1773,7 @@ function _vocabOptions() {
 export function ownOptionsFor(categoryId, skillId) {
     const own = SKILL_OPTIONS[`${categoryId}:${skillId}`] || SKILL_OPTIONS[skillId];
     if (own) return own;
-    if (categoryId === 'vocabulary' && /^vocab_grade_/.test(String(skillId))) return _vocabOptions();
+    if (categoryId === 'vocabulary' && /^vocab_grade_/.test(String(skillId))) return _vocabOptions(skillId);
     if (_poolOptions) {
         try { const p = _poolOptions(categoryId, skillId); if (p) return p; } catch (e) { /* no pool */ }
     }
@@ -2229,6 +2310,169 @@ Object.assign(P12_OPTIONS, {
 
 // (The P12 TIME AND MONEY stop-gap entries were superseded by the P10 block and removed.)
 
+// ======================= O2 · A REAL EASIER / HARDER LADDER  (2026-09-25) ==================
+// design/audit/OPTIONS-CRITIC-R2.md §5 #5 and #13: 104 panels offered only "What the items ask",
+// and 39 only the measured Max Number, which bounded an operand at best ("Up to 10" dealt factors
+// of 24). Each skill below gains ONE size or complexity control of its own; the item kinds stay
+// where they were. Every control defaults to "As dealt", which draws exactly what the skill drew
+// before (so a saved page or a link without the option is unchanged), and owning a `band` hides the
+// measured Max Number (OWNS_ITS_NUMBERS) — the band replaces it.
+//
+//   `band` + accept 'max'   "Numbers to N": EVERY number on the item, the answer included, is at
+//                           most N (generate-question.js p12Acceptor redraws any item over it). A
+//                           skill that sizes its numbers from the Max Number also carries
+//                           `asRange` (the Max Number it draws at while the band is on), so the
+//                           generator draws small numbers natively instead of by luck.
+//   `band` read by the generator   integers (−N to N) and number theory (what the item asks about).
+//   `tiles` / `most`               graphs: categories drawn, and the largest count (gen-data-stats.js).
+//   `wordSet`                      vocabulary (_vocabOptions above).
+// No per-family SUPPORT control is added here: a separate supports programme attaches those.
+const _O2_FOLLOWS = 'As dealt (follows the Max Number setting)';
+const _o2Band = (values, { label = 'Numbers to', natural, help, labels = {}, asRange } = {}) => ({
+    id: 'band', label, type: 'enum', group: 'difficulty', default: null, accept: 'max',
+    values: [{ v: null, l: natural ? `As dealt (to about ${natural.toLocaleString('en-US')})` : _O2_FOLLOWS },
+        ...values.map(v => ({ v, l: labels[v] || v.toLocaleString('en-US') }))],
+    help: help || 'The largest number anywhere on an item, the answer included. A smaller number is the easier step.',
+    ...(asRange ? { asRange } : {}),
+});
+/** A band for a skill that sizes its numbers from the Max Number: it draws at `rangeFor(band)`. */
+const _o2RangeBand = (values, opts = {}) => _o2Band(values, { ...opts, asRange: opts.asRange || (b => b) });
+/** Integers: −N to N. */
+const _o2IntBand = (values, { dflt = null, natural = '−20 to 20', help } = {}) => ({
+    id: 'band', label: 'Numbers from', type: 'enum', group: 'difficulty', default: dflt, accept: 'max',
+    values: [...(dflt === null ? [{ v: null, l: `As dealt (${natural}, follows the Max Number setting)` }] : []),
+        ...values.map(v => ({ v, l: `−${v} to ${v}` }))],
+    help: help || 'Every number on the item, the answer too, lies between −N and N. Numbers close to 0 are the easier step.',
+});
+/** Number theory: the band bounds what the item asks about (gen-number-theory.js ntBand). */
+const _o2NtBand = (values, natural, what) => ({
+    ..._o2Band(values, { natural, help: `${what} Smaller numbers are the easier step.` }),
+    label: 'Numbers to',
+});
+const _o2Tiles = (label, values, dealt, help) => ({
+    id: 'tiles', label, type: 'enum', group: 'difficulty', default: null,
+    values: [{ v: null, l: `${dealt}, dealt` }, ...values.map(v => ({ v, l: String(v) }))], help,
+});
+const _o2Most = (label, values, dealt, help) => ({
+    id: 'most', label, type: 'enum', group: 'difficulty', default: null,
+    values: [{ v: null, l: `As dealt (${dealt})` }, ...values.map(v => ({ v, l: String(v) }))], help,
+});
+// Order of operations sizes its numbers steeply from the Max Number (Max Number 20 already deals
+// 1,470 ÷ 42): a band to 100 draws at Max Number 10, a band to 1,000 at 20 (measured, 60 items).
+const _o2OopBand = () => _o2RangeBand([20, 50, 100, 1000], { asRange: b => (b <= 100 ? 10 : 20),
+    help: 'The largest number anywhere in the expression, the answer included. Smaller numbers let the pupil think about the order, not the arithmetic.' });
+/** Append O2 controls to a skill's panel (its P12 entry, or its P9 / P11 registry entry). */
+const _o2Add = (key, ...defs) => {
+    const base = P12_OPTIONS[key] || SKILL_OPTIONS[key] || [];
+    P12_OPTIONS[key] = [...base, ...defs];
+};
+[
+    // ---- integers: −N to N (gen-operations.js intBand, gen-algebraic.js _intBand / order_negatives)
+    ['integers:number_line_int', _o2IntBand([5, 10], { help: 'The number the arrow points to lies between −N and N. Beyond 20 the line counts in tens, so the ladder stops at the Max Number\'s 20.' })],
+    ['integers:compare_int', _o2IntBand([5, 10, 50, 100])],
+    ['integers:add_int', _o2IntBand([5, 10, 50, 100])],
+    ['integers:sub_int', _o2IntBand([5, 10, 50, 100])],
+    ['integers:order_negatives', _o2IntBand([10, 20, 50], { natural: '−100 to 100' })],
+    ['integers:integer_nl_drag', _o2IntBand([5, 10, 20], { dflt: 10, help: 'The number line runs from −N to N, one tick for every whole number. −10 to 10 is the line the skill always drew.' })],
+    ['integers:abs_value', _o2IntBand([5, 10, 100], { natural: '−20 to 20' })],
+    ['integers:opposite_numbers', _o2IntBand([5, 10, 100], { natural: '−20 to 20' })],
+    // ---- number theory (gen-number-theory.js ntBand): the number the item is about
+    ['number_theory:prime_composite', _o2NtBand([30, 50], 100, 'Every number to sort or decide on is at most this.')],
+    ['number_theory:factors_identify', _o2NtBand([20, 40, 60], 100, 'The number to factor is at most this.')],
+    ['number_theory:factor_tchart_easy', _o2NtBand([20, 30], 48, 'The number to factor is at most this.')],
+    ['number_theory:factor_links_easy', _o2NtBand([20, 30], 48, 'The number to factor is at most this.')],
+    ['number_theory:factor_tchart_medium', _o2NtBand([24, 40], 60, 'The number to factor is at most this.')],
+    ['number_theory:factor_links_medium', _o2NtBand([24, 40], 60, 'The number to factor is at most this.')],
+    ['number_theory:factor_tchart_hard', _o2NtBand([40, 60], 100, 'The number to factor is at most this.')],
+    ['number_theory:factor_links_hard', _o2NtBand([40, 60], 100, 'The number to factor is at most this.')],
+    ['number_theory:multiples', _o2NtBand([30, 60], 144, 'The largest multiple written or asked for is at most this.')],
+    ['number_theory:gcf_easy', _o2NtBand([20, 30], 48, 'Both numbers are at most this.')],
+    ['number_theory:gcf_hard', _o2NtBand([36, 48], 90, 'Both numbers are at most this.')],
+    ['number_theory:lcm', _o2NtBand([20, 30], 70, 'The least common multiple (the answer) is at most this.')],
+    ['number_theory:divisibility_sort', _o2NtBand([50, 500], 100, 'Every number to sort is at most this.')],
+    // ---- order of operations
+    ['order_of_operations:two_ops_no_paren', _o2OopBand()],
+    ['order_of_operations:three_ops_no_paren', _o2OopBand()],
+    ['order_of_operations:multi_ops_no_paren', _o2OopBand()],
+    ['order_of_operations:paren_simple', _o2OopBand()],
+    ['order_of_operations:paren_multi', _o2OopBand()],
+    ['order_of_operations:exponents_simple', _o2OopBand()],
+    ['order_of_operations:oop_easy', _o2Band([10, 20], { natural: 45 })],
+    ['order_of_operations:oop_medium', _o2Band([20, 50], { natural: 130 })],
+    ['order_of_operations:oop_hard', _o2Band([20, 50], { natural: 140 })],
+    ['order_of_operations:compare_expressions', _o2Band([10, 20], { natural: 40 })],
+    // ---- algebra
+    // A tape diagram's whole runs to about twice the Max Number: it draws at half the band.
+    ['algebra:tape_diagram', _o2RangeBand([20, 50], { asRange: b => Math.max(10, Math.floor(b / 2)) })],
+    ['algebra:tape_diagram_plain', _o2RangeBand([20, 50], { asRange: b => Math.max(10, Math.floor(b / 2)) })],
+    ['algebra:multi_step_word', _o2RangeBand([30, 50])],
+    ['algebra:multi_step_word_plain', _o2RangeBand([30, 50])],
+    ['algebra:algebra_word_mixed_plain', _o2RangeBand([20, 50])],
+    ['algebra:solve_unknown', _o2RangeBand([10, 20])],
+    ['algebra:balance_addsub', _o2RangeBand([10, 20])],
+    ['algebra:write_expression', _o2RangeBand([10, 20])],
+    ['algebra:evaluate_expression', _o2RangeBand([10, 20])],
+    ['algebra:inequalities', _o2RangeBand([10, 20])],
+    ['algebra:solve_eq_addsub', _o2RangeBand([10, 20])],
+    ['algebra:solve_eq_multdiv', _o2RangeBand([10, 20])],
+    ['algebra:solve_eq_twostep', _o2RangeBand([20, 50])],
+    ['algebra:write_equation', _o2RangeBand([10, 20])],
+    ['algebra:build_expr_addsub', _o2RangeBand([10, 20, 50])],
+    ['algebra:evaluate_expression_hard', _o2Band([20, 50], { natural: 170 })],
+    ['algebra:combine_like_terms', _o2Band([10], { natural: 18 })],
+    ['algebra:distributive_expr', _o2Band([20, 50], { natural: 110 })],
+    ['algebra:build_expr_multdiv', _o2Band([20, 50], { natural: 100 })],
+    // ---- patterns: doubling and halving
+    ['patterns:double', _o2RangeBand([20, 50, 1000], { asRange: b => Math.max(10, Math.floor(b / 2)),
+        help: 'The largest number on an item, the double included: to 20 doubles numbers to 10.' })],
+    ['patterns:halve', _o2RangeBand([10, 20, 50, 1000], { help: 'The number to halve is at most this.' })],
+    // compensation always uses a number next to a ten (18, 28, 48 …); the band bounds the sum or the
+    // number taken from, and draws with the small second number (Max Number 10).
+    ['number_sense:compensation', _o2RangeBand([30, 50], { asRange: () => 10,
+        help: 'The sum, or the number you take from, is at most this. Smaller numbers keep the pupil on the strategy.' })],
+    // ---- counting sequences: the measured Max Number bounded where a count STARTS ("Up to 10"
+    // dealt 40); the band bounds every number in the row.
+    ['patterns:seq_2', _o2RangeBand([20, 50, 1000], { help: 'Every number in the count, the missing one too, is at most this.' })],
+    ['patterns:seq_5', _o2RangeBand([20, 50, 1000], { help: 'Every number in the count, the missing one too, is at most this.' })],
+    ['patterns:seq_10', _o2RangeBand([50, 1000], { help: 'Every number in the count, the missing one too, is at most this.' })],
+    ['patterns:number_pattern', _o2RangeBand([50, 1000], { help: 'Every number in the pattern, the missing ones too, is at most this.' })],
+    ['patterns:skip_count_line', _o2RangeBand([50, 1000], { help: 'Every number on the line, the answer too, is at most this.' })],
+    // ---- area, perimeter, volume (the answer is the largest number: the band bounds it)
+    ['area_perimeter:area_perimeter', _o2RangeBand([20, 50, 1000], { label: 'Area and perimeter to' })],
+    ['area_perimeter:area_distributive_visual', _o2RangeBand([30, 50], { label: 'Area to' })],
+    ['area_perimeter:area_triangle', _o2RangeBand([10, 20], { label: 'Numbers to' })],
+    ['area_perimeter:perimeter', _o2RangeBand([12, 20], { label: 'Numbers to' })],
+    ['area_perimeter:area', _o2RangeBand([10, 25], { label: 'Numbers to' })],
+    ['area_perimeter:volume', _o2RangeBand([12, 30], { label: 'Numbers to' })],
+    ['area_perimeter:composite_shapes', _o2RangeBand([25, 40], { label: 'Numbers to' })],
+    ['area_perimeter:area_polygon_decompose', _o2RangeBand([25, 50], { label: 'Area to' })],
+    ['area_perimeter:volume_composite', _o2RangeBand([50, 100], { label: 'Volume to' })],
+    // ---- shapes, angles, coordinates
+    // The naming skills (name_2d / 3d_shapes, identify_angles / lines, classify_triangles,
+    // measure_angles, cross_section_3d, shape_positions, compose_shapes) are NOT given a pick-list ladder:
+    // their printed item is written (the name on a line), so a shorter pick list would change the
+    // screen and not the paper (OC3). Their shape / angle / position sets are their ladder.
+    ['shapes_early:count_edges_faces_vertices', _o2Band([6, 10], { label: 'Counts up to', natural: 18,
+        help: 'The largest count asked for: to 6 keeps to shapes with few faces, edges or corners.' })],
+    ['shapes_early:shape_attributes', _o2Band([4, 6], { label: 'Sides up to', natural: 8, help: 'The most sides or vertices a counted shape has.' })],
+    ['coordinates:coord_polygon', _o2RangeBand([10, 20])],
+    ['coordinates:coord_distance_q1', _o2RangeBand([5], { label: 'Coordinates to', help: 'Every coordinate and the distance are at most this.' })],
+    ['coordinates:coordinate_q1', _o2Band([5], { label: 'Coordinates to', natural: 10, help: 'Every coordinate is at most this.' })],
+    ['coordinates:coordinate_graph', _o2Band([5], { label: 'Coordinates to', natural: 10, help: 'Every coordinate is at most this.' })],
+    ['coordinates:net_surface_area', _o2RangeBand([50, 100], { label: 'Numbers to' })],
+    // ---- graphs (gen-data-stats.js _dNum): how much there is to read
+    ['graphs:bar_graph', _o2Tiles('Bars', [3, 4, 5], '4 or 5', 'Fewer bars is the easier step.'),
+        _o2Most('Tallest bar up to', [5, 10, 50], 'to 20 at Max Number 100', 'The largest value a bar shows. Small values read straight off the scale.')],
+    ['graphs:pictograph', _o2Tiles('Rows', [3, 4, 5], '3, 4 or 5', 'Fewer rows is the easier step.')],
+    ['graphs:tally_chart', _o2Tiles('Rows', [3, 4, 5], '3, 4 or 5', 'Fewer rows is the easier step.'),
+        _o2Most('Most tallies in a row', [5, 10, 20], '3 to 15', 'To 5 is one bundle of tallies; more bundles is harder to count.')],
+    ['graphs:pie_chart', _o2Tiles('Parts of the circle', [3, 4], '3 or 4', 'Three parts is the easier step.')],
+    ['graphs:line_plot', _o2Tiles('Data points', [6, 8, 12], '8 to 12', 'Fewer marks is the easier step.')],
+    ['graphs:line_plot_fractions', _o2Tiles('Data points', [6, 10, 15], '8 to 15', 'Fewer marks is the easier step.')],
+    ['graphs:line_plot_g2', _o2Most('Most marks at one size', [2, 3, 6], '0 to 4', 'Fewer marks in a column is the easier step to count.')],
+].forEach(([key, ...defs]) => _o2Add(key, ...defs));
+// ============================ end O2 · easier / harder ladder ============================
+
 Object.assign(SKILL_OPTIONS, P12_OPTIONS);
 // ============================ end P12 · every other family ============================
 
@@ -2281,7 +2525,8 @@ export function derivedEntry(categoryId, skillId) { return DERIVED[`${categoryId
 // generators should stop reading state.range for fact drills at all).
 // A rounding / estimation `place` sets the number size the same way (numbers to 10 x the place),
 // so it owns its numbers too.
-const OWNS_ITS_NUMBERS = new Set(['constant', 'band', 'place']);
+// O2: a graph's `most` (the tallest bar) is its number size, so it owns its numbers too.
+const OWNS_ITS_NUMBERS = new Set(['constant', 'band', 'place', 'most']);
 
 // P12: skills whose measured Max Number / Decimals would mislead. word_problems_mixed deals the
 // four story kinds at their own sizes, so "Up to 10" still printed 49 and "Tenths" printed whole
@@ -2320,7 +2565,11 @@ export function offeredOptionsFor(categoryId, skillId) {
     const ownIds = new Set(own.map(o => o.id));
     const d = DERIVED[`${categoryId}:${skillId}`];
     const out = [];
+    // An own control flagged `ownsNumbers` (× / ÷ "Digits × digits") IS the number size: the
+    // measured Max Number stays in the model (old share codes decode) but is not shown beside it.
+    const sized = own.some(o => o.ownsNumbers);
     for (const o of optionsFor(categoryId, skillId)) {
+        if (sized && o.id === 'range' && !ownIds.has('range')) continue;
         if (ownIds.has(o.id) || o.id !== 'level') { out.push(o); continue; }
         // The universal level: only the levels measured to draw something different.
         if (d && Array.isArray(d.level) && d.level.length > 1) out.push(levelSubset(d.level, 1));

@@ -8335,3 +8335,16 @@ html.dark .student-def strong {
     background: var(--mq-ws-grey, #949494);
     border-color: var(--mq-ws-ink, #000);
 }
+
+/* Student header switches (owner, 2026-09-25: "they seem to merge with each other"). Each switch is
+   its own bordered pill, label beside its switch, with clear space between pills and a 44 px target. */
+.nav-stats .nav-tip-wrap > .nav-popup-toggle {
+    flex-direction: row; gap: 8px; min-height: 44px; padding: 0 12px;
+    border: 2px solid var(--mq-rule, #E5E0F2); border-radius: 999px; background: var(--mq-card, #fff);
+    box-sizing: border-box;
+}
+.nav-stats .nav-tip-wrap > .nav-popup-toggle .popup-toggle-label { font-size: 0.75rem; color: var(--mq-ink, #3D3A4E); }
+.nav-stats .nav-tip-wrap > .nav-popup-toggle:focus-within { outline: 3px solid var(--mq-purple, #7C5CE6); outline-offset: 2px; }
+.nav-stats .nav-tip-wrap.student-only + .nav-tip-wrap.student-only { margin-left: 4px; }
+.dark .nav-stats .nav-tip-wrap > .nav-popup-toggle { background: #2A2740; border-color: #4A4660; }
+.dark .nav-stats .nav-tip-wrap > .nav-popup-toggle .popup-toggle-label { color: #E9E6F5; }

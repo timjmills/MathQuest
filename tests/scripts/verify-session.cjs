@@ -273,7 +273,7 @@ async function dragIntegrityChecks(page) {
 
         await page.evaluate(() => {
             window.state.userRole = 'teacher';
-            try { localStorage.setItem('mathquest_user_role', 'teacher'); } catch {}
+            try { localStorage.setItem('mathquest_user_role', 'teacher'); localStorage.setItem('mathquest_start_role', 'last'); } catch {}
         });
 
         for (const target of SKILLS) {

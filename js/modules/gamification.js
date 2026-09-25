@@ -1454,8 +1454,10 @@ export function startFromLanding() {
     const overlay = document.getElementById('studentLandingOverlay');
     if (overlay) overlay.remove();
 
-    // Force student mode
-    if (!document.body.classList.contains('student-mode')) {
+    // Force student mode (not in the teacher's board window, ?board=1: it stays a teacher view)
+    let boardWindow = false;
+    try { boardWindow = new URLSearchParams(window.location.search).get('board') === '1'; } catch (e) { /* no location */ }
+    if (!boardWindow && !document.body.classList.contains('student-mode')) {
         if (typeof window !== 'undefined' && window.toggleUserRole) {
             window.toggleUserRole();
         }

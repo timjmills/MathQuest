@@ -80,7 +80,7 @@ export const KEY_BLOCKS = Object.freeze({
     3: Object.freeze({ owner: 'function tables', status: 'assigned', keys: '3A-3A' }),
     4: Object.freeze({ owner: 'supports', status: 'assigned', keys: '4A-4D' }),
     5: Object.freeze({ owner: 'P12 every other family', status: 'assigned', keys: '5A-5M' }),
-    6: Object.freeze({ owner: '', status: 'spare', keys: '' }),
+    6: Object.freeze({ owner: 'O2 easier / harder ladders (vocabulary, integers, geometry, graphs, algebra, number theory)', status: 'assigned', keys: '6A-6B' }),
     7: Object.freeze({ owner: '', status: 'spare', keys: '' }),
     8: Object.freeze({ owner: '', status: 'spare', keys: '' }),
     9: Object.freeze({ owner: '', status: 'spare', keys: '' }),
@@ -164,6 +164,12 @@ export const MULTI_KEYS = Object.freeze({
     units: '5L',         // measurement: which units
     parts: '5M',         // equal parts, or the parts a figure is split into
     // NEXT FREE IN BLOCK 5: 5N.
+
+    // Block 6 — O2 easier / harder ladders (design/audit/OPTIONS-CRITIC-R2.md §5 #5, #13; 2026-09-25).
+    // The other new ladders reuse `band` (B, a scalar: every number on the item, the answer too).
+    wordSet: '6A',       // vocabulary: the first N words of the skill's list (the core words)
+    most: '6B',          // graphs: the largest count one bar / row / mark may show
+    // NEXT FREE IN BLOCK 6: 6C.
 });
 
 /** Every option id -> its key (one letter, or digit + letter). */
@@ -303,6 +309,8 @@ export const SCALAR_ONLY = Object.freeze({
     missing: 'decimal', rule: 'bool',
     // block 1 (P10): the longest elapsed time, in minutes
     hours: 'decimal',
+    // block 6 (O2 ladders)
+    wordSet: 'decimal', most: 'decimal',
     members: 'def-tokens',   // two base-36 characters per member: its position (skill-options-pools.js)
     // reserved ids (block 4): their values are allocated when they are built
     touch: 'reserved', cover: 'reserved', mix: 'reserved', anchors: 'reserved',

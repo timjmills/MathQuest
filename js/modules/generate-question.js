@@ -211,6 +211,14 @@ function applySkillSettings() {
     let touched = false;
     if (typeof o.range === 'number' && Number.isFinite(o.range) && o.range > 0) { state.range = o.range; touched = true; }
     if (typeof o.decimals === 'number' && Number.isFinite(o.decimals) && o.decimals >= 0) { state.decimalPlaces = o.decimals; touched = true; }
+    // O2 lane (2026-09-25): a skill's own "Numbers to" band that REPLACES the measured Max Number
+    // (`asRange` on the def) also stands in for the Max Number while the item is drawn, so a
+    // generator that sizes its numbers from state.range draws at the band's size natively; the
+    // band's `accept: 'max'` check then guarantees the promise (every number, the answer too).
+    if (typeof o.band === 'number' && Number.isFinite(o.band) && o.band > 0) {
+        const def = (optionsFor(state.category, state.skill) || []).find(d => d.id === 'band');
+        if (def && def.asRange) { state.range = typeof def.asRange === 'function' ? def.asRange(o.band) : o.band; touched = true; }
+    }
     return touched ? () => { state.range = saved.range; state.decimalPlaces = saved.decimalPlaces; } : null;
 }
 

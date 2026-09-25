@@ -69,9 +69,21 @@ export function loadUserRole() {
         const params = new URLSearchParams(window.location.search);
         pupilLink = PUPIL_LINK_PARAMS.some((k) => params.get(k));
     } catch (e) { /* no location */ }
-    if (pupilLink) { setUserRole('student', { persist: false }); return; }
     const savedRole = localStorage.getItem('mathquest_user_role') || 'student';
-    setUserRole(savedRole);
+    // The teacher's "Open board view in new window" link (?c=…&board=1) opens the whole-class
+    // board on a teacher device; on any other device it is an ordinary pupil link.
+    let board = false;
+    try { board = new URLSearchParams(window.location.search).get('board') === '1'; } catch (e) { /* no location */ }
+    if (pupilLink && board && savedRole === 'teacher') {
+        setUserRole('teacher', { persist: false });
+        return;
+    }
+    if (pupilLink) { setUserRole('student', { persist: false }); return; }
+    // The site opens in Student view (owner ruling 2026-09-25) unless Settings → "Open the site
+    // in" says "Last view used". The last view is still remembered either way.
+    let startRole = 'student';
+    try { startRole = localStorage.getItem('mathquest_start_role') || 'student'; } catch (e) { /* storage off */ }
+    setUserRole(startRole === 'last' ? savedRole : 'student', { persist: false });
 }
 
 export function updateUIForRole(role) {
