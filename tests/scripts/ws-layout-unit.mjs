@@ -380,12 +380,12 @@ const hostLike = (q, h = 50) => {
         q, key, template: q.cell.template, legacy: false, skill: `${q.categoryId}:${q.skillId}`, answerType: 'number',
         footprint: Object.assign({}, fp, { measure: false, maxCols: 6 }), measured, fclass: 'standard', cellCls: '',
         canShow: () => true,
-        render: (c, { shown, ink } = {}) => {
+        render: (c, { shown, ink, shownSlots } = {}) => {
             let state = c.state;
             let wrong = c.wrong;
             if (shown !== undefined && shown !== null && shown !== '') {
                 if (ink === 'trace' && String(shown) === ans) state = 'traced';
-                else { state = 'wrong'; wrong = { value: String(shown) }; }
+                else { state = 'wrong'; wrong = { value: String(shown), slots: Object.assign({}, shownSlots || {}) }; }
             }
             return renderCell(q, Object.assign({}, c, { state, wrong }));
         },
@@ -592,6 +592,17 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     ok(eaPrepare(honest, { index: 0, wrong: true }) !== null, 'Error analysis: a wrong item whose work shows the wrong value is kept');
     const liar = Object.assign(hostLike(stackQ(333, 111)), { render: (c) => renderCell(stackQ(333, 111), Object.assign({}, c, { state: 'answered' })) });
     ok(eaPrepare(liar, { index: 0, wrong: true }) === null, 'Error analysis: a wrong item whose template draws the right answer is never printed (H1)');
+    // LESSONS_LEARNED L3, the round-4 case: add_three's cell fills its slot from the key, so a
+    // "wrong" 7 for 3 + 4 + 3 was drawn as 10. The role names the slot; the work shows 7.
+    const a3q = { categoryId: 'addition', skillId: 'add_three', answerType: 'number', text: '3 + 4 + 3 = ?', ans: 10,
+        distractorTags: { 7: 'Added only two of the three numbers.' },
+        cell: { template: 'add-three', v: 1, payload: { a: 3, b: 4, c: 3, pictures: false } } };
+    const a3 = eaPrepare(hostLike(a3q), { index: 0, wrong: true });
+    ok(a3 !== null && a3.thinking.shown === '7', `L3: add_three shows the wrong 7 in its own slot (${a3 && a3.thinking.shown})`);
+    if (a3) {
+        const work = a3.render(resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'answered' }), { cols: 1 });
+        ok(/data-ws-slot="answer"[^>]*>(?:<[^>]*>)*7</.test(work), 'L3: the pupil\'s slot holds 7, never the right sum');
+    }
     const none = hostPlan('error-analysis', [ADD_SKILL], addMake);
     ok(typeof none.unsupported === 'string' && /wrong/.test(none.unsupported), `PT-ERR-1: no real wrong answer -> unsupported, never an all-correct page (${none.unsupported || none.plan.meta.wrongShare})`);
 }

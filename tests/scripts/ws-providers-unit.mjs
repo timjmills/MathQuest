@@ -655,13 +655,7 @@ for (const band of ['10', '20', '50', '100', '1k', '10k', '100k', '1m']) {
 // a named misconception, never the right answer, never a near miss. Items in the generators' shapes.
 {
     const LW = {
-        'fractions:compare': [
-            { text: 'Compare the fractions: 1/8 ___ 5/8', ans: '<', fractionData: { num1: 1, denom1: 8, num2: 5, denom2: 8 } },
-            { text: 'Compare the fractions: 1/3 ___ 1/5', ans: '>', fractionData: { num1: 1, denom1: 3, num2: 1, denom2: 5 } },
-            { text: 'Is 2/4 greater than, less than, or equal to 1/2?', ans: 'equal to' },
-            { text: 'Is 1/3 greater than, less than, or equal to 1/2?', ans: 'less than' },
-            { text: 'Which is greater: 1/2 or 3/4? (Type the greater fraction, or "equal")', ans: '3/4' },
-        ],
+        // fractions:compare has its own provider (providers/fractions.js), tested with its family.
         'area_perimeter:perimeter_intro': [
             { ans: 22, perimeterIntroData: { shape: 'rectangle', sides: [6, 5, 6, 5], sideLabels: { length: 6, width: 5 } } },
             { ans: 13, perimeterIntroData: { shape: 'triangle', sides: [3, 6, 4], sideLabels: { a: 3, b: 6, c: 4 } } },
