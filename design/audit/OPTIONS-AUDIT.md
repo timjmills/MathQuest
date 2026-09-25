@@ -818,3 +818,69 @@ evidence, per option value.
 | `number_sense:compensation` | Max Number only; no strategy support (number line / ten frame) | range = 1000: printed sheet identical to the default sheet |
 | `number_sense:mixed_number_sense` | Max Number only; no strategy support (number line / ten frame) | — |
 | `number_theory:prime_composite` | no number range for factor / prime tasks that the generator honours | * = "*": timed out after 60000 ms |
+
+---
+
+## P12 · every other family (2026-09-25)
+
+**Scope:** every live skill P9 (place value, rounding) and P11 (+ − × ÷, K-2) did not cover.
+Blocks: `js/modules/skill-options.js` "P12 · EVERY OTHER FAMILY" (one contiguous section, family
+sub-blocks), `js/modules/skill-options-pools.js` (the mixed-review control), the P12 helpers in
+`generate-question.js`, `gen-operations.js`, `gen-fractions.js`, `gen-counting.js`,
+`gen-data-stats.js`, `gen-measurement.js`, `gen-algebraic.js`, `variant-cycler.js`.
+
+### Panel counts (tests/scripts/ws-options-count.mjs)
+
+| | live | own panel | measured Max Number only | no panel |
+|---|---|---|---|---|
+| before P12 | 583 | 156 | 132 | 295 |
+| after P12 | 583 | 532 | 45 | 6 |
+
+The six with no panel, each with the one-sentence reason (rubric O1 = 8 without a control):
+`shape_name_match_2d` / `shape_name_match_3d` (a fixed four-name drag match), `compose_rect_from_squares`
+(one fixed 2 × 3 fill), `hotspot_quads` (one fixed task: click the quadrilaterals),
+`statistical_question` (pick the statistical question from a fixed bank), `mixed_probability` (a pool
+of one skill).
+
+### Mechanisms (each inactive at its default, so an untouched skill deals what it dealt before)
+
+| Mechanism | Where | Used for |
+|---|---|---|
+| READ | the generator branch reads the option | × ÷ ladder steps, number-family band, box division, data builders, K-2 bands |
+| VARIANT | `pickVariant()` asks `variantOverride` (generate-question.js) | the item kinds a generator already rotates (fraction _nv, word problems, ratios, area/perimeter/volume, …) |
+| ACCEPT | `p12Acceptor` redraws until the item has the property | `denoms` (families), `forms`/kinds with `match`, `accept: 'max'` bands, `accept: 'dp'` decimal places |
+| POST | `p12Post` | `pictures` with `strip: true` (fraction pictures off) |
+| ROUTE | `p12RouteFor` before dispatch | time / elapsed / clock-ordering rungs (supersedable, P10 owns time and money) |
+| POOL | `narrowPool` | `members` on every mixed review (skills, or topics for grade / "_all" reviews) |
+
+Codec: two-character extended keys `X` + letter (`skill-option-codec.js`, XA … XM used, next XN),
+append-only and backward compatible; an extended key is never written beside `op`.
+
+### Fixes found on the way (pre-existing bugs)
+
+- Real skills whose ids start `mixed_` (`mixed_nl_drag`, `mixed_add_sub`, `mixed_mult_div`,
+  `mixed_improper_visual`) were dealt as pools of random siblings; now they generate themselves.
+- `word_problems_mixed` / `frac_word_mixed` / `algebra_word_mixed` left `state.skill` swapped, so live
+  practice drew every item from the first story kind.
+- Pool members that are `_plain` word problems now print without pictures.
+- Grade / "_all" reviews looked a picked skill's category up by id (placevalue:compare dealt
+  fractions:compare); the category now travels with the pick.
+
+### Self-scores (O1 sense · O2 difficulty · O3 support · O4 works · O5 clarity)
+
+| Family | O1 | O2 | O3 | O4 | O5 | Note |
+|---|---|---|---|---|---|---|
+| × ÷ ladder steps | 8 | 8 | 8 | 9 | 8 | divisor sets, digit sizes, kinds; pictures where a picture is a hint |
+| number families | 9 | 9 | 9 | 10 | 9 | P-1 split: band owns size, level owns blanks; retired ids carry their old band |
+| mixed reviews (all) | 8 | 8 | 8 | 9 | 8 | "Which skills / topics"; no support by nature |
+| fractions + fraction ops | 8 | 8 | 8 | 9 | 8 | denominator families, item kinds, pictures off on the visual twins |
+| decimals, conversions | 8 | 8 | 8 | 9 | 8 | places, kinds, families; Max Number stays where measured |
+| geometry | 8 | 8 | 7 | 9 | 8 | shapes / kinds / sizes; no labels-on/off control (gen-geometry figures bake labels) |
+| measurement (non-time) | 8 | 8 | 7 | 9 | 8 | units, kinds, marks; no scale-picture fade |
+| time, money | 7 | 8 | 7 | 9 | 8 | stop-gap, handed to P10: no clock-numbers or coin-set control yet |
+| data | 8 | 8 | 8 | 9 | 8 | question kinds, picture key, data-set size, bars / rows |
+| algebra, order of operations | 8 | 8 | 8 | 9 | 8 | forms and operations; size via measured Max Number |
+| integers, number theory | 8 | 8 | 8 | 9 | 8 | sign patterns, kinds; factor charts keep Max Number only |
+| vocabulary | 8 | 8 | 8 | 9 | 8 | item kind (definition → word is the easy step) |
+
+Below 8: time and money (O1, O3) — owned by P10 now; geometry and measurement O3 (no label fade).

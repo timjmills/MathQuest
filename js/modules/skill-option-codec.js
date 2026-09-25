@@ -68,8 +68,39 @@ export const OPTION_KEYS = {
     tiles: 'Y',
     // P11 K-2 counting (2026-09-25): the last free letter.
     objects: 'J',
+
+    // ---- EXTENDED KEYS: "X" + a second letter (P12, 2026-09-25) --------------------------------
+    // The alphabet ran out at `objects`. An extended key is TWO characters, "X" followed by a
+    // letter, which gives 26 more keys (XA … XZ) without a format version bump. It is backward
+    // compatible both ways:
+    //   - An old decoder reads "XA…" as a field for `op` (the one-letter X). Every skill that is
+    //     not place_value_10x has no `op`, so the field is skipped as unknown; and no skill may
+    //     declare both `op` and an extended option (assertExtendedKeys below lists offenders, and
+    //     the encoder refuses to write one), so place_value_10x never sees one. The skill loads
+    //     with that option at its default, which is what an old app should do.
+    //   - This decoder reads a field that starts with "X" as `op` when the skill declares `op`,
+    //     and as an extended key otherwise, so every code written before P12 decodes exactly as
+    //     it did (ws-code-snapshot).
+    // APPEND-ONLY, like the one-letter keys. When XA … XZ run out, the next escape is "XX" + a
+    // letter, read the same way ("XX" is never itself assigned below, so it stays free for that).
+    members: 'XA',       // mixed pools: which member skills / categories the pool draws from
+    forms: 'XB',         // which of a skill's item forms are dealt (a set of form numbers)
+    denoms: 'XC',        // fractions: which denominators
+    model: 'XD',         // the picture model drawn (area / bar / circle / number line / none)
+    labels: 'XE',        // geometry, graphs: the labels drawn on a figure
+    precision: 'XF',     // time: to the hour / half / quarter / 5 min / 1 min
+    coins: 'XG',         // money: which coins
+    shapes: 'XH',        // geometry: which shapes
+    points: 'XI',        // data: how many data points / categories
+    scale: 'XJ',         // data, measurement: the scale step
+    digits: 'XK',        // how many digits (area models, box division)
+    units: 'XL',         // measurement: which units
+    parts: 'XM',         // equal parts (halves / thirds / fourths), or the parts a figure is split into
+    // NEXT FREE EXTENDED KEY: XN. Take the next letter in order and add a line above.
 };
 const KEY_TO_OPTION = Object.fromEntries(Object.entries(OPTION_KEYS).map(([id, k]) => [k, id]));
+/** True for a two-character extended key (see above). */
+const _isExtendedKey = (k) => typeof k === 'string' && k.length === 2 && k[0] === 'X';
 
 // String values get a one-letter token per option. APPEND-ONLY, unique within an option.
 // Integer values are written as themselves: base 36, one character, inside a set ({7, 8} -> "78",
@@ -97,10 +128,45 @@ export const VALUE_TOKENS = {
         // P11 operations hint pictures (appended)
         tile: 'D', frame: 'R', skip: 'K', array: 'A', think: 'H', bar: 'M' },
     objects: { shapes: 'S', pictures: 'P', frame: 'F', dice: 'D' },
+    // P12 (appended). String-valued P12 options; numeric ones are written as themselves.
+    model: { none: 'N', area: 'A', bar: 'B', circle: 'C', line: 'L', set: 'S', grid: 'G', blocks: 'K', analog: 'H', digital: 'D' },
+    labels: { all: 'A', some: 'S', none: 'N' },
+    precision: { hour: 'H', half: 'F', quarter: 'Q', five: 'V', one: 'O' },
+    coins: { p: 'P', n: 'N', d: 'D', q: 'Q' },
+    units: { metric: 'M', customary: 'C', mixed: 'X' },
     // Numeric sets whose members are not all under 36: one digit per power of ten.
     power: { 10: '1', 100: '2', 1000: '3' },
     places: { 1: '0', 10: '1', 100: '2', 1000: '3', 10000: '4', 100000: '5' },
 };
+
+// A def may carry its OWN tokens (`def.tokens`: value -> token, every token `def.tokenWidth`
+// characters). P12 uses it for a mixed pool's `members`, whose values are skill ids: each is
+// written as its position in SKILLS[category] in two base-36 characters, which is stable
+// because a skill is never spliced out of its category (CLAUDE.md), only tombstoned.
+function _defToken(def, v) {
+    return def && def.tokens && Object.prototype.hasOwnProperty.call(def.tokens, v) ? def.tokens[v] : null;
+}
+
+function _defsHave(categoryId, skillId, id) {
+    return optionsFor(categoryId, skillId).some(d => d.id === id);
+}
+
+/**
+ * The skills that break the extended-key rule: a skill that declares `op` AND an option with an
+ * extended ("X" + letter) key. An old decoder would read the extended field as `op` there, so the
+ * encoder never writes it; this lists offenders so a gate can fail loudly. Empty when the rule holds.
+ * `skillRefs` is a list of [categoryId, skillId].
+ */
+export function assertExtendedKeys(skillRefs) {
+    const bad = [];
+    for (const [categoryId, skillId] of skillRefs) {
+        const defs = optionsFor(categoryId, skillId);
+        if (!defs.some(d => d.id === 'op')) continue;
+        const ext = defs.filter(d => _isExtendedKey(OPTION_KEYS[d.id])).map(d => d.id);
+        if (ext.length) bad.push(`${categoryId}:${skillId} declares op and ${ext.join(', ')}`);
+    }
+    return bad;
+}
 
 function _setToken(optId, v) {
     const own = VALUE_TOKENS[optId] && VALUE_TOKENS[optId][v];
@@ -141,14 +207,26 @@ export function encodeOptionPayload(categoryId, skillId, opts) {
         if (!(def.id in packed)) continue;
         const key = OPTION_KEYS[def.id];
         if (!key) continue;
+        // An extended key on a skill that also declares `op` would be read as `op` by an old
+        // decoder, so it is never written (see OPTION_KEYS and assertExtendedKeys).
+        if (_isExtendedKey(key) && _defsHave(categoryId, skillId, 'op')) continue;
         const v = packed[def.id];
         try {
             if (def.type === 'set') {
                 const order = (def.values || []).map(x => x.v);
                 const list = (Array.isArray(v) ? v : []).slice().sort((a, b) => order.indexOf(a) - order.indexOf(b));
+                if (def.tokens) {
+                    const toks = list.map(x => _defToken(def, x));
+                    if (toks.some(t => t === null)) continue;
+                    fields.push(key + toks.join(''));
+                    continue;
+                }
                 fields.push(key + list.map(x => _setToken(def.id, x)).join(''));
             } else if (def.type === 'bool') {
                 fields.push(key + (v ? '1' : '0'));
+            } else if (v !== null && v !== undefined && def.tokens) {
+                const t = _defToken(def, v);
+                if (t !== null) fields.push(key + t);
             } else if (v !== null && v !== undefined) {
                 fields.push(key + _scalarToken(def.id, v));
             }
@@ -175,12 +253,34 @@ export function decodeOptionPayload(categoryId, skillId, payload) {
     if (/^\d/.test(p)) return {};             // a later format version: ignore, never misread
     const defs = optionsFor(categoryId, skillId);
     const raw = {};
+    const hasOp = defs.some(d => d.id === 'op');
     for (const field of p.split('_')) {
         if (!field) continue;
-        const optId = KEY_TO_OPTION[field[0]];
+        // "X" is `op` on a skill that declares it; on every other skill it opens a two-character
+        // extended key (OPTION_KEYS, P12).
+        const keyLen = field[0] === 'X' && !hasOp && field.length >= 2 ? 2 : 1;
+        const optId = KEY_TO_OPTION[field.slice(0, keyLen)];
         const def = optId && defs.find(d => d.id === optId);
         if (!def) continue;                    // an option this skill (or this app) does not know
-        const body = field.slice(1);
+        const body = field.slice(keyLen);
+        if (def.tokens) {
+            const w = def.tokenWidth || 1;
+            const byTok = {};
+            for (const [v, t] of Object.entries(def.tokens)) byTok[String(t).toUpperCase()] = v;
+            const back = (t) => {
+                const v = byTok[t];
+                return v === undefined ? undefined : (def.values || []).map(x => x.v).find(x => String(x) === v);
+            };
+            if (def.type === 'set') {
+                const out = [];
+                for (let i = 0; i + w <= body.length; i += w) { const v = back(body.slice(i, i + w)); if (v !== undefined) out.push(v); }
+                raw[optId] = out;
+            } else {
+                const v = back(body);
+                if (v !== undefined) raw[optId] = v;
+            }
+            continue;
+        }
         if (def.type === 'set') {
             raw[optId] = [...body].map(t => _fromToken(optId, def, t, true)).filter(v => v !== undefined);
         } else if (def.type === 'bool') {

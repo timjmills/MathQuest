@@ -3303,6 +3303,17 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // type appears — no Math.random() picks a type any more.
             const _estAt = Number.isFinite(state.itemIndex) ? state.itemIndex : (++_estLiveCursor);
             const _estDeal = (n) => ((_estAt % n) + n) % n;
+            // P12: `forms` (make_a_ten, doubles_near_doubles) — when the teacher changed it from
+            // every kind, deal only the ticked kinds; untouched, the old deal.
+            const _estForm = (n) => {
+                let def = null;
+                try { def = optionsFor(state.category, state.skill).find(o => o.id === 'forms') || null; } catch (e) { def = null; }
+                const o = state.skillOptions;
+                if (!def || !o || !Array.isArray(o.forms)) return _estDeal(n);
+                const t = def.values.map(x => x.v).filter(v => o.forms.includes(v) && v < n);
+                if (!t.length || t.length === def.values.length) return _estDeal(n);
+                return t[_estDeal(t.length)];
+            };
             // One value that lands in the chosen task's branch in ALL THREE skills below (their
             // cut points are 0.4 / 0.7, 0.4 / 0.7 and 0.5 / 0.8): 0.55 is "closest" in every one.
             const _estTaskR = () => {
@@ -3747,7 +3758,7 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // MAKE A TEN STRATEGY (Grade 1)
             // ========================================
             else if (estSkill === "make_a_ten") {
-                const r = [0, 0.9][_estDeal(2)];
+                const r = [0, 0.9][_estForm(2)];
 
                 if (r < 0.5) {
                     // Type 1 (50%): Complete the make-ten decomposition
@@ -3813,7 +3824,7 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // DOUBLES & NEAR DOUBLES (Grade 1)
             // ========================================
             else if (estSkill === "doubles_near_doubles") {
-                const r = [0, 0.5, 0.9][_estDeal(3)];
+                const r = [0, 0.5, 0.9][_estForm(3)];
 
                 if (r < 0.4) {
                     // Type 1 (40%): Doubles fact

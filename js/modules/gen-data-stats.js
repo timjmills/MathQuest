@@ -2,6 +2,16 @@
 import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { COLORS, STROKE, FONTS, categoricalFill } from './design-tokens.js';
+import { optionsFor } from './skill-options.js';
+
+// P12: an option value the teacher chose for this skill (skill-options.js), else undefined.
+function _dOpt(id) {
+    let def = null;
+    try { def = optionsFor(state.category, state.skill).find(o => o.id === id) || null; } catch (e) { def = null; }
+    const o = state.skillOptions;
+    if (!def || !o || typeof o !== 'object' || !Object.prototype.hasOwnProperty.call(o, id)) return undefined;
+    return o[id];
+}
 
 // generate-question.js post-strips q.options when no array element is a
 // non-numeric string. Our multi-select-check options are objects
@@ -347,9 +357,10 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     { title: "Toys Sold", cats: ["Cars", "Dolls", "Blocks", "Games"] },
                     { title: "Pets at Home", cats: ["Dogs", "Cats", "Fish", "Birds"] }
                 ]);
-                const numCats = pick([3, 3, 4]);
+                // P12: `tiles` fixes the number of bars (3 or 4), `band` the tallest bar (5 or 10).
+                const numCats = [3, 4].includes(Number(_dOpt('tiles'))) ? Number(_dOpt('tiles')) : pick([3, 3, 4]);
                 const cats = _ctx.cats.slice(0, numCats);
-                const values = cats.map(() => randInt(1, 10));
+                const values = cats.map(() => randInt(1, Number(_dOpt('band')) === 5 ? 5 : 10));
                 const targetData = cats.map((label, i) => ({ label, value: values[i] }));
                 const valuesPhrase = targetData.map(d => `${d.label}=${d.value}`).join(', ');
                 q.text = `Build a bar graph showing: ${valuesPhrase}.`;
@@ -375,11 +386,14 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     { title: "Toys", cats: ["Cars", "Balls", "Blocks"], icons: ["🚗", "⚽", "🧱"] },
                     { title: "Bugs Found", cats: ["Ants", "Bees", "Ladybugs"], icons: ["🐜", "🐝", "🐞"] }
                 ];
-                const _ctx = pick(_picCtxs);
-                const numCats = Math.min(_ctx.cats.length, pick([3, 3, 4]));
+                // P12: `tiles` fixes the number of rows (3, or 4 from the one context that has four);
+                // `band` 5 keeps every row to 5 pictures (the default runs to 7).
+                const _pT = Number(_dOpt('tiles'));
+                const _ctx = _pT === 4 ? _picCtxs[0] : pick(_picCtxs);
+                const numCats = _pT === 3 || _pT === 4 ? _pT : Math.min(_ctx.cats.length, pick([3, 3, 4]));
                 const cats = _ctx.cats.slice(0, numCats);
                 const icons = _ctx.icons.slice(0, numCats);
-                const values = cats.map(() => randInt(1, 7));
+                const values = cats.map(() => randInt(1, Number(_dOpt('band')) === 5 ? 5 : 7));
                 const targetData = cats.map((label, i) => ({ label, value: values[i], icon: icons[i] }));
                 const valuesPhrase = targetData.map(d => `${d.label}=${d.value}`).join(', ');
                 q.text = `Build a pictograph: ${valuesPhrase} (each picture = 1).`;
