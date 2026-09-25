@@ -26,7 +26,7 @@ import {
     SIZES, DEFAULT_SIZE, LOOKS, DEFAULT_LOOK,
 } from '../index.js';
 import {
-    resolveSectionLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor,
+    resolveSectionLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM,
 } from '../layout.js';
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
@@ -572,14 +572,27 @@ function planItem(it, level, cols) {
  * Lay out every section of ONE sheet and place it on pages.
  * @returns {{layouts, chunksBySection, pages}}
  */
+/**
+ * The cell height of one part of a split section (splitWide): the two groups share a page, so
+ * each row is as tall as its tallest problem with DENSE_ROOM to spare, never the even share of the
+ * grid a lone section fills, and three rows of either leave the page's 1 mm safety (PG-12).
+ */
+export function splitCellH(L) {
+    return Math.round(Math.min(L.cellH, L.hMin * DENSE_ROOM, (L.gridH - 1) / Math.max(1, L.rows)) * 1000) / 1000;
+}
+
 function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, headerFirst, availableWidthMm, anchors }) {
     const instr = instructionMm(size);
     const body = bodyHeightMm(paper, headerFirst);
+    const split = new Set(sectionsIn.map((s) => s.splitOf).filter((x) => x !== undefined && x !== null));
     const layouts = sectionsIn.map((sec, si) => {
-        const L = resolveSectionLayout(
+        const L0 = resolveSectionLayout(
             { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols },
             itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
         );
+        // A split section's two parts share the page: their rows are sized to what they hold.
+        const L = (sec.splitOf !== undefined && sec.splitOf !== null) || split.has(si)
+            ? Object.assign({}, L0, { cellH: splitCellH(L0), fill: false }) : L0;
         // S6 SECTIONS: anchor band + 3-4 problems per block; the band's height comes off the page
         // (anchors.js blockPlan) and a block is never split.
         const aMm = anchorBandOf(anchors, si);
@@ -604,7 +617,7 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
                 gridFirstMm: L.gridH, gridContMm: L.gridHCont, maxRows: Math.max(1, Math.floor(L.ceiling / L.cols)), cellH: L.cellH, force: !!L.packed,
             })) || paginate(itemsBySection[si].length, L)));
     const pages = placeSections(
-        layouts.map((L, si) => ({ layout: L, chunks: chunksBySection[si], instrMm: instr })),
+        layouts.map((L, si) => ({ layout: L, chunks: chunksBySection[si], instrMm: instr, sharesWith: sectionsIn[si].splitOf })),
         { bodyFirstMm: body, bodyContMm: bodyHeightMm(paper, headerFirst, { cont: true }) },
     );
     return { layouts, chunksBySection, pages };
@@ -678,9 +691,12 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
         const narrow = its.filter((it) => !one(it));
         if (!wide.length || !narrow.length) return keep();
         // (narrow keeps its order here; composeSheet groups by height once the columns are known)
-        const L = resolveSectionLayout(Object.assign({}, base, { count: narrow.length }), narrow, paper, availableWidthMm, { size, look });
+        const L = resolveSectionLayout(Object.assign({}, base, { count: narrow.length, floor: sec.floor }), narrow, paper, availableWidthMm, { size, look });
         if (L.cols <= whole.cols) return keep();
-        sections.push(Object.assign({}, sec, { floor: null }));
+        // The narrow part keeps the section's floor: print-sheet.js measures it over the skill's
+        // narrow problems only (floorOf), so the columns the page was counted for are the columns
+        // it prints, whichever of the skill's problems this page happens to hold (PT-ENG-9).
+        sections.push(Object.assign({}, sec));
         items.push(narrow);
         sections.push(Object.assign({}, sec, { columns: 1, floor: null, splitOf: sections.length - 1 }));
         items.push(wide);

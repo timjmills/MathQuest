@@ -1789,7 +1789,9 @@ export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
         // said once (regrade 2): a twin that prints the story itself (add_wp_10) takes a short
         // instruction, not the story again; the number line takes its jump instruction
         const said = _normText(q.text);
-        const instr = isNumberLineItem(q) ? NUMBER_LINE_INSTRUCTION
+        // `q.screenInstr`: a generator's own instruction for a twin that prints its whole sentence
+        // (add_three: "Add." over `8 + 5 + 3 = [ ]`, never the sentence twice).
+        const instr = q.screenInstr ? q.screenInstr : isNumberLineItem(q) ? NUMBER_LINE_INSTRUCTION
             : (said && said.length > 12 && _normText(q.visual).includes(said)) ? 'Read the story. Write the answer.'
                 : plainText(q.text);
         return { mode: 'kit', html: q.visual, instr, count: cells > 1 ? cells : 0 };

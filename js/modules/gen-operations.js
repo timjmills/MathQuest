@@ -2312,6 +2312,11 @@ function _applyOptionPost(q, selected, routed) {
     if (_opt('pictures') === false) {
         q.visual = '';
         if (q.cell && q.cell.template === 'wordpic') q.cell = { ...q.cell, payload: { ...q.cell.payload, pictures: false } };
+        // add_three: the same sentence without the counters (its box is still the answer place).
+        if (q.cell && q.cell.template === 'add-three') {
+            q.cell = { ...q.cell, payload: { ...q.cell.payload, pictures: false } };
+            q.visual = _kitTwin('add-three', q.cell.payload);
+        }
         // A story prints as the plain story with a work space; a sum (add_three) prints its sentence.
         if (/^word/.test(String(q.printFormat || '')) || _WP_RE.test(routed) || /word_problems/.test(selected)) q.printFormat = 'word-plain';
         q.picturesOff = true;
@@ -3237,61 +3242,16 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.answerType = "number";
                 q.hint = `Add the first two: ${a} + ${b} = ${a + b}. Then add the third: ${a + b} + ${c} = ${sum}`;
 
-                // Visual: three groups of colored dots
-                const dotR = 8;
-                const dotGap = 22;
-                const groupGap = 30;
-                const maxPerRow = 5;
-
-                const buildDotGroup = (count, color, startX, startY) => {
-                    let dots = '';
-                    for (let i = 0; i < count; i++) {
-                        const col = i % maxPerRow;
-                        const row = Math.floor(i / maxPerRow);
-                        dots += `<circle cx="${startX + col * dotGap + dotR}" cy="${startY + row * dotGap + dotR}" r="${dotR}" fill="${color}" opacity="0.85"/>`;
-                    }
-                    const rows = Math.ceil(count / maxPerRow);
-                    const cols = Math.min(count, maxPerRow);
-                    return { svg: dots, w: cols * dotGap, h: rows * dotGap };
-                };
-
-                // Three groups get distinct categorical colors (color identifies
-                // which addend each cluster belongs to).
-                const colA = categoricalFill(0); // blue
-                const colB = categoricalFill(1); // green
-                const colC = categoricalFill(2); // orange
-                const grpA = buildDotGroup(a, colA, 10, 30);
-                const grpB = buildDotGroup(b, colB, 10 + grpA.w + groupGap, 30);
-                const grpC = buildDotGroup(c, colC, 10 + grpA.w + groupGap + grpB.w + groupGap, 30);
-
-                const svgW = 10 + grpA.w + groupGap + grpB.w + groupGap + grpC.w + 20;
-                const svgH = Math.max(grpA.h, grpB.h, grpC.h) + 60;
-
-                // Plus signs between groups
-                const plusY = 30 + Math.max(grpA.h, grpB.h, grpC.h) / 2;
-                const plus1X = 10 + grpA.w + groupGap / 2;
-                const plus2X = 10 + grpA.w + groupGap + grpB.w + groupGap / 2;
-
-                // Labels under groups
-                const labelY = svgH - 8;
-                const labelAX = 10 + grpA.w / 2;
-                const labelBX = 10 + grpA.w + groupGap + grpB.w / 2;
-                const labelCX = 10 + grpA.w + groupGap + grpB.w + groupGap + grpC.w / 2;
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Add Three Numbers</div>
-                    <svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW, 360)}" style="background:var(--bg-card);border-radius:12px;padding:8px;" font-family='${FONTS.sans}'>
-                        ${grpA.svg}${grpB.svg}${grpC.svg}
-                        <text x="${plus1X}" y="${plusY + 5}" text-anchor="middle" font-family='${FONTS.sans}' font-size="18" font-weight="700" fill="${COLORS.text}">+</text>
-                        <text x="${plus2X}" y="${plusY + 5}" text-anchor="middle" font-family='${FONTS.sans}' font-size="18" font-weight="700" fill="${COLORS.text}">+</text>
-                        <text x="${labelAX}" y="${labelY}" text-anchor="middle" font-family='${FONTS.sans}' font-size="14" font-weight="700" fill="${colA}">${a}</text>
-                        <text x="${labelBX}" y="${labelY}" text-anchor="middle" font-family='${FONTS.sans}' font-size="14" font-weight="700" fill="${colB}">${b}</text>
-                        <text x="${labelCX}" y="${labelY}" text-anchor="middle" font-family='${FONTS.sans}' font-size="14" font-weight="700" fill="${colC}">${c}</text>
-                    </svg>
-                    <div style="margin-top:8px;font-size:1.1rem;font-weight:600;color:var(--text-bright);">
-                        <span style="color:${colA};">${a}</span> + <span style="color:${colB};">${b}</span> + <span style="color:${colC};">${c}</span> = ?
-                    </div>
-                </div>`;
+                // The kit's `add-three` cell (ops-counters.js): three groups of solid counters in
+                // columns of five, "+" between them, and `a + b + c = [ ]`, black on white in
+                // Andika, the same drawing on paper, on the key and on screen. (It was a coloured
+                // SVG, one colour per addend, printed by the legacy path.)
+                const _a3Payload = { a, b, c };
+                q.cell = { template: 'add-three', v: 1, payload: _a3Payload };
+                q.visual = _kitTwin('add-three', _a3Payload);
+                q.selfAnswering = true;
+                q.screenInstr = 'Add.';
+                q.printText = 'Add.';
                 q.options = buildNumericOptions(sum);
                 // Tag common add-three misconceptions: only two addends summed.
                 if (typeof window !== 'undefined' && typeof window.tagDistractor === 'function') {

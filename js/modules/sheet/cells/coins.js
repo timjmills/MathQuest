@@ -145,8 +145,10 @@ function enough(p, ctx) {
 }
 
 function compare(p, ctx) {
+    // RP-111's half-width scale (0.8) and two coins a row: each collection is at most 41 mm wide,
+    // so "Check the one with more" stands in a 2-column cell (2026-09-25, AP4).
     const side = (name, c) => `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 2)};">${lbl(ctx, name)}`
-        + `${collection(ctx, { coins: c.coins || [], notes: c.notes || [], dots: 'none', wrap: 3, scatter: c.scatter === 'soft' ? 'soft' : !!c.scatter })}</div>`;
+        + `${collection(ctx, { coins: c.coins || [], notes: c.notes || [], dots: 'none', wrap: 2, scatter: c.scatter === 'soft' ? 'soft' : !!c.scatter }, { compact: true })}</div>`;
     if (p.response === 'sign') {
         const s = S(ctx);
         const d = s.writeMm + 2;
@@ -156,11 +158,14 @@ function compare(p, ctx) {
         const circle = `<span data-ws-slot="sign" data-ws-shape="circle"${isTwin(ctx) ? ' data-mq-blank="box"' : ''} style="display:inline-flex;align-items:center;justify-content:center;`
             + `box-sizing:border-box;width:${L(ctx, d + 4)};height:${L(ctx, d + 4)};border:${L(ctx, 0.26)} solid ${INK};border-radius:50%;background:#fff;`
             + `font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;color:${ctx.state === 'traced' ? GREY : INK};">${esc(v)}</span>`;
-        return cellRoot(ctx, 'tm-compare', `<div style="display:flex;justify-content:center;align-items:center;gap:${L(ctx, 6)};">${side('A', p.a)}${circle}${side('B', p.b)}</div>`);
+        // The two collections side by side, and under them the sentence "A ( ) B" with the circle
+        // to write the sign in (2026-09-25, AP4): the same half-width cell as the check-box form.
+        return cellRoot(ctx, 'tm-compare', `<div style="display:flex;justify-content:center;align-items:flex-start;gap:${L(ctx, 4)};">${side('A', p.a)}${side('B', p.b)}</div>`
+            + row(ctx, `${lbl(ctx, 'A')}${circle}${lbl(ctx, 'B')}`, { gap: 3 }));
     }
     const labels = ['A', 'B'];
     const on = tickedIndex(ctx, labels, p.more);
-    return cellRoot(ctx, 'tm-compare', `<div style="display:flex;justify-content:center;align-items:flex-start;gap:${L(ctx, 12)};">${side('A', p.a)}${side('B', p.b)}</div>`
+    return cellRoot(ctx, 'tm-compare', `<div style="display:flex;justify-content:center;align-items:flex-start;gap:${L(ctx, 4)};">${side('A', p.a)}${side('B', p.b)}</div>`
         + row(ctx, lbl(ctx, 'More money:') + tickList(ctx, labels, { on, vertical: false }), { gap: 3 }));
 }
 
@@ -226,7 +231,8 @@ register('coins', {
     answerKey: keyOf,
     footprint(p, ctx) {
         const coins = (p.coins || []).length, notes = (p.notes || []).length;
-        const wide = p.kind === 'compare' || p.kind === 'order' || p.kind === 'find' || notes > 3 || coins > 6
+        // Compare is half-width (compact coins, two a row; the sign circle sits under them).
+        const wide = p.kind === 'order' || p.kind === 'find' || notes > 3 || coins > 6
             || (notes && coins) || (levelOf(ctx) >= 2 && p.kind === 'count' && coins && coins <= 5 && !notes);
         return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2 };
     },

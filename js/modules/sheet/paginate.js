@@ -124,9 +124,13 @@ export function placeSections(sections, { bodyFirstMm, bodyContMm }) {
             // S6: a chunk of anchored blocks also carries its anchor bands (anchors.js blockPages).
             // A chunk packed by its rows' own heights (layout.js packByHeight) carries its grid height.
             const gridMm = Number(chunk.gridMm) > 0 ? Number(chunk.gridMm) : chunk.rows * s.layout.cellH;
-            const heightMm = s.instrMm + (Number(chunk.anchorMm) || 0) + gridMm;
+            // A split-off full-width group (practice.js splitWide, `sharesWith` its parent section)
+            // prints no instruction line of its own when it follows its parent on the same page.
+            const shares = s.sharesWith !== undefined && s.sharesWith !== null && cur && ci === 0
+                && cur.parts.length > 0 && cur.parts[cur.parts.length - 1].section === s.sharesWith;
+            let heightMm = (shares ? 0 : s.instrMm) + (Number(chunk.anchorMm) || 0) + gridMm;
             const fitsHere = cur && ci === 0 && cur.usedMm + heightMm <= cur.bodyMm - SAFETY;
-            if (!fitsHere) open();
+            if (!fitsHere) { open(); heightMm = s.instrMm + (Number(chunk.anchorMm) || 0) + gridMm; }
             cur.parts.push({ section: si, chunk, heightMm });
             cur.usedMm += heightMm;
         });

@@ -504,6 +504,9 @@ function genClockParts(q, skill) {
         const t = { h: 1 + dealPerm(`${skill}:h`, 12), m: 5 * randInt(1, 11) };
         const hourLetter = deal(`${skill}:l`, 2) === 0 ? 'A' : 'B';
         setCell(q, 'clock', { kind: 'parts', task: 'hands', h: t.h, m: t.m, hourLetter, ...(faceNumerals(o) !== 'all' ? { numerals: faceNumerals(o) } : {}) });
+        // Its own print format, so a page's instruction line (read before any item, from the
+        // provider's chooseRef) names this task, not "Write the missing numbers".
+        q.printFormat = 'tm-clock-hands';
         q.text = 'Which is the hour hand? Check one box.';
         choiceAnswer(q, hourLetter);
         q.hint = 'The hour hand is the short hand.';
@@ -951,8 +954,10 @@ function genMoneyCompare(q, skill) {
     const k = pos6();
     let a, b;
     for (let t = 0; t < 120; t++) {
-        a = randomCoins(vals, randInt(1, 5), band);
-        b = randomCoins(vals, randInt(1, 5), band);
+        // At most four coins a side (2026-09-25, AP4): two rows of two half-size coins, so the
+        // two collections stand side by side in a half-width cell and a page holds six.
+        a = randomCoins(vals, randInt(1, 4), band);
+        b = randomCoins(vals, randInt(1, 4), band);
         if (o.response === 'sign' && k === 5) b = a.slice().reverse().sort((x, y) => y - x);   // equal totals once a page
         const ok = o.response === 'sign' ? true : sum(a) !== sum(b);
         // M-M8: more coins but less money, once a page
