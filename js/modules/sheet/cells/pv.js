@@ -561,7 +561,7 @@ register('pv', {
                         + `${frameHTML(ctx, `Round to the nearest ${fmt(p.place)}: ____`, kv, rDigits)}</div>`;
                 }
                 const pic = p.support === 'none' ? big(`${esc(fmt(p.n))} →`) : numeral({ cut: p.place, arrow: true });
-                return `<div class="pv-cell" style="text-align:center;white-space:nowrap;">${pic}${big(slot)}</div>`;
+                return `<div class="pv-cell pv-round1" style="text-align:center;white-space:nowrap;">${pic}${big(slot)}</div>`;
             }
             case 'round-notate': {
                 // RN-7a: the strip without an answer slot; the key underlines the place's digit and

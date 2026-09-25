@@ -273,13 +273,13 @@ adds the **drawing** each one needs.
 
 | # | Representation | Where (R) | Status | Existing / proposed |
 |---|---|---|---|---|
-| R01 | Match the same: target + line-up / two columns to join | B1 S1–S2 | GAP | proposed `counting:match_same` (`hands-match` tag exists, no K cell) |
+| R01 | Match the same: target + line-up / two columns to join | B1 S1–S2 | MATCH | `counting:match_same` (`template:picture-row` kind `pick`: a target in a key box and a line-up of 2–4, check the same one; `match` same / shadow / same kind). The two-column join is drawn as the line-up (build lane k2) |
 | R02 | Memory / snap picture cards (face-down grid) | B1 S2; B5 S1; B7 S3 | GAP | hands-on card page (low) |
-| R03 | Odd one out / which one doesn't belong / incomplete set | B1 S3, S6; B15 S1 | GAP | proposed `comparing:odd_one_out` (Reason It key for open answers) |
+| R03 | Odd one out / which one doesn't belong / incomplete set | B1 S3, S6; B15 S1 | MATCH | `comparing:odd_one_out` (`template:picture-row`: a row of 3–4, check the odd one; `task: 'rule'` circles it and asks why from a bank; `attr` kind / size) |
 | R04 | Sorting rings / hoops ("yes / not", by attribute, 0 / not 0, 4 sides / not) | B1 S4–S6; B4 S1; B5 S1; B6 S1, S4; B7 S2; B10 S1; B11 S1; B15 S8 | PARTIAL | `classify_count` (`counters` `sort`, counts one kind); `hands-sort` tag → new `template:sort-rings` + proposed `comparing:sort_into_groups` (≈ Y3 R59, R43) |
 | R05 | One-to-one lines of two sets (more / fewer / same) | B1 S7; B11 S2 | MATCH | `template:compare` (`compare_groups`, aligned 2×5 frames, `objects`) |
 | R06 | Cube towers side by side to compare | B1 S7; B11 S2 | PARTIAL | `compare_objects` towers (no unit cubes) → `objects` kind `cubes` (= Y3 R41) |
-| R07 | Same object at two / three sizes (big / small) | B2 S1 | GAP | proposed `comparing:compare_size` |
+| R07 | Same object at two / three sizes (big / small) | B2 S1 | MATCH | `comparing:compare_size` (`template:picture-row`: one kind at two or three sizes on one floor; check the bigger / smaller or write 1, 2, 3) |
 | R08 | Pan balance tipped / level (objects; cubes as the unit; number shapes) | B2 S2; B8 S1–S2 | GAP | `heavier_lighter_visual` is emoji, no balance → `template:balance` (= Y3 R50) + proposed `measurement:balance_scales` |
 | R09 | Unscaled containers: full / empty / nearly; holds more; count cupfuls | B2 S3; B8 S3–S4 | GAP | proposed `comparing:compare_capacity` (single-grey fill level; ≈ Y3 R51 without a scale) |
 | R10 | Lengths compared / ordered with ends aligned (ribbons, worms, lines) | B2 S1; B10 S1–S2 | MATCH | `comparing:compare_objects` (length); order three PARTIAL `order_objects_length` (legacy (C)) |
@@ -316,7 +316,7 @@ adds the **drawing** each one needs.
 | R41 | Pairs for odd / even (socks, animals, cubes in pairs; one left over) | B9 S6; B11 S13; B16 S5 | PARTIAL | `composing:odd_even` (legacy (C)) → `layout: 'pairs'` on `template:counters` |
 | R42 | Sharing onto plates (dealt; fair / unfair; leftovers) | B16 S1–S2, S5 | GAP | proposed `division:share_and_group_early` (outline plates) |
 | R43 | Grouping into containers of a stated size | B16 S3–S4 | PARTIAL | `template:counters` `share` (`share_into_groups`, runs to ring; grade 3, to 20) (≈ Y3 R40) |
-| R44 | Zero / empty set (empty plate, bare tree, empty bus, empty frame, blank card) | B7 S1–S3 | GAP | proposed `counting:zero_none` |
+| R44 | Zero / empty set (empty plate, bare tree, empty bus, empty frame, blank card) | B7 S1–S3 | MATCH | `counting:zero_none` (`template:counters` kind `zero`: plates, boxes or a ten frame holding 0-10; how many / which has none / take them all away) |
 | R45 | First–then–now story pictures (join / take away) | B14 S1–S4; B9 S9 | MATCH / PARTIAL | `template:wordpic` (`add_wp_10`), `counters` `join` / `takeaway`; change-unknown GAP (`unknown: 'change'`) |
 | R46 | Hidden part (under a bowl / cloth / blanket; fingers show it) | B3 S6; B5 S7; B11 S4; B14 S1 | GAP | a covered-part mark (outline "cloth" box with ?) on bond / counters |
 | R47 | Take-away objects crossed out | B3 S5; B14 S3 | MATCH | `template:counters` `takeaway` (= Y3 R32) |

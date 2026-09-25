@@ -273,8 +273,20 @@ has('var grey border', inkHTML(`<div style="border:1px solid var(--mq-muted)"></
     ok('TY-4: no cv01 / cv06 anywhere in the role CSS', !/cv0[16]"/.test(SHEET_ENGINE_CSS));
     ok('key answers are Andika 700', /\.ws-key \[data-ws-ink="solid"\][^{]*\{font-weight:700\}/.test(SHEET_ENGINE_CSS));
     ok('pupil ink (error analysis) is the one grey', /\.mq-pupil,[^{]*\.mq-pupil \*\{color:#949494!important\}/.test(SHEET_ENGINE_CSS));
-    const colours = [...SHEET_ENGINE_CSS.matchAll(/#[0-9a-fA-F]{3,6}\b/g)].map((m) => m[0].toLowerCase());
-    ok('role CSS: ink, paper and the one grey only', colours.every((c) => ['#000', '#000000', '#fff', '#ffffff', '#949494'].includes(c)), colours.join(','));
+    // INK-30 (owner ruling 2026-09-25): lesson pages may carry ONE accent colour, and only there. The
+    // engine CSS minus the lesson layer stays ink / paper / grey; the lesson layer may add the accent,
+    // and only in rules whose selector names a lesson-only element (.mq-l* / .mq-c*).
+    const { LESSON_CSS } = await import('../../js/modules/sheet/lesson-css.js');
+    const { LESSON_ACCENT } = await import('../../js/modules/sheet/tokens.js');
+    const INKSET = ['#000', '#000000', '#fff', '#ffffff', '#949494'];
+    const hexes = (css) => [...css.matchAll(/#[0-9a-fA-F]{3,6}\b/g)].map((m) => m[0].toLowerCase());
+    // The accent is DEFINED once as a custom property on the page; defining it colours nothing.
+    const DEF = /--mq-lesson-accent:\s*#[0-9a-fA-F]{3,6}/g;
+    const colours = hexes(SHEET_ENGINE_CSS.replace(LESSON_CSS, '').replace(DEF, ''));
+    ok('role CSS: ink, paper and the one grey only', colours.every((c) => INKSET.includes(c)), colours.join(','));
+    ok('lesson CSS: ink set plus the one lesson accent only', hexes(LESSON_CSS).every((c) => INKSET.includes(c) || c === LESSON_ACCENT.toLowerCase()), hexes(LESSON_CSS).join(','));
+    const accentRules = [...LESSON_CSS.matchAll(/([^{}]*)\{([^{}]*)\}/g)].filter((m) => m[2].toLowerCase().includes(LESSON_ACCENT.toLowerCase()) || /var\(--mq-lesson-accent/.test(m[2]));
+    ok('lesson accent only on lesson-only elements', accentRules.every((m) => /\.mq-[lc][a-z-]*/.test(m[1]) || /^\s*--mq-lesson-accent:[^;]*;?\s*$/.test(m[2])), accentRules.map((m) => m[1].trim()).join(' | '));
     const { dotTile } = await import('../../js/modules/sheet/roles/guided.js');
     const tile = dotTile(7);
     eq('dot tile: seven dots', (tile.match(/<circle/g) || []).length, 7);

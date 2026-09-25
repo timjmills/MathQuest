@@ -185,3 +185,91 @@ registerSkill('subtraction:nl_sub', {
         ]);
     },
 });
+
+/* ====================================================== two-digit column subtraction */
+// The sub_*_regroup / _no_regroup / _mixed ladder within 50 and 100 (PEDAGOGY_STANDARD L-3 and
+// L-5): the standard algorithm, ones first, a ten regrouped from the next place when the top
+// ones digit is smaller. Added 2026-09-25 with the first sample lessons, so a Model, a Guided
+// page and a lesson's worked example show THIS skill's steps (never "count back").
+//
+// Marks name the stack's logical slots (steps.js): `strike:tens` / `strike:ones` cross out a
+// top digit (VA-23), `regroup:tens` / `regroup:ones` write the new values in the headroom boxes
+// above them (VA-20 / VA-21), `ones` / `tens` write the answer digits.
+
+/**
+ * Column subtraction of two whole numbers below 100 (a >= b), worked place by place.
+ * @returns {{steps, diff, regroup, smallFromLarge, forgotTen}}
+ */
+export function columnSub(a, b) {
+    const ao = a % 10, at = Math.floor(a / 10);
+    const bo = b % 10, bt = Math.floor(b / 10);
+    const diff = a - b;
+    const regroup = ao < bo;
+    const steps = [];
+    if (regroup) {
+        steps.push(step(`Ones: ${ao} is less than ${bo}.`, [{ slot: 'ring:ones', value: '' }]));
+        steps.push(step(`${at} tens ${ao} ones is ${at - 1} tens ${ao + 10} ones.`, [
+            { slot: 'strike:tens', value: String(at) }, { slot: 'regroup:tens', value: String(at - 1) },
+            { slot: 'strike:ones', value: String(ao) }, { slot: 'regroup:ones', value: String(ao + 10) },
+        ]));
+        steps.push(step(`${ao + 10} − ${bo} = ${ao + 10 - bo}. Write ${ao + 10 - bo}.`, [{ slot: 'ones', value: String(ao + 10 - bo) }]));
+    } else {
+        steps.push(step(`Ones: ${ao} is not less than ${bo}.`, [{ slot: 'ring:ones', value: '' }]));
+        steps.push(step(`${ao} − ${bo} = ${ao - bo}. Write ${ao - bo}.`, [{ slot: 'ones', value: String(ao - bo) }]));
+    }
+    const topTens = regroup ? at - 1 : at;
+    const t = topTens - bt;
+    // A leading zero is never written (L-3 step 5): 53 − 48 = 5, not 05.
+    if (t > 0) steps.push(step(`${topTens} − ${bt} = ${t}. Write ${t}.`, [{ slot: 'tens', value: String(t) }]));
+    else if (topTens > 0) steps.push(step(`${topTens} − ${bt} = 0. Leave the tens empty.`));
+    steps.push(step(`Check: ${diff} + ${b} = ${a}.`));
+    // Two classic errors (PEDAGOGY misconception list): the smaller digit taken from the larger in
+    // every column, and the ones regrouped but the ten never taken from the tens.
+    const smallFromLarge = Math.abs(at - bt) * 10 + Math.abs(ao - bo);
+    const forgotTen = regroup ? (at - bt) * 10 + (ao + 10 - bo) : diff;
+    return { steps, diff, regroup, smallFromLarge, forgotTen };
+}
+
+const COLUMN_SUB_STEPS = [
+    'Look at the ones. Is the top smaller?',
+    'Yes: regroup a ten. Cross out. Write the new numbers.',
+    'Subtract the ones.',
+    'Subtract the tens.',
+    'Check: add the answer and the bottom number.',
+];
+
+for (const [id, iCan] of [
+    ['sub_50_regroup', 'I Can subtract within 50 (with regrouping)'],
+    ['sub_100_regroup', 'I Can subtract within 100 (with regrouping)'],
+    ['sub_50_no_regroup', 'I Can subtract within 50 (no regrouping)'],
+    ['sub_100_no_regroup', 'I Can subtract within 100 (no regrouping)'],
+    ['sub_50_mixed', 'I Can subtract within 50'],
+    ['sub_100_mixed', 'I Can subtract within 100'],
+]) {
+    const regroups = /_(regroup|mixed)$/.test(id);
+    registerSkill(`subtraction:${id}`, {
+        strings: strings({
+            iCan,
+            instructionKey: 'subtract',
+            steps: regroups ? COLUMN_SUB_STEPS : [COLUMN_SUB_STEPS[0], ...COLUMN_SUB_STEPS.slice(2)],
+            say: '__ minus __ equals __.',
+        }),
+        misconceptions: ['small-from-large', 'forgot-ten', 'added'],
+        workedSteps: (q) => {
+            const [a, b] = operands(q);
+            if (!Number.isInteger(a) || !Number.isInteger(b) || a < b || a >= 100) return [];
+            return columnSub(a, b).steps;
+        },
+        wrongAnswer: (q) => {
+            const [a, b] = operands(q);
+            if (!Number.isInteger(a) || !Number.isInteger(b) || a < b || a >= 100) return null;
+            const c = columnSub(a, b);
+            return chooseWrong(q, [
+                c.regroup ? { value: c.smallFromLarge, misconception: 'small-from-large', explain: 'Took the smaller ones digit from the larger one.' } : null,
+                c.regroup ? { value: c.forgotTen, misconception: 'forgot-ten', explain: 'Regrouped the ones but did not take the ten from the tens.' } : null,
+                { value: a + b, misconception: 'added', explain: 'Added instead of subtracting.' },
+            ]);
+        },
+        stories: storiesFor('-'),
+    });
+}

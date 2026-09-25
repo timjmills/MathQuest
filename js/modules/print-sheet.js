@@ -34,6 +34,8 @@ import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/ro
 import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
+import { tagLine as lessonTagLine } from './sheet/roles/lesson.js';
+import { lessonFor, skillRef } from './lessons/prereqs.js';
 import {
     normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, easeScore, ineligibleNote,
     blockPlan, sideItems, pickDistinct,
@@ -85,6 +87,9 @@ function normaliseRequest(req = {}) {
             // Cells sized to their content (layout.js dense packing); `dense: false` keeps the
             // plain 12.1 grid.
             dense: req.dense !== false && !(s && s.dense === false),
+            // A grid height the caller caps (the lesson's practice page); the page's body otherwise.
+            gridH: s && Number(s.gridH) > 0 ? Number(s.gridH) : undefined,
+            capH: !!(s && Number(s.gridH) > 0),
         }))
         .filter((s) => s.skills.length);
     return {
@@ -103,6 +108,15 @@ function normaliseRequest(req = {}) {
         // own `cover` / `mix` option (the default: every problem, clashing supports by section).
         coverage: req.coverage ? normCoverage(req.coverage) : null,
         mix: req.mix ? normMix(req.mix) : null,
+        // The lesson packet (role 'lesson'): Independent pages after the teaching sheet, and the
+        // optional Mixed practice page.
+        practicePages: req.practicePages !== undefined && req.practicePages !== null ? clampInt(req.practicePages, 0, 10, 1) : 1,
+        mixed: !!req.mixed,
+        // The look the request asked for ('auto' when none): a lesson's Mixed practice page keeps
+        // the lesson's I Can look unless the teacher chose Daily.
+        lookAsked: req.look === 'daily' || req.look === 'ican' ? req.look : 'auto',
+        // A practice page's step reminder (the lesson's anchor chart in one strip): {html, hMm}.
+        stepStrip: req.stepStrip && req.stepStrip.html && Number(req.stepStrip.hMm) > 0 ? { html: String(req.stepStrip.html), hMm: Number(req.stepStrip.hMm) } : null,
     };
 }
 
@@ -1214,6 +1228,7 @@ export async function buildSheet(req = {}) {
         }
         return firstQ.get(key);
     };
+    if (n.role === 'lesson') return buildLesson(n, metaOf);
     if (!PRACTICE_ROLES.has(n.role)) return buildRoleSheet(n, metaOf);
 
     // DN-31 / DN-34: a section of several skills is GROUPED, never silently mixed - one
@@ -1246,6 +1261,11 @@ export async function buildSheet(req = {}) {
     const header = Object.assign({}, n.header, { titleLines: n.header.title === false ? 0 : measureTitleLines(title, n.size) });
     const layoutHeader = { tab: n.header.tab === false ? false : ['Level', 'Strand', 'Id'], title: n.header.title === false ? '' : title, titleLines: header.titleLines };
     const lctx = { paper, header: layoutHeader };
+    // A lesson's step reminder strip sits above the grid on every page: the grid is that much
+    // shorter (the strip's height comes off the body, never off a cell).
+    if (n.stepStrip) {
+        for (const sec of n.sections) if (!sec.gridH) sec.gridH = Math.floor((bodyHeightMm(paper, layoutHeader) - instructionMm(n.size) - n.stepStrip.hMm) * 1000) / 1000;
+    }
 
     // S5 / S6: the worked examples of each section's skill, generated and measured BEFORE the
     // page capacity is decided, so the capacity reserves their band (sections) or their half of
@@ -1519,13 +1539,14 @@ export async function buildSheet(req = {}) {
         items: hostItems,
         skills,
         anchors: anchorsIn,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols, capH: s.capH })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
         seed: n.seed,
         labels: n.labels,
         lesson: n.lesson,
+        stepStrip: n.stepStrip ? n.stepStrip.html : '',
     };
     const plan = n.role === 'more-practice' ? morePracticePlan(input) : independentPlan(input);
     const out = renderPlan(plan, { key: n.key });
@@ -1608,7 +1629,7 @@ const SHOWS_WORK = new Set(['error-analysis', 'true-false', 'reason-it']);
 async function buildRoleSheet(n, metaOf) {
     const mod = ROLE_MODULES[n.role];
     const reqSkills = n.sections.flatMap((s) => s.skills);
-    const pools = (mod.sources(reqSkills, { earlier: earlierSkills }) || []).filter((p) => p && p.skills && p.skills.length);
+    const pools = (mod.sources(reqSkills, { earlier: earlierSkills, lesson: n.lessonInput }) || []).filter((p) => p && p.skills && p.skills.length);
     if (!pools.length) throw new Error(`buildSheet: ${n.role} has no skill to print`);
     const allSkills = [];
     const seenSkill = new Set();
@@ -1629,6 +1650,7 @@ async function buildRoleSheet(n, metaOf) {
         count: n.sections[0] && n.sections[0].count ? n.sections[0].count : undefined,
         targetSkill: metaOf(reqSkills[0]),
         floors: {},
+        lesson: n.lessonInput,
     };
 
     /**
@@ -1663,7 +1685,7 @@ async function buildRoleSheet(n, metaOf) {
                 if (!prepared) continue;
                 prepared.pool = pool.id;
                 // A role that draws Model / Guided cells measures them at their tallest level.
-                if (mod.MEASURE_LEVEL) prepared.measureLevel = mod.MEASURE_LEVEL;
+                if (mod.MEASURE_LEVEL) prepared.measureLevel = typeof mod.MEASURE_LEVEL === 'function' ? mod.MEASURE_LEVEL(pool.id) : mod.MEASURE_LEVEL;
                 prepared.section = 0;
                 out.push(prepared);
             }
@@ -1673,7 +1695,7 @@ async function buildRoleSheet(n, metaOf) {
     const measure = (items) => measureItems(items, { size: n.size, look: n.look, colsList });
 
     // 1. The probe: enough items to measure the skill (PT-ENG-9), per pool.
-    const PROBE = { 'scripted-model': 1, stretch: 2, 'word-problems': 4, 'reason-it': 4, 'fact-probe': 20 }[n.role] || 8;
+    const PROBE = mod.PROBE || { 'scripted-model': 1, stretch: 2, 'word-problems': 4, 'reason-it': 4, 'fact-probe': 20 }[n.role] || 8;
     const probe = {};
     pools.forEach((p, pi) => {
         probe[p.id] = dealPool(p, pi, PROBE);
@@ -1752,6 +1774,15 @@ async function buildRoleSheet(n, metaOf) {
         }
     }
 
+    // A role that draws blocks of its own around the skill's cells (the lesson's anchor chart
+    // panels, its vocabulary match and Steps zone) hands them over here to be measured, exactly as
+    // the cells were: `extras(input)` -> host-shaped items, measured at every column count.
+    if (typeof mod.extras === 'function') {
+        const ex = (mod.extras(input) || []).filter(Boolean);
+        if (ex.length) measureItems(ex, { size: n.size, look: n.look, colsList: [1, 2, 3, 4] });
+        input.extras = ex;
+    }
+
     const plan = mod.plan(input);
     const out = renderPlan(plan, { key: n.key });
     const fitsList = (plan.meta && plan.meta.fits) || [];
@@ -1766,6 +1797,7 @@ async function buildRoleSheet(n, metaOf) {
         fits: { cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: out.pupilPages.length, note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '), sections: fitsList },
         items: items.map((it) => ({
             skill: it.skill, section: 0, pool: it.pool, template: it.template,
+            kind: (it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind) || undefined,
             text: String((it.q && it.q.text) || ''), ans: it.q && it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy,
             thinking: it.thinking ? { isWrong: !!it.thinking.isWrong, shown: it.thinking.shown } : undefined,
         })),
@@ -1777,6 +1809,148 @@ async function buildRoleSheet(n, metaOf) {
         title: plan.meta && plan.meta.title,
         notes,
         plan,
+        extras: input.extras || [],
+    };
+}
+
+/* ======================================================================= the lesson packet */
+
+/**
+ * THE LESSON PACKET (design/LESSONS_VISION.md, roles/lesson.js): the teaching sheet - the anchor
+ * chart, then Vocabulary, Warm-up, Guided ("we do") and the first Independent rows - then
+ * `practicePages` Independent pages (each with the chart's step strip above its grid) and, when
+ * asked, a Mixed practice page with the lesson's earlier skills. Every sheet carries the lesson's
+ * tags (skill, grade, CCSS, EE from standards.js) in its teacher footer. The pupil pages print
+ * first, part by part, then the keys in the same order (PT-KEY-6).
+ */
+async function buildLesson(n, metaOf) {
+    const sk = n.sections[0].skills[0];
+    const meta = metaOf(sk);
+    const data = lessonFor(sk.categoryId, sk.skillId);
+    const warmSkills = data ? data.skills.map(skillRef) : earlierSkills(sk, 2);
+    let st = { ccss: [], ee: [], approx: false };
+    try { if (standardsMod) st = standardsMod.standardsFor(sk.categoryId, sk.skillId); } catch (e) { /* no tags */ }
+    // The lesson's tags: the PRIMARY CCSS code (an approximate mapping is no tag) and its EEs.
+    const ccss = !st.approx && st.ccss && st.ccss[0] ? [st.ccss[0].short || st.ccss[0].code] : [];
+    const ee = (st.ee || []).map((r) => r.code).slice(0, 2);
+    const tagLine = lessonTagLine({ skillId: sk.skillId, grade: meta.grade, ccss, ee });
+    const header = Object.assign({}, n.header, { footerLeft: tagLine });
+    const lessonNo = Math.max(1, Number(n.lesson) || 1);
+
+    // 1. The teaching sheet: the anchor chart, Vocabulary, Warm-up, Guided and Independent rows.
+    const teach = await buildRoleSheet(Object.assign({}, n, {
+        role: 'lesson', header, look: 'ican',
+        lessonInput: { data, warmSkills, tagLine, number: lessonNo },
+    }), metaOf);
+    const parts = [{ part: 'teach', role: 'lesson', res: teach }];
+
+    // 2. Massed practice: Independent pages with the chart's step strip.
+    const common = {
+        size: n.size, look: 'ican', paper: n.paper, key: n.key, labels: n.labels, lesson: lessonNo,
+        photocopySafe: n.photocopySafe, header,
+    };
+    if (n.practicePages > 0) {
+        const strip = (teach.extras || []).find((x) => x.lessonStrip);
+        const h = strip && strip.measured && strip.measured[1] ? strip.measured[1].hMm + 0.5 : 0;
+        const stripHtml = strip && h ? strip.render(resolveCtx({ size: n.size, look: 'ican', mode: 'print' })) : '';
+        // A rounding item ("27 -> ___") is a one-number answer on one line, like a fact.
+        const oneLine = (it) => it.template === 'fact' || (it.template === 'pv' && it.kind === 'round');
+        const facts = (teach.items || []).filter((it) => it.pool === 'main').every(oneLine);
+        // One-line items take the dense grid at the most a page holds within the 12.1 ceiling, in
+        // whole rows of three (15 at S, then 12). Taller problems (column subtraction) print six a
+        // page, three across, grown to at most 1.3 x their own height (the lesson rows' cap): a
+        // taller row is an empty band in every cell (H13), so the grid stops short instead.
+        const tries = (facts ? (n.size === 'S' ? [15, 12] : [12]) : []).map((k) => ({ per: k, dense: true })).concat([{ per: 6, dense: false, columns: 3 }]);
+        const make = async (t) => {
+            let req = Object.assign({}, common, {
+                role: 'independent', sections: [{ skills: [sk], count: t.per * n.practicePages, dense: t.dense, columns: t.columns }], seed: (n.seed + 7919) >>> 0,
+            });
+            let res = await buildSheet(req);
+            const f0 = res && res.fits && res.fits.sections && res.fits.sections[0];
+            if (!t.dense && f0 && f0.hMin > 0 && f0.rows > 0 && f0.cellH > f0.hMin * 1.3) {
+                const gridH = Math.floor(f0.rows * f0.hMin * 1.3 * 1000) / 1000;
+                req = Object.assign({}, req, { sections: [Object.assign({}, req.sections[0], { gridH, columns: f0.cols })] });
+                res = await buildSheet(req);
+            }
+            return { req, res };
+        };
+        // The strip goes on only where it fits without crowding the page (owner, 2026-09-25): the
+        // page with the strip keeps the columns, the page count and the items a page of it holds.
+        // A strip that would turn three columns into two wide, half-empty ones is left off.
+        const withStrip = async (t, base) => {
+            const cols = (base.res.fits && base.res.fits.cols) || 'auto';
+            const cap = Math.min((base.res.fits && base.res.fits.perPage) || 0, t.per);
+            let out = null;
+            try {
+                out = await buildSheet(Object.assign({}, base.req, {
+                    sections: [Object.assign({}, base.req.sections[0], { columns: cols })], stepStrip: { html: stripHtml, hMm: h },
+                }));
+            } catch (e) { out = null; }
+            return out && out.fits && out.fits.cols === cols && (out.fits.perPage || 0) >= cap && out.pageCount <= base.res.pageCount ? out : null;
+        };
+        // A page with the step strip beats a fuller page without it (the strip is how the practice
+        // page points back to the anchor chart); a count that spills past the pages asked for
+        // steps down.
+        let res = null;
+        let plain = null;
+        for (const t of tries) {
+            const base = await make(t);
+            if (!plain || plain.pageCount > n.practicePages) plain = base.res;
+            if (base.res.pageCount > n.practicePages) continue;
+            const striped = stripHtml ? await withStrip(t, base) : null;
+            if (striped) { res = striped; break; }
+            if (!stripHtml) { res = base.res; break; }
+        }
+        if (!res) res = plain;
+        parts.push({ part: 'practice', role: 'independent', res, strip: /data-mq-lesson-strip/.test(res.pupilHtml) });
+    }
+
+    // 3. Mixed practice (optional): the lesson skill with the earlier skills the lesson names.
+    if (n.mixed) {
+        const withSkills = data && data.mixWith ? data.mixWith.map(skillRef) : earlierSkills(sk, 2);
+        const res = await buildSheet(Object.assign({}, common, {
+            // The lesson's own look (I Can) unless the teacher chose Daily for the packet.
+            role: 'mixed-practice', look: n.lookAsked === 'daily' ? 'daily' : 'ican', sections: [{ skills: [sk, ...withSkills] }],
+            seed: (n.seed + 15838) >>> 0,
+        }));
+        parts.push({ part: 'mixed', role: 'mixed-practice', res });
+    }
+
+    // Each part is a sheet of its own (its own header, Score and page count), and the anchor chart
+    // is a sheet apart from the lesson pages: `data-ws-sheet` says so on every page, so a page is
+    // only ever compared with the pages of its own sheet.
+    const tagSheets = (html, first, rest) => {
+        let k = 0;
+        return String(html || '').replace(/<section class="ws-page/g, (m) => `<section data-ws-sheet="${k++ === 0 ? first : rest}" class="ws-page`);
+    };
+    const sheetIds = (p) => (p.part === 'teach' ? ['lesson-chart', 'lesson-sheet'] : [`lesson-${p.part}`, `lesson-${p.part}`]);
+    const pupilHtml = parts.map((p) => tagSheets(p.res.pupilHtml, ...sheetIds(p))).join('\n');
+    const keyHtml = n.key ? parts.map((p) => tagSheets(p.res.keyHtml || '', ...sheetIds(p))).join('\n') : '';
+    const pageCount = parts.reduce((a, p) => a + (p.res.pageCount || 0), 0);
+    const keyPageCount = n.key ? parts.reduce((a, p) => a + (p.res.keyPageCount || 0), 0) : 0;
+    const notes = [...new Set(parts.flatMap((p) => p.res.notes || []))];
+    const line = parts.map((p) => `${p.part === 'teach' ? 'Lesson' : p.part === 'practice' ? 'Practice' : 'Mixed'}: ${p.res.pageCount} page${p.res.pageCount === 1 ? '' : 's'}`).join(' · ');
+    return {
+        pupilHtml, keyHtml, pageCount, keyPageCount,
+        fits: { cols: teach.fits.cols, rows: teach.fits.rows, pages: pageCount, note: [`${line}.`, teach.fits.note].filter(Boolean).join(' '), sections: teach.fits.sections },
+        items: parts.flatMap((p) => (p.res.items || []).map((it) => Object.assign({ part: p.part }, it))),
+        gaps: parts.flatMap((p) => p.res.gaps || []),
+        anchors: teach.anchors,
+        floors: teach.floors,
+        seed: n.seed,
+        role: 'lesson',
+        title: teach.title,
+        notes,
+        plan: teach.plan,
+        lesson: {
+            skill: `${sk.categoryId}:${sk.skillId}`, tags: { ccss, ee, line: tagLine },
+            prerequisites: data
+                ? { skills: data.skills.map((s) => s.key), concepts: data.concepts.map((c) => c.text), vocab: data.vocab.map((v) => v.word) }
+                : { skills: warmSkills.map((s) => `${s.categoryId}:${s.skillId}`), concepts: [], vocab: [] },
+            steps: data ? data.steps.map((s) => s.text) : [], chant: data ? data.chant : '', format: data ? data.format : null,
+            parts: parts.map((p) => ({ part: p.part, role: p.role, pages: p.res.pageCount, keyPages: p.res.keyPageCount, strip: p.strip })),
+            example: teach.plan && teach.plan.meta ? teach.plan.meta.example : '',
+        },
     };
 }
 

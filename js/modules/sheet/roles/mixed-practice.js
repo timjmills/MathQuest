@@ -33,7 +33,8 @@ export const DEFAULT_LOOK = 'daily';
 const AUTO_N = { ican: { S: 10, M: 8, L: 6 }, daily: { S: 8, M: 6, L: 4 } };
 
 export const sources = (skills) => skills.map((s, i) => ({ id: `s${i}`, skills: [s], weight: Number(s.weight) > 0 ? Number(s.weight) : 1 }));
-export const measureCols = () => [1, 2, 3, 4, 6];
+// 5: a shelf of an I Can page at S (N = 10) holds 5 cells, so they are measured at 5 too.
+export const measureCols = () => [1, 2, 3, 4, 5, 6];
 
 const divisorsDesc = (n) => Array.from({ length: n }, (_, i) => n - i).filter((d) => n % d === 0);
 

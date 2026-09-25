@@ -235,6 +235,7 @@ Line 5 (15 pt 400):  I Can add two-digit numbers.   Level K 1 2 3 4 5 6
 - **INK-5** Solid black fill is allowed only where the smaller dimension of the filled shape is 7 mm or less: number tabs, Day tabs, counters, clock pivot, arrow tips, colon dots, anchor dots, plotted points, bars up to 7 mm wide.
 - **INK-6** No cue depends on color or on grey alone. Two sets are told apart by solid against hollow (LS-5), hands by length and weight, series by fill against outline.
 - **INK-7** No emoji or pictographic Unicode code point appears in sheet DOM or SVG text. Pictures are in-house line art (RP-20).
+- **INK-30** *Lesson pages only* (owner ruling 2026-09-25): one accent colour beside black, the purple token `LESSON_ACCENT` `#5B2A86` (CSS `--mq-lesson-accent`; 9.9 : 1 on white, greyscale 67 of 255, so a black-and-white copy keeps it dark and apart from the trace grey). It colours only what teaches a step: the step numerals, their outlined circles and the step icons of a lesson's anchor chart, Guided steps and practice-page step strip. Every accent element carries a second cue (the circle and numeral, the icon's shape), so nothing depends on colour (INK-6). Worksheet cells, answers and every other page stay black, white and one grey; `ws-print-lint` allows the colour only inside a `[data-mq-accent]` element on a lesson page (`.mq-lesson` or the `[data-mq-lesson-strip]` strip).
 
 ### 4.2 Line weights
 

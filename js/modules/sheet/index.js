@@ -12,7 +12,7 @@
 
 /* -------------------------------------------------------------------------- tokens */
 export {
-    INK, STROKE, STROKE_WIDTHS, DASH, HATCH,
+    INK, LESSON_ACCENT, STROKE, STROKE_WIDTHS, DASH, HATCH,
     PAPER, DEFAULT_PAPER, PAGE_CHROME,
     SIZES, SIZE_IDS, DEFAULT_SIZE,
     LOOKS, LOOK_IDS, DEFAULT_LOOK,

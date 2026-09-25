@@ -34,7 +34,7 @@ import { getProvider } from './sheet/index.js';
 // The page types buildSheet composes (print-sheet.js SHEET_ROLES). Anything else is listed,
 // disabled, as "coming soon".
 const WORKING = new Set([
-    'opener', 'scripted-model', 'guided', 'independent', 'more-practice', 'error-analysis', 'review', 'test', 'test-b',
+    'lesson', 'opener', 'scripted-model', 'guided', 'independent', 'more-practice', 'error-analysis', 'review', 'test', 'test-b',
     'pre-skill-check', 'word-problems', 'fact-rows', 'fact-probe', 'mixed-practice', 'true-false', 'reason-it', 'stretch',
 ]);
 // The picker: every working role as a picture card, in quiet groups. [role, name, one line]
@@ -46,6 +46,7 @@ const PAGE_GROUPS = [
         ['word-problems', 'Word problems', 'Stories with room to work.'],
     ]],
     ['Teach', [
+        ['lesson', 'Lesson', 'Anchor chart, warm-up, we do, then practice.'],
         ['opener', 'Lesson opener', 'A warm-up to start the lesson.'],
         ['scripted-model', 'Scripted model', 'Worked examples and what to say.'],
         ['guided', 'Guided', 'Help that fades item by item.'],
@@ -68,7 +69,7 @@ const PAGE_GROUPS = [
     ]],
 ].map(([g, list]) => [g, list.filter(([v]) => WORKING.has(v))]).filter(([, list]) => list.length);
 const PAGE_TYPES = [
-    ['Lesson', [['lesson-packet', 'Lesson packet'], ['opener', 'Lesson opener'], ['scripted-model', 'Scripted model'], ['guided', 'Guided'], ['independent', 'Independent'], ['more-practice', 'More Practice'], ['error-analysis', 'Error analysis (Check it)'], ['review', 'Review'], ['test', 'Test A'], ['test-b', 'Test B'], ['pre-skill-check', 'Pre-skill check']]],
+    ['Lesson', [['lesson', 'Lesson'], ['lesson-packet', 'Lesson packet'], ['opener', 'Lesson opener'], ['scripted-model', 'Scripted model'], ['guided', 'Guided'], ['independent', 'Independent'], ['more-practice', 'More Practice'], ['error-analysis', 'Error analysis (Check it)'], ['review', 'Review'], ['test', 'Test A'], ['test-b', 'Test B'], ['pre-skill-check', 'Pre-skill check']]],
     ['Practice', [['computation', 'Computation grid'], ['word-problems', 'Word problems'], ['visual-grid', 'Visual grid']]],
     ['Facts', [['fact-rows', 'Fact rows'], ['fact-probe', 'Fact probe']]],
     ['Mixed review', [['mixed-practice', 'Mixed practice'], ['daily4', 'Daily 4'], ['spiral', 'Daily spiral'], ['todays-number', "Today's Number"]]],
@@ -84,7 +85,7 @@ let buildTimer = null;
 let last = null;     // {sections:[{pupilHtml,keyHtml,pageCount,keyPageCount,fits,role,letters}], pupilHtml, keyHtml, pages:[labels], keyPages}
 
 function newSection(skills = []) {
-    return { role: 'more-practice', columns: 'auto', letters: ['A', 'B'], pages: 1, skills, optionsOpen: '', picking: false, menu: '', types: false };
+    return { role: 'more-practice', columns: 'auto', letters: ['A', 'B'], pages: 1, mixed: false, skills, optionsOpen: '', picking: false, menu: '', types: false };
 }
 
 function initState() {
@@ -319,6 +320,7 @@ function onChange(e) {
     if (d.role !== undefined) { sec(d.role).role = t.value; renderWhat(); scheduleBuild(); }
     else if (d.cols !== undefined) { sec(d.cols).columns = t.value === 'auto' ? 'auto' : Number(t.value); scheduleBuild(); }
     else if (d.pages !== undefined) { sec(d.pages).pages = Number(t.value); scheduleBuild(); }
+    else if (d.mixed !== undefined) { sec(d.mixed).mixed = !!t.checked; scheduleBuild(); }
     else if (d.classic !== undefined) { pr.classic[d.classic] = Number(t.value); }
 }
 
@@ -331,7 +333,7 @@ function renderWhat() {
 
 function sectionHTML(s, i) {
     const name = `Section ${String.fromCharCode(65 + i)}`;
-    const sub = `${ROLE_NAME[s.role] || ''}${s.role === 'more-practice' ? ` · ${s.letters.length} page${s.letters.length === 1 ? '' : 's'}` : s.role === 'independent' ? ` · ${s.pages} page${s.pages === 1 ? '' : 's'}` : ''}`;
+    const sub = `${ROLE_NAME[s.role] || ''}${s.role === 'more-practice' ? ` · ${s.letters.length} page${s.letters.length === 1 ? '' : 's'}` : s.role === 'independent' ? ` · ${s.pages} page${s.pages === 1 ? '' : 's'}` : s.role === 'lesson' ? ` · ${s.pages} practice page${s.pages === 1 ? '' : 's'}${s.mixed ? ' + mixed' : ''}` : ''}`;
     const bad = s.unsupported && s.unsupported.role === s.role ? s.unsupported.why : '';
     const chosen = PAGE_GROUPS.flatMap(([, list]) => list).find(([v]) => v === s.role) || [s.role, ROLE_NAME[s.role] || s.role, ''];
     const typeCards = PAGE_GROUPS.map(([g, list]) => `<div class="tv-ptype-group" role="group" aria-label="${g}"><span class="tv-ptype-h">${g}</span><div class="tv-ptypes">${list.map(([v, l, text]) => {
@@ -347,6 +349,14 @@ function sectionHTML(s, i) {
     <span class="tv-label" id="tvLetters${i}">Practice pages</span>
     <div class="tv-chips tv-letters" role="group" aria-labelledby="tvLetters${i}">${LETTERS.map((L) => `<button type="button" class="tv-chip tv-chip-sm" data-act="letter" data-sec="${i}" data-letter="${L}" aria-pressed="${s.letters.includes(L)}" aria-label="Practice ${L}">${L}</button>`).join('')}</div>
     <p class="tv-cap" style="margin-top:6px;">One page per letter, each with its own numbers.</p>
+  </div>` : s.role === 'lesson' ? `
+  <div>
+    <label class="tv-label" for="tvPages${i}">Practice pages</label>
+    <select id="tvPages${i}" class="tv-select" data-pages="${i}">${[0, 1, 2, 3, 4, 5].map((n) => `<option value="${n}"${s.pages === n ? ' selected' : ''}>${n}</option>`).join('')}</select>
+  </div>
+  <div>
+    <label class="tv-label" for="tvMixed${i}"><input type="checkbox" id="tvMixed${i}" data-mixed="${i}"${s.mixed ? ' checked' : ''}> Mixed practice page</label>
+    <p class="tv-cap" style="margin-top:6px;">The anchor chart, warm-up and we do come first; practice pages follow.</p>
   </div>` : s.role !== 'independent' ? '' : `
   <div>
     <label class="tv-label" for="tvPages${i}">Pages</label>
@@ -424,6 +434,7 @@ function pageThumb(role) {
         case 'more-practice': body = `${tag('A', 4, 3)}${grid(4, 12, 26, 28, 2, 2)}`; break;
         case 'mixed-practice': body = `${grid(4, 11, 26, 12, 3, 1)}${line(4, 26, 30, 26, .6)}${grid(4, 28, 26, 12, 2, 1)}`; break;
         case 'word-problems': body = `${txt(12, 3)}${box(4, 21, 26, 6)}${txt(30, 3)}${box(4, 38, 26, 3)}`; break;
+        case 'lesson': body = `${grid(4, 11, 26, 12, 2, 1)}${line(4, 26, 30, 26, .6)}${grid(4, 28, 26, 12, 3, 1)}<circle cx="7" cy="14" r="1.6" fill="none" stroke="currentColor" stroke-width=".8"/>`; break;
         case 'opener': body = `${box(4, 11, 26, 12)}<text x="17" y="20" text-anchor="middle" font-size="7" font-weight="700" font-family="system-ui,sans-serif" fill="currentColor">?</text>${grid(4, 27, 26, 13, 2, 1)}`; break;
         case 'scripted-model': body = [11, 27].map((y) => `${box(4, y, 12, 12)}${line(18, y + 2, 30, y + 2, .8)}${line(18, y + 5, 30, y + 5, .8)}${line(18, y + 8, 26, y + 8, .8)}`).join(''); break;
         case 'guided': body = `${grid(4, 11, 26, 29, 2, 2)}<path d="M7 16h7M7 19h5" stroke="currentColor" stroke-width=".8" stroke-dasharray="1.2 1"/><path d="M20 16h7" stroke="currentColor" stroke-width=".8" stroke-dasharray="1.2 1.6"/>`; break;
@@ -696,8 +707,11 @@ function requestFor(s, i) {
     const h = pr.header;
     return {
         role: s.role,
-        sections: [{ skills, columns: s.columns, pages: s.role === 'independent' ? s.pages : undefined }],
+        // A lesson is one skill: the first skill of the section (roles/lesson.js).
+        sections: [{ skills: s.role === 'lesson' ? skills.slice(0, 1) : skills, columns: s.columns, pages: s.role === 'independent' ? s.pages : undefined }],
         letters: s.role === 'more-practice' ? s.letters.slice() : undefined,
+        practicePages: s.role === 'lesson' ? s.pages : undefined,
+        mixed: s.role === 'lesson' ? !!s.mixed : undefined,
         size: pr.size,
         // 'auto' lets each page type take its own default look (Daily on the fact layouts).
         look: pr.look === 'daily' || pr.look === 'ican' ? pr.look : 'auto',
