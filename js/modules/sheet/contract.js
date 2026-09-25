@@ -127,6 +127,11 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     // Build lane k2 (2026-09-25, design/BUILD_LIST.md): the new K-1 picture skills.
     'count-zero': 'Count. Write how many. None is 0.',
     'check-none': 'Check the one with none.',
+    'check-odd': 'Check the one that does not belong.',
+    'check-why': 'Why does the circled one not belong? Check one box.',
+    'check-same': 'Check the one that is the same.',
+    'check-shadow': 'Check the picture that fits the shadow.',
+    'check-same-kind': 'Check the one that is the same kind.',
     'check-bigger': 'Check the bigger one.',
     'check-smaller': 'Check the smaller one.',
     'check-biggest': 'Check the biggest one.',

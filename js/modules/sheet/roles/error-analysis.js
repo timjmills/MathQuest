@@ -52,7 +52,9 @@ const PUPILS = ['Sam', 'Ana', 'Leo', 'Mia', 'Omar', 'Zara'];
 /** Templates whose answer IS a drawing: the fix is to draw it again. */
 const DRAWN = new Set(['base10', 'tenframe']);
 /** Templates whose answer is a choice among the item's own labels. */
-const CHOICE = new Set(['compare']);
+// build lane k2 (2026-09-25): a picture row / a zero plate row whose payload carries `labels`
+// (A, B, C or its word bank) is fixed by checking a box too; an item without labels falls through.
+const CHOICE = new Set(['compare', 'picture-row', 'counters']);
 /** Templates that draw one fix box beside each line of the work (a fact family's four facts;
  *  a function table's rows, its rule and its Check row). */
 const LINED = new Set(['fact-family', 'function-table']);

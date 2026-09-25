@@ -3061,6 +3061,47 @@ const K2_LANE_OPTIONS = {
             help: 'What is drawn. One kind in each item, at two or three sizes.',
         },
     ],
+    'comparing:odd_one_out': [
+        {
+            id: 'task', label: 'Task', type: 'enum', default: 'find', group: 'difficulty',
+            values: [{ v: 'find', l: 'Find the one that does not belong (default)' }, { v: 'rule', l: 'Say why: the odd one is circled, check the reason' }],
+            help: 'One task for the whole page. "Say why" names the rule: a different kind or a different size.',
+        },
+        {
+            id: 'attr', label: 'What is different', type: 'enum', default: 'kind', group: 'difficulty',
+            values: [{ v: 'kind', l: 'The kind of thing (default)' }, { v: 'size', l: 'The size (all the same kind)' }, { v: 'mixed', l: 'Kind or size, mixed on the page' }],
+            help: 'Kind first (three apples and a ball), then size (three small balls and a big one), then both on one page.',
+        },
+        {
+            id: 'tiles', label: 'How many pictures', type: 'enum', default: 4, group: 'difficulty',
+            values: [{ v: 3, l: 'Three' }, { v: 4, l: 'Four (default)' }],
+            help: 'Three pictures (two alike) is easier to hold in mind than four.',
+        },
+        { ...levelSubset([2, 1], 1, 'Level 2 prints "Look at the kind." or "Look at the size." under the row; level 1 leaves the pupil to find what is different. (Find the one only: on "Say why" the cue would be the answer.)'),
+            appliesTo: (o) => o.task !== 'rule' },
+        {
+            id: 'objects', label: 'Objects', type: 'enum', default: 'pictures', group: 'layout',
+            values: [{ v: 'pictures', l: 'Pictures (ball, apple, car, house ...) (default)' }, { v: 'shapes', l: 'Plain shapes (circle, square, triangle ...)' }],
+            help: 'What is drawn. With shapes, a different kind is a different shape.',
+        },
+    ],
+    'counting:match_same': [
+        {
+            id: 'match', label: 'What matches', type: 'enum', default: 'same', group: 'difficulty',
+            values: [{ v: 'same', l: 'The same picture (default)' }, { v: 'shadow', l: 'The picture that fits a shadow' }, { v: 'kind', l: 'The same kind, another size' }],
+            help: 'One for the whole page: the identical picture first, then a picture to its grey shadow, then the same kind drawn smaller.',
+        },
+        {
+            id: 'tiles', label: 'How many to choose from', type: 'enum', default: 3, group: 'difficulty',
+            values: [{ v: 2, l: 'Two' }, { v: 3, l: 'Three (default)' }, { v: 4, l: 'Four' }],
+            help: 'More pictures beside the box is harder: more to look at before finding the match.',
+        },
+        {
+            id: 'objects', label: 'Objects', type: 'enum', default: 'pictures', group: 'layout',
+            values: [{ v: 'pictures', l: 'Pictures (ball, apple, car, house ...) (default)' }, { v: 'shapes', l: 'Plain shapes (circle, square, triangle ...)' }],
+            help: 'What is drawn in the box and in the row.',
+        },
+    ],
 };
 for (const [key, defs] of Object.entries(K2_LANE_OPTIONS)) SKILL_OPTIONS[key] = defs;
 // ============================ end build lane k2 ============================

@@ -1270,6 +1270,11 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `count-tens` | Write how many tens. | count rods or full ten frames as tens (added 2026-09-25) |
 | `count-zero` | Count. Write how many. None is 0. | count objects on a plate, an empty one included: zero means none (build lane k2, 2026-09-25) |
 | `check-none` | Check the one with none. | find the empty plate, box or frame among three (build lane k2) |
+| `check-odd` | Check the one that does not belong. | find the odd one out of a row of pictures (build lane k2) |
+| `check-why` | Why does the circled one not belong? Check one box. | name the rule the odd one breaks: a different kind or size (build lane k2) |
+| `check-same` | Check the one that is the same. | match a picture to the same picture (build lane k2) |
+| `check-shadow` | Check the picture that fits the shadow. | match a picture to its grey shadow (build lane k2) |
+| `check-same-kind` | Check the one that is the same kind. | match the same kind of thing at another size (build lane k2) |
 | `check-bigger` | Check the bigger one. | compare the size of two pictures (build lane k2) |
 | `check-smaller` | Check the smaller one. | compare the size of two pictures (build lane k2) |
 | `check-biggest` | Check the biggest one. | compare the size of three pictures (build lane k2) |

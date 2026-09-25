@@ -1357,6 +1357,8 @@ function _k2LaneSkill(q, id, rng) {
     switch (id) {
         case 'zero_none': return _k2Zero(q, rng);
         case 'compare_size': return _k2CompareSize(q, rng);
+        case 'odd_one_out': return _k2OddOneOut(q, rng);
+        case 'match_same': return _k2MatchSame(q, rng);
         default: return false;
     }
 }
@@ -1401,7 +1403,7 @@ function _k2Zero(q, rng) {
         q.distractorTags = { [['A', 'B', 'C'][fewest]]: 'chose the one with the fewest, not none' };
         q._variant = 'find';
         q.printFormat = 'k2-find';
-        _kSetCell(q, 'counters', { kind: 'zero', task: 'find', objects: holder, shape, counts, correct: at, ans: letter });
+        _kSetCell(q, 'counters', { kind: 'zero', task: 'find', objects: holder, shape, counts, correct: at, ans: letter, labels: ['A', 'B', 'C'] });
         return true;
     }
     if (task === 'compute') {
@@ -1509,6 +1511,120 @@ function _k2CompareSize(q, rng) {
     q.distractorTags = { [K2_LETTERS[at.indexOf(dir === 'more' ? 0 : count - 1)]]: `chose the ${dir === 'more' ? 'smaller' : 'bigger'} one` };
     q._variant = word;
     q.printFormat = `k2-${word}`;
-    _kSetCell(q, 'picture-row', Object.assign(payload, { correct }));
+    _kSetCell(q, 'picture-row', Object.assign(payload, { correct, labels: K2_LETTERS.slice(0, count) }));
+    return true;
+}
+
+/** Two different entries of a pool, dealt (the pair changes item to item). */
+function _k2Two(pool) {
+    const a = _kDealShuffled(pool.length);
+    let b = rngPick(pool.length - 1);
+    if (b >= a) b += 1;
+    return [pool[a], pool[b]];
+}
+function rngPick(n) { return Math.floor(Math.random() * n); }
+
+/**
+ * WHICH ONE DOES NOT BELONG? (R.B1.S3: identify a set). A row of three or four line drawings, all
+ * alike in one attribute but one.
+ *   find  Check the one that does not belong (its place dealt round the row, never "always the last").
+ *   why   The odd one is ringed: check the reason, "A different kind" or "A different size".
+ * Options: What is different (attr: kind / size / mixed), How many pictures (3 / 4), Support level
+ * 2 (a cue under the row: "Look at the kind." / "Look at the size.") / 1, Objects pictures / shapes.
+ */
+function _k2OddOneOut(q, rng) {
+    const n = Number(_kOpt('tiles')) === 3 ? 3 : 4;
+    const task = _kOpt('task') === 'rule' ? 'why' : 'find';
+    const attrOpt = ['kind', 'size', 'mixed'].includes(_kOpt('attr')) ? _kOpt('attr') : 'kind';
+    const attr = attrOpt === 'mixed' ? (_kDeal(2) === 0 ? 'kind' : 'size') : attrOpt;
+    const pool = _kOpt('objects') === 'shapes' ? K2_ROW_SHAPES : K2_ROW_PICTURES;
+    const at = _kDealShuffled(n);
+    let row;
+    if (attr === 'kind') {
+        const [same, odd] = _k2Two(pool);
+        row = Array.from({ length: n }, (_, i) => ({ shape: i === at ? odd : same, s: 0.9 }));
+    } else {
+        const shape = pool[_kDealShuffled(pool.length)];
+        const oddBig = rng(0, 1) === 1;
+        row = Array.from({ length: n }, (_, i) => ({ shape, s: (i === at) === oddBig ? 1 : 0.52 }));
+    }
+    const lvl = _kLevel(1);
+    q.options = [];
+    q.selfAnswering = true;
+    q.skillLabel = 'Which One Does Not Belong?';
+    q.supportLevel = lvl;
+    q.oddAttr = attr;
+    if (task === 'why') {
+        const words = [{ label: 'A different kind' }, { label: 'A different size' }];
+        const correct = attr === 'kind' ? 0 : 1;
+        const label = words[correct].label;
+        q.text = 'The circled one does not belong. Why?';
+        q.printText = 'Why does the circled one not belong? Check one box.';
+        q.ans = label;
+        q.printAnswer = label;
+        q.acceptedAnswers = [label, label.toLowerCase(), attr];
+        q.answerType = 'text';
+        q.hint = `Look at the others. Are they all the same ${attr === 'kind' ? 'kind of thing' : 'size'}?`;
+        q.distractorTags = { [words[1 - correct].label]: 'picked a reason that does not fit' };
+        q._variant = 'why';
+        q.printFormat = 'k2-why';
+        // no cue here: "Look at the size." would BE the answer (RP-1)
+        _kSetCell(q, 'picture-row', { kind: 'words', row, ring: at, words, correct, pic: 20, labels: words.map((w) => w.label) });
+        return true;
+    }
+    const letter = K2_LETTERS[at];
+    q.text = 'Which one does not belong?';
+    q.printText = 'Check the one that does not belong.';
+    q.ans = letter;
+    q.printAnswer = letter;
+    q.acceptedAnswers = [letter, letter.toLowerCase()];
+    q.answerType = 'text';
+    q.hint = attr === 'kind' ? 'Three are the same kind of thing. Find the one that is not.' : 'Three are the same size. Find the one that is not.';
+    q.distractorTags = { [K2_LETTERS[at === n - 1 ? 0 : n - 1]]: 'chose by place, not by looking' };
+    q._variant = 'find';
+    q.printFormat = 'k2-find';
+    _kSetCell(q, 'picture-row', { kind: 'pick', choices: row, correct: at, labels: K2_LETTERS.slice(0, n), pic: n === 4 ? 15.5 : 19, gap: n === 4 ? 5 : 6, cue: lvl >= 2 ? attr : null });
+    return true;
+}
+
+/**
+ * MATCH THE SAME (R.B1.S1-S2: match objects and pictures). A target in a key box at the left and a
+ * row of 2-4 pictures; exactly one matches.
+ *   same    the identical picture (the others are other kinds)
+ *   shadow  the target is a grey SILHOUETTE: check the picture that fits the shadow
+ *   kind    the same kind drawn at another size (the others are other kinds at the target's size)
+ * Options: Task, How many to choose from (2 / 3 / 4), Objects pictures / shapes.
+ */
+function _k2MatchSame(q, rng) {
+    const n = [2, 3, 4].includes(Number(_kOpt('tiles'))) ? Number(_kOpt('tiles')) : 3;
+    const task = ['same', 'shadow', 'kind'].includes(_kOpt('match')) ? _kOpt('match') : 'same';
+    const pool = _kOpt('objects') === 'shapes' ? K2_ROW_SHAPES : K2_ROW_PICTURES;
+    const target = pool[_kDealShuffled(pool.length)];
+    const others = shuffle(pool.filter((s) => s !== target)).slice(0, n - 1);
+    const at = _kDealShuffled(n);
+    const choices = [];
+    let k = 0;
+    for (let i = 0; i < n; i++) {
+        if (i === at) choices.push({ shape: target, s: task === 'kind' ? 0.58 : 0.9 });
+        else choices.push({ shape: others[k++], s: 0.9 });
+    }
+    const letter = K2_LETTERS[at];
+    const one = K2_SHAPES[target] ? K2_SHAPES[target].one : 'picture';
+    q.options = [];
+    q.selfAnswering = true;
+    q.skillLabel = 'Match the Same';
+    q.text = task === 'shadow' ? 'Which picture fits the shadow?' : task === 'kind' ? `Which one is a ${one} too?` : 'Which one is the same?';
+    q.printText = task === 'shadow' ? 'Check the picture that fits the shadow.' : task === 'kind' ? 'Check the one that is the same kind.' : 'Check the one that is the same.';
+    q.ans = letter;
+    q.printAnswer = letter;
+    q.acceptedAnswers = [letter, letter.toLowerCase()];
+    q.answerType = 'text';
+    q.hint = task === 'shadow' ? 'Look at the outline of the shadow. Find the picture with the same outline.'
+        : task === 'kind' ? `Find the other ${one}. It can be big or small.` : 'Look at the picture in the box. Find the one just like it.';
+    q.distractorTags = { [K2_LETTERS[at === 0 ? 1 : 0]]: 'matched a different picture' };
+    q._variant = task;
+    q.printFormat = `k2-${task}`;
+    _kSetCell(q, 'picture-row', { kind: 'pick', target: { shape: target, s: 0.9, sil: task === 'shadow' }, choices, correct: at, labels: K2_LETTERS.slice(0, n),
+        pic: n === 4 ? 12 : n === 3 ? 14 : 17, gap: 4 });
     return true;
 }

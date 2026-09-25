@@ -624,9 +624,31 @@ const K2_LANE_MAKERS = {
         return { ans: letter, printAnswer: letter, answerType: 'text', text: `Which ball is ${form}?`, _variant: form,
             cell: cellOf('picture-row', { kind: 'pick', choices, correct }) };
     },
+    'comparing:odd_one_out': (r, i) => {
+        const n = i % 3 === 2 ? 3 : 4; const at = int(r, 0, n - 1); const attr = i % 2 ? 'size' : 'kind';
+        const row = Array.from({ length: n }, (_, k) => (attr === 'kind' ? { shape: k === at ? 'ball' : 'apple', s: 0.9 } : { shape: 'fish', s: k === at ? 1 : 0.52 }));
+        if (i % 4 === 3) {
+            const words = [{ label: 'A different kind' }, { label: 'A different size' }]; const correct = attr === 'kind' ? 0 : 1;
+            return { ans: words[correct].label, printAnswer: words[correct].label, answerType: 'text', text: 'The circled one does not belong. Why?', _variant: 'why', oddAttr: attr,
+                cell: cellOf('picture-row', { kind: 'words', row, ring: at, words, correct }) };
+        }
+        const letter = 'ABCD'[at];
+        return { ans: letter, printAnswer: letter, answerType: 'text', text: 'Which one does not belong?', _variant: 'find', oddAttr: attr,
+            cell: cellOf('picture-row', { kind: 'pick', choices: row, correct: at }) };
+    },
+    'counting:match_same': (r, i) => {
+        const t = ['same', 'shadow', 'kind'][i % 3]; const n = [2, 3, 4][i % 3]; const at = int(r, 0, n - 1);
+        const others = ['ball', 'car', 'tree', 'hat'].filter((s) => s !== 'apple');
+        const choices = Array.from({ length: n }, (_, k) => (k === at ? { shape: 'apple', s: t === 'kind' ? 0.58 : 0.9 } : { shape: others[k], s: 0.9 }));
+        const letter = 'ABCD'[at];
+        return { ans: letter, printAnswer: letter, answerType: 'text', text: 'Which one is the same?', _variant: t,
+            cell: cellOf('picture-row', { kind: 'pick', target: { shape: 'apple', s: 0.9, sil: t === 'shadow' }, choices, correct: at }) };
+    },
 };
 Object.assign(REQUIRED, {
     'counting:zero_none': /none/i,
+    'counting:match_same': /same|outline/i,
+    'comparing:odd_one_out': /not like|not belong|reason/i,
     'comparing:compare_size': /room|smallest/i,
 });
 for (const [key, mk] of Object.entries(K2_LANE_MAKERS)) { let k = 0; ITEM_MAKERS[key] = (r) => mk(r, k++); checkSkill(key); }

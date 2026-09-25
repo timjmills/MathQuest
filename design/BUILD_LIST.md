@@ -16,14 +16,14 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 
 ## Summary
 
-- 220 entries: **130 new skills, 88 new options, 2 repairs**.
-- 160 from the White Rose audit (41 extended for standards), 60 from the standards audit.
+- 218 entries: **128 new skills, 88 new options, 2 repairs**.
+- 158 from the White Rose audit (41 extended for standards), 60 from the standards audit.
 - They close 114 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
 - 14 new sheet-kit templates are needed; each is owned by one lane.
 
 | Lane | Entries | New skills | Options | Repairs | Standards closed | WRM steps closed |
 |---|---|---|---|---|---|---|
-| Counting and early number (K-1 pictures) (`k2`) | 21 | 14 | 7 | 0 | 20 | 32 |
+| Counting and early number (K-1 pictures) (`k2`) | 19 | 12 | 7 | 0 | 20 | 29 |
 | Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 29 | 18 | 10 | 1 | 21 | 50 |
 | Place value, rounding and estimation (the pv kit) (`placevalue`) | 12 | 4 | 8 | 0 | 9 | 36 |
 | Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 24 | 14 | 10 | 0 | 19 | 20 |
@@ -68,7 +68,7 @@ positions are share codes, so nothing is spliced and the integrator fixes the fi
 | Template | Owner lane | What | Used by |
 |---|---|---|---|
 | `bar-model` | `operations` | part-whole and comparison bars (tape diagrams), fraction bars of an amount, with labelled parts and one blank | 15 entries |
-| `picture-row` | `k2` | a row or small grid of line-drawn pictures with letter tags: match, odd one out, order events, repeating patterns | 13 entries |
+| `picture-row` | `k2` | a row or small grid of line-drawn pictures with letter tags: match, odd one out, order events, repeating patterns | 11 entries |
 | `sort-rings` | `k2` | two or three sorting rings, a Carroll two-box table or a two-set Venn, with tiles written in by letter | 3 entries |
 | `shape-grid` | `geometry` | a square or dot grid with shapes, mirror lines, arrows: draw, complete, reflect, translate, area/perimeter on squares | 20 entries |
 | `coord-grid` | `geometry` | a coordinate plane (quadrant I or four quadrants) with labelled axes: plot, read, join, translate, reflect | 7 entries |
@@ -90,7 +90,7 @@ positions are share codes, so nothing is spliced and the integrator fixes the fi
    (standards closed × 2 + White Rose steps closed).
 3. Lanes run in parallel; an entry whose dependency is in another lane waits for it (named in its `After` line).
 
-## Lane `k2`: Counting and early number (K-1 pictures) (21)
+## Lane `k2`: Counting and early number (K-1 pictures) (19)
 
 Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,bond,seqstrip,compare,chartwindow,base10,wordpic,count-row,k2kit}.js`, `js/modules/sheet/providers/k2.js`. Builds templates: `picture-row`, `sort-rings`.
 
@@ -241,19 +241,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 to 500 → 900 · O3 each flat labelled 100 → none · O6 flats / disks.
 - **Misconceptions:** 600 has 6 tens; writes 6 for 600.
 
-### 13. Match the Same — `match_same`
-
-- **What:** new skill `counting:match_same`. Grade PK · family counting · source White Rose audit.
-- **Closes (standards):** none not already full
-- **Closes (White Rose steps):** R.B1.S1, R.B1.S2
-- **Teaches:** matching identical objects and pictures one to one (the first step before sorting and counting).
-- **Problem types:** (1) match identical pictures; (2) match picture to object silhouette; (3) find the one that is the same; (4) match by one attribute.
-- **Representation:** two columns of line-drawn pictures; draw a line to join each pair that is the same. Templates: `wordpic`; new: `picture-row`.
-- **Answer:** draw a line between each matching pair.
-- **Ladder:** O2 2 → 3 → 4 pairs; identical → same kind different look · O3 first pair joined → none · O6 objects / shapes.
-- **Misconceptions:** matches by colour or size instead of kind; uses one picture twice.
-
-### 14. What Can We Measure? — `measurable_attributes`
+### 13. What Can We Measure? — `measurable_attributes`
 
 - **What:** new skill `comparing:what_can_we_measure`. Grade K · family measurement · source standards audit.
 - **Closes (standards):** K.MD.A.1 · tag with CCSS K.MD.A.1, EE M.EE.K.MD.1
@@ -265,7 +253,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 two attributes (long, heavy) → four (tall, holds) · O3 icons beside each word → words only · O6 objects.
 - **Misconceptions:** colour is something we measure; only length can be measured.
 
-### 15. Write the Number Sentence for the Picture (option) — `pictures_to_sentence`
+### 14. Write the Number Sentence for the Picture (option) — `pictures_to_sentence`
 
 - **What:** option on `addition:add_5_pictures` (and `subtraction:sub_5_pictures`): response "write the number sentence" (the pupil writes 3 + 2 = 5 for the picture). Grade K · family operations · source standards audit.
 - **Closes (standards):** K.OA.A.1 · tag with CCSS K.OA.A.1, EE M.EE.K.OA.1
@@ -277,7 +265,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 within 5 → within 10 · O3 frame with signs printed → blank line · O6 pictures / dots / ten frame.
 - **Misconceptions:** writes the total first (5 + 3 = 2); uses + for a take-away picture.
 
-### 16. A Hundred Is Ten Tens (option) — `regroup_hundreds`
+### 15. A Hundred Is Ten Tens (option) — `regroup_hundreds`
 
 - **What:** option on `composing:base10_regroup`: band 999: trade 1 hundred for 10 tens. Grade 2 · family placevalue · source standards audit.
 - **Closes (standards):** 2.NBT.A.1a · tag with CCSS 2.NBT.A.1a, EE M.EE.2.NBT.1
@@ -289,7 +277,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 hundreds only → with tens and ones · O3 flat drawn with its ten rods → none · O6 blocks / disks.
 - **Misconceptions:** 100 = 10 ones; a trade changes the number.
 
-### 17. Understand 10 and 20 (option) — `teen_structure`
+### 16. Understand 10 and 20 (option) — `teen_structure`
 
 - **What:** option on `composing:teen_compose`: 10 and 20. Grade K · family counting · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS K.NBT.A.1, K.CC.A.3, EE -
@@ -301,7 +289,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 10 → 20 → mix with 11-19 · O3 frames drawn full → partly → none · O6 frames / rods.
 - **Misconceptions:** calls 20 "twelve"; counts the ten as 1.
 
-### 18. Write the Numbers 0 to 20 — `write_numerals`
+### 17. Write the Numbers 0 to 20 — `write_numerals`
 
 - **What:** new skill `counting:write_numbers_0_20`. Grade K · family counting · source standards audit.
 - **Closes (standards):** K.CC.A.3 · tag with CCSS K.CC.A.3, EE M.EE.2.NBT.3
@@ -313,7 +301,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 0-5 → 0-10 → 11-20 · O3 dotted trace with start dot and arrow → start dot only → empty box · O6 pictures / dots / ten frame.
 - **Misconceptions:** reverses 2, 3, 5, 7, 9; writes 31 for 13; leaves the box empty for zero.
 
-### 19. Number Bonds to 20 — `bonds_20`
+### 18. Number Bonds to 20 — `bonds_20`
 
 - **What:** new skill `composing:bonds_to_20`. Grade K · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS K.OA.A.1, 1.OA.C.6, EE M.EE.K.OA.1
@@ -325,19 +313,7 @@ Owns: `js/modules/gen-counting.js`, `js/modules/sheet/cells/{counters,tenframe,b
 - **Ladder:** O2 bonds to 10 → to 20 → within 20 · O3 two frames → none · O6 frames / bond.
 - **Misconceptions:** 13 + 7 = 10; answers 3 for 20 − 7.
 
-### 20. Which One Does Not Belong? — `odd_one_out`
-
-- **What:** new skill `comparing:odd_one_out`. Grade PK · family counting · source White Rose audit.
-- **Closes (standards):** none not already full
-- **Closes (White Rose steps):** R.B1.S3
-- **Teaches:** identifying a set: objects that belong together because they share one attribute.
-- **Problem types:** (1) circle the one that does not belong; (2) say why (word bank); (3) find the one that belongs to the set; (4) two rules at once.
-- **Representation:** a row of four line drawings; circle the one that is not in the set, say why. Templates: `wordpic`; new: `picture-row`.
-- **Answer:** circle one picture; tick the reason from a bank.
-- **Ladder:** O2 kind → colour-free attribute (size, shape) → two attributes · O3 reason bank shown → none · O6 objects / shapes.
-- **Misconceptions:** chooses by position (always the last); picks a reason that fits every picture.
-
-### 21. 1st, 2nd, 3rd — `ordinal`
+### 19. 1st, 2nd, 3rd — `ordinal`
 
 - **What:** new skill `counting:ordinal_numbers`. Grade K · family counting · source White Rose audit.
 - **Closes (standards):** none not already full

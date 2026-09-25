@@ -846,3 +846,94 @@ registerSkill('comparing:compare_size', {
         return chooseWrong(q, c);
     },
 });
+
+/* ============================================================================ odd_one_out */
+
+const ODD_FIND = {
+    iCan: 'I Can find the one that does not belong',
+    instructionKey: 'check-odd',
+    steps: ['Look at every picture.', 'Find what most of them share: kind or size.', 'Check the one that is not like the others.'],
+    say: '__ does not belong.',
+    sayValues: (q) => [String(q.ans)],
+};
+const ODD_WHY = {
+    iCan: 'I Can find the one that does not belong',
+    instructionKey: 'check-why',
+    steps: ['Look at the circled one.', 'Look at the others: same kind? same size?', 'Check the reason that is true.'],
+    say: 'It does not belong. It is __.',
+    sayValues: (q) => [String(q.ans).toLowerCase()],
+};
+
+registerSkill('comparing:odd_one_out', {
+    strings: stringsBy((t, ref) => (t === 'why' || t === 'rule' || (ref && ref.opts && ref.opts.task === 'rule') ? ODD_WHY : null), ODD_FIND),
+    misconceptions: ['chose-by-place', 'chose-a-match', 'reason-wrong-attribute'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        const attr = q.oddAttr || (p.cue) || (/size/i.test(String(q.ans)) ? 'size' : 'kind');
+        if (p.kind === 'words') {
+            return [
+                step('Look at the circled one.'),
+                step(`Look at the others. They are all the same ${attr === 'kind' ? 'kind of thing' : 'size'}.`),
+                step(`The circled one is ${attr === 'kind' ? 'another kind' : 'another size'}.`),
+                step(`Check "${q.ans}".`, [{ slot: 'answer', value: String(q.ans) }]),
+            ];
+        }
+        const n = (p.choices || []).length;
+        return [
+            step(`Look at ${LETTERS_K2.slice(0, n).join(', ')}.`),
+            step(attr === 'kind' ? `${n - 1} are the same kind of thing.` : `${n - 1} are the same size.`),
+            step(`${q.ans} is not like the others.`),
+            step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
+        ];
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        if (p.kind === 'words') {
+            const other = (p.words || []).map((w) => w.label).find((l) => l !== q.ans);
+            return other ? chooseWrong(q, [{ value: other, misconception: 'reason-wrong-attribute', explain: 'Named a reason that is not what makes it different.' }]) : null;
+        }
+        const n = (p.choices || []).length;
+        const c = Number(p.correct) || 0;
+        return chooseWrong(q, [
+            { value: LETTERS_K2[c === n - 1 ? 0 : n - 1], misconception: 'chose-by-place', explain: 'Chose by where it stands (the last one), not by looking.' },
+            { value: LETTERS_K2[(c + 1) % n], misconception: 'chose-a-match', explain: 'Chose one of the pictures that are alike.' },
+        ]);
+    },
+});
+
+/* ============================================================================ match_same */
+
+const matchDef = (key, steps, say) => ({ iCan: 'I Can match pictures that are the same', instructionKey: key, steps, say, sayValues: (q) => [String(q.ans)] });
+const MATCH_DEFS = {
+    same: matchDef('check-same', ['Look at the picture in the box.', 'Look at each picture in the row.', 'Find the one that is the same. Check its box.'], '__ is the same.'),
+    shadow: matchDef('check-shadow', ['Look at the outline of the shadow.', 'Find the picture with the same outline.', 'Check its box.'], '__ fits the shadow.'),
+    kind: matchDef('check-same-kind', ['Look at the picture in the box.', 'Find the same kind of thing. Its size can change.', 'Check its box.'], '__ is the same kind.'),
+};
+
+registerSkill('counting:match_same', {
+    strings: stringsBy((t, ref) => MATCH_DEFS[t] || MATCH_DEFS[ref && ref.opts && ref.opts.match] || null, MATCH_DEFS.same),
+    misconceptions: ['matched-by-size', 'matched-a-neighbour', 'matched-by-outline-only'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        const n = (p.choices || []).length;
+        const t = MATCH_DEFS[q._variant] ? q._variant : 'same';
+        const first = t === 'shadow' ? 'Look at the outline of the shadow in the box.' : 'Look at the picture in the box.';
+        return [
+            step(first),
+            step(`Look at ${LETTERS_K2.slice(0, n).join(', ')}.`),
+            step(t === 'kind' ? `${q.ans} is the same kind, in another size.` : `${q.ans} is just like it.`),
+            step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
+        ];
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        const n = (p.choices || []).length;
+        const c = Number(p.correct) || 0;
+        const t = q._variant;
+        return chooseWrong(q, [
+            t === 'kind' ? { value: LETTERS_K2[(c + 1) % n], misconception: 'matched-by-size', explain: 'Chose a different thing of the same size.' } : null,
+            { value: LETTERS_K2[c === 0 ? 1 : c - 1], misconception: 'matched-a-neighbour', explain: 'Chose the picture next to the match.' },
+            t === 'shadow' ? { value: LETTERS_K2[(c + 1) % n], misconception: 'matched-by-outline-only', explain: 'Chose a picture whose outline only looks a little like the shadow.' } : null,
+        ]);
+    },
+});

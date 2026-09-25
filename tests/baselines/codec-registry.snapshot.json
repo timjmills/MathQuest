@@ -89,7 +89,9 @@
     "wpCues": "8A",
     "wpBank": "8B",
     "wpBar": "8C",
-    "bars": "9F"
+    "bars": "9F",
+    "attr": "3B",
+    "match": "3C"
   },
   "blocks": {
     "0": {
@@ -630,6 +632,18 @@
     "bars": {
       "vertical": "V",
       "horizontal": "H"
+    },
+    "attr": {
+      "kind": "K",
+      "size": "Z",
+      "mixed": "M",
+      "shape": "H",
+      "weight": "W"
+    },
+    "match": {
+      "same": "S",
+      "shadow": "W",
+      "kind": "K"
     }
   },
   "scalarOnly": {

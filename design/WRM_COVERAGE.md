@@ -22,20 +22,20 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 515 (59%), partial only 148 (17%), gap 209 (24%).
+- Covered 518 (59%), partial only 148 (17%), gap 206 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 330 skills carry WRM tags. 160 proposals (118 new skills, 42 options on existing skills) would close every gap.
+- 332 skills carry WRM tags. 158 proposals (116 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
-| Reception | PK | 18 | 119 | 60 (50%) | 27 | 32 |
+| Reception | PK | 18 | 119 | 63 (53%) | 27 | 29 |
 | Year 1 | K | 14 | 116 | 72 (62%) | 24 | 20 |
 | Year 2 | 1 | 11 | 124 | 80 (65%) | 18 | 26 |
 | Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
 | Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
 | Year 5 | 4 | 15 | 136 | 81 (60%) | 22 | 33 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **515 (59%)** | **148** | **209** |
+| **All** | | **97** | **872** | **518 (59%)** | **148** | **206** |
 
 ## Source disagreements
 
@@ -82,7 +82,7 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Closes (1): Y6.B7.S5 Formulae  
   _proposal id: formulae_
 
-### counting (11 proposals, 25 steps)
+### counting (9 proposals, 22 steps)
 
 - **Say How Many Without Counting** — new skill `counting:subitise`. Teaches perceptual subitising of 0-5 and conceptual subitising to 10 (seeing small groups inside a larger one: 3 and 2 make 5). Representation: standard dot, dice, finger and ten-frame patterns shown briefly on screen, printed as a grid; write the number; option: say the two parts.  
   Closes (7): R.B3.S2 Subitise 1, 2 and 3; R.B5.S2 Subitise 4 and 5; R.B7.S3 Subitise 0 to 5; R.B7.S8 Conceptual subitising to 5; R.B9.S10 Conceptual subitising; R.B11.S4 Conceptual subitising to 10; R.B11.S9 Make arrangements of 10  
@@ -93,18 +93,12 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
 - **Number Sense Review** — new skill `counting:number_sense_review`. Teaches consolidating counting, cardinality, composition and patterns to 10 (Reception year review). Representation: a mixed page of counting, compare, compose and pattern cells drawn from the existing K skills (a review pool, not new content).  
   Closes (3): R.B13.S5 Verbal counting beyond 20; R.B18.S1 Deepen understanding; R.B18.S2 Patterns and relationships  
   _proposal id: consolidate_
-- **Match the Same** — new skill `counting:match_same`. Teaches matching identical objects and pictures one to one (the first step before sorting and counting). Representation: two columns of line-drawn pictures; draw a line to join each pair that is the same.  
-  Closes (2): R.B1.S1 Match objects; R.B1.S2 Match pictures and objects  
-  _proposal id: match_same_
 - **Understand 10 and 20 (option)** — option on `composing:teen_compose`: 10 and 20. Teaches 10 as one ten and 20 as two tens (the skill covers 11-19). Representation: band values "exactly 10" and "20" on teen_compose with one and two full ten frames.  
   Closes (2): Y1.B4.S2 Understand 10; Y1.B4.S6 Understand 20  
   _proposal id: teen_structure_
 - **Count by Making Tens** — new skill `composing:count_in_tens_groups`. Teaches counting a large set by circling groups of ten, then counting tens and ones. Representation: a scattered set of 20-50 objects; circle tens, write ___ tens ___ ones = ___.  
   Closes (2): Y1.B6.S3 Count by making groups of tens; Y2.B1.S2 Count objects to 100 by making 10s  
   _proposal id: tens_ones_group_
-- **Which One Does Not Belong?** — new skill `comparing:odd_one_out`. Teaches identifying a set: objects that belong together because they share one attribute. Representation: a row of four line drawings; circle the one that is not in the set, say why.  
-  Closes (1): R.B1.S3 Identify a set  
-  _proposal id: odd_one_out_
 - **Number Words 0 to 10 (option)** — option on `composing:number_word_form`: words 0-10. Teaches reading and writing the number words zero to ten (the skill starts at 10). Representation: a band option "0 to 10" on the existing skill: numeral to word and word to numeral.  
   Closes (1): Y1.B1.S5 Recognise numbers as words  
   _proposal id: words_0_10_
@@ -621,14 +615,14 @@ whatever happens to the WRM gaps.
 
 #### R.B1 Autumn Block 1: Match, sort and compare
 
-- **R.B1.S1** Match objects — GAP. _Beyond CCSS_  
-  Proposal: Match the Same  
+- **R.B1.S1** Match objects — covered. _Beyond CCSS_  
+  Skills: Match the Same (`counting:match_same`)  
   Vocabulary: match, same, different  
-- **R.B1.S2** Match pictures and objects — GAP. _Beyond CCSS_  
-  Proposal: Match the Same  
+- **R.B1.S2** Match pictures and objects — covered. _Beyond CCSS_  
+  Skills: Match the Same (`counting:match_same`)  
   Vocabulary: match, same, different  
-- **R.B1.S3** Identify a set — GAP. _Beyond CCSS_  
-  Proposal: Which One Does Not Belong?  
+- **R.B1.S3** Identify a set — covered. _Beyond CCSS_  
+  Skills: Which One Does Not Belong? (`comparing:odd_one_out`)  
   Vocabulary: set, belong, go together, match  
 - **R.B1.S4** Sort objects to a type — PARTIAL. _K.MD.B.3, M.EE.K.MD.3_  
   Partial: Sort & Count by Category (Visual) (`comparing:classify_count`), missing the sort itself: putting every object into its group; the skill only counts one kind  

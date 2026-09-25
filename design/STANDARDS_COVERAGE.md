@@ -24,12 +24,12 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 603 live skills; 494 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 605 live skills; 494 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 55 have no standard, with a reason (50 vocabulary games, 5 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
 - **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 220 entries â€” 130 new skills, 88 options on existing skills, 2 repairs; 160 from the White Rose audit (41 of them extended to close standards clauses), 60 from this audit.
+- The one build list: 218 entries â€” 128 new skills, 88 options on existing skills, 2 repairs; 158 from the White Rose audit (41 of them extended to close standards clauses), 60 from this audit.
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
@@ -300,27 +300,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership â
 | 21 | **Partition the Whole** (`frac_whole_partition`) | new `fractions:partition_the_whole` | - | 1 |
 | 22 | **Subtract from a Mixed Number: Break the Whole (option)** (`sub_break_whole`) | option on `fraction_operations:sub_mixed_like` | - | 1 |
 
-### Counting and early number (16)
-
-| # | Entry | Kind | Closes standards | Closes WRM steps |
-|---|---|---|---|---|
-| 1 | **Sort into Groups** (`sort_groups`) | new `comparing:sort_into_groups` | K.MD.B.3, M.EE.K.MD.1, M.EE.K.MD.2, M.EE.K.MD.3, M.EE.1.MD.4 | 4 |
-| 2 | **Say How Many Without Counting** (`subitise`) | new `counting:subitise` | - | 7 |
-| 3 | **Count Out a Number** (`ten_count_out`) | new `counting:count_out` | K.CC.B.5, M.EE.K.CC.6, M.EE.2.NBT.2 | 1 |
-| 4 | **Count in a Circle and to 30 (option)** (`count_objects_more`) | option on `counting:count_objects` | K.CC.B.5, M.EE.2.NBT.2 | - |
-| 5 | **Count by Making Tens** (`tens_ones_group`) | new `composing:count_in_tens_groups` | 1.NBT.A.1 | 2 |
-| 6 | **Number Sense Review** (`consolidate`) | new `counting:number_sense_review` | - | 3 |
-| 7 | **Count to 120 on the Chart (option)** (`chart_120`) | option on `composing:hundreds_chart_fill` | 1.NBT.A.1 | - |
-| 8 | **Same Number After Moving (option)** (`count_conserve`) | option on `counting:count_objects` | K.CC.B.4b | - |
-| 9 | **Match the Same** (`match_same`) | new `counting:match_same` | - | 2 |
-| 10 | **Odd or Even by Pairing (option)** (`odd_even_pairs`) | option on `composing:odd_even` | 2.OA.C.3 | - |
-| 11 | **Understand 10 and 20 (option)** (`teen_structure`) | option on `composing:teen_compose` | - | 2 |
-| 12 | **Write the Numbers 0 to 20** (`write_numerals`) | new `counting:write_numbers_0_20` | K.CC.A.3 | - |
-| 13 | **Count in 3s** (`count_3s`) | new `patterns:count_in_3s` | - | 1 |
-| 14 | **Which One Does Not Belong?** (`odd_one_out`) | new `comparing:odd_one_out` | - | 1 |
-| 15 | **1st, 2nd, 3rd** (`ordinal`) | new `counting:ordinal_numbers` | - | 1 |
-| 16 | **Number Words 0 to 10 (option)** (`words_0_10`) | option on `composing:number_word_form` | - | 1 |
-
 ### Place value (12)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
@@ -337,6 +316,25 @@ representation, answer, option ladder, misconceptions, lane and file ownership â
 | 10 | **10,000 and 100,000 More or Less (option)** (`pv_more_less_big`) | option on `placevalue:more_less_100` | - | 1 |
 | 11 | **Roman Numerals** (`roman_100`) | new `placevalue:roman_numerals` | - | 1 |
 | 12 | **Roman Numerals to 1,000 (option)** (`roman_1000`) | option on `placevalue:roman_numerals` | - | 1 |
+
+### Counting and early number (14)
+
+| # | Entry | Kind | Closes standards | Closes WRM steps |
+|---|---|---|---|---|
+| 1 | **Sort into Groups** (`sort_groups`) | new `comparing:sort_into_groups` | K.MD.B.3, M.EE.K.MD.1, M.EE.K.MD.2, M.EE.K.MD.3, M.EE.1.MD.4 | 4 |
+| 2 | **Say How Many Without Counting** (`subitise`) | new `counting:subitise` | - | 7 |
+| 3 | **Count Out a Number** (`ten_count_out`) | new `counting:count_out` | K.CC.B.5, M.EE.K.CC.6, M.EE.2.NBT.2 | 1 |
+| 4 | **Count in a Circle and to 30 (option)** (`count_objects_more`) | option on `counting:count_objects` | K.CC.B.5, M.EE.2.NBT.2 | - |
+| 5 | **Count by Making Tens** (`tens_ones_group`) | new `composing:count_in_tens_groups` | 1.NBT.A.1 | 2 |
+| 6 | **Number Sense Review** (`consolidate`) | new `counting:number_sense_review` | - | 3 |
+| 7 | **Count to 120 on the Chart (option)** (`chart_120`) | option on `composing:hundreds_chart_fill` | 1.NBT.A.1 | - |
+| 8 | **Same Number After Moving (option)** (`count_conserve`) | option on `counting:count_objects` | K.CC.B.4b | - |
+| 9 | **Odd or Even by Pairing (option)** (`odd_even_pairs`) | option on `composing:odd_even` | 2.OA.C.3 | - |
+| 10 | **Understand 10 and 20 (option)** (`teen_structure`) | option on `composing:teen_compose` | - | 2 |
+| 11 | **Write the Numbers 0 to 20** (`write_numerals`) | new `counting:write_numbers_0_20` | K.CC.A.3 | - |
+| 12 | **Count in 3s** (`count_3s`) | new `patterns:count_in_3s` | - | 1 |
+| 13 | **1st, 2nd, 3rd** (`ordinal`) | new `counting:ordinal_numbers` | - | 1 |
+| 14 | **Number Words 0 to 10 (option)** (`words_0_10`) | option on `composing:number_word_form` | - | 1 |
 
 ### Data and statistics (12)
 

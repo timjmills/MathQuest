@@ -160,7 +160,10 @@ export const MULTI_KEYS = Object.freeze({
     // tokens only (task, response, order: inorder, support); `ops` is its own key because the
     // deployed decoder would read an unknown `op` token as an EMPTY set (every operation).
     ops: '3A',           // function_table_easy / _hard: the operations a rule may use (+ − × ÷)
-    // NEXT FREE IN BLOCK 3: 3B.
+    // Sub-range 3B-3M: build lane k2 (2026-09-25, KEY_SUBRANGES).
+    attr: '3B',          // odd_one_out / sort_into_groups: the attribute (kind, size, shape, weight)
+    match: '3C',         // match_same: what matches (the same picture, its shadow, the same kind)
+    // NEXT FREE IN LANE k2's SUB-RANGE: 3D (to 3M).
 
     // Block 4 — SUPPORTS (S2: `cover` and `mix` are live; `touch` is unused - touch dots are
     // values of the unified `support` set; `anchors` is the sheet-level S6 request field)
@@ -318,6 +321,9 @@ export const VALUE_TOKENS = Object.freeze({
     shape: Object.freeze({ box: 'B', circle: 'C', hex: 'H', mixed: 'M' }),
     // block 3 (2026-09-25)
     ops: Object.freeze({ '+': 'A', '-': 'S', x: 'M', '/': 'D' }),
+    // block 3, lane k2 sub-range (2026-09-25)
+    attr: Object.freeze({ kind: 'K', size: 'Z', mixed: 'M', shape: 'H', weight: 'W' }),
+    match: Object.freeze({ same: 'S', shadow: 'W', kind: 'K' }),
     // block 7 (option-panel round 3)
     poolSize: Object.freeze({ easier: 'E', set: 'S', harder: 'H' }),
     ftRules: Object.freeze({ '+': 'A', '-': 'S', x: 'M', '/': 'D', 'x+': 'P', 'x-': 'N', '/+': 'Q', '/-': 'R' }),

@@ -61,6 +61,8 @@ export const SKILL_WRM = {
         { step: 'Y1.B4.S1', note: 'count to 20' },
     ],
     // Build lane k2 (2026-09-25)
+    'counting:match_same': ['R.B1.S1', 'R.B1.S2'],
+    'comparing:odd_one_out': ['R.B1.S3'],
     'comparing:compare_size': ['R.B2.S1'],
     'counting:zero_none': ['R.B7.S1'],
     'counting:count_sequence': [
@@ -1149,22 +1151,6 @@ export const WRM_PROPOSALS = {
     },
 
     // ---- counting
-    match_same: {
-        kind: 'new', skill: 'counting:match_same',
-        name: 'Match the Same',
-        teaches: 'matching identical objects and pictures one to one (the first step before sorting and counting)',
-        representation: 'two columns of line-drawn pictures; draw a line to join each pair that is the same',
-        family: 'counting',
-        steps: ['R.B1.S1', 'R.B1.S2'],
-    },
-    odd_one_out: {
-        kind: 'new', skill: 'comparing:odd_one_out',
-        name: 'Which One Does Not Belong?',
-        teaches: 'identifying a set: objects that belong together because they share one attribute',
-        representation: 'a row of four line drawings; circle the one that is not in the set, say why',
-        family: 'counting',
-        steps: ['R.B1.S3'],
-    },
     sort_groups: {
         kind: 'new', skill: 'comparing:sort_into_groups',
         name: 'Sort into Groups',

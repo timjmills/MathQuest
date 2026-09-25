@@ -210,7 +210,7 @@ register('picture-row', {
                 : picture(ctx, p.pic0, bw * 1.3, bh * 1.3);
             const dir = p.row ? 'column' : 'row';
             return root(ctx, 'k2-prow', `<div style="display:flex;flex-direction:${dir};align-items:center;justify-content:center;gap:${L(ctx, p.row ? 4 : 8)};">`
-                + `<div style="flex:none;">${pics}</div>${choiceRow(ctx, choices, { on, vertical: true, labelW, labelPt: lp })}</div>`);
+                + `<div style="flex:none;">${pics}${cueLine(ctx, p.cue)}</div>${choiceRow(ctx, choices, { on, vertical: true, labelW, labelPt: lp })}</div>`);
         }
 
         if (p.kind === 'line') {
@@ -236,13 +236,14 @@ register('picture-row', {
         // pick
         const labels = labelsOf(p, (p.choices || []).length);
         const on = checkedChoice(p, ctx, labels);
-        const choices = (p.choices || []).map((c, i) => ({ pic: picture(ctx, c, bw, bh, { floor: p.base ? 7 * k : null }), label: labels[i] }));
-        const row = choiceRow(ctx, choices, { on, gapMm: 7 * k });
-        if (!p.target) return root(ctx, 'k2-prow', `<div style="display:inline-block;">${row}</div>`);
+        const gap = (p.gap || 7) * k;
+        const choices = (p.choices || []).map((c, i) => ({ pic: picture(ctx, c, bw, bh, { floor: p.base ? gap : null }), label: labels[i] }));
+        const row = choiceRow(ctx, choices, { on, gapMm: gap });
+        if (!p.target) return root(ctx, 'k2-prow', `<div style="display:inline-block;">${row}</div>${cueLine(ctx, p.cue)}`);
         // the target in a key box, left of the row, on the same floor as the pictures
         const tb = `<div style="flex:none;display:inline-flex;flex-direction:column;align-items:center;gap:${L(ctx, 1.5)};">`
             + `<div style="border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 2)};padding:${L(ctx, 2)};background:#fff;">${picture(ctx, p.target, bw, bh)}</div></div>`;
-        return root(ctx, 'k2-prow', `<div style="display:flex;align-items:flex-start;justify-content:center;gap:${L(ctx, 9 * k)};">`
+        return root(ctx, 'k2-prow', `<div style="display:flex;align-items:flex-start;justify-content:center;gap:${L(ctx, gap)};">`
             + `${tb}<div style="width:${B(ctx, 0.75)};align-self:stretch;background:${INK};"></div>${row}</div>`);
     },
     answerKey(p) {
@@ -262,7 +263,8 @@ register('picture-row', {
         const k = ctx ? pscale(ctx) : 1;
         const bw = (p.pic || 20) * k;
         const n = (p.choices || p.items || p.row || []).length || 1;
-        let w = n * (bw + 1) + (n - 1) * 8 * k + (p.target ? bw + 18 : 0) + (p.kind === 'line' ? 14 : 0);
+        const gap = (p.gap || 7) * k;
+        let w = n * (bw + 1) + (n - 1) * gap + (p.target ? bw + 6 + 2 * gap : 0) + (p.kind === 'line' ? 14 : 0);
         if (p.kind === 'words' && !p.row) w = bw * 1.3 + 60;
         return { wMm: Math.min(186, Math.ceil(w + 6)), hMm: null, measure: true, factLike: false, maxCols: w + 6 <= 93 ? 2 : 1 };
     },
@@ -273,6 +275,12 @@ register('picture-row', {
     },
     layout() { return { card: 'card-wide-visual', checker: 'choice' }; },
 });
+
+/** Support level 2: which attribute to look at, under the row (a hint that fades; never the answer). */
+function cueLine(ctx, cue) {
+    if (!cue) return '';
+    return `<div class="k2-cue" style="margin-top:${L(ctx, 2)};font-size:${P(ctx, textPt(ctx))};line-height:1.2;">Look at the ${esc(cue)}.</div>`;
+}
 
 /** The tags of a row's choices: the payload's own (place numbers 1, 2, 3 on a supported ordinal line), else A, B, C. */
 const labelsOf = (p, n) => (Array.isArray(p.labels) && p.labels.length === n ? p.labels.map(String) : LETTERS.slice(0, n));

@@ -44,12 +44,6 @@ export const WRM_SPECS = {
         ['stops before listing every pair', 'lists a pair twice (3,5 and 5,3 when order does not matter)'], ['data-table', 'bar-model']),
 
     // ------------------------------------------------------------------ counting
-    match_same: S(['match identical pictures', 'match picture to object silhouette', 'find the one that is the same', 'match by one attribute'],
-        ['wordpic'], 'draw a line between each matching pair', 'O2 2 → 3 → 4 pairs; identical → same kind different look · O3 first pair joined → none · O6 objects / shapes',
-        ['matches by colour or size instead of kind', 'uses one picture twice'], ['picture-row']),
-    odd_one_out: S(['circle the one that does not belong', 'say why (word bank)', 'find the one that belongs to the set', 'two rules at once'],
-        ['wordpic'], 'circle one picture; tick the reason from a bank', 'O2 kind → colour-free attribute (size, shape) → two attributes · O3 reason bank shown → none · O6 objects / shapes',
-        ['chooses by position (always the last)', 'picks a reason that fits every picture'], ['picture-row']),
     sort_groups: S(['sort by a given rule', 'find the rule of a sort', 'count each group and say which has most', 'order the groups by count', 'sort by big/small or heavy/light'],
         ['wordpic', 'counters'], 'write each tile letter in its ring; write how many in each group', 'O2 2 groups → 3 groups → rule found by the pupil → order the groups · O3 first tile placed, labels with pictures → words only · O6 rings / Carroll boxes',
         ['sorts by two attributes at once', 'leaves tiles unsorted', 'counts a tile in two rings'], ['sort-rings', 'picture-row']),
