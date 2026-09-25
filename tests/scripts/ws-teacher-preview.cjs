@@ -38,6 +38,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     };
   }, pt);
   const hoverCenter = async (sel) => {
+    // Web fonts arriving late re-flow the page under a pointer already placed: wait for them.
+    await page.evaluate(() => (document.fonts ? document.fonts.ready.then(() => 0) : 0)).catch(() => {});
     const found = await page.evaluate((sel) => {
       const el = document.querySelector(sel);
       if (!el) return false;
@@ -273,6 +275,138 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await shot('run-mode-race-hover-dark-1280');
     await page.mouse.move(5, 5);
     await page.evaluate(() => document.documentElement.classList.remove('dark'));
+
+    // ---- Skills library, LIST view (owner request 2026-09-25): a row shows the same floating
+    //      preview on hover and on keyboard focus, steady (no flicker), on-screen, never over the
+    //      pointer; Escape closes it; on touch the row's (i) button pins it. 1280 / 820 / 390,
+    //      light and dark.
+    await page.evaluate(() => { window.tvGo('library'); });
+    await waitFor(page, () => !!document.querySelector('#tvlResults'), 5000, 'library screen');
+    await page.evaluate(() => {
+      const b = document.querySelector('#tvlView [data-view="list"]'); if (b && b.getAttribute('aria-checked') !== 'true') b.click();
+      const c = document.querySelector('[data-lib-act="clear-filters"]'); if (c && !c.hidden) c.click();
+    });
+    await waitFor(page, () => document.querySelectorAll('#tvlResults .tvl-li[data-tvp] > .tvl-row').length > 400, 5000, 'library rows');
+    const libSel = '#tvlResults .tvl-li[data-tvp="multiplication|mult_facts"]';
+    for (const dark of [false, true]) {
+      await page.evaluate((d) => document.documentElement.classList.toggle('dark', d), dark);
+      for (const width of [1280, 820, 390]) {
+        const tag = `library list@${width}${dark ? ' dark' : ''}`;
+        await page.setViewport({ width, height: 900, deviceScaleFactor: 1 });
+        await setPointer(true);
+        await sleep(200);
+        const lpt = await hoverCenter(libSel);
+        info = await popInfo(lpt);
+        if (!info.open) { fail(`${tag}: hover on a row did not open the preview`); continue; }
+        if (!info.inside) fail(`${tag}: row preview is outside the viewport`);
+        if (info.covers) fail(`${tag}: row preview covers the pointer`);
+        if (!info.drawn) fail(`${tag}: row preview has no sample`);
+        if (!/Multiplication Facts/.test(info.text)) fail(`${tag}: row preview names the wrong skill: ${info.text.slice(0, 80)}`);
+        // Near the row: the pop touches the row's band (beside it) or sits just above / below it.
+        const near = await page.evaluate((sel) => {
+          const r = document.querySelector(`${sel} > .tvl-row`).getBoundingClientRect();
+          const p = document.getElementById('tvSkillPreview').getBoundingClientRect();
+          const gapY = p.top >= r.bottom ? p.top - r.bottom : r.top >= p.bottom ? r.top - p.bottom : 0;
+          const gapX = p.left >= r.right ? p.left - r.right : r.left >= p.right ? r.left - p.right : 0;
+          return { gapY, gapX };
+        }, libSel);
+        if (near.gapY > 24 || near.gapX > 24) fail(`${tag}: preview is not beside its row (${JSON.stringify(near)})`);
+        // Steady: small moves inside the row (name -> level) never close or reopen it.
+        const flick = [];
+        for (let i = 1; i <= 6; i++) {
+          await page.mouse.move(lpt.x + i * 12, lpt.y + (i % 2 ? 3 : -3));
+          await sleep(60);
+          flick.push((await popInfo()).open ? 1 : 0);
+        }
+        if (flick.includes(0)) fail(`${tag}: preview flickers while the pointer moves inside the row (${flick.join('')})`);
+        if (width === 1280 || width === 390) await shot(`library-list-hover-${width}${dark ? '-dark' : ''}`);
+        // Next row: the preview follows.
+        const nextKey = await page.evaluate((sel) => {
+          const li = document.querySelector(sel);
+          let n = li.nextElementSibling; while (n && !n.matches('.tvl-li')) n = n.nextElementSibling;
+          return n ? n.dataset.tvp : null;
+        }, libSel);
+        if (nextKey) {
+          const npt = await page.evaluate((k) => { const r = document.querySelector(`#tvlResults .tvl-li[data-tvp="${k}"] > .tvl-row`).getBoundingClientRect(); return { x: r.left + 40, y: r.top + r.height / 2 }; }, nextKey);
+          await page.mouse.move(npt.x, npt.y, { steps: 3 });
+          await sleep(450);
+          info = await popInfo(npt);
+          const shownKey = await page.evaluate(() => { const d = document.querySelector('#tvlResults .tvl-li[aria-describedby~="tvSkillPreview"]'); return d ? d.dataset.tvp : null; });
+          if (!info.open || shownKey !== nextKey) fail(`${tag}: moving to the next row did not move the preview (${shownKey} vs ${nextKey})`);
+          if (info.covers) fail(`${tag}: next-row preview covers the pointer`);
+        }
+        await page.mouse.move(5, 5);
+        await sleep(150);
+        if ((await popInfo()).open) fail(`${tag}: preview did not hide on mouseleave`);
+      }
+    }
+    await page.evaluate(() => document.documentElement.classList.remove('dark'));
+    await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
+    await sleep(200);
+
+    // Keyboard: focus a row, arrow down through the list (it scrolls): the preview shows for the
+    // focused row, is described by it, stays on-screen; Escape closes it.
+    await page.evaluate((sel) => { const b = document.querySelector(`${sel} > .tvl-row`); b.scrollIntoView({ block: 'center' }); }, libSel);
+    await sleep(100);
+    await page.evaluate((sel) => document.querySelector(`${sel} > .tvl-row`).focus(), libSel);
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('ArrowUp');
+    await sleep(600);
+    info = await popInfo();
+    const kFocus = await page.evaluate(() => ({ desc: document.activeElement.getAttribute('aria-describedby'), key: document.activeElement.closest('.tvl-li')?.dataset.tvp }));
+    if (!info.open || !/Multiplication Facts/.test(info.text)) fail(`library keyboard: focus did not open the row preview (${JSON.stringify(kFocus)})`);
+    if (kFocus.desc !== 'tvSkillPreview') fail(`library keyboard: focused row is not described by the preview (${kFocus.desc})`);
+    for (let i = 0; i < 14; i++) { await page.keyboard.press('ArrowDown'); await sleep(40); }
+    await sleep(600);
+    info = await popInfo();
+    const kFocus2 = await page.evaluate(() => {
+      const a = document.activeElement; const li = a.closest('.tvl-li');
+      const r = a.getBoundingClientRect(); const bar = document.querySelector('.tvl-bar').getBoundingClientRect();
+      return { key: li && li.dataset.tvp, title: li && document.getElementById('tvSkillPreview')?.querySelector('.tvp-pop-title')?.textContent, label: a.querySelector('.tvl-row-name')?.textContent, clear: r.top >= bar.bottom - 1 };
+    });
+    if (!info.open || !info.inside || kFocus2.title !== kFocus2.label) fail(`library keyboard: after arrowing down, preview ${JSON.stringify({ open: info.open, inside: info.inside, ...kFocus2 })}`);
+    if (!kFocus2.clear) fail('library keyboard: the focused row is under the sticky search bar');
+    await page.keyboard.press('Escape');
+    await sleep(50);
+    if ((await popInfo()).open) fail('library keyboard: Escape did not hide the preview');
+
+    // Touch: the row's (i) button shows (44 px) and pins the preview; a tap outside closes it.
+    const infoHiddenDesk = await page.evaluate((sel) => getComputedStyle(document.querySelector(`${sel} [data-tvp-info]`)).display === 'none', libSel);
+    if (!infoHiddenDesk) fail('library: row (i) button is shown where the pointer can hover');
+    for (const width of [820, 390]) {
+      await page.setViewport({ width, height: 900, deviceScaleFactor: 1 });
+      await setPointer(false);
+      await page.evaluate((sel) => document.querySelector(sel).scrollIntoView({ block: 'center' }), libSel);
+      await sleep(250);
+      const ib = await page.evaluate((sel) => {
+        const b = document.querySelector(`${sel} [data-tvp-info]`);
+        if (getComputedStyle(b).display === 'none') return null;
+        const r = b.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height, inside: r.right <= document.documentElement.clientWidth };
+      }, libSel);
+      if (!ib) { fail(`library touch@${width}: row (i) button hidden on a touch screen`); continue; }
+      if (ib.w < 44 || ib.h < 44) fail(`library touch@${width}: (i) button is ${ib.w}x${ib.h}`);
+      if (!ib.inside) fail(`library touch@${width}: (i) button off-screen`);
+      await page.touchscreen.tap(ib.x, ib.y);
+      await sleep(100);
+      info = await popInfo(ib);
+      const pin = await page.evaluate((sel) => document.querySelector(`${sel} [data-tvp-info]`).getAttribute('aria-expanded'), libSel);
+      if (!info.open || pin !== 'true' || !/Multiplication Facts/.test(info.text)) fail(`library touch@${width}: (i) did not pin the preview`);
+      if (info.open && !info.inside) fail(`library touch@${width}: pinned preview off-screen`);
+      if (info.covers) fail(`library touch@${width}: pinned preview covers the (i) button`);
+      await shot(`library-list-touch-${width}`);
+      await page.keyboard.press('Escape');
+      await sleep(80);
+      if ((await popInfo()).open) fail(`library touch@${width}: Escape did not close the pinned preview`);
+      await page.touchscreen.tap(ib.x, ib.y);
+      await sleep(80);
+      await page.touchscreen.tap(Math.min(width - 10, 300), 200);
+      await sleep(80);
+      if ((await popInfo()).open) fail(`library touch@${width}: tap outside did not close the pinned preview`);
+    }
+    await setPointer(true);
+    await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
+    await page.evaluate(() => window.scrollTo(0, 0));
 
     const liveAfter = await page.evaluate(() => ({ c: window.state.category, s: window.state.skill, r: window.state.range }));
     if (JSON.stringify(liveBefore) !== JSON.stringify(liveAfter)) fail(`live state changed: ${JSON.stringify(liveBefore)} -> ${JSON.stringify(liveAfter)}`);

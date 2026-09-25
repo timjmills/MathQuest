@@ -2938,7 +2938,9 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 const count = randInt(3, 6);
                 const setNums = new Set();
                 let safety = 0;
-                const limit = Math.max(10, Math.min(range, 100));
+                // O2 (2026-09-25): the skill's own band (−N to N) replaces the Max Number cap.
+                const _onBand = state.skillOptions && typeof state.skillOptions.band === 'number' && state.skillOptions.band > 0 ? state.skillOptions.band : null;
+                const limit = _onBand || Math.max(10, Math.min(range, 100));
                 while (setNums.size < count && safety < 200) {
                     safety++;
                     const sign = pick([-1, 1]);
@@ -3840,12 +3842,17 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
             // ========================================
             // GRADE 6 — NUMBER SYSTEM (6.NS)
             // ========================================
+            // O2 (2026-09-25): abs_value / opposite_numbers read the skill's own band (−N to N); unset,
+            // they deal their old fixed spans (−15…15 to compare, −20…20 otherwise).
+            const _intBand = (algSkill === 'abs_value' || algSkill === 'opposite_numbers') && state.skillOptions
+                && typeof state.skillOptions.band === 'number' && state.skillOptions.band > 0 ? state.skillOptions.band : null;
             if (algSkill === "abs_value") {
                 if (Math.random() < 0.35) {
                     // Compare absolute values variant
-                    let aAv = randInt(-15, 15); if (aAv === 0) aAv = -7;
-                    let bAv = randInt(-15, 15); if (bAv === 0) bAv = 4;
-                    while (Math.abs(aAv) === Math.abs(bAv)) { bAv = randInt(-15, 15) || 5; }
+                    const cm = _intBand || 15;
+                    let aAv = randInt(-cm, cm); if (aAv === 0) aAv = -Math.min(7, cm);
+                    let bAv = randInt(-cm, cm); if (bAv === 0) bAv = Math.min(4, cm - 1);
+                    while (Math.abs(aAv) === Math.abs(bAv)) { bAv = randInt(-cm, cm) || Math.min(5, cm - 2) || 1; }
                     const greater = Math.abs(aAv) > Math.abs(bAv) ? aAv : bAv;
                     q.text = `Which has the greater absolute value: ${aAv} or ${bAv}?`;
                     q.ans = String(greater);
@@ -3856,8 +3863,8 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     q.printFormat = 'compact';
                     return;
                 }
-                let nAv = randInt(-20, 20);
-                if (nAv === 0) nAv = -7;
+                let nAv = randInt(-(_intBand || 20), _intBand || 20);
+                if (nAv === 0) nAv = -Math.min(7, _intBand || 20);
                 q.text = `What is |${nAv}|?`;
                 q.ans = Math.abs(nAv);
                 q.answerType = 'number';
@@ -3870,8 +3877,8 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
             if (algSkill === "opposite_numbers") {
                 if (Math.random() < 0.4) {
                     // Distance-from-zero phrasing variant
-                    let nOp = randInt(-20, 20);
-                    if (nOp === 0) nOp = -7;
+                    let nOp = randInt(-(_intBand || 20), _intBand || 20);
+                    if (nOp === 0) nOp = -Math.min(7, _intBand || 20);
                     q.text = `What number is the same distance from 0 as ${nOp} but on the other side of the number line?`;
                     q.ans = -nOp;
                     q.answerType = 'number';
@@ -3880,8 +3887,8 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     q.printFormat = 'compact';
                     return;
                 }
-                let nOp = randInt(-20, 20);
-                if (nOp === 0) nOp = 12;
+                let nOp = randInt(-(_intBand || 20), _intBand || 20);
+                if (nOp === 0) nOp = Math.min(12, _intBand || 20);
                 q.text = `What is the opposite of ${nOp}?`;
                 q.ans = -nOp;
                 q.answerType = 'number';

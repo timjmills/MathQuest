@@ -224,6 +224,73 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       }
     }
 
+    /* ------------------------------------------------------------ sticky search bar (2026-09-25)
+       The search + filter row stays pinned to the top of the window while the list scrolls, at
+       every width and in both themes; it is opaque (rows slide under it, not through it); the
+       document's scroll-padding clears it, so a row focused by the keyboard is never hidden
+       under it; and it never makes the page scroll sideways. */
+    await page.evaluate(() => window.tvGo('library'));
+    await sleep(250);
+    await page.evaluate(() => {
+      const b = document.querySelector('#tvlView [data-view="list"]'); if (b) b.click();
+      const c = document.querySelector('[data-lib-act="clear-filters"]'); if (c && !c.hidden) c.click();
+    });
+    await sleep(300);
+    for (const dark of [false, true]) {
+      await page.evaluate((d) => document.documentElement.classList.toggle('dark', d), dark);
+      for (const width of [1280, 820, 390]) {
+        const tag = `sticky@${width}${dark ? ' dark' : ''}`;
+        await page.setViewport({ width, height: 900 });
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await sleep(250);
+        const rest = await page.evaluate(() => ({ stuck: document.querySelector('.tvl-bar').classList.contains('is-stuck') }));
+        check(!rest.stuck, `${tag}: bar marked stuck before any scroll`);
+        await page.evaluate(() => window.scrollTo(0, 2400));
+        await sleep(250);
+        const st = await page.evaluate(() => {
+          const bar = document.querySelector('.tvl-bar');
+          const r = bar.getBoundingClientRect();
+          const cs = getComputedStyle(bar);
+          const page = getComputedStyle(document.body).getPropertyValue('--tv-page').trim();
+          const probe = document.createElement('div');
+          probe.style.color = page; document.body.appendChild(probe);
+          const pageRgb = getComputedStyle(probe).color; probe.remove();
+          // What is painted just under the bar's middle: the bar (or its controls), not a row.
+          const hit = document.elementFromPoint(Math.round((r.left + r.right) / 2), Math.round(r.top + 4));
+          return {
+            scrollY: window.scrollY, top: r.top, bottom: r.bottom, pos: cs.position, bg: cs.backgroundColor, pageRgb,
+            stuck: bar.classList.contains('is-stuck'), onTop: !!(hit && bar.contains(hit)),
+            pad: parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0,
+            overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+          };
+        });
+        check(st.scrollY > 500, `${tag}: the list did not scroll (${st.scrollY})`);
+        check(st.pos === 'sticky' && Math.abs(st.top) <= 1, `${tag}: bar not pinned at the top after scrolling (top ${st.top}, ${st.pos})`);
+        check(st.stuck, `${tag}: bar not marked .is-stuck while pinned`);
+        check(st.bg === st.pageRgb, `${tag}: bar background ${st.bg} is not the page colour ${st.pageRgb}`);
+        check(st.onTop, `${tag}: rows paint over the pinned bar`);
+        check(st.pad >= st.bottom, `${tag}: scroll-padding ${st.pad} does not clear the bar (${st.bottom})`);
+        check(st.bottom <= 900 * 0.2, `${tag}: pinned bar is ${Math.round(st.bottom)} px tall`);
+        check(!st.overflow, `${tag}: page scrolls sideways`);
+        // Keyboard: arrow down through the rows; the focused row always clears the bar.
+        await page.evaluate(() => { const rows = [...document.querySelectorAll('#tvlResults .tvl-row')]; const r = rows.find((x) => x.getBoundingClientRect().top > 300) || rows[0]; r.focus(); });
+        for (let i = 0; i < 25; i++) await page.keyboard.press('ArrowDown');
+        await page.keyboard.press('ArrowUp');
+        for (let i = 0; i < 12; i++) await page.keyboard.press('ArrowUp');
+        await sleep(150);
+        const foc = await page.evaluate(() => {
+          const a = document.activeElement;
+          const bar = document.querySelector('.tvl-bar').getBoundingClientRect();
+          const r = a.getBoundingClientRect();
+          return { row: a.classList.contains('tvl-row'), top: r.top, bar: bar.bottom };
+        });
+        check(foc.row && foc.top >= foc.bar - 1, `${tag}: keyboard-focused row is under the bar (${JSON.stringify(foc)})`);
+        await page.keyboard.press('Escape');
+      }
+    }
+    await page.evaluate(() => { document.documentElement.classList.remove('dark'); window.scrollTo(0, 0); });
+    await page.setViewport({ width: 1280, height: 900 });
+
     /* ------------------------------------------------------------ pupil side */
     const ctx = await browser.createBrowserContext();
     const pupil = await ctx.newPage();

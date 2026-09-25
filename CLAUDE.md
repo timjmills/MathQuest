@@ -81,6 +81,22 @@ produce, computed from the pool so it cannot rot — but an operation no pool me
 still fails. If a skill legitimately does something its name does not cover, **fix the name**, do not
 add an exemption.
 
+## Standards (CCSS + Wisconsin Essential Elements) — the permanent database
+
+Every live skill is tagged with the CCSS standards it teaches and the Wisconsin Essential Elements
+(EE) linked to them. This is the project's standing standards memory; use it, never re-derive it.
+
+| File | What it is |
+|---|---|
+| `data/standards/ccss-math.json`, `data/standards/ee-math.json` | The full records: every CCSS K–6 standard and every EE, with descriptors, Wisconsin wording and sources (the owner's Wisconsin files and the CCEE 2024 workbook) |
+| `js/modules/standards-db.js` | GENERATED compact copy the browser reads (`node tests/scripts/ws-standards.cjs --write-db`); never hand-edit |
+| `js/modules/standards.js` | `SKILL_STANDARDS` map (`'category:skill' → {ccss, ee}`) plus `standardsFor`, `skillsForStandard`, `coverage` |
+| `design/STANDARDS_COVERAGE.md` | The coverage report: which standards are covered and the gap list of skills still to make |
+
+Rules: a **new skill must get a `SKILL_STANDARDS` entry** (primary CCSS first, plus its EE) in the same
+change; `node tests/scripts/ws-standards.cjs` is the gate and regenerates the coverage report. Use the
+gap list in `STANDARDS_COVERAGE.md` to choose the next skills to build.
+
 ## Researching Skills Before Implementation
 
 **The design contract above outranks every reference site.** Research tells you *what to teach and

@@ -1,6 +1,6 @@
 # Option Panel Rubric — 1 to 10, per skill
 
-**Version 1 · 2026-09-25.** Owner request: "make sure there is an option audit as well for each
+**Version 2 · 2026-09-25** (v2 adds O6 Appearance and caps OC13–OC15, owner ruling: "the options must be quality covering support, difficulty and appearance… must have an 8/10 to pass with a critic agent assessing them independently"). **Version 1 · 2026-09-25.** Owner request: "make sure there is an option audit as well for each
 skill so the options make sense and can go easier/harder, more support/less support" and "each
 option panel needs to have an 8/10 or above. And all parts of the option need to be made sure it's
 working for both print and screen as applicable."
@@ -8,7 +8,7 @@ working for both print and screen as applicable."
 This rubric grades a skill's **option panel**: the controls a teacher sees for that skill
 (`offeredOptionsFor()` in `js/modules/skill-options.js`, drawn by `js/modules/skill-options-ui.js`).
 It is a companion to `RUBRIC.md` (which grades the rendered page and card). A skill passes this
-rubric when **every criterion O1–O5 scores 8 or more and no cap applies.** One criterion at 7 is a
+rubric when **every criterion O1–O6 scores 8 or more and no cap applies.** One criterion at 7 is a
 fail.
 
 | Gate | Reads | Catches |
@@ -33,7 +33,7 @@ Governing rules the critic applies (they outrank general design advice):
 
 ---
 
-## 1. The five criteria
+## 1. The six criteria
 
 ### O1 · Sense — is every option meaningful here, and is nothing essential missing?
 
@@ -99,7 +99,33 @@ predicate on one surface; 7 or less = any hard failure (see caps).
   "Pictures" that the level also removes).
 - The help line says honestly what the control does, including exceptions ("multi-digit stays
   stacked").
-- The panel fits: ≤ 5 controls, a set with > 8 values offers "All" / "None".
+- The panel fits: ≤ 6 controls (with one appearance control), a set with > 8 values offers "All" / "None".
+
+### O6 · Appearance — can the teacher change how the item looks, where the skill has a real choice?
+
+Two layers, both graded:
+- **Item form (on the skill panel).** Where the skill has a genuine choice of how an item is written
+  or drawn, the panel offers it, and every value visibly changes print *and* screen. Typical
+  essentials by family:
+  - operations: **vertical / horizontal** (stacked or across); fact drills: across / stacked;
+  - K-2 counting and composing: the **picture kind** (dots / objects / ten frame / dice);
+  - number lines: **tick labels** (every number / some / ends only) and hops shown or not;
+  - geometry and measurement figures: **figure labels** (all / some / none);
+  - clocks: **numerals** (all / quarters / none); money: coins in order or scattered;
+  - graphs: the graph drawn or the table only, where both teach the skill;
+  - answer shape where the pupil's written response can change (box / line / pick from a bank),
+    never turning a production item into multiple choice on screen only.
+  A skill with genuinely one correct form (a hundreds chart, a place-value chart) scores O6 = 8
+  without an item-form control only when the critic can say in one sentence why.
+- **Page choices honoured by the skill (on the Print screen).** Size S / M / L and Columns really
+  change this skill's layout: the drawings scale, and the column-fit rule holds (most skills reach 2
+  columns at S, operations 3, fact drills 4+; an item that must stay one column is placed at the top
+  or bottom of a multi-column page, never forcing the whole page to 1 column). Wasted space inside a
+  cell (RUBRIC H13) at any size counts against O6.
+
+Score: 10 = every appearance choice a specialist teacher expects is there and each changes both
+surfaces; 8 = the essential one is there and works, sizes and columns honoured; 7 or less = an
+essential appearance choice missing, a value that looks identical, or the skill ignoring size/columns.
 
 ---
 
@@ -137,6 +163,9 @@ Score down when in doubt. A score of 8+ must be defensible in one sentence.
 | OC10 | No option is shown at all and the skill has both a number size and a hint scaffold | O1 ≤ 3, O2 ≤ 3, O3 ≤ 3 |
 | OC11 | Two controls duplicate each other, or a value label repeats | O5 ≤ 6 |
 | OC12 | A value makes the generator throw, return nothing, or hang | O4 ≤ 2 |
+| OC13 | An appearance value changes nothing visible on print or screen | O6 ≤ 3 |
+| OC14 | The skill ignores Size or Columns (same layout at S and L, or stays 1 column when 2 fit) | O6 ≤ 5 |
+| OC15 | The family's essential appearance choice (§1 O6 list) is missing | O6 ≤ 6 |
 
 ---
 
@@ -145,14 +174,14 @@ Score down when in doubt. A score of 8+ must be defensible in one sentence.
 One row per skill in `OPTIONS-AUDIT.md`:
 
 ```
-| skill | O1 | O2 | O3 | O4 | O5 | caps | pass |
+| skill | O1 | O2 | O3 | O4 | O5 | O6 | caps | pass |
 ```
 
 and, for every score below 10, a defect line: criterion, the concrete defect, and the fix, grouped
 by the generator file that must change (fix agents own files, not skills).
 
 Rules for the critic:
-- **Evidence or nothing.** O4 comes from the verifier report; O1–O3 and O5 from the live panel and
+- **Evidence or nothing.** O4 comes from the verifier report; O1–O3, O5 and O6 from the live panel, the renders at each appearance value and size, and
   the generated items.
 - **No praise, no hedging.** Report problems.
 - **Grade what is shown to the teacher,** not the option model: an option in `SKILL_OPTIONS` that

@@ -429,6 +429,8 @@ let timer = null;
 let shownFor = null;        // the trigger element
 let describedEl = null;     // the element carrying aria-describedby
 let pinnedBy = null;        // the (i) button that pinned it
+let pendingFocus = null;    // the focused element a scheduled (keyboard) preview is for
+let shownByFocus = false;   // the open preview came from keyboard focus (not hover)
 let lastHide = 0;
 let pointer = { x: -1, y: -1 };
 let installed = false;
@@ -528,6 +530,7 @@ function show(t, focusEl) {
     place(t);
     shownFor = t;
     describedEl = focusEl || t;
+    shownByFocus = !!focusEl;
     const cur = (describedEl.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
     if (!cur.includes(POP_ID)) describedEl.setAttribute('aria-describedby', [...cur, POP_ID].join(' '));
 }
@@ -545,10 +548,12 @@ function hide(silent) {
     shownFor = null;
     describedEl = null;
     pinnedBy = null;
+    shownByFocus = false;
 }
 
 function schedule(t, focusEl) {
     clearTimeout(timer);
+    pendingFocus = focusEl || null;
     const delay = Date.now() - lastHide < 400 ? WARM : DELAY;
     timer = setTimeout(() => show(t, focusEl), delay);
 }
@@ -650,6 +655,24 @@ export function installPreview() {
         hide();
     }, true);
 
-    window.addEventListener('scroll', () => { if (pop && !pop.hidden) hide(); else clearTimeout(timer); }, { passive: true, capture: true });
+    // A scroll hides a hover preview. A KEYBOARD preview follows its row instead: arrowing down a
+    // long list scrolls the focused row into view, and the preview must not vanish (or never
+    // appear) each time it does. It re-places beside the row and hides once the row leaves the
+    // window. A pinned (i) preview still closes on scroll.
+    let followRaf = 0;
+    const followsFocus = (el) => !pinnedBy && el && el === document.activeElement && el.isConnected;
+    window.addEventListener('scroll', () => {
+        if (pop && !pop.hidden) {
+            if (!shownByFocus || !followsFocus(describedEl)) { hide(); return; }
+            if (followRaf) return;
+            followRaf = requestAnimationFrame(() => {
+                followRaf = 0;
+                if (!shownFor || !pop || pop.hidden) return;
+                const r = anchorRect(shownFor);
+                if (r.bottom <= 0 || r.top >= window.innerHeight) { hide(); return; }
+                place(shownFor);
+            });
+        } else if (!followsFocus(pendingFocus)) clearTimeout(timer);
+    }, { passive: true, capture: true });
     window.addEventListener('resize', () => { if (pop && !pop.hidden) hide(); });
 }
