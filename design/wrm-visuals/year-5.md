@@ -272,3 +272,200 @@ legacy PARTIAL** until the pv drawing gains places 0.1 / 0.01 / 0.001 (N5-03). T
 | 2 Compare volume | A long flat shape vs a tall one (taller is not greater); pairs of cube shapes in boxes (which greater?); **compare circles between pairs of cuboid pictures**; cuboids drawn on isometric paper; stepped shapes (a volume between two others); **two shapes built from different-sized cubes** (not comparable by count). Guide: cube-built solids; layers × cubes per layer. | PARTIAL N5-13 + MATCH R34 compare circle. |
 | 3 Estimate volume | A book beside a cuboid of cubes (estimate); an apple beside a cube block; a pyramid beside a stepped cube pyramid; why not cm³ for a room (m³); estimate everyday volumes; a money box partly filled with cubes (depth ignored); marbles in boxes (0.8 cm³ each). Guide: one layer × number of layers. | GAP (N5-13 `task: 'estimate'`, low; pictures are photographs of real objects). |
 | 4 Estimate capacity | **Pairs of containers (glasses, beakers, flasks, cones) with the same amount of juice** → greater capacity; capacity cards for a bottle (20 ml / 200 ml / 2 litres / 20 litres) and a teacup; **three containers each holding 1 litre at different levels** (estimate capacity); **a bottle poured into two 250 ml measuring jugs** (scale); four 1-litre containers, estimate each volume of water; jugs A / B with 500 ml at different heights; 1 cm³ of water = 1 ml = 1 g; compost bags (4.5 litres, £2.50). Guide: jug with a scale + a 1-litre bottle benchmark. | Jugs: PARTIAL R51 (`measurement:mass_volume_liquid` graduated cylinder, legacy → kit `template:jug`). Unscaled containers: GAP Y1 R62. Unit choice: MATCH `measurement:capacity`. |
+
+---
+
+## Every Year 5 representation (de-duplicated)
+
+"Where" lists the Year 5 blocks / steps that use it. "Earlier" = the same representation in an earlier
+table (`year-3.md` R01–R84, `year-2.md` R85–R101, `year-1.md` "Y1 R.."), or **NEW** when none of Years 1,
+2 and 3 has a row for it. Status is the best match across the app **for the Year 5 use** (number range,
+decimals, orientation), so a Y3 MATCH can be a Y5 PARTIAL.
+
+| # | Representation | Where (Y5) | Earlier | Status | Existing / proposed |
+|---|---|---|---|---|---|
+| R01 | Base-10 blocks to scale incl. the thousand cube; **decimal base 10** (flat = 1); inside area-model cells | B1 S2; B5 S2; B7 S1, S5 | Y3 | PARTIAL | `pane:base10` (to 99, not wired) → thousands cube, `unit: 'flat'` (flat = 1), `task: 'read'` |
+| R03 | Place-value counters loose / in a row (to 100,000; decimal counters) | B1 S2, S8, S10; B2 S2; B7 S5–S6 | Y3 | MATCH / PARTIAL | `template:pv` `disks` (`place_value_disks` band ≤ 9,999) → 99,999 / 999,999 bands; decimals → N5-03 |
+| R04 | PV chart with counters, read / build (TTh, HTh; beside a calculation) | B1 S2–S4, S7, S10; B2 S1–S3; B3 S8–S9; B5 S1, S7–S9, S11; B7 S1, S7–S9; B12 S1, S4–S8, S10–S12 | Y3 | PARTIAL | `template:pv` `build` (`pv_disks_build` ≤ 999) → 5–6 digit bands; beside a calc → R31 |
+| R05 | Chart with **plain unlabelled dots** (value from the column; slide left / right) | B1 S2–S7, S10; B2 S1; B3 S8–S9; B7 S7–S9; B12 S10–S11 | Y3 | GAP | `disk: 'value' \| 'dot'` on the pv mat; `motion: 'left' \| 'right'` arrows for × / ÷ 10 |
+| R06 | Digit PV chart (digits in heads; the shift chart) | B3 S9; B7 S7, S9; B12 S11–S12 | Y3 | MATCH / PARTIAL | `_pvDigitSupport` `support: 'chart'`; `place_value_10x` `support: 'shift'` (1 dp) → Hth / Thth heads |
+| R07 | Bead string (10 beads = 1; 100 beads = 100 %) | B7 S2, S14 | Y3, Y1 R29 | GAP | `pane:beadstring` (`unit` 0.1 / 1 %) |
+| R10 | Ten frame of PV counters — **tenths** (0.1 in each square; two frames) | B12 S2–S3 | Y3 | GAP | `unit: 0.1 \| 1 \| 10 \| 100`, `frames: 2` on `pane:tenframe` |
+| R11 | Part-whole, 2 parts (numerals, split at the comma, decimals to make 1, Roman parts as text) | B1 S1, S4–S5; B2 S5; B5 S7, S10; B7 S2; B12 S2 | Y3 | MATCH / PARTIAL | `template:bond`; decimal / text values PARTIAL (`values: 'decimal' \| 'text'`) |
+| R13 | Part-whole, 3 parts (numbers; percentages; decimals) | B1 S8; B7 S12, S14 | Y3 | GAP | `parts: 2…5` on `template:bond` |
+| R15 | Split-and-operate part-whole (÷ arrows under each part) | B5 S7, S10 | Y3 | GAP | `template:split-op` |
+| R16 | Area model — 2 × 2 grid (numbers; base 10 or PV counters in the cells) | B5 S2–S3, S5 | Y3 | PARTIAL | `multiplication:area_model_mult_hard` (legacy 2×2 / 2×3); kit `template:area-model` is 1-digit × n → `rows`, `fill: 'base10' \| 'disks'` |
+| R17 | Number line to read / label / arrows (to 1,000,000; decimals to 0.001; zoomed interval) | B1 S3, S9, S11; B7 S2, S4, S6, S8; B12 S9; B13 S2 | Y3 | PARTIAL | `pv` `line-mark`, `decimals:decimal_nl_drag` (`ticks`) → `number_sense:read_number_line` (Y3 proposal) with 6-digit and decimal intervals, `zoom` |
+| R18 | Estimate on a line (ends only / midpoint only; midpoint between two fractions) | B1 S9, S11, S13; B4 S14 | Y3 | PARTIAL | `ticks: 'none' \| 'mid'` + `task: 'estimate' \| 'midpoint'` on read_number_line |
+| R19 | Skip-count / equal-jump line (fraction lots; through zero) | B5 S10; B13 S3 | Y3 | PARTIAL | `template:hop-line` (from 0, whole steps) → negative start, `bridge: 0`, unequal "chunk" arcs |
+| R20 | Jump line with labelled hops (compensation ±; bridge 1 with decimals; count on to find a difference; split at 0) | B2 S1, S8; B4 S14–S15; B7 S10–S11; B12 S3, S8; B13 S5 | Y3 | PARTIAL | `pane:openline` (not wired); `number-line` 0–20 → `line: 'open'`, `hops: 'compensate' \| 'bridge'`, decimal / fraction / integer values |
+| R21 | Split under the second number to make a whole (0.67 → 0.55 + 0.12) | B12 S3 | Y3 | GAP | `pane:split` with decimal values |
+| R22 | Number / sequence track (Roman, mixed numbers, decimals, 10,000s) | B1 S1, S7; B4 S13; B12 S9 | Y3 | MATCH / PARTIAL | `template:count-row` / `seqstrip` (`count_by_step_*`, `count_by_powers_of_10`) → fraction / decimal / text tiles |
+| R23 | Hundred square — shade multiples, circle a second set, the sieve | B3 S1–S2, S5 | Y3 | PARTIAL | `pane:hundreds`, `template:chartwindow` → whole-chart `task: 'shade' \| 'circle' \| 'sieve'` |
+| R25 | Bar model part-whole (whole over parts; fact family; decimals) | B1 S3–S4; B2 S5–S6, S8; B5 S6, S11; B12 S6 | Y3 | PARTIAL | `template:word-work` `wpBar`, `pane:bar` (not wired), `algebra:tape_diagram` (legacy) |
+| R26 | Comparison bars (stacked, left-aligned; brace for the total, difference marked) | B2 S6–S7 | Y3 | MATCH / PARTIAL | `wpBar` compare look → `brace: 'total'` |
+| R27 | Equal-parts bar with counters / PV counters / numerals in the parts; "?" whole (find the whole) | B6 S4–S7; B7 S1 | Y3 | GAP | `model: 'bar'` + `fill: 'counters' \| 'disks' \| 'numbers'`, `task: 'part' \| 'whole'` → `fractions:fraction_of_amount`, `find_the_whole` |
+| R29 | Unit-conversion bars (1 km cells over "__ m"; gallons over pints over ml) | B14 S1–S2, S4 | Y3 | GAP | `model: 'bars'` on `measurement:unit_conversions` / `length_metric` |
+| R30 | Column method on squared paper (5–6 digits; 4-digit × 1-digit; decimals with a point track) | B2 S2–S3; B3 S7; B5 S1; B12 S4–S8 | Y3 | MATCH / PARTIAL | `template:stack` (whole numbers; bands to 10,000); point track exists in `template:money-columns` (£) → `stack` `dp: 1–3` |
+| R31 | PV chart beside the method with exchange ring + arrow (add, subtract, n rows for ×, grouped rings for ÷) | B2 S2–S3; B5 S1, S7–S9, S11; B12 S4–S7 | Y3 | GAP | `pane:pv-exchange` (`op` + − × ÷, decimal places) |
+| R32 | Crossed-out parts (fraction bars, area rectangles, whole squares) | B4 S9, S14–S17 | Y3 | PARTIAL | `frac-model` → `cross: k` (hatched or X over parts; a big X over a whole) |
+| R33 | Missing-digit boxes (column, bus stop, splat-hidden digits) | B2 S2–S3, S8; B5 S1, S5, S7–S9; B12 S8 | Y3 | MATCH | `add_missing_digit`, `sub_missing_digit`, `mult_missing_digit`; bus stop → N5-10 |
+| R34 | Compare circle (< > =) between numbers, expressions, measures, pictures | B1–B4, B5 S5–S6, S8; B7; B12 S10; B13 S4; B14 S1–S3; B15 S2 | Y3 | MATCH | equation frame (sign in a circle); `template:pv` `compare` |
+| R36 | Function machine / arrow chain (÷100 then ÷2; × ↔ ÷ inverse) | B3 S10; B12 S12 | Y3 | PARTIAL | `template:function-table` → chained look |
+| R37 | Equal groups (objects ringed) | B6 S4 | Y3 | MATCH | `template:arrays` groups |
+| R38 | Arrays (split with dashed lines; n × n square arrays; factor arrays) | B3 S1, S3–S4, S6; B5 S10; B6 S4 | Y3 | MATCH / PARTIAL | `template:arrays`, `pane:array`; split line PARTIAL |
+| R41 | Linking-cube towers (improper fractions: towers of 5) | B4 S4–S5 | Y3, Y1 R11 | GAP | `objects` kind `cubes` |
+| R43 | Venn diagram (multiples / factors of two numbers) | B3 S2, S4 | Y3 | GAP | `template:venn` + `number_theory:common_multiples` / `common_factors` |
+| R44 | Carroll diagram 2 × 2 (multiples; prime × even; symmetry × sides) | B3 S2, S5; B11 S5 | Y3 | GAP | `template:carroll` |
+| R46 | Ruler cm / mm (short rulers, offset start; decimal-metre scale under a bar) | B7 S6; B8 S1; B10 S5; B14 S3 | Y3 | PARTIAL | `measurement:reading_ruler` (inches, legacy) → kit `template:ruler` `units`, `start`, decimal labels |
+| R48 | Double / triple number line (kg\|g, m\|km, ml\|l, h\|min; decimal\|fraction; fraction\|decimal\|percent) | B7 S2, S4, S15; B14 S1–S2, S5 | Y3 | GAP | `template:double-scale` (`rows: 2 \| 3`, value kinds per row) |
+| R50 | Balance / see-saw with weights | B14 S1 | Y3, Y1 R61 | PARTIAL | `measurement:heavier_lighter_visual` → `template:balance` |
+| R51 | Measuring jugs / containers with a scale | B15 S4 | Y3 | PARTIAL | `mass_volume_liquid` (legacy) → `template:jug` |
+| R52 | Perimeter / area on a squared grid; labelled rectilinear shapes; missing sides; regular polygons | B8 S1–S5; B10 S8; B12 S5 | Y3 | MATCH / PARTIAL | `area_perimeter:perimeter_grid`, `perimeter`, `area_unit_squares`, `composite_shapes`; missing-side / regular tasks PARTIAL |
+| R53 | Fraction area models (rectangles in strips / grids; circles; two-way split) | B4 S1–S3, S5, S10, S14 | Y3 | PARTIAL | `frac-model` area / circle (`model` option) → `split: [a, b]`, several wholes |
+| R54 | Fraction bars: stacked equal-length, wall rows, past one whole, mixed-number bars (wholes + part), brackets / braces, 100 % head | B4 S1–S17; B6 S1–S3, S7; B7 S13 | Y3 | PARTIAL | `frac-model` bar (one bar) → `stack`, `wholes`, `brackets`, `labels: 'unit'`, `whole: '100%'` |
+| R55 | Fraction number line (past 1: 0–3, 0–4; fraction blocks sitting on the line) | B4 S4–S5, S7, S16; B6 S1–S2 | Y3 | PARTIAL | `fraction_nl_drag`, `mixed_nl_drag` (`ticks`) → `blocks: true` |
+| R56 | Two stacked fraction lines (equivalence; subtraction hops) | B4 S1–S2, S14 | Y3 | PARTIAL | `frac-model` line → `stack: 2` |
+| R57 | Fraction of a set (pictured objects ringed) | B6 S4 | Y3 | PARTIAL | `fractions:fraction_of_set` (legacy) → `template:arrays` rings |
+| R58 | Data / listing table with blanks (populations, masses, conversions, cube table, translation table, temperatures) | B1 S11, S14; B2 S4; B3 S7; B9 S1, S3; B11 S4; B13 S1, S5; B14 S5 | Y3 | GAP | `template:data-table` |
+| R59 | Sort table (2–5 labelled columns) | B3 S5; B6 S4; B10 S2; B12 S6, S8 | Y3 | PARTIAL | `hands-sort` page tag; kit `template:sort-table` GAP |
+| R60 | Analogue clock (minute-hand turn in degrees) | B10 S1 | Y3 | MATCH | `template:clock` |
+| R64 | Time line with hops (to the hour, hours, minutes) | B14 S6 | Y3 | MATCH | `template:timeline` (`elapsed_find_duration`) |
+| R69 | Price tags / price boards on pictured items | B2 S4, S6; B5 S6; B12 S1, S4 | Y3 | PARTIAL | money word problems (`template:word-work`), `money-columns` (`currency`) |
+| R73 | Two-way table with totals (read, complete, build from sentences) | B9 S4 | Y3 | GAP | `graphs:two_way_table` on R58 |
+| R74 | Angles with arcs / right-angle marks (classify, estimate, in a polygon) | B10 S2–S3, S8 | Y3 | PARTIAL | `angles_lines:identify_angles`, `measure_angles` (MC estimate; legacy) → kit `template:angle` |
+| R76 | Lines of symmetry on shapes (on squared paper; vertical / horizontal / diagonal) | B11 S5 | Y3 | PARTIAL | `angles_lines:symmetry`, `place_symmetry_lines` (legacy) |
+| R78 | 2-D polygons with equal-side hatch marks; regular / irregular; polygon or not | B10 S9 | Y3 | MATCH / PARTIAL | `shapes_classify:classify_quads`, `shapes_early:shape_attributes` → hatch marks, `task: 'regular'` |
+| R79 | 3-D solids (name, match, faces / edges / vertices) | B10 S10 | Y3 | MATCH | `shapes_early:name_3d_shapes`, `count_edges_faces_vertices` |
+| R80 | Turns: compass rose (8 points), a labelled-direction star, a figure turning | B10 S1, S6–S7 | Y3, Y1 R64 | GAP | `angles_lines:turns` |
+| R81 | Digit / number cards into box templates (□□□□ × □□; □.□□; □ < □) | B1 S3, S10; B4 S7, S16; B5 S5–S6; B7 S3; B12 S3–S4, S6 | Y3 | PARTIAL | `template:cloze-bank`; box template GAP |
+| R82 | Grouped-object pictures for word problems (bags, boxes, packs) | B2 S6; B5 S11; B6 S4 | Y3 | PARTIAL | `template:wordpic` / `pictures` option |
+| R87 | Covered / hidden part (splat over counters, digits, a hundred square) | B1 S8; B5 S5; B7 S12 | Y2, Y1 R32 | GAP | `cover` mark |
+| R92 | Shape as the unknown (in an inequality) | B2 S8 | Y2, Y1 R39 | GAP | shape-symbol unknowns |
+| R96 | Reflection / symmetry completion on squared paper (mirror line; shade squares) | B11 S5–S6 | Y2 | GAP | `template:symmetry-grid` → merged with N5-18 |
+| R98 | Thermometer (vertical and **horizontal**; below zero) | B13 S1–S2, S4 | Y2 | PARTIAL | `measurement:temperature` (`createThermometerSVG`, vertical −10…40) → `orientation`, `min/max/every` |
+| Y1 R48 | "Which pictures show n?" / odd one out across representations | B1 S2; B7 S2–S3 | Y1 | GAP | `task: 'which'` across panes |
+| Y1 R79 | True / false and always / sometimes / never statement cards | every block (reasoning pages) | Y1 | MATCH | reasoning page role (true / false) |
+| **N5-01** | **Roman numerals** (symbol → value table, partition into Roman parts, match cards, dates, sequences, calculations) | B1 S1, S8, S10 | **NEW** | GAP | `placevalue:roman_numerals` (+ Y3 R61 Roman clock numerals reuse the converter) |
+| **N5-02** | **Period-grouped PV chart** (Thousands \| Ones, H T O under each; commas in threes) | B1 S4–S6, S11 | **NEW** | GAP | `heads: 'periods'` on the pv chart, `pv_digit_drag`, `number_word_names` support |
+| **N5-03** | **Decimal PV chart** (O · Tth \| Hth \| Thth, the point on the column line) with **0.1 / 0.01 / 0.001 counters** (also fraction-labelled 1/10 …) and decimal digit charts | B7 S1, S5–S9, S14; B12 S1, S4–S8, S10–S12 | **NEW** | GAP | extend `pv.js` places below the ones (`LETTER` 0.1 → Tth …), `disk: 'fraction'`; decimal bands on `place_value_disks` / `pv_disks_build` / `value` / `expand` |
+| **N5-04** | **Gattegno chart** (rows 1–9 × powers of ten, incl. decimal rows; ring cells; arrows up / down a row) | B1 S6–S7; B3 S8; B12 S10–S12 | **NEW** | GAP | `template:gattegno` (`rows`, `task: 'read' \| 'ring' \| 'shift'`) as a support on `place_value_10x`, `more_less_*` |
+| **N5-05** | **Hundred square as one whole** (columns = tenths, cells = hundredths; shade / read; two squares for > 1; percent) | B7 S1, S3–S4, S12–S15; B12 S1–S2 | **NEW** | PARTIAL | `conversions:percent_visual`, `fraction_operations:frac_10_100` (legacy) → kit `template:hundred-square` (`labels: 'decimal' \| 'fraction' \| 'percent'`) |
+| **N5-06** | **Thousand square** (1,000-cell grid) | B7 S5 | **NEW** | GAP | `template:hundred-square` `grid: 1000` |
+| **N5-07** | **Percentage bar** (a "100 %" bar in tenths / quarters / fifths, % in each part; 10 % split into 1 %) | B7 S12–S15 | **NEW** | GAP | `frac-model` bar `whole: '100%'` + `conversions` skills |
+| **N5-08** | **Equivalence multiplier arrows** (× n / ÷ n arcs over the numerators and under the denominators) | B4 S1–S3 | **NEW** | GAP | mark pane `scale-arrows` (support on `equivalent`, `equiv_frac_nv`, `simplify`) |
+| **N5-09** | **Long multiplication** with partial-product rows, placeholder zero and "(__ × __)" row labels | B5 S3–S5 | **NEW** | PARTIAL | `multiplication:multiply` `tiles: 22` (legacy `column-mult`), `mult_placeholder_zero` → kit `stack` `partials: true`, tiles 32 / 42 |
+| **N5-10** | **Short division (bus stop)** with carried digits and a remainder "r" | B5 S7–S11 | **NEW** | PARTIAL | `template:division` (long-division bracket + work rows) → `form: 'short'` |
+| **N5-11** | **Number pyramid** (each brick the sum of the two below; whole numbers or decimals) | B2 S5; B12 S5 | **NEW** | GAP | `template:pyramid` (`rows` 3–5, blanks anywhere) |
+| **N5-12** | **Factor-pair list / two-row factor table** (systematic, crossed-out non-factors) | B3 S3, S6 | **NEW** | PARTIAL | `number_theory:factor_tchart_*`, `factor_links_*` (legacy drag, B&W) → kit template |
+| **N5-13** | **Isometric cube solids** (linking-cube shapes, cube of cubes, cuboids in layers) and **isometric dot paper** | B3 S7; B10 S10; B15 S1–S3 | **NEW** | PARTIAL | `area_perimeter:volume`, `volume_composite` (legacy boxes) → `template:cube-solid` + `template:iso-grid` |
+| **N5-14** | **Protractor** (semicircle, inner / outer scales; full-circle 360°) over an angle | B10 S4–S6 | **NEW** | GAP | `template:protractor` + `angles_lines:read_protractor` |
+| **N5-15** | **Angles at a point / on a straight line** (sectors with arcs, known angles, letter unknowns; crossing lines) | B10 S6–S8 | **NEW** | PARTIAL | `angles_lines:additive_angles` (legacy, 2 parts, text) → kit `template:angle-sum` (`around: 180 \| 360`, 2–6 parts) |
+| **N5-16** | **First-quadrant coordinate grid** (read / plot / join; axes without grid lines) | B11 S1–S2, S4 | **NEW** | PARTIAL | `coordinates:coordinate_q1`, `coordinate_graph`, `coord_polygon` (legacy) → kit `template:coord-grid` |
+| **N5-17** | **Translation on a grid** (draw the image; "__ right / left, __ up / down" frame; coordinate table) | B11 S3–S4 | **NEW** | PARTIAL | `coordinates:geo_translate` (legacy MC) → `coord-grid` `task: 'translate'` |
+| **N5-18** | **Reflection in a vertical / horizontal mirror line** (squared or coordinate grid; image coordinates) | B11 S6 | **NEW** | PARTIAL | `coordinates:geo_reflect` (legacy MC) → `coord-grid` `task: 'reflect'` (shared with R96) |
+| **N5-19** | **Line graph** (plot from a table, read between points, choose the axis scale; sketch graphs to stories) | B9 S1–S2 | **NEW** | GAP | `graphs:line_graph` |
+| **N5-20** | **Timetables** (train / bus stops × times; school timetable grid; TV-guide grid and block timeline) | B9 S5; B14 S6 | **NEW** | GAP | `template:data-table` `kind: 'timetable'` + `measurement:timetable` |
+| **N5-21** | **Number line through zero**, horizontal and **vertical** (lift panel, sea-level scale) | B13 S1–S5 | **NEW** | MATCH / PARTIAL | horizontal MATCH `integers:number_line_int` (value-line), `integer_nl_drag`; vertical → `orientation: 'vertical'` |
+| **N5-22** | **Conversion ladder** (unit boxes mm → cm → m with ÷ arrows above, × arrows below) | B14 S1, S3, S5 | **NEW** | GAP | structural scaffold pane `ladder` on `length_metric`, `unit_conversions` |
+| **N5-23** | **Estimate area of an irregular shape on a cm grid** (full / more-than-half squares) | B8 S6 | **NEW** | GAP | `area_perimeter:estimate_area` on `pane:gridpaper` |
+| **N5-24** | **Compound rectilinear area split into A / B** (dashed partition; subtract the missing corner) | B8 S5; B10 S8 | **NEW** | MATCH / PARTIAL | `area_perimeter:area_polygon_decompose`, `composite_shapes`; `method: 'subtract'` PARTIAL |
+| **N5-25** | **One number, four ways** grid (counters \| part-whole \| bar \| PV chart) | B1 S3 | **NEW** | GAP | low; a reasoning / lesson-page frame over existing panes |
+| **N5-26** | **Two worked methods side by side** (Method 1 \| Method 2; which is more efficient / correct) | B3 S10; B4 S16–S17; B5 S3, S6, S10; B8 S1 | **NEW** | PARTIAL | error-analysis / reasoning page roles; a `method-pair` frame |
+| **N5-27** | **Partition flow for mixed numbers** (split into whole + fraction, operate, recombine) | B4 S12–S13; B6 S3 | **NEW** | GAP | low; bond `values: 'fraction'` (Y3 R14) chained |
+| **N5-28** | **Counter-pattern terms** (1st, 2nd, 3rd term as growing counter columns) | B12 S9 | **NEW** | GAP | low; `count-row` with pictured terms |
+| **N5-29** | **Square and cube notation** (n², n³; tables of squares / cubes) | B3 S6–S7, S8 | **NEW** | GAP | `number_theory:square_numbers`, `cube_numbers` (array / cube picture + notation) |
+| **N5-30** | **Rounding line** (two bounding multiples, halfway, bounds circled, hops to each bound; to 1,000,000 and to 1 dp) | B1 S12–S14; B2 S4; B7 S10–S11 | **NEW** | MATCH / PARTIAL | `number_sense:rounding_visual`, `nearest_*`, `round_nl_*` (`pane:round-line`, `round-chart`, `round-pv`, integers only) → decimals, `hops: 'bounds'` |
+
+**Counts (92 representations: 62 shared with Years 1–3 + 30 new):** MATCH 7 · MATCH / PARTIAL 12 ·
+PARTIAL 36 · GAP 37. (Shared rows: 56 from Year 3, 4 first catalogued in Year 2, 2 in Year 1.)
+Of the PARTIAL rows, about 8 close by **wiring existing panes or widening bands** (R03, R04 6-digit bands,
+R17, R20, R25, R30 bands, R06, N5-30), 7 by **`frac-model` gaining modes** (`stack`, `wholes`, `cross`,
+`split`, `blocks`, `whole: '100%'` — R32, R53–R56, N5-07), and 12 are **legacy visuals** awaiting the
+kit / B&W migration (R16, R46, R50, R51, R57, R74, R76, R98, N5-05, N5-12, N5-13, N5-15–N5-18).
+
+---
+
+## Representations NEW relative to Years 1–3
+
+Years 1 (`year-1.md`), 2 (`year-2.md`, R85–R101) and 3 (`year-3.md`, R01–R84) have no row for these 30
+Year 5 representations:
+
+- **Place value to a million and beyond the point:** N5-01 Roman numerals; N5-02 period-grouped
+  (Thousands \| Ones) chart; N5-03 decimal PV chart with 0.1 / 0.01 / 0.001 counters; N5-04 Gattegno chart;
+  N5-30 rounding line (Year 3 has no rounding step; our rounding panes exist but are integer-only).
+- **Decimals and percentages:** N5-05 hundred square as one whole; N5-06 thousand square; N5-07 percentage
+  bar.
+- **Written methods:** N5-09 long multiplication with partial rows; N5-10 short (bus-stop) division;
+  N5-26 two worked methods side by side.
+- **Number puzzles and notation:** N5-08 equivalence multiplier arrows; N5-11 number pyramid; N5-12
+  factor-pair table; N5-27 mixed-number partition flow; N5-28 counter-pattern terms; N5-29 square / cube
+  notation; N5-25 one-number-four-ways grid.
+- **Geometry:** N5-13 isometric cube solids and dot paper; N5-14 protractor; N5-15 angles at a point / on
+  a line; N5-16 coordinate grid; N5-17 translation; N5-18 reflection in a mirror line.
+- **Measures and data:** N5-19 line graph; N5-20 timetables; N5-21 vertical number line through zero;
+  N5-22 conversion ladder; N5-23 estimating irregular area; N5-24 compound area split into rectangles.
+
+(Rows with an earlier id reuse that id's proposal — e.g. R48 double number line serves both the Year 3
+measures and the Year 5 fraction / decimal / percent lines; R96 symmetry completion and N5-18 reflection
+should be one `coord-grid` / `symmetry-grid` template — so one build closes several years.)
+
+**Suggested build order (by Year 5 reach × effort):**
+1. **Decimal place value in the pv drawing** (N5-03: places 0.1 / 0.01 / 0.001, decimal counters, the point on
+   the column line) **plus plain dots** (R05) — unlocks B7 S1, S5–S9 and B12 S1, S4–S12 (≈ 17 steps) and
+   every chart row of B1. Widen the whole-number bands to 99,999 / 999,999 on `place_value_disks`,
+   `pv_disks_build`, `more_less_100` (steps 10,000 / 100,000), `add_10k_*` / `sub_10k_*` (R03, R04, R30).
+2. **`pane:pv-exchange`** (R31: the chart beside + − × ÷ with exchange rings, repeated rows and grouping
+   rings) and the **point track in `stack`** (`dp: 1–3`, lifted from `money-columns`) — B2 S2–S3, B5 S1,
+   S7–S11, B12 S4–S8 (≈ 14 steps).
+3. **`frac-model` modes** — `stack`, `wholes` (mixed-number bars and bars past one), `cross`, `split`,
+   `brackets`, `blocks` on the line, `whole: '100%'` — plus `fill` / `task: 'whole'` for R27 — the whole of
+   B4 and B6 (24 steps) and the percentage bars of B7.
+4. **Written methods:** `stack` `partials` (N5-09, tiles 32 / 42 / 41) and `division` `form: 'short'`
+   (N5-10) — B5 S1, S3–S5, S7–S11 (9 steps).
+5. **Hundred square as a whole** (N5-05, N5-06) and the **double / triple number line** (R48,
+   `template:double-scale`) — B7 S2–S5, S12–S15, B12 S1–S2, B14 S1–S2, S5 (≈ 14 steps; R48 is shared with
+   Year 3 measures).
+6. **Geometry family:** `template:protractor` (N5-14), `angle-sum` (N5-15), `coord-grid` with read / plot /
+   translate / reflect (N5-16–N5-18, merging Y2 R96), `angles_lines:turns` (R80) — all of B10 and B11
+   (16 steps).
+7. **Data:** `template:data-table` (R58) with `kind: 'timetable'` (N5-20), two-way tables (R73), and
+   `graphs:line_graph` (N5-19) — B9 (5 steps) and B14 S6, plus the many small tables elsewhere.
+8. **Gattegno chart** (N5-04) and **Roman numerals** (N5-01) — B1 S1, S6–S8, S10; B3 S8; B12 S10–S12.
+9. **Negative numbers and measures:** `orientation: 'vertical'` on the value-line and a horizontal
+   thermometer (N5-21, R98), conversion ladder and bars (N5-22, R29), `cube-solid` + isometric paper
+   (N5-13), `estimate_area` (N5-23) — B13, B14, B15, B8 S6.
+10. Smaller items: Venn / Carroll (R43, R44), number pyramid (N5-11), multiplier arrows (N5-08), square /
+    cube numbers (N5-29), rounding panes for decimals (N5-30), period heads (N5-02), tenths ten frame
+    (R10), bead string (R07), cover mark (R87), method-pair frame (N5-26).
+
+---
+
+## Method notes
+
+Same method as the pilot (`year-3.md` § Method notes), with these Year 5 differences:
+
+- **File ids straight from `data/curriculum/wrm-steps.json`** (branch `claude/sweet-newton-c8wrv1`): each
+  step's `drive.lesson` and `drive.guide`. No folder listing was needed.
+- **Downloads by `curl`, not the Drive tool.** The files are shared "anyone with the link", so
+  `curl -sL "https://drive.google.com/uc?export=download&id=<id>" -o <stepId>.pdf` fetches each PDF directly
+  (8 in parallel, one retry loop, a `%PDF` magic-byte check). Nothing passes through the conversation or the
+  shared `tool-results` folder, so **the same-millisecond collision and the cross-lane decode theft of the
+  earlier runs cannot happen**; 136 guides and 136 lessons arrived with no loss and no re-download. Scripts:
+  `scratchpad/wrm/year-5/dl.py` (download by kind and block), `guides.py` (key-model / avoid extraction for
+  all guides in one pass, ≈ 38 KB of text for 136 steps), `tile.py` (pages 2–3, 52 dpi, three steps per
+  2 × 3 sheet). Recommended for the remaining years.
+- **Cost.** 136 steps: one guide pass, 15 block downloads (lesson PDFs 1–3 MB), 46 contact sheets read.
+  PDFs were deleted after each block; disk stayed under 50 MB.
+- **What the WRM pages lean on in Year 5** (for the build lanes): the **PV chart with counters is drawn
+  beside every written method** (add, subtract, short multiply, short divide, decimal add / subtract), and
+  the guides forbid shortcuts it replaces ("add a zero", "remove a zero", "round up / down"); fractions
+  are **always equal-length stacked bars** before any rule; decimals and percentages are anchored on the
+  **hundred square as one whole** and the **double number line**; the reasoning pages are dominated by
+  true / false, always / sometimes / never, "spot the mistake" and "two methods" items — so Year 5's error
+  analysis and reasoning page roles need the method-pair frame (N5-26) as much as new drawings.
+- **Mapping notes.** Year 5 = US Grade 4, but several Year 5 steps sit at Grade 5 in CCSS (decimals to
+  thousandths, powers of ten, volume by cubes, first-quadrant coordinates) or beyond CCSS (Roman numerals,
+  metric ↔ imperial approximations, negative numbers, translation / reflection) — the representation rows
+  are catalogued regardless; `wrm-steps.json` carries the flags. Money in £ / p maps to the `currency`
+  option; UK spellings (litre, metre) are content, not a gap.
