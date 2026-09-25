@@ -23,6 +23,7 @@ import { showToast, createBackgroundShapes, loadState, saveState, saveSettings, 
 import { toggleUserRole, setUserRole, loadUserRole, updateUIForRole } from './modules/user-role.js';
 import { showView, goHome, exitGame, saveIncompleteSession, restoreSettingsUI } from './modules/navigation.js';
 import { toggleSettingsPanel, openSettingsPanel, closeSettingsPanel, setTTS, saveSettingsToStorage, loadSettingsFromStorage } from './modules/settings-panel.js';
+import { setHelpAfterWrong, helpMode } from './modules/support-ladder.js';
 import { loadFavorites, saveFavorites, addFavorite, removeFavorite, toggleFavorite, isFavorite, clearFavorites, renderFavorites, updateFavoriteCards } from './modules/favorites.js';
 import { updateNumberSectionVisibility, initDivisorGrid, toggleDivisor, toggleAllDivisors, showDivisibilityRulesChart, updateTimerForRange, renderNumbers, toggleNumber, updateNumberButtonStates, toggleAllNumbers, updateCompactNumberVisibility } from './modules/number-selection.js';
 import { updateCategoryOptions, updateBreadcrumb, updateSkillOptions, initInlineDropdowns, updateCategoryOptionsInline, updateSkillOptionsInline, updateSkillListInline, addSkillFromList, addSkillFromDropdown } from './modules/category-dropdowns.js';
@@ -208,7 +209,7 @@ Object.assign(window, {
     showView, goHome, exitGame, saveIncompleteSession, restoreSettingsUI,
 
     // Settings Panel
-    toggleSettingsPanel, openSettingsPanel, closeSettingsPanel, setTTS,
+    toggleSettingsPanel, openSettingsPanel, closeSettingsPanel, setTTS, setHelpAfterWrong, helpMode,
     saveSettingsToStorage, loadSettingsFromStorage,
 
     // Favorites

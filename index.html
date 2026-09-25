@@ -317,6 +317,22 @@
                     </p>
                 </div>
 
+                <!-- Help after a wrong answer: the support ladder (support-ladder.js) -->
+                <div class="settings-group teacher-only">
+                    <div class="settings-group-title">🪜 Help after a wrong answer</div>
+                    <div class="settings-row">
+                        <label for="helpAfterWrongSelect">After a wrong answer</label>
+                        <select class="dropdown" id="helpAfterWrongSelect" aria-label="Help after a wrong answer" onchange="setHelpAfterWrong(this.value)">
+                            <option value="ladder">Support ladder (default)</option>
+                            <option value="worked">Worked example only</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.5;margin:0;">
+                        Practice, online worksheets and quizzes with instant feedback. Each wrong answer on a problem adds help in its cell: a support, then a different one, then the worked steps. The answer is never shown by the help. Direct Play links carry this choice.
+                    </p>
+                </div>
+
                 <!-- Adaptive Mode info (toggle and reset live in the top nav row) -->
                 <div class="settings-group">
                     <div class="settings-group-title">🎯 Adaptive Mode</div>

@@ -9,6 +9,7 @@ import {
     markAllCorrectFired,
 } from './widget-retry.js';
 import { ftAnswerMatches } from './sheet/index.js';
+import { practiceLadderWrong, markTried } from './support-ladder.js';
 
 // Expose per-skill calculator gate so #calcBtn show/hide logic in other
 // modules (question-render, etc.) can consult it. Default is no calc.
@@ -435,7 +436,7 @@ export function showSkipButtonIfNeeded() {
 // Record a wrong attempt: bumps counter, stores submission, optionally crosses
 // out the multi-choice button, optionally appends to history chips.
 // Then conditionally shows Skip.
-export function recordWrongAttempt({ submitted, btnElement, showHistoryChip }) {
+export function recordWrongAttempt({ submitted, btnElement, showHistoryChip, noHint = false }) {
     state.currentQAttempts = (state.currentQAttempts || 0) + 1;
     if (!Array.isArray(state.currentQAttemptHistory)) state.currentQAttemptHistory = [];
     state.currentQAttemptHistory.push(submitted);
@@ -452,7 +453,8 @@ export function recordWrongAttempt({ submitted, btnElement, showHistoryChip }) {
     // every skill (no more silent failures on skills that forgot to set a
     // hint string). Subsequent wrong attempts don't re-show — the popup
     // either is still open or was deliberately dismissed by the student.
-    if (state.currentQAttempts === 1
+    // The support ladder (support-ladder.js) is the help on the card: no popup on top of it.
+    if (state.currentQAttempts === 1 && !noHint
         && typeof window !== 'undefined'
         && typeof window.showHint === 'function'
         && state.currentQ) {
@@ -1162,11 +1164,21 @@ export function checkAnswer(userAns, btnElement) {
         state.lastStreakBonus = 0;
         awardXP(2, 'attempt');
 
+        // The SUPPORT LADDER (support-ladder.js, owner 2026-09-25): on the practice card each wrong
+        // answer on this item adds a support in its cell (1st, a different 2nd, then the worked
+        // steps). While it climbs, the entry stays, marked gently: no red flood, no solution.
+        const ladder = state.gameMode === 'practice' && !state.quizMode ? practiceLadderWrong(q, userAns) : null;
+        const gentle = !!(ladder && !ladder.spent);
+        if (gentle) {
+            const sb = document.getElementById("solutionBtn");
+            if (sb) sb.style.display = "none";
+        }
+
         const card = document.getElementById("questionCard");
         if (card) {
-            card.classList.add("incorrect-bg");
+            if (!gentle) card.classList.add("incorrect-bg");
             // Brief red flash, then return to neutral so student can keep trying
-            setTimeout(() => card.classList.remove("incorrect-bg"), 700);
+            if (!gentle) setTimeout(() => card.classList.remove("incorrect-bg"), 700);
             // Skill-specific visual hint on wrong answer. perimeter_grid
             // glows the outside path yellow/orange so kids see that the
             // perimeter is the OUTSIDE distance. Stays on until next
@@ -1179,7 +1191,7 @@ export function checkAnswer(userAns, btnElement) {
             }
         }
         // Shake the card + play wrong sfx (in addition to the red flash).
-        celebrateWrong();
+        if (!gentle) celebrateWrong();
 
         const answerInput = document.getElementById("answerInput");
         const isMC = (q.options && q.options.length > 0);
@@ -1188,20 +1200,23 @@ export function checkAnswer(userAns, btnElement) {
         recordWrongAttempt({
             submitted: userAns,
             btnElement: isMC ? btnElement : null,
-            showHistoryChip: !isMC,
+            showHistoryChip: !isMC && !gentle,
+            noHint: !!ladder,
         });
 
         // Snapshot the wrong attempt so the dot row turns red AND the
         // dot becomes clickable for redo. Subsequent attempts overwrite.
         if (state.mapMode !== true) _snapshotQ(false, userAns);
 
-        // Reset the input so student can try again immediately
+        // Reset the input so student can try again immediately (the ladder keeps the entry,
+        // marked gently and selected, so typing replaces it)
         if (answerInput) {
-            answerInput.value = "";
+            if (gentle && answerInput.value) markTried(answerInput);
+            else answerInput.value = "";
             answerInput.style.borderColor = "";
             answerInput.style.background = "";
             answerInput.disabled = false;
-            setTimeout(() => answerInput.focus(), 50);
+            setTimeout(() => { answerInput.focus(); if (gentle) { try { answerInput.select(); } catch (e) { /* ignore */ } } }, 50);
         }
 
         // Record attempt but do NOT advance

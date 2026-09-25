@@ -784,3 +784,46 @@ twins, so a side-by-side page of such a mix shows twins beside that skill's prob
 
 **Not built yet.** The on-screen "Show me an example" panel (a later lane), and step states for
 the number line, arrays, counters, function tables and place value.
+
+## S9 · The support ladder for wrong answers (on screen)
+
+Owner, 2026-09-25: "if an answer goes wrong, that is where to include one of our supports, and each
+time they get it wrong you can either add more / different approach to supports."
+`js/modules/support-ladder.js`; gate `tests/scripts/ws-support-ladder.cjs`.
+
+**Where.** The practice card, each online worksheet card, and a quiz ONLY when its feedback is
+"instant". Never a test-style quiz (feedback at the end), never boss / race / MAP.
+
+**The ladder, per item** (keyed by the question object, so the next item starts clean):
+
+| Wrong answer | What happens |
+|---|---|
+| 1st | The entry stays, marked gently (grey dashed underline, selected so typing replaces it; no red flash, no shake). The skill's FIRST support is drawn in the cell: the first id its provider declares (`supports`, S2) that this item can draw. |
+| 2nd | A DIFFERENT approach: the first declared support of another kind (touch dots / picture / mark or checklist). It is added; when it clashes with the first (S4.7: two ways of counting on one problem) it takes the first's place. |
+| 3rd | The worked steps for THIS item (the provider's `workedSteps`, else the generic steps), black and white, with the Say: line. A **Listen** button reads the Say: line when Voice is on. |
+| 4th+ | Spent: the host's own behaviour (the card's Show Solution, the worksheet's red, the quiz's "The answer is"). |
+
+Items the kit does not draw get their own supports: a clock face gets its minute ring (the payload
+flag `ring: 'on'`) and then a clock checklist; a count gets the counting checklist and then the same
+count in ten frames.
+
+**No answer in a support (S8).** Pictures draw the given numbers only. The worked steps blank every
+answer value the provider marks (`___`), and a count that runs up to the answer is cut
+("Count on 2: 7, …"); the Say: line keeps the given numbers and blanks the answer.
+
+**The teacher's setting.** Settings → "Help after a wrong answer": support ladder (default) / worked
+example only / none. Saved per device (cookie `mathquest_help`); a Direct Play link carries a
+non-default choice in its settings suffix (`H1` worked example only, `H0` none; the default writes
+nothing, so existing links are unchanged and an old app skips the token). No option key was needed.
+A set whose Support level is 0 only ("nothing given") has its supports off: its ladder is the worked
+example alone.
+
+**Session data.** `state.sessionHelp` → the session history's per-skill `h`
+(`{touch: 2, tile: 1, worked: 1}`: times each was shown); a quiz answer keeps `help` (the ids shown).
+
+**Host hooks** (kept minimal; the screen-hosts lane owns these files): `answer-check.js` checkAnswer's
+wrong branch → `practiceLadderWrong`; `worksheet.js` checkWorksheetAnswer /
+checkWorksheetAnswerFromColumns wrong branches → `worksheetLadderWrong` (it waits while a word or a
+fraction is still shorter than its answer); `quiz-take.js` recordAnswer → `quizLadderWrong`, the
+instant feedback line, and `drawLadder` after the cell mounts. `screen-cell.js` `slotsFilled` now
+reads a time's two boxes (`h:mm`), so a clock item on the online worksheet is checked live.
