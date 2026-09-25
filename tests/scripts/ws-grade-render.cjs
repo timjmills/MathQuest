@@ -90,10 +90,16 @@ function supportOptsInPage({ list, SUPPORTS, COVER, MIX }) {
         return o;
     });
 }
-/** Put the --supports options in the set's option store (the screen hosts read it). */
+// --opts '{"labels":"some"}'  O6: skill option values every skill in scope carries, on the roles and
+// the screen hosts (merged over any --supports). A value a skill does not offer is dropped by the
+// app's own normalizeOptions, so one --opts can serve a mixed skill list.
+const OPTS = arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null;
+const withOpts = (o) => (OPTS ? Object.assign({}, o || {}, OPTS) : o);
+/** Put the --supports / --opts options in the set's option store (the screen hosts read it). */
 async function storeSupports(page, skill) {
-    if (!SUPPORTS) return;
-    const [opts] = await page.evaluate(supportOptsInPage, { list: [[skill.categoryId, skill.skillId]], SUPPORTS, COVER, MIX });
+    if (!SUPPORTS && !OPTS) return;
+    const [raw] = await page.evaluate(supportOptsInPage, { list: [[skill.categoryId, skill.skillId]], SUPPORTS, COVER, MIX });
+    const opts = withOpts(raw);
     await page.evaluate(({ skill, opts }) => {
         window.clearSetOptions({ silent: true });
         if (opts) window.setSetOptions(skill.categoryId, skill.skillId, opts, { silent: true });
@@ -387,7 +393,7 @@ async function renderRole(page, skill, role, dir) {
     await applyRange(page);
     const seed = hash(slug(skill) + ':' + role) % 1000000;
     const set = skill.set || [{ categoryId: skill.categoryId, skillId: skill.skillId }];
-    const supOpts = await page.evaluate(supportOptsInPage, { list: set.map((k) => [k.categoryId, k.skillId]), SUPPORTS, COVER: null, MIX: null });
+    const supOpts = (await page.evaluate(supportOptsInPage, { list: set.map((k) => [k.categoryId, k.skillId]), SUPPORTS, COVER: null, MIX: null })).map(withOpts);
     const built = await page.evaluate(async ({ skill, set, role, seed, count, size, look, paper, anchors, supOpts, COVER, MIX, columns }) => {
         try {
             const skills = set.map((k, i) => (supOpts[i] ? Object.assign({}, k, { opts: supOpts[i] }) : k));

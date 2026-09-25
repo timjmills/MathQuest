@@ -88,7 +88,8 @@
     "ftTask": "7E",
     "wpCues": "8A",
     "wpBank": "8B",
-    "wpBar": "8C"
+    "wpBar": "8C",
+    "bars": "9F"
   },
   "blocks": {
     "0": {
@@ -620,7 +621,11 @@
     },
     "wpCues": {},
     "wpBank": {},
-    "wpBar": {}
+    "wpBar": {},
+    "bars": {
+      "vertical": "V",
+      "horizontal": "H"
+    }
   },
   "scalarOnly": {
     "range": "decimal",
