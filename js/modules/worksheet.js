@@ -10,7 +10,7 @@ import {
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled,
-    fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank,
+    fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
 } from './screen-cell.js';
 
 // Build a static (non-interactive) visual for a grid-fill question so that
@@ -874,6 +874,8 @@ function _wsTidyLegacyCell(cellEl) {
 // up as a whole (screen-cell.js fitCellDigits); one that cannot reach 29 px in a grid column takes
 // a full row of the grid and is fitted again.
 function _wsFitDigits(card, cellEl, q) {
+    const grid = card.parentElement;
+    if (grid && grid.classList.contains('mq-wsfit')) { _wsFitCard(card); return; }
     if (!canFitDigits(q)) return;
     const kids = Array.from(cellEl.children).filter(c => !c.classList.contains('mq-answerrow') && !c.hasAttribute('data-mq-screen-only') && !c.classList.contains('mq-sr'));
     if (kids.length !== 1) return;
@@ -886,6 +888,70 @@ function _wsFitDigits(card, cellEl, q) {
         const w = cellEl.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
         fitCellDigits(root, cellDigitTarget(cellEl), { avail: w });
     }
+}
+
+// ---- The grid (regrade 2 2026-09-25, RUBRIC C3): cards sized to their content.
+// Every card of a sheet takes the same column width; the sheet takes as many columns (3 at
+// 1280, 2 on a tablet, 1 on a phone) as its widest card allows at the host's 29 px digits. A
+// card "fits" a column when its drawing reaches the digit size without overflowing the cell.
+// The grid stretches the cards of a row to one height (the paper cell fills its card).
+
+// Scale one card's drawing to the grid's digit size in its current column; true when it fits.
+function _wsFitCard(card) {
+    const cellEl = card && card.querySelector('.ws-cell');
+    if (!cellEl) return true;
+    const i = Number(String(card.id || '').replace('ws_card_', ''));
+    const q = state.worksheetQs && state.worksheetQs[i];
+    const cs = getComputedStyle(cellEl);
+    const avail = cellEl.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+    if (q && cellEl.dataset.wsCell === 'legacy' && (canFitDigits(q) || q._mqTwin === 'kit' || q._mqTwin === 'model')) {
+        const kids = Array.from(cellEl.children).filter(c => !c.classList.contains('mq-answerrow') && !c.hasAttribute('data-mq-screen-only')
+            && !c.classList.contains('mq-sr') && getComputedStyle(c).display !== 'none');
+        if (kids.length === 1) {
+            fitCellDigits(kids[0], cellDigitTarget(cellEl), { avail });
+            if (kids[0].dataset.mqFitShort === '1') return false;
+        }
+    }
+    // a drawing that scrolls inside itself (a long number line) does not fit this column either
+    if (Array.from(cellEl.querySelectorAll('[data-mq-scroll]')).some(s => s.scrollWidth > s.clientWidth + 1)) return false;
+    return cellEl.scrollWidth <= cellEl.clientWidth + 1;
+}
+
+/** Lay the worksheet grid out: the most columns (<= 3) in which every card fits. */
+export function layoutWorksheetGrid(grid) {
+    grid = grid || document.getElementById('worksheetGrid');
+    if (!grid || !grid.isConnected || !grid.clientWidth) return;
+    grid.classList.add('mq-wsfit');
+    unifyFactTracks(grid);
+    const cards = Array.from(grid.querySelectorAll(':scope > .problem-card.mq-wscard'));
+    if (!cards.length) return;
+    cards.forEach(c => c.classList.remove('mq-span-row'));
+    const w = grid.clientWidth;
+    const maxCols = w >= 960 ? 3 : w >= 620 ? 2 : 1;
+    for (let cols = maxCols; cols >= 1; cols--) {
+        grid.style.setProperty('--mq-wscols', String(cols));
+        let ok = true;
+        for (const c of cards) { if (!_wsFitCard(c)) { ok = false; if (cols > 1) break; } }
+        if (ok) break;
+    }
+}
+
+let _wsLayoutTimers = [];
+function _wsScheduleLayout(grid) {
+    _wsLayoutTimers.forEach(t => clearTimeout(t));
+    layoutWorksheetGrid(grid);
+    // widgets and their stylesheets mount a moment later (dynamic import): lay out again
+    _wsLayoutTimers = [80, 320, 900].map(ms => setTimeout(() => layoutWorksheetGrid(grid), ms));
+}
+if (typeof window !== 'undefined') {
+    let _wsResizeT = 0;
+    window.addEventListener('resize', () => {
+        clearTimeout(_wsResizeT);
+        _wsResizeT = setTimeout(() => {
+            const g = document.getElementById('worksheetGrid');
+            if (g && g.classList.contains('mq-wsfit') && g.clientWidth) layoutWorksheetGrid(g);
+        }, 150);
+    });
 }
 
 // Render ONE worksheet card. Shared by the first render and "Load More", which used to carry two
@@ -1285,7 +1351,6 @@ function _wsRenderCard(grid, q, i) {
         questionDisplay = twin.html;
         q._mqTwin = twin.mode;
         q._mqSlots = twin.count || 0;
-        if (twin.wide) card.classList.add('mq-span-row');
     }
 
     // For vertical format, function tables, interactive types, dual answer, coordinate types, and number families - hide the main answer input
@@ -1416,7 +1481,7 @@ function _wsRenderCard(grid, q, i) {
             afterInk: (el) => {
                 const line = el.parentNode && el.parentNode.querySelector(':scope > .question-line.mq-instr');
                 if (line) Array.from(el.children).forEach(c => hideRepeatedPrompt(c, line.textContent));
-                if (!kind && !twin) _wsFitDigits(card, el, q);
+                if (!kind) _wsFitDigits(card, el, q);
             },
         });
     }
@@ -1586,6 +1651,7 @@ export function newWorksheet() {
         state.worksheetQs.push(q);
         _wsRenderCard(grid, q, i);
     }
+    _wsScheduleLayout(grid);
     _wsHeaderPill();
 
     document.getElementById("worksheetResult").innerText = "";
@@ -1603,6 +1669,7 @@ export function addMoreProblems() {
         state.worksheetQs.push(q);
         _wsRenderCard(grid, q, i);
     }
+    _wsScheduleLayout(grid);
 
     // Scroll to the new problems
     const firstNewCard = document.getElementById(`ws_card_${startIndex}`);

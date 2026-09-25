@@ -211,6 +211,34 @@ export function factHTML(k, slotHtml) {
 }
 
 /**
+ * One set of digit tracks for every vertical fact of a sheet (regrade 2): a "7 − 4" and a
+ * "19 − 10" on one worksheet sit in the same tracks, so the stacks line up card to card, as the
+ * cells of a printed section do. Empty tracks are added on the left of the narrower facts.
+ * Idempotent; returns the track count used.
+ */
+export function unifyFactTracks(root) {
+    if (!root) return 0;
+    const facts = Array.from(root.querySelectorAll('.ws-fact.mq-fact'));
+    const count = (f) => Number(f.dataset.mqTracks) || Math.max(1, (f.children.length - 4) / 2);
+    facts.forEach((f) => { if (!f.dataset.mqTracks) f.dataset.mqTracks = String(count(f)); });
+    const N = Math.max(0, ...facts.map(count));
+    facts.forEach((f) => {
+        const n = count(f);
+        if (n >= N) return;
+        const kids = Array.from(f.children);
+        const opIdx = kids.findIndex((k) => k.classList.contains('op'));
+        const pad = () => { const s = document.createElement('span'); s.className = 'mq-factpad'; return s; };
+        for (let i = 0; i < N - n; i++) {
+            f.insertBefore(pad(), kids[opIdx].nextSibling);
+            f.insertBefore(pad(), kids[0].nextSibling);
+        }
+        f.style.gridTemplateColumns = String(f.style.gridTemplateColumns || '').replace(/repeat\(\d+,/, `repeat(${N},`);
+        f.dataset.mqTracks = String(N);
+    });
+    return N;
+}
+
+/**
  * Column arithmetic (VA-1..VA-13) in the kit's `.ws-stack` grid: the operands in their tracks, the
  * operator on the bottom row (VA-2), the sum rule, an optional regroup strip, and a digit strip of
  * inputs under the digit tracks.
@@ -460,6 +488,7 @@ export function wireTickBoxes(cellEl, q, input) {
  */
 export function adoptVisualBlank(cellEl, input) {
     if (!cellEl || !input) return false;
+    wireNumberLines(cellEl);
     const blanks = cellEl.querySelectorAll('[data-mq-blank]');
     if (blanks.length !== 1) return false;
     const blank = blanks[0];
@@ -474,6 +503,14 @@ export function adoptVisualBlank(cellEl, input) {
         input.dataset.mqPrevStyle = input.getAttribute('style') || '';
         input.style.cssText += `;${blank.getAttribute('style') || ''}`;
         input.style.removeProperty('display');
+        // a K-2 kit box keeps the paper's shape (a square for a count): the host's slot rules
+        // would widen it into a line-slot rectangle (regrade 2)
+        const bw = blank.style.width, bh = blank.style.height;
+        if (/--mq-k2/.test(bw) && /--mq-k2/.test(bh)) {
+            input.style.setProperty('--mq-bw', bw);
+            input.style.setProperty('--mq-bh', bh);
+            input.classList.add('mq-bsize');
+        }
     }
     blank.replaceWith(input);
     return true;
@@ -493,6 +530,7 @@ export function adoptVisualBlank(cellEl, input) {
  */
 export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     if (!cellEl || !input) return false;
+    wireOpsWork(cellEl);
     const slots = Array.from(cellEl.querySelectorAll('[data-mq-cell]'));
     if (!slots.length) return false;
     // What stands between the answers in `q.ans`: ", " for a list, " R " for a quotient and
@@ -536,10 +574,204 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     return true;
 }
 
+/* ------------------------------------------------------------------ the number line (regrade 2)
+ * The kit's number line is one SVG sized for paper: on a phone its labels are 7-9 px, and the
+ * paper's task ("Draw the jumps on the line") had no screen twin, so the pupil only typed a sum.
+ * On screen the line is redrawn from the same drawing (its labels and its start dot) as a row of
+ * tick buttons: every label is read at the cell's text size, every tick is a tap target (44 px
+ * wide below 1024 px; the line scrolls inside the cell when it is longer than the cell, never the
+ * page), and a tap on a tick draws a jump arc from where the pupil stands to that tick. A tap on
+ * the last landing takes that jump back; "Start again" clears them. The jumps are working, as the
+ * paper's are: the answer is still written in the equation's box.
+ */
+export const NUMBER_LINE_INSTRUCTION = 'Tap the line to jump. Write the answer.';
+
+/** Is this item the kit's number line (its instruction on screen is the jump one)? */
+export function isNumberLineItem(q) {
+    if (!q) return false;
+    const t = q.cell && q.cell.template;
+    return t === 'number-line' || /data-ws-ops="number-line"/.test(String(q.visual || ''));
+}
+
+export function wireNumberLines(root) {
+    if (!root || typeof document === 'undefined') return 0;
+    let n = 0;
+    root.querySelectorAll('.ws-ops-number-line').forEach((ops) => {
+        if (ops.dataset.mqNl === '1') return;
+        const svg = ops.querySelector(':scope > svg');
+        if (!svg) return;
+        const labels = Array.from(svg.querySelectorAll('text'))
+            .map((t) => ({ x: Number(t.getAttribute('x')), s: t.textContent.trim() }))
+            .filter((t) => t.s !== '' && Number.isFinite(t.x) && /^-?\d+$/.test(t.s))
+            .sort((a, b) => a.x - b.x);
+        if (labels.length < 2) return;
+        const dot = svg.querySelector('[data-nl-start]');
+        const start = dot ? String(dot.getAttribute('data-nl-start')) : labels[0].s;
+        const vals = labels.map((l) => l.s);
+        const startIdx = Math.max(0, vals.indexOf(start));
+        ops.dataset.mqNl = '1';
+        const wrap = document.createElement('div');
+        wrap.className = 'mq-nl';
+        wrap.setAttribute('data-mq-nl', '');
+        wrap.style.setProperty('--mq-nl-n', String(vals.length));
+        wrap.innerHTML = `<div class="mq-nl-scroll" data-mq-scroll><div class="mq-nl-track" role="group" aria-label="${attr(svg.getAttribute('aria-label') || 'number line')}. Tap a number to jump to it.">`
+            + '<svg class="mq-nl-arcs" aria-hidden="true" preserveAspectRatio="none"></svg><span class="mq-nl-line" aria-hidden="true"></span>'
+            + vals.map((v, i) => `<button type="button" class="mq-nl-tick${i === startIdx ? ' mq-nl-start' : ''}" data-i="${i}" aria-label="${attr(v)}${i === startIdx ? ', start' : ''}">`
+                + `<span class="mq-nl-mark" aria-hidden="true"></span><span class="mq-nl-lab">${esc(v)}</span></button>`).join('')
+            + '</div></div>'
+            + `<div class="mq-nl-tools"><button type="button" class="mq-nl-pan" data-d="-1" aria-label="show smaller numbers">◀</button>`
+            + `<button type="button" class="mq-nl-reset">Start again</button>`
+            + `<button type="button" class="mq-nl-pan" data-d="1" aria-label="show bigger numbers">▶</button></div>`;
+        svg.replaceWith(wrap);
+        const arcs = wrap.querySelector('.mq-nl-arcs');
+        const ticks = Array.from(wrap.querySelectorAll('.mq-nl-tick'));
+        const N = vals.length;
+        arcs.setAttribute('viewBox', `0 0 ${N * 10} 30`);
+        const jumps = [];
+        wrap._mqSetJumps = (arr) => { jumps.length = 0; (arr || []).forEach((i) => { if (i >= 0 && i < N) jumps.push(i); }); draw(); };
+        const draw = () => {
+            wrap.dataset.mqJumps = jumps.join(',');
+            let pos = startIdx;
+            let html = '';
+            jumps.forEach((to) => {
+                const x1 = (pos + 0.5) * 10, x2 = (to + 0.5) * 10;
+                const h = Math.min(26, 8 + Math.abs(to - pos) * 2.5);
+                html += `<path d="M${x1} 29 Q${(x1 + x2) / 2} ${29 - h * 2} ${x2} 29" fill="none" stroke="#000" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
+                pos = to;
+            });
+            arcs.innerHTML = html;
+            ticks.forEach((t, i) => t.classList.toggle('mq-nl-land', jumps.length > 0 && i === pos));
+            ticks.forEach((t, i) => t.setAttribute('aria-pressed', jumps.includes(i) ? 'true' : 'false'));
+            wrap.dataset.mqAt = vals[pos];
+        };
+        wrap.addEventListener('click', (e) => {
+            if (e.target.closest('.mq-nl-reset')) { jumps.length = 0; draw(); return; }
+            const pan = e.target.closest('.mq-nl-pan');
+            if (pan) {
+                const sc = wrap.querySelector('.mq-nl-scroll');
+                sc.scrollBy({ left: Number(pan.dataset.d) * sc.clientWidth * 0.6, behavior: 'smooth' });
+                return;
+            }
+            const t = e.target.closest('.mq-nl-tick');
+            if (!t) return;
+            const i = Number(t.dataset.i);
+            const at = jumps.length ? jumps[jumps.length - 1] : startIdx;
+            if (i === at) { if (jumps.length) jumps.pop(); }
+            else jumps.push(i);
+            draw();
+        });
+        draw();
+        // the start is in view when the line scrolls inside the cell
+        const scroller = wrap.querySelector('.mq-nl-scroll');
+        requestAnimationFrame(() => {
+            const scrolls = scroller.scrollWidth > scroller.clientWidth + 1;
+            wrap.classList.toggle('mq-nl-scrolls', scrolls);
+            if (scrolls) {
+                const tick = ticks[startIdx];
+                scroller.scrollLeft = Math.max(0, tick.offsetLeft - scroller.clientWidth * 0.25);
+            }
+        });
+        n++;
+    });
+    return n;
+}
+
+/**
+ * The pupil's working in a cell (number-line jumps, long-division working digits), so a host that
+ * redraws the cell (the quiz re-renders on every answer) can put it back. Working is never graded.
+ */
+export function saveWorking(root) {
+    if (!root) return null;
+    return {
+        nl: Array.from(root.querySelectorAll('[data-mq-nl]')).map((w) => w.dataset.mqJumps || ''),
+        work: Array.from(root.querySelectorAll('input.mq-work')).map((i) => i.value || ''),
+    };
+}
+export function restoreWorking(root, saved) {
+    if (!root || !saved) return;
+    Array.from(root.querySelectorAll('[data-mq-nl]')).forEach((w, k) => {
+        const s = saved.nl && saved.nl[k];
+        if (s && w._mqSetJumps) w._mqSetJumps(s.split(',').map(Number));
+    });
+    Array.from(root.querySelectorAll('input.mq-work')).forEach((i, k) => {
+        if (saved.work && saved.work[k]) i.value = saved.work[k];
+    });
+}
+
+/**
+ * Long division's working on screen (regrade 2, 2026-09-25): the kit's bracket draws the
+ * subtraction rows and the bring-down rows under the dividend as ruled space. On paper the pupil
+ * writes there; on screen each digit place of those rows becomes a one-digit box, so the whole
+ * algorithm can be worked in the cell. Scratch space only: never graded (`data-ws-graded="0"`),
+ * never auto-focused, outside the tab order, and not a `data-mq-cell` slot, so every checker
+ * still reads the quotient alone. The drawing's own rules (the line under each "−" row) stay.
+ * Idempotent. Returns the number of boxes added.
+ */
+export function wireOpsWork(root) {
+    if (!root || typeof document === 'undefined') return 0;
+    let added = 0;
+    root.querySelectorAll('.ws-ops-division').forEach((ops) => {
+        ops.classList.add('mq-opsdiv');
+        if (ops.dataset.mqOpsWork === '1') return;
+        ops.dataset.mqOpsWork = '1';
+        const grid = ops.querySelector('[role="group"]') || ops.firstElementChild;
+        if (!grid) return;
+        const pos = (el) => {
+            const st = el.getAttribute('style') || '';
+            const c = st.match(/grid-column:\s*(\d+)/), r = st.match(/grid-row:\s*(\d+)/);
+            return c && r ? { col: Number(c[1]), row: Number(r[1]) } : null;
+        };
+        const cells = Array.from(grid.children).map((el) => ({ el, p: pos(el) })).filter((x) => x.p);
+        // the dividend's digit places: row 2, under the vinculum
+        const cols = new Set(cells.filter((x) => x.p.row === 2 && /border-top/.test(x.el.getAttribute('style') || '')).map((x) => x.p.col));
+        if (!cols.size) return;
+        const rows = new Map();
+        cells.forEach((x) => {
+            if (x.p.row < 3 || !cols.has(x.p.col) || x.el.textContent.trim() || x.el.querySelector('input')) return;
+            if (!rows.has(x.p.row)) rows.set(x.p.row, []);
+            rows.get(x.p.row).push(x);
+        });
+        let step = 0;
+        Array.from(rows.keys()).sort((a, b) => a - b).forEach((row) => {
+            step++;
+            const list = rows.get(row).sort((a, b) => a.p.col - b.p.col);
+            const boxes = list.map((x, k) => {
+                const inp = document.createElement('input');
+                inp.type = 'text';
+                inp.className = 'mq-work mq-opswork';
+                inp.setAttribute('inputmode', 'numeric');
+                inp.setAttribute('maxlength', '1');
+                inp.setAttribute('autocomplete', 'off');
+                inp.setAttribute('spellcheck', 'false');
+                inp.tabIndex = -1;
+                inp.dataset.wsGraded = '0';
+                inp.dataset._boxValAttached = '1';
+                inp.dataset._colAdvAttached = '1';
+                inp.setAttribute('aria-label', `working, row ${step}, digit ${k + 1}`);
+                x.el.appendChild(inp);
+                added++;
+                return inp;
+            });
+            boxes.forEach((b, k) => {
+                b.addEventListener('input', () => {
+                    b.value = (b.value || '').replace(/[^0-9]/g, '').slice(-1);
+                    if (b.value && boxes[k + 1]) boxes[k + 1].focus();
+                });
+                b.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !b.value && boxes[k - 1]) { e.preventDefault(); boxes[k - 1].focus(); }
+                    else if (e.key === 'ArrowLeft' && boxes[k - 1]) { e.preventDefault(); boxes[k - 1].focus(); }
+                    else if (e.key === 'ArrowRight' && boxes[k + 1]) { e.preventDefault(); boxes[k + 1].focus(); }
+                });
+            });
+        });
+    });
+    return added;
+}
+
 /** Undo adoptVisualBlank on an input that outlives its cell (the practice card's #answerInput). */
 export function releaseVisualBlank(input) {
     if (!input || !input.classList.contains('mq-slot--invisual')) return;
-    input.classList.remove('mq-slot--invisual', 'mq-slot--svg');
+    input.classList.remove('mq-slot--invisual', 'mq-slot--svg', 'mq-bsize');
     if (input.dataset.mqPrevStyle !== undefined) {
         input.setAttribute('style', input.dataset.mqPrevStyle);
         delete input.dataset.mqPrevStyle;
@@ -1069,8 +1301,9 @@ export function ringCellHTML(p) {
             + `<span>${p.a}</span><span class="o">÷</span><span>${p.b}</span><span class="o">=</span>`
             + `${cellSlot(w, 'quotient')}<span class="mq-rlabel">R</span>${cellSlot(w, 'remainder')}</div>`;
     }
+    // the paper's frame: "[ ] groups of 4" (regrade 2: not a bare "Answer:")
     return ringGroupsHTML(p.a, p.b)
-        + '<div class="mq-ansline"><span class="mq-anslabel">Answer:</span> <span data-mq-blank="box"></span></div>';
+        + `<div class="mq-ansline mq-groupsof"><span data-mq-blank="box"></span> <span class="mq-anslabel">groups of</span> <span class="mq-ansn">${p.b | 0}</span></div>`;
 }
 
 /**
@@ -1192,7 +1425,7 @@ export function fitCellDigits(root, target, { avail = 0, max = 2.6 } = {}) {
     if (wide > 0 && room > 0) f = Math.min(f, (room - 4) / wide);
     f = Math.min(f, max);
     // the cell was too narrow for the host's digit size: a host that can widen the cell does
-    if (f < Math.min(want, max) * 0.9) root.dataset.mqFitShort = '1';
+    if (f < Math.min(want, max) * 0.97) root.dataset.mqFitShort = '1';
     if (f <= 1.04) return 1;
     root.style.setProperty('zoom', f.toFixed(3));
     root.dataset.mqFit = f.toFixed(2);
@@ -1258,7 +1491,13 @@ export function screenTwin(q) {
     // its data-mq-blank / data-mq-cell boxes take the answer (the generic slot pass wires them)
     if (/class="k2-twin"|data-mq-cell=|data-mq-blank=|area-model-total|fact-family-input/.test(String(q.visual || ''))) {
         const cells = (String(q.visual).match(/data-mq-cell=/g) || []).length;
-        return { mode: 'kit', html: q.visual, instr: plainText(q.text), count: cells > 1 ? cells : 0 };
+        // said once (regrade 2): a twin that prints the story itself (add_wp_10) takes a short
+        // instruction, not the story again; the number line takes its jump instruction
+        const said = _normText(q.text);
+        const instr = isNumberLineItem(q) ? NUMBER_LINE_INSTRUCTION
+            : (said && said.length > 12 && _normText(q.visual).includes(said)) ? 'Read the story. Write the answer.'
+                : plainText(q.text);
+        return { mode: 'kit', html: q.visual, instr, count: cells > 1 ? cells : 0 };
     }
     if (t === 'base10-build' || t === 'ten-frame-build') {
         const target = _n(q.target != null ? q.target : q.ans);
@@ -1387,6 +1626,11 @@ export function mountModel(root, input, { onValue = null } = {}) {
             td.addEventListener('click', toggle);
             td.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); } });
         });
+        // how to build (regrade 2): a black-and-white cue under the frame
+        const cue = document.createElement('div');
+        cue.className = 'mq-buildcue';
+        cue.textContent = 'Tap the boxes to put in counters.';
+        el.appendChild(cue);
         return true;
     }
     if (model === 'base10') {
@@ -1424,6 +1668,10 @@ export function mountModel(root, input, { onValue = null } = {}) {
             bar.appendChild(grp);
         });
         el.appendChild(bar);
+        const cue = document.createElement('div');
+        cue.className = 'mq-buildcue';
+        cue.textContent = 'Tap + to add a block. Tap − to take one away.';
+        el.appendChild(cue);
         return true;
     }
     el.dataset.mqBuilt = '';
