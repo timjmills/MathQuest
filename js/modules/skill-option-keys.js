@@ -275,7 +275,9 @@ export const VALUE_TOKENS = Object.freeze({
     // block 2 (2026-09-25)
     pattern: Object.freeze({ add: 'A', sub: 'S', double: 'D', times10: 'T', grow: 'G' }),
     chart: Object.freeze({ window: 'W', whole: 'F' }),
-    ticks: Object.freeze({ step: 'S', one: 'O' }),
+    ticks: Object.freeze({ step: 'S', one: 'O',
+        // O6 appearance (lane AP3): "Numbers on the line" on + / − lines, drag-onto-the-line and read-the-line items
+        some: 'M', ends: 'E' }),
     shape: Object.freeze({ box: 'B', circle: 'C', hex: 'H', mixed: 'M' }),
     // block 3 (2026-09-25)
     ops: Object.freeze({ '+': 'A', '-': 'S', x: 'M', '/': 'D' }),

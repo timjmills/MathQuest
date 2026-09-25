@@ -23,13 +23,23 @@
 // The key draws the hops, one arc per unit from the start, and writes the answer in the pupil's
 // box; a wrong piece of work (Error analysis) draws the hops to where that wrong answer landed.
 //
-// Payload: { max, start, add, op?: '+'|'-', unknown?: 'result'|'a'|'b', min?: 0 }
+// Payload: { max, start, add, op?: '+'|'-', unknown?: 'result'|'a'|'b', min?: 0,
+//            ticks?: 'one'|'some'|'ends' }
+//
+// `ticks` (O6 appearance, lane AP3, "Numbers on the line"): which ticks carry a numeral. Every
+// tick is always drawn and the hops stay one per number; only the numerals thin out
+// (line-labels.js): 'one' (absent, the default the owner asked for) every number, 'some' every
+// 2nd number, 'ends' the two ends. The given point (the dot or the ring) is always labelled -
+// it is information the pupil is given. Every tick carries `data-nl-v` (its value) and a
+// labelled one `data-nl-lab`, so the screen's tap-to-jump line keeps a target on every tick
+// and shows the same numerals as the paper.
 //
 // Pure module (SCC-01).
 
 import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, box, esc } from './ops-common.js';
 import { INK } from '../tokens.js';
+import { tickLabelSet } from './line-labels.js';
 
 const PT_MM = 25.4 / 72;
 /** The drawn width of every line: a one-column cell's content width (186 mm less pads). */
@@ -48,7 +58,8 @@ function partsOf(p) {
     const unknown = ['a', 'b'].includes(p.unknown) ? p.unknown : 'result';
     const min = Number.isFinite(Number(p.min)) ? Number(p.min) : 0;
     const max = Number(p.max) || 20;
-    return { start, add, op, end, unknown, min, max, ans: unknown === 'a' ? start : unknown === 'b' ? add : end };
+    const ticks = ['some', 'ends'].includes(p.ticks) ? p.ticks : 'one';
+    return { start, add, op, end, unknown, min, max, ticks, ans: unknown === 'a' ? start : unknown === 'b' ? add : end };
 }
 
 /**
@@ -68,10 +79,17 @@ function lineSVG(g, p, hopsTo, ink, from = null) {
     const X = (v) => x0 + (v - t.min) * pitch;
     let body = `<line x1="${(x0 - 2).toFixed(2)}" y1="${yLine}" x2="${(X(t.max) + 3).toFixed(2)}" y2="${yLine}" stroke="${INK.ink}" stroke-width="0.53"/>`;
     body += `<path d="M${(X(t.max) + 4.5).toFixed(2)} ${yLine} l-2.4 -1.3 v2.6 z" fill="${INK.ink}"/>`;
+    // The given point is always labelled (the start, or the landing point when the start is missing).
+    const given = (t.unknown === 'a' ? t.end : t.start) - t.min;
+    const lab = t.ticks === 'one' ? null : new Set(tickLabelSet(units, t.ticks, {
+        period: 2, zero: t.min <= 0 && t.max >= 0 ? -t.min : null, origin: ((-t.min % 2) + 2) % 2, keep: [given],
+    }));
     for (let v = t.min; v <= t.max; v++) {
         const tk = v % 5 === 0 ? 2.4 : 1.6;
-        body += `<line x1="${X(v).toFixed(2)}" y1="${(yLine - tk).toFixed(2)}" x2="${X(v).toFixed(2)}" y2="${(yLine + tk).toFixed(2)}" stroke="${INK.ink}" stroke-width="0.265"/>`;
-        body += `<text x="${X(v).toFixed(2)}" y="${(yLine + 3 + labelMm).toFixed(2)}" text-anchor="middle" font-size="${labelMm.toFixed(2)}" font-family="Andika, sans-serif" fill="${INK.ink}">${v}</text>`;
+        const on = !lab || lab.has(v - t.min);
+        const tag = lab ? ` data-nl-v="${v}"${on ? ' data-nl-lab="1"' : ''}` : '';
+        body += `<line x1="${X(v).toFixed(2)}" y1="${(yLine - tk).toFixed(2)}" x2="${X(v).toFixed(2)}" y2="${(yLine + tk).toFixed(2)}" stroke="${INK.ink}" stroke-width="0.265"${tag}/>`;
+        if (on) body += `<text x="${X(v).toFixed(2)}" y="${(yLine + 3 + labelMm).toFixed(2)}" text-anchor="middle" font-size="${labelMm.toFixed(2)}" font-family="Andika, sans-serif" fill="${INK.ink}">${v}</text>`;
     }
     // The given point: the start, or (start missing) where the hops land. `data-nl-start` is
     // where the screen's tap-to-jump line begins.

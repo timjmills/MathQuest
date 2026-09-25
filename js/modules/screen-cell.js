@@ -856,14 +856,22 @@ export function wireNumberLines(root) {
         if (ops.dataset.mqNl === '1') return;
         const svg = ops.querySelector(':scope > svg');
         if (!svg) return;
-        const labels = Array.from(svg.querySelectorAll('text'))
-            .map((t) => ({ x: Number(t.getAttribute('x')), s: t.textContent.trim() }))
-            .filter((t) => t.s !== '' && Number.isFinite(t.x) && /^-?\d+$/.test(t.s))
-            .sort((a, b) => a.x - b.x);
+        // O6 "Numbers on the line" (lane AP3): a line that labels only some ticks names EVERY tick
+        // (`data-nl-v`) and marks the labelled ones (`data-nl-lab`): every tick stays a tap target,
+        // and only the paper's numerals are shown under the ticks.
+        const tagged = Array.from(svg.querySelectorAll('line[data-nl-v]'));
+        const labels = tagged.length >= 2
+            ? tagged.map((t) => ({ x: Number(t.getAttribute('x1')), s: String(t.getAttribute('data-nl-v')), on: t.hasAttribute('data-nl-lab') }))
+                .filter((t) => Number.isFinite(t.x) && /^-?\d+$/.test(t.s)).sort((a, b) => a.x - b.x)
+            : Array.from(svg.querySelectorAll('text'))
+                .map((t) => ({ x: Number(t.getAttribute('x')), s: t.textContent.trim(), on: true }))
+                .filter((t) => t.s !== '' && Number.isFinite(t.x) && /^-?\d+$/.test(t.s))
+                .sort((a, b) => a.x - b.x);
         if (labels.length < 2) return;
         const dot = svg.querySelector('[data-nl-start]');
         const start = dot ? String(dot.getAttribute('data-nl-start')) : labels[0].s;
         const vals = labels.map((l) => l.s);
+        const shown = labels.map((l) => l.on);
         const startIdx = Math.max(0, vals.indexOf(start));
         ops.dataset.mqNl = '1';
         const wrap = document.createElement('div');
@@ -875,7 +883,7 @@ export function wireNumberLines(root) {
         wrap.innerHTML = `<div class="mq-nl-scroll" data-mq-scroll><div class="mq-nl-track" role="group" aria-label="${attr(svg.getAttribute('aria-label') || 'number line')}. Tap a number to jump to it.">`
             + '<svg class="mq-nl-arcs" aria-hidden="true" preserveAspectRatio="none"></svg><span class="mq-nl-line" aria-hidden="true"></span>'
             + vals.map((v, i) => `<button type="button" class="mq-nl-tick${i === startIdx ? ' mq-nl-start' : ''}" data-i="${i}" aria-label="${attr(v)}${i === startIdx ? ', start' : ''}">`
-                + `<span class="mq-nl-mark" aria-hidden="true"></span><span class="mq-nl-lab">${esc(v)}</span></button>`).join('')
+                + `<span class="mq-nl-mark" aria-hidden="true"></span><span class="mq-nl-lab">${shown[i] ? esc(v) : ''}</span></button>`).join('')
             + '</div></div>'
             + `<div class="mq-nl-tools"><button type="button" class="mq-nl-pan" data-d="-1" aria-label="show smaller numbers">◀</button>`
             + `<button type="button" class="mq-nl-reset">Start again</button>`
