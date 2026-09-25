@@ -22,6 +22,8 @@ import './function-table.js';
 import './countby.js';
 import './pv.js';
 import './word-work.js';
+// last: registers only skills no other provider has claimed
+import './legacy-wrong.js';
 
 export { storiesFor, STORY_NOUNS, STORY_NAMES, STORY_TEMPLATES, nounFor } from './stories.js';
 export { columnAdd, lineSteps } from './addition.js';

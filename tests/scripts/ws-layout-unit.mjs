@@ -586,6 +586,12 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     ok(plan.meta.wrongShare > 0, 'PT-ERR-1: at least one real wrong answer');
     ok(/data-ws-slot="ea-ans" data-ws-shape="box"/.test(r.pupilHtml), 'Error analysis: the fix is a square write box');
     ok(/correct answer<\/small>/.test(r.pupilHtml), 'Error analysis: the write box is captioned');
+    // Critic round 4 (H1): a "wrong" item whose work shows the RIGHT answer never prints.
+    const { prepare: eaPrepare } = ROLE_MODULES['error-analysis'];
+    const honest = hostLike(stackQ(333, 111));
+    ok(eaPrepare(honest, { index: 0, wrong: true }) !== null, 'Error analysis: a wrong item whose work shows the wrong value is kept');
+    const liar = Object.assign(hostLike(stackQ(333, 111)), { render: (c) => renderCell(stackQ(333, 111), Object.assign({}, c, { state: 'answered' })) });
+    ok(eaPrepare(liar, { index: 0, wrong: true }) === null, 'Error analysis: a wrong item whose template draws the right answer is never printed (H1)');
     const none = hostPlan('error-analysis', [ADD_SKILL], addMake);
     ok(typeof none.unsupported === 'string' && /wrong/.test(none.unsupported), `PT-ERR-1: no real wrong answer -> unsupported, never an all-correct page (${none.unsupported || none.plan.meta.wrongShare})`);
 }

@@ -38,10 +38,10 @@ import {
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, wrongPattern,
     checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf,
 } from './compose.js';
-import { gridHeightMm, SAFETY_H_MM } from '../layout.js';
+import { gridHeightMm, SAFETY_H_MM, rowGapFor } from '../layout.js';
 import { coinSVG } from '../cells/tmkit.js';
 import { gridSlots } from '../cells/mult-grid.js';
-import { getProvider } from '../index.js';
+import { getProvider, resolveCtx } from '../index.js';
 
 export const ROLE_ID = 'error-analysis';
 // WORKSHEET_DESIGN_STANDARD 12.1: Error analysis 6 / 4 / 2-4 (the 04-E mock-up's 2 x 3 at L
@@ -74,7 +74,10 @@ export function realWrongOf(it) {
 
 /** Mark what the pupil wrote: every solid-ink element of the finished work becomes pupil ink. */
 export function pupilInk(html) {
-    const mark = (tag, attrs) => (/\sclass="/.test(attrs)
+    // The pupil's own dot on a number line (the `mark` slot) is the pupil's pencil too (critic
+    // round 4: drawn solid black like a printed point).
+    if (/data-ws-slot="mark"/.test(html)) html = String(html).replace(/<circle data-pv-dot="([^"]*)"([^>]*?) fill="#000"/g, '<circle data-pv-dot="$1"$2 fill="#949494" class="mq-pupil"');
+    const mark =(tag, attrs) => (/\sclass="/.test(attrs)
         ? `<${tag}${attrs.replace(/\sclass="([^"]*)"/, ' class="$1 mq-pupil"')}>`
         : `<${tag} class="mq-pupil"${attrs}>`);
     return String(html).replace(/<([a-z][a-z0-9]*)\b([^>]*?)\sdata-ws-ink="solid"([^>]*)>/gi, (m, tag, pre, post) => {
@@ -245,13 +248,22 @@ function choicesOf(it, correct, shown) {
         return { labels: payload.labels.map(String), correct: Number(payload.correct) || 0 };
     }
     if (/^\d[\d,.]*$/.test(correct)) return null;
-    const opts = Array.isArray(q.options) ? q.options.filter((o) => o !== null && typeof o !== 'object').map(String) : [];
+    // A sign is WRITTEN, in a circle, as the item asks (critic round 4: check boxes beside < > =).
+    if (/^[<>=]$/.test(correct)) return null;
+    const opts = [...new Set(Array.isArray(q.options) ? q.options.filter((o) => o !== null && typeof o !== 'object').map(String) : [])];
     const i = opts.indexOf(correct);
-    // A multiple-choice item: the fix is the item's own choice. Long options (a word name) are
-    // named by the letters the item prints beside them (A-D), never copied out again.
-    if (opts.length >= 2 && opts.length <= 4 && i >= 0) {
-        const long = opts.some((t) => t.length > 12);
-        return { labels: long ? opts.map((_, k) => 'ABCD'[k]) : opts, correct: i };
+    // The item's own answer is a check box (its key slot is `choice`): the fix is checking the
+    // right one - A or B, a.m. or p.m. (critic round 4: a letter written in a box).
+    const ks = (it.key && it.key.slots) || {};
+    if (ks.choice) {
+        const labs = opts.length >= 2 && i >= 0 ? opts : /^[A-D]$/.test(correct) ? ['A', 'B', 'C', 'D'].slice(0, Math.max(2, 'ABCD'.indexOf(correct) + 1, 'ABCD'.indexOf(String(shown)) + 1)) : null;
+        if (labs && labs.includes(correct)) return { labels: labs, correct: labs.indexOf(correct) };
+    }
+    // A multiple-choice item whose options are too long to write out again (a word name): the
+    // fix is the letter the item prints beside the option (A-D). A short option (a fraction, a
+    // number) is WRITTEN: a production item is never turned into a choice (critic round 4).
+    if (opts.length >= 2 && opts.length <= 4 && i >= 0 && opts.some((t) => t.length > 12)) {
+        return { labels: opts.map((_, k) => 'ABCD'[k]), correct: i };
     }
     // A two-way word answer (Yes / No, Enough / Not enough, a.m. / p.m.): the fix is a check box
     // pair, never the word written in a box (critic round 3).
@@ -266,6 +278,34 @@ function choicesOf(it, correct, shown) {
         return i >= 0 ? { labels, correct: i } : null;
     }
     return null;
+}
+
+const normWork = (t) => String(t).replace(/<[^>]*>/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&[a-z]+;/g, ' ').replace(/[\s,/:]+/g, '').toLowerCase();
+
+/**
+ * Does the finished work really show the pupil's wrong answer? The work is drawn once, as it
+ * prints; the text of its answer slots (or, for a legacy cell, of the whole cell) must hold the
+ * shown value, and must not be just the right answer. A drawn model cannot be read this way and
+ * is trusted to its template.
+ */
+export function showsWrong({ it, kind, shown, shownSlots, sParts, correct, P }) {
+    if (kind === 'draw' || kind === 'line') return true;
+    if (String(shown).replace(/[\s,]+/g, '') === String(correct).replace(/[\s,]+/g, '')) return false;
+    let html = '';
+    try {
+        const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
+        html = it.render(ctx, { cols: 1, shown, prompt: false, shownSlots });
+    } catch (e) { return true; }
+    if (!html) return true;
+    // the text inside the item's own writing places
+    const slotText = [];
+    const re = /<([a-z][a-z0-9]*)\b[^>]*\sdata-ws-slot="(?!x\d|fix|ea-)[^"]*"[^>]*>([\s\S]*?)<\/\1>/gi;
+    let m;
+    while ((m = re.exec(html))) slotText.push(m[2]);
+    const hay = normWork(slotText.join(' ')) || normWork(html);
+    const want = (sParts && sParts.length ? sParts.filter((v, i) => P && String(v) !== String(P.parts[i].value)) : [shown])
+        .map(normWork).filter(Boolean);
+    return !want.length || want.every((w) => hay.includes(w));
 }
 
 /**
@@ -283,7 +323,11 @@ export function prepare(it, info = {}) {
     const q = it.q || {};
     let P = LINED.has(it.template) || DRAWN.has(it.template) ? null : answerParts(it, correct0);
     const correct = correct0;
-    const shown = isWrong ? (P ? wrong.value : likeCorrect(wrong.value, correct)) : correct;
+    // A place-value line slot writes the number the way the key does ("80,000", never "80000"
+    // beside a wrong "80,000" - critic round 4); a digit grid keeps its bare digits.
+    const kDisp = String((it.key && it.key.display) || '');
+    const written = it.template === 'pv' && kDisp.replace(/,/g, '') === correct ? kDisp : correct;
+    const shown = isWrong ? (P ? wrong.value : likeCorrect(wrong.value, written)) : written;
     const who = PUPILS[(Number(info.index) || 0) % PUPILS.length];
     // The word-work cell draws its own finished working (sign, columns, answer): no extra line.
     const story = (it.fclass === 'word' || it.template === 'wordpic') && it.template !== 'word-work';
@@ -331,6 +375,17 @@ export function prepare(it, info = {}) {
         redraw = '';
     }
     // a multiple-choice item keeps its own choice even when it reads as a story (word names)
+    // A one-value answer names its slot, so a template that fills slots from the key writes what
+    // the pupil wrote there (critic round 4: add_three drew the right sum as the "wrong" work).
+    if (!P) {
+        const ks = (it.key && it.key.slots) || {};
+        const one = Object.keys(ks).filter((id) => ks[id] && ks[id].graded !== false && !/^(x\d+|fix|ea-)/.test(id));
+        if (one.length === 1 && !(shownSlots && shownSlots[one[0]] !== undefined)) shownSlots = Object.assign({}, shownSlots || {}, { [one[0]]: shown });
+        // A misplaced dot is a second mistake the one fix slot cannot correct: the dot stays
+        // where the number is, and the error is in the rounding only (critic round 4).
+        if (shownSlots && shownSlots.mark !== undefined && !ks.mark) { shownSlots = Object.assign({}, shownSlots); delete shownSlots.mark; }
+    }
+    // a multiple-choice item keeps its own choice even when it reads as a story (word names)
     const choice = !P && !redraw && (!story || (Array.isArray(q.options) && q.options.length >= 2)) ? choicesOf(it, correct, shown) : null;
     // ONE number written a digit per box (a column sum's answer row, a quotient, a place-value
     // chart): the fix is that number, in one box - the work above already shows it split.
@@ -339,6 +394,7 @@ export function prepare(it, info = {}) {
     // How the fix is written (PT-ERR-2): in the item's OWN answer shape.
     let kind;
     let labels = null;
+    let tagged = null;
     if (DRAWN.has(it.template)) kind = 'draw';
     else if (redraw) kind = 'redo';
     else if (LINED.has(it.template)) kind = 'line';
@@ -346,6 +402,13 @@ export function prepare(it, info = {}) {
     else if (P && P.parts.length > 1 && digitSplit) kind = 'value';
     else if (P && P.parts.length > 1) {
         labels = isList(glue) || !glue ? partLabels(it, P.parts, null) : null;
+        // Blanks scattered in a chart (a hundreds-chart window's two gaps): each grey number is
+        // lettered A, B ... and so is its fix box (critic round 4: "[ ] , [ ]" said nothing about
+        // which box fixes which number).
+        if (!labels && isList(glue) && it.template !== 'pv' && !REDO.has(it.template) && it.template !== 'clock' && P.parts.length <= 6) {
+            labels = P.parts.map((_, i) => ({ text: 'ABCDEF'[i] }));
+            tagged = P.parts.map((x) => x.id);
+        }
         kind = labels ? 'parts' : REDO.has(it.template) || (it.template === 'clock' && isList(glue)) ? 'redo' : glue ? 'parts' : 'value';
     } else kind = /[A-Za-z]{2}/.test(correct) && !/^\d/.test(correct) ? 'text' : 'value';
     const work = story ? storyWork(it, shown, wrong, isWrong) : '';
@@ -420,6 +483,13 @@ export function prepare(it, info = {}) {
         const place = it.template === 'pv' && /^estimate_(sum|diff|sums_diffs)$/.test(String(q.skillId || '')) ? Number((q.pv && q.pv.place) || (q.cell && q.cell.payload && q.cell.payload.place) || 0) : 0;
         const task = redraw === 'mark' && q.cell.payload.n !== undefined ? `<div class="mq-eatask">Mark <b>${esc(commas(q.cell.payload.n))}</b>.</div>`
             : place >= 10 ? `<div class="mq-eatask">Round each number to the nearest <b>${esc(commas(place))}</b>.</div>` : '';
+        // the letters on the grey numbers the fix boxes are captioned with
+        if (tagged) {
+            tagged.forEach((id, i) => {
+                const re = new RegExp(`(<[a-z][a-z0-9]*\\b[^>]*\\sdata-ws-slot="${id}"[^>]*)>`, 'i');
+                body = body.replace(re, (m0, open) => `${open} data-ws-tagged="1"><i class="mq-slottag">${'ABCDEF'[i]}</i>`);
+            });
+        }
         const shownWork = `<div class="mq-judge-work"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}">${esc(who)} ${verb}:</span>${task}${kind === 'draw' ? body : pupilInk(body)}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         const box = (id, w, text) => blank({ id, kind: 'number', shape: 'box', widthMm: w, graded: false }, c, slotOnly(key, id)) + (text ? '' : '');
@@ -430,6 +500,8 @@ export function prepare(it, info = {}) {
             fix = `<span class="mq-ansslot mq-fixslot mq-fixsign">${blank({ id: 'ea-ans', kind: 'sign', shape: 'circle', graded: false }, c, slotOnly(key, 'ea-ans'))}<small>right sign</small></span>`;
         } else if (kind === 'value') {
             fix = `<span class="mq-ansslot mq-fixslot">${box('ea-ans', fixWidth(c.size))}<small>correct answer</small></span>`;
+            // a fraction is written stacked over its bar, never with a slash (TY-7)
+            fix = fix.replace(/>(\d+)\s*\/\s*(\d+)</, '><span class="mq-frac"><span>$1</span><span>$2</span></span><');
         } else if (kind === 'text') {
             fix = `<span class="mq-ansslot mq-fixslot mq-fixtext">${blank({ id: 'ea-ans', kind: 'text', shape: 'line', widthMm: fixWidth(c.size), graded: false }, c, slotOnly(key, 'ea-ans'))}<small>correct answer</small></span>`;
         } else if (kind === 'parts') {
@@ -481,6 +553,10 @@ export function prepare(it, info = {}) {
             + (below ? fix : '')
             + `</div>`;
     };
+    // THE GUARD (critic round 4, H1): a "wrong" item whose finished work does not show the wrong
+    // value - the template wrote the right answer, or the wrong value equals the right one - is
+    // never printed; the host deals another item. The key would otherwise "fix" a right answer.
+    if (isWrong && !showsWrong({ it, kind, shown, shownSlots, sParts, correct, P })) return null;
     return Object.assign({}, it, {
         render, key, measured: null, drawsAnswer: true, answerWords: isWrong ? `Fix it: ${correct}` : 'Correct',
         // The judgement flows beside the work in one column and under it in two: a taller cell in
@@ -625,12 +701,32 @@ export function plan(input = {}) {
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
     const grid = gridPart(items.map((it) => planItem(it, { cols: L.cols })), { cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
     if (rows === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
+    // RUBRIC H13 (critic round 4): a row is as tall as what it holds (+10%), never the page's
+    // share of the grid - cells stretched to G / rows left 30-45% empty under the fix. The
+    // spare page height goes BETWEEN the rows (the density lane's rowGapFor, as on a Test).
+    if (M && rows > 1) {
+        const rowH = [];
+        for (let r = 0; r < rows; r++) {
+            const hs = items.slice(r * L.cols, (r + 1) * L.cols).map((it) => heightAt(it, L.cols)).filter(Number.isFinite);
+            rowH.push(hs.length ? Math.round(Math.min(L.gridH / rows, Math.max(...hs) * 1.1) * 100) / 100 : L.gridH / rows);
+        }
+        const sum = rowH.reduce((a, b) => a + b, 0);
+        if (sum < L.gridH * 0.95) {
+            const g = rowGapFor(rows, sum, L.gridH);
+            grid.cls = 'fixed';
+            grid.rowsTpl = rowH.map((h) => `${h}fr`).join(' ');
+            grid.height = `${Math.round((g.gap ? g.heightMm : sum) * 100) / 100}mm`;
+            if (g.gap) grid.rowGap = g.gap;
+        }
+    }
     const wrongShare = items.length ? items.filter((it) => it.thinking && it.thinking.isWrong).length / items.length : 0;
     const fit = Object.assign({}, L, { items: undefined });
     // The instruction says where the fix goes (critic round 3): written, or drawn again.
     const drawn = items.length && items.every((it) => it.thinking && (it.thinking.kind === 'draw' || it.thinking.redraw === 'draw'));
     const marked = items.length && items.every((it) => it.thinking && it.thinking.redraw === 'mark');
-    return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(drawn ? 'check-fix-draw' : marked ? 'check-fix-mark' : 'check-fix-write'), grid] }], {
+    // the fix is checking the right option on every item: the instruction says so (critic round 4)
+    const checked = items.length && items.every((it) => it.thinking && it.thinking.kind === 'choice');
+    return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(drawn ? 'check-fix-draw' : marked ? 'check-fix-mark' : checked ? 'check-fix-check' : 'check-fix-write'), grid] }], {
         meta: { items: items.length, scoreOutOf: items.length, wrongShare, fits: [Object.assign(fit, { line: fitsLine(fit) })], notes: L.note ? [L.note] : [] },
     });
 }

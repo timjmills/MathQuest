@@ -308,7 +308,7 @@ function quickDraw(place, n) {
  *
  * @returns {string|null} the filled html, or null when no slot could be filled with certainty
  */
-export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
+export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {}) {
     // `ink: 'trace'` writes the value in the single grey (a Model or first Guided cell, INK-3);
     // the default is the pupil's solid ink of a key or of shown work (Error analysis).
     const INK_STYLE = ink === 'trace' ? 'font-weight:700;color:#949494;' : SOLID_STYLE;
@@ -434,7 +434,26 @@ export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
     const lineRe = /(Answer:\s*<\/span>\s*<span style="[^"]*border-bottom:[^"]*">)(?:&nbsp;|\s)*(<\/span>)/g;
     const lines = html.match(lineRe) || [];
     if (lines.length === 1 && display) {
-        return html.replace(lineRe, (m, open, close) => `${open}<b data-ws-ink="${inkAttr}" style="${INK_STYLE}">${escText(display)}</b>${close}`);
+        const fl = /^(\d+)\s*\/\s*(\d+)$/.exec(display.trim());
+        const v = fl ? `<span class="mq-frac" style="font-size:1em;"><span>${fl[1]}</span><span>${fl[2]}</span></span>` : escText(display);
+        return html.replace(lineRe, (m, open, close) => `${open}<b data-ws-ink="${inkAttr}" style="${INK_STYLE}">${v}</b>${close}`);
+    }
+
+    // 3b. ONE empty inline write place with no "Answer:" label - a ruled underline ("Perimeter =
+    // ____ units", a question's own answer rule, a bar-graph answer rule) or the empty box between
+    // two fractions: the value is written ON it (AK-1), so the key is a facsimile and Error
+    // analysis can show the pupil's work in the pupil's own slot (critic round 4: these skills
+    // had no Check it page at all).
+    const openRe = /(<(span|div) style="([^"]*(?:border-bottom:\s*2px solid #000|border:\s*2px solid #000)[^"]*)">)(?:&nbsp;|\s)*(<\/\2>)/g;
+    const opens = html.match(openRe) || [];
+    // Shown work only (`shown`): a key keeps its answer stamp until the cell names its slot, so
+    // the pupil page and the key count the same answer places (AK-4).
+    if (shown && opens.length === 1 && display && !/Answer:/.test(html) && display.length <= 24) {
+        // a fraction is written stacked over its bar, never with a slash (TY-7); the place is at
+        // least 14 mm wide (SL-1)
+        const fm = /^(\d+)\s*\/\s*(\d+)$/.exec(display.trim());
+        const val = fm ? `<span class="mq-frac" style="font-size:1em;"><span>${fm[1]}</span><span>${fm[2]}</span></span>` : escText(display);
+        return html.replace(openRe, (m, open, tag, style, close) => `<${tag} style="${style};text-align:center;min-width:14mm;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}">${val}</b>${close}`);
     }
 
     // 4. The K-2 check-box list: the box beside the answer's label gets a check mark (AK-2).
@@ -694,7 +713,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
             // A wrong value is written as a pupil would have written it: a place-value mat draws
             // the WRONG model, boxed slots take the wrong value, never the right parts.
             const asQ = v === answer ? q0 : Object.assign({}, q0, { ans: v, target: v, keyParts: undefined, printAnswer: undefined });
-            const filled = legacyKeyFill(html.replace(STAMP_RE, ''), asQ, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid' });
+            const filled = legacyKeyFill(html.replace(STAMP_RE, ''), asQ, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid', shown: true });
             if (filled !== null) return filled;
             return html + shownLine(v, ink);
         }
@@ -711,7 +730,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         if (showable === null) {
             try {
                 const blankHtml = legacyClean(renderCell(q, resolveCtx({ mode: 'print', size, look: 'ican', state: 'blank' }))).replace(STAMP_RE, '');
-                showable = legacyKeyFill(blankHtml, null, { value: answer, display: answer }) !== null;
+                showable = legacyKeyFill(blankHtml, null, { value: answer, display: answer }, { shown: true }) !== null;
             } catch (e) { showable = false; }
         }
         return showable;

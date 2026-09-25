@@ -651,6 +651,50 @@ for (const band of ['10', '20', '50', '100', '1k', '10k', '100k', '1m']) {
     }
 }
 
+// Critic round 4: the legacy skills' Error analysis wrong answers (providers/legacy-wrong.js) -
+// a named misconception, never the right answer, never a near miss. Items in the generators' shapes.
+{
+    const LW = {
+        'fractions:compare': [
+            { text: 'Compare the fractions: 1/8 ___ 5/8', ans: '<', fractionData: { num1: 1, denom1: 8, num2: 5, denom2: 8 } },
+            { text: 'Compare the fractions: 1/3 ___ 1/5', ans: '>', fractionData: { num1: 1, denom1: 3, num2: 1, denom2: 5 } },
+            { text: 'Is 2/4 greater than, less than, or equal to 1/2?', ans: 'equal to' },
+            { text: 'Is 1/3 greater than, less than, or equal to 1/2?', ans: 'less than' },
+            { text: 'Which is greater: 1/2 or 3/4? (Type the greater fraction, or "equal")', ans: '3/4' },
+        ],
+        'area_perimeter:perimeter_intro': [
+            { ans: 22, perimeterIntroData: { shape: 'rectangle', sides: [6, 5, 6, 5], sideLabels: { length: 6, width: 5 } } },
+            { ans: 13, perimeterIntroData: { shape: 'triangle', sides: [3, 6, 4], sideLabels: { a: 3, b: 6, c: 4 } } },
+        ],
+        'measurement:temperature': [
+            { ans: 36, measurementData: { temp: 36, unit: '°F', every: 5 } },
+            { ans: 35, measurementData: { temp: 35, unit: '°F', every: 5 } },
+            { ans: 37, measurementData: { celsius: 3, fahrenheit: 37, direction: 'c_to_f' } },
+            { ans: 3, measurementData: { celsius: 3, fahrenheit: 37, direction: 'f_to_c' } },
+        ],
+        'graphs:bar_graph': [
+            { text: 'Books Read: How many chose Feb?', ans: 3, dataData: { categories: ['Jan', 'Feb', 'Mar'], values: [12, 3, 6], questionType: 'specific_value' } },
+            { text: 'Pets: What is the total of all responses?', ans: 21, dataData: { categories: ['A', 'B', 'C'], values: [12, 3, 6], questionType: 'total' } },
+            { text: 'Pets: Which category has the least?', ans: 'B', dataData: { categories: ['A', 'B', 'C'], values: [12, 3, 6], questionType: 'which_lowest' } },
+            { text: 'Pets: What is the difference between A and C?', ans: 6, dataData: { categories: ['A', 'B', 'C'], values: [12, 3, 6], questionType: 'difference' } },
+        ],
+    };
+    for (const [key, items] of Object.entries(LW)) {
+        const [cat, skill] = key.split(':');
+        const p = getProvider(cat, skill);
+        ok(!(p.defaults || []).includes('wrongAnswer'), `${key}: wrongAnswer is a real provider`);
+        items.forEach((q0, i) => {
+            const q = Object.assign({ categoryId: cat, skillId: skill }, q0);
+            const w = p.wrongAnswer(q);
+            ok(!!w, `${key} item ${i}: a wrong answer`);
+            if (!w) return;
+            ok(!sameAnswer(w.value, q.ans), `${key} item ${i}: the "wrong" answer ${w.value} is the right answer (H1)`);
+            ok(w.misconception && w.misconception !== 'unknown' && w.basis !== 'nudge', `${key} item ${i}: a named misconception`);
+            ok((p.misconceptions || []).includes(w.misconception), `${key} item ${i}: misconception "${w.misconception}" is declared`);
+        });
+    }
+}
+
 if (failures.length) {
     for (const f of failures.slice(0, 60)) console.log('  FAIL', f);
     if (failures.length > 60) console.log(`  ... and ${failures.length - 60} more`);
