@@ -634,14 +634,14 @@ const _opsRegroup = (dflt, sub = false) => ({
     help: sub ? 'Whether the ones column has to borrow. The regroup boxes stay on the page either way.'
         : 'Whether a column carries. The regroup boxes stay on the page either way.',
 });
-const _opsAcrossZeros = () => ({
+const _opsAcrossZeros = (withNone = true) => ({
     id: 'zeroPlace', label: 'Across zeros (5,003 − 2,847)', type: 'enum', default: 'some',
-    values: [{ v: 'none', l: 'Never' }, { v: 'some', l: 'Now and then' }, { v: 'always', l: 'Every item' }],
+    values: [...(withNone ? [{ v: 'none', l: 'Never' }] : []), { v: 'some', l: 'Now and then' }, { v: 'always', l: 'Every item' }],
     help: 'A zero in the number you start from, with a digit under it, so the borrow crosses the zero.',
 });
-const _opsUnknown = (dflt = 'answer', { first = 'The first number (__ + 7 = 15)', second = 'The second number (8 + __ = 15)' } = {}) => ({
+const _opsUnknown = (dflt = 'answer', { answer = 'The answer (8 + 7 = __)', first = 'The first number (__ + 7 = 15)', second = 'The second number (8 + __ = 15)' } = {}) => ({
     id: 'unknown', label: 'What is missing', type: 'enum', default: dflt,
-    values: [{ v: 'answer', l: 'The answer (8 + 7 = __)' }, { v: 'first', l: first }, { v: 'second', l: second },
+    values: [{ v: 'answer', l: answer }, { v: 'first', l: first }, { v: 'second', l: second },
         { v: 'mixed', l: 'Mixed' }],
     help: 'One position per page, or Mixed. The missing number is a box in the number sentence.',
 });
@@ -667,11 +667,11 @@ const _opsMulCue = (div = false) => ({
     ],
     help: 'A hint drawn under every fact on the page, in print and on screen. None is the fade.',
 });
-const _opsFactBand = () => _opsBand([5, 10, 12, 18, 20], 20, {
+const _opsFactBand = () => ({ ..._opsBand([5, 10, 12, 15, 20], 20, {
     label: 'Facts to',
     help: 'The largest sum (or the largest number you start from, for −). Independent of the fact '
         + 'set: "Add 6, facts to 10". A fact set larger than the band is left out.',
-});
+}), helpShort: 'The largest answer (for −, the largest number you start from). Single-digit facts never pass 18.' });
 const _opsTableBand = () => _opsBand([100, 144], 144, {
     label: 'Tables to', labels: { 100: '10 × 10', 144: '12 × 12' },
     help: 'Up to the 10s table or the whole 12s table: the largest product (or number shared) is 100 or 144.',
@@ -702,7 +702,7 @@ const P11_OPS_OPTIONS = {
     // --- the four basic skills: regrouping and the unknown position ----------------------------
     'addition:add': [notationOption('+'), _opsRegroup('mixed'), _opsUnknown()],
     'subtraction:subtract': [notationOption('-'), _opsRegroup('mixed', true), _opsUnknown('answer',
-        { first: 'The number you start from (__ − 7 = 8)', second: 'The number taken away (15 − __ = 8)' })],
+        { answer: 'The answer (15 − 7 = __)', first: 'The number you start from (__ − 7 = 8)', second: 'The number taken away (15 − __ = 8)' })],
     'multiplication:multiply': [notationOption('x'), {
         id: 'tiles', label: 'Digits × digits', type: 'enum', default: null, group: 'difficulty',
         values: [{ v: null, l: 'Set by Max Number' }, { v: 11, l: '1-digit × 1-digit (7 × 8)' },
@@ -723,8 +723,8 @@ const P11_OPS_OPTIONS = {
     }],
 
     // --- the number lines: which number is missing ---------------------------------------------
-    'addition:nl_add': [_opsUnknown('mixed', { first: 'The start (__ + 5 = 12)', second: 'The jump (7 + __ = 12)' })],
-    'subtraction:nl_sub': [_opsUnknown('mixed', { first: 'The start (__ − 5 = 7)', second: 'The jump back (12 − __ = 7)' })],
+    'addition:nl_add': [_opsUnknown('mixed', { answer: 'Where it lands (7 + 5 = __)', first: 'The start (__ + 5 = 12)', second: 'The jump (7 + __ = 12)' })],
+    'subtraction:nl_sub': [_opsUnknown('mixed', { answer: 'Where it lands (12 − 5 = __)', first: 'The start (__ − 5 = 7)', second: 'The jump back (12 − __ = 7)' })],
 
     // --- add_column_multi: how many numbers are added ------------------------------------------
     'addition:add_column_multi': [{
@@ -732,6 +732,14 @@ const P11_OPS_OPTIONS = {
         values: [{ v: null, l: 'Dealt across the page (3 and 4)' }, { v: 3, l: '3 numbers' }, { v: 4, l: '4 numbers' }],
         help: 'How many numbers each column sum stacks. The column and its carry boxes stay the same.',
     }],
+
+    // --- the tables: how far the chart and the number lines reach -------------------------------
+    'multiplication:mult_chart': [_opsBand([25, 100, 144], 144, {
+        label: 'Tables to', labels: { 25: '5 × 5', 100: '10 × 10', 144: '12 × 12' },
+        help: 'The part of the chart the window is cut from: the largest factor is 5, 10 or 12.',
+    })],
+    'multiplication:nl_mult': [_opsBand([20, 50, 100], 100, { help: 'The largest product the hops reach.' })],
+    'division:nl_div': [_opsBand([20, 50, 100], 100, { help: 'The largest number shared along the line.' })],
 
     // --- ÷ notation: every ticked way really prints ---------------------------------------------
     'division:missing_mult_div': [notationOption('/')],
@@ -771,19 +779,20 @@ for (const op of ['add', 'sub']) {
                     + '(write both parts, then the answer), level 1 the answer only.') : _opsAddCue(false));
             } else {
                 opts.push(_opsColumnLevel());
-                if (op === 'sub' && max >= 1000 && rg !== 'no_regroup') opts.push(_opsAcrossZeros());
+                if (op === 'sub' && max >= 1000 && rg !== 'no_regroup') opts.push(_opsAcrossZeros(rg === 'regroup'));
             }
             P11_OPS_OPTIONS[`${cat}:${id}`] = opts;
         }
     }
-    // Word problems by band: one ladder too. The picture twins (_plain) keep the band only, because
-    // their pictures are removed after generation. Pictures exist on the stories to 100.
+    // Word problems by band: one ladder too. The no-picture twins (_plain) keep the band only:
+    // generate-question.js strips their visual after generation, so a bar model could not reach
+    // them. Pictures exist on the stories to 100; the bar model on every band.
     for (const [code, max] of Object.entries(_OPS_BANDS)) {
         if (op === 'add' && max === 10) continue;      // add_wp_10 is the K picture story (gen-counting.js)
         const bands = Object.values(_OPS_BANDS).filter(b => b >= 20 || (op === 'sub' && b === 10));
         const band = _opsBand(bands, max, { help: 'Bounds the answer of every story (the total, or the number you start from).' });
         P11_OPS_OPTIONS[`${cat}:${op}_wp_${code}`] = [band, ...(max <= 100 ? [_opsPictures()] : []), _opsBar()];
-        P11_OPS_OPTIONS[`${cat}:${op}_wp_${code}_plain`] = [band, _opsBar()];
+        P11_OPS_OPTIONS[`${cat}:${op}_wp_${code}_plain`] = [band];
     }
 }
 Object.assign(SKILL_OPTIONS, P11_OPS_OPTIONS);
@@ -800,7 +809,7 @@ const P11_K2_OPTIONS = {
         _k2CountTo([5, 10, 20], 20),
         {
             id: 'objects', label: 'Objects', type: 'enum', default: 'shapes', group: 'support',
-            values: [{ v: 'shapes', l: 'Plain shapes (one kind per item)' }, { v: 'counters', l: 'Round counters' },
+            values: [{ v: 'shapes', l: 'Plain shapes (one kind per item)' }, { v: 'pictures', l: 'Pictures (balls, apples, fish)' },
                 { v: 'frame', l: 'Counters in ten frames' }, { v: 'dice', l: 'Dice patterns' }],
             help: 'What the pupil counts. Ten frames and dice let a pupil count on from a group he knows.',
         },
@@ -837,7 +846,7 @@ const P11_K2_OPTIONS = {
             id: 'dir', label: 'Compare by', type: 'enum', default: 'mixed',
             values: [{ v: 'more', l: 'Which has more?' }, { v: 'fewer', l: 'Which has fewer?' }, { v: 'same', l: 'Same or not the same?' },
                 { v: 'mixed', l: 'One of the three per page' }],
-            help: 'One question for the whole page (P-28).',
+            help: 'One question for the whole page, so the instruction says one thing.',
         },
         _k2CountTo([5, 10], 10),
         levelSubset([2, 1], 1, 'Level 2 writes how many under each group (compare the numbers); level 1 leaves the pupil to match one to one.'),
@@ -872,6 +881,17 @@ const P11_K2_OPTIONS = {
     'composing:teen_compose': [levelSubset([1, 0], 1, 'Level 1 shows the full ten frame and the ones; level 0 is the number sentence alone.')],
     'composing:ten_frame_build': [_k2CountTo([5, 10], 10)],
     'composing:base10_build': [_opsBand([20, 50, 99], 99, { label: 'Numbers to', help: 'The largest number to build.' })],
+    'composing:base10_regroup': [_opsBand([50, 99], 99, { label: 'Numbers to', help: 'The largest number to build and trade.' })],
+    'composing:base10_build_hundreds': [_opsBand([500, 999], 999, { label: 'Numbers to', help: 'The largest number to build.' })],
+    'composing:tens_foundation_visual': [_opsBand([50, 90], 90, { label: 'Tens to', labels: { 50: '5 tens (50)', 90: '9 tens (90)' }, help: 'The most rods drawn.' })],
+    'composing:hundreds_chart_fill': [
+        _opsBand([50, 100], 100, { label: 'Numbers to', help: 'Which part of the hundreds chart the window is cut from.' }),
+        {
+            id: 'tiles', label: 'Empty boxes', type: 'enum', default: null, group: 'difficulty',
+            values: [{ v: null, l: '1 to 3, dealt' }, { v: 1, l: '1 box' }, { v: 2, l: '2 boxes' }, { v: 3, l: '3 boxes' }],
+            help: 'How many numbers the pupil writes in each window.',
+        },
+    ],
 };
 Object.assign(SKILL_OPTIONS, P11_K2_OPTIONS);
 // ============================ end P11 · K-2 options ============================

@@ -76,7 +76,7 @@ export {
 
 /* ------------------------------------------------- cell templates (register on load) */
 export { stack, stackTabStep, stackAnswerSlot } from './cells/stack.js';
-export { fact, factPadTop, factWidthMm, factFillOfColumn, factWriteMm, FACT_GEOMETRY } from './cells/fact.js';
+export { fact, factPadTop, factWidthMm, factFillOfColumn, factWriteMm, FACT_GEOMETRY, factCue } from './cells/fact.js';
 export { equation, equationParts, equationColumns, frac, mixed } from './cells/equation.js';
 // P9 place value + rounding: the `pv` template and the drawings the screen card shares with it.
 export {

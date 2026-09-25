@@ -86,6 +86,20 @@ register('equation', {
             digits, graded: true, order: 0, inputmode: u === 'op' ? 'text' : 'numeric',
             scopes: ['full', 'answer-only'],
         }, ctx, ctx.state === 'wrong' ? (ctx.wrong && ctx.wrong.value) : unknownValue(Object.assign({}, p, { result })));
+        // P11: a ÷ sentence written the way the teacher ticked (`notation`): the dividend over the
+        // divisor on a fraction bar, or the divisor outside a long-division bracket. The unknown
+        // keeps its slot wherever it sits.
+        const isDiv = p.op === '/' || p.op === '÷';
+        if (isDiv && (p.notation === 'fraction' || p.notation === 'bracket')) {
+            const A = u === 'a' ? slotHtml : `<span>${esc(p.a)}</span>`;
+            const B = u === 'b' ? slotHtml : `<span>${esc(p.b)}</span>`;
+            const R = u === 'result' ? slotHtml : `<span>${esc(result)}</span>`;
+            const body = p.notation === 'fraction'
+                ? `<span class="ws-divfrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;">`
+                    + `<span style="border-bottom:0.75pt solid #000;padding:0 0.2em;">${A}</span><span style="padding:0 0.2em;">${B}</span></span>`
+                : `${B}<span style="border-top:0.75pt solid #000;border-left:0.75pt solid #000;border-top-left-radius:0.4em;padding:0.05em 0.3em 0 0.3em;margin-left:0.15em;">${A}</span>`;
+            return `<div class="ws-eq" data-ws-notation="${p.notation}">${body}<span class="o">=</span>${R}</div>`;
+        }
         const pieces = [
             u === 'a' ? slotHtml : `<span>${esc(p.a)}</span>`,
             u === 'op' ? slotHtml : `<span class="o">${opGlyph(p.op)}</span>`,
@@ -106,7 +120,7 @@ register('equation', {
         const chars = String(p.a).length + String(p.b).length + String(p.result ?? compute(p)).length;
         const wMm = chars * em * 0.62 + 2 * em + blankWidth(p.digits || 2, ctx.size) + 6;
         return {
-            wMm: Math.ceil(wMm), hMm: Math.ceil(em * 1.15 + ctx.metrics.writeMm + 4), measure: false,
+            wMm: Math.ceil(wMm), hMm: Math.ceil(em * 1.15 + ctx.metrics.writeMm + 4) * (p.notation === 'fraction' ? 2 : 1), measure: p.notation === 'fraction',
             factLike: false, maxCols: 4, stretchCap: STRETCH_CAP.equation,
         };
     },

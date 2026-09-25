@@ -96,7 +96,7 @@ export const VALUE_TOKENS = {
     support: { cut: 'C', line: 'L', none: 'N', labels: 'B', chart: 'T',
         // P11 operations hint pictures (appended)
         tile: 'D', frame: 'R', skip: 'K', array: 'A', think: 'H', bar: 'M' },
-    objects: { shapes: 'S', counters: 'C', frame: 'F', dice: 'D' },
+    objects: { shapes: 'S', pictures: 'P', frame: 'F', dice: 'D' },
     // Numeric sets whose members are not all under 36: one digit per power of ten.
     power: { 10: '1', 100: '2', 1000: '3' },
     places: { 1: '0', 10: '1', 100: '2', 1000: '3', 10000: '4', 100000: '5' },

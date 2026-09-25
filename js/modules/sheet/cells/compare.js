@@ -53,7 +53,10 @@ register('compare', {
     render(p, ctx) {
         const on = checkedIndex(p, ctx);
         const row = (name, n, solid) => `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};margin:${L(ctx, 1.5)} 0;">`
-            + `<b style="width:${L(ctx, 7)};text-align:right;font-size:${P(ctx, digitPt(ctx) * 0.8)};line-height:1;">${name}</b>${frame(ctx, n, solid)}</div>`;
+            + `<b style="width:${L(ctx, 7)};text-align:right;font-size:${P(ctx, digitPt(ctx) * 0.8)};line-height:1;">${name}</b>${frame(ctx, n, solid)}`
+            // P11 hint (Support level 2): how many, written beside each frame, so the pupil can
+            // compare two numbers instead of matching one to one. Faded at level 1 (absent).
+            + `${p.showCounts ? `<span data-k2-count="1" style="font-size:${P(ctx, digitPt(ctx) * 0.8)};font-weight:700;line-height:1;">${esc(n)}</span>` : ''}</div>`;
         const ticks = (p.labels || []).map((lab, i) => `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};margin:${L(ctx, 1.5)} 0;">`
             + `<span style="min-width:${L(ctx, 34)};text-align:left;font-size:${P(ctx, textPt(ctx) + 2)};">${esc(lab)}</span>`
             + checkBox(ctx, { id: `c${i}`, on: on === i, slot: false }) + `</div>`).join('');
