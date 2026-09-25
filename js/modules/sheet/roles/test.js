@@ -16,6 +16,7 @@ import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, instructionKeyOf, assemble,
     poolItems, topicOf, labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, rng, shuffle, deriveSeed,
 } from './compose.js';
+import { groupByHeight, rowShape } from '../layout.js';
 
 export const ROLE_ID = 'test';
 const CEILING = { S: 20, M: 16, L: 12 };
@@ -66,6 +67,8 @@ export function plan(input = {}) {
     items = items.slice(0, L.perPage);
     // PT-TST-1: Form B is Form A re-ordered under (seed, form).
     if (form === 'B') items = shuffle(rng(deriveSeed(input.seed === undefined ? 0 : input.seed, 'test', 'B')), items);
+    // RUBRIC H13: problems of one height together, so each row is sized for what it holds.
+    items = groupByHeight(items, L.cols);
     const topic = topicOf(((input.skills || [])[0] || {}).iCan || '');
     const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: `Test ${form}: ${topic}`, score: items.length });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
@@ -78,8 +81,11 @@ export function plan(input = {}) {
             cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1,
         }),
     ];
-    // The layout's grid height is the page's (one instruction); a lone full grid fills by flex.
-    if (rows === L.rows) { sections[1].cls = ''; sections[1].height = ''; }
+    // Rows sized to what they hold (H13); else the layout's grid height is the page's (one
+    // instruction) and a lone full grid fills by flex.
+    const shape = rowShape(items, L.cols, rows, L.cellH);
+    if (shape) { sections[1].rowsTpl = shape.rowsTpl; sections[1].height = `${shape.heightMm}mm`; }
+    else if (rows === L.rows && L.fill !== false) { sections[1].cls = ''; sections[1].height = ''; }
     return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, [{ sections }], {
         scaffoldLevel: 0,
         meta: { items: items.length, scoreOutOf: items.length, form, fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },

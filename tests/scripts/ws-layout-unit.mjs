@@ -142,6 +142,23 @@ for (const s of SIZES) {
     near(lay.cellH, s === 'L' ? 75.667 : 76, `PT 2.4 standard cell height at ${s}`, 0.01);
     eq(lay.cellW, 93, `PT 2.4 standard cell width at ${s}`);
 }
+// RUBRIC H13: a row held back by a ceiling is never stretched past FILL_CAP x its content, and
+// the grid then does not fill by flex (the spare height stays under the grid).
+{
+    const lay = L(run(12, () => plainItem(12)), 'auto', 'L', { ceiling: 12, target: { cols: 3, rows: 4 } });
+    ok(lay.cellH <= lay.hMin * 1.8 + 0.01 && lay.fill === false, `H13: 12 short items capped at 1.8 x hMin (cellH ${lay.cellH}, hMin ${lay.hMin}, fill ${lay.fill})`);
+}
+// RUBRIC H13: mixed heights - tall problems grouped first, rows sized to what they hold.
+{
+    const { groupByHeight, rowShape } = await import('../../js/modules/sheet/layout.js');
+    const mk = (h, id) => ({ id, measured: { 2: { hMm: h, fits: true } } });
+    const its = [mk(18, 'a'), mk(78, 'b'), mk(18, 'c'), mk(78, 'd'), mk(18, 'e'), mk(18, 'f')];
+    const g = groupByHeight(its, 2);
+    eq(g.map((x) => x.id).join(''), 'bdacef', 'H13: tallest first, order kept within each height');
+    const sh = rowShape(g, 2, 3, 75);
+    ok(sh && /^78fr 18fr 18fr$/.test(sh.rowsTpl) && sh.heightMm <= 3 * 75 + 0.01, `H13: rows weighted by what they hold (${sh && sh.rowsTpl}, ${sh && sh.heightMm} mm)`);
+    eq(rowShape([mk(40), mk(40), mk(40), mk(40)], 2, 2, 60), null, 'H13: equal rows are left as they were');
+}
 // Long algorithm: 2 x 2, 93 x 114 / 113.5.
 {
     const lay = L(run(4, () => plainItem(40, {})).map((it) => Object.assign(it, { fclass: 'long' })));

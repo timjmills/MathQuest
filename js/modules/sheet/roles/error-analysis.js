@@ -619,7 +619,7 @@ export function plan(input = {}) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Check it', score: items.length });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
     const grid = gridPart(items.map((it) => planItem(it, { cols: L.cols })), { cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
-    if (rows === L.rows) { grid.cls = ''; grid.height = ''; }
+    if (rows === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
     const wrongShare = items.length ? items.filter((it) => it.thinking && it.thinking.isWrong).length / items.length : 0;
     const fit = Object.assign({}, L, { items: undefined });
     // The instruction says where the fix goes (critic round 3): written, or drawn again.

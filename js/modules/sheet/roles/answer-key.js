@@ -374,6 +374,7 @@ function gridPart(part, ctx, report) {
         height: part.height || '',
         unlabelled: part.unlabelled || [],
         rowsTpl: part.rowsTpl || '',
+        spanFirst: !!part.spanFirst,
     });
 }
 

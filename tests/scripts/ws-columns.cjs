@@ -35,7 +35,6 @@ const ONE_COLUMN = {
     timeline: { cols: 1, why: 'an elapsed-time line needs the full width for its hour ticks and hops' },
     'count-row': { cols: 1, why: 'a count-by / pattern train is one unbroken row of 6-10 boxes at the train box minimum, wider than a 2-column cell (a broken train loses the pattern)' },
     equation: { cols: { S: 3, M: 2, L: 2 }, why: 'at M / L an equation with two 2-digit numbers, a sign circle and a slot is wider than a 3-column cell at the size\'s digit height (DN-11: columns never shrink digits); 2 columns hold it' },
-    remainder: { cols: { S: 2, M: 2, L: 1 }, why: 'at L the counter runs of a larger divisor (4 mm gaps so each run can be ringed, RUBRIC H12) are wider than a 2-column cell; S and M reach 2' },
 };
 
 const SIZES = (arg('sizes', 'S,M,L')).split(',').filter(Boolean);
