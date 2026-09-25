@@ -1,11 +1,18 @@
 // js/modules/sheet/cells/family.js
 // Two number-sentence templates with real writing boxes:
 //
-//   `fact-family`  the three numbers in a number bond, then the four facts, one per line:
+//   `fact-family`  the three numbers in a number bond ABOVE the four facts, one per line:
 //                      (11)
 //                     /    \
-//                   (8)    (3)        8 + 3 = [  ]     3 + 8 = [  ]
-//                                     11 − 8 = [  ]    11 − 3 = [  ]
+//                   (8)    (3)
+//                  8 + 3 = [  ]
+//                  3 + 8 = [  ]
+//                 11 − 8 = [  ]
+//                 11 − 3 = [  ]
+//                  The bond sat beside the facts (about 118 mm at L), which wrapped the facts
+//                  under the bond in a 2-column cell and held the page to 1 x 3. Stacked, the
+//                  cell is as wide as one fact line (about 65 mm at L), so 2 x 2 fits. A 2 x 2
+//                  grid of facts would be about 130 mm: wider than a 2-column cell.
 //   `cloze-bank`   [  ] + [  ] = 12 with a NUMBER BANK printed inside the cell under each box:
 //                   ( 5  7  8 )   ( 4  6  9 )
 //
@@ -77,7 +84,9 @@ register('fact-family', {
         const lines = `<div style="display:inline-grid;grid-template-columns:auto 1em auto 1em auto;column-gap:0.28em;row-gap:0.15em;align-items:center;white-space:nowrap;font-size:${EQ_EM}em">`
             + fs.map((f, i) => c(esc(f.a), 'text-align:right') + c(f.op, 'font-weight:700;text-align:center') + c(esc(f.b), 'text-align:right')
                 + c('=', 'font-weight:700;text-align:center') + slot(i)).join('') + '</div>';
-        const body = `<div style="display:flex;align-items:center;justify-content:center;gap:0.5em;flex-wrap:wrap">`
+        // The bond above, the facts under it, both centred: one drawing at every column count,
+        // so a narrower column never re-flows it (DN-10).
+        const body = `<div style="display:flex;flex-direction:column;align-items:center;gap:0.3em">`
             + `<div style="flex:0 0 auto">${bond.svg}</div><div style="flex:0 0 auto;text-align:left">${lines}</div></div>`;
         return root(g, 'fact-family', body, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
@@ -91,7 +100,12 @@ register('fact-family', {
     footprint(p, ctx) {
         const g = geo(ctx);
         const bond = bondSVG(g, p);
-        return { wMm: Math.ceil(bond.wMm + 7 * g.E * EQ_EM + 8), hMm: null, measure: true, factLike: false, maxCols: 2 };
+        // The wider of the bond and one fact line ("20 − 12 = [  ]": about 5.4 em of text at
+        // 0.85 of the digit size, then the box), plus the side pads.
+        const n = String(Number(p.a) + Number(p.b)).length;
+        const bw = Math.max(g.writeMm * 2, (n * 0.62 + 0.8) * g.E * EQ_EM);
+        const line = (4 * 0.56 + 2 + 4 * 0.28) * g.E * EQ_EM + bw;
+        return { wMm: Math.ceil(Math.max(bond.wMm, line) + 8), hMm: null, measure: true, factLike: false, maxCols: 2 };
     },
     inputs() {
         return [0, 1, 2, 3].map((i) => ({ id: `f${i}`, kind: 'number', shape: 'box', graded: true, order: i, inputmode: 'numeric', scopes: ['full'] }));

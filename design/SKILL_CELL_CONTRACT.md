@@ -397,6 +397,19 @@ export function coverage(skillKeys) {}  // {[skillKey]: {template, isLegacy, def
 - **SCC-T12** On screen, `traced` slots are real inputs showing the trace value as a ghost; the pupil types
   over it and gets live feedback.
 
+#### 2.4.1 Error-analysis payload flags (2026-09-25)
+
+Two templates take a payload flag an Error analysis role can set so the finished work is a real
+piece of work to judge and fix:
+
+| Flag | Templates | What it draws |
+|---|---|---|
+| `fix: 'draw'` (or `ctx.options.fix === 'draw'`) | `base10`, `tenframe` | The finished work as usual (in state `wrong`, the wrong model), and under it a second **empty** Tens / Ones mat or ten frame captioned "Fix it:", the place to draw the number correctly: slot `fix`, shape `draw`, listed by `inputs(p)` and keyed by `answerKey(p).slots.fix`. The key fills the fix zone with the right model. Because Error analysis draws its work in state `wrong` on **both** pages, the key render marks itself with `ctx.options.fixKey = true`; a direct `answered` / `traced` render also fills it. |
+| `shown` | `seqstrip` | A value printed in a tile of the finished track in **every** state: an array aligned with `values` (`null` = none) or a map `{index: value}`. On a given tile it replaces the printed number (the wrong tile to find); on a blank it is the pupil's finished work, written in the box in solid ink. The tile carries `data-ws-shown="1"`. `answerKey` is unchanged (the right values). |
+
+- **SCC-T21** A fix zone has the same size as the work zone and is empty on the pupil page; the key draws
+  only the right model in it, never the wrong one (AK-1).
+
 ### 2.5 Scaffold levels
 
 | Level | Name | Hint scaffolds | Structural scaffolds |

@@ -657,7 +657,29 @@ eq([stripPos(0, 1), stripPos(0, 3), stripPos(1, 3), stripPos(2, 3)], ['only', 'f
     // VA-2: a vertical fact's operator has its own track - never written over a digit track.
     const f = renderCell(T('fact', { a: 7, b: 12, op: '*', digits: 3 }), ctxL());
     ok(/<span class="op">×<\/span><span><\/span><span>1<\/span><span>2<\/span>/.test(f), 'VA-2: ×12 keeps an operator track and a blank hundreds track');
-    ok(/grid-template-columns:1\.2em repeat\(3, 0\.72em\)/.test(f), 'TY-22: fact digit tracks stay 0.72 em, the operator track is its own');
+    // A 3-track band whose second operand leaves the first track empty takes the tight 0.72 em
+    // operator track (the empty track keeps it clear); a full-width operand keeps 1.2 em.
+    ok(/grid-template-columns:0\.72em repeat\(3, 0\.72em\)/.test(f), 'TY-22: fact digit tracks stay 0.72 em, the operator track is its own (tight over an empty track)');
+    ok(/grid-template-columns:1\.2em repeat\(2, 0\.72em\)/.test(renderCell(T('fact', { a: 7, b: 12, op: '+', digits: 2 }), ctxL())), 'VA-2: a 2-track fact keeps the 1.2 em operator track');
+    {
+        // Capacity: a 2-digit + 2-digit fact with a 3-digit answer band fits 5 columns at L and
+        // 6 at M (content width = 186 / cols - 6.6 mm); the answer zone keeps all 3 tracks.
+        const fa = T('fact', { a: 78, b: 96, op: '+', notation: 'vertical', digits: 3 });
+        const w5 = cellFootprint(fa, resolveCtx(ctxL('blank', { options: { factColumns: 5 } }))).wMm;
+        ok(w5 <= 186 / 5 - 0.6, `DN-16: a 3-track addition fact fits 5 columns at L (${w5} mm)`);
+        ok(/grid-template-columns:repeat\(3, 0\.72em\)/.test(renderCell(fa, ctxL('answered'))), 'SL-12: the answer zone keeps 3 tracks with the tight operator');
+        // Division across: vertical on a fact-rows page of 5+ columns (VA-65), the answer below
+        // on a 3-4 column page, beside it where it fits.
+        const dv = T('fact', { a: 60, b: 12, op: '/', notation: 'horiz', digits: 2 });
+        const at = (c, st = 'blank') => renderCell(dv, ctxL(st, { options: { factColumns: c } }));
+        ok(/class="ws-fact"/.test(at(5)) && /<span class="op">÷<\/span>/.test(at(5)), 'VA-65: a division fact on a 5-column fact-rows page is drawn vertical');
+        ok(/ws-eq-below/.test(at(3)) && !/class="ws-fact"/.test(at(3)), 'DN-22: a 3-column across fact stacks its answer below');
+        ok(!/ws-eq-below/.test(at(2)) && /class="ws-eq"/.test(at(2)), 'the answer stays beside the fact at 2 columns');
+        eq(slotIds(at(3)), slotIds(at(3, 'answered')), 'AK-4: the below form carries the same slot blank and keyed');
+        const fpAuto = cellFootprint(dv, resolveCtx(ctxL()));
+        ok(fpAuto.wMm <= 186 / 5 - 0.6 && !fpAuto.tracks, `the across footprint without a column count is its narrowest drawing (${fpAuto.wMm} mm) and not a stack`);
+        ok(/class="ws-eq"/.test(renderCell(dv, { mode: 'screen', static: true, size: 'L', state: 'blank', options: { factColumns: 6 } })), 'the screen twin keeps the across notation');
+    }
     const fs = renderCell(T('fact', { a: 15, b: 13, op: '-' }), ctxL());
     ok(fs.includes('<span class="op">−</span>') && !/>-</.test(fs), 'TY-6: subtraction draws the true minus sign');
     eq(slotIds(f), slotIds(renderCell(T('fact', { a: 7, b: 12, op: '*', digits: 3 }), ctxL('answered'))), 'AK-4: a fact carries the same slot blank and keyed');
@@ -698,6 +720,13 @@ eq([stripPos(0, 1), stripPos(0, 3), stripPos(1, 3), stripPos(2, 3)], ['only', 'f
     const r = Math.min(...[...arB.matchAll(/<circle [^>]*r="([\d.]+)"/g)].map((m) => Number(m[1])));
     ok(r * 2 >= 4, `RP-3: counters are at least 4 mm (${r * 2} mm)`);
     eq(slotIds(arB), ['first', 'second', 'total'], 'three boxes, one per blank');
+    {
+        // Every range-100 picture fits a 2-column cell's width (86 mm) at the RP-3 minimum pitch.
+        const widest = Math.max(...[['equal_groups', 6, 8], ['equal_groups', 6, 4], ['write_mult', 6, 8], ['count_all', 5, 7]]
+            .map(([kind, rows, cols]) => Number(renderCell(T('arrays', { kind, rows, cols }), ctxL()).match(/viewBox="0 0 ([\d.]+)/)[1])));
+        ok(widest <= 84, `arrays: the widest picture fits a 2-column cell (${widest} mm)`);
+        ok(!/There are/.test(arB) && (arB.match(/white-space:nowrap/g) || []).length === 2, 'arrays: two sentence lines, "[ ] groups of [ ]" then "[ ] in all."');
+    }
     // Remainder: two slots "[q] R [r]"; rows of counters at least 6 mm apart.
     const rm = T('remainder', { dividend: 19, divisor: 3 });
     const rmB = renderCell(rm, ctxL());
@@ -727,6 +756,28 @@ eq([stripPos(0, 1), stripPos(0, 3), stripPos(1, 3), stripPos(2, 3)], ['only', 'f
     ok(/data-mq-blank="box"/.test(tw(nl)), 'number-line twin: the answer box takes the input');
     ok(/data-mq-join=" R "/.test(tw(rm)) && (tw(rm).match(/data-mq-cell/g) || []).length === 2, 'remainder twin: two boxes joined " R "');
     ok(/area-model-input/.test(tw(am)) && /area-model-total/.test(tw(am)), 'area-model twin keeps the checker classes');
+    // Number track: a long track wraps to two rows; `shown` prints a value in every state.
+    const sq = T('seqstrip', { values: [10, 20, 30, 40, 50], blanks: [1, 3] });
+    ok(/flex-wrap:nowrap/.test(renderCell(sq, ctxL())), 'seqstrip: five tiles stay one row');
+    ok(cellFootprint(sq, resolveCtx(ctxL())).wMm <= 93 && cellFootprint(sq, resolveCtx(ctxL())).maxCols === 2, 'seqstrip: five tiles fit a 2-column cell');
+    ok(/flex-wrap:wrap;[^"]*max-width:/.test(renderCell(T('seqstrip', { values: [2, 4, 6, 8, 10, 12, 14, 16], blanks: [2] }), ctxL())), 'seqstrip: eight tiles wrap to two rows');
+    const sqShown = renderCell(T('seqstrip', { values: [10, 20, 30, 40, 50], blanks: [1, 3], shown: { 2: 35, 3: 41 } }), ctxL());
+    ok(/data-ws-shown="1"[^>]*>35</.test(sqShown) && !/>30</.test(sqShown), 'seqstrip shown: a given tile prints the shown (wrong) value');
+    ok(/data-ws-slot="b0"[^>]*><\/span>/.test(sqShown), 'seqstrip shown: an unshown blank stays empty on the pupil page');
+    ok(/data-ws-slot="b1" data-ws-shape="box" data-ws-ink="solid" data-ws-shown="1"[^>]*>41</.test(sqShown), 'seqstrip shown: a blank holds the finished work in solid ink');
+    // Drawing-fix slot: an empty mat / frame under the work; the key fills it with the right model.
+    for (const [tpl, pay] of [['base10', { target: 34, fix: 'draw' }], ['tenframe', { target: 7, fix: 'draw' }]]) {
+        const q = T(tpl, pay);
+        const wrongPupil = renderCell(q, ctxL('wrong', { wrong: { value: tpl === 'base10' ? 43 : 6 } }));
+        const wrongKey = renderCell(q, ctxL('wrong', { wrong: { value: tpl === 'base10' ? 43 : 6 }, options: { fixKey: true } }));
+        eq(slotIds(wrongPupil), ['answer', 'fix'], `${tpl} fix: the work slot and the fix slot`);
+        ok(/Fix it:/.test(wrongPupil), `${tpl} fix: the fix zone is captioned`);
+        const fixPart = (h) => h.slice(h.indexOf('data-ws-slot="fix"'));
+        ok(!/data-k2-sym|<circle/.test(fixPart(wrongPupil)), `${tpl} fix: the fix zone is empty on the pupil page`);
+        ok(/data-k2-sym|<circle/.test(fixPart(wrongKey)), `${tpl} fix: the key draws the right model in the fix zone`);
+        eq(cellAnswerKey(q).slots.fix.value, String(pay.target), `${tpl} fix: the fix slot is keyed`);
+        ok(!/Fix it:/.test(renderCell(T(tpl, { target: pay.target }), ctxL())), `${tpl}: no fix zone without the flag`);
+    }
 }
 
 /* ===================================================================== small words */

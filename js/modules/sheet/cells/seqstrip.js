@@ -13,7 +13,12 @@
 // host input (which is what `q.ans` holds). The twin is sized in `--mq-k2` px and five tiles fit a
 // 390 px phone without wrapping or overlapping.
 //
-// payload: {values: [n0 .. n4], blanks: [index, ...] (ascending)}
+// A track of more than five tiles wraps to two even rows, so no item forces the page to one
+// column (five tiles are 81 mm at L, inside a 2-column cell).
+//
+// payload: {values: [n0 .. n4], blanks: [index, ...] (ascending), shown?: [..] | {index: v}}
+//   `shown` (Error analysis): a value printed in a tile of the finished track - a wrong given
+//   tile to find, or the pupil's finished work in a blank - in every state.
 //
 // Pure module (SCC-01).
 
@@ -22,30 +27,65 @@ import { esc } from '../cell.js';
 import { L, P, B, INK, GREY, root, digitPt, sizeOf, inkOf, isTwin, shownParts } from './k2kit.js';
 
 const TILE = { S: { w: 14, h: 14 }, M: { w: 14.5, h: 14.5 }, L: { w: 15, h: 15 } };
+const GAP_MM = 1.5;
+/** At most this many tiles in one row: five 15 mm tiles are 81 mm, inside a 2-column cell. */
+export const SEQ_ROW_MAX = 5;
+
+/** Tiles per row: the whole track up to five, else the track wraps to two even rows. */
+const perRowOf = (n) => (n <= SEQ_ROW_MAX ? Math.max(1, n) : Math.ceil(n / 2));
+/** Width (mm) of one row of the track at this size. */
+const rowMm = (n, size) => {
+    const t = TILE[size] || TILE.L;
+    const k = perRowOf(n);
+    return k * t.w + (k - 1) * GAP_MM;
+};
+
+/**
+ * `shown` (Error analysis, SKILL_CELL_CONTRACT.md): a value printed in a tile of the finished
+ * track, in every state - an array aligned with `values` (null / undefined = none) or a map
+ * {index: value}. On a GIVEN tile it replaces the printed number (the wrong tile a pupil must
+ * find); on a blank it is the pupil's finished work written in the box (solid ink).
+ */
+const shownAt = (p, i) => {
+    const s = p.shown;
+    if (s === undefined || s === null) return undefined;
+    const v = Array.isArray(s) ? s[i] : s[i] !== undefined ? s[i] : s[String(i)];
+    return v === undefined || v === null || v === '' ? undefined : v;
+};
 
 register('seqstrip', {
     render(p, ctx) {
-        const t = TILE[sizeOf(ctx)] || TILE.L;
+        const size = sizeOf(ctx);
+        const t = TILE[size] || TILE.L;
         const values = p.values || [];
         const blanks = (p.blanks || []).map(Number);
         const keyParts = blanks.map((i) => values[i]);
         const shown = shownParts(ctx, keyParts);
         const pt = Math.min(digitPt(ctx) * 0.72, 20);
-        const fmt = (v) => Number(v).toLocaleString('en-US');
+        const fmt = (v) => (Number.isFinite(Number(v)) && String(v).trim() !== '' ? Number(v).toLocaleString('en-US') : String(v));
         const tiles = values.map((v, i) => {
             const k = blanks.indexOf(i);
+            const over = shownAt(p, i);
             const base = `box-sizing:border-box;flex:none;width:${L(ctx, t.w)};height:${L(ctx, t.h)};display:flex;align-items:center;`
                 + `justify-content:center;font-size:${P(ctx, pt)};font-weight:700;line-height:1;background:#fff;`;
-            if (k < 0) return `<span class="k2-tile" style="${base}border:${B(ctx, 0.75)} solid ${INK};color:${INK};">${fmt(v)}</span>`;
-            const val = shown[k];
-            const ink = val !== '' ? inkOf(ctx) : null;
+            if (k < 0) {
+                return `<span class="k2-tile"${over !== undefined ? ' data-ws-shown="1"' : ''} style="${base}border:${B(ctx, 0.75)} solid ${INK};color:${INK};">`
+                    + `${esc(fmt(over !== undefined ? over : v))}</span>`;
+            }
+            const val = over !== undefined ? String(over) : shown[k];
+            const ink = over !== undefined ? 'solid' : val !== '' ? inkOf(ctx) : null;
             const hook = isTwin(ctx) ? ' data-mq-cell="1"' : '';
-            return `<span class="k2-tile k2-tile-slot" data-ws-slot="b${k}" data-ws-shape="box"${ink ? ` data-ws-ink="${ink}"` : ''}${hook} `
+            return `<span class="k2-tile k2-tile-slot" data-ws-slot="b${k}" data-ws-shape="box"${ink ? ` data-ws-ink="${ink}"` : ''}`
+                + `${over !== undefined ? ' data-ws-shown="1"' : ''}${hook} `
                 + `style="${base}border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 1.25)};color:${ink === 'trace' ? GREY : INK};">`
                 + `${val === '' ? '' : esc(fmt(val))}</span>`;
         }).join('');
-        return root(ctx, 'k2-seqstrip', `<div class="k2-track" data-mq-join=", " style="display:flex;flex-wrap:nowrap;justify-content:center;`
-            + `gap:${L(ctx, 1.5)};">${tiles}</div>`);
+        // A track of more than five tiles wraps to two even rows, so the cell stays inside a
+        // 2-column page (one reading order: the twin's inputs still join left to right, top row
+        // first).
+        const wrap = values.length > SEQ_ROW_MAX;
+        return root(ctx, 'k2-seqstrip', `<div class="k2-track" data-mq-join=", " style="display:flex;flex-wrap:${wrap ? 'wrap' : 'nowrap'};justify-content:center;`
+            + `${wrap ? `max-width:${L(ctx, rowMm(values.length, size) + 0.5)};margin:0 auto;` : ''}gap:${L(ctx, GAP_MM)};">${tiles}</div>`);
     },
     answerKey(p) {
         const parts = (p.blanks || []).map((i) => String((p.values || [])[i]));
@@ -53,7 +93,11 @@ register('seqstrip', {
         parts.forEach((v, i) => { slots[`b${i}`] = { value: v, graded: true }; });
         return { value: parts.join(', '), display: parts.join(', '), slots };
     },
-    footprint() { return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2 }; },
+    footprint(p, ctx) {
+        // The widest row and the side pads: 81 + 8 mm for five tiles at L, so 2 columns fit.
+        const w = rowMm(((p && p.values) || []).length || SEQ_ROW_MAX, sizeOf(ctx));
+        return { wMm: Math.ceil(w + 8), hMm: null, measure: true, factLike: false, maxCols: w + 8 <= 93 ? 2 : 1 };
+    },
     inputs(p) {
         return (p.blanks || []).map((_, i) => ({ id: `b${i}`, kind: 'number', shape: 'box', graded: true, order: i, scopes: ['full', 'answer-only'] }));
     },

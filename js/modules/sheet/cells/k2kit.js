@@ -56,6 +56,21 @@ export function slotValue(ctx, id, keyValue) {
     return keyValue === undefined || keyValue === null ? '' : String(keyValue);
 }
 
+/**
+ * THE DRAWING-FIX SLOT (Error analysis of a build-the-number item, SKILL_CELL_CONTRACT.md).
+ * With payload `fix: 'draw'` (or `ctx.options.fix === 'draw'`) a picture template that the pupil
+ * DRAWS in (`base10`, `tenframe`) prints its finished work as usual and, under it, a second EMPTY
+ * mat or frame captioned "Fix it:", the place to draw the number correctly (slot `fix`, shape
+ * `draw`). The fix zone is filled with the right model on the key: when the cell is drawn in
+ * the `answered` / `traced` state, or when the role marks its key render with
+ * `ctx.options.fixKey` (Error analysis draws its work in state `wrong` on BOTH pages, so the state
+ * alone cannot tell the key from the pupil page).
+ */
+export const fixDraw = (p, ctx) => (p && p.fix === 'draw') || !!(ctx && ctx.options && ctx.options.fix === 'draw');
+export const fixFilled = (ctx) => !!(ctx && ctx.options && ctx.options.fixKey) || answered(ctx);
+/** The "Fix it:" caption over a fix zone, at zone-label size. */
+export const fixCaption = (ctx) => `<div style="font-size:${P(ctx, zonePt(ctx))};font-weight:700;line-height:1.5;text-align:left;">Fix it:</div>`;
+
 /** The parts of a list-valued shown answer ("78, 84"), in reading order. */
 export function shownParts(ctx, keyParts) {
     if (ctx.state === 'blank') return keyParts.map(() => '');
