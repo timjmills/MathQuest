@@ -93,7 +93,8 @@ export function frameOf({ skills = [], input = {}, tabId, title, twoLine = false
     const idText = ids.length > 3 ? `${ids.slice(0, 3).join(', ')} +${ids.length - 3}` : ids.join(', ');
     const codes = [...new Set(skills.flatMap((s) => String(s.ccss || '').split(/[,;]\s*/)).map((c) => c.trim()).filter(Boolean))];
     const ccss = codes.length > 9 ? `${codes.slice(0, 9).join(', ')} +${codes.length - 9}` : codes.join(', ');
-    const left = footerLeft || [idText, gradeWords(skills.map((s) => s.grade)), ccss].filter(Boolean).join(' · ');
+    // A lesson packet prints its own tags on every sheet (header.footerLeft, roles/lesson.js).
+    const left = footerLeft || (typeof h.footerLeft === 'string' && h.footerLeft) || [idText, gradeWords(skills.map((s) => s.grade)), ccss].filter(Boolean).join(' · ');
     const on = (k) => h[k] !== false;
     const tab = h.tab === false ? false : tabLines;
     const size = (input.ctx && SIZES[input.ctx.size]) ? input.ctx.size : DEFAULT_SIZE;

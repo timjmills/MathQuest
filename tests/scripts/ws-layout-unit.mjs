@@ -31,7 +31,7 @@ import {
     renderPlan, sectionInstructionKey, instructionHtml, levelLine, estimateTitleLines,
 } from '../../js/modules/sheet/roles/practice.js';
 import { ROLE_IDS, ROLE_MODULES, ROLE_ALIASES } from '../../js/modules/sheet/roles/index.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx } from '../../js/modules/sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, getProvider } from '../../js/modules/sheet/index.js';
 import { stack } from '../../js/modules/sheet/cells/stack.js';
 import { SLOT, SIZES as KIT_SIZES, slotRadiusMm, stripSegStyle, stripPos } from '../../js/modules/sheet/tokens.js';
 
@@ -413,7 +413,7 @@ const provMake = (pool, sk, i) => Object.assign(stackQ(12 + i, 25 + i), { skillI
 const bigAMake = (pool, sk, i) => stackQ(333 + i * 7, 111 + i * 3);
 const storyMake = (pool, sk, i) => Object.assign(stackQ(3 + i, 4), { skillId: 'add_wp_10', printFormat: 'word-problem', text: `Sam has ${3 + i} apples. He gets 4 more. How many apples does Sam have now?` });
 
-eq(Object.keys(ROLE_MODULES).length, 14, 'roles/index.js carries the fourteen P7.2b role modules');
+eq(Object.keys(ROLE_MODULES).length, 15, 'roles/index.js carries the fourteen P7.2b role modules and the lesson');
 ok(Object.keys(ROLE_MODULES).every((id) => ROLE_IDS.includes(id)), 'ROLE_IDS lists every P7.2b role');
 eq(ROLE_ALIASES.model, 'scripted-model', 'the print screen\'s "model" names the Scripted Model role');
 
@@ -960,6 +960,31 @@ eq(levelLine(['M']), 'All levels', 'HD-5: a multi-level skill');
 eq(sectionInstructionKey(['add', 'add']), 'add', 'BD-13: one key');
 eq(sectionInstructionKey(['multiply', 'divide']), 'mixed-ops', 'BD-13: x and / mixed');
 eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div class="ws-instrline" data-ws-instruction="mixed-sign">Add or subtract. Look at the <u>sign</u>.</div>', 'BD-14: the underlined word of a library string');
+
+/* ================================================ the lesson (roles/lesson.js, 2026-09-25) */
+{
+    const L = ROLE_MODULES.lesson;
+    ok(!!L && typeof L.plan === 'function' && typeof L.extras === 'function', 'lesson: a role module with plan and extras');
+    // Worked steps: one state each, a closing check rides with the state before it, at most 4.
+    const st = (m) => ({ text: 't', marks: m ? [{ slot: 'ones', value: '1' }] : [] });
+    eq(L.stateGroups([st(1), st(1), st(1), st(1), st(0)]).length, 4, 'lesson: a closing check joins the last state');
+    eq(L.stateGroups([st(0), st(0), st(1)]).length, 3, 'lesson: every step before the last mark is a state');
+    eq(L.stateGroups([st(1), st(1), st(1), st(1), st(1), st(1)]).length, 4, 'lesson: at most 4 states');
+    eq(JSON.stringify(L.chartLayout(4)), JSON.stringify({ cols: 2, rows: 2, variant: 'col' }), 'lesson: 4 steps make a 2 x 2 chart');
+    eq(L.chartLayout(3).variant, 'row', 'lesson: 3 steps make full-width rows');
+    eq(L.tagLine({ skillId: 'nearest_10', grade: '3', ccss: ['3.NBT.1'], ee: ['M.EE.3.NBT.1'] }), 'nearest_10 · Grade 3 · 3.NBT.1 · EE M.EE.3.NBT.1', 'lesson: the footer tag line');
+    eq(L.tagLine({ skillId: 'x', grade: 'PK', ccss: [], ee: [] }), 'x · Grade PK', 'lesson: no CCSS code is invented');
+    eq(L.packetParts({ practicePages: 2, mixed: true }).map((p) => p.part).join(), 'teach,practice,mixed', 'lesson: the packet parts in order');
+    eq(L.packetParts({ practicePages: 0 }).map((p) => p.part).join(), 'teach', 'lesson: no practice pages when none are asked');
+    // The vocabulary words never sit under their own picture.
+    for (const seed of [0, 1, 7, 42]) ok(L.vocabOrder(3, seed).every((v, i) => v !== i), `lesson: vocabulary order is a derangement (seed ${seed})`);
+    // The column-subtraction provider: its marks write the example's answer.
+    const p = getProvider('subtraction', 'sub_100_regroup');
+    const ws = p.workedSteps({ a: 67, b: 18, ans: 49, text: '67 − 18 = ?' });
+    ok(ws.some((s) => s.marks.some((m) => m.slot === 'strike:tens')) && ws.some((s) => s.marks.some((m) => m.slot === 'regroup:ones' && m.value === '17')), 'provider sub_100_regroup: the regroup step crosses out and writes 5 tens 17 ones');
+    eq(ws.flatMap((s) => s.marks).filter((m) => m.slot === 'tens' || m.slot === 'ones').map((m) => m.value).join(''), '94', 'provider sub_100_regroup: the ones 9 then the tens 4');
+    eq(p.wrongAnswer({ a: 67, b: 18, ans: 49, text: '67 − 18 = ?' }) !== null, true, 'provider sub_100_regroup: a misconception answer');
+}
 
 /* ======================================================================= report */
 

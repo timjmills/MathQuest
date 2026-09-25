@@ -429,6 +429,11 @@ function wsLintPage(cfg) {
             const c = parseColor(value);
             if (!c || c.a === 0) return;
             if (c.a < 0.995) { F('L-INK', 'INK-2', 'major', el, `${what} is semi-transparent (${value}): no opacity below 1 (INK-2)`, `alpha ${what} ${value}`); return; }
+            // INK-30 (owner ruling 2026-09-25): the lesson accent is allowed on a lesson page only,
+            // and only inside an element that declares it (`data-mq-accent`: step numerals, their
+            // circles, step icons). Anywhere else the colour is still an INK-1 defect.
+            if (!isAllowed(c) && hex(c).toLowerCase() === '#5b2a86' && el.closest && el.closest('[data-mq-accent]')
+                && el.closest('.mq-lesson, [data-mq-lesson-strip]')) return;
             if (!isAllowed(c)) F('L-INK', 'INK-1', sevIfBad, el, `${what} ${hex(c)} is not ink #000, paper #fff or grey #949494 (INK-1)${note}`, `${what} ${hex(c)}`);
         };
         if (textBearing && !svg) paint(cs.color, 'text colour');
@@ -789,7 +794,8 @@ function wsLintPage(cfg) {
         }
         // (not on the pack: its Daily-look panels, BD-6, set their instructions in page-local markup)
         const titled = ri.el.querySelector('.ws-title, .sheet-title, .worksheet-title');
-        if (cfg.mode !== 'pack' && ri.cells.length && !list.length && !ri.key && titled && titled.textContent.trim()) F('L-VERBS', 'BD-10', 'minor', ri.el, `no instruction line above the cells: the task sentence is not a section instruction (BD-10: one instruction per section, never inside a cell)`, 'no instruction line');
+        const chart = /^Anchor chart$/.test(([...ri.el.querySelectorAll('.ws-tabbox span')].pop() || {}).textContent || '');
+        if (cfg.mode !== 'pack' && ri.cells.length && !list.length && !ri.key && !chart && titled && titled.textContent.trim()) F('L-VERBS', 'BD-10', 'minor', ri.el, `no instruction line above the cells: the task sentence is not a section instruction (BD-10: one instruction per section, never inside a cell)`, 'no instruction line');
         const HEAD_SEL = '.section-num, .worksheet-section-header, .ws-strip > b, h2, h3';
         for (const h of ri.el.querySelectorAll(HEAD_SEL)) {
             if (!visible(h) || (h.parentElement && h.parentElement.closest(HEAD_SEL))) continue;
@@ -972,7 +978,7 @@ function wsLintPage(cfg) {
                     shapes: [...new Set(slots.map(s => s.getAttribute('data-ws-shape')))],
                     item: !model && !ITEM_BANDS.test(bandLabel),
                     // a one-line fact, equation or number track: one short answer (PT 2.9 packs 20)
-                    short: !!c.querySelector('.ws-fact, .ws-eq, .mq-hfact, .k2-seqstrip'),
+                    short: !!c.querySelector('.ws-fact, .ws-eq, .mq-hfact, .k2-seqstrip, .pv-round1'),
                 };
             });
             let role = pg.getAttribute('data-ws-role') || '';
@@ -992,11 +998,15 @@ function wsLintPage(cfg) {
             out.pages.push({
                 idx: ri.idx + 1, tag: pg.id, key: ri.key, role, size, look: pg.getAttribute('data-ws-look') || '',
                 sheet: pg.getAttribute('data-ws-sheet') || '', tab, bands, foot: footParts,
+                // INK-30: a lesson page (or a practice page's lesson step strip) may print the accent.
+                accentOk: !!pg.querySelector('[data-mq-accent]') && (pg.classList.contains('mq-lesson') || !!pg.querySelector('[data-mq-lesson-strip]')),
                 pageId: (footParts[2] || '').split('·').map(s => s.trim()).filter(s => /^\d\d-[A-Z]\d?$/.test(s))[0] || '',
                 w: mm(pr.width), h: mm(pr.height), padB: mm(parseFloat(cs.paddingBottom)), padT: mm(parseFloat(cs.paddingTop)),
                 footRect, cells, items: items.length,
                 oneSymbol: (itemShapes.length > 0 && itemShapes.every(s => oneSymbolShapes.has(s)))
-                    || (/^test\b/.test(role) && items.length > 0 && items.every(c => c.short)),
+                    // a page of one-line facts is a page of one-number answers on the Independent
+                    // page too (12.1: up to 16; the engine's dense packing calls them `short`)
+                    || ((/^test\b/.test(role) || role === 'independent') && items.length > 0 && items.every(c => c.short)),
                 slots: cells.reduce((n, c) => n + c.slots, 0), instructions: ri.instructions,
             });
         }
@@ -1291,6 +1301,7 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
     pdf.pages.forEach((p, i) => {
         for (const e of Object.values(p.colours)) {
             if (domHex.has(e.hex) && !e.margin) continue;
+            if (e.hex === '#5b2a86' && !e.margin && dom.pages && dom.pages[i] && dom.pages[i].accentOk) continue;
             F('L-INK', 'INK-1', 'major', { page: i + 1 }, `printed page ${i + 1}: ${e.n} ${e.kind} paint(s) in ${e.hex}${e.kind === 'text' ? ` (e.g. "${e.sample}")` : ''}${e.margin ? ' in the @page margin box' : ` at ${e.at[0]}, ${e.at[1]} mm`} - only #000, #fff and #949494 print (INK-1${e.kind === 'text' ? ', INK-3' : ''})`, `pdf ${e.kind} ${e.hex}`);
         }
         if (p.illegible.length && !domIllegiblePages.has(i + 1)) {

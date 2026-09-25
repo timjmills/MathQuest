@@ -16,6 +16,17 @@ export const INK = Object.freeze({
     grey: '#949494',    // the only grey (INK-3): shaded parts, trace digits, faded scaffolds
 });
 
+/**
+ * INK-30 (owner ruling 2026-09-25, LESSON PAGES ONLY): one accent colour beside black, for what
+ * teaches a step - the step numbers and their icons. Purple, because it prints darkest of the two
+ * allowed hues (greyscale 67 of 255: far from the trace grey 148, so a photocopy keeps the step
+ * numbers dark) and reads at 9.9 : 1 on white (WCAG >= 4.5). Every accent element also carries a
+ * second cue (the outlined circle and its numeral, the icon's shape), so nothing depends on colour
+ * (INK-6). CSS custom property `--mq-lesson-accent`; `ws-print-lint` allows it only inside a
+ * `[data-mq-accent]` element of a lesson page. Worksheet cells never use it.
+ */
+export const LESSON_ACCENT = '#5B2A86';
+
 /* ---------------------------------------------------- line weights (section 4.2, INK-10) */
 
 // The closed set of allowed stroke widths, in pt. Names match the CSS custom properties in
