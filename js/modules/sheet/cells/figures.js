@@ -47,12 +47,13 @@ const line = (x1, y1, x2, y2, w, color = INK, extra = '') => `<line x1="${n2(x1)
 
 /**
  * payload: {temp, unit: '°F' | '°C', lo, hi, every: 5 | 10}. The window lo..hi is 20 degrees, a
- * mark every degree 2.5 mm apart; the tube is a 7 mm outline, the column a 3.2 mm solid bar and
+ * mark every degree 2 / 2.25 / 2.5 mm apart (S / M / L); the tube is a 7 mm outline, the column a 3.2 mm solid bar and
  * the bulb a 6.8 mm solid disc inside a 13 mm outline (INK-5: no solid fill wider than 7 mm).
  */
 export function thermometerSVG(p, ctx) {
     const lo = Number(p.lo), hi = Number(p.hi), every = Number(p.every) || 5, t = Number(p.temp);
-    const pitch = 2.5;
+    // a mark every degree, 2 / 2.25 / 2.5 mm apart at S / M / L (L1: the S page holds more)
+    const pitch = isTwin(ctx) ? 2.5 : ({ S: 2, M: 2.25, L: 2.5 }[sizeOf(ctx)] || 2.5);
     const labPt = Math.max(zonePt(ctx), textPt(ctx));
     const labMm = labPt * PT_MM;
     const tx = 1.5, tw = 7, cx = tx + tw / 2;
@@ -98,7 +99,8 @@ register('thermometer', {
     answerKey(p) {
         return { value: Number(p.temp), display: `${p.temp} ${p.unit || ''}`.trim(), slots: { answer: { value: String(p.temp), graded: true } } };
     },
-    footprint() { return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2 }; },
+    // up to 3 across (a thermometer and one box are narrow); the page measures what fits
+    footprint() { return { wMm: 62, hMm: null, measure: true, factLike: false, maxCols: 3 }; },
     inputs() { return [{ id: 'answer', kind: 'number', shape: 'box', graded: true, order: 0, inputmode: 'numeric', scopes: ['full', 'answer-only'] }]; },
     layout() { return { card: 'card-medium-visual', checker: 'value', requiresVisual: true }; },
 });
@@ -377,7 +379,7 @@ export function pictographSVG(p, ctx) {
     };
     foot.h = () => d + 1;
     return rowTable(p, ctx, {
-        markW, rowH: d + 5, head2: p.valTitle || '', foot,
+        markW, rowH: d + (sizeOf(ctx) === 'S' && !isTwin(ctx) ? 4 : 5), head2: p.valTitle || '', foot,
         cell: (i, x, y) => {
             let out = '';
             for (let k = 0; k < counts[i]; k++) out += shape.draw(x + k * pitch + d / 2, y, d);
