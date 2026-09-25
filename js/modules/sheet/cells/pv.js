@@ -562,15 +562,15 @@ register('pv', {
             }
             case 'word-choice': {
                 // Choose the word name: the numeral (letters over its places), then the choices one
-                // per line at the cell-text size (unlettered: a letter would read as the item's own
-                // letter), a hyphenated word never split at its hyphen. One response: ring the right
+                // per line at the cell-text size, lettered A-D in capitals (the item's own letter is a
+                // lower-case "a."), a hyphenated word never split at its hyphen. One response: ring the right
                 // name (the key rings it).
                 const on = shownVal(ctx, 'answer', kv);
                 const rows = (p.choices || []).map((c, i) => `<div class="pv-choice" data-ws-slot="choice" data-ws-shape="ring" `
-                    + `style="display:table;padding:1mm 3mm;margin:1.5mm auto;border-radius:4mm;`
-                    + `${on && String(c) === on ? RING : 'border:1.5pt solid transparent;'}">`
-                    + `<span>${esc(c).split(' ').map(w => (w.includes('-') ? `<span style="white-space:nowrap;">${w}</span>` : w)).join(' ')}</span></div>`).join('');
-                return `<div class="pv-cell">${center(numeral({}))}<div class="pv-word-choices" style="font-size:${pt(m.textPt + 2)};`
+                    + `style="display:table;padding:1mm 3mm;margin:1.5mm 0;border-radius:4mm;`
+                    + `${on && String(c) === on ? 'border:1.5pt solid #000;' : 'border:1.5pt solid transparent;'}">`
+                    + `<span style="display:inline-block;min-width:7mm;">${esc((p.labels || [])[i] || '')}</span><span>${esc(c).split(' ').map(w => (w.includes('-') ? `<span style="white-space:nowrap;">${w}</span>` : w)).join(' ')}</span></div>`).join('');
+                return `<div class="pv-cell">${center(numeral({}))}<div class="pv-word-choices" style="display:table;margin:0 auto;font-size:${pt(m.textPt + 2)};`
                     + `font-weight:700;line-height:1.3;text-align:left;">${rows}</div></div>`;
             }
             case 'sort':

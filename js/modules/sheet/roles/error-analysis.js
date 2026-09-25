@@ -115,7 +115,7 @@ export function prepare(it, info = {}) {
     // SCC 2.4.1 / SCC-T21: the templates that draw their OWN fix place (a redraw zone, a box per fact).
     const kind = DRAWN.has(it.template) ? 'draw'
         : LINED.has(it.template) ? 'line'
-        : CHOICE.has(it.template) && Array.isArray(payload.labels) && payload.labels.length ? 'choice'
+        : (CHOICE.has(it.template) || payload.kind === 'word-choice') && Array.isArray(payload.labels) && payload.labels.length ? 'choice'
             : partsOf(correct) && partsOf(shown) && partsOf(correct).length === partsOf(shown).length ? 'parts' : 'value';
     const story = it.fclass === 'word' || it.template === 'wordpic';
     const work = story ? storyWork(it, shown, wrong, isWrong) : '';

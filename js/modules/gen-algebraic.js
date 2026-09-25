@@ -3132,7 +3132,11 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 // The kit cell (it was template:legacy, whose handler printed "word name for NaN"
                 // and a second Answer line under the choices): the numeral, then the four word
                 // names one per line; ONE response — ring the right one. The key rings it.
-                q.cell = { template: 'pv', v: 1, payload: { kind: 'word-choice', n: target, choices: options, keyValue: correctText } };
+                // `labels` / `correct`: the choices' letters, so a fix on Error analysis is a check
+                // box by the right letter, not the whole word name copied into a box.
+                const letters = options.map((_, i) => 'ABCD'[i]);
+                q.cell = { template: 'pv', v: 1, payload: { kind: 'word-choice', n: target, choices: options, labels: letters,
+                    correct: options.indexOf(correctText), keyValue: correctText } };
                 q.printFormat = 'pv-cell';
                 q.pv = { kind: 'words', n: target, choices: options.slice() };
             }
