@@ -37,6 +37,8 @@ import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine } from './sheet/roles/lesson.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import { routePaper, weightedCounts, PAPER_IDS } from './sheet/papers.js';
+import { wrmFor } from './wrm.js';
+import { page as framePage } from './sheet/frame.js';
 import {
     normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, easeScore, ineligibleNote,
     blockPlan, sideItems, pickDistinct,
@@ -134,6 +136,9 @@ function normaliseRequest(req = {}) {
         // A Practice paper of several skills (papers.js): items dealt EXACTLY by weight (§8e).
         weightExact: !!req.weightedMix,
         weightMaxTotal: Number(req.weightMaxTotal) > 0 ? Math.floor(Number(req.weightMaxTotal)) : 0,
+        // A Quiz paper (TEACHER_SCREENS "Make quiz"): every question cell carries a hidden marker of
+        // its skill, so the key can tag and score each question.
+        tagItems: !!req.tagItems,
     };
 }
 
@@ -1965,6 +1970,7 @@ async function buildRoleSheet(n, metaOf) {
                     : it;
                 if (!prepared) continue;
                 prepared.pool = pool.id;
+                if (n.tagItems) tagItem(prepared);
                 // A role that draws Model / Guided cells measures them at their tallest level.
                 if (mod.MEASURE_LEVEL) prepared.measureLevel = typeof mod.MEASURE_LEVEL === 'function' ? mod.MEASURE_LEVEL(pool.id) : mod.MEASURE_LEVEL;
                 prepared.section = 0;
@@ -2287,6 +2293,94 @@ async function buildLesson(n, metaOf) {
 
 /* =========================================================================== the papers */
 
+/* ============================================================================ the quiz */
+
+/** A Quiz item's hidden marker: its skill, read back from the page in question order. */
+function tagItem(it) {
+    if (!it || it.__quizTag || typeof it.render !== 'function') return;
+    const r0 = it.render;
+    const mark = `<i hidden data-mq-q="${escText(it.skill || '')}"></i>`;
+    it.render = (...a) => { const h = r0(...a); return typeof h === 'string' ? h + mark : h; };
+    it.__quizTag = true;
+}
+
+/** A skill's standard tags: primary CCSS (short), every CCSS, EE, WRM small steps. */
+function quizTags(key) {
+    const [c, k] = String(key).split(':');
+    const out = { ccss: '', ccssAll: [], ee: [], wrm: [] };
+    try {
+        if (standardsMod) {
+            out.ccss = standardsMod.primaryStandard(c, k, { short: true }) || '';
+            const st = standardsMod.standardsFor(c, k);
+            out.ccssAll = st.approx ? [] : (st.ccss || []).map((r) => r.short || r.code);
+            out.ee = (st.ee || []).map((r) => r.code);
+        }
+    } catch (e) { /* untagged */ }
+    try { out.wrm = wrmFor(c, k).filter((w) => !w.partial).map((w) => w.id); } catch (e) { out.wrm = []; }
+    return out;
+}
+
+/**
+ * Score a built Quiz form (TEACHER_SCREENS "Make quiz", owner 2026-09-26): 1 point a question, a
+ * points value per question type (skill), or a custom value per question; the total goes in the
+ * Score box of pupil page and key; the key gains a summary page - every question's standards
+ * (CCSS / EE / WRM, never on the pupil page, HD-6) and points, and a subtotal per standard so the
+ * teacher sees which standards were missed.
+ * @param {Object} res       buildSheet result (mutated: pupilHtml, keyHtml, keyPageCount, quiz)
+ * @param {Object} r         the routed request (form, size, header)
+ * @param {Object} [scoring] {mode: 'each'|'type'|'custom', perType: {skill: pts}, perQ: {'A:3': pts}}
+ */
+function scoreQuiz(res, r, scoring = {}, source = null) {
+    const mode = ['type', 'custom'].includes(scoring && scoring.mode) ? scoring.mode : 'each';
+    const pts = (v) => { const x = Number(v); return Number.isFinite(x) && x > 0 ? Math.min(20, Math.round(x * 2) / 2) : 1; };
+    const form = r.form || 'A';
+    const keys = [...String(res.pupilHtml || '').matchAll(/data-mq-q="([^"]*)"/g)].map((m) => m[1]);
+    const tags = new Map();
+    const questions = keys.map((skill, i) => {
+        if (!tags.has(skill)) tags.set(skill, quizTags(skill));
+        const n = i + 1;
+        const points = mode === 'type' ? pts(scoring.perType && scoring.perType[skill])
+            : mode === 'custom' ? pts(scoring.perQ && scoring.perQ[`${form}:${n}`]) : 1;
+        return Object.assign({ n, skill, points }, tags.get(skill));
+    });
+    const total = questions.reduce((a, q) => a + q.points, 0);
+    const setScore = (html) => String(html || '').replace(/(<div class="ws-field score">Score<i><\/i><b>\/)\d+(?:\.\d+)?(<\/b>)/, `$1${total}$2`);
+    res.pupilHtml = setScore(res.pupilHtml);
+    res.keyHtml = setScore(res.keyHtml);
+    // Subtotals: per primary CCSS, per EE, per WRM step.
+    const sub = (field) => {
+        const m = new Map();
+        for (const q of questions) {
+            const codes = Array.isArray(q[field]) ? q[field] : q[field] ? [q[field]] : [];
+            for (const c of (codes.length ? codes : ['(untagged)'])) {
+                const e = m.get(c) || { code: c, qs: [], points: 0 };
+                e.qs.push(q.n); e.points += q.points;
+                m.set(c, e);
+            }
+        }
+        return [...m.values()];
+    };
+    const byStandard = { ccss: sub('ccss'), ee: sub('ee'), wrm: sub('wrm') };
+    res.quiz = { form, questions, total, byStandard, mode, source };
+    if (!res.keyHtml) return;
+    const label = (skill) => { const [c, k] = skill.split(':'); return SKILL_FULL_LABELS[k] || k || c; };
+    const qRows = questions.map((q) => `<tr><td>${q.n}</td><td>${escText(label(q.skill))}</td><td class="mq-qz-tag">${escText([q.ccss, ...q.ee, ...q.wrm].filter(Boolean).join(' · ') || '-')}</td><td>${q.points}</td><td class="mq-qz-got"></td></tr>`).join('');
+    const sRows = (list, head) => list.map((e) => `<tr><td>${escText(head)}</td><td class="mq-qz-tag">${escText(e.code)}</td><td>${e.qs.join(', ')}</td><td>${e.points}</td><td class="mq-qz-got"></td></tr>`).join('');
+    const css = '<style>.mq-qz{width:100%;border-collapse:collapse;font-size:var(--ws-text,11pt);margin:0 0 4mm}.mq-qz th,.mq-qz td{border:0.75pt solid #000;padding:1mm 2mm;text-align:left;vertical-align:top}.mq-qz th{font-weight:700}.mq-qz .mq-qz-tag{font-size:0.8em}.mq-qz .mq-qz-got{width:16mm}.mq-qz-h{font-weight:700;margin:2mm 0 1mm}</style>';
+    const body = `${css}<div class="mq-qz-h">Questions: standards and points (${mode === 'each' ? '1 point each' : mode === 'type' ? 'points by question type' : 'custom points'})</div>
+<table class="mq-qz"><thead><tr><th>#</th><th>Skill</th><th>Standards</th><th>Points</th><th>Scored</th></tr></thead><tbody>${qRows}</tbody><tfoot><tr><th></th><th>Total</th><th></th><th>${total}</th><th></th></tr></tfoot></table>
+<div class="mq-qz-h">By standard: which standards were missed</div>
+<table class="mq-qz"><thead><tr><th></th><th>Standard</th><th>Questions</th><th>Points</th><th>Scored</th></tr></thead><tbody>${sRows(byStandard.ccss, 'CCSS')}${sRows(byStandard.ee.filter((e) => e.code !== '(untagged)'), 'EE')}${sRows(byStandard.wrm.filter((e) => e.code !== '(untagged)'), 'WRM')}</tbody></table>`;
+    const pageHtml = framePage({
+        look: WORKSHEET_LOOK, size: r.size || 'L', tab: 6,
+        header: { name: false, date: false, score: total, tab: ['Quiz', `Form ${form}`, 'Answer Key'], title: `Quiz ${form}: score summary` },
+        footer: { left: 'Teacher page: standards appear on the key only', center: '', right: `Form ${form}` },
+        body,
+    }).replace('<section class="ws-page', '<section data-ws-sheet="quiz-summary" class="ws-page');
+    res.keyHtml += `\n${pageHtml}`;
+    res.keyPageCount = (res.keyPageCount || 0) + 1;
+}
+
 /**
  * A Practice, Quiz or Lesson paper (owner ruling 2026-09-26, LESSON_LIBRARY_PLAN §8e): routed to
  * the role request(s) that build it today (sheet/papers.js PAPER_ROUTES). A Quiz of Forms A and B
@@ -2296,6 +2390,7 @@ async function buildLesson(n, metaOf) {
  */
 async function buildPaper(req) {
     const routed = routePaper(req);
+    if (routed[0] && routed[0].paperKind === 'quiz') routed.forEach((r) => { r.tagItems = true; });
     const built = [];
     for (const r of routed) {
         let res = await buildSheet(r);
@@ -2310,6 +2405,12 @@ async function buildPaper(req) {
         built.push(res);
     }
     const tag = { paperKind: routed[0].paperKind, routedRole: routed[0].role };
+    // The Quiz: tags and points per question, the total in the Score box, a summary on the key.
+    if (tag.paperKind === 'quiz') {
+        await loadStandards();
+        built.forEach((b, i) => scoreQuiz(b, routed[i], req.scoring, req.quizSource));
+        tag.quiz = { forms: built.map((b) => b.quiz), scoring: req.scoring || { mode: 'each' }, source: req.quizSource || null };
+    }
     if (built.length === 1) return Object.assign(built[0], tag, { routed: routed.map((r) => ({ role: r.role, form: r.form, letters: r.letters })) });
     const first = built[0];
     const pageCount = built.reduce((a, b) => a + (b.pageCount || 0), 0);

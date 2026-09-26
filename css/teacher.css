@@ -918,3 +918,10 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 }
 /* A packet of many pages (a Lesson, versions A-J): the page tabs wrap on a phone, never scroll the page. */
 @media (max-width: 600px) { #tvPageTabs { display: flex; flex-wrap: wrap; } #tvPageTabs > button { flex: 1 1 auto; min-width: 56px; } }
+/* The Quiz: build it from standards / WRM / a lesson, and score it. */
+.tv-quiz-src { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--tv-rule); border-radius: 10px; }
+.tv-quiz-src .tv-btn { align-self: flex-start; }
+.tv-qpts-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); gap: 8px 12px; margin-top: 8px; }
+.tv-qpts { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; font-size: 13px; line-height: 18px; color: var(--tv-text); }
+.tv-qpts span { min-width: 0; overflow-wrap: anywhere; }
+.tv-qpts .tv-input { width: 76px; flex: none; }

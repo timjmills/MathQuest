@@ -34,6 +34,8 @@ import { getProvider } from './sheet/index.js';
 import { PAPER_NAMES, LESSON_PARTS, LESSON_PART_NAMES, paperOfRole, isWordSkill } from './sheet/papers.js';
 import { prerequisiteSkillsFor } from './prerequisite-skills.js';
 import { lessonFor } from './lessons/prereqs.js';
+import { skillsMatchingCode } from './standards.js';
+import { skillsForWrmStep, WRM_YEARS, WRM_BLOCKS, WRM_STEPS } from './wrm.js';
 
 // THE THREE PAPERS (owner ruling 2026-09-26, design/LESSON_LIBRARY_PLAN.md §8e): Practice, Quiz
 // and Lesson replace the 17 page-type cards. A section carries a paper and its options; the
@@ -75,6 +77,9 @@ function newSection(skills = [], kind = 'practice') {
     return {
         kind, columns: 'auto', letters: ['A'], pages: 1, factColumns: 'off', timed: 0,
         forms: ['A'], parts: LESSON_PARTS.slice(), lessonPages: 1,
+        // The Quiz (TEACHER_SCREENS "Make quiz"): where its skills came from, how it is scored.
+        qsrc: { type: 'ccss', code: '', year: '', block: '', step: '', lesson: '' }, source: [],
+        scoring: { mode: 'each', perType: {}, perQ: {} }, lastQuiz: null,
         skills, optionsOpen: '', prereqOpen: '', picking: false, menu: '',
     };
 }
@@ -324,6 +329,22 @@ function onClick(e) {
             root.querySelector(`[data-act="prereq"][data-sec="${d.sec}"][data-key="${CSS.escape(d.key)}"]`)?.focus();
             break;
         }
+        case 'qsrc-add': {
+            if (b.getAttribute('aria-disabled') === 'true') break;
+            const s = sec(d.sec);
+            const found = quizSourceSkills(s.qsrc);
+            let added = 0;
+            for (const k of found.slice(0, MAX_QUIZ_SKILLS)) {
+                if (s.skills.some((x) => x.categoryId === k.categoryId && x.skillId === k.skillId)) continue;
+                s.skills.push({ categoryId: k.categoryId, skillId: k.skillId, weight: 1 });
+                added++;
+            }
+            s.source.push(Object.assign({ label: quizSourceLabel(s.qsrc) }, s.qsrc));
+            toast(added ? `Added ${added} skill${added === 1 ? '' : 's'}, equal weights` : 'Those skills are already in the quiz');
+            renderWhat(); scheduleBuild();
+            break;
+        }
+        case 'qscore': sec(d.sec).scoring.mode = d.v; renderWhat(); scheduleBuild(); break;
         case 'classic-build': buildClassic(); break;
         case 'classic-forms': exportForms(); break;
         case 'classic-opt': pr.classic[d.v] = !pr.classic[d.v]; renderSetup(); break;
@@ -381,6 +402,20 @@ function onClick(e) {
 function onChange(e) {
     const t = e.target;
     const d = t.dataset;
+    const qs = (k) => sec(d[k]).qsrc;
+    if (d.qtype !== undefined) { qs('qtype').type = t.value; renderWhat(); root.querySelector(`[data-qtype="${d.qtype}"]`)?.focus(); return; }
+    if (d.qyear !== undefined) { Object.assign(qs('qyear'), { year: t.value, block: '', step: '' }); renderWhat(); root.querySelector(`[data-qyear="${d.qyear}"]`)?.focus(); return; }
+    if (d.qblock !== undefined) { Object.assign(qs('qblock'), { block: t.value, step: '' }); renderWhat(); root.querySelector(`[data-qblock="${d.qblock}"]`)?.focus(); return; }
+    if (d.qstep !== undefined) { qs('qstep').step = t.value; renderWhat(); root.querySelector(`[data-qstep="${d.qstep}"]`)?.focus(); return; }
+    if (d.qlesson !== undefined) { qs('qlesson').lesson = t.value; renderWhat(); root.querySelector(`[data-qlesson="${d.qlesson}"]`)?.focus(); return; }
+    if (d.qcode !== undefined) { qs('qcode').code = t.value; renderWhat(); root.querySelector(`[data-qcode="${d.qcode}"]`)?.focus(); return; }
+    if (d.qptype !== undefined || d.qpq !== undefined) {
+        const s = sec(d.sec);
+        const v = Math.max(0.5, Math.min(20, Math.round((Number(t.value) || 1) * 2) / 2));
+        if (d.qptype !== undefined) s.scoring.perType[d.qptype] = v; else s.scoring.perQ[d.qpq] = v;
+        scheduleBuild();
+        return;
+    }
     if (d.factcols !== undefined) { const s = sec(d.factcols); s.factColumns = t.value === 'off' || t.value === 'auto' ? t.value : Number(t.value); if (s.factColumns !== 'off') s.timed = 0; renderWhat(); scheduleBuild(); }
     else if (d.timed !== undefined) { const s = sec(d.timed); s.timed = Number(t.value) || 0; if (s.timed) s.factColumns = 'off'; renderWhat(); scheduleBuild(); }
     else if (d.lpages !== undefined) { sec(d.lpages).lessonPages = Number(t.value) || 1; scheduleBuild(); }
@@ -450,16 +485,91 @@ function prerequisitesOf(k) {
     return _pre.get(key);
 }
 
+/* ---------------------------------------------------------------- the Quiz: build it, score it */
+
+const QSRC_TYPES = [['ccss', 'CCSS domain or standard'], ['ee', 'Essential Element (EE)'], ['wrm', 'White Rose unit or step'], ['lesson', 'Lesson']];
+const MAX_QUIZ_SKILLS = 12;
+
+/** The skills a quiz source names, as {categoryId, skillId} (live skills only). */
+function quizSourceSkills(q) {
+    let keys = [];
+    try {
+        if (q.type === 'ccss' || q.type === 'ee') keys = q.code.trim() ? skillsMatchingCode(q.code.trim()) : [];
+        else if (q.type === 'wrm') {
+            const ids = q.step ? [q.step] : q.block ? WRM_STEPS.filter((st) => st.id.startsWith(`${q.block}.S`)).map((st) => st.id) : [];
+            keys = ids.flatMap((id) => skillsForWrmStep(id));
+        } else if (q.type === 'lesson' && q.lesson) keys = [q.lesson];
+    } catch (e) { keys = []; }
+    const seen = new Set();
+    return keys.filter((k) => !seen.has(k) && seen.add(k)).map((k) => { const [categoryId, skillId] = k.split(':'); return { categoryId, skillId }; }).filter((k) => findSkill(k.categoryId, k.skillId));
+}
+
+function quizSourceLabel(q) {
+    if (q.type === 'wrm') { const st = WRM_STEPS.find((x) => x.id === q.step); const bl = WRM_BLOCKS.find((x) => x.id === q.block); return st ? `WRM ${st.id} ${st.title}` : bl ? `WRM ${bl.id} ${bl.name}` : 'WRM'; }
+    if (q.type === 'lesson') { const hit = q.lesson && findSkill(...q.lesson.split(':')); return `Lesson: ${hit ? hit.label : q.lesson}`; }
+    return `${q.type === 'ee' ? 'EE' : 'CCSS'} ${q.code.trim()}`;
+}
+
+/** "Build from": a CCSS domain / standard, an EE, a WRM unit or step, a lesson (§8e, Make quiz). */
+function quizSourceHTML(s, i) {
+    const q = s.qsrc;
+    const opt = (v, t, cur) => `<option value="${esc(v)}"${String(cur) === String(v) ? ' selected' : ''}>${esc(t)}</option>`;
+    let field = '';
+    if (q.type === 'ccss' || q.type === 'ee') {
+        field = `<div><label class="tv-label" for="tvQCode${i}">${q.type === 'ee' ? 'EE code' : 'CCSS code'}</label><input id="tvQCode${i}" class="tv-input" type="text" data-qcode="${i}" value="${esc(q.code)}" placeholder="${q.type === 'ee' ? 'e.g. EE.3.OA.2' : 'e.g. 3.NBT or 3.NBT.2'}" autocomplete="off"></div>`;
+    } else if (q.type === 'wrm') {
+        const blocks = q.year ? WRM_BLOCKS.filter((b) => b.id.startsWith(`${q.year}.`)) : [];
+        const steps = q.block ? WRM_STEPS.filter((st) => st.id.startsWith(`${q.block}.S`)) : [];
+        field = `<div class="tv-fields-cols">
+  <div><label class="tv-label" for="tvQYear${i}">Year</label><select id="tvQYear${i}" class="tv-select" data-qyear="${i}">${opt('', 'Choose', q.year)}${WRM_YEARS.map((y) => opt(y.id, y.name, q.year)).join('')}</select></div>
+  <div><label class="tv-label" for="tvQBlock${i}">Unit (block)</label><select id="tvQBlock${i}" class="tv-select" data-qblock="${i}"${blocks.length ? '' : ' disabled'}>${opt('', 'Choose', q.block)}${blocks.map((b) => opt(b.id, `${b.id.split('.')[1]} ${b.name}`, q.block)).join('')}</select></div>
+</div>
+<div><label class="tv-label" for="tvQStep${i}">Small step</label><select id="tvQStep${i}" class="tv-select" data-qstep="${i}"${steps.length ? '' : ' disabled'}>${opt('', 'The whole unit', q.step)}${steps.map((st) => opt(st.id, `${st.id.split('.').pop()} ${st.title}`, q.step)).join('')}</select></div>`;
+    } else {
+        field = `<div><label class="tv-label" for="tvQLesson${i}">Lesson</label><select id="tvQLesson${i}" class="tv-select" data-qlesson="${i}">${opt('', 'Choose', q.lesson)}${[...SAMPLE_LESSONS].map((k) => { const hit = findSkill(...k.split(':')); return opt(k, hit ? hit.label : k, q.lesson); }).join('')}</select></div>`;
+    }
+    const found = quizSourceSkills(q);
+    const src = s.source.length ? `<p class="tv-cap">Built from: ${s.source.map((x) => esc(x.label)).join('; ')}</p>` : '';
+    return `<div class="tv-quiz-src" role="group" aria-labelledby="tvQSrcL${i}">
+  <span class="tv-label" id="tvQSrcL${i}">Build from</span>
+  <div><label class="tv-sr" for="tvQType${i}">What to build the quiz from</label><select id="tvQType${i}" class="tv-select" data-qtype="${i}">${QSRC_TYPES.map(([v, t]) => opt(v, t, q.type)).join('')}</select></div>
+  ${field}
+  <button type="button" class="tv-btn" data-act="qsrc-add" data-sec="${i}"${found.length ? '' : ' aria-disabled="true"'} title="Adds the skills tagged to this choice, with equal weights">${icon('plus', 16)}<span>${found.length ? `Add ${Math.min(found.length, MAX_QUIZ_SKILLS)} skill${found.length === 1 ? '' : 's'}${found.length > MAX_QUIZ_SKILLS ? ` of ${found.length}` : ''}` : 'No skills found yet'}</span></button>
+  ${src}
+</div>`;
+}
+
+/** Scoring: 1 point each, by question type (skill), or per question (TEACHER_SCREENS). */
+function quizScoringHTML(s, i) {
+    const sc = s.scoring;
+    const seg2 = `<div class="tv-seg" role="radiogroup" aria-labelledby="tvQScL${i}">${[['each', '1 point each'], ['type', 'By type'], ['custom', 'Per question']].map(([v, t]) => `<button type="button" role="radio" data-act="qscore" data-sec="${i}" data-v="${v}" aria-checked="${sc.mode === v}">${t}</button>`).join('')}</div>`;
+    const num = (attr, key, val, label) => `<label class="tv-qpts"><span>${esc(label)}</span><input class="tv-input" type="number" min="0.5" max="20" step="0.5" inputmode="decimal" ${attr}="${esc(key)}" data-sec="${i}" value="${val}" aria-label="Points for ${esc(label)}"></label>`;
+    let rows = '';
+    if (sc.mode === 'type') {
+        rows = s.skills.map((k) => { const key = `${k.categoryId}:${k.skillId}`; const hit = findSkill(k.categoryId, k.skillId); return num('data-qptype', key, sc.perType[key] || 1, hit ? hit.label : k.skillId); }).join('');
+    } else if (sc.mode === 'custom') {
+        const forms = (s.lastQuiz && s.lastQuiz.forms) || [];
+        rows = forms.length ? forms.map((f) => f.questions.map((q) => num('data-qpq', `${f.form}:${q.n}`, sc.perQ[`${f.form}:${q.n}`] || 1, `${forms.length > 1 ? f.form : ''}${q.n}`)).join('')).join('')
+            : '<p class="tv-cap">The questions appear here once the preview is built.</p>';
+    }
+    const totals = s.lastQuiz && s.lastQuiz.forms ? s.lastQuiz.forms.map((f) => `Form ${f.form}: ${f.questions.length} questions, ${f.total} points`).join(' · ') : '';
+    return `<div><span class="tv-label" id="tvQScL${i}">Scoring</span>${seg2}
+  ${rows ? `<div class="tv-qpts-list">${rows}</div>` : ''}
+  <p class="tv-cap" style="margin-top:6px;">${totals ? `${esc(totals)}. ` : ''}The key lists every question's standards (CCSS, EE, WRM) and a total per standard. Standards never print on the pupil page.</p></div>`;
+}
+
 /** The options of a section's paper (§8e). */
 function paperOptionsHTML(s, i) {
     const cols = ['auto', 1, 2, 3, 4, 5, 6].map((c) => `<option value="${c}"${String(s.columns) === String(c) ? ' selected' : ''}>${c === 'auto' ? 'Auto' : c}</option>`).join('');
     const colsSel = `<div><label class="tv-label" for="tvCols${i}">Columns</label><select id="tvCols${i}" class="tv-select" data-cols="${i}">${cols}</select></div>`;
     if (s.kind === 'quiz') {
-        return `<div class="tv-fields-cols">${colsSel}
+        return `${quizSourceHTML(s, i)}
+<div class="tv-fields-cols">${colsSel}
   <div><span class="tv-label" id="tvForms${i}">Versions</span>
     <div class="tv-chips tv-letters" role="group" aria-labelledby="tvForms${i}">${['A', 'B'].map((L) => `<button type="button" class="tv-chip tv-chip-sm" data-act="form" data-sec="${i}" data-v="${L}" aria-pressed="${s.forms.includes(L)}" aria-label="Form ${L}">${L}</button>`).join('')}</div></div>
 </div>
-<p class="tv-cap">Scored, one point a question. Form B is Form A's problems in a new order.</p>`;
+<p class="tv-cap">Form B is Form A's problems in a new order.</p>
+${quizScoringHTML(s, i)}`;
     }
     if (s.kind === 'lesson') {
         return `<div><span class="tv-label" id="tvParts${i}">Parts to print</span>
@@ -827,7 +937,7 @@ function requestFor(s, i) {
     const h = pr.header;
     // THE PAPER (§8e): print-sheet.js routes it to today's roles (sheet/papers.js).
     const paper = s.kind === 'quiz'
-        ? { kind: 'quiz', versions: s.forms.slice() }
+        ? { kind: 'quiz', versions: s.forms.slice(), scoring: JSON.parse(JSON.stringify(s.scoring)), quizSource: s.source.length ? s.source.map((x) => ({ type: x.type, code: x.code, block: x.block, step: x.step, lesson: x.lesson, label: x.label })) : null }
         : s.kind === 'lesson'
             ? { kind: 'lesson', parts: s.parts.slice(), practicePages: s.lessonPages }
             : { kind: 'practice', versions: s.letters.slice(), factColumns: s.factColumns, timed: s.timed };
@@ -897,6 +1007,8 @@ async function runBuild() {
         last = built;
         if (pr.sections.some((x) => x.unsupported)) { pr.sections.forEach((x) => { x.unsupported = null; }); renderWhat(); }
         last.req = req;
+        // The Quiz: its questions and totals, for the per-question scoring list.
+        built.parts.forEach((p, k) => { const si = req.idx ? req.idx[k] : k; if (pr.sections[si] && p.res.quiz) { const before = JSON.stringify(pr.sections[si].lastQuiz && pr.sections[si].lastQuiz.forms && pr.sections[si].lastQuiz.forms.map((f) => [f.questions.length, f.total])); pr.sections[si].lastQuiz = p.res.quiz; if (JSON.stringify(p.res.quiz.forms.map((f) => [f.questions.length, f.total])) !== before) renderWhat(); } });
         if (pr.view !== 'key' && pr.view >= last.pages.length) pr.view = 0;
         if (pr.view === 'key' && !pr.key) pr.view = 0;
         const plain = built.parts.map((p, i) => {
