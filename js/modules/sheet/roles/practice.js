@@ -258,8 +258,10 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-judge3>.mq-redraw{flex:1 1 100%}
 /* the finished work and its judgement sit in the middle of the cell like every kit cell (H13: no band pinned under it) */
 :is(.ws-page,.ws-sheet) .ws-cell.mq-eacell>.mq-judge.mq-judge3{flex:0 0 auto}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-eacell{justify-content:center}
 /* AX-4: one place for the Correct / Fix-it block on every cell of a page - under the work, beside it (the two centred together), or in the item's own answer column */
 :is(.ws-page,.ws-sheet) .mq-judge3.mq-jbelow>.mq-judge-row{flex:1 1 100%;min-width:100%}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbelow:not(.mq-jstack):not(.mq-judge-drawn) .mq-judge-row{flex-direction:row;align-items:flex-start;column-gap:8mm}
 :is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside{flex-wrap:nowrap;justify-content:center;column-gap:10mm}
 :is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside>.mq-judge-work{flex:0 0 auto;min-width:auto}
 :is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside>.mq-judge-row{flex:0 0 auto;min-width:0}

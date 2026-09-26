@@ -705,10 +705,11 @@ export function prepare(it, info = {}) {
         }
         // The flow: the work, then the judgement, then a redraw zone across the whole cell. The
         // decision boxes always come before the fix. The page decides ONE place for every cell
-        // (`o.judge`: 'beside' at the cell's right, 'below' in one row under the work - AX-4);
-        // unset (measuring), it flows beside when it fits, else under.
-        const mode = modal && (o.judge === 'beside' || o.judge === 'below') ? o.judge : '';
-        return `<div class="mq-judge mq-judge3${ask}${mode ? ` mq-j${mode}` : ''}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm">`
+        // (`o.judge`: 'beside' the work, 'below' it in ONE line - "Correct  Fix it [fix]" - or
+        // 'stack', below it in two lines - AX-4); unset (measuring), it flows as it fits.
+        const mode = modal && ['beside', 'below', 'stack'].includes(o.judge) ? o.judge : '';
+        const modeCls = mode === 'stack' ? ' mq-jbelow mq-jstack' : mode ? ` mq-j${mode}` : '';
+        return `<div class="mq-judge mq-judge3${ask}${modeCls}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm">`
             + shownWork
             + judge
             + (below ? fix : '')
@@ -725,7 +726,7 @@ export function prepare(it, info = {}) {
         // it is and the page takes whichever holds more (critic round 3: half-empty pages).
         colsLayout: true,
         // the places the Correct / Fix-it block can take; the host measures each (AX-4)
-        judgeModes: kind === 'draw' || kind === 'redo' ? undefined : ['incol', 'beside', 'below'],
+        judgeModes: kind === 'draw' || kind === 'redo' ? undefined : JUDGE_MODES,
         // the fix's SHAPE (boxes / a sign circle / a stacked fraction / check boxes / a word line),
         // so a page keeps to one (critic EA r5, B: a line, "+" boxes and a sign circle on one page)
         fixSig: kind === 'value' && /^[<>=]$/.test(correct) ? 'sign' : fracFix ? 'frac' : kind === 'choice' ? 'check'
@@ -791,7 +792,8 @@ function staticLayout(items, input) {
 // `mode` ('incol' | 'beside' | 'below'): the height with the Correct / Fix-it block in that one
 // place (the host measures each `judgeModes`; null = it does not fit there); an item measured
 // without modes (a drawn model) is the same height either way.
-const JUDGE_MODES = ['incol', 'beside', 'below'];
+// in the item's answer column; beside the work; under it in one line; under it in two lines
+const JUDGE_MODES = ['incol', 'beside', 'below', 'stack'];
 const heightAt = (it, cols, mode) => {
     const m = it.measured && it.measured[cols];
     if (!m || !Number.isFinite(m.hMm) || m.fits === false) return Infinity;
