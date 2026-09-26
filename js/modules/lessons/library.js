@@ -9,6 +9,8 @@
 //   lessonsForSkill(cat, skill)      every lesson practised by a skill
 //   defaultLessonForSkill(cat, skill) the lesson a skill-keyed request prints (the Print dialog's
 //                                    "Lesson" role for a skill; prereqs.js lessonFor)
+//   prerequisiteSkillsFor(cat, skill) every prerequisite skill of a skill, most basic first: its
+//                                    lesson's prerequisites, else the seed's fallback (prereq-db.js)
 //   allNeeds()                       every family's NEEDS
 //   validateLibrary(known)           every structural problem ([] when the library is sound)
 //
@@ -25,6 +27,7 @@ import * as geometry from './families/geometry.js';
 import * as data from './families/data.js';
 import * as algebra from './families/algebra.js';
 import { FAMILY_IDS, validateRoutine, validateLesson, validateNeed } from './schema.js';
+import { prereqFallback } from './prereq-db.js';
 
 export const FAMILIES = Object.freeze({ early, placevalue, addsub, multdiv, fractions, measure, timemoney, geometry, data, algebra });
 
@@ -106,6 +109,47 @@ export function defaultLessonForSkill(categoryId, skillId) {
     return all.find((l) => l.defaultFor) || all[0] || null;
 }
 
+/** The words a fallback reason prints ("ccss 1.NBT.2" -> "CCSS 1.NBT.2, the grade before"). */
+function fallbackWhy(why) {
+    const [kind, code] = String(why || '').split(' ');
+    if (kind === 'ccss') return `CCSS ${code}, the grade before`;
+    if (kind === 'wrm') return `WRM ${code}, a step before`;
+    return String(why || '');
+}
+
+/**
+ * EVERY prerequisite skill of a skill, most basic first (owner ruling 2026-09-26, plan §8e: the
+ * Practice paper's "Mix in prerequisite skills" lists them all, none ticked by default):
+ * [{categoryId, skillId, opts?, why, lesson?}].
+ *   - A skill WITH a lesson: its lesson's prerequisites (the Prerequisite Check's `prereqs`, each
+ *     with the lesson it routes to, else the Warm-up skills), in the lesson's order.
+ *   - A skill with no lesson: the seed's default (prereq-db.js, ws-lesson-seed.cjs) - the skills of
+ *     the CCSS standards a grade before its primary code (same domain), then the skills of the two
+ *     WRM small steps before its first step in its block.
+ * Fresh objects; [] when the skill has none.
+ */
+export function prerequisiteSkillsFor(categoryId, skillId) {
+    const lesson = defaultLessonForSkill(categoryId, skillId);
+    const own = lesson ? (lesson.prereqs && lesson.prereqs.length ? lesson.prereqs : lesson.warmup) : null;
+    const self = `${categoryId}:${skillId}`;
+    const list = own && own.length
+        ? own.map((p) => ({ key: p.key, opts: p.opts, why: p.why || '', lesson: p.lesson }))
+        : prereqFallback(self).map((p) => ({ key: p.key, why: fallbackWhy(p.why) }));
+    const seen = new Set();
+    const out = [];
+    for (const p of list) {
+        if (!p.key || p.key === self || seen.has(`${p.key}|${JSON.stringify(p.opts || null)}`)) continue;
+        seen.add(`${p.key}|${JSON.stringify(p.opts || null)}`);
+        const [c, s] = String(p.key).split(':');
+        const ref = { categoryId: c, skillId: s };
+        if (p.opts) ref.opts = JSON.parse(JSON.stringify(p.opts));
+        ref.why = p.why;
+        if (p.lesson) ref.lesson = p.lesson;
+        out.push(ref);
+    }
+    return out;
+}
+
 /** Every family's needs, each with its family. */
 export function allNeeds() {
     return FAMILY_IDS.flatMap((f) => ((FAMILIES[f] && FAMILIES[f].NEEDS) || []).map((n) => Object.assign({ family: f }, n)));
@@ -136,5 +180,5 @@ export function validateLibrary(known = {}) {
 
 export default {
     FAMILIES, ROUTINES, LESSONS, FAMILY_OF, lessonIdOf, lessonById, routineOf, lessonData, practiceRef,
-    lessonsForSkill, defaultLessonForSkill, allNeeds, validateLibrary,
+    lessonsForSkill, defaultLessonForSkill, prerequisiteSkillsFor, allNeeds, validateLibrary,
 };

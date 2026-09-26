@@ -1144,6 +1144,9 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     eq(JSON.stringify(LIB.practiceRef('Y1.B2.S9')), JSON.stringify({ categoryId: 'addition', skillId: 'add_facts', opts: { band: 10, constant: [1, 2, 3] } }), 'library: the practice options live in the lesson record');
     eq((LIB.defaultLessonForSkill('subtraction', 'sub_100_regroup') || {}).id, 'Y2.B2.S18', 'library: a skill finds its default lesson');
     eq([SCHEMA.kindOf('Y2.B2.S18'), SCHEMA.kindOf('ccss:6.NS.A.1'), SCHEMA.kindOf('ee:M.EE.6.SP.1'), SCHEMA.kindOf('skill:addition:add_facts'), SCHEMA.kindOf('Y9.B1')].join(','), 'wrm,ccss,ee,skill,', 'library: lesson id kinds');
+    // The prerequisite skills (plan §8e): a lesson's own list, else the seed's fallback.
+    eq(LIB.prerequisiteSkillsFor('subtraction', 'sub_100_regroup').map((p) => p.skillId).join(','), 'subtract,sub_100_no_regroup', 'library: a skill with a lesson lists its lesson prerequisites');
+    ok(LIB.prerequisiteSkillsFor('multiplication', 'mult_facts').length > 0 && LIB.prerequisiteSkillsFor('multiplication', 'mult_facts').every((p) => p.categoryId && p.skillId && p.why), 'library: a skill with no lesson takes the seed fallback, each with its reason');
     ok(LIB.lessonData('Y4.B1.S14').cases.includes('toHundred') && !('archetype' in LIB.lessonData('Y4.B1.S14')), 'library: lessonData is the routine plus the lesson (no archetype field for the engine)');
     // LR-10: the packet prints at its one size, whatever was asked.
     eq(LR.packetViolations({ lesson: { cases: [] }, placed: [], sizePrinted: 'M', packetSize: 'L' }).map((v) => v.rule).join(','), 'LR-10', 'LR-10: a packet printed off its one size fails');
