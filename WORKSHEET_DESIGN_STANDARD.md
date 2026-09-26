@@ -907,7 +907,7 @@ Items per page. "By table" means the computed capacity in 12.3. A ceiling is nev
 |---|---|---|---|---|
 | Lesson opener | 2 Model + 4 Guided | 1-2 + 3 | 1-2 + 2-3 | Plus bands; K one-pager: 2 Model / 2 Guided / 2 alone |
 | Scripted model | 1 problem, 3-6 frames | same | same | Second example only with identical wording |
-| Guided page | 10 | 8 | 3-6 | Steps strip stays visible. 10 / 8 at S / M since 2026-09-25 (pv-r1 critic: short problems left a 20-26% strip under 8); tall problems stop sooner by height |
+| Guided page | 10 | 8 | 3-6 | Tries, plus the unscored Model (CL-14: cells unlabelled). Steps strip stays visible. 10 / 8 at S / M since 2026-09-25 (pv-r1 critic: short problems left a 20-26% strip under 8); tall problems stop sooner by height |
 | Independent / More Practice | 6 (up to 16 for one-symbol answers, using the 2 x 5 and 2 x 8 grids) | 6 (one-symbol answers: as S) | 6 (one-symbol answers: as S); 4 for long procedures | 2 x 3 default |
 | Wide-visual rows | 5 | 4 | 3 | Number lines, base-10 over 100, coin rows |
 | Sub-skill / decision | 12 | 8 | 6-8 | No answer computed |
@@ -937,7 +937,7 @@ Items per page. "By table" means the computed capacity in 12.3. A ceiling is nev
 
 - **DN-1** Reference densities above about 40 responses per page were judged too dense for these pupils; outside fact layouts no page exceeds 20 scored responses at L.
 - **DN-2** Every cell passes CL-5 (40% free) at every capacity in this section.
-- **DN-1a** (2026-09-25, `design/audit/LESSONS_LEARNED.md` L1) A kit Independent / More Practice page packed to its problems' measured size (dense packing) holds up to **20 / 16 / 12** standard problems at S / M / L (the Test row), and may take one more column at S than at L where the problem's own width allows it (12.3's stacked-arithmetic table). Size S never prints the grid of L.
+- **DN-1a** (2026-09-25, `design/audit/LESSONS_LEARNED.md` L1) A kit Independent / More Practice page packed to its problems' measured size (dense packing) holds up to **30 / 20 / 12** standard problems at S / M / L, and a page of short problems up to **30 / 24 / 20** (DN-1's 20 is at L; critic guided-r1), and may take one more column at S than at L where the problem's own width allows it (12.3's stacked-arithmetic table). Size S never prints the grid of L.
 
 ### 12.2 The column x size rule
 

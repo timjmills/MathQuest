@@ -261,7 +261,12 @@ function shownVal(ctx, id, key) {
     return answered(ctx) ? (key === undefined || key === null ? '' : String(key)) : '';
 }
 const showing = (ctx) => answered(ctx) || ctx.state === 'wrong';
-const RING = 'border:1.5pt solid #000;border-radius:999px;';
+// The Guided Model (state `traced`) writes every mark a pupil would make in trace grey, as blank()
+// does for a slot: a written value, a tick, a ring (critic guided-r1: the Model's answers printed
+// solid black in the drawings that are not blank() slots).
+const isTraced = (ctx) => ctx.state === 'traced';
+const inked = (ctx, v) => (isTraced(ctx) && v !== '' ? `<span class="ws-trace" data-ws-ink="trace">${v}</span>` : v);
+const ringLine = (ctx) => (isTraced(ctx) ? 'border:1.5pt solid var(--ws-grey);' : 'border:1.5pt solid #000;');
 const PLACE_WORD_KIT = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands' };
 
 function textLine(ctx, html) {
@@ -350,7 +355,7 @@ function slotFloor(p, grow) {
 function ringRow(ctx, items, correct, sizePt) {
     const on = ctx.state === 'wrong' ? new Set([shownVal(ctx, 'answer', '')]) : answered(ctx) ? new Set((correct || []).map(String)) : new Set();
     const cells = items.map(w => `<span class="pv-choice" data-ws-slot="choice" data-ws-shape="ring" style="display:inline-block;`
-        + `padding:0.8mm 2.2mm;margin:1mm 2mm;${on.has(String(w)) ? RING : 'border:1.5pt solid transparent;'}">${esc(w)}</span>`).join('');
+        + `padding:0.8mm 2.2mm;margin:1mm 2mm;${on.has(String(w)) ? `${ringLine(ctx)}border-radius:999px;` : 'border:1.5pt solid transparent;'}">${esc(w)}</span>`).join('');
     return `<div class="pv-ring-row" style="font-size:${pt(sizePt || ctx.metrics.digitPt * 0.75)};font-weight:700;text-align:center;`
         + `line-height:1.6;">${cells}</div>`;
 }
@@ -361,7 +366,7 @@ function checkRow(ctx, labels, correct) {
     const chosen = shownVal(ctx, 'answer', correct);
     const cw = (SIZES[ctx.size] || SIZES.M || { checkMm: 6 }).checkMm || 6;
     const boxes = labels.map((l, i) => `<span style="display:inline-flex;align-items:center;gap:2mm;margin:0 4mm;">`
-        + `<span class="ws-check" data-ws-slot="c${i}" data-ws-shape="check" style="width:${cw}mm;height:${cw}mm">${chosen === l ? '✓' : ''}</span>`
+        + `<span class="ws-check" data-ws-slot="c${i}" data-ws-shape="check" style="width:${cw}mm;height:${cw}mm">${chosen === l ? inked(ctx, '✓') : ''}</span>`
         + `<span style="font-size:${pt(ctx.metrics.textPt + 2)};font-weight:700;">${esc(l)}</span></span>`).join('');
     return `<div class="pv-checks" style="text-align:center;margin-top:2mm;">${boxes}</div>`;
 }
@@ -422,7 +427,7 @@ function chartHTML(p, ctx) {
         return j >= 0 ? wDigits[j] : '';
     };
     const cells = places.map((pl, i) => `<td style="border:0.75pt solid #000;width:${colW}mm;height:${rowH}mm;text-align:center;`
-        + `font-size:${pt(ctx.metrics.digitPt)};font-weight:700;"><span data-ws-slot="d${i}" data-ws-shape="cell">${esc(cellVal(i))}</span></td>`).join('');
+        + `font-size:${pt(ctx.metrics.digitPt)};font-weight:700;"><span data-ws-slot="d${i}" data-ws-shape="cell">${inked(ctx, esc(cellVal(i)))}</span></td>`).join('');
     // The source at the working digit size when it is numbers (40,000 + 6,000 + 300), at a large
     // text size when it is words.
     const srcPt = /[a-z]/i.test(String(p.source || '')) ? ctx.metrics.textPt + 3 : ctx.metrics.digitPt * 0.8;
@@ -452,7 +457,10 @@ function tableHTML(p, ctx) {
             if (v !== null && v !== undefined) return `<td style="${bd}padding:0 3mm;text-align:center;">${esc(v)}</td>`;
             const key = p.keys && p.keys[r] ? p.keys[r][c] : '';
             const id = `t${k++}`;
-            return `<td style="${bd}min-width:22mm;padding:0 3mm;text-align:center;" data-ws-slot="${id}" data-ws-shape="cell">${esc(ctx.state === 'wrong' ? tableWrong(ctx, k - 1) : shownVal(ctx, id, key))}</td>`;
+            // A traced cell (the Guided Model) writes its value in trace grey like every blank()
+            // slot, never solid black (critic guided-r1: the Model's table answers printed black).
+            const val = esc(ctx.state === 'wrong' ? tableWrong(ctx, k - 1) : shownVal(ctx, id, key));
+            return `<td style="${bd}min-width:22mm;padding:0 3mm;text-align:center;" data-ws-slot="${id}" data-ws-shape="cell">${inked(ctx, val)}</td>`;
         }).join('') + '</tr>').join('');
     return `<table class="pv-rtable" style="border-collapse:collapse;margin:0 auto;font-size:${pt(ctx.metrics.digitPt * 0.7)};font-weight:700;">${head}${body}</table>`;
 }
@@ -567,7 +575,7 @@ register('pv', {
                 // RN-7a: the strip without an answer slot; the key underlines the place's digit and
                 // rings the one after it (1.5 pt, §13.6).
                 const strip = numeralTracksHTML(p.n, { underline: showing(ctx) ? p.place : 0, size: pt(m.digitPt) });
-                const ringDigit = showing(ctx) ? `<div style="font-size:${pt(m.textPt)};margin-top:1mm;">${esc(shownVal(ctx, 'answer', kv))}</div>` : '';
+                const ringDigit = showing(ctx) ? `<div style="font-size:${pt(m.textPt)};margin-top:1mm;">${inked(ctx, esc(shownVal(ctx, 'answer', kv)))}</div>` : '';
                 return `<div class="pv-cell" data-ws-slot="answer" data-ws-shape="mark">${center(strip)}${ringDigit}</div>`;
             }
             case 'decide': {
@@ -635,7 +643,7 @@ register('pv', {
                 const on = shownVal(ctx, 'answer', kv);
                 const rows = (p.choices || []).map((c, i) => `<div class="pv-choice" data-ws-slot="choice" data-ws-shape="ring" `
                     + `style="display:table;padding:1mm 3mm;margin:1.5mm 0;border-radius:4mm;`
-                    + `${on && String(c) === on ? 'border:1.5pt solid #000;' : 'border:1.5pt solid transparent;'}">`
+                    + `${on && String(c) === on ? ringLine(ctx) : 'border:1.5pt solid transparent;'}">`
                     + `<span style="display:table-cell;width:7mm;">${esc((p.labels || [])[i] || '')}</span><span style="display:table-cell;">${esc(c).split(' ').map(w => (w.includes('-') ? `<span style="white-space:nowrap;">${w}</span>` : w)).join(' ')}</span></div>`).join('');
                 return `<div class="pv-cell">${center(numeral({}))}<div class="pv-word-choices" style="display:table;margin:0 auto;font-size:${pt(m.textPt + 2)};`
                     + `font-weight:700;line-height:1.3;text-align:left;">${rows}</div></div>`;

@@ -1390,11 +1390,11 @@ function lintKitGeometry(dom, pdf, info, F) {
             if (c && /^(independent|more-practice)$/.test(p.role) && p.gridTop !== null && p.gridBottom !== null) {
                 const gh = p.gridBottom - p.gridTop;
                 const its = p.cells.filter(x => x.item);
-                if (its.length && gh > 0 && its.every(x => x.rect[3] <= gh / 4.5)) c = { n: Math.max(c.n, 20), name: `${c.name} (short problems, DN-1)` };
+                if (its.length && gh > 0 && its.every(x => x.rect[3] <= gh / 4.5)) c = { n: Math.max(c.n, { S: 30, M: 24, L: 20 }[p.size] || 20), name: `${c.name} (short problems, DN-1)` };
                 // 12.3's capacity tables (layout.js DENSE_CEILING): a kit page packed to its
                 // problems' measured size holds up to 20 / 16 / 12 standard problems at S / M / L
                 // (DN-1a, LESSONS_LEARNED L1: S no longer prints L's 3 x 4).
-                else if (info.mode === 'kit') c = { n: Math.max(c.n, { S: 20, M: 16, L: 12 }[p.size] || 12), name: `${c.name} (12.3 dense capacity)` };
+                else if (info.mode === 'kit') c = { n: Math.max(c.n, { S: 30, M: 20, L: 12 }[p.size] || 12), name: `${c.name} (12.3 dense capacity)` };
             }
             if (c && p.items > c.n) F('L-DENSITY', 'DN-1', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} items; the ${c.name} ceiling at size ${p.size} is ${c.n} (section 12.1)`, `over ceiling ${p.role}`);
             if (p.role && !c) info.notes.push(`page ${p.idx}: role "${p.role}" has no ceiling in this gate`);

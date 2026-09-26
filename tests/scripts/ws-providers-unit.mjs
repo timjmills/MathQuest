@@ -31,6 +31,10 @@ import { REGRADED_SKILLS, STORY_NOUNS, PV_PROVIDER_IDS, pvRoundingErrors } from 
 import { rng, int, pick, shuffle, deriveSeed } from '../../js/modules/sheet/rng.js';
 import { sameAnswer } from '../../js/modules/sheet/providers/util.js';
 import { applyRule, ftSlots } from '../../js/modules/sheet/index.js';
+import { hintOf, hintGivesAnswer } from '../../js/modules/sheet/roles/guided.js';
+
+/** Skills whose items yield no Guided hint (reported; a stack or a fact draws its own cue). */
+const NO_HINT = [];
 
 const failures = [];
 let checks = 0;
@@ -450,6 +454,17 @@ function checkSkill(key, { requireStories = false } = {}) {
     const r = rng(deriveSeed('ws-providers-unit', key));
     const items = Array.from({ length: 20 }, (_, i) => Object.assign({ categoryId: cat, skillId: skill, seed: 1000 + i, itemIndex: i }, maker(r)));
 
+    // ---- the Guided fade contract (critic guided-r1): a first try's grey hint never holds its
+    // answer ("387 to the nearest 100 is 400", "The hour is 1" on a 1:00 clock).
+    let hinted = 0;
+    for (const q of items) {
+        const hit = { q, template: q.cell && q.cell.template };
+        const h = hintOf(hit);
+        if (h) hinted++;
+        ok(!h || !hintGivesAnswer(h, hit), `${key}: the Guided hint "${h}" holds the answer (${JSON.stringify(q.ans)})`);
+    }
+    if (!hinted) NO_HINT.push(key);
+
     // ---- strings
     const str = typeof p.strings === 'function' ? p.strings({ categoryId: cat, skillId: skill, q: items[0] }) : p.strings;
     ok(/^I Can \S/.test(str.iCan || ''), `${key}: iCan "${str.iCan}" does not start with "I Can"`);
@@ -728,4 +743,5 @@ if (failures.length) {
     console.log(`ws-providers-unit: FAIL (${failures.length} of ${checks} checks)`);
     process.exit(1);
 }
+if (NO_HINT.length) console.log(`  note: no Guided hint from ${NO_HINT.length} skill(s): ${NO_HINT.join(', ')}`);
 console.log(`ws-providers-unit: OK (${checks} checks, ${TM_PROVIDER_SKILLS.length} time and money + ${REGRADED_SKILLS.length} re-graded skills + ${Object.keys(SIBLINGS).length} siblings + ${PV_PROVIDER_IDS.length} place-value / rounding / estimation + ${Object.keys(COUNTBY_MAKERS).length} count-by)`);

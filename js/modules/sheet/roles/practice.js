@@ -617,7 +617,9 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
             ? paginate(Math.ceil(itemsBySection[si].length / 2), { cols: 1, rows: L.rows / 2 })
                 .map((c) => Object.assign({}, c, { from: c.from * 2, count: Math.min(c.count * 2, itemsBySection[si].length - c.from * 2), rows: c.rows * 2 }))
             : (!anchors && packByHeight(itemsBySection[si], L.cols, {
-                gridFirstMm: L.gridH, gridContMm: L.gridHCont, maxRows: Math.max(1, Math.floor(L.ceiling / L.cols)), cellH: L.cellH, force: !!L.packed,
+                // A packed dense section holds the rows its layout packed (its dense ceiling), not
+                // the practice ceiling's (critic guided-r1: 10 mixed problems split 6 + 4 at S).
+                gridFirstMm: L.gridH, gridContMm: L.gridHCont, maxRows: Math.max(1, Math.floor(L.ceiling / L.cols), L.packed ? L.rows : 0), cellH: L.cellH, force: !!L.packed,
             })) || paginate(itemsBySection[si].length, L)));
     const pages = placeSections(
         layouts.map((L, si) => ({ layout: L, chunks: chunksBySection[si], instrMm: instr, sharesWith: sectionsIn[si].splitOf })),
@@ -707,7 +709,51 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
     return { norm: Object.assign({}, norm, { sections }), items };
 }
 
+/**
+ * The instruction key of ONE item: its own, else its provider's for THIS question (a mixed pool's
+ * items come from sub-skills with their own instructions), else ''.
+ */
+export function itemInstructionKey(it) {
+    if (!it) return '';
+    // The provider's key for THIS question first: the host stamps a mixed pool's items with the
+    // pool's one key, which is exactly the line that does not fit each kind.
+    const q = it.q || {};
+    try {
+        const p = getProvider(q.categoryId || '', q.skillId || '');
+        // Only a skill's own strings (the default adapter's key is a placeholder).
+        const real = p && Array.isArray(p.real) && p.real.includes('strings');
+        const raw = real && (typeof p.strings === 'function' ? p.strings({ categoryId: q.categoryId, skillId: q.skillId, label: q.skillLabel, q }) : p.strings);
+        if (raw && raw.instructionKey) return raw.instructionKey;
+    } catch (e) { /* the host's key */ }
+    return it.instructionKey || '';
+}
+
+/**
+ * The drawn kind of an item: its template and the template's own variant (a clock to read, a
+ * clock to choose; a place-value strip, a word-name choice).
+ */
+export function itemKindSig(it) {
+    const q = (it && it.q) || {};
+    const p = (q.cell && q.cell.payload) || {};
+    return `${(it && it.template) || (q.cell && q.cell.template) || ''}:${p.kind || p.task || ''}`;
+}
+
+/**
+ * The line a section prints: its key, except that a "write the answer" line over problems of
+ * different drawn kinds (a mixed pool whose kinds carry no line of their own: a circle-the-place
+ * item beside a tens-and-ones frame) becomes the neutral "Solve." (critic guided-r1).
+ */
+export function neutralForKinds(key, items) {
+    if (key !== 'default-write') return key;
+    return new Set((items || []).map(itemKindSig)).size > 1 ? 'default-solve' : key;
+}
+
 function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
+    // Critic guided-r1, one instruction per item kind: a band per kind is not split out here (the
+    // host deals a mixed pool's kinds one or two at a time, so a band per kind printed part-rows
+    // of ruled empty cells and ran a page over). A mixed section's line is instead the one its
+    // kinds share - see the per-item keys below. (The Review page, whose rows are its own, does
+    // print one band per kind: review.js allocate.)
     const split = input.anchors ? { norm: norm0, items: sheetItems0 } : splitWide(role, norm0, sheetItems0, { availableWidthMm: Number(norm0.ctxIn.availableWidthMm) || LIVE_W_MM });
     const norm = split.norm;
     let sheetItems = split.items;
@@ -733,13 +779,18 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     // Instruction per section (BD-10, BD-13): the section's own key, else the skills' keys.
     const instr = norm.sections.map((sec, si) => {
         const pupil = sheetItems[si].filter((it) => !it.anchor);
-        const keys = sec.instructionKey ? [sec.instructionKey]
-            : pupil.map((it) => {
-                const q = it.q || {};
-                const s = skills.find((k) => k.skillId === q.skillId && (!q.categoryId || k.categoryId === q.categoryId));
-                return (it.instructionKey) || (s ? skillWords(s).instructionKey : '');
-            });
-        let key = sectionInstructionKey(keys);
+        const hostKeys = pupil.map((it) => {
+            const q = it.q || {};
+            const s = skills.find((k) => k.skillId === q.skillId && (!q.categoryId || k.categoryId === q.categoryId));
+            return (it.instructionKey) || (s ? skillWords(s).instructionKey : '');
+        });
+        // Critic guided-r1: a mixed pool's items are stamped with the pool's one line ("Solve.
+        // Write the answer.") over check-box and circle items. When the items' own kinds differ,
+        // they decide, and different kinds share the neutral line.
+        const ownKeys = pupil.map(itemInstructionKey);
+        const mixedKinds = new Set(ownKeys.filter(Boolean)).size > 1;
+        const keys = sec.instructionKey ? [sec.instructionKey] : mixedKinds ? ownKeys : hostKeys;
+        let key = sec.instructionKey ? sectionInstructionKey(keys) : neutralForKinds(sectionInstructionKey(keys), pupil);
         let text;
         ({ key, text } = resolveInstruction(key, pupil, sec.instructionVars));
         return { key, text };

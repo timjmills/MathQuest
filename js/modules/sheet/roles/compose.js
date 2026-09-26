@@ -141,6 +141,20 @@ export function bandMetrics(ctx, header, { cont = false } = {}) {
     };
 }
 
+/**
+ * The extra height (mm) a band strip takes when its label and instruction wrap past one line
+ * (critic guided-r1: a two-line "Circle groups of the second number. Write the quotient and the
+ * remainder." pushed a Review 4 mm past its page). A width estimate, 0.5 em a character.
+ */
+export function stripExtraMm(ctx, label, text) {
+    const s = SIZES[ctx.size] || SIZES[DEFAULT_SIZE];
+    const em = s.textPt * (25.4 / 72);
+    const labelW = label ? String(label).length * 0.55 * em + 4 : 0;
+    const room = Math.max(40, LIVE_W_MM - 10 - labelW);
+    const lines = Math.max(1, Math.ceil((String(text || '').length * 0.5 * em) / room));
+    return (lines - 1) * em * 1.25;
+}
+
 /* ======================================================================== plan items */
 
 /** A host item's measured (or static) height at `cols`, the tallest of a set. */
@@ -166,7 +180,7 @@ export function fitsAt(items, cols, ctx) {
         // where the Independent page of the same rows is 2 x 4 (k2-r1 critic).
         const size = (ctx && ctx.size) || '';
         const staticW = !fp.measure && !fp.factLike && Number.isFinite(fp.wMm);
-        const cap = fp.maxCols && (staticW || (fp.measure && it.measured))
+        const cap = fp.maxCols && !fp.hardCap && (staticW || (fp.measure && it.measured))
             ? itemCap({ fp, measured: staticW ? null : it.measured, size }) : fp.maxCols;
         if (cap && cols > cap) return false;
         if (cols > 1 && (it.fclass === 'word' || it.fclass === 'wide')) return false;
