@@ -368,7 +368,7 @@ function genDecimalValue(q, o) {
 }
 
 function wantZero(o) {
-    return o.zeroPlace === 'always' || (o.zeroPlace === 'some' && randInt(0, 1) === 1);
+    return o.zeroPlace === 'always' || (o.zeroPlace === 'some' && slot(2, 'zero') === 1);
 }
 
 /** Every order of a short list (up to 5 parts; longer lists keep the given order and its reverse). */
@@ -484,7 +484,10 @@ function genDecimalExpand(q, o) {
     const d = decOf(o);
     const num = decimalNumber(d, { zero: wantZero(o) });
     const { s, n } = num;
-    const places = num.w ? num.places : num.places.slice(1);
+    // Every place, in order, the ones too - a zero ones part is written as 0 just as a zero tenths
+    // part is (critic pv-r2: "0.022 = 0 + 0.02 + 0.002" wrote one zero and dropped the other), and
+    // every item of a page has the same number of parts, so its cells are one height.
+    const places = num.places;
     const ds = places.map((p) => num.digits[p]);
     const parts = ds.map((dg, i) => dround(dg * places[i], d));
     const form = o.form === 'notation' ? 'notation' : 'sum';
@@ -675,7 +678,8 @@ function stripAround(v, step, dir, inverse) {
 }
 
 function diskCounts(places, o) {
-    const zero = o.zeroPlace === 'some' && randInt(0, 1) === 1 && places.length >= 2;
+    // 'some': half the page, dealt (a coin per item gave five zeros on a page of six)
+    const zero = o.zeroPlace === 'some' && slot(2, 'zero') === 1 && places.length >= 2;
     const nine = slot(3) === 0;
     const ds = digitsNumber(places.length, { zero, nine });
     const counts = {};
@@ -696,13 +700,13 @@ function genDisks(q, skill, o) {
     const dec = decOf(o);
     let ns = null;
     if (dec && ['read', 'count', undefined, ''].includes(o.task || '')) {
-        const num = decimalNumber(dec, { zero: o.zeroPlace === 'some' && randInt(0, 1) === 1 });
+        const num = decimalNumber(dec, { zero: o.zeroPlace === 'some' && slot(2, 'zero') === 1 });
         places = num.places.slice();
         counts = { ...num.digits };
         n = num.n;
         ns = num.s;
     } else if (dec && skill === 'pv_disks_build') {
-        const num = decimalNumber(Math.min(2, dec), { zero: o.zeroPlace === 'some' && randInt(0, 1) === 1 });
+        const num = decimalNumber(Math.min(2, dec), { zero: o.zeroPlace === 'some' && slot(2, 'zero') === 1 });
         places = num.places.slice();
         counts = { ...num.digits };
         n = num.n;
@@ -729,7 +733,10 @@ function genDisks(q, skill, o) {
         q.hint = 'Look at each digit. Draw that many disks in its place. A zero place stays empty.';
         q.skillLabel = 'Draw Place-Value Disks';
         q.pv = { kind: 'build', n, places: places.slice(), dots, decimals: ns ? dec : 0, s: ns, fraction: frac };
-        setCell(q, { kind: 'build', n: ns || n, places: places.slice(), counts: { ...counts }, keyValue: q.printAnswer, dots, ...(frac ? { fraction: true } : {}) });
+        // (pvAid 'split': each place's digit over its zone - the support, critic pv-r2)
+        const split = o.pvAid === 'split';
+        if (split) q.pv.split = true;
+        setCell(q, { kind: 'build', n: ns || n, places: places.slice(), counts: { ...counts }, keyValue: q.printAnswer, dots, ...(frac ? { fraction: true } : {}), ...(split ? { split: true } : {}) });
         return;
     }
     const task = o.task === 'count' ? 'count' : 'read';
@@ -754,7 +761,9 @@ function genDisks(q, skill, o) {
     }
     q.pv.dots = dots;
     if (ns) { q.pv.decimals = dec; q.pv.s = ns; q.pv.fraction = frac; }
-    setCell(q, { kind: 'disks', task, places: places.slice(), counts: { ...counts }, place: q.pv.place, dots, ...(ns ? { n: ns } : {}), ...(frac ? { fraction: true } : {}) });
+    // (pvAid 'digits': a row under the chart to write each place's digit first, critic pv-r2)
+    const digitRow = task === 'read' && o.pvAid === 'digits';
+    setCell(q, { kind: 'disks', task, places: places.slice(), counts: { ...counts }, place: q.pv.place, dots, ...(ns ? { n: ns } : {}), ...(frac ? { fraction: true } : {}), ...(digitRow ? { digitRow: true } : {}) });
 }
 
 /**
@@ -775,8 +784,13 @@ function genDiskTask(q, o, places, counts, n, dots) {
         // Nine charts, dealt from the seed (critic pv-r1: four items only): tens and ones or
         // hundreds and tens with 2 to 5 counters (3 to 6 numbers), or hundreds, tens and ones with
         // 2 counters (6 numbers) - three counters on three places ask for ten, too many for a cell.
-        const pick = [[[10, 1], 2], [[10, 1], 3], [[10, 1], 4], [[10, 1], 5], [[100, 10], 2], [[100, 10], 3],
-            [[100, 10], 4], [[100, 10], 5], [[100, 10, 1], 2]][slot(9)];
+        // Thirteen charts (critic pv-r2: nine gave a second page of repeats): also thousands and
+        // hundreds with 2 to 5 counters. (Never three zones with thousands: the mat and its six
+        // boxes then no longer stand side by side in one row.)
+        const ALL = [[[10, 1], 2], [[10, 1], 3], [[10, 1], 4], [[10, 1], 5], [[100, 10], 2], [[100, 10], 3],
+            [[100, 10], 4], [[100, 10], 5], [[100, 10, 1], 2], [[1000, 100], 2], [[1000, 100], 3], [[1000, 100], 4],
+            [[1000, 100], 5]];
+        const pick = ALL[slot(ALL.length, 'allmat')];
         const c = pick[1];
         const ps = pick[0];
         const nums = [];
@@ -787,7 +801,10 @@ function genDiskTask(q, o, places, counts, n, dots) {
         rec(0, c, 0);
         const sorted = [...new Set(nums)].sort((a, b) => a - b);
         inlineBlanks(q, sorted.map(() => '___').join(', '), [sorted.map(String)], sorted.map((v) => String(v).length + 1));
-        q.text = `Use ${c} counters on the chart. Write every number you can make, smallest first: ${q.text}`;
+        // (the chart's places are named: two items with the same count on different charts are
+        // different problems, never a duplicate the page drops)
+        const chartName = ps.map((pl) => PLACE_WORD[pl]).join(' and ');
+        q.text = `Use ${c} counters on the ${chartName} chart. Write every number you can make, smallest first: ${q.text}`;
         q.printText = `Use ${c} counters. Write every number you can make, smallest first.`;
         q.ans = sorted.join(', ');
         q.printAnswer = sorted.map(fmt).join(', ');
@@ -853,6 +870,13 @@ function genTimesTen(q, skill, o) {
     let powers = (Array.isArray(o.power) && o.power.length ? o.power : [10]).map(Number).filter(p => [10, 100, 1000].includes(p));
     if (!powers.length) powers = [10];
     powers.sort((a, b) => a - b);
+    // A power the band cannot host with a two-digit number (× 1,000 in "Numbers to 1,000") stays
+    // off the page; the smallest ticked power always stays (its floor is the band's).
+    {
+        const band0 = capOf('placevalue', skill, o, 10000);
+        const fit = powers.filter((p) => p * 10 <= band0);
+        powers = fit.length ? fit : powers.slice(0, 1);
+    }
     const power = powers[slot(powers.length)];
     // 'both': a block of × (one per power), then a block of ÷, so every op meets every power.
     const op = o.op === 'both' ? (slot(2, 'op') === 0 ? 'x' : '/') : o.op === '/' ? '/' : 'x';
@@ -993,7 +1017,7 @@ function genDecimalCompare(q, o) {
     } else {
         const f2 = fr.slice(); f2[0] = f2[0] === 1 ? 2 : f2[0] - 1; b = `${w}.${f2.join('')}`;
     }
-    if (randInt(0, 1) === 1) [a, b] = [b, a];
+    if (slot(2, 'swap') === 1) [a, b] = [b, a];
     const na = Number(a), nb = Number(b);
     q.text = `Compare: ${a} ___ ${b}`;
     q.printText = 'Write <, > or = in the circle.';
@@ -1007,7 +1031,7 @@ function genDecimalCompare(q, o) {
         + `<div style="width:2.2rem;height:2.2rem;border:1.5pt solid #000;border-radius:50%;"></div>`
         + `<div style="font-size:2rem;font-weight:700;">${b}</div></div>`;
     q.pv = { kind: 'compare', a: na, b: nb, as: a, bs: b, decimals: d, closeness: 'close', lengths: a.length === b.length ? 'equal' : 'mixed' };
-    setCell(q, { kind: 'compare', a, b, keyValue: q.ans });
+    setCell(q, { kind: 'compare', a, b, keyValue: q.ans, ...(['align', 'zeros'].includes(o.pvAid) ? { aid: o.pvAid } : {}) });
 }
 
 function genCompare(q, skill, o) {
@@ -1016,7 +1040,7 @@ function genCompare(q, skill, o) {
     let [a, b] = comparableSet(2, cap, o);
     // One item in six is equal (the "=" case; CP-9), dealt, never rolled.
     if (slot(6) === 5 && o.lengths !== 'mixed') b = a;
-    if (randInt(0, 1) === 1 && a !== b) [a, b] = [b, a];
+    if (slot(2, 'swap') === 1 && a !== b) [a, b] = [b, a];
     q.text = `Compare: ${fmt(a)} ___ ${fmt(b)}`;
     q.printText = 'Write <, > or = in the circle.';
     q.ans = a > b ? '>' : a < b ? '<' : '=';
@@ -1030,7 +1054,7 @@ function genCompare(q, skill, o) {
         + `<div style="width:2.2rem;height:2.2rem;border:1.5pt solid #000;border-radius:50%;"></div>`
         + `<div style="font-size:2rem;font-weight:700;">${fmt(b)}</div></div>`;
     q.pv = { kind: 'compare', a, b, closeness: String(a)[0] === String(b)[0] && String(a).length === String(b).length ? 'close' : 'far', lengths: o.lengths || 'equal' };
-    setCell(q, { kind: 'compare', a, b, keyValue: q.ans });
+    setCell(q, { kind: 'compare', a, b, keyValue: q.ans, ...(['align', 'zeros'].includes(o.pvAid) ? { aid: o.pvAid } : {}) });
 }
 
 function genOrder(q, skill, o) {
@@ -1089,7 +1113,7 @@ function genDigitChart(q, skill, o) {
     const [lo, hi] = digitSpan(cap);
     const nd = String(hi).length;
     // A zero place in every other item (an empty column is a wrong answer here, §13.3).
-    const ds = digitsNumber(nd, { zero: randInt(0, 1) === 1 });
+    const ds = digitsNumber(nd, { zero: slot(2, 'zero') === 1 });
     let n = fromDigits(ds);
     if (n < lo || n > hi) n = randInt(lo, hi);
     const s = String(n);
@@ -1125,19 +1149,26 @@ const roundTo = (n, P) => Math.floor((n + P / 2) / P) * P;   // halfway rounds u
 function roundNumber(P, cap, kind, avoidMid) {
     const lo = P + 1;
     const pickIn = (a, b) => randInt(Math.min(a, b), Math.max(a, b));
+    // A halfway or a zero-inside number stays below the band's top step as a plain one does (critic
+    // pv-r2: a quarter of a nearest-1,000 page was in the 9,000s); only the `across` item goes there.
+    const topStep = (m) => (m >= 3 ? m - 1 : m);
     if (kind === 'mid') {
         const mMax = Math.max(1, Math.floor((cap - P / 2) / P));
-        return pickIn(1, mMax) * P + P / 2;
+        return pickIn(1, topStep(mMax)) * P + P / 2;
     }
     if (kind === 'across') {
+        // Just under ANY multiple of ten of the place the band holds (2,960 -> 3,000 to the
+        // nearest 100), dealt from the seed. Where the band holds one such multiple only (the
+        // default: nearest 1,000 to 10,000), it is the band's top - that one item a page is the
+        // only number in the top step (plain numbers stay below it), and it is what "round up
+        // across a place" means there (midpoint-seeded: one on every page of six).
         const jMax = Math.max(1, Math.floor((cap + P / 2) / (10 * P)));
-        const j = pickIn(1, jMax);
-        const n = j * 10 * P - pickIn(1, P / 2 - (avoidMid ? 1 : 0));
+        const n = pickIn(1, jMax) * 10 * P - pickIn(1, P / 2 - (avoidMid ? 1 : 0));
         if (n >= lo && n <= cap) return n;
     }
     if (kind === 'zero' && P >= 100) {
         const mMax = Math.max(1, Math.floor(cap / P) - 1);
-        const n = pickIn(1, mMax) * P + pickIn(1, P / 10 - 1);
+        const n = pickIn(1, topStep(mMax)) * P + pickIn(1, P / 10 - 1);
         if (n >= lo && n <= cap) return n;
     }
     // A plain item stays below the band's top step: the numbers just under the next place (96,
@@ -1491,7 +1522,9 @@ function genScaleLine(q, skill, o) {
     const labels = task === 'estimate' ? (o.ticks === 'ends' ? 'ends' : 'some') : (['step', 'some', 'ends'].includes(o.ticks) ? o.ticks : 'some');
     // A member of a mixed review takes the biggest line its review's Max Number allows.
     const band = inReview(skill) ? (SCALE_BANDS.filter((b) => b <= rangeCap(skill, Number(o.band) || 100)).pop() || 20) : o.band;
-    const { lo, hi, step } = scaleLineOf(band, o.chart, undefined, o.decimals);
+    // A part of the line is DEALT from the page's seed, each window once a block (critic pv-r2:
+    // two items on one 0.86 to 0.87 line).
+    const { lo, hi, step } = scaleLineOf(band, o.chart, (a, z) => a + slot(z - a + 1, 'window'), o.decimals);
     const dec = [1, 2, 3].includes(Number(o.decimals)) ? Number(o.decimals) : 0;
     const n = Math.round((hi - lo) / step);
     // The asked ticks: never an end, never a labelled tick (with every tick labelled, any inner one).
@@ -1517,7 +1550,7 @@ function genScaleLine(q, skill, o) {
         q.printAnswer = targets.map((v, i) => `${'ABC'[i]} ${fmt(v)}`).join(', ');
         q.hint = `${jumps} Count on from a number you know.`;
         q.pv = { kind: 'scale', task, lo, hi, step, labels, targets, n: targets[0], decimals: dec };
-        setCell(q, { kind: 'scale', task, lo, hi, step, labels, targets, n: targets[0], keyValue: q.ans });
+        setCell(q, { kind: 'scale', task, lo, hi, step, labels, targets, n: targets[0], keyValue: q.ans, decimals: dec });
         return;
     }
     const k = free[slot(free.length, 'tick')];
@@ -1532,7 +1565,7 @@ function genScaleLine(q, skill, o) {
         q.printText = 'Write the number the arrow points to.';
         q.answerType = 'number';
         q.hint = half ? `${jumps} The arrow is halfway along a jump.` : `${jumps} Count the jumps from ${fmt(lo)} to the arrow.`;
-        setCell(q, { kind: 'scale', task, lo, hi, step, labels, n: v, keyValue: v });
+        setCell(q, { kind: 'scale', task, lo, hi, step, labels, n: v, keyValue: v, decimals: dec });
         return;
     }
     // mark / estimate: on screen the paper's own line is ONE tap target (screen-cell.js
@@ -1547,7 +1580,7 @@ function genScaleLine(q, skill, o) {
     q.nlMark = { n: v, lo, hi, tol: est ? step : step / 2 };
     q.hint = est ? `Halfway is ${fmt(r6((lo + hi) / 2))}. Is ${fmt(v)} before or after halfway?` : `${jumps} Count the jumps from ${fmt(lo)}.`;
     q.printAnswer = fmt(v);
-    setCell(q, { kind: 'scale', task, lo, hi, step, labels, n: v, keyValue: fmt(v) });
+    setCell(q, { kind: 'scale', task, lo, hi, step, labels, n: v, keyValue: fmt(v), decimals: dec });
 }
 
 const SORT_PLACE = { round_sort_10: 10, round_sort_100: 100, round_sort_1000: 1000, round_sort_10000: 10000,
@@ -1656,7 +1689,10 @@ function genRoundSort(q, skill, o) {
  */
 function roundMultiNumber(places, cap, o) {
     const small = places[0], top = places[places.length - 1];
-    const lo = top + 1, hi = Math.max(top + 2, cap - 1);
+    // Every number on the page has the band's number of digits ("Numbers to 10,000,000" deals
+    // seven-digit numbers): one cell width, one layout a page (critic pv-r2: a 6-digit number in a
+    // half-width cell above 7-digit full-width rows).
+    const lo = Math.max(top + 1, Math.floor(cap / 10)), hi = Math.max(lo + 1, cap - 1);
     const isMid = (v) => places.some((P) => v % P === P / 2);
     const ok = (v) => v >= lo && v <= hi && v % top !== 0;
     const plain = () => {
@@ -1670,10 +1706,9 @@ function roundMultiNumber(places, cap, o) {
     if (kind === 'mid' && o.midpoint === 'never') kind = 'plain';
     if (kind === 'chain' && (places.length < 2 || o.midpoint === 'never')) kind = 'plain';
     if (kind === 'mid') {
-        // halfway for the chosen places in turn (4,685 for 10; 4,650 for 100)
-        // halfway for one of the two smallest places, drawn: halfway for a big place leaves every
-        // smaller place's answer equal to the number itself (1,500,000 to the nearest 10)
-        const P = places[randInt(0, Math.min(1, places.length - 1))];
+        // Halfway for EVERY chosen place in turn, dealt from the page's seed (critic pv-r2: it was
+        // almost always the smallest place, and "2,500 -> 3,000" never appeared on a 3-place page).
+        const P = places[slot(places.length, 'midplace')];
         for (let t = 0; t < 40; t++) {
             const v = randInt(Math.floor(lo / P), Math.floor(hi / P)) * P + P / 2;
             if (ok(v)) return { n: v, kind };
@@ -1712,6 +1747,8 @@ function genRoundMulti(q, skill, o, places, cap) {
     const said = list.length > 1 ? `${list.slice(0, -1).join(', ')} and ${list[list.length - 1]}` : list[0];
     q.text = `Round ${fmt(n)} to the nearest ${said}.`;
     q.printText = `Round each number to the nearest ${said}.`;
+    // a screen shows the one number (critic pv-r2: "each number" over a single number)
+    q.screenInstr = `Round the number to the nearest ${said}.`;
     inlineBlanks(q, `Round ${fmt(n)}. ${places.map((P) => `Nearest ${fmt(P)}: ___`).join('  ')}`, [keys],
         keys.map(() => String(n).length + 1));
     q.ans = keys.map(fmt).join('; ');
@@ -1736,17 +1773,19 @@ function genRoundingTable(q, skill, o) {
     if (o.blank !== 'column' && o.blank !== 'row') { genRoundMulti(q, skill, o, places, cap); return; }
     const rowsN = 4;
     const nums = new Set();
+    // (every number the band's digit count, as a one-number-a-problem page)
+    const lo = Math.max(top + 1, Math.floor(cap / 10));
     // One halfway number for the smallest place, and one chain-rounding trap (1,449: to the
     // nearest 1,000 it is 1,000, not 2,000 — M-R6) where two places are asked.
     const small = places[0];
     for (let t = 0; nums.size < rowsN && t < 200; t++) {
         let v;
-        if (nums.size === 0) v = randInt(top / small + 1, Math.floor(cap / small) - 1) * small + small / 2;
+        if (nums.size === 0) v = randInt(Math.ceil(lo / small), Math.floor(cap / small) - 1) * small + small / 2;
         else if (nums.size === 1 && places.length >= 2) {
             const P2 = places[1];
-            v = randInt(1, Math.max(1, Math.floor(cap / P2) - 1)) * P2 + P2 / 2 - small / 2;
-        } else v = randInt(top + 1, cap - 1);
-        if (v <= top || v >= cap || v % small === 0) continue;
+            v = randInt(Math.max(1, Math.ceil(lo / P2)), Math.max(1, Math.floor(cap / P2) - 1)) * P2 + P2 / 2 - small / 2;
+        } else v = randInt(lo, cap - 1);
+        if (v < lo || v >= cap || v % small === 0) continue;
         nums.add(v);
     }
     const rows = shuffle([...nums]);
@@ -1754,18 +1793,29 @@ function genRoundingTable(q, skill, o) {
     const table = rows.map(n => places.map(p => roundTo(n, p)));
     let text, sets, blankCells;
     if (blank === 'column') {
-        const ci = slot(places.length);
-        const P = places[ci];
-        blankCells = rows.map((_, r) => [r, ci]);
-        sets = [rows.map((_, r) => table[r][ci])];
-        text = `Round each number to the nearest ${fmt(P)}. ${rows.map(n => `${fmt(n)}: ___`).join('  ')}`;
-        q.printText = `Round each number to the nearest ${fmt(P)}. Fill in the column.`;
+        // A blank column is never next to a printed FINER column (critic pv-r2: the nearest-1,000
+        // column read straight off the printed nearest-100 one, 6,645 -> 6,600 -> 7,000): the
+        // columns blanked are the finest place up to the one dealt, so every printed column is a
+        // coarser place, and nothing blank can be chained from a neighbour.
+        const ci = slot(places.length, 'tcol');
+        const cols = places.map((_, c) => c).filter((c) => c <= ci);
+        blankCells = [];
+        rows.forEach((_, r) => cols.forEach((c) => blankCells.push([r, c])));
+        sets = [blankCells.map(([r, c]) => table[r][c])];
+        const named = cols.map((c) => fmt(places[c]));
+        const said = named.length > 1 ? `${named.slice(0, -1).join(', ')} and ${named[named.length - 1]}` : named[0];
+        text = `Round each number to the nearest ${said}. ${rows.map(n => `${fmt(n)}: ${cols.map(() => '___').join(' ')}`).join('  ')}`;
+        q.printText = `Round each number to the nearest ${said}. Fill in the ${cols.length > 1 ? 'columns' : 'column'}.`;
     } else {
-        const ri = slot(rows.length);
-        blankCells = places.map((_, c) => [ri, c]);
-        sets = [places.map((_, c) => table[ri][c])];
-        text = `Round ${fmt(rows[ri])}. ${places.map(p => `Nearest ${fmt(p)}: ___`).join('  ')}`;
-        q.printText = `Round ${fmt(rows[ri])} to each place. Fill in the row.`;
+        // Two blank rows a table (critic pv-r2: one row left 9 answers on a page of three tables).
+        const r1 = slot(rows.length, 'trow');
+        const r2 = (r1 + 1 + randInt(0, rows.length - 2)) % rows.length;
+        const rs = [r1, r2].sort((a, b) => a - b);
+        blankCells = [];
+        rs.forEach((r) => places.forEach((_, c) => blankCells.push([r, c])));
+        sets = [blankCells.map(([r, c]) => table[r][c])];
+        text = rs.map((r) => `Round ${fmt(rows[r])}. ${places.map(p => `Nearest ${fmt(p)}: ___`).join('  ')}`).join('  ');
+        q.printText = 'Round each number in an empty row to every place. Fill in the rows.';
     }
     inlineBlanks(q, text, sets, sets[0].map(v => String(v).length + 2));
     q.ans = sets[0].map(fmt).join('; ');

@@ -345,15 +345,9 @@ export function togglePrintSkillOptionSet(sIdx, skIdx, optId, valueIndex) {
     _writeSkillOption(sIdx, skIdx, (next, defs) => {
         const def = defs.find(d => d.id === optId);
         if (!def || def.type !== 'set') return;
-        const hit = (def.values || [])[Number(valueIndex)];
-        if (!hit) return;
-        const cur = Array.isArray(next[optId]) ? next[optId].slice() : [];
-        const at = cur.indexOf(hit.v);
-        if (at === -1) cur.push(hit.v); else cur.splice(at, 1);
-        // Keep the declared order so the chips and the summary read the same way every time.
-        const order = def.values.map(x => x.v);
-        cur.sort((a, b) => order.indexOf(a) - order.indexOf(b));
-        next[optId] = cur;
+        // The shared edit: declared order, `minTicks`, and a stand-alone value (Plain) that
+        // clears the other ticks (pv-r2) behave the same here as in every other host.
+        applyOptionEdit(next, defs, 'toggle', optId, valueIndex);
     });
 }
 
@@ -362,7 +356,7 @@ export function setPrintSkillOptionSetAll(sIdx, skIdx, optId, all) {
     _writeSkillOption(sIdx, skIdx, (next, defs) => {
         const def = defs.find(d => d.id === optId);
         if (!def || def.type !== 'set') return;
-        next[optId] = all ? def.values.map(x => x.v) : [];
+        applyOptionEdit(next, defs, 'all', optId, !!all);
     });
 }
 

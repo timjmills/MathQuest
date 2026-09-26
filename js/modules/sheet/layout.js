@@ -551,6 +551,12 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         notes.push('A problem is taller than the page at this size.');
     }
 
+    // SIZE S BUYS PROBLEMS (LESSONS L1, critic pv-r2). DN-1's 20 scored problems bind at L; a
+    // skill whose cells are short at S may declare how many its S page holds (`fp.sCeiling`),
+    // and the dense packing and the page fill below then go up to that at S only - so S prints
+    // more than L instead of the same page with a third of every cell empty. Opt-in per footprint.
+    const sCeil = size === 'S' ? Math.max(0, ...infos.map((i) => Number(i.fp.sCeiling) || 0)) : 0;
+
     // DENSE PACKING (2026-09-25 re-grade, C3: "cells ~70% empty"). With `section.dense`, a
     // section whose cells are much shorter or narrower than the default grid gives them is packed
     // tighter: more columns while every item still fits (measured, DN-10), and as many rows as
@@ -561,7 +567,7 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         // 12.1: a role that states its own ceiling (a Test: 20 / 16 / 12) is never packed past it,
         // however dense it asks to be (round-3 re-grade: a Test printed 20 facts at L under a
         // "At most 12 problems" note).
-        const dCeil0 = bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling;
+        const dCeil0 = Math.max(bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling, sCeil);
         const dCeil = section.ceiling !== undefined && section.ceiling !== null ? Math.min(dCeil0, ceiling) : dCeil0;
         const colOpts = requested === 'auto'
             ? Array.from({ length: Math.max(0, Math.min(Number(section.denseMaxCols) > 0 ? Number(section.denseMaxCols) : DENSE_MAX_COLS, hardCap) - cols + 1) }, (_, k) => cols + k)
@@ -608,7 +614,7 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         const used = rows * Math.min(G / rows, hMin * FILL_CAP);
         const fit = Math.floor((G - SAFETY_H_MM) / (hMin * DENSE_ROOM));
         if (used < PAGE_FILL * G && fit >= 5 / cols) {
-            let want = Math.min(fit, Math.floor(DN1_MAX / cols));
+            let want = Math.min(fit, Math.floor(Math.max(DN1_MAX, sCeil) / cols));
             if (cols === 2 && want > 1) want = TWO_COL_ROWS.find((r) => r <= want) || want;
             if (want > rows) {
                 rows = want;

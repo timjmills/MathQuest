@@ -84,7 +84,7 @@ function _diskHtml(place, idx, px, fraction = false) {
                padding:0;margin:0;line-height:1;">${label}</button>`;
 }
 
-function _zoneHtml(place, i, px, cols = 3, width = 0, point = false) {
+function _zoneHtml(place, i, px, cols = 3, width = 0, point = false, digit = null) {
     // Round 3 (H2 / H6 at 390 px): the three zones must fit the cell side by side. A narrow cell
     // gives each zone its share of the width and fewer disks per row (the zone grows down),
     // never smaller disks than a touch target.
@@ -92,7 +92,7 @@ function _zoneHtml(place, i, px, cols = 3, width = 0, point = false) {
     const tall = Math.max(side, Math.ceil(9 / cols) * (px + GAP_PX) + GAP_PX);
     return `<div class="pvb-col" data-place="${place}" style="display:flex;flex-direction:column;align-items:stretch;">
         <div class="pvb-zone-label" aria-hidden="true" style="text-align:center;font-family:'Andika',sans-serif;font-weight:700;
-             font-size:1.35rem;color:#000;line-height:1.3;">${LETTER[place] || ''}</div>
+             font-size:1.35rem;color:#000;line-height:1.3;">${LETTER[place] || ''}${digit !== null ? `: ${digit}` : ''}</div>
         <div class="pvb-zone" data-place="${place}" role="button" tabindex="0"
             aria-label="${PLACE_LABEL[place]} zone, empty. Tap to add a ${PLACE_LABEL[place].toLowerCase()} disk."
             style="box-sizing:border-box;width:${side}px;height:${cols === 3 ? side : tall}px;border:2px solid #000;${i ? 'border-left:none;' : ''}
@@ -135,7 +135,9 @@ export function renderPvDisksBuild(q, container) {
                  color:#000;margin-bottom:10px;letter-spacing:1px;">${_esc(targetText)}</div>
             <div class="pvb-zones" data-role="zones"
                  style="display:flex;flex-wrap:nowrap;justify-content:center;width:100%;overflow-x:auto;">
-                ${places.map((p, i) => _zoneHtml(p, i, px, cols, zoneW, p < 1 && places[i - 1] === 1)).join('')}
+                ${places.map((p, i) => _zoneHtml(p, i, px, cols, zoneW, p < 1 && places[i - 1] === 1,
+                    // the pvAid 'split' support (critic pv-r2): each place's digit over its zone, as on paper
+                    q.pv && q.pv.split ? pvDigitAt(q, p) : null)).join('')}
             </div>
             <div class="pvb-howto" style="text-align:center;font-size:0.95rem;color:#000;margin-top:8px;">
                 Tap a zone to add a disk. Tap a disk to take it away.</div>

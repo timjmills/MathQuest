@@ -59,7 +59,9 @@ export function pvRoundingErrors(n, P) {
         out.push({ value: n - digitAt(n, unit) * unit, misconception: 'M-R3' });
     }
     const seen = new Set();
-    return out.filter((w) => w.value !== r && w.value >= 0 && !seen.has(w.value) && seen.add(w.value));
+    // Never 0 (critic pv-r2: "25 -> 0" is not an error a pupil makes; it is spotted without
+    // rounding at all).
+    return out.filter((w) => w.value !== r && w.value > 0 && !seen.has(w.value) && seen.add(w.value));
 }
 
 /** A strings member chosen per item (the scope or task changes the instruction). */
@@ -88,7 +90,10 @@ const PV_PAGE_META = {
     'placevalue:expand': decMeta('4.NF.6', '5.NBT.3'),
     'placevalue:compare': decMeta('4.NF.7', '5.NBT.3'),
     // decimals are read or counted only; the counter tasks (take, x10, d10, all) stay whole numbers
-    'placevalue:place_value_disks': (o) => (!o || !o.task || o.task === 'read' || o.task === 'count' ? decMeta('4.NF.6', '5.NBT.1')(o) : null),
+    // × 10 / ÷ 10 is 4.NBT.1 ("a digit in one place is ten times what it is in the place to its
+    // right"), whatever the number (critic pv-r2: "Level 2 - 2.NBT.1" on × 10 of 3-digit numbers)
+    'placevalue:place_value_disks': (o) => (o && (o.task === 'x10' || o.task === 'd10') ? { grade: '4', ccss: '4.NBT.1' }
+        : !o || !o.task || o.task === 'read' || o.task === 'count' ? decMeta('4.NF.6', '5.NBT.1')(o) : null),
     'placevalue:pv_disks_build': decMeta('4.NF.6', '5.NBT.1'),
     'number_sense:number_line_scales': (o) => {
         const d = Number(o && o.decimals) || 0;
@@ -551,7 +556,10 @@ registerSkill('placevalue:place_value_disks', {
             return [step(`Find the ${PLACE_WORD[p.place]} zone.`), step(`Each disk there says ${f(p.place)}.`),
                 step(`Count them: there are ${counts[p.place]}.`), step(`Write ${counts[p.place]}.`, [{ slot: 'answer', value: String(counts[p.place]) }])];
         }
-        const out = places.slice(0, 4).map((pl) => step(`${PLACE_WORD[pl]}: ${counts[pl] || 0} disks, so the digit is ${counts[pl] || 0}.`));
+        // (`hide`: the count IS the answer's digit, so the screen's worked box blanks it - critic
+        // pv-r2; the paper's model keeps it)
+        const out = places.slice(0, 4).map((pl) => ({ ...step(`${PLACE_WORD[pl]}: ${counts[pl] || 0} disks, so the digit is ${counts[pl] || 0}.`),
+            hide: [String(counts[pl] || 0)] }));
         out.push(step(`Write ${shown(p)}.`, [{ slot: 'answer', value: shown(p) }]));
         return clampSteps(out.length >= 3 ? out : [step('Look at each zone.')].concat(out));
     },
@@ -1003,6 +1011,9 @@ for (const [id, P] of [['nearest_10', 10], ['nearest_100', 100], ['nearest_1000'
     const main = nearestDef(P);
     const plainDef = nearestPlainDef(P);
     registerSkill(`number_sense:${id}`, {
+        // The tab and footer: rounding to 10 or 100 is 3.NBT.1 (grade 3), to 1,000 and beyond
+        // 4.NBT.3 (grade 4) - never "Level 3" over a 4.NBT.3 footer (critic pv-r2 pre-flight).
+        pageMeta: () => (P <= 100 ? { grade: '3', ccss: '3.NBT.1' } : { grade: '4', ccss: '4.NBT.3' }),
         // The support ladder on screen (support-ladder.js): a wrong answer first marks the digits
         // (the place's digit ringed, the next one underlined), then adds the rounding number line,
         // then the place-value chart. Owner 2026-09-26.
@@ -1233,8 +1244,11 @@ registerSkill('number_sense:number_line_scales', {
         const at = Math.round((lo + k * st) * 1e6) / 1e6;
         const last = p.task === 'mark' ? step(`Mark ${f(p.n)}.`, [{ slot: 'answer', value: f(p.n) }]) : step(`The arrow points to ${f(p.n)}.`, [{ slot: 'answer', value: f(p.n) }]);
         const count = step(`Count ${k} jump${k === 1 ? '' : 's'} from ${f(lo)}${p.half ? ` to ${f(at)}` : ''}.`);
-        return [step(`The line goes from ${f(lo)} to ${f(hi)}.`), step(`Each jump is ${f(st)}.`), count,
-            ...(p.half ? [step(`The arrow is halfway to ${f(at + st)}.`)] : []), last];
+        // A half-tick arrow (35 on a line in tens): the model counts to the tick before it, then
+        // adds the half jump, so every number in the answer is worked (critic pv-r2).
+        const half = p.half ? [step(`The arrow is half a jump further: half of ${f(st)} is ${f(st / 2)}.`),
+            step(`${f(at)} + ${f(st / 2)} = ${f(p.n)}.`)] : [];
+        return clampSteps([step(`The line goes from ${f(lo)} to ${f(hi)}.`), step(`Each jump is ${f(st)}.`), count, ...half, last]);
     },
     wrongAnswer: (q) => {
         const p = pvOf(q);
@@ -1333,14 +1347,15 @@ function multiSteps(q) {
     const p = pvOf(q);
     const places = arr(p.places).map(Number);
     if (!places.length) return [];
-    const out = places.slice(0, 3).map((P, i) => {
+    // Every place gets its own line (critic pv-r2: the Model showed 3 of 6); six places are six
+    // steps, the contract's most.
+    const out = places.slice(0, 6).map((P, i) => {
         const lo = Math.floor(p.n / P) * P, r = roundTo(p.n, P);
         const nx = digitAt(p.n, P / 10 >= 1 ? P / 10 : 1);
         // short lines (the Guided model keeps work lines of 90 characters or fewer)
         const why = p.n - lo === P / 2 ? 'halfway, round up' : `the next digit is ${nx}, round ${nx >= 5 ? 'up' : 'down'}`;
         return step(`To ${f(P)}: ${why}: ${f(r)}.`, [{ slot: `b${i}`, value: f(r) }]);
     });
-    if (places.length > 3) out.push(step(`Do the same for ${places.slice(3).map(f).join(' and ')}.`, places.slice(3).map((P, k) => ({ slot: `b${k + 3}`, value: f(roundTo(p.n, P)) }))));
     return clampSteps(out.length >= 3 ? out : [step(`Round ${f(p.n)} from the number itself each time.`)].concat(out));
 }
 function multiWrong(q) {
@@ -1351,13 +1366,15 @@ function multiWrong(q) {
     const as = (list, misconception, explain) => (list.some((v, i) => v !== right[i])
         ? { value: list.map(f).join('; '), misconception, explain, slots: Object.fromEntries(list.map((v, i) => [`b${i}`, f(v)])) } : null);
     const chain = places.map((P, i) => (i ? roundTo(roundTo(p.n, places[i - 1]), P) : roundTo(p.n, P)));
-    const below = places.map((P) => (P >= 100 ? roundTo(p.n, P / 10) : Math.floor(p.n / P) * P));
+    // Every wrong value is a multiple of its own place (critic pv-r2: "100 -> 1,570" was spotted
+    // without rounding): rounded to the NEXT place up instead (M-R5), else cut down.
+    const below = places.map((P) => { const v = roundTo(p.n, P * 10); return v > 0 ? v : Math.floor(p.n / P) * P; });
     const cut = places.map((P) => Math.floor(p.n / P) * P);
     const halfDown = places.map((P) => (p.n % P === P / 2 ? p.n - P / 2 : roundTo(p.n, P)));
     return choose(q, [
         as(chain, 'M-R6', 'Rounded the rounded number again, not the number itself.'),
         as(halfDown, 'M-R2', 'Rounded halfway down.'),
-        as(below, 'M-R5', 'Rounded to the place below the one asked.'),
+        as(below, 'M-R5', 'Rounded to the place above the one asked.'),
         as(cut, 'M-R1', 'Cut the digits off: always rounded down.'),
     ]);
 }
@@ -1406,7 +1423,8 @@ registerSkill('number_sense:rounding_table', {
         // place UP turned 3-digit numbers into 0s and 1,000s).
         const down = (n, P) => Math.floor(n / P) * P;
         const chain = cells.map(([r, c]) => (c > 0 ? roundTo(roundTo(rows[r], places[c - 1]), places[c]) : roundTo(rows[r], places[c])));
-        const wrongPlace = cells.map(([r, c]) => (places[c] >= 100 ? roundTo(rows[r], places[c] / 10) : down(rows[r], places[c])));
+        // (a multiple of its own place: rounded to the place above, critic pv-r2)
+        const wrongPlace = cells.map(([r, c]) => { const v = roundTo(rows[r], places[c] * 10); return v > 0 ? v : down(rows[r], places[c]); });
         const alwaysDown = cells.map(([r, c]) => down(rows[r], places[c]));
         const right = cells.map(([r, c]) => roundTo(rows[r], places[c]));
         const differs = (list) => list.some((v, i) => v !== right[i]);

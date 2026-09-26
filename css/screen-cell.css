@@ -1308,3 +1308,13 @@ html body .mq-scell input.mq-workbox:focus { box-shadow: inset 0 0 0 3px #000; }
 /* a start-unknown number line: the given point is where the hops land - a hollow ring, never the
    filled start dot (round 4) */
 html body .mq-scell .mq-nl-start.mq-nl-given .mq-nl-mark::after { background: #fff !important; border: 3px solid #000; box-sizing: border-box; }
+
+/* critic pv-r2 (additive): a kit twin's slot is ONE box - the typed input fills its box with no
+   border, padding or shadow of its own (a box drawn inside the box clipped "950" to "95"); and a
+   several-place rounding's "100 ->" labels sit level with the middle of their boxes. */
+html body .mq-scell .mq-kittwin .mq-cellbox > input.mq-cellslot {
+    width: 100% !important; height: 100% !important; border: 0 !important; margin: 0 !important; padding: 0 !important;
+    box-shadow: none !important; background: transparent !important; text-align: center; min-width: 0 !important; border-radius: 0 !important;
+}
+.mq-scell .mq-kittwin .pv-rmulti span[style*="table-cell"] { vertical-align: middle !important; height: auto !important; padding-top: 3px !important; padding-bottom: 3px !important; }
+html body .mq-scell .mq-kittwin .mq-cellbox > input.mq-cellslot.mq-tried { border-bottom: 3px dashed #949494 !important; }

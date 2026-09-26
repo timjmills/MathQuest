@@ -221,7 +221,10 @@ export const MULTI_KEYS = Object.freeze({
     supportMore: '4E',
     // vis_pv_decimal_places (build lane placevalue): decimal counters named 0.1 or 1/10.
     counterLabel: '4F',
-    // NEXT FREE IN SUB-RANGE 4E-4O: 4G.
+    // critic pv-r2: the support of compare (line the numbers up, fill the zeros), place_value_disks
+    // (a row to write each place's digit) and pv_disks_build (each place's digit over its zone).
+    pvAid: '4G',
+    // NEXT FREE IN SUB-RANGE 4E-4O: 4H.
 });
 
 /**
@@ -323,6 +326,7 @@ export const VALUE_TOKENS = Object.freeze({
     model: Object.freeze({ none: 'N', area: 'A', bar: 'B', circle: 'C', line: 'L', set: 'S', grid: 'G', blocks: 'K', analog: 'H', digital: 'D' }),
     labels: Object.freeze({ all: 'A', some: 'S', none: 'N' }),
     counterLabel: Object.freeze({ decimal: 'D', fraction: 'F' }),
+    pvAid: Object.freeze({ none: 'N', align: 'A', zeros: 'Z', digits: 'D', split: 'S' }),
     // block 9 (O6 appearance, AP2): bar graphs
     bars: Object.freeze({ vertical: 'V', horizontal: 'H' }),
     precision: Object.freeze({ hour: 'H', half: 'F', quarter: 'Q', five: 'V', one: 'O' }),

@@ -96,7 +96,12 @@ function _liveDef(def) {
  */
 export function groupedOptionRowsHTML(defs, cur, row, headingStyle) {
     const shown = defs.filter(def => !(typeof def.appliesTo === 'function' && !def.appliesTo(cur)));
-    const used = OPTION_GROUPS.filter(g => shown.some(d => optionGroup(d) === g.id));
+    let used = OPTION_GROUPS.filter(g => shown.some(d => optionGroup(d) === g.id));
+    // A group whose set has a stand-alone value (`only`: rounding's "Plain: no drawing") goes
+    // FIRST, so that choice is one click at the top of the panel on a phone too (owner request;
+    // pv-r2: at 420 px it sat half under the sticky footer below the difficulty controls).
+    const lead = used.find(g => shown.some(d => optionGroup(d) === g.id && d.type === 'set' && (d.values || []).some(x => x.only)));
+    if (lead) used = [lead, ...used.filter(g => g !== lead)];
     const hs = headingStyle || 'font-size:0.68rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-dim);margin:10px 0 0;';
     const heads = used.length > 1 || (used[0] && used[0].id !== 'difficulty');
     return used.map(g => `<div class="sko-group" data-sko-group="${g.id}">`
@@ -199,16 +204,24 @@ export function optionControlHTML(def, cur, color, h) {
             ? `display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:4px;`
             : `display:flex;flex-direction:column;gap:4px;`;
         // Nothing ticked is legal and means "no restriction" (skill-options.js), so say so.
-        const none = !chosen.length
+        // A set with a stand-alone value (`only`: Plain) has that value as its "none", and a set
+        // with a minimum (`minTicks`) cannot be cleared: neither shows a None button (pv-r2: a
+        // None that reset to 10 + 100 did not do what it said), and the minimum is written out.
+        const hasAlone = vals.some(x => x.only);
+        const minT = Number(def.minTicks) > 0 ? Number(def.minTicks) : 0;
+        const none = minT
+            ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">Tick at least ${minT}. The last ${minT === 1 ? 'tick stays' : `${minT} ticks stay`} on.</div>`
+            : !chosen.length && !hasAlone
             ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">None ticked — any of them may appear.</div>`
             : '';
+        const noneBtn = minT || hasAlone ? '' : `<button type="button" onclick="${h.all(id, false)}"
+                    style="padding:2px 8px;font-size:0.7rem;border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:5px;cursor:pointer;">None</button>`;
         return `<div${tip} style="font-size:0.82rem;color:var(--text);">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
                 <span style="flex:1;min-width:0;font-weight:600;overflow-wrap:anywhere;">${escHTML(def.label)}</span>
                 <button type="button" onclick="${h.all(id, true)}"
                     style="padding:2px 8px;font-size:0.7rem;border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:5px;cursor:pointer;">All</button>
-                <button type="button" onclick="${h.all(id, false)}"
-                    style="padding:2px 8px;font-size:0.7rem;border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:5px;cursor:pointer;">None</button>
+                ${noneBtn}
             </div>
             <div style="${rowsWrap}">${rows}</div>
             ${none}
@@ -310,12 +323,20 @@ export function applyOptionEdit(next, defs, action, optId, raw) {
         // `minTicks` (a set that must keep at least N ticks: "Round to Several Places"): the last
         // ticks cannot be cleared.
         if (at !== -1 && Number(def.minTicks) > 0 && cur.length <= Number(def.minTicks)) return next;
-        if (at === -1) cur.push(hit.v); else cur.splice(at, 1);
+        // A value that stands alone (`only`: "Plain: no drawing") clears every other tick, and
+        // any other tick clears it; clearing the last tick falls back to it (it IS "none").
+        const alone = def.values.filter(x => x.only).map(x => x.v);
+        if (at === -1 && hit.only) cur.splice(0, cur.length, hit.v);
+        else if (at === -1) { for (const a of alone) { const k = cur.indexOf(a); if (k !== -1) cur.splice(k, 1); } cur.push(hit.v); }
+        else cur.splice(at, 1);
+        if (!cur.length && alone.length) cur.push(alone[0]);
         const order = def.values.map(x => x.v);
         cur.sort((a, b) => order.indexOf(a) - order.indexOf(b));
         next[optId] = cur;
     } else if (action === 'all' && def.type === 'set') {
-        next[optId] = raw ? def.values.map(x => x.v) : (Number(def.minTicks) > 0 ? (def.default || []).slice() : []);
+        const alone = def.values.filter(x => x.only).map(x => x.v);
+        next[optId] = raw ? def.values.filter(x => !x.only).map(x => x.v)
+            : (Number(def.minTicks) > 0 ? (def.default || []).slice() : alone.slice(0, 1));
     }
     return next;
 }

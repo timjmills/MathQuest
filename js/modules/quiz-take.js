@@ -215,7 +215,11 @@ const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlan
     'dualFractionAnswers',
     // AP2 round 3: a twin that prints its own question (a graph's) says its instruction here,
     // as it does on the card and the worksheet
-    'screenInstr'];
+    'screenInstr',
+    // critic pv-r2: the place-value family's own record (the places of a several-place rounding,
+    // the item's number) - without it the quiz's instruction and help were read from the skill's
+    // DEFAULT options ("nearest 10 and 100" over an item with three places)
+    'pv'];
 export function quizQuestionData(q) {
     if (!q) return null;
     const d = {

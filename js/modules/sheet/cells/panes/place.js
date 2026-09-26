@@ -153,10 +153,14 @@ function pvGrid(c, rowsVals, op, { ans = NaN, key = false } = {}) {
 //   level 0  chart + answer row only
 // Flags `ring`, `look`, `rule`, `answerRow`, `zeros` override the level one by one.
 const roundOf = (n, place) => Math.round(n / place) * place;
-function roundMarks(p) {
+function roundMarks(p, c = null) {
     const lv = Number.isInteger(num(p.level)) ? num(p.level) : 3;
     const pick = (k, on) => (typeof p[k] === 'boolean' ? p[k] : on);
-    return { ring: pick('ring', lv >= 1), look: pick('look', lv >= 2), rule: pick('rule', lv >= 3), answerRow: pick('answerRow', true), zeros: pick('zeros', lv >= 4) };
+    // No answer row where the chart is a SUPPORT (drawn without its own sentence, beside a problem
+    // that has its own line: support-draw.js, the screen twin, the ladder) - a second, empty row
+    // read as a second answer (critic pv-r2). On its own, the chart keeps its answer row.
+    const asSupport = !!(c && c.raw && c.raw.sentence === false);
+    return { ring: pick('ring', lv >= 1), look: pick('look', lv >= 2), rule: pick('rule', lv >= 3), answerRow: pick('answerRow', !asSupport), zeros: pick('zeros', lv >= 4) };
 }
 
 /** The rule strip: two short lines in a rounded box. A hint, black text, line ink. */
@@ -457,7 +461,7 @@ export const PLACE_PANES = {
             return Number.isInteger(n) && n >= 0 && n <= 9999999 && RPV_PLACES.includes(place) && place <= 10 ** String(n).length;
         },
         geom(p, c) {
-            const place = num(p.place || 10), m = roundMarks(p);
+            const place = num(p.place || 10), m = roundMarks(p, c);
             return { ...roundPv(c, num(p.n), place, m, !!(c.raw && c.raw.key)), label: `place-value chart of ${p.n}${m.ring ? `, the ${PLACE_NAME[place]} digit ringed` : ''}${m.look ? ', the digit to its right underlined' : ''}` };
         },
     },

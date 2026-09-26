@@ -104,12 +104,15 @@ export const SUPPORT_LABELS = Object.freeze({
 const _SUPPORT_MARKS = new Set(['boxsign', 'startarrow', 'steps', 'round-mark']);
 const _supportTicks = (o) => (Array.isArray(o && o.support) ? o.support : []).filter(v => SUPPORT_LABELS[v]);
 /** The unified Support set. `labels` overrides the wording per skill (count back, count by). */
-export const supportsOption = (values, { help, labels = {}, render = null, dflt = [] } = {}) => ({
+export const supportsOption = (values, { help, labels = {}, render = null, dflt = [], only = [] } = {}) => ({
     id: 'support', label: 'Support', type: 'set', default: dflt.slice(), group: 'support',
     supportsModel: true,
     // The values drawn at render time (the rest, on a rounding skill, are its generation rungs).
     render: (render || values).slice(),
-    values: values.map(v => ({ v, l: labels[v] || SUPPORT_LABELS[v] || v })),
+    // `only` (pv-r2): a value that stands alone - "Plain: no drawing" - IS the "no support"
+    // choice: ticking it clears every other tick, ticking another clears it, and it replaces the
+    // panel's None button (skill-options-ui.js), so Plain and None are one value, not two.
+    values: values.map(v => ({ v, l: labels[v] || SUPPORT_LABELS[v] || v, ...(only.includes(v) ? { only: true } : {}) })),
     allLabel: 'Every support',
     help: help || 'Tick the help to draw on each problem, on paper and on screen. Supports that cannot '
         + 'share a problem are shared out by section or problem by problem. None ticked is the fade.',
@@ -497,7 +500,7 @@ const _pvNearest = (place) => {
         // FIRST Support value, one click at the top of the panel - "Round 4,683 to the nearest
         // 100." and a line, no drawing at all (it switches every other tick off).
         ...supportsOptions(['bare', 'cut', 'line', 'round-pv', 'round-mark'], {
-            dflt: ['cut'], render: ['round-pv', 'round-mark'],
+            dflt: ['cut'], render: ['round-pv', 'round-mark'], only: ['bare'],
             labels: { bare: 'Plain: no drawing, the number and a line (4,683 → ____)', cut: 'Cut line (place letters over the digits)', line: 'Number line (ends labelled)' },
             help: 'Plain is the number and a line to write on. The cut line and the number line change the '
                 + 'problem\'s own drawing (tick one). The chart and the marks are drawn beside it.',
@@ -726,6 +729,13 @@ const _pvCounterName = () => ({
     verifyBase: { decimals: 2 },
 });
 const _noDec = (def) => ({ ...def, appliesTo: (o) => !(Number(o.decimals) > 0) && (!def.appliesTo || def.appliesTo(o)) });
+// critic pv-r2: a Support control for compare, the disks and the build (none was offered). Each is
+// structural first (the numbers lined up, a row for the digits), the hint after; None is the fade.
+const _pvAid = (values, help, appliesTo = null) => ({
+    id: 'pvAid', label: 'Support', type: 'enum', default: 'none', group: 'support',
+    values: [...values, { v: 'none', l: 'None: the problem on its own' }], help,
+    ...(appliesTo ? { appliesTo } : {}),
+});
 const P9_PV_OPTIONS = {
     'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport(), _pvIdentifyResponse(), _pvRepeatDigit()],
     'placevalue:value': [_noDec(_pvBand(_PV_PLACE_BANDS, 999)), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit(), _pvDecimals()],
@@ -735,7 +745,10 @@ const P9_PV_OPTIONS = {
         values: [{ v: 'largest', l: 'Largest first' }, { v: 'scrambled', l: 'Scrambled (5 + 300 + 20)' }],
         help: 'Scrambled parts are harder: the pupil has to put each part in its place.',
     }],
-    'placevalue:compare': [_noDec(_pvBand([99, 999, 9999, 99999, 999999], 999)), _noDec(_pvCloseness()), _noDec(_pvLengths()), _pvDecimals()],
+    'placevalue:compare': [_noDec(_pvBand([99, 999, 9999, 99999, 999999], 999)), _noDec(_pvCloseness()), _noDec(_pvLengths()), _pvDecimals(),
+        _pvAid([{ v: 'zeros', l: 'Lined up, the empty places filled with 0 (4.7 → 4.70)' }, { v: 'align', l: 'Lined up: one number over the other, places in line' }],
+            'Most support first: the two numbers one over the other with their places (and points) in line, the empty '
+            + 'decimal places filled with 0; then lined up only; None is the fade.')],
     'placevalue:order_least_to_greatest': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvOrderCount(), _pvCloseness(), _pvLengths()],
     'placevalue:order_greatest_to_least': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvOrderCount(), _pvCloseness(), _pvLengths()],
     'placevalue:place_value_disks': [_noDec(_pvBand([99, 999, 9999], 999)), {
@@ -748,9 +761,14 @@ const P9_PV_OPTIONS = {
         help: 'Counting one place is the easier first step; reading the whole number comes next. The move tasks show the '
             + 'counters with an arrow from each place to the next; "every number" asks for all the numbers a few counters make.',
     }, _pvZeroPlace(false), _pvCounterLook(), _pvDecimals(3, (o) => !o.task || o.task === 'read' || o.task === 'count'),
-    { ..._pvCounterName(), appliesTo: (o) => Number(o.decimals) > 0 && o.labels !== 'none' && (!o.task || o.task === 'read' || o.task === 'count') }],
+    { ..._pvCounterName(), appliesTo: (o) => Number(o.decimals) > 0 && o.labels !== 'none' && (!o.task || o.task === 'read' || o.task === 'count') },
+    _pvAid([{ v: 'digits', l: 'A row under the chart: write each place\'s digit first' }],
+        'The row under the chart is where the pupil writes how many disks each place has, then the number. None is the fade.',
+        (o) => !o.task || o.task === 'read')],
     // Draw to 999 only (owner ruling 3): nine 1,000 disks and 27 others is a poster, not a cell.
-    'placevalue:pv_disks_build': [_noDec(_pvBand([99, 999], 999)), _pvZeroPlace(false), _pvCounterLook(), _pvDecimals(2), _pvCounterName()],
+    'placevalue:pv_disks_build': [_noDec(_pvBand([99, 999], 999)), _pvZeroPlace(false), _pvCounterLook(), _pvDecimals(2), _pvCounterName(),
+        _pvAid([{ v: 'split', l: 'Each place\'s digit over its zone (H: 2)' }],
+            'The digit of each place printed over its zone: the pupil draws that many disks. None is the fade.')],
     'placevalue:pv_digit_drag': [_pvBand([999, 9999, 99999, 999999], 99999), {
         id: 'source', label: 'The number is given as', type: 'enum', default: 'expanded', group: 'difficulty',
         values: [
@@ -876,8 +894,10 @@ const PV_LANE_OPTIONS = {
                 { v: 'estimate', l: 'Estimate: mark a number on a line with only its ends' }],
             help: 'One task a page. Estimating has no ticks to count: the pupil uses halfway and the ends.' },
         { id: 'decimals', label: 'Jumps of', type: 'enum', default: 0, group: 'difficulty',
-            values: [{ v: 0, l: 'Whole numbers (as the line sets them)' }, { v: 1, l: 'Tenths (0 to 1, or 3 to 4)' },
-                { v: 2, l: 'Hundredths (0.2 to 0.3)' }, { v: 3, l: 'Thousandths (0.25 to 0.26)' }],
+            // (each label says what BOTH lines print: the whole line, then a part of it - critic
+            // pv-r2: "0.2 to 0.3" described only the part while the whole line prints 0 to 0.1)
+            values: [{ v: 0, l: 'Whole numbers (as the line sets them)' }, { v: 1, l: 'Tenths (0 to 1; a part: 3 to 4)' },
+                { v: 2, l: 'Hundredths (0 to 0.1; a part: 0.2 to 0.3)' }, { v: 3, l: 'Thousandths (0 to 0.01; a part: 0.25 to 0.26)' }],
             help: 'Decimal jumps: ten jumps of a tenth, a hundredth or a thousandth. "Numbers to" still bounds the numbers.' },
         { id: 'ticks', label: 'Numbers on the line', type: 'enum', default: 'some', group: 'support',
             values: [{ v: 'step', l: 'Every tick (but the ones asked)' }, { v: 'some', l: 'The ends and the middle' },
@@ -919,8 +939,11 @@ export function pvBandFloor(categoryId, skillId, opts) {
     if (skillId === 'more_less_10') return Number(o.step) === 1 ? 10 : 20;
     if (skillId === 'pv_digit_drag') return 1000;
     if (skillId === 'place_value_10x') {
+        // The SMALLEST power ticked sets the floor: a band too small for × 1,000 leaves that power
+        // out of the page (gen-pv.js genTimesTen), never raises every number past the band
+        // ("Numbers to 1,000" dealt 10 × 1,000 = 10,000).
         const powers = (Array.isArray(o.power) && o.power.length ? o.power : [10]).map(Number);
-        return Math.max(...powers) * 10;
+        return Math.min(...powers) * 10;
     }
     return 0;
 }
@@ -3514,7 +3537,14 @@ export function normalizeOptions(categoryId, skillId, opts) {
             // fail Array.isArray, fall back to the default, and silently discard the teacher's
             // choice — the page would print in a notation nobody picked.
             const list = Array.isArray(v) ? v : (v === undefined || v === null ? null : [v]);
-            if (list) out[def.id] = list.filter(x => legal.has(x));
+            if (list) {
+                let kept = list.filter(x => legal.has(x));
+                // A value that stands alone (`only`: Plain) wins over any tick beside it (pv-r2:
+                // an old panel could hold ["bare", "cut"]; the page it printed was Plain).
+                const alone = def.values.find(x => x.only && kept.includes(x.v));
+                if (alone) kept = [alone.v];
+                out[def.id] = kept;
+            }
         }
     }
     return out;

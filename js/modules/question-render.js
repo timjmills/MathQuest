@@ -15,7 +15,7 @@ import {
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
     regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
     clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget, isNumberLineItem, NUMBER_LINE_INSTRUCTION,
-    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs,
+    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, optionGradeFor, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs,
 } from './screen-cell.js';
 
 // Escape HTML-significant characters so q.text strings (which may contain
@@ -1978,6 +1978,9 @@ function _renderQuestionImpl() {
         if (label) {
             let _grade = getSkillGrade(_itemSkill, _itemCat);
             if (_grade === null || _grade === undefined) _grade = getSkillGrade(state.skill, state.category);
+            // the level the skill's options put it at (decimals, a × 10 task), as on paper
+            const _og = optionGradeFor(_itemCat, _itemSkill, (q && q.skillOptions) || state.skillOptions || {});
+            if (_og) _grade = _og;
             const gc = _teacher ? '' : gradeCircleHTML(_grade);
             if (_teacher) skillLabelEl.textContent = label;
             else skillLabelEl.innerHTML = gc ? gc + ' ' + label : label;
@@ -3702,6 +3705,26 @@ function _renderQuestionImpl() {
                         wrongCount++;
                     }
                 });
+
+                // The support ladder (critic pv-r2: four wrong builds met only "1 correct, 2 to
+                // fix"): each wrong build climbs a rung - the zones to fix stay marked, the skill's
+                // checklist, then the worked steps - and the disks stay for the pupil to change.
+                const value = Object.keys(counts).reduce((t, pl) => t + (counts[pl] | 0) * Math.round(Number(pl) * 1000), 0) / 1000;
+                if (!allCorrect && typeof window.widgetLadderWrong === 'function' && window.widgetLadderWrong(qq, String(value))) {
+                    if (host._pvUnlockForRetry) host._pvUnlockForRetry();
+                    // the zones to fix, outlined in ink (not colour) until the next build
+                    places.forEach(p => {
+                        const zone = host.querySelector(`.pvb-zone[data-place="${p}"]`);
+                        if (!zone) return;
+                        const stack = host.querySelector(`.pvb-zone-stack[data-place="${p}"]`);
+                        const bad = !stack || stack.querySelectorAll('.pvb-disk').length !== mod.pvDigitAt(qq, p);
+                        zone.style.outline = bad ? '3px dashed #000' : '';
+                        zone.style.outlineOffset = bad ? '-4px' : '';
+                        if (bad) zone.setAttribute('data-pvb-fix', '1'); else zone.removeAttribute('data-pvb-fix');
+                    });
+                    return;
+                }
+                host.querySelectorAll('.pvb-zone[data-pvb-fix]').forEach(z => { z.style.outline = ''; z.removeAttribute('data-pvb-fix'); });
 
                 _handleMultiPlaceSubmit({
                     qq,

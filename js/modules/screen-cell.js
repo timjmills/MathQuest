@@ -34,6 +34,8 @@ import {
     withSupports, supportOpKey as opKey,
 } from './sheet/index.js';
 import { SKILLS } from './data.js';
+import { state } from './state.js';
+import { renderPane } from './sheet/cells/panes/index.js';
 
 export const INK = '#000000';
 export const PAPER = '#ffffff';
@@ -2244,6 +2246,19 @@ export function printInstructionFor(q, categoryId = '') {
 }
 
 /**
+ * The level an item's OPTIONS put it at (its provider's `pageMeta`, as the printed tab reads it):
+ * decimal thousandths are grade 5 whatever the whole-number skill's grade (critic pv-r2: a
+ * "2 Compare Numbers" chip on a 5.NBT.3 decimal item). null: the skill's own grade stands.
+ */
+export function optionGradeFor(categoryId, skillId, opts) {
+    try {
+        const pm = getProvider(categoryId, skillId).pageMeta;
+        const r = typeof pm === 'function' ? pm(opts || {}) : null;
+        return r && r.grade ? String(r.grade) : null;
+    } catch (e) { return null; }
+}
+
+/**
  * The skill's name for the chrome pill (round 3: "Compare Frac" on a whole-number compare, "Find
  * the Sta", "Est Product"): the skill's own label in its category, a trailing "(…)" note dropped.
  * '' when the category does not hold the skill (a mixed session), so the caller keeps its own.
@@ -2318,7 +2333,7 @@ function scaleLineTwin(q, p, categoryId) {
         // The paper line, one tap target: the tap writes the number into the hidden slot.
         const n = Number(p.n);
         const tol = q.nlMark && Number.isFinite(Number(q.nlMark.tol)) ? Number(q.nlMark.tol) : st / 2;
-        const svg = scaleLineSVG({ lo, hi, step: st, labels: p.labels, ticks: task !== 'estimate', lengthMm: 110, labelPt: 18, pxPerMm: 3.2, tapDot: true })
+        const svg = scaleLineSVG({ lo, hi, step: st, labels: p.labels, ticks: task !== 'estimate', lengthMm: 110, labelPt: 18, pxPerMm: 3.2, tapDot: true, dp: Number(p.decimals) > 0 ? Number(p.decimals) : 0 })
             .replace('max-width:100%;', 'max-width:100%;width:100%;');
         const html = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin mq-rlwrap" data-mq-kit="pv" data-mq-kind="scale">`
             + `<div class="mq-rl-num" style="text-align:center;font-weight:700;"><span style="font-size:calc(var(--mq-digit) * 0.55);font-weight:400;">Mark</span> `
@@ -2336,7 +2351,7 @@ function scaleLineTwin(q, p, categoryId) {
     const fitPt = 18;
     const letters = task === 'fill' ? (p.targets || []).map((v, i) => ({ v: Number(v), l: 'ABC'[i] })) : [];
     const svg = scaleLineSVG({ lo, hi, step: st, labels: p.labels, arrow: task === 'read' ? Number(p.n) : null, letters,
-        lengthMm: 110, labelPt: Math.max(12, Math.min(20, fitPt)), pxPerMm: 3.2 })
+        lengthMm: 110, labelPt: Math.max(12, Math.min(20, fitPt)), pxPerMm: 3.2, dp: Number(p.decimals) > 0 ? Number(p.decimals) : 0 })
         .replace('max-width:100%;', 'max-width:100%;width:100%;');
     const w = Math.max(2, chars + (decimal ? 1 : 0));
     let answer, mode;
@@ -2522,10 +2537,30 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     }
     const wrap = document.createElement('div');
     wrap.appendChild(tpl.content);
-    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="pv" data-mq-kind="${attr(p.kind)}">${wrap.innerHTML}</div>`;
-    const instr = printInstructionFor(q, categoryId) || plainText(q.text);
+    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="pv" data-mq-kind="${attr(p.kind)}">${wrap.innerHTML}${roundSupportPanes(q, p)}</div>`;
+    // (a generator's own screen instruction first: a card shows ONE item, so "Round each number"
+    // over a single number reads wrong - critic pv-r2)
+    const instr = q.screenInstr || printInstructionFor(q, categoryId) || plainText(q.text);
     // a chart's digits make ONE number: the host checks the number, not a list of parts
     return { mode, html: body, instr, count: mode === 'slots' && !chart && !order ? slots.length : 0, kit: 'pv' };
+}
+
+/**
+ * A rounding item's ticked render-time supports on screen (critic pv-r2, OC3: the place-value
+ * chart and the ring-and-underline marks printed but were never drawn on the card): the same
+ * panes as paper, under the problem. Plain (no drawing) draws nothing.
+ */
+function roundSupportPanes(q, p) {
+    if (!p || p.kind !== 'round' || p.support === 'none' || p.support === 'line') return '';
+    const o = (q && q.skillOptions) || state.skillOptions || {};
+    const ticks = Array.isArray(o.support) ? o.support : [];
+    if (ticks.includes('bare')) return '';
+    const pay = { kind: 'round', n: Number(p.n), place: Number(p.place) };
+    return ticks.filter((v) => v === 'round-pv' || v === 'round-mark').map((id) => {
+        let h = '';
+        try { h = renderPane(id, pay, { size: id === 'round-mark' ? 'M' : 'L', twin: true, ink: 'black', sentence: false }) || ''; } catch (e) { h = ''; }
+        return h ? `<div class="mq-twin-support ws-support" data-ws-support-on="${attr(id)}" style="margin-top:8px;text-align:center;">${h}</div>` : '';
+    }).join('');
 }
 
 /**

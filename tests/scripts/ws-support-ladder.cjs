@@ -47,6 +47,20 @@ function ANSWERS(which) {
     const a = String(q.ans);
     const t = /^(\d{1,2}):(\d{2})$/.exec(a);
     let wrong;
+    // One number rounded to several places ("9,300; 9,300; 9,000"): the boxes join as the host's
+    // slots do (", "), and a wrong entry changes the first part only (critic pv-r2: the harness
+    // typed NaN, which a host rightly waits on).
+    if (/;\s/.test(a)) {
+        const parts = a.split(/;\s*/);
+        return { right: parts.join(', '), wrong: [1, 2, 3].map((k) => [String(Number(parts[0].replace(/,/g, '')) + k * 10), ...parts.slice(1)].join(', ')) };
+    }
+    // A sign ("<"): the other signs. An expanded form ("300 + 0 + 8"): the first part changed.
+    if (/^[<>=]$/.test(a)) return { right: a, wrong: ['<', '>', '=', '<'].filter((x) => x !== a).slice(0, 3) };
+    if (/\s\+\s/.test(a)) {
+        const parts = a.split(/\s+\+\s+/);
+        const bump = (p, k) => (/^\d+$/.test(p) ? String(Number(p) + k) : `${p}${k}`);
+        return { right: a, wrong: [1, 2, 3].map((k) => [bump(parts[0], k), ...parts.slice(1)].join(' + ')) };
+    }
     if (t) {
         const h = Number(t[1]);
         wrong = [1, 2, 3].map((k) => `${((h - 1 + k) % 12) + 1}:${t[2]}`);

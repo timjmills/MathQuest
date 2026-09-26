@@ -184,6 +184,27 @@ export function candidatesFor(q, ctx = {}) {
         return declared.map((id) => ({ id, how: 'pane', pane: id, payload: pay }))
             .filter((r) => !!(PANES[r.pane] && PANES[r.pane].accepts(r.payload)));
     }
+    // The rest of the place-value family (critic pv-r2: value, compare, expand, the number-line
+    // scales, the disks and the build had ONE rung - the worked steps on the first miss): the
+    // skill's own step checklist first (it names what to do, never a number of this item), then a
+    // place-value grid of the item's whole number where one can be drawn, then the worked steps.
+    if (c && (c.template === 'pv' || c.template === 'pv-support') && c.payload) {
+        const out = [];
+        let steps = [];
+        try {
+            const { cat, skill } = whereFrom(q, ctx);
+            const pr = getProvider(cat, skill);
+            const st = pr && (typeof pr.strings === 'function' ? pr.strings({ categoryId: cat, skillId: skill, q }) : pr.strings);
+            steps = st && Array.isArray(st.steps) ? st.steps.map(String).filter(Boolean).slice(0, 4) : [];
+        } catch (e) { steps = []; }
+        if (steps.length) out.push({ id: 'steps', how: 'pane', pane: 'steps', payload: { steps } });
+        // (only where the item PRINTS its number: on a scale, a disk mat or a chart the number is
+        // the answer, and a grid of it would give it away)
+        const pay = ['value', 'place', 'place-bank', 'expand', 'expand-line'].includes(c.payload.kind) ? c.payload : null;
+        const n = pay ? Number(pay.n) : NaN;
+        if (Number.isInteger(n) && n >= 10 && PANES.pvgrid && PANES.pvgrid.accepts({ n })) out.push({ id: 'pvgrid', how: 'pane', pane: 'pvgrid', payload: { n } });
+        return out;
+    }
     if (c && c.template === 'clock' && c.payload) {
         const P = Number(c.payload.precision) || 60;
         if (c.payload.kind === 'read') {
@@ -271,7 +292,7 @@ export function shownOf(q) {
         for (let i = drawn.length - 1; i >= 0; i--) if (clashes(drawn[i].id, r.id)) drawn.splice(i, 1);
         drawn.push(r);
     }
-    return { rungs, drawn, ids: rungs.map((r) => r.id), drawnIds: drawn.map((r) => r.id), worked: rungs.some((r) => r.id === 'worked'), spent: e.n > e.rungs.length, n: e.n };
+    return { rungs, drawn, ids: rungs.map((r) => r.id), drawnIds: drawn.map((r) => r.id), worked: rungs.some((r) => r.id === 'worked'), spent: e.n > e.rungs.length || !!e.spent, n: e.n };
 }
 
 const NAMES = {
@@ -297,7 +318,11 @@ export function ladderWrong(q, value, ctx = {}) {
         _entries.set(q, e);
     }
     const v = String(value == null ? '' : value).trim();
-    if (ctx.dedupe && e.n > 0 && e.last === v) return { n: e.n, rung: e.rungs[Math.min(e.n, e.rungs.length) - 1] || null, spent: e.n > e.rungs.length, repeat: true, message: messageFor(e) };
+    if (ctx.dedupe && e.n > 0 && e.last === v) return { n: e.n, rung: e.rungs[Math.min(e.n, e.rungs.length) - 1] || null, spent: e.n > e.rungs.length || !!e.spent, repeat: true, message: messageFor(e) };
+    // Once every rung is shown, a further wrong answer is the host's own behaviour: the count stays
+    // at the ladder's length (a worksheet or quiz host asks on every wrong answer, the card only
+    // while the ladder will help - both now read the same count, critic pv-r2).
+    if (e.n >= e.rungs.length) { e.last = v; e.spent = true; return { n: e.n, rung: null, spent: true, repeat: false, message: '' }; }
     e.last = v;
     e.n += 1;
     const spent = e.n > e.rungs.length;
@@ -324,7 +349,7 @@ export function ladderMessage(q) {
 }
 
 function messageFor(e) {
-    if (e.n > e.rungs.length) return '';
+    if (e.n > e.rungs.length || e.spent) return '';
     const r = e.rungs[e.n - 1];
     if (r.id === 'worked') return 'Here is how. Finish it, then try again.';
     const name = NAMES[r.id] || 'the help';
@@ -649,13 +674,29 @@ function answerTokens(q, steps) {
         const t = /^(\d{1,2}):(\d{2})$/.exec(s);
         if (t) { out.add(String(Number(t[1]))); out.add(t[2]); out.add(String(Number(t[2]))); }
     };
-    if (q && (typeof q.ans === 'string' || typeof q.ans === 'number')) add(q.ans);
+    if (q && (typeof q.ans === 'string' || typeof q.ans === 'number')) {
+        add(q.ans);
+        // A many-part answer written as one string ("9,300; 9,300; 9,000", "8 + 0.3 + 0.09"):
+        // every part is an answer too (critic pv-r2: the quiz's worked box printed the whole
+        // several-place rounding, and an expanded form in full).
+        const s = String(q.ans);
+        if (/;\s|\s\+\s/.test(s)) s.split(/;\s*|\s+\+\s+/).forEach(add);
+    }
     // Every part of a many-slot answer is an answer too (one number rounded to several places).
     if (q && Array.isArray(q.keyParts)) q.keyParts.forEach(add);
     (steps || []).forEach((st) => (Array.isArray(st.marks) ? st.marks : []).forEach((m) => {
-        if (m && (m.slot === 'ans' || m.slot === 'answer' || m.slot === 'hour' || m.slot === 'minute' || /^ans/.test(String(m.slot)))) add(m.value);
+        // (the answer slots of a many-slot cell count too: b0, t1, part2, o0, d3 - the values the
+        // pupil writes, never the ones the cell prints)
+        if (m && (m.slot === 'ans' || m.slot === 'answer' || m.slot === 'hour' || m.slot === 'minute' || /^ans/.test(String(m.slot))
+            || /^(b|t|part|o|d)\d+$/.test(String(m.slot)))) add(m.value);
     }));
-    out.delete('0');
+    // A zero is only an answer where a step says so (a place-value digit: "the digit is 0");
+    // elsewhere "0" is a start or an end printed in the problem.
+    // A step may name values it gives away without writing them into a slot (`hide`: the digit a
+    // count of disks makes) - those are answers on a screen too.
+    (steps || []).forEach((st) => (Array.isArray(st.hide) ? st.hide : []).forEach(add));
+    const zeroDigit = (steps || []).some((st) => Array.isArray(st.hide) && st.hide.map(String).includes('0'));
+    if (!zeroDigit) out.delete('0');
     return [...out].sort((a, b) => b.length - a.length);
 }
 

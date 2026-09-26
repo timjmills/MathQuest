@@ -91,7 +91,8 @@
     "wpBar": "8C",
     "bars": "9F",
     "supportMore": "4E",
-    "counterLabel": "4F"
+    "counterLabel": "4F",
+    "pvAid": "4G"
   },
   "blocks": {
     "0": {
@@ -655,6 +656,13 @@
     "counterLabel": {
       "decimal": "D",
       "fraction": "F"
+    },
+    "pvAid": {
+      "none": "N",
+      "align": "A",
+      "zeros": "Z",
+      "digits": "D",
+      "split": "S"
     }
   },
   "scalarOnly": {
