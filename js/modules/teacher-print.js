@@ -568,7 +568,8 @@ function paperOptionsHTML(s, i) {
   <div><span class="tv-label" id="tvForms${i}">Versions</span>
     <div class="tv-chips tv-letters" role="group" aria-labelledby="tvForms${i}">${['A', 'B'].map((L) => `<button type="button" class="tv-chip tv-chip-sm" data-act="form" data-sec="${i}" data-v="${L}" aria-pressed="${s.forms.includes(L)}" aria-label="Form ${L}">${L}</button>`).join('')}</div></div>
 </div>
-<p class="tv-cap">Form B is Form A's problems in a new order.</p>
+<div class="tv-fields-cols"><div><label class="tv-label" for="tvQPages${i}">Pages</label><select id="tvQPages${i}" class="tv-select" data-pages="${i}">${[1, 2, 3].map((n) => `<option value="${n}"${s.pages === n ? ' selected' : ''}>${n}</option>`).join('')}</select></div></div>
+<p class="tv-cap">Form B has new numbers. The skills share the questions by weight (equal unless you change them).</p>
 ${quizScoringHTML(s, i)}`;
     }
     if (s.kind === 'lesson') {
@@ -943,7 +944,7 @@ function requestFor(s, i) {
             : { kind: 'practice', versions: s.letters.slice(), factColumns: s.factColumns, timed: s.timed };
     return Object.assign(paper, {
         // A lesson is one skill: the first skill of the section (roles/lesson.js).
-        sections: [{ skills: s.kind === 'lesson' ? skills.slice(0, 1) : skills, columns: s.columns, pages: s.kind === 'practice' && s.letters.length < 2 ? s.pages : undefined }],
+        sections: [{ skills: s.kind === 'lesson' ? skills.slice(0, 1) : skills, columns: s.columns, pages: (s.kind === 'practice' && s.letters.length < 2) || s.kind === 'quiz' ? s.pages : undefined }],
         size: pr.size,
         paper: pr.paper,
         photocopySafe: pr.photocopySafe,

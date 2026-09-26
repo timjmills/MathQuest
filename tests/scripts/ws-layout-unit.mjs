@@ -1222,8 +1222,10 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     eq(route({ kind: 'practice', factColumns: 7 }), 'fact-rows', 'papers: Practice fact columns are Fact rows');
     eq(route({ kind: 'practice', timed: 2 }), 'fact-probe', 'papers: a timed check is the Fact probe');
     eq(route({ kind: 'practice', sections: [{ skills: [sk('add_word_problems')] }] }), 'word-problems', 'papers: word-problem skills get the story layout');
-    eq(route({ kind: 'quiz', versions: ['A', 'B'] }), 'test:A,test:B', 'papers: a Quiz of Forms A and B is two tests');
-    eq(route({ kind: 'quiz', versions: ['C'] }), 'test:A', 'papers: a Quiz version other than A / B falls back to Form A');
+    eq(route({ kind: 'quiz', versions: ['A', 'B'] }), 'independent:A,independent:B', 'papers: a Quiz of Forms A and B is two sheets of the Practice engine');
+    eq(route({ kind: 'quiz', versions: ['C'] }), 'independent:A', 'papers: a Quiz version other than A / B falls back to Form A');
+    const qz = P.routePaper({ kind: 'quiz', seed: 100, versions: ['A', 'B'], sections: [{ skills: [sk('add_20_regroup')] }] });
+    ok(qz[0].seed === 100 && qz[1].seed !== 100 && qz[0].header.title === 'Quiz A' && qz[1].tabId === 'Quiz B', 'papers: Quiz Form B has new numbers, its own title and tab');
     eq(route({ kind: 'lesson' }), 'lesson', 'papers: Lesson is the lesson packet');
     const mixed = P.routePaper({ kind: 'practice', sections: [{ skills: [sk('add_20_regroup'), sk('sub_100_regroup', 'subtraction')] }] })[0];
     ok(mixed.weightedMix === true, 'papers: a Practice paper of several skills deals them by weight');

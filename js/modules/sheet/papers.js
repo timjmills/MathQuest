@@ -62,7 +62,9 @@ export const PAPER_ROUTES = Object.freeze([
     { paper: 'practice', role: 'more-practice', when: (o) => o.versions.length > 1, why: 'versions A, B, C...: one page each, new numbers' },
     { paper: 'practice', role: 'word-problems', when: (o, skills) => skills.length > 0 && skills.every(isWordSkill), why: 'word-problem skills: the story-with-work layout' },
     { paper: 'practice', role: 'independent', when: () => true, why: 'one or more skills, dealt by weight' },
-    { paper: 'quiz', role: 'test', when: () => true, why: 'the scored test, Form A / Form B' },
+    // The Quiz is the Practice engine with scoring and tagging on (owner, 2026-09-26: "you can use
+    // the same practice paper engine"): one sheet per version, each with new numbers.
+    { paper: 'quiz', role: 'independent', when: () => true, why: 'the Practice engine, scored and tagged: one sheet per form' },
     { paper: 'lesson', role: 'lesson', when: () => true, why: 'the lesson packet' },
 ]);
 
@@ -79,8 +81,18 @@ export function routePaper(req = {}) {
     delete base.kind; delete base.versions; delete base.factColumns; delete base.timed; delete base.parts;
     base.role = row.role;
     base.paperKind = o.paper;
-    if (row.role === 'test') {
-        return o.versions.map((form) => Object.assign({}, base, { form, role: 'test' }));
+    if (o.paper === 'quiz') {
+        const multi = new Set(skills.map((k) => `${k.categoryId}:${k.skillId}`)).size > 1;
+        const seed = Number.isFinite(Number(req.seed)) ? Number(req.seed) >>> 0 : undefined;
+        return o.versions.map((form) => {
+            const h = Object.assign({}, req.header || {});
+            if (!(typeof h.title === 'string' && h.title.trim()) && h.title !== false) h.title = `Quiz ${form}`;
+            return Object.assign({}, base, {
+                form, role: row.role, tabId: `Quiz ${form}`, header: h, weightedMix: multi,
+                // Form B: new numbers (its own seed), as a Practice version.
+                seed: seed === undefined ? undefined : (form === 'A' ? seed : (seed + 104729 * (form.charCodeAt(0) - 64)) >>> 0),
+            });
+        });
     }
     if (row.role === 'more-practice') return [Object.assign(base, { letters: o.versions })];
     if (row.role === 'fact-rows') {

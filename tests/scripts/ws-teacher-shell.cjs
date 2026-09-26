@@ -361,6 +361,36 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
     return { tabs: [...document.querySelectorAll('#tvPageTabs button')].map((b) => b.textContent), titles };
   });
   if (quiz.tabs.filter((t) => /^Page/.test(t)).length < 2) fail(`Print: a Quiz of Forms A and B does not print two pages (${quiz.tabs.join()})`);
+  // Make quiz (TEACHER_SCREENS): build from a CCSS standard, score by type, the key's summary page.
+  const qz = await page.evaluate(async () => {
+    const scr = document.querySelector('#teacherMain [data-screen="print"]');
+    const before = scr.querySelectorAll('.tv-set-item').length;
+    const code = scr.querySelector('[data-qcode]');
+    code.value = '2.NBT.5';
+    code.dispatchEvent(new Event('change', { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 150));
+    document.querySelector('#teacherMain [data-screen="print"] [data-act="qsrc-add"]').click();
+    await new Promise((r) => setTimeout(r, 150));
+    const after = document.querySelectorAll('#teacherMain [data-screen="print"] .tv-set-item').length;
+    document.querySelector('#teacherMain [data-screen="print"] [data-act="qscore"][data-v="type"]').click();
+    await new Promise((r) => setTimeout(r, 150));
+    const inputs = document.querySelectorAll('#teacherMain [data-screen="print"] [data-qptype]');
+    const h = inputs[0] ? inputs[0].getBoundingClientRect().height : 0;
+    const b = await window.buildSheet({ kind: 'quiz', versions: ['A'], size: 'L', seed: 4242, key: true, sections: [{ skills: [{ categoryId: 'subtraction', skillId: 'sub_100_regroup' }, { categoryId: 'addition', skillId: 'add_word_problems' }] }], scoring: { mode: 'type', perType: { 'addition:add_word_problems': 3 } } });
+    const f = b.quiz.forms[0];
+    const wp = f.questions.filter((q) => q.skill === 'addition:add_word_problems').length;
+    return {
+      added: after - before, inputs: inputs.length, h,
+      total: f.total, expect: f.questions.length + 2 * wp,
+      box: (b.pupilHtml.match(/ws-field score">Score<i><\/i><b>\/(\d+)/) || [])[1],
+      summary: /data-ws-sheet="quiz-summary"/.test(b.keyHtml), tagged: f.questions.every((q) => q.ccss),
+      pupilTags: /data-ws-sheet="quiz-summary"/.test(b.pupilHtml),
+    };
+  });
+  if (qz.added < 2) fail(`Make quiz: CCSS 2.NBT.5 added ${qz.added} skills`);
+  if (!qz.inputs || qz.h < 44) fail(`Make quiz: "By type" scoring shows no 44px inputs (${qz.inputs}, ${qz.h}px)`);
+  if (qz.total !== qz.expect || String(qz.box) !== String(qz.total)) fail(`Make quiz: type scoring total ${qz.total} (want ${qz.expect}), Score box /${qz.box}`);
+  if (!qz.summary || !qz.tagged || qz.pupilTags) fail(`Make quiz: the key's standards summary is missing or leaks to the pupil (${JSON.stringify(qz)})`);
   // Old role ids decode to their paper (§8e: saved sets and old links are never broken).
   await page.evaluate(() => window.tvOpenPrintWith([{ categoryId: 'multiplication', skillId: 'mult_facts' }], { role: 'fact-probe' }));
   await sleep(200);

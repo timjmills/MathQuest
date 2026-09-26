@@ -1505,7 +1505,11 @@ export async function buildSheet(req = {}) {
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
         const gen = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null }, extra));
         const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix, alt: sec.supportAlt };
-        return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size, { mix, look: n.look })], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
+        return gen.map((g) => {
+            const it = settlePrompts([hostItem(g, sectionIdx, n.size, { mix, look: n.look })], sec.instructionKey || metaOf(g.skill).instructionKey)[0];
+            if (n.tagItems) tagItem(it);
+            return it;
+        });
     };
 
     const notes = [];
