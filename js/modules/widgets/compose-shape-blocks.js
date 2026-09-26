@@ -37,12 +37,15 @@ function _esc(s) {
 
 // Pattern-block colors match standard physical-manipulative colors used in
 // elementary classrooms (yellow hexagon, red trapezoid, blue rhombus, etc.).
+// Black and white question content (WORKSHEET_DESIGN_STANDARD): every block is white with an ink
+// outline, so a placed block shows as the lines that split the shape (the black ink filter turned
+// the coloured blocks into solid black shapes; vis_migrate_shapes).
 const _BLOCK_STYLE = {
-    triangle:  { fill: '#4caf50', stroke: '#2e7d32', label: 'Triangle' },
-    square:    { fill: '#fb8c00', stroke: '#e65100', label: 'Square' },
-    rhombus:   { fill: '#1e88e5', stroke: '#0d47a1', label: 'Rhombus' },
-    trapezoid: { fill: '#e53935', stroke: '#b71c1c', label: 'Trapezoid' },
-    hexagon:   { fill: '#fdd835', stroke: '#f9a825', label: 'Hexagon' }
+    triangle:  { fill: '#fff', stroke: '#000', label: 'Triangle' },
+    square:    { fill: '#fff', stroke: '#000', label: 'Square' },
+    rhombus:   { fill: '#fff', stroke: '#000', label: 'Rhombus' },
+    trapezoid: { fill: '#fff', stroke: '#000', label: 'Trapezoid' },
+    hexagon:   { fill: '#fff', stroke: '#000', label: 'Hexagon' }
 };
 
 // Generate a polygon-points string for a given shape, scaled to fit a

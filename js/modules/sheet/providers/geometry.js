@@ -283,3 +283,51 @@ for (const [id, def] of Object.entries(FIG_DEFS)) {
     });
 }
 export const GEO_FIGURE_SKILLS = Object.freeze(Object.keys(FIG_DEFS).map((id) => `area_perimeter:${id}`));
+
+/* ============================================================ fill a shape with blocks */
+// compose_hexagon, compose_rect_from_squares (shape-grid kind `fill`). The misconception bank:
+//   M-F1  left a gap: one block too few          M-F2  overlapped: one block too many
+//   M-F3  counted the sides of the shape, not the blocks inside it
+const FILL_PLURAL = { triangle: 'triangles', rhombus: 'rhombuses', trapezoid: 'trapezoids', square: 'squares' };
+const fillName = (q) => FILL_PLURAL[payloadOf(q).block] || 'blocks';
+
+function fillSteps(q) {
+    const p = payloadOf(q);
+    const n = Number(p.count) || 0;
+    const one = p.block || 'block';
+    return [
+        step(`Look at the ${one}. Every block is the same size.`),
+        step(`Start in a corner of the ${p.shapeName || 'shape'}. Draw the lines of one ${one}.`),
+        step(`Fill the rest with no gaps. Count the ${fillName(q)}: ${n}.`, [{ slot: 'count', value: String(n) }]),
+    ];
+}
+
+function fillWrong(q) {
+    const p = payloadOf(q);
+    const n = Number(p.count) || 0;
+    const sides = (p.target || []).length;
+    const c = [];
+    if (n > 2) c.push({ value: n - 1, slot: 'count', misconception: 'M-F1', explain: 'Left a gap: one block is missing.' });
+    c.push({ value: n + 1, slot: 'count', misconception: 'M-F2', explain: 'Two blocks overlap: one block too many.' });
+    if (sides && sides !== n) c.push({ value: sides, slot: 'count', misconception: 'M-F3', explain: 'Counted the sides of the shape, not the blocks inside it.' });
+    return chooseWrong(q, c);
+}
+
+const FILL_DEFS = {
+    compose_hexagon: { iCan: 'I Can fill a hexagon with pattern blocks' },
+    compose_rect_from_squares: { iCan: 'I Can fill a rectangle with squares' },
+};
+for (const [id, def] of Object.entries(FILL_DEFS)) {
+    registerSkill(`shapes_early:${id}`, {
+        strings: strings({
+            iCan: def.iCan, instructionKey: 'fill-blocks',
+            steps: ['Put one block in a corner.', 'Fill the shape with no gaps and no overlaps.', 'Count the blocks. Write how many.'],
+            say: '__ blocks fill the shape.',
+            sayValues: (q) => [payloadOf(q).count],
+        }),
+        misconceptions: ['M-F1', 'M-F2', 'M-F3'],
+        workedSteps: (q) => clampSteps(fillSteps(q)),
+        wrongAnswer: fillWrong,
+    });
+}
+export const GEO_FILL_SKILLS = Object.freeze(Object.keys(FILL_DEFS).map((id) => `shapes_early:${id}`));

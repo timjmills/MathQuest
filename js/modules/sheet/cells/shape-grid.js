@@ -36,6 +36,7 @@ import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import { L, P, B, INK, GREY, SW, PT_MM, n2, isTwin, sizeOf, S, textPt, box, checkBox, svg } from './k2kit.js';
 import { renderFigure, figureKey, figureInputs, figureFootprint } from './shape-figure.js';
+import { renderFill, fillKey, fillInputs, fillFootprint } from './shape-fill.js';
 
 export const COMPOSE_LETTERS = Object.freeze(['A', 'B', 'C', 'D']);
 
@@ -237,6 +238,7 @@ const root = (ctx, cls, inner) => `<div class="sg-cell ${cls}"${isTwin(ctx) ? ' 
 
 function keyOf(p) {
     if (p.kind === 'figure') return figureKey(p);
+    if (p.kind === 'fill') return fillKey(p);
     if (p.kind === 'compose' && p.task === 'pieces') {
         const v = COMPOSE_LETTERS[p.correct];
         return { value: v, display: v, slots: { choice: { value: v, graded: true } } };
@@ -250,17 +252,20 @@ register('shape-grid', {
     render(p, ctx) {
         if (p.kind === 'compose') return p.task === 'pieces' ? composePieces(p, ctx) : composeName(p, ctx);
         if (p.kind === 'figure') return renderFigure(p, ctx, root);
+        if (p.kind === 'fill') return renderFill(p, ctx, root);
         return root(ctx, 'sg-empty', '');
     },
     answerKey: keyOf,
     footprint(p, ctx) {
         if (p.kind === 'figure') return figureFootprint(p, ctx);
+        if (p.kind === 'fill') return fillFootprint(p, ctx);
         if (p.kind === 'compose' && p.task === 'pieces') return { wMm: 186, hMm: null, measure: true, factLike: false, maxCols: 1 };
         const col = NAME_COL[sizeOf(ctx)];
         return { wMm: col.wMm, hMm: null, measure: true, factLike: false, maxCols: col.maxCols };
     },
     inputs(p) {
         if (p.kind === 'figure') return figureInputs(p);
+        if (p.kind === 'fill') return fillInputs(p);
         if (p.kind === 'compose' && p.task === 'pieces') return [{ id: 'choice', kind: 'check', shape: 'check', graded: true, order: 0, scopes: ['full', 'answer-only', 'decision'] }];
         if (p.response === 'write') return [{ id: 'answer', kind: 'text', shape: 'box', graded: true, order: 0, inputmode: 'text', scopes: ['full', 'answer-only'] }];
         return [{ id: 'choice', kind: 'check', shape: 'check', graded: true, order: 0, scopes: ['full', 'answer-only', 'decision'] }];

@@ -2222,8 +2222,17 @@ Object.assign(P12_OPTIONS, {
             appliesTo: (o) => (o && o.compose) !== 'pieces' },
         levelSubset([3, 2, 1], 1, 'Level 3 checks or writes the answer in grey to trace; level 2 puts grey dots on the corners of the whole shape; level 1 is the pieces alone.'),
     ],
-    'shapes_early:compose_hexagon': [_p12Kinds('shapes', 'Blocks used', [['Triangles', '\\(triangles\\)'], ['Trapezoids', '\\(trapezoids\\)'], ['Rhombi', '\\(rhombi\\)']],
-        'Two trapezoids is the easiest fill; six triangles the most blocks to place.')],
+    // Build lane geometry (vis_migrate_shapes): read directly by gen-geometry.js (the kinds and their
+    // order are unchanged, so a share code written before decodes to the same blocks).
+    'shapes_early:compose_hexagon': [
+        { id: 'shapes', label: 'Blocks used', type: 'set', default: [0, 1, 2], group: 'difficulty',
+            values: [{ v: 0, l: 'Triangles' }, { v: 1, l: 'Trapezoids' }, { v: 2, l: 'Rhombi' }],
+            allLabel: 'All three, mixed',
+            help: 'Two trapezoids is the easiest fill; six triangles the most blocks to place.' },
+        levelSubset([3, 2, 1], 1, 'Level 3 draws the block lines in grey to trace; level 2 puts a grey dot at every corner where the lines meet; level 1 is the outline alone.')],
+    'shapes_early:compose_rect_from_squares': [
+        _p12Max([6], 12, { label: 'Squares up to', labels: { null: 'Up to 12' }, help: 'The most unit squares in the rectangle: up to 6 keeps to one or two short rows.' }),
+        levelSubset([3, 2, 1], 1, 'Level 3 draws the square lines in grey to trace; level 2 puts a grey dot at every corner where the lines meet; level 1 is the outline alone.')],
     'shapes_early:partition_shapes': [
         _p12Variants('partition_shapes', ['count_parts', 'fraction_shaded'], ['How many equal parts?', 'What fraction is shaded?']),
         _p12Kinds('parts', 'Equal parts', [['Halves', '=> (2|\\d/2)$'], ['Thirds', '=> (3|\\d/3)$'], ['Fourths', '=> (4|\\d/4)$']]),

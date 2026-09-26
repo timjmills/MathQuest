@@ -265,6 +265,22 @@ function PLAN(rootSel, which) {
         if (sub) tag(sub, { type: 'domclick' });
         return { plan, q: ans.join(', ') };
     }
+    // fill a shape with blocks (compose-shape-blocks): tap a block of each place's kind, then the
+    // place, as a pupil taps; then Submit
+    if (q.answerType === 'compose-shape-blocks') {
+        const snaps = Array.from(root.querySelectorAll('.csb-snap'));
+        const blocks = Array.from(root.querySelectorAll('.csb-tile'));
+        if (snaps.length && blocks.length) {
+            const used = new Set();
+            snaps.forEach(sn => {
+                const t = blocks.find(x => x.dataset.shape === sn.dataset.shape && !used.has(x));
+                if (t) { used.add(t); tag(t, { type: 'domclick' }); tag(sn, { type: 'evclick' }); }
+            });
+            const sub = root.querySelector('.csb-submit');
+            if (sub) tag(sub, { type: 'domclick' });
+            return { plan, q: String(ans) };
+        }
+    }
     return { error: `no answer control (${q.answerType})` };
 }
 

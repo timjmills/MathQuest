@@ -230,6 +230,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'composite-perimeter': 'Add all the sides. Write the perimeter.',
     'composite-area': 'Split the shape into rectangles. Write the area.',
     'triangle-area': 'Multiply the base by the height. Halve it. Write the area.',
+    'fill-blocks': 'Draw lines to fill the shape with the blocks. Write how many.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',

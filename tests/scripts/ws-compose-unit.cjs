@@ -219,7 +219,12 @@ const svgs = (html) => [...String(html).matchAll(/<svg\b[^>]*class="([^"]*)"[^>]
                 const div = document.createElement('div');
                 W.renderComposeShapeBlocks(q, div);
                 const shown = Array.from(div.querySelectorAll('.csb-snap-outline')).filter((el) => el.getAttribute('stroke') !== 'none').length;
-                out.push({ skill, opts, ans: q.ans, targetSvg: q.targetSvg, blocks, palette: q.palette, shown });
+                // the paper cell (shape-grid kind `fill`): pupil page and key at every size
+                const K = await import('/js/modules/sheet/index.js');
+                const paper = ['S', 'M', 'L'].map((size) => ({ size,
+                    pupil: K.renderCell(q, K.resolveCtx({ mode: 'print', size, look: 'ican', state: 'blank', scaffoldLevel: 1 })),
+                    key: K.renderCell(q, K.resolveCtx({ mode: 'print', size, look: 'ican', state: 'answered', scaffoldLevel: 1 })) }));
+                out.push({ skill, opts, ans: q.ans, targetSvg: q.targetSvg, blocks, palette: q.palette, shown, payload: q.cell && q.cell.payload, paper });
             }
         }
         return out;
@@ -349,6 +354,23 @@ const svgs = (html) => [...String(html).matchAll(/<svg\b[^>]*class="([^"]*)"[^>]
         const count = (f.palette || []).reduce((a, x) => a + (x.count || 0), 0);
         if (count !== f.blocks.length) fails.push(`${tag}: FILL the palette holds ${count} blocks for ${f.blocks.length} places`);
         if (f.shown) fails.push(`${tag}: FILL ${f.shown} empty places are drawn (they show how to fill the shape)`);
+        // PAPER: the kit cell's places are the widget's blocks; the pupil page draws none of them
+        const P = f.payload || {};
+        const PLAN = { 0: 'triangle', 1: 'trapezoid', 2: 'rhombus' };
+        if (P.kind !== 'fill') fails.push(`${tag}: PAPER no fill cell`);
+        else {
+            if (P.count !== f.blocks.length || f.ans !== f.blocks.length) fails.push(`${tag}: PAPER count ${P.count} / ans ${f.ans} for ${f.blocks.length} blocks`);
+            const areaU = P.places.reduce((a, pl) => a + polyArea(pl), 0);
+            if (Math.abs(areaU - polyArea(P.target)) > 0.005 * polyArea(P.target)) fails.push(`${tag}: PAPER places ${areaU.toFixed(2)} vs outline ${polyArea(P.target).toFixed(2)}`);
+            if (f.skill === 'compose_hexagon' && f.opts.shapes && P.block !== PLAN[f.opts.shapes[0]]) fails.push(`${tag}: PAPER "Blocks used" ${f.opts.shapes} dealt ${P.block}`);
+            for (const pg of f.paper) {
+                const inkPolys = (html) => (html.match(/<polygon[^>]*data-ws-ink="solid"/g) || []).length;
+                if (inkPolys(pg.pupil) || /data-ws-guide="trace"/.test(pg.pupil)) fails.push(`${tag} ${pg.size}: PAPER the pupil page draws the blocks (the answer)`);
+                if (inkPolys(pg.key) !== P.count) fails.push(`${tag} ${pg.size}: PAPER the key draws ${inkPolys(pg.key)} blocks for ${P.count}`);
+                if (!/data-ws-figure="1"/.test(pg.pupil)) fails.push(`${tag} ${pg.size}: PAPER the outline is not drawn`);
+                if (!/data-ws-slot="count"/.test(pg.pupil)) fails.push(`${tag} ${pg.size}: PAPER no count box`);
+            }
+        }
     }
     console.log(`ws-compose-unit: ${fillChecked} drag-to-fill items (compose_hexagon, compose_rect_from_squares)`);
 

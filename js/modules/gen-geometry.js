@@ -8,6 +8,7 @@ import { k2Twin, COMPOSE_LETTERS } from './sheet/index.js';
 import { geoOpt, geoBegin, geoDeal, geoLevel, areaUnitSquares, perimeterGrid, perimeterFigure, areaFigure,
     areaPerimeterFigure, compositeFigure, decomposeFigure, triangleFigure, storyFigure } from './gen-geo-kit.js';
 import { compositionsFor, dealComposition, decoyPieceSets, nameBank, namesFor, corners, transformShape } from './geo-compose.js';
+import { blockPoints } from './widgets/compose-shape-blocks.js';
 
 // O6 appearance (lane AP2): the "Figure labels" choice for the skill being generated — 'all',
 // 'some' or 'none' — or `dflt` when this skill has no such control (a mixed pool, a skill without
@@ -25,6 +26,27 @@ function _figLabels(dflt = 'all') {
 /* ============================================================ build lane geometry: shared */
 // The option reader, the page position and the Support-level fade live in gen-geo-kit.js.
 const _geoOpt = geoOpt, _geoBegin = geoBegin, _geoDeal = geoDeal, _geoLevel = geoLevel;
+
+
+/**
+ * The paper form of a fill-the-shape item (shape-grid kind `fill`): the outline and every block
+ * place in block units, from the same snap places the screen widget uses (the key's fill is
+ * exactly the widget's answer). `targetPx` is the outline in the widget's pixels.
+ */
+function _fillCell(q, { targetPx, shapeName, block, unit, fitW }) {
+    const lvl = _geoLevel(1);
+    const places = q.snapPoints.map((sp) => {
+        const t = (sp.rotation || 0) * Math.PI / 180, c = Math.cos(t), s = Math.sin(t);
+        return blockPoints(sp.shape, unit).map(([x, y]) => [+((sp.cx + x * c - y * s) / unit).toFixed(4), +((sp.cy + x * s + y * c) / unit).toFixed(4)]);
+    });
+    const payload = {
+        kind: 'fill', shapeName, block, target: targetPx.map(([x, y]) => [+(x / unit).toFixed(4), +(y / unit).toFixed(4)]),
+        places, count: places.length, hint: lvl >= 2, traced: lvl >= 3, fitW,
+    };
+    q.cell = { template: 'shape-grid', v: 1, payload };
+    q.ans = places.length;
+    q.printAnswer = String(places.length);
+}
 
 /* ============================================================ Combine Shapes (compose_shapes) */
 
@@ -1212,7 +1234,12 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     <polygon points="${hexPts.join(' ')}" fill="#fff" stroke="#37474f" stroke-width="3" stroke-linejoin="round"/>
                 </svg>`;
 
-                const plan = pick(['triangles', 'rhombi', 'trapezoids']);
+                // "Blocks used" (shapes, 5H): 0 triangles, 1 trapezoids, 2 rhombi, dealt by position
+                const _ticked = _geoOpt('shapes');
+                const _plans = ['triangles', 'trapezoids', 'rhombi'];
+                const _pool = (Array.isArray(_ticked) && _ticked.length ? _ticked : [0, 1, 2]).map(i => _plans[i]).filter(Boolean);
+                _geoBegin();
+                const plan = _pool[_geoDeal('hex-plan', _pool.length)] || 'trapezoids';
                 let snapPoints = [];
                 let palette = [];
                 const r3 = (v) => +v.toFixed(3);
@@ -1247,20 +1274,26 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.snapPoints = snapPoints;
                 q.palette = palette;
                 q.unit = unit;
-                q.ans = `Hexagon (${plan})`;
                 q.options = [];
                 q.hint = `Put a block in a corner of the hexagon first. The blocks must fill it with no gaps and no overlaps.`;
                 q.skillLabel = 'Compose Hexagon';
                 q.printFormat = 'compose-shape-blocks';
-                q.visual = `<div style="text-align:center;font-weight:600;color:#1565c0;">Target: Hexagon</div>`;
+                q.visual = '';
+                // paper: draw the lines that split the hexagon into the blocks, write how many
+                _fillCell(q, { targetPx: [0, 1, 2, 3, 4, 5].map(V), shapeName: 'hexagon', block: palette[0].shape, unit, fitW: 8 });
                 return;
             }
 
             if (mappedSkill === "compose_rect_from_squares") {
-                // Compose a 2x3 rectangle from 6 unit squares.
+                // Compose a rectangle from unit squares: 1 to 3 rows of 2 to 4 (it was always 2 x 3).
+                // "Squares up to" (band) bounds how many.
+                _geoBegin();
                 const unit = 28;
                 const cellSize = unit * 2;
-                const cols = 3, rows = 2;
+                const _band = Number(_geoOpt('band')) || 12;
+                let cols = 3, rows = 2;
+                for (let t = 0; t < 30; t++) { cols = randInt(2, 4); rows = randInt(1, 3); if (rows * cols <= _band) break; }
+                if (rows * cols > _band) { cols = 2; rows = 1; }
                 const totalW = cellSize * cols;
                 const totalH = cellSize * rows;
                 const offsetX = (340 - totalW) / 2;
@@ -1287,14 +1320,15 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.answerType = "compose-shape-blocks";
                 q.targetSvg = targetSvg;
                 q.snapPoints = snapPoints;
-                q.palette = [{ shape: 'square', count: 6 }];
+                q.palette = [{ shape: 'square', count: rows * cols }];
                 q.unit = unit;
-                q.ans = `2 × 3 rectangle`;
                 q.options = [];
-                q.hint = `A 2 × 3 rectangle holds 2 rows × 3 columns = 6 unit squares.`;
+                q.hint = `Start in a corner. Fill a row, then the next row. No gaps and no overlaps.`;
                 q.skillLabel = 'Compose Rectangle';
                 q.printFormat = 'compose-shape-blocks';
-                q.visual = `<div style="text-align:center;font-weight:600;color:#1565c0;">Target: 2 × 3 rectangle</div>`;
+                q.visual = '';
+                _fillCell(q, { targetPx: [[offsetX, offsetY], [offsetX + totalW, offsetY], [offsetX + totalW, offsetY + totalH], [offsetX, offsetY + totalH]],
+                    shapeName: 'rectangle', block: 'square', unit, fitW: 2 + 8 });
                 return;
             }
 
