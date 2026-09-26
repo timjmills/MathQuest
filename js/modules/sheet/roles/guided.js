@@ -80,7 +80,9 @@ export const PROBE = 48;
 export const ROLE_ID = 'guided';
 // 12.1: a Guided page holds 8 / 6 / 3-6 (S / M / L). The continuation page (below) is what gives a
 // sheet of tall cells its Model and three tries.
-const CEILING = { S: 8, M: 6, L: 6 };
+// pv-r1 critic: a Guided page of short problems at S left a 20-26% strip under 6 tries ("8-10
+// at S"); 12.1 now allows 10 / 8 / 6 (tall problems stop sooner by height).
+const CEILING = { S: 10, M: 8, L: 6 };
 const AUTO_COLS = { S: 4, M: 3, L: 3 };
 
 export const sources = (skills) => [{ id: 'main', skills }];
@@ -101,8 +103,11 @@ const MAX_PAGES = 3;
 /** The kind of problem an item is: its template, the template's own variant (pv 'chart') ... */
 const kindOf = (it) => {
     const p = (it && it.q && it.q.cell && it.q.cell.payload) || {};
-    // ...and its provider's steps: one payload kind can carry two sub-skills of a mixed pool.
-    return `${(it && it.template) || ''}:${p.kind || ''}:${generalStepsOf(it).join('|')}`;
+    // ...and the steps its provider writes for THIS question: one payload kind can carry two
+    // sub-skills of a mixed pool, or two question kinds ("How many?" / "How many more?") whose
+    // steps differ (L6, figures-r6: one step list printed over every question kind).
+    const own = splitSteps(stringsOf(it).steps);
+    return `${(it && it.template) || ''}:${p.kind || ''}:${(own.length ? own : generalStepsOf(it)).join('|')}`;
 };
 
 export function pageSet(items0, ctx, kind = null, input = null, fixedCols = 0) {
@@ -139,8 +144,14 @@ export function pageSet(items0, ctx, kind = null, input = null, fixedCols = 0) {
     // the most; a tie keeps the wider grid.
     if (input) {
         let bestN = -1, bestC = cols;
+        // RUBRIC H13 across the cell: a static-width problem (a stack) centred in a column so wide
+        // that each side band is 30% or more is not a candidate while a narrower grid avoids it.
+        const ws = use.map((it) => it.footprint || {}).filter((fp) => !fp.measure && !fp.factLike && Number.isFinite(fp.wMm)).map((fp) => fp.wMm);
+        const side = (c) => (ws.length === use.length && ws.length ? (1 - Math.max(...ws) / (186 / c)) / 2 : 0);
+        const fitting = options.filter((x) => x <= cols && (x > 1 || cols === 1) && fitsAt(use, x, ctx));
+        const calm = fitting.filter((c) => side(c) < 0.28);
         // Never down to one full-width column when two fit (a compare row alone in a 186 mm cell).
-        for (const c of options.filter((x) => x <= cols && (x > 1 || cols === 1) && fitsAt(use, x, ctx))) {
+        for (const c of (calm.length ? calm : fitting)) {
             const f = sheetFit(ordered(use, c), c, ctx, input, use.length < items0.length ? use.length : Infinity);
             const n = Math.min(f.pages[0].cap, f.total);
             if (n > bestN) { bestN = n; bestC = c; }
@@ -292,8 +303,11 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false } = {
     // BD-7: the first tries carry a grey hint line (hintOf); their row is that much taller.
     // Its height is the longest hint's wrapped lines at this column width (a clock's two-sentence
     // hint wraps to two lines in a third of the page), plus the line's top margin.
-    const hints = noHint ? [] : items.slice(1, partialEndOf(cols, span)).map((x) => hintOf(x)).filter(Boolean);
-    const hint = hints.length ? Math.max(HINT_MM, ...hints.map((t) => workLinesMm([t], cols, m) - 4 + 2)) : 0;
+    // Every cell of that row carries one, or none does: a row where one try has no hint of its
+    // own would leave that cell a hint-line's height of empty band (H13).
+    const partial = items.slice(1, partialEndOf(cols, span));
+    const hints = noHint ? [] : partial.map((x) => hintOf(x));
+    const hint = hints.length && hints.every(Boolean) ? Math.max(HINT_MM, ...hints.map((t) => workLinesMm([t], cols, m) - 4 + 2)) : 0;
     const h = h0 + extra;
     const rows = Math.max(1, Math.min(Math.floor(CEILING[ctx.size] / cols), Math.floor(avail / Math.max(1, h))));
     return { rows, h, h0, avail, stepsH, steps, frame, m, span, hint };
@@ -408,10 +422,16 @@ const HINT_MM = 8;
 export function hintOf(it) {
     if (!it || it.template === 'stack' || countCueOf(it) || thinkCueOf(it)) return '';
     const ans = String(answerOf(it) === null || answerOf(it) === undefined ? '' : (typeof answerOf(it) === 'object' ? (answerOf(it).display || answerOf(it).value || '') : answerOf(it))).trim();
-    const tokens = ans ? ans.split(/[\s,]+/).filter((t) => /\d/.test(t)) : [];
+    const tokens = ans ? ans.split(/[\s,]+/).filter((t) => /\d/.test(t) || t.length > 1) : [];
+    // A step is THIS problem's when it carries its numbers or names something the problem shows
+    // (figures-r6: "Find the Birds bar." - a graph's first step has no digit, and the hint was
+    // missing from every try, so nothing faded from the Model).
+    const q = it.q || {};
+    const src = `${q.text || ''} ${JSON.stringify((q.cell && q.cell.payload) || {})}`;
+    const own = (t) => /\d/.test(t) || (t.match(/\b[A-Z][a-z]{2,}\b/g) || []).slice(1).some((w) => src.includes(w));
     for (const st of providerWorkedSteps(it, 6)) {
         const t = String(st.text || '').trim();
-        if (!/\d/.test(t) || /^(Write|Check|Say)\b/i.test(t) || t.length > 60) continue;
+        if (!own(t) || /^(Write|Check|Say)\b/i.test(t) || t.length > 60) continue;
         const words = t.replace(/[.,:;!?]/g, ' ').split(/\s+/);
         if (tokens.some((a) => words.includes(a))) continue;
         return t;

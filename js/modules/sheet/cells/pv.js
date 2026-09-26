@@ -150,7 +150,7 @@ export function numeralTracksHTML(n, { underline = 0, cut = 0, arrow = false, si
     const cutAt = (c) => cut && c.place === cut;
     const td = (inner, style = '') => `<td style="padding:0;text-align:center;${style}">${inner}</td>`;
     const heads = cols.map(c => c.comma ? td('', 'width:0.3em;')
-        : td(LETTER[c.place] || '', `width:2.2em;font-size:0.42em;line-height:1.6;font-weight:${cutAt(c) ? 700 : 400};`
+        : td(LETTER[c.place] || '', `width:2.2em;font-size:max(0.42em, 8pt);line-height:1.6;font-weight:${cutAt(c) ? 700 : 400};`
             + (cutAt(c) ? `border-right:${cutPt}pt solid #000;` : ''))).join('');
     const digits = cols.map(c => c.comma ? td(',', 'width:0.3em;')
         : td(c.place === underline
