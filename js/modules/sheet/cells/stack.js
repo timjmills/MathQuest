@@ -235,7 +235,7 @@ export function regroupWorking(p, t) {
 }
 
 /** A regroup box's written digits (a key, or a worked step): small, centred in the box. */
-const regroupInk = (value, ink = 'solid') => `<i style="display:flex;align-items:center;justify-content:center;font-size:0.62em;line-height:1"><span class="${ink === 'trace' ? 'ws-trace' : ''}" data-ws-ink="${ink}">${esc(value)}</span></i>`;
+const regroupInk = (value, ink = 'solid') => `<i style="display:flex;align-items:center;justify-content:center;font-size:0.62em;line-height:1"><span class="${ink === 'trace' ? 'ws-trace ' : ''}mq-rgink" data-ws-ink="${ink}">${esc(value)}</span></i>`;
 
 /**
  * Lessons r1 (step 5 "Check: add back" given room): `p.check` puts a Check line under a
@@ -323,12 +323,20 @@ register('stack', {
         }
         // AK-2 over VA-13 on a key (owner, 2026-09-25): an answered print cell writes the whole
         // working into the regroup / carry boxes and crosses out the regrouped top digits.
+        // The Guided Model (state `traced`) writes the same working in trace grey: the cross-out
+        // and the new numbers are the step its Steps band names (critic guided-r1, sub_100_regroup:
+        // "Yes: regroup a ten. Cross out." over a Model with no cross-out).
         let strikes = null;
-        if (regroup && !screen && ctx.state === 'answered') {
+        if (regroup && !screen && (ctx.state === 'answered' || ctx.state === 'traced')) {
+            const wInk = ctx.state === 'traced' ? 'trace' : 'solid';
+            // `workUpTo` (a role's payload variant): the working of the columns up to that one only,
+            // counted from the ones (1 = the first regroup: the ten carried or borrowed at the ones).
+            const upTo = Number.isInteger(p.workUpTo) ? p.workUpTo : Infinity;
+            const near = (i) => t - 1 - i <= upTo;
             const w = regroupWorking(p, t);
             const on = regroupTracks(regroup, t, String(Array.isArray(a) ? a[0] : a).length);
-            regroupSlots = Array.from({ length: t }, (_, i) => (on.includes(i) && w.vals[i] ? regroupInk(w.vals[i]) : '<i></i>'));
-            if (regroup === 'sub' && w.strikes.length) strikes = w.strikes.map((x) => (x ? 'solid' : null));
+            regroupSlots = Array.from({ length: t }, (_, i) => (on.includes(i) && w.vals[i] && near(i) ? regroupInk(w.vals[i], wInk) : '<i></i>'));
+            if (regroup === 'sub' && w.strikes.length) strikes = w.strikes.map((x, i) => (x && near(i) ? wInk : null));
         }
         const tm = touchMode(p);
         const rowsTd = tm ? touchColumns([...(Array.isArray(a) ? a : [a]), b], t, p.op, tm) : null;

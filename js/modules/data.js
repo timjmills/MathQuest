@@ -28,7 +28,7 @@ export const SKILL_GRADES = {
     'number_bonds': 'K', 'make_ten': 'K', 'teen_compose': 'K',
     // Phase 5 batch 1: K-2 MAP early-band skills
     'add_5_pictures': 'K', 'sub_5_pictures': 'K',
-    'heavier_lighter_visual': 'K', 'pictograph_intro': 'K',
+    'heavier_lighter_visual': 'K', 'pictograph_intro': 1,
     'tens_foundation_visual': 'K', 'bar_graph_intro': 'K', 'shape_corners_count': 'K',
     // PDF gap-fill: drag-build manipulatives (ten frame + base-10 blocks)
     'ten_frame_build': 'K', 'ten_frame_build_teen': 'K',

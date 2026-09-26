@@ -167,6 +167,81 @@ then come back."
   more than 4 questions, or points at an unknown lesson; a prerequisite graph with no cycles (a lesson may not require
   itself through a chain). The coverage record lists lessons blocked only by a missing prerequisite lesson.
 
+## 8c. Owner ruling: merge the stand-alone page types into the lesson designs (2026-09-26)
+
+The stand-alone worksheet page types kept failing the critic for almost every skill (Guided 24/105, Find the mistake
+3/27 skills, Review and Worked example half-empty), while the lesson packet's pages passed 48/48. Owner: "merge these
+types". One design per page job, used by both the lesson packet and the Print screen:
+
+| Print-screen page type | Becomes | Source in the lesson packet |
+|---|---|---|
+| Worked example (scripted Model) | the **anchor chart** for the skill (steps, icons, Say, rule, other examples) | `chartPage` |
+| Guided | the **We Do** band: worked example + tries with fading grey hints and the chart's steps, one page | lesson sheet guided band |
+| Warm-up / pre-skill check | the **Prerequisite Check** (§8b) | lesson sheet warm-up |
+| Independent / More practice | the lesson **practice** page (one frame, rows sized to content, min-size floors §8a) | practice page |
+| Review / Mixed practice | the lesson **mixed** page (earlier skills only, lesson skill ≥ half) | mixed page |
+| Test, Reason it, Stretch | keep their jobs, but reuse the practice-page frame and row sizing | — |
+| Find the mistake (error analysis) | **dropped from lessons and from the pass bar** (owner ruling 2026-09-26, §8d) | — |
+
+Build order: the engine lane (E) extracts the lesson page builders into shared, archetype-driven modules
+(`sheet/lesson-pages/*`) during Phase 0 (samples byte-identical). The role lane then turns `roles/guided.js`,
+`roles/scripted-model.js`, `roles/review.js` (and the practice frame used by the others) into thin adapters that call
+those builders for ANY skill, falling back to the old role only for skills whose archetype is not built yet. Providers
+supply the data both need (worked steps, cases, row-1 hint / level-2 cue, prerequisites). Each switched skill is
+re-graded by the critic; the old page stays until its replacement passes.
+
+## 8d. Owner ruling: no Find-the-mistake worksheets going forward (2026-09-26)
+
+"Let's forgo the find the error type for future lessons" — clarified: "for future worksheets". The error-analysis
+("Find the mistake") page type is **retired for new worksheets**: it is not part of any lesson packet or the lesson
+library, it is **removed from the page types a teacher can choose on the Print screen**, and it is **no longer part of
+the 8/10 pass bar** (critics do not grade it; a skill passes without it). Saved and shared printouts that already use it
+keep printing (share codes and saved sets are never broken); no further work is done on it except keeping the
+answer-giveaway fixes already made.
+
+**Paused, not deleted (owner, 2026-09-26): "we might bring these back later once everything is built."** Keep the role
+code, its providers' `wrongAnswer` data, its share-code entries and its critic history intact so it can be revived.
+Revival is a later-wave item (recorded in `design/LESSONS_VISION.md` → Later), after the lesson library and skills pass; it would be
+rebuilt on the lesson practice frame (§8c) and re-graded before it returns to the Print screen.
+
+## 8e. Owner ruling: three kinds of paper — Practice, Quiz, Lesson (2026-09-26)
+
+"All of these practice, mixed review can be options within the one page, and fact rows/probes deal with the columns. The
+thinking pages we will leave for later, do not use them. And the lesson, prerequisite check, worked example, guided are
+all part of the lesson — so we then have three types of papers: practice, quiz, and lesson."
+
+This supersedes the 17-card page-type menu (and the stand-alone mapping in §8c, whose engine plan still holds):
+
+| Paper | Absorbs | Options on the one paper |
+|---|---|---|
+| **Practice** | Independent, More Practice (A, B, C…), Mixed practice, Review, Fact rows, Fact probe | skills: one or more (one skill → "I Can" title, §Daily look); **versions** (1 or A, B, C… new numbers); **mix of skills by weight** — every skill in the set carries its own **weight** option (its share of the items, e.g. 3 : 1 : 1), set in that skill's options; no fixed cap (owner, 2026-09-26). **"Mix in prerequisite skills"** (owner, 2026-09-26): an option that lists ALL of the skill's prerequisite skills (from the lesson library's prerequisite graph, `prerequisiteSkillsFor(skill)`; for a skill without a lesson, the skills of the WRM steps before it and its CCSS progression) as choices — none ticked by default; each one the teacher ticks joins the set with its own weight; **fact columns** (auto, or 5–10 across — the old Fact rows); **timed check** (the old Fact probe: minutes + score line); size S / M / L (min-size floors §8a). Word problems are **skills, not a paper type** (owner): a word-problem skill on a Practice or Quiz paper gets its story-with-work layout automatically. Built on the lesson practice and mixed page designs. |
+| **Quiz** | Test A / Test B | **the Practice paper engine with scoring and tagging on** (owner): build by CCSS domain, CCSS standard / part, EE, WRM unit / step, lesson, or skills; every question tagged to its standards (tags on the key only); score per question, custom score per question or per question type; a per-standard breakdown on the key; versions A, B…; size. Details: `design/TEACHER_SCREENS.md` → Make quiz. The on-screen Quiz Builder is separate and unchanged. |
+| **Lesson** | Lesson packet, Prerequisite check, Worked example (anchor chart), Guided (We Do), Lesson opener, Pre-skill check | **parts** to print (default all: Prerequisite Check, anchor chart, lesson sheet with We Do, practice, mixed); one size (§8a). The stand-alone Guided / Worked example / Prerequisite pages exist only as parts of a lesson. **Every lesson must HAVE all parts** (a lesson missing a part is incomplete and fails `ws-lesson-coverage`); the teacher **selects which parts to print**, and can **refresh any part with new numbers** — each part (and the chart's worked examples) has its own seed, so refreshing one part re-deals it without changing the others, and the key follows. |
+
+- **Paused for later (hidden, code kept, like §8d):** True or False?, Reason It, Stretch, and Find the mistake. Their
+  provider data (`open(q)`, `wrongAnswer`, reason prompts) is kept; no new work goes into them now.
+- **Saved sets and share codes are never broken:** every old role id decodes to its new paper + options
+  (`independent`/`more-practice`/`mixed-practice`/`review`/`fact-rows`/`fact-probe` → Practice; `word-problems` → Practice with those skills;
+  `test`/`test-b` → Quiz versions; `lesson`/`opener`/`pre-skill-check`/`scripted-model`/`guided` → Lesson with the
+  matching part). Paused roles still print from old saved sets.
+- **The 8/10 pass bar now covers:** Practice (single skill and mixed, at S and L, with its key), Quiz (with its key),
+  the Lesson where the skill has one, the three screen hosts (practice card, online worksheet, quiz) and the option panel.
+  Stand-alone Guided, Worked example, Review, Opener, Pre-skill check and the thinking pages are no longer graded as
+  separate pages.
+- **Build:** (1) the Print screen shows three paper cards with their options, and the old ids map across — one lane, in
+  `teacher-print.js` + `print-sheet.js` request normalising; (2) Practice and Quiz are rebuilt on the lesson practice /
+  mixed builders when the engine lane extracts them (§8c); until then they route to today's roles with these options;
+  (3) the Lesson paper gains the "parts" option.
+
+## 8f. Owner ruling: worked examples on Practice papers — one example on top only (2026-09-26)
+
+Practice keeps a **"Worked example"** option in ONE form only: a single worked example at the **top of each skill's
+block** (the old "sections" layout). The side-by-side pair form is **dropped** (it caused most one-problem-per-page
+failures). The example uses **different numbers from every problem on the page** (never a problem's own numbers or its
+answers), is **easy-first but shows the skill's real move** (no trivial single-coin or 1:03 examples), is drawn **the same
+way as the problems**, prints its steps at ≥ 11 pt at every size, and the block fills with problems under it. Critic
+anchor-r1 defects (commit 7146df5 on `critic-anchor-r1`) are the fix list.
+
 ## 9. Risks
 
 Engine regressions invalidating passed lessons (single engine owner, render-hash stamps → `stale`); ≈ 359 steps blocked

@@ -191,6 +191,44 @@ registerSkill('addition:add', {
     stories: storiesFor('+'),
 });
 
+/* ========================================================== the column-addition ladder */
+// add_{50,100,1k,10k,100k}_{no_regroup,regroup,mixed} (PEDAGOGY_STANDARD L-3): the standard
+// algorithm, ones first, a ten regrouped into the next place when a column makes 10 or more.
+// Round-4 re-grade: the ladder had no provider, so its Guided page printed no Steps band and its
+// Model no worked steps; these are THIS skill's steps (never the count-on fact's).
+const PLACES_BY_BAND = { 50: 2, 100: 2, '1k': 3, '10k': 4, '100k': 5 };
+const PLACE_TITLE = ['ones', 'tens', 'hundreds', 'thousands', 'ten thousands'];
+const columnAddSteps = (places, regroups) => {
+    const out = ['Add the ones.'];
+    if (regroups) out.push('10 or more? Write the ones. Regroup the ten into the box above the tens.');
+    const next = PLACE_TITLE.slice(1, places);
+    if (next.length <= 2) next.forEach((pl) => out.push(`Add the ${pl}${regroups ? ', and any regrouped number' : ''}.`));
+    else out.push(`Add each place in turn: ${next.join(', ')}${regroups ? ', with any regrouped number' : ''}.`);
+    out.push('Check: the sum is bigger than each number.');
+    return out.slice(0, 6);
+};
+for (const [band, places] of Object.entries(PLACES_BY_BAND)) {
+    const within = band === '1k' ? '1,000' : band === '10k' ? '10,000' : band === '100k' ? '100,000' : band;
+    for (const [kind, tag] of [['no_regroup', ' (no regrouping)'], ['regroup', ' (with regrouping)'], ['mixed', '']]) {
+        registerSkill(`addition:add_${band}_${kind}`, {
+            strings: strings({
+                iCan: `I Can add within ${within}${tag}`,
+                instructionKey: 'add',
+                steps: columnAddSteps(places, kind !== 'no_regroup'),
+                say: '__ plus __ equals __.',
+            }),
+            misconceptions: ['forgot-regroup', 'whole-column-total', 'misaligned', 'subtracted'],
+            workedSteps: (q) => {
+                const ops = operands(q);
+                if (ops.length < 2 || !ops.every((n) => Number.isInteger(n) && n >= 0)) return [];
+                const col = columnAdd(ops.slice(0, 2));
+                return clampSteps(col.steps.concat(step(`The sum is ${fmt(col.sum)}.`, [{ slot: 'answer', value: String(col.sum) }])));
+            },
+            wrongAnswer: (q) => { const ops = operands(q); return ops.length >= 2 ? columnWrong(q, ops.slice(0, 2)) : null; },
+        });
+    }
+}
+
 /* ===================================================================== add_column_multi */
 
 const multiAddends = (q) => {
@@ -340,21 +378,22 @@ registerSkill('addition:cloze_addition', {
 /* ======================================================================= number lines */
 
 /** Worked jumps on a number line, one jump per one (b <= 10) or tens then ones. */
-export function lineSteps(a, b, dir) {
+export function lineSteps(a, b, dir, { verb = 'Jump', noun = 'jumps' } = {}) {
     const end = a + dir * b;
     const side = dir > 0 ? 'right' : 'left';
-    const out = [step(`Put a dot on ${a}. That is the start.`, [{ slot: 'start', value: String(a) }])];
+    // Round-4 re-grade: the start dot is printed on the line, so the worked step finds it.
+    const out = [step(`Start at ${a}, the dot.`, [{ slot: 'start', value: String(a) }])];
     if (b <= 10) {
         const marks = [];
         for (let k = 1; k <= b; k++) marks.push({ slot: `jump:${k}`, value: `${a + dir * (k - 1)}-${a + dir * k}` });
-        out.push(step(`Jump ${b} ${b === 1 ? 'space' : 'spaces'} to the ${side}.`, marks));
-        out.push(step(`Count the jumps: ${countList(1, b)}.`));
+        out.push(step(`${verb} ${b} ${b === 1 ? 'space' : 'spaces'} to the ${side}.`, marks));
+        out.push(step(`Count the ${noun}: ${countList(1, b)}.`));
     } else {
         const tens = Math.floor(b / 10);
         const ones = b % 10;
         const mid = a + dir * tens * 10;
-        out.push(step(`Jump ${tens} ${tens === 1 ? 'ten' : 'tens'} to the ${side}: ${a} to ${mid}.`, [{ slot: 'jump:10s', value: `${a}-${mid}` }]));
-        if (ones) out.push(step(`Jump ${ones} ${ones === 1 ? 'one' : 'ones'}: ${mid} to ${end}.`, [{ slot: 'jump:1s', value: `${mid}-${end}` }]));
+        out.push(step(`${verb} ${tens} ${tens === 1 ? 'ten' : 'tens'} to the ${side}: ${a} to ${mid}.`, [{ slot: 'jump:10s', value: `${a}-${mid}` }]));
+        if (ones) out.push(step(`${verb} ${ones} ${ones === 1 ? 'one' : 'ones'}: ${mid} to ${end}.`, [{ slot: 'jump:1s', value: `${mid}-${end}` }]));
     }
     out.push(step(`You land on ${end}. Write ${end}.`, [{ slot: 'answer', value: String(end) }]));
     return clampSteps(out);
@@ -365,7 +404,7 @@ registerSkill('addition:number_line_add', {
         iCan: 'I Can add by jumping on a number line',
         instructionKey: 'line-jumps',
         steps: [
-            'Put a dot on the first number.',
+            'Find the dot. It is the first number.',
             'Jump to the right, one jump for each one you add.',
             'Write the number you land on.',
         ],
