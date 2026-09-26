@@ -509,7 +509,7 @@ export function printQuizTest(quiz, options = {}) {
     </div>`;
     // Owner ruling 2026-09-26: the copyright line on every printed paper, on every page.
     const copyLine = `\u00A9 ${new Date().getFullYear()} Cultivating the Digital. All rights reserved.`;
-    html += `<style>@page { @bottom-center { content: "${copyLine}"; font-size: 8pt; color: #000; } }
+    html += `<style>@page { margin: 12mm 10mm; @bottom-center { content: "${copyLine}"; font-family: 'Andika', sans-serif; font-size: 8pt; color: #000; } }
         .mq-copy { margin-top: 24px; text-align: center; font-size: 8pt; color: #000; }</style>
         <div class="mq-copy">${copyLine}</div>`;
     html += '</body></html>';
