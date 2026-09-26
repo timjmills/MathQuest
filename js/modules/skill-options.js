@@ -3221,8 +3221,8 @@ const K2_LANE_OPTIONS = {
         {
             id: 'dir', label: 'Start from', type: 'enum', default: 'forward', group: 'difficulty',
             values: [{ v: 'forward', l: '0 (0 and 5, 1 and 4 ...) (default)' }, { v: 'back', l: 'The whole (5 and 0, 4 and 1 ...)' },
-                { v: 'mixed', l: 'Either (one start for each page)' }],
-            help: 'Where the list starts. Every table on a page starts at the same end, so the steps are true of all of them.',
+                { v: 'mixed', l: 'Both, mixed on the page (each table shows where it starts)' }],
+            help: 'Where the list starts: 0 first, the whole first, or both mixed on the page. With one start the page\'s steps name the direction; mixed, they tell the pupil to read which way each table goes.',
         },
         {
             id: 'task', label: 'Task', type: 'enum', default: 'fill', group: 'difficulty',

@@ -1250,14 +1250,16 @@ const BONDS_DEFS = {
     fill: {
         iCan: BONDS_ICAN, instructionKey: 'fill-bonds',
         steps: ['Start with 0 and the whole.', 'The first part goes up by 1.', 'The second part goes down by 1.', 'Check: the two parts make the whole.'],
-        stepsFor: (q) => (bondsDown(q) ? ['Start with the whole and 0.', 'The first part goes down by 1.', 'The second part goes up by 1.', 'Check: the two parts make the whole.'] : null),
+        stepsFor: (q) => (payloadOf(q).mixedDir ? ['Read the first row.', 'One part goes up by 1. The other goes down by 1.', 'Keep going to the last row.', 'Check: the two parts make the whole.']
+            : bondsDown(q) ? ['Start with the whole and 0.', 'The first part goes down by 1.', 'The second part goes up by 1.', 'Check: the two parts make the whole.'] : null),
         say: '__ is __ and __.',
         sayValues: (q) => { const p = payloadOf(q); const r = (p.rows || [])[1]; return r ? [p.n, r.a, r.b] : null; },
     },
     missing: {
         iCan: BONDS_ICAN, instructionKey: 'missing-bonds',
         steps: ['Read the row before the gap.', 'The first part is 1 more.', 'The second part is 1 less.', 'Write both parts.'],
-        stepsFor: (q) => (bondsDown(q) ? ['Read the row before the gap.', 'The first part is 1 less.', 'The second part is 1 more.', 'Write both parts.'] : null),
+        stepsFor: (q) => (payloadOf(q).mixedDir ? ['Read the row before the gap.', 'Does the first part go up or down?', 'One part is 1 more. The other is 1 less.', 'Write both parts.']
+            : bondsDown(q) ? ['Read the row before the gap.', 'The first part is 1 less.', 'The second part is 1 more.', 'Write both parts.'] : null),
         say: '__ is __ and __.',
         sayValues: (q) => { const p = payloadOf(q); const r = (p.rows || []).find((x) => x.hide === 'both'); return r ? [p.n, r.a, r.b] : null; },
     },

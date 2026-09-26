@@ -11,7 +11,7 @@ import {
     buildRetryMessage,
 } from './widget-retry.js';
 import {
-    cellKindFor, kindHTML, instructionForKind, screenSupportsFor, screenSupportExtrasHTML,
+    cellKindFor, kindHTML, instructionForKind, screenSupportsFor, screenSupportExtrasHTML, k2TwinSupportsHTML,
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
     regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
     clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget, isNumberLineItem, NUMBER_LINE_INSTRUCTION,
@@ -1529,6 +1529,12 @@ function _applyScreenCell() {
         }
     } else {
         paper.classList.add('mq-kind-legacy');
+        // S2: a K count twin carries its ticked counting checklist beside it (render time only)
+        if (visualAid) {
+            const k2s = _k2TwinSupportsHTML(q);
+            const t = k2s ? visualAid.querySelector('.k2-twin') : null;
+            if (t) t.outerHTML = k2s;
+        }
         _applyCardTwin(q, paper, visualAid, qt);
         if (visualAid && visualAid.style.display !== 'none') hideScreenOnlyCaptions(visualAid);
         // S2: a legacy-drawn fact still carries its ticked cues, tally row and extras under its visual.
@@ -7343,6 +7349,15 @@ function _supportsOf(q, kind) {
         return screenSupportsFor(q, kind, { index, total: state.problemCount > 0 ? state.problemCount : 20,
             categoryId: state.category, skillId: state.skill, options: state.skillOptions || (state.skillOptionsBySkill || {})[`${state.category}:${state.skill}`] || null });
     } catch (e) { return null; }
+}
+
+/** S2: a K count twin with its checklist (screen-cell.js k2TwinSupportsHTML), or ''. */
+function _k2TwinSupportsHTML(q) {
+    try {
+        const index = Array.isArray(state.questionHistory) ? state.questionHistory.length : 0;
+        return k2TwinSupportsHTML(q, { index, total: state.problemCount > 0 ? state.problemCount : 20,
+            categoryId: state.category, skillId: state.skill, options: state.skillOptions || (state.skillOptionsBySkill || {})[`${state.category}:${state.skill}`] || null });
+    } catch (e) { return ''; }
 }
 
 /** S2: the supports of a practice item the kit does not redraw (screen-cell.js screenSupportExtrasHTML). */

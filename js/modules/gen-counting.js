@@ -280,12 +280,7 @@ function _kPair(rng, lo, hi, gapLo, gapHi) {
 // hosts draw that same template's twin (`q.visual`), so paper, key and screen are one drawing.
 function _kSetCell(q, template, payload) {
     q.cell = { template, v: 1, payload };
-    // critic k2-r1 ("the counting checklist is on paper only"): a ticked checklist support is
-    // drawn beside the SCREEN twin too. Paper gets it from the page's support plan
-    // (print-sheet.js), so it is added to the twin's payload only, never to q.cell.
-    const sup = template === 'counters' ? _kOpt('support') : null;
-    const steps = Array.isArray(sup) && sup.includes('steps') && (payload.kind || 'count') === 'count';
-    q.visual = k2Twin(template, steps ? Object.assign({}, payload, { supports: { on: ['steps'], reserve: [] } }) : payload);
+    q.visual = k2Twin(template, payload);
 }
 
 /** The plain counters of the count cells (one SVG primitive each, RP-20 plain set). */
@@ -2134,9 +2129,9 @@ function _k2BondsInOrder(q, rng) {
     const n = band === 5 ? 2 + _kDealShuffled(4) : 5 + _kDealShuffled(6);
     const notation = _kOpt('notation') === 'across' ? 'across' : 'table';
     // Start from (dir): 0 (forward, default) or the whole (back), ONE direction for the whole page
-    // (so the Steps strip is true of every table); "either" holds a direction per page
+    // (so the Steps strip is true of every table); mixed deals each table's own (neutral steps)
     const dir = ['forward', 'back', 'mixed'].includes(_kOpt('dir')) ? _kOpt('dir') : 'forward';
-    const down = dir === 'back' || (dir === 'mixed' && _kPageDeal('bonds-dir', 2) === 1);
+    const down = dir === 'back' || (dir === 'mixed' && _kDraw('bonds-dir', 2) === 1);
     const rows = Array.from({ length: n + 1 }, (_, i) => { const a = down ? n - i : i; return { a, b: n - a, hide: null }; });
     const given = lvl >= 2 ? 2 : 0;
     if (task === 'fill') rows.forEach((r, i) => { if (i >= given) r.hide = 'b'; });
@@ -2145,7 +2140,7 @@ function _k2BondsInOrder(q, rng) {
         const pool = shuffle(Array.from({ length: n + 1 - given }, (_, i) => i + given));
         pool.slice(0, k).forEach((i) => { rows[i].hide = 'both'; });
     }
-    const payload = { kind: 'table', task, n, rows, notation, dots: lvl >= 3 };
+    const payload = { kind: 'table', task, n, rows, notation, dots: lvl >= 3, ...(dir === 'mixed' ? { mixedDir: true } : {}) };
     q.openWhole = n;   // the Stretch page: two numbers add to n, find different pairs
     q.options = [];
     q.selfAnswering = true;

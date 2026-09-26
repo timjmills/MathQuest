@@ -27,7 +27,7 @@
 // widget on demand).
 // No window writes; no state import.
 
-import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
+import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, renderCell, resolveCtx, getProvider, roundingLineSVG, k2Twin } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
 import {
     supportsForItem, canDraw, supportNeeds, touchNumbers, touchColumns, touchNumberHTML, touchOpts, touchDigit,
@@ -2830,6 +2830,27 @@ export function wireDrawnAnswers(cellEl, input, { onChange = null } = {}) {
  * the cues, the ÷ tally row and the extras, as HTML to put under that visual. Touch dots need the
  * kit's digit spans, so they are drawn only on a kit kind. '' when there is nothing to add.
  */
+/**
+ * S2 on a K counting twin (critic k2-r1, OC3: "the counting checklist is drawn in print only"): the
+ * count cell's twin redrawn WITH its ticked checklist beside it, dealt by the same allocator as
+ * paper (cover / mix). Render time only: the generated item never changes (ws-options-verify).
+ * '' when the item is not a count cell or the checklist is not on for this item.
+ */
+export function k2TwinSupportsHTML(q, { index = 0, total = 1, categoryId = '', skillId = '', options = null } = {}) {
+    const c = q && q.cell;
+    if (!c || c.template !== 'counters' || !c.payload || ((c.payload.kind || 'count') !== 'count')) return '';
+    const o = q.skillOptions || options || {};
+    let def = null;
+    try { def = optionsFor(q.categoryId || categoryId, q.requestedSkillId || q.skillId || skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
+    if (!def && skillId) try { def = optionsFor(categoryId, skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
+    if (!def) return '';
+    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
+    if (!chosen.includes('steps')) return '';
+    const r = supportsForItem(chosen, { index, total, coverage: o.cover || 'whole', mix: o.mix || 'section', can: ['steps'], need: { steps: 1 } });
+    if (!r.on.includes('steps')) return '';
+    try { return k2Twin('counters', Object.assign({}, c.payload, { supports: { on: ['steps'], reserve: [] } })); } catch (e) { return ''; }
+}
+
 export function screenSupportExtrasHTML(q, opts = {}) {
     if (!q) return '';
     const p = binaryParts(Object.assign({}, q, { options: [] })) || (Number.isFinite(Number(q.a)) && Number.isFinite(Number(q.b)) && OP_NORM[q.op] ? { a: Number(q.a), b: Number(q.b), op: OP_NORM[q.op] } : null);
