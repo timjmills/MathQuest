@@ -793,6 +793,10 @@ function requestFor(s, i) {
         // A section opened from the Lesson library keeps its lesson id while its skill is still
         // that lesson's practice skill (a teacher who changes the skill prints by skill again).
         lessonId: s.role === 'lesson' && s.lessonId && lessonSkillKept(s) ? s.lessonId : undefined,
+        // LR-18: the lesson parts to print and each part's own seed (the Print screen lane sets
+        // s.parts and s.lessonSeeds - print-sheet.js LESSON_PARTS, lessonPartSeed).
+        parts: s.role === 'lesson' && Array.isArray(s.parts) ? s.parts.slice() : undefined,
+        lessonSeeds: s.role === 'lesson' && s.lessonSeeds ? Object.assign({}, s.lessonSeeds) : undefined,
         size: pr.size,
         // 'auto' lets each page type take its own default look (Daily on the fact layouts).
         look: pr.look === 'daily' || pr.look === 'ican' ? pr.look : 'auto',

@@ -14,7 +14,7 @@ import { CASE_TESTS } from '../lesson-arch/index.js';
 import { factMarks, panelHops } from '../lesson-arch/fact.js';
 import { checkStackOf } from '../lesson-arch/column.js';
 import { roundState, isRound, chartLineMmOf } from '../lesson-arch/line.js';
-import { EXAMPLE_KEYS, mainPool, sigOf, digitsOfOps, stateGroups, namedSteps, stepMarker, band, hOf } from './common.js';
+import { EXAMPLE_KEYS, mainPool, keyOfItem, exactKeyOf, sigOf, digitsOfOps, stateGroups, namedSteps, stepMarker, band, hOf } from './common.js';
 
 /**
  * The worked example: an item of the skill whose provider steps show the strategy the lesson
@@ -80,7 +80,14 @@ export function pickSecond(items, example, data, which = 'second', avoid = []) {
  * data, each from the main pool or its own case pool (`x<key>`), never one another.
  */
 export function otherExamples(input, example, data) {
-    const cands = mainPool(input).concat(...EXAMPLE_KEYS.map((k) => poolItems(input, `x${k}`)));
+    // (A refreshed chart, LR-18: a case pool's items no other part holds, while it has any.)
+    const avoid = input.lesson && input.lesson.avoidKeys;
+    const fresh = (list) => {
+        if (!avoid || !avoid.size) return list;
+        const f = list.filter((it) => !avoid.has(keyOfItem(it)) && !avoid.has(exactKeyOf(it)));
+        return f.length ? f : list;
+    };
+    const cands = mainPool(input).concat(...EXAMPLE_KEYS.map((k) => fresh(poolItems(input, `x${k}`))));
     const out = [];
     // (The gate's proof mode, LR-1 off: the second example only, as before the case rules.)
     const lr1Off = ((input.lesson && input.lesson.rulesOff) || []).includes('LR-1');

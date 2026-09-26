@@ -218,6 +218,20 @@ This supersedes the 17-card page-type menu (and the stand-alone mapping in §8c,
 | **Quiz** | Test A / Test B | **the Practice paper engine with scoring and tagging on** (owner): build by CCSS domain, CCSS standard / part, EE, WRM unit / step, lesson, or skills; every question tagged to its standards (tags on the key only); score per question, custom score per question or per question type; a per-standard breakdown on the key; versions A, B…; size. Details: `design/TEACHER_SCREENS.md` → Make quiz. The on-screen Quiz Builder is separate and unchanged. |
 | **Lesson** | Lesson packet, Prerequisite check, Worked example (anchor chart), Guided (We Do), Lesson opener, Pre-skill check | **parts** to print (default all: Prerequisite Check, anchor chart, lesson sheet with We Do, practice, mixed); one size (§8a). The stand-alone Guided / Worked example / Prerequisite pages exist only as parts of a lesson. **Every lesson must HAVE all parts** (a lesson missing a part is incomplete and fails `ws-lesson-coverage`); the teacher **selects which parts to print**, and can **refresh any part with new numbers** — each part (and the chart's worked examples) has its own seed, so refreshing one part re-deals it without changing the others, and the key follows. |
 
+- **The seed scheme (engine, 2026-09-26; built for the three samples).** A part's seed is
+  `lessonPartSeed(packetSeed, part, refresh)` (`print-sheet.js`): refresh 0 returns the seed the
+  packet always used for that part (chart and lesson sheet: the packet seed; practice +7919; mixed
+  +15838), so the default packet is byte-identical; refresh k > 0 is a hash of (base, k, part). The
+  request carries the result per part: `req.lessonSeeds = {chart, sheet, practice, mixed}` (a part
+  whose seed is not its refresh-0 seed is "refreshed": dealt last, avoiding every other part), and
+  `req.parts` picks what prints. **Section-level refresh can be added later without changing any
+  default deal:** inside a part, each section already draws from its own pool with a fixed derived
+  base (`buildRoleSheet` `dealPool`: part seed + pool index × 100003 - the Warm-up pools `w0`, `w1`,
+  the lesson pool `main`, the case pools `x*`). A later `req.lessonSectionSeeds = {'sheet.w0': s}`
+  would override only that pool's base; the absent key keeps today's base, so every existing deal
+  stays identical. (The one coupling to design for: the lesson pool `main` feeds the chart examples,
+  We Do and Independent cells together, so a "refresh Independent only" section must deal its cells
+  from a pool of its own - a new pool id, default unchanged - rather than re-seed `main`.)
 - **Paused for later (hidden, code kept, like §8d):** True or False?, Reason It, Stretch, and Find the mistake. Their
   provider data (`open(q)`, `wrongAnswer`, reason prompts) is kept; no new work goes into them now.
 - **Saved sets and share codes are never broken:** every old role id decodes to its new paper + options

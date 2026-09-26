@@ -26,7 +26,23 @@ export function mainPool(input) {
     const main = poolItems(input, 'main');
     if (((input.lesson && input.lesson.rulesOff) || []).includes('LR-5')) return main;
     const warm = new Set(warmPools(input).flatMap((id) => poolItems(input, id)).map(keyOfItem));
-    return warm.size ? main.filter((it) => !warm.has(keyOfItem(it))) : main;
+    const pool = warm.size ? main.filter((it) => !warm.has(keyOfItem(it))) : main;
+    // LR-18: a part dealt again (`lesson.avoidKeys`, the packet's other parts) draws its examples
+    // and cells from the items no other part holds - the dealer takes a repeat only when a small
+    // skill runs out, and that repeat never becomes a chart example while another item remains.
+    const avoid = input.lesson && input.lesson.avoidKeys;
+    if (!avoid || !avoid.size) return pool;
+    const fresh = pool.filter((it) => !avoid.has(keyOfItem(it)) && !avoid.has(exactKeyOf(it)));
+    return fresh.length >= 4 ? fresh : pool;
+}
+
+/** An item exactly as printed, as print-sheet.js exactKey writes it (its words, answer and number). */
+export function exactKeyOf(it) {
+    const q = (it && it.q) || {};
+    const text = String(q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const ans = q.ans !== null && typeof q.ans === 'object' ? JSON.stringify(q.ans) : String(q.ans !== undefined ? q.ans : '');
+    const n = q.n !== undefined ? q.n : q.cell && q.cell.payload ? q.cell.payload.n : undefined;
+    return `=${text}|${ans}|${n === undefined || n === null ? '' : n}`;
 }
 
 export const warmPools = (input) => ((input.pools || []).map((p) => p.id)).filter((id) => /^w\d$/.test(id));

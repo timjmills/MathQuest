@@ -21,6 +21,9 @@
 //           overflow; LR-14 a key leaves no graded slot empty
 //   sizes   LR-10 the packet at its one size; LR-16 the lesson's Mixed set printed as a Mixed page
 //           at S holds more items than at L, every regroup stack at its M floor, and passes H13
+//   parts   LR-18 (the first seed): refreshing ONE part with new numbers (lessonSeeds) changes that
+//           part and its key and no other part, and the packet's rules still hold; a part printed
+//           alone is the page it is in the whole packet
 //
 // A `soft` finding (a turnaround of another page's item in a skill too small to avoid it) is
 // printed and counted, never failed.
@@ -233,6 +236,40 @@ async function renderDoc(app, html) {
             for (const [rule, msg] of await layoutCheck(pg, 'S', false)) fail(where, rule, msg);
         } finally { await pg.close(); }
         console.log(`  ${l.id} mixed page: S ${at.S.n} items on ${at.S.pages}, L ${at.L.n} on ${at.L.pages}`);
+    }
+    // ---- LR-18: every part refreshed alone, and a part printed alone (owner ruling 2026-09-26).
+    if (!has('no-parts')) for (const l of LESSONS) {
+        const seed = SEED_LIST[0];
+        const where = `${l.id} parts`;
+        const req = { role: 'lesson', sections: [{ skills: [l.skill] }], size: 'L', paper: 'A4', seed, key: true, practicePages: 1, mixed: true };
+        const run = (extra) => app.page.evaluate(async ({ req, extra }) => {
+            const r = Object.assign({}, req, extra);
+            if (extra && extra.refresh) r.lessonSeeds = { [extra.refresh]: window.lessonPartSeed(req.seed, extra.refresh, 1) };
+            delete r.refresh;
+            const b = await window.buildSheet(r);
+            return { partHtml: b.lesson.partHtml, pupil: b.pupilHtml, violations: b.lesson.check.violations, refreshed: b.lesson.refreshed };
+        }, { req, extra });
+        const base = await run({});
+        const PARTS = ['chart', 'sheet', 'practice', 'mixed'];
+        for (const part of PARTS) {
+            const r = await run({ refresh: part });
+            if (String(r.refreshed) !== part) fail(where, 'LR-18', `refreshing ${part} was not read as a refresh (${r.refreshed})`);
+            for (const q of PARTS) {
+                if (q === part) continue;
+                if (!r.partHtml[q] || !base.partHtml[q] || r.partHtml[q].pupil !== base.partHtml[q].pupil || r.partHtml[q].key !== base.partHtml[q].key) fail(where, 'LR-18', `refreshing ${part} changed the ${q}`);
+            }
+            if (r.partHtml[part].pupil === base.partHtml[part].pupil) fail(where, 'LR-18', `refreshing ${part} dealt the same numbers`);
+            if (r.partHtml[part].key === base.partHtml[part].key) fail(where, 'LR-18', `the ${part} key did not follow its new numbers`);
+            for (const v of r.violations) {
+                if (v.soft) softs.push(`${where} ${part}: ${v.rule} ${v.msg}`);
+                else fail(where, v.rule, `after refreshing ${part}: ${v.msg}`);
+            }
+        }
+        for (const part of PARTS) {
+            const one = await run({ parts: [part] });
+            if (one.pupil !== base.partHtml[part].pupil) fail(where, 'LR-18', `the ${part} printed alone is not the page it is in the packet`);
+        }
+        console.log(`  ${l.id} parts: each part refreshed alone and printed alone`);
     }
     await app.close();
 

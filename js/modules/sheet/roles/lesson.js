@@ -89,7 +89,9 @@ export function sources(skills, helpers = {}) {
     const data = helpers.lesson && helpers.lesson.data;
     const lr1Off = ((helpers.lesson && helpers.lesson.rulesOff) || []).includes('LR-1');
     const extra = lr1Off ? [] : EXAMPLE_KEYS.filter((k) => data && data[k] && data[k].ref).map((k) => ({
-        id: `x${k}`, skills: [Object.assign({ categoryId: main.categoryId, skillId: main.skillId }, main.opts ? { opts: main.opts } : {}, main.minTop !== undefined ? { minTop: main.minTop } : {}, main.maxTop !== undefined ? { maxTop: main.maxTop } : {}, data[k].ref)],
+        id: `x${k}`, skills: [Object.assign({ categoryId: main.categoryId, skillId: main.skillId }, main.opts ? { opts: main.opts } : {}, main.minTop !== undefined ? { minTop: main.minTop } : {}, main.maxTop !== undefined ? { maxTop: main.maxTop } : {},
+            // (A refreshed chart avoids every other part of the packet, its other examples too: LR-18.)
+            main.avoidHard ? { avoidHard: main.avoidHard, avoidSoft: main.avoidSoft } : {}, data[k].ref)],
     }));
     return [{ id: 'main', skills: [main] }, ...pre.map((s, i) => ({ id: `w${i}`, skills: [s] })), ...extra];
 }
