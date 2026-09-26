@@ -2217,6 +2217,8 @@ export function fitTwinRows(root) {
  * skill's own print instruction with its verb swapped (P-LG, PEDAGOGY 10.2).
  */
 const PV_TWIN_KINDS = new Set(['frame', 'value', 'compare', 'round', 'expand-line', 'place-bank', 'disks', 'estimate', 'blanks', 'chart',
+    // expanded form in boxes, typed into the paper's boxes (critic pv-r3)
+    'expand',
     // build lane placevalue: the number line of any scale (read the arrow; the lettered numbers)
     'scale',
     // one number rounded to several places (rounding_table, owner 2026-09-26): a line per place
@@ -2551,7 +2553,9 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
  * panes as paper, under the problem. Plain (no drawing) draws nothing.
  */
 function roundSupportPanes(q, p) {
-    if (!p || p.kind !== 'round' || p.support === 'none' || p.support === 'line') return '';
+    // (a chart or marks ticked ALONE - no cut line - is still drawn: the cell is then the plain
+    // number, critic pv-r3 O4; only Plain itself draws nothing)
+    if (!p || p.kind !== 'round' || p.support === 'line') return '';
     const o = (q && q.skillOptions) || state.skillOptions || {};
     const ticks = Array.isArray(o.support) ? o.support : [];
     if (ticks.includes('bare')) return '';

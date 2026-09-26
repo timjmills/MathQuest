@@ -91,6 +91,14 @@ function beginItem() { _at = Number.isFinite(state.itemIndex) ? state.itemIndex 
  */
 /** This item's value 0 .. n-1, dealt under its own key (every value in each block of max(6, n)). */
 const slot = (n, salt = 0) => (n <= 1 ? 0 : dealAt(`pv:${n}:${salt}`, n, _at));
+/** As slot, with relative weights (a block holds each value as often as its weight asks). */
+const slotW = (weights, salt) => dealAt(`pv:w${weights.join('-')}:${salt}`, weights.length, _at, weights);
+/**
+ * A multiple 1 .. m of a page's step, dealt from a shuffled bag so a page spreads over the band
+ * (critic pv-r3: seven of twelve nearest-1,000 numbers were 8,xxx / 9,xxx). A band of more than
+ * twelve steps is rolled (a bag that big never repeats on a page anyway).
+ */
+const leadOf = (m, salt = 'lead') => (m <= 1 ? 1 : m <= 12 ? 1 + slot(m, salt) : randInt(1, m));
 
 function optsOf(cat, skill) {
     // A mixed parent's options (only `level`) never name a member's own options, so the member's
@@ -309,7 +317,10 @@ function genPlace(q, skill, o) {
     if (form === 'unit') {
         inlineBlanks(q, 'The underlined digit is worth ___ ___.', [[digit, word], [digit, plural(word, digit)], [digit, word.replace(/s$/, '')]], [2, 9]);
         q.ans = `${digit} ${plural(word, digit)}`;
-        cellFor({ kind: 'blanks', n, place, frame: 'worth ____ ____', keys: [digit, plural(word, digit)], keyValue: q.ans });
+        // The place words the number has, as a bank to choose from, and one word line as wide as
+        // the longest of them (critic pv-r3: two unlabelled boxes of different widths).
+        const bank = Array.from({ length: String(n).length }, (_, i) => PLACE_WORD[10 ** (String(n).length - 1 - i)]);
+        cellFor({ kind: 'blanks', n, place, frame: 'worth ____ ____', keys: [digit, plural(word, digit)], keyValue: q.ans, words: true, bank });
     } else {
         inlineBlanks(q, 'The underlined digit is worth ___ × ___.', [[digit, place]], [2, String(place).length + 2]);
         q.ans = `${digit} × ${fmt(place)}`;
@@ -442,13 +453,9 @@ function genExpandCombine(q, skill, o) {
             setCell(q, { kind: 'blanks', n, frame: `${fmt(n)} = ${frameText}`, keys: ds.slice(), keyValue: q.ans, bigNumerals: true });
             return;
         }
-        q.text = `Write ${fmt(n)} in expanded form.`;
-        q.answerType = 'interactive';
-        q.interactiveType = 'expanded';
-        q.expandedNumber = n;
-        q.expandedDigits = ds.slice();
-        q.expandedValues = parts.slice();
-        q.expandedPlaceIdx = ds.map((_, i) => ds.length - 1 - i);
+        // The screen types into the PAPER cell's boxes (critic pv-r3: the card, the worksheet and
+        // the quiz drew an old digit-tile widget, or one free line with no number): "390 = [ ] + [ ] + [ ]".
+        inlineBlanks(q, `${fmt(n)} = ${parts.map(() => '___').join(' + ')}`, [parts.map(fmt)], parts.map((v) => fmt(v).length + 1));
         q.ans = parts.map(fmt).join(' + ');
         q.printAnswer = q.ans;
         setCell(q, { kind: 'expand', n, parts, keyValue: q.ans });
@@ -745,8 +752,12 @@ function genDisks(q, skill, o) {
     q.answerType = 'number';
     q.skillLabel = 'Read Place-Value Disks';
     if (task === 'count') {
-        const withSome = places.filter(p => counts[p] > 0);
-        const place = withSome[slot(withSome.length)];
+        // On a decimal chart the place asked is a DECIMAL place (critic pv-r3: the ones asked on a
+        // fraction-label chart never used the fractions)
+        const withSome0 = places.filter(p => counts[p] > 0);
+        const decSome = withSome0.filter((p) => p < 1);
+        const withSome = ns && decSome.length ? decSome : withSome0;
+        const place = withSome[slot(withSome.length, 'cplace')];
         q.text = `How many ${PLACE_WORD[place]} disks are there?`;
         q.printText = q.text;
         q.ans = counts[place];
@@ -1001,7 +1012,10 @@ function genDecimalCompare(q, o) {
     const a0 = decimalNumber(d);
     const w = a0.w, fr = a0.fr.slice();
     let a = a0.s, b;
-    const kind = [0, 1, 2, 3, 0, 4][slot(6)];
+    // (item 1 of a page is never the "=" pair: it is the Guided page's Model, and "=" models none
+    // of the steps - critic pv-r3)
+    let kind = [0, 1, 2, 3, 0, 4][slot(6)];
+    if (kind === 4 && _at === 0) kind = 1;
     if (kind === 1 && d >= 2) {
         const f2 = fr.slice(); const j = d - 1; f2[j] = f2[j] === 9 ? 8 : f2[j] + 1; b = `${w}.${f2.join('')}`;
     } else if (kind === 2 && d >= 2) {
@@ -1017,7 +1031,9 @@ function genDecimalCompare(q, o) {
     } else {
         const f2 = fr.slice(); f2[0] = f2[0] === 1 ? 2 : f2[0] - 1; b = `${w}.${f2.join('')}`;
     }
-    if (slot(2, 'swap') === 1) [a, b] = [b, a];
+    // The SIGN is dealt, half "<" and half ">" (critic pv-r3: 11 of 16 were ">"): the pair is
+    // turned round to give the dealt sign.
+    if (Number(a) !== Number(b) && (Number(a) > Number(b)) !== (slot(2, 'sign') === 1)) [a, b] = [b, a];
     const na = Number(a), nb = Number(b);
     q.text = `Compare: ${a} ___ ${b}`;
     q.printText = 'Write <, > or = in the circle.';
@@ -1039,8 +1055,9 @@ function genCompare(q, skill, o) {
     const cap = capOf('placevalue', skill, o, 999);
     let [a, b] = comparableSet(2, cap, o);
     // One item in six is equal (the "=" case; CP-9), dealt, never rolled.
-    if (slot(6) === 5 && o.lengths !== 'mixed') b = a;
-    if (slot(2, 'swap') === 1 && a !== b) [a, b] = [b, a];
+    if (slot(6) === 5 && o.lengths !== 'mixed' && _at !== 0) b = a;
+    // the sign dealt, half "<" and half ">" (as the decimal pairs)
+    if (a !== b && (a > b) !== (slot(2, 'sign') === 1)) [a, b] = [b, a];
     q.text = `Compare: ${fmt(a)} ___ ${fmt(b)}`;
     q.printText = 'Write <, > or = in the circle.';
     q.ans = a > b ? '>' : a < b ? '<' : '=';
@@ -1154,7 +1171,7 @@ function roundNumber(P, cap, kind, avoidMid) {
     const topStep = (m) => (m >= 3 ? m - 1 : m);
     if (kind === 'mid') {
         const mMax = Math.max(1, Math.floor((cap - P / 2) / P));
-        return pickIn(1, topStep(mMax)) * P + P / 2;
+        return leadOf(topStep(mMax)) * P + P / 2;
     }
     if (kind === 'across') {
         // Just under ANY multiple of ten of the place the band holds (2,960 -> 3,000 to the
@@ -1168,16 +1185,29 @@ function roundNumber(P, cap, kind, avoidMid) {
     }
     if (kind === 'zero' && P >= 100) {
         const mMax = Math.max(1, Math.floor(cap / P) - 1);
-        const n = pickIn(1, topStep(mMax)) * P + pickIn(1, P / 10 - 1);
+        const n = leadOf(topStep(mMax)) * P + pickIn(1, P / 10 - 1);
         if (n >= lo && n <= cap) return n;
     }
     // A plain item stays below the band's top step: the numbers just under the next place (96,
     // 97 ... for the nearest 10) belong to the one `across` item, so they do not crowd a page.
-    const plainHi = cap - P > lo + P ? cap - P : cap;
+    // Its multiple of the place comes from the page's bag and its DIRECTION is dealt (critic
+    // pv-r3: 7 of 8 rounded up on one page): in a block of six, the halfway and the across items
+    // round up and the zero item down, so the three plain ones go two down and one up.
+    const mTop = Math.max(1, Math.floor((cap - P) / P));
+    const m = leadOf(topStep(mTop) || 1);
+    const down = slotW([2, 1], 'rdir') === 0;
     for (let t = 0; t < 60; t++) {
-        const n = pickIn(lo, plainHi);
-        if (n % P === 0) continue;
-        if (n % P === P / 2) continue;       // a plain item is never halfway: halfway is dealt
+        let r;
+        if (P === 1) r = 0;
+        else if (down) r = pickIn(1, Math.max(1, P / 2 - 1));
+        else r = pickIn(P / 2 + 1, P - 1);
+        const n = m * P + r;
+        if (n < lo || n > cap || n % P === 0 || n % P === P / 2) continue;
+        return n;
+    }
+    for (let t = 0; t < 60; t++) {
+        const n = pickIn(lo, cap - P > lo + P ? cap - P : cap);
+        if (n % P === 0 || n % P === P / 2) continue;
         return n;
     }
     return lo + 1;
@@ -1350,9 +1380,13 @@ function genRoundingVisual(q, skill, o) {
 function roundNlNumber(R, P, kind) {
     const { lo, hi } = R;
     const inRange = (v) => v >= lo && v <= hi;
+    // The leading digit comes from the page's bag of 1 to 8 (the 9s belong to the round-up item),
+    // so a page spreads over the band (critic pv-r3: four of eight numbers in the 9,000s).
+    const unit = 10 ** (String(hi).length - 1);
     const plain = () => {
+        const d = leadOf(8, 'nllead');
         for (let t = 0; t < 80; t++) {
-            const v = randInt(lo, hi);
+            const v = randInt(Math.max(lo, d * unit), Math.min(hi, (d + 1) * unit - 1));
             if (v % P === 0 || v % P === P / 2) continue;
             return v;
         }
@@ -1553,10 +1587,16 @@ function genScaleLine(q, skill, o) {
         setCell(q, { kind: 'scale', task, lo, hi, step, labels, targets, n: targets[0], keyValue: q.ans, decimals: dec });
         return;
     }
-    const k = free[slot(free.length, 'tick')];
-    // Edge case (WRM Y4 "arrows between ticks"): one read item in six points HALFWAY along a jump
-    // of an even size (45 on a line in tens), never past the band's last jump.
-    const half = task === 'read' && !dec && step % 2 === 0 && slot(6) === 4 && k < n;
+    // Every position the arrow can point to, dealt from ONE bag a page (critic pv-r3: 13 different
+    // answers in 30, the same tick twice on a page): each free tick, and on a read page of even
+    // jumps each halfway point between two ticks (WRM Y4 "arrows between ticks": 35 on a line in
+    // tens), never past the last jump and never a labelled number.
+    const halves = task === 'read' && !dec && step % 2 === 0
+        ? Array.from({ length: n }, (_, i) => i + 0.5) : [];
+    const spots = free.concat(halves);
+    const at = spots[slot(spots.length, 'spot')];
+    const half = !Number.isInteger(at);
+    const k = half ? Math.floor(at) : at;
     const v = half ? val(k) + step / 2 : val(k);
     q.ans = v;
     q.pv = { kind: 'scale', task, lo, hi, step, labels, n: v, decimals: dec, half };
@@ -1797,8 +1837,10 @@ function genRoundingTable(q, skill, o) {
         // column read straight off the printed nearest-100 one, 6,645 -> 6,600 -> 7,000): the
         // columns blanked are the finest place up to the one dealt, so every printed column is a
         // coarser place, and nothing blank can be chained from a neighbour.
-        const ci = slot(places.length, 'tcol');
-        const cols = places.map((_, c) => c).filter((c) => c <= ci);
+        // Exactly ONE column (critic pv-r3: whole tables came out blank, 32 answers a page): the
+        // finest place, so every printed column is a coarser one and nothing blank can be chained
+        // from a neighbour.
+        const cols = [0];
         blankCells = [];
         rows.forEach((_, r) => cols.forEach((c) => blankCells.push([r, c])));
         sets = [blankCells.map(([r, c]) => table[r][c])];

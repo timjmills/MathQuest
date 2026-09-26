@@ -11,6 +11,13 @@
 //   position   the item KIND (pv.deal / pv.kind + scope) sits at the same positions on both seeds,
 //   same-page  both seeds give the very same answers (test = practice).
 //
+// And PER PAGE (critic pv-r3: no cycle, yet 7 of 8 items on one page rounded up), on every page of
+// 8 and of 12 the 30 items hold:
+//   direction  a rounding page rounds up and down alike: neither side over 75 % of the page,
+//   lead       no leading digit on more than 40 % of a page (the numbers spread over the band),
+//   sign       a compare page: no sign on more than 60 % of it,
+//   distinct   a number-line reading page: at least 75 % different answers.
+//
 //   node tests/scripts/ws-pv-deal.cjs
 //   node tests/scripts/ws-pv-deal.cjs --skills number_sense:number_line_scales
 const { open } = require('../lib/ws-harness.cjs');
@@ -22,6 +29,7 @@ const DEFAULT = [
     ['number_sense', 'number_line_scales', {}], ['number_sense', 'number_line_scales', { task: 'mark' }],
     ['number_sense', 'number_line_scales', { decimals: 1 }],
     ...['nearest_10', 'nearest_100', 'nearest_1000', 'nearest_10000', 'nearest_100000', 'nearest_million'].map((s) => ['number_sense', s, {}]),
+    ['number_sense', 'nearest_1000', { support: ['bare'] }], ['placevalue', 'compare', { decimals: 3 }],
     ['number_sense', 'nearest_100', { support: ['bare'] }],
     ['number_sense', 'rounding_table', {}], ['number_sense', 'rounding_table', { places: [10, 100, 1000] }],
     ['number_sense', 'rounding_table', { blank: 'column' }], ['number_sense', 'rounding_table', { blank: 'row' }],
@@ -47,7 +55,13 @@ const LIST = only.length ? DEFAULT.filter(([c, s]) => only.includes(`${c}:${s}`)
                 if (!q) { out.push({ ans: '(none)', kind: '' }); continue; }
                 const pv = q.pv || {};
                 const ans = typeof q.ans === 'object' ? JSON.stringify(q.ans) : String(q.ans);
-                out.push({ ans, kind: [pv.deal, pv.half ? 'half' : '', pv.kind === 'table' ? JSON.stringify(pv.cells && pv.cells[0]) : ''].join('|') });
+                // the page facts the balance checks read: a rounding's direction, the number's
+                // leading digit, a comparison's sign
+                const n = Number(pv.n);
+                const dir = pv.kind === 'round' && pv.place && Number.isFinite(n) ? (Math.floor((n + pv.place / 2) / pv.place) * pv.place > n ? 'up' : 'down') : '';
+                const lead = pv.kind === 'round' && Number.isFinite(n) ? String(Math.trunc(n))[0] : '';
+                out.push({ ans, dir, lead, sign: pv.kind === 'compare' ? ans : '', read: pv.kind === 'scale' && pv.task === 'read',
+                    kind: [pv.deal, pv.half ? 'half' : '', pv.kind === 'table' ? JSON.stringify(pv.cells && pv.cells[0]) : ''].join('|') });
             }
             return out;
         }), cat, skill, opts, N, SEEDS);
@@ -63,6 +77,25 @@ const LIST = only.length ? DEFAULT.filter(([c, s]) => only.includes(`${c}:${s}`)
             const top = Math.max(...Object.values(counts));
             if (Object.keys(counts).length === 1) bad.push(`one: seed ${r + 1} every answer is ${a[0]}`);
             else if (Object.keys(counts).length <= 3 && top / a.length > 0.8) bad.push(`one: seed ${r + 1} one answer takes ${Math.round(100 * top / a.length)} %`);
+        });
+        // per page: pages of 8 and of 12 from each seed's run
+        runs.forEach((run, r) => {
+            for (const size of [8, 12]) {
+                for (let st = 0; st + size <= run.length; st += size) {
+                    const pg = run.slice(st, st + size);
+                    const tag = `seed ${r + 1} page of ${size} at ${st + 1}`;
+                    const share = (key) => { const c = {}; pg.forEach((x) => { if (x[key]) c[x[key]] = (c[x[key]] || 0) + 1; }); const t = Object.values(c); return t.length ? { top: Math.max(...t), n: t.reduce((a2, b2) => a2 + b2, 0), c } : null; };
+                    const d = share('dir');
+                    if (d && d.n === size && d.top > 0.75 * size) { bad.push(`direction: ${tag} ${JSON.stringify(d.c)}`); break; }
+                    const l = share('lead');
+                    if (l && l.n === size && l.top > 0.4 * size) { bad.push(`lead: ${tag} ${JSON.stringify(l.c)}`); break; }
+                    const g = share('sign');
+                    if (g && g.n === size && g.top > Math.ceil(0.6 * size)) { bad.push(`sign: ${tag} ${JSON.stringify(g.c)}`); break; }
+                    // (a line with fewer places than that - tenths from 0 to 1 - holds every one it has)
+                    const most = new Set(run.map((x) => x.ans)).size;
+                    if (pg.every((x) => x.read) && new Set(pg.map((x) => x.ans)).size < Math.min(0.75 * size, most)) { bad.push(`distinct: ${tag} ${new Set(pg.map((x) => x.ans)).size} different`); break; }
+                }
+            }
         });
         const k1 = runs[0].map((x) => x.kind), k2 = runs[1].map((x) => x.kind);
         if (new Set(k1).size > 1 && k1.join() === k2.join()) bad.push('position: the item kinds sit at the same positions on both seeds');

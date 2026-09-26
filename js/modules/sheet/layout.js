@@ -678,6 +678,14 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         }
     }
 
+    // A footprint may cap the items a page holds (`fp.pageMax`, critic pv-r3: a 30-item S page ran
+    // past "z." and lettered its last four "a. b. c. d." again, CL-13). Opt-in per footprint.
+    const pageMax = Math.min(...infos.map((i) => (Number(i.fp.pageMax) > 0 ? Number(i.fp.pageMax) : Infinity)));
+    if (Number.isFinite(pageMax) && rows * cols > pageMax) {
+        rows = Math.max(1, Math.floor(pageMax / cols));
+        if (cols === 2 && rows > 1) rows = TWO_COL_ROWS.find((r) => r <= rows) || rows;
+    }
+
     // Stacked, visual and word-problem cells fill the grid (PG-11) - but never past FILL_CAP x the
     // tallest measured cell (RUBRIC H13, owner 2026-09-25): a row far taller than what it holds
     // leaves an empty band of a third of every cell, even centred. When the ceiling (12.1) stops
@@ -691,6 +699,11 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     // FILL_CAP x their measurement instead - the page is filled before a strip is left.
     let cellH = r3(capped ? Math.min(even, fillLimit(hMin)) : even);
     if (capped && rows * cellH < 0.8 * G) cellH = r3(Math.min(even, hMin * FILL_CAP));
+    // A footprint may hold its cell closer to its content (`fp.fillCap`, critic pv-r3: one-line
+    // rounding and comparing cells kept a third of every cell empty at S, H13). The spare height
+    // stays under the grid (a page still more than half used, H5). Opt-in per footprint.
+    const fpFillCap = Math.min(...infos.map((i) => (Number(i.fp.fillCap) >= 1 ? Number(i.fp.fillCap) : Infinity)));
+    if (capped && Number.isFinite(fpFillCap)) cellH = r3(Math.min(cellH, Math.max(hMin, hMin * fpFillCap)));
     const fillsGrid = cellH >= even - 0.01;
     const perPage = rows * cols;
     const count = Math.max(0, Math.floor(Number(section.count) || 0));

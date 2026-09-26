@@ -343,7 +343,11 @@ function renderQuizQuestion(qItem, flatIdx) {
             ? '<div class="qt-feedback correct">Correct!</div>'
             : lad && lad.n && !lad.spent
                 ? `<div class="qt-feedback mq-ladder-feedback">${escHtml(ladderMessage(qd))}</div>`
-                : `<div class="qt-feedback incorrect">Incorrect. The answer is: ${escHtml(String(qd.ans))}</div>`;
+                // Once the ladder is spent the quiz never prints the answer (critic pv-r3, L3): the
+                // pupil moves on and the teacher sees the item in the results.
+                : lad && lad.n
+                    ? '<div class="qt-feedback incorrect">Not quite. Go on to the next question; your teacher will look at this one with you.</div>'
+                    : `<div class="qt-feedback incorrect">Incorrect. The answer is: ${escHtml(String(qd.ans))}</div>`;
     }
 
     // Always use text input — no multiple choice.

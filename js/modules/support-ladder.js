@@ -181,7 +181,11 @@ export function candidatesFor(q, ctx = {}) {
     const rmulti = c && c.template === 'pv' && c.payload && c.payload.kind === 'round-multi' && Array.isArray(c.payload.places);
     if (c && c.template === 'pv' && c.payload && (c.payload.kind === 'round' || rmulti) && Number.isFinite(Number(c.payload.n))) {
         const pay = { kind: 'round', n: Number(c.payload.n), place: Number(rmulti ? c.payload.places[0] : c.payload.place) };
-        return declared.map((id) => ({ id, how: 'pane', pane: id, payload: pay }))
+        // One number rounded to several places: each rung is drawn for the finest AND the coarsest
+        // place (critic pv-r3: the marks and the line covered only the 10 place of a 10-and-100 item).
+        const pls = rmulti ? [...new Set([c.payload.places[0], c.payload.places[c.payload.places.length - 1]].map(Number))] : [pay.place];
+        return declared.map((id) => ({ id, how: 'pane', pane: id, payload: pay,
+            ...(pls.length > 1 ? { payloads: pls.map((pl) => ({ ...pay, place: pl })).filter((x) => PANES[id] && PANES[id].accepts(x)) } : {}) }))
             .filter((r) => !!(PANES[r.pane] && PANES[r.pane].accepts(r.payload)));
     }
     // The rest of the place-value family (critic pv-r2: value, compare, expand, the number-line
@@ -596,7 +600,8 @@ function wwSupports(root, q, rungs) {
 
 function paneHTML(r) {
     const id = r.pane || r.id;
-    const html = renderPane(id, r.payload, PANE_CTX(id));
+    const html = (Array.isArray(r.payloads) && r.payloads.length ? r.payloads : [r.payload])
+        .map((pl) => renderPane(id, pl, PANE_CTX(id))).filter(Boolean).join('');
     return html ? `<div class="mq-ladder-pane" data-mq-ladder-on="${esc(r.id)}">${html}</div>` : '';
 }
 

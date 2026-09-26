@@ -127,8 +127,10 @@ function crossOut(cx, cy, d, hole = 0) {
     const seg = (t0, t1) => `x1="${(cx - t0 * k).toFixed(2)}" y1="${(cy + t0 * k).toFixed(2)}" x2="${(cx - t1 * k).toFixed(2)}" y2="${(cy + t1 * k).toFixed(2)}"`;
     const ink = (a) => `<line data-pv-crossed="1" ${a} stroke="#000" stroke-width="${(1.5 * PT_MM).toFixed(3)}" stroke-linecap="round"/>`;
     if (hole > 0) {
-        const t0 = (hole + 0.5) / k;
-        return t0 < r - 0.8 ? ink(seg(t0, r)) + ink(seg(-t0, -r)).replace('data-pv-crossed="1" ', '') : '';
+        // the two pieces run from just outside the label to just past the ring, so the slash is
+        // long enough to read as crossing the disk out (critic pv-r3: it still clipped the label)
+        const t0 = (hole + 0.5) / k, t1 = r + 1.2;
+        return ink(seg(t0, t1)) + ink(seg(-t0, -t1)).replace('data-pv-crossed="1" ', '');
     }
     const a = seg(r, -r);
     return `<line data-pv-crossed="1" ${a} stroke="#fff" stroke-width="${(2.25 * 1.9 * PT_MM).toFixed(3)}" stroke-linecap="round"/>`
@@ -168,7 +170,8 @@ function disk(cx, cy, place, size, strokePt = HAIR_PT, fraction = false, halo = 
  */
 function screenMat(ctx, p, opts) {
     const wide = diskMatSVG(opts).svg;
-    if (!((ctx && ctx.mode === 'screen') || p.onScreen) || (p.places || []).length < 4) return wide;
+    // (three zones too: H T O at full size is wider than a 390 card, critic pv-r3)
+    if (!((ctx && ctx.mode === 'screen') || p.onScreen) || (p.places || []).length < 3) return wide;
     // the narrow twin may shrink a little to the card's width (never the paper drawing)
     const narrow = diskMatSVG({ ...opts, across: 2 }).svg.replace('max-width:none;', 'max-width:100%;height:auto;');
     return `<style>.pv-mat-narrow{display:none}@media (max-width:600px){.pv-mat-wide{display:none}.pv-mat-narrow{display:block}}</style>`
@@ -232,7 +235,7 @@ export function diskMatSVG({ places, counts = null, size = 'L', pxPerMm = 0, dis
             body += dots ? dotCounter(cx, cy, p) : disk(cx, cy, p, size, diskPt, fraction, false, D);
             if (k >= c - xk) {
                 // the stroke stops short of the label (a fraction's stacked label is taller)
-                const hole = dots ? 0 : fraction && p < 1 ? 9 * PT_MM * 1.05 : labelPt(p, size, D) * PT_MM * 0.42;
+                const hole = dots ? 0 : fraction && p < 1 ? 9 * PT_MM * 1.05 : labelPt(p, size, D) * PT_MM * 0.6;
                 body += crossOut(cx, cy, dots ? 6 : D, hole);
             }
         }
@@ -489,7 +492,9 @@ const showing = (ctx) => answered(ctx) || ctx.state === 'wrong';
 const isTraced = (ctx) => ctx.state === 'traced';
 const inked = (ctx, v) => (isTraced(ctx) && v !== '' ? `<span class="ws-trace" data-ws-ink="trace">${v}</span>` : v);
 const ringLine = (ctx) => (isTraced(ctx) ? 'border:1.5pt solid var(--ws-grey);' : 'border:1.5pt solid #000;');
-const PLACE_WORD_KIT = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands' };
+const PLACE_WORD_KIT = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands',
+    // (a decimal place is named too: "hundredths disks: ___", critic pv-r3)
+    0.1: 'tenths', 0.01: 'hundredths', 0.001: 'thousandths' };
 
 function textLine(ctx, html) {
     return html ? `<div class="pv-prompt" style="font-size:${pt(ctx.metrics.textPt)};margin:0 0 2mm;">${html}</div>` : '';
@@ -535,7 +540,9 @@ function blanksHTML(ctx, text, keys, words, floor = 0) {
     parts.forEach((seg, i) => {
         if (i < parts.length - 1) {
             const k = keys && keys[i] !== undefined ? String(keys[i]) : '';
-            const digits = /^\d/.test(k) ? width : Math.max(1, k.length || 1);
+            // (a word slot is as wide as the longest place word, never its own answer: "ones"
+            // and "thousands" get one line - critic pv-r3)
+            const digits = /^\d/.test(k) ? width : words ? 10 : Math.max(1, k.length || 1);
             const shape = words && !/^\d/.test(k) ? 'line' : 'box';
             slots.push(blank({ id: `b${i}`, kind: /^\d/.test(k) ? 'number' : 'text', shape, digits: Math.max(digits, shape === 'line' ? 6 : 1),
                 graded: true, order: i, scopes: ['full', 'answer-only'] }, ctx, k));
@@ -590,12 +597,14 @@ function slotFloor(p, grow) {
 }
 
 /** Words or numbers printed for the pupil to ring; the key rings the right ones. */
-function ringRow(ctx, items, correct, sizePt) {
+function ringRow(ctx, items, correct, sizePt, cols = 0) {
     const on = ctx.state === 'wrong' ? new Set([shownVal(ctx, 'answer', '')]) : answered(ctx) ? new Set((correct || []).map(String)) : new Set();
     const cells = items.map(w => `<span class="pv-choice" data-ws-slot="choice" data-ws-shape="ring" style="display:inline-block;`
         + `padding:0.8mm 2.2mm;margin:1mm 2mm;${on.has(String(w)) ? `${ringLine(ctx)}border-radius:999px;` : 'border:1.5pt solid transparent;'}">${esc(w)}</span>`).join('');
+    // `cols`: a fixed grid (eight numbers as 4 + 4, critic pv-r3: one number orphaned on a line)
+    const grid = cols ? `display:grid;grid-template-columns:repeat(${cols},auto);justify-content:center;` : '';
     return `<div class="pv-ring-row" style="font-size:${pt(sizePt || ctx.metrics.digitPt * 0.75)};font-weight:700;text-align:center;`
-        + `line-height:1.6;">${cells}</div>`;
+        + `line-height:1.6;${grid}">${cells}</div>`;
 }
 
 /** Check-box choices ("Round up / Round down", "Correct / Fix it"): the key ticks the right one. */
@@ -615,9 +624,12 @@ function expandHTML(p, ctx) {
     const boxes = parts.map((v, i) => blank({ id: `part${i}`, kind: 'number', shape: 'box', digits, graded: true, order: i,
         scopes: ['full', 'answer-only'] }, ctx, fmt(v)));
     // The kit's equation row: boxes bottom-aligned with the digits, `+` and `=` in 1 em slots (TY-25).
-    return `<div class="ws-eq pv-expand" style="font-weight:700;">`
-        + `<span>${esc(fmt(p.n))}</span><span class="o">=</span>`
-        + boxes.join('<span class="o">+</span>') + `</div>`;
+    // A narrow card wraps only BEFORE a "+", each sign staying with its box (critic pv-r3: at 390
+    // the "+" and the ones box fell to a second row away from the tens box).
+    const NW = 'display:inline-flex;align-items:flex-end;flex-wrap:nowrap;white-space:nowrap;column-gap:0.2em;';
+    return `<div class="ws-eq pv-expand" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:2mm;">`
+        + `<span style="${NW}"><span>${esc(fmt(p.n))}</span><span class="o">=</span>${boxes[0] || ''}</span>`
+        + boxes.slice(1).map((b) => `<span style="${NW}"><span class="o">+</span>${b}</span>`).join('') + `</div>`;
 }
 
 function sortHTML(p, ctx) {
@@ -811,7 +823,11 @@ register('pv', {
                 return `<div class="pv-cell">${top ?? center(numeral({ underline: p.place }))}${frameHTML(ctx, p.frame, kv, digits)}</div>`;
             case 'blanks': {
                 const pic = p.place && !p.hideNumeral ? center(numeral({ underline: p.place })) : '';
-                return `<div class="pv-cell">${pic}${blanksHTML(ctx, p.frame, p.keys, p.words, slotFloor(p, false))}</div>`;
+                // `bank`: the words to choose from, in a rounded box under the frame (unit form)
+                const bank = Array.isArray(p.bank) && p.bank.length
+                    ? `<div class="pv-bank" style="display:table;margin:2mm auto 0;border:0.75pt solid #000;border-radius:2mm;padding:0.5mm 2.5mm;`
+                        + `font-size:${pt(m.textPt)};font-weight:400;">${p.bank.map(esc).join('&nbsp;&nbsp; ')}</div>` : '';
+                return `<div class="pv-cell">${pic}${blanksHTML(ctx, p.frame, p.keys, p.words, slotFloor(p, false))}${bank}</div>`;
             }
             case 'expand':
                 return `<div class="pv-cell">${expandHTML(p, ctx)}</div>`;
@@ -825,7 +841,9 @@ register('pv', {
                 return `<div class="pv-cell">${p.showNumeral ? center(numeral({})) : ''}${frameHTML(ctx, p.frame, kv, Math.max(digits, Number(p.slotDigits) || 0))}</div>`;
             case 'compare': {
                 const slot = blank({ id: 'answer', kind: 'sign', shape: 'circle', graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, kv);
-                return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:4mm;">`
+                // (side room of its own, so two numbers never run to the cell walls and read on into
+                // the next cell - critic pv-r3; measured with it, a crowded row takes fewer columns)
+                return `<div class="pv-cell" style="text-align:center;padding:0 3mm;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:4mm;">`
                     // (a decimal arrives as its string, so 0.50 keeps its zero)
                     + `<span>${esc(typeof p.a === 'string' ? p.a : fmt(p.a))}</span>${slot}<span>${esc(typeof p.b === 'string' ? p.b : fmt(p.b))}</span></div>`
                     + `${p.aid ? alignedPair(p, m) : ''}</div>`;
@@ -865,12 +883,20 @@ register('pv', {
                 const keep = 'display:inline-block;white-space:nowrap;vertical-align:bottom;';
                 const arrow = `<span class="pv-arrow" style="font-size:${pt(m.digitPt * 0.7)};font-weight:700;margin:0 1.2mm;">→</span>`;
                 const tail = `<span class="pv-round-tail" style="${keep}">${arrow}${big(slot)}</span>`;
+                // ONE layout per number size, on every page and host (critic pv-r3: the arrow beside
+                // the number on one page and under it on another, and a cell measured one way and
+                // drawn the other): a cut-line number of three digits or more, or a plain one of five
+                // or more, has "→ ____" UNDER it; a shorter one has it beside, never wrapping.
+                const nDig = String(Math.trunc(Math.abs(Number(p.n) || 0))).length;
+                const stack = p.support === 'none' ? nDig >= 5 : nDig >= 3;
+                const two = (a, b) => (stack
+                    ? `<div style="${keep}">${a}</div><div style="margin-top:1mm;">${tail}</div>`
+                    : `<span style="white-space:nowrap;"><span style="${keep}">${a}</span> ${tail}</span>`);
                 if (p.support === 'none') {
                     // Plain (no drawing): "4,683 → ____".
-                    return `<div class="pv-cell pv-round1 pv-round-plain" style="text-align:center;">`
-                        + `<span style="${keep}">${big(esc(fmt(p.n)))}</span> ${tail}</div>`;
+                    return `<div class="pv-cell pv-round1 pv-round-plain" style="text-align:center;">${two(big(esc(fmt(p.n))))}</div>`;
                 }
-                return `<div class="pv-cell pv-round1" style="text-align:center;"><span style="${keep}">${numeral({ cut: p.place })}</span> ${tail}</div>`;
+                return `<div class="pv-cell pv-round1" style="text-align:center;">${two(numeral({ cut: p.place }))}</div>`;
             }
             case 'round-notate': {
                 // RN-7a: the strip without an answer slot; the key underlines the place's digit and
@@ -902,7 +928,7 @@ register('pv', {
                 return `<div class="pv-cell">${center(target)}${center(`<div data-ws-slot="answer" data-ws-shape="draw">${line}</div>`)}</div>`;
             }
             case 'circle':
-                return `<div class="pv-cell">${textLine(ctx, `Rounds to <b>${esc(fmt(p.target))}</b>:`)}${ringRow(ctx, p.tiles || [], p.correct || [])}</div>`;
+                return `<div class="pv-cell">${textLine(ctx, `Rounds to <b>${esc(fmt(p.target))}</b>:`)}${ringRow(ctx, p.tiles || [], p.correct || [], 0, Math.ceil((p.tiles || []).length / 2))}</div>`;
             case 'closest':
                 return `<div class="pv-cell">${center(big(esc(p.expr)))}${ringRow(ctx, p.choices || [], [kv])}</div>`;
             case 'estimate': {
@@ -939,7 +965,7 @@ register('pv', {
                     + `<span style="display:table-cell;padding:0;height:${Math.max(ctx.size === 'S' ? 10 : 10.5, (m.writeMm || 8) + 1).toFixed(1)}mm;vertical-align:bottom;">${blank({ id: `b${i}`, kind: 'number', shape: 'line', digits: w, graded: true, order: i,
                         scopes: ['full', 'answer-only'] }, ctx, (p.keys || [])[i])}</span></div>`).join('');
                 // `labels`: the place letters over the number's digits (the support); plain is the fade.
-                return `<div class="pv-cell pv-rmulti" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;column-gap:6mm;row-gap:1mm;">`
+                return `<div class="pv-cell pv-rmulti" style="display:flex;flex-direction:column;justify-content:center;align-items:center;row-gap:1mm;">`
                     + `<div style="white-space:nowrap;">${p.labels ? numeral({}) : big(esc(fmt(p.n)))}</div>`
                     + `<div class="ws-eq" style="display:table;font-weight:700;">${rows}</div></div>`;
             }
@@ -1105,15 +1131,19 @@ register('pv', {
         // narrow (the render keeps "4,683 →" whole): that is not a collapse (measureItems' reflow).
         // The same holds for a cut-line cell (critic pv-r2: a 4-7 digit cut line printed ONE
         // column at L; stacked, "→ ____" goes under the number and two columns fit).
-        const restacks = (p.kind === 'round' && p.support !== 'line') || p.kind === 'round-multi';
+        const restacks = false;
         // Size S buys problems (LESSONS L1, critic pv-r2): a one-line rounding cell is short enough
         // at S for three columns of ten, a value / compare / frame cell or a several-place rounding
         // for three of eight - DN-1's 20 binds at L (layout.js `sCeiling`).
         // (24 at most: a page is lettered a to x, never a second "a.")
         const sCeiling = wide ? 0 : p.kind === 'round' && p.support !== 'line' ? 24
             : ['value', 'compare', 'frame', 'blanks', 'place', 'place-bank', 'round-multi', 'expand-line'].includes(p.kind) ? 24 : 0;
+        // Short one-line cells stay close to their content (critic pv-r3, H13: a third of every
+        // S cell was empty); the spare height stays under the grid. Drawings keep the page fill.
+        const tight = ['round', 'value', 'compare', 'frame', 'blanks', 'place', 'place-bank', 'round-multi', 'expand', 'expand-line', 'scale', 'decide', 'judge', 'estimate', 'closest']
+            .includes(p.kind) && p.support !== 'line';
         return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2, ...(fclass ? { fclass } : {}), ...(restacks ? { restacks } : {}),
-            ...(sCeiling ? { sCeiling } : {}) };
+            ...(sCeiling ? { sCeiling } : {}), ...(tight ? { fillCap: 1.3 } : {}), pageMax: 26 };
     },
     inputs() { return [{ id: 'answer', kind: 'number', shape: 'line', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },
     layout(p) {

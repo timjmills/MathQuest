@@ -30,7 +30,20 @@ const WIDE = ['multiplication:mult_facts', 'division:div_facts', 'division:box_d
     'addition:add_word_problems', 'number_sense:round_nl_thousands', 'number_sense:nearest_100', 'measurement:money_count',
     'measurement:time_quarter|{"response":"draw"}', 'area_perimeter:area_perimeter', 'fractions:write_fraction',
     'algebra:function_table_easy', 'placevalue:value', 'comparing:compare_groups', 'composing:number_bonds'];
-const LIST = (arg('skills', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
+// Split on the commas BETWEEN skills only: a skill's options JSON ("cat:skill|{"a":1,"b":2}")
+// has commas of its own (critic pv-r3: the list crashed).
+const splitTop = (str) => {
+    const out = [];
+    let depth = 0, cur = '';
+    for (const ch of String(str || '')) {
+        if (ch === '{' || ch === '[') depth++;
+        if (ch === '}' || ch === ']') depth = Math.max(0, depth - 1);
+        if (ch === ',' && depth === 0) { out.push(cur); cur = ''; } else cur += ch;
+    }
+    out.push(cur);
+    return out;
+};
+const LIST = splitTop(arg('skills', '')).map((s) => s.trim()).filter(Boolean);
 const SKILLS = LIST.length ? LIST : has('wide') ? WIDE : DEFAULT;
 const HOSTS = (arg('hosts', has('wide') ? 'card' : 'card,worksheet,quiz') || '').split(',');
 const SHOTS = arg('shots', null);
@@ -247,7 +260,8 @@ async function shot(page, host, skill, k, w) {
     for (const w of WIDTHS) {
         await page.setViewport({ width: w, height: w < 600 ? 844 : 900, deviceScaleFactor: 1 });
         for (const spec of SKILLS) {
-            const [s, optJson] = spec.split('|');
+            const cut = spec.indexOf('|');
+            const [s, optJson] = cut < 0 ? [spec, ''] : [spec.slice(0, cut), spec.slice(cut + 1)];
             const [c, k] = s.split(':');
             const line = [];
             await page.reload({ waitUntil: 'networkidle2' });

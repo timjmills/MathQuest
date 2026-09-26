@@ -81,6 +81,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     array: 'Write how many rows. Write how many in each row.',
     'skip-count': 'Count by {n}. Write the missing numbers.',
     expanded: 'Write the number in expanded form.',
+    // critic pv-r3: an expanded-notation page (3 × 100 + 4 × 10) says so
+    'expanded-notation': 'Write the number in expanded notation.',
     'digit-value': 'Write the value of the underlined digit.',
     round: 'Round to the nearest {place}.',
     'more-less': 'Write 1 more and 1 less.',

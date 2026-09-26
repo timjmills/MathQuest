@@ -1318,3 +1318,6 @@ html body .mq-scell .mq-kittwin .mq-cellbox > input.mq-cellslot {
 }
 .mq-scell .mq-kittwin .pv-rmulti span[style*="table-cell"] { vertical-align: middle !important; height: auto !important; padding-top: 3px !important; padding-bottom: 3px !important; }
 html body .mq-scell .mq-kittwin .mq-cellbox > input.mq-cellslot.mq-tried { border-bottom: 3px dashed #949494 !important; }
+/* critic pv-r3 (additive): the focused box of a kit twin draws ONE ring (the inset shadow and the
+   outline together read as a doubled rule on the first box) */
+html body .mq-scell .mq-kittwin [data-mq-cell] > input.mq-cellslot:focus:not(.box-correct):not(.box-wrong) { box-shadow: none !important; outline: 3px solid #000 !important; outline-offset: -3px !important; }

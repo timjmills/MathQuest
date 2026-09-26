@@ -255,6 +255,8 @@
 /* Round-3: a digit box in a frame of words (unit form "4 hundreds 0 tens 5 ones", expanded
    notation, between two tens) is at least 14 mm tall — the pupil writes a whole digit in it. */
 :is(.ws-page, .ws-sheet) .pv-cell .pv-blanks .ws-box { height: max(var(--ws-hw), 14mm); line-height: max(var(--ws-hw), 14mm); min-width: 12mm; }
+/* critic pv-r3: an expanded form's part boxes hold a whole written part, Hw + 2 mm tall */
+:is(.ws-page, .ws-sheet) .pv-cell .pv-expand .ws-box { height: calc(var(--ws-hw) + 2mm); line-height: calc(var(--ws-hw) + 2mm); }
 
 /* ---------- writing-box radius and the digit strip (SL-11, SL-12; owner ruling 2026-09-25) ----------
    Every WRITING box is slightly rounded (1 / 1.25 / 1.5 mm at S / M / L). The cell frame, the grid

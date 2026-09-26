@@ -15,6 +15,10 @@ import { num, fmt, obj, arr, chooseWrong, strings, step, clampSteps } from './ut
 
 const PLACE_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands', 1000000: 'millions',
     0.1: 'tenths', 0.01: 'hundredths', 0.001: 'thousandths' };
+/** "1 hundred", "3 hundreds", "1 disk", "0 disks" (critic pv-r3: "1 hundreds", "1 disks"). */
+const ONE_WORD = { ones: 'one', tens: 'ten', hundreds: 'hundred', thousands: 'thousand', 'ten thousands': 'ten thousand',
+    'hundred thousands': 'hundred thousand', millions: 'million', tenths: 'tenth', hundredths: 'hundredth', thousandths: 'thousandth', disks: 'disk', dots: 'dot' };
+const nWord = (k, word) => (Number(k) === 1 && ONE_WORD[word] ? ONE_WORD[word] : word);
 const LETTER = { 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M', 0.1: 'Tth', 0.01: 'Hth', 0.001: 'Thth' };
 // A decimal part is worked to six places, so 3 x 0.1 prints 0.3, never 0.30000000000000004.
 const f = (v) => fmt(Number(Number(v).toFixed(6)));
@@ -208,7 +212,7 @@ registerSkill('placevalue:value', {
         return [
             step(`The underlined digit is ${v.digit}.`),
             step(`It is in the ${v.word} place.`),
-            v.digit === 0 ? step('A zero is worth nothing. It holds the place.') : step(`${v.digit} ${v.word} is ${v.digit} × ${f(v.place)} = ${f(v.value)}.`),
+            v.digit === 0 ? step('A zero is worth nothing. It holds the place.') : step(`${v.digit} ${nWord(v.digit, v.word)} is ${v.digit} × ${f(v.place)} = ${f(v.value)}.`),
             last,
         ];
     },
@@ -241,7 +245,7 @@ const EXPAND_DEC = {
 };
 const EXPAND_DEC_NOTATION = {
     iCan: 'I Can write a decimal in expanded notation',
-    instructionKey: 'expanded',
+    instructionKey: 'expanded-notation',
     steps: ['Start with the digit on the left.', 'Write each digit in its box.', 'The box is multiplied by its place: 4 × 0.1.'],
     say: '__ is __.',
     sayValues: EXPAND_DEC.sayValues,
@@ -352,7 +356,7 @@ registerSkill('placevalue:expand', {
 
 const EXPAND_NOTATION = {
     iCan: 'I Can write a number in expanded notation',
-    instructionKey: 'expanded',
+    instructionKey: 'expanded-notation',
     steps: ['Start with the digit on the left.', 'Write each digit in its box.', 'The box is multiplied by its place: 3 × 100.'],
     say: '__ is __.',
     sayValues: (q) => { const p = pvOf(q); return p.n ? [p.n, String(q.ans).replace(/×/g, 'times').replace(/\+/g, 'plus')] : null; },
@@ -414,7 +418,7 @@ registerSkill('placevalue:unit_form', {
                 step(`So there are ${counts[hiP] + 1} ${PLACE_WORD[hiP]} and ${counts[loP] - 10} ${PLACE_WORD[loP]}.`),
                 step(`That is ${f(p.n)}.`), step(`Write ${f(p.n)}.`, [{ slot: 'answer', value: f(p.n) }])];
         }
-        const out = keys.map((pl, i) => step(`${digitAt(p.n, pl)} ${PLACE_WORD[pl]}.`, [{ slot: `b${i}`, value: String(digitAt(p.n, pl)) }]));
+        const out = keys.map((pl, i) => step(`${digitAt(p.n, pl)} ${nWord(digitAt(p.n, pl), PLACE_WORD[pl])}.`, [{ slot: `b${i}`, value: String(digitAt(p.n, pl)) }]));
         return clampSteps([step(`Read ${f(p.n)}.`)].concat(out));
     },
     wrongAnswer: (q) => {
@@ -558,7 +562,7 @@ registerSkill('placevalue:place_value_disks', {
         }
         // (`hide`: the count IS the answer's digit, so the screen's worked box blanks it - critic
         // pv-r2; the paper's model keeps it)
-        const out = places.slice(0, 4).map((pl) => ({ ...step(`${PLACE_WORD[pl]}: ${counts[pl] || 0} disks, so the digit is ${counts[pl] || 0}.`),
+        const out = places.slice(0, 4).map((pl) => ({ ...step(`${PLACE_WORD[pl]}: ${counts[pl] || 0} ${nWord(counts[pl] || 0, p.dots ? 'dots' : 'disks')}, so the digit is ${counts[pl] || 0}.`),
             hide: [String(counts[pl] || 0)] }));
         out.push(step(`Write ${shown(p)}.`, [{ slot: 'answer', value: shown(p) }]));
         return clampSteps(out.length >= 3 ? out : [step('Look at each zone.')].concat(out));
@@ -664,7 +668,9 @@ registerSkill('placevalue:pv_disks_build', {
         const places = arr(p.places).map(Number);
         if (!places.length) return [];
         const mark = (pl) => (p.fraction && pl < 1 ? `1/${Math.round(1 / pl)}` : f(pl));
-        const out = places.map((pl) => step(`${digitAt(p.n, pl)} in the ${PLACE_WORD[pl]}: draw ${digitAt(p.n, pl)} ${p.dots ? 'dots' : `disks marked ${mark(pl)}`}.`));
+        // (a zero place: "0 ones: leave the zone empty", critic pv-r3)
+        const out = places.map((pl) => (digitAt(p.n, pl) === 0 ? step(`0 ${PLACE_WORD[pl]}: leave the ${PLACE_WORD[pl]} zone empty.`)
+            : step(`${digitAt(p.n, pl)} ${nWord(digitAt(p.n, pl), PLACE_WORD[pl])}: draw ${digitAt(p.n, pl)} ${nWord(digitAt(p.n, pl), p.dots ? 'dots' : 'disks')}${p.dots ? '' : ` marked ${mark(pl)}`}.`)));
         out.push(step(`The mat shows ${shown(p)}.`, [{ slot: 'answer', value: String(q.printAnswer || shown(p)) }]));
         return clampSteps(out.length >= 3 ? out : [step(`Read ${f(p.n)}.`)].concat(out));
     },
@@ -829,16 +835,20 @@ registerSkill('placevalue:compare', {
             return [step(`Line up the points: ${d.aw}.${d.af} and ${d.bw}.${d.bf}.`), step(why),
                 step(`${p.as} ${q.ans} ${p.bs}.`, [{ slot: 'answer', value: String(q.ans) }])];
         }
+        // The model walks the Steps box in order (critic pv-r3): count the digits, then the first
+        // place that differs, named, with its two digits.
         const la = String(p.a).length, lb = String(p.b).length;
+        const count = la !== lb ? `${f(p.a)} has ${la} digits, ${f(p.b)} has ${lb}.` : `Both have ${la} digits.`;
         let why;
-        if (la !== lb) why = `${f(la > lb ? p.a : p.b)} has more digits.`;
+        if (la !== lb) why = `More digits is bigger: ${f(la > lb ? p.a : p.b)} is bigger.`;
         else if (p.a === p.b) why = 'Every digit is the same.';
         else {
             const sa = String(p.a), sb = String(p.b);
             const i = [...sa].findIndex((d, k) => d !== sb[k]);
-            why = `The first different digits are ${sa[i]} and ${sb[i]}.`;
+            const word = PLACE_WORD[10 ** (sa.length - 1 - i)] || 'place';
+            why = `The ${word} differ first: ${sa[i]} ${Number(sa[i]) > Number(sb[i]) ? '>' : '<'} ${sb[i]}.`;
         }
-        return [step(`Compare ${f(p.a)} and ${f(p.b)}.`), step(why), step(`${f(p.a)} ${q.ans} ${f(p.b)}.`, [{ slot: 'answer', value: String(q.ans) }])];
+        return [step(count), step(why), step(`So ${f(p.a)} ${q.ans} ${f(p.b)}.`, [{ slot: 'answer', value: String(q.ans) }])];
     },
     wrongAnswer: (q) => {
         const p = pvOf(q);
@@ -931,7 +941,8 @@ const ROUND_JUDGE = {
 const ROUND_CIRCLE = {
     iCan: 'I Can find every number that rounds to a number',
     instructionKey: 'circle-rounds-to',
-    instructionVars: (q) => ({ n: f(pvOf(q).target) }),
+    // (a page's items round to different numbers: the page line names none, each cell has its own)
+    instructionVars: (q) => ({ n: 'the number shown' }),
     steps: ['Find the two halfway numbers either side.', 'Halfway rounds up.', 'Circle every number between them.'],
     say: '__ rounds to __, so I circle it.',
     sayValues: (q) => { const p = pvOf(q); return p.target ? [arr(p.tiles).find((v) => roundTo(v, p.place) === p.target), p.target] : null; },
@@ -949,8 +960,10 @@ function roundingSteps(q) {
             step(`Circle the digit after it: ${next}.`, [{ slot: 'b0', value: String(digitAt(p.n, P)) }, { slot: 'b1', value: String(next) }])];
     }
     const out = [step(`${f(p.n)} is between ${f(lo)} and ${f(lo + P)}.`),
-        p.n - lo === P / 2 ? step(`It is exactly halfway. Halfway rounds up.`)
-            : step(`The digit after ${p.plain ? `the ${PLACE_WORD[P]} digit` : 'the cut'} is ${next}: ${next >= 5 ? '5 or more, round up' : '4 or less, round down'}.`)];
+        // (the deciding digit is named in the halfway case too: the Guided model keeps the steps
+        // that name the item's numbers, critic pv-r3 - "75 rounds to 80" skipped the 5)
+        step(`The digit after ${p.plain ? `the ${PLACE_WORD[P]} digit` : 'the cut'} is ${next}: `
+            + `${p.n - lo === P / 2 ? 'exactly halfway, round up' : next >= 5 ? '5 or more, round up' : '4 or less, round down'}.`)];
     if (p.scope === 'decision') return out.concat(step(`Check ${String(q.ans)}.`, [{ slot: 'answer', value: String(q.ans) }]));
     if (p.scope === 'judge') return out.concat(step(`${f(p.n)} rounds to ${f(r)}.`), step(`${f(p.shown)} is ${p.shown === r ? 'correct' : 'wrong'}.`, [{ slot: 'answer', value: String(q.ans) }]));
     return out.concat(step(`${f(p.n)} rounds to ${f(r)}.`), step(`Write ${f(r)}.`, [{ slot: 'answer', value: f(r) }]));
@@ -1010,6 +1023,7 @@ const nearestPlainDef = (P) => ({
 for (const [id, P] of [['nearest_10', 10], ['nearest_100', 100], ['nearest_1000', 1000], ['nearest_10000', 10000], ['nearest_100000', 100000], ['nearest_million', 1000000]]) {
     const main = nearestDef(P);
     const plainDef = nearestPlainDef(P);
+    const notateDef = { ...ROUND_NOTATE, instructionVars: () => ({ place: PLACE_WORD[P] }) };
     registerSkill(`number_sense:${id}`, {
         // The tab and footer: rounding to 10 or 100 is 3.NBT.1 (grade 3), to 1,000 and beyond
         // 4.NBT.3 (grade 4) - never "Level 3" over a 4.NBT.3 footer (critic pv-r2 pre-flight).
@@ -1021,8 +1035,11 @@ for (const [id, P] of [['nearest_10', 10], ['nearest_100', 100], ['nearest_1000'
         strings: stringsBy((q) => {
             const p = pvOf(q);
             if (p.plain || p.responseScope === 'plain' || (Array.isArray(p.support) && p.support.includes('bare'))) return plainDef;
-            if (p.kind === 'circle') return ROUND_CIRCLE;
-            return p.scope === 'notation' ? ROUND_NOTATE : p.scope === 'decision' ? ROUND_DECIDE : p.scope === 'judge' ? ROUND_JUDGE : null;
+            // (a page's options arrive as {pv: opts}: responseScope / response, not scope / kind -
+            // critic pv-r3: the "do not round" page said "Round to the nearest hundreds.")
+            if (p.kind === 'circle' || p.response === 'circle-all') return ROUND_CIRCLE;
+            const scope = p.scope || p.responseScope;
+            return scope === 'notation' ? notateDef : scope === 'decision' ? ROUND_DECIDE : scope === 'judge' ? ROUND_JUDGE : null;
         }, main),
         misconceptions: ['M-R1', 'M-R2', 'M-R3', 'M-R4', 'M-R5', 'M-R7'],
         workedSteps: (q) => (pvOf(q).kind === 'circle'
@@ -1245,10 +1262,13 @@ registerSkill('number_sense:number_line_scales', {
         const last = p.task === 'mark' ? step(`Mark ${f(p.n)}.`, [{ slot: 'answer', value: f(p.n) }]) : step(`The arrow points to ${f(p.n)}.`, [{ slot: 'answer', value: f(p.n) }]);
         const count = step(`Count ${k} jump${k === 1 ? '' : 's'} from ${f(lo)}${p.half ? ` to ${f(at)}` : ''}.`);
         // A half-tick arrow (35 on a line in tens): the model counts to the tick before it, then
-        // adds the half jump, so every number in the answer is worked (critic pv-r2).
-        const half = p.half ? [step(`The arrow is half a jump further: half of ${f(st)} is ${f(st / 2)}.`),
-            step(`${f(at)} + ${f(st / 2)} = ${f(p.n)}.`)] : [];
-        return clampSteps([step(`The line goes from ${f(lo)} to ${f(hi)}.`), step(`Each jump is ${f(st)}.`), count, ...half, last]);
+        // adds the half jump, in three work lines a Guided model shows whole (critic pv-r3: "Count 3
+        // jumps from 0 to 30" and no half jump).
+        if (p.half) {
+            return [step(`Each jump is ${f(st)}. Half a jump is ${f(st / 2)}.`), step(`${k} jump${k === 1 ? '' : 's'} from ${f(lo)} is ${f(at)}.`),
+                step(`Half a jump more: ${f(at)} + ${f(st / 2)} = ${f(p.n)}.`), last];
+        }
+        return clampSteps([step(`The line goes from ${f(lo)} to ${f(hi)}.`), step(`Each jump is ${f(st)}.`), count, last]);
     },
     wrongAnswer: (q) => {
         const p = pvOf(q);
@@ -1347,8 +1367,20 @@ function multiSteps(q) {
     const p = pvOf(q);
     const places = arr(p.places).map(Number);
     if (!places.length) return [];
-    // Every place gets its own line (critic pv-r2: the Model showed 3 of 6); six places are six
-    // steps, the contract's most.
+    // Four or more places: two places a line, so a Guided model's three work lines hold EVERY
+    // place (critic pv-r3: the 6-place model stopped after 1,000).
+    if (places.length > 3) {
+        const one = (P) => {
+            const r = roundTo(p.n, P), nx = digitAt(p.n, P / 10 >= 1 ? P / 10 : 1);
+            return `${f(P)}: next digit ${nx}, ${p.n - Math.floor(p.n / P) * P === P / 2 ? 'halfway, up' : nx >= 5 ? 'up' : 'down'} → ${f(r)}`;
+        };
+        const lines = [];
+        for (let i = 0; i < places.length; i += 2) {
+            const pair = places.slice(i, i + 2);
+            lines.push(step(`${pair.map(one).join('; ')}.`, pair.map((P, k) => ({ slot: `b${i + k}`, value: f(roundTo(p.n, P)) }))));
+        }
+        return clampSteps(lines);
+    }
     const out = places.slice(0, 6).map((P, i) => {
         const lo = Math.floor(p.n / P) * P, r = roundTo(p.n, P);
         const nx = digitAt(p.n, P / 10 >= 1 ? P / 10 : 1);

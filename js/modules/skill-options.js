@@ -753,13 +753,16 @@ const P9_PV_OPTIONS = {
     'placevalue:order_greatest_to_least': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvOrderCount(), _pvCloseness(), _pvLengths()],
     'placevalue:place_value_disks': [_noDec(_pvBand([99, 999, 9999], 999)), {
         id: 'task', label: 'Task', type: 'enum', default: 'read', group: 'layout',
-        values: [{ v: 'read', l: 'Read the number from the disks' }, { v: 'count', l: "Count one place's disks" },
+        // (the two STEPS of reading a mat first, then the tasks that build on it, each named as
+        // such - critic pv-r3 O2: steps and new tasks read as one list)
+        values: [{ v: 'count', l: "Step 1: count one place's disks" }, { v: 'read', l: 'Step 2: read the whole number' },
             // build lane placevalue (vis_pv_dot_disks)
-            { v: 'take', l: 'Some are crossed out: write the number left' },
-            { v: 'x10', l: 'Every counter moves left: × 10' }, { v: 'd10', l: 'Every counter moves right: ÷ 10' },
-            { v: 'all', l: 'Use 2 to 5 counters: write every number they make (tens and ones)' }],
-        help: 'Counting one place is the easier first step; reading the whole number comes next. The move tasks show the '
-            + 'counters with an arrow from each place to the next; "every number" asks for all the numbers a few counters make.',
+            { v: 'take', l: 'Next task: some are crossed out, write the number left' },
+            { v: 'x10', l: 'Next task: every counter moves left (× 10)' }, { v: 'd10', l: 'Next task: every counter moves right (÷ 10)' },
+            { v: 'all', l: 'Next task: 2 to 5 counters on two places, write every number they make' }],
+        help: 'Steps 1 and 2 are the ladder of reading a mat: one place first, then the whole number. The next tasks '
+            + 'use a mat you can read: counters crossed out, every counter moving one place (× 10 or ÷ 10), and every '
+            + 'number a few counters make.',
     }, _pvZeroPlace(false), _pvCounterLook(), _pvDecimals(3, (o) => !o.task || o.task === 'read' || o.task === 'count'),
     { ..._pvCounterName(), appliesTo: (o) => Number(o.decimals) > 0 && o.labels !== 'none' && (!o.task || o.task === 'read' || o.task === 'count') },
     _pvAid([{ v: 'digits', l: 'A row under the chart: write each place\'s digit first' }],
@@ -863,8 +866,9 @@ const P9_PV_OPTIONS = {
             help: 'The place letters show where each place is; plain is the fade.' },
         { id: 'blank', label: 'How it is set out', type: 'enum', default: 'list', group: 'layout',
             values: [{ v: 'list', l: 'One number a problem, a line for each place (4,683: 10 → __, 100 → __)' },
-                { v: 'column', l: 'A table: fill in a whole column' }, { v: 'row', l: 'A table: fill in a whole row' }],
-            help: 'One number a problem is the plain way. In a table a whole column or row is blank, so no answer can be read off its neighbours.' },
+                { v: 'column', l: 'A table: fill in the column of the smallest place' }, { v: 'row', l: 'A table: fill in two whole rows' }],
+            help: 'One number a problem is the plain way. In a table the smallest place\'s column is blank (the printed columns are bigger '
+                + 'places, so no answer can be read off them), or two whole rows are.' },
     ],
     'number_sense:estimate_sum': [_pvEstPlace(), _pvEstSupport()],
     'number_sense:estimate_diff': [_pvEstPlace(), _pvEstSupport()],
