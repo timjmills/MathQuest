@@ -20,7 +20,7 @@
 
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
-import { L, P, INK, GREY, SW, n2, svg, root, checkBox, textPt, digitPt, shapeOf, pscale } from './k2kit.js';
+import { L, P, INK, GREY, SW, n2, svg, root, checkBox, textPt, digitPt, shapeOf, pscale, k2StepCtx, workInk, ringWrap } from './k2kit.js';
 import { dicePicture } from './counters.js';
 
 /** The frame's cell (mm): 10 at L, scaled with the sheet size (critic guided-r1: S drew at L's size). */
@@ -77,7 +77,7 @@ function group(ctx, n, solid, p) {
  * right edge for the top row, the left edge for the bottom row) so it never crosses an object.
  * The objects left over show which group has more. Returns {svg, hA, hB, gap} (mm) or null (dice).
  */
-function matchedPicture(ctx, p) {
+function matchedPicture(ctx, p, { lines = 'trace', left = '' } = {}) {
     if (p.objects === 'dice') return null;
     const C = cellOf(ctx), m = SW.heavy / 2, k = pscale(ctx);
     const shapes = p.objects === 'shapes' || p.objects === 'pictures';
@@ -92,7 +92,17 @@ function matchedPicture(ctx, p) {
         const ya = m + (row + 0.5) * C, yb = yB + m + (row + 0.5) * C;
         const side = row === 0 ? 1 : -1;
         const x0 = cx + side * r, x1 = cx + side * off;
-        s += `<path d="M${n2(x0)} ${n2(ya)}H${n2(x1)}V${n2(yb)}H${n2(x0)}" fill="none" stroke="${GREY}" stroke-width="${n2(SW.heavy)}" stroke-linejoin="round" data-ws-ink="trace"/>`;
+        const col = lines === 'trace' ? GREY : INK;
+        s += `<path d="M${n2(x0)} ${n2(ya)}H${n2(x1)}V${n2(yb)}H${n2(x0)}" fill="none" stroke="${col}" stroke-width="${n2(SW.heavy)}" stroke-linejoin="round"${lines === 'trace' ? ' data-ws-ink="trace"' : ''}/>`;
+    }
+    // the ones with no partner, ringed (a model's second step)
+    if (left) {
+        const col = left === 'trace' ? GREY : INK;
+        const big = p.a > p.b, from = Math.min(p.a, p.b), to = Math.max(p.a, p.b), y0 = big ? 0 : yB;
+        for (let j = from; j < to; j++) {
+            const cx = m + (j % 5 + 0.5) * C, cy = y0 + m + (Math.floor(j / 5) + 0.5) * C;
+            s += `<circle cx="${n2(cx)}" cy="${n2(cy)}" r="${n2(C / 2 - 0.5)}" fill="none" stroke="${col}" stroke-width="${n2(SW.heavy)}"${left === 'trace' ? ' data-ws-ink="trace"' : ''}/>`;
+        }
     }
     return { svg: svg(ctx, 5 * C + 2 * m, yB + hB, s, { label: `${p.a} and ${p.b}, matched one to one` }), hA, hB, gap };
 }
@@ -117,10 +127,13 @@ register('compare', {
             // P11 hint (Support level 2): how many, written beside each frame, so the pupil can
             // compare two numbers instead of matching one to one. Faded at level 1 (absent).
             + `${p.showCounts ? `<span data-k2-count="1" style="font-size:${P(ctx, digitPt(ctx) * 0.8)};font-weight:700;line-height:1;">${esc(n)}</span>` : ''}</div>`;
-        // the Model (traced): the two groups matched one to one in grey
-        const mp = ctx.state === 'traced' ? matchedPicture(ctx, p) : null;
+        // the Model (traced): the two groups matched one to one in grey; a scripted model's states
+        // (ctx.work) add the lines, the leftovers and the winner's name one step at a time
+        const lines = ctx.work ? workInk(ctx, 'match') : ctx.state === 'traced' ? 'trace' : '';
+        const mp = lines ? matchedPicture(ctx, p, { lines, left: ctx.work ? workInk(ctx, 'left') : '' }) : null;
+        const winner = p.correct === 1 ? 'B' : 'A';
         const lab = (t, h) => `<div style="height:${L(ctx, h)};display:flex;align-items:center;justify-content:flex-end;">`
-            + `<b style="font-size:${P(ctx, digitPt(ctx) * 0.8)};line-height:1;">${t}</b></div>`;
+            + `<b style="font-size:${P(ctx, digitPt(ctx) * 0.8)};line-height:1;">${ctx.work && t === winner ? ringWrap(ctx, t, workInk(ctx, 'win')) : t}</b></div>`;
         const cnt = (n, h) => `<div style="height:${L(ctx, h)};display:flex;align-items:center;">`
             + `<span data-k2-count="1" style="font-size:${P(ctx, digitPt(ctx) * 0.8)};font-weight:700;line-height:1;">${esc(n)}</span></div>`;
         const groups = mp
@@ -152,4 +165,7 @@ register('compare', {
     },
     inputs() { return [{ id: 'answer', kind: 'check', shape: 'check', graded: true, order: 0, scopes: ['full'] }]; },
     layout() { return { card: 'card-medium-visual', checker: 'choice' }; },
+    /** PT-MOD-1: model states from the provider's work marks (match, left, win) and the answer. */
+    modelStates: (p) => !!p && p.objects !== 'dice',
+    stepState(p, steps, k, ctx) { return this.render(p, k2StepCtx(steps, k, ctx)); },
 });

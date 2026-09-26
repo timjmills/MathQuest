@@ -44,8 +44,12 @@ export const workInk = (ctx, token) => (ctx && ctx.work && ctx.work[token]) || '
 export function ringWrap(ctx, html, ink) {
     if (!ink) return html;
     const grey = ink === 'trace';
-    return `<span data-ws-ink="${grey ? 'trace' : 'solid'}" style="display:inline-block;border:${B(ctx, 1.5)} solid ${grey ? GREY : INK};`
-        + `border-radius:${L(ctx, 6)};padding:${L(ctx, 1)};margin:${L(ctx, -1.53)};line-height:0;">${html}</span>`;
+    // a ring round a WORD keeps the word's line box (critic k2-r2: with line-height 0 the ring round
+    // "Empty" collapsed into a line through it, so the answer looked crossed out); a drawing's ring
+    // hugs the drawing (line-height 0)
+    const words = /\S/.test(String(html).replace(/<[^>]*>/g, ''));
+    return `<span data-ws-ink="${grey ? 'trace' : 'solid'}" style="display:inline-${words ? 'flex;align-items:center;gap:inherit' : 'block'};border:${B(ctx, 1.5)} solid ${grey ? GREY : INK};`
+        + `border-radius:${L(ctx, 6)};padding:${L(ctx, words ? 0.8 : 1)} ${L(ctx, words ? 2 : 1)};margin:${words ? `${L(ctx, -1.33)} ${L(ctx, -2.53)}` : L(ctx, -1.53)};line-height:${words ? 1.15 : 0};">${html}</span>`;
 }
 /** A multi-box cell's slot value in a model state (its ink as a state), else the normal shown value. */
 export function stepSlot(ctx, id, fallback) {
@@ -438,7 +442,7 @@ export function checkedChoice(p, ctx, labels) {
  * choices: [{pic: html, label: 'A'}], on: the checked index (-1 none), vertical: a list of word
  * choices (a bank), each box on the right of its word (the compare cell's form).
  */
-export function choiceRow(ctx, choices, { on = -1, gapMm = 7, vertical = false, labelPt = null, labelW = null, ring = null } = {}) {
+export function choiceRow(ctx, choices, { on = -1, gapMm = 7, vertical = false, labelPt = null, labelW = null, ring = null, hideLabels = false } = {}) {
     const lp = labelPt || textPt(ctx) + 2;
     // a model state's ring round the chosen one (ring = {index, ink}, from ctx.work)
     const ringed = (i, html) => (ring && ring.ink && ring.index === i ? ringWrap(ctx, html, ring.ink) : html);
@@ -449,9 +453,14 @@ export function choiceRow(ctx, choices, { on = -1, gapMm = 7, vertical = false, 
                 + `<span style="flex:none;${labelW ? `width:${L(ctx, labelW)};` : ''}display:inline-flex;align-items:center;gap:${L(ctx, 2)};white-space:nowrap;text-align:left;font-size:${P(ctx, lp)};">`
                 + `${ringed(i, `${c.pic || ''}${esc(c.label)}`)}</span>${box}</div>`;
         }
-        return `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 2)};">`
+        // hideLabels (critic k2-r2, L3: an ordinal line lettered A, B, C from the flag named the
+        // place): the choice keeps its name for the screen's tap wiring and the key, drawn nowhere
+        // (paper prints no name at all; the screen twin keeps it off-screen for the tap wiring)
+        const name = !hideLabels ? esc(c.label)
+            : isTwin(ctx) ? `<span class="mq-sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;">${esc(c.label)}</span>` : '';
+        return `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 2)};${hideLabels ? 'position:relative;' : ''}">`
             + `<span style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 1.5)};font-size:${P(ctx, lp)};font-weight:700;line-height:1;">`
-            + `${c.pic ? ringed(i, c.pic) : ''}${c.pic ? esc(c.label) : ringed(i, esc(c.label))}</span>${box}</div>`;
+            + `${c.pic ? ringed(i, c.pic) : ''}${c.pic ? name : ringed(i, name)}</span>${box}</div>`;
     }).join('');
     // A traced Model marks only the check in grey (the box carries its own trace ink): a trace ink
     // on the whole row would grey the pictures and their labels too (practice.js INK-3 rule).

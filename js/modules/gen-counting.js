@@ -690,8 +690,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             partB = unknown === 'B' ? answer : shown;
         }
         // part + part = whole, the order ws-content-audit reads as an equation.
-        q.text = unknown === 'whole' ? `${partA} + ${partB} = ?`
-            : `${unknown === 'A' ? '?' : partA} + ${unknown === 'B' ? '?' : partB} = ${total}`;
+        // the screen prompt carries a verb (critic k2-r2: the bare "2 + 4 = ?")
+        q.text = 'Find the missing number. ' + (unknown === 'whole' ? `${partA} + ${partB} = ?`
+            : `${unknown === 'A' ? '?' : partA} + ${unknown === 'B' ? '?' : partB} = ${total}`);
         q.printText = 'Write the missing number.';
         q.selfAnswering = true;
         q.ans = answer;
@@ -707,6 +708,10 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const wrong = unknown === 'whole' ? (partA === partB ? total - 1 : Math.abs(partA - partB)) : total + known;
         q.distractorTags = { [wrong]: unknown === 'whole' ? 'took one part from the other' : 'added the two numbers it could see' };
         const _nbPayload = { whole: total, a: partA, b: partB, unknown };
+        // Support level 2 (critic k2-r2 panel): dots under each part the pupil is given
+        const _nbLvl = _kLevel(1);
+        if (_nbLvl >= 2) _nbPayload.dots = true;
+        q.supportLevel = _nbLvl;
         // O6 AP1: "How the bond is drawn" — whole above (the default, unchanged) or at the side.
         if (_kOpt('orientation') === 'horizontal') _nbPayload.orientation = 'horizontal';
         _kSetCell(q, 'bond', _nbPayload);
@@ -734,9 +739,15 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         q.ans = answer;
         q.answerType = "number";
         q.hint = `Count the empty boxes. ${filled} and ${answer} make ${target}.`;
-        q.visual = _kCell(target === 5 ? _kTenFrame(filled, { rows: 1 }) : _kTenFrame(filled, { frames: target === 20 ? 2 : 1 }));
+        // the kit's counters cell (kind 'maketen'): the frame and `filled + [ ] = target` under it,
+        // the box the only answer place on paper, the key and screen (critic k2-r2: the legacy cell
+        // repeated its instruction inside and added an "Answer: ____" line)
+        q.selfAnswering = true;
+        _kSetCell(q, 'counters', { kind: 'maketen', filled, target, ans: answer });
         // P11 Support level 0: the number sentence alone, no frame to count the empty boxes of.
         if (_kLevel(1) === 0) {
+            delete q.cell;
+            q.selfAnswering = false;
             q.text = `${filled} + ? = ${target}`;
             q.printText = 'Write the missing number.';
             q.visual = _kCell(`<div style="font-size:1.6rem;font-weight:700;white-space:nowrap;">${filled} + ${_kLine(2)} = ${target}</div>`, null, true);
@@ -757,7 +768,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // "Teen numbers to" 15 keeps the loose ones to one row of five (option-panel round 3).
         const ones = 1 + _kDraw('tc-ones', Number(_kOpt('band')) === 15 ? 5 : 9);   // 1..9 -> 11..19 (or 11..15)
         const teen = 10 + ones;
-        const askTotal = _kDraw('tc-ask', 2) === 1;
+        // "What is missing" (critic k2-r2 panel): the teen number, the ones, or both dealt on the page
+        const _tcU = _kOpt('unknown');
+        const askTotal = _tcU === 'answer' ? true : _tcU === 'second' ? false : _kDraw('tc-ask', 2) === 1;
 
         // THE NUMBER SENTENCE IS PART OF THE CELL, not part of the instruction: "Write the missing
         // number." over a ten frame and five loose counters is unanswerable (5 and 15 both fit), so
@@ -1451,7 +1464,7 @@ function _k2Zero(q, rng) {
         q.distractorTags = all ? { [n]: 'wrote how many there were, not how many are left' } : { 0: 'took them all away' };
         q._variant = 'compute';
         q.printFormat = 'k2-compute';
-        const cp = { kind: 'zero', task: 'compute', objects: holder, shape, n, m, ans: n - m };
+        const cp = { kind: 'zero', task: 'compute', objects: holder, shape, n, m, ans: n - m, band };
         const clvl = _kLevel(1);
         if (clvl >= 2) cp.track = band;    // the track 0..band to count back along
         q.supportLevel = clvl;
@@ -1471,7 +1484,7 @@ function _k2Zero(q, rng) {
     q.distractorTags = n === 0 ? { 1: 'wrote 1 for an empty set' } : { [n + 1]: 'counted one object twice' };
     q._variant = 'count';
     q.printFormat = 'k2-count';
-    const payload = { kind: 'zero', task: 'count', objects: holder, shape, n, ans: n };
+    const payload = { kind: 'zero', task: 'count', objects: holder, shape, n, ans: n, band };
     const lvl = _kLevel(1);
     if (lvl >= 2) payload.track = band;
     q.supportLevel = lvl;
@@ -1624,7 +1637,7 @@ function _k2OddOneOut(q, rng) {
     q.distractorTags = { [K2_LETTERS[at === n - 1 ? 0 : n - 1]]: 'chose by place, not by looking' };
     q._variant = 'find';
     q.printFormat = 'k2-find';
-    _kSetCell(q, 'picture-row', { kind: 'pick', choices: row, correct: at, labels: K2_LETTERS.slice(0, n), pic: n === 4 ? 15.5 : 19, gap: n === 4 ? 5 : 6, cue: lvl >= 2 ? attr : null });
+    _kSetCell(q, 'picture-row', { kind: 'pick', choices: row, correct: at, labels: K2_LETTERS.slice(0, n), pic: n === 4 ? 15.5 : 19, gap: n === 4 ? 5 : 6, cue: lvl >= 2 ? attr : null, attr });
     return true;
 }
 
@@ -1836,7 +1849,7 @@ function _k2Measurable(q, rng) {
     const TOOL_NOTE = { Ruler: 'A ruler: long, tall.', Scale: 'A scale: heavy.', Jug: 'A jug: how much it holds.' };
     const note = task === 'tool' && lvl >= 2 ? words.map((w) => TOOL_NOTE[w.label]).filter(Boolean).join(' ') : null;
     _kSetCell(q, 'picture-row', {
-        kind: 'words', pic0: obj, words, correct, labels: words.map((w) => w.label), pic: 19,
+        kind: 'words', pic0: obj, words, correct, labels: words.map((w) => w.label), pic: 23,
         icons: task === 'tool' || lvl >= 2, iconSize: task === 'tool' ? 11 : 6.5, caption: task === 'tool' ? m.q : null,
         ...(note ? { note } : {}), ...(_kOpt('orientation') === 'horizontal' ? { under: true } : {}),
     });
@@ -1901,7 +1914,9 @@ function _k2OrdinalLine(q, rng) {
     q._variant = 'find';
     q.printFormat = 'k2-find';
     q.ordPlace = place;
-    _kSetCell(q, 'picture-row', { kind: 'line', task: 'find', items, correct: place - 1, labels, ask: ord, pic, gap: band === 5 ? 3 : 4 });
+    // Level 1 (critic k2-r2, L3): the letters A, B, C ... ran from the flag, so "3rd" was always C;
+    // they name the boxes for the screen and the key only and are never drawn (check boxes alone)
+    _kSetCell(q, 'picture-row', { kind: 'line', task: 'find', items, correct: place - 1, labels, ask: ord, pic, gap: band === 5 ? 3 : 4, ...(lvl >= 2 ? {} : { hideLabels: true }) });
     return true;
 }
 
@@ -2062,7 +2077,7 @@ function _k2Conserve(q, rng) {
     const shape = objects === 'pictures' ? K2_PICTURE_KINDS[_kPageDeal('cons-shape', K2_PICTURE_KINDS.length)] : K2_COUNT_SHAPES[_kPageDeal('cons-shape', K2_COUNT_SHAPES.length)];
     const n = 3 + _kDealShuffled(Math.max(2, band - 2));          // 3..band
     const same = _kDraw('conserve-same', 2) === 0;
-    const m = same ? n : (n > 3 && rng(0, 1) === 0 ? n - 1 : n + 1);
+    const m = same ? n : (n > 3 && (n >= band || rng(0, 1) === 0) ? n - 1 : n + 1);   // never past the band (critic k2-r2: 11 on a to-10 page)
     const labels = ['Same', 'Not the same'];
     const correct = same ? 0 : 1;
     const plural = K2_SHAPES[shape].plural;
@@ -2111,7 +2126,7 @@ function _k2BondsInOrder(q, rng) {
         const pool = shuffle(Array.from({ length: n + 1 - given }, (_, i) => i + given));
         pool.slice(0, k).forEach((i) => { rows[i].hide = 'both'; });
     }
-    const payload = { kind: 'table', task, n, rows, notation, dots: lvl >= 3, ...(dir === 'mixed' ? { mixedDir: true } : {}) };
+    const payload = { kind: 'table', task, n, rows, notation, dots: lvl >= 3, ...(band === 5 ? {} : { split: true }), ...(dir === 'mixed' ? { mixedDir: true } : {}) };
     q.options = [];
     q.selfAnswering = true;
     q.skillLabel = 'Number Bonds in Order';

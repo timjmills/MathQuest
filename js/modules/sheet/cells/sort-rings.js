@@ -39,8 +39,12 @@ function pic(ctx, spec, d) {
 
 /** The tile row: pictures with their letter under each. */
 function tileRow(ctx, tiles, d) {
-    return `<div style="display:flex;justify-content:center;align-items:flex-end;gap:${L(ctx, 4)};flex-wrap:wrap;">`
-        + tiles.map((t, i) => `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 1)};">${pic(ctx, t, d)}`
+    // on screen a row of up to ten stays one line (critic k2-r2: "G alone on a second line"): the
+    // screen fit shrinks the tiles instead; a longer row, and paper, wrap
+    const one = isTwin(ctx) && tiles.length <= 10;
+    return `<div${one ? ' data-mq-nowrap="1"' : ''} style="display:flex;justify-content:center;align-items:flex-end;gap:${L(ctx, 4)};flex-wrap:${one ? 'nowrap' : 'wrap'};">`
+        // screen: each tile is a tap target the sort control moves into a ring (screen-cell.js wireSortTaps)
+        + tiles.map((t, i) => `<div${isTwin(ctx) ? ` data-k2-tile="${LETTERS[i]}"` : ''} style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 1)};">${pic(ctx, t, d)}`
             + `<span style="font-size:${P(ctx, textPt(ctx))};font-weight:700;line-height:1;">${LETTERS[i]}</span></div>`).join('') + '</div>';
 }
 
@@ -90,9 +94,9 @@ register('sort-rings', {
             const shape = grid ? `border-radius:${L(ctx, 1.5)};` : 'border-radius:50%;';
             const ringed = task === 'most' && gi === (p.correct || 0) ? workInk(ctx, 'ring') : '';
             return (ringed ? `<div style="border:${B(ctx, 1.5)} solid ${ringed === 'trace' ? GREY : INK};border-radius:${L(ctx, 8)};padding:${L(ctx, 1)};">` : '<div>')
-                + `<div class="k2-ring" style="box-sizing:border-box;width:${L(ctx, w)};height:${L(ctx, h)};border:${B(ctx, 1.5)} solid ${INK};${shape}`
+                + `<div class="k2-ring"${isTwin(ctx) && task === 'count' ? ` data-k2-ring="${gi}"` : ''} style="box-sizing:border-box;width:${L(ctx, w)};height:${L(ctx, h)};border:${B(ctx, 1.5)} solid ${INK};${shape}`
                 + `display:flex;flex-direction:column;align-items:center;justify-content:${inside ? 'center' : 'flex-start'};gap:${L(ctx, 1.5)};padding:${L(ctx, grid ? 2 : 4)} ${L(ctx, 4)};background:#fff;">`
-                + `${label}${members}${letters}</div></div>`;
+                + `${label}${members}${letters}${isTwin(ctx) && task === 'count' ? `<div data-k2-drop="1" style="font-size:${P(ctx, textPt(ctx) + 2)};font-weight:700;line-height:1.3;letter-spacing:.12em;"></div>` : ''}</div></div>`;
         });
         let under = '';
         if (task === 'count' || task === 'order') {

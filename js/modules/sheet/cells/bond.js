@@ -84,7 +84,10 @@ function bondTable(p, ctx) {
     const ink = inkOf(ctx);
     const across = p.notation === 'across';
     const dp = digitPt(ctx);
-    const cellStyle = (w) => `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};height:${L(ctx, ch)};`
+    // screen twin (critic k2-r2: rows drifted at 390 - the host's input made a blank cell taller than
+    // its number cell): a cell is at LEAST its height and stretches to its row's tallest cell
+    const hCss = isTwin(ctx) ? `min-height:${L(ctx, ch)};align-self:stretch;` : `height:${L(ctx, ch)};`;
+    const cellStyle = (w) => `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};${hCss}`
         + `font-size:${P(ctx, dp)};font-weight:700;line-height:1;${KEY_FEATURES}flex:none;`;
     // one number: printed, or a blank the pupil writes in (the cell IS the writing place)
     const num = (i, part, value, border) => {
@@ -127,7 +130,9 @@ function bondTable(p, ctx) {
     // whole: the list reads down the first half, then down the second. Half the height, so a
     // page holds two tables a row and an anchor panel holds one.
     const idx = rows.map((_, i) => i);
-    const split = rows.length > 6 && !(across && p.dots);
+    // p.split (bonds of 5 to 10): every table of the page in two halves, so a bonds-of-5 table is as wide
+    // as the others (critic k2-r2: a lone single table left a 34 % band in its cell)
+    const split = (rows.length > 6 || (p.split && rows.length > 3)) && !(across && p.dots);
     const halves = split ? [idx.slice(0, Math.ceil(rows.length / 2)), idx.slice(Math.ceil(rows.length / 2))] : [idx];
     let block;
     if (across) {
@@ -204,12 +209,49 @@ register('bond', {
             return root(ctx, 'k2-bond-cell', side);
         }
         const line = (x2) => `<line x1="2.1" y1="1" x2="${x2}" y2="1.9" stroke="${INK}" stroke-width="1" vector-effect="non-scaling-stroke" stroke-linecap="round"/>`;
+        // Support level 2 (p.dots, critic k2-r2 "number_bonds has no support control"): a row of dots
+        // under each part the pupil is GIVEN, to count on or count all. A scripted model's states
+        // (ctx.work): the numbers read ringed ('parts' / 'given'), the dots of both parts ('dots':
+        // the missing part's in grey), the check sentence ('check').
+        const work = ctx.work || null;
+        const ringed = (key) => (work ? workInk(ctx, key) : '');
+        const dotsInk = work ? workInk(ctx, 'dots') : '';
+        const missVal = p.unknown === 'A' ? p.a : p.unknown === 'B' ? p.b : null;
+        const dotRow = (n, col, grey) => {
+            if (!(n > 0)) return '';
+            const rows = Math.ceil(n / 5);
+            let d = '';
+            for (let i = 0; i < n; i++) d += `<circle cx="${n2(0.5 + (i % 5) + 0.5)}" cy="${n2(0.55 + Math.floor(i / 5) * 1.1)}" r="0.36" fill="${grey ? GREY : INK}"${grey ? ' data-ws-ink="trace"' : ''}/>`;
+            return `<svg viewBox="0 0 6 ${n2(rows * 1.1 + 0.1)}" aria-hidden="true" style="position:absolute;left:${at(col === 0 ? 1.08 : 2.22)};top:${at(rows > 1 ? 2.2 : 2.3)};width:${at(0.18 * 6)};height:${at(0.18 * (rows * 1.1 + 0.1))};overflow:visible;">${d}</svg>`;
+        };
+        // the support shows the GIVEN parts' dots; a model's 'dots' step shows both parts' (the one
+        // being worked out in its ink)
+        const showDotsA = dotsInk ? true : !!p.dots && p.unknown !== 'A';
+        const showDotsB = dotsInk ? true : !!p.dots && p.unknown !== 'B';
+        const dots = (showDotsA ? dotRow(p.a, 0, dotsInk === 'trace' && (p.unknown === 'A' || p.unknown === 'whole')) : '')
+            + (showDotsB ? dotRow(p.b, 2, dotsInk === 'trace' && (p.unknown === 'B' || p.unknown === 'whole')) : '');
+        // the dots sit in the free room BETWEEN the parts (right of A, left of B) and the check
+        // sentence in the free room right of the whole, so no state is taller than the bond
+        const ringBox = (col, row, key) => {
+            const ink = ringed(key);
+            if (!ink) return '';
+            return `<span data-ws-ink="${ink === 'trace' ? 'trace' : 'solid'}" style="position:absolute;left:${at(col * 1.6 - 0.12)};top:${at(row * 1.9 - 0.12)};`
+                + `width:${at(1.24)};height:${at(1.24)};box-sizing:border-box;border:${B(ctx, 1.5)} solid ${ink === 'trace' ? GREY : INK};border-radius:${at(0.3)};"></span>`;
+        };
+        const rings = work ? (ringBox(0, 1, p.unknown !== 'A' ? (p.unknown === 'whole' ? 'parts' : 'given') : '_')
+            + ringBox(2, 1, p.unknown !== 'B' ? (p.unknown === 'whole' ? 'parts' : 'given') : '_')
+            + ringBox(1, 0, p.unknown !== 'whole' ? 'given' : '_')) : '';
+        const checkInk = ringed('check');
+        const check = checkInk && missVal !== null
+            ? `<div data-ws-ink="${checkInk === 'trace' ? 'trace' : 'solid'}" style="position:absolute;left:${at(2.7)};width:${at(1.5)};top:${at(0.32)};text-align:right;white-space:nowrap;font-weight:700;font-size:${at(0.3)};line-height:1;color:${checkInk === 'trace' ? GREY : INK};">`
+                + `${esc(p.whole - missVal)} + ${esc(missVal)} = ${esc(p.whole)}</div>` : '';
         const bond = `<div class="k2-bond mq-bond" role="img" aria-label="number bond" style="position:relative;display:inline-block;`
             + `width:${at(4.2)};height:${at(2.9)};vertical-align:top;">`
-            + `<svg viewBox="0 0 4.2 2.9" preserveAspectRatio="none" aria-hidden="true" style="position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;">${line(0.5)}${line(3.7)}</svg>`
+            + `<svg viewBox="0 0 4.2 2.9" preserveAspectRatio="none" aria-hidden="true" style="position:absolute;left:0;top:0;width:100%;height:${at(2.9)};overflow:visible;">${line(0.5)}${line(3.7)}</svg>`
             + boxAt(1, 0, p.whole, true, p.unknown === 'whole')
             + boxAt(0, 1, p.a, false, p.unknown === 'A')
             + boxAt(2, 1, p.b, false, p.unknown === 'B')
+            + rings + dots + check
             + `</div>`;
         return root(ctx, 'k2-bond-cell', bond);
     },
@@ -228,7 +270,7 @@ register('bond', {
         // a bonds table is narrow (two 14-17 mm columns, or two halves side by side): the columns a
         // page may take grow as the size shrinks (L1: S fits more than L); measuring decides the rest
         if (p && p.kind === 'table' && p.notation !== 'across') {
-            const single = (p.rows || []).length <= 6;
+            const single = (p.rows || []).length <= 6 && !p.split;
             const cols = ({ S: single ? 4 : 3, M: single ? 3 : 2, L: single ? 3 : 2 })[sizeOf(ctx || {})] || 2;
             return { wMm: Math.floor(186 / cols), hMm: null, measure: true, factLike: false, maxCols: cols };
         }
@@ -247,10 +289,12 @@ register('bond', {
      * step k in grey, earlier steps' in black. A bond has one slot; a table writes its cells.
      */
     /** The scripted model draws step states for the bonds table (its provider marks every cell). */
-    modelStates: (p) => !!(p && p.kind === 'table'),
+    modelStates: (p) => !!(p && (p.kind === 'table' || (!p.kind && p.orientation !== 'horizontal'))),
     stepState(p, steps, k, ctx) {
         const marks = stepMarks(steps, k);
         if (p.kind === 'table' && p.task === 'pattern') return this.render(p, k2StepCtx(steps, k, ctx));
+        // a single bond: its work marks (numbers ringed, dots, the check) and the answer slot
+        if (p.kind !== 'table' && p.orientation !== 'horizontal') return this.render(p, k2StepCtx(steps, k, ctx));
         if (p.kind !== 'table') return this.render(p, Object.assign({}, ctx, { state: singleSlotState(marks) }));
         const stepInks = slotInks(marks, (slot) => (/^r\d+[ab]$/.test(slot) ? slot : null));
         return bondTable(p, Object.assign({}, ctx, { state: 'blank', stepInks }));

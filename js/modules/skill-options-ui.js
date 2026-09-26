@@ -44,6 +44,18 @@ const GROUP_BY_ID = {
     level: 'support', pictures: 'support', support: 'support',
     notation: 'layout', orientation: 'layout', response: 'layout', task: 'layout', tiles: 'layout',
 };
+/**
+ * The value label with "(default)" after the skill's default value (critic k2-r2 panels: the teacher
+ * could not tell which value is the stand-alone default). A label that already says so is kept.
+ */
+export function withDefaultMark(def, x) {
+    const l = String((x && x.l) ?? '');
+    if (!def || !x || /default/i.test(l)) return l;
+    const dv = Array.isArray(def.default) ? def.default : [def.default];
+    if (Array.isArray(def.default) && dv.length !== 1) return l;
+    return dv.some((d) => JSON.stringify(d) === JSON.stringify(x.v)) ? `${l} (default)` : l;
+}
+
 export function optionGroup(def) {
     return (def && (def.group || GROUP_BY_ID[def.id])) || 'difficulty';
 }
@@ -189,7 +201,7 @@ export function optionControlHTML(def, cur, color, h) {
                         padding:${pad};border:1px solid ${on ? color : offBorder};border-radius:7px;
                         background:${on ? color + '1a' : 'transparent'};cursor:pointer;min-width:0;
                         font-size:0.8rem;color:var(--text);font-weight:${on ? '600' : '400'};">
-                <span style="min-width:0;overflow-wrap:anywhere;">${escHTML(x.l)}</span>
+                <span style="min-width:0;overflow-wrap:anywhere;">${escHTML(withDefaultMark(def, x))}</span>
                 <input type="checkbox" ${on ? 'checked' : ''}
                     onchange="${h.toggle(id, i)}"
                     style="width:16px;height:16px;flex:none;accent-color:${color};cursor:pointer;margin:0;">
@@ -217,7 +229,7 @@ export function optionControlHTML(def, cur, color, h) {
     }
     // enum — the option index is the control value so numeric, string and null values behave alike
     const opts = (def.values || []).map((x, i) =>
-        `<option value="${i}"${x.v === v ? ' selected' : ''}>${escHTML(x.l)}</option>`
+        `<option value="${i}"${x.v === v ? ' selected' : ''}>${escHTML(withDefaultMark(def, x))}</option>`
     ).join('');
     // The label sits ABOVE a full-width drop-down, so a long value ("Place-value chart (place names
     // over the digits)") never pushes the label off a 420 px panel or is cut off itself.

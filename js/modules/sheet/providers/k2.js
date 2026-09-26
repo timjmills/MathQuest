@@ -11,6 +11,50 @@ import { registerSkill } from '../contract.js';
 import { SHAPES as K2_PICTURES } from '../cells/k2kit.js';
 import { num, arr, obj, countList, digitsOf, chooseWrong, strings, step, clampSteps } from './util.js';
 
+
+/**
+ * The row-1 hint / level-2 cue of each K picture skill (contract member `hint`, critic k2-r2): a
+ * patch for the item's payload that draws the skill's own fading hint, never the answer. The
+ * Guided / We Do builders merge it into the cells after the worked example.
+ */
+const K2_HINTS = {
+    'counting:count_objects': (q) => {
+        const p = payloadOf(q);
+        if (p.kind === 'conserve') return { marks: true };
+        if ((p.kind || 'count') !== 'count' || p.objects) return null;
+        if (p.layout === 'circle') return { startMark: true };
+        const band = Number(p.band) || 20;
+        return band > 20 ? { tenMarks: true } : { track: band };
+    },
+    'counting:zero_none': (q) => {
+        const p = payloadOf(q);
+        if (p.task === 'find') return { legend: true };
+        return { track: Number(p.band) || 5 };
+    },
+    'counting:match_same': (q) => {
+        const t = payloadOf(q).target;
+        const one = t && K2_PICTURES[t.shape] ? K2_PICTURES[t.shape].one : null;
+        return one ? { name: one } : null;
+    },
+    'counting:ordinal_numbers': () => ({ numbers: true }),
+    'comparing:compare_size': () => ({ base: true }),
+    'comparing:odd_one_out': (q) => { const p = payloadOf(q); return p.kind === 'pick' && p.attr ? { cue: p.attr } : null; },
+    'comparing:compare_capacity': (q) => (payloadOf(q).kind === 'words' ? { icons: true } : { base: true }),
+    'comparing:what_can_we_measure': (q) => {
+        const p = payloadOf(q);
+        if (p.caption) {
+            const NOTE = { Ruler: 'A ruler: long, tall.', Scale: 'A scale: heavy.', Jug: 'A jug: how much it holds.' };
+            const note = (p.words || []).map((w) => NOTE[w.label]).filter(Boolean).join(' ');
+            return note ? { note } : null;
+        }
+        return { icons: true };
+    },
+    'comparing:sort_into_groups': (q) => (payloadOf(q).task === 'count' || !payloadOf(q).task ? { work: true } : null),
+    'composing:bonds_in_order': (q) => (payloadOf(q).notation === 'across' ? null : { dots: true }),
+    'comparing:compare_groups': () => ({ showCounts: true }),
+    'composing:number_bonds': () => ({ dots: true }),
+};
+
 /* ========================================================================= count_objects */
 
 const COUNT_WRITE = {
@@ -29,6 +73,7 @@ const COUNT_SAME = {
 };
 
 registerSkill('counting:count_objects', {
+    hint: K2_HINTS['counting:count_objects'],
     // S2: the supports this skill can draw (touch dots, cues, panes); the Support control offers these.
     supports: Object.freeze(['steps']),
     // task 'same' (K.CC.B.4b): two groups, one moved; the instruction and steps change with it.
@@ -157,11 +202,105 @@ registerSkill('counting:number_seq_fill', {
     },
 });
 
+/* ============================================================================== make_ten */
+
+const MAKE_N = (n) => ({
+    iCan: `I Can find how many more make ${n}`,
+    instructionKey: 'how-many-more',
+    instructionVars: (q) => { const p = payloadOf(q); return { n: Number.isFinite(p.target) ? p.target : n }; },
+    steps: ['Count the counters.', 'Count the empty boxes.', 'The empty boxes are how many more.'],
+    say: '__ and __ make __.',
+    sayValues: (q) => { const p = payloadOf(q); return Number.isFinite(p.filled) ? [p.filled, p.target - p.filled, p.target] : null; },
+});
+const MAKE_5 = MAKE_N(5), MAKE_10 = MAKE_N(10), MAKE_20 = MAKE_N(20);
+
+registerSkill('composing:make_ten', {
+    // the title names the number the page makes ("Make" option: 5 / 10 / 20)
+    strings: stringsBy((t, ref) => {
+        const b = Number(ref && ref.opts && ref.opts.band) || num(payloadOf(ref && ref.q).target);
+        return b === 5 ? MAKE_5 : b === 20 ? MAKE_20 : null;
+    }, MAKE_10),
+    misconceptions: ['wrote-the-counters', 'wrote-the-target'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        if (!Number.isFinite(p.filled)) return [];
+        const more = p.target - p.filled;
+        return [
+            step(`There are ${p.filled} counters.`),
+            step(`Count the empty boxes: ${countList(1, more, 1, 10)}.`),
+            step(`${p.filled} and ${more} make ${p.target}. Write ${more}.`, [{ slot: 'answer', value: String(more) }]),
+        ];
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        if (!Number.isFinite(p.filled)) return null;
+        return chooseWrong(q, [
+            { value: p.filled, misconception: 'wrote-the-counters', explain: `Wrote the counters there are (${p.filled}), not how many more.` },
+            { value: p.target, misconception: 'wrote-the-target', explain: `Wrote ${p.target}, the number to make.` },
+        ]);
+    },
+});
+
+/* ======================================================================== count_sequence */
+
+/** The five-box path of a count_sequence item: {values, pos, form, ans} or null. */
+function pathOf(q) {
+    const p = payloadOf(q);
+    const values = Array.isArray(p.values) ? p.values.map(Number) : null;
+    const pos = Array.isArray(p.blanks) && p.blanks.length ? Number(p.blanks[0]) : NaN;
+    if (!values || values.length < 3 || !Number.isInteger(pos)) return null;
+    const form = pos === values.length - 1 ? 'after' : pos === 0 ? 'before' : 'between';
+    return { values, pos, form, ans: values[pos] };
+}
+
+// critic k2-r2: the skill had no provider - no Steps band, no Model, no Error analysis (H11), and a
+// title built from its label ("I Can count next/before/after number").
+registerSkill('counting:count_sequence', {
+    strings: strings({
+        iCan: 'I Can find the number before, after or between',
+        instructionKey: 'missing',
+        steps: ['Read the numbers in the path.', 'Count on by 1, or back by 1, to the empty box.', 'Write the number.'],
+        say: 'The missing number is __.',
+        sayValues: (q) => { const s = pathOf(q); return s ? [s.ans] : null; },
+    }),
+    misconceptions: ['counted-the-wrong-way', 'skipped-one', 'copied-neighbour'],
+    workedSteps: (q) => {
+        const s = pathOf(q);
+        if (!s) return [];
+        const shown = s.values.filter((_, i) => i !== s.pos);
+        const write = step(`Write ${s.ans} in the empty box.`, [{ slot: 'b0', value: String(s.ans) }]);
+        if (s.form === 'after') {
+            return [step(`Read the numbers: ${shown.join(', ')}.`), step(`Count on by 1: after ${s.ans - 1} comes ${s.ans}.`), write];
+        }
+        if (s.form === 'before') {
+            return [step(`Read the numbers: ${shown.join(', ')}.`), step(`Count back by 1: before ${s.ans + 1} comes ${s.ans}.`), write];
+        }
+        return [step(`Read the numbers on each side: ${s.ans - 1} and ${s.ans + 1}.`), step(`Count on by 1 from ${s.ans - 1}: ${s.ans}.`), write];
+    },
+    wrongAnswer: (q) => {
+        const s = pathOf(q);
+        if (!s) return null;
+        const c = [];
+        if (s.form === 'after') {
+            c.push({ value: s.ans + 1, misconception: 'skipped-one', slot: 'b0', explain: `Skipped a number: after ${s.ans - 1} comes ${s.ans}, not ${s.ans + 1}.` });
+            c.push({ value: s.ans - 2, misconception: 'counted-the-wrong-way', slot: 'b0', explain: `Counted back from ${s.ans - 1} instead of on.` });
+        } else if (s.form === 'before') {
+            c.push({ value: s.ans - 1, misconception: 'skipped-one', slot: 'b0', explain: `Skipped a number: before ${s.ans + 1} comes ${s.ans}, not ${s.ans - 1}.` });
+            c.push({ value: s.ans + 2, misconception: 'counted-the-wrong-way', slot: 'b0', explain: `Counted on from ${s.ans + 1} instead of back.` });
+        } else {
+            c.push({ value: s.ans + 1, misconception: 'copied-neighbour', slot: 'b0', explain: `Copied the number after the box, ${s.ans + 1}.` });
+            c.push({ value: s.ans - 1, misconception: 'copied-neighbour', slot: 'b0', explain: `Copied the number before the box, ${s.ans - 1}.` });
+        }
+        return chooseWrong(q, c);
+    },
+});
+
 /* ======================================================================== compare_groups */
 
 const OTHER = { a: 'B', b: 'A' };
 
 registerSkill('comparing:compare_groups', {
+    hint: K2_HINTS['comparing:compare_groups'],
     strings: strings({
         iCan: 'I Can compare two groups: more, fewer or the same',
         instructionKey: 'check-groups',
@@ -189,18 +328,19 @@ registerSkill('comparing:compare_groups', {
         if (v === 'same') {
             const same = /^same$/i.test(ans.trim());
             return [
-                step('Draw a line from each one in A to one in B.'),
-                step(same ? 'Every one has a partner.' : 'Some are left with no partner.'),
-                step(`Check ${same ? 'Same' : 'Not the same'}.`, [{ slot: 'choice', value: same ? 'Same' : 'Not the same' }]),
+                step('Draw a line from each one in A to one in B.', [WORK('match')]),
+                step(same ? 'Every one has a partner.' : 'Some are left with no partner.', [WORK('left')]),
+                step(`Check ${same ? 'Same' : 'Not the same'}.`, [{ slot: 'answer', value: same ? 'Same' : 'Not the same' }]),
             ];
         }
         const winner = ans.toUpperCase().replace(/^GROUP\s*/, '');
         const loser = OTHER[winner.toLowerCase()] || '';
+        // PT-MOD-1 (critic k2-r2): the matching lines, then the leftovers ringed, then the group named
         return [
-            step('Draw a line from each one in A to one in B.'),
-            step(v === 'more' ? `Group ${winner} has some left over.` : `Group ${loser} has some left over.`),
-            step(v === 'more' ? `Group ${winner} has more.` : `Group ${winner} has fewer.`),
-            step(`Check Group ${winner}.`, [{ slot: 'choice', value: `Group ${winner}` }]),
+            step('Draw a line from each one in A to one in B.', [WORK('match')]),
+            step(v === 'more' ? `Group ${winner} has some left over.` : `Group ${loser} has some left over.`, [WORK('left')]),
+            step(v === 'more' ? `Group ${winner} has more.` : `Group ${winner} has fewer.`, [WORK('win')]),
+            step(`Check Group ${winner}.`, [{ slot: 'answer', value: `Group ${winner}` }]),
         ];
     },
     wrongAnswer: (q) => {
@@ -222,7 +362,12 @@ registerSkill('comparing:compare_groups', {
 /* =========================================================================== number_bonds */
 
 function bond(q) {
-    const t = String(q.text || '').replace(/\s+/g, '');
+    // the item's own payload first (the screen prompt now opens with a verb, critic k2-r2)
+    const pl = payloadOf(q);
+    if (Number.isFinite(Number(pl.whole)) && Number.isFinite(Number(pl.a)) && Number.isFinite(Number(pl.b)) && pl.unknown) {
+        return { p1: num(pl.a), p2: num(pl.b), whole: num(pl.whole), missing: pl.unknown === 'whole' ? 'whole' : 'part', unknown: pl.unknown };
+    }
+    const t = String(q.text || '').replace(/^[^0-9?]*/, '').replace(/\s+/g, '');
     let m = /^(\d+)\+(\d+)=\?$/.exec(t);
     if (m) return { p1: num(m[1]), p2: num(m[2]), whole: num(m[1]) + num(m[2]), missing: 'whole' };
     m = /^\?\+(\d+)=(\d+)$/.exec(t);
@@ -233,6 +378,7 @@ function bond(q) {
 }
 
 registerSkill('composing:number_bonds', {
+    hint: K2_HINTS['composing:number_bonds'],
     strings: strings({
         iCan: 'I Can find the missing part or whole of a number bond',
         instructionKey: 'missing',
@@ -249,19 +395,22 @@ registerSkill('composing:number_bonds', {
     workedSteps: (q) => {
         const b = bond(q);
         if (!b) return [];
+        // PT-MOD-1 (critic k2-r2: states 1-3 were the same blank bond): each step adds its marks -
+        // the numbers read ringed, the dots counted under the parts, the check sentence
         if (b.missing === 'whole') {
             return [
-                step(`The parts are ${b.p1} and ${b.p2}. The whole is missing.`),
-                step(`Put them together: ${b.p1} + ${b.p2} = ${b.whole}.`),
+                step(`The parts are ${b.p1} and ${b.p2}. The whole is missing.`, [WORK('parts')]),
+                step(`Put them together: ${b.p1} + ${b.p2} = ${b.whole}.`, [WORK('dots')]),
                 step(`Write ${b.whole} in the whole.`, [{ slot: 'answer', value: String(b.whole) }]),
             ];
         }
-        const known = /^\?/.test(String(q.text).trim()) ? b.p2 : b.p1;
+        const firstMissing = b.unknown ? b.unknown === 'A' : /^\?/.test(String(q.text).replace(/^[^0-9?]*/, '').trim());
+        const known = firstMissing ? b.p2 : b.p1;
         const miss = b.whole - known;
         return [
-            step(`The whole is ${b.whole}. One part is ${known}.`),
-            step(`Take ${known} from ${b.whole}: ${b.whole} − ${known} = ${miss}.`),
-            step(`Check: ${known} and ${miss} make ${b.whole}.`),
+            step(`The whole is ${b.whole}. One part is ${known}.`, [WORK('given')]),
+            step(`Take ${known} from ${b.whole}: ${b.whole} − ${known} = ${miss}.`, [WORK('dots')]),
+            step(`Check: ${known} and ${miss} make ${b.whole}.`, [WORK('check')]),
             step(`Write ${miss} in the part.`, [{ slot: 'answer', value: String(miss) }]),
         ];
     },
@@ -739,6 +888,7 @@ const ZERO_LEFT = {
 };
 
 registerSkill('counting:zero_none', {
+    hint: K2_HINTS['counting:zero_none'],
     strings: stringsBy((t) => (t === 'find' ? ZERO_FIND : t === 'compute' ? ZERO_LEFT : ZERO_COUNT), ZERO_COUNT),
     misconceptions: ['wrote-one-for-none', 'skipped-one', 'counted-twice', 'chose-fewest', 'wrote-the-start', 'took-all-away'],
     workedSteps: (q) => {
@@ -830,7 +980,7 @@ const sizeDef = (word) => ({
     steps: word === 'bigger' || word === 'biggest'
         ? ['Look at the whole of each one.', 'Find the one that takes up the most room.', 'That one is the ' + word + '. Check its box.']
         : ['Look at the whole of each one.', 'Find the one that takes up the least room.', 'That one is the ' + word + '. Check its box.'],
-    say: `The __ is ${word}.`,
+    say: `__ is ${word}.`,   // "A is bigger." (critic k2-r2: "The A is bigger." is not English)
     sayValues: (q) => [String(q.ans)],
 });
 const SIZE_DEFS = Object.fromEntries(SIZE_WORDS.map((w) => [w, sizeDef(w)]));
@@ -844,6 +994,7 @@ const SIZE_ORDER = {
 const LETTERS_K2 = ['A', 'B', 'C', 'D', 'E', 'F'];
 
 registerSkill('comparing:compare_size', {
+    hint: K2_HINTS['comparing:compare_size'],
     strings: stringsBy((t, ref) => {
         if (t === 'order') return SIZE_ORDER;
         if (SIZE_DEFS[t]) return SIZE_DEFS[t];
@@ -917,6 +1068,7 @@ const ODD_WHY = {
 };
 
 registerSkill('comparing:odd_one_out', {
+    hint: K2_HINTS['comparing:odd_one_out'],
     strings: stringsBy((t, ref) => (t === 'why' || t === 'rule' || (ref && ref.opts && ref.opts.task === 'rule') ? ODD_WHY : null), ODD_FIND),
     misconceptions: ['chose-by-place', 'chose-a-match', 'reason-wrong-attribute'],
     workedSteps: (q) => {
@@ -961,6 +1113,7 @@ const MATCH_DEFS = {
 };
 
 registerSkill('counting:match_same', {
+    hint: K2_HINTS['counting:match_same'],
     strings: stringsBy((t, ref) => MATCH_DEFS[t] || MATCH_DEFS[ref && ref.opts && ref.opts.match] || null, MATCH_DEFS.same),
     misconceptions: ['matched-by-size', 'matched-a-neighbour', 'matched-by-outline-only'],
     workedSteps: (q) => {
@@ -1011,6 +1164,7 @@ const capOrder = (verb) => ({
 const CAP_DEFS = { read: CAP_READ, 'holds-more': capFind('holds', 'more'), 'has-more': capFind('has', 'more'), 'order-holds': capOrder('holds') };
 
 registerSkill('comparing:compare_capacity', {
+    hint: K2_HINTS['comparing:compare_capacity'],
     strings: stringsBy((t, ref) => {
         if (CAP_DEFS[t]) return CAP_DEFS[t];
         const o = (ref && ref.opts) || {};
@@ -1089,6 +1243,7 @@ const MEAS_TOOL = {
 const MEAS_WORD = { long: 'how long', heavy: 'how heavy', tall: 'how tall', holds: 'how much it holds' };
 
 registerSkill('comparing:what_can_we_measure', {
+    hint: K2_HINTS['comparing:what_can_we_measure'],
     strings: stringsBy((t, ref) => (t === 'tool' || (ref && ref.opts && ref.opts.task === 'find') ? MEAS_TOOL : null), MEAS_WHICH),
     misconceptions: ['colour-is-measured', 'name-is-measured', 'wrong-tool'],
     workedSteps: (q) => {
@@ -1133,6 +1288,7 @@ const ORD_WRITE = {
 };
 
 registerSkill('counting:ordinal_numbers', {
+    hint: K2_HINTS['counting:ordinal_numbers'],
     strings: stringsBy((t, ref) => (t === 'write' || (ref && ref.opts && ref.opts.task === 'write') ? ORD_WRITE : null), ORD_FIND),
     misconceptions: ['wrong-end', 'off-by-one', 'wrong-suffix'],
     workedSteps: (q) => {
@@ -1190,6 +1346,7 @@ const SORT_DEFS = {
 };
 
 registerSkill('comparing:sort_into_groups', {
+    hint: K2_HINTS['comparing:sort_into_groups'],
     strings: stringsBy((t, ref) => SORT_DEFS[t] || SORT_DEFS[ref && ref.opts && ref.opts.task] || null, SORT_DEFS.count),
     misconceptions: ['counted-a-tile-twice', 'left-one-out', 'rings-swapped', 'most-fewest-swapped', 'order-reversed', 'rule-does-not-fit'],
     workedSteps: (q) => {
@@ -1299,21 +1456,22 @@ function bondBlanks(rows) {
 }
 
 registerSkill('composing:bonds_in_order', {
-    // Stretch: the open task behind the table - every pair of parts that makes this whole, in
-    // any order; the page's example row is 0 and the whole (the table's first row).
-    open: (q, { size = 'L' } = {}) => {
+    hint: K2_HINTS['composing:bonds_in_order'],
+    // Stretch: the open task behind the table - the pairs of parts that make this whole, a pair and
+    // its swap counted once (critic k2-r2: 7 ordered pairs of 6 did not fit the page's rows, so "I
+    // found them all" could not be written); the example row is 0 and the whole.
+    open: (q) => {
         const n = num(payloadOf(q).n);
         if (!Number.isInteger(n) || n < 2) return null;
-        const rowsN = ({ S: 4, M: 6, L: 6 })[size] || 6;
         const rows = [];
-        for (let a = 1; a <= n && rows.length < rowsN; a++) rows.push([a, n - a, n]);
+        for (let a = 1; a <= Math.floor(n / 2); a++) rows.push([a, n - a, n]);
         return {
-            prompt: [`Two parts make ${n}.`, 'Find different pairs.'],
+            prompt: [`Two parts make ${n}.`, `Find different pairs. ${n - 1} and 1 is the same pair as 1 and ${n - 1}.`],
             columns: ['First part', 'Second part', 'Check: whole'],
             example: [0, n, n],
             keyRows: rows,
             rule: `+ = ${n}`,
-            total: n + 1,
+            total: Math.floor(n / 2) + 1,
         };
     },
     strings: stringsBy((t, ref) => BONDS_DEFS[String(t).replace(/^bonds-/, '')] || BONDS_DEFS[ref && ref.opts && ref.opts.task] || null, BONDS_DEFS.fill),

@@ -154,7 +154,9 @@ for (const s of SIZES) {
     const mk = (h, id) => ({ id, measured: { 2: { hMm: h, fits: true } } });
     const its = [mk(18, 'a'), mk(78, 'b'), mk(18, 'c'), mk(78, 'd'), mk(18, 'e'), mk(18, 'f')];
     const g = groupByHeight(its, 2);
-    eq(g.map((x) => x.id).join(''), 'bdacef', 'H13: tallest first, order kept within each height');
+    // critic k2-r2: rows keep their height partners, but the rows alternate (even rows, then odd)
+    // so the answers they carry do not fall down the page tallest first
+    eq(g.map((x) => x.id).join(''), 'bdefac', 'H13: rows grouped by height, order kept within each height, row order alternated');
     const sh = rowShape(g, 2, 3, 75);
     ok(sh && (() => { const f = sh.rowsTpl.split(' ').map(parseFloat); return f.length === 3 && f[0] >= 79 && f[1] >= 19 && f[1] <= 19 * 1.8 + 0.1 && f[0] > 2 * f[1]; })() && sh.heightMm <= 3 * 75 + 0.01, `H13: rows weighted by what they hold (${sh && sh.rowsTpl}, ${sh && sh.heightMm} mm)`);
     eq(rowShape([mk(40), mk(40), mk(40), mk(40)], 2, 2, 60), null, 'H13: equal rows are left as they were');

@@ -694,7 +694,17 @@ export function groupByHeight(items, cols) {
     // Tallest first, so every row's neighbours are the closest in height; equal heights (within
     // 2 mm) keep their order.
     const q = (h) => Math.round(h / 2);
-    return items.map((it, i) => ({ it, i, b: -q(hs[i]) })).sort((a, b) => a.b - b.b || a.i - b.i).map((x) => x.it);
+    const sorted = items.map((it, i) => ({ it, i, b: -q(hs[i]) })).sort((a, b) => a.b - b.b || a.i - b.i).map((x) => x.it);
+    // The ROWS keep their height partners but not their tallest-first order (critic k2-r2: a count
+    // page printed 20, 16, 19, 18, 15, 14, 3, 7, 5, 2 - the answers fell down the page): the even
+    // rows first, then the odd ones, so row heights (and the answers they carry) alternate.
+    const c = Math.max(1, Math.floor(cols) || 1);
+    const rows = [];
+    for (let r = 0; r * c < sorted.length; r++) rows.push(sorted.slice(r * c, (r + 1) * c));
+    if (rows.length < 3) return sorted;
+    const full = rows.filter((r) => r.length === c), last = rows.length && rows[rows.length - 1].length < c ? [rows[rows.length - 1]] : [];
+    const order = full.filter((_, k) => k % 2 === 0).concat(full.filter((_, k) => k % 2 === 1)).concat(last);
+    return order.flat();
 }
 
 /**

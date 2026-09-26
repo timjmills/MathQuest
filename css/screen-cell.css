@@ -1315,3 +1315,10 @@ html body .mq-scell .mq-nl-start.mq-nl-given .mq-nl-mark::after { background: #f
    card. The column keeps its 48 px height. */
 .mq-scell [data-mq-nowrap] > .mq-tickrow { padding: 0 2px; }
 .mq-scell [data-mq-nowrap] .mq-tickbox { width: max(18px, calc(var(--mq-k2, 3.4px) * 7)) !important; height: max(18px, calc(var(--mq-k2, 3.4px) * 7)) !important; min-width: 0 !important; min-height: 0 !important; }
+
+/* Tap to sort (k2-r2): a sort-into-groups twin's pictures and rings are tap targets */
+.k2-twin .mq-sort-tile { cursor: pointer; border-radius: 6px; padding: 2px; min-width: 44px; min-height: 44px; justify-content: center; }
+.k2-twin .mq-sort-tile.mq-sort-sel { outline: 3px solid #000; outline-offset: 2px; }
+.k2-twin .mq-sort-tile.mq-sort-used { opacity: .3; cursor: default; }
+.k2-twin .mq-sort-ring { cursor: pointer; }
+.k2-twin .mq-sort-tag { cursor: pointer; display: inline-block; min-width: 24px; }

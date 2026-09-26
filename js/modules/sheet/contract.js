@@ -35,6 +35,10 @@ export const CONTRACT_MEMBERS = Object.freeze([
 export const OPTIONAL_MEMBERS = Object.freeze([
     'decision', 'setupOnly', 'open', 'claims', 'variants', 'notations', 'representations',
     'supports', 'misconceptions',
+    // `hint(q) -> payload patch | null`: the skill's own level-2 cue for this item (the row-1 hint of
+    // a Guided / We Do band): merged into q.cell.payload it draws the hint that fades - a number
+    // track, the name under the box, a base line, numbered places, dots - never the answer.
+    'hint',
     // `stories(q, {seed}) -> Story | null`: an original story carrying ONE item's numbers, with a
     // number + label answer, for the word-problem role (section 3.8; providers/stories.js).
     'stories',
@@ -104,6 +108,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'check-fix-draw': 'Is it right? Check one box. Fix it: draw it again.',
     'check-fix-mark': 'Is it right? Check one box. Fix it: mark it again.',
     'check-fix-check': 'Is it right? Check one box. Fix it: check the right one.',
+    'how-many-more': 'Count the empty boxes. Write how many more make {n}.',
     'check-by': 'Multiply to check. Check one box: Correct or Fix it.',
     'true-false': 'Check one box: True or False. Finish the sentence.',
     spot: 'Find the mistake. Circle it. Write the correct answer.',

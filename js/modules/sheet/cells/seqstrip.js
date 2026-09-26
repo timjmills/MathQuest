@@ -100,7 +100,9 @@ register('seqstrip', {
         // 2-column page (one reading order: the twin's inputs still join left to right, top row
         // first).
         const wrap = values.length > SEQ_ROW_MAX;
-        return root(ctx, 'k2-seqstrip', `<div class="k2-track" data-mq-join=", " style="display:flex;flex-wrap:${wrap ? 'wrap' : 'nowrap'};justify-content:center;`
+        // one line never wraps on screen either (critic k2-r2: the path wrapped 4 + 1 on the
+        // worksheet): data-mq-nowrap makes the screen fit shrink the tiles instead
+        return root(ctx, 'k2-seqstrip', `<div class="k2-track" data-mq-join=", "${wrap ? '' : ' data-mq-nowrap="1"'} style="display:flex;flex-wrap:${wrap ? 'wrap' : 'nowrap'};justify-content:center;`
             + `${wrap ? `max-width:${L(ctx, rowMm(values.length, size, p.shape) + 0.5)};margin:0 auto;` : ''}gap:${L(ctx, GAP_MM)};">${tiles}</div>`);
     },
     answerKey(p) {

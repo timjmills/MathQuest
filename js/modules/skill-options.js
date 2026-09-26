@@ -1188,8 +1188,9 @@ const P11_K2_OPTIONS = {
         _opsBand([5, 10], 10, { label: 'Bonds to', help: 'The largest whole. Bonds to 5 first, then to 10.' }),
         {
             id: 'unknown', label: 'What is missing', type: 'enum', default: 'mixed',
-            values: [{ v: 'answer', l: 'The whole' }, { v: 'first', l: 'The first part' }, { v: 'second', l: 'The second part' }, { v: 'mixed', l: 'Mixed' }],
+            values: [{ v: 'answer', l: 'The whole' }, { v: 'first', l: 'The first part' }, { v: 'second', l: 'The second part' }, { v: 'mixed', l: 'Mixed (default)' }],
         },
+        levelSubset([2, 1], 1, 'Level 2 draws a row of dots under each part the pupil is given, to count all or count on; level 1 is the bond alone.'),
     ],
     // OPTIONS-CRITIC-R2 §5 #11: a number-size ladder beside the support level on both.
     'composing:make_ten': [
@@ -1201,6 +1202,12 @@ const P11_K2_OPTIONS = {
         _opsBand([15, 19], 19, { label: 'Teen numbers to', labels: { 15: '15 (10 and up to 5 more)', 19: '19 (10 and up to 9 more)' },
             help: 'Up to 15 keeps the loose ones to one row of five.' }),
         levelSubset([1, 0], 1, 'Level 1 shows the full ten frame and the ones; level 0 is the number sentence alone.'),
+        {
+            id: 'unknown', label: 'What is missing', type: 'enum', default: 'mixed', group: 'difficulty',
+            values: [{ v: 'answer', l: 'The teen number (10 and 4 make __)' }, { v: 'second', l: 'The ones (10 and __ make 14)' },
+                { v: 'mixed', l: 'Both, mixed on the page (default)' }],
+            help: 'Name the teen number first; finding the ones in it comes next.',
+        },
     ],
     'composing:ten_frame_build': [_k2CountTo([5, 10], 10)],
     'composing:base10_build': [_opsBand([20, 50, 99], 99, { label: 'Numbers to', help: 'The largest number to build.' })],

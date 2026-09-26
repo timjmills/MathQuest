@@ -65,23 +65,26 @@ function countPicture(ctx, n, shape, p = {}) {
     // a row of ten is two fives: a gap after the fifth (critic k2-r1), so a ten reads as 5 and 5
     const five = line ? 2.5 * k : 0;
     const w = (cols - 1) * pitch + d + 1 + (line && cols > 5 ? five : 0);
-    const under = p.countMarks && rows === 1;   // R3: a one-row Model counts in numerals UNDER its objects
-    const h = (rows - 1) * pitch + d + 1 + (!line && rows > 2 ? gap : 0) + (under ? 5.5 : 0);
+    // R3: a one-row Model counts in numerals UNDER its objects; so does a line of tens (critic k2-r2:
+    // tags inside 5 mm stars were illegible), each row then a numeral line taller
+    const under = p.countMarks && (rows === 1 || line);
+    const rowP = pitch + (under && rows > 1 ? 5.5 : 0);
+    const h = (rows - 1) * rowP + d + 1 + (!line && rows > 2 ? gap : 0) + (under ? 5.5 : 0);
     let body = '';
     for (let i = 0; i < n; i++) {
         const r = Math.floor(i / per);
-        const cx = 0.5 + d / 2 + (i % per) * pitch + (line && i % per >= 5 ? five : 0), cy = 0.5 + d / 2 + r * pitch + (!line && r >= 2 ? gap : 0);
+        const cx = 0.5 + d / 2 + (i % per) * pitch + (line && i % per >= 5 ? five : 0), cy = 0.5 + d / 2 + r * rowP + (!line && r >= 2 ? gap : 0);
         body += shapeOf(shape).draw(cx, cy, d);
         if (p.lastRing && i === n - 1) body += lastRing(cx, cy, d, p.lastRing);
         // R3 (critic round 3): the worked Model counts in grey, one number on each object in
         // touch order, so Steps 1-3 (touch, count, the last number is how many) are shown.
-        if (p.countMarks) body += `<text x="${n2(cx)}" y="${n2(under ? cy + d / 2 + 5 : cy + 1.4)}" text-anchor="middle" font-size="${under ? 4.6 : 3.8}" font-weight="700" font-family="Andika, sans-serif" fill="${GREY}" data-ws-ink="trace">${i + 1}</text>`;
+        if (p.countMarks) body += `<text x="${n2(cx)}" y="${n2(under ? cy + d / 2 + 5 : cy + 1.4)}" text-anchor="middle" font-size="${under ? (line ? 3.6 : 4.6) : 3.8}" font-weight="700" font-family="Andika, sans-serif" fill="${GREY}" data-ws-ink="trace">${i + 1}</text>`;
     }
     // build lane k2 (count to 30): at support level 2 each FULL row of ten is labelled 10 at its right
     let wx = w;
     if (line && p.tenMarks) {
         for (let r = 0; r < Math.floor(n / 10); r++) {
-            body += `<text x="${n2(w + 2)}" y="${n2(0.5 + d / 2 + r * pitch + 1.6)}" font-size="4.6" font-weight="700" font-family="Andika, sans-serif" fill="${INK}">10</text>`;
+            body += `<text x="${n2(w + 2)}" y="${n2(0.5 + d / 2 + r * rowP + 1.6)}" font-size="4.6" font-weight="700" font-family="Andika, sans-serif" fill="${INK}">10</text>`;
         }
         wx = w + 8;
     }
@@ -133,6 +136,29 @@ function framePicture(ctx, n) {
         for (let i = 0; i < Math.min(10, n - f * 10); i++) body += dot(0.5 + (i % 5 + 0.5) * c, oy + (Math.floor(i / 5) + 0.5) * c, 6);
     }
     return svg(ctx, w, h, body, { label: `${n} counters in ten frames` });
+}
+
+/**
+ * make_ten (critic k2-r2: the legacy cell printed its instruction inside the cell and an
+ * "Answer: ____" line): a five frame (target 5), a ten frame (10) or two ten frames with the first
+ * full (20), `filled` solid counters, scaled with the size; the empty boxes are what the pupil counts.
+ */
+function makeFramePicture(ctx, filled, target) {
+    const k = pscale(ctx);
+    const c = 9 * k, rows = target === 5 ? 1 : 2, frames = target === 20 ? 2 : 1, gapY = 3 * k;
+    const w = 5 * c + 1, h = frames * rows * c + (frames - 1) * gapY + 1;
+    let body = '';
+    for (let f = 0; f < frames; f++) {
+        const oy = 0.5 + f * (rows * c + gapY);
+        body += `<path d="M0.5 ${n2(oy)}h${n2(5 * c)}v${n2(rows * c)}h${n2(-5 * c)}Z" fill="none" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`;
+        let grid = '';
+        for (let j = 1; j < 5; j++) grid += `M${n2(0.5 + j * c)} ${n2(oy)}v${n2(rows * c)}`;
+        if (rows === 2) grid += `M0.5 ${n2(oy + c)}h${n2(5 * c)}`;
+        body += `<path d="${grid}" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}"/>`;
+        const per = rows * 5;
+        for (let i = 0; i < Math.min(per, filled - f * per); i++) body += dot(0.5 + (i % 5 + 0.5) * c, oy + (Math.floor(i / 5) + 0.5) * c, 6 * k);
+    }
+    return svg(ctx, w, h, body, { label: `${filled} counters in ${frames === 2 ? 'two ten frames' : target === 5 ? 'a five frame' : 'a ten frame'}` });
 }
 
 /** P11: n pips as dice faces of up to six (17 = 6 + 6 + 5), each face the standard pattern. */
@@ -378,7 +404,7 @@ function holderPicture(ctx, n, shape, p, { scale = 1, crossed = false, counted =
     const rows0 = PLATE_ROWS[Math.max(0, Math.min(10, n))] || [];
     const across = Math.max(1, ...rows0), down = Math.max(1, rows0.length);
     const room = 2 * inner * (box ? 0.72 : 0.82);
-    const pitch = Math.min(14 * s, room / across, (box ? room * 0.8 : room) / down), d = 0.84 * pitch;
+    const pitch = Math.min(17 * s, room / across, (box ? room * 0.8 : room) / down), d = Math.max(0.7 * pitch, pitch - 1.8);   // critic k2-r2: 9-16 mm at L, scaled with the plate
     const W = 2 * R + 2 * pad, H = box ? 1.64 * R + 2 * pad : W;
     const cx0 = W / 2, cy0 = H / 2;
     let body = box
@@ -399,6 +425,44 @@ function holderPicture(ctx, n, shape, p, { scale = 1, crossed = false, counted =
     // a model's "look here" mark on the holder's middle (an empty plate: nothing there), inside its own box
     if (ringed === 'trace') body += `<circle cx="${n2(cx0)}" cy="${n2(cy0)}" r="${n2(inner * 0.55)}" fill="none" stroke="${ringed === 'trace' ? GREY : INK}" stroke-width="${n2(SW.heavy)}"${ringed === 'trace' ? ' data-ws-ink="trace"' : ''}/>`;
     return svg(ctx, W, H, body, { label: box ? 'a box' : 'a plate' });
+}
+
+/**
+ * The picture-and-box row. Paper: a grid, the picture centred in the room left of a box that
+ * stands at the cell's right in every cell. Screen twin (critic k2-r2: the host's answer box covered
+ * the fifth column of objects in a narrow worksheet card): the picture BESIDE the box in one row
+ * that never wraps, so the screen fit shrinks the drawing instead (data-mq-nowrap).
+ */
+function picBoxRow(ctx, pic, slot, { stack = false, under = false } = {}) {
+    // size S on paper (critic k2-r2, L1: S printed as many as L): the box stands UNDER the picture,
+    // so a count cell is a third of the page wide and S takes three columns
+    if (!isTwin(ctx) && under) {
+        return `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};">`
+            + `<div style="flex:none;">${pic}</div><div style="flex:none;">${slot}</div></div>`;
+    }
+    // rows of ten (count to 30) stand ABOVE the box on screen, so the objects keep a touchable size
+    if (isTwin(ctx) && stack) {
+        return `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};padding:0 ${L(ctx, 3)};">`
+            + `<div data-mq-nowrap="1" style="display:flex;justify-content:center;"><div style="flex:none;">${pic}</div></div><div style="flex:none;">${slot}</div></div>`;
+    }
+    if (isTwin(ctx)) {
+        return `<div data-mq-nowrap="1" style="display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;gap:${L(ctx, 4)};padding:0 ${L(ctx, 3)};">`
+            + `<div style="flex:none;">${pic}</div><div style="flex:none;">${slot}</div></div>`;
+    }
+    // paper: the picture and its box centred together (critic k2-r2, H13: a box pinned to the cell's
+    // right left a 31-37 % empty band beside one to three objects)
+    return `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 6)};">`
+        + `<div style="flex:0 1 auto;min-width:0;display:flex;justify-content:center;"><div style="flex:none;">${pic}</div></div><div style="flex:none;">${slot}</div></div>`;
+}
+
+/**
+ * A plain count to 10 in rows of five at size S: its box goes under the picture, a third-page cell
+ * (12 a page at S, 10 at L). A count to 20 keeps the box beside it: four rows of five and the
+ * 16 mm square need 57 mm under each other, so three columns would hold only 9.
+ */
+function countUnderS(p, ctx) {
+    return !!p && !!ctx && ctx.size === 'S' && !isTwin(ctx) && (p.kind || 'count') === 'count' && Number(p.band) > 0 && Number(p.band) <= 10
+        && !p.objects && p.layout !== 'circle' && p.layout !== 'line' && p.layout !== 'scattered';
 }
 
 register('counters', {
@@ -448,8 +512,7 @@ register('counters', {
             const sq = squareMm(ctx);
             const tctx = p.traced && ctx.state === 'blank' ? Object.assign({}, ctx, { state: 'traced' }) : ctx;
             const slot = box(tctx, { value: slotValue(tctx, 'answer', kv), w: sq, h: sq, mark: 'blank' });
-            return root(ctx, 'k2-zero', `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:${L(ctx, 4)};${isTwin(ctx) ? `padding:0 ${L(ctx, 3)};` : ''}">`
-                + `<div style="display:flex;justify-content:center;"><div style="flex:none;">${holderPicture(ctx, p.n, p.shape, p, { scale: k, counted: !!workInk(ctx, 'count'), ringed: workInk(ctx, 'ring') })}</div></div>${slot}</div>`
+            return root(ctx, 'k2-zero', picBoxRow(ctx, holderPicture(ctx, p.n, p.shape, p, { scale: k, counted: !!workInk(ctx, 'count'), ringed: workInk(ctx, 'ring') }), slot)
                 + (p.track ? `<div style="display:flex;justify-content:center;margin-top:${L(ctx, 3)};">${numberTrack(ctx, 0, p.track)}</div>` : ''),
             isTwin(ctx) ? {} : { style: 'width:100%;box-sizing:border-box;' });
         }
@@ -491,9 +554,14 @@ register('counters', {
             const sq = squareMm(ctx);
             const slot = box(ctx, { value: slotValue(ctx, 'answer', kv), w: sq, h: sq, mark: 'blank' });
             return root(ctx, 'k2-sort', `<div style="display:flex;justify-content:center;margin-bottom:${L(ctx, 3)};">${keySpecimen(ctx, p.asked)}</div>`
-                + `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:${L(ctx, 4)};">`
-                + `<div style="display:flex;justify-content:center;"><div style="flex:none;">${bagPicture(ctx, p.bag || [])}</div></div>${slot}</div>`,
+                + picBoxRow(ctx, bagPicture(ctx, p.bag || []), slot),
             isTwin(ctx) ? {} : { style: 'width:100%;box-sizing:border-box;' });
+        }
+        if (p.kind === 'maketen') {
+            const b = inlineBoxMm(ctx, 2);
+            const slot = box(ctx, { value: slotValue(ctx, 'answer', kv), w: b.w, h: b.h, mark: 'blank' });
+            return root(ctx, 'k2-maketen', `<div style="display:flex;justify-content:center;">${makeFramePicture(ctx, p.filled, p.target)}</div>`
+                + eqRow([eqSpan(ctx, p.filled), opSpan(ctx, '+'), slot, opSpan(ctx, '='), eqSpan(ctx, p.target)]));
         }
         if (p.kind === 'teen') {
             const b = inlineBoxMm(ctx, 2);
@@ -529,8 +597,7 @@ register('counters', {
                 + (p.track ? `<div style="display:flex;justify-content:center;margin-top:${L(ctx, 3)};">${trackStrip(ctx, p.track)}</div>` : ''),
             isTwin(ctx) ? {} : { style: 'width:100%;box-sizing:border-box;' });
         }
-        return root(ctx, 'k2-count', `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:${L(ctx, 4)};${isTwin(ctx) ? `padding:0 ${L(ctx, 3)};` : ''}">`
-            + `<div style="display:flex;justify-content:center;"><div style="flex:none;">${countPicture(ctx, p.n, p.shape, pp)}</div></div>${slot}</div>`
+        return root(ctx, 'k2-count', picBoxRow(ctx, countPicture(ctx, p.n, p.shape, pp), slot, { stack: p.layout === 'line' && p.n > 10, under: countUnderS(p, ctx) })
             // P11 Support level 2: a number track under the picture to point along.
             + (p.track ? `<div style="display:flex;justify-content:center;margin-top:${L(ctx, 3)};">${trackStrip(ctx, p.track)}</div>` : ''),
         isTwin(ctx) ? {} : { style: 'width:100%;box-sizing:border-box;' });
@@ -539,7 +606,8 @@ register('counters', {
         const v = p.ans;
         return { value: v, display: String(v), slots: { answer: { value: String(v), graded: true } } };
     },
-    footprint(p) {
+    footprint(p, ctx) {
+        if (countUnderS(p, ctx || {})) return { wMm: 61, hMm: null, measure: true, factLike: false, maxCols: 3 };
         return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2 };
     },
     inputs(p) {

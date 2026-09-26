@@ -2134,8 +2134,76 @@ function _rowOverflows(el, box) {
     return false;
 }
 
+/**
+ * TAP TO SORT (critic k2-r2, L5: "on screen the pupil only types the counts; the sort itself is not
+ * done"): in a sort-into-groups twin the pupil taps a picture, then a ring - the ring collects the
+ * picture's letter and the picture fades; tapping a letter in a ring sends it back. The sort is the
+ * pupil's working, as the letters written in the rings are on paper; the counts typed in the boxes
+ * are what is checked. Idempotent.
+ */
+export function wireSortTaps(root) {
+    if (!root || !root.querySelectorAll) return 0;
+    let n = 0;
+    const twins = root.matches && root.matches('.k2-twin') ? [root] : Array.from(root.querySelectorAll('.k2-twin'));
+    twins.forEach((twin) => {
+        if (twin.dataset.mqSortWired === '1') return;
+        const tiles = Array.from(twin.querySelectorAll('[data-k2-tile]'));
+        const rings = Array.from(twin.querySelectorAll('[data-k2-ring]'));
+        if (!tiles.length || rings.length < 2) return;
+        twin.dataset.mqSortWired = '1';
+        n++;
+        let sel = null;
+        const choose = (t) => {
+            if (t.dataset.used) return;
+            const next = sel === t ? null : t;
+            tiles.forEach((x) => x.classList.toggle('mq-sort-sel', x === next));
+            sel = next;
+        };
+        tiles.forEach((t) => {
+            t.setAttribute('role', 'button');
+            t.setAttribute('tabindex', '0');
+            t.setAttribute('aria-label', `picture ${t.dataset.k2Tile}`);
+            t.classList.add('mq-sort-tile');
+            t.addEventListener('click', () => choose(t));
+            t.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); choose(t); } });
+        });
+        const drop = (ring) => {
+            if (!sel) return;
+            const box = ring.querySelector('[data-k2-drop]');
+            if (!box) return;
+            const t = sel;
+            const tag = document.createElement('span');
+            tag.textContent = `${t.dataset.k2Tile} `;
+            tag.className = 'mq-sort-tag';
+            tag.setAttribute('role', 'button');
+            tag.setAttribute('aria-label', `take ${t.dataset.k2Tile} out`);
+            tag.addEventListener('click', (e) => {
+                e.stopPropagation();
+                tag.remove();
+                delete t.dataset.used;
+                t.classList.remove('mq-sort-used');
+            });
+            box.appendChild(tag);
+            t.dataset.used = ring.dataset.k2Ring;
+            t.classList.add('mq-sort-used');
+            t.classList.remove('mq-sort-sel');
+            sel = null;
+        };
+        rings.forEach((ring) => {
+            ring.classList.add('mq-sort-ring');
+            ring.setAttribute('role', 'button');
+            ring.setAttribute('tabindex', '0');
+            ring.setAttribute('aria-label', `ring ${Number(ring.dataset.k2Ring) + 1}`);
+            ring.addEventListener('click', () => drop(ring));
+            ring.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); drop(ring); } });
+        });
+    });
+    return n;
+}
+
 export function fitTwinRows(root) {
     if (!root || typeof getComputedStyle === 'undefined') return false;
+    try { wireSortTaps(root); } catch (e) { /* a sort control is working space: never block the fit */ }
     const twins = root.matches && root.matches('.k2-twin') ? [root] : Array.from(root.querySelectorAll('.k2-twin'));
     let changed = false;
     // Long division (round 3, 390 px: "the fourth digit column is clipped"): the divisor's tracks

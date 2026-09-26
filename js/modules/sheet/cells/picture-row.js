@@ -290,9 +290,10 @@ register('picture-row', {
             const choices = items.map((s, i) => ({ pic: picture(ctx, s, bw, bh), label: labels[i] }));
             // the place asked for, printed once over the line ("3rd"): the item's own question
             const ask = p.ask ? `<div style="font-size:${P(ctx, digitPt(ctx) * 0.9)};font-weight:700;line-height:1;margin-bottom:${L(ctx, 3)};">${esc(p.ask)}</div>` : '';
-            const nums = counted ? numberRow(ctx, items.length, bw, gap, counted === 'trace') : '';
+            // the places numbered: a model's count step, or the level-2 hint (p.numbers)
+            const nums = counted ? numberRow(ctx, items.length, bw, gap, counted === 'trace') : p.numbers ? numberRow(ctx, items.length, bw, gap, false) : '';
             return root(ctx, 'k2-prow', `${ask}${nums}<div${NOWRAP} style="display:flex;align-items:flex-start;justify-content:center;gap:${L(ctx, gap)};">`
-                + `<div style="flex:none;padding-top:${L(ctx, 0.4)};">${flag}</div>${choiceRow(ctx, choices, { on, gapMm: gap, ring: { index: p.correct || 0, ink: workInk(ctx, 'ring') } })}</div>`);
+                + `<div style="flex:none;padding-top:${L(ctx, 0.4)};">${flag}</div>${choiceRow(ctx, choices, { on, gapMm: gap, hideLabels: !!p.hideLabels, ring: { index: p.correct || 0, ink: workInk(ctx, 'ring') } })}</div>`);
         }
 
         // pick
@@ -330,7 +331,7 @@ register('picture-row', {
             const rowW = words.reduce((a, wd) => a + Math.max(14, String(wd.label).length * 2.6 + (p.icons ? (p.iconSize || 6.5) + 2 : 0)), 0) + 6 * Math.max(0, words.length - 1);
             w = p.under ? Math.max(bw * 1.3, rowW) : bw * 1.3 + 60;
         }
-        return { wMm: Math.min(186, Math.ceil(w + 6)), hMm: null, measure: true, factLike: false, maxCols: w + 6 <= 93 ? 2 : 1 };
+        return { wMm: Math.min(186, Math.ceil(w + 6)), hMm: null, measure: true, factLike: false, maxCols: w + 6 <= 61 ? 3 : w + 6 <= 93 ? 2 : 1 };   // a row a third of the page wide takes three columns (measured)
     },
     inputs(p) {
         if (p && p.kind === 'order') return (p.order || []).map((_, i) => ({ id: `b${i}`, kind: 'number', shape: 'box', graded: true, order: i, scopes: ['full'] }));
