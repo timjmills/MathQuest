@@ -7,7 +7,7 @@
 // For every skill whose provider really implements `workedSteps` (the skills that get anchors),
 // this builds the anchor-bearing pages through the app's own `buildSheet`, lays each out in an
 // A4 document (`sheetDocument`, the real stylesheets) and measures:
-//   STEPS-COL    a steps list BESIDE its drawing narrower than 55 mm, or any steps list narrower
+//   STEPS-COL    any steps list (beside its drawing or under it) narrower
 //                than 18 characters of the page's step type (anchors.js stepsMinMm)
 //   STEPS-WORD   a step line printed about one word a line (fewer than 2 words a line box)
 //   STEPS-LEAVE  anything in a Model / anchor cell outside that cell's border
@@ -162,7 +162,6 @@ async function measureBuild({ size, role, anchors, skills }) {
                     const w = rect(ol).width / MM;
                     const beside = !!(draw && ol.parentElement.classList.contains('mq-anchor-beside') && rect(ol).left >= rect(draw).right - 1 && rect(ol).top < rect(draw).bottom - 1);
                     steps.push({ where, w: Math.round(w * 10) / 10, beside });
-                    if (beside && w < 55 - 0.5) findings.push(`STEPS-COL ${where}: steps beside the drawing in ${w.toFixed(1)} mm (< 55 mm)`);
                     if (w < minChars - 0.5) findings.push(`STEPS-COL ${where}: a steps column of ${w.toFixed(1)} mm holds fewer than 18 characters (${minChars.toFixed(1)} mm)`);
                     for (const s of ol.querySelectorAll('li span')) { const wd = wordy(s); if (wd) { findings.push(`STEPS-WORD ${where}: ${wd}`); break; } }
                 }
@@ -200,7 +199,7 @@ async function measureBuild({ size, role, anchors, skills }) {
                 if (side) {
                     const w = rect(side).width / MM;
                     steps.push({ where, w: Math.round(w * 10) / 10, beside: true });
-                    if (w < 55 - 0.5) findings.push(`STEPS-COL ${where}: step text beside the drawing in ${w.toFixed(1)} mm (< 55 mm)`);
+                    if (w < minChars - 0.5) findings.push(`STEPS-COL ${where}: step text beside the drawing in ${w.toFixed(1)} mm (< ${minChars.toFixed(1)} mm)`);
                 }
                 for (const b of st.querySelectorAll('.mq-chead b, .mq-cwords > div')) { const wd = wordy(b); if (wd) { findings.push(`STEPS-WORD ${where}: ${wd}`); break; } }
             }

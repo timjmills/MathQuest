@@ -185,9 +185,8 @@ const BAND_W_MM = 178;
 // column; otherwise they go UNDER it, across the cell's full width. Measured, never assumed (and
 // the stylesheet wraps them under the drawing if a drawing turns out wider than estimated).
 
-/** A steps column beside a drawing is at least this wide (mm): about 25 characters a line at L. */
-export const STEPS_BESIDE_MIN_MM = 55;
-/** Every steps column holds at least this many characters a line at the page's step type. */
+/** Every steps column - beside a drawing or under it - holds at least this many characters a line
+ *  at the page's step type (`stepsMinMm`: 41 / 35 / 33 mm at L / M / S). */
 export const STEPS_MIN_CHARS = 18;
 /** Under a wide drawing the steps take two text columns (read 1 2 / 3 4) when each is this wide. */
 const STEPS_UNDER_COL_MM = 80;
@@ -233,8 +232,8 @@ export function drawingWidthMm(it, c = {}, size = 'M') {
 }
 
 /**
- * Where the steps of a one-state anchor go: BESIDE the drawing when the column left beside it is
- * at least STEPS_BESIDE_MIN_MM (and STEPS_MIN_CHARS characters) wide, else UNDER it. A drawing
+ * Where the steps of a one-state anchor go: BESIDE the drawing when the column left beside it
+ * holds STEPS_MIN_CHARS characters a line (`stepsMinMm`), else UNDER it. A drawing
  * that takes most of the cell (a count-by row, a number line, a long table, a bar model) always
  * puts its steps under it. Under a full-width drawing the steps take two text columns.
  *
@@ -247,16 +246,17 @@ export function stepsPlacement(it, c = {}, { variant = 'side', cols = 1, size = 
     // A footprint is an upper bound (a stack's is its widest answer plus pads), so only a drawing
     // that is clearly wide is decided here; for the rest the steps are offered beside it and the
     // stylesheet measures: `.mq-anchor-beside` wraps them UNDER the drawing whenever less than
-    // STEPS_BESIDE_MIN_MM is left beside it (flex-basis and min-width), so the real drawing
-    // decides, never the estimate.
-    const wide = drawMm > innerMm * 0.55 || innerMm - STEPS_GAP_MM < STEPS_BESIDE_MIN_MM + Math.min(drawMm, 20);
+    // `stepsMinMm` is left beside it (flex-basis and min-width), so the real drawing decides,
+    // never the estimate.
+    const need = stepsMinMm(c.size);
+    const wide = drawMm > innerMm * 0.55 || innerMm - STEPS_GAP_MM < need + Math.min(drawMm, 20);
     const beside = !wide;
     const underCols = innerMm >= 2 * STEPS_UNDER_COL_MM + STEPS_GAP_MM ? 2 : 1;
-    return { beside, innerMm, drawMm: Math.round(drawMm * 10) / 10, colMm, underCols };
+    return { beside, innerMm, drawMm: Math.round(drawMm * 10) / 10, colMm, underCols, needMm: need };
 }
 
 const lineHtml = (text, n) => `<li${n ? '' : ' class="mq-anchor-cont"'}>${n ? `<em>${n}</em>` : '<em></em>'}<span>${esc(text)}</span></li>`;
-const stepsList = (steps, idx) => `<ol class="mq-anchor-steps">${idx.map((i) => stepLines(steps[i].text).map((t, j) => lineHtml(t, j === 0 ? i + 1 : 0)).join('')).join('')}</ol>`;
+const stepsList = (steps, idx, style = '') => `<ol class="mq-anchor-steps"${style ? ` style="${style}"` : ''}>${idx.map((i) => stepLines(steps[i].text).map((t, j) => lineHtml(t, j === 0 ? i + 1 : 0)).join('')).join('')}</ol>`;
 /**
  * The steps UNDER a drawing in `k` text columns read row by row (1 2 / 3 4), as the Guided page's
  * Steps band reads: each step keeps its lines together in one grid cell (a span a line, so every
@@ -333,7 +333,9 @@ export function anchorHtml(it, c, { variant = 'band', twinCols = 2, cols } = {})
         const inCols = Number(cols) > 0 ? Number(cols) : variant === 'side' ? 2 : 1;
         const pl = stepsPlacement(it, c, { variant, cols: inCols, size });
         const body = pl.beside
-            ? `<div class="mq-anchor-one mq-anchor-beside">${st}${stepsList(steps, idx)}</div>`
+            // The column's floor is 18 characters of the page's step type: narrower, the list wraps
+            // under the drawing (flex-wrap), so it can never print a word a line.
+            ? `<div class="mq-anchor-one mq-anchor-beside">${st}${stepsList(steps, idx, `flex-basis:${pl.needMm}mm;min-width:min(${pl.needMm}mm,100%)`)}</div>`
             : `<div class="mq-anchor-one mq-anchor-under">${st}${stepsGrid(steps, idx, pl.underCols,
                 charsPerLine((pl.innerMm - (pl.underCols - 1) * 6) / pl.underCols, pageSize))}</div>`;
         return `<div class="mq-anchor mq-anchor-${variant}" data-ws-anchor="${variant}" data-ws-states="1" data-ws-steps="${pl.beside ? 'beside' : 'under'}">${body}${sayHtml}</div>`;
@@ -608,7 +610,7 @@ export const ANCHOR_CSS = `
 :is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-cell{flex:none}
 :is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-steps{flex:1;min-width:0;padding-top:1mm}
 :is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside{flex-wrap:wrap;row-gap:2mm;justify-content:center}
-:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-steps{flex:1 1 ${STEPS_BESIDE_MIN_MM}mm;min-width:min(${STEPS_BESIDE_MIN_MM}mm,100%)}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-steps{flex:1 1 41mm;min-width:min(41mm,100%)}
 :is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-under{flex-direction:column;align-items:stretch;gap:2mm}
 :is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-under>.mq-anchor-cell{justify-content:center}
 :is(.ws-page,.ws-sheet) .mq-anchor-steps.mq-anchor-stepgrid{display:grid;column-gap:6mm;row-gap:1mm}
@@ -623,5 +625,5 @@ export default {
     ANCHOR_MODES, ANCHOR_ROLES, normaliseAnchors, wordCount, workedStepsOf, anchorEligible, ineligibleNote,
     stepLines, anchorGroups, sayLineOf, stepTemplateOf, unslot, stateSize, anchorHtml, anchorItem,
     anchorPlanItem, anchorHeightMm, easeScore, pickDistinct, sideItems, pupilCount, blockPlan, blockPages, ANCHOR_CSS,
-    STEPS_BESIDE_MIN_MM, STEPS_MIN_CHARS, stepsMinMm, anchorInnerMm, drawingWidthMm, stepsPlacement, pairRows, packPairs, pairsPerPage,
+    STEPS_MIN_CHARS, stepsMinMm, anchorInnerMm, drawingWidthMm, stepsPlacement, pairRows, packPairs, pairsPerPage,
 };

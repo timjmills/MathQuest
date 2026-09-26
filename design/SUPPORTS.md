@@ -696,16 +696,17 @@ answer traced grey, and every step listed beside it.
 - **Where the steps go (owner report 2026-09-25, `anchors.js stepsPlacement`).** A count-by row's
   Model cell printed its steps one word a line in a column squeezed against the cell's right
   border, running past it and down beside the next cell. The steps of a one-state anchor go
-  BESIDE the drawing only when the column left beside it is at least **55 mm**
-  (`STEPS_BESIDE_MIN_MM`, about 25 characters a line at L) and never less than **18 characters**
-  of the page's step type (`stepsMinMm`: 41 / 35 / 33 mm at L / M / S). Otherwise they go UNDER the
-  drawing, across the cell: in two text columns read row by row (1 2 / 3 4) when the cell is at
-  least 164 mm wide, with short sentences of one step sharing a line while it stays within 10 words.
-  A drawing wider than 55% of the cell (a count-by row, a number line, a long table, a bar model)
-  always takes its steps under it. The drawing's width is its template's footprint AT the anchor's
-  preset (a count-by row of twelve is one row at M but two at L). The stylesheet backs the rule:
-  a steps list beside a drawing is at least 55 mm wide and wraps under the drawing if it would be
-  narrower (`flex-wrap`), so a drawing wider than estimated can never squeeze it again.
+  BESIDE the drawing only when the column left beside it holds **18 characters** a line of the
+  page's step type (`stepsMinMm`: 41 / 35 / 33 mm at L / M / S; `STEPS_MIN_CHARS`). Otherwise they
+  go UNDER the drawing, across the cell: in two text columns read row by row (1 2 / 3 4) when the
+  cell is at least 164 mm wide, short sentences of one step sharing a line while it stays within
+  10 words. A drawing wider than 55% of the cell (a count-by row, a number line, a long table, a bar
+  model) always takes its steps under it. The drawing's width is its template's footprint AT the
+  anchor's preset (a count-by row of twelve is one row at M but two at L). The stylesheet enforces
+  the floor: the list beside a drawing has `flex-basis` and `min-width` of that width and wraps
+  under the drawing if it would be narrower (`flex-wrap`), so a drawing wider than estimated can
+  never squeeze it again. A twin is marked `restacks` (print-sheet.js measureItems): taller at two
+  columns than at one on purpose, not a collapse.
 - **Wide models.** A band whose states would not fit their columns (the width is the template's
   footprint at the smaller preset), or whose columns would hold fewer than 18 characters of step
   text a line (four states at L leave 36 mm, 15 characters: three stand), merges states down to 2.
@@ -713,11 +714,13 @@ answer traced grey, and every step listed beside it.
 - **Side by side in one column** pages its [twin, problem] pairs by their OWN heights
   (`anchors.js packPairs`, `pairsPerPage`): each row is as tall as what it holds, so one tall twin
   no longer sizes every row of the page (Count by 1-12 at L: 1 pair a page before, 2 after; at S, 3).
+- **Side by side, two columns:** a row is [twin | problem] by construction, so the layout never
+  re-packs such a section by height (`layout.js`, the H13 packing skips a list holding twins).
 - **Gate.** `tests/scripts/ws-anchor-steps.cjs` builds every skill with worked steps (independent /
-  more practice, side and sections; guided; lesson; mixed practice; S and L) and fails on a steps
-  column beside a drawing under 55 mm or any under 18 characters (STEPS-COL), a step printed about
-  one word a line (STEPS-WORD), anything leaving an anchor, Model or chart cell (STEPS-LEAVE), and an
-  anchor cell 30% empty (STEPS-H13).
+  more practice, side and sections; guided; lesson; mixed practice; S and L; `--builds` narrows it)
+  and fails on any steps column under 18 characters (STEPS-COL), a step printed about one word a
+  line (STEPS-WORD), anything leaving an anchor, Model or chart cell (STEPS-LEAVE), and an anchor
+  cell 30% empty (STEPS-H13).
 
 ## S6 · Anchor layouts on practice sheets
 

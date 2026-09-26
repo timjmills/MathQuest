@@ -355,21 +355,8 @@ export function namedSteps(steps, data) {
 /** A step marker: the outlined circle and its numeral in the lesson accent (INK-30, BD-4). */
 export const stepMarker = (n) => `<em class="mq-lnum" data-mq-accent>${n}</em>`;
 
-/**
- * The chart layout by state count: 4 -> 2 x 2 panels; 2 or 3 -> full-width rows, the drawing
- * beside its step. A WIDE drawing (a count-by row, a long number line or table: wider than the
- * drawing's share of a half-width panel or of a row) never stands beside anything: each panel is
- * a full-width row, its step above the drawing and its words under it (owner report 2026-09-25:
- * a count-by row ran out of its 2 x 2 panel into the next one).
- */
-export const chartLayout = (n, { wide = false } = {}) => (wide ? { cols: 1, rows: n, variant: 'col' }
-    : n >= 4 ? { cols: 2, rows: Math.ceil(n / 2), variant: 'col' } : { cols: 1, rows: n, variant: 'row' });
-
-/** The widest drawing a half-width panel (and a row's 42% drawing zone) holds, in mm. */
-const CHART_DRAW_MM = 75;
-/** Is the example's drawing too wide for a half-width panel or a row's drawing zone? */
-export const wideChart = (example) => !!example && !isRound(example)
-    && Number((example.footprint || {}).wMm) > CHART_DRAW_MM;
+/** The chart layout by state count: 4 -> 2 x 2 panels; 2 or 3 -> full-width rows. */
+export const chartLayout = (n) => (n >= 4 ? { cols: 2, rows: Math.ceil(n / 2), variant: 'col' } : { cols: 1, rows: n, variant: 'row' });
 
 /**
  * The ANCHOR CHART's state items (owner ruling 2026-09-25: "the I Do example should be like an
@@ -383,7 +370,7 @@ export function stateItems(example, data) {
     if (!steps.length) return [];
     const groups = stateGroups(steps);
     const named = namedSteps(steps, data);
-    const { variant } = chartLayout(groups.length, { wide: wideChart(example) });
+    const { variant } = chartLayout(groups.length);
     const drawing = (k, c) => stateDrawing(example, steps, groups, k, c);
     const base = {
         q: null, key: { value: '', display: '', slots: {} }, drawsAnswer: true, visual: false,
@@ -605,7 +592,7 @@ function chartPage(input, ctx, data, example, states, draws) {
     const header = Object.assign({}, f.header, { name: false, date: false, score: false });
     const m = bandMetrics(ctx, layoutHeader(header));
     const n = states.length;
-    const lay = chartLayout(n, { wide: wideChart(example) });
+    const lay = chartLayout(n);
     const chant = data && data.chant ? data.chant : '';
     const chantH = chant ? { S: 13, M: 15, L: 17 }[ctx.size] + 1.5 : 0;
     // PAGE_TYPES 7.2: the chart's panels need no band label - the title names the skill and each
