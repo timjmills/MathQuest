@@ -79,6 +79,22 @@ Phase 0 is on the lessons lane (above); Phase 1 (archetype pilots) is next.
 
 ## 6. How to resume
 
+**Backup branches on origin** (owner-approved, 2026-09-26; WIP, never merged or deployed):
+
+| Branch | Head | Lane |
+|---|---|---|
+| claude/sweet-newton-c8wrv1-wip-lessons | ea22a97 | lessons engine |
+| claude/sweet-newton-c8wrv1-wip-teacher-ui | c9fd46d | teacher UI / three papers / quiz / home |
+| claude/sweet-newton-c8wrv1-wip-anchors | 8efc257 | worked examples |
+| claude/sweet-newton-c8wrv1-wip-placevalue | 8d968fa | place value / rounding |
+| claude/sweet-newton-c8wrv1-wip-figures | fb2c296 | figures / data |
+| claude/sweet-newton-c8wrv1-wip-geometry | 032a27d | geometry |
+| claude/sweet-newton-c8wrv1-wip-k2 | 99eca66 | K-2 |
+| claude/sweet-newton-c8wrv1-wip-operations | 1ce8868 | operations |
+| claude/sweet-newton-c8wrv1-wip-fractions | af4963f | fractions |
+
+To recreate a lane: `git worktree add .claude/worktrees/<lane> -b <local-name> origin/<branch>`.
+
 1. The lane branches are local to this container. If the container was reclaimed, only what is on `origin` survives:
    master / sweet-newton (this file, all critic grades above, the backlog) — the lane work in §3 is lost unless it was
    pushed. Check `git branch -a` first.
