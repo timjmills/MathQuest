@@ -38,7 +38,7 @@ import {
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, wrongPattern,
     checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf,
 } from './compose.js';
-import { gridHeightMm, SAFETY_H_MM, rowGapFor } from '../layout.js';
+import { gridHeightMm, SAFETY_H_MM } from '../layout.js';
 import { coinSVG } from '../cells/tmkit.js';
 import { gridSlots } from '../cells/mult-grid.js';
 import { getProvider, resolveCtx, getCell, hasCell } from '../index.js';
@@ -58,7 +58,10 @@ const CHOICE = new Set(['compare']);
 const LINED = new Set(['fact-family', 'function-table']);
 
 export const sources = (skills) => [{ id: 'main', skills }];
-export const measureCols = () => [1, 2];
+// Size S is the size that holds MORE (L1): its one-line items and small figures also get three
+// columns, so an S page reaches its ceiling of 6 where L holds 4 (critic EA r5, A).
+export const measureCols = (ctx) => (ctx && ctx.size === 'S' ? [1, 2, 3] : [1, 2]);
+const colsFor = (size) => (size === 'S' ? [1, 2, 3] : [1, 2]);
 
 /**
  * A wrong answer a pupil could really have written: the provider's `wrongAnswer(q)`, but never
@@ -84,6 +87,9 @@ export function pupilInk(html) {
         const attrs = `${pre} data-ws-ink="solid"${post}`;
         // A template's own fix place (a fix box per fact, the redraw zone) is the KEY's ink.
         if (/data-ws-slot="(?:x\d+|fix)/.test(attrs) || /\bmq-pupil\b/.test(attrs)) return m;
+        // A choice slot WRAPS the printed choices (a pick task's fraction and its models): only
+        // the ring the pupil drew is pupil ink, never the printed prompt inside (critic EA r5).
+        if (/data-ws-shape="choice"/.test(attrs)) return m;
         return mark(tag, attrs);
     }).replace(/<([a-z][a-z0-9]*)\b([^>]*\sdata-ws-slot="(?!x\d|fix|ea-)[^"]*"[^>]*)>/gi, (m, tag, attrs) => {
         // A slot the template fills without an ink mark (the rounding table's cells): what is
@@ -103,7 +109,32 @@ const partsOfList = (v) => (/,\s/.test(String(v)) ? String(v).split(/,\s*/) : nu
 /** "9000" -> "9,000": a plain whole number of 4+ digits written the way the kit writes numbers. */
 const commas = (v) => (/^\d{4,}$/.test(String(v)) ? String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ',') : String(v));
 /** Written the same way as the right answer: a wrong "9000" beside a right "6,000" becomes "9,000". */
-const likeCorrect = (v, correct) => (/^\d{1,3}(,\d{3})+$/.test(correct) ? commas(v) : String(v));
+const likeCorrect = (v, correct) => likeAnswer(v, correct);
+
+/**
+ * A shown value written EXACTLY the way the right answer is (L3, critic pv-r1 / EA r5): its
+ * thousands commas (or none), its decimal places and its unit. A wrong "40000" beside a right
+ * "60,000" - or "3.5" beside "2.75", "5" beside "7 cm" - lets the pupil read the verdict from the
+ * typography. Anything that is not a number is left as it is.
+ */
+export function likeAnswer(v, correct) {
+    const s = String(v === undefined || v === null ? '' : v).trim();
+    const c = String(correct === undefined || correct === null ? '' : correct).trim();
+    const num = /^(-?)([\d,]*\d)(?:\.(\d+))?\s*(.*)$/;
+    const mv = num.exec(s), mc = num.exec(c);
+    if (!mv || !mc || !/^[\d,]+$/.test(mv[2]) || !/^[\d,]+$/.test(mc[2])) return s;
+    if (mv[4] && mc[4] && mv[4] !== mc[4]) return s;          // a different unit is the pupil's own
+    let whole = mv[2].replace(/,/g, '');
+    // commas exactly when the right answer has them; a short right answer says nothing
+    const cWhole = mc[2];
+    if (cWhole.includes(',')) whole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    else if (cWhole.length < 4) whole = mv[2];                 // no telling: as the pupil wrote it
+    const dp = mc[3] ? mc[3].length : 0;
+    let frac = mv[3] || '';
+    if (dp > frac.length) frac = frac.padEnd(dp, '0');
+    const unit = mv[4] || mc[4];
+    return `${mv[1]}${whole}${frac ? `.${frac}` : ''}${unit ? `${/^[%°]/.test(unit) ? '' : ' '}${unit}` : ''}`;
+}
 
 /**
  * The item's OWN answer slots, in order: [{id, value}] from the cell's key (a clock's hour and
@@ -119,6 +150,13 @@ export function answerParts(it, correct) {
         && String(slots[id].value === undefined || slots[id].value === null ? '' : slots[id].value) !== '');
     if (ids.length > 1) ids = ids.filter((id) => id !== 'answer');
     const display = String((it.key && it.key.display) || correct);
+    // A mixed-number place ("[w] [n]/[d]") is ONE shape, whole-number answers included: its fix is
+    // the same three places, the fraction left empty (critic EA r5: a box on one ruler item, a
+    // slashed three-box slot on the next).
+    if (['w', 'n', 'd'].every((id) => id in slots) && ids.length >= 1 && ids.every((id) => ['w', 'n', 'd'].includes(id))) {
+        const v = (id) => String(slots[id].value === undefined || slots[id].value === null ? '' : slots[id].value);
+        return { parts: ['w', 'n', 'd'].map((id) => ({ id, value: v(id) })), display, glue: ['', ' ', '/', ''] };
+    }
     if (ids.length > 1) return { parts: ids.map((id) => ({ id, value: String(slots[id].value) })), display };
     if (/;\s/.test(correct) && correct.split(/;\s*/).every((v) => /\d/.test(v))) return { parts: correct.split(/;\s*/).map((v, i) => ({ id: `t${i}`, value: v })), display: correct };
     if (/,\s/.test(correct) && correct.split(/,\s*/).every((v) => /\d/.test(v))) return { parts: correct.split(/,\s*/).map((v, i) => ({ id: `p${i}`, value: v })), display: correct };
@@ -260,12 +298,49 @@ function storyWork(it, shown, wrong, isWrong) {
     return o.length >= 2 && g ? `${o[0]} ${g} ${o[1]} = ${shown}` : '';
 }
 
+/**
+ * How many characters a fix place needs: the longest number the QUESTION prints (its text, the
+ * numbers its picture draws) - never the right answer, and never the pupil's shown one, so a box
+ * is as wide for "10,000" as for "9,000" (L3, critic EA r5: round_nl 55 vs 47 mm). The caller
+ * adds its own headroom (a sum or a rounding can be a digit longer).
+ */
+export function roomOf(it) {
+    const q = it.q || {};
+    const p = (q.cell && q.cell.payload) || {};
+    const printed = [q.text, q.printText];
+    // the numbers a payload DRAWS (a chart's cells, a rounding target), never its answer fields
+    const skip = /ans|answer|correct|result|solution|key|missing|blank|gap|hide|total|sum|product|quotient|diff|round|shown|wrong/i;
+    const add = (v) => { if (typeof v === 'number' || (typeof v === 'string' && /^\d[\d,]*(?:\.\d+)?$/.test(v))) printed.push(String(v)); };
+    for (const [k, v] of Object.entries(p)) {
+        if (skip.test(k)) continue;
+        if (Array.isArray(v)) v.slice(0, 200).forEach(add); else add(v);
+    }
+    const nums = printed.join(' ').match(/\d[\d,]*(?:\.\d+)?/g) || [];
+    const commas = nums.some((t) => t.includes(','));
+    // in DIGIT widths: a comma or a point is under half a digit wide
+    const units = (t) => {
+        const w = commas && /^\d{4,}$/.test(t) ? Number(t).toLocaleString('en-US') : t;
+        return w.replace(/[,.]/g, '').length + 0.4 * (w.match(/[,.]/g) || []).length;
+    };
+    return Math.max(1, ...nums.map(units));
+}
+
+/** The shape of the item's own answer place ('box', 'line', 'circle' ...), or '' when unknown. */
+function ownShapeOf(it) {
+    const payload = (it.q && it.q.cell && it.q.cell.payload) || {};
+    try {
+        const ins = hasCell(it.template) ? (getCell(it.template).inputs(payload) || []) : [];
+        const g = ins.find((x) => x && x.graded !== false) || ins[0];
+        return g && g.shape ? String(g.shape) : '';
+    } catch (e) { return ''; }
+}
+
 /** Is the item's own answer a check box (the pupil CHOSE it, rather than wrote it)? */
 function answersByCheck(it) {
     const payload = (it.q && it.q.cell && it.q.cell.payload) || {};
     if (it.key && it.key.slots && it.key.slots.choice) return true;
     try {
-        return hasCell(it.template) && (getCell(it.template).inputs(payload) || []).some((x) => x && (x.shape === 'check' || x.kind === 'check'));
+        return hasCell(it.template) && (getCell(it.template).inputs(payload) || []).some((x) => x && (x.shape === 'check' || x.kind === 'check' || x.shape === 'choice' || x.kind === 'choice'));
     } catch (e) { return false; }
 }
 
@@ -295,6 +370,12 @@ function choicesOf(it, correct, shown) {
     const cats = Array.isArray(payload.categories) ? payload.categories.map(String) : [];
     if (answersByCheck(it) && cats.length >= 2 && cats.includes(correct)) {
         return { labels: cats, correct: cats.indexOf(correct) };
+    }
+    // A picked model (the pupil CIRCLED A, B, C or D): the fix is checking the right letter,
+    // never a letter written in a box (critic EA r5: fractions:identify)
+    const letters = Array.isArray(payload.terms) ? payload.terms.map((t) => (t && t.letter ? String(t.letter) : '')).filter(Boolean) : [];
+    if (answersByCheck(it) && letters.length >= 2 && letters.includes(correct)) {
+        return { labels: letters, correct: letters.indexOf(correct) };
     }
     // A multiple-choice item whose options are too long to write out again (a word name): the
     // fix is the letter the item prints beside the option (A-D). A short option (a fraction, a
@@ -364,7 +445,7 @@ export function prepare(it, info = {}) {
     // beside a wrong "80,000" - critic round 4); a digit grid keeps its bare digits.
     const kDisp = String((it.key && it.key.display) || '');
     const written = it.template === 'pv' && kDisp.replace(/,/g, '') === correct ? kDisp : correct;
-    const shown = isWrong ? (P ? wrong.value : likeCorrect(wrong.value, written)) : written;
+    const shown = isWrong ? (P ? likeAnswer(wrong.value, P.display || written) : likeCorrect(wrong.value, written)) : written;
     const who = PUPILS[(Number(info.index) || 0) % PUPILS.length];
     // The word-work cell draws its own finished working (sign, columns, answer): no extra line.
     const story = (it.fclass === 'word' || it.template === 'wordpic') && it.template !== 'word-work';
@@ -372,20 +453,26 @@ export function prepare(it, info = {}) {
     // The item's answer slots, and what the pupil wrote in each (critic round 3): a correct item
     // shows the RIGHT value in every slot ("10 + 30 = 40", never "40 + 40 = 40"), a wrong one the
     // wrong answer split into the same slots ("4 | 6 | 2", never "462" in every column).
-    let glue = P ? glueOf(P.display, P.parts) : null;
-    let shownSlots = isWrong && wrong.slots ? wrong.slots : undefined;
+    let glue = P ? (P.glue || glueOf(P.display, P.parts)) : null;
+    // every value the pupil wrote in a slot is written like the right one there (L3)
+    const keySlots = (it.key && it.key.slots) || {};
+    let shownSlots = isWrong && wrong.slots
+        ? Object.fromEntries(Object.entries(wrong.slots).map(([id, v]) => [id, keySlots[id] ? likeAnswer(v, keySlots[id].value) : v]))
+        : undefined;
     let sParts = null;
     if (P) {
         const ids = P.parts.map((x) => x.id);
         if (!isWrong) sParts = P.parts.map((x) => x.value);
         else {
             const split = splitLike(wrong.value, glue, ids.length)
+                // a whole number in a mixed-number place: the whole box, the fraction left empty
+                || (P.glue && /^\d+$/.test(String(wrong.value).trim()) ? [String(wrong.value).trim(), '', ''] : null)
                 || (/[;,]\s/.test(String(wrong.value)) ? String(wrong.value).split(/[;,]\s*/) : null);
             sParts = ids.map((id, i) => {
-                if (wrong.slots && wrong.slots[id] !== undefined) return String(wrong.slots[id]);
+                if (wrong.slots && wrong.slots[id] !== undefined) return likeAnswer(wrong.slots[id], P.parts[i].value);
                 // a part the wrong answer does not name was written right ("5, 7, 28": one
                 // group short leaves the 5 and the 7 as they were)
-                return split && split.length === ids.length ? split[i] : (i === ids.length - 1 && !split ? String(wrong.value) : P.parts[i].value);
+                return likeAnswer(split && split.length === ids.length ? split[i] : (i === ids.length - 1 && !split ? String(wrong.value) : P.parts[i].value), P.parts[i].value);
             });
             if (sParts.every((v) => v === '')) sParts = null;
             // Parts the whole answer does not spell out (an area model's partial products under
@@ -462,18 +549,31 @@ export function prepare(it, info = {}) {
     if (kind === 'choice') choice.labels.forEach((lab, i) => { slots[`ea-pick-${i}`] = isWrong && i === choice.correct ? '✓' : ''; });
     const key = slotKey(slots, correct);
     const digitMm = (size) => ({ S: 6, M: 7, L: 8 }[size] || 8);
+    // L3 (critic EA r5): a fix box as wide as the RIGHT answer gives it away ("10,000" is wider
+    // than "9,000": round_nl 55 vs 47 mm). Its room comes from the numbers the question prints,
+    // never from the answer (roomOf).
+    // headroom: a sum or a rounding can be one digit longer than any number it prints ("9,677"
+    // rounds to "10,000"); a product as long as its two factors together
+    const times = /×|\bx\b|\*/.test(String(q.text || '')) || opOf(q) === 'multiply';
+    const room = times ? roomOf(it) * 2 : roomOf(it) + 1;
+    const ownLine = kind === 'value' && ownShapeOf(it) === 'line';
+    // a fraction ("n/d") or a mixed number ("w n/d") is fixed as one: the last two parts over a bar
+    const fracFix = kind === 'parts' && !labels && glue && (P.parts.length === 2 || P.parts.length === 3) && glue[glue.length - 2].trim() === '/'
+        && !glue[0].trim() && !glue[glue.length - 1].trim() && (P.parts.length === 2 || !glue[1].trim());
     // The fix's width on paper (mm), so a wide fix goes under the work, never over the edge.
     const fixWidth = (size) => {
-        if (kind === 'value') return Math.max(26, Math.max(correct.length, String(shown).length) * digitMm(size) + 8);
-        // a word is HANDWRITTEN: ~6 mm a letter at L (critic regrade 5: "trapezoid" on a 40 mm line)
-        if (kind === 'text') return Math.min(90, Math.max(40, Math.max(correct.length, String(shown).length) * ({ S: 5, M: 5.5, L: 6 }[size] || 6) + 8));
+        if (kind === 'value') return Math.max(26, room * digitMm(size) + 10);
+        // a word is HANDWRITTEN: ~6 mm a letter at L (critic regrade 5: "trapezoid" on a 40 mm
+        // line) - one width for every word on the page, whatever the answer
+        if (kind === 'text') return { S: 52, M: 58, L: 64 }[size] || 64;
         if (kind === 'parts') {
-            return P.parts.reduce((s, x, i) => s + Math.max(16, Math.max(x.value.length, String((sParts || [])[i] || '').length) * digitMm(size) + 6) + 4, 0)
-                + (labels ? 0 : glue.join('').length * 3.2);
+            if (fracFix) return (P.parts.length - 1) * (boxW(null, 0, size) + 4);
+            return P.parts.reduce((s, x, i) => s + boxW(x, i, size) + 4, 0) + (labels ? 0 : glue.join('').length * 3.2);
         }
         return 0;
     };
-    const boxW = (x, i, size) => Math.max(16, Math.max(x.value.length, String((sParts || [])[i] || '').length) * digitMm(size) + 6);
+    // every box of a several-part fix the same width, from the printed numbers (L3)
+    const boxW = (x, i, size) => Math.max(16, (room - 1) * digitMm(size) + 8);
     /**
      * The narrowest the judgement can be (mm): it sits BESIDE the work when the cell has that much
      * room left, and wraps UNDER it otherwise - decided by the page's own flow, so the measured
@@ -538,7 +638,12 @@ export function prepare(it, info = {}) {
             // a sign is written in a circle, as in the item (critic round 3)
             fix = `<span class="mq-ansslot mq-fixslot mq-fixsign">${blank({ id: 'ea-ans', kind: 'sign', shape: 'circle', graded: false }, c, slotOnly(key, 'ea-ans'))}<small>right sign</small></span>`;
         } else if (kind === 'value') {
-            fix = `<span class="mq-ansslot mq-fixslot">${box('ea-ans', fixWidth(c.size))}<small>correct answer</small></span>`;
+            // the item's own shape: a line answer is fixed on a line, a box answer in a box (critic
+            // EA r5: "the pupil's slot is a line but the fix slot a box on the same item")
+            const place = ownLine
+                ? blank({ id: 'ea-ans', kind: 'number', shape: 'line', widthMm: fixWidth(c.size), graded: false }, c, slotOnly(key, 'ea-ans'))
+                : box('ea-ans', fixWidth(c.size));
+            fix = `<span class="mq-ansslot mq-fixslot${ownLine ? ' mq-fixtext' : ''}">${place}<small>correct answer</small></span>`;
             // a fraction is written stacked over its bar, never with a slash (TY-7)
             fix = fix.replace(/>(\d+)\s*\/\s*(\d+)</, '><span class="mq-frac"><span>$1</span><span>$2</span></span><');
         } else if (kind === 'text') {
@@ -556,14 +661,18 @@ export function prepare(it, info = {}) {
                 const cols = inner.some((g) => !g.trim()) && inner.every((g) => !g.trim() || g.trim() === ',');
                 // a sign keeps the size of the item's signs; a word ("h", "hundreds") the text size
                 const g = (t) => (!cols && t.trim() ? `<span class="mq-fixglue${/^[+\-−×÷=:<>R,]$/.test(t.trim()) ? ' mq-fixsym' : ''}">${esc(t.trim())}</span>` : '');
-                fix = `<span class="mq-fixpat mq-fixslot${cols ? ' mq-fixcols' : ''}">${g(glue[0])}`
+                // a fraction is fixed as a fraction: two boxes over a bar, never "[ ] / [ ]"
+                // (critic EA r5: a slashed fraction on paper, TY-7)
+                const k0 = P.parts.length - 2;
+                fix = fracFix
+                    ? `<span class="mq-fixpat mq-fixslot">${k0 ? box('ea-ans-0', w(P.parts[0], 0)) : ''}<span class="mq-frac mq-fixfrac"><span>${box(`ea-ans-${k0}`, w(P.parts[k0], k0))}</span><span>${box(`ea-ans-${k0 + 1}`, w(P.parts[k0 + 1], k0 + 1))}</span></span></span>`
+                    : `<span class="mq-fixpat mq-fixslot${cols ? ' mq-fixcols' : ''}">${g(glue[0])}`
                     + P.parts.map((x, i) => box(`ea-ans-${i}`, w(x, i)) + g(glue[i + 1])).join('')
                     + '</span>';
             }
         } else if (kind === 'line' && !askedFix) {
             const cParts = partsOfList(correct) || [];
-            const wMax = Math.max(...cParts.map((v) => String(v).length));
-            const fixW = Math.max({ S: 18, M: 20, L: 22 }[c.size] || 22, wMax * digitMm(c.size) + 6);
+            const fixW = Math.max({ S: 18, M: 20, L: 22 }[c.size] || 22, room * digitMm(c.size) + 6);
             fix = `<span class="mq-fixes mq-fixslot">${cParts.map((v, i) => `<span class="mq-ansslot">${box(`ea-ans-${i}`, fixW)}<small>${i + 1}</small></span>`).join('')}</span>`;
         } else if (kind === 'choice') {
             fix = `<span class="mq-fixchoice mq-fixslot${choice.labels.every((l) => /^[A-D]$/.test(String(l))) ? ' mq-fixletters' : ''}">${choice.labels.map((lab, i) => checkLine(`ea-pick-${i}`, String(lab), c, key, { graded: false })).join('')}</span>`;
@@ -588,16 +697,18 @@ export function prepare(it, info = {}) {
         // An item with its own answer column (a graph and its question): the judgement goes under
         // the pupil's answer, inside that column, on every cell (AX-4) - and costs no width.
         const modal = !below && !drawnJudge && kind !== 'draw';
+        // a graph's question sits beside its picture in one column, under it in more (EA r5, B)
+        const ask = (Number(o.cols) || 1) >= 2 ? ' mq-askunder' : ' mq-askside';
         if (modal && (o.judge === 'incol' || !o.judge)) {
             const inCol = intoAnswerColumn(shownWork, `<div class="mq-judgecol">${judge}</div>`);
-            if (inCol) return `<div class="mq-judge mq-judge3 mq-judge-incol" data-judge-mode="incol">${inCol}</div>`;
+            if (inCol) return `<div class="mq-judge mq-judge3 mq-judge-incol${ask}" data-judge-mode="incol">${inCol}</div>`;
         }
         // The flow: the work, then the judgement, then a redraw zone across the whole cell. The
         // decision boxes always come before the fix. The page decides ONE place for every cell
         // (`o.judge`: 'beside' at the cell's right, 'below' in one row under the work - AX-4);
         // unset (measuring), it flows beside when it fits, else under.
         const mode = modal && (o.judge === 'beside' || o.judge === 'below') ? o.judge : '';
-        return `<div class="mq-judge mq-judge3${mode ? ` mq-j${mode}` : ''}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm">`
+        return `<div class="mq-judge mq-judge3${ask}${mode ? ` mq-j${mode}` : ''}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm">`
             + shownWork
             + judge
             + (below ? fix : '')
@@ -615,9 +726,13 @@ export function prepare(it, info = {}) {
         colsLayout: true,
         // the places the Correct / Fix-it block can take; the host measures each (AX-4)
         judgeModes: kind === 'draw' || kind === 'redo' ? undefined : ['incol', 'beside', 'below'],
+        // the fix's SHAPE (boxes / a sign circle / a stacked fraction / check boxes / a word line),
+        // so a page keeps to one (critic EA r5, B: a line, "+" boxes and a sign circle on one page)
+        fixSig: kind === 'value' && /^[<>=]$/.test(correct) ? 'sign' : fracFix ? 'frac' : kind === 'choice' ? 'check'
+            : kind === 'value' ? (ownLine ? 'line' : 'box') : kind === 'parts' ? 'boxes' : kind,
         // The judgement column sits beside the work; a word problem or a wide picture keeps its
         // own single column (PT-WPR-1).
-        footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: Math.min(2, (it.footprint && it.footprint.maxCols) || 2) }),
+        footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: Math.min(3, (it.footprint && it.footprint.maxCols) || 3) }),
         fclass: it.fclass === 'word' || it.fclass === 'wide' ? it.fclass : 'standard', thinking: { shown, correct, isWrong, basis: wrong ? wrong.basis : '', kind, redraw },
         cellCls: [it.cellCls || '', 'mq-thinkcell mq-eacell'].join(' ').trim(),
     });
@@ -685,6 +800,64 @@ const heightAt = (it, cols, mode) => {
 };
 
 /**
+ * The deal order with every item whose RIGHT answer is new to its kind (wrong or right) first,
+ * the repeats after (L10, critic EA r5: every fixed sign on a page was ">"). Stable otherwise.
+ */
+export function varied(items) {
+    const seen = new Set();
+    const first = [], again = [];
+    for (const it of items) {
+        const t = it.thinking || {};
+        const k = `${t.isWrong ? 'w' : 'r'}|${String(t.correct)}`;
+        (seen.has(k) ? again : first).push(it);
+        seen.add(k);
+    }
+    return first.concat(again);
+}
+
+/**
+ * The height each row of a page gets (mm): what its tallest item needs (+10%), then every row
+ * grown alike toward the grid's height - never past 1.4 times - so spare height goes INTO the
+ * cells instead of a ~24 mm strip between rows (critic EA r5, A: rowGapFor strips of 18-33%).
+ */
+export function rowHeights(items, cols, G, mode) {
+    const rows = Math.max(1, Math.ceil(items.length / cols));
+    const need = [];
+    for (let r = 0; r < rows; r++) {
+        const hs = items.slice(r * cols, (r + 1) * cols).map((it) => heightAt(it, cols, mode)).filter(Number.isFinite);
+        need.push(hs.length ? Math.min(G / rows, Math.max(...hs) * 1.1) : G / rows);
+    }
+    const sum = need.reduce((a, b) => a + b, 0);
+    const grow = sum > 0 ? Math.max(1, Math.min((G - SAFETY_H_MM) / sum, 1.4)) : 1;
+    return need.map((x) => Math.round(Math.min(G / rows, x * grow) * 100) / 100);
+}
+
+/**
+ * How empty a layout leaves its cells: per item, the larger of its empty width and empty height
+ * share, averaged (0 = full). A one-line item alone in a full-width cell scores ~0.6; the same
+ * item in half the width ~0.2 (critic EA r5: placevalue:compare 51-57% H13 in one column).
+ */
+export function emptiness(items, cols, G, mode) {
+    const rh = rowHeights(items, cols, G, mode);
+    let tot = 0;
+    items.forEach((it, i) => {
+        const m = (it.measured && it.measured[cols]) || {};
+        const cellW = Math.max(10, (Number(m.innerMm) || LIVE_W_MM / cols) - 6);
+        const w = m.inkW && Number.isFinite(m.inkW[mode]) ? m.inkW[mode] : cellW * 0.8;
+        const h = heightAt(it, cols, mode) - 4;
+        const H = rh[Math.floor(i / cols)] || 1;
+        tot += Math.max(0, 1 - w / cellW, 1 - h / H);
+    });
+    // ... plus the page left blank under the grid (critic figures-r6: temperature 2 x 1 left the
+    // lower half of the page blank where 1 x 2 fills it)
+    const under = Math.max(0, 1 - rh.reduce((a, b) => a + b, 0) / G);
+    return items.length ? tot / items.length + under : 1;
+}
+
+/** The fix shape an item asks for ("value", "parts|2", "choice|4" ...): one per section (B). */
+const sigOf = (it) => String(it.fixSig || (it.thinking && it.thinking.kind) || '');
+
+/**
  * Choose n items (in order) that fit `rows` rows of `cols` columns, about half of them wrong
  * (PT-ERR-1): an item is taken while its measured height fits G / rows and its kind (wrong or
  * right) still has room. null when fewer than n fit.
@@ -695,7 +868,7 @@ function pick(items, cols, rows, G, mode) {
     const wantWrong = Math.max(1, Math.round(n / 2));
     const out = [];
     let w = 0;
-    for (const it of items) {
+    for (const it of varied(items)) {
         if (out.length >= n) break;
         if (heightAt(it, cols, mode) > h) continue;
         const bad = !!(it.thinking && it.thinking.isWrong);
@@ -717,22 +890,20 @@ function measuredLayout(items, input) {
     const G = gridHeightMm(ctx.paper, ctx.size, layoutHeader(frame.header));
     const ceil = CEILING[ctx.size];
     const word = items.some((it) => it.fclass === 'word' || it.fclass === 'wide');
+    // ONE fix shape per section (critic EA r5, B: a mixed pool printed a line, two boxes with +,
+    // a sign circle and tens/ones boxes on one page): the page deals the pool's commonest shape.
+    const count = new Map();
+    for (const it of items) count.set(sigOf(it), (count.get(sigOf(it)) || 0) + 1);
+    const tops = [...count.entries()].sort((a, b) => b[1] - a[1]).map((e) => e[0]);
+    // the commonest shape that fills a page as well as the whole pool does (never a one-item
+    // page to keep one shape: then the page mixes, as before)
+    const full = layoutOf(items, ctx, G, ceil, word);
     let best = null;
-    for (const cols of word ? [1] : [1, 2]) {
-        for (let rows = Math.floor(ceil / cols); rows >= 1; rows--) {
-            // AX-4: the judgement in ONE place on the page - beside the work when every item
-            // has room for it there, else under the work on every cell.
-            // (in the item's own answer column first, as it costs no width)
-            let mode = null;
-            let got = null;
-            for (const m of JUDGE_MODES) { got = pick(items, cols, rows, G, m); if (got) { mode = m; break; } }
-            // RUBRIC H13: the same number of items in fewer, fuller rows loses to more rows the
-            // items fill (a 2 x 1 thermometer page left 47% of each cell empty; 1 x 2 fills it).
-            const fill = got ? Math.max(...got.map((it) => heightAt(it, cols, mode))) * rows / G : 0;
-            if (got && (!best || got.length > best.items.length || (got.length === best.items.length && fill > best.fill + 0.1))) best = { cols, rows, items: got, fill, mode };
-            if (got) break;
-        }
+    for (const sig of tops) {
+        const got = layoutOf(items.filter((it) => sigOf(it) === sig), ctx, G, ceil, word);
+        if (got && full && got.items.length >= full.items.length) { best = got; break; }
     }
+    if (!best) best = full;
     if (!best) return null;
     const perPage = best.cols * best.rows;
     return {
@@ -741,11 +912,34 @@ function measuredLayout(items, input) {
     };
 }
 
-// The host deals twice the ceiling, so the page can choose the items that fit (measured).
+/** The best page `pool` makes: the most items, then the least empty cells (see measuredLayout). */
+function layoutOf(pool, ctx, G, ceil, word) {
+    if (!pool.length || !pool.some((it) => it.thinking && it.thinking.isWrong)) return null;
+    let best = null;
+    for (const cols of word ? [1] : colsFor(ctx.size)) {
+        for (let rows = Math.floor(ceil / cols); rows >= 1; rows--) {
+            // AX-4: the judgement in ONE place on the page - in the item's own answer column,
+            // beside the work, or under it - the first that every item on the page has room for.
+            let mode = null;
+            let got = null;
+            for (const m of JUDGE_MODES) { got = pick(pool, cols, rows, G, m); if (got) { mode = m; break; } }
+            if (!got) continue;
+            // More items wins; the same number goes to the layout that leaves its cells least
+            // empty, in width as well as height (H13: a one-line item in a full-width cell).
+            const empty = emptiness(got, cols, G, mode);
+            if (!best || got.length > best.items.length || (got.length === best.items.length && empty < best.empty - 0.05)) best = { cols, rows, items: got, empty, mode };
+            break;
+        }
+    }
+    return best;
+}
+
+// The host deals three times the ceiling, so the page can choose the items that fit (measured)
+// and still keep to one fix shape when a pool mixes kinds.
 export const counts = (pools, input) => {
     const ctx = ctxOf(input);
     const items = pools.main || [];
-    return { main: items.length && items.every((it) => it.measured && it.measured[1]) ? CEILING[ctx.size] * 2 + 2 : staticLayout(items, input).perPage };
+    return { main: items.length && items.every((it) => it.measured && it.measured[1]) ? CEILING[ctx.size] * 3 + 3 : staticLayout(items, input).perPage };
 };
 
 /** n items in deal order, about half of them wrong and at least one (PT-ERR-1). */
@@ -775,23 +969,15 @@ export function plan(input = {}) {
     const grid = gridPart(items.map((it) => planItem(it, { cols: L.cols, render: judged(it) })), { cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
     if (rows === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
     // RUBRIC H13 (critic round 4): a row is as tall as what it holds (+10%), never the page's
-    // share of the grid - cells stretched to G / rows left 30-45% empty under the fix. The
-    // spare page height goes BETWEEN the rows (the density lane's rowGapFor, as on a Test).
-    // A lone row too: a cell as tall as its content, the page's spare height left under the grid
-    // (critic k2-r1 / regrade 5: 38-48% bands under every one-row page's cells).
+    // share of the grid - cells stretched to G / rows left 30-45% empty under the fix. Spare
+    // height grows every row alike (at most 1.4 times), never a strip between rows (EA r5).
     if (M) {
-        const rowH = [];
-        for (let r = 0; r < rows; r++) {
-            const hs = items.slice(r * L.cols, (r + 1) * L.cols).map((it) => heightAt(it, L.cols, L.mode)).filter(Number.isFinite);
-            rowH.push(hs.length ? Math.round(Math.min(L.gridH / rows, Math.max(...hs) * 1.1) * 100) / 100 : L.gridH / rows);
-        }
+        const rowH = rowHeights(items, L.cols, L.gridH, L.mode);
         const sum = rowH.reduce((a, b) => a + b, 0);
-        if (sum < L.gridH * 0.95) {
-            const g = rowGapFor(rows, sum, L.gridH);
+        if (sum < L.gridH * 0.97) {
             grid.cls = 'fixed';
             grid.rowsTpl = rowH.map((h) => `${h}fr`).join(' ');
-            grid.height = `${Math.round((g.gap ? g.heightMm : sum) * 100) / 100}mm`;
-            if (g.gap) grid.rowGap = g.gap;
+            grid.height = `${Math.round(sum * 100) / 100}mm`;
         }
     }
     const wrongShare = items.length ? items.filter((it) => it.thinking && it.thinking.isWrong).length / items.length : 0;
@@ -811,5 +997,5 @@ export function plan(input = {}) {
 /** Which items show a wrong answer: a seeded 40-60% pattern over the run (PT-ERR-1). */
 export const wrongFlags = (n, seed) => wrongPattern(n, seed, ROLE_ID);
 
-export default { ROLE_ID, sources, measureCols, prepare, supports, counts, plan, wrongFlags, realWrongOf, pupilInk, intoAnswerColumn };
+export default { ROLE_ID, sources, measureCols, prepare, supports, counts, plan, wrongFlags, realWrongOf, pupilInk, intoAnswerColumn, likeAnswer, roomOf, varied, rowHeights, emptiness };
 export { esc };

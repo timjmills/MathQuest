@@ -535,7 +535,7 @@ const ICAN_VERBS = new Set([
     'add', 'subtract', 'multiply', 'divide', 'count', 'compare', 'order', 'round', 'estimate',
     'find', 'identify', 'name', 'sort', 'read', 'write', 'tell', 'measure', 'convert',
     'simplify', 'solve', 'make', 'build', 'plot', 'graph', 'classify', 'partition', 'compose',
-    'decompose',
+    'decompose', 'combine', 'review',
 ]);
 
 /** Instruction key by screen answer type (section 4.5). The ONLY five the default may pick. */
@@ -613,7 +613,9 @@ export function defaultStrings(ref = {}) {
     const label = cleanLabel(ref.label || fromTable || fromFn || skillId.replace(/_/g, ' '));
     // The label goes INSIDE a sentence, so it is de-title-cased first: "Multiplication Chart"
     // must read "I Can work on multiplication chart", never "... multiplication Chart".
-    const lower = deTitleCase(label);
+    // "Mixed Place Value" is a REVIEW of place value: "I Can review place value", never the
+    // pasted label "I Can work on mixed place value" (critic EA r5, D).
+    const lower = deTitleCase(label).replace(/^mixed\s+(?!numbers?\b)/i, 'review ');
     const firstWord = lower.split(/\s+/)[0].replace(/[^a-z]/gi, '').toLowerCase();
     const iCan = !lower ? 'I Can work on this skill'
         : ICAN_VERBS.has(firstWord) ? `I Can ${lower}` : `I Can work on ${lower}`;

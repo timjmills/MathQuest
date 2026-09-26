@@ -554,6 +554,31 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
         if (hm && new RegExp(`mq-j${mode}[^"]*"[^>]*data-judge-mode="${mode}"`).test(hm)) modes.add(mode);
     }
     ok(modes.size === 2 && Array.isArray(p.judgeModes) && p.judgeModes.includes('incol'), 'Error analysis: the page\'s judge mode reaches every cell, and the host is told which modes to measure');
+    // Critic EA r5 / pv-r1 (L3): nothing on the pupil page may tell a wrong answer from a right one.
+    const { likeAnswer, roomOf, varied, rowHeights } = ROLE_MODULES['error-analysis'];
+    eq(likeAnswer('40000', '60,000'), '40,000', 'L3: a wrong value takes the right answer\'s commas');
+    eq(likeAnswer('40,000', '60000'), '40000', 'L3: ... and drops them when the right answer has none');
+    eq(likeAnswer('3.5', '2.75'), '3.50', 'L3: ... its decimal places');
+    eq(likeAnswer('5', '7 cm'), '5 cm', 'L3: ... and its unit');
+    eq(likeAnswer('<', '>'), '<', 'L3: a sign is left as it is');
+    // The fix box's width comes from what the page prints, never from the right answer.
+    const roundQ = (ans) => ({ categoryId: 'number_sense', skillId: 'nearest_1000', ans, text: 'Round 9,677 to the nearest 1,000.', cell: { template: 'equation', v: 1, payload: { n: 9677, place: 1000, answer: ans } } });
+    const widthOf = (ans, shown) => {
+        const itm = { q: roundQ(ans), template: 'equation', fclass: 'standard', footprint: { wMm: 80 }, render: () => '<div>Round 9,677</div>', key: { value: ans, display: ans, slots: { answer: { value: ans, graded: true } } } };
+        const pp = prepare(itm, { index: 0, wrong: false });
+        const hm = pp && pp.render(ctx, { cols: 1, judge: 'below' });
+        const m = hm && /<[^>]*--w:\s*([\d.]+)mm[^>]*data-ws-slot="ea-ans"/.exec(hm);
+        return m ? Number(m[1]) : NaN;
+    };
+    ok(Number.isFinite(widthOf('10,000')) && widthOf('10,000') === widthOf('9,000'), `L3: the fix box is as wide for "10,000" as for "9,000" (${widthOf('10,000')} / ${widthOf('9,000')} mm)`);
+    eq(roomOf({ q: roundQ('10,000') }), roomOf({ q: roundQ('9,000') }), 'L3: the fix room reads the printed numbers, not the answer');
+    // L10: the page deals each right answer once before it repeats one.
+    const mk = (c, w) => ({ thinking: { correct: c, isWrong: w } });
+    eq(varied([mk('>', true), mk('>', true), mk('<', true), mk('=', false)]).map((x) => x.thinking.correct).join(''), '><=>', 'L10: a new right answer comes before a repeat (wrong items)');
+    // A page's spare height grows its rows, never a strip between them.
+    const fake2 = (h) => ({ measured: { 1: { hMm: h, fits: true } } });
+    const rh = rowHeights([fake2(40), fake2(40)], 1, 200);
+    ok(rh.every((x) => x > 44 && x <= 100) && Math.abs(rh[0] - rh[1]) < 0.01, `EA r5 A: rows grow alike toward the grid, at most 1.4 times (${rh.join(', ')})`);
 }
 // Guided Steps band: the provider's own steps, read row by row (1 2 / 3 4), never 1 3 / 2.
 {

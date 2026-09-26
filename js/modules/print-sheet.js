@@ -25,7 +25,7 @@
 import { generateQuestionFor } from './generate-question.js';
 import { factSetTitle, optionsFor, normalizeOptions } from './skill-options.js';
 import { opsRoutedSkill } from './gen-operations.js';
-import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill } from './data.js';
+import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills } from './data.js';
 import { kitCellSpec } from './print-generate.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
@@ -953,6 +953,7 @@ function measureItems(items, { size, look, colsList }) {
                     // them in `judgeModes`; each is drawn and measured here, and the role picks the
                     // one the whole page can use. null: that way does not fit (or does not apply).
                     const vary = {};
+                    const inkW = best.inkW || {};
                     if (fits && Array.isArray(it.judgeModes)) {
                         const grow = (Math.max(hPx, r.height) - r.height) / PX_PER_MM;
                         for (const mode of it.judgeModes) {
@@ -964,23 +965,33 @@ function measureItems(items, { size, look, colsList }) {
                             const mc = root.firstChild;
                             const cr = mc.getBoundingClientRect();
                             let over = false;
+                            // the ink's width: the leftmost to the rightmost drawn thing (a text run, a
+                            // box, a picture), so the role can tell a one-line item in a full-width
+                            // cell (half of it empty) from one that fills it (critic EA r5, H13 W)
+                            let lo = Infinity, hi = -Infinity;
                             for (const el of mc.querySelectorAll('*')) {
                                 const er = el.getBoundingClientRect();
                                 if ((!er.width && !er.height) || getComputedStyle(el).position === 'absolute') continue;
                                 if (er.right > cr.right - padR + 1 || er.left < cr.left + padL - 1) { over = true; break; }
+                                const leaf = !el.children.length || el.tagName.toLowerCase() === 'svg';
+                                if (leaf && !el.closest('.ws-letter') && !(el.parentElement && el.parentElement.closest('svg'))) { lo = Math.min(lo, er.left); hi = Math.max(hi, er.right); }
                             }
                             vary[mode] = over ? null : cr.height / PX_PER_MM + grow;
+                            if (!over && hi > lo) inkW[mode] = Math.max(inkW[mode] || 0, (hi - lo) / PX_PER_MM);
                         }
                     }
                     const modes = Object.assign({}, best.modes || {});
                     for (const mode of Object.keys(vary)) modes[mode] = vary[mode] === null || modes[mode] === null ? null : Math.max(modes[mode] || 0, vary[mode]);
-                    best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits, modes };
+                    best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits, modes, inkW };
                 }
                 it.measured = it.measured || {};
                 it.measured[c] = { hMm: Math.ceil(best.hMm * 10) / 10, fits: best.fits };
                 if (best.modes && Object.keys(best.modes).length) {
                     it.measured[c].modes = {};
                     for (const [mode, h] of Object.entries(best.modes)) it.measured[c].modes[mode] = h === null ? null : Math.ceil(h * 10) / 10;
+                    it.measured[c].inkW = {};
+                    for (const [mode, w] of Object.entries(best.inkW || {})) it.measured[c].inkW[mode] = Math.ceil(w * 10) / 10;
+                    it.measured[c].innerMm = inner;
                 }
             }
         }
@@ -1045,7 +1056,42 @@ async function loadStandards() {
     return standardsMod;
 }
 function primaryCcss(sk) {
-    try { return standardsMod ? standardsMod.primaryStandard(sk.categoryId, sk.skillId, { short: true }) : ''; } catch (e) { return ''; }
+    try {
+        if (!standardsMod) return '';
+        const code = standardsMod.primaryStandard(sk.categoryId, sk.skillId, { short: true });
+        if (code) return code;
+        // A skill tagged to its CLOSEST standard (temperature: CCSS names no thermometer) still
+        // prints that code, marked as the closest - never a footer with no standard at all
+        // (critic EA r5, D).
+        const e = standardsMod.standardsEntry(sk.categoryId, sk.skillId);
+        if (e && e.approx && e.ccss && e.ccss.length) {
+            const short = String(e.ccss[0]).replace(/\.([A-Z])\.(\d+)$/, '.$2');
+            return `≈ ${short}`;
+        }
+    } catch (e) { return ''; }
+    return '';
+}
+
+/**
+ * The levels a skill printed as "M" (every level) really spans: the grades of its CCSS codes, or
+ * of the skills its review pool deals. A page is never tabbed "All levels" / "Grade mixed" when its
+ * content has a level (critic EA r5, D: number_chart_fill, mixed_placevalue).
+ */
+function spanGrades(sk) {
+    const G = ['K', '1', '2', '3', '4', '5', '6'];
+    const gradeOfCode = (c) => { const m = /^(K|\d)\./i.exec(String(c)); return m ? m[1].toUpperCase() : ''; };
+    const out = new Set();
+    try {
+        const e = standardsMod && standardsMod.standardsEntry(sk.categoryId, sk.skillId);
+        (e && e.ccss ? e.ccss : []).map(gradeOfCode).filter((g) => G.includes(g)).forEach((g) => out.add(g));
+        if (!out.size && isMixedMetaSkill(sk.skillId)) {
+            for (const id of getMixedPoolSkills(sk.categoryId, sk.skillId) || []) {
+                const g = String(getSkillGrade(id, sk.categoryId) || '').toUpperCase();
+                if (G.includes(g)) out.add(g);
+            }
+        }
+    } catch (e) { /* keep none */ }
+    return [...out].sort((a, b) => G.indexOf(a) - G.indexOf(b));
 }
 
 /**
@@ -1087,6 +1133,10 @@ function skillMeta(sk, q) {
     let grade = null;
     try { grade = getSkillGrade(sk.skillId, sk.categoryId); } catch (e) { grade = null; }
     const meta = { categoryId: sk.categoryId, skillId: sk.skillId, label, grade: grade === null || grade === undefined ? '' : String(grade), ccss: sk.ccss || primaryCcss(sk) };
+    if (!/^(K|[1-6])$/i.test(meta.grade)) {
+        const span = spanGrades(sk);
+        if (span.length) { meta.grades = span; meta.grade = span[0]; }
+    }
     const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, { skillId: nameId }));
     meta.iCan = sk.iCan || optionTitle(sk, words.iCan) || words.iCan;
     meta.instructionKey = q ? instructionKeyFor(q, words) : words.instructionKey;
