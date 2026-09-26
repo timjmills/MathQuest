@@ -325,8 +325,16 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   await sleep(200);
   await page.evaluate(pickRole, 'review');
   await sleep(6000);
-  const warn = await page.evaluate(() => (document.querySelector('#tvFits .tv-fits-warn') || {}).textContent || '');
-  if (!/of 4 skills fit/.test(warn)) fail(`Print: no warning when a Review page cannot hold every skill ("${warn}")`);
+  // Review prints one section per skill (guided-r1), so four skills normally all fit; the rule is
+  // that a skill missing from the sheet is always named, never that a warning always shows.
+  const reviewFit = await page.evaluate(async () => {
+    const skills = [['composing', 'base10_regroup'], ['addition', 'add_10_no_regroup'], ['addition', 'add_10_regroup'], ['addition', 'add_20_no_regroup']].map(([c, s]) => ({ categoryId: c, skillId: s }));
+    const res = await window.buildSheet({ role: 'review', sections: [{ skills }], seed: 1 });
+    const got = new Set((res.items || []).map((it) => it && it.skill));
+    return { missing: skills.filter((k) => !got.has(`${k.categoryId}:${k.skillId}`)).length, warn: (document.querySelector('#tvFits .tv-fits-warn') || {}).textContent || '' };
+  });
+  if (reviewFit.missing && !/of 4 skills fit/.test(reviewFit.warn)) fail(`Print: no warning when a Review page cannot hold every skill ("${reviewFit.warn}")`);
+  if (!reviewFit.missing && /skills fit/.test(reviewFit.warn)) fail(`Print: a Review page holding every skill still warns ("${reviewFit.warn}")`);
   await page.evaluate(() => window.tvOpenPrintWith(window.skillQueue));
   await sleep(300);
   // More Practice letter chips
