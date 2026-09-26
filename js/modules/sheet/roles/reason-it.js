@@ -21,7 +21,17 @@ import {
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, blank, writeLine, slotKey, rng, deriveSeed, wrongPattern,
 } from './compose.js';
 
+import { hasCell, getCell, cellFootprint } from '../registry.js';
+
 export const ROLE_ID = 'reason-it';
+
+/** A template that splits its item into the question and the answer (frac-model `views`). */
+function viewsOf(it) {
+    const q = it.q || {};
+    if (!q.cell || !hasCell(q.cell.template)) return null;
+    const t = getCell(q.cell.template);
+    try { return typeof t.views === 'function' ? t.views(q.cell.payload || {}) : null; } catch (e) { return null; }
+}
 const ROWS = { S: 4, M: 3, L: 2 };
 
 export const sources = (skills) => [{ id: 'main', skills }];
@@ -37,11 +47,30 @@ export function prepare(it, info = {}) {
     const right = aRight ? 'A' : 'B';
     const digits = Math.max(2, Math.min(6, correct.replace(/[^0-9]/g, '').length || 2));
     const key = slotKey({ 'ri-a': aRight ? 'A' : '', 'ri-b': aRight ? '' : 'B', 'ri-who': right, 'ri-ans': correct }, `${right}: ${correct}`);
-    const work = (c, o, v) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: 3, shown: v, prompt: false }));
+    // A template with VIEWS draws its question once (pictures, story) and only the answer in A and
+    // B (critic fractions-r1: every picture drawn twice made one item a page at L).
+    const views = viewsOf(it);
+    const vp = views ? { payload: { view: 'answer' } } : {};
+    // the wrong solution carries the provider's slot values (a whole box holding "4/4")
+    const work = (c, o, v) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: 3, shown: v, prompt: false },
+        v === wrong.value && wrong.slots ? { shownSlots: wrong.slots } : {}, vp));
+    const question = (c, o) => (views && views.question
+        ? `<div class="mq-abq">${it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: 3, prompt: false, payload: { view: 'question' } }))}</div>` : '');
     // A cell wider than one of the two side-by-side boxes (a row of fraction models, a long
     // sentence) stacks A over B instead, so neither finished solution sticks out of its box (PG-12).
-    const wide = Number((it.footprint || {}).wMm) > 56;
-    const render = (c, o = {}) => `<div class="mq-ab${wide ? ' mq-ab--wide' : ''}">`
+    let wMm = Number((it.footprint || {}).wMm);
+    if (views) {
+        try {
+            const qa = Object.assign({}, it.q, { cell: Object.assign({}, it.q.cell, { payload: Object.assign({}, it.q.cell.payload, { view: 'answer' }) }) });
+            const f = cellFootprint(qa, { mode: 'print', size: info.size || 'L', look: 'ican' });
+            wMm = Number(f && f.wMm) || wMm;
+        } catch (e) { /* the item's own width */ }
+    }
+    const wide = wMm > 56;
+    // wider than the A box beside the answers (a count of six tiles): A, B and the answers one under another
+    const xwide = wMm > 120;
+    const render = (c, o = {}) => `<div class="mq-ab${wide ? ' mq-ab--wide' : ''}${xwide ? ' mq-ab--xwide' : ''}${views && views.question ? ' mq-ab--q' : ''}">`
+        + question(c, o)
         + `<div class="mq-abbox"><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value)}</div>`
         + `<div class="mq-abbox"><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct)}</div>`
         + `<div class="mq-abresp">`
@@ -54,7 +83,7 @@ export function prepare(it, info = {}) {
         footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: 1 }),
         // a stacked (wide) pair is twice as tall as a side-by-side one: the section keeps one row
         // height for all (no packing by height), so the tall pair is never squeezed (PG-12)
-        fclass: wide ? 'wide' : 'standard', thinking: { correct, wrong: wrong.value, right },
+        fclass: wide && !views ? 'wide' : 'standard', thinking: { correct, wrong: wrong.value, right },
         cellCls: [it.cellCls || '', 'mq-thinkcell'].join(' ').trim(),
     });
 }

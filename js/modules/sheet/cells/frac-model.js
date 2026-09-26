@@ -313,9 +313,12 @@ function answerValues(p, ctx) {
         out.sign = raw; out.letter = raw.toUpperCase(); out.part = raw; out.answer = raw;
         // several answer terms ("1/6 + 1/6 + 1/6", "2 + 3/4"): each term into its own boxes, so a
         // True or False? statement or shown work is written in the sentence itself
-        if (Array.isArray(a.terms) && /[+]/.test(raw)) {
-            raw.split(/\s*\+\s*/).forEach((part, i) => {
+        if (Array.isArray(a.terms) && /[+,]/.test(raw)) {
+            raw.split(/\s*[+,]\s*/).forEach((part, i) => {
                 const f = /^(?:(\d+)\s+)?(\d+)\s*\/\s*(\d+)$/.exec(part);
+                // a whole-number box holds what the pupil wrote there, a fraction too (4/4 for 1)
+                const term = (p.terms || []).find((t) => t.ai === i);
+                if (term && term.frac === 'w') { out[`w${i}`] = part; return; }
                 if (f) { out[`w${i}`] = f[1] || ''; out[`n${i}`] = f[2]; out[`d${i}`] = f[3]; }
                 else if (/^\d+$/.test(part)) { out[`w${i}`] = part; out[`n${i}`] = ''; out[`d${i}`] = ''; }
             });
@@ -337,7 +340,7 @@ function slotBox(ctx, id, value, mark, graded = true, extra = '', digits = 2) {
     return `<span class="fm-box" data-ws-slot="${id}" data-ws-shape="box"${graded ? '' : ' data-ws-graded="0"'}${ink ? ` data-ws-ink="${ink}"` : ''}${hook}${extra} `
         + `style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};height:${L(ctx, h)};`
         + `border:${B(ctx, 0.75)} solid ${INK.ink};border-radius:${L(ctx, 1.25)};background:#fff;font-size:${P(ctx, digitPt(ctx))};`
-        + `font-weight:700;line-height:1;color:${color};flex:none;${KEY_FEATURES}">${ink ? escText(value) : ''}</span>`;
+        + `font-weight:700;line-height:1;color:${color};flex:none;${KEY_FEATURES}">${ink ? (/\//.test(String(value)) ? `<span style="font-size:0.62em;">${escText(value)}</span>` : escText(value)) : ''}</span>`;
 }
 
 /** A number written at the digit size. */
@@ -825,6 +828,7 @@ function amountRow(p, ctx, vals) {
         bar = `<svg class="fm-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f2(g.wMm)} ${f2(g.hMm)}" role="img" aria-label="${esc(g.aria)}" `
             + `data-frac-model="amount-bar" style="display:block;width:${L(ctx, g.wMm)};height:auto;max-width:100%;overflow:visible;">${g.body}</svg>`;
     }
+    if (p.onlyPic) return bar;
     return `<div class="fm-row" data-ws-slot-row="amount" style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 4)};">`
         + `${bar}<span style="display:flex;align-items:center;gap:${L(ctx, 3)};">${line}</span></div>`;
 }
@@ -933,10 +937,12 @@ function countGeom(p, ctx) {
         const fw = Math.max(String(t.n).length, String(t.d).length) * dig * 0.62;
         return Number(t.w) ? (Number(t.n) ? dig * 0.62 * String(t.w).length + 1 + Math.max(7, fw) : dig * 0.62 * String(t.w).length) : Math.max(7, fw);
     };
-    // every tile as wide as it needs (a mixed number's boxes are wide); the ticks sit over the
-    // tiles' centres, so the line's parts are only as even as the tiles
-    const ws = (p.terms || []).map((t) => tileW(t) + 3);
-    const gap = 6;
+    // every tile as wide as the widest (a mixed number's boxes), so the ticks over the tiles'
+    // centres are EQUALLY spaced: each count moves one equal part (critic fractions-r1)
+    const nat = (p.terms || []).map((t) => tileW(t) + (p.line ? 1.5 : 3));
+    const w0 = Math.max(0, ...nat);
+    const ws = p.line ? nat.map(() => w0) : nat;
+    const gap = p.line ? 3 : 6;
     const xs = [];
     let x = 0;
     ws.forEach((w) => { xs.push(x + w / 2); x += w + gap; });
@@ -989,8 +995,47 @@ function storySize(p, ctx) {
     return { w, h };
 }
 
+/*
+ * VIEWS (a thinking page: Reason It). `views(p)` says whether the item splits into the QUESTION
+ * (its pictures and story, drawn once) and the ANSWER (the sentence in numbers, written twice in
+ * A and B), so a page of A / B pairs does not draw every picture twice (critic fractions-r1: one
+ * item a page at L). `p.view = 'question' | 'answer'` draws one half.
+ */
+const hasPictures = (p) => (p.terms || []).some((t) => t.kind) || !!p.area || (p.task === 'amount' && (p.pic === 'set' || p.bar));
+export function fracViews(p) {
+    if (!p || p.task === 'pick' || p.task === 'shade') return null;
+    // a count: the row with its gaps once, and in A / B only what each pupil wrote in the gaps
+    if (p.task === 'count') return { question: true };
+    if (p.task === 'part') return null;
+    return { question: hasPictures(p) || (Array.isArray(p.story) && p.story.length > 0) };
+}
+/** The answer half: the number sentence alone (no pictures, no story, no hint drawings). */
+function answerPayload(p) {
+    const q = Object.assign({}, p, { terms: (p.terms || []).map((t) => Object.assign({}, t, { kind: null })), view: null });
+    delete q.story; delete q.modelTop; delete q.wall; delete q.area; delete q.stack; delete q.hops; delete q.oneLine;
+    if (q.task === 'amount') { q.pic = null; q.bar = false; }
+    if (q.task === 'count') { q.line = false; q.terms = q.terms.filter((t) => t.ai !== undefined && t.ai !== null); }
+    return q;
+}
+/** The question half: the story and every picture, in a row (a wall: one under another). */
+function questionView(p, ctx) {
+    if (p.task === 'count') {
+        return `<div class="k2-cell fm-cell fm-question" style="color:${INK.ink};font-family:'Andika','Open Sans',sans-serif;text-align:center;">${countRow(p, ctx, {})}</div>`;
+    }
+    const pics = p.area ? areaProduct(p, ctx)
+        : (p.terms || []).filter((t) => t.kind).map((t) => termModel(p, t, ctx)).join('');
+    let pic = pics;
+    if (p.task === 'amount') pic = amountRow(Object.assign({}, p, { onlyPic: true }), ctx, {});
+    const dir = p.wall ? 'column' : 'row';
+    return `<div class="k2-cell fm-cell fm-question" style="color:${INK.ink};font-family:'Andika','Open Sans',sans-serif;text-align:center;">${storyBlock(p, ctx)}`
+        + `<div style="display:flex;flex-direction:${dir};flex-wrap:wrap;align-items:${p.wall ? 'flex-start' : 'center'};justify-content:center;gap:${L(ctx, 4)} ${L(ctx, 8)};">${pic}</div></div>`;
+}
+
 register('frac-model', {
-    render(p, ctx) {
+    views: fracViews,
+    render(p0, ctx) {
+        if (p0.view === 'question') return questionView(p0, ctx);
+        const p = p0.view === 'answer' ? answerPayload(p0) : p0;
         const twin = isTwin(ctx);
         return `<div class="k2-cell fm-cell" data-fm-task="${esc(p.task || '')}"${twin ? ' data-mq-k2="1"' : ''} `
             + `style="color:${INK.ink};font-family:'Andika','Open Sans',sans-serif;text-align:center;">${storyBlock(p, ctx)}${renderRow(p, ctx)}</div>`;
@@ -1029,7 +1074,8 @@ register('frac-model', {
             : `${a.w ? `${a.w} ` : ''}${Number(a.n) ? `${a.n}/${a.d}` : ''}`.trim() || String(a.w || 0);
         return { value: t.frac === 'n' ? Number(a.n) : t.frac === 'd' ? Number(a.d) : t.frac === 'w' ? Number(a.w || 0) : display, display, slots };
     },
-    footprint(p, ctx) {
+    footprint(p0, ctx) {
+        const p = p0.view === 'answer' ? answerPayload(p0) : p0;
         const r = p.task === 'amount' ? amountSize(p, ctx) : p.task === 'count' ? countSize(p, ctx)
             : p.arcs && (p.terms || []).length === 2 && (p.task === 'op' || p.task === 'sign') ? arcsSize(p, ctx) : rowSize(p, ctx);
         const st = storySize(p, ctx);

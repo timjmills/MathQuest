@@ -3681,7 +3681,10 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 const mode = _cfForms ? pick(_cfForms) : pick([0, 1, 2, 3]);
                 const d = mode === 0 ? pick(_filterDens([3, 4, 5, 6, 8])) : pick(_filterDens([2, 3, 4, 5, 6, 8]));
                 // six counts (fewer inside one whole when the denominator is small)
-                const nT = mode === 0 ? Math.min(6, d + 1) : 6;
+                // five counts on the mixed ladder under a number line: its ticks are equally spaced,
+                // so every count takes the width of a mixed-number frame
+                const _cfLine0 = !(state.skillOptions && state.skillOptions.countLine === false);
+                const nT = mode === 0 ? Math.min(6, d + 1) : (mode >= 2 && _cfLine0 ? 5 : 6);
                 const k0 = mode === 0 ? d + 1 - nT : Math.max(1, d - rng(1, Math.min(3, d - 1)));
                 let ks = Array.from({ length: nT }, (_, i) => k0 + i);
                 if (mode === 3) ks = ks.reverse();

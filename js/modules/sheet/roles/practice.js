@@ -130,6 +130,13 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-abchoice{display:flex;gap:10mm;padding-left:2mm}
 :is(.ws-page,.ws-sheet) .mq-ab.mq-ab--wide{grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm}
 :is(.ws-page,.ws-sheet) .mq-ab.mq-ab--wide .mq-abresp{grid-column:2;grid-row:1 / span 2}
+:is(.ws-page,.ws-sheet) .mq-ab.mq-ab--q .mq-abq{grid-column:1 / span 2;grid-row:1;display:flex;justify-content:center;padding-bottom:1mm}
+:is(.ws-page,.ws-sheet) .mq-ab.mq-ab--q .mq-abresp{grid-column:3;grid-row:1 / span 2}
+:is(.ws-page,.ws-sheet) .mq-ab.mq-ab--q.mq-ab--wide .mq-abq{grid-column:1}
+:is(.ws-page,.ws-sheet) .mq-ab.mq-ab--q.mq-ab--wide .mq-abresp{grid-column:2;grid-row:1 / span 3}
+:is(.ws-page,.ws-sheet) .mq-ab.mq-ab--xwide{grid-template-columns:1fr}
+:is(.ws-page,.ws-sheet) .mq-ab.mq-ab--xwide .mq-abq,:is(.ws-page,.ws-sheet) .mq-ab.mq-ab--xwide .mq-abresp{grid-column:1;grid-row:auto}
+:is(.ws-page,.ws-sheet) .mq-ab.mq-ab--xwide .mq-abresp{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-start;column-gap:10mm;row-gap:3mm}
 :is(.ws-page,.ws-sheet) .ws-choice{display:inline-flex;align-items:center;justify-content:center;min-width:12mm;height:12mm;padding:0 1.5mm;font-size:var(--ws-digit);font-weight:700;line-height:1}
 /* Stretch (09-D mock-up): the prompt box, the results table, the closing frames */
 :is(.ws-page,.ws-sheet) .ws-cell.mq-stretchcell{align-items:stretch;padding:4mm 5mm 4mm 9mm}
