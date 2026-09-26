@@ -894,3 +894,27 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 @media (max-width: 1023px) {
     .tv-print-grid { grid-template-areas: "preview" "what" "setup"; }
 }
+
+/* ---------------------------------------------------------------- the three papers (2026-09-26)
+   Practice, Quiz, Lesson (design/LESSON_LIBRARY_PLAN.md §8e): three cards in one row where they
+   fit, stacked on a phone; the prerequisite list and the lesson parts are check-box lists. */
+.tv-papers { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+.tv-papers .tv-ptype { min-height: 56px; padding: 6px 10px; gap: 10px; }
+.tv-papers .tv-ptype-thumb { width: 26px; height: 34px; }
+.tv-set-top .tv-weight { margin-left: auto; flex: none; }
+.tv-paper-opts { display: flex; flex-direction: column; gap: 12px; }
+.tv-prereqs { display: flex; flex-direction: column; margin: 4px 0 0; padding: 4px 0 4px 12px; border-left: 2px solid var(--tv-rule); }
+.tv-prereqs .tv-check { text-align: left; }
+.tv-parts { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); gap: 0 12px; }
+.tv-prereq-of { margin-top: 2px; }
+.tv-set-tools { flex-wrap: wrap; row-gap: 4px; }
+/* A weighted skill row: the name keeps at least 150px; on a phone the weight moves under it. */
+.tv-set-top:has(.tv-weight) { flex-wrap: wrap; }
+.tv-set-top:has(.tv-weight) > .tvp-name { flex: 1 1 150px; }
+@media (max-width: 480px) {
+    .tv-set-top:has(.tv-weight) > .tvp-name { flex: 1 1 100px; }
+    .tv-set-top:has(.tv-weight) > .tv-icon-btn { order: 1; }
+    .tv-set-top:has(.tv-weight) > .tv-weight { order: 2; margin-left: 0; }
+}
+/* A packet of many pages (a Lesson, versions A-J): the page tabs wrap on a phone, never scroll the page. */
+@media (max-width: 600px) { #tvPageTabs { display: flex; flex-wrap: wrap; } #tvPageTabs > button { flex: 1 1 auto; min-width: 56px; } }

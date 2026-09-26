@@ -213,7 +213,7 @@ function start() {
     // Hooks for modules that must not import the teacher view: the skill options popover draws
     // a live sample, and the classic print entry points open the Print screen instead.
     window.tvMountSample = mountSample;
-    window.tvOpenPrintWith = (skills) => { openPrintWith(skills); tvGo('print'); };
+    window.tvOpenPrintWith = (skills, opts) => { openPrintWith(skills, opts); tvGo('print'); };
 
     // A legacy panel or modal opening or closing re-decides what may take focus.
     let inertPending = false;

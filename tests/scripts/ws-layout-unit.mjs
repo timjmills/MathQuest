@@ -1206,6 +1206,43 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     ok(plain.perPage <= dense.perPage, 'packing: a section that is not dense keeps its ceiling');
 }
 
+/* =================================================== the three papers (owner ruling 2026-09-26) */
+// LESSON_LIBRARY_PLAN §8e: Practice, Quiz, Lesson; one routing table (sheet/papers.js).
+{
+    const P = await import('../../js/modules/sheet/papers.js');
+    eq(P.weightedCounts([3, 1, 1], 5), [3, 1, 1], 'papers: 3 : 1 : 1 of 5 deals 3 / 1 / 1');
+    eq(P.weightedCounts([3, 1, 1], 10), [6, 2, 2], 'papers: 3 : 1 : 1 of 10 deals 60 / 20 / 20');
+    eq(P.weightedCounts([3, 1, 1], 16), [10, 3, 3], 'papers: 3 : 1 : 1 of 16, largest remainder');
+    eq(P.weightedCounts([8, 1, 1], 3), [1, 1, 1], 'papers: every weighted skill gets at least one item');
+    eq(P.weightedCounts([1, 1], 9), [5, 4], 'papers: equal weights, the remainder to the first');
+    const sk = (id, c = 'addition') => ({ categoryId: c, skillId: id });
+    const route = (req) => P.routePaper(Object.assign({ sections: [{ skills: [sk('add_20_regroup')] }] }, req)).map((r) => r.role + (r.form ? `:${r.form}` : '') + (r.letters ? `:${r.letters.join('')}` : '')).join(',');
+    eq(route({ kind: 'practice' }), 'independent', 'papers: Practice of one skill is the Independent page');
+    eq(route({ kind: 'practice', versions: ['A', 'B', 'C'] }), 'more-practice:ABC', 'papers: Practice versions A, B, C are More Practice');
+    eq(route({ kind: 'practice', factColumns: 7 }), 'fact-rows', 'papers: Practice fact columns are Fact rows');
+    eq(route({ kind: 'practice', timed: 2 }), 'fact-probe', 'papers: a timed check is the Fact probe');
+    eq(route({ kind: 'practice', sections: [{ skills: [sk('add_word_problems')] }] }), 'word-problems', 'papers: word-problem skills get the story layout');
+    eq(route({ kind: 'quiz', versions: ['A', 'B'] }), 'test:A,test:B', 'papers: a Quiz of Forms A and B is two tests');
+    eq(route({ kind: 'quiz', versions: ['C'] }), 'test:A', 'papers: a Quiz version other than A / B falls back to Form A');
+    eq(route({ kind: 'lesson' }), 'lesson', 'papers: Lesson is the lesson packet');
+    const mixed = P.routePaper({ kind: 'practice', sections: [{ skills: [sk('add_20_regroup'), sk('sub_100_regroup', 'subtraction')] }] })[0];
+    ok(mixed.weightedMix === true, 'papers: a Practice paper of several skills deals them by weight');
+    const lesson = P.routePaper({ kind: 'lesson', parts: ['chart'], sections: [{ skills: [sk('add_facts')] }] })[0];
+    ok(lesson.practicePages === 0 && lesson.mixed === false && lesson.lessonParts.join() === 'chart', 'papers: Lesson parts switch the practice and mixed pages off');
+    // Every old role id decodes to its paper (saved sets and old links are never broken).
+    const want = {
+        independent: 'practice', 'more-practice': 'practice', 'mixed-practice': 'practice', review: 'practice', 'fact-rows': 'practice',
+        'fact-probe': 'practice', 'word-problems': 'practice', test: 'quiz', 'test-b': 'quiz', lesson: 'lesson', opener: 'lesson',
+        'pre-skill-check': 'lesson', 'scripted-model': 'lesson', guided: 'lesson',
+        'true-false': 'practice', 'reason-it': 'practice', stretch: 'practice', 'error-analysis': 'practice',
+    };
+    for (const [role, paper] of Object.entries(want)) eq(P.paperOfRole(role).paper, paper, `papers: old role ${role} decodes to ${paper}`);
+    ok(P.paperOfRole('stretch').paused === 'stretch', 'papers: a paused role keeps its role (it still reprints)');
+    eq(P.paperOfRole('test-b').versions, ['B'], 'papers: test-b is Quiz Form B');
+    eq(P.paperOfRole('fact-probe').timed, 1, 'papers: fact-probe is a timed Practice paper');
+    for (const r of Object.keys(want)) ok(ROLE_MODULES[r] || ROLE_MODULES[ROLE_ALIASES[r]] || ['independent', 'more-practice'].includes(r), `papers: old role ${r} still builds (buildSheet knows it)`);
+}
+
 /* ======================================================================= report */
 
 if (fails.length) {

@@ -62,7 +62,14 @@ async function open({ seed = null, viewport = { width: 1280, height: 900, device
   const problems = [];
   page.on('pageerror', e => problems.push({ type: 'pageerror', text: e.message }));
   page.on('console', m => { if (m.type() === 'error') problems.push({ type: 'console.error', text: m.text() }); });
-  page.on('requestfailed', r => { if (r.url().startsWith(base)) problems.push({ type: 'requestfailed', text: r.url() }); });
+  // An ABORTED request is not a failure: a preview iframe rebuilt while its fonts were still
+  // loading cancels them (net::ERR_ABORTED). Anything else (404, refused) is reported.
+  page.on('requestfailed', r => {
+    if (!r.url().startsWith(base)) return;
+    const why = (r.failure() && r.failure().errorText) || '';
+    if (/ERR_ABORTED/.test(why)) return;
+    problems.push({ type: 'requestfailed', text: `${r.url()}${why ? ` (${why})` : ''}` });
+  });
   if (seed !== null) await page.evaluateOnNewDocument(seedScript(seed));
   // Returning-user flags so first-run overlays do not cover the app
   await page.evaluateOnNewDocument(() => { try { localStorage.setItem('mathquest_onboarded', '1'); } catch (e) {} });

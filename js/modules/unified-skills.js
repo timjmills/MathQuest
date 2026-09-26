@@ -486,8 +486,13 @@ export function playSelectedSkills(mode = 'practice') {
         'worksheet': 'Worksheet'
     };
 
+    // The set's weights (skill codes carry them: AB3-CD-EF) - generate-question deals by them.
+    const weights = {};
+    window.skillQueue.forEach(skill => { if (Number(skill.weight) > 1) weights[`${skill.categoryId}:${skill.skillId}`] = Number(skill.weight); });
+
     state.mixedModeSettings = {
         selectedSkills: selectedSkills,
+        weights,
         name: `Custom ${modeNames[mode] || 'Practice'} (${window.skillQueue.length} skills)`
     };
 

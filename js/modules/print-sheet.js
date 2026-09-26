@@ -36,6 +36,7 @@ import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine } from './sheet/roles/lesson.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
+import { routePaper, weightedCounts, PAPER_IDS } from './sheet/papers.js';
 import {
     normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, easeScore, ineligibleNote,
     blockPlan, sideItems, pickDistinct,
@@ -96,6 +97,8 @@ function normaliseRequest(req = {}) {
             // A lesson practice page (lessons r1): the rows share the whole grid (no FILL_CAP row
             // gaps) - the caller has chosen a count whose cells stay under H13's band.
             noCap: !!(s && s.noCap),
+            // A Practice paper's weighted mix (papers.js): every weighted skill gets an item.
+            minOne: !!(s && s.minOne),
         }))
         .filter((s) => s.skills.length);
     return {
@@ -126,6 +129,11 @@ function normaliseRequest(req = {}) {
         latticeN: [4, 6, 8, 10].includes(Number(req.latticeN)) ? Number(req.latticeN) : 0,
         // A lesson's Mixed page (lessons r3): its first skill holds at least half the placed items.
         leadHalf: !!req.leadHalf,
+        // The Lesson paper (§8e): which parts to print; null = every part (the packet as before).
+        lessonParts: Array.isArray(req.lessonParts) ? req.lessonParts.map(String) : null,
+        // A Practice paper of several skills (papers.js): items dealt EXACTLY by weight (§8e).
+        weightExact: !!req.weightedMix,
+        weightMaxTotal: Number(req.weightMaxTotal) > 0 ? Math.floor(Number(req.weightMaxTotal)) : 0,
     };
 }
 
@@ -1388,6 +1396,8 @@ function anchorSummary(mode, list, notes) {
  * @returns {Promise<{pupilHtml, keyHtml, pageCount, keyPageCount, fits, items, plan, seed, notes}>}
  */
 export async function buildSheet(req = {}) {
+    // The three papers (§8e): a paper request routes to today's roles (sheet/papers.js).
+    if (req && PAPER_IDS.includes(req.kind)) return buildPaper(req);
     const n = normaliseRequest(req);
     if (!n.sections.length) throw new Error('buildSheet: no section has a skill');
     await fontsReady();
@@ -1415,8 +1425,15 @@ export async function buildSheet(req = {}) {
     // shares its page(s) between them (see `shareRows` below).
     n.sections = n.sections.flatMap((sec, gi) => {
         if (sec.skills.length < 2) return [Object.assign({}, sec, { group: null })];
-        const dealt = sec.count ? dealSkills(sec.skills, sec.count) : null;
-        const w = sec.skills.map((k) => Math.max(0, Number(k.weight || k.percent) || 0));
+        // A skill with no weight weighs 1 (a Print-screen row sends 1 as no weight at all); a
+        // Practice paper's weighted mix gives every weighted skill at least one item (§8e).
+        const w = sec.skills.map((k) => (k.weight === undefined && k.percent === undefined ? 1 : Math.max(0, Number(k.weight || k.percent) || 0)));
+        const dealt = !sec.count ? null : sec.minOne
+            ? weightedCounts(w, sec.count).flatMap((c, i) => Array.from({ length: c }, () => sec.skills[i]))
+            : (() => {
+                const copies = sec.skills.map((k, i) => Object.assign({}, k, { weight: w[i] }));
+                return dealSkills(copies, sec.count).map((x) => sec.skills[copies.indexOf(x)]);
+            })();
         const tw = w.reduce((a, b) => a + b, 0);
         return sec.skills.map((k, i) => Object.assign({}, sec, {
             skills: [k],
@@ -1557,6 +1574,36 @@ export async function buildSheet(req = {}) {
             }
             const tw = members.reduce((a, si) => a + n.sections[si].group.share, 0) || 1;
             let h = members.map((si) => avail * n.sections[si].group.share / tw);
+            // A Practice paper's weighted mix (owner, 2026-09-26, §8e): items per skill = total x
+            // weight / total weight, largest remainder, each weighted skill at least one
+            // (papers.js weightedCounts). The total is the largest whose rows - each skill's count
+            // over its own columns, at its own row height - fit the page; each skill then gets the
+            // height its rows need plus a share of the spare in the same proportion.
+            let exact = null;
+            if (n.weightExact && members.length > 1 && anchorMode === 'off') {
+                // The layout engine is the judge (its ceilings, row rules and floors all apply):
+                // for a total T, deal it by weight, give each skill height in proportion to the
+                // area its items take, and keep T when every skill's layout holds its count.
+                const ws = members.map((si) => n.sections[si].group.share);
+                const area = (k) => (layouts[members[k]].hMin || 20) / Math.max(1, layouts[members[k]].cols || 1);
+                const layoutAt = (k, gridH) => resolveSectionLayout({ role: n.role, columns: n.sections[members[k]].columns, count: 0, floor: n.sections[members[k]].floor, gridH, dense: n.sections[members[k]].dense, maxCols: n.sections[members[k]].maxCols, noCap: n.sections[members[k]].noCap },
+                    withTwins(members[k], probesOf(members[k])), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
+                const upper = members.reduce((a, si) => a + Math.max(1, capFromL(n.sections[si], si, layouts[si])), 0);
+                for (let T = Math.min(MAX_ITEMS, upper, n.weightMaxTotal || MAX_ITEMS); T >= members.length && !exact; T--) {
+                    const c = weightedCounts(ws, T);
+                    if (!c.every((x) => x >= 1)) continue;
+                    const a = c.map((x, k) => x * area(k));
+                    const sa = a.reduce((p, q) => p + q, 0) || 1;
+                    // One row each first, then the rest of the page by item area.
+                    const base = members.map(needOf);
+                    const spare = avail - base.reduce((p, q) => p + q, 0);
+                    if (spare < 0) break;
+                    const hh = members.map((si, k) => base[k] + spare * a[k] / sa);
+                    const Ls = members.map((si, k) => layoutAt(k, hh[k]));
+                    if (Ls.every((L, k) => L.perPage >= c[k])) exact = { c, hh };
+                }
+                if (exact) { h = exact.hh.slice(); need = members.map(needOf); }
+            }
             // Every member gets at least one row; the others give up the height it lacks.
             for (let k = 0; k < members.length; k++) {
                 if (h[k] >= need[k]) continue;
@@ -1578,7 +1625,7 @@ export async function buildSheet(req = {}) {
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
                 const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
                     withTwins(si, probesOf(si)), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
-                out[si] = capFromL(sec, si, L);
+                out[si] = exact ? exact.c[k] : capFromL(sec, si, L);
             });
         }
         return out;
@@ -2190,6 +2237,14 @@ async function buildLesson(n, metaOf) {
         return String(html || '').replace(/<section class="ws-page/g, (m) => `<section data-ws-sheet="${k++ === 0 ? first : rest}" class="ws-page`);
     };
     const sheetIds = (p) => (p.part === 'teach' ? ['lesson-sheet', 'lesson-sheet'] : [`lesson-${p.part}`, `lesson-${p.part}`]);
+    // The Lesson paper prints the parts the teacher ticked (§8e). Every part is still BUILT, so
+    // each keeps the numbers it had; the Prerequisite Check prints on the lesson sheet (its warm-up)
+    // until the engine lane gives it a page of its own.
+    if (n.lessonParts) {
+        const want = new Set(n.lessonParts);
+        const keep = parts.filter((p) => (p.part === 'chart' ? want.has('chart') : p.part === 'teach' ? (want.has('sheet') || want.has('prereq')) : true));
+        if (keep.length) parts.splice(0, parts.length, ...keep);
+    }
     const pupilHtml = parts.map((p) => tagSheets(p.res.pupilHtml, ...sheetIds(p))).join('\n');
     const keyHtml = n.key ? parts.map((p) => tagSheets(p.res.keyHtml || '', ...sheetIds(p))).join('\n') : '';
     const pageCount = parts.reduce((a, p) => a + (p.res.pageCount || 0), 0);
@@ -2228,6 +2283,47 @@ async function buildLesson(n, metaOf) {
             size,
         },
     };
+}
+
+/* =========================================================================== the papers */
+
+/**
+ * A Practice, Quiz or Lesson paper (owner ruling 2026-09-26, LESSON_LIBRARY_PLAN §8e): routed to
+ * the role request(s) that build it today (sheet/papers.js PAPER_ROUTES). A Quiz of Forms A and B
+ * is two role sheets, printed one after the other, each with its own key.
+ * @param {Object} req  a buildSheet request plus {kind: 'practice'|'quiz'|'lesson', versions,
+ *                      factColumns, timed, parts}
+ */
+async function buildPaper(req) {
+    const routed = routePaper(req);
+    const built = [];
+    for (const r of routed) {
+        let res = await buildSheet(r);
+        // A weighted mix is planned on the probe's floors; when the final problems run taller and
+        // the sheet spills a page, it is dealt again one problem smaller (same weights).
+        const pagesAsked = Math.max(1, Number(((r.sections || [])[0] || {}).pages) || 1);
+        for (let g = 0; r.weightedMix && g < 6 && (res.pageCount || 1) > pagesAsked; g++) {
+            const total = (res.items || []).length;
+            if (total <= 1) break;
+            res = await buildSheet(Object.assign({}, r, { weightMaxTotal: Math.ceil(total / pagesAsked) - 1 }));
+        }
+        built.push(res);
+    }
+    const tag = { paperKind: routed[0].paperKind, routedRole: routed[0].role };
+    if (built.length === 1) return Object.assign(built[0], tag, { routed: routed.map((r) => ({ role: r.role, form: r.form, letters: r.letters })) });
+    const first = built[0];
+    const pageCount = built.reduce((a, b) => a + (b.pageCount || 0), 0);
+    return Object.assign({}, first, tag, {
+        pupilHtml: built.map((b) => b.pupilHtml).join('\n'),
+        keyHtml: built.map((b) => b.keyHtml || '').join('\n'),
+        pageCount,
+        keyPageCount: built.reduce((a, b) => a + (b.keyPageCount || 0), 0),
+        fits: Object.assign({}, first.fits, { pages: pageCount }),
+        items: built.flatMap((b, i) => (b.items || []).map((it) => Object.assign({ form: routed[i].form }, it))),
+        notes: [...new Set(built.flatMap((b) => b.notes || []))],
+        routed: routed.map((r) => ({ role: r.role, form: r.form, letters: r.letters })),
+        parts: built.map((b, i) => ({ role: routed[i].role, form: routed[i].form, pageCount: b.pageCount, keyPageCount: b.keyPageCount })),
+    });
 }
 
 /* ===================================================================== standalone document */

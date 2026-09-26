@@ -28,6 +28,30 @@ import './skill-options-derived.js';
 // own pitch / support (option-panel round 3), which poolMemberOptions() hands to each member.
 import { poolMemberOptions } from './skill-options-pools.js';
 
+/**
+ * The weighted deck of a custom mix: every skill `weight` times in a shuffled block (Math.random,
+ * seeded in tests), dealt one question at a time and refilled when empty, so a 3 : 1 : 1 set is
+ * exactly 60 / 20 / 20 over every five questions. Returns null when no skill carries a weight
+ * above 1 (the plain uniform pick applies).
+ * @param {{skill: string, category: string}[]} list
+ * @param {Object<string, number>} [weights]  'category:skill' -> weight
+ */
+const _mixDeck = { sig: '', deck: [] };
+export function weightedMixPick(list, weights) {
+    if (!weights || !list.length) return null;
+    const w = list.map((x) => Math.max(1, Math.min(20, Math.round(Number(weights[`${x.category}:${x.skill}`]) || 1))));
+    if (w.every((x) => x === 1)) return null;
+    const sig = list.map((x, i) => `${x.category}:${x.skill}*${w[i]}`).join('|');
+    if (_mixDeck.sig !== sig) { _mixDeck.sig = sig; _mixDeck.deck = []; }
+    if (!_mixDeck.deck.length) {
+        const deck = [];
+        w.forEach((m, i) => { for (let k = 0; k < m; k++) deck.push(i); });
+        for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
+        _mixDeck.deck = deck;
+    }
+    return list[_mixDeck.deck.shift()];
+}
+
 // P12: "What the items ask" (`forms` with a `variantKey`, skill-options.js formsOption). When the
 // teacher has ticked some of a skill's item forms, pickVariant() for that key deals only those,
 // balanced but in a RANDOM order (page-deal.js: a 6-item page with 2 ticked still gives 3 of each,
@@ -925,7 +949,10 @@ function generateResolvedQuestion() {
             }
 
             if (skillsWithCategories.length > 0) {
-                const picked = pick(skillsWithCategories);
+                // A weighted set (skill codes carry weights, AB3-CD-EF): each skill's share of the
+                // questions follows its weight exactly over every block of sum(weights) questions
+                // (owner, 2026-09-26: 3 : 1 : 1 deals 60 / 20 / 20). Unweighted sets pick as before.
+                const picked = weightedMixPick(skillsWithCategories, state.mixedModeSettings && state.mixedModeSettings.weights) || pick(skillsWithCategories);
                 targetSkill = picked.skill;
                 targetCategory = picked.category;
                 console.log(`custom_mixed picked: skill=${targetSkill}, category=${targetCategory}`);

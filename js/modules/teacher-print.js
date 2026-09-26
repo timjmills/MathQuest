@@ -3,12 +3,13 @@
 // Drives the sheet engine through its app bridge (print-sheet.js):
 //   buildSheet(req)    -> {pupilHtml, keyHtml, pageCount, keyPageCount, fits}
 //   sheetDocument(html)-> the standalone printable document (A4/Letter, Andika, sheet kit)
-// Each section is one buildSheet request (a section carries its own page type), and the
-// pupil pages of every section print first, then every answer key.
+// Each section is one buildSheet request (a section carries its own paper), and the pupil pages
+// of every section print first, then every answer key.
 //
-// Page types: every role buildSheet composes (WORKING below), chosen from picture cards grouped
-// Practice / Teach / Check / Facts / Thinking. A role that does not fit the chosen skills (the
-// fact layouts need a fact skill) says why on its card, from buildSheet's `unsupported` error.
+// Papers (owner ruling 2026-09-26, LESSON_LIBRARY_PLAN §8e): Practice, Quiz and Lesson, each with
+// its options (PAPERS below). A paper option that does not fit the chosen skills (fact columns
+// need a fact skill; a lesson needs a skill that has one) says why, from buildSheet's
+// `unsupported` error or the lesson list.
 //
 // The classic print dialog is retired for teachers: every teacher path that opened it
 // (openSimplePrintDialog, openPrintSettings, the Library's Print) lands here instead, with its
@@ -30,59 +31,38 @@ import { skillHasOfferedOptions } from './skill-options-ui.js';
 import { generateQuestionFor } from './generate-question.js';
 import { getSetOptions } from './skill-option-store.js';
 import { getProvider } from './sheet/index.js';
-import { stretchWhy, hasOwnOpen, NO_STRETCH_REASON } from './sheet/roles/stretch.js';
+import { PAPER_NAMES, LESSON_PARTS, LESSON_PART_NAMES, paperOfRole, isWordSkill } from './sheet/papers.js';
+import { prerequisiteSkillsFor } from './prerequisite-skills.js';
+import { lessonFor } from './lessons/prereqs.js';
 
-// The page types buildSheet composes (print-sheet.js SHEET_ROLES). Anything else is listed,
-// disabled, as "coming soon".
-const WORKING = new Set([
-    'lesson', 'opener', 'scripted-model', 'guided', 'independent', 'more-practice', 'error-analysis', 'review', 'test', 'test-b',
-    'pre-skill-check', 'word-problems', 'fact-rows', 'fact-probe', 'mixed-practice', 'true-false', 'reason-it', 'stretch',
-]);
-// PAUSED (owner ruling 2026-09-26: "let's forgo the find the error type for future worksheets ...
-// we might bring these back later once everything is built"): a working role that is NOT offered
-// for a new page. It stays in WORKING, so a saved or shared set that already uses it still prints,
-// and its role code, providers' wrongAnswer data, share-code entries and grades are all kept
-// (design/LESSONS_VISION.md -> Later). To bring it back, take it out of this set.
-const PAUSED = new Set(['error-analysis']);
-// The picker: every working role as a picture card, in quiet groups. [role, name, one line]
-const PAGE_GROUPS = [
-    ['Practice', [
-        ['independent', 'Independent', 'Practice alone, with a score.'],
-        ['more-practice', 'More Practice', 'Pages A, B, C… new numbers each.'],
-        ['mixed-practice', 'Mixed practice', 'Several skills on one page.'],
-        ['word-problems', 'Word problems', 'Stories with room to work.'],
-    ]],
-    ['Teach', [
-        ['lesson', 'Lesson', 'Anchor chart, warm-up, we do, then practice.'],
-        ['opener', 'Lesson opener', 'A warm-up to start the lesson.'],
-        ['scripted-model', 'Scripted model', 'Worked examples and what to say.'],
-        ['guided', 'Guided', 'Help that fades item by item.'],
-    ]],
-    ['Check', [
-        ['pre-skill-check', 'Pre-skill check', 'Ready for this skill?'],
-        ['error-analysis', 'Check it', 'Find and fix the mistake.'],
-        ['review', 'Review', 'Earlier skills, spaced out.'],
-        ['test', 'Test A', 'A scored test.'],
-        ['test-b', 'Test B', 'The same test, new numbers.'],
-    ]],
-    ['Facts', [
-        ['fact-rows', 'Fact rows', 'Rows of facts to drill.'],
-        ['fact-probe', 'Fact probe', 'A quick timed fact check.'],
-    ]],
-    ['Thinking', [
-        ['true-false', 'True or False?', 'Decide, then circle.'],
-        ['reason-it', 'Reason It', 'Explain in words or pictures.'],
-        ['stretch', 'Stretch', 'One harder problem to think about.'],
-    ]],
-].map(([g, list]) => [g, list.filter(([v]) => WORKING.has(v) && !PAUSED.has(v))]).filter(([, list]) => list.length);
-const PAGE_TYPES = [
-    ['Lesson', [['lesson', 'Lesson'], ['lesson-packet', 'Lesson packet'], ['opener', 'Lesson opener'], ['scripted-model', 'Scripted model'], ['guided', 'Guided'], ['independent', 'Independent'], ['more-practice', 'More Practice'], ['error-analysis', 'Error analysis (Check it)'], ['review', 'Review'], ['test', 'Test A'], ['test-b', 'Test B'], ['pre-skill-check', 'Pre-skill check']]],
-    ['Practice', [['computation', 'Computation grid'], ['word-problems', 'Word problems'], ['visual-grid', 'Visual grid']]],
-    ['Facts', [['fact-rows', 'Fact rows'], ['fact-probe', 'Fact probe']]],
-    ['Mixed review', [['mixed-practice', 'Mixed practice'], ['daily4', 'Daily 4'], ['spiral', 'Daily spiral'], ['todays-number', "Today's Number"]]],
-    ['Thinking', [['true-false', 'True or False?'], ['reason-it', 'Reason It'], ['stretch', 'Stretch']]],
+// THE THREE PAPERS (owner ruling 2026-09-26, design/LESSON_LIBRARY_PLAN.md §8e): Practice, Quiz
+// and Lesson replace the 17 page-type cards. A section carries a paper and its options; the
+// request goes to buildSheet as {kind, versions, factColumns, timed, parts} and print-sheet.js
+// routes it to today's roles (sheet/papers.js, one table). True or False?, Reason It, Stretch and
+// Find the mistake are paused (§8d, §8e): hidden here, their code kept, and an old printout that
+// used one still reprints (Home, "Recent printouts" rebuilds the stored request as it was).
+const PAPERS = [
+    ['practice', 'Practice', 'One skill or several, weighted.'],
+    ['quiz', 'Quiz', 'A scored test, Form A and B.'],
+    ['lesson', 'Lesson', 'Chart, We Do, practice, mixed.'],
 ];
-const ROLE_NAME = Object.fromEntries(PAGE_TYPES.flatMap(([, list]) => list));
+// The role names an old stored printout carries (its "kind" line on Home).
+const ROLE_NAME = {
+    independent: 'Practice', 'more-practice': 'Practice', 'mixed-practice': 'Practice', review: 'Practice',
+    'fact-rows': 'Practice · fact columns', 'fact-probe': 'Practice · timed check', 'word-problems': 'Practice',
+    test: 'Quiz', 'test-b': 'Quiz', lesson: 'Lesson', opener: 'Lesson', 'pre-skill-check': 'Lesson', 'scripted-model': 'Lesson', guided: 'Lesson',
+    'error-analysis': 'Find the mistake (paused)', 'true-false': 'True or False? (paused)', 'reason-it': 'Reason It (paused)', stretch: 'Stretch (paused)',
+};
+// The skills that have a lesson today: the authored lesson data plus the three sample lessons the
+// critic passed (ws-lesson-samples). The lesson library (engine lane) answers this when it lands.
+const SAMPLE_LESSONS = new Set(['addition:add_facts', 'subtraction:sub_100_regroup', 'number_sense:nearest_10']);
+function hasLesson(k) {
+    if (!k) return false;
+    const lib = typeof window !== 'undefined' ? window.lessonLibraryHas : null;
+    if (typeof lib === 'function') { try { return !!lib(k.categoryId, k.skillId); } catch (e) { /* fall back */ } }
+    return !!lessonFor(k.categoryId, k.skillId) || SAMPLE_LESSONS.has(`${k.categoryId}:${k.skillId}`);
+}
+const FACT_CATEGORIES = new Set(['addition', 'subtraction', 'multiplication', 'division']);
 const LETTERS = 'ABCDEFGHIJ'.split('');
 
 let pr = null;
@@ -91,9 +71,39 @@ let buildToken = 0;
 let buildTimer = null;
 let last = null;     // {sections:[{pupilHtml,keyHtml,pageCount,keyPageCount,fits,role,letters}], pupilHtml, keyHtml, pages:[labels], keyPages}
 
-function newSection(skills = []) {
-    return { role: 'more-practice', columns: 'auto', letters: ['A', 'B'], pages: 1, mixed: false, skills, optionsOpen: '', picking: false, menu: '', types: false };
+function newSection(skills = [], kind = 'practice') {
+    return {
+        kind, columns: 'auto', letters: ['A'], pages: 1, factColumns: 'off', timed: 0,
+        forms: ['A'], parts: LESSON_PARTS.slice(), lessonPages: 1,
+        skills, optionsOpen: '', prereqOpen: '', picking: false, menu: '',
+    };
 }
+
+/**
+ * A section for a paper, or for an OLD role id (a saved printout, an older link): the role decodes
+ * to its paper and options (sheet/papers.js paperOfRole, §8e - never break a saved set).
+ */
+function sectionFor(skills, kind = 'practice', role = '') {
+    if (!role) return newSection(skills, ['practice', 'quiz', 'lesson'].includes(kind) ? kind : 'practice');
+    const m = paperOfRole(role);
+    const s = newSection(skills, m.paper);
+    if (m.paper === 'practice') { s.letters = m.versions || ['A']; s.factColumns = m.factColumns || 'off'; s.timed = m.timed || 0; }
+    if (m.paper === 'quiz') s.forms = m.versions || ['A'];
+    if (m.paper === 'lesson') s.parts = m.parts || LESSON_PARTS.slice();
+    return s;
+}
+
+/** The role a section builds today (sheet/papers.js PAPER_ROUTES), for the notes that name it. */
+function roleOf(s) {
+    if (s.kind === 'quiz') return 'test';
+    if (s.kind === 'lesson') return 'lesson';
+    if (s.timed > 0) return 'fact-probe';
+    if (s.factColumns !== 'off') return 'fact-rows';
+    if (s.letters.length > 1) return 'more-practice';
+    if (s.skills.length && s.skills.every(isWordSkill)) return 'word-problems';
+    return 'independent';
+}
+const factCapable = (s) => s.skills.length > 0 && s.skills.every((k) => FACT_CATEGORIES.has(k.categoryId) && !isWordSkill(k));
 
 function initState() {
     const d = printDefaults();
@@ -150,13 +160,13 @@ export function renderPrintScreen(el) {
  * window.tvOpenPrintWith, then show the screen). Accepts queue items or dialog entries:
  * {categoryId, skillId, opts?, weight?}. An empty list keeps what is there.
  */
-export function openPrintWith(list) {
+export function openPrintWith(list, { kind = 'practice', role = '' } = {}) {
     const skills = (Array.isArray(list) ? list : [])
         .filter((k) => k && k.categoryId && k.skillId && findSkill(k.categoryId, k.skillId))
         .map((k) => ({ categoryId: k.categoryId, skillId: k.skillId, opts: optsOf(k), weight: k.weight > 1 ? k.weight : 1 }));
     if (!pr) initState();
     if (!skills.length) return;
-    pr.sections = [newSection(skills)];
+    pr.sections = [sectionFor(skills, kind, role)];
     pr.seed = freshSeed();
     pr.view = 0;
 }
@@ -202,7 +212,7 @@ function shellHTML() {
 <header class="tv-header">
   <div>
     <h1 class="tv-h1">Print worksheets</h1>
-    <p class="tv-sub">Choose skills and a page type. Every page prints with its answer key.</p>
+    <p class="tv-sub">Choose a paper - Practice, Quiz or Lesson - and its skills. Every page prints with its answer key.</p>
   </div>
 </header>
 <div class="tv-print-grid">
@@ -256,24 +266,62 @@ function onClick(e) {
     if (!b || !root.contains(b)) return;
     const d = b.dataset;
     switch (d.act) {
-        case 'role': {
-            // A withheld page type (Stretch with no open problem yet) cannot be chosen; its reason is on the card.
+        case 'kind': {
+            // A paper withheld for the chosen skills (Lesson with no lesson yet) says why on its card.
             if (b.getAttribute('aria-disabled') === 'true') break;
             const s = sec(d.sec);
-            const changed = s.role !== d.v;
-            s.role = d.v;
-            s.types = false;
-            renderWhat();
-            root.querySelector(`[data-act="types"][data-sec="${d.sec}"]`)?.focus();
-            if (changed) { renderSetup(); scheduleBuild(); }
+            if (s.kind === d.v) break;
+            s.kind = d.v;
+            renderWhat(); renderSetup(); scheduleBuild();
+            root.querySelector(`[data-act="kind"][data-sec="${d.sec}"][data-v="${d.v}"]`)?.focus();
             break;
         }
-        case 'types': {
+        case 'versions': {
             const s = sec(d.sec);
-            s.types = !s.types;
+            s.letters = d.v === 'many' ? (s.letters.length > 1 ? s.letters : ['A', 'B']) : ['A'];
+            renderWhat(); scheduleBuild();
+            break;
+        }
+        case 'form': {
+            const s = sec(d.sec);
+            const on = s.forms.includes(d.v);
+            if (on && s.forms.length > 1) s.forms = s.forms.filter((f) => f !== d.v);
+            else if (!on) s.forms = [...s.forms, d.v].sort();
+            renderWhat(); scheduleBuild();
+            break;
+        }
+        case 'part': {
+            const s = sec(d.sec);
+            const on = s.parts.includes(d.v);
+            if (on && s.parts.length > 1) s.parts = s.parts.filter((x) => x !== d.v);
+            else if (!on) s.parts = LESSON_PARTS.filter((x) => x === d.v || s.parts.includes(x));
+            renderWhat(); scheduleBuild();
+            break;
+        }
+        case 'weight': {
+            const k = sec(d.sec).skills[Number(d.idx)];
+            if (!k) break;
+            k.weight = Math.max(1, Math.min(9, (Number(k.weight) || 1) + Number(d.dir)));
+            renderWhat(); scheduleBuild();
+            root.querySelector(`[data-act="weight"][data-sec="${d.sec}"][data-idx="${d.idx}"][data-dir="${d.dir}"]`)?.focus();
+            break;
+        }
+        case 'prereqs': {
+            const s = sec(d.sec);
+            s.prereqOpen = s.prereqOpen === d.idx ? '' : d.idx;
             renderWhat();
-            if (s.types) root.querySelector(`[data-act="role"][data-sec="${d.sec}"][aria-checked="true"]`)?.focus();
-            else root.querySelector(`[data-act="types"][data-sec="${d.sec}"]`)?.focus();
+            root.querySelector(`[data-act="prereqs"][data-sec="${d.sec}"][data-idx="${d.idx}"]`)?.focus();
+            break;
+        }
+        case 'prereq': {
+            // A ticked prerequisite joins the set with its own weight (1), noted "prerequisite of".
+            const s = sec(d.sec);
+            const [cat, sk] = d.key.split('|');
+            const at = s.skills.findIndex((x) => x.categoryId === cat && x.skillId === sk);
+            if (at >= 0) { if (s.skills[at].prereqOf) s.skills.splice(at, 1); }
+            else s.skills.push({ categoryId: cat, skillId: sk, weight: 1, prereqOf: d.of });
+            renderWhat(); scheduleBuild();
+            root.querySelector(`[data-act="prereq"][data-sec="${d.sec}"][data-key="${CSS.escape(d.key)}"]`)?.focus();
             break;
         }
         case 'classic-build': buildClassic(); break;
@@ -283,12 +331,19 @@ function onClick(e) {
         case 'letter': {
             const s = sec(d.sec);
             const i = s.letters.indexOf(d.letter);
-            if (i >= 0) { if (s.letters.length > 1) s.letters.splice(i, 1); } else s.letters.push(d.letter);
+            if (i >= 0) { if (s.letters.length > 2) s.letters.splice(i, 1); } else s.letters.push(d.letter);
             s.letters.sort();
             renderWhat(); scheduleBuild();
             break;
         }
-        case 'remove-skill': sec(d.sec).skills.splice(Number(d.idx), 1); renderWhat(); scheduleBuild(); break;
+        case 'remove-skill': {
+            // Removing a skill also removes the prerequisites that were ticked for it.
+            const s = sec(d.sec);
+            const gone = s.skills.splice(Number(d.idx), 1)[0];
+            if (gone) s.skills = s.skills.filter((x) => x.prereqOf !== `${gone.categoryId}:${gone.skillId}`);
+            renderWhat(); scheduleBuild();
+            break;
+        }
         case 'skill-options': openOptions(Number(d.sec), Number(d.idx), b); break;
         case 'pick': { const s = sec(d.sec); s.picking = !s.picking; s.menu = ''; renderWhat(); if (s.picking) root.querySelector(`[data-pick="${d.sec}"]`)?.focus(); break; }
         case 'pick-skill': {
@@ -326,10 +381,11 @@ function onClick(e) {
 function onChange(e) {
     const t = e.target;
     const d = t.dataset;
-    if (d.role !== undefined) { sec(d.role).role = t.value; renderWhat(); scheduleBuild(); }
+    if (d.factcols !== undefined) { const s = sec(d.factcols); s.factColumns = t.value === 'off' || t.value === 'auto' ? t.value : Number(t.value); if (s.factColumns !== 'off') s.timed = 0; renderWhat(); scheduleBuild(); }
+    else if (d.timed !== undefined) { const s = sec(d.timed); s.timed = Number(t.value) || 0; if (s.timed) s.factColumns = 'off'; renderWhat(); scheduleBuild(); }
+    else if (d.lpages !== undefined) { sec(d.lpages).lessonPages = Number(t.value) || 1; scheduleBuild(); }
     else if (d.cols !== undefined) { sec(d.cols).columns = t.value === 'auto' ? 'auto' : Number(t.value); scheduleBuild(); }
     else if (d.pages !== undefined) { sec(d.pages).pages = Number(t.value); scheduleBuild(); }
-    else if (d.mixed !== undefined) { sec(d.mixed).mixed = !!t.checked; scheduleBuild(); }
     else if (d.classic !== undefined) { pr.classic[d.classic] = Number(t.value); }
 }
 
@@ -340,84 +396,113 @@ function renderWhat() {
     box.innerHTML = pr.sections.map((s, i) => sectionHTML(s, i)).join('');
 }
 
-/**
- * Why Stretch cannot be built for these skills, or '' when it can. Stretch is withheld for a skill
- * with no open problem of its own (sheet/roles/stretch.js): its provider has no `open(q)` and its
- * items are not whole-number operations. Asked of a few seeded sample items per skill (cached), so
- * the card says "not yet" before the teacher picks it, rather than after a failed build.
- */
-const _stretchOk = new Map();
-function stretchBlocked(skills) {
-    if (!skills || !skills.length) return '';
-    const ok = skills.some((k) => {
-        const key = `${k.categoryId}:${k.skillId}:${JSON.stringify(k.opts || null)}`;
-        if (!_stretchOk.has(key)) {
-            let yes = hasOwnOpen(k.categoryId, k.skillId);
-            for (let j = 0; !yes && j < 6; j++) {
-                let q = null;
-                try { q = generateQuestionFor({ category: k.categoryId, skill: k.skillId, opts: k.opts, seed: 7717 + j * 7919, itemIndex: j }); } catch (e) { q = null; }
-                if (q && !stretchWhy(q)) yes = true;
-            }
-            _stretchOk.set(key, yes);
-        }
-        return _stretchOk.get(key);
-    });
-    return ok ? '' : NO_STRETCH_REASON;
-}
-
-function sectionHTML(s, i) {
-    const name = `Section ${String.fromCharCode(65 + i)}`;
-    const sub = `${ROLE_NAME[s.role] || ''}${s.role === 'more-practice' ? ` · ${s.letters.length} page${s.letters.length === 1 ? '' : 's'}` : s.role === 'independent' ? ` · ${s.pages} page${s.pages === 1 ? '' : 's'}` : s.role === 'lesson' ? ` · ${s.pages} practice page${s.pages === 1 ? '' : 's'}${s.mixed ? ' + mixed' : ''}` : ''}`;
-    // Stretch, withheld for skills with no open problem yet: the card is disabled and says why
-    // (its title for a hover or a long press, and a note tied to it by aria-describedby).
-    const noStretch = stretchBlocked(s.skills);
-    const bad = s.unsupported && s.unsupported.role === s.role ? s.unsupported.why : (s.role === 'stretch' && noStretch ? noStretch : '');
-    const chosen = PAGE_GROUPS.flatMap(([, list]) => list).find(([v]) => v === s.role) || [s.role, ROLE_NAME[s.role] || s.role, ''];
-    const typeCards = PAGE_GROUPS.map(([g, list]) => `<div class="tv-ptype-group" role="group" aria-label="${g}"><span class="tv-ptype-h">${g}</span><div class="tv-ptypes">${list.map(([v, l, text]) => {
-        const on = s.role === v;
-        const off = v === 'stretch' && noStretch ? noStretch : '';
-        const why = on && bad ? bad : off;
-        const described = on && bad ? `tvRoleWhy${i}` : off ? `tvStretchWhy${i}` : '';
-        return `<button type="button" class="tv-ptype${why ? ' is-unfit' : ''}" role="radio" aria-checked="${on}" data-act="role" data-sec="${i}" data-v="${v}"${off ? ` aria-disabled="true" title="${esc(off)}"` : ''}${described ? ` aria-describedby="${described}"` : ''}>
-      ${pageThumb(v)}<span><span class="tv-radio-title">${l}</span><span class="tv-radio-text">${off && !on ? 'Not for this skill yet.' : text}</span></span></button>`;
-    }).join('')}</div></div>`).join('') + (noStretch && s.role !== 'stretch' ? `<p class="tv-cap tv-cap-why" id="tvStretchWhy${i}">${icon('info', 14)}<span>${esc(noStretch)}</span></p>` : '');
-    const whyNote = bad ? `<p class="tv-ptype-why" id="tvRoleWhy${i}" role="status">${icon('info', 16)}<span>${esc(bad)}</span></p>` : '';
-    const cols = ['auto', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((c) => `<option value="${c}"${String(s.columns) === String(c) ? ' selected' : ''}>${c === 'auto' ? 'Auto' : c}</option>`).join('');
-    const pagesPart = s.role === 'more-practice' ? `
-  <div>
-    <span class="tv-label" id="tvLetters${i}">Practice pages</span>
-    <div class="tv-chips tv-letters" role="group" aria-labelledby="tvLetters${i}">${LETTERS.map((L) => `<button type="button" class="tv-chip tv-chip-sm" data-act="letter" data-sec="${i}" data-letter="${L}" aria-pressed="${s.letters.includes(L)}" aria-label="Practice ${L}">${L}</button>`).join('')}</div>
-    <p class="tv-cap" style="margin-top:6px;">One page per letter, each with its own numbers.</p>
-  </div>` : s.role === 'lesson' ? `
-  <div>
-    <label class="tv-label" for="tvPages${i}">Practice pages</label>
-    <select id="tvPages${i}" class="tv-select" data-pages="${i}">${[0, 1, 2, 3, 4, 5].map((n) => `<option value="${n}"${s.pages === n ? ' selected' : ''}>${n}</option>`).join('')}</select>
-  </div>
-  <div>
-    <label class="tv-label" for="tvMixed${i}"><input type="checkbox" id="tvMixed${i}" data-mixed="${i}"${s.mixed ? ' checked' : ''}> Mixed practice page</label>
-    <p class="tv-cap" style="margin-top:6px;">The anchor chart, warm-up and we do come first; practice pages follow.</p>
-  </div>` : s.role !== 'independent' ? '' : `
-  <div>
-    <label class="tv-label" for="tvPages${i}">Pages</label>
-    <select id="tvPages${i}" class="tv-select" data-pages="${i}">${[1, 2, 3, 4, 5].map((n) => `<option value="${n}"${s.pages === n ? ' selected' : ''}>${n}</option>`).join('')}</select>
-  </div>`;
-    const skills = s.skills.map((k, idx) => {
+/** The skill rows of a section: name, options, weight (a set of several), prerequisites. */
+function skillRowsHTML(s, i, name) {
+    const many = s.skills.length > 1 && s.kind !== 'lesson';
+    const totalW = s.skills.reduce((a, k) => a + (Number(k.weight) || 1), 0) || 1;
+    return s.skills.map((k, idx) => {
         const hit = findSkill(k.categoryId, k.skillId);
         const label = hit ? hit.label : k.skillId;
         const summary = optionsSummary(k.categoryId, k.skillId, k.opts) || 'Default options';
         const open = s.optionsOpen === String(idx) && typeof window.openSkillOptionsPanel !== 'function';
+        const w = Number(k.weight) || 1;
+        const parent = k.prereqOf ? findSkill(...k.prereqOf.split(':')) : null;
+        const note = k.prereqOf ? `<div class="tv-cap tv-prereq-of">Prerequisite of ${esc(parent ? parent.label : k.prereqOf)}</div>` : '';
+        // "Mix in prerequisite skills" (§8e): every prerequisite as a check box, none ticked.
+        const pre = s.kind === 'practice' && !k.prereqOf ? prerequisitesOf(k) : [];
+        const preOpen = s.prereqOpen === String(idx);
+        const preList = preOpen ? `<div class="tv-prereqs" id="tvPre${i}_${idx}" role="group" aria-label="Prerequisites of ${esc(label)}">${pre.map((p) => {
+            const key = `${p.categoryId}|${p.skillId}`;
+            const on = s.skills.some((x) => x.categoryId === p.categoryId && x.skillId === p.skillId);
+            const ph = findSkill(p.categoryId, p.skillId);
+            return `<button type="button" class="tv-check" role="checkbox" aria-checked="${on}" data-act="prereq" data-sec="${i}" data-key="${esc(key)}" data-of="${esc(k.categoryId + ':' + k.skillId)}" title="${esc(p.why || '')}"><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span><span>${esc(ph ? ph.label : p.skillId)}<span class="tv-cap"> · ${esc(ph ? levelText(ph.level) : '')}</span></span></button>`;
+        }).join('')}</div>` : '';
         return `<div class="tv-set-item" role="group" aria-label="${esc(label)}">
   <div class="tv-set-top">
-    <div class="tvp-name" tabindex="0"${tvpAttrs(k.categoryId, k.skillId, k.opts)}><div class="tv-skill-name">${esc(label)}${infoButtonHTML(label)}</div><div class="tv-skill-meta">${esc(summary)}</div></div>
+    <div class="tvp-name" tabindex="0"${tvpAttrs(k.categoryId, k.skillId, k.opts)}><div class="tv-skill-name">${esc(label)}${infoButtonHTML(label)}</div><div class="tv-skill-meta">${esc(summary)}</div>${note}</div>
+    ${many ? `<div class="tv-weight" role="group" aria-label="Weight of ${esc(label)}: ${w} of ${totalW}" title="Its share of the problems: ${w} of ${totalW} (${Math.round((100 * w) / totalW)}%)">
+      <button type="button" data-act="weight" data-dir="-1" data-sec="${i}" data-idx="${idx}" aria-label="Fewer ${esc(label)} problems"${w <= 1 ? ' aria-disabled="true"' : ''}>${icon('minus', 16)}</button>
+      <span>×${w}</span>
+      <button type="button" data-act="weight" data-dir="1" data-sec="${i}" data-idx="${idx}" aria-label="More ${esc(label)} problems">${icon('plus', 16)}</button>
+    </div>` : ''}
     <button type="button" class="tv-icon-btn" data-act="remove-skill" data-sec="${i}" data-idx="${idx}" aria-label="Remove ${esc(label)} from ${name}">${icon('x', 18)}</button>
   </div>
   <div class="tv-set-tools">
     ${skillHasOfferedOptions(k.categoryId, k.skillId) ? `<button type="button" class="tv-opt-btn" data-act="skill-options" data-sec="${i}" data-idx="${idx}" aria-expanded="${open}" aria-label="Options for ${esc(label)}">${icon('sliders', 16)}<span>Options</span></button>` : ''}
-    <span class="tv-cap">${hit ? esc(levelText(hit.level)) + ' · ' + esc(hit.categoryName) : ''}</span>
+    ${pre.length ? `<button type="button" class="tv-opt-btn" data-act="prereqs" data-sec="${i}" data-idx="${idx}" aria-expanded="${preOpen}" aria-controls="tvPre${i}_${idx}">${icon('layers', 16)}<span>Prerequisites (${pre.length})</span></button>` : ''}
+    ${many ? '' : `<span class="tv-cap">${hit ? esc(levelText(hit.level)) + ' · ' + esc(hit.categoryName) : ''}</span>`}
   </div>
+  ${preList}
   ${open ? `<div class="tv-opt-panel">${optionsReadOnlyHTML(k.categoryId, k.skillId, k.opts)}</div>` : ''}
 </div>`;
     }).join('');
+}
+
+/** A skill's prerequisites that exist in the catalogue (cached: the WRM walk is not free). */
+const _pre = new Map();
+function prerequisitesOf(k) {
+    const key = `${k.categoryId}:${k.skillId}`;
+    if (!_pre.has(key)) {
+        let list = [];
+        try { list = prerequisiteSkillsFor(k.categoryId, k.skillId).filter((p) => findSkill(p.categoryId, p.skillId)); } catch (e) { list = []; }
+        _pre.set(key, list);
+    }
+    return _pre.get(key);
+}
+
+/** The options of a section's paper (§8e). */
+function paperOptionsHTML(s, i) {
+    const cols = ['auto', 1, 2, 3, 4, 5, 6].map((c) => `<option value="${c}"${String(s.columns) === String(c) ? ' selected' : ''}>${c === 'auto' ? 'Auto' : c}</option>`).join('');
+    const colsSel = `<div><label class="tv-label" for="tvCols${i}">Columns</label><select id="tvCols${i}" class="tv-select" data-cols="${i}">${cols}</select></div>`;
+    if (s.kind === 'quiz') {
+        return `<div class="tv-fields-cols">${colsSel}
+  <div><span class="tv-label" id="tvForms${i}">Versions</span>
+    <div class="tv-chips tv-letters" role="group" aria-labelledby="tvForms${i}">${['A', 'B'].map((L) => `<button type="button" class="tv-chip tv-chip-sm" data-act="form" data-sec="${i}" data-v="${L}" aria-pressed="${s.forms.includes(L)}" aria-label="Form ${L}">${L}</button>`).join('')}</div></div>
+</div>
+<p class="tv-cap">Scored, one point a question. Form B is Form A's problems in a new order.</p>`;
+    }
+    if (s.kind === 'lesson') {
+        return `<div><span class="tv-label" id="tvParts${i}">Parts to print</span>
+  <div class="tv-parts" role="group" aria-labelledby="tvParts${i}">${LESSON_PARTS.map((p) => `<button type="button" class="tv-check" role="checkbox" aria-checked="${s.parts.includes(p)}" data-act="part" data-sec="${i}" data-v="${p}"><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span><span>${esc(LESSON_PART_NAMES[p])}</span></button>`).join('')}</div>
+  <p class="tv-cap" style="margin-top:6px;">Every lesson has all five parts: tick the ones to print. The Prerequisite Check prints on the lesson sheet for now. A lesson prints at one size. New numbers (Page setup) re-deals the whole packet.</p>
+</div>
+${s.parts.includes('practice') ? `<div class="tv-fields-cols"><div><label class="tv-label" for="tvLPages${i}">Practice pages</label><select id="tvLPages${i}" class="tv-select" data-lpages="${i}">${[1, 2, 3].map((n) => `<option value="${n}"${s.lessonPages === n ? ' selected' : ''}>${n}</option>`).join('')}</select></div></div>` : ''}`;
+    }
+    const many = s.letters.length > 1;
+    const facts = factCapable(s);
+    const factOpts = [['off', 'Off'], ['auto', 'Auto'], ...[5, 6, 7, 8, 9, 10].map((n) => [String(n), `${n} across`])];
+    const timedOpts = [['0', 'Off'], ['1', '1 minute'], ['2', '2 minutes'], ['3', '3 minutes'], ['5', '5 minutes']];
+    return `<div><span class="tv-label" id="tvVer${i}">Versions</span>
+  <div class="tv-seg" role="radiogroup" aria-labelledby="tvVer${i}">
+    <button type="button" role="radio" data-act="versions" data-sec="${i}" data-v="one" aria-checked="${!many}">1 version</button>
+    <button type="button" role="radio" data-act="versions" data-sec="${i}" data-v="many" aria-checked="${many}">A, B, C…</button>
+  </div>
+  ${many ? `<div class="tv-chips tv-letters" role="group" aria-label="Versions to print" style="margin-top:8px;">${LETTERS.map((L) => `<button type="button" class="tv-chip tv-chip-sm" data-act="letter" data-sec="${i}" data-letter="${L}" aria-pressed="${s.letters.includes(L)}" aria-label="Version ${L}">${L}</button>`).join('')}</div>
+  <p class="tv-cap" style="margin-top:6px;">One page per version, each with new numbers.</p>` : ''}
+</div>
+<div class="tv-fields-cols">${s.factColumns === 'off' ? colsSel : ''}${many ? '' : `<div><label class="tv-label" for="tvPages${i}">Pages</label><select id="tvPages${i}" class="tv-select" data-pages="${i}">${[1, 2, 3, 4, 5].map((n) => `<option value="${n}"${s.pages === n ? ' selected' : ''}>${n}</option>`).join('')}</select></div>`}</div>
+${facts ? `<div class="tv-fields-cols">
+  <div><label class="tv-label" for="tvFact${i}">Fact columns</label><select id="tvFact${i}" class="tv-select" data-factcols="${i}">${factOpts.map(([v, t]) => `<option value="${v}"${String(s.factColumns) === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
+  <div><label class="tv-label" for="tvTimed${i}">Timed check</label><select id="tvTimed${i}" class="tv-select" data-timed="${i}">${timedOpts.map(([v, t]) => `<option value="${v}"${String(s.timed) === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
+</div>
+<p class="tv-cap">Fact columns print rows of facts, 5 to 10 across. A timed check adds the minutes and a score line.</p>` : ''}`;
+}
+
+function sectionHTML(s, i) {
+    const name = `Section ${String.fromCharCode(65 + i)}`;
+    const sub = s.kind === 'practice' ? `${PAPER_NAMES.practice}${s.letters.length > 1 ? ` · versions ${s.letters.join(', ')}` : ''}${s.skills.length > 1 ? ` · ${s.skills.length} skills` : ''}`
+        : s.kind === 'quiz' ? `${PAPER_NAMES.quiz} · Form ${s.forms.join(' and ')}` : `${PAPER_NAMES.lesson} · ${s.parts.length} of ${LESSON_PARTS.length} parts`;
+    const firstHit = s.skills.length ? findSkill(s.skills[0].categoryId, s.skills[0].skillId) : null;
+    const noLesson = s.skills.length && !hasLesson(s.skills[0]) ? `No lesson for ${(firstHit || {}).label || 'this skill'} yet.` : '';
+    const bad = s.unsupported && s.unsupported.kind === s.kind ? s.unsupported.why : (s.kind === 'lesson' && noLesson ? noLesson : '');
+    const cards = PAPERS.map(([v, l, text]) => {
+        const on = s.kind === v;
+        const off = v === 'lesson' && noLesson && !on ? noLesson : '';
+        return `<button type="button" class="tv-ptype tv-paper${bad && on ? ' is-unfit' : ''}" role="radio" aria-checked="${on}" data-act="kind" data-sec="${i}" data-v="${v}"${off ? ` aria-disabled="true" title="${esc(off)}" aria-describedby="tvLessonWhy${i}"` : ''}>
+      ${pageThumb(v === 'practice' ? 'independent' : v === 'quiz' ? 'test' : 'lesson')}<span><span class="tv-radio-title">${l}</span><span class="tv-radio-text">${off ? 'Not for this skill yet.' : text}</span></span></button>`;
+    }).join('');
+    const lessonWhy = noLesson && s.kind !== 'lesson' ? `<p class="tv-cap tv-cap-why" id="tvLessonWhy${i}">${icon('info', 14)}<span>${esc(noLesson)}</span></p>` : '';
+    const whyNote = bad ? `<p class="tv-ptype-why" id="tvRoleWhy${i}" role="status">${icon('info', 16)}<span>${esc(bad)}</span></p>` : '';
     const sets = savedSets();
     const setMenu = s.menu === 'set' ? `<div class="tv-menu" style="left:0;right:auto;">
       <button type="button" data-act="add-set" data-sec="${i}" data-set="__current"${currentSet().length ? '' : ' disabled'}>Current set (${currentSet().length})</button>
@@ -427,28 +512,24 @@ function sectionHTML(s, i) {
       <button type="button" data-act="clear-section" data-sec="${i}">Clear the skills</button>
       ${pr.sections.length > 1 ? `<button type="button" class="is-danger" data-act="remove-section" data-sec="${i}">Remove ${name}</button>` : ''}
     </div>` : '';
+    const lessonOne = s.kind === 'lesson' && s.skills.length > 1 ? '<p class="tv-cap">A lesson is one skill: the first one in the list.</p>' : '';
     return `<div class="tv-section" role="group" aria-labelledby="tvSecH${i}">
   <div class="tv-section-head">
     <div><h3 class="tv-h3" id="tvSecH${i}">${name}</h3><div class="tv-cap">${esc(sub)}</div></div>
     <div class="tv-menu-wrap"><button type="button" class="tv-icon-btn" data-act="menu" data-menu="more" data-sec="${i}" aria-label="More actions for ${name}" aria-expanded="${s.menu === 'more'}">${icon('dots', 18)}</button>${moreMenu}</div>
   </div>
-  <div>${skills || '<p class="tv-empty">No skills in this section yet.</p>'}</div>
+  <div>${skillRowsHTML(s, i, name) || '<p class="tv-empty">No skills in this section yet.</p>'}${lessonOne}</div>
   <div class="tv-row">
     <button type="button" class="tv-btn tv-btn-ghost" data-act="pick" data-sec="${i}" aria-expanded="${!!s.picking}">${icon('plus', 16)}<span>Add a skill</span></button>
     <div class="tv-menu-wrap"><button type="button" class="tv-btn tv-btn-ghost" data-act="menu" data-menu="set" data-sec="${i}" aria-expanded="${s.menu === 'set'}">${icon('layers', 16)}<span>Add a set</span></button>${setMenu}</div>
   </div>
   ${s.picking ? `<div class="tv-search"><label class="tv-sr" for="tvPick${i}">Find a skill</label>${icon('search', 18)}<input id="tvPick${i}" class="tv-input" type="search" data-pick="${i}" placeholder="Search skills" autocomplete="off"></div><div class="tv-pick-results" id="tvPickRes${i}"><p class="tv-cap" style="padding:8px 12px;">Type to search.</p></div>` : ''}
   <div class="tv-divided">
-    <span class="tv-label" id="tvRoleL${i}">Page type</span>
-    <div class="tv-ptype-now">
-      <div class="tv-ptype is-static${bad ? ' is-unfit' : ''}">${pageThumb(chosen[0])}<span><span class="tv-radio-title">${esc(chosen[1])}</span><span class="tv-radio-text">${esc(chosen[2])}</span></span></div>
-      <button type="button" class="tv-btn" data-act="types" data-sec="${i}" aria-expanded="${!!s.types}" aria-controls="tvTypes${i}" aria-label="${s.types ? 'Close the page types' : `Change the page type of ${name}`}">${s.types ? `${icon('x', 16)}<span>Close</span>` : '<span>Change</span>'}</button>
-    </div>
-    ${s.types ? `<div class="tv-ptype-groups" id="tvTypes${i}" role="radiogroup" aria-labelledby="tvRoleL${i}">${typeCards}</div>` : ''}
-    ${whyNote}
+    <span class="tv-label" id="tvPaperL${i}">Paper</span>
+    <div class="tv-ptypes tv-papers" role="radiogroup" aria-labelledby="tvPaperL${i}">${cards}</div>
+    ${lessonWhy}${whyNote}
   </div>
-  ${s.role === 'more-practice' ? `<div class="tv-fields-cols"><div><label class="tv-label" for="tvCols${i}">Columns</label><select id="tvCols${i}" class="tv-select" data-cols="${i}">${cols}</select></div></div>${pagesPart}`
-        : `<div class="tv-fields-cols"><div><label class="tv-label" for="tvCols${i}">Columns</label><select id="tvCols${i}" class="tv-select" data-cols="${i}">${cols}</select></div>${pagesPart}</div>`}
+  <div class="tv-paper-opts">${paperOptionsHTML(s, i)}</div>
 </div>`;
 }
 
@@ -644,8 +725,9 @@ function renderSetup() {
     box.innerHTML = `
   <div style="padding:24px;display:flex;flex-direction:column;gap:16px;">
     <h2 class="tv-h2" id="tvSetupH">Page setup</h2>
-    <div><span class="tv-label">Size</span>${seg('size', pr.size, [['S', 'S', 'Small'], ['M', 'M', 'Medium'], ['L', 'L', 'Large']], 'Size')}${pr.size === 'S' && pr.sections.some((x) => x.role === 'lesson') ? `
-      <p class="tv-cap" id="tvSizeLesson" style="margin-top:6px;">A lesson prints at Medium: at Small its regroup boxes and step words are too small to write in. The other page types print at Small.</p>` : ''}</div>
+    ${pr.sections.every((x) => x.kind === 'lesson') ? `<div><span class="tv-label">Size</span><p class="tv-cap" id="tvSizeLesson">A lesson prints at one size, its designed size. Practice and Quiz papers offer S, M and L.</p></div>`
+        : `<div><span class="tv-label">Size</span>${seg('size', pr.size, [['S', 'S', 'Small'], ['M', 'M', 'Medium'], ['L', 'L', 'Large']], 'Size')}${pr.sections.some((x) => x.kind === 'lesson') ? `
+      <p class="tv-cap" id="tvSizeLesson" style="margin-top:6px;">The size is for the Practice and Quiz papers: a lesson prints at its one designed size.</p>` : ''}</div>`}
     <div class="tv-fields-2">
       <div><span class="tv-label">Paper</span>${seg('paper', pr.paper, [['A4', 'A4'], ['Letter', 'Letter']], 'Paper')}</div>
     </div>
@@ -689,8 +771,8 @@ function anchorsHTML() {
 function anchorsBlocked() {
     const used = pr.sections.filter((s) => s.skills.length);
     if (!used.length) return 'Add a skill first.';
-    const roles = used.filter((s) => ANCHOR_PAGE_TYPES.includes(s.role));
-    if (!roles.length) return `${ROLE_NAME[used[0].role] || 'This page type'} does not take worked examples. Use Independent, More Practice or Mixed practice.`;
+    const roles = used.filter((s) => ANCHOR_PAGE_TYPES.includes(roleOf(s)));
+    if (!roles.length) return `${used[0].kind === 'practice' ? 'Fact columns and timed checks' : PAPER_NAMES[used[0].kind] || 'This paper'} do not take worked examples. Use a Practice paper.`;
     const any = roles.some((s) => s.skills.some((k) => hasWorkedSteps(k.categoryId, k.skillId)));
     if (!any) return 'None of the chosen skills has step-by-step worked examples yet.';
     return '';
@@ -737,19 +819,21 @@ function requestFor(s, i) {
     const skills = s.skills.map((k) => {
         // Always an explicit object: a row reset to its defaults here (k.opts undefined) must
         // print the defaults, not fall back to the set's options (generateQuestionFor looks the
-        // set up only when it is given no options at all).
+        // set up only when it is given no options at all). Every skill carries its weight (§8e).
         const o = { categoryId: k.categoryId, skillId: k.skillId, opts: k.opts && typeof k.opts === 'object' ? k.opts : {} };
-        if (k.weight > 1) o.weight = k.weight;
+        o.weight = Math.max(1, Number(k.weight) || 1);
         return o;
     });
     const h = pr.header;
-    return {
-        role: s.role,
+    // THE PAPER (§8e): print-sheet.js routes it to today's roles (sheet/papers.js).
+    const paper = s.kind === 'quiz'
+        ? { kind: 'quiz', versions: s.forms.slice() }
+        : s.kind === 'lesson'
+            ? { kind: 'lesson', parts: s.parts.slice(), practicePages: s.lessonPages }
+            : { kind: 'practice', versions: s.letters.slice(), factColumns: s.factColumns, timed: s.timed };
+    return Object.assign(paper, {
         // A lesson is one skill: the first skill of the section (roles/lesson.js).
-        sections: [{ skills: s.role === 'lesson' ? skills.slice(0, 1) : skills, columns: s.columns, pages: s.role === 'independent' ? s.pages : undefined }],
-        letters: s.role === 'more-practice' ? s.letters.slice() : undefined,
-        practicePages: s.role === 'lesson' ? s.pages : undefined,
-        mixed: s.role === 'lesson' ? !!s.mixed : undefined,
+        sections: [{ skills: s.kind === 'lesson' ? skills.slice(0, 1) : skills, columns: s.columns, pages: s.kind === 'practice' && s.letters.length < 2 ? s.pages : undefined }],
         size: pr.size,
         paper: pr.paper,
         photocopySafe: pr.photocopySafe,
@@ -757,7 +841,7 @@ function requestFor(s, i) {
         header: { name: h.name, date: h.date, score: h.score, tab: h.tab ? undefined : false, title: h.title ? (pr.title.trim() || true) : false },
         key: pr.key,
         seed: (pr.seed + i * 7919) >>> 0,
-    };
+    });
 }
 
 function currentReq() {
@@ -770,12 +854,15 @@ async function buildAll(req) {
     for (const [ri, r] of req.parts.entries()) {
         let res;
         try { res = await buildSheet(r); } catch (e) { if (e && typeof e === 'object') e.sectionIndex = req.idx ? req.idx[ri] : ri; throw e; }
-        out.parts.push({ res, role: r.role, letters: r.letters });
+        // An old stored request names its role; a paper request is routed (res.routedRole).
+        const role = r.role || res.routedRole || res.role;
+        const letters = r.letters || (res.routed && res.routed[0] && res.routed[0].letters);
+        out.parts.push({ res, role, letters, kind: r.kind });
         out.pupilHtml += res.pupilHtml;
         out.keyHtml += res.keyHtml || '';
         out.keyPages += res.keyPageCount || 0;
         for (let p = 0; p < res.pageCount; p++) {
-            out.pages.push(r.role === 'more-practice' && r.letters && r.letters[p] ? `Practice ${r.letters[p]}` : `Page ${out.pages.length + 1}`);
+            out.pages.push(role === 'more-practice' && letters && letters[p] ? `Version ${letters[p]}` : `Page ${out.pages.length + 1}`);
         }
     }
     // Page labels must be unique when several sections repeat a letter.
@@ -824,7 +911,7 @@ async function runBuild() {
             const got = new Set((p.res.items || []).map((it) => it && it.skill).filter(Boolean));
             const n = [...asked].filter((k) => got.has(k)).length;
             if (!p.res.items || n >= asked.size) return '';
-            return `Only ${n} of ${asked.size} skills fit on ${ROLE_NAME[p.role] || 'this page type'}${built.parts.length > 1 ? ` (Section ${String.fromCharCode(65 + (req.idx ? req.idx[i] : i))})` : ''}. Independent, More Practice and Mixed practice fit every skill.`;
+            return `Only ${n} of ${asked.size} skills fit on this ${ROLE_NAME[p.role] || 'paper'}${built.parts.length > 1 ? ` (Section ${String.fromCharCode(65 + (req.idx ? req.idx[i] : i))})` : ''}. A Practice paper fits every skill.`;
         }).filter(Boolean);
         // Lessons r2: a lesson asked for at S prints at M - said where the teacher sees it, not
         // only under "Why?" (the page itself carries no size marker).
@@ -839,10 +926,10 @@ async function runBuild() {
         // A page type a skill cannot take says why, on its card (the fact layouts need a fact skill).
         if (e && e.unsupported) {
             const si = Number.isInteger(e.sectionIndex) ? e.sectionIndex : 0;
-            if (pr.sections[si]) pr.sections[si].unsupported = { role: pr.sections[si].role, why: e.message };
+            if (pr.sections[si]) pr.sections[si].unsupported = { kind: pr.sections[si].kind, why: e.message };
             renderWhat();
         }
-        msg.textContent = e && e.unsupported ? `${e.message}` : 'This page could not be built. Try another page type, or the auto-layout worksheet under Page setup.';
+        msg.textContent = e && e.unsupported ? `${e.message}` : 'This page could not be built. Try another paper or option, or the auto-layout worksheet under Page setup.';
         msg.hidden = false;
         root.querySelector('#tvStage').dataset.state = 'error';
         root.querySelector('#tvFits').innerHTML = '';
@@ -1013,7 +1100,11 @@ function rememberPrint(title) {
     const req = last.req;
     const first = pr.sections.find((s) => s.skills.length);
     const hit = first && findSkill(first.skills[0].categoryId, first.skills[0].skillId);
-    const kinds = [...new Set(req.parts.map((p) => (p.role === 'more-practice' ? `More Practice ${p.letters[0]}${p.letters.length > 1 ? '–' + p.letters[p.letters.length - 1] : ''}` : (ROLE_NAME[p.role] || 'Independent'))))];
+    const kinds = [...new Set(req.parts.map((p) => {
+        if (p.kind === 'practice' && Array.isArray(p.versions) && p.versions.length > 1) return `Practice ${p.versions[0]}–${p.versions[p.versions.length - 1]}`;
+        if (p.kind) return PAPER_NAMES[p.kind] || 'Practice';
+        return ROLE_NAME[p.role] || PAPER_NAMES[paperOfRole(p.role).paper] || 'Practice';
+    }))];
     const rec = {
         id: 'pr_' + Date.now().toString(36),
         title,

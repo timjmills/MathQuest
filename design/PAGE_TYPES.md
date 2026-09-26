@@ -1752,9 +1752,35 @@ Every option on every role lives in the print dialog. Scope is `job` (the whole 
 
 **Skill-scope options belong to the skill, not to the page** (owner clarification 2026-09-19). A skill declares its own option schema — what it takes, the allowed values and the default (`design/SKILL_CELL_CONTRACT.md` section 3.6, SCC-P13). The dialog reads that schema and shows those options **per skill**, so a section holding several skills shows each skill's own set, and "Add 6, band 20, practice level 2" beside "Subtract 2, band 10" is one section with two configured skills. The chosen values then ride with the skill into any page role — Opener, Scripted Model, Guided, Independent, More Practice, daily or mixed review, Test A / B, Error analysis — on screen and in print, and a page role never invents or overrides one (SCC-P14, SCC-P15). Job and section scope keep the page's own choices: paper, look, size, columns, label style, header fields, photocopy-safe, seed, answer key. The values are saved with a favourite, a quick skill, a saved quiz and a print section, and travel in the settings segment of a share code, so a shared link reopens the same configured skill (SCC-P16).
 
+### PT-DLG-0 — three papers: Practice, Quiz, Lesson (owner ruling 2026-09-26)
+
+> "we then have three types of papers: practice, quiz, and lesson" (`LESSON_LIBRARY_PLAN.md` §8e). The Print screen
+> shows **three paper cards** in place of the 17 page-type cards. A section carries a paper and that paper's options;
+> the request goes to `buildSheet` as `{kind: 'practice'|'quiz'|'lesson', versions, factColumns, timed, parts}` and
+> `print-sheet.js` routes it to today's roles through ONE table, `PAPER_ROUTES` in `js/modules/sheet/papers.js`. When
+> the engine lane rebuilds Practice and Quiz on the lesson page builders (§8c), only that table's role column changes.
+
+| Paper | Options on the Print screen | Routes to (today) |
+|---|---|---|
+| **Practice** | skills, one or more (one skill -> its I Can title, PT-TTL-1); a **weight** per skill (default 1: equal), items per skill = page items x weight / total weight, largest remainder, every weighted skill at least one (`weightedCounts`); **Prerequisites (n)** under each skill: every prerequisite skill as a check box, none ticked; a ticked one joins the set with weight 1 and a "Prerequisite of X" note (`prerequisite-skills.js`, the lesson library's graph when it lands, else the WRM steps before the skill's step); **versions** 1 or A, B, C... (new numbers each); pages; columns; **fact columns** off / auto / 5-10 across and **timed check** off / 1-5 minutes (fact and operation skills only); size S / M / L | timed check -> `fact-probe`; fact columns -> `fact-rows`; versions -> `more-practice`; word-problem skills only -> `word-problems`; else `independent` (several skills: `weightedMix`, exact weights) |
+| **Quiz** | skills (weights as Practice); versions Form A and / or Form B; columns; size | `test`, one sheet per form |
+| **Lesson** | the first skill (the card is withheld, with its reason, for a skill with no lesson yet); **parts to print** as check boxes, all ticked by default: Prerequisite Check, anchor chart, lesson sheet (We Do), practice, mixed; practice pages 1-3; one size (§8a: the Size control is replaced by a note when every section is a Lesson); "New numbers" re-deals the whole packet until the engine lane ships per-part seeds (`req.lessonSeeds`) | `lesson` with `lessonParts` (every part is built, only the ticked ones print; the Prerequisite Check prints on the lesson sheet until it has a page of its own) |
+
+- **Paused, hidden, code kept:** True or False?, Reason It, Stretch, Find the mistake (§8d, §8e). No card offers them;
+  their roles still build, so an old stored printout that used one still reprints.
+- **Old role ids decode to a paper** (`paperOfRole`, never break a saved set or a link): independent / more-practice /
+  mixed-practice / review / fact-rows / fact-probe / word-problems -> Practice with the matching options; test / test-b
+  -> Quiz Form A / B; lesson / opener / pre-skill-check / scripted-model / guided -> Lesson with the matching part.
+  `buildSheet` still takes every old role id directly (Home's "Recent printouts" rebuild the stored request as it was).
+- **Weights on screen:** a skill code's weights (`AB3-CD-EF`) reach live practice too (`playSelectedSkills` ->
+  `mixedModeSettings.weights`; `generate-question.js` `weightedMixPick` deals a shuffled block of sum(weights), so
+  3 : 1 : 1 is exactly 60 / 20 / 20 over every five questions).
+- The rows below that name a page role (PT-DLG-1 "Sheet type") describe the engine's roles, which the papers route to;
+  the teacher no longer picks a role.
+
 | Id | Option | Values | Default | Scope | Notes |
 |---|---|---|---|---|---|
-| PT-DLG-1 | Sheet type and packet parts | any role in sections 2 to 8; "Lesson packet" opens a checklist of parts (PT-PKT-1) and presets | Auto by skill (fact-like -> Fact rows; stack -> Computation grid; visual -> Visual grid; story -> Word problems) | section | a part marked "basic" uses a default adapter (section 10) |
+| PT-DLG-1 | Sheet type and packet parts | *superseded 2026-09-26 by PT-DLG-0 (three papers)*; was: any role in sections 2 to 8; "Lesson packet" opens a checklist of parts (PT-PKT-1) and presets | Practice | section | the paper routes to a role (PT-DLG-0) |
 | PT-DLG-2 | Look | *retired 2026-09-26* — no control; every worksheet prints Daily (PT-LOOK-1) | Daily | — | a stored `ican` / `auto` decodes and prints Daily; the lesson packet pins its own look (PT-LOOK-2); the title follows the skills (PT-TTL-1) |
 | PT-DLG-3 | Label style | Auto, letters, black tabs, none | Auto (black tabs, the Daily look) | section | never reflows the page (PT-LBL-4) |
 | PT-DLG-4 | Columns | Auto, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 | Auto | section | the stored choice is never overwritten; the clamp, step-down or forced note shows beside the control and in the preview only (PT-COL-5) |

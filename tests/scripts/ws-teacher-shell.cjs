@@ -219,131 +219,163 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   if (await page.evaluate(() => !!document.getElementById('tvBoardOverlay'))) fail('Esc did not close the board code');
 
   /* ------------------------------------------------------------ 5 Print */
+  // THE THREE PAPERS (owner ruling 2026-09-26, LESSON_LIBRARY_PLAN §8e): Practice, Quiz, Lesson.
   await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
   await page.evaluate(() => { window.tvGo('print'); window.tvOpenPrintWith(window.skillQueue); });
   await sleep(300);
-  // R2: the page types are collapsed to the chosen card + Change, so Add a skill comes first.
-  const collapsed = await page.evaluate(() => {
-    const scr = document.querySelector('#teacherMain [data-screen="print"]');
-    const add = scr.querySelector('[data-act="pick"]').getBoundingClientRect();
-    const type = scr.querySelector('.tv-ptype-now').getBoundingClientRect();
-    return { grid: !!scr.querySelector('[data-act="role"]'), change: !!scr.querySelector('[data-act="types"]'), order: add.top < type.top, addTop: add.top };
-  });
-  if (collapsed.grid || !collapsed.change) fail('Print: the page-type grid is open before Change is pressed');
-  if (!collapsed.order || collapsed.addTop > 900) fail(`Print: Add a skill is not above the page type near the top (${JSON.stringify(collapsed)})`);
-  const pickRole = (v) => { const scr = document.querySelector('#teacherMain [data-screen="print"]'); if (!scr.querySelector('[data-act="role"]')) scr.querySelector('[data-act="types"]').click(); scr.querySelector(`[data-act="role"][data-v="${v}"]`).click(); };
-  await page.evaluate(() => document.querySelector('#teacherMain [data-screen="print"] [data-act="types"]').click());
-  await sleep(100);
+  const pickPaper = (v) => { document.querySelector(`#teacherMain [data-screen="print"] [data-act="kind"][data-v="${v}"]`).click(); };
   const pr0 = await page.evaluate(() => {
     const scr = document.querySelector('#teacherMain [data-screen="print"]');
+    const add = scr.querySelector('[data-act="pick"]').getBoundingClientRect();
     return {
-      chips: [...scr.querySelectorAll('.tv-ptype[data-v]')].map((b) => b.dataset.v),
-      groups: [...scr.querySelectorAll('.tv-ptype-h')].map((h) => h.textContent),
-      thumbs: scr.querySelectorAll('.tv-ptype[data-v] .tv-ptype-thumb').length,
+      papers: [...scr.querySelectorAll('[data-act="kind"]')].map((b) => b.dataset.v),
+      thumbs: scr.querySelectorAll('[data-act="kind"] .tv-ptype-thumb').length,
+      checked: (scr.querySelector('[data-act="kind"][aria-checked="true"]') || {}).dataset?.v,
+      oldCards: scr.querySelectorAll('[data-act="role"], [data-act="types"]').length,
+      look: /\bLook\b/.test(scr.querySelector('#tvSetup').textContent),
+      addTop: add.top,
     };
   });
-  await page.evaluate(pickRole, 'independent');
+  if (pr0.papers.join() !== 'practice,quiz,lesson') fail(`Print: the paper cards are ${pr0.papers.join()}, not Practice, Quiz, Lesson`);
+  if (pr0.thumbs !== 3) fail('Print: a paper card has no thumbnail');
+  if (pr0.checked !== 'practice') fail(`Print: the default paper is ${pr0.checked}, not Practice`);
+  if (pr0.oldCards) fail('Print: the old page-type cards are still offered');
+  if (pr0.look) fail('Print: the retired Look control is still on Page setup');
+  if (pr0.addTop > 900) fail(`Print: Add a skill is below the fold (${pr0.addTop})`);
   await sleep(5000);
   const pr = await page.evaluate(() => {
     const what = document.querySelector('.tv-print-what').getBoundingClientRect();
     const prev = document.querySelector('.tv-preview-card').getBoundingClientRect();
     const scr = document.querySelector('#teacherMain [data-screen="print"]');
     const frame = document.getElementById('tvPreviewFrame');
-    let score = '', cells = 0;
+    let score = '', cells = 0, title = '';
     try {
       const d = frame.contentDocument;
       score = (d.querySelector('.ws-field.score b') || {}).textContent || '';
       cells = [...d.querySelectorAll('.ws-page')].reduce((n, p) => n + p.querySelectorAll('.ws-cell').length, 0);
+      title = (d.querySelector('.ws-title') || {}).textContent || '';
     } catch (e) { /* */ }
     return {
       beside: prev.left >= what.right && prev.top < 300,
       fits: document.getElementById('tvFits').innerText,
-      gridClosed: !scr.querySelector('[data-act="role"]'),
-      select: !!scr.querySelector('select[data-role]'), soon: /coming soon/i.test(scr.textContent),
+      soon: /coming soon/i.test(scr.textContent),
       classic: !!scr.querySelector('[data-act="classic"]'),
       skills: scr.querySelectorAll('.tv-set-item').length,
-      score, cells,
+      weights: scr.querySelectorAll('.tv-set-item .tv-weight').length,
+      score, cells, title,
     };
   });
   await shot('print-1280');
-  Object.assign(pr, pr0);
   if (!pr.beside) fail('Print: the preview is not beside the controls at 1280');
-  if (!pr.gridClosed) fail('Print: choosing a page type did not close the grid');
   if (/Fits:|rows?,|per page/i.test(pr.fits) || !/^\d+ problems? on \d+ pages?/.test(pr.fits)) fail(`Print: the fits line is not one plain line ("${pr.fits}")`);
-  // error-analysis (Check it) is PAUSED: still a working role for saved sets, but not offered (owner ruling 2026-09-26)
-  const ROLES = ['lesson', 'independent', 'more-practice', 'mixed-practice', 'word-problems', 'opener', 'scripted-model', 'guided', 'pre-skill-check', 'review', 'test', 'test-b', 'fact-rows', 'fact-probe', 'true-false', 'reason-it', 'stretch'];
-  if (pr.select || [...pr.chips].sort().join() !== [...ROLES].sort().join()) fail(`Print: page type cards are not every working role (${pr.chips.join()})`);
-  if (pr.groups.join() !== 'Practice,Teach,Check,Facts,Thinking') fail(`Print: page type groups are ${pr.groups.join()}`);
-  if (pr.thumbs !== pr.chips.length) fail('Print: a page type card has no thumbnail');
   if (pr.soon) fail('Print: "coming soon" entries are still shown');
   if (pr.classic) fail('Print: the Classic print dialog button is still there');
   if (pr.skills !== 4) fail(`Print: expected the 4 queued skills, found ${pr.skills}`);
+  if (pr.weights !== 4) fail(`Print: a skill of a mixed set has no weight control (${pr.weights} of 4)`);
   if (!pr.score || pr.score !== `/${pr.cells}`) fail(`Print: Score "${pr.score}" does not count the ${pr.cells} items`);
-  // A role that does not fit the skills says why on its card: fact rows for a non-fact skill.
-  await page.evaluate(() => { window.tvOpenPrintWith([{ categoryId: 'composing', skillId: 'base10_regroup' }]); window.tvGo('print'); });
-  await sleep(200);
-  await page.evaluate(pickRole, 'fact-rows');
+  if (/^I Can/.test(pr.title)) fail(`Print: a mixed set carries an I Can title ("${pr.title}")`);
+  // One skill: the I Can title (PT-TTL-1), and no weight control.
+  await page.evaluate(() => { window.tvOpenPrintWith([{ categoryId: 'subtraction', skillId: 'sub_100_regroup' }]); window.tvGo('print'); });
   await sleep(5000);
-  const unfit = await page.evaluate(() => {
-    const why = document.querySelector('#teacherMain [data-screen="print"] .tv-ptype-why');
-    const card = document.querySelector('#teacherMain [data-screen="print"] .tv-ptype.is-static');
-    return { why: why ? why.textContent.trim() : '', marked: !!(card && card.classList.contains('is-unfit')) };
+  const one = await page.evaluate(() => {
+    const scr = document.querySelector('#teacherMain [data-screen="print"]');
+    let title = '';
+    try { title = (document.getElementById('tvPreviewFrame').contentDocument.querySelector('.ws-title') || {}).textContent || ''; } catch (e) { /* */ }
+    return { title, weights: scr.querySelectorAll('.tv-weight').length, lesson: scr.querySelector('[data-act="kind"][data-v="lesson"]').getAttribute('aria-disabled') };
   });
-  if (!unfit.why || !unfit.marked) fail(`Print: an unfit page type does not say why (${JSON.stringify(unfit)})`);
-  // Stretch is WITHHELD for a skill with no open problem of its own (a K counting picture): its card
-  // is disabled, says why, and cannot be chosen; an operation skill keeps it.
+  if (!/^I Can /.test(one.title)) fail(`Print: a one-skill Practice paper has no I Can title ("${one.title}")`);
+  if (one.weights) fail('Print: a one-skill set shows a weight control');
+  if (one.lesson === 'true') fail('Print: the Lesson paper is withheld for a skill that has a lesson');
+  // Weights: 3 : 1 : 1 deals 60 / 20 / 20 (largest remainder, every skill at least one).
+  await page.evaluate(() => { window.tvOpenPrintWith([{ categoryId: 'addition', skillId: 'add_20_regroup', weight: 3 }, { categoryId: 'subtraction', skillId: 'sub_100_regroup' }, { categoryId: 'number_sense', skillId: 'nearest_10' }]); window.tvGo('print'); });
+  await sleep(200);
+  const dealt = await page.evaluate(async () => {
+    const b = await window.buildSheet({ kind: 'practice', size: 'S', seed: 4242, key: false, sections: [{ skills: [{ categoryId: 'addition', skillId: 'add_20_regroup', weight: 3 }, { categoryId: 'subtraction', skillId: 'sub_100_regroup', weight: 1 }, { categoryId: 'number_sense', skillId: 'nearest_10', weight: 1 }] }] });
+    const per = {};
+    for (const it of b.items || []) per[it.skill] = (per[it.skill] || 0) + 1;
+    return { per, n: (b.items || []).length };
+  });
+  const want = [3, 1, 1].map((w) => (dealt.n * w) / 5);
+  const got = [dealt.per['addition:add_20_regroup'] || 0, dealt.per['subtraction:sub_100_regroup'] || 0, dealt.per['number_sense:nearest_10'] || 0];
+  if (got.some((g, k) => Math.abs(g - want[k]) >= 1)) fail(`Print: a 3 : 1 : 1 Practice paper dealt ${got.join(' / ')} of ${dealt.n}`);
+  // The weight control changes the weight (+ and -).
+  await page.evaluate(() => document.querySelector('#teacherMain [data-screen="print"] [data-act="weight"][data-idx="1"][data-dir="1"]').click());
+  await sleep(100);
+  const w2 = await page.evaluate(() => document.querySelectorAll('#teacherMain [data-screen="print"] .tv-weight span')[1].textContent);
+  if (w2 !== '×2') fail(`Print: the weight + button did not raise the weight (${w2})`);
+  // Mix in prerequisite skills: listed, none ticked; ticking one adds it with a "prerequisite of" note.
+  const pre = await page.evaluate(async () => {
+    const btn = document.querySelector('#teacherMain [data-screen="print"] [data-act="prereqs"]');
+    if (!btn) return { none: true };
+    btn.click();
+    await new Promise((r) => setTimeout(r, 100));
+    const boxes = [...document.querySelectorAll('[data-act="prereq"]')];
+    const ticked = boxes.filter((b) => b.getAttribute('aria-checked') === 'true').length;
+    const before = document.querySelectorAll('.tv-set-item').length;
+    const h = boxes[0].getBoundingClientRect().height;
+    boxes[0].click();
+    await new Promise((r) => setTimeout(r, 100));
+    return { n: boxes.length, ticked, before, after: document.querySelectorAll('.tv-set-item').length, note: !!document.querySelector('.tv-prereq-of'), h };
+  });
+  if (pre.none || !pre.n) fail('Print: no "Prerequisites" list for a Practice skill');
+  else {
+    if (pre.ticked) fail('Print: a prerequisite is ticked by default');
+    if (pre.after !== pre.before + 1 || !pre.note) fail(`Print: ticking a prerequisite did not add it with its note (${JSON.stringify(pre)})`);
+    if (pre.h < 44) fail(`Print: a prerequisite check box is ${pre.h}px tall`);
+  }
+  // A paper option that does not fit the skills says why: fact columns for a non-fact skill.
+  await page.evaluate(async () => {
+    const b = await window.buildSheet({ kind: 'practice', factColumns: 6, sections: [{ skills: [{ categoryId: 'composing', skillId: 'base10_regroup' }] }] }).catch((e) => e);
+    window.__factWhy = b && b.unsupported ? b.message : '';
+  });
+  if (!(await page.evaluate(() => window.__factWhy))) fail('Print: fact columns for a non-fact skill are not refused with a reason');
+  // Lesson: withheld, with its reason, for a skill that has no lesson; chosen, it offers its parts.
   await page.evaluate(() => { window.tvOpenPrintWith([{ categoryId: 'counting', skillId: 'count_objects' }]); window.tvGo('print'); });
   await sleep(200);
-  const noStretch = await page.evaluate(async () => {
-    const scr = document.querySelector('#teacherMain [data-screen="print"]');
-    if (!scr.querySelector('[data-act="role"]')) scr.querySelector('[data-act="types"]').click();
-    const card = scr.querySelector('[data-act="role"][data-v="stretch"]');
-    const out = { disabled: card && card.getAttribute('aria-disabled') === 'true', title: card ? card.getAttribute('title') || '' : '' };
-    const note = card && card.getAttribute('aria-describedby') ? document.getElementById(card.getAttribute('aria-describedby')) : null;
-    out.note = note ? note.textContent.trim() : '';
-    card && card.click();
-    await new Promise((r) => setTimeout(r, 300));
-    const again = scr.querySelector('[data-act="role"][data-v="stretch"]');
-    out.chosen = !!(again && again.getAttribute('aria-checked') === 'true');
-    return out;
+  const noLesson = await page.evaluate(() => {
+    const card = document.querySelector('#teacherMain [data-screen="print"] [data-act="kind"][data-v="lesson"]');
+    const note = card.getAttribute('aria-describedby') ? document.getElementById(card.getAttribute('aria-describedby')) : null;
+    card.click();
+    return { disabled: card.getAttribute('aria-disabled') === 'true', note: note ? note.textContent.trim() : '', chosen: document.querySelector('[data-act="kind"][data-v="lesson"]').getAttribute('aria-checked') };
   });
-  if (!noStretch.disabled || !/No Stretch/.test(noStretch.title) || !/No Stretch/.test(noStretch.note) || noStretch.chosen) fail(`Print: Stretch is not withheld, with its reason, for a skill with no open problem (${JSON.stringify(noStretch)})`);
-  await page.evaluate(() => { window.tvOpenPrintWith([{ categoryId: 'addition', skillId: 'add_20_regroup' }]); window.tvGo('print'); });
-  await sleep(200);
-  const hasStretch = await page.evaluate(() => {
-    const scr = document.querySelector('#teacherMain [data-screen="print"]');
-    if (!scr.querySelector('[data-act="role"]')) scr.querySelector('[data-act="types"]').click();
-    const card = scr.querySelector('[data-act="role"][data-v="stretch"]');
-    return !!card && card.getAttribute('aria-disabled') !== 'true';
-  });
-  if (!hasStretch) fail('Print: Stretch is withheld for an operation skill that has an open problem');
-  // A one-page type too small for every chosen skill says so (never drops a skill quietly).
-  await page.evaluate(() => {
-    window.tvOpenPrintWith([['composing', 'base10_regroup'], ['addition', 'add_10_no_regroup'], ['addition', 'add_10_regroup'], ['addition', 'add_20_no_regroup']].map(([c, s]) => ({ categoryId: c, skillId: s })));
-    window.tvGo('print');
-  });
-  await sleep(200);
-  await page.evaluate(pickRole, 'review');
+  if (!noLesson.disabled || !/No lesson/.test(noLesson.note) || noLesson.chosen === 'true') fail(`Print: the Lesson paper is not withheld, with its reason, for a skill with no lesson (${JSON.stringify(noLesson)})`);
+  await page.evaluate(() => { window.tvOpenPrintWith([{ categoryId: 'subtraction', skillId: 'sub_100_regroup' }], { kind: 'lesson' }); });
   await sleep(6000);
-  const warn = await page.evaluate(() => (document.querySelector('#tvFits .tv-fits-warn') || {}).textContent || '');
-  // Since the review sections round (sweet-newton, 2026-09-26) a Review page deals one section per
-  // skill and can hold all four: then there is nothing to warn about. The rule is only that a skill
-  // never misses the sheet QUIETLY.
-  const placed = await page.evaluate(async () => {
-    const skills = [['composing', 'base10_regroup'], ['addition', 'add_10_no_regroup'], ['addition', 'add_10_regroup'], ['addition', 'add_20_no_regroup']].map(([c, s]) => ({ categoryId: c, skillId: s }));
-    const b = await window.buildSheet({ role: 'review', sections: [{ skills }], size: 'L', seed: 4242, key: false });
-    return new Set((b.items || []).map((it) => it && it.skill).filter(Boolean)).size;
+  const lesson = await page.evaluate(() => ({
+    parts: [...document.querySelectorAll('[data-act="part"]')].map((b) => `${b.dataset.v}:${b.getAttribute('aria-checked')}`),
+    fits: document.getElementById('tvFits').innerText,
+  }));
+  if (lesson.parts.join() !== 'prereq:true,chart:true,sheet:true,practice:true,mixed:true') fail(`Print: the Lesson parts are not all five, ticked (${lesson.parts.join()})`);
+  await page.evaluate(() => { document.querySelector('[data-act="part"][data-v="mixed"]').click(); document.querySelector('[data-act="part"][data-v="practice"]').click(); });
+  await sleep(6000);
+  const lesson2 = await page.evaluate(() => document.getElementById('tvFits').innerText);
+  if (/Mixed|Practice:/.test(lesson2.replace(/Practice pages/g, '')) && lesson2 === lesson.fits) fail('Print: unticking lesson parts did not change the packet');
+  // Quiz: Forms A and B.
+  await page.evaluate(() => { window.tvOpenPrintWith([{ categoryId: 'subtraction', skillId: 'sub_100_regroup' }], { kind: 'quiz' }); });
+  await sleep(200);
+  await page.evaluate(() => document.querySelector('[data-act="form"][data-v="B"]').click());
+  await sleep(6000);
+  const quiz = await page.evaluate(() => {
+    let titles = [];
+    try { titles = [...document.getElementById('tvPreviewFrame').contentDocument.querySelectorAll('.ws-title')].map((t) => t.textContent); } catch (e) { /* */ }
+    return { tabs: [...document.querySelectorAll('#tvPageTabs button')].map((b) => b.textContent), titles };
   });
-  if (!/of 4 skills fit/.test(warn) && placed < 4) fail(`Print: no warning when a Review page cannot hold every skill ("${warn}", ${placed} of 4 placed)`);
+  if (quiz.tabs.filter((t) => /^Page/.test(t)).length < 2) fail(`Print: a Quiz of Forms A and B does not print two pages (${quiz.tabs.join()})`);
+  // Old role ids decode to their paper (§8e: saved sets and old links are never broken).
+  await page.evaluate(() => window.tvOpenPrintWith([{ categoryId: 'multiplication', skillId: 'mult_facts' }], { role: 'fact-probe' }));
+  await sleep(200);
+  const probe = await page.evaluate(() => ({ paper: document.querySelector('[data-act="kind"][aria-checked="true"]').dataset.v, timed: (document.querySelector('[data-timed]') || {}).value }));
+  if (probe.paper !== 'practice' || probe.timed !== '1') fail(`Print: an old fact-probe set does not open as a timed Practice paper (${JSON.stringify(probe)})`);
   await page.evaluate(() => window.tvOpenPrintWith(window.skillQueue));
   await sleep(300);
-  // More Practice letter chips
+  // Versions A, B, C… chips
   await page.evaluate(() => window.tvGo('print'));
   await sleep(200);
-  await page.evaluate(pickRole, 'more-practice');
+  await page.evaluate(() => document.querySelector('[data-act="versions"][data-v="many"]').click());
   await sleep(300);
   const chipSize = await page.evaluate(() => { const r = document.querySelector('[data-act="letter"]').getBoundingClientRect(); return [r.width, r.height]; });
-  if (chipSize[0] < 44 || chipSize[1] < 44) fail(`Print: letter chips are ${chipSize.join('x')}`);
+  if (chipSize[0] < 44 || chipSize[1] < 44) fail(`Print: version chips are ${chipSize.join('x')}`);
+  void pickPaper;
 
   // The mixed worksheet (classic engine) with worked solutions, in black and white.
   await page.evaluate(() => { document.querySelector('.tv-extras').open = true; document.querySelector('[data-act="classic-opt"][data-v="worked"]').click(); });
