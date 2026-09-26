@@ -36,6 +36,7 @@ import { stack, regroupWorking } from '../../js/modules/sheet/cells/stack.js';
 import * as LR from '../../js/modules/sheet/lesson-rules.js';
 import * as LIB from '../../js/modules/lessons/library.js';
 import * as SCHEMA from '../../js/modules/lessons/schema.js';
+import * as BL from '../../js/modules/build-list.js';
 import { SLOT, SIZES as KIT_SIZES, slotRadiusMm, stripSegStyle, stripPos, atLeastSize } from '../../js/modules/sheet/tokens.js';
 
 let pass = 0;
@@ -1148,6 +1149,12 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     eq(LIB.prerequisiteSkillsFor('subtraction', 'sub_100_regroup').map((p) => p.skillId).join(','), 'subtract,sub_100_no_regroup', 'library: a skill with a lesson lists its lesson prerequisites');
     ok(LIB.prerequisiteSkillsFor('multiplication', 'mult_facts').length > 0 && LIB.prerequisiteSkillsFor('multiplication', 'mult_facts').every((p) => p.categoryId && p.skillId && p.why), 'library: a skill with no lesson takes the seed fallback, each with its reason');
     ok(LIB.lessonData('Y4.B1.S14').cases.includes('toHundred') && !('archetype' in LIB.lessonData('Y4.B1.S14')), 'library: lessonData is the routine plus the lesson (no archetype field for the engine)');
+    // Lesson NEEDS reach the build list (plan §2): a match blocks the entry, a new need is an entry.
+    const blOpt = BL.buildList(null, []).find((e) => e.kind === 'option');
+    const blMerged = BL.buildList(null, [{ lesson: 'Y2.B2.S18', kind: 'option', skill: blOpt.skill, option: blOpt.option, name: 'x' },
+        { lesson: 'Y3.B2.S1', kind: 'skill', skill: 'addition:zz_unit', name: 'n' }, { lesson: 'Y1.B2.S9', kind: 'lesson', prereq: 'Y1.B1.S2', name: 'p' }]);
+    ok(blMerged.find((e) => e.id === blOpt.id).lessonsBlocked.includes('Y2.B2.S18') && blMerged.some((e) => e.source === 'lesson' && e.skill === 'addition:zz_unit')
+        && !blMerged.some((e) => e.lessonsBlocked.includes('Y1.B2.S9')), 'build list: a lesson need blocks its entry or adds one; a missing lesson stays off the skill list');
     // LR-10: the packet prints at its one size, whatever was asked.
     eq(LR.packetViolations({ lesson: { cases: [] }, placed: [], sizePrinted: 'M', packetSize: 'L' }).map((v) => v.rule).join(','), 'LR-10', 'LR-10: a packet printed off its one size fails');
     eq(LR.packetViolations({ lesson: { cases: [] }, placed: [], sizePrinted: 'L', packetSize: 'L' }).length, 0, 'LR-10: a packet at its size passes');

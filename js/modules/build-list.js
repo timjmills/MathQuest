@@ -29,6 +29,7 @@
 
 import { WRM_PROPOSALS, WRM_STEPS } from './wrm.js';
 import { WRM_SPECS } from './build-specs.js';
+import { allNeeds } from './lessons/library.js';
 
 /* ================================================================ new templates */
 // Kit templates the build list needs that do not exist yet. The owner lane builds it (first, in
@@ -1024,7 +1025,7 @@ function gradeOfSteps(steps) {
  * templates, newTemplates, answer, ladder, misconceptions, extension, after }]. WRM proposals
  * carry their WRM_EXTENSIONS scope and derive grade and codes from their small steps.
  */
-export function buildList(visualIndex = null) {
+export function buildList(visualIndex = null, lessonNeeds = allNeeds()) {
     const out = [];
     for (const [id, p] of Object.entries(WRM_PROPOSALS)) {
         const spec = WRM_SPECS[id] || null;
@@ -1077,6 +1078,30 @@ export function buildList(visualIndex = null) {
             teaches: b.build, representation: b.build, extension: '', after: [...b.after],
             problemTypes: [], templates: [...b.templates], newTemplates: [...b.newTemplates], answer: '', ladder: '', misconceptions: [],
             specMissing: false, files: [...b.files], low: !!b.low, visuals: [...r.visuals], visualSteps: [...r.steps],
+        });
+    }
+    // THE LESSON LIBRARY'S NEEDS (design/LESSON_LIBRARY_PLAN.md §2-3): a lesson lane never edits a
+    // generator, provider or option - it records what its lesson waits for. A need that matches an
+    // entry here adds its lesson to that entry's `lessonsBlocked` (a skill lane picks entries by the
+    // lessons they block); any other becomes an entry of its own, `source: 'lesson'`. A missing
+    // PREREQUISITE LESSON (kind 'lesson') is lesson-lane work: the coverage record lists it.
+    for (const e of out) e.lessonsBlocked = [];
+    let n = 0;
+    for (const need of lessonNeeds || []) {
+        if (!need || need.kind === 'lesson') continue;
+        const kind = need.kind === 'skill' ? 'new' : need.kind === 'option' ? 'option' : 'repair';
+        const onSkill = (e) => e.source !== 'visual' && (e.skill === need.skill || (e.also || []).includes(need.skill));
+        const hit = out.find((e) => onSkill(e) && e.kind === kind && (kind !== 'option' || !need.option || String(e.option).includes(need.option)));
+        if (hit) {
+            if (!hit.lessonsBlocked.includes(need.lesson)) hit.lessonsBlocked.push(need.lesson);
+            continue;
+        }
+        out.push({
+            id: `lsn_${String(need.lesson).replace(/[^A-Za-z0-9]+/g, '_')}_${++n}`, source: 'lesson', kind, skill: need.skill || '', also: [], option: need.option || '',
+            name: need.name, grade: '', family: need.family || '', lane: laneFor(need.skill || ''), standards: [], ee: [], wrmSteps: [], wrmImproves: [],
+            teaches: need.why || need.name, representation: '', extension: '', after: [],
+            problemTypes: [], templates: [], newTemplates: [], answer: '', ladder: '', misconceptions: [], specMissing: true,
+            visuals: [], visualSteps: [], lessonsBlocked: [need.lesson],
         });
     }
     return out;

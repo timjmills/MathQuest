@@ -760,7 +760,8 @@ function writeBuildList(A, skillLabel) {
             const what = e.kind === 'new' ? `new skill \`${e.skill}\`` : `${e.kind} on \`${e.skill}\`${e.also.length ? ` (and ${e.also.map((k) => `\`${k}\``).join(', ')})` : ''}: ${e.option}`;
             L(`### ${i + 1}. ${e.name} — \`${e.id}\``);
             L();
-            L(`- **What:** ${what}. Grade ${e.grade || '-'} · family ${e.family} · source ${e.source === 'wrm' ? 'White Rose audit' : 'standards audit'}.`);
+            L(`- **What:** ${what}. Grade ${e.grade || '-'} · family ${e.family} · source ${e.source === 'wrm' ? 'White Rose audit' : e.source === 'lesson' ? 'lesson library need' : 'standards audit'}.`);
+            if ((e.lessonsBlocked || []).length) L(`- **Blocks ${e.lessonsBlocked.length} lesson${e.lessonsBlocked.length === 1 ? '' : 's'}:** ${e.lessonsBlocked.join(', ')} (\`js/modules/lessons/families/*.js\` NEEDS).`);
             L(`- **Closes (standards):** ${cl.length ? cl.join(', ') : 'none not already full'}${e.standards.length ? ` · tag with CCSS ${e.standards.filter((c) => !c.startsWith('M.EE')).join(', ') || '-'}, EE ${e.ee.join(', ') || '-'}` : ''}`);
             L(`- **Closes (White Rose steps):** ${e.wrmSteps.length ? e.wrmSteps.join(', ') : 'none'}${e.wrmImproves.length ? ` · strengthens ${e.wrmImproves.join(', ')}` : ''}`);
             L(`- **Teaches:** ${e.teaches}.`);
