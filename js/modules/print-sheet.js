@@ -25,13 +25,13 @@
 import { generateQuestionFor } from './generate-question.js';
 import { factSetTitle, optionsFor, normalizeOptions } from './skill-options.js';
 import { opsRoutedSkill } from './gen-operations.js';
-import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill } from './data.js';
+import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
-import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap } from './sheet/layout.js';
+import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine } from './sheet/roles/lesson.js';
@@ -86,10 +86,15 @@ function normaliseRequest(req = {}) {
             instructionKey: s && s.instructionKey,
             // Cells sized to their content (layout.js dense packing); `dense: false` keeps the
             // plain 12.1 grid.
-            dense: req.dense !== false && !(s && s.dense === false),
+            // (An object {S, M, L} is the section's own dense ceiling: a lesson practice page asks
+            // for whole rows of three within 12.1's 16, lessons r1.)
+            dense: s && s.dense && typeof s.dense === 'object' ? Object.assign({}, s.dense) : req.dense !== false && !(s && s.dense === false),
             // A grid height the caller caps (the lesson's practice page); the page's body otherwise.
             gridH: s && Number(s.gridH) > 0 ? Number(s.gridH) : undefined,
             capH: !!(s && Number(s.gridH) > 0),
+            // A lesson practice page (lessons r1): the rows share the whole grid (no FILL_CAP row
+            // gaps) - the caller has chosen a count whose cells stay under H13's band.
+            noCap: !!(s && s.noCap),
         }))
         .filter((s) => s.skills.length);
     return {
@@ -117,6 +122,12 @@ function normaliseRequest(req = {}) {
         lookAsked: req.look === 'daily' || req.look === 'ican' ? req.look : 'auto',
         // A practice page's step reminder (the lesson's anchor chart in one strip): {html, hMm}.
         stepStrip: req.stepStrip && req.stepStrip.html && Number(req.stepStrip.hMm) > 0 ? { html: String(req.stepStrip.html), hMm: Number(req.stepStrip.hMm) } : null,
+        // The strand tab's last line, when a packet names its part ("Practice 1", lessons r1).
+        tabId: typeof req.tabId === 'string' && req.tabId.trim() ? req.tabId.trim().slice(0, 16) : '',
+        // Mixed practice's unit lattice, when a packet fixes it (lessons r1).
+        latticeN: [4, 6, 8, 10].includes(Number(req.latticeN)) ? Number(req.latticeN) : 0,
+        // A lesson's Mixed page (lessons r3): its first skill holds at least half the placed items.
+        leadHalf: !!req.leadHalf,
     };
 }
 
@@ -151,6 +162,56 @@ function dealSkills(skills, count) {
  * reprints the same page); a duplicate retries under `baseSeed + i + 7919 * k`. `itemIndex`
  * counts only the items of that skill that were KEPT (generateQuestionFor's contract).
  */
+/** The numeric operands of a generated item (its cell payload's, else its own a / b). */
+function refOperands(q) {
+    const p = (q && q.cell && q.cell.payload) || {};
+    const raw = Array.isArray(p.operands) ? p.operands : p.a !== undefined ? [p.a, p.b] : [q.a, q.b];
+    return raw.filter((v) => v !== undefined && v !== null && v !== '').map((v) => Number(String(v).replace(/,/g, ''))).filter(Number.isFinite);
+}
+
+/**
+ * A lesson skill ref's floors (lessons r2-r3), each a promise the packet makes:
+ *   minOperand     every operand at least this (no + 0 in "add 1-3"; 2-place partner addition)
+ *   minTop         the first operand at least this (no 11 - 6 in 2-place regrouping)
+ *   maxTop         the first operand at most this (no 100 - 47 in a 2-place lesson)
+ *   maxBottom      the second operand at most this (a one-place take-away example)
+ *   zeroOnes       the first operand ends in 0 (a 0 in the ones)
+ *   distinctFirst  no two items share a first operand (36 - 29, 36 - 18)
+ *   distinctAnswer no two items share an answer (21 - 4, 22 - 5)
+ *   noTurnaround   no two items are the same numbers turned round (1 + 9, 9 + 1)
+ *   maxSmall       at most this many items with a one-place second operand
+ *   avoidTexts     never an item another page of the packet printed
+ */
+function refAccepts(sk, cand, key, seen, kept) {
+    const ops = refOperands(cand);
+    if (sk.minOperand !== undefined && ops.some((v) => v < Number(sk.minOperand))) return false;
+    if (sk.minTop !== undefined && !(ops[0] >= Number(sk.minTop))) return false;
+    if (sk.maxTop !== undefined && !(ops[0] <= Number(sk.maxTop))) return false;
+    if (sk.maxBottom !== undefined && !(ops[1] <= Number(sk.maxBottom))) return false;
+    if (sk.zeroOnes && !(ops[0] % 10 === 0)) return false;
+    // `minN`: a rounding item's number at least this (the 90s -> 100 example).
+    if (sk.minN !== undefined && !(Number(cand.cell && cand.cell.payload && cand.cell.payload.n) >= Number(sk.minN))) return false;
+    if (sk.distinctFirst && seen.has(`first:${key}:${ops[0]}`)) return false;
+    if (sk.distinctAnswer && seen.has(`ans:${key}:${refAnswer(cand)}`)) return false;
+    if (sk.noTurnaround && ops.length >= 2 && seen.has(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`)) return false;
+    if (sk.maxSmall !== undefined && ops.length >= 2 && ops[1] < 10 && (kept.get(`small:${key}`) || 0) >= Number(sk.maxSmall)) return false;
+    if (Array.isArray(sk.avoidTexts) && sk.avoidTexts.includes(refText(cand))) return false;
+    return true;
+}
+
+/** Records what `refAccepts` checks the next items against. */
+function refRecord(sk, q, key, seen, kept) {
+    const ops = refOperands(q);
+    if (sk.distinctFirst) seen.add(`first:${key}:${ops[0]}`);
+    if (sk.distinctAnswer) seen.add(`ans:${key}:${refAnswer(q)}`);
+    if (sk.noTurnaround && ops.length >= 2) seen.add(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`);
+    if (sk.maxSmall !== undefined && ops.length >= 2 && ops[1] < 10) kept.set(`small:${key}`, (kept.get(`small:${key}`) || 0) + 1);
+}
+
+const refAnswer = (q) => String(q && q.ans !== undefined ? (typeof q.ans === 'object' ? JSON.stringify(q.ans) : q.ans) : '');
+/** An item's text as a packet compares it ("67 − 9 = ?"), tags and spaces removed. */
+export const refText = (q) => String((q && q.text) || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+
 function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map(), itemCount = null } = {}) {
     const slots = dealSkills(skills, startIndex + count).slice(startIndex);
     // S2: a ticked support LEVEL fades down the page. With the section's count known it is dealt
@@ -164,16 +225,26 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         const key = `${sk.categoryId}:${sk.skillId}`;
         const itemIndex = kept.get(key) || 0;
         let q = null;
-        for (let k = 0; k <= RETRIES; k++) {
+        // A lesson ref's floors can need many tries to meet (a 0 in the ones AND a one-place
+        // bottom number): `tries` raises the budget for that ref only.
+        const tries = Math.max(RETRIES, Math.min(600, Number(sk.tries) || 0));
+        for (let k = 0; k <= tries; k++) {
             const seed = (baseSeed + i + 7919 * k) >>> 0;
             let cand = null;
             try { cand = generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex, itemCount: perSkill ? perSkill.get(key) : undefined }); } catch (e) { cand = null; }
             if (!cand) continue;
+            // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
+            // options - the packet's; the last try takes what it gets.
+            if (k < tries && !refAccepts(sk, cand, key, seen, kept)) continue;
             q = cand;
             if (!seen.has(signature(cand))) break;
         }
         if (!q) return;
+        // A lesson's practice page (lessons r1): `check` on the skill ref puts the Check line
+        // ("Check: add back") under every subtraction stack. Not a skill option - the page's.
+        if (sk.check && q.cell && q.cell.template === 'stack') q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { check: true }) });
         seen.add(signature(q));
+        refRecord(sk, q, key, seen, kept);
         kept.set(key, itemIndex + 1);
         out.push({ q, skill: sk });
     });
@@ -308,7 +379,7 @@ function quickDraw(place, n) {
  *
  * @returns {string|null} the filled html, or null when no slot could be filled with certainty
  */
-export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
+export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {}) {
     // `ink: 'trace'` writes the value in the single grey (a Model or first Guided cell, INK-3);
     // the default is the pupil's solid ink of a key or of shown work (Error analysis).
     const INK_STYLE = ink === 'trace' ? 'font-weight:700;color:#949494;' : SOLID_STYLE;
@@ -434,7 +505,26 @@ export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
     const lineRe = /(Answer:\s*<\/span>\s*<span style="[^"]*border-bottom:[^"]*">)(?:&nbsp;|\s)*(<\/span>)/g;
     const lines = html.match(lineRe) || [];
     if (lines.length === 1 && display) {
-        return html.replace(lineRe, (m, open, close) => `${open}<b data-ws-ink="${inkAttr}" style="${INK_STYLE}">${escText(display)}</b>${close}`);
+        const fl = /^(\d+)\s*\/\s*(\d+)$/.exec(display.trim());
+        const v = fl ? `<span class="mq-frac" style="font-size:1em;"><span>${fl[1]}</span><span>${fl[2]}</span></span>` : escText(display);
+        return html.replace(lineRe, (m, open, close) => `${open}<b data-ws-ink="${inkAttr}" style="${INK_STYLE}">${v}</b>${close}`);
+    }
+
+    // 3b. ONE empty inline write place with no "Answer:" label - a ruled underline ("Perimeter =
+    // ____ units", a question's own answer rule, a bar-graph answer rule) or the empty box between
+    // two fractions: the value is written ON it (AK-1), so the key is a facsimile and Error
+    // analysis can show the pupil's work in the pupil's own slot (critic round 4: these skills
+    // had no Check it page at all).
+    const openRe = /(<(span|div) style="([^"]*(?:border-bottom:\s*2px solid #000|border:\s*2px solid #000)[^"]*)">)(?:&nbsp;|\s)*(<\/\2>)/g;
+    const opens = html.match(openRe) || [];
+    // Shown work only (`shown`): a key keeps its answer stamp until the cell names its slot, so
+    // the pupil page and the key count the same answer places (AK-4).
+    if (shown && opens.length === 1 && display && !/Answer:/.test(html) && display.length <= 24) {
+        // a fraction is written stacked over its bar, never with a slash (TY-7); the place is at
+        // least 14 mm wide (SL-1)
+        const fm = /^(\d+)\s*\/\s*(\d+)$/.exec(display.trim());
+        const val = fm ? `<span class="mq-frac" style="font-size:1em;"><span>${fm[1]}</span><span>${fm[2]}</span></span>` : escText(display);
+        return html.replace(openRe, (m, open, tag, style, close) => `<${tag} style="${style};text-align:center;min-width:14mm;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}">${val}</b>${close}`);
     }
 
     // 4. The K-2 check-box list: the box beside the answer's label gets a check mark (AK-2).
@@ -637,7 +727,13 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
     const supportsBox = { plan: withSupports ? supportPlanFor(g.skill, q, template, size, mix) : null, cur: null, level: 3, mixKey: mix ? mix.key : undefined };
     if (supportsBox.plan) supportsBox.cur = Object.assign({}, supportsBox.plan.extra, { on: supportsBox.plan.worst.slice(), reserve: [] });
     const forceL = !!(supportsBox.plan && supportsBox.plan.forceL);
-    const atL = (c) => (forceL && c.size !== 'L' ? Object.assign({}, c, { size: 'L', metrics: resolveCtx({ size: 'L', look: c.look }).metrics }) : c);
+    // The item's floor size (owner ruling 2026-09-26, LESSON_LIBRARY_PLAN.md 8a): the page's size
+    // wherever the item can be drawn at it, else the size its template declares as its floor
+    // (`minSize`) - the item keeps its floor and the rest of the page keeps the chosen size. S2
+    // touch dots force L the same way.
+    const floor = forceL ? 'L' : (sizeFloor(size, cellMinSize(q)) || size);
+    const up = floor !== size;
+    const atL = (c) => (up && sizeFloor(c.size, floor) !== c.size ? Object.assign({}, c, { size: floor, metrics: resolveCtx({ size: floor, look: c.look }).metrics }) : c);
     // The draw function. `cols` is the section's final column count, handed in by the role:
     // the legacy template picks its size class from it, the fact ladder its digit size.
     const key = cellAnswerKey(q);
@@ -688,13 +784,13 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         // S2: touch dots need 24 pt digits, so a forced section draws its problems at L inside a
         // smaller page (the preset's custom properties re-set on a wrapper; the page stays M / S).
         const html0 = legacy ? legacyClean(renderCell(q, ctx)) : renderCell(qd, ctx);
-        const html = forceL && c.size !== 'L' ? `<div class="ws-L" data-ws-force-size="L">${html0}</div>` : html0;
+        const html = up && sizeFloor(c.size, floor) !== c.size ? `<div class="ws-${floor}" data-ws-force-size="${floor}">${html0}</div>` : html0;
         if (legacy && hasShown) {
             const v = String(shown);
             // A wrong value is written as a pupil would have written it: a place-value mat draws
             // the WRONG model, boxed slots take the wrong value, never the right parts.
             const asQ = v === answer ? q0 : Object.assign({}, q0, { ans: v, target: v, keyParts: undefined, printAnswer: undefined });
-            const filled = legacyKeyFill(html.replace(STAMP_RE, ''), asQ, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid' });
+            const filled = legacyKeyFill(html.replace(STAMP_RE, ''), asQ, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid', shown: true });
             if (filled !== null) return filled;
             return html + shownLine(v, ink);
         }
@@ -711,14 +807,14 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         if (showable === null) {
             try {
                 const blankHtml = legacyClean(renderCell(q, resolveCtx({ mode: 'print', size, look: 'ican', state: 'blank' }))).replace(STAMP_RE, '');
-                showable = legacyKeyFill(blankHtml, null, { value: answer, display: answer }) !== null;
+                showable = legacyKeyFill(blankHtml, null, { value: answer, display: answer }, { shown: true }) !== null;
             } catch (e) { showable = false; }
         }
         return showable;
     };
     let fp;
     const qFoot = supportsBox.cur ? Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { supports: supportsBox.cur }) }) }) : q;
-    try { fp = cellFootprint(qFoot, resolveCtx({ mode: 'print', size: forceL ? 'L' : size, look: 'ican' })); } catch (e) { fp = { wMm: 93, hMm: null, measure: true, maxCols: 2 }; }
+    try { fp = cellFootprint(qFoot, resolveCtx({ mode: 'print', size: floor, look: 'ican' })); } catch (e) { fp = { wMm: 93, hMm: null, measure: true, maxCols: 2 }; }
     if (legacy) {
         // SCC-A6: a legacy cell is sized by measurement. Its size class caps the columns only for
         // word problems (PT-WPR-1); everything else is decided by what the measurement shows.
@@ -926,13 +1022,56 @@ function measureItems(items, { size, look, colsList }) {
                             // scale-down of up to 10% is read as the same picture.
                             const tol = it.legacy ? 0.9 : 0.98;
                             const b = baseW.get(it) || [];
-                            if (pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) { fits = false; why(it, c, 'shrunk picture'); }
+                            // (A lesson chart's other example draws its number line to the
+                            // column on purpose, `scalesWithCols`: not a shrunk picture.)
+                            if (!it.scalesWithCols && pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) { fits = false; why(it, c, 'shrunk picture'); }
                         }
                     }
-                    best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits };
+                    // A role that places part of the cell in one of several ways (error analysis,
+                    // AX-4: the Correct / Fix-it block in ONE place on every cell of a page) names
+                    // them in `judgeModes`; each is drawn and measured here, and the role picks the
+                    // one the whole page can use. null: that way does not fit (or does not apply).
+                    const vary = {};
+                    const inkW = best.inkW || {};
+                    if (fits && Array.isArray(it.judgeModes)) {
+                        const grow = (Math.max(hPx, r.height) - r.height) / PX_PER_MM;
+                        for (const mode of it.judgeModes) {
+                            let mb = '';
+                            try { mb = it.render(ctx, { cols: c, judge: mode }); } catch (e) { mb = ''; }
+                            if (!mb || !String(mb).includes(`data-judge-mode="${mode}"`)) { vary[mode] = null; continue; }
+                            root.innerHTML = `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
+                                + `<span class="ws-letter">m.</span>${mb}</div>`;
+                            const mc = root.firstChild;
+                            const cr = mc.getBoundingClientRect();
+                            let over = false;
+                            // the ink's width: the leftmost to the rightmost drawn thing (a text run, a
+                            // box, a picture), so the role can tell a one-line item in a full-width
+                            // cell (half of it empty) from one that fills it (critic EA r5, H13 W)
+                            let lo = Infinity, hi = -Infinity;
+                            for (const el of mc.querySelectorAll('*')) {
+                                const er = el.getBoundingClientRect();
+                                if ((!er.width && !er.height) || getComputedStyle(el).position === 'absolute') continue;
+                                if (er.right > cr.right - padR + 1 || er.left < cr.left + padL - 1) { over = true; break; }
+                                const leaf = !el.children.length || el.tagName.toLowerCase() === 'svg';
+                                if (leaf && !el.closest('.ws-letter') && !(el.parentElement && el.parentElement.closest('svg'))) { lo = Math.min(lo, er.left); hi = Math.max(hi, er.right); }
+                            }
+                            vary[mode] = over ? null : cr.height / PX_PER_MM + grow;
+                            if (!over && hi > lo) inkW[mode] = Math.max(inkW[mode] || 0, (hi - lo) / PX_PER_MM);
+                        }
+                    }
+                    const modes = Object.assign({}, best.modes || {});
+                    for (const mode of Object.keys(vary)) modes[mode] = vary[mode] === null || modes[mode] === null ? null : Math.max(modes[mode] || 0, vary[mode]);
+                    best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits, modes, inkW };
                 }
                 it.measured = it.measured || {};
                 it.measured[c] = { hMm: Math.ceil(best.hMm * 10) / 10, fits: best.fits };
+                if (best.modes && Object.keys(best.modes).length) {
+                    it.measured[c].modes = {};
+                    for (const [mode, h] of Object.entries(best.modes)) it.measured[c].modes[mode] = h === null ? null : Math.ceil(h * 10) / 10;
+                    it.measured[c].inkW = {};
+                    for (const [mode, w] of Object.entries(best.inkW || {})) it.measured[c].inkW[mode] = Math.ceil(w * 10) / 10;
+                    it.measured[c].innerMm = inner;
+                }
             }
         }
         // A MINIMUM COLUMN WIDTH for legacy markup that reflows instead of overflowing (an area
@@ -980,10 +1119,11 @@ async function fontsReady() {
 }
 
 /** The column counts a section's layout may choose, so each gets measured. */
-function candidateCols(columns) {
-    // Dense packing (layout.js) may take an Auto section up to DENSE_MAX_COLS columns, so every
-    // count it may choose is measured (an unmeasured legacy count would be read as fitting).
-    if (columns === 'auto') return [1, 2, 3, 4];
+function candidateCols(columns, size) {
+    // Dense packing (layout.js) may take an Auto section up to DENSE_MAX_COLS_AT[size] columns, so
+    // every count it may choose is measured (an unmeasured count would be read as fitting: facts
+    // at S in 5 columns stuck out of their 36.8 mm cells by 0.5 mm, critic guided-r1 lint).
+    if (columns === 'auto') return Array.from({ length: Math.max(4, DENSE_MAX_COLS_AT[size] || DENSE_MAX_COLS) }, (_, i) => i + 1);
     return Array.from({ length: Math.max(1, columns) }, (_, i) => i + 1);
 }
 
@@ -996,7 +1136,42 @@ async function loadStandards() {
     return standardsMod;
 }
 function primaryCcss(sk) {
-    try { return standardsMod ? standardsMod.primaryStandard(sk.categoryId, sk.skillId, { short: true }) : ''; } catch (e) { return ''; }
+    try {
+        if (!standardsMod) return '';
+        const code = standardsMod.primaryStandard(sk.categoryId, sk.skillId, { short: true });
+        if (code) return code;
+        // A skill tagged to its CLOSEST standard (temperature: CCSS names no thermometer) still
+        // prints that code, marked as the closest - never a footer with no standard at all
+        // (critic EA r5, D).
+        const e = standardsMod.standardsEntry(sk.categoryId, sk.skillId);
+        if (e && e.approx && e.ccss && e.ccss.length) {
+            const short = String(e.ccss[0]).replace(/\.([A-Z])\.(\d+)$/, '.$2');
+            return `≈ ${short}`;
+        }
+    } catch (e) { return ''; }
+    return '';
+}
+
+/**
+ * The levels a skill printed as "M" (every level) really spans: the grades of its CCSS codes, or
+ * of the skills its review pool deals. A page is never tabbed "All levels" / "Grade mixed" when its
+ * content has a level (critic EA r5, D: number_chart_fill, mixed_placevalue).
+ */
+function spanGrades(sk) {
+    const G = ['K', '1', '2', '3', '4', '5', '6'];
+    const gradeOfCode = (c) => { const m = /^(K|\d)\./i.exec(String(c)); return m ? m[1].toUpperCase() : ''; };
+    const out = new Set();
+    try {
+        const e = standardsMod && standardsMod.standardsEntry(sk.categoryId, sk.skillId);
+        (e && e.ccss ? e.ccss : []).map(gradeOfCode).filter((g) => G.includes(g)).forEach((g) => out.add(g));
+        if (!out.size && isMixedMetaSkill(sk.skillId)) {
+            for (const id of getMixedPoolSkills(sk.categoryId, sk.skillId) || []) {
+                const g = String(getSkillGrade(id, sk.categoryId) || '').toUpperCase();
+                if (G.includes(g)) out.add(g);
+            }
+        }
+    } catch (e) { /* keep none */ }
+    return [...out].sort((a, b) => G.indexOf(a) - G.indexOf(b));
 }
 
 /**
@@ -1038,6 +1213,10 @@ function skillMeta(sk, q) {
     let grade = null;
     try { grade = getSkillGrade(sk.skillId, sk.categoryId); } catch (e) { grade = null; }
     const meta = { categoryId: sk.categoryId, skillId: sk.skillId, label, grade: grade === null || grade === undefined ? '' : String(grade), ccss: sk.ccss || primaryCcss(sk) };
+    if (!/^(K|[1-6])$/i.test(meta.grade)) {
+        const span = spanGrades(sk);
+        if (span.length) { meta.grades = span; meta.grade = span[0]; }
+    }
     const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, { skillId: nameId }));
     meta.iCan = sk.iCan || optionTitle(sk, words.iCan) || words.iCan;
     meta.instructionKey = q ? instructionKeyFor(q, words) : words.instructionKey;
@@ -1061,7 +1240,7 @@ function oneColumnOnly(it, n) {
  * clocks a page in one column because two of its nine skills are full width).
  */
 function layoutOf(role, section, items, n, ctx) {
-    const base = { role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols };
+    const base = { role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap };
     const opts = { size: n.size, look: n.look, header: ctx.header };
     const whole = resolveSectionLayout(base, items, ctx.paper, LIVE_W_MM, opts);
     if (!(role === 'independent' || role === 'more-practice') || (n.anchors && n.anchors !== 'off') || section.gridH || items.length < 2) return whole;
@@ -1313,7 +1492,7 @@ export async function buildSheet(req = {}) {
 
     const notes = [];
     let hostItems = [];
-    const measure = (items, sec) => measureItems(items, { size: n.size, look: n.look, colsList: candidateCols(sec.columns) });
+    const measure = (items, sec) => measureItems(items, { size: n.size, look: n.look, colsList: candidateCols(sec.columns, n.size) });
     const PROBE = 16;
 
     /**
@@ -1401,7 +1580,7 @@ export async function buildSheet(req = {}) {
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
-                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols },
+                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
                     withTwins(si, probesOf(si)), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
                 out[si] = capFromL(sec, si, L, withTwins(si, probesOf(si)));
             });
@@ -1541,17 +1720,19 @@ export async function buildSheet(req = {}) {
     // S2: deal the supports over the finished sheet (page order), before it is drawn.
     allocateHostSupports(hostItems, n);
 
+    settleMixedGrades(skills, hostItems);
     const input = {
         items: hostItems,
         skills,
         anchors: anchorsIn,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols, capH: s.capH })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
         seed: n.seed,
         labels: n.labels,
         lesson: n.lesson,
+        tabId: n.tabId || '',
         stepStrip: n.stepStrip ? n.stepStrip.html : '',
     };
     const plan = n.role === 'more-practice' ? morePracticePlan(input) : independentPlan(input);
@@ -1597,24 +1778,69 @@ export async function buildSheet(req = {}) {
  * pre-skill list is not modelled (P-AT-1). Tombstones and the mixed pools are skipped.
  */
 const GRADE_RANK = (g) => { const i = ['K', '1', '2', '3', '4', '5', '6'].indexOf(String(g === undefined || g === null ? '' : g).toUpperCase()); return i < 0 ? null : i; };
-function earlierSkills(sk, count = 1) {
-    const list = Array.isArray(SKILLS[sk.categoryId]) ? SKILLS[sk.categoryId] : [];
-    const at = list.findIndex((s) => s.v === sk.skillId);
+/**
+ * A mixed pool's page is at the level of what it deals (critic guided-r1: "All levels" in the tab
+ * and "Grade mixed" in the footer over a page of o'clock times, Grade 1). A skill whose own grade
+ * is mixed or unknown takes the highest grade among the page's items drawn from it.
+ */
+function settleMixedGrades(metas, items) {
+    const LEVELS = ['K', '1', '2', '3', '4', '5', '6'];
+    const named = new Set(metas.map((m) => `${m.categoryId}:${m.skillId}`));
+    for (const m of metas) {
+        if (GRADE_RANK(m.grade) !== null) continue;
+        const ranks = (items || []).map((it) => it && it.q).filter((q) => q && q.categoryId === m.categoryId
+            && (q.skillId === m.skillId || !named.has(`${q.categoryId}:${q.skillId}`)))
+            .map((q) => { try { return GRADE_RANK(getSkillGrade(q.skillId, q.categoryId)); } catch (e) { return null; } })
+            .filter((r) => r !== null);
+        if (ranks.length) m.grade = LEVELS[Math.max(...ranks)];
+    }
+}
+
+function earlierSkills(sk, count = 1, { fallback = false } = {}) {
     // An earlier step is never a HARDER one: a category lists its skills in groups (facts, then
     // columns, then word problems), so the skill just above a Level K word problem can be a
     // 5-digit sum. Only skills at the same level or below count.
     let own = null;
     try { own = GRADE_RANK(getSkillGrade(sk.skillId, sk.categoryId)); } catch (e) { own = null; }
     const out = [];
-    for (let i = at - 1; i >= 0 && out.length < count; i--) {
-        const s = list[i];
-        if (!s || s.retired || s.tombstone || s.hidden || /^mixed_/.test(s.v)) continue;
-        try { if (isMixedMetaSkill(s.v)) continue; } catch (e) { /* keep */ }
+    const ok = (s, cat) => {
+        if (!s || s.v === sk.skillId || s.retired || s.tombstone || s.hidden || /^mixed_/.test(s.v)) return false;
+        try { if (isMixedMetaSkill(s.v)) return false; } catch (e) { /* keep */ }
         let g = null;
-        try { g = GRADE_RANK(getSkillGrade(s.v, sk.categoryId)); } catch (e) { g = null; }
-        if (own !== null && (g === null || g > own)) continue;
-        out.push({ categoryId: sk.categoryId, skillId: s.v });
-    }
+        try { g = GRADE_RANK(getSkillGrade(s.v, cat)); } catch (e) { g = null; }
+        return !(own !== null && (g === null || g > own));
+    };
+    const take = (cat, idxs) => {
+        const list = Array.isArray(SKILLS[cat]) ? SKILLS[cat] : [];
+        for (const i of idxs) {
+            if (out.length >= count) return;
+            const s = list[i];
+            if (ok(s, cat) && !out.some((o) => o.categoryId === cat && o.skillId === s.v)) out.push({ categoryId: cat, skillId: s.v });
+        }
+    };
+    const range = (a, b, step) => { const r = []; for (let i = a; step > 0 ? i < b : i > b; i += step) r.push(i); return r; };
+    const list = Array.isArray(SKILLS[sk.categoryId]) ? SKILLS[sk.categoryId] : [];
+    const at = list.findIndex((s) => s.v === sk.skillId);
+    // 1. The skills listed before it in its category, nearest first.
+    take(sk.categoryId, range(at - 1, -1, -1));
+    // Critic guided-r1: a skill with no earlier step (the first of its category: compare_groups,
+    // count_objects, mult_facts, perimeter_intro, bar_graph) printed a Review with no Mixed Review
+    // at all. The fallback, in order: 2. the categories before it in its domain, their last
+    // (hardest allowed) skills first; 3. the skills after it in its own category at its level or
+    // below; 4. the categories after it in its domain.
+    if (!fallback || out.length >= count) return out;
+    const cats = (() => {
+        for (const d of Object.values(DOMAINS || {})) {
+            const ids = (d.categories || []).map((c) => c.id).filter((id) => !/mixed/.test(id));
+            if (ids.includes(sk.categoryId)) return ids;
+        }
+        return [sk.categoryId];
+    })();
+    const ci = cats.indexOf(sk.categoryId);
+    const lenOf = (cat) => (Array.isArray(SKILLS[cat]) ? SKILLS[cat].length : 0);
+    for (let c = ci - 1; c >= 0 && out.length < count; c--) take(cats[c], range(lenOf(cats[c]) - 1, -1, -1));
+    if (out.length < count) take(sk.categoryId, range(at + 1, list.length, 1));
+    for (let c = ci + 1; c < cats.length && out.length < count; c++) take(cats[c], range(0, lenOf(cats[c]), 1));
     return out;
 }
 
@@ -1657,6 +1883,12 @@ async function buildRoleSheet(n, metaOf) {
         targetSkill: metaOf(reqSkills[0]),
         floors: {},
         lesson: n.lessonInput,
+        // A lesson packet's step strip (Mixed page) and page fill (lessons r1).
+        stepStrip: n.stepStrip ? n.stepStrip.html : '',
+        stepStripMm: n.stepStrip ? n.stepStrip.hMm : 0,
+        fill: !!n.stepStrip,
+        latticeN: n.latticeN || 0,
+        leadHalf: !!n.leadHalf,
     };
 
     /**
@@ -1756,6 +1988,7 @@ async function buildRoleSheet(n, metaOf) {
         items = items.concat(its);
     });
     input.items = items;
+    settleMixedGrades(allSkills, items);
     // S2: deal the supports over the page's items (a pool of Mixed practice is its own section).
     allocateHostSupports(items, n);
     if (anchorsIn) {
@@ -1829,8 +2062,25 @@ async function buildRoleSheet(n, metaOf) {
  * tags (skill, grade, CCSS, EE from standards.js) in its teacher footer. The pupil pages print
  * first, part by part, then the keys in the same order (PT-KEY-6).
  */
+/** The note a lesson asked for at S carries (the print panel shows it as a warning). */
+export const LESSON_SIZE_NOTE = 'A lesson prints at Medium or Large: Small is printed at Medium, because its regroup boxes, place-value letters and step words are too small to write in at Small.';
+
 async function buildLesson(n, metaOf) {
-    const sk = n.sections[0].skills[0];
+    const sk0 = n.sections[0].skills[0];
+    const data0 = lessonFor(sk0.categoryId, sk0.skillId);
+    // The lesson's floor on its own operands (lessons r2: "add 1-3" never deals + 0), on every part.
+    const flags = {};
+    if (data0 && data0.minOperand !== undefined && sk0.minOperand === undefined) flags.minOperand = data0.minOperand;
+    if (data0 && data0.distinctFirst) flags.distinctFirst = true;
+    if (data0 && data0.minTop !== undefined) flags.minTop = data0.minTop;
+    if (data0 && data0.maxTop !== undefined) flags.maxTop = data0.maxTop;
+    // Lessons r3: no two answers alike and at most N one-place take-aways a page, where the
+    // lesson asks; never the same numbers turned round on one page (1 + 9, 9 + 1).
+    if (data0 && data0.distinctAnswer) flags.distinctAnswer = true;
+    if (data0 && data0.maxSmall !== undefined) flags.maxSmall = data0.maxSmall;
+    if (data0) flags.noTurnaround = true;
+    const sk = Object.keys(flags).length ? Object.assign({}, sk0, flags) : sk0;
+    if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
     const data = lessonFor(sk.categoryId, sk.skillId);
     const warmSkills = data ? data.skills.map(skillRef) : earlierSkills(sk, 2);
@@ -1843,81 +2093,93 @@ async function buildLesson(n, metaOf) {
     const header = Object.assign({}, n.header, { footerLeft: tagLine });
     const lessonNo = Math.max(1, Number(n.lesson) || 1);
 
-    // 1. The teaching sheet: the anchor chart, Vocabulary, Warm-up, Guided and Independent rows.
-    const teach = await buildRoleSheet(Object.assign({}, n, {
-        role: 'lesson', header, look: 'ican',
-        lessonInput: { data, warmSkills, tagLine, number: lessonNo },
-    }), metaOf);
-    const parts = [{ part: 'teach', role: 'lesson', res: teach }];
+    // Lessons r1: a lesson packet never prints below M (the regroup scaffold, the place-value
+    // letters and the step words are unreadable at S), and its ANCHOR CHART is a wall chart: L type
+    // at every size. S is printed as M and says so in the notes.
+    const size = n.size === 'S' ? 'M' : n.size;
+    // (Shown in the print panel beside the Size control, not only under "Why?": lessons r2.)
+    const sizeNote = size !== n.size ? [LESSON_SIZE_NOTE] : [];
+    const nz = Object.assign({}, n, { size });
+    const lessonInput = { data, warmSkills, tagLine, number: lessonNo };
 
-    // 2. Massed practice: Independent pages with the chart's step strip.
+    // 1. The anchor chart (always L) and the teaching sheet: Vocabulary, Warm-up, Guided, Independent.
+    const chart = await buildRoleSheet(Object.assign({}, nz, {
+        size: 'L', role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'chart' }),
+    }), metaOf);
+    const teach = await buildRoleSheet(Object.assign({}, nz, {
+        role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'sheet' }),
+    }), metaOf);
+    const parts = [{ part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
+
+    // 2. Massed practice: Independent pages with the chart's step strip, the grid filling the page
+    // body in ONE frame (CL-1; lessons r1: no blank band above the footer, no gutters).
     const common = {
-        size: n.size, look: 'ican', paper: n.paper, key: n.key, labels: n.labels, lesson: lessonNo,
+        size, look: 'ican', paper: n.paper, key: n.key, labels: n.labels, lesson: lessonNo,
         photocopySafe: n.photocopySafe, header,
     };
+    const strip = (teach.extras || []).find((x) => x.lessonStrip);
+    const stripH = strip && strip.measured && strip.measured[1] ? strip.measured[1].hMm + 0.5 : 0;
+    const stripHtml = strip && stripH ? strip.render(resolveCtx({ size, look: 'ican', mode: 'print' })) : '';
+    // A rounding item ("27 -> ___") is a one-number answer on one line, like a fact.
+    const oneLine = (it) => it.template === 'fact' || (it.template === 'pv' && it.kind === 'round');
+    const facts = (teach.items || []).filter((it) => it.pool === 'main').every(oneLine);
+    // The skill ref of the practice pages: a subtraction lesson gives step 5 ("Check: add back")
+    // its room, a Check line under every problem.
+    const practiceSk = data && data.checkRow ? Object.assign({}, sk, { check: true }) : sk;
+    // One-line answers: the engine fills the page (PAGE FILL, DN-1) - one frame, no row gaps,
+    // because the count is the page's own. Taller problems: 12.1's six a page, 2 x 3, each cell
+    // with its working space and Check line.
+    // Lessons r2-r3: a rounding cell ("27 -> ___") is short and narrow: M prints three across like
+    // L, and the lesson's own 15 at every size (never 12.1's 16 ceiling passed).
+    const rounding = (teach.items || []).some((it) => it.pool === 'main' && it.template === 'pv');
+    const section = facts ? { skills: [practiceSk], pages: 0, noCap: true, dense: rounding ? { S: 15, M: 15, L: 15 } : { S: 16, M: 16, L: 15 } } : { skills: [practiceSk], count: 0, columns: 2, noCap: true };
+    // Taller problems: 12.1's six a page (2 x 3) at every size - an Independent page holds 6 at
+    // most, so M is the same six cells in smaller type (lessons r2: by design, not a missed gain).
+    const stackShapes = [[6, 2]];
+    // Lessons r3: fifteen rounding cells fill an M page with cells three times their content (a
+    // 33 % empty band); the same fifteen print at L type, which fills them - the page holds the
+    // same count either way, so the pupil gets the bigger digits.
+    const practiceSize = rounding ? 'L' : size;
+    const practiceReq = (pages, withStrip, shape = stackShapes[stackShapes.length - 1]) => Object.assign({}, common, {
+        size: practiceSize,
+        role: 'independent', tabId: `Practice ${lessonNo}`,
+        sections: [facts ? Object.assign({}, section, { pages }) : Object.assign({}, section, { count: shape[0] * pages, columns: shape[1] })],
+        seed: (n.seed + 7919) >>> 0,
+        // (At L type the strip's words are a point bigger: 2 mm more for it.)
+        stepStrip: withStrip && stripHtml ? (practiceSize === size ? { html: stripHtml, hMm: stripH }
+            : { html: strip.render(resolveCtx({ size: practiceSize, look: 'ican', mode: 'print' })), hMm: stripH + 2 }) : undefined,
+    });
+    const practiceTried = [];
+    const practiceTexts = [];
     if (n.practicePages > 0) {
-        const strip = (teach.extras || []).find((x) => x.lessonStrip);
-        const h = strip && strip.measured && strip.measured[1] ? strip.measured[1].hMm + 0.5 : 0;
-        const stripHtml = strip && h ? strip.render(resolveCtx({ size: n.size, look: 'ican', mode: 'print' })) : '';
-        // A rounding item ("27 -> ___") is a one-number answer on one line, like a fact.
-        const oneLine = (it) => it.template === 'fact' || (it.template === 'pv' && it.kind === 'round');
-        const facts = (teach.items || []).filter((it) => it.pool === 'main').every(oneLine);
-        // One-line items take the dense grid at the most a page holds within the 12.1 ceiling, in
-        // whole rows of three (15 at S, then 12). Taller problems (column subtraction) print six a
-        // page, three across, grown to at most 1.3 x their own height (the lesson rows' cap): a
-        // taller row is an empty band in every cell (H13), so the grid stops short instead.
-        const tries = (facts ? (n.size === 'S' ? [15, 12] : [12]) : []).map((k) => ({ per: k, dense: true })).concat([{ per: 6, dense: false, columns: 3 }]);
-        const make = async (t) => {
-            let req = Object.assign({}, common, {
-                role: 'independent', sections: [{ skills: [sk], count: t.per * n.practicePages, dense: t.dense, columns: t.columns }], seed: (n.seed + 7919) >>> 0,
-            });
-            let res = await buildSheet(req);
-            const f0 = res && res.fits && res.fits.sections && res.fits.sections[0];
-            if (!t.dense && f0 && f0.hMin > 0 && f0.rows > 0 && f0.cellH > f0.hMin * 1.3) {
-                const gridH = Math.floor(f0.rows * f0.hMin * 1.3 * 1000) / 1000;
-                req = Object.assign({}, req, { sections: [Object.assign({}, req.sections[0], { gridH, columns: f0.cols })] });
-                res = await buildSheet(req);
-            }
-            return { req, res };
-        };
-        // The strip goes on only where it fits without crowding the page (owner, 2026-09-25): the
-        // page with the strip keeps the columns, the page count and the items a page of it holds.
-        // A strip that would turn three columns into two wide, half-empty ones is left off.
-        const withStrip = async (t, base) => {
-            const cols = (base.res.fits && base.res.fits.cols) || 'auto';
-            const cap = Math.min((base.res.fits && base.res.fits.perPage) || 0, t.per);
-            let out = null;
-            try {
-                out = await buildSheet(Object.assign({}, base.req, {
-                    sections: [Object.assign({}, base.req.sections[0], { columns: cols })], stepStrip: { html: stripHtml, hMm: h },
-                }));
-            } catch (e) { out = null; }
-            return out && out.fits && out.fits.cols === cols && (out.fits.perPage || 0) >= cap && out.pageCount <= base.res.pageCount ? out : null;
-        };
-        // A page with the step strip beats a fuller page without it (the strip is how the practice
-        // page points back to the anchor chart); a count that spills past the pages asked for
-        // steps down.
         let res = null;
-        let plain = null;
-        for (const t of tries) {
-            const base = await make(t);
-            if (!plain || plain.pageCount > n.practicePages) plain = base.res;
-            if (base.res.pageCount > n.practicePages) continue;
-            const striped = stripHtml ? await withStrip(t, base) : null;
-            if (striped) { res = striped; break; }
-            if (!stripHtml) { res = base.res; break; }
+        for (const shape of facts ? [null] : stackShapes) {
+            const r = await buildSheet(practiceReq(n.practicePages, true, shape || undefined));
+            const f0 = r.fits && r.fits.sections && r.fits.sections[0];
+            const whole = f0 ? f0.clamped !== true : true;
+            practiceTried.push({ shape, pages: r.pageCount, clamped: !whole, hMin: f0 && f0.hMin, cellH: f0 && f0.cellH, stripH: +stripH.toFixed(1) });
+            if (r.pageCount <= n.practicePages && whole) { res = r; break; }
         }
-        if (!res) res = plain;
+        // The strip never pushes a page overleaf: without room for it the page prints without it.
+        if (!res) res = await buildSheet(practiceReq(n.practicePages, false));
         parts.push({ part: 'practice', role: 'independent', res, strip: /data-mq-lesson-strip/.test(res.pupilHtml) });
+        for (const it of res.items || []) practiceTexts.push(refText(it));
     }
 
-    // 3. Mixed practice (optional): the lesson skill with the earlier skills the lesson names.
+    // 3. Mixed practice (optional): the lesson skill with EARLIER skills only (lessons r1), each
+    // skill its own section, the page filled in one frame per section.
     if (n.mixed) {
         const withSkills = data && data.mixWith ? data.mixWith.map(skillRef) : earlierSkills(sk, 2);
         const res = await buildSheet(Object.assign({}, common, {
             // The lesson's own look (I Can) unless the teacher chose Daily for the packet.
-            role: 'mixed-practice', look: n.lookAsked === 'daily' ? 'daily' : 'ican', sections: [{ skills: [sk, ...withSkills] }],
+            // Lessons r2: the lesson's own skill fills at least half the page (its weight is the
+            // partners' together), the earlier skills the rest.
+            role: 'mixed-practice', look: n.lookAsked === 'daily' ? 'daily' : 'ican',
+            // Lessons r3: never a problem the Practice page printed; the lesson skill at least
+            // half the placed items (`leadHalf`, enforced after packing).
+            sections: [{ skills: [Object.assign({}, practiceSk, { weight: Math.max(1, withSkills.length) + 0.5, avoidTexts: practiceTexts }), ...withSkills] }], latticeN: 6, leadHalf: true,
             seed: (n.seed + 15838) >>> 0,
+            stepStrip: stripHtml ? { html: stripHtml, hMm: stripH } : undefined,
         }));
         parts.push({ part: 'mixed', role: 'mixed-practice', res });
     }
@@ -1929,17 +2191,23 @@ async function buildLesson(n, metaOf) {
         let k = 0;
         return String(html || '').replace(/<section class="ws-page/g, (m) => `<section data-ws-sheet="${k++ === 0 ? first : rest}" class="ws-page`);
     };
-    const sheetIds = (p) => (p.part === 'teach' ? ['lesson-chart', 'lesson-sheet'] : [`lesson-${p.part}`, `lesson-${p.part}`]);
+    const sheetIds = (p) => (p.part === 'teach' ? ['lesson-sheet', 'lesson-sheet'] : [`lesson-${p.part}`, `lesson-${p.part}`]);
     const pupilHtml = parts.map((p) => tagSheets(p.res.pupilHtml, ...sheetIds(p))).join('\n');
     const keyHtml = n.key ? parts.map((p) => tagSheets(p.res.keyHtml || '', ...sheetIds(p))).join('\n') : '';
     const pageCount = parts.reduce((a, p) => a + (p.res.pageCount || 0), 0);
     const keyPageCount = n.key ? parts.reduce((a, p) => a + (p.res.keyPageCount || 0), 0) : 0;
-    const notes = [...new Set(parts.flatMap((p) => p.res.notes || []))];
-    const line = parts.map((p) => `${p.part === 'teach' ? 'Lesson' : p.part === 'practice' ? 'Practice' : 'Mixed'}: ${p.res.pageCount} page${p.res.pageCount === 1 ? '' : 's'}`).join(' · ');
+    const notes = [...new Set(sizeNote.concat(parts.flatMap((p) => p.res.notes || [])))];
+    const PART_NAME = { chart: 'Anchor chart', teach: 'Lesson', practice: 'Practice', mixed: 'Mixed' };
+    const line = parts.map((p) => `${PART_NAME[p.part]}: ${p.res.pageCount} page${p.res.pageCount === 1 ? '' : 's'}`).join(' · ');
     return {
         pupilHtml, keyHtml, pageCount, keyPageCount,
         fits: { cols: teach.fits.cols, rows: teach.fits.rows, pages: pageCount, note: [`${line}.`, teach.fits.note].filter(Boolean).join(' '), sections: teach.fits.sections },
         items: parts.flatMap((p) => (p.res.items || []).map((it) => Object.assign({ part: p.part }, it))),
+        // The problems the pupil does (lessons r3: the print panel counted every dealt pool item,
+        // "46 problems" for 13): the teaching sheet's lettered items, then each page's own.
+        problemCount: parts.reduce((a, p) => a + (p.part === 'chart' ? 0
+            : p.part === 'teach' ? Number((p.res.plan && p.res.plan.meta && p.res.plan.meta.items) || 0)
+                : (p.res.items || []).length), 0),
         gaps: parts.flatMap((p) => p.res.gaps || []),
         anchors: teach.anchors,
         floors: teach.floors,
@@ -1955,7 +2223,11 @@ async function buildLesson(n, metaOf) {
                 : { skills: warmSkills.map((s) => `${s.categoryId}:${s.skillId}`), concepts: [], vocab: [] },
             steps: data ? data.steps.map((s) => s.text) : [], chant: data ? data.chant : '', format: data ? data.format : null,
             parts: parts.map((p) => ({ part: p.part, role: p.role, pages: p.res.pageCount, keyPages: p.res.keyPageCount, strip: p.strip })),
-            example: teach.plan && teach.plan.meta ? teach.plan.meta.example : '',
+            example: chart.plan && chart.plan.meta ? chart.plan.meta.example : '',
+            chart: chart.plan && chart.plan.meta ? { zoom: chart.plan.meta.chartZoom, example2: chart.plan.meta.example2, example2Found: chart.plan.meta.example2Found, sizing: chart.plan.meta.chartSizing, example3: chart.plan.meta.example3, example4: chart.plan.meta.example4 } : null,
+            practiceTried,
+            teach: teach.plan && teach.plan.meta ? { bands: teach.plan.meta.bandSizes, guided: teach.plan.meta.guided, independent: teach.plan.meta.independent } : null,
+            size,
         },
     };
 }
@@ -1989,6 +2261,8 @@ export function sheetDocument(html, title = 'Worksheet', opts = {}) {
 <head>
 <meta charset="utf-8">
 <title>${escText(title)}</title>
+<meta name="copyright" content="&copy; ${new Date().getFullYear()} Cultivating the Digital. All rights reserved.">
+<meta name="author" content="Cultivating the Digital">
 ${links}
 <style data-mq-sheet-engine>${SHEET_ENGINE_CSS}</style>
 <style>

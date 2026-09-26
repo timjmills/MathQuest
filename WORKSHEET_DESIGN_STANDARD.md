@@ -509,6 +509,8 @@ Horizontal reflow of row A (available width W_A = 186, or 152 when the tab is on
 
 ### 8.5 Footer
 
+**Copyright (owner ruling 2026-09-26, PT-FRM-7a):** below the footer band, in the bottom margin, every printed page carries "© <year> Cultivating the Digital. All rights reserved." (6.5 pt, black, centred). The band itself is unchanged.
+
 ```
 | add-3d-regroup · Grade 2 · 2.NBT.B.7                 2/3                 Form A · seed 4F2K |
 ```
@@ -642,7 +644,8 @@ Minimum cell height (mm), I Can / Daily:
 - **VA-10** **Carry box**: one segment of the regroup strip (SL-12): solid 0.75 pt, slot radius at the strip's ends, width = one track, height 6 / 7 / 8 mm, in a regroup row of 6 / 7 / 8 mm. One above **every column except the ones**, whether or not that column regroups, so the boxes reveal nothing. Black in Model, grey 1 pt in Guided, and present as black structural boxes in Independent when "regroup boxes" is on.
 - **VA-11** **Ones box**: in Model and Guided cells the answer row is one answer strip with a segment per track (SL-12: 0.75 pt, one track x 1.2 Hw). The first Model cell links the ones answer box and the carry box above the tens with a dotted arrow pair (hint) to show "write the ones here, regroup the ten there". Independent cells have an open answer row.
 - **VA-12** Any regroup row forces 0.95 em tracks (TY-21). Strip segments are therefore one 0.95 em track wide: 5.4 / 7.4 / 9.4 mm (the old separate boxes were track - 1 mm, 4.4 / 6.4 / 8.4 mm).
-- **VA-13** Regroup boxes are scratch space: never scored, never marked on screen, never auto-focused (SP-23).
+- **VA-13** Regroup boxes are scratch space: never scored, never marked on screen, never auto-focused (SP-23). **On an answer key AK-2 wins** (owner ruling 2026-09-25): the key FILLS the regroup and carry boxes with the full working - the new value of every regrouped top digit (the 5 over a crossed 6, the 17 over a crossed 7) with the old digit crossed out (VA-23), and every carry over the column that receives it. The boxes stay unscored; only the key writes in them.
+- **VA-13a** A subtraction's ONES regroup box holds a two-digit number after a regroup (12, 17), so it is two digits wide (1.5 tracks), overhanging the ones column to the right; the other regroup boxes keep one track (lessons r1, H9).
 
 ### 10.3 Subtraction: Tens / Ones boxes, including across zeros
 
@@ -906,7 +909,7 @@ Items per page. "By table" means the computed capacity in 12.3. A ceiling is nev
 |---|---|---|---|---|
 | Lesson opener | 2 Model + 4 Guided | 1-2 + 3 | 1-2 + 2-3 | Plus bands; K one-pager: 2 Model / 2 Guided / 2 alone |
 | Scripted model | 1 problem, 3-6 frames | same | same | Second example only with identical wording |
-| Guided page | 8 | 6 | 3-6 | Steps strip stays visible |
+| Guided page | 10 | 8 | 3-6 | Tries, plus the unscored Model (CL-14: cells unlabelled). Steps strip stays visible. 10 / 8 at S / M since 2026-09-25 (pv-r1 critic: short problems left a 20-26% strip under 8); tall problems stop sooner by height |
 | Independent / More Practice | 6 (up to 16 for one-symbol answers, using the 2 x 5 and 2 x 8 grids) | 6 (one-symbol answers: as S) | 6 (one-symbol answers: as S); 4 for long procedures | 2 x 3 default |
 | Wide-visual rows | 5 | 4 | 3 | Number lines, base-10 over 100, coin rows |
 | Sub-skill / decision | 12 | 8 | 6-8 | No answer computed |
@@ -936,6 +939,7 @@ Items per page. "By table" means the computed capacity in 12.3. A ceiling is nev
 
 - **DN-1** Reference densities above about 40 responses per page were judged too dense for these pupils; outside fact layouts no page exceeds 20 scored responses at L.
 - **DN-2** Every cell passes CL-5 (40% free) at every capacity in this section.
+- **DN-1a** (2026-09-25, `design/audit/LESSONS_LEARNED.md` L1) A kit Independent / More Practice page packed to its problems' measured size (dense packing) holds up to **30 / 20 / 12** standard problems at S / M / L, and a page of short problems up to **30 / 24 / 20** (DN-1's 20 is at L; critic guided-r1), and may take one more column at S than at L where the problem's own width allows it (12.3's stacked-arithmetic table). Size S never prints the grid of L.
 
 ### 12.2 The column x size rule
 
@@ -1169,7 +1173,7 @@ v1: one per page, fully scaffolded
 ## 14. Answer key = facsimile
 
 - **AK-1** Every generated page has an answer key, and the key is a **facsimile**: the same page, same paper, same cells, same labels, same geometry, with answers overlaid in the pupil's answer slots. A teacher marks by position.
-- **AK-2** Answers are Andika **700**, black, at the slot's working size, placed exactly where a pupil would write. Working is shown where the page teaches it: regroup digits in carry boxes, partial products, division work rows, quotient and remainder, hands drawn on clocks, shaded parts shaded, plotted points plotted, rings and check marks drawn at 1.5 pt.
+- **AK-2** Answers are Andika **700**, black, at the slot's working size, placed exactly where a pupil would write. Working is shown where the page teaches it: regroup digits in carry boxes (on EVERY key - practice, mixed, independent - over VA-13's scratch rule, owner ruling 2026-09-25), partial products, division work rows, quotient and remainder, hands drawn on clocks, shaded parts shaded, plotted points plotted, rings and check marks drawn at 1.5 pt.
 - **AK-3** The key is marked in three places: tab line 3 reads "Answer Key"; the Name field is replaced by the bold words "Answer Key"; the footer right reads "Key · Form A · seed". No color is used (there is none).
 - **AK-4** The key is generated from the same seed and the same layout result as the pupil page. Slot count on the key equals slot count on the pupil page; label sequence and Score denominator are identical.
 - **AK-5** Dialog option "Key size": full size (default) or reduced 2-up (two keys per landscape sheet, rendered from the size-S layout of the same items, same cell order; never produced by scaling the page down, PG-20). No other reduction is offered. Reduced keys are teacher-facing and exempt from TY-11 but not from the ink and line rules; minimum text 7 pt.

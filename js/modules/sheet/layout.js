@@ -102,7 +102,8 @@ export const PRACTICE_TARGET = Object.freeze({
     standard: Object.freeze({ cols: 2, rows: Object.freeze({ S: 3, M: 3, L: 3 }) }),
     long: Object.freeze({ cols: 2, rows: Object.freeze({ S: 2, M: 2, L: 2 }) }),
     // A one-column short cell (a number line with its equation) holds 5 to a page (owner, 2026-09-25).
-    short: Object.freeze({ cols: 2, rows: Object.freeze({ S: 8, M: 5, L: 4 }), rowsByCols: Object.freeze({ 1: 5 }) }),
+    // Critic guided-r1 (L1): at S the line is drawn shorter-labelled rows, so S holds one more.
+    short: Object.freeze({ cols: 2, rows: Object.freeze({ S: 8, M: 5, L: 4 }), rowsByCols: Object.freeze({ 1: Object.freeze({ S: 6, M: 5, L: 5 }) }) }),
     wide: Object.freeze({ cols: 1, rows: Object.freeze({ S: 5, M: 4, L: 3 }) }),
     word: Object.freeze({ cols: 1, rows: Object.freeze({ S: 4, M: 3, L: 3 }) }),
 });
@@ -115,17 +116,41 @@ export const PRACTICE_TARGET = Object.freeze({
  * up to 12 (3 x 4), long procedures up to 6.
  */
 export const DENSE_MAX_COLS = 4;
+/**
+ * LESSONS_LEARNED L1 (Size S ignored): the same cap at every size gave S the grid of L. Below L a
+ * cell's content is smaller, so dense packing may try one more column at S (a column only an item
+ * whose own width allows it reaches: layout.itemCap), and holds more standard problems a page.
+ */
+export const DENSE_MAX_COLS_AT = Object.freeze({ S: 5, M: 4, L: 4 });
 /** RUBRIC H13: a cell is never stretched past this multiple of its tallest measured content. */
 export const FILL_CAP = 1.8;
+/**
+ * THE row-stretch limit of every grid page (critic guided-r1, one spare-height rule): a measured
+ * height carries ~7 mm of pads and label keep-out, so FILL_CAP x the measurement left a 20 mm
+ * problem in a 50 mm cell (34% bands, H13). A row grows to at most CONTENT_FILL x its content
+ * plus those pads, and never past FILL_CAP x the measurement; the rest of the page buys more rows
+ * (items) where the role's count allows, else stays under the grid.
+ */
+export const CONTENT_FILL = 1.5;
+export const CELL_PAD_MM = 7;
+export const fillLimit = (h) => (h > 0 ? Math.min(FILL_CAP * h, CONTENT_FILL * Math.max(1, h - CELL_PAD_MM) + CELL_PAD_MM) : h);
 /** Page fill: the practice roles take more rows when less than this share of the grid is used. */
 export const PAGE_FILL = 0.85;
 /** DN-1: outside fact layouts no page holds more than 20 scored problems. */
 export const DN1_MAX = 20;
+/**
+ * DN-1 by size: "no page exceeds 20 scored responses AT L" (12.1). A smaller size draws smaller
+ * problems, so S and M hold more (critic guided-r1, L1: a page of rounding strips at S held 20 in
+ * half the page) - still under the ~40 the reference densities were judged too dense at.
+ */
+export const DN1_AT = Object.freeze({ S: 30, M: 24, L: 20 });
 const FILL_ROLES = new Set(['independent', 'more-practice']);
 export const DENSE_ROOM = 1.2;
 export const DENSE_CEILING = Object.freeze({
-    short: Object.freeze({ S: 16, M: 16, L: 16 }),
-    standard: Object.freeze({ S: 12, M: 12, L: 12 }),
+    short: Object.freeze({ S: 30, M: 24, L: 16 }),
+    // L1: 12 at every size printed a 3 x 4 page of tiny two-digit stacks at S; S and M hold more
+    // (critic guided-r1: 20 rounding strips filled half a page at S).
+    standard: Object.freeze({ S: 30, M: 20, L: 12 }),
     long: Object.freeze({ S: 6, M: 6, L: 4 }),
 });
 
@@ -314,7 +339,7 @@ export function itemInfo(item, ctx = {}) {
     if (!fp && it.q) {
         try { fp = cellFootprint(it.q, ctx); } catch (e) { fp = null; }
     }
-    return { fp: fp || { wMm: 93, hMm: null, measure: true, maxCols: 2 }, fclass: it.fclass || '', measured: it.measured || null };
+    return { fp: fp || { wMm: 93, hMm: null, measure: true, maxCols: 2 }, fclass: it.fclass || '', measured: it.measured || null, size: ctx.size || it.size || '' };
 }
 
 /**
@@ -327,10 +352,27 @@ export function itemInfo(item, ctx = {}) {
 export function itemCap(info) {
     const { fp, measured } = info;
     const cap = fp.maxCols || 6;
+    // A template that knows its measurement cannot see its floor (a chart window's 12 mm tracks
+    // squeeze rather than overflow) holds its author's cap at every size.
+    if (fp.hardCap) return cap;
+    // LESSONS_LEARNED L1 (size S ignored): a STATIC footprint's width is computed at the sheet's
+    // size (a stack's tracks from ctx.metrics), but its `maxCols` is the author's guess at L, so a
+    // two-digit stack was held to 3 columns at S as at L. Below L the width decides: as many
+    // columns as the footprint's own width allows (at most 6); fitAt's width and digit-aware
+    // clamps (VA-6, DN-15) still apply to the count chosen. L keeps the author's cap.
+    if (staticWidth(fp) && info.size && info.size !== 'L') {
+        const byWidth = Math.floor((LIVE_W_MM + GAP_W_MM) / (fp.wMm + GAP_W_MM + SAFETY_W_MM));
+        return Math.max(cap, Math.min(6, byWidth));
+    }
     if (!fp.measure || !measured) return cap;
     const ok = Object.entries(measured).filter(([, m]) => m && m.fits !== false && Number.isFinite(m.hMm)).map(([c]) => Number(c));
     return ok.length ? Math.max(...ok) : cap;
 }
+
+/** A footprint whose width the template computes (not measured by the host, not a fact ladder). */
+const staticWidth = (fp) => !!fp && !fp.measure && !fp.factLike && Number.isFinite(fp.wMm);
+/** The room a cell's frame and pads take beside its footprint width, in mm (a grid column). */
+const GAP_W_MM = 6;
 
 /** The tallest cell a column count needs, from the static footprint (PG-11's hMin). */
 function staticHMin(fp, size) {
@@ -355,7 +397,7 @@ function fitAt(info, cols, { size, look, availableWidthMm, auto }) {
     const m = measured && measured[cols];
     let hMin = staticHMin(fp, size);
     if (m && Number.isFinite(m.hMm)) hMin = fp.measure || fp.hMm == null ? m.hMm : Math.max(hMin, m.hMm);
-    const maxCols = m && fp.measure ? Math.max(cols, itemCap(info)) : fp.maxCols || 6;
+    const maxCols = fp.hardCap ? fp.maxCols || 6 : m && fp.measure ? Math.max(cols, itemCap(info)) : staticWidth(fp) ? itemCap(info) : fp.maxCols || 6;
     if (cols > maxCols) return { fits: false, why: 'cap', hMin };
     // The host's measurement is the truth about overflow, clipping and shrinking (DN-10).
     if (m && m.fits === false) return { fits: false, why: 'width', hMin };
@@ -511,7 +553,7 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     }
     const hard = Math.max(1, Math.floor((G - SAFETY_H_MM) / Math.max(1, hMin)));
     const targetRows = cols === (target && target.cols) ? target.rows[size]
-        : (target && target.rowsByCols && target.rowsByCols[cols]) || (EXPLICIT_TARGET_ROWS[cols] || cols);
+        : (target && target.rowsByCols && bySize(target.rowsByCols[cols])[size]) || (EXPLICIT_TARGET_ROWS[cols] || cols);
     let rows = Math.min(targetRows, hard);
     // CL-2: a two-column grid takes one of the permitted shapes.
     if (cols === 2) rows = TWO_COL_ROWS.find((r) => r <= rows) || 1;
@@ -538,7 +580,12 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
             const rowH = [];
             for (let i = 0; i < sorted.length; i += cols) rowH.push(sorted[i]);
             const avg = rowH.reduce((a, b) => a + b, 0) / rowH.length;
-            let fit = Math.min(ceilRows, Math.floor((G - SAFETY_H_MM) / Math.max(1, avg)));
+            // A dense section (Independent) packs to its dense ceiling, as a grid of one height
+            // does below (critic guided-r1: a mixed place-value page at S held 6 problems in its
+            // top half, the practice ceiling read as the page's limit). A role's own ceiling holds.
+            const packCeil = section.dense && (section.ceiling === undefined || section.ceiling === null)
+                ? bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling : ceiling;
+            let fit = Math.min(Math.max(ceilRows, Math.floor(packCeil / cols)), Math.floor((G - SAFETY_H_MM) / Math.max(1, avg)));
             if (cols === 2 && fit > 1) fit = TWO_COL_ROWS.find((r) => r <= fit) || fit;
             if (fit > rows) {
                 rows = fit;
@@ -567,7 +614,7 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         const dCeil0 = bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling;
         const dCeil = section.ceiling !== undefined && section.ceiling !== null ? Math.min(dCeil0, ceiling) : dCeil0;
         const colOpts = requested === 'auto'
-            ? Array.from({ length: Math.max(0, Math.min(Number(section.denseMaxCols) > 0 ? Number(section.denseMaxCols) : DENSE_MAX_COLS, hardCap) - cols + 1) }, (_, k) => cols + k)
+            ? Array.from({ length: Math.max(0, Math.min(Number(section.denseMaxCols) > 0 ? Number(section.denseMaxCols) : DENSE_MAX_COLS_AT[size] || DENSE_MAX_COLS, hardCap) - cols + 1) }, (_, k) => cols + k)
             : [cols];
         let best = { perPage: rows * cols, cols, rows };
         // The room each cell keeps over its content: the section's own (a Test), else the
@@ -576,14 +623,21 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         // such an item with ordinary ones therefore keeps the ordinary 1.2.
         const room = Number(section.denseRoom) > 1 ? Number(section.denseRoom)
             : Math.max(...infos.map((i) => (Number(i.fp.denseRoom) >= 1 ? Number(i.fp.denseRoom) : DENSE_ROOM)));
+        // RUBRIC H13 across the cell: the side band a static-width problem (a stack) leaves at c
+        // columns, centred. At the same count a page, the grid with the narrower bands wins (L1:
+        // two-digit stacks at S in 4 columns left 30% of every cell empty on each side; 5 x 4
+        // holds the same 20 at 26%).
+        const staticWs = infos.filter((i) => staticWidth(i.fp)).map((i) => i.fp.wMm);
+        const sideBand = (c) => (staticWs.length === infos.length ? (1 - Math.min(1, Math.max(...staticWs) / cellWidthMm(c, W, look).inner)) / 2 : 0);
         for (const c of colOpts) {
             const pc = probe(c, c > cols);
             if (!pc.fits) continue;
             let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (pc.hMin * room)), Math.floor(dCeil / c)));
             if (c === 2) rr = TWO_COL_ROWS.find((x) => x <= rr) || rr;
-            if (rr * c > best.perPage) best = { perPage: rr * c, cols: c, rows: rr, hMin: pc.hMin };
+            const tie = rr * c === best.perPage && best.cols !== c && sideBand(best.cols) >= 0.25 && sideBand(c) < sideBand(best.cols);
+            if (rr * c > best.perPage || tie) best = { perPage: rr * c, cols: c, rows: rr, hMin: pc.hMin };
         }
-        if (best.perPage > rows * cols) {
+        if (best.perPage > rows * cols || (best.perPage === rows * cols && best.cols !== cols)) {
             cols = best.cols;
             rows = best.rows;
             // The note says what the page prints: a practice ceiling the dense tables go past
@@ -608,15 +662,15 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     // Column stacks keep 12.1's grid too: their cell height is the pupil's regrouping space.
     const stacked = infos.some((i) => i.fp.tracks && !i.fp.factLike);
     if (FILL_ROLES.has(role) && !clamped && !packed && !stacked && !gridOverride && hMin > 0 && cls !== 'word' && cls !== 'long') {
-        const used = rows * Math.min(G / rows, hMin * FILL_CAP);
+        const used = rows * Math.min(G / rows, fillLimit(hMin));
         const fit = Math.floor((G - SAFETY_H_MM) / (hMin * DENSE_ROOM));
         if (used < PAGE_FILL * G && fit >= 5 / cols) {
-            let want = Math.min(fit, Math.floor(DN1_MAX / cols));
+            let want = Math.min(fit, Math.floor((DN1_AT[size] || DN1_MAX) / cols));
             if (cols === 2 && want > 1) want = TWO_COL_ROWS.find((r) => r <= want) || want;
             if (want > rows) {
                 rows = want;
                 filled = true;
-                notes.push(`Page filled: ${rows * cols} short problems (at most ${DN1_MAX}, DN-1).`);
+                notes.push(`Page filled: ${rows * cols} short problems (at most ${DN1_AT[size] || DN1_MAX}, DN-1).`);
             }
         }
     }
@@ -628,8 +682,12 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     const even = G / rows;
     // Long procedures and word problems are exempt: their cell's spare height IS the pupil's
     // working space (PT 2.4's 93 x 114 long-division cell).
-    const capped = hMin > 0 && cls !== 'long' && cls !== 'word';
-    const cellH = r3(capped ? Math.min(even, hMin * FILL_CAP) : even);
+    const capped = hMin > 0 && cls !== 'long' && cls !== 'word' && !section.noCap;
+    // The fill limit first (H13, content-based); when that would leave more than a fifth of the
+    // grid under the rows (a page of tiny problems held to DN-1's 20), the rows take up to
+    // FILL_CAP x their measurement instead - the page is filled before a strip is left.
+    let cellH = r3(capped ? Math.min(even, fillLimit(hMin)) : even);
+    if (capped && rows * cellH < 0.8 * G) cellH = r3(Math.min(even, hMin * FILL_CAP));
     const fillsGrid = cellH >= even - 0.01;
     const perPage = rows * cols;
     const count = Math.max(0, Math.floor(Number(section.count) || 0));
@@ -694,10 +752,11 @@ export function groupByHeight(items, cols) {
     if (hs.some((h) => !h)) return items;
     const lo = Math.min(...hs), hi = Math.max(...hs);
     if (!(hi > lo * 1.6)) return items;
-    // Tallest first, so every row's neighbours are the closest in height; equal heights (within
-    // 2 mm) keep their order.
-    const q = (h) => Math.round(h / 2);
-    return items.map((it, i) => ({ it, i, b: -q(hs[i]) })).sort((a, b) => a.b - b.b || a.i - b.i).map((x) => x.it);
+    // Height CLASSES, tallest class first; within a class the dealt order stands (critic
+    // guided-r1, L10: a fine sort by height put a count page's answers in falling order,
+    // 20, 16, 19, 18, 15 ... 3, 5, 2). A class spans a 1.35 x height ratio.
+    const cls = (h) => Math.floor(Math.log(h / lo) / Math.log(1.35) + 1e-9);
+    return items.map((it, i) => ({ it, i, b: -cls(hs[i]) })).sort((a, b) => a.b - b.b || a.i - b.i).map((x) => x.it);
 }
 
 /**
@@ -721,13 +780,17 @@ export function rowShape(items, cols, rows, cellH) {
     const S = w.reduce((a, b) => a + b, 0);
     // Uniform rows keep the layout's grid, unless that grid stretches them past what they allow
     // (a short last page of a section whose first page held taller problems).
-    if (hi - lo < 2 && rows * cellH <= S * Math.min(FILL_CAP, FILL_CAP * lo / hi) + 0.5) return null;
+    if (hi - lo < 2 && rows * cellH <= S * Math.min(fillLimit(hi) / hi, fillLimit(lo) / hi) + 0.5) return null;
     // A row is stretched no further than its SHORTEST problem allows (FILL_CAP x keeps a centred
     // problem's bands under 30%), and never below its tallest (k >= 1).
     // Each row stretches by the page's share (k) but no further than its own shortest problem
     // allows, and never below its tallest (1).
     const k = Math.max(1, Math.min((rows * cellH) / S, FILL_CAP));
-    const H = w.map((x, r) => x * Math.max(1, Math.min(k, (FILL_CAP * mins[r]) / x)));
+    let H = w.map((x, r) => Math.max(x, Math.min(k * x, fillLimit(mins[r]))));
+    // The same fallback as the layout's cell height: when the fill limit would leave more than a
+    // fifth of the grid it was given under the rows, they take up to FILL_CAP x their content
+    // (critic guided-r1 lint: a compare page at L left an 80 mm strip under 18 short rows).
+    if (H.reduce((a, b) => a + b, 0) < 0.8 * rows * cellH) H = w.map((x, r) => Math.max(x, Math.min(k * x, FILL_CAP * mins[r])));
     const total = H.reduce((a, b) => a + b, 0);
     return { rowsTpl: H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' '), heightMm: Math.round(total * 100) / 100 };
 }
@@ -763,13 +826,20 @@ export function packByHeight(items, cols, { gridFirstMm, gridContMm, maxRows, ce
 
 /** Row gaps: the most whitespace between two rows of a fixed-count sheet (mm). */
 export const ROW_GAP_MAX = 24;
+const ROW_GAPS_OFF = true;
 
 /**
- * The row gap that spends a fixed-count grid's spare height between its rows (RUBRIC H13 page
- * fill): 0 when the grid already fills its area (within 5%) or has one row.
+ * ONE spare-height rule for every grid page (critic guided-r1, 2026-09-26): a grid's spare height
+ * goes INTO its cells up to FILL_CAP x their content, then buys more rows (more items) where the
+ * role's count allows; what is left stays under the grid. It never goes BETWEEN rows: row strips
+ * floating in the frame with unruled blank bands between them read as empty answer rows (the
+ * critic measured 5-24 mm bands on every page that used them). So this returns no gap; it is
+ * kept, with its signature, for the callers (practice, test, guided, review) and grid.js's
+ * `rowGap`, which a saved plan may still carry.
  * @returns {{gap: number, heightMm: number}}
  */
 export function rowGapFor(rows, gridMm, availMm) {
+    if (ROW_GAPS_OFF) return { gap: 0, heightMm: gridMm };
     const spare = availMm - gridMm - SAFETY_H_MM;
     if (rows < 2 || !(spare > 0.05 * availMm)) return { gap: 0, heightMm: gridMm };
     const gap = Math.round(Math.min(ROW_GAP_MAX, spare / (rows - 1)) * 100) / 100;

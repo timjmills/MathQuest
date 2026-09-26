@@ -29,8 +29,12 @@ import {
 } from '../../js/modules/sheet/index.js';
 import { REGRADED_SKILLS, STORY_NOUNS, PV_PROVIDER_IDS, pvRoundingErrors } from '../../js/modules/sheet/providers/index.js';
 import { rng, int, pick, shuffle, deriveSeed } from '../../js/modules/sheet/rng.js';
-import { sameAnswer } from '../../js/modules/sheet/providers/util.js';
+import { sameAnswer, chooseWrong } from '../../js/modules/sheet/providers/util.js';
 import { applyRule, ftSlots } from '../../js/modules/sheet/index.js';
+import { hintOf, hintGivesAnswer } from '../../js/modules/sheet/roles/guided.js';
+
+/** Skills whose items yield no Guided hint (reported; a stack or a fact draws its own cue). */
+const NO_HINT = [];
 
 const failures = [];
 let checks = 0;
@@ -450,6 +454,17 @@ function checkSkill(key, { requireStories = false } = {}) {
     const r = rng(deriveSeed('ws-providers-unit', key));
     const items = Array.from({ length: 20 }, (_, i) => Object.assign({ categoryId: cat, skillId: skill, seed: 1000 + i, itemIndex: i }, maker(r)));
 
+    // ---- the Guided fade contract (critic guided-r1): a first try's grey hint never holds its
+    // answer ("387 to the nearest 100 is 400", "The hour is 1" on a 1:00 clock).
+    let hinted = 0;
+    for (const q of items) {
+        const hit = { q, template: q.cell && q.cell.template };
+        const h = hintOf(hit);
+        if (h) hinted++;
+        ok(!h || !hintGivesAnswer(h, hit), `${key}: the Guided hint "${h}" holds the answer (${JSON.stringify(q.ans)})`);
+    }
+    if (!hinted) NO_HINT.push(key);
+
     // ---- strings
     const str = typeof p.strings === 'function' ? p.strings({ categoryId: cat, skillId: skill, q: items[0] }) : p.strings;
     ok(/^I Can \S/.test(str.iCan || ''), `${key}: iCan "${str.iCan}" does not start with "I Can"`);
@@ -722,10 +737,27 @@ for (const band of ['10', '20', '50', '100', '1k', '10k', '100k', '1m']) {
     }
 }
 
+// LESSONS_LEARNED L3: a "wrong" answer equal to the right one can never leave a provider. Every
+// provider picks through chooseWrong, which must drop a candidate equal to the answer in any
+// form (10 / "10" / "10 " / "1,0"-free); the default adapter's tagged distractors likewise.
+{
+    const q = { categoryId: 'addition', skillId: 'add_three', ans: 10, text: '3 + 4 + 3 = ?' };
+    for (const same of [10, '10', ' 10 ', '10.0']) {
+        const w = chooseWrong(q, [{ value: same, misconception: 'x', explain: '' }]);
+        ok(w === null || !sameAnswer(w.value, q.ans), `L3: chooseWrong let the right answer ${JSON.stringify(same)} through as wrong`);
+    }
+    const w2 = chooseWrong(q, [{ value: 10, misconception: 'x' }, { value: 7, misconception: 'two-addends' }]);
+    ok(w2 && Number(w2.value) === 7, 'L3: chooseWrong skips the right answer and takes the next real error');
+    const dq = { categoryId: 'addition', skillId: 'add_three', ans: 10, text: '3 + 4 + 3 = ?', distractorTags: { 10: 'same', 7: 'Added two of the three.' } };
+    const dw = getProvider('addition', 'add_three').wrongAnswer(dq);
+    ok(dw && !sameAnswer(dw.value, dq.ans), `L3: the default adapter never tags the right answer as wrong (${dw && dw.value})`);
+}
+
 if (failures.length) {
     for (const f of failures.slice(0, 60)) console.log('  FAIL', f);
     if (failures.length > 60) console.log(`  ... and ${failures.length - 60} more`);
     console.log(`ws-providers-unit: FAIL (${failures.length} of ${checks} checks)`);
     process.exit(1);
 }
+if (NO_HINT.length) console.log(`  note: no Guided hint from ${NO_HINT.length} skill(s): ${NO_HINT.join(', ')}`);
 console.log(`ws-providers-unit: OK (${checks} checks, ${TM_PROVIDER_SKILLS.length} time and money + ${REGRADED_SKILLS.length} re-graded skills + ${Object.keys(SIBLINGS).length} siblings + ${PV_PROVIDER_IDS.length} place-value / rounding / estimation + ${Object.keys(COUNTBY_MAKERS).length} count-by)`);

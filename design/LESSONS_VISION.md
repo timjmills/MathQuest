@@ -52,18 +52,60 @@ relates to every other (prerequisite / builds on / leads to), with concepts and 
 ## First build (2026-09-25): the `lesson` page role
 `buildSheet({role: 'lesson', sections: [{skills: [skill]}], practicePages, mixed})` prints the packet
 (`js/modules/sheet/roles/lesson.js`, host `buildLesson` in `js/modules/print-sheet.js`):
-1. **Anchor chart** (no Name / Score; its own key): the worked example in 2-4 step panels, `Say:`, `Rule:`.
+A packet prints at **M or L** (lessons r1: the regroup scaffold, place-value letters and step words
+are unreadable at S; an S request prints at M and says so), and its anchor chart at **L** always.
+1. **Anchor chart** (no Name / Score; its own sheet and key, a wall chart): the worked example in 2-4
+   step panels sized to their content (the drawing enlarged until the page is full, never shrunk), a
+   closing step that draws nothing ("Check: add back") on a line of its own under the panels, an
+   `Another example:` row of the OTHER case where there is room (the big number second; a 0 in the
+   ones; a number that rounds down - `second` in the lesson data), `Say:`, `Rule:`. One icon per
+   STEP (round: ends / eye / arrows / pencil; subtract: eye / rod-to-ones / minus-ones / minus-tens /
+   check), drawn at 1.5 pt so a photocopy keeps them dark.
 2. **Lesson sheet**: `Vocabulary:` match (word to picture, key draws the lines), `Remember:` (the key
-   concept), `Warm-up:` (the prerequisite skills' own generators, lettered and scored), `Guided Practice:`
-   2-3 cells beside the chart's `Steps:` (cell 1 with the first step traced), then `Independent
-   Practice:` rows filling the page.
-3. **Practice pages** (Independent, the teacher's count) with the chart's step strip. One-line,
-   one-number items (facts, "27 → ___") take the dense grid at the most a page holds within the 12.1
-   ceiling, in whole rows of three (15 at S, else 12); taller items (column subtraction) print six a page, three across,
-   grown to at most 1.3 × their own height (H13), so a short grid stops above the footer rather
-   than drawing empty bands in every cell. The strip stays only when it keeps the page's columns
-   and capacity.
-4. **Mixed practice** (optional) with the lesson's earlier skills.
+   concept), `Warm-up:` (the prerequisite skills' own generators, lettered and scored; one
+   instruction when both halves share it), `Guided Practice:` 2-3 VARIED cells (different answers, at
+   most one make-10, the big number on both sides) beside the chart's `Steps:` - cell 1 with step 1
+   done in grey; a rounding cell carries the chart's number line with two empty tens boxes - then
+   `Independent Practice:` rows where they fit (else the bands share the spare height).
+3. **Practice pages** (Independent, the teacher's count, tab `Practice n`) with the chart's step
+   strip, ONE frame filling the body, no row gaps: one-line answers (facts, "27 → ___") in whole
+   rows of three up to 15 (12.1: 16); column subtraction six a page, 2 x 3, every problem with a
+   `Check: ___ + 18 = ___` line (step 5 given room). Keys fill the regroup boxes (VA-13 / AK-2).
+4. **Mixed practice** (optional) with the lesson's step strip, the lesson skill and EARLIER skills
+   only, each from its own strand (never a later skill such as nearest 100).
+
+Lessons r2 (critic 22/48, fixes in round 3):
+- The chart RESERVES its other examples before it enlarges the panels. First layout that fits:
+  the second example's row of states (add: 2 + 5); else the panels at >= 0.85 zoom with the OTHER
+  CASES drawn whole under them (round: 42 -> 40 "4 or less? Round down." and 55 -> 60 "5 in the
+  ones? Round up.", lesson data `third`); else one 3-column grid of the panels, the closing step as
+  a panel (a subtraction's check drawn as its own column addition) and the other example whole
+  (subtract: 70 - 23, "0 ones? Regroup a ten."). Only when none fits does the chart show one case.
+- Guided: `guided: [cases]` in the lesson data picks one cell per case (round: up, down, ends in
+  5). Cells that do not fit beside the Steps list, or a list much taller than its cells, put the
+  steps in a STRIP over three full-width cells (the chant then rides on the `Rule:` line). A
+  Steps list beside taller cells spreads over its panel. Rounding tens boxes are writing places:
+  as tall as the answer strip (12 / 9.6 mm), three digits wide.
+- Every column problem reserves its answer row (12 mm at L, 10 mm at M) on the pupil page, so the
+  page and its key share one layout; the Check sum wraps under `Check:` in a narrow cell.
+- Lesson data floors (host, per skill ref): `minOperand` (no + 0 in "add 1-3"; 2-place partner
+  addition on a Mixed page), `minTop` (no 11 - 6 in 2-place regrouping), `distinctFirst` (no
+  repeated top number). The lesson skill fills at least half the Mixed page (its weight).
+- An S request prints at M, and the print panel says so beside the Size control and above the
+  preview (`LESSON_SIZE_NOTE`), not only under "Why?".
+
+Lessons r3 (critic 38/48, fixes in round 4):
+- A case the main pool rarely deals gets its own pool (`ref` on the case in the lesson data, dealt
+  to host floors): subtract's other example is a one-place take-away from a 0 in the ones (60 - 3),
+  and step 4's panel carries the rule for answers under 10, "0 tens? Leave it empty." (`notes`).
+  Rounding's chart shows three other cases three across where they fit: down, ends in 5, 90s -> 100.
+- The add chart draws the counting (hops 7 -> 8, 9) and says what to do with a double.
+- Packet floors (print-sheet.js `refAccepts`): `distinctAnswer`, `maxSmall` (one one-place
+  take-away a page), `maxTop` (two places), `noTurnaround`, `avoidTexts` (Mixed never repeats a
+  Practice item). The lesson skill holds at least half the Mixed page after packing (`leadHalf`).
+- Guided never repeats the number added or taken away. Rounding practice is 15 at every size, at L
+  type. Place-value pairs vary their asked place with the page seed (gen-pv.js, L10).
+- The print panel counts the problems the pupil does, not the items dealt.
 Every sheet's teacher footer carries the tags: skill id, grade, primary CCSS, EEs (`standards.js`).
 The per-lesson data (prerequisite skills, concepts, vocabulary with pictures, the steps with their
 icons, the chant and why) lives in `js/modules/lessons/prereqs.js`, shaped to grow into the
@@ -74,3 +116,10 @@ An **intervention lesson for every White Rose Maths small step**, using the same
 prerequisites, minimal-words worked example, we-do, massed practice, optional mixed), tagged to the small
 step, CCSS and EE. Starts after the sample lessons are approved and the WRM small-step inventory
 (`design/WRM_ALIGNMENT_PLAN.md` phase 1) exists.
+
+## Later — revisit once everything is built (owner, 2026-09-26)
+- **Find-the-mistake (error analysis) worksheets:** retired for new worksheets on 2026-09-26 (LESSON_LIBRARY_PLAN §8d).
+  Owner: "we might bring these back later once everything is built." Revive after the lesson library and the skills
+  pass: rebuild it on the lesson practice frame (§8c) and re-grade it before it returns to the Print screen. Its role
+  code, providers' `wrongAnswer` data, share-code entries and critic history are kept for that.
+- **Intervention lessons per WRM small step** — now in progress as the lesson library (LESSON_LIBRARY_PLAN.md).

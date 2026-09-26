@@ -242,6 +242,11 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-fixtext .ws-line{font-size:var(--ws-text);font-weight:700;max-width:100%}
 :is(.ws-page,.ws-sheet) .mq-eacell .mq-fixslot small{font-size:max(var(--ws-zone),11pt)}
 :is(.ws-page,.ws-sheet) .mq-fixcols{gap:0}
+:is(.ws-page,.ws-sheet) [data-ws-tagged]{position:relative}
+:is(.ws-page,.ws-sheet) .mq-frac{display:inline-flex;flex-direction:column;align-items:center;font-size:.55em;line-height:1.05}
+:is(.ws-page,.ws-sheet) .mq-frac>span+span{border-top:1.5pt solid currentColor;padding-top:.3mm}
+:is(.ws-page,.ws-sheet) .mq-slottag,:is(.ws-page,.ws-sheet) .mq-pupil .mq-slottag{position:absolute;top:.4mm;left:.8mm;font-size:var(--ws-zone);font-style:normal;font-weight:700;line-height:1;color:#000!important}
+:is(.ws-page,.ws-sheet) .mq-fixsign .ws-circle{display:inline-flex;align-items:center;justify-content:center;font-size:var(--ws-digit);font-weight:700;line-height:1;vertical-align:middle}
 :is(.ws-page,.ws-sheet) .mq-eatask{font-size:var(--ws-text);line-height:1.2;margin:0 0 1mm;align-self:flex-start}
 :is(.ws-page,.ws-sheet) .mq-fixcols>.ws-box+.ws-box{margin-left:-.75pt}
 /* the flow judgement: beside the work when --mq-jw fits, under it when not */
@@ -251,6 +256,30 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-judge3 .mq-fixrow{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:4mm;row-gap:2mm}
 :is(.ws-page,.ws-sheet) .mq-judge3 .mq-fixslot{margin-left:0}
 :is(.ws-page,.ws-sheet) .mq-judge3>.mq-redraw{flex:1 1 100%}
+/* the finished work and its judgement sit in the middle of the cell like every kit cell (H13: no band pinned under it) */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-eacell>.mq-judge.mq-judge3{flex:0 0 auto}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-eacell{justify-content:center}
+/* AX-4: one place for the Correct / Fix-it block on every cell of a page - under the work, beside it (the two centred together), or in the item's own answer column */
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbelow>.mq-judge-row{flex:1 1 100%;min-width:100%}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbelow:not(.mq-jstack):not(.mq-judge-drawn) .mq-judge-row{flex-direction:row;align-items:flex-start;column-gap:8mm}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside{flex-wrap:nowrap;justify-content:center;column-gap:10mm}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside>.mq-judge-work{flex:0 0 auto;min-width:auto}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside>.mq-judge-row{flex:0 0 auto;min-width:0}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside:not(.mq-judge-drawn) .mq-fixrow{flex-direction:column;align-items:flex-start;row-gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-judgecol{margin-top:3mm;text-align:left}
+:is(.ws-page,.ws-sheet) .mq-judgecol>.mq-judge-row{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:6mm;row-gap:2mm;padding:0}
+:is(.ws-page,.ws-sheet) .mq-judgecol .mq-fixrow{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:4mm;row-gap:2mm}
+/* EA r5 (B): ONE Correct / Fix-it layout on every cell - "Correct" on its line, "Fix it" and the whole fix (every box, its captions) on the next, never wrapped */
+:is(.ws-page,.ws-sheet) .mq-judge3:not(.mq-judge-drawn) .mq-judge-row{flex-direction:column;align-items:flex-start;flex-wrap:nowrap}
+:is(.ws-page,.ws-sheet) .mq-judge3:not(.mq-judge-drawn) .mq-fixrow{flex-wrap:nowrap}
+:is(.ws-page,.ws-sheet) .mq-judge3:not(.mq-judge-drawn) .mq-fixes,:is(.ws-page,.ws-sheet) .mq-judge3:not(.mq-judge-drawn) .mq-fixpat{flex-wrap:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixfrac{font-size:1em;line-height:1;row-gap:0}
+:is(.ws-page,.ws-sheet) .mq-fixfrac>span:first-child{padding-bottom:1.2mm}
+:is(.ws-page,.ws-sheet) .mq-fixfrac>span+span{border-top-width:1.5pt;padding-top:1.2mm}
+/* EA r5 (B): a graph's question follows the page - beside its picture in one column, under it in two or more, on every cell */
+:is(.ws-page,.ws-sheet) .mq-eacell .mq-askside div:has(> .fg-ask){flex-wrap:nowrap !important}
+:is(.ws-page,.ws-sheet) .mq-eacell .mq-askunder div:has(> .fg-ask){flex-direction:column !important;flex-wrap:nowrap !important;align-items:center !important}
+:is(.ws-page,.ws-sheet) .mq-eacell .mq-askunder .fg-ask{flex:0 0 auto !important;max-width:none !important;align-self:stretch}
 :is(.ws-page,.ws-sheet) .mq-judge-drawn .mq-fixrow{display:contents}
 :is(.ws-page,.ws-sheet) .mq-judge-drawn .mq-fixzone{flex:0 0 100%}
 /* the key's correction is black Andika 700, even inside the pupil's grey work (a fix box per fact) */
@@ -508,7 +537,7 @@ export function frameWords(role, input, skills, { tabId }) {
     const derived = titles.length === 1 ? titles[0] : titles.length ? 'Mixed practice' : 'I Can practise';
     const title = typeof header.title === 'string' && header.title.trim() ? header.title.trim() : derived;
     const strands = [...new Set(words.map((w) => w.strand).filter(Boolean))];
-    const level = levelLine(skills.map((s) => s.grade));
+    const level = levelLine(skills.flatMap((s) => s.grades || [s.grade]));
     const tabLines = Array.isArray(header.tab) && header.tab.length ? header.tab.map(String)
         : strands.length === 1 ? [level, strands[0], tabId] : [level, tabId];
     const ids = [...new Set(skills.map((s) => s.skillId).filter(Boolean))];
@@ -516,7 +545,7 @@ export function frameWords(role, input, skills, { tabId }) {
     const codes = [...new Set(skills.flatMap((s) => String(s.ccss || '').split(/[,;]\s*/)).map((c) => c.trim()).filter(Boolean))];
     const ccss = codes.length > 9 ? `${codes.slice(0, 9).join(', ')} +${codes.length - 9}` : codes.join(', ');
     // A lesson packet prints its own tags on every sheet (header.footerLeft, roles/lesson.js).
-    const left = (typeof header.footerLeft === 'string' && header.footerLeft) || [idText, gradeWords(skills.map((s) => s.grade)), ccss].filter(Boolean).join(' · ');
+    const left = (typeof header.footerLeft === 'string' && header.footerLeft) || [idText, gradeWords(skills.flatMap((s) => s.grades || [s.grade])), ccss].filter(Boolean).join(' · ');
     return { title, tabLines, left, words };
 }
 
@@ -590,7 +619,7 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
     const split = new Set(sectionsIn.map((s) => s.splitOf).filter((x) => x !== undefined && x !== null));
     const layouts = sectionsIn.map((sec, si) => {
         const L0 = resolveSectionLayout(
-            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols },
+            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
             itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
         );
         // A split section's two parts share the page: their rows are sized to what they hold.
@@ -619,7 +648,9 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
                 || paginate(Math.ceil(itemsBySection[si].length / 2), { cols: 1, rows: L.rows / 2 })
                     .map((c) => Object.assign({}, c, { from: c.from * 2, count: Math.min(c.count * 2, itemsBySection[si].length - c.from * 2), rows: c.rows * 2 }))
             : (!anchors && packByHeight(itemsBySection[si], L.cols, {
-                gridFirstMm: L.gridH, gridContMm: L.gridHCont, maxRows: Math.max(1, Math.floor(L.ceiling / L.cols)), cellH: L.cellH, force: !!L.packed,
+                // A packed dense section holds the rows its layout packed (its dense ceiling), not
+                // the practice ceiling's (critic guided-r1: 10 mixed problems split 6 + 4 at S).
+                gridFirstMm: L.gridH, gridContMm: L.gridHCont, maxRows: Math.max(1, Math.floor(L.ceiling / L.cols), L.packed ? L.rows : 0), cellH: L.cellH, force: !!L.packed,
             })) || paginate(itemsBySection[si].length, L)));
     const pages = placeSections(
         layouts.map((L, si) => ({ layout: L, chunks: chunksBySection[si], instrMm: instr, sharesWith: sectionsIn[si].splitOf })),
@@ -688,7 +719,7 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
         const its = sheetItems[si] || [];
         const keep = () => { sections.push(sec); items.push(its); };
         if (its.length < 2 || its.some((it) => it.anchor)) return keep();
-        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols };
+        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap };
         const whole = resolveSectionLayout(Object.assign({ floor: sec.floor }, base), its, paper, availableWidthMm, { size, look });
         const one = (it) => it.fclass === 'word' || it.fclass === 'wide'
             || itemCap(itemInfo(it, { size, look, paper, mode: 'print' })) < 2;
@@ -709,7 +740,51 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
     return { norm: Object.assign({}, norm, { sections }), items };
 }
 
+/**
+ * The instruction key of ONE item: its own, else its provider's for THIS question (a mixed pool's
+ * items come from sub-skills with their own instructions), else ''.
+ */
+export function itemInstructionKey(it) {
+    if (!it) return '';
+    // The provider's key for THIS question first: the host stamps a mixed pool's items with the
+    // pool's one key, which is exactly the line that does not fit each kind.
+    const q = it.q || {};
+    try {
+        const p = getProvider(q.categoryId || '', q.skillId || '');
+        // Only a skill's own strings (the default adapter's key is a placeholder).
+        const real = p && Array.isArray(p.real) && p.real.includes('strings');
+        const raw = real && (typeof p.strings === 'function' ? p.strings({ categoryId: q.categoryId, skillId: q.skillId, label: q.skillLabel, q }) : p.strings);
+        if (raw && raw.instructionKey) return raw.instructionKey;
+    } catch (e) { /* the host's key */ }
+    return it.instructionKey || '';
+}
+
+/**
+ * The drawn kind of an item: its template and the template's own variant (a clock to read, a
+ * clock to choose; a place-value strip, a word-name choice).
+ */
+export function itemKindSig(it) {
+    const q = (it && it.q) || {};
+    const p = (q.cell && q.cell.payload) || {};
+    return `${(it && it.template) || (q.cell && q.cell.template) || ''}:${p.kind || p.task || ''}`;
+}
+
+/**
+ * The line a section prints: its key, except that a "write the answer" line over problems of
+ * different drawn kinds (a mixed pool whose kinds carry no line of their own: a circle-the-place
+ * item beside a tens-and-ones frame) becomes the neutral "Solve." (critic guided-r1).
+ */
+export function neutralForKinds(key, items) {
+    if (key !== 'default-write') return key;
+    return new Set((items || []).map(itemKindSig)).size > 1 ? 'default-solve' : key;
+}
+
 function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
+    // Critic guided-r1, one instruction per item kind: a band per kind is not split out here (the
+    // host deals a mixed pool's kinds one or two at a time, so a band per kind printed part-rows
+    // of ruled empty cells and ran a page over). A mixed section's line is instead the one its
+    // kinds share - see the per-item keys below. (The Review page, whose rows are its own, does
+    // print one band per kind: review.js allocate.)
     const split = input.anchors ? { norm: norm0, items: sheetItems0 } : splitWide(role, norm0, sheetItems0, { availableWidthMm: Number(norm0.ctxIn.availableWidthMm) || LIVE_W_MM });
     const norm = split.norm;
     let sheetItems = split.items;
@@ -722,7 +797,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     if (!input.anchors) {
         sheetItems = sheetItems.map((its, si) => {
             const sec = norm.sections[si] || {};
-            const Lp = resolveSectionLayout({ role, columns: sec.columns, count: its.length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols },
+            const Lp = resolveSectionLayout({ role, columns: sec.columns, count: its.length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
                 its, norm.paper, Number(norm.ctxIn.availableWidthMm) || LIVE_W_MM, { size, look });
             return groupByHeight(its, Lp.cols);
         });
@@ -735,13 +810,18 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     // Instruction per section (BD-10, BD-13): the section's own key, else the skills' keys.
     const instr = norm.sections.map((sec, si) => {
         const pupil = sheetItems[si].filter((it) => !it.anchor);
-        const keys = sec.instructionKey ? [sec.instructionKey]
-            : pupil.map((it) => {
-                const q = it.q || {};
-                const s = skills.find((k) => k.skillId === q.skillId && (!q.categoryId || k.categoryId === q.categoryId));
-                return (it.instructionKey) || (s ? skillWords(s).instructionKey : '');
-            });
-        let key = sectionInstructionKey(keys);
+        const hostKeys = pupil.map((it) => {
+            const q = it.q || {};
+            const s = skills.find((k) => k.skillId === q.skillId && (!q.categoryId || k.categoryId === q.categoryId));
+            return (it.instructionKey) || (s ? skillWords(s).instructionKey : '');
+        });
+        // Critic guided-r1: a mixed pool's items are stamped with the pool's one line ("Solve.
+        // Write the answer.") over check-box and circle items. When the items' own kinds differ,
+        // they decide, and different kinds share the neutral line.
+        const ownKeys = pupil.map(itemInstructionKey);
+        const mixedKinds = new Set(ownKeys.filter(Boolean)).size > 1;
+        const keys = sec.instructionKey ? [sec.instructionKey] : mixedKinds ? ownKeys : hostKeys;
+        let key = sec.instructionKey ? sectionInstructionKey(keys) : neutralForKinds(sectionInstructionKey(keys), pupil);
         let text;
         ({ key, text } = resolveInstruction(key, pupil, sec.instructionVars));
         return { key, text };
@@ -803,13 +883,15 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 continue;
             }
             // RUBRIC H13: each row as tall as what it holds (rowShape), when the rows differ.
+            // (`noCap`, a lesson practice page: one frame, every row the same, no row gaps.)
+            const noCapSec = !!(norm.sections[part.section] || {}).noCap;
             const shape = part.chunk.gridMm ? { heightMm: part.chunk.gridMm, rowsTpl: part.chunk.rowsTpl || '' }
-                : its.some((it) => it.anchor) ? null : rowShape(its, L.cols, part.chunk.rows, L.cellH);
+                : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, L.cellH);
             // A lone grid shorter than its page (the teacher's count, a capped row) spends the
             // spare height as whitespace between its rows (grid.js rowGap), never inside cells.
             const avail = pg.cont ? L.gridHCont : L.gridH;
             const baseMm = shape ? shape.heightMm : fillByFlex ? 0 : part.chunk.rows * L.cellH;
-            const gap = lone && baseMm && !its.some((it) => it.anchor) ? rowGapFor(part.chunk.rows, baseMm, avail) : { gap: 0 };
+            const gap = lone && baseMm && !noCapSec && !its.some((it) => it.anchor) ? rowGapFor(part.chunk.rows, baseMm, avail) : { gap: 0 };
             sections.push({
                 kind: 'grid',
                 cols: L.cols,
@@ -879,7 +961,7 @@ export function composePractice(role, input = {}) {
 
     if (role !== 'more-practice') {
         const lesson = Math.max(1, Number(input.lesson) || 1);
-        const sheet = composeSheet(role, input, norm, bySection, { tabId: `Lesson ${lesson}`, seed, form });
+        const sheet = composeSheet(role, input, norm, bySection, { tabId: input.tabId || `Lesson ${lesson}`, seed, form });
         return base(sheet, {
             meta: {
                 role, items: norm.items.length, scoreOutOf: sheet.score, pages: sheet.pages.length,

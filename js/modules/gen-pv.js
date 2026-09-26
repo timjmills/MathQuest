@@ -63,7 +63,11 @@ const slot = (n) => ((_at % n) + n) % n;
  */
 function blockOrder(L) {
     const block = Math.floor(_at / Math.max(1, L));
-    const key = (i) => ((i + 1) * 7919 + (block + 3) * 104729 + (i + 1) * (block + 5) * 31) % 257;
+    // L10 (lessons r3): the order also turns on the PAGE's seed (the item's seed less its index),
+    // so a page holding one block - two place-value items on a Mixed page - does not ask tens then
+    // ones on every sheet. Live play has no seed and keeps the fixed mixing.
+    const run = Number.isFinite(state.itemSeed) ? (((state.itemSeed - _at) % 9973) + 9973) % 9973 : 0;
+    const key = (i) => ((i + 1) * 7919 + (block + 3 + run) * 104729 + (i + 1) * (block + 5 + run) * 31) % 257;
     return Array.from({ length: L }, (_, i) => i).sort((a, b) => key(a) - key(b) || a - b);
 }
 

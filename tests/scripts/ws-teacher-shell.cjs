@@ -270,7 +270,8 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   if (!pr.beside) fail('Print: the preview is not beside the controls at 1280');
   if (!pr.gridClosed) fail('Print: choosing a page type did not close the grid');
   if (/Fits:|rows?,|per page/i.test(pr.fits) || !/^\d+ problems? on \d+ pages?/.test(pr.fits)) fail(`Print: the fits line is not one plain line ("${pr.fits}")`);
-  const ROLES = ['lesson', 'independent', 'more-practice', 'mixed-practice', 'word-problems', 'opener', 'scripted-model', 'guided', 'pre-skill-check', 'error-analysis', 'review', 'test', 'test-b', 'fact-rows', 'fact-probe', 'true-false', 'reason-it', 'stretch'];
+  // error-analysis (Check it) is PAUSED: still a working role for saved sets, but not offered (owner ruling 2026-09-26)
+  const ROLES = ['lesson', 'independent', 'more-practice', 'mixed-practice', 'word-problems', 'opener', 'scripted-model', 'guided', 'pre-skill-check', 'review', 'test', 'test-b', 'fact-rows', 'fact-probe', 'true-false', 'reason-it', 'stretch'];
   if (pr.select || [...pr.chips].sort().join() !== [...ROLES].sort().join()) fail(`Print: page type cards are not every working role (${pr.chips.join()})`);
   if (pr.groups.join() !== 'Practice,Teach,Check,Facts,Thinking') fail(`Print: page type groups are ${pr.groups.join()}`);
   if (pr.thumbs !== pr.chips.length) fail('Print: a page type card has no thumbnail');
@@ -289,6 +290,33 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
     return { why: why ? why.textContent.trim() : '', marked: !!(card && card.classList.contains('is-unfit')) };
   });
   if (!unfit.why || !unfit.marked) fail(`Print: an unfit page type does not say why (${JSON.stringify(unfit)})`);
+  // Stretch is WITHHELD for a skill with no open problem of its own (a K counting picture): its card
+  // is disabled, says why, and cannot be chosen; an operation skill keeps it.
+  await page.evaluate(() => { window.tvOpenPrintWith([{ categoryId: 'counting', skillId: 'count_objects' }]); window.tvGo('print'); });
+  await sleep(200);
+  const noStretch = await page.evaluate(async () => {
+    const scr = document.querySelector('#teacherMain [data-screen="print"]');
+    if (!scr.querySelector('[data-act="role"]')) scr.querySelector('[data-act="types"]').click();
+    const card = scr.querySelector('[data-act="role"][data-v="stretch"]');
+    const out = { disabled: card && card.getAttribute('aria-disabled') === 'true', title: card ? card.getAttribute('title') || '' : '' };
+    const note = card && card.getAttribute('aria-describedby') ? document.getElementById(card.getAttribute('aria-describedby')) : null;
+    out.note = note ? note.textContent.trim() : '';
+    card && card.click();
+    await new Promise((r) => setTimeout(r, 300));
+    const again = scr.querySelector('[data-act="role"][data-v="stretch"]');
+    out.chosen = !!(again && again.getAttribute('aria-checked') === 'true');
+    return out;
+  });
+  if (!noStretch.disabled || !/No Stretch/.test(noStretch.title) || !/No Stretch/.test(noStretch.note) || noStretch.chosen) fail(`Print: Stretch is not withheld, with its reason, for a skill with no open problem (${JSON.stringify(noStretch)})`);
+  await page.evaluate(() => { window.tvOpenPrintWith([{ categoryId: 'addition', skillId: 'add_20_regroup' }]); window.tvGo('print'); });
+  await sleep(200);
+  const hasStretch = await page.evaluate(() => {
+    const scr = document.querySelector('#teacherMain [data-screen="print"]');
+    if (!scr.querySelector('[data-act="role"]')) scr.querySelector('[data-act="types"]').click();
+    const card = scr.querySelector('[data-act="role"][data-v="stretch"]');
+    return !!card && card.getAttribute('aria-disabled') !== 'true';
+  });
+  if (!hasStretch) fail('Print: Stretch is withheld for an operation skill that has an open problem');
   // A one-page type too small for every chosen skill says so (never drops a skill quietly).
   await page.evaluate(() => {
     window.tvOpenPrintWith([['composing', 'base10_regroup'], ['addition', 'add_10_no_regroup'], ['addition', 'add_10_regroup'], ['addition', 'add_20_no_regroup']].map(([c, s]) => ({ categoryId: c, skillId: s })));

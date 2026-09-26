@@ -971,9 +971,12 @@ registerSkill('number_sense:rounding_table', {
         const rows = arr(p.rows).map(Number);
         const places = arr(p.places).map(Number);
         if (!cells.length) return [];
-        const out = cells.slice(0, 4).map(([r, c], i) => step(`${f(rows[r])} to the nearest ${f(places[c])} is ${f(roundTo(rows[r], places[c]))}.`, [{ slot: `t${i}`, value: f(roundTo(rows[r], places[c])) }]));
+        const out = cells.slice(0, 3).map(([r, c], i) => step(`${f(rows[r])} to the nearest ${f(places[c])} is ${f(roundTo(rows[r], places[c]))}.`, [{ slot: `t${i}`, value: f(roundTo(rows[r], places[c])) }]));
         out.push(step(`Fill in: ${String(q.ans)}.`, [{ slot: 'answer', value: String(q.ans) }]));
-        return clampSteps(out.length >= 3 ? out : [step('Round from the number itself.')].concat(out));
+        // Guided fade (critic guided-r1): the first step never holds an answer - a first try's
+        // grey hint was "387 to the nearest 100 is 400".
+        const [r0, c0] = cells[0];
+        return clampSteps([step(`Start from ${f(rows[r0])} each time. Find the ${PLACE_WORD[places[c0]] || 'place'} digit.`)].concat(out));
     },
     wrongAnswer: (q) => {
         const p = pvOf(q);
