@@ -16,7 +16,7 @@ import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, instructionKeyOf, assemble,
     poolItems, topicOf, labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, rng, shuffle, deriveSeed,
 } from './compose.js';
-import { groupByHeight, rowShape, rowGapFor, DENSE_CEILING } from '../layout.js';
+import { groupByHeight, rowShape, rowGapFor, DENSE_CEILING, itemInfo } from '../layout.js';
 
 export const ROLE_ID = 'test';
 const CEILING = { S: 20, M: 16, L: 12 };
@@ -34,21 +34,21 @@ function layout(items, input, count) {
     // (PT 2.9: 4 x 4 at 57, 4 x 5 at 45.6), its rows chosen from the MEASURED height with a
     // little room (1.05 x the tallest cell, which already holds the pads and the answer zone), up to 20 items and 5 columns. A 4 x 3 grid of 75 mm
     // cells left two thirds of every cell empty.
+    // A short track that the practice page packs 16 to a page at L (a count-on strip) tests on that
+    // same grid (footprint `testAsPractice`, critic k2-r3: 10 items in 35 mm cells left 30% of every
+    // cell empty at L). Only L moves (12 -> 16); S and M keep 12.1's 20 / 16.
+    const asPractice = !long && items.length > 0 && items.every((it) => { try { return !!itemInfo(it, { size: ctx.size, look: ctx.look, mode: 'print' }).fp.testAsPractice; } catch (e) { return false; } });
+    const ceil = asPractice ? Object.assign({}, CEILING, { L: DENSE_CEILING.short.L }) : CEILING;
     const oneLine = items.length && items.every((it) => it.fclass === 'short' || it.template === 'fact' || it.template === 'equation'
         || (it.footprint && it.footprint.factLike));
     if (oneLine && !long) {
         return resolveSectionLayout({
             role: 'test', columns: input.columns || 'auto', count: count || items.length,
             target: { cols: 4, rows: { S: 5, M: 4, L: 4 }, rowsByCols: { 3: 4, 2: 4, 1: 4 } },
-            ceiling: CEILING, floor: (input.floors || {}).main,
+            ceiling: ceil, floor: (input.floors || {}).main,
             dense: { S: 20, M: 20, L: 20 }, denseRoom: 1.05, denseMaxCols: 5,
         }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
     }
-    // A short track that the practice page packs 16 to a page at L (a count-on strip) tests on that
-    // same grid (footprint `testAsPractice`, critic k2-r3: 10 items in 35 mm cells left 30% of every
-    // cell empty at L). Only L moves (12 -> 16); S and M keep 12.1's 20 / 16.
-    const asPractice = !long && items.length > 0 && items.every((it) => it.footprint && it.footprint.testAsPractice);
-    const ceil = asPractice ? Object.assign({}, CEILING, { L: DENSE_CEILING.short.L }) : CEILING;
     return resolveSectionLayout({
         role: 'test', columns: input.columns || 'auto', count: count || items.length,
         target: long ? { cols: 2, rows: { S: 3, M: 2, L: 2 } } : { cols: 4, rows: { S: 5, M: 4, L: 4 }, rowsByCols: { 3: 4, 2: 4, 1: 4 } },
