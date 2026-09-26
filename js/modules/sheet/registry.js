@@ -31,7 +31,42 @@ const withoutSupports = (p) => { const o = Object.assign({}, p); delete o.suppor
  * @property {(payload: Object) => Object} [layout]
  * @property {(payload: Object, fromV: number) => Object} [migrate]
  * @property {string[]} [states]
+ * @property {'S'|'M'|'L'|((payload: Object) => ('S'|'M'|'L'|null))} [minSize]
+ *           the smallest print size the template can be drawn at (owner ruling 2026-09-26,
+ *           LESSON_LIBRARY_PLAN.md 8a). On a page set smaller, an item of this template keeps its
+ *           floor size and the rest of the page keeps the chosen size (cellMinSize / sizeFloor).
  */
+
+/** The print sizes, smallest first. */
+export const SIZE_ORDER = Object.freeze(['S', 'M', 'L']);
+
+/**
+ * The size an item is drawn at on a page of `size`: the page's size, unless the item's floor
+ * (`floor`, e.g. a template's minSize) is larger - then the floor. Never smaller than either.
+ */
+export function sizeFloor(size, floor) {
+    const a = SIZE_ORDER.indexOf(String(size || '').toUpperCase());
+    const b = SIZE_ORDER.indexOf(String(floor || '').toUpperCase());
+    if (b < 0) return a < 0 ? size : SIZE_ORDER[a];
+    if (a < 0) return SIZE_ORDER[b];
+    return SIZE_ORDER[Math.max(a, b)];
+}
+
+/**
+ * The smallest print size a question's cell can be drawn at: its template's `minSize` (a size or
+ * a function of the payload), or the question's own `cell.minSize`; null when it has none.
+ */
+export function cellMinSize(q) {
+    const spec = (q && q.cell) || {};
+    const tpl = resolveTemplate(spec.template);
+    let m = null;
+    try {
+        const own = spec.minSize;
+        const t = typeof tpl.minSize === 'function' ? tpl.minSize(payloadFor(tpl, q, spec)) : tpl.minSize;
+        m = sizeFloor(t || null, own || null);
+    } catch (e) { m = null; }
+    return SIZE_ORDER.includes(m) ? m : null;
+}
 
 /**
  * Register a cell template. Registering the same id twice throws (SCC-T2): registration

@@ -26,7 +26,7 @@ import {
     esc, blank, getProvider, instructionFor, INSTRUCTION_LIBRARY, JUDGE_LABELS,
     SIZES, DEFAULT_SIZE, LOOKS, DEFAULT_LOOK, deriveSeed, rng, shuffle,
 } from '../index.js';
-import { paperOf, bodyHeightMm, instructionMm, resolveSectionLayout, fitsLine, LIVE_W_MM } from '../layout.js';
+import { paperOf, bodyHeightMm, instructionMm, resolveSectionLayout, fitsLine, LIVE_W_MM, itemCap } from '../layout.js';
 import {
     skillWords, levelLine, gradeWords, instructionHtml, estimateTitleLines, styleBlock, hookClasses,
     STRAND_BY_CATEGORY, sectionInstructionKey, resolveInstruction, varsOfItems,
@@ -86,7 +86,7 @@ export function frameOf({ skills = [], input = {}, tabId, title, twoLine = false
     const derived = title || (titles.length === 1 ? titles[0] : titles.length ? 'Mixed practice' : 'I Can practise');
     const finalTitle = typeof h.title === 'string' && h.title.trim() ? h.title.trim() : derived;
     const strands = [...new Set(words.map((w) => w.strand).filter(Boolean))];
-    const level = levelLine(skills.map((s) => s.grade));
+    const level = levelLine(skills.flatMap((s) => s.grades || [s.grade]));
     const tabLines = Array.isArray(h.tab) && h.tab.length ? h.tab.map(String)
         : !twoLine && strands.length === 1 ? [level, strands[0], tabId] : [level, tabId];
     const ids = [...new Set(skills.map((s) => s.skillId).filter(Boolean))];
@@ -94,7 +94,7 @@ export function frameOf({ skills = [], input = {}, tabId, title, twoLine = false
     const codes = [...new Set(skills.flatMap((s) => String(s.ccss || '').split(/[,;]\s*/)).map((c) => c.trim()).filter(Boolean))];
     const ccss = codes.length > 9 ? `${codes.slice(0, 9).join(', ')} +${codes.length - 9}` : codes.join(', ');
     // A lesson packet prints its own tags on every sheet (header.footerLeft, roles/lesson.js).
-    const left = footerLeft || (typeof h.footerLeft === 'string' && h.footerLeft) || [idText, gradeWords(skills.map((s) => s.grade)), ccss].filter(Boolean).join(' · ');
+    const left = footerLeft || (typeof h.footerLeft === 'string' && h.footerLeft) || [idText, gradeWords(skills.flatMap((s) => s.grades || [s.grade])), ccss].filter(Boolean).join(' · ');
     const on = (k) => h[k] !== false;
     const tab = h.tab === false ? false : tabLines;
     const size = (input.ctx && SIZES[input.ctx.size]) ? input.ctx.size : DEFAULT_SIZE;
@@ -141,6 +141,20 @@ export function bandMetrics(ctx, header, { cont = false } = {}) {
     };
 }
 
+/**
+ * The extra height (mm) a band strip takes when its label and instruction wrap past one line
+ * (critic guided-r1: a two-line "Circle groups of the second number. Write the quotient and the
+ * remainder." pushed a Review 4 mm past its page). A width estimate, 0.5 em a character.
+ */
+export function stripExtraMm(ctx, label, text) {
+    const s = SIZES[ctx.size] || SIZES[DEFAULT_SIZE];
+    const em = s.textPt * (25.4 / 72);
+    const labelW = label ? String(label).length * 0.55 * em + 4 : 0;
+    const room = Math.max(40, LIVE_W_MM - 10 - labelW);
+    const lines = Math.max(1, Math.ceil((String(text || '').length * 0.5 * em) / room));
+    return (lines - 1) * em * 1.25;
+}
+
 /* ======================================================================== plan items */
 
 /** A host item's measured (or static) height at `cols`, the tallest of a set. */
@@ -159,7 +173,16 @@ export function fitsAt(items, cols, ctx) {
         // The item's own column cap first (a word problem is one column, PT-WPR-1, however
         // narrow its wrapped text measures), then the host's measurement (DN-10).
         const fp = it.footprint || {};
-        if (fp.maxCols && cols > fp.maxCols) return false;
+        // The item's cap as the practice roles read it (layout.itemCap; LESSONS_LEARNED L1/L2):
+        // a measured cell by its measurement - the widest count at which nothing overflowed,
+        // clipped or shrank (DN-10) - and, below L, a static-width cell by its own computed
+        // width. The author's `maxCols` alone held a Review of ordinal rows to one column at L
+        // where the Independent page of the same rows is 2 x 4 (k2-r1 critic).
+        const size = (ctx && ctx.size) || '';
+        const staticW = !fp.measure && !fp.factLike && Number.isFinite(fp.wMm);
+        const cap = fp.maxCols && !fp.hardCap && (staticW || (fp.measure && it.measured))
+            ? itemCap({ fp, measured: staticW ? null : it.measured, size }) : fp.maxCols;
+        if (cap && cols > cap) return false;
         if (cols > 1 && (it.fclass === 'word' || it.fclass === 'wide')) return false;
         const m = it.measured && it.measured[cols];
         return m ? m.fits !== false : true;

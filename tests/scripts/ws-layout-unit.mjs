@@ -21,7 +21,7 @@
 
 import {
     gridHeightMm, bodyHeightMm, headerHeightMm, FULL_HEADER, factRowsCapacity, stackMaxColumns,
-    stackCapacity, visualGridCapacity, resolveSectionLayout, cellWidthMm, paperOf, autoFitsAt,
+    stackCapacity, visualGridCapacity, resolveSectionLayout, cellWidthMm, paperOf, autoFitsAt, fillLimit,
 } from '../../js/modules/sheet/layout.js';
 import { groupRuns } from '../../js/modules/sheet/cells/k2kit.js';
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../../js/modules/sheet/paginate.js';
@@ -139,7 +139,9 @@ const L = (items, columns = 'auto', size = 'L', extra = {}) => resolveSectionLay
 for (const s of SIZES) {
     const lay = L(run(6, () => stackItem(3)), 'auto', s);
     eq([lay.cols, lay.rows, lay.perPage], [2, 3, 6], `PT 2.4 standard grid at ${s}`);
-    near(lay.cellH, s === 'L' ? 75.667 : 76, `PT 2.4 standard cell height at ${s}`, 0.01);
+    // Critic guided-r1 (one spare-height rule): a cell grows to layout.fillLimit of its content
+    // (1.5 x the content plus the pads, never past FILL_CAP), no longer to the whole even share.
+    near(lay.cellH, Math.min(s === 'L' ? 75.667 : 76, fillLimit(lay.hMin)), `PT 2.4 standard cell height at ${s} (fill limit)`, 0.01);
     eq(lay.cellW, 93, `PT 2.4 standard cell width at ${s}`);
 }
 // RUBRIC H13: a row held back by a ceiling is never stretched past FILL_CAP x its content, and
@@ -157,7 +159,8 @@ for (const s of SIZES) {
     eq(g.map((x) => x.id).join(''), 'bdacef', 'H13: tallest first, order kept within each height');
     const sh = rowShape(g, 2, 3, 75);
     ok(sh && (() => { const f = sh.rowsTpl.split(' ').map(parseFloat); return f.length === 3 && f[0] >= 79 && f[1] >= 19 && f[1] <= 19 * 1.8 + 0.1 && f[0] > 2 * f[1]; })() && sh.heightMm <= 3 * 75 + 0.01, `H13: rows weighted by what they hold (${sh && sh.rowsTpl}, ${sh && sh.heightMm} mm)`);
-    eq(rowShape([mk(40), mk(40), mk(40), mk(40)], 2, 2, 60), null, 'H13: equal rows are left as they were');
+    eq(rowShape([mk(40), mk(40), mk(40), mk(40)], 2, 2, 50), null, 'H13: equal rows within the fill limit are left as they were');
+    ok((() => { const sh2 = rowShape([mk(40), mk(40), mk(40), mk(40)], 2, 2, 70); return sh2 && sh2.heightMm <= 2 * fillLimit(41) + 0.1; })(), 'H13: equal rows past the fill limit are held to it');
 }
 // Page fill (owner 2026-09-25): an Independent page of SHORT problems takes more rows instead of
 // leaving an empty strip, up to DN-1's 20; a column stack keeps 12.1's grid.
@@ -182,8 +185,10 @@ for (const s of SIZES) {
     eq([s.cols, s.rows, s.perPage], [2, 8, 16], 'PT 2.4 one-symbol answers at S: 2 x 8');
     near(s.cellH, 28.5, 'PT 2.4 one-symbol cell at S', 0.01);
     eq([m.cols, m.rows, m.perPage], [2, 5, 10], 'PT 2.4 one-symbol answers at M: 2 x 5');
-    near(m.cellH, 45.6, 'PT 2.4 one-symbol cell at M', 0.01);
-    eq([l.cols, l.rows, l.perPage], [2, 4, 8], 'PT 2.4 one-symbol answers at L: 2 x 4 (05 Practice A)');
+    ok(m.cellH <= fillLimit(m.hMin) + 0.01, `PT 2.4 one-symbol cell at M within its fill limit (${m.cellH})`);
+    // Critic guided-r1: a cell held to its fill limit buys another row (2 x 5 at L, not 2 x 4
+    // with a strip of empty cell height).
+    ok(l.cols === 2 && l.perPage >= 8 && l.cellH <= fillLimit(l.hMin) + 0.01, `PT 2.4 one-symbol answers at L: 2 x 4 or more, within the fill limit (${l.cols} x ${l.rows})`);
     // A taller one-symbol cell drops to the next permitted shape, never to 2 x 7 (CL-2).
     const tall = L(short(35), 'auto', 'S');
     eq([tall.rows, tall.perPage], [5, 10], 'CL-2: one-symbol rows snap to a permitted grid');
@@ -286,13 +291,16 @@ eq(scoreDenominator([6, 6, 4, 4]), 20, 'PT-FRM-4: Score = every scored cell on t
 
 /* ===================================================================== the two roles */
 
+// The fixture skill has NO provider (its roles fall back to the kit's defaults, SCC 3.8). It was
+// add_1k_regroup until round 4 gave the addition ladder a provider; the id is a stand-in now.
+const NOPROV = 'add_noprovider_fixture';
 const stackQ = (a, b, op = '+') => ({
-    categoryId: 'addition', skillId: 'add_1k_regroup', skillLabel: 'Add within 1,000', answerType: 'number',
+    categoryId: 'addition', skillId: NOPROV, skillLabel: 'Add within 1,000', answerType: 'number',
     text: `${a} ${op} ${b} = ?`, ans: op === '+' ? a + b : a - b, a, b, op,
     cell: { template: 'stack', v: 1, payload: { operands: [a, b], op } },
 });
 const stackRun = (n) => run(n, (i) => ({ q: stackQ(111 + i * 7, 222 + i * 3) }));
-const SKILL = [{ categoryId: 'addition', skillId: 'add_1k_regroup', label: 'Add within 1,000 (With Regrouping)', grade: 3, instructionKey: 'add', ccss: '3.NBT.A.2' }];
+const SKILL = [{ categoryId: 'addition', skillId: NOPROV, label: 'Add within 1,000 (With Regrouping)', grade: 3, instructionKey: 'add', ccss: '3.NBT.A.2' }];
 
 eq(ROLE_IDS.includes('independent') && ROLE_IDS.includes('more-practice'), true, 'roles/index.js registers both roles');
 
@@ -380,12 +388,12 @@ const hostLike = (q, h = 50) => {
         q, key, template: q.cell.template, legacy: false, skill: `${q.categoryId}:${q.skillId}`, answerType: 'number',
         footprint: Object.assign({}, fp, { measure: false, maxCols: 6 }), measured, fclass: 'standard', cellCls: '',
         canShow: () => true,
-        render: (c, { shown, ink } = {}) => {
+        render: (c, { shown, ink, shownSlots } = {}) => {
             let state = c.state;
             let wrong = c.wrong;
             if (shown !== undefined && shown !== null && shown !== '') {
                 if (ink === 'trace' && String(shown) === ans) state = 'traced';
-                else { state = 'wrong'; wrong = { value: String(shown) }; }
+                else { state = 'wrong'; wrong = { value: String(shown), slots: Object.assign({}, shownSlots || {}) }; }
             }
             return renderCell(q, Object.assign({}, c, { state, wrong }));
         },
@@ -407,7 +415,7 @@ const ADD_SKILL = Object.assign({}, SKILL[0], { iCan: 'I Can add within 1,000' }
  */
 function hostPlan(roleId, skills, make, extra = {}) {
     const mod = ROLE_MODULES[roleId];
-    const earlier = (sk, n) => (sk.skillId === 'add_1k_regroup' ? ['add_100_regroup', 'add_100_no_regroup', 'add_20_regroup', 'add_10'].map((skillId) => ({ categoryId: 'addition', skillId })).slice(0, n) : []);
+    const earlier = (sk, n) => (sk.skillId === NOPROV ? ['add_100_regroup', 'add_100_no_regroup', 'add_20_regroup', 'add_10'].map((skillId) => ({ categoryId: 'addition', skillId })).slice(0, n) : []);
     const pools = mod.sources(skills.map((s) => ({ categoryId: s.categoryId, skillId: s.skillId, weight: s.weight })), { earlier });
     const input = Object.assign({ items: [], skills, pools: pools.map((p) => ({ id: p.id, weight: p.weight || 1 })), ctx: { size: 'L', paper: 'A4' }, seed: 42, form: 'A', floors: {} }, extra);
     const deal = (pool, n) => {
@@ -460,10 +468,11 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
 {
     const { plan, r } = hostPlan('guided', [ADD_SKILL], addMake);
     ok(plan.meta.items >= 6 && plan.meta.items <= 12, `PT 2.3 (re-grade 2026-09-25): Guided at L fills the page, 6 to 12 cells (${plan.meta.items})`);
-    // Critic round 2 (C4): the Guided page is lettered and scored like every other role; the
-    // worked example carries the Model tab and is not scored.
+    // The Guided page is scored like every other role; the worked example carries the Model tab
+    // and is not scored.
     eq(plan.header.score, plan.meta.items - 1, 'Guided: Score counts every cell but the worked example');
-    ok(/data-ws-label="letter"/.test(r.pupilHtml), 'Guided: quiet letter labels');
+    // CL-14 (round-4 re-grade, superseding round 2's letters): Guided cells are unlabelled.
+    ok(!/data-ws-label="letter"/.test(r.pupilHtml), 'CL-14: Guided cells carry no letter labels');
     ok(/data-ws-label="model"/.test(r.pupilPages[0]), 'Guided: the worked example carries the Model tab');
     ok(/data-ws-ink="trace"/.test(r.pupilPages[0]), 'PT-GDP-1: cell 1 carries its answer in trace grey');
     ok(/Guided Practice:/.test(r.pupilHtml), 'PT 2.3: the Guided Practice band');
@@ -475,7 +484,9 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     ok(cells.length >= 3 && /class="mq-untraced"/.test(cells[1]) && /data-ws-ink="trace"|ws-trace/.test(cells[1]), 'PEDAGOGY 4.2 H5: cell 2 is partially traced');
     ok(!/ws-trace|data-ws-ink="trace"/.test(cells[cells.length - 1]), 'PT-GDP-1: the last row is solid (no trace)');
     const grid = plan.pages[0].sections.find((s) => s.kind === 'band' && s.label === 'Guided Practice:').content;
-    ok(parseFloat(grid.height) >= 170, `Guided: the grid fills the page under the bands (${grid.height})`);
+    // Critic guided-r1: the rows grow only to their content limit (guided.js rowLimit); the rest of
+    // the page stays under the grid, never as gaps between rows.
+    ok(parseFloat(grid.height) >= 140 && !grid.rowGap, `Guided: the grid fills the page to its rows' content limit, no row gaps (${grid.height})`);
 }
 // Critic round 2: the fade traces the WORKING (carries), never a lone digit, and cues facts.
 {
@@ -543,6 +554,59 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
     const html = p && p.render(ctx, { cols: 1 });
     ok(html && (html.match(/data-ws-slot="ea-ans-\d"/g) || []).length === 3, 'Error analysis: a three-value answer gets one fix box per value');
+    // Critic regrade 5 (AX-4): the Correct / Fix-it block in ONE place on every cell of a page.
+    const { intoAnswerColumn } = ROLE_MODULES['error-analysis'];
+    eq(intoAnswerColumn('<div><svg></svg><div class="fg-ask"><div>Q</div><div>A</div></div></div>', '<i>J</i>'),
+        '<div><svg></svg><div class="fg-ask"><div>Q</div><div>A</div><i>J</i></div></div>', 'Error analysis: the judgement goes at the END of the item\'s own answer column');
+    eq(intoAnswerColumn('<div><span>7</span></div>', '<i>J</i>'), null, 'Error analysis: no answer column, no insertion');
+    const modes = new Set();
+    for (const mode of ['beside', 'below']) {
+        const hm = p && p.render(ctx, { cols: 1, judge: mode });
+        if (hm && new RegExp(`mq-j${mode}[^"]*"[^>]*data-judge-mode="${mode}"`).test(hm)) modes.add(mode);
+    }
+    ok(modes.size === 2 && Array.isArray(p.judgeModes) && p.judgeModes.includes('incol'), 'Error analysis: the page\'s judge mode reaches every cell, and the host is told which modes to measure');
+    // Critic EA r5 / pv-r1 (L3): nothing on the pupil page may tell a wrong answer from a right one.
+    const { likeAnswer, roomOf, varied, rowHeights } = ROLE_MODULES['error-analysis'];
+    eq(likeAnswer('40000', '60,000'), '40,000', 'L3: a wrong value takes the right answer\'s commas');
+    eq(likeAnswer('40,000', '60000'), '40000', 'L3: ... and drops them when the right answer has none');
+    eq(likeAnswer('3.5', '2.75'), '3.50', 'L3: ... its decimal places');
+    eq(likeAnswer('5', '7 cm'), '5 cm', 'L3: ... and its unit');
+    eq(likeAnswer('<', '>'), '<', 'L3: a sign is left as it is');
+    // critic pv-r2: the rounding keys are stored "6000" on a page that prints "6,093" - the PAGE's
+    // rule decides, for the wrong value AND the right one
+    eq(likeAnswer('10000', '6000', { commas: true }), '10,000', 'L3: a page that prints commas writes the wrong value with them, whatever the key stores');
+    eq(likeAnswer('6000', '6000', { commas: true }), '6,000', 'L3: ... and the right value too');
+    eq(likeAnswer('6,093', '6000', { commas: false }), '6093', 'L3: a page without commas writes none');
+    eq(likeAnswer('170', '80 + 80 = 160'), '170', 'L3: a sentence answer is never glued to a bare number');
+    eq(likeAnswer('3:30', '3:15'), '3:30', 'L3: a time is left as written');
+    eq(likeAnswer('5', '3/4'), '5', 'L3: a fraction tail is not a unit');
+    {
+        // one pupil page, one rounding item shown right and one shown wrong: no 4+ digit number without its comma
+        const rq = (ans, n) => ({ categoryId: 'number_sense', skillId: 'nearest_1000', ans, text: `Round ${n} to the nearest 1,000.`, cell: { template: 'equation', v: 1, payload: {} } });
+        const itm = (ans, n) => ({ q: rq(ans, n), template: 'equation', fclass: 'standard', footprint: { wMm: 80 }, render: (c, o) => `<div>${(o && o.shownSlots && o.shownSlots.answer) || (o && o.shown) || ''}</div>`,
+            key: { value: ans, display: ans, slots: { answer: { value: ans, graded: true } } } });
+        const right = prepare(itm('6000', '6,093'), { index: 0, wrong: false });
+        const html = right && right.render(ctx, { cols: 1, judge: 'below' });
+        ok(html && /6,000/.test(html) && !/\b6000\b/.test(html), 'L3: a right answer stored "6000" prints "6,000" on a page that writes commas');
+    }
+    // The fix box's width comes from what the page prints, never from the right answer.
+    const roundQ = (ans) => ({ categoryId: 'number_sense', skillId: 'nearest_1000', ans, text: 'Round 9,677 to the nearest 1,000.', cell: { template: 'equation', v: 1, payload: { n: 9677, place: 1000, answer: ans } } });
+    const widthOf = (ans, shown) => {
+        const itm = { q: roundQ(ans), template: 'equation', fclass: 'standard', footprint: { wMm: 80 }, render: () => '<div>Round 9,677</div>', key: { value: ans, display: ans, slots: { answer: { value: ans, graded: true } } } };
+        const pp = prepare(itm, { index: 0, wrong: false });
+        const hm = pp && pp.render(ctx, { cols: 1, judge: 'below' });
+        const m = hm && /<[^>]*--w:\s*([\d.]+)mm[^>]*data-ws-slot="ea-ans"/.exec(hm);
+        return m ? Number(m[1]) : NaN;
+    };
+    ok(Number.isFinite(widthOf('10,000')) && widthOf('10,000') === widthOf('9,000'), `L3: the fix box is as wide for "10,000" as for "9,000" (${widthOf('10,000')} / ${widthOf('9,000')} mm)`);
+    eq(roomOf({ q: roundQ('10,000') }), roomOf({ q: roundQ('9,000') }), 'L3: the fix room reads the printed numbers, not the answer');
+    // L10: the page deals each right answer once before it repeats one.
+    const mk = (c, w) => ({ thinking: { correct: c, isWrong: w } });
+    eq(varied([mk('>', true), mk('>', true), mk('<', true), mk('=', false)]).map((x) => x.thinking.correct).join(''), '><=>', 'L10: a new right answer comes before a repeat (wrong items)');
+    // A page's spare height grows its rows, never a strip between them.
+    const fake2 = (h) => ({ measured: { 1: { hMm: h, fits: true } } });
+    const rh = rowHeights([fake2(40), fake2(40)], 1, 200);
+    ok(rh.every((x) => x > 44 && x <= 100) && Math.abs(rh[0] - rh[1]) < 0.01, `EA r5 A: rows grow alike toward the grid, at most 1.4 times (${rh.join(', ')})`);
 }
 // Guided Steps band: the provider's own steps, read row by row (1 2 / 3 4), never 1 3 / 2.
 {
@@ -571,7 +635,7 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     const short = run(20, (i) => ({ q: stackQ(11 + i, 22 + i), measured: Object.fromEntries([1, 2, 3, 4].map((c) => [c, { hMm: 30, fits: true }])), footprint: { measure: true, hMm: null, maxCols: 6 } }));
     const plain = L(short, 'auto', 'L');
     const dense = L(short, 'auto', 'L', { dense: true });
-    ok(dense.perPage > plain.perPage && dense.perPage <= 12, `dense: more items than the 2 x 3 default, within the 12 ceiling (${plain.perPage} -> ${dense.perPage})`);
+    ok(dense.perPage > plain.perPage && dense.perPage <= 20, `dense: more items than the 2 x 3 default, within DN-1's 20 (${plain.perPage} -> ${dense.perPage})`);
     ok(dense.cellH >= 30 * 1.2 - 0.01, 'dense: every cell keeps 1.2 x its measured content');
     const tall = run(6, (i) => ({ q: stackQ(11 + i, 22 + i), measured: Object.fromEntries([1, 2, 3, 4].map((c) => [c, { hMm: 70, fits: true }])), footprint: { measure: true, hMm: null, maxCols: 6 } }));
     ok(L(tall, 'auto', 'L', { dense: true }).perPage >= L(tall, 'auto', 'L').perPage, 'dense: never fewer items than the default grid');
@@ -586,6 +650,23 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     ok(plan.meta.wrongShare > 0, 'PT-ERR-1: at least one real wrong answer');
     ok(/data-ws-slot="ea-ans" data-ws-shape="box"/.test(r.pupilHtml), 'Error analysis: the fix is a square write box');
     ok(/correct answer<\/small>/.test(r.pupilHtml), 'Error analysis: the write box is captioned');
+    // Critic round 4 (H1): a "wrong" item whose work shows the RIGHT answer never prints.
+    const { prepare: eaPrepare } = ROLE_MODULES['error-analysis'];
+    const honest = hostLike(stackQ(333, 111));
+    ok(eaPrepare(honest, { index: 0, wrong: true }) !== null, 'Error analysis: a wrong item whose work shows the wrong value is kept');
+    const liar = Object.assign(hostLike(stackQ(333, 111)), { render: (c) => renderCell(stackQ(333, 111), Object.assign({}, c, { state: 'answered' })) });
+    ok(eaPrepare(liar, { index: 0, wrong: true }) === null, 'Error analysis: a wrong item whose template draws the right answer is never printed (H1)');
+    // LESSONS_LEARNED L3, the round-4 case: add_three's cell fills its slot from the key, so a
+    // "wrong" 7 for 3 + 4 + 3 was drawn as 10. The role names the slot; the work shows 7.
+    const a3q = { categoryId: 'addition', skillId: 'add_three', answerType: 'number', text: '3 + 4 + 3 = ?', ans: 10,
+        distractorTags: { 7: 'Added only two of the three numbers.' },
+        cell: { template: 'add-three', v: 1, payload: { a: 3, b: 4, c: 3, pictures: false } } };
+    const a3 = eaPrepare(hostLike(a3q), { index: 0, wrong: true });
+    ok(a3 !== null && a3.thinking.shown === '7', `L3: add_three shows the wrong 7 in its own slot (${a3 && a3.thinking.shown})`);
+    if (a3) {
+        const work = a3.render(resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'answered' }), { cols: 1 });
+        ok(/data-ws-slot="answer"[^>]*>(?:<[^>]*>)*7</.test(work), 'L3: the pupil\'s slot holds 7, never the right sum');
+    }
     const none = hostPlan('error-analysis', [ADD_SKILL], addMake);
     ok(typeof none.unsupported === 'string' && /wrong/.test(none.unsupported), `PT-ERR-1: no real wrong answer -> unsupported, never an all-correct page (${none.unsupported || none.plan.meta.wrongShare})`);
 }
@@ -1050,6 +1131,62 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     const hops = L.hopsSvg(7, 2, 'trace');
     eq((hops.match(/<text/g) || []).length, 3, 'lesson: count on 2 from 7 draws 7, 8, 9');
     ok(/>7<\/text>/.test(hops) && />9<\/text>/.test(hops) && (hops.match(/data-ws-ink="trace"/g) || []).length === 2, 'lesson: the counted numbers are grey on their step, the start number black');
+}
+
+/* =========================== owner ruling 2026-09-26: a template's size floor (minSize) */
+// LESSON_LIBRARY_PLAN.md 8a: an item that cannot be drawn at the chosen size keeps its floor,
+// the rest of the page keeps the chosen size, and a mixed page packs them together - S still holds
+// more than L, no item is below its floor, and no row is stretched past its content (H13).
+{
+    const { registerCell, hasCell, cellMinSize, sizeFloor } = await import('../../js/modules/sheet/index.js');
+    const DIM = { S: 26, M: 36, L: 46 };
+    const FLOOR_T = 'test-floor-m';
+    if (!hasCell(FLOOR_T)) {
+        registerCell(FLOOR_T, {
+            minSize: 'M',
+            render: () => '<span>floor</span>',
+            footprint: (p, ctx) => ({ wMm: DIM[ctx.size] + 8, hMm: DIM[ctx.size], measure: false, factLike: false, maxCols: 4 }),
+        });
+    }
+    if (!hasCell('test-floor-any')) {
+        registerCell('test-floor-any', {
+            render: () => '<span>any</span>',
+            footprint: (p, ctx) => ({ wMm: DIM[ctx.size] + 8, hMm: DIM[ctx.size], measure: false, factLike: false, maxCols: 4 }),
+        });
+    }
+    eq(sizeFloor('S', 'M'), 'M', 'sizeFloor: an S page draws an M-floor item at M');
+    eq(sizeFloor('L', 'M'), 'L', 'sizeFloor: an L page draws an M-floor item at L (never smaller)');
+    eq(sizeFloor('M', null), 'M', 'sizeFloor: no floor keeps the page size');
+    const qF = { cell: { template: FLOOR_T, payload: {} } };
+    const qA = { cell: { template: 'test-floor-any', payload: {} } };
+    eq(cellMinSize(qF), 'M', 'cellMinSize reads the template minSize');
+    eq(cellMinSize(qA), null, 'cellMinSize: none declared');
+    // The host (print-sheet.js hostItem) takes each item's footprint at sizeFloor(page, minSize).
+    const itemsAt = (size) => Array.from({ length: 20 }, (_, i) => {
+        const q = i === 3 ? qF : qA;
+        const at = sizeFloor(size, cellMinSize(q)) || size;
+        return { q, footprint: cellFootprint(q, resolveCtx({ size: at, look: 'ican' })), floorSize: at };
+    });
+    const pageS = L(itemsAt('S'), 'auto', 'S', { dense: true });
+    const pageL = L(itemsAt('L'), 'auto', 'L', { dense: true });
+    ok(pageS.perPage > pageL.perPage, `size floor: a mixed page at S with an M-floor item holds more than at L (${pageS.perPage} vs ${pageL.perPage})`);
+    const fS = itemsAt('S')[3];
+    ok(fS.floorSize === 'M' && fS.footprint.hMm === DIM.M, 'size floor: the M-floor item on an S page is drawn at M (its floor)');
+    ok(itemsAt('S').every((it) => it.footprint.hMm >= DIM[cellMinSize(it.q) || 'S']), 'size floor: every item at or above its floor');
+    ok(!pageS.clamped && pageS.cols >= pageL.cols, `size floor: the page is not forced up a size (S ${pageS.cols} columns, L ${pageL.cols})`);
+    ok(pageS.cellH <= 1.8 * (DIM.M + 12) + 0.5, `size floor: H13 - the S rows are no taller than 1.8 x the tallest item (${pageS.cellH})`);
+}
+
+// Critic guided-r1 (mixed place value at S): a dense section of MIXED heights (a mat among
+// one-line frames) packs its rows by height up to its dense ceiling, not the practice ceiling:
+// it held 6 problems in the top half of the page.
+{
+    const hs = [64, 54, 53, 29, 27, 15, 15, 14, 14, 13, 13, 15, 54, 25, 14, 13];
+    const items = hs.map((h, i) => ({ id: `m${i}`, measured: { 1: { hMm: h, fits: true }, 2: { hMm: h, fits: true } }, footprint: { measure: true, hMm: null, maxCols: 2 } }));
+    const dense = L(items, 'auto', 'S', { dense: true });
+    ok(dense.packed && dense.perPage > 6, `packing: a dense mixed-height section packs past the practice ceiling (${dense.cols} x ${dense.rows})`);
+    const plain = L(items, 'auto', 'S');
+    ok(plain.perPage <= dense.perPage, 'packing: a section that is not dense keeps its ceiling');
 }
 
 /* ======================================================================= report */

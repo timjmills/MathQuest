@@ -83,7 +83,9 @@ export function thermometerSVG(p, ctx) {
     const pitch = (isTwin(ctx) ? 2.5 : ({ S: 2, M: 2.25, L: 2.5 }[sizeOf(ctx)] || 2.5)) / step;
     const labPt = isTwin(ctx) ? 18 : Math.max(zonePt(ctx), textPt(ctx));
     const labMm = labPt * PT_MM;
-    const tx = 1.5, tw = 7, cx = tx + tw / 2;
+    // the bulb (r 6.5) is wider than the tube: the tube sits in from the left so the bulb's
+    // edge and stroke stay inside the viewBox (it drew 1.5 mm outside the cell, left-aligned)
+    const tw = 7, tx = 6.5 - tw / 2 + 1, cx = tx + tw / 2;
     const yT = labMm + 3.5;                               // the tube's top, under the unit
     const y = (d) => yT + 4 + (hi - d) * pitch;
     const yB = y(lo) + 4;

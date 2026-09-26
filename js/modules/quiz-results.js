@@ -388,6 +388,8 @@ export function printQuizTest(quiz, options = {}) {
     let html = `<!DOCTYPE html><html><head>
         <meta charset="UTF-8">
         <title>${escHtml(quiz.name)}</title>
+        <meta name="copyright" content="&copy; ${new Date().getFullYear()} Cultivating the Digital. All rights reserved.">
+        <meta name="author" content="Cultivating the Digital">
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
         <style>
             body { font-family: 'Nunito', sans-serif; margin: 20px 40px; color: #1a1a2e; }
@@ -505,6 +507,11 @@ export function printQuizTest(quiz, options = {}) {
     html += `<div class="no-print" style="text-align:center;margin-top:30px;">
         <button onclick="window.print()" style="padding:10px 30px;font-size:1rem;background:#8b5cf6;color:white;border:none;border-radius:10px;cursor:pointer;">Print</button>
     </div>`;
+    // Owner ruling 2026-09-26: the copyright line on every printed paper, on every page.
+    const copyLine = `\u00A9 ${new Date().getFullYear()} Cultivating the Digital. All rights reserved.`;
+    html += `<style>@page { margin: 12mm 10mm; @bottom-center { content: "${copyLine}"; font-family: 'Andika', sans-serif; font-size: 8pt; color: #000; } }
+        .mq-copy { margin-top: 24px; text-align: center; font-size: 8pt; color: #000; }</style>
+        <div class="mq-copy">${copyLine}</div>`;
     html += '</body></html>';
 
     // Open in new window for printing
