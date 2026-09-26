@@ -195,7 +195,7 @@ register('arrays', {
  * three: with at most five rows (25 counters, the generator's cap) every cell of a page is within
  * 1.5 x of the tallest, one even grid holds them all, and no cell leaves a band of a third.
  */
-const REM_GEO = { S: { d: 6.5, gap: 2.5, rowGap: 4 }, M: { d: 7, gap: 2.5, rowGap: 4 }, L: { d: 9, gap: 3, rowGap: 5 } };
+const REM_GEO = { S: { d: 6.5, gap: 3, rowGap: 4.5 }, M: { d: 7, gap: 3.5, rowGap: 5 }, L: { d: 8.5, gap: 4, rowGap: 6 } };
 const REM_PER_ROW = 5;
 const REM_MIN_ROWS = 3;
 function remainderGeometry(size, n) {
