@@ -4,7 +4,7 @@ import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { COLORS, STROKE, FONTS, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
 import { k2Twin, fadeRung } from './sheet/index.js';
-import { dealPick } from './page-deal.js';
+import { dealPick, pageConstant } from './page-deal.js';
 
 // P12: an option value the teacher chose for this skill (skill-options.js), else undefined.
 function _dOpt(id) {
@@ -101,6 +101,19 @@ const BAR_CONTEXTS = [
  * AP2 round 4: the question kinds a skill's ticked forms allow, in the order a page turns
  * through them (a count first, the check-box kinds apart). `map[f]` lists the kinds of form f.
  */
+/**
+ * One answer shape a page (RUBRIC C1, critic figures-r7): where a skill's ticked forms mix
+ * number questions with "which has the most?" check-box questions, a printed page (or online
+ * sheet) deals ONE of the two - about one page in three the check-box kinds, the others the
+ * number kinds - drawn once a page from the seeded rng. Live play keeps them mixed.
+ */
+function _dPageKinds(kinds, key) {
+    const chk = kinds.filter(k => k === 'most' || k === 'least');
+    const num = kinds.filter(k => !chk.includes(k));
+    if (!chk.length || !num.length || !_dOnPage()) return kinds;
+    return pageConstant(`${key}:shape`, 3) === 0 ? chk : num;
+}
+
 function _dKinds(map) {
     const forms = _dSet('forms') || Object.keys(map).map(Number);
     const allowed = new Set(forms.flatMap(f => map[f] || []));
@@ -519,39 +532,44 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
             // ===== BUILD A PICTOGRAPH (G2) — interactive widget =====
             // Student adjusts each row's icon count with +/- buttons (1 picture = 1 item).
             if (dataSkill === "build_pictograph") {
-                const _picCtxs = [
-                    { title: "Animals", cats: ["Cats", "Dogs", "Birds", "Rabbits"], icons: ["🐱", "🐶", "🐦", "🐰"] },
-                    { title: "Sea Life", cats: ["Fish", "Crabs", "Turtles"], icons: ["🐠", "🦀", "🐢"] },
-                    { title: "Snacks", cats: ["Apples", "Cookies", "Grapes"], icons: ["🍎", "🍪", "🍇"] },
-                    { title: "Toys", cats: ["Cars", "Balls", "Blocks"], icons: ["🚗", "⚽", "🧱"] },
-                    { title: "Bugs Found", cats: ["Ants", "Bees", "Ladybugs"], icons: ["🐜", "🐝", "🐞"] }
+                // BUILD A PICTOGRAPH (G2, 2.MD.D.10) - AP2 round 6 (critic figures-r7): one kit cell
+                // (sheet/cells/figures.js `picture-build`) on paper, in the key and on the three
+                // screen hosts: each row names its number and shows its own picture, and the pupil
+                // draws one picture a box (on screen a tap draws it). The answer is the counts,
+                // "3,5,2". Options: rows 3 / 4, most pictures 3 / 5 / 7, the pictures (each row's own,
+                // or one plain circle) and a Support level that draws the first picture in grey.
+                const _pbCtxs = [
+                    { title: 'Toys', cats: ['Balls', 'Cars', 'Stars'], icons: ['ball', 'car', 'star'] },
+                    { title: 'Things We Found', cats: ['Apples', 'Flowers', 'Fish'], icons: ['apple', 'flower', 'fish'] },
+                    { title: 'Shapes We Drew', cats: ['Circles', 'Squares', 'Triangles', 'Stars'], icons: ['circle', 'square', 'triangle', 'star'] },
+                    { title: 'At the Park', cats: ['Balls', 'Flowers', 'Cars'], icons: ['ball', 'flower', 'car'] },
                 ];
-                // P12: `tiles` fixes the number of rows (3, or 4 from the one context that has four);
-                // `band` 5 keeps every row to 5 pictures (the default runs to 7).
+                const _pbEmoji = { ball: '\u26BD', car: '\u{1F697}', star: '\u2B50', apple: '\u{1F34E}', flower: '\u{1F338}', fish: '\u{1F420}',
+                    circle: '\u26AA', square: '\u2B1C', triangle: '\u{1F53A}' };
+                const at = _dAt();
                 const _pT = Number(_dOpt('tiles'));
-                const _ctx = _pT === 4 ? _picCtxs[0] : pick(_picCtxs);
-                const numCats = _pT === 3 || _pT === 4 ? _pT : Math.min(_ctx.cats.length, pick([3, 3, 4]));
-                const cats = _ctx.cats.slice(0, numCats);
-                const icons = _ctx.icons.slice(0, numCats);
-                const values = cats.map(() => randInt(1, Number(_dOpt('band')) === 5 ? 5 : 7));
-                const targetData = cats.map((label, i) => ({ label, value: values[i], icon: icons[i] }));
-                const valuesPhrase = targetData.map(d => `${d.label}=${d.value}`).join(', ');
-                q.text = `Build a pictograph: ${valuesPhrase} (each picture = 1).`;
-                q.ans = "graph-built";
-                q.hint = `Use + to add a picture and − to remove one. Make each row match the value.`;
-                q.answerType = "graph-builder";
-                q.graphType = "pictograph";
-                q.targetData = targetData;
-                q.maxValue = 10;
+                const _ctx = _pT === 4 ? _pbCtxs[2] : dealPick('build_pictograph:context', _pbCtxs);
+                const numCats = _pT === 3 || _pT === 4 ? Math.min(_pT, _ctx.cats.length) : Math.min(_ctx.cats.length, 3);
+                const order = shuffle(_ctx.cats.map((_, k) => k)).slice(0, numCats);
+                const cats = order.map(k => _ctx.cats[k]);
+                const plain = _dOpt('objects') === 'shapes';
+                const icons = order.map(k => (plain ? 'circle' : _ctx.icons[k]));
+                const most = [3, 5, 7].includes(Number(_dOpt('band'))) ? Number(_dOpt('band')) : 7;
+                const values = cats.map(() => randInt(1, most));
+                if (Math.max(...values) === Math.min(...values) && values.length > 1) values[0] = values[0] < most ? values[0] + 1 : values[0] - 1;
+                const payload = { title: _ctx.title, categories: cats, values, icons, slots: most, catTitle: 'Row', support: _dLevel(at) };
+                q.cell = { template: 'picture-build', v: 1, payload };
+                q.visual = k2Twin('picture-build', payload);
+                q.text = 'Draw the pictures. Make each row match its number.';
+                q.screenInstr = 'Tap the boxes to draw the pictures. Make each row match its number.';
+                q.ans = values.join(',');
+                q.answerType = 'text';
+                q.options = [];
+                q.hint = 'Look at the number in each row. Draw that many pictures, one in each box.';
+                q.targetData = cats.map((label, k) => ({ label, value: values[k], icon: _pbEmoji[icons[k]] || '\u26AA' }));
                 q.skillLabel = "Build Pictograph";
                 q.printFormat = "build-pictograph";
                 q.dataData = { categories: cats, values, icons, context: _ctx.title, type: 'build_pictograph' };
-                // The printed page (critic guided-r1 H1 / H9): a kit cell with 8-10 mm boxes, one
-                // picture a box, and a key that draws the pictures (sheet/cells/figures.js). The
-                // screen keeps its + / - builder (q.cell is read by print only for this template).
-                const _shapes = ['circle', 'square', 'star', 'triangle'];
-                q.cell = { template: 'picture-build', v: 1, payload: { title: _ctx.title, categories: cats, values,
-                    icons: cats.map((_, i) => _shapes[i % _shapes.length]), slots: Number(_dOpt('band')) === 5 ? 5 : 7, catTitle: 'Row' } };
                 return;
             }
 
@@ -922,7 +940,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 const half = step === 2 || step === 10;
                 const unit = half ? step / 2 : step;
                 const kMax = Math.max(2, Math.floor(barMax / unit));
-                const kinds = _dKinds({ 0: ['most', 'least'], 1: ['value'], 2: ['more'], 3: ['total'] });
+                const kinds = _dPageKinds(_dKinds({ 0: ['most', 'least'], 1: ['value'], 2: ['more'], 3: ['total'] }), dataSkill);
                 const kind = dealPick(`${dataSkill}:kind`, kinds);
                 const deal = () => categories.map(() => unit * rng(half ? 2 : 1, kMax));
                 const d = _dFreshAsk(at, () => _dataAsk(kind, context, categories, deal(), deal, unit));
@@ -970,7 +988,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     if (halves && !first.some(v => (v / scale) % 1)) first[rng(0, first.length - 1)] += scale / 2;
                     return first.map(v => Math.min(v, most * scale));
                 };
-                const kinds = _dKinds({ 0: ['most', 'least'], 1: ['value'], 2: ['total'], 3: ['more'] });
+                const kinds = _dPageKinds(_dKinds({ 0: ['most', 'least'], 1: ['value'], 2: ['total'], 3: ['more'] }), dataSkill);
                 const kind = dealPick(`${dataSkill}:kind`, kinds);
                 const d = _dFreshAsk(at, () => _dataAsk(kind, context, categories, firstDeal(), deal, halves ? scale / 2 : scale));
                 const icon = _dOpt('objects') === 'shapes' ? 'circle' : context.pic;
@@ -1084,7 +1102,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 const categories = shuffle(context.cats.slice()).slice(0, numRows);
                 const _tMost = _dNum('most');
                 const deal = () => categories.map(() => (_tMost ? rng(_tMost <= 5 ? 1 : 3, _tMost) : rng(3, 15)));
-                const kinds = _dKinds({ 0: ['value'], 1: ['most', 'least'], 2: ['total'], 3: ['more'] });
+                const kinds = _dPageKinds(_dKinds({ 0: ['value'], 1: ['most', 'least'], 2: ['total'], 3: ['more'] }), dataSkill);
                 const kind = dealPick(`${dataSkill}:kind`, kinds);
                 const d = _dFreshAsk(at, () => _dataAsk(kind, context, categories, deal(), deal, 1));
                 // widest: the longest row the skill deals, so every chart of a page takes one cell width

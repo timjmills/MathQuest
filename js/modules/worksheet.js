@@ -1534,9 +1534,10 @@ function _wsRenderCard(grid, q, i) {
             wireClozeBanks(cellEl);
             // the place-value mat needs three zones side by side: its card takes the whole row (round 3)
             if (twin.mode === 'build' && q.answerType === 'pv-build') { card.classList.add('mq-span-row'); card.dataset.mqSpan = '1'; }
-            // a ruler is read to the quarter inch: its card takes the whole row, so the ruler draws
-            // at the practice card's scale, not squeezed into a third of the sheet (critic figures-r6)
-            if (q.cell && q.cell.template === 'ruler') { card.classList.add('mq-span-row'); card.dataset.mqSpan = '1'; }
+            // a ruler is read to the quarter inch, a bar graph to a line of its scale: the card takes
+            // the whole row, so the drawing is at the practice card's scale, not squeezed into a
+            // third of the sheet (critics figures-r6 / r7)
+            if (q.cell && ['ruler', 'bar-graph', 'picture-build'].includes(q.cell.template)) { card.classList.add('mq-span-row'); card.dataset.mqSpan = '1'; }
             if ((twin.mode === 'build' || twin.mode === 'model') && inp) {
                 const row = cellEl.querySelector(':scope > .mq-answerrow');
                 if (row) row.style.display = 'none';

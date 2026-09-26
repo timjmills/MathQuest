@@ -601,11 +601,21 @@ const FIGURE_MAKERS = {
         const ans = sides.reduce((a, b) => a + b, 0);
         return figCell('perimeter-shape', { shape, sides, show, unit: 'cm', ans }, { ans, text: 'What is the perimeter?' });
     },
+    'graphs:build_pictograph': (r) => {
+        const n = pick(r, [3, 3, 4]);
+        const cats = ['Balls', 'Cars', 'Stars', 'Fish'].slice(0, n);
+        const slots = pick(r, [5, 7]);
+        const values = cats.map(() => int(r, 1, slots));
+        if (Math.max(...values) === Math.min(...values)) values[0] = values[0] < slots ? values[0] + 1 : values[0] - 1;
+        const ans = values.join(',');
+        return figCell('picture-build', { title: 'Toys', categories: cats, values, icons: ['ball', 'car', 'star', 'fish'].slice(0, n), slots },
+            { ans, text: 'Draw the pictures. Make each row match its number.', answerType: 'text' });
+    },
 };
 for (const [key, maker] of Object.entries(FIGURE_MAKERS)) ITEM_MAKERS[key] = maker;
 for (const key of FIGURE_PROVIDER_IDS) checkSkill(key);
 ok(FIGURE_PROVIDER_IDS.length === Object.keys(FIGURE_MAKERS).length, `FIGURE_PROVIDER_IDS lists ${FIGURE_PROVIDER_IDS.length}, the test makes ${Object.keys(FIGURE_MAKERS).length}`);
-for (const k of ['read-thermometer', 'measure-object', 'add-sides', 'tally']) {
+for (const k of ['read-thermometer', 'measure-object', 'add-sides', 'tally', 'build-pictograph']) {
     ok(k in INSTRUCTION_LIBRARY, `figure library key "${k}" is missing`);
     ok(lintInstruction(INSTRUCTION_LIBRARY[k]).length === 0, `figure library "${k}" fails the lint: ${lintInstruction(INSTRUCTION_LIBRARY[k]).join('; ')}`);
 }

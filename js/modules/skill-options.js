@@ -2279,8 +2279,13 @@ Object.assign(P12_OPTIONS, {
     // Read by gen-data-stats.js (_dOpt): `tiles` the bars / rows, `band` the tallest one.
     'graphs:build_bar_graph': [_p12Enum('tiles', 'Bars to draw', [{ v: null, l: '3 or 4, dealt' }, { v: 3, l: '3' }, { v: 4, l: '4' }], null, 'More bars is more to draw.'),
         _opsBand([5, 10], 10, { label: 'Tallest bar', help: 'The largest value a bar has to reach.' })],
-    'graphs:build_pictograph': [_p12Enum('tiles', 'Rows to draw', [{ v: null, l: '3 or 4, dealt' }, { v: 3, l: '3' }, { v: 4, l: '4' }], null, 'More rows is more to draw.'),
-        _opsBand([5, 7], 7, { label: 'Most pictures in a row', help: 'The largest value a row has to reach.' })],
+    'graphs:build_pictograph': [_p12Enum('tiles', 'Rows to draw', [{ v: null, l: '3 (default)' }, { v: 4, l: '4' }], null, 'More rows is more to draw.'),
+        _opsBand([3, 5, 7], 7, { label: 'Most pictures in a row', help: 'The largest number a row has to reach. Up to 3 is the first step.' }),
+        // AP2 round 6 (critic figures-r7, OC14 / OC15): the pictures and a Support level
+        { id: 'objects', label: 'Pictures', type: 'enum', group: 'layout', default: 'pictures',
+            values: [{ v: 'pictures', l: "Each row's own picture (default)" }, { v: 'shapes', l: 'One plain circle for every row' }],
+            help: 'What the pupil draws in the boxes. The numbers do not change.', helpShort: "Each row's own picture, or plain circles." },
+        { ...levelSubset([2, 1], 1, 'Level 2 draws the first picture of each row in grey, to copy.'), label: 'Grey hint', group: 'support' }],
     'graphs:tally_chart': [_p12Match([['How many for one row?', '^How many (?!more )(?!.*in all\\?)'], ['Which has the most or the least?', 'the (most|fewest)'],
         ['The total', 'in all\\?'], ['How many more? (two rows)', '^How many more ']])],
     'graphs:line_plot': [_p12Match([['How many at one mark?', 'How many plants (were|measure)'], ['Which is the most common?', 'Which measurement is mo']])],
@@ -2520,7 +2525,7 @@ Object.assign(P12_OPTIONS, {
     'measurement:temperature': [
         // AP2 round 3: one task, read the thermometer (the conversions and the click / sort items
         // are gone). The generator reads the ticked units itself (gen-measurement.js _mSet).
-        _p12Match([['Read the thermometer (°F)', 'in °F\\?'], ['Read the thermometer (°C)', 'in °C\\?']], { label: 'Degrees' }),
+        _p12Match([['Read the thermometer (°F)', 'in °F\\?'], ['Read the thermometer (°C)', 'in °C\\?']], { label: 'Scale (°F / °C)' }),
     ],
     'measurement:capacity': [
         _p12Kinds('units', 'Units', [['Customary (cups, pints, quarts, gallons)', 'cups|pints|quarts|gallons'], ['Metric (mL and L)', '\\bmL\\b|\\bL\\b|lit']]),
@@ -2793,7 +2798,8 @@ const _AP2_POINTS = { all: 'Points named with their coordinates: A(3, 2)', some:
 //   `belowZero` (9G)  Temperatures below zero on some items.
 //   `step`      (T)   Degrees a thermometer mark stands for (1 or 2).
 //   `band`      (B)   The highest temperature a scale reaches.
-const _ap2Support = (help) => ({ ...levelSubset([2, 1], 1, help), label: 'Support', group: 'support' });
+// (labelled by what it draws: the group heading already says "Support", critic figures-r7)
+const _ap2Support = (help) => ({ ...levelSubset([2, 1], 1, help), label: 'Grey hint', group: 'support' });
 const _AP2_PICTURES = (words) => ({
     id: 'objects', label: 'Pictures', type: 'enum', group: 'layout', default: 'pictures',
     values: [{ v: 'pictures', l: words + _AP2_DEFAULT }, { v: 'shapes', l: 'One plain circle for every row' }],
@@ -2846,7 +2852,7 @@ const _AP2_PICTURES = (words) => ({
     ['area_perimeter:perimeter_intro',
         { id: 'shapes', label: 'Shapes', type: 'set', group: 'difficulty', default: [0, 1, 2, 3],
             values: [{ v: 0, l: 'Rectangles' }, { v: 1, l: 'Squares' }, { v: 2, l: 'Triangles' }, { v: 3, l: 'Five-sided (a house)' }],
-            allLabel: 'All of them, mixed', help: 'The shapes on the page, taken in turn. Rectangles and squares first; five sides is the most to add.' },
+            allLabel: 'All of them, mixed', help: 'The shapes a page may use, dealt at random. Five sides is the most to add.' },
         _ap2Support('Level 2 prints a grey addition frame under the shape, one line for each side.')],
 ].forEach(([key, ...defs]) => _o2Add(key, ...defs));
 // ============================ end AP2 round 4 ==============================================

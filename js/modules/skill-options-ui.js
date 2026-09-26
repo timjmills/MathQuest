@@ -288,19 +288,18 @@ function _tidySample(frame) {
     stage.style.top = '';
     stage.style.transformOrigin = '';
     stage.style.transform = 'translate(-50%, -50%)';
+    // A drawing wider than the stage (a graph, a ruler) widens the stage, so the WHOLE drawing is
+    // scaled into the frame - never cropped (critic figures-r7: "...any cats?", no scale shown).
+    if (stage.scrollWidth > stage.offsetWidth + 1) {
+        stage.style.maxWidth = 'none';
+        stage.style.width = `${stage.scrollWidth}px`;
+    }
     const w = Math.max(stage.scrollWidth, stage.offsetWidth, 1);
     const h = Math.max(stage.scrollHeight, stage.offsetHeight, 1);
     const fw = frame.clientWidth - 12, fh = frame.clientHeight - 12;
     if (fw <= 0 || fh <= 0) return;
+    frame.classList.remove('is-cropped');
     const k = Math.min(1, fw / w, fh / h);
-    // AP2 round 4: a tall drawing (a thermometer, a graph) would shrink past reading in the short
-    // popover frame; show its top half at a legible scale instead, anchored to the frame's top.
-    if (k < 0.3) {
-        stage.style.top = '0';
-        stage.style.transformOrigin = 'top center';
-        stage.style.transform = `translate(-50%, 0) scale(${Math.min(0.45, fw / w).toFixed(4)})`;
-        return;
-    }
     stage.style.transform = `translate(-50%, -50%) scale(${k.toFixed(4)})`;
 }
 

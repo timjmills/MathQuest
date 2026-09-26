@@ -7,7 +7,7 @@ import { createAnalogClockSVG, createDigitalClockHTML, addTime, subtractTime, fo
 import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 import { isTimeMoneySkill, generateTimeMoneyQuestion } from './gen-time-money.js';
 import { k2Twin, fadeRung } from './sheet/index.js';
-import { dealPick } from './page-deal.js';
+import { dealPick, pageConstant } from './page-deal.js';
 
 // O6 appearance (lane AP2): the value of an appearance control (`labels`, `bars`) for the skill
 // being generated, or `dflt` when the skill has no such control. It never consumes a random
@@ -903,7 +903,12 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 const top = _mNum('most') || 5;
                 // the kinds the teacher ticked (forms: 0 most, 1 how many, 2 how many more), dealt
                 const forms = _mSet('forms') || [0, 1, 2];
-                const order = [1, 2, 0].filter(f => forms.includes(f));
+                let order = [1, 2, 0].filter(f => forms.includes(f));
+                // one answer shape a page (RUBRIC C1): a page of "Which has the most?" (check
+                // boxes) about one page in three, else the number questions; live play mixes
+                if (_mOnPage() && order.includes(0) && order.some(f => f !== 0)) {
+                    order = pageConstant('bar_graph_intro:shape', 3) === 0 ? [0] : order.filter(f => f !== 0);
+                }
                 let theme, cats, counts, ask, text, ans, askType;
                 for (let tries = 0; tries < 8; tries++) {
                     theme = dealPick('bar_graph_intro:theme', themes);

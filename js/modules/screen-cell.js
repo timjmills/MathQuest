@@ -2717,6 +2717,36 @@ export function mountModel(root, input, { onValue = null } = {}) {
         el.appendChild(cue);
         return true;
     }
+    if (model === 'picture-build') {
+        // AP2 round 6 (critic figures-r7): build a picture graph as on paper - a tap draws the
+        // row's picture in a box, a tap again rubs it out. The answer is each row's count, "3,5,2".
+        const rows = Math.max(1, Number(el.getAttribute('data-mq-rows')) || 1);
+        const boxes = Array.from(el.querySelectorAll('[data-pb-box]'));
+        const value = () => Array.from({ length: rows }, (_, r) => boxes.filter((g) => g.getAttribute('data-pb-row') === String(r)
+            && g.querySelector('[data-pb-pic]').getAttribute('visibility') === 'visible').length).join(',');
+        boxes.forEach((g) => {
+            const pic = g.querySelector('[data-pb-pic]');
+            g.setAttribute('role', 'button');
+            g.setAttribute('tabindex', '0');
+            g.setAttribute('aria-pressed', 'false');
+            g.setAttribute('aria-label', `row ${Number(g.getAttribute('data-pb-row')) + 1}, box ${Number(g.getAttribute('data-pb-box')) + 1}`);
+            g.style.cursor = 'pointer';
+            const toggle = () => {
+                if (locked()) return;
+                const on = pic.getAttribute('visibility') !== 'visible';
+                pic.setAttribute('visibility', on ? 'visible' : 'hidden');
+                g.setAttribute('aria-pressed', on ? 'true' : 'false');
+                write(value());
+            };
+            g.addEventListener('click', toggle);
+            g.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); } });
+        });
+        const cue = document.createElement('div');
+        cue.className = 'mq-buildcue';
+        cue.textContent = 'Tap a box to draw a picture. Tap again to rub it out.';
+        el.appendChild(cue);
+        return true;
+    }
     if (model === 'ten-frame') {
         const cells = Array.from(el.querySelectorAll('td'));
         const count = () => cells.filter((c) => c.dataset.on === '1').length;

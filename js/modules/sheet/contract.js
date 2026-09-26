@@ -219,6 +219,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'build-pictograph': 'Draw the pictures. Make each row match its number.',
     'add-sides': 'Add the lengths of all the sides. Write the perimeter.',
     tally: 'Use the tally chart. Answer the questions.',
+    'tally-check': 'Use the tally chart. Check one box.',
+    'graph-check': 'Use the graph. Check one box.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',
@@ -282,6 +284,7 @@ const SCREEN_VERB_MAP = Object.freeze([
     ['Check the clock', 'Tap the clock'],
     // the ruler is drawn under the object on screen too: the pupil reads it, nothing is dragged
     ['Measure the object', 'Read the ruler under the object'],
+    ['Draw the pictures', 'Tap the boxes to draw the pictures'],
     ['Measure the line', 'Drag the ruler to the line'],
     ['Check one box', 'Tap one box'],
     ['Check the box', 'Tap the box'],

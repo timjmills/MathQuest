@@ -21,6 +21,8 @@
 // Pure module (SCC-01): no window, no DOM, no Math.random.
 
 import { registerSkill } from '../contract.js';
+import { resolveCtx } from '../tokens.js';
+import { thermometerSVG, rulerSVG, barGraphSVG, tallySVG } from '../cells/figures.js';
 import { chooseWrong, strings, step, clampSteps, countList } from './util.js';
 
 const payloadOf = (q) => (q && q.cell && q.cell.payload) || {};
@@ -29,19 +31,49 @@ const sum = (a) => a.reduce((s, v) => s + v, 0);
 const deg = (v) => (v < 0 ? `−${Math.abs(v)}` : String(v));
 
 /* ============================================================================ open tasks */
-// AP2 round 5 (critic figures-r6, H3): the Stretch role's open problem for each figure skill -
-// several right answers about the skill's OWN model, a results table the pupil fills, and a last
-// column the pupil can check. Built from the item (pure: no rng), so two items give two tasks.
-// {prompt: [lines], columns, example (the traced row), keyRows (other answers), total}.
+// AP2 rounds 5-6 (critic figures-r6 H3, figures-r7): the Stretch role's open problem for each
+// figure skill - several right answers about the skill's OWN model, drawn over the table (a
+// thermometer, a ruler, an empty graph, a tally row, a grid), a results table the pupil fills,
+// and a last column the pupil can check. Built from the item (pure: no rng), so two items give
+// two tasks. {prompt: [lines], figure (html), columns, example, keyRows, total}.
 
-/** A length in inches as printed in a table: 2, ½, 2¼ (a fraction glyph, never a slash). */
-const inchGlyph = (x) => {
+const ctxFor = (size) => resolveCtx({ mode: 'print', size: size || 'L', look: 'ican', state: 'blank' });
+
+/** A length in inches for a table: a whole number, or a stacked fraction (never a slash). */
+const inchCell = (x) => {
     const q4 = Math.round(x * 4), w = Math.floor(q4 / 4), r = q4 % 4;
-    const f = ['', '¼', '½', '¾'][r];
-    return w ? `${w}${f}` : (f || '0');
+    if (!r) return String(w);
+    const [n, d] = r === 2 ? [1, 2] : [r, 4];
+    const html = `<span style="display:inline-flex;align-items:center;gap:0.8mm;">${w ? `<span>${w}</span>` : ''}`
+        + `<span style="display:inline-flex;flex-direction:column;align-items:center;line-height:1.05;font-size:0.85em;">`
+        + `<span>${n}</span><span style="border-top:0.35mm solid currentColor;padding:0 0.8mm;">${d}</span></span></span>`;
+    return { text: w ? `${w} ${n}/${d}` : `${n}/${d}`, html };
 };
 
-function tempOpen(q) {
+/** A row of empty drawing boxes (a picture row to draw in), `label` on its left. */
+function boxRows(labels, n, size) {
+    const bx = { S: 8, M: 9, L: 10 }[size] || 10, gap = 1.8, labW = Math.max(...labels.map((t) => String(t).length)) * 2.6 + 6;
+    const W = labW + n * (bx + gap) + 2, H = labels.length * (bx + 3) + 2;
+    let s = '';
+    labels.forEach((t, r) => {
+        const y = 1 + r * (bx + 3);
+        s += `<text x="1" y="${(y + bx * 0.7).toFixed(2)}" font-size="4.2" font-weight="700" font-family="Andika, 'Open Sans', sans-serif">${String(t).replace(/[<&>]/g, '')}</text>`;
+        for (let k = 0; k < n; k++) s += `<rect x="${(labW + k * (bx + gap)).toFixed(2)}" y="${y.toFixed(2)}" width="${bx}" height="${bx}" rx="0.8" fill="#fff" stroke="#000" stroke-width="0.35"/>`;
+    });
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W.toFixed(2)} ${H.toFixed(2)}" style="display:block;width:${W.toFixed(2)}mm;height:auto;max-width:100%;" aria-label="rows of boxes to draw in">${s}</svg>`;
+}
+
+/** A square grid to draw rectangles on (1 unit a square). */
+function gridFigure(cols, rows, size) {
+    const g = Math.min({ S: 5, M: 5.5, L: 6 }[size] || 6, 150 / cols);
+    const W = cols * g + 1, H = rows * g + 1;
+    let s = '';
+    for (let c = 0; c <= cols; c++) s += `<line x1="${(0.5 + c * g).toFixed(2)}" y1="0.5" x2="${(0.5 + c * g).toFixed(2)}" y2="${(H - 0.5).toFixed(2)}" stroke="#949494" stroke-width="0.25"/>`;
+    for (let r = 0; r <= rows; r++) s += `<line x1="0.5" y1="${(0.5 + r * g).toFixed(2)}" x2="${(W - 0.5).toFixed(2)}" y2="${(0.5 + r * g).toFixed(2)}" stroke="#949494" stroke-width="0.25"/>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W.toFixed(2)} ${H.toFixed(2)}" style="display:block;width:${W.toFixed(2)}mm;height:auto;max-width:100%;" aria-label="a square grid, 1 unit a square">${s}</svg>`;
+}
+
+function tempOpen(q, { size } = {}) {
     const p = payloadOf(q);
     const lo = Number(p.lo), hi = Number(p.hi), t = Number(p.temp);
     const unit = String(p.unit || '°');
@@ -52,8 +84,11 @@ function tempOpen(q) {
     for (let s = lo; s + rise <= hi; s += span / 5) starts.push(s);
     if (starts.length < 4) return null;
     const row = (s) => [deg(s), deg(s + rise), rise];
+    let figure = '';
+    try { figure = thermometerSVG({ lo, hi, every: p.every, step: p.step, unit, temp: lo, empty: true }, ctxFor(size)).html; } catch (e) { figure = ''; }
     return {
-        prompt: [`The temperature went up ${rise} degrees.`, 'Where could it start and end? Find different ways.'],
+        prompt: [`On this thermometer the temperature went up ${rise} degrees.`, 'Where could it start and end? Find different ways.'],
+        figure,
         columns: [`Start (${unit})`, `End (${unit})`, 'Check: went up'],
         example: row(starts[0]),
         keyRows: starts.slice(1).map(row),
@@ -61,17 +96,24 @@ function tempOpen(q) {
     };
 }
 
-function rulerOpen(q) {
+function rulerOpen(q, { size } = {}) {
     const p = payloadOf(q);
     const L = Number(p.meas), res = Number(p.res) || 1, len = Number(p.len) || 6;
     if (!Number.isFinite(L) || L <= 0) return null;
-    const stepIn = res === 1 ? 1 : 0.5;
+    // every mark the ruler has is a start (critic figures-r7, H1: on a quarter-inch ruler the
+    // quarter marks are starts too)
+    const stepIn = 1 / res;
     const starts = [];
-    for (let s = 0; s + L <= len + 1e-9; s += stepIn) starts.push(s);
+    for (let s = 0; s + L <= len + 1e-9; s += stepIn) starts.push(Math.round(s * 4) / 4);
     if (starts.length < 4) return null;
-    const row = (s) => [inchGlyph(s), inchGlyph(s + L), inchGlyph(L)];
+    const row = (s) => [inchCell(s), inchCell(s + L), inchCell(L)];
+    let figure = '';
+    try { figure = rulerSVG({ len, res, labels: 'all', object: 'none', start: 0, meas: 0 }, ctxFor(size)).html; } catch (e) { figure = ''; }
     return {
-        prompt: [`A ${p.object || 'pencil'} is ${inchGlyph(L)} inches long.`, `It lies on a ${len}-inch ruler. Where can it start and end?`],
+        // the length in words (a slash fraction is never printed, TY-7)
+        prompt: [`A ${p.object || 'pencil'} is ${inchWords(L)} long.`,
+            'Where on this ruler can it start and end?'],
+        figure,
         columns: ['Starts at', 'Ends at', 'Check: how long'],
         example: row(starts[0]),
         keyRows: starts.slice(1).map(row),
@@ -79,18 +121,19 @@ function rulerOpen(q) {
     };
 }
 
-function perimeterOpen(q) {
+function perimeterOpen(q, { size } = {}) {
     const p = payloadOf(q);
     const a = Number(p.ans);
     if (!Number.isFinite(a)) return null;
-    const N = Math.max(16, Math.min(40, a - (a % 2)));
+    const N = Math.max(16, Math.min(28, a - (a % 2)));
     const half = N / 2;
     const rows = [];
     for (let l = half - 1; l >= half - l; l--) rows.push([l, half - l, N]);
     if (rows.length < 4) return null;
     const unit = p.unit ? ` ${p.unit}` : '';
     return {
-        prompt: [`A rectangle has a perimeter of ${N}${unit}.`, 'How long and how wide can it be? Find different rectangles.'],
+        prompt: [`Draw rectangles on the grid with a perimeter of ${N}${unit}.`, 'Write the length and the width of each.'],
+        figure: gridFigure(half - 1, Math.min(half - 1, 7), size),
         columns: ['Length', 'Width', 'Check: perimeter'],
         example: rows[0],
         keyRows: rows.slice(1),
@@ -98,34 +141,27 @@ function perimeterOpen(q) {
     };
 }
 
-/** Bar graph: three bars, one more than another by d, a given total. */
-function barOpen(q) {
+/** Bar graph: two bars, one d more than the other, drawn on an empty graph. */
+function barOpen(q, { size } = {}) {
     const p = payloadOf(q);
     const cats = (p.categories || []).map(String);
     const vals = (p.values || []).map(Number);
     if (cats.length < 2) return null;
-    if (q.skillId === 'bar_graph_intro' || cats.length < 3) {
-        // a Kindergarten graph: two bars, one taller than the other by d, each 6 or less
-        const d = 1 + (sum(vals) % 2);
-        const rows = [];
-        for (let b = 1; b + d <= 6; b++) rows.push([b + d, b, d]);
-        if (rows.length < 4) return null;
-        return {
-            prompt: [`Draw two bars. The ${cats[0]} bar is ${d} more than the ${cats[1]} bar.`, 'Find different ways. Each bar is 6 or less.'],
-            columns: [cats[0], cats[1], 'Check: how many more'],
-            example: rows[0],
-            keyRows: rows.slice(1),
-            total: rows.length,
-        };
-    }
-    // Grade 3: two bars on a scale that counts by 2s, one bar d more than the other
     const [A, B] = cats;
-    const d = 2 * (1 + (sum(vals) % 3));                    // 2, 4 or 6 more
+    const intro = q.skillId === 'bar_graph_intro';
+    const d = intro ? 1 + ((sum(vals) + A.length) % 2) : 2 * (1 + (sum(vals) % 3));
+    const top = intro ? 6 : 20, stepV = intro ? 1 : 2;
     const rows = [];
-    for (let b = 2; b + d <= 20; b += 2) rows.push([b + d, b, d]);
+    for (let b = stepV; b + d <= top; b += stepV) rows.push([b + d, b, d]);
     if (rows.length < 4) return null;
+    let figure = '';
+    try {
+        figure = barGraphSVG({ categories: [A, B], values: [0, 0], step: stepV, top, orientation: 'vertical', catTitle: '', valTitle: intro ? 'How many' : 'Number' }, ctxFor(size)).html;
+    } catch (e) { figure = ''; }
     return {
-        prompt: [`The ${A} bar is ${d} more than the ${B} bar.`, 'The scale counts by 2s, up to 20. Find different graphs.'],
+        prompt: intro ? [`Draw the ${A} bar ${d} more than the ${B} bar.`, 'Find other ways.']
+            : [`Draw the ${A} bar ${d} more than the ${B} bar.`, 'The scale counts by 2s. Find different graphs.'],
+        figure,
         columns: [A, B, 'Check: how many more'],
         example: rows[0],
         keyRows: rows.slice(1),
@@ -133,31 +169,35 @@ function barOpen(q) {
     };
 }
 
-/** Pictograph: one row of N shown with different keys. A graph of ones: two rows set d apart. */
-function pictoOpen(q) {
+/** Pictograph: one row of N shown with different keys (10 pictures a row at most). A graph of
+ * ones: two rows set d apart, drawn in two rows of boxes. */
+function pictoOpen(q, { size } = {}) {
     const p = payloadOf(q);
     const cats = (p.categories || []).map(String);
     const vals = (p.values || []).map(Number);
     if (Number(p.scale) === 1 || !Number(p.scale)) {
         if (cats.length < 2) return null;
-        const d = 1 + (sum(vals) % 2);
+        const d = 1 + ((sum(vals) + cats[0].length + cats[1].length) % 2);
         const rows = [];
         for (let b = 1; b + d <= 6; b++) rows.push([b, b + d, d]);
         if (rows.length < 4) return null;
         return {
-            prompt: [`The ${cats[1]} row has ${d} more pictures than the ${cats[0]} row.`, 'Find different ways. Use 6 pictures or fewer in a row.'],
+            prompt: [`Draw ${d} more ${cats[1].toLowerCase()} than ${cats[0].toLowerCase()}.`, 'Find other ways.'],
+            figure: boxRows([cats[0], cats[1]], 6, size),
             columns: [cats[0], cats[1], 'Check: how many more'],
             example: rows[0],
             keyRows: rows.slice(1),
             total: rows.length,
         };
     }
-    const N = 10 * (2 + (sum(vals) % 3));                   // 20, 30 or 40
-    const keys = [1, 2, 5, 10].filter((k) => N % k === 0 && N / k <= 40);
-    const rows = keys.slice().reverse().map((k) => [k, N / k, N]);
+    const N = [20, 24, 30][sum(vals) % 3];
+    const keys = [];
+    for (let k = 2; k <= N / 2; k++) if (N % k === 0 && N / k <= 10) keys.push(k);
+    const rows = keys.map((k) => [k, N / k, N]);
     if (rows.length < 4) return null;
     return {
-        prompt: [`A row shows ${N} children.`, 'Each picture can stand for 1, 2, 5 or 10. Find different rows.'],
+        prompt: [`A row shows ${N} children. Choose a key.`, 'How many pictures does the row need? Find different keys.'],
+        figure: boxRows([`Key: 1 picture = __`], 10, size),
         columns: ['Each picture stands for', 'Pictures in the row', 'Check: the row shows'],
         example: rows[0],
         keyRows: rows.slice(1),
@@ -166,14 +206,17 @@ function pictoOpen(q) {
 }
 
 /** Tally chart: a row between B and B + 10, as bundles of 5 and single marks. */
-function tallyOpen(q) {
+function tallyOpen(q, { size } = {}) {
     const p = payloadOf(q);
     const vals = (p.values || []).map(Number);
     const B = 5 * (2 + (sum(vals) % 3));                    // 10, 15 or 20
     const rows = [];
     for (let v = B + 1; v < B + 10; v++) rows.push([Math.floor(v / 5), v % 5, v]);
+    let figure = '';
+    try { figure = tallySVG({ categories: ['My row'], values: [0], catTitle: 'Row', valTitle: 'Tally', widest: B + 9 }, ctxFor(size)).html; } catch (e) { figure = ''; }
     return {
-        prompt: [`A tally row shows more than ${B} and less than ${B + 10}.`, 'Find different rows.'],
+        prompt: [`A tally row shows more than ${B} and less than ${B + 10}.`, 'Draw one. Then find different rows.'],
+        figure,
         columns: ['Bundles of 5', 'Single marks', 'Check: the number'],
         example: rows[0],
         keyRows: rows.slice(1),
@@ -182,9 +225,9 @@ function tallyOpen(q) {
 }
 
 /** The open task of a data display, by what it draws. */
-const dataOpen = (q) => {
+const dataOpen = (q, o) => {
     const t = (q && q.cell && q.cell.template) || 'bar-graph';
-    return t === 'pictograph' ? pictoOpen(q) : t === 'tally-chart' ? tallyOpen(q) : barOpen(q);
+    return t === 'pictograph' ? pictoOpen(q, o) : t === 'tally-chart' ? tallyOpen(q, o) : barOpen(q, o);
 };
 
 /* ============================================================================ temperature */
@@ -567,6 +610,69 @@ registerSkill('measurement:pictograph_intro', dataProvider('I Can read a picture
 registerSkill('graphs:tally_chart', dataProvider('I Can read a tally chart', 'tally',
     ['A bundle with a line across is 5.', 'Count the bundles by 5s.', 'Count on the single marks.'], ['M-TL1', 'M-D7']));
 
+/* ============================================================================ build a pictograph */
+// AP2 round 6 (critic figures-r7): graphs:build_pictograph - the pupil draws one picture a box.
+//   M-PB1 drew one picture too few in a row       M-PB2 drew one picture too many
+//   M-PB3 filled every box of a row, not its number
+
+const buildVals = (q) => (payloadOf(q).values || []).map(Number);
+
+function buildWrong(q) {
+    const p = payloadOf(q);
+    const v = buildVals(q);
+    if (!v.length) return null;
+    const slots = Math.max(Number(p.slots) || 0, ...v);
+    const c = [];
+    const at = v.indexOf(Math.max(...v));
+    const lo = v.findIndex((x) => x > 1);
+    if (lo >= 0) { const w = v.slice(); w[lo] -= 1; c.push({ value: w.join(','), misconception: 'M-PB1', explain: `Drew one picture too few for ${(p.categories || [])[lo]}.` }); }
+    { const w = v.slice(); if (w[at] < slots) { w[at] += 1; c.push({ value: w.join(','), misconception: 'M-PB2', explain: `Drew one picture too many for ${(p.categories || [])[at]}.` }); } }
+    const mi = v.findIndex((x) => x < slots);
+    if (mi >= 0) { const w = v.slice(); w[mi] = slots; c.push({ value: w.join(','), misconception: 'M-PB3', explain: `Filled every box for ${(p.categories || [])[mi]}, not its number.` }); }
+    return chooseWrong(q, c);
+}
+
+function buildSteps(q) {
+    const p = payloadOf(q);
+    const cats = (p.categories || []).map(String);
+    const v = buildVals(q);
+    return [
+        step('Read the number in each row.'),
+        step(`${cats.map((c, i) => `${c}: ${v[i]}`).join(', ')}.`),
+        step('Draw one picture a box for each. Leave the rest empty.', [{ slot: 'answer', value: v.join(',') }]),
+    ];
+}
+
+function buildOpen(q, { size } = {}) {
+    const v = buildVals(q);
+    const N = [12, 8, 10][sum(v) % 3];
+    const keys = [1, 2, 3, 4, 5, 6].filter((k) => N % k === 0 && N / k <= 12 && N / k >= 2);
+    const rows = keys.map((k) => [k, N / k, N]);
+    if (rows.length < 4) return null;
+    return {
+        prompt: [`Draw a row that shows ${N}. Choose what one picture stands for.`, 'Find different rows.'],
+        figure: boxRows(['My row'], 12, size),
+        columns: ['One picture stands for', 'Pictures', 'Check: the row shows'],
+        example: rows[0],
+        keyRows: rows.slice(1),
+        total: rows.length,
+    };
+}
+
+registerSkill('graphs:build_pictograph', {
+    strings: strings({
+        iCan: 'I Can build a pictograph',
+        instructionKey: 'build-pictograph',
+        steps: ['Read the number in each row.', 'Draw one picture in a box for each.', 'Leave the other boxes empty.'],
+        say: 'The row has __ pictures.',
+        sayValues: (q) => [buildVals(q)[0]],
+    }),
+    misconceptions: ['M-PB1', 'M-PB2', 'M-PB3'],
+    workedSteps: (q) => clampSteps(buildSteps(q)),
+    wrongAnswer: buildWrong,
+    open: buildOpen,
+});
+
 /* ============================================================================ perimeter */
 
 function perimeterWrong(q) {
@@ -618,5 +724,5 @@ registerSkill('area_perimeter:perimeter_intro', {
 export const FIGURE_PROVIDER_IDS = Object.freeze([
     'measurement:temperature', 'measurement:reading_ruler', 'measurement:reading_ruler_hard',
     'graphs:bar_graph', 'measurement:bar_graph_intro', 'graphs:pictograph', 'measurement:pictograph_intro', 'graphs:tally_chart',
-    'area_perimeter:perimeter_intro',
+    'area_perimeter:perimeter_intro', 'graphs:build_pictograph',
 ]);

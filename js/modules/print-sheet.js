@@ -1070,7 +1070,16 @@ async function loadStandards() {
     return standardsMod;
 }
 function primaryCcss(sk) {
-    try { return standardsMod ? standardsMod.primaryStandard(sk.categoryId, sk.skillId, { short: true }) : ''; } catch (e) { return ''; }
+    try {
+        if (!standardsMod) return '';
+        const code = standardsMod.primaryStandard(sk.categoryId, sk.skillId, { short: true });
+        if (code) return code;
+        // A skill CCSS does not name (temperature) prints its CLOSEST standard, marked as such, so
+        // the footer still carries a code (critic figures-r7); the lesson's tags stay exact.
+        const st = standardsMod.standardsFor(sk.categoryId, sk.skillId);
+        const c0 = st && st.approx && st.ccss && st.ccss[0];
+        return c0 ? `${c0.short || c0.code} (closest)` : '';
+    } catch (e) { return ''; }
 }
 
 /**

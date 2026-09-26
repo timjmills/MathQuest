@@ -186,8 +186,6 @@ function tidySample(cell) {
 }
 
 // Below this scale a sample's lines and digits are hairlines in a thumbnail: show a legible crop.
-const MIN_LEGIBLE = 0.3;
-const CROP_SCALE = 0.45;
 
 /** Fit the stage inside its frame: scale down (never up), centred. */
 function fit(frame) {
@@ -205,19 +203,7 @@ function fit(frame) {
     const fw = frame.clientWidth - 12, fh = frame.clientHeight - 12;
     if (fw <= 0 || fh <= 0) return;
     const s = Math.min(1, fw / w, fh / h);
-    if (s < MIN_LEGIBLE && fh < 200) {
-        // A tall drawing in a short frame (a thermometer, a graph in the options popover, AP2
-        // round 4: "the sample preview renders blank"): show its TOP at a legible scale. Scaling
-        // about the stage's own centre while it sat at the frame's centre put the drawing below
-        // the frame, so nothing showed; the crop is anchored to the frame's top edge instead.
-        frame.classList.add('is-cropped');
-        stage.style.top = '0';
-        stage.style.transformOrigin = 'top center';
-        // never wider than the frame: a wide graph keeps its left edge and its scale (critic
-        // figures-r6: "the sample is clipped")
-        stage.style.transform = `translate(-50%, 0) scale(${Math.min(CROP_SCALE, fw / w).toFixed(4)})`;
-        return;
-    }
+    // the whole drawing, scaled - never cropped (critic figures-r7)
     frame.classList.remove('is-cropped');
     stage.style.top = '';
     stage.style.transformOrigin = '';

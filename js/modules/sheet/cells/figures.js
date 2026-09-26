@@ -98,7 +98,8 @@ export function thermometerSVG(p, ctx) {
     s += `<path d="M${n2(tx)} ${n2(yT + tw / 2)}A${n2(tw / 2)} ${n2(tw / 2)} 0 0 1 ${n2(tx + tw)} ${n2(yT + tw / 2)}L${n2(tx + tw)} ${n2(yJ)}`
         + `A${n2(bulbR)} ${n2(bulbR)} 0 1 1 ${n2(tx)} ${n2(yJ)}Z" fill="#fff" stroke="${INK}" stroke-width="${n2(SW.heavy)}" stroke-linejoin="round"/>`;
     s += `<circle cx="${n2(cx)}" cy="${n2(by)}" r="3.4" fill="${INK}"/>`;
-    s += `<rect x="${n2(cx - 1.6)}" y="${n2(y(t))}" width="3.2" height="${n2(by - y(t))}" fill="${INK}" data-fg-temp="${esc(t)}"/>`;
+    // `empty`: a thermometer to read from, no column (the Stretch task's scale)
+    if (!p.empty) s += `<rect x="${n2(cx - 1.6)}" y="${n2(y(t))}" width="3.2" height="${n2(by - y(t))}" fill="${INK}" data-fg-temp="${esc(t)}"/>`;
     // the scale: a mark every `step` degrees, longer every 5 and 10, a number every `every`
     for (let d = lo; d <= hi; d += step) {
         const len = d % 10 === 0 ? 5.5 : d % 5 === 0 ? 4 : 2.5;
@@ -198,7 +199,7 @@ export function rulerSVG(p, ctx) {
         if (whole && (p.labels !== 'some' || n % 2 === 0)) s += txt(xi, y0 + 6.8 + numPt * PT_MM * 0.8, String(n), numPt);
     }
     // the object, lying along the ruler just above it
-    s += `<g data-fg-object="${esc(p.object || 'pencil')}" data-fg-end="${esc(end)}">${objectPath(p.object || 'pencil', x(start), x(end), 1, objH)}</g>`;
+    if (p.object !== 'none') s += `<g data-fg-object="${esc(p.object || 'pencil')}" data-fg-end="${esc(end)}">${objectPath(p.object || 'pencil', x(start), x(end), 1, objH)}</g>`;
     return { html: svg(ctx, bodyW + SW.hair, y0 + bodyH + 0.5, s, { cls: 'fg-ruler', label: `a ${p.object || 'pencil'} along an inch ruler` }), W: bodyW };
 }
 
@@ -275,9 +276,11 @@ const PLOT = Object.freeze({ S: [80, 46], M: [90, 62], L: [100, 80] });
 // per worksheet"), five slots wide whatever the number of bars
 const TWIN_PLOT = Object.freeze([130, 64]);
 /** mm between two lines of the scale on paper: [short scale (6 lines or fewer), long scale]. */
-const GRID_PITCH = Object.freeze({ S: [4, 2.6], M: [4.6, 4.2], L: [6, 4.5] });
+const GRID_PITCH = Object.freeze({ S: [3.4, 4.1], M: [4.6, 4.3], L: [6, 4.5] });
+/** A long scale's plot is at least this tall at every size (critic figures-r7). */
+const LONG_MIN = 45;
 /** The shortest paper plot, and the narrowest bar slot / the height of a bar's row (horizontal). */
-const PLOT_MIN = Object.freeze({ S: 20, M: 28, L: 36 });
+const PLOT_MIN = Object.freeze({ S: 17, M: 28, L: 36 });
 const SLOT_MIN = Object.freeze({ S: 14, M: 16, L: 18 });
 const ROW_MIN = Object.freeze({ S: 8, M: 9, L: 10 });
 
@@ -300,7 +303,9 @@ export function barGraphSVG(p, ctx) {
     // an S page and the screen twin number every other line of a long scale (the lines stay; the
     // numbers would touch). The scale then ENDS on a numbered line, one more line when it must:
     // 0, 4, 8, ... 20, never "16, 18" at the top (critic figures-r6, H2).
-    const every = long && (twin || sz === 'S') ? 2 : 1;
+    // (paper keeps one labelling at every size, critic figures-r7: S labelled every 4 changed the
+    // maths; the S plot is kept >= 45 mm tall instead)
+    const every = long && twin ? 2 : 1;
     if (every === 2 && Math.round(top / step) % 2) top += step;
     const steps = [];
     for (let v = 0; v <= top + 1e-9; v += step) steps.push(+v.toFixed(6));
@@ -321,7 +326,8 @@ export function barGraphSVG(p, ctx) {
         // critic regrade 5) and every name inside its own slot
         const slotW = twin ? Math.max(pw0 / Math.max(n, 5), catW + 4) * Math.max(n, 5) / n : Math.max(catW + 3, SLOT_MIN[sz]);
         const PW = slotW * n;
-        const PH = twin ? Math.max(ph0, (nSt / every) * zMm * 1.3) : Math.min(ph0, Math.max(PLOT_MIN[sz], nSt * GRID_PITCH[sz][long ? 1 : 0]));
+        const PH = twin ? Math.max(ph0, (nSt / every) * zMm * 1.3)
+            : Math.max(long ? LONG_MIN : 0, Math.min(ph0, Math.max(PLOT_MIN[sz], nSt * GRID_PITCH[sz][long ? 1 : 0])));
         const valTitleY = zMm * 1.0;
         const x0 = Math.max(valLabW + 3, 1), yTop = valTitleY + 3.2, yBot = yTop + PH;
         const yOf = (v) => yBot - (v / top) * PH;
@@ -478,10 +484,10 @@ dataCell('bar-graph', barGraphSVG);
  * `cell(i, x, yMid)` drawing the row's marks; `markW` is the widest row's marks. `rules: 'open'`
  * (O6) leaves out the lines between the rows.
  */
-function rowTable(p, ctx, { markW, rowH, head2, cell, labelWeight = 400 }) {
+function rowTable(p, ctx, { markW, rowH, head2, cell, labelWeight = 400, labelIcon = null }) {
     const cats = (p.categories || []).map(String);
     const zPt = labelPt(ctx), zMm = zPt * PT_MM;
-    const labW = Math.max(...cats.map((c) => textW(c, zPt)), textW(p.catTitle || '', zPt)) + 5;
+    const labW = Math.max(...cats.map((c) => textW(c, zPt) + (labelIcon ? labelIcon.w + 1 : 0)), textW(p.catTitle || '', zPt)) + 5;
     const m = SW.heavy / 2;
     const headH = zMm * 1.8;
     const W = labW + Math.max(markW + 6, textW(head2, zPt) + 5);
@@ -494,6 +500,7 @@ function rowTable(p, ctx, { markW, rowH, head2, cell, labelWeight = 400 }) {
         const y = m + headH + i * rowH;
         if (i && p.rules !== 'open') s += line(m, y, m + W, y, SW.hair);
         s += txt(m + 2.5, y + rowH / 2 + zMm * 0.35, c, zPt, { anchor: 'start', weight: labelWeight });
+        if (labelIcon) s += labelIcon.draw(i, m + 2.5 + textW(c, zPt) + 1, y + rowH / 2);
         s += cell(i, m + labW + 3, y + rowH / 2);
     });
     return { html: svg(ctx, W + 2 * m, H + 2 * m, s, { cls: 'fg-table', label: `${p.title || 'table'}` }), W: W + 2 * m, H: H + 2 * m };
@@ -535,7 +542,7 @@ export function pictographSVG(p, ctx) {
     const twin = isTwin(ctx);
     // a picture graph of ones (Kindergarten) draws its pictures bigger on screen (critic regrade 5:
     // 12 px pictures on a phone card)
-    const d = twin ? (scale === 1 ? 12 : 9) : ({ S: 5.5, M: 6.5, L: 7 }[sizeOf(ctx)] || 7);
+    const d = twin ? (scale === 1 ? 12 : 11) : ({ S: 5.5, M: 6.5, L: 7 }[sizeOf(ctx)] || 7);
     const pitch = d + (twin ? 2.5 : 2);
     const counts = vals.map((v) => v / scale);
     // the twin keeps the widest table a skill deals (5 or 6 pictures), so every graph shares a scale
@@ -566,8 +573,10 @@ export function pictographSVG(p, ctx) {
     // the key: every picture of the graph once (one picture, or each row's), "= scale"
     const kinds = [...new Set(vals.map((_, i) => iconOf(i)))];
     // the key decides the answer: on screen it is as big as the question (critic figures-r6)
-    const kPt = twin ? textPt(ctx) * 1.35 : Math.max(zonePt(ctx), 11);
-    const kd = d * 0.85;
+    // the key decides the answer: on screen it is set larger than the question line (critic
+    // figures-r7: 17 px against a 22-26 px question on the card)
+    const kPt = twin ? 26 : Math.max(zonePt(ctx), 11);
+    const kd = twin ? 11 : d * 0.85;
     const keySvg = (id) => svg(ctx, kd + 1, kd + 1, picture(id, (kd + 1) / 2, (kd + 1) / 2, kd), { label: `picture` });
     const unit = scale === 1 ? '1' : String(scale);
     // a graph of ones with a different picture in each row says so in words (three pictures
@@ -721,7 +730,7 @@ register('perimeter-shape', {
         // paper: every drawing stands in one box as tall as the tallest shape and its labels, so
         // the "Perimeter =" lines of a row sit level (critic regrade 5, test@S)
         const box = isTwin(ctx) ? 'display:inline-block;max-width:100%;'
-            : `display:flex;align-items:center;justify-content:center;max-width:100%;min-height:${L(ctx, (FIG_BOX[sizeOf(ctx)] || FIG_BOX.L)[1] + 2 * (2.5 + digitPt(ctx) * PT_MM) + 1)};`;
+            : `display:flex;align-items:flex-start;justify-content:center;max-width:100%;min-height:${L(ctx, (FIG_BOX[sizeOf(ctx)] || FIG_BOX.L)[1] + 2 * (2.5 + digitPt(ctx) * PT_MM) + 1)};`;
         return root(ctx, 'fg-perimeter-cell', `<div style="${box}">${f.html}</div>${frame}${sentence}`);
     },
     answerKey(p) {
@@ -745,45 +754,80 @@ register('perimeter-shape', {
 /* ================================================================ build a pictograph */
 
 /**
- * The pupil BUILDS a picture graph (graphs:build_pictograph, critic guided-r1 H1 / H9): each row
- * names its value ("Cats: 4") and has a row of empty boxes, 8 / 9 / 10 mm square (S / M / L), one
- * picture to a box; the key draws the pictures in the first `value` boxes of each row (never
- * "Answer: graph-built"). payload: {title, categories, values, icons (a k2kit shape a row), slots}.
+ * The pupil BUILDS a picture graph (graphs:build_pictograph, critics guided-r1 H1 / H9 and
+ * figures-r7): each row names its number and shows its own picture ("Balls: 3 [ball]"), and has a
+ * row of empty boxes, 8 / 9 / 10 mm square (S / M / L), one picture to a box; the key line says
+ * what one picture is. The answer key draws each row's own picture in its first `value` boxes;
+ * Error analysis draws the pupil's counts (`ctx.wrong.value`, "3,6,7"). The Support level draws
+ * the first picture of each row in grey (a hint). The screen twin is the same table: a tap draws
+ * a picture in a box (screen-cell.js mountModel "picture-build"), the answer is the counts.
+ * payload: {title, categories, values, icons (the picture of each row), slots, support}.
  */
 const BUILD_BOX = Object.freeze({ S: 8, M: 9, L: 10 });
+const buildCounts = (p, ctx) => {
+    const vals = (p.values || []).map(Number);
+    if (ctx.state === 'wrong' && ctx.wrong && ctx.wrong.value !== undefined) {
+        const w = String(ctx.wrong.value).split(',').map(Number);
+        if (w.length === vals.length && w.every(Number.isFinite)) return w;
+    }
+    return answered(ctx) ? vals : null;
+};
+const tintTo = (html, c) => (c === INK ? html : html.replace(/stroke="#000"/g, `stroke="${c}"`));
 register('picture-build', {
     render(p, ctx) {
         const cats = (p.categories || []).map(String);
         const vals = (p.values || []).map(Number);
-        const slots = Math.max(5, Number(p.slots) || 0, ...vals);
-        const bx = isTwin(ctx) ? 10 : (BUILD_BOX[sizeOf(ctx)] || 10);
+        const slots = Math.max(3, Number(p.slots) || 0, ...vals);
+        const twin = isTwin(ctx);
+        const bx = twin ? 10 : (BUILD_BOX[sizeOf(ctx)] || 10);
         const gap = 1.8;
-        const drawn = answered(ctx) || ctx.state === 'wrong';
-        const ink = inkOf(ctx);
+        const counts = buildCounts(p, ctx);
+        const ink = counts ? inkOf(ctx) : null;
         const color = ctx.state === 'traced' ? GREY : INK;
         const iconOf = (i) => (Array.isArray(p.icons) && p.icons[i]) || 'circle';
+        const hint = hintOn(p, ctx) && !twin;
+        const ic = bx * 0.62;
         const g = rowTable({ categories: cats.map((c, i) => `${c}: ${vals[i]}`), catTitle: p.catTitle || 'Row', rules: 'ruled' }, ctx, {
-            markW: slots * (bx + gap), rowH: bx + 3, head2: 'Pictures', labelWeight: 700,
+            markW: slots * (bx + gap), rowH: bx + (twin ? 4 : sizeOf(ctx) === 'S' ? 2 : 3), head2: 'Pictures', labelWeight: 700,
+            // the row's own picture after its name, so the pupil knows what to draw
+            labelIcon: { w: ic + 2, draw: (i, x, y) => picture(iconOf(i), x + ic / 2, y, ic) },
             cell: (i, x, y) => {
                 let out = '';
                 for (let k = 0; k < slots; k++) {
                     const bx0 = x + k * (bx + gap);
-                    out += `<rect x="${n2(bx0)}" y="${n2(y - bx / 2)}" width="${n2(bx)}" height="${n2(bx)}" rx="0.8" fill="#fff" stroke="${INK}" stroke-width="${n2(SW.one)}"/>`;
-                    if (drawn && k < vals[i]) {
-                        const pic = shapeOf(iconOf(i)).draw(bx0 + bx / 2, y, bx * 0.7);
-                        out += color === GREY ? pic.replace(/stroke="#000"/g, `stroke="${GREY}"`) : pic;
+                    const pic = picture(iconOf(i), bx0 + bx / 2, y, bx * 0.7);
+                    const drawn = !!counts && k < counts[i];
+                    const box = `<rect x="${n2(bx0)}" y="${n2(y - bx / 2)}" width="${n2(bx)}" height="${n2(bx)}" rx="0.8" fill="#fff" stroke="${INK}" stroke-width="${n2(SW.one)}"/>`;
+                    if (twin) {
+                        // every box carries its picture, hidden until a tap draws it
+                        out += `<g data-pb-row="${i}" data-pb-box="${k}">${box}<g data-pb-pic="1" visibility="${drawn ? 'visible' : 'hidden'}">${pic}</g></g>`;
+                    } else if (drawn) {
+                        out += box + tintTo(pic, color);
+                    } else if (hint && k === 0) {
+                        out += box + `<g data-fg-hint="first">${tintTo(pic, GREY)}</g>`;
+                    } else {
+                        out += box;
                     }
                 }
                 return out;
             },
         });
-        const title = `<div style="font-size:${P(ctx, textPt(ctx))};font-weight:700;margin-bottom:${L(ctx, 1.5)};">${esc(p.title || '')}</div>`;
-        const say = `<div style="font-size:${P(ctx, Math.max(zonePt(ctx), 11))};margin-top:${L(ctx, 2)};">Draw one picture for each. Leave the other boxes empty.</div>`;
-        return root(ctx, 'fg-picture-build', `${title}<div data-ws-slot="answer" data-ws-shape="draw"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-block;max-width:100%;">${g.html}</div>${say}`);
+        const kd = bx * 0.8;
+        const kinds = [...new Set(cats.map((_, i) => iconOf(i)))];
+        const kPt = twin ? labelPt(ctx) : Math.max(zonePt(ctx), 11);
+        const keySvg = (id) => svg(ctx, kd + 1, kd + 1, picture(id, (kd + 1) / 2, (kd + 1) / 2, kd), { label: 'picture' });
+        const title = `<div style="font-size:${P(ctx, twin ? labelPt(ctx) : textPt(ctx))};font-weight:700;margin-bottom:${L(ctx, 1)};">${esc(p.title || '')}</div>`;
+        // the key: each picture stands for 1
+        const key = `<div class="fg-key" style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:${L(ctx, 1.5)};font-size:${P(ctx, kPt)};font-weight:700;margin-bottom:${L(ctx, 1.5)};">`
+            + `<span>Key:</span>${kinds.map((id) => `<span style="display:inline-block;line-height:0;">${keySvg(id)}</span>`).join('')}<span>= 1 each</span></div>`;
+        const model = twin ? ` data-mq-model="picture-build" data-mq-rows="${cats.length}"` : '';
+        // paper: the title and the key share one line (four charts to an S page)
+        const head = twin ? `${title}${key}` : `<div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;column-gap:${L(ctx, 6)};margin-bottom:${L(ctx, 1.5)};">`
+            + `${title.replace(`margin-bottom:${L(ctx, 1)};`, 'margin:0;')}${key.replace(`margin-bottom:${L(ctx, 1.5)};`, 'margin:0;')}</div>`;
+        return root(ctx, 'fg-picture-build', `${head}<div data-ws-slot="answer" data-ws-shape="draw"${ink ? ` data-ws-ink="${ink}"` : ''}${model} style="display:inline-block;max-width:100%;">${g.html}</div>`);
     },
     answerKey(p) {
-        const cats = (p.categories || []).map(String), vals = (p.values || []).map(Number);
-        const shown = cats.map((c, i) => `${c} ${vals[i]}`).join(', ');
+        const shown = (p.values || []).map(Number).join(',');
         return { value: shown, display: shown, slots: { answer: { value: shown, graded: true } } };
     },
     footprint() { return { wMm: 186, hMm: null, measure: true, factLike: false, maxCols: 1 }; },

@@ -58,8 +58,14 @@ function providerTask(q, size) {
         example: Array.isArray(t.example) ? t.example : [],
         keyRows: Array.isArray(t.keyRows) ? t.keyRows : [],
         rule: t.rule || '', total: t.total === undefined ? Infinity : t.total, basic: !!t.basic,
+        // the skill's own figure over the table (a ruler, a thermometer, an empty graph ...), so
+        // each row is checked against the model it is about (critic figures-r7)
+        figure: typeof t.figure === 'string' ? t.figure : '',
     };
 }
+
+/** A table entry: a plain value, or {text, html} (a stacked fraction the provider drew). */
+const cellOf = (v) => (v && typeof v === 'object' ? { text: String(v.text), html: String(v.html) } : { text: String(v), html: esc(String(v)) });
 
 /** True when this skill has a provider-written open problem (`open(q)`), whatever the item. */
 export function hasOwnOpen(categoryId, skillId) {
@@ -142,7 +148,9 @@ export function prepare(it, info = {}) {
     if (!task.basic && task.keyRows.length < 3) return null;
     const nRows = task.basic ? (EMPTY_ROWS[size] || 5) : Math.min(EMPTY_ROWS[size] || 5, task.keyRows.length);
     const slots = {};
-    task.keyRows.slice(0, nRows).forEach((row, r) => row.forEach((v, c) => { slots[`st-${r}-${c}`] = v; }));
+    task.keyRows.slice(0, nRows).forEach((row, r) => row.forEach((v, c) => { slots[`st-${r}-${c}`] = cellOf(v).text; }));
+    const shown = {};
+    task.keyRows.slice(0, nRows).forEach((row, r) => row.forEach((v, c) => { shown[`st-${r}-${c}`] = cellOf(v).html; }));
     slots['st-found'] = task.keyRows.length ? String(Math.min(nRows, task.keyRows.length) + 1) : '';
     const found = Math.min(nRows, task.keyRows.length) + 1;
     const all = task.keyRows.length > 0 && found >= (task.total || Infinity);
@@ -151,18 +159,19 @@ export function prepare(it, info = {}) {
     const key = slotKey(slots, task.keyRows.length ? `${Math.min(nRows, task.keyRows.length) + 1} answers shown` : 'Answers vary');
     const render = (c) => {
         const head = `<tr>${task.columns.map((h) => `<th>${esc(h)}</th>`).join('')}</tr>`;
-        const ex = `<tr class="mq-ex">${task.example.map((v) => `<td><span class="ws-trace" data-ws-ink="trace">${esc(String(v))}</span></td>`).join('')}</tr>`;
+        const ex = `<tr class="mq-ex">${task.example.map((v) => `<td><span class="ws-trace" data-ws-ink="trace">${cellOf(v).html}</span></td>`).join('')}</tr>`;
         let body = '';
         for (let r = 0; r < nRows; r++) {
             body += `<tr>${task.columns.map((_, col) => {
                 const v = c.state === 'answered' ? slots[`st-${r}-${col}`] : undefined;
                 // A "problems like this one" table (basic) has no single right entry: its cells and
                 // count are open answers, drawn but not graded, and the key says "Answers vary".
-                return `<td data-ws-slot="st-${r}-${col}" data-ws-shape="open"${task.basic ? ' data-ws-graded="0"' : ''}>${v !== undefined && v !== '' ? `<b data-ws-ink="solid">${esc(String(v))}</b>` : ''}</td>`;
+                return `<td data-ws-slot="st-${r}-${col}" data-ws-shape="open"${task.basic ? ' data-ws-graded="0"' : ''}>${v !== undefined && v !== '' ? `<b data-ws-ink="solid">${shown[`st-${r}-${col}`] || esc(String(v))}</b>` : ''}</td>`;
             }).join('')}</tr>`;
         }
         return `<div class="mq-stretch">`
             + `<div class="ws-story mq-prompt">${task.prompt.map((l) => `<div>${esc(l)}</div>`).join('')}</div>`
+            + (task.figure ? `<div class="mq-stretch-fig" style="display:flex;justify-content:center;">${task.figure}</div>` : '')
             + `<div class="mq-stretch-main"><table class="mq-table mq-cols${task.columns.length}">${head}${ex}${body}</table>`
             + `<div class="mq-closing"><div class="mq-frame">I found ${writeLine('st-found', c, key, 2, { graded: !task.basic })} answers.</div>`
             + judgeGroup('st-judge', `${checkLine('st-more', 'There are more.', c, key, { graded: false })}${checkLine('st-all', 'I found them all.', c, key, { graded: false })}`, 'mq-stjudge')
