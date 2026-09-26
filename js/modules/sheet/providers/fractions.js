@@ -1019,6 +1019,8 @@ registerSkill('fractions:fraction_of_set_hard', AMOUNT_DEF('I Can find a fractio
 
 const pctOf = (p) => (p && p.terms && p.terms[0] ? Math.round((p.terms[0].n * 100) / p.terms[0].d) : null);
 registerSkill('conversions:percent_visual', {
+    // Stretch: the fractions equal to the shaded percent (25% = 1/4 = 2/8 = 3/12 ...)
+    open: (q, { rows = 6 } = {}) => { const p = payloadOf(q); const t = p && p.terms && p.terms[0]; return t && Number(t.n) > 0 ? equivOpen(Number(t.n), 100, rows) : null; },
     strings: strings({
         iCan: 'I Can read percent on a hundred square',
         instructionKey: 'missing',
@@ -1206,6 +1208,16 @@ registerSkill('fractions:simplify', {
 /* ==================================================================== count in fractions */
 
 registerSkill('fractions:count_in_fractions', {
+    // Stretch: count on in the item's parts past 1, each count also as a mixed number
+    open: (q, { rows = 6 } = {}) => {
+        const p = payloadOf(q);
+        const t = p && (p.terms || []).find((x) => Number(x.d) > 1);
+        if (!t) return null;
+        const d = Number(t.d), keyRows = [];
+        for (let k = d + 1; keyRows.length < rows && k <= 4 * d; k++) if (k % d) keyRows.push([fr(k, d), mixedText(Math.floor(k / d), k % d, d)]);
+        return { prompt: [`Count on in parts of ${d} past 1.`, 'Write each count as a mixed number too.'], columns: ['Count', 'Mixed number'],
+            example: [fr(d, d), '1'], keyRows, total: Infinity };
+    },
     strings: strings({
         iCan: 'I Can count in fractions',
         instructionKey: 'missing-many',
@@ -1273,7 +1285,7 @@ registerSkill('fractions:count_in_fractions', {
 /* ==================================================================== fractions beyond 1 */
 
 registerSkill('fractions:mixed_numbers_intro', {
-    open: fracOpen,
+    open: mixedOpen,
     strings: strings({
         iCan: 'I Can write numbers bigger than 1 with fractions',
         instructionKey: 'missing',

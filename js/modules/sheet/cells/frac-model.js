@@ -337,7 +337,7 @@ function slotBox(ctx, id, value, mark, graded = true, extra = '', digits = 2) {
     return `<span class="fm-box" data-ws-slot="${id}" data-ws-shape="box"${graded ? '' : ' data-ws-graded="0"'}${ink ? ` data-ws-ink="${ink}"` : ''}${hook}${extra} `
         + `style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};height:${L(ctx, h)};`
         + `border:${B(ctx, 0.75)} solid ${INK.ink};border-radius:${L(ctx, 1.25)};background:#fff;font-size:${P(ctx, digitPt(ctx))};`
-        + `font-weight:700;line-height:1;color:${color};flex:none;${KEY_FEATURES}">${ink ? esc(value) : ''}</span>`;
+        + `font-weight:700;line-height:1;color:${color};flex:none;${KEY_FEATURES}">${ink ? escText(value) : ''}</span>`;
 }
 
 /** A number written at the digit size. */
@@ -1035,8 +1035,8 @@ register('frac-model', {
         const st = storySize(p, ctx);
         const wMm = Math.ceil(Math.max(r.w, st.w) + 8), hMm = Math.ceil(r.h + st.h + 8);
         // a story keeps its lines whole: two columns at most, one when a line is longer than half the page
-        // a story is a word problem: its own single column (PT-WPR-1)
-        const maxCols = st.h ? 1 : wMm <= 56 ? 3 : wMm <= 88 ? 2 : 1;
+        // a story keeps its lines whole: two columns at most, one when it is wider than half the page
+        const maxCols = wMm <= 56 && !st.h ? 3 : wMm <= 88 ? 2 : 1;
         return { wMm, hMm, measure: true, factLike: false, maxCols };
     },
     inputs(p) {

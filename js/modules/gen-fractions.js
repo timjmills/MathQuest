@@ -3660,7 +3660,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 if (mode === 2) {
                     q.text = `What mixed number does the dot show?`;
                     q.hint = `Count the whole numbers first, then the parts after ${w}: each whole is cut into ${d} parts.`;
-                    _fKit(q, { task: 'write', terms: [{ w, n, d, kind: 'line', frac: 'wnd' }], answer: { w, n, d }, wholeMm: w + 1 > 2 ? 26 : 36, fracAt: 'below' });
+                    _fKit(q, { task: 'write', terms: [{ w, n, d, kind: 'line', frac: 'wnd' }], answer: { w, n, d }, wholeMm: w + 1 > 2 ? 24 : 32, fracAt: 'below' });
                     return;
                 }
                 q.text = `Write the mixed number the shapes show.`;
