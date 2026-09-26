@@ -1322,3 +1322,10 @@ html body .mq-scell .mq-nl-start.mq-nl-given .mq-nl-mark::after { background: #f
 .k2-twin .mq-sort-tile.mq-sort-used { opacity: .3; cursor: default; }
 .k2-twin .mq-sort-ring { cursor: pointer; }
 .k2-twin .mq-sort-tag { cursor: pointer; display: inline-block; min-width: 24px; }
+
+/* k2-r3: touch targets >= 44 px in the K twins (a check-box row, a tile to type in, a sort ring) */
+.mq-scell .k2-twin .mq-tickrow { min-width: 44px; min-height: 44px; }
+.mq-scell .k2-twin [data-mq-nowrap] > .mq-tickrow { min-width: 44px; }
+.mq-scell .k2-twin .mq-cellbox { min-width: 48px; min-height: 48px; }
+.mq-scell .k2-twin .mq-sort-ring { min-width: 132px; min-height: 76px; }
+.mq-scell .k2-twin .mq-sort-tag { font-size: 20px; line-height: 1.4; }

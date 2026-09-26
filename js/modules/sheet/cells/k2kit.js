@@ -75,6 +75,14 @@ export const S = (ctx) => SIZES[sizeOf(ctx)];
 export const L = (ctx, mm) => (isTwin(ctx) ? `calc(var(--mq-k2, 3.4px) * ${n2(mm)})` : `${n2(mm)}mm`);
 /** A point size in the host's unit. */
 export const P = (ctx, pt) => (isTwin(ctx) ? L(ctx, pt * PT_MM) : `${n2(pt)}pt`);
+/**
+ * A DIGIT size: on paper the pt size; in a screen twin never under the host's digit size
+ * (--mq-digit: 40 / 48 / 56 px at 390 / 820 / 1280; critic k2-r3: make_ten, teen_compose and
+ * bonds_in_order read 46 / 40 / 28 px, count_sequence 34 / 28 / 20).
+ */
+export const D = (ctx, pt) => (isTwin(ctx) ? `max(var(--mq-digit, 40px), ${L(ctx, pt * PT_MM)})` : `${n2(pt)}pt`);
+/** A box's width in a twin: at least room for `chars` digits at the digit size. */
+export const DW = (ctx, mm, chars = 2) => (isTwin(ctx) ? `max(${L(ctx, mm)}, ${n2(chars * 0.56 + 0.3)}em)` : `${n2(mm)}mm`);
 /** A border width: the pt value on paper, never under 1 CSS px on screen (RP-2). */
 export const B = (ctx, pt) => (isTwin(ctx) ? `${Math.max(1, Math.round(pt * 1.33))}px` : `${pt}pt`);
 

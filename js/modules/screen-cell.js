@@ -2178,6 +2178,9 @@ export function wireSortTaps(root) {
             tag.setAttribute('role', 'button');
             tag.setAttribute('aria-label', `take ${t.dataset.k2Tile} out`);
             tag.addEventListener('click', (e) => {
+                // a picture is chosen: the tap is for the ring, even where a letter already sits
+                // (critic k2-r3: at 390 the letters filled the ring, so a tap to add removed one)
+                if (sel) return;
                 e.stopPropagation();
                 tag.remove();
                 delete t.dataset.used;
@@ -2256,19 +2259,51 @@ export function fitTwinRows(root) {
         });
         // one item still wider than the cell: the drawing's millimetre shrinks to fit. Parts of a
         // row keep pixel minimums (a check box), so the shrink is measured again, up to 3 times.
-        for (let pass = 0; pass < 3; pass++) {
-            const tw = twin.scrollWidth;
+        const excess = () => {
             const avail = Math.min(box.width, twin.parentElement ? twin.parentElement.clientWidth || box.width : box.width) - 8;
             const over = Array.from(twin.querySelectorAll('*')).reduce((m, el) => {
                 const r = el.getBoundingClientRect();
                 return Math.max(m, r.right - box.right, box.left - r.left);
             }, 0);
+            return { tw: twin.scrollWidth, avail, over };
+        };
+        for (let pass = 0; pass < 3; pass++) {
+            const { tw, avail, over } = excess();
             if (!(over > 1 || tw > avail + 1)) break;
             const cur = parseFloat(getComputedStyle(twin).getPropertyValue('--mq-k2')) || 3.4;
             const need = Math.max(tw, avail + 2 * over);
             const floor = twin.querySelector('[data-mq-nowrap]') ? K2_FLOOR_NOWRAP_PX : K2_FLOOR_PX;
             const k = Math.max(floor, cur * (avail / need));
-            if (k < cur - 0.01) { twin.style.setProperty('--mq-k2', `${k.toFixed(2)}px`); changed = true; } else break;
+            if (!(k < cur - 0.01)) break;
+            const prev = twin.style.getPropertyValue('--mq-k2');
+            twin.style.setProperty('--mq-k2', `${k.toFixed(2)}px`);
+            // a shrink that does not bring the drawing in (the overflow is a part with a pixel
+            // minimum: a 132 px sort ring, a 44 px box) is undone - it only made the pictures tiny
+            // (critic k2-r3: sort pictures and letters at about 9 px on a phone)
+            const after = excess();
+            if (after.over >= over - 0.5 && after.tw >= tw - 0.5) {
+                if (prev) twin.style.setProperty('--mq-k2', prev); else twin.style.removeProperty('--mq-k2');
+                break;
+            }
+            changed = true;
+        }
+        // Last resort for a one-line row whose digits keep the host's digit floor (--mq-digit, the
+        // 56 / 48 / 40 px of the RUBRIC): a number track of five 3-digit tiles on a phone. Only
+        // then do the digits shrink, to fit and never below three quarters of the floor.
+        if (twin.querySelector('[data-mq-nowrap]')) {
+            const base = parseFloat(getComputedStyle(twin).getPropertyValue('--mq-digit')) || 40;
+            for (let pass = 0; pass < 3; pass++) {
+                const avail = Math.min(box.width, twin.parentElement ? twin.parentElement.clientWidth || box.width : box.width) - 8;
+                // the widest one-line row, from its first child's left edge to its last child's right
+                const tw = Array.from(twin.querySelectorAll('[data-mq-nowrap]')).reduce((m, row) => {
+                    const rs = Array.from(row.children).map((c) => c.getBoundingClientRect()).filter((r) => r.width > 0);
+                    return rs.length ? Math.max(m, Math.max(...rs.map((r) => r.right)) - Math.min(...rs.map((r) => r.left))) : m;
+                }, 0);
+                if (!(tw > avail + 1)) break;
+                const cur = parseFloat(getComputedStyle(twin).getPropertyValue('--mq-digit')) || base;
+                const next = Math.max(base * 0.75, cur * (avail / tw));
+                if (next < cur - 0.5) { twin.style.setProperty('--mq-digit', `${next.toFixed(1)}px`); changed = true; } else break;
+            }
         }
     });
     return changed;

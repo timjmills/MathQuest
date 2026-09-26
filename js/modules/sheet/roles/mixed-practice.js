@@ -97,20 +97,24 @@ function packing(poolsIn, input) {
             for (let k = 0; k < shelf[id].n; k++) {
                 const hh = bandH(id, k === 0) + (k === 0 ? shelf[id].band : 0);
                 const budget = pages === 1 ? m.budget : mCont.budget;
-                if (cur && cur + hh > budget) { pages++; cur = 0; }
+                if (cur && cur + hh > budget + 0.5) { pages++; cur = 0; }
                 cur += hh;
             }
         }
         return pages;
     };
-    const basePages = A ? pagesOf() : 1;
+    // A set whose one shelf per skill already spills page 1 (three tall K skills at L) fills the
+    // pages it takes, as an anchored set does: page 2 is not left holding one 2-item section
+    // (critic k2-r3 sweep, set E at L: 4 items on page 1, 2 on page 2 under a 75% empty page).
+    const spills = !A && used > m.budget + 0.5;
+    const basePages = A || spills ? pagesOf() : 1;
     for (let guard = 0; guard < 40; guard++) {
         if (ids.reduce((a, id) => a + shelf[id].n, 0) >= maxShelves * basePages) break;
         const tw = ids.reduce((a, id) => a + (weights[id] || 1), 0);
         const gaps = ids.map((id) => ({ id, gap: (weights[id] || 1) / tw - (shelf[id].n * shelf[id].per) / Math.max(1, total()) }))
             .sort((a, b) => b.gap - a.gap);
         const fits = (id) => {
-            if (!A) return used + bandH(id, false) <= m.budget;
+            if (!A && !spills) return used + bandH(id, false) <= m.budget;
             shelf[id].n++;
             const ok = pagesOf() <= basePages;
             shelf[id].n--;

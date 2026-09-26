@@ -61,7 +61,7 @@ export function topicOf(iCan) {
     if (!m) return t;
     const v = m[1].toLowerCase();
     const verbs = new Set(['add', 'subtract', 'multiply', 'divide', 'count', 'compare', 'order', 'round', 'estimate',
-        'read', 'write', 'tell', 'measure', 'find', 'make', 'build', 'show', 'solve', 'name', 'use', 'draw', 'skip', 'identify', 'sort']);
+        'read', 'write', 'tell', 'measure', 'find', 'make', 'build', 'show', 'solve', 'name', 'use', 'draw', 'skip', 'identify', 'sort', 'match', 'talk', 'say', 'check', 'fill', 'put', 'take', 'group']);
     if (!verbs.has(v) || GERUND_SKIP.has(v)) return t;
     const ing = /e$/.test(v) && !/ee$/.test(v) ? `${v.slice(0, -1)}ing` : /^(?:[^aeiou]*[aeiou])[^aeiouwxy]$/.test(v) && v.length <= 3 ? `${v}${v.slice(-1)}ing` : `${v}ing`;
     return `${ing}${m[2]}`;

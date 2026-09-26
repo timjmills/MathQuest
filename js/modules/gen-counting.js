@@ -470,7 +470,11 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             const diff = [1, 1, 2, 2, 3][_kDraw('cg-diff', 5)];
             const lo = Math.max(1, Math.min(2, _cgTop - diff - 1)) + rng(0, Math.max(0, _cgTop - 2 - diff));   // 2 .. top - diff
             const big = lo + diff;
-            [countA, countB] = _kDraw('cg-order', 2) === 1 ? [big, lo] : [lo, big];   // L10: which box answers is page-dealt (critic guided-r1: every answer was B)
+            // L10: the ANSWER box is page-dealt (critic k2-r3: more / fewer answered B on 15 of 20 when
+            // the order was dealt apart from the question): A answers when the deal says so, for either word
+            const aAnswers = _kDraw(form === 'same' ? 'cg-order' : 'cg-answer', 2) === 0;
+            const aBig = form === 'fewer' ? !aAnswers : aAnswers;
+            [countA, countB] = aBig ? [big, lo] : [lo, big];
         }
         let labels, values, correct, questionText, printText;
         if (form === 'same') {
@@ -734,7 +738,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             : 1 + _kDraw('tf-fill10', 9);                              // 1..9, every value on a page of six or more
         const answer = target - filled;
 
-        q.text = `The frame shows ${filled}. How many more make ${target}?`;
+        q.text = `The ${_kOpt('model') === 'line' ? 'line' : 'frame'} shows ${filled}. How many more make ${target}?`;
         q.printText = `Write how many more make ${target}.`;
         q.ans = answer;
         q.answerType = "number";
@@ -743,7 +747,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // the box the only answer place on paper, the key and screen (critic k2-r2: the legacy cell
         // repeated its instruction inside and added an "Answer: ____" line)
         q.selfAnswering = true;
-        _kSetCell(q, 'counters', { kind: 'maketen', filled, target, ans: answer });
+        _kSetCell(q, 'counters', { kind: 'maketen', filled, target, ans: answer, ...(_kOpt('model') === 'line' ? { model: 'line' } : {}) });
         // P11 Support level 0: the number sentence alone, no frame to count the empty boxes of.
         if (_kLevel(1) === 0) {
             delete q.cell;

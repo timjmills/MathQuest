@@ -27,7 +27,7 @@
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import {
-    B, L, P, INK, GREY, SW, n2, root, sizeOf, inkOf, isTwin, slotValue, svg, dot, digitPt, textPt, inlineBoxMm,
+    B, L, P, INK, GREY, SW, n2, root, sizeOf, inkOf, isTwin, slotValue, svg, dot, digitPt, textPt, inlineBoxMm, D, DW,
     checkedChoice, choiceRow, KEY_FEATURES, k2StepCtx, workInk,
 } from './k2kit.js';
 import { stepMarks, singleSlotState, slotInks } from '../steps.js';
@@ -87,8 +87,8 @@ function bondTable(p, ctx) {
     // screen twin (critic k2-r2: rows drifted at 390 - the host's input made a blank cell taller than
     // its number cell): a cell is at LEAST its height and stretches to its row's tallest cell
     const hCss = isTwin(ctx) ? `min-height:${L(ctx, ch)};align-self:stretch;` : `height:${L(ctx, ch)};`;
-    const cellStyle = (w) => `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};${hCss}`
-        + `font-size:${P(ctx, dp)};font-weight:700;line-height:1;${KEY_FEATURES}flex:none;`;
+    const cellStyle = (w) => `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${DW(ctx, w, 2)};${hCss}`
+        + `font-size:${D(ctx, dp)};font-weight:700;line-height:1;${KEY_FEATURES}flex:none;`;
     // one number: printed, or a blank the pupil writes in (the cell IS the writing place)
     const num = (i, part, value, border) => {
         const id = `r${i}${part}`;
@@ -138,7 +138,7 @@ function bondTable(p, ctx) {
     if (across) {
         // 0 + 5 = 5: each blank a writing box, the signs and the whole printed
         const boxB = `border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1.25)};`;
-        const sym = (t) => `<span style="font-size:${P(ctx, dp)};font-weight:700;line-height:1;width:${L(ctx, 9)};text-align:center;flex:none;">${t}</span>`;
+        const sym = (t) => `<span style="font-size:${D(ctx, dp)};font-weight:700;line-height:1;width:${L(ctx, 9)};text-align:center;flex:none;">${t}</span>`;
         block = (list) => `<div style="display:inline-block;text-align:left;vertical-align:top;">${fixHead(2 * bx.w + 18 + bx.w)}` + list.map((i) => {
             const r = rows[i];
             return `<div data-mq-nowrap="1" style="display:flex;align-items:center;justify-content:flex-start;margin:${L(ctx, 1.5)} 0;">`
@@ -217,12 +217,17 @@ register('bond', {
         const ringed = (key) => (work ? workInk(ctx, key) : '');
         const dotsInk = work ? workInk(ctx, 'dots') : '';
         const missVal = p.unknown === 'A' ? p.a : p.unknown === 'B' ? p.b : null;
+        // 5 mm dots on a 6 mm pitch, five to a row (critic k2-r3: 1.5 mm dots), under each part box: A's
+        // from the left edge, B's to the right edge, so the two groups never meet
+        const sideMm = isTwin(ctx) ? 18 : (SIDE[sizeOf(ctx)] || 20);
+        const u = (mm) => mm / sideMm;
         const dotRow = (n, col, grey) => {
             if (!(n > 0)) return '';
-            const rows = Math.ceil(n / 5);
+            const rows = Math.ceil(n / 5), per = Math.min(5, n);
             let d = '';
-            for (let i = 0; i < n; i++) d += `<circle cx="${n2(0.5 + (i % 5) + 0.5)}" cy="${n2(0.55 + Math.floor(i / 5) * 1.1)}" r="0.36" fill="${grey ? GREY : INK}"${grey ? ' data-ws-ink="trace"' : ''}/>`;
-            return `<svg viewBox="0 0 6 ${n2(rows * 1.1 + 0.1)}" aria-hidden="true" style="position:absolute;left:${at(col === 0 ? 1.08 : 2.22)};top:${at(rows > 1 ? 2.2 : 2.3)};width:${at(0.18 * 6)};height:${at(0.18 * (rows * 1.1 + 0.1))};overflow:visible;">${d}</svg>`;
+            for (let i = 0; i < n; i++) d += `<circle cx="${n2(3 + (i % 5) * 6)}" cy="${n2(3 + Math.floor(i / 5) * 6)}" r="2.5" fill="${grey ? GREY : INK}"${grey ? ' data-ws-ink="trace"' : ''}/>`;
+            const wU = u(per * 6), left = col === 0 ? 0 : 4.2 - wU;
+            return `<svg viewBox="0 0 ${per * 6} ${rows * 6}" aria-hidden="true" style="position:absolute;left:${at(n2(left))};top:${at(3.05)};width:${at(n2(wU))};height:${at(n2(u(rows * 6)))};overflow:visible;">${d}</svg>`;
         };
         // the support shows the GIVEN parts' dots; a model's 'dots' step shows both parts' (the one
         // being worked out in its ink)
@@ -230,6 +235,8 @@ register('bond', {
         const showDotsB = dotsInk ? true : !!p.dots && p.unknown !== 'B';
         const dots = (showDotsA ? dotRow(p.a, 0, dotsInk === 'trace' && (p.unknown === 'A' || p.unknown === 'whole')) : '')
             + (showDotsB ? dotRow(p.b, 2, dotsInk === 'trace' && (p.unknown === 'B' || p.unknown === 'whole')) : '');
+        const dotRows = Math.max(showDotsA ? Math.ceil(p.a / 5) : 0, showDotsB ? Math.ceil(p.b / 5) : 0);
+        const dotsH = dotRows ? 0.15 + u(dotRows * 6) : 0;
         // the dots sit in the free room BETWEEN the parts (right of A, left of B) and the check
         // sentence in the free room right of the whole, so no state is taller than the bond
         const ringBox = (col, row, key) => {
@@ -246,7 +253,7 @@ register('bond', {
             ? `<div data-ws-ink="${checkInk === 'trace' ? 'trace' : 'solid'}" style="position:absolute;left:${at(2.7)};width:${at(1.5)};top:${at(0.32)};text-align:right;white-space:nowrap;font-weight:700;font-size:${at(0.3)};line-height:1;color:${checkInk === 'trace' ? GREY : INK};">`
                 + `${esc(p.whole - missVal)} + ${esc(missVal)} = ${esc(p.whole)}</div>` : '';
         const bond = `<div class="k2-bond mq-bond" role="img" aria-label="number bond" style="position:relative;display:inline-block;`
-            + `width:${at(4.2)};height:${at(2.9)};vertical-align:top;">`
+            + `width:${at(4.2)};height:${at(n2(2.9 + dotsH))};vertical-align:top;">`
             + `<svg viewBox="0 0 4.2 2.9" preserveAspectRatio="none" aria-hidden="true" style="position:absolute;left:0;top:0;width:100%;height:${at(2.9)};overflow:visible;">${line(0.5)}${line(3.7)}</svg>`
             + boxAt(1, 0, p.whole, true, p.unknown === 'whole')
             + boxAt(0, 1, p.a, false, p.unknown === 'A')

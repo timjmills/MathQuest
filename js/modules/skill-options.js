@@ -155,9 +155,10 @@ export const levelOption = (dflt = 1) => ({
 // teacher ticks it, the page comes back identical, and the dialog stops being believed. The
 // labels stay the canonical ones so the scale means the same thing on every sheet; `help` says
 // what those levels look like for this particular skill.
-export const levelSubset = (values, dflt, help) => {
+export const levelSubset = (values, dflt, help, labels = null) => {
     const all = levelOption();
-    const keep = all.values.filter(v => values.includes(v.v));
+    // labels (critic k2-r3): the skill's own words for each level instead of the generic ones
+    const keep = all.values.filter(v => values.includes(v.v)).map(v => (labels && labels[v.v] ? { ...v, l: labels[v.v] } : v));
     return {
         ...all,
         default: [dflt],
@@ -1197,6 +1198,11 @@ const P11_K2_OPTIONS = {
         _opsBand([5, 10, 20], 10, { label: 'Make', labels: { 5: 'Make 5 (a five frame)', 10: 'Make 10 (a ten frame)', 20: 'Make 20 (two ten frames, the first one full)' },
             help: 'The number the pupil makes. Make 5 comes first; make 20 fills the second ten frame.' }),
         levelSubset([1, 0], 1, 'Level 1 shows the frame; level 0 is the number sentence alone (6 + __ = 10).'),
+        {
+            id: 'model', label: 'Drawn as', type: 'enum', default: 'grid', group: 'layout',
+            values: [{ v: 'grid', l: 'Ten frames (default)' }, { v: 'line', l: 'A line of ten boxes' }],
+            help: 'The same counters and empty boxes, in ten frames (rows of five) or in one line of ten.',
+        },
     ],
     'composing:teen_compose': [
         _opsBand([15, 19], 19, { label: 'Teen numbers to', labels: { 15: '15 (10 and up to 5 more)', 19: '19 (10 and up to 9 more)' },
@@ -3239,7 +3245,8 @@ const K2_LANE_OPTIONS = {
             help: 'One task for the whole page: list the bonds first, then find the missing rows, then name the pattern.',
         },
         { ...levelSubset([3, 2, 1], 2, 'Level 3 fills the first two rows and draws each row as dots (the first part solid, '
-            + 'the second hollow); level 2 fills the first two rows; level 1 fills none (the pupil starts at 0 and the whole).') },
+            + 'the second hollow); level 2 fills the first two rows; level 1 fills none (the pupil starts at 0 and the whole).',
+            { 3: 'First two rows filled, and dots for each row', 2: 'First two rows filled in', 1: 'No rows filled in' }) },
         {
             id: 'notation', label: 'Written as', type: 'enum', default: 'table', group: 'layout',
             values: [{ v: 'table', l: 'A bond over a two-column table (default)' }, { v: 'across', l: 'Number sentences (0 + 5 = 5)' }],
@@ -3266,7 +3273,8 @@ const K2_LANE_OPTIONS = {
             values: [{ v: 2, l: 'Two rings (default)' }, { v: 3, l: 'Three rings' }],
             help: 'Three rings is harder: each picture has three places it could go. (Kind or shape.)',
         },
-        { ...levelSubset([3, 2, 1], 2, 'Level 3 places the first picture for the pupil (its letter written in its ring in grey); level 2 labels each ring with a picture; level 1 labels the rings in words only.') },
+        { ...levelSubset([3, 2, 1], 2, 'Level 3 places the first picture for the pupil (its letter written in its ring in grey); level 2 labels each ring with a picture; level 1 labels the rings in words only.',
+            { 3: 'First picture placed for them', 2: 'Rings labelled with a picture', 1: 'Rings labelled in words only' }) },
         {
             id: 'model', label: 'Drawn as', type: 'enum', default: 'circle', group: 'layout',
             values: [{ v: 'circle', l: 'Sorting rings (default)' }, { v: 'grid', l: 'Boxes side by side (a sorting table)' }],

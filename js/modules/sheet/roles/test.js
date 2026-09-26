@@ -16,7 +16,7 @@ import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, instructionKeyOf, assemble,
     poolItems, topicOf, labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, rng, shuffle, deriveSeed,
 } from './compose.js';
-import { groupByHeight, rowShape, rowGapFor } from '../layout.js';
+import { groupByHeight, rowShape, rowGapFor, DENSE_CEILING } from '../layout.js';
 
 export const ROLE_ID = 'test';
 const CEILING = { S: 20, M: 16, L: 12 };
@@ -44,13 +44,18 @@ function layout(items, input, count) {
             dense: { S: 20, M: 20, L: 20 }, denseRoom: 1.05, denseMaxCols: 5,
         }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
     }
+    // A short track that the practice page packs 16 to a page at L (a count-on strip) tests on that
+    // same grid (footprint `testAsPractice`, critic k2-r3: 10 items in 35 mm cells left 30% of every
+    // cell empty at L). Only L moves (12 -> 16); S and M keep 12.1's 20 / 16.
+    const asPractice = !long && items.length > 0 && items.every((it) => it.footprint && it.footprint.testAsPractice);
+    const ceil = asPractice ? Object.assign({}, CEILING, { L: DENSE_CEILING.short.L }) : CEILING;
     return resolveSectionLayout({
         role: 'test', columns: input.columns || 'auto', count: count || items.length,
         target: long ? { cols: 2, rows: { S: 3, M: 2, L: 2 } } : { cols: 4, rows: { S: 5, M: 4, L: 4 }, rowsByCols: { 3: 4, 2: 4, 1: 4 } },
-        ceiling: long ? { S: 6, M: 4, L: 4 } : CEILING, floor: (input.floors || {}).main,
+        ceiling: long ? { S: 6, M: 4, L: 4 } : ceil, floor: (input.floors || {}).main,
         // Cells sized to the problems (layout.js dense packing): a test of one-line facts in
         // 57 mm cells left ~70% of every cell empty. Never above 12.1's 20 / 16 / 12.
-        dense: long ? false : DENSE,
+        dense: long ? false : asPractice ? ceil : DENSE,
     }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
 }
 

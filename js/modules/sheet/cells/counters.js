@@ -24,7 +24,7 @@ import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import {
     L, P, B, svg, root, box, slotValue, shapeOf, dot, cross, digitPt, textPt, squareMm, inlineBoxMm, INK, GREY, SW, n2, groupRuns, isTwin, looseArray,
-    pscale, checkedChoice, choiceRow, LETTERS, numberTrack, k2StepCtx, workInk, ringWrap,
+    pscale, checkedChoice, choiceRow, LETTERS, numberTrack, k2StepCtx, workInk, ringWrap, D,
 } from './k2kit.js';
 
 const MINUS = '−';
@@ -143,8 +143,25 @@ function framePicture(ctx, n) {
  * "Answer: ____" line): a five frame (target 5), a ten frame (10) or two ten frames with the first
  * full (20), `filled` solid counters, scaled with the size; the empty boxes are what the pupil counts.
  */
-function makeFramePicture(ctx, filled, target) {
+function makeFramePicture(ctx, filled, target, line = false) {
     const k = pscale(ctx);
+    // "Drawn as" a line (critic k2-r3 panel): the boxes in ONE row of up to ten (a 20 in two such
+    // rows), a heavier rule after the fifth, instead of ten frames
+    if (line) {
+        const c = 8.5 * k, per = Math.min(10, target), lines = Math.ceil(target / per), gapY = 3 * k;
+        const w = per * c + 1, h = lines * c + (lines - 1) * gapY + 1;
+        let body = '';
+        for (let r = 0; r < lines; r++) {
+            const oy = 0.5 + r * (c + gapY);
+            body += `<path d="M0.5 ${n2(oy)}h${n2(per * c)}v${n2(c)}h${n2(-per * c)}Z" fill="none" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`;
+            let grid = '';
+            for (let j = 1; j < per; j++) if (j !== 5) grid += `M${n2(0.5 + j * c)} ${n2(oy)}v${n2(c)}`;
+            body += `<path d="${grid}" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}"/>`;
+            if (per > 5) body += `<path d="M${n2(0.5 + 5 * c)} ${n2(oy)}v${n2(c)}" stroke="${INK}" stroke-width="${n2(SW.heavy)}"/>`;
+            for (let i = 0; i < Math.min(per, filled - r * per); i++) body += dot(0.5 + (i + 0.5) * c, oy + c / 2, 5.6 * k);
+        }
+        return svg(ctx, w, h, body, { label: `${filled} counters in a line of ${target}` });
+    }
     const c = 9 * k, rows = target === 5 ? 1 : 2, frames = target === 20 ? 2 : 1, gapY = 3 * k;
     const w = 5 * c + 1, h = frames * rows * c + (frames - 1) * gapY + 1;
     let body = '';
@@ -243,9 +260,9 @@ function sharePicture(ctx, n, size) {
     return svg(ctx, lay.w, lay.h, body, { label: `${n} counters` });
 }
 
-const eqSpan = (ctx, s) => `<span style="font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;">${esc(s)}</span>`;
+const eqSpan = (ctx, s) => `<span style="font-size:${D(ctx, digitPt(ctx))};font-weight:700;line-height:1;">${esc(s)}</span>`;
 const eqRowOf = (ctx, parts) => `<div class="ws-eq" style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 1.5)};margin-top:${L(ctx, 5)};white-space:nowrap;">${parts.join('')}</div>`;
-const opSpan = (ctx, s) => `<span style="display:inline-block;width:1em;text-align:center;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;">${s}</span>`;
+const opSpan = (ctx, s) => `<span style="display:inline-block;width:1em;text-align:center;font-size:${D(ctx, digitPt(ctx))};font-weight:700;line-height:1;">${s}</span>`;
 
 /* ---------------------------------------------------- O6 AP1 migrations (2026-09-25, round 2)
  * Four K-2 skills that were drawn by gen-counting.js HTML (printed by the legacy path) are drawn
@@ -433,21 +450,18 @@ function holderPicture(ctx, n, shape, p, { scale = 1, crossed = false, counted =
  * the fifth column of objects in a narrow worksheet card): the picture BESIDE the box in one row
  * that never wraps, so the screen fit shrinks the drawing instead (data-mq-nowrap).
  */
-function picBoxRow(ctx, pic, slot, { stack = false, under = false } = {}) {
+function picBoxRow(ctx, pic, slot, { under = false } = {}) {
     // size S on paper (critic k2-r2, L1: S printed as many as L): the box stands UNDER the picture,
     // so a count cell is a third of the page wide and S takes three columns
     if (!isTwin(ctx) && under) {
         return `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};">`
             + `<div style="flex:none;">${pic}</div><div style="flex:none;">${slot}</div></div>`;
     }
-    // rows of ten (count to 30) stand ABOVE the box on screen, so the objects keep a touchable size
-    if (isTwin(ctx) && stack) {
+    // on screen the box always stands UNDER the picture (critic k2-r3: a worksheet showed it under in
+    // five cards and beside in the sixth); the objects keep a touchable size
+    if (isTwin(ctx)) {
         return `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};padding:0 ${L(ctx, 3)};">`
             + `<div data-mq-nowrap="1" style="display:flex;justify-content:center;"><div style="flex:none;">${pic}</div></div><div style="flex:none;">${slot}</div></div>`;
-    }
-    if (isTwin(ctx)) {
-        return `<div data-mq-nowrap="1" style="display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;gap:${L(ctx, 4)};padding:0 ${L(ctx, 3)};">`
-            + `<div style="flex:none;">${pic}</div><div style="flex:none;">${slot}</div></div>`;
     }
     // paper: the picture and its box centred together (critic k2-r2, H13: a box pinned to the cell's
     // right left a 31-37 % empty band beside one to three objects)
@@ -560,7 +574,7 @@ register('counters', {
         if (p.kind === 'maketen') {
             const b = inlineBoxMm(ctx, 2);
             const slot = box(ctx, { value: slotValue(ctx, 'answer', kv), w: b.w, h: b.h, mark: 'blank' });
-            return root(ctx, 'k2-maketen', `<div style="display:flex;justify-content:center;">${makeFramePicture(ctx, p.filled, p.target)}</div>`
+            return root(ctx, 'k2-maketen', `<div style="display:flex;justify-content:center;">${makeFramePicture(ctx, p.filled, p.target, p.model === 'line')}</div>`
                 + eqRow([eqSpan(ctx, p.filled), opSpan(ctx, '+'), slot, opSpan(ctx, '='), eqSpan(ctx, p.target)]));
         }
         if (p.kind === 'teen') {
@@ -597,7 +611,7 @@ register('counters', {
                 + (p.track ? `<div style="display:flex;justify-content:center;margin-top:${L(ctx, 3)};">${trackStrip(ctx, p.track)}</div>` : ''),
             isTwin(ctx) ? {} : { style: 'width:100%;box-sizing:border-box;' });
         }
-        return root(ctx, 'k2-count', picBoxRow(ctx, countPicture(ctx, p.n, p.shape, pp), slot, { stack: p.layout === 'line' && p.n > 10, under: countUnderS(p, ctx) })
+        return root(ctx, 'k2-count', picBoxRow(ctx, countPicture(ctx, p.n, p.shape, pp), slot, { under: countUnderS(p, ctx) })
             // P11 Support level 2: a number track under the picture to point along.
             + (p.track ? `<div style="display:flex;justify-content:center;margin-top:${L(ctx, 3)};">${trackStrip(ctx, p.track)}</div>` : ''),
         isTwin(ctx) ? {} : { style: 'width:100%;box-sizing:border-box;' });

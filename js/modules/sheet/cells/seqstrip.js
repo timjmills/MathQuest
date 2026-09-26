@@ -26,7 +26,7 @@
 
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
-import { L, P, B, INK, GREY, root, digitPt, sizeOf, inkOf, isTwin, shownParts } from './k2kit.js';
+import { L, P, B, INK, GREY, root, digitPt, sizeOf, inkOf, isTwin, shownParts, D, DW } from './k2kit.js';
 import { tile as shapeTile, tileSize, shapeAt } from './shapes.js';
 
 const TILE = { S: { w: 14, h: 14 }, M: { w: 14.5, h: 14.5 }, L: { w: 15, h: 15 } };
@@ -97,8 +97,9 @@ register('seqstrip', {
                 return shapeTile(ctx, { shape: sh, w: sz.w, h: sz.h, pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink, heavy: true, shown: over !== undefined });
             }
             const tw = cs && k < 0 && !isTwin(ctx) ? cs.given : t.w;
-            const base = `box-sizing:border-box;flex:none;width:${L(ctx, tw)};height:${L(ctx, t.h)};display:flex;align-items:center;`
-                + `justify-content:center;font-size:${P(ctx, pt)};font-weight:700;line-height:1;background:#fff;`;
+            const chars = Math.max(2, ...values.map((x) => String(x).length));
+            const base = `box-sizing:border-box;flex:none;width:${DW(ctx, tw, chars)};height:${isTwin(ctx) ? `max(${L(ctx, t.h)}, 1.35em)` : L(ctx, t.h)};display:flex;align-items:center;`
+                + `justify-content:center;font-size:${D(ctx, pt)};font-weight:700;line-height:1;background:#fff;`;
             if (k < 0) {
                 return `<span class="k2-tile"${over !== undefined ? ' data-ws-shown="1"' : ''} style="${base}border:${B(ctx, 0.75)} solid ${INK};color:${INK};">`
                     + `${esc(fmt(over !== undefined ? over : v))}</span>`;
@@ -131,7 +132,8 @@ register('seqstrip', {
         const cs = compactS(p, sizeOf(ctx || {}));
         if (cs) return { wMm: Math.ceil(cs.w + 6), hMm: null, measure: true, factLike: false, maxCols: 3 };
         const w = rowMm(((p && p.values) || []).length || SEQ_ROW_MAX, sizeOf(ctx), p && p.shape);
-        return { wMm: Math.ceil(w + 8), hMm: null, measure: true, factLike: false, maxCols: w + 8 <= 93 ? 2 : 1 };
+        // freeRows: a track is short, so a page takes any number of rows (a Test at L holds 2 x 6, critic k2-r3)
+        return { wMm: Math.ceil(w + 8), hMm: null, measure: true, factLike: false, maxCols: w + 8 <= 93 ? 2 : 1, freeRows: true, testAsPractice: true };
     },
     inputs(p) {
         return (p.blanks || []).map((_, i) => ({ id: `b${i}`, kind: 'number', shape: 'box', graded: true, order: i, scopes: ['full', 'answer-only'] }));

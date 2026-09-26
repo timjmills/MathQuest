@@ -144,16 +144,20 @@ function icon(kind, d) {
  * One picture of the row in a box of `bw` x `bh` mm, standing on the box floor (a shared base
  * line). `ring` draws a pencil ring round it (the marked one of a "why?" item, given not answered).
  */
-function picture(ctx, spec, bw, bh, { ring = false, label = '', floor = null } = {}) {
+function picture(ctx, spec, bw0, bh, { ring = false, label = '', floor = null, tight = false } = {}) {
     const sp = spec || {};
+    // tight (critic k2-r3, H13: a small picture stood in a slot as wide as the big one, a 30 % band
+    // between A and B): the slot is only as wide as its own picture, on the row's shared floor
+    const narrow = tight && !sp.tool && (sp.container ? (sp.w || 1) : (sp.s || 1)) < 1;
+    const bw = narrow ? Math.max(6, bw0 * (sp.container ? sp.w : sp.s)) : bw0;
     let body;
     if (sp.container) {
-        const w = bw * (sp.w || 1), h = bh * (sp.h || 1);
+        const w = bw0 * (sp.w || 1), h = bh * (sp.h || 1);
         body = `<g transform="translate(${n2((bw - w) / 2)} ${n2(bh - h)})">${container(sp.container, sp.fill, w, h)}</g>`;
     } else if (sp.tool) {
         body = tool(sp.tool, bw, bh);
     } else {
-        const d = Math.min(bw, bh) * (sp.s || 1);
+        const d = Math.min(bw0, bh) * (sp.s || 1);
         const cx = bw / 2, cy = bh - d / 2;
         body = sp.sil ? silhouette(sp.shape, cx, cy, d) : shapeOf(sp.shape).draw(cx, cy, d);
     }
@@ -346,7 +350,7 @@ register('picture-row', {
 
 /** The pick row: the choices (A, B, C) and, with a target, its key box left of them. */
 function pickRow(p, ctx, bw, bh, gap, labels, on, lp) {
-    const choices = (p.choices || []).map((c, i) => ({ pic: picture(ctx, c, bw, bh, { floor: p.base ? gap : null }), label: labels[i] }));
+    const choices = (p.choices || []).map((c, i) => ({ pic: picture(ctx, c, bw, bh, { floor: p.base ? gap : null, tight: !p.target }), label: labels[i] }));
     const row = choiceRow(ctx, choices, { on, gapMm: gap, ring: { index: p.correct || 0, ink: workInk(ctx, 'ring') } });
     if (!p.target) return root(ctx, 'k2-prow', `<div style="display:inline-block;">${row}</div>${cueLine(ctx, p.cue)}${noteLine(ctx, p.note)}`);
     // the target in a key box, left of the row, on the same floor as the pictures

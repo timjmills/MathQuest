@@ -63,7 +63,7 @@ register('sort-rings', {
         const n = groups.length;
         const grid = p.model === 'grid';
         // critic k2-r1: 4 mm labels and 7 mm tiles were too small; tiles 13 mm, labels 10 mm (at L)
-        const w = (n === 3 ? 44 : 56) * k, h = (p.task === 'count' ? 32 : 42) * k;
+        const w = (n === 3 ? 44 : 56) * k, h = (p.task === 'count' ? 35 : 45) * k;   // k2-r3: labels 7 mm, pictures 13 mm
         const d = 13 * k;
         const inside = p.task !== 'count';
         const task = p.task || 'count';
@@ -72,8 +72,8 @@ register('sort-rings', {
         const bx = inlineBoxMm(ctx, 1);
         const rings = groups.map((g, gi) => {
             const label = p.labels === false || task === 'rule' ? ''
-                : `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 1.5)};font-size:${P(ctx, textPt(ctx) + 3)};font-weight:700;line-height:1.1;">`
-                    + `${g.pic ? pic(ctx, g.pic, 10 * k) : ''}${g.word ? `<span>${esc(g.word)}</span>` : ''}</div>`;
+                : `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 1.5)};font-size:${P(ctx, textPt(ctx) + 7)};font-weight:700;line-height:1.1;">`
+                    + `${g.pic ? pic(ctx, g.pic, 13 * k) : ''}${g.word ? `<span>${esc(g.word)}</span>` : ''}</div>`;
             const members = inside ? `<div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:${L(ctx, 1.5)};max-width:${L(ctx, w - 10)};">`
                 + g.members.map((ti) => pic(ctx, p.tiles[ti], 12 * k)).join('') + '</div>' : '';
             // the letters written in the ring (the working): all of them on the key (solid) and in a
