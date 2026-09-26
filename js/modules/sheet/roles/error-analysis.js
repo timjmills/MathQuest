@@ -706,8 +706,9 @@ export function prepare(it, info = {}) {
         // The flow: the work, then the judgement, then a redraw zone across the whole cell. The
         // decision boxes always come before the fix. The page decides ONE place for every cell
         // (`o.judge`: 'beside' the work, 'below' it in ONE line - "Correct  Fix it [fix]" - or
-        // 'stack', below it in two lines - AX-4); unset (measuring), it flows as it fits.
-        const mode = modal && ['beside', 'below', 'stack'].includes(o.judge) ? o.judge : '';
+        // 'stack', below it in two lines - AX-4).
+        // unset (the host's first measure, an unmeasured page): 'stack', which always fits the cell
+        const mode = !modal ? '' : ['beside', 'below', 'stack'].includes(o.judge) ? o.judge : 'stack';
         const modeCls = mode === 'stack' ? ' mq-jbelow mq-jstack' : mode ? ` mq-j${mode}` : '';
         return `<div class="mq-judge mq-judge3${ask}${modeCls}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm">`
             + shownWork
