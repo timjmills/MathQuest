@@ -15,7 +15,8 @@
 //     transform  a shape on a grid and three grids A-C, one showing the shape moved as asked (a
 //                translation, a reflection over an axis, a turn about the origin); the pupil checks
 //                the grid that shows it (the skill is a choice on screen and on paper). geometry-r1:
-//                the four grids stand in one row at S, two to a row at M and L, every one numbered,
+//                the four grids stand in one row across the page at S and M, two to a row at L
+//                (or when a long slide widens them), every one numbered,
 //                squares 5 / 5 / 5.5 mm;
 //                Support level 2 draws the mirror line, the turn arrow or the slide arrow
 //   screen       the plot twin carries data-mq-model="coord-plot": a tap on the grid puts a dot on
@@ -154,16 +155,23 @@ function stepFor(want, u, ctx, lo = -10, hi = 10) {
  *  at S / M / L. At S the shape and its three choices stand in ONE row across the page (so S prints
  *  more items than L); at M and L two to a row. A long slide's wide grid takes smaller squares. */
 const TSQ = { S: 5, M: 5, L: 5.5 };
+// A full-width cell: at S and M the shape and its three choices in ONE row when their squares can
+// stay 5 mm, else two to a row (a long slide's wide grid); at L, the big print, always two to a row,
+// the letters beside the grids (two items a page: S prints three).
 export const TRANSFORM_COL = { S: { wMm: 186, maxCols: 1 }, M: { wMm: 186, maxCols: 1 }, L: { wMm: 186, maxCols: 1 } };
-const oneRow = (p, ctx) => sizeOf(ctx) === 'S' && (p.x1 - p.x0) <= 6;
-function smallOf(p, ctx) {
-    const size = sizeOf(ctx);
+const TGAP = 4;
+/** The square size for `per` grids to a row: every grid's numerals, the shape's axis names, the gaps. */
+function fitOf(p, ctx, per) {
     const span = (p.x1 - p.x0) || 1;
-    const pt = textPt(ctx), nMm = pt * PT_MM;
-    const padL = nMm * 0.6 * 2 + 2.2, names = 3.2 + nMm * 0.7 + 0.8;
-    const per = oneRow(p, ctx) ? 4 : 2;
-    const room = TRANSFORM_COL[size].wMm - 10 - per * (padL + 1.5) - names - (per - 1) * 4;
-    return Math.min(TSQ[size], Math.max(3.4, room / (per * span)));
+    const nMm = textPt(ctx) * PT_MM;
+    const wide = Math.max(...[p.x0, p.y0, p.x1, p.y1].map((v) => minus(v).length));
+    const padL = nMm * 0.6 * wide + 2.2, names = 3.2 + nMm * 0.7 + 0.8 - 1.5;
+    const room = TRANSFORM_COL[sizeOf(ctx)].wMm - 8 - per * (padL + 1.5) - names - (per - 1) * TGAP;
+    return room / (per * span);
+}
+const oneRow = (p, ctx) => sizeOf(ctx) !== 'L' && fitOf(p, ctx, 4) >= 4.9;
+function smallOf(p, ctx) {
+    return Math.min(TSQ[sizeOf(ctx)], Math.max(3.4, fitOf(p, ctx, oneRow(p, ctx) ? 4 : 2)));
 }
 
 /** The value a slot shows in this state. */
@@ -293,7 +301,10 @@ function renderTransform(p, ctx) {
     if (ctx.state === 'answered' || ctx.state === 'traced' || (ctx.state === 'blank' && p.traced)) on = p.correct;
     else if (ctx.state === 'wrong') { const w = ctx.wrong || {}; on = LETTERS.indexOf(String(w.slots && w.slots.choice !== undefined ? w.slots.choice : w.value).trim().toUpperCase()); }
     const tctx = ctx.state === 'blank' && p.traced ? { ...ctx, state: 'traced' } : ctx;
-    const cellOf = (inner, foot) => `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 1.5)};">`
+    // in one row the letter and its box stand under each grid; two to a row, beside it (the item
+    // stays short enough for two on an L page)
+    const row1 = oneRow(p, ctx);
+    const cellOf = (inner, foot) => `<div style="display:flex;flex-direction:${row1 ? 'column' : 'row'};align-items:center;gap:${L(ctx, row1 ? 1.5 : 3)};">`
         + `<div style="line-height:0;">${inner}</div>${foot}</div>`;
     const opts = (p.choices || []).map((pts, i) => {
         const g = gridSVG(ctx, { x0: p.x0, x1: p.x1, y0: p.y0, y1: p.y1, u, step, shapes: [{ pts }], pt, names: false, numerals: numbered, label: `grid ${LETTERS[i]}` });
@@ -302,11 +313,11 @@ function renderTransform(p, ctx) {
     });
     const given = cellOf(big.html, `<div style="font-size:${P(ctx, textPt(ctx) + 1)};line-height:1.2;font-weight:700;">The shape</div>`);
     const ink = on >= 0 ? ` data-ws-ink="${tctx.state === 'traced' ? 'trace' : 'solid'}"` : '';
-    const grid2 = (a, b) => `<div style="display:flex;justify-content:center;align-items:flex-end;gap:${L(ctx, 6)};">${a}${b || ''}</div>`;
+    const grid2 = (a, b) => `<div style="display:flex;justify-content:center;align-items:flex-end;gap:${L(ctx, TGAP)};">${a}${b || ''}</div>`;
     const task = p.noAsk || isTwin(ctx) ? '' : `<div class="cg-task" style="font-size:${P(ctx, textPt(ctx) + 1)};line-height:1.3;">${esc(p.task || '')}</div>`;
     if (p.noAsk) return `<div style="line-height:0;">${big.html}</div>`;
     const body = oneRow(p, ctx)
-        ? `<div style="display:flex;justify-content:center;align-items:flex-end;gap:${L(ctx, 4)};">${given}${opts.join('')}</div>`
+        ? `<div style="display:flex;justify-content:center;align-items:flex-end;gap:${L(ctx, TGAP)};">${given}${opts.join('')}</div>`
         : grid2(given, opts[0]) + grid2(opts[1], opts[2]);
     return `${task}<div data-ws-slot="choice" data-ws-shape="check"${ink} style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};">`
         + body + `</div>`;
