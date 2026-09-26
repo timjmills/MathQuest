@@ -147,6 +147,11 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'check-measure': 'What can we measure? Check one box.',
     'check-tool': 'Which tool measures it? Check one box.',
     'check-level': 'How full is it? Check one box.',
+    // 2026-09-26: odd and even (the kit `parity` cell) and composing a whole from unit fractions.
+    'check-odd-even': 'Odd or even? Check one box.',
+    'check-asked': 'Read the question. Check one box.',
+    'circle-even': 'Circle the even numbers. Cross out the odd numbers.',
+    'make-whole': 'Use the pieces. Write the fractions that make 1 whole.',
     'check-holds-more': 'Check the one that holds more.',
     'check-has-more': 'Check the one that has more.',
     'order-holds': 'Write 1, 2, 3. Start with the one that holds least.',

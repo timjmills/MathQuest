@@ -125,6 +125,9 @@ import './cells/wordpic.js';
 // Build lane k2 (2026-09-25): a row of pictures to match / compare / order; sorting rings.
 import './cells/picture-row.js';
 import './cells/sort-rings.js';
+// 2026-09-26: odd and even (pairs, which, sort) and a whole from unit-fraction pieces.
+import './cells/parity.js';
+import './cells/frac-wall.js';
 // Every whole-number word problem (owner ruling 2026-09-25): story, sign row, column boxes, answer + unit bank.
 export { wordWorkPayload, wordWorkTwin, solveStory, parseTwoStep, storyLines, unitOf, cueRanges, columnRows, KEYWORD_BANK, WW_TEMPLATE } from './cells/word-work.js';
 // Count-by rows, number patterns, the chart to complete, and × / ÷ on a number line (2026-09-25).

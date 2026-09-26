@@ -1544,3 +1544,108 @@ registerSkill('composing:bonds_in_order', {
         return chooseWrong(q, c.filter((x) => x.value !== right));
     },
 });
+
+/* ======================================================= odd_even, select_even_odd (kit `parity`) */
+
+const PAR_ICAN = 'I Can tell if a number is odd or even';
+const PAR_PAIRS = {
+    iCan: PAR_ICAN, instructionKey: 'check-odd-even',
+    steps: ['Look at the dots. Make pairs: two in each column.', 'Every dot has a partner: even.', 'One dot is left over: odd.', 'Check Odd or Even.'],
+    say: '__ is __.', sayValues: (q) => { const p = payloadOf(q); return Number.isFinite(Number(p.n)) ? [String(p.n), String(q.ans).toLowerCase()] : null; },
+};
+const PAR_WHICH = {
+    iCan: PAR_ICAN, instructionKey: 'check-asked',
+    steps: ['Read the question: odd or even?', 'Look at the ones digit of each number.', 'Even numbers end in 0, 2, 4, 6 or 8. Odd numbers end in 1, 3, 5, 7 or 9.', 'Check the number that matches.'],
+    say: '__ is __.', sayValues: (q) => { const p = payloadOf(q); return p.target ? [String(q.ans), String(p.target)] : null; },
+};
+const PAR_SORT = {
+    iCan: 'I Can sort even and odd numbers', instructionKey: 'circle-even',
+    steps: ['Look at the ones digit of each number.', 'It ends in 0, 2, 4, 6 or 8: even. Circle it.', 'It ends in 1, 3, 5, 7 or 9: odd. Cross it out.'],
+    say: '__ is even.', sayValues: (q) => { const e = (payloadOf(q).nums || []).find((v) => Number(v) % 2 === 0); return e !== undefined ? [String(e)] : null; },
+};
+const PAR_DEFS = { pairs: PAR_PAIRS, which: PAR_WHICH, sort: PAR_SORT };
+const onesDigit = (v) => String(Math.abs(Number(v)) % 10);
+
+function parityWorked(q) {
+    const p = payloadOf(q);
+    if (p.task === 'sort') {
+        const nums = (p.nums || []).map(Number);
+        const ev = nums.filter((v) => v % 2 === 0), od = nums.filter((v) => v % 2 !== 0);
+        return [
+            step('Look at the ones digit of each number.'),
+            step(ev.length ? `${ev.join(', ')} end in an even digit. Circle ${ev.length > 1 ? 'them' : 'it'}.` : 'No number ends in 0, 2, 4, 6 or 8.'),
+            step(od.length ? `${od.join(', ')} end in an odd digit. Cross ${od.length > 1 ? 'them' : 'it'} out.` : 'No number ends in 1, 3, 5, 7 or 9.', [WORK('sort')]),
+        ];
+    }
+    if (p.task === 'which') {
+        return [
+            step(`The question asks for the ${p.target || 'even'} number.`),
+            step(`${q.ans} ends in ${onesDigit(q.ans)}: it is ${p.target || 'even'}.`, [WORK('ring')]),
+            step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
+        ];
+    }
+    const n = Number(p.n) || 0;
+    const pairs = Math.floor(n / 2);
+    return [
+        step(`Make pairs: ${pairs} pair${pairs === 1 ? '' : 's'}.`, [WORK('pairs')]),
+        step(n % 2 ? 'One dot is left over. So it is odd.' : 'Every dot has a partner. So it is even.', [WORK('ring')]),
+        step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
+    ];
+}
+
+function parityWrong(q) {
+    const p = payloadOf(q);
+    if (p.task === 'sort') {
+        const nums = (p.nums || []).map(Number);
+        // odd and even swapped: the odd numbers circled, the even ones crossed out
+        const od = nums.filter((v) => v % 2 !== 0), ev = nums.filter((v) => v % 2 === 0);
+        const v = `Circle: ${od.join(', ') || '(none)'}; Cross out: ${ev.join(', ') || '(none)'}`;
+        return { value: v, display: v, misconception: 'odd-even-swapped', slot: 'answer', slots: { answer: v }, explain: 'Circled the odd numbers instead of the even ones.' };
+    }
+    if (p.task === 'which') {
+        const other = (p.nums || []).map(String).find((v) => v !== String(q.ans));
+        return other ? chooseWrong(q, [{ value: other, misconception: 'tens-digit-read', explain: `Looked at the tens digit of ${other}, not the ones.` }]) : null;
+    }
+    return chooseWrong(q, [{ value: q.ans === 'Even' ? 'Odd' : 'Even', misconception: 'counted-pairs-not-leftover', explain: 'Looked at the pairs and missed the one left over (or saw one that is not there).' }]);
+}
+
+for (const id of ['composing:odd_even', 'composing:select_even_odd']) {
+    registerSkill(id, {
+        hint: (q) => (payloadOf(q).task === 'pairs' ? { rings: true } : null),
+        strings: stringsBy((t) => PAR_DEFS[t] || null, id === 'composing:select_even_odd' ? PAR_SORT : PAR_PAIRS),
+        misconceptions: ['odd-even-swapped', 'tens-digit-read', 'counted-pairs-not-leftover'],
+        workedSteps: parityWorked,
+        wrongAnswer: parityWrong,
+    });
+}
+
+/* ======================================================= compose_whole (kit `frac-wall`) */
+
+const PIECE = { 2: 'half', 3: 'third', 4: 'quarter', 6: 'sixth', 8: 'eighth' };
+registerSkill('composing:compose_whole', {
+    strings: strings({
+        iCan: 'I Can make 1 whole from unit fractions', instructionKey: 'make-whole',
+        steps: ['Look at the whole bar.', 'Find pieces that fill it with no gap and no overlap.', 'Write each piece: 1 over how many pieces make a whole.'],
+        say: 'These pieces make 1 whole.',
+    }),
+    misconceptions: ['sum-past-whole'],
+    workedSteps: (q) => {
+        const combo = (payloadOf(q).combo || []).map(Number);
+        const slots = combo.map((d, i) => ({ slot: `b${i}`, value: String(d) }));
+        return [
+            step('Look at the whole bar.'),
+            step(`Choose pieces that fill it: ${combo.map((d) => `one ${PIECE[d] || `1 of ${d}`}`).join(', ')}.`, slots.slice(0, 1)),
+            step('Write the bottom number of each piece.', slots),
+        ];
+    },
+    wrongAnswer: (q) => {
+        const combo = (payloadOf(q).combo || []).map(Number);
+        if (!combo.length) return null;
+        // the last piece written one size bigger: the pieces then add up past the whole
+        const wrong = combo.map((d, i) => (i === combo.length - 1 ? Math.max(2, d / 2) : d));
+        if (wrong.join() === combo.join()) return null;
+        const slots = Object.fromEntries(wrong.map((d, i) => [`b${i}`, String(d)]));
+        const v = wrong.map((d) => `1/${d}`).join(' + ');
+        return { value: v, display: v, misconception: 'sum-past-whole', slot: 'b0', slots, explain: 'The pieces add up to more than 1 whole.' };
+    },
+});

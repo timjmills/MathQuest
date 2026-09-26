@@ -1628,14 +1628,48 @@ export async function buildSheet(req = {}) {
             const pageCount = () => (shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, probe.items), n, lctx)));
             let want = sec.count || Math.min(MAX_ITEMS, pageCount() * pagesWanted);
             let items = [];
-            for (let pass = 0; pass < 3; pass++) {
+            // A MIXED POOL (mixed_composing, counting_all ...) is one skill whose items come from
+            // many templates, 25 to 110 mm tall. Its probe's tallest item sized every page, so a page
+            // that was dealt short items printed three of them over a 20-35 % empty strip (kit lint
+            // PAGEFILL, 2026-09-26). A pool page is sized by the items it HOLDS: the count grows or
+            // shrinks with them until it settles, and the largest count that fits is kept.
+            const pool = !sec.count && shared[si] === null && sec.skills.length === 1 && isMixedMetaSkill(sec.skills[0].skillId);
+            let fitBest = 0;
+            for (let pass = 0; pass < (pool ? 6 : 3); pass++) {
                 items = finalRun(sec, si, base, want, probe);
                 if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(items.length + 2);
-                sec.floor = floorWith(si, probe.items.concat(items));
+                sec.floor = floorWith(si, pool ? items : probe.items.concat(items));
                 if (sec.count) break;
                 const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, items), n, lctx)) * pagesWanted);
+                if (pool) {
+                    if (again >= want) fitBest = Math.max(fitBest, want);
+                    if (again === want) break;
+                    // grown past a count that fitted and now shrinking: settle on the one that fitted
+                    const next = again > want ? again : fitBest > 0 && fitBest < want ? fitBest : again;
+                    if (next === want || (next > want && fitBest >= next)) break;
+                    want = next;
+                    continue;
+                }
                 if (again >= want) break;
                 want = again;
+            }
+            if (pool && fitBest > 0 && items.length !== fitBest) {
+                items = finalRun(sec, si, base, fitBest, probe);
+                sec.floor = floorWith(si, items);
+            }
+            // A pool's count estimate comes from the few items it has dealt (their rows); one more
+            // item is tried while the page still holds it WITH ROOM FOR ONE MORE (the estimate
+            // draws every row at one height; the page lays them as dealt, so the last item of a
+            // count that only just fits could spill to a second page), so a page of short items
+            // is filled.
+            if (pool && fitBest > 0) {
+                for (let g = 0; g < 16 && items.length < MAX_ITEMS; g++) {
+                    const more = finalRun(sec, si, base, items.length + 1, probe);
+                    sec.floor = floorWith(si, more);
+                    const cap = capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, more), n, lctx)) * pagesWanted;
+                    if (cap <= more.length) { sec.floor = floorWith(si, items); break; }
+                    items = more;
+                }
             }
             hostItems = hostItems.concat(items);
         });

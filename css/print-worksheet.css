@@ -2909,3 +2909,8 @@
 }
 /* Stand-alone write-in boxes of the legacy print path: slightly rounded, never square (SL-11). */
 .print-edition .eq .blank-box, .print-edition .factfam .row .blank-box { border-radius: 1.25mm; }
+
+/* 2026-09-26 (kit lint TY-2): a legacy stacked fraction on paper is Andika bold - the screen rule in
+   ui-components.css sets 600, which Andika does not have. */
+.print-edition .frac .num,
+.print-edition .frac .den { font-weight: 700; }
