@@ -214,14 +214,14 @@ This supersedes the 17-card page-type menu (and the stand-alone mapping in §8c,
 
 | Paper | Absorbs | Options on the one paper |
 |---|---|---|
-| **Practice** | Independent, More Practice (A, B, C…), Mixed practice, Review, Word problems, Fact rows, Fact probe | skills: one or more (one skill → "I Can" title, §Daily look); **versions** (1 or A, B, C… new numbers); **mix in earlier skills** (off / review share, capped 45 %); **fact columns** (auto, or 5–10 across — the old Fact rows); **timed check** (the old Fact probe: minutes + score line); size S / M / L (min-size floors §8a). Word-problem skills get their story-with-work layout automatically. Built on the lesson practice and mixed page designs. |
+| **Practice** | Independent, More Practice (A, B, C…), Mixed practice, Review, Fact rows, Fact probe | skills: one or more (one skill → "I Can" title, §Daily look); **versions** (1 or A, B, C… new numbers); **mix in earlier skills** (off / review share, capped 45 %); **fact columns** (auto, or 5–10 across — the old Fact rows); **timed check** (the old Fact probe: minutes + score line); size S / M / L (min-size floors §8a). Word problems are **skills, not a paper type** (owner): a word-problem skill on a Practice or Quiz paper gets its story-with-work layout automatically. Built on the lesson practice and mixed page designs. |
 | **Quiz** | Test A / Test B | scored; **versions** A, B… (same skills, new numbers); size. Built on the lesson practice frame. The on-screen Quiz Builder is separate and unchanged. |
 | **Lesson** | Lesson packet, Prerequisite check, Worked example (anchor chart), Guided (We Do), Lesson opener, Pre-skill check | **parts** to print (default all: Prerequisite Check, anchor chart, lesson sheet with We Do, practice, mixed); one size (§8a). The stand-alone Guided / Worked example / Prerequisite pages exist only as parts of a lesson. |
 
 - **Paused for later (hidden, code kept, like §8d):** True or False?, Reason It, Stretch, and Find the mistake. Their
   provider data (`open(q)`, `wrongAnswer`, reason prompts) is kept; no new work goes into them now.
 - **Saved sets and share codes are never broken:** every old role id decodes to its new paper + options
-  (`independent`/`more-practice`/`mixed-practice`/`review`/`word-problems`/`fact-rows`/`fact-probe` → Practice;
+  (`independent`/`more-practice`/`mixed-practice`/`review`/`fact-rows`/`fact-probe` → Practice; `word-problems` → Practice with those skills;
   `test`/`test-b` → Quiz versions; `lesson`/`opener`/`pre-skill-check`/`scripted-model`/`guided` → Lesson with the
   matching part). Paused roles still print from old saved sets.
 - **The 8/10 pass bar now covers:** Practice (single skill and mixed, at S and L, with its key), Quiz (with its key),
