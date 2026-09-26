@@ -16,6 +16,7 @@
 // Randomness is Math.random, which generateQuestionFor() seeds, so a page is reproducible.
 
 import { state } from './state.js';
+import { dealIndex } from './page-deal.js';
 import { randInt, shuffle } from './utils.js';
 import { optionsFor, pvCap } from './skill-options.js';
 import { k2Twin, renderCell } from './sheet/index.js';
@@ -92,14 +93,11 @@ export function genCountByTables(q) {
     if (untouched) tables = tables.filter((v) => v >= 2);
     let t;
     if ((untouched || opt('order') === 'mixed') && tables.length > 1) {
-        // Mixed: every ticked table once in a shuffled round, then the next round.
-        const round = Math.floor(idx / tables.length);
-        const order = tables.slice();
-        // a per-round shuffle that does not depend on earlier items (a seeded page is reproducible)
-        let h = 2166136261 ^ round;
-        for (let i = order.length - 1; i > 0; i--) { h = Math.imul(h ^ (h >>> 13), 16777619) >>> 0; const j = h % (i + 1); [order[i], order[j]] = [order[j], order[i]]; }
-        t = order[idx % order.length];
-        if (!Number.isFinite(state.itemIndex) && t === _lastTable) t = order[(idx + 1) % order.length];
+        // Mixed: every ticked table once in a shuffled round, then the next round. L10: the round
+        // used to be shuffled from the round NUMBER alone, so every seed printed the same order of
+        // tables; page-deal.js shuffles each round from the page's own seeded rng.
+        t = tables[dealIndex('cbt-table', tables.length)];
+        if (!Number.isFinite(state.itemIndex) && t === _lastTable && tables.length > 1) t = tables[(tables.indexOf(t) + 1) % tables.length];
     } else {
         t = tables[idx % tables.length];
     }
@@ -306,7 +304,9 @@ export function genMultChart(q, skill) {
     const pctRaw = opt('missing');
     const pct = pctRaw === null || pctRaw === undefined ? null : Number(pctRaw);
     const idx = itemAt();
-    const focus = tabs[idx % tabs.length];                      // the table this item leans on
+    // The table this item leans on. L10: dealt at random, each ticked table once a round
+    // (page-deal.js), not tabs[idx % n], which printed the same tables in the same order on every seed.
+    const focus = tabs[dealIndex('chart-focus', tabs.length)];
 
     // The chart: the whole block 1..T, or a 4 x 5 window cut from it that holds the focus table.
     let rows, cols;
@@ -382,7 +382,8 @@ export function genMultChart(q, skill) {
         q.acceptedAnswers = acceptLists(vals);
         q.hint = 'Look at a product and the number you know on its edge. What times that number makes the product?';
     } else if (task === 'shade') {
-        const n = tabs.filter(v => v >= 2).length ? tabs.filter(v => v >= 2)[idx % tabs.filter(v => v >= 2).length] : 2;
+        const shadeOf = tabs.filter(v => v >= 2);
+        const n = shadeOf.length ? shadeOf[dealIndex('chart-shade', shadeOf.length)] : 2;
         payload.shade = n;
         const distinct = [...new Set(rows.flatMap(r => cols.map(c => r * c)))].sort((a, b) => a - b);
         const opts = distinct.map((v, k) => ({ id: 'opt' + k, label: String(v), correct: v % n === 0 }));
@@ -441,7 +442,8 @@ export function genHopLine(q, skill) {
     const below = { 20: 0, 50: 20, 100: 50, 144: 100 }[band] || 0;
     const lean = one ? [] : fits.filter(s => s * 12 > below);
     const deal = lean.length ? lean : fits;
-    const s = deal.length ? deal[idx % deal.length] : 2;
+    // L10: the step and the unknown are two independent random deals (page-deal.js), not idx % n.
+    const s = deal.length ? deal[dealIndex(`hop-step:${div ? 'd' : 'm'}`, deal.length)] : 2;
     const gMax = Math.max(2, Math.min(12, Math.floor(maxEnd / s)));
     const g = randInt(2, gMax);
     const p = g * s;
@@ -450,7 +452,7 @@ export function genHopLine(q, skill) {
     else M = s * Math.min(Math.floor(maxEnd / s), 12, g + randInt(1, 3));
     if (M < p) M = p;
     const response = ['draw', 'sentence', 'missing'].includes(opt('response')) ? opt('response') : 'draw';
-    const unknown = ['a', 'b', 'c'][idx % 3];
+    const unknown = ['a', 'b', 'c'][dealIndex(`hop-unknown:${div ? 'd' : 'm'}`, 3)];
     const numbered = opt('support') === 'numbers';
     const payload = { op: div ? '/' : 'x', hops: g, step: s, max: M, ticks: one ? 'one' : 'step', response, numbered };
     if (response === 'missing') payload.unknown = unknown;

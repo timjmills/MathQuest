@@ -19,6 +19,7 @@
 // Layer 4 (reads state; imports the pure kit only).
 
 import { state } from './state.js';
+import { pageConstant } from './page-deal.js';
 import { renderCell, wordWorkPayload, wordWorkTwin, WW_TEMPLATE } from './sheet/index.js';
 
 /** The word-problem skills the cell is for (the ids a generated item carries). */
@@ -82,7 +83,9 @@ export function applyWordWork(q) {
     let payload = null;
     // the story's names and nouns vary by the item's place on a page (seeded, so reproducible)
     // (by the item's place: neighbours never share a name or a noun, P-WP-12 variety across the page)
-    const k = Number.isFinite(state.itemIndex) ? state.itemIndex * 5 : Math.floor(Math.random() * 1000);
+    // L10: the walk starts at a point drawn once per page from the seeded rng, so every seed tells
+    // different stories (it used to be the same books, stickers, pencils … on every page).
+    const k = Number.isFinite(state.itemIndex) ? (state.itemIndex + pageConstant('word-work', 200)) * 5 : Math.floor(Math.random() * 1000);
     const two = TWO_STEP.has(skill) || TWO_STEP.has(outer);
     try {
         payload = wordWorkPayload(q, {

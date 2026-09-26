@@ -1,5 +1,6 @@
 // gen-operations.js - Number & Operations + Integers question generation
 import { state } from './state.js';
+import { dealIndex, dealPick } from './page-deal.js';
 import { randInt, shuffle, pick, buildNumericOptions, pickName, pickTwoNames, pickNoun } from './utils.js';
 import { DEFAULT_TABLES, getSkillGrade, maxOperandForGrade, multCapsForGrade, divCapsForGrade } from './data.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
@@ -1146,12 +1147,14 @@ function _wrongSmallerFromLarger(a, b) {
     return parseInt(out, 10);
 }
 
-/** A deal over `n` rungs that starts each PAGE at a different point, as factConstantFor does. */
-let _rungOffset = 0;
-function _dealRung(n) {
-    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _constantCursor;
-    if (at === 0) _rungOffset = Math.floor(Math.random() * n);
-    return (((at + _rungOffset) % n) + n) % n;
+/**
+ * A deal over `n` rungs down the page. L10: it used to walk the rungs in order from a random
+ * start, so every page read A B A B (fact_family_sort yes/no, equal_or_unequal_groups, which_sign
+ * ÷ + − ×). It is now page-deal.js: each rung equally often in a block, in a random order.
+ * `tag` separates two independent deals in one item.
+ */
+function _dealRung(n, tag = '') {
+    return dealIndex(`rung:${state.skill}:${tag}:${n}`, n);
 }
 
 /**
@@ -2319,7 +2322,8 @@ function _applyOptionPost(q, selected, routed) {
     // --- the unknown position on add / subtract --------------------------------------------
     if ((selected === 'add' || selected === 'subtract') && ints && (isAdd || isSubOp)) {
         let u = _opt('unknown');
-        if (u === 'mixed') u = ['answer', 'first', 'second'][((_optAt() % 3) + 3) % 3];
+        // L10: dealt at random, balanced (page-deal.js), not answer/first/second in turn.
+        if (u === 'mixed') u = dealPick(`unknown:${state.skill}`, ['answer', 'first', 'second']);
         if (u === 'first' || u === 'second') {
             const a = q.a, b = q.b, res = isAdd ? a + b : a - b, glyph = isAdd ? '+' : '−';
             q.text = u === 'first' ? `? ${glyph} ${b} = ${res}` : `${a} ${glyph} ? = ${res}`;
@@ -2466,7 +2470,7 @@ function _generateSizedMultDiv(q, skill, helpers) {
         if (!d && (!rem || rem === 'none')) return false;
         const nDividend = d ? Math.floor(d / 10) : 2, nDivisor = d ? d % 10 : 1;
         const divisor = nDivisor === 1 ? rng(2, 9) : rng(11, 99);
-        const withR = rem === 'always' || (rem === 'mixed' && _optAt() % 2 === 1);
+        const withR = rem === 'always' || (rem === 'mixed' && dealIndex(`remainder:${state.skill}`, 2) === 1);
         const lo = 10 ** (nDividend - 1), hi = 10 ** nDividend - 1;
         let dividend = lo, quotient = 1, r = 0;
         for (let t = 0; t < 80; t++) {
@@ -4463,10 +4467,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     return t.length ? t : legal.slice();
                 })();
                 const _mmDeal = !(_mmTicked.length === 1 && _mmTicked[0] === 'across');
-                const _mmAt = _optAt();
+                // L10: ÷ or × per cell and the ÷ notation are two independent deals (page-deal.js),
+                // balanced but in a random order, never × ÷ × ÷.
+                const _mmDiv = _mmDeal && dealIndex(`mm-op:${state.skill}`, 2) === 0;
                 const position = !_mmDeal ? pick(positions)
-                    : (_mmAt % 2 === 0 ? pick(['dividend', 'divisor', 'quotient']) : pick(['first_factor', 'second_factor', 'product']));
-                const _mmNotation = _mmDeal ? _mmTicked[(Math.floor(_mmAt / 2) % _mmTicked.length + _mmTicked.length) % _mmTicked.length] : null;
+                    : (_mmDiv ? pick(['dividend', 'divisor', 'quotient']) : pick(['first_factor', 'second_factor', 'product']));
+                const _mmNotation = _mmDeal ? dealPick(`mm-notation:${state.skill}`, _mmTicked) : null;
                 // Scale factor range: for range<=100 use 2-12 (times tables), for larger ranges scale up
                 const mmFactorMax = range <= 100 ? 12 : Math.min(Math.ceil(Math.sqrt(range)), 25);
 

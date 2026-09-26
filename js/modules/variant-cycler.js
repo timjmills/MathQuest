@@ -1,6 +1,10 @@
 // variant-cycler.js — centralized least-recently-used picker for problem-type
 // rotation across the gen-*.js generators.
 //
+// L10 UPDATE (2026-09-26): the default deal is now page-deal.js (balanced, random order, no
+// cycle); the LRU scoring below only runs when adaptive practice is bringing back a variant the
+// pupil got wrong. The original note follows.
+//
 // PROBLEM SOLVED: Each skill in MathQuest has multiple sub-types selected by
 // `Math.random() < threshold` chains inside its generator. Pure independent
 // random rolls cluster — students see the same sub-type three or four times
@@ -25,6 +29,7 @@
 // penalized but rare variants still get more time on the bench.
 
 import { state } from './state.js';
+import { dealIndex } from './page-deal.js';
 
 // History capacity per skill. Larger = stronger anti-repeat. We use 6 so even
 // a 6-variant skill never repeats consecutively unless it has to.
@@ -145,6 +150,19 @@ export function pickVariant(skillId, variants, weights = null) {
     const hist = historyFor(skillId);
     const wrongMap = wrongMapFor(skillId);
     const adaptiveOn = !!(state && state.adaptiveModeEnabled);
+
+    // L10 (design/audit/LESSONS_LEARNED.md): the pure LRU rotation below is a strict cycle — with
+    // equal weights it deals A B A B / A B C A B C down every page, so a pupil can read the kind
+    // (and often the answer) off the position. Unless adaptive practice has a wrong answer to
+    // bring back, the variant is dealt by page-deal.js instead: balanced in blocks, in a random
+    // order from the seeded rng, repeats allowed, never a run of more than three.
+    const wantsBoost = adaptiveOn && variants.some(v => (wrongMap[String(v)] || 0) > 0);
+    if (!wantsBoost) {
+        const w = Array.isArray(weights) ? variants.map((_, i) => (typeof weights[i] === 'number' ? weights[i] : 1)) : null;
+        const chosen = variants[dealIndex(`variant:${skillId}`, variants.length, w)];
+        pushHistory(skillId, chosen);
+        return chosen;
+    }
 
     let bestIdx = 0;
     let bestScore = Infinity;
