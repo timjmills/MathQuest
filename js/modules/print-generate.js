@@ -13212,7 +13212,7 @@ export function generateWorksheetHTML() {
                 <div class="worksheet-problems" style="grid-template-columns: ${gridCols};gap:${gridGap};">${problemsHTML}</div>
                 ${answerKeyHTML}
                 <div class="worksheet-footer">
-                    <span class="footer-left">Math Quest Pro</span>
+                    <span class="footer-left">Math Quest Pro · &copy; ${new Date().getFullYear()} Cultivating the Digital</span>
                     <span class="footer-center">${numSets > 1 ? `Page ${setNum + 1}` : ''}</span>
                     <span class="footer-right">${today}</span>
                 </div>
@@ -14086,7 +14086,7 @@ async function generateWorksheetHTMLAsync() {
                 </div>
                 ${answerKeyHTML}
                 <div class="worksheet-footer">
-                    <span class="footer-left">Math Quest Pro</span>
+                    <span class="footer-left">Math Quest Pro · &copy; ${new Date().getFullYear()} Cultivating the Digital</span>
                     <span class="footer-center">${numSets > 1 && labelSets ? `Page ${setNum + 1}` : ''}</span>
                     <span class="footer-right">${today}</span>
                 </div>
@@ -14140,6 +14140,13 @@ export async function printWorksheet() {
     const contentSize = content.length;
     const delay = Math.min(2000, Math.max(200, Math.floor(contentSize / 1000) * 50));
     await new Promise(r => setTimeout(r, delay));
+    // The running footer's copyright needs the year, which CSS cannot compute (owner ruling 2026-09-26).
+    if (!document.getElementById('mq-copyright-page')) {
+        const st = document.createElement('style');
+        st.id = 'mq-copyright-page';
+        st.textContent = legacyCopyrightCSS();
+        document.head.appendChild(st);
+    }
     window.print();
 
     // Hide after print dialog closes
@@ -14273,6 +14280,13 @@ function sheetDocPaperClass() {
  * `head` is either { links: [href, ...] } for a same-origin iframe or popup, or
  * { css: '...' } for a file that will be saved to disk.
  */
+// Owner ruling 2026-09-26: every printed paper carries "(c) <year> Cultivating the Digital. All rights reserved."
+// CSS cannot compute the year, so the running @page footer is re-declared here with it.
+function legacyCopyrightCSS() {
+    const line = `Math Quest Pro \\00B7  \\00A9  ${new Date().getFullYear()} Cultivating the Digital. All rights reserved.`;
+    return `@page { @bottom-left { content: "${line}"; } } @page mqletter { @bottom-left { content: "${line}"; } }`;
+}
+
 function buildSheetDocument(title, bodyHTML, head) {
     const safeTitle = String(title || 'Math Worksheet')
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -14284,8 +14298,11 @@ function buildSheetDocument(title, bodyHTML, head) {
 <head>
     <meta charset="UTF-8">
     <title>${safeTitle}</title>
+    <meta name="copyright" content="&copy; ${new Date().getFullYear()} Cultivating the Digital. All rights reserved.">
+    <meta name="author" content="Cultivating the Digital">
     ${styles}
     <style>${SHEET_DOC_LOCAL_CSS}</style>
+    <style>${legacyCopyrightCSS()}</style>
 </head>
 <body>
 <div class="print-preview-content">

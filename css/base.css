@@ -360,3 +360,7 @@ input[type=number] { -moz-appearance: textfield; }
     color: #000;
 }
 .ci-host .ci-paren, .ci-host .ci-comma, .ci-host .ci-label { color: #000; font-family: Andika, "Open Sans", sans-serif; }
+/* Owner ruling 2026-09-26: copyright on every web page. Static at the end of the page (never covers controls),
+   quiet but readable; hidden when printing (printed pages carry their own line). */
+.mq-site-copy { display: block; text-align: center; font-size: 12px; line-height: 1.4; padding: 14px 16px 18px; color: var(--text-secondary, #555); opacity: 0.85; }
+@media print { .mq-site-copy { display: none !important; } }

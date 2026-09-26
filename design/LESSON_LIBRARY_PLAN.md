@@ -131,6 +131,117 @@ Owner ruling: everything is committed only after an independent critic scores it
 - The grades ledger records the basis (`direct` / `sampled` / `machine`) so what was graded is auditable.
 - `ws-lesson-check` (25 seeds, every LESSON_RULES rule, LINK-1…5) must pass before a batch reaches a critic.
 
+## 8a. Owner ruling on sizes (2026-09-26)
+
+"Lessons themselves can be just one size, but when printed as practice pages or added to mixed practice pages at
+different sizes they need to work, or they default to their needed size and problems work around them on the page."
+
+- **The lesson packet prints at one size** (the anchor chart and lesson sheet at their designed size; the size control is
+  not offered for the Lesson role, with a required tooltip saying why). The S→M notice is retired.
+- **Practice and mixed pages honour the teacher's size S / M / L.** Every item that CAN be drawn at the chosen size is.
+- **An item that cannot be drawn at the chosen size keeps its minimum needed size** (a per-template `minSize`, e.g. the
+  regroup stack at M, a clock or graph at its readable floor), and the page packs the other items around it: the
+  paginator places mixed-height and mixed-width items together (rows grouped by height, spanning cells where needed) with
+  no blank strips — never shrinking content below its floor and never forcing the whole page up a size.
+- Gate: a mixed page at S that contains a `minSize: M` item must still hold more items than the same page at L, keep every
+  item at or above its floor, and pass H13; `ws-lesson-check` and `ws-layout-unit` carry this case.
+
+## 8b. Owner ruling: every lesson opens with a prerequisite check (2026-09-26)
+
+"All the lessons should have a prerequisite check/practice with 3-4 questions moving through important prerequisite
+skills for the lesson — if they fail/struggle they need to go to the previous skill lesson to get the prerequisite first,
+then come back."
+
+- **Prerequisite Check** is the first part of every lesson packet (replacing / absorbing the Warm-up): **3–4 questions**,
+  ordered from the most basic prerequisite to the one closest to the lesson. Each question is tied to ONE prerequisite
+  (`prereqs[i].lesson` — a lesson id in the library, plus its skill + options for the item).
+- **The rule:** a question missed (on screen: wrong after the support ladder; on paper: marked wrong by the teacher) sends
+  the pupil to **that prerequisite's lesson**, then back to this lesson. Two or more misses: start with the earliest missed
+  prerequisite.
+- **Print:** each question carries a small teacher tag "If missed → Lesson <id> <title>"; the key lists the routing
+  table. Pupil-facing text stays one line per question.
+- **Screen:** the check runs first; a miss offers "Let's practise <prerequisite> first" and opens that lesson, with a
+  "Back to <this lesson>" return. Passing all goes straight into the anchor chart.
+- **Data / gates:** `prereqs` must name 3–4 prerequisite lessons that exist in the library (or a `NEEDS` entry when the
+  prerequisite lesson is not built yet); `ws-lesson-coverage` fails a lesson whose check is missing, has fewer than 3 or
+  more than 4 questions, or points at an unknown lesson; a prerequisite graph with no cycles (a lesson may not require
+  itself through a chain). The coverage record lists lessons blocked only by a missing prerequisite lesson.
+
+## 8c. Owner ruling: merge the stand-alone page types into the lesson designs (2026-09-26)
+
+The stand-alone worksheet page types kept failing the critic for almost every skill (Guided 24/105, Find the mistake
+3/27 skills, Review and Worked example half-empty), while the lesson packet's pages passed 48/48. Owner: "merge these
+types". One design per page job, used by both the lesson packet and the Print screen:
+
+| Print-screen page type | Becomes | Source in the lesson packet |
+|---|---|---|
+| Worked example (scripted Model) | the **anchor chart** for the skill (steps, icons, Say, rule, other examples) | `chartPage` |
+| Guided | the **We Do** band: worked example + tries with fading grey hints and the chart's steps, one page | lesson sheet guided band |
+| Warm-up / pre-skill check | the **Prerequisite Check** (§8b) | lesson sheet warm-up |
+| Independent / More practice | the lesson **practice** page (one frame, rows sized to content, min-size floors §8a) | practice page |
+| Review / Mixed practice | the lesson **mixed** page (earlier skills only, lesson skill ≥ half) | mixed page |
+| Test, Reason it, Stretch | keep their jobs, but reuse the practice-page frame and row sizing | — |
+| Find the mistake (error analysis) | **dropped from lessons and from the pass bar** (owner ruling 2026-09-26, §8d) | — |
+
+Build order: the engine lane (E) extracts the lesson page builders into shared, archetype-driven modules
+(`sheet/lesson-pages/*`) during Phase 0 (samples byte-identical). The role lane then turns `roles/guided.js`,
+`roles/scripted-model.js`, `roles/review.js` (and the practice frame used by the others) into thin adapters that call
+those builders for ANY skill, falling back to the old role only for skills whose archetype is not built yet. Providers
+supply the data both need (worked steps, cases, row-1 hint / level-2 cue, prerequisites). Each switched skill is
+re-graded by the critic; the old page stays until its replacement passes.
+
+## 8d. Owner ruling: no Find-the-mistake worksheets going forward (2026-09-26)
+
+"Let's forgo the find the error type for future lessons" — clarified: "for future worksheets". The error-analysis
+("Find the mistake") page type is **retired for new worksheets**: it is not part of any lesson packet or the lesson
+library, it is **removed from the page types a teacher can choose on the Print screen**, and it is **no longer part of
+the 8/10 pass bar** (critics do not grade it; a skill passes without it). Saved and shared printouts that already use it
+keep printing (share codes and saved sets are never broken); no further work is done on it except keeping the
+answer-giveaway fixes already made.
+
+**Paused, not deleted (owner, 2026-09-26): "we might bring these back later once everything is built."** Keep the role
+code, its providers' `wrongAnswer` data, its share-code entries and its critic history intact so it can be revived.
+Revival is a later-wave item (recorded in `design/LESSONS_VISION.md` → Later), after the lesson library and skills pass; it would be
+rebuilt on the lesson practice frame (§8c) and re-graded before it returns to the Print screen.
+
+## 8e. Owner ruling: three kinds of paper — Practice, Quiz, Lesson (2026-09-26)
+
+"All of these practice, mixed review can be options within the one page, and fact rows/probes deal with the columns. The
+thinking pages we will leave for later, do not use them. And the lesson, prerequisite check, worked example, guided are
+all part of the lesson — so we then have three types of papers: practice, quiz, and lesson."
+
+This supersedes the 17-card page-type menu (and the stand-alone mapping in §8c, whose engine plan still holds):
+
+| Paper | Absorbs | Options on the one paper |
+|---|---|---|
+| **Practice** | Independent, More Practice (A, B, C…), Mixed practice, Review, Fact rows, Fact probe | skills: one or more (one skill → "I Can" title, §Daily look); **versions** (1 or A, B, C… new numbers); **mix of skills by weight** — every skill in the set carries its own **weight** option (its share of the items, e.g. 3 : 1 : 1), set in that skill's options; no fixed cap (owner, 2026-09-26). **"Mix in prerequisite skills"** (owner, 2026-09-26): an option that lists ALL of the skill's prerequisite skills (from the lesson library's prerequisite graph, `prerequisiteSkillsFor(skill)`; for a skill without a lesson, the skills of the WRM steps before it and its CCSS progression) as choices — none ticked by default; each one the teacher ticks joins the set with its own weight; **fact columns** (auto, or 5–10 across — the old Fact rows); **timed check** (the old Fact probe: minutes + score line); size S / M / L (min-size floors §8a). Word problems are **skills, not a paper type** (owner): a word-problem skill on a Practice or Quiz paper gets its story-with-work layout automatically. Built on the lesson practice and mixed page designs. |
+| **Quiz** | Test A / Test B | **the Practice paper engine with scoring and tagging on** (owner): build by CCSS domain, CCSS standard / part, EE, WRM unit / step, lesson, or skills; every question tagged to its standards (tags on the key only); score per question, custom score per question or per question type; a per-standard breakdown on the key; versions A, B…; size. Details: `design/TEACHER_SCREENS.md` → Make quiz. The on-screen Quiz Builder is separate and unchanged. |
+| **Lesson** | Lesson packet, Prerequisite check, Worked example (anchor chart), Guided (We Do), Lesson opener, Pre-skill check | **parts** to print (default all: Prerequisite Check, anchor chart, lesson sheet with We Do, practice, mixed); one size (§8a). The stand-alone Guided / Worked example / Prerequisite pages exist only as parts of a lesson. **Every lesson must HAVE all parts** (a lesson missing a part is incomplete and fails `ws-lesson-coverage`); the teacher **selects which parts to print**, and can **refresh any part with new numbers** — each part (and the chart's worked examples) has its own seed, so refreshing one part re-deals it without changing the others, and the key follows. |
+
+- **Paused for later (hidden, code kept, like §8d):** True or False?, Reason It, Stretch, and Find the mistake. Their
+  provider data (`open(q)`, `wrongAnswer`, reason prompts) is kept; no new work goes into them now.
+- **Saved sets and share codes are never broken:** every old role id decodes to its new paper + options
+  (`independent`/`more-practice`/`mixed-practice`/`review`/`fact-rows`/`fact-probe` → Practice; `word-problems` → Practice with those skills;
+  `test`/`test-b` → Quiz versions; `lesson`/`opener`/`pre-skill-check`/`scripted-model`/`guided` → Lesson with the
+  matching part). Paused roles still print from old saved sets.
+- **The 8/10 pass bar now covers:** Practice (single skill and mixed, at S and L, with its key), Quiz (with its key),
+  the Lesson where the skill has one, the three screen hosts (practice card, online worksheet, quiz) and the option panel.
+  Stand-alone Guided, Worked example, Review, Opener, Pre-skill check and the thinking pages are no longer graded as
+  separate pages.
+- **Build:** (1) the Print screen shows three paper cards with their options, and the old ids map across — one lane, in
+  `teacher-print.js` + `print-sheet.js` request normalising; (2) Practice and Quiz are rebuilt on the lesson practice /
+  mixed builders when the engine lane extracts them (§8c); until then they route to today's roles with these options;
+  (3) the Lesson paper gains the "parts" option.
+
+## 8f. Owner ruling: worked examples on Practice papers — one example on top only (2026-09-26)
+
+Practice keeps a **"Worked example"** option in ONE form only: a single worked example at the **top of each skill's
+block** (the old "sections" layout). The side-by-side pair form is **dropped** (it caused most one-problem-per-page
+failures). The example uses **different numbers from every problem on the page** (never a problem's own numbers or its
+answers), is **easy-first but shows the skill's real move** (no trivial single-coin or 1:03 examples), is drawn **the same
+way as the problems**, prints its steps at ≥ 11 pt at every size, and the block fills with problems under it. Critic
+anchor-r1 defects (commit 7146df5 on `critic-anchor-r1`) are the fix list.
+
 ## 9. Risks
 
 Engine regressions invalidating passed lessons (single engine owner, render-hash stamps → `stale`); ≈ 359 steps blocked

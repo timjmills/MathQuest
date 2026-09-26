@@ -25,13 +25,13 @@
 import { generateQuestionFor } from './generate-question.js';
 import { factSetTitle, optionsFor, normalizeOptions } from './skill-options.js';
 import { opsRoutedSkill } from './gen-operations.js';
-import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill } from './data.js';
+import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
-import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap } from './sheet/layout.js';
+import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine } from './sheet/roles/lesson.js';
@@ -379,7 +379,7 @@ function quickDraw(place, n) {
  *
  * @returns {string|null} the filled html, or null when no slot could be filled with certainty
  */
-export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
+export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {}) {
     // `ink: 'trace'` writes the value in the single grey (a Model or first Guided cell, INK-3);
     // the default is the pupil's solid ink of a key or of shown work (Error analysis).
     const INK_STYLE = ink === 'trace' ? 'font-weight:700;color:#949494;' : SOLID_STYLE;
@@ -505,7 +505,26 @@ export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
     const lineRe = /(Answer:\s*<\/span>\s*<span style="[^"]*border-bottom:[^"]*">)(?:&nbsp;|\s)*(<\/span>)/g;
     const lines = html.match(lineRe) || [];
     if (lines.length === 1 && display) {
-        return html.replace(lineRe, (m, open, close) => `${open}<b data-ws-ink="${inkAttr}" style="${INK_STYLE}">${escText(display)}</b>${close}`);
+        const fl = /^(\d+)\s*\/\s*(\d+)$/.exec(display.trim());
+        const v = fl ? `<span class="mq-frac" style="font-size:1em;"><span>${fl[1]}</span><span>${fl[2]}</span></span>` : escText(display);
+        return html.replace(lineRe, (m, open, close) => `${open}<b data-ws-ink="${inkAttr}" style="${INK_STYLE}">${v}</b>${close}`);
+    }
+
+    // 3b. ONE empty inline write place with no "Answer:" label - a ruled underline ("Perimeter =
+    // ____ units", a question's own answer rule, a bar-graph answer rule) or the empty box between
+    // two fractions: the value is written ON it (AK-1), so the key is a facsimile and Error
+    // analysis can show the pupil's work in the pupil's own slot (critic round 4: these skills
+    // had no Check it page at all).
+    const openRe = /(<(span|div) style="([^"]*(?:border-bottom:\s*2px solid #000|border:\s*2px solid #000)[^"]*)">)(?:&nbsp;|\s)*(<\/\2>)/g;
+    const opens = html.match(openRe) || [];
+    // Shown work only (`shown`): a key keeps its answer stamp until the cell names its slot, so
+    // the pupil page and the key count the same answer places (AK-4).
+    if (shown && opens.length === 1 && display && !/Answer:/.test(html) && display.length <= 24) {
+        // a fraction is written stacked over its bar, never with a slash (TY-7); the place is at
+        // least 14 mm wide (SL-1)
+        const fm = /^(\d+)\s*\/\s*(\d+)$/.exec(display.trim());
+        const val = fm ? `<span class="mq-frac" style="font-size:1em;"><span>${fm[1]}</span><span>${fm[2]}</span></span>` : escText(display);
+        return html.replace(openRe, (m, open, tag, style, close) => `<${tag} style="${style};text-align:center;min-width:14mm;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}">${val}</b>${close}`);
     }
 
     // 4. The K-2 check-box list: the box beside the answer's label gets a check mark (AK-2).
@@ -708,7 +727,13 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
     const supportsBox = { plan: withSupports ? supportPlanFor(g.skill, q, template, size, mix) : null, cur: null, level: 3, mixKey: mix ? mix.key : undefined };
     if (supportsBox.plan) supportsBox.cur = Object.assign({}, supportsBox.plan.extra, { on: supportsBox.plan.worst.slice(), reserve: [] });
     const forceL = !!(supportsBox.plan && supportsBox.plan.forceL);
-    const atL = (c) => (forceL && c.size !== 'L' ? Object.assign({}, c, { size: 'L', metrics: resolveCtx({ size: 'L', look: c.look }).metrics }) : c);
+    // The item's floor size (owner ruling 2026-09-26, LESSON_LIBRARY_PLAN.md 8a): the page's size
+    // wherever the item can be drawn at it, else the size its template declares as its floor
+    // (`minSize`) - the item keeps its floor and the rest of the page keeps the chosen size. S2
+    // touch dots force L the same way.
+    const floor = forceL ? 'L' : (sizeFloor(size, cellMinSize(q)) || size);
+    const up = floor !== size;
+    const atL = (c) => (up && sizeFloor(c.size, floor) !== c.size ? Object.assign({}, c, { size: floor, metrics: resolveCtx({ size: floor, look: c.look }).metrics }) : c);
     // The draw function. `cols` is the section's final column count, handed in by the role:
     // the legacy template picks its size class from it, the fact ladder its digit size.
     const key = cellAnswerKey(q);
@@ -759,13 +784,13 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         // S2: touch dots need 24 pt digits, so a forced section draws its problems at L inside a
         // smaller page (the preset's custom properties re-set on a wrapper; the page stays M / S).
         const html0 = legacy ? legacyClean(renderCell(q, ctx)) : renderCell(qd, ctx);
-        const html = forceL && c.size !== 'L' ? `<div class="ws-L" data-ws-force-size="L">${html0}</div>` : html0;
+        const html = up && sizeFloor(c.size, floor) !== c.size ? `<div class="ws-${floor}" data-ws-force-size="${floor}">${html0}</div>` : html0;
         if (legacy && hasShown) {
             const v = String(shown);
             // A wrong value is written as a pupil would have written it: a place-value mat draws
             // the WRONG model, boxed slots take the wrong value, never the right parts.
             const asQ = v === answer ? q0 : Object.assign({}, q0, { ans: v, target: v, keyParts: undefined, printAnswer: undefined });
-            const filled = legacyKeyFill(html.replace(STAMP_RE, ''), asQ, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid' });
+            const filled = legacyKeyFill(html.replace(STAMP_RE, ''), asQ, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid', shown: true });
             if (filled !== null) return filled;
             return html + shownLine(v, ink);
         }
@@ -782,14 +807,14 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         if (showable === null) {
             try {
                 const blankHtml = legacyClean(renderCell(q, resolveCtx({ mode: 'print', size, look: 'ican', state: 'blank' }))).replace(STAMP_RE, '');
-                showable = legacyKeyFill(blankHtml, null, { value: answer, display: answer }) !== null;
+                showable = legacyKeyFill(blankHtml, null, { value: answer, display: answer }, { shown: true }) !== null;
             } catch (e) { showable = false; }
         }
         return showable;
     };
     let fp;
     const qFoot = supportsBox.cur ? Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { supports: supportsBox.cur }) }) }) : q;
-    try { fp = cellFootprint(qFoot, resolveCtx({ mode: 'print', size: forceL ? 'L' : size, look: 'ican' })); } catch (e) { fp = { wMm: 93, hMm: null, measure: true, maxCols: 2 }; }
+    try { fp = cellFootprint(qFoot, resolveCtx({ mode: 'print', size: floor, look: 'ican' })); } catch (e) { fp = { wMm: 93, hMm: null, measure: true, maxCols: 2 }; }
     if (legacy) {
         // SCC-A6: a legacy cell is sized by measurement. Its size class caps the columns only for
         // word problems (PT-WPR-1); everything else is decided by what the measurement shows.
@@ -1002,10 +1027,51 @@ function measureItems(items, { size, look, colsList }) {
                             if (!it.scalesWithCols && pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) { fits = false; why(it, c, 'shrunk picture'); }
                         }
                     }
-                    best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits };
+                    // A role that places part of the cell in one of several ways (error analysis,
+                    // AX-4: the Correct / Fix-it block in ONE place on every cell of a page) names
+                    // them in `judgeModes`; each is drawn and measured here, and the role picks the
+                    // one the whole page can use. null: that way does not fit (or does not apply).
+                    const vary = {};
+                    const inkW = best.inkW || {};
+                    if (fits && Array.isArray(it.judgeModes)) {
+                        const grow = (Math.max(hPx, r.height) - r.height) / PX_PER_MM;
+                        for (const mode of it.judgeModes) {
+                            let mb = '';
+                            try { mb = it.render(ctx, { cols: c, judge: mode }); } catch (e) { mb = ''; }
+                            if (!mb || !String(mb).includes(`data-judge-mode="${mode}"`)) { vary[mode] = null; continue; }
+                            root.innerHTML = `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
+                                + `<span class="ws-letter">m.</span>${mb}</div>`;
+                            const mc = root.firstChild;
+                            const cr = mc.getBoundingClientRect();
+                            let over = false;
+                            // the ink's width: the leftmost to the rightmost drawn thing (a text run, a
+                            // box, a picture), so the role can tell a one-line item in a full-width
+                            // cell (half of it empty) from one that fills it (critic EA r5, H13 W)
+                            let lo = Infinity, hi = -Infinity;
+                            for (const el of mc.querySelectorAll('*')) {
+                                const er = el.getBoundingClientRect();
+                                if ((!er.width && !er.height) || getComputedStyle(el).position === 'absolute') continue;
+                                if (er.right > cr.right - padR + 1 || er.left < cr.left + padL - 1) { over = true; break; }
+                                const leaf = !el.children.length || el.tagName.toLowerCase() === 'svg';
+                                if (leaf && !el.closest('.ws-letter') && !(el.parentElement && el.parentElement.closest('svg'))) { lo = Math.min(lo, er.left); hi = Math.max(hi, er.right); }
+                            }
+                            vary[mode] = over ? null : cr.height / PX_PER_MM + grow;
+                            if (!over && hi > lo) inkW[mode] = Math.max(inkW[mode] || 0, (hi - lo) / PX_PER_MM);
+                        }
+                    }
+                    const modes = Object.assign({}, best.modes || {});
+                    for (const mode of Object.keys(vary)) modes[mode] = vary[mode] === null || modes[mode] === null ? null : Math.max(modes[mode] || 0, vary[mode]);
+                    best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits, modes, inkW };
                 }
                 it.measured = it.measured || {};
                 it.measured[c] = { hMm: Math.ceil(best.hMm * 10) / 10, fits: best.fits };
+                if (best.modes && Object.keys(best.modes).length) {
+                    it.measured[c].modes = {};
+                    for (const [mode, h] of Object.entries(best.modes)) it.measured[c].modes[mode] = h === null ? null : Math.ceil(h * 10) / 10;
+                    it.measured[c].inkW = {};
+                    for (const [mode, w] of Object.entries(best.inkW || {})) it.measured[c].inkW[mode] = Math.ceil(w * 10) / 10;
+                    it.measured[c].innerMm = inner;
+                }
             }
         }
         // A MINIMUM COLUMN WIDTH for legacy markup that reflows instead of overflowing (an area
@@ -1053,10 +1119,11 @@ async function fontsReady() {
 }
 
 /** The column counts a section's layout may choose, so each gets measured. */
-function candidateCols(columns) {
-    // Dense packing (layout.js) may take an Auto section up to DENSE_MAX_COLS columns, so every
-    // count it may choose is measured (an unmeasured legacy count would be read as fitting).
-    if (columns === 'auto') return [1, 2, 3, 4];
+function candidateCols(columns, size) {
+    // Dense packing (layout.js) may take an Auto section up to DENSE_MAX_COLS_AT[size] columns, so
+    // every count it may choose is measured (an unmeasured count would be read as fitting: facts
+    // at S in 5 columns stuck out of their 36.8 mm cells by 0.5 mm, critic guided-r1 lint).
+    if (columns === 'auto') return Array.from({ length: Math.max(4, DENSE_MAX_COLS_AT[size] || DENSE_MAX_COLS) }, (_, i) => i + 1);
     return Array.from({ length: Math.max(1, columns) }, (_, i) => i + 1);
 }
 
@@ -1069,7 +1136,42 @@ async function loadStandards() {
     return standardsMod;
 }
 function primaryCcss(sk) {
-    try { return standardsMod ? standardsMod.primaryStandard(sk.categoryId, sk.skillId, { short: true }) : ''; } catch (e) { return ''; }
+    try {
+        if (!standardsMod) return '';
+        const code = standardsMod.primaryStandard(sk.categoryId, sk.skillId, { short: true });
+        if (code) return code;
+        // A skill tagged to its CLOSEST standard (temperature: CCSS names no thermometer) still
+        // prints that code, marked as the closest - never a footer with no standard at all
+        // (critic EA r5, D).
+        const e = standardsMod.standardsEntry(sk.categoryId, sk.skillId);
+        if (e && e.approx && e.ccss && e.ccss.length) {
+            const short = String(e.ccss[0]).replace(/\.([A-Z])\.(\d+)$/, '.$2');
+            return `≈ ${short}`;
+        }
+    } catch (e) { return ''; }
+    return '';
+}
+
+/**
+ * The levels a skill printed as "M" (every level) really spans: the grades of its CCSS codes, or
+ * of the skills its review pool deals. A page is never tabbed "All levels" / "Grade mixed" when its
+ * content has a level (critic EA r5, D: number_chart_fill, mixed_placevalue).
+ */
+function spanGrades(sk) {
+    const G = ['K', '1', '2', '3', '4', '5', '6'];
+    const gradeOfCode = (c) => { const m = /^(K|\d)\./i.exec(String(c)); return m ? m[1].toUpperCase() : ''; };
+    const out = new Set();
+    try {
+        const e = standardsMod && standardsMod.standardsEntry(sk.categoryId, sk.skillId);
+        (e && e.ccss ? e.ccss : []).map(gradeOfCode).filter((g) => G.includes(g)).forEach((g) => out.add(g));
+        if (!out.size && isMixedMetaSkill(sk.skillId)) {
+            for (const id of getMixedPoolSkills(sk.categoryId, sk.skillId) || []) {
+                const g = String(getSkillGrade(id, sk.categoryId) || '').toUpperCase();
+                if (G.includes(g)) out.add(g);
+            }
+        }
+    } catch (e) { /* keep none */ }
+    return [...out].sort((a, b) => G.indexOf(a) - G.indexOf(b));
 }
 
 /**
@@ -1111,6 +1213,10 @@ function skillMeta(sk, q) {
     let grade = null;
     try { grade = getSkillGrade(sk.skillId, sk.categoryId); } catch (e) { grade = null; }
     const meta = { categoryId: sk.categoryId, skillId: sk.skillId, label, grade: grade === null || grade === undefined ? '' : String(grade), ccss: sk.ccss || primaryCcss(sk) };
+    if (!/^(K|[1-6])$/i.test(meta.grade)) {
+        const span = spanGrades(sk);
+        if (span.length) { meta.grades = span; meta.grade = span[0]; }
+    }
     const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, { skillId: nameId }));
     meta.iCan = sk.iCan || optionTitle(sk, words.iCan) || words.iCan;
     meta.instructionKey = q ? instructionKeyFor(q, words) : words.instructionKey;
@@ -1380,7 +1486,7 @@ export async function buildSheet(req = {}) {
 
     const notes = [];
     let hostItems = [];
-    const measure = (items, sec) => measureItems(items, { size: n.size, look: n.look, colsList: candidateCols(sec.columns) });
+    const measure = (items, sec) => measureItems(items, { size: n.size, look: n.look, colsList: candidateCols(sec.columns, n.size) });
     const PROBE = 16;
 
     /**
@@ -1608,6 +1714,7 @@ export async function buildSheet(req = {}) {
     // S2: deal the supports over the finished sheet (page order), before it is drawn.
     allocateHostSupports(hostItems, n);
 
+    settleMixedGrades(skills, hostItems);
     const input = {
         items: hostItems,
         skills,
@@ -1665,24 +1772,69 @@ export async function buildSheet(req = {}) {
  * pre-skill list is not modelled (P-AT-1). Tombstones and the mixed pools are skipped.
  */
 const GRADE_RANK = (g) => { const i = ['K', '1', '2', '3', '4', '5', '6'].indexOf(String(g === undefined || g === null ? '' : g).toUpperCase()); return i < 0 ? null : i; };
-function earlierSkills(sk, count = 1) {
-    const list = Array.isArray(SKILLS[sk.categoryId]) ? SKILLS[sk.categoryId] : [];
-    const at = list.findIndex((s) => s.v === sk.skillId);
+/**
+ * A mixed pool's page is at the level of what it deals (critic guided-r1: "All levels" in the tab
+ * and "Grade mixed" in the footer over a page of o'clock times, Grade 1). A skill whose own grade
+ * is mixed or unknown takes the highest grade among the page's items drawn from it.
+ */
+function settleMixedGrades(metas, items) {
+    const LEVELS = ['K', '1', '2', '3', '4', '5', '6'];
+    const named = new Set(metas.map((m) => `${m.categoryId}:${m.skillId}`));
+    for (const m of metas) {
+        if (GRADE_RANK(m.grade) !== null) continue;
+        const ranks = (items || []).map((it) => it && it.q).filter((q) => q && q.categoryId === m.categoryId
+            && (q.skillId === m.skillId || !named.has(`${q.categoryId}:${q.skillId}`)))
+            .map((q) => { try { return GRADE_RANK(getSkillGrade(q.skillId, q.categoryId)); } catch (e) { return null; } })
+            .filter((r) => r !== null);
+        if (ranks.length) m.grade = LEVELS[Math.max(...ranks)];
+    }
+}
+
+function earlierSkills(sk, count = 1, { fallback = false } = {}) {
     // An earlier step is never a HARDER one: a category lists its skills in groups (facts, then
     // columns, then word problems), so the skill just above a Level K word problem can be a
     // 5-digit sum. Only skills at the same level or below count.
     let own = null;
     try { own = GRADE_RANK(getSkillGrade(sk.skillId, sk.categoryId)); } catch (e) { own = null; }
     const out = [];
-    for (let i = at - 1; i >= 0 && out.length < count; i--) {
-        const s = list[i];
-        if (!s || s.retired || s.tombstone || s.hidden || /^mixed_/.test(s.v)) continue;
-        try { if (isMixedMetaSkill(s.v)) continue; } catch (e) { /* keep */ }
+    const ok = (s, cat) => {
+        if (!s || s.v === sk.skillId || s.retired || s.tombstone || s.hidden || /^mixed_/.test(s.v)) return false;
+        try { if (isMixedMetaSkill(s.v)) return false; } catch (e) { /* keep */ }
         let g = null;
-        try { g = GRADE_RANK(getSkillGrade(s.v, sk.categoryId)); } catch (e) { g = null; }
-        if (own !== null && (g === null || g > own)) continue;
-        out.push({ categoryId: sk.categoryId, skillId: s.v });
-    }
+        try { g = GRADE_RANK(getSkillGrade(s.v, cat)); } catch (e) { g = null; }
+        return !(own !== null && (g === null || g > own));
+    };
+    const take = (cat, idxs) => {
+        const list = Array.isArray(SKILLS[cat]) ? SKILLS[cat] : [];
+        for (const i of idxs) {
+            if (out.length >= count) return;
+            const s = list[i];
+            if (ok(s, cat) && !out.some((o) => o.categoryId === cat && o.skillId === s.v)) out.push({ categoryId: cat, skillId: s.v });
+        }
+    };
+    const range = (a, b, step) => { const r = []; for (let i = a; step > 0 ? i < b : i > b; i += step) r.push(i); return r; };
+    const list = Array.isArray(SKILLS[sk.categoryId]) ? SKILLS[sk.categoryId] : [];
+    const at = list.findIndex((s) => s.v === sk.skillId);
+    // 1. The skills listed before it in its category, nearest first.
+    take(sk.categoryId, range(at - 1, -1, -1));
+    // Critic guided-r1: a skill with no earlier step (the first of its category: compare_groups,
+    // count_objects, mult_facts, perimeter_intro, bar_graph) printed a Review with no Mixed Review
+    // at all. The fallback, in order: 2. the categories before it in its domain, their last
+    // (hardest allowed) skills first; 3. the skills after it in its own category at its level or
+    // below; 4. the categories after it in its domain.
+    if (!fallback || out.length >= count) return out;
+    const cats = (() => {
+        for (const d of Object.values(DOMAINS || {})) {
+            const ids = (d.categories || []).map((c) => c.id).filter((id) => !/mixed/.test(id));
+            if (ids.includes(sk.categoryId)) return ids;
+        }
+        return [sk.categoryId];
+    })();
+    const ci = cats.indexOf(sk.categoryId);
+    const lenOf = (cat) => (Array.isArray(SKILLS[cat]) ? SKILLS[cat].length : 0);
+    for (let c = ci - 1; c >= 0 && out.length < count; c--) take(cats[c], range(lenOf(cats[c]) - 1, -1, -1));
+    if (out.length < count) take(sk.categoryId, range(at + 1, list.length, 1));
+    for (let c = ci + 1; c < cats.length && out.length < count; c++) take(cats[c], range(0, lenOf(cats[c]), 1));
     return out;
 }
 
@@ -1830,6 +1982,7 @@ async function buildRoleSheet(n, metaOf) {
         items = items.concat(its);
     });
     input.items = items;
+    settleMixedGrades(allSkills, items);
     // S2: deal the supports over the page's items (a pool of Mixed practice is its own section).
     allocateHostSupports(items, n);
     if (anchorsIn) {
@@ -2102,6 +2255,8 @@ export function sheetDocument(html, title = 'Worksheet', opts = {}) {
 <head>
 <meta charset="utf-8">
 <title>${escText(title)}</title>
+<meta name="copyright" content="&copy; ${new Date().getFullYear()} Cultivating the Digital. All rights reserved.">
+<meta name="author" content="Cultivating the Digital">
 ${links}
 <style data-mq-sheet-engine>${SHEET_ENGINE_CSS}</style>
 <style>

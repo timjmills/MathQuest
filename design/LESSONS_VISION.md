@@ -116,3 +116,10 @@ An **intervention lesson for every White Rose Maths small step**, using the same
 prerequisites, minimal-words worked example, we-do, massed practice, optional mixed), tagged to the small
 step, CCSS and EE. Starts after the sample lessons are approved and the WRM small-step inventory
 (`design/WRM_ALIGNMENT_PLAN.md` phase 1) exists.
+
+## Later — revisit once everything is built (owner, 2026-09-26)
+- **Find-the-mistake (error analysis) worksheets:** retired for new worksheets on 2026-09-26 (LESSON_LIBRARY_PLAN §8d).
+  Owner: "we might bring these back later once everything is built." Revive after the lesson library and the skills
+  pass: rebuild it on the lesson practice frame (§8c) and re-grade it before it returns to the Print screen. Its role
+  code, providers' `wrongAnswer` data, share-code entries and critic history are kept for that.
+- **Intervention lessons per WRM small step** — now in progress as the lesson library (LESSON_LIBRARY_PLAN.md).

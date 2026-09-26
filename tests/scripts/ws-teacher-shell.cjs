@@ -270,7 +270,8 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   if (!pr.beside) fail('Print: the preview is not beside the controls at 1280');
   if (!pr.gridClosed) fail('Print: choosing a page type did not close the grid');
   if (/Fits:|rows?,|per page/i.test(pr.fits) || !/^\d+ problems? on \d+ pages?/.test(pr.fits)) fail(`Print: the fits line is not one plain line ("${pr.fits}")`);
-  const ROLES = ['lesson', 'independent', 'more-practice', 'mixed-practice', 'word-problems', 'opener', 'scripted-model', 'guided', 'pre-skill-check', 'error-analysis', 'review', 'test', 'test-b', 'fact-rows', 'fact-probe', 'true-false', 'reason-it', 'stretch'];
+  // error-analysis (Check it) is PAUSED: still a working role for saved sets, but not offered (owner ruling 2026-09-26)
+  const ROLES = ['lesson', 'independent', 'more-practice', 'mixed-practice', 'word-problems', 'opener', 'scripted-model', 'guided', 'pre-skill-check', 'review', 'test', 'test-b', 'fact-rows', 'fact-probe', 'true-false', 'reason-it', 'stretch'];
   if (pr.select || [...pr.chips].sort().join() !== [...ROLES].sort().join()) fail(`Print: page type cards are not every working role (${pr.chips.join()})`);
   if (pr.groups.join() !== 'Practice,Teach,Check,Facts,Thinking') fail(`Print: page type groups are ${pr.groups.join()}`);
   if (pr.thumbs !== pr.chips.length) fail('Print: a page type card has no thumbnail');
@@ -324,8 +325,16 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   await sleep(200);
   await page.evaluate(pickRole, 'review');
   await sleep(6000);
-  const warn = await page.evaluate(() => (document.querySelector('#tvFits .tv-fits-warn') || {}).textContent || '');
-  if (!/of 4 skills fit/.test(warn)) fail(`Print: no warning when a Review page cannot hold every skill ("${warn}")`);
+  // Review prints one section per skill (guided-r1), so four skills normally all fit; the rule is
+  // that a skill missing from the sheet is always named, never that a warning always shows.
+  const reviewFit = await page.evaluate(async () => {
+    const skills = [['composing', 'base10_regroup'], ['addition', 'add_10_no_regroup'], ['addition', 'add_10_regroup'], ['addition', 'add_20_no_regroup']].map(([c, s]) => ({ categoryId: c, skillId: s }));
+    const res = await window.buildSheet({ role: 'review', sections: [{ skills }], seed: 1 });
+    const got = new Set((res.items || []).map((it) => it && it.skill));
+    return { missing: skills.filter((k) => !got.has(`${k.categoryId}:${k.skillId}`)).length, warn: (document.querySelector('#tvFits .tv-fits-warn') || {}).textContent || '' };
+  });
+  if (reviewFit.missing && !/of 4 skills fit/.test(reviewFit.warn)) fail(`Print: no warning when a Review page cannot hold every skill ("${reviewFit.warn}")`);
+  if (!reviewFit.missing && /skills fit/.test(reviewFit.warn)) fail(`Print: a Review page holding every skill still warns ("${reviewFit.warn}")`);
   await page.evaluate(() => window.tvOpenPrintWith(window.skillQueue));
   await sleep(300);
   // More Practice letter chips

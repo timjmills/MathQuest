@@ -1878,8 +1878,9 @@ const P12_OPTIONS = {
     'multiplication:mult_missing_digit': [_p12Enum('tiles', 'Top number', [
         { v: 21, l: '2 digits (47 × 6)' }, { v: 31, l: '3 digits (215 × 6)' }], 21,
     'A longer number has more places the missing digit can hide in.')],
-    'division:div_remainders': [_p12DivBy(2, 9, [2, 3, 4, 5, 6],
-        'The group size to ring. Above 6 the pictures get fewer groups, so every picture stays countable.')],
+    // titleTail: the page says what it practises - "I Can divide by 2-6 with remainders" (critic EA r5, D)
+    'division:div_remainders': [Object.assign(_p12DivBy(2, 9, [2, 3, 4, 5, 6],
+        'The group size to ring. Above 6 the pictures get fewer groups, so every picture stays countable.'), { titleTail: 'with remainders' })],
     'division:box_division_easy': [
         _p12DivBy(2, 9),
         { ..._opsRegroup('none'), label: 'Remainders', values: [{ v: 'none', l: 'None (it shares exactly)' }, { v: 'mixed', l: 'Some items' }, { v: 'always', l: 'Every item' }],
@@ -3694,7 +3695,7 @@ export function factSetTitle(categoryId, skillId, opts) {
         return rest.length ? `${def.titleVerb || def.label} ${_joinAnd(_numberRuns(rest))}, and ${def.zeroTitle.toLowerCase()}`
             : def.zeroTitle;
     }
-    return `${def.titleVerb || def.label} ${_joinAnd(_numberRuns(chosen))}`.trim();
+    return `${def.titleVerb || def.label} ${_joinAnd(_numberRuns(chosen))}${def.titleTail ? ` ${def.titleTail}` : ''}`.trim();
 }
 
 /** A short human summary for the dialog and the teacher footer, e.g. "Add 6 · to 20 · Level 2". */
