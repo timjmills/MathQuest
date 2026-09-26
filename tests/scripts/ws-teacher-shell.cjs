@@ -489,6 +489,41 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   if (!st.shownDialog) fail('student: the print dialog did not open');
   if (st.inert) fail(`student: ${st.inert} elements are still inert`);
 
+  /* ------------------------------------------------------------ Home: six actions (owner ruling 2026-09-26) */
+  await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
+  await page.evaluate(() => { window.setUserRole('teacher'); window.tvGo('home'); });
+  await sleep(400);
+  const home = await page.evaluate(() => {
+    const scr = document.querySelector('#teacherMain [data-screen="home"]');
+    const tiles = [...scr.querySelectorAll('[data-home-tile]')];
+    const tops = new Set(tiles.map((t) => Math.round(t.getBoundingClientRect().top)));
+    return {
+      keys: tiles.map((t) => t.dataset.homeTile).join(),
+      art: scr.querySelectorAll('[data-home-tile] .tv-ptype-thumb').length,
+      small: tiles.filter((t) => t.getBoundingClientRect().height < 44).length,
+      rows: tops.size,
+      more: [...scr.querySelectorAll('.tv-home-more button')].map((b) => b.textContent.trim().replace(/\s*\(\d+\)/, '')).join('|'),
+    };
+  });
+  if (home.keys !== 'skill-sheet,mixed-review,quiz,lesson,send,map') fail(`Home: the actions are ${home.keys}`);
+  if (home.art !== 6) fail('Home: a tile has no picture of what it makes');
+  if (home.small) fail('Home: a tile is under 44px');
+  if (home.rows !== 2) fail(`Home: the six tiles are not three across at 1280 (${home.rows} rows)`);
+  if (!/Saved sets\|Recent printouts\|Quizzes\|Progress\|Settings/.test(home.more)) fail(`Home: the secondary menu is ${home.more}`);
+  for (const [tile, kind] of [['skill-sheet', 'practice'], ['quiz', 'quiz'], ['lesson', 'lesson']]) {
+    await page.evaluate(() => window.tvGo('home'));
+    await sleep(200);
+    await page.evaluate((t) => document.querySelector(`#teacherMain [data-home-tile="${t}"]`).click(), tile);
+    await sleep(300);
+    const got = await page.evaluate(() => ({ screen: (document.querySelector('#teacherMain .tv-screen.is-active') || {}).dataset?.screen, kind: (document.querySelector('#teacherMain [data-screen="print"] [data-act="kind"][aria-checked="true"]') || {}).dataset?.v }));
+    if (got.screen !== 'print' || got.kind !== kind) fail(`Home: "${tile}" opened ${JSON.stringify(got)}, not the ${kind} paper`);
+  }
+  await page.setViewport({ width: 390, height: 900, deviceScaleFactor: 1 });
+  await page.evaluate(() => window.tvGo('home'));
+  await sleep(400);
+  if (await page.evaluate(() => document.documentElement.scrollWidth > 390)) fail('Home: horizontal scroll at 390');
+  await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
+
   if (app.problems.length) fail(`console: ${app.problems.map((p) => p.text).slice(0, 3).join(' | ')}`);
   await app.close();
   if (failures.length) {

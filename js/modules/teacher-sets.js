@@ -29,6 +29,7 @@ import {
     skillView, setSkillView, viewToggleHTML, lazyThumbs, tvpAttrs, infoButtonHTML, installPreview, modeAttrs,
 } from './teacher-preview.js';
 import { skillHasOfferedOptions } from './skill-options-ui.js';
+import { codeHits } from './teacher-find.js';
 
 const LEVELS = ['K', '1', '2', '3', '4', '5', '6'];
 const UI_KEY = 'mq_teacher_sets_ui';
@@ -298,6 +299,9 @@ function matches(s, q) {
 
 function shownSkills() {
     const q = ui.query.toLowerCase();
+    // A code (CCSS, EE, WRM step or unit) finds the skills tagged to it (teacher-find.js).
+    const hits = codeHits(ui.query);
+    if (hits) return skillCatalogue().filter((s) => hits.has(`${s.categoryId}:${s.skillId}`) && (!ui.levels.length || ui.levels.includes(s.level)));
     return skillCatalogue().filter((s) => matches(s, q));
 }
 

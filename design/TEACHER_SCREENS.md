@@ -65,3 +65,20 @@ custom score per problem / type of problem and the tagging of problems."
 
 Teacher screens are graded by an independent critic like everything else (≥ 8 on every criterion): screenshots at
 1280 / 820 / 390 px, every action clicked through to a built paper, keyboard and touch use, no console errors.
+
+## Built (2026-09-26, teacher UI lane)
+
+- **Home** (`teacher-shell.js` `renderHome`): the six tiles above, three across on desktop, two on a tablet, one
+  on a phone, each with an icon, one line and a picture of its paper (`teacher-print.js` `pageThumb`). "Make skill
+  sheet" / "Make mixed review" / "Make quiz" / "Make lesson" open the Print screen on that paper
+  (`openPaper(kind, skills)`: the current set, equal weights; the picker opens when there is no skill; "Make lesson"
+  takes a set skill that has a lesson, else offers the lessons there are). "Send practice code" opens the Send screen,
+  "Practice map" the MAP screen (read as the MAP practice screen). The secondary menu under the tiles: Saved sets and
+  Recent printouts (a panel; saved sets as list or thumbnails), Quizzes, Progress, Settings. The side navigation keeps
+  every screen reachable.
+- **One find bar** (`teacher-find.js`): text or a code (CCSS `3.NBT.2`, EE `EE.3.OA.2`, WRM `Y3.B1` / `Y3.B1.S4`),
+  level, domain, and the List | Thumbnails toggle, remembered per teacher. Used by the Print screen's skill picker;
+  the Skills library and the Send screen's search read the same codes (WRM added).
+- **Thumbnails in three columns** on desktop (Skills library, Send screen, saved sets), two on a tablet, one on a
+  phone; a picker inside a narrow card sizes by its own width (container query). The lesson library gets the same
+  toggle when it lands.

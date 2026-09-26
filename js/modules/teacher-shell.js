@@ -29,10 +29,10 @@ import {
     loadSetIntoQueue, skillCatalogue, optionsSummary, readStore, writeStore, PRINT_DEFAULTS_KEY, printDefaults, pupilCode,
 } from './teacher-ui.js';
 import { renderSetsScreen, openSavedSet, startNewSet, currentSetName } from './teacher-sets.js';
-import { renderPrintScreen, recentPrintouts, reprint, printoutMeta, openPrintWith } from './teacher-print.js';
+import { renderPrintScreen, recentPrintouts, reprint, printoutMeta, openPrintWith, openPaper, pageThumb, lessonSkills } from './teacher-print.js';
 import { renderLibraryScreen } from './teacher-library.js';
 import { renderMapScreen } from './teacher-map.js';
-import { installPreview, tvpAttrs, infoButtonHTML, modeAttrs, mountSample } from './teacher-preview.js';
+import { installPreview, tvpAttrs, infoButtonHTML, modeAttrs, mountSample, skillView, setSkillView, viewToggleHTML, lazyThumbs } from './teacher-preview.js';
 
 const SCREENS = ['home', 'sets', 'print', 'run', 'library', 'quizzes', 'map', 'settings', 'progress'];
 // Legacy views a teacher is routed away from, to the teacher screen that replaces them
@@ -269,76 +269,122 @@ function greeting() {
     return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
 }
 
-function renderHome(el) {
-    const sets = savedSets().slice(0, 6);
-    const prints = recentPrintouts().slice(0, 4);
-    const today = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
-    const job = (go, ic, title, text, cta, primary) => `
-    <button type="button" class="tv-job" data-home-go="${go}">
-      <span class="tv-job-icon" aria-hidden="true">${icon(ic, 24)}</span>
-      <span><span class="tv-job-title">${title}</span><span class="tv-job-text">${text}</span></span>
-      <span class="tv-btn${primary ? ' tv-btn-primary' : ''}">${cta}${icon('arrow', 16)}</span>
-    </button>`;
-    const setRows = sets.map((s) => {
+/**
+ * HOME (owner ruling 2026-09-26, design/TEACHER_SCREENS.md): six big visual actions and nothing
+ * competing with them. Each is a tile with an icon, a one-line purpose and a picture of the paper
+ * (or screen) it makes. Saved sets, recent printouts, quizzes, progress and settings sit in a
+ * small secondary menu under the tiles.
+ */
+const HOME_TILES = [
+    ['skill-sheet', 'sheet', 'Make skill sheet', 'One skill on a Practice paper, with its I Can title.', 'independent'],
+    ['mixed-review', 'layers', 'Make mixed review', 'Several skills on one Practice paper, equal weights.', 'mixed-practice'],
+    ['quiz', 'flag', 'Make quiz', 'A scored quiz from standards, White Rose steps or skills.', 'test'],
+    ['lesson', 'book', 'Make lesson', 'Anchor chart, We Do, practice and mixed, ready to teach.', 'lesson'],
+    ['send', 'send', 'Send practice code', 'A link or a code pupils open on their own device.', ''],
+    ['map', 'chart', 'Practice map', 'MAP practice: levels, domains and RIT bands.', ''],
+];
+
+function homeTileArt(key, role) {
+    if (role) return pageThumb(role);
+    // Screen pictures for the two non-paper actions (decorative: the tile names them).
+    const frame = '<rect x=".5" y=".5" width="33" height="43" rx="2" fill="var(--tv-surface)" stroke="currentColor"/>';
+    const body = key === 'send'
+        ? '<rect x="7" y="8" width="20" height="28" rx="3" fill="none" stroke="currentColor"/><path d="M11 16h12M11 20h12M11 24h8" stroke="currentColor" stroke-width=".9"/><rect x="11" y="29" width="12" height="4" rx="1" fill="currentColor"/>'
+        : '<path d="M6 36V10M6 36h22" stroke="currentColor"/><path d="M9 31l5-6 4 3 7-10" stroke="currentColor" stroke-width="1.1" fill="none"/><circle cx="25" cy="18" r="1.4" fill="currentColor"/>';
+    return `<svg width="34" height="44" viewBox="0 0 34 44" aria-hidden="true" class="tv-ptype-thumb">${frame}${body}</svg>`;
+}
+
+function homeSetsHTML(sets) {
+    if (!sets.length) return '<p class="tv-cap">No saved sets yet. "Send practice code" saves one with its link and code.</p>';
+    const view = skillView();
+    const toggle = viewToggleHTML(view).replace('aria-label="Show skills as"', 'aria-label="Show sets as"');
+    if (view === 'thumbs') {
+        return `${toggle}<div class="tvp-grid tv-home-sets" role="list">${sets.map((s) => {
+            const k = s.skills[0];
+            const lv = levelsSummary(s.skills);
+            return `<div class="tvp-card" role="listitem">
+  ${k ? `<div class="tvp-frame tvp-thumb" data-tvp-lazy="${esc(`${k.categoryId}|${k.skillId}`)}" role="img" aria-label="Sample question from ${esc(s.name || 'this set')}"></div>` : ''}
+  <div class="tvp-card-body"><div class="tvp-card-text"><button type="button" class="tv-cell-title tv-link-row" data-open-set="${esc(s.id)}">${esc(s.name || 'Untitled set')}</button><div class="tv-skill-meta">${s.skills.length} skill${s.skills.length === 1 ? '' : 's'}${lv ? ' · ' + esc(lv) : ''}${s.code ? ' · ' + esc(pupilCode(s.code)) : ''}</div></div>
+  ${s.link ? `<button type="button" class="tv-icon-btn" data-copy-set="${esc(s.id)}" aria-label="Copy the link for ${esc(s.name || 'this set')}">${icon('copy', 18)}</button>` : ''}</div>
+</div>`;
+        }).join('')}</div>`;
+    }
+    return `${toggle}<table class="tv-table">
+        <thead><tr><th scope="col">Set</th><th scope="col" style="width:38%;">Code</th><th scope="col" style="width:104px;">Last used</th><th scope="col" style="width:76px;"><span class="tv-sr">Copy link</span></th></tr></thead>
+        <tbody>${sets.map((s) => {
         const n = s.skills.length;
         const lv = levelsSummary(s.skills);
         return `<tr>
   <td><button type="button" class="tv-cell-title tv-link-row" data-open-set="${esc(s.id)}">${esc(s.name || 'Untitled set')}</button><span class="tv-cell-sub">${n} skill${n === 1 ? '' : 's'}${lv ? ' · ' + esc(lv) : ''}</span></td>
-  <td>${s.code ? `<code class="tv-code" title="${esc(pupilCode(s.code))}">${esc(pupilCode(s.code))}</code><span class="tv-cell-sub" style="margin-top:2px;">${s.type === 'qs' ? 'Quick Start link' : 'Direct link'}</span>` : '<span class="tv-cell-sub">No link yet</span>'}</td>
+  <td>${s.code ? `<code class="tv-code" title="${esc(pupilCode(s.code))}">${esc(pupilCode(s.code))}</code>` : '<span class="tv-cell-sub">No link yet</span>'}</td>
   <td><span class="tv-cell-sub">${esc(fmtDay(s.lastUsed || s.createdAt))}</span></td>
   <td style="text-align:right;padding:0 16px 0 0;overflow:visible;">${s.link ? `<button type="button" class="tv-icon-btn" data-copy-set="${esc(s.id)}" aria-label="Copy the link for ${esc(s.name || 'this set')}">${icon('copy', 18)}</button>` : ''}</td>
 </tr>`;
-    }).join('');
-    const setsCard = `
-    <section class="tv-card tv-flush" aria-labelledby="tvHomeSetsH">
-      <div class="tv-card-head"><h2 class="tv-h2-sm" id="tvHomeSetsH">Your skill sets</h2>
-        <button type="button" class="tv-btn tv-btn-ghost" data-home-new>${icon('plus', 16)}<span>New set</span></button></div>
-      ${sets.length ? `<table class="tv-table">
-        <thead><tr><th scope="col">Set</th><th scope="col" style="width:38%;">Code</th><th scope="col" style="width:104px;">Last used</th><th scope="col" style="width:76px;"><span class="tv-sr">Copy link</span></th></tr></thead>
-        <tbody>${setRows}</tbody></table>
-        <p class="tv-cap tv-card-foot">Pupils without a link can type the code on the start screen.</p>`
-        : `<div class="tv-empty-lg"><span class="tv-empty-icon" aria-hidden="true">${icon('send', 22)}</span>
-            <div class="tv-h3">No skill sets yet</div>
-            <p class="tv-cap">Sets you save or send from “Send a skill set” appear here, with their links and codes.</p>
-            <button type="button" class="tv-btn tv-btn-primary" data-home-go="sets" style="margin-top:8px;">New skill set</button></div>`}
-    </section>`;
-    const printsCard = prints.length ? `
-    <section class="tv-card tv-flush" aria-labelledby="tvHomePrintsH">
-      <div class="tv-card-head"><h2 class="tv-h2-sm" id="tvHomePrintsH">Recent printouts</h2></div>
-      <div role="list">${prints.map((p) => {
+    }).join('')}</tbody></table>`;
+}
+
+let homeMore = '';   // '' | 'sets' | 'prints' (the secondary menu's open panel)
+
+function renderHome(el) {
+    const sets = savedSets().slice(0, 12);
+    const prints = recentPrintouts().slice(0, 6);
+    const today = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+    const tiles = HOME_TILES.map(([key, ic, title, text, role]) => `
+    <button type="button" class="tv-home-tile" data-home-tile="${key}">
+      <span class="tv-home-tile-top"><span class="tv-job-icon" aria-hidden="true">${icon(ic, 24)}</span><span class="tv-home-art">${homeTileArt(key, role)}</span></span>
+      <span class="tv-job-title">${title}</span>
+      <span class="tv-job-text">${text}</span>
+    </button>`).join('');
+    const more = [
+        ['sets', 'layers', `Saved sets (${savedSets().length})`], ['prints', 'print', `Recent printouts (${recentPrintouts().length})`],
+    ];
+    const printsHTML = prints.length ? `<div role="list">${prints.map((p) => {
         const m = printoutMeta(p);
         return `<div role="listitem" class="tv-print-item">
-          <svg width="40" height="56" viewBox="0 0 40 56" aria-hidden="true" style="flex:none;"><rect x="0.5" y="0.5" width="39" height="55" rx="2" fill="#ffffff" stroke="#c9c9c4"/><path d="M5 7h15" stroke="#85878c"/><path d="M5 11.5h30" stroke="#1f2023" stroke-width="1.2"/><rect x="5" y="15" width="30" height="35" fill="none" stroke="#85878c"/><path d="M15 15v35M25 15v35M5 26.7h30M5 38.3h30" stroke="#c9c9c4"/></svg>
           <div><div class="tv-cell-title">${esc(p.title)}</div><span class="tv-cell-sub">${esc(m.line1)}</span><span class="tv-cell-sub">${esc(m.line2)}</span></div>
           <button type="button" class="tv-icon-btn" data-reprint="${esc(p.id)}" aria-label="Print ${esc(p.title)} again">${icon('print', 18)}</button>
         </div>`;
-    }).join('')}</div>
-    </section>` : '';
+    }).join('')}</div>` : '<p class="tv-cap">Pages you print appear here, ready to print again.</p>';
     el.innerHTML = `
 <header class="tv-header">
   <div><h1 class="tv-h1">${greeting()}</h1><p class="tv-sub">${esc(today)}</p></div>
   <div class="tv-header-actions"><a class="tv-btn tv-btn-ghost" href="help/teacher-online.html" target="_blank" rel="noopener">${icon('book', 20)}<span>Teacher help</span></a></div>
 </header>
-<section class="tv-grid-3" aria-label="Start a job">
-  ${job('sets', 'send', 'Send a skill set', 'Pick the skills and the rules, then give pupils a link or a code to open on their own device.', 'New skill set', true)}
-  ${job('print', 'print', 'Print worksheets', 'Choose skills and a page type, then print pupil pages with an answer key.', 'Choose a worksheet', false)}
-  ${job('run', 'board', 'Run practice on the board', 'Put practice, a game or one large question at a time on the classroom screen.', 'Set up the board', false)}
-</section>
-<div class="${prints.length ? 'tv-grid-2-1' : ''}">${setsCard}${printsCard}</div>`;
+<section class="tv-home-tiles" aria-label="What do you want to make?">${tiles}</section>
+<nav class="tv-home-more" aria-label="More">
+  ${more.map(([k, ic, t]) => `<button type="button" class="tv-btn tv-btn-ghost" data-home-more="${k}" aria-expanded="${homeMore === k}" aria-controls="tvHomeMore">${icon(ic, 16)}<span>${t}</span></button>`).join('')}
+  <button type="button" class="tv-btn tv-btn-ghost" data-home-go="quizzes">${icon('flag', 16)}<span>Quizzes</span></button>
+  <button type="button" class="tv-btn tv-btn-ghost" data-home-go="progress">${icon('chart', 16)}<span>Progress</span></button>
+  <button type="button" class="tv-btn tv-btn-ghost" data-home-go="settings">${icon('sliders', 16)}<span>Settings</span></button>
+</nav>
+${homeMore ? `<section class="tv-card tv-home-panel" id="tvHomeMore" aria-label="${homeMore === 'sets' ? 'Saved sets' : 'Recent printouts'}">${homeMore === 'sets' ? homeSetsHTML(sets) : printsHTML}</section>` : ''}`;
+    if (homeMore === 'sets') lazyThumbs(el, el);
     if (!el.dataset.wired) {
         el.dataset.wired = '1';
         el.addEventListener('click', async (e) => {
             const b = e.target.closest('button');
             if (!b) return;
-            if (b.dataset.homeGo) {
-                if (b.dataset.homeGo === 'sets' && b.classList.contains('tv-job')) startNewSet();
-                tvGo(b.dataset.homeGo);
-            } else if (b.hasAttribute('data-home-new')) { startNewSet(); tvGo('sets'); }
-            else if (b.dataset.openSet) { if (openSavedSet(b.dataset.openSet)) tvGo('sets'); }
-            else if (b.dataset.copySet) {
-                const s = savedSets().find((x) => x.id === b.dataset.copySet);
+            const d = b.dataset;
+            if (d.homeTile) {
+                const set = currentSet();
+                if (d.homeTile === 'skill-sheet') { openPaper('practice', set.slice(0, 1)); tvGo('print'); }
+                else if (d.homeTile === 'mixed-review') { openPaper('practice', set.length > 1 ? set : []); tvGo('print'); }
+                else if (d.homeTile === 'quiz') { openPaper('quiz', set); tvGo('print'); }
+                else if (d.homeTile === 'lesson') {
+                    const ls = lessonSkills();
+                    const hit = set.find((k) => ls.some((x) => x.categoryId === k.categoryId && x.skillId === k.skillId));
+                    openPaper('lesson', hit ? [hit] : []);
+                    tvGo('print');
+                } else if (d.homeTile === 'send') { startNewSet(); tvGo('sets'); }
+                else if (d.homeTile === 'map') tvGo('map');
+            } else if (d.homeMore) { homeMore = homeMore === d.homeMore ? '' : d.homeMore; renderHome(el); el.querySelector(`[data-home-more="${d.homeMore}"]`)?.focus(); }
+            else if (d.act === 'skill-view') { setSkillView(d.view); renderHome(el); el.querySelector(`[data-act="skill-view"][data-view="${d.view}"]`)?.focus(); }
+            else if (d.homeGo) tvGo(d.homeGo);
+            else if (d.openSet) { if (openSavedSet(d.openSet)) tvGo('sets'); }
+            else if (d.copySet) {
+                const s = savedSets().find((x) => x.id === d.copySet);
                 if (s && s.link) toast((await copyText(s.link)) ? 'Link copied' : 'Could not copy');
-            } else if (b.dataset.reprint) reprint(b.dataset.reprint);
+            } else if (d.reprint) reprint(d.reprint);
         });
     }
 }

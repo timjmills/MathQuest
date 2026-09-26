@@ -26,7 +26,8 @@ import {
     icon, esc, toast, skillCatalogue, findSkill, levelText, currentSet, savedSets, printDefaults,
     optionsSummary, optionsReadOnlyHTML, readStore, writeStore, PRINTS_KEY, fmtDay,
 } from './teacher-ui.js';
-import { tvpAttrs, infoButtonHTML } from './teacher-preview.js';
+import { tvpAttrs, infoButtonHTML, skillView, setSkillView, lazyThumbs } from './teacher-preview.js';
+import { findBarHTML, findSkills } from './teacher-find.js';
 import { skillHasOfferedOptions } from './skill-options-ui.js';
 import { generateQuestionFor } from './generate-question.js';
 import { getSetOptions } from './skill-option-store.js';
@@ -80,7 +81,7 @@ function newSection(skills = [], kind = 'practice') {
         // The Quiz (TEACHER_SCREENS "Make quiz"): where its skills came from, how it is scored.
         qsrc: { type: 'ccss', code: '', year: '', block: '', step: '', lesson: '' }, source: [],
         scoring: { mode: 'each', perType: {}, perQ: {} }, lastQuiz: null,
-        skills, optionsOpen: '', prereqOpen: '', picking: false, menu: '',
+        skills, optionsOpen: '', prereqOpen: '', picking: false, menu: '', find: { q: '', grade: '', domain: '' },
     };
 }
 
@@ -177,6 +178,29 @@ export function openPrintWith(list, { kind = 'practice', role = '' } = {}) {
 }
 
 /**
+ * Open a paper from Home (TEACHER_SCREENS: six actions): a fresh section of that paper with these
+ * skills, equal weights, and the skill picker open when there is none yet.
+ * @param {'practice'|'quiz'|'lesson'} kind
+ * @param {{categoryId, skillId, opts?}[]} [skills]
+ */
+export function openPaper(kind, skills = []) {
+    if (!pr) initState();
+    const list = (Array.isArray(skills) ? skills : [])
+        .filter((k) => k && k.categoryId && k.skillId && findSkill(k.categoryId, k.skillId))
+        .map((k) => ({ categoryId: k.categoryId, skillId: k.skillId, opts: optsOf(k), weight: 1 }));
+    pr.title = '';
+    pr.sections = [newSection(kind === 'lesson' ? list.slice(0, 1) : list, ['practice', 'quiz', 'lesson'].includes(kind) ? kind : 'practice')];
+    pr.sections[0].picking = !list.length && kind !== 'lesson';
+    pr.seed = freshSeed();
+    pr.view = 0;
+}
+
+/** The skills that have a lesson today, for Home's "Make lesson" and the Lesson paper's quick picks. */
+export function lessonSkills() {
+    return [...SAMPLE_LESSONS].map((k) => { const [categoryId, skillId] = k.split(':'); return { categoryId, skillId }; }).filter((k) => findSkill(k.categoryId, k.skillId));
+}
+
+/**
  * Start a fresh sheet from the given skills ({categoryId, skillId, opts?, weight?}[]). Used by the
  * Skills library's "Print"; the caller then shows this screen with tvGo('print').
  */
@@ -251,9 +275,19 @@ function wire() {
     root.querySelector('#tvSheetTitle').addEventListener('input', (e) => { pr.title = e.target.value; scheduleBuild(); });
     root.addEventListener('click', onClick);
     root.addEventListener('change', onChange);
-    root.addEventListener('input', (e) => {
-        if (e.target.dataset.pick !== undefined) renderPickResults(Number(e.target.dataset.pick), e.target.value);
-    });
+    // The skill picker's find bar (teacher-find.js): text or a code, grade, domain.
+    let findT = null;
+    const onFind = (e) => {
+        const f = e.target.dataset.find;
+        const wrap = e.target.closest('[data-picksec]');
+        if (!f || !wrap) return;
+        const si = Number(wrap.dataset.picksec);
+        pr.sections[si].find[f] = e.target.value;
+        clearTimeout(findT);
+        findT = setTimeout(() => renderPickResults(si), e.type === 'input' ? 150 : 0);
+    };
+    root.addEventListener('input', onFind);
+    root.addEventListener('change', onFind);
     window.addEventListener('resize', () => fitPreview());
     document.addEventListener('click', (e) => {
         if (!pr) return;
@@ -366,7 +400,15 @@ function onClick(e) {
             break;
         }
         case 'skill-options': openOptions(Number(d.sec), Number(d.idx), b); break;
-        case 'pick': { const s = sec(d.sec); s.picking = !s.picking; s.menu = ''; renderWhat(); if (s.picking) root.querySelector(`[data-pick="${d.sec}"]`)?.focus(); break; }
+        case 'pick': { const s = sec(d.sec); s.picking = !s.picking; s.menu = ''; renderWhat(); if (s.picking) root.querySelector(`[data-picksec="${d.sec}"] [data-find="q"]`)?.focus(); break; }
+        case 'skill-view': {
+            // The same List | Thumbnails toggle as the Library and Send screens, remembered per teacher.
+            setSkillView(d.view);
+            const wrap = b.closest('[data-picksec]');
+            wrap?.querySelectorAll('[data-act="skill-view"]').forEach((x) => x.setAttribute('aria-checked', String(x.dataset.view === d.view)));
+            if (wrap) renderPickResults(Number(wrap.dataset.picksec));
+            break;
+        }
         case 'pick-skill': {
             const s = sec(d.sec);
             const [cat, sk] = d.key.split('|');
@@ -429,6 +471,7 @@ function onChange(e) {
 function renderWhat() {
     const box = root.querySelector('#tvSections');
     box.innerHTML = pr.sections.map((s, i) => sectionHTML(s, i)).join('');
+    pr.sections.forEach((s, i) => { if (s.picking) renderPickResults(i); });
 }
 
 /** The skill rows of a section: name, options, weight (a set of several), prerequisites. */
@@ -572,6 +615,11 @@ function paperOptionsHTML(s, i) {
 <p class="tv-cap">Form B has new numbers. The skills share the questions by weight (equal unless you change them).</p>
 ${quizScoringHTML(s, i)}`;
     }
+    if (s.kind === 'lesson' && !s.skills.length) {
+        return `<div><span class="tv-label" id="tvLessonsL${i}">Choose a lesson</span>
+  <div class="tv-lesson-picks" role="group" aria-labelledby="tvLessonsL${i}">${lessonSkills().map((k) => { const hit = findSkill(k.categoryId, k.skillId); return `<button type="button" class="tv-btn" data-act="pick-skill" data-sec="${i}" data-key="${esc(k.categoryId + '|' + k.skillId)}">${icon('book', 16)}<span>${esc(hit.label)}</span></button>`; }).join('')}</div>
+  <p class="tv-cap" style="margin-top:6px;">Every lesson has five parts: Prerequisite Check, anchor chart, lesson sheet (We Do), practice, mixed.</p></div>`;
+    }
     if (s.kind === 'lesson') {
         return `<div><span class="tv-label" id="tvParts${i}">Parts to print</span>
   <div class="tv-parts" role="group" aria-labelledby="tvParts${i}">${LESSON_PARTS.map((p) => `<button type="button" class="tv-check" role="checkbox" aria-checked="${s.parts.includes(p)}" data-act="part" data-sec="${i}" data-v="${p}"><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span><span>${esc(LESSON_PART_NAMES[p])}</span></button>`).join('')}</div>
@@ -634,7 +682,7 @@ function sectionHTML(s, i) {
     <button type="button" class="tv-btn tv-btn-ghost" data-act="pick" data-sec="${i}" aria-expanded="${!!s.picking}">${icon('plus', 16)}<span>Add a skill</span></button>
     <div class="tv-menu-wrap"><button type="button" class="tv-btn tv-btn-ghost" data-act="menu" data-menu="set" data-sec="${i}" aria-expanded="${s.menu === 'set'}">${icon('layers', 16)}<span>Add a set</span></button>${setMenu}</div>
   </div>
-  ${s.picking ? `<div class="tv-search"><label class="tv-sr" for="tvPick${i}">Find a skill</label>${icon('search', 18)}<input id="tvPick${i}" class="tv-input" type="search" data-pick="${i}" placeholder="Search skills" autocomplete="off"></div><div class="tv-pick-results" id="tvPickRes${i}"><p class="tv-cap" style="padding:8px 12px;">Type to search.</p></div>` : ''}
+  ${s.picking ? `<div class="tv-pick" data-picksec="${i}">${findBarHTML(`tvPick${i}`, s.find, skillView())}<div class="tv-pick-results" id="tvPickRes${i}"></div></div>` : ''}
   <div class="tv-divided">
     <span class="tv-label" id="tvPaperL${i}">Paper</span>
     <div class="tv-ptypes tv-papers" role="radiogroup" aria-labelledby="tvPaperL${i}">${cards}</div>
@@ -648,7 +696,7 @@ function sectionHTML(s, i) {
  * A small black-and-white schematic of a page type (decorative: the card names it). Every page
  * is a sheet with a header line; what sits under the header tells the page types apart.
  */
-function pageThumb(role) {
+export function pageThumb(role) {
     const W = 34, H = 44;
     const line = (x1, y1, x2, y2, w = 1) => `<path d="M${x1} ${y1}H${x2}${y2 !== y1 ? `V${y2}` : ''}" stroke="currentColor" stroke-width="${w}" fill="none"/>`;
     const box = (x, y, w, h, extra = '') => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="1" fill="none" stroke="currentColor" stroke-width=".9"${extra}/>`;
@@ -791,17 +839,34 @@ function exportForms() {
     window.openGoogleExportModal(problems, 'print', titleOf());
 }
 
-function renderPickResults(i, q) {
+/** The picker's results: the shared find bar's filter, as a list or as thumbnails (3 columns). */
+function renderPickResults(i) {
     const box = root.querySelector(`#tvPickRes${i}`);
-    if (!box) return;
-    const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
-    if (!words.length) { box.innerHTML = '<p class="tv-cap" style="padding:8px 12px;">Type to search.</p>'; return; }
-    const hits = skillCatalogue().filter((s) => {
-        const hay = `${s.label} ${s.categoryName} ${s.skillId.replace(/_/g, ' ')}`.toLowerCase();
-        return words.every((w) => hay.includes(w));
-    }).slice(0, 40);
-    box.innerHTML = hits.length ? hits.map((s) => `<button type="button" data-act="pick-skill" data-sec="${i}" data-key="${esc(s.categoryId + '|' + s.skillId)}"${tvpAttrs(s.categoryId, s.skillId)}><span class="tv-skill-name">${esc(s.label)}</span><br><span class="tv-skill-meta">${esc(levelText(s.level))} · ${esc(s.categoryName)}</span></button>`).join('')
-        : '<p class="tv-cap" style="padding:8px 12px;">No skills match.</p>';
+    const s = pr.sections[i];
+    if (!box || !s) return;
+    const st = s.find;
+    if (!String(st.q || '').trim() && !st.grade && !st.domain) { box.innerHTML = '<p class="tv-cap" style="padding:8px 12px;">Type a skill or a code, or choose a level or domain.</p>'; box.className = 'tv-pick-results'; return; }
+    const all = findSkills(st);
+    const thumbs = skillView() === 'thumbs';
+    const hits = all.slice(0, thumbs ? 24 : 40);
+    const inSet = new Set(s.skills.map((k) => `${k.categoryId}|${k.skillId}`));
+    const more = all.length > hits.length ? `<p class="tv-cap" style="padding:8px 12px;">Showing ${hits.length} of ${all.length}: narrow the search.</p>` : '';
+    if (!hits.length) { box.className = 'tv-pick-results'; box.innerHTML = '<p class="tv-cap" style="padding:8px 12px;">No skills match.</p>'; return; }
+    if (thumbs) {
+        box.className = 'tv-pick-results is-thumbs';
+        box.innerHTML = `<div class="tvp-grid" role="list">${hits.map((k) => {
+            const key = `${k.categoryId}|${k.skillId}`;
+            return `<div class="tvp-card${inSet.has(key) ? ' is-added' : ''}" role="listitem">
+  <div class="tvp-frame tvp-thumb" data-tvp-lazy="${esc(key)}" role="img" aria-label="Sample question for ${esc(k.label)}"></div>
+  <div class="tvp-card-body"><div class="tvp-card-text"><div class="tv-skill-name tvp-clamp" title="${esc(k.label)}">${esc(k.label)}</div><div class="tv-skill-meta">${esc(levelText(k.level))} · ${esc(k.categoryName)}</div></div>
+  <button type="button" class="tv-icon-btn tv-add" data-act="pick-skill" data-sec="${i}" data-key="${esc(key)}" aria-label="Add ${esc(k.label)}">${icon(inSet.has(key) ? 'check' : 'plus', 18)}</button></div>
+</div>`;
+        }).join('')}</div>${more}`;
+        lazyThumbs(box, box);
+        return;
+    }
+    box.className = 'tv-pick-results';
+    box.innerHTML = hits.map((k) => `<button type="button" data-act="pick-skill" data-sec="${i}" data-key="${esc(k.categoryId + '|' + k.skillId)}"${tvpAttrs(k.categoryId, k.skillId)}><span class="tv-skill-name">${esc(k.label)}</span><br><span class="tv-skill-meta">${esc(levelText(k.level))} · ${esc(k.categoryName)}</span></button>`).join('') + more;
 }
 
 function openOptions(si, idx, anchor) {

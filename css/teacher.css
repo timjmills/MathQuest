@@ -925,3 +925,47 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 .tv-qpts { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; font-size: 13px; line-height: 18px; color: var(--tv-text); }
 .tv-qpts span { min-width: 0; overflow-wrap: anywhere; }
 .tv-qpts .tv-input { width: 76px; flex: none; }
+
+/* ---------------------------------------------------------------- thumbnails: 3 / 2 / 1 columns
+   Owner ruling 2026-09-26 (TEACHER_SCREENS): three columns on desktop, two on a tablet, one on a
+   phone, never a horizontal scroll. A picker inside a narrow card sizes by ITS width instead. */
+.tvl-thumbs, .tvp-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 1023px) { .tvl-thumbs, .tvp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .tvl-thumbs, .tvp-grid { grid-template-columns: minmax(0, 1fr); } }
+.tv-pick-results.is-thumbs { container-type: inline-size; max-height: 560px; overflow-y: auto; padding: 8px; }
+.tv-pick-results.is-thumbs .tvp-grid { grid-template-columns: minmax(0, 1fr); }
+@container (min-width: 360px) { .tv-pick-results.is-thumbs .tvp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (min-width: 540px) { .tv-pick-results.is-thumbs .tvp-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* The one find bar (teacher-find.js): text or a code, grade, domain, List | Thumbnails. */
+.tv-find { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin: 8px 0; }
+.tv-find > div:not(.tv-find-q) { min-width: 0; }
+.tv-find .tvp-viewseg { justify-self: start; }
+
+/* ---------------------------------------------------------------- HOME: six actions (2026-09-26)
+   TEACHER_SCREENS: six big visual tiles (icon, one line, a picture of the paper), three across on
+   desktop, two on a tablet, one on a phone; a small secondary menu underneath. */
+.tv-home-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; }
+@media (max-width: 1023px) { .tv-home-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .tv-home-tiles { grid-template-columns: minmax(0, 1fr); gap: 12px; } }
+.tv-home-tile {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 176px; padding: 20px; text-align: left; cursor: pointer;
+    border: 1px solid var(--tv-border); border-radius: var(--tv-r-card, 14px); background: var(--tv-surface); color: var(--tv-text);
+    box-shadow: var(--tv-card-lip, none); font: inherit;
+}
+.tv-home-tile:hover { border-color: var(--tv-control); }
+.tv-home-tile:focus-visible { outline: 3px solid var(--tv-selected); outline-offset: 2px; }
+.tv-home-tile-top { display: flex; align-items: flex-start; justify-content: space-between; width: 100%; margin-bottom: 6px; }
+.tv-home-tile .tv-job-icon { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 12px; background: var(--tv-subtle); color: var(--tv-text); }
+.tv-home-art .tv-ptype-thumb { width: 58px; height: 75px; color: var(--tv-text-2); }
+.tv-home-tile .tv-job-title { font-size: 18px; line-height: 24px; }
+.tv-home-tile .tv-job-text { font-size: 14px; line-height: 20px; color: var(--tv-text-2); }
+@media (max-width: 600px) { .tv-home-tile { min-height: 0; padding: 16px; } .tv-home-art .tv-ptype-thumb { width: 44px; height: 57px; } }
+.tv-home-more { display: flex; flex-wrap: wrap; gap: 4px 8px; margin-bottom: 16px; }
+.tv-home-panel { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.tv-home-panel .tv-table { width: 100%; }
+.tv-lesson-picks { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.tv-home-tile[data-home-tile="skill-sheet"] .tv-job-icon, .tv-home-tile[data-home-tile="mixed-review"] .tv-job-icon { background: var(--brand-peach-tile, var(--tv-subtle)); color: var(--brand-peach-ink, var(--tv-text)); }
+.tv-home-tile[data-home-tile="quiz"] .tv-job-icon, .tv-home-tile[data-home-tile="lesson"] .tv-job-icon { background: var(--brand-purple-soft, var(--tv-subtle)); color: var(--brand-purple-d, var(--tv-text)); }
+.tv-home-tile[data-home-tile="send"] .tv-job-icon, .tv-home-tile[data-home-tile="map"] .tv-job-icon { background: var(--brand-mint-tile, var(--tv-subtle)); color: var(--brand-mint-ink, var(--tv-text)); }
+html.dark body.teacher-mode .tv-home-tile .tv-job-icon { background: var(--tv-subtle); color: var(--tv-text); }

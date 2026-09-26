@@ -29,6 +29,7 @@ import {
 import { printSkills } from './teacher-print.js';
 import { skillView, setSkillView, viewToggleHTML, mountSample, lazyThumbs, tvpAttrs, infoButtonHTML } from './teacher-preview.js';
 import { renderStandardsCoverage } from './teacher-standards.js';
+import { codeHits } from './teacher-find.js';
 
 // Standards (owner request 2026-09-25): the detail panel tags each skill with its CCSS standards
 // and Essential Elements, the search finds skills by a standard code (3.OA.7, EE.3.OA.6), and a
@@ -122,7 +123,7 @@ function shellHTML() {
 </header>
 <section class="tvl-std-view" id="tvlStd" aria-labelledby="tvlTitle" hidden></section>
 <div class="tvl-bar" role="search" aria-label="Find a skill">
-  <div class="tv-search tvl-bar-search"><label class="tv-sr" for="tvlSearch">Search skills</label>${icon('search', 18)}<input id="tvlSearch" class="tv-input" type="search" placeholder="Search, e.g. subtract across zeros or 3.OA.7" autocomplete="off"></div>
+  <div class="tv-search tvl-bar-search"><label class="tv-sr" for="tvlSearch">Search skills</label>${icon('search', 18)}<input id="tvlSearch" class="tv-input" type="search" placeholder="Search, or a code: 3.OA.7, EE.3.OA.2, Y3.B1" autocomplete="off"></div>
   <div class="tvl-bar-filter"><label class="tv-sr" for="tvlLevel">Level</label><select id="tvlLevel" class="tv-select"><option value="">All levels</option>${levelOpts}</select></div>
   <div class="tvl-bar-filter"><label class="tv-sr" for="tvlDomain">Domain</label><select id="tvlDomain" class="tv-select"><option value="">All domains</option>${domainOpts}</select></div>
 </div>
@@ -166,6 +167,8 @@ function stdSearch() {
     lib.stdHits = null;
     lib.stdRec = null;
     const q = lib.query.trim();
+    // A White Rose small step or unit (Y3.B1, Y3.B1.S4) finds the skills that teach it.
+    if (/^(R|Y[1-6])(\.B\d{1,2}(\.S\d{1,2})?)?$/i.test(q)) { lib.stdHits = codeHits(q); return; }
     if (!STD || !q || !STD.looksLikeStandardCode(q)) return;
     const rec = STD.findStandard(q);
     lib.stdRec = rec;
@@ -176,7 +179,7 @@ function stdBannerHTML(count) {
     const q = lib.query.trim();
     const r = lib.stdRec;
     if (!r) {
-        return `<div class="tvl-std-banner"><p class="tv-cap">${count ? `Skills tagged with a standard starting ${esc(q)}.` : `No standard or skill matches ${esc(q)}.`}</p></div>`;
+        return `<div class="tvl-std-banner"><p class="tv-cap">${count ? `Skills tagged with ${esc(q)} (a standard or a White Rose step).` : `No standard or skill matches ${esc(q)}.`}</p></div>`;
     }
     const kind = r.type === 'ee' ? 'Essential Element' : r.type === 'wi' ? 'Wisconsin standard' : 'Common Core';
     return `<div class="tvl-std-banner"><p class="tvl-std-banner-code">${esc(r.short || r.code)} <span class="tv-muted">· ${kind}, Level ${esc(r.grade)}</span></p>
