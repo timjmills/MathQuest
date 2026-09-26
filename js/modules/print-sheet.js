@@ -38,6 +38,8 @@ import { tagLine as lessonTagLine } from './sheet/roles/lesson.js';
 import { itemKey, nearTwins, packetViolations } from './sheet/lesson-rules.js';
 import { lessonFor, lessonDataById, skillRef } from './lessons/prereqs.js';
 import { lessonById, practiceRef } from './lessons/library.js';
+import { practiceSection, practiceRequest, PRACTICE_STACK_SHAPES } from './sheet/lesson-pages/practice.js';
+import { mixedRequest } from './sheet/lesson-pages/mixed.js';
 import {
     normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, easeScore, ineligibleNote,
     blockPlan, sideItems, pickDistinct,
@@ -2181,19 +2183,15 @@ async function buildLesson(n, metaOf) {
     // Lessons r2-r3: a rounding cell ("27 -> ___") is short and narrow: M prints three across like
     // L, and the lesson's own 15 at every size (never 12.1's 16 ceiling passed).
     const rounding = (teach.items || []).some((it) => it.pool === 'main' && it.template === 'pv');
-    const section = facts ? { skills: [practiceSk], pages: 0, noCap: true, dense: rounding ? { S: 15, M: 15, L: 15 } : { S: 16, M: 16, L: 15 } } : { skills: [practiceSk], count: 0, columns: 2, noCap: true };
+    // The practice page (sheet/lesson-pages/practice.js, the shared builder, §8c).
+    const section = practiceSection({ skill: practiceSk, facts, rounding });
     // Taller problems: 12.1's six a page (2 x 3) at every size - an Independent page holds 6 at
     // most, so M is the same six cells in smaller type (lessons r2: by design, not a missed gain).
-    const stackShapes = [[6, 2]];
+    const stackShapes = PRACTICE_STACK_SHAPES;
     const practiceSize = size;
-    const practiceReq = (pages, withStrip, shape = stackShapes[stackShapes.length - 1]) => Object.assign({}, common, {
-        size: practiceSize,
-        role: 'independent', tabId: `Practice ${lessonNo}`,
-        sections: [facts ? Object.assign({}, section, { pages }) : Object.assign({}, section, { count: shape[0] * pages, columns: shape[1] })],
-        seed: (n.seed + 7919) >>> 0,
-        // (At L type the strip's words are a point bigger: 2 mm more for it.)
-        stepStrip: withStrip && stripHtml ? (practiceSize === size ? { html: stripHtml, hMm: stripH }
-            : { html: strip.render(resolveCtx({ size: practiceSize, look: 'ican', mode: 'print' })), hMm: stripH + 2 }) : undefined,
+    const practiceReq = (pages, withStrip, shape = stackShapes[stackShapes.length - 1]) => practiceRequest({
+        common, size, practiceSize, lessonNo, section, facts, pages, withStrip, shape,
+        seed: (n.seed + 7919) >>> 0, strip, stripH, stripHtml,
     });
     const practiceTried = [];
     const practiceTexts = [];
@@ -2218,16 +2216,10 @@ async function buildLesson(n, metaOf) {
     if (n.mixed) {
         // (Each partner avoids the packet too: the Warm-up's own items never come back.)
         const withSkills = (data && data.mixWith ? data.mixWith.map(skillRef) : earlierSkills(sk, 2)).map((r) => Object.assign(r, avoidOf()));
-        const res = await buildSheet(Object.assign({}, common, {
-            // The lesson's own look (I Can) unless the teacher chose Daily for the packet.
-            // Lessons r2: the lesson's own skill fills at least half the page (its weight is the
-            // partners' together), the earlier skills the rest.
-            role: 'mixed-practice', look: n.lookAsked === 'daily' ? 'daily' : 'ican',
-            // Lessons r3: never a problem the Practice page printed; the lesson skill at least
-            // half the placed items (`leadHalf`, enforced after packing).
-            sections: [{ skills: [Object.assign({}, practiceSk0, avoidOf(), { weight: Math.max(1, withSkills.length) + 0.5 }), ...withSkills] }], latticeN: 6, leadHalf: !off.has('LR-8'),
-            seed: (n.seed + 15838) >>> 0,
-            stepStrip: stripHtml ? { html: stripHtml, hMm: stripH } : undefined,
+        // The mixed page (sheet/lesson-pages/mixed.js, the shared builder, §8c).
+        const res = await buildSheet(mixedRequest({
+            common, lookAsked: n.lookAsked, lead: Object.assign({}, practiceSk0, avoidOf()), partners: withSkills,
+            leadHalf: !off.has('LR-8'), seed: (n.seed + 15838) >>> 0, stripHtml, stripH,
         }));
         parts.push({ part: 'mixed', role: 'mixed-practice', res });
         hold('mixed', res.items);

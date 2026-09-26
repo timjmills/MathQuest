@@ -920,6 +920,60 @@ The instruction library gained ten keys with these providers (`line-jumps`, `dra
 
 ---
 
+### 3.9 Lesson page data: what a skill supplies to the lesson page builders (2026-09-26)
+
+Owner ruling 2026-09-26 (`design/LESSON_LIBRARY_PLAN.md` §8c, §8e): the stand-alone page types merge into the
+lesson designs, one design per page job. The builders are archetype-driven shared modules, and any skill
+can call them:
+
+| Builder | Module | Page job it replaces |
+|---|---|---|
+| anchor chart | `sheet/lesson-pages/chart.js` (`pickExample`, `otherExamples`, `stateItems`, `finalItems`, `chartPage`) | Worked example (scripted Model) |
+| prerequisite check | `sheet/lesson-pages/prereq-check.js` (`warmShape`, `warmUpBand`) | Warm-up, pre-skill check |
+| We Do | `sheet/lesson-pages/we-do.js` (`pickWeDo`, `weDoRender`, `stepsItem`, `weDoBand`) | Guided |
+| practice | `sheet/lesson-pages/practice.js` (`practiceSection`, `practiceRequest`, `stripHtml`) | Independent, More practice |
+| mixed | `sheet/lesson-pages/mixed.js` (`mixedRequest`) | Review, Mixed practice |
+| vocabulary | `sheet/lesson-pages/vocab.js` (`vocabItem`, `vocabBands`) | - |
+
+The ARCHETYPE decides only how a worked example is drawn step by step and which cases it names
+(`sheet/lesson-arch/{fact,column,line}.js`, one per certified archetype; `CASE_TESTS` in
+`lesson-arch/index.js`). The builders are the same for every archetype. `roles/lesson.js` composes them
+into the lesson packet; the role lane's adapters compose them for a skill's Practice and Quiz papers.
+
+**The items.** Every builder takes host-shaped items (6.2: `{q, render, template, measured, footprint,
+fclass, pool}`), measured by the host at the builder's column counts. The builders read an item only
+through these provider members:
+
+| Member | Read by | What it gives |
+|---|---|---|
+| `workedSteps(q)` (3.3), through `anchors.js workedStepsOf` | chart (states, panels, words), We Do (cell 1's grey first step), practice strip | the worked steps, each `{text, marks}`; step n of the lesson's step list IS worked step n |
+| the template's `stepState(payload, groups, k, ctx)` (2.x, through `anchors.js stepTemplateOf`) | chart panels, We Do | the problem drawn after step k (newest marks grey, earlier black) |
+| `strings(ref)` (3.4, 3.8): `instructionKey`, `say` | every band's instruction, the chart's Say line | the library instruction, the oral frame |
+| `answerKey` / `q.ans` | We Do variety, keys | the answer |
+| `footprint(p, ctx).minSize` (LR-16) | practice, mixed | the item's size floor on an S / M page |
+
+**The lesson page data.** One record tells the builders what the skill teaches. A library lesson's
+`lessonData(id)` (`js/modules/lessons/library.js`) has exactly this shape. For a skill with no lesson
+yet, the adapter derives it from the provider:
+
+| Field | Used by | From a library lesson | From a provider (no lesson yet) |
+|---|---|---|---|
+| `steps: [{icon, text}]` | chart panels, We Do Steps zone, practice strip | the routine's steps (one distinct icon each, LR-3) | `strings(ref).steps`, with each step's icon from `lesson-icons.js iconForText` |
+| `example: {match, test?, prefer?}` | chart: which item is the worked example | the routine | `{match: <the first worked step's verb>}` |
+| `second / third / fourth: {test, label, ref?}` | chart: the other examples, one per case | the routine | none (the chart draws the worked example alone) |
+| `cases: [name]` | LR-1 / LR-2 checks, chart coverage | the routine (names from `lesson-rules.js CASE_FAMILIES`) | none |
+| `guided: [case]` | We Do: one Guided cell per case, in order | the routine | none |
+| **row-1 hint** (the level-2 cue) | We Do cell 1 | the first worked step's marks, drawn in grey (P-LC-7) | the same: `workedSteps(q)[0].marks` |
+| `vocab`, `concepts`, `chant`, `format`, `words`, `notes` | vocabulary band, Remember / Rule, step words | the routine | none (the bands are left out) |
+| floors and caps (`minOperand`, `minTop`, `maxTop`, `distinctFirst`, `distinctAnswer`, `noNearTwin`, `caps`) | every dealt pool | the routine | the skill's option defaults |
+| `practice: {skill, opts}` | practice and mixed pages | the lesson record (LINK-1) | the Print request's skill and options (`skill-options.js`) |
+| prerequisites (`skills` today; `prereqs: [{lesson, key, opts, why}]` from §8b) | prerequisite check | the lesson record | `library.js prerequisiteSkillsFor(categoryId, skillId)` |
+| `mixWith: [{key, opts?, ...floors}]` | mixed page | the lesson record (earlier skills only, LR-9) | the host's `earlierSkills` |
+
+A builder never needs more than this. A provider that can supply `workedSteps` with marks and a
+template with `stepState` gets the full anchor chart and We Do band; one without them gets the problem
+blank, then answered in grey on the last state (`lesson-pages/chart.js stateDrawing`).
+
 ## 4. Default adapters: every existing skill works immediately
 
 ### 4.1 Injection

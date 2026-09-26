@@ -171,3 +171,8 @@ export {
     REGRADED_SKILLS, storiesFor, STORY_NOUNS, STORY_NAMES, STORY_TEMPLATES, nounFor,
     columnAdd, lineSteps, longDivision,
 } from './providers/index.js';
+
+// The lesson page builders and the archetype plug-ins (design/LESSON_LIBRARY_PLAN.md 8c,
+// SKILL_CELL_CONTRACT.md 3.9): one design per page job, callable for any skill.
+export * as lessonPages from './lesson-pages/index.js';
+export * as lessonArch from './lesson-arch/index.js';
