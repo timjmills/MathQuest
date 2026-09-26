@@ -124,8 +124,12 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
         }).join('');
     }
     if (answer === 'steps' && trackInk) html += trackInk.map((tk) => (tk ? `<span class="${tk.ink === 'trace' ? 'ws-trace' : ''}" data-ws-ink="${tk.ink}">${tk.ch}</span>` : '<span></span>')).join('');
-    if (answer === 'traced' && ans !== null) html += pad(String(ans)).map((ch) => `<span class="ws-trace">${ch === ' ' ? '' : ch}</span>`).join('');
-    if (answer === 'solid' && ans !== null) html += pad(String(ans)).map((ch) => `<span data-ws-ink="solid" style="font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums">${ch === ' ' ? '' : ch}</span>`).join('');
+    // Lessons r2 (VA-4, AK-1): the open answer zone is a REAL row, as tall as the answer strip
+    // (12 mm at L, 10 mm at M), so the pupil page and its key - whose answer digits fill that
+    // row - share one geometry: the key never redraws the problem higher or its Check lower.
+    if (answer === 'open') html += `<span class="ansrow" aria-hidden="true"></span>`;
+    if (answer === 'traced' && ans !== null) html += pad(String(ans)).map((ch) => `<span class="ws-trace an">${ch === ' ' ? '' : ch}</span>`).join('');
+    if (answer === 'solid' && ans !== null) html += pad(String(ans)).map((ch) => `<span class="an" data-ws-ink="solid" style="font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums">${ch === ' ' ? '' : ch}</span>`).join('');
     if (answer === 'slots' && slots) {
         // A null slot is a track with no box (the operator track, SL-12): the strip skips it.
         const live = slots.filter((s) => s !== null && s !== undefined).length;
@@ -243,7 +247,9 @@ const isSub = (p) => p.op === '-' || p.op === '−';
 function checkRowHtml(p, ctx, key) {
     const [A, B] = (p.operands || [p.a, p.b]).map((o) => String(o ?? ''));
     const d = Math.max(2, A.length);
-    return `<div class="ws-checkrow"><b>Check:</b>${blank(checkSlot('check-ans', d), ctx, key)}<span>+</span><span class="ws-checkn">${esc(B)}</span><span>=</span>${blank(checkSlot('check-sum', d), ctx, key)}</div>`;
+    // Lessons r2: the sum is one unbreakable group, so a narrow cell (3 across) puts it on a line
+    // under "Check:" instead of overflowing the cell.
+    return `<div class="ws-checkrow"><b>Check:</b><span class="ws-checkeq">${blank(checkSlot('check-ans', d), ctx, key)}<span>+</span><span class="ws-checkn">${esc(B)}</span><span>=</span>${blank(checkSlot('check-sum', d), ctx, key)}</span></div>`;
 }
 
 /** The scaffold the ladder asks for, resolved once (SCC-Q10: the ctx decides, not the generator). */

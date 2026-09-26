@@ -1023,6 +1023,25 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     // The lesson's second example: never the example's own numbers turned round.
     const fq = (a, b) => ({ q: { a, b, op: '+', text: `${a} + ${b} = ?`, cell: { template: 'fact', payload: { a, b, op: '+' } } }, template: 'fact' });
     ok(L.CASE_TESTS.bigSecond(fq(2, 5)) && !L.CASE_TESTS.bigSecond(fq(5, 2)), 'lesson: the big-number-second case');
+    // Lessons r2: the three rounding cases (up, down, ends in 5), for the chart and the Guided set.
+    const rq = (n) => ({ q: { text: `Round ${n} to the nearest 10.`, cell: { template: 'pv', payload: { kind: 'round', n, place: 10 } } }, template: 'pv' });
+    eq([77, 42, 35, 71, 50].map((n) => ['roundUp', 'roundDown', 'endsFive'].filter((t) => L.CASE_TESTS[t](rq(n))).join('+') || '-').join(' '),
+        'roundUp roundDown endsFive - -', 'lesson: 77 rounds up, 42 down, 35 ends in 5; 71 and 50 are none of the three');
+    const pool = [77, 42, 35, 86, 23, 65].map(rq);
+    const data = { second: { test: 'roundDown' }, third: { test: 'endsFive' }, guided: ['roundUp', 'roundDown', 'endsFive'] };
+    const ex2 = L.pickSecond(pool, pool[0], data);
+    const ex3 = L.pickSecond(pool, pool[0], data, 'third', [ex2]);
+    ok(L.CASE_TESTS.roundDown(ex2) && L.CASE_TESTS.endsFive(ex3) && ex2 !== ex3, 'lesson: the chart\'s second and third examples are the other two cases');
+    const gd = L.pickWeDo(pool.filter((x) => x !== ex2 && x !== ex3), pool[0], data, 3);
+    eq(gd.map((x) => ['roundUp', 'roundDown', 'endsFive'].find((t) => L.CASE_TESTS[t](x))).join(','), 'roundUp,roundDown,endsFive', 'lesson: the rounding Guided set is up, down, ends in 5');
+    // The Guided tens boxes are writing places: as tall as the answer strip (12 mm at L).
+    const box = /<rect[^>]*height="([\d.]+)"/.exec(L.roundLineSvg({ lo: 40, hi: 50, n: 47, r: 50, lineMm: 34, boxHmm: 12, boxDigits: 3, emptyTens: true }));
+    eq(box && Number(box[1]), 12, 'lesson: a Guided tens box is 12 mm tall at L');
+    // VA-4 / AK-1: the open answer zone is a real row, so the pupil page and the key share one layout.
+    ok(/class="ansrow"/.test(stack('67', '18', '-', { answer: 'open' })) && /class="an"/.test(stack('67', '18', '-', { answer: 'solid', ans: 49 })),
+        'stack: the open answer row is reserved on the pupil page; the key writes into a row of the same height');
+    const chk = renderCell({ cell: { template: 'stack', payload: { a: 67, b: 18, op: '-', check: true } } }, resolveCtx({ mode: 'print', size: 'L', state: 'blank' }));
+    ok(/ws-checkrow"><b>Check:<\/b><span class="ws-checkeq">/.test(chk), 'stack: the Check sum is one group (it wraps under "Check:" in a narrow cell)');
 }
 
 /* ======================================================================= report */

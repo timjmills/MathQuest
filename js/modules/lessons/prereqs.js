@@ -67,6 +67,8 @@ export const LESSONS = Object.freeze({
         // The chart's second example: the big number SECOND (lessons r1: the Guided and practice
         // items put it on either side, so the chart models both).
         second: { test: 'bigSecond', label: 'Big number second? Start with it.' },
+        // Lessons r2: counting on 0 is not counting on (the chart never shows it): no + 0 item.
+        minOperand: 1,
         mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'counting:count_objects', opts: { band: 10 } }],
     },
 
@@ -101,9 +103,16 @@ export const LESSONS = Object.freeze({
         example: { match: 'Regroup a ten' },
         // The second example: a 0 in the ones (the edge case: 0 is smaller than any digit).
         second: { test: 'zeroOnes', label: '0 ones? Regroup a ten.' },
+        // The check step's words, without the step name's own "Check:" (lessons r2).
+        words: [{ from: '^Check:\\s*', to: '' }],
         // Practice cells give step 5 its room: a Check line under every problem.
         checkRow: true,
-        mixWith: [{ key: 'addition:add_100_regroup' }],
+        // Lessons r2: no two problems of a page share a top number.
+        distinctFirst: true,
+        // ... and every top number is past the teens (11 - 6 is a fact, not regrouping).
+        minTop: 20,
+        // Lessons r2: the partner is 2-digit addition (never 2 + 8 in a carry scaffold).
+        mixWith: [{ key: 'addition:add_100_regroup', minOperand: 10 }],
     },
 
     // ------------------------------------------------- Round to the nearest 10 / 100 (3)
@@ -124,7 +133,7 @@ export const LESSONS = Object.freeze({
         ],
         steps: [
             { icon: 'ends', text: 'Find the two tens.' },
-            { icon: 'look', text: 'Look at the ones digit.' },
+            { icon: 'look', text: 'Look at the ones.' },
             { icon: 'decide', text: 'Round up or down.' },
             { icon: 'write', text: 'Write the ten.' },
         ],
@@ -136,11 +145,15 @@ export const LESSONS = Object.freeze({
         example: { match: 'round up', prefer: '\\b\\d[678]\\b' },
         // The second example rounds DOWN (the first rounds up): both directions of the rule.
         second: { test: 'roundDown', label: '4 or less? Round down.' },
+        // The third case (lessons r2): a 5 in the ones rounds UP - the half the rule decides.
+        third: { test: 'endsFive', label: '5 in the ones? Round up.' },
+        // Guided Practice: one of each case, in this order (up, down, ends in 5).
+        guided: ['roundUp', 'roundDown', 'endsFive'],
         // The provider's words, in the lesson's own terms ("the cut" is never taught here).
         words: [{ from: '^The digit after the cut is (\\d+):.*$', to: 'The ones digit is $1.' }],
         // Mixed practice: EARLIER skills only, each from its own strand (lessons r1: never nearest
         // 100, which comes after, and never two "Number Sense" sections).
-        mixWith: [{ key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }, { key: 'addition:add_100_regroup' }],
+        mixWith: [{ key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }, { key: 'addition:add_100_regroup', minOperand: 10 }],
     },
 });
 
@@ -152,7 +165,10 @@ export function lessonFor(categoryId, skillId) {
 /** `{categoryId, skillId, opts?}` of a 'category:skill' key. */
 export function skillRef(entry) {
     const [categoryId, skillId] = String(entry.key || '').split(':');
-    return entry.opts ? { categoryId, skillId, opts: Object.assign({}, entry.opts) } : { categoryId, skillId };
+    const ref = entry.opts ? { categoryId, skillId, opts: Object.assign({}, entry.opts) } : { categoryId, skillId };
+    // `minOperand` (lessons r2): the packet's floor on every operand (2-digit addition only).
+    if (entry.minOperand !== undefined) ref.minOperand = entry.minOperand;
+    return ref;
 }
 
 export default { LESSONS, STEP_ICONS, lessonFor, skillRef };

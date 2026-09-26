@@ -73,6 +73,26 @@ are unreadable at S; an S request prints at M and says so), and its anchor chart
    `Check: ___ + 18 = ___` line (step 5 given room). Keys fill the regroup boxes (VA-13 / AK-2).
 4. **Mixed practice** (optional) with the lesson's step strip, the lesson skill and EARLIER skills
    only, each from its own strand (never a later skill such as nearest 100).
+
+Lessons r2 (critic 22/48, fixes in round 3):
+- The chart RESERVES its other examples before it enlarges the panels. First layout that fits:
+  the second example's row of states (add: 2 + 5); else the panels at >= 0.85 zoom with the OTHER
+  CASES drawn whole under them (round: 42 -> 40 "4 or less? Round down." and 55 -> 60 "5 in the
+  ones? Round up.", lesson data `third`); else one 3-column grid of the panels, the closing step as
+  a panel (a subtraction's check drawn as its own column addition) and the other example whole
+  (subtract: 70 - 23, "0 ones? Regroup a ten."). Only when none fits does the chart show one case.
+- Guided: `guided: [cases]` in the lesson data picks one cell per case (round: up, down, ends in
+  5). Cells that do not fit beside the Steps list, or a list much taller than its cells, put the
+  steps in a STRIP over three full-width cells (the chant then rides on the `Rule:` line). A
+  Steps list beside taller cells spreads over its panel. Rounding tens boxes are writing places:
+  as tall as the answer strip (12 / 9.6 mm), three digits wide.
+- Every column problem reserves its answer row (12 mm at L, 10 mm at M) on the pupil page, so the
+  page and its key share one layout; the Check sum wraps under `Check:` in a narrow cell.
+- Lesson data floors (host, per skill ref): `minOperand` (no + 0 in "add 1-3"; 2-place partner
+  addition on a Mixed page), `minTop` (no 11 - 6 in 2-place regrouping), `distinctFirst` (no
+  repeated top number). The lesson skill fills at least half the Mixed page (its weight).
+- An S request prints at M, and the print panel says so beside the Size control and above the
+  preview (`LESSON_SIZE_NOTE`), not only under "Why?".
 Every sheet's teacher footer carries the tags: skill id, grade, primary CCSS, EEs (`standards.js`).
 The per-lesson data (prerequisite skills, concepts, vocabulary with pictures, the steps with their
 icons, the chant and why) lives in `js/modules/lessons/prereqs.js`, shaped to grow into the

@@ -160,6 +160,13 @@ function dealSkills(skills, count) {
  * reprints the same page); a duplicate retries under `baseSeed + i + 7919 * k`. `itemIndex`
  * counts only the items of that skill that were KEPT (generateQuestionFor's contract).
  */
+/** The numeric operands of a generated item (its cell payload's, else its own a / b). */
+function refOperands(q) {
+    const p = (q && q.cell && q.cell.payload) || {};
+    const raw = Array.isArray(p.operands) ? p.operands : p.a !== undefined ? [p.a, p.b] : [q.a, q.b];
+    return raw.filter((v) => v !== undefined && v !== null && v !== '').map((v) => Number(String(v).replace(/,/g, ''))).filter(Number.isFinite);
+}
+
 function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map(), itemCount = null } = {}) {
     const slots = dealSkills(skills, startIndex + count).slice(startIndex);
     // S2: a ticked support LEVEL fades down the page. With the section's count known it is dealt
@@ -178,6 +185,14 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
             let cand = null;
             try { cand = generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex, itemCount: perSkill ? perSkill.get(key) : undefined }); } catch (e) { cand = null; }
             if (!cand) continue;
+            // A lesson's skill ref (lessons r2): `minOperand` keeps every operand at or above it
+            // (an "add 1-3" page never deals + 0; a mixed page's 2-digit addition never deals
+            // 2 + 8). Not a skill option - the packet's; the last retry takes what it gets.
+            if (sk.minOperand !== undefined && k < RETRIES && refOperands(cand).some((v) => v < Number(sk.minOperand))) continue;
+            // `distinctFirst`: no two items of the skill share a first operand (36 - 29, 36 - 18).
+            // `minTop`: the first operand at least this (a 2-place regrouping never deals 11 - 6).
+            if (sk.minTop !== undefined && k < RETRIES && !(refOperands(cand)[0] >= Number(sk.minTop))) continue;
+            if (sk.distinctFirst && k < RETRIES && seen.has(`first:${key}:${refOperands(cand)[0]}`)) continue;
             q = cand;
             if (!seen.has(signature(cand))) break;
         }
@@ -186,6 +201,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // ("Check: add back") under every subtraction stack. Not a skill option - the page's.
         if (sk.check && q.cell && q.cell.template === 'stack') q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { check: true }) });
         seen.add(signature(q));
+        if (sk.distinctFirst) seen.add(`first:${key}:${refOperands(q)[0]}`);
         kept.set(key, itemIndex + 1);
         out.push({ q, skill: sk });
     });
@@ -1841,8 +1857,19 @@ async function buildRoleSheet(n, metaOf) {
  * tags (skill, grade, CCSS, EE from standards.js) in its teacher footer. The pupil pages print
  * first, part by part, then the keys in the same order (PT-KEY-6).
  */
+/** The note a lesson asked for at S carries (the print panel shows it as a warning). */
+export const LESSON_SIZE_NOTE = 'A lesson prints at Medium or Large: Small is printed at Medium, because its regroup boxes, place-value letters and step words are too small to write in at Small.';
+
 async function buildLesson(n, metaOf) {
-    const sk = n.sections[0].skills[0];
+    const sk0 = n.sections[0].skills[0];
+    const data0 = lessonFor(sk0.categoryId, sk0.skillId);
+    // The lesson's floor on its own operands (lessons r2: "add 1-3" never deals + 0), on every part.
+    const flags = {};
+    if (data0 && data0.minOperand !== undefined && sk0.minOperand === undefined) flags.minOperand = data0.minOperand;
+    if (data0 && data0.distinctFirst) flags.distinctFirst = true;
+    if (data0 && data0.minTop !== undefined) flags.minTop = data0.minTop;
+    const sk = Object.keys(flags).length ? Object.assign({}, sk0, flags) : sk0;
+    if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
     const data = lessonFor(sk.categoryId, sk.skillId);
     const warmSkills = data ? data.skills.map(skillRef) : earlierSkills(sk, 2);
@@ -1859,7 +1886,8 @@ async function buildLesson(n, metaOf) {
     // letters and the step words are unreadable at S), and its ANCHOR CHART is a wall chart: L type
     // at every size. S is printed as M and says so in the notes.
     const size = n.size === 'S' ? 'M' : n.size;
-    const sizeNote = size !== n.size ? [`A lesson packet prints at M or L: S is printed at M (lessons r1).`] : [];
+    // (Shown in the print panel beside the Size control, not only under "Why?": lessons r2.)
+    const sizeNote = size !== n.size ? [LESSON_SIZE_NOTE] : [];
     const nz = Object.assign({}, n, { size });
     const lessonInput = { data, warmSkills, tagLine, number: lessonNo };
 
@@ -1890,17 +1918,31 @@ async function buildLesson(n, metaOf) {
     // One-line answers: the engine fills the page (PAGE FILL, DN-1) - one frame, no row gaps,
     // because the count is the page's own. Taller problems: 12.1's six a page, 2 x 3, each cell
     // with its working space and Check line.
-    const section = facts ? { skills: [practiceSk], pages: 0, noCap: true, dense: { S: 16, M: 16, L: 15 } } : { skills: [practiceSk], count: 0, columns: 2, noCap: true };
-    const practiceReq = (pages, withStrip) => Object.assign({}, common, {
+    // Lessons r2: a rounding cell ("27 -> ___") is short and narrow: M prints three across like L,
+    // six rows (18), not two columns of eight.
+    const rounding = (teach.items || []).some((it) => it.pool === 'main' && it.template === 'pv');
+    const section = facts ? { skills: [practiceSk], pages: 0, noCap: true, dense: rounding ? { S: 18, M: 18, L: 15 } : { S: 16, M: 16, L: 15 } } : { skills: [practiceSk], count: 0, columns: 2, noCap: true };
+    // Taller problems: 12.1's six a page (2 x 3) at every size - an Independent page holds 6 at
+    // most, so M is the same six cells in smaller type (lessons r2: by design, not a missed gain).
+    const stackShapes = [[6, 2]];
+    const practiceReq = (pages, withStrip, shape = stackShapes[stackShapes.length - 1]) => Object.assign({}, common, {
         role: 'independent', tabId: `Practice ${lessonNo}`,
-        sections: [facts ? Object.assign({}, section, { pages }) : Object.assign({}, section, { count: 6 * pages })],
+        sections: [facts ? Object.assign({}, section, { pages }) : Object.assign({}, section, { count: shape[0] * pages, columns: shape[1] })],
         seed: (n.seed + 7919) >>> 0,
         stepStrip: withStrip && stripHtml ? { html: stripHtml, hMm: stripH } : undefined,
     });
+    const practiceTried = [];
     if (n.practicePages > 0) {
-        let res = await buildSheet(practiceReq(n.practicePages, true));
+        let res = null;
+        for (const shape of facts ? [null] : stackShapes) {
+            const r = await buildSheet(practiceReq(n.practicePages, true, shape || undefined));
+            const f0 = r.fits && r.fits.sections && r.fits.sections[0];
+            const whole = f0 ? f0.clamped !== true : true;
+            practiceTried.push({ shape, pages: r.pageCount, clamped: !whole, hMin: f0 && f0.hMin, cellH: f0 && f0.cellH, stripH: +stripH.toFixed(1) });
+            if (r.pageCount <= n.practicePages && whole) { res = r; break; }
+        }
         // The strip never pushes a page overleaf: without room for it the page prints without it.
-        if (res.pageCount > n.practicePages) res = await buildSheet(practiceReq(n.practicePages, false));
+        if (!res) res = await buildSheet(practiceReq(n.practicePages, false));
         parts.push({ part: 'practice', role: 'independent', res, strip: /data-mq-lesson-strip/.test(res.pupilHtml) });
     }
 
@@ -1910,7 +1952,10 @@ async function buildLesson(n, metaOf) {
         const withSkills = data && data.mixWith ? data.mixWith.map(skillRef) : earlierSkills(sk, 2);
         const res = await buildSheet(Object.assign({}, common, {
             // The lesson's own look (I Can) unless the teacher chose Daily for the packet.
-            role: 'mixed-practice', look: n.lookAsked === 'daily' ? 'daily' : 'ican', sections: [{ skills: [practiceSk, ...withSkills] }], latticeN: 6,
+            // Lessons r2: the lesson's own skill fills at least half the page (its weight is the
+            // partners' together), the earlier skills the rest.
+            role: 'mixed-practice', look: n.lookAsked === 'daily' ? 'daily' : 'ican',
+            sections: [{ skills: [Object.assign({}, practiceSk, { weight: Math.max(1, withSkills.length) + 0.5 }), ...withSkills] }], latticeN: 6,
             seed: (n.seed + 15838) >>> 0,
             stepStrip: stripHtml ? { html: stripHtml, hMm: stripH } : undefined,
         }));
@@ -1952,7 +1997,9 @@ async function buildLesson(n, metaOf) {
             steps: data ? data.steps.map((s) => s.text) : [], chant: data ? data.chant : '', format: data ? data.format : null,
             parts: parts.map((p) => ({ part: p.part, role: p.role, pages: p.res.pageCount, keyPages: p.res.keyPageCount, strip: p.strip })),
             example: chart.plan && chart.plan.meta ? chart.plan.meta.example : '',
-            chart: chart.plan && chart.plan.meta ? { zoom: chart.plan.meta.chartZoom, example2: chart.plan.meta.example2, example2Found: chart.plan.meta.example2Found, sizing: chart.plan.meta.chartSizing } : null,
+            chart: chart.plan && chart.plan.meta ? { zoom: chart.plan.meta.chartZoom, example2: chart.plan.meta.example2, example2Found: chart.plan.meta.example2Found, sizing: chart.plan.meta.chartSizing, example3: chart.plan.meta.example3 } : null,
+            practiceTried,
+            teach: teach.plan && teach.plan.meta ? { bands: teach.plan.meta.bandSizes, guided: teach.plan.meta.guided, independent: teach.plan.meta.independent } : null,
             size,
         },
     };

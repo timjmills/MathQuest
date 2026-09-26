@@ -14,6 +14,7 @@ import { ICON_CSS } from './lesson-icons.js';
 
 export const LESSON_CSS = `
 :is(.ws-page,.ws-sheet){--mq-lesson-accent:${LESSON_ACCENT}}
+:is(.ws-page,.ws-sheet) svg :is(text,tspan)[data-ws-ink="trace"]{fill:#949494!important}
 ${ICON_CSS}
 :is(.ws-page,.ws-sheet) .mq-lnum{flex:none;font-style:normal;box-sizing:border-box;width:6.4mm;height:6.4mm;border:1pt solid var(--mq-lesson-accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:max(11pt,var(--ws-zone));font-weight:700;color:var(--mq-lesson-accent);line-height:1}
 :is(.ws-page,.ws-sheet) .mq-lstrip{flex:none;display:flex;align-items:flex-start;gap:3mm;padding:1.6mm 0 2mm;border-bottom:var(--ws-hair) solid var(--ws-ink);margin-bottom:1mm;font-size:max(11pt,var(--ws-zone));line-height:1.2}
@@ -26,6 +27,12 @@ ${ICON_CSS}
 :is(.ws-page,.ws-sheet) .mq-lsteps li>span{min-width:0}
 :is(.ws-page,.ws-sheet) .mq-lstepszone{padding:2.5mm 3mm 0 3mm}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-lstepscell{padding:0;justify-content:flex-start;align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-lstepsbox{display:flex;flex-direction:column}
+:is(.ws-page,.ws-sheet) .mq-lstepsbox>.mq-lstepszone{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-evenly;padding-bottom:2.5mm}
+:is(.ws-page,.ws-sheet) .mq-lstepsbox .mq-lsteps{flex:1 1 auto;justify-content:space-evenly}
+:is(.ws-page,.ws-sheet) .mq-lwedotop>.mq-lstrip{padding-left:3mm;padding-right:3mm;margin-bottom:0}
+:is(.ws-page,.ws-sheet) .mq-lstripchant{flex:none;display:flex;align-items:center;gap:3mm;padding:0 3mm;font-size:max(11pt,calc(var(--ws-text) - 2pt));line-height:1.2;border-bottom:var(--ws-hair) solid var(--ws-ink)}
+:is(.ws-page,.ws-sheet) .mq-lstripchant>span{font-weight:700}
 :is(.ws-page,.ws-sheet) .mq-lchant{margin:3mm 0 0;font-size:max(11pt,calc(var(--ws-text) - 2pt));font-weight:700;line-height:1.2}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-cstatecell{justify-content:center;align-items:stretch;padding:3mm 4mm}
 :is(.ws-page,.ws-sheet) .mq-cstate{width:100%;min-height:0;display:flex}
@@ -47,6 +54,15 @@ ${ICON_CSS}
 :is(.ws-page,.ws-sheet) .mq-c2nums{display:flex;gap:1.5mm}
 :is(.ws-page,.ws-sheet) .mq-cwords{font-size:var(--ws-text);line-height:1.3;display:flex;flex-direction:column;gap:.8mm}
 :is(.ws-page,.ws-sheet) .mq-cstate-col>.mq-cwords{text-align:center}
+:is(.ws-page,.ws-sheet) .mq-cstate-n{gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-cstate-n .mq-chead{font-size:var(--ws-text);gap:1mm 1.8mm;flex-wrap:wrap;justify-content:center}
+:is(.ws-page,.ws-sheet) .mq-cstate-n .mq-chead>b{flex:1 1 100%;text-align:center}
+:is(.ws-page,.ws-sheet) .mq-cstate-n .mq-chead>.mq-lnum{width:8.5mm;height:8.5mm;font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-cfinalcell{justify-content:center;align-items:stretch;padding:2.5mm 3mm}
+:is(.ws-page,.ws-sheet) .mq-cfinal{width:100%;display:flex;flex-direction:column;align-items:center;gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-cfinal-h{font-size:var(--ws-text);line-height:1.25;text-align:center}
+:is(.ws-page,.ws-sheet) .mq-cfinal-h>b{font-weight:700;display:block}
+:is(.ws-page,.ws-sheet) .mq-cfinal>.mq-cdraw{align-items:center}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-cdrawcell{padding:0;justify-content:flex-start;align-items:flex-start}
 :is(.ws-page,.ws-sheet) .ws-band.mq-cchantband{flex:none;display:flex;align-items:center}
 :is(.ws-page,.ws-sheet) .mq-cchant{display:flex;align-items:center;gap:5mm;padding:0 3mm;width:100%}
@@ -65,7 +81,7 @@ ${ICON_CSS}
 :is(.ws-page,.ws-sheet) .mq-lvword{display:flex;flex-direction:column;align-items:center;gap:1.5mm;font-size:var(--ws-text)}
 :is(.ws-page,.ws-sheet) .mq-lvword b{font-weight:700}
 :is(.ws-page,.ws-sheet) .mq-ldot{display:block;width:2mm;height:2mm;border-radius:50%;background:#000}
-:is(.ws-page,.ws-sheet) .mq-lvgap{position:relative;height:calc(var(--ws-hw) * 1.3)}
+:is(.ws-page,.ws-sheet) .mq-lvgap{position:relative;height:calc(var(--ws-hw) * 1.05)}
 :is(.ws-page,.ws-sheet) .mq-lvgap>svg{position:absolute;left:0;top:-1mm;width:100%;height:calc(100% + 2mm);overflow:visible}
 :is(.ws-page,.ws-sheet) .mq-lwarmrow .mq-rowcol+.mq-rowcol{border-left:var(--ws-hair) solid var(--ws-ink)}
 :is(.ws-page,.ws-sheet) .mq-lwarmcol{display:flex;flex-direction:column;min-width:0}
