@@ -26,6 +26,25 @@ The home screen shows **six large, visual actions** and nothing else competing w
   app's cohesive teacher/student style. Touch targets ≥ 44 px; phone, tablet and desktop layouts.
 - Everything else (sets, progress, settings, quizzes list) moves out of the home screen into a small secondary menu.
 
+## Make quiz (owner, 2026-09-26)
+
+"For make a quiz it can be done by CCSS domain, specific CCSS or EE standards, by WRM units, lessons etc. — can be tagged
+to. Questions can be tagged to specific standards. But you can use the same practice paper engine, just with score /
+custom score per problem / type of problem and the tagging of problems."
+
+- **Same engine as Practice.** A Quiz is a Practice paper with scoring and tags switched on — no separate quiz renderer.
+- **Build it from what you teach to:** pick by **CCSS domain** (e.g. 3.NBT), **specific CCSS standards or lettered parts**,
+  **EE standards**, **WRM year → block (unit) → small step**, or **lessons** in the library — or plain skills. The
+  quiz finds the skills tagged to that choice (`skillsForStandard`, `skillsForWrmStep`, the lesson library) and adds
+  them with equal weights (editable, as in Practice).
+- **Every question is tagged** to its standard(s): CCSS code / part, EE code, WRM step. The tag prints small on the
+  teacher key (and in the score summary), never on the pupil page (HD-6: codes only in the footer / key).
+- **Scoring:** a default score per question (1), a **custom score per question**, or a **score per type of question**
+  (e.g. all 2-step word problems = 3 points); the total and a per-standard subtotal print on the key and the score box.
+- Versions A / B… with new numbers; size S / M / L (floors §8a).
+- The key adds a **standards breakdown**: points per CCSS / EE / WRM step, so the teacher sees which standards a pupil
+  missed.
+
 ## Browsing skills, sets, lessons
 
 - **Thumbnail view and list view everywhere** a teacher picks from many things (skills library, the skill picker inside
