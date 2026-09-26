@@ -35,13 +35,25 @@ function _mSet(id) {
     return d.length ? d : legal;
 }
 
-// AP2 round 4: where this item sits on a printed page (its item index), or a live cursor. A page
-// turns through its themes, question kinds, shapes and objects by this, so two items side by
-// side never repeat one question (critic round 5), and every page mixes its kinds.
+// AP2 round 5 (critic figures-r6, L10): themes, question kinds, shapes, objects and the marks a
+// ruler reads are DEALT from the seeded rng, never turned through by the item's place on the page
+// (a pupil could read the pattern). The item index serves the Support level (it fades down a
+// page, O3) and the answers already on the page (no answer on most of a page's items).
 let _mLive = 0;
 const _mAt = () => (Number.isFinite(state.itemIndex) ? state.itemIndex : (_mLive++));
 const _mOnPage = () => Number.isFinite(state.itemIndex);
-const _mTurn = (list, at, mult = 1) => (_mOnPage() ? list[((at * mult) % list.length + list.length) % list.length] : pick(list));
+// The answers dealt so far on this page (a page restarts at item 0). An answer already on a
+// third of the page is dealt again, so "2, 2, 1, 2" never fills a test.
+let _mPageAns = [];
+function _mNoteAnswer(at, ans) {
+    if (at === 0) _mPageAns = [];
+    _mPageAns.push(String(ans));
+}
+function _mFresh(at, ans) {
+    if (at === 0) return true;
+    const seen = _mPageAns.filter(a => a === String(ans)).length;
+    return seen < Math.max(1, Math.ceil((at + 1) / 3));
+}
 /** A whole-number option value, or null (unset, "As dealt"). */
 function _mNum(id) {
     const v = _mLook(id, null);
@@ -819,34 +831,39 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                         more: (a, b) => `How many more ${a.toLowerCase()} than ${b.toLowerCase()}?` },
                 ];
                 const at = _mAt();
-                const theme = _mTurn(themes, at);
-                const numCats = Math.min(_mNum('tiles') || pick([2, 3]), theme.items.length);
-                const rows = shuffle([...theme.items]).slice(0, numCats);
-                const cats = rows.map(r => r[0]);
-                const most = _mNum('most') || 5;
-                const counts = cats.map(() => randInt(1, most));
                 const forms = _mSet('forms') || [0, 1];
-                const askType = _mTurn(forms.map(f => ['count', 'more'][f]).filter(Boolean), at) || 'count';
-                let ask, text, ans;
-                if (askType === 'more') {
-                    if (Math.max(...counts) === Math.min(...counts)) counts[0] = counts[0] < most ? counts[0] + 1 : counts[0] - 1;
-                    const order = [...counts.keys()].sort((x, y) => counts[y] - counts[x]);
-                    const i = order[0], j = order[order.length - 1];
-                    ans = counts[i] - counts[j];
-                    text = theme.more(cats[i], cats[j]);
-                    ask = { kind: 'more', i, j };
-                } else {
-                    // a count on a graph whose rows differ (never every row the same)
-                    if (Math.max(...counts) === Math.min(...counts) && counts.length > 1) counts[1] = counts[1] < most ? counts[1] + 1 : counts[1] - 1;
-                    const i = randInt(0, numCats - 1);
-                    ans = counts[i];
-                    text = theme.count(cats[i]);
-                    ask = { kind: 'value', i };
+                const most = _mNum('most') || 5;
+                let theme, rows, cats, counts, ask, text, ans, askType;
+                for (let tries = 0; tries < 8; tries++) {
+                    theme = pick(themes);
+                    const numCats = Math.min(_mNum('tiles') || pick([2, 3]), theme.items.length);
+                    rows = shuffle([...theme.items]).slice(0, numCats);
+                    cats = rows.map(r => r[0]);
+                    counts = cats.map(() => randInt(1, most));
+                    askType = pick(forms.map(f => ['count', 'more'][f]).filter(Boolean)) || 'count';
+                    if (askType === 'more') {
+                        // two rows set apart by 1 to most - 1, the larger at random
+                        const [i, j] = shuffle([...cats.keys()]).slice(0, 2);
+                        counts[j] = randInt(1, most - 1);
+                        counts[i] = counts[j] + randInt(1, most - counts[j]);
+                        ans = counts[i] - counts[j];
+                        text = theme.more(cats[i], cats[j]);
+                        ask = { kind: 'more', i, j };
+                    } else {
+                        // a count on a graph whose rows differ (never every row the same)
+                        if (Math.max(...counts) === Math.min(...counts) && counts.length > 1) counts[1] = counts[1] < most ? counts[1] + 1 : counts[1] - 1;
+                        const i = randInt(0, cats.length - 1);
+                        ans = counts[i];
+                        text = theme.count(cats[i]);
+                        ask = { kind: 'value', i };
+                    }
+                    if (_mFresh(at, ans)) break;
                 }
+                _mNoteAnswer(at, ans);
                 const plain = _mLook('objects', 'pictures') === 'shapes';
                 const payload = { title: theme.title, categories: cats, values: counts, scale: 1,
                     icons: rows.map(r => (plain ? 'circle' : r[1])), catTitle: theme.cat, valTitle: theme.val, ask,
-                    kinds: forms.map(f => ['value', 'more'][f]).filter(Boolean), scales: [1], question: text, answer: ans, support: _mLevel(at) };
+                    kinds: forms.map(f => ['value', 'more'][f]).filter(Boolean), scales: [1], question: text, answer: ans, support: _mLevel(at), widest: most };
                 q.cell = { template: 'pictograph', v: 1, payload };
                 q.visual = k2Twin('pictograph', payload);
                 q.text = text;
@@ -882,39 +899,43 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                         count: c => `How many ${c.toLowerCase()} books?`, more: (a, b) => `How many more ${a.toLowerCase()} books than ${b.toLowerCase()} books?` },
                 ];
                 const at = _mAt();
-                const theme = _mTurn(themes, at, 2);
-                const numCats = Math.min(_mNum('tiles') || pick([2, 3]), theme.items.length);
-                const cats = theme.items.slice(0, numCats);
                 const top = _mNum('most') || 5;
-                const counts = cats.map(() => randInt(1, top));
-                // the kinds the teacher ticked (forms: 0 most, 1 how many, 2 how many more), turned
-                // through down the page
+                // the kinds the teacher ticked (forms: 0 most, 1 how many, 2 how many more), dealt
                 const forms = _mSet('forms') || [0, 1, 2];
                 const order = [1, 2, 0].filter(f => forms.includes(f));
-                const askType = ['most', 'count', 'more'][_mTurn(order.length ? order : [1], at)] || 'count';
-                let ask, text, ans;
-                if (askType === 'most') {
-                    // one bar is the most: break a tie
-                    const maxVal = Math.max(...counts);
-                    const tops = counts.map((c, i) => (c === maxVal ? i : -1)).filter(i => i >= 0);
-                    if (tops.length > 1) { if (counts[tops[0]] < top) counts[tops[0]]++; else counts[tops[1]]--; }
-                    ans = cats[counts.indexOf(Math.max(...counts))];
-                    text = 'Which has the most?';
-                    ask = { kind: 'most' };
-                } else if (askType === 'more') {
-                    if (Math.max(...counts) === Math.min(...counts)) counts[0] = counts[0] < top ? counts[0] + 1 : counts[0] - 1;
-                    const ord = [...counts.keys()].sort((x, y) => counts[y] - counts[x]);
-                    const i = ord[0], j = ord[ord.length - 1];
-                    ans = counts[i] - counts[j];
-                    text = theme.more(cats[i], cats[j]);
-                    ask = { kind: 'more', i, j };
-                } else {
-                    if (Math.max(...counts) === Math.min(...counts) && counts.length > 1) counts[1] = counts[1] < top ? counts[1] + 1 : counts[1] - 1;
-                    const i = randInt(0, cats.length - 1);
-                    ans = counts[i];
-                    text = theme.count(cats[i]);
-                    ask = { kind: 'value', i };
+                let theme, cats, counts, ask, text, ans, askType;
+                for (let tries = 0; tries < 8; tries++) {
+                    theme = pick(themes);
+                    const numCats = Math.min(_mNum('tiles') || pick([2, 3]), theme.items.length);
+                    // the bars in a dealt order, so the tallest is not the first bar
+                    cats = shuffle(theme.items.slice()).slice(0, numCats);
+                    counts = cats.map(() => randInt(1, top));
+                    askType = ['most', 'count', 'more'][pick(order.length ? order : [1])] || 'count';
+                    if (askType === 'most') {
+                        // one bar is the most: a tie is broken at a dealt bar
+                        const maxVal = Math.max(...counts);
+                        const tops = shuffle(counts.map((c, i) => (c === maxVal ? i : -1)).filter(i => i >= 0));
+                        if (tops.length > 1) { if (counts[tops[0]] < top) counts[tops[0]]++; else counts[tops[1]]--; }
+                        ans = cats[counts.indexOf(Math.max(...counts))];
+                        text = 'Which has the most?';
+                        ask = { kind: 'most' };
+                    } else if (askType === 'more') {
+                        const [i, j] = shuffle([...cats.keys()]).slice(0, 2);
+                        counts[j] = randInt(1, top - 1);
+                        counts[i] = counts[j] + randInt(1, top - counts[j]);
+                        ans = counts[i] - counts[j];
+                        text = theme.more(cats[i], cats[j]);
+                        ask = { kind: 'more', i, j };
+                    } else {
+                        if (Math.max(...counts) === Math.min(...counts) && counts.length > 1) counts[1] = counts[1] < top ? counts[1] + 1 : counts[1] - 1;
+                        const i = randInt(0, cats.length - 1);
+                        ans = counts[i];
+                        text = theme.count(cats[i]);
+                        ask = { kind: 'value', i };
+                    }
+                    if (_mFresh(at, ans)) break;
                 }
+                _mNoteAnswer(at, ans);
                 const orientation = _mLook('bars', 'vertical') === 'horizontal' ? 'horizontal' : 'vertical';
                 const payload = { title: theme.title, categories: cats, values: counts, step: 1, top, half: false,
                     orientation, catTitle: theme.cat, valTitle: theme.val, ask,
@@ -947,10 +968,14 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 const at = _mAt();
                 const kindsOn = _mSet('shapes') || [0, 1, 2, 3];
                 const order = [0, 2, 1, 3].filter(k => kindsOn.includes(k));
-                const kind = ['rectangle', 'square', 'triangle', 'pentagon'][_mTurn(order.length ? order : [0], at)];
+                const kind = ['rectangle', 'square', 'triangle', 'pentagon'][pick(order.length ? order : [0])];
                 const band = _mNum('band');
                 const sideMax = band ? Math.max(4, Math.min(15, Math.floor(band / 3.2))) : 10;
+                // "Perimeter up to" (default about 40) is the bound the page keeps: a deal past it is
+                // dealt again (critic figures-r6: "Up to about 40" dealt 44)
+                const limit = band || 40;
                 let shape = kind, sides, sideLabels;
+                for (let tries = 0; tries < 40; tries++) {
                 if (kind === 'rectangle') {
                     const w = randInt(2, Math.max(2, sideMax - 1));
                     let l = randInt(2, sideMax);
@@ -976,6 +1001,8 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     const roof = randInt(base / 2 + 1, Math.max(base / 2 + 1, Math.min(sideMax, base)));
                     sides = [base, wall, roof, roof, wall];  // base, right wall, right roof, left roof, left wall
                     sideLabels = { base, wall, roof };
+                }
+                if (sides.reduce((x, y) => x + y, 0) <= limit) break;
                 }
                 const ans = sides.reduce((x, y) => x + y, 0);
                 const unit = pick(['cm', 'm']);
@@ -1181,17 +1208,27 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 const at = _mAt();
                 const hard = measSkill === "reading_ruler_hard";
                 const parts = _mSet('parts') || (hard ? [0, 1, 2] : [0]);
-                const kindAt = _mTurn(parts, at);
                 const res = parts.includes(2) ? 4 : parts.includes(1) ? 2 : 1;
+                // AP2 round 5 (L10): the marks each item reads are DEALT. A page of one fine part
+                // (half or quarter inches alone) also deals the coarser readings it contains - a
+                // whole inch, and on a quarter page a half - so the fraction is never the same on
+                // every item. The page's first item (a Guided page's Model) reads the finest marks.
+                const finest = Math.max(...parts);
+                const pool = parts.length > 1 ? parts : finest === 2 ? [2, 2, 2, 1, 0] : finest === 1 ? [1, 1, 0] : [0];
+                const kindAt = at === 0 && _mOnPage() ? finest : pick(pool);
                 const moved = _mLook('measure', 'zero') === 'moved';
-                const start = moved ? _mTurn([1, 2, 1], at) : 0;
+                const start = moved ? rng(1, 2) : 0;
                 const room = 6 - start;
                 let meas;
-                if (kindAt === 0) meas = rng(1, Math.min(room, 6));
-                else if (kindAt === 1) meas = rng(0, room - 1) + 0.5;
-                else meas = rng(0, room - 1) + pick([0.25, 0.75]);
+                for (let tries = 0; tries < 8; tries++) {
+                    if (kindAt === 0) meas = rng(1, Math.min(room, 6));
+                    else if (kindAt === 1) meas = rng(0, room - 1) + 0.5;
+                    else meas = rng(0, room - 1) + pick([0.25, 0.75]);
+                    if (_mFresh(at, meas)) break;
+                }
+                _mNoteAnswer(at, meas);
                 const ans = _inchText(meas);
-                const object = _mTurn(['pencil', 'crayon', 'ribbon', 'straw'], at);
+                const object = pick(['pencil', 'crayon', 'ribbon', 'straw']);
                 const payload = { len: 6, start, meas, res, labels: _mLook('labels', 'all'), object, ans, support: _mLevel(at) };
                 q.cell = { template: 'ruler', v: 1, payload };
                 q.visual = k2Twin('ruler', payload);
@@ -1220,13 +1257,13 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 const at = _mAt();
                 const forms = _mSet('forms');
                 const units = (forms || [0, 1]).map(i => ['°F', '°C'][i]).filter(Boolean);
-                const unit = _mTurn(units.length ? units : ['°F', '°C'], at);
+                const unit = pick(units.length ? units : ['°F', '°C']);
                 const step = _mNum('step') === 2 ? 2 : 1;
                 const span = 20 * step;
                 const some = _mLook('labels', 'all') === 'some';
                 const every = step === 2 ? (some ? 20 : 10) : (some ? 10 : 5);
                 const band = _mNum('band');
-                const below = _mLook('belowZero', 'never') === 'some' && at % 3 === 1;
+                const below = _mLook('belowZero', 'never') === 'some' && rng(1, 3) === 1;
                 const top = band || (unit === '°F' ? 100 : 40);
                 const floor = below ? -span + 10 : (band ? 0 : (unit === '°F' ? 30 : 0));
                 const los = [];

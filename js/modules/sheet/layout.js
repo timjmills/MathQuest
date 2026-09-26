@@ -483,9 +483,26 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     if (requested === 'auto') {
         // DN-15: the largest N up to the Auto cap that fits with the Auto margins. It never
         // returns 1 when 2 fit, because it counts DOWN from the cap and stops at the first fit.
-        const top = Math.min(cls === 'word' || cls === 'wide' ? 1 : (target ? target.cols : 2), autoCap, hardCap);
+        // A footprint may raise Auto's column target (`fp.autoCols`) when EVERY item of the section
+        // asks for it - a narrow picture cell, a thermometer (critic figures-r6: 2 columns on the
+        // independent S page where the Test holds 3). Width is still measured (probe below).
+        const fpAuto = infos.length && infos.every((i) => Number(i.fp && i.fp.autoCols) > 0)
+            ? Math.min(...infos.map((i) => Number(i.fp.autoCols))) : 0;
+        const top = Math.min(cls === 'word' || cls === 'wide' ? 1 : Math.max(target ? target.cols : 2, fpAuto), Math.max(autoCap, fpAuto), hardCap);
         cols = 1;
         for (let c = Math.max(1, top); c >= 1; c--) { if (probe(c, true).fits) { cols = c; break; } }
+        // A cell that restacks by width (`fp.byCapacity`: a graph with its question beside it in
+        // one column, under it in two) takes the column count that holds the MOST problems, not
+        // simply the most columns: two half-width graphs a page can be fewer than three full ones.
+        if (cols > 1 && infos.length && infos.every((i) => i.fp && i.fp.byCapacity)) {
+            const perAt = (c) => {
+                const pr = probe(c, c > 1);
+                return pr.fits ? c * Math.max(1, Math.floor((G - SAFETY_H_MM) / Math.max(1, pr.hMin))) : 0;
+            };
+            let best = cols, bestN = perAt(cols);
+            for (let c = cols - 1; c >= 1; c--) { const k = perAt(c); if (k > bestN) { best = c; bestN = k; } }
+            cols = best;
+        }
         if (cls === 'word') reason = 'Word problems print in 1 column.';
         else if (cls === 'wide') reason = 'Wide pictures use the full width.';
     } else {

@@ -213,7 +213,9 @@ function fit(frame) {
         frame.classList.add('is-cropped');
         stage.style.top = '0';
         stage.style.transformOrigin = 'top center';
-        stage.style.transform = `translate(-50%, 0) scale(${CROP_SCALE})`;
+        // never wider than the frame: a wide graph keeps its left edge and its scale (critic
+        // figures-r6: "the sample is clipped")
+        stage.style.transform = `translate(-50%, 0) scale(${Math.min(CROP_SCALE, fw / w).toFixed(4)})`;
         return;
     }
     frame.classList.remove('is-cropped');

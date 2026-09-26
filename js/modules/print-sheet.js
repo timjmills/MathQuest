@@ -27,7 +27,7 @@ import { factSetTitle, optionsFor, normalizeOptions } from './skill-options.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, groupByAnswerShape } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
@@ -1457,7 +1457,8 @@ export async function buildSheet(req = {}) {
                 if (again >= want) break;
                 want = again;
             }
-            hostItems = hostItems.concat(items);
+            // check-box items after the box items, never mixed down the page (RUBRIC C1)
+            hostItems = hostItems.concat(groupByAnswerShape(items));
         });
     } else {
         // MORE PRACTICE: each letter under its own seed (PT-MPR-2). The first letter's probe fixes
@@ -1691,7 +1692,8 @@ async function buildRoleSheet(n, metaOf) {
                 out.push(prepared);
             }
         }
-        return out;
+        // check-box items after the box items (RUBRIC C1); the Model (item 0) keeps its place
+        return out.length > 2 && n.role === 'guided' ? [out[0]].concat(groupByAnswerShape(out.slice(1))) : groupByAnswerShape(out);
     };
     const measure = (items) => measureItems(items, { size: n.size, look: n.look, colsList });
 

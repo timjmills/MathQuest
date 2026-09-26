@@ -5,7 +5,7 @@ import { shuffle, normalizeText } from './utils.js';
 import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
 import { openZoomModal, ZOOM_CLICK_IS_ANSWER_TYPES } from './question-render.js';
 import { generateQuestion, generateQuestionFor } from './generate-question.js';
-import { deriveSeed } from './sheet/index.js';
+import { deriveSeed, groupByAnswerShape } from './sheet/index.js';
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
@@ -1534,6 +1534,9 @@ function _wsRenderCard(grid, q, i) {
             wireClozeBanks(cellEl);
             // the place-value mat needs three zones side by side: its card takes the whole row (round 3)
             if (twin.mode === 'build' && q.answerType === 'pv-build') { card.classList.add('mq-span-row'); card.dataset.mqSpan = '1'; }
+            // a ruler is read to the quarter inch: its card takes the whole row, so the ruler draws
+            // at the practice card's scale, not squeezed into a third of the sheet (critic figures-r6)
+            if (q.cell && q.cell.template === 'ruler') { card.classList.add('mq-span-row'); card.dataset.mqSpan = '1'; }
             if ((twin.mode === 'build' || twin.mode === 'model') && inp) {
                 const row = cellEl.querySelector(':scope > .mq-answerrow');
                 if (row) row.style.display = 'none';
@@ -1715,11 +1718,12 @@ export function newWorksheet() {
     // honoured, so a sheet is reproducible and a configured skill deals the same items here as
     // on paper. Mixed pools still mix: the mixed category / skill ids route inside the dispatcher.
     state.worksheetSeed = (Math.random() * 0x100000000) >>> 0;
-    for (let i = 0; i < total; i++) {
-        const q = _wsGenerate(i);
-        state.worksheetQs.push(q);
-        _wsRenderCard(grid, q, i);
-    }
+    // One answer shape per run of cards (RUBRIC C1, critic figures-r6): the check-box cards of a
+    // data sheet follow the number cards, never between them.
+    // (_wsGenerate reads the items dealt so far, so they are kept in order first.)
+    for (let i = 0; i < total; i++) state.worksheetQs.push(_wsGenerate(i));
+    state.worksheetQs = groupByAnswerShape(state.worksheetQs, (q) => q);
+    state.worksheetQs.forEach((q, i) => _wsRenderCard(grid, q, i));
     _wsScheduleLayout(grid);
     _wsHeaderPill();
 

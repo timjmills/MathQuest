@@ -18,6 +18,7 @@
 //
 // Pure module (SCC-01).
 
+import { getProvider } from '../index.js';
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, planItem, gridPart, instructionPart, assemble, poolItems,
     answerOf, opOf, operandsOf, esc, blank, writeLine, checkLine, slotKey,    judgeGroup,
@@ -34,6 +35,16 @@ const toInt = (v) => Number(String(v).replace(/,/g, ''));
 /** The open task of one question (`open(q)` default): prompt, columns, example row, key rows. */
 export function openTask(it, size = 'L') {
     const q = it.q || {};
+    // SCC-P: a skill's own open problem (`open(q)`) comes first - a graph, a ruler, a thermometer
+    // or a figure has an open task of its own, never the "two numbers add to N" adapter (critic
+    // figures-r6, H3). It returns {prompt, columns, example, keyRows, total?, rule?}.
+    try {
+        const p = getProvider(q.categoryId || '', q.skillId || '');
+        const own = typeof p.open === 'function' ? p.open(q, { size, rows: EMPTY_ROWS[size] || 5 }) : null;
+        if (own && Array.isArray(own.prompt) && Array.isArray(own.columns) && Array.isArray(own.keyRows)) {
+            return Object.assign({ rule: '', total: Infinity }, own, { basic: false });
+        }
+    } catch (e) { /* the default adapter below */ }
     const ans = answerOf(it);
     const op = opOf(q);
     const ops = operandsOf(q);
@@ -144,7 +155,16 @@ export function counts(pools, input) {
 
 export function plan(input = {}) {
     const ctx = ctxOf(input);
-    const all = poolItems(input, 'main');
+    // never the same open problem twice on one page (critic figures-r6)
+    const seen = new Set();
+    const all = poolItems(input, 'main').filter((it) => {
+        const t = it.thinking && it.thinking.task;
+        const k = t ? `${t.prompt.join(' ')}|${t.columns.join('|')}` : null;
+        if (k === null) return true;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+    });
     const n = Math.max(1, Math.min(ctx.size === 'S' ? 2 : 1, all.length));
     const items = all.slice(0, n);
     const basic = items.some((it) => it.thinking && it.thinking.task && it.thinking.task.basic);

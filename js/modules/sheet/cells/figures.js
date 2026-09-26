@@ -125,7 +125,7 @@ register('thermometer', {
         return { value: Number(p.temp), display: `${signed(p.temp)} ${p.unit || ''}`.trim(), slots: { answer: { value: signed(p.temp), graded: true } } };
     },
     // up to 3 across (a thermometer and one box are narrow); the page measures what fits
-    footprint(p, ctx) { return { wMm: ctx && !isTwin(ctx) && sizeOf(ctx) === 'S' ? 54 : 62, hMm: null, measure: true, factLike: false, maxCols: 3 }; },
+    footprint(p, ctx) { return { wMm: ctx && !isTwin(ctx) && sizeOf(ctx) === 'S' ? 54 : 62, hMm: null, measure: true, factLike: false, maxCols: 3, autoCols: 3 }; },
     inputs() { return [{ id: 'answer', kind: 'number', shape: 'box', graded: true, order: 0, inputmode: 'numeric', scopes: ['full', 'answer-only'] }]; },
     layout() { return { card: 'card-medium-visual', checker: 'value', requiresVisual: true }; },
 });
@@ -176,8 +176,8 @@ export function rulerSVG(p, ctx) {
     // with bigger numerals (a phone shows it 320 px wide)
     const inch = isTwin(ctx) ? 17 : 25.4, inset = 4;
     // the body is as tall as its marks and numbers need; S packs it closer (five rulers to a page)
-    const bodyW = len * inch + 2 * inset, bodyH = isTwin(ctx) ? 14 : ({ S: 12.3, M: 13, L: 14 }[sizeOf(ctx)] || 14);
-    const objH = isTwin(ctx) ? 6 : ({ S: 4.5, M: 5, L: 5.5 }[sizeOf(ctx)] || 5.5);
+    const bodyW = len * inch + 2 * inset, bodyH = isTwin(ctx) ? 14 : ({ S: 11.6, M: 12.4, L: 13 }[sizeOf(ctx)] || 13);
+    const objH = isTwin(ctx) ? 6 : ({ S: 4, M: 5, L: 5.5 }[sizeOf(ctx)] || 5.5);
     const y0 = objH + 2.5;                                // the body's top edge, under the object
     const numPt = isTwin(ctx) ? 19 : textPt(ctx);
     const x = (inches) => SW.hair / 2 + inset + inches * inch;
@@ -217,11 +217,14 @@ function rulerSlot(p, ctx) {
         const graded = id === 'w' ? shown.w !== '' : shown.n !== '';
         return box(ctx, { id, value: val(id), w, h: hh, mark: 'cell', graded });
     };
-    const frac = `<span style="display:inline-flex;flex-direction:column;align-items:center;flex:none;">${one('n', 12, fb)}`
-        + `<span aria-hidden="true" style="display:block;align-self:stretch;min-width:${L(ctx, 12)};border-top:${B(ctx, 1.5)} solid ${INK};margin:${L(ctx, 0.8)} 0;"></span>`
-        + `${one('d', 12, fb)}</span>`;
+    // the screen twin's fraction boxes are a touch target each (>= 44 px on a phone card, critic
+    // figures-r6): wider and taller than the paper boxes
+    const fw = isTwin(ctx) ? 17 : 12, fhh = isTwin(ctx) ? fb + 3 : fb;
+    const frac = `<span style="display:inline-flex;flex-direction:column;align-items:center;flex:none;">${one('n', fw, fhh)}`
+        + `<span aria-hidden="true" style="display:block;align-self:stretch;min-width:${L(ctx, fw)};border-top:${B(ctx, 1.5)} solid ${INK};margin:${L(ctx, 0.8)} 0;"></span>`
+        + `${one('d', fw, fhh)}</span>`;
     return `<span data-ws-slot-group="mixed"${isTwin(ctx) ? ' data-mq-join="mixed"' : ''} style="display:inline-flex;align-items:center;gap:${L(ctx, 1.5)};flex:none;">`
-        + `${one('w', 14, h)}${frac}</span>`;
+        + `${one('w', isTwin(ctx) ? 17 : 14, isTwin(ctx) ? h + 3 : h)}${frac}</span>`;
 }
 
 register('ruler', {
@@ -267,9 +270,11 @@ register('ruler', {
  * width (one scale per worksheet).
  */
 const PLOT = Object.freeze({ S: [80, 46], M: [90, 62], L: [100, 80] });
-const TWIN_PLOT = Object.freeze([118, 64]);
+// the twin: one plot size for every graph of a worksheet (critic figures-r6: "one graph scale
+// per worksheet"), five slots wide whatever the number of bars
+const TWIN_PLOT = Object.freeze([130, 64]);
 /** mm between two lines of the scale on paper: [short scale (6 lines or fewer), long scale]. */
-const GRID_PITCH = Object.freeze({ S: [4, 2.9], M: [4.6, 4.2], L: [6, 4.5] });
+const GRID_PITCH = Object.freeze({ S: [4, 2.6], M: [4.6, 4.2], L: [6, 4.5] });
 /** The shortest paper plot, and the narrowest bar slot / the height of a bar's row (horizontal). */
 const PLOT_MIN = Object.freeze({ S: 20, M: 28, L: 36 });
 const SLOT_MIN = Object.freeze({ S: 14, M: 16, L: 18 });
@@ -284,22 +289,26 @@ export function barGraphSVG(p, ctx) {
     const cats = (p.categories || []).map(String);
     const vals = (p.values || []).map(Number);
     const n = Math.max(1, cats.length);
-    const step = Number(p.step) || 1, top = Number(p.top) || Math.max(...vals, 1);
+    const step = Number(p.step) || 1;
+    let top = Number(p.top) || Math.max(...vals, 1);
     const twin = isTwin(ctx);
     const sz = PLOT[sizeOf(ctx)] ? sizeOf(ctx) : 'L';
     const [pw0, ph0] = twin ? TWIN_PLOT : PLOT[sz];
     const zPt = labelPt(ctx), zMm = zPt * PT_MM;
+    const long = Math.round(top / step) > 6;
+    // an S page and the screen twin number every other line of a long scale (the lines stay; the
+    // numbers would touch). The scale then ENDS on a numbered line, one more line when it must:
+    // 0, 4, 8, ... 20, never "16, 18" at the top (critic figures-r6, H2).
+    const every = long && (twin || sz === 'S') ? 2 : 1;
+    if (every === 2 && Math.round(top / step) % 2) top += step;
     const steps = [];
     for (let v = 0; v <= top + 1e-9; v += step) steps.push(+v.toFixed(6));
     const nSt = Math.max(1, steps.length - 1);
-    const long = nSt > 6;
-    // an S page numbers every other line of a long scale (the lines stay; 3 mm is too close for
-    // a number on each)
-    const every = !twin && sz === 'S' && long ? 2 : 1;
-    const named = (k) => k % every === 0 || k === nSt;
+    const named = (k) => k % every === 0;
     const a = p.ask || {};
     // the hint's bars: the one asked, the two compared, or every bar
-    const guides = !hintOn(p, ctx) ? [] : a.kind === 'value' ? [a.i] : a.kind === 'more' ? [a.i, a.j] : vals.map((_, i) => i);
+    // (a "most" or "in all" question reads every bar: no line across the whole plot for it)
+    const guides = !hintOn(p, ctx) ? [] : a.kind === 'value' ? [a.i] : a.kind === 'more' ? [a.i, a.j] : [];
     let s = '';
     let W, H;
     if (p.orientation !== 'horizontal') {
@@ -309,9 +318,9 @@ export function barGraphSVG(p, ctx) {
         // slot only when a name needs it
         // the twin: every number of the scale a line apart (they ran together on a long scale,
         // critic regrade 5) and every name inside its own slot
-        const slotW = twin ? Math.max(pw0 / n, catW + 4) : Math.max(catW + 3, SLOT_MIN[sz]);
+        const slotW = twin ? Math.max(pw0 / Math.max(n, 5), catW + 4) * Math.max(n, 5) / n : Math.max(catW + 3, SLOT_MIN[sz]);
         const PW = slotW * n;
-        const PH = twin ? Math.max(ph0, nSt * zMm * 1.02) : Math.min(ph0, Math.max(PLOT_MIN[sz], nSt * GRID_PITCH[sz][long ? 1 : 0]));
+        const PH = twin ? Math.max(ph0, (nSt / every) * zMm * 1.3) : Math.min(ph0, Math.max(PLOT_MIN[sz], nSt * GRID_PITCH[sz][long ? 1 : 0]));
         const valTitleY = zMm * 1.0;
         const x0 = Math.max(valLabW + 3, 1), yTop = valTitleY + 3.2, yBot = yTop + PH;
         const yOf = (v) => yBot - (v / top) * PH;
@@ -426,7 +435,30 @@ function dataCell(name, draw) {
             const v = asksBar(p) ? String(p.answer) : Number(p.answer);
             return { value: v, display: String(p.answer), slots: { answer: { value: String(p.answer), graded: true } } };
         },
-        footprint() { return { wMm: 186, hMm: null, measure: true, factLike: false, maxCols: 1 }; },
+        // RUBRIC H13 (critic figures-r6): the cell is as wide as its drawing. A drawing that fits
+        // half the page (a picture table, a tally chart, a small or S bar graph) stands two to a
+        // row, its question under it; a wide one keeps the full width, the question beside it.
+        footprint(p, ctx) {
+            // The width of the WIDEST drawing the skill deals (its longest row, its longest name, a
+            // bar graph's five bars), so every item of a page takes one cell width - a page never
+            // mixes half-width and full-width graphs.
+            const q = p || {};
+            const scale = Number(q.scale) || 1;
+            const canon = name === 'bar-graph'
+                ? (Number(q.step) === 1 && Number(q.top) <= 10 && (q.categories || []).length <= 3
+                    ? Object.assign({}, q, { categories: ['Nature', 'Nature', 'Nature'], values: [1, 1, 1] }) : null)
+                : name === 'pictograph'
+                    ? Object.assign({}, q, { categories: ['Triangles'], values: [(Number(q.widest) || 6) * scale] })
+                    : Object.assign({}, q, { categories: ['Purple'], values: [Number(q.widest) || 15] });
+            let W = 186;
+            try { if (canon) W = draw(canon, ctx || {}).W; } catch (e) { W = 186; }
+            // Two to a row when the drawing fits half the page (the question then stands under
+            // it); the layout keeps whichever column count holds more problems (byCapacity).
+            const two = W + 4 <= 84;
+            // restacks: the question stands under the drawing in a half-width cell on purpose (not a
+            // collapse, print-sheet's reflow rule)
+            return { wMm: two ? Math.ceil(Math.max(W, 44) + 4) : 186, hMm: null, measure: true, factLike: false, maxCols: two ? 2 : 1, restacks: true, byCapacity: true };
+        },
         inputs(p) {
             return asksBar(p)
                 ? [{ id: 'answer', kind: 'check', shape: 'check', graded: true, order: 0, scopes: ['full'] }]
@@ -506,7 +538,8 @@ export function pictographSVG(p, ctx) {
     const pitch = d + (twin ? 2.5 : 2);
     const counts = vals.map((v) => v / scale);
     // the twin keeps the widest table a skill deals (5 or 6 pictures), so every graph shares a scale
-    const maxPics = twin ? Math.max(scale === 1 ? 5 : 6, ...counts.map(Math.ceil)) : Math.max(3, ...counts.map(Math.ceil));
+    // every table of a page is as wide as the widest row the skill deals (`widest`)
+    const maxPics = Math.max(twin ? (scale === 1 ? 5 : 6) : 3, Number(p.widest) || 0, ...counts.map(Math.ceil));
     const iconOf = (i) => (Array.isArray(p.icons) && p.icons[i]) || p.icon || 'circle';
     const hint = hintOn(p, ctx);
     const hPt = hintPt(ctx), hMm = hPt * PT_MM;
@@ -531,7 +564,8 @@ export function pictographSVG(p, ctx) {
     });
     // the key: every picture of the graph once (one picture, or each row's), "= scale"
     const kinds = [...new Set(vals.map((_, i) => iconOf(i)))];
-    const kPt = Math.max(zonePt(ctx), 11) * (twin ? 1.35 : 1);
+    // the key decides the answer: on screen it is as big as the question (critic figures-r6)
+    const kPt = twin ? textPt(ctx) * 1.35 : Math.max(zonePt(ctx), 11);
     const kd = d * 0.85;
     const keySvg = (id) => svg(ctx, kd + 1, kd + 1, picture(id, (kd + 1) / 2, (kd + 1) / 2, kd), { label: `picture` });
     const unit = scale === 1 ? '1' : String(scale);
@@ -556,7 +590,7 @@ export function tallySVG(p, ctx) {
     const hPt = hintPt(ctx), hLab = hint ? textW('20', hPt) + 1.5 : 0;
     const bundleW = 4 * pitch + (twin ? 5 : 4) + hLab;
     const widthOf = (v) => Math.floor(v / 5) * bundleW + (v % 5) * pitch;
-    const markW = twin ? Math.max(4 * bundleW, ...vals.map(widthOf)) : Math.max(...vals.map(widthOf), 10);
+    const markW = Math.max(twin ? 4 * bundleW : 10, widthOf(Number(p.widest) || 0), ...vals.map(widthOf));
     return rowTable(p, ctx, {
         markW, rowH: h + (twin ? 4 : sizeOf(ctx) === 'S' ? 2.5 : 3), head2: p.valTitle || 'Tally',
         cell: (i, x, y) => {

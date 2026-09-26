@@ -1308,3 +1308,8 @@ html body .mq-scell input.mq-workbox:focus { box-shadow: inset 0 0 0 3px #000; }
 /* a start-unknown number line: the given point is where the hops land - a hollow ring, never the
    filled start dot (round 4) */
 html body .mq-scell .mq-nl-start.mq-nl-given .mq-nl-mark::after { background: #fff !important; border: 3px solid #000; box-sizing: border-box; }
+
+/* AP2 round 5 (critic figures-r6): a worksheet row of graphs starts every graph at the top of its
+   card, so the tables and scales line up across the row (they were centred in cards of the
+   row's height, 18-24% blank above some). */
+.online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard > .mq-wspaper > .ws-cell.mq-scell:has(.fg-bar-graph, .fg-pictograph, .fg-tally-chart) { justify-content: flex-start; }

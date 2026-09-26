@@ -43,14 +43,12 @@ function _dSet(id) {
     return d.length ? d : legal;
 }
 
-// AP2 round 4: where this item sits on a printed page (its item index), or a live cursor. A page
-// turns through its contexts and its question kinds by this, so two items side by side never ask
-// the same question of the same graph (critic round 5: "the identical question twice on a test").
+// AP2 round 5 (critic figures-r6, L10): every context, question kind, key and bar order is DEALT
+// from the seeded rng, never turned through by the item's place on the page (a pupil could read
+// the pattern). The item index serves only the Support level, which fades down a page (O3).
 let _dLive = 0;
 const _dAt = () => (Number.isFinite(state.itemIndex) ? state.itemIndex : (_dLive++));
 const _dOnPage = () => Number.isFinite(state.itemIndex);
-/** One of `list` for this item: turned through by the item index on a page, dealt when live. */
-const _dTurn = (list, at, mult = 1) => (_dOnPage() ? list[((at * mult) % list.length + list.length) % list.length] : pick(list));
 
 /** The Support level of this item (O3): the ticked levels dealt most-support-first down a page. */
 function _dLevel(at) {
@@ -895,16 +893,16 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 // bar. A page turns through its contexts and its question kinds (AP2 round 4), and
                 // the Support level draws the grey read-across lines (a hint that fades).
                 const at = _dAt();
-                const context = _dTurn(BAR_CONTEXTS, at, 2);
+                const context = pick(BAR_CONTEXTS);
                 const numBars = _dNum('tiles') || pick([4, 5]);
-                const categories = context.cats.slice(0, numBars);
+                const categories = shuffle(context.cats.slice()).slice(0, numBars);
                 const barMax = _dNum('most') || 20;
                 const step = barMax <= 10 ? 1 : barMax <= 20 ? 2 : barMax <= 50 ? 5 : 10;
                 const half = step === 2 || step === 10;
                 const unit = half ? step / 2 : step;
                 const kMax = Math.max(2, Math.floor(barMax / unit));
                 const kinds = _dKinds({ 0: ['most', 'least'], 1: ['value'], 2: ['more'], 3: ['total'] });
-                const kind = _dTurn(kinds, at);
+                const kind = pick(kinds);
                 const deal = () => categories.map(() => unit * rng(half ? 2 : 1, kMax));
                 const d = _dataAsk(kind, context, categories, deal(), deal, unit);
                 const values = d.vals;
@@ -931,13 +929,13 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 // numbers are set by the key and "Most pictures in a row", never by the Max Number
                 // (critic round 5: "Up to 10" dealt totals of 60).
                 const at = _dAt();
-                const context = _dTurn(BAR_CONTEXTS, at, 2);
+                const context = pick(BAR_CONTEXTS);
                 const numRows = _dNum('tiles') || pick([3, 4, 5]);
-                const categories = context.cats.slice(0, numRows);
+                const categories = shuffle(context.cats.slice()).slice(0, numRows);
                 const _sc = _dOpt('scale');
                 const ticked = Array.isArray(_sc) && _sc.length ? _sc : [0, 1, 2];
                 const scaleOpts = ticked.map(i => [2, 5, 10, 25][i]).filter(Boolean);
-                const scale = _dTurn(scaleOpts.length ? scaleOpts : [2, 5], at);
+                const scale = pick(scaleOpts.length ? scaleOpts : [2, 5]);
                 const most = _dNum('most') || 6;
                 const halves = (scale === 2 || scale === 10) && _dOpt('halves') !== 'never';
                 // a row of 1 to `most` pictures; at a key of 2 or 10 about one row in three ends in
@@ -950,11 +948,11 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 if (halves && !first.some(v => (v / scale) % 1)) first[rng(0, first.length - 1)] += scale / 2;
                 first = first.map(v => Math.min(v, most * scale));
                 const kinds = _dKinds({ 0: ['most', 'least'], 1: ['value'], 2: ['total'], 3: ['more'] });
-                const kind = _dTurn(kinds, at);
+                const kind = pick(kinds);
                 const d = _dataAsk(kind, context, categories, first, deal, halves ? scale / 2 : scale);
                 const icon = _dOpt('objects') === 'shapes' ? 'circle' : context.pic;
                 const payload = { title: context.title, categories, values: d.vals, scale, icon, catTitle: context.cat, valTitle: context.val,
-                    ask: d.ask, kinds, scales: scaleOpts, question: d.text, answer: d.ans, support: _dLevel(at) };
+                    ask: d.ask, kinds, scales: scaleOpts, question: d.text, answer: d.ans, support: _dLevel(at), widest: most };
                 _dataCell(q, 'pictograph', payload);
                 q.ccss = "3.MD.B.3";
                 q.hint = `Count the pictures in the row by ${scale}s.${halves ? ` Half a picture is ${scale / 2}.` : ''}`;
@@ -1058,15 +1056,16 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 // contexts and question kinds; the Support level prints the grey running count after
                 // each bundle of five (a hint that fades).
                 const at = _dAt();
-                const context = _dTurn(BAR_CONTEXTS, at, 2);
+                const context = pick(BAR_CONTEXTS);
                 const numRows = _dNum('tiles') || pick([3, 4, 5]);
-                const categories = context.cats.slice(0, numRows);
+                const categories = shuffle(context.cats.slice()).slice(0, numRows);
                 const _tMost = _dNum('most');
                 const deal = () => categories.map(() => (_tMost ? rng(_tMost <= 5 ? 1 : 3, _tMost) : rng(3, 15)));
                 const kinds = _dKinds({ 0: ['value'], 1: ['most', 'least'], 2: ['total'], 3: ['more'] });
-                const kind = _dTurn(kinds, at);
+                const kind = pick(kinds);
                 const d = _dataAsk(kind, context, categories, deal(), deal, 1);
-                const payload = { title: context.title, categories, values: d.vals, catTitle: context.cat, valTitle: 'Tally',
+                // widest: the longest row the skill deals, so every chart of a page takes one cell width
+                const payload = { title: context.title, categories, values: d.vals, catTitle: context.cat, valTitle: 'Tally', widest: _tMost || 15,
                     rules: _dOpt('rules') === 'open' ? 'open' : 'ruled', ask: d.ask, kinds, question: d.text, answer: d.ans, support: _dLevel(at) };
                 _dataCell(q, 'tally-chart', payload, { screenInstr: 'Use the tally chart. Answer the question.' });
                 q.ccss = "1.MD.C.4";

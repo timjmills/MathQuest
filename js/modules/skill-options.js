@@ -2694,8 +2694,8 @@ const _o2Add = (key, ...defs) => {
     ['coordinates:coordinate_graph', _o2Band([5], { label: 'Coordinates to', natural: 10, help: 'Every coordinate is at most this.' })],
     ['coordinates:net_surface_area', _o2RangeBand([50, 100], { label: 'Numbers to' })],
     // ---- graphs (gen-data-stats.js _dNum): how much there is to read
-    ['graphs:bar_graph', _o2Tiles('Bars', [3, 4, 5], '4 or 5', 'Fewer bars is the easier step.'),
-        _o2Most('Tallest bar up to', [5, 10, 50], 'up to 20', 'The largest value a bar shows. Up to 10 counts by 1; up to 20 by 2 and up to 50 by 5, where a bar may end half way.')],
+    ['graphs:bar_graph', _o2Tiles('Number of bars', [3, 4, 5], '4 or 5', 'Fewer bars is the easier step.'),
+        _o2Most('Tallest bar up to', [5, 10, 50], 'up to 20', 'The largest value a bar shows. Up to 10 counts by 1; up to 20 by 2, where a bar may end half way between two lines; up to 50 by 5.')],
     ['graphs:pictograph', _o2Tiles('Rows', [3, 4, 5], '3, 4 or 5', 'Fewer rows is the easier step.')],
     ['graphs:tally_chart', _o2Tiles('Rows', [3, 4, 5], '3, 4 or 5', 'Fewer rows is the easier step.'),
         _o2Most('Most tallies in a row', [5, 10, 20], '3 to 15', 'To 5 is one bundle of tallies; more bundles is harder to count.')],
@@ -2731,7 +2731,7 @@ const _ap2Labels = (values, dflt, words, help, helpShort) => ({
     help, helpShort: helpShort || 'How many numbers are written on the figure.',
 });
 const _ap2Bars = () => ({
-    id: 'bars', label: 'Bars', type: 'enum', group: 'layout', default: 'vertical',
+    id: 'bars', label: 'Bar direction', type: 'enum', group: 'layout', default: 'vertical',
     values: [{ v: 'vertical', l: 'Standing up (vertical)' + _AP2_DEFAULT }, { v: 'horizontal', l: 'Lying down (horizontal)' }],
     help: 'The same graph turned on its side: the categories go down the left and the scale runs along the bottom. The numbers and the question do not change.',
     helpShort: 'Bars standing up, or lying down.',
@@ -2803,14 +2803,13 @@ const _AP2_PICTURES = (words) => ({
 [
     ['graphs:bar_graph', _ap2Support('Level 2 draws a grey line from the end of each bar the question names across to the scale.')],
     ['measurement:bar_graph_intro',
-        _o2Tiles('Bars', [2, 3], '2 or 3', 'Two bars is the easier step.'),
+        _o2Tiles('Number of bars', [2, 3], '2 or 3', 'Two bars is the easier step.'),
         _o2Most('Tallest bar up to', [3, 10], 'up to 5', 'The top of the scale. Up to 3 is the first step; up to 10 has more lines to read against.'),
         _ap2Support('Level 2 draws a grey line from the end of each bar the question names across to the scale.')],
     ['graphs:pictograph',
         _o2Most('Most pictures in a row', [4, 8], 'up to 6', 'The longest row. With half pictures the longest row may end in half a picture.'),
-        { id: 'halves', label: 'Half pictures', type: 'enum', group: 'difficulty', default: 'some',
-            values: [{ v: 'some', l: 'Some rows end in half a picture' + _AP2_DEFAULT }, { v: 'never', l: 'Never' }],
-            help: 'With a key of 2 or 10, about one row in three ends in half a picture (half of the key). A key of 5 or 25 never uses halves.' },
+        // (Half pictures are not a control of their own - six controls at most (O5): with a key of
+        // 2 or 10 about one row in three ends in half a picture, the 3.MD.3 edge case.)
         _AP2_PICTURES('A child for "Number of children", a car for a car count'),
         _ap2Support('Level 2 writes the running count in grey under each picture (5, 10, 15 ...).')],
     ['measurement:pictograph_intro',

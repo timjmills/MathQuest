@@ -25,11 +25,169 @@ import { chooseWrong, strings, step, clampSteps, countList } from './util.js';
 
 const payloadOf = (q) => (q && q.cell && q.cell.payload) || {};
 const sum = (a) => a.reduce((s, v) => s + v, 0);
-
-/* ============================================================================ temperature */
-
 /** A temperature as a pupil writes it: the true minus sign below zero. */
 const deg = (v) => (v < 0 ? `−${Math.abs(v)}` : String(v));
+
+/* ============================================================================ open tasks */
+// AP2 round 5 (critic figures-r6, H3): the Stretch role's open problem for each figure skill -
+// several right answers about the skill's OWN model, a results table the pupil fills, and a last
+// column the pupil can check. Built from the item (pure: no rng), so two items give two tasks.
+// {prompt: [lines], columns, example (the traced row), keyRows (other answers), total}.
+
+/** A length in inches as printed in a table: 2, ½, 2¼ (a fraction glyph, never a slash). */
+const inchGlyph = (x) => {
+    const q4 = Math.round(x * 4), w = Math.floor(q4 / 4), r = q4 % 4;
+    const f = ['', '¼', '½', '¾'][r];
+    return w ? `${w}${f}` : (f || '0');
+};
+
+function tempOpen(q) {
+    const p = payloadOf(q);
+    const lo = Number(p.lo), hi = Number(p.hi), t = Number(p.temp);
+    const unit = String(p.unit || '°');
+    if (![lo, hi, t].every(Number.isFinite)) return null;
+    const span = hi - lo;
+    const rise = (3 + (Math.abs(t) % 6)) * (span > 20 ? 2 : 1);   // 3 to 8 degrees (6 to 16 on a 2-degree scale)
+    const starts = [];
+    for (let s = lo; s + rise <= hi; s += span / 5) starts.push(s);
+    if (starts.length < 4) return null;
+    const row = (s) => [deg(s), deg(s + rise), rise];
+    return {
+        prompt: [`The temperature went up ${rise} degrees.`, 'Where could it start and end? Find different ways.'],
+        columns: [`Start (${unit})`, `End (${unit})`, 'Check: went up'],
+        example: row(starts[0]),
+        keyRows: starts.slice(1).map(row),
+        total: Infinity,
+    };
+}
+
+function rulerOpen(q) {
+    const p = payloadOf(q);
+    const L = Number(p.meas), res = Number(p.res) || 1, len = Number(p.len) || 6;
+    if (!Number.isFinite(L) || L <= 0) return null;
+    const stepIn = res === 1 ? 1 : 0.5;
+    const starts = [];
+    for (let s = 0; s + L <= len + 1e-9; s += stepIn) starts.push(s);
+    if (starts.length < 4) return null;
+    const row = (s) => [inchGlyph(s), inchGlyph(s + L), inchGlyph(L)];
+    return {
+        prompt: [`A ${p.object || 'pencil'} is ${inchGlyph(L)} inches long.`, `It lies on a ${len}-inch ruler. Where can it start and end?`],
+        columns: ['Starts at', 'Ends at', 'Check: how long'],
+        example: row(starts[0]),
+        keyRows: starts.slice(1).map(row),
+        total: starts.length,
+    };
+}
+
+function perimeterOpen(q) {
+    const p = payloadOf(q);
+    const a = Number(p.ans);
+    if (!Number.isFinite(a)) return null;
+    const N = Math.max(16, Math.min(40, a - (a % 2)));
+    const half = N / 2;
+    const rows = [];
+    for (let l = half - 1; l >= half - l; l--) rows.push([l, half - l, N]);
+    if (rows.length < 4) return null;
+    const unit = p.unit ? ` ${p.unit}` : '';
+    return {
+        prompt: [`A rectangle has a perimeter of ${N}${unit}.`, 'How long and how wide can it be? Find different rectangles.'],
+        columns: ['Length', 'Width', 'Check: perimeter'],
+        example: rows[0],
+        keyRows: rows.slice(1),
+        total: rows.length,
+    };
+}
+
+/** Bar graph: three bars, one more than another by d, a given total. */
+function barOpen(q) {
+    const p = payloadOf(q);
+    const cats = (p.categories || []).map(String);
+    const vals = (p.values || []).map(Number);
+    if (cats.length < 2) return null;
+    if (q.skillId === 'bar_graph_intro' || cats.length < 3) {
+        // a Kindergarten graph: two bars, one taller than the other by d, each 6 or less
+        const d = 1 + (sum(vals) % 2);
+        const rows = [];
+        for (let b = 1; b + d <= 6; b++) rows.push([b + d, b, d]);
+        if (rows.length < 4) return null;
+        return {
+            prompt: [`Draw two bars. The ${cats[0]} bar is ${d} more than the ${cats[1]} bar.`, 'Find different ways. Each bar is 6 or less.'],
+            columns: [cats[0], cats[1], 'Check: how many more'],
+            example: rows[0],
+            keyRows: rows.slice(1),
+            total: rows.length,
+        };
+    }
+    const [A, B, C] = cats;
+    const d = 2 + (sum(vals) % 3);                          // 2, 3 or 4 more
+    const T = 20;
+    const rows = [];
+    for (let b = 1; 2 * b + d + 1 <= T; b++) rows.push([b + d, b, T - 2 * b - d, T]);
+    if (rows.length < 4) return null;
+    return {
+        prompt: [`A bar graph shows ${A}, ${B} and ${C}. The ${A} bar is ${d} more than the ${B} bar.`, `The bars show ${T} in all. Find different graphs.`],
+        columns: [A, B, C, 'Check: in all'],
+        example: rows[0],
+        keyRows: rows.slice(1),
+        total: rows.length,
+    };
+}
+
+/** Pictograph: one row of N shown with different keys. A graph of ones: two rows set d apart. */
+function pictoOpen(q) {
+    const p = payloadOf(q);
+    const cats = (p.categories || []).map(String);
+    const vals = (p.values || []).map(Number);
+    if (Number(p.scale) === 1 || !Number(p.scale)) {
+        if (cats.length < 2) return null;
+        const d = 1 + (sum(vals) % 2);
+        const rows = [];
+        for (let b = 1; b + d <= 6; b++) rows.push([b, b + d, d]);
+        if (rows.length < 4) return null;
+        return {
+            prompt: [`The ${cats[1]} row has ${d} more pictures than the ${cats[0]} row.`, 'Find different ways. Use 6 pictures or fewer in a row.'],
+            columns: [cats[0], cats[1], 'Check: how many more'],
+            example: rows[0],
+            keyRows: rows.slice(1),
+            total: rows.length,
+        };
+    }
+    const N = 10 * (2 + (sum(vals) % 3));                   // 20, 30 or 40
+    const keys = [1, 2, 5, 10].filter((k) => N % k === 0 && N / k <= 40);
+    const rows = keys.slice().reverse().map((k) => [k, N / k, N]);
+    if (rows.length < 4) return null;
+    return {
+        prompt: [`A row shows ${N} children.`, 'Each picture can stand for 1, 2, 5 or 10. Find different rows.'],
+        columns: ['Each picture stands for', 'Pictures in the row', 'Check: the row shows'],
+        example: rows[0],
+        keyRows: rows.slice(1),
+        total: rows.length,
+    };
+}
+
+/** Tally chart: a row between B and B + 10, as bundles of 5 and single marks. */
+function tallyOpen(q) {
+    const p = payloadOf(q);
+    const vals = (p.values || []).map(Number);
+    const B = 5 * (2 + (sum(vals) % 3));                    // 10, 15 or 20
+    const rows = [];
+    for (let v = B + 1; v < B + 10; v++) rows.push([Math.floor(v / 5), v % 5, v]);
+    return {
+        prompt: [`A tally row shows more than ${B} and less than ${B + 10}.`, 'Find different rows.'],
+        columns: ['Bundles of 5', 'Single marks', 'Check: the number'],
+        example: rows[0],
+        keyRows: rows.slice(1),
+        total: rows.length,
+    };
+}
+
+/** The open task of a data display, by what it draws. */
+const dataOpen = (q) => {
+    const t = (q && q.cell && q.cell.template) || 'bar-graph';
+    return t === 'pictograph' ? pictoOpen(q) : t === 'tally-chart' ? tallyOpen(q) : barOpen(q);
+};
+
+/* ============================================================================ temperature */
 
 function tempWrong(q) {
     const p = payloadOf(q);
@@ -84,6 +242,7 @@ registerSkill('measurement:temperature', {
     misconceptions: ['M-TM1', 'M-TM2', 'M-TM3', 'M-TM4', 'M-TM5'],
     workedSteps: (q) => clampSteps(tempSteps(q)),
     wrongAnswer: tempWrong,
+    open: tempOpen,
 });
 
 /* ============================================================================ ruler */
@@ -201,12 +360,14 @@ registerSkill('measurement:reading_ruler', {
     misconceptions: ['M-RL1', 'M-RL2', 'M-RL3', 'M-RL4', 'M-RL5'],
     workedSteps: (q) => clampSteps(rulerSteps(q)),
     wrongAnswer: rulerWrong,
+    open: rulerOpen,
 });
 registerSkill('measurement:reading_ruler_hard', {
     strings: rulerStrings('I Can measure to the inch'),
     misconceptions: ['M-RL1', 'M-RL2', 'M-RL3', 'M-RL4', 'M-RL5'],
     workedSteps: (q) => clampSteps(rulerSteps(q)),
     wrongAnswer: rulerWrong,
+    open: rulerOpen,
 });
 
 /* ============================================================================ bar graph, pictograph, tally chart */
@@ -394,6 +555,7 @@ const dataProvider = (iCan, instructionKey, steps, extra = []) => ({
     misconceptions: DATA_MISCONCEPTIONS.concat(extra),
     workedSteps: (q) => clampSteps(barSteps(q)),
     wrongAnswer: barWrong,
+    open: dataOpen,
 });
 const BAR_STEPS = ['Read the title and the words on each side.', 'Find the bar the question names.', 'Follow the end of the bar to the scale.'];
 registerSkill('graphs:bar_graph', dataProvider('I Can read a bar graph', 'graph', BAR_STEPS));
@@ -449,6 +611,7 @@ registerSkill('area_perimeter:perimeter_intro', {
     misconceptions: ['M-P1', 'M-P2', 'M-P3', 'M-P4'],
     workedSteps: (q) => clampSteps(perimeterSteps(q)),
     wrongAnswer: perimeterWrong,
+    open: perimeterOpen,
 });
 
 /** The skills this module gives a real provider (the error-analysis lane's legacy-wrong.js skips them). */

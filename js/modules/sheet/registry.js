@@ -171,6 +171,23 @@ export function cellGridItem(q, ctx = {}) {
 }
 
 /** The slots one question draws, filtered by its response scope (SCC-T13). Never throws. */
+/** Does this item answer in check boxes (a "which has the most?" row) rather than a box? */
+export function isCheckAnswer(q) {
+    if (!q || !q.cell) return false;
+    try { return cellInputs(q).some((s) => s.shape === 'check'); } catch (e) { return false; }
+}
+
+/**
+ * One answer shape per run (RUBRIC C1, critic figures-r6): the check-box items of a page go
+ * after the box items, as their own block, never between them. Stable; `qOf` reads an item's
+ * question. A page of one shape is returned as it is.
+ */
+export function groupByAnswerShape(items, qOf = (it) => (it && it.q) || it) {
+    const check = items.filter((it) => isCheckAnswer(qOf(it)));
+    if (!check.length || check.length === items.length) return items;
+    return items.filter((it) => !isCheckAnswer(qOf(it))).concat(check);
+}
+
 export function cellInputs(q, ctx = {}) {
     const c = ctx && ctx.metrics ? ctx : resolveCtx(ctx);
     const spec = (q && q.cell) || q || {};
