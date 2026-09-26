@@ -148,6 +148,7 @@ export function generateQuestionFor({ category, skill, range, decimals, opts, se
         decimalPlaces: state.decimalPlaces, gameMode: state.gameMode, isMixedMode: state.isMixedMode,
         skillOptions: state.skillOptions, fixedDifficulty: state.fixedDifficulty,
         selectedNumbers: state.selectedNumbers, itemIndex: state.itemIndex, itemCount: state.itemCount,
+        itemSeed: state.itemSeed,
     };
     const restoreRandom = seed === undefined ? null : seedRandom(seed);
     try {
@@ -172,6 +173,9 @@ export function generateQuestionFor({ category, skill, range, decimals, opts, se
         // S2: how many items of this skill the page holds, so a ticked support level FADES down the
         // page in equal blocks (most support first) instead of cycling. Optional.
         state.itemCount = Number.isFinite(itemCount) && itemCount > 0 ? itemCount : undefined;
+        // The item's own seed, for a generator that varies a page-level order by the page's seed
+        // (gen-pv.js blockOrder: the asked place of a place-value pair). Optional.
+        state.itemSeed = seed !== undefined && Number.isFinite(Number(seed)) ? Number(seed) : undefined;
         if (!state.selectedNumbers || !state.selectedNumbers.length) {
             state.selectedNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
         }

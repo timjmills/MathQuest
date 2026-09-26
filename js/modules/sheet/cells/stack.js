@@ -99,8 +99,11 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
         const on = regroupTracks(regroup, t, A.length);
         html += Array.from({ length: t }, (_, i) => {
             const k = on.indexOf(i);
+            // The ones box of a subtraction holds a two-digit number after a regroup (17): it is
+            // two digits wide, overhanging to the right (lessons r1, H9).
+            const wide = regroup === 'sub' && i === t - 1 ? ' rg-wide' : '';
             return k < 0 ? `<span class="rg${g}"></span>`
-                : `<span class="rg${g}" data-ws-seg="${stripPos(k, on.length)}">${rgBox(i)}</span>`;
+                : `<span class="rg${g}${wide}" data-ws-seg="${stripPos(k, on.length)}">${rgBox(i)}</span>`;
         }).join('');
     }
     html += tops.map((x, k) => row(pad(x), '', k === 0 ? 'a' : `a${k}`, tr(k)) + `<span class="gap"></span>`).join('')
@@ -121,8 +124,12 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
         }).join('');
     }
     if (answer === 'steps' && trackInk) html += trackInk.map((tk) => (tk ? `<span class="${tk.ink === 'trace' ? 'ws-trace' : ''}" data-ws-ink="${tk.ink}">${tk.ch}</span>` : '<span></span>')).join('');
-    if (answer === 'traced' && ans !== null) html += pad(String(ans)).map((ch) => `<span class="ws-trace">${ch === ' ' ? '' : ch}</span>`).join('');
-    if (answer === 'solid' && ans !== null) html += pad(String(ans)).map((ch) => `<span data-ws-ink="solid" style="font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums">${ch === ' ' ? '' : ch}</span>`).join('');
+    // Lessons r2 (VA-4, AK-1): the open answer zone is a REAL row, as tall as the answer strip
+    // (12 mm at L, 10 mm at M), so the pupil page and its key - whose answer digits fill that
+    // row - share one geometry: the key never redraws the problem higher or its Check lower.
+    if (answer === 'open') html += `<span class="ansrow" aria-hidden="true"></span>`;
+    if (answer === 'traced' && ans !== null) html += pad(String(ans)).map((ch) => `<span class="ws-trace an">${ch === ' ' ? '' : ch}</span>`).join('');
+    if (answer === 'solid' && ans !== null) html += pad(String(ans)).map((ch) => `<span class="an" data-ws-ink="solid" style="font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums">${ch === ' ' ? '' : ch}</span>`).join('');
     if (answer === 'slots' && slots) {
         // A null slot is a track with no box (the operator track, SL-12): the strip skips it.
         const live = slots.filter((s) => s !== null && s !== undefined).length;
@@ -185,6 +192,66 @@ function regroupTracks(kind, t, topDigits) {
     return [];
 }
 
+/**
+ * AK-2 (owner ruling 2026-09-25: keys FILL the regroup / carry boxes): the full written working of
+ * a column sum or difference, one entry per track. Addition: the carry written over each column
+ * that receives one. Subtraction: the new value of every top digit a regroup changed (the 5 over
+ * a crossed 6, the 17 over a crossed 7), and which top digits are crossed out (VA-23).
+ * @returns {{vals: string[], strikes: boolean[]}}
+ */
+export function regroupWorking(p, t) {
+    const ops = (p.operands || [p.a, p.b]).map((o) => String(o ?? '').replace(/\D/g, ''));
+    const vals = [];
+    const strikes = [];
+    if (p.op === '+') {
+        let carry = 0;
+        for (let o = 0; o < t - 1; o++) {
+            if (o > 0 && carry) vals[t - 1 - o] = String(carry);
+            let sum = carry;
+            for (const x of ops) { const d = x.length - 1 - o; if (d >= 0) sum += Number(x[d]) || 0; }
+            carry = Math.floor(sum / 10);
+        }
+    } else if (p.op === '-' || p.op === '−') {
+        const [A, B] = ops;
+        if (!A || !B || Number(A) < Number(B)) return { vals, strikes };
+        const cur = [...A].reverse().map(Number);
+        const orig = cur.slice();
+        const bd = [...B].reverse().map(Number);
+        const borrow = (o) => {
+            if (o + 1 >= cur.length) return false;
+            if (cur[o + 1] === 0 && !borrow(o + 1)) return false;
+            cur[o + 1] -= 1;
+            cur[o] += 10;
+            return true;
+        };
+        for (let o = 0; o < cur.length; o++) if (cur[o] < (bd[o] || 0)) borrow(o);
+        for (let o = 0; o < cur.length; o++) {
+            if (cur[o] === orig[o]) continue;
+            vals[t - 1 - o] = String(cur[o]);
+            strikes[t - 1 - o] = true;
+        }
+    }
+    return { vals, strikes };
+}
+
+/** A regroup box's written digits (a key, or a worked step): small, centred in the box. */
+const regroupInk = (value, ink = 'solid') => `<i style="display:flex;align-items:center;justify-content:center;font-size:0.62em;line-height:1"><span class="${ink === 'trace' ? 'ws-trace' : ''}" data-ws-ink="${ink}">${esc(value)}</span></i>`;
+
+/**
+ * Lessons r1 (step 5 "Check: add back" given room): `p.check` puts a Check line under a
+ * subtraction - "Check: ___ + 18 = ___" - the pupil adds the answer back to the bottom number
+ * and gets the top number. Its two lines are ungraded (VA-13's scratch rule); a key fills them.
+ */
+const checkSlot = (id, digits) => ({ id, kind: 'number', shape: 'line', digits, graded: false, order: 60 + (id === 'check-sum' ? 1 : 0), inputmode: 'numeric', scopes: ['full'] });
+const isSub = (p) => p.op === '-' || p.op === '−';
+function checkRowHtml(p, ctx, key) {
+    const [A, B] = (p.operands || [p.a, p.b]).map((o) => String(o ?? ''));
+    const d = Math.max(2, A.length);
+    // Lessons r2: the sum is one unbreakable group, so a narrow cell (3 across) puts it on a line
+    // under "Check:" instead of overflowing the cell.
+    return `<div class="ws-checkrow"><b>Check:</b><span class="ws-checkeq">${blank(checkSlot('check-ans', d), ctx, key)}<span>+</span><span class="ws-checkn">${esc(B)}</span><span>=</span>${blank(checkSlot('check-sum', d), ctx, key)}</span></div>`;
+}
+
 /** The scaffold the ladder asks for, resolved once (SCC-Q10: the ctx decides, not the generator). */
 function scaffoldOf(p, ctx) {
     const level = ctx && ctx.scaffoldLevel !== undefined ? ctx.scaffoldLevel : 1;
@@ -238,7 +305,8 @@ register('stack', {
         // open answer zone becomes one digit input per track, in the same geometry (VA-11), the
         // carry boxes become ungraded inputs (VA-13) and the missing digit becomes an input too.
         const screen = ctx.mode === 'screen' && !ctx.static;
-        const key = p.unknown || screen ? this.answerKey(p) : null;
+        const withCheck = !!(p.check && isSub(p));
+        const key = p.unknown || screen || withCheck ? this.answerKey(p) : null;
         let slots = null, regroupSlots = null, unknownSlot = null;
         // VA-7: the missing digit is a slot in BOTH modes, so it is typed on screen and carries
         // its given digit on an answer key. Its printed width is B(1) = 14 mm either way.
@@ -253,15 +321,25 @@ register('stack', {
                 for (const i of regroupTracks(regroup, t, String(Array.isArray(a) ? a[0] : a).length)) regroupSlots[i] = blank(regroupSlot(i), ctx, key);
             }
         }
+        // AK-2 over VA-13 on a key (owner, 2026-09-25): an answered print cell writes the whole
+        // working into the regroup / carry boxes and crosses out the regrouped top digits.
+        let strikes = null;
+        if (regroup && !screen && ctx.state === 'answered') {
+            const w = regroupWorking(p, t);
+            const on = regroupTracks(regroup, t, String(Array.isArray(a) ? a[0] : a).length);
+            regroupSlots = Array.from({ length: t }, (_, i) => (on.includes(i) && w.vals[i] ? regroupInk(w.vals[i]) : '<i></i>'));
+            if (regroup === 'sub' && w.strikes.length) strikes = w.strikes.map((x) => (x ? 'solid' : null));
+        }
         const tm = touchMode(p);
         const rowsTd = tm ? touchColumns([...(Array.isArray(a) ? a : [a]), b], t, p.op, tm) : null;
-        return stack(a, b, p.op, {
-            T: t, heads, regroup, answer, slots, regroupSlots, unknownSlot, boxInk, ansTracks: nAns,
+        const drawn = stack(a, b, p.op, {
+            T: t, heads, regroup, answer, slots, regroupSlots, unknownSlot, boxInk, ansTracks: nAns, strikes,
             touch: rowsTd ? { rows: rowsTd, o: touchOpts(ctx.metrics ? ctx.metrics.digitPt : 28, ctx.mode === 'screen' ? 'px' : 'pt') } : null,
             grey: level === 2 && ctx.state === 'blank',
             ans: shown === undefined ? null : shown,
             unknown: p.unknown || null,
         });
+        return withCheck ? drawn + checkRowHtml(p, ctx, key) : drawn;
     },
     answerKey(p) {
         const value = p.ans !== undefined ? p.ans : compute(p);
@@ -279,9 +357,16 @@ register('stack', {
         // VA-13: regroup boxes are scratch space; never scored, on paper or on screen. Both
         // regroup shapes are listed, because `answerKey` has no ctx and so cannot know which
         // scaffold is drawn; `gradeSlots` returns null for every one of them either way.
+        // AK-2 (owner, 2026-09-25): the key carries the working the boxes hold - still ungraded.
         const topDigits = String((p.operands || [p.a])[0] ?? '').length;
-        for (const i of regroupTracks('add', t, topDigits)) slots[`regroup-${i}`] = { value: '', graded: false };
-        for (const i of regroupTracks('sub', t, topDigits)) slots[`regroup-${i}`] = { value: '', graded: false };
+        const work = regroupWorking(p, t);
+        const kind = p.op === '-' || p.op === '−' ? 'sub' : p.op === '+' ? 'add' : null;
+        for (const i of regroupTracks('add', t, topDigits)) slots[`regroup-${i}`] = { value: kind === 'add' ? (work.vals[i] || '') : '', graded: false };
+        for (const i of regroupTracks('sub', t, topDigits)) slots[`regroup-${i}`] = { value: kind === 'sub' ? (work.vals[i] || '') : '', graded: false };
+        if (p.check && isSub(p)) {
+            slots['check-ans'] = { value: digits, graded: false };
+            slots['check-sum'] = { value: String((p.operands || [p.a])[0] ?? ''), graded: false };
+        }
         // VA-7: in a missing-digit item the unknown digit is the scored answer (SL-10).
         if (p.unknown) {
             const src = p.unknown.row === 'b' ? String((p.operands || [p.a, p.b])[1] ?? '') : p.unknown.row === 'a' ? String((p.operands || [p.a])[0] ?? '') : digits;
@@ -298,9 +383,11 @@ register('stack', {
         const digitH = (ctx.metrics.digitPt / 72) * 25.4 * 1.15;   // TY-13 digit line-height 1.15
         const hMm = (p.heads || ctx.scaffoldLevel >= 2 ? s.headsMm : 0)
             + (regroup ? (p.op === '-' ? s.headroomMm : s.regroupMm) : 0)
-            + digitH * (p.operands ? Math.max(2, p.operands.length) : 2) + 3 + s.answerMm;
+            + digitH * (p.operands ? Math.max(2, p.operands.length) : 2) + 3 + s.answerMm
+            + (p.check && isSub(p) ? (ctx.metrics.textPt / 72) * 25.4 * 1.6 + 4 : 0);
         return {
-            wMm: Math.ceil(t * track + 6), hMm: Math.ceil(hMm), measure: false,
+            // A Check line is text and slots: the host measures it (lessons r1).
+            wMm: Math.ceil(t * track + 6), hMm: Math.ceil(hMm), measure: !!(p.check && isSub(p)),
             factLike: false, maxCols: 3, tracks: t,
         };
     },
@@ -321,6 +408,10 @@ register('stack', {
         // On paper the answer zone under the sum rule is ONE open slot (VA-11, PG-14).
         else out.push({ id: 'answer', kind: 'number', shape: 'open', graded: true, order: 0, inputmode: 'numeric', scopes: ['full', 'answer-only'] });
         if (p.unknown) out.push(unknownSlotSpec(p.unknown));
+        if (p.check && isSub(p)) {
+            const d = Math.max(2, String(a ?? '').length);
+            out.push(checkSlot('check-ans', d), checkSlot('check-sum', d));
+        }
         return out;
     },
     layout(p) { return { card: 'card-column', checker: 'columns', requiresVisual: true }; },
@@ -342,8 +433,7 @@ register('stack', {
             for (const r of regroupMarks(marks)) {
                 const i = t - 1 - r.offset;
                 if (i < 1 || i >= t) continue;
-                const cls = r.ink === 'trace' ? 'ws-trace' : '';
-                regroupSlots[i] = `<i style="display:flex;align-items:center;justify-content:center;font-size:0.62em;line-height:1"><span class="${cls}" data-ws-ink="${r.ink}">${esc(r.value)}</span></i>`;
+                regroupSlots[i] = regroupInk(r.value, r.ink);
             }
         }
         const answer = p.answer || (level >= 2 ? 'boxes' : 'steps');
@@ -362,6 +452,8 @@ register('stack', {
             if (i >= 1 && i < t && (r[1] === 'strike' || m.ink === 'trace')) (r[1] === 'strike' ? strikes : rings)[i] = m.ink;
         }
         return stack(a, b, p.op, {
+            // A Guided cell (level 2) greys its boxes like every other Guided cell (SF-10, VA-10).
+            grey: level === 2 && (!ctx || !ctx.state || ctx.state === 'blank'),
             T: t, heads, regroup, answer, trackInk, ansTracks: nAns, strikes: strikes.length ? strikes : null, rings: rings.length ? rings : null,
             regroupSlots: regroup ? Array.from({ length: t }, (_, i) => regroupSlots[i] || '<i></i>') : null,
             unknown: p.unknown || null,
