@@ -31,7 +31,7 @@ import {
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
 import { deriveSeed } from '../rng.js';
-import { ANCHOR_CSS, anchorPlanItem, sideItems, pupilCount, blockPlan, blockPages } from '../anchors.js';
+import { ANCHOR_CSS, anchorPlanItem, sideItems, pupilCount, blockPlan, blockPages, packPairs } from '../anchors.js';
 import { LESSON_CSS } from '../lesson-css.js';
 
 /* ======================================================================= engine stylesheet */
@@ -613,9 +613,11 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
     const chunksBySection = layouts.map((L, si) => (L.blocks
         ? blockPages(itemsBySection[si].length, L.blocks, L.cols, L.anchorMm)
         : L.pairs
-            // Paginate PAIRS, then count them back as rows: a page break never falls inside one.
-            ? paginate(Math.ceil(itemsBySection[si].length / 2), { cols: 1, rows: L.rows / 2 })
-                .map((c) => Object.assign({}, c, { from: c.from * 2, count: Math.min(c.count * 2, itemsBySection[si].length - c.from * 2), rows: c.rows * 2 }))
+            // Paginate PAIRS, each row as tall as what it holds (a twin, its problem), then count
+            // them back as rows: a page break never falls inside a pair.
+            ? packPairs(itemsBySection[si], { gridFirstMm: L.gridH, gridContMm: L.gridHCont || L.gridH })
+                || paginate(Math.ceil(itemsBySection[si].length / 2), { cols: 1, rows: L.rows / 2 })
+                    .map((c) => Object.assign({}, c, { from: c.from * 2, count: Math.min(c.count * 2, itemsBySection[si].length - c.from * 2), rows: c.rows * 2 }))
             : (!anchors && packByHeight(itemsBySection[si], L.cols, {
                 gridFirstMm: L.gridH, gridContMm: L.gridHCont, maxRows: Math.max(1, Math.floor(L.ceiling / L.cols)), cellH: L.cellH, force: !!L.packed,
             })) || paginate(itemsBySection[si].length, L)));

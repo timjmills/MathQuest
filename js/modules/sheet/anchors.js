@@ -20,7 +20,8 @@
 //
 // Pure module (SCC-01): no window, no DOM, no Math.random, no app import.
 
-import { esc, getProvider, hasCell, getCell, resolveCtx, SIZES } from './index.js';
+import { esc, getProvider, hasCell, getCell, resolveCtx, SIZES, cellFootprint } from './index.js';
+import { cellWidthMm, LIVE_W_MM, measuredH, SAFETY_H_MM } from './layout.js';
 
 export const ANCHOR_MODES = Object.freeze(['off', 'side', 'sections']);
 
@@ -176,8 +177,114 @@ export function stateSize(pageSize, n) {
 /** The inner width of a full-width anchor cell at one column (mm). */
 const BAND_W_MM = 178;
 
+/* ------------------------------------------------ where the steps go (owner report 2026-09-25) */
+//
+// "The Model cell's step list is squeezed into a narrow column on the right": a count-by row drawn
+// across the cell left its steps a column one word wide, which ran past the cell's border and down
+// beside the next cell. The steps go BESIDE the drawing only when the cell leaves them a real
+// column; otherwise they go UNDER it, across the cell's full width. Measured, never assumed (and
+// the stylesheet wraps them under the drawing if a drawing turns out wider than estimated).
+
+/** A steps column beside a drawing is at least this wide (mm): about 25 characters a line at L. */
+export const STEPS_BESIDE_MIN_MM = 55;
+/** Every steps column holds at least this many characters a line at the page's step type. */
+export const STEPS_MIN_CHARS = 18;
+/** Under a wide drawing the steps take two text columns (read 1 2 / 3 4) when each is this wide. */
+const STEPS_UNDER_COL_MM = 80;
+const STEPS_GAP_MM = 4;               // between a drawing and its steps (.mq-anchor-beside gap)
+const CELL_PAD_MM = 3;                // .ws-cell padding (css/sheet-kit.css)
+const TAB_CLEAR_MM = 13;              // a band's (compact's) drawing moves right of the Model tab
+const BULLET_MM = 6.2;                // a step's number circle and its gap (.mq-anchor-steps li>em)
+const PT_MM = 25.4 / 72;
+/** Andika's mean advance for step text (em; measured 0.475 at 11 pt): 18 characters of 11 pt are about 35 mm. */
+const CHAR_EM = 0.5;
+
+/** The width (mm) a steps column needs for STEPS_MIN_CHARS characters at the page's step type. */
+export function stepsMinMm(pageSize = 'L') {
+    const s = SIZES[pageSize] || SIZES.L;
+    return Math.round((STEPS_MIN_CHARS * CHAR_EM * s.zonePt * 0.92 * PT_MM + BULLET_MM) * 10) / 10;
+}
+
+/** The content width (mm) of an anchor cell in a grid of `cols` columns. */
+export function anchorInnerMm(c = {}, cols = 1, variant = 'band') {
+    const avail = Number(c.availableWidthMm) > 0 ? Number(c.availableWidthMm) : LIVE_W_MM;
+    const inner = cellWidthMm(Math.max(1, cols), avail, c.look).inner - 2 * CELL_PAD_MM;
+    return Math.round((inner - (variant === 'side' ? 0 : TAB_CLEAR_MM)) * 10) / 10;
+}
+
+/**
+ * How wide the example's drawing is at the anchor's own preset (mm): the template's footprint at
+ * THAT size (a count-by row of twelve is one row at M but two at L, so a page-size footprint
+ * scaled down would be wrong), else a legacy cell's page-size footprint scaled by the digit size.
+ */
+export function drawingWidthMm(it, c = {}, size = 'M') {
+    const q = (it && it.q) || {};
+    const pageSize = SIZES[c.size] ? c.size : 'L';
+    const tpl = q.cell && q.cell.template;
+    if (tpl && tpl !== 'legacy' && hasCell(tpl)) {
+        try {
+            const fp = cellFootprint(q, resolveCtx({ mode: 'print', size, look: c.look, state: 'answered' }));
+            if (fp && Number(fp.wMm) > 0) return Number(fp.wMm);
+        } catch (e) { /* the host's footprint below */ }
+    }
+    const fp = (it && it.footprint) || {};
+    const w = Number(fp.wMm) > 0 ? Number(fp.wMm) : 60;
+    return w * (SIZES[size] || SIZES.M).digitPt / SIZES[pageSize].digitPt;
+}
+
+/**
+ * Where the steps of a one-state anchor go: BESIDE the drawing when the column left beside it is
+ * at least STEPS_BESIDE_MIN_MM (and STEPS_MIN_CHARS characters) wide, else UNDER it. A drawing
+ * that takes most of the cell (a count-by row, a number line, a long table, a bar model) always
+ * puts its steps under it. Under a full-width drawing the steps take two text columns.
+ *
+ * @returns {{beside: boolean, innerMm: number, drawMm: number, colMm: number, underCols: number}}
+ */
+export function stepsPlacement(it, c = {}, { variant = 'side', cols = 1, size = 'M' } = {}) {
+    const innerMm = anchorInnerMm(c, cols, variant);
+    const drawMm = drawingWidthMm(it, c, size);
+    const colMm = Math.round((innerMm - drawMm - STEPS_GAP_MM) * 10) / 10;
+    // A footprint is an upper bound (a stack's is its widest answer plus pads), so only a drawing
+    // that is clearly wide is decided here; for the rest the steps are offered beside it and the
+    // stylesheet measures: `.mq-anchor-beside` wraps them UNDER the drawing whenever less than
+    // STEPS_BESIDE_MIN_MM is left beside it (flex-basis and min-width), so the real drawing
+    // decides, never the estimate.
+    const wide = drawMm > innerMm * 0.55 || innerMm - STEPS_GAP_MM < STEPS_BESIDE_MIN_MM + Math.min(drawMm, 20);
+    const beside = !wide;
+    const underCols = innerMm >= 2 * STEPS_UNDER_COL_MM + STEPS_GAP_MM ? 2 : 1;
+    return { beside, innerMm, drawMm: Math.round(drawMm * 10) / 10, colMm, underCols };
+}
+
 const lineHtml = (text, n) => `<li${n ? '' : ' class="mq-anchor-cont"'}>${n ? `<em>${n}</em>` : '<em></em>'}<span>${esc(text)}</span></li>`;
 const stepsList = (steps, idx) => `<ol class="mq-anchor-steps">${idx.map((i) => stepLines(steps[i].text).map((t, j) => lineHtml(t, j === 0 ? i + 1 : 0)).join('')).join('')}</ol>`;
+/**
+ * The steps UNDER a drawing in `k` text columns read row by row (1 2 / 3 4), as the Guided page's
+ * Steps band reads: each step keeps its lines together in one grid cell (a span a line, so every
+ * printed line stays within P-5's 10 words).
+ */
+const stepsGrid = (steps, idx, k, maxChars = 0) => (k < 2 ? stepsList(steps, idx)
+    : `<ol class="mq-anchor-steps mq-anchor-stepgrid" style="grid-template-columns:repeat(${k},minmax(0,1fr))">`
+        + `${idx.map((i) => `<li class="mq-anchor-step"><em>${i + 1}</em><div class="mq-anchor-lines">`
+            + `${joinLines(stepLines(steps[i].text), maxChars).map((t) => `<span>${esc(t)}</span>`).join('')}</div></li>`).join('')}</ol>`);
+
+/**
+ * Short sentences of one step share a printed line when the column holds them both and the line
+ * stays within P-5's 10 words ("12 + 12 = 24. Write 24." is one line in a half-width column).
+ */
+export function joinLines(lines, maxChars) {
+    if (!(maxChars > 0)) return lines;
+    const out = [];
+    for (const t of lines) {
+        const prev = out[out.length - 1];
+        const both = prev ? `${prev} ${t}` : '';
+        if (prev && both.length <= maxChars && wordCount(both) <= 10) out[out.length - 1] = both;
+        else out.push(t);
+    }
+    return out;
+}
+
+/** Characters a line of a steps column `colMm` wide holds at the page's step type (Andika, mean advance). */
+export const charsPerLine = (colMm, pageSize = 'L') => Math.floor((colMm - BULLET_MM) / (CHAR_EM * (SIZES[pageSize] || SIZES.L).zonePt * 0.92 * PT_MM));
 
 /**
  * The anchor's drawing.
@@ -186,49 +293,57 @@ const stepsList = (steps, idx) => `<ol class="mq-anchor-steps">${idx.map((i) => 
  * @param {Object} o
  * @param {'band'|'side'|'compact'} o.variant   the full-width strip of 2-4 states; the half-width
  *        twin (one state); or the compact full-width band of Mixed practice (one state, its steps
- *        beside it), which keeps a skill's shelf band short enough for two skills a page
+ *        beside or under it), which keeps a skill's shelf band short
  * @param {number} o.twinCols   the column count the pupil's cells are drawn at (fact ladder, stacks)
+ * @param {number} [o.cols]     the column count of the grid the anchor cell itself sits in (a side
+ *        twin: 2, or 1 when its problem is too wide for half the page); decides where its steps go
  */
-export function anchorHtml(it, c, { variant = 'band', twinCols = 2 } = {}) {
+export function anchorHtml(it, c, { variant = 'band', twinCols = 2, cols } = {}) {
     const steps = workedStepsOf(it);
     const say = sayLineOf(it);
     let whole = !stepTemplateOf(it);
     let groups = whole ? [{ steps: steps.map((_, i) => i), marks: [] }] : anchorGroups(steps);
+    const pageSize = SIZES[c.size] ? c.size : 'L';
     if (!whole && variant === 'band') {
-        // Every state must fit its column: a wide model (an area model of three parts) takes fewer
-        // states, and one that cannot stand two abreast is drawn whole with its steps beside it.
-        const fp = (it && it.footprint) || {};
-        const pageSize = SIZES[c.size] ? c.size : 'L';
-        const scale = SIZES[stateSize(pageSize, 2)].digitPt / SIZES[pageSize].digitPt;
-        const estW = (Number(fp.wMm) > 0 ? Number(fp.wMm) : 60) * scale;
+        // Every state must fit its column, and so must its steps under it (STEPS_MIN_CHARS a line
+        // at the page's step type: at L four states leave 36 mm, 15 characters, so three stand):
+        // a wide model (an area model of three parts) takes fewer states, and one that cannot
+        // stand two abreast is drawn whole with its steps beside or under it.
+        const estW = drawingWidthMm(it, c, stateSize(pageSize, 2));
         const colW = (n) => (BAND_W_MM - 13) / n - 5;
-        while (groups.length > 2 && estW > colW(groups.length)) {
+        const textMin = stepsMinMm(pageSize);
+        const tooNarrow = (n) => estW > colW(n) || colW(n) < textMin;
+        while (groups.length > 2 && tooNarrow(groups.length)) {
             let best = 0;
             for (let i = 1; i < groups.length - 1; i++) if (groups[i].steps.length + groups[i + 1].steps.length < groups[best].steps.length + groups[best + 1].steps.length) best = i;
             groups.splice(best, 2, { steps: groups[best].steps.concat(groups[best + 1].steps), marks: groups[best].marks.concat(groups[best + 1].marks) });
         }
-        if (estW > colW(groups.length)) variant = 'compact';
+        if (tooNarrow(groups.length)) variant = 'compact';
     }
     const merged = groups.map((g) => ({ marks: g.marks }));
     const sayHtml = say ? `<div class="mq-anchor-say"><b>Say:</b> <span>${esc(say)}</span></div>` : '';
     if (variant === 'side' || variant === 'compact' || whole) {
-        // One state: the worked example whole (the newest step grey), its steps under it
-        // (side) or beside it (a band whose template draws no step states).
+        // One state: the worked example whole (the newest step grey), and its numbered steps
+        // BESIDE it when the cell leaves them a real column (the twin keeps its height close to
+        // the pupil's problem beside it), else UNDER it across the cell. The Say line closes it.
         const k = merged.length - 1;
         const size = stateSize(c.size, variant === 'band' ? 2 : 1);
         const st = `<div class="mq-anchor-cell ws-${size}">${stateHtml(it, merged, k, c, twinCols, whole, size)}</div>`;
-        const list = stepsList(steps, steps.map((_, i) => i));
-        // The state and its numbered steps side by side (the twin keeps its height close to the
-        // pupil's problem beside it); the Say line closes it.
-        const body = `<div class="mq-anchor-one mq-anchor-beside">${st}${list}</div>`;
-        return `<div class="mq-anchor mq-anchor-${variant}" data-ws-anchor="${variant}" data-ws-states="1">${body}${sayHtml}</div>`;
+        const idx = steps.map((_, i) => i);
+        const inCols = Number(cols) > 0 ? Number(cols) : variant === 'side' ? 2 : 1;
+        const pl = stepsPlacement(it, c, { variant, cols: inCols, size });
+        const body = pl.beside
+            ? `<div class="mq-anchor-one mq-anchor-beside">${st}${stepsList(steps, idx)}</div>`
+            : `<div class="mq-anchor-one mq-anchor-under">${st}${stepsGrid(steps, idx, pl.underCols,
+                charsPerLine((pl.innerMm - (pl.underCols - 1) * 6) / pl.underCols, pageSize))}</div>`;
+        return `<div class="mq-anchor mq-anchor-${variant}" data-ws-anchor="${variant}" data-ws-states="1" data-ws-steps="${pl.beside ? 'beside' : 'under'}">${body}${sayHtml}</div>`;
     }
     const n = groups.length;
     const size = stateSize(c.size, n);
     const states = groups.map((g, k) => `<div class="mq-anchor-state">`
         + `<div class="mq-anchor-cell ws-${size}">${stateHtml(it, merged, k, c, twinCols, false, size)}</div>`
         + `${stepsList(steps, g.steps)}</div>`).join('');
-    return `<div class="mq-anchor mq-anchor-band" data-ws-anchor="band" data-ws-states="${n}">`
+    return `<div class="mq-anchor mq-anchor-band" data-ws-anchor="band" data-ws-states="${n}" data-ws-steps="under">`
         + `<div class="mq-anchor-states" style="grid-template-columns:repeat(${n},minmax(0,1fr))">${states}</div>${sayHtml}</div>`;
 }
 
@@ -243,14 +358,18 @@ export function anchorItem(it, { variant = 'band', twinCols = 2 } = {}) {
         anchor: variant,
         source: it,
         skill: it.skill || '',
-        render: (c) => anchorHtml(it, c, { variant, twinCols }),
+        // The grid's column count (measureItems and the plan pass `{cols}`) decides where the
+        // steps go: beside the drawing only when the cell leaves them a real column.
+        render: (c, o) => anchorHtml(it, c, { variant, twinCols, cols: o && o.cols }),
         key: { value: '', display: '', slots: {} },
         drawsAnswer: true,
         visual: false,
         // A twin clears the Model tab with the Guided model cell's top pad; a band keeps its
         // height for the problems and moves its first state right of the tab instead.
         cellCls: `mq-anchorcell mq-anchor-${variant}cell${variant === 'side' ? ' mq-modelcell' : ''}`,
-        footprint: { wMm: variant === 'side' ? 88 : 180, hMm: null, measure: true, maxCols: variant === 'side' ? 2 : 1 },
+        // `restacks`: its steps stand beside the drawing in a wide cell and under it in a narrow one
+        // on purpose, so a taller twin at 2 columns is not a collapse (print-sheet.js measureItems).
+        footprint: { wMm: variant === 'side' ? 88 : 180, hMm: null, measure: true, maxCols: variant === 'side' ? 2 : 1, restacks: true },
         fclass: variant === 'side' ? 'standard' : 'wide',
         measureLevel: 3,
         section: it.section,
@@ -326,6 +445,71 @@ export function sideItems(pupil, twins) {
 
 /** Pupil (scored) items in a list that may hold anchors. */
 export const pupilCount = (items) => items.filter((it) => !it.anchor).length;
+
+/**
+ * A row's measured height at one column (mm). A legacy cell's measurement is trusted here: the
+ * pairs are only ever laid out at one column, the width it was measured at, so it cannot reflow.
+ */
+const pairH = (it) => measuredH(it, 1)
+    || (it && it.measured && it.measured[1] && Number.isFinite(it.measured[1].hMm) ? it.measured[1].hMm + 1 : 0);
+
+/**
+ * Side by side in ONE column: the measured heights (mm) of each [twin, problem] pair, each row as
+ * tall as what it holds. Null when a height is unknown, or the list is not pairs.
+ * @returns {{rows: number[], pairs: number[][]} | null}   pairs = [[rowStart, rowCount], ...]
+ */
+export function pairRows(items) {
+    const hs = items.map(pairH);
+    if (!items.length || hs.some((h) => !h)) return null;
+    const pairs = [];
+    for (let i = 0; i < items.length;) {
+        const n = items[i].anchor && i + 1 < items.length && !items[i + 1].anchor ? 2 : 1;
+        pairs.push([i, n]);
+        i += n;
+    }
+    return { rows: hs, pairs };
+}
+
+/**
+ * Side by side in ONE column, paged by the rows' OWN heights (owner report 2026-09-25: one tall
+ * twin sized every row of the page, and the page held one pair). Whole pairs only (PG-21: never a
+ * twin at the foot of a page with its problem overleaf); each chunk carries its grid height and
+ * its row template, so a twin and its problem are each as tall as what they hold (RUBRIC H13).
+ * Null when a height is unknown (the uniform grid applies).
+ */
+export function packPairs(items, { gridFirstMm, gridContMm }) {
+    const pr = pairRows(items);
+    if (!pr) return null;
+    const hOf = ([from, n]) => pr.rows.slice(from, from + n).reduce((a, b) => a + b, 0);
+    const chunks = [];
+    let p = 0;
+    while (p < pr.pairs.length) {
+        const G = (chunks.length ? gridContMm : gridFirstMm) - SAFETY_H_MM;
+        let k = 0, sum = 0;
+        while (p + k < pr.pairs.length && (k === 0 || sum + hOf(pr.pairs[p + k]) <= G)) { sum += hOf(pr.pairs[p + k]); k++; }
+        const from = pr.pairs[p][0];
+        const last = pr.pairs[p + k - 1];
+        const count = last[0] + last[1] - from;
+        const hs = pr.rows.slice(from, from + count);
+        chunks.push({
+            index: chunks.length, from, count, rows: count, rebalanced: false,
+            gridMm: Math.round(sum * 100) / 100, rowsTpl: hs.map((h) => `${Math.round(h * 10) / 10}fr`).join(' '),
+        });
+        p += k;
+    }
+    return chunks;
+}
+
+/**
+ * How many [twin, problem] pairs one page of `gridMm` holds, sized by the tallest twin and the
+ * tallest problem measured (the page count is decided before the examples are picked).
+ */
+export function pairsPerPage(items, gridMm) {
+    const tw = items.filter((it) => it.anchor).map(pairH);
+    const pb = items.filter((it) => !it.anchor).map(pairH);
+    if (!tw.length || !pb.length || tw.concat(pb).some((h) => !h)) return 0;
+    return Math.max(1, Math.floor((gridMm - SAFETY_H_MM) / (Math.max(...tw) + Math.max(...pb))));
+}
 
 /* ==================================================================== SECTIONS */
 
@@ -423,6 +607,14 @@ export const ANCHOR_CSS = `
 :is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside{flex-direction:row;align-items:flex-start;gap:4mm}
 :is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-cell{flex:none}
 :is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-steps{flex:1;min-width:0;padding-top:1mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside{flex-wrap:wrap;row-gap:2mm;justify-content:center}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-steps{flex:1 1 ${STEPS_BESIDE_MIN_MM}mm;min-width:min(${STEPS_BESIDE_MIN_MM}mm,100%)}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-under{flex-direction:column;align-items:stretch;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-under>.mq-anchor-cell{justify-content:center}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps.mq-anchor-stepgrid{display:grid;column-gap:6mm;row-gap:1mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-stepgrid>li.mq-anchor-step{margin:0}
+:is(.ws-page,.ws-sheet) .mq-anchor-lines{flex:1;min-width:0;display:flex;flex-direction:column;gap:0.5mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-lines>span{display:block}
 :is(.ws-page,.ws-sheet) .mq-anchor-say{font-size:var(--ws-zone);line-height:1.2;padding-top:1mm;border-top:var(--ws-hair) solid var(--ws-ink)}
 :is(.ws-page,.ws-sheet) .mq-anchor-say>b{font-weight:700}
 `;
@@ -431,4 +623,5 @@ export default {
     ANCHOR_MODES, ANCHOR_ROLES, normaliseAnchors, wordCount, workedStepsOf, anchorEligible, ineligibleNote,
     stepLines, anchorGroups, sayLineOf, stepTemplateOf, unslot, stateSize, anchorHtml, anchorItem,
     anchorPlanItem, anchorHeightMm, easeScore, pickDistinct, sideItems, pupilCount, blockPlan, blockPages, ANCHOR_CSS,
+    STEPS_BESIDE_MIN_MM, STEPS_MIN_CHARS, stepsMinMm, anchorInnerMm, drawingWidthMm, stepsPlacement, pairRows, packPairs, pairsPerPage,
 };

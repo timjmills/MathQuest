@@ -528,7 +528,10 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     // the AVERAGE row of the measured sample fits (never above the ceiling). Explicit column
     // counts, word problems, wide rows and long procedures keep the grid.
     let packed = false;
-    if (cls !== 'word' && cls !== 'wide' && cls !== 'long' && !gridOverride) {
+    // Not with side-by-side worked twins (anchors.js): a row is [twin | problem] by construction,
+    // never regrouped by height, so every row is as tall as its twin (a 125 mm clock twin beside a
+    // 74 mm clock was paged as if half the rows held two problems, and the page overflowed).
+    if (cls !== 'word' && cls !== 'wide' && cls !== 'long' && !gridOverride && !(items || []).some((it) => it && it.anchor)) {
         const hs = (items || []).map((it) => measuredH(it, cols));
         if (hs.length >= 2 && hs.every((h) => h > 0) && Math.max(...hs) > Math.min(...hs) * 1.6) {
             const sorted = hs.slice().sort((a, b) => b - a);

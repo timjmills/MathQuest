@@ -38,7 +38,7 @@ import { tagLine as lessonTagLine } from './sheet/roles/lesson.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import {
     normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, easeScore, ineligibleNote,
-    blockPlan, sideItems, pickDistinct,
+    blockPlan, sideItems, pickDistinct, pairsPerPage,
 } from './sheet/anchors.js';
 import {
     allocateSupports, alternativesOf, TOUCH_IDS, normCoverage, normMix, TOUCH_MIN_PT,
@@ -1182,7 +1182,7 @@ function anchorSummary(mode, list, notes) {
     for (const a of list) {
         if (!a || !a.source || seen.has(a)) continue;
         seen.add(a);
-        examples.push({ section: a.section, pool: a.pool, variant: a.anchor, skill: a.skill, text: String(a.source.q.text || ''), ans: a.source.q.ans, sig: signature(a.source.q), measured: a.measured });
+        examples.push({ section: a.section, pool: a.pool, variant: a.anchor, skill: a.skill, text: String(a.source.q.text || ''), ans: a.source.q.ans, sig: signature(a.source.q), measured: a.measured, measureWhy: a.measureWhy });
     }
     return { mode, examples, notes: notes.slice() };
 }
@@ -1289,12 +1289,18 @@ export async function buildSheet(req = {}) {
         return sideItems(items, items.map((_, i) => set.items[i % set.items.length]));
     };
     /** Pupil problems a page of this section holds, from its layout (anchors taken off). */
-    const capFromL = (sec, si, L) => {
+    const capFromL = (sec, si, L, items = null) => {
         if (anchorMode === 'sections' && anchorSets[si]) {
             const body = sec.gridH ? sec.gridH + instrMm : bodyHeightMm(paper, layoutHeader);
             return blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: body, instrMm, anchorMm: sec.anchorMm }).perPage;
         }
-        if (anchorMode === 'side' && anchorSets[si] && anchorSets[si].items.length) return Math.max(1, Math.floor((L.cols === 1 ? Math.max(2, L.rows - (L.rows % 2)) : L.perPage) / 2));
+        if (anchorMode === 'side' && anchorSets[si] && anchorSets[si].items.length) {
+            // One column: pairs of rows each as tall as what it holds (practice.js packPairs), so
+            // a page holds as many [twin, problem] pairs as their own heights allow - never the
+            // count of rows the tallest twin would give every row.
+            const k = L.cols === 1 && items ? pairsPerPage(items, L.gridH) : 0;
+            return k || Math.max(1, Math.floor((L.cols === 1 ? Math.max(2, L.rows - (L.rows % 2)) : L.perPage) / 2));
+        }
         return L.perPage;
     };
     const floorWith = (si, items) => floorOf(anchorMode === 'side' && anchorSets[si] ? items.concat(anchorSets[si].items) : items, n);
@@ -1397,7 +1403,7 @@ export async function buildSheet(req = {}) {
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
                 const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols },
                     withTwins(si, probesOf(si)), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
-                out[si] = capFromL(sec, si, L);
+                out[si] = capFromL(sec, si, L, withTwins(si, probesOf(si)));
             });
         }
         return out;
@@ -1444,7 +1450,7 @@ export async function buildSheet(req = {}) {
             const pagesWanted = sec.pages || 1;
             // "A page" (or N pages) when no count is given: the page decides the count. The floor
             // only grows as items are added, so the capacity can only fall; the loop settles.
-            const pageCount = () => (shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, probe.items), n, lctx)));
+            const pageCount = () => (shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, probe.items), n, lctx), withTwins(si, probe.items)));
             let want = sec.count || Math.min(MAX_ITEMS, pageCount() * pagesWanted);
             let items = [];
             for (let pass = 0; pass < 3; pass++) {
@@ -1452,7 +1458,7 @@ export async function buildSheet(req = {}) {
                 if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(items.length + 2);
                 sec.floor = floorWith(si, probe.items.concat(items));
                 if (sec.count) break;
-                const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, items), n, lctx)) * pagesWanted);
+                const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, items), n, lctx), withTwins(si, items)) * pagesWanted);
                 if (again >= want) break;
                 want = again;
             }
@@ -1475,7 +1481,7 @@ export async function buildSheet(req = {}) {
         const shared = shareRows(n.sections.map((sec, si) => layoutOf(n.role, sec, withTwins(si, firstProbes[si].items), n, lctx)));
         const firstLayouts = n.sections.map((sec, si) => {
             const L = layoutOf(n.role, sec, withTwins(si, firstProbes[si].items), n, lctx);
-            return Object.assign({}, L, { perPage: capFromL(sec, si, L) });
+            return Object.assign({}, L, { perPage: capFromL(sec, si, L, withTwins(si, firstProbes[si].items)) });
         });
         n.sections.forEach((sec, si) => {
             const letterBase = letterBaseOf(si);
@@ -1499,7 +1505,7 @@ export async function buildSheet(req = {}) {
             let byLetter = letters.map((L, k) => finalRun(sec, si, letterBase(L), perLetter[k], probeOf(L)));
             if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(byLetter.flat().length + 2);
             sec.floor = floorWith(si, [...probes.values()].flatMap((p) => p.items).concat(...byLetter));
-            const cap = shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, byLetter.flat()), n, lctx));
+            const cap = shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, byLetter.flat()), n, lctx), withTwins(si, byLetter.flat()));
             if (perLetter.some((c) => c > cap)) {
                 byLetter = letters.map((L, k) => (perLetter[k] > cap ? finalRun(sec, si, letterBase(L), cap, probeOf(L)) : byLetter[k]));
             }
