@@ -591,7 +591,13 @@ registerSkill('measurement:equiv_coin_sets', {
 registerSkill('measurement:make_change_least_coins', {
     strings: strings({ iCan: 'I Can make an amount with the fewest coins', instructionKey: 'fewest-coins',
         steps: ['Use as many of the biggest coin as you can.', 'Make what is left with the next coin.', 'Write how many of each.'],
-        say: '__ is made with the fewest coins.', sayValues: (q) => [payloadOf(q).target] }),
+        // The Say line rehearses the answer: the coins, biggest first (critic anchor-r2).
+        say: '__ is __.', sayValues: (q) => {
+            const p = payloadOf(q);
+            const used = (p.values || []).map((v, i) => [v, Number((p.counts || [])[i]) || 0]).filter(([, n]) => n);
+            const words = used.map(([v, n]) => `${n} of the ${v}`);
+            return [p.target, words.length > 1 ? `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}` : (words[0] || '')];
+        } }),
     misconceptions: ['M-M9'],
     workedSteps: (q) => {
         const p = payloadOf(q);

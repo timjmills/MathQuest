@@ -134,11 +134,23 @@ async function measureBuild({ size, role, anchors, skills }) {
             return '';
         };
         /** Line boxes of a text element (Range client rects, merged by top). */
+        // Line boxes: the text nodes' rects, a stacked fraction counted as one inline box (its
+        // numerator and denominator sit at two tops of ONE line - critic anchor-r2), rects whose
+        // tops lie within half a line of each other merged.
         const lineCount = (el) => {
-            const rg = d.createRange();
-            rg.selectNodeContents(el);
-            const tops = new Set([...rg.getClientRects()].filter((x) => x.width > 0.5).map((x) => Math.round(x.top)));
-            return tops.size || 1;
+            const lh = parseFloat(getComputedStyle(el).fontSize) || 12;
+            const tops = [];
+            const walker = d.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+            for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+                if (!n.textContent.trim()) continue;
+                const frac = n.parentElement && n.parentElement.closest('.ws-frac');
+                const rects = frac ? [frac.getBoundingClientRect()] : (() => { const rg = d.createRange(); rg.selectNodeContents(n); return [...rg.getClientRects()]; })();
+                for (const r of rects) if (r.width > 0.5) tops.push(frac ? r.top + r.height / 2 - lh / 2 : r.top);
+            }
+            tops.sort((x, y) => x - y);
+            let lines = 0, last = -1e9;
+            for (const t of tops) { if (t - last > lh * 0.6) { lines++; last = t; } }
+            return lines || 1;
         };
         const wordy = (el) => {
             const words = el.textContent.split(/\s+/).filter((w) => /[A-Za-z0-9]/.test(w)).length;

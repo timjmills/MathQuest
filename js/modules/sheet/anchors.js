@@ -333,6 +333,28 @@ export function anchorHtml(it, c, { variant = 'band', twinCols = 2, cols } = {})
     let whole = !stepTemplateOf(it);
     let groups = whole ? [{ steps: steps.map((_, i) => i), marks: [] }] : anchorGroups(steps);
     const pageSize = SIZES[c.size] ? c.size : 'L';
+    if (!whole && variant === 'band' && groups.length > 1) {
+        // A state whose drawing is the one before it (a "The sum is 101." step that re-inks the
+        // digits already written) folds into its neighbour, never repeats it (critic anchor-r2);
+        // a skill with ONE real state (a fact's one mark) is drawn once, finished, with its steps
+        // beside it.
+        const size2 = stateSize(pageSize, 2);
+        const drawOf = (gs, k) => String(stateHtml(it, gs.map((g) => ({ marks: g.marks })), k, c, twinCols, false, size2))
+            .replace(/ data-ws-ink="[^"]*"/g, '').replace(/ws-trace/g, '').replace(/#949494/gi, '#000');
+        const kept = [groups[0]];
+        for (let i = 1; i < groups.length; i++) {
+            const trial = kept.concat([groups[i]]);
+            if (drawOf(trial, trial.length - 1) === drawOf(trial, trial.length - 2)) {
+                const prev = kept[kept.length - 1];
+                kept[kept.length - 1] = { steps: prev.steps.concat(groups[i].steps), marks: prev.marks.concat(groups[i].marks) };
+            } else kept.push(groups[i]);
+        }
+        groups = kept;
+        if (groups.filter((g) => g.marks.length).length <= 1) {
+            groups = [{ steps: steps.map((_, i) => i), marks: groups.flatMap((g) => g.marks) }];
+            variant = 'compact';
+        }
+    }
     if (!whole && variant === 'band') {
         // Every state must fit its column, and so must its steps under it (STEPS_MIN_CHARS a line
         // at the page's step type: at L four states leave 36 mm, 15 characters, so three stand):
@@ -445,6 +467,18 @@ export function anchorHeightMm(a, cols = 1) {
  */
 export function easeScore(q = {}) {
     const p = (q.cell && q.cell.payload) || {};
+    const tpl = q.cell && q.cell.template;
+    // Per template (critic anchor-r2: every clock and coin scored 0, so the generation order -
+    // 10:58, 11:57 - decided). A clock: fewer fives to count, and not near the next hour (the
+    // hour hand almost on the next number, the hands overlapping at 10-12). Coins: the total.
+    if (tpl === 'clock' && p.m !== undefined) {
+        const m = Number(p.m), h = Number(p.h);
+        return m + (m >= 45 ? 60 : 0) + (h >= 10 || h === 12 ? 25 : 0);
+    }
+    if (tpl === 'coins') {
+        if (p.kind === 'tally') return Number(p.target) || 0;
+        return (p.coins || []).concat(p.notes || []).reduce((a, v) => a + (Number(v) || 0), 0);
+    }
     const nums = [];
     const add = (v) => { const n = Number(String(v).replace(/,/g, '')); if (Number.isFinite(n)) nums.push(Math.abs(n)); };
     for (const v of [].concat(p.operands || [], p.a, p.b, p.dividend, p.divisor, p.multiplier, p.parts || [], q.a, q.b, p.tab)) if (v !== undefined && v !== null && v !== '') add(v);
@@ -470,6 +504,10 @@ export function anchorKey(q = {}) {
     const p = c.payload || {};
     const ans = typeof q.ans === 'object' && q.ans !== null ? JSON.stringify(q.ans) : String(q.ans ?? '').trim();
     let id = '';
+    // A choice item teaches every option it prints: its key holds each option's numbers (critic
+    // anchor-r2: a Model 1 1/2 + 2 1/2 above a "Check ALL" item listing 1 1/2 + 2 1/2).
+    const opts = Array.isArray(q.options) ? q.options.map((o) => (o && typeof o === 'object' ? o.label : o)).filter((x) => x !== undefined && x !== null) : [];
+    if (opts.length) return { id: '', ans, ids: opts.map((o) => `n:${numsIn(o).sort().join('|')}`) };
     if (c.template === 'count-row' && p.tab !== undefined) id = `step:${p.tab}`;
     else if (c.template === 'clock' && p.h !== undefined) id = `time:${p.h}:${p.m}`;
     else if (c.template === 'coins') id = p.kind === 'tally' ? `make:${p.target}` : `coins:${p.total ?? ans}`;
@@ -484,7 +522,34 @@ export function anchorKey(q = {}) {
 
 /** Does example `a` share its key numbers or its answer with problem `b`? */
 export function keysClash(a, b) {
+    if ((b.ids || []).includes(a.id) || (a.ids || []).includes(b.id)) return true;
     return (!!a.id && a.id === b.id) || (!!a.ans && a.ans === b.ans);
+}
+
+/**
+ * The SHAPE of an item's move (critic anchor-r2: "the example's answer form = the block's"): a
+ * stack's operand lengths and whether it regroups; whether a fraction sum passes a whole; a
+ * fact's operation. The example is taken from the block's most common shape first.
+ */
+export function anchorShape(q = {}) {
+    const c = q.cell || {};
+    const p = c.payload || {};
+    if (c.template === 'stack' && Array.isArray(p.operands)) {
+        const ops = p.operands.map((n) => Math.abs(Number(n)));
+        const op = String(p.op || '+');
+        let regroup = false;
+        if (/-|−/.test(op) && ops.length === 2) {
+            const [a, b] = ops.map((n) => String(n).split('').reverse().map(Number));
+            regroup = b.some((d, i) => d > (a[i] || 0));
+        } else {
+            const cols = Math.max(...ops.map((n) => String(n).length));
+            let carry = 0;
+            for (let i = 0; i < cols; i++) { const s = ops.reduce((t, n) => t + (Math.floor(n / 10 ** i) % 10), carry); if (s >= 10) regroup = true; carry = Math.floor(s / 10); }
+        }
+        return `stack:${op}:${ops.map((n) => String(n).length).join(',')}:${regroup ? 'r' : 'n'}`;
+    }
+    if (c.template === 'frac-model') return `frac:${/^\s*\d+(\s|$)/.test(String(q.ans ?? '')) ? 'whole' : 'part'}`;
+    return c.template ? `t:${c.template}` : '';
 }
 
 /**
@@ -496,16 +561,30 @@ export function anchorRich(q = {}) {
     const c = q.cell || {};
     const p = c.payload || {};
     if (c.template === 'coins' && p.kind !== 'tally' && Array.isArray(p.coins)) {
-        // At least 3 coins, so the example counts ON (a skill set to one kind of coin has no mixed set).
-        return p.coins.concat(p.notes || []).length >= 3;
+        // At least 3 coins and a coin above 1 (never counting pennies by ones, critic anchor-r2).
+        const all = p.coins.concat(p.notes || []).map(Number);
+        return all.length >= 3 && all.some((v) => v > 1);
     }
     if (c.template === 'coins' && p.kind === 'tally' && Array.isArray(p.counts)) {
-        return p.counts.filter((n) => Number(n) > 0).length >= 2;
+        // The fewest-coins move shows only when the biggest coin fits and a smaller one follows.
+        return Number(p.counts[0]) > 0 && p.counts.filter((n) => Number(n) > 0).length >= 2;
+    }
+    const ops = (p.operands || (p.a !== undefined && p.b !== undefined ? [p.a, p.b] : [])).map(Number);
+    if ((c.template === 'fact' || c.template === 'equation') && ops.length >= 2 && ops.every(Number.isFinite)) {
+        // No 0 or 1 facts (the zero / identity rules are edge cases, not the groups move).
+        const op = String(p.op || '');
+        if (/[*x×]/.test(op)) return ops.every((n) => n >= 2);
+        if (/[/÷]/.test(op)) return ops[1] >= 2 && ops[0] / ops[1] >= 2;
+        return ops.every((n) => n >= 1);
+    }
+    if (c.template === 'stack' && ops.length >= 2 && ops.every(Number.isFinite)) {
+        // No zero ones digit (12 - 10, 20 - 10) and no one-digit operand under a longer one.
+        return ops.every((n) => n % 10 !== 0) && new Set(ops.map((n) => String(Math.abs(n)).length)).size === 1;
     }
     if (c.template === 'clock' && p.m !== undefined) {
         const m = Number(p.m);
-        if (Number(p.precision) === 1) return m % 5 !== 0 && m > 10;
-        if (Number(p.precision) === 5) return m >= 10;
+        if (Number(p.precision) === 1) return m % 5 !== 0 && m > 10 && m < 45;
+        if (Number(p.precision) === 5) return m >= 10 && m < 45;
         return true;
     }
     if (c.template === 'count-row' && p.tab !== undefined) return Number(p.tab) >= 2;
@@ -522,8 +601,12 @@ export function pickExamples(cands, pupilQs, count, qOf = (a) => a.source.q) {
     const keys = (pupilQs || []).map(anchorKey);
     const free = cands.filter((a) => { const k = anchorKey(qOf(a)); return !keys.some((pk) => keysClash(k, pk)); });
     if (!free.length || count <= 0) return [];
-    const rich = free.filter((a) => anchorRich(qOf(a)));
-    const pool = rich.length ? rich.concat(free.filter((a) => !rich.includes(a))) : free;
+    // The block's most common shape first (its answer form, its regrouping), then the real move.
+    const tally = new Map();
+    for (const q of pupilQs || []) { const sh = anchorShape(q); if (sh) tally.set(sh, (tally.get(sh) || 0) + 1); }
+    const top = [...tally.entries()].sort((x, y) => y[1] - x[1])[0];
+    const rank = (a) => (top && anchorShape(qOf(a)) === top[0] ? 0 : 2) + (anchorRich(qOf(a)) ? 0 : 1);
+    const pool = free.map((a, i) => ({ a, i, r: rank(a) })).sort((x, y) => x.r - y.r || x.i - y.i).map((x) => x.a);
     const out = [];
     const used = new Set();
     for (const a of pool) {
@@ -737,7 +820,9 @@ export const ANCHOR_CSS = `
 :is(.ws-page,.ws-sheet) .mq-anchor-lines>span{display:block}
 :is(.ws-page,.ws-sheet) .mq-anchor-steps{font-size:max(${STEP_MIN_PT}pt,calc(var(--ws-zone) * 0.92))}
 :is(.ws-page,.ws-sheet) .mq-anchor .ws-frac.mq-anchor-frac{font-size:1em;margin:0 .1em}
-:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-cell-wrap{flex:none;display:flex}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-cell-wrap{flex:none;display:flex;width:max-content}
+:is(.ws-page,.ws-sheet) :is(.mq-anchor-band,.mq-anchor-compact)>.mq-anchor-one{padding-left:${TAB_CLEAR_MM}mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-compact>.mq-anchor-one .mq-anchor-cell{padding-left:0}
 :is(.ws-page,.ws-sheet) .mq-anchor-eq{white-space:nowrap}
 :is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-text{flex-grow:1;flex-shrink:1;max-width:105mm;display:flex;flex-direction:column;gap:1.5mm;padding-top:1mm}
 :is(.ws-page,.ws-sheet) .mq-anchor-say{font-size:max(${STEP_MIN_PT}pt,var(--ws-zone));line-height:1.2;padding-top:1mm;border-top:var(--ws-hair) solid var(--ws-ink)}
@@ -747,6 +832,6 @@ export const ANCHOR_CSS = `
 export default {
     ANCHOR_MODES, ANCHOR_ROLES, normaliseAnchors, wordCount, workedStepsOf, anchorEligible, ineligibleNote,
     stepLines, anchorGroups, sayLineOf, stepTemplateOf, unslot, stateSize, anchorHtml, anchorItem,
-    anchorPlanItem, anchorHeightMm, easeScore, pickDistinct, pickExamples, anchorKey, keysClash, anchorRich, isChoiceItem, sideItems, pupilCount, blockPlan, blockPages, ANCHOR_CSS,
+    anchorPlanItem, anchorHeightMm, easeScore, pickDistinct, pickExamples, anchorKey, keysClash, anchorRich, anchorShape, isChoiceItem, sideItems, pupilCount, blockPlan, blockPages, ANCHOR_CSS,
     STEPS_MIN_CHARS, stepsMinMm, anchorInnerMm, drawingWidthMm, stepsPlacement, pairRows, packPairs, pairsPerPage,
 };

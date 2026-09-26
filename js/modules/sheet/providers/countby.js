@@ -51,7 +51,7 @@ function rowSteps(values, blanks, stepText, jump) {
     out.push(step(`${fmt(values[first - 1])} ${jump(first)} = ${fmt(values[first])}. Write ${fmt(values[first])}.`, [{ slot: 'blank0', value: String(values[first]) }]));
     if (blanks.length > 1) {
         const k = 1, i = blanks[k];
-        out.push(step(`${fmt(values[i - 1])} ${jump(i)} = ${fmt(values[i])}.`, [{ slot: `blank${k}`, value: String(values[i]) }]));
+        out.push(step(`${fmt(values[i - 1])} ${jump(i)} = ${fmt(values[i])}. Write ${fmt(values[i])}.`, [{ slot: `blank${k}`, value: String(values[i]) }]));
     }
     out.push(step('Do the same at every gap. Check each jump.', blanks.map((i, k) => ({ slot: `blank${k}`, value: String(values[i]) }))));
     return clampSteps(out);

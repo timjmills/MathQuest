@@ -2541,6 +2541,11 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
     }
     try { _applyKitFactCell(q, mappedSkill, Number((_genHelpers && _genHelpers.range) || state.range || 100)); } catch (e) { /* the legacy cell stays */ }
     try { _applyOptionPost(q, selected, mappedSkill); } catch (e) { /* the item stands as generated */ }
+    // A no-regrouping rung prints no regroup frame (critic anchor-r2: a two-box frame over every
+    // minuend of "Subtract within 50 (no regrouping)" invited a regroup the skill never needs).
+    if (/_no_regroup$/.test(String(mappedSkill)) && q && q.cell && q.cell.template === 'stack' && q.cell.payload && q.cell.payload.regroup === undefined) {
+        q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { regroup: false }) });
+    }
     if (q && typeof q.text === 'string') q.text = agreeWithOne(q.text);
     if (q && typeof q.printText === 'string') q.printText = agreeWithOne(q.printText);
     // Auto-add vertical-column instruction + SVG diagram to horizontal add/sub

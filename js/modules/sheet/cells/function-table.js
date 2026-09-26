@@ -252,7 +252,9 @@ function machine(p, g, d, wMm) {
     const inner = given ? txt(g, ruleHtml(p.rule), { bold: true }) : txt(g, 'rule');
     const boxH = d.machineH;
     return `<div class="ft-machine" data-ft-machine="1" style="display:flex;align-items:center;justify-content:center;gap:${g.em(1.5)};`
-        + `width:${g.em(wMm)};margin:0 auto ${g.em(0.8)};white-space:nowrap">`
+        // At least the table's width, and as wide as its row: a fixed width let "In" and "Out"
+        // spill past the box into the text beside it (critic anchor-r2, a worked example's steps).
+        + `min-width:${g.em(wMm)};width:max-content;margin:0 auto ${g.em(0.8)};white-space:nowrap">`
         + `${txt(g, 'In', { bold: true })}${arrow(g, 7)}`
         + `<span style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${g.em(18)};height:${g.em(boxH)};`
         + `padding:0 ${g.em(2.5)};border:${HEAVY} solid ${INK.ink};background:#fff">${inner}</span>`

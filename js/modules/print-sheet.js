@@ -38,7 +38,7 @@ import { tagLine as lessonTagLine } from './sheet/roles/lesson.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import {
     normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, easeScore, ineligibleNote,
-    blockPlan, sideItems, pickDistinct, pairsPerPage, pickExamples, anchorKey, keysClash, anchorRich,
+    blockPlan, sideItems, pickDistinct, pairsPerPage, pickExamples, anchorKey, keysClash, anchorRich, isChoiceItem,
 } from './sheet/anchors.js';
 import {
     allocateSupports, alternativesOf, TOUCH_IDS, normCoverage, normMix, TOUCH_MIN_PT,
@@ -212,7 +212,7 @@ const refAnswer = (q) => String(q && q.ans !== undefined ? (typeof q.ans === 'ob
 /** An item's text as a packet compares it ("67 − 9 = ?"), tags and spaces removed. */
 export const refText = (q) => String((q && q.text) || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
-function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map(), itemCount = null } = {}) {
+function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map(), itemCount = null, noChoice = false } = {}) {
     const slots = dealSkills(skills, startIndex + count).slice(startIndex);
     // S2: a ticked support LEVEL fades down the page. With the section's count known it is dealt
     // in equal blocks of that count; otherwise two items a level (supports.js fadeRung). The same
@@ -236,6 +236,9 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
             // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
             // options - the packet's; the last try takes what it gets.
             if (k < tries && !refAccepts(sk, cand, key, seen, kept)) continue;
+            // A block under a worked example holds the example's task only: a skill's choice /
+            // sort variant ("Check ALL sums...") is not dealt there (critic anchor-r2).
+            if (noChoice && k < tries && isChoiceItem(cand)) continue;
             q = cand;
             if (!seen.has(signature(cand))) break;
         }
@@ -1484,6 +1487,7 @@ export async function buildSheet(req = {}) {
         if (!set.eligible) { anchorNotes.push(ineligibleNote(metaOf(sk).label)); return null; }
         if (anchorMode === 'side') sec.columns = 2;
         else { sec.maxCols = 4; sec.anchorMm = set.heightMm(1); }
+        sec.noChoice = true;
         return set;
     });
     /** A section's items as the layout sees them: side by side puts a twin before each. */
@@ -1512,7 +1516,7 @@ export async function buildSheet(req = {}) {
     const floorWith = (si, items) => floorOf(anchorMode === 'side' && anchorSets[si] ? items.concat(anchorSets[si].items) : items, n);
 
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
-        const gen = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null }, extra));
+        const gen = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null, noChoice: !!sec.noChoice }, extra));
         const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix, alt: sec.supportAlt };
         return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size, { mix })], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
     };
