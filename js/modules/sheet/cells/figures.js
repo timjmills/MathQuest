@@ -326,7 +326,8 @@ export function barGraphSVG(p, ctx) {
         // `uniform` (critic figures-r8: "four graphs at four sizes"): every graph a skill deals on a
         // page takes ONE plot - as wide as its most bars with its longest name, as tall as its
         // longest scale - and a graph with fewer bars or a shorter scale spreads over it.
-        const U = !twin && p.uniform ? p.uniform : null;
+        // (the screen twin too: one graph size on a worksheet, one card layout, critic figures-r8 G)
+        const U = p.uniform ? p.uniform : null;
         const valLabW = Math.max(...steps.map((v) => textW(v, zPt)), U ? textW(U.top, zPt) : 0);
         const catW = Math.max(...cats.map((c) => textW(c, zPt)), U ? textW('x'.repeat(Number(U.chars) || 0), zPt) : 0);
         // the twin keeps one plot width for every graph (one scale per worksheet); paper widens a
@@ -340,7 +341,7 @@ export function barGraphSVG(p, ctx) {
         const PW = slotW * n;
         const nPlot = U ? Math.max(nSt, Math.round(Number(U.top) / step) || 0) : nSt;
         const longPlot = nPlot > 6;
-        const PH = twin ? Math.max(ph0, (nSt / every) * zMm * 1.3)
+        const PH = twin ? Math.max(ph0, (nPlot / every) * zMm * 1.3)
             : Math.max(longPlot ? LONG_MIN : 0, Math.min(ph0, Math.max(PLOT_MIN[sz], nPlot * GRID_PITCH[sz][longPlot ? 1 : 0])));
         const valTitleY = zMm * 1.0;
         const x0 = Math.max(valLabW + 3, 1), yTop = valTitleY + 3.2, yBot = yTop + PH;
@@ -351,7 +352,7 @@ export function barGraphSVG(p, ctx) {
             if (named(k)) s += txt(x0 - 2.5, yOf(v) + zMm * 0.35, String(v), zPt, { anchor: 'end', weight: 400 });
             if (p.half && v + step <= top + 1e-9) s += line(x0 - 1, yOf(v + step / 2), x0, yOf(v + step / 2), SW.one, INK, ' data-fg-half="1"');
         }
-        const barW = Math.min(slotW * 0.6, 18, U ? 12 : 18);
+        const barW = Math.min(slotW * 0.6, 18, U && !twin ? 12 : 18);
         const bxOf = (i) => x0 + i * slotW + (slotW - barW) / 2;
         // the grey read-across lines sit UNDER the bars, so a taller bar in the way hides its part
         for (const i of guides) if (Number.isInteger(i) && vals[i] > 0) s += line(x0, yOf(vals[i]), bxOf(i) + barW, yOf(vals[i]), SW.rule, GREY, ' data-fg-hint="guide"');

@@ -2087,7 +2087,10 @@ async function buildRoleSheet(n, metaOf) {
     };
     let items = [];
     pools.forEach((p, pi) => {
-        const w = Math.max(0, Math.min(MAX_ITEMS, Math.floor(Number(want[p.id]) || 0)));
+        const w0 = Math.max(0, Math.min(MAX_ITEMS, Math.floor(Number(want[p.id]) || 0)));
+        // a Quiz of number and check-box items: a few spare of each, so test.js can fill whole
+        // rows in both parts (the page keeps only what it prints)
+        const w = n.role === 'test' && w0 && [...shapeSkills.values()].some(Boolean) ? Math.min(MAX_ITEMS, w0 + 4) : w0;
         let its = w <= probe[p.id].length && !mod.wrongFlags ? coverSlice(p, probe[p.id], w) : null;
         if (!its) { its = dealPool(p, pi, w); measure(its); }
         items = items.concat(its);

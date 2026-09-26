@@ -71,30 +71,36 @@ const isChk = (it) => isCheckAnswer((it && it.q) || it);
 export function plan(input = {}) {
     const ctx = ctxOf(input);
     const form = String(input.form || 'A').toUpperCase() === 'B' ? 'B' : 'A';
-    let items = poolItems(input, 'main');
-    const L = layout(items, input);
-    items = items.slice(0, L.perPage);
+    const pool = poolItems(input, 'main');
+    const L = layout(pool, input);
+    let items = pool.slice(0, L.perPage);
     // One answer shape a part (AP2 round 7, critic figures-r8 L10 / RUBRIC C1): a test whose
     // questions mix number boxes with check-box items ("which has the most?") prints the check-box
-    // items as their own part, under their own instruction, after the number items. The second
-    // instruction line comes off the grid: items are dropped (the larger part first) until both
-    // parts fit the page.
+    // items as their own part, under their own instruction, after the number items. The host deals
+    // a few spare items of each shape; the page takes the counts that hold the most problems under
+    // the second instruction line, in whole rows where it can.
     const baseKey = instructionKeyOf(items, input.skills);
     const chkKey = checkKeyOf(baseKey);
     let groups = [items];
-    if (chkKey && items.some(isChk) && !items.every(isChk)) {
-        const box = items.filter((it) => !isChk(it));
-        const chk = items.filter(isChk);
+    if (chkKey && pool.some(isChk) && !pool.every(isChk)) {
+        const boxAll = pool.filter((it) => !isChk(it));
+        const chkAll = pool.filter(isChk);
         const avail = (L.gridH || 0) - instructionMm(ctx.size);
         // rows at the problems' own height (the grid's cells are stretched to fill one part)
         const rowMm = L.hMin || L.cellH || 0;
-        const need = () => (Math.ceil(box.length / L.cols) + Math.ceil(chk.length / L.cols)) * rowMm;
-        while (L.gridH && rowMm && need() > avail + 0.01 && box.length + chk.length > 2) {
-            if (box.length >= chk.length && box.length > 1) box.pop();
-            else if (chk.length > 1) chk.pop();
-            else box.pop();
+        const c = Math.max(1, L.cols);
+        let best = null;
+        for (let nb = 1; nb <= boxAll.length; nb++) {
+            for (let nc = 1; nc <= chkAll.length; nc++) {
+                if (nb + nc > L.perPage) continue;
+                const rows = Math.ceil(nb / c) + Math.ceil(nc / c);
+                if (rowMm && L.gridH && rows * rowMm > avail + 0.01) continue;
+                const full = nb % c === 0 && nc % c === 0;
+                const score = (nb + nc) * 100 + (full ? 10 : 0) + (nb >= nc ? 5 : 0) - Math.abs(nb - 2 * nc) * 0.1;
+                if (!best || score > best.score) best = { nb, nc, score };
+            }
         }
-        groups = [box, chk];
+        if (best) groups = [boxAll.slice(0, best.nb), chkAll.slice(0, best.nc)];
     }
     // PT-TST-1: Form B is Form A re-ordered under (seed, form), within each part.
     if (form === 'B') {
