@@ -43,6 +43,7 @@ import { esc } from '../cell.js';
 import { blankWidth } from '../tokens.js';
 import {
     L, P, B, INK, GREY, SW, PT_MM, n2, isTwin, sizeOf, S, digitPt, textPt, zonePt, box, svg, root, shapeOf,
+    inkOf, answered,
 } from './k2kit.js';
 import { levelOf, partValue, numberSlot, tickList, tickedIndex, words } from './tmkit.js';
 
@@ -477,7 +478,7 @@ dataCell('bar-graph', barGraphSVG);
  * `cell(i, x, yMid)` drawing the row's marks; `markW` is the widest row's marks. `rules: 'open'`
  * (O6) leaves out the lines between the rows.
  */
-function rowTable(p, ctx, { markW, rowH, head2, cell }) {
+function rowTable(p, ctx, { markW, rowH, head2, cell, labelWeight = 400 }) {
     const cats = (p.categories || []).map(String);
     const zPt = labelPt(ctx), zMm = zPt * PT_MM;
     const labW = Math.max(...cats.map((c) => textW(c, zPt)), textW(p.catTitle || '', zPt)) + 5;
@@ -492,7 +493,7 @@ function rowTable(p, ctx, { markW, rowH, head2, cell }) {
     cats.forEach((c, i) => {
         const y = m + headH + i * rowH;
         if (i && p.rules !== 'open') s += line(m, y, m + W, y, SW.hair);
-        s += txt(m + 2.5, y + rowH / 2 + zMm * 0.35, c, zPt, { anchor: 'start', weight: 400 });
+        s += txt(m + 2.5, y + rowH / 2 + zMm * 0.35, c, zPt, { anchor: 'start', weight: labelWeight });
         s += cell(i, m + labW + 3, y + rowH / 2);
     });
     return { html: svg(ctx, W + 2 * m, H + 2 * m, s, { cls: 'fg-table', label: `${p.title || 'table'}` }), W: W + 2 * m, H: H + 2 * m };
@@ -741,4 +742,53 @@ register('perimeter-shape', {
     layout() { return { card: 'card-medium-visual', checker: 'value', requiresVisual: true }; },
 });
 
-export const FIGURE_TEMPLATE_IDS = Object.freeze(['thermometer', 'ruler', 'bar-graph', 'pictograph', 'tally-chart', 'perimeter-shape']);
+/* ================================================================ build a pictograph */
+
+/**
+ * The pupil BUILDS a picture graph (graphs:build_pictograph, critic guided-r1 H1 / H9): each row
+ * names its value ("Cats: 4") and has a row of empty boxes, 8 / 9 / 10 mm square (S / M / L), one
+ * picture to a box; the key draws the pictures in the first `value` boxes of each row (never
+ * "Answer: graph-built"). payload: {title, categories, values, icons (a k2kit shape a row), slots}.
+ */
+const BUILD_BOX = Object.freeze({ S: 8, M: 9, L: 10 });
+register('picture-build', {
+    render(p, ctx) {
+        const cats = (p.categories || []).map(String);
+        const vals = (p.values || []).map(Number);
+        const slots = Math.max(5, Number(p.slots) || 0, ...vals);
+        const bx = isTwin(ctx) ? 10 : (BUILD_BOX[sizeOf(ctx)] || 10);
+        const gap = 1.8;
+        const drawn = answered(ctx) || ctx.state === 'wrong';
+        const ink = inkOf(ctx);
+        const color = ctx.state === 'traced' ? GREY : INK;
+        const iconOf = (i) => (Array.isArray(p.icons) && p.icons[i]) || 'circle';
+        const g = rowTable({ categories: cats.map((c, i) => `${c}: ${vals[i]}`), catTitle: p.catTitle || 'Row', rules: 'ruled' }, ctx, {
+            markW: slots * (bx + gap), rowH: bx + 3, head2: 'Pictures', labelWeight: 700,
+            cell: (i, x, y) => {
+                let out = '';
+                for (let k = 0; k < slots; k++) {
+                    const bx0 = x + k * (bx + gap);
+                    out += `<rect x="${n2(bx0)}" y="${n2(y - bx / 2)}" width="${n2(bx)}" height="${n2(bx)}" rx="0.8" fill="#fff" stroke="${INK}" stroke-width="${n2(SW.one)}"/>`;
+                    if (drawn && k < vals[i]) {
+                        const pic = shapeOf(iconOf(i)).draw(bx0 + bx / 2, y, bx * 0.7);
+                        out += color === GREY ? pic.replace(/stroke="#000"/g, `stroke="${GREY}"`) : pic;
+                    }
+                }
+                return out;
+            },
+        });
+        const title = `<div style="font-size:${P(ctx, textPt(ctx))};font-weight:700;margin-bottom:${L(ctx, 1.5)};">${esc(p.title || '')}</div>`;
+        const say = `<div style="font-size:${P(ctx, Math.max(zonePt(ctx), 11))};margin-top:${L(ctx, 2)};">Draw one picture for each. Leave the other boxes empty.</div>`;
+        return root(ctx, 'fg-picture-build', `${title}<div data-ws-slot="answer" data-ws-shape="draw"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-block;max-width:100%;">${g.html}</div>${say}`);
+    },
+    answerKey(p) {
+        const cats = (p.categories || []).map(String), vals = (p.values || []).map(Number);
+        const shown = cats.map((c, i) => `${c} ${vals[i]}`).join(', ');
+        return { value: shown, display: shown, slots: { answer: { value: shown, graded: true } } };
+    },
+    footprint() { return { wMm: 186, hMm: null, measure: true, factLike: false, maxCols: 1 }; },
+    inputs() { return [{ id: 'answer', kind: 'drag', shape: 'draw', graded: true, order: 0, scopes: ['full'] }]; },
+    layout() { return { card: 'card-wide-visual', checker: 'value', requiresVisual: true }; },
+});
+
+export const FIGURE_TEMPLATE_IDS = Object.freeze(['thermometer', 'ruler', 'bar-graph', 'pictograph', 'tally-chart', 'perimeter-shape', 'picture-build']);

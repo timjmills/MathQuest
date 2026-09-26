@@ -118,15 +118,15 @@ function barOpen(q) {
             total: rows.length,
         };
     }
-    const [A, B, C] = cats;
-    const d = 2 + (sum(vals) % 3);                          // 2, 3 or 4 more
-    const T = 20;
+    // Grade 3: two bars on a scale that counts by 2s, one bar d more than the other
+    const [A, B] = cats;
+    const d = 2 * (1 + (sum(vals) % 3));                    // 2, 4 or 6 more
     const rows = [];
-    for (let b = 1; 2 * b + d + 1 <= T; b++) rows.push([b + d, b, T - 2 * b - d, T]);
+    for (let b = 2; b + d <= 20; b += 2) rows.push([b + d, b, d]);
     if (rows.length < 4) return null;
     return {
-        prompt: [`A bar graph shows ${A}, ${B} and ${C}. The ${A} bar is ${d} more than the ${B} bar.`, `The bars show ${T} in all. Find different graphs.`],
-        columns: [A, B, C, 'Check: in all'],
+        prompt: [`The ${A} bar is ${d} more than the ${B} bar.`, 'The scale counts by 2s, up to 20. Find different graphs.'],
+        columns: [A, B, 'Check: how many more'],
         example: rows[0],
         keyRows: rows.slice(1),
         total: rows.length,

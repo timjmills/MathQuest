@@ -4,6 +4,7 @@ import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { COLORS, STROKE, FONTS, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
 import { k2Twin, fadeRung } from './sheet/index.js';
+import { dealPick } from './page-deal.js';
 
 // P12: an option value the teacher chose for this skill (skill-options.js), else undefined.
 function _dOpt(id) {
@@ -48,6 +49,20 @@ function _dSet(id) {
 // the pattern). The item index serves only the Support level, which fades down a page (O3).
 let _dLive = 0;
 const _dAt = () => (Number.isFinite(state.itemIndex) ? state.itemIndex : (_dLive++));
+// The answers dealt so far on this page (item 0 opens a page). An answer already on a third of
+// the page is dealt again (critic guided-r1: "18, 18, 8, 18").
+let _dPageAns = [];
+function _dFreshAsk(at, ask) {
+    if (at === 0) _dPageAns = [];
+    let d = ask();
+    for (let t = 0; t < 8; t++) {
+        const seen = _dPageAns.filter(a => a === String(d.ans)).length;
+        if (at === 0 || seen < Math.max(1, Math.ceil((at + 1) / 3))) break;
+        d = ask();
+    }
+    _dPageAns.push(String(d.ans));
+    return d;
+}
 const _dOnPage = () => Number.isFinite(state.itemIndex);
 
 /** The Support level of this item (O3): the ticked levels dealt most-support-first down a page. */
@@ -531,6 +546,12 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Build Pictograph";
                 q.printFormat = "build-pictograph";
                 q.dataData = { categories: cats, values, icons, context: _ctx.title, type: 'build_pictograph' };
+                // The printed page (critic guided-r1 H1 / H9): a kit cell with 8-10 mm boxes, one
+                // picture a box, and a key that draws the pictures (sheet/cells/figures.js). The
+                // screen keeps its + / - builder (q.cell is read by print only for this template).
+                const _shapes = ['circle', 'square', 'star', 'triangle'];
+                q.cell = { template: 'picture-build', v: 1, payload: { title: _ctx.title, categories: cats, values,
+                    icons: cats.map((_, i) => _shapes[i % _shapes.length]), slots: Number(_dOpt('band')) === 5 ? 5 : 7, catTitle: 'Row' } };
                 return;
             }
 
@@ -893,7 +914,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 // bar. A page turns through its contexts and its question kinds (AP2 round 4), and
                 // the Support level draws the grey read-across lines (a hint that fades).
                 const at = _dAt();
-                const context = pick(BAR_CONTEXTS);
+                const context = dealPick(`${dataSkill}:context`, BAR_CONTEXTS);
                 const numBars = _dNum('tiles') || pick([4, 5]);
                 const categories = shuffle(context.cats.slice()).slice(0, numBars);
                 const barMax = _dNum('most') || 20;
@@ -902,9 +923,9 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 const unit = half ? step / 2 : step;
                 const kMax = Math.max(2, Math.floor(barMax / unit));
                 const kinds = _dKinds({ 0: ['most', 'least'], 1: ['value'], 2: ['more'], 3: ['total'] });
-                const kind = pick(kinds);
+                const kind = dealPick(`${dataSkill}:kind`, kinds);
                 const deal = () => categories.map(() => unit * rng(half ? 2 : 1, kMax));
-                const d = _dataAsk(kind, context, categories, deal(), deal, unit);
+                const d = _dFreshAsk(at, () => _dataAsk(kind, context, categories, deal(), deal, unit));
                 const values = d.vals;
                 // the scale ends on the first line above the tallest bar (a bar never touches the top)
                 const top = step * Math.ceil((Math.max(...values) + 0.5) / step);
@@ -929,13 +950,13 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 // numbers are set by the key and "Most pictures in a row", never by the Max Number
                 // (critic round 5: "Up to 10" dealt totals of 60).
                 const at = _dAt();
-                const context = pick(BAR_CONTEXTS);
+                const context = dealPick(`${dataSkill}:context`, BAR_CONTEXTS);
                 const numRows = _dNum('tiles') || pick([3, 4, 5]);
                 const categories = shuffle(context.cats.slice()).slice(0, numRows);
                 const _sc = _dOpt('scale');
                 const ticked = Array.isArray(_sc) && _sc.length ? _sc : [0, 1, 2];
                 const scaleOpts = ticked.map(i => [2, 5, 10, 25][i]).filter(Boolean);
-                const scale = pick(scaleOpts.length ? scaleOpts : [2, 5]);
+                const scale = dealPick('pictograph:key', scaleOpts.length ? scaleOpts : [2, 5]);
                 const most = _dNum('most') || 6;
                 const halves = (scale === 2 || scale === 10) && _dOpt('halves') !== 'never';
                 // a row of 1 to `most` pictures; at a key of 2 or 10 about one row in three ends in
@@ -944,12 +965,14 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     const k = rng(1, halves ? most - 1 : most);
                     return (k + (halves && rng(1, 3) === 1 ? 0.5 : 0)) * scale;
                 });
-                let first = deal();
-                if (halves && !first.some(v => (v / scale) % 1)) first[rng(0, first.length - 1)] += scale / 2;
-                first = first.map(v => Math.min(v, most * scale));
+                const firstDeal = () => {
+                    let first = deal();
+                    if (halves && !first.some(v => (v / scale) % 1)) first[rng(0, first.length - 1)] += scale / 2;
+                    return first.map(v => Math.min(v, most * scale));
+                };
                 const kinds = _dKinds({ 0: ['most', 'least'], 1: ['value'], 2: ['total'], 3: ['more'] });
-                const kind = pick(kinds);
-                const d = _dataAsk(kind, context, categories, first, deal, halves ? scale / 2 : scale);
+                const kind = dealPick(`${dataSkill}:kind`, kinds);
+                const d = _dFreshAsk(at, () => _dataAsk(kind, context, categories, firstDeal(), deal, halves ? scale / 2 : scale));
                 const icon = _dOpt('objects') === 'shapes' ? 'circle' : context.pic;
                 const payload = { title: context.title, categories, values: d.vals, scale, icon, catTitle: context.cat, valTitle: context.val,
                     ask: d.ask, kinds, scales: scaleOpts, question: d.text, answer: d.ans, support: _dLevel(at), widest: most };
@@ -1056,14 +1079,14 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 // contexts and question kinds; the Support level prints the grey running count after
                 // each bundle of five (a hint that fades).
                 const at = _dAt();
-                const context = pick(BAR_CONTEXTS);
+                const context = dealPick(`${dataSkill}:context`, BAR_CONTEXTS);
                 const numRows = _dNum('tiles') || pick([3, 4, 5]);
                 const categories = shuffle(context.cats.slice()).slice(0, numRows);
                 const _tMost = _dNum('most');
                 const deal = () => categories.map(() => (_tMost ? rng(_tMost <= 5 ? 1 : 3, _tMost) : rng(3, 15)));
                 const kinds = _dKinds({ 0: ['value'], 1: ['most', 'least'], 2: ['total'], 3: ['more'] });
-                const kind = pick(kinds);
-                const d = _dataAsk(kind, context, categories, deal(), deal, 1);
+                const kind = dealPick(`${dataSkill}:kind`, kinds);
+                const d = _dFreshAsk(at, () => _dataAsk(kind, context, categories, deal(), deal, 1));
                 // widest: the longest row the skill deals, so every chart of a page takes one cell width
                 const payload = { title: context.title, categories, values: d.vals, catTitle: context.cat, valTitle: 'Tally', widest: _tMost || 15,
                     rules: _dOpt('rules') === 'open' ? 'open' : 'ruled', ask: d.ask, kinds, question: d.text, answer: d.ans, support: _dLevel(at) };

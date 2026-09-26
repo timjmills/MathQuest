@@ -265,6 +265,7 @@ const FACT_FORMAT_RE = /-facts-(vertical|horizontal|fraction|long)$/;
 const SKILL_INSTRUCTION_FALLBACK = Object.freeze({
     count_objects: 'count-write', ten_frame_build: 'draw-count', base10_build: 'draw-blocks',
     compare_groups: 'check-groups', share_into_groups: 'ring-groups', number_bonds: 'missing',
+    build_pictograph: 'build-pictograph',
 });
 
 function instructionKeyFor(q, words) {

@@ -7,6 +7,7 @@ import { createAnalogClockSVG, createDigitalClockHTML, addTime, subtractTime, fo
 import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 import { isTimeMoneySkill, generateTimeMoneyQuestion } from './gen-time-money.js';
 import { k2Twin, fadeRung } from './sheet/index.js';
+import { dealPick } from './page-deal.js';
 
 // O6 appearance (lane AP2): the value of an appearance control (`labels`, `bars`) for the skill
 // being generated, or `dflt` when the skill has no such control. It never consumes a random
@@ -835,12 +836,12 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 const most = _mNum('most') || 5;
                 let theme, rows, cats, counts, ask, text, ans, askType;
                 for (let tries = 0; tries < 8; tries++) {
-                    theme = pick(themes);
+                    theme = dealPick('pictograph_intro:theme', themes);
                     const numCats = Math.min(_mNum('tiles') || pick([2, 3]), theme.items.length);
                     rows = shuffle([...theme.items]).slice(0, numCats);
                     cats = rows.map(r => r[0]);
                     counts = cats.map(() => randInt(1, most));
-                    askType = pick(forms.map(f => ['count', 'more'][f]).filter(Boolean)) || 'count';
+                    askType = dealPick('pictograph_intro:kind', forms.map(f => ['count', 'more'][f]).filter(Boolean)) || 'count';
                     if (askType === 'more') {
                         // two rows set apart by 1 to most - 1, the larger at random
                         const [i, j] = shuffle([...cats.keys()]).slice(0, 2);
@@ -905,12 +906,12 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 const order = [1, 2, 0].filter(f => forms.includes(f));
                 let theme, cats, counts, ask, text, ans, askType;
                 for (let tries = 0; tries < 8; tries++) {
-                    theme = pick(themes);
+                    theme = dealPick('bar_graph_intro:theme', themes);
                     const numCats = Math.min(_mNum('tiles') || pick([2, 3]), theme.items.length);
                     // the bars in a dealt order, so the tallest is not the first bar
                     cats = shuffle(theme.items.slice()).slice(0, numCats);
                     counts = cats.map(() => randInt(1, top));
-                    askType = ['most', 'count', 'more'][pick(order.length ? order : [1])] || 'count';
+                    askType = ['most', 'count', 'more'][dealPick('bar_graph_intro:kind', order.length ? order : [1])] || 'count';
                     if (askType === 'most') {
                         // one bar is the most: a tie is broken at a dealt bar
                         const maxVal = Math.max(...counts);
@@ -968,7 +969,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 const at = _mAt();
                 const kindsOn = _mSet('shapes') || [0, 1, 2, 3];
                 const order = [0, 2, 1, 3].filter(k => kindsOn.includes(k));
-                const kind = ['rectangle', 'square', 'triangle', 'pentagon'][pick(order.length ? order : [0])];
+                const kind = ['rectangle', 'square', 'triangle', 'pentagon'][dealPick('perimeter_intro:shape', order.length ? order : [0])];
                 const band = _mNum('band');
                 const sideMax = band ? Math.max(4, Math.min(15, Math.floor(band / 3.2))) : 10;
                 // "Perimeter up to" (default about 40) is the bound the page keeps: a deal past it is
@@ -1209,13 +1210,14 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 const hard = measSkill === "reading_ruler_hard";
                 const parts = _mSet('parts') || (hard ? [0, 1, 2] : [0]);
                 const res = parts.includes(2) ? 4 : parts.includes(1) ? 2 : 1;
-                // AP2 round 5 (L10): the marks each item reads are DEALT. A page of one fine part
-                // (half or quarter inches alone) also deals the coarser readings it contains - a
-                // whole inch, and on a quarter page a half - so the fraction is never the same on
-                // every item. The page's first item (a Guided page's Model) reads the finest marks.
+                // AP2 round 5 (L10): the marks each item reads are DEALT (page-deal.js), never
+                // turned through by position. The page's first item (a Guided page's Model) reads
+                // the finest ticked marks.
                 const finest = Math.max(...parts);
-                const pool = parts.length > 1 ? parts : finest === 2 ? [2, 2, 2, 1, 0] : finest === 1 ? [1, 1, 0] : [0];
-                const kindAt = at === 0 && _mOnPage() ? finest : pick(pool);
+                // (a page of one ticked part reads only that part: "Marks read" is the teacher's
+                // choice of item kind, O1)
+                const pool = parts;
+                const kindAt = at === 0 && _mOnPage() ? finest : dealPick(`${measSkill}:marks`, pool);
                 const moved = _mLook('measure', 'zero') === 'moved';
                 const start = moved ? rng(1, 2) : 0;
                 const room = 6 - start;
@@ -1228,7 +1230,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 }
                 _mNoteAnswer(at, meas);
                 const ans = _inchText(meas);
-                const object = pick(['pencil', 'crayon', 'ribbon', 'straw']);
+                const object = dealPick(`${measSkill}:object`, ['pencil', 'crayon', 'ribbon', 'straw']);
                 const payload = { len: 6, start, meas, res, labels: _mLook('labels', 'all'), object, ans, support: _mLevel(at) };
                 q.cell = { template: 'ruler', v: 1, payload };
                 q.visual = k2Twin('ruler', payload);
@@ -1257,13 +1259,13 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 const at = _mAt();
                 const forms = _mSet('forms');
                 const units = (forms || [0, 1]).map(i => ['°F', '°C'][i]).filter(Boolean);
-                const unit = pick(units.length ? units : ['°F', '°C']);
+                const unit = dealPick('temperature:unit', units.length ? units : ['°F', '°C']);
                 const step = _mNum('step') === 2 ? 2 : 1;
                 const span = 20 * step;
                 const some = _mLook('labels', 'all') === 'some';
                 const every = step === 2 ? (some ? 20 : 10) : (some ? 10 : 5);
                 const band = _mNum('band');
-                const below = _mLook('belowZero', 'never') === 'some' && rng(1, 3) === 1;
+                const below = _mLook('belowZero', 'never') === 'some' && dealPick('temperature:below', [true, false, false]);
                 const top = band || (unit === '°F' ? 100 : 40);
                 const floor = below ? -span + 10 : (band ? 0 : (unit === '°F' ? 30 : 0));
                 const los = [];

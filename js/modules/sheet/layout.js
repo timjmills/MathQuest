@@ -495,12 +495,15 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         // one column, under it in two) takes the column count that holds the MOST problems, not
         // simply the most columns: two half-width graphs a page can be fewer than three full ones.
         if (cols > 1 && infos.length && infos.every((i) => i.fp && i.fp.byCapacity)) {
+            // (the cell's own column cap holds even where a narrower column measured as fitting;
+            // a tie goes to more columns: the page's width is used, H13)
             const perAt = (c) => {
+                if (infos.some((i) => Number(i.fp.maxCols) > 0 && c > Number(i.fp.maxCols))) return 0;
                 const pr = probe(c, c > 1);
                 return pr.fits ? c * Math.max(1, Math.floor((G - SAFETY_H_MM) / Math.max(1, pr.hMin))) : 0;
             };
-            let best = cols, bestN = perAt(cols);
-            for (let c = cols - 1; c >= 1; c--) { const k = perAt(c); if (k > bestN) { best = c; bestN = k; } }
+            let best = 1, bestN = perAt(1);
+            for (let c = 2; c <= cols; c++) { const k = perAt(c); if (k >= bestN && k > 0) { best = c; bestN = k; } }
             cols = best;
         }
         if (cls === 'word') reason = 'Word problems print in 1 column.';

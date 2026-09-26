@@ -38,6 +38,7 @@ const ONE_COLUMN = {
     ruler: { cols: 1, why: 'a ruler prints at true scale only (RP-160): 6 inches is 158 mm, the whole live width (section 11.2: 1 column)' },
     'bar-graph': { cols: 1, why: 'the plot area is 80 x 60 / 90 x 70 / 100 x 80 mm (section 11.2) and its question sits beside it in the same cell (RP-133)' },
     pictograph: { cols: 1, why: 'a graph (section 11.2: 1 column): the table of up to 8 pictures a row, its key, and its question beside it in the same cell (RP-133)' },
+    'picture-build': { cols: 1, why: 'a picture graph the pupil builds: up to 7 drawing boxes a row, each 8-10 mm (H9), with the row names - the full live width' },
     equation: { cols: { S: 3, M: 2, L: 2 }, why: 'at M / L an equation with two 2-digit numbers, a sign circle and a slot is wider than a 3-column cell at the size\'s digit height (DN-11: columns never shrink digits); 2 columns hold it' },
 };
 

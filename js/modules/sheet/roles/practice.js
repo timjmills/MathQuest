@@ -132,9 +132,6 @@ export const SHEET_ENGINE_CSS = `
 /* Stretch (09-D mock-up): the prompt box, the results table, the closing frames */
 :is(.ws-page,.ws-sheet) .ws-cell.mq-stretchcell{align-items:stretch;padding:4mm 5mm 4mm 9mm}
 :is(.ws-page,.ws-sheet) .mq-stretch{width:100%;display:flex;flex-direction:column;gap:5mm}
-:is(.ws-page,.ws-sheet) .ws-cell.mq-stretchcell{justify-content:flex-start;align-content:flex-start}
-.ws-page .ws-grid > .ws-cell.mq-stretchcell:not(.blankrun){justify-content:flex-start}
-:is(.ws-page,.ws-sheet) .ws-cell.mq-stretchcell>.mq-stretch{align-self:flex-start;margin-top:3mm}
 :is(.ws-page,.ws-sheet) .mq-prompt{padding:2.5mm 5mm}
 :is(.ws-page,.ws-sheet) .mq-stretch-main{display:flex;align-items:flex-end;gap:7mm}
 :is(.ws-page,.ws-sheet) .mq-table{flex:none;border-collapse:collapse;border:var(--ws-heavy) solid var(--ws-ink)}

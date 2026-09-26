@@ -168,6 +168,19 @@ export function fitsAt(items, cols, ctx) {
 
 /** The largest column count in `options` (descending) at which every item fits. */
 export function bestCols(items, options, ctx) {
+    // Cells that restack by width (`footprint.byCapacity`: a graph with its question beside it at
+    // one column, under it at two) take the count that holds the most on a page, as the practice
+    // layout does (layout.js); every other cell the most columns that fit.
+    if (items.length && items.every((it) => it.footprint && it.footprint.byCapacity)) {
+        let best = null, bestN = -1;
+        for (const c of options.slice().sort((x, y) => x - y)) {
+            if (!fitsAt(items, c, ctx)) continue;
+            const h = hMinAt(items, c, ctx);
+            const n = Number.isFinite(h) && h > 0 ? c * Math.floor(226 / h) : 0;
+            if (n > 0 && n > bestN) { best = c; bestN = n; }   // a tie: fewer columns (a Model row stacks its work)
+        }
+        if (best !== null) return best;
+    }
     for (const c of options) if (fitsAt(items, c, ctx)) return c;
     return options[options.length - 1] || 1;
 }
