@@ -696,8 +696,11 @@ answer traced grey, and every step listed beside it.
 - **Where the steps go (owner report 2026-09-25, `anchors.js stepsPlacement`).** A count-by row's
   Model cell printed its steps one word a line in a column squeezed against the cell's right
   border, running past it and down beside the next cell. The steps of a one-state anchor go
-  BESIDE the drawing only when the column left beside it holds **18 characters** a line of the
-  page's step type (`stepsMinMm`: 41 / 35 / 33 mm at L / M / S; `STEPS_MIN_CHARS`). Otherwise they
+  BESIDE the drawing only when the column left beside it holds **24 characters** a line of the
+  page's step type (`stepsMinMm`, about 53 mm; `STEPS_MIN_CHARS`). Step and Say text is never under
+  **11 pt** at any size (`STEP_MIN_PT`); a number sentence never breaks inside, and fractions in
+  steps and Say are stacked (TY-7). Beside the drawing, the steps and the Say line stand together,
+  the pair centred in the band. Otherwise they
   go UNDER the drawing, across the cell: in two text columns read row by row (1 2 / 3 4) when the
   cell is at least 164 mm wide, short sentences of one step sharing a line while it stays within
   10 words. A drawing wider than 55% of the cell (a count-by row, a number line, a long table, a bar
@@ -724,7 +727,24 @@ answer traced grey, and every step listed beside it.
 
 ## S6 · Anchor layouts on practice sheets
 
-**Request.** `buildSheet({... anchors: 'off' | 'side' | 'sections'})`. `'on'` means the role's
+**Owner ruling 2026-09-26 (LESSON_LIBRARY_PLAN.md 8f): ONE form only.** Practice keeps a single
+worked example on top of each block (SECTIONS). SIDE BY SIDE is dropped: `normaliseAnchors` maps an
+old `'side'` request to `'sections'` so saved sets still print, and the Print screen's control is
+Off / On. The rules for the example (`anchors.js pickExamples`, `print-sheet.js anchorSet`):
+- **Eligible per candidate**: a choice / multi-select variant is skipped, never a Model, and never
+  decides for the whole skill.
+- **Different numbers from every problem on the page** (`anchorKey` / `keysClash`): not the same
+  count-by table, clock time, coin total or change target, function-table rule or operands, and
+  not the same answer. The candidates walk the item index too, so a skill that deals its table by
+  position gives varied examples; the examples of one page differ from each other.
+- **The skill's real move, easy-first** (`anchorRich`): at least 3 coins; to the minute, a minute
+  past a five beyond :10; to five minutes, :10 or later; no count by 1.
+- **Drawn like the problems**: the example is drawn at the page's scaffold level (1).
+- **A band that cannot stand over one row of the problems is not printed** (a note says so), and a
+  band is only as tall as the example it holds.
+- **A lone block fills the page**: it takes the rows that fit, up to 6 problems or 3 rows.
+
+**Request (historical).** `buildSheet({... anchors: 'off' | 'side' | 'sections'})`. `'on'` means the role's
 default, sections. `normaliseRequest` accepts it on `independent`, `more-practice` and
 `mixed-practice`, and forces `'off'` on every other role. The default is `'off'`, so existing pages
 and links are unchanged.

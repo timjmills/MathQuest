@@ -1989,7 +1989,9 @@ async function buildRoleSheet(n, metaOf) {
             // The compact band (one state, steps beside): a skill's shelf band stays short.
             const band = anchorSet(sk, pi, n, { variant: 'compact', colsList: [1], twinCols: 4 });
             if (!band.eligible) { anchorNotes.push(ineligibleNote(metaOf(sk).label)); return; }
-            const entry = { band: band.items.slice(), bandSet: band };
+            // The band the packing reserves: the first candidates (rich-first, easy-first), the ones
+            // `take` picks from.
+            const entry = { band: band.items.slice(0, 6), bandSet: band };
             if (n.anchors === 'side') {
                 const side = anchorSet(sk, pi + 4099, n, { variant: 'side', colsList, twinCols: 2 });
                 entry.side = side.items.slice();
@@ -2033,7 +2035,10 @@ async function buildRoleSheet(n, metaOf) {
         for (const [id, e] of Object.entries(anchorsIn.byPool)) {
             const pupil = items.filter((it) => it.pool === id);
             const maxBand = Math.max(0, ...e.band.map((a) => anchorHeightMm(a, 1)));
-            e.band = e.bandSet.take(items, 4).filter((a) => anchorHeightMm(a, 1) <= maxBand + 0.05).slice(0, 1);
+            // The picked example first; the reserved list stays behind it, so the shelves are
+            // packed with the band the page was counted with (the role draws band[0] only).
+            const pick = e.bandSet.take(items, 4).filter((a) => anchorHeightMm(a, 1) <= maxBand + 0.05).slice(0, 1);
+            e.band = pick.length ? pick.concat(e.band.filter((a) => a !== pick[0])) : [];
             if (e.sideSet) {
                 const tw = e.sideSet.take(items, pupil.length);
                 pupil.forEach((it, i) => { it.twin = tw[i] || null; });
@@ -2078,7 +2083,7 @@ async function buildRoleSheet(n, metaOf) {
             thinking: it.thinking ? { isWrong: !!it.thinking.isWrong, shown: it.thinking.shown } : undefined,
         })),
         gaps: out.gaps,
-        anchors: anchorSummary(n.anchors, anchorsIn ? Object.values(anchorsIn.byPool).flatMap((e) => e.band).concat(items.map((it) => it.twin).filter(Boolean)) : [], anchorNotes),
+        anchors: anchorSummary(n.anchors, anchorsIn ? Object.values(anchorsIn.byPool).flatMap((e) => e.band.slice(0, 1)).concat(items.map((it) => it.twin).filter(Boolean)) : [], anchorNotes),
         floors: pools.map((p) => input.floors[p.id]),
         seed: n.seed,
         role: n.role,

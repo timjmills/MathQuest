@@ -406,7 +406,10 @@ async function browserChecks() {
             } else {
                 // A skill without worked steps has no twin; every other problem still has its own.
                 ok(grids.every((g) => g === 'M' || /^p+$/.test(g)), `${r.what}: example bands and problem grids, no pairs (${grids.join(' / ')})`);
-                ok(r.count === 1, `${r.what}: "a page" stays one page (${r.count})`);
+                // Sections form (owner ruling 8f): when the members' bands and one row each do not fit
+                // one page, the sheet runs to a second page and its Score counts the whole sheet
+                // (design/SUPPORTS.md S6, "A page of several skills") - never more than that.
+                ok(r.count <= 2, `${r.what}: "a page" is at most two pages with the example bands (${r.count})`);
             }
             // Sheets: each page with a Score starts a sheet; the sheet runs to the next Score.
             let sheet = null;
