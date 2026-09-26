@@ -752,6 +752,13 @@ function wsLintPage(cfg) {
             let n = 0;
             for (const d of pg.querySelectorAll('*')) {
                 if (n > 2 || !visible(d)) continue;
+                // PT-FRM-8: the copyright line hangs in the bottom margin by design (the footer band never grows);
+                // it must stay inside the paper, at least 6 mm above its bottom edge.
+                if (d.classList && d.classList.contains('ws-copy')) {
+                    const rc = d.getBoundingClientRect();
+                    if (rc.bottom > pr.bottom - 6 * 96 / 25.4) { n++; F('L-OVERFLOW', 'PG-13', 'major', d, `the copyright line is within 6 mm of the paper's bottom edge (PT-FRM-8)`, 'copyright near edge'); }
+                    continue;
+                }
                 const r = d.getBoundingClientRect();
                 if (!r.width || !r.height) continue;
                 const over = Math.max(r.right - live.r, live.l - r.left, r.bottom - live.b, live.t - r.top);
