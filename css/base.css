@@ -346,3 +346,17 @@ input[type=number] { -moz-appearance: textfield; }
     color: #b71c1c;
 }
 
+
+/* geometry-r1: the ( x , y ) boxes of a coordinates item are tap targets of 44 px or more, in ink
+   like the paper cell they sit under (additive: the rules above are kept for saved quizzes). */
+.ci-host .ci-x, .ci-host .ci-y {
+    min-height: 48px;
+    min-width: 56px;
+    box-sizing: border-box;
+    font-family: Andika, "Open Sans", sans-serif;
+}
+.ci-host .ci-x:not(.flash-correct):not(.flash-wrong), .ci-host .ci-y:not(.flash-correct):not(.flash-wrong) {
+    border-color: #000;
+    color: #000;
+}
+.ci-host .ci-paren, .ci-host .ci-comma, .ci-host .ci-label { color: #000; font-family: Andika, "Open Sans", sans-serif; }

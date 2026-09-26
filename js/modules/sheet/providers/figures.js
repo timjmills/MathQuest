@@ -22,6 +22,7 @@
 
 import { registerSkill } from '../contract.js';
 import { chooseWrong, strings, step, clampSteps, countList } from './util.js';
+import { openPerimeter } from './geometry.js';
 
 const payloadOf = (q) => (q && q.cell && q.cell.payload) || {};
 const sum = (a) => a.reduce((s, v) => s + v, 0);
@@ -380,6 +381,8 @@ registerSkill('area_perimeter:perimeter_intro', {
     misconceptions: ['M-P1', 'M-P2', 'M-P3', 'M-P4'],
     workedSteps: (q) => clampSteps(perimeterSteps(q)),
     wrongAnswer: perimeterWrong,
+    // Stretch (geometry-r1): rectangles with the same perimeter, a results table the pupil checks
+    open: (q) => openPerimeter(q, false),
 });
 
 /** The skills this module gives a real provider (the error-analysis lane's legacy-wrong.js skips them). */

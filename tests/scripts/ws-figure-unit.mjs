@@ -10,6 +10,8 @@
 //   CROSS    no label crosses a side of the figure or the dotted height
 //   REVEAL   the pupil page (state blank, Support level 1) prints no answer
 //   WIDTH    the drawing fits its cell (a third of the page at S, a half at M and L)
+//   PLACE    geometry-r1, the one label rule: no label is forced; each label is nearer its own edge
+//            (or the height's dotted line) than any other line; two labels keep LABEL_GAP apart
 //
 //   node tests/scripts/ws-figure-unit.mjs            # 120 items per builder
 //   node tests/scripts/ws-figure-unit.mjs --n 400
@@ -64,7 +66,7 @@ function segHits(A, B, [x1, y1, x2, y2]) {
 
 let failures = 0, checks = 0;
 const report = [];
-const fail = (name, msg) => { failures++; if (report.filter((r) => r.startsWith(name)).length < 4) report.push(`${name}: ${msg}`); };
+const fail = (name, msg) => { failures++; if (process.env.FIGALL || report.filter((r) => r.startsWith(name)).length < 4) report.push(`${name}: ${msg}`); };
 
 for (const [name, build] of Object.entries(builders)) {
     for (let i = 0; i < N; i++) {
@@ -115,6 +117,33 @@ for (const [name, build] of Object.entries(builders)) {
             }
             for (const bx of boxes) if (segs.some(([A, B]) => segHits(A, B, bx.b))) fail(name, `${size}: label ${bx.v} crosses a side (${JSON.stringify(poly)})`);
             if (r.W > WIDTH[size]) fail(name, `${size}: the drawing is ${r.W.toFixed(1)} mm wide (cell ${WIDTH[size]})`);
+            // PLACE: the one label rule
+            const dSeg = ([x, y], [A, B]) => {
+                const vx = B[0] - A[0], vy = B[1] - A[1], L2 = vx * vx + vy * vy || 1;
+                const t = Math.max(0, Math.min(1, ((x - A[0]) * vx + (y - A[1]) * vy) / L2));
+                return Math.hypot(x - (A[0] + t * vx), y - (A[1] + t * vy));
+            };
+            for (const lb of r.labels || []) {
+                if (lb.forced) fail(name, `${size}: label ${lb.v} has no clear place by its edge (${JSON.stringify(poly)})`);
+                const own = lb.edge === 'h' ? segs[segs.length - 1] : segs[lb.edge];
+                if (!own) continue;
+                // the gap from the label's box to a line: the nearest of points round the box
+                const ring = [];
+                for (let u = 0; u <= 4; u++) {
+                    const fx = lb.x - lb.w / 2 + (lb.w * u) / 4, fy = lb.y - lb.h / 2 + (lb.h * u) / 4;
+                    ring.push([fx, lb.y - lb.h / 2], [fx, lb.y + lb.h / 2], [lb.x - lb.w / 2, fy], [lb.x + lb.w / 2, fy]);
+                }
+                const gapTo = (sg) => Math.min(...ring.map((pt) => dSeg(pt, sg)));
+                const dOwn = gapTo(own);
+                const other = segs.filter((sg) => sg !== own).map(gapTo);
+                if (other.some((d) => d < dOwn - 0.05)) fail(name, `${size}: label ${lb.v} is nearer another side than its own (${JSON.stringify(poly)})`);
+            }
+            const lbs = r.labels || [];
+            for (let a = 0; a < lbs.length; a++) for (let b = a + 1; b < lbs.length; b++) {
+                const A = lbs[a], B = lbs[b];
+                const bA = [A.x - A.w / 2, A.y - A.h / 2, A.x + A.w / 2, A.y + A.h / 2], bB = [B.x - B.w / 2, B.y - B.h / 2, B.x + B.w / 2, B.y + B.h / 2];
+                if (!fig.labelsClear(bA, bB, r.gap - 0.01)) fail(name, `${size}: labels ${A.v} and ${B.v} are too close to read apart (${JSON.stringify(poly)})`);
+            }
             // REVEAL: the blank pupil cell writes no answer
             const root = (ctx, cls, inner) => inner;
             const html = fig.renderFigure(p, { size, scaffoldLevel: 1, state: 'blank', metrics: null }, root);

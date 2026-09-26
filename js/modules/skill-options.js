@@ -2406,9 +2406,11 @@ Object.assign(P12_OPTIONS, {
         _p12Kinds('dir', 'Order', [['Least to greatest', 'least to great'], ['Greatest to least', 'greatest to least']]),
         _p12Match([['Write the order', '^Order'], ['Drag into order', '^Drag']]),
     ],
-    'coordinates:coordinate_q1': [_p12Match([['Read the coordinates', '^What are the coordinates'], ['Plot the points', '^Plot']])],
-    'coordinates:coordinate_all': [_p12Match([['Read the coordinates', '^What are the coordinates'], ['Plot the points', '^Plot']])],
-    'coordinates:coordinate_graph': [_p12Match([['Read the coordinates', '^What are the coordinates'], ['Plot the points', '^Plot']])],
+    // geometry-r1: the kind is dealt by the generator (page-deal.js), so the choice is the variant
+    // itself (pickVariant), never a redraw that would meet the same dealt kind again
+    'coordinates:coordinate_q1': [_p12Variants('coordinate_q1', ['identify', 'plot'], ['Read the coordinates', 'Plot the points'])],
+    'coordinates:coordinate_all': [_p12Variants('coordinate_all', ['identify', 'plot'], ['Read the coordinates', 'Plot the points'])],
+    'coordinates:coordinate_graph': [_p12Variants('coordinate_graph', ['identify', 'plot'], ['Read a value off the graph', 'Plot the pairs from a table'])],
     'number_ops_mixed:mixed': [_p12Kinds('task', 'Operations', _ops4, 'Tick the operations the page mixes.')],
     'order_of_operations:three_ops_no_paren': [_p12Match([['× written first (4 × 3 − 2 + 1)', '^\\d+ × \\d+ [-+]'], ['+ written first (4 + 3 + 2 × 1)', '^\\d+ \\+ \\d+']])],
     'order_of_operations:paren_multi': [_p12Match([['(a − b) × c + d', '^\\(\\d+ - \\d+\\) × \\d+ \\+'], ['a × (b + c) − d', '^\\d+ × \\('], ['(a + b) × (c + d)', '\\) × \\(']])],
@@ -2859,6 +2861,90 @@ const _AP2_POINTS = { all: 'Points named with their coordinates: A(3, 2)', some:
         levelSubset([3, 2, 1], 1, 'Level 3 writes the answer in grey to trace; level 2 adds the formula line; level 1 is the triangle alone. The dotted height is always drawn.')],
 ].forEach(([key, ...defs]) => _o2Add(key, ...defs));
 // ============================ end O6 · appearance: figures and data (AP2) ===================
+
+// ============================ build lane geometry · critic geometry-r1 (2026-09-26) ===========
+// design/audit/runs/geometry-r1: every panel names its default (R2 - no "As dealt (follows the
+// Max Number setting)"), a skill promises what it deals, and every figure skill has an appearance
+// control. A def here REPLACES the one of the same id registered above (or is added).
+const _geoPut = (key, ...defs) => {
+    const base = (P12_OPTIONS[key] || SKILL_OPTIONS[key] || []).filter((d) => !defs.some((n) => n.id === d.id));
+    P12_OPTIONS[key] = [...base, ...defs];
+};
+/** "Numbers to" with a NAMED default (a real value, so the page never moves with the Max Number). */
+const _geoBand = (values, dflt, { label = 'Numbers to', labels = {}, asRange = (b) => b, help, accept = 'max' } = {}) => ({
+    id: 'band', label, type: 'enum', group: 'difficulty', default: dflt, ...(accept ? { accept } : {}), ...(asRange ? { asRange } : {}),
+    values: values.map((v) => ({ v, l: (labels[v] || v.toLocaleString('en-US')) + (v === dflt ? ' (default)' : '') })),
+    help: help || 'The largest number anywhere on an item, the answer included. A smaller number is the easier step.',
+});
+const _GEO_SQUARES = (values, dflt, help) => ({
+    id: 'gridLook', label: 'How the squares are shown', type: 'enum', group: 'layout', default: dflt,
+    values: values.map((v) => ({ v, l: ({ squares: 'Every unit square drawn', rows: 'The rows drawn (count a row, then the rows)',
+        ticks: 'The outline with a tick at every unit', plain: 'Plain (no squares)', grid: 'On squared paper (count the base and the height)' })[v]
+        + (v === dflt ? ' (default)' : '') })),
+    help,
+});
+const _GEO_PAPER = (help) => ({
+    id: 'paper', label: 'Paper behind the shape', type: 'enum', group: 'layout', default: 'plain',
+    values: [{ v: 'plain', l: 'Plain: the outline only (default)' }, { v: 'dots', l: 'Dot paper: a dot where block corners can go' }],
+    help,
+});
+[
+    ['shapes_early:compose_hexagon',
+        { id: 'shapes', label: 'Blocks used', type: 'set', default: [0, 1, 2, 3], group: 'difficulty',
+            values: [{ v: 0, l: 'Triangles' }, { v: 1, l: 'Trapezoids' }, { v: 2, l: 'Rhombuses' },
+                { v: 3, l: 'Mixed blocks (1 trapezoid and 3 triangles, 2 rhombuses and 2 triangles …)' }],
+            allLabel: 'All four, mixed',
+            help: 'One kind of block fills the hexagon first (two trapezoids is the easiest). Mixed blocks is the harder step: the item names the blocks already used and asks how many of the other kind.' },
+        _GEO_PAPER('Dot paper puts a grey dot at every place a block corner can go (the triangle grid), so the lines are easier to draw.')],
+    ['shapes_early:compose_rect_from_squares',
+        _GEO_PAPER('Dot paper puts a grey dot at every corner of the unit squares, so the lines are easier to draw.')],
+    ['area_perimeter:area_unit_squares',
+        { ..._p12Max([12, 24], 42, { label: 'Area up to', labels: { null: 'Up to 42 (default)' }, help: 'The most unit squares to count.' }) },
+        _GEO_SQUARES(['squares', 'rows', 'ticks'], 'squares', 'Every square drawn is counting. The rows drawn moves to counting a row and the rows; ticks on the outline is the step to multiplying.')],
+    ['area_perimeter:perimeter_grid',
+        _p12Match([['Count the edges of a rectangle', 'outside edges\\. What'], ['Count the edges of an L-shape', 'L-shap']]),
+        _p12Max([12, 16, 24], 36, { label: 'Perimeter up to', labels: { null: 'Up to 36 (default)' } }),
+        _GEO_SQUARES(['squares', 'ticks'], 'squares', 'Every square drawn shows each unit edge to count; ticks on the outline leaves only the edges.')],
+    // perimeter / area: sides to 10 is what the page always drew at the default Max Number (100)
+    ['area_perimeter:perimeter', _geoBand([12, 20, 40], 40, { labels: { 40: 'Up to 40 (sides to 10)' }, asRange: (b) => Math.round((b * b) / 16) })],
+    ['area_perimeter:area', _geoBand([10, 25, 100], 100, { labels: { 100: 'Up to 100 (sides to 10)' } })],
+    ['area_perimeter:area_perimeter', _geoBand([20, 50, 100, 200], 100, { label: 'Area and perimeter to', labels: { 100: 'Up to 100 (sides to 10)' } }),
+        _p12Variants('area_perimeter', ['standard', 'missing', 'word'], ['Find the perimeter and the area', 'A missing side (the area is given)', 'A story (a garden, a rug)'])],
+    // the smallest U-shape has an area of 32: the ladder starts where every shape fits
+    ['area_perimeter:composite_shapes', _geoBand([40, 64, 100], 100, { labels: { 100: 'Up to 100 (sides to 10)' } }),
+        { id: 'shapes', label: 'Which shapes', type: 'set', default: [0, 1, 2], group: 'difficulty',
+            values: [{ v: 0, l: 'L-shapes' }, { v: 1, l: 'T-shapes' }, { v: 2, l: 'U-shapes' }], allLabel: 'All three, mixed',
+            help: 'An L has one inner corner; a T and a U have two, so more sides to work out.' }],
+    ['area_perimeter:area_polygon_decompose', _geoBand([40, 64, 100], 100, { label: 'Area to', labels: { 100: 'Up to 100 (sides to 10)' } })],
+    ['area_perimeter:area_triangle', _geoBand([10, 20, 50], 50, { labels: { 50: 'Up to 50 (base and height to 10)' }, asRange: (b) => 2 * b }),
+        _GEO_SQUARES(['plain', 'grid'], 'plain', 'On squared paper the pupil can count the base and the height as well as read them.')],
+    ['area_perimeter:volume', _geoBand([12, 30, 60, 125], 125, { labels: { 125: 'Up to 125 (edges to 5)' } }),
+        { id: 'solidLook', label: 'How the solid is drawn', type: 'enum', group: 'layout', default: 'solid',
+            values: [{ v: 'solid', l: 'A solid box with its edges labelled (default)' }, { v: 'cubes', l: 'Built of unit cubes (every cube drawn)' }],
+            help: 'Unit cubes let the pupil count; the solid box is the step to multiplying the edges. A box drawn smaller than its real size keeps the solid look.' }],
+    ['area_perimeter:volume_composite', _geoBand([24, 40, 100], 100, { label: 'Volume to', labels: { 100: 'Up to 100 (default page)' } }),
+        { id: 'solidLook', label: 'How the solid is drawn', type: 'enum', group: 'layout', default: 'solid',
+            values: [{ v: 'solid', l: 'Solid, its edges labelled (default)' }, { v: 'cubes', l: 'Built of unit cubes (every cube drawn)' }],
+            help: 'Unit cubes let the pupil count each prism; the solid is the step to multiplying.' }],
+    // coordinates: "Coordinates to" is read by gen-geo-kit.js coordinateItem (never the Max Number)
+    ['coordinates:coordinate_q1', _geoBand([5, 10, 20], 10, { label: 'Coordinates to', accept: null, asRange: null, help: 'Every coordinate is at most this. A grid to 5 has big squares; to 20 the axes count in twos.' })],
+    ['coordinates:coordinate_graph', _geoBand([5, 10, 20], 10, { label: 'Coordinates to', accept: null, asRange: null, help: 'Every coordinate is at most this (first quadrant only).' })],
+    ['coordinates:coordinate_all', _geoBand([5, 10], 5, { label: 'Coordinates from', labels: { 5: '−5 to 5', 10: '−10 to 10' }, accept: null, asRange: null,
+        help: 'The grid runs from −N to N on both axes.' }),
+    { id: 'quadrants', label: 'Which quadrants', type: 'enum', group: 'difficulty', default: 'all',
+        values: [{ v: 'left', l: 'Quadrants I and II (only x may be negative)' }, { v: 'down', l: 'Quadrants I and IV (only y may be negative)' },
+            { v: 'all', l: 'All four quadrants (default)' }],
+        help: 'One negative coordinate is the first step; all four quadrants mixes negative x and negative y. Every item has points off quadrant I.' }],
+    ...['geo_reflect', 'geo_rotate', 'geo_translate'].map((id) => [`coordinates:${id}`,
+        levelSubset([2, 1], 1, id === 'geo_reflect' ? 'Level 2 draws the mirror line (the axis) dotted in grey; level 1 is the shape alone.'
+            : id === 'geo_rotate' ? 'Level 2 draws a turn arrow round the origin; level 1 is the shape alone.'
+                : 'Level 2 draws the slide arrow from one corner; level 1 is the shape alone.'),
+        { id: 'shapes', label: 'Which shapes', type: 'set', default: [0, 1], group: 'difficulty',
+            values: [{ v: 0, l: 'Triangles (3 corners)' }, { v: 1, l: 'Shapes with 4 to 6 corners' }], allLabel: 'Both, mixed',
+            help: 'A triangle has fewer corners to move: the easier step.' },
+        _ap2Labels(['all', 'some'], 'all', { all: 'Every grid numbered', some: 'Only the shape\'s grid numbered' },
+            'Numbers on every grid let the pupil read each corner; numbers on the shape\'s grid alone is the step to counting squares on the choices.')]),
+].forEach(([key, ...defs]) => _geoPut(key, ...defs));
 
 Object.assign(SKILL_OPTIONS, P12_OPTIONS);
 // ============================ end P12 · every other family ============================

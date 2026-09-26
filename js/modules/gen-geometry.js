@@ -4,12 +4,11 @@ import { randInt, shuffle, pick, buildNumericOptions, pickName } from './utils.j
 import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG, computeTriangleAngles } from './svg-geometry.js';
 import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
-import { k2Twin, COMPOSE_LETTERS, coordGridSVG } from './sheet/index.js';
+import { k2Twin, COMPOSE_LETTERS } from './sheet/index.js';
 import { geoOpt, geoBegin, geoDeal, geoLevel, areaUnitSquares, perimeterGrid, perimeterFigure, areaFigure,
     areaPerimeterFigure, compositeFigure, decomposeFigure, triangleFigure, storyFigure,
-    volumeFigure, compositeVolume, coordinateItem, transformItem } from './gen-geo-kit.js';
+    volumeFigure, compositeVolume, coordinateItem, transformItem, hexagonFill, rectSquaresFill, geoFresh } from './gen-geo-kit.js';
 import { compositionsFor, dealComposition, decoyPieceSets, nameBank, namesFor, corners, transformShape } from './geo-compose.js';
-import { blockPoints } from './widgets/compose-shape-blocks.js';
 
 // O6 appearance (lane AP2): the "Figure labels" choice for the skill being generated — 'all',
 // 'some' or 'none' — or `dflt` when this skill has no such control (a mixed pool, a skill without
@@ -28,29 +27,6 @@ function _figLabels(dflt = 'all') {
 // The option reader, the page position and the Support-level fade live in gen-geo-kit.js.
 const _geoOpt = geoOpt, _geoBegin = geoBegin, _geoDeal = geoDeal, _geoLevel = geoLevel;
 
-
-/**
- * The paper form of a fill-the-shape item (shape-grid kind `fill`): the outline and every block
- * place in block units, from the same snap places the screen widget uses (the key's fill is
- * exactly the widget's answer). `targetPx` is the outline in the widget's pixels.
- */
-function _fillCell(q, { targetPx, shapeName, block, unit, fitW }) {
-    const lvl = _geoLevel(1);
-    const places = q.snapPoints.map((sp) => {
-        const t = (sp.rotation || 0) * Math.PI / 180, c = Math.cos(t), s = Math.sin(t);
-        return blockPoints(sp.shape, unit).map(([x, y]) => [+((sp.cx + x * c - y * s) / unit).toFixed(4), +((sp.cy + x * s + y * c) / unit).toFixed(4)]);
-    });
-    const payload = {
-        kind: 'fill', shapeName, block, target: targetPx.map(([x, y]) => [+(x / unit).toFixed(4), +(y / unit).toFixed(4)]),
-        places, count: places.length, hint: lvl >= 2, traced: lvl >= 3, fitW,
-    };
-    q.cell = { template: 'shape-grid', v: 1, payload };
-    q.ans = places.length;
-    q.printAnswer = String(places.length);
-    // a host without the drag widget (the quiz) draws the paper cell: the shape, the block and
-    // "[ ] trapezoids"; the card and the worksheet mount the widget over it
-    q._fillTwin = k2Twin('shape-grid', payload);
-}
 
 /* ============================================================ Combine Shapes (compose_shapes) */
 
@@ -79,7 +55,21 @@ function _composeShapes(q) {
     // One composition per item, in a page-long order, so six items show six different builds
     // where the ticked kinds allow it.
     const pickDealt = (arr) => (arr === list ? arr[_geoDeal(`compose:${n}:${list.length}`, list.length)] : pick(arr));
-    const deal = dealComposition(list, { pick: pickDealt, int: randInt, wide: true });
+    let deal = dealComposition(list, { pick: pickDealt, int: randInt, wide: true });
+    // geometry-r1: never the same build twice on a page (a test showed a = j, b = k), and never a
+    // flat 4 : 1 build (its picture box stood 40 % empty above it): deal again, from the rng
+    const flat = (d) => {
+        const xs = [], ys = [];
+        for (const sh of d.parts || []) {
+            if (sh.pts) sh.pts.forEach(([x, y]) => { xs.push(x); ys.push(y); });
+            else if (sh.arc) { xs.push(sh.arc.cx - sh.arc.r, sh.arc.cx + sh.arc.r); ys.push(sh.arc.cy - sh.arc.r, sh.arc.cy + sh.arc.r); }
+        }
+        if (!xs.length) return false;
+        return (Math.max(...xs) - Math.min(...xs)) > 2.2 * (Math.max(...ys) - Math.min(...ys));
+    };
+    for (let t = 0; t < 10 && (flat(deal) || !geoFresh('compose-build', `${deal.id}:${deal.rot}:${deal.flip}`)); t++) {
+        deal = dealComposition(list, { pick: (arr) => pick(arr), int: randInt, wide: true });
+    }
     const lvl = _geoLevel(1);
     const answer = deal.target.name;
     const pieceNames = deal.parts.map(s => s.name);
@@ -1215,126 +1205,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 return;
             }
 
-            // ===== COMPOSE HEXAGON / COMPOSE RECT FROM SQUARES (Drag pattern blocks) =====
-            // compose-shape-blocks widget: student drags pattern blocks into snap
-            // points on a target outline. Many valid solutions can exist for
-            // compose_hexagon (the generator picks ONE plan per question).
-            if (mappedSkill === "compose_hexagon") {
-                // Pattern-block "unit" - must match the widget's default (28px): every block side is
-                // 2 units (widgets/compose-shape-blocks.js blockPoints).
-                // Owner bug 2026-09-25 (geometry): the hexagon was POINTY-topped while the two
-                // trapezoid places were cut straight across (a pointy hexagon cut across makes two
-                // pentagons), the trapezoid block was 2 units tall (legs 2.24, not 2), and the rhombus
-                // places were turned 60 degrees wrong. Now: a FLAT-topped hexagon of side 2u, and every
-                // place is computed from its vertices V_k (tests/scripts/ws-compose-unit.cjs proves the
-                // placed blocks tile the outline exactly).
-                const unit = 28;
-                const cx = 170, cy = 110;
-                const side = unit * 2;                    // hexagon side = block side
-                const trapH = unit * Math.sqrt(3);        // trapezoid height (half the hexagon)
-                const V = (k) => [cx + side * Math.cos(Math.PI / 3 * k), cy + side * Math.sin(Math.PI / 3 * k)];
-                const hexPts = [0, 1, 2, 3, 4, 5].map(k => V(k).map(v => v.toFixed(2)).join(','));
-                const targetSvg = `<svg viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg">
-                    <polygon points="${hexPts.join(' ')}" fill="#fff" stroke="#37474f" stroke-width="3" stroke-linejoin="round"/>
-                </svg>`;
-
-                // "Blocks used" (shapes, 5H): 0 triangles, 1 trapezoids, 2 rhombi, dealt by position
-                const _ticked = _geoOpt('shapes');
-                const _plans = ['triangles', 'trapezoids', 'rhombi'];
-                const _pool = (Array.isArray(_ticked) && _ticked.length ? _ticked : [0, 1, 2]).map(i => _plans[i]).filter(Boolean);
-                _geoBegin();
-                const plan = _pool[_geoDeal('hex-plan', _pool.length)] || 'trapezoids';
-                let snapPoints = [];
-                let palette = [];
-                const r3 = (v) => +v.toFixed(3);
-
-                if (plan === 'triangles') {
-                    // Triangle k = centre, V_k, V_k+1: its centroid is (V_k + V_k+1) / 3, side / sqrt(3)
-                    // from the centre along 60k + 30 degrees; the block's apex (up at rotation 0) turns
-                    // to point at the centre: rotation 60k + 300.
-                    for (let k = 0; k < 6; k++) {
-                        const a = (60 * k + 30) * Math.PI / 180, d = side / Math.sqrt(3);
-                        snapPoints.push({ id: `t${k}`, shape: 'triangle', cx: r3(cx + d * Math.cos(a)), cy: r3(cy + d * Math.sin(a)), rotation: (60 * k + 300) % 360 });
-                    }
-                    palette = [{ shape: 'triangle', count: 6 }];
-                } else if (plan === 'rhombi') {
-                    // Rhombus i = centre, V_2i, V_2i+1, V_2i+2: its centre is half-way to V_2i+1, and its
-                    // short diagonal (across at rotation 0) points at V_2i+1: rotation 60(2i + 1).
-                    for (let i = 0; i < 3; i++) {
-                        const deg = 60 * (2 * i + 1), a = deg * Math.PI / 180;
-                        snapPoints.push({ id: `rh${i}`, shape: 'rhombus', cx: r3(cx + (side / 2) * Math.cos(a)), cy: r3(cy + (side / 2) * Math.sin(a)), rotation: deg });
-                    }
-                    palette = [{ shape: 'rhombus', count: 3 }];
-                } else {
-                    // Two trapezoids: the top half (short side up) and the bottom half (turned 180).
-                    snapPoints.push({ id: 'tr0', shape: 'trapezoid', cx: cx, cy: r3(cy - trapH / 2), rotation: 0 });
-                    snapPoints.push({ id: 'tr1', shape: 'trapezoid', cx: cx, cy: r3(cy + trapH / 2), rotation: 180 });
-                    palette = [{ shape: 'trapezoid', count: 2 }];
-                }
-
-                q.text = `Fill the hexagon with the pattern blocks.`;
-                q.answerType = "compose-shape-blocks";
-                q.targetSvg = targetSvg;
-                q.snapPoints = snapPoints;
-                q.palette = palette;
-                q.unit = unit;
-                q.options = [];
-                q.hint = `Put a block in a corner of the hexagon first. The blocks must fill it with no gaps and no overlaps.`;
-                q.skillLabel = 'Compose Hexagon';
-                q.printFormat = 'compose-shape-blocks';
-                // paper: draw the lines that split the hexagon into the blocks, write how many
-                _fillCell(q, { targetPx: [0, 1, 2, 3, 4, 5].map(V), shapeName: 'hexagon', block: palette[0].shape, unit, fitW: 8 });
-                q.visual = q._fillTwin; delete q._fillTwin;
-                return;
-            }
-
-            if (mappedSkill === "compose_rect_from_squares") {
-                // Compose a rectangle from unit squares: 1 to 3 rows of 2 to 4 (it was always 2 x 3).
-                // "Squares up to" (band) bounds how many.
-                _geoBegin();
-                const unit = 28;
-                const cellSize = unit * 2;
-                const _band = Number(_geoOpt('band')) || 12;
-                let cols = 3, rows = 2;
-                for (let t = 0; t < 30; t++) { cols = randInt(2, 4); rows = randInt(1, 3); if (rows * cols <= _band) break; }
-                if (rows * cols > _band) { cols = 2; rows = 1; }
-                const totalW = cellSize * cols;
-                const totalH = cellSize * rows;
-                const offsetX = (340 - totalW) / 2;
-                const offsetY = (220 - totalH) / 2;
-
-                const targetSvg = `<svg viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="${offsetX}" y="${offsetY}" width="${totalW}" height="${totalH}" fill="#fff" stroke="#37474f" stroke-width="3" stroke-linejoin="round"/>
-                </svg>`;
-
-                const snapPoints = [];
-                for (let r = 0; r < rows; r++) {
-                    for (let c = 0; c < cols; c++) {
-                        snapPoints.push({
-                            id: `sq${r}${c}`,
-                            shape: 'square',
-                            cx: offsetX + c * cellSize + cellSize / 2,
-                            cy: offsetY + r * cellSize + cellSize / 2,
-                            rotation: 0
-                        });
-                    }
-                }
-
-                q.text = `Fill the rectangle with the squares.`;
-                q.answerType = "compose-shape-blocks";
-                q.targetSvg = targetSvg;
-                q.snapPoints = snapPoints;
-                q.palette = [{ shape: 'square', count: rows * cols }];
-                q.unit = unit;
-                q.options = [];
-                q.hint = `Start in a corner. Fill a row, then the next row. No gaps and no overlaps.`;
-                q.skillLabel = 'Compose Rectangle';
-                q.printFormat = 'compose-shape-blocks';
-                _fillCell(q, { targetPx: [[offsetX, offsetY], [offsetX + totalW, offsetY], [offsetX + totalW, offsetY + totalH], [offsetX, offsetY + totalH]],
-                    shapeName: 'rectangle', block: 'square', unit, fitW: 2 + 8 });
-                q.visual = q._fillTwin; delete q._fillTwin;
-                return;
-            }
+            // ===== COMPOSE HEXAGON / COMPOSE RECT FROM SQUARES =====
+            // geometry-r1: one cell on paper and on screen (gen-geo-kit.js hexagonFill /
+            // rectSquaresFill): the outline, one of each block, and the count box. The drag widget
+            // is retired from these two skills - it showed the answer ("0 of N slots") and asked a
+            // different task from the page.
+            if (mappedSkill === "compose_hexagon") { hexagonFill(q); return; }
+            if (mappedSkill === "compose_rect_from_squares") { rectSquaresFill(q); return; }
 
             // ===== PARTITION SHAPES (Grade 1-3) =====
             if (mappedSkill === "partition_shapes") {
@@ -2702,11 +2579,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
             } else if (geoSkill === "geo_reflect" || geoSkill === "geo_rotate" || geoSkill === "geo_translate") {
                 // Build lane geometry: four black-and-white grids to choose from, on the coord-grid
                 // cell on paper (they printed one to a page in colour).
-                return transformItem(q, geoSkill, coordGridSVG);
+                return transformItem(q, geoSkill);
             } else if (geoSkill === "coordinate_graph" || geoSkill === "coordinate_q1" || geoSkill === "coordinate_all") {
                 // Build lane geometry: the coord-grid cell (a black-and-white grid, axis numerals at
                 // the text size, the reading boxes in the cell; they printed one to a page).
-                return coordinateItem(q, geoSkill, state.range);
+                return coordinateItem(q, geoSkill);
             } else if (geoSkill === "area_distributive_visual") {
                 // ===== AREA DISTRIBUTIVE VISUAL (Grade 4) — Phase 5 batch 4 =====
                 // Band 201-210, MD domain. Rectangle split into TWO sub-rectangles

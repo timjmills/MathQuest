@@ -91,7 +91,11 @@
     "wpBar": "8C",
     "bars": "9F",
     "compose": "2G",
-    "slide": "2H"
+    "slide": "2H",
+    "paper": "2I",
+    "quadrants": "2J",
+    "solidLook": "2K",
+    "gridLook": "2L"
   },
   "blocks": {
     "0": {
@@ -635,7 +639,27 @@
       "name": "N",
       "pieces": "P"
     },
-    "slide": {}
+    "slide": {},
+    "paper": {
+      "plain": "P",
+      "dots": "D"
+    },
+    "quadrants": {
+      "left": "L",
+      "down": "D",
+      "all": "A"
+    },
+    "solidLook": {
+      "solid": "S",
+      "cubes": "C"
+    },
+    "gridLook": {
+      "squares": "Q",
+      "rows": "R",
+      "ticks": "T",
+      "plain": "P",
+      "grid": "G"
+    }
   },
   "scalarOnly": {
     "range": "decimal",

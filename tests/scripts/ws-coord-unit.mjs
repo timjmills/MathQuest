@@ -32,14 +32,22 @@ const fail = (name, msg) => { failures++; byName[name] = (byName[name] || 0) + 1
 const keyOf = (pts) => [...pts].map((p) => `${p[0]},${p[1]}`).sort().join('|');
 const rotate = (pts, deg) => { const r = (-deg) * Math.PI / 180, c = Math.cos(r), s = Math.sin(r); return pts.map(([x, y]) => [Math.round(x * c - y * s), Math.round(x * s + y * c)]); };
 
-const builders = {
-    coordinate_q1: (q) => kit.coordinateItem(q, 'coordinate_q1', 100),
-    coordinate_all: (q) => kit.coordinateItem(q, 'coordinate_all', 100),
-    coordinate_big: (q) => kit.coordinateItem(q, 'coordinate_q1', 1000),
-    geo_reflect: (q) => kit.transformItem(q, 'geo_reflect', sheet.coordGridSVG),
-    geo_rotate: (q) => kit.transformItem(q, 'geo_rotate', sheet.coordGridSVG),
-    geo_translate: (q) => kit.transformItem(q, 'geo_translate', sheet.coordGridSVG),
+const withOpts = (skill, opts, fn) => (q) => {
+    state.category = 'coordinates'; state.skill = skill; state.skillOptions = opts;
+    try { return fn(q); } finally { state.skillOptions = null; }
 };
+const builders = {
+    coordinate_q1: withOpts('coordinate_q1', null, (q) => kit.coordinateItem(q, 'coordinate_q1')),
+    coordinate_all: withOpts('coordinate_all', null, (q) => kit.coordinateItem(q, 'coordinate_all')),
+    coordinate_all_10: withOpts('coordinate_all', { band: 10 }, (q) => kit.coordinateItem(q, 'coordinate_all')),
+    coordinate_all_left: withOpts('coordinate_all', { quadrants: 'left' }, (q) => kit.coordinateItem(q, 'coordinate_all')),
+    coordinate_big: withOpts('coordinate_q1', { band: 20 }, (q) => kit.coordinateItem(q, 'coordinate_q1')),
+    coordinate_graph: withOpts('coordinate_graph', null, (q) => kit.coordinateItem(q, 'coordinate_graph')),
+    geo_reflect: withOpts('geo_reflect', null, (q) => kit.transformItem(q, 'geo_reflect')),
+    geo_rotate: withOpts('geo_rotate', null, (q) => kit.transformItem(q, 'geo_rotate')),
+    geo_translate: withOpts('geo_translate', null, (q) => kit.transformItem(q, 'geo_translate')),
+};
+const answerSlots = {};
 
 for (const [name, build] of Object.entries(builders)) {
     for (let i = 0; i < N; i++) {
@@ -64,15 +72,40 @@ for (const [name, build] of Object.entries(builders)) {
             if (keyOf(want) !== keyOf(right)) fail(name, `the right grid is not the shape moved as asked (${q.text})`);
             p.choices.forEach((c, k) => { if (k !== p.correct && keyOf(c) === keyOf(want)) fail(name, 'a wrong grid also shows the move'); });
             for (const c of [src, ...p.choices]) for (const [x, y] of c) if (x < p.x0 || x > p.x1 || y < p.y0 || y > p.y1) fail(name, `a corner (${x}, ${y}) off the grid`);
-            if (q.ans[0] !== `opt${p.correct}` || q.printAnswer !== 'ABC'[p.correct]) fail(name, 'the answer is not the right grid');
+            if (q.ans !== 'ABC'[p.correct] || q.printAnswer !== 'ABC'[p.correct] || !q.selfAnswering) fail(name, 'the answer is not the right grid');
+            answerSlots[name] = answerSlots[name] || [0, 0, 0];
+            answerSlots[name][p.correct]++;
         } else {
             const pts = p.points;
             for (const pt of pts) if (pt.x < p.x0 || pt.x > p.x1 || pt.y < p.y0 || pt.y > p.y1) fail(name, `point ${pt.label} off the grid`);
             for (let a = 0; a < pts.length; a++) for (let b = a + 1; b < pts.length; b++) {
                 if (Math.max(Math.abs(pts[a].x - pts[b].x), Math.abs(pts[a].y - pts[b].y)) < 2) fail(name, 'two points closer than 2 squares');
             }
-            const ans = Array.isArray(q.ans) ? q.ans : [q.ans];
-            if (ans.length !== pts.length || ans.some((a, k) => a.x !== pts[k].x || a.y !== pts[k].y)) fail(name, 'q.ans is not the points');
+            if (p.ask && p.ask.kind === 'value') {
+                if (q.ans !== pts[0].y) fail(name, 'the value asked is not the point\'s y');
+            } else if (p.kind === 'plot') {
+                const want = pts.slice().sort((a, b) => a.x - b.x || a.y - b.y).map((a) => `(${a.x}, ${a.y})`).join(', ');
+                if (q.ans !== want) fail(name, `a plot's answer ${q.ans} is not the set of points ${want}`);
+            } else {
+                const ans = Array.isArray(q.ans) ? q.ans : [q.ans];
+                if (ans.length !== pts.length || ans.some((a, k) => a.x !== pts[k].x || a.y !== pts[k].y)) fail(name, 'q.ans is not the points');
+            }
+            // geometry-r1: all-quadrant items live off quadrant I, off the axes and off the grid's edge
+            if (/coordinate_all/.test(name)) {
+                const off = pts.filter((pt) => pt.x < 0 || pt.y < 0).length;
+                if (off < Math.min(2, pts.length)) fail(name, `only ${off} of ${pts.length} points off quadrant I`);
+                for (const pt of pts) {
+                    if (pt.x === 0 || pt.y === 0) fail(name, `point ${pt.label} on an axis`);
+                    if (Math.abs(pt.x) >= p.x1 || Math.abs(pt.y) >= p.y1) fail(name, `point ${pt.label} on the grid's edge`);
+                }
+                if (/left/.test(name) && pts.some((pt) => pt.y < 0)) fail(name, 'quadrants I and II dealt a negative y');
+            } else if (pts.some((pt) => pt.x < 0 || pt.y < 0)) fail(name, 'a first-quadrant skill dealt a negative');
+            if (/_10$/.test(name) && p.x1 !== 10) fail(name, `"Coordinates from -10 to 10" drew a grid to ${p.x1}`);
+            if (/big/.test(name) && p.x1 !== 20) fail(name, `"Coordinates to 20" drew a grid to ${p.x1}`);
+            if (name === 'coordinate_graph') {
+                if (!p.axisNames) fail(name, 'a situation graph has no axis names');
+                if (new Set(pts.map((pt) => pt.x)).size !== pts.length) fail(name, 'a table repeats an x');
+            }
         }
         for (const size of ['S', 'M', 'L']) {
             const pupil = sheet.renderCell(q, sheet.resolveCtx({ mode: 'print', size, look: 'ican', state: 'blank', scaffoldLevel: 1 }));
@@ -83,10 +116,13 @@ for (const [name, build] of Object.entries(builders)) {
                 if (Number(m[1]) / PT_MM < minPt - 0.05) { fail(name, `${size}: numeral ${m[2]} at ${(Number(m[1]) / PT_MM).toFixed(1)} pt, under ${minPt}`); break; }
             }
             const dots = (h) => (h.match(/<circle[^>]*r="1.1"/g) || []).length;
-            if (p.kind === 'read') {
+            if (p.kind === 'read' && p.ask && p.ask.kind === 'value') {
+                if (dots(pupil) !== 1) fail(name, `${size}: the value item draws ${dots(pupil)} dots`);
+                if (!/data-ws-slot="value"/.test(pupil)) fail(name, `${size}: no box for the value`);
+            } else if (p.kind === 'read') {
                 if (dots(pupil) !== p.points.length) fail(name, `${size}: the pupil page draws ${dots(pupil)} dots for ${p.points.length} points`);
-                if (/data-ws-slot="x0"[^>]*>\s*-?\d/.test(pupil)) fail(name, `${size}: the blank cell writes a coordinate`);
-                if (!new RegExp(`data-ws-slot="x0"[^>]*>\\s*${String(p.points[0].x).replace('-', '[−-]')}\\s*<`).test(key)) fail(name, `${size}: the key does not write x of ${p.points[0].label}`);
+                if (/data-ws-slot="px0"[^>]*>\s*-?\d/.test(pupil)) fail(name, `${size}: the blank cell writes a coordinate`);
+                if (!new RegExp(`data-ws-slot="px0"[^>]*>\\s*${String(p.points[0].x).replace('-', '[−-]')}\\s*<`).test(key)) fail(name, `${size}: the key does not write x of ${p.points[0].label}`);
                 // letters: their boxes do not overlap (read from the text positions)
                 const L = [...pupil.matchAll(/<text x="([\d.-]+)" y="([\d.-]+)"[^>]*font-weight="700"[^>]*paint-order="stroke">([A-C])<\/text>/g)].map((m) => [Number(m[1]), Number(m[2])]);
                 for (let a = 0; a < L.length; a++) for (let b = a + 1; b < L.length; b++) if (Math.abs(L[a][0] - L[b][0]) < 3.5 && Math.abs(L[a][1] - L[b][1]) < 4) fail(name, `${size}: two letters overlap`);
@@ -98,6 +134,11 @@ for (const [name, build] of Object.entries(builders)) {
     }
 }
 state.itemIndex = undefined;
+// L10: the right grid's place is dealt balanced (A, B and C each near a third)
+for (const [name, c] of Object.entries(answerSlots)) {
+    const tot = c[0] + c[1] + c[2];
+    if (Math.min(...c) < tot * 0.25) fail(name, `the right grid sits at A/B/C ${c.join('/')} times: not balanced`);
+}
 for (const r of report) console.log('  ' + r);
 if (failures) { console.log('  by builder:', JSON.stringify(byName)); console.log(`ws-coord-unit: FAIL (${failures} failure(s) in ${checks} items x 3 sizes)`); process.exit(1); }
 console.log(`ws-coord-unit: OK (${Object.keys(builders).length} builders, ${checks} items x 3 sizes)`);

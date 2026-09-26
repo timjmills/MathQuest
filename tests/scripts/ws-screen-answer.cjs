@@ -114,6 +114,12 @@ function PLAN(rootSel, which) {
 
     // the kit's model: tap boxes of the ten frame, or + under each base-ten zone
     const model = root.querySelector('[data-mq-model]');
+    // plot points on the kit grid (geometry-r1 coord-plot): a real mouse tap on each crossing
+    if (model && model.dataset.mqBuilt === '1' && model.dataset.mqModel === 'coord-plot') {
+        const pts = ((q.cell && q.cell.payload) || {}).points || [];
+        pts.forEach(pt => tag(model, { type: 'cg', value: `${pt.x},${pt.y}` }));
+        return { plan, q: String(ans) };
+    }
     if (model && model.dataset.mqBuilt === '1') {
         const t = Number(model.dataset.mqTarget || q.target || ans);
         if (model.dataset.mqModel === 'ten-frame') { Array.from(model.querySelectorAll('td')).slice(0, t).forEach(c => tag(c, { type: 'click' })); return { plan, q: String(t) }; }
@@ -294,6 +300,18 @@ async function run(page, sel, which) {
         if (step.type === 'click') { await el.click(); await sleep(40); continue; }
         if (step.type === 'domclick') { await el.evaluate(e => (e.click ? e.click() : e.dispatchEvent(new MouseEvent('click', { bubbles: true })))); await sleep(40); continue; }
         if (step.type === 'evclick') { await el.evaluate(e => e.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))); await sleep(60); continue; }
+        if (step.type === 'cg') {
+            const pt = await el.evaluate((e, v) => {
+                const g = JSON.parse(e.dataset.cg); const svg = e.querySelector('svg'); const r = svg.getBoundingClientRect();
+                const [x, y] = v.split(',').map(Number); const k = r.width / g.W;
+                return { x: r.left + (g.padL + (x - g.x0) * g.u) * k, y: r.top + (g.padT + (g.y1 - y) * g.u) * k };
+            }, step.value);
+            await page.mouse.click(pt.x, pt.y);
+            await sleep(60);
+            const on = await el.evaluate((e, v) => !!e.querySelector(`[data-mq-dot="${v}"]`), step.value);
+            if (!on) return { error: `coord plot: the tap at (${Math.round(pt.x)}, ${Math.round(pt.y)}) put no dot at ${step.value}` };
+            continue;
+        }
         if (step.type === 'rl') {
             // A real mouse tap on the line at the number's place (the kit's line geometry).
             const pt = await el.evaluate((e, v) => {

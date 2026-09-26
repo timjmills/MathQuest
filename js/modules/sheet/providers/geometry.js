@@ -145,6 +145,7 @@ export const GEO_PROVIDER_SKILLS = Object.freeze(['shapes_early:compose_shapes']
 //                                                                          one length and one width
 
 const figOf = (q) => payloadOf(q);
+let FIG_OPEN = {};   // Stretch open problems, filled in below the steps
 const askOf = (q, id) => (figOf(q).ask || []).find((a) => a.id === id);
 const unitOf = (q) => figOf(q).unit || '';
 const sidesOf = (q) => {
@@ -248,6 +249,102 @@ function figWrong(q) {
     return chooseWrong(q, c);
 }
 
+/* ============================================================ Stretch: the open problems */
+// geometry-r1 (critic): a figure skill's Stretch is the item's own measure opened up — "a rectangle
+// has an area of 24: find different lengths and widths" — with a results table the pupil checks by
+// computing. Only where such a task is genuine: coordinates, transforms, composite and decomposed
+// shapes, joined prisms and Combine Shapes have none, so their Stretch stays withheld (no open()).
+// Every task returns >= 3 other answers (the role's floor), else null and the host deals another.
+const divisorPairs = (N) => { const out = []; for (let a = 1; a <= N; a++) if (N % a === 0) out.push([a, N / a]); return out; };
+/** N if `ok(N)`, else the candidate nearest to N that is (the task keeps the item's own number when it can). */
+function nearestOk(N, candidates, ok) {
+    if (Number.isFinite(N) && N > 0 && Number.isInteger(N) && ok(N)) return N;
+    const c = candidates.filter(ok).sort((a, b) => Math.abs(a - N) - Math.abs(b - N) || a - b);
+    return c.length ? c[0] : null;
+}
+const sameRow = (a, b) => a.length === b.length && a.every((v, i) => Number(v) === Number(b[i]));
+/** The task: `rows` are every answer (the example among them); the key lists the others. */
+function openOf(prompt, columns, example, rows) {
+    const others = rows.filter((r) => !sameRow(r, example));
+    if (others.length < 3) return null;
+    return { prompt, columns, example, keyRows: others, total: rows.length, basic: false };
+}
+const UNIT_WORDS = { cm: 'centimeters', m: 'meters', in: 'inches', ft: 'feet' };
+const sqUnit = (u) => (u ? `square ${UNIT_WORDS[u] || u}` : 'square units');
+const lenUnit = (u) => (u ? UNIT_WORDS[u] || u : 'units');
+/** A rectangle's length and width (length >= width) from the item's figure, or null. */
+function rectOf(q) {
+    const poly = figOf(q).poly || [];
+    if (poly.length !== 4) return null;
+    const [w, h] = bboxWH(poly);
+    return [Math.max(w, h), Math.min(w, h)];
+}
+/** Rectangles of area N (length >= width). */
+function openArea(q) {
+    const r = rectOf(q), u = unitOf(q);
+    const A0 = r ? r[0] * r[1] : Number((askOf(q, 'area') || {}).ans);
+    const rich = (n) => divisorPairs(n).filter(([l, w]) => l >= w).length >= 4;
+    const N = nearestOk(A0, [24, 30, 36, 40, 48, 60], rich);
+    if (!N) return null;
+    const rows = divisorPairs(N).filter(([l, w]) => l >= w).map(([l, w]) => [l, w, N]).sort((a, b) => b[0] - a[0]);
+    const ex = r && r[0] * r[1] === N ? [r[0], r[1], N] : rows[Math.floor(rows.length / 2)];
+    return openOf([`A rectangle has an area of ${N} ${sqUnit(u)}.`, 'Find different lengths and widths.'],
+        ['Length', 'Width', 'Check: area'], ex, rows);
+}
+/** Rectangles of perimeter P (length >= width); `withArea` adds each one's area. */
+export function openPerimeter(q, withArea = false) {
+    const r = rectOf(q), u = unitOf(q);
+    const P0 = r ? 2 * (r[0] + r[1]) : Number((askOf(q, 'perimeter') || askOf(q, 'answer') || {}).ans);
+    const ok = (p) => p % 2 === 0 && Math.floor(p / 4) >= 4 && p <= 40;
+    const P = nearestOk(P0, [16, 20, 24], ok);
+    if (!P) return null;
+    const rows = [];
+    for (let w = 1; w <= P / 4; w++) { const l = P / 2 - w; rows.push(withArea ? [l, w, l * w, P] : [l, w, P]); }
+    const ex = r && 2 * (r[0] + r[1]) === P ? (withArea ? [r[0], r[1], r[0] * r[1], P] : [r[0], r[1], P]) : rows[Math.floor(rows.length / 2)];
+    return withArea
+        ? openOf([`A rectangle has a perimeter of ${P} ${lenUnit(u)}.`, 'Find different rectangles. Find the area of each.'],
+            ['Length', 'Width', 'Area', 'Check: perimeter'], ex, rows)
+        : openOf([`A rectangle has a perimeter of ${P} ${lenUnit(u)}.`, 'Find different lengths and widths.'],
+            ['Length', 'Width', 'Check: perimeter'], ex, rows);
+}
+/** Rectangles made of N unit squares: rows and squares in each row (3 rows of 4 and 4 rows of 3 differ). */
+export function openArray(N0, ex0, cap) {
+    const ok = (n) => divisorPairs(n).length >= 4 && n <= cap;
+    const N = nearestOk(N0, [6, 8, 12, 16, 18, 20, 24], ok);
+    if (!N) return null;
+    const rows = divisorPairs(N).map(([a, b]) => [a, b, N]);
+    const ex = ex0 && ex0[0] * ex0[1] === N ? [ex0[0], ex0[1], N] : rows.find((x) => x[0] > 1 && x[1] > 1) || rows[0];
+    return openOf([`Make a rectangle from ${N} squares.`, 'Find different ways.'],
+        ['Rows', 'Squares in each row', 'Check: squares in all'], ex, rows);
+}
+/** Triangles of area A: base x height = 2A (a base of 3 and a height of 4 is a different triangle from 4 and 3). */
+function openTriangle(q) {
+    const u = unitOf(q);
+    const p = figOf(q);
+    const b0 = ((p.edges || []).find((e) => e.i === 1) || {}).v, h0 = (p.height || {}).v;
+    const A0 = Number((askOf(q, 'area') || {}).ans);
+    // a base and a height from 2 to 20: a triangle 1 wide and 50 tall is no drawing a pupil makes
+    const pairs = (a) => divisorPairs(2 * a).filter(([b, h]) => b >= 2 && h >= 2 && b <= 20 && h <= 20);
+    const ok = (a) => Number.isInteger(2 * a) && pairs(a).length >= 4;
+    const A = nearestOk(A0, [6, 8, 10, 12, 15, 18], ok);
+    if (!A) return null;
+    const rows = pairs(A).map(([b, h]) => [b, h, A]);
+    const ex = Number(b0) * Number(h0) === 2 * A ? [Number(b0), Number(h0), A] : rows[Math.floor(rows.length / 2)];
+    return openOf([`A triangle has an area of ${A} ${sqUnit(u)}.`, 'Find different bases and heights.'],
+        ['Base', 'Height', 'Check: area'], ex, rows);
+}
+FIG_OPEN = {
+    area: openArea,
+    perimeter: (q) => openPerimeter(q, false),
+    perimeter_grid: (q) => openPerimeter(q, false),
+    area_perimeter: (q) => openPerimeter(q, true),
+    area_triangle: openTriangle,
+    area_unit_squares: (q) => {
+        const r = rectOf(q);
+        return openArray(Number((askOf(q, 'area') || {}).ans), r ? [r[1], r[0]] : null, 24);
+    },
+};
+
 const FIG_DEFS = {
     area_unit_squares: { iCan: 'I Can find area by counting unit squares', instructionKey: 'count-squares',
         steps: ['Touch each square once.', 'Count row by row.', 'Write how many squares.'], say: 'The area is __ square units.',
@@ -274,12 +371,28 @@ const FIG_DEFS = {
         steps: ['Find the base and the height.', 'Multiply the base by the height.', 'Halve it.'], say: 'The area is __.',
         sayValues: (q) => [q.ans] },
 };
+// composite_shapes (geometry-r1, L6): the title and the instruction follow the kinds on the page -
+// the perimeter only, the perimeter and the area, or both kinds mixed ("What the items ask").
+function compositeStrings() {
+    const only = strings(FIG_DEFS.composite_shapes);
+    const both = strings({ ...FIG_DEFS.composite_shapes, iCan: 'I Can find the perimeter and the area of a composite shape', instructionKey: 'composite-both',
+        steps: ['Add all the sides for the perimeter.', 'Split the shape into two rectangles.', 'Add their areas for the area.'] });
+    const mixed = strings({ ...FIG_DEFS.composite_shapes, iCan: 'I Can find the perimeter and the area of a composite shape', instructionKey: 'composite-mixed',
+        steps: ['Add all the sides for the perimeter.', 'A box for the area: split the shape into two rectangles.', 'Add their areas.'] });
+    return (ref = {}) => {
+        const o = (ref.q && ref.q.skillOptions) || {};
+        const f = Array.isArray(o.forms) ? o.forms.map(Number) : [0, 1];
+        const pick = f.length === 1 ? (f[0] === 0 ? only : both) : mixed;
+        return pick(ref);
+    };
+}
 for (const [id, def] of Object.entries(FIG_DEFS)) {
     registerSkill(`area_perimeter:${id}`, {
-        strings: strings(def),
+        strings: id === 'composite_shapes' ? compositeStrings() : strings(def),
         misconceptions: ['M-AP1', 'M-AP2', 'M-AP3', 'M-AP4', 'M-AP5', 'M-AP6', 'M-AP7', 'M-AP8'],
         workedSteps: (q) => clampSteps(figSteps(q)),
         wrongAnswer: figWrong,
+        ...(FIG_OPEN[id] ? { open: FIG_OPEN[id] } : {}),
     });
 }
 export const GEO_FIGURE_SKILLS = Object.freeze(Object.keys(FIG_DEFS).map((id) => `area_perimeter:${id}`));
@@ -288,6 +401,7 @@ export const GEO_FIGURE_SKILLS = Object.freeze(Object.keys(FIG_DEFS).map((id) =>
 // compose_hexagon, compose_rect_from_squares (shape-grid kind `fill`). The misconception bank:
 //   M-F1  left a gap: one block too few          M-F2  overlapped: one block too many
 //   M-F3  counted the sides of the shape, not the blocks inside it
+//   M-F4  a mixed fill: counted every block, not only the kind asked for
 const FILL_PLURAL = { triangle: 'triangles', rhombus: 'rhombuses', trapezoid: 'trapezoids', square: 'squares' };
 const fillName = (q) => FILL_PLURAL[payloadOf(q).block] || 'blocks';
 
@@ -295,6 +409,16 @@ function fillSteps(q) {
     const p = payloadOf(q);
     const n = Number(p.count) || 0;
     const one = p.block || 'block';
+    const given = p.given || [];
+    if (given.length) {
+        // a mixed fill: the named blocks first, then the asked kind fills the rest
+        const words = given.map((g) => `${g.n} ${g.n === 1 ? g.block : FILL_PLURAL[g.block] || g.block}`).join(' and ');
+        return [
+            step(`Draw the ${words} in the ${p.shapeName || 'shape'} first.`),
+            step(`Fill the rest with ${fillName(q)}: no gaps, no overlaps.`),
+            step(`Count the ${fillName(q)}: ${n}.`, [{ slot: 'count', value: String(n) }]),
+        ];
+    }
     return [
         step(`Look at the ${one}. Every block is the same size.`),
         step(`Start in a corner of the ${p.shapeName || 'shape'}. Draw the lines of one ${one}.`),
@@ -310,12 +434,33 @@ function fillWrong(q) {
     if (n > 2) c.push({ value: n - 1, slot: 'count', misconception: 'M-F1', explain: 'Left a gap: one block is missing.' });
     c.push({ value: n + 1, slot: 'count', misconception: 'M-F2', explain: 'Two blocks overlap: one block too many.' });
     if (sides && sides !== n) c.push({ value: sides, slot: 'count', misconception: 'M-F3', explain: 'Counted the sides of the shape, not the blocks inside it.' });
+    const all = (p.places || []).length;
+    if ((p.given || []).length && all !== n) c.push({ value: all, slot: 'count', misconception: 'M-F4', explain: 'Counted every block, not only the kind asked for.' });
     return chooseWrong(q, c);
 }
 
+// Stretch (geometry-r1). A hexagon is 6 triangles' worth: a trapezoid is 3, a rhombus 2, so the
+// fills are the whole-number answers of 3a + 2b + c = 6 (seven of them, 1.G.A.2). A rectangle of N
+// squares is rows x squares in each row.
+const HEX_FILLS = [];
+for (let a = 2; a >= 0; a--) for (let b = Math.floor((6 - 3 * a) / 2); b >= 0; b--) HEX_FILLS.push([a, b, 6 - 3 * a - 2 * b]);
+function openHexagon(q) {
+    const k = payloadOf(q).blocks || {};
+    const ex0 = [Number(k.trapezoid) || 0, Number(k.rhombus) || 0, Number(k.triangle) || 0];
+    const rows = HEX_FILLS.map(([a, b, c]) => [a, b, c, a + b + c]);
+    const ex = rows.find((r) => sameRow(r.slice(0, 3), ex0)) || rows[0];
+    return openOf(['Fill a hexagon with pattern blocks.', 'Find different ways. No gaps, no overlaps.'],
+        ['Trapezoids', 'Rhombuses', 'Triangles', 'Check: blocks in all'], ex, rows);
+}
+function openRectSquares(q) {
+    const t = payloadOf(q).target || [];
+    if (t.length !== 4) return null;
+    const [w, h] = bboxWH(t);
+    return openArray(Math.round(w * h), [Math.round(h), Math.round(w)], 12);
+}
 const FILL_DEFS = {
-    compose_hexagon: { iCan: 'I Can fill a hexagon with pattern blocks' },
-    compose_rect_from_squares: { iCan: 'I Can fill a rectangle with squares' },
+    compose_hexagon: { iCan: 'I Can fill a hexagon with pattern blocks', open: openHexagon },
+    compose_rect_from_squares: { iCan: 'I Can fill a rectangle with squares', open: openRectSquares },
 };
 for (const [id, def] of Object.entries(FILL_DEFS)) {
     registerSkill(`shapes_early:${id}`, {
@@ -325,9 +470,10 @@ for (const [id, def] of Object.entries(FILL_DEFS)) {
             say: '__ blocks fill the shape.',
             sayValues: (q) => [payloadOf(q).count],
         }),
-        misconceptions: ['M-F1', 'M-F2', 'M-F3'],
+        misconceptions: ['M-F1', 'M-F2', 'M-F3', 'M-F4'],
         workedSteps: (q) => clampSteps(fillSteps(q)),
         wrongAnswer: fillWrong,
+        open: def.open,
     });
 }
 export const GEO_FILL_SKILLS = Object.freeze(Object.keys(FILL_DEFS).map((id) => `shapes_early:${id}`));
@@ -376,6 +522,23 @@ function volWrong(q) {
     if (vals.length === 3) c.push({ value: vals[0] * vals[1], slot: 'volume', misconception: 'M-V2', explain: 'Multiplied two edges only: that is the area of one face.' });
     return chooseWrong(q, c);
 }
+// Stretch (geometry-r1): boxes of volume V, length >= width >= height (a box turned over is the same box).
+function openVolume(q) {
+    const p = payloadOf(q);
+    const a = (p.ask || [])[0] || {};
+    const b = (p.boxes || [])[0] || {};
+    const V0 = a.id === 'volume' ? Number(a.ans) : Number(b.l) * Number(b.w) * Number(b.h);
+    const triples = (V) => { const out = []; for (let l = V; l >= 1; l--) for (let w = l; w >= 1; w--) { const h = V / (l * w); if (Number.isInteger(h) && h <= w) out.push([l, w, h, V]); } return out; };
+    const ok = (V) => V <= 60 && triples(V).length >= 4;
+    const V = nearestOk(V0, [12, 24, 18, 30, 36, 48, 60], ok);
+    if (!V) return null;
+    const rows = triples(V);
+    const d = [Number(b.l), Number(b.w), Number(b.h)].sort((x, y) => y - x);
+    const ex = d[0] * d[1] * d[2] === V ? [...d, V] : rows[Math.floor(rows.length / 2)];
+    const u = p.unit ? `cubic ${UNIT_WORDS[p.unit] || p.unit}` : 'cubic units';
+    return openOf([`A box has a volume of ${V} ${u}.`, 'Find different lengths, widths and heights.'],
+        ['Length', 'Width', 'Height', 'Check: volume'], ex, rows);
+}
 const VOL_DEFS = {
     volume: { iCan: 'I Can find the volume of a rectangular prism', instructionKey: 'volume',
         steps: ['Find the length, the width and the height.', 'Multiply them.', 'Write the volume in cubic units.'] },
@@ -389,6 +552,8 @@ for (const [id, def] of Object.entries(VOL_DEFS)) {
         misconceptions: ['M-V1', 'M-V2', 'M-V3', 'M-V4'],
         workedSteps: (q) => clampSteps(volSteps(q)),
         wrongAnswer: volWrong,
+        // joined prisms have no genuine open task: Stretch stays withheld for volume_composite
+        ...(id === 'volume' ? { open: openVolume } : {}),
     });
 }
 
@@ -406,11 +571,16 @@ function coordSteps(q) {
             step(`Find the grid with the corner there: ${LETTERS[p.correct]}.`, [{ slot: 'choice', value: LETTERS[p.correct] }])];
     }
     const pt = pts[0] || { x: 0, y: 0, label: 'A' };
+    if (p.ask && p.ask.kind === 'value') {
+        const ax = p.axisNames || { x: 'x', y: 'y' };
+        return [step(`Find ${pt.x} on the ${ax.x.toLowerCase()} axis.`), step('Go up to point A.'),
+            step(`Read across to the ${ax.y.toLowerCase()} axis: ${pt.y}.`, [{ slot: 'value', value: String(pt.y) }])];
+    }
     if (p.kind === 'plot') {
         return [step(`Start at 0. Go along the x-axis to ${minus(pt.x)}.`), step(`Go ${pt.y < 0 ? 'down' : 'up'} to ${minus(pt.y)}. Put a dot. Write ${pt.label}.`)];
     }
-    return [step(`Start at 0. Go along to ${pt.label}: x is ${minus(pt.x)}.`, [{ slot: 'x0', value: String(pt.x) }]),
-        step(`Go ${pt.y < 0 ? 'down' : 'up'} to ${pt.label}: y is ${minus(pt.y)}.`, [{ slot: 'y0', value: String(pt.y) }]),
+    return [step(`Start at 0. Go along to ${pt.label}: x is ${minus(pt.x)}.`, [{ slot: 'px0', value: String(pt.x) }]),
+        step(`Go ${pt.y < 0 ? 'down' : 'up'} to ${pt.label}: y is ${minus(pt.y)}.`, [{ slot: 'py0', value: String(pt.y) }]),
         step(`Write (${minus(pt.x)}, ${minus(pt.y)}).`)];
 }
 function coordWrong(q) {
@@ -422,16 +592,35 @@ function coordWrong(q) {
         return chooseWrong(q, c);
     }
     const pts = p.points || [];
-    if (!pts.length || p.kind === 'plot') return null;
+    if (!pts.length) return null;
+    if (p.ask && p.ask.kind === 'value') {
+        const pt = pts[0];
+        if (pt.x === pt.y) return null;
+        c.push({ value: pt.x, slot: 'value', slots: { value: String(pt.x) }, misconception: 'M-C1', explain: 'Read the number on the wrong axis.' });
+        return chooseWrong(q, c);
+    }
+    if (p.kind === 'plot') {
+        // the pupil's dots: drawn on the grid of an error-analysis page (coord-grid pointsIn)
+        const say = (list) => list.map((pt) => `${pt.label} (${minus(pt.x)}, ${minus(pt.y)})`).join(', ');
+        if (pts.some((pt) => pt.x !== pt.y)) {
+            const v = say(pts.map((pt) => ({ label: pt.label, x: pt.y, y: pt.x })));
+            c.push({ value: v, slots: { plot: v }, misconception: 'M-C1', explain: 'Went up first, then along: x and y swapped.' });
+        }
+        if (pts.some((pt) => pt.x < 0 || pt.y < 0)) {
+            const v = say(pts.map((pt) => ({ label: pt.label, x: Math.abs(pt.x), y: Math.abs(pt.y) })));
+            c.push({ value: v, slots: { plot: v }, misconception: 'M-C2', explain: 'Lost the minus sign.' });
+        }
+        return c.length ? chooseWrong(q, c) : null;
+    }
     const sw = pts.map((pt) => ({ x: pt.y, y: pt.x }));
     if (pts.some((pt) => pt.x !== pt.y)) {
         const slots = {};
-        sw.forEach((pt, i) => { slots[`x${i}`] = String(pt.x); slots[`y${i}`] = String(pt.y); });
+        sw.forEach((pt, i) => { slots[`px${i}`] = String(pt.x); slots[`py${i}`] = String(pt.y); });
         c.push({ value: sw.map((pt) => `${pt.x}, ${pt.y}`).join(', '), slots, misconception: 'M-C1', explain: 'Wrote the y-coordinate first.' });
     }
     if (pts.some((pt) => pt.x < 0 || pt.y < 0)) {
         const slots = {};
-        pts.forEach((pt, i) => { slots[`x${i}`] = String(Math.abs(pt.x)); slots[`y${i}`] = String(Math.abs(pt.y)); });
+        pts.forEach((pt, i) => { slots[`px${i}`] = String(Math.abs(pt.x)); slots[`py${i}`] = String(Math.abs(pt.y)); });
         c.push({ value: pts.map((pt) => `${Math.abs(pt.x)}, ${Math.abs(pt.y)}`).join(', '), slots, misconception: 'M-C2', explain: 'Lost the minus sign.' });
     }
     return chooseWrong(q, c);
@@ -439,7 +628,7 @@ function coordWrong(q) {
 const COORD_DEFS = {
     coordinate_q1: { iCan: 'I Can read and plot points on a grid' },
     coordinate_all: { iCan: 'I Can read and plot points in all four quadrants' },
-    coordinate_graph: { iCan: 'I Can read and plot points on a grid' },
+    coordinate_graph: { iCan: 'I Can use a graph to answer questions', graph: true },
     geo_reflect: { iCan: 'I Can reflect a shape over an axis', move: true },
     geo_rotate: { iCan: 'I Can turn a shape around the origin', move: true },
     geo_translate: { iCan: 'I Can slide a shape on a grid', move: true },
@@ -447,13 +636,15 @@ const COORD_DEFS = {
 for (const [id, def] of Object.entries(COORD_DEFS)) {
     registerSkill(`coordinates:${id}`, {
         strings: strings({
-            iCan: def.iCan, instructionKey: def.move ? 'transform-choice' : 'coord-read-plot',
+            iCan: def.iCan, instructionKey: def.move ? 'transform-choice' : def.graph ? 'coord-graph' : 'coord-read-plot',
             steps: def.move ? ['Look at one corner of the shape.', 'Move it as the question says.', 'Check the grid that shows it.']
-                : ['Start at 0.', 'Go along the x-axis first.', 'Then go up or down the y-axis.'],
+                : def.graph ? ['Read the names on the two axes.', 'Go along the bottom axis first.', 'Then go up. Read or plot the point.']
+                    : ['Start at 0.', 'Go along the x-axis first.', 'Then go up or down the y-axis.'],
             say: def.move ? 'Grid __ shows the shape moved.' : 'Point A is at __.',
             sayValues: (q) => {
                 const p = payloadOf(q);
                 if (p.kind === 'transform') return [LETTERS[p.correct]];
+                if (p.ask && p.ask.kind === 'value') return [`(${minus((p.points || [])[0].x)}, ${minus((p.points || [])[0].y)})`];
                 const pt = (p.points || [])[0] || { x: 0, y: 0 };
                 return [`(${minus(pt.x)}, ${minus(pt.y)})`];
             },

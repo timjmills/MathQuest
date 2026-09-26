@@ -139,6 +139,7 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-table th{height:10mm;font-size:var(--ws-zone);font-weight:700;line-height:1.1}
 :is(.ws-page,.ws-sheet) .mq-table td{height:calc(var(--ws-hw) + 3mm);min-width:28mm;font-size:var(--ws-text);line-height:1}
 :is(.ws-page,.ws-sheet) .mq-table.mq-cols3 td{width:30mm}
+:is(.ws-page,.ws-sheet) .mq-table.mq-cols4 td{min-width:22mm;width:24mm}
 :is(.ws-page,.ws-sheet) .mq-table.mq-cols2 td:first-child{width:60mm}
 :is(.ws-page,.ws-sheet) .mq-table td b{font-weight:700}
 :is(.ws-page,.ws-sheet) .mq-closing{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:6mm;padding-bottom:1mm}

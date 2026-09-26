@@ -2513,6 +2513,85 @@ function _nlpNumeral(t) {
  * Tap the tick again to take it off. The input holds each tile's tick read back in the tile's own
  * form, in tile order ("2/8", "1/4, 3/4"), which is what the item's answer is.
  */
+/**
+ * geometry-r1: plot points on the kit's own coordinate grid (sheet/cells/coord-grid.js, the same
+ * grid as the paper). A tap puts an ink dot on the nearest crossing; a tap on a dot takes it off.
+ * The answer is the set of dots, "(2, 3), (4, 1)" in x order (the generator's q.ans), so the order
+ * of the taps never matters. The whole grid is the target: a tap snaps to the crossing within half
+ * a square of it. The grid is drawn at least 44 px a square where the card allows.
+ */
+function _mountCoordPlot(el, write, locked) {
+    let g = null;
+    try { g = JSON.parse(el.dataset.cg || 'null'); } catch (e) { g = null; }
+    const svgEl = el.querySelector('svg');
+    if (!g || !svgEl) return false;
+    const NS = 'http://www.w3.org/2000/svg';
+    const dots = new Map();
+    const sp = el.style;
+    sp.cursor = 'pointer';
+    sp.touchAction = 'manipulation';
+    // a square of at least 44 px: the grid's CSS width grows to fit (never past its host)
+    const want = Math.round((44 * g.W) / g.u);
+    svgEl.style.width = `min(100%, ${want}px)`;
+    svgEl.style.height = 'auto';
+    svgEl.setAttribute('aria-label', `a grid from ${g.x0} to ${g.x1}: tap a crossing to plot a point`);
+    const minus = (v) => (v < 0 ? `-${-v}` : String(v));
+    const paint = () => {
+        const list = [...dots.values()].sort((a, b) => a.x - b.x || a.y - b.y);
+        write(list.length ? list.map((d) => `(${minus(d.x)}, ${minus(d.y)})`).join(', ') : '');
+    };
+    const toggle = (x, y) => {
+        const k = `${x},${y}`;
+        if (dots.has(k)) { dots.get(k).el.remove(); dots.delete(k); paint(); return; }
+        const c = document.createElementNS(NS, 'circle');
+        c.setAttribute('cx', String(g.padL + (x - g.x0) * g.u));
+        c.setAttribute('cy', String(g.padT + (g.y1 - y) * g.u));
+        c.setAttribute('r', String(Math.max(1.2, g.u * 0.22)));
+        c.setAttribute('fill', INK);
+        c.setAttribute('data-mq-dot', k);
+        svgEl.appendChild(c);
+        dots.set(k, { x, y, el: c });
+        paint();
+    };
+    el.addEventListener('click', (e) => {
+        if (locked()) return;
+        const r = svgEl.getBoundingClientRect();
+        if (!r.width) return;
+        const k = r.width / g.W;
+        const mx = (e.clientX - r.left) / k, my = (e.clientY - r.top) / k;
+        const fx = (mx - g.padL) / g.u + g.x0, fy = g.y1 - (my - g.padT) / g.u;
+        const x = Math.round(fx), y = Math.round(fy);
+        if (x < g.x0 || x > g.x1 || y < g.y0 || y > g.y1) return;
+        if (Math.abs(fx - x) > 0.5 || Math.abs(fy - y) > 0.5) return;
+        toggle(x, y);
+    });
+    // keyboard: arrows move a cursor crossing, Space / Enter plots it
+    let cur = { x: Math.max(g.x0, Math.min(g.x1, 0)), y: Math.max(g.y0, Math.min(g.y1, 0)) };
+    const ring = document.createElementNS(NS, 'circle');
+    ring.setAttribute('r', String(Math.max(1.6, g.u * 0.32)));
+    ring.setAttribute('fill', 'none');
+    ring.setAttribute('stroke', INK);
+    ring.setAttribute('stroke-width', '0.4');
+    ring.style.display = 'none';
+    svgEl.appendChild(ring);
+    const place = () => { ring.setAttribute('cx', String(g.padL + (cur.x - g.x0) * g.u)); ring.setAttribute('cy', String(g.padT + (g.y1 - cur.y) * g.u)); };
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('role', 'application');
+    el.addEventListener('focus', () => { ring.style.display = ''; place(); });
+    el.addEventListener('blur', () => { ring.style.display = 'none'; });
+    el.addEventListener('keydown', (e) => {
+        if (locked()) return;
+        const mv = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] }[e.key];
+        if (mv) { e.preventDefault(); cur = { x: Math.max(g.x0, Math.min(g.x1, cur.x + mv[0])), y: Math.max(g.y0, Math.min(g.y1, cur.y + mv[1])) }; place(); return; }
+        if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(cur.x, cur.y); }
+    });
+    const cue = document.createElement('div');
+    cue.className = 'mq-buildcue';
+    cue.textContent = g.n > 1 ? 'Tap the grid where each point goes. Tap a dot again to take it off.' : 'Tap the grid where the point goes. Tap the dot again to take it off.';
+    el.parentNode.insertBefore(cue, el.nextSibling);
+    return true;
+}
+
 function _mountNlPlace(el, write, locked) {
     const n = Number(el.dataset.nlpN);
     const line = el.querySelector('.nlp-line');
@@ -2689,6 +2768,7 @@ export function mountModel(root, input, { onValue = null } = {}) {
     const locked = () => !!input.disabled;
     const model = el.getAttribute('data-mq-model');
     if (model === 'nl-place') return _mountNlPlace(el, write, locked);
+    if (model === 'coord-plot') return _mountCoordPlot(el, write, locked);
     if (model === 'shade') {
         // O6 lane AP3: a fraction model to shade (sheet/cells/frac-model.js). A tap shades a part
         // (the one grey), a tap again clears it; the count of shaded parts is the answer.

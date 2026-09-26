@@ -120,6 +120,13 @@ for (const [name, build] of Object.entries(builders)) {
                 if (faces.some((f) => inPoly(f, c))) fail(name, `${size}: label ${bx.v} sits on the solid (${JSON.stringify(p.boxes)})`);
             }
             if (r.W > WIDTH[size]) fail(name, `${size}: the drawing is ${r.W.toFixed(1)} mm wide`);
+            // PLACE (geometry-r1, the one label rule): no label forced; labels keep their gap
+            const fig = await import(new URL('../../js/modules/sheet/cells/shape-figure.js', import.meta.url).href);
+            for (const lb of r.labels || []) if (lb.forced) fail(name, `${size}: label ${lb.v} has no clear place by its edge (${JSON.stringify(p.boxes)})`);
+            const lbs = r.labels || [];
+            for (let u = 0; u < lbs.length; u++) for (let v = u + 1; v < lbs.length; v++) {
+                if (!fig.labelsClear(lbs[u].r, lbs[v].r, r.gap - 0.01)) fail(name, `${size}: labels ${lbs[u].v} and ${lbs[v].v} are too close to read apart (${JSON.stringify(p.boxes)})`);
+            }
             const html = sheet.renderCell(q, sheet.resolveCtx({ mode: 'print', size, look: 'ican', state: 'blank', scaffoldLevel: 1 }));
             if (new RegExp(`data-ws-slot="${a.id}"[^>]*>\\s*${a.ans}\\s*<`).test(html)) fail(name, `${size}: the blank cell writes the answer`);
             const key = sheet.renderCell(q, sheet.resolveCtx({ mode: 'print', size, look: 'ican', state: 'answered', scaffoldLevel: 1 }));

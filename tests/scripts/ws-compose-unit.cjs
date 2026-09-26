@@ -21,9 +21,11 @@
 //   PIECES  on the "which pieces" task: the target is drawn once, outline only; the right set is
 //           the composition's pieces (so it tiles the target); every wrong set has a different
 //           total area (so it cannot make it); and each set's pieces are drawn apart, not joined.
-//   FILL    compose_hexagon (every plan) and compose_rect_from_squares: the widget's blocks, placed
-//           and turned at their places, tile the outline exactly, the palette holds one block per
-//           place, and no empty place is drawn (dashed places showed how to fill the shape).
+//   FILL    compose_hexagon (every plan, mixed fills too) and compose_rect_from_squares: the kit
+//           cell's block places tile the outline exactly; the answer is the count of the asked kind
+//           and the given kinds are the rest; the screen is the same cell with a typed count
+//           (geometry-r1: the drag widget showed "0 of N slots", the answer); the pupil page draws
+//           no block line, the key draws every one; the drawing is smaller at S than at L.
 //
 // Prints `ws-compose-unit: OK` or `ws-compose-unit: FAIL (n)` and exits non-zero on failure.
 const { open } = require('../lib/ws-harness.cjs');
@@ -201,45 +203,25 @@ const svgs = (html) => [...String(html).matchAll(/<svg\b[^>]*class="([^"]*)"[^>]
         }
         return out;
     }, SETS, N);
-    // The drag-to-fill skills (compose_hexagon, compose_rect_from_squares): every block placed at
-    // its place, turned by its rotation, from the widget's own block geometry.
+    // The fill skills (compose_hexagon, compose_rect_from_squares): the kit cell on paper and screen.
     const fills = await app.page.evaluate(async (N) => {
-        const W = await import('/js/modules/widgets/compose-shape-blocks.js');
         const out = [];
         const runs = [['compose_hexagon', { shapes: [0] }], ['compose_hexagon', { shapes: [1] }], ['compose_hexagon', { shapes: [2] }],
-            ['compose_rect_from_squares', {}]];
+            ['compose_hexagon', { shapes: [3] }], ['compose_hexagon', {}], ['compose_rect_from_squares', {}]];
+        const K = await import('/js/modules/sheet/index.js');
         for (const [skill, opts] of runs) {
             for (let k = 0; k < Math.max(6, Math.round(N / 4)); k++) {
                 const q = window.generateQuestionFor({ category: 'shapes_early', skill, opts, seed: 50 + k, itemIndex: k % 6, itemCount: 6 });
                 if (!q) { out.push({ skill, missing: true }); continue; }
-                const blocks = (q.snapPoints || []).map((sp) => {
-                    const t = (sp.rotation || 0) * Math.PI / 180, c = Math.cos(t), sn = Math.sin(t);
-                    return { name: sp.shape, pts: W.blockPoints(sp.shape, q.unit).map(([x, y]) => [sp.cx + x * c - y * sn, sp.cy + x * sn + y * c]) };
-                });
-                const div = document.createElement('div');
-                W.renderComposeShapeBlocks(q, div);
-                const shown = Array.from(div.querySelectorAll('.csb-snap-outline')).filter((el) => el.getAttribute('stroke') !== 'none').length;
-                // the paper cell (shape-grid kind `fill`): pupil page and key at every size
-                const K = await import('/js/modules/sheet/index.js');
                 const paper = ['S', 'M', 'L'].map((size) => ({ size,
                     pupil: K.renderCell(q, K.resolveCtx({ mode: 'print', size, look: 'ican', state: 'blank', scaffoldLevel: 1 })),
                     key: K.renderCell(q, K.resolveCtx({ mode: 'print', size, look: 'ican', state: 'answered', scaffoldLevel: 1 })) }));
-                out.push({ skill, opts, ans: q.ans, targetSvg: q.targetSvg, blocks, palette: q.palette, shown, payload: q.cell && q.cell.payload, paper });
+                out.push({ skill, opts, ans: q.ans, answerType: q.answerType, visual: String(q.visual || ''), payload: q.cell && q.cell.payload, paper });
             }
         }
         return out;
     }, N);
     await app.close();
-    /** The outline a target SVG draws: its polygon, or its rect. */
-    const targetOf = (svg) => {
-        const poly = /<polygon points="([^"]+)"/.exec(svg);
-        if (poly) return { name: 'target', pts: poly[1].trim().split(/\s+/).map((p) => p.split(',').map(Number)) };
-        const r = /<rect x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/.exec(svg);
-        if (!r) return null;
-        const [x, y, w, h] = r.slice(1).map(Number);
-        return { name: 'target', pts: [[x, y], [x + w, y], [x + w, y + h], [x, y + h]] };
-    };
-
     const fails = [];
     const bad = (it, msg) => fails.push(`set ${JSON.stringify(SETS[it.si])} item ${it.k}: ${msg}`);
     let checked = 0;
@@ -330,49 +312,50 @@ const svgs = (html) => [...String(html).matchAll(/<svg\b[^>]*class="([^"]*)"[^>]
         else if (it.payload.task !== 'pieces' && !(it.payload.names || []).includes(w.value)) bad(it, `PROVIDER wrong answer "${w.value}" is not on the bank`);
     }
 
-    // FILL: the drag-to-fill skills place blocks that tile their outline, and draw no empty place
-    // (the dashed places were the answer: how the shape is filled).
+    // FILL: the kit cell's places tile the outline; the count is the asked kind's
     let fillChecked = 0;
+    const PLAN = { 0: 'triangle', 1: 'trapezoid', 2: 'rhombus' };
+    const polyArea = (pts) => Math.abs(pts.reduce((a, [x, y], i) => { const [X, Y] = pts[(i + 1) % pts.length]; return a + x * Y - X * y; }, 0)) / 2;
+    const inP = (pts, [x, y]) => { let c = false; for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) { const [xi, yi] = pts[i], [xj, yj] = pts[j]; if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) c = !c; } return c; };
     for (const f of fills) {
         const tag = `${f.skill} ${JSON.stringify(f.opts || {})}`;
         if (f.missing) { fails.push(`${tag}: no item`); continue; }
         fillChecked++;
-        const t = targetOf(f.targetSvg);
-        if (!t) { fails.push(`${tag}: no target outline`); continue; }
-        // coordinates are px to 2 decimals: compare areas to 0.5 %
-        const sum = f.blocks.reduce((a, b) => a + polyArea(b.pts), 0);
-        if (Math.abs(sum - polyArea(t.pts)) > 0.005 * polyArea(t.pts)) fails.push(`${tag} ${f.ans}: FILL blocks ${sum.toFixed(1)} px2 vs outline ${polyArea(t.pts).toFixed(1)}`);
-        const b = bboxOf([t, ...f.blocks]);
-        let bad = 0;
-        for (let i = 0; i < 60; i++) for (let j = 0; j < 60; j++) {
-            const pnt = [b.x0 + (i + 0.5 + 0.1234567 * Math.SQRT2) * (b.x1 - b.x0) / 60, b.y0 + (j + 0.5 + 0.0765432 * Math.PI) * (b.y1 - b.y0) / 60];
-            if ([t, ...f.blocks].some((sh) => edgeDist(sh, pnt) < 0.6)) continue;
-            const inT = inPoly(t.pts, pnt), hits = f.blocks.filter((sh) => inPoly(sh.pts, pnt)).length;
-            if ((inT && hits !== 1) || (!inT && hits !== 0)) bad++;
-        }
-        if (bad) fails.push(`${tag} ${f.ans}: FILL ${bad} sample points break the tiling`);
-        const count = (f.palette || []).reduce((a, x) => a + (x.count || 0), 0);
-        if (count !== f.blocks.length) fails.push(`${tag}: FILL the palette holds ${count} blocks for ${f.blocks.length} places`);
-        if (f.shown) fails.push(`${tag}: FILL ${f.shown} empty places are drawn (they show how to fill the shape)`);
-        // PAPER: the kit cell's places are the widget's blocks; the pupil page draws none of them
         const P = f.payload || {};
-        const PLAN = { 0: 'triangle', 1: 'trapezoid', 2: 'rhombus' };
-        if (P.kind !== 'fill') fails.push(`${tag}: PAPER no fill cell`);
-        else {
-            if (P.count !== f.blocks.length || f.ans !== f.blocks.length) fails.push(`${tag}: PAPER count ${P.count} / ans ${f.ans} for ${f.blocks.length} blocks`);
-            const areaU = P.places.reduce((a, pl) => a + polyArea(pl), 0);
-            if (Math.abs(areaU - polyArea(P.target)) > 0.005 * polyArea(P.target)) fails.push(`${tag}: PAPER places ${areaU.toFixed(2)} vs outline ${polyArea(P.target).toFixed(2)}`);
-            if (f.skill === 'compose_hexagon' && f.opts.shapes && P.block !== PLAN[f.opts.shapes[0]]) fails.push(`${tag}: PAPER "Blocks used" ${f.opts.shapes} dealt ${P.block}`);
-            for (const pg of f.paper) {
-                const inkPolys = (html) => (html.match(/<polygon[^>]*data-ws-ink="solid"/g) || []).length;
-                if (inkPolys(pg.pupil) || /data-ws-guide="trace"/.test(pg.pupil)) fails.push(`${tag} ${pg.size}: PAPER the pupil page draws the blocks (the answer)`);
-                if (inkPolys(pg.key) !== P.count) fails.push(`${tag} ${pg.size}: PAPER the key draws ${inkPolys(pg.key)} blocks for ${P.count}`);
-                if (!/data-ws-figure="1"/.test(pg.pupil)) fails.push(`${tag} ${pg.size}: PAPER the outline is not drawn`);
-                if (!/data-ws-slot="count"/.test(pg.pupil)) fails.push(`${tag} ${pg.size}: PAPER no count box`);
-            }
+        if (P.kind !== 'fill') { fails.push(`${tag}: no fill cell`); continue; }
+        const areaU = P.places.reduce((a, pl) => a + polyArea(pl), 0);
+        if (Math.abs(areaU - polyArea(P.target)) > 0.005 * polyArea(P.target)) fails.push(`${tag}: FILL places ${areaU.toFixed(2)} vs outline ${polyArea(P.target).toFixed(2)}`);
+        // no overlap, no gap: sample points inside the outline are in exactly one place
+        const xs = P.target.map((v) => v[0]), ys = P.target.map((v) => v[1]);
+        let bad = 0;
+        for (let i = 0; i < 40; i++) for (let j = 0; j < 40; j++) {
+            const pt = [Math.min(...xs) + (i + 0.5 + 0.1234) * (Math.max(...xs) - Math.min(...xs)) / 40, Math.min(...ys) + (j + 0.5 + 0.0765) * (Math.max(...ys) - Math.min(...ys)) / 40];
+            if (!inP(P.target, pt)) continue;
+            const hits = P.places.filter((pl) => inP(pl, pt)).length;
+            if (hits !== 1) bad++;
         }
+        if (bad > 3) fails.push(`${tag}: FILL ${bad} sample points break the tiling`);
+        const kinds = P.placeBlocks || P.places.map(() => P.block);
+        const asked = kinds.filter((k) => k === P.block).length;
+        if (P.count !== asked || f.ans !== asked) fails.push(`${tag}: count ${P.count} / ans ${f.ans} for ${asked} ${P.block} places`);
+        for (const g of P.given || []) if (kinds.filter((k) => k === g.block).length !== g.n) fails.push(`${tag}: given ${g.n} ${g.block} but ${kinds.filter((k) => k === g.block).length} placed`);
+        if (f.skill === 'compose_hexagon' && f.opts.shapes && f.opts.shapes[0] < 3 && P.block !== PLAN[f.opts.shapes[0]]) fails.push(`${tag}: "Blocks used" ${f.opts.shapes} dealt ${P.block}`);
+        if (f.skill === 'compose_hexagon' && f.opts.shapes && f.opts.shapes[0] === 3 && new Set(kinds).size < 2) fails.push(`${tag}: a mixed fill of one kind of block`);
+        if (f.answerType !== 'number' || /compose-shape-blocks|csb-/.test(f.visual)) fails.push(`${tag}: SCREEN the drag widget is back (answerType ${f.answerType})`);
+        if (!/data-ws-slot="count"/.test(f.visual) && !/data-mq-blank|data-ws-slot/.test(f.visual)) fails.push(`${tag}: SCREEN the twin has no count box`);
+        const w = {};
+        for (const pg of f.paper) {
+            const inkPolys = (html) => (html.match(/<polygon[^>]*data-ws-ink="solid"/g) || []).length;
+            if (inkPolys(pg.pupil) || /data-ws-guide="trace"/.test(pg.pupil)) fails.push(`${tag} ${pg.size}: PAPER the pupil page draws the blocks (the answer)`);
+            if (inkPolys(pg.key) !== P.places.length) fails.push(`${tag} ${pg.size}: PAPER the key draws ${inkPolys(pg.key)} blocks for ${P.places.length}`);
+            if (!/data-ws-figure="1"/.test(pg.pupil)) fails.push(`${tag} ${pg.size}: PAPER the outline is not drawn`);
+            if (!/data-ws-slot="count"/.test(pg.pupil)) fails.push(`${tag} ${pg.size}: PAPER no count box`);
+            const m = /class="k2-svg sg-fill"[^>]*viewBox="0 0 ([\d.]+)/.exec(pg.pupil);
+            w[pg.size] = m ? Number(m[1]) : null;
+        }
+        if (w.S && w.L && !(w.S < w.L * 0.9)) fails.push(`${tag}: SIZE the shape is ${w.S} mm at S and ${w.L} mm at L (S must be smaller)`);
     }
-    console.log(`ws-compose-unit: ${fillChecked} drag-to-fill items (compose_hexagon, compose_rect_from_squares)`);
+    console.log(`ws-compose-unit: ${fillChecked} fill items (compose_hexagon, compose_rect_from_squares)`);
 
     const byComp = {};
     items.forEach((it) => { const c = it.payload && it.payload.comp; if (c) byComp[c] = (byComp[c] || 0) + 1; });

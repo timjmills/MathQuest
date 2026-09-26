@@ -235,6 +235,9 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'volume-composite': 'Split the solid into two prisms. Add their volumes.',
     'coord-read-plot': 'Write the coordinates of each point, or plot the points.',
     'transform-choice': 'Check the grid that shows the shape moved.',
+    'composite-both': 'Write the perimeter and the area.',
+    'composite-mixed': 'Write the perimeter. Write the area if there is a box.',
+    'coord-graph': 'Use the graph to answer, or plot the pairs in the table.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',

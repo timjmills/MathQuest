@@ -29,6 +29,7 @@ import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import { blankWidth } from '../tokens.js';
 import { L, P, B, INK, GREY, SW, PT_MM, n2, isTwin, sizeOf, S, digitPt, textPt, box, svg } from './k2kit.js';
+import { labelsClear, boxGap, glyphGap, UNIT_NAME } from './shape-figure.js';
 
 const FONT = `font-family="Andika, 'Open Sans', sans-serif"`;
 const textW = (s, pt) => String(s).length * pt * PT_MM * 0.58;
@@ -40,7 +41,10 @@ const FIT_W = { S: 54, M: 80, L: 80 };
 
 const levelOf = (ctx) => (ctx && Number.isFinite(ctx.scaffoldLevel) ? ctx.scaffoldLevel : 1);
 const hintsOn = (p, ctx) => !!p.hint || !!p.traced || levelOf(ctx) >= 2;
-const labelPt = (ctx) => Math.max(textPt(ctx) + 3, digitPt(ctx) * 0.7);
+const labelPt = (ctx) => Math.max(textPt(ctx) + 1, digitPt(ctx) * 0.7);
+/** The unit rides on each label when the solid has three labels or fewer; else it is written once
+ *  under the drawing ("All lengths are in cm."), so a pair of labels never reads "2 m 2 m". */
+export const unitOnLabels = (p) => !!p.unit && (p.labels || []).filter((l) => l.v !== '?').length <= 3;
 
 /** The unit cubes of the solid, as a Set of "x,y,z" keys, and their list. */
 function cubesOf(p) {
@@ -134,13 +138,13 @@ export function solidSVG(p, ctx) {
     const size = sizeOf(ctx);
     const bb = bounds(p);
     const dPt = labelPt(ctx), uPt = textPt(ctx), dMm = dPt * PT_MM;
-    const unit = String(p.unit || '');
+    const unit = unitOnLabels(p) ? String(p.unit || '') : '';
     const labW = (v) => textW(v, dPt) + (unit && v !== '?' ? textW(` ${unit}`, uPt) : 0);
     // a story's sketch is smaller (the story is the item; the sketch is a picture of it)
     let k = Math.min(FIG[size].w / (bb.x1 - bb.x0 || 1), FIG[size].h / (bb.y1 - bb.y0 || 1)) * (p.sketch ? 0.6 : 1);
     const faces = facesOf(p);
     let placed, X0, X1, Y0, Y1;
-    for (let tries = 0; tries < 5; tries++) {
+    for (let tries = 0; tries < 9; tries++) {
         // the drawing at this scale: its faces (a label never sits on them) and its real edges
         const polys = faces.map((f) => f.pts.map((pt) => proj(pt, k)));
         const edges = [];
@@ -158,38 +162,48 @@ export function solidSVG(p, ctx) {
             if (nx * (mx - cx) + ny * (my - cy) < 0) { nx = -nx; ny = -ny; }     // away from the solid first
             const w = labW(lb.v), h = dMm;
             let best = null;
-            // beside its edge, on the outer side first, then the other; along the edge; a little
-            // further out: the first place clear of the other labels, the edges and the faces
+            // THE ONE LABEL RULE (as shape-figure.js): beside the middle of its own edge, on the outer
+            // side first, then the other; a little along the edge; never further from its own edge
+            // than from another edge; LABEL_GAP from every other label
+            const own = [A, Bp];
+            const along = (e) => Math.abs(((e[1][0] - e[0][0]) * (Bp[1] - A[1]) - (e[1][1] - e[0][1]) * (Bp[0] - A[0]))) < 1e-6
+                && Math.abs(((e[0][0] - A[0]) * (Bp[1] - A[1]) - (e[0][1] - A[1]) * (Bp[0] - A[0]))) < 1e-6;
+            const others = edges.filter((e) => !along(e));
             search:
-            for (const d of [1.6, 3, 5]) {
+            for (const d of [1.4, 2.4, 3.4]) {
                 for (const side of [1, -1]) {
                     for (const t of [0, -0.2, 0.2, -0.35, 0.35]) {
                         const sx = nx * side, sy = ny * side;
                         const px = mx + (Bp[0] - A[0]) * t + sx * (d + Math.abs(sx) * w / 2 + Math.abs(sy) * h * 0.55);
                         const py = my + (Bp[1] - A[1]) * t + sy * (d + Math.abs(sx) * w / 2 + Math.abs(sy) * h * 0.55);
                         const r = [px - w / 2 - 0.4, py - h / 2 - 0.2, px + w / 2 + 0.4, py + h / 2 + 0.2];
-                        if (placed.some((q) => boxesMeet(q.r, r)) || !clear(r)) continue;
+                        if (placed.some((q) => !labelsClear(q.r, r, glyphGap(dPt))) || !clear(r)) continue;
+                        const dOwn = boxGap(r, own);
+                        if (others.some((e) => boxGap(r, e) < dOwn - 0.05)) continue;
                         best = { v: lb.v, x: px, y: py, r, unknown: lb.v === '?' };
                         break search;
                     }
                 }
             }
             if (!best) {
-                const px = mx + nx * (8 + w / 2), py = my + ny * (8 + h / 2);
+                const px = mx + nx * (1.4 + Math.abs(nx) * w / 2 + Math.abs(ny) * h * 0.55), py = my + ny * (1.4 + Math.abs(nx) * w / 2 + Math.abs(ny) * h * 0.55);
                 best = { v: lb.v, x: px, y: py, r: [px - w / 2, py - h / 2, px + w / 2, py + h / 2], unknown: lb.v === '?', forced: true };
             }
             placed.push(best);
             X0 = Math.min(X0, best.r[0]); X1 = Math.max(X1, best.r[2]); Y0 = Math.min(Y0, best.r[1]); Y1 = Math.max(Y1, best.r[3]);
         }
         // a label with no clear place: the drawing grows while it still fits the cell
-        if (placed.some((q) => q.forced) && tries < 4 && (X1 - X0) * 1.15 + 3 <= FIT_W[size]) { k *= 1.15; continue; }
-        if (X1 - X0 + 3 <= FIT_W[size] || tries === 4) break;
+        if (placed.some((q) => q.forced) && tries < 8 && (X1 - X0) * 1.12 + 3 <= FIT_W[size]) { k *= 1.12; continue; }
+        if (X1 - X0 + 3 <= FIT_W[size] || tries === 8) break;
         k *= Math.max(0.6, (FIT_W[size] - 3 - (X1 - X0 - (bb.x1 - bb.x0) * k)) / ((bb.x1 - bb.x0) * k));
     }
     const pad = 1.5, ox = -X0 + pad, oy = -Y0 + pad;
     const W = X1 - X0 + 2 * pad, H = Y1 - Y0 + 2 * pad;
     const P2 = (pt) => { const [u, v] = proj(pt, k); return [u + ox, v + oy]; };
-    const cubes = hintsOn(p, ctx) && p.toScale && p.cubes !== false;
+    // the unit cubes: every cube in ink when the look is "built of unit cubes" (structure), else
+    // the grey dotted Support-level-2 hint
+    const allCubes = p.cubes === 'all' && p.toScale;
+    const cubes = allCubes || (hintsOn(p, ctx) && p.toScale && p.cubes !== false);
     let body = '';
     for (const f of faces) {
         const q = f.pts.map(P2);
@@ -198,6 +212,7 @@ export function solidSVG(p, ctx) {
         f.real.forEach((real, i) => {
             const [a, b] = [q[i], q[(i + 1) % 4]];
             if (real) body += `<line x1="${n2(a[0])}" y1="${n2(a[1])}" x2="${n2(b[0])}" y2="${n2(b[1])}" stroke="${INK}" stroke-width="${n2(SW.heavy)}" stroke-linecap="round" data-ws-figure="1"/>`;
+            else if (allCubes) body += `<line x1="${n2(a[0])}" y1="${n2(a[1])}" x2="${n2(b[0])}" y2="${n2(b[1])}" stroke="${INK}" stroke-width="${n2(SW.hair)}" data-ws-cube="1"/>`;
             else if (cubes) body += `<line x1="${n2(a[0])}" y1="${n2(a[1])}" x2="${n2(b[0])}" y2="${n2(b[1])}" stroke="${GREY}" stroke-width="${n2(PT_MM)}" stroke-dasharray="0.01 1.2" stroke-linecap="round" data-ws-hint="cube"/>`;
         });
     }
@@ -220,7 +235,8 @@ export function solidSVG(p, ctx) {
             + `<tspan font-size="${n2(dMm)}">${esc(lb.v)}</tspan>${unit && !lb.unknown ? `<tspan font-size="${n2(uPt * PT_MM)}"> ${esc(unit)}</tspan>` : ''}</text>`;
     }
     const aria = `a solid with edges ${(p.labels || []).map((l) => l.v).join(', ')}`;
-    return { html: svg(ctx, W, H, body, { cls: 'sk-solid', label: aria }), W, H };
+    return { html: svg(ctx, W, H, body, { cls: 'sk-solid', label: aria }), W, H, gap: glyphGap(dPt),
+        labels: placed.map((lb) => ({ v: lb.v, r: lb.r.map((v, i) => v + (i % 2 ? oy : ox)), forced: !!lb.forced })) };
 }
 
 function shown(p, ctx, a) {
@@ -252,11 +268,13 @@ register('solid-kit', {
         const f = solidSVG(bare ? { ...p, labels: [] } : p, ctx);
         const story = (p.story || []).length
             ? `<div class="sk-story" style="font-size:${P(ctx, textPt(ctx) + 2)};line-height:1.3;text-align:left;max-width:${L(ctx, SOLID_COL[sizeOf(ctx)].wMm - 8)};">${p.story.map((t) => `<div>${esc(t)}</div>`).join('')}</div>` : '';
+        const unitLine = !bare && p.unit && !unitOnLabels(p) && (p.labels || []).length
+            ? `<div class="sk-units" style="font-size:${P(ctx, textPt(ctx))};line-height:1.25;">All lengths are in ${esc(UNIT_NAME[p.unit] || p.unit)}.</div>` : '';
         const given = (p.given || []).map((g) => `<div class="sk-given" style="font-size:${P(ctx, textPt(ctx))};font-weight:700;line-height:1.25;">${esc(g)}</div>`).join('');
         const formula = p.formula && hintsOn(p, ctx)
             ? `<div class="sk-formula" data-ws-hint="formula" style="font-size:${P(ctx, textPt(ctx))};line-height:1.25;color:${GREY};">${esc(p.formula)}</div>` : '';
         const asks = (p.ask || []).map((a) => answerLine(p, ctx, a)).join('');
-        return root(ctx, `${story}${f.html ? `<div style="line-height:0;">${f.html}</div>` : ''}${given}${formula}${asks}`);
+        return root(ctx, `${story}${f.html ? `<div style="line-height:0;">${f.html}</div>` : ''}${unitLine}${given}${formula}${asks}`);
     },
     answerKey(p) {
         const a = (p.ask || [])[0] || {};

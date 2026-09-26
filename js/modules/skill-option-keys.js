@@ -158,7 +158,11 @@ export const MULTI_KEYS = Object.freeze({
     // Sub-range 2G-2T — build lane geometry (design/BUILD_LIST.md, 2026-09-25).
     compose: '2G',       // compose_shapes: name the shape the pieces make / find the pieces that make a shape
     slide: '2H',         // geo_translate: the longest slide, in squares (a scalar)
-    // NEXT FREE FOR BUILD LANE GEOMETRY: 2I (to 2T).
+    paper: '2I',         // compose_hexagon, compose_rect_from_squares: plain / dot paper behind the shape
+    quadrants: '2J',     // coordinate_all: quadrants I and II / I and IV / all four
+    solidLook: '2K',     // volume, volume_composite: a solid box / built of unit cubes
+    gridLook: '2L',      // area_unit_squares, perimeter_grid, area_triangle: how the unit squares are shown
+    // NEXT FREE FOR BUILD LANE GEOMETRY: 2M (to 2T).
 
     // Block 3 — function tables (2026-09-25). Their other options reuse one-letter keys with value
     // tokens only (task, response, order: inorder, support); `ops` is its own key because the
@@ -320,6 +324,10 @@ export const VALUE_TOKENS = Object.freeze({
     shape: Object.freeze({ box: 'B', circle: 'C', hex: 'H', mixed: 'M' }),
     // build lane geometry (sub-range 2G-2T)
     compose: Object.freeze({ name: 'N', pieces: 'P' }),
+    paper: Object.freeze({ plain: 'P', dots: 'D' }),
+    quadrants: Object.freeze({ left: 'L', down: 'D', all: 'A' }),
+    solidLook: Object.freeze({ solid: 'S', cubes: 'C' }),
+    gridLook: Object.freeze({ squares: 'Q', rows: 'R', ticks: 'T', plain: 'P', grid: 'G' }),
     // block 3 (2026-09-25)
     ops: Object.freeze({ '+': 'A', '-': 'S', x: 'M', '/': 'D' }),
     // block 7 (option-panel round 3)
