@@ -157,7 +157,8 @@ export const MULTI_KEYS = Object.freeze({
     // NEXT FREE IN BLOCK 2: 2G.
     // Sub-range 2G-2T — build lane geometry (design/BUILD_LIST.md, 2026-09-25).
     compose: '2G',       // compose_shapes: name the shape the pieces make / find the pieces that make a shape
-    // NEXT FREE FOR BUILD LANE GEOMETRY: 2H (to 2T).
+    slide: '2H',         // geo_translate: the longest slide, in squares (a scalar)
+    // NEXT FREE FOR BUILD LANE GEOMETRY: 2I (to 2T).
 
     // Block 3 — function tables (2026-09-25). Their other options reuse one-letter keys with value
     // tokens only (task, response, order: inorder, support); `ops` is its own key because the
@@ -378,6 +379,8 @@ export const SCALAR_ONLY = Object.freeze({
     count: 'decimal', span: 'decimal', repeatDigit: 'bool', zeroDigit: 'bool', midLabel: 'bool',
     // block 2 (2026-09-25)
     missing: 'decimal', rule: 'bool',
+    // build lane geometry (2H): the longest slide of a translation, in squares
+    slide: 'decimal',
     // block 1 (P10): the longest elapsed time, in minutes
     hours: 'decimal',
     // block 6 (O2 ladders)

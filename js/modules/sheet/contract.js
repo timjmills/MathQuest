@@ -233,6 +233,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'fill-blocks': 'Draw lines to fill the shape with the blocks. Write how many.',
     'volume': 'Find the volume, or the missing edge.',
     'volume-composite': 'Split the solid into two prisms. Add their volumes.',
+    'coord-read-plot': 'Write the coordinates of each point, or plot the points.',
+    'transform-choice': 'Check the grid that shows the shape moved.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',

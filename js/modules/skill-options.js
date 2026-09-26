@@ -2285,7 +2285,11 @@ Object.assign(P12_OPTIONS, {
     'coordinates:geo_rotate': [_p12Kinds('forms', 'Turn', [['A half turn (180°)', '180°'], ['A quarter turn (90°)', ' 90°'], ['Three quarters (270°)', '270°']],
         'A half turn is the easiest to see.')],
     'coordinates:geo_translate': [_p12Kinds('forms', 'Slide', [['Right and up', 'right and \\d+ up'], ['Left and up', 'left and \\d+ up'],
-        ['Right and down', 'right and \\d+ down'], ['Left and down', 'left and \\d+ down']])],
+        ['Right and down', 'right and \\d+ down'], ['Left and down', 'left and \\d+ down']]),
+        // Build lane geometry (2H): the longest slide, read by gen-geo-kit.js transformItem
+        { id: 'slide', label: 'Slide up to', type: 'enum', default: 3, group: 'difficulty',
+            values: [{ v: 2, l: '2 squares' }, { v: 3, l: '3 squares (default)' }, { v: 5, l: '5 squares' }],
+            help: 'How far the shape may move each way. A short slide is easier to see; 5 squares needs a bigger grid.' }],
     'coordinates:coord_polygon': [_p12Match([['The length of one side', 'length of side'], ['The perimeter', 'perimeter']])],
 });
 
@@ -2832,6 +2836,9 @@ const _AP2_POINTS = { all: 'Points named with their coordinates: A(3, 2)', some:
         levelSubset([3, 2, 1], 1, 'Level 3 writes the answer in grey to trace; level 2 puts a grey dot in every square to touch as it is counted; level 1 is the squares alone.')],
     ['area_perimeter:perimeter_grid',
         levelSubset([3, 2, 1], 1, 'Level 3 writes the answer in grey to trace; level 2 puts a grey dot on every unit of the outline to touch as it is counted; level 1 is the outline alone.')],
+    ['coordinates:coordinate_q1', levelSubset([3, 2, 1], 1, 'Level 3 writes the coordinates in grey to trace (or the dots to plot); level 2 draws grey guide lines from each point to both axes; level 1 is the grid alone.')],
+    ['coordinates:coordinate_all', levelSubset([3, 2, 1], 1, 'Level 3 writes the coordinates in grey to trace (or the dots to plot); level 2 draws grey guide lines from each point to both axes; level 1 is the grid alone.')],
+    ['coordinates:coordinate_graph', levelSubset([3, 2, 1], 1, 'Level 3 writes the coordinates in grey to trace (or the dots to plot); level 2 draws grey guide lines from each point to both axes; level 1 is the grid alone.')],
     ['area_perimeter:perimeter_intro',
         { id: 'shapes', label: 'Which shapes', type: 'set', default: [0, 1, 2], group: 'difficulty',
             values: [{ v: 0, l: 'Rectangles and squares (4 sides)' }, { v: 1, l: 'Triangles (3 sides)' },

@@ -215,7 +215,10 @@ const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlan
     'dualFractionAnswers',
     // AP2 round 3: a twin that prints its own question (a graph's) says its instruction here,
     // as it does on the card and the worksheet
-    'screenInstr'];
+    'screenInstr',
+    // build lane geometry: a coordinate item's points travel with it (the quiz read its typed
+    // ( x , y ) boxes without them)
+    'coordinateData'];
 export function quizQuestionData(q) {
     if (!q) return null;
     const d = {

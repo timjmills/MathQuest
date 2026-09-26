@@ -4,10 +4,10 @@ import { randInt, shuffle, pick, buildNumericOptions, pickName } from './utils.j
 import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG, computeTriangleAngles } from './svg-geometry.js';
 import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
-import { k2Twin, COMPOSE_LETTERS } from './sheet/index.js';
+import { k2Twin, COMPOSE_LETTERS, coordGridSVG } from './sheet/index.js';
 import { geoOpt, geoBegin, geoDeal, geoLevel, areaUnitSquares, perimeterGrid, perimeterFigure, areaFigure,
     areaPerimeterFigure, compositeFigure, decomposeFigure, triangleFigure, storyFigure,
-    volumeFigure, compositeVolume } from './gen-geo-kit.js';
+    volumeFigure, compositeVolume, coordinateItem, transformItem } from './gen-geo-kit.js';
 import { compositionsFor, dealComposition, decoyPieceSets, nameBank, namesFor, corners, transformShape } from './geo-compose.js';
 import { blockPoints } from './widgets/compose-shape-blocks.js';
 
@@ -47,6 +47,9 @@ function _fillCell(q, { targetPx, shapeName, block, unit, fitW }) {
     q.cell = { template: 'shape-grid', v: 1, payload };
     q.ans = places.length;
     q.printAnswer = String(places.length);
+    // a host without the drag widget (the quiz) draws the paper cell: the shape, the block and
+    // "[ ] trapezoids"; the card and the worksheet mount the widget over it
+    q._fillTwin = k2Twin('shape-grid', payload);
 }
 
 /* ============================================================ Combine Shapes (compose_shapes) */
@@ -1279,9 +1282,9 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.hint = `Put a block in a corner of the hexagon first. The blocks must fill it with no gaps and no overlaps.`;
                 q.skillLabel = 'Compose Hexagon';
                 q.printFormat = 'compose-shape-blocks';
-                q.visual = '';
                 // paper: draw the lines that split the hexagon into the blocks, write how many
                 _fillCell(q, { targetPx: [0, 1, 2, 3, 4, 5].map(V), shapeName: 'hexagon', block: palette[0].shape, unit, fitW: 8 });
+                q.visual = q._fillTwin; delete q._fillTwin;
                 return;
             }
 
@@ -1327,9 +1330,9 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.hint = `Start in a corner. Fill a row, then the next row. No gaps and no overlaps.`;
                 q.skillLabel = 'Compose Rectangle';
                 q.printFormat = 'compose-shape-blocks';
-                q.visual = '';
                 _fillCell(q, { targetPx: [[offsetX, offsetY], [offsetX + totalW, offsetY], [offsetX + totalW, offsetY + totalH], [offsetX, offsetY + totalH]],
                     shapeName: 'rectangle', block: 'square', unit, fitW: 2 + 8 });
+                q.visual = q._fillTwin; delete q._fillTwin;
                 return;
             }
 
@@ -2697,371 +2700,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.geometryData = { shape: shape.name, lines: shape.lines };
                 q.printFormat = "geometry-symmetry";
             } else if (geoSkill === "geo_reflect" || geoSkill === "geo_rotate" || geoSkill === "geo_translate") {
-                // ===== GEOMETRIC TRANSFORMATIONS (G5) — MC with 4 small grids =====
-                // Pick a random small polygon (3-5 vertices), apply the correct
-                // transformation + 3 distractor transformations, present as a
-                // multi-select-check with minCorrect:1 (one-correct enforced).
-                const _gtRandShape = () => {
-                    // 4 hand-tuned shapes that look distinct under rotation/reflection.
-                    const shapes = [
-                        // Right triangle (asymmetric)
-                        [[1, 1], [4, 1], [1, 3]],
-                        // L-shape pentagon
-                        [[1, 1], [3, 1], [3, 2], [2, 2], [2, 4], [1, 4]],
-                        // Scalene triangle
-                        [[1, 1], [4, 2], [2, 4]],
-                        // Trapezoid
-                        [[1, 1], [4, 1], [3, 3], [2, 3]],
-                    ];
-                    return shapes[randInt(0, shapes.length - 1)].map(p => [p[0], p[1]]);
-                };
-                // Translate every vertex of the source so it fits comfortably
-                // in [-5, 5] on both axes (so distractor results stay on grid).
-                const _gtNormalize = (pts, ox, oy) => pts.map(([x, y]) => [x + ox, y + oy]);
-                const _gtReflectY = pts => pts.map(([x, y]) => [-x, y]);
-                const _gtReflectX = pts => pts.map(([x, y]) => [x, -y]);
-                const _gtRotate = (pts, deg) => {
-                    // Clockwise positive deg; rotate around origin.
-                    const r = (-deg) * Math.PI / 180;
-                    const c = Math.cos(r), s = Math.sin(r);
-                    return pts.map(([x, y]) => {
-                        const nx = x * c - y * s;
-                        const ny = x * s + y * c;
-                        return [Math.round(nx), Math.round(ny)];
-                    });
-                };
-                const _gtTranslate = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
-                const _gtKey = pts => {
-                    // Order-independent polygon key for distractor de-dup.
-                    return [...pts].map(p => `${p[0]},${p[1]}`).sort().join('|');
-                };
-                // Build an SVG of the polygon on a coordinate grid spanning [-6, 6].
-                const _gtGridSvg = (pts, color, label) => {
-                    const min = -6, max = 6, span = max - min;
-                    const size = 180;
-                    const pad = 12;
-                    const inner = size - 2 * pad;
-                    const tx = (x) => pad + ((x - min) / span) * inner;
-                    const ty = (y) => pad + ((max - y) / span) * inner;
-                    let grid = '';
-                    for (let i = min; i <= max; i++) {
-                        const isAxis = (i === 0);
-                        const stroke = isAxis ? '#333' : '#cfd8dc';
-                        const sw = isAxis ? 1.5 : 0.6;
-                        grid += `<line x1="${tx(i)}" y1="${pad}" x2="${tx(i)}" y2="${size - pad}" stroke="${stroke}" stroke-width="${sw}"/>`;
-                        grid += `<line x1="${pad}" y1="${ty(i)}" x2="${size - pad}" y2="${ty(i)}" stroke="${stroke}" stroke-width="${sw}"/>`;
-                    }
-                    const polyPts = pts.map(([x, y]) => `${tx(x).toFixed(1)},${ty(y).toFixed(1)}`).join(' ');
-                    const fill = color + '33';
-                    const lab = label ? `<text x="${pad + 4}" y="${size - pad - 4}" font-family="Arial" font-size="10" fill="#666">${label}</text>` : '';
-                    return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
-                        ${grid}
-                        <polygon points="${polyPts}" fill="${fill}" stroke="${color}" stroke-width="2"/>
-                        ${lab}
-                    </svg>`;
-                };
-
-                // Pick a source shape and place it so transforms stay in-grid.
-                const baseShape = _gtRandShape();
-                // Shift source into Q1 lightly off-center so reflections/rotations move visibly.
-                const sourcePts = _gtNormalize(baseShape, 1, 1);
-                const srcColor = '#1e88e5';
-                const ansColor = '#43a047';
-                let promptText, hintText, correctPts, distractorSet;
-
-                if (geoSkill === "geo_reflect") {
-                    // Pick reflection axis. y-axis flips x sign.
-                    const axisChoice = pick(['y', 'x']);
-                    if (axisChoice === 'y') {
-                        correctPts = _gtReflectY(sourcePts);
-                        promptText = 'Which figure shows this shape reflected over the y-axis?';
-                        hintText = 'Reflecting over the y-axis flips the shape left/right (x becomes -x).';
-                    } else {
-                        correctPts = _gtReflectX(sourcePts);
-                        promptText = 'Which figure shows this shape reflected over the x-axis?';
-                        hintText = 'Reflecting over the x-axis flips the shape up/down (y becomes -y).';
-                    }
-                    // Distractors: other reflections + rotations
-                    const candDistractors = [
-                        axisChoice === 'y' ? _gtReflectX(sourcePts) : _gtReflectY(sourcePts),
-                        _gtRotate(sourcePts, 180),
-                        _gtRotate(sourcePts, 90),
-                        sourcePts,
-                    ];
-                    distractorSet = candDistractors;
-                } else if (geoSkill === "geo_rotate") {
-                    const rotChoice = pick([90, 180, 270]);
-                    correctPts = _gtRotate(sourcePts, rotChoice);
-                    const rotName = rotChoice === 90 ? '90° clockwise' : (rotChoice === 180 ? '180°' : '270° clockwise');
-                    promptText = `Which figure shows this shape rotated ${rotName} around the origin?`;
-                    hintText = `Rotate every vertex ${rotName} around (0, 0). Tip: 90° CW takes (x, y) → (y, -x).`;
-                    // Distractors: other rotation amounts and a reflection
-                    const otherRotations = [90, 180, 270].filter(r => r !== rotChoice);
-                    distractorSet = [
-                        _gtRotate(sourcePts, otherRotations[0]),
-                        _gtRotate(sourcePts, otherRotations[1]),
-                        _gtReflectY(sourcePts),
-                        _gtReflectX(sourcePts),
-                    ];
-                } else {
-                    // geo_translate
-                    const dx = pick([-3, -2, -1, 1, 2, 3]);
-                    const dy = pick([-3, -2, -1, 1, 2, 3]);
-                    correctPts = _gtTranslate(sourcePts, dx, dy);
-                    const dirX = dx > 0 ? `${dx} right` : `${-dx} left`;
-                    const dirY = dy > 0 ? `${dy} up` : `${-dy} down`;
-                    promptText = `Which figure shows this shape translated ${dirX} and ${dirY}?`;
-                    hintText = `Add (${dx}, ${dy}) to every vertex. The shape slides without rotating or flipping.`;
-                    // Distractor translations: swap signs / use different magnitudes
-                    distractorSet = [
-                        _gtTranslate(sourcePts, -dx, dy),
-                        _gtTranslate(sourcePts, dx, -dy),
-                        _gtTranslate(sourcePts, dy, dx),
-                        _gtTranslate(sourcePts, -dx, -dy),
-                    ];
-                }
-
-                // De-dup distractors against correct + each other.
-                const correctKey = _gtKey(correctPts);
-                const usedKeys = new Set([correctKey]);
-                const distractors = [];
-                for (const d of distractorSet) {
-                    const k = _gtKey(d);
-                    if (usedKeys.has(k)) continue;
-                    usedKeys.add(k);
-                    distractors.push(d);
-                    if (distractors.length === 3) break;
-                }
-                // Pad if dedup left fewer than 3 distractors (rare with degenerate shapes).
-                let _padTries = 0;
-                while (distractors.length < 3 && _padTries < 12) {
-                    _padTries++;
-                    const dx = pick([-3, -2, -1, 1, 2, 3]);
-                    const dy = pick([-3, -2, -1, 1, 2, 3]);
-                    const cand = _gtTranslate(sourcePts, dx, dy);
-                    const k = _gtKey(cand);
-                    if (usedKeys.has(k)) continue;
-                    usedKeys.add(k);
-                    distractors.push(cand);
-                }
-
-                // Build options array: 1 correct + 3 distractors, shuffled.
-                const allOpts = [
-                    { pts: correctPts, correct: true },
-                    ...distractors.slice(0, 3).map(p => ({ pts: p, correct: false })),
-                ];
-                const shuffledOpts = shuffle(allOpts);
-                const opts = shuffledOpts.map((o, i) => ({
-                    id: 'opt' + i,
-                    svg: _gtGridSvg(o.pts, o.correct ? ansColor : srcColor, ''),
-                    label: '',
-                    correct: o.correct,
-                }));
-                const ans = opts.filter(o => o.correct).map(o => o.id);
-
-                // Source figure shown above the choices.
-                const srcSvg = _gtGridSvg(sourcePts, srcColor, 'original');
-                q.text = promptText;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Original Shape</div>
-                    ${srcSvg}
-                </div>`;
-                q.ans = ans;
-                q.options = opts;
-                q.minCorrect = 1;
-                q.answerType = 'multi-select-check';
-                q.hint = hintText;
-                q.printFormat = 'geo-transform-mc';
-                q.skillLabel = geoSkill === 'geo_reflect' ? 'Reflect'
-                    : geoSkill === 'geo_rotate' ? 'Rotate' : 'Translate';
-                q.geometryData = {
-                    sourcePts, correctPts,
-                    transform: geoSkill,
-                };
-                return;
+                // Build lane geometry: four black-and-white grids to choose from, on the coord-grid
+                // cell on paper (they printed one to a page in colour).
+                return transformItem(q, geoSkill, coordGridSVG);
             } else if (geoSkill === "coordinate_graph" || geoSkill === "coordinate_q1" || geoSkill === "coordinate_all") {
-                // Coordinate graphing with multiple modes
-                // Determine quadrant mode based on skill selection
-                let quadrantMode;
-                if (geoSkill === "coordinate_q1") {
-                    quadrantMode = "quadrant1";
-                } else if (geoSkill === "coordinate_all") {
-                    quadrantMode = "all_quadrants";
-                } else {
-                    // Mixed - random
-                    quadrantMode = pick(["quadrant1", "all_quadrants"]);
-                }
-                // LRU-rotated identify-vs-plot rotation per coordinate skill.
-                const problemType = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant(geoSkill || 'coordinate', ["identify", "plot"])
-                    : pick(["identify", "plot"]);
-                q._variant = problemType;
-                const numPoints = rng(1, 3);
-
-                // Scale coordinate bounds with state.range
-                const maxCoordQ1 = Math.min(Math.max(10, Math.floor(state.range / 10)), 20);
-                const maxCoordAll = Math.min(Math.max(5, Math.floor(state.range / 20)), 10);
-
-                // Generate points based on quadrant mode
-                const points = [];
-                const usedCoords = new Set();
-                for (let p = 0; p < numPoints; p++) {
-                    let x, y;
-                    do {
-                        if (quadrantMode === "quadrant1") {
-                            x = rng(1, maxCoordQ1);
-                            y = rng(1, maxCoordQ1);
-                        } else {
-                            x = rng(-maxCoordAll, maxCoordAll);
-                            y = rng(-maxCoordAll, maxCoordAll);
-                        }
-                    } while (usedCoords.has(`${x},${y}`) || (x === 0 && y === 0));
-                    usedCoords.add(`${x},${y}`);
-                    points.push({ x, y, label: String.fromCharCode(65 + p) }); // A, B, C
-                }
-
-                // Build answers
-                // IDENTIFY mode: dots are pre-rendered on the grid; student
-                // reads the coordinates and TYPES them back → coord-input
-                // (separate x/y boxes).
-                // PLOT mode: empty grid; student CLICKS to place dots →
-                // coord-plot (interactive widget with toggle + color feedback).
-                q.ans = points.length === 1
-                    ? { x: points[0].x, y: points[0].y }
-                    : points.map(p => ({ label: p.label, x: p.x, y: p.y }));
-                q.answerType = problemType === "plot" ? "coord-plot" : "coord-input";
-
-                // Grid setup based on quadrant mode - scale spacing to fit maxCoord
-                const maxCoord = quadrantMode === "quadrant1" ? maxCoordQ1 : maxCoordAll;
-                // Pass maxCoord into coordinateData so the click-to-plot widget
-                // can size its own grid (it re-builds the SVG rather than
-                // reusing q.visual's static SVG).
-                q.coordinateData = { points, quadrantMode, problemType, maxCoord };
-                const gridSpacing = Math.max(12, Math.floor(200 / maxCoord));
-                const gridSize = quadrantMode === "quadrant1" ? maxCoord * gridSpacing + 40 : maxCoord * 2 * gridSpacing + 40;
-                const origin = quadrantMode === "quadrant1" ? { x: 20, y: gridSize - 20 } : { x: gridSize / 2, y: gridSize / 2 };
-                // Label every N ticks to avoid crowding. O6 "Figure labels" (AP2): `all` numbers
-                // every grid line on both axes; `some` (the default) every other one, as before.
-                const _coLabels = _figLabels('some');
-                const labelStep = _coLabels === 'all' ? 1 : maxCoord > 12 ? 4 : maxCoord > 8 ? 2 : 2;
-                if (_coLabels === 'all') q.coordinateData.labelStep = 1;
-                const labelFontSize = maxCoord > 12 ? 8 : 10;
-
-                // Build SVG grid
-                let gridLines = '';
-                let axisLabels = '';
-
-                if (quadrantMode === "quadrant1") {
-                    // Quadrant 1 only - positive x and y
-                    for (let i = 0; i <= maxCoord; i++) {
-                        gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="10" x2="${origin.x + i * gridSpacing}" y2="${gridSize - 10}" stroke="#e6e8ec" stroke-width="0.75"/>`;
-                        gridLines += `<line x1="10" y1="${origin.y - i * gridSpacing}" x2="${gridSize - 10}" y2="${origin.y - i * gridSpacing}" stroke="#e6e8ec" stroke-width="0.75"/>`;
-                        if (i % labelStep === 0) {
-                            axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 15}" text-anchor="middle" fill="currentColor" font-size="${labelFontSize}">${i}</text>`;
-                            if (i > 0) axisLabels += `<text x="${origin.x - 12}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" fill="currentColor" font-size="${labelFontSize}">${i}</text>`;
-                        }
-                    }
-                } else {
-                    // All quadrants
-                    for (let i = -maxCoord; i <= maxCoord; i++) {
-                        gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="10" x2="${origin.x + i * gridSpacing}" y2="${gridSize - 10}" stroke="#e6e8ec" stroke-width="0.75"/>`;
-                        gridLines += `<line x1="10" y1="${origin.y - i * gridSpacing}" x2="${gridSize - 10}" y2="${origin.y - i * gridSpacing}" stroke="#e6e8ec" stroke-width="0.75"/>`;
-                        if (i % labelStep === 0 || i === 0) {
-                            axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 15}" text-anchor="middle" fill="currentColor" font-size="${labelFontSize - 1}">${i}</text>`;
-                            if (i !== 0) axisLabels += `<text x="${origin.x - 12}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" fill="currentColor" font-size="${labelFontSize - 1}">${i}</text>`;
-                        }
-                    }
-                }
-
-                // Build points SVG (for identify mode only).
-                // Plot mode: NO dashed-circle placeholders — show an empty
-                // grid; the target coordinates appear in q.text and the
-                // student types them into the coord-input boxes.
-                let pointsSVG = '';
-                if (problemType === "identify") {
-                    points.forEach((p, idx) => {
-                        const px = origin.x + p.x * gridSpacing;
-                        const py = origin.y - p.y * gridSpacing;
-                        const colors = ['#e53935', '#43a047', '#1e88e5'];
-                        // Show the points, student identifies coordinates
-                        pointsSVG += `<circle cx="${px}" cy="${py}" r="7" fill="${colors[idx]}"/>`;
-                        // Position label to not overlap with point - offset based on quadrant
-                        const labelOffsetX = p.x >= 0 ? 12 : -12;
-                        const labelOffsetY = p.y >= 0 ? -10 : 15;
-                        pointsSVG += `<text x="${px + labelOffsetX}" y="${py + labelOffsetY}" fill="${colors[idx]}" font-size="14" font-weight="bold" text-anchor="${p.x >= 0 ? 'start' : 'end'}">${p.label}</text>`;
-                    });
-                }
-
-                // Build answer input area — both modes use the new coord-input
-                // format (parens + comma + two numeric boxes per point).
-                if (problemType === "identify") {
-                    q.text = numPoints === 1
-                        ? `What are the coordinates of point ${points[0].label}?`
-                        : `What are the coordinates of each point?`;
-                    q.hint = `Read the x-coordinate (horizontal) first, then y-coordinate (vertical).`;
-                } else {
-                    // Plot mode — coords in text, empty grid, student CLICKS to place dots.
-                    const coordList = points.map(p => `${p.label}: (${p.x}, ${p.y})`).join(', ');
-                    q.text = numPoints === 1
-                        ? `Plot point ${points[0].label} at (${points[0].x}, ${points[0].y})`
-                        : `Plot these points: ${coordList}`;
-                    q.hint = `Find the x-value on the horizontal axis, then go up/down to the y-value. Click the intersection to place each point. Click an existing dot to remove it.`;
-                }
-
-                // PLOT mode bypasses the static-SVG path entirely — the
-                // coord-plot widget owns the grid, lattice hit-targets, and
-                // submit button. Don't bake the typed-input host into q.visual
-                // (it would render alongside the widget and confuse students).
-                if (problemType === "plot") {
-                    // Leave q.visual EMPTY — the widget host renders inside
-                    // visualAid in question-render.js. Keep coordinateData
-                    // (set above) and a print-friendly format below.
-                    q.visual = "";
-                    q.printFormat = "geometry-coordinates";
-                } else {
-                    const colors = ['#e53935', '#43a047', '#1e88e5'];
-                    const answerInputs = `<div class="ci-host">
-                        ${points.map((p, idx) => `
-                            <div class="ci-row">
-                                <span class="ci-label" style="color:${colors[idx]};">${p.label}:</span>
-                                <span class="ci-paren">(</span>
-                                <input type="text" inputmode="numeric" pattern="-?[0-9]*" class="ci-x" id="ciX_${idx}" data-point="${idx}" data-axis="x" maxlength="4" autocomplete="off" />
-                                <span class="ci-comma">,</span>
-                                <input type="text" inputmode="numeric" pattern="-?[0-9]*" class="ci-y" id="ciY_${idx}" data-point="${idx}" data-axis="y" maxlength="4" autocomplete="off" />
-                                <span class="ci-paren">)</span>
-                            </div>
-                        `).join('')}
-                        <button class="ci-submit primary-btn" id="ciSubmitBtn" type="button" onclick="submitAnswer()">Check</button>
-                    </div>`;
-
-                    // Cap rendered SVG height so the 4-quadrant grid + answer
-                    // inputs fit within the visualAid frame at 100% browser
-                    // zoom on a 1080p display. All-quadrants needs a tighter
-                    // cap than quadrant-1 because its native aspect is square
-                    // around the origin (so width AND height scale together).
-                    const _coordMaxH = quadrantMode === "all_quadrants" ? "44vh" : "50vh";
-                    const _coordMaxW = quadrantMode === "all_quadrants" ? "min(420px, 80vw)" : "min(540px, 80vw)";
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);">Coordinate ${quadrantMode === "quadrant1" ? "(Quadrant I)" : "(All Quadrants)"}</div>
-                        <svg width="${gridSize}" height="${gridSize}" viewBox="0 0 ${gridSize} ${gridSize}" style="display:block;margin:0 auto;width:100% !important;max-width:${_coordMaxW} !important;max-height:${_coordMaxH} !important;height:auto !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
-                            ${gridLines}
-                            <!-- Axes -->
-                            <line x1="${quadrantMode === "quadrant1" ? origin.x : 10}" y1="${origin.y}" x2="${gridSize - 10}" y2="${origin.y}" stroke="currentColor" stroke-width="2"/>
-                            <line x1="${origin.x}" y1="${quadrantMode === "quadrant1" ? gridSize - 10 : 10}" x2="${origin.x}" y2="10" stroke="currentColor" stroke-width="2"/>
-                            <!-- Axis labels -->
-                            ${axisLabels}
-                            <text x="${gridSize - 8}" y="${origin.y - 8}" fill="currentColor" font-size="12" font-weight="bold">x</text>
-                            <text x="${origin.x + 8}" y="18" fill="currentColor" font-size="12" font-weight="bold">y</text>
-                            <!-- Points -->
-                            ${pointsSVG}
-                        </svg>
-                        ${answerInputs}
-                    </div>`;
-                }
-                q.geometryData = { points, quadrantMode, problemType, mode: problemType, ...(_coLabels === 'all' ? { labelStep: 1 } : {}) };
-                // Identify-mode prints the X/Y typed-input boxes; plot-mode
-                // prints an empty grid + the target coords in q.text.
-                q.printFormat = problemType === "identify" ? "coord-input" : "geometry-coordinates";
+                // Build lane geometry: the coord-grid cell (a black-and-white grid, axis numerals at
+                // the text size, the reading boxes in the cell; they printed one to a page).
+                return coordinateItem(q, geoSkill, state.range);
             } else if (geoSkill === "area_distributive_visual") {
                 // ===== AREA DISTRIBUTIVE VISUAL (Grade 4) — Phase 5 batch 4 =====
                 // Band 201-210, MD domain. Rectangle split into TWO sub-rectangles

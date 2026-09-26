@@ -391,3 +391,75 @@ for (const [id, def] of Object.entries(VOL_DEFS)) {
         wrongAnswer: volWrong,
     });
 }
+
+/* ============================================================ coordinates (coord-grid) */
+// coordinate_q1 / coordinate_all / coordinate_graph (read or plot), geo_reflect / geo_rotate /
+// geo_translate (which grid). The misconception bank:
+//   M-C1  swapped x and y             M-C2  lost the minus sign        M-C3  counted from 1, not 0
+//   M-T1  flipped over the other axis M-T2  turned the other way       M-T3  slid the other way
+const minus = (v) => (v < 0 ? `−${-v}` : String(v));
+function coordSteps(q) {
+    const p = payloadOf(q);
+    const pts = p.points || [];
+    if (p.kind === 'transform') {
+        return [step('Look at one corner of the shape.'), step('Move that corner as the question says.'),
+            step(`Find the grid with the corner there: ${LETTERS[p.correct]}.`, [{ slot: 'choice', value: LETTERS[p.correct] }])];
+    }
+    const pt = pts[0] || { x: 0, y: 0, label: 'A' };
+    if (p.kind === 'plot') {
+        return [step(`Start at 0. Go along the x-axis to ${minus(pt.x)}.`), step(`Go ${pt.y < 0 ? 'down' : 'up'} to ${minus(pt.y)}. Put a dot. Write ${pt.label}.`)];
+    }
+    return [step(`Start at 0. Go along to ${pt.label}: x is ${minus(pt.x)}.`, [{ slot: 'x0', value: String(pt.x) }]),
+        step(`Go ${pt.y < 0 ? 'down' : 'up'} to ${pt.label}: y is ${minus(pt.y)}.`, [{ slot: 'y0', value: String(pt.y) }]),
+        step(`Write (${minus(pt.x)}, ${minus(pt.y)}).`)];
+}
+function coordWrong(q) {
+    const p = payloadOf(q);
+    const c = [];
+    if (p.kind === 'transform') {
+        const w = (p.correct + 1) % ((p.choices || []).length || 3);
+        c.push({ value: LETTERS[w], slot: 'choice', slots: { choice: LETTERS[w] }, misconception: 'M-T1', explain: 'Chose a shape moved the wrong way.' });
+        return chooseWrong(q, c);
+    }
+    const pts = p.points || [];
+    if (!pts.length || p.kind === 'plot') return null;
+    const sw = pts.map((pt) => ({ x: pt.y, y: pt.x }));
+    if (pts.some((pt) => pt.x !== pt.y)) {
+        const slots = {};
+        sw.forEach((pt, i) => { slots[`x${i}`] = String(pt.x); slots[`y${i}`] = String(pt.y); });
+        c.push({ value: sw.map((pt) => `${pt.x}, ${pt.y}`).join(', '), slots, misconception: 'M-C1', explain: 'Wrote the y-coordinate first.' });
+    }
+    if (pts.some((pt) => pt.x < 0 || pt.y < 0)) {
+        const slots = {};
+        pts.forEach((pt, i) => { slots[`x${i}`] = String(Math.abs(pt.x)); slots[`y${i}`] = String(Math.abs(pt.y)); });
+        c.push({ value: pts.map((pt) => `${Math.abs(pt.x)}, ${Math.abs(pt.y)}`).join(', '), slots, misconception: 'M-C2', explain: 'Lost the minus sign.' });
+    }
+    return chooseWrong(q, c);
+}
+const COORD_DEFS = {
+    coordinate_q1: { iCan: 'I Can read and plot points on a grid' },
+    coordinate_all: { iCan: 'I Can read and plot points in all four quadrants' },
+    coordinate_graph: { iCan: 'I Can read and plot points on a grid' },
+    geo_reflect: { iCan: 'I Can reflect a shape over an axis', move: true },
+    geo_rotate: { iCan: 'I Can turn a shape around the origin', move: true },
+    geo_translate: { iCan: 'I Can slide a shape on a grid', move: true },
+};
+for (const [id, def] of Object.entries(COORD_DEFS)) {
+    registerSkill(`coordinates:${id}`, {
+        strings: strings({
+            iCan: def.iCan, instructionKey: def.move ? 'transform-choice' : 'coord-read-plot',
+            steps: def.move ? ['Look at one corner of the shape.', 'Move it as the question says.', 'Check the grid that shows it.']
+                : ['Start at 0.', 'Go along the x-axis first.', 'Then go up or down the y-axis.'],
+            say: def.move ? 'Grid __ shows the shape moved.' : 'Point A is at __.',
+            sayValues: (q) => {
+                const p = payloadOf(q);
+                if (p.kind === 'transform') return [LETTERS[p.correct]];
+                const pt = (p.points || [])[0] || { x: 0, y: 0 };
+                return [`(${minus(pt.x)}, ${minus(pt.y)})`];
+            },
+        }),
+        misconceptions: def.move ? ['M-T1', 'M-T2', 'M-T3'] : ['M-C1', 'M-C2', 'M-C3'],
+        workedSteps: (q) => clampSteps(coordSteps(q)),
+        wrongAnswer: coordWrong,
+    });
+}

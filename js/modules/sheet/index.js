@@ -162,8 +162,10 @@ import { FIGURE_TEMPLATE_IDS } from './cells/figures.js';
 // Build lane geometry (design/BUILD_LIST.md): the shape-grid template (compose shapes first).
 import './cells/shape-grid.js';
 import './cells/solid-kit.js';
+import './cells/coord-grid.js';
+export { gridSVG as coordGridSVG, coordPicture } from './cells/coord-grid.js';
 export { COMPOSE_LETTERS } from './cells/shape-grid.js';
-export const GEO_TEMPLATE_IDS = ['shape-grid', 'solid-kit'];
+export const GEO_TEMPLATE_IDS = ['shape-grid', 'solid-kit', 'coord-grid'];
 
 /** Which cell templates this build carries. `legacy` is registered by `adapters.js`. */
 export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv',

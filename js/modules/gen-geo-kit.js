@@ -24,7 +24,7 @@
 import { state } from './state.js';
 import { randInt, shuffle, pick } from './utils.js';
 import { optionsFor } from './skill-options.js';
-import { k2Twin, fadeRung } from './sheet/index.js';
+import { k2Twin, fadeRung, coordPicture } from './sheet/index.js';
 
 /* ============================================================ options and the page position */
 
@@ -692,4 +692,156 @@ export function compositeVolume(q, maxVol) {
         skillLabel: kind === 0 ? 'Composite Volume · Side by Side' : 'Composite Volume · Stacked',
         hint: 'Split the solid into two rectangular prisms. Find each volume. Add them.',
     });
+}
+
+/* ============================================================ coordinates (coord-grid) */
+
+const _twinCtx = { mode: 'print', size: 'M', look: 'ican', state: 'blank', options: { twin: true } };
+
+/**
+ * Read or plot points (coordinates:coordinate_q1 / coordinate_all / coordinate_graph) on the
+ * coord-grid cell. The screen keeps its hosts - typed ( x , y ) boxes to read, the click-to-plot
+ * widget to plot - around the same black-and-white grid (the twin draws the grid only, `noAsk`).
+ */
+export function coordinateItem(q, skill, range) {
+    geoBegin();
+    const lvl = geoLevel(1);
+    const quadrantMode = skill === 'coordinate_q1' ? 'quadrant1' : skill === 'coordinate_all' ? 'all_quadrants' : pick(['quadrant1', 'all_quadrants']);
+    const problemType = (typeof window !== 'undefined' && window.pickVariant)
+        ? window.pickVariant(skill || 'coordinate', ['identify', 'plot']) : pick(['identify', 'plot']);
+    q._variant = problemType;
+    const numPoints = randInt(1, 3);
+    const maxCoordQ1 = Math.min(Math.max(10, Math.floor(range / 10)), 20);
+    const maxCoordAll = Math.min(Math.max(5, Math.floor(range / 20)), 10);
+    const points = [];
+    const used = new Set();
+    for (let i = 0; i < numPoints; i++) {
+        let x, y;
+        do {
+            if (quadrantMode === 'quadrant1') { x = randInt(1, maxCoordQ1); y = randInt(1, maxCoordQ1); }
+            else { x = randInt(-maxCoordAll, maxCoordAll); y = randInt(-maxCoordAll, maxCoordAll); }
+        } while (used.has(`${x},${y}`) || (x === 0 && y === 0) || points.some((p) => Math.max(Math.abs(p.x - x), Math.abs(p.y - y)) < 2));
+        used.add(`${x},${y}`);
+        points.push({ x, y, label: String.fromCharCode(65 + i) });
+    }
+    const maxCoord = quadrantMode === 'quadrant1' ? maxCoordQ1 : maxCoordAll;
+    const labels = labelsOpt('some');
+    const lo = quadrantMode === 'quadrant1' ? 0 : -maxCoord;
+    const payload = { kind: problemType === 'plot' ? 'plot' : 'read', x0: lo, x1: maxCoord, y0: lo, y1: maxCoord, labels,
+        points, hint: lvl >= 2, traced: lvl >= 3 };
+    q.cell = { template: 'coord-grid', v: 1, payload };
+    q.ans = points.length === 1 ? { x: points[0].x, y: points[0].y } : points.map((p) => ({ label: p.label, x: p.x, y: p.y }));
+    q.answerType = problemType === 'plot' ? 'coord-plot' : 'coord-input';
+    q.coordinateData = { points, quadrantMode, problemType, maxCoord, ...(labels === 'all' ? { labelStep: 1 } : {}) };
+    q.geometryData = { points, quadrantMode, problemType, mode: problemType, ...(labels === 'all' ? { labelStep: 1 } : {}) };
+    q.options = [];
+    if (problemType === 'identify') {
+        q.text = numPoints === 1 ? `What are the coordinates of point ${points[0].label}?` : 'What are the coordinates of each point?';
+        q.hint = 'Read the x-coordinate (along) first, then the y-coordinate (up or down).';
+        const inputs = `<div class="ci-host">${points.map((p, idx) => `
+            <div class="ci-row">
+                <span class="ci-label" style="color:#000;">${p.label}:</span>
+                <span class="ci-paren">(</span>
+                <input type="text" inputmode="numeric" pattern="-?[0-9]*" class="ci-x" id="ciX_${idx}" data-point="${idx}" data-axis="x" maxlength="4" autocomplete="off" />
+                <span class="ci-comma">,</span>
+                <input type="text" inputmode="numeric" pattern="-?[0-9]*" class="ci-y" id="ciY_${idx}" data-point="${idx}" data-axis="y" maxlength="4" autocomplete="off" />
+                <span class="ci-paren">)</span>
+            </div>`).join('')}
+            <button class="ci-submit primary-btn" id="ciSubmitBtn" type="button" onclick="submitAnswer()">Check</button>
+        </div>`;
+        // the host's own ( x , y ) boxes under the same grid (a kit twin would take the quiz's input)
+        q.visual = coordPicture(payload) + inputs;
+        // a host that reads the boxes as one typed answer (the quiz): "(2, 7)", "2, 7", "(2,7)"
+        const one = (p, paren, sp) => (paren ? `(${p.x},${sp}${p.y})` : `${p.x},${sp}${p.y}`);
+        q.acceptedAnswers = [];
+        for (const paren of [true, false]) for (const sp of [' ', '']) q.acceptedAnswers.push(points.map((p) => one(p, paren, sp)).join(`,${sp}`));
+        q.printFormat = 'coord-input';
+    } else {
+        const list = points.map((p) => `${p.label}: (${p.x}, ${p.y})`).join(', ');
+        q.text = numPoints === 1 ? `Plot point ${points[0].label} at (${points[0].x}, ${points[0].y})` : `Plot these points: ${list}`;
+        q.hint = 'Go along the x-axis to the first number, then up or down to the second. Put a dot there.';
+        q.visual = '';
+        q.printFormat = 'geometry-coordinates';
+    }
+    q.skillLabel = quadrantMode === 'quadrant1' ? 'Coordinates (Quadrant I)' : 'Coordinates (All Quadrants)';
+    return q;
+}
+
+/**
+ * Reflect, turn or slide a shape (coordinates:geo_reflect / geo_rotate / geo_translate): which of
+ * four grids shows it moved as asked. A choice on screen (the four grids to tick) and on paper (the
+ * four grids with a check box each), all in black and white. "Slide up to" (slide, 2H) bounds a
+ * translation; the grid grows so every choice stays on it.
+ */
+export function transformItem(q, skill, coordGridSVG) {
+    geoBegin();
+    const SHAPES = [
+        [[1, 1], [4, 1], [1, 3]],
+        [[1, 1], [3, 1], [3, 2], [2, 2], [2, 4], [1, 4]],
+        [[1, 1], [4, 2], [2, 4]],
+        [[1, 1], [4, 1], [3, 3], [2, 3]],
+    ];
+    const base = SHAPES[geoDeal('gt-shape', SHAPES.length)].map((p) => p.slice());
+    const reflectY = (pts) => pts.map(([x, y]) => [-x, y]);
+    const reflectX = (pts) => pts.map(([x, y]) => [x, -y]);
+    const rotate = (pts, deg) => { const r = (-deg) * Math.PI / 180, c = Math.cos(r), s = Math.sin(r); return pts.map(([x, y]) => [Math.round(x * c - y * s), Math.round(x * s + y * c)]); };
+    const move = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
+    const keyOf = (pts) => [...pts].map((p) => `${p[0]},${p[1]}`).sort().join('|');
+    let src = move(base, 1, 1), right, cands, text, hint;
+    if (skill === 'geo_reflect') {
+        const axis = pick(['y', 'x']);
+        right = axis === 'y' ? reflectY(src) : reflectX(src);
+        text = `Which figure shows this shape reflected over the ${axis}-axis?`;
+        hint = axis === 'y' ? 'Reflecting over the y-axis flips the shape left and right: x becomes −x.' : 'Reflecting over the x-axis flips the shape up and down: y becomes −y.';
+        cands = [axis === 'y' ? reflectX(src) : reflectY(src), rotate(src, 180), rotate(src, 90), src];
+    } else if (skill === 'geo_rotate') {
+        const deg = pick([90, 180, 270]);
+        right = rotate(src, deg);
+        const name = deg === 90 ? '90° clockwise' : deg === 180 ? '180°' : '270° clockwise';
+        text = `Which figure shows this shape rotated ${name} around the origin?`;
+        hint = `Turn every corner ${name} around (0, 0).`;
+        cands = [...[90, 180, 270].filter((r) => r !== deg).map((r) => rotate(src, r)), reflectY(src), reflectX(src)];
+    } else {
+        const cap = Number(geoOpt('slide')) || 3;
+        const steps = [];
+        for (let v = 1; v <= cap; v++) steps.push(v, -v);
+        const dx = pick(steps), dy = pick(steps);
+        // the shape starts near the middle, so every choice stays on the grid
+        src = move(base, -2, -2);
+        right = move(src, dx, dy);
+        text = `Which figure shows this shape translated ${dx > 0 ? `${dx} right` : `${-dx} left`} and ${dy > 0 ? `${dy} up` : `${-dy} down`}?`;
+        hint = `Slide every corner ${Math.abs(dx)} ${dx > 0 ? 'right' : 'left'} and ${Math.abs(dy)} ${dy > 0 ? 'up' : 'down'}. The shape does not turn or flip.`;
+        cands = [move(src, -dx, dy), move(src, dx, -dy), move(src, dy, dx), move(src, -dx, -dy), move(src, 0, 0)];
+    }
+    const seen = new Set([keyOf(right)]);
+    const wrong = [];
+    // three grids to choose from (four did not fit two to a page at a size a pupil can count)
+    for (const c of cands) { const k = keyOf(c); if (!seen.has(k)) { seen.add(k); wrong.push(c); } if (wrong.length === 2) break; }
+    for (let t = 0; wrong.length < 2 && t < 20; t++) {
+        const c = move(right, pick([-2, -1, 1, 2]), pick([-2, -1, 1, 2]));
+        const k = keyOf(c); if (!seen.has(k)) { seen.add(k); wrong.push(c); }
+    }
+    const order = shuffle([0, 1, 2]);
+    const all = [right, ...wrong.slice(0, 2)];
+    const choices = order.map((i) => all[i]);
+    const correct = order.indexOf(0);
+    // the grid: -5 to 5, or as far as the farthest corner of any choice
+    const far = Math.max(5, ...[src, ...choices].flat().map(([x, y]) => Math.max(Math.abs(x), Math.abs(y))));
+    const payload = { kind: 'transform', x0: -far, x1: far, y0: -far, y1: far, shape: src, choices, correct,
+        fixChoices: choices.map((_, i) => String.fromCharCode(65 + i)),
+        task: text.replace(/^Which figure shows/, 'Which grid shows') };
+    q.cell = { template: 'coord-grid', v: 1, payload };
+    q.visual = k2Twin('coord-grid', { ...payload, noAsk: true });
+    q.text = text;
+    q.hint = hint;
+    q.options = choices.map((pts, i) => ({ id: `opt${i}`, correct: i === correct, label: String.fromCharCode(65 + i),
+        svg: coordGridSVG(_twinCtx, { x0: -far, x1: far, y0: -far, y1: far, u: 3, numerals: false, shapes: [{ pts }], label: `grid ${String.fromCharCode(65 + i)}` }).html }));
+    q.ans = [`opt${correct}`];
+    q.minCorrect = 1;
+    q.answerType = 'multi-select-check';
+    q.printAnswer = String.fromCharCode(65 + correct);
+    q.printFormat = 'geo-transform-mc';
+    q.skillLabel = skill === 'geo_reflect' ? 'Reflect' : skill === 'geo_rotate' ? 'Rotate' : 'Translate';
+    q.geometryData = { sourcePts: src, correctPts: right, transform: skill };
+    return q;
 }

@@ -90,7 +90,8 @@
     "wpBank": "8B",
     "wpBar": "8C",
     "bars": "9F",
-    "compose": "2G"
+    "compose": "2G",
+    "slide": "2H"
   },
   "blocks": {
     "0": {
@@ -633,7 +634,8 @@
     "compose": {
       "name": "N",
       "pieces": "P"
-    }
+    },
+    "slide": {}
   },
   "scalarOnly": {
     "range": "decimal",
@@ -662,7 +664,8 @@
     "poolSupport": "decimal",
     "wpCues": "bool",
     "wpBank": "bool",
-    "wpBar": "bool"
+    "wpBar": "bool",
+    "slide": "decimal"
   },
   "subranges": {
     "3B-3M": "build lane k2 (BUILD_LIST.md)",
