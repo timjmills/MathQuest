@@ -4274,15 +4274,18 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // "Remainder: 6" — so the pupil read the answer off the page. Now: divisor 2-9,
                 // quotient 2-9 (at most nine groups to ring), a remainder from 1 up to
                 // divisor − 1 (so remainder = divisor − 1, the "one more would make a group"
-                // case, appears), and the counters are drawn UNGROUPED in rows of ten. The pupil
+                // case, appears), and the counters are drawn UNGROUPED in rows of five. The pupil
                 // rings the groups and counts what is left.
-                // Divisor and quotient 2-6 keep every picture countable (at most 41 counters, four
-                // rows of whole groups); the remainder still reaches divisor - 1.
+                // Divisor and quotient 2-6 keep every picture countable (at most 25 counters, five
+                // rows of five); the remainder still reaches divisor - 1 (but for 9, whose second
+                // group leaves room for 7 more).
                 // P12: a changed `constant` ("Divide by", 2-9) picks the divisor; above 6 the
-                // quotient shrinks so the picture stays at 41 counters or fewer.
+                // quotient shrinks so the picture stays at 25 counters or fewer.
                 const divisor = _p12Constant() || rng(2, 6);
-                const quotient = rng(2, Math.max(2, Math.min(6, Math.floor((27 - (divisor - 1)) / divisor))));   // R3: at most 27 counters (3 neutral rows of 9 or 10)
-                const remainder = rng(1, divisor - 1);
+                // Backlog 2026-09-26: at most 25 counters (five rows of five, ops-counters.js), so the
+                // cells of a page stay within 1.5 x of each other at every size.
+                const quotient = rng(2, Math.max(2, Math.min(6, Math.floor((25 - (divisor - 1)) / divisor))));
+                const remainder = rng(1, Math.min(divisor - 1, 25 - divisor * quotient));
                 const dividend = divisor * quotient + remainder;
 
                 q.text = `Ring groups of ${divisor}. Write the quotient and the remainder.`;
@@ -4308,8 +4311,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 ];
                 q.hint = `Divide ${dividend} by ${divisor}. How many full groups of ${divisor}? What's left over? ${divisor} × ${quotient} = ${quotient * divisor}, remainder = ${dividend} - ${quotient * divisor} = ${remainder}`;
 
-                // The kit's `remainder` template: loose open counters in rows that are a whole
-                // number of groups, 7 mm apart so every ring can be drawn, and the answer as two
+                // The kit's `remainder` template: open counters in rows of five, 4-5 mm between
+                // rows so every ring can be drawn, and the answer as two
                 // boxes, "[q] R [r]" (VA-62). On screen the two boxes are typed and compose
                 // "q R r" (data-mq-join), which is q.ans.
                 const _drPayload = { dividend, divisor };

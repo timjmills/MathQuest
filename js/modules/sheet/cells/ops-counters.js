@@ -10,8 +10,8 @@
 // the size never shrinks with the page's columns (DN-10). The picture never states the answer
 // (RP-1): nothing is labelled, counted or ringed for the pupil. Equal groups are dealt in a
 // subitisable pattern inside each ring (4 = 2 x 2, 6 = 3 x 2, never 3 + 1). Remainder counters
-// are dealt in rows whose length is a whole number of groups, with a row gap of at least 6 mm,
-// so each ring can be drawn round one run of a row without crossing another counter (H12).
+// are laid in rows of five (7.5 / 8 / 9 mm open circles, 5 mm between rows), neutral for the
+// groups, so a ring can be drawn round any few of them without crossing another counter (H12).
 //
 // Every writing place is the same box (SL-11), sized for the section's widest answer; the key
 // fills every box (AK-1).
@@ -21,7 +21,6 @@
 import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, box, esc, splitList, splitRemainder, HAIR, HEAVY } from './ops-common.js';
 import { INK } from '../tokens.js';
-import { looseArray } from './k2kit.js';
 
 /* ------------------------------------------------------------------ shared drawing */
 
@@ -186,22 +185,40 @@ register('arrays', {
 
 /* ---------------------------------------------------------------------- remainder */
 
+/*
+ * The remainder counters (owner backlog 2026-09-26, critic EA r5: "4.7 mm circles in rows of 10",
+ * "a 32 % band under a one-row picture"). Open counters of 6.5 / 7 / 9 mm (S / M / L) in ROWS OF
+ * FIVE - the five-structure a pupil already counts by - with 2.5-3 mm between two counters and
+ * 4-5 mm between rows, so a ring can be drawn round any few of them (RUBRIC H12). Rows of five are
+ * neutral for every group size but 5, so the picture does not draw the quotient or the remainder
+ * (R3: runs of the divisor did). The picture is as tall as its own rows, but never shorter than
+ * three: with at most five rows (25 counters, the generator's cap) every cell of a page is within
+ * 1.5 x of the tallest, one even grid holds them all, and no cell leaves a band of a third.
+ */
+const REM_GEO = { S: { d: 6.5, gap: 2.5, rowGap: 4 }, M: { d: 7, gap: 2.5, rowGap: 4 }, L: { d: 9, gap: 3, rowGap: 5 } };
+const REM_PER_ROW = 5;
+const REM_MIN_ROWS = 3;
+function remainderGeometry(size, n) {
+    const { d, gap, rowGap } = REM_GEO[size] || REM_GEO.L;
+    const pad = 0.5;
+    const cols = Math.max(1, Math.min(REM_PER_ROW, n));
+    const rows = Math.max(1, Math.ceil(n / REM_PER_ROW));
+    // The picture keeps room for three rows (REM_MIN_ROWS): the generator deals 5 to 25 counters
+    // (one to five rows), so every cell of a page is within 1.5 x of the tallest and the page keeps
+    // one even grid; the spare row of a short picture is under a third of its cell (H13).
+    const hRows = Math.max(rows, REM_MIN_ROWS);
+    return { d, gap, rowGap, pad, cols, rows, w: 2 * pad + (cols - 1) * (d + gap) + d, h: 2 * pad + (hRows - 1) * (d + rowGap) + d };
+}
+
 function remainderCounters(g, p) {
-    const d = Math.min(DOT[g.size], 4.5), r = d / 2;     // >= 4 mm (RP-3); 4.5 mm keeps ten across a 2-column cell
-    // RUNS of the divisor (k2kit `groupRuns`, RUBRIC H12): one run is one group to ring, 4 mm
-    // between two counters of a run, 9 mm between runs, 7 mm between lines; the last, shorter
-    // run is the remainder. (The 2026-09-25 regrade: rows of 12 at a 2.5 mm gap let a group of
-    // 5 wrap a row end, so it could not be ringed.)
-    // R3 (critic round 3): runs of the divisor drew the quotient and the remainder for the pupil
-    // (9 ÷ 2 as four pairs and one on its own). A neutral array (k2kit looseArray) never does.
-    // R3 (lint L-DENSITY H13): up to ten across (a 2-column cell holds 77 mm) in at most THREE
-    // rows, and the picture always reserves the three rows, so every cell of a page is one height
-    // (a 1-row 9 ÷ 2 no longer sits in a row sized for a 4-row 28 ÷ 6) and six fit at L.
-    const ROWS = 3, rowGap = 6;
-    const lay = looseArray(Number(p.dividend), Number(p.divisor), { d, gap: 4, rowGap, pad: 0.5, maxCols: 10, order: [10, 9, 8, 7, 6, 5], maxRows: ROWS });
-    const h = Math.max(lay.h, 2 * 0.5 + (ROWS - 1) * (d + rowGap) + d);
-    const body = lay.pts.map((c) => dot(c.cx, c.cy, r, true)).join('');
-    return { svg: svgMm(g, lay.w, h, body, `${p.dividend} counters`), wMm: lay.w };
+    const n = Math.max(0, Math.floor(Number(p.dividend)) || 0);
+    const G = remainderGeometry(g.size, n);
+    const r = G.d / 2;
+    let body = '';
+    for (let i = 0; i < n; i++) {
+        body += dot(G.pad + r + (i % REM_PER_ROW) * (G.d + G.gap), G.pad + r + Math.floor(i / REM_PER_ROW) * (G.d + G.rowGap), r, true);
+    }
+    return { svg: svgMm(g, G.w, G.h, body, `${n} counters`), wMm: G.w };
 }
 
 const remKey = (p) => {
@@ -308,9 +325,10 @@ register('remainder', {
         const slot = (id) => box(g, id, { wMm: bw, hMm: g.stripMm, value: vals[id] || '', ink, mark: g.twin ? 'cell' : null });
         // VA-62: the "R" and its box print in every cell, whatever the remainder.
         const eq = p.notation === 'bracket' ? remainderBracket(p, slot)
-            : `<div data-mq-join=" R " style="display:inline-flex;align-items:center;gap:0.2em;white-space:nowrap;margin-top:0.4em">`
-            + `<span>${esc(p.dividend)}</span><span style="font-weight:700;width:1em;text-align:center">÷</span><span>${esc(p.divisor)}</span>`
-            + `<span style="font-weight:700;width:1em;text-align:center">=</span>${slot('q')}<span style="font-weight:700">R</span>${slot('r')}</div>`;
+            // 0.8 em operators and 0.15 em gaps keep the line inside a 3-column cell at S (L1).
+            : `<div data-mq-join=" R " style="display:inline-flex;align-items:center;gap:0.15em;white-space:nowrap;margin-top:0.4em">`
+            + `<span>${esc(p.dividend)}</span><span style="font-weight:700;width:0.8em;text-align:center">÷</span><span>${esc(p.divisor)}</span>`
+            + `<span style="font-weight:700;width:0.8em;text-align:center">=</span>${slot('q')}<span style="font-weight:700">R</span>${slot('r')}</div>`;
         return root(g, 'remainder', `${pic.svg}${eq}`, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
     answerKey(p) {
@@ -323,7 +341,12 @@ register('remainder', {
     footprint(p, ctx) {
         const g = geo(ctx);
         const pic = remainderCounters(g, p);
-        return { wMm: Math.ceil(Math.max(pic.wMm, 70) + 6), hMm: null, measure: true, factLike: false, maxCols: 2 };
+        // the sentence: the numbers, two operators, "R", two 14 mm boxes and six gaps
+        const digits = String(p.dividend).length + String(p.divisor).length;
+        const eqW = (digits * 0.62 + 2 * 0.8 + 0.7 + 6 * 0.15) * g.E + 2 * Math.max(14, 0.62 * g.E + 5);
+        // denseRoom 1.05: the measured height already holds the letter, the pads and the answer boxes,
+        // so a page of pictures packs a third column at S (L1) with its cells sized to them.
+        return { wMm: Math.ceil(Math.max(pic.wMm, eqW) + 6), hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1.05 };
     },
     inputs() {
         return [
