@@ -129,8 +129,9 @@ export const LESSONS = Object.freeze({
         prereqs: [
             { lesson: 'Y2.B1.S4', key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Regrouping reads the tens digit and the ones digit.' },
             { lesson: 'Y2.B1.S5', key: 'placevalue:expand', opts: { band: 99, zeroPlace: 'none' }, why: 'A 2-digit number is its tens and its ones: 63 = 60 + 3.' },
-            { lesson: 'Y2.B2.S10', key: 'subtraction:sub_10_regroup', why: 'After regrouping, the ones column is a teen fact: 13 − 5.' },
-            { lesson: 'Y2.B2.S17', key: 'subtraction:sub_100_no_regroup', why: 'The column steps without the new part.' },
+            // (Each stack with its Check line: the lesson's step 5, and a cell its content fills, H13.)
+            { lesson: 'Y2.B2.S10', key: 'subtraction:sub_10_regroup', check: true, why: 'After regrouping, the ones column is a teen fact: 13 − 5.' },
+            { lesson: 'Y2.B2.S17', key: 'subtraction:sub_100_no_regroup', check: true, why: 'The column steps without the new part.' },
         ],
         // Lessons r2: the partner is 2-digit addition (never 2 + 8 in a carry scaffold).
         // Lessons r4: sums to 99, so the column has no empty hundreds place.

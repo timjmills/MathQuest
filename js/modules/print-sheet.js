@@ -2214,14 +2214,16 @@ async function buildLesson(n, metaOf) {
         }
         return res;
     };
-    let prereq = prereqList.length ? await buildPrereq(seeds.prereq === lessonPartSeed(n.seed, 'prereq') ? seeds.prereq : lessonPartSeed(n.seed, 'prereq')) : null;
+    // (Dealt after the chart and the lesson sheet, below, so its questions avoid theirs - LR-5;
+    // it still prints first.)
+    let prereq = null;
 
     // 1. The anchor chart (always L) and the teaching sheet: Vocabulary, Warm-up, Guided, Independent.
     const chart0 = await buildChart(seeds.chart === lessonPartSeed(n.seed, 'chart') ? seeds.chart : lessonPartSeed(n.seed, 'chart'));
     const teach0 = await buildTeach(seeds.sheet === lessonPartSeed(n.seed, 'sheet') ? seeds.sheet : lessonPartSeed(n.seed, 'sheet'));
     let chart = chart0;
     let teach = teach0;
-    const parts = [...(prereq ? [{ part: 'prereq', role: 'lesson', res: prereq }] : []), { part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
+    const parts = [{ part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
 
     // LR-5 (lessons r4): ONE avoid set for the whole packet. The chart's examples (never again,
     // not even turned round) and every item the teaching sheet placed go in first; each page adds
@@ -2240,9 +2242,13 @@ async function buildLesson(n, metaOf) {
     const chartMeta = (chart.plan && chart.plan.meta) || {};
     hold('chart', chartMeta.chartItems, true);
     hold('teach', teach.plan && teach.plan.meta && teach.plan.meta.usedItems);
-    if (prereq) hold('prereq', prereq.plan && prereq.plan.meta && prereq.plan.meta.usedItems);
     // (A packet-wide avoid set needs more tries than a page's own rules: 60 a slot.)
     const avoidOf = () => (packetOn ? { avoidHard: new Set(avoidHard), avoidSoft: new Set(avoidSoft), tries: 60 } : {});
+    if (prereqList.length) {
+        prereq = await buildPrereq(seeds.prereq === lessonPartSeed(n.seed, 'prereq') ? seeds.prereq : lessonPartSeed(n.seed, 'prereq'), avoidOf());
+        parts.unshift({ part: 'prereq', role: 'lesson', res: prereq });
+        hold('prereq', prereq.plan && prereq.plan.meta && prereq.plan.meta.usedItems);
+    }
 
     // 2. Massed practice: Independent pages with the chart's step strip, the grid filling the page
     // body in ONE frame (CL-1; lessons r1: no blank band above the footer, no gutters).

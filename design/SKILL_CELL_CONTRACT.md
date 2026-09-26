@@ -929,7 +929,7 @@ can call them:
 | Builder | Module | Page job it replaces |
 |---|---|---|
 | anchor chart | `sheet/lesson-pages/chart.js` (`pickExample`, `otherExamples`, `stateItems`, `finalItems`, `chartPage`) | Worked example (scripted Model) |
-| prerequisite check | `sheet/lesson-pages/prereq-check.js` (`warmShape`, `warmUpBand`) | Warm-up, pre-skill check |
+| prerequisite check | `sheet/lesson-pages/prereq-check.js` (`prereqPlan`: 3-4 questions, one per prerequisite lesson, each with its "If missed → Lesson ..." tag, and the key's routing table; `warmUpBand` for a lesson without one) | Warm-up, pre-skill check |
 | We Do | `sheet/lesson-pages/we-do.js` (`pickWeDo`, `weDoRender`, `stepsItem`, `weDoBand`) | Guided |
 | practice | `sheet/lesson-pages/practice.js` (`practiceSection`, `practiceRequest`, `stripHtml`) | Independent, More practice |
 | mixed | `sheet/lesson-pages/mixed.js` (`mixedRequest`) | Review, Mixed practice |
@@ -967,7 +967,7 @@ yet, the adapter derives it from the provider:
 | `vocab`, `concepts`, `chant`, `format`, `words`, `notes` | vocabulary band, Remember / Rule, step words | the routine | none (the bands are left out) |
 | floors and caps (`minOperand`, `minTop`, `maxTop`, `distinctFirst`, `distinctAnswer`, `noNearTwin`, `caps`) | every dealt pool | the routine | the skill's option defaults |
 | `practice: {skill, opts}` | practice and mixed pages | the lesson record (LINK-1) | the Print request's skill and options (`skill-options.js`) |
-| prerequisites (`skills` today; `prereqs: [{lesson, key, opts, why}]` from §8b) | prerequisite check | the lesson record | `library.js prerequisiteSkillsFor(categoryId, skillId)` |
+| prerequisites (`prereqs: [{lesson, key, opts?, why}]`, LR-17) | prerequisite check (and the routing rule, `library.js prereqRoute`) | the lesson record | `library.js prerequisiteSkillsFor(categoryId, skillId)` (no lesson ids: the check needs a lesson to route to) |
 | `mixWith: [{key, opts?, ...floors}]` | mixed page | the lesson record (earlier skills only, LR-9) | the host's `earlierSkills` |
 
 A builder never needs more than this. A provider that can supply `workedSteps` with marks and a

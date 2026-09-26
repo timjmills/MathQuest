@@ -123,6 +123,8 @@ export function warmUpBand({ input, m, labels, warmPlaced, groups, letter = 1 })
  * prerequisite's skill ref (roles/lesson.js sources). Returns the pupil page's plan; its
  * `meta.routePlan` is the key's ROUTING TABLE page (the host renders it after the key).
  */
+// The spare height a row may take, as a share of its own height (H13: bands under 30 %).
+const GROW = 0.1;
 export function prereqPlan(input, { ROLE_ID }) {
     const ctx = ctxOf(input);
     const lesson = input.lesson || {};
@@ -169,7 +171,7 @@ export function prereqPlan(input, { ROLE_ID }) {
     // problem keeps every empty band under 30 %, H13); a check of 3-4 questions is a fixed count,
     // so what is left stays at the foot of the page.
     const spare = Math.max(0, m.budget - used - 1);
-    for (const r of rows) r.cellH += Math.min(r.cellH * 0.33, spare / rows.length);
+    for (const r of rows) r.cellH += Math.min(r.cellH * GROW, spare / rows.length);
     const parts = rows.map((r) => {
         const halves = r.qs.map((q, j) => ({
             kind: 'col', cls: `mq-lwarmcol mq-lprecol${r.instrH > m.instr ? ' mq-lwarm2' : ''}`,

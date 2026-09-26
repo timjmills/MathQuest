@@ -116,7 +116,7 @@ Reasoning steps ("spot the pattern", "compare", "estimate") stay in their host a
   Y1.B1.S11 Fewer, more, same, Y1.B2.S5 Number bonds within 10 (for add within 10); Y2.B1.S4 Use a
   place value chart, Y2.B1.S5 Partition numbers to 100, Y2.B2.S10 Subtract across 10, Y2.B2.S17
   Subtract two 2-digit numbers (not across a 10) (for subtract with regrouping); Y1.B9.S2 Count in
-  10s, Y2.B1.S10 10s and 1s on the number line to 100, Y3.B1.S3 Number line to 100 (for round to
+  10s, Y2.B1.S10 10s and 1s on the number line to 100, Y2.B2.S13 10 more, 10 less (for round to
   the nearest 10). They open the pilot list of their archetypes.
 - **Phase 1 — archetype certification.** Per archetype: 3 pilot lessons spanning its variation; E builds the module,
   `stepState`, icons, vocabulary pictures; the critic grades every page at L and M, seeds 4242 and 1001, keys included,
