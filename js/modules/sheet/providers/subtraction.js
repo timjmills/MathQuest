@@ -179,9 +179,13 @@ registerSkill('subtraction:nl_sub', {
     wrongAnswer: (q) => {
         const [a, b] = operands(q);
         if (!Number.isFinite(a) || !Number.isFinite(b) || q.missing) return null;
+        // Hopping right only where the line has room for every hop: past its end the drawn hops
+        // stop at the edge and contradict the written answer (critic round 4: 4 hops to 20, "22").
+        const p = (q.cell && q.cell.payload) || {};
+        const max = Number(p.max !== undefined ? p.max : q.nlMax);
         return chooseWrong(q, [
             { value: a - b + 1, misconception: 'counted-start', explain: `Counted ${a}, the start, as the first hop.` },
-            { value: a + b, misconception: 'jumped-wrong-way', explain: 'Hopped to the right, not the left.' },
+            !Number.isFinite(max) || a + b <= max ? { value: a + b, misconception: 'jumped-wrong-way', explain: 'Hopped to the right, not the left.' } : null,
         ]);
     },
 });

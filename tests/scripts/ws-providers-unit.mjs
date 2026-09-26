@@ -29,7 +29,7 @@ import {
 } from '../../js/modules/sheet/index.js';
 import { REGRADED_SKILLS, STORY_NOUNS, PV_PROVIDER_IDS, pvRoundingErrors } from '../../js/modules/sheet/providers/index.js';
 import { rng, int, pick, shuffle, deriveSeed } from '../../js/modules/sheet/rng.js';
-import { sameAnswer } from '../../js/modules/sheet/providers/util.js';
+import { sameAnswer, chooseWrong } from '../../js/modules/sheet/providers/util.js';
 import { applyRule, ftSlots } from '../../js/modules/sheet/index.js';
 
 const failures = [];
@@ -871,6 +871,22 @@ for (const band of ['10', '20', '50', '100', '1k', '10k', '100k', '1m']) {
     for (const [cat, op] of [['addition', 'add'], ['subtraction', 'sub']]) {
         for (const suffix of ['', '_plain']) ok(registered.has(`${cat}:${op}_wp_${band}${suffix}`), `${cat}:${op}_wp_${band}${suffix} has no provider`);
     }
+}
+
+// LESSONS_LEARNED L3: a "wrong" answer equal to the right one can never leave a provider. Every
+// provider picks through chooseWrong, which must drop a candidate equal to the answer in any
+// form (10 / "10" / "10 " / "1,0"-free); the default adapter's tagged distractors likewise.
+{
+    const q = { categoryId: 'addition', skillId: 'add_three', ans: 10, text: '3 + 4 + 3 = ?' };
+    for (const same of [10, '10', ' 10 ', '10.0']) {
+        const w = chooseWrong(q, [{ value: same, misconception: 'x', explain: '' }]);
+        ok(w === null || !sameAnswer(w.value, q.ans), `L3: chooseWrong let the right answer ${JSON.stringify(same)} through as wrong`);
+    }
+    const w2 = chooseWrong(q, [{ value: 10, misconception: 'x' }, { value: 7, misconception: 'two-addends' }]);
+    ok(w2 && Number(w2.value) === 7, 'L3: chooseWrong skips the right answer and takes the next real error');
+    const dq = { categoryId: 'addition', skillId: 'add_three', ans: 10, text: '3 + 4 + 3 = ?', distractorTags: { 10: 'same', 7: 'Added two of the three.' } };
+    const dw = getProvider('addition', 'add_three').wrongAnswer(dq);
+    ok(dw && !sameAnswer(dw.value, dq.ans), `L3: the default adapter never tags the right answer as wrong (${dw && dw.value})`);
 }
 
 if (failures.length) {

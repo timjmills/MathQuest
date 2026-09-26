@@ -38,6 +38,12 @@ const WORKING = new Set([
     'lesson', 'opener', 'scripted-model', 'guided', 'independent', 'more-practice', 'error-analysis', 'review', 'test', 'test-b',
     'pre-skill-check', 'word-problems', 'fact-rows', 'fact-probe', 'mixed-practice', 'true-false', 'reason-it', 'stretch',
 ]);
+// PAUSED (owner ruling 2026-09-26: "let's forgo the find the error type for future worksheets ...
+// we might bring these back later once everything is built"): a working role that is NOT offered
+// for a new page. It stays in WORKING, so a saved or shared set that already uses it still prints,
+// and its role code, providers' wrongAnswer data, share-code entries and grades are all kept
+// (design/LESSONS_VISION.md -> Later). To bring it back, take it out of this set.
+const PAUSED = new Set(['error-analysis']);
 // The picker: every working role as a picture card, in quiet groups. [role, name, one line]
 const PAGE_GROUPS = [
     ['Practice', [
@@ -68,7 +74,7 @@ const PAGE_GROUPS = [
         ['reason-it', 'Reason It', 'Explain in words or pictures.'],
         ['stretch', 'Stretch', 'One harder problem to think about.'],
     ]],
-].map(([g, list]) => [g, list.filter(([v]) => WORKING.has(v))]).filter(([, list]) => list.length);
+].map(([g, list]) => [g, list.filter(([v]) => WORKING.has(v) && !PAUSED.has(v))]).filter(([, list]) => list.length);
 const PAGE_TYPES = [
     ['Lesson', [['lesson', 'Lesson'], ['lesson-packet', 'Lesson packet'], ['opener', 'Lesson opener'], ['scripted-model', 'Scripted model'], ['guided', 'Guided'], ['independent', 'Independent'], ['more-practice', 'More Practice'], ['error-analysis', 'Error analysis (Check it)'], ['review', 'Review'], ['test', 'Test A'], ['test-b', 'Test B'], ['pre-skill-check', 'Pre-skill check']]],
     ['Practice', [['computation', 'Computation grid'], ['word-problems', 'Word problems'], ['visual-grid', 'Visual grid']]],
