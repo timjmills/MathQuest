@@ -23,12 +23,15 @@
 import { esc, getProvider, hasCell, getCell, resolveCtx, SIZES, cellFootprint } from './index.js';
 import { cellWidthMm, LIVE_W_MM, measuredH, SAFETY_H_MM } from './layout.js';
 
-export const ANCHOR_MODES = Object.freeze(['off', 'side', 'sections']);
+export const ANCHOR_MODES = Object.freeze(['off', 'sections']);
 
 /** 'off' | 'side' | 'sections'. 'on' (and true) mean the role's default: sections (S6). */
 export function normaliseAnchors(v, { role = '' } = {}) {
     const s = String(v === true ? 'on' : v === undefined || v === null ? 'off' : v).toLowerCase().replace(/[^a-z]/g, '');
-    if (s === 'side' || s === 'sidebyside') return 'side';
+    // Owner ruling 2026-09-26 (LESSON_LIBRARY_PLAN.md 8f): ONE form only, a worked example on top
+    // of each block. The side-by-side pair form is dropped; an old saved 'side' request prints as
+    // sections, so saved sets still print.
+    if (s === 'side' || s === 'sidebyside' || s === 'beside') return 'sections';
     if (s === 'sections' || s === 'section' || s === 'on') return 'sections';
     return 'off';
 }
@@ -55,8 +58,20 @@ export function workedStepsOf(it) {
     } catch (e) { return []; }
 }
 
-/** Does this skill get an anchor? Only a real provider with at least 2 worked steps (review note 3). */
-export const anchorEligible = (it) => workedStepsOf(it).length >= 2;
+/** A choice / sort / multi-select item: never a worked example (critic anchor-r1: "Answer: opt3"). */
+export function isChoiceItem(q = {}) {
+    const at = String(q.answerType || '').toLowerCase();
+    if (/multi|choice|select|sort|drag|match/.test(at)) return true;
+    const ans = typeof q.ans === 'object' && q.ans !== null ? JSON.stringify(q.ans) : String(q.ans ?? '');
+    return /\bopt\d/.test(ans);
+}
+
+/**
+ * Can THIS item be a worked example? A real provider with at least 2 worked steps (review note 3),
+ * and never a choice item. Decided per candidate: a skill whose first dealt item is a choice
+ * variant still gets an example from its next written one (critic anchor-r1).
+ */
+export const anchorEligible = (it) => !isChoiceItem((it && it.q) || {}) && workedStepsOf(it).length >= 2;
 
 /** The dialog's note for a skill that has no anchor. */
 export const ineligibleNote = (label) => `No worked example for ${label || 'this skill'}: it has no step-by-step steps yet.`;
@@ -147,7 +162,9 @@ function stateHtml(it, merged, k, c, twinCols, whole, size) {
     const t = stepTemplateOf(it);
     // The state is drawn at the anchor's own (smaller) preset: the templates read ctx.metrics and
     // the kit's size custom properties, which the wrapper's `ws-<size>` class sets (anchorHtml).
-    const ctx = resolveCtx(Object.assign({}, c, { size, metrics: undefined, state: 'blank', scaffoldLevel: 3, options: Object.assign({}, c.options || {}, { factColumns: twinCols }) }));
+    // Drawn like the pupil's problems (owner ruling 8f): the page's own scaffold level (1), so a
+    // no-regroup skill gets no regroup frame and no head row or box the problems lack.
+    const ctx = resolveCtx(Object.assign({}, c, { size, metrics: undefined, state: 'blank', scaffoldLevel: 1, options: Object.assign({}, c.options || {}, { factColumns: twinCols }) }));
     if (t && !whole) {
         const payload = Object.assign({}, it.q.cell.payload || {});
         // A fact's digit size follows the fact ladder, not the preset: pin it to the anchor's size.
@@ -187,7 +204,10 @@ const BAND_W_MM = 178;
 
 /** Every steps column - beside a drawing or under it - holds at least this many characters a line
  *  at the page's step type (`stepsMinMm`: 41 / 35 / 33 mm at L / M / S). */
-export const STEPS_MIN_CHARS = 18;
+export const STEPS_MIN_CHARS = 24;
+/** Step text is never under 11 pt, at any size (critic anchor-r1: 8.3 pt at S). */
+export const STEP_MIN_PT = 11;
+const stepPt = (pageSize) => Math.max(STEP_MIN_PT, (SIZES[pageSize] || SIZES.L).zonePt * 0.92);
 /** Under a wide drawing the steps take two text columns (read 1 2 / 3 4) when each is this wide. */
 const STEPS_UNDER_COL_MM = 80;
 const STEPS_GAP_MM = 4;               // between a drawing and its steps (.mq-anchor-beside gap)
@@ -201,7 +221,7 @@ const CHAR_EM = 0.5;
 /** The width (mm) a steps column needs for STEPS_MIN_CHARS characters at the page's step type. */
 export function stepsMinMm(pageSize = 'L') {
     const s = SIZES[pageSize] || SIZES.L;
-    return Math.round((STEPS_MIN_CHARS * CHAR_EM * s.zonePt * 0.92 * PT_MM + BULLET_MM) * 10) / 10;
+    return Math.round((STEPS_MIN_CHARS * CHAR_EM * stepPt(s.id) * PT_MM + BULLET_MM) * 10) / 10;
 }
 
 /** The content width (mm) of an anchor cell in a grid of `cols` columns. */
@@ -249,13 +269,22 @@ export function stepsPlacement(it, c = {}, { variant = 'side', cols = 1, size = 
     // `stepsMinMm` is left beside it (flex-basis and min-width), so the real drawing decides,
     // never the estimate.
     const need = stepsMinMm(c.size);
-    const wide = drawMm > innerMm * 0.55 || innerMm - STEPS_GAP_MM < need + Math.min(drawMm, 20);
+    const wide = drawMm > innerMm * 0.6 || innerMm - STEPS_GAP_MM < need + Math.min(drawMm, 20);
     const beside = !wide;
     const underCols = innerMm >= 2 * STEPS_UNDER_COL_MM + STEPS_GAP_MM ? 2 : 1;
     return { beside, innerMm, drawMm: Math.round(drawMm * 10) / 10, colMm, underCols, needMm: need };
 }
 
-const lineHtml = (text, n) => `<li${n ? '' : ' class="mq-anchor-cont"'}>${n ? `<em>${n}</em>` : '<em></em>'}<span>${esc(text)}</span></li>`;
+/**
+ * Step and Say text with its fractions STACKED (TY-7, critic anchor-r1: "1/2 + 1/2 = 2/2" printed
+ * with slashes): "a/b" becomes the kit's stacked fraction, at the text's own size.
+ */
+export const stepText = (t) => esc(t)
+    // A number sentence never breaks inside ("2 + / 2 = 4", critic anchor-r1): it wraps as a whole.
+    .replace(/\d[\d,/.:]*(?:\s*[+\-\u2212\u00d7\u00f7=]\s*\d[\d,/.:]*)+/g, (m) => `<span class="mq-anchor-eq">${m}</span>`)
+    .replace(/(\d+)\/(\d+)/g, (_, n, d) => `<span class="ws-frac mq-anchor-frac"><span>${n}</span><span>${d}</span></span>`);
+
+const lineHtml = (text, n) => `<li${n ? '' : ' class="mq-anchor-cont"'}>${n ? `<em>${n}</em>` : '<em></em>'}<span>${stepText(text)}</span></li>`;
 const stepsList = (steps, idx, style = '') => `<ol class="mq-anchor-steps"${style ? ` style="${style}"` : ''}>${idx.map((i) => stepLines(steps[i].text).map((t, j) => lineHtml(t, j === 0 ? i + 1 : 0)).join('')).join('')}</ol>`;
 /**
  * The steps UNDER a drawing in `k` text columns read row by row (1 2 / 3 4), as the Guided page's
@@ -265,7 +294,7 @@ const stepsList = (steps, idx, style = '') => `<ol class="mq-anchor-steps"${styl
 const stepsGrid = (steps, idx, k, maxChars = 0) => (k < 2 ? stepsList(steps, idx)
     : `<ol class="mq-anchor-steps mq-anchor-stepgrid" style="grid-template-columns:repeat(${k},minmax(0,1fr))">`
         + `${idx.map((i) => `<li class="mq-anchor-step"><em>${i + 1}</em><div class="mq-anchor-lines">`
-            + `${joinLines(stepLines(steps[i].text), maxChars).map((t) => `<span>${esc(t)}</span>`).join('')}</div></li>`).join('')}</ol>`);
+            + `${joinLines(stepLines(steps[i].text), maxChars).map((t) => `<span>${stepText(t)}</span>`).join('')}</div></li>`).join('')}</ol>`);
 
 /**
  * Short sentences of one step share a printed line when the column holds them both and the line
@@ -284,7 +313,7 @@ export function joinLines(lines, maxChars) {
 }
 
 /** Characters a line of a steps column `colMm` wide holds at the page's step type (Andika, mean advance). */
-export const charsPerLine = (colMm, pageSize = 'L') => Math.floor((colMm - BULLET_MM) / (CHAR_EM * (SIZES[pageSize] || SIZES.L).zonePt * 0.92 * PT_MM));
+export const charsPerLine = (colMm, pageSize = 'L') => Math.floor((colMm - BULLET_MM) / (CHAR_EM * stepPt(pageSize) * PT_MM));
 
 /**
  * The anchor's drawing.
@@ -321,7 +350,7 @@ export function anchorHtml(it, c, { variant = 'band', twinCols = 2, cols } = {})
         if (tooNarrow(groups.length)) variant = 'compact';
     }
     const merged = groups.map((g) => ({ marks: g.marks }));
-    const sayHtml = say ? `<div class="mq-anchor-say"><b>Say:</b> <span>${esc(say)}</span></div>` : '';
+    const sayHtml = say ? `<div class="mq-anchor-say"><b>Say:</b> <span>${stepText(say)}</span></div>` : '';
     if (variant === 'side' || variant === 'compact' || whole) {
         // One state: the worked example whole (the newest step grey), and its numbered steps
         // BESIDE it when the cell leaves them a real column (the twin keeps its height close to
@@ -335,10 +364,12 @@ export function anchorHtml(it, c, { variant = 'band', twinCols = 2, cols } = {})
         const body = pl.beside
             // The column's floor is 18 characters of the page's step type: narrower, the list wraps
             // under the drawing (flex-wrap), so it can never print a word a line.
-            ? `<div class="mq-anchor-one mq-anchor-beside">${st}${stepsList(steps, idx, `flex-basis:${pl.needMm}mm;min-width:min(${pl.needMm}mm,100%)`)}</div>`
+            // The steps and the Say line stand together beside the drawing, the pair centred in the
+            // band (critic anchor-r1: a clock band left 33-45% of its width empty).
+            ? `<div class="mq-anchor-one mq-anchor-beside"><div class="mq-anchor-cell-wrap">${st}</div><div class="mq-anchor-text" style="flex-basis:${pl.needMm}mm;min-width:min(${pl.needMm}mm,100%)">${stepsList(steps, idx)}${sayHtml}</div></div>`
             : `<div class="mq-anchor-one mq-anchor-under">${st}${stepsGrid(steps, idx, pl.underCols,
                 charsPerLine((pl.innerMm - (pl.underCols - 1) * 6) / pl.underCols, pageSize))}</div>`;
-        return `<div class="mq-anchor mq-anchor-${variant}" data-ws-anchor="${variant}" data-ws-states="1" data-ws-steps="${pl.beside ? 'beside' : 'under'}">${body}${sayHtml}</div>`;
+        return `<div class="mq-anchor mq-anchor-${variant}" data-ws-anchor="${variant}" data-ws-states="1" data-ws-steps="${pl.beside ? 'beside' : 'under'}">${body}${pl.beside ? '' : sayHtml}</div>`;
     }
     const n = groups.length;
     const size = stateSize(c.size, n);
@@ -416,10 +447,95 @@ export function easeScore(q = {}) {
     const p = (q.cell && q.cell.payload) || {};
     const nums = [];
     const add = (v) => { const n = Number(String(v).replace(/,/g, '')); if (Number.isFinite(n)) nums.push(Math.abs(n)); };
-    for (const v of [].concat(p.operands || [], p.a, p.b, p.dividend, p.divisor, p.multiplier, p.parts || [], q.a, q.b)) if (v !== undefined && v !== null && v !== '') add(v);
+    for (const v of [].concat(p.operands || [], p.a, p.b, p.dividend, p.divisor, p.multiplier, p.parts || [], q.a, q.b, p.tab)) if (v !== undefined && v !== null && v !== '') add(v);
     if (!nums.length) for (const m of String(q.text || '').replace(/<[^>]*>/g, ' ').matchAll(/\d[\d,]*/g)) add(m[0]);
     if (q.ans !== undefined && typeof q.ans !== 'object') add(q.ans);
     return nums.reduce((s, n) => s + n, 0);
+}
+
+/* ======================================================= distinct from the page (owner 8f) */
+
+const numsIn = (v) => [...String(v ?? '').replace(/<[^>]*>/g, ' ').matchAll(/\d[\d,]*(?:\.\d+)?/g)].map((m) => m[0].replace(/,/g, ''));
+
+/**
+ * The KEY numbers of an item (owner ruling 2026-09-26, 8f: "the example uses different numbers
+ * from every problem on the page - never a problem's own numbers or its answers"): the count-by
+ * table, the clock time, the coins' total or the change target, a function table's rule, else the
+ * operands (sorted), else the numbers of its sentence. Two items with one `id` teach the same
+ * numbers; `ans` is the answer as written.
+ * @returns {{id: string, ans: string}}
+ */
+export function anchorKey(q = {}) {
+    const c = q.cell || {};
+    const p = c.payload || {};
+    const ans = typeof q.ans === 'object' && q.ans !== null ? JSON.stringify(q.ans) : String(q.ans ?? '').trim();
+    let id = '';
+    if (c.template === 'count-row' && p.tab !== undefined) id = `step:${p.tab}`;
+    else if (c.template === 'clock' && p.h !== undefined) id = `time:${p.h}:${p.m}`;
+    else if (c.template === 'coins') id = p.kind === 'tally' ? `make:${p.target}` : `coins:${p.total ?? ans}`;
+    else if (c.template === 'function-table' && Array.isArray(p.rule)) id = `rule:${p.rule.map((r) => `${r.op}${r.n}`).join(',')}`;
+    else {
+        const ops = [].concat(p.operands || [], p.a !== undefined ? [p.a] : [], p.b !== undefined ? [p.b] : [], p.dividend !== undefined ? [p.dividend, p.divisor] : []);
+        const nums = (ops.length ? ops.map(String) : numsIn(q.text)).map((n) => String(n).replace(/,/g, '')).sort();
+        id = nums.length ? `n:${nums.join('|')}` : '';
+    }
+    return { id, ans };
+}
+
+/** Does example `a` share its key numbers or its answer with problem `b`? */
+export function keysClash(a, b) {
+    return (!!a.id && a.id === b.id) || (!!a.ans && a.ans === b.ans);
+}
+
+/**
+ * Does the example show the skill's REAL move (critic anchor-r1)? Not a single coin (count at
+ * least 3 coins of 2 kinds), not a minute that skips the move (to the minute: a minute past a
+ * five, beyond the first five; to five minutes: past :05), not a count by 1.
+ */
+export function anchorRich(q = {}) {
+    const c = q.cell || {};
+    const p = c.payload || {};
+    if (c.template === 'coins' && p.kind !== 'tally' && Array.isArray(p.coins)) {
+        // At least 3 coins, so the example counts ON (a skill set to one kind of coin has no mixed set).
+        return p.coins.concat(p.notes || []).length >= 3;
+    }
+    if (c.template === 'coins' && p.kind === 'tally' && Array.isArray(p.counts)) {
+        return p.counts.filter((n) => Number(n) > 0).length >= 2;
+    }
+    if (c.template === 'clock' && p.m !== undefined) {
+        const m = Number(p.m);
+        if (Number(p.precision) === 1) return m % 5 !== 0 && m > 10;
+        if (Number(p.precision) === 5) return m >= 10;
+        return true;
+    }
+    if (c.template === 'count-row' && p.tab !== undefined) return Number(p.tab) >= 2;
+    return true;
+}
+
+/**
+ * `count` worked examples for a page (owner ruling 8f): candidates already sorted easy-first;
+ * never one whose key numbers or answer match any problem on the page (`pupilQs`); the skill's
+ * real move first (`anchorRich`), trivial ones only when nothing else is left; and the examples of
+ * one page distinct from each other while the skill has enough. Cycles when it runs out.
+ */
+export function pickExamples(cands, pupilQs, count, qOf = (a) => a.source.q) {
+    const keys = (pupilQs || []).map(anchorKey);
+    const free = cands.filter((a) => { const k = anchorKey(qOf(a)); return !keys.some((pk) => keysClash(k, pk)); });
+    if (!free.length || count <= 0) return [];
+    const rich = free.filter((a) => anchorRich(qOf(a)));
+    const pool = rich.length ? rich.concat(free.filter((a) => !rich.includes(a))) : free;
+    const out = [];
+    const used = new Set();
+    for (const a of pool) {
+        if (out.length >= count) break;
+        const k = anchorKey(qOf(a)).id;
+        if (k && used.has(k)) continue;
+        used.add(k);
+        out.push(a);
+    }
+    const base = out.length ? out.slice() : pool.slice(0, 1);
+    while (out.length < count) out.push(base[out.length % base.length]);
+    return out;
 }
 
 /**
@@ -540,7 +656,9 @@ export function blockPlan({ cols, hMin, cellH, bodyMm, instrMm, anchorMm }) {
     // rows that fit, up to 6 problems, rather than printing a half-empty page (PT-ENG-3).
     if (blocksPerPage === 1) {
         const more = Math.floor((avail - anchorMm) / h);
-        while (blockRows < more && (blockRows + 1) * c <= Math.max(6, want * c)) blockRows++;
+        // Critic anchor-r1: a lone block of one row left 68-83 mm of page empty; it takes every row
+        // that fits (at S, with 4 columns, a second and third row), up to 6 problems or 3 rows.
+        while (blockRows < more && (blockRows + 1) * c <= Math.max(6, 3 * c)) blockRows++;
     }
     const fill = (avail - blocksPerPage * anchorMm) / (blocksPerPage * blockRows);
     const ch = Math.max(h, Math.min(fill, Math.max(cellH || h, h)));
@@ -617,13 +735,18 @@ export const ANCHOR_CSS = `
 :is(.ws-page,.ws-sheet) .mq-anchor-stepgrid>li.mq-anchor-step{margin:0}
 :is(.ws-page,.ws-sheet) .mq-anchor-lines{flex:1;min-width:0;display:flex;flex-direction:column;gap:0.5mm}
 :is(.ws-page,.ws-sheet) .mq-anchor-lines>span{display:block}
-:is(.ws-page,.ws-sheet) .mq-anchor-say{font-size:var(--ws-zone);line-height:1.2;padding-top:1mm;border-top:var(--ws-hair) solid var(--ws-ink)}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps{font-size:max(${STEP_MIN_PT}pt,calc(var(--ws-zone) * 0.92))}
+:is(.ws-page,.ws-sheet) .mq-anchor .ws-frac.mq-anchor-frac{font-size:1em;margin:0 .1em}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-cell-wrap{flex:none;display:flex}
+:is(.ws-page,.ws-sheet) .mq-anchor-eq{white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-text{flex-grow:1;flex-shrink:1;max-width:105mm;display:flex;flex-direction:column;gap:1.5mm;padding-top:1mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-say{font-size:max(${STEP_MIN_PT}pt,var(--ws-zone));line-height:1.2;padding-top:1mm;border-top:var(--ws-hair) solid var(--ws-ink)}
 :is(.ws-page,.ws-sheet) .mq-anchor-say>b{font-weight:700}
 `;
 
 export default {
     ANCHOR_MODES, ANCHOR_ROLES, normaliseAnchors, wordCount, workedStepsOf, anchorEligible, ineligibleNote,
     stepLines, anchorGroups, sayLineOf, stepTemplateOf, unslot, stateSize, anchorHtml, anchorItem,
-    anchorPlanItem, anchorHeightMm, easeScore, pickDistinct, sideItems, pupilCount, blockPlan, blockPages, ANCHOR_CSS,
+    anchorPlanItem, anchorHeightMm, easeScore, pickDistinct, pickExamples, anchorKey, keysClash, anchorRich, isChoiceItem, sideItems, pupilCount, blockPlan, blockPages, ANCHOR_CSS,
     STEPS_MIN_CHARS, stepsMinMm, anchorInnerMm, drawingWidthMm, stepsPlacement, pairRows, packPairs, pairsPerPage,
 };

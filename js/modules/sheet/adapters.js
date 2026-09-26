@@ -222,7 +222,14 @@ const LEGACY_TEMPLATE = register('legacy', {
         const value = p && p.ans !== undefined ? p.ans : '';
         // SCC-A7: a simple value stamps itself; anything else is stamped with the legacy hint.
         let display;
-        if (value !== null && typeof value === 'object') {
+        // A choice item names its answer by the options' labels, never their ids (critic
+        // anchor-r1: the key printed `["opt0","opt4"]`).
+        const opts = Array.isArray(p && p.options) ? p.options : [];
+        const isOpt = (x) => typeof x === 'string' && /^opt\d+$/.test(x);
+        const label = (id) => { const o = opts.find((x) => x && typeof x === 'object' && x.id === id); return o && o.label !== undefined && o.label !== null ? String(o.label) : id; };
+        if (opts.length && ((Array.isArray(value) && value.length && value.every(isOpt)) || isOpt(value))) {
+            display = [].concat(value).map(label).join('; ');
+        } else if (value !== null && typeof value === 'object') {
             const hint = callDep('answerKeyHint', [p], '');
             display = hint ? `${hint} = ${JSON.stringify(value)}` : JSON.stringify(value);
         } else {

@@ -5691,7 +5691,9 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const optCount = (problem.options || []).length;
         const cols = optCount <= 9 ? ' cols-3' : '';
         const rawText = problem.text || '';
-        const promptText = rawText.replace(/Click ALL/gi, 'Circle ALL');
+        // The options print as check boxes, so the verb is "Check", never "Circle" (critic
+        // anchor-r1: "Circle ALL sums" over a row of boxes; 'Tick' left the verb list 2026-09-19).
+        const promptText = rawText.replace(/\b(?:Click|Circle) ALL\b/gi, 'Check ALL');
         // A generator that draws the figure the options refer to sets `printStem` (identify_angles:
         // "Tick every obtuse angle in this shape", its corners lettered).
         const stem = _msStem(problem) || (problem.printStem && problem.visual ? printVisualWrap(problem.visual) : '');

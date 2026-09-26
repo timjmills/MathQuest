@@ -595,9 +595,22 @@ registerSkill('measurement:make_change_least_coins', {
     misconceptions: ['M-M9'],
     workedSteps: (q) => {
         const p = payloadOf(q);
-        const used = (p.values || []).map((v, i) => [v, (p.counts || [])[i]]).filter(([, n]) => n);
-        return clampSteps([step(`Make ${p.target}.`), ...used.slice(0, 3).map(([v, n]) => step(`Use ${n} of the ${v}.`)),
-            step('Write how many of each.', (p.counts || []).map((n, i) => ({ slot: `n${i}`, value: String(n) })))]);
+        // The fewest-coins rule, said for THIS amount (critic anchor-r1): the biggest coin that fits
+        // first ("25 is too big. 10 fits: 2 of the 10 make 20. 4 left."), then the next.
+        const pairs = (p.values || []).map((v, i) => [Number(v), Number((p.counts || [])[i]) || 0]).sort((a, b) => b[0] - a[0]);
+        let left = Number(p.target);
+        const out = [step(`Make ${p.target}. Start with the biggest coin.`)];
+        const tooBig = [];
+        for (const [v, n] of pairs) {
+            if (left <= 0) break;
+            if (!n) { if (v > left) tooBig.push(v); continue; }
+            left -= n * v;
+            const pre = tooBig.length ? `${tooBig.join(' and ')} ${tooBig.length > 1 ? 'are' : 'is'} too big. ` : '';
+            tooBig.length = 0;
+            out.push(step(`${pre}${v} fits: ${n} of the ${v} make ${n * v}.${left > 0 ? ` ${left} left.` : ''}`));
+        }
+        out.push(step('Write how many of each.', (p.counts || []).map((n, i) => ({ slot: `n${i}`, value: String(n) }))));
+        return clampSteps(out);
     },
     wrongAnswer: (q) => {
         const p = payloadOf(q);

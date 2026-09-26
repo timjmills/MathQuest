@@ -677,14 +677,15 @@ function renderSetup() {
  */
 function anchorsHTML() {
     const why = anchorsBlocked();
-    const mode = why ? 'off' : (pr.anchors || 'off');
-    const opts = [['off', 'Off'], ['side', 'Beside'], ['sections', 'In blocks']];
+    // Owner ruling 2026-09-26: one form only (a worked example on top of each block); a saved
+    // 'side' choice shows, and prints, as that form.
+    const mode = why ? 'off' : (pr.anchors && pr.anchors !== 'off' ? 'sections' : 'off');
+    const opts = [['off', 'Off'], ['sections', 'On']];
     const segHtml = `<div class="tv-seg" role="radiogroup" aria-labelledby="tvAnchorL"${why ? ' aria-describedby="tvAnchorWhy"' : ''}>${opts.map(([v, t]) => `<button type="button" role="radio" data-act="anchors" data-v="${v}" aria-checked="${mode === v}"${why ? ' aria-disabled="true" tabindex="-1"' : ''}>${t}</button>`).join('')}</div>`;
     const cap = why ? `<p class="tv-cap tv-cap-why" id="tvAnchorWhy" style="margin-top:6px;">${icon('info', 14)}<span>${esc(why)}</span></p>`
-        : `<p class="tv-cap" style="margin-top:6px;">${mode === 'side' ? 'Beside: worked examples next to the problems, with the same steps and easier numbers. The page makes as many as fit.'
-            : mode === 'sections' ? 'In blocks: a worked example, then 3 or 4 problems, then the next example. Mixed practice: one example per skill.'
+        : `<p class="tv-cap" style="margin-top:6px;">${mode === 'sections' ? 'A worked example on top of each block of problems, with different numbers. Mixed practice: one example per skill.'
                 : 'Worked examples, step by step, on Independent, More Practice and Mixed practice pages. Not scored.'}</p>`;
-    return `<div><span class="tv-label" id="tvAnchorL">Anchor problems</span>${segHtml}${cap}</div>`;
+    return `<div><span class="tv-label" id="tvAnchorL">Worked example</span>${segHtml}${cap}</div>`;
 }
 
 /** Why anchor problems cannot go on this sheet, or '' when they can. */
@@ -757,7 +758,7 @@ function requestFor(s, i) {
         look: pr.look === 'daily' || pr.look === 'ican' ? pr.look : 'auto',
         paper: pr.paper,
         photocopySafe: pr.photocopySafe,
-        anchors: anchorsBlocked() ? 'off' : (pr.anchors || 'off'),
+        anchors: anchorsBlocked() ? 'off' : (pr.anchors && pr.anchors !== 'off' ? 'sections' : 'off'),
         header: { name: h.name, date: h.date, score: h.score, tab: h.tab ? undefined : false, title: h.title ? (pr.title.trim() || true) : false },
         key: pr.key,
         seed: (pr.seed + i * 7919) >>> 0,

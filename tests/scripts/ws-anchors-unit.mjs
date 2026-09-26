@@ -141,7 +141,8 @@ const STACK_STEPS = [
     ok(anchorGroups([none, m('ones'), m('answer')]).length >= 2, 'groups: at least 2 states');
     eq(stepLines('Bring down 4: 144. 144 ÷ 36 = 4. 4 × 36 = 144.'), ['Bring down 4: 144.', '144 ÷ 36 = 4.', '4 × 36 = 144.'], 'stepLines: one sentence a line');
     eq(stepLines('Think addition: 5 + ? = 11.'), ['Think addition: 5 + ? = 11.'], 'stepLines: never splits a number sentence');
-    eq(normaliseAnchors('Side by side'), 'side', 'normaliseAnchors side');
+    // Owner ruling 2026-09-26 (LESSON_LIBRARY_PLAN 8f): side by side is dropped; an old request prints as sections.
+    eq(normaliseAnchors('Side by side'), 'sections', 'normaliseAnchors: an old side request prints as sections');
     eq(normaliseAnchors('on'), 'sections', 'normaliseAnchors on = sections');
     eq(normaliseAnchors(undefined), 'off', 'normaliseAnchors default off');
 }
@@ -215,8 +216,10 @@ function checkPlan(plan, what, { anchors, scored }) {
     const key = out.keyHtml;
     const tabs = (pupil.match(/data-ws-label="model"/g) || []).length;
     ok(tabs === anchors, `${what}: ${anchors} Model tabs (got ${tabs})`);
-    const aP = pupil.match(/<div class="mq-anchor[\s\S]*?(?=<\/div><\/div><div class="ws-cell|<\/div><\/div><\/div>)/g) || [];
-    const aK = key.match(/<div class="mq-anchor[\s\S]*?(?=<\/div><\/div><div class="ws-cell|<\/div><\/div><\/div>)/g) || [];
+    // Each anchor, from its root to the next cell (the anchor's own markup nests divs freely).
+    const anchorsOf = (h) => h.split(/(?=<div class="mq-anchor mq-anchor-)/).slice(1).map((x) => x.split('<div class="ws-cell')[0]);
+    const aP = anchorsOf(pupil);
+    const aK = anchorsOf(key);
     ok(aP.length === anchors && JSON.stringify(aP) === JSON.stringify(aK), `${what}: every anchor draws the same on the pupil page and the key`);
     ok(!(out.gaps || []).length, `${what}: no key gap`);
     const scores = [...pupil.matchAll(/class="ws-field score">Score<i><\/i><b>\/(\d+)<\/b>/g)].map((m) => Number(m[1]));
@@ -397,10 +400,12 @@ async function browserChecks() {
         for (const r of screen) {
             const grids = r.pages.flatMap((pg) => pg.grids);
             if (r.one) {
-                ok(grids.every((g) => /^(Mp)+$/.test(g)), `${r.what}: every problem beside its own worked twin (${grids.join(' / ')})`);
+                // Owner ruling 8f: an old 'side' request prints as sections - a Model band grid, then
+                // the block's problems; never a [twin | problem] pair.
+                ok(grids.every((g) => g === 'M' || /^p+$/.test(g)) && grids[0] === 'M', `${r.what}: an old side request prints as a worked example on top of its block (${grids.join(' / ')})`);
             } else {
                 // A skill without worked steps has no twin; every other problem still has its own.
-                ok(grids.every((g) => /^(Mp)+$/.test(g) || /^p+$/.test(g)), `${r.what}: pairs or a skill without steps (${grids.join(' / ')})`);
+                ok(grids.every((g) => g === 'M' || /^p+$/.test(g)), `${r.what}: example bands and problem grids, no pairs (${grids.join(' / ')})`);
                 ok(r.count === 1, `${r.what}: "a page" stays one page (${r.count})`);
             }
             // Sheets: each page with a Score starts a sheet; the sheet runs to the next Score.

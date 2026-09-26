@@ -38,7 +38,7 @@ import { tagLine as lessonTagLine } from './sheet/roles/lesson.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import {
     normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, easeScore, ineligibleNote,
-    blockPlan, sideItems, pickDistinct, pairsPerPage,
+    blockPlan, sideItems, pickDistinct, pairsPerPage, pickExamples, anchorKey, keysClash, anchorRich,
 } from './sheet/anchors.js';
 import {
     allocateSupports, alternativesOf, TOUCH_IDS, normCoverage, normMix, TOUCH_MIN_PT,
@@ -736,12 +736,27 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
     const atL = (c) => (up && sizeFloor(c.size, floor) !== c.size ? Object.assign({}, c, { size: floor, metrics: resolveCtx({ size: floor, look: c.look }).metrics }) : c);
     // The draw function. `cols` is the section's final column count, handed in by the role:
     // the legacy template picks its size class from it, the fact ladder its digit size.
-    const key = cellAnswerKey(q);
+    const key0 = cellAnswerKey(q);
     const scalar = (v) => (v === undefined || v === null || typeof v === 'object' ? '' : String(v));
     // A several-part answer (a cloze's parts) is written one part per box, comma separated - the
     // same form as the roles' answerOf (compose.js).
     const parts = (v) => (Array.isArray(v) && v.length && v.every((x) => x !== null && typeof x !== 'object') ? v.map(String).join(', ') : '');
-    const answer = scalar(q0.ans) || parts(q0.ans) || scalar(key && key.value);
+    // A choice item's answer is written by its options' labels, never their ids (critic
+    // anchor-r1: the key printed "Answer: opt3").
+    const optLabel = (v) => {
+        const o = Array.isArray(q0.options) ? q0.options.find((x) => x && typeof x === 'object' && x.id === v) : null;
+        return o && o.label !== undefined && o.label !== null && o.label !== '' ? String(o.label) : v;
+    };
+    const asList = (v) => { if (typeof v === 'string' && /^\s*\[.*\]\s*$/.test(v)) { try { return JSON.parse(v); } catch (e) { return v; } } return v; };
+    const isOpts = (v) => Array.isArray(v) && v.length > 0 && v.every((x) => typeof x === 'string' && /^opt\d+$/.test(x));
+    const labelled = (v0) => {
+        const v = asList(v0);
+        if (isOpts(v)) return v.map(optLabel);
+        return typeof v0 === 'string' && /^opt\d+$/.test(v0) ? optLabel(v0) : v0;
+    };
+    const answer = scalar(labelled(q0.ans)) || parts(labelled(q0.ans)) || scalar(key0 && key0.value);
+    // A choice item's key names its options by label, never by id ("opt0").
+    const key = key0 && /\bopt\d/.test(String(key0.display ?? key0.value ?? '')) && answer ? Object.assign({}, key0, { display: answer }) : key0;
     /**
      * The draw function. `cols` is the section's final column count; `shown` is a value written
      * INTO the cell's own answer slot in both states (the finished work of Error analysis, a
@@ -1317,22 +1332,29 @@ function anchorSet(sk, si, n, { variant, colsList, twinCols }) {
     const grow = (want) => {
         const fresh = [];
         while (cands.length < Math.min(want, ANCHOR_MAX) && next < ANCHOR_MAX * 3) {
+            // A skill with no worked steps at all is known after a dozen tries.
+            if (!eligible && next >= 12) break;
             const seed = (base + next * 7919) >>> 0;
             next++;
             let q = null;
-            try { q = generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: 0 }); } catch (e) { q = null; }
+            // The item index walks too: a skill that deals its tables or kinds by position (Count by
+            // 1-12 counts by the index's table) gives varied examples, not twelve of one table.
+            try { q = generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: next - 1 }); } catch (e) { q = null; }
             if (!q || seen.has(signature(q))) continue;
             seen.add(signature(q));
             const it = hostItem({ q, skill: sk }, si, n.size, { supports: false });
-            if (eligible === null) eligible = anchorEligible(it);
-            if (!eligible) return;
+            // Eligibility per CANDIDATE (critic anchor-r1): a choice variant is skipped, never
+            // decides for the whole skill; the skill gets no example only when none qualifies.
+            if (!anchorEligible(it)) continue;
+            eligible = true;
             const a = anchorItem(it, { variant, twinCols });
             cands.push(a);
             fresh.push(a);
         }
         if (fresh.length) measureItems(fresh, { size: n.size, look: n.look, colsList });
         // Easy numbers first; a stable order, so the same seed reprints the same examples.
-        cands.sort((x, y) => easeScore(x.source.q) - easeScore(y.source.q) || signature(x.source.q).localeCompare(signature(y.source.q)));
+        // The skill's real move first (anchorRich: no single coin, no 1:03), then easy numbers.
+        cands.sort((x, y) => (anchorRich(y.source.q) - anchorRich(x.source.q)) || easeScore(x.source.q) - easeScore(y.source.q) || signature(x.source.q).localeCompare(signature(y.source.q)));
     };
     grow(ANCHOR_FIRST);
     return {
@@ -1342,14 +1364,17 @@ function anchorSet(sk, si, n, { variant, colsList, twinCols }) {
         /** The band height every candidate fits in (mm). */
         // The easiest few are the ones a page uses; a later, taller one is never picked into a
         // band that cannot hold it (see `take` callers).
-        heightMm: (cols = 1) => Math.max(0, ...cands.slice(0, 3).map((a) => anchorHeightMm(a, cols))),
+        heightMm: (cols = 1) => Math.max(0, ...cands.slice(0, 6).map((a) => anchorHeightMm(a, cols))),
         /** `count` examples that are none of the pupil items (cycled if the skill runs out). */
+        // Owner ruling 8f: never a problem's own numbers or answers (anchors.js pickExamples).
         take(pupil, count) {
-            const sigs = new Set(pupil.filter((it) => it && it.q).map((it) => signature(it.q)));
-            const sigOf = (a) => signature(a.source.q);
-            const free = () => cands.filter((a) => !sigs.has(sigOf(a))).length;
-            if (free() < count) grow(cands.length + count - free() + 2);
-            return pickDistinct(cands, sigs, count, sigOf);
+            const qs = pupil.filter((it) => it && it.q).map((it) => it.q);
+            const pk = qs.map(anchorKey);
+            const free = () => cands.filter((a) => !pk.some((k) => keysClash(anchorKey(a.source.q), k))).length;
+            if (free() < count) grow(cands.length + count - free() + 4);
+            // The skill's real move: look further when no free candidate shows it yet.
+            if (!cands.some((a) => anchorRich(a.source.q) && !pk.some((k) => keysClash(anchorKey(a.source.q), k)))) grow(cands.length + 12);
+            return pickExamples(cands, qs, count);
         },
     };
 }
@@ -1471,6 +1496,8 @@ export async function buildSheet(req = {}) {
     const capFromL = (sec, si, L, items = null) => {
         if (anchorMode === 'sections' && anchorSets[si]) {
             const body = sec.gridH ? sec.gridH + instrMm : bodyHeightMm(paper, layoutHeader);
+            // A band that cannot stand over one row of these problems is not printed (below).
+            if (sec.anchorMm + L.hMin > body - instrMm - 1) return L.perPage;
             return blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: body, instrMm, anchorMm: sec.anchorMm }).perPage;
         }
         if (anchorMode === 'side' && anchorSets[si] && anchorSets[si].items.length) {
@@ -1710,8 +1737,18 @@ export async function buildSheet(req = {}) {
                 const perLetter = new Map();
                 for (const it of mine) perLetter.set(it.letter || '', (perLetter.get(it.letter || '') || 0) + 1);
                 const need = Math.min(24, Math.max(1, ...perLetter.values()));
+                // A band and one row of problems must fit a page; else the section prints without
+                // its example and the dialog says why (critic anchor-r1: a page overflowing 11 mm).
+                const L = layoutOf(n.role, sec, mine, n, lctx);
+                const body = sec.gridH ? sec.gridH + instrMm : bodyHeightMm(paper, layoutHeader);
+                if (sec.anchorMm + L.hMin > body - instrMm - 1) {
+                    anchorNotes.push(`No worked example for ${metaOf(sec.skills[0]).label}: it does not fit above these problems at size ${n.size}.`);
+                    return;
+                }
                 bySection[si] = set.take(hostItems, need).filter((a) => anchorHeightMm(a, 1) <= sec.anchorMm + 0.05);
-                bandMm[si] = bySection[si].length ? sec.anchorMm : 0;
+                // The band is as tall as the tallest example it holds (critic anchor-r1: a band
+                // reserved for a taller candidate left its example floating in empty space).
+                bandMm[si] = bySection[si].length ? Math.min(sec.anchorMm, Math.max(...bySection[si].map((a) => anchorHeightMm(a, 1)))) : 0;
             }
         });
         anchorsIn = { mode: anchorMode, bySection, bandMm };
