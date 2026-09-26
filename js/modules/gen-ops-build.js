@@ -12,7 +12,7 @@
 import { state } from './state.js';
 import { dealIndex, dealPick } from './page-deal.js';
 import { optionsFor } from './skill-options.js';
-import { k2Twin } from './sheet/index.js';
+import { k2Twin, fadeRung } from './sheet/index.js';
 
 /* ------------------------------------------------------------------------------ options */
 
@@ -246,11 +246,132 @@ export function genCountThroughZero(q) {
     return q;
 }
 
+/* ================================================== division:share_and_group_early */
+
+/** The kinds of item, in the order of the "What the pupil does" option (forms 0-3). */
+export const SHARE_KINDS = Object.freeze(['share', 'group', 'fair', 'left']);
+/** The smallest amount a band deals, so each band's page really uses its numbers. */
+const SHARE_LO = { 10: 2, 20: 8, 30: 14 };
+
+const _shareCache = new Map();
+/**
+ * Every item a kind allows at a band, as plain data the page dealer runs through (a block holds
+ * each once, so a page never repeats an item):
+ *   share  [n, k]  k plates (2-5), n a multiple of k, at most 10 on a plate
+ *   group  [n, k]  groups of k (2-5), 2 to 6 groups
+ *   left   [n, k]  k plates (2-3; 2-5 past 10), n not a multiple of k, at least 1 on a plate
+ *   fair   [counts] 2 or 3 plates, all equal (fair) or one plate 1 or 2 away (not fair), tagged
+ */
+function shareConfigs(kind, band) {
+    const key = `${kind}:${band}`;
+    if (_shareCache.has(key)) return _shareCache.get(key);
+    const lo = SHARE_LO[band] || 2;
+    const out = [];
+    if (kind === 'share' || kind === 'group' || kind === 'left') {
+        // plates: 2 to 4 friends (5 at 30); groups of 2 to 5
+        const ks = kind === 'group' ? [2, 3, 4, 5] : kind === 'left' && band <= 10 ? [2, 3] : band >= 30 ? [2, 3, 4, 5] : [2, 3, 4];
+        for (let n = lo; n <= band; n++) for (const k of ks) {
+            if (kind === 'share' && n % k === 0 && n / k >= 1 && n / k <= 10) out.push([n, k]);
+            if (kind === 'group' && n % k === 0 && n / k >= 2 && n / k <= 6) out.push([n, k]);
+            if (kind === 'left' && n % k !== 0 && Math.floor(n / k) >= 1 && Math.floor(n / k) <= 10) out.push([n, k]);
+        }
+    } else {
+        for (const k of [2, 3]) for (let m = 1; m <= 10; m++) {
+            if (k * m > band || k * m < Math.min(lo, 4)) continue;
+            out.push({ fair: true, shown: Array(k).fill(m) });
+            for (const dlt of [1, 2]) {
+                if (m + dlt > 10 || k * m + dlt > band) continue;
+                // the odd plate out is the last, the first or the middle one
+                const shown = Array(k).fill(m);
+                shown[(m + dlt) % k] = m + dlt;
+                out.push({ fair: false, shown });
+            }
+        }
+    }
+    _shareCache.set(key, out);
+    return out;
+}
+
+export function genShareGroupEarly(q) {
+    const kinds = ticked('forms', [0, 1, 2, 3]).map((i) => SHARE_KINDS[i]).filter(Boolean);
+    const kind = kinds.length > 1 ? kinds[dealIndex('sge:kind', kinds.length)] : kinds[0] || 'share';
+    const band = [10, 20, 30].includes(Number(opt('band'))) ? Number(opt('band')) : 10;
+    const look = opt('groupLook') === 'rings' ? 'rings' : 'plates';
+    // the support level: several ticked FADE down the page, most support first (sheet fadeRung)
+    const levels = ticked('level', [2, 1]).slice().sort((a, b) => b - a);
+    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : 0;
+    const hint = levels[fadeRung(at, levels.length, state.itemCount, Number.isFinite(state.itemIndex))] >= 2;
+    const where = look === 'rings' ? 'into' : 'between';
+    const things = (k) => (look === 'rings' ? `${k} rings` : `${k} plates`);
+    let payload, text, printText, ans, hintText;
+
+    if (kind === 'fair') {
+        // fair or not is its own deal, so a page shows both; the plates within each list
+        const fair = dealIndex('sge:fair', 2) === 0;
+        const pool = shareConfigs('fair', band).filter((c) => c.fair === fair);
+        const c = pool.length ? dealPick(`sge:fair:${fair}:${band}`, pool) : shareConfigs('fair', band)[0];
+        const k = c.shown.length, n = c.shown.reduce((a, b) => a + b, 0);
+        ans = c.fair ? 'Fair' : 'Not fair';
+        payload = { kind, n, k, look, shown: c.shown.slice(), ans };
+        text = `Are the counters shared fairly? Check Fair or Not fair.`;
+        printText = 'Is it fair? Check one box.';
+        hintText = 'Count each plate. Fair means every plate has the same.';
+        q.printAnswer = ans;
+        q.acceptedAnswers = [ans, ans.toLowerCase()];
+        q.share = { kind, k, shown: c.shown.slice(), fair: c.fair };
+    } else {
+        const list = shareConfigs(kind, band);
+        const [n, k] = dealPick(`sge:${kind}:${band}`, list);
+        payload = { kind, n, k, look, hint, ans: 0 };
+        if (kind === 'share') {
+            ans = String(n / k);
+            text = `Share ${n} counters ${where} ${things(k)}. How many ${look === 'rings' ? 'in' : 'on'} each?`;
+            printText = look === 'rings' ? 'Draw the same number in each ring. Write how many.'
+                : 'Draw the same number on each plate. Write how many.';
+            hintText = `Give one to each ${look === 'rings' ? 'ring' : 'plate'}, then one more to each, until none are left.`;
+            q.acceptedAnswers = [ans];
+        } else if (kind === 'group') {
+            ans = String(n / k);
+            text = `Make groups of ${k} from ${n} counters. How many groups?`;
+            printText = `Circle groups of ${k}. Write how many groups.`;
+            hintText = `Circle ${k} counters. Then circle ${k} more. Count the circles.`;
+            q.acceptedAnswers = [ans];
+        } else {
+            const each = Math.floor(n / k), left = n % k;
+            ans = `${each}, ${left}`;
+            q.keyParts = [String(each), String(left)];
+            q.acceptedAnswers = [`${each}, ${left}`, `${each},${left}`, `${each} ${left}`];
+            text = `Share ${n} counters ${where} ${things(k)}. How many ${look === 'rings' ? 'in' : 'on'} each, and how many left over?`;
+            printText = look === 'rings' ? 'Draw the same number in each ring. Fill in the boxes.'
+                : 'Draw the same number on each plate. Fill in the boxes.';
+            hintText = `Give one to each ${look === 'rings' ? 'ring' : 'plate'} until there are not enough to go round. Those are left over.`;
+        }
+        payload.ans = kind === 'left' ? [Math.floor(n / k), n % k] : n / k;
+        q.share = { kind, n, k, look, hint };
+    }
+
+    q.a = payload.n; q.b = payload.k;
+    q.text = text;
+    q.printText = printText;
+    q.ans = ans;
+    q.answerType = kind === 'share' || kind === 'group' ? 'number' : 'text';
+    if (q.answerType === 'number') q.ans = Number(ans);
+    q.selfAnswering = true;
+    q.options = [];
+    q.hint = hintText;
+    q.skillLabel = 'Share and Make Groups';
+    q.cell = { template: 'share-plates', v: 1, payload };
+    q.visual = k2Twin('share-plates', payload);
+    q.printFormat = 'share-plates';
+    return q;
+}
+
 /* ------------------------------------------------------------------------------ dispatch */
 
 /** Every skill id this module generates, by its id within its category. */
 export const OPS_BUILD_SKILLS = Object.freeze({
     count_through_zero: genCountThroughZero,
+    share_and_group_early: genShareGroupEarly,
 });
 
 /** Generate `q` for a build-lane skill; false when the id is not one of them. */

@@ -107,9 +107,11 @@ import './cells/ops-counters.js';
 import './cells/number-line.js';
 // Build lane operations (2026-09-26): a number line through zero, across or as a thermometer.
 import './cells/int-line.js';
+// Build lane operations (2026-09-26): share on plates, make equal groups, is it fair.
+import './cells/share-plates.js';
 import './cells/family.js';
 export { factDigitTracks, factGridStyle, FACT_OP_TRACK_EM } from './cells/fact.js';
-export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'remainder', 'number-line', 'fact-family', 'cloze-bank', 'int-line'];
+export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'remainder', 'number-line', 'fact-family', 'cloze-bank', 'int-line', 'share-plates'];
 
 
 // K-2 picture cells: counters, ten frame, base-10 mat, number bond, chart window, number track,

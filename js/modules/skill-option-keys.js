@@ -161,6 +161,9 @@ export const MULTI_KEYS = Object.freeze({
     // deployed decoder would read an unknown `op` token as an EMPTY set (every operation).
     ops: '3A',           // function_table_easy / _hard: the operations a rule may use (+ − × ÷)
     // NEXT FREE IN BLOCK 3: 3B.
+    // Build lane operations (KEY_SUBRANGES 3N-3Z, 2026-09-26)
+    groupLook: '3N',     // share_and_group_early: the groups drawn as plates / rings
+    // NEXT FREE FOR THE OPERATIONS LANE: 3P (to 3Z).
 
     // Block 4 — SUPPORTS (S2: `cover` and `mix` are live; `touch` is unused - touch dots are
     // values of the unified `support` set; `anchors` is the sheet-level S6 request field)
@@ -301,6 +304,8 @@ export const VALUE_TOKENS = Object.freeze({
     frame: Object.freeze({ boxes: 'B', line: 'L' }),
     responseScope: Object.freeze({ full: 'F', notation: 'N', decision: 'D', judge: 'J' }),
     bins: Object.freeze({ adjacent: 'A', apart: 'P', three: 'T' }),
+    // build lane operations (2026-09-26)
+    groupLook: Object.freeze({ plates: 'P', rings: 'R' }),
     blank: Object.freeze({ column: 'C', row: 'R' }),
     line: Object.freeze({ plotted: 'P', mark: 'M', ends: 'E' }),
     closeness: Object.freeze({ far: 'F', close: 'C', some: 'S' }),

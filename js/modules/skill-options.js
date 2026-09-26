@@ -3296,6 +3296,38 @@ const OPS_BUILD_OPTIONS = {
             helpShort: 'Across the page, or up and down like a thermometer.',
         },
     ],
+    // Entry 2 · Share and Make Groups (PK-1; K.OA.1-2, 3.OA.2; EE 2.OA.3).
+    'division:share_and_group_early': [
+        {
+            id: 'forms', label: 'What the pupil does', type: 'set', default: [0], group: 'difficulty',
+            values: [
+                { v: 0, l: 'Share equally: draw them on the plates, write how many each (default)' },
+                { v: 1, l: 'Make equal groups: circle groups, write how many groups' },
+                { v: 2, l: 'Is it fair? Check Fair or Not fair' },
+                { v: 3, l: 'Share with some left over: how many each, how many left' },
+            ],
+            match: ['How many (on|in) each\\?', 'How many groups\\?', 'shared fairly', 'left over\\?'],
+            allLabel: 'All four, mixed',
+            help: 'Tick one kind for a page of it, or several to mix them. Sharing first (one for you, one for me), then '
+                + 'grouping, then judging a share, then amounts that do not share fairly.',
+            helpShort: 'Share, make groups, is it fair, and left over.',
+        },
+        {
+            id: 'band', label: 'Counters to', type: 'enum', default: 10, group: 'difficulty', accept: 'max',
+            values: [{ v: 10, l: '10 (default)' }, { v: 20, l: '20 (share an even number between two, to 20)' }, { v: 30, l: '30' }],
+            help: 'The most counters on an item. 20 and 30 start at 8 and 14, so each page uses its numbers; a plate '
+                + 'never holds more than 10.',
+            helpShort: 'The most counters to share or group.',
+        },
+        levelSubset([2, 1], 2, 'Level 2 puts one grey counter on each plate to start the share (one for you, one for me), '
+            + 'or rings the first group in grey. Level 1 draws the plates or counters alone.'),
+        {
+            id: 'groupLook', label: 'Groups drawn as', type: 'enum', default: 'plates', group: 'layout',
+            values: [{ v: 'plates', l: 'Plates (default)' }, { v: 'rings', l: 'Rings' }],
+            help: 'Where the shared counters go: an oval plate with a rim, or a plain ring. The same room to draw in either way.',
+            helpShort: 'Plates or rings.',
+        },
+    ],
 };
 Object.assign(SKILL_OPTIONS, OPS_BUILD_OPTIONS);
 // ============================ end OPERATIONS BUILD LANE =========================================

@@ -1328,6 +1328,12 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `sign-number` | Read the sentence. Write the number with its sign. | a quantity above or below zero in a context (6.NS.C.5) |
 | `sign-compare` | Read the sentence. Write < or > in the circle. | "−3 °C is warmer than −7 °C": the order statement (6.NS.C.7b) |
 | `line-each` | Use the line. Write the answer in each box. | a page mixing the kinds above |
+| `share-plates` | Draw the same number on each plate. Write how many. | share a small amount equally onto plates (added 2026-09-26, build lane operations) |
+| `share-rings` | Draw the same number in each ring. Write how many. | the same, the groups drawn as rings |
+| `share-left` | Draw the same number on each plate. Fill in the boxes. | share with some left over: how many each, how many left |
+| `share-left-rings` | Draw the same number in each ring. Fill in the boxes. | the same, the groups drawn as rings |
+| `fair-check` | Is it fair? Check one box. | plates already holding counters: Fair / Not fair |
+| `share-mixed` | Draw or circle the counters. Then fill in the boxes. | a page mixing sharing, grouping and fair / not fair |
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |
 | `default-order` | Write the numbers in order. | default adapter: ordering items with no stated direction |
 | `default-solve` | Solve. | default adapter: any other answer type |

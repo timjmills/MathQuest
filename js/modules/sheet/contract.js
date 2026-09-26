@@ -226,6 +226,12 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'sign-number': 'Read the sentence. Write the number with its sign.',
     'sign-compare': 'Read the sentence. Write < or > in the circle.',
     'line-each': 'Use the line. Write the answer in each box.',
+    'share-plates': 'Draw the same number on each plate. Write how many.',
+    'share-rings': 'Draw the same number in each ring. Write how many.',
+    'share-left': 'Draw the same number on each plate. Fill in the boxes.',
+    'share-left-rings': 'Draw the same number in each ring. Fill in the boxes.',
+    'fair-check': 'Is it fair? Check one box.',
+    'share-mixed': 'Draw or circle the counters. Then fill in the boxes.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',

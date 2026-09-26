@@ -127,7 +127,7 @@ export const SKILL_GRADES = {
     'missing_factor_or_addend': 3,  // 3.OA.A.4 — determine the unknown in an equation
     // Integers
     'number_line_int': 6, 'compare_int': 6, 'add_int': 6, 'sub_int': 6,
-    'count_through_zero': 4,
+    'count_through_zero': 4, 'share_and_group_early': 'K',
     // Fraction Operations
     'add_fractions_like': 4, 'sub_fractions_like': 4, 'add_mixed_like': 4, 'sub_mixed_like': 4,
     'mult_frac_whole': 4, 'decompose_fractions': 4, 'frac_word_problems': 4, 'frac_word_problems_plain': 4, 'frac_10_100': 4,
@@ -784,6 +784,9 @@ export const SKILLS = {
         { v: "remainder_too_big", l: "Is the Remainder Finished?" },                 // DF-27: judges deliberately-wrong remainders
         { v: "div_check_by_multiplying", l: "Check a Division by Multiplying" },     // DL-8: the check is × and + on deliberately-wrong work
         { v: "div_fix_estimate", l: "Fix the Estimate (Long Division)" },            // DL-13, DL-14: a crossed-out attempt plus a second attempt
+        // APPENDED 2026-09-26 (build list, lane operations, entry 2): share a small amount equally,
+        // make equal groups, is it fair?, and what is left over (PK-1; EE 2.OA.3).
+        { v: "share_and_group_early", l: "Share and Make Groups" },
     ],
     integers: [
         { v: "number_line_int", l: "Number Lines with Negatives" },
@@ -1668,7 +1671,7 @@ export const SKILL_TIME_CATEGORY = {
     sub_1m_no_regroup: "quick", sub_1m_regroup: "quick", sub_1m_mixed: "quick",
     // Basic operations & arithmetic
     add_decimal: "quick", sub_decimal: "quick", mult_decimal: "quick", div_decimal: "quick",
-    add_int: "quick", sub_int: "quick", count_through_zero: "quick",
+    add_int: "quick", sub_int: "quick", count_through_zero: "quick", share_and_group_early: "quick",
     missing_add_sub: "quick", missing_mult_div: "quick",
     // Reusable primitive demos
     cloze_addition: "quick", hotspot_quads: "quick",
@@ -1887,7 +1890,7 @@ export const SKILL_PRINT_SIZE = {
     estimate_sums_diffs: "standard", estimate_products: "standard", estimate_quotient: "standard",
     make_a_ten: "medium", doubles_near_doubles: "medium", compensation: "medium",
     expand: "medium", combine: "medium",
-    add_int: "standard", sub_int: "standard", number_line_int: "standard", count_through_zero: "wide",
+    add_int: "standard", sub_int: "standard", number_line_int: "standard", count_through_zero: "wide", share_and_group_early: "medium",
     solve_unknown: "standard", evaluate_expression: "standard",
     write_expression: "standard", inequalities: "standard",
     build_expr_addsub: "wide", build_expr_multdiv: "wide",
