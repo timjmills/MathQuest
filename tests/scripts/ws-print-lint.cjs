@@ -23,6 +23,7 @@
 //   --files 01,11             pack: only page files whose name starts with one of these
 //   --count N                 legacy: items per section (default 20, the print dialog's default)
 //   --roles r1,r2             kit: the page roles to lint (default independent); any role buildSheet knows
+//   --size S|M|L              kit: the print size of every sheet (default L; LESSONS_LEARNED L1/L2 run S and L)
 //   --count auto|N            kit practice roles: the problem count (default auto, as the print screen);
 //                             auto also turns on L-DENSITY PAGEFILL (an empty strip over 20% of a page)
 //   --anchors side|sections   kit: print with step-by-step anchor problems (S6); adds L-ANCHOR
@@ -670,7 +671,9 @@ function wsLintPage(cfg) {
     styleEl.remove();
 
     /* ------------------------------------------------------------------ L-EMOJI */
-    const EMOJI = /[\p{Extended_Pictographic}\u{FE0F}\u{20E3}\u{1F1E6}-\u{1F1FF}\u{2605}\u{2606}]/gu;
+    // © and ® are Extended_Pictographic in Unicode but are plain text glyphs in Andika (no emoji
+    // presentation without U+FE0F, which stays banned). The owner's copyright line needs ©.
+    const EMOJI = /(?![\u00A9\u00AE](?!\u{FE0F}))[\p{Extended_Pictographic}\u{FE0F}\u{20E3}\u{1F1E6}-\u{1F1FF}\u{2605}\u{2606}]/gu;
     for (const ri of rootInfo) {
         const walker = document.createTreeWalker(ri.el, NodeFilter.SHOW_TEXT);
         for (let n = walker.nextNode(); n; n = walker.nextNode()) {
@@ -752,6 +755,13 @@ function wsLintPage(cfg) {
             let n = 0;
             for (const d of pg.querySelectorAll('*')) {
                 if (n > 2 || !visible(d)) continue;
+                // PT-FRM-7a: the copyright line hangs in the bottom margin by design (the footer band never grows);
+                // it must stay inside the paper, at least 6 mm above its bottom edge.
+                if (d.classList && d.classList.contains('ws-copy')) {
+                    const rc = d.getBoundingClientRect();
+                    if (rc.bottom > pr.bottom - 6 * 96 / 25.4) { n++; F('L-OVERFLOW', 'PG-13', 'major', d, `the copyright line is within 6 mm of the paper's bottom edge (PT-FRM-7a)`, 'copyright near edge'); }
+                    continue;
+                }
                 const r = d.getBoundingClientRect();
                 if (!r.width || !r.height) continue;
                 const over = Math.max(r.right - live.r, live.l - r.left, r.bottom - live.b, live.t - r.top);
@@ -1391,10 +1401,11 @@ function lintKitGeometry(dom, pdf, info, F) {
             if (c && /^(independent|more-practice)$/.test(p.role) && p.gridTop !== null && p.gridBottom !== null) {
                 const gh = p.gridBottom - p.gridTop;
                 const its = p.cells.filter(x => x.item);
-                if (its.length && gh > 0 && its.every(x => x.rect[3] <= gh / 4.5)) c = { n: Math.max(c.n, 20), name: `${c.name} (short problems, DN-1)` };
+                if (its.length && gh > 0 && its.every(x => x.rect[3] <= gh / 4.5)) c = { n: Math.max(c.n, { S: 30, M: 24, L: 20 }[p.size] || 20), name: `${c.name} (short problems, DN-1)` };
                 // 12.3's capacity tables (layout.js DENSE_CEILING): a kit page packed to its
-                // problems' measured size holds up to 12 standard problems (3 x 4).
-                else if (info.mode === 'kit') c = { n: Math.max(c.n, 12), name: `${c.name} (12.3 dense capacity)` };
+                // problems' measured size holds up to 20 / 16 / 12 standard problems at S / M / L
+                // (DN-1a, LESSONS_LEARNED L1: S no longer prints L's 3 x 4).
+                else if (info.mode === 'kit') c = { n: Math.max(c.n, { S: 30, M: 20, L: 12 }[p.size] || 12), name: `${c.name} (12.3 dense capacity)` };
             }
             if (c && p.items > c.n) F('L-DENSITY', 'DN-1', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} items; the ${c.name} ceiling at size ${p.size} is ${c.n} (section 12.1)`, `over ceiling ${p.role}`);
             if (p.role && !c) info.notes.push(`page ${p.idx}: role "${p.role}" has no ceiling in this gate`);
