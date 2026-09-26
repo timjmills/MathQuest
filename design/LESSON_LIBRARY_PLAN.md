@@ -204,6 +204,35 @@ code, its providers' `wrongAnswer` data, its share-code entries and its critic h
 Revival is a later-wave item (recorded in `design/LESSONS_VISION.md` → Later), after the lesson library and skills pass; it would be
 rebuilt on the lesson practice frame (§8c) and re-graded before it returns to the Print screen.
 
+## 8e. Owner ruling: three kinds of paper — Practice, Quiz, Lesson (2026-09-26)
+
+"All of these practice, mixed review can be options within the one page, and fact rows/probes deal with the columns. The
+thinking pages we will leave for later, do not use them. And the lesson, prerequisite check, worked example, guided are
+all part of the lesson — so we then have three types of papers: practice, quiz, and lesson."
+
+This supersedes the 17-card page-type menu (and the stand-alone mapping in §8c, whose engine plan still holds):
+
+| Paper | Absorbs | Options on the one paper |
+|---|---|---|
+| **Practice** | Independent, More Practice (A, B, C…), Mixed practice, Review, Word problems, Fact rows, Fact probe | skills: one or more (one skill → "I Can" title, §Daily look); **versions** (1 or A, B, C… new numbers); **mix in earlier skills** (off / review share, capped 45 %); **fact columns** (auto, or 5–10 across — the old Fact rows); **timed check** (the old Fact probe: minutes + score line); size S / M / L (min-size floors §8a). Word-problem skills get their story-with-work layout automatically. Built on the lesson practice and mixed page designs. |
+| **Quiz** | Test A / Test B | scored; **versions** A, B… (same skills, new numbers); size. Built on the lesson practice frame. The on-screen Quiz Builder is separate and unchanged. |
+| **Lesson** | Lesson packet, Prerequisite check, Worked example (anchor chart), Guided (We Do), Lesson opener, Pre-skill check | **parts** to print (default all: Prerequisite Check, anchor chart, lesson sheet with We Do, practice, mixed); one size (§8a). The stand-alone Guided / Worked example / Prerequisite pages exist only as parts of a lesson. |
+
+- **Paused for later (hidden, code kept, like §8d):** True or False?, Reason It, Stretch, and Find the mistake. Their
+  provider data (`open(q)`, `wrongAnswer`, reason prompts) is kept; no new work goes into them now.
+- **Saved sets and share codes are never broken:** every old role id decodes to its new paper + options
+  (`independent`/`more-practice`/`mixed-practice`/`review`/`word-problems`/`fact-rows`/`fact-probe` → Practice;
+  `test`/`test-b` → Quiz versions; `lesson`/`opener`/`pre-skill-check`/`scripted-model`/`guided` → Lesson with the
+  matching part). Paused roles still print from old saved sets.
+- **The 8/10 pass bar now covers:** Practice (single skill and mixed, at S and L, with its key), Quiz (with its key),
+  the Lesson where the skill has one, the three screen hosts (practice card, online worksheet, quiz) and the option panel.
+  Stand-alone Guided, Worked example, Review, Opener, Pre-skill check and the thinking pages are no longer graded as
+  separate pages.
+- **Build:** (1) the Print screen shows three paper cards with their options, and the old ids map across — one lane, in
+  `teacher-print.js` + `print-sheet.js` request normalising; (2) Practice and Quiz are rebuilt on the lesson practice /
+  mixed builders when the engine lane extracts them (§8c); until then they route to today's roles with these options;
+  (3) the Lesson paper gains the "parts" option.
+
 ## 9. Risks
 
 Engine regressions invalidating passed lessons (single engine owner, render-hash stamps → `stale`); ≈ 359 steps blocked
