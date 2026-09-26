@@ -561,6 +561,23 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     eq(likeAnswer('3.5', '2.75'), '3.50', 'L3: ... its decimal places');
     eq(likeAnswer('5', '7 cm'), '5 cm', 'L3: ... and its unit');
     eq(likeAnswer('<', '>'), '<', 'L3: a sign is left as it is');
+    // critic pv-r2: the rounding keys are stored "6000" on a page that prints "6,093" - the PAGE's
+    // rule decides, for the wrong value AND the right one
+    eq(likeAnswer('10000', '6000', { commas: true }), '10,000', 'L3: a page that prints commas writes the wrong value with them, whatever the key stores');
+    eq(likeAnswer('6000', '6000', { commas: true }), '6,000', 'L3: ... and the right value too');
+    eq(likeAnswer('6,093', '6000', { commas: false }), '6093', 'L3: a page without commas writes none');
+    eq(likeAnswer('170', '80 + 80 = 160'), '170', 'L3: a sentence answer is never glued to a bare number');
+    eq(likeAnswer('3:30', '3:15'), '3:30', 'L3: a time is left as written');
+    eq(likeAnswer('5', '3/4'), '5', 'L3: a fraction tail is not a unit');
+    {
+        // one pupil page, one rounding item shown right and one shown wrong: no 4+ digit number without its comma
+        const rq = (ans, n) => ({ categoryId: 'number_sense', skillId: 'nearest_1000', ans, text: `Round ${n} to the nearest 1,000.`, cell: { template: 'equation', v: 1, payload: {} } });
+        const itm = (ans, n) => ({ q: rq(ans, n), template: 'equation', fclass: 'standard', footprint: { wMm: 80 }, render: (c, o) => `<div>${(o && o.shownSlots && o.shownSlots.answer) || (o && o.shown) || ''}</div>`,
+            key: { value: ans, display: ans, slots: { answer: { value: ans, graded: true } } } });
+        const right = prepare(itm('6000', '6,093'), { index: 0, wrong: false });
+        const html = right && right.render(ctx, { cols: 1, judge: 'below' });
+        ok(html && /6,000/.test(html) && !/\b6000\b/.test(html), 'L3: a right answer stored "6000" prints "6,000" on a page that writes commas');
+    }
     // The fix box's width comes from what the page prints, never from the right answer.
     const roundQ = (ans) => ({ categoryId: 'number_sense', skillId: 'nearest_1000', ans, text: 'Round 9,677 to the nearest 1,000.', cell: { template: 'equation', v: 1, payload: { n: 9677, place: 1000, answer: ans } } });
     const widthOf = (ans, shown) => {

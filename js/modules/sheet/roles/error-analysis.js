@@ -109,7 +109,7 @@ const partsOfList = (v) => (/,\s/.test(String(v)) ? String(v).split(/,\s*/) : nu
 /** "9000" -> "9,000": a plain whole number of 4+ digits written the way the kit writes numbers. */
 const commas = (v) => (/^\d{4,}$/.test(String(v)) ? String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ',') : String(v));
 /** Written the same way as the right answer: a wrong "9000" beside a right "6,000" becomes "9,000". */
-const likeCorrect = (v, correct) => likeAnswer(v, correct);
+const likeCorrect = (v, correct, opts) => likeAnswer(v, correct, opts);
 
 /**
  * A shown value written EXACTLY the way the right answer is (L3, critic pv-r1 / EA r5): its
@@ -117,18 +117,24 @@ const likeCorrect = (v, correct) => likeAnswer(v, correct);
  * "60,000" - or "3.5" beside "2.75", "5" beside "7 cm" - lets the pupil read the verdict from the
  * typography. Anything that is not a number is left as it is.
  */
-export function likeAnswer(v, correct) {
+export function likeAnswer(v, correct, { commas: pageCommas } = {}) {
     const s = String(v === undefined || v === null ? '' : v).trim();
     const c = String(correct === undefined || correct === null ? '' : correct).trim();
     const num = /^(-?)([\d,]*\d)(?:\.(\d+))?\s*(.*)$/;
     const mv = num.exec(s), mc = num.exec(c);
     if (!mv || !mc || !/^[\d,]+$/.test(mv[2]) || !/^[\d,]+$/.test(mc[2])) return s;
+    // only a plain number, or a number and a UNIT ("7 cm", "40°"), is re-written: "3:15", "3/4",
+    // "4 R 2" or "80 + 80 = 160" is left exactly as it is
+    const isUnit = (t) => !t || /^[A-Za-z%°][A-Za-z%°²³. ]{0,11}$/.test(t);
+    if (!isUnit(mv[4]) || !isUnit(mc[4])) return s;
     if (mv[4] && mc[4] && mv[4] !== mc[4]) return s;          // a different unit is the pupil's own
     let whole = mv[2].replace(/,/g, '');
-    // commas exactly when the right answer has them; a short right answer says nothing
+    // The PAGE's rule first (critic pv-r2: rounding keys are stored "6000" on a page that prints
+    // "6,093"): a page that writes its big numbers with commas writes every one with them, a
+    // page that does not writes none. Without a page rule: the right answer's commas.
     const cWhole = mc[2];
-    if (cWhole.includes(',')) whole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    else if (cWhole.length < 4) whole = mv[2];                 // no telling: as the pupil wrote it
+    if (pageCommas === true || (pageCommas === undefined && cWhole.includes(','))) whole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    else if (pageCommas === undefined && cWhole.length < 4) whole = mv[2];   // no telling: as written
     const dp = mc[3] ? mc[3].length : 0;
     let frac = mv[3] || '';
     if (dp > frac.length) frac = frac.padEnd(dp, '0');
@@ -406,8 +412,10 @@ const normWork = (t) => String(t).replace(/<[^>]*>/g, ' ').replace(/&lt;/g, '<')
  * shown value, and must not be just the right answer. A drawn model cannot be read this way and
  * is trusted to its template.
  */
-export function showsWrong({ it, kind, shown, shownSlots, sParts, correct, P }) {
-    if (kind === 'draw' || kind === 'line') return true;
+export function showsWrong({ it, kind, shown, shownSlots, sParts, correct, P, drawn = false }) {
+    // a drawing (a model, a mat of disks) shows its number as a picture, not as text: only the
+    // value itself can be checked (critic pv-r2: pv_disks_build lost every wrong mat here)
+    if (kind === 'draw' || kind === 'line' || drawn) return String(shown).replace(/[\s,]+/g, '') !== String(correct).replace(/[\s,]+/g, '');
     if (String(shown).replace(/[\s,]+/g, '') === String(correct).replace(/[\s,]+/g, '')) return false;
     let html = '';
     try {
@@ -444,8 +452,12 @@ export function prepare(it, info = {}) {
     // A place-value line slot writes the number the way the key does ("80,000", never "80000"
     // beside a wrong "80,000" - critic round 4); a digit grid keeps its bare digits.
     const kDisp = String((it.key && it.key.display) || '');
-    const written = it.template === 'pv' && kDisp.replace(/,/g, '') === correct ? kDisp : correct;
-    const shown = isWrong ? (P ? likeAnswer(wrong.value, P.display || written) : likeCorrect(wrong.value, written)) : written;
+    // How the PAGE writes a 4+ digit number - with commas when the item prints any ("6,093"),
+    // whatever form the key stores ("6000"). Right AND wrong values follow it (L3, critic pv-r2).
+    const pageCommas = /\d,\d{3}/.test(`${q.printText || ''} ${q.text || ''} ${kDisp}`);
+    const fmt = { commas: pageCommas };
+    const written = likeAnswer(it.template === 'pv' && kDisp.replace(/,/g, '') === correct ? kDisp : correct, correct, fmt);
+    const shown = isWrong ? (P ? likeAnswer(wrong.value, P.display || written, fmt) : likeCorrect(wrong.value, written, fmt)) : written;
     const who = PUPILS[(Number(info.index) || 0) % PUPILS.length];
     // The word-work cell draws its own finished working (sign, columns, answer): no extra line.
     const story = (it.fclass === 'word' || it.template === 'wordpic') && it.template !== 'word-work';
@@ -457,7 +469,7 @@ export function prepare(it, info = {}) {
     // every value the pupil wrote in a slot is written like the right one there (L3)
     const keySlots = (it.key && it.key.slots) || {};
     let shownSlots = isWrong && wrong.slots
-        ? Object.fromEntries(Object.entries(wrong.slots).map(([id, v]) => [id, keySlots[id] ? likeAnswer(v, keySlots[id].value) : v]))
+        ? Object.fromEntries(Object.entries(wrong.slots).map(([id, v]) => [id, keySlots[id] ? likeAnswer(v, keySlots[id].value, fmt) : v]))
         : undefined;
     let sParts = null;
     if (P) {
@@ -469,10 +481,10 @@ export function prepare(it, info = {}) {
                 || (P.glue && /^\d+$/.test(String(wrong.value).trim()) ? [String(wrong.value).trim(), '', ''] : null)
                 || (/[;,]\s/.test(String(wrong.value)) ? String(wrong.value).split(/[;,]\s*/) : null);
             sParts = ids.map((id, i) => {
-                if (wrong.slots && wrong.slots[id] !== undefined) return likeAnswer(wrong.slots[id], P.parts[i].value);
+                if (wrong.slots && wrong.slots[id] !== undefined) return likeAnswer(wrong.slots[id], P.parts[i].value, fmt);
                 // a part the wrong answer does not name was written right ("5, 7, 28": one
                 // group short leaves the 5 and the 7 as they were)
-                return likeAnswer(split && split.length === ids.length ? split[i] : (i === ids.length - 1 && !split ? String(wrong.value) : P.parts[i].value), P.parts[i].value);
+                return likeAnswer(split && split.length === ids.length ? split[i] : (i === ids.length - 1 && !split ? String(wrong.value) : P.parts[i].value), P.parts[i].value, fmt);
             });
             if (sParts.every((v) => v === '')) sParts = null;
             // Parts the whole answer does not spell out (an area model's partial products under
@@ -555,7 +567,9 @@ export function prepare(it, info = {}) {
     // headroom: a sum or a rounding can be one digit longer than any number it prints ("9,677"
     // rounds to "10,000"); a product as long as its two factors together
     const times = /×|\bx\b|\*/.test(String(q.text || '')) || opOf(q) === 'multiply';
-    const room = times ? roomOf(it) * 2 : roomOf(it) + 1;
+    const room0 = times ? roomOf(it) * 2 : roomOf(it) + 1;
+    // ONE fix width a page (critic pv-r2): the page passes its widest item's room as `o.room`
+    let room = room0;
     const ownLine = kind === 'value' && ownShapeOf(it) === 'line';
     // a fraction ("n/d") or a mixed number ("w n/d") is fixed as one: the last two parts over a bar
     const fracFix = kind === 'parts' && !labels && glue && (P.parts.length === 2 || P.parts.length === 3) && glue[glue.length - 2].trim() === '/'
@@ -589,6 +603,7 @@ export function prepare(it, info = {}) {
         return 44;
     };
     const render = (c, o = {}) => {
+        room = Number(o.room) > room0 ? Number(o.room) : room0;
         // The work is drawn in state `wrong` on BOTH pages, so a key render says so itself
         // (`options.fixKey`), and the template fills its fix place only there.
         const workOf = (fixOpts) => {
@@ -719,7 +734,7 @@ export function prepare(it, info = {}) {
     // THE GUARD (critic round 4, H1): a "wrong" item whose finished work does not show the wrong
     // value - the template wrote the right answer, or the wrong value equals the right one - is
     // never printed; the host deals another item. The key would otherwise "fix" a right answer.
-    if (isWrong && !showsWrong({ it, kind, shown, shownSlots, sParts, correct, P })) return null;
+    if (isWrong && !showsWrong({ it, kind, shown, shownSlots, sParts, correct, P, drawn: drewWork })) return null;
     return Object.assign({}, it, {
         render, key, measured: null, drawsAnswer: true, answerWords: isWrong ? `Fix it: ${correct}` : 'Correct',
         // The judgement flows beside the work in one column and under it in two: a taller cell in
@@ -728,6 +743,7 @@ export function prepare(it, info = {}) {
         colsLayout: true,
         // the places the Correct / Fix-it block can take; the host measures each (AX-4)
         judgeModes: kind === 'draw' || kind === 'redo' ? undefined : JUDGE_MODES,
+        fixRoom: room0,
         // the fix's SHAPE (boxes / a sign circle / a stacked fraction / check boxes / a word line),
         // so a page keeps to one (critic EA r5, B: a line, "+" boxes and a sign circle on one page)
         fixSig: kind === 'value' && /^[<>=]$/.test(correct) ? 'sign' : fracFix ? 'frac' : kind === 'choice' ? 'check'
@@ -968,7 +984,9 @@ export function plan(input = {}) {
     const items = (M ? M.items : balanced(all, L.perPage)).slice().sort((a, b) => isPick(a) - isPick(b));
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Check it', score: items.length });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
-    const judged = (it) => (L.mode && typeof it.render === 'function' ? (c, o) => it.render(c, Object.assign({}, o, { judge: L.mode })) : undefined);
+    // one fix width for every cell of the page: the widest item's (critic pv-r2)
+    const pageRoom = Math.max(0, ...items.map((it) => Number(it.fixRoom) || 0));
+    const judged = (it) => (typeof it.render === 'function' ? (c, o) => it.render(c, Object.assign({}, o, L.mode ? { judge: L.mode } : {}, { room: pageRoom })) : undefined);
     const grid = gridPart(items.map((it) => planItem(it, { cols: L.cols, render: judged(it) })), { cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
     if (rows === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
     // RUBRIC H13 (critic round 4): a row is as tall as what it holds (+10%), never the page's
