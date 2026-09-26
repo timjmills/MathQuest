@@ -32,7 +32,7 @@ import {
 } from '../../js/modules/sheet/roles/practice.js';
 import { ROLE_IDS, ROLE_MODULES, ROLE_ALIASES } from '../../js/modules/sheet/roles/index.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, getProvider } from '../../js/modules/sheet/index.js';
-import { stack } from '../../js/modules/sheet/cells/stack.js';
+import { stack, regroupWorking } from '../../js/modules/sheet/cells/stack.js';
 import { SLOT, SIZES as KIT_SIZES, slotRadiusMm, stripSegStyle, stripPos } from '../../js/modules/sheet/tokens.js';
 
 let pass = 0;
@@ -1014,6 +1014,46 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     ok(ws.some((s) => s.marks.some((m) => m.slot === 'strike:tens')) && ws.some((s) => s.marks.some((m) => m.slot === 'regroup:ones' && m.value === '17')), 'provider sub_100_regroup: the regroup step crosses out and writes 5 tens 17 ones');
     eq(ws.flatMap((s) => s.marks).filter((m) => m.slot === 'tens' || m.slot === 'ones').map((m) => m.value).join(''), '94', 'provider sub_100_regroup: the ones 9 then the tens 4');
     eq(p.wrongAnswer({ a: 67, b: 18, ans: 49, text: '67 − 18 = ?' }) !== null, true, 'provider sub_100_regroup: a misconception answer');
+    // Lessons r1 / AK-2 over VA-13: the key's regroup working.
+    const w1 = regroupWorking({ op: '-', a: 67, b: 18 }, 3);
+    eq(`${w1.vals[1]}|${w1.vals[2]}|${!!w1.strikes[1]}|${!!w1.strikes[2]}`, '5|17|true|true', 'key working: 67 - 18 writes 5 over the crossed 6 and 17 over the crossed 7');
+    const w2 = regroupWorking({ op: '-', a: 500, b: 238 }, 4);
+    eq(`${w2.vals[1]}|${w2.vals[2]}|${w2.vals[3]}`, '4|9|10', 'key working: 500 - 238 regroups through the 0 (4, 9, 10)');
+    eq(regroupWorking({ op: '-', a: 58, b: 23 }, 3).vals.filter(Boolean).length, 0, 'key working: no regroup, nothing written');
+    const w3 = regroupWorking({ op: '+', operands: [58, 37, 45, 65] }, 4);
+    eq(`${w3.vals[1] || ''}|${w3.vals[2] || ''}`, '2|2', 'key working: 58 + 37 + 45 + 65 carries 2 and 2');
+    const k = cellAnswerKey({ cell: { template: 'stack', payload: { a: 67, b: 18, op: '-', check: true } } });
+    eq(`${k.slots['check-ans'].value}|${k.slots['check-sum'].value}|${k.slots['regroup-2'].value}`, '49|67|17', 'stack key: the Check line and the regroup box are filled');
+    // The lesson's second example: never the example's own numbers turned round.
+    const fq = (a, b) => ({ q: { a, b, op: '+', text: `${a} + ${b} = ?`, cell: { template: 'fact', payload: { a, b, op: '+' } } }, template: 'fact' });
+    ok(L.CASE_TESTS.bigSecond(fq(2, 5)) && !L.CASE_TESTS.bigSecond(fq(5, 2)), 'lesson: the big-number-second case');
+    // Lessons r2: the three rounding cases (up, down, ends in 5), for the chart and the Guided set.
+    const rq = (n) => ({ q: { text: `Round ${n} to the nearest 10.`, cell: { template: 'pv', payload: { kind: 'round', n, place: 10 } } }, template: 'pv' });
+    eq([77, 42, 35, 71, 50].map((n) => ['roundUp', 'roundDown', 'endsFive'].filter((t) => L.CASE_TESTS[t](rq(n))).join('+') || '-').join(' '),
+        'roundUp roundDown endsFive - -', 'lesson: 77 rounds up, 42 down, 35 ends in 5; 71 and 50 are none of the three');
+    const pool = [77, 42, 35, 86, 23, 65].map(rq);
+    const data = { second: { test: 'roundDown' }, third: { test: 'endsFive' }, guided: ['roundUp', 'roundDown', 'endsFive'] };
+    const ex2 = L.pickSecond(pool, pool[0], data);
+    const ex3 = L.pickSecond(pool, pool[0], data, 'third', [ex2]);
+    ok(L.CASE_TESTS.roundDown(ex2) && L.CASE_TESTS.endsFive(ex3) && ex2 !== ex3, 'lesson: the chart\'s second and third examples are the other two cases');
+    const gd = L.pickWeDo(pool.filter((x) => x !== ex2 && x !== ex3), pool[0], data, 3);
+    eq(gd.map((x) => ['roundUp', 'roundDown', 'endsFive'].find((t) => L.CASE_TESTS[t](x))).join(','), 'roundUp,roundDown,endsFive', 'lesson: the rounding Guided set is up, down, ends in 5');
+    // The Guided tens boxes are writing places: as tall as the answer strip (12 mm at L).
+    const box = /<rect[^>]*height="([\d.]+)"/.exec(L.roundLineSvg({ lo: 40, hi: 50, n: 47, r: 50, lineMm: 34, boxHmm: 12, boxDigits: 3, emptyTens: true }));
+    eq(box && Number(box[1]), 12, 'lesson: a Guided tens box is 12 mm tall at L');
+    // VA-4 / AK-1: the open answer zone is a real row, so the pupil page and the key share one layout.
+    ok(/class="ansrow"/.test(stack('67', '18', '-', { answer: 'open' })) && /class="an"/.test(stack('67', '18', '-', { answer: 'solid', ans: 49 })),
+        'stack: the open answer row is reserved on the pupil page; the key writes into a row of the same height');
+    const chk = renderCell({ cell: { template: 'stack', payload: { a: 67, b: 18, op: '-', check: true } } }, resolveCtx({ mode: 'print', size: 'L', state: 'blank' }));
+    ok(/ws-checkrow"><b>Check:<\/b><span class="ws-checkeq">/.test(chk), 'stack: the Check sum is one group (it wraps under "Check:" in a narrow cell)');
+    // Lessons r3: the subtract chart's one-place take-away from a 0 in the ones, the 90s -> 100.
+    const sq = (a, b) => ({ q: { a, b, op: '-', text: `${a} − ${b} = ?`, cell: { template: 'stack', payload: { a, b, op: '-' } } }, template: 'stack' });
+    eq([sq(70, 8), sq(70, 23), sq(67, 9)].map((x) => L.CASE_TESTS.takeAwayZero(x)).join(','), 'true,false,false', 'lesson: 70 - 8 is the take-away-from-0-ones case; 70 - 23 and 67 - 9 are not');
+    eq([98, 95, 94, 77].map((n) => L.CASE_TESTS.toHundred(rq(n))).join(','), 'true,true,false,false', 'lesson: 98 and 95 round to 100; 94 and 77 do not');
+    // The count-on hops: the start number and one arc and number for each number counted on.
+    const hops = L.hopsSvg(7, 2, 'trace');
+    eq((hops.match(/<text/g) || []).length, 3, 'lesson: count on 2 from 7 draws 7, 8, 9');
+    ok(/>7<\/text>/.test(hops) && />9<\/text>/.test(hops) && (hops.match(/data-ws-ink="trace"/g) || []).length === 2, 'lesson: the counted numbers are grey on their step, the start number black');
 }
 
 /* ======================================================================= report */

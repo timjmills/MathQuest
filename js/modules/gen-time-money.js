@@ -28,6 +28,7 @@
 // which generateQuestionFor() seeds, so a seed reprints the same page.
 
 import { state } from './state.js';
+import { dealAt, blockPermutation } from './page-deal.js';
 import { randInt, shuffle } from './utils.js';
 import { normalizeOptions } from './skill-options.js';
 import { k2Twin, fmtTime, fmtDuration, toMin, fromMin, currencyOf, unitWord, fmtMoney, amountText } from './sheet/index.js';
@@ -36,21 +37,23 @@ import { k2Twin, fmtTime, fmtDuration, toMin, fromMin, currencyOf, unitWord, fmt
 
 let _liveCursor = -1;
 let _at = 0;
-const _offsets = {};
-const _perms = {};
 function beginItem() { _at = Number.isFinite(state.itemIndex) ? state.itemIndex : ++_liveCursor; }
-/** Round-robin 0..n-1 off the page position, offset once per page so pages differ. */
+// L10 (design/audit/LESSONS_LEARNED.md): both dealers used to walk the values in turn — `deal` a
+// round-robin from a random start, `dealPerm` one permutation repeated every n items — so a page
+// read A B A B (clock_parts hands, enough_money, equiv_coin_sets), C A B C A B (the choose-a-clock
+// letter) or repeated its six durations in the same order. They now read page-deal.js: every value
+// equally often in each block of six (so a page of six still shows every ticked value), in a
+// random order from the seeded rng, reshuffled for the next block. The block is reset when a page
+// opens (generateQuestionFor, item 0).
+/** 0..n-1 at this item: balanced, random order. */
 function deal(key, n) {
     if (n <= 1) return 0;
-    const k = `${key}:${n}`;
-    if (_at === 0 || _offsets[k] === undefined) _offsets[k] = randInt(0, n - 1);
-    return (((_at + _offsets[k]) % n) + n) % n;
+    return dealAt(`tm:${key}`, n, _at);
 }
-/** A page-long permutation of 0..n-1 (shuffled at the page's first item), read at the position. */
+/** 0..n-1 at page position `at`: each value once per block of max(6, n), so no repeat inside a block when n >= 6. */
 function dealPerm(key, n, at = _at) {
-    const k = `${key}:${n}`;
-    if (_at === 0 || !_perms[k]) _perms[k] = shuffle(Array.from({ length: n }, (_, i) => i));
-    return _perms[k][((at % n) + n) % n];
+    if (n <= 1) return 0;
+    return dealAt(`tmp:${key}`, n, at);
 }
 const pos6 = () => ((_at % 6) + 6) % 6;
 /**
@@ -358,9 +361,16 @@ function elapsedItem(q, skill, { mode, durs, startStep, spanH, tickStep, support
     const k = pos6();
     let total = durs[dealPerm(`${skill}:d`, durs.length)];
     // Crossing noon (TE-9): some items start before 12 and end after it, a.m. / p.m. printed.
-    const crossNoon = noon === 'seeded' && (k === 2 || k === 5);
-    let start;
+    // Two of each six, on places no edge seed holds. L10: which two is dealt per block of six from
+    // the seeded rng; it was always the 3rd and 6th item, so a.m./p.m. ran no, no, yes down every page.
     const seed = seeds[k];
+    let crossNoon = false;
+    if (noon === 'seeded' && !seed) {
+        const free = [0, 1, 2, 3, 4, 5].filter((p) => !seeds[p]);
+        const chosen = blockPermutation(`${skill}:noon`, free.length, Math.floor(_at / 6)).slice(0, 2).map((i) => free[i]);
+        crossNoon = chosen.includes(k);
+    }
+    let start;
     if (seed) {
         total = seed.total ? seed.total : total;
         start = seed.start;
