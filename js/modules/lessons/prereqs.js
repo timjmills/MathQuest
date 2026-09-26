@@ -22,7 +22,19 @@
 //     format:   {kind, why}                             the memorable-step format chosen, and why
 //     example:  {match}                                 the worked example: a /regex/ its provider
 //                                                      steps must contain (the strategy taught)
-//     mixWith:  [{key, opts?}]                          Mixed practice partners (earlier skills)
+//     mixWith:  [{key, opts?, ...floors}]               Mixed practice partners (earlier skills)
+//
+//   THE SELF-CHECKING PART (lessons r4, design/LESSON_RULES.md - read its NEW LESSON CHECKLIST):
+//     cases:    ['bigFirst', ...]                      the cases the lesson teaches (names from
+//                                                      sheet/lesson-rules.js CASE_FAMILIES). The
+//                                                      chart must draw an example of every one (LR-1)
+//                                                      and the packet deals no other (LR-2).
+//     second / third / fourth: {test, label, ref?}     the chart's other examples, one per case the
+//                                                      worked example does not show; `ref` deals the
+//                                                      case from its own pool when it is rare
+//     caps:     {case: n}                              at most n items of a case a page (LR-7)
+//     pool floors (LR-2, LR-6): minOperand, minTop, maxTop, distinctFirst, distinctAnswer,
+//                                                      noNearTwin - applied to every part
 //   }
 //
 // Later, the full map adds `leadsTo` / `buildsOn` edges between skills and concept nodes; this
@@ -67,11 +79,12 @@ export const LESSONS = Object.freeze({
         // The chart's second example: the big number SECOND (lessons r1: the Guided and practice
         // items put it on either side, so the chart models both).
         second: { test: 'bigSecond', label: 'Big number second? Start with it.' },
-        // Lessons r3: a double (3 + 3) has no big number - the chart says what to do.
-        notes: { 0: 'Same numbers? Start with either.' },
+        // Lessons r4 (LR-1): a double (3 + 3) has no big number - the chart DRAWS one.
+        third: { test: 'double', label: 'Same numbers? Start with either.', ref: { sameOps: true, tries: 300 } },
+        cases: ['bigFirst', 'bigSecond', 'double'],
         // Lessons r2: counting on 0 is not counting on (the chart never shows it): no + 0 item.
         minOperand: 1,
-        mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'counting:count_objects', opts: { band: 10 } }],
+        mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 }, title: 'Number Bonds' }, { key: 'counting:count_objects', opts: { band: 10 } }],
     },
 
     // ---------------------------------------------- 2-digit subtraction with regrouping (2)
@@ -108,23 +121,28 @@ export const LESSONS = Object.freeze({
         // the 0 in the ones regroups and the bottom number has an empty tens place. Its own pool
         // deals the case (`ref`: print-sheet.js refAccepts), as the main pool rarely holds it.
         second: { test: 'takeAwayZero', label: '0 ones? Regroup a ten.', ref: { maxBottom: 9, zeroOnes: true, tries: 400 } },
-        // ... and the rule for an answer under 10 (36 - 29 = 7), on step 4's panel.
-        notes: { 3: '0 tens? Leave it empty.' },
+        // Lessons r4 (LR-1): an answer under 10 is DRAWN, its tens box left empty (36 - 29 = 7).
+        third: { test: 'underTen', label: 'Answer under 10? Leave the tens empty.', ref: { maxAnswer: 9, tries: 400 } },
+        cases: ['twoPlace', 'onePlace', 'zeroOnes', 'underTen'],
+        // LR-7: at most one one-place take-away and two answers under 10 a page.
+        caps: { onePlace: 1, underTen: 2 },
+        // LR-6: no near twins (51 - 44, 53 - 45) and no number taken away twice on a page.
+        noNearTwin: true,
         // The check step's words, without the step name's own "Check:" (lessons r2).
         words: [{ from: '^Check:\\s*', to: '' }],
         // Practice cells give step 5 its room: a Check line under every problem.
         checkRow: true,
         // Lessons r2: no two problems of a page share a top number.
         distinctFirst: true,
-        // Lessons r3: no two answers alike, at most one one-place take-away a page.
+        // Lessons r3: no two answers alike.
         distinctAnswer: true,
-        maxSmall: 1,
         // ... and every top number is past the teens (11 - 6 is a fact, not regrouping).
         minTop: 20,
         // Lessons r3: two places only - 100 - 47 regroups across a 0 the chart never shows.
         maxTop: 99,
         // Lessons r2: the partner is 2-digit addition (never 2 + 8 in a carry scaffold).
-        mixWith: [{ key: 'addition:add_100_regroup', minOperand: 10 }],
+        // Lessons r4: sums to 99, so the column has no empty hundreds place.
+        mixWith: [{ key: 'addition:add_100_regroup', minOperand: 10, maxAnswer: 99, ansDigits: 2 }],
     },
 
     // ------------------------------------------------- Round to the nearest 10 / 100 (3)
@@ -161,13 +179,14 @@ export const LESSONS = Object.freeze({
         third: { test: 'endsFive', label: '5 in the ones? Round up.' },
         // Lessons r3: the 90s round up to 100 (a three-digit answer), where the chart has room.
         fourth: { test: 'toHundred', label: '9 tens? Up to 100.', ref: { minN: 95, tries: 300 } },
+        cases: ['roundUp', 'roundDown', 'endsFive', 'toHundred'],
         // Guided Practice: one of each case, in this order (up, down, ends in 5).
         guided: ['roundUp', 'roundDown', 'endsFive'],
         // The provider's words, in the lesson's own terms ("the cut" is never taught here).
         words: [{ from: '^The digit after the cut is (\\d+):.*$', to: 'The ones digit is $1.' }],
         // Mixed practice: EARLIER skills only, each from its own strand (lessons r1: never nearest
         // 100, which comes after, and never two "Number Sense" sections).
-        mixWith: [{ key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }, { key: 'addition:add_100_regroup', minOperand: 10 }],
+        mixWith: [{ key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }, { key: 'addition:add_100_regroup', minOperand: 10, maxAnswer: 99, ansDigits: 2 }],
     },
 });
 
@@ -180,8 +199,9 @@ export function lessonFor(categoryId, skillId) {
 export function skillRef(entry) {
     const [categoryId, skillId] = String(entry.key || '').split(':');
     const ref = entry.opts ? { categoryId, skillId, opts: Object.assign({}, entry.opts) } : { categoryId, skillId };
-    // `minOperand` (lessons r2): the packet's floor on every operand (2-digit addition only).
-    if (entry.minOperand !== undefined) ref.minOperand = entry.minOperand;
+    // The packet's floors on a partner (lessons r2-r4: minOperand, maxAnswer, ansDigits ...):
+    // every other field travels on the ref (print-sheet.js refAccepts reads them).
+    for (const [k, v] of Object.entries(entry)) if (!['key', 'opts', 'why'].includes(k)) ref[k] = v;
     return ref;
 }
 

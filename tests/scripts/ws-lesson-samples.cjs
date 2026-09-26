@@ -3,6 +3,7 @@
 //
 //   node tests/scripts/ws-lesson-samples.cjs                       # the three samples at L and S
 //   node tests/scripts/ws-lesson-samples.cjs --sizes L --only add  # one lesson, one size
+//   node tests/scripts/ws-lesson-samples.cjs --seed 1001           # another seed (default 4242)
 //   node tests/scripts/ws-lesson-samples.cjs --copy                # also copy the PNGs for the owner
 //                                                                  # to design/lesson-samples/<skill>/
 //
@@ -22,6 +23,7 @@ const ONLY = arg('only', '');
 const OUT = path.resolve(ROOT, arg('out', 'tests/audit-runs/lessons'));
 const DPI = parseInt(arg('dpi', '110'), 10);
 const PRACTICE = parseInt(arg('pages', '1'), 10);
+const SEED = parseInt(arg('seed', '4242'), 10) >>> 0;
 
 /** The three samples the owner asked for (2026-09-25), with the options that make each one. */
 const LESSONS = [
@@ -124,9 +126,9 @@ async function printDoc(page, html, pdfPath) {
             const dir = path.join(OUT, l.dir, size);
             fs.rmSync(dir, { recursive: true, force: true });
             fs.mkdirSync(dir, { recursive: true });
-            const built = await page.evaluate(async ({ skill, size, PRACTICE }) => {
+            const built = await page.evaluate(async ({ skill, size, PRACTICE, SEED }) => {
                 try {
-                    const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: 4242, key: true, practicePages: PRACTICE, mixed: true });
+                    const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: SEED, key: true, practicePages: PRACTICE, mixed: true });
                     return {
                         pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }),
                         key: window.sheetDocument(r.keyHtml, `${r.title} - Answer Key`, { paper: 'A4' }),
@@ -135,7 +137,7 @@ async function printDoc(page, html, pdfPath) {
                         items: r.items.map((it) => ({ part: it.part, pool: it.pool, template: it.template, text: String(it.text).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 60), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans) })),
                     };
                 } catch (e) { return { error: (e && e.stack) || String(e) }; }
-            }, { skill: l.skill, size, PRACTICE });
+            }, { skill: l.skill, size, PRACTICE, SEED });
             if (built.error) { console.log(`${l.dir} ${size}: ERROR ${built.error}`); summary.push({ lesson: l.dir, size, error: built.error }); continue; }
             const pdfP = path.join(dir, 'pupil.pdf');
             const pdfK = path.join(dir, 'key.pdf');

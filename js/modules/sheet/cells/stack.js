@@ -7,7 +7,7 @@
 // Pure module (SCC-01). A template draws inner HTML only (SCC-T5) and never chooses a type
 // size, a line weight or a grey (SCC-T3).
 
-import { opGlyph, trackMm, SIZES, factTab, stripPos } from '../tokens.js';
+import { opGlyph, trackMm, SIZES, factTab, stripPos, atLeastSize, resolveCtx } from '../tokens.js';
 import { blank, esc } from '../cell.js';
 import { register } from '../registry.js';
 import { stepMarks, placeDigits, regroupMarks, PLACE_OFFSET } from '../steps.js';
@@ -282,8 +282,30 @@ const unknownSlotSpec = (u) => ({
     maxLength: 1, inputmode: 'numeric', scopes: ['full', 'answer-only'],
 });
 
-register('stack', {
+/**
+ * LR-16 (owner ruling 2026-09-26): the stack's minimum size. A regroup strip, its two-digit ones
+ * box and the Check line cannot be written in at S: a stack with its regroup scaffold draws at M
+ * at least, on any page (the page stays at its own size; the paginator packs around the item).
+ * Print only - a screen draws to its own scale.
+ */
+export function stackMinSize(p, ctx) {
+    if (ctx && ctx.mode === 'screen') return null;
+    return scaffoldOf(p, ctx || {}).regroup ? 'M' : null;
+}
+/** The context an item is drawn in after its floor, or null when the floor does not apply. */
+function floorCtx(p, ctx) {
+    if (!ctx || !ctx.size) return null;
+    const eff = atLeastSize(ctx.size, stackMinSize(p, ctx));
+    return eff === ctx.size ? null : resolveCtx(Object.assign({}, ctx, { size: eff, metrics: undefined }));
+}
+/** The floor's wrapper: the bigger size's tokens for this item alone (no box of its own). */
+const floorWrap = (fc, html) => `<div class="ws-${fc.size} ws-sizefloor" data-ws-floor="${fc.size}" style="display:contents">${html}</div>`;
+
+const stackTpl = {
+    minSize(p, ctx) { return stackMinSize(p, ctx); },
     render(p, ctx) {
+        const fc = floorCtx(p, ctx);
+        if (fc) return floorWrap(fc, stackTpl.render(p, fc));
         const a = topsOf(p), b = bottomOf(p);
         const value = p.ans !== undefined ? p.ans : compute(p);
         // The scaffold ladder (section 2.5) decides what is drawn, never the generator (SCC-Q10).
@@ -376,6 +398,8 @@ register('stack', {
         return { value, display, slots };
     },
     footprint(p, ctx) {
+        const fc = floorCtx(p, ctx);
+        if (fc) return Object.assign(stackTpl.footprint(p, fc), { minSize: fc.size });
         const t = tracksOf(p);
         const s = SIZES[ctx.size];
         const regroup = p.regroup !== undefined ? !!p.regroup : ctx.scaffoldLevel >= 1;
@@ -422,6 +446,8 @@ register('stack', {
      * grey, the earlier ones black. Same geometry as every other state of the cell (SCC-T10).
      */
     stepState(p, steps, k, ctx) {
+        const fc = floorCtx(p, ctx);
+        if (fc) return floorWrap(fc, stackTpl.stepState(p, steps, k, fc));
         const a = topsOf(p), b = bottomOf(p);
         const { heads, regroup } = scaffoldOf(p, ctx);
         const level = ctx && ctx.scaffoldLevel !== undefined ? ctx.scaffoldLevel : 1;
@@ -459,7 +485,8 @@ register('stack', {
             unknown: p.unknown || null,
         });
     },
-});
+};
+register('stack', stackTpl);
 
 /** The tab step a stacked section asks for at this digit size (CL-31). */
 export const stackTabStep = (digitPt) => factTab(digitPt);

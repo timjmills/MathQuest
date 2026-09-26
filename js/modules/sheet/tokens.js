@@ -125,6 +125,15 @@ export const SIZES = Object.freeze({
     }),
 });
 export const SIZE_IDS = Object.freeze(['S', 'M', 'L']);
+
+/**
+ * THE SIZE FLOOR (owner ruling 2026-09-26, design/LESSON_RULES.md LR-16): an item that cannot be
+ * drawn at the chosen size keeps its minimum needed size (a template's `minSize`, e.g. the regroup
+ * stack at M); the page packs the other items around it and is never forced up a size.
+ */
+export const SIZE_RANK = Object.freeze({ S: 0, M: 1, L: 2 });
+/** `size`, or `min` when `min` is bigger (the size an item with that floor is drawn at). */
+export const atLeastSize = (size, min) => (min && SIZE_RANK[min] !== undefined && SIZE_RANK[min] > (SIZE_RANK[size] ?? 2) ? min : size);
 export const DEFAULT_SIZE = 'L';
 
 /* --------------------------------------------------------- the two looks (section 1.2) */
@@ -380,7 +389,7 @@ export function metricsFor(size = DEFAULT_SIZE, look = DEFAULT_LOOK, { factColum
 
 export default {
     INK, STROKE, STROKE_WIDTHS, DASH, HATCH, PAPER, DEFAULT_PAPER, PAGE_CHROME,
-    SIZES, SIZE_IDS, DEFAULT_SIZE, LOOKS, LOOK_IDS, DEFAULT_LOOK,
+    SIZES, SIZE_IDS, DEFAULT_SIZE, SIZE_RANK, atLeastSize, LOOKS, LOOK_IDS, DEFAULT_LOOK,
     FACT_TRACK_EM, FACT_TRACKS, MINUS, TIMES, DIV, opGlyph,
     EM_MM, trackMm, trackEmFor, trackFloorMm, SEPARATOR_EM,
     FACT_LADDER, FACT_AUTO_COLS, FACT_PROBE_COLS, FACT_PROBE_XL_PT, FACT_CELL_H_MM, factDigitPt, factCellHMm,

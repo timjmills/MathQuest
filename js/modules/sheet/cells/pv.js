@@ -676,7 +676,12 @@ register('pv', {
         if (p.kind === 'word-choice' && wide) {
             return { wMm: 186, hMm: { S: 62, M: 70, L: 80 }[ctx.size] || 80, measure: false, factLike: false, maxCols: 1 };
         }
-        return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2 };
+        // LESSONS_LEARNED L1 (Size S ignored; lessons r5, LESSON_RULES.md LR-16): at S a rounding
+        // item on one line ("54 -> ___") is measured up to four across - two across left it in a
+        // 92 mm cell with a third of the cell empty beside it. (Not a word choice: "ones tens
+        // hundreds" wraps at three across.) M and L keep their two.
+        const oneLine = p.kind === 'round' && ctx.size === 'S';
+        return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : oneLine ? 4 : 2 };
     },
     inputs() { return [{ id: 'answer', kind: 'number', shape: 'line', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },
     layout(p) {

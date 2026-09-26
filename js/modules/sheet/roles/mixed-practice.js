@@ -27,6 +27,7 @@ import {
 } from './compose.js';
 import { skillWords } from './practice.js';
 import { anchorPlanItem, anchorHeightMm } from '../anchors.js';
+import { SIZE_RANK } from '../tokens.js';
 
 export const ROLE_ID = 'mixed-practice';
 export const DEFAULT_LOOK = 'daily';
@@ -46,16 +47,50 @@ const divisorsDesc = (n) => Array.from({ length: n }, (_, i) => n - i).filter((d
  */
 const stripMmOf = (input) => (input.stepStrip && Number(input.stepStripMm) > 0 ? Number(input.stepStripMm) : 0);
 
-/** Shelves: for each pool {id, k, h}, then how many shelves each gets. */
+/**
+ * Shelves on the page's lattice. The lattice is the look's Auto N, or the host's `latticeN`.
+ *
+ * LR-16 (owner ruling 2026-09-26, design/LESSON_RULES.md): a page that holds an item drawn above
+ * the page size (its template's `minSize` floor - the regroup stack at M on an S page) may take a
+ * coarser lattice when that packs MORE problems: the floored stack fits three across but not four,
+ * so an S page on 8 units put it two across in 92 mm cells (a 38 % empty band, and fewer problems
+ * than the M page). The lattice with the fewest WIDE shelves wins, then the one with the most
+ * problems. Pages without a floored item keep their Auto N.
+ */
 function packing(poolsIn, input) {
+    const ctx = ctxOf(input, DEFAULT_LOOK);
+    const fixed = [4, 6, 8, 10].includes(Number(input.latticeN)) ? Number(input.latticeN) : 0;
+    const auto = AUTO_N[ctx.look][ctx.size];
+    if (fixed) return packingAt(poolsIn, input, fixed);
+    const floored = Object.values(poolsIn).some((its) => (its || []).some((it) => {
+        const min = it && it.footprint && it.footprint.minSize;
+        return min && SIZE_RANK[min] > (SIZE_RANK[ctx.size] ?? 2);
+    }));
+    if (!floored) return packingAt(poolsIn, input, auto);
+    // A shelf is WIDE when its cells are half as wide again as its items need (k / kfit < 0.7:
+    // two across where three fit - a third of each cell empty beside the drawing, H13). Fewest
+    // wide shelves first, then the most problems, then the Auto N.
+    const kfit = {};
+    for (const [id, its] of Object.entries(poolsIn)) if ((its || []).length) kfit[id] = [6, 5, 4, 3, 2, 1].find((c) => fitsAt(its, c, ctx)) || 1;
+    let best = null;
+    for (const N of [auto, ...[10, 8, 6, 4].filter((x) => x < auto)]) {
+        const p = packingAt(poolsIn, input, N);
+        const tot = p.ids.reduce((a, id) => a + p.shelf[id].n * p.shelf[id].per, 0);
+        const wide = p.ids.filter((id) => !p.shelf[id].pairs && p.shelf[id].k / (kfit[id] || 1) < 0.7).length;
+        if (!best || wide < best.wide || (wide === best.wide && tot > best.tot)) best = { p, tot, wide };
+    }
+    return best.p;
+}
+
+/** Shelves: for each pool {id, k, h}, then how many shelves each gets, on an N-unit lattice. */
+function packingAt(poolsIn, input, N) {
     const ctx = ctxOf(input, DEFAULT_LOOK);
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Mixed 1', title: 'Mixed practice', twoLine: true, score: 1 });
     const m0 = bandMetrics(ctx, layoutHeader(frame.header));
     const m = Object.assign({}, m0, { budget: m0.budget - stripMmOf(input) });
     const mCont = bandMetrics(ctx, layoutHeader(frame.header), { cont: true });
-    // A lesson packet's Mixed page keeps the L lattice (6) at M: a 3-across shelf of stacks, never
-    // 2 half-empty cells (lessons r1, H13 width).
-    const N = [4, 6, 8, 10].includes(Number(input.latticeN)) ? Number(input.latticeN) : AUTO_N[ctx.look][ctx.size];
+    // (A lesson packet's Mixed page keeps the L lattice (6) at M: a 3-across shelf of stacks, never
+    // 2 half-empty cells - lessons r1, H13 width - through `latticeN`.)
     const ids = Object.keys(poolsIn).filter((id) => (poolsIn[id] || []).length);
     const shelf = {};
     const A = input.anchors && input.anchors.byPool ? input.anchors : null;
@@ -175,7 +210,16 @@ export function plan(input = {}) {
     const spare = p.pages > 1 ? 0 : Math.max(0, m.budget - used - (input.fill ? 1 : 0));
     // The spare height is shared into the shelves only as far as a cell keeps its drawing filling
     // it (H13: never an empty band of 30% of a cell): a tenth of a shelf's own height at most.
-    const growOf = (sh) => (shelves.length ? (input.fill ? Math.min(sh.h * 0.35, spare / shelves.length) : Math.min(12, sh.h * 0.1, spare / shelves.length)) : 0);
+    // (Lessons r4: a short row - a fact row, under 50 mm - grows by an eighth of its height at most,
+    // sized to its content (0.35 left 27 % bands round a fact); a tall column row a fifth.)
+    const tallShelves = shelves.filter((sh) => sh.h >= 50).length;
+    const growOf = (sh) => {
+        if (!shelves.length) return 0;
+        if (!input.fill) return Math.min(12, sh.h * 0.1, spare / shelves.length);
+        if (sh.h < 50) return Math.min(sh.h * 0.12, spare / shelves.length);
+        const shortTake = shelves.filter((x) => x.h < 50).reduce((a, x) => a + Math.min(x.h * 0.12, spare / shelves.length), 0);
+        return Math.min(sh.h * 0.2, (spare - shortTake) / Math.max(1, tallShelves));
+    };
     for (const [i, sh] of shelves.entries()) {
         const grow = growOf(sh);
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
@@ -191,7 +235,8 @@ export function plan(input = {}) {
         }
         const first = sh.items.find((it) => !it.anchor);
         const skill = (input.skills || []).find((s) => first && first.q && s.skillId === first.q.skillId) || {};
-        const title = STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';
+        const poolTitle = ((input.pools || []).find((pl) => pl.id === sh.id) || {}).title;
+        const title = poolTitle || STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';
         const pupil = sh.items.filter((it) => !it.anchor);
         const grid = gridPart(sh.items.map((it) => (it.anchor ? anchorPlanItem(it, Math.min(sh.k, 6)) : planItem(it, { cols: Math.min(sh.k, 6) }))), { cols: sh.k, rows: 1, cellH: sh.h + grow, labels, start });
         if (joins) {

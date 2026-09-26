@@ -20,7 +20,7 @@
 // window.openSkillOptionsPanel(categoryId, skillId, anchorEl, {opts, onChange}) when installed;
 // the chosen `opts` go straight into the buildSheet request (skills[].opts).
 
-import { buildSheet, sheetDocument, LESSON_SIZE_NOTE } from './print-sheet.js';
+import { buildSheet, sheetDocument, LESSON_SIZE_WHY } from './print-sheet.js';
 import {
     icon, esc, toast, skillCatalogue, findSkill, levelText, currentSet, savedSets, printDefaults,
     optionsSummary, optionsReadOnlyHTML, readStore, writeStore, PRINTS_KEY, fmtDay,
@@ -631,6 +631,21 @@ function check(key, label) {
     return `<button type="button" class="tv-check" role="checkbox" aria-checked="${on}" data-act="header" data-v="${key}"><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span><span>${label}</span></button>`;
 }
 
+/**
+ * The Size control (owner ruling 2026-09-26, LESSON_RULES.md LR-10): a lesson prints at one size,
+ * so a set of lessons offers no size; the reason is a REQUIRED tip - always shown, never dismissed.
+ * With other page types in the set the control stays for them, and the tip says the lessons keep
+ * their size.
+ */
+function sizeSetupHTML() {
+    const lessons = pr.sections.filter((x) => x.role === 'lesson').length;
+    const tip = `<p class="tv-cap tv-tip-required" id="tvSizeLesson" role="note" data-tip-required="1" style="margin-top:6px;">${icon('info', 14)} ${esc(LESSON_SIZE_WHY)}</p>`;
+    if (lessons && lessons === pr.sections.length) {
+        return `<div><span class="tv-label">Size</span><p class="tv-cap" aria-describedby="tvSizeLesson" style="margin:0;"><b>Large</b> (a lesson prints at one size)</p>${tip}</div>`;
+    }
+    return `<div><span class="tv-label">Size</span>${seg('size', pr.size, [['S', 'S', 'Small'], ['M', 'M', 'Medium'], ['L', 'L', 'Large']], 'Size')}${lessons ? tip : ''}</div>`;
+}
+
 function renderSetup() {
     const box = root.querySelector('#tvSetup');
     const pages = last ? last.pages.length : 0;
@@ -638,8 +653,7 @@ function renderSetup() {
     box.innerHTML = `
   <div style="padding:24px;display:flex;flex-direction:column;gap:16px;">
     <h2 class="tv-h2" id="tvSetupH">Page setup</h2>
-    <div><span class="tv-label">Size</span>${seg('size', pr.size, [['S', 'S', 'Small'], ['M', 'M', 'Medium'], ['L', 'L', 'Large']], 'Size')}${pr.size === 'S' && pr.sections.some((x) => x.role === 'lesson') ? `
-      <p class="tv-cap" id="tvSizeLesson" style="margin-top:6px;">A lesson prints at Medium: at Small its regroup boxes and step words are too small to write in. The other page types print at Small.</p>` : ''}</div>
+    ${sizeSetupHTML()}
     <div><span class="tv-label">Look</span>${seg('look', pr.look, [['auto', 'Auto'], ['ican', 'I Can'], ['daily', 'Daily']], 'Look')}
       <p class="tv-cap" style="margin-top:6px;">${pr.look === 'daily' ? 'Daily: a light header for everyday practice.' : 'I Can: the title states the goal. Auto uses each page type\'s own look (Daily on fact rows, fact probes and Mixed practice).'}</p></div>
     <div class="tv-fields-2">
@@ -826,7 +840,7 @@ async function runBuild() {
         }).filter(Boolean);
         // Lessons r2: a lesson asked for at S prints at M - said where the teacher sees it, not
         // only under "Why?" (the page itself carries no size marker).
-        const sized = built.parts.some((p) => (p.res.notes || []).includes(LESSON_SIZE_NOTE)) ? [LESSON_SIZE_NOTE] : [];
+        const sized = [];
         const warn = short.concat(sized);
         root.querySelector('#tvFits').innerHTML = `<span class="tv-fits-line">${plain.map(esc).join('<br>')}</span>${details.length ? `<details class="tv-fits-why"><summary>Why?</summary><ul>${details.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></details>` : ''}${warn.length ? `<span class="tv-fits-warn" data-tv-warn="${sized.length ? 'lesson-size' : 'short'}">${icon('info', 16)}<span>${esc(warn.join(' '))}</span></span>` : ''}`;
         renderTabs(); renderSetup(); showPreview();

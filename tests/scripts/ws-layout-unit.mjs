@@ -33,7 +33,8 @@ import {
 import { ROLE_IDS, ROLE_MODULES, ROLE_ALIASES } from '../../js/modules/sheet/roles/index.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, getProvider } from '../../js/modules/sheet/index.js';
 import { stack, regroupWorking } from '../../js/modules/sheet/cells/stack.js';
-import { SLOT, SIZES as KIT_SIZES, slotRadiusMm, stripSegStyle, stripPos } from '../../js/modules/sheet/tokens.js';
+import * as LR from '../../js/modules/sheet/lesson-rules.js';
+import { SLOT, SIZES as KIT_SIZES, slotRadiusMm, stripSegStyle, stripPos, atLeastSize } from '../../js/modules/sheet/tokens.js';
 
 let pass = 0;
 const fails = [];
@@ -1050,6 +1051,36 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     const hops = L.hopsSvg(7, 2, 'trace');
     eq((hops.match(/<text/g) || []).length, 3, 'lesson: count on 2 from 7 draws 7, 8, 9');
     ok(/>7<\/text>/.test(hops) && />9<\/text>/.test(hops) && (hops.match(/data-ws-ink="trace"/g) || []).length === 2, 'lesson: the counted numbers are grey on their step, the start number black');
+    // THE LESSON RULES (design/LESSON_RULES.md, sheet/lesson-rules.js).
+    eq(LR.itemKey('9 + 1 = ?', '10'), LR.itemKey('1 + 9 = ?', '10'), 'LR-5: a turnaround is the same item');
+    ok(LR.itemKey('Which place?', 'tens', 78) !== LR.itemKey('Which place?', 'tens', 42), 'LR-5: a place-value item is keyed by its number');
+    ok(LR.nearTwins([51, 44], [53, 45]) && LR.nearTwins([27, 19], [77, 19]) && !LR.nearTwins([52, 39], [70, 23]), 'LR-6: near twins');
+    eq(LR.casesOf({ text: '36 − 29 = ?', ops: [36, 29] }).join(','), 'twoPlace,underTen', 'LR-1: 36 - 29 is a two-place take-away with an answer under 10');
+    eq(LR.casesOf({ text: '60 − 3 = ?', ops: [60, 3] }).join(','), 'onePlace,zeroOnes', 'LR-1: 60 - 3 is one-place, 0 in the ones');
+    eq(LR.casesOf({ kind: 'round', n: 98, place: 10, text: 'Round 98' }).join(','), 'roundUp,toHundred', 'LR-1: 98 rounds up to 100');
+    const pk = (part, text, ops, ans) => ({ part, skill: 'subtraction:sub_100_regroup', text, ops, ans });
+    const V = LR.packetViolations({
+        lesson: { skill: 'subtraction:sub_100_regroup', cases: ['twoPlace', 'onePlace', 'zeroOnes', 'underTen'], caps: { onePlace: 1, underTen: 2 } },
+        placed: [pk('chart', '52 − 39 = ?', [52, 39], '13'), pk('practice', '52 − 39 = ?', [52, 39], '13'), pk('practice', '62 − 59 = ?', [62, 59], '3'),
+            pk('practice', '64 − 59 = ?', [64, 59], '5'), pk('practice', '31 − 25 = ?', [31, 25], '6'), pk('practice', '100 − 47 = ?', [100, 47], '53')],
+        chartCases: ['twoPlace'],
+    }).map((v) => v.rule);
+    ok(['LR-1', 'LR-2', 'LR-5', 'LR-6', 'LR-7'].every((r) => V.includes(r)), `LR: a packet breaking five rules is caught (${[...new Set(V)].join(', ')})`);
+    // LR-10: the packet prints at its one size, whatever was asked.
+    eq(LR.packetViolations({ lesson: { cases: [] }, placed: [], sizePrinted: 'M', packetSize: 'L' }).map((v) => v.rule).join(','), 'LR-10', 'LR-10: a packet printed off its one size fails');
+    eq(LR.packetViolations({ lesson: { cases: [] }, placed: [], sizePrinted: 'L', packetSize: 'L' }).length, 0, 'LR-10: a packet at its size passes');
+    // LR-16 (owner ruling 2026-09-26): an item keeps its template's floor; the page keeps its size.
+    eq([atLeastSize('S', 'M'), atLeastSize('M', 'M'), atLeastSize('L', 'M'), atLeastSize('S', null)].join(','), 'M,M,L,S', 'LR-16: atLeastSize lifts only below the floor');
+    const rg = { cell: { template: 'stack', payload: { a: 67, b: 18, op: '-' } } };
+    const plain = { cell: { template: 'stack', payload: { a: 67, b: 18, op: '-', regroup: false } } };
+    const at = (q, size, mode = 'print') => resolveCtx({ mode, size, state: 'blank' });
+    ok(/data-ws-floor="M"/.test(renderCell(rg, at(rg, 'S'))), 'LR-16: a regroup stack at S is drawn at its M floor');
+    ok(!/data-ws-floor/.test(renderCell(rg, at(rg, 'L'))) && !/data-ws-floor/.test(renderCell(rg, at(rg, 'M'))), 'LR-16: at M and L the regroup stack is drawn at the page size');
+    ok(!/data-ws-floor/.test(renderCell(plain, at(plain, 'S'))), 'LR-16: a stack with no regroup boxes follows S');
+    ok(!/data-ws-floor/.test(renderCell(rg, at(rg, 'S', 'screen'))), 'LR-16: the floor is a print rule (screen cells size themselves)');
+    const fS = cellFootprint(rg, at(rg, 'S')), fM = cellFootprint(rg, at(rg, 'M')), fP = cellFootprint(plain, at(plain, 'S'));
+    eq(fS.minSize, 'M', 'LR-16: the regroup stack declares minSize M in its footprint');
+    ok(Math.abs(fS.hMm - fM.hMm) < 0.01 && fP.hMm < fS.hMm, `LR-16: the floored item takes its M footprint (${fS.hMm.toFixed(1)} = ${fM.hMm.toFixed(1)} mm; plain S ${fP.hMm.toFixed(1)} mm)`);
 }
 
 /* ======================================================================= report */

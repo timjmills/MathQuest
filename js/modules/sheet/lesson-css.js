@@ -56,6 +56,9 @@ ${ICON_CSS}
 :is(.ws-page,.ws-sheet) .mq-cstate-col>.mq-cwords{text-align:center}
 :is(.ws-page,.ws-sheet) .mq-cwords>.mq-cnote{font-weight:700}
 :is(.ws-page,.ws-sheet) .mq-hopwrap{display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-cchant>span{border-radius:0}
+:is(.ws-page,.ws-sheet) .mq-ctail>.mq-chead{justify-content:center}
+:is(.ws-page,.ws-sheet) .mq-cdraw .mq-lround-top .ws-line{font-size:.8em;font-weight:400;line-height:1}
 :is(.ws-page,.ws-sheet) .mq-chops>.mq-hops{margin:0!important}
 :is(.ws-page,.ws-sheet) :is(.mq-cfinal-h,.mq-cnote,.mq-cstate-n .mq-chead>b){text-wrap:balance}
 :is(.ws-page,.ws-sheet) .mq-cstate-n{gap:2mm}

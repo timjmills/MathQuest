@@ -106,6 +106,18 @@ Lessons r3 (critic 38/48, fixes in round 4):
 - Guided never repeats the number added or taken away. Rounding practice is 15 at every size, at L
   type. Place-value pairs vary their asked place with the page seed (gen-pv.js, L10).
 - The print panel counts the problems the pupil does, not the items dealt.
+
+Lessons r4 (critic 48/48 at seed 4242; seed 1001 failed one page) - round 5, and the rules:
+- Every past critic finding is now a numbered rule in `design/LESSON_RULES.md` (with a NEW LESSON
+  CHECKLIST), enforced by the engine and checked by `tests/scripts/ws-lesson-check.cjs` (25 seeds x L, S,
+  items + rendered layout) before any critic round. A lesson declares its `cases`; the chart must draw
+  every one (subtract now draws 36 - 29 = 7 with its tens box empty; add draws a double) and the packet
+  may deal no other. One avoid set covers the whole packet (`sheet/lesson-rules.js` itemKey); caps,
+  near twins and the Mixed share are per page. `buildSheet` returns `lesson.check` for every lesson.
+- Owner ruling 2026-09-26 on sizes: the packet prints at ONE size (L); the print panel shows no Size
+  for a set of lessons and a required tip says why. Printed on their own, Practice and Mixed pages
+  honour S / M / L, each item at its template's `minSize` at least (the regroup stack keeps M), the
+  page packing the rest around it (LR-16).
 Every sheet's teacher footer carries the tags: skill id, grade, primary CCSS, EEs (`standards.js`).
 The per-lesson data (prerequisite skills, concepts, vocabulary with pictures, the steps with their
 icons, the chant and why) lives in `js/modules/lessons/prereqs.js`, shaped to grow into the
