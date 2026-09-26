@@ -2651,14 +2651,19 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
             if (mappedSkill === 'nl_sub') {
                 const maxVal = Math.max(10, Math.min(range, 100));
-                const a = rng(3, maxVal);
+                // Backlog (critic EA r5): "16 − [6] = 10" and "16 − 6 = [11]" on one page. The start
+                // is dealt from the page dealer over every start the band allows, so a page never
+                // repeats a start (a block holds each start once); the jump back is its own draw.
+                const _nlStarts = Array.from({ length: maxVal - 2 }, (_, i) => i + 3);
+                const a = dealPick(`nl_sub:start:${maxVal}`, _nlStarts);
                 const b = rng(1, Math.min(10, a - 1));
                 const diff = a - b;
-                // LRU rotation across 3 sub-types (was Math.random() chain).
-                const _nlU = { answer: 'find_diff', first: 'find_min', second: 'find_sub' }[_opt('unknown')];
-                const roll = _nlU || ((typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('nl_sub', ["find_diff","find_sub","find_min"], [4,1,1])
-                    : (Math.random() < 0.5 ? 'find_diff' : (Math.random() < 0.5 ? 'find_sub' : 'find_min')));
+                // Backlog (critic EA r5): the default is "where it lands" on every item (a
+                // missing-change item does not belong on the hop-back page); the start or the jump
+                // is a teacher's choice, and Mixed deals the three at random (L10, page-deal.js).
+                const _nlOpt = _opt('unknown');
+                const _nlU = { answer: 'find_diff', first: 'find_min', second: 'find_sub' }[_nlOpt];
+                const roll = _nlU || dealPick(`nl_sub:unknown`, ['find_diff', 'find_sub', 'find_min'], [2, 1, 1]);
                 q._variant = roll;
                 _nlKitItem(q, { a, b, op: '-', unknown: roll === 'find_sub' ? 'b' : roll === 'find_min' ? 'a' : 'result', range });
                 q.hint = roll === 'find_diff' ? `Start at ${a}. Hop back ${b} times, one number each hop. Where do you land?`

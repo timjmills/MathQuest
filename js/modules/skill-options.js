@@ -998,7 +998,9 @@ const P11_OPS_OPTIONS = {
 
     // --- the number lines: which number is missing ---------------------------------------------
     'addition:nl_add': [_opsUnknown('mixed', { answer: 'Where it lands (7 + 5 = __)', first: 'The start (__ + 5 = 12)', second: 'The jump (7 + __ = 12)' })],
-    'subtraction:nl_sub': [_opsUnknown('mixed', { answer: 'Where it lands (12 − 5 = __)', first: 'The start (__ − 5 = 7)', second: 'The jump back (12 − __ = 7)' })],
+    // Backlog (critic EA r5): the stand-alone nl_sub page asks where the hops land; the start and
+    // the jump back are the teacher's next steps (P-1).
+    'subtraction:nl_sub': [_opsUnknown('answer', { answer: 'Where it lands (12 − 5 = __)', first: 'The start (__ − 5 = 7)', second: 'The jump back (12 − __ = 7)' })],
 
     // --- add_three: the sum and the dot groups -------------------------------------------------
     'addition:add_three': [_opsBand([10, 20], 20, { label: 'Sum to', help: 'The largest total of the three numbers.' }),

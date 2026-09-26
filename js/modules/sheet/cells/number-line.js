@@ -154,7 +154,9 @@ register('number-line', {
     footprint(p, ctx) {
         const g = geo(ctx);
         const line = lineSVG(g, p, null, null);
-        return { wMm: Math.ceil(line.wMm + 6), hMm: Math.ceil(line.hMm + g.stripMm + 6), measure: true, factLike: false, maxCols: 1 };
+        // denseRoom 1.05 (L1, backlog 2026-09-26): the measured cell already holds the hop space above
+        // the line, the numerals and the equation, so a page at S packs a sixth line where L keeps five.
+        return { wMm: Math.ceil(line.wMm + 6), hMm: Math.ceil(line.hMm + g.stripMm + 6), measure: true, factLike: false, maxCols: 1, denseRoom: 1.05 };
     },
     inputs() {
         return [{ id: 'answer', kind: 'number', shape: 'box', graded: true, order: 0, inputmode: 'numeric', scopes: ['full', 'answer-only'] }];
