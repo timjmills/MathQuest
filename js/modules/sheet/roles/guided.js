@@ -48,10 +48,13 @@ const ordered = (items0, cols) => {
     // Regrade 5 (tally_chart: page 1 held the Model alone, a 184 mm chart): of those, the Model is
     // the SHORTEST (measured at this column count), so the Model and its tries share page 1.
     const hOf = (it) => { const m = it && it.measured && it.measured[cols]; return m && Number.isFinite(m.hMm) ? m.hMm : Infinity; };
-    let k = -1;
+    // Only a clearly shorter one (under 85% of the first's height) displaces the first: near
+    // heights keep the deal's order, so the page counts() planned is the page printed.
+    const first = items0.findIndex((it) => !(it && it.q && it.q.missing));
+    let k = first;
     items0.forEach((it, i) => {
-        if (it && it.q && it.q.missing) return;
-        if (k < 0 || hOf(it) < hOf(items0[k]) - 0.5) k = i;
+        if (first < 0 || (it && it.q && it.q.missing)) return;
+        if (hOf(it) < 0.85 * hOf(items0[first]) && hOf(it) < hOf(items0[k])) k = i;
     });
     const items = k > 0 ? [items0[k], ...items0.slice(0, k), ...items0.slice(k + 1)] : items0;
     return items.length > 2 ? [items[0], ...groupByHeight(items.slice(1), cols)] : items;
@@ -155,7 +158,16 @@ export function counts(pools, input) {
     input.guidedKind = kind;
     input.guidedCols = cols;
     const cut = items.length < all.length;
-    const total = sheetFit(ordered(items, cols), cols, ctx, input, cut ? items.length : Infinity).total;
+    let total = sheetFit(ordered(items, cols), cols, ctx, input, cut ? items.length : Infinity).total;
+    // The plan sees only the items dealt (the first `total`), so it may choose another Model (the
+    // shortest of THOSE) and hold fewer (teen_compose at L: Model + 3 planned on the probe, Model
+    // + 2 printed). Settle on a count the dealt items themselves fill.
+    for (let k = 0; k < 4; k++) {
+        const sub = items.slice(0, total);
+        const t2 = Math.min(total, sheetFit(ordered(sub, cols), cols, ctx, input, sub.length).total);
+        if (t2 === total) break;
+        total = t2;
+    }
     if (items.length === all.length) return { main: total };
     // The deal is a prefix of the probe: take it up to the total-th kept item.
     const last = items[Math.min(total, items.length) - 1];
