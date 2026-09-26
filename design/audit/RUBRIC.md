@@ -1,5 +1,9 @@
 # Skill Quality Rubric — print and screen, 1 to 10
 
+> **Scope note (owner ruling 2026-09-26):** the error-analysis / "Find the mistake" page type is out of the pass bar. Critics do not grade it; a skill passes on its other page types and screen hosts. See `design/LESSON_LIBRARY_PLAN.md` §8d.
+
+> **Scope (owner ruling 2026-09-26, three kinds of paper):** a skill passes on **Practice** (single skill and mixed, S and L, with keys), **Quiz** (with key), its **Lesson** where it has one, the three screen hosts and its option panel. Stand-alone Guided, Worked example, Review, Opener, Pre-skill check, Find the mistake, True or False?, Reason It and Stretch are not graded as separate pages. See `design/LESSON_LIBRARY_PLAN.md` §8e.
+
 **Version 1 · 2026-09-24 · owner-approved rules:** every criterion must score **8 or more** on
 **every** graded version of a skill, on paper and on screen. One criterion at 7 anywhere is a fail,
 and the skill goes back for redesign until it passes.

@@ -25,7 +25,7 @@
 import { generateQuestionFor } from './generate-question.js';
 import { factSetTitle, optionsFor, normalizeOptions } from './skill-options.js';
 import { opsRoutedSkill } from './gen-operations.js';
-import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill } from './data.js';
+import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills } from './data.js';
 import { kitCellSpec } from './print-generate.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
@@ -423,7 +423,7 @@ function quickDraw(place, n) {
  *
  * @returns {string|null} the filled html, or null when no slot could be filled with certainty
  */
-export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
+export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {}) {
     // `ink: 'trace'` writes the value in the single grey (a Model or first Guided cell, INK-3);
     // the default is the pupil's solid ink of a key or of shown work (Error analysis).
     const INK_STYLE = ink === 'trace' ? 'font-weight:700;color:#949494;' : SOLID_STYLE;
@@ -549,7 +549,26 @@ export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
     const lineRe = /(Answer:\s*<\/span>\s*<span style="[^"]*border-bottom:[^"]*">)(?:&nbsp;|\s)*(<\/span>)/g;
     const lines = html.match(lineRe) || [];
     if (lines.length === 1 && display) {
-        return html.replace(lineRe, (m, open, close) => `${open}<b data-ws-ink="${inkAttr}" style="${INK_STYLE}">${escText(display)}</b>${close}`);
+        const fl = /^(\d+)\s*\/\s*(\d+)$/.exec(display.trim());
+        const v = fl ? `<span class="mq-frac" style="font-size:1em;"><span>${fl[1]}</span><span>${fl[2]}</span></span>` : escText(display);
+        return html.replace(lineRe, (m, open, close) => `${open}<b data-ws-ink="${inkAttr}" style="${INK_STYLE}">${v}</b>${close}`);
+    }
+
+    // 3b. ONE empty inline write place with no "Answer:" label - a ruled underline ("Perimeter =
+    // ____ units", a question's own answer rule, a bar-graph answer rule) or the empty box between
+    // two fractions: the value is written ON it (AK-1), so the key is a facsimile and Error
+    // analysis can show the pupil's work in the pupil's own slot (critic round 4: these skills
+    // had no Check it page at all).
+    const openRe = /(<(span|div) style="([^"]*(?:border-bottom:\s*2px solid #000|border:\s*2px solid #000)[^"]*)">)(?:&nbsp;|\s)*(<\/\2>)/g;
+    const opens = html.match(openRe) || [];
+    // Shown work only (`shown`): a key keeps its answer stamp until the cell names its slot, so
+    // the pupil page and the key count the same answer places (AK-4).
+    if (shown && opens.length === 1 && display && !/Answer:/.test(html) && display.length <= 24) {
+        // a fraction is written stacked over its bar, never with a slash (TY-7); the place is at
+        // least 14 mm wide (SL-1)
+        const fm = /^(\d+)\s*\/\s*(\d+)$/.exec(display.trim());
+        const val = fm ? `<span class="mq-frac" style="font-size:1em;"><span>${fm[1]}</span><span>${fm[2]}</span></span>` : escText(display);
+        return html.replace(openRe, (m, open, tag, style, close) => `<${tag} style="${style};text-align:center;min-width:14mm;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}">${val}</b>${close}`);
     }
 
     // 4. The K-2 check-box list: the box beside the answer's label gets a check mark (AK-2).
@@ -809,7 +828,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
             // A wrong value is written as a pupil would have written it: a place-value mat draws
             // the WRONG model, boxed slots take the wrong value, never the right parts.
             const asQ = v === answer ? q0 : Object.assign({}, q0, { ans: v, target: v, keyParts: undefined, printAnswer: undefined });
-            const filled = legacyKeyFill(html.replace(STAMP_RE, ''), asQ, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid' });
+            const filled = legacyKeyFill(html.replace(STAMP_RE, ''), asQ, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid', shown: true });
             if (filled !== null) return filled;
             return html + shownLine(v, ink);
         }
@@ -826,7 +845,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         if (showable === null) {
             try {
                 const blankHtml = legacyClean(renderCell(q, resolveCtx({ mode: 'print', size, look: 'ican', state: 'blank' }))).replace(STAMP_RE, '');
-                showable = legacyKeyFill(blankHtml, null, { value: answer, display: answer }) !== null;
+                showable = legacyKeyFill(blankHtml, null, { value: answer, display: answer }, { shown: true }) !== null;
             } catch (e) { showable = false; }
         }
         return showable;
@@ -1046,10 +1065,51 @@ function measureItems(items, { size, look, colsList }) {
                             if (!it.scalesWithCols && pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) { fits = false; why(it, c, 'shrunk picture'); }
                         }
                     }
-                    best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits };
+                    // A role that places part of the cell in one of several ways (error analysis,
+                    // AX-4: the Correct / Fix-it block in ONE place on every cell of a page) names
+                    // them in `judgeModes`; each is drawn and measured here, and the role picks the
+                    // one the whole page can use. null: that way does not fit (or does not apply).
+                    const vary = {};
+                    const inkW = best.inkW || {};
+                    if (fits && Array.isArray(it.judgeModes)) {
+                        const grow = (Math.max(hPx, r.height) - r.height) / PX_PER_MM;
+                        for (const mode of it.judgeModes) {
+                            let mb = '';
+                            try { mb = it.render(ctx, { cols: c, judge: mode }); } catch (e) { mb = ''; }
+                            if (!mb || !String(mb).includes(`data-judge-mode="${mode}"`)) { vary[mode] = null; continue; }
+                            root.innerHTML = `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
+                                + `<span class="ws-letter">m.</span>${mb}</div>`;
+                            const mc = root.firstChild;
+                            const cr = mc.getBoundingClientRect();
+                            let over = false;
+                            // the ink's width: the leftmost to the rightmost drawn thing (a text run, a
+                            // box, a picture), so the role can tell a one-line item in a full-width
+                            // cell (half of it empty) from one that fills it (critic EA r5, H13 W)
+                            let lo = Infinity, hi = -Infinity;
+                            for (const el of mc.querySelectorAll('*')) {
+                                const er = el.getBoundingClientRect();
+                                if ((!er.width && !er.height) || getComputedStyle(el).position === 'absolute') continue;
+                                if (er.right > cr.right - padR + 1 || er.left < cr.left + padL - 1) { over = true; break; }
+                                const leaf = !el.children.length || el.tagName.toLowerCase() === 'svg';
+                                if (leaf && !el.closest('.ws-letter') && !(el.parentElement && el.parentElement.closest('svg'))) { lo = Math.min(lo, er.left); hi = Math.max(hi, er.right); }
+                            }
+                            vary[mode] = over ? null : cr.height / PX_PER_MM + grow;
+                            if (!over && hi > lo) inkW[mode] = Math.max(inkW[mode] || 0, (hi - lo) / PX_PER_MM);
+                        }
+                    }
+                    const modes = Object.assign({}, best.modes || {});
+                    for (const mode of Object.keys(vary)) modes[mode] = vary[mode] === null || modes[mode] === null ? null : Math.max(modes[mode] || 0, vary[mode]);
+                    best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits, modes, inkW };
                 }
                 it.measured = it.measured || {};
                 it.measured[c] = { hMm: Math.ceil(best.hMm * 10) / 10, fits: best.fits };
+                if (best.modes && Object.keys(best.modes).length) {
+                    it.measured[c].modes = {};
+                    for (const [mode, h] of Object.entries(best.modes)) it.measured[c].modes[mode] = h === null ? null : Math.ceil(h * 10) / 10;
+                    it.measured[c].inkW = {};
+                    for (const [mode, w] of Object.entries(best.inkW || {})) it.measured[c].inkW[mode] = Math.ceil(w * 10) / 10;
+                    it.measured[c].innerMm = inner;
+                }
             }
         }
         // A MINIMUM COLUMN WIDTH for legacy markup that reflows instead of overflowing (an area
@@ -1113,7 +1173,42 @@ async function loadStandards() {
     return standardsMod;
 }
 function primaryCcss(sk) {
-    try { return standardsMod ? standardsMod.primaryStandard(sk.categoryId, sk.skillId, { short: true }) : ''; } catch (e) { return ''; }
+    try {
+        if (!standardsMod) return '';
+        const code = standardsMod.primaryStandard(sk.categoryId, sk.skillId, { short: true });
+        if (code) return code;
+        // A skill tagged to its CLOSEST standard (temperature: CCSS names no thermometer) still
+        // prints that code, marked as the closest - never a footer with no standard at all
+        // (critic EA r5, D).
+        const e = standardsMod.standardsEntry(sk.categoryId, sk.skillId);
+        if (e && e.approx && e.ccss && e.ccss.length) {
+            const short = String(e.ccss[0]).replace(/\.([A-Z])\.(\d+)$/, '.$2');
+            return `≈ ${short}`;
+        }
+    } catch (e) { return ''; }
+    return '';
+}
+
+/**
+ * The levels a skill printed as "M" (every level) really spans: the grades of its CCSS codes, or
+ * of the skills its review pool deals. A page is never tabbed "All levels" / "Grade mixed" when its
+ * content has a level (critic EA r5, D: number_chart_fill, mixed_placevalue).
+ */
+function spanGrades(sk) {
+    const G = ['K', '1', '2', '3', '4', '5', '6'];
+    const gradeOfCode = (c) => { const m = /^(K|\d)\./i.exec(String(c)); return m ? m[1].toUpperCase() : ''; };
+    const out = new Set();
+    try {
+        const e = standardsMod && standardsMod.standardsEntry(sk.categoryId, sk.skillId);
+        (e && e.ccss ? e.ccss : []).map(gradeOfCode).filter((g) => G.includes(g)).forEach((g) => out.add(g));
+        if (!out.size && isMixedMetaSkill(sk.skillId)) {
+            for (const id of getMixedPoolSkills(sk.categoryId, sk.skillId) || []) {
+                const g = String(getSkillGrade(id, sk.categoryId) || '').toUpperCase();
+                if (G.includes(g)) out.add(g);
+            }
+        }
+    } catch (e) { /* keep none */ }
+    return [...out].sort((a, b) => G.indexOf(a) - G.indexOf(b));
 }
 
 /**
@@ -1155,6 +1250,10 @@ function skillMeta(sk, q) {
     let grade = null;
     try { grade = getSkillGrade(sk.skillId, sk.categoryId); } catch (e) { grade = null; }
     const meta = { categoryId: sk.categoryId, skillId: sk.skillId, label, grade: grade === null || grade === undefined ? '' : String(grade), ccss: sk.ccss || primaryCcss(sk) };
+    if (!/^(K|[1-6])$/i.test(meta.grade)) {
+        const span = spanGrades(sk);
+        if (span.length) { meta.grades = span; meta.grade = span[0]; }
+    }
     const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, { skillId: nameId }));
     meta.iCan = sk.iCan || optionTitle(sk, words.iCan) || words.iCan;
     meta.instructionKey = q ? instructionKeyFor(q, words) : words.instructionKey;
