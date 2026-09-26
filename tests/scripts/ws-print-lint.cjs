@@ -670,7 +670,9 @@ function wsLintPage(cfg) {
     styleEl.remove();
 
     /* ------------------------------------------------------------------ L-EMOJI */
-    const EMOJI = /[\p{Extended_Pictographic}\u{FE0F}\u{20E3}\u{1F1E6}-\u{1F1FF}\u{2605}\u{2606}]/gu;
+    // © and ® are Extended_Pictographic in Unicode but are plain text glyphs in Andika (no emoji
+    // presentation without U+FE0F, which stays banned). The owner's copyright line needs ©.
+    const EMOJI = /(?![\u00A9\u00AE](?!\u{FE0F}))[\p{Extended_Pictographic}\u{FE0F}\u{20E3}\u{1F1E6}-\u{1F1FF}\u{2605}\u{2606}]/gu;
     for (const ri of rootInfo) {
         const walker = document.createTreeWalker(ri.el, NodeFilter.SHOW_TEXT);
         for (let n = walker.nextNode(); n; n = walker.nextNode()) {
@@ -752,6 +754,13 @@ function wsLintPage(cfg) {
             let n = 0;
             for (const d of pg.querySelectorAll('*')) {
                 if (n > 2 || !visible(d)) continue;
+                // PT-FRM-7a: the copyright line hangs in the bottom margin by design (the footer band never grows);
+                // it must stay inside the paper, at least 6 mm above its bottom edge.
+                if (d.classList && d.classList.contains('ws-copy')) {
+                    const rc = d.getBoundingClientRect();
+                    if (rc.bottom > pr.bottom - 6 * 96 / 25.4) { n++; F('L-OVERFLOW', 'PG-13', 'major', d, `the copyright line is within 6 mm of the paper's bottom edge (PT-FRM-7a)`, 'copyright near edge'); }
+                    continue;
+                }
                 const r = d.getBoundingClientRect();
                 if (!r.width || !r.height) continue;
                 const over = Math.max(r.right - live.r, live.l - r.left, r.bottom - live.b, live.t - r.top);
