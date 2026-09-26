@@ -146,6 +146,27 @@ different sizes they need to work, or they default to their needed size and prob
 - Gate: a mixed page at S that contains a `minSize: M` item must still hold more items than the same page at L, keep every
   item at or above its floor, and pass H13; `ws-lesson-check` and `ws-layout-unit` carry this case.
 
+## 8b. Owner ruling: every lesson opens with a prerequisite check (2026-09-26)
+
+"All the lessons should have a prerequisite check/practice with 3-4 questions moving through important prerequisite
+skills for the lesson — if they fail/struggle they need to go to the previous skill lesson to get the prerequisite first,
+then come back."
+
+- **Prerequisite Check** is the first part of every lesson packet (replacing / absorbing the Warm-up): **3–4 questions**,
+  ordered from the most basic prerequisite to the one closest to the lesson. Each question is tied to ONE prerequisite
+  (`prereqs[i].lesson` — a lesson id in the library, plus its skill + options for the item).
+- **The rule:** a question missed (on screen: wrong after the support ladder; on paper: marked wrong by the teacher) sends
+  the pupil to **that prerequisite's lesson**, then back to this lesson. Two or more misses: start with the earliest missed
+  prerequisite.
+- **Print:** each question carries a small teacher tag "If missed → Lesson <id> <title>"; the key lists the routing
+  table. Pupil-facing text stays one line per question.
+- **Screen:** the check runs first; a miss offers "Let's practise <prerequisite> first" and opens that lesson, with a
+  "Back to <this lesson>" return. Passing all goes straight into the anchor chart.
+- **Data / gates:** `prereqs` must name 3–4 prerequisite lessons that exist in the library (or a `NEEDS` entry when the
+  prerequisite lesson is not built yet); `ws-lesson-coverage` fails a lesson whose check is missing, has fewer than 3 or
+  more than 4 questions, or points at an unknown lesson; a prerequisite graph with no cycles (a lesson may not require
+  itself through a chain). The coverage record lists lessons blocked only by a missing prerequisite lesson.
+
 ## 9. Risks
 
 Engine regressions invalidating passed lessons (single engine owner, render-hash stamps → `stale`); ≈ 359 steps blocked
