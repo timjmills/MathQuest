@@ -191,6 +191,8 @@
 :is(.ws-page, .ws-sheet) .ws-stack .rg i { height: var(--ws-carry); }
 :is(.ws-page, .ws-sheet) .ws-stack .ab { height: var(--ws-answer); align-items: flex-start; }
 :is(.ws-page, .ws-sheet) .ws-stack .ab i { height: var(--ws-hw); }
+:is(.ws-page, .ws-sheet) .ws-stack .ansrow { grid-column: 1 / -1; height: var(--ws-answer); }          /* lessons r2: the open answer row */
+:is(.ws-page, .ws-sheet) .ws-stack > span.an { height: var(--ws-answer); }
 :is(.ws-page, .ws-sheet) .ws-stack .headroom { grid-column: 1 / -1; height: var(--ws-answer); }
 :is(.ws-page, .ws-sheet) .ws-stack .prow { grid-column: 1 / -1; height: var(--ws-hw); }
 :is(.ws-page, .ws-sheet) .ws-stack .prow.plus { display: flex; align-items: center; font-weight: 700; padding-left: calc(var(--ws-track) * .3); }
@@ -270,6 +272,18 @@
 :is(.ws-page, .ws-sheet) .ws-stack :is(.rg, .ab)[data-ws-seg] > i {
     width: 100%; border: var(--ws-hair) solid var(--ws-ink); border-right-width: 0; border-radius: 0; }
 :is(.ws-page, .ws-sheet) .ws-stack .rg[data-ws-seg] > i { height: var(--ws-rstrip, var(--ws-regroup)); }
+/* Lessons r1 (H9): a subtraction's ones regroup box holds a two-digit number (17), so it is two
+   digits wide, overhanging the ones column to the right; the other boxes keep one track. */
+:is(.ws-page, .ws-sheet) .ws-stack .rg.rg-wide { width: calc(var(--ws-track) * 1.5); justify-self: start; }
+/* Lessons r1: a subtraction's Check line ("Check: ___ + 18 = ___", step 5 "Check: add back"). */
+:is(.ws-page, .ws-sheet) .ws-checkrow { display: flex; align-items: flex-end; justify-content: center; gap: 1.6mm; margin-top: 3mm; font-size: var(--ws-text); line-height: 1.1; white-space: nowrap; }
+:is(.ws-page, .ws-sheet) .ws-checkrow > b { font-weight: 700; margin-right: 1mm; }
+:is(.ws-page, .ws-sheet) .ws-checkrow .ws-checkn { font-weight: 700; }
+/* Lessons r2: the stack now reserves its own answer row (.ansrow), so the Check line needs only
+   a small gap under it. */
+:is(.ws-page, .ws-sheet) .ws-stack + .ws-checkrow { margin-top: 1.5mm; }
+:is(.ws-page, .ws-sheet) .ws-checkrow { flex-wrap: wrap; row-gap: 1.5mm; }
+:is(.ws-page, .ws-sheet) .ws-checkrow > .ws-checkeq { display: inline-flex; align-items: flex-end; gap: 1.6mm; white-space: nowrap; }
 :is(.ws-page, .ws-sheet) .ws-stack .ab[data-ws-seg] > i { height: var(--ws-dstrip, var(--ws-hw)); }
 :is(.ws-page, .ws-sheet) .ws-stack :is(.rg, .ab)[data-ws-seg="first"] > i { border-radius: var(--ws-slot-r, 1.25mm) 0 0 var(--ws-slot-r, 1.25mm); }
 :is(.ws-page, .ws-sheet) .ws-stack :is(.rg, .ab)[data-ws-seg="last"] > i { border-right-width: var(--ws-hair); border-radius: 0 var(--ws-slot-r, 1.25mm) var(--ws-slot-r, 1.25mm) 0; }

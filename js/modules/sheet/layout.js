@@ -625,7 +625,7 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     const even = G / rows;
     // Long procedures and word problems are exempt: their cell's spare height IS the pupil's
     // working space (PT 2.4's 93 x 114 long-division cell).
-    const capped = hMin > 0 && cls !== 'long' && cls !== 'word';
+    const capped = hMin > 0 && cls !== 'long' && cls !== 'word' && !section.noCap;
     const cellH = r3(capped ? Math.min(even, hMin * FILL_CAP) : even);
     const fillsGrid = cellH >= even - 0.01;
     const perPage = rows * cols;

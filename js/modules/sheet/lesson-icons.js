@@ -5,7 +5,7 @@
 // Every lesson uses the same icon for the same action.
 //
 // Drawing rules (WORKSHEET_DESIGN_STANDARD): line art in the lesson accent (INK-30), never emoji (INK-7),
-// lines (INK-10: 1 pt; `vector-effect: non-scaling-stroke` keeps the stroke 1 pt at any icon
+// lines (INK-10: 1.5 pt since lessons r1 - a 1 pt hairline printed mid-grey; `vector-effect: non-scaling-stroke` keeps the stroke 1 pt at any icon
 // size), solid fills only on marks under 7 mm (INK-5), no text inside an icon.
 //
 // Pure module (SCC-01).
@@ -29,6 +29,13 @@ const DRAW = {
         + '<rect x="6.8" y="6" width="1.3" height="1.3"/><rect x="8.4" y="6" width="1.3" height="1.3"/>',
     // a minus sign in a ring: subtract / take away
     subtract: '<circle cx="5" cy="5" r="4.2"/><path d="M2.6 5 H7.4"/>',
+    // lessons r1: one icon per STEP - the ring's minus beside a ones cube: subtract the ones
+    subOnes: '<circle cx="3.4" cy="5" r="2.9"/><path d="M1.9 5 H4.9"/><rect x="7" y="3.6" width="2.6" height="2.6"/>',
+    // ... and beside a ten rod: subtract the tens
+    subTens: '<circle cx="3.4" cy="5" r="2.9"/><path d="M1.9 5 H4.9"/><rect x="7.4" y="0.6" width="2" height="8.8"/><path d="M7.4 2.4 H9.4 M7.4 4.1 H9.4 M7.4 5.8 H9.4 M7.4 7.5 H9.4"/>',
+    // a short number line with its two end ticks marked: find the two tens
+    ends: '<path d="M0.8 6.4 H9.2"/><path d="M0.8 3.6 V9.2 M9.2 3.6 V9.2"/><path d="M3.1 5.4 V7.4 M5 5.4 V7.4 M6.9 5.4 V7.4"/>'
+        + '<circle cx="0.8" cy="1.5" r="1" class="f"/><circle cx="9.2" cy="1.5" r="1" class="f"/>',
     // an up arrow and a down arrow: decide, round up or down
     decide: '<path d="M3 9.2 V1.2"/><path d="M1.4 2.9 L3 1 L4.6 2.9"/><path d="M7 0.8 V8.8"/><path d="M5.4 7.1 L7 9 L8.6 7.1"/>',
     // a check mark in a box: check the work
@@ -67,7 +74,7 @@ export function stepIcon(id, size = 'L', { mm: sideMm } = {}) {
     // The icon is drawn in the lesson accent (INK-30, `--mq-lesson-accent`): its SHAPE is the cue,
     // the colour only a second one, so a black-and-white copy loses nothing (INK-6).
     return `<svg class="mq-licon" data-mq-accent data-mq-icon="${id}" viewBox="0 0 10 10" width="${mm}mm" height="${mm}mm" aria-hidden="true">`
-        + `<g fill="none" stroke="currentColor" stroke-width="1pt" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round">${body}</g></svg>`;
+        + `<g fill="none" stroke="currentColor" stroke-width="1.5pt" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round">${body}</g></svg>`;
 }
 
 /** The stylesheet the icons need (a solid mark is `.f`). */
