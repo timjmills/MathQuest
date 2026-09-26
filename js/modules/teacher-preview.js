@@ -185,8 +185,6 @@ function tidySample(cell) {
     });
 }
 
-// Below this scale a sample's lines and digits are hairlines in a thumbnail: show a legible crop.
-
 /** Fit the stage inside its frame: scale down (never up), centred. */
 function fit(frame) {
     const stage = frame.querySelector(':scope > .tvp-stage');

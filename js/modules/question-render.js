@@ -1710,8 +1710,9 @@ function _applyCardTwin(q, paper, visualAid, qt) {
         visualAid.dataset.mqNoZoom = '1';
         return;
     }
+    // (AP2 round 6: a picture graph to build is tapped box by box, as the worksheet and the quiz do)
     if (/data-mq-model=/.test(String(q.visual || '')) && (q.answerType === 'base10-build' || q.answerType === 'ten-frame-build'
-        || /data-mq-model="nl-place"/.test(String(q.visual || '')))) {
+        || /data-mq-model="(nl-place|picture-build)"/.test(String(q.visual || '')))) {
         // The kit's drawn mat / frame IS the answer: tap to build (regrade H3/H6: the drag
         // widget's rods and counters were under 44 px and drag-only).
         const input = document.getElementById('answerInput');

@@ -117,6 +117,12 @@ function PLAN(rootSel, which) {
     if (model && model.dataset.mqBuilt === '1') {
         const t = Number(model.dataset.mqTarget || q.target || ans);
         if (model.dataset.mqModel === 'ten-frame') { Array.from(model.querySelectorAll('td')).slice(0, t).forEach(c => tag(c, { type: 'click' })); return { plan, q: String(t) }; }
+        // a picture graph to build (AP2 round 6): draw each row's number of pictures, box by box
+        if (model.dataset.mqModel === 'picture-build') {
+            String(ans).split(',').map(Number).forEach((v, r) => Array.from(model.querySelectorAll(`[data-pb-row="${r}"]`)).slice(0, v)
+                .forEach(g => tag(g, { type: 'domclick' })));
+            return { plan, q: String(ans) };
+        }
         const places = String(model.dataset.mqPlaces || '10,1').split(',').map(Number);
         const pairs = Array.from(model.querySelectorAll('.mq-b10pair'));
         let rest = t;

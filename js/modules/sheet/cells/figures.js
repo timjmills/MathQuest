@@ -830,7 +830,22 @@ register('picture-build', {
         const shown = (p.values || []).map(Number).join(',');
         return { value: shown, display: shown, slots: { answer: { value: shown, graded: true } } };
     },
-    footprint() { return { wMm: 186, hMm: null, measure: true, factLike: false, maxCols: 1 }; },
+    footprint(p, ctx) {
+        // The table's own width (rowTable's geometry), at the WIDEST row name a page can deal
+        // ("Triangles: 7"), so every chart of a page takes one width. A chart of up to 3 pictures
+        // fits half the page: two to a row, eight to an S page (critic figures-r7, "more per page
+        // at S"); a wider one keeps the full width. The width is real either way, so a role that
+        // sets a cell beside its steps (the Lesson's Guided band) never scales the table down.
+        const c = ctx || {};
+        const q = p || {};
+        const bx = BUILD_BOX[sizeOf(c)] || 10;
+        const slots = Math.max(3, Number(q.slots) || 0, ...(q.values || []).map(Number));
+        const zPt = labelPt(c);
+        const labW = Math.max(textW('Triangles: 7', zPt) + bx * 0.62 + 3, textW(q.catTitle || 'Row', zPt)) + 5;
+        const W = labW + Math.max(slots * (bx + 1.8) + 6, textW('Pictures', zPt) + 5) + SW.heavy;
+        const two = W + 4 <= 84;
+        return { wMm: Math.ceil(Math.max(W, 44) + 4), hMm: null, measure: true, factLike: false, maxCols: two ? 2 : 1, byCapacity: true };
+    },
     inputs() { return [{ id: 'answer', kind: 'drag', shape: 'draw', graded: true, order: 0, scopes: ['full'] }]; },
     layout() { return { card: 'card-wide-visual', checker: 'value', requiresVisual: true }; },
 });

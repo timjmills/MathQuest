@@ -284,7 +284,7 @@ const SCREEN_VERB_MAP = Object.freeze([
     ['Check the clock', 'Tap the clock'],
     // the ruler is drawn under the object on screen too: the pupil reads it, nothing is dragged
     ['Measure the object', 'Read the ruler under the object'],
-    ['Draw the pictures', 'Tap the boxes to draw the pictures'],
+    ['Draw the pictures', 'Tap a box for each picture'],  // (never repeats its own phrase: applied twice, it must not grow)
     ['Measure the line', 'Drag the ruler to the line'],
     ['Check one box', 'Tap one box'],
     ['Check the box', 'Tap the box'],

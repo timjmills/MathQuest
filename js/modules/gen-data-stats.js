@@ -561,7 +561,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.cell = { template: 'picture-build', v: 1, payload };
                 q.visual = k2Twin('picture-build', payload);
                 q.text = 'Draw the pictures. Make each row match its number.';
-                q.screenInstr = 'Tap the boxes to draw the pictures. Make each row match its number.';
+                q.screenInstr = 'Tap a box for each picture. Make each row match its number.';
                 q.ans = values.join(',');
                 q.answerType = 'text';
                 q.options = [];
