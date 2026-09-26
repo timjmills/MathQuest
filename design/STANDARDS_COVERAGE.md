@@ -24,12 +24,12 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 604 live skills; 495 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 605 live skills; 496 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
-- **Full coverage: CCSS 77 of 177 standards FULL, 90 PARTIAL, 10 GAP** (tagged: 167). Counting leaves and lettered parts (217): 105 FULL, 91 PARTIAL, 21 GAP.
+- **Full coverage: CCSS 78 of 177 standards FULL, 89 PARTIAL, 10 GAP** (tagged: 167). Counting leaves and lettered parts (217): 106 FULL, 90 PARTIAL, 21 GAP.
 - **Essential Elements: 86 of 117 FULL, 28 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 272 entries — 129 new skills, 88 options on existing skills, 2 repairs; 159 from the White Rose audit (40 of them extended to close standards clauses), 60 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+- The one build list: 271 entries — 128 new skills, 88 options on existing skills, 2 repairs; 158 from the White Rose audit (40 of them extended to close standards clauses), 60 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
@@ -38,9 +38,9 @@ Sources:
 | 2 | 12 / 11 / 3 of 26 (46% full) | 12 / 10 / 5 of 27 | 12 / 6 / 1 of 19 (63% full) | 23/26, 18/19 |
 | 3 | 12 / 13 / 0 of 25 (48% full) | 18 / 15 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
 | 4 | 14 / 13 / 1 of 28 (50% full) | 19 / 13 / 2 of 34 | 16 / 4 / 0 of 20 (80% full) | 27/28, 20/20 |
-| 5 | 10 / 14 / 2 of 26 (38% full) | 16 / 13 / 5 of 34 | 13 / 4 / 1 of 18 (72% full) | 24/26, 17/18 |
+| 5 | 11 / 13 / 2 of 26 (42% full) | 17 / 12 / 5 of 34 | 13 / 4 / 1 of 18 (72% full) | 24/26, 17/18 |
 | 6 | 8 / 18 / 3 of 29 (28% full) | 16 / 18 / 8 of 42 | 14 / 3 / 0 of 17 (82% full) | 26/29, 17/17 |
-| **All** | **77 / 90 / 10 of 177 (44% full)** | **105 / 91 / 21 of 217** | **86 / 28 / 3 of 117 (74% full)** | 167/177, 115/117 |
+| **All** | **78 / 89 / 10 of 177 (44% full)** | **106 / 90 / 21 of 217** | **86 / 28 / 3 of 117 (74% full)** | 167/177, 115/117 |
 
 ## Tag fixes made by this audit
 
@@ -231,28 +231,28 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 36 | **Faces, Edges or Vertices (option)** (`shape_faces`) | option on `shapes_early:count_edges_faces_vertices` | - | 1 |
 | 37 | **3-D Shapes: Names and Properties** (`shapes_3d_props`) | new `shapes_classify:3d_shape_properties` | - | 1 |
 
-### Operations (36)
+### Operations (35)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
 |---|---|---|---|---|
 | 1 | **Number Bonds in Order** (`systematic_bonds`) | new `composing:bonds_in_order` | K.OA.A.3, M.EE.1.NBT.4, M.EE.1.NBT.6, M.EE.2.NBT.6 | 1 |
-| 2 | **Long Multiplication and Division (4-digit)** (`long_mult`) | new `multiplication:long_multiplication_4x2` | 5.NBT.B.5 | 4 |
-| 3 | **Compare Calculations** (`compare_calcs`) | new `algebra:compare_calculations` | 5.OA.A.2, M.EE.6.EE.3 | 1 |
-| 4 | **To the Next Ten** (`add_next_10`) | new `addition:bridge_to_next_ten` | - | 4 |
-| 5 | **Add Three Numbers: Stories and Make a Ten First (option)** (`add_three_forms`) | option on `addition:add_three` | 1.OA.A.2, 1.OA.B.3 | - |
-| 6 | **Add and Subtract 10s Across 100 (option)** (`cross_100`) | option on `addition:add_sub_100s` | 2.NBT.B.7 | 2 |
-| 7 | **Multiply Three Numbers** (`mult_three`) | new `multiplication:multiply_three_numbers` | 3.OA.B.5 | 2 |
-| 8 | **Add and Subtract With a Base-10 Picture (option)** (`stack_base10_support`) | option on `addition:add_100_mixed` | 1.NBT.C.4, 2.NBT.B.7 | - |
-| 9 | **Related Times-Tables** (`tables_links`) | new `multiplication:related_tables` | - | 4 |
-| 10 | **Add and Subtract Multiples of Ten (option)** (`tens_any`) | option on `addition:add_sub_10s` | 1.NBT.C.4, 1.NBT.C.6 | - |
-| 11 | **Add or Multiply?** (`add_or_mult`) | new `algebra:add_or_multiply` | 4.OA.A.2 | 1 |
-| 12 | **Add or Subtract 1 or 2** (`add_sub_1_2`) | new `addition:add_sub_1_or_2` | K.CC.B.4c | 1 |
-| 13 | **Compare Number Sentences** (`compare_sentences`) | new `algebra:compare_number_sentences` | 1.OA.D.7 | 1 |
-| 14 | **Make Equal Groups** (`equal_groups_early`) | new `multiplication:make_equal_groups` | 2.OA.C.4 | 1 |
-| 15 | **Mental Calculation and Estimation** (`mental_estimate`) | new `number_sense:estimate_and_check` | 3.OA.D.8 | 1 |
-| 16 | **Part-Whole Model** (`part_whole`) | new `composing:part_whole_model` | K.OA.A.1 | 1 |
-| 17 | **Bonds to 100** (`bonds_100`) | new `addition:bonds_to_100` | - | 2 |
-| 18 | **Times as Many: Statements and Equations (option)** (`comparison_statements`) | option on `multiplication:mult_comparison` | 4.OA.A.1 | - |
+| 2 | **Compare Calculations** (`compare_calcs`) | new `algebra:compare_calculations` | 5.OA.A.2, M.EE.6.EE.3 | 1 |
+| 3 | **To the Next Ten** (`add_next_10`) | new `addition:bridge_to_next_ten` | - | 4 |
+| 4 | **Add Three Numbers: Stories and Make a Ten First (option)** (`add_three_forms`) | option on `addition:add_three` | 1.OA.A.2, 1.OA.B.3 | - |
+| 5 | **Add and Subtract 10s Across 100 (option)** (`cross_100`) | option on `addition:add_sub_100s` | 2.NBT.B.7 | 2 |
+| 6 | **Multiply Three Numbers** (`mult_three`) | new `multiplication:multiply_three_numbers` | 3.OA.B.5 | 2 |
+| 7 | **Add and Subtract With a Base-10 Picture (option)** (`stack_base10_support`) | option on `addition:add_100_mixed` | 1.NBT.C.4, 2.NBT.B.7 | - |
+| 8 | **Related Times-Tables** (`tables_links`) | new `multiplication:related_tables` | - | 4 |
+| 9 | **Add and Subtract Multiples of Ten (option)** (`tens_any`) | option on `addition:add_sub_10s` | 1.NBT.C.4, 1.NBT.C.6 | - |
+| 10 | **Add or Multiply?** (`add_or_mult`) | new `algebra:add_or_multiply` | 4.OA.A.2 | 1 |
+| 11 | **Add or Subtract 1 or 2** (`add_sub_1_2`) | new `addition:add_sub_1_or_2` | K.CC.B.4c | 1 |
+| 12 | **Compare Number Sentences** (`compare_sentences`) | new `algebra:compare_number_sentences` | 1.OA.D.7 | 1 |
+| 13 | **Make Equal Groups** (`equal_groups_early`) | new `multiplication:make_equal_groups` | 2.OA.C.4 | 1 |
+| 14 | **Mental Calculation and Estimation** (`mental_estimate`) | new `number_sense:estimate_and_check` | 3.OA.D.8 | 1 |
+| 15 | **Part-Whole Model** (`part_whole`) | new `composing:part_whole_model` | K.OA.A.1 | 1 |
+| 16 | **Bonds to 100** (`bonds_100`) | new `addition:bonds_to_100` | - | 2 |
+| 17 | **Times as Many: Statements and Equations (option)** (`comparison_statements`) | option on `multiplication:mult_comparison` | 4.OA.A.1 | - |
+| 18 | **Division Using Factors** (`div_factors`) | new `division:divide_using_factors` | - | 2 |
 | 19 | **True or False Equations (repair)** (`equal_sign_repair`) | repair on `addition:equal_sign` | 1.OA.D.7 | - |
 | 20 | **Why Does It Work?** (`explain_strategy`) | new `number_sense:why_it_works` | 2.NBT.B.9 | - |
 | 21 | **Subtract Back Through Ten (option)** (`make_ten_subtract`) | option on `number_sense:make_a_ten` | 1.OA.C.6 | - |
@@ -262,15 +262,14 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 25 | **Number Bonds to 20** (`bonds_20`) | new `composing:bonds_to_20` | - | 1 |
 | 26 | **Correspondence Problems** (`correspondence`) | new `multiplication:correspondence_problems` | - | 1 |
 | 27 | **Find the Difference** (`difference`) | new `subtraction:find_the_difference` | - | 1 |
-| 28 | **Division Using Factors** (`div_factors`) | new `division:divide_using_factors` | - | 1 |
-| 29 | **How Many Ways?** (`how_many_ways`) | new `multiplication:how_many_ways` | - | 1 |
-| 30 | **Inverse Operations (option)** (`inverse_check`) | option on `subtraction:sub_check_by_adding` | - | 1 |
-| 31 | **Reason from Known Facts** (`known_facts`) | new `multiplication:reason_from_known_facts` | - | 1 |
-| 32 | **Long Division with Remainders (option)** (`long_div_rem`) | option on `division:long_div_2digit` | - | 1 |
-| 33 | **Mental or Written?** (`make_decisions`) | new `addition:choose_a_method` | - | 1 |
-| 34 | **Mental Addition and Subtraction** (`mental_add_sub`) | new `addition:mental_strategies` | - | 1 |
-| 35 | **Multiples of 10, 100 and 1,000 (option)** (`mult_multiples`) | option on `multiplication:mult_zeros` | - | 1 |
-| 36 | **Partition to Multiply** (`informal_mult`) | new `multiplication:partition_multiply` | - | - |
+| 28 | **How Many Ways?** (`how_many_ways`) | new `multiplication:how_many_ways` | - | 1 |
+| 29 | **Inverse Operations (option)** (`inverse_check`) | option on `subtraction:sub_check_by_adding` | - | 1 |
+| 30 | **Reason from Known Facts** (`known_facts`) | new `multiplication:reason_from_known_facts` | - | 1 |
+| 31 | **Long Division with Remainders (option)** (`long_div_rem`) | option on `division:long_div_2digit` | - | 1 |
+| 32 | **Mental or Written?** (`make_decisions`) | new `addition:choose_a_method` | - | 1 |
+| 33 | **Mental Addition and Subtraction** (`mental_add_sub`) | new `addition:mental_strategies` | - | 1 |
+| 34 | **Multiples of 10, 100 and 1,000 (option)** (`mult_multiples`) | option on `multiplication:mult_zeros` | - | 1 |
+| 35 | **Partition to Multiply** (`informal_mult`) | new `multiplication:partition_multiply` | - | - |
 
 ### Counting and early number (17)
 
@@ -816,10 +815,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught in part by: Round Decimals (Visual) (`decimals:round_decimals`); Round Thousandths (`decimals:round_thousandths`)  
   Missing: round to the nearest whole number  
   Build: Round Decimals to the Nearest Whole (option) (`round_whole`)
-- **5.NBT.B.5** — PARTIAL. Fluently multiply multi-digit whole numbers using the standard algorithm.  
-  Taught in part by: Basic Multiplication (`multiplication:multiply`); Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`); Write the Placeholder Zero (`multiplication:mult_placeholder_zero`)  
-  Missing: the standard algorithm beyond 2 × 2 digits (3- and 4-digit × 2-digit) worked to the end  
-  Build: Long Multiplication and Division (4-digit) (`long_mult`)
 - **5.NBT.B.7** — PARTIAL. Add, subtract, multiply, and divide decimals to hundredths, using concrete models or drawings and strategies based on place value, properties of operations, and/or the relationship between addition and subtraction; relate the strategy to a written method and explain the reasoning used.  
   Taught in part by: Adding Decimals (`decimals:add_decimal`); Subtracting Decimals (`decimals:sub_decimal`); Multiplying Decimals (`decimals:mult_decimal`); Dividing Decimals (`decimals:div_decimal`)  
   Missing: concrete models or drawings for decimal operations, related to the written method  
@@ -1488,10 +1483,10 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **4.NBT.B.5** — PARTIAL. Multiply a whole number of up to four digits by a one-digit whole number, and multiply two two-digit numbers, using strategies based on place value and the properties of operations. Illustrate and explain the calculation by using equations, rectangular arrays, and/or area models.  
   In part: Basic Multiplication (`multiplication:multiply`); Area Model Multiplication (`multiplication:area_model_mult`); Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`)  
   Missing: a 4-digit number × a 1-digit number (the sizes stop at 3 × 1) → `mult_4x1`  
-  Also tagged: `multiplication:mult_placeholder_zero`, `multiplication:mult_missing_digit`
+  Also tagged: `multiplication:mult_placeholder_zero`, `multiplication:mult_missing_digit`, `multiplication:long_multiplication_4x2`
 - **4.NBT.B.6** — FULL. Find whole-number quotients and remainders with up to four-digit dividends and one-digit divisors, using strategies based on place value, the properties of operations, and/or the relationship between multiplication and division. Illustrate and explain the calculation by using equations, rectangular arrays, and/or area models.  
   Taught by: Basic Division (`division:divide`); Box Method Division (3÷1 digit) (`division:box_division_hard`); Area Model Division (3÷1 digit) (`division:area_model_div_3by1`); Division with Remainders (Visual) (`division:div_remainders`) — divide at tiles 41 is 4-digit ÷ 1-digit  
-  Also tagged: `division:box_division_easy`, `division:area_model_div_2by1`, `division:div_zero_in_quotient`, `division:remainder_too_big`, `division:div_check_by_multiplying`, `number_sense:estimate_quotient`
+  Also tagged: `multiplication:long_multiplication_4x2`, `division:box_division_easy`, `division:area_model_div_2by1`, `division:div_zero_in_quotient`, `division:remainder_too_big`, `division:div_check_by_multiplying`, `number_sense:estimate_quotient`
 #### Number and Operations—Fractions (4.NF)
 
 *A. Extend understanding of fraction equivalence and ordering.*
@@ -1619,9 +1614,8 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Also tagged: `number_sense:round_sort_tenths`, `number_sense:round_sort_hundredths`
 *B. Perform operations with multi-digit whole numbers and with decimals to hundredths.*
 
-- **5.NBT.B.5** — PARTIAL. Fluently multiply multi-digit whole numbers using the standard algorithm.  
-  In part: Basic Multiplication (`multiplication:multiply`); Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`); Write the Placeholder Zero (`multiplication:mult_placeholder_zero`)  
-  Missing: the standard algorithm beyond 2 × 2 digits (3- and 4-digit × 2-digit) worked to the end → `long_mult`  
+- **5.NBT.B.5** — FULL. Fluently multiply multi-digit whole numbers using the standard algorithm.  
+  Taught by: Basic Multiplication (`multiplication:multiply`); Long Multiplication and Short Division (`multiplication:long_multiplication_4x2`); Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`); Write the Placeholder Zero (`multiplication:mult_placeholder_zero`) — long_multiplication_4x2: 3- and 4-digit × 2-digit by the standard algorithm, one partial row per multiplier digit, worked to the end (multiply: 2 × 2)  
 - **5.NBT.B.6** — FULL. Find whole-number quotients of whole numbers with up to four-digit dividends and two-digit divisors, using strategies based on place value, the properties of operations, and/or the relationship between multiplication and division. Illustrate and explain the calculation by using equations, rectangular arrays, and/or area models.  
   Taught by: Divide by 2-Digit Numbers (Visual) (`division:long_div_2digit`); Fix the Estimate (Long Division) (`division:div_fix_estimate`); Zero in the Quotient (`division:div_zero_in_quotient`)  
 - **5.NBT.B.7** — PARTIAL. Add, subtract, multiply, and divide decimals to hundredths, using concrete models or drawings and strategies based on place value, properties of operations, and/or the relationship between addition and subtraction; relate the strategy to a written method and explain the reasoning used.  

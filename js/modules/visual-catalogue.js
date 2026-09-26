@@ -243,7 +243,7 @@ export const VISUALS = {
     V188: ['Y6:N06', 'Conversion ladder (mm → cm → m → km)', ['vis_conversion_models']],
     V189: ['Y6:N07', 'Short division (bus stop) with exchanges, r and decimal point', ['vis_division_layouts']],
     V190: ['Y6:N08', 'Long division with step notes and a multiples list', ['vis_division_layouts', 'long_div_rem']],
-    V191: ['Y6:N09', 'Long multiplication with partial-product rows', ['long_mult']],
+    V191: ['Y6:N09', 'Long multiplication with partial-product rows', []],
     V192: ['Y6:N10', 'Factor tree / halving tree', ['vis_factor_diagrams', 'div_factors']],
     V193: ['Y6:N11', 'Spider diagram of related facts', ['known_facts']],
     V194: ['Y6:N14', 'Two-way area grid for fraction × fraction', ['vis_frac_area_modes']],

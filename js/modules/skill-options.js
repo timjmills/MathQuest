@@ -3361,6 +3361,32 @@ const OPS_BUILD_OPTIONS = {
             helpShort: 'A ladder of rows, or column sums side by side.',
         },
     ],
+    // Entry 4 · Long Multiplication and Short Division (4.NBT.5-6, 5.NBT.5; WRM Y5 B5).
+    'multiplication:long_multiplication_4x2': [
+        {
+            id: 'forms', label: 'What the pupil does', type: 'set', default: [0], group: 'difficulty',
+            values: [
+                { v: 0, l: 'Long multiplication: 3456 × 27 (default)' },
+                { v: 1, l: 'Short division: 4530 ÷ 6' },
+                { v: 2, l: 'Short multiplication: 3456 × 7' },
+            ],
+            match: ['^Multiply: \\d+ × \\d\\d\\.', '^Divide:', '^Multiply: \\d+ × \\d\\.'],
+            allLabel: 'All three, mixed',
+            help: 'Tick one for a page of it, or several to mix them. Short multiplication (a 1-digit multiplier) is the '
+                + 'step before long multiplication. Every division shares exactly (no remainder) and carries at least once.',
+            helpShort: 'Long or short multiplication, short division, or a mix.',
+        },
+        {
+            id: 'tiles', label: 'Top number', type: 'enum', default: 42, group: 'difficulty',
+            values: [{ v: 32, l: '3 digits (345 × 27, 845 ÷ 5)' }, { v: 42, l: '4 digits (3456 × 27, 4530 ÷ 6) (default)' }],
+            help: 'The number of digits in the number being multiplied or divided. The multiplier has two digits '
+                + '(one in short multiplication) and the divisor one.',
+            helpShort: '3 or 4 digits.',
+        },
+        levelSubset([2, 1, 0], 2, 'Level 2 names each row at the side ("(3456 × 7)", "(3456 × 20)"), prints the '
+            + 'placeholder 0 in grey and gives the carry and exchange boxes; level 1 keeps the boxes and outlines where '
+            + 'the placeholder goes; level 0 is the grid alone.'),
+    ],
 };
 Object.assign(SKILL_OPTIONS, OPS_BUILD_OPTIONS);
 // ============================ end OPERATIONS BUILD LANE =========================================

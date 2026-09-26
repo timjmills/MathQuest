@@ -1336,6 +1336,10 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `share-mixed` | Draw or circle the counters. Then fill in the boxes. | a page mixing sharing, grouping and fair / not fair |
 | `ladder-result` | Use the first fact. Write each answer. | a known fact and the same fact in tens and hundreds (added 2026-09-26, build lane operations) |
 | `ladder-missing` | Use the first fact. Write the missing numbers. | the same ladder with the second number missing |
+| `long-mult` | Use long multiplication. Write the answer. | a 3- or 4-digit number times a 2-digit one in the column grid, one row per multiplier digit (added 2026-09-26, build lane operations) |
+| `short-div` | Use short division. Write the answer. | a 3- or 4-digit number divided by a 1-digit one in the bus stop, the exchanges written small |
+| `long-mult-div` | Multiply or divide. Write the answer. | a page mixing long multiplication and short division |
+| `short-mult` | Use short multiplication. Write the answer. | a 3- or 4-digit number times a 1-digit one, the carries in boxes over the answer |
 | `ladder-fill` | Use the first fact. Fill in the boxes. | the ladder in place-value words ("3 tens + 4 tens = [ ] tens = [ ]"), or a page mixing the ladder kinds |
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |
 | `default-order` | Write the numbers in order. | default adapter: ordering items with no stated direction |

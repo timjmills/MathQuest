@@ -362,7 +362,7 @@ function framesPromised(id, label) {
 // add-facts-vertical are both a stacked sum). Two shapes on one page is the defect that matters:
 // the pupil's cell changes kind halfway down the sheet.
 const SHAPE_OF = {
-    column: ['column-add', 'column-sub', 'add-facts-vertical', 'sub-facts-vertical', 'mult-facts-vertical', 'long-division'],
+    column: ['column-add', 'column-sub', 'add-facts-vertical', 'sub-facts-vertical', 'mult-facts-vertical', 'long-division', 'long-mult-kit', 'short-div-kit'],
     across: ['(none)', 'add-facts-horizontal', 'sub-facts-horizontal', 'mult-facts-horizontal', 'div-facts-horizontal',
         'div-facts-fraction', 'missing-number', 'missing-operator', 'missing-factor', 'inline-cloze', 'build-expr', 'fact-ladder'],
     word: ['word-add', 'word-sub', 'word-problem', 'word-plain', 'unknown-start-wp'],

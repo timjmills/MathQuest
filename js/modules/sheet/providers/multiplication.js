@@ -224,3 +224,126 @@ registerSkill('multiplication:area_model_mult_hard', {
 // mult_chart and mult_chart_easy moved to countby.js (2026-09-25): the chart now has four tasks
 // (fill, the factors on its edges, shading multiples, a row's rule), and each needs its own words.
 
+
+/* ================================================================ long_multiplication_4x2 */
+
+// Build list, lane operations, entry 4 (2026-09-26): long multiplication (3- or 4-digit × 2-digit)
+// and short division (3- or 4-digit ÷ 1-digit). The item's own data is q.lm (gen-ops-build.js).
+// Misconceptions (build list; WRM Y5 B5): the placeholder zero forgotten (the tens row one place
+// too far right), a carry added into the wrong row, and in short division the exchange dropped.
+
+const lmOf = (q) => obj(q && q.lm);
+const LM_KINDS = ['mult', 'div', 'short'];
+
+function lmStringsBy(pick) {
+    const fn = (ref = {}) => strings(pick(ref && ref.q, ref || {}))(ref);
+    fn.def = pick(null, {});
+    return fn;
+}
+
+registerSkill('multiplication:long_multiplication_4x2', {
+    strings: lmStringsBy((q, ref = {}) => {
+        const d = q ? lmOf(q) : null;
+        const opts = ref.opts || {};
+        const forms = Array.isArray(opts.forms) && opts.forms.length ? opts.forms.filter((i) => LM_KINDS[i]) : [0];
+        const kinds = forms.length ? forms.map((i) => LM_KINDS[i]) : ['mult'];
+        const mixed = !d && kinds.length > 1;
+        const kind = d ? d.kind : kinds[0];
+        const digits = d && d.digits ? d.digits : Number(opts.tiles) === 32 ? 3 : 4;
+        const nd = digits === 3 ? '3-digit' : '4-digit';
+        if (mixed) {
+            return {
+                iCan: `I Can multiply and divide ${nd} numbers`,
+                instructionKey: 'long-mult-div',
+                steps: ['Read the sign: × or ÷.', 'Work one digit at a time.', 'Write carries small, in their boxes.', 'Write the answer in the boxes.'],
+                say: '__ times __ is __. / __ divided by __ is __.',
+            };
+        }
+        if (kind === 'short') {
+            return {
+                iCan: `I Can multiply a ${nd} number by a 1-digit number`,
+                instructionKey: 'short-mult',
+                steps: ['Multiply the ones.', 'Write the carry in the box of the next place.', 'Multiply the next digit. Add the carry.', 'Keep going to the last digit.'],
+                say: '__ times __ is __.',
+                sayValues: (item) => { const e = lmOf(item); return e ? [e.a, e.b, e.a * e.b] : null; },
+            };
+        }
+        if (kind === 'div') {
+            return {
+                iCan: `I Can divide a ${nd} number by a 1-digit number`,
+                instructionKey: 'short-div',
+                steps: ['Divide the first digit.', 'Write what is left small, in front of the next digit.', 'Divide the next number.', 'Keep going to the last digit.'],
+                say: '__ divided by __ is __.',
+                sayValues: (item) => { const e = lmOf(item); return e ? [e.a, e.b, Math.floor(e.a / e.b)] : null; },
+            };
+        }
+        return {
+            iCan: `I Can multiply a ${nd} number by a 2-digit number`,
+            instructionKey: 'long-mult',
+            steps: ['Multiply by the ones digit.', 'Write 0 in the ones. Multiply by the tens digit.', 'Add the two rows.', 'Write the answer.'],
+            say: '__ times __ is __.',
+            sayValues: (item) => { const e = lmOf(item); return e ? [e.a, e.b, e.a * e.b] : null; },
+        };
+    }),
+    misconceptions: ['no-placeholder', 'carry-wrong-row', 'dropped-exchange', 'dropped-carry'],
+    workedSteps: (q) => {
+        const d = lmOf(q);
+        if (!d) return [];
+        if (d.kind === 'div') {
+            const D = String(d.a);
+            const out = [];
+            let r = 0;
+            for (let j = 0; j < D.length && out.length < 4; j++) {
+                const cur = r * 10 + Number(D[j]);
+                const digit = Math.floor(cur / d.b);
+                const left = cur - digit * d.b;
+                out.push(step(`${cur} ÷ ${d.b} = ${digit}${left ? `, ${left} left: write it small before the next digit` : ''}.`));
+                r = left;
+            }
+            out.push(step(`${d.a} ÷ ${d.b} = ${Math.floor(d.a / d.b)}.`, [{ slot: 'answer', value: String(Math.floor(d.a / d.b)) }]));
+            return clampSteps(out);
+        }
+        if (d.kind === 'short') {
+            const A = String(d.a);
+            const out = [];
+            let c = 0;
+            for (let i = A.length - 1; i >= 0 && out.length < 4; i--) {
+                const pr = Number(A[i]) * d.b + c;
+                out.push(step(`${A[i]} × ${d.b}${c ? ` + ${c}` : ''} = ${pr}${i > 0 && pr >= 10 ? `: write ${pr % 10}, carry ${Math.floor(pr / 10)}` : ''}.`));
+                c = Math.floor(pr / 10);
+            }
+            out.push(step(`${d.a} × ${d.b} = ${d.a * d.b}.`, [{ slot: 'answer', value: String(d.a * d.b) }]));
+            return clampSteps(out);
+        }
+        const ones = d.b % 10, tens = Math.floor(d.b / 10);
+        return clampSteps([
+            step(`${d.a} × ${ones} = ${d.a * ones}. Write it in the first row.`),
+            step(`Write 0 in the ones: the next row is tens.`),
+            step(`${d.a} × ${tens * 10} = ${d.a * tens * 10}. Write it in the second row.`),
+            step(`${d.a * ones} + ${d.a * tens * 10} = ${d.a * d.b}.`, [{ slot: 'answer', value: String(d.a * d.b) }]),
+        ]);
+    },
+    wrongAnswer: (q) => {
+        const d = lmOf(q);
+        if (!d) return null;
+        if (d.kind === 'div') {
+            // the exchange dropped: every digit divided on its own, the remainders thrown away
+            const v = Number(String(d.a).split('').map((x) => String(Math.floor(Number(x) / d.b))).join('')) || 0;
+            return chooseWrong(q, [
+                v !== Math.floor(d.a / d.b) && v > 0 ? { value: v, misconception: 'dropped-exchange', explain: 'Did not carry what was left to the next digit.' } : null,
+            ]);
+        }
+        if (d.kind === 'short') {
+            // the carries dropped: each digit's product written alone, its tens thrown away
+            const A = String(d.a);
+            const v = Number(A.split('').map((x) => String((Number(x) * d.b) % 10)).join('')) || 0;
+            return chooseWrong(q, [v !== d.a * d.b ? { value: v, misconception: 'dropped-carry', explain: 'Did not add the carries.' } : null]);
+        }
+        const ones = d.b % 10, tens = Math.floor(d.b / 10);
+        return chooseWrong(q, [
+            // the placeholder forgotten: the tens row added as if it were ones
+            { value: d.a * ones + d.a * tens, misconception: 'no-placeholder', explain: 'The second row has no 0: it was added as ones, not tens.' },
+            { value: d.a * ones + d.a * tens * 10 + 10, misconception: 'carry-wrong-row', explain: 'A carry was added in the wrong row.' },
+        ]);
+    },
+});

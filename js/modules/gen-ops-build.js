@@ -12,7 +12,7 @@
 import { state } from './state.js';
 import { dealIndex, dealPick } from './page-deal.js';
 import { optionsFor } from './skill-options.js';
-import { k2Twin, fadeRung } from './sheet/index.js';
+import { k2Twin, fadeRung, renderCell } from './sheet/index.js';
 
 /* ------------------------------------------------------------------------------ options */
 
@@ -435,6 +435,100 @@ export function genAddSubPatterns(q) {
     return q;
 }
 
+/* ================================================ multiplication:long_multiplication_4x2 */
+
+// Build list, lane operations, entry 4 (2026-09-26): long multiplication of a 3- or 4-digit
+// number by a 2-digit one (4.NBT.B.5, 5.NBT.B.5; WRM Y5.B5.S5), and short division of a 3- or
+// 4-digit number by a 1-digit one (4.NBT.B.6; WRM Y5.B5.S8). Templates `long-multiplication`
+// and `short-division` (sheet/cells/long-multiplication.js).
+
+/** The kinds, in the order of the "What the pupil does" option. */
+export const LM_KINDS = Object.freeze(['mult', 'div', 'short']);
+
+/** The screen twin of an ops-common template: the same drawing at the host's digit size. */
+function opsTwin(template, payload) {
+    let html = '';
+    try { html = renderCell({ cell: { template, v: 1, payload } }, { mode: 'screen', static: true, size: 'L', look: 'ican', state: 'blank' }); } catch (e) { html = ''; }
+    return `<div data-mq-join="">${html}</div>`;
+}
+
+const rnd = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+
+/** Does short division of n by d exchange at least once (a remainder carried into a digit)? */
+function exchanges(n, d) {
+    const D = String(n);
+    let r = 0;
+    for (let j = 0; j < D.length; j++) {
+        const cur = r * 10 + Number(D[j]);
+        if (j > 0 && r > 0) return true;
+        r = cur % d;
+    }
+    return false;
+}
+
+export function genLongMult(q) {
+    const kinds = ticked('forms', [0, 1]).map((i) => LM_KINDS[i]).filter(Boolean);
+    const kind = kinds.length > 1 ? kinds[dealIndex('lm:kind', kinds.length)] : kinds[0] || 'mult';
+    const digits = Number(opt('tiles')) === 32 ? 3 : 4;
+    const levels = ticked('level', [2, 1, 0]).slice().sort((x, y) => y - x);
+    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : 0;
+    const level = levels[fadeRung(at, levels.length, state.itemCount, Number.isFinite(state.itemIndex))];
+    const lo = 10 ** (digits - 1), hi = 10 ** digits - 1;
+    if (kind === 'div') {
+        // the divisor is dealt (a page holds each of 2-9 once before any repeats); the quotient is
+        // chosen so the dividend has the asked number of digits and at least one exchange
+        const d = dealPick(`lm:div:${digits}`, [2, 3, 4, 5, 6, 7, 8, 9]);
+        let n = 0;
+        for (let t = 0; t < 60; t++) {
+            const quo = rnd(Math.ceil(lo / d), Math.floor(hi / d));
+            n = quo * d;
+            if (n >= lo && n <= hi && exchanges(n, d) && n % 10 !== 0) break;
+        }
+        const quotient = n / d;
+        const payload = { dividend: n, divisor: d, level };
+        q.text = `Divide: ${n} ÷ ${d}.`;
+        q.printText = 'Use short division. Write the answer.';
+        q.ans = quotient;
+        q.a = n; q.b = d; q.op = '÷';
+        q.answerType = 'number';
+        q.options = [];
+        q.hint = `Divide each digit by ${d}, from the left. Carry what is left over to the next digit: write it small in front of it.`;
+        q.skillLabel = 'Short Division';
+        q.lm = { kind, a: n, b: d, level, digits };
+        q.cell = { template: 'short-division', v: 1, payload };
+        q.visual = opsTwin('short-division', payload);
+        q.printFormat = 'short-div-kit';
+        q.notation = 'bracket';
+        return q;
+    }
+    // the multiplier: its ones digit is dealt from 2-9 (a 0 has no ones row, a 1 copies the top
+    // number) and its tens digit from 1-9, each on its own key (L10); short multiplication has the
+    // ones digit alone
+    const short = kind === 'short';
+    const ones = dealPick(`lm:ones:${short ? 's' : ''}${digits}`, [2, 3, 4, 5, 6, 7, 8, 9]);
+    const tens = short ? 0 : dealPick(`lm:tens:${digits}`, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    const b = tens * 10 + ones;
+    let a = rnd(lo, hi);
+    // a top number of all one digit (2222) or ending in 0 has no carrying to practise
+    for (let t = 0; t < 20 && (a % 10 === 0 || /^(\d)\1+$/.test(String(a))); t++) a = rnd(lo, hi);
+    const payload = { a, b, level };
+    q.text = `Multiply: ${a} × ${b}.`;
+    q.printText = short ? 'Use short multiplication. Write the answer.' : 'Use long multiplication. Write the answer.';
+    q.ans = a * b;
+    q.a = a; q.b = b; q.op = '×';
+    q.answerType = 'number';
+    q.options = [];
+    q.hint = short ? `Multiply each digit of ${a} by ${ones}, from the ones. Write a carry small, in the box of the next place.`
+        : `First ${a} × ${ones}. Then ${a} × ${tens * 10}: write 0 in the ones first. Add the two rows.`;
+    q.skillLabel = short ? 'Short Multiplication' : 'Long Multiplication';
+    q.lm = { kind, a, b, level, digits };
+    q.cell = { template: 'long-multiplication', v: 1, payload };
+    q.visual = opsTwin('long-multiplication', payload);
+    q.printFormat = 'long-mult-kit';
+    q.notation = 'stacked';
+    return q;
+}
+
 /* ------------------------------------------------------------------------------ dispatch */
 
 /** Every skill id this module generates, by its id within its category. */
@@ -442,6 +536,7 @@ export const OPS_BUILD_SKILLS = Object.freeze({
     count_through_zero: genCountThroughZero,
     share_and_group_early: genShareGroupEarly,
     add_sub_patterns: genAddSubPatterns,
+    long_multiplication_4x2: genLongMult,
 });
 
 /** Generate `q` for a build-lane skill; false when the id is not one of them. */

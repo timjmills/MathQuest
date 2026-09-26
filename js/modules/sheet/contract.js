@@ -235,6 +235,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'ladder-result': 'Use the first fact. Write each answer.',
     'ladder-missing': 'Use the first fact. Write the missing numbers.',
     'ladder-fill': 'Use the first fact. Fill in the boxes.',
+    'long-mult': 'Use long multiplication. Write the answer.',
+    'short-div': 'Use short division. Write the answer.',
+    'short-mult': 'Use short multiplication. Write the answer.',
+    'long-mult-div': 'Multiply or divide. Write the answer.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',

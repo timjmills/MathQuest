@@ -127,7 +127,7 @@ export const SKILL_GRADES = {
     'missing_factor_or_addend': 3,  // 3.OA.A.4 — determine the unknown in an equation
     // Integers
     'number_line_int': 6, 'compare_int': 6, 'add_int': 6, 'sub_int': 6,
-    'count_through_zero': 4, 'share_and_group_early': 'K', 'add_sub_patterns': 2,
+    'count_through_zero': 4, 'share_and_group_early': 'K', 'add_sub_patterns': 2, 'long_multiplication_4x2': 5,
     // Fraction Operations
     'add_fractions_like': 4, 'sub_fractions_like': 4, 'add_mixed_like': 4, 'sub_mixed_like': 4,
     'mult_frac_whole': 4, 'decompose_fractions': 4, 'frac_word_problems': 4, 'frac_word_problems_plain': 4, 'frac_10_100': 4,
@@ -758,6 +758,9 @@ export const SKILLS = {
         { v: "mult_missing_digit", l: "Find the Missing Digit (Multiplication)" },   // MB-12
         // APPENDED 2026-09-25 (owner): one count-by row per table, to 12x (3.OA.7 prep).
         { v: "count_by_tables", l: "Count by 1–12" },
+        // APPENDED 2026-09-26 (build list, lane operations, entry 4): long multiplication (3- or
+        // 4-digit × 2-digit) and short division (3- or 4-digit ÷ 1-digit), 4.NBT.5-6, 5.NBT.5.
+        { v: "long_multiplication_4x2", l: "Long Multiplication and Short Division" },
     ],
     division: [
         { v: "div_facts", l: "Division Facts (1-12)" },
@@ -1675,6 +1678,7 @@ export const SKILL_TIME_CATEGORY = {
     // Basic operations & arithmetic
     add_decimal: "quick", sub_decimal: "quick", mult_decimal: "quick", div_decimal: "quick",
     add_int: "quick", sub_int: "quick", count_through_zero: "quick", share_and_group_early: "quick", add_sub_patterns: "quick",
+    long_multiplication_4x2: "extended",
     missing_add_sub: "quick", missing_mult_div: "quick",
     // Reusable primitive demos
     cloze_addition: "quick", hotspot_quads: "quick",
@@ -1893,7 +1897,7 @@ export const SKILL_PRINT_SIZE = {
     estimate_sums_diffs: "standard", estimate_products: "standard", estimate_quotient: "standard",
     make_a_ten: "medium", doubles_near_doubles: "medium", compensation: "medium",
     expand: "medium", combine: "medium",
-    add_int: "standard", sub_int: "standard", number_line_int: "standard", count_through_zero: "wide", share_and_group_early: "medium", add_sub_patterns: "medium",
+    add_int: "standard", sub_int: "standard", number_line_int: "standard", count_through_zero: "wide", share_and_group_early: "medium", add_sub_patterns: "medium", long_multiplication_4x2: "medium",
     solve_unknown: "standard", evaluate_expression: "standard",
     write_expression: "standard", inequalities: "standard",
     build_expr_addsub: "wide", build_expr_multdiv: "wide",

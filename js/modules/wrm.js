@@ -374,6 +374,11 @@ export const SKILL_WRM = {
         { step: 'Y5.B5.S5', partial: 'a 4-digit by 2-digit long multiplication worked to the end' },
         { step: 'Y6.B2.S7', partial: 'the whole 4-digit by 2-digit calculation' },
     ],
+    // Build lane operations, entry 4 (2026-09-26): long multiplication and short division.
+    'multiplication:long_multiplication_4x2': [
+        'Y5.B5.S1', 'Y5.B5.S4', 'Y5.B5.S5', 'Y5.B5.S7', 'Y5.B5.S8', 'Y6.B2.S7', 'Y6.B2.S9',
+        { step: 'Y5.B5.S10', partial: 'short division is one efficient method; choosing between methods is not dealt' },
+    ],
     'multiplication:count_by_tables': [
         { step: 'Y2.B5.S9', note: '2' },
         { step: 'Y2.B5.S13', note: '10' },
@@ -2277,22 +2282,15 @@ export const WRM_PROPOSALS = {
         family: 'operations',
         steps: ['Y5.B3.S10'],
     },
-    long_mult: {
-        kind: 'new', skill: 'multiplication:long_multiplication_4x2',
-        name: 'Long Multiplication and Division (4-digit)',
-        teaches: 'long multiplication of a 4-digit by a 2-digit number, short division of a 4-digit number, and choosing an efficient division method',
-        representation: 'a column grid with carry boxes and the placeholder row; option: short division bus stop with exchange boxes',
-        family: 'operations',
-        steps: ['Y5.B5.S1', 'Y5.B5.S5', 'Y5.B5.S8', 'Y5.B5.S10'],
-        improves: ['Y6.B2.S7'],
-    },
     div_factors: {
         kind: 'new', skill: 'division:divide_using_factors',
         name: 'Division Using Factors',
         teaches: 'dividing by a 2-digit number by dividing by its factors in turn (420 ÷ 12 = 420 ÷ 2 ÷ 6)',
         representation: 'a two-step arrow diagram with the factor pair chosen',
         family: 'operations',
-        steps: ['Y6.B2.S10'],
+        // Y5.B5.S10 "Efficient division": choosing a method (the factor method among them) is
+        // what this entry adds beside long_multiplication_4x2's short division (2026-09-26)
+        steps: ['Y6.B2.S10', 'Y5.B5.S10'],
     },
     long_div_rem: {
         kind: 'option', skill: 'division:long_div_2digit', option: 'remainders',
