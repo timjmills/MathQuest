@@ -167,6 +167,28 @@ then come back."
   more than 4 questions, or points at an unknown lesson; a prerequisite graph with no cycles (a lesson may not require
   itself through a chain). The coverage record lists lessons blocked only by a missing prerequisite lesson.
 
+## 8c. Owner ruling: merge the stand-alone page types into the lesson designs (2026-09-26)
+
+The stand-alone worksheet page types kept failing the critic for almost every skill (Guided 24/105, Find the mistake
+3/27 skills, Review and Worked example half-empty), while the lesson packet's pages passed 48/48. Owner: "merge these
+types". One design per page job, used by both the lesson packet and the Print screen:
+
+| Print-screen page type | Becomes | Source in the lesson packet |
+|---|---|---|
+| Worked example (scripted Model) | the **anchor chart** for the skill (steps, icons, Say, rule, other examples) | `chartPage` |
+| Guided | the **We Do** band: worked example + tries with fading grey hints and the chart's steps, one page | lesson sheet guided band |
+| Warm-up / pre-skill check | the **Prerequisite Check** (§8b) | lesson sheet warm-up |
+| Independent / More practice | the lesson **practice** page (one frame, rows sized to content, min-size floors §8a) | practice page |
+| Review / Mixed practice | the lesson **mixed** page (earlier skills only, lesson skill ≥ half) | mixed page |
+| Find the mistake, Test, Reason it, Stretch | keep their jobs, but reuse the practice-page frame and row sizing | — |
+
+Build order: the engine lane (E) extracts the lesson page builders into shared, archetype-driven modules
+(`sheet/lesson-pages/*`) during Phase 0 (samples byte-identical). The role lane then turns `roles/guided.js`,
+`roles/scripted-model.js`, `roles/review.js` (and the practice frame used by the others) into thin adapters that call
+those builders for ANY skill, falling back to the old role only for skills whose archetype is not built yet. Providers
+supply the data both need (worked steps, cases, row-1 hint / level-2 cue, prerequisites). Each switched skill is
+re-graded by the critic; the old page stays until its replacement passes.
+
 ## 9. Risks
 
 Engine regressions invalidating passed lessons (single engine owner, render-hash stamps → `stale`); ≈ 359 steps blocked
