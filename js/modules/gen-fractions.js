@@ -100,9 +100,11 @@ function _fParts(str) {
  * whole (never the answer: RP-1), "=", and the answer boxes - a mixed number's three boxes when
  * the answer can be 1 or more (`mixed`), a fraction's two otherwise. Pictures off: numbers only.
  */
-function _fSentenceKit(q, terms, ops, kind, { mixed = false, wholeMm = 26, stack = false, perRow = 0, area = null, barH = 0 } = {}) {
+function _fSentenceKit(q, terms, ops, kind, { mixed = false, wholeMm = 26, stack = false, perRow = 0, area = null, barH = 0, ans = null } = {}) {
     const k = _fPicturesOff() ? null : kind;
-    const a = _fParts(q.ans) || {};
+    // `ans` = the parts the boxes hold when they differ from q.ans's form (an improper sum kept
+    // in a fraction's two boxes; q.ans stays the simplified form, checked by equivalence)
+    const a = ans || _fParts(q.ans) || {};
     // the answer's boxes: a mixed number's three where the answer can reach 1, a fraction's two,
     // one box where the answer can only be a whole number (a whole divided by a unit fraction)
     const whole = !a.n && !mixed;
@@ -318,7 +320,11 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
                 // KIT (O6 lane AP3): both fractions drawn on one whole as the ticked model (bars by
                 // default), never the sum (RP-1); the pupil writes the sum in the boxes after "=".
-                _fSentenceKit(q, [{ n: n1, d: den }, { n: n2, d: den }], ['+'], _fModelPick() || 'bar', { mixed: sumNum >= den });
+                // The answer is always a fraction's two boxes: three boxes only when the sum reaches
+                // 1 told the pupil that before they added (critic anchor-r2). A sum of 1 or more is
+                // written as the fraction it is (5/4, 4/4), which the checker accepts as 1 1/4 or 1.
+                _fSentenceKit(q, [{ n: n1, d: den }, { n: n2, d: den }], ['+'], _fModelPick() || 'bar',
+                    sumNum >= den ? { ans: { n: sumNum, d: den } } : {});
                 return;
 
             } else if (fracSkill === "sub_fractions_like" && Math.random() < 0.25) {
@@ -461,11 +467,15 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "add_mixed_like") {
                 // Grade 4: Add mixed numbers with SAME denominator
-                const den = pick([2, 3, 4, 5, 6, 8]);
+                // Never a whole-number sum (1 3/4 + 2 1/4 = 4): the answer is three boxes (whole,
+                // numerator, denominator), and a whole sum leaves two of them empty on the key
+                // (AK-2). Halves always make a whole (1/2 + 1/2), so this skill uses thirds and up.
+                const den = pick([3, 4, 5, 6, 8]);
                 const w1 = rng(1, 4);
                 const f1 = rng(1, den - 1);
                 const w2 = rng(1, 3);
-                const f2 = rng(1, den - 1);
+                let f2 = rng(1, den - 1);
+                if (f1 + f2 === den) f2 = f2 > 1 ? f2 - 1 : f2 + 1;
                 const totalNum = (w1 * den + f1) + (w2 * den + f2);
                 const answer = _fracStr(totalNum, den);
 

@@ -711,7 +711,9 @@ function genMoneyCount(q, skill) {
         const v = vals[deal(`${skill}:v`, vals.length)];
         const most = Math.max(1, Math.min(maxN, Math.floor(band / v)));
         let n;
-        if (k === 0) n = 1;                                               // a single coin
+        // the fewest coins that still count on: two (a lone coin is naming, not counting, and sat
+        // pinned in a cell a third empty - critic anchor-r2, RUBRIC H13)
+        if (k === 0) n = Math.min(2, most);
         else if (k === 1) n = most;                                       // as many as the cell holds (six 10s)
         else if (k === 2 && v === 25 && band >= 100 && maxN >= 4) n = 4;   // exactly 100
         else n = randInt(Math.min(2, most), most);

@@ -1486,7 +1486,9 @@ export async function buildSheet(req = {}) {
             ? { variant: 'side', colsList: [1, 2], twinCols: 2 } : { variant: 'band', colsList: [1], twinCols: 4 });
         if (!set.eligible) { anchorNotes.push(ineligibleNote(metaOf(sk).label)); return null; }
         if (anchorMode === 'side') sec.columns = 2;
-        else { sec.maxCols = 4; sec.anchorMm = set.heightMm(1); }
+        // At S a block may hold up to 6 narrow problems in a row (LESSONS_LEARNED L1: S fits more
+        // than L; critic anchor-r2: a two-digit stack sat in a 46 mm cell 30% empty each side).
+        else { sec.maxCols = n.size === 'S' ? 6 : 4; sec.anchorMm = set.heightMm(1); }
         sec.noChoice = true;
         return set;
     });

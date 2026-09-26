@@ -579,7 +579,13 @@ export function anchorRich(q = {}) {
     }
     if (c.template === 'stack' && ops.length >= 2 && ops.every(Number.isFinite)) {
         // No zero ones digit (12 - 10, 20 - 10) and no one-digit operand under a longer one.
-        return ops.every((n) => n % 10 !== 0) && new Set(ops.map((n) => String(Math.abs(n)).length)).size === 1;
+        // ...and no zero digit in the answer (21 - 11 = 10 works "1 - 1 = 0"; 39 - 36 = 3 leaves
+        // an unprinted tens), so every column of the example shows the real move.
+        const res = /-|\u2212/.test(String(p.op || '')) ? ops[0] - ops[1] : ops.reduce((a, n) => a + n, 0);
+        const rs = String(Math.abs(res));
+        return ops.every((n) => n % 10 !== 0) && res > 0 && !rs.includes('0')
+            && rs.length >= String(Math.abs(ops[0])).length
+            && new Set(ops.map((n) => String(Math.abs(n)).length)).size === 1;
     }
     if (c.template === 'clock' && p.m !== undefined) {
         const m = Number(p.m);
