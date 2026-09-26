@@ -380,12 +380,12 @@ const hostLike = (q, h = 50) => {
         q, key, template: q.cell.template, legacy: false, skill: `${q.categoryId}:${q.skillId}`, answerType: 'number',
         footprint: Object.assign({}, fp, { measure: false, maxCols: 6 }), measured, fclass: 'standard', cellCls: '',
         canShow: () => true,
-        render: (c, { shown, ink } = {}) => {
+        render: (c, { shown, ink, shownSlots } = {}) => {
             let state = c.state;
             let wrong = c.wrong;
             if (shown !== undefined && shown !== null && shown !== '') {
                 if (ink === 'trace' && String(shown) === ans) state = 'traced';
-                else { state = 'wrong'; wrong = { value: String(shown) }; }
+                else { state = 'wrong'; wrong = { value: String(shown), slots: Object.assign({}, shownSlots || {}) }; }
             }
             return renderCell(q, Object.assign({}, c, { state, wrong }));
         },
@@ -543,6 +543,59 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
     const html = p && p.render(ctx, { cols: 1 });
     ok(html && (html.match(/data-ws-slot="ea-ans-\d"/g) || []).length === 3, 'Error analysis: a three-value answer gets one fix box per value');
+    // Critic regrade 5 (AX-4): the Correct / Fix-it block in ONE place on every cell of a page.
+    const { intoAnswerColumn } = ROLE_MODULES['error-analysis'];
+    eq(intoAnswerColumn('<div><svg></svg><div class="fg-ask"><div>Q</div><div>A</div></div></div>', '<i>J</i>'),
+        '<div><svg></svg><div class="fg-ask"><div>Q</div><div>A</div><i>J</i></div></div>', 'Error analysis: the judgement goes at the END of the item\'s own answer column');
+    eq(intoAnswerColumn('<div><span>7</span></div>', '<i>J</i>'), null, 'Error analysis: no answer column, no insertion');
+    const modes = new Set();
+    for (const mode of ['beside', 'below']) {
+        const hm = p && p.render(ctx, { cols: 1, judge: mode });
+        if (hm && new RegExp(`mq-j${mode}[^"]*"[^>]*data-judge-mode="${mode}"`).test(hm)) modes.add(mode);
+    }
+    ok(modes.size === 2 && Array.isArray(p.judgeModes) && p.judgeModes.includes('incol'), 'Error analysis: the page\'s judge mode reaches every cell, and the host is told which modes to measure');
+    // Critic EA r5 / pv-r1 (L3): nothing on the pupil page may tell a wrong answer from a right one.
+    const { likeAnswer, roomOf, varied, rowHeights } = ROLE_MODULES['error-analysis'];
+    eq(likeAnswer('40000', '60,000'), '40,000', 'L3: a wrong value takes the right answer\'s commas');
+    eq(likeAnswer('40,000', '60000'), '40000', 'L3: ... and drops them when the right answer has none');
+    eq(likeAnswer('3.5', '2.75'), '3.50', 'L3: ... its decimal places');
+    eq(likeAnswer('5', '7 cm'), '5 cm', 'L3: ... and its unit');
+    eq(likeAnswer('<', '>'), '<', 'L3: a sign is left as it is');
+    // critic pv-r2: the rounding keys are stored "6000" on a page that prints "6,093" - the PAGE's
+    // rule decides, for the wrong value AND the right one
+    eq(likeAnswer('10000', '6000', { commas: true }), '10,000', 'L3: a page that prints commas writes the wrong value with them, whatever the key stores');
+    eq(likeAnswer('6000', '6000', { commas: true }), '6,000', 'L3: ... and the right value too');
+    eq(likeAnswer('6,093', '6000', { commas: false }), '6093', 'L3: a page without commas writes none');
+    eq(likeAnswer('170', '80 + 80 = 160'), '170', 'L3: a sentence answer is never glued to a bare number');
+    eq(likeAnswer('3:30', '3:15'), '3:30', 'L3: a time is left as written');
+    eq(likeAnswer('5', '3/4'), '5', 'L3: a fraction tail is not a unit');
+    {
+        // one pupil page, one rounding item shown right and one shown wrong: no 4+ digit number without its comma
+        const rq = (ans, n) => ({ categoryId: 'number_sense', skillId: 'nearest_1000', ans, text: `Round ${n} to the nearest 1,000.`, cell: { template: 'equation', v: 1, payload: {} } });
+        const itm = (ans, n) => ({ q: rq(ans, n), template: 'equation', fclass: 'standard', footprint: { wMm: 80 }, render: (c, o) => `<div>${(o && o.shownSlots && o.shownSlots.answer) || (o && o.shown) || ''}</div>`,
+            key: { value: ans, display: ans, slots: { answer: { value: ans, graded: true } } } });
+        const right = prepare(itm('6000', '6,093'), { index: 0, wrong: false });
+        const html = right && right.render(ctx, { cols: 1, judge: 'below' });
+        ok(html && /6,000/.test(html) && !/\b6000\b/.test(html), 'L3: a right answer stored "6000" prints "6,000" on a page that writes commas');
+    }
+    // The fix box's width comes from what the page prints, never from the right answer.
+    const roundQ = (ans) => ({ categoryId: 'number_sense', skillId: 'nearest_1000', ans, text: 'Round 9,677 to the nearest 1,000.', cell: { template: 'equation', v: 1, payload: { n: 9677, place: 1000, answer: ans } } });
+    const widthOf = (ans, shown) => {
+        const itm = { q: roundQ(ans), template: 'equation', fclass: 'standard', footprint: { wMm: 80 }, render: () => '<div>Round 9,677</div>', key: { value: ans, display: ans, slots: { answer: { value: ans, graded: true } } } };
+        const pp = prepare(itm, { index: 0, wrong: false });
+        const hm = pp && pp.render(ctx, { cols: 1, judge: 'below' });
+        const m = hm && /<[^>]*--w:\s*([\d.]+)mm[^>]*data-ws-slot="ea-ans"/.exec(hm);
+        return m ? Number(m[1]) : NaN;
+    };
+    ok(Number.isFinite(widthOf('10,000')) && widthOf('10,000') === widthOf('9,000'), `L3: the fix box is as wide for "10,000" as for "9,000" (${widthOf('10,000')} / ${widthOf('9,000')} mm)`);
+    eq(roomOf({ q: roundQ('10,000') }), roomOf({ q: roundQ('9,000') }), 'L3: the fix room reads the printed numbers, not the answer');
+    // L10: the page deals each right answer once before it repeats one.
+    const mk = (c, w) => ({ thinking: { correct: c, isWrong: w } });
+    eq(varied([mk('>', true), mk('>', true), mk('<', true), mk('=', false)]).map((x) => x.thinking.correct).join(''), '><=>', 'L10: a new right answer comes before a repeat (wrong items)');
+    // A page's spare height grows its rows, never a strip between them.
+    const fake2 = (h) => ({ measured: { 1: { hMm: h, fits: true } } });
+    const rh = rowHeights([fake2(40), fake2(40)], 1, 200);
+    ok(rh.every((x) => x > 44 && x <= 100) && Math.abs(rh[0] - rh[1]) < 0.01, `EA r5 A: rows grow alike toward the grid, at most 1.4 times (${rh.join(', ')})`);
 }
 // Guided Steps band: the provider's own steps, read row by row (1 2 / 3 4), never 1 3 / 2.
 {
@@ -586,6 +639,23 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     ok(plan.meta.wrongShare > 0, 'PT-ERR-1: at least one real wrong answer');
     ok(/data-ws-slot="ea-ans" data-ws-shape="box"/.test(r.pupilHtml), 'Error analysis: the fix is a square write box');
     ok(/correct answer<\/small>/.test(r.pupilHtml), 'Error analysis: the write box is captioned');
+    // Critic round 4 (H1): a "wrong" item whose work shows the RIGHT answer never prints.
+    const { prepare: eaPrepare } = ROLE_MODULES['error-analysis'];
+    const honest = hostLike(stackQ(333, 111));
+    ok(eaPrepare(honest, { index: 0, wrong: true }) !== null, 'Error analysis: a wrong item whose work shows the wrong value is kept');
+    const liar = Object.assign(hostLike(stackQ(333, 111)), { render: (c) => renderCell(stackQ(333, 111), Object.assign({}, c, { state: 'answered' })) });
+    ok(eaPrepare(liar, { index: 0, wrong: true }) === null, 'Error analysis: a wrong item whose template draws the right answer is never printed (H1)');
+    // LESSONS_LEARNED L3, the round-4 case: add_three's cell fills its slot from the key, so a
+    // "wrong" 7 for 3 + 4 + 3 was drawn as 10. The role names the slot; the work shows 7.
+    const a3q = { categoryId: 'addition', skillId: 'add_three', answerType: 'number', text: '3 + 4 + 3 = ?', ans: 10,
+        distractorTags: { 7: 'Added only two of the three numbers.' },
+        cell: { template: 'add-three', v: 1, payload: { a: 3, b: 4, c: 3, pictures: false } } };
+    const a3 = eaPrepare(hostLike(a3q), { index: 0, wrong: true });
+    ok(a3 !== null && a3.thinking.shown === '7', `L3: add_three shows the wrong 7 in its own slot (${a3 && a3.thinking.shown})`);
+    if (a3) {
+        const work = a3.render(resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'answered' }), { cols: 1 });
+        ok(/data-ws-slot="answer"[^>]*>(?:<[^>]*>)*7</.test(work), 'L3: the pupil\'s slot holds 7, never the right sum');
+    }
     const none = hostPlan('error-analysis', [ADD_SKILL], addMake);
     ok(typeof none.unsupported === 'string' && /wrong/.test(none.unsupported), `PT-ERR-1: no real wrong answer -> unsupported, never an all-correct page (${none.unsupported || none.plan.meta.wrongShare})`);
 }

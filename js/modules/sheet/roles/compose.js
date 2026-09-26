@@ -86,7 +86,7 @@ export function frameOf({ skills = [], input = {}, tabId, title, twoLine = false
     const derived = title || (titles.length === 1 ? titles[0] : titles.length ? 'Mixed practice' : 'I Can practise');
     const finalTitle = typeof h.title === 'string' && h.title.trim() ? h.title.trim() : derived;
     const strands = [...new Set(words.map((w) => w.strand).filter(Boolean))];
-    const level = levelLine(skills.map((s) => s.grade));
+    const level = levelLine(skills.flatMap((s) => s.grades || [s.grade]));
     const tabLines = Array.isArray(h.tab) && h.tab.length ? h.tab.map(String)
         : !twoLine && strands.length === 1 ? [level, strands[0], tabId] : [level, tabId];
     const ids = [...new Set(skills.map((s) => s.skillId).filter(Boolean))];
@@ -94,7 +94,7 @@ export function frameOf({ skills = [], input = {}, tabId, title, twoLine = false
     const codes = [...new Set(skills.flatMap((s) => String(s.ccss || '').split(/[,;]\s*/)).map((c) => c.trim()).filter(Boolean))];
     const ccss = codes.length > 9 ? `${codes.slice(0, 9).join(', ')} +${codes.length - 9}` : codes.join(', ');
     // A lesson packet prints its own tags on every sheet (header.footerLeft, roles/lesson.js).
-    const left = footerLeft || (typeof h.footerLeft === 'string' && h.footerLeft) || [idText, gradeWords(skills.map((s) => s.grade)), ccss].filter(Boolean).join(' · ');
+    const left = footerLeft || (typeof h.footerLeft === 'string' && h.footerLeft) || [idText, gradeWords(skills.flatMap((s) => s.grades || [s.grade])), ccss].filter(Boolean).join(' · ');
     const on = (k) => h[k] !== false;
     const tab = h.tab === false ? false : tabLines;
     const size = (input.ctx && SIZES[input.ctx.size]) ? input.ctx.size : DEFAULT_SIZE;
