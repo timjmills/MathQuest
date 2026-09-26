@@ -326,7 +326,15 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   await page.evaluate(pickRole, 'review');
   await sleep(6000);
   const warn = await page.evaluate(() => (document.querySelector('#tvFits .tv-fits-warn') || {}).textContent || '');
-  if (!/of 4 skills fit/.test(warn)) fail(`Print: no warning when a Review page cannot hold every skill ("${warn}")`);
+  // Since the review sections round (sweet-newton, 2026-09-26) a Review page deals one section per
+  // skill and can hold all four: then there is nothing to warn about. The rule is only that a skill
+  // never misses the sheet QUIETLY.
+  const placed = await page.evaluate(async () => {
+    const skills = [['composing', 'base10_regroup'], ['addition', 'add_10_no_regroup'], ['addition', 'add_10_regroup'], ['addition', 'add_20_no_regroup']].map(([c, s]) => ({ categoryId: c, skillId: s }));
+    const b = await window.buildSheet({ role: 'review', sections: [{ skills }], size: 'L', seed: 4242, key: false });
+    return new Set((b.items || []).map((it) => it && it.skill).filter(Boolean)).size;
+  });
+  if (!/of 4 skills fit/.test(warn) && placed < 4) fail(`Print: no warning when a Review page cannot hold every skill ("${warn}", ${placed} of 4 placed)`);
   await page.evaluate(() => window.tvOpenPrintWith(window.skillQueue));
   await sleep(300);
   // More Practice letter chips
