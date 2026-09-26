@@ -131,6 +131,21 @@ Owner ruling: everything is committed only after an independent critic scores it
 - The grades ledger records the basis (`direct` / `sampled` / `machine`) so what was graded is auditable.
 - `ws-lesson-check` (25 seeds, every LESSON_RULES rule, LINK-1…5) must pass before a batch reaches a critic.
 
+## 8a. Owner ruling on sizes (2026-09-26)
+
+"Lessons themselves can be just one size, but when printed as practice pages or added to mixed practice pages at
+different sizes they need to work, or they default to their needed size and problems work around them on the page."
+
+- **The lesson packet prints at one size** (the anchor chart and lesson sheet at their designed size; the size control is
+  not offered for the Lesson role, with a required tooltip saying why). The S→M notice is retired.
+- **Practice and mixed pages honour the teacher's size S / M / L.** Every item that CAN be drawn at the chosen size is.
+- **An item that cannot be drawn at the chosen size keeps its minimum needed size** (a per-template `minSize`, e.g. the
+  regroup stack at M, a clock or graph at its readable floor), and the page packs the other items around it: the
+  paginator places mixed-height and mixed-width items together (rows grouped by height, spanning cells where needed) with
+  no blank strips — never shrinking content below its floor and never forcing the whole page up a size.
+- Gate: a mixed page at S that contains a `minSize: M` item must still hold more items than the same page at L, keep every
+  item at or above its floor, and pass H13; `ws-lesson-check` and `ws-layout-unit` carry this case.
+
 ## 9. Risks
 
 Engine regressions invalidating passed lessons (single engine owner, render-hash stamps → `stale`); ≈ 359 steps blocked
