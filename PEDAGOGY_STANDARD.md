@@ -1246,6 +1246,7 @@ word. New strings may be added only by adding a key here.
 | `story-v2` | Solve. Write the number and the label. | word problems v2 |
 | `story-k` | Show the story with lines. Write the equation. | K picture version |
 | `check-fix` | Check the work. Check one box: Correct or Fix it. | error analysis |
+| `check-fix-check` | Is it right? Check one box. Fix it: check the right one. | error analysis page whose fixes are check boxes (build lane k2) |
 | `check-by` | Multiply to check. Check one box: Correct or Fix it. | check-only steps |
 
 The two judge wordings are not interchangeable. A page where the pupil then writes the right answer uses **Correct / Fix it** (`check-fix`, `check-by`); a page where the pupil only judges and writes nothing uses **Correct / Not correct** (`judge-correct`, `judge-not-correct`, the decide-only fallback). Ruled 2026-09-19.

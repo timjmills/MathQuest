@@ -1308,3 +1308,10 @@ html body .mq-scell input.mq-workbox:focus { box-shadow: inset 0 0 0 3px #000; }
 /* a start-unknown number line: the given point is where the hops land - a hollow ring, never the
    filled start dot (round 4) */
 html body .mq-scell .mq-nl-start.mq-nl-given .mq-nl-mark::after { background: #fff !important; border: 3px solid #000; box-sizing: border-box; }
+
+/* ---- build lane k2 (critic k2-r1): a ONE-LINE row of choices (data-mq-nowrap: an ordinal line,
+   a picture row) never wraps; the whole column (picture, letter, box) is the tap target, so its
+   check box follows the drawing's size instead of forcing 44 px each and pushing the row off the
+   card. The column keeps its 48 px height. */
+.mq-scell [data-mq-nowrap] > .mq-tickrow { padding: 0 2px; }
+.mq-scell [data-mq-nowrap] .mq-tickbox { width: max(18px, calc(var(--mq-k2, 3.4px) * 7)) !important; height: max(18px, calc(var(--mq-k2, 3.4px) * 7)) !important; min-width: 0 !important; min-height: 0 !important; }

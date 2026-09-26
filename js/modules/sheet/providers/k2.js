@@ -33,26 +33,33 @@ registerSkill('counting:count_objects', {
     supports: Object.freeze(['steps']),
     // task 'same' (K.CC.B.4b): two groups, one moved; the instruction and steps change with it.
     strings: stringsBy((t, ref) => (t === 'same' ? COUNT_SAME
-        : (Number(ref && ref.opts && ref.opts.band) > 20 || num(payloadOf(ref && ref.q).n) > 20) ? COUNT_30 : null), COUNT_WRITE),
+        : (Number(ref && ref.opts && ref.opts.band) > 20 || num(payloadOf(ref && ref.q).band) > 20 || num(payloadOf(ref && ref.q).n) > 20) ? COUNT_30 : null), COUNT_WRITE),
     misconceptions: ['counted-twice', 'skipped-one', 'reversed-teen', 'spread-means-more'],
     workedSteps: (q) => {
         const p = payloadOf(q);
         if (p.kind === 'conserve') {
             const n = num(p.n); const m = num(p.m);
             return [
-                step(`Count A: ${countList(1, n, 1, 10)}. A has ${n}.`),
-                step(`Count B: ${countList(1, m, 1, 10)}. B has ${m}.`),
-                step(n === m ? `${n} and ${m} are the same number.` : `${n} and ${m} are not the same number.`),
-                step(`Check "${q.ans}".`, [{ slot: 'answer', value: String(q.ans) }]),
+                step(`Count A: ${countList(1, n, 1, 10)}. A has ${n}.`, [WORK('countA')]),
+                step(`Count B: ${countList(1, m, 1, 10)}. B has ${m}.`, [WORK('countB')]),
+                step(`${n} and ${m} are ${n === m ? '' : 'not '}the same. Check "${q.ans}".`, [{ slot: 'answer', value: String(q.ans) }]),
             ];
         }
         const n = num(q.ans);
         if (!Number.isFinite(n)) return [];
-        const thing = (/How many (\w+)/i.exec(String(q.text || '')) || [])[1] || 'objects';
+        // PT-MOD-1: each step adds one mark group (k2kit `work`): the start, the count numerals, the
+        // last one ringed, the number written
+        if (p.layout === 'circle') {
+            return [
+                step('Start at the arrow at the top.', [WORK('start')]),
+                step(`Count round the circle: ${countList(1, n, 1, 10)}.`, [WORK('count')]),
+                step(`The last number is ${n}. That is how many.`, [WORK('last')]),
+                step(`Write ${n}.`, [{ slot: 'answer', value: String(n) }]),
+            ];
+        }
         return [
-            step(`Touch each one of the ${thing}.`),
-            step(`Count: ${countList(1, n, 1, 10)}.`),
-            step(`The last number is ${n}.`),
+            step(`Touch each one. Count: ${countList(1, n, 1, 10)}.`, [WORK('count')]),
+            step(`The last number is ${n}. That is how many.`, [WORK('last')]),
             step(`Write ${n}.`, [{ slot: 'answer', value: String(n) }]),
         ];
     },
@@ -675,6 +682,8 @@ registerSkill('composing:ten_frame_build_teen', {
  * ================================================================================================ */
 
 /** The kit payload of an item, or {}. */
+/** A step's working mark for the scripted model (k2kit `work` tokens: count, ring, start ...). */
+const WORK = (v) => ({ slot: 'work', value: v });
 const payloadOf = (q) => (q && q.cell && q.cell.payload && typeof q.cell.payload === 'object' ? q.cell.payload : {});
 
 /**
@@ -736,16 +745,15 @@ registerSkill('counting:zero_none', {
         if (t === 'find') {
             const counts = Array.isArray(p.counts) ? p.counts : [];
             return [
-                step(`Look at ${['A', 'B', 'C'].slice(0, counts.length).join(', ')}.`),
-                step(counts.map((c, i) => `${['A', 'B', 'C'][i]} has ${c}`).join('. ') + '.'),
-                step(`${q.ans} has nothing in it. That is none.`),
+                step('Count each one: ' + counts.map((c, i) => `${['A', 'B', 'C'][i]} has ${c}`).join(', ') + '.', [WORK('count')]),
+                step(`${q.ans} has nothing in it. That is none.`, [WORK('ring')]),
                 step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
             ];
         }
         if (t === 'compute') {
             const n = num(p.n);
             return [
-                step(`There are ${n} on the ${word}.`),
+                step(`There are ${n} on the ${word}.`, [WORK('count')]),
                 step(`Every one is crossed out: ${n} are taken away.`),
                 step('None are left.'),
                 // the numeral stays in the box (traced on the Model), never in the text: the support
@@ -756,16 +764,14 @@ registerSkill('counting:zero_none', {
         const n = num(q.ans);
         if (n === 0) {
             return [
-                step(`Look at the ${word}.`),
-                step(`There is nothing on the ${word}.`),
-                step('Nothing there is none.'),
+                step(`Look at the ${word}.`, [WORK('ring')]),
+                step(`There is nothing on the ${word}. Nothing there is none.`),
                 step('Write the number for none.', [{ slot: 'answer', value: '0' }]),
             ];
         }
         return [
-            step(`Touch each one on the ${word}.`),
-            step(`Count: ${countList(1, n, 1, 10)}.`),
-            step(`The last number is ${n}.`),
+            step(`Touch each one on the ${word}. Count: ${countList(1, n, 1, 10)}.`, [WORK('count')]),
+            step(`The last number is ${n}. That is how many.`),
             step(`Write ${n}.`, [{ slot: 'answer', value: String(n) }]),
         ];
     },
@@ -838,7 +844,6 @@ registerSkill('comparing:compare_size', {
             const order = (p.order || []).map(Number);
             const at = (r) => LETTERS_K2[order.indexOf(r)];
             return [
-                step(`Look at ${names}.`),
                 step(`${at(1)} is the smallest. Write 1 under ${at(1)}.`, [{ slot: `b${order.indexOf(1)}`, value: '1' }]),
                 step(`${at(2)} is the next size. Write 2 under ${at(2)}.`, [{ slot: `b${order.indexOf(2)}`, value: '2' }]),
                 step(`${at(3)} is the biggest. Write 3 under ${at(3)}.`, order.map((r, i) => ({ slot: `b${i}`, value: String(r) }))),
@@ -848,8 +853,7 @@ registerSkill('comparing:compare_size', {
         const most = word === 'bigger' || word === 'biggest';
         return [
             step(`Look at the whole of ${names}.`),
-            step(`${q.ans} takes up the ${most ? 'most' : 'least'} room.`),
-            step(`${q.ans} is the ${word}.`),
+            step(`${q.ans} takes up the ${most ? 'most' : 'least'} room: it is the ${word}.`, [WORK('ring')]),
             step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
         ];
     },
@@ -903,17 +907,15 @@ registerSkill('comparing:odd_one_out', {
         const attr = q.oddAttr || (p.cue) || (/size/i.test(String(q.ans)) ? 'size' : 'kind');
         if (p.kind === 'words') {
             return [
-                step('Look at the circled one.'),
                 step(`Look at the others. They are all the same ${attr === 'kind' ? 'kind of thing' : 'size'}.`),
-                step(`The circled one is ${attr === 'kind' ? 'another kind' : 'another size'}.`),
+                step(`The circled one is ${attr === 'kind' ? 'another kind' : 'another size'}: "${q.ans}".`, [WORK('ring')]),
                 step(`Check "${q.ans}".`, [{ slot: 'answer', value: String(q.ans) }]),
             ];
         }
         const n = (p.choices || []).length;
         return [
-            step(`Look at ${LETTERS_K2.slice(0, n).join(', ')}.`),
-            step(attr === 'kind' ? `${n - 1} are the same kind of thing.` : `${n - 1} are the same size.`),
-            step(`${q.ans} is not like the others.`),
+            step(attr === 'kind' ? `Look at ${LETTERS_K2.slice(0, n).join(', ')}: ${n - 1} are the same kind of thing.` : `Look at ${LETTERS_K2.slice(0, n).join(', ')}: ${n - 1} are the same size.`),
+            step(`${q.ans} is not like the others.`, [WORK('ring')]),
             step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
         ];
     },
@@ -950,9 +952,8 @@ registerSkill('counting:match_same', {
         const t = MATCH_DEFS[q._variant] ? q._variant : 'same';
         const first = t === 'shadow' ? 'Look at the outline of the shadow in the box.' : 'Look at the picture in the box.';
         return [
-            step(first),
-            step(`Look at ${LETTERS_K2.slice(0, n).join(', ')}.`),
-            step(t === 'kind' ? `${q.ans} is the same kind, in another size.` : `${q.ans} is just like it.`),
+            step(`${first} Then look at ${LETTERS_K2.slice(0, n).join(', ')}.`),
+            step(t === 'kind' ? `${q.ans} is the same kind, in another size.` : `${q.ans} is just like it.`, [WORK('ring')]),
             step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
         ];
     },
@@ -1007,8 +1008,7 @@ registerSkill('comparing:compare_capacity', {
             const where = fill >= 0.99 ? 'at the very top' : fill >= 0.7 ? 'near the top' : fill >= 0.4 ? 'halfway up' : fill > 0 ? 'near the bottom' : 'not there: there is none';
             return [
                 step('Look at the grey water.'),
-                step(`The water is ${where}.`),
-                step(`So it is ${String(q.ans).toLowerCase()}.`),
+                step(`The water is ${where}. So it is ${String(q.ans).toLowerCase()}.`, [WORK('ring')]),
                 step(`Check "${q.ans}".`, [{ slot: 'answer', value: String(q.ans) }]),
             ];
         }
@@ -1017,7 +1017,6 @@ registerSkill('comparing:compare_capacity', {
             const order = (p.order || []).map(Number);
             const at = (r) => LETTERS_K2[order.indexOf(r)];
             return [
-                step(holds ? 'Look at how big each one is.' : 'Look at the grey water in each one.'),
                 step(`${at(1)} ${holds ? 'holds' : 'has'} the least. Write 1 under ${at(1)}.`, [{ slot: `b${order.indexOf(1)}`, value: '1' }]),
                 step(`${at(2)} is next. Write 2 under ${at(2)}.`, [{ slot: `b${order.indexOf(2)}`, value: '2' }]),
                 step(`${at(3)} ${holds ? 'holds' : 'has'} the most. Write 3.`, order.map((r, i) => ({ slot: `b${i}`, value: String(r) }))),
@@ -1026,8 +1025,7 @@ registerSkill('comparing:compare_capacity', {
         const more = /more/.test(t);
         return [
             step(holds ? 'Look at how big each one is.' : 'Look at the grey water in each one.'),
-            step(holds ? `${q.ans} is ${more ? 'bigger' : 'smaller'}.` : `${q.ans} has ${more ? 'higher' : 'lower'} water.`),
-            step(`${q.ans} ${holds ? 'holds' : 'has'} ${more ? 'more' : 'less'}.`),
+            step(holds ? `${q.ans} is ${more ? 'bigger' : 'smaller'}: it holds ${more ? 'more' : 'less'}.` : `${q.ans} has ${more ? 'higher' : 'lower'} water: it has ${more ? 'more' : 'less'}.`, [WORK('ring')]),
             step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
         ];
     },
@@ -1081,14 +1079,13 @@ registerSkill('comparing:what_can_we_measure', {
         if (q._variant === 'tool') {
             return [
                 step(`The question is ${MEAS_WORD[attr]}.`),
-                step(attr === 'heavy' ? 'A scale shows which is heavier.' : attr === 'holds' ? 'A jug shows how much it holds.' : 'A ruler shows how long or tall.'),
+                step(attr === 'heavy' ? 'A scale shows which is heavier.' : attr === 'holds' ? 'A jug shows how much it holds.' : 'A ruler shows how long or tall.', [WORK('ring')]),
                 step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
             ];
         }
         return [
-            step('Look at the thing in the picture.'),
-            step(`We can find ${MEAS_WORD[attr]} it is.`.replace('how much it holds it is', 'how much it holds')),
-            step('A colour or a name is not measured.'),
+            step('Look at the thing in the picture. A colour or a name is not measured.'),
+            step(`We can find ${MEAS_WORD[attr]} it is.`.replace('how much it holds it is', 'how much it holds'), [WORK('ring')]),
             step(`Check "${q.ans}".`, [{ slot: 'answer', value: String(q.ans) }]),
         ];
     },
@@ -1125,9 +1122,9 @@ registerSkill('counting:ordinal_numbers', {
         const n = Number(q.ordPlace) || 1;
         const counted = Array.from({ length: Math.min(n, 4) }, (_, i) => ORD(i + 1)).join(', ') + (n > 4 ? ` ... ${ORD(n)}` : '');
         if (q._variant === 'write') {
-            return [step('Start at the flag.'), step(`Count: ${counted}.`), step(`The star is ${ORD(n)}.`), step(`Write ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }])];
+            return [step('Start at the flag.', [WORK('flag')]), step(`Count: ${counted}.`, [WORK('count')]), step(`The star is ${ORD(n)}.`, [WORK('ring')]), step(`Write ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }])];
         }
-        return [step('Start at the flag.'), step(`Count: ${counted}.`), step(`${q.ans} is ${ORD(n)}.`), step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }])];
+        return [step('Start at the flag.', [WORK('flag')]), step(`Count: ${counted}.`, [WORK('count')]), step(`${q.ans} is ${ORD(n)}.`, [WORK('ring')]), step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }])];
     },
     wrongAnswer: (q) => {
         const p = payloadOf(q);
@@ -1189,31 +1186,31 @@ registerSkill('comparing:sort_into_groups', {
             return sh ? `the ${sh.plural} ring` : `ring ${gi + 1}`;
         };
         if (p.task === 'count') {
-            const out = [step('Look at the label on each ring.')];
-            groups.forEach((g, gi) => out.push(step(`${g.members.map((i) => LETTERS_K2[i] || '').join(', ')} go in ${name(gi)}.`)));
+            const out = [];
+            groups.forEach((g, gi) => out.push(step(`${g.members.map((i) => LETTERS_K2[i] || '').join(', ')} go in ${name(gi)}.`, [WORK(`g${gi}`)])));
             out.push(step(`Count: ${counts.join(' and ')}.`, counts.map((c, i) => ({ slot: `b${i}`, value: String(c) }))));
-            return clampSteps(out.length < 3 ? [step('Look at each picture.')].concat(out) : out);
+            return clampSteps(out.length < 3 ? [step('Look at the label on each ring.')].concat(out) : out);
         }
         if (p.task === 'order') {
             const order = (p.order || []).map(Number);
+            const at = (r) => order.indexOf(r);
             return [
-                step(`Count each ring: ${counts.join(', ')}.`),
-                step(`The fewest is ${Math.min(...counts)}. It gets 1.`),
-                step(`The most is ${Math.max(...counts)}. It gets 3.`),
+                step(`Count each ring: ${counts.join(', ')}.`, [WORK('count')]),
+                step(`The fewest is ${Math.min(...counts)}. It gets 1.`, [{ slot: `b${at(1)}`, value: '1' }]),
+                step(`The most is ${Math.max(...counts)}. It gets 3.`, [{ slot: `b${at(3)}`, value: '3' }]),
                 step(`Write ${order.join(', ')}.`, order.map((r, i) => ({ slot: `b${i}`, value: String(r) }))),
             ];
         }
         if (p.task === 'most') {
             return [
-                step(`Count each ring: ${counts.join(', ')}.`),
-                step(`${Math.max(...counts)} is the most.`),
+                step(`Count each ring: ${counts.join(', ')}.`, [WORK('count')]),
+                step(`${Math.max(...counts)} is the most.`, [WORK('ring')]),
                 step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
             ];
         }
         return [
-            step('Look at one ring.'),
-            step(`Everything in it is the same ${String(q.sortAttr || 'kind').replace('weight', 'weight (heavy or light)')}.`),
-            step(`They are sorted ${String(q.ans).toLowerCase()}.`),
+            step(`Look at one ring. Everything in it is the same ${String(q.sortAttr || 'kind').replace('weight', 'weight (heavy or light)')}.`),
+            step(`They are sorted ${String(q.ans).toLowerCase()}.`, [WORK('ring')]),
             step(`Check "${q.ans}".`, [{ slot: 'answer', value: String(q.ans) }]),
         ];
     },
@@ -1259,8 +1256,8 @@ const BONDS_DEFS = {
     },
     missing: {
         iCan: BONDS_ICAN, instructionKey: 'missing-bonds',
-        steps: ['Read the row above the gap.', 'The first part is 1 more.', 'The second part is 1 less.', 'Write both parts.'],
-        stepsFor: (q) => (bondsDown(q) ? ['Read the row above the gap.', 'The first part is 1 less.', 'The second part is 1 more.', 'Write both parts.'] : null),
+        steps: ['Read the row before the gap.', 'The first part is 1 more.', 'The second part is 1 less.', 'Write both parts.'],
+        stepsFor: (q) => (bondsDown(q) ? ['Read the row before the gap.', 'The first part is 1 less.', 'The second part is 1 more.', 'Write both parts.'] : null),
         say: '__ is __ and __.',
         sayValues: (q) => { const p = payloadOf(q); const r = (p.rows || []).find((x) => x.hide === 'both'); return r ? [p.n, r.a, r.b] : null; },
     },
@@ -1312,7 +1309,7 @@ registerSkill('composing:bonds_in_order', {
         return clampSteps([
             step(`The whole is ${n}. The first part goes ${bondsDown(q) ? 'down' : 'up'} by 1.`),
             step(`${r0.a} and ${r0.b} make ${n}. Write ${r0.b}.`, first ? [{ slot: first.id, value: first.value }] : []),
-            step(`Each next second part is 1 ${bondsDown(q) ? 'more' : 'less'}.`),
+            step(`Each next second part is 1 ${bondsDown(q) ? 'more' : 'less'}.`, blanks[1] ? [{ slot: blanks[1].id, value: blanks[1].value }] : []),
             step(`Write ${blanks.map((b) => b.value).join(', ')}.`, marks(blanks)),
         ]);
     },

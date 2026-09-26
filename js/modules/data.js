@@ -553,7 +553,7 @@ export function getCategoryInfo(categoryId) {
 export const SKILLS = {
     // ========== DOMAIN 0: COUNTING & CARDINALITY (K-3) ==========
     counting: [
-        { v: "count_objects", l: "Count Objects (1-20) (Visual)" },
+        { v: "count_objects", l: "Count Objects (1-30) (Visual)" },
         { v: "count_sequence", l: "Next/Before/After Number (Visual)" },
         { v: "number_seq_fill", l: "Number Sequence: Fill Missing (Grid)" },
         { v: "mixed_counting", l: "Mixed Counting" },

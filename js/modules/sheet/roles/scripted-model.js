@@ -17,6 +17,7 @@ import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, providerWorkedSteps,
     generalSteps, oralFrameOf, assemble, poolItems, answerOf, instructionText, esc,
 } from './compose.js';
+import { stepTemplateOf, unslot } from '../anchors.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
@@ -55,16 +56,57 @@ export function plan(input = {}) {
     const textH = 2 * (m.pitch + 1.5) + 6;
     // A state too wide for the half-width state column (a word problem, a wide picture) takes the
     // full width, with its step text over it in the same row (PT-MOD-2 cannot hold it beside).
-    const H = cols === 2 ? Math.max(hMinAt([it], 2, ctx), textH) : hMinAt([it], 1, ctx) + textH;
-    const perFirst = Math.max(1, Math.floor((m.budget - m.strip - m.say) / H));
-    const perCont = Math.max(1, Math.floor((mCont.budget - m.strip - m.say) / H));
+    let H = cols === 2 ? Math.max(hMinAt([it], 2, ctx), textH) : hMinAt([it], 1, ctx) + textH;
     const ans = answerOf(it);
+    // PT-MOD-1 (critic k2-r1: "states 1-3 are the identical blank picture"): a template that draws
+    // step states (`stepState`, the SCC contract's `ctx.step`) gets the provider's own worked
+    // steps WITH their marks, so each state shows that step's new marks in grey and the earlier
+    // ones black. Only when every worked step is on the page (no step text dropped for length),
+    // and only for a template that opts in (`modelStates`).
+    const worked = providerWorkedSteps(it, 6);
+    const t = stepTemplateOf(it);
+    const pl = (it.q && it.q.cell && it.q.cell.payload) || {};
+    const opted = t && (typeof t.modelStates === 'function' ? t.modelStates(pl) : t.modelStates);
+    const byStates = !!(opted && it.q && it.q.cell && worked.length === steps.length && worked.every((s, k) => s.text === steps[k]));
+    // ONE PAGE (critic k2-r1: a lone last state, bonds on 4 pages): a state-drawing model whose
+    // states overflow the page draws each state smaller (the picture only, never the step text),
+    // down to 60 %; below that it continues on a second page as before.
+    let zoom = 1;
+    const avail = m.budget - m.strip - m.say;
+    // A full-width state whose drawing is no wider than 120 mm (an ordinal line of five) keeps its
+    // step text BESIDE it, in a 58 mm column, instead of over it: the row is as tall as the
+    // drawing, not the drawing plus two lines of text.
+    let beside = false;
+    if (byStates && cols === 1 && t && typeof t.footprint === 'function') {
+        let fw = 186;
+        try { fw = Number(t.footprint(pl, ctx).wMm) || 186; } catch (e) { fw = 186; }
+        if (fw <= 120) { beside = true; H = Math.max(H - textH, textH); }
+    }
+    if (byStates && steps.length * H > avail) {
+        const draw = cols === 2 || beside ? H : H - textH;
+        const fit = cols === 2 || beside ? Math.max(textH, avail / steps.length) : avail / steps.length - textH;
+        const z = Math.min(1, fit / Math.max(1, draw));
+        if (z >= 0.6) { zoom = Math.floor(z * 100) / 100; H = cols === 2 || beside ? Math.max(textH, draw * zoom) : draw * zoom + textH; }
+    }
+    const perFirst = Math.max(1, Math.floor(avail / H));
+    const perCont = Math.max(1, Math.floor((mCont.budget - m.strip - m.say) / H));
     const stepText = (i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${esc(steps[i])}</span></div>`;
     const stateItem = (i) => planItem(it, {
         cols, level: 3, nolabel: true,
-        render: (c, o) => (cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')
-            + it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o,
-                i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {})),
+        render: (c, o) => {
+            const stateHtml = byStates
+                ? `<div${zoom < 1 ? ` style="zoom:${zoom}"` : ''}>${unslot(t.stepState(it.q.cell.payload || {}, worked, i, Object.assign({}, c, { state: 'blank', step: { index: i, marks: worked[i].marks } })))}</div>`
+                : null;
+            if (beside) {
+                return `<div style="display:flex;align-items:center;gap:4mm;width:100%;height:100%;box-sizing:border-box;">`
+                    + `<div style="flex:0 0 58mm;">${stepText(i)}</div><div style="flex:1 1 auto;display:flex;justify-content:center;">${stateHtml}</div></div>`;
+            }
+            return (cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')
+            + (byStates
+                ? stateHtml
+                : it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o,
+                    i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {})));
+        },
     });
     const textItem = (i) => ({
         render: () => stepText(i),

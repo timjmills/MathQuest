@@ -33,7 +33,7 @@ import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import {
     L, P, B, INK, GREY, SW, n2, svg, root, box, slotValue, shapeOf, silhouette, textPt, digitPt, inlineBoxMm, isTwin,
-    pscale, checkedChoice, choiceRow, LETTERS, shownParts, inkOf, zonePt,
+    pscale, checkedChoice, choiceRow, LETTERS, shownParts, inkOf, zonePt, k2StepCtx, workInk, ringWrap, stepSlot, sizeOf,
 } from './k2kit.js';
 
 /* ----------------------------------------------------------------------------- the pictures */
@@ -49,8 +49,12 @@ function container(kind, fill, w, h) {
     if (kind === 'jug') {
         const bx0 = x0 + w * 0.12, bx1 = x1 - w * 0.22;
         outline = `M${n2(bx0)} ${n2(y0)}L${n2(bx1)} ${n2(y0)}L${n2(bx1 + w * 0.06)} ${n2(y0 - h * 0.05)}L${n2(bx1 + w * 0.04)} ${n2(y0 + h * 0.08)}L${n2(bx1)} ${n2(y1)}L${n2(bx0)} ${n2(y1)}Z`;
-        side = () => [bx0, bx1];
+        // the body's right wall slants from under the spout (bx1 + 4 %) down to bx1: the liquid follows
+        // it, so a full jug has no white wedge under the spout (critic k2-r1)
+        const ysp = y0 + h * 0.08;
+        side = (y) => [bx0, y <= ysp ? bx1 + w * 0.04 : lerp(bx1 + w * 0.04, bx1, (y - ysp) / (y1 - ysp))];
         extra = `<path d="M${n2(bx0)} ${n2(y0 + h * 0.18)}Q${n2(x0 - w * 0.02)} ${n2(y0 + h * 0.2)} ${n2(x0)} ${n2(lerp(y0, y1, 0.42))}Q${n2(x0 + w * 0.02)} ${n2(lerp(y0, y1, 0.62))} ${n2(bx0)} ${n2(lerp(y0, y1, 0.64))}" fill="none" stroke="${INK}" stroke-width="${n2(SW.heavy)}" stroke-linecap="round"/>`;
+        return draw(y0);
     } else if (kind === 'bucket') {
         const tx0 = x0 + w * 0.04, tx1 = x1 - w * 0.04, bx0 = x0 + w * 0.18, bx1 = x1 - w * 0.18, yt = y0 + h * 0.22;
         outline = `M${n2(tx0)} ${n2(yt)}L${n2(tx1)} ${n2(yt)}L${n2(bx1)} ${n2(y1)}L${n2(bx0)} ${n2(y1)}Z`;
@@ -79,18 +83,17 @@ function container(kind, fill, w, h) {
         const f = Math.max(0, Math.min(1, Number(fill) || 0));
         let body = `<path d="${outline}" fill="#fff" stroke="none"/>`;
         if (f > 0) {
-            // the liquid: a polygon traced down both sides from the surface to the floor
-            const ys = top + (y1 - top) * (1 - Math.min(f, 0.98));
-            const steps = 12, left = [], right = [];
-            for (let k = 0; k <= steps; k++) {
-                const y = ys + (y1 - ys) * (k / steps);
-                const [xl, xr] = side(y);
-                left.push(`${n2(xl + o)} ${n2(Math.min(y, y1 - o))}`);
-                right.unshift(`${n2(xr - o)} ${n2(Math.min(y, y1 - o))}`);
+            // the liquid (critic k2-r1: white wedges under the jug's spout, at the bowl's curve and the
+            // bottle's shoulders): the WHOLE inside filled grey by the outline itself, then the part
+            // above the surface painted back to paper. The outline and the handles are drawn after,
+            // so the liquid follows every curve exactly; "full" fills to the rim.
+            const ys = top + (y1 - top) * (1 - f);
+            body += `<path d="${outline}" fill="${GREY}" stroke="none"/>`;
+            if (f < 1) {
+                body += `<rect x="-1" y="-1" width="${n2(w + 2)}" height="${n2(ys + 1)}" fill="#fff" stroke="none"/>`;
+                const [sl, sr] = side(ys);
+                body += `<path d="M${n2(sl + o)} ${n2(ys)}H${n2(sr - o)}" stroke="${INK}" stroke-width="${n2(SW.hair)}"/>`;
             }
-            body += `<path d="M${left.join('L')}L${right.join('L')}Z" fill="${GREY}" stroke="none"/>`;
-            const [sl, sr] = side(ys);
-            body += `<path d="M${n2(sl + o)} ${n2(ys)}H${n2(sr - o)}" stroke="${INK}" stroke-width="${n2(SW.hair)}"/>`;
         }
         body += `<path d="${outline}" fill="none" stroke="${INK}" stroke-width="${n2(SW.heavy)}" stroke-linejoin="round"/>${extra}`;
         return body;
@@ -178,6 +181,47 @@ function boxSize(ctx, p) {
     return { w: base * k, h: (containers ? base * 1.3 : base) * k };
 }
 
+/**
+ * SIZE S FITS A THIRD OF THE PAGE (critic k2-r1, OC14: "match_same prints 10 at S and at L"). The
+ * content width of a three-column cell at S: 61.5 mm inner less the 3 mm cell padding each side.
+ * A target-and-choices row (match the same) whose pictures can stay at least 9 mm across in that
+ * width draws them so, with 2.4 mm gaps, and the page takes three columns at S; else null.
+ */
+const S3_W = 55;
+function pickFitS(p, ctx) {
+    if (sizeOf(ctx) !== 'S' || isTwin(ctx) || p.kind !== 'pick' || !p.target) return null;
+    const n = (p.choices || []).length, gap = 2.4;
+    const bw = (S3_W - (n - 1) * gap - 2 * gap - 0.3 - 5.9) / (n + 1) - 0.8;
+    const base = boxSize(ctx, p).w;
+    if (bw >= base) return { bw: base, gap };
+    return bw >= 9 ? { bw: Math.floor(bw * 10) / 10, gap } : null;
+}
+
+/** The label column of a word bank (mm): the longest word at the bank's type size, plus its icon. */
+function wordsLabelW(p, ctx) {
+    const lp = textPt(ctx) + 2;
+    const longest = Math.max(0, ...(p.words || []).map((wd) => String(wd.label).length));
+    return Math.max(26, Math.ceil(longest * lp * 0.54 * 0.3528) + (p.icons ? (p.iconSize || 6.5) + 3 : 0) + 2);
+}
+/**
+ * A word bank beside its picture: at S it takes a third of the page when the picture can stay at
+ * least 11 mm across; at M / L it keeps to half the page (82 mm of content) when the picture can
+ * stay at least 16 mm across (a level-2 bank with icons otherwise pushed it to one column).
+ * null when the picture keeps its own size.
+ */
+function wordsFitS(p, ctx) {
+    if (isTwin(ctx) || p.kind !== 'words' || p.row || p.under) return null;
+    const small = sizeOf(ctx) === 'S';
+    const gap = small ? 4 : 8;
+    const listW = wordsLabelW(p, ctx) + 3 + checkMmOf(ctx) + 0.5;
+    const pic = (small ? S3_W : C2_W) - gap - listW - 0.8;
+    const base = boxSize(ctx, p).w * 1.3;
+    if (pic >= base) return small ? { pic: base, gap, third: true } : null;
+    return pic >= (small ? 11 : 16) ? { pic: Math.floor(pic * 10) / 10, gap, third: small } : null;
+}
+const C2_W = 82;   // the content width of a two-column cell (88 mm inner less the 3 mm padding each side)
+const checkMmOf = (ctx) => ({ S: 5, M: 6, L: 7 })[sizeOf(ctx)] || 7;   // tokens checkMm
+
 /* ----------------------------------------------------------------------------- the template */
 
 register('picture-row', {
@@ -190,12 +234,15 @@ register('picture-row', {
             const keys = (p.order || []).map(String);
             const shown = shownParts(ctx, keys);
             const b = inlineBoxMm(ctx, 1);
-            const cols = (p.choices || []).map((c, i) => `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};">`
-                + picture(ctx, c, bw, bh, { floor: p.base ? 7 * k : null }) + box(ctx, { id: `b${i}`, value: shown[i], w: b.w + 2, h: b.h + 2, mark: 'cell' }) + '</div>').join('');
+            const cols = (p.choices || []).map((c, i) => {
+                const st = stepSlot(ctx, `b${i}`, shown[i]);
+                return `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};">`
+                    + picture(ctx, c, bw, bh, { floor: p.base ? 7 * k : null }) + box(st.ctx, { id: `b${i}`, value: st.value, w: b.w + 2, h: b.h + 2, mark: 'cell' }) + '</div>';
+            }).join('');
             const ink = inkOf(ctx);
             // the boxes carry their own ink; a trace on the row would grey the pictures (INK-3)
             return root(ctx, 'k2-prow', `<div data-ws-slot="answer" data-ws-shape="box"${ink === 'solid' && shown.some(Boolean) ? ' data-ws-ink="solid"' : ''} `
-                + `style="display:flex;justify-content:center;align-items:flex-end;gap:${L(ctx, 7 * k)};">${cols}</div>`);
+                + `${NOWRAP} style="display:flex;justify-content:center;align-items:flex-end;gap:${L(ctx, 7 * k)};">${cols}</div>`);
         }
 
         if (p.kind === 'words') {
@@ -206,28 +253,35 @@ register('picture-row', {
                 label: wd.label,
                 pic: p.icons && wd.icon ? svg(ctx, iconD, iconD, icon(wd.icon, iconD), { label: '' }) : '',
             }));
-            const longest = Math.max(0, ...labels.map((l) => String(l).length));
-            const labelW = Math.max(26, Math.ceil(longest * lp * 0.52 * 0.3528) + (p.icons ? iconD + 3 : 0) + 2);
+            const labelW = wordsLabelW(p, ctx);
+            const fitS = wordsFitS(p, ctx);
             const pics = p.row
-                ? `<div style="display:flex;align-items:flex-end;gap:${L(ctx, 5 * k)};">${p.row.map((s, i) => picture(ctx, s, bw * 0.8, bh * 0.8, { ring: i === p.ring })).join('')}</div>`
-                : picture(ctx, p.pic0, bw * 1.3, bh * 1.3);
-            const dir = p.row ? 'column' : 'row';
-            return root(ctx, 'k2-prow', `<div style="display:flex;flex-direction:${dir};align-items:center;justify-content:center;gap:${L(ctx, p.row ? 4 : 8)};">`
+                ? `<div${NOWRAP} style="display:flex;align-items:flex-end;gap:${L(ctx, 5 * k)};">${p.row.map((s, i) => picture(ctx, s, bw * 0.8, bh * 0.8, { ring: i === p.ring })).join('')}</div>`
+                : fitS ? picture(ctx, p.pic0, fitS.pic, (fitS.pic * bh) / bw) : picture(ctx, p.pic0, bw * 1.3, bh * 1.3);
+            // Appearance "under" (p.under): the choices in a row under the picture instead of a list beside it
+            const under = !!p.under && !p.row;
+            const dir = p.row || under ? 'column' : 'row';
+            const bank = under
+                ? choiceRow(ctx, choices, { on, gapMm: 6, labelPt: lp, ring: { index: p.correct || 0, ink: workInk(ctx, 'ring') } })
+                : choiceRow(ctx, choices, { on, vertical: true, labelW, labelPt: lp, ring: { index: p.correct || 0, ink: workInk(ctx, 'ring') } });
+            return root(ctx, 'k2-prow', `<div style="display:flex;flex-direction:${dir};align-items:center;justify-content:center;gap:${L(ctx, p.row || under ? 4 : fitS ? fitS.gap : 8)};">`
                 + `<div style="flex:none;">${pics}${cueLine(ctx, p.cue)}</div>`
-                + `<div style="flex:none;text-align:left;">${p.caption ? `<div style="font-size:${P(ctx, lp)};font-weight:700;line-height:1.25;margin-bottom:${L(ctx, 1.5)};">${esc(p.caption)}</div>` : ''}`
-                + `${choiceRow(ctx, choices, { on, vertical: true, labelW, labelPt: lp })}</div></div>`);
+                + `<div style="flex:none;text-align:${under ? 'center' : 'left'};">${p.caption ? `<div style="font-size:${P(ctx, lp)};font-weight:700;line-height:1.25;margin-bottom:${L(ctx, 1.5)};">${esc(p.caption)}</div>` : ''}`
+                + `${bank}${noteLine(ctx, p.note)}</div></div>`);
         }
 
         if (p.kind === 'line') {
             const items = p.items || [];
             const gap = (p.gap || 4) * k;
-            const flag = startFlag(ctx, bh * 0.9);
+            // model states: the flag ringed ("start at the flag"), the places numbered ("count"), the one ringed
+            const flag = ringWrap(ctx, startFlag(ctx, bh * 0.9), workInk(ctx, 'flag'));
+            const counted = workInk(ctx, 'count');
             if (p.task === 'write') {
                 const b = inlineBoxMm(ctx, 3);
                 const slot = box(ctx, { id: 'answer', value: slotValue(ctx, 'answer', p.ans), w: b.w + 4, h: b.h + 2, mark: 'blank' });
-                const nums = p.numbers ? numberRow(ctx, items.length, bw, gap) : '';
-                return root(ctx, 'k2-prow', `<div style="display:flex;align-items:flex-end;justify-content:center;gap:${L(ctx, gap)};">`
-                    + `<div style="flex:none;">${flag}</div>${items.map((s) => picture(ctx, s, bw, bh)).join('')}</div>${nums}`
+                const nums = p.numbers || counted ? numberRow(ctx, items.length, bw, gap, counted === 'trace' && !p.numbers) : '';
+                return root(ctx, 'k2-prow', `<div${NOWRAP} style="display:flex;align-items:flex-end;justify-content:center;gap:${L(ctx, gap)};">`
+                    + `<div style="flex:none;">${flag}</div>${items.map((s, i) => (i === p.target ? ringWrap(ctx, picture(ctx, s, bw, bh), workInk(ctx, 'ring')) : picture(ctx, s, bw, bh))).join('')}</div>${nums}`
                     + `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 3)};margin-top:${L(ctx, 4)};font-size:${P(ctx, lp)};">`
                     + `${picture(ctx, items[p.target], bw * 0.55, bh * 0.55)}<span>is</span>${slot}</div>`);
             }
@@ -236,22 +290,17 @@ register('picture-row', {
             const choices = items.map((s, i) => ({ pic: picture(ctx, s, bw, bh), label: labels[i] }));
             // the place asked for, printed once over the line ("3rd"): the item's own question
             const ask = p.ask ? `<div style="font-size:${P(ctx, digitPt(ctx) * 0.9)};font-weight:700;line-height:1;margin-bottom:${L(ctx, 3)};">${esc(p.ask)}</div>` : '';
-            return root(ctx, 'k2-prow', `${ask}<div style="display:flex;align-items:flex-start;justify-content:center;gap:${L(ctx, gap)};">`
-                + `<div style="flex:none;padding-top:${L(ctx, 0.4)};">${flag}</div>${choiceRow(ctx, choices, { on, gapMm: gap })}</div>`);
+            const nums = counted ? numberRow(ctx, items.length, bw, gap, counted === 'trace') : '';
+            return root(ctx, 'k2-prow', `${ask}${nums}<div${NOWRAP} style="display:flex;align-items:flex-start;justify-content:center;gap:${L(ctx, gap)};">`
+                + `<div style="flex:none;padding-top:${L(ctx, 0.4)};">${flag}</div>${choiceRow(ctx, choices, { on, gapMm: gap, ring: { index: p.correct || 0, ink: workInk(ctx, 'ring') } })}</div>`);
         }
 
         // pick
         const labels = labelsOf(p, (p.choices || []).length);
         const on = checkedChoice(p, ctx, labels);
-        const gap = (p.gap || 7) * k;
-        const choices = (p.choices || []).map((c, i) => ({ pic: picture(ctx, c, bw, bh, { floor: p.base ? gap : null }), label: labels[i] }));
-        const row = choiceRow(ctx, choices, { on, gapMm: gap });
-        if (!p.target) return root(ctx, 'k2-prow', `<div style="display:inline-block;">${row}</div>${cueLine(ctx, p.cue)}`);
-        // the target in a key box, left of the row, on the same floor as the pictures
-        const tb = `<div style="flex:none;display:inline-flex;flex-direction:column;align-items:center;gap:${L(ctx, 1.5)};">`
-            + `<div style="border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 2)};padding:${L(ctx, 2)};background:#fff;">${picture(ctx, p.target, bw, bh)}</div></div>`;
-        return root(ctx, 'k2-prow', `<div style="display:flex;align-items:flex-start;justify-content:center;gap:${L(ctx, gap)};">`
-            + `${tb}<div style="width:${B(ctx, 0.75)};align-self:stretch;background:${INK};"></div>${row}</div>`);
+        const fitS = pickFitS(p, ctx);
+        if (fitS) return pickRow(p, ctx, fitS.bw, (bh * fitS.bw) / bw, fitS.gap, labels, on, lp);
+        return pickRow(p, ctx, bw, bh, (p.gap || 7) * k, labels, on, lp);
     },
     answerKey(p) {
         if (p.kind === 'order') {
@@ -272,7 +321,15 @@ register('picture-row', {
         const n = (p.choices || p.items || p.row || []).length || 1;
         const gap = (p.gap || 7) * k;
         let w = n * (bw + 1) + (n - 1) * gap + (p.target ? bw + 6 + 2 * gap : 0) + (p.kind === 'line' ? 14 : 0);
-        if (p.kind === 'words' && !p.row) w = bw * 1.3 + 60;
+        const wf = wordsFitS(p, ctx || {});
+        if (pickFitS(p, ctx || {}) || (wf && wf.third)) return { wMm: S3_W + 6, hMm: null, measure: true, factLike: false, maxCols: 3 };
+        if (wf) return { wMm: C2_W + 6, hMm: null, measure: true, factLike: false, maxCols: 2 };
+        if (p.kind === 'words' && !p.row) {
+            // beside: the picture and a list; under: the wider of the picture and the row of words
+            const words = p.words || [];
+            const rowW = words.reduce((a, wd) => a + Math.max(14, String(wd.label).length * 2.6 + (p.icons ? (p.iconSize || 6.5) + 2 : 0)), 0) + 6 * Math.max(0, words.length - 1);
+            w = p.under ? Math.max(bw * 1.3, rowW) : bw * 1.3 + 60;
+        }
         return { wMm: Math.min(186, Math.ceil(w + 6)), hMm: null, measure: true, factLike: false, maxCols: w + 6 <= 93 ? 2 : 1 };
     },
     inputs(p) {
@@ -281,7 +338,27 @@ register('picture-row', {
         return [{ id: 'answer', kind: 'check', shape: 'check', graded: true, order: 0, scopes: ['full'] }];
     },
     layout() { return { card: 'card-wide-visual', checker: 'choice' }; },
+    /** PT-MOD-1: the scripted model's states, from the provider's `work` and slot marks (k2kit). */
+    modelStates: true,
+    stepState(p, steps, k, ctx) { return this.render(p, k2StepCtx(steps, k, ctx)); },
 });
+
+/** The pick row: the choices (A, B, C) and, with a target, its key box left of them. */
+function pickRow(p, ctx, bw, bh, gap, labels, on, lp) {
+    const choices = (p.choices || []).map((c, i) => ({ pic: picture(ctx, c, bw, bh, { floor: p.base ? gap : null }), label: labels[i] }));
+    const row = choiceRow(ctx, choices, { on, gapMm: gap, ring: { index: p.correct || 0, ink: workInk(ctx, 'ring') } });
+    if (!p.target) return root(ctx, 'k2-prow', `<div style="display:inline-block;">${row}</div>${cueLine(ctx, p.cue)}${noteLine(ctx, p.note)}`);
+    // the target in a key box, left of the row, on the same floor as the pictures
+    const tb = `<div style="flex:none;display:inline-flex;flex-direction:column;align-items:center;gap:${L(ctx, 1.5)};">`
+        + `<div style="border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 2)};padding:${L(ctx, 2)};background:#fff;">${picture(ctx, p.target, bw, bh)}</div>`
+        // Support level 2 (p.name): the target's name under its box - what to look for, never where
+        + `${p.name ? `<div style="font-size:${P(ctx, lp)};font-weight:700;line-height:1;">${esc(p.name)}</div>` : ''}</div>`;
+    return root(ctx, 'k2-prow', `<div${NOWRAP} style="display:flex;align-items:flex-start;justify-content:center;gap:${L(ctx, gap)};">`
+        + `${tb}<div style="width:${B(ctx, 0.75)};align-self:stretch;background:${INK};"></div>${row}</div>`);
+}
+
+/** A row that stays one line on screen too (screen-cell fitTwinRows shrinks it instead of wrapping it). */
+const NOWRAP = ' data-mq-nowrap="1"';
 
 /** Support level 2: which attribute to look at, under the row (a hint that fades; never the answer). */
 function cueLine(ctx, cue) {
@@ -289,16 +366,23 @@ function cueLine(ctx, cue) {
     return `<div class="k2-cue" style="margin-top:${L(ctx, 2)};font-size:${P(ctx, textPt(ctx))};line-height:1.2;">Look at the ${esc(cue)}.</div>`;
 }
 
+/** A support line in the item's own words (a hint that fades: Support level 2), or ''. */
+function noteLine(ctx, note) {
+    if (!note) return '';
+    return `<div class="k2-cue" style="margin-top:${L(ctx, 2)};font-size:${P(ctx, textPt(ctx))};font-weight:700;line-height:1.2;">${esc(note)}</div>`;
+}
+
 /** The tags of a row's choices: the payload's own (place numbers 1, 2, 3 on a supported ordinal line), else A, B, C. */
 const labelsOf = (p, n) => (Array.isArray(p.labels) && p.labels.length === n ? p.labels.map(String) : LETTERS.slice(0, n));
 
 /** The place numeral under a picture of an ordinal line (the support that fades). */
-function numeral(ctx, n, bw) {
-    return svg(ctx, bw, 5, `<text x="${n2(bw / 2)}" y="4.2" text-anchor="middle" font-size="4.2" font-weight="700" font-family="Andika, sans-serif" fill="${INK}">${n}</text>`, { label: '' });
+function numeral(ctx, n, bw, grey = false) {
+    return svg(ctx, bw, 5, `<text x="${n2(bw / 2)}" y="4.2" text-anchor="middle" font-size="4.2" font-weight="700" font-family="Andika, sans-serif" fill="${grey ? GREY : INK}"${grey ? ' data-ws-ink="trace"' : ''}>${n}</text>`, { label: '' });
 }
-function numberRow(ctx, n, bw, gap) {
-    return `<div style="display:flex;justify-content:center;gap:${L(ctx, gap)};margin-top:${L(ctx, 1)};"><div style="flex:none;width:${L(ctx, 9.5)};"></div>`
-        + Array.from({ length: n }, (_, i) => numeral(ctx, i + 1, bw + 0.8)).join('') + '</div>';
+/** The place numbers 1, 2, 3 ... under (or, in a model's "count" state, over) the line; grey as the newest mark. */
+function numberRow(ctx, n, bw, gap, grey = false) {
+    return `<div${NOWRAP} style="display:flex;justify-content:center;gap:${L(ctx, gap)};margin-top:${L(ctx, 1)};"><div style="flex:none;width:${L(ctx, 9.5)};"></div>`
+        + Array.from({ length: n }, (_, i) => numeral(ctx, i + 1, bw + 0.8, grey)).join('') + '</div>';
 }
 
 export const PICTURE_ROW_TEMPLATE = 'picture-row';

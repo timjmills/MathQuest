@@ -2119,6 +2119,8 @@ export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
  * below a floor that keeps numerals legible. Idempotent; run after mount and after a re-render.
  */
 const K2_FLOOR_PX = 2.4;
+/** A one-line row (data-mq-nowrap) may shrink further before it would have to wrap. */
+const K2_FLOOR_NOWRAP_PX = 1.5;
 
 function _rowOverflows(el, box) {
     const r = el.getBoundingClientRect();
@@ -2172,6 +2174,9 @@ export function fitTwinRows(root) {
             return (cs.display === 'flex' || cs.display === 'inline-flex') && !/column/.test(cs.flexDirection) && el.children.length > 1;
         });
         rows.forEach((row) => {
+            // a row that must stay one line (an ordinal line, a row of choices, a bonds table row)
+            // is never wrapped: the drawing shrinks instead (below)
+            if (row.dataset.mqNowrap === '1') return;
             if (row.dataset.mqWrapped === '1' || !_rowOverflows(row, box)) return;
             row.style.setProperty('flex-wrap', 'wrap', 'important');
             row.style.setProperty('white-space', 'normal', 'important');
@@ -2181,18 +2186,21 @@ export function fitTwinRows(root) {
             row.dataset.mqWrapped = '1';
             changed = true;
         });
-        // one item still wider than the cell: the drawing's millimetre shrinks to fit
-        const tw = twin.scrollWidth;
-        const avail = Math.min(box.width, twin.parentElement ? twin.parentElement.clientWidth || box.width : box.width) - 8;
-        const over = Array.from(twin.querySelectorAll('*')).reduce((m, el) => {
-            const r = el.getBoundingClientRect();
-            return Math.max(m, r.right - box.right, box.left - r.left);
-        }, 0);
-        if (over > 1 || tw > avail + 1) {
+        // one item still wider than the cell: the drawing's millimetre shrinks to fit. Parts of a
+        // row keep pixel minimums (a check box), so the shrink is measured again, up to 3 times.
+        for (let pass = 0; pass < 3; pass++) {
+            const tw = twin.scrollWidth;
+            const avail = Math.min(box.width, twin.parentElement ? twin.parentElement.clientWidth || box.width : box.width) - 8;
+            const over = Array.from(twin.querySelectorAll('*')).reduce((m, el) => {
+                const r = el.getBoundingClientRect();
+                return Math.max(m, r.right - box.right, box.left - r.left);
+            }, 0);
+            if (!(over > 1 || tw > avail + 1)) break;
             const cur = parseFloat(getComputedStyle(twin).getPropertyValue('--mq-k2')) || 3.4;
             const need = Math.max(tw, avail + 2 * over);
-            const k = Math.max(K2_FLOOR_PX, cur * (avail / need));
-            if (k < cur - 0.01) { twin.style.setProperty('--mq-k2', `${k.toFixed(2)}px`); changed = true; }
+            const floor = twin.querySelector('[data-mq-nowrap]') ? K2_FLOOR_NOWRAP_PX : K2_FLOOR_PX;
+            const k = Math.max(floor, cur * (avail / need));
+            if (k < cur - 0.01) { twin.style.setProperty('--mq-k2', `${k.toFixed(2)}px`); changed = true; } else break;
         }
     });
     return changed;

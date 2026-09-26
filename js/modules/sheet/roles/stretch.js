@@ -92,7 +92,20 @@ export function openTask(it, size = 'L') {
     };
 }
 
+/**
+ * Withheld (PAGE_TYPES 6.3) when no item of the page has an open task: an item that declares
+ * `q.stretch === false` (build lane k2: a K picture item has one answer) gives the reason.
+ */
+export function supports(items) {
+    const list = (items || []).filter(Boolean);
+    const off = list.filter((it) => it.q && it.q.stretch === false);
+    if (list.length && off.length === list.length) return String(off[0].q.stretchWhy || 'This skill has no open problem with several answers, so it has no Stretch page.');
+    return '';
+}
+
 export function prepare(it, info = {}) {
+    // an item without an open task is not dealt onto a Stretch page (the host deals another)
+    if (it && it.q && it.q.stretch === false) return null;
     const size = info.size || 'L';
     const task = openTask(it, size);
     // PT-STC-1: 3 to 6 empty rows, and never more rows than the key can fill (a key row per

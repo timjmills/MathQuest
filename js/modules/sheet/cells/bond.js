@@ -28,7 +28,7 @@ import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import {
     B, L, P, INK, GREY, SW, n2, root, sizeOf, inkOf, isTwin, slotValue, svg, dot, digitPt, textPt, inlineBoxMm,
-    checkedChoice, choiceRow, KEY_FEATURES,
+    checkedChoice, choiceRow, KEY_FEATURES, k2StepCtx, workInk,
 } from './k2kit.js';
 import { stepMarks, singleSlotState, slotInks } from '../steps.js';
 
@@ -72,7 +72,12 @@ function bondTable(p, ctx) {
     // An anchor-chart panel (ctx.stepInks, from stepState) is read, never written on, and a table
     // with nothing to write (task 'pattern') is read too: their rows are lower than writing rows.
     const readOnly = p.task === 'pattern' || !!ctx.stepInks;
-    const cw = Math.max(14, bx.w), ch = readOnly ? bx.h - 3 : bx.h;
+    // Size S (critic k2-r1: "S cells are 106 mm tall, six tables would fit"): the writing rows lose
+    // 1.5 mm (a 10.5 mm row round 8 mm writing) and the whole's box and legs are read-only height,
+    // so three tables stand in a column at S where L holds two
+    const small = sizeOf(ctx) === 'S';
+    const cw = Math.max(14, bx.w), ch = readOnly ? bx.h - 3 : bx.h - (small ? 1.5 : 0);
+    const wholeH = small ? bx.h - 3 : ch, legH = small ? 4 : 6;
     const rows = p.rows || [];
     const keyBlanks = bondTableBlanks(p);
     const idxOf = Object.fromEntries(keyBlanks.map((b, i) => [b.id, i]));
@@ -100,6 +105,24 @@ function bondTable(p, ctx) {
             + `style="${cellStyle(across ? bx.w : cw)}${border}background:#fff;color:${si === 'trace' ? GREY : INK};">${shown}</span>`;
     };
     const dotsOf = (r) => (p.dots ? `<span style="display:inline-flex;align-items:center;margin-left:${L(ctx, 4)};flex:none;">${partDots(ctx, r.a, p.n)}</span>` : '');
+    // ERROR ANALYSIS (the role's `line` kind, critic k2-r1: "the pupil must rewrite all 6-8 blanks
+    // in a detached row of comma boxes"): with ctx.options.fix the table draws its own fix place
+    // - a Fix box at the end of each row the pupil wrote in, one per row (slot x<k>, k the row's
+    // first blank in reading order), filled on the key of a wrong item (options.fixKey).
+    const fixOn = !!(ctx.options && ctx.options.fix) && p.task !== 'pattern';
+    const fixKeyed = fixOn && !!(ctx.options.fixKey || ctx.state === 'answered' || ctx.state === 'traced');
+    const fixW = across ? 2 * bx.w + 6 : cw + 4;
+    const fixOf = (r, i) => {
+        if (!fixOn) return '';
+        const ids = r.hide === 'both' ? [`r${i}a`, `r${i}b`] : r.hide ? [`r${i}b`] : [];
+        if (!ids.length) return `<span style="display:inline-block;width:${L(ctx, fixW)};margin-left:${L(ctx, 3)};flex:none;"></span>`;
+        const val = fixKeyed ? (r.hide === 'both' ? `${r.a} + ${r.b}` : String(r.b)) : '';
+        return `<span class="k2-box" data-ws-slot="x${idxOf[ids[0]]}" data-ws-shape="box" data-ws-graded="0"${val ? ' data-ws-ink="solid"' : ''} `
+            + `style="${cellStyle(fixW)}margin-left:${L(ctx, 3)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1.25)};background:#fff;color:${INK};">${val}</span>`;
+    };
+    const fixLabel = fixOn ? `<div style="flex:none;width:${L(ctx, fixW)};margin-left:${L(ctx, 3)};text-align:center;`
+        + `font-size:${P(ctx, textPt(ctx))};font-weight:700;line-height:1.2;">Fix</div>` : '';
+    const fixHead = (wLeft) => (fixOn ? `<div style="display:flex;"><div style="flex:none;width:${L(ctx, wLeft)};"></div>${fixLabel}</div>` : '');
     // More than six rows (the bonds of 6 to 10) go in two halves side by side, each under its own
     // whole: the list reads down the first half, then down the second. Half the height, so a
     // page holds two tables a row and an anchor panel holds one.
@@ -111,30 +134,30 @@ function bondTable(p, ctx) {
         // 0 + 5 = 5: each blank a writing box, the signs and the whole printed
         const boxB = `border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1.25)};`;
         const sym = (t) => `<span style="font-size:${P(ctx, dp)};font-weight:700;line-height:1;width:${L(ctx, 9)};text-align:center;flex:none;">${t}</span>`;
-        block = (list) => `<div style="display:inline-block;text-align:left;vertical-align:top;">` + list.map((i) => {
+        block = (list) => `<div style="display:inline-block;text-align:left;vertical-align:top;">${fixHead(2 * bx.w + 18 + bx.w)}` + list.map((i) => {
             const r = rows[i];
-            return `<div style="display:flex;align-items:center;justify-content:flex-start;margin:${L(ctx, 1.5)} 0;">`
+            return `<div data-mq-nowrap="1" style="display:flex;align-items:center;justify-content:flex-start;margin:${L(ctx, 1.5)} 0;">`
                 + `${num(i, 'a', r.a, r.hide === 'both' ? boxB : '')}${sym('+')}${num(i, 'b', r.b, r.hide ? boxB : '')}${sym('=')}`
-                + `<span style="${cellStyle(bx.w)}color:${INK};">${p.n}</span>${dotsOf(r)}</div>`;
+                + `<span style="${cellStyle(bx.w)}color:${INK};">${p.n}</span>${dotsOf(r)}${fixOf(r, i)}</div>`;
         }).join('') + '</div>';
     } else {
         // the bond on top: the whole in the heavy box, two lines down to the column heads
-        const whole = `<div style="display:flex;justify-content:center;width:${L(ctx, 2 * cw)};">`
-            + `<span style="${cellStyle(cw)}border:${B(ctx, 1.5)} solid ${INK};color:${INK};">${p.n}</span></div>`;
-        const legs = svg(ctx, 2 * cw, 6, `<path d="M${n2(cw)} 0.4L${n2(cw / 2)} 5.6M${n2(cw)} 0.4L${n2(1.5 * cw)} 5.6" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}" stroke-linecap="round"/>`);
+        const whole = `<div style="display:flex;align-items:flex-end;"><div style="display:flex;justify-content:center;width:${L(ctx, 2 * cw)};">`
+            + `<span style="${cellStyle(cw)}height:${L(ctx, wholeH)};border:${B(ctx, 1.5)} solid ${INK};color:${INK};">${p.n}</span></div>${fixLabel}</div>`;
+        const legs = svg(ctx, 2 * cw, legH, `<path d="M${n2(cw)} 0.4L${n2(cw / 2)} ${n2(legH - 0.4)}M${n2(cw)} 0.4L${n2(1.5 * cw)} ${n2(legH - 0.4)}" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}" stroke-linecap="round"/>`);
         const hair = `${B(ctx, 0.75)} solid ${INK}`, heavy = `${B(ctx, 1.5)} solid ${INK}`;
         block = (list) => `<div style="display:inline-block;text-align:left;vertical-align:top;">${whole}<div style="width:${L(ctx, 2 * cw)};">${legs}</div>`
             + list.map((i, k) => {
                 const r = rows[i];
                 const last = k === list.length - 1;
                 const bottom = last ? '' : `border-bottom:${hair};`;
-                return `<div style="display:flex;align-items:center;">`
+                return `<div data-mq-nowrap="1" style="display:flex;align-items:center;">`
                     + `<span style="display:inline-flex;border-left:${heavy};border-right:${heavy};border-top:${k === 0 ? heavy : '0'};border-bottom:${last ? heavy : '0'};">`
-                    + num(i, 'a', r.a, `${bottom}border-right:${hair};`) + num(i, 'b', r.b, bottom) + `</span>${dotsOf(r)}</div>`;
+                    + num(i, 'a', r.a, `${bottom}border-right:${hair};`) + num(i, 'b', r.b, bottom) + `</span>${dotsOf(r)}${fixOf(r, i)}</div>`;
             }).join('') + '</div>';
     }
     let body = halves.length > 1
-        ? `<div style="display:inline-flex;align-items:flex-start;gap:${L(ctx, across ? 8 : 3 + (cw - 14))};">${halves.map(block).join('')}</div>`
+        ? `<div style="display:inline-flex;align-items:flex-start;justify-content:center;gap:${L(ctx, across ? 8 : 3 + (cw - 14))};">${halves.map(block).join('')}</div>`
         : block(halves[0]);
     if (p.task === 'pattern') {
         const labels = p.labels || [];
@@ -142,7 +165,7 @@ function bondTable(p, ctx) {
         const ask = `<div style="font-size:${P(ctx, textPt(ctx) + 2)};font-weight:700;line-height:1.2;margin-bottom:${L(ctx, 2)};text-align:left;">`
             + `The ${p.ask === 'first' ? 'first' : 'second'} number:</div>`;
         body = `<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:${L(ctx, 4)} ${L(ctx, 8)};">`
-            + `<div style="flex:none;">${body}</div><div style="flex:none;">${ask}${choiceRow(ctx, labels.map((l) => ({ label: l })), { on, vertical: true, labelPt: textPt(ctx) + 2 })}</div></div>`;
+            + `<div style="flex:none;">${body}</div><div style="flex:none;">${ask}${choiceRow(ctx, labels.map((l) => ({ label: l })), { on, vertical: true, labelPt: textPt(ctx) + 2, ring: { index: p.correct || 0, ink: workInk(ctx, 'ring') } })}</div></div>`;
     }
     return root(ctx, 'k2-bond-table', body);
 }
@@ -223,9 +246,12 @@ register('bond', {
      * S5 / P-LC-9 (the lesson's anchor chart): the problem as it looks after step k - the marks of
      * step k in grey, earlier steps' in black. A bond has one slot; a table writes its cells.
      */
+    /** The scripted model draws step states for the bonds table (its provider marks every cell). */
+    modelStates: (p) => !!(p && p.kind === 'table'),
     stepState(p, steps, k, ctx) {
         const marks = stepMarks(steps, k);
-        if (p.kind !== 'table' || p.task === 'pattern') return this.render(p, Object.assign({}, ctx, { state: singleSlotState(marks) }));
+        if (p.kind === 'table' && p.task === 'pattern') return this.render(p, k2StepCtx(steps, k, ctx));
+        if (p.kind !== 'table') return this.render(p, Object.assign({}, ctx, { state: singleSlotState(marks) }));
         const stepInks = slotInks(marks, (slot) => (/^r\d+[ab]$/.test(slot) ? slot : null));
         return bondTable(p, Object.assign({}, ctx, { state: 'blank', stepInks }));
     },

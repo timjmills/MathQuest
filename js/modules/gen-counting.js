@@ -280,7 +280,12 @@ function _kPair(rng, lo, hi, gapLo, gapHi) {
 // hosts draw that same template's twin (`q.visual`), so paper, key and screen are one drawing.
 function _kSetCell(q, template, payload) {
     q.cell = { template, v: 1, payload };
-    q.visual = k2Twin(template, payload);
+    // critic k2-r1 ("the counting checklist is on paper only"): a ticked checklist support is
+    // drawn beside the SCREEN twin too. Paper gets it from the page's support plan
+    // (print-sheet.js), so it is added to the twin's payload only, never to q.cell.
+    const sup = template === 'counters' ? _kOpt('support') : null;
+    const steps = Array.isArray(sup) && sup.includes('steps') && (payload.kind || 'count') === 'count';
+    q.visual = k2Twin(template, steps ? Object.assign({}, payload, { supports: { on: ['steps'], reserve: [] } }) : payload);
 }
 
 /** The plain counters of the count cells (one SVG primitive each, RP-20 plain set). */
@@ -299,6 +304,33 @@ function _kPageDeal(key, n) {
     return _kPageHeld[key];
 }
 
+/**
+ * An ANSWER POSITION (which of n choices is right; which of two things is asked), drawn at random
+ * with repeats allowed - never a round-robin, which a pupil reads as a pattern (A, B, A, B ...;
+ * critic k2-r1). A printed page draws a block of positions at its first item: every value at
+ * least twice when the page holds 2n items (once when it holds n), the rest at random, the block
+ * shuffled; the next block is drawn when the page runs past it. Live play draws each time.
+ */
+const _kDrawBlock = {};
+function _kDraw(key, n) {
+    n = Math.max(1, Math.floor(n));
+    if (n === 1) return 0;
+    if (!Number.isFinite(state.itemIndex)) return Math.floor(Math.random() * n);
+    const len = Math.max(2 * n, Number(state.itemCount) || 12);
+    const k = `${key}:${n}`;
+    const at = state.itemIndex;
+    let b = _kDrawBlock[k];
+    if (at === 0 || !b || at < b.start || at >= b.start + b.seq.length) {
+        const start = at - (at % len);
+        const seq = [];
+        const each = len >= 2 * n ? 2 : 1;
+        for (let v = 0; v < n; v++) for (let r = 0; r < each; r++) seq.push(v);
+        while (seq.length < len) seq.push(Math.floor(Math.random() * n));
+        b = _kDrawBlock[k] = { start, seq: shuffle(seq) };
+    }
+    return b.seq[at - b.start];
+}
+
 /* ================================================================================ the generator */
 
 export function generateCountingQuestion(q, mappedSkill, helpers) {
@@ -306,7 +338,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     _kBeginItem();
 
     // ========================================
-    // COUNT OBJECTS (Grade K) — "Count Objects (1-20)". The name bounds the count at 1-20 and
+    // COUNT OBJECTS (Grade K) — "Count Objects (1-30)". The name bounds the count at 1-30 (20 by default) and
     // the picture is the only question a non-reader gets, so the cell draws `count` shapes in
     // rows of five and says nothing else.
     // ========================================
@@ -318,6 +350,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // a page spreads it instead of rolling six numbers that may repeat.
         // P11: "Count to" 5 / 10 / 20 (20 is the stand-alone default).
         // Build lane k2: the "same number?" task (conservation) has its own cell.
+        _k2NoStretch(q);   // "Two numbers add to 18" is not a counting task: no Stretch page
         if (_kOpt('task') === 'same') { _k2Conserve(q, rng); return; }
         const band = Number(_kOpt('band')) || 20;
         const _coCircle = _kOpt('orientation') === 'circle';
@@ -344,11 +377,11 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         q.distractorTags = _kDeal(2) === 0 || count === 1
             ? { [count + 1]: 'counted one object twice' }
             : { [count - 1]: 'missed one object' };
-        const _coPayload = { kind: 'count', n: count, shape, ans: count };
+        const _coPayload = { kind: 'count', n: count, shape, ans: count, band };   // band: the page title's "to 20 / to 30"
         if (objects === 'frame' || objects === 'dice') _coPayload.objects = objects;
         const layout = _kOpt('orientation') || 'rows';
         if (layout === 'line' || layout === 'scattered') _coPayload.layout = layout;
-        if (layout === 'circle' && objects !== 'frame' && objects !== 'dice') { _coPayload.layout = 'circle'; _coPayload.ringN = Math.min(20, band); }
+        if (layout === 'circle' && objects !== 'frame' && objects !== 'dice') { _coPayload.layout = 'circle'; }   // critic k2-r1: the ring is sized from its own count
         if (band > 20 && !_coPayload.layout && objects !== 'frame' && objects !== 'dice') _coPayload.layout = 'line';   // to 30: rows of ten, every item alike
         if (layout === 'scattered' && objects !== 'frame' && objects !== 'dice') _coPayload.pos = _kScatter(count, rng);
         const lvl = _kLevel(1);
@@ -420,6 +453,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 : `Count on from ${answer - 1}. The next number goes in the box.`;
         q.visual = _kCell(`<svg viewBox="0 0 ${totalW} ${totalH}" width="${Math.min(totalW, 340)}" `
             + `style="display:block;margin:0 auto;">${boxesSvg}</svg>`);
+        // the gap box in the number path IS the answer place: no second "Answer:" line under it on
+        // paper (critic k2-r1, H8: a zero_none review mixed in this cell with a box and a line)
+        q.selfAnswering = true;
         // P11 Support level 0: the question alone, with no number path to read the gap from.
         if (_kLevel(1) === 0) {
             q.visual = _kCell(`<div style="font-size:1.6rem;font-weight:700;">${questionText.replace('?', '')} ${_kLine(2)}</div>`, null, true);
@@ -1362,7 +1398,21 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
 const K2_HOLDER_WORD = { plates: 'plate', boxes: 'box', frame: 'ten frame' };
 const K2_HOLDER_PREP = { plates: 'on the', boxes: 'in the', frame: 'in the' };
 
+/**
+ * A K picture item has ONE answer (a count, a checked picture, a place): there is no open problem
+ * with several answers for a Stretch page (critic k2-r1: "Find more problems like it" with the
+ * answer "B"). It declares so, and the Stretch role withholds the page with this reason
+ * (PAGE_TYPES 6.3 allows withholding). bonds_in_order has a real open task (q.openWhole).
+ */
+const K2_NO_STRETCH = 'A picture item for the youngest pupils has one answer, so it has no open Stretch problem. '
+    + 'Use More practice, Reasoning or Error analysis for this skill.';
+function _k2NoStretch(q) { q.stretch = false; q.stretchWhy = K2_NO_STRETCH; return true; }
+
 function _k2LaneSkill(q, id, rng) {
+    if (id !== 'bonds_in_order' && _k2LaneSkill0(q, id, rng)) return _k2NoStretch(q);
+    return id === 'bonds_in_order' ? _k2LaneSkill0(q, id, rng) : false;
+}
+function _k2LaneSkill0(q, id, rng) {
     switch (id) {
         case 'zero_none': return _k2Zero(q, rng);
         case 'compare_size': return _k2CompareSize(q, rng);
@@ -1398,7 +1448,7 @@ function _k2Zero(q, rng) {
     q.skillLabel = 'Zero Means None';
     if (task === 'find') {
         // one empty holder among three, at a dealt place; the other two hold different counts
-        const at = _kDealShuffled(3);
+        const at = _kDraw('zero-find', 3);
         const a = rng(1, band);
         let b = rng(1, Math.max(1, band - 1));
         if (b >= a) b = Math.min(band, b + 1);
@@ -1417,7 +1467,11 @@ function _k2Zero(q, rng) {
         q.distractorTags = { [['A', 'B', 'C'][fewest]]: 'chose the one with the fewest, not none' };
         q._variant = 'find';
         q.printFormat = 'k2-find';
-        _kSetCell(q, 'counters', { kind: 'zero', task: 'find', objects: holder, shape, counts, correct: at, ans: letter, labels: ['A', 'B', 'C'] });
+        const fp = { kind: 'zero', task: 'find', objects: holder, shape, counts, correct: at, ans: letter, labels: ['A', 'B', 'C'] };
+        const flvl = _kLevel(1);
+        if (flvl >= 2) fp.legend = true;   // what "none" looks like (never where it is)
+        q.supportLevel = flvl;
+        _kSetCell(q, 'counters', fp);
         return true;
     }
     if (task === 'compute') {
@@ -1431,11 +1485,17 @@ function _k2Zero(q, rng) {
         q.distractorTags = { [n]: 'wrote how many there were, not how many are left' };
         q._variant = 'compute';
         q.printFormat = 'k2-compute';
-        _kSetCell(q, 'counters', { kind: 'zero', task: 'compute', objects: holder, shape, n, ans: 0 });
+        const cp = { kind: 'zero', task: 'compute', objects: holder, shape, n, ans: 0 };
+        const clvl = _kLevel(1);
+        if (clvl >= 2) cp.track = band;    // the track 0..band to count back along
+        q.supportLevel = clvl;
+        _kSetCell(q, 'counters', cp);
         return true;
     }
     // count: a third of the page is empty (R.B7.S1: zero is a count like any other)
-    const empty = _kDealShuffled(3) === 0;
+    // the page's first item (the Model's and Guided's worked example) is the empty one: the model
+    // must show 0 (critic k2-r1); after it, a third of the items are empty at random
+    const empty = _kDraw('zero-empty', 3) === 0 || state.itemIndex === 0;
     const n = empty ? 0 : nonzero();
     q.text = `How many are ${prep} ${word}?`;
     q.printText = 'Count. Write how many. None is 0.';
@@ -1461,7 +1521,7 @@ const K2_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
 /** A permutation of 0..n-1 from the page deal (the positions of a row, never in size order twice running). */
 function _k2Perm(n) {
     // two: dealt round the page (half the items the bigger one stands first)
-    if (n === 2) return _kDealShuffled(2) === 0 ? [0, 1] : [1, 0];
+    if (n === 2) return _kDraw('perm2', 2) === 0 ? [0, 1] : [1, 0];
     let out = shuffle(Array.from({ length: n }, (_, i) => i));
     // never in size order (smallest to biggest left to right): the pupil must look, not read the row
     for (let t = 0; t < 6 && out.every((v, i) => v === i); t++) out = shuffle(out);
@@ -1550,9 +1610,10 @@ function _k2OddOneOut(q, rng) {
     const n = Number(_kOpt('tiles')) === 3 ? 3 : 4;
     const task = _kOpt('task') === 'rule' ? 'why' : 'find';
     const attrOpt = ['kind', 'size', 'mixed'].includes(_kOpt('attr')) ? _kOpt('attr') : 'kind';
-    const attr = attrOpt === 'mixed' ? (_kDeal(2) === 0 ? 'kind' : 'size') : attrOpt;
+    // "Say why" names the rule, so its page mixes the two rules itself (one fixed rule is one fixed answer)
+    const attr = attrOpt === 'mixed' || task === 'why' ? (_kDraw('odd-attr', 2) === 0 ? 'kind' : 'size') : attrOpt;
     const pool = _kOpt('objects') === 'shapes' ? K2_ROW_SHAPES : K2_ROW_PICTURES;
-    const at = _kDealShuffled(n);
+    const at = _kDraw('odd-at', n);
     let row;
     if (attr === 'kind') {
         const [same, odd] = _k2Two(pool);
@@ -1615,7 +1676,7 @@ function _k2MatchSame(q, rng) {
     const pool = _kOpt('objects') === 'shapes' ? K2_ROW_SHAPES : K2_ROW_PICTURES;
     const target = pool[_kDealShuffled(pool.length)];
     const others = shuffle(pool.filter((s) => s !== target)).slice(0, n - 1);
-    const at = _kDealShuffled(n);
+    const at = _kDraw('match-at', n);
     const choices = [];
     let k = 0;
     for (let i = 0; i < n; i++) {
@@ -1638,8 +1699,13 @@ function _k2MatchSame(q, rng) {
     q.distractorTags = { [K2_LETTERS[at === 0 ? 1 : 0]]: 'matched a different picture' };
     q._variant = task;
     q.printFormat = `k2-${task}`;
-    _kSetCell(q, 'picture-row', { kind: 'pick', target: { shape: target, s: 0.9, sil: task === 'shadow' }, choices, correct: at, labels: K2_LETTERS.slice(0, n),
-        pic: n === 4 ? 12 : n === 3 ? 14 : 17, gap: 4 });
+    const mp = { kind: 'pick', target: { shape: target, s: 0.9, sil: task === 'shadow' }, choices, correct: at, labels: K2_LETTERS.slice(0, n),
+        pic: n === 4 ? 11 : n === 3 ? 14 : 17, gap: n === 4 ? 3 : 4 };   // four: 11 mm, 3 mm gaps, so two still fit a row at L
+    // Support level 2 (critic k2-r1: "match_same has no support control"): the target's name under its box
+    const mlvl = _kLevel(1);
+    if (mlvl >= 2) mp.name = one;
+    q.supportLevel = mlvl;
+    _kSetCell(q, 'picture-row', mp);
     return true;
 }
 
@@ -1679,7 +1745,7 @@ function _k2Capacity(q, rng) {
     q.supportLevel = lvl;
     if (task === 'read') {
         const words = five ? K2_FILL_WORDS : K2_FILL_WORDS.filter((w) => !/Nearly/.test(w.label));
-        const correct = _kDealShuffled(words.length);
+        const correct = _kDraw('cap-word', words.length);
         const w = words[correct];
         q.text = `Is the ${one} full, half full or empty?`;
         q.printText = 'How full is it? Check one box.';
@@ -1703,6 +1769,9 @@ function _k2Capacity(q, rng) {
     const fills = n === 3 ? [0.22, 0.52, 0.86] : [0.25, 0.8];
     const choices = at.map((k) => (holds ? { container: kind, fill: 0, w: sizes[k], h: sizes[k] } : { container: kind, fill: fills[k] }));
     const payload = { kind: task === 'order' ? 'order' : 'pick', choices, pic: 20 };
+    // Support level 2 on the compare tasks (critic k2-r1: support applied to the words only): a floor
+    // line the containers stand on, so they are compared from one base
+    if (lvl >= 2) payload.base = true;
     const verb = holds ? 'holds' : 'has';
     if (task === 'order') {
         const order = at.map((k) => k + 1);
@@ -1759,7 +1828,7 @@ function _k2Measurable(q, rng) {
     const four = Number(_kOpt('count')) === 4;
     const n = Number(_kOpt('tiles')) === 3 ? 3 : 2;
     const keys = four ? ['long', 'heavy', 'tall', 'holds'] : ['long', 'heavy'];
-    const key = keys[_kDealShuffled(keys.length)];
+    const key = keys[_kDraw('measure-key', keys.length)];
     const m = K2_MEASURE[key];
     const obj = m.objects[rng(0, m.objects.length - 1)];
     const lvl = _kLevel(1);
@@ -1796,9 +1865,14 @@ function _k2Measurable(q, rng) {
     const wrong = words.find((w, i) => i !== correct);
     q.distractorTags = { [wrong.label]: task === 'tool' ? 'chose the wrong tool' : 'thought a colour or a name can be measured' };
     q.measureAttr = key;
+    // Support level 2 on "Which tool" (critic k2-r1: support applied to the first task only): a
+    // line naming what each tool on the page measures (a reference, not the choice)
+    const TOOL_NOTE = { Ruler: 'A ruler: long, tall.', Scale: 'A scale: heavy.', Jug: 'A jug: how much it holds.' };
+    const note = task === 'tool' && lvl >= 2 ? words.map((w) => TOOL_NOTE[w.label]).filter(Boolean).join(' ') : null;
     _kSetCell(q, 'picture-row', {
         kind: 'words', pic0: obj, words, correct, labels: words.map((w) => w.label), pic: 19,
         icons: task === 'tool' || lvl >= 2, iconSize: task === 'tool' ? 11 : 6.5, caption: task === 'tool' ? m.q : null,
+        ...(note ? { note } : {}), ...(_kOpt('orientation') === 'horizontal' ? { under: true } : {}),
     });
     return true;
 }
@@ -1824,7 +1898,7 @@ function _k2OrdinalLine(q, rng) {
     const task = _kOpt('task') === 'write' ? 'write' : 'find';
     const pool = _kOpt('objects') === 'shapes' ? K2_ROW_SHAPES.filter((s) => s !== 'star') : K2_ROW_PICTURES.filter((s) => s !== 'star');
     const kind = pool[_kDealShuffled(pool.length)];
-    const place = 1 + _kDealShuffled(band);                   // 1-based place from the flag
+    const place = 1 + _kDraw('ordinal-place', band);                   // 1-based place from the flag
     const lvl = _kLevel(1);
     const ord = _k2Ordinal(place);
     const pic = band === 10 ? 12 : band === 5 ? 11.5 : 17;
@@ -1884,7 +1958,11 @@ const K2_RULE_WORDS = { kind: 'By kind', shape: 'By shape', size: 'By size', wei
  */
 function _k2SortGroups(q, rng) {
     const task = ['count', 'most', 'order', 'rule'].includes(_kOpt('task')) ? _kOpt('task') : 'count';
-    const attr0 = ['kind', 'shape', 'size', 'weight'].includes(_kOpt('attr')) ? _kOpt('attr') : 'kind';
+    // "Find the rule" names the rule, so its page mixes the four rules itself (one rule is one answer)
+    const attr0 = task === 'rule' ? ['kind', 'shape', 'size', 'weight'][_kDraw('sort-rule', 4)]
+        : ['kind', 'shape', 'size', 'weight'].includes(_kOpt('attr')) ? _kOpt('attr') : 'kind';
+    // Pictures in a ring (the count range): up to 4 (default) or up to 6 (up to 5 with three rings)
+    const most = Number(_kOpt('band')) === 6 ? 6 : 4;
     // ordering needs three groups, and big / small, heavy / light are two: ordering sorts by kind
     const attr = task === 'order' && (attr0 === 'size' || attr0 === 'weight') ? 'kind' : attr0;
     let nGroups = task === 'order' ? 3 : Number(_kOpt('tiles')) === 3 ? 3 : 2;
@@ -1906,10 +1984,12 @@ function _k2SortGroups(q, rng) {
     // how many in each group: 1-4; all different for most / order (a set of distinct counts, shuffled)
     let counts;
     if (task === 'most' || task === 'order') {
-        const sets = nGroups === 3 ? [[1, 2, 3], [2, 3, 4], [1, 3, 4], [1, 2, 4]] : [[1, 3], [2, 4], [1, 4], [2, 3], [3, 4], [1, 2]];
-        counts = shuffle(sets[_kDealShuffled(sets.length)].slice());
+        const top = nGroups === 3 ? Math.min(most, 5) : most;
+        counts = shuffle(Array.from({ length: top }, (_, i) => i + 1)).slice(0, nGroups);
     } else {
-        counts = defs.map(() => rng(1, nGroups === 3 ? 3 : 4));
+        const top = nGroups === 3 ? (most === 6 ? 5 : 3) : most;
+        const low = most === 6 ? 2 : 1;
+        counts = defs.map(() => rng(low, top));
         if (counts.reduce((a, b) => a + b, 0) < 4) counts[0] += 1;
     }
     // the tiles, shuffled into a row, and which group each belongs to
@@ -2015,7 +2095,7 @@ function _k2Conserve(q, rng) {
     const objects = _kOpt('objects') || 'shapes';
     const shape = objects === 'pictures' ? K2_PICTURE_KINDS[_kPageDeal('cons-shape', K2_PICTURE_KINDS.length)] : K2_COUNT_SHAPES[_kPageDeal('cons-shape', K2_COUNT_SHAPES.length)];
     const n = 3 + _kDealShuffled(Math.max(2, band - 2));          // 3..band
-    const same = _kDealShuffled(2) === 0;
+    const same = _kDraw('conserve-same', 2) === 0;
     const m = same ? n : (n > 3 && rng(0, 1) === 0 ? n - 1 : n + 1);
     const labels = ['Same', 'Not the same'];
     const correct = same ? 0 : 1;
@@ -2051,11 +2131,12 @@ function _k2BondsInOrder(q, rng) {
     const band = Number(_kOpt('band')) === 5 ? 5 : 10;
     const task = _kOpt('task') || 'fill';
     const lvl = _kLevel(2);
-    const n = band === 5 ? 3 + _kDealShuffled(3) : 6 + _kDealShuffled(5);
+    const n = band === 5 ? 2 + _kDealShuffled(4) : 5 + _kDealShuffled(6);
     const notation = _kOpt('notation') === 'across' ? 'across' : 'table';
-    // half the items list the bonds from the other end (n and 0 first): systematic from either
-    // end, and on a pattern page the answer moves
-    const down = _kDealShuffled(2) === 1;
+    // Start from (dir): 0 (forward, default) or the whole (back), ONE direction for the whole page
+    // (so the Steps strip is true of every table); "either" holds a direction per page
+    const dir = ['forward', 'back', 'mixed'].includes(_kOpt('dir')) ? _kOpt('dir') : 'forward';
+    const down = dir === 'back' || (dir === 'mixed' && _kPageDeal('bonds-dir', 2) === 1);
     const rows = Array.from({ length: n + 1 }, (_, i) => { const a = down ? n - i : i; return { a, b: n - a, hide: null }; });
     const given = lvl >= 2 ? 2 : 0;
     if (task === 'fill') rows.forEach((r, i) => { if (i >= given) r.hide = 'b'; });
@@ -2073,7 +2154,7 @@ function _k2BondsInOrder(q, rng) {
     q._variant = task;
     q.printFormat = `k2-bonds-${task}`;
     if (task === 'pattern') {
-        const ask = _kDealShuffled(2) === 0 ? 'second' : 'first';
+        const ask = _kDraw('bonds-ask', 2) === 0 ? 'second' : 'first';
         const labels = ['Goes up by 1', 'Goes down by 1', 'Stays the same'];
         const goesUp = (ask === 'first') !== down;
         const correct = goesUp ? 0 : 1;

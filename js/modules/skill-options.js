@@ -3071,8 +3071,9 @@ const K2_LANE_OPTIONS = {
             help: 'One task for the whole page. "How many?" writes a number, 0 included; "Which one has none?" checks the empty '
                 + 'one of three; "Take them all away" crosses out every object and writes what is left.',
         },
-        { ...levelSubset([2, 1], 1, 'Level 2 prints a number track 0 to the top number under each picture (0 comes first); '
-            + 'level 1 is the picture alone.'), appliesTo: (o) => !o.task || o.task === 'count' },
+        levelSubset([2, 1], 1, 'Level 2: on "How many?" and "Take them all away" a number track 0 to the top number under each picture '
+            + '(0 comes first, to count along or back along); on "Which one has none?" a small empty plate marked "none = 0" under the row. '
+            + 'Level 1 is the picture alone.'),
         {
             id: 'objects', label: 'Objects', type: 'enum', default: 'plates', group: 'layout',
             values: [{ v: 'plates', l: 'Pictures on plates (default)' }, { v: 'boxes', l: 'Pictures in boxes' }, { v: 'frame', l: 'Counters in a ten frame' }],
@@ -3112,7 +3113,7 @@ const K2_LANE_OPTIONS = {
     'comparing:odd_one_out': [
         {
             id: 'task', label: 'Task', type: 'enum', default: 'find', group: 'difficulty',
-            values: [{ v: 'find', l: 'Find the one that does not belong (default)' }, { v: 'rule', l: 'Say why: the odd one is circled, check the reason' }],
+            values: [{ v: 'find', l: 'Find the one that does not belong (default)' }, { v: 'rule', l: 'Say why: the odd one is circled, check the reason (kind and size mix on the page)' }],
             help: 'One task for the whole page. "Say why" names the rule: a different kind or a different size.',
         },
         {
@@ -3149,6 +3150,7 @@ const K2_LANE_OPTIONS = {
             values: [{ v: 'pictures', l: 'Pictures (ball, apple, car, house ...) (default)' }, { v: 'shapes', l: 'Plain shapes (circle, square, triangle ...)' }],
             help: 'What is drawn in the box and in the row.',
         },
+        levelSubset([2, 1], 1, 'Level 2 writes the picture\'s name under the box (ball, star ...): what to look for, never where it is; level 1 is the picture alone.'),
     ],
     'comparing:compare_capacity': [
         {
@@ -3163,8 +3165,8 @@ const K2_LANE_OPTIONS = {
             help: 'Nearly full and nearly empty come after the three main words. (The word task only.)',
             appliesTo: (o) => !o.task || o.task === 'read',
         },
-        { ...levelSubset([2, 1], 1, 'Level 2 draws a small glass beside each word (full, half full, empty) as a picture of the word; level 1 prints the words alone. (The word task only.)'),
-            appliesTo: (o) => !o.task || o.task === 'read' },
+        levelSubset([2, 1], 1, 'Level 2: on the word task a small glass beside each word (full, half full, empty) as a picture of the word; '
+            + 'on the compare and order tasks a floor line the containers stand on. Level 1 is the pictures alone.'),
         {
             id: 'objects', label: 'Containers', type: 'enum', default: null, group: 'layout',
             values: [{ v: null, l: 'Mixed: glass, jug, bucket, bottle, bowl (default)' }, { v: 'glass', l: 'Glasses' }, { v: 'jug', l: 'Jugs' },
@@ -3188,8 +3190,15 @@ const K2_LANE_OPTIONS = {
             values: [{ v: 2, l: 'Two to choose from (default)' }, { v: 3, l: 'Three to choose from' }],
             help: 'Two: one we can measure and one we cannot. Three adds another.',
         },
-        { ...levelSubset([2, 1], 1, 'Level 2 draws a small picture beside each word (an arrow for long, a weight for heavy, a jug for holds); level 1 prints the words alone. (The word task only: the tools are always pictured.)'),
-            appliesTo: (o) => o.task !== 'find' },
+        levelSubset([2, 1], 1, 'Level 2: on "What can we measure?" a small picture beside each word (an arrow for long, a weight for heavy, '
+            + 'a jug for holds); on "Which tool?" a line under the choices saying what each tool measures. Level 1 is the words alone.'),
+        {
+            // the existing orientation id and tokens (V / H): a new share key is not needed
+            id: 'orientation', label: 'Choices drawn', type: 'enum', default: 'vertical', group: 'layout',
+            values: [{ v: 'vertical', l: 'In a list beside the picture (default)' }, { v: 'horizontal', l: 'In a row under the picture' }],
+            help: 'Where the check boxes sit: a list beside the picture, or a row under it.',
+            helpShort: 'Where the check boxes sit: a list beside the picture, or a row under it.',
+        },
     ],
     'counting:ordinal_numbers': [
         _opsBand([3, 5, 10], 5, { label: 'Places to', labels: { 3: '1st to 3rd (three in the line)', 5: '1st to 5th (five in the line)', 10: '1st to 10th (ten in the line)' },
@@ -3207,8 +3216,14 @@ const K2_LANE_OPTIONS = {
         },
     ],
     'composing:bonds_in_order': [
-        _opsBand([5, 10], 10, { label: 'Bonds of', labels: { 5: 'The numbers 3 to 5', 10: 'The numbers 6 to 10' },
-            help: 'The whole each table lists. 3 to 5 first (4 to 6 rows); then 6 to 10 (7 to 11 rows, one table a column).' }),
+        _opsBand([5, 10], 10, { label: 'Bonds of', labels: { 5: 'The numbers 2 to 5', 10: 'The numbers 5 to 10' },
+            help: 'The whole each table lists. 2 to 5 first (3 to 6 rows); then 5 to 10 (6 to 11 rows, in two halves side by side).' }),
+        {
+            id: 'dir', label: 'Start from', type: 'enum', default: 'forward', group: 'difficulty',
+            values: [{ v: 'forward', l: '0 (0 and 5, 1 and 4 ...) (default)' }, { v: 'back', l: 'The whole (5 and 0, 4 and 1 ...)' },
+                { v: 'mixed', l: 'Either (one start for each page)' }],
+            help: 'Where the list starts. Every table on a page starts at the same end, so the steps are true of all of them.',
+        },
         {
             id: 'task', label: 'Task', type: 'enum', default: 'fill', group: 'difficulty',
             values: [{ v: 'fill', l: 'Write the second part of each row (default)' }, { v: 'missing', l: 'Write the missing rows (both parts)' },
@@ -3224,10 +3239,12 @@ const K2_LANE_OPTIONS = {
         },
     ],
     'comparing:sort_into_groups': [
+        _opsBand([4, 6], 4, { label: 'Pictures in a ring', labels: { 4: '1 to 4 in each ring', 6: '2 to 6 in each ring (up to 5 with three rings)' },
+            help: 'How many pictures each ring gets: the count the pupil writes. Up to 4 first, then up to 6.' }),
         {
             id: 'task', label: 'Task', type: 'enum', default: 'count', group: 'difficulty',
             values: [{ v: 'count', l: 'Sort the pictures, write how many in each ring (default)' }, { v: 'most', l: 'Sorted: check the ring with the most' },
-                { v: 'order', l: 'Sorted: order three rings, fewest first (write 1, 2, 3)' }, { v: 'rule', l: 'Find the rule: how are they sorted?' }],
+                { v: 'order', l: 'Sorted: order three rings, fewest first (write 1, 2, 3)' }, { v: 'rule', l: 'Find the rule: how are they sorted? (the four rules mix on the page)' }],
             help: 'One task for the whole page: sort and count first; then compare the groups; then name the rule of a finished sort.',
         },
         {
@@ -3263,11 +3280,19 @@ const _k2Swap = (key, id, fn) => {
 // count_objects: count to 30 (rows of ten, M.EE.2.NBT.2); objects in a circle (K.CC.B.5); the
 // "same number?" task (conservation, K.CC.B.4b).
 _k2Swap('counting:count_objects', 'band', () => _opsBand([5, 10, 20, 30], 20, { label: 'Count to',
-    labels: { 30: '30 (rows of ten)' }, help: 'The largest number on the page. To 30 draws the objects in rows of ten.' }));
+    labels: { 30: '30 (11 to 30, rows of ten)' }, help: 'The largest number on the page. To 30 deals 11 to 30 objects in rows of ten (two fives).' }));
 _k2Swap('counting:count_objects', 'orientation', (o) => ({ ...o,
     values: [...o.values.filter((v) => v.v !== 'circle'), { v: 'circle', l: 'In a circle (mark where you start)' }],
     help: 'Scattered and in a circle are the hardest: the pupil has to keep track of what he has counted '
-        + '(in a circle, where he started). Support level 2 marks the first object of a circle.' }));
+        + '(in a circle, where he started). Support level 2 marks the first object of a circle.',
+    helpShort: 'How the objects are laid out: rows of five, one line, scattered, or in a circle.' }));
+// critic k2-r1: two controls read "Support" (the level and the set of extra pictures); the set is
+// named for what it adds
+{
+    const list = SKILL_OPTIONS['counting:count_objects'] || [];
+    const i = list.findIndex((o) => o && o.id === 'support');
+    if (i >= 0) list[i] = { ...list[i], label: 'Extra help on the page' };
+}
 _k2Swap('counting:count_objects', 'task', () => ({
     id: 'task', label: 'Task', type: 'enum', default: 'count', group: 'difficulty',
     values: [{ v: 'count', l: 'How many? (default)' }, { v: 'same', l: 'Same number? (the same objects moved: check a box)' }],

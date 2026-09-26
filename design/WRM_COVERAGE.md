@@ -653,10 +653,10 @@ whatever happens to the WRM gaps.
 #### R.B3 Autumn Block 3: It's me 1, 2, 3
 
 - **R.B3.S1** Find 1, 2 and 3 — covered. _K.CC.B.4, K.CC.B.5, M.EE.K.CC.4, M.EE.K.CC.6_  
-  Skills: Count Objects (1-20) (Visual) (`counting:count_objects`) {count to 5}  
+  Skills: Count Objects (1-30) (Visual) (`counting:count_objects`) {count to 5}  
   Vocabulary: how many, altogether, match  
 - **R.B3.S2** Subitise 1, 2 and 3 — PARTIAL. _K.CC.B.5, M.EE.K.CC.6_  
-  Partial: Count Objects (1-20) (Visual) (`counting:count_objects`), missing recognition at a glance (dice patterns are counted one by one, not subitised)  
+  Partial: Count Objects (1-30) (Visual) (`counting:count_objects`), missing recognition at a glance (dice patterns are counted one by one, not subitised)  
   Proposal: Say How Many Without Counting  
   Vocabulary: dot, how many, subitise  
 - **R.B3.S3** Represent 1, 2 and 3 — covered. _K.CC.A.3, K.CC.B.5, M.EE.K.CC.6_  
@@ -691,10 +691,10 @@ whatever happens to the WRM gaps.
 #### R.B5 Autumn Block 5: 1, 2, 3, 4, 5
 
 - **R.B5.S1** Find 4 and 5 — covered. _K.CC.B.4, K.CC.B.5, M.EE.K.CC.4, M.EE.K.CC.6_  
-  Skills: Count Objects (1-20) (Visual) (`counting:count_objects`) {count to 5}  
+  Skills: Count Objects (1-30) (Visual) (`counting:count_objects`) {count to 5}  
   Vocabulary: count, altogether, same amount  
 - **R.B5.S2** Subitise 4 and 5 — PARTIAL. _K.CC.B.5, M.EE.K.CC.6_  
-  Partial: Count Objects (1-20) (Visual) (`counting:count_objects`), missing recognition at a glance  
+  Partial: Count Objects (1-30) (Visual) (`counting:count_objects`), missing recognition at a glance  
   Proposal: Say How Many Without Counting  
   Vocabulary: subitise, without counting, arrangement  
 - **R.B5.S3** Represent 4 and 5 — covered. _K.CC.A.3, K.CC.B.5, M.EE.K.CC.6_  
@@ -734,10 +734,10 @@ whatever happens to the WRM gaps.
   Skills: Zero Means None (`counting:zero_none`)  
   Vocabulary: zero, none, all gone  
 - **R.B7.S2** Find 0 to 5 — covered. _K.CC.B.4, K.CC.B.5, M.EE.K.CC.4, M.EE.K.CC.6_  
-  Skills: Count Objects (1-20) (Visual) (`counting:count_objects`) {count to 5}  
+  Skills: Count Objects (1-30) (Visual) (`counting:count_objects`) {count to 5}  
   Vocabulary: how many, zero, match, same  
 - **R.B7.S3** Subitise 0 to 5 — PARTIAL. _K.CC.B.5, M.EE.K.CC.6_  
-  Partial: Count Objects (1-20) (Visual) (`counting:count_objects`), missing recognition at a glance; zero  
+  Partial: Count Objects (1-30) (Visual) (`counting:count_objects`), missing recognition at a glance; zero  
   Proposal: Say How Many Without Counting  
   Vocabulary: subitise, how many, zero  
 - **R.B7.S4** Represent 0 to 5 — covered. _K.CC.A.3, K.CC.B.5, M.EE.K.CC.6_  
@@ -775,7 +775,7 @@ whatever happens to the WRM gaps.
 #### R.B9 Spring Block 3: Growing 6, 7, 8
 
 - **R.B9.S1** Find 6, 7 and 8 — covered. _K.CC.B.4, K.CC.B.5, M.EE.K.CC.4, M.EE.K.CC.6_  
-  Skills: Count Objects (1-20) (Visual) (`counting:count_objects`) {count to 10}  
+  Skills: Count Objects (1-30) (Visual) (`counting:count_objects`) {count to 10}  
   Vocabulary: how many, altogether, the same  
 - **R.B9.S2** Represent 6, 7 and 8 — covered. _K.CC.A.3, K.CC.B.5, M.EE.K.CC.6_  
   Skills: Build a Number on a Ten Frame (`composing:ten_frame_build`) {count to 10}  
@@ -831,7 +831,7 @@ whatever happens to the WRM gaps.
 #### R.B11 Spring Block 5: Building 9 and 10
 
 - **R.B11.S1** Find 9 and 10 — covered. _K.CC.B.4, K.CC.B.5, M.EE.K.CC.4, M.EE.K.CC.6_  
-  Skills: Count Objects (1-20) (Visual) (`counting:count_objects`) {count to 10}  
+  Skills: Count Objects (1-30) (Visual) (`counting:count_objects`) {count to 10}  
   Vocabulary: nine, ten, altogether  
 - **R.B11.S2** Compare numbers to 10 — covered. _K.CC.C.6, K.CC.C.7, M.EE.K.CC.7_  
   Skills: More/Fewer/Same Groups (Visual) (`comparing:compare_groups`) {count to 10}; Compare Numbers (>, <, =) (`placevalue:compare`) {numbers to 10}  
@@ -1049,10 +1049,10 @@ whatever happens to the WRM gaps.
   Partial: Sort & Count by Category (Visual) (`comparing:classify_count`), missing sorting every object into groups by a rule; the skill counts one kind  
   Vocabulary: sort, set, attribute  
 - **Y1.B1.S2** Count objects — covered. _K.CC.B.5, M.EE.K.CC.6_  
-  Skills: Count Objects (1-20) (Visual) (`counting:count_objects`) {count to 10}  
+  Skills: Count Objects (1-30) (Visual) (`counting:count_objects`) {count to 10}  
   Vocabulary: count, total, last  
 - **Y1.B1.S3** Count objects from a larger group — PARTIAL. _K.CC.B.5, M.EE.K.CC.6_  
-  Partial: Count Objects (1-20) (Visual) (`counting:count_objects`), missing counting out a given number from a larger group  
+  Partial: Count Objects (1-30) (Visual) (`counting:count_objects`), missing counting out a given number from a larger group  
   Proposal: Count Out a Number  
   Vocabulary: count out, altogether, left  
 - **Y1.B1.S4** Represent objects — covered. _K.CC.A.3, K.CC.B.4, M.EE.K.CC.4_  
@@ -1177,7 +1177,7 @@ whatever happens to the WRM gaps.
 #### Y1.B4 Spring Block 1: Place value (within 20)
 
 - **Y1.B4.S1** Count within 20 — covered. _K.CC.B.5, M.EE.K.CC.6_  
-  Skills: Count Objects (1-20) (Visual) (`counting:count_objects`) {count to 20}  
+  Skills: Count Objects (1-30) (Visual) (`counting:count_objects`) {count to 20}  
   Vocabulary: ten, ones, next, -teen  
 - **Y1.B4.S2** Understand 10 — PARTIAL. _K.NBT.A.1_  
   Partial: Build a Number on a Ten Frame (`composing:ten_frame_build`), missing 10 as one ten (a full frame is one ten)  

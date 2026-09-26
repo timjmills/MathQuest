@@ -479,6 +479,40 @@ function equationCheck(it) {
 // ---------------------------------------------------------------------------
 // Sampling (runs inside the page)
 // ---------------------------------------------------------------------------
+/**
+ * In the page: for the skill's defaults and each value of each enum option, the right answer of
+ * 30 consecutive items (the checked position of a choice cell, else the label answer). Returns a
+ * message for each run whose answer never moves (with more than one choice) or repeats with a
+ * period of 2-6 items.
+ */
+async function answerCycles({ categoryId, skillId, baseSeed }) {
+    const mod = await import('/js/modules/skill-options.js');
+    const defs = (mod.SKILL_OPTIONS[`${categoryId}:${skillId}`] || []).filter((d) => d && d.type === 'enum' && Array.isArray(d.values));
+    const combos = [{}];
+    for (const d of defs) for (const v of d.values) { const val = v && typeof v === 'object' ? v.v : v; if (val !== d.default) combos.push({ [d.id]: val }); }
+    const msgs = [];
+    for (const opts of combos) {
+        const seq = [];
+        let choices = 0;
+        for (let i = 0; i < 30; i++) {
+            let q = null;
+            try { q = window.generateQuestionFor({ category: categoryId, skill: skillId, range: 100, decimals: 0, opts, seed: baseSeed + 7000 + i, itemIndex: i }); } catch (e) { q = null; }
+            if (!q || q.printAnswer === undefined || q.printAnswer === null) continue;
+            const p = (q.cell && q.cell.payload) || {};
+            const n = Array.isArray(p.labels) ? p.labels.length : Array.isArray(p.choices) ? p.choices.length : Array.isArray(p.words) ? p.words.length : 2;
+            choices = Math.max(choices, n);
+            seq.push(Number.isInteger(p.correct) ? `#${p.correct}` : String(q.printAnswer));
+        }
+        if (seq.length < 20 || choices < 2) continue;
+        const tag = Object.keys(opts).length ? JSON.stringify(opts) : 'defaults';
+        if (new Set(seq).size === 1) { msgs.push(`${tag}: the right answer is ${seq[0]} on all ${seq.length} items`); continue; }
+        for (let per = 2; per <= 6; per++) {
+            if (seq.every((v, i) => i + per >= seq.length || v === seq[i + per])) { msgs.push(`${tag}: the right answer repeats every ${per} items (${seq.slice(0, 2 * per).join(' ')} ...)`); break; }
+        }
+    }
+    return msgs;
+}
+
 function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm, opts }) {
     // What a K-2 cell carries INSTEAD of a and b. These are the fields the generators already
     // publish so the renderers can draw the representation, and they are exactly what the
@@ -2439,7 +2473,15 @@ function selfTest() {
             categoryId: s.categoryId, skillId: s.skillId, n: N, baseSeed, range: 100,
             k2: family === 'k2', tm: family === 'tm',
         });
-        out.push({ ...skill, ...audit(skill, items) });
+        const res = { ...skill, ...audit(skill, items) };
+        // ANSWER POSITION (critic k2-r1, L3): a choice item whose right answer cycles (A, B, A, B
+        // ...) or never moves is answered by pattern. Every K-2 choice skill, at its defaults and
+        // at each value of each of its choices, over 30 consecutive items of one page.
+        if (family === 'k2' && !s.pool) {
+            const cyc = await app.page.evaluate(answerCycles, { categoryId: s.categoryId, skillId: s.skillId, baseSeed });
+            for (const c of cyc) res.fails.push({ cls: 'answer-cycle', msg: c });
+        }
+        out.push(res);
     }
     await app.close();
 

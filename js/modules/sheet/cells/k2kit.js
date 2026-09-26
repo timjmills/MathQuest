@@ -19,6 +19,40 @@
 import { esc } from '../cell.js';
 import { SIZES, DEFAULT_SIZE, blankWidth } from '../tokens.js';
 import { renderCell } from '../registry.js';
+import { stepMarks, singleSlotState, slotInks } from '../steps.js';
+
+/* ----------------------------------------------------------- the scripted model's states (PT-MOD-1)
+ * A K picture template draws the problem as it looks after step k of the provider's worked steps:
+ * the answer slot from the steps' slot marks, and the WORKING from `work` marks - a step mark
+ * `{slot: 'work', value: 'count ring'}` names what that step adds (count numerals on the objects,
+ * a ring round the chosen picture, the start mark, the letters in a sorting ring ...). The newest
+ * step's marks are grey (trace), earlier ones black (PAGE_TYPES 2.2).
+ *   ctx.work       {token: 'trace' | 'solid'}
+ *   ctx.stepSlots  {slotId: {value, ink}} for multi-box cells (the order boxes, a sort's counts)
+ */
+export function k2StepCtx(steps, k, ctx) {
+    const marks = stepMarks(steps, k);
+    const work = {};
+    for (const m of marks) if (m.slot === 'work') for (const t of String(m.value).split(/\s+/)) if (t) work[t] = m.ink;
+    const stepSlots = slotInks(marks, (s) => (s === 'work' ? null : s));
+    return Object.assign({}, ctx, { state: singleSlotState(marks), work, stepSlots });
+}
+/** The ink of a work token in this state: 'trace' (newest), 'solid' (earlier) or '' (not yet). */
+export const workInk = (ctx, token) => (ctx && ctx.work && ctx.work[token]) || '';
+/** A ring round a drawing (a model's "this one" mark): grey and dashed when it is the newest mark. A
+ *  negative margin the size of its padding and border keeps the drawing's box (a state row never grows). */
+export function ringWrap(ctx, html, ink) {
+    if (!ink) return html;
+    const grey = ink === 'trace';
+    return `<span data-ws-ink="${grey ? 'trace' : 'solid'}" style="display:inline-block;border:${B(ctx, 1.5)} ${grey ? 'dashed' : 'solid'} ${grey ? GREY : INK};`
+        + `border-radius:${L(ctx, 6)};padding:${L(ctx, 1)};margin:${L(ctx, -1.53)};line-height:0;">${html}</span>`;
+}
+/** A multi-box cell's slot value in a model state (its ink as a state), else the normal shown value. */
+export function stepSlot(ctx, id, fallback) {
+    const s = ctx && ctx.stepSlots && ctx.stepSlots[id];
+    if (!ctx || !ctx.stepSlots) return { value: fallback, ctx };
+    return s ? { value: s.value, ctx: Object.assign({}, ctx, { state: s.ink === 'trace' ? 'traced' : 'answered' }) } : { value: '', ctx: Object.assign({}, ctx, { state: 'blank' }) };
+}
 
 export const PT_MM = 25.4 / 72;
 /** Stroke widths of the closed set (INK-10), in mm. */
@@ -404,26 +438,31 @@ export function checkedChoice(p, ctx, labels) {
  * choices: [{pic: html, label: 'A'}], on: the checked index (-1 none), vertical: a list of word
  * choices (a bank), each box on the right of its word (the compare cell's form).
  */
-export function choiceRow(ctx, choices, { on = -1, gapMm = 7, vertical = false, labelPt = null, labelW = null } = {}) {
+export function choiceRow(ctx, choices, { on = -1, gapMm = 7, vertical = false, labelPt = null, labelW = null, ring = null } = {}) {
     const lp = labelPt || textPt(ctx) + 2;
+    // a model state's ring round the chosen one (ring = {index, ink}, from ctx.work)
+    const ringed = (i, html) => (ring && ring.ink && ring.index === i ? ringWrap(ctx, html, ring.ink) : html);
     const cols = choices.map((c, i) => {
         const box = checkBox(ctx, { id: `c${i}`, on: on === i, slot: false });
         if (vertical) {
             return `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};margin:${L(ctx, 1.5)} 0;">`
                 + `<span style="flex:none;${labelW ? `width:${L(ctx, labelW)};` : ''}display:inline-flex;align-items:center;gap:${L(ctx, 2)};white-space:nowrap;text-align:left;font-size:${P(ctx, lp)};">`
-                + `${c.pic || ''}${esc(c.label)}</span>${box}</div>`;
+                + `${ringed(i, `${c.pic || ''}${esc(c.label)}`)}</span>${box}</div>`;
         }
         return `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 2)};">`
             + `<span style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 1.5)};font-size:${P(ctx, lp)};font-weight:700;line-height:1;">`
-            + `${c.pic || ''}${esc(c.label)}</span>${box}</div>`;
+            + `${c.pic ? ringed(i, c.pic) : ''}${c.pic ? esc(c.label) : ringed(i, esc(c.label))}</span>${box}</div>`;
     }).join('');
     // A traced Model marks only the check in grey (the box carries its own trace ink): a trace ink
     // on the whole row would grey the pictures and their labels too (practice.js INK-3 rule).
     // Error analysis draws the finished work in pupil-writing grey through the slot's ink, so a
     // wrong row carries none either: only its check mark is the pupil's (the labels stay black).
     const ink = on >= 0 && ctx.state === 'answered' ? ' data-ws-ink="solid"' : '';
-    return `<div class="k2-choices" data-ws-slot="answer" data-ws-shape="check"${ink} style="display:${vertical ? 'inline-block' : 'flex'};`
-        + `${vertical ? 'text-align:left;' : `justify-content:center;align-items:flex-end;gap:${L(ctx, gapMm)};flex-wrap:wrap;`}font-weight:700;">${cols}</div>`;
+    // a row of choices is ONE line on paper and on screen (critic k2-r1: a row that wraps 2 + 1 on
+    // a worksheet card breaks the comparison); data-mq-nowrap tells the screen fit to shrink the
+    // drawing instead of wrapping it
+    return `<div class="k2-choices" data-ws-slot="answer" data-ws-shape="check"${ink}${vertical ? '' : ' data-mq-nowrap="1"'} style="display:${vertical ? 'inline-block' : 'flex'};`
+        + `${vertical ? 'text-align:left;' : `justify-content:center;align-items:flex-end;gap:${L(ctx, gapMm)};flex-wrap:nowrap;`}font-weight:700;">${cols}</div>`;
 }
 
 /**

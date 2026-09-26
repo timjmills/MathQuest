@@ -37,7 +37,7 @@ const VOCAB = 'Vocabulary matching game: it supports the language of every stand
 export const SKILL_STANDARDS = {
 
     // ---- counting
-    'counting:count_objects': { ccss: ['K.CC.B.5', 'K.CC.B.4b', 'K.CC.A.3', 'K.CC.B.4a'], ee: ['M.EE.K.CC.6', 'M.EE.K.CC.4', 'M.EE.2.NBT.2', 'M.EE.1.NBT.1'] }, // Count Objects (1-20) (Visual)
+    'counting:count_objects': { ccss: ['K.CC.B.5', 'K.CC.B.4b', 'K.CC.A.3', 'K.CC.B.4a'], ee: ['M.EE.K.CC.6', 'M.EE.K.CC.4', 'M.EE.2.NBT.2', 'M.EE.1.NBT.1'] }, // Count Objects (1-30) (Visual)
     'counting:count_sequence': { ccss: ['K.CC.A.2', 'K.CC.B.4c'], ee: ['M.EE.K.CC.4', 'M.EE.1.NBT.1', 'M.EE.K.CC.1', 'M.EE.2.NBT.2'] }, // Next/Before/After Number (Visual)
     'counting:number_seq_fill': { ccss: ['1.NBT.A.1', 'K.CC.A.2', 'K.CC.A.1'], ee: ['M.EE.1.NBT.1', 'M.EE.2.NBT.3', 'M.EE.K.CC.1'] }, // Number Sequence: Fill Missing (Grid)
     'counting:mixed_counting': { ccss: [], ee: [], pool: true }, // Mixed Counting

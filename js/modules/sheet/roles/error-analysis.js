@@ -343,7 +343,8 @@ export function prepare(it, info = {}) {
     let labels = null;
     if (DRAWN.has(it.template)) kind = 'draw';
     else if (redraw) kind = 'redo';
-    else if (LINED.has(it.template)) kind = 'line';
+    // build lane k2: a bonds table draws a Fix box at the end of each row (bond.js), like a function table
+    else if (LINED.has(it.template) || (it.template === 'bond' && q.cell && q.cell.payload && q.cell.payload.kind === 'table' && q.cell.payload.task !== 'pattern')) kind = 'line';
     else if (choice) kind = 'choice';
     else if (P && P.parts.length > 1 && digitSplit) kind = 'value';
     else if (P && P.parts.length > 1) {
@@ -414,7 +415,8 @@ export function prepare(it, info = {}) {
         body = ungraded(body);
         drawZone = ungraded(drawZone);
         const askedFix = !!drawZone || ((kind === 'draw' || kind === 'line') && /data-ws-slot="(?:fix|x\d)/.test(body));
-        const verb = kind === 'draw' || drewWork ? 'drew' : redraw === 'mark' ? 'marked' : 'wrote';
+        // a check-box answer was checked, not written (critic k2-r1: "Sam wrote:" over a checked box)
+        const verb = kind === 'draw' || drewWork ? 'drew' : redraw === 'mark' ? 'marked' : kind === 'choice' ? 'checked' : 'wrote';
         // A line-mark item names its number only in the page's own instruction: the finished
         // work says which number was to be marked, or it cannot be checked (critic round 3).
         // An estimate is judged against ITS rounding rule, so the rule is printed with the work
@@ -632,7 +634,9 @@ export function plan(input = {}) {
     // The instruction says where the fix goes (critic round 3): written, or drawn again.
     const drawn = items.length && items.every((it) => it.thinking && (it.thinking.kind === 'draw' || it.thinking.redraw === 'draw'));
     const marked = items.length && items.every((it) => it.thinking && it.thinking.redraw === 'mark');
-    return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(drawn ? 'check-fix-draw' : marked ? 'check-fix-mark' : 'check-fix-write'), grid] }], {
+    // a page whose fixes are all check boxes says so (the fix is checked, not written)
+    const checked = items.length && items.every((it) => it.thinking && it.thinking.kind === 'choice');
+    return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(drawn ? 'check-fix-draw' : marked ? 'check-fix-mark' : checked ? 'check-fix-check' : 'check-fix-write'), grid] }], {
         meta: { items: items.length, scoreOutOf: items.length, wrongShare, fits: [Object.assign(fit, { line: fitsLine(fit) })], notes: L.note ? [L.note] : [] },
     });
 }

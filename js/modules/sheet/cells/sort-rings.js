@@ -28,7 +28,7 @@ import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import {
     L, P, B, INK, GREY, SW, n2, svg, root, box, shapeOf, textPt, digitPt, inlineBoxMm, isTwin, pscale,
-    checkedChoice, choiceRow, LETTERS, shownParts, inkOf, KEY_FEATURES,
+    checkedChoice, choiceRow, LETTERS, shownParts, inkOf, KEY_FEATURES, k2StepCtx, workInk, ringWrap, stepSlot,
 } from './k2kit.js';
 
 /** One picture of `d` mm, centred in a square svg. */
@@ -58,8 +58,9 @@ register('sort-rings', {
         const groups = p.groups || [];
         const n = groups.length;
         const grid = p.model === 'grid';
-        const w = (n === 3 ? 40 : 52) * k, h = (p.task === 'count' ? 30 : 38) * k;
-        const d = 11 * k;
+        // critic k2-r1: 4 mm labels and 7 mm tiles were too small; tiles 13 mm, labels 10 mm (at L)
+        const w = (n === 3 ? 44 : 56) * k, h = (p.task === 'count' ? 32 : 42) * k;
+        const d = 13 * k;
         const inside = p.task !== 'count';
         const task = p.task || 'count';
         const counts = (p.counts || groups.map((g) => g.members.length)).map(String);
@@ -67,29 +68,41 @@ register('sort-rings', {
         const bx = inlineBoxMm(ctx, 1);
         const rings = groups.map((g, gi) => {
             const label = p.labels === false || task === 'rule' ? ''
-                : `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 1.5)};font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.1;">`
-                    + `${g.pic ? pic(ctx, g.pic, 8 * k) : ''}${g.word ? `<span>${esc(g.word)}</span>` : ''}</div>`;
+                : `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 1.5)};font-size:${P(ctx, textPt(ctx) + 3)};font-weight:700;line-height:1.1;">`
+                    + `${g.pic ? pic(ctx, g.pic, 10 * k) : ''}${g.word ? `<span>${esc(g.word)}</span>` : ''}</div>`;
             const members = inside ? `<div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:${L(ctx, 1.5)};max-width:${L(ctx, w - 10)};">`
-                + g.members.map((ti) => pic(ctx, p.tiles[ti], 11 * k)).join('') + '</div>' : '';
+                + g.members.map((ti) => pic(ctx, p.tiles[ti], 12 * k)).join('') + '</div>' : '';
             // the letters written in the ring (the working): all of them on the key (solid) and in a
             // traced Model (grey); at support level 3 the first tile placed (grey); never graded
             let letters = '';
-            if (task === 'count') {
+            if (ctx.work) {
+                // a scripted model's state: the rings filled one step at a time (g0, g1, ...), and
+                // the ring's count written small at its foot ("count")
+                const gi0 = workInk(ctx, `g${gi}`);
+                if (task === 'count' && gi0) letters = workLetters(ctx, g.members, gi0);
+                const ci = workInk(ctx, 'count');
+                if (ci && task !== 'count') letters = `<div data-ws-part="work" style="font-size:${P(ctx, textPt(ctx) + 2)};font-weight:700;line-height:1;color:${ci === 'trace' ? GREY : INK};">${g.members.length}</div>`;
+            } else if (task === 'count') {
                 if (ctx.state === 'answered') letters = workLetters(ctx, g.members, 'solid');
                 else if (ctx.state === 'traced') letters = workLetters(ctx, g.members, 'trace');
                 else if (p.work && ctx.state === 'blank' && g.members.includes(0)) letters = workLetters(ctx, [0], 'trace');
             }
             const shape = grid ? `border-radius:${L(ctx, 1.5)};` : 'border-radius:50%;';
-            return `<div class="k2-ring" style="box-sizing:border-box;width:${L(ctx, w)};height:${L(ctx, h)};border:${B(ctx, 1.5)} solid ${INK};${shape}`
+            const ringed = task === 'most' && gi === (p.correct || 0) ? workInk(ctx, 'ring') : '';
+            return (ringed ? `<div style="border:${B(ctx, 1.5)} ${ringed === 'trace' ? 'dashed' : 'solid'} ${ringed === 'trace' ? GREY : INK};border-radius:${L(ctx, 8)};padding:${L(ctx, 1)};">` : '<div>')
+                + `<div class="k2-ring" style="box-sizing:border-box;width:${L(ctx, w)};height:${L(ctx, h)};border:${B(ctx, 1.5)} solid ${INK};${shape}`
                 + `display:flex;flex-direction:column;align-items:center;justify-content:${inside ? 'center' : 'flex-start'};gap:${L(ctx, 1.5)};padding:${L(ctx, grid ? 2 : 4)} ${L(ctx, 4)};background:#fff;">`
-                + `${label}${members}${letters}</div>`;
+                + `${label}${members}${letters}</div></div>`;
         });
         let under = '';
         if (task === 'count' || task === 'order') {
             // each ring's box stands at its right, at the ring's middle: the page keeps three items
             const ink = inkOf(ctx);
-            const pairs = rings.map((r, gi) => `<div style="display:flex;align-items:center;gap:${L(ctx, 2.5)};">${r}`
-                + box(ctx, { id: `b${gi}`, value: shownCounts[gi], w: bx.w + 2, h: bx.h + 2, mark: 'cell' }) + '</div>').join('');
+            const pairs = rings.map((r, gi) => {
+                const st = stepSlot(ctx, `b${gi}`, shownCounts[gi]);
+                return `<div style="display:flex;align-items:center;gap:${L(ctx, 2.5)};">${r}`
+                    + box(st.ctx, { id: `b${gi}`, value: st.value, w: bx.w + 2, h: bx.h + 2, mark: 'cell' }) + '</div>';
+            }).join('');
             const row = `<div data-ws-slot="answer" data-ws-shape="box"${ink === 'solid' && shownCounts.some(Boolean) ? ' data-ws-ink="solid"' : ''} `
                 + `style="display:flex;justify-content:center;gap:${L(ctx, (grid ? 3 : 6) * k)};">${pairs}</div>`;
             const tiles = task === 'count' ? `<div style="margin-bottom:${L(ctx, 3)};">${tileRow(ctx, p.tiles || [], d)}</div>` : '';
@@ -106,7 +119,7 @@ register('sort-rings', {
             const labels = (p.words || []).map((x) => x.label);
             const on = checkedChoice(p, ctx, labels);
             return root(ctx, 'k2-sort', `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 7)};">${main}`
-                + `${choiceRow(ctx, labels.map((l) => ({ label: l })), { on, vertical: true, labelPt: textPt(ctx) + 2 })}</div>`);
+                + `${choiceRow(ctx, labels.map((l) => ({ label: l })), { on, vertical: true, labelPt: textPt(ctx) + 2, ring: { index: p.correct || 0, ink: workInk(ctx, 'ring') } })}</div>`);
         }
         const tiles = task === 'count' ? `<div style="margin-bottom:${L(ctx, 4)};">${tileRow(ctx, p.tiles || [], d)}</div>` : '';
         return root(ctx, 'k2-sort', `${tiles}${main}`);
@@ -124,6 +137,9 @@ register('sort-rings', {
         return { value: v, display: v, slots: { answer: { value: v, graded: true } } };
     },
     footprint() { return { wMm: 186, hMm: null, measure: true, factLike: false, maxCols: 1 }; },
+    /** PT-MOD-1: the scripted model's states, from the provider's `work` and slot marks (k2kit). */
+    modelStates: true,
+    stepState(p, steps, k, ctx) { return this.render(p, k2StepCtx(steps, k, ctx)); },
     inputs(p) {
         const task = (p && p.task) || 'count';
         if (task === 'count' || task === 'order') return (p.groups || []).map((_, i) => ({ id: `b${i}`, kind: 'number', shape: 'box', graded: true, order: i, scopes: ['full'] }));
