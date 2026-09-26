@@ -36,7 +36,8 @@ import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine } from './sheet/roles/lesson.js';
 import { itemKey, nearTwins, packetViolations } from './sheet/lesson-rules.js';
-import { lessonFor, skillRef } from './lessons/prereqs.js';
+import { lessonFor, lessonDataById, skillRef } from './lessons/prereqs.js';
+import { lessonById, practiceRef } from './lessons/library.js';
 import {
     normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, easeScore, ineligibleNote,
     blockPlan, sideItems, pickDistinct,
@@ -132,6 +133,9 @@ function normaliseRequest(req = {}) {
         // The lesson gate's proof mode (ws-lesson-check.cjs --rule-off): a lesson rule's engine
         // side switched off. Never set by the print panel.
         rulesOff: Array.isArray(req.rulesOff) ? req.rulesOff.map(String) : [],
+        // A lesson packet by LESSON id (lessons/library.js): the lesson's own practice skill and
+        // options, whatever skill the request names (design/LESSON_LIBRARY_PLAN.md phase 0).
+        lessonId: req.role === 'lesson' && req.lessonId ? String(req.lessonId) : '',
     };
 }
 
@@ -1426,6 +1430,13 @@ function anchorSummary(mode, list, notes) {
  * @returns {Promise<{pupilHtml, keyHtml, pageCount, keyPageCount, fits, items, plan, seed, notes}>}
  */
 export async function buildSheet(req = {}) {
+    // A lesson asked for by id: its sections are the lesson's practice skill with the lesson's
+    // option values (a skill the request names is replaced - the lesson record decides, LINK-1).
+    if (req && req.role === 'lesson' && req.lessonId) {
+        const ref = lessonById(req.lessonId) ? practiceRef(req.lessonId) : null;
+        if (!ref) throw new Error(`buildSheet: no lesson "${req.lessonId}" in the library`);
+        req = Object.assign({}, req, { sections: [Object.assign({}, (req.sections || [])[0] || {}, { skills: [ref] })] });
+    }
     const n = normaliseRequest(req);
     if (!n.sections.length) throw new Error('buildSheet: no section has a skill');
     await fontsReady();
@@ -2074,7 +2085,9 @@ export const LESSON_SIZE_WHY = 'A lesson prints at one size, Large: its anchor c
 
 async function buildLesson(n, metaOf) {
     const sk0 = n.sections[0].skills[0];
-    const data0 = lessonFor(sk0.categoryId, sk0.skillId);
+    // The lesson record: by its id (the library), else the skill's default lesson (prereqs.js).
+    const dataOf = (sk) => (n.lessonId ? lessonDataById(n.lessonId) : lessonFor(sk.categoryId, sk.skillId));
+    const data0 = dataOf(sk0);
     // The lesson's floor on its own operands (lessons r2: "add 1-3" never deals + 0), on every part.
     const flags = {};
     if (data0 && data0.minOperand !== undefined && sk0.minOperand === undefined) flags.minOperand = data0.minOperand;
@@ -2098,7 +2111,7 @@ async function buildLesson(n, metaOf) {
     const sk = Object.keys(flags).length ? Object.assign({}, sk0, flags) : sk0;
     if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
-    const data = lessonFor(sk.categoryId, sk.skillId);
+    const data = dataOf(sk);
     const warmSkills = data ? data.skills.map(skillRef) : earlierSkills(sk, 2);
     let st = { ccss: [], ee: [], approx: false };
     try { if (standardsMod) st = standardsMod.standardsFor(sk.categoryId, sk.skillId); } catch (e) { /* no tags */ }
@@ -2257,6 +2270,7 @@ async function buildLesson(n, metaOf) {
         notes,
         plan: teach.plan,
         lesson: {
+            id: n.lessonId || '',
             skill: `${sk.categoryId}:${sk.skillId}`, tags: { ccss, ee, line: tagLine },
             prerequisites: data
                 ? { skills: data.skills.map((s) => s.key), concepts: data.concepts.map((c) => c.text), vocab: data.vocab.map((v) => v.word) }

@@ -34,6 +34,8 @@ import { ROLE_IDS, ROLE_MODULES, ROLE_ALIASES } from '../../js/modules/sheet/rol
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, getProvider } from '../../js/modules/sheet/index.js';
 import { stack, regroupWorking } from '../../js/modules/sheet/cells/stack.js';
 import * as LR from '../../js/modules/sheet/lesson-rules.js';
+import * as LIB from '../../js/modules/lessons/library.js';
+import * as SCHEMA from '../../js/modules/lessons/schema.js';
 import { SLOT, SIZES as KIT_SIZES, slotRadiusMm, stripSegStyle, stripPos, atLeastSize } from '../../js/modules/sheet/tokens.js';
 
 let pass = 0;
@@ -1136,6 +1138,13 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
         chartCases: ['twoPlace'],
     }).map((v) => v.rule);
     ok(['LR-1', 'LR-2', 'LR-5', 'LR-6', 'LR-7'].every((r) => V.includes(r)), `LR: a packet breaking five rules is caught (${[...new Set(V)].join(', ')})`);
+    // THE LESSON LIBRARY (design/LESSON_LIBRARY_PLAN.md phase 0).
+    eq(LIB.validateLibrary().join('; '), '', 'library: no structural problem');
+    eq(LIB.lessonById('add-within-10') && LIB.lessonById('add-within-10').id, 'Y1.B2.S9', 'library: an older slug finds its lesson');
+    eq(JSON.stringify(LIB.practiceRef('Y1.B2.S9')), JSON.stringify({ categoryId: 'addition', skillId: 'add_facts', opts: { band: 10, constant: [1, 2, 3] } }), 'library: the practice options live in the lesson record');
+    eq((LIB.defaultLessonForSkill('subtraction', 'sub_100_regroup') || {}).id, 'Y2.B2.S18', 'library: a skill finds its default lesson');
+    eq([SCHEMA.kindOf('Y2.B2.S18'), SCHEMA.kindOf('ccss:6.NS.A.1'), SCHEMA.kindOf('ee:M.EE.6.SP.1'), SCHEMA.kindOf('skill:addition:add_facts'), SCHEMA.kindOf('Y9.B1')].join(','), 'wrm,ccss,ee,skill,', 'library: lesson id kinds');
+    ok(LIB.lessonData('Y4.B1.S14').cases.includes('toHundred') && !('archetype' in LIB.lessonData('Y4.B1.S14')), 'library: lessonData is the routine plus the lesson (no archetype field for the engine)');
     // LR-10: the packet prints at its one size, whatever was asked.
     eq(LR.packetViolations({ lesson: { cases: [] }, placed: [], sizePrinted: 'M', packetSize: 'L' }).map((v) => v.rule).join(','), 'LR-10', 'LR-10: a packet printed off its one size fails');
     eq(LR.packetViolations({ lesson: { cases: [] }, placed: [], sizePrinted: 'L', packetSize: 'L' }).length, 0, 'LR-10: a packet at its size passes');

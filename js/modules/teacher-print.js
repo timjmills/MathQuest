@@ -21,6 +21,7 @@
 // the chosen `opts` go straight into the buildSheet request (skills[].opts).
 
 import { buildSheet, sheetDocument, LESSON_SIZE_WHY } from './print-sheet.js';
+import { lessonById, practiceRef } from './lessons/library.js';
 import {
     icon, esc, toast, skillCatalogue, findSkill, levelText, currentSet, savedSets, printDefaults,
     optionsSummary, optionsReadOnlyHTML, readStore, writeStore, PRINTS_KEY, fmtDay,
@@ -150,6 +151,22 @@ export function renderPrintScreen(el) {
  * {categoryId, skillId, opts?, weight?}. An empty list keeps what is there.
  */
 export function openPrintWith(list) {
+    // A lesson from the Lesson library (design/LESSON_LIBRARY_PLAN.md §5): {role: 'lesson',
+    // lessonId} opens a Lesson section on that lesson's practice skill and options; the packet is
+    // then built by lesson id.
+    const lessonAsk = (Array.isArray(list) ? list : []).find((k) => k && k.role === 'lesson' && k.lessonId && lessonById(k.lessonId));
+    if (lessonAsk) {
+        const ref = practiceRef(lessonAsk.lessonId);
+        if (!pr) initState();
+        const sec = newSection([{ categoryId: ref.categoryId, skillId: ref.skillId, opts: ref.opts || {}, weight: 1 }]);
+        sec.role = 'lesson';
+        sec.mixed = true;
+        sec.lessonId = lessonById(lessonAsk.lessonId).id;
+        pr.sections = [sec];
+        pr.seed = freshSeed();
+        pr.view = 0;
+        return;
+    }
     const skills = (Array.isArray(list) ? list : [])
         .filter((k) => k && k.categoryId && k.skillId && findSkill(k.categoryId, k.skillId))
         .map((k) => ({ categoryId: k.categoryId, skillId: k.skillId, opts: optsOf(k), weight: k.weight > 1 ? k.weight : 1 }));
@@ -749,6 +766,13 @@ function classicHTML() {
 
 /* ================================================================= build + preview */
 
+/** Is a lesson section's first skill still its lesson's practice skill? */
+function lessonSkillKept(s) {
+    const ref = practiceRef(s.lessonId);
+    const k = s.skills[0];
+    return !!(ref && k && k.categoryId === ref.categoryId && k.skillId === ref.skillId);
+}
+
 function requestFor(s, i) {
     const skills = s.skills.map((k) => {
         // Always an explicit object: a row reset to its defaults here (k.opts undefined) must
@@ -766,6 +790,9 @@ function requestFor(s, i) {
         letters: s.role === 'more-practice' ? s.letters.slice() : undefined,
         practicePages: s.role === 'lesson' ? s.pages : undefined,
         mixed: s.role === 'lesson' ? !!s.mixed : undefined,
+        // A section opened from the Lesson library keeps its lesson id while its skill is still
+        // that lesson's practice skill (a teacher who changes the skill prints by skill again).
+        lessonId: s.role === 'lesson' && s.lessonId && lessonSkillKept(s) ? s.lessonId : undefined,
         size: pr.size,
         // 'auto' lets each page type take its own default look (Daily on the fact layouts).
         look: pr.look === 'daily' || pr.look === 'ican' ? pr.look : 'auto',
