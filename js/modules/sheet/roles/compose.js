@@ -159,15 +159,14 @@ export function fitsAt(items, cols, ctx) {
         // The item's own column cap first (a word problem is one column, PT-WPR-1, however
         // narrow its wrapped text measures), then the host's measurement (DN-10).
         const fp = it.footprint || {};
-        // The item's cap at THIS size (LESSONS_LEARNED L1: S printed the grid of L). Below L a
-        // static-width cell's computed width decides, and a measured cell its measurement (the
-        // widest count at which nothing overflowed, clipped or shrank, DN-10) - layout.itemCap,
-        // as the practice roles already do. L, and a full-width template (maxCols 1: a number
-        // line, a story), keep the author's cap.
+        // The item's cap as the practice roles read it (layout.itemCap; LESSONS_LEARNED L1/L2):
+        // a measured cell by its measurement - the widest count at which nothing overflowed,
+        // clipped or shrank (DN-10) - and, below L, a static-width cell by its own computed
+        // width. The author's `maxCols` alone held a Review of ordinal rows to one column at L
+        // where the Independent page of the same rows is 2 x 4 (k2-r1 critic).
         const size = (ctx && ctx.size) || '';
         const staticW = !fp.measure && !fp.factLike && Number.isFinite(fp.wMm);
-        const below = size && size !== 'L' && fp.maxCols > 1;
-        const cap = fp.maxCols && below && (staticW || (fp.measure && it.measured))
+        const cap = fp.maxCols && (staticW || (fp.measure && it.measured))
             ? itemCap({ fp, measured: staticW ? null : it.measured, size }) : fp.maxCols;
         if (cap && cols > cap) return false;
         if (cols > 1 && (it.fclass === 'word' || it.fclass === 'wide')) return false;
