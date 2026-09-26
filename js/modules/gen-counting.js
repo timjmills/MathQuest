@@ -1474,7 +1474,10 @@ function _k2Zero(q, rng) {
     // count: a third of the page is empty (R.B7.S1: zero is a count like any other)
     // the page's first item (the Model's and Guided's worked example) is the empty one: the model
     // must show 0 (critic k2-r1); after it, a third of the items are empty at random
-    const empty = _kDraw('zero-empty', 3) === 0 || state.itemIndex === 0;
+    // the item after the empty first one always has objects (critic k2-r3: a mixed sheet's two items
+    // were both empty plates), and a short section holds ONE empty
+    const small = Number.isFinite(state.itemCount) && state.itemCount > 0 && state.itemCount <= 3;
+    const empty = state.itemIndex === 0 || (!small && state.itemIndex >= 2 && _kDraw('zero-empty', 3) === 0);
     const n = empty ? 0 : nonzero();
     q.text = `How many are ${prep} ${word}?`;
     q.printText = 'Count. Write how many. None is 0.';

@@ -479,6 +479,11 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     const G = gridOverride || gridHeightMm(paper, size, header);
     const Gc = gridOverride || gridHeightMm(paper, size, header, { cont: true });
     const infos = (items || []).map((it) => itemInfo(it, { size, look, paper: paperOf(paper).id, mode: 'print' }));
+    // CL-2's two-column row shapes (2 x 2 / 3 / 4 / 5 / 8), except for a section whose every cell
+    // opts out (`fp.freeRows`, critic k2-r3: a count page at S could hold 2 x 6 but the shapes
+    // jumped from 5 rows to 8, so S printed exactly as many as L). Minimal: those cells only.
+    const freeRows = infos.length > 0 && infos.every((i) => i.fp && i.fp.freeRows);
+    const snap2 = (r, dflt) => (freeRows ? r : TWO_COL_ROWS.find((x) => x <= r) || dflt);
     const cls = sectionClass(infos);
     // A role's own grid (PT 2.3, 2.7, 2.9, 6.1 ...) overrides the Independent targets and ceiling:
     //   section.target  = {cols, rows: N | {S, M, L}, rowsByCols?: {[cols]: N}}
@@ -556,14 +561,14 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         : (target && target.rowsByCols && bySize(target.rowsByCols[cols])[size]) || (EXPLICIT_TARGET_ROWS[cols] || cols);
     let rows = Math.min(targetRows, hard);
     // CL-2: a two-column grid takes one of the permitted shapes.
-    if (cols === 2) rows = TWO_COL_ROWS.find((r) => r <= rows) || 1;
+    if (cols === 2) rows = snap2(rows, 1);
     // 12.1: a ceiling is never exceeded.
     const ceilRows = Math.max(1, Math.floor(ceiling / cols));
     if (rows > ceilRows) {
         rows = ceilRows;
         notes.push(`At most ${ceiling} problems on this page.`);
     }
-    if (cols === 2 && rows > 1) rows = TWO_COL_ROWS.find((r) => r <= rows) || rows;
+    if (cols === 2 && rows > 1) rows = snap2(rows, rows);
     // RUBRIC H13 (owner 2026-09-25): a section of problems of different heights (a place-value
     // mat among one-line frames) is not paged as if every problem were the tallest. Its rows are
     // sized to what they hold (groupByHeight + packByHeight), so the page holds as many rows as
@@ -573,9 +578,14 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     if (cls !== 'word' && cls !== 'wide' && cls !== 'long' && !gridOverride) {
         const hs = (items || []).map((it) => measuredH(it, cols));
         if (hs.length >= 2 && hs.every((h) => h > 0) && Math.max(...hs) > Math.min(...hs) * 1.6) {
-            const sorted = hs.slice().sort((a, b) => b - a);
+            // the rows as the page will lay them (groupByHeight: height classes, the dealt order kept
+            // inside a class), not an ideal tallest-first pairing (critic k2-r3: a count page at L
+            // was sized for 10 but its grouped rows ran 2 items onto a second page)
+            let grouped = items;
+            try { grouped = groupByHeight(items, cols); } catch (e) { grouped = items; }
+            const gh = grouped.map((it) => measuredH(it, cols));
             const rowH = [];
-            for (let i = 0; i < sorted.length; i += cols) rowH.push(sorted[i]);
+            for (let i = 0; i < gh.length; i += cols) rowH.push(Math.max(...gh.slice(i, i + cols)));
             const avg = rowH.reduce((a, b) => a + b, 0) / rowH.length;
             // A dense section (Independent) packs to its dense ceiling, as a grid of one height
             // does below (critic guided-r1: a mixed place-value page at S held 6 problems in its
@@ -583,7 +593,7 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
             const packCeil = section.dense && (section.ceiling === undefined || section.ceiling === null)
                 ? bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling : ceiling;
             let fit = Math.min(Math.max(ceilRows, Math.floor(packCeil / cols)), Math.floor((G - SAFETY_H_MM) / Math.max(1, avg)));
-            if (cols === 2 && fit > 1) fit = TWO_COL_ROWS.find((r) => r <= fit) || fit;
+            if (cols === 2 && fit > 1) fit = snap2(fit, fit);
             if (fit > rows) {
                 rows = fit;
                 packed = true;
@@ -630,7 +640,7 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
             const pc = probe(c, c > cols);
             if (!pc.fits) continue;
             let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (pc.hMin * room)), Math.floor(dCeil / c)));
-            if (c === 2) rr = TWO_COL_ROWS.find((x) => x <= rr) || rr;
+            if (c === 2) rr = snap2(rr, rr);
             const tie = rr * c === best.perPage && best.cols !== c && sideBand(best.cols) >= 0.25 && sideBand(c) < sideBand(best.cols);
             if (rr * c > best.perPage || tie) best = { perPage: rr * c, cols: c, rows: rr, hMin: pc.hMin };
         }
@@ -663,7 +673,7 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         const fit = Math.floor((G - SAFETY_H_MM) / (hMin * DENSE_ROOM));
         if (used < PAGE_FILL * G && fit >= 5 / cols) {
             let want = Math.min(fit, Math.floor((DN1_AT[size] || DN1_MAX) / cols));
-            if (cols === 2 && want > 1) want = TWO_COL_ROWS.find((r) => r <= want) || want;
+            if (cols === 2 && want > 1) want = snap2(want, want);
             if (want > rows) {
                 rows = want;
                 filled = true;

@@ -27,6 +27,7 @@ import {
 } from './compose.js';
 import { skillWords } from './practice.js';
 import { anchorPlanItem, anchorHeightMm } from '../anchors.js';
+import { groupByHeight } from '../layout.js';
 
 export const ROLE_ID = 'mixed-practice';
 export const DEFAULT_LOOK = 'daily';
@@ -55,7 +56,12 @@ function packing(poolsIn, input) {
     const mCont = bandMetrics(ctx, layoutHeader(frame.header), { cont: true });
     // A lesson packet's Mixed page keeps the L lattice (6) at M: a 3-across shelf of stacks, never
     // 2 half-empty cells (lessons r1, H13 width).
-    const N = [4, 6, 8, 10].includes(Number(input.latticeN)) ? Number(input.latticeN) : AUTO_N[ctx.look][ctx.size];
+    // critic k2-r3: a section keeps the column count its single-skill page takes. The lattice is 12
+    // units (it divides into 6, 4, 3, 2 and 1 cells, so a 3-across shelf of two-picture cells sits on
+    // it too - on the old 4-unit L lattice it was forced to 2 half-empty cells); the size's Auto
+    // width stays the most cells a shelf holds.
+    const N = [4, 6, 8, 10, 12].includes(Number(input.latticeN)) ? Number(input.latticeN) : 12;
+    const kMax = Math.min(6, [4, 6, 8, 10].includes(Number(input.latticeN)) ? Number(input.latticeN) : AUTO_N[ctx.look][ctx.size]);
     const ids = Object.keys(poolsIn).filter((id) => (poolsIn[id] || []).length);
     const shelf = {};
     const A = input.anchors && input.anchors.byPool ? input.anchors : null;
@@ -64,8 +70,8 @@ function packing(poolsIn, input) {
         const a = A && A.byPool[id];
         const twins = a && A.mode === 'side' ? (a.side || []) : [];
         // SIDE: a shelf of [twin | problem] pairs needs an even count of cells the twins fit too.
-        const pairK = twins.length ? divisorsDesc(N).find((d) => d <= 6 && d % 2 === 0 && fitsAt(its, d, ctx) && fitsAt(twins, d, ctx)) : 0;
-        const k = pairK || divisorsDesc(N).find((d) => d <= 6 && fitsAt(its, Math.min(d, 6), ctx)) || 1;
+        const pairK = twins.length ? divisorsDesc(N).find((d) => d <= kMax && d % 2 === 0 && fitsAt(its, d, ctx) && fitsAt(twins, d, ctx)) : 0;
+        const k = pairK || divisorsDesc(N).find((d) => d <= kMax && fitsAt(its, Math.min(d, 6), ctx)) || 1;
         const h = Math.max(hMinAt(its, Math.min(k, 6), ctx), pairK ? hMinAt(twins, k, ctx) : 0);
         // The skill's anchor band (SECTIONS, or SIDE when no pair fits): measured by the host.
         const band = a && (A.mode === 'sections' || !pairK) && (a.band || []).length ? Math.max(0, ...a.band.map((x) => anchorHeightMm(x, 1))) : 0;
@@ -152,7 +158,11 @@ export function plan(input = {}) {
     const A = input.anchors && input.anchors.byPool ? input.anchors : null;
     for (const id of p.ids) {
         const sh = p.shelf[id];
-        const its = pools[id].slice(0, sh.n * sh.per);
+        // the section's items grouped by height class (critic k2-r3: 3 triangles shared a row with 18
+        // stars), the dealt order kept inside a class, as on the single-skill page
+        const its0 = pools[id].slice(0, sh.n * sh.per);
+        let its = its0;
+        try { its = sh.pairs ? its0 : groupByHeight(its0, Math.min(sh.k, 6)); } catch (e) { its = its0; }
         for (let s = 0; s < sh.n; s++) {
             let chunk = its.slice(s * sh.per, (s + 1) * sh.per);
             // SIDE: [twin | problem] pairs, the twin first (example, then problem).
@@ -172,7 +182,9 @@ export function plan(input = {}) {
     let start = 1;
     const used = shelves.reduce((a, sh, i) => a + (i === 0 || shelves[i - 1].id !== sh.id ? m.strip : 0) + sh.h + (sh.anchor ? sh.bandMm : 0), 0);
     // (1 mm kept back: shares that sum to the whole budget must not spill a shelf on rounding.)
-    const spare = p.pages > 1 ? 0 : Math.max(0, m.budget - used - (input.fill ? 1 : 0));
+    // (critic k2-r3: shares that summed to the whole budget spilled the last 2-item section onto a
+    // 75 %-empty page 2 on a rounding error; 1 mm is always kept back and a break allows 0.5 mm)
+    const spare = p.pages > 1 ? 0 : Math.max(0, m.budget - used - 1);
     // The spare height is shared into the shelves only as far as a cell keeps its drawing filling
     // it (H13: never an empty band of 30% of a cell): a tenth of a shelf's own height at most.
     const growOf = (sh) => (shelves.length ? (input.fill ? Math.min(sh.h * 0.35, spare / shelves.length) : Math.min(12, sh.h * 0.1, spare / shelves.length)) : 0);
@@ -181,9 +193,9 @@ export function plan(input = {}) {
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
         const budget = pages.length > 1 ? p.mCont.budget : m.budget;   // the page `cur` is on
         let bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
-        let joins = !firstOfSkill && !!cur && cur.sections.some((x) => x.kind === 'band') && cur.used + bandH - m.strip <= budget;
+        let joins = !firstOfSkill && !!cur && cur.sections.some((x) => x.kind === 'band') && cur.used + bandH - m.strip <= budget + 0.5;
         if (joins) bandH -= m.strip;
-        if (!cur || cur.used + bandH > budget) {
+        if (!cur || cur.used + bandH > budget + 0.5) {
             cur = { sections: pages.length === 0 && input.stepStrip ? [{ kind: 'html', html: input.stepStrip }] : [], used: 0 };
             pages.push(cur);
             joins = false;
@@ -219,6 +231,7 @@ export function plan(input = {}) {
     return assemble(ROLE_ID, input, frame, pages.map((pg) => ({ sections: pg.sections })), {
         defaultLook: DEFAULT_LOOK,
         meta: { items: n, scoreOutOf: n, units: p.N, achieved,
+            shelves: shelves.map((sh) => ({ id: sh.id, k: sh.k, h: Math.round(sh.h * 10) / 10, n: sh.items.length })), budget: m.budget, strip: m.strip, spare,
             fits: [{ cols: p.N, rows: shelves.length, line: `Fits: ${shelves.length} shelves on a ${p.N}-unit lattice, ${n} problems, ${pages.length} page${pages.length > 1 ? 's' : ''}.` }] },
     });
 }

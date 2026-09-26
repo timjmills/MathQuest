@@ -608,7 +608,9 @@ register('counters', {
     },
     footprint(p, ctx) {
         if (countUnderS(p, ctx || {})) return { wMm: 61, hMm: null, measure: true, factLike: false, maxCols: 3 };
-        return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2 };
+        // a plain count takes any number of rows (freeRows): its cells run 22-45 mm, so S holds 2 x 6
+        const plain = !!p && (p.kind || 'count') === 'count';
+        return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2, ...(plain ? { freeRows: true } : {}) };
     },
     inputs(p) {
         if (p && ((p.kind === 'zero' && p.task === 'find') || p.kind === 'conserve')) return [{ id: 'answer', kind: 'check', shape: 'check', graded: true, order: 0, scopes: ['full'] }];

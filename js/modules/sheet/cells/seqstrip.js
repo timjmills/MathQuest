@@ -36,6 +36,19 @@ export const SEQ_ROW_MAX = 5;
 
 /** Tiles per row: the whole track up to five, else the track wraps to two even rows. */
 const perRowOf = (n) => (n <= SEQ_ROW_MAX ? Math.max(1, n) : Math.ceil(n / 2));
+/**
+ * Size S, a one-line track of short numbers (critic k2-r3, L1: S printed 16 like L): the GIVEN
+ * tiles close up to 9 mm (1 mm apart) while every blank keeps its 14 mm writing box (H9), so the
+ * track is 54 mm and S takes three columns. null when the track keeps its tiles.
+ */
+function compactS(p, size) {
+    const values = (p && p.values) || [];
+    if (size !== 'S' || (p.shape && p.shape !== 'box') || values.length > SEQ_ROW_MAX || p.shown) return null;
+    if (!values.every((v) => String(v).length <= 3)) return null;
+    const b = ((p && p.blanks) || []).length;
+    return { given: 9, gap: 1, w: (values.length - b) * 9 + b * 14 + (values.length - 1) * 1 };
+}
+
 /** Width (mm) of one row of the track at this size. */
 const rowMm = (n, size, shape) => {
     const t0 = TILE[size] || TILE.L;
@@ -69,6 +82,7 @@ register('seqstrip', {
         const pt = Math.min(digitPt(ctx) * 0.72, 20);
         const fmt = (v) => (Number.isFinite(Number(v)) && String(v).trim() !== '' ? Number(v).toLocaleString('en-US') : String(v));
         const shaped = p.shape && p.shape !== 'box';
+        const cs = isTwin(ctx) ? null : compactS(p, size);
         const tiles = values.map((v, i) => {
             const k = blanks.indexOf(i);
             const over = shownAt(p, i);
@@ -82,7 +96,8 @@ register('seqstrip', {
                 const ink = over !== undefined ? 'solid' : val !== '' ? inkOf(ctx) : null;
                 return shapeTile(ctx, { shape: sh, w: sz.w, h: sz.h, pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink, heavy: true, shown: over !== undefined });
             }
-            const base = `box-sizing:border-box;flex:none;width:${L(ctx, t.w)};height:${L(ctx, t.h)};display:flex;align-items:center;`
+            const tw = cs && k < 0 && !isTwin(ctx) ? cs.given : t.w;
+            const base = `box-sizing:border-box;flex:none;width:${L(ctx, tw)};height:${L(ctx, t.h)};display:flex;align-items:center;`
                 + `justify-content:center;font-size:${P(ctx, pt)};font-weight:700;line-height:1;background:#fff;`;
             if (k < 0) {
                 return `<span class="k2-tile"${over !== undefined ? ' data-ws-shown="1"' : ''} style="${base}border:${B(ctx, 0.75)} solid ${INK};color:${INK};">`
@@ -103,7 +118,7 @@ register('seqstrip', {
         // one line never wraps on screen either (critic k2-r2: the path wrapped 4 + 1 on the
         // worksheet): data-mq-nowrap makes the screen fit shrink the tiles instead
         return root(ctx, 'k2-seqstrip', `<div class="k2-track" data-mq-join=", "${wrap ? '' : ' data-mq-nowrap="1"'} style="display:flex;flex-wrap:${wrap ? 'wrap' : 'nowrap'};justify-content:center;`
-            + `${wrap ? `max-width:${L(ctx, rowMm(values.length, size, p.shape) + 0.5)};margin:0 auto;` : ''}gap:${L(ctx, GAP_MM)};">${tiles}</div>`);
+            + `${wrap ? `max-width:${L(ctx, rowMm(values.length, size, p.shape) + 0.5)};margin:0 auto;` : ''}gap:${L(ctx, cs ? cs.gap : GAP_MM)};">${tiles}</div>`);
     },
     answerKey(p) {
         const parts = (p.blanks || []).map((i) => String((p.values || [])[i]));
@@ -113,6 +128,8 @@ register('seqstrip', {
     },
     footprint(p, ctx) {
         // The widest row and the side pads: 81 + 8 mm for five tiles at L, so 2 columns fit.
+        const cs = compactS(p, sizeOf(ctx || {}));
+        if (cs) return { wMm: Math.ceil(cs.w + 6), hMm: null, measure: true, factLike: false, maxCols: 3 };
         const w = rowMm(((p && p.values) || []).length || SEQ_ROW_MAX, sizeOf(ctx), p && p.shape);
         return { wMm: Math.ceil(w + 8), hMm: null, measure: true, factLike: false, maxCols: w + 8 <= 93 ? 2 : 1 };
     },
