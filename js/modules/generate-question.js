@@ -16,6 +16,8 @@ import { generateVocabularyQuestion } from './gen-vocabulary.js';
 import { resolveSkill } from './skill-aliases.js';
 import { normalizeOptions, pvRefusal, optionsFor, p12RouteFor } from './skill-options.js';
 import { registerVariantOverride } from './variant-cycler.js';
+// L10: the page dealer. Every choice dealt down a page goes through it; reset at item 0.
+import { dealIndex, resetPageDeals } from './page-deal.js';
 // Every whole-number word problem is drawn as ONE cell type: the story, a small + − × ÷ row,
 // column boxes and "Answer: [ ] ____" (owner ruling 2026-09-25; word-work.js).
 import { applyWordWork } from './word-work.js';
@@ -28,9 +30,9 @@ import { poolMemberOptions } from './skill-options-pools.js';
 
 // P12: "What the items ask" (`forms` with a `variantKey`, skill-options.js formsOption). When the
 // teacher has ticked some of a skill's item forms, pickVariant() for that key deals only those,
-// round-robin by the kept-item index (so a 6-item page with 2 ticked gives 3 of each). Untouched
-// (every form ticked, or none), it returns undefined and the LRU rotation runs as before.
-let _formCursor = 0, _formOffset = 0;
+// balanced but in a RANDOM order (page-deal.js: a 6-item page with 2 ticked still gives 3 of each,
+// never A B A B, L10). Untouched (every form ticked, or none), it returns undefined and
+// pickVariant's own deal runs as before.
 function variantOverride(key, variants) {
     const def = (optionsFor(state.category, state.skill) || []).find(o => o.id === 'forms' && o.variantKey === key);
     if (!def) return undefined;
@@ -39,9 +41,7 @@ function variantOverride(key, variants) {
     let t = o && Array.isArray(o.forms) ? legal.filter(v => o.forms.includes(v)) : [];
     const dflt = legal.filter(v => (def.default || []).includes(v));
     if (!t.length || (t.length === dflt.length && t.every(v => dflt.includes(v)))) return undefined;
-    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _formCursor++;
-    if (at === 0) _formOffset = Math.floor(Math.random() * t.length);
-    const pickIdx = t[(((at + _formOffset) % t.length) + t.length) % t.length];
+    const pickIdx = t[dealIndex(`forms:${key}`, t.length)];
     const name = (def.variants || [])[pickIdx];
     return variants.includes(name) ? name : undefined;
 }
@@ -169,6 +169,10 @@ export function generateQuestionFor({ category, skill, range, decimals, opts, se
         // come out 3/2/1 instead of 2/2/2. Callers that do not track an index may omit it; the
         // generator then falls back to its own counter.
         state.itemIndex = Number.isFinite(itemIndex) ? itemIndex : undefined;
+        // L10: item 0 opens a page. Every page deal (page-deal.js) starts afresh from this item's
+        // seed, so a page never depends on what was dealt before it (a probe and its final run,
+        // a reprint, an audit) and two seeds deal two different orders.
+        if (state.itemIndex === 0) resetPageDeals();
         // S2: how many items of this skill the page holds, so a ticked support level FADES down the
         // page in equal blocks (most support first) instead of cycling. Optional.
         state.itemCount = Number.isFinite(itemCount) && itemCount > 0 ? itemCount : undefined;
@@ -650,7 +654,9 @@ function generateResolvedQuestion() {
                     pool = spread;
                 }
             }
-            actualSkill = Number.isFinite(state.itemIndex) ? pool[state.itemIndex % pool.length] : pick(pool);
+            // L10: the members are dealt balanced in a random order (page-deal.js), never in the
+            // fixed rotation that made every Mixed Time page open on the same member.
+            actualSkill = Number.isFinite(state.itemIndex) ? pool[dealIndex('pool:mixed_time', pool.length)] : pick(pool);
         } else {
             actualSkill = pick(pool);
         }

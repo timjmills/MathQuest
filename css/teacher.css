@@ -860,6 +860,8 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 .tv-ptype-thumb { flex: none; color: var(--tv-text-2); }
 .tv-ptype[aria-checked="true"] .tv-ptype-thumb { color: var(--tv-text); }
 .tv-ptype.is-unfit { border-style: dashed; }
+/* A page type withheld for the chosen skills (Stretch with no open problem yet): shown, not choosable. */
+.tv-ptype[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
 .tv-ptype-why {
     display: flex; align-items: flex-start; gap: 8px; margin: 8px 0 0; padding: 10px 12px;
     border: 1px solid var(--tv-border); border-radius: 8px; background: var(--tv-subtle-2);
