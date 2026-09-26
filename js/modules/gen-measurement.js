@@ -6,7 +6,7 @@ import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { createAnalogClockSVG, createDigitalClockHTML, addTime, subtractTime, formatTime, timeToWords, generateTimeDistractors, createMagnifiableClock, createClockChoiceWithMagnify } from './svg-clock.js';
 import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 import { isTimeMoneySkill, generateTimeMoneyQuestion } from './gen-time-money.js';
-import { k2Twin } from './sheet/index.js';
+import { k2Twin, fadeRung } from './sheet/index.js';
 
 // O6 appearance (lane AP2): the value of an appearance control (`labels`, `bars`) for the skill
 // being generated, or `dflt` when the skill has no such control. It never consumes a random
@@ -33,6 +33,28 @@ function _mSet(id) {
     if (t.length) return t;
     const d = Array.isArray(def.default) ? legal.filter(x => def.default.includes(x)) : [];
     return d.length ? d : legal;
+}
+
+// AP2 round 4: where this item sits on a printed page (its item index), or a live cursor. A page
+// turns through its themes, question kinds, shapes and objects by this, so two items side by
+// side never repeat one question (critic round 5), and every page mixes its kinds.
+let _mLive = 0;
+const _mAt = () => (Number.isFinite(state.itemIndex) ? state.itemIndex : (_mLive++));
+const _mOnPage = () => Number.isFinite(state.itemIndex);
+const _mTurn = (list, at, mult = 1) => (_mOnPage() ? list[((at * mult) % list.length + list.length) % list.length] : pick(list));
+/** A whole-number option value, or null (unset, "As dealt"). */
+function _mNum(id) {
+    const v = _mLook(id, null);
+    const n = Number(v);
+    return v !== null && v !== undefined && Number.isFinite(n) && n > 0 ? n : null;
+}
+/** The Support level of this item (O3): the ticked levels dealt most-support-first down a page. */
+function _mLevel(at) {
+    let t = _mSet('level');
+    if (typeof t === 'number') t = [t];
+    t = Array.isArray(t) ? t.map(Number).filter(Number.isFinite).sort((x, y) => y - x) : [];
+    if (!t.length) return 1;
+    return t[fadeRung(at, t.length, state.itemCount, _mOnPage())];
 }
 
 // A length in inches as a pupil writes it: 3, 1/2, 2 3/4 (a half never 2/4).
@@ -778,41 +800,53 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
             }
 
             // ===== PICTOGRAPH INTRO (Grade K) =====
-            // AP2 round 3 (the bar graph's defects, critic round 4): a kit cell (sheet/cells/figures.js
-            // `pictograph`), drawn the same on paper, in the key and on the three screen hosts: 2-3
-            // rows of in-house line pictures (RP-20; the emoji broke INK-7) in a ruled table, one
-            // picture for one, the key printed under it; the question beside it, one box.
+            // A kit cell (sheet/cells/figures.js `pictograph`), drawn the same on paper, in the key and
+            // on the three screen hosts. AP2 round 4 (critic round 5): every row is drawn with ITS OWN
+            // picture (circles as circles, balls as balls - never another row's object), or one plain
+            // circle for every row (O6 "Pictures"); one picture for one; the key beside the table.
+            // "Counts up to" 5 or 10, 2 or 3 rows, and the Support level prints the grey count under
+            // each picture (a hint that fades).
             if (mappedSkill === "pictograph_intro") {
                 const themes = [
-                    { title: 'Pets We Have', icon: 'fish', items: ['Cats', 'Dogs', 'Birds', 'Fish'], cat: 'Pet', val: 'Number of pets',
-                        count: c => `How many ${c.toLowerCase()}?`, more: (a, b) => `How many more ${a.toLowerCase()} than ${b.toLowerCase()}?` },
-                    { title: 'Fruits We Like', icon: 'apple', items: ['Apples', 'Pears', 'Grapes', 'Plums'], cat: 'Fruit', val: 'Number of children',
-                        count: c => `How many children like ${c.toLowerCase()}?`, more: (a, b) => `How many more children like ${a.toLowerCase()} than ${b.toLowerCase()}?` },
-                    { title: 'Toys in the Box', icon: 'ball', items: ['Cars', 'Balls', 'Blocks'], cat: 'Toy', val: 'Number of toys',
-                        count: c => `How many ${c.toLowerCase()}?`, more: (a, b) => `How many more ${a.toLowerCase()} than ${b.toLowerCase()}?` },
+                    { title: 'Shapes in the Box', items: [['Circles', 'circle'], ['Squares', 'square'], ['Stars', 'star'], ['Triangles', 'triangle']],
+                        cat: 'Shape', val: 'Number of shapes', count: c => `How many ${c.toLowerCase()}?`,
+                        more: (a, b) => `How many more ${a.toLowerCase()} than ${b.toLowerCase()}?` },
+                    { title: 'Things We Picked Up', items: [['Balls', 'ball'], ['Apples', 'apple'], ['Flowers', 'flower']],
+                        cat: 'Thing', val: 'How many', count: c => `How many ${c.toLowerCase()}?`,
+                        more: (a, b) => `How many more ${a.toLowerCase()} than ${b.toLowerCase()}?` },
+                    { title: 'Stickers We Have', items: [['Stars', 'star'], ['Fish', 'fish'], ['Flowers', 'flower']],
+                        cat: 'Thing', val: 'How many', count: c => `How many ${c.toLowerCase()}?`,
+                        more: (a, b) => `How many more ${a.toLowerCase()} than ${b.toLowerCase()}?` },
                 ];
-                const theme = pick(themes);
-                const numCats = pick([2, 3]);
-                const cats = shuffle([...theme.items]).slice(0, numCats);
-                const counts = cats.map(() => randInt(1, 5));
+                const at = _mAt();
+                const theme = _mTurn(themes, at);
+                const numCats = Math.min(_mNum('tiles') || pick([2, 3]), theme.items.length);
+                const rows = shuffle([...theme.items]).slice(0, numCats);
+                const cats = rows.map(r => r[0]);
+                const most = _mNum('most') || 5;
+                const counts = cats.map(() => randInt(1, most));
                 const forms = _mSet('forms') || [0, 1];
-                const askType = ['count', 'more'][pick(forms)] || 'count';
+                const askType = _mTurn(forms.map(f => ['count', 'more'][f]).filter(Boolean), at) || 'count';
                 let ask, text, ans;
                 if (askType === 'more') {
-                    if (Math.max(...counts) === Math.min(...counts)) counts[0] = counts[0] < 5 ? counts[0] + 1 : counts[0] - 1;
+                    if (Math.max(...counts) === Math.min(...counts)) counts[0] = counts[0] < most ? counts[0] + 1 : counts[0] - 1;
                     const order = [...counts.keys()].sort((x, y) => counts[y] - counts[x]);
                     const i = order[0], j = order[order.length - 1];
                     ans = counts[i] - counts[j];
                     text = theme.more(cats[i], cats[j]);
                     ask = { kind: 'more', i, j };
                 } else {
+                    // a count on a graph whose rows differ (never every row the same)
+                    if (Math.max(...counts) === Math.min(...counts) && counts.length > 1) counts[1] = counts[1] < most ? counts[1] + 1 : counts[1] - 1;
                     const i = randInt(0, numCats - 1);
                     ans = counts[i];
                     text = theme.count(cats[i]);
                     ask = { kind: 'value', i };
                 }
-                const payload = { title: theme.title, categories: cats, values: counts, scale: 1, icon: theme.icon,
-                    catTitle: theme.cat, valTitle: theme.val, ask, question: text, answer: ans };
+                const plain = _mLook('objects', 'pictures') === 'shapes';
+                const payload = { title: theme.title, categories: cats, values: counts, scale: 1,
+                    icons: rows.map(r => (plain ? 'circle' : r[1])), catTitle: theme.cat, valTitle: theme.val, ask,
+                    kinds: forms.map(f => ['value', 'more'][f]).filter(Boolean), scales: [1], question: text, answer: ans, support: _mLevel(at) };
                 q.cell = { template: 'pictograph', v: 1, payload };
                 q.visual = k2Twin('pictograph', payload);
                 q.text = text;
@@ -829,56 +863,62 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
             }
 
             // ===== BAR GRAPH INTRO (Grade K) =====
-            // AP2 round 3 (critic round 4): a kit cell (sheet/cells/figures.js `bar-graph`), drawn the
-            // same on paper, in the key and on the three screen hosts: 2-3 bars on a full numbered
-            // scale 0 to 5, axis titles in words, no number over any bar. "Which has the most?" is
-            // answered with one check box (the most is never a tie); a count with one box.
+            // A kit cell (sheet/cells/figures.js `bar-graph`), drawn the same on paper, in the key and on
+            // the three screen hosts: 2-3 bars ("Bars", O1) on a full numbered scale to 5 or 10 ("Tallest
+            // bar up to", O2), axis titles in words, no number over any bar. "Which has the most?" is one
+            // check box (the most is never a tie); a count one box. A page turns through its themes and
+            // question kinds (AP2 round 4); the Support level draws the grey read-across (a hint).
             if (mappedSkill === "bar_graph_intro") {
                 const themes = [
                     { title: 'Pets in Our Class', items: ['Cats', 'Dogs', 'Birds'], cat: 'Pet', val: 'Number of pets',
                         count: c => `How many ${c.toLowerCase()}?`, more: (a, b) => `How many more ${a.toLowerCase()} than ${b.toLowerCase()}?` },
-                    { title: 'Snacks We Like', items: ['Apples', 'Crackers', 'Grapes'], cat: 'Snack', val: 'Number of children',
+                    { title: 'Snacks We Like', items: ['Apples', 'Grapes', 'Pears'], cat: 'Snack', val: 'Number of children',
                         count: c => `How many children like ${c.toLowerCase()}?`, more: (a, b) => `How many more children like ${a.toLowerCase()} than ${b.toLowerCase()}?` },
                     { title: 'Favorite Colors', items: ['Red', 'Blue', 'Green'], cat: 'Color', val: 'Number of children',
                         count: c => `How many children like ${c.toLowerCase()}?`, more: (a, b) => `How many more children like ${a.toLowerCase()} than ${b.toLowerCase()}?` },
-                    { title: 'Sports We Play', items: ['Soccer', 'Tennis'], cat: 'Sport', val: 'Number of children',
+                    { title: 'Sports We Play', items: ['Soccer', 'Tennis', 'Golf'], cat: 'Sport', val: 'Number of children',
                         count: c => `How many children play ${c.toLowerCase()}?`, more: (a, b) => `How many more children play ${a.toLowerCase()} than ${b.toLowerCase()}?` },
                     { title: 'Books on the Shelf', items: ['Animal', 'Comic', 'Nature'], cat: 'Kind of book', val: 'Number of books',
                         count: c => `How many ${c.toLowerCase()} books?`, more: (a, b) => `How many more ${a.toLowerCase()} books than ${b.toLowerCase()} books?` },
                 ];
-                const theme = pick(themes);
-                const numCats = Math.min(pick([2, 3]), theme.items.length);
+                const at = _mAt();
+                const theme = _mTurn(themes, at, 2);
+                const numCats = Math.min(_mNum('tiles') || pick([2, 3]), theme.items.length);
                 const cats = theme.items.slice(0, numCats);
-                const counts = cats.map(() => randInt(1, 5));
-                // the kinds the teacher ticked (forms: 0 most, 1 how many, 2 how many more)
+                const top = _mNum('most') || 5;
+                const counts = cats.map(() => randInt(1, top));
+                // the kinds the teacher ticked (forms: 0 most, 1 how many, 2 how many more), turned
+                // through down the page
                 const forms = _mSet('forms') || [0, 1, 2];
-                const askType = ['most', 'count', 'more'][pick(forms)] || 'count';
+                const order = [1, 2, 0].filter(f => forms.includes(f));
+                const askType = ['most', 'count', 'more'][_mTurn(order.length ? order : [1], at)] || 'count';
                 let ask, text, ans;
                 if (askType === 'most') {
                     // one bar is the most: break a tie
                     const maxVal = Math.max(...counts);
-                    const top = counts.map((c, i) => (c === maxVal ? i : -1)).filter(i => i >= 0);
-                    if (top.length > 1) { if (counts[top[0]] < 5) counts[top[0]]++; else counts[top[1]]--; }
+                    const tops = counts.map((c, i) => (c === maxVal ? i : -1)).filter(i => i >= 0);
+                    if (tops.length > 1) { if (counts[tops[0]] < top) counts[tops[0]]++; else counts[tops[1]]--; }
                     ans = cats[counts.indexOf(Math.max(...counts))];
                     text = 'Which has the most?';
                     ask = { kind: 'most' };
                 } else if (askType === 'more') {
-                    // two different counts: move one when every bar is the same
-                    if (Math.max(...counts) === Math.min(...counts)) counts[0] = counts[0] < 5 ? counts[0] + 1 : counts[0] - 1;
-                    const order = [...counts.keys()].sort((x, y) => counts[y] - counts[x]);
-                    const i = order[0], j = order[order.length - 1];
+                    if (Math.max(...counts) === Math.min(...counts)) counts[0] = counts[0] < top ? counts[0] + 1 : counts[0] - 1;
+                    const ord = [...counts.keys()].sort((x, y) => counts[y] - counts[x]);
+                    const i = ord[0], j = ord[ord.length - 1];
                     ans = counts[i] - counts[j];
                     text = theme.more(cats[i], cats[j]);
                     ask = { kind: 'more', i, j };
                 } else {
+                    if (Math.max(...counts) === Math.min(...counts) && counts.length > 1) counts[1] = counts[1] < top ? counts[1] + 1 : counts[1] - 1;
                     const i = randInt(0, cats.length - 1);
                     ans = counts[i];
                     text = theme.count(cats[i]);
                     ask = { kind: 'value', i };
                 }
                 const orientation = _mLook('bars', 'vertical') === 'horizontal' ? 'horizontal' : 'vertical';
-                const payload = { title: theme.title, categories: cats, values: counts, step: 1, top: 5, orientation,
-                    catTitle: theme.cat, valTitle: theme.val, ask, question: text, answer: ans };
+                const payload = { title: theme.title, categories: cats, values: counts, step: 1, top, half: false,
+                    orientation, catTitle: theme.cat, valTitle: theme.val, ask,
+                    kinds: order.map(f => ['most', 'value', 'more'][f]), question: text, answer: ans, support: _mLevel(at) };
                 q.cell = { template: 'bar-graph', v: 1, payload };
                 q.visual = k2Twin('bar-graph', payload);
                 q.text = text;
@@ -896,49 +936,62 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
             }
 
             // ===== PERIMETER INTRO (Grade 3, 3.MD.D.8) =====
-            // AP2 round 3 (critic round 4): a kit cell (sheet/cells/figures.js `perimeter-shape`): a
-            // rectangle, square or triangle drawn to scale, each side labelled with its length and
-            // a real unit at the working digit size, and "Perimeter = [ ] cm" under it. O6 "Figure
-            // labels: some" labels one length and one width of a rectangle or square (the other two
-            // follow from equal opposite sides); a triangle keeps all three.
+            // A kit cell (sheet/cells/figures.js `perimeter-shape`): a rectangle, square, triangle or
+            // five-sided house drawn to scale, each side labelled with its length and a real unit at
+            // the working digit size, "Perimeter = [ ] cm" under it. O6 "Figure labels: some" labels
+            // only the sides that cannot be worked out (equal opposite sides, equal walls and roof
+            // edges); a triangle keeps all three. AP2 round 4 (critic round 5): "Shapes" (O1) picks the
+            // kinds and a page turns through them (never four rectangles), "Perimeter up to" reaches
+            // 50, and the Support level prints a grey addition frame, one line a side (a hint).
             if (mappedSkill === "perimeter_intro") {
-                const shapeRoll = Math.random();
-                let shape, sides, sideLabels;
-                if (shapeRoll < 0.55) {
-                    shape = "rectangle";
-                    const w = randInt(2, 9);
-                    let l = randInt(2, 10);
-                    if (l === w) l = w + 1;
+                const at = _mAt();
+                const kindsOn = _mSet('shapes') || [0, 1, 2, 3];
+                const order = [0, 2, 1, 3].filter(k => kindsOn.includes(k));
+                const kind = ['rectangle', 'square', 'triangle', 'pentagon'][_mTurn(order.length ? order : [0], at)];
+                const band = _mNum('band');
+                const sideMax = band ? Math.max(4, Math.min(15, Math.floor(band / 3.2))) : 10;
+                let shape = kind, sides, sideLabels;
+                if (kind === 'rectangle') {
+                    const w = randInt(2, Math.max(2, sideMax - 1));
+                    let l = randInt(2, sideMax);
+                    if (l === w) l = w + 1 <= sideMax ? w + 1 : w - 1;
                     sides = [l, w, l, w];                    // top, left, bottom, right
                     sideLabels = { length: l, width: w };
-                } else if (shapeRoll < 0.75) {
-                    shape = "square";
-                    const e = randInt(2, 9);
+                } else if (kind === 'square') {
+                    const e = randInt(2, Math.min(sideMax, 12));
                     sides = [e, e, e, e];
                     sideLabels = { side: e };
-                } else {
-                    shape = "triangle";
+                } else if (kind === 'triangle') {
                     // three different-looking sides, the longest along the bottom
-                    const a = randInt(3, 9), b = randInt(3, 9);
-                    const cMax = Math.min(10, a + b - 1), cMin = Math.max(3, Math.abs(a - b) + 1);
+                    const a = randInt(3, sideMax), b = randInt(3, sideMax);
+                    const cMax = Math.min(sideMax, a + b - 1), cMin = Math.max(3, Math.abs(a - b) + 1);
                     const c = cMin <= cMax ? randInt(cMin, cMax) : a;
                     const t = [a, b, c].sort((x, y) => y - x);
                     sides = [t[0], t[1], t[2]];              // base, right, left
                     sideLabels = { a: t[0], b: t[1], c: t[2] };
+                } else {
+                    // a house: base, two equal walls, two equal roof edges (each longer than half the base)
+                    const base = 2 * randInt(2, Math.max(2, Math.floor(sideMax / 2)));
+                    const wall = randInt(2, Math.max(2, sideMax - 2));
+                    const roof = randInt(base / 2 + 1, Math.max(base / 2 + 1, Math.min(sideMax, base)));
+                    sides = [base, wall, roof, roof, wall];  // base, right wall, right roof, left roof, left wall
+                    sideLabels = { base, wall, roof };
                 }
                 const ans = sides.reduce((x, y) => x + y, 0);
                 const unit = pick(['cm', 'm']);
                 const some = _mLook('labels', 'all') === 'some' && shape !== 'triangle';
-                const show = sides.map((_, i) => !some || i < 2);
-                const payload = { shape, sides, show, unit, ans };
+                // "some": the sides a pupil can work out stay blank (a rectangle's bottom and right; a
+                // house's left roof and left wall)
+                const show = sides.map((_, i) => !some || (shape === 'pentagon' ? i < 3 : i < 2));
+                const payload = { shape, sides, show, unit, ans, support: _mLevel(at) };
                 q.cell = { template: 'perimeter-shape', v: 1, payload };
                 q.visual = k2Twin('perimeter-shape', payload);
-                q.text = `What is the perimeter?`;
+                q.text = 'Add the lengths of all the sides. Write the perimeter.';
                 q.screenInstr = 'Add the lengths of all the sides. Write the perimeter.';
                 q.ans = ans;
                 q.answerType = "number";
                 q.options = [];
-                q.hint = some ? 'A side with no number is as long as the side opposite it. Add all the sides.' : 'Add the lengths of all the sides.';
+                q.hint = some ? 'A side with no number is as long as the side that matches it. Add all the sides.' : 'Add the lengths of all the sides.';
                 q.skillLabel = "Perimeter Intro";
                 q.printFormat = "perimeter-intro";
                 q.perimeterIntroData = { shape, sides, sideLabels, ans, unit, ...(some ? { labels: 'some' } : {}) };
@@ -1117,54 +1170,76 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== READING A RULER =====
             if (measSkill === "reading_ruler" || measSkill === "reading_ruler_hard") {
-                // AP2 round 3 (critic round 4): a kit cell (sheet/cells/figures.js `ruler`), drawn the
-                // same on paper, in the key and on the three screen hosts. The ruler is at TRUE scale
-                // (RP-160), the arrow comes from above, and there is ONE answer slot, in the sentence
-                // "The arrow points to [ ] inches." Reading to the inch is the Grade 2 step
-                // (2.MD.A.1): `parts` defaults to whole inches there; the Quarter Inches skill
-                // (3.MD.B.4) reads all three. The ruler carries only the marks the page reads.
+                // A kit cell (sheet/cells/figures.js `ruler`), drawn the same on paper, in the key and on
+                // the three screen hosts: an inch ruler at TRUE scale (RP-160) with an object lying along
+                // it, and ONE answer place, "The pencil is [ ] inches long." AP2 round 4 (critic round 5):
+                // no arrow on a labelled mark any more - the pupil finds where the object ENDS; with
+                // "What is measured: not from 0" the object starts on a later inch mark and the pupil
+                // counts from there. Reading to the inch is the Grade 2 step (2.MD.A.1); the Quarter
+                // Inches skill (3.MD.B.4) reads all three. The ruler carries only the marks the page
+                // reads. The Support level draws grey guides from the object's ends (a hint).
+                const at = _mAt();
                 const hard = measSkill === "reading_ruler_hard";
                 const parts = _mSet('parts') || (hard ? [0, 1, 2] : [0]);
-                const kind = pick(parts);
+                const kindAt = _mTurn(parts, at);
                 const res = parts.includes(2) ? 4 : parts.includes(1) ? 2 : 1;
+                const moved = _mLook('measure', 'zero') === 'moved';
+                const start = moved ? _mTurn([1, 2, 1], at) : 0;
+                const room = 6 - start;
                 let meas;
-                if (kind === 0) meas = rng(1, 6);
-                else if (kind === 1) meas = rng(0, 5) + 0.5;
-                else meas = rng(0, 5) + pick([0.25, 0.75]);
+                if (kindAt === 0) meas = rng(1, Math.min(room, 6));
+                else if (kindAt === 1) meas = rng(0, room - 1) + 0.5;
+                else meas = rng(0, room - 1) + pick([0.25, 0.75]);
                 const ans = _inchText(meas);
-                const payload = { len: 6, meas, res, labels: _mLook('labels', 'all'), ans };
+                const object = _mTurn(['pencil', 'crayon', 'ribbon', 'straw'], at);
+                const payload = { len: 6, start, meas, res, labels: _mLook('labels', 'all'), object, ans, support: _mLevel(at) };
                 q.cell = { template: 'ruler', v: 1, payload };
                 q.visual = k2Twin('ruler', payload);
-                q.text = `What length does the arrow point to?`;
-                q.screenInstr = 'Read the ruler. Write the number the arrow points to.';
+                q.text = `How long is the ${object}?`;
+                q.screenInstr = 'Measure the object. Write how many inches long it is.';
                 q.ans = res === 1 ? meas : ans;
                 q.answerType = res === 1 ? "number" : "text";
                 q.options = [];
-                q.hint = res === 1 ? 'Follow the arrow down to the ruler. Read the number under the long mark.'
-                    : res === 2 ? 'Find the inch number before the arrow. A mark between two numbers is a half inch.'
-                        : 'Find the inch number before the arrow. Count the small spaces after it: each is a quarter inch.';
-                q.measurementData = { meas, res, ans };
+                q.hint = (moved ? `The ${object} starts at ${start}, not at 0: count the inches from ${start}. ` : `The ${object} starts at 0. `)
+                    + (res === 1 ? 'Find where it ends. Read the number there.'
+                        : res === 2 ? 'Find where it ends. A mark between two numbers is a half inch.'
+                            : 'Find where it ends. Count the small spaces after the last inch: each is a quarter inch.');
+                q.measurementData = { meas, start, res, ans };
                 q.printFormat = 'reading-ruler';
                 q.skillLabel = 'Ruler';
             }
             // ===== TEMPERATURE =====
             else if (measSkill === "temperature") {
-                // AP2 round 3 (critic round 4): ONE task, read the thermometer, as a kit cell
-                // (sheet/cells/figures.js `thermometer`) drawn the same on paper, in the key and on the
-                // three screen hosts, with ONE box and the unit printed after it. The click-all and
-                // sort variants (a drag task on paper) and the conversions (a formula, not reading a
-                // scale) are gone. A 20-degree window, a mark every degree; the scale numbered every
-                // 5 or, with O6 "Figure labels: some", every 10. Never below zero (negative numbers
-                // are Grade 6).
+                // ONE task, read the thermometer, as a kit cell (sheet/cells/figures.js `thermometer`)
+                // drawn the same on paper, in the key and on the three screen hosts, with ONE box and the
+                // unit printed after it. A window of 20 marks, a mark every degree or every 2 degrees
+                // ("Each small mark", O2), the scale numbered every 5 / 10 or, with O6 "Figure labels:
+                // some", every 10 / 20. AP2 round 4 (critic round 5): "Temperatures up to" 30 / 60 / 100
+                // (a number-size ladder), "Below zero: some items" (one item in three reads below 0),
+                // and the Support level draws the grey read-across guide (a hint that fades).
+                const at = _mAt();
                 const forms = _mSet('forms');
                 const units = (forms || [0, 1]).map(i => ['°F', '°C'][i]).filter(Boolean);
-                const unit = pick(units.length ? units : ['°F', '°C']);
-                const every = _mLook('labels', 'all') === 'some' ? 10 : 5;
-                const lo = pick(unit === '°F' ? [30, 40, 50, 60, 70] : [0, 10, 20]);
-                const hi = lo + 20;
-                let temp = rng(lo + 1, hi - 1);
-                if (temp % every === 0) temp = rng(lo + 1, hi - 1);   // mostly between two numbers
-                const payload = { temp, unit, lo, hi, every };
+                const unit = _mTurn(units.length ? units : ['°F', '°C'], at);
+                const step = _mNum('step') === 2 ? 2 : 1;
+                const span = 20 * step;
+                const some = _mLook('labels', 'all') === 'some';
+                const every = step === 2 ? (some ? 20 : 10) : (some ? 10 : 5);
+                const band = _mNum('band');
+                const below = _mLook('belowZero', 'never') === 'some' && at % 3 === 1;
+                const top = band || (unit === '°F' ? 100 : 40);
+                const floor = below ? -span + 10 : (band ? 0 : (unit === '°F' ? 30 : 0));
+                const los = [];
+                for (let lo = floor; lo + span <= Math.max(top, floor + span); lo += 10) {
+                    if (below ? lo < 0 : lo >= 0) los.push(lo);
+                }
+                const lo = pick(los.length ? los : [floor]);
+                const hi = lo + span;
+                const deal = () => step * rng(Math.ceil((lo + 1) / step), Math.floor((hi - 1) / step));
+                let temp = deal();
+                if (temp % every === 0) temp = deal();          // mostly between two numbers
+                if (below && temp >= 0) temp = -step * rng(1, Math.max(1, Math.floor(-lo / step) - 1));
+                const payload = { temp, unit, lo, hi, every, step, support: _mLevel(at) };
                 q.cell = { template: 'thermometer', v: 1, payload };
                 q.visual = k2Twin('thermometer', payload);
                 q.text = `What is the temperature in ${unit}?`;
@@ -1172,8 +1247,9 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.ans = temp;
                 q.answerType = 'number';
                 q.options = [];
-                q.hint = 'Find the top of the dark column. Start at the number just below it and count up one degree for each small mark.';
-                q.measurementData = { temp, unit, every, lo, hi };
+                q.hint = (temp < 0 ? 'The column stops below 0: the temperature is below zero, so it has a minus sign. ' : '')
+                    + `Find the top of the dark column. Start at the number just below it and count up ${step} degree${step > 1 ? 's' : ''} for each small mark.`;
+                q.measurementData = { temp, unit, every, lo, hi, step };
                 q.printFormat = "measurement-temp";
                 q.skillLabel = 'Temperature';
             }

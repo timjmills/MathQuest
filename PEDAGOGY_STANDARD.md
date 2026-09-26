@@ -1318,6 +1318,7 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `line-mark-each` | Mark each number on the line. | put fractions, mixed numbers, decimals or integers on a number line: a dot on the tick, and the number's letter when there are several (added 2026-09-25, O6 lane AP3) |
 | `read-thermometer` | Read the thermometer. Write the temperature. | read a thermometer: one box, the unit printed after it (added 2026-09-25, O6 lane AP2) |
 | `read-ruler` | Read the ruler. Write the number the arrow points to. | read an inch ruler at true scale: one answer slot, a whole box and a stacked fraction on a half / quarter ruler (added 2026-09-25, O6 lane AP2) |
+| `measure-object` | Measure the object. Write how long it is. | measure an object lying along an inch ruler (from 0, or from a later mark): one answer slot (added 2026-09-25, O6 lane AP2 round 4) |
 | `add-sides` | Add the lengths of all the sides. Write the perimeter. | perimeter of a drawn rectangle, square or triangle (added 2026-09-25, O6 lane AP2) |
 | `tally` | Use the tally chart. Answer the questions. | read a tally chart: one box, or one check box for the row with the most / least (added 2026-09-25, O6 lane AP2) |
 | `default-write` | Solve. Write the answer. | default adapter: skills with no provider, number or text answer |

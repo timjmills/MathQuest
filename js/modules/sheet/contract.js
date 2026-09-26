@@ -215,6 +215,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     // O6 lane AP2 round 3 (2026-09-25): the figure and data cells moved to the kit.
     'read-thermometer': 'Read the thermometer. Write the temperature.',
     'read-ruler': 'Read the ruler. Write the number the arrow points to.',
+    'measure-object': 'Measure the object. Write how long it is.',
     'add-sides': 'Add the lengths of all the sides. Write the perimeter.',
     tally: 'Use the tally chart. Answer the questions.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
@@ -278,6 +279,8 @@ const SCREEN_VERB_MAP = Object.freeze([
     ['Draw the lines of symmetry', 'Tap the lines of symmetry'],
     ['Draw disks to show', 'Tap the mat to show'],
     ['Check the clock', 'Tap the clock'],
+    // the ruler is drawn under the object on screen too: the pupil reads it, nothing is dragged
+    ['Measure the object', 'Read the ruler under the object'],
     ['Measure the line', 'Drag the ruler to the line'],
     ['Check one box', 'Tap one box'],
     ['Check the box', 'Tap the box'],

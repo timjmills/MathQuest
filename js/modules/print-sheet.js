@@ -1038,7 +1038,8 @@ function skillMeta(sk, q) {
     let grade = null;
     try { grade = getSkillGrade(sk.skillId, sk.categoryId); } catch (e) { grade = null; }
     const meta = { categoryId: sk.categoryId, skillId: sk.skillId, label, grade: grade === null || grade === undefined ? '' : String(grade), ccss: sk.ccss || primaryCcss(sk) };
-    const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, { skillId: nameId }));
+    // the skill's options travel into its strings (a ruler page titled by the marks it reads)
+    const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat, opts: sk.opts || {} }, meta, { skillId: nameId }));
     meta.iCan = sk.iCan || optionTitle(sk, words.iCan) || words.iCan;
     meta.instructionKey = q ? instructionKeyFor(q, words) : words.instructionKey;
     return meta;

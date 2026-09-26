@@ -113,7 +113,8 @@ function cellHTML(q, skillId) {
         const vis = q.visual ? `<div class="tvp-visual">${q.visual}</div>` : '';
         const opts = Array.isArray(q.options) && q.options.length
             ? `<div class="tvp-options">${q.options.slice(0, 6).map((o) => `<span class="tvp-opt">${optionHTML(o)}</span>`).join('')}</div>` : '';
-        const hasOwnSlots = /<input\b|<select\b|<textarea\b/i.test(q.visual || '');
+        // a kit twin's own answer places (data-mq-blank / data-mq-cell) count too: no second line
+        const hasOwnSlots = /<input\b|<select\b|<textarea\b|data-mq-blank=|data-mq-cell=/i.test(q.visual || '');
         const numeric = q.answerType === 'number' || typeof q.ans === 'number';
         const slot = !opts && !hasOwnSlots && !q.selfAnswering && q.ans != null && q.ans !== ''
             ? `<div class="tvp-answerrow"><span class="mq-slot${numeric ? '' : ' mq-slot--text'}" style="--mq-n:${numeric ? answerDigits(q) : 6}"></span></div>` : '';
@@ -205,11 +206,19 @@ function fit(frame) {
     if (fw <= 0 || fh <= 0) return;
     const s = Math.min(1, fw / w, fh / h);
     if (s < MIN_LEGIBLE && fh < 200) {
+        // A tall drawing in a short frame (a thermometer, a graph in the options popover, AP2
+        // round 4: "the sample preview renders blank"): show its TOP at a legible scale. Scaling
+        // about the stage's own centre while it sat at the frame's centre put the drawing below
+        // the frame, so nothing showed; the crop is anchored to the frame's top edge instead.
         frame.classList.add('is-cropped');
-        stage.style.transform = `scale(${CROP_SCALE})`;
+        stage.style.top = '0';
+        stage.style.transformOrigin = 'top center';
+        stage.style.transform = `translate(-50%, 0) scale(${CROP_SCALE})`;
         return;
     }
     frame.classList.remove('is-cropped');
+    stage.style.top = '';
+    stage.style.transformOrigin = '';
     stage.style.transform = `translate(-50%, -50%) scale(${s.toFixed(4)})`;
 }
 

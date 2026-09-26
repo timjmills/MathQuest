@@ -89,7 +89,11 @@
     "wpCues": "8A",
     "wpBank": "8B",
     "wpBar": "8C",
-    "bars": "9F"
+    "bars": "9F",
+    "belowZero": "9G",
+    "rules": "9H",
+    "measure": "9I",
+    "halves": "9J"
   },
   "blocks": {
     "0": {
@@ -628,6 +632,22 @@
     "bars": {
       "vertical": "V",
       "horizontal": "H"
+    },
+    "belowZero": {
+      "never": "N",
+      "some": "S"
+    },
+    "rules": {
+      "ruled": "R",
+      "open": "O"
+    },
+    "measure": {
+      "zero": "Z",
+      "moved": "M"
+    },
+    "halves": {
+      "some": "S",
+      "never": "N"
     }
   },
   "scalarOnly": {

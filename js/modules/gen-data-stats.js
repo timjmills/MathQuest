@@ -3,7 +3,7 @@ import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { COLORS, STROKE, FONTS, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
-import { k2Twin } from './sheet/index.js';
+import { k2Twin, fadeRung } from './sheet/index.js';
 
 // P12: an option value the teacher chose for this skill (skill-options.js), else undefined.
 function _dOpt(id) {
@@ -43,26 +43,58 @@ function _dSet(id) {
     return d.length ? d : legal;
 }
 
-// AP2 round 3 (critic round 4: "Weather This Week" was a context with no meaning; names were cut
-// short and turned): what each bar graph is about, its axis titles in words, and its questions in
-// the context's own words. Names are at most 9 letters, so they stand level under a bar.
+// AP2 round 4: where this item sits on a printed page (its item index), or a live cursor. A page
+// turns through its contexts and its question kinds by this, so two items side by side never ask
+// the same question of the same graph (critic round 5: "the identical question twice on a test").
+let _dLive = 0;
+const _dAt = () => (Number.isFinite(state.itemIndex) ? state.itemIndex : (_dLive++));
+const _dOnPage = () => Number.isFinite(state.itemIndex);
+/** One of `list` for this item: turned through by the item index on a page, dealt when live. */
+const _dTurn = (list, at, mult = 1) => (_dOnPage() ? list[((at * mult) % list.length + list.length) % list.length] : pick(list));
+
+/** The Support level of this item (O3): the ticked levels dealt most-support-first down a page. */
+function _dLevel(at) {
+    let t = _dOpt('level');
+    if (t === undefined) { try { const def = optionsFor(state.category, state.skill).find(o => o.id === 'level'); t = def ? def.default : undefined; } catch (e) { t = undefined; } }
+    if (typeof t === 'number') t = [t];
+    t = Array.isArray(t) ? t.map(Number).filter(Number.isFinite).sort((x, y) => y - x) : [];
+    if (!t.length) return 1;
+    return t[fadeRung(at, t.length, state.itemCount, _dOnPage())];
+}
+
+// AP2 round 4 (critic round 5): what each graph is about, its axis titles in words, its questions
+// in the context's own words, and its picture (a child counted by a "Number of children" graph, a
+// car by a car count - never another row's object). Names are at most 6 letters, so they stand
+// level under a bar at every size and on a phone.
 const BAR_CONTEXTS = [
-    { title: 'Favorite Pets', icon: 'fish', cats: ['Dogs', 'Cats', 'Fish', 'Birds', 'Rabbits'], cat: 'Pet', val: 'Number of children',
+    { title: 'Favorite Pets', pic: 'person', cats: ['Dogs', 'Cats', 'Fish', 'Birds', 'Mice'], cat: 'Pet', val: 'Number of children',
         value: c => `How many children chose ${c.toLowerCase()}?`, more: (a, b) => `How many more children chose ${a.toLowerCase()} than ${b.toLowerCase()}?`,
         most: 'Which pet did the most children choose?', least: 'Which pet did the fewest children choose?', total: 'How many children chose a pet in all?' },
-    { title: 'Sports We Play', icon: 'ball', cats: ['Soccer', 'Tennis', 'Running', 'Swimming', 'Baseball'], cat: 'Sport', val: 'Number of children',
+    { title: 'Sports We Play', pic: 'person', cats: ['Soccer', 'Tennis', 'Golf', 'Hockey', 'Rugby'], cat: 'Sport', val: 'Number of children',
         value: c => `How many children chose ${c.toLowerCase()}?`, more: (a, b) => `How many more children chose ${a.toLowerCase()} than ${b.toLowerCase()}?`,
         most: 'Which sport did the most children choose?', least: 'Which sport did the fewest children choose?', total: 'How many children chose a sport in all?' },
-    { title: 'Favorite Fruits', icon: 'apple', cats: ['Apples', 'Pears', 'Grapes', 'Plums', 'Mangoes'], cat: 'Fruit', val: 'Number of children',
+    { title: 'Favorite Fruits', pic: 'person', cats: ['Apples', 'Pears', 'Grapes', 'Plums', 'Limes'], cat: 'Fruit', val: 'Number of children',
         value: c => `How many children chose ${c.toLowerCase()}?`, more: (a, b) => `How many more children chose ${a.toLowerCase()} than ${b.toLowerCase()}?`,
         most: 'Which fruit did the most children choose?', least: 'Which fruit did the fewest children choose?', total: 'How many children chose a fruit in all?' },
-    { title: 'Books We Read', icon: 'star', cats: ['January', 'February', 'March', 'April', 'May'], cat: 'Month', val: 'Number of books',
-        value: c => `How many books were read in ${c}?`, more: (a, b) => `How many more books were read in ${a} than in ${b}?`,
-        most: 'In which month were the most books read?', least: 'In which month were the fewest books read?', total: 'How many books were read in all?' },
-    { title: 'Cars We Counted', icon: 'star', cats: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], cat: 'Day', val: 'Number of cars',
-        value: c => `How many cars were counted on ${c}?`, more: (a, b) => `How many more cars were counted on ${a} than on ${b}?`,
-        most: 'On which day were the most cars counted?', least: 'On which day were the fewest cars counted?', total: 'How many cars were counted in all?' },
+    { title: 'Cars We Counted', pic: 'car', cats: ['Red', 'Blue', 'White', 'Black', 'Gray'], cat: 'Color', val: 'Number of cars',
+        value: c => `How many ${c.toLowerCase()} cars were counted?`, more: (a, b) => `How many more ${a.toLowerCase()} cars than ${b.toLowerCase()} cars were counted?`,
+        most: 'Which color of car was counted the most?', least: 'Which color of car was counted the fewest times?', total: 'How many cars were counted in all?' },
+    { title: 'Our Favorite Colors', pic: 'person', cats: ['Red', 'Blue', 'Green', 'Pink', 'Purple'], cat: 'Color', val: 'Number of children',
+        value: c => `How many children chose ${c.toLowerCase()}?`, more: (a, b) => `How many more children chose ${a.toLowerCase()} than ${b.toLowerCase()}?`,
+        most: 'Which color did the most children choose?', least: 'Which color did the fewest children choose?', total: 'How many children chose a color in all?' },
 ];
+
+/**
+ * AP2 round 4: the question kinds a skill's ticked forms allow, in the order a page turns
+ * through them (a count first, the check-box kinds apart). `map[f]` lists the kinds of form f.
+ */
+function _dKinds(map) {
+    const forms = _dSet('forms') || Object.keys(map).map(Number);
+    const allowed = new Set(forms.flatMap(f => map[f] || []));
+    const order = ['value', 'more', 'most', 'total', 'least'];
+    const out = order.filter(k => allowed.has(k));
+    return out.length ? out : ['value'];
+}
 
 // AP2 round 3: one question about a data display (bar graph, pictograph, tally chart), in the
 // context's own words. `kind` is most | least | value | more | total; `redeal()` deals a fresh
@@ -856,65 +888,76 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "data-range";
 
             } else if (dataSkill === "bar_graph") {
-                // Bar Graph - CCSS 3.MD.B.3. AP2 round 3 (critic round 4): a kit cell
-                // (sheet/cells/figures.js `bar-graph`), drawn the same on paper, in the key and on the
-                // three screen hosts. A FULL numbered scale (a grid line and a number on every step of
-                // 1, 2, 5 or 10) with every value ON a step, axis titles in words, grey bars and no
-                // number over any bar, so the graph is read, never copied. The question sits beside
-                // the graph in the same cell; a bar answer is one check box (most and least are never
-                // a tie), a number answer one box. The click-all variant is gone (a list on paper).
-                const context = pick(BAR_CONTEXTS);
+                // Bar Graph - CCSS 3.MD.B.3. A kit cell (sheet/cells/figures.js `bar-graph`), drawn the
+                // same on paper, in the key and on the three screen hosts: a full numbered scale of
+                // 1, 2, 5 or 10 (on a scale of 2 or 10 a bar may end half way, at a short mark - the
+                // scaled-graph read of 3.MD.3), axis titles in words, grey bars, no number over any
+                // bar. A page turns through its contexts and its question kinds (AP2 round 4), and
+                // the Support level draws the grey read-across lines (a hint that fades).
+                const at = _dAt();
+                const context = _dTurn(BAR_CONTEXTS, at, 2);
                 const numBars = _dNum('tiles') || pick([4, 5]);
                 const categories = context.cats.slice(0, numBars);
-                const barMax = _dNum('most') || Math.max(5, Math.min(Math.ceil(dataMax / 5), 50));
+                const barMax = _dNum('most') || 20;
                 const step = barMax <= 10 ? 1 : barMax <= 20 ? 2 : barMax <= 50 ? 5 : 10;
-                const kMax = Math.max(2, Math.floor(barMax / step));
-                const forms = _dSet('forms') || [0, 1, 2, 3];
-                const kind = [pick(['most', 'least']), 'value', 'more', 'total'][pick(forms)] || 'value';
-                const deal = () => categories.map(() => step * rng(1, kMax));
-                const d = _dataAsk(kind, context, categories, deal(), deal, step);
+                const half = step === 2 || step === 10;
+                const unit = half ? step / 2 : step;
+                const kMax = Math.max(2, Math.floor(barMax / unit));
+                const kinds = _dKinds({ 0: ['most', 'least'], 1: ['value'], 2: ['more'], 3: ['total'] });
+                const kind = _dTurn(kinds, at);
+                const deal = () => categories.map(() => unit * rng(half ? 2 : 1, kMax));
+                const d = _dataAsk(kind, context, categories, deal(), deal, unit);
                 const values = d.vals;
-                const top = step * (Math.ceil(Math.max(...values) / step) + 1);
-                const ask = d.ask;
+                // the scale ends on the first line above the tallest bar (a bar never touches the top)
+                const top = step * Math.ceil((Math.max(...values) + 0.5) / step);
                 const horizontal = _barsLyingDown();
-                const payload = { title: context.title, categories, values, step, top, orientation: horizontal ? 'horizontal' : 'vertical',
-                    catTitle: context.cat, valTitle: context.val, ask, question: d.text, answer: d.ans };
+                const payload = { title: context.title, categories, values, step, top, half: half && values.some(v => v % step !== 0),
+                    orientation: horizontal ? 'horizontal' : 'vertical', catTitle: context.cat, valTitle: context.val,
+                    ask: d.ask, kinds, question: d.text, answer: d.ans, support: _dLevel(at) };
                 _dataCell(q, 'bar-graph', payload);
                 q.ccss = "3.MD.B.3";
                 q.hint = horizontal ? 'Follow the end of each bar down to the numbers along the bottom.'
-                    : 'Follow the top of each bar across to the numbers up the side.';
-                const legacyType = { most: 'which_highest', least: 'which_lowest', value: 'specific_value', more: 'difference', total: 'total' }[ask.kind];
+                    : 'Follow the top of each bar across to the numbers up the side. A short mark is half way.';
+                const legacyType = { most: 'which_highest', least: 'which_lowest', value: 'specific_value', more: 'difference', total: 'total' }[d.ask.kind];
                 q.dataData = { categories, values, context: context.title, questionType: legacyType, type: 'bar_graph', ...(horizontal ? { bars: 'horizontal' } : {}) };
                 q.printFormat = "data-bar-graph";
                 q.skillLabel = 'Bar Graph';
 
             } else if (dataSkill === "pictograph") {
-                // Pictograph - CCSS 3.MD.B.3. AP2 round 3 (critic round 4, the bar graph's defects): a
-                // kit cell (sheet/cells/figures.js `pictograph`), drawn the same on paper, in the key and
-                // on the three screen hosts: in-house pictures in a ruled table, the key printed under
-                // it (RP-132), the question beside it in the context's own words, one box or one check
-                // box. The click-all variant is gone (a list on paper).
-                const context = pick(BAR_CONTEXTS);
+                // Pictograph - CCSS 3.MD.B.3. A kit cell (sheet/cells/figures.js `pictograph`): in-house
+                // pictures in a ruled table - a child for a "Number of children" graph, a car for a car
+                // count, or one plain circle (O6 "Pictures") - the key beside it, half pictures at a
+                // key of 2 or 10 (the 3.MD.3 edge case), the question in the context's own words. The
+                // numbers are set by the key and "Most pictures in a row", never by the Max Number
+                // (critic round 5: "Up to 10" dealt totals of 60).
+                const at = _dAt();
+                const context = _dTurn(BAR_CONTEXTS, at, 2);
                 const numRows = _dNum('tiles') || pick([3, 4, 5]);
                 const categories = context.cats.slice(0, numRows);
-                const _sc = _dOpt('scale');   // the teacher's ticked scales, else by the Max Number
-                const ticked = Array.isArray(_sc) && _sc.length ? _sc : null;
-                const scaleOpts = ticked ? ticked.map(i => [2, 5, 10, 25][i]).filter(Boolean)
-                    : (range >= 100 ? [2, 5, 10, 25] : range >= 50 ? [2, 5, 10] : [2, 5]);
-                const scale = pick(scaleOpts.length ? scaleOpts : [2, 5]);
-                const pictoMax = Math.max(2, Math.min(Math.ceil(dataMax / scale), 8));
-                const deal = () => categories.map(() => rng(1, pictoMax) * scale);
-                const forms = _dSet('forms') || [0, 1, 2, 3];
-                const kind = [pick(['most', 'least']), 'value', 'total', 'more'][pick(forms)] || 'value';
-                const d = _dataAsk(kind, context, categories, deal(), deal, scale);
-                // an in-house line picture for the context (RP-20); never a plain square, which reads
-                // as a check box beside the answer's check boxes
-                const icon = context.icon || 'star';
+                const _sc = _dOpt('scale');
+                const ticked = Array.isArray(_sc) && _sc.length ? _sc : [0, 1, 2];
+                const scaleOpts = ticked.map(i => [2, 5, 10, 25][i]).filter(Boolean);
+                const scale = _dTurn(scaleOpts.length ? scaleOpts : [2, 5], at);
+                const most = _dNum('most') || 6;
+                const halves = (scale === 2 || scale === 10) && _dOpt('halves') !== 'never';
+                // a row of 1 to `most` pictures; at a key of 2 or 10 about one row in three ends in
+                // half a picture (never a row that is ONLY half a picture)
+                const deal = () => categories.map(() => {
+                    const k = rng(1, halves ? most - 1 : most);
+                    return (k + (halves && rng(1, 3) === 1 ? 0.5 : 0)) * scale;
+                });
+                let first = deal();
+                if (halves && !first.some(v => (v / scale) % 1)) first[rng(0, first.length - 1)] += scale / 2;
+                first = first.map(v => Math.min(v, most * scale));
+                const kinds = _dKinds({ 0: ['most', 'least'], 1: ['value'], 2: ['total'], 3: ['more'] });
+                const kind = _dTurn(kinds, at);
+                const d = _dataAsk(kind, context, categories, first, deal, halves ? scale / 2 : scale);
+                const icon = _dOpt('objects') === 'shapes' ? 'circle' : context.pic;
                 const payload = { title: context.title, categories, values: d.vals, scale, icon, catTitle: context.cat, valTitle: context.val,
-                    ask: d.ask, question: d.text, answer: d.ans };
+                    ask: d.ask, kinds, scales: scaleOpts, question: d.text, answer: d.ans, support: _dLevel(at) };
                 _dataCell(q, 'pictograph', payload);
                 q.ccss = "3.MD.B.3";
-                q.hint = `Count the pictures in the row. Each picture stands for ${scale}: count by ${scale}s.`;
+                q.hint = `Count the pictures in the row by ${scale}s.${halves ? ` Half a picture is ${scale / 2}.` : ''}`;
                 q.dataData = { categories, values: d.vals, scale, icon, context: context.title, type: 'pictograph' };
                 q.printFormat = "data-pictograph";
                 q.skillLabel = 'Pictograph';
@@ -1009,21 +1052,22 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "data-line-plot";
 
             } else if (dataSkill === "tally_chart") {
-                // Tally Chart - CCSS 1.MD.C.4. AP2 round 3 (critic round 4, the bar graph's defects): a
-                // kit cell (sheet/cells/figures.js `tally-chart`), drawn the same on paper, in the key
-                // and on the three screen hosts: tally marks in a ruled table (RP-22, a diagonal fifth),
-                // the question beside it in the context's own words, one box or one check box. The
-                // click-all variant is gone (a list on paper).
-                const context = pick(BAR_CONTEXTS);
+                // Tally Chart - CCSS 1.MD.C.4. A kit cell (sheet/cells/figures.js `tally-chart`): tally
+                // marks in a ruled (or open, O6) table (RP-22, a diagonal fifth), the question beside it
+                // in the context's own words, one box or one check box. A page turns through its
+                // contexts and question kinds; the Support level prints the grey running count after
+                // each bundle of five (a hint that fades).
+                const at = _dAt();
+                const context = _dTurn(BAR_CONTEXTS, at, 2);
                 const numRows = _dNum('tiles') || pick([3, 4, 5]);
                 const categories = context.cats.slice(0, numRows);
                 const _tMost = _dNum('most');
                 const deal = () => categories.map(() => (_tMost ? rng(_tMost <= 5 ? 1 : 3, _tMost) : rng(3, 15)));
-                const forms = _dSet('forms') || [0, 1, 2, 3];
-                const kind = ['value', pick(['most', 'least']), 'total', 'more'][pick(forms)] || 'value';
+                const kinds = _dKinds({ 0: ['value'], 1: ['most', 'least'], 2: ['total'], 3: ['more'] });
+                const kind = _dTurn(kinds, at);
                 const d = _dataAsk(kind, context, categories, deal(), deal, 1);
                 const payload = { title: context.title, categories, values: d.vals, catTitle: context.cat, valTitle: 'Tally',
-                    ask: d.ask, question: d.text, answer: d.ans };
+                    rules: _dOpt('rules') === 'open' ? 'open' : 'ruled', ask: d.ask, kinds, question: d.text, answer: d.ans, support: _dLevel(at) };
                 _dataCell(q, 'tally-chart', payload, { screenInstr: 'Use the tally chart. Answer the question.' });
                 q.ccss = "1.MD.C.4";
                 q.hint = 'A bundle with a line across is 5. Count the bundles by 5s, then count on the single marks.';

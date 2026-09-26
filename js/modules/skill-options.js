@@ -2214,7 +2214,10 @@ Object.assign(P12_OPTIONS, {
 const _clickOrName = (nameLabel, nameRe) => _p12Match([[nameLabel, nameRe], ['Click every one of a kind', '^Click']],
     { help: 'Writing the name is recall; clicking picks from a set. One kind per page, or both.' });
 Object.assign(P12_OPTIONS, {
-    'area_perimeter:perimeter_intro': [_p12Max([16, 24], 32, { label: 'Perimeter up to', help: 'The largest perimeter on the page.' })],
+    // AP2 round 4: the ladder reaches 50 (the generator deals longer sides to fill it); its
+    // default names its value (critic round 5, O5).
+    'area_perimeter:perimeter_intro': [_p12Max([16, 24, 50], 40, { label: 'Perimeter up to', help: 'The largest perimeter on the page.',
+        labels: { null: 'Up to about 40 (as dealt)' } })],
     'area_perimeter:area_unit_squares': [_p12Variants('area_unit_squares', ['rectangle', 'L'], ['Rectangles', 'L-shapes']),
         _p12Max([12, 24], 42, { label: 'Area up to', help: 'The most unit squares to count.' })],
     'area_perimeter:perimeter_grid': [_p12Match([['Count the edges of a rectangle', 'outside edges\\. What'], ['Count the edges of an L-shape', 'L-shap'],
@@ -2269,9 +2272,9 @@ Object.assign(P12_OPTIONS, {
     'graphs:pictograph': [
         _p12Match([['Which has the most or the least?', 'the (most|fewest)'], ['How many for one row?', '^How many (?!more )(?!.*in all\\?)'],
             ['The total', 'in all\\?'], ['How many more? (two rows)', '^How many more ']]),
-        { id: 'scale', label: 'Each picture stands for', type: 'set', group: 'difficulty', default: [0, 1, 2, 3],
+        { id: 'scale', label: 'Each picture stands for', type: 'set', group: 'difficulty', default: [0, 1, 2],
             values: [{ v: 0, l: '2' }, { v: 1, l: '5' }, { v: 2, l: '10' }, { v: 3, l: '25' }], allLabel: 'All of them, mixed',
-            help: 'Counting in 2s is the easiest key; 25s the hardest. Untouched, the Max Number chooses.' },
+            help: 'Counting in 2s is the easiest key; 25s the hardest. Untouched, the keys 2, 5 and 10 are dealt.' },
     ],
     // Read by gen-data-stats.js (_dOpt): `tiles` the bars / rows, `band` the tallest one.
     'graphs:build_bar_graph': [_p12Enum('tiles', 'Bars to draw', [{ v: null, l: '3 or 4, dealt' }, { v: 3, l: '3' }, { v: 4, l: '4' }], null, 'More bars is more to draw.'),
@@ -2692,7 +2695,7 @@ const _o2Add = (key, ...defs) => {
     ['coordinates:net_surface_area', _o2RangeBand([50, 100], { label: 'Numbers to' })],
     // ---- graphs (gen-data-stats.js _dNum): how much there is to read
     ['graphs:bar_graph', _o2Tiles('Bars', [3, 4, 5], '4 or 5', 'Fewer bars is the easier step.'),
-        _o2Most('Tallest bar up to', [5, 10, 50], 'to 20 at Max Number 100', 'The largest value a bar shows. Small values read straight off the scale.')],
+        _o2Most('Tallest bar up to', [5, 10, 50], 'up to 20', 'The largest value a bar shows. Up to 10 counts by 1; up to 20 by 2 and up to 50 by 5, where a bar may end half way.')],
     ['graphs:pictograph', _o2Tiles('Rows', [3, 4, 5], '3, 4 or 5', 'Fewer rows is the easier step.')],
     ['graphs:tally_chart', _o2Tiles('Rows', [3, 4, 5], '3, 4 or 5', 'Fewer rows is the easier step.'),
         _o2Most('Most tallies in a row', [5, 10, 20], '3 to 15', 'To 5 is one bundle of tallies; more bundles is harder to count.')],
@@ -2767,12 +2770,87 @@ const _AP2_POINTS = { all: 'Points named with their coordinates: A(3, 2)', some:
         { all: 'Every inch numbered', some: 'Every other inch numbered (0, 2, 4, 6)' },
         'The numbers under the inch marks. With every other inch numbered the pupil counts on from a numbered mark; the tick marks do not change.')],
     ['measurement:temperature', _ap2Labels(['all', 'some'], 'all',
-        { all: 'Every 5 degrees numbered', some: 'Every 10 degrees numbered' },
-        'The numbers on the thermometer scale for the "What temperature is shown?" items. There is a mark for every degree either way.')],
+        { all: 'Every 5 degrees numbered (every 10 at 2 degrees a mark)', some: 'Every 10 degrees numbered (every 20 at 2 degrees a mark)' },
+        'The numbers on the thermometer scale. The small marks do not change.')],
     ['graphs:bar_graph', _ap2Bars()],
     ['measurement:bar_graph_intro', _ap2Bars()],
 ].forEach(([key, ...defs]) => _o2Add(key, ...defs));
 // ============================ end O6 · appearance: figures and data (AP2) ===================
+
+// ======================= AP2 round 4 (critic regrade 5, 2026-09-25) =========================
+// Every figure skill gets the four dimensions of design/audit/LESSONS_LEARNED.md L8: a number-size
+// ladder, a complexity control, a Support level that fades a grey hint (never the structure), and
+// an appearance choice.
+//   `level`     (L)   Support: 2 draws the skill's grey hint, 1 leaves the structure only. The hint
+//                     is the graph's read-across line, the running count under pictures or after a
+//                     tally bundle, the guides from a ruler's object, a thermometer's guide line, a
+//                     perimeter's addition frame. Several ticked fade down the page.
+//   `objects`   (J)   Pictures: each row's own picture (or a child / car for a scaled graph), or one
+//                     plain circle for every row.
+//   `rules`     (9H)  Tally chart lines: a ruled table, or rows without lines between them.
+//   `halves`    (9J)  Half pictures on a scaled pictograph (a key of 2 or 10).
+//   `measure`   (9I)  What the ruler measures: an object from 0, or one starting on a later mark.
+//   `belowZero` (9G)  Temperatures below zero on some items.
+//   `step`      (T)   Degrees a thermometer mark stands for (1 or 2).
+//   `band`      (B)   The highest temperature a scale reaches.
+const _ap2Support = (help) => ({ ...levelSubset([2, 1], 1, help), label: 'Support', group: 'support' });
+const _AP2_PICTURES = (words) => ({
+    id: 'objects', label: 'Pictures', type: 'enum', group: 'layout', default: 'pictures',
+    values: [{ v: 'pictures', l: words + _AP2_DEFAULT }, { v: 'shapes', l: 'One plain circle for every row' }],
+    help: 'What the pictures in the rows look like. The numbers and the key do not change.',
+    helpShort: 'Each row\'s own picture, or plain circles.',
+});
+[
+    ['graphs:bar_graph', _ap2Support('Level 2 draws a grey line from the end of each bar the question names across to the scale.')],
+    ['measurement:bar_graph_intro',
+        _o2Tiles('Bars', [2, 3], '2 or 3', 'Two bars is the easier step.'),
+        _o2Most('Tallest bar up to', [3, 10], 'up to 5', 'The top of the scale. Up to 3 is the first step; up to 10 has more lines to read against.'),
+        _ap2Support('Level 2 draws a grey line from the end of each bar the question names across to the scale.')],
+    ['graphs:pictograph',
+        _o2Most('Most pictures in a row', [4, 8], 'up to 6', 'The longest row. With half pictures the longest row may end in half a picture.'),
+        { id: 'halves', label: 'Half pictures', type: 'enum', group: 'difficulty', default: 'some',
+            values: [{ v: 'some', l: 'Some rows end in half a picture' + _AP2_DEFAULT }, { v: 'never', l: 'Never' }],
+            help: 'With a key of 2 or 10, about one row in three ends in half a picture (half of the key). A key of 5 or 25 never uses halves.' },
+        _AP2_PICTURES('A child for "Number of children", a car for a car count'),
+        _ap2Support('Level 2 writes the running count in grey under each picture (5, 10, 15 ...).')],
+    ['measurement:pictograph_intro',
+        _o2Tiles('Rows', [2, 3], '2 or 3', 'Two rows is the easier step.'),
+        _o2Most('Counts up to', [3, 10], 'up to 5', 'The most pictures in a row. Up to 3 is the first step.'),
+        _AP2_PICTURES('Each row\'s own picture (circles, balls, fish ...)'),
+        _ap2Support('Level 2 writes the count in grey under each picture (1, 2, 3 ...).')],
+    ['graphs:tally_chart',
+        { id: 'rules', label: 'Chart lines', type: 'enum', group: 'layout', default: 'ruled',
+            values: [{ v: 'ruled', l: 'A line between the rows' + _AP2_DEFAULT }, { v: 'open', l: 'Rows without lines' }],
+            help: 'How the table is drawn. The tally marks and the question do not change.', helpShort: 'Ruled rows, or open rows.' },
+        _ap2Support('Level 2 writes the running count in grey after each bundle of five (5, 10, 15).')],
+    ['measurement:reading_ruler',
+        { id: 'measure', label: 'What is measured', type: 'enum', group: 'difficulty', default: 'zero',
+            values: [{ v: 'zero', l: 'An object from 0' + _AP2_DEFAULT }, { v: 'moved', l: 'An object that starts on a later inch' }],
+            help: 'Starting on a later inch, the pupil counts the inches from where the object starts, not from 0.' },
+        _ap2Support('Level 2 draws grey guides from the two ends of the object down to the ruler.')],
+    ['measurement:reading_ruler_hard',
+        { id: 'measure', label: 'What is measured', type: 'enum', group: 'difficulty', default: 'zero',
+            values: [{ v: 'zero', l: 'An object from 0' + _AP2_DEFAULT }, { v: 'moved', l: 'An object that starts on a later inch' }],
+            help: 'Starting on a later inch, the pupil counts the inches from where the object starts, not from 0.' },
+        _ap2Support('Level 2 draws grey guides from the two ends of the object down to the ruler.')],
+    ['measurement:temperature',
+        { ..._opsBand([null, 30, 60, 100], null, { label: 'Temperatures up to',
+            labels: { null: 'As dealt (°F to 100, °C to 40)', 30: 'Up to 30°', 60: 'Up to 60°', 100: 'Up to 100°' },
+            help: 'The highest number on a thermometer scale.' }), group: 'difficulty' },
+        { id: 'step', label: 'Each small mark', type: 'enum', group: 'difficulty', default: 1,
+            values: [{ v: 1, l: '1 degree' + _AP2_DEFAULT }, { v: 2, l: '2 degrees' }],
+            help: 'How many degrees one small mark stands for. At 2 degrees the pupil counts the marks by 2s.' },
+        { id: 'belowZero', label: 'Below zero', type: 'enum', group: 'difficulty', default: 'never',
+            values: [{ v: 'never', l: 'Never' + _AP2_DEFAULT }, { v: 'some', l: 'Some items (about 1 in 3)' }],
+            help: 'Some thermometers read below 0: the answer has a minus sign.' },
+        _ap2Support('Level 2 draws a grey guide from the top of the column across to the scale.')],
+    ['area_perimeter:perimeter_intro',
+        { id: 'shapes', label: 'Shapes', type: 'set', group: 'difficulty', default: [0, 1, 2, 3],
+            values: [{ v: 0, l: 'Rectangles' }, { v: 1, l: 'Squares' }, { v: 2, l: 'Triangles' }, { v: 3, l: 'Five-sided (a house)' }],
+            allLabel: 'All of them, mixed', help: 'The shapes on the page, taken in turn. Rectangles and squares first; five sides is the most to add.' },
+        _ap2Support('Level 2 prints a grey addition frame under the shape, one line for each side.')],
+].forEach(([key, ...defs]) => _o2Add(key, ...defs));
+// ============================ end AP2 round 4 ==============================================
 
 Object.assign(SKILL_OPTIONS, P12_OPTIONS);
 // ============================ end P12 · every other family ============================

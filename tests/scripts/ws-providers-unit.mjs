@@ -561,31 +561,40 @@ const dataItem = (template, { scale = 1, step = 1, max = 10, kinds = ['value', '
 };
 const FIGURE_MAKERS = {
     'measurement:temperature': (r) => {
-        const unit = pick(r, ['°F', '°C']); const lo = pick(r, [0, 10, 20, 30]); const every = pick(r, [5, 10]);
-        const temp = int(r, lo + 1, lo + 19);
-        return figCell('thermometer', { temp, unit, lo, hi: lo + 20, every }, { ans: temp, text: `What is the temperature in ${unit}?` });
+        const unit = pick(r, ['°F', '°C']); const step = pick(r, [1, 1, 2]); const lo = pick(r, [-10, 0, 10, 20, 30]);
+        const every = step === 2 ? pick(r, [10, 20]) : pick(r, [5, 10]);
+        const temp = step * int(r, Math.ceil((lo + 1) / step), Math.floor((lo + 20 * step - 1) / step));
+        return figCell('thermometer', { temp, unit, lo, hi: lo + 20 * step, every, step }, { ans: temp, text: `What is the temperature in ${unit}?` });
     },
     'measurement:reading_ruler': (r) => {
-        const res = pick(r, [1, 1, 2]);
-        const meas = res === 1 ? int(r, 1, 6) : int(r, 0, 5) + 0.5;
+        const res = pick(r, [1, 1, 2]); const start = pick(r, [0, 0, 1, 2]);
+        const meas = res === 1 ? int(r, 1, 6 - start) : int(r, 0, 5 - start) + 0.5;
         const ans = inchText(meas, 4);
-        return figCell('ruler', { len: 6, meas, res, labels: 'all', ans }, { ans: res === 1 ? meas : ans, text: 'What length does the arrow point to?' });
+        return figCell('ruler', { len: 6, start, meas, res, labels: 'all', object: 'pencil', ans }, { ans: res === 1 ? meas : ans, text: 'How long is the pencil?' });
     },
     'measurement:reading_ruler_hard': (r) => {
-        const meas = int(r, 0, 5) + pick(r, [0.25, 0.5, 0.75, 1]);
+        const start = pick(r, [0, 0, 1]);
+        const meas = int(r, 0, 4 - start) + pick(r, [0.25, 0.5, 0.75, 1]);
         const ans = inchText(meas, 4);
-        return figCell('ruler', { len: 6, meas, res: 4, labels: 'all', ans }, { ans, text: 'What length does the arrow point to?' });
+        return figCell('ruler', { len: 6, start, meas, res: 4, labels: 'all', object: 'crayon', ans }, { ans, text: 'How long is the crayon?' });
     },
     'graphs:bar_graph': dataItem('bar-graph', { step: 2 }),
     'measurement:bar_graph_intro': dataItem('bar-graph', { max: 5, kinds: ['value', 'most', 'more'] }),
-    'graphs:pictograph': dataItem('pictograph', { scale: 5, max: 6 }),
+    'graphs:pictograph': (r) => {
+        const q = dataItem('pictograph', { scale: 2, max: 6 })(r);
+        // one row ends in half a picture (a key of 2): its value is odd
+        const p = q.cell.payload;
+        if (p.ask.kind === 'value' && r() < 0.5) { p.values[p.ask.i] -= 1; p.answer = p.values[p.ask.i]; q.ans = p.answer; }
+        return q;
+    },
     'measurement:pictograph_intro': dataItem('pictograph', { max: 5, kinds: ['value', 'more'] }),
     'graphs:tally_chart': dataItem('tally-chart', { max: 15 }),
     'area_perimeter:perimeter_intro': (r) => {
-        const shape = pick(r, ['rectangle', 'square', 'triangle']);
+        const shape = pick(r, ['rectangle', 'square', 'triangle', 'pentagon']);
         let sides;
         if (shape === 'rectangle') { const l = int(r, 3, 10), w = int(r, 2, l - 1); sides = [l, w, l, w]; }
         else if (shape === 'square') { const e = int(r, 2, 9); sides = [e, e, e, e]; }
+        else if (shape === 'pentagon') sides = [6, 4, 5, 5, 4];
         else sides = [9, 7, 5];
         const some = shape !== 'triangle' && r() < 0.5;
         const show = sides.map((_, i) => !some || i < 2);
@@ -596,7 +605,7 @@ const FIGURE_MAKERS = {
 for (const [key, maker] of Object.entries(FIGURE_MAKERS)) ITEM_MAKERS[key] = maker;
 for (const key of FIGURE_PROVIDER_IDS) checkSkill(key);
 ok(FIGURE_PROVIDER_IDS.length === Object.keys(FIGURE_MAKERS).length, `FIGURE_PROVIDER_IDS lists ${FIGURE_PROVIDER_IDS.length}, the test makes ${Object.keys(FIGURE_MAKERS).length}`);
-for (const k of ['read-thermometer', 'read-ruler', 'add-sides', 'tally']) {
+for (const k of ['read-thermometer', 'measure-object', 'add-sides', 'tally']) {
     ok(k in INSTRUCTION_LIBRARY, `figure library key "${k}" is missing`);
     ok(lintInstruction(INSTRUCTION_LIBRARY[k]).length === 0, `figure library "${k}" fails the lint: ${lintInstruction(INSTRUCTION_LIBRARY[k]).join('; ')}`);
 }

@@ -6,16 +6,16 @@
 // area_perimeter:perimeter_intro (perimeter-shape). Every member reads the item's kit payload (`q.cell.payload`, plain data the
 // generator wrote), never the drawing.
 //
-// THE MISCONCEPTION BANK. The error-analysis lane's legacy-wrong.js ids are kept (M-TM1, M-TM2,
-// M-P1 ... M-P3, M-D1 ... M-D4); the ones for items that no longer exist are not: M-TM3 (the
-// thermometer reads no temperature below zero now) and M-TC1 / M-TC2 (conversions left the skill,
-// critic round 4). New ones, each a real, computable error:
+// THE MISCONCEPTION BANK. The error-analysis lane's legacy-wrong.js ids are kept (M-TM1 ... M-TM3,
+// M-P1 ... M-P3, M-D1 ... M-D4); M-TC1 / M-TC2 are not (conversions left the skill, critic round
+// 4). New ones, each a real, computable error:
 //   M-TM4 counted the small marks up from the numbered line ABOVE the column
 //   M-RL1 read the small mark next to the arrow       M-RL2 a half inch too far
 //   M-RL3 read the next inch number after the arrow   M-RL4 counted the marks, not the spaces
 //   M-D5  read the next number up the scale           M-D6  wrote the taller bar, not how many more
 //   M-PG1 counted the pictures, not what each stands for   M-TL1 counted a bundle of five as four
-//   M-D7  counted one mark or picture twice
+//   M-D7  counted one mark or picture twice               M-PG2 counted half a picture as a whole
+//   M-TM5 counted a 2-degree mark as 1 degree              M-RL5 read the end number, not the length
 //   M-P4  added only one length and one width
 //
 // Pure module (SCC-01): no window, no DOM, no Math.random.
@@ -28,31 +28,40 @@ const sum = (a) => a.reduce((s, v) => s + v, 0);
 
 /* ============================================================================ temperature */
 
+/** A temperature as a pupil writes it: the true minus sign below zero. */
+const deg = (v) => (v < 0 ? `−${Math.abs(v)}` : String(v));
+
 function tempWrong(q) {
     const p = payloadOf(q);
-    const t = Number(p.temp), every = Number(p.every) || 5;
+    const t = Number(p.temp), every = Number(p.every) || 5, st = Number(p.step) === 2 ? 2 : 1;
     if (!Number.isFinite(t)) return null;
     const below = Math.floor(t / every) * every, above = below + every;
     const c = [];
+    // M-TM3: a reading below zero written as above zero (the minus sign left off)
+    if (t < 0) c.push({ value: -t, misconception: 'M-TM3', explain: 'Read a temperature below zero as above zero: the minus sign is missing.' });
     // M-TM1: read the nearest numbered line, not the small marks
     c.push({ value: Math.round(t / every) * every, misconception: 'M-TM1', explain: 'Read the nearest numbered line, not the small marks.' });
     // M-TM4: started at the number above the column and counted the marks the wrong way
-    if (t !== below) c.push({ value: above + (above - t), misconception: 'M-TM4', explain: `Counted the small marks up from ${above}, not up from ${below}.` });
+    if (t !== below) c.push({ value: above + (above - t), misconception: 'M-TM4', explain: `Counted the small marks up from ${deg(above)}, not up from ${deg(below)}.` });
+    // M-TM5: counted each mark as one degree on a scale of 2 degrees a mark
+    if (st === 2 && t !== below) c.push({ value: below + (t - below) / 2, misconception: 'M-TM5', explain: 'Counted each small mark as 1 degree: here a mark is 2 degrees.' });
     // M-TM2: counted the numbered line as the first mark
-    c.push({ value: t + 1, misconception: 'M-TM2', explain: 'Counted the numbered line as the first mark: one degree too many.' });
+    c.push({ value: t + st, misconception: 'M-TM2', explain: 'Counted the numbered line as the first mark: one mark too many.' });
     return chooseWrong(q, c);
 }
 
 function tempSteps(q) {
     const p = payloadOf(q);
-    const t = Number(p.temp), every = Number(p.every) || 5;
-    const below = Math.floor(t / every) * every, k = t - below;
-    return [
-        step(k ? `The dark column stops between ${below} and ${below + every}.` : `The dark column stops at the ${t} line.`),
-        k ? step(`Start at ${below}. Count up ${k} small mark${k > 1 ? 's' : ''}: ${countList(below + 1, t)}.`)
-            : step(`${t} has a number on the scale.`),
-        step(`Write ${t} in the box.`, [{ slot: 'answer', value: String(t) }]),
+    const t = Number(p.temp), every = Number(p.every) || 5, st = Number(p.step) === 2 ? 2 : 1;
+    const below = Math.floor(t / every) * every, k = (t - below) / st;
+    const out = [
+        step(k ? `The dark column stops between ${deg(below)} and ${deg(below + every)}.` : `The dark column stops at the ${deg(t)} line.`),
+        k ? step(`Start at ${deg(below)}. Count up ${k} small mark${k > 1 ? 's' : ''}, ${st} degree${st > 1 ? 's' : ''} each.`)
+            : step(`${deg(t)} has a number on the scale.`),
     ];
+    if (t < 0) out.push(step('The column stops below 0, so write the minus sign.'));
+    out.push(step(`Write ${deg(t)} in the box.`, [{ slot: 'answer', value: deg(t) }]));
+    return out;
 }
 
 registerSkill('measurement:temperature', {
@@ -61,9 +70,18 @@ registerSkill('measurement:temperature', {
         instructionKey: 'read-thermometer',
         steps: ['Find the top of the dark column.', 'Find the numbered line just below it.', 'Count up the small marks, one degree each.'],
         say: 'The temperature is __ degrees.',
-        sayValues: (q) => [Number(payloadOf(q).temp)],
+        sayValues: (q) => { const t = Number(payloadOf(q).temp); return [t < 0 ? `minus ${Math.abs(t)}` : t]; },
+        // the steps follow the page's thermometer: 1 or 2 degrees a mark, below zero or not
+        stepsFor: (q) => {
+            const p = payloadOf(q);
+            const st = Number(p.step) === 2 ? 2 : 1;
+            const out = ['Find the top of the dark column.', 'Find the numbered line just below it.',
+                st === 2 ? 'Count up the small marks, 2 degrees each.' : 'Count up the small marks, one degree each.'];
+            if (Number(p.lo) < 0) out.push('Below 0? Write a minus sign.');
+            return out;
+        },
     }),
-    misconceptions: ['M-TM1', 'M-TM2', 'M-TM4'],
+    misconceptions: ['M-TM1', 'M-TM2', 'M-TM3', 'M-TM4', 'M-TM5'],
     workedSteps: (q) => clampSteps(tempSteps(q)),
     wrongAnswer: tempWrong,
 });
@@ -96,14 +114,17 @@ const mixedSlots = (text) => {
 function rulerWrong(q) {
     const p = payloadOf(q);
     const meas = Number(p.meas), res = Number(p.res) || 1, len = Number(p.len) || 6;
+    const start = Number(p.start) || 0, end = start + meas;
     if (!Number.isFinite(meas)) return null;
     const c = [];
     // (M-RL4 may pass the ruler's end: 6 inches has 7 long marks, 0 to 6, and a pupil who counts
     // the marks, not the spaces, writes 7.)
-    const add = (x, misconception, explain) => { if (x > 0 && (x <= len || misconception === 'M-RL4')) c.push({ x, misconception, explain }); };
-    if (res === 4) add(meas + (meas % 1 === 0.75 ? -0.25 : 0.25), 'M-RL1', 'Read the small mark next to the arrow, not the one it points to.');
+    const add = (x, misconception, explain) => { if (x > 0 && (x <= len || misconception === 'M-RL4' || misconception === 'M-RL5')) c.push({ x, misconception, explain }); };
+    // M-RL5: the object does not start at 0 - wrote the number at its end, not its length
+    if (start > 0) add(end, 'M-RL5', `Read the number at the end (${inchText(end, res === 1 ? 1 : 4)}), not the inches from ${start} to the end.`);
+    if (res === 4) add(meas + (meas % 1 === 0.75 ? -0.25 : 0.25), 'M-RL1', 'Read the small mark next to the end, not the one it reaches.');
     if (res >= 2) add(meas + 0.5, 'M-RL2', 'Counted a half inch too far.');
-    if (meas % 1) add(Math.ceil(meas), 'M-RL3', 'Read the next inch number after the arrow, not the one before it.');
+    if (end % 1) add(Math.ceil(end) - start, 'M-RL3', 'Read the next inch number after the end, not the one before it.');
     add(meas + 1, 'M-RL4', 'Counted the long marks, not the spaces between them: one too many.');
     return chooseWrong(q, c.map(({ x, misconception, explain }) => {
         const text = inchText(x, res === 1 ? 1 : 4);
@@ -116,50 +137,74 @@ function rulerWrong(q) {
 function rulerSteps(q) {
     const p = payloadOf(q);
     const meas = Number(p.meas), res = Number(p.res) || 1;
+    const start = Number(p.start) || 0, end = start + meas;
+    const obj = p.object || 'pencil';
     const ans = inchText(meas, res === 1 ? 1 : 4);
-    if (res === 1) {
-        return [
-            step('Find the arrow. Follow it down to the ruler.'),
-            step(`The arrow points to the long mark with ${meas} under it.`),
-            step(`Write ${meas}.`, [{ slot: 'answer', value: String(meas) }]),
-        ];
-    }
-    const w = Math.floor(meas), k = Math.round((meas - w) * res);
     const parts = mixedSlots(ans);
     const marks = [];
-    if (parts.w) marks.push({ slot: 'w', value: parts.w });
-    if (parts.n) marks.push({ slot: 'n', value: parts.n }, { slot: 'd', value: parts.d });
+    if (res === 1) marks.push({ slot: 'answer', value: String(meas) });
+    else {
+        if (parts.w) marks.push({ slot: 'w', value: parts.w });
+        if (parts.n) marks.push({ slot: 'n', value: parts.n }, { slot: 'd', value: parts.d });
+    }
+    const write = step(parts.n ? `Write ${parts.w ? `${parts.w}, then ` : ''}${parts.n} over ${parts.d}.` : `Write ${parts.w || meas}.`, marks);
+    const w = Math.floor(end), k = Math.round((end - w) * res);
+    const endStep = k
+        ? step(`It ends after the ${w} mark: ${k} small space${k > 1 ? 's' : ''}, ${res === 2 ? 'a half' : 'a quarter'} inch each.`)
+        : step(`It ends at the long mark with ${w} under it.`);
+    if (!start) return [step(`The ${obj} starts at 0.`), endStep, write];
     return [
-        step(k ? `The arrow is after the ${w} inch mark.` : `The arrow points to the long mark with ${w} under it.`),
-        k ? step(`Each small space is ${res === 2 ? 'a half' : 'a quarter'} inch. Count ${k} space${k > 1 ? 's' : ''} after ${w}.`) : step('There are no small spaces to count.'),
-        step(parts.n ? `Write ${parts.w ? `${parts.w}, then ` : ''}${parts.n} over ${parts.d}.` : `Write ${parts.w}.`, marks),
+        step(`The ${obj} starts at ${start}, not at 0.`),
+        endStep,
+        step(`Count the inches from ${start} to the end: ${inchWords(meas)}.`),
+        write,
     ];
 }
 
-const rulerStrings = (iCan) => strings({
-    iCan,
-    instructionKey: 'read-ruler',
-    steps: ['Find the arrow. Follow it down to the ruler.', 'Find the inch number just before it.', 'Count the small spaces after that number.'],
-    say: 'The arrow points to __.',
-    // said in words (a slash fraction is never printed, TY-7)
-    sayValues: (q) => [inchWords(Number(payloadOf(q).meas))],
-    // the steps follow the ruler on the page: a whole-inch ruler has no small spaces to count
-    stepsFor: (q) => {
-        const res = Number(payloadOf(q).res) || 1;
-        if (res === 1) return ['Find the arrow. Follow it down to the ruler.', 'Find the long mark it points to.', 'Read the number under that mark.'];
-        return ['Find the arrow. Follow it down to the ruler.', 'Find the inch number just before it.',
-            `Each small space is ${res === 2 ? 'a half' : 'a quarter'} inch.`, 'Count the small spaces after that number.'];
-    },
-});
+/** The ruler's strings: the title and the steps follow the marks the page reads (critic round 5). */
+function rulerStrings(iCanWhole) {
+    const TITLE = { 1: iCanWhole, 2: 'I Can measure to the half inch', 4: 'I Can measure to the quarter inch' };
+    const byRes = {};
+    for (const r of [1, 2, 4]) {
+        byRes[r] = strings({
+            iCan: TITLE[r],
+            instructionKey: 'measure-object',
+            steps: ['Find where the object starts.', 'Find where the object ends.', 'Read the number at the end.'],
+            say: 'It is __ long.',
+            // said in words (a slash fraction is never printed, TY-7)
+            sayValues: (q) => [inchWords(Number(payloadOf(q).meas))],
+            stepsFor: (q) => {
+                const pp = payloadOf(q);
+                const moved = Number(pp.start) > 0;
+                const out = [moved ? 'Find where the object starts. It is not 0.' : 'The object starts at 0.', 'Find where the object ends.'];
+                if (r > 1) out.push(`A small space is ${r === 2 ? 'a half' : 'a quarter'} inch.`);
+                out.push(moved ? 'Count the inches from the start to the end.' : 'Read the inches at the end.');
+                return out;
+            },
+        });
+    }
+    // the marks the page reads: the item's own, else the skill's "Parts" option, else the
+    // skill's default (Quarter Inches reads all three)
+    const resOf = (ref) => {
+        const r = Number(payloadOf(ref && ref.q).res);
+        if (byRes[r]) return r;
+        const parts = ref && ref.opts && Array.isArray(ref.opts.parts) && ref.opts.parts.length ? ref.opts.parts
+            : (ref && ref.skillId === 'reading_ruler_hard' ? [0, 1, 2] : [0]);
+        return parts.includes(2) ? 4 : parts.includes(1) ? 2 : 1;
+    };
+    const fn = (ref = {}) => byRes[resOf(ref || {})](ref);
+    fn.def = byRes[1].def;
+    return fn;
+}
 registerSkill('measurement:reading_ruler', {
-    strings: rulerStrings('I Can read a ruler to the inch'),
-    misconceptions: ['M-RL1', 'M-RL2', 'M-RL3', 'M-RL4'],
+    strings: rulerStrings('I Can measure to the inch'),
+    misconceptions: ['M-RL1', 'M-RL2', 'M-RL3', 'M-RL4', 'M-RL5'],
     workedSteps: (q) => clampSteps(rulerSteps(q)),
     wrongAnswer: rulerWrong,
 });
 registerSkill('measurement:reading_ruler_hard', {
-    strings: rulerStrings('I Can read a ruler to the quarter inch'),
-    misconceptions: ['M-RL1', 'M-RL2', 'M-RL3', 'M-RL4'],
+    strings: rulerStrings('I Can measure to the inch'),
+    misconceptions: ['M-RL1', 'M-RL2', 'M-RL3', 'M-RL4', 'M-RL5'],
     workedSteps: (q) => clampSteps(rulerSteps(q)),
     wrongAnswer: rulerWrong,
 });
@@ -168,6 +213,8 @@ registerSkill('measurement:reading_ruler_hard', {
 
 /** Which display an item draws: 'bar-graph', 'pictograph' or 'tally-chart'. */
 const displayOf = (q) => (q && q.cell && q.cell.template) || 'bar-graph';
+/** Does row i of a pictograph end in half a picture? */
+const halfRow = (p, i) => { const k = Number(p.values[i]) / (Number(p.scale) || 1); return Math.abs(k - Math.floor(k) - 0.5) < 1e-6; };
 
 function barWrong(q) {
     const p = payloadOf(q);
@@ -183,16 +230,18 @@ function barWrong(q) {
     switch (a.kind) {
         case 'value': {
             const i = a.i;
+            // M-PG2: counted half a picture as a whole one
+            if (kind === 'pictograph' && halfRow(p, i)) c.push({ value: vals[i] + scale / 2, misconception: 'M-PG2', explain: `Counted the half picture as a whole ${scale}: it is ${scale / 2}.` });
             // M-D1: read the bar (row) next to the one asked
             if (i + 1 < vals.length) c.push({ value: vals[i + 1], misconception: 'M-D1', explain: `Read the ${long} next to the one asked.` });
             if (i > 0) c.push({ value: vals[i - 1], misconception: 'M-D1', explain: `Read the ${long} next to the one asked.` });
             // M-D5: read the next number up the scale (a bar graph)
-            if (kind === 'bar-graph') c.push({ value: vals[i] + step1, misconception: 'M-D5', explain: 'Read the next number up the scale, past the end of the bar.' });
+            if (kind === 'bar-graph') c.push({ value: Math.floor(vals[i] / step1) * step1 + step1, misconception: 'M-D5', explain: 'Read the next number up the scale, past the end of the bar.' });
             // M-PG1: counted the pictures, not what each one stands for (a pictograph with a key past 1)
-            if (kind === 'pictograph' && scale > 1) c.push({ value: vals[i] / scale, misconception: 'M-PG1', explain: `Counted the pictures, not ${scale} for each one.` });
-            // M-TL1: counted a bundle of five as four (the line across not counted)
+            if (kind === 'pictograph' && scale > 1) c.push({ value: Math.ceil(vals[i] / scale), misconception: 'M-PG1', explain: `Counted the pictures, not ${scale} for each one.` });
             // M-D7: counted one mark or picture twice
             if (kind !== 'bar-graph' && scale === 1) c.push({ value: vals[i] + 1, misconception: 'M-D7', explain: 'Counted one mark twice: one too many.' });
+            // M-TL1: counted a bundle of five as four (the line across not counted)
             if (kind === 'tally-chart' && vals[i] >= 5) c.push({ value: vals[i] - Math.floor(vals[i] / 5), misconception: 'M-TL1', explain: 'Did not count the line across: each bundle is 5, not 4.' });
             break;
         }
@@ -221,21 +270,26 @@ function barWrong(q) {
     return chooseWrong(q, c);
 }
 
-/** How a pupil reads one value off the display, in words. */
+/** How a pupil reads one value off the display, in words (the item's own key and marks). */
 function readText(q, i) {
     const p = payloadOf(q);
     const v = Number((p.values || [])[i]);
     const kind = displayOf(q);
     if (kind === 'pictograph') {
         const scale = Number(p.scale) || 1;
-        return scale === 1 ? `Count the pictures: ${countList(1, v)}.` : `Count the pictures by ${scale}s: ${countList(scale, v, scale)}.`;
+        const whole = Math.floor(v / scale) * scale;
+        const halfTxt = halfRow(p, i) ? ` Half a picture is ${scale / 2}: ${whole} + ${scale / 2} = ${v}.` : '';
+        if (scale === 1) return `Count the pictures: ${countList(1, v)}.`;
+        return whole ? `Count the whole pictures by ${scale}s: ${countList(scale, whole, scale)}.${halfTxt}` : `Half a picture is ${scale / 2}.`;
     }
     if (kind === 'tally-chart') {
         const b = Math.floor(v / 5), r = v % 5;
         if (!b) return `Count the marks: ${countList(1, v)}.`;
         return r ? `Count the bundles by 5s to ${b * 5}, then count on ${r}: ${v}.` : `Count the bundles by 5s: ${countList(5, v, 5)}.`;
     }
-    return `Follow the end of the bar to the scale. It is at ${v}.`;
+    const st = Number(p.step) || 1;
+    return v % st ? `Follow the end of the bar to the scale: half way from ${v - st / 2} to ${v + st / 2} is ${v}.`
+        : `Follow the end of the bar to the scale. It is at ${v}.`;
 }
 
 function barSteps(q) {
@@ -266,7 +320,8 @@ function barSteps(q) {
             const vi = vals[a.i], vj = vals[a.j];
             return [
                 step(`${cats[a.i]} has ${vi}. ${cats[a.j]} has ${vj}.`),
-                step(`Subtract: ${vi} − ${vj} = ${vi - vj}.`),
+                step(`Compare: ${cats[a.i]} has more, so subtract.`),
+                step(`${vi} − ${vj} = ${vi - vj}.`),
                 step(`Write ${vi - vj}.`, mark(vi - vj)),
             ];
         }
@@ -298,26 +353,40 @@ function barSay(q) {
 }
 
 const DATA_MISCONCEPTIONS = ['M-D1', 'M-D2', 'M-D3', 'M-D4', 'M-D5', 'M-D6'];
-/** The Steps band from the page's own item: its display and what it asks (L6). */
+/**
+ * The Steps band (L6, critic round 5): built from what the PAGE deals - the question kinds its
+ * forms allow (`p.kinds`) and, for a pictograph, its keys (`p.scales`). A step that only some
+ * items need says which ("How many more? Subtract ..."), so no step tells a "most" item to
+ * subtract; a page of one key counts by that key.
+ */
 function dataStepsFor(q) {
     const p = payloadOf(q);
-    const a = p.ask || {};
     const kind = displayOf(q);
     const unit = kind === 'bar-graph' ? 'bar' : 'row';
-    const scale = Number(p.scale) || 1;
-    const read = kind === 'pictograph' ? (scale === 1 ? 'Count the pictures. One picture is one.' : `Count the pictures by ${scale}s.`)
-        : kind === 'tally-chart' ? 'Count the bundles by 5s, then the single marks.' : 'Follow the end of the bar to the scale.';
-    const first = kind === 'pictograph' && scale > 1 ? ['Read the key: what one picture stands for.'] : [];
-    switch (a.kind) {
-        case 'most': case 'least':
-            return first.concat([`Look at all the ${unit}s.`, `Find the ${a.kind === 'most' ? 'longest' : 'shortest'} ${unit}.`, 'Check the box for it.']);
-        case 'more':
-            return first.concat([`Find the two ${unit}s the question names.`, read, 'Subtract the smaller number from the bigger one.']);
-        case 'total':
-            return first.concat([`Read every ${unit}. ${read}`, 'Add all the numbers.']);
-        default:
-            return first.concat([`Find the ${unit} the question names.`, read]);
+    const kinds = Array.isArray(p.kinds) && p.kinds.length ? p.kinds : [(p.ask || {}).kind || 'value'];
+    const scales = Array.isArray(p.scales) && p.scales.length ? p.scales : [Number(p.scale) || 1];
+    const pick1 = (k) => kinds.length === 1 && kinds[0] === k;
+    const out = [];
+    if (kind === 'pictograph' && !(scales.length === 1 && scales[0] === 1)) {
+        out.push(scales.length === 1 ? `Read the key: one picture stands for ${scales[0]}.` : 'Read the key: what one picture stands for.');
     }
+    const read = kind === 'pictograph'
+        ? (scales.length === 1 ? (scales[0] === 1 ? 'Count the pictures in the row.' : `Count the pictures by ${scales[0]}s.`) : 'Count the pictures by the key number.')
+        : kind === 'tally-chart' ? 'Count the bundles by 5s, then the single marks.' : 'Follow the end of the bar to the scale.';
+    if (kinds.some((k) => k === 'value' || k === 'more' || k === 'total')) {
+        out.push(`Find the ${unit} the question names.`, read);
+    }
+    const tails = [];
+    if (kinds.includes('more')) tails.push(pick1('more') ? 'Subtract the smaller number from the bigger one.' : 'How many more? Subtract the smaller number.');
+    if (kinds.includes('total')) tails.push(pick1('total') ? `Add the numbers of every ${unit}.` : 'In all? Add all the numbers.');
+    if (kinds.includes('most') || kinds.includes('least')) {
+        tails.push(kinds.every((k) => k === 'most' || k === 'least') ? `Find the longest or shortest ${unit}. Check its box.` : `Most or fewest? Check the longest or shortest ${unit}.`);
+    }
+    // four steps at most: the two sums share a line, then the "find the bar" step goes
+    if (out.length + tails.length > 4 && kinds.includes('more') && kinds.includes('total')) tails.splice(0, 2, 'How many more? Subtract. In all? Add.');
+    const steps = out.concat(tails);
+    if (steps.length > 4) { const k = steps.findIndex((x) => /the question names/.test(x)); if (k >= 0) steps.splice(k, 1); }
+    return steps.length >= 2 ? steps : steps.concat([`Write the number, or check a box.`]);
 }
 
 const dataProvider = (iCan, instructionKey, steps, extra = []) => ({
@@ -330,7 +399,7 @@ const BAR_STEPS = ['Read the title and the words on each side.', 'Find the bar t
 registerSkill('graphs:bar_graph', dataProvider('I Can read a bar graph', 'graph', BAR_STEPS));
 registerSkill('measurement:bar_graph_intro', dataProvider('I Can read a bar graph', 'graph', BAR_STEPS));
 registerSkill('graphs:pictograph', dataProvider('I Can read a pictograph', 'graph',
-    ['Read the key: what one picture stands for.', 'Find the row the question names.', 'Count the pictures by the key number.'], ['M-PG1']));
+    ['Read the key: what one picture stands for.', 'Find the row the question names.', 'Count the pictures by the key number.'], ['M-PG1', 'M-PG2']));
 registerSkill('measurement:pictograph_intro', dataProvider('I Can read a picture graph', 'graph',
     ['Read the title and the words at the top.', 'Find the row the question names.', 'Count the pictures. One picture is one.'], ['M-D7']));
 registerSkill('graphs:tally_chart', dataProvider('I Can read a tally chart', 'tally',
@@ -348,9 +417,9 @@ function perimeterWrong(q) {
     // M-P1: added only the sides with a number on them
     if (labelled.length < sides.length) c.push({ value: sum(labelled), misconception: 'M-P1', explain: 'Added only the sides with numbers on them.' });
     // M-P2: multiplied length by width, found the area
-    if (p.shape !== 'triangle') c.push({ value: sides[0] * sides[1], misconception: 'M-P2', explain: 'Multiplied: found the area, not the distance around.' });
+    if (p.shape === 'rectangle' || p.shape === 'square') c.push({ value: sides[0] * sides[1], misconception: 'M-P2', explain: 'Multiplied: found the area, not the distance around.' });
     // M-P4: one length and one width
-    if (p.shape !== 'triangle' && labelled.length === sides.length) c.push({ value: sides[0] + sides[1], misconception: 'M-P4', explain: 'Added one length and one width, not all four sides.' });
+    if ((p.shape === 'rectangle' || p.shape === 'square') && labelled.length === sides.length) c.push({ value: sides[0] + sides[1], misconception: 'M-P4', explain: 'Added one length and one width, not all four sides.' });
     // M-P3: left one side out
     c.push({ value: sum(sides) - sides[sides.length - 1], misconception: 'M-P3', explain: 'Left one side out.' });
     return chooseWrong(q, c);
@@ -362,7 +431,7 @@ function perimeterSteps(q) {
     const show = p.show || sides.map(() => true);
     const tot = sum(sides);
     const out = [];
-    if (show.some((v) => !v)) out.push(step('A side with no number is as long as the side opposite it.'));
+    if (show.some((v) => !v)) out.push(step(p.shape === 'pentagon' ? 'A side with no number is as long as the side that matches it.' : 'A side with no number is as long as the side opposite it.'));
     out.push(step(`Go all the way round: ${sides.length} sides, ${sides.join(', ')}.`));
     out.push(step(`Add: ${sides.join(' + ')} = ${tot}.`));
     out.push(step(`Write ${tot} in the box.`, [{ slot: 'answer', value: String(tot) }]));

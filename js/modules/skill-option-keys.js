@@ -209,6 +209,10 @@ export const MULTI_KEYS = Object.freeze({
     // Block 9 — O6 appearance (2026-09-25). 9F-9J: lane AP2 (figures and data). Figure labels
     // ride on the reserved `labels` (5E).
     bars: '9F',          // bar graphs: bars standing up (vertical) / lying down (horizontal)
+    belowZero: '9G',     // temperature: some thermometers read below zero
+    rules: '9H',         // tally chart: a line between the rows / open rows
+    measure: '9I',       // ruler: an object from 0 / starting on a later inch
+    halves: '9J',        // pictograph: some rows end in half a picture
     // NEXT FREE FOR AP2: 9G (to 9J).
 });
 
@@ -292,6 +296,10 @@ export const VALUE_TOKENS = Object.freeze({
     labels: Object.freeze({ all: 'A', some: 'S', none: 'N' }),
     // block 9 (O6 appearance, AP2): bar graphs
     bars: Object.freeze({ vertical: 'V', horizontal: 'H' }),
+    belowZero: Object.freeze({ never: 'N', some: 'S' }),
+    rules: Object.freeze({ ruled: 'R', open: 'O' }),
+    measure: Object.freeze({ zero: 'Z', moved: 'M' }),
+    halves: Object.freeze({ some: 'S', never: 'N' }),
     precision: Object.freeze({ hour: 'H', half: 'F', quarter: 'Q', five: 'V', one: 'O' }),
     coins: Object.freeze({ p: 'P', n: 'N', d: 'D', q: 'Q' }),
     units: Object.freeze({ metric: 'M', customary: 'C', mixed: 'X' }),
