@@ -278,11 +278,6 @@ export const WRM_SPECS = {
         ['legacy'], 'write the coordinates; plot', 'O2 quadrant I → II → all · O3 axes numbered every 1 → every 2 · O6 grid size',
         ['(x, y) swapped', 'distance across the axis ignores the sign'], ['coord-grid']),
 
-    // ------------------------------------------------------------------ integers
-    negative_count: S(['count through zero in 1s', 'count in multiples through zero', 'temperature below zero', 'difference between a positive and a negative', 'opposite directions: above / below, gain / lose, and the meaning of 0 (6.NS.C.5)'],
-        ['number-line', 'count-row'], 'write the number or the difference', 'O2 1s → 2s, 5s → differences · O3 thermometer / line labelled → ends only · O6 vertical / horizontal line',
-        ['counts 1, 0, 1 (no negatives)', 'difference 3 to −2 is 1'], ['measure-scale']),
-
     // ------------------------------------------------------------------ measurement
     compare_size: S(['circle the bigger', 'circle the smaller', 'order three by size', 'same size?'],
         ['wordpic'], 'circle one', 'O2 two → three objects · O3 base line drawn → none · O6 objects',

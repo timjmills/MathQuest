@@ -347,7 +347,9 @@ export const VALUE_TOKENS = Object.freeze({
 export const NUMERIC_SET_VALUES = Object.freeze({
     constant: Object.freeze([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]),
     level: Object.freeze([0, 1, 2, 3]),
-    step: Object.freeze([0, 1, 2, 15, 30]),
+    step: Object.freeze([0, 1, 2, 15, 30,
+        // build lane operations (2026-09-26): count_through_zero counts in 5s and 10s
+        5, 10]),
     dir: Object.freeze([0, 1]),
     task: Object.freeze([0, 1, 2, 3]),
     unknown: Object.freeze([0, 1, 2]),

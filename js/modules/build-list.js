@@ -156,7 +156,6 @@ export const WRM_EXTENSIONS = {
     thousandths_pv: { adds: 'number names and expanded form to thousandths (347.392 = 3 × 100 + … + 2 × 1/1000)', ccss: ['5.NBT.A.3a'], ee: [] },
     mult_mixed_int: { adds: 'real-world stories multiplying mixed numbers', ccss: ['5.NF.B.6'], ee: [] },
     volume_cubes: { adds: 'unit cube = one cubic unit; pack a prism and show layers × cubes = l × w × h = B × h; EE counting', ccss: ['5.MD.C.3a', '5.MD.C.3b', '5.MD.C.4', '5.MD.C.5a'], ee: ['M.EE.5.MD.4', 'M.EE.5.MD.5', 'M.EE.6.G.2'] },
-    negative_count: { adds: 'opposite directions and values (elevation, money, temperature) and the meaning of 0; write −3 °C > −7 °C', ccss: ['6.NS.C.5', '6.NS.C.7b'], ee: ['M.EE.6.NS.5', 'M.EE.6.NS.6', 'M.EE.6.NS.7', 'M.EE.6.NS.8'] },
     four_quadrants: { adds: 'signs name the quadrant; points that differ only by signs are reflections across an axis; distance across an axis with absolute value; draw a polygon from vertices', ccss: ['6.NS.C.6b', '6.NS.C.8', '6.G.A.3'], ee: [] },
     square_cube: { adds: 'write a repeated product as a power and evaluate it (6.EE.A.1)', ccss: ['6.EE.A.1'], ee: [] },
     formulae: { adds: 'formulas with powers (V = s³, A = 6s²) and fraction values', ccss: ['6.EE.A.2c'], ee: [] },
@@ -631,7 +630,7 @@ export const STANDARD_PROPOSALS = {
         problemTypes: ['|−30| = 30 describes the debt', 'which debt is greater?', 'which balance is less?', 'distance from 0 on a line'],
         templates: ['number-line'], newTemplates: [], answer: 'write the value; tick the statement',
         ladder: 'O2 integers → decimals · O3 number line → none · O6 line / story',
-        misconceptions: ['−40 > −30 because 40 > 30', 'absolute value makes a number negative'], wrmSteps: [], after: ['negative_count'],
+        misconceptions: ['−40 > −30 because 40 > 30', 'absolute value makes a number negative'], wrmSteps: [], after: [],
     }),
     gcf_distributive: P({
         kind: 'option', skill: 'number_theory:gcf_easy', option: 'task "write the sum as a product": 36 + 8 = 4 × (9 + 2)',

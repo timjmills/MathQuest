@@ -441,6 +441,9 @@ export const SKILL_WRM = {
     ],
     'integers:order_negatives': ['Y5.B13.S4', 'Y6.B1.S6', 'Y6.B1.S8'],
     'integers:integer_nl_drag': ['Y5.B13.S1'],
+    // Build lane operations, entry 1 (2026-09-26): count through zero in 1s and multiples,
+    // temperature below zero, the difference across zero.
+    'integers:count_through_zero': ['Y5.B13.S2', 'Y5.B13.S3', 'Y5.B13.S5'],
 
     // ---- number_ops_mixed
     'number_ops_mixed:word_problems_mixed': ['Y5.B5.S6', 'Y5.B5.S11', 'Y6.B2.S8', 'Y6.B2.S14'],
@@ -1754,16 +1757,6 @@ export const WRM_PROPOSALS = {
         representation: 'a task option on coordinate_all',
         family: 'geometry',
         steps: ['Y6.B13.S3'],
-    },
-
-    // ---- integers
-    negative_count: {
-        kind: 'new', skill: 'integers:count_through_zero',
-        name: 'Count Through Zero',
-        teaches: 'negative numbers in context (temperature), counting through zero in 1s and multiples, and the difference between a positive and a negative number',
-        representation: 'a vertical thermometer or number line; write the next numbers or the difference',
-        family: 'integers',
-        steps: ['Y5.B13.S2', 'Y5.B13.S3', 'Y5.B13.S5'],
     },
 
     // ---- measurement

@@ -3246,6 +3246,60 @@ for (const id of ['equiv_coin_sets', 'enough_money', 'money_compare']) _ap4Add(`
 _ap4Add('measurement:money_notation', { ..._ap4CoinsSetOut(), appliesTo: (cur) => cur.task !== 'words' });
 // ============================ end O6 · appearance: operations, clocks, money (AP4) ============
 
+// ============================ OPERATIONS BUILD LANE (design/BUILD_LIST.md, lane operations) ====
+// The new skills of the operations lane, in build order. Each panel is designed on the O1-O6
+// grid first (design/audit/OPTIONS-RUBRIC.md): a number-size ladder, a complexity control, a
+// support that fades hints (never structure) and an appearance choice. gen-ops-build.js reads
+// every value here and nowhere else.
+const OPS_BUILD_OPTIONS = {
+    // Entry 1 · Count Through Zero (6.NS.C.5, 6.NS.C.7b; WRM Y5 negative numbers).
+    'integers:count_through_zero': [
+        {
+            id: 'forms', label: 'What the pupil does', type: 'set', default: [0], group: 'difficulty',
+            values: [
+                { v: 0, l: 'Count through zero: write the missing numbers on the line (default)' },
+                { v: 1, l: 'Temperature: it gets warmer or colder, write the new temperature' },
+                { v: 2, l: 'How far apart: from a number below zero to one above it' },
+                { v: 3, l: 'Above and below zero: write the number with its sign (sea level, floors, money)' },
+                { v: 4, l: 'Warmer or colder: write < or > (−3 °C > −7 °C)' },
+            ],
+            // the generator-side filter and the verifier read each kind from its words (q.text)
+            match: ['through zero\\. Fill in', 'It gets \\d+ degrees? (warmer|colder)', 'How far is it from',
+                '(sea level|freezes|ground floor|no money)\\.', 'is (warmer|colder) than'],
+            allLabel: 'All five, mixed',
+            help: 'Tick one kind for a page of it, or several to mix them. The order is the teaching order: count through '
+                + 'zero first, then use it (temperature, how far apart), then the meaning of negative numbers and comparing them.',
+            helpShort: 'Count through zero, then temperature, how far apart, above and below, and comparing.',
+        },
+        {
+            id: 'step', label: 'Count in', type: 'set', default: [1], group: 'difficulty',
+            values: [{ v: 1, l: '1s (−3, −2, −1, 0, 1 …) (default)' }, { v: 2, l: '2s (−4, −2, 0, 2 …)' },
+                { v: 5, l: '5s (−10, −5, 0, 5 …)' }, { v: 10, l: '10s (−20, −10, 0, 10 …)' }],
+            allLabel: 'All four, mixed',
+            help: 'The step between two ticks. Every number on an item is a multiple of it: counting in 10s reaches −60, '
+                + 'a temperature in 5s falls 15 degrees. Tick several to mix the steps on one page.',
+            helpShort: 'The step between ticks; every number on the item is a multiple of it.',
+        },
+        {
+            id: 'ticks', label: 'Numbers on the line', type: 'enum', default: 'one', group: 'support',
+            values: [{ v: 'one', l: 'Every tick numbered (default)' }, { v: 'some', l: 'Every second tick numbered' },
+                { v: 'ends', l: 'Only the two ends, 0 and the given points' }],
+            help: 'A hint that fades: fewer printed numbers make the pupil count along the ticks. 0, the marked points and a '
+                + 'temperature\'s start are always numbered; the boxes the pupil writes in are never numbered.',
+            helpShort: 'Fewer printed numbers: the pupil counts along the ticks.',
+        },
+        {
+            id: 'orientation', label: 'The line', type: 'enum', default: 'horizontal', group: 'layout',
+            values: [{ v: 'horizontal', l: 'Across the page (default)' }, { v: 'vertical', l: 'Up and down, like a thermometer' }],
+            help: 'Up and down draws every line as a vertical scale (a thermometer for temperatures, with the grey column '
+                + 'up to the start): the numbers above zero are higher up. It is narrower, so more fit a page.',
+            helpShort: 'Across the page, or up and down like a thermometer.',
+        },
+    ],
+};
+Object.assign(SKILL_OPTIONS, OPS_BUILD_OPTIONS);
+// ============================ end OPERATIONS BUILD LANE =========================================
+
 // Options every skill understands, whether or not it declares anything of its own.
 export const UNIVERSAL_OPTIONS = [levelOption()];
 

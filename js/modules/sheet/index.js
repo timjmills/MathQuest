@@ -105,9 +105,11 @@ import './cells/area-model.js';
 import './cells/mult-chart.js';
 import './cells/ops-counters.js';
 import './cells/number-line.js';
+// Build lane operations (2026-09-26): a number line through zero, across or as a thermometer.
+import './cells/int-line.js';
 import './cells/family.js';
 export { factDigitTracks, factGridStyle, FACT_OP_TRACK_EM } from './cells/fact.js';
-export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'remainder', 'number-line', 'fact-family', 'cloze-bank'];
+export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'remainder', 'number-line', 'fact-family', 'cloze-bank', 'int-line'];
 
 
 // K-2 picture cells: counters, ten frame, base-10 mat, number bond, chart window, number track,

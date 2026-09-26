@@ -26,6 +26,8 @@ import './fractions.js';
 import './nl-place.js';
 // O6 lane AP2 round 3: thermometer, ruler, bar graph and perimeter (sheet/cells/figures.js).
 import './figures.js';
+// Build lane operations (2026-09-26): count_through_zero.
+import './integers.js';
 
 export { storiesFor, STORY_NOUNS, STORY_NAMES, STORY_TEMPLATES, nounFor } from './stories.js';
 export { columnAdd, lineSteps } from './addition.js';

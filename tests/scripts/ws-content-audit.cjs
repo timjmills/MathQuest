@@ -81,7 +81,9 @@ const FT_SKILLS = new Set(['function_table_easy', 'function_table_hard']);
 const CATS = [...OPS_CATS, ...K2_CATS, ...PV_FAMILY_CATS, ...FT_CATS, ...TM_CATS];
 // Skills audited outside the three families' categories: the number pattern skill of 2026-09-25
 // is held to its own rule (countByRules) with none of the families' name-readers.
-const EXTRA_SKILLS = new Map([['patterns:number_patterns_rule', 'patterns']]);
+const EXTRA_SKILLS = new Map([['patterns:number_patterns_rule', 'patterns'],
+    // Build lane operations (2026-09-26): the integer skills, each held to its own rule (intRules).
+    ['integers:count_through_zero', 'integers']]);
 const familyOf = cat => (OPS_CATS.includes(cat) ? 'operations' : PV_FAMILY_CATS.includes(cat) ? 'pv' : FT_CATS.includes(cat) ? 'ftable' : TM_CATS.includes(cat) ? 'tm' : 'k2');
 const FAMILY_CATS = { operations: OPS_CATS, k2: K2_CATS, pv: PV_FAMILY_CATS, ftable: FT_CATS, tm: TM_CATS };
 
@@ -626,6 +628,13 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm, opt
             if (Array.isArray(q.options) && q.options.some(o => o && typeof o === 'object' && 'correct' in o)) item.optCorrect = q.options.map(o => ({ label: String(o.label), correct: !!o.correct }));
             item.opts = q.skillOptions ? JSON.parse(JSON.stringify(q.skillOptions)) : null;
         }
+        // Build lane operations: a line through zero (int-line) carries its payload and q.ctz.
+        if (q.cell && q.cell.template === 'int-line') {
+            item.cellT = q.cell.template;
+            try { item.cellP = JSON.parse(JSON.stringify(q.cell.payload || {})); } catch (e) { item.cellP = {}; }
+            if (q.ctz) item.ctz = JSON.parse(JSON.stringify(q.ctz));
+            item.opts = q.skillOptions ? JSON.parse(JSON.stringify(q.skillOptions)) : null;
+        }
         if (q.cell && q.cell.template && ['counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic'].includes(q.cell.template)) {
             item.cellT = q.cell.template;
             try { item.cellP = JSON.parse(JSON.stringify(q.cell.payload || {})); } catch (e) { item.cellP = {}; }
@@ -958,6 +967,64 @@ function countByRules(items, F) {
     if (bad.pat.length) F('pattern-rule', `${bad.pat.length} patterns break their rule: ${show(bad.pat)}`);
     if (bad.grid.length) F('mult-grid', `${bad.grid.length} charts are keyed wrongly: ${show(bad.grid)}`);
     if (bad.hop.length) F('hop-line', `${bad.hop.length} number lines disagree with their sentence: ${show(bad.hop)}`);
+}
+
+/**
+ * Build lane operations (2026-09-26): integers:count_through_zero, "Count Through Zero". Every
+ * item's numbers are read from its drawn payload and recomputed here, independently of the
+ * generator: the line runs THROUGH zero in its step, the key is what the pupil writes, a
+ * temperature ends where its change says, a distance is counted across 0, a quantity below zero
+ * is negative, and a warmer / colder sentence is keyed > / <.
+ */
+const minusOf = (v) => (Number(v) < 0 ? `\u2212${Math.abs(Number(v))}` : String(v));
+function intRules(items, F) {
+    const live = items.filter(it => it && !it.error && !it.empty && it.cellT === 'int-line');
+    if (!live.length) return;
+    const bad = [];
+    const keyOf = (it) => (it.keyParts || String(it.ans).split(/\s*,\s*/)).map(String);
+    for (const it of live) {
+        const p = it.cellP || {};
+        const v = p.values || [];
+        const step = v.length > 1 ? v[1] - v[0] : 0;
+        if (!(step > 0) || v.some((x, i) => i && x - v[i - 1] !== step)) { bad.push(`ticks not evenly stepped: ${v.join(', ')}`); continue; }
+        if (!v.includes(0) || v[0] >= 0 || v[v.length - 1] <= 0) bad.push(`the line does not run through 0: ${v[0]} to ${v[v.length - 1]}`);
+        if (v.some((x) => x % step !== 0)) bad.push(`a tick is not a multiple of ${step}`);
+        const d = it.ctz || {};
+        if (p.kind === 'fill') {
+            const b = p.blanks || [];
+            if (!b.some((x) => x < 0) || !b.some((x) => x >= 0)) bad.push(`the boxes do not cross 0: ${b.join(', ')}`);
+            if (b.includes(v[0]) || b.includes(v[v.length - 1])) bad.push('an end of the line is a box');
+            const want = (p.orient === 'v' ? b.slice().reverse() : b).map(minusOf);
+            if (keyOf(it).join('|') !== want.join('|')) bad.push(`the key ${it.ans} is not the boxes ${want.join(', ')}`);
+        } else if (p.kind === 'temp') {
+            const end = p.start + p.change;
+            if (String(it.ans) !== minusOf(end)) bad.push(`${p.start} and ${p.change} ends at ${end}, keyed ${it.ans}`);
+            if (!((p.start > 0 && end <= 0) || (p.start < 0 && end >= 0))) bad.push(`the temperature does not cross or reach 0: ${p.start} to ${end}`);
+            if (!v.includes(p.start) || !v.includes(end)) bad.push('the start or the end is off the line');
+            const lines = (p.lines || []).join(' ');
+            if (!lines.includes(minusOf(p.start)) || !lines.includes(String(Math.abs(p.change)))
+                || !(p.change < 0 ? /colder/.test(lines) : /warmer/.test(lines))) bad.push(`the sentence does not say the change: ${lines}`);
+        } else if (p.kind === 'diff') {
+            if (!(p.a < 0 && p.b > 0)) bad.push(`not from a negative to a positive: ${p.a} to ${p.b}`);
+            if (Number(it.ans) !== p.b - p.a) bad.push(`from ${p.a} to ${p.b} keyed ${it.ans}`);
+        } else if (p.kind === 'write') {
+            const lines = (p.lines || []).join(' ');
+            const down = /below|down|loses/.test(lines), up = /above|up\b|makes/.test(lines);
+            if (down === up) bad.push(`the sentence names no one direction: ${lines}`);
+            if (!/\b0\b/.test(lines)) bad.push('the sentence does not say what 0 means');
+            if ((down && !(p.ans < 0)) || (up && !(p.ans > 0))) bad.push(`"${lines}" keyed ${it.ans}`);
+            if (String(it.ans) !== minusOf(p.ans)) bad.push(`the key ${it.ans} is not ${minusOf(p.ans)}`);
+        } else if (p.kind === 'compare') {
+            const lines = (p.lines || []).join(' ');
+            const warmer = /warmer/.test(lines);
+            const truth = warmer ? p.a > p.b : p.a < p.b;
+            if (!truth) bad.push(`the sentence is false: ${lines}`);
+            if (String(it.ans) !== (p.a > p.b ? '>' : '<')) bad.push(`${p.a} and ${p.b} keyed ${it.ans}`);
+            if (!(p.a < 0 || p.b < 0)) bad.push('neither temperature is below zero');
+        } else bad.push(`unknown kind ${p.kind}`);
+        if (d.kind && d.kind !== p.kind) bad.push('the item data and the drawing disagree on the kind');
+    }
+    if (bad.length) F('int-line', `${bad.length} lines through zero are wrong: ${[...new Set(bad)].slice(0, 4).join('; ')}`);
 }
 
 /**
@@ -1988,6 +2055,7 @@ function audit(skill, items) {
     if (id === 'number_bonds') bondRules(items, F);
     if (K2_PICTURE_SKILLS.has(id)) pictureRules(items, F);
     countByRules(items, F);
+    intRules(items, F);
 
     if (r.eqRemainder) NOTE('answer-floor', `${r.eqRemainder} of ${r.eqChecked} equations answer with the whole-number quotient and drop the remainder`);
 

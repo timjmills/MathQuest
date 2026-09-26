@@ -219,6 +219,13 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'read-ruler': 'Read the ruler. Write the number the arrow points to.',
     'add-sides': 'Add the lengths of all the sides. Write the perimeter.',
     tally: 'Use the tally chart. Answer the questions.',
+    // Build lane operations (2026-09-26): counting, reading and comparing through zero.
+    'line-fill': 'Write the missing numbers on the line.',
+    'temp-now': 'Read the sentence. Write the temperature now.',
+    'line-apart': 'Use the line. Write how far apart the numbers are.',
+    'sign-number': 'Read the sentence. Write the number with its sign.',
+    'sign-compare': 'Read the sentence. Write < or > in the circle.',
+    'line-each': 'Use the line. Write the answer in each box.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',

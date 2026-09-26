@@ -22,9 +22,9 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
+- Covered 516 (59%), partial only 148 (17%), gap 208 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 328 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 329 skills carry WRM tags. 161 proposals (119 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -33,9 +33,9 @@ Sources:
 | Year 2 | 1 | 11 | 124 | 80 (65%) | 18 | 26 |
 | Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
 | Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
-| Year 5 | 4 | 15 | 136 | 81 (60%) | 22 | 33 |
+| Year 5 | 4 | 15 | 136 | 84 (62%) | 21 | 31 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **513 (59%)** | **149** | **210** |
+| **All** | | **97** | **872** | **516 (59%)** | **148** | **208** |
 
 ## Source disagreements
 
@@ -322,12 +322,6 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
 - **Coordinates in Four Quadrants (option)** — option on `coordinates:coordinate_all`: problems. Teaches reading, plotting and solving problems with coordinates in four quadrants (missing vertices, midpoints). Representation: a task option on coordinate_all.  
   Closes (1): Y6.B13.S3 Solve problems with coordinates  
   _proposal id: four_quadrants_
-
-### integers (1 proposals, 3 steps)
-
-- **Count Through Zero** — new skill `integers:count_through_zero`. Teaches negative numbers in context (temperature), counting through zero in 1s and multiples, and the difference between a positive and a negative number. Representation: a vertical thermometer or number line; write the next numbers or the difference.  
-  Closes (3): Y5.B13.S2 Count through zero in 1s; Y5.B13.S3 Count through zero in multiples; Y5.B13.S5 Find the difference  
-  _proposal id: negative_count_
 
 ### measurement (39 proposals, 85 steps)
 
@@ -3282,18 +3276,18 @@ whatever happens to the WRM gaps.
 - **Y5.B13.S1** Understand negative numbers — covered. _6.NS.C.6, M.EE.6.NS.6_  
   Skills: Number Lines with Negatives (`integers:number_line_int`); Place Integers on a Number Line (`integers:integer_nl_drag`)  
   Vocabulary: negative, positive, scale, interval  
-- **Y5.B13.S2** Count through zero in 1s — GAP. _6.NS.C.6, M.EE.6.NS.6_  
-  Proposal: Count Through Zero  
+- **Y5.B13.S2** Count through zero in 1s — covered. _6.NS.C.6, M.EE.6.NS.6_  
+  Skills: Count Through Zero (`integers:count_through_zero`)  
   Vocabulary: negative, positive, count on  
-- **Y5.B13.S3** Count through zero in multiples — GAP. _6.NS.C.6, M.EE.6.NS.6_  
-  Proposal: Count Through Zero  
+- **Y5.B13.S3** Count through zero in multiples — covered. _6.NS.C.6, M.EE.6.NS.6_  
+  Skills: Count Through Zero (`integers:count_through_zero`)  
   Vocabulary: multiple, interval, mirror  
 - **Y5.B13.S4** Compare and order negative numbers — covered. _6.NS.C.7, M.EE.6.NS.7_  
   Skills: Comparing Integers (`integers:compare_int`); Order Integers: Least to Greatest (`integers:order_negatives`)  
   Vocabulary: greater than, less than, ascending, descending  
-- **Y5.B13.S5** Find the difference — PARTIAL. _6.NS.C.7, M.EE.6.NS.7_  
+- **Y5.B13.S5** Find the difference — covered. _6.NS.C.7, M.EE.6.NS.7_  
+  Skills: Count Through Zero (`integers:count_through_zero`)  
   Partial: Subtracting Integers (`integers:sub_int`), missing finding the difference between a positive and a negative number on a number line  
-  Proposal: Count Through Zero  
   Vocabulary: difference, negative, distance to zero  
 
 #### Y5.B14 Summer Block 5: Converting units

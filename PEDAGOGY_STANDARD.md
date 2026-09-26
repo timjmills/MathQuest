@@ -1322,6 +1322,12 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `tally` | Use the tally chart. Answer the questions. | read a tally chart: one box, or one check box for the row with the most / least (added 2026-09-25, O6 lane AP2) |
 | `default-write` | Solve. Write the answer. | default adapter: skills with no provider, number or text answer |
 | `default-circle` | Circle the answer. | default adapter: choice items |
+| `line-fill` | Write the missing numbers on the line. | count through zero: boxes under the ticks of a line (added 2026-09-26, build lane operations) |
+| `temp-now` | Read the sentence. Write the temperature now. | a temperature that rises or falls through zero |
+| `line-apart` | Use the line. Write how far apart the numbers are. | the distance from a negative number to a positive one |
+| `sign-number` | Read the sentence. Write the number with its sign. | a quantity above or below zero in a context (6.NS.C.5) |
+| `sign-compare` | Read the sentence. Write < or > in the circle. | "−3 °C is warmer than −7 °C": the order statement (6.NS.C.7b) |
+| `line-each` | Use the line. Write the answer in each box. | a page mixing the kinds above |
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |
 | `default-order` | Write the numbers in order. | default adapter: ordering items with no stated direction |
 | `default-solve` | Solve. | default adapter: any other answer type |

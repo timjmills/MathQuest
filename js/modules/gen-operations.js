@@ -7,6 +7,8 @@ import { createBase10Blocks, createCountingDots, createDotArray, createNumberLin
 import { COLORS, STROKE, FONTS, MONO, softFill, categoricalFill } from './design-tokens.js';
 import { optionsFor, normalizeOptions } from './skill-options.js';
 import { genCountByTables, genMultChart, genHopLine } from './gen-mult-patterns.js';
+// The operations lane's new skills (design/BUILD_LIST.md, lane operations) live in their own module.
+import { generateOpsBuild, OPS_BUILD_SKILLS } from './gen-ops-build.js';
 const _MP_SKILLS = new Set(['count_by_tables', 'mult_chart', 'mult_chart_easy', 'mult_chart_medium', 'mult_chart_hard', 'nl_mult', 'nl_div']);
 import { stripSegStyle, stripPos } from './sheet/tokens.js';
 import { renderCell as _kitRender, fadeRung, tickLabelSet, valueLineSVG, valueLineWindow, nlPlacePayload, nlPlaceAnswer, nlPlaceTwin } from './sheet/index.js';
@@ -2522,6 +2524,8 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
     const _selBand = (selected === 'add' || selected === 'subtract') ? Number(_opt('band')) : 0;
     const _genHelpers = _selBand ? { ...helpers, range: Math.min(Number(helpers.range) || _selBand, _selBand) } : helpers;
     let result;
+    // The operations lane's new skills (design/BUILD_LIST.md): one module reads their options.
+    if (OPS_BUILD_SKILLS[mappedSkill]) { generateOpsBuild(q, mappedSkill); return q; }
     // Count by 1-12, the multiplication chart and the x / ÷ number lines (gen-mult-patterns.js,
     // owner requests of 2026-09-25): one generator reads every option those skills declare.
     if (_MP_SKILLS.has(mappedSkill)) {
@@ -7056,6 +7060,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
 export function generateIntegersQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
+    // Build-lane skills (gen-ops-build.js): count_through_zero.
+    if (OPS_BUILD_SKILLS[mappedSkill]) { generateOpsBuild(q, mappedSkill); return q; }
 
             // Integers Category
             const intSkill = mappedSkill === "mixed" ? pick(["number_line_int", "compare_int", "add_int", "sub_int", "integer_nl_drag"]) : mappedSkill;

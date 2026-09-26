@@ -24,12 +24,12 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 601 live skills; 492 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 602 live skills; 493 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
-- **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
-- **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
+- **Full coverage: CCSS 77 of 177 standards FULL, 89 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 105 FULL, 90 PARTIAL, 22 GAP.
+- **Essential Elements: 85 of 117 FULL, 29 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 275 entries — 132 new skills, 88 options on existing skills, 2 repairs; 162 from the White Rose audit (42 of them extended to close standards clauses), 60 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+- The one build list: 274 entries — 131 new skills, 88 options on existing skills, 2 repairs; 161 from the White Rose audit (41 of them extended to close standards clauses), 60 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
@@ -39,8 +39,8 @@ Sources:
 | 3 | 12 / 13 / 0 of 25 (48% full) | 18 / 15 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
 | 4 | 14 / 13 / 1 of 28 (50% full) | 19 / 13 / 2 of 34 | 16 / 4 / 0 of 20 (80% full) | 27/28, 20/20 |
 | 5 | 10 / 14 / 2 of 26 (38% full) | 16 / 13 / 5 of 34 | 13 / 4 / 1 of 18 (72% full) | 24/26, 17/18 |
-| 6 | 7 / 19 / 3 of 29 (24% full) | 14 / 20 / 8 of 42 | 10 / 7 / 0 of 17 (59% full) | 26/29, 17/17 |
-| **All** | **76 / 90 / 11 of 177 (43% full)** | **103 / 92 / 22 of 217** | **81 / 33 / 3 of 117 (69% full)** | 166/177, 115/117 |
+| 6 | 8 / 18 / 3 of 29 (28% full) | 16 / 18 / 8 of 42 | 14 / 3 / 0 of 17 (82% full) | 26/29, 17/17 |
+| **All** | **77 / 89 / 11 of 177 (44% full)** | **105 / 90 / 22 of 217** | **85 / 29 / 3 of 117 (73% full)** | 166/177, 115/117 |
 
 ## Tag fixes made by this audit
 
@@ -393,13 +393,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 12 | **Percentages: Multi-Step and Missing Values (option)** (`percent_multi`) | option on `conversions:percent_of_number` | - | 1 |
 | 13 | **Ratio and Fractions (option)** (`ratio_fraction`) | option on `conversions:ratio_intro` | - | 1 |
 
-### Integers (2)
-
-| # | Entry | Kind | Closes standards | Closes WRM steps |
-|---|---|---|---|---|
-| 1 | **Count Through Zero** (`negative_count`) | new `integers:count_through_zero` | 6.NS.C.5, 6.NS.C.7b, M.EE.6.NS.5, M.EE.6.NS.6, M.EE.6.NS.7, M.EE.6.NS.8 | 3 |
-| 2 | **Absolute Value in Context (option)** (`abs_context`) | option on `integers:abs_value` | 6.NS.C.7c, 6.NS.C.7d | - |
-
 ### Number theory (5)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
@@ -419,6 +412,12 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 3 | **Ratio Tables: Plot and Compare (option)** (`ratio_table_plot`) | option on `conversions:ratio_tables` | 6.RP.A.3a | - |
 | 4 | **Fraction Unit Rates (option)** (`unit_rate_fraction`) | option on `conversions:unit_rate_intro` | 6.RP.A.2 | - |
 | 5 | **Ratio and Proportion Problems** (`ratio_problems`) | new `conversions:ratio_problems_bar` | - | 1 |
+
+### Integers (1)
+
+| # | Entry | Kind | Closes standards | Closes WRM steps |
+|---|---|---|---|---|
+| 1 | **Absolute Value in Context (option)** (`abs_context`) | option on `integers:abs_value` | 6.NS.C.7c, 6.NS.C.7d | - |
 
 ## Not fully covered, level by level
 
@@ -910,18 +909,10 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught in part by: Greatest Common Factor (Easy) (`number_theory:gcf_easy`); Greatest Common Factor (Hard) (`number_theory:gcf_hard`); Least Common Multiple (`number_theory:lcm`)  
   Missing: the distributive property to write a sum as the GCF × a sum (36 + 8 = 4 × (9 + 2))  
   Build: Factor a Sum With the GCF (option) (`gcf_distributive`)
-- **6.NS.C.5** — PARTIAL. Understand that positive and negative numbers are used together to describe quantities having opposite directions or values (e.g., temperature above/below zero, elevation above/below sea level, credits/debits, positive/negative electric charge); use positive and negative numbers to represent quantities in real-world contexts, explaining the meaning of 0 in each situation.  
-  Taught in part by: Number Lines with Negatives (`integers:number_line_int`)  
-  Missing: positive and negative numbers for opposite directions and values in real contexts, and the meaning of 0  
-  Build: Count Through Zero (`negative_count`)
 - **6.NS.C.6b** — PARTIAL. Understand signs of numbers in ordered pairs as indicating locations in quadrants of the coordinate plane; recognize that when two ordered pairs differ only by signs, the locations of the points are related by reflections across one or both axes.  
   Taught in part by: Coordinates (All 4 Quadrants) (`coordinates:coordinate_all`)  
   Missing: the signs of the coordinates name the quadrant; points that differ only by signs are reflections across an axis  
   Build: Coordinates in Four Quadrants (option) (`four_quadrants`)
-- **6.NS.C.7b** — PARTIAL. Write, interpret, and explain statements of order for rational numbers in real-world contexts. For example, write –3 °C > –7 °C to express the fact that –3 °C is warmer than –7 °C.  
-  Taught in part by: Comparing Integers (`integers:compare_int`); Order Integers: Least to Greatest (`integers:order_negatives`)  
-  Missing: write and explain order statements in real-world contexts (−3 °C > −7 °C)  
-  Build: Count Through Zero (`negative_count`)
 - **6.NS.C.7c** — PARTIAL. Understand the absolute value of a rational number as its distance from 0 on the number line; interpret absolute value as magnitude for a positive or negative quantity in a real-world situation. For example, for an account balance of –30 dollars, write |–30| = 30 to describe the size of the debt in dollars.  
   Taught in part by: Absolute Value (`integers:abs_value`)  
   Missing: absolute value as a magnitude in a real-world situation (a debt)  
@@ -996,22 +987,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught in part by: Compare Fractions (>, <, =) (`fractions:compare`)  
   Missing: compare two unit fractions (the skill does not target them)  
   Build: Compare Fractions by Numerator (option) (`compare_numerator`)
-- **M.EE.6.NS.5** — PARTIAL. Describe quantities having opposite directions or values as positive and negative numbers (e.g., temperature above/below zero).  
-  Taught in part by: Number Lines with Negatives (`integers:number_line_int`)  
-  Missing: describe quantities with opposite directions or values (temperature above / below zero) as positive and negative  
-  Build: Count Through Zero (`negative_count`)
-- **M.EE.6.NS.6** — PARTIAL. Describe quantities having opposite directions or values as positive and negative numbers (e.g., temperature above/below zero).  
-  Taught in part by: Number Lines with Negatives (`integers:number_line_int`)  
-  Missing: describe quantities with opposite directions or values as positive and negative  
-  Build: Count Through Zero (`negative_count`)
-- **M.EE.6.NS.7** — PARTIAL. Describe quantities having opposite directions or values as positive and negative numbers (e.g., temperature above/below zero).  
-  Taught in part by: Number Lines with Negatives (`integers:number_line_int`)  
-  Missing: describe quantities with opposite directions or values as positive and negative  
-  Build: Count Through Zero (`negative_count`)
-- **M.EE.6.NS.8** — PARTIAL. Describe quantities having opposite directions or values as positive and negative numbers (e.g., temperature above/below zero).  
-  Taught in part by: Number Lines with Negatives (`integers:number_line_int`)  
-  Missing: describe quantities with opposite directions or values as positive and negative  
-  Build: Count Through Zero (`negative_count`)
 - **M.EE.6.EE.3** — PARTIAL. Apply the properties of addition to identify equivalent numerical expressions.  
   Taught in part by: Addition Fact Families (`addition:add_sub_fact_family`)  
   Missing: identify equivalent numerical expressions using the properties of addition  
@@ -1778,9 +1753,8 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Missing: the distributive property to write a sum as the GCF × a sum (36 + 8 = 4 × (9 + 2)) → `gcf_distributive`  
 *C. Apply and extend previous understandings of numbers to the system of rational numbers.*
 
-- **6.NS.C.5** — PARTIAL. Understand that positive and negative numbers are used together to describe quantities having opposite directions or values (e.g., temperature above/below zero, elevation above/below sea level, credits/debits, positive/negative electric charge); use positive and negative numbers to represent quantities in real-world contexts, explaining the meaning of 0 in each situation.  
-  In part: Number Lines with Negatives (`integers:number_line_int`)  
-  Missing: positive and negative numbers for opposite directions and values in real contexts, and the meaning of 0 → `negative_count`  
+- **6.NS.C.5** — FULL. Understand that positive and negative numbers are used together to describe quantities having opposite directions or values (e.g., temperature above/below zero, elevation above/below sea level, credits/debits, positive/negative electric charge); use positive and negative numbers to represent quantities in real-world contexts, explaining the meaning of 0 in each situation.  
+  Taught by: Number Lines with Negatives (`integers:number_line_int`); Count Through Zero (`integers:count_through_zero`) — count_through_zero: above / below zero in four contexts (sea level, temperature, floors, money), each with what 0 means  
 - **6.NS.C.6** — PARTIAL (from its parts). Understand a rational number as a point on the number line. Extend number line diagrams and coordinate axes familiar from previous grades to represent points on the line and in the plane with negative number coordinates.  
   Not FULL because of its lettered parts.  
 -   **6.NS.C.6a** — FULL. Recognize opposite signs of numbers as indicating locations on opposite sides of 0 on the number line; recognize that the opposite of the opposite of a number is the number itself, e.g., –(–3) = 3, and that 0 is its own opposite.  
@@ -1790,14 +1764,14 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Missing: the signs of the coordinates name the quadrant; points that differ only by signs are reflections across an axis → `four_quadrants`  
 -   **6.NS.C.6c** — FULL. Find and position integers and other rational numbers on a horizontal or vertical number line diagram; find and position pairs of integers and other rational numbers on a coordinate plane.  
   Taught by: Number Lines with Negatives (`integers:number_line_int`); Place Integers on a Number Line (`integers:integer_nl_drag`); Coordinates (All 4 Quadrants) (`coordinates:coordinate_all`); Order Rationals on a Number Line (`integers:ordering_rationals`)  
+  Also tagged: `integers:count_through_zero`
 - **6.NS.C.7** — PARTIAL (from its parts). Understand ordering and absolute value of rational numbers.  
   Not FULL because of its lettered parts.  
 -   **6.NS.C.7a** — FULL. Interpret statements of inequality as statements about the relative position of two numbers on a number line diagram. For example, interpret –3 > –7 as a statement that –3 is located to the right of –7 on a number line oriented from left to right.  
   Taught by: Comparing Integers (`integers:compare_int`); Order Integers: Least to Greatest (`integers:order_negatives`)  
-  Also tagged: `integers:ordering_rationals`, `conversions:order_fdp`
--   **6.NS.C.7b** — PARTIAL. Write, interpret, and explain statements of order for rational numbers in real-world contexts. For example, write –3 °C > –7 °C to express the fact that –3 °C is warmer than –7 °C.  
-  In part: Comparing Integers (`integers:compare_int`); Order Integers: Least to Greatest (`integers:order_negatives`)  
-  Missing: write and explain order statements in real-world contexts (−3 °C > −7 °C) → `negative_count`  
+  Also tagged: `integers:ordering_rationals`, `integers:count_through_zero`, `conversions:order_fdp`
+-   **6.NS.C.7b** — FULL. Write, interpret, and explain statements of order for rational numbers in real-world contexts. For example, write –3 °C > –7 °C to express the fact that –3 °C is warmer than –7 °C.  
+  Taught by: Comparing Integers (`integers:compare_int`); Order Integers: Least to Greatest (`integers:order_negatives`); Count Through Zero (`integers:count_through_zero`) — count_through_zero: "−3 °C is warmer than −7 °C" written as −3 °C > −7 °C  
 -   **6.NS.C.7c** — PARTIAL. Understand the absolute value of a rational number as its distance from 0 on the number line; interpret absolute value as magnitude for a positive or negative quantity in a real-world situation. For example, for an account balance of –30 dollars, write |–30| = 30 to describe the size of the debt in dollars.  
   In part: Absolute Value (`integers:abs_value`)  
   Missing: absolute value as a magnitude in a real-world situation (a debt) → `abs_context`  
@@ -2147,18 +2121,14 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught by: Division Word Problems (`division:div_word_problems`); Make Equal Groups to Divide (Visual) (`division:share_into_groups`)  
 - **M.EE.6.NS.3** — FULL. Use the meaning of multiplication and the properties of operations (e.g., the distributive property) to develop and understand strategies to find products with multiples of 3, 4, and 9 within 100. (CCSS 6.NS.B.3)  
   Taught by: Multiplication Facts (1-12) (`multiplication:mult_facts`) — constant 3, 4, 9  
-- **M.EE.6.NS.5** — PARTIAL. Describe quantities having opposite directions or values as positive and negative numbers (e.g., temperature above/below zero). (CCSS 6.NS.C.5)  
-  In part: Number Lines with Negatives (`integers:number_line_int`)  
-  Missing: describe quantities with opposite directions or values (temperature above / below zero) as positive and negative → `negative_count`
-- **M.EE.6.NS.6** — PARTIAL. Describe quantities having opposite directions or values as positive and negative numbers (e.g., temperature above/below zero). (CCSS 6.NS.C.6)  
-  In part: Number Lines with Negatives (`integers:number_line_int`)  
-  Missing: describe quantities with opposite directions or values as positive and negative → `negative_count`
-- **M.EE.6.NS.7** — PARTIAL. Describe quantities having opposite directions or values as positive and negative numbers (e.g., temperature above/below zero). (CCSS 6.NS.C.7)  
-  In part: Number Lines with Negatives (`integers:number_line_int`)  
-  Missing: describe quantities with opposite directions or values as positive and negative → `negative_count`
-- **M.EE.6.NS.8** — PARTIAL. Describe quantities having opposite directions or values as positive and negative numbers (e.g., temperature above/below zero). (CCSS 6.NS.C.8)  
-  In part: Number Lines with Negatives (`integers:number_line_int`)  
-  Missing: describe quantities with opposite directions or values as positive and negative → `negative_count`
+- **M.EE.6.NS.5** — FULL. Describe quantities having opposite directions or values as positive and negative numbers (e.g., temperature above/below zero). (CCSS 6.NS.C.5)  
+  Taught by: Number Lines with Negatives (`integers:number_line_int`); Count Through Zero (`integers:count_through_zero`) — temperature above / below zero written as positive and negative  
+- **M.EE.6.NS.6** — FULL. Describe quantities having opposite directions or values as positive and negative numbers (e.g., temperature above/below zero). (CCSS 6.NS.C.6)  
+  Taught by: Number Lines with Negatives (`integers:number_line_int`); Count Through Zero (`integers:count_through_zero`) — opposite directions (up / down, makes / loses) as positive and negative  
+- **M.EE.6.NS.7** — FULL. Describe quantities having opposite directions or values as positive and negative numbers (e.g., temperature above/below zero). (CCSS 6.NS.C.7)  
+  Taught by: Number Lines with Negatives (`integers:number_line_int`); Count Through Zero (`integers:count_through_zero`) — opposite directions (up / down, makes / loses) as positive and negative  
+- **M.EE.6.NS.8** — FULL. Describe quantities having opposite directions or values as positive and negative numbers (e.g., temperature above/below zero). (CCSS 6.NS.C.8)  
+  Taught by: Number Lines with Negatives (`integers:number_line_int`); Count Through Zero (`integers:count_through_zero`) — opposite directions (up / down, makes / loses) as positive and negative  
 - **M.EE.6.EE.1-2** — FULL. Evaluate if an equation is true. (CCSS 6.EE.A.1)  
   Taught by: Compare Expressions (=, ≠, <, >) (`order_of_operations:compare_expressions`); Inequalities (>, <, ≥, ≤) (`algebra:inequalities`) — true / false sorts of equations and inequalities  
 - **M.EE.6.EE.3** — PARTIAL. Apply the properties of addition to identify equivalent numerical expressions. (CCSS 6.EE.A.3)  

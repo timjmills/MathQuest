@@ -127,6 +127,7 @@ export const SKILL_GRADES = {
     'missing_factor_or_addend': 3,  // 3.OA.A.4 — determine the unknown in an equation
     // Integers
     'number_line_int': 6, 'compare_int': 6, 'add_int': 6, 'sub_int': 6,
+    'count_through_zero': 4,
     // Fraction Operations
     'add_fractions_like': 4, 'sub_fractions_like': 4, 'add_mixed_like': 4, 'sub_mixed_like': 4,
     'mult_frac_whole': 4, 'decompose_fractions': 4, 'frac_word_problems': 4, 'frac_word_problems_plain': 4, 'frac_10_100': 4,
@@ -796,6 +797,9 @@ export const SKILLS = {
         { v: "abs_value", l: "Absolute Value" },
         { v: "opposite_numbers", l: "Opposites of Integers" },
         { v: "ordering_rationals", l: "Order Rationals on a Number Line" },
+        // APPENDED 2026-09-26 (build list, lane operations, entry 1): count, read and compare
+        // through zero on a line or a thermometer (6.NS.5, 6.NS.7b; WRM Y5 negative numbers).
+        { v: "count_through_zero", l: "Count Through Zero" },
     ],
     number_ops_mixed: [
         { v: "mixed", l: "All Four Operations (+ − × ÷)" },
@@ -1664,7 +1668,7 @@ export const SKILL_TIME_CATEGORY = {
     sub_1m_no_regroup: "quick", sub_1m_regroup: "quick", sub_1m_mixed: "quick",
     // Basic operations & arithmetic
     add_decimal: "quick", sub_decimal: "quick", mult_decimal: "quick", div_decimal: "quick",
-    add_int: "quick", sub_int: "quick",
+    add_int: "quick", sub_int: "quick", count_through_zero: "quick",
     missing_add_sub: "quick", missing_mult_div: "quick",
     // Reusable primitive demos
     cloze_addition: "quick", hotspot_quads: "quick",
@@ -1883,7 +1887,7 @@ export const SKILL_PRINT_SIZE = {
     estimate_sums_diffs: "standard", estimate_products: "standard", estimate_quotient: "standard",
     make_a_ten: "medium", doubles_near_doubles: "medium", compensation: "medium",
     expand: "medium", combine: "medium",
-    add_int: "standard", sub_int: "standard", number_line_int: "standard",
+    add_int: "standard", sub_int: "standard", number_line_int: "standard", count_through_zero: "wide",
     solve_unknown: "standard", evaluate_expression: "standard",
     write_expression: "standard", inequalities: "standard",
     build_expr_addsub: "wide", build_expr_multdiv: "wide",

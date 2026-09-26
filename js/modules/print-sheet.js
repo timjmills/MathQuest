@@ -1210,7 +1210,9 @@ function skillMeta(sk, q) {
         const span = spanGrades(sk);
         if (span.length) { meta.grades = span; meta.grade = span[0]; }
     }
-    const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, { skillId: nameId }));
+    // The skill's options travel with it (a provider's title and instruction may follow them:
+    // count_through_zero's kinds, number_patterns_rule's rule).
+    const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, { skillId: nameId, opts: sk.opts || {} }));
     meta.iCan = sk.iCan || optionTitle(sk, words.iCan) || words.iCan;
     meta.instructionKey = q ? instructionKeyFor(q, words) : words.instructionKey;
     return meta;

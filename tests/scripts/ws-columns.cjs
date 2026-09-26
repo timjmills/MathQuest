@@ -32,6 +32,9 @@ const ONE_COLUMN = {
     wordpic: { cols: 1, why: 'a K picture word problem is a full-width story with its pictures and work box (PT-WPR-1)' },
     'number-line': { cols: 1, why: 'a number line needs the full width for 1 cm ticks and labels (RP number-line minimums)' },
     'hop-line': { cols: 1, why: 'a hop line needs the full width for its arcs and tick labels' },
+    // Build lane operations (2026-09-26): the default line runs ACROSS with a writing box under
+    // its ticks; the skill's "The line: up and down" option prints the same line 2-4 across.
+    'int-line': { cols: 1, why: 'a line through zero across the page holds seven 14 mm+ writing boxes under its ticks (a full-width cell); its up-and-down form prints 2-4 across' },
     timeline: { cols: 1, why: 'an elapsed-time line needs the full width for its hour ticks and hops' },
     // O6 lane AP2 round 3 (critic round 4): WORKSHEET_DESIGN_STANDARD.md section 11.2 gives the
     // ruler and the graph plot one column each, and RP-133 keeps a graph and its question in one cell.

@@ -248,6 +248,9 @@ export const SKILL_STANDARDS = {
     'integers:abs_value': { ccss: ['6.NS.C.7c'], ee: ['M.EE.6.NS.7'] }, // Absolute Value
     'integers:opposite_numbers': { ccss: ['6.NS.C.6a'], ee: ['M.EE.6.NS.6'] }, // Opposites of Integers
     'integers:ordering_rationals': { ccss: ['6.NS.C.7a', '6.NS.C.6c'], ee: ['M.EE.6.NS.7', 'M.EE.6.NS.6'] }, // Order Rationals on a Number Line
+    // Build lane operations, entry 1 (2026-09-26): count through zero, temperature, how far apart,
+    // above / below zero with what 0 means (6.NS.5), and warmer / colder as < or > (6.NS.7b).
+    'integers:count_through_zero': { ccss: ['6.NS.C.5', '6.NS.C.6c', '6.NS.C.7b', '6.NS.C.7a'], ee: ['M.EE.6.NS.5', 'M.EE.6.NS.6', 'M.EE.6.NS.7', 'M.EE.6.NS.8'] }, // Count Through Zero
 
     // ---- number_ops_mixed
     'number_ops_mixed:mixed': { ccss: [], ee: [], pool: true }, // All Four Operations (+ − × ÷)
