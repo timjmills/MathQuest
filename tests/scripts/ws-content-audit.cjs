@@ -629,6 +629,10 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm, opt
             item.opts = q.skillOptions ? JSON.parse(JSON.stringify(q.skillOptions)) : null;
         }
         // Build lane operations: a line through zero (int-line) carries its payload and q.ctz.
+        if (q.cell && q.cell.template === 'share-plates') {
+            item.cellT = q.cell.template;
+            try { item.cellP = JSON.parse(JSON.stringify(q.cell.payload || {})); } catch (e) { item.cellP = {}; }
+        }
         if (q.cell && q.cell.template === 'int-line') {
             item.cellT = q.cell.template;
             try { item.cellP = JSON.parse(JSON.stringify(q.cell.payload || {})); } catch (e) { item.cellP = {}; }
@@ -1025,6 +1029,36 @@ function intRules(items, F) {
         if (d.kind && d.kind !== p.kind) bad.push('the item data and the drawing disagree on the kind');
     }
     if (bad.length) F('int-line', `${bad.length} lines through zero are wrong: ${[...new Set(bad)].slice(0, 4).join('; ')}`);
+}
+
+/**
+ * Build lane operations (2026-09-26): division:share_and_group_early, "Share and Make Groups". From
+ * the drawn payload alone: a share shares equally (n a multiple of the plates, keyed n / k), a
+ * group of k divides n, a left-over share keys n / k and n % k with something really left, and a
+ * fair / not fair item keys what its plates show.
+ */
+function shareRules(items, F) {
+    const live = items.filter(it => it && !it.error && !it.empty && it.cellT === 'share-plates');
+    if (!live.length) return;
+    const bad = [];
+    for (const it of live) {
+        const p = it.cellP || {};
+        const n = Number(p.n), k = Number(p.k);
+        const ans = String(it.ans);
+        if (p.kind === 'share' || p.kind === 'group') {
+            if (!(k >= 2) || n % k !== 0) bad.push(`${n} does not share into ${k}`);
+            if (ans !== String(n / k)) bad.push(`${n} / ${k} keyed ${ans}`);
+        } else if (p.kind === 'left') {
+            if (n % k === 0) bad.push(`${n} between ${k} leaves nothing over`);
+            if (ans.replace(/\s/g, '') !== `${Math.floor(n / k)},${n % k}`) bad.push(`${n} between ${k} keyed ${ans}`);
+        } else if (p.kind === 'fair') {
+            const sh = p.shown || [];
+            const fair = sh.length > 1 && sh.every(v => v === sh[0]);
+            if (ans !== (fair ? 'Fair' : 'Not fair')) bad.push(`plates ${sh.join(', ')} keyed ${ans}`);
+            if (sh.reduce((a, b) => a + b, 0) !== n) bad.push('the plates do not hold n');
+        } else bad.push(`unknown kind ${p.kind}`);
+    }
+    if (bad.length) F('share-plates', `${bad.length} shares are wrong: ${[...new Set(bad)].slice(0, 4).join('; ')}`);
 }
 
 /**
@@ -2056,6 +2090,7 @@ function audit(skill, items) {
     if (K2_PICTURE_SKILLS.has(id)) pictureRules(items, F);
     countByRules(items, F);
     intRules(items, F);
+    shareRules(items, F);
 
     if (r.eqRemainder) NOTE('answer-floor', `${r.eqRemainder} of ${r.eqChecked} equations answer with the whole-number quotient and drop the remainder`);
 

@@ -319,7 +319,7 @@ one-to-one.
 | R51 | Equal / unequal groups in containers; finish drawing equal groups | B9 S4–S5, S8 | R37 | MATCH / PARTIAL | `equal_or_unequal_groups`, `template:arrays` groups; `task: 'complete'` GAP |
 | R52 | Arrays (rows / columns; not-an-array; finish an array) | B9 S6 | R38 | MATCH | `template:arrays`, `arrays_groups`, `dot_array_mult`; finish-the-array GAP (low) |
 | R53 | Grouping: ring runs of the group size | B9 S8 | R40 | MATCH | counters `share` (`division:share_into_groups`) |
-| R54 | Sharing into drawn empty containers (plates, boxes, rings) | B9 S9; B10 S3–S4, S8 | R40 (part) | GAP | counters kind `share-into` |
+| R54 | Sharing into drawn empty containers (plates, boxes, rings) | B9 S9; B10 S3–S4, S8 | R40 (part) | MATCH | `template:share-plates` (`division:share_and_group_early`: plates or rings) |
 | R55 | Halves / quarters of a shape: equal or not; shade; draw the cut; draw the other half | B10 S1–S2, S5–S6 | R53 | PARTIAL | frac-model `model` (shade / identify MATCH); `partition_shapes` legacy; `fraction-shape` `equal`, `task: 'cut' \| 'complete-half'` GAP |
 | R56 | Half / quarter of a set (plates, rings, arrays; shade half of a row) | B10 S3–S4, S7–S8 | R57 | PARTIAL | `fraction_of_set`, `patterns:halve` (legacy); counters `share-into` k = 2 / 4 and `shade-part` GAP |
 | R57 | Bar in 2 or 4 equal parts with counters in each part (whole above or "?") | B10 S7–S8 | R27 | GAP | `model: 'bar'` + `fill: 'counters'` on fraction_of_set |

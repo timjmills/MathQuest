@@ -144,7 +144,6 @@ export const WRM_EXTENSIONS = {
     length_ops: { adds: 'EE level: make a cube train longer or shorter by adding or taking units; Grade 4 lengths with fractions/decimals and a unit change', ccss: ['2.MD.B.5', '4.MD.A.2'], ee: ['M.EE.2.MD.5'] },
     mass_ops: { adds: 'Grade 4 word problems with simple fractions or decimals and a larger-to-smaller unit change', ccss: ['3.MD.A.2', '4.MD.A.2'], ee: [] },
     mass_scales: { adds: 'EE level: which tool measures it (scale, jug, ruler)?', ccss: ['3.MD.A.2'], ee: ['M.EE.3.MD.2'] },
-    share_group: { adds: 'share an even number of objects equally between two groups (EE 2.OA.3), to 20', ccss: [], ee: ['M.EE.2.OA.3'] },
     mult_three: { adds: 'show that (3 × 5) × 2 = 3 × (5 × 2) as a strategy (associative property)', ccss: ['3.OA.B.5'], ee: [] },
     frac_count: { adds: 'locate 4/4 and 1 (and 6/3 and 2) at the same point', ccss: ['3.NF.A.3c'], ee: [] },
     frac_nl_equiv: { adds: 'Grade 3 level (halves, quarters, eighths) for 3.NF.A.3a, not only Year 6', ccss: ['3.NF.A.3a'], ee: [] },

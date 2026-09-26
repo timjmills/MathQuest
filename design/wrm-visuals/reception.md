@@ -314,8 +314,8 @@ adds the **drawing** each one needs.
 | R39 | Doubles: two identical groups (two dice, hands the same, mirrored spots, butterfly wings); double / not a double | B9 S7–S8; B11 S11–S12; B16 S6 | PARTIAL | `doubles_near_doubles` (legacy (C)), `patterns:double` (text); `pane:dice` / `pane:fingers` pairs → kit double / not-a-double cell |
 | R40 | Caterpillar board (numbered circles in a row) | B9 S7; B16 S6 | MATCH | `seqstrip` `circle` tiles |
 | R41 | Pairs for odd / even (socks, animals, cubes in pairs; one left over) | B9 S6; B11 S13; B16 S5 | PARTIAL | `composing:odd_even` (legacy (C)) → `layout: 'pairs'` on `template:counters` |
-| R42 | Sharing onto plates (dealt; fair / unfair; leftovers) | B16 S1–S2, S5 | GAP | proposed `division:share_and_group_early` (outline plates) |
-| R43 | Grouping into containers of a stated size | B16 S3–S4 | PARTIAL | `template:counters` `share` (`share_into_groups`, runs to ring; grade 3, to 20) (≈ Y3 R40) |
+| R42 | Sharing onto plates (dealt; fair / unfair; leftovers) | B16 S1–S2, S5 | MATCH | `template:share-plates` (`division:share_and_group_early`: share, fair / not fair, left over; plates or rings) |
+| R43 | Grouping into containers of a stated size | B16 S3–S4 | MATCH | `template:share-plates` `group` (`division:share_and_group_early`: groups of 2-5 to 10, 20, 30); also `template:counters` `share` (`share_into_groups`) |
 | R44 | Zero / empty set (empty plate, bare tree, empty bus, empty frame, blank card) | B7 S1–S3 | GAP | proposed `counting:zero_none` |
 | R45 | First–then–now story pictures (join / take away) | B14 S1–S4; B9 S9 | MATCH / PARTIAL | `template:wordpic` (`add_wp_10`), `counters` `join` / `takeaway`; change-unknown GAP (`unknown: 'change'`) |
 | R46 | Hidden part (under a bowl / cloth / blanket; fingers show it) | B3 S6; B5 S7; B11 S4; B14 S1 | GAP | a covered-part mark (outline "cloth" box with ?) on bond / counters |

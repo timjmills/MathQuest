@@ -240,6 +240,46 @@ const COUNTBY_MAKERS = {
     },
 };
 Object.assign(ITEM_MAKERS, COUNTBY_MAKERS);
+// Build lane operations (2026-09-26): the new skills, in the shapes js/modules/gen-ops-build.js emits.
+const MINUS = (v) => (v < 0 ? `\u2212${-v}` : String(v));
+const OPS_BUILD_MAKERS = {
+    'integers:count_through_zero': (r) => {
+        const kind = pick(r, ['fill', 'temp', 'diff', 'write', 'compare']);
+        const s = pick(r, [1, 2, 5, 10]);
+        const orient = pick(r, ['h', 'v']);
+        if (kind === 'fill') {
+            const o = int(r, 2, 4);
+            const values = Array.from({ length: 7 }, (_, i) => (i - o) * s);
+            const blanks = [values[o - 1], values[o], values[o + 2]];
+            const parts = (orient === 'v' ? blanks.slice().reverse() : blanks).map(MINUS);
+            return { ans: parts.join(', '), keyParts: parts, text: `Count in ${s}s through zero.`, ctz: { kind, step: s, values, blanks, orient } };
+        }
+        if (kind === 'temp') {
+            const fall = int(r, 0, 1) === 1; const a = int(r, 1, 3) * s, b = int(r, 0, 3) * s;
+            const start = fall ? a : -a, end = fall ? -b : b;
+            return { ans: MINUS(end), text: `It is ${MINUS(start)} °C.`, ctz: { kind, step: s, start, change: end - start, end } };
+        }
+        if (kind === 'diff') { const a = -int(r, 1, 4) * s, b = int(r, 1, 4) * s; return { ans: String(b - a), text: `How far is it from ${MINUS(a)} to ${b}?`, ctz: { kind, step: s, a, b } }; }
+        if (kind === 'write') { const down = int(r, 0, 1) === 1; const v = (down ? -1 : 1) * int(r, 1, 6) * s; return { ans: MINUS(v), text: '0 m is sea level.', ctz: { kind, step: s, value: v, down, unit: 'm' } }; }
+        const warmer = int(r, 0, 1) === 1; const x = -int(r, 1, 6) * s; let y = int(r, 0, 5) * s;
+        const [a, b] = warmer ? [Math.max(x, y), Math.min(x, y)] : [Math.min(x, y), Math.max(x, y)];
+        return { ans: warmer ? '>' : '<', text: `${MINUS(a)} °C is ${warmer ? 'warmer' : 'colder'} than ${MINUS(b)} °C.`, ctz: { kind, step: s, a, b, warmer } };
+    },
+    'division:share_and_group_early': (r) => {
+        const kind = pick(r, ['share', 'group', 'fair', 'left']);
+        const look = pick(r, ['plates', 'rings']);
+        if (kind === 'fair') {
+            const k = int(r, 2, 3), m = int(r, 1, 5), fair = int(r, 0, 1) === 1;
+            const shown = Array(k).fill(m); if (!fair) shown[0] = m + 1;
+            return { ans: fair ? 'Fair' : 'Not fair', text: 'Are the counters shared fairly?', share: { kind, k, shown, fair } };
+        }
+        const k = int(r, 2, 4);
+        if (kind === 'left') { const n = k * int(r, 1, 4) + int(r, 1, k - 1); return { ans: `${Math.floor(n / k)}, ${n % k}`, keyParts: [String(Math.floor(n / k)), String(n % k)], text: `Share ${n} counters.`, share: { kind, n, k, look } }; }
+        const n = k * int(r, 2, 5);
+        return { ans: n / k, text: `Share ${n} counters.`, share: { kind, n, k, look } };
+    },
+};
+Object.assign(ITEM_MAKERS, OPS_BUILD_MAKERS);
 
 /* ============================================================ skill-specific phrasing */
 
@@ -529,6 +569,7 @@ for (const key of Object.keys(SIBLINGS)) checkSkill(key, { requireStories: /_wp_
 // P10 time + money: every provider, both of its item shapes.
 for (const key of TM_PROVIDER_SKILLS) checkSkill(key);
 for (const key of Object.keys(COUNTBY_MAKERS)) checkSkill(key);
+for (const key of Object.keys(OPS_BUILD_MAKERS)) checkSkill(key);
 
 // ---- O6 lane AP2 round 3: the figure and data cells (providers/figures.js), items in the shapes
 // gen-measurement.js / gen-data-stats.js emit (the kit payload the providers read).
@@ -744,4 +785,4 @@ if (failures.length) {
     console.log(`ws-providers-unit: FAIL (${failures.length} of ${checks} checks)`);
     process.exit(1);
 }
-console.log(`ws-providers-unit: OK (${checks} checks, ${TM_PROVIDER_SKILLS.length} time and money + ${REGRADED_SKILLS.length} re-graded skills + ${Object.keys(SIBLINGS).length} siblings + ${PV_PROVIDER_IDS.length} place-value / rounding / estimation + ${Object.keys(COUNTBY_MAKERS).length} count-by)`);
+console.log(`ws-providers-unit: OK (${checks} checks, ${TM_PROVIDER_SKILLS.length} time and money + ${REGRADED_SKILLS.length} re-graded skills + ${Object.keys(SIBLINGS).length} siblings + ${PV_PROVIDER_IDS.length} place-value / rounding / estimation + ${Object.keys(COUNTBY_MAKERS).length} count-by + ${Object.keys(OPS_BUILD_MAKERS).length} operations build lane)`);

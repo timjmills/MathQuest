@@ -85,7 +85,7 @@ export const VISUALS = {
     V037: ['Y3:R37', 'Equal groups (objects in rings, plates, bags)', ['equal_groups_early']],
     V038: ['Y3:R38', 'Arrays (split, hidden part, finish the array)', ['vis_array_options']],
     V039: ['Y3:R39', 'Arrays / groups of place-value counters (tens, hundreds)', ['vis_array_options']],
-    V040: ['Y3:R40', 'Sharing vs grouping counters; remainders', ['share_group']],
+    V040: ['Y3:R40', 'Sharing vs grouping counters; remainders', []],
     V041: ['Y3:R41', 'Linking-cube towers and staircases', ['vis_object_kinds']],
     V042: ['Y3:R42', 'Multiplication grid (partial or non-consecutive headers)', ['vis_array_options']],
     // ---- sorting, measures, fractions, data, geometry (R43–R84)

@@ -444,6 +444,8 @@ export const SKILL_WRM = {
     // Build lane operations, entry 1 (2026-09-26): count through zero in 1s and multiples,
     // temperature below zero, the difference across zero.
     'integers:count_through_zero': ['Y5.B13.S2', 'Y5.B13.S3', 'Y5.B13.S5'],
+    // Build lane operations, entry 2 (2026-09-26): sharing and grouping, fair / not fair, left over.
+    'division:share_and_group_early': ['R.B9.S6', 'R.B9.S8', 'R.B11.S10', 'R.B11.S12', 'R.B11.S13', 'R.B14.S2', 'R.B14.S4', 'R.B16.S1', 'R.B16.S2', 'R.B16.S3', 'R.B16.S5', 'Y1.B9.S9', 'Y2.B5.S8'],
 
     // ---- number_ops_mixed
     'number_ops_mixed:word_problems_mixed': ['Y5.B5.S6', 'Y5.B5.S11', 'Y6.B2.S8', 'Y6.B2.S14'],
@@ -2108,14 +2110,6 @@ export const WRM_PROPOSALS = {
     },
 
     // ---- operations
-    share_group: {
-        kind: 'new', skill: 'division:share_and_group_early',
-        name: 'Share and Make Groups',
-        teaches: 'sharing a small amount equally (one for you, one for me) and grouping into equal groups within 10, including odd amounts that do not share fairly',
-        representation: 'counters drawn next to plates or rings; draw them shared or grouped; write how many each / how many groups; option: fair or not fair',
-        family: 'operations',
-        steps: ['R.B9.S6', 'R.B9.S8', 'R.B11.S10', 'R.B11.S12', 'R.B11.S13', 'R.B14.S2', 'R.B14.S4', 'R.B16.S1', 'R.B16.S2', 'R.B16.S3', 'R.B16.S5', 'Y1.B9.S9', 'Y2.B5.S8'],
-    },
     part_whole: {
         kind: 'new', skill: 'composing:part_whole_model',
         name: 'Part-Whole Model',

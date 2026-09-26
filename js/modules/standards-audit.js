@@ -294,7 +294,7 @@ export const EE_AUDIT = {
     'M.EE.1.G.2': P(['shapes_early:name_2d_shapes'], ['sort shapes of one size and orientation into groups by kind'], ['shape_sort']),
     'M.EE.1.G.3': F(['shapes_early:compose_shapes', 'shapes_early:compose_hexagon']),
     // ================================================================ 2
-    'M.EE.2.OA.3': P(['patterns:halve'], ['equally distribute objects (not numbers) between two groups'], ['share_group']),
+    'M.EE.2.OA.3': F(['patterns:halve', 'division:share_and_group_early'], 'share_and_group_early: counters dealt onto two plates, even numbers to 20 (Counters to 20)'),
     'M.EE.2.OA.4': F(['multiplication:repeated_add_to_mult', 'multiplication:arrays_groups']),
     'M.EE.2.NBT.1': F(['composing:base10_build', 'composing:teen_compose']),
     'M.EE.2.NBT.2': P(['counting:count_objects', 'counting:count_sequence'], ['count 21-30 things and count out 1-30 objects (count_objects stops at 20)'], ['count_objects_more', 'ten_count_out']),

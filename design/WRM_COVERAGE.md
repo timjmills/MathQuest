@@ -22,20 +22,20 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 516 (59%), partial only 148 (17%), gap 208 (24%).
+- Covered 529 (61%), partial only 137 (16%), gap 206 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 329 skills carry WRM tags. 161 proposals (119 new skills, 42 options on existing skills) would close every gap.
+- 330 skills carry WRM tags. 160 proposals (118 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
-| Reception | PK | 18 | 119 | 58 (49%) | 28 | 33 |
-| Year 1 | K | 14 | 116 | 72 (62%) | 24 | 20 |
-| Year 2 | 1 | 11 | 124 | 80 (65%) | 18 | 26 |
+| Reception | PK | 18 | 119 | 69 (58%) | 19 | 31 |
+| Year 1 | K | 14 | 116 | 73 (63%) | 23 | 20 |
+| Year 2 | 1 | 11 | 124 | 81 (65%) | 17 | 26 |
 | Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
 | Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
 | Year 5 | 4 | 15 | 136 | 84 (62%) | 21 | 31 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **516 (59%)** | **148** | **208** |
+| **All** | | **97** | **872** | **529 (61%)** | **137** | **206** |
 
 ## Source disagreements
 
@@ -458,11 +458,8 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Closes (1): Y6.B2.S4 Rules of divisibility  
   _proposal id: divisibility_rules_
 
-### operations (27 proposals, 54 steps)
+### operations (26 proposals, 41 steps)
 
-- **Share and Make Groups** — new skill `division:share_and_group_early`. Teaches sharing a small amount equally (one for you, one for me) and grouping into equal groups within 10, including odd amounts that do not share fairly. Representation: counters drawn next to plates or rings; draw them shared or grouped; write how many each / how many groups; option: fair or not fair.  
-  Closes (13): R.B9.S6 Make pairs-odd and even; R.B9.S8 Double to 8 (make a double); R.B11.S10 Bonds to 10 (3 parts); R.B11.S12 Doubles to 10 (make a double); R.B11.S13 Explore even and odd; R.B14.S2 How many did I add; R.B14.S4 How many did I take away; R.B16.S1 Explore sharing; R.B16.S2 Sharing; R.B16.S3 Explore grouping; R.B16.S5 Even and odd sharing; Y1.B9.S9 Make equal groups - sharing; Y2.B5.S8 Make equal groups – sharing  
-  _proposal id: share_group_
 - **To the Next Ten** — new skill `addition:bridge_to_next_ten`. Teaches adding to reach the next multiple of 10 (38 + 2 = 40), then crossing it (38 + 5 = 38 + 2 + 3), and subtracting back to a ten (43 - 3). Representation: a number line with the ten marked; write the jump to the ten and then the rest.  
   Closes (4): Y2.B2.S8 Add to the next 10; Y2.B2.S11 Subtract from a 10; Y3.B2.S6 Add 1s across a 10; Y3.B2.S8 Subtract 1s across a 10  
   Strengthens: Y2.B2.S9  
@@ -807,16 +804,16 @@ whatever happens to the WRM gaps.
 - **R.B9.S5** Composition of 6, 7 and 8 — covered. _K.OA.A.3_  
   Skills: Number Bonds within 10 (Visual) (`composing:number_bonds`) {bonds to 10}  
   Vocabulary: part, whole, altogether  
-- **R.B9.S6** Make pairs-odd and even — PARTIAL. _Beyond CCSS_  
+- **R.B9.S6** Make pairs-odd and even — covered. _Beyond CCSS_  
+  Skills: Share and Make Groups (`division:share_and_group_early`)  
   Partial: Odd or Even? (Visual) (`composing:odd_even`), missing making pairs of objects to see odd and even; the skill names odd or even numbers  
-  Proposal: Share and Make Groups  
   Vocabulary: pair, partner, even, odd  
 - **R.B9.S7** Double to 8 (find a double) — covered. _K.OA.A.1, M.EE.K.OA.1_  
   Skills: Doubles & Near Doubles (`number_sense:doubles_near_doubles`)  
   Vocabulary: double, the same, twice  
-- **R.B9.S8** Double to 8 (make a double) — PARTIAL. _K.OA.A.1, M.EE.K.OA.1_  
+- **R.B9.S8** Double to 8 (make a double) — covered. _K.OA.A.1, M.EE.K.OA.1_  
+  Skills: Share and Make Groups (`division:share_and_group_early`)  
   Partial: Doubling (`patterns:double`), missing building a double with objects to 8; the skill is double facts to 100  
-  Proposal: Share and Make Groups  
   Vocabulary: make, build, the same again, double  
 - **R.B9.S9** Combine 2 groups — covered. _K.OA.A.1, K.OA.A.2, M.EE.K.OA.1_  
   Skills: Add Within 5 with Pictures (Visual) (`addition:add_5_pictures`); Addition Word Problems (within 10) (`addition:add_wp_10`)  
@@ -876,20 +873,20 @@ whatever happens to the WRM gaps.
   Partial: Build a Number on a Ten Frame (`composing:ten_frame_build`), missing different arrangements of 10 (5 and 5, 4 and 6) seen as the same 10  
   Proposal: Say How Many Without Counting  
   Vocabulary: altogether, arrangement, the same  
-- **R.B11.S10** Bonds to 10 (3 parts) — PARTIAL. _K.OA.A.1, K.OA.A.4, M.EE.K.OA.1_  
+- **R.B11.S10** Bonds to 10 (3 parts) — covered. _K.OA.A.1, K.OA.A.4, M.EE.K.OA.1_  
+  Skills: Share and Make Groups (`division:share_and_group_early`)  
   Partial: Add Three Numbers (≤20) (`addition:add_three`), missing three parts that make 10  
-  Proposal: Share and Make Groups  
   Vocabulary: part, altogether, none, zero  
 - **R.B11.S11** Doubles to 10 (find a double) — covered. _K.OA.A.1, M.EE.K.OA.1_  
   Skills: Doubles & Near Doubles (`number_sense:doubles_near_doubles`)  
   Vocabulary: double, the same, equal, not a double  
-- **R.B11.S12** Doubles to 10 (make a double) — PARTIAL. _K.OA.A.1, M.EE.K.OA.1_  
+- **R.B11.S12** Doubles to 10 (make a double) — covered. _K.OA.A.1, M.EE.K.OA.1_  
+  Skills: Share and Make Groups (`division:share_and_group_early`)  
   Partial: Doubling (`patterns:double`), missing building a double with objects to 10  
-  Proposal: Share and Make Groups  
   Vocabulary: make a double, the same, equal, pair-wise  
-- **R.B11.S13** Explore even and odd — PARTIAL. _Beyond CCSS_  
+- **R.B11.S13** Explore even and odd — covered. _Beyond CCSS_  
+  Skills: Share and Make Groups (`division:share_and_group_early`)  
   Partial: Odd or Even? (Visual) (`composing:odd_even`), missing making pairs to see odd and even  
-  Proposal: Share and Make Groups  
   Vocabulary: even, odd, partner  
 
 #### R.B12 Spring Block 6: Explore 3-D shapes
@@ -944,16 +941,16 @@ whatever happens to the WRM gaps.
 - **R.B14.S1** Add more — covered. _K.OA.A.1, K.OA.A.2, M.EE.K.OA.1_  
   Skills: Add Within 5 with Pictures (Visual) (`addition:add_5_pictures`); Addition Word Problems (within 10) (`addition:add_wp_10`)  
   Vocabulary: more, now, altogether  
-- **R.B14.S2** How many did I add — PARTIAL. _K.OA.A.1, K.OA.A.2, M.EE.K.OA.1_  
+- **R.B14.S2** How many did I add — covered. _K.OA.A.1, K.OA.A.2, M.EE.K.OA.1_  
+  Skills: Share and Make Groups (`division:share_and_group_early`)  
   Partial: Addition Word Problems (within 10) (`addition:add_wp_10`), missing finding how many were added (change unknown); the skill asks for the total  
-  Proposal: Share and Make Groups  
   Vocabulary: added, how many, altogether, now  
 - **R.B14.S3** Take away — covered. _K.OA.A.1, K.OA.A.2, M.EE.K.OA.1_  
   Skills: Subtract Within 5 with Pictures (Visual) (`subtraction:sub_5_pictures`); Subtraction Word Problems (within 10) (`subtraction:sub_wp_10`)  
   Vocabulary: take away, left, now  
-- **R.B14.S4** How many did I take away — PARTIAL. _K.OA.A.1, K.OA.A.2, M.EE.K.OA.1_  
+- **R.B14.S4** How many did I take away — covered. _K.OA.A.1, K.OA.A.2, M.EE.K.OA.1_  
+  Skills: Share and Make Groups (`division:share_and_group_early`)  
   Partial: Subtraction Word Problems (within 10) (`subtraction:sub_wp_10`), missing finding how many were taken away (change unknown)  
-  Proposal: Share and Make Groups  
   Vocabulary: first, now, taken away  
 
 #### R.B15 Summer Block 3: Manipulate, compose and decompose
@@ -989,22 +986,22 @@ whatever happens to the WRM gaps.
 
 #### R.B16 Summer Block 4: Sharing and grouping
 
-- **R.B16.S1** Explore sharing — GAP. _Beyond CCSS_  
-  Proposal: Share and Make Groups  
+- **R.B16.S1** Explore sharing — covered. _Beyond CCSS_  
+  Skills: Share and Make Groups (`division:share_and_group_early`)  
   Vocabulary: share, fair, equal, unfair  
-- **R.B16.S2** Sharing — PARTIAL. _Beyond CCSS_  
+- **R.B16.S2** Sharing — covered. _Beyond CCSS_  
+  Skills: Share and Make Groups (`division:share_and_group_early`)  
   Partial: Make Equal Groups to Divide (Visual) (`division:share_into_groups`), missing sharing one at a time (how many each); the skill makes groups of a size, and works to 20  
-  Proposal: Share and Make Groups  
   Vocabulary: share equally, each, left over  
-- **R.B16.S3** Explore grouping — GAP. _Beyond CCSS_  
-  Proposal: Share and Make Groups  
+- **R.B16.S3** Explore grouping — covered. _Beyond CCSS_  
+  Skills: Share and Make Groups (`division:share_and_group_early`)  
   Vocabulary: group, groups of 2, altogether  
 - **R.B16.S4** Grouping — covered. _Beyond CCSS_  
   Skills: Make Equal Groups to Divide (Visual) (`division:share_into_groups`)  
   Vocabulary: groups of 3, altogether, left over  
-- **R.B16.S5** Even and odd sharing — PARTIAL. _Beyond CCSS_  
+- **R.B16.S5** Even and odd sharing — covered. _Beyond CCSS_  
+  Skills: Share and Make Groups (`division:share_and_group_early`)  
   Partial: Odd or Even? (Visual) (`composing:odd_even`), missing sharing an amount between two and seeing it is fair (even) or not (odd)  
-  Proposal: Share and Make Groups  
   Vocabulary: share, even, odd  
 - **R.B16.S6** Play with and build doubles — covered. _K.OA.A.1, M.EE.K.OA.1_  
   Skills: Doubles & Near Doubles (`number_sense:doubles_near_doubles`)  
@@ -1367,9 +1364,9 @@ whatever happens to the WRM gaps.
 - **Y1.B9.S8** Make equal groups - grouping — covered. _3.OA.A.2, M.EE.3.OA.2_  
   Skills: Make Equal Groups to Divide (Visual) (`division:share_into_groups`)  
   Vocabulary: grouping, equal groups, altogether  
-- **Y1.B9.S9** Make equal groups - sharing — PARTIAL. _3.OA.A.2, M.EE.3.OA.2_  
+- **Y1.B9.S9** Make equal groups - sharing — covered. _3.OA.A.2, M.EE.3.OA.2_  
+  Skills: Share and Make Groups (`division:share_and_group_early`)  
   Partial: Make Equal Groups to Divide (Visual) (`division:share_into_groups`), missing sharing one at a time between a given number of groups (how many in each)  
-  Proposal: Share and Make Groups  
   Vocabulary: share, in each group  
 
 #### Y1.B10 Summer Block 2: Fractions
@@ -1710,9 +1707,9 @@ whatever happens to the WRM gaps.
 - **Y2.B5.S7** Make equal groups – grouping — covered. _3.OA.A.2, M.EE.3.OA.2_  
   Skills: Make Equal Groups to Divide (Visual) (`division:share_into_groups`)  
   Vocabulary: altogether, equal groups, divided by (÷)  
-- **Y2.B5.S8** Make equal groups – sharing — PARTIAL. _3.OA.A.2, M.EE.3.OA.2_  
+- **Y2.B5.S8** Make equal groups – sharing — covered. _3.OA.A.2, M.EE.3.OA.2_  
+  Skills: Share and Make Groups (`division:share_and_group_early`)  
   Partial: Make Equal Groups to Divide (Visual) (`division:share_into_groups`), missing sharing into a given number of groups (how many in each)  
-  Proposal: Share and Make Groups  
   Vocabulary: share, equal groups, in each group  
 - **Y2.B5.S9** The 2 times-table — covered. _2.OA.C.3, 3.OA.C.7, M.EE.2.OA.3, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 2}; Count by 1–12 (`multiplication:count_by_tables`) {2}  

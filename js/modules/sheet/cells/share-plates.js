@@ -71,8 +71,10 @@ function geom(ctx, p) {
 function rowPicture(ctx, p, g) {
     const n = Number(p.n), k = Number(p.k);
     // rows of five (the five-structure); a group row is a whole number of groups (never gapped)
-    const per = p.kind === 'group' ? Math.max(k, k * Math.floor(6 / k)) : Math.min(5, n);
-    const pitch = g.d + GAP, rowGap = g.vgap[0];
+    // (at S, ten in one row: the small page trades the five-structure for a row per item)
+    const small = sizeOf(ctx) === 'S';
+    const per = p.kind === 'group' ? Math.max(k, k * Math.floor((small ? 8 : 6) / k)) : Math.min(small ? 10 : 5, n);
+    const pitch = g.d + (small ? 2.5 : GAP), rowGap = g.vgap[0];
     const cols = Math.min(per, n), rows = Math.ceil(n / per);
     const w = (cols - 1) * pitch + g.d + 1, h = (rows - 1) * (g.d + rowGap) + g.d + 1;
     const at = (i) => ({ x: 0.5 + g.d / 2 + (i % per) * pitch, y: 0.5 + g.d / 2 + Math.floor(i / per) * (g.d + rowGap) });
@@ -82,7 +84,7 @@ function rowPicture(ctx, p, g) {
     const ringGroups = p.kind === 'group' ? (answered(ctx) ? Math.floor(n / k) : p.hint ? 1 : 0) : 0;
     for (let r = 0; r < ringGroups; r++) {
         const a = at(r * k), b = at(r * k + k - 1);
-        const x = a.x - g.d / 2 - 1.2, y = a.y - g.d / 2 - 1.2, rw = b.x - a.x + g.d + 2.4, rh = g.d + 2.4;
+        const x = a.x - g.d / 2 - 1, y = a.y - g.d / 2 - 1, rw = b.x - a.x + g.d + 2, rh = g.d + 2;
         const colour = answered(ctx) ? INK : GREY;
         body += `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(rw)}" height="${n2(rh)}" rx="${n2(rh / 2)}" fill="none" stroke="${colour}" stroke-width="${n2(SW.heavy)}"${answered(ctx) ? '' : ' data-ws-ink="trace"'}/>`;
     }
@@ -172,7 +174,8 @@ register('share-plates', {
         const across = platesAcross(g, k);
         const plates = p.kind === 'group' ? 0 : across * g.pw + (across - 1) * PLATE_GAP;
         const n = Number(p.n);
-        const row = p.kind === 'fair' ? 0 : (Math.min(p.kind === 'group' ? Math.max(k, k * Math.floor(6 / k)) : 5, n) - 1) * (g.d + GAP) + g.d;
+        const small = sizeOf(ctx) === 'S';
+        const row = p.kind === 'fair' ? 0 : (Math.min(p.kind === 'group' ? Math.max(k, k * Math.floor((small ? 8 : 6) / k)) : small ? 10 : 5, n) - 1) * (g.d + (small ? 2.5 : GAP)) + g.d;
         const w = Math.max(plates, row, 60) + 6;
         return { wMm: Math.ceil(w), hMm: null, measure: true, factLike: false, maxCols: w <= 88 ? 2 : 1, denseRoom: 1.05 };
     },

@@ -412,9 +412,6 @@ export const WRM_SPECS = {
         ['divisible by 3 if it ends in 3', 'by 4 if even']),
 
     // ------------------------------------------------------------------ operations
-    share_group: S(['share equally (one for you, one for me)', 'make equal groups', 'is it fair?', 'odd amounts left over', 'share an even number between two (EE 2.OA.3)'],
-        ['counters', 'arrays'], 'draw the counters; write how many each / how many groups', 'O2 within 10 → 20 → 30 · O3 plates drawn with first counters → none · O6 plates / rings',
-        ['unequal shares', 'counts the groups not the share']),
     part_whole: S(['find the missing part', 'write the four sentences', 'which diagram matches?', 'whole unknown'],
         ['bond'], 'write the missing part or sentences', 'O2 within 5 → 10 → 20 · O3 counters in the circles → none · O6 cherry / bar',
         ['adds the whole and a part', 'writes 3 − 5 = 2']),

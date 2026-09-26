@@ -251,6 +251,9 @@ export const SKILL_STANDARDS = {
     // Build lane operations, entry 1 (2026-09-26): count through zero, temperature, how far apart,
     // above / below zero with what 0 means (6.NS.5), and warmer / colder as < or > (6.NS.7b).
     'integers:count_through_zero': { ccss: ['6.NS.C.5', '6.NS.C.6c', '6.NS.C.7b', '6.NS.C.7a'], ee: ['M.EE.6.NS.5', 'M.EE.6.NS.6', 'M.EE.6.NS.7', 'M.EE.6.NS.8'] }, // Count Through Zero
+    // Build lane operations, entry 2 (2026-09-26): share onto plates, make equal groups, is it
+    // fair?, share with some left over; an even number shared between two to 20 (EE 2.OA.3).
+    'division:share_and_group_early': { ccss: ['K.OA.A.1', 'K.OA.A.4', 'K.OA.A.2', '3.OA.A.2'], ee: ['M.EE.K.OA.1', 'M.EE.3.OA.2', 'M.EE.2.OA.3'] }, // Share and Make Groups
 
     // ---- number_ops_mixed
     'number_ops_mixed:mixed': { ccss: [], ee: [], pool: true }, // All Four Operations (+ − × ÷)

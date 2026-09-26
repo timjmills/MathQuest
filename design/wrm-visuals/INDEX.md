@@ -20,13 +20,13 @@ the first entry.
 ## Summary
 
 - **575 year rows** (Reception 67, Year 1 79, Year 2 75, Year 3 84, Year 4 89, Year 5 92, Year 6 89) → **210 representations**.
-- **MATCH 6 · PARTIAL 103 · GAP 101.**
-- The 204 PARTIAL / GAP representations are closed by 93 existing build-list entries (merged) and 53 entries added from this catalogue.
+- **MATCH 7 · PARTIAL 102 · GAP 101.**
+- The 203 PARTIAL / GAP representations are closed by 92 existing build-list entries (merged) and 53 entries added from this catalogue.
 
 | Lane | Representations it owns | MATCH | PARTIAL | GAP | Entries added from the catalogue |
 |---|---|---|---|---|---|
 | `k2` | 50 | 0 | 21 | 29 | 12 |
-| `operations` | 32 | 0 | 20 | 12 | 11 |
+| `operations` | 31 | 0 | 19 | 12 | 11 |
 | `placevalue` | 17 | 0 | 9 | 8 | 9 |
 | `algebra` | 15 | 0 | 6 | 9 | 4 |
 | `fractions` | 18 | 0 | 11 | 7 | 7 |
@@ -91,7 +91,7 @@ the first entry.
 | V037 | Equal groups (objects in rings, plates, bags) | Y1 R51 (M/P), Y2 R37 (MATCH), Y3 R37 (MATCH), Y4 R30 (M/P), Y5 R37 (MATCH) | 24 | PARTIAL | `multiplication:equal_or_unequal_groups`, `pane:objects`, `multiplication:repeated_add_to_mult` | `equal_groups_early` | `operations` |
 | V038 | Arrays (split, hidden part, finish the array) | Y1 R52 (MATCH), Y2 R38 (M/P), Y3 R38 (M/P), Y4 R32 (M/P), Y5 R38 (M/P), Y6 R38 (M/P) | 38 | PARTIAL | `multiplication:arrays_groups`, `multiplication:dot_array_mult`, `pane:array`, `pane:area`, `multiplication:mult_div_fact_family`, `area_perimeter:area_distributive_visual` | `vis_array_options`* | `operations` |
 | V039 | Arrays / groups of place-value counters (tens, hundreds) | Y2 R39, Y3 R39, Y4 R34 | 7 | GAP | - | `vis_array_options`* | `operations` |
-| V040 | Sharing vs grouping counters; remainders | R R42 (GAP), R R43, Y1 R53 (MATCH), Y1 R54 (GAP), Y2 R40 (MATCH), Y3 R40 (MATCH) | 23 | PARTIAL | `template:counters`, `division:share_into_groups` | `share_group` | `operations` |
+| V040 | Sharing vs grouping counters; remainders | R R42, R R43, Y1 R53, Y1 R54, Y2 R40, Y3 R40 | 23 | MATCH | `template:share-plates`, `division:share_and_group_early`, `template:counters`, `division:share_into_groups` | - | - |
 | V041 | Linking-cube towers and staircases | R R06, R R24 (GAP / PARTIAL), Y1 R11 (GAP), Y2 R41 (GAP), Y3 R41 (GAP), Y5 R41 (GAP), Y6 R41 (GAP) | 31 | PARTIAL | `comparing:compare_objects`, `composing:teen_compose` | `vis_object_kinds`* | `k2` |
 | V042 | Multiplication grid (partial or non-consecutive headers) | Y3 R42 (MATCH), Y4 R35 (M/P) | 3 | PARTIAL | `template:mult-grid`, `template:mult-chart`, `multiplication:mult_chart` | `vis_array_options`* | `operations` |
 | V043 | Venn diagram (2 sets; universal set; nested) | Y2 R43, Y3 R43, Y5 R43, Y6 R43 | 10 | GAP | - | `vis_sort_diagrams`*, `common_mf` | `k2` |
@@ -381,7 +381,6 @@ Every entry of `design/BUILD_LIST.md` that draws a catalogued representation, wi
 | `vis_open_line` Open Number Line (template option) | `operations` | added from visual catalogue | V020 | 32 |
 | `vis_stack_layouts` Column Layouts: Decimal Point Track and Expanded Column | `operations` | added from visual catalogue | V030, V161 | 29 |
 | `equal_groups_early` Make Equal Groups | `operations` | White Rose audit | V037 | 24 |
-| `share_group` Share and Make Groups | `operations` | White Rose audit | V040 | 23 |
 | `vis_hop_line_options` Hop Lines: Through Zero, Chunks, Fact Labels | `operations` | added from visual catalogue | V019, V092 | 16 |
 | `vis_split_op` Split and Operate (template) | `operations` | added from visual catalogue | V015 | 10 |
 | `mult_multiples` Multiples of 10, 100 and 1,000 (option) | `operations` | White Rose audit | V160 | 10 |

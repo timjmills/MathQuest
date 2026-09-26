@@ -89,7 +89,8 @@
     "wpCues": "8A",
     "wpBank": "8B",
     "wpBar": "8C",
-    "bars": "9F"
+    "bars": "9F",
+    "groupLook": "3N"
   },
   "blocks": {
     "0": {
@@ -630,6 +631,10 @@
     "bars": {
       "vertical": "V",
       "horizontal": "H"
+    },
+    "groupLook": {
+      "plates": "P",
+      "rings": "R"
     }
   },
   "scalarOnly": {
