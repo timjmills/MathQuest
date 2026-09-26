@@ -20,7 +20,7 @@
 // window.openSkillOptionsPanel(categoryId, skillId, anchorEl, {opts, onChange}) when installed;
 // the chosen `opts` go straight into the buildSheet request (skills[].opts).
 
-import { buildSheet, sheetDocument } from './print-sheet.js';
+import { buildSheet, sheetDocument, LESSON_SIZE_NOTE } from './print-sheet.js';
 import {
     icon, esc, toast, skillCatalogue, findSkill, levelText, currentSet, savedSets, printDefaults,
     optionsSummary, optionsReadOnlyHTML, readStore, writeStore, PRINTS_KEY, fmtDay,
@@ -30,6 +30,7 @@ import { skillHasOfferedOptions } from './skill-options-ui.js';
 import { generateQuestionFor } from './generate-question.js';
 import { getSetOptions } from './skill-option-store.js';
 import { getProvider } from './sheet/index.js';
+import { stretchWhy, hasOwnOpen, NO_STRETCH_REASON } from './sheet/roles/stretch.js';
 
 // The page types buildSheet composes (print-sheet.js SHEET_ROLES). Anything else is listed,
 // disabled, as "coming soon".
@@ -249,6 +250,8 @@ function onClick(e) {
     const d = b.dataset;
     switch (d.act) {
         case 'role': {
+            // A withheld page type (Stretch with no open problem yet) cannot be chosen; its reason is on the card.
+            if (b.getAttribute('aria-disabled') === 'true') break;
             const s = sec(d.sec);
             const changed = s.role !== d.v;
             s.role = d.v;
@@ -331,17 +334,47 @@ function renderWhat() {
     box.innerHTML = pr.sections.map((s, i) => sectionHTML(s, i)).join('');
 }
 
+/**
+ * Why Stretch cannot be built for these skills, or '' when it can. Stretch is withheld for a skill
+ * with no open problem of its own (sheet/roles/stretch.js): its provider has no `open(q)` and its
+ * items are not whole-number operations. Asked of a few seeded sample items per skill (cached), so
+ * the card says "not yet" before the teacher picks it, rather than after a failed build.
+ */
+const _stretchOk = new Map();
+function stretchBlocked(skills) {
+    if (!skills || !skills.length) return '';
+    const ok = skills.some((k) => {
+        const key = `${k.categoryId}:${k.skillId}:${JSON.stringify(k.opts || null)}`;
+        if (!_stretchOk.has(key)) {
+            let yes = hasOwnOpen(k.categoryId, k.skillId);
+            for (let j = 0; !yes && j < 6; j++) {
+                let q = null;
+                try { q = generateQuestionFor({ category: k.categoryId, skill: k.skillId, opts: k.opts, seed: 7717 + j * 7919, itemIndex: j }); } catch (e) { q = null; }
+                if (q && !stretchWhy(q)) yes = true;
+            }
+            _stretchOk.set(key, yes);
+        }
+        return _stretchOk.get(key);
+    });
+    return ok ? '' : NO_STRETCH_REASON;
+}
+
 function sectionHTML(s, i) {
     const name = `Section ${String.fromCharCode(65 + i)}`;
     const sub = `${ROLE_NAME[s.role] || ''}${s.role === 'more-practice' ? ` · ${s.letters.length} page${s.letters.length === 1 ? '' : 's'}` : s.role === 'independent' ? ` · ${s.pages} page${s.pages === 1 ? '' : 's'}` : s.role === 'lesson' ? ` · ${s.pages} practice page${s.pages === 1 ? '' : 's'}${s.mixed ? ' + mixed' : ''}` : ''}`;
-    const bad = s.unsupported && s.unsupported.role === s.role ? s.unsupported.why : '';
+    // Stretch, withheld for skills with no open problem yet: the card is disabled and says why
+    // (its title for a hover or a long press, and a note tied to it by aria-describedby).
+    const noStretch = stretchBlocked(s.skills);
+    const bad = s.unsupported && s.unsupported.role === s.role ? s.unsupported.why : (s.role === 'stretch' && noStretch ? noStretch : '');
     const chosen = PAGE_GROUPS.flatMap(([, list]) => list).find(([v]) => v === s.role) || [s.role, ROLE_NAME[s.role] || s.role, ''];
     const typeCards = PAGE_GROUPS.map(([g, list]) => `<div class="tv-ptype-group" role="group" aria-label="${g}"><span class="tv-ptype-h">${g}</span><div class="tv-ptypes">${list.map(([v, l, text]) => {
         const on = s.role === v;
-        const why = on && bad ? bad : '';
-        return `<button type="button" class="tv-ptype${why ? ' is-unfit' : ''}" role="radio" aria-checked="${on}" data-act="role" data-sec="${i}" data-v="${v}"${why ? ` aria-describedby="tvRoleWhy${i}"` : ''}>
-      ${pageThumb(v)}<span><span class="tv-radio-title">${l}</span><span class="tv-radio-text">${text}</span></span></button>`;
-    }).join('')}</div></div>`).join('');
+        const off = v === 'stretch' && noStretch ? noStretch : '';
+        const why = on && bad ? bad : off;
+        const described = on && bad ? `tvRoleWhy${i}` : off ? `tvStretchWhy${i}` : '';
+        return `<button type="button" class="tv-ptype${why ? ' is-unfit' : ''}" role="radio" aria-checked="${on}" data-act="role" data-sec="${i}" data-v="${v}"${off ? ` aria-disabled="true" title="${esc(off)}"` : ''}${described ? ` aria-describedby="${described}"` : ''}>
+      ${pageThumb(v)}<span><span class="tv-radio-title">${l}</span><span class="tv-radio-text">${off && !on ? 'Not for this skill yet.' : text}</span></span></button>`;
+    }).join('')}</div></div>`).join('') + (noStretch && s.role !== 'stretch' ? `<p class="tv-cap tv-cap-why" id="tvStretchWhy${i}">${icon('info', 14)}<span>${esc(noStretch)}</span></p>` : '');
     const whyNote = bad ? `<p class="tv-ptype-why" id="tvRoleWhy${i}" role="status">${icon('info', 16)}<span>${esc(bad)}</span></p>` : '';
     const cols = ['auto', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((c) => `<option value="${c}"${String(s.columns) === String(c) ? ' selected' : ''}>${c === 'auto' ? 'Auto' : c}</option>`).join('');
     const pagesPart = s.role === 'more-practice' ? `
@@ -605,7 +638,8 @@ function renderSetup() {
     box.innerHTML = `
   <div style="padding:24px;display:flex;flex-direction:column;gap:16px;">
     <h2 class="tv-h2" id="tvSetupH">Page setup</h2>
-    <div><span class="tv-label">Size</span>${seg('size', pr.size, [['S', 'S', 'Small'], ['M', 'M', 'Medium'], ['L', 'L', 'Large']], 'Size')}</div>
+    <div><span class="tv-label">Size</span>${seg('size', pr.size, [['S', 'S', 'Small'], ['M', 'M', 'Medium'], ['L', 'L', 'Large']], 'Size')}${pr.size === 'S' && pr.sections.some((x) => x.role === 'lesson') ? `
+      <p class="tv-cap" id="tvSizeLesson" style="margin-top:6px;">A lesson prints at Medium: at Small its regroup boxes and step words are too small to write in. The other page types print at Small.</p>` : ''}</div>
     <div><span class="tv-label">Look</span>${seg('look', pr.look, [['auto', 'Auto'], ['ican', 'I Can'], ['daily', 'Daily']], 'Look')}
       <p class="tv-cap" style="margin-top:6px;">${pr.look === 'daily' ? 'Daily: a light header for everyday practice.' : 'I Can: the title states the goal. Auto uses each page type\'s own look (Daily on fact rows, fact probes and Mixed practice).'}</p></div>
     <div class="tv-fields-2">
@@ -790,7 +824,11 @@ async function runBuild() {
             if (!p.res.items || n >= asked.size) return '';
             return `Only ${n} of ${asked.size} skills fit on ${ROLE_NAME[p.role] || 'this page type'}${built.parts.length > 1 ? ` (Section ${String.fromCharCode(65 + (req.idx ? req.idx[i] : i))})` : ''}. Independent, More Practice and Mixed practice fit every skill.`;
         }).filter(Boolean);
-        root.querySelector('#tvFits').innerHTML = `<span class="tv-fits-line">${plain.map(esc).join('<br>')}</span>${details.length ? `<details class="tv-fits-why"><summary>Why?</summary><ul>${details.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></details>` : ''}${short.length ? `<span class="tv-fits-warn">${icon('info', 16)}<span>${esc(short.join(' '))}</span></span>` : ''}`;
+        // Lessons r2: a lesson asked for at S prints at M - said where the teacher sees it, not
+        // only under "Why?" (the page itself carries no size marker).
+        const sized = built.parts.some((p) => (p.res.notes || []).includes(LESSON_SIZE_NOTE)) ? [LESSON_SIZE_NOTE] : [];
+        const warn = short.concat(sized);
+        root.querySelector('#tvFits').innerHTML = `<span class="tv-fits-line">${plain.map(esc).join('<br>')}</span>${details.length ? `<details class="tv-fits-why"><summary>Why?</summary><ul>${details.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></details>` : ''}${warn.length ? `<span class="tv-fits-warn" data-tv-warn="${sized.length ? 'lesson-size' : 'short'}">${icon('info', 16)}<span>${esc(warn.join(' '))}</span></span>` : ''}`;
         renderTabs(); renderSetup(); showPreview();
     } catch (e) {
         if (token !== buildToken) return;
@@ -814,7 +852,8 @@ async function runBuild() {
 /** One plain line for a built section: "12 problems on 2 pages · 3 columns". */
 function fitsLine(res) {
     const f = res.fits || {};
-    const n = Array.isArray(res.items) ? res.items.length : 0;
+    // A lesson packet says how many problems its pages hold, not how many items it dealt.
+    const n = Number.isFinite(res.problemCount) ? res.problemCount : Array.isArray(res.items) ? res.items.length : 0;
     const pages = res.pageCount || f.pages || 1;
     const parts = [];
     parts.push(n ? `${n} problem${n === 1 ? '' : 's'} on ${pages} page${pages === 1 ? '' : 's'}` : `${pages} page${pages === 1 ? '' : 's'}`);
