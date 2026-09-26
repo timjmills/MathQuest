@@ -509,6 +509,8 @@ Horizontal reflow of row A (available width W_A = 186, or 152 when the tab is on
 
 ### 8.5 Footer
 
+**Copyright (owner ruling 2026-09-26, PT-FRM-8):** below the footer band, in the bottom margin, every printed page carries "© <year> Cultivating the Digital. All rights reserved." (6.5 pt, black, centred). The band itself is unchanged.
+
 ```
 | add-3d-regroup · Grade 2 · 2.NBT.B.7                 2/3                 Form A · seed 4F2K |
 ```

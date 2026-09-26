@@ -309,6 +309,8 @@
 
 /* Owner ruling 2026-09-26: a copyright line on every printed sheet. Additive: it is a second, smaller line
    inside the existing 6 mm footer band (grid row 2, full width), so the page body keeps its height. */
-:is(.ws-page, .ws-sheet) .ws-foot { grid-template-rows: auto auto; row-gap: 0.6mm; }
-:is(.ws-page, .ws-sheet) .ws-foot > .ws-copy { grid-column: 1 / -1; text-align: center; font-size: 6pt; line-height: 1; font-weight: 400; }
+:is(.ws-page, .ws-sheet) .ws-foot { position: relative; }
+/* It hangs just below the footer band, in the 14 mm bottom margin: the band never grows (PG-3), the page body keeps its
+   height, and a wrapped left-hand teacher line can never collide with it. */
+:is(.ws-page, .ws-sheet) .ws-foot > .ws-copy { position: absolute; left: 0; right: 0; top: 100%; margin-top: 1mm; text-align: center; font-size: 6.5pt; line-height: 1; font-weight: 400; }
 :is(.ws-page, .ws-sheet) .ws-foot > span:last-of-type { text-align: right; }

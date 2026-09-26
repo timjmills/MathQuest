@@ -1698,7 +1698,7 @@
             color: #666;
         }
         @bottom-left {
-            content: "Math Quest Pro \00B7  \00A9  Cultivating the Digital";
+            content: "Math Quest Pro \00B7  \00A9  Cultivating the Digital. All rights reserved.";
             font-family: 'Andika', sans-serif;
             font-size: 9pt;
             color: #000;    /* INK-1: was #1565c0 */
@@ -1834,7 +1834,7 @@
         color: #666;
     }
     @bottom-left {
-        content: "Math Quest Pro \00B7  \00A9  Cultivating the Digital";
+        content: "Math Quest Pro \00B7  \00A9  Cultivating the Digital. All rights reserved.";
         font-family: 'Andika', sans-serif;
         font-size: 9pt;
         color: #000;    /* INK-1: was #1565c0 */
@@ -1863,7 +1863,7 @@
         color: #666;
     }
     @bottom-left {
-        content: "Math Quest Pro \00B7  \00A9  Cultivating the Digital";
+        content: "Math Quest Pro \00B7  \00A9  Cultivating the Digital. All rights reserved.";
         font-family: 'Andika', sans-serif;
         font-size: 9pt;
         color: #000;    /* INK-1: was #1565c0 */
