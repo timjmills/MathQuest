@@ -493,14 +493,15 @@ const _pvNearest = (place) => {
         // S2: the rounding supports are one set. "Cut line" and "Number line" are the generator's
         // own rungs (the cell it draws, as before: "~FL" still means the number line); the chart
         // and the marks are drawn round the problem at render time. None ticked is the fade.
-        // Owner 2026-09-26 ("normal rounding problems where they have to give it"): the plain
-        // problem is its own choice under "What the pupil does"; the Support ticks then do not apply.
-        ...supportsOptions(['cut', 'line', 'round-pv', 'round-mark'], {
+        // Owner 2026-09-26 ("normal rounding problems where they have to give it"): Plain is the
+        // FIRST Support value, one click at the top of the panel - "Round 4,683 to the nearest
+        // 100." and a line, no drawing at all (it switches every other tick off).
+        ...supportsOptions(['bare', 'cut', 'line', 'round-pv', 'round-mark'], {
             dflt: ['cut'], render: ['round-pv', 'round-mark'],
-            labels: { cut: 'Cut line (place letters over the digits)', line: 'Number line (ends labelled)' },
-            help: 'The cut line and the number line change the problem\'s own drawing (tick one). The chart '
-                + 'and the marks are drawn beside it. None ticked is the fade.',
-        }).map((d) => ({ ...d, appliesTo: (o) => o.responseScope !== 'plain' && (typeof d.appliesTo !== 'function' || d.appliesTo(o)) })),
+            labels: { bare: 'Plain: no drawing, the number and a line (4,683 → ____)', cut: 'Cut line (place letters over the digits)', line: 'Number line (ends labelled)' },
+            help: 'Plain is the number and a line to write on. The cut line and the number line change the '
+                + 'problem\'s own drawing (tick one). The chart and the marks are drawn beside it.',
+        }),
         {
             id: 'response', label: 'How the pupil answers', type: 'enum', default: 'write', group: 'layout',
             values: [
@@ -646,14 +647,12 @@ const _pvOrderCount = () => ({
 const _pvResponseScope = () => ({
     id: 'responseScope', label: 'What the pupil does', type: 'enum', default: 'full', group: 'layout',
     values: [
-        { v: 'full', l: 'Round the number (with the drawing ticked under Support)' },
-        { v: 'plain', l: 'Round the number: plain, no drawing (4,683 → ____)' },
+        { v: 'full', l: 'Round the number' },
         { v: 'notation', l: 'Underline the place and circle the next digit (do not round)' },
         { v: 'decision', l: 'Decide: round up or round down' },
         { v: 'judge', l: 'Check a finished rounding (correct or fix it)' },
     ],
-    help: 'Plain is the number and a line to write the rounded number: no cut line, no number line (the '
-        + 'fade). The sub-steps before rounding, and checking a rounding, are each a page of their own.',
+    help: 'The sub-steps before rounding, and checking a rounding, each as a page of their own.',
 });
 const _pvBins = () => ({
     id: 'bins', label: 'The bins', type: 'enum', default: 'adjacent', group: 'difficulty',
@@ -833,9 +832,17 @@ const P9_PV_OPTIONS = {
         { id: 'places', label: 'Round to the nearest', type: 'set', default: [10, 100], group: 'difficulty',
             values: [{ v: 10, l: '10' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }, { v: 10000, l: '10,000' },
                 { v: 100000, l: '100,000' }, { v: 1000000, l: '1,000,000' }],
+            // "Several places" (critic pv-r1): at least two stay ticked.
+            minTicks: 2,
             allLabel: 'Every place',
             help: 'Tick two or more places: each number is rounded to every one. The numbers are as big as the biggest place needs.' },
+        _pvBand([1000, 10000, 100000, 1000000, 10000000], 1000,
+            'The biggest number dealt. It is never smaller than ten times the biggest place ticked (to round to 1,000 the numbers need four digits).'),
         _pvMidpoint(true),
+        { id: 'support', label: 'Support', type: 'enum', default: 'none', group: 'support',
+            values: [{ v: 'none', l: 'Plain: the number and a line for each place' },
+                { v: 'labels', l: 'Place letters over the digits (Th H T O)' }],
+            help: 'The place letters show where each place is; plain is the fade.' },
         { id: 'blank', label: 'How it is set out', type: 'enum', default: 'list', group: 'layout',
             values: [{ v: 'list', l: 'One number a problem, a line for each place (4,683: 10 → __, 100 → __)' },
                 { v: 'column', l: 'A table: fill in a whole column' }, { v: 'row', l: 'A table: fill in a whole row' }],

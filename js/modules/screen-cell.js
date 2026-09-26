@@ -2511,7 +2511,9 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
             t.innerHTML = cellSlot(w, `answer ${k + 1} of ${slots.length}`);
             const box = t.content.firstChild;
             if (dec) { box.setAttribute('data-mq-kind', 'decimal'); box.setAttribute('inputmode', 'decimal'); }
-            if (s.getAttribute('data-ws-shape') === 'line') box.classList.add('mq-cellbox--line');
+            // (one number rounded to several places keeps plain boxes: a box over a paper line
+            // read as two answer places, critic pv-r1)
+            if (s.getAttribute('data-ws-shape') === 'line' && p.kind !== 'round-multi') box.classList.add('mq-cellbox--line');
             s.replaceWith(box);
         });
         mode = 'slots';

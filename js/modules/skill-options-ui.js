@@ -307,12 +307,15 @@ export function applyOptionEdit(next, defs, action, optId, raw) {
         if (!hit) return next;
         const cur = Array.isArray(next[optId]) ? next[optId].slice() : [];
         const at = cur.indexOf(hit.v);
+        // `minTicks` (a set that must keep at least N ticks: "Round to Several Places"): the last
+        // ticks cannot be cleared.
+        if (at !== -1 && Number(def.minTicks) > 0 && cur.length <= Number(def.minTicks)) return next;
         if (at === -1) cur.push(hit.v); else cur.splice(at, 1);
         const order = def.values.map(x => x.v);
         cur.sort((a, b) => order.indexOf(a) - order.indexOf(b));
         next[optId] = cur;
     } else if (action === 'all' && def.type === 'set') {
-        next[optId] = raw ? def.values.map(x => x.v) : [];
+        next[optId] = raw ? def.values.map(x => x.v) : (Number(def.minTicks) > 0 ? (def.default || []).slice() : []);
     }
     return next;
 }

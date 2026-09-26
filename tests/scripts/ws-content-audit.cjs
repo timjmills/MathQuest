@@ -1756,7 +1756,7 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
             if (row.d < 8 || row.capacity < 9 || row.zone + 1e-6 < 3 * (row.d + 2) + 2) F('disk-fits', `${row.size} ${row.place}s: ${row.d} mm disks, zone ${row.zone} mm holds ${row.capacity}`);
         }
         for (const cellRow of g.cells || []) {
-            if (cellRow.minZone + 1e-6 < cellRow.need) F('disk-fits', `${cellRow.size}: the printed build mat's zones are ${cellRow.minZone} mm, nine disks need ${cellRow.need} mm`);
+            if (cellRow.minZone < cellRow.need) F('disk-fits', `${cellRow.size}: a printed build mat's zone holds ${cellRow.minZone} disks, nine are needed`);
         }
         if (id === 'pv_disks_build' && ctx.buildMax10k > 999) F('disk-fits', `builds ${ctx.buildMax10k.toLocaleString('en-US')} at Max Number 10,000: drawing stops at 999 (owner ruling 3)`);
     }
@@ -2404,10 +2404,15 @@ function selfTest() {
                 const cells = [];
                 for (const size of ['S', 'M', 'L']) {
                     const html = kit.renderCell(q, { mode: 'print', size, state: 'blank' });
+                    // A zone holds nine disks at its pitch: three across (3 x 3), or - a three-zone
+                    // mat at S, two side by side in a column (build lane placevalue) - two across
+                    // and five down. The check is the zone's own capacity, not one fixed shape.
+                    const d = kit.diskDiameter(100, size), pitch = d + 2;
                     const zones = [...html.matchAll(/<rect[^>]*width="([\d.]+)"[^>]*height="([\d.]+)"[^>]*data-pv-zone="(\d+)"/g)]
-                        .map(m => Math.min(parseFloat(m[1]), parseFloat(m[2])));
-                    const need = 3 * (kit.diskDiameter(100, size) + 2) + 2;
-                    cells.push({ size, minZone: zones.length ? Math.min(...zones) : 0, need });
+                        .map(m => ({ w: parseFloat(m[1]), h: parseFloat(m[2]) }));
+                    const cap = (z) => Math.floor((z.w - 2 + 1e-6) / pitch) * Math.floor((z.h - 2 + 1e-6) / pitch);
+                    const need = 9;
+                    cells.push({ size, minZone: zones.length ? Math.min(...zones.map(cap)) : 0, need });
                 }
                 return { rows, cells };
             } catch (e) { return { error: String(e && e.message || e) }; }

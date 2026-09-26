@@ -215,6 +215,10 @@ function partLabels(it, parts, c) {
             return lab.every(Boolean) ? lab : null;
         } catch (e) { return null; }
     }
+    // One number rounded to several places (build lane placevalue): one labelled fix box a place.
+    if (it.template === 'pv' && p.kind === 'round-multi' && every(/^[bt]\d+$/) && Array.isArray(p.places) && p.places.length === n) {
+        return p.places.map((pl) => ({ text: `to ${commas(pl)}` }));
+    }
     if (it.template === 'pv' && every(/^t\d+$/) && Array.isArray(p.rows) && Array.isArray(p.places)) {
         // The rounding table's blank cells, in reading order: "171 to 100".
         const lab = [];

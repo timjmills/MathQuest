@@ -649,7 +649,8 @@
       "pvgrid": "G",
       "hundreds": "H",
       "openline": "I",
-      "gridpaper": "J"
+      "gridpaper": "J",
+      "bare": "K"
     },
     "counterLabel": {
       "decimal": "D",

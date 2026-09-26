@@ -38,6 +38,10 @@ export const OPTIONAL_MEMBERS = Object.freeze([
     // `stories(q, {seed}) -> Story | null`: an original story carrying ONE item's numbers, with a
     // number + label answer, for the word-problem role (section 3.8; providers/stories.js).
     'stories',
+    // `pageMeta(opts) -> {grade?, ccss?} | null`: the level and standard a page's OPTIONS put it
+    // at (decimal places make a place-value page grade 4-5; the biggest place of a rounding table
+    // sets its level). The tab and the footer follow it (critic pv-r1, L6).
+    'pageMeta',
 ]);
 
 /* ================================================== the controlled instruction library */
@@ -209,6 +213,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'draw-dots': 'Draw dots in the chart to show the number.',
     // rounding_table, one number a problem (owner 2026-09-26): {place} is the list "10, 100 and 1,000".
     'round-places': 'Round each number to the nearest {place}.',
+    // four or more places: the list would run to two lines over the grid (critic pv-r1)
+    'round-places-many': 'Round each number to every place.',
     'sort-round': 'Write each number under what it rounds to.',
     'round-table': 'Round each number. Fill in the table.',
     estimate: 'Round each number. Then estimate.',

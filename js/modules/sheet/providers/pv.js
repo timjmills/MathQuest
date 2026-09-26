@@ -31,7 +31,12 @@ const roundTo = (n, P) => Math.floor((n + P / 2) / P) * P;          // halfway r
 const placesOf = (n) => { const s = String(Math.trunc(Math.abs(n))); return Array.from({ length: s.length }, (_, i) => 10 ** (s.length - 1 - i)); };
 const ansNum = (q) => num(q.ans);
 /** chooseWrong, with the slot named: a candidate that fills several slots marks its first one. */
-const choose = (q, list) => chooseWrong(q, list.filter(Boolean).map((c) => (c.slots && !c.slot ? { ...c, slot: Object.keys(c.slots)[0] } : c)));
+// A wrong number is written exactly as the right one is (critic pv-r1: "40000" beside "60,000"
+// gave the verdict away on an Error-analysis page): numbers in the house format, 1,000 and up
+// with commas.
+const choose = (q, list) => chooseWrong(q, list.filter(Boolean)
+    .map((c) => (typeof c.value === 'number' && Number.isFinite(c.value) ? { ...c, value: fmt(Number(c.value.toFixed(6))) } : c))
+    .map((c) => (c.slots && !c.slot ? { ...c, slot: Object.keys(c.slots)[0] } : c)));
 
 /**
  * The §14 wrong roundings of `n` to the nearest `P`, as {value, misconception}. Shared with the
@@ -69,6 +74,33 @@ function stringsBy(pickDef, fallbackDef) {
     fn.def = fallbackDef;
     return fn;
 }
+
+/* ======================================================================== page level (L6) */
+// A decimal page is grade 4 (tenths and hundredths, 4.NF.6 / 4.NF.7) or 5 (thousandths, 5.NBT);
+// the tab and footer follow the options, never the skill's whole-number grade (critic pv-r1).
+const decMeta = (cc4, cc5) => (o) => {
+    const d = Number(o && o.decimals) || 0;
+    if (!d) return null;
+    return d >= 3 ? { grade: '5', ccss: cc5 } : { grade: '4', ccss: cc4 };
+};
+const PV_PAGE_META = {
+    'placevalue:value': decMeta('4.NF.6', '5.NBT.1'),
+    'placevalue:expand': decMeta('4.NF.6', '5.NBT.3'),
+    'placevalue:compare': decMeta('4.NF.7', '5.NBT.3'),
+    // decimals are read or counted only; the counter tasks (take, x10, d10, all) stay whole numbers
+    'placevalue:place_value_disks': (o) => (!o || !o.task || o.task === 'read' || o.task === 'count' ? decMeta('4.NF.6', '5.NBT.1')(o) : null),
+    'placevalue:pv_disks_build': decMeta('4.NF.6', '5.NBT.1'),
+    'number_sense:number_line_scales': (o) => {
+        const d = Number(o && o.decimals) || 0;
+        if (d) return d >= 2 ? { grade: '5', ccss: '5.NBT.3' } : { grade: '4', ccss: '4.NF.6' };
+        const b = Number(o && o.band) || 100;
+        return b <= 100 ? { grade: '2', ccss: '2.MD.6' } : b <= 1000 ? { grade: '3', ccss: '3.NBT.1' } : { grade: '4', ccss: '4.NBT.2' };
+    },
+    'number_sense:rounding_table': (o) => {
+        const top = Math.max(...(Array.isArray(o && o.places) && o.places.length ? o.places : [10, 100]).map(Number));
+        return top <= 100 ? { grade: '3', ccss: '3.NBT.1' } : { grade: '4', ccss: '4.NBT.3' };
+    },
+};
 
 /* =============================================================================== place / value */
 
@@ -153,6 +185,7 @@ const VALUE_DEC = {
 };
 
 registerSkill('placevalue:value', {
+    pageMeta: PV_PAGE_META['placevalue:value'],
     strings: stringsBy((q) => (isDec(q) ? VALUE_DEC : null), {
         iCan: 'I Can write the value of a digit',
         instructionKey: 'digit-value',
@@ -253,6 +286,7 @@ function expandDecWrong(q) {
 }
 
 registerSkill('placevalue:expand', {
+    pageMeta: PV_PAGE_META['placevalue:expand'],
     strings: stringsBy((q) => (isDec(q) ? (pvOf(q).form === 'notation' ? EXPAND_DEC_NOTATION : EXPAND_DEC) : pvOf(q).form === 'notation' ? EXPAND_NOTATION : null), {
         iCan: 'I Can write a number in expanded form',
         instructionKey: 'expanded',
@@ -481,6 +515,7 @@ const DISK_READ_DEC = {
 };
 
 registerSkill('placevalue:place_value_disks', {
+    pageMeta: PV_PAGE_META['placevalue:place_value_disks'],
     strings: stringsBy((q) => (pvOf(q).task === 'count' ? DISK_COUNT : DISK_TASKS[pvOf(q).task] || (isDec(q) ? DISK_READ_DEC : null)), {
         iCan: 'I Can read a number from place-value disks',
         instructionKey: 'disk-read',
@@ -607,6 +642,7 @@ const BUILD_DOTS = {
     sayValues: (q) => { const p = pvOf(q); return p.n ? [arr(p.places).map((pl) => `${digitAt(p.n, pl)} ${PLACE_WORD[pl]}`).join(', ')] : null; },
 };
 registerSkill('placevalue:pv_disks_build', {
+    pageMeta: PV_PAGE_META['placevalue:pv_disks_build'],
     strings: stringsBy((q) => ((pvOf(q).dots || pvOf(q).labels === 'none') ? BUILD_DOTS : null), {
         iCan: 'I Can draw place-value disks for a number',
         instructionKey: 'draw-disks',
@@ -761,6 +797,7 @@ function padDec(p) {
 const DEC_PLACE_NAMES = ['tenths', 'hundredths', 'thousandths', 'ten-thousandths'];
 
 registerSkill('placevalue:compare', {
+    pageMeta: PV_PAGE_META['placevalue:compare'],
     strings: stringsBy((q) => (isDec(q) ? COMPARE_DEC : null), {
         iCan: 'I Can compare numbers with <, > and =',
         instructionKey: 'compare',
@@ -972,7 +1009,7 @@ for (const [id, P] of [['nearest_10', 10], ['nearest_100', 100], ['nearest_1000'
         supports: ['round-mark', 'round-line', 'round-pv'],
         strings: stringsBy((q) => {
             const p = pvOf(q);
-            if (p.plain || p.responseScope === 'plain') return plainDef;
+            if (p.plain || p.responseScope === 'plain' || (Array.isArray(p.support) && p.support.includes('bare'))) return plainDef;
             if (p.kind === 'circle') return ROUND_CIRCLE;
             return p.scope === 'notation' ? ROUND_NOTATE : p.scope === 'decision' ? ROUND_DECIDE : p.scope === 'judge' ? ROUND_JUDGE : null;
         }, main),
@@ -1166,6 +1203,7 @@ const SCALE_DEFS = {
 for (const d of Object.values(SCALE_DEFS)) d.sayValues = (q) => { const p = pvOf(q); return [p.task === 'fill' ? arr(p.targets)[0] : p.n]; };
 
 registerSkill('number_sense:number_line_scales', {
+    pageMeta: PV_PAGE_META['number_sense:number_line_scales'],
     // The task is the page's (one task a page): the first item's, else the skill's own option.
     strings: (() => {
         const by = Object.fromEntries(Object.entries(SCALE_DEFS).map(([k, d]) => [k, strings(d)]));
@@ -1277,6 +1315,12 @@ for (const [id, P] of SORTS) {
  * number (chain, M-R6), rounded to the place below (M-R5), cut the digits off (always down, M-R1),
  * rounded halfway down (M-R2). */
 const placesSaid = (pl) => { const l = pl.map(f); return l.length > 1 ? `${l.slice(0, -1).join(', ')} and ${l[l.length - 1]}` : (l[0] || '10'); };
+const ROUND_MULTI_MANY = {
+    iCan: 'I Can round a number to different places',
+    instructionKey: 'round-places-many',
+    steps: ['Find the place you round to.', 'Look at the digit just after it: 5 or more rounds up.', 'Start again from the number for each place.'],
+    say: 'To the nearest __, __ rounds to __.',
+};
 const ROUND_MULTI = {
     iCan: 'I Can round a number to different places',
     instructionKey: 'round-places',
@@ -1292,8 +1336,9 @@ function multiSteps(q) {
     const out = places.slice(0, 3).map((P, i) => {
         const lo = Math.floor(p.n / P) * P, r = roundTo(p.n, P);
         const nx = digitAt(p.n, P / 10 >= 1 ? P / 10 : 1);
-        const why = p.n - lo === P / 2 ? 'exactly halfway, so round up' : `the next digit is ${nx}, so round ${nx >= 5 ? 'up' : 'down'}`;
-        return step(`Nearest ${f(P)}: ${f(p.n)} is between ${f(lo)} and ${f(lo + P)}; ${why}: ${f(r)}.`, [{ slot: `b${i}`, value: f(r) }]);
+        // short lines (the Guided model keeps work lines of 90 characters or fewer)
+        const why = p.n - lo === P / 2 ? 'halfway, round up' : `the next digit is ${nx}, round ${nx >= 5 ? 'up' : 'down'}`;
+        return step(`To ${f(P)}: ${why}: ${f(r)}.`, [{ slot: `b${i}`, value: f(r) }]);
     });
     if (places.length > 3) out.push(step(`Do the same for ${places.slice(3).map(f).join(' and ')}.`, places.slice(3).map((P, k) => ({ slot: `b${k + 3}`, value: f(roundTo(p.n, P)) }))));
     return clampSteps(out.length >= 3 ? out : [step(`Round ${f(p.n)} from the number itself each time.`)].concat(out));
@@ -1317,8 +1362,18 @@ function multiWrong(q) {
     ]);
 }
 
+const multiDef = (q) => {
+    const p = pvOf(q);
+    if (!(p.kind === 'multi' || (p.blank !== 'column' && p.blank !== 'row' && p.kind !== 'table'))) return null;
+    return arr(p.places).length > 3 ? { ...ROUND_MULTI_MANY, sayValues: ROUND_MULTI.sayValues } : ROUND_MULTI;
+};
+
 registerSkill('number_sense:rounding_table', {
-    strings: stringsBy((q) => (pvOf(q).kind === 'multi' || (pvOf(q).blank !== 'column' && pvOf(q).blank !== 'row' && pvOf(q).kind !== 'table') ? ROUND_MULTI : null), {
+    pageMeta: PV_PAGE_META['number_sense:rounding_table'],
+    // The screen ladder (support-ladder.js): the digit marks, then the rounding line, for the
+    // first place of the item; then the worked steps with every answer blanked.
+    supports: ['round-mark', 'round-line', 'round-pv'],
+    strings: stringsBy(multiDef, {
         iCan: 'I Can round a number to different places',
         instructionKey: 'round-table',
         steps: ['Round from the number itself every time.', 'Find the place, then the digit after it.', '5 or more rounds up.'],

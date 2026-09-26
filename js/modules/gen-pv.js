@@ -61,7 +61,7 @@ const dround = (v, d = 6) => Number(Number(v).toFixed(d));
  * 3.4). Returns the string (it keeps the places), the number, and its digits by place.
  */
 function decimalNumber(d, { zero = false, whole = null, fr: given = null } = {}) {
-    const w = whole !== null ? whole : (slot(3) === 0 ? 0 : randInt(1, 9));
+    const w = whole !== null ? whole : (randInt(0, 2) === 0 ? 0 : randInt(1, 9));
     const fr = given ? given.slice() : Array.from({ length: d }, () => randInt(1, 9));
     if (!given && zero && d >= 2) fr[randInt(0, d - 2)] = 0;
     const s = `${w}.${fr.join('')}`;
@@ -80,16 +80,42 @@ const SCREEN_PX_PER_MM = 3.2;
 let _liveCursor = -1;
 let _at = 0;
 function beginItem() { _at = Number.isFinite(state.itemIndex) ? state.itemIndex : ++_liveCursor; }
-const slot = (n) => ((_at % n) + n) % n;
-/**
- * The order of 0 .. L-1 for the current block of L items: each block takes every value once, the
- * order changes from block to block (a fixed mixing, no Math.random, so a seed reprints a page).
+/*
+ * SEEDED BLOCK DEALING (critic pv-r1, LESSONS L10). A generator still deals its edge cases in blocks
+ * (one halfway number and one round-up-across in every six, so a page of six always teaches them),
+ * but WHICH item of a block gets which is a permutation drawn from the PAGE's seed and the block
+ * number - never the item's position: item b is not always the halfway one, and two seeds give two
+ * different pages. The page's seed is the item's seed minus its index (a page deals item i with
+ * seed base + i, generate-question.js); live play, which has no seed, draws one key per visit.
+ * `salt` keeps two attributes of one item independent (one draw per attribute).
  */
-function blockOrder(L) {
-    const block = Math.floor(_at / Math.max(1, L));
-    const key = (i) => ((i + 1) * 7919 + (block + 3) * 104729 + (i + 1) * (block + 5) * 31) % 257;
-    return Array.from({ length: L }, (_, i) => i).sort((a, b) => key(a) - key(b) || a - b);
+let _liveKey = null;
+function pageKey() {
+    if (Number.isFinite(state.itemSeed) && Number.isFinite(state.itemIndex)) return (state.itemSeed - state.itemIndex) >>> 0;
+    if (_liveKey === null) _liveKey = Math.floor(Math.random() * 2147483647) >>> 0;
+    return _liveKey;
 }
+function mix32(a, b) {
+    let h = (a ^ Math.imul(b >>> 0, 0x9e3779b1)) >>> 0;
+    h = Math.imul(h ^ (h >>> 16), 0x85ebca6b) >>> 0;
+    h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35) >>> 0;
+    return (h ^ (h >>> 16)) >>> 0;
+}
+/** The order of 0 .. L-1 for the current block of L items: each block takes every value once. */
+function blockOrder(L, salt = 0) {
+    const n = Math.max(1, L);
+    const block = Math.floor(_at / n);
+    let k = mix32(mix32(pageKey(), block * 7919 + n), salt + 17);
+    const out = Array.from({ length: n }, (_, i) => i);
+    for (let i = n - 1; i > 0; i--) {
+        k = mix32(k, i);
+        const j = k % (i + 1);
+        [out[i], out[j]] = [out[j], out[i]];
+    }
+    return out;
+}
+/** This item's value 0 .. n-1 in its block (a seeded permutation; every value once a block). */
+const slot = (n, salt = 0) => (n <= 1 ? 0 : blockOrder(n, salt)[((_at % n) + n) % n]);
 
 function optsOf(cat, skill) {
     // A mixed parent's options (only `level`) never name a member's own options, so the member's
@@ -367,7 +393,7 @@ function genDecimalValue(q, o) {
 }
 
 function wantZero(o) {
-    return o.zeroPlace === 'always' || (o.zeroPlace === 'some' && slot(2) === 1);
+    return o.zeroPlace === 'always' || (o.zeroPlace === 'some' && randInt(0, 1) === 1);
 }
 
 /** Every order of a short list (up to 5 parts; longer lists keep the given order and its reverse). */
@@ -384,15 +410,18 @@ function genExpandCombine(q, skill, o) {
     const cap = capOf('placevalue', skill, o, 999);
     const [lo, hi] = digitSpan(cap);
     const nd = String(hi).length;
-    const zero = wantZero(o);
+    // A zero place needs three digits: a 2-digit number with a zero is ONE part ("70 = 70 + 0",
+    // "80 = ?"), nothing to expand or combine (critic ea-r5).
+    const zero = wantZero(o) && nd >= 3;
+    const oneNonZero = (list) => list.filter(Boolean).length < 2;
     let ds = [];
     for (let t = 0; t < 60; t++) {
         ds = digitsNumber(nd, { zero });
         const v = fromDigits(ds);
-        if (v >= lo && v <= hi) break;
+        if (v >= lo && v <= hi && !oneNonZero(ds)) break;
     }
     let n = fromDigits(ds);
-    if (n < lo || n > hi) { n = randInt(lo, hi); ds = String(n).split('').map(Number); }
+    for (let t = 0; t < 60 && (n < lo || n > hi || oneNonZero(ds)); t++) { n = randInt(lo, hi); ds = String(n).split('').map(Number); }
     // ONE PART PER PLACE, zeros included (§2.4 rule 1): the box count never tells the pupil how
     // many non-zero parts there are, and the key writes the zero part.
     const parts = ds.map((d, i) => d * 10 ** (ds.length - 1 - i));
@@ -585,7 +614,7 @@ function genMoreLess(q, skill, o) {
     // direction so a page of four already carries all four: 1 more, 1 less, 10 more, 10 less.
     const both = skill === 'more_less_100' ? [10, 100] : [1, 10];
     const step = Number(o.step) || both[Math.floor(_at / 2) % 2];
-    const dir = o.dir === 'both' ? (slot(2) === 0 ? 'more' : 'less') : (o.dir || 'more');
+    const dir = o.dir === 'both' ? (randInt(0, 1) === 0 ? 'more' : 'less') : (o.dir || 'more');
     const cap = capOf('placevalue', skill, o, 100);
     // Support is its own control (P-1): a strip of the hundreds chart, the chart rows, a number
     // line, or nothing. It changes the picture, never the numbers dealt, except that a chart
@@ -623,7 +652,7 @@ function genMoreLess(q, skill, o) {
     q.visual = '';
     q.hint = start ? `Think: which number is ${fmt(step)} ${dir === 'more' ? 'less' : 'more'} than ${fmt(result)}?`
         : step === 1 ? `Count ${dir === 'more' ? 'on' : 'back'} one.`
-            : `Only the ${PLACE_WORD[step]} digit changes, unless it goes past 9 or below 0.`;
+            : `Only the ${PLACE_WORD[step]} digit changes, unless it goes past nine or below zero.`;
     q.skillLabel = big ? '10, 100 or 1,000 More or Less' : '1 or 10 More or Less';
     q.pv = { kind: 'moreless', n, step, dir, support, unknown: start ? 'start' : 'answer', given };
     const base = { keyValue: q.ans, kind: 'frame', frame: q.printText, slotDigits: String(Math.trunc(cap)).length };
@@ -671,7 +700,7 @@ function stripAround(v, step, dir, inverse) {
 }
 
 function diskCounts(places, o) {
-    const zero = o.zeroPlace === 'some' && slot(2) === 1 && places.length >= 2;
+    const zero = o.zeroPlace === 'some' && randInt(0, 1) === 1 && places.length >= 2;
     const nine = slot(3) === 0;
     const ds = digitsNumber(places.length, { zero, nine });
     const counts = {};
@@ -692,13 +721,13 @@ function genDisks(q, skill, o) {
     const dec = decOf(o);
     let ns = null;
     if (dec && ['read', 'count', undefined, ''].includes(o.task || '')) {
-        const num = decimalNumber(dec, { zero: o.zeroPlace === 'some' && slot(2) === 1 });
+        const num = decimalNumber(dec, { zero: o.zeroPlace === 'some' && randInt(0, 1) === 1 });
         places = num.places.slice();
         counts = { ...num.digits };
         n = num.n;
         ns = num.s;
     } else if (dec && skill === 'pv_disks_build') {
-        const num = decimalNumber(Math.min(2, dec), { zero: o.zeroPlace === 'some' && slot(2) === 1 });
+        const num = decimalNumber(Math.min(2, dec), { zero: o.zeroPlace === 'some' && randInt(0, 1) === 1 });
         places = num.places.slice();
         counts = { ...num.digits };
         n = num.n;
@@ -768,10 +797,13 @@ function genDiskTask(q, o, places, counts, n, dots) {
     q.skillLabel = 'Place-Value Counters';
     const mat = (m) => `<div style="text-align:center;">${diskMatSVG({ size: 'M', pxPerMm: SCREEN_PX_PER_MM, dots, ...m }).svg}</div>`;
     if (task === 'all') {
-        // A tens and ones chart, 2 to 5 counters (3 to 6 numbers): a three-place chart with even
-        // three counters asks for ten numbers, too many for one cell.
-        const c = [2, 3, 4, 5][blockOrder(4)[slot(4)]];
-        const ps = [10, 1];
+        // Nine charts, dealt from the seed (critic pv-r1: four items only): tens and ones or
+        // hundreds and tens with 2 to 5 counters (3 to 6 numbers), or hundreds, tens and ones with
+        // 2 counters (6 numbers) - three counters on three places ask for ten, too many for a cell.
+        const pick = [[[10, 1], 2], [[10, 1], 3], [[10, 1], 4], [[10, 1], 5], [[100, 10], 2], [[100, 10], 3],
+            [[100, 10], 4], [[100, 10], 5], [[100, 10, 1], 2]][slot(9)];
+        const c = pick[1];
+        const ps = pick[0];
         const nums = [];
         const rec = (i, left, acc) => {
             if (i === ps.length - 1) { nums.push(acc + left * ps[i]); return; }
@@ -977,12 +1009,16 @@ function genDecimalCompare(q, o) {
         b = `${w}.${fr[0] === 9 ? 8 : fr[0] + 1}`;
     } else if (kind === 3) {
         b = `${w === 9 ? 8 : w + 1}.${fr.map(() => randInt(1, 9)).join('')}`;
-    } else if (kind === 4) {
-        b = `${w}.${fr.join('')}0`;
+    } else if (kind === 4 && d >= 2) {
+        // equal with a trailing zero, inside the page's places (critic pv-r1: "4.7560" on a
+        // thousandths page): 4.750 and 4.75
+        const head = fr.slice(0, -1).join('');
+        a = `${w}.${head}0`;
+        b = `${w}.${head}`;
     } else {
         const f2 = fr.slice(); f2[0] = f2[0] === 1 ? 2 : f2[0] - 1; b = `${w}.${f2.join('')}`;
     }
-    if (slot(2) === 1) [a, b] = [b, a];
+    if (randInt(0, 1) === 1) [a, b] = [b, a];
     const na = Number(a), nb = Number(b);
     q.text = `Compare: ${a} ___ ${b}`;
     q.printText = 'Write <, > or = in the circle.';
@@ -1005,7 +1041,7 @@ function genCompare(q, skill, o) {
     let [a, b] = comparableSet(2, cap, o);
     // One item in six is equal (the "=" case; CP-9), dealt, never rolled.
     if (slot(6) === 5 && o.lengths !== 'mixed') b = a;
-    if (slot(2) === 1 && a !== b) [a, b] = [b, a];
+    if (randInt(0, 1) === 1 && a !== b) [a, b] = [b, a];
     q.text = `Compare: ${fmt(a)} ___ ${fmt(b)}`;
     q.printText = 'Write <, > or = in the circle.';
     q.ans = a > b ? '>' : a < b ? '<' : '=';
@@ -1078,7 +1114,7 @@ function genDigitChart(q, skill, o) {
     const [lo, hi] = digitSpan(cap);
     const nd = String(hi).length;
     // A zero place in every other item (an empty column is a wrong answer here, §13.3).
-    const ds = digitsNumber(nd, { zero: slot(2) === 1 });
+    const ds = digitsNumber(nd, { zero: randInt(0, 1) === 1 });
     let n = fromDigits(ds);
     if (n < lo || n > hi) n = randInt(lo, hi);
     const s = String(n);
@@ -1193,7 +1229,9 @@ function genNearest(q, skill, o) {
     const rounded = roundTo(n, P);
     const scope = ['notation', 'decision', 'judge'].includes(o.responseScope) ? o.responseScope : 'full';
     // Plain (owner 2026-09-26): "Round 4,683 to the nearest 100." and a line - no drawing at all.
-    const plain = o.responseScope === 'plain';
+    // (Support "plain" is the panel's choice; responseScope "plain" is its first form, kept so an
+    // early share code still reads.)
+    const plain = o.responseScope === 'plain' || (Array.isArray(o.support) && o.support.includes('bare'));
     q.skillLabel = `Round to ${fmt(P)}`;
     q.options = [];
     q.pv = { kind: 'round', n, place: P, deal: kind, scope, ...(plain ? { plain: true } : {}) };
@@ -1232,7 +1270,7 @@ function genNearest(q, skill, o) {
     if (scope === 'judge') {
         // RN-14: a finished rounding in black; about half are wrong, each from §14.
         const wrongs = pvRoundingErrors(n, P);
-        const isWrong = slot(2) === 1 && wrongs.length > 0;
+        const isWrong = randInt(0, 1) === 1 && wrongs.length > 0;
         const shown = isWrong ? wrongs[Math.floor(_at / 2) % wrongs.length].value : rounded;
         q.text = `Check: ${fmt(n)} rounded to ${name} is ${fmt(shown)}. Is it correct?`;
         q.printText = 'Check the work. Check one box: Correct or Fix it.';
@@ -1659,7 +1697,9 @@ function roundMultiNumber(places, cap, o) {
     if (kind === 'chain' && (places.length < 2 || o.midpoint === 'never')) kind = 'plain';
     if (kind === 'mid') {
         // halfway for the chosen places in turn (4,685 for 10; 4,650 for 100)
-        const P = places[_at % places.length];
+        // halfway for one of the two smallest places, drawn: halfway for a big place leaves every
+        // smaller place's answer equal to the number itself (1,500,000 to the nearest 10)
+        const P = places[randInt(0, Math.min(1, places.length - 1))];
         for (let t = 0; t < 40; t++) {
             const v = randInt(Math.floor(lo / P), Math.floor(hi / P)) * P + P / 2;
             if (ok(v)) return { n: v, kind };
@@ -1705,14 +1745,17 @@ function genRoundMulti(q, skill, o, places, cap) {
     q.visual = '';
     q.hint = 'Round from the number itself every time: find the place, then look at the digit after it.';
     q.skillLabel = 'Round to Several Places';
-    q.pv = { kind: 'multi', n, places: places.slice(), keys, deal: kind };
-    setCell(q, { kind: 'round-multi', n, places: places.slice(), keys: keys.map(fmt), keyValue: q.ans });
+    const labels = o.support === 'labels';
+    q.pv = { kind: 'multi', n, places: places.slice(), keys, deal: kind, ...(labels ? { labels } : {}) };
+    setCell(q, { kind: 'round-multi', n, places: places.slice(), keys: keys.map(fmt), keyValue: q.ans, ...(labels ? { labels } : {}) });
 }
 
 function genRoundingTable(q, skill, o) {
     let places = (Array.isArray(o.places) && o.places.length ? o.places : [10, 100]).map(Number).filter(p => [10, 100, 1000, 10000, 100000, 1000000].includes(p));
     if (!places.length) places = [10, 100];
     places.sort((a, b) => a - b);
+    // "Several places": one tick (an old link) gets the place above it (below it at 1,000,000).
+    if (places.length === 1) places = places[0] >= 1000000 ? [100000, 1000000] : [places[0], places[0] * 10];
     const top = places[places.length - 1];
     const cap = capOf('number_sense', skill, o, top * 10);
     // One number a problem (the default, owner 2026-09-26); the table is a layout choice.
@@ -1793,7 +1836,7 @@ function genEstimate(q, skill, o) {
         const qMin = Math.min(qMax, Math.max(2, Math.ceil((10 + off) / (divisor * pf))));
         est = randInt(qMin, qMax) * pf;
         compat = divisor * est;
-        a = Math.max(1, compat + randInt(1, off) * (slot(2) ? 1 : -1));
+        a = Math.max(1, compat + randInt(1, off) * (randInt(0, 1) ? 1 : -1));
         if (a === compat) a += 1;
         b = divisor;
         op = '÷';
@@ -1805,7 +1848,7 @@ function genEstimate(q, skill, o) {
         // The estimate owns its numbers (the place's two-digit multiples); only a mixed review's
         // Max Number narrows them, never below three of the place.
         const top = Math.max(3 * P, rangeCap(skill, P * 10 - 1));
-        op = skill === 'estimate_sum' ? '+' : skill === 'estimate_diff' ? '−' : skill === 'estimate_products' ? '×' : (slot(2) === 0 ? '+' : '−');
+        op = skill === 'estimate_sum' ? '+' : skill === 'estimate_diff' ? '−' : skill === 'estimate_products' ? '×' : (randInt(0, 1) === 0 ? '+' : '−');
         if (op === '×') {
             a = estOperand(P, P + 1, top);
             b = randInt(2, 9);

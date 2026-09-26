@@ -485,7 +485,9 @@ function sentenceHtml(sf, c, ink) {
  * rest are drawn invisibly, so the geometry never changes between measurement and print.
  */
 /** A Support set hidden by the skill's other choices (`appliesTo`: plain rounding) draws nothing. */
-const supportOff = (def, o) => typeof def.appliesTo === 'function' && !def.appliesTo(o);
+const supportOff = (def, o) => (typeof def.appliesTo === 'function' && !def.appliesTo(o))
+    // "Plain: no drawing" (rounding) switches every drawn support off.
+    || (Array.isArray(o.support) && o.support.includes('bare'));
 
 function supportPlanFor(sk, q, template, size, mix = null) {
     if (!sk || !q || !q.cell || template === 'legacy') return null;
@@ -1043,6 +1045,13 @@ function skillMeta(sk, q) {
     let grade = null;
     try { grade = getSkillGrade(sk.skillId, sk.categoryId); } catch (e) { grade = null; }
     const meta = { categoryId: sk.categoryId, skillId: sk.skillId, label, grade: grade === null || grade === undefined ? '' : String(grade), ccss: sk.ccss || primaryCcss(sk) };
+    // The level and standard the skill's OPTIONS put the page at (a provider's `pageMeta`).
+    try {
+        const pm = getProvider(sk.categoryId, sk.skillId).pageMeta;
+        const r = typeof pm === 'function' ? pm(sk.opts || {}) : null;
+        if (r && r.grade) meta.grade = String(r.grade);
+        if (r && r.ccss && !sk.ccss) meta.ccss = r.ccss;
+    } catch (e) { /* the skill's own tags */ }
     // The skill's options travel to its provider's strings (a page of one task names that task:
     // number_line_scales' "Write the number at each letter.", build lane placevalue).
     const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, { skillId: nameId, opts: sk.opts || {} }));

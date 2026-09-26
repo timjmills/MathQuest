@@ -309,7 +309,10 @@ export const VALUE_TOKENS = Object.freeze({
     // The support set's second field (4E, SPILL_KEYS): the S4 picture panes wired as supports
     // (build lane placevalue, vis_supports_wiring). Every letter and digit is free here.
     supportMore: Object.freeze({ objects: 'A', fingers: 'B', rekenrek: 'C', base10: 'D', 'base10-quick': 'E', disks: 'F',
-        pvgrid: 'G', hundreds: 'H', openline: 'I', gridpaper: 'J' }),
+        pvgrid: 'G', hundreds: 'H', openline: 'I', gridpaper: 'J',
+        // rounding "Plain: no drawing" (critic pv-r1): in the spill field, so an older app that
+        // cannot draw it loads the skill's defaults instead of misreading it
+        bare: 'K' }),
     // S2 supports model (block 4): which problems carry the supports, and how clashing ones mix.
     cover: Object.freeze({ whole: 'W', needed: 'N', fade: 'F' }),
     mix: Object.freeze({ section: 'S', problem: 'P' }),

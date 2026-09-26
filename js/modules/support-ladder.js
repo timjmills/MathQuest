@@ -176,9 +176,11 @@ export function candidatesFor(q, ctx = {}) {
                     : { id, how: 'pane', pane: PANE_FOR[id] || id, payload: pay }))
             .filter((r) => r.how !== 'pane' || !!(PANES[r.pane] && PANES[r.pane].accepts(r.payload)));
     }
-    // rounding (the pv `round` cell): the skill's rounding panes and its checklist
-    if (c && c.template === 'pv' && c.payload && c.payload.kind === 'round' && Number.isFinite(Number(c.payload.n))) {
-        const pay = { kind: 'round', n: Number(c.payload.n), place: Number(c.payload.place) };
+    // rounding (the pv `round` cell, and one number rounded to several places: its first place):
+    // the skill's rounding panes and its checklist
+    const rmulti = c && c.template === 'pv' && c.payload && c.payload.kind === 'round-multi' && Array.isArray(c.payload.places);
+    if (c && c.template === 'pv' && c.payload && (c.payload.kind === 'round' || rmulti) && Number.isFinite(Number(c.payload.n))) {
+        const pay = { kind: 'round', n: Number(c.payload.n), place: Number(rmulti ? c.payload.places[0] : c.payload.place) };
         return declared.map((id) => ({ id, how: 'pane', pane: id, payload: pay }))
             .filter((r) => !!(PANES[r.pane] && PANES[r.pane].accepts(r.payload)));
     }
@@ -648,6 +650,8 @@ function answerTokens(q, steps) {
         if (t) { out.add(String(Number(t[1]))); out.add(t[2]); out.add(String(Number(t[2]))); }
     };
     if (q && (typeof q.ans === 'string' || typeof q.ans === 'number')) add(q.ans);
+    // Every part of a many-slot answer is an answer too (one number rounded to several places).
+    if (q && Array.isArray(q.keyParts)) q.keyParts.forEach(add);
     (steps || []).forEach((st) => (Array.isArray(st.marks) ? st.marks : []).forEach((m) => {
         if (m && (m.slot === 'ans' || m.slot === 'answer' || m.slot === 'hour' || m.slot === 'minute' || /^ans/.test(String(m.slot)))) add(m.value);
     }));

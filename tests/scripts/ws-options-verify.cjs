@@ -391,7 +391,13 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             for (const x of def.values) {
                 if (JSON.stringify([x.v]) === JSON.stringify(def.default)) continue;
                 if (ro([x.v])) tries.push({ def, value: [...new Set([...(def.default || []), x.v])], vl: x.l, renderOnly: true });
-                else tries.push({ def, value: [x.v], vl: x.l });
+                // A set that keeps at least `minTicks` ticks ("Round to Several Places") is tried as
+                // its default plus this value, never as one tick the control cannot hold.
+                else if (Number(def.minTicks) > 1) {
+                    if ((def.default || []).includes(x.v)) continue;
+                    const order = def.values.map((y) => y.v);
+                    tries.push({ def, value: [...new Set([...(def.default || []), x.v])].sort((a, b) => order.indexOf(a) - order.indexOf(b)), vl: x.l });
+                } else tries.push({ def, value: [x.v], vl: x.l });
             }
             if (all.length > 1 && JSON.stringify(all) !== JSON.stringify(def.default)) tries.push({ def, value: all, vl: def.allLabel || 'all', renderOnly: ro(all) });
         }

@@ -72,7 +72,7 @@ export function diskDiameter(place, size = 'L', fraction = false) {
     const g = DISK_SIZES[size] || DISK_SIZES.L;
     // "1,000" and "0.001" need 2 mm more to keep their label at 8 pt or more (TY-11); so does a
     // fraction-named 1/100 (its "100" under the bar, R61).
-    return place >= 1000 || place < 0.01 || (fraction && place < 0.1) ? g.d + 2 : g.d;
+    return place < 0.01 ? g.d + 3 : place >= 1000 || (fraction && place < 0.1) ? g.d + 2 : g.d;
 }
 
 /** The side of one square zone: 3 x (d + 2) + 2 mm (§13.4). */
@@ -115,7 +115,7 @@ function crossOut(cx, cy, d) {
 }
 
 /** One disk, centred at (cx, cy) mm. `data-pv-disk` names its place for the audit's recount. */
-function disk(cx, cy, place, size, strokePt = HAIR_PT, fraction = false) {
+function disk(cx, cy, place, size, strokePt = HAIR_PT, fraction = false, halo = false) {
     const d = diskDiameter(place, size, fraction);
     const pt = labelPt(place, size);
     const ring = `<circle data-pv-disk="${place}" cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="${(d / 2).toFixed(2)}" `
@@ -130,9 +130,12 @@ function disk(cx, cy, place, size, strokePt = HAIR_PT, fraction = false) {
             + `<line x1="${(cx - bw / 2).toFixed(2)}" x2="${(cx + bw / 2).toFixed(2)}" y1="${(cy + 0.2).toFixed(2)}" y2="${(cy + 0.2).toFixed(2)}" stroke="#000" stroke-width="${(HAIR_PT * PT_MM).toFixed(3)}"/>`
             + `<text x="${cx.toFixed(2)}" y="${(cy + 0.9 + h * 0.72).toFixed(2)}" text-anchor="middle" font-size="${h.toFixed(3)}" font-weight="700" fill="#000">${den}</text>`;
     }
-    return ring
+    // `halo`: the label again over a cross-out stroke, ringed in white, so the stroke never runs
+    // through the value (critic pv-r1).
+    const h = halo ? ` stroke="#fff" stroke-width="${(1.6 * PT_MM).toFixed(3)}" paint-order="stroke"` : '';
+    return (halo ? '' : ring)
         + `<text x="${cx.toFixed(2)}" y="${(cy + pt * PT_MM * 0.36).toFixed(2)}" text-anchor="middle" `
-        + `font-size="${(pt * PT_MM).toFixed(3)}" font-weight="700" fill="#000">${fmt(place)}</text>`;
+        + `font-size="${(pt * PT_MM).toFixed(3)}" font-weight="700" fill="#000"${h}>${fmt(place)}</text>`;
 }
 
 /**
@@ -188,7 +191,10 @@ export function diskMatSVG({ places, counts = null, size = 'L', pxPerMm = 0, dis
             const cx = x + 1 + pitch * (k % per) + pitch / 2;
             const cy = g.head + 1 + pitch * Math.floor(k / per) + pitch / 2;
             body += dots ? dotCounter(cx, cy, p) : disk(cx, cy, p, size, diskPt, fraction);
-            if (k >= c - xk) body += crossOut(cx, cy, dots ? 6 : diskDiameter(p, size, fraction));
+            if (k >= c - xk) {
+                body += crossOut(cx, cy, dots ? 6 : diskDiameter(p, size, fraction));
+                if (!dots && !fraction) body += disk(cx, cy, p, size, diskPt, false, true);
+            }
         }
         if (arrows && c > 0) {
             const i2 = arrows === 'left' ? i - 1 : i + 1;
@@ -241,15 +247,21 @@ export function numeralTracksHTML(n, { underline = 0, cut = 0, arrow = false, si
     const cols = typeof n === 'string' && n.includes('.') ? numberCols(n)
         : numberCols(Number.isInteger(Number(n)) ? Math.floor(Math.abs(Number(n) || 0)) : Number(n));
     const cutPt = 1.5;
-    const cutAt = (c) => cut && !c.comma && !c.point && samePlace(c.place, cut);
+    // The cut line stands after the cut place's digit - and after its comma when one follows
+    // ("7,|712", never "7|,712", critic pv-r1).
+    const cutIdx = cut ? cols.findIndex((c) => !c.comma && !c.point && samePlace(c.place, cut)) : -1;
+    const barIdx = cutIdx >= 0 && cols[cutIdx + 1] && cols[cutIdx + 1].comma ? cutIdx + 1 : cutIdx;
+    const cutAt = (c) => cutIdx >= 0 && cols.indexOf(c) === cutIdx;
+    const barAt = (c) => barIdx >= 0 && cols.indexOf(c) === barIdx;
     const td = (inner, style = '') => `<td style="padding:0;text-align:center;${style}">${inner}</td>`;
-    const heads = cols.map(c => c.comma || c.point ? td('', 'width:0.3em;')
-        : td(LETTER[c.place] || '', `width:2.2em;font-size:0.42em;line-height:1.6;font-weight:${cutAt(c) ? 700 : 400};`
-            + (cutAt(c) ? `border-right:${cutPt}pt solid #000;` : ''))).join('');
-    const digits = cols.map(c => c.comma ? td(',', 'width:0.3em;') : c.point ? td('.', 'width:0.3em;')
+    const bar = `border-right:${cutPt}pt solid #000;`;
+    const heads = cols.map(c => c.comma || c.point ? td('', 'width:0.3em;' + (barAt(c) ? bar : ''))
+        : td(LETTER[c.place] || '', `width:2.2em;font-size:max(0.42em, 8pt);line-height:1.6;font-weight:${cutAt(c) ? 700 : 400};`
+            + (barAt(c) ? bar : ''))).join('');
+    const digits = cols.map(c => c.comma ? td(',', 'width:0.3em;' + (barAt(c) ? bar : '')) : c.point ? td('.', 'width:0.3em;')
         : td(underline && samePlace(c.place, underline)
             ? `<span style="display:inline-block;line-height:1;border-bottom:0.08em solid #000;padding:0 0.04em 0.04em;">${c.digit}</span>` : c.digit,
-            'width:0.95em;line-height:1.15;' + (cutAt(c) ? `border-right:${cutPt}pt solid #000;` : ''))).join('');
+            'width:0.95em;line-height:1.15;' + (barAt(c) ? bar : ''))).join('');
     const table = `<table class="pv-tracks" style="border-collapse:collapse;display:inline-table;vertical-align:bottom;`
         + `color:#000;font-weight:700;">`
         + `${showHeads ? `<tr>${heads}</tr>` : ''}<tr>${digits}</tr></table>`;
@@ -513,8 +525,12 @@ function blanksHTML(ctx, text, keys, words, floor = 0) {
  * numbers of one size, so their slots come out the same width whatever each answer is.
  */
 function slotFloor(p, grow) {
-    const lens = [p.n, p.a, p.b, p.lo, p.hi].filter((v) => typeof v === 'number' && Number.isFinite(v))
-        .map((v) => String(Math.abs(Math.round(v))).length);
+    // (a decimal arrives as its string, "4.567": its digits count, the point does not - so a value
+    // line is as wide as the number's digits, never as its own answer, critic pv-r1 L3)
+    const lens = [p.n, p.a, p.b, p.lo, p.hi].map((v) => (typeof v === 'string' && /^\d[\d,]*(\.\d+)?$/.test(v) ? v : v))
+        .filter((v) => (typeof v === 'number' && Number.isFinite(v)) || typeof v === 'string')
+        .map((v) => (typeof v === 'string' ? v.replace(/[^0-9]/g, '').length : String(Math.abs(Math.round(v))).length))
+        .filter((k) => k > 0);
     for (const t of String(p.frame || '').match(/\d[\d,]*/g) || []) lens.push(t.replace(/,/g, '').length);
     for (const v of p.nums || []) lens.push(String(v).replace(/[^0-9]/g, '').length);
     const m = lens.length ? Math.max(...lens) : 0;
@@ -647,6 +663,15 @@ function orderHTML(p, ctx) {
         + `<div class="ws-eq pv-order" style="font-weight:700;flex-wrap:nowrap;white-space:nowrap;justify-content:center;">${boxes}</div>`;
 }
 
+/**
+ * Size S buys more problems a page (LESSONS L1, critic pv-r1): a number line of ten jumps or fewer
+ * is drawn 70 mm long there, so two stand side by side; a mat of three zones stands its disks two
+ * across (and five down), so two mats stand side by side.
+ */
+const scaleHalf = (p, size) => size === 'S' && Math.round((p.hi - p.lo) / p.step) <= 10
+    && (p.labels !== 'step' || String(Math.round(Math.abs(p.hi))).length <= 3);
+const matAcross = (p, size) => (size === 'S' && (p.places || []).length === 3 ? 2 : 3);
+
 const keyDigits = (kv) => Math.max(2, String(kv === undefined ? '' : kv).replace(/[^0-9]/g, '').length);
 
 register('pv', {
@@ -748,6 +773,12 @@ register('pv', {
                         + `<span style="${keep}">${big(`${esc(fmt(p.n))} →`)}</span> <span style="${keep}">${big(slot)}</span></div>`;
                 }
                 const pic = numeral({ cut: p.place, arrow: true });
+                // On a screen (the kit twin) a narrow card stacks the answer UNDER the cut-line
+                // number instead of clipping it (critic pv-r1, 390 px); paper keeps one line.
+                if (p.onScreen) {
+                    const keep = 'display:inline-block;white-space:nowrap;vertical-align:bottom;';
+                    return `<div class="pv-cell pv-round1" style="text-align:center;"><span style="${keep}">${pic}</span> <span style="${keep}">${big(slot)}</span></div>`;
+                }
                 return `<div class="pv-cell pv-round1" style="text-align:center;white-space:nowrap;">${pic}${big(slot)}</div>`;
             }
             case 'round-notate': {
@@ -805,19 +836,23 @@ register('pv', {
                 // The number stands BESIDE its lines where the column is wide enough, over them
                 // where it is not (footprint `restacks`), so a cell is only as tall as its lines.
                 // The page instruction names the places; each line is labelled with its place.
-                const w = String(Math.trunc(Math.abs(Number(p.n) || 0))).length + 1;
+                // Four or more places (a 7-digit number): the line is as wide as the number, and the
+                // label is the place alone, so a problem still fits half the page (critic pv-r1).
+                const many = (p.places || []).length > 3;
+                const w = String(Math.trunc(Math.abs(Number(p.n) || 0))).length + (many ? 0 : 1);
                 const rows = (p.places || []).map((P, i) => `<div style="display:table-row;">`
-                    + `<span style="display:table-cell;text-align:right;padding:0 2mm 0 0;font-size:${pt(m.textPt + 2)};white-space:nowrap;vertical-align:bottom;">${esc(fmt(P))} →</span>`
+                    + `<span style="display:table-cell;text-align:right;padding:0 2mm 0 0;font-size:${pt(m.textPt + (many ? 0 : 2))};white-space:nowrap;vertical-align:bottom;">${esc(fmt(P))}${many ? ':' : ' →'}</span>`
                     + `<span style="display:table-cell;padding:0.5mm 0;vertical-align:bottom;">${blank({ id: `b${i}`, kind: 'number', shape: 'line', digits: w, graded: true, order: i,
                         scopes: ['full', 'answer-only'] }, ctx, (p.keys || [])[i])}</span></div>`).join('');
+                // `labels`: the place letters over the number's digits (the support); plain is the fade.
                 return `<div class="pv-cell pv-rmulti" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;column-gap:6mm;row-gap:1mm;">`
-                    + `<div style="white-space:nowrap;">${big(esc(fmt(p.n)))}</div>`
+                    + `<div style="white-space:nowrap;">${p.labels ? numeral({}) : big(esc(fmt(p.n)))}</div>`
                     + `<div class="ws-eq" style="display:table;font-weight:700;">${rows}</div></div>`;
             }
             case 'scale': {
                 // nl_20 (number_sense:number_line_scales): read the arrow, write the lettered
                 // numbers, mark a number, or estimate where it goes on a line with only its ends.
-                const len = { S: 120, M: 140, L: 150 }[ctx.size] || 140;
+                const len = scaleHalf(p, ctx.size) ? 70 : ({ S: 120, M: 140, L: 150 }[ctx.size] || 140);
                 const task = p.task || 'read';
                 const base = { lo: p.lo, hi: p.hi, step: p.step, labels: p.labels, lengthMm: len, labelPt: m.zonePt };
                 if (task === 'mark' || task === 'estimate') {
@@ -840,7 +875,7 @@ register('pv', {
                 // arrows of × / ÷ 10 (task x10 / d10), and every number from n counters (task all).
                 const moving = p.task === 'x10' ? 'left' : p.task === 'd10' ? 'right' : null;
                 if (p.task === 'all') {
-                    const mat = diskMatSVG({ places: p.places, counts: null, size: ctx.size }).svg;
+                    const mat = diskMatSVG({ places: p.places, counts: null, size: ctx.size, across: matAcross(p, ctx.size) }).svg;
                     const head = `<span style="font-size:${pt(m.textPt + 3)};font-weight:400;">Use</span> ${big(esc(String(p.counters)))} `
                         + `<span style="font-size:${pt(m.textPt + 3)};font-weight:400;">counters.</span>`;
                     const list = (p.sorted || []).map(String);
@@ -852,7 +887,7 @@ register('pv', {
                     return `<div class="pv-cell">${center(head)}${center(mat)}<div class="ws-eq pv-allnums" style="font-weight:700;display:grid;`
                         + `grid-template-columns:repeat(${Math.min(3, list.length)},auto);justify-content:center;gap:2mm 5mm;">${boxes}</div></div>`;
                 }
-                const mat = screenMat(ctx, p, { places: p.places, counts: p.counts, size: ctx.size, dots: !!p.dots, crossed: p.crossed || null, arrows: moving, fraction: !!p.fraction });
+                const mat = screenMat(ctx, p, { places: p.places, counts: p.counts, size: ctx.size, dots: !!p.dots, crossed: p.crossed || null, arrows: moving, fraction: !!p.fraction, across: matAcross(p, ctx.size) });
                 const frame = p.task === 'count' ? `${PLACE_WORD_KIT[p.place] || ''}${p.dots ? '' : ' disks'}: ____`
                     : p.task === 'x10' ? `${fmt(p.n)} × 10 = ____` : p.task === 'd10' ? `${fmt(p.n)} ÷ 10 = ____` : '____';
                 return `<div class="pv-cell">${center(mat)}${frameHTML(ctx, frame, kv, digits)}</div>`;
@@ -865,7 +900,7 @@ register('pv', {
                     const v = Number(String(shownVal(ctx, 'answer', '')).replace(/[^0-9.]/g, ''));
                     if (Number.isFinite(v)) counts = Object.fromEntries((p.places || []).map((pl) => [pl, Math.floor(Math.round(v * 1000) / Math.round(pl * 1000)) % 10]));
                 }
-                const mat = screenMat(ctx, p, { places: p.places, counts, size: ctx.size, diskPt: 1.5, dots: !!p.dots, fraction: !!p.fraction });
+                const mat = screenMat(ctx, p, { places: p.places, counts, size: ctx.size, diskPt: 1.5, dots: !!p.dots, fraction: !!p.fraction, across: matAcross(p, ctx.size) });
                 const numeralSpan = `<span style="font-size:${pt(m.digitPt)};font-weight:700;">${esc(fmt(p.n))}</span>`;
                 // A mat of three or more zones fills a full-width cell: the number stands BESIDE it
                 // (not over it), so the row is one mat tall and a page holds more rows (L2).
@@ -913,10 +948,10 @@ register('pv', {
     },
     footprint(p, ctx) {
         const nd = String(p.n === undefined ? '' : p.n).length;
-        const wide = p.kind === 'sort' || p.kind === 'table' || p.kind === 'line-mark' || p.kind === 'chart' || p.kind === 'scale'
+        const wide = p.kind === 'sort' || p.kind === 'table' || p.kind === 'line-mark' || p.kind === 'chart' || (p.kind === 'scale' && !scaleHalf(p, ctx.size))
             || (p.kind === 'word-choice' && Math.max(0, ...(p.choices || []).map(c => String(c).length)) > 30)
             || (p.kind === 'round' && (p.support === 'line' || (nd >= 6 && p.support !== 'none'))) || (p.kind === 'judge' && nd >= 6)
-            || ((p.kind === 'disks' || p.kind === 'build') && (p.places || []).length >= 3)
+            || ((p.kind === 'disks' || p.kind === 'build') && (p.places || []).length >= 3 && matAcross(p, ctx.size) === 3)
             || (p.kind === 'expand' && (nd >= 4 || (nd === 3 && ctx.size === 'L')))
             || ((p.kind === 'blanks' || p.kind === 'expand-line') && String(p.frame || p.n || '').length > 34)
             || (p.kind === 'order' && (p.nums || []).length >= 5)
@@ -931,7 +966,8 @@ register('pv', {
         // M and L (5 against 4: the smaller drawing buys a row, LESSONS L1). At S it is the 'wide'
         // class (5 rows); at M and L the one-column grid (4 rows) - 'wide' there would drop L to 3
         // rows and leave a third of every cell empty (L2).
-        const fclass = ctx.size === 'S' && wide && (p.kind === 'scale' || ((p.kind === 'disks' || p.kind === 'build') && (p.places || []).length >= 3)) ? 'wide' : undefined;
+        const fclass = ctx.size === 'S' && wide && (p.kind === 'scale' || ((p.kind === 'disks' || p.kind === 'build') && (p.places || []).length >= 3)) ? 'wide'
+            : undefined;
         // A plain rounding cell stacks its line under the number on purpose when the column is
         // narrow (the render keeps "4,683 →" whole): that is not a collapse (measureItems' reflow).
         const restacks = (p.kind === 'round' && p.support === 'none' && nd >= 5) || p.kind === 'round-multi';
