@@ -1313,3 +1313,12 @@ html body .mq-scell .mq-nl-start.mq-nl-given .mq-nl-mark::after { background: #f
    card, so the tables and scales line up across the row (they were centred in cards of the
    row's height, 18-24% blank above some). */
 .online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard > .mq-wspaper > .ws-cell.mq-scell:has(.fg-bar-graph, .fg-pictograph, .fg-tally-chart) { justify-content: flex-start; }
+
+/* AP2 round 7 (critic figures-r8 G): on a wide online-worksheet card a graph and its question
+   always stand side by side - the graph three fifths of the card - so every card of a worksheet
+   has one layout (a short question no longer let the graph wrap its question underneath). */
+@media (min-width: 700px) {
+  .mq-span-row .fg-datarow { flex-wrap: nowrap !important; width: 780px; max-width: calc(100vw - 120px); margin: 0 auto; }
+  .mq-span-row .fg-datarow > .fg-pic { flex: 0 0 55% !important; max-width: 55% !important; }
+  .mq-span-row .fg-datarow > .fg-ask { flex: 1 1 0 !important; min-width: 0 !important; }
+}

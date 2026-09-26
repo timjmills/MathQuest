@@ -450,7 +450,9 @@ function dataCell(name, draw) {
                 : `<div class="fg-pic" style="flex:none;max-width:100%;">${g.html}</div>`;
             // paper: the cell takes the full column width, so the question stands beside the graph
             // (a shrink-to-fit cell wrapped a short question under a narrow graph)
-            return root(ctx, `fg-${name}`, `<div style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 5)};flex-wrap:wrap;">`
+            // (fg-datarow: a wide online-worksheet card keeps the question beside the graph on every
+            // card - screen-cell.css - so one worksheet has one card layout, critic figures-r8 G)
+            return root(ctx, `fg-${name}`, `<div class="fg-datarow" style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 5)};flex-wrap:wrap;">`
                 + `${pic}${ask}</div>`, { style: isTwin(ctx) ? '' : 'width:100%;box-sizing:border-box;' });
         },
         answerKey(p) {
