@@ -199,6 +199,11 @@ the 8/10 pass bar** (critics do not grade it; a skill passes without it). Saved 
 keep printing (share codes and saved sets are never broken); no further work is done on it except keeping the
 answer-giveaway fixes already made.
 
+**Paused, not deleted (owner, 2026-09-26): "we might bring these back later once everything is built."** Keep the role
+code, its providers' `wrongAnswer` data, its share-code entries and its critic history intact so it can be revived.
+Revival is a later-wave item (recorded in `design/LESSONS_VISION.md` → Later), after the lesson library and skills pass; it would be
+rebuilt on the lesson practice frame (§8c) and re-graded before it returns to the Print screen.
+
 ## 9. Risks
 
 Engine regressions invalidating passed lessons (single engine owner, render-hash stamps → `stale`); ≈ 359 steps blocked
