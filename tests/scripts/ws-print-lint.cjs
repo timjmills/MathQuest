@@ -668,7 +668,9 @@ function wsLintPage(cfg) {
     styleEl.remove();
 
     /* ------------------------------------------------------------------ L-EMOJI */
-    const EMOJI = /[\p{Extended_Pictographic}\u{FE0F}\u{20E3}\u{1F1E6}-\u{1F1FF}\u{2605}\u{2606}]/gu;
+    // © and ® are Extended_Pictographic in Unicode but are plain text glyphs in Andika (no emoji
+    // presentation without U+FE0F, which stays banned). The owner's copyright line needs ©.
+    const EMOJI = /(?![\u00A9\u00AE](?!\u{FE0F}))[\p{Extended_Pictographic}\u{FE0F}\u{20E3}\u{1F1E6}-\u{1F1FF}\u{2605}\u{2606}]/gu;
     for (const ri of rootInfo) {
         const walker = document.createTreeWalker(ri.el, NodeFilter.SHOW_TEXT);
         for (let n = walker.nextNode(); n; n = walker.nextNode()) {

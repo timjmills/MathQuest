@@ -13212,7 +13212,7 @@ export function generateWorksheetHTML() {
                 <div class="worksheet-problems" style="grid-template-columns: ${gridCols};gap:${gridGap};">${problemsHTML}</div>
                 ${answerKeyHTML}
                 <div class="worksheet-footer">
-                    <span class="footer-left">Math Quest Pro</span>
+                    <span class="footer-left">Math Quest Pro · &copy; ${new Date().getFullYear()} Cultivating the Digital</span>
                     <span class="footer-center">${numSets > 1 ? `Page ${setNum + 1}` : ''}</span>
                     <span class="footer-right">${today}</span>
                 </div>
@@ -14086,7 +14086,7 @@ async function generateWorksheetHTMLAsync() {
                 </div>
                 ${answerKeyHTML}
                 <div class="worksheet-footer">
-                    <span class="footer-left">Math Quest Pro</span>
+                    <span class="footer-left">Math Quest Pro · &copy; ${new Date().getFullYear()} Cultivating the Digital</span>
                     <span class="footer-center">${numSets > 1 && labelSets ? `Page ${setNum + 1}` : ''}</span>
                     <span class="footer-right">${today}</span>
                 </div>

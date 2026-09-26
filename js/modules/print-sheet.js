@@ -2102,6 +2102,8 @@ export function sheetDocument(html, title = 'Worksheet', opts = {}) {
 <head>
 <meta charset="utf-8">
 <title>${escText(title)}</title>
+<meta name="copyright" content="&copy; ${new Date().getFullYear()} Cultivating the Digital. All rights reserved.">
+<meta name="author" content="Cultivating the Digital">
 ${links}
 <style data-mq-sheet-engine>${SHEET_ENGINE_CSS}</style>
 <style>
