@@ -115,7 +115,9 @@ register('chartwindow', {
         // The window's width at L: a 1-100 window (85 mm) shares a row; a row of ten or a window
         // of four- and five-digit numbers takes the whole row (the host's measurement decides at S).
         const w = (p && p.cols ? p.cols.length : 5) * cellW(p || {}, 'L', 28 * 0.8);
-        return w <= 90 ? { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2 }
+        // `hardCap`: the chart's tracks have a 12 mm floor its measurement cannot see (the table
+        // squeezes rather than overflowing), so its 2 columns hold at every size (critic guided-r1).
+        return w <= 90 ? { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true }
             : { wMm: Math.ceil(w + 4), hMm: null, measure: true, factLike: false, maxCols: 1 };
     },
     inputs(p) {

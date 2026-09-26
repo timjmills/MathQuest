@@ -264,6 +264,20 @@ has('var grey border', inkHTML(`<div style="border:1px solid var(--mq-muted)"></
             eq(`${q.cell.template} ${state}: no residue`, inkResidue(html).length, 0);
         }
     }
+    // Critic guided-r1: the worked cell carries the working its Steps name, in the Model's ink.
+    const rings = (s) => (renderCell(T('remainder', { dividend: 19, divisor: 3 }), { mode: 'print', size: 'L', state: s }).match(/data-mq-ring="group"/g) || []).length;
+    const remT = renderCell(T('remainder', { dividend: 19, divisor: 3 }), { mode: 'print', size: 'L', state: 'traced' });
+    const groupPaths = remT.match(/<path[^>]*data-mq-ring="group"[^>]*>/g) || [];
+    ok('remainder traced: a ring round each of the 6 groups (a wrapped group is two)', groupPaths.length >= 6 && groupPaths.length <= 12, String(groupPaths.length));
+    ok('remainder traced: rings in trace grey', groupPaths.every((p) => /#949494/.test(p) && /data-ws-ink="trace"/.test(p)));
+    eq('remainder blank: no rings', rings('blank'), 0);
+    const sub = T('stack', { operands: [21, 4], op: '-', regroup: 'sub' });
+    const subT = renderCell(sub, { mode: 'print', size: 'L', state: 'traced', scaffoldLevel: 3 });
+    ok('stack sub traced: the regrouped digits crossed out in grey', /class="ws-strike ws-trace"/.test(subT));
+    ok('stack sub traced: the new numbers 1 and 11 in grey', /data-ws-ink="trace">1<\/span>/.test(subT) && /data-ws-ink="trace">11<\/span>/.test(subT));
+    const add3 = T('stack', { operands: [468, 275], op: '+', regroup: 'add', workUpTo: 1 });
+    const addT = renderCell(add3, { mode: 'print', size: 'L', state: 'traced', scaffoldLevel: 3 });
+    eq('stack add traced workUpTo 1: only the ten carried from the ones', (addT.match(/mq-rgink" data-ws-ink="trace">/g) || []).length, 1);
 }
 // 26. Critic round 2 (C4): the key's digits keep the sheet's open 4 (cv04) at Andika 700, never
 //     cv01 (TY-4), and the role CSS stays in the ink set.

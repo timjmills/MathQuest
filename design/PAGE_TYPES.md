@@ -399,7 +399,7 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 ### 2.3 Guided page
 
 **Purpose.** "We do" with many repetitions while the steps stay in view.
-**Look.** I Can. Quiet letters and a Score like every other role (critic round 2, 2026-09-25); the worked example carries the `Model` tab and is not scored. The fade: cell 1 fully traced (answer and working), the rest of row 1 the first step of the working traced (a column stack's ones digit and carried ten) or the count cue (a grey dot tile for + and −, the missing-factor think line for ÷), later rows blank. A lone grey digit or half the blanks is never traced.
+**Look.** I Can. Cells are **unlabelled** (CL-14: the band names them; round-4 re-grade, superseding round 2's quiet letters) and scored: the Score counts every cell but the worked example, which carries the `Model` tab. The fade: cell 1 fully traced (answer and working); the first try row the first step of the working in grey - a column stack's ones digit and carried ten, the count cue (a grey dot tile for + and −, the missing-factor think line for ÷), or a grey hint line: the problem's own first worked step that holds none of its answer (when every step names part of the answer, as a clock's hour does, the first step as a frame with the answer left as a gap: "The short hand has passed ___."); later rows blank. When every try sits in that one row, only the FIRST try is hinted, so the page fades to "none". A lone grey digit or half the blanks is never traced. One kind of problem per page (the kind the pool deals most), so the Steps fit every item; the Model is the forward item whose worked steps are the most (it exercises every printed step), and it draws that working in trace grey: a subtraction's cross-outs and new numbers, a remainder's rings round each group, a fact's skip count, a table's answers. A Model too tall to leave a row of tries under it takes a cell of its own with a hinted try beside it, never a page alone. A column stack keeps its black digit grid on every try.
 
 ```
 +=======================================================================+
@@ -411,7 +411,9 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 | +----------------------+----------------------+---------------------+ |
 | | row 2: level 1 (first-cell cue, then structural supports only)    | | 45
 | +----------------------+----------------------+---------------------+ |
-| (spare height stays blank: the Guided page ceiling is 8 / 6 / 6 cells) |
+| (rows grow to 1.5 x their content, then more rows up to the ceiling of  |
+| 10 / 8 / 6 tries plus the Model; the rest stays under the grid - never |
+| as gaps between rows)                                                  |
 | Teacher prompts (optional strip)                                      |  8
 +-----------------------------------------------------------------------+
 ```
@@ -421,13 +423,13 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 | Steps strip (strip + 3 text lines + 3) | 6 + 15 + 3 = 24 | 6 + 18 + 3 = 27 | 8 + 21 + 3 = 32 |
 | Rows = floor((232 - steps - band strip) / Hg) | (232-24-6)/36 = 5 | (232-27-6)/45 = 4 | (232-32-8)/54 = 3 |
 | Columns (Auto) | 4 | 3 | 3 |
-| Cells (design-standard ceiling 8 / 6 / 6; rows beyond it are not printed) | 8 (2 rows used) | 6 (2 rows used) | 6 (2 rows used) |
+| Tries (design-standard 12.1 ceiling 10 / 8 / 6, plus the Model; rows beyond it are not printed) | up to 10 | up to 8 | up to 6 |
 
 - **PT-GDP-1.** The fade inside the page is monotone: cell 1 is level 3, the rest of row 1 is level 2, every later row is level 1. Structural supports never drop on this page.
 - **PT-GDP-2.** The Steps strip is two text columns, 3 lines at most; longer step lists move to a Scripted Model page and the strip shows the step verbs only.
 - **PT-GDP-3.** The teacher-prompt strip costs 8 mm and is taken off the row budget before rows are counted.
 
-**Teacher options.** Steps strip on or off or as a check box checklist; cell count 3, 6 or 8 (never above the ceiling for the size); teacher-prompt strip; individual supports.
+**Teacher options.** Steps strip on or off or as a check box checklist; cell count 3, 6 or 8 (never above the ceiling for the size: 10 / 8 / 6 tries); teacher-prompt strip; individual supports.
 **Skill supplies.** `workedSteps`, `renderCell` at levels 3, 2, 1, `strings.instruction`.
 **Screen.** Guided items in Learn mode: live per-digit feedback, Hint reveals the next grey support, the steps stay docked above (375) or left (1440) of the cell.
 
@@ -575,6 +577,7 @@ M: 6 + 82 + 6 + 41 + 6 + 57 = 198 <= 232; spare 34 lets the three stack rows gai
 - **PT-REV-1.** Two or three sections, each a band strip that holds the instruction (weight 400; the earlier-items section also carries the band label `Mixed Review:`), followed by whole rows of the section's cell. 8 to 20 items in total, from the pedagogy standard's allowed totals (8, 10, 12, 16, 20; P-23), never above the design-standard ceiling per page (16 / 12 / 8-12).
 - **PT-REV-2.** Supports equal those of the last lesson taught. Steps, models and traces do not appear.
 - **PT-REV-3.** Earlier-step items make up 25 to 35% of the labelled cells; the lint checks the ratio.
+- **PT-REV-4** (critic guided-r1). The earlier share never passes 45%: 20-45% when whole rows allow it, else one mixed row, else none. A skill with no earlier step in its category rehearses the nearest earlier skill in its domain (same grade or lower), so every Review has its `Mixed Review:` section. The skill's own problems come in one band per instruction kind (a kind names its own line; problems with no line of their own take the neutral `Solve.`), each band whole rows, and every row is as tall as what it holds - a page of mixed heights fills by the rows it prints, never by its tallest problem.
 
 **Teacher options.** Sections and their skills; counts; mix ratio; hints (off by default).
 **Skill supplies.** `renderCell` level 1, `footprint`, `strings.instruction`. **Screen.** Mixed review mode, feedback on Check.

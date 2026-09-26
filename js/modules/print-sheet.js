@@ -25,13 +25,13 @@
 import { generateQuestionFor } from './generate-question.js';
 import { factSetTitle, optionsFor, normalizeOptions } from './skill-options.js';
 import { opsRoutedSkill } from './gen-operations.js';
-import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills } from './data.js';
+import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
-import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap } from './sheet/layout.js';
+import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine } from './sheet/roles/lesson.js';
@@ -727,7 +727,13 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
     const supportsBox = { plan: withSupports ? supportPlanFor(g.skill, q, template, size, mix) : null, cur: null, level: 3, mixKey: mix ? mix.key : undefined };
     if (supportsBox.plan) supportsBox.cur = Object.assign({}, supportsBox.plan.extra, { on: supportsBox.plan.worst.slice(), reserve: [] });
     const forceL = !!(supportsBox.plan && supportsBox.plan.forceL);
-    const atL = (c) => (forceL && c.size !== 'L' ? Object.assign({}, c, { size: 'L', metrics: resolveCtx({ size: 'L', look: c.look }).metrics }) : c);
+    // The item's floor size (owner ruling 2026-09-26, LESSON_LIBRARY_PLAN.md 8a): the page's size
+    // wherever the item can be drawn at it, else the size its template declares as its floor
+    // (`minSize`) - the item keeps its floor and the rest of the page keeps the chosen size. S2
+    // touch dots force L the same way.
+    const floor = forceL ? 'L' : (sizeFloor(size, cellMinSize(q)) || size);
+    const up = floor !== size;
+    const atL = (c) => (up && sizeFloor(c.size, floor) !== c.size ? Object.assign({}, c, { size: floor, metrics: resolveCtx({ size: floor, look: c.look }).metrics }) : c);
     // The draw function. `cols` is the section's final column count, handed in by the role:
     // the legacy template picks its size class from it, the fact ladder its digit size.
     const key = cellAnswerKey(q);
@@ -778,7 +784,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         // S2: touch dots need 24 pt digits, so a forced section draws its problems at L inside a
         // smaller page (the preset's custom properties re-set on a wrapper; the page stays M / S).
         const html0 = legacy ? legacyClean(renderCell(q, ctx)) : renderCell(qd, ctx);
-        const html = forceL && c.size !== 'L' ? `<div class="ws-L" data-ws-force-size="L">${html0}</div>` : html0;
+        const html = up && sizeFloor(c.size, floor) !== c.size ? `<div class="ws-${floor}" data-ws-force-size="${floor}">${html0}</div>` : html0;
         if (legacy && hasShown) {
             const v = String(shown);
             // A wrong value is written as a pupil would have written it: a place-value mat draws
@@ -808,7 +814,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
     };
     let fp;
     const qFoot = supportsBox.cur ? Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { supports: supportsBox.cur }) }) }) : q;
-    try { fp = cellFootprint(qFoot, resolveCtx({ mode: 'print', size: forceL ? 'L' : size, look: 'ican' })); } catch (e) { fp = { wMm: 93, hMm: null, measure: true, maxCols: 2 }; }
+    try { fp = cellFootprint(qFoot, resolveCtx({ mode: 'print', size: floor, look: 'ican' })); } catch (e) { fp = { wMm: 93, hMm: null, measure: true, maxCols: 2 }; }
     if (legacy) {
         // SCC-A6: a legacy cell is sized by measurement. Its size class caps the columns only for
         // word problems (PT-WPR-1); everything else is decided by what the measurement shows.
@@ -1113,10 +1119,11 @@ async function fontsReady() {
 }
 
 /** The column counts a section's layout may choose, so each gets measured. */
-function candidateCols(columns) {
-    // Dense packing (layout.js) may take an Auto section up to DENSE_MAX_COLS columns, so every
-    // count it may choose is measured (an unmeasured legacy count would be read as fitting).
-    if (columns === 'auto') return [1, 2, 3, 4];
+function candidateCols(columns, size) {
+    // Dense packing (layout.js) may take an Auto section up to DENSE_MAX_COLS_AT[size] columns, so
+    // every count it may choose is measured (an unmeasured count would be read as fitting: facts
+    // at S in 5 columns stuck out of their 36.8 mm cells by 0.5 mm, critic guided-r1 lint).
+    if (columns === 'auto') return Array.from({ length: Math.max(4, DENSE_MAX_COLS_AT[size] || DENSE_MAX_COLS) }, (_, i) => i + 1);
     return Array.from({ length: Math.max(1, columns) }, (_, i) => i + 1);
 }
 
@@ -1479,7 +1486,7 @@ export async function buildSheet(req = {}) {
 
     const notes = [];
     let hostItems = [];
-    const measure = (items, sec) => measureItems(items, { size: n.size, look: n.look, colsList: candidateCols(sec.columns) });
+    const measure = (items, sec) => measureItems(items, { size: n.size, look: n.look, colsList: candidateCols(sec.columns, n.size) });
     const PROBE = 16;
 
     /**
@@ -1707,6 +1714,7 @@ export async function buildSheet(req = {}) {
     // S2: deal the supports over the finished sheet (page order), before it is drawn.
     allocateHostSupports(hostItems, n);
 
+    settleMixedGrades(skills, hostItems);
     const input = {
         items: hostItems,
         skills,
@@ -1764,24 +1772,69 @@ export async function buildSheet(req = {}) {
  * pre-skill list is not modelled (P-AT-1). Tombstones and the mixed pools are skipped.
  */
 const GRADE_RANK = (g) => { const i = ['K', '1', '2', '3', '4', '5', '6'].indexOf(String(g === undefined || g === null ? '' : g).toUpperCase()); return i < 0 ? null : i; };
-function earlierSkills(sk, count = 1) {
-    const list = Array.isArray(SKILLS[sk.categoryId]) ? SKILLS[sk.categoryId] : [];
-    const at = list.findIndex((s) => s.v === sk.skillId);
+/**
+ * A mixed pool's page is at the level of what it deals (critic guided-r1: "All levels" in the tab
+ * and "Grade mixed" in the footer over a page of o'clock times, Grade 1). A skill whose own grade
+ * is mixed or unknown takes the highest grade among the page's items drawn from it.
+ */
+function settleMixedGrades(metas, items) {
+    const LEVELS = ['K', '1', '2', '3', '4', '5', '6'];
+    const named = new Set(metas.map((m) => `${m.categoryId}:${m.skillId}`));
+    for (const m of metas) {
+        if (GRADE_RANK(m.grade) !== null) continue;
+        const ranks = (items || []).map((it) => it && it.q).filter((q) => q && q.categoryId === m.categoryId
+            && (q.skillId === m.skillId || !named.has(`${q.categoryId}:${q.skillId}`)))
+            .map((q) => { try { return GRADE_RANK(getSkillGrade(q.skillId, q.categoryId)); } catch (e) { return null; } })
+            .filter((r) => r !== null);
+        if (ranks.length) m.grade = LEVELS[Math.max(...ranks)];
+    }
+}
+
+function earlierSkills(sk, count = 1, { fallback = false } = {}) {
     // An earlier step is never a HARDER one: a category lists its skills in groups (facts, then
     // columns, then word problems), so the skill just above a Level K word problem can be a
     // 5-digit sum. Only skills at the same level or below count.
     let own = null;
     try { own = GRADE_RANK(getSkillGrade(sk.skillId, sk.categoryId)); } catch (e) { own = null; }
     const out = [];
-    for (let i = at - 1; i >= 0 && out.length < count; i--) {
-        const s = list[i];
-        if (!s || s.retired || s.tombstone || s.hidden || /^mixed_/.test(s.v)) continue;
-        try { if (isMixedMetaSkill(s.v)) continue; } catch (e) { /* keep */ }
+    const ok = (s, cat) => {
+        if (!s || s.v === sk.skillId || s.retired || s.tombstone || s.hidden || /^mixed_/.test(s.v)) return false;
+        try { if (isMixedMetaSkill(s.v)) return false; } catch (e) { /* keep */ }
         let g = null;
-        try { g = GRADE_RANK(getSkillGrade(s.v, sk.categoryId)); } catch (e) { g = null; }
-        if (own !== null && (g === null || g > own)) continue;
-        out.push({ categoryId: sk.categoryId, skillId: s.v });
-    }
+        try { g = GRADE_RANK(getSkillGrade(s.v, cat)); } catch (e) { g = null; }
+        return !(own !== null && (g === null || g > own));
+    };
+    const take = (cat, idxs) => {
+        const list = Array.isArray(SKILLS[cat]) ? SKILLS[cat] : [];
+        for (const i of idxs) {
+            if (out.length >= count) return;
+            const s = list[i];
+            if (ok(s, cat) && !out.some((o) => o.categoryId === cat && o.skillId === s.v)) out.push({ categoryId: cat, skillId: s.v });
+        }
+    };
+    const range = (a, b, step) => { const r = []; for (let i = a; step > 0 ? i < b : i > b; i += step) r.push(i); return r; };
+    const list = Array.isArray(SKILLS[sk.categoryId]) ? SKILLS[sk.categoryId] : [];
+    const at = list.findIndex((s) => s.v === sk.skillId);
+    // 1. The skills listed before it in its category, nearest first.
+    take(sk.categoryId, range(at - 1, -1, -1));
+    // Critic guided-r1: a skill with no earlier step (the first of its category: compare_groups,
+    // count_objects, mult_facts, perimeter_intro, bar_graph) printed a Review with no Mixed Review
+    // at all. The fallback, in order: 2. the categories before it in its domain, their last
+    // (hardest allowed) skills first; 3. the skills after it in its own category at its level or
+    // below; 4. the categories after it in its domain.
+    if (!fallback || out.length >= count) return out;
+    const cats = (() => {
+        for (const d of Object.values(DOMAINS || {})) {
+            const ids = (d.categories || []).map((c) => c.id).filter((id) => !/mixed/.test(id));
+            if (ids.includes(sk.categoryId)) return ids;
+        }
+        return [sk.categoryId];
+    })();
+    const ci = cats.indexOf(sk.categoryId);
+    const lenOf = (cat) => (Array.isArray(SKILLS[cat]) ? SKILLS[cat].length : 0);
+    for (let c = ci - 1; c >= 0 && out.length < count; c--) take(cats[c], range(lenOf(cats[c]) - 1, -1, -1));
+    if (out.length < count) take(sk.categoryId, range(at + 1, list.length, 1));
+    for (let c = ci + 1; c < cats.length && out.length < count; c++) take(cats[c], range(0, lenOf(cats[c]), 1));
     return out;
 }
 
@@ -1929,6 +1982,7 @@ async function buildRoleSheet(n, metaOf) {
         items = items.concat(its);
     });
     input.items = items;
+    settleMixedGrades(allSkills, items);
     // S2: deal the supports over the page's items (a pool of Mixed practice is its own section).
     allocateHostSupports(items, n);
     if (anchorsIn) {
