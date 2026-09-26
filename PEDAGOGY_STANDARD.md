@@ -1321,6 +1321,7 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `measure-object` | Measure the object. Write how long it is. | measure an object lying along an inch ruler (from 0, or from a later mark): one answer slot (added 2026-09-25, O6 lane AP2 round 4) |
 | `build-pictograph` | Draw the pictures. Make each row match its number. | build a picture graph: one picture in a box for each, the rest of the row empty (added 2026-09-26, O6 lane AP2 round 5) |
 | `graph-check` | Use the graph. Check one box. | a data display's "which has the most / fewest?" items, in their own section after the number items (added 2026-09-26, AP2 round 6) |
+| `measure-parts` | Measure the object. On a whole inch, leave the fraction empty. | a ruler read to the half or quarter inch: a whole-inch length leaves the fraction boxes empty (added 2026-09-26, AP2 round 7) |
 | `tally-check` | Use the tally chart. Check one box. | the same for a tally chart (added 2026-09-26, AP2 round 6) |
 | `add-sides` | Add the lengths of all the sides. Write the perimeter. | perimeter of a drawn rectangle, square or triangle (added 2026-09-25, O6 lane AP2) |
 | `tally` | Use the tally chart. Answer the questions. | read a tally chart: one box, or one check box for the row with the most / least (added 2026-09-25, O6 lane AP2) |

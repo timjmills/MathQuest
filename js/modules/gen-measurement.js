@@ -7,7 +7,7 @@ import { createAnalogClockSVG, createDigitalClockHTML, addTime, subtractTime, fo
 import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 import { isTimeMoneySkill, generateTimeMoneyQuestion } from './gen-time-money.js';
 import { k2Twin, fadeRung } from './sheet/index.js';
-import { dealPick, pageConstant } from './page-deal.js';
+import { dealPick } from './page-deal.js';
 
 // O6 appearance (lane AP2): the value of an appearance control (`labels`, `bars`) for the skill
 // being generated, or `dflt` when the skill has no such control. It never consumes a random
@@ -830,6 +830,12 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     { title: 'Stickers We Have', items: [['Stars', 'star'], ['Fish', 'fish'], ['Flowers', 'flower']],
                         cat: 'Thing', val: 'How many', count: c => `How many ${c.toLowerCase()}?`,
                         more: (a, b) => `How many more ${a.toLowerCase()} than ${b.toLowerCase()}?` },
+                    { title: 'Toys on the Mat', items: [['Balls', 'ball'], ['Cars', 'car'], ['Stars', 'star']],
+                        cat: 'Toy', val: 'How many', count: c => `How many ${c.toLowerCase()}?`,
+                        more: (a, b) => `How many more ${a.toLowerCase()} than ${b.toLowerCase()}?` },
+                    { title: 'Shapes We Cut Out', items: [['Diamonds', 'diamond'], ['Circles', 'circle'], ['Triangles', 'triangle']],
+                        cat: 'Shape', val: 'Number of shapes', count: c => `How many ${c.toLowerCase()}?`,
+                        more: (a, b) => `How many more ${a.toLowerCase()} than ${b.toLowerCase()}?` },
                 ];
                 const at = _mAt();
                 const forms = _mSet('forms') || [0, 1];
@@ -866,6 +872,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     icons: rows.map(r => (plain ? 'circle' : r[1])), catTitle: theme.cat, valTitle: theme.val, ask,
                     kinds: forms.map(f => ['value', 'more'][f]).filter(Boolean), scales: [1], question: text, answer: ans, support: _mLevel(at), widest: most };
                 q.cell = { template: 'pictograph', v: 1, payload };
+                q.dedupeKey = `${theme.title}|${text}`;
                 q.visual = k2Twin('pictograph', payload);
                 q.text = text;
                 q.screenInstr = 'Use the picture graph. Answer the question.';
@@ -904,11 +911,10 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 // the kinds the teacher ticked (forms: 0 most, 1 how many, 2 how many more), dealt
                 const forms = _mSet('forms') || [0, 1, 2];
                 let order = [1, 2, 0].filter(f => forms.includes(f));
-                // one answer shape a page (RUBRIC C1): a page of "Which has the most?" (check
-                // boxes) about one page in three, else the number questions; live play mixes
-                if (_mOnPage() && order.includes(0) && order.some(f => f !== 0)) {
-                    order = pageConstant('bar_graph_intro:shape', 3) === 0 ? [0] : order.filter(f => f !== 0);
-                }
+                // the kind is dealt per item (critic figures-r8 L10); a printed page's check-box
+                // section asks for 'check', its number section for 'box' (print-sheet splitByShape)
+                if (state.answerShape === 'check' && order.includes(0)) order = [0];
+                else if (state.answerShape === 'box' && order.some(f => f !== 0)) order = order.filter(f => f !== 0);
                 let theme, cats, counts, ask, text, ans, askType;
                 for (let tries = 0; tries < 8; tries++) {
                     theme = dealPick('bar_graph_intro:theme', themes);
@@ -916,7 +922,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     // the bars in a dealt order, so the tallest is not the first bar
                     cats = shuffle(theme.items.slice()).slice(0, numCats);
                     counts = cats.map(() => randInt(1, top));
-                    askType = ['most', 'count', 'more'][dealPick('bar_graph_intro:kind', order.length ? order : [1])] || 'count';
+                    askType = ['most', 'count', 'more'][dealPick(`bar_graph_intro:kind:${order.join()}`, order.length ? order : [1])] || 'count';
                     if (askType === 'most') {
                         // one bar is the most: a tie is broken at a dealt bar
                         const maxVal = Math.max(...counts);
@@ -945,11 +951,14 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 const orientation = _mLook('bars', 'vertical') === 'horizontal' ? 'horizontal' : 'vertical';
                 const payload = { title: theme.title, categories: cats, values: counts, step: 1, top, half: false,
                     orientation, catTitle: theme.cat, valTitle: theme.val, ask,
-                    kinds: order.map(f => ['most', 'value', 'more'][f]), question: text, answer: ans, support: _mLevel(at) };
+                    kinds: order.map(f => ['most', 'value', 'more'][f]), question: text, answer: ans, support: _mLevel(at),
+                    // one plot a page (critic figures-r8): the most bars, the longest name, the scale
+                    uniform: { slots: Math.max(3, _mNum('tiles') || 3), chars: Math.max(...themes.flatMap(t => t.items).map(c => c.length)), top } };
                 q.cell = { template: 'bar-graph', v: 1, payload };
                 q.visual = k2Twin('bar-graph', payload);
                 q.text = text;
                 q.screenInstr = 'Use the graph. Answer the question.';
+                q.dedupeKey = `${theme.title}|${text}`;
                 q.ans = ans;
                 q.options = [];
                 if (askType === 'most') { q.answerType = 'text'; q.selfAnswering = true; q.printAnswer = ans; }
@@ -1228,9 +1237,12 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 const room = 6 - start;
                 let meas;
                 for (let tries = 0; tries < 8; tries++) {
-                    if (kindAt === 0) meas = rng(1, Math.min(room, 6));
-                    else if (kindAt === 1) meas = rng(0, room - 1) + 0.5;
-                    else meas = rng(0, room - 1) + pick([0.25, 0.75]);
+                    // (critic figures-r8: at least 2 whole inches - "1 inches" is wrong English and
+                    // "1 inch" would give the answer away - and a half or quarter past at least one
+                    // whole inch: a quarter-inch object is a 6 mm stub, and the whole box stays used)
+                    if (kindAt === 0) meas = rng(2, Math.min(room, 6));
+                    else if (kindAt === 1) meas = rng(1, room - 1) + 0.5;
+                    else meas = rng(1, room - 1) + pick([0.25, 0.75]);
                     if (_mFresh(at, meas)) break;
                 }
                 _mNoteAnswer(at, meas);

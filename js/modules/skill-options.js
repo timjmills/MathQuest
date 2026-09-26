@@ -2800,7 +2800,8 @@ const _AP2_POINTS = { all: 'Points named with their coordinates: A(3, 2)', some:
 //   `step`      (T)   Degrees a thermometer mark stands for (1 or 2).
 //   `band`      (B)   The highest temperature a scale reaches.
 // (labelled by what it draws: the group heading already says "Support", critic figures-r7)
-const _ap2Support = (help) => ({ ...levelSubset([2, 1], 1, help), label: 'Grey hint', group: 'support' });
+// helpShort: the panel line says what level 2 draws (critic figures-r8 panel: the generic line did not)
+const _ap2Support = (help) => ({ ...levelSubset([2, 1], 1, help), label: 'Grey hint', group: 'support', helpShort: help });
 const _AP2_PICTURES = (words) => ({
     id: 'objects', label: 'Pictures', type: 'enum', group: 'layout', default: 'pictures',
     values: [{ v: 'pictures', l: words + _AP2_DEFAULT }, { v: 'shapes', l: 'One plain circle for every row' }],
@@ -2817,12 +2818,12 @@ const _AP2_PICTURES = (words) => ({
         _o2Most('Most pictures in a row', [4, 8], 'up to 6', 'The longest row. With half pictures the longest row may end in half a picture.'),
         // (Half pictures are not a control of their own - six controls at most (O5): with a key of
         // 2 or 10 about one row in three ends in half a picture, the 3.MD.3 edge case.)
-        _AP2_PICTURES('A child for "Number of children", a car for a car count'),
+        _AP2_PICTURES('The graph\'s own picture'),
         _ap2Support('Level 2 writes the running count in grey under each picture (5, 10, 15 ...).')],
     ['measurement:pictograph_intro',
         _o2Tiles('Rows', [2, 3], '2 or 3', 'Two rows is the easier step.'),
         _o2Most('Counts up to', [3, 10], 'up to 5', 'The most pictures in a row. Up to 3 is the first step.'),
-        _AP2_PICTURES('Each row\'s own picture (circles, balls, fish ...)'),
+        _AP2_PICTURES('Each row\'s own picture'),
         _ap2Support('Level 2 writes the count in grey under each picture (1, 2, 3 ...).')],
     ['graphs:tally_chart',
         { id: 'rules', label: 'Chart lines', type: 'enum', group: 'layout', default: 'ruled',

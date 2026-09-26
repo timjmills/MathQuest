@@ -27,7 +27,7 @@ import { factSetTitle, optionsFor, normalizeOptions } from './skill-options.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, groupByAnswerShape, cellMinSize, sizeFloor } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, groupByAnswerShape, isCheckAnswer, cellMinSize, sizeFloor } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
@@ -135,6 +135,10 @@ function normaliseRequest(req = {}) {
 
 /** A question's identity for de-duplication: what the pupil would see as "the same problem". */
 function signature(q) {
+    // A question that names its own sameness (a graph's context and question, "Favorite Pets |
+    // Which pet did the fewest children choose?") is a repeat whatever its numbers (critic
+    // figures-r8 B: the same graph and question twice on one sheet).
+    if (q && q.dedupeKey) return `dk|${q.categoryId || ''}:${q.skillId || ''}|${q.dedupeKey}`;
     const payload = q.cell && q.cell.payload ? JSON.stringify(q.cell.payload) : '';
     const ans = typeof q.ans === 'object' ? JSON.stringify(q.ans) : String(q.ans);
     return `${String(q.text || '').replace(/\s+/g, ' ').trim()}|${ans}|${payload}`;
@@ -231,7 +235,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         for (let k = 0; k <= tries; k++) {
             const seed = (baseSeed + i + 7919 * k) >>> 0;
             let cand = null;
-            try { cand = generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex, itemCount: perSkill ? perSkill.get(key) : undefined }); } catch (e) { cand = null; }
+            try { cand = generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex, itemCount: perSkill ? perSkill.get(key) : undefined, shape: sk.shape || (typeof sk.shapeAt === 'function' ? sk.shapeAt(i) : undefined) }); } catch (e) { cand = null; }
             if (!cand) continue;
             // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
             // options - the packet's; the last try takes what it gets.
@@ -641,6 +645,45 @@ function splitBySupports(sec, gi, n) {
         group: { id: `sup${gi}`, share: 1 / k },
         supportAlt: i,
     })).filter((x) => !counts || x.count);
+}
+
+/**
+ * One answer shape a section (AP2 round 7, critic figures-r8 L10 / RUBRIC C1). A skill that deals
+ * its question kind per item may ask "how many?" (a number box) and "which has the most?" (check
+ * boxes); a printed page keeps both, never one kind for the whole page, but gives the check-box
+ * items their OWN section under their own instruction ("Use the graph. Check one box."), after the
+ * number items, sharing the page (`shareRows`): the number kinds two parts of the page, the check
+ * boxes one. Each part asks the generator for its shape (`skill.shape`). A skill whose ticked
+ * kinds give one shape only, or a skill that never answers in check boxes, is left as it is.
+ */
+function mixesShapes(sk, seed) {
+    if (!sk || sk.shape) return false;
+    const one = (shape) => {
+        try { return generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: 0, shape }); } catch (e) { return null; }
+    };
+    const chk = one('check');
+    if (!chk || !isCheckAnswer(chk)) return false;
+    const box = one('box');
+    return !!box && !isCheckAnswer(box);
+}
+function checkKeyOf(key) {
+    const k = `${String(key || '').replace(/-check$/, '')}-check`;
+    return Object.prototype.hasOwnProperty.call(INSTRUCTION_LIBRARY, k) ? k : '';
+}
+function splitByShape(sec, gi, n, metaOf) {
+    if (!sec.skills || sec.skills.length !== 1 || sec.supportAlt !== undefined) return [sec];
+    const sk = sec.skills[0];
+    if (sec.count && sec.count < 3) return [sec];
+    if (!mixesShapes(sk, n.seed)) return [sec];
+    const chkKey = checkKeyOf(sec.instructionKey || metaOf(sk).instructionKey);
+    if (!chkKey) return [sec];
+    const share = sec.group ? sec.group.share : 1;
+    const id = sec.group ? sec.group.id : `shape${gi}`;
+    const nChk = sec.count ? Math.max(1, Math.round(sec.count / 3)) : null;
+    return [
+        Object.assign({}, sec, { skills: [Object.assign({}, sk, { shape: 'box' })], count: sec.count ? sec.count - nChk : null, group: { id, share: share * 2 / 3, pack: !sec.group } }),
+        Object.assign({}, sec, { skills: [Object.assign({}, sk, { shape: 'check' })], count: nChk, group: { id, share: share / 3, pack: !sec.group }, instructionKey: chkKey }),
+    ];
 }
 
 /** The sheet-level mix, when the request sets one. */
@@ -1142,12 +1185,14 @@ function primaryCcss(sk) {
         const code = standardsMod.primaryStandard(sk.categoryId, sk.skillId, { short: true });
         if (code) return code;
         // A skill tagged to its CLOSEST standard (temperature: CCSS names no thermometer) still
-        // prints that code, marked as the closest - never a footer with no standard at all
+        // prints that code - never a footer with no standard at all
         // (critic EA r5, D).
         const e = standardsMod.standardsEntry(sk.categoryId, sk.skillId);
         if (e && e.approx && e.ccss && e.ccss.length) {
             const short = String(e.ccss[0]).replace(/\.([A-Z])\.(\d+)$/, '.$2');
-            return `≈ ${short}`;
+            // printed as the code itself (critic figures-r8 F: "≈ 2.MD.6" read as a typo on a
+            // pupil page); the approximation is the tag's own note in standards.js
+            return short;
         }
     } catch (e) { return ''; }
     return '';
@@ -1432,6 +1477,9 @@ export async function buildSheet(req = {}) {
     // becomes one sub-section per alternative (section A touch dots, section B dot tiles). Each
     // sub-section lays out and reserves room for its OWN support only, so a page is as full as it
     // is without supports, less that support's own size.
+    // One answer shape a section: a skill's check-box kinds in their own part of the page (before
+    // S2, which then leaves a split section alone: it splits a sheet of ONE section only).
+    if (n.anchors === 'off') n.sections = n.sections.flatMap((sec, gi) => splitByShape(sec, gi, n, metaOf));
     const unsplit = n.sections;
     if (n.sections.length === 1 && n.role === 'independent' && n.anchors === 'off') n.sections = n.sections.flatMap((sec, gi) => splitBySupports(sec, gi, n));
 
@@ -1557,8 +1605,56 @@ export async function buildSheet(req = {}) {
             }
             const tw = members.reduce((a, si) => a + n.sections[si].group.share, 0) || 1;
             let h = members.map((si) => avail * n.sections[si].group.share / tw);
+            // One skill split by answer shape (splitByShape): the rows are shared to hold the MOST
+            // problems - a share by weight can leave a row's height unused in each part - with the
+            // number part never shorter than the check-box part; its spare height goes to the first.
+            const packed = members.length === 2 && members.every((si) => n.sections[si].group.pack);
+            if (packed) {
+                // each part's column choices (Auto: 1-3), each with its own row height
+                const choices = members.map((si) => {
+                    const sec = n.sections[si];
+                    // (never more columns than every problem's own footprint allows: a forced
+                    // column count would squeeze a graph that needs the full width)
+                    const its = probesOf(si);
+                    const maxC = Math.max(1, Math.min(3, ...its.map((it) => (it && it.footprint && it.footprint.maxCols) || 3)));
+                    const list = sec.columns === 'auto' || sec.columns === undefined || sec.columns === null ? [1, 2, 3].filter((c) => c <= maxC) : [sec.columns];
+                    const seen = new Map();
+                    for (const c of list) {
+                        let Lc = null;
+                        try {
+                            Lc = resolveSectionLayout({ role: n.role, columns: c, count: 0, floor: sec.floor, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
+                                withTwins(si, probesOf(si)), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
+                        } catch (e) { Lc = null; }
+                        if (Lc && Lc.cols && Lc.hMin > 0 && !seen.has(Lc.cols)) seen.set(Lc.cols, { c: Lc.cols, h: Lc.hMin * pairOf(si) });
+                    }
+                    return [...seen.values()];
+                });
+                let best = null;
+                for (const o0 of choices[0]) {
+                    for (const o1 of choices[1]) {
+                        for (let a = 1; a * o0.h + o1.h + 2 <= avail + 1e-6; a++) {
+                            const b = Math.floor((avail - 2 - a * o0.h) / o1.h);
+                            if (b < 1) break;
+                            const nb = a * o0.c, nc = b * o1.c;
+                            // the most problems; then the number part at least as big as the
+                            // check-box part; then close to two number items for each check box
+                            const score = (nb + nc) * 10 + (nb >= nc ? 5 : 0) - Math.abs(nb - 2 * nc) * 0.01;
+                            if (!best || score > best.score) best = { a, b, o0, o1, score };
+                        }
+                    }
+                }
+                if (best) {
+                    const hb = best.b * best.o1.h + 1;
+                    h = [avail - hb, hb];
+                    [best.o0, best.o1].forEach((o, k) => {
+                        const sec = n.sections[members[k]];
+                        if (sec.columns === 'auto' || sec.columns === undefined || sec.columns === null) sec.columns = o.c;
+                    });
+                    need = [best.a * best.o0.h + 1, hb];
+                }
+            }
             // Every member gets at least one row; the others give up the height it lacks.
-            for (let k = 0; k < members.length; k++) {
+            for (let k = 0; !packed && k < members.length; k++) {
                 if (h[k] >= need[k]) continue;
                 const lack = need[k] - h[k];
                 h[k] = need[k];
@@ -1896,6 +1992,15 @@ async function buildRoleSheet(n, metaOf) {
      * its value on an answer line under the cell.
      */
     const flagsFor = (count) => (typeof mod.wrongFlags === 'function' ? mod.wrongFlags(count, n.seed) : []);
+    // A Quiz of one skill that answers in both shapes (splitByShape): one item in three a check-box
+    // item, so every quiz has both and prints them as two parts (test.js), never a quiz of only
+    // "which has the most?" or only "how many?" (critic figures-r8 L10).
+    const shapeSkills = new Map();
+    const withShapes = (skills) => (n.role !== 'test' || skills.length !== 1 ? skills : skills.map((sk) => {
+        const key = `${sk.categoryId}:${sk.skillId}`;
+        if (!shapeSkills.has(key)) shapeSkills.set(key, mixesShapes(sk, n.seed));
+        return shapeSkills.get(key) ? Object.assign({}, sk, { shapeAt: (i) => (i % 3 === 2 ? 'check' : 'box') }) : sk;
+    }));
     const dealPool = (pool, pi, want) => {
         const base = (n.seed + pi * 100003) >>> 0;
         const st = { seen: new Set(), kept: new Map() };
@@ -1905,7 +2010,7 @@ async function buildRoleSheet(n, metaOf) {
         for (let pass = 0; pass < 4 && out.length < want; pass++) {
             const need = want - out.length;
             const batch = pass === 0 ? need : need * 2 + 2;
-            const gen = generateRun(pool.skills, batch, base, { startIndex: next, seen: st.seen, kept: st.kept });
+            const gen = generateRun(withShapes(pool.skills), batch, base, { startIndex: next, seen: st.seen, kept: st.kept });
             next += batch;
             for (const g of gen) {
                 if (out.length >= want) break;
@@ -1926,6 +2031,8 @@ async function buildRoleSheet(n, metaOf) {
             }
         }
         // check-box items after the box items (RUBRIC C1); the Model (item 0) keeps its place
+        // (a Quiz keeps the dealt order: test.js takes its page's items first, then parts them by shape)
+        if (n.role === 'test') return out;
         return out.length > 2 && n.role === 'guided' ? [out[0]].concat(groupByAnswerShape(out.slice(1))) : groupByAnswerShape(out);
     };
     const measure = (items) => measureItems(items, { size: n.size, look: n.look, colsList });

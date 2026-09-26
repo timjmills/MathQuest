@@ -370,7 +370,9 @@ function rulerStrings(iCanWhole) {
     for (const r of [1, 2, 4]) {
         byRes[r] = strings({
             iCan: TITLE[r],
-            instructionKey: 'measure-object',
+            // a half / quarter page says what to do with the fraction boxes on a whole inch (critic
+            // figures-r8 F: "6" left them blank with no word to the pupil)
+            instructionKey: r === 1 ? 'measure-object' : 'measure-parts',
             steps: ['Find where the object starts.', 'Find where the object ends.', 'Read the number at the end.'],
             say: 'It is __ long.',
             // said in words (a slash fraction is never printed, TY-7)

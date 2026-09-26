@@ -218,6 +218,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'read-thermometer': 'Read the thermometer. Write the temperature.',
     'read-ruler': 'Read the ruler. Write the number the arrow points to.',
     'measure-object': 'Measure the object. Write how long it is.',
+    'measure-parts': 'Measure the object. On a whole inch, leave the fraction empty.',
     'build-pictograph': 'Draw the pictures. Make each row match its number.',
     'add-sides': 'Add the lengths of all the sides. Write the perimeter.',
     tally: 'Use the tally chart. Answer the questions.',

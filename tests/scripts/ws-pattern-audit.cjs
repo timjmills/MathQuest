@@ -37,6 +37,9 @@
 //                     sign, the key, the unknown; a top-level variant; the instruction key) repeats
 //                     with a period of 2-6, on every seed
 //   same-page         the first 5 answers are identical on all 3 seeds (the seed does nothing)
+//   kind-page         a question kind (the answer shape: check boxes or a box; a kind / task field)
+//                     is ONE value on every page while the seeds deal more than one: the kind is
+//                     drawn once a page, not per item (critic figures-r8, L10)
 //   position-dominant one choice position holds the answer on more than 70% of all choice items
 //
 // FALSE POSITIVES. A period needs >= 2 distinct values inside it and at most 10% mismatches over
@@ -71,7 +74,6 @@ const KIND_OPTIONS = new Set([
 // value BY DESIGN. Each line says why.
 const CONSTANT_OK = new Map([
     // An interactive build: the "answer" is a sentinel the checker reads the pupil's drawing against.
-    ['graphs:build_pictograph', 'answer is the build sentinel "graph-built"; the target data varies'],
     ['graphs:build_bar_graph', 'answer is the build sentinel; the target data varies'],
     // The skill IS the zero: "Write the Placeholder Zero" asks for the 0 that holds the ones place
     // in the second partial product; the numbers around it vary.
@@ -208,6 +210,20 @@ function judge(pages, key, variant) {
             if (head.every(h => h === head[0]) && new Set(seqs[0].slice(0, 6)).size >= 3) F('same-page', `${f} runs in the same order on all ${seqs.length} seeds: ${show(seqs[0], 6)} …`);
         }
     }
+    // 4c. a question KIND dealt once a PAGE (critic figures-r8, L10): every item of a page asks
+    // the same kind - a page of only "which has the most?" check boxes, the next of only "how
+    // many?" - while the seeds show the skill deals more than one. Item-by-item checks cannot see
+    // it (each page is internally constant). `answerShape` is the item's answer shape (a check-box
+    // list or a box), read from the cell; `kind` / `task` / `ask` / `form` fields likewise.
+    for (const f of [...fields].filter(x => x === 'answerShape' || /(^|\.)(kind|task|ask|form)$/i.test(x)).sort()) {
+        if (PRESENTATION_FIELDS.has(f)) continue;
+        const seqs = pages.map(pg => pg.map(it => (f in it.attrs ? it.attrs[f] : null)).filter(v => v !== null));
+        if (seqs.length < 2 || seqs.some(q => q.length < 4)) continue;
+        const per = seqs.map(q => (new Set(q).size === 1 ? q[0] : null));
+        if (per.every(v => v !== null) && new Set(per).size > 1) {
+            F('kind-page', `${f} is dealt once a page: every item of a page is the same (per seed: ${per.map(v => String(v).slice(0, 14)).join(' / ')})`);
+        }
+    }
     // 4b. a mixed pool dealing its members in a fixed rotation
     {
         const seqs = pages.map(pg => pg.map(it => it.member));
@@ -302,6 +318,8 @@ async function dealInPage({ categoryId, skillId, opts, seeds, n, retries, presen
         if (pos === null && /^[A-H]$/.test(ans)) { pos = ans; nChoices = nChoices || 2; }
         const attrs = {};
         if (q.cell && q.cell.template) attrs.template = q.cell.template;
+        // the answer's shape: a check-box list or a box (check 4c, a kind dealt once a page)
+        try { if (q.cell) attrs.answerShape = gp.isCheckAnswer(q) ? 'check' : 'box'; } catch (e) { /* no inputs */ }
         for (const [k, v] of Object.entries(q)) {
             if (skipTop.includes(k) || k === 'cell' || k === 'poolMember') continue;
             const kv = kindVal(v);

@@ -142,13 +142,13 @@ const MIXED_WORD_SKILLS = {
  *                               widget per card) still applies.
  * @returns {object|null} the question, or null if the skill generated nothing
  */
-export function generateQuestionFor({ category, skill, range, decimals, opts, seed, itemIndex, itemCount, adaptive = false, gameMode } = {}) {
+export function generateQuestionFor({ category, skill, range, decimals, opts, seed, itemIndex, itemCount, adaptive = false, gameMode, shape } = {}) {
     const saved = {
         category: state.category, skill: state.skill, range: state.range,
         decimalPlaces: state.decimalPlaces, gameMode: state.gameMode, isMixedMode: state.isMixedMode,
         skillOptions: state.skillOptions, fixedDifficulty: state.fixedDifficulty,
         selectedNumbers: state.selectedNumbers, itemIndex: state.itemIndex, itemCount: state.itemCount,
-        itemSeed: state.itemSeed,
+        itemSeed: state.itemSeed, answerShape: state.answerShape,
     };
     const restoreRandom = seed === undefined ? null : seedRandom(seed);
     try {
@@ -180,6 +180,11 @@ export function generateQuestionFor({ category, skill, range, decimals, opts, se
         // The item's own seed, for a generator that varies a page-level order by the page's seed
         // (gen-pv.js blockOrder: the asked place of a place-value pair). Optional.
         state.itemSeed = seed !== undefined && Number.isFinite(Number(seed)) ? Number(seed) : undefined;
+        // AP2 round 7 (critic figures-r8, L10): the ANSWER SHAPE a page section asks for. A graph
+        // skill deals its question kind per item; a printed page gives its check-box kinds ("which
+        // has the most?") their own section, so print-sheet.js asks each section for one shape:
+        // 'box' (a number) or 'check'. Unset (live play, the screen hosts) deals every kind.
+        state.answerShape = shape === 'box' || shape === 'check' ? shape : undefined;
         if (!state.selectedNumbers || !state.selectedNumbers.length) {
             state.selectedNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
         }

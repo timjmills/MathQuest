@@ -278,12 +278,14 @@ const PLOT = Object.freeze({ S: [80, 46], M: [90, 62], L: [100, 80] });
 // per worksheet"), five slots wide whatever the number of bars
 const TWIN_PLOT = Object.freeze([130, 64]);
 /** mm between two lines of the scale on paper: [short scale (6 lines or fewer), long scale]. */
-const GRID_PITCH = Object.freeze({ S: [3.4, 4.1], M: [4.6, 4.3], L: [6, 4.5] });
+// (critic figures-r8: S no longer packs the lines closer - 2.4-3.4 mm let the digits touch; every
+// labelled line is at least 4.1 mm from the next at every size, and S gains its graphs by columns)
+const GRID_PITCH = Object.freeze({ S: [5, 4.1], M: [5.5, 4.1], L: [6, 4.1] });
 /** A long scale's plot is at least this tall at every size (critic figures-r7). */
 const LONG_MIN = 45;
 /** The shortest paper plot, and the narrowest bar slot / the height of a bar's row (horizontal). */
-const PLOT_MIN = Object.freeze({ S: 17, M: 28, L: 36 });
-const SLOT_MIN = Object.freeze({ S: 14, M: 16, L: 18 });
+const PLOT_MIN = Object.freeze({ S: 28, M: 30, L: 36 });
+const SLOT_MIN = Object.freeze({ S: 13, M: 16, L: 18 });
 const ROW_MIN = Object.freeze({ S: 8, M: 9, L: 10 });
 
 /**
@@ -307,7 +309,8 @@ export function barGraphSVG(p, ctx) {
     // 0, 4, 8, ... 20, never "16, 18" at the top (critic figures-r6, H2).
     // (paper keeps one labelling at every size, critic figures-r7: S labelled every 4 changed the
     // maths; the S plot is kept >= 45 mm tall instead)
-    const every = long && twin ? 2 : 1;
+    // (the screen twin labels as paper does, every line: critic figures-r8 G)
+    const every = 1;
     if (every === 2 && Math.round(top / step) % 2) top += step;
     const steps = [];
     for (let v = 0; v <= top + 1e-9; v += step) steps.push(+v.toFixed(6));
@@ -320,16 +323,25 @@ export function barGraphSVG(p, ctx) {
     let s = '';
     let W, H;
     if (p.orientation !== 'horizontal') {
-        const valLabW = Math.max(...steps.map((v) => textW(v, zPt)));
-        const catW = Math.max(...cats.map((c) => textW(c, zPt)));
+        // `uniform` (critic figures-r8: "four graphs at four sizes"): every graph a skill deals on a
+        // page takes ONE plot - as wide as its most bars with its longest name, as tall as its
+        // longest scale - and a graph with fewer bars or a shorter scale spreads over it.
+        const U = !twin && p.uniform ? p.uniform : null;
+        const valLabW = Math.max(...steps.map((v) => textW(v, zPt)), U ? textW(U.top, zPt) : 0);
+        const catW = Math.max(...cats.map((c) => textW(c, zPt)), U ? textW('x'.repeat(Number(U.chars) || 0), zPt) : 0);
         // the twin keeps one plot width for every graph (one scale per worksheet); paper widens a
-        // slot only when a name needs it
+        // slot only when a name needs it (S sets the names 1.2 mm apart, L 3 mm: two graphs to an
+        // S row, never a smaller name)
         // the twin: every number of the scale a line apart (they ran together on a long scale,
         // critic regrade 5) and every name inside its own slot
-        const slotW = twin ? Math.max(pw0 / Math.max(n, 5), catW + 4) * Math.max(n, 5) / n : Math.max(catW + 3, SLOT_MIN[sz]);
+        const slots = U ? Math.max(n, Number(U.slots) || n) : n;
+        const slotW = twin ? Math.max(pw0 / Math.max(n, 5), catW + 4) * Math.max(n, 5) / n
+            : Math.max(catW + (sz === 'S' ? 1.2 : 3), SLOT_MIN[sz]) * slots / n;
         const PW = slotW * n;
+        const nPlot = U ? Math.max(nSt, Math.round(Number(U.top) / step) || 0) : nSt;
+        const longPlot = nPlot > 6;
         const PH = twin ? Math.max(ph0, (nSt / every) * zMm * 1.3)
-            : Math.max(long ? LONG_MIN : 0, Math.min(ph0, Math.max(PLOT_MIN[sz], nSt * GRID_PITCH[sz][long ? 1 : 0])));
+            : Math.max(longPlot ? LONG_MIN : 0, Math.min(ph0, Math.max(PLOT_MIN[sz], nPlot * GRID_PITCH[sz][longPlot ? 1 : 0])));
         const valTitleY = zMm * 1.0;
         const x0 = Math.max(valLabW + 3, 1), yTop = valTitleY + 3.2, yBot = yTop + PH;
         const yOf = (v) => yBot - (v / top) * PH;
@@ -339,7 +351,7 @@ export function barGraphSVG(p, ctx) {
             if (named(k)) s += txt(x0 - 2.5, yOf(v) + zMm * 0.35, String(v), zPt, { anchor: 'end', weight: 400 });
             if (p.half && v + step <= top + 1e-9) s += line(x0 - 1, yOf(v + step / 2), x0, yOf(v + step / 2), SW.one, INK, ' data-fg-half="1"');
         }
-        const barW = Math.min(slotW * 0.6, 18);
+        const barW = Math.min(slotW * 0.6, 18, U ? 12 : 18);
         const bxOf = (i) => x0 + i * slotW + (slotW - barW) / 2;
         // the grey read-across lines sit UNDER the bars, so a taller bar in the way hides its part
         for (const i of guides) if (Number.isInteger(i) && vals[i] > 0) s += line(x0, yOf(vals[i]), bxOf(i) + barW, yOf(vals[i]), SW.rule, GREY, ' data-fg-hint="guide"');
@@ -454,8 +466,10 @@ function dataCell(name, draw) {
             const q = p || {};
             const scale = Number(q.scale) || 1;
             const canon = name === 'bar-graph'
-                ? (Number(q.step) === 1 && Number(q.top) <= 10 && (q.categories || []).length <= 3
-                    ? Object.assign({}, q, { categories: ['Nature', 'Nature', 'Nature'], values: [1, 1, 1] }) : null)
+                // a graph that names its page plot (`uniform`) is that wide whatever it deals
+                ? (q.uniform ? q
+                    : Number(q.step) === 1 && Number(q.top) <= 10 && (q.categories || []).length <= 3
+                        ? Object.assign({}, q, { categories: ['Nature', 'Nature', 'Nature'], values: [1, 1, 1] }) : null)
                 : name === 'pictograph'
                     ? Object.assign({}, q, { categories: ['Triangles'], values: [(Number(q.widest) || 6) * scale] })
                     : Object.assign({}, q, { categories: ['Purple'], values: [Number(q.widest) || 15] });
@@ -463,7 +477,9 @@ function dataCell(name, draw) {
             try { if (canon) W = draw(canon, ctx || {}).W; } catch (e) { W = 186; }
             // Two to a row when the drawing fits half the page (the question then stands under
             // it); the layout keeps whichever column count holds more problems (byCapacity).
-            const two = W + 4 <= 84;
+            // (a bar graph's plot has no margin of its own beyond its axis labels: it may take
+            // the half-width cell's inner width, 88 mm of its 92)
+            const two = W + 4 <= (name === 'bar-graph' ? 88 : 84);
             // restacks: the question stands under the drawing in a half-width cell on purpose (not a
             // collapse, print-sheet's reflow rule)
             return { wMm: two ? Math.ceil(Math.max(W, 44) + 4) : 186, hMm: null, measure: true, factLike: false, maxCols: two ? 2 : 1, restacks: true, byCapacity: true };
@@ -731,7 +747,9 @@ register('perimeter-shape', {
             + `${words(ctx, 'Perimeter =')}${numberSlot(ctx, 'answer', p.ans, { digits, unit: String(p.unit || '') })}</div>`;
         // paper: every drawing stands in one box as tall as the tallest shape and its labels, so
         // the "Perimeter =" lines of a row sit level (critic regrade 5, test@S)
-        const box = isTwin(ctx) ? 'display:inline-block;max-width:100%;'
+        // (the twin too, critic figures-r8: the worksheet's answer boxes sat at a different height
+        // in every card)
+        const box = isTwin(ctx) ? `display:flex;align-items:center;justify-content:center;max-width:100%;min-height:${L(ctx, FIG_BOX.L[1] + 2 * (2.5 + digitPt(ctx) * PT_MM) + 1)};`
             : `display:flex;align-items:flex-start;justify-content:center;max-width:100%;min-height:${L(ctx, (FIG_BOX[sizeOf(ctx)] || FIG_BOX.L)[1] + 2 * (2.5 + digitPt(ctx) * PT_MM) + 1)};`;
         return root(ctx, 'fg-perimeter-cell', `<div style="${box}">${f.html}</div>${frame}${sentence}`);
     },
@@ -765,7 +783,44 @@ register('perimeter-shape', {
  * a picture in a box (screen-cell.js mountModel "picture-build"), the answer is the counts.
  * payload: {title, categories, values, icons (the picture of each row), slots, support}.
  */
-const BUILD_BOX = Object.freeze({ S: 8, M: 9, L: 10 });
+// (9 mm at S and M: a Grade 2 pupil draws a fish or a car in it; critic figures-r8 C. An S page
+// gains its charts by columns, never by a smaller box)
+const BUILD_BOX = Object.freeze({ S: 9, M: 9, L: 10 });
+/** The screen twin's box and its pitch (units of --mq-k2): 13.8 x 3.4 px = 47 px a tap target. */
+const TWIN_BOX = 12, TWIN_GAP = 1.8;
+
+/**
+ * The screen twin of a picture graph to build: each row's name and picture on its own line, its
+ * boxes the full width under it, so a phone card keeps every box a 44 px target (critic figures-r8
+ * H6: 24 px boxes beside the names at 390 px). Each box is a tap target as wide as its pitch.
+ */
+function buildTwinSVG(p, ctx, { cats, vals, slots, counts, iconOf }) {
+    const zPt = labelPt(ctx), zMm = zPt * PT_MM;
+    const pitch = TWIN_BOX + TWIN_GAP;
+    const labH = zMm * 1.35;
+    const rowH = labH + TWIN_BOX + 3.5;
+    const ic = zMm * 0.9;
+    const labels = cats.map((c, i) => `${c}: ${vals[i]}`);
+    const W = Math.max(slots * pitch, ...labels.map((t) => textW(t, zPt) + ic + 4)) + 2;
+    let s = '';
+    cats.forEach((_, i) => {
+        const y0 = 1 + i * rowH;
+        if (i) s += line(0.5, y0 - 1.75, W - 0.5, y0 - 1.75, SW.hair);
+        s += txt(1, y0 + zMm * 0.95, labels[i], zPt, { anchor: 'start', weight: 700 });
+        s += picture(iconOf(i), 1 + textW(labels[i], zPt) + 2 + ic / 2, y0 + zMm * 0.6, ic);
+        const yb = y0 + labH;
+        for (let k = 0; k < slots; k++) {
+            const x = 1 + k * pitch;
+            const drawn = !!counts && k < counts[i];
+            s += `<g data-pb-row="${i}" data-pb-box="${k}">`
+                + `<rect x="${n2(x - TWIN_GAP / 2)}" y="${n2(yb - TWIN_GAP / 2)}" width="${n2(pitch)}" height="${n2(TWIN_BOX + TWIN_GAP)}" fill="#fff" fill-opacity="0"/>`
+                + `<rect x="${n2(x)}" y="${n2(yb)}" width="${n2(TWIN_BOX)}" height="${n2(TWIN_BOX)}" rx="0.8" fill="#fff" stroke="${INK}" stroke-width="${n2(SW.one)}"/>`
+                + `<g data-pb-pic="1" visibility="${drawn ? 'visible' : 'hidden'}">${picture(iconOf(i), x + TWIN_BOX / 2, yb + TWIN_BOX / 2, TWIN_BOX * 0.7)}</g></g>`;
+        }
+    });
+    const H = 1 + cats.length * rowH;
+    return { html: svg(ctx, W, H, s, { cls: 'fg-table', label: `${p.title || 'picture graph'}: draw the pictures` }), W, H };
+}
 const buildCounts = (p, ctx) => {
     const vals = (p.values || []).map(Number);
     if (ctx.state === 'wrong' && ctx.wrong && ctx.wrong.value !== undefined) {
@@ -789,8 +844,8 @@ register('picture-build', {
         const iconOf = (i) => (Array.isArray(p.icons) && p.icons[i]) || 'circle';
         const hint = hintOn(p, ctx) && !twin;
         const ic = bx * 0.62;
-        const g = rowTable({ categories: cats.map((c, i) => `${c}: ${vals[i]}`), catTitle: p.catTitle || 'Row', rules: 'ruled' }, ctx, {
-            markW: slots * (bx + gap), rowH: bx + (twin ? 4 : sizeOf(ctx) === 'S' ? 2 : 3), head2: 'Pictures', labelWeight: 700,
+        const g = twin ? buildTwinSVG(p, ctx, { cats, vals, slots, counts, iconOf }) : rowTable({ categories: cats.map((c, i) => `${c}: ${vals[i]}`), catTitle: p.catTitle || 'Row', rules: 'ruled' }, ctx, {
+            markW: slots * (bx + gap), rowH: bx + (twin ? 4 : sizeOf(ctx) === 'S' ? 1.6 : 3), head2: 'Pictures', labelWeight: 700,
             // the row's own picture after its name, so the pupil knows what to draw
             labelIcon: { w: ic + 2, draw: (i, x, y) => picture(iconOf(i), x + ic / 2, y, ic) },
             cell: (i, x, y) => {
@@ -814,7 +869,8 @@ register('picture-build', {
                 return out;
             },
         });
-        const kd = bx * 0.8;
+        // (the key's pictures at most 6.5 mm on paper: four charts to an S page with 9 mm boxes)
+        const kd = twin ? bx * 0.8 : Math.min(bx * 0.8, 6.5);
         const kinds = [...new Set(cats.map((_, i) => iconOf(i)))];
         const kPt = twin ? labelPt(ctx) : Math.max(zonePt(ctx), 11);
         const keySvg = (id) => svg(ctx, kd + 1, kd + 1, picture(id, (kd + 1) / 2, (kd + 1) / 2, kd), { label: 'picture' });

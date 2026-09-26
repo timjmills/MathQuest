@@ -4,7 +4,7 @@ import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { COLORS, STROKE, FONTS, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
 import { k2Twin, fadeRung } from './sheet/index.js';
-import { dealPick, pageConstant } from './page-deal.js';
+import { dealPick } from './page-deal.js';
 
 // P12: an option value the teacher chose for this skill (skill-options.js), else undefined.
 function _dOpt(id) {
@@ -102,16 +102,19 @@ const BAR_CONTEXTS = [
  * through them (a count first, the check-box kinds apart). `map[f]` lists the kinds of form f.
  */
 /**
- * One answer shape a page (RUBRIC C1, critic figures-r7): where a skill's ticked forms mix
- * number questions with "which has the most?" check-box questions, a printed page (or online
- * sheet) deals ONE of the two - about one page in three the check-box kinds, the others the
- * number kinds - drawn once a page from the seeded rng. Live play keeps them mixed.
+ * The kinds one item may ask (AP2 round 7, critic figures-r8 L10): the kind is dealt PER ITEM
+ * from every ticked kind - a page mixes "how many?" with "which has the most?", so it always
+ * reads the scale or the key. A printed page gives its check-box kinds their OWN section (one
+ * instruction, one answer shape - print-sheet.js splitByShape), and asks each section for one
+ * shape (`state.answerShape`, set by generateQuestionFor): 'check' deals only most / least,
+ * 'box' only the number kinds. A shape the ticked kinds cannot give falls back to every kind.
  */
-function _dPageKinds(kinds, key) {
+function _dPageKinds(kinds) {
     const chk = kinds.filter(k => k === 'most' || k === 'least');
     const num = kinds.filter(k => !chk.includes(k));
-    if (!chk.length || !num.length || !_dOnPage()) return kinds;
-    return pageConstant(`${key}:shape`, 3) === 0 ? chk : num;
+    if (state.answerShape === 'check' && chk.length) return chk;
+    if (state.answerShape === 'box' && num.length) return num;
+    return kinds;
 }
 
 function _dKinds(map) {
@@ -158,6 +161,8 @@ function _dataCell(q, template, payload, { screenInstr = 'Use the graph. Answer 
     q.cell = { template, v: 1, payload };
     q.visual = k2Twin(template, payload);
     q.text = payload.question;
+    // one graph and question once a sheet (print-sheet.js signature; critic figures-r8 B)
+    q.dedupeKey = `${payload.title}|${payload.question}`;
     q.screenInstr = screenInstr;
     q.ans = payload.answer;
     q.options = [];
@@ -539,17 +544,21 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 // "3,5,2". Options: rows 3 / 4, most pictures 3 / 5 / 7, the pictures (each row's own,
                 // or one plain circle) and a Support level that draws the first picture in grey.
                 const _pbCtxs = [
-                    { title: 'Toys', cats: ['Balls', 'Cars', 'Stars'], icons: ['ball', 'car', 'star'] },
-                    { title: 'Things We Found', cats: ['Apples', 'Flowers', 'Fish'], icons: ['apple', 'flower', 'fish'] },
+                    { title: 'Toys', cats: ['Balls', 'Cars', 'Stars', 'Circles'], icons: ['ball', 'car', 'star', 'circle'] },
+                    { title: 'Things We Found', cats: ['Apples', 'Flowers', 'Fish', 'Balls'], icons: ['apple', 'flower', 'fish', 'ball'] },
                     { title: 'Shapes We Drew', cats: ['Circles', 'Squares', 'Triangles', 'Stars'], icons: ['circle', 'square', 'triangle', 'star'] },
-                    { title: 'At the Park', cats: ['Balls', 'Flowers', 'Cars'], icons: ['ball', 'flower', 'car'] },
+                    { title: 'At the Park', cats: ['Balls', 'Flowers', 'Cars', 'Children'], icons: ['ball', 'flower', 'car', 'person'] },
+                    { title: 'In the Garden', cats: ['Flowers', 'Apples', 'Stars', 'Children'], icons: ['flower', 'apple', 'star', 'person'] },
+                    { title: 'Shapes We Cut Out', cats: ['Diamonds', 'Circles', 'Squares', 'Triangles'], icons: ['diamond', 'circle', 'square', 'triangle'] },
+                    { title: 'At the Beach', cats: ['Fish', 'Balls', 'Stars', 'Children'], icons: ['fish', 'ball', 'star', 'person'] },
+                    { title: 'On Our Street', cats: ['Cars', 'Children', 'Flowers', 'Balls'], icons: ['car', 'person', 'flower', 'ball'] },
                 ];
                 const _pbEmoji = { ball: '\u26BD', car: '\u{1F697}', star: '\u2B50', apple: '\u{1F34E}', flower: '\u{1F338}', fish: '\u{1F420}',
-                    circle: '\u26AA', square: '\u2B1C', triangle: '\u{1F53A}' };
+                    circle: '\u26AA', square: '\u2B1C', triangle: '\u{1F53A}', diamond: '\u{1F537}', person: '\u{1F9D2}' };
                 const at = _dAt();
                 const _pT = Number(_dOpt('tiles'));
-                const _ctx = _pT === 4 ? _pbCtxs[2] : dealPick('build_pictograph:context', _pbCtxs);
-                const numCats = _pT === 3 || _pT === 4 ? Math.min(_pT, _ctx.cats.length) : Math.min(_ctx.cats.length, 3);
+                const _ctx = dealPick('build_pictograph:context', _pbCtxs);
+                const numCats = _pT === 4 ? 4 : 3;
                 const order = shuffle(_ctx.cats.map((_, k) => k)).slice(0, numCats);
                 const cats = order.map(k => _ctx.cats[k]);
                 const plain = _dOpt('objects') === 'shapes';
@@ -559,6 +568,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 if (Math.max(...values) === Math.min(...values) && values.length > 1) values[0] = values[0] < most ? values[0] + 1 : values[0] - 1;
                 const payload = { title: _ctx.title, categories: cats, values, icons, slots: most, catTitle: 'Row', support: _dLevel(at) };
                 q.cell = { template: 'picture-build', v: 1, payload };
+                q.dedupeKey = _ctx.title;
                 q.visual = k2Twin('picture-build', payload);
                 q.text = 'Draw the pictures. Make each row match its number.';
                 q.screenInstr = 'Tap a box for each picture. Make each row match its number.';
@@ -940,8 +950,8 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 const half = step === 2 || step === 10;
                 const unit = half ? step / 2 : step;
                 const kMax = Math.max(2, Math.floor(barMax / unit));
-                const kinds = _dPageKinds(_dKinds({ 0: ['most', 'least'], 1: ['value'], 2: ['more'], 3: ['total'] }), dataSkill);
-                const kind = dealPick(`${dataSkill}:kind`, kinds);
+                const kinds = _dPageKinds(_dKinds({ 0: ['most', 'least'], 1: ['value'], 2: ['more'], 3: ['total'] }));
+                const kind = dealPick(`${dataSkill}:kind:${kinds.join()}`, kinds);
                 const deal = () => categories.map(() => unit * rng(half ? 2 : 1, kMax));
                 const d = _dFreshAsk(at, () => _dataAsk(kind, context, categories, deal(), deal, unit));
                 const values = d.vals;
@@ -950,7 +960,9 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 const horizontal = _barsLyingDown();
                 const payload = { title: context.title, categories, values, step, top, half: half && values.some(v => v % step !== 0),
                     orientation: horizontal ? 'horizontal' : 'vertical', catTitle: context.cat, valTitle: context.val,
-                    ask: d.ask, kinds, question: d.text, answer: d.ans, support: _dLevel(at) };
+                    ask: d.ask, kinds, question: d.text, answer: d.ans, support: _dLevel(at),
+                    // one plot a page: the most bars, the longest name, the longest scale the skill deals
+                    uniform: { slots: _dNum('tiles') || 5, chars: Math.max(...BAR_CONTEXTS.flatMap(c => c.cats).map(c => c.length)), top: step * Math.ceil((barMax + 0.5) / step) } };
                 _dataCell(q, 'bar-graph', payload);
                 q.ccss = "3.MD.B.3";
                 q.hint = horizontal ? 'Follow the end of each bar down to the numbers along the bottom.'
@@ -988,8 +1000,8 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     if (halves && !first.some(v => (v / scale) % 1)) first[rng(0, first.length - 1)] += scale / 2;
                     return first.map(v => Math.min(v, most * scale));
                 };
-                const kinds = _dPageKinds(_dKinds({ 0: ['most', 'least'], 1: ['value'], 2: ['total'], 3: ['more'] }), dataSkill);
-                const kind = dealPick(`${dataSkill}:kind`, kinds);
+                const kinds = _dPageKinds(_dKinds({ 0: ['most', 'least'], 1: ['value'], 2: ['total'], 3: ['more'] }));
+                const kind = dealPick(`${dataSkill}:kind:${kinds.join()}`, kinds);
                 const d = _dFreshAsk(at, () => _dataAsk(kind, context, categories, firstDeal(), deal, halves ? scale / 2 : scale));
                 const icon = _dOpt('objects') === 'shapes' ? 'circle' : context.pic;
                 const payload = { title: context.title, categories, values: d.vals, scale, icon, catTitle: context.cat, valTitle: context.val,
@@ -1102,8 +1114,8 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 const categories = shuffle(context.cats.slice()).slice(0, numRows);
                 const _tMost = _dNum('most');
                 const deal = () => categories.map(() => (_tMost ? rng(_tMost <= 5 ? 1 : 3, _tMost) : rng(3, 15)));
-                const kinds = _dPageKinds(_dKinds({ 0: ['value'], 1: ['most', 'least'], 2: ['total'], 3: ['more'] }), dataSkill);
-                const kind = dealPick(`${dataSkill}:kind`, kinds);
+                const kinds = _dPageKinds(_dKinds({ 0: ['value'], 1: ['most', 'least'], 2: ['total'], 3: ['more'] }));
+                const kind = dealPick(`${dataSkill}:kind:${kinds.join()}`, kinds);
                 const d = _dFreshAsk(at, () => _dataAsk(kind, context, categories, deal(), deal, 1));
                 // widest: the longest row the skill deals, so every chart of a page takes one cell width
                 const payload = { title: context.title, categories, values: d.vals, catTitle: context.cat, valTitle: 'Tally', widest: _tMost || 15,

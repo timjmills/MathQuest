@@ -1722,7 +1722,8 @@ function _applyCardTwin(q, paper, visualAid, qt) {
         if (input) { input.value = ''; mountModel(visualAid, input); }
         // a number put on the line is answered on the line: its typed line under the cell goes
         // (the input stays, hidden, for Check; O6 AP3 nl-place)
-        if (/data-mq-model="nl-place"/.test(String(q.visual || ''))) {
+        // (a picture graph is built in its boxes too: no second, typed answer place, H8)
+        if (/data-mq-model="(nl-place|picture-build)"/.test(String(q.visual || ''))) {
             const area = document.getElementById('answerInputArea');
             if (area) area.style.display = 'none';
         }

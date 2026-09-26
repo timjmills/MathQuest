@@ -16,7 +16,9 @@ import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, instructionKeyOf, assemble,
     poolItems, topicOf, labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, rng, shuffle, deriveSeed,
 } from './compose.js';
-import { groupByHeight, rowShape, rowGapFor } from '../layout.js';
+import { groupByHeight, rowShape, rowGapFor, instructionMm } from '../layout.js';
+import { isCheckAnswer } from '../registry.js';
+import { INSTRUCTION_LIBRARY } from '../contract.js';
 
 export const ROLE_ID = 'test';
 const CEILING = { S: 20, M: 16, L: 12 };
@@ -59,38 +61,80 @@ export function counts(pools, input) {
     return { main: input.count ? Math.min(input.count, L.perPage) : L.perPage };
 }
 
+/** The check-box twin of an instruction key ("graph" -> "graph-check"), or '' when there is none. */
+function checkKeyOf(key) {
+    const k = `${String(key || '').replace(/-check$/, '')}-check`;
+    return Object.prototype.hasOwnProperty.call(INSTRUCTION_LIBRARY, k) ? k : '';
+}
+const isChk = (it) => isCheckAnswer((it && it.q) || it);
+
 export function plan(input = {}) {
     const ctx = ctxOf(input);
     const form = String(input.form || 'A').toUpperCase() === 'B' ? 'B' : 'A';
     let items = poolItems(input, 'main');
     const L = layout(items, input);
     items = items.slice(0, L.perPage);
-    // PT-TST-1: Form B is Form A re-ordered under (seed, form).
-    if (form === 'B') items = shuffle(rng(deriveSeed(input.seed === undefined ? 0 : input.seed, 'test', 'B')), items);
+    // One answer shape a part (AP2 round 7, critic figures-r8 L10 / RUBRIC C1): a test whose
+    // questions mix number boxes with check-box items ("which has the most?") prints the check-box
+    // items as their own part, under their own instruction, after the number items. The second
+    // instruction line comes off the grid: items are dropped (the larger part first) until both
+    // parts fit the page.
+    const baseKey = instructionKeyOf(items, input.skills);
+    const chkKey = checkKeyOf(baseKey);
+    let groups = [items];
+    if (chkKey && items.some(isChk) && !items.every(isChk)) {
+        const box = items.filter((it) => !isChk(it));
+        const chk = items.filter(isChk);
+        const avail = (L.gridH || 0) - instructionMm(ctx.size);
+        // rows at the problems' own height (the grid's cells are stretched to fill one part)
+        const rowMm = L.hMin || L.cellH || 0;
+        const need = () => (Math.ceil(box.length / L.cols) + Math.ceil(chk.length / L.cols)) * rowMm;
+        while (L.gridH && rowMm && need() > avail + 0.01 && box.length + chk.length > 2) {
+            if (box.length >= chk.length && box.length > 1) box.pop();
+            else if (chk.length > 1) chk.pop();
+            else box.pop();
+        }
+        groups = [box, chk];
+    }
+    // PT-TST-1: Form B is Form A re-ordered under (seed, form), within each part.
+    if (form === 'B') {
+        const r = rng(deriveSeed(input.seed === undefined ? 0 : input.seed, 'test', 'B'));
+        groups = groups.map((g) => shuffle(r, g));
+    }
     // RUBRIC H13: problems of one height together, so each row is sized for what it holds.
-    items = groupByHeight(items, L.cols);
+    groups = groups.map((g) => groupByHeight(g, L.cols));
+    items = groups.flat();
     const topic = topicOf(((input.skills || [])[0] || {}).iCan || '');
     const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: `Test ${form}: ${topic}`, score: items.length });
-    const rows = Math.max(1, Math.ceil(items.length / L.cols));
-    const instr = instructionPart(instructionKeyOf(items, input.skills), items);
-    const sections = [
-        instr,
-        gridPart(items.map((it) => planItem(it, { cols: L.cols, level: 0 })), {
+    const split = groups.length > 1;
+    const totalRows = groups.reduce((a, g) => a + Math.max(1, Math.ceil(g.length / L.cols)), 0);
+    // two parts share the grid height under two instruction lines: each row that much shorter
+    const cellH = split && L.gridH ? Math.min(L.cellH, Math.floor(((L.gridH - instructionMm(ctx.size)) / totalRows) * 100) / 100) : L.cellH;
+    const sections = [];
+    let start = 1;
+    groups.forEach((g, gi) => {
+        const rows = Math.max(1, Math.ceil(g.length / L.cols));
+        sections.push(instructionPart(split && gi === 1 ? chkKey : baseKey, g));
+        const grid = gridPart(g.map((it) => planItem(it, { cols: L.cols, level: 0 })), {
             // Every item in its own boxed cell (the 04-G "open array" drew the outer frame only,
             // and the items floated in one big box: 2026-09-25 re-grade, C3/C4).
-            cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1,
-        }),
-    ];
-    // Rows sized to what they hold (H13); else the layout's grid height is the page's (one
-    // instruction) and a lone full grid fills by flex.
-    const shape = rowShape(items, L.cols, rows, L.cellH);
-    if (shape) { sections[1].rowsTpl = shape.rowsTpl; sections[1].height = `${shape.heightMm}mm`; }
-    else if (rows === L.rows && L.fill !== false) { sections[1].cls = ''; sections[1].height = ''; }
-    // A Test's count is fixed (12.1): spare page height goes between the rows, not into them.
-    if (sections[1].height) {
-        const g = rowGapFor(rows, parseFloat(sections[1].height), L.gridH);
-        if (g.gap) { sections[1].rowGap = g.gap; sections[1].height = `${g.heightMm}mm`; }
-    }
+            cols: L.cols, rows, cellH, labels: labelStyleOf(ctx.look, input.labels), start,
+        });
+        start += g.length;
+        // Rows sized to what they hold (H13); else the layout's grid height is the page's (one
+        // instruction) and a lone full grid fills by flex.
+        const shape = rowShape(g, L.cols, rows, cellH);
+        if (shape) { grid.rowsTpl = shape.rowsTpl; grid.height = `${shape.heightMm}mm`; }
+        else if (!split && rows === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
+        // A Test's count is fixed (12.1): spare page height goes between the rows, not into them.
+        // Two parts share the page's grid height by their rows.
+        if (grid.height) {
+            const availMm = split ? ((L.gridH || 0) - instructionMm(ctx.size)) * rows / totalRows : L.gridH;
+            const gp = rowGapFor(rows, parseFloat(grid.height), availMm);
+            if (gp.gap) { grid.rowGap = gp.gap; grid.height = `${gp.heightMm}mm`; }
+        }
+        sections.push(grid);
+    });
     return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, [{ sections }], {
         scaffoldLevel: 0,
         meta: { items: items.length, scoreOutOf: items.length, form, fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },
