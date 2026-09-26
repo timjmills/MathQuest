@@ -37,6 +37,10 @@ import { MONO, MONO_STROKE } from './design-tokens.js';
 import { k2Twin, K2_SHAPES } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
 import { fadeRung } from './sheet/index.js';
+import { dealPick } from './page-deal.js';
+
+/** add_5_pictures: every n + m with both groups 1-4 and the sum at most 5 (ten facts). */
+const A5_FACTS = Object.freeze([[1, 1], [1, 2], [2, 1], [1, 3], [3, 1], [2, 2], [1, 4], [4, 1], [2, 3], [3, 2]]);
 
 /* ================================================= P11 · the teacher's options (skill-options.js) */
 // The K-2 options P11_K2_OPTIONS declares (count to, objects, arrangement, support level, compare
@@ -1056,17 +1060,11 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     else if (mappedSkill === "add_5_pictures") {
         const counterSet = ["●", "■", "▲", "★", "◆"];
         const counter = pick(counterSet);
-        let n, m;
-        do { n = randInt(1, 3); m = randInt(1, 3); } while (n + m > 5);
+        // Backlog (critic EA r5): a page of six dealt 1 + 3 and 1 + 2 twice each. The ten facts
+        // with both groups 1-4 and a sum to 5 are dealt from the page dealer (page-deal.js), a block
+        // holding each fact once, so a page of up to ten never repeats one and 4 + 1 / 1 + 4 appear.
+        const [n, m] = dealPick('add_5_pictures:fact', A5_FACTS);
         const total = n + m;
-        // The old choice row's draws are still made (and dropped), so a page deals the same sums
-        // in the same order as before the migration.
-        const optsSet = new Set([total]);
-        while (optsSet.size < 3) {
-            const cand = total + (Math.random() < 0.5 ? -1 : 1) * randInt(1, 2);
-            if (cand >= 0 && cand <= 5) optsSet.add(cand);
-        }
-        shuffle([...optsSet]);
 
         q.text = `How many in all? ${n} + ${m} = ?`;
         q.printText = 'Count them all. Write how many.';
