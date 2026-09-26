@@ -233,6 +233,15 @@ This supersedes the 17-card page-type menu (and the stand-alone mapping in §8c,
   mixed builders when the engine lane extracts them (§8c); until then they route to today's roles with these options;
   (3) the Lesson paper gains the "parts" option.
 
+## 8f. Owner ruling: worked examples on Practice papers — one example on top only (2026-09-26)
+
+Practice keeps a **"Worked example"** option in ONE form only: a single worked example at the **top of each skill's
+block** (the old "sections" layout). The side-by-side pair form is **dropped** (it caused most one-problem-per-page
+failures). The example uses **different numbers from every problem on the page** (never a problem's own numbers or its
+answers), is **easy-first but shows the skill's real move** (no trivial single-coin or 1:03 examples), is drawn **the same
+way as the problems**, prints its steps at ≥ 11 pt at every size, and the block fills with problems under it. Critic
+anchor-r1 defects (commit 7146df5 on `critic-anchor-r1`) are the fix list.
+
 ## 9. Risks
 
 Engine regressions invalidating passed lessons (single engine owner, render-hash stamps → `stale`); ≈ 359 steps blocked
