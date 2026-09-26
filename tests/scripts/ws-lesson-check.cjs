@@ -150,7 +150,7 @@ async function renderDoc(app, html) {
         if (!Array.isArray(data.mixWith) || !data.mixWith.length) fail(where, 'LR-9', 'no Mixed partners');
     }
 
-    const app = await open({ seed: 1 });
+    const app = await open({ seed: 1, lock: 'ws-lesson-check' });
     // LR-9: a partner is an EARLIER skill - its grade at most the lesson's.
     const grades = await app.page.evaluate((keys) => Object.fromEntries(keys.map((k) => {
         const [c, s] = k.split(':');

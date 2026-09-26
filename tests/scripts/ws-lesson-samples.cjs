@@ -118,7 +118,7 @@ async function printDoc(page, html, pdfPath) {
 
 (async () => {
     fs.mkdirSync(OUT, { recursive: true });
-    const app = await open({ seed: 1 });
+    const app = await open({ seed: 1, lock: 'ws-lesson-samples' });
     const { page } = app;
     const summary = [];
     for (const l of LESSONS) {

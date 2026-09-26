@@ -29,7 +29,7 @@ const SAMPLES = [
 const sha = (s) => crypto.createHash('sha256').update(String(s)).digest('hex').slice(0, 16);
 
 (async () => {
-    const app = await open({ seed: 1 });
+    const app = await open({ seed: 1, lock: 'ws-lesson-hash' });
     const stamps = {};
     for (const l of SAMPLES) for (const seed of SEEDS) for (const size of SIZES) {
         const r = await app.page.evaluate(async ({ skill, size, seed, lessonId }) => {

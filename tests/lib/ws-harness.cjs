@@ -52,7 +52,11 @@ function seedScript(seed) {
   return `(() => { let a = ${seed >>> 0}; window.__wsReseed = n => { a = n >>> 0; }; Math.random = function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; })();`;
 }
 
-async function open({ seed = null, viewport = { width: 1280, height: 900, deviceScaleFactor: 2 }, pagePath = '/index.html' } = {}) {
+// One headless-Chrome gate at a time on this machine (tests/lib/browser-lock.cjs): taken when the
+// caller passes `lock: 'name'` or MQ_BROWSER_LOCK=1, given back by close().
+async function open({ seed = null, viewport = { width: 1280, height: 900, deviceScaleFactor: 2 }, pagePath = '/index.html', lock = null } = {}) {
+  const wantLock = process.env.MQ_BROWSER_LOCK === '1' || (lock && process.env.MQ_BROWSER_LOCK !== '0');
+  const release = wantLock ? await require('./browser-lock.cjs').acquire(typeof lock === 'string' ? lock : path.basename(process.argv[1] || 'gate')) : () => {};
   let server = null;
   let base = process.env.MQ_BASE ? process.env.MQ_BASE.replace(/\/index\.html$/, '').replace(/\/$/, '') : null;
   if (!base) ({ server, base } = await startServer());
@@ -69,7 +73,7 @@ async function open({ seed = null, viewport = { width: 1280, height: 900, device
   await page.goto(base + pagePath, { waitUntil: 'networkidle2', timeout: 60000 });
   await waitFor(page, () => typeof window.generateQuestion === 'function' && !!window.SKILLS, 30000, 'app boot');
   await page.evaluate(() => document.fonts && document.fonts.ready);
-  const close = async () => { await browser.close(); if (server) await new Promise(r => server.close(r)); };
+  const close = async () => { try { await browser.close(); if (server) await new Promise(r => server.close(r)); } finally { release(); } };
   return { browser, page, base, problems, close };
 }
 
