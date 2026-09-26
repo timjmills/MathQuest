@@ -173,7 +173,10 @@ registerSkill('division:div_remainders', {
         const r = qr(q);
         if (!r || !Number.isFinite(a) || !Number.isFinite(b)) return [];
         return [
-            step(`Circle groups of ${b}: ${r.quo} ${r.quo === 1 ? 'group' : 'groups'}.`, [{ slot: 'quotient', value: String(r.quo) }]),
+            // Guided fade (critic guided-r1): the first step is the action alone, so a first try's
+            // grey hint ("Circle groups of 5.") never holds the quotient.
+            step(`Circle groups of ${b}.`),
+            step(`Count the groups: ${r.quo}.`, [{ slot: 'quotient', value: String(r.quo) }]),
             step(`Count the ones left over: ${r.rem}.`, [{ slot: 'remainder', value: String(r.rem) }]),
             step(`Check: ${r.rem} is less than ${b}.`),
             step(`${r.quo} × ${b} = ${r.quo * b}. ${r.quo * b} + ${r.rem} = ${a}.`),

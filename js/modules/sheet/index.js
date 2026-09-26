@@ -49,6 +49,7 @@ export {
 export {
     register, registerCell, getCell, hasCell, listCells, resolveTemplate,
     renderCell, cellAnswerKey, cellFootprint, cellInputs, cellGridItem, coverage, FALLBACK,
+    cellMinSize, sizeFloor, SIZE_ORDER,
 } from './registry.js';
 
 /* ----------------------------------------------------------------------------- rng */

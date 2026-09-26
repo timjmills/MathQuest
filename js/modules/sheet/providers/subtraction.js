@@ -142,7 +142,7 @@ registerSkill('subtraction:number_line_sub', {
         iCan: 'I Can subtract by jumping back on a number line',
         instructionKey: 'line-jumps',
         steps: [
-            'Put a dot on the first number.',
+            'Find the dot. It is the first number.',
             'Jump to the left, one jump for each one you take away.',
             'Write the number you land on.',
         ],
@@ -175,7 +175,8 @@ registerSkill('subtraction:nl_sub', {
         say: '__ minus __ equals __.',
     }),
     misconceptions: ['counted-start', 'jumped-wrong-way'],
-    workedSteps: (q) => { const [a, b] = operands(q); return Number.isFinite(a) && Number.isFinite(b) ? lineSteps(a, b, -1) : []; },
+    // The steps say "hop" (round-4 re-grade: the Model said "Jump" under "Hop" steps).
+    workedSteps: (q) => { const [a, b] = operands(q); return Number.isFinite(a) && Number.isFinite(b) ? lineSteps(a, b, -1, { verb: 'Hop', noun: 'hops' }) : []; },
     wrongAnswer: (q) => {
         const [a, b] = operands(q);
         if (!Number.isFinite(a) || !Number.isFinite(b) || q.missing) return null;

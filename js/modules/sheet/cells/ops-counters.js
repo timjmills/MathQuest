@@ -210,15 +210,58 @@ function remainderGeometry(size, n) {
     return { d, gap, rowGap, pad, cols, rows, w: 2 * pad + (cols - 1) * (d + gap) + d, h: 2 * pad + (hRows - 1) * (d + rowGap) + d };
 }
 
-function remainderCounters(g, p) {
+function remainderCounters(g, p, state = 'blank') {
     const n = Math.max(0, Math.floor(Number(p.dividend)) || 0);
     const G = remainderGeometry(g.size, n);
     const r = G.d / 2;
-    let body = '';
+    const pts = [];
     for (let i = 0; i < n; i++) {
-        body += dot(G.pad + r + (i % REM_PER_ROW) * (G.d + G.gap), G.pad + r + Math.floor(i / REM_PER_ROW) * (G.d + G.rowGap), r, true);
+        pts.push({ cx: G.pad + r + (i % REM_PER_ROW) * (G.d + G.gap), cy: G.pad + r + Math.floor(i / REM_PER_ROW) * (G.d + G.rowGap) });
     }
+    // the worked cell (Guided Model, key) rings each whole group in reading order (groupRings)
+    const body = pts.map((c) => dot(c.cx, c.cy, r, true)).join('') + groupRings({ pts }, Number(p.divisor), r, state);
     return { svg: svgMm(g, G.w, G.h, body, `${n} counters`), wMm: G.w };
+}
+
+/**
+ * Step 1 worked (critic guided-r1, div_remainders: "Circle groups of 4" over a Model with no
+ * rings): the worked cell rings every whole group of the divisor in reading order - trace grey
+ * on the Guided Model (state `traced`), solid on the key (AK-2: a key shows the working). The
+ * counters left outside a ring are the remainder. The array's rows are never a multiple of the
+ * divisor (a neutral array, R3), so a group that runs off a row's end is drawn as a ring open
+ * at that end and continued, open at its start, on the next row. The rings take no space.
+ */
+function groupRings(lay, k, r, state) {
+    if (!(state === 'traced' || state === 'answered') || !(k > 1)) return '';
+    const grey = state === 'traced';
+    const pad = 1.1, hh = r + pad;
+    const stroke = grey ? `stroke="${INK.grey}" stroke-width="0.353"` : `stroke="${INK.ink}" stroke-width="0.265"`;
+    const left = lay.pts.length ? Math.min(...lay.pts.map((c) => c.cx)) - hh - 0.8 : 0;
+    const right = lay.pts.length ? Math.max(...lay.pts.map((c) => c.cx)) + hh + 0.8 : 0;
+    const f = (v) => v.toFixed(2);
+    let out = '';
+    const groups = Math.floor(lay.pts.length / k);
+    for (let gi = 0; gi < groups; gi++) {
+        const pts = lay.pts.slice(gi * k, gi * k + k);
+        const rows = [];
+        for (const c of pts) {
+            const last = rows[rows.length - 1];
+            if (last && Math.abs(last.cy - c.cy) < 0.01) last.x2 = c.cx;
+            else rows.push({ cy: c.cy, x1: c.cx, x2: c.cx });
+        }
+        rows.forEach((seg, si) => {
+            const openL = si > 0, openR = si < rows.length - 1;
+            const x1 = seg.x1 - hh, x2 = seg.x2 + hh, y1 = seg.cy - hh, y2 = seg.cy + hh;
+            // a closed stadium; an open end runs straight on to the array's edge
+            const lEnd = openL ? `M${f(left)} ${f(y1)}` : `M${f(x1 + hh)} ${f(y1)}`;
+            const top = `H${f(openR ? right : x2 - hh)}`;
+            const rCap = openR ? `M${f(right)} ${f(y2)}` : `A${f(hh)} ${f(hh)} 0 0 1 ${f(x2 - hh)} ${f(y2)}`;
+            const bottom = `H${f(openL ? left : x1 + hh)}`;
+            const lCap = openL ? '' : `A${f(hh)} ${f(hh)} 0 0 1 ${f(x1 + hh)} ${f(y1)}`;
+            out += `<path d="${lEnd}${top}${rCap}${bottom}${lCap}" fill="none" ${stroke} data-ws-ink="${grey ? 'trace' : 'solid'}" data-mq-ring="group"/>`;
+        });
+    }
+    return out;
 }
 
 const remKey = (p) => {
@@ -318,7 +361,7 @@ register('remainder', {
         const ink = inkOf(ctx);
         const key = remKey(p);
         const vals = slotValues(ctx, key, (w) => splitRemainder(w));
-        const pic = remainderCounters(g, p);
+        const pic = remainderCounters(g, p, ctx.state);
         // R3: one-digit answers take the 14 mm writing box (RUBRIC H9), not two writing widths,
         // so "23 ÷ 4 = [ ] R [ ]" is one line inside a 2-column cell (it was ~100 mm, one column).
         const bw = Math.max(14, 0.62 * g.E + 5);

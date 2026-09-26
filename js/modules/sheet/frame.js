@@ -46,7 +46,16 @@ export const pageTitle = (text, note = '') =>
  * grade and standards; centre page n/N; right form letter, seed or week/day code.
  */
 export const pageFooter = (f = {}) =>
-    `<footer class="ws-foot"><span>${esc(f.left || '')}</span><b>${esc(f.center || '1/1')}</b><span>${esc(f.right || '')}</span></footer>`;
+    `<footer class="ws-foot"><span>${esc(f.left || '')}</span><b>${esc(f.center || '1/1')}</b><span>${esc(f.right || '')}</span>` +
+    `<small class="ws-copy">${esc(copyrightLine(f.year))}</small></footer>`;
+
+/**
+ * The owner's copyright line, printed on EVERY sheet, key and lesson page (owner ruling 2026-09-26).
+ * It shares the footer's 6 mm band as a second line, so no page loses body height. The year is the
+ * print year unless a caller pins it (`footer.year`) for reproducible renders.
+ */
+export const COPYRIGHT_HOLDER = 'Cultivating the Digital';
+export const copyrightLine = (year) => `© ${year || new Date().getFullYear()} ${COPYRIGHT_HOLDER}. All rights reserved.`;
 
 /* ------------------------------------------------------------------- the sheet (PG) */
 
