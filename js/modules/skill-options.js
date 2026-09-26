@@ -3067,11 +3067,11 @@ const K2_LANE_OPTIONS = {
         {
             id: 'task', label: 'Task', type: 'enum', default: 'count', group: 'difficulty',
             values: [{ v: 'count', l: 'How many? (0 for none) (default)' }, { v: 'find', l: 'Which one has none? (check a box)' },
-                { v: 'compute', l: 'Take them all away (5 − 5 = 0)' }],
+                { v: 'compute', l: 'Take away all or none (5 − 5 = 0, 5 − 0 = 5)' }],
             help: 'One task for the whole page. "How many?" writes a number, 0 included; "Which one has none?" checks the empty '
-                + 'one of three; "Take them all away" crosses out every object and writes what is left.',
+                + 'one of three; "Take away all or none" crosses out every object or none of them and writes what is left.',
         },
-        levelSubset([2, 1], 1, 'Level 2: on "How many?" and "Take them all away" a number track 0 to the top number under each picture '
+        levelSubset([2, 1], 1, 'Level 2: on "How many?" and "Take away all or none" a number track 0 to the top number under each picture '
             + '(0 comes first, to count along or back along); on "Which one has none?" a small empty plate marked "none = 0" under the row. '
             + 'Level 1 is the picture alone.'),
         {

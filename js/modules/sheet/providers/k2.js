@@ -730,14 +730,17 @@ const ZERO_FIND = {
 const ZERO_LEFT = {
     iCan: 'I Can write 0 when there are none',
     instructionKey: 'how-many-left',
-    steps: ['Every one is crossed out.', 'Look for one that is not crossed out.', 'None are left. Write 0.'],
-    say: '__ take away __ is 0.',
-    sayValues: (q) => { const n = num(payloadOf(q).n); return Number.isFinite(n) ? [n, n] : null; },
+    steps: ['Look for the crosses.', 'Count the ones not crossed out.', 'Write how many are left.'],
+    say: '__ take away __ is __.',
+    sayValues: (q) => {
+        const p = payloadOf(q); const n = num(p.n); const m = Number.isFinite(p.m) ? p.m : n;
+        return Number.isFinite(n) ? [n, m, n - m] : null;
+    },
 };
 
 registerSkill('counting:zero_none', {
     strings: stringsBy((t) => (t === 'find' ? ZERO_FIND : t === 'compute' ? ZERO_LEFT : ZERO_COUNT), ZERO_COUNT),
-    misconceptions: ['wrote-one-for-none', 'skipped-one', 'counted-twice', 'chose-fewest', 'wrote-the-start'],
+    misconceptions: ['wrote-one-for-none', 'skipped-one', 'counted-twice', 'chose-fewest', 'wrote-the-start', 'took-all-away'],
     workedSteps: (q) => {
         const p = payloadOf(q);
         const word = HOLDER[p.objects] || 'plate';
@@ -748,6 +751,15 @@ registerSkill('counting:zero_none', {
                 step('Count each one: ' + counts.map((c, i) => `${['A', 'B', 'C'][i]} has ${c}`).join(', ') + '.', [WORK('count')]),
                 step(`${q.ans} has nothing in it. That is none.`, [WORK('ring')]),
                 step(`Check ${q.ans}.`, [{ slot: 'answer', value: String(q.ans) }]),
+            ];
+        }
+        if (t === 'compute' && Number.isFinite(p.m) && p.m === 0) {
+            const n = num(p.n);
+            return [
+                step(`There are ${n} on the ${word}.`, [WORK('count')]),
+                step('None are crossed out: 0 are taken away.'),
+                step(`All ${n} are left.`),
+                step(`Write ${n}.`, [{ slot: 'answer', value: String(n) }]),
             ];
         }
         if (t === 'compute') {
@@ -783,6 +795,11 @@ registerSkill('counting:zero_none', {
             const nz = counts.map((c, i) => [c, i]).filter(([c]) => c > 0).sort((x, y) => x[0] - y[0]);
             return chooseWrong(q, nz.slice(0, 1).map(([c, i]) => ({ value: ['A', 'B', 'C'][i], misconception: 'chose-fewest',
                 slot: 'answer', explain: `Chose the one with the fewest (${c}), not the one with none.` })), { rotate: false });
+        }
+        if (t === 'compute' && Number.isFinite(p.m) && p.m === 0) {
+            return chooseWrong(q, [
+                { value: 0, misconception: 'took-all-away', explain: 'Wrote 0: took them all away when none were taken.' },
+            ]);
         }
         if (t === 'compute') {
             const n = num(p.n);
@@ -1282,6 +1299,23 @@ function bondBlanks(rows) {
 }
 
 registerSkill('composing:bonds_in_order', {
+    // Stretch: the open task behind the table - every pair of parts that makes this whole, in
+    // any order; the page's example row is 0 and the whole (the table's first row).
+    open: (q, { size = 'L' } = {}) => {
+        const n = num(payloadOf(q).n);
+        if (!Number.isInteger(n) || n < 2) return null;
+        const rowsN = ({ S: 4, M: 6, L: 6 })[size] || 6;
+        const rows = [];
+        for (let a = 1; a <= n && rows.length < rowsN; a++) rows.push([a, n - a, n]);
+        return {
+            prompt: [`Two parts make ${n}.`, 'Find different pairs.'],
+            columns: ['First part', 'Second part', 'Check: whole'],
+            example: [0, n, n],
+            keyRows: rows,
+            rule: `+ = ${n}`,
+            total: n + 1,
+        };
+    },
     strings: stringsBy((t, ref) => BONDS_DEFS[String(t).replace(/^bonds-/, '')] || BONDS_DEFS[ref && ref.opts && ref.opts.task] || null, BONDS_DEFS.fill),
     misconceptions: ['copied-first-part', 'second-goes-up', 'missed-zero', 'parts-miss-whole', 'repeated-a-row', 'up-down-swapped'],
     workedSteps: (q) => {

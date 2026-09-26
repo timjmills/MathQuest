@@ -39,12 +39,12 @@ export function k2StepCtx(steps, k, ctx) {
 }
 /** The ink of a work token in this state: 'trace' (newest), 'solid' (earlier) or '' (not yet). */
 export const workInk = (ctx, token) => (ctx && ctx.work && ctx.work[token]) || '';
-/** A ring round a drawing (a model's "this one" mark): grey and dashed when it is the newest mark. A
+/** A ring round a drawing (a model's "this one" mark): grey when it is the newest mark (solid: a dashed line means cut here, LS-4). A
  *  negative margin the size of its padding and border keeps the drawing's box (a state row never grows). */
 export function ringWrap(ctx, html, ink) {
     if (!ink) return html;
     const grey = ink === 'trace';
-    return `<span data-ws-ink="${grey ? 'trace' : 'solid'}" style="display:inline-block;border:${B(ctx, 1.5)} ${grey ? 'dashed' : 'solid'} ${grey ? GREY : INK};`
+    return `<span data-ws-ink="${grey ? 'trace' : 'solid'}" style="display:inline-block;border:${B(ctx, 1.5)} solid ${grey ? GREY : INK};`
         + `border-radius:${L(ctx, 6)};padding:${L(ctx, 1)};margin:${L(ctx, -1.53)};line-height:0;">${html}</span>`;
 }
 /** A multi-box cell's slot value in a model state (its ink as a state), else the normal shown value. */

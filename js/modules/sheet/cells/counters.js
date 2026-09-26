@@ -39,7 +39,7 @@ const MINUS = '−';
 /** A model's count numeral on an object (grey: the newest mark of its step). */
 const countNum = (x, y, pt, v) => `<text x="${n2(x)}" y="${n2(y)}" text-anchor="middle" font-size="${pt}" font-weight="700" font-family="Andika, sans-serif" fill="${GREY}" data-ws-ink="trace">${v}</text>`;
 /** A model's ring round the last object counted ("the last number is how many"). */
-const lastRing = (x, y, d, ink) => `<circle cx="${n2(x)}" cy="${n2(y)}" r="${n2(d * 0.78)}" fill="none" stroke="${ink === 'trace' ? GREY : INK}" stroke-width="${n2(SW.heavy)}"${ink === 'trace' ? ' stroke-dasharray="1.6 1.2" data-ws-ink="trace"' : ''}/>`;
+const lastRing = (x, y, d, ink) => `<circle cx="${n2(x)}" cy="${n2(y)}" r="${n2(d * 0.78)}" fill="none" stroke="${ink === 'trace' ? GREY : INK}" stroke-width="${n2(SW.heavy)}"${ink === 'trace' ? ' data-ws-ink="trace"' : ''}/>`;
 
 function countPicture(ctx, n, shape, p = {}) {
     if (p.objects === 'frame') return framePicture(ctx, n);
@@ -397,7 +397,7 @@ function holderPicture(ctx, n, shape, p, { scale = 1, crossed = false, counted =
         }
     });
     // a model's "look here" mark on the holder's middle (an empty plate: nothing there), inside its own box
-    if (ringed === 'trace') body += `<circle cx="${n2(cx0)}" cy="${n2(cy0)}" r="${n2(inner * 0.55)}" fill="none" stroke="${ringed === 'trace' ? GREY : INK}" stroke-width="${n2(SW.heavy)}"${ringed === 'trace' ? ' stroke-dasharray="2 1.5" data-ws-ink="trace"' : ''}/>`;
+    if (ringed === 'trace') body += `<circle cx="${n2(cx0)}" cy="${n2(cy0)}" r="${n2(inner * 0.55)}" fill="none" stroke="${ringed === 'trace' ? GREY : INK}" stroke-width="${n2(SW.heavy)}"${ringed === 'trace' ? ' data-ws-ink="trace"' : ''}/>`;
     return svg(ctx, W, H, body, { label: box ? 'a box' : 'a plate' });
 }
 
@@ -438,8 +438,10 @@ register('counters', {
             if (p.task === 'takeaway' || p.task === 'compute') {
                 const b = inlineBoxMm(ctx, 1);
                 const slot = box(ctx, { value: slotValue(ctx, 'answer', kv), w: b.w, h: b.h, mark: 'blank' });
-                return root(ctx, 'k2-zero', `<div style="display:flex;justify-content:center;">${holderPicture(ctx, p.n, p.shape, p, { scale: k, crossed: true, counted: !!workInk(ctx, 'count') })}</div>`
-                    + eqRowOf(ctx, [eqSpan(ctx, p.n), opSpan(ctx, MINUS), eqSpan(ctx, p.n), opSpan(ctx, '='), slot])
+                // p.m: how many are taken away - all of them (crossed) or none (5 - 0); older pages all
+                const m = Number.isFinite(p.m) ? p.m : p.n;
+                return root(ctx, 'k2-zero', `<div style="display:flex;justify-content:center;">${holderPicture(ctx, p.n, p.shape, p, { scale: k, crossed: m > 0, counted: !!workInk(ctx, 'count') })}</div>`
+                    + eqRowOf(ctx, [eqSpan(ctx, p.n), opSpan(ctx, MINUS), eqSpan(ctx, m), opSpan(ctx, '='), slot])
                     // Support level 2: the number track 0 to the top number, to count back along
                     + (p.track ? `<div style="display:flex;justify-content:center;margin-top:${L(ctx, 3)};">${numberTrack(ctx, 0, p.track)}</div>` : ''));
             }

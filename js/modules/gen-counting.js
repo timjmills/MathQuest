@@ -36,6 +36,7 @@ import { randInt, shuffle, pick } from './utils.js';
 import { MONO, MONO_STROKE } from './design-tokens.js';
 import { k2Twin, K2_SHAPES } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
+import { dealIndex } from './page-deal.js';
 import { fadeRung } from './sheet/index.js';
 
 /* ================================================= P11 · the teacher's options (skill-options.js) */
@@ -132,8 +133,18 @@ function _kDeal(n) {
  */
 const _kPerm = {};
 function _kDealShuffled(n) {
-    if (_kAt === 0 || !_kPerm[n]) _kPerm[n] = shuffle(Array.from({ length: n }, (_, i) => i));
-    return _kPerm[n][((_kAt % n) + n) % n];
+    // L10 (ws-pattern-audit): each run of n items takes a FRESH permutation, so a page never
+    // repeats one order with period n (a zero_none page read 4 2 3 1 5 4 2 3 ...); a new block
+    // never starts with the value the last one ended on
+    const at = ((_kAt % 1e6) + 1e6) % 1e6, blk = Math.floor(at / n);
+    let rec = _kPerm[n];
+    if (_kAt === 0 || !rec || rec.blk !== blk) {
+        const prev = rec && rec.blk === blk - 1 ? rec.perm[n - 1] : null;
+        let perm = shuffle(Array.from({ length: n }, (_, i) => i));
+        if (n > 1 && perm[0] === prev) { const j = 1 + Math.floor(Math.random() * (n - 1)); [perm[0], perm[j]] = [perm[j], perm[0]]; }
+        rec = _kPerm[n] = { blk, perm };
+    }
+    return rec.perm[at % n];
 }
 
 /**
@@ -300,30 +311,13 @@ function _kPageDeal(key, n) {
 }
 
 /**
- * An ANSWER POSITION (which of n choices is right; which of two things is asked), drawn at random
- * with repeats allowed - never a round-robin, which a pupil reads as a pattern (A, B, A, B ...;
- * critic k2-r1). A printed page draws a block of positions at its first item: every value at
- * least twice when the page holds 2n items (once when it holds n), the rest at random, the block
- * shuffled; the next block is drawn when the page runs past it. Live play draws each time.
+ * An ANSWER POSITION or task attribute (which of n choices is right; which of two things is
+ * asked): the shared page dealer (page-deal.js, L10) - random, balanced in blocks, repeats
+ * allowed, never a round-robin a pupil reads as a pattern (A, B, A, B ...; critic k2-r1). One key
+ * per independent attribute. Live play deals from each key's own counter.
  */
-const _kDrawBlock = {};
 function _kDraw(key, n) {
-    n = Math.max(1, Math.floor(n));
-    if (n === 1) return 0;
-    if (!Number.isFinite(state.itemIndex)) return Math.floor(Math.random() * n);
-    const len = Math.max(2 * n, Number(state.itemCount) || 12);
-    const k = `${key}:${n}`;
-    const at = state.itemIndex;
-    let b = _kDrawBlock[k];
-    if (at === 0 || !b || at < b.start || at >= b.start + b.seq.length) {
-        const start = at - (at % len);
-        const seq = [];
-        const each = len >= 2 * n ? 2 : 1;
-        for (let v = 0; v < n; v++) for (let r = 0; r < each; r++) seq.push(v);
-        while (seq.length < len) seq.push(Math.floor(Math.random() * n));
-        b = _kDrawBlock[k] = { start, seq: shuffle(seq) };
-    }
-    return b.seq[at - b.start];
+    return dealIndex(`k2:${key}`, Math.max(1, Math.floor(n)));
 }
 
 /* ================================================================================ the generator */
@@ -345,7 +339,6 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // a page spreads it instead of rolling six numbers that may repeat.
         // P11: "Count to" 5 / 10 / 20 (20 is the stand-alone default).
         // Build lane k2: the "same number?" task (conservation) has its own cell.
-        _k2NoStretch(q);   // "Two numbers add to 18" is not a counting task: no Stretch page
         if (_kOpt('task') === 'same') { _k2Conserve(q, rng); return; }
         const band = Number(_kOpt('band')) || 20;
         const _coCircle = _kOpt('orientation') === 'circle';
@@ -369,7 +362,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         q.selfAnswering = true;
         q.hint = "Touch each one as you count. The last number you say is how many.";
         // The two real counting errors (a K pupil's error analysis): one counted twice, one missed.
-        q.distractorTags = _kDeal(2) === 0 || count === 1
+        q.distractorTags = _kDraw('co-miss', 2) === 0 || count === 1
             ? { [count + 1]: 'counted one object twice' }
             : { [count - 1]: 'missed one object' };
         const _coPayload = { kind: 'count', n: count, shape, ans: count, band };   // band: the page title's "to 20 / to 30"
@@ -399,7 +392,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const FORMS = ['after', 'before', 'between'];
         // P11: "Which number" (after / before / all three) and "Count to" (10 / 20 / 100).
         const _csDir = _kOpt('dir');
-        const form = _csDir === 'forward' ? 'after' : _csDir === 'back' ? 'before' : FORMS[_kDeal(3)];
+        const form = _csDir === 'forward' ? 'after' : _csDir === 'back' ? 'before' : FORMS[_kDraw('cs-form', 3)];
         const _csTop = Number(_kOpt('band')) || 20;
         let answer, questionText, blankPos, anchor;
         if (form === 'after') {
@@ -421,22 +414,6 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const start = answer - blankPos;
         const pathNums = [0, 1, 2, 3, 4].map(i => start + i);
 
-        const boxW = 54, boxH = 46, gap = 8, pad = 6;
-        const totalW = pathNums.length * (boxW + gap) - gap + pad * 2;
-        const totalH = boxH + pad * 2;
-        let boxesSvg = '';
-        pathNums.forEach((n, i) => {
-            const x = pad + i * (boxW + gap);
-            const isBlank = n === answer;
-            // LS-8: a dashed box is the one thing that means UNKNOWN.
-            boxesSvg += `<rect x="${x}" y="${pad}" width="${boxW}" height="${boxH}" rx="6" fill="none" `
-                + `stroke="${K_INK}" stroke-width="${K_HEAVY}"${isBlank ? ' stroke-dasharray="6,4"' : ''}/>`;
-            if (!isBlank) {
-                boxesSvg += `<text x="${x + boxW / 2}" y="${pad + boxH / 2 + 8}" text-anchor="middle" `
-                    + `font-family="${K_FONT}" font-size="24" font-weight="700" fill="${K_INK}">${n}</text>`;
-            }
-        });
-
         q.text = questionText;
         q.printText = 'Write the missing number.';
         q.ans = answer;
@@ -446,13 +423,13 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             : form === 'after'
                 ? `Count on from ${anchor}. The next number goes in the box.`
                 : `Count on from ${answer - 1}. The next number goes in the box.`;
-        q.visual = _kCell(`<svg viewBox="0 0 ${totalW} ${totalH}" width="${Math.min(totalW, 340)}" `
-            + `style="display:block;margin:0 auto;">${boxesSvg}</svg>`);
-        // the gap box in the number path IS the answer place: no second "Answer:" line under it on
-        // paper (critic k2-r1, H8: a zero_none review mixed in this cell with a box and a line)
-        q.selfAnswering = true;
+        // critic k2-r1 (H8): the five-box path is the kit's number track (seqstrip), whose empty box
+        // IS the answer place on paper, on the key and on screen - the legacy picture printed a
+        // second "Answer:" line under it.
+        _kSetCell(q, 'seqstrip', { values: pathNums, blanks: [blankPos] });
         // P11 Support level 0: the question alone, with no number path to read the gap from.
         if (_kLevel(1) === 0) {
+            delete q.cell;
             q.visual = _kCell(`<div style="font-size:1.6rem;font-weight:700;">${questionText.replace('?', '')} ${_kLine(2)}</div>`, null, true);
             q.supportLevel = 0;
         }
@@ -490,7 +467,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         if (wantSame) {
             countA = countB = 2 + _kDealShuffled(_cgTop - 1);
         } else {
-            const diff = [1, 1, 2, 2, 3][_kDeal(5)];
+            const diff = [1, 1, 2, 2, 3][_kDraw('cg-diff', 5)];
             const lo = Math.max(1, Math.min(2, _cgTop - diff - 1)) + rng(0, Math.max(0, _cgTop - 2 - diff));   // 2 .. top - diff
             const big = lo + diff;
             [countA, countB] = rng(0, 1) === 1 ? [big, lo] : [lo, big];
@@ -531,7 +508,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             _cgPayload.objects = _cgObj;
             let noun = 'dots';
             if (_cgObj !== 'dice') {
-                _cgPayload.shape = _cgObj === 'pictures' ? K2_PICTURE_KINDS[_kDeal(3)] : K2_COUNT_SHAPES[_kDeal(K2_COUNT_SHAPES.length)];
+                _cgPayload.shape = _cgObj === 'pictures' ? K2_PICTURE_KINDS[_kDraw('cg-pic', 3)] : K2_COUNT_SHAPES[_kDraw('cg-shape', K2_COUNT_SHAPES.length)];
                 noun = K2_SHAPES[_cgPayload.shape].plural;
             }
             q.text = form === 'same' ? `Do the groups have the same number of ${noun}?` : `Which group has ${form === 'more' ? 'more' : 'fewer'} ${noun}?`;
@@ -563,7 +540,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const _coDir = _kOpt('dir'), _coTask = _kOpt('task');
         const _coPool = ATTRS.filter(x => (_coDir === 'more' ? x.bigger : _coDir === 'fewer' ? !x.bigger : true)
             && (['length', 'height', 'thickness'].includes(_coTask) ? x.dim === _coTask : true));
-        const attr = _coPool.length === ATTRS.length ? ATTRS[_kDeal(ATTRS.length)] : _coPool[_kDeal(_coPool.length)];
+        const attr = _coPool.length === ATTRS.length ? ATTRS[_kDraw('co-attr', ATTRS.length)] : _coPool[_kDraw('co-attr', _coPool.length)];
 
         let a, b, picture, hint;
         const label = (l) => `<span style="font-size:1.4rem;font-weight:700;width:1.2em;text-align:right;">${l}</span>`;
@@ -643,7 +620,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // line-art pictures. The draws are the old ones (a four-way shuffle, the counts, the bag).
         const _ccPics = _kOpt('objects') === 'pictures';
         const _ccPool = _ccPics ? K2_PICTURE_KINDS : K2_COUNT_SHAPES;
-        const kinds = shuffle(_ccPool.slice()).slice(0, _ccKinds >= 2 ? _ccKinds : 2 + _kDeal(2));   // 2 or 3 kinds
+        const kinds = shuffle(_ccPool.slice()).slice(0, _ccKinds >= 2 ? _ccKinds : 2 + _kDraw('cc-kinds', 2));   // 2 or 3 kinds
         const _ccTop = Number(_kOpt('band')) || 6;
         const counts = kinds.map(() => rng(_ccTop <= 3 ? 1 : 2, _ccTop));
         const _ccCap = _ccTop <= 3 ? 9 : _ccTop <= 6 ? 14 : 24;
@@ -697,7 +674,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // 1-9 (a part) and 3-10 (the whole); a third of the items hide the whole.
         // P11: "What is missing" and "Bonds to" (5 / 10 / 20; 10 is the default).
         const _nbU = { answer: 'whole', first: 'A', second: 'B' }[_kOpt('unknown')];
-        const unknown = _nbU || ['A', 'B', 'whole'][_kDeal(3)];
+        const unknown = _nbU || ['A', 'B', 'whole'][_kDraw('nb-unknown', 3)];
         const _nbTop = Number(_kOpt('band')) || 10;
         let total, partA, partB, answer;
         if (unknown === 'whole') {
@@ -747,9 +724,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // "Make" (option-panel round 3): 5 on a five frame, 10 on a ten frame (the default, and
         // exactly the draws it made before), 20 on two ten frames with the first one full.
         const target = [5, 20].includes(Number(_kOpt('band'))) ? Number(_kOpt('band')) : 10;
-        const filled = target === 5 ? 1 + _kDeal(4)       // 1..4
-            : target === 20 ? 11 + _kDeal(9)              // 11..19: the first frame full
-            : 1 + _kDeal(9);                              // 1..9, every value on a page of six or more
+        const filled = target === 5 ? 1 + _kDraw('tf-fill5', 4)       // 1..4
+            : target === 20 ? 11 + _kDraw('tf-fill20', 9)              // 11..19: the first frame full
+            : 1 + _kDraw('tf-fill10', 9);                              // 1..9, every value on a page of six or more
         const answer = target - filled;
 
         q.text = `The frame shows ${filled}. How many more make ${target}?`;
@@ -778,9 +755,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // ========================================
     else if (mappedSkill === "teen_compose") {
         // "Teen numbers to" 15 keeps the loose ones to one row of five (option-panel round 3).
-        const ones = 1 + _kDeal(Number(_kOpt('band')) === 15 ? 5 : 9);   // 1..9 -> 11..19 (or 11..15)
+        const ones = 1 + _kDraw('tc-ones', Number(_kOpt('band')) === 15 ? 5 : 9);   // 1..9 -> 11..19 (or 11..15)
         const teen = 10 + ones;
-        const askTotal = _kDeal(2) === 1;
+        const askTotal = _kDraw('tc-ask', 2) === 1;
 
         // THE NUMBER SENTENCE IS PART OF THE CELL, not part of the instruction: "Write the missing
         // number." over a ten frame and five loose counters is unanswerable (5 and 15 both fit), so
@@ -830,7 +807,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // answer the picture gives. The rods are drawn here instead, with the rule the pupil needs.
     // ========================================
     else if (mappedSkill === "tens_foundation_visual") {
-        const rods = 1 + _kDeal(Number(_kOpt('band')) === 50 ? 5 : 9);   // 1..9 (P11: or 1..5), dealt
+        const rods = 1 + _kDraw('b10-rods', Number(_kOpt('band')) === 50 ? 5 : 9);   // 1..9 (P11: or 1..5), dealt
 
         q.text = `How many tens?`;
         q.printText = 'Write how many tens.';
@@ -900,7 +877,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const N = R * C;
         const _hcWant = Number(_kOpt('tiles'));
         const cap = R * Math.min(Math.ceil(C / 2), C - 2);
-        const want = Math.min(cap, [1, 2, 3, 4, 5, 6, 7].includes(_hcWant) ? _hcWant : [1, 2, 2, 3][_kDeal(4)]);
+        const want = Math.min(cap, [1, 2, 3, 4, 5, 6, 7].includes(_hcWant) ? _hcWant : [1, 2, 2, 3][_kDraw('hc-want', 4)]);
         const at = (i) => rows[Math.floor(i / C)] * 10 + cols[i % C] + 1;
         const neighbours = (i) => {
             const r = Math.floor(i / C), c = i % C, out = [];
@@ -1151,7 +1128,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // pictures are dealt off the same four-way deal as the shapes, so the numbers that follow
         // are the same items whichever kind is drawn.
         const _sbObj = _kOpt('objects');
-        const shape = (_sbObj === 'pictures' ? K2_PICTURE_KINDS : K2_COUNT_SHAPES)[_kDeal(K2_COUNT_SHAPES.length)];
+        const shape = (_sbObj === 'pictures' ? K2_PICTURE_KINDS : K2_COUNT_SHAPES)[_kDraw('sb-shape', K2_COUNT_SHAPES.length)];
         // R3 (critic round 3): "take away 0" came up on a fifth of the items (three of six on a
         // worksheet). Now each edge fact is ONE slot in ten - take away all (answer 0) and take
         // away none (m = 0) - and every other item takes at least one away and leaves 1 to 4.
@@ -1209,13 +1186,13 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const LEN = 5;
         // P11: "Count by" fixes the step and "Direction" the way the track runs; the defaults deal both.
         const _sfStep = Number(_kOpt('step'));
-        const step = [1, 2, 5, 10].includes(_sfStep) ? _sfStep : steps[_kDeal(steps.length)];
+        const step = [1, 2, 5, 10].includes(_sfStep) ? _sfStep : steps[_kDraw('sf-step', steps.length)];
         const _sfDir = _kOpt('dir');
-        const down = _sfDir === 'forward' ? false : _sfDir === 'back' ? true : _kDeal(4) === 3;
+        const down = _sfDir === 'forward' ? false : _sfDir === 'back' ? true : _kDraw('sf-down', 4) === 3;
         const span = step * (LEN - 1);
         const lo = step >= 10 ? 1 : (step === 1 ? 0 : 1);
         let start;
-        if (step >= 5 && _kDeal(2) === 0) {
+        if (step >= 5 && _kDraw('sf-bridge', 2) === 0) {
             // on the decade / on the step (5, 10, 15 ... or 20, 30, 40 ...)
             start = step * rng(1, Math.max(1, Math.floor((cap - span) / step)));
         } else {
@@ -1227,7 +1204,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
 
         // Blanks: one or two; never both ends, never three in a row, and always two printed
         // neighbours side by side somewhere, so the step can be read.
-        const want = [1, 2, 2, 1, 2][_kDeal(5)];
+        const want = [1, 2, 2, 1, 2][_kDraw('sf-want', 5)];
         let blanks = [];
         for (let t = 0; t < 80; t++) {
             const cand = shuffle(Array.from({ length: LEN }, (_, i) => i)).slice(0, want).sort((x, y) => x - y);
@@ -1325,7 +1302,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             { shape: 'fish', many: 'fish', place: 'in a pond', place2: 'in a tank', arrive: 'swim in' },
             { shape: 'star', many: 'stars', place: 'on a card', place2: 'on a page', arrive: 'are added' },
         ];
-        const scene = SCENES[_kDeal(SCENES.length)];
+        const scene = SCENES[_kDraw('wp-scene', SCENES.length)];
         // P12: `band` "Total to" 5 or 7 (read off the raw options: the plain twin is generated here
         // under the base id, whose own panel does not declare it). The default, 10, is the old deal.
         const _wpBand = state.skillOptions && typeof state.skillOptions === 'object' ? Number(state.skillOptions.band) : NaN;
@@ -1338,7 +1315,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             [`${a} ${N} are ${scene.place}.`, `${b} ${N} are ${scene.place2}.`, `How many ${N} are there in all?`],
             [`I have ${a} ${N}.`, `I get ${b} more ${N}.`, `How many ${N} do I have now?`],
         ];
-        const lines = FRAMES[_kDeal(FRAMES.length)];
+        const lines = FRAMES[_kDraw('wp-frame', FRAMES.length)];
         q.text = lines.join(' ');
         q.printText = 'Write the total in the box.';
         q.ans = sum;
@@ -1393,21 +1370,10 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
 const K2_HOLDER_WORD = { plates: 'plate', boxes: 'box', frame: 'ten frame' };
 const K2_HOLDER_PREP = { plates: 'on the', boxes: 'in the', frame: 'in the' };
 
-/**
- * A K picture item has ONE answer (a count, a checked picture, a place): there is no open problem
- * with several answers for a Stretch page (critic k2-r1: "Find more problems like it" with the
- * answer "B"). It declares so, and the Stretch role withholds the page with this reason
- * (PAGE_TYPES 6.3 allows withholding). bonds_in_order has a real open task (q.openWhole).
- */
-const K2_NO_STRETCH = 'A picture item for the youngest pupils has one answer, so it has no open Stretch problem. '
-    + 'Use More practice, Reasoning or Error analysis for this skill.';
-function _k2NoStretch(q) { q.stretch = false; q.stretchWhy = K2_NO_STRETCH; return true; }
-
+// Stretch (critic k2-r1): a K picture item has ONE answer, so its provider supplies no `open(q)`
+// and the Stretch role withholds the page with its reason; bonds_in_order's provider has a real
+// open task (every pair that makes the whole).
 function _k2LaneSkill(q, id, rng) {
-    if (id !== 'bonds_in_order' && _k2LaneSkill0(q, id, rng)) return _k2NoStretch(q);
-    return id === 'bonds_in_order' ? _k2LaneSkill0(q, id, rng) : false;
-}
-function _k2LaneSkill0(q, id, rng) {
     switch (id) {
         case 'zero_none': return _k2Zero(q, rng);
         case 'compare_size': return _k2CompareSize(q, rng);
@@ -1470,17 +1436,22 @@ function _k2Zero(q, rng) {
         return true;
     }
     if (task === 'compute') {
+        // the two zero facts (R.B7: 5 - 5 = 0 and 5 - 0 = 5), dealt at random down the page: a page
+        // of "take them all away" only answered 0 on every item (ws-pattern-audit constant-answer)
         const n = nonzero();
-        q.text = `Take them all away. ${n} − ${n} = ?`;
+        const all = _kDraw('zero-take', 2) === 0;
+        const m = all ? n : 0;
+        q.text = all ? `Take them all away. ${n} − ${n} = ?` : `Take none away. ${n} − 0 = ?`;
         q.printText = 'Write how many are left.';
-        q.ans = 0;
-        q.a = n; q.b = n;
+        q.ans = n - m;
+        q.a = n; q.b = m;
         q.answerType = 'number';
-        q.hint = 'Every one is crossed out. None are left. None is zero.';
-        q.distractorTags = { [n]: 'wrote how many there were, not how many are left' };
+        q.hint = all ? 'Every one is crossed out. None are left. None is zero.'
+            : 'None are crossed out. Taking away 0 leaves them all.';
+        q.distractorTags = all ? { [n]: 'wrote how many there were, not how many are left' } : { 0: 'took them all away' };
         q._variant = 'compute';
         q.printFormat = 'k2-compute';
-        const cp = { kind: 'zero', task: 'compute', objects: holder, shape, n, ans: 0 };
+        const cp = { kind: 'zero', task: 'compute', objects: holder, shape, n, m, ans: n - m };
         const clvl = _kLevel(1);
         if (clvl >= 2) cp.track = band;    // the track 0..band to count back along
         q.supportLevel = clvl;
@@ -2141,7 +2112,6 @@ function _k2BondsInOrder(q, rng) {
         pool.slice(0, k).forEach((i) => { rows[i].hide = 'both'; });
     }
     const payload = { kind: 'table', task, n, rows, notation, dots: lvl >= 3, ...(dir === 'mixed' ? { mixedDir: true } : {}) };
-    q.openWhole = n;   // the Stretch page: two numbers add to n, find different pairs
     q.options = [];
     q.selfAnswering = true;
     q.skillLabel = 'Number Bonds in Order';

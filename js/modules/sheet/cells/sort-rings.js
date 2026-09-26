@@ -89,7 +89,7 @@ register('sort-rings', {
             }
             const shape = grid ? `border-radius:${L(ctx, 1.5)};` : 'border-radius:50%;';
             const ringed = task === 'most' && gi === (p.correct || 0) ? workInk(ctx, 'ring') : '';
-            return (ringed ? `<div style="border:${B(ctx, 1.5)} ${ringed === 'trace' ? 'dashed' : 'solid'} ${ringed === 'trace' ? GREY : INK};border-radius:${L(ctx, 8)};padding:${L(ctx, 1)};">` : '<div>')
+            return (ringed ? `<div style="border:${B(ctx, 1.5)} solid ${ringed === 'trace' ? GREY : INK};border-radius:${L(ctx, 8)};padding:${L(ctx, 1)};">` : '<div>')
                 + `<div class="k2-ring" style="box-sizing:border-box;width:${L(ctx, w)};height:${L(ctx, h)};border:${B(ctx, 1.5)} solid ${INK};${shape}`
                 + `display:flex;flex-direction:column;align-items:center;justify-content:${inside ? 'center' : 'flex-start'};gap:${L(ctx, 1.5)};padding:${L(ctx, grid ? 2 : 4)} ${L(ctx, 4)};background:#fff;">`
                 + `${label}${members}${letters}</div></div>`;
