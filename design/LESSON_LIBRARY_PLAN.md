@@ -190,12 +190,14 @@ those builders for ANY skill, falling back to the old role only for skills whose
 supply the data both need (worked steps, cases, row-1 hint / level-2 cue, prerequisites). Each switched skill is
 re-graded by the critic; the old page stays until its replacement passes.
 
-## 8d. Owner ruling: no Find-the-mistake in lessons (2026-09-26)
+## 8d. Owner ruling: no Find-the-mistake worksheets going forward (2026-09-26)
 
-"Let's forgo the find the error type for future lessons." The error-analysis (Find the mistake) page is not part of any
-lesson packet or the lesson library, and it is **no longer part of the 8/10 pass bar**: critics do not grade it and a
-skill passes without it. The existing page stays printable from the Print screen as it is (frozen, no further work),
-except that the answer-giveaway fixes already made (formatted wrong values, fix-box widths) are kept.
+"Let's forgo the find the error type for future lessons" — clarified: "for future worksheets". The error-analysis
+("Find the mistake") page type is **retired for new worksheets**: it is not part of any lesson packet or the lesson
+library, it is **removed from the page types a teacher can choose on the Print screen**, and it is **no longer part of
+the 8/10 pass bar** (critics do not grade it; a skill passes without it). Saved and shared printouts that already use it
+keep printing (share codes and saved sets are never broken); no further work is done on it except keeping the
+answer-giveaway fixes already made.
 
 ## 9. Risks
 
