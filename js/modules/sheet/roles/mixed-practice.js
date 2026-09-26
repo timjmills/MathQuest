@@ -115,6 +115,22 @@ function packing(poolsIn, input) {
         shelf[next.id].n++;
         used += bandH(next.id, false);
     }
+    // Lessons r3: a lesson's Mixed page (`leadHalf`) gives its first skill - the lesson's own - at
+    // least half the placed items AFTER packing (weights alone lost to a taller lesson shelf):
+    // a partner gives up an extra shelf, and the lesson takes a shelf where one fits.
+    if (input.leadHalf && ids.length > 1 && !A) {
+        const lead = ids[0];
+        const cnt = (id) => shelf[id].n * shelf[id].per;
+        const rest = () => ids.slice(1).reduce((a, id) => a + cnt(id), 0);
+        for (let g = 0; g < 24 && cnt(lead) < rest(); g++) {
+            const shelves = ids.reduce((a, id) => a + shelf[id].n, 0);
+            if (shelves < maxShelves * basePages && used + bandH(lead, false) <= m.budget) { shelf[lead].n++; used += bandH(lead, false); continue; }
+            const drop = ids.slice(1).filter((id) => shelf[id].n > 1).sort((a, b) => cnt(b) - cnt(a))[0];
+            if (!drop) break;
+            shelf[drop].n--;
+            used -= bandH(drop, false);
+        }
+    }
     return { ctx, m, mCont, N, ids, shelf, used, pages: basePages };
 }
 

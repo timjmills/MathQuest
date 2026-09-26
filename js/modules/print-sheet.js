@@ -126,6 +126,8 @@ function normaliseRequest(req = {}) {
         tabId: typeof req.tabId === 'string' && req.tabId.trim() ? req.tabId.trim().slice(0, 16) : '',
         // Mixed practice's unit lattice, when a packet fixes it (lessons r1).
         latticeN: [4, 6, 8, 10].includes(Number(req.latticeN)) ? Number(req.latticeN) : 0,
+        // A lesson's Mixed page (lessons r3): its first skill holds at least half the placed items.
+        leadHalf: !!req.leadHalf,
     };
 }
 
@@ -167,6 +169,49 @@ function refOperands(q) {
     return raw.filter((v) => v !== undefined && v !== null && v !== '').map((v) => Number(String(v).replace(/,/g, ''))).filter(Number.isFinite);
 }
 
+/**
+ * A lesson skill ref's floors (lessons r2-r3), each a promise the packet makes:
+ *   minOperand     every operand at least this (no + 0 in "add 1-3"; 2-place partner addition)
+ *   minTop         the first operand at least this (no 11 - 6 in 2-place regrouping)
+ *   maxTop         the first operand at most this (no 100 - 47 in a 2-place lesson)
+ *   maxBottom      the second operand at most this (a one-place take-away example)
+ *   zeroOnes       the first operand ends in 0 (a 0 in the ones)
+ *   distinctFirst  no two items share a first operand (36 - 29, 36 - 18)
+ *   distinctAnswer no two items share an answer (21 - 4, 22 - 5)
+ *   noTurnaround   no two items are the same numbers turned round (1 + 9, 9 + 1)
+ *   maxSmall       at most this many items with a one-place second operand
+ *   avoidTexts     never an item another page of the packet printed
+ */
+function refAccepts(sk, cand, key, seen, kept) {
+    const ops = refOperands(cand);
+    if (sk.minOperand !== undefined && ops.some((v) => v < Number(sk.minOperand))) return false;
+    if (sk.minTop !== undefined && !(ops[0] >= Number(sk.minTop))) return false;
+    if (sk.maxTop !== undefined && !(ops[0] <= Number(sk.maxTop))) return false;
+    if (sk.maxBottom !== undefined && !(ops[1] <= Number(sk.maxBottom))) return false;
+    if (sk.zeroOnes && !(ops[0] % 10 === 0)) return false;
+    // `minN`: a rounding item's number at least this (the 90s -> 100 example).
+    if (sk.minN !== undefined && !(Number(cand.cell && cand.cell.payload && cand.cell.payload.n) >= Number(sk.minN))) return false;
+    if (sk.distinctFirst && seen.has(`first:${key}:${ops[0]}`)) return false;
+    if (sk.distinctAnswer && seen.has(`ans:${key}:${refAnswer(cand)}`)) return false;
+    if (sk.noTurnaround && ops.length >= 2 && seen.has(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`)) return false;
+    if (sk.maxSmall !== undefined && ops.length >= 2 && ops[1] < 10 && (kept.get(`small:${key}`) || 0) >= Number(sk.maxSmall)) return false;
+    if (Array.isArray(sk.avoidTexts) && sk.avoidTexts.includes(refText(cand))) return false;
+    return true;
+}
+
+/** Records what `refAccepts` checks the next items against. */
+function refRecord(sk, q, key, seen, kept) {
+    const ops = refOperands(q);
+    if (sk.distinctFirst) seen.add(`first:${key}:${ops[0]}`);
+    if (sk.distinctAnswer) seen.add(`ans:${key}:${refAnswer(q)}`);
+    if (sk.noTurnaround && ops.length >= 2) seen.add(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`);
+    if (sk.maxSmall !== undefined && ops.length >= 2 && ops[1] < 10) kept.set(`small:${key}`, (kept.get(`small:${key}`) || 0) + 1);
+}
+
+const refAnswer = (q) => String(q && q.ans !== undefined ? (typeof q.ans === 'object' ? JSON.stringify(q.ans) : q.ans) : '');
+/** An item's text as a packet compares it ("67 − 9 = ?"), tags and spaces removed. */
+export const refText = (q) => String((q && q.text) || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+
 function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map(), itemCount = null } = {}) {
     const slots = dealSkills(skills, startIndex + count).slice(startIndex);
     // S2: a ticked support LEVEL fades down the page. With the section's count known it is dealt
@@ -180,19 +225,17 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         const key = `${sk.categoryId}:${sk.skillId}`;
         const itemIndex = kept.get(key) || 0;
         let q = null;
-        for (let k = 0; k <= RETRIES; k++) {
+        // A lesson ref's floors can need many tries to meet (a 0 in the ones AND a one-place
+        // bottom number): `tries` raises the budget for that ref only.
+        const tries = Math.max(RETRIES, Math.min(600, Number(sk.tries) || 0));
+        for (let k = 0; k <= tries; k++) {
             const seed = (baseSeed + i + 7919 * k) >>> 0;
             let cand = null;
             try { cand = generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex, itemCount: perSkill ? perSkill.get(key) : undefined }); } catch (e) { cand = null; }
             if (!cand) continue;
-            // A lesson's skill ref (lessons r2): `minOperand` keeps every operand at or above it
-            // (an "add 1-3" page never deals + 0; a mixed page's 2-digit addition never deals
-            // 2 + 8). Not a skill option - the packet's; the last retry takes what it gets.
-            if (sk.minOperand !== undefined && k < RETRIES && refOperands(cand).some((v) => v < Number(sk.minOperand))) continue;
-            // `distinctFirst`: no two items of the skill share a first operand (36 - 29, 36 - 18).
-            // `minTop`: the first operand at least this (a 2-place regrouping never deals 11 - 6).
-            if (sk.minTop !== undefined && k < RETRIES && !(refOperands(cand)[0] >= Number(sk.minTop))) continue;
-            if (sk.distinctFirst && k < RETRIES && seen.has(`first:${key}:${refOperands(cand)[0]}`)) continue;
+            // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
+            // options - the packet's; the last try takes what it gets.
+            if (k < tries && !refAccepts(sk, cand, key, seen, kept)) continue;
             q = cand;
             if (!seen.has(signature(cand))) break;
         }
@@ -201,7 +244,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // ("Check: add back") under every subtraction stack. Not a skill option - the page's.
         if (sk.check && q.cell && q.cell.template === 'stack') q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { check: true }) });
         seen.add(signature(q));
-        if (sk.distinctFirst) seen.add(`first:${key}:${refOperands(q)[0]}`);
+        refRecord(sk, q, key, seen, kept);
         kept.set(key, itemIndex + 1);
         out.push({ q, skill: sk });
     });
@@ -954,7 +997,9 @@ function measureItems(items, { size, look, colsList }) {
                             // scale-down of up to 10% is read as the same picture.
                             const tol = it.legacy ? 0.9 : 0.98;
                             const b = baseW.get(it) || [];
-                            if (pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) { fits = false; why(it, c, 'shrunk picture'); }
+                            // (A lesson chart's other example draws its number line to the
+                            // column on purpose, `scalesWithCols`: not a shrunk picture.)
+                            if (!it.scalesWithCols && pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) { fits = false; why(it, c, 'shrunk picture'); }
                         }
                     }
                     best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits };
@@ -1685,6 +1730,7 @@ async function buildRoleSheet(n, metaOf) {
         stepStripMm: n.stepStrip ? n.stepStrip.hMm : 0,
         fill: !!n.stepStrip,
         latticeN: n.latticeN || 0,
+        leadHalf: !!n.leadHalf,
     };
 
     /**
@@ -1868,6 +1914,12 @@ async function buildLesson(n, metaOf) {
     if (data0 && data0.minOperand !== undefined && sk0.minOperand === undefined) flags.minOperand = data0.minOperand;
     if (data0 && data0.distinctFirst) flags.distinctFirst = true;
     if (data0 && data0.minTop !== undefined) flags.minTop = data0.minTop;
+    if (data0 && data0.maxTop !== undefined) flags.maxTop = data0.maxTop;
+    // Lessons r3: no two answers alike and at most N one-place take-aways a page, where the
+    // lesson asks; never the same numbers turned round on one page (1 + 9, 9 + 1).
+    if (data0 && data0.distinctAnswer) flags.distinctAnswer = true;
+    if (data0 && data0.maxSmall !== undefined) flags.maxSmall = data0.maxSmall;
+    if (data0) flags.noTurnaround = true;
     const sk = Object.keys(flags).length ? Object.assign({}, sk0, flags) : sk0;
     if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
@@ -1918,20 +1970,28 @@ async function buildLesson(n, metaOf) {
     // One-line answers: the engine fills the page (PAGE FILL, DN-1) - one frame, no row gaps,
     // because the count is the page's own. Taller problems: 12.1's six a page, 2 x 3, each cell
     // with its working space and Check line.
-    // Lessons r2: a rounding cell ("27 -> ___") is short and narrow: M prints three across like L,
-    // six rows (18), not two columns of eight.
+    // Lessons r2-r3: a rounding cell ("27 -> ___") is short and narrow: M prints three across like
+    // L, and the lesson's own 15 at every size (never 12.1's 16 ceiling passed).
     const rounding = (teach.items || []).some((it) => it.pool === 'main' && it.template === 'pv');
-    const section = facts ? { skills: [practiceSk], pages: 0, noCap: true, dense: rounding ? { S: 18, M: 18, L: 15 } : { S: 16, M: 16, L: 15 } } : { skills: [practiceSk], count: 0, columns: 2, noCap: true };
+    const section = facts ? { skills: [practiceSk], pages: 0, noCap: true, dense: rounding ? { S: 15, M: 15, L: 15 } : { S: 16, M: 16, L: 15 } } : { skills: [practiceSk], count: 0, columns: 2, noCap: true };
     // Taller problems: 12.1's six a page (2 x 3) at every size - an Independent page holds 6 at
     // most, so M is the same six cells in smaller type (lessons r2: by design, not a missed gain).
     const stackShapes = [[6, 2]];
+    // Lessons r3: fifteen rounding cells fill an M page with cells three times their content (a
+    // 33 % empty band); the same fifteen print at L type, which fills them - the page holds the
+    // same count either way, so the pupil gets the bigger digits.
+    const practiceSize = rounding ? 'L' : size;
     const practiceReq = (pages, withStrip, shape = stackShapes[stackShapes.length - 1]) => Object.assign({}, common, {
+        size: practiceSize,
         role: 'independent', tabId: `Practice ${lessonNo}`,
         sections: [facts ? Object.assign({}, section, { pages }) : Object.assign({}, section, { count: shape[0] * pages, columns: shape[1] })],
         seed: (n.seed + 7919) >>> 0,
-        stepStrip: withStrip && stripHtml ? { html: stripHtml, hMm: stripH } : undefined,
+        // (At L type the strip's words are a point bigger: 2 mm more for it.)
+        stepStrip: withStrip && stripHtml ? (practiceSize === size ? { html: stripHtml, hMm: stripH }
+            : { html: strip.render(resolveCtx({ size: practiceSize, look: 'ican', mode: 'print' })), hMm: stripH + 2 }) : undefined,
     });
     const practiceTried = [];
+    const practiceTexts = [];
     if (n.practicePages > 0) {
         let res = null;
         for (const shape of facts ? [null] : stackShapes) {
@@ -1944,6 +2004,7 @@ async function buildLesson(n, metaOf) {
         // The strip never pushes a page overleaf: without room for it the page prints without it.
         if (!res) res = await buildSheet(practiceReq(n.practicePages, false));
         parts.push({ part: 'practice', role: 'independent', res, strip: /data-mq-lesson-strip/.test(res.pupilHtml) });
+        for (const it of res.items || []) practiceTexts.push(refText(it));
     }
 
     // 3. Mixed practice (optional): the lesson skill with EARLIER skills only (lessons r1), each
@@ -1955,7 +2016,9 @@ async function buildLesson(n, metaOf) {
             // Lessons r2: the lesson's own skill fills at least half the page (its weight is the
             // partners' together), the earlier skills the rest.
             role: 'mixed-practice', look: n.lookAsked === 'daily' ? 'daily' : 'ican',
-            sections: [{ skills: [Object.assign({}, practiceSk, { weight: Math.max(1, withSkills.length) + 0.5 }), ...withSkills] }], latticeN: 6,
+            // Lessons r3: never a problem the Practice page printed; the lesson skill at least
+            // half the placed items (`leadHalf`, enforced after packing).
+            sections: [{ skills: [Object.assign({}, practiceSk, { weight: Math.max(1, withSkills.length) + 0.5, avoidTexts: practiceTexts }), ...withSkills] }], latticeN: 6, leadHalf: true,
             seed: (n.seed + 15838) >>> 0,
             stepStrip: stripHtml ? { html: stripHtml, hMm: stripH } : undefined,
         }));
@@ -1981,6 +2044,11 @@ async function buildLesson(n, metaOf) {
         pupilHtml, keyHtml, pageCount, keyPageCount,
         fits: { cols: teach.fits.cols, rows: teach.fits.rows, pages: pageCount, note: [`${line}.`, teach.fits.note].filter(Boolean).join(' '), sections: teach.fits.sections },
         items: parts.flatMap((p) => (p.res.items || []).map((it) => Object.assign({ part: p.part }, it))),
+        // The problems the pupil does (lessons r3: the print panel counted every dealt pool item,
+        // "46 problems" for 13): the teaching sheet's lettered items, then each page's own.
+        problemCount: parts.reduce((a, p) => a + (p.part === 'chart' ? 0
+            : p.part === 'teach' ? Number((p.res.plan && p.res.plan.meta && p.res.plan.meta.items) || 0)
+                : (p.res.items || []).length), 0),
         gaps: parts.flatMap((p) => p.res.gaps || []),
         anchors: teach.anchors,
         floors: teach.floors,
@@ -1997,7 +2065,7 @@ async function buildLesson(n, metaOf) {
             steps: data ? data.steps.map((s) => s.text) : [], chant: data ? data.chant : '', format: data ? data.format : null,
             parts: parts.map((p) => ({ part: p.part, role: p.role, pages: p.res.pageCount, keyPages: p.res.keyPageCount, strip: p.strip })),
             example: chart.plan && chart.plan.meta ? chart.plan.meta.example : '',
-            chart: chart.plan && chart.plan.meta ? { zoom: chart.plan.meta.chartZoom, example2: chart.plan.meta.example2, example2Found: chart.plan.meta.example2Found, sizing: chart.plan.meta.chartSizing, example3: chart.plan.meta.example3 } : null,
+            chart: chart.plan && chart.plan.meta ? { zoom: chart.plan.meta.chartZoom, example2: chart.plan.meta.example2, example2Found: chart.plan.meta.example2Found, sizing: chart.plan.meta.chartSizing, example3: chart.plan.meta.example3, example4: chart.plan.meta.example4 } : null,
             practiceTried,
             teach: teach.plan && teach.plan.meta ? { bands: teach.plan.meta.bandSizes, guided: teach.plan.meta.guided, independent: teach.plan.meta.independent } : null,
             size,

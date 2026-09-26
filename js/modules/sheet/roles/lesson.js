@@ -69,8 +69,18 @@ const PT_MM = 25.4 / 72;
 export function sources(skills, helpers = {}) {
     const main = skills[0];
     const pre = ((helpers.lesson && helpers.lesson.warmSkills) || []).slice(0, 2);
-    return [{ id: 'main', skills: [main] }, ...pre.map((s, i) => ({ id: `w${i}`, skills: [s] }))];
+    // Lessons r3: an example case the main pool rarely deals (a 0 in the ones AND a one-place
+    // bottom number; a number in the 90s) gets a pool of its own, dealt to the case's `ref`
+    // floors (print-sheet.js refAccepts) - the chart's other examples come from it.
+    const data = helpers.lesson && helpers.lesson.data;
+    const extra = EXAMPLE_KEYS.filter((k) => data && data[k] && data[k].ref).map((k) => ({
+        id: `x${k}`, skills: [Object.assign({ categoryId: main.categoryId, skillId: main.skillId }, main.opts ? { opts: main.opts } : {}, main.minTop !== undefined ? { minTop: main.minTop } : {}, main.maxTop !== undefined ? { maxTop: main.maxTop } : {}, data[k].ref)],
+    }));
+    return [{ id: 'main', skills: [main] }, ...pre.map((s, i) => ({ id: `w${i}`, skills: [s] })), ...extra];
 }
+
+/** The lesson data's other-example keys, in chart order. */
+const EXAMPLE_KEYS = ['second', 'third', 'fourth'];
 
 export const measureCols = () => [1, 2, 3, 4];
 
@@ -118,6 +128,7 @@ export function counts(pools, input) {
     const shape = warmShape(pools, input);
     const out = { main: PROBE };
     for (const [id, s] of Object.entries(shape)) out[id] = s.k * (s.rows || 1);
+    for (const id of Object.keys(pools)) if (/^x/.test(id)) out[id] = 3;
     return out;
 }
 
@@ -141,6 +152,13 @@ export const CASE_TESTS = Object.freeze({
     // Lessons r2: the rounding Guided set and the chart's third example need the other two cases.
     roundUp: (it) => { const r = roundRest(it); return r !== null && r > 5; },
     endsFive: (it) => roundRest(it) === 5,
+    // Lessons r3: a one-place take-away from a number with 0 ones (70 - 8), and the 90s -> 100.
+    takeAwayZero: (it) => { const o = operandsOf((it && it.q) || {}); return o.length >= 2 && Number(o[0]) % 10 === 0 && Number(o[1]) < 10; },
+    toHundred: (it) => {
+        const c = it && it.q && it.q.cell;
+        const n = c && c.payload ? Number(c.payload.n) : NaN;
+        return roundRest(it) !== null && (Number(c.payload.place) || 10) === 10 && n >= 95 && n <= 99;
+    },
 });
 
 /** A rounding item's ones digit on the tenths scale of its place (0-9), or null. */
@@ -212,6 +230,20 @@ export function pickSecond(items, example, data, which = 'second', avoid = []) {
     return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length / 3))];
 }
 
+/**
+ * The chart's other examples (lessons r1-r3): the second, third and fourth cases of the lesson
+ * data, each from the main pool or its own case pool (`x<key>`), never one another.
+ */
+export function otherExamples(input, example, data) {
+    const cands = poolItems(input, 'main').concat(...EXAMPLE_KEYS.map((k) => poolItems(input, `x${k}`)));
+    const out = [];
+    for (const k of EXAMPLE_KEYS) {
+        if (k !== 'second' && !out[0]) break;
+        out.push(pickSecond(cands, example, data, k, out.filter(Boolean)));
+    }
+    return { ex2: out[0] || null, ex3: out[1] || null, ex4: out[2] || null };
+}
+
 /** The Guided ("we do") items: the example's kind first (same strategy, same digit shape). */
 export function pickWeDo(items, example, data, n) {
     const re = data && data.example && data.example.match ? new RegExp(data.example.match, 'i') : null;
@@ -242,6 +274,9 @@ export function pickWeDo(items, example, data, n) {
         if (out.length >= n) break;
         if (out.includes(it)) continue;
         if (out.some((x) => ansOf(x) === ansOf(it) && ansOf(it) !== '')) continue;
+        // Lessons r3: no two Guided cells add or take away the same number (8 + 2, 6 + 2).
+        const second = (x) => { const o = operandsOf((x && x.q) || {}); return o.length >= 2 ? String(o[1]) : ''; };
+        if (second(it) && out.some((x) => second(x) === second(it))) continue;
         if (isFact(it) && top && Number(ansOf(it)) === top && out.some((x) => Number(ansOf(x)) === top)) continue;
         out.push(it);
     }
@@ -308,23 +343,59 @@ const inkTile = (n, ink) => {
  * The count-on marks of an addition fact, by step: "Start with" rings the bigger number, "Count
  * on" puts the dot tile of the smaller one beside it (the Guided page's count cue, H3).
  */
-function factMarks(html, it, steps, groups, k) {
+function factMarks(html, it, steps, groups, k, hops = false) {
     const q = it.q || {};
     const o = operandsOf(q);
     if (opOf(q) !== 'add' || o.length < 2) return html;
     let out = html;
     let tile = null;
+    let start = null;
     groups.slice(0, k + 1).forEach((g, gi) => {
         const ink = gi === k ? 'trace' : 'solid';
         for (const si of g.steps) {
             const t = (steps[si] && steps[si].text) || '';
-            if (/^Start with/i.test(t)) out = ringFactRow(out, o[0] >= o[1] ? 1 : 2, ink);
+            if (/^Start with/i.test(t)) { out = ringFactRow(out, o[0] >= o[1] ? 1 : 2, ink); start = ink; }
             if (/^Count on/i.test(t)) tile = ink;
         }
     });
     const n = countCueOf(it);
     if (tile && n) out = `<div class="mq-cuewrap">${out}<span class="mq-cue${countCueRow(it) === 2 ? ' mq-cue-b' : ''}">${inkTile(n, tile)}</span></div>`;
+    // Lessons r3: "Count on" draws the counting itself - the hops from the big number, one a
+    // number said (4 -> 5, 6, 7), under the fact.
+    // (Before it, "Start with" writes the start number where the hops will begin.)
+    if (hops && o[0] !== o[1] && (tile || start)) out = `<div class="mq-hopwrap">${out}${hopsSvg(Math.max(o[0], o[1]), tile ? Math.min(o[0], o[1]) : 0, tile || start, tile ? 'solid' : start)}</div>`;
     return out;
+}
+
+/** The hops of a count-on example on state k (grey on the step that counts on, black after), or ''. */
+function panelHops(it, steps, groups, k) {
+    const q = (it && it.q) || {};
+    const o = operandsOf(q);
+    if (!(q.cell && q.cell.template === 'fact') || opOf(q) !== 'add' || o.length < 2 || o[0] === o[1]) return '';
+    let ink = null;
+    groups.slice(0, k + 1).forEach((g, gi) => { for (const si of g.steps) if (/^Count on/i.test((steps[si] && steps[si].text) || '')) ink = gi === k ? 'trace' : 'solid'; });
+    return ink ? `<div class="mq-chops">${hopsSvg(Math.max(o[0], o[1]), Math.min(o[0], o[1]), ink)}</div>` : '';
+}
+
+/** The count-on hops: the start number, then one arc and one number for each number counted on. */
+export function hopsSvg(from, n, ink = 'solid', startInk = 'solid') {
+    const k = Math.max(0, Math.min(9, Math.floor(Number(n) || 0)));
+    const step = 11, pad = 5, fsz = 5.2, H = 15.5;
+    const col = ink === 'trace' ? '#949494' : '#000';
+    let b = '';
+    for (let j = 0; j <= k; j++) {
+        const x = pad + j * step;
+        const inkJ = j === 0 ? startInk : ink;
+        const cJ = inkJ === 'trace' ? '#949494' : '#000';
+        b += `<text x="${x.toFixed(2)}" y="${(H - 1.2).toFixed(2)}" text-anchor="middle" font-size="${fsz}" font-weight="700" fill="${cJ}" style="fill:${cJ}"${inkJ === 'trace' ? ' data-ws-ink="trace"' : ''}>${Number(from) + j}</text>`;
+        if (j < k) {
+            const x1 = x + 1.2, x2 = x + step - 1.2;
+            b += `<path d="M${x1.toFixed(2)} 7.2 Q${(x + step / 2).toFixed(2)} 0.6 ${x2.toFixed(2)} 6.6" fill="none" stroke="${col}" stroke-width="${(1 * PT_MM).toFixed(3)}"/>`
+                + `<path d="M${(x2 - 1.6).toFixed(2)} 5.2 L${x2.toFixed(2)} 7.2 L${(x2 + 0.4).toFixed(2)} 4.8 Z" fill="${col}"/>`;
+        }
+    }
+    const W = pad * 2 + step * k;
+    return `<svg class="mq-hops" viewBox="0 0 ${W} ${H}" width="${W}mm" height="${H}mm" aria-hidden="true" style="display:block;margin:1.5mm auto 0;font-family:'Andika',sans-serif">${b}</svg>`;
 }
 
 /**
@@ -432,7 +503,7 @@ function stateDrawing(it, steps, groups, k, c) {
         const payload = Object.assign({}, it.q.cell.payload || {});
         if (it.q.cell.template === 'fact' && !payload.pt) payload.pt = ctx.metrics.digitPt;
         let html = t.stepState(payload, merged, k, Object.assign({}, ctx, { step: k }));
-        if (it.q.cell.template === 'fact') html = factMarks(html, it, steps, groups, k);
+        if (it.q.cell.template === 'fact') html = factMarks(html, it, steps, groups, k, !!c.hops);
         return unslot(html);
     }
     // A template with no step states: the problem blank, then answered in grey on the last state.
@@ -457,6 +528,8 @@ export function namedSteps(steps, data) {
         name: own ? own[i].text : s.text,
         icon: own ? (own[i].icon || iconForText(own[i].text)) : iconForText(s.text),
         words: own ? say(s.text) : '',
+        // Lessons r3: a rule the step needs for another case ("0 tens? Leave it empty.").
+        note: data && data.notes && data.notes[i] ? String(data.notes[i]) : '',
     }));
 }
 
@@ -507,10 +580,14 @@ export function stateItems(example, data) {
             const iconMm = { S: 7, M: 8.5, L: 10 }[c.size] || 10;
             const heads = headSteps(g).map((i) => `<div class="mq-chead">${stepMarker(i + 1)}${stepIcon(named[i].icon, c.size, { mm: iconMm })}<b>${esc(named[i].name)}</b></div>`).join('');
             const words = headSteps(g).map((i) => named[i].words).filter(Boolean);
-            const wordsHtml = words.length ? `<div class="mq-cwords">${words.map((w) => `<div>${esc(w)}</div>`).join('')}</div>` : '';
-            const draw = `<div class="mq-cdraw" style="zoom:${z}">${drawing(k, c)}</div>`;
+            const notes = headSteps(g).map((i) => named[i].note).filter(Boolean);
+            const wordsHtml = words.length || notes.length ? `<div class="mq-cwords">${words.map((w) => `<div>${esc(w)}</div>`).join('')}${notes.map((w) => `<div class="mq-cnote">${esc(w)}</div>`).join('')}</div>` : '';
+            // Lessons r3: a panel whose step counts on draws the hops beside its words (the side
+            // column has the room; under the fact they would push the panels past the page).
+            const hops = v === 'row' ? panelHops(example, steps, groups, k) : '';
+            const draw = `<div class="mq-cdraw" style="zoom:${z}">${drawing(k, v === 'row' ? c : Object.assign({}, c, { hops: true }))}</div>`;
             return v === 'row'
-                ? `<div class="mq-cstate mq-cstate-row">${draw}<div class="mq-cside"><div class="mq-cheads">${heads}</div>${wordsHtml}</div></div>`
+                ? `<div class="mq-cstate mq-cstate-row">${draw}<div class="mq-cside"><div class="mq-cheads">${heads}</div>${wordsHtml}${hops}</div></div>`
                 : `<div class="mq-cstate mq-cstate-col${cols >= 3 ? ' mq-cstate-n' : ''}"><div class="mq-cheads">${heads}</div>${draw}${wordsHtml}</div>`;
         },
     }));
@@ -587,11 +664,13 @@ export function finalItems(list) {
     return list.filter((x) => x && x.it).map((x, j) => ({
         q: null, key: { value: '', display: '', slots: {} }, drawsAnswer: true, visual: false,
         footprint: { wMm: 40, hMm: null, measure: true, maxCols: 4 }, fclass: 'standard', measureLevel: 3,
-        template: 'lesson-final', skill: x.it.skill || '', pool: 'extra', lessonFinal: j, lessonFinalOf: x.it, colsLayout: true,
+        template: 'lesson-final', skill: x.it.skill || '', pool: 'extra', lessonFinal: j, lessonFinalOf: x.it, colsLayout: true, scalesWithCols: true,
         cellCls: 'mq-cfinalcell',
         render: (c, o) => {
             const z = Number(c.chartZoom) > 0 ? Number(c.chartZoom) : 1;
             const cols = (o && o.cols) || 2;
+            // The line as long as the column allows (two across: 70 mm; three across, lessons r3:
+            // the 90s -> 100 beside the other two, 38 mm) - drawn to the width on purpose.
             const c2 = isRound(x.it) ? Object.assign({}, c, { chartLineMm: chartLineMmOf('col', cols, c.size) }) : c;
             return `<div class="mq-cfinal"><div class="mq-cfinal-h"><b>Another example:</b>${x.label ? ` <span>${esc(x.label)}</span>` : ''}</div>`
                 + `<div class="mq-cdraw" style="zoom:${z}">${finalDrawing(x.it, c2)}</div></div>`;
@@ -627,7 +706,7 @@ export function secondItems(example2) {
         template: 'lesson-second', skill: example2.skill || '', pool: 'extra', lessonSecond: k, lessonSecondOf: groups.length,
         cellCls: 'mq-c2cell',
         render: (c) => `<div class="mq-c2"><div class="mq-c2nums">${g.steps.map((i) => stepMarker(i + 1)).join('')}</div>`
-            + `<div class="mq-cdraw">${stateDrawing(example2, steps, groups, k, c)}</div></div>`,
+            + `<div class="mq-cdraw">${stateDrawing(example2, steps, groups, k, Object.assign({}, c, { hops: true }))}</div></div>`,
     }));
 }
 
@@ -788,12 +867,13 @@ export function extras(input = {}) {
     const steps = ex ? workedStepsOf(ex) : [];
     const out = [];
     if (ex) out.push(...stateItems(ex, data));
-    const ex2 = pickSecond(main, ex, data);
+    const { ex2, ex3, ex4 } = otherExamples(input, ex, data);
     if (ex2) out.push(...secondItems(ex2));
-    // Lessons r2: the other examples whole (the chart shows them when the second example's row
-    // of states does not fit), the third case where the lesson names one (rounding: ends in 5).
-    const ex3 = ex2 ? pickSecond(main, ex, data, 'third', [ex2]) : null;
-    out.push(...finalItems([{ it: ex2, label: data && data.second && data.second.label }, { it: ex3, label: data && data.third && data.third.label }]));
+    // Lessons r2-r3: the other examples whole (the chart shows them when the second example's row
+    // of states does not fit), the third and fourth cases where the lesson names them (rounding:
+    // ends in 5; the 90s round up to 100).
+    const lab = (k) => (data && data[k] && data[k].label) || '';
+    out.push(...finalItems([{ it: ex2, label: lab('second') }, { it: ex3, label: lab('third') }, { it: ex4, label: lab('fourth') }]));
     const v = vocabItem(data && data.vocab, input.seed);
     if (v) out.push(v);
     if (steps.length) { out.push(stepsItem(data, steps)); out.push(stripItem(data, steps)); }
@@ -879,12 +959,16 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
     let hF = 0;
     // 1. row: the second example's states under the panels, the panels at zoom 1 or more.
     if (k2 && lay.rows * H(1) + band2 <= avail) { mode = 'row'; z = solve((q) => lay.rows * H(q), avail - band2, 1, zMax); }
-    // 2. final: two other examples whole, side by side; the panels a little smaller.
-    if (mode === 'one' && fin.length === 2 && lay.cols === 2) {
-        const hF1 = Math.max(...fin.map((x) => hOf(x, 2)));
+    // 2. final: the other examples whole, side by side - three across where a third case fits
+    //    (lessons r3: rounding's 90s -> 100), else two; the panels a little smaller.
+    let finShown = fin;
+    let finCols = 2;
+    for (const [list, c] of [[finals.slice(0, 3), 3], [fin, 2]]) {
+        if (mode !== 'one' || lay.cols !== 2 || list.length !== c || (c === 3 && !list.every(fits3))) continue;
+        const hF1 = Math.max(...list.map((x) => hOf(x, c)));
         const HF = (q) => hF1 - (1 - q) * dLast;
         const zb = solve((q) => lay.rows * H(q) + HF(q), avail, 0.85, 1);
-        if (zb) { mode = 'final'; z = zb; hF = HF(zb); }
+        if (zb) { mode = 'final'; z = zb; hF = HF(zb); finShown = list; finCols = c; }
     }
     // 3. grid3: the panels, the closing step and the other examples share one 3-column grid.
     const cells3 = states.concat(tailPanel ? [tailPanel] : [], fin);
@@ -933,11 +1017,11 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
                 content: gridPart(second.map((x) => Object.assign(planItem(x, { cols: Math.min(4, k2), nolabel: true }), { cls: x.cellCls })), { cols: k2, rows: 1, cellH: h2 + Math.min(spare, h2 * 0.3), labels: 'none' }),
             });
         }
-        if (mode === 'final') sections.push(gridPart(fin.map((x) => withZoom(x, 2)), { cols: 2, rows: 1, cellH: hF + Math.min(spare, hF * 0.3), labels: 'none', cls: 'mq-cfinalgrid' }));
+        if (mode === 'final') sections.push(gridPart(finShown.map((x) => withZoom(x, finCols)), { cols: finCols, rows: 1, cellH: hF + Math.min(spare, hF * 0.3), labels: 'none', cls: 'mq-cfinalgrid' }));
     }
     sections.push({ kind: 'say', frame: oralFrameOf(example || {}, { fill: true }), digits: 2 });
     if (chant) sections.push({ kind: 'html', html: `<div class="ws-band mq-cchantband" style="height:${chantH - 1.5}mm"><div class="mq-cchant"><b>Rule:</b><span>${esc(chant)}</span></div></div>` });
-    const shown = mode === 'row' ? 1 : mode === 'final' || mode === 'grid3' ? fin.length : 0;
+    const shown = mode === 'row' ? 1 : mode === 'final' ? finShown.length : mode === 'grid3' ? fin.length : 0;
     return {
         header, sections, zoom: z, second: shown, mode,
         sizing: { mode, avail: +avail.toFixed(1), room: +room.toFixed(1), rowH: +rowH.toFixed(1), base: base.map((v) => +v.toFixed(1)), dH: dH.map((v) => +v.toFixed(1)), zMax: +zMax.toFixed(2), h2: +h2.toFixed(1), k2, hF: +hF.toFixed(1), h3: cells3.map((x) => +hOf(x, 3).toFixed(1)), fits3: cells3.map(fits3), why3: cells3.map((x) => (x.measureWhy && x.measureWhy[3]) || '') },
@@ -959,8 +1043,7 @@ export function plan(input = {}) {
     // The host draws the chart and the lesson sheet as two sheets (lessons r1: the chart is L at
     // every size): `lesson.part` = 'chart' | 'sheet' ('all' draws both, as before).
     const part = lesson.part || 'all';
-    const example2 = pickSecond(main, example, data);
-    const example3 = example2 ? pickSecond(main, example, data, 'third', [example2]) : null;
+    const { ex2: example2, ex3: example3, ex4: example4 } = otherExamples(input, example, data);
     const finals = extrasList.filter((x) => x.lessonFinal !== undefined);
     const vocab = extrasList.find((x) => x.lessonVocab);
     const stepsZone = extrasList.find((x) => x.lessonSteps);
@@ -1033,7 +1116,7 @@ export function plan(input = {}) {
     }
 
     /* ---- Guided Practice ("we do") beside the Steps: the chart's names and icons */
-    const rest = main.filter((it) => it !== example && it !== example2 && it !== example3);
+    const rest = main.filter((it) => it !== example && it !== example2 && it !== example3 && it !== example4);
     // The width left of the Steps zone is two thirds of the page: 2 cells are a 3-column page's
     // cells, 3 cells are narrower (a 4-column page's measurement, plus the fact's cue beside it).
     const colsFor = (k) => (k >= 3 ? 4 : k === 2 ? 3 : 2);
@@ -1051,7 +1134,7 @@ export function plan(input = {}) {
     const shortH = Math.max(20, hAt(rest.slice(0, 3), 2) + lineExtra(rest.slice(0, 3)));
     const stackRows = zH > 0 && rest.length >= 3 && fitsWidth(rest.slice(0, 3), 2) && shortH * 1.8 <= zH ? Math.min(3, Math.floor(zH / shortH)) : 0;
     if (stackRows) gk = stackRows;
-    const weDoPool = main.filter((it) => it !== example2 && it !== example3);
+    const weDoPool = main.filter((it) => it !== example2 && it !== example3 && it !== example4);
     let weDo = example ? pickWeDo(weDoPool, example, data, gk) : rest.slice(0, gk);
     const gcols = stackRows ? 2 : colsFor(weDo.length || 1);
     const gH = stackRows ? Math.max(20, hAt(weDo, 2) + lineExtra(weDo)) * stackRows : Math.max(hAt(weDo, gcols) + lineExtra(weDo), 20) + (cue(weDo) ? 2 : 0);
@@ -1117,7 +1200,7 @@ export function plan(input = {}) {
     }
 
     /* ---- Independent Practice: whole rows filling the last page (PT-OPN-7, H5) */
-    const used = new Set([example, example2, example3, ...weDo]);
+    const used = new Set([example, example2, example3, example4, ...weDo]);
     const indepPool = main.filter((it) => !used.has(it));
     const icWanted = AUTO_COLS[ctx.size];
     const ic = bestCols(indepPool.slice(0, 6), [icWanted, 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= icWanted), ctx);
@@ -1183,7 +1266,7 @@ export function plan(input = {}) {
             states: states.length, chartZoom: zoom, example: example ? String((example.q && example.q.text) || '') : '',
             example2: secondShown && example2 ? String((example2.q && example2.q.text) || '') : '', part, chartSizing,
             example2Found: example2 ? String((example2.q && example2.q.text) || '') : '',
-            example3: example3 ? String((example3.q && example3.q.text) || '') : '', bandSizes,
+            example3: example3 ? String((example3.q && example3.q.text) || '') : '', example4: example4 ? String((example4.q && example4.q.text) || '') : '', bandSizes,
             fits: [{ cols: 1, rows: out.length, line: `Fits: an anchor chart of ${states.length} steps, ${warmCount} warm-up, ${weDo.length} guided and ${indep.length} independent on ${out.length} page${out.length > 1 ? 's' : ''}.` }],
             notes: data ? [] : ['No lesson data for this skill yet: the warm-up uses the skills listed before it, with no vocabulary.'],
         },

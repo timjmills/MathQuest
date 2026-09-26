@@ -93,6 +93,19 @@ Lessons r2 (critic 22/48, fixes in round 3):
   repeated top number). The lesson skill fills at least half the Mixed page (its weight).
 - An S request prints at M, and the print panel says so beside the Size control and above the
   preview (`LESSON_SIZE_NOTE`), not only under "Why?".
+
+Lessons r3 (critic 38/48, fixes in round 4):
+- A case the main pool rarely deals gets its own pool (`ref` on the case in the lesson data, dealt
+  to host floors): subtract's other example is a one-place take-away from a 0 in the ones (60 - 3),
+  and step 4's panel carries the rule for answers under 10, "0 tens? Leave it empty." (`notes`).
+  Rounding's chart shows three other cases three across where they fit: down, ends in 5, 90s -> 100.
+- The add chart draws the counting (hops 7 -> 8, 9) and says what to do with a double.
+- Packet floors (print-sheet.js `refAccepts`): `distinctAnswer`, `maxSmall` (one one-place
+  take-away a page), `maxTop` (two places), `noTurnaround`, `avoidTexts` (Mixed never repeats a
+  Practice item). The lesson skill holds at least half the Mixed page after packing (`leadHalf`).
+- Guided never repeats the number added or taken away. Rounding practice is 15 at every size, at L
+  type. Place-value pairs vary their asked place with the page seed (gen-pv.js, L10).
+- The print panel counts the problems the pupil does, not the items dealt.
 Every sheet's teacher footer carries the tags: skill id, grade, primary CCSS, EEs (`standards.js`).
 The per-lesson data (prerequisite skills, concepts, vocabulary with pictures, the steps with their
 icons, the chant and why) lives in `js/modules/lessons/prereqs.js`, shaped to grow into the

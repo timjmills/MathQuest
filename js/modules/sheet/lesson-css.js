@@ -54,12 +54,16 @@ ${ICON_CSS}
 :is(.ws-page,.ws-sheet) .mq-c2nums{display:flex;gap:1.5mm}
 :is(.ws-page,.ws-sheet) .mq-cwords{font-size:var(--ws-text);line-height:1.3;display:flex;flex-direction:column;gap:.8mm}
 :is(.ws-page,.ws-sheet) .mq-cstate-col>.mq-cwords{text-align:center}
+:is(.ws-page,.ws-sheet) .mq-cwords>.mq-cnote{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-hopwrap{display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-chops>.mq-hops{margin:0!important}
+:is(.ws-page,.ws-sheet) :is(.mq-cfinal-h,.mq-cnote,.mq-cstate-n .mq-chead>b){text-wrap:balance}
 :is(.ws-page,.ws-sheet) .mq-cstate-n{gap:2mm}
 :is(.ws-page,.ws-sheet) .mq-cstate-n .mq-chead{font-size:var(--ws-text);gap:1mm 1.8mm;flex-wrap:wrap;justify-content:center}
 :is(.ws-page,.ws-sheet) .mq-cstate-n .mq-chead>b{flex:1 1 100%;text-align:center}
 :is(.ws-page,.ws-sheet) .mq-cstate-n .mq-chead>.mq-lnum{width:8.5mm;height:8.5mm;font-size:var(--ws-text)}
-:is(.ws-page,.ws-sheet) .ws-cell.mq-cfinalcell{justify-content:center;align-items:stretch;padding:2.5mm 3mm}
-:is(.ws-page,.ws-sheet) .mq-cfinal{width:100%;display:flex;flex-direction:column;align-items:center;gap:3mm}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-cfinalcell{justify-content:center;align-items:stretch;padding:1.5mm 3mm}
+:is(.ws-page,.ws-sheet) .mq-cfinal{width:100%;display:flex;flex-direction:column;align-items:center;gap:2mm}
 :is(.ws-page,.ws-sheet) .mq-cfinal-h{font-size:var(--ws-text);line-height:1.25;text-align:center}
 :is(.ws-page,.ws-sheet) .mq-cfinal-h>b{font-weight:700;display:block}
 :is(.ws-page,.ws-sheet) .mq-cfinal>.mq-cdraw{align-items:center}

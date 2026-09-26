@@ -819,7 +819,8 @@ async function runBuild() {
 /** One plain line for a built section: "12 problems on 2 pages · 3 columns". */
 function fitsLine(res) {
     const f = res.fits || {};
-    const n = Array.isArray(res.items) ? res.items.length : 0;
+    // A lesson packet says how many problems its pages hold, not how many items it dealt.
+    const n = Number.isFinite(res.problemCount) ? res.problemCount : Array.isArray(res.items) ? res.items.length : 0;
     const pages = res.pageCount || f.pages || 1;
     const parts = [];
     parts.push(n ? `${n} problem${n === 1 ? '' : 's'} on ${pages} page${pages === 1 ? '' : 's'}` : `${pages} page${pages === 1 ? '' : 's'}`);

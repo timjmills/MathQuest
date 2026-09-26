@@ -1042,6 +1042,14 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
         'stack: the open answer row is reserved on the pupil page; the key writes into a row of the same height');
     const chk = renderCell({ cell: { template: 'stack', payload: { a: 67, b: 18, op: '-', check: true } } }, resolveCtx({ mode: 'print', size: 'L', state: 'blank' }));
     ok(/ws-checkrow"><b>Check:<\/b><span class="ws-checkeq">/.test(chk), 'stack: the Check sum is one group (it wraps under "Check:" in a narrow cell)');
+    // Lessons r3: the subtract chart's one-place take-away from a 0 in the ones, the 90s -> 100.
+    const sq = (a, b) => ({ q: { a, b, op: '-', text: `${a} − ${b} = ?`, cell: { template: 'stack', payload: { a, b, op: '-' } } }, template: 'stack' });
+    eq([sq(70, 8), sq(70, 23), sq(67, 9)].map((x) => L.CASE_TESTS.takeAwayZero(x)).join(','), 'true,false,false', 'lesson: 70 - 8 is the take-away-from-0-ones case; 70 - 23 and 67 - 9 are not');
+    eq([98, 95, 94, 77].map((n) => L.CASE_TESTS.toHundred(rq(n))).join(','), 'true,true,false,false', 'lesson: 98 and 95 round to 100; 94 and 77 do not');
+    // The count-on hops: the start number and one arc and number for each number counted on.
+    const hops = L.hopsSvg(7, 2, 'trace');
+    eq((hops.match(/<text/g) || []).length, 3, 'lesson: count on 2 from 7 draws 7, 8, 9');
+    ok(/>7<\/text>/.test(hops) && />9<\/text>/.test(hops) && (hops.match(/data-ws-ink="trace"/g) || []).length === 2, 'lesson: the counted numbers are grey on their step, the start number black');
 }
 
 /* ======================================================================= report */
