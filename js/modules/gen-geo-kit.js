@@ -420,12 +420,13 @@ export function storyFigure(q, measure, maxDim) {
     const w = randInt(2, Math.max(2, l - 1));
     const poly = rectPoly(l, w);
     const ans = measure === 'area' ? l * w : 2 * (l + w);
+    // geometry-r2: three short lines (the long ones wrapped to six in a half-page cell and made
+    // the story row twice the height of the others); a number keeps its unit (a no-break space)
     const story = [
-        `${name} is ${st.verb} a rectangular ${st.obj}.`,
-        // a number keeps its unit on its line (a no-break space)
-        `The ${st.obj} is ${l}\u00a0${unit} long and ${w}\u00a0${unit} wide.`,
-        measure === 'area' ? `How many square ${UNIT_WORD[unit]} of ${st.need} does ${name} need?`
-            : `How many ${UNIT_WORD[unit]} of ${st.need} does ${name} need?`,
+        `${name}'s ${st.obj} is a rectangle.`,
+        `It is ${l}\u00a0${unit} long and ${w}\u00a0${unit} wide.`,
+        measure === 'area' ? `How many square ${UNIT_WORD[unit]} of ${st.need}?`
+            : `How many ${UNIT_WORD[unit]} of ${st.need}?`,
     ];
     return finish(q, {
         kind: 'figure', poly, grid: 'none', unit, story, sketch: true,
@@ -445,10 +446,10 @@ export function storyFigure(q, measure, maxDim) {
  * other side, then the perimeter), word (a story: the fence round a garden and the grass inside it).
  */
 const AP_STORIES = [
-    { obj: 'garden', unit: 'm', edge: 'fence', inside: 'grass' },
-    { obj: 'rug', unit: 'ft', edge: 'trim', inside: 'rug' },
-    { obj: 'poster', unit: 'in', edge: 'frame', inside: 'paper' },
-    { obj: 'patio', unit: 'ft', edge: 'border', inside: 'tiles' },
+    { obj: 'garden', unit: 'm', edge: 'fence', cover: 'ground' },
+    { obj: 'rug', unit: 'ft', edge: 'trim', cover: 'floor' },
+    { obj: 'poster', unit: 'in', edge: 'frame', cover: 'wall' },
+    { obj: 'patio', unit: 'ft', edge: 'border', cover: 'ground' },
 ];
 export function areaPerimeterFigure(q, maxDim) {
     geoBegin();
@@ -479,9 +480,9 @@ export function areaPerimeterFigure(q, maxDim) {
         for (let t = 0; t < 6 && !geoFresh('ap-story', st.obj); t++) st = pick(AP_STORIES);
         const name = freshName(), unit = st.unit;
         const story = [
-            `${name}'s ${st.obj} is a rectangle ${d.w}\u00a0${unit} long and ${d.h}\u00a0${unit} wide.`,
-            `How much ${st.edge} goes all the way round it?`,
-            `How much ${st.inside} covers it?`,
+            `${name}'s ${st.obj} is ${d.w}\u00a0${unit} long and ${d.h}\u00a0${unit} wide.`,
+            `How much ${st.edge} goes around it?`,
+            `How much ${st.cover} does it cover?`,
         ];
         return finish(q, {
             kind: 'figure', poly, grid: 'none', unit, story, sketch: true,
@@ -527,7 +528,7 @@ export function roomyL(wLo, wHi, hLo, hHi) {
         const W = randInt(wLo, wHi), H = randInt(hLo, hHi);
         const m = Math.max(W, H);
         const cw = randInt(1, Math.max(1, W - 1)), ch = randInt(1, Math.max(1, H - 1));
-        if (cw < 0.34 * m || ch < 0.34 * m || W - cw < 0.34 * m || H - ch < 0.34 * m) continue;
+        if (cw < 0.38 * m || ch < 0.38 * m || W - cw < 0.34 * m || H - ch < 0.34 * m) continue;
         const poly = lPoly(W, H, cw, ch);
         if (roomy(poly, 0.25)) return poly;
     }
@@ -566,7 +567,7 @@ function compositeShape(kind, maxDim) {
             const cw = randInt(2, Math.max(2, W - 2)), ch = randInt(2, Math.max(2, H - 2));
             if (cw > W - 2 || ch > H - 2) continue;
             const m = Math.max(W, H);
-            if (cw < 0.34 * m || ch < 0.34 * m || W - cw < 0.34 * m || H - ch < 0.34 * m) continue;
+            if (cw < 0.38 * m || ch < 0.38 * m || W - cw < 0.34 * m || H - ch < 0.34 * m) continue;
             out = { poly: lPoly(W, H, cw, ch), split: [[0, ch], [W - cw, ch]], derivable: [1, 2] };
         }
         // landscape, as the cell is (a tall figure is drawn small at S, its inner corners cramped)

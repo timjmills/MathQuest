@@ -23,7 +23,7 @@
 //                  never above 12.1's 8 / 6 / 6 cells, the spare height shared by the rows
 //   Pages          round-3 re-grade ("a model and ONE practice item"): when page 1 holds fewer
 //                  than the Model and three tries, the sheet continues on page 2 (and 3) under
-//                  the continuation header with the Steps band repeated; each page's rows are
+//                  the continuation header (the Steps band printed once, on page 1); each page's rows are
 //                  sized by the items it holds, the model row taller by its worked trace
 //   Worked trace   P-LC-9: a template that draws no step states marks its model in grey - the
 //                  story's numbers ringed and its sentence in the work box, a chart's factors
@@ -339,8 +339,8 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
 /**
  * The pages of the sheet. Page 1 holds what fits under its Steps band; when that is fewer than
  * the Model and three tries (a tall clock, coin set or story holds two a page), the section
- * continues on page 2 (and 3) under the continuation header, the Steps band repeated so the steps
- * stay in view (PT-GDP-2, PG-22). A continuation page is filled, never above the ceiling.
+ * continues on page 2 (and 3) under the continuation header, the Steps band printed once, on page 1 (geometry-r2: a
+ * repeated band cost every page 49 mm). A continuation page is filled, never above the ceiling.
  */
 function sheetFit(items, cols, ctx, input, limit = Infinity) {
     let a = sheetFitWith(items, cols, ctx, input, false, false, limit);
@@ -380,7 +380,8 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
     const first = fitRows(items, cols, ctx, input, { noSpan, noHint, noLines });
     const extra = first.h - first.h0;
     const mc = bandMetrics(ctx, layoutHeader(first.frame.contHeader), { cont: true });
-    const availC = mc.budget - first.stepsH - mc.strip - first.wrap;
+    // a continuation page carries no Steps band (it is printed once, on page 1)
+    const availC = mc.budget - mc.strip - first.wrap;
     const all = hMinAt(items, cols, ctx);
     // A page's rows are sized by the items that page holds (a tall coin set on page 2 does not
     // cost page 1 a row). Past the end of the probe the tallest probe item stands in.
@@ -916,7 +917,8 @@ export function plan(input = {}) {
         const cellH = gridH / rows;
         const sections = [];
         if (pi === 0) sections.push({ kind: 'html', html: GUIDED_CSS });
-        if (fit.steps.length) sections.push(stepsBand());
+        // geometry-r2: the Steps band once, on page 1 (a continuation page repeated it, 49 mm a page)
+        if (fit.steps.length && pi === 0) sections.push(stepsBand());
         // CL-14: Model and Guided cells are unlabelled (the band names them); still scored.
         const part = gridPart(chunk, { cols, rows, cellH, labels: 'none', start: letter });
         if (spanHere) part.spanFirst = true;

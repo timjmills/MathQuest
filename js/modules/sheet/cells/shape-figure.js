@@ -112,36 +112,60 @@ function layoutLabels(cands, segs, gap = LABEL_GAP) {
         const next = placeInOrder(order, segs, gap);
         if (next.filter((lb) => lb.forced).length < best.filter((lb) => lb.forced).length) best = next;
     }
+    // geometry-r2 ("4 4 4" clustered in a notch): every label then moves, in turn, to the place by
+    // its own edge that stands FARTHEST from the other labels (the middle of its edge preferred
+    // when the room is the same), so labels spread apart instead of settling at the first fit
+    for (let pass = 0; pass < 2; pass++) {
+        for (let i = 0; i < best.length; i++) {
+            // a label with no place yet does not hold the others where they are
+            const others = best.filter((q, j) => j !== i && !q.forced);
+            let top = null, topScore = -Infinity;
+            for (const pos of placesOf(best[i], segs)) {
+                if (others.some((q) => !labelsClear(q.box, pos.box, gap))) continue;
+                const room = others.length ? Math.min(...others.map((q) => {
+                    const gx = Math.max(q.box[0], pos.box[0]) - Math.min(q.box[2], pos.box[2]);
+                    const gy = Math.max(q.box[1], pos.box[1]) - Math.min(q.box[3], pos.box[3]);
+                    return Math.max(gx, gy);
+                })) : 99;
+                const score = Math.min(room, 3 * gap) - 0.6 * Math.abs(pos.t - 0.5) * 4 - 0.2 * (pos.d - 1.4);
+                if (score > topScore) { topScore = score; top = pos; }
+            }
+            if (top) best[i] = { ...best[i], x: top.x, y: top.y, box: top.box, wide: top.box, forced: false };
+        }
+    }
     return best;
+}
+/** Every place a label may take by its own edge: beside it, near its middle, nearer it than any other line. */
+function placesOf(c, segs) {
+    const out = [];
+    const slide = c.edge === 'h' ? [0.5, 0.42, 0.58] : [0.5, 0.42, 0.58, 0.34, 0.66, 0.26, 0.74];
+    const own = c.edge === 'h' ? segs[segs.length - 1] : segs[c.edge];
+    const sides = c.edge === 'h' ? [1, -1] : [1];
+    for (const sd of sides) for (const d of [1.4, 2.4, 3.4]) for (const t of slide) {
+        const nx = c.nx * sd, ny = c.ny * sd;
+        const x = c.mx + c.ex * (t - 0.5) * c.len + nx * (d + Math.abs(nx) * c.w / 2 + Math.abs(ny) * c.h * 0.55);
+        const y = c.my + c.ey * (t - 0.5) * c.len + ny * (d + Math.abs(nx) * c.w / 2 + Math.abs(ny) * c.h * 0.55);
+        const box = [x - c.w / 2 - 0.4, y - c.h / 2 - 0.2, x + c.w / 2 + 0.4, y + c.h / 2 + 0.2];
+        if (segs.some(([A, B]) => segHitsBox(A, B, box))) continue;
+        if (own) {
+            const dOwn = boxGap(box, own);
+            if (segs.some((sg) => sg !== own && boxGap(box, sg) < dOwn - 0.05)) continue;
+        }
+        out.push({ x, y, box, t, d });
+    }
+    return out;
 }
 function placeInOrder(order, segs, gap) {
     const placed = [];
     for (const c of order) {
         let best = null;
         // the middle first, then a slide along the edge (at an inner corner, away from the corner),
-        // only while the label stays nearer its own edge than any other line
-        // (a height's label stays at mid-height, beside its dotted line: geometry-r1)
-        const slide = c.edge === 'h' ? [0.5, 0.42, 0.58] : [0.5, 0.42, 0.58, 0.34, 0.66, 0.26, 0.74];
-        const own = c.edge === 'h' ? segs[segs.length - 1] : segs[c.edge];
-        // a height's label may sit on either side of its dotted line (the roomier side of the triangle)
-        const sides = c.edge === 'h' ? [1, -1] : [1];
-        search:
-        for (const sd of sides) for (const d of [1.4, 2.4, 3.4]) {
-            for (const t of slide) {
-                const nx = c.nx * sd, ny = c.ny * sd;
-                const cx = c.mx + c.ex * (t - 0.5) * c.len + nx * (d + Math.abs(nx) * c.w / 2 + Math.abs(ny) * c.h * 0.55);
-                const cy = c.my + c.ey * (t - 0.5) * c.len + ny * (d + Math.abs(nx) * c.w / 2 + Math.abs(ny) * c.h * 0.55);
-                const bx = [cx - c.w / 2 - 0.4, cy - c.h / 2 - 0.2, cx + c.w / 2 + 0.4, cy + c.h / 2 + 0.2];
-                const wide = bx;
-                if (placed.some((q) => !labelsClear(q.box, bx, gap))) continue;
-                if (segs.some(([A, B]) => segHitsBox(A, B, bx))) continue;
-                if (own) {
-                    const dOwn = boxGap(bx, own);
-                    if (segs.some((sg) => sg !== own && boxGap(bx, sg) < dOwn - 0.05)) continue;
-                }
-                best = { ...c, x: cx, y: cy, box: bx, wide };
-                break search;
-            }
+        // only while the label stays nearer its own edge than any other line; a height's label
+        // stays at mid-height, beside its dotted line, on either side of it (geometry-r1)
+        for (const pos of placesOf(c, segs)) {
+            if (placed.some((q) => !labelsClear(q.box, pos.box, gap))) continue;
+            best = { ...c, x: pos.x, y: pos.y, box: pos.box, wide: pos.box };
+            break;
         }
         if (!best) {
             const d = 1.4;
@@ -165,25 +189,50 @@ const unitOnLabels = (p) => !!p.unit && shownLabels(p) <= 4 && !p.height;
 export const UNIT_NAME = { cm: 'centimeters', m: 'meters', in: 'inches', ft: 'feet', mm: 'millimeters', km: 'kilometers' };
 
 /** The labels' font: the working digit size, eased on a figure with many sides (RP-6). */
-const labelPt = (ctx) => Math.max(textPt(ctx) + 1, digitPt(ctx) * 0.7);
+const labelPt = (ctx) => Math.max(textPt(ctx) + 1, digitPt(ctx) * 0.55);
 /** The width a cell leaves its figure (a third of the page at S, a half at M and L). */
 const FIT_W = { S: 54, M: 80, L: 80 };
+// geometry-r2 (footprints): a labelled figure stands BESIDE its answers - the figure on the left,
+// "Perimeter =" over its box on the right - so a cell is about as tall as the figure, and a page
+// holds 3 rows at L (6 items) and 4 at S (8). The figure's room in a half-page cell:
+const FIG_BESIDE = { S: { w: 40, h: 21 }, M: { w: 44, h: 26 }, L: { w: 46, h: 29 } };
+const FIT_BESIDE = { S: 52, M: 48, L: 46 };
+// a story's bare sketch (no numbers on it: the pupil reads them from the story) is a small picture
+// beside answers written on one line each ("Perimeter = [ ] ft"): the story is the item
+const SKETCH_BESIDE = { S: { w: 18, h: 13 }, M: { w: 20, h: 15 }, L: { w: 22, h: 17 } };
+const bareSketch = (p) => !!p.sketch && !(p.edges || []).some((e) => e.show !== false);
+/** A figure on unit squares (counted, not labelled) keeps its squares and stands over its answer;
+ *  so does a composite with eight sides (a T or a U: its labels need the whole cell's width). */
+const besideKind = (p) => !['squares', 'rows', 'ticks'].includes(p.grid) && (p.poly || []).length <= 6;
+/** Beside when the figure's labels all find their places in the narrower room (else it stands over its answers). */
+export function besideOf(p, ctx = null) {
+    if (!besideKind(p)) return false;
+    if (!ctx) return true;
+    try {
+        const f = figureSVG(p, ctx, { beside: true });
+        return !f.labels.some((lb) => lb.forced) && f.W <= FIT_BESIDE[sizeOf(ctx)] + 2;
+    } catch (e) { return true; }
+}
 
 /** The figure's picture: outline, squares, labels, height; returns {html, W, H}. */
-export function figureSVG(p, ctx) {
+export function figureSVG(p, ctx, { beside = besideOf(p, ctx) } = {}) {
     const poly = p.poly || [];
     const xs = poly.map((q) => q[0]), ys = poly.map((q) => q[1]);
     const x0 = Math.min(...xs), y0 = Math.min(...ys), wU = Math.max(...xs) - x0, hU = Math.max(...ys) - y0;
     const size = sizeOf(ctx);
     const onGrid = ['squares', 'rows', 'ticks', 'paper'].includes(p.grid);
     const dPt = labelPt(ctx), uPt = textPt(ctx), dMm = dPt * PT_MM;
-    const unit = unitOnLabels(p) ? String(p.unit || '') : '';
+    // beside its answers the unit is written once under the figure (short labels keep it narrow)
+    const unit = unitOnLabels(p) && !beside ? String(p.unit || '') : '';
     const labW = (v) => textW(v, dPt) + (unit && v !== '?' ? textW(` ${unit}`, uPt) : 0);
     // a labelled figure shrinks (never below 60 %) until it and its labels fit the cell (L1: the
     // cell is narrower at S); a figure on unit squares keeps its squares (RP-5: 6 mm or more)
     // a story's sketch is smaller (the story is the item; the sketch is a picture of it)
-    let k = p.grid === 'paper' ? Math.max(4.5, Math.min(SQUARE[size], (FIT_W[size] - 4) / (wU + 2)))
-        : onGrid ? SQUARE[size] : Math.min(FIG[size].w / (wU || 1), FIG[size].h / (hU || 1)) * (p.sketch ? 0.6 : 1);
+    const fitW = beside ? FIT_BESIDE[size] : FIT_W[size];
+    const small = beside && bareSketch(p);
+    const box0 = small ? SKETCH_BESIDE[size] : beside ? FIG_BESIDE[size] : FIG[size];
+    let k = p.grid === 'paper' ? Math.max(4.5, Math.min(SQUARE[size], (fitW - 4) / (wU + 2)))
+        : onGrid ? SQUARE[size] : Math.min(box0.w / (wU || 1), box0.h / (hU || 1)) * (p.sketch && !small ? 0.7 : 1);
     const k0 = k;
     let P2, labels, hF, hT, hSide, bx1, by1, bx2, by2;
     let grown = 0;
@@ -227,9 +276,9 @@ export function figureSVG(p, ctx) {
         if (onGrid) break;
         // a label with no clear place (a narrow notch): the figure grows, while it still fits the
         // cell, so its inner corners have room (never past 1.6 x)
-        if (labels.some((lb) => lb.forced) && grown < 8 && (bx2 - bx1) * 1.12 + 3 <= FIT_W[size]) { k *= 1.12; grown++; continue; }
-        if (bx2 - bx1 + 3 <= FIT_W[size] || k <= k0 * 0.6) break;
-        k = Math.max(k0 * 0.6, k * Math.min(0.92, (FIT_W[size] - 3 - (bx2 - bx1 - wU * k)) / (wU * k)));
+        if (labels.some((lb) => lb.forced) && grown < 8 && (bx2 - bx1) * 1.12 + 3 <= fitW) { k *= 1.12; grown++; continue; }
+        if (bx2 - bx1 + 3 <= fitW || k <= k0 * 0.6) break;
+        k = Math.max(k0 * 0.6, k * Math.min(0.92, (fitW - 3 - (bx2 - bx1 - wU * k)) / (wU * k)));
     }
     const pad = 1.5, ox = -bx1 + pad, oy = -by1 + pad;
     const W = bx2 - bx1 + 2 * pad, H = by2 - by1 + 2 * pad;
@@ -319,7 +368,7 @@ export function figureSVG(p, ctx) {
             + `<tspan font-size="${n2(dMm)}">${esc(lb.v)}</tspan>${unit && !lb.unknown ? `<tspan font-size="${n2(uPt * PT_MM)}"> ${esc(unit)}</tspan>` : ''}</text>`;
     }
     const aria = p.grid === 'squares' ? 'a shape made of unit squares' : onGrid ? 'a shape measured in units' : `a figure with sides ${(p.edges || []).filter((e) => e.show !== false).map((e) => e.v).join(', ')}`;
-    return { html: svg(ctx, W, H, body, { cls: 'sg-figure', label: aria }), W, H, gap: glyphGap(dPt), labels: labels.map((lb) => ({ v: lb.v, edge: lb.edge, x: lb.x + ox, y: lb.y + oy, w: lb.w, h: lb.h, forced: !!lb.forced })) };
+    return { html: svg(ctx, W, H, body, { cls: 'sg-figure', label: aria }), W, H, gap: glyphGap(dPt), beside, labels: labels.map((lb) => ({ v: lb.v, edge: lb.edge, x: lb.x + ox, y: lb.y + oy, w: lb.w, h: lb.h, forced: !!lb.forced })) };
 }
 
 function inPoly(pts, [x, y]) {
@@ -344,14 +393,26 @@ function shown(p, ctx, a) {
     return '';
 }
 
-/** One answer line: "Area = [ ] square units". */
-function answerLine(p, ctx, a, several) {
+/** One answer line: "Area = [ ] square units" (or, beside a figure, "Area =" over its box). */
+function answerLine(p, ctx, a, several, stacked = false) {
     const trace = ctx.state === 'traced' || (ctx.state === 'blank' && p.traced);
     const bctx = trace ? { ...ctx, state: 'traced' } : ctx;
     const b = box(bctx, { id: a.id, value: shown(p, ctx, a), w: blankWidth(Math.max(2, String(a.ans).length), sizeOf(ctx)),
         h: S(ctx).writeMm + 2, mark: several ? 'cell' : 'blank' });
     const t = (s) => `<span style="font-size:${P(ctx, textPt(ctx))};line-height:1.2;white-space:nowrap;">${esc(s)}</span>`;
-    return `<div class="sg-ask" style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 1.5)};">${t(`${a.label} =`)}${b}${a.unit ? t(a.unit) : ''}</div>`;
+    if (stacked) {
+        return `<div class="sg-ask" style="display:flex;flex-direction:column;align-items:flex-start;gap:${L(ctx, 0.8)};">${t(`${a.label} =`)}`
+            + `<div style="display:flex;align-items:center;gap:${L(ctx, 1.5)};">${b}${a.unit ? t(a.unit) : ''}</div></div>`;
+    }
+    // one row of the answers' grid (asksGrid): label right-aligned, box, unit - so the boxes of
+    // "Perimeter =" and "Area =" stand in one column (geometry-r2: align the answer boxes)
+    return `<div class="sg-ask" style="display:contents;">${t(`${a.label} =`).replace('<span style="', '<span style="justify-self:end;')}`
+        + `${b}${a.unit ? t(a.unit).replace('<span style="', '<span style="justify-self:start;') : '<span></span>'}</div>`;
+}
+/** The answers written one to a line, their boxes in one column. */
+function asksGrid(p, ctx, several, join, align = 'center') {
+    const rows = (p.ask || []).map((a) => answerLine(p, ctx, a, several)).join('');
+    return `<div style="display:grid;grid-template-columns:auto auto auto;align-items:center;justify-content:${align};column-gap:${L(ctx, 1.5)};row-gap:${L(ctx, 2)};"${join}>${rows}</div>`;
 }
 
 export function renderFigure(p, ctx, root) {
@@ -363,8 +424,8 @@ export function renderFigure(p, ctx, root) {
     const drawn = !bare;
     const f = figureSVG(bare ? { ...p, edges: [] } : p, ctx);
     const story = (p.story || []).length
-        ? `<div class="sg-story" style="font-size:${P(ctx, textPt(ctx) + 2)};line-height:1.3;text-align:left;max-width:${L(ctx, FIGURE_COL[sizeOf(ctx)].wMm - 8)};white-space:normal;">${p.story.map((t) => `<div>${esc(t)}</div>`).join('')}</div>` : '';
-    const unitLine = drawn && p.unit && !unitOnLabels(p) && shownLabels(p)
+        ? `<div class="sg-story" style="font-size:${P(ctx, textPt(ctx) + 1)};line-height:1.3;text-align:left;max-width:${L(ctx, FIGURE_COL[sizeOf(ctx)].wMm - 8)};white-space:normal;">${p.story.map((t) => `<div>${esc(t)}</div>`).join('')}</div>` : '';
+    const unitLine = drawn && p.unit && (!unitOnLabels(p) || f.beside) && shownLabels(p)
         ? `<div class="sg-units" style="font-size:${P(ctx, textPt(ctx))};line-height:1.25;">All lengths are in ${esc(UNIT_NAME[p.unit] || p.unit)}.</div>` : '';
     const given = (p.given || []).map((g) => `<div class="sg-given" style="font-size:${P(ctx, textPt(ctx))};font-weight:700;line-height:1.25;">${esc(g)}</div>`).join('');
     // HINT: the grey formula line, or an addition frame of grey ruled lines, one for each side
@@ -375,10 +436,23 @@ export function renderFigure(p, ctx, root) {
             + Array.from({ length: p.frame }, () => rule).join('<span>+</span>') + '<span>=</span></div>'
         : p.formula ? `<div class="sg-formula" data-ws-hint="formula" style="font-size:${P(ctx, textPt(ctx))};line-height:1.25;color:${GREY};">${esc(p.formula)}</div>` : '';
     const several = (p.ask || []).length > 1;
-    const asks = (p.ask || []).map((a) => answerLine(p, ctx, a, several)).join('');
     const join = several ? ' data-mq-join=", "' : '';
+    if (f.beside && f.html) {
+        // the figure (and its unit line) on the left, the given line and the answers on the right,
+        // their tops level; the grey hint under both (geometry-r2: cells a page could not hold 6 of)
+        const asks = bare ? asksGrid(p, ctx, several, join, 'start')
+            : `<div style="display:flex;flex-direction:column;align-items:flex-start;gap:${L(ctx, 2)};"${join}>${(p.ask || []).map((a) => answerLine(p, ctx, a, several, true)).join('')}</div>`;
+        // (a given line, "Area = 24 square cm", reads first, over both: in the answer column it
+        // made the cell too wide for two to a row)
+        // (one column at a 2 mm gap, not the cell's 4 mm: the given line, the row and the unit line
+        // belong together, and 4 mm between each kept 3 rows from a page at L)
+        return root(ctx, 'sg-figure-cell', `${story}<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 2)};">`
+            + `${given}<div class="sg-beside" style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 4)};">`
+            + `<div style="line-height:0;">${f.html}</div>`
+            + `${asks}</div>${unitLine}</div>${formula}`);
+    }
     return root(ctx, 'sg-figure-cell', `${story}${f.html ? `<div style="line-height:0;">${f.html}</div>` : ''}${unitLine}${given}${formula}`
-        + `<div style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 2)};"${join}>${asks}</div>`);
+        + asksGrid(p, ctx, several, join));
 }
 
 export function figureKey(p) {
@@ -392,7 +466,9 @@ export function figureInputs(p) {
     return (p.ask || []).map((a, i) => ({ id: a.id, kind: 'number', shape: 'box', graded: true, order: i, inputmode: 'numeric', scopes: ['full', 'answer-only'] }));
 }
 
+// a figure beside its answers is a half-page cell at every size (S shorter, so 4 rows to L's 3)
+const FIGURE_BESIDE_COL = { S: { wMm: 93, maxCols: 2 }, M: { wMm: 93, maxCols: 2 }, L: { wMm: 93, maxCols: 2 } };
 export function figureFootprint(p, ctx) {
-    const col = FIGURE_COL[sizeOf(ctx)];
+    const col = (besideOf(p, ctx) ? FIGURE_BESIDE_COL : FIGURE_COL)[sizeOf(ctx)];
     return { wMm: col.wMm, hMm: null, measure: true, factLike: false, maxCols: col.maxCols };
 }
