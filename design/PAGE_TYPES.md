@@ -138,9 +138,17 @@ Owned by `WORKSHEET_DESIGN_STANDARD.md`; restated so the arithmetic below can be
 - **PT-TOK-2.** Shading uses one flat 40% grey (`#949494`) for shaded parts, trace or model digits and faded scaffolds; this is the default. The Photocopy-safe switch, a print-dialog option that is off by default (PT-DLG-19), replaces grey fills with 45-degree hatch (0.75 pt, 1.6 mm pitch, areas of 6 mm or more) and grey trace digits with dotted-outline digits. No other grey, gradient, shadow, colour or emoji appears on any role.
 - **PT-TOK-3.** Line style carries meaning on every role: dotted = trace or model; **dashed = cut, with one exception: the short-dash missing-digit box, which marks the unknown digit inside a stacked problem (design standard LS-8, VA-7); nothing else is ever dashed**; square corners = structure (cells, answer boxes, frames); rounded corners = read or think containers (story box, steps box, support strips, flashcards, think box). An unknown quantity in a diagram is a solid-outline box with a label-size "?" in its corner, never a dashed box.
 
-### 1.3 The two looks
+### 1.3 The two looks — one worksheet look, Daily (owner ruling 2026-09-26)
 
-| | "I Can" look | "Daily" look |
+> **Owner ruling 2026-09-26:** "the daily and I Can pages look the same almost — get rid of the 'I Can'
+> page, use the daily, but if it's a single skill put an I Can on it. And it's just an option for the daily
+> page to have one or more skills." **Every worksheet page type prints in the Daily look.** The "I Can" look
+> is **retired for worksheets**: it stays in the kit (`LOOKS` / `LOOK_IDS` in `sheet/tokens.js`) only so old
+> saved sets and share codes still decode — a stored `ican` or `auto` prints Daily — and for the **lesson
+> packet**, whose pages are a fixed one-size design that pins its own look (`LESSON_LIBRARY_PLAN.md` §8a).
+> The title rule (PT-TTL-1) replaces the look choice: a one-skill page carries its "I Can ..." line.
+
+| | "I Can" look (retired for worksheets; lesson packet only) | "Daily" look (every worksheet) |
 |---|---|---|
 | Cell rules | 0.75 pt, cells share borders, 1.5 pt outer frame | 1.5 pt grid throughout (fact grids: 0.75 pt interiors, 1.5 pt frame and band edges) |
 | Stacked digit tracks | 0.72 em (0.95 em when any regroup scaffold is on) | 0.95 em, plus a 2 mm gap between operand rows |
@@ -149,13 +157,12 @@ Owned by `WORKSHEET_DESIGN_STANDARD.md`; restated so the arithmetic below can be
 | Sum rule | 1.5 pt | 1.5 pt |
 | Band and section titles | the fixed band labels of design standard BD-1, bold, ending in a colon (`Guided Practice:`), under a 2.25 pt rule | plain bold sentence-case section titles under a 2.25 pt rule; never a black title tab |
 
-- **PT-LOOK-1.** Default look by role. The dialog can override the look and, separately, the label style. A page uses exactly one look: sections that share a page share it.
+- **PT-LOOK-1.** *(Owner ruling 2026-09-26.)* One worksheet look: **Daily**, on every page type. There is no Look control in the print dialog and no look preset or quick pick; `buildSheet` prints Daily whatever look a request names (`WORKSHEET_LOOK` in `sheet/tokens.js`), so an old saved set or share code that stored `ican` or `auto` still builds, in Daily. The dialog keeps the separate label-style option (PT-DLG-3). Where a role section below still says **Look. I Can**, read Daily: that line describes the retired default, and the I Can label and band rules survive only for the lesson packet.
 
-| Default "I Can" | Default "Daily" |
-|---|---|
-| Opener, Scripted Model, Guided, Independent, More Practice, Sub-skill pages, Error analysis, Review, Test, Pre-skill check, K one-page lesson, Visual grid, K counting, Chart and table pages, Word problems, Blank template (inherits its source role), Fact-family Intro and Warm-up, True or False?, Reason It, Stretch, Anchor chart, Steps card, Hands-on family | Computation grid, Equation drill, Long division (standalone), Fact rows, Fact Fluency Probe, Fact-family Probe, Practice strips, Cumulative fact review, Daily Spiral, Mixed Skill Practice, Today's Number, Daily 4 |
+  *Superseded default table (kept for the record):* "I Can" by default on Opener, Scripted Model, Guided, Independent, More Practice, Sub-skill pages, Error analysis, Review, Test, Pre-skill check, K one-page lesson, Visual grid, K counting, Chart and table pages, Word problems, Blank template, Fact-family Intro and Warm-up, True or False?, Reason It, Stretch, Anchor chart, Steps card, Hands-on family; "Daily" on Computation grid, Equation drill, Long division, Fact rows, Fact Fluency Probe, Fact-family Probe, Practice strips, Cumulative fact review, Daily Spiral, Mixed Skill Practice, Today's Number, Daily 4.
 
-- **PT-LOOK-2.** A role placed inside a lesson packet takes the packet's look. Long division inside a packet is therefore "I Can".
+- **PT-LOOK-2.** The lesson packet (role `lesson`: anchor chart, lesson sheet, its practice and mixed pages) keeps its own pinned look (`LESSON_LOOK`, the I Can rules) — a fixed one-size design that passed the critic 48/48 (`LESSON_LIBRARY_PLAN.md` §8a). The one-look rule does not reach inside it; its render is byte-identical before and after the ruling (`ws-lesson-samples --stats`).
+- **PT-TTL-1.** *(Owner ruling 2026-09-26.)* The title follows the skills, not a look. A sheet whose items all come from **one** skill carries that skill's "I Can ..." line (`frame.js` `pageTitle`) in the Daily header. A sheet of **two or more** skills — counted by skill id, so two skills that share a wording are still two — carries no I Can line: the neutral `Mixed practice`, or the role's fixed title without a topic (`Test A`, `Review`). A role with a fixed title keeps it for one skill (`Test A: adding within 20`, `Review: rounding to the nearest 10`). One skill or several is simply what the teacher puts in the set; the Daily page is built for both.
 - **PT-LOOK-3.** Black is reserved for identifiers (strand tab, Day tab, number tabs), digits, rules and marks of 7 mm or less. Section titles are never reversed out.
 
 ### 1.4 Labels, numbering and Score
@@ -1744,8 +1751,8 @@ Every option on every role lives in the print dialog. Scope is `job` (the whole 
 | Id | Option | Values | Default | Scope | Notes |
 |---|---|---|---|---|---|
 | PT-DLG-1 | Sheet type and packet parts | any role in sections 2 to 8; "Lesson packet" opens a checklist of parts (PT-PKT-1) and presets | Auto by skill (fact-like -> Fact rows; stack -> Computation grid; visual -> Visual grid; story -> Word problems) | section | a part marked "basic" uses a default adapter (section 10) |
-| PT-DLG-2 | Look | Auto, I Can, Daily | Auto (PT-LOOK-1) | section | one look per page: sections that share a page share it |
-| PT-DLG-3 | Label style | Auto, letters, black tabs, none | Auto (by look) | section | never reflows the page (PT-LBL-4) |
+| PT-DLG-2 | Look | *retired 2026-09-26* — no control; every worksheet prints Daily (PT-LOOK-1) | Daily | — | a stored `ican` / `auto` decodes and prints Daily; the lesson packet pins its own look (PT-LOOK-2); the title follows the skills (PT-TTL-1) |
+| PT-DLG-3 | Label style | Auto, letters, black tabs, none | Auto (black tabs, the Daily look) | section | never reflows the page (PT-LBL-4) |
 | PT-DLG-4 | Columns | Auto, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 | Auto | section | the stored choice is never overwritten; the clamp, step-down or forced note shows beside the control and in the preview only (PT-COL-5) |
 | PT-DLG-5 | Size | S, M, L | L | section | fixes writing space; content never shrinks to fit |
 | PT-DLG-6 | Count | problems, pages, or problems per page (word problems: Auto, 1, 2, 3, 4) | role default | section | rounded to full rows (PT-ENG-7) |

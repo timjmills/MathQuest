@@ -35,13 +35,30 @@ Terms used throughout: **S / M / L** = the size preset. **Hw** = writing height 
 - **SC-6** No tracking artefacts are specified or may be added: no goal pages, pupil trackers, class records, mastery logs, progress graphs or mastery gates. A per-page Score line and an optional per-page Goal / Time line (section 8) are the only record fields.
 - **SC-7** Every page is black, white and one grey (section 4). No color, gradient, shadow, emoji, clip-art, mascot or decorative lettering appears anywhere on a sheet.
 
-### 1.2 The two looks
+### 1.2 The two looks — one worksheet look, Daily (owner ruling 2026-09-26)
 
-A look is a named bundle of cell border, digit track, label style and section-title style. Each page type has a default look. The print dialog can override the look (Auto / I Can / Daily; sections that share a page share one look, SC-10) and, separately, the label style (CL-20).
+> **Owner ruling 2026-09-26:** "the daily and I Can pages look the same almost — get rid of the 'I Can'
+> page, use the daily, but if it's a single skill put an I Can on it. And it's just an option for the daily
+> page to have one or more skills."
 
-| Attribute | "I Can" look | "Daily" look |
+A look is a named bundle of cell border, digit track, label style and section-title style. **Every
+worksheet page type now prints in the Daily look.** The **"I Can" look is retired for worksheets**: there
+is no Look control in the print dialog, and the look is kept in the kit only so that old saved sets and
+share codes still decode (a stored `ican` or `auto` prints Daily) and for the lesson packet, a fixed
+one-size design that pins its own look (`design/LESSON_LIBRARY_PLAN.md` §8a). The label style can still be
+chosen separately (CL-20).
+
+- **SC-12** *(2026-09-26)* The "I Can" **title** is not a look: a sheet whose items all come from ONE skill
+  carries that skill's `I Can ...` line (HD-10) in the Daily header; a sheet of two or more skills carries
+  no I Can line (the neutral "Mixed practice", or its role's fixed title without a topic). One skill or
+  several is simply what the teacher puts in the set (`design/PAGE_TYPES.md` PT-TTL-1).
+
+The table below keeps both columns: the Daily column is the worksheet contract; the I Can column is kept
+for decoding and for the lesson packet only.
+
+| Attribute | "I Can" look (retired for worksheets) | "Daily" look |
 |---|---|---|
-| Default for | Lesson opener, scripted model, guided, independent, more practice, review, test, pre-skill check, sub-skill / decision, error analysis, True or False?, Reason It, Stretch, word problems | Computation grids, fact rows, daily spiral, mixed practice, Daily 4, Today's Number |
+| Used by | The lesson packet only (its pinned look); decoding old saved sets | **Every worksheet page type** (independent, more practice, guided, review, test, word problems, computation grids, fact rows, mixed practice, daily spiral, Daily 4, Today's Number, ...) |
 | Outer frame | 1.5 pt | 1.5 pt |
 | Interior cell borders | 0.75 pt, shared | 1.5 pt, shared. Fact grids: 0.75 pt interiors with 1.5 pt frame and band edges |
 | Digit track (stacked arithmetic) | 0.72 em | 0.95 em |

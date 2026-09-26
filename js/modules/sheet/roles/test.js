@@ -14,7 +14,7 @@
 
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, instructionKeyOf, assemble,
-    poolItems, topicOf, labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, rng, shuffle, deriveSeed,
+    poolItems, topicOf, oneSkill, labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, rng, shuffle, deriveSeed,
 } from './compose.js';
 import { groupByHeight, rowShape, rowGapFor } from '../layout.js';
 
@@ -69,8 +69,11 @@ export function plan(input = {}) {
     if (form === 'B') items = shuffle(rng(deriveSeed(input.seed === undefined ? 0 : input.seed, 'test', 'B')), items);
     // RUBRIC H13: problems of one height together, so each row is sized for what it holds.
     items = groupByHeight(items, L.cols);
-    const topic = topicOf(((input.skills || [])[0] || {}).iCan || '');
-    const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: `Test ${form}: ${topic}`, score: items.length });
+    // PT-TTL-1: a test of one skill names its topic; a test of several names none (never the
+    // first skill's topic over items that are not all of it).
+    const single = oneSkill(input.skills || []);
+    const topic = single ? topicOf(single.iCan || '') : '';
+    const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: topic ? `Test ${form}: ${topic}` : `Test ${form}`, score: items.length });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
     const instr = instructionPart(instructionKeyOf(items, input.skills), items);
     const sections = [

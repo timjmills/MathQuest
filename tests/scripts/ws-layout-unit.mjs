@@ -313,7 +313,8 @@ eq(ROLE_IDS.includes('independent') && ROLE_IDS.includes('more-practice'), true,
     eq(r.pupilPages.map(cellsOf), [6, 6, 4, 4], 'PG-23 through the role: 6 / 6 / 4 / 4');
     const gridStyles = (html) => (html.match(/<div class="ws-grid[^"]*" style="[^"]*"/g) || []);
     eq(r.pupilPages.map(gridStyles), r.keyPages.map(gridStyles), 'AK-1: every grid has the same geometry on the key');
-    ok(/data-ws-label="letter">g\.<\/span>/.test(r.pupilPages[1]) && !/>a\.<\/span>/.test(r.pupilPages[1]), 'CL-12: page 2 of an Independent run starts at g.');
+    // PT-LOOK-1 (2026-09-26): one worksheet look, Daily - the labels are black number tabs.
+    ok(/data-ws-label="tab">7<\/span>/.test(r.pupilPages[1]) && !/data-ws-label="tab">1<\/span>/.test(r.pupilPages[1]), 'CL-12: page 2 of an Independent run starts at 7.');
     ok(r.pupilPages[1].includes('class="mq-cont"'), 'HD-20: pages 2+ carry the continuation header');
     ok(!/ws-field date/.test(r.pupilPages[1]) && !/ws-title/.test(r.pupilPages[1]), 'HD-20: no Date and no title on a continuation page');
     ok(/data-ws-instruction="add">Add\.<\/div>/.test(r.pupilPages[3]), 'PG-22: the instruction repeats on every page');
@@ -347,13 +348,28 @@ eq(ROLE_IDS.includes('independent') && ROLE_IDS.includes('more-practice'), true,
     eq(p.meta.instructions[0].key, 'mixed-sign', 'BD-13: an add + subtract section says "Look at the sign"');
 }
 {
+    // PT-LOOK-1 / PT-TTL-1 (owner ruling 2026-09-26): one worksheet look, Daily; a page of ONE
+    // skill carries its I Can line, a page of two or more never does - even when they share one.
+    const p1 = independentPlan({ items: stackRun(6), skills: SKILL });
+    eq(p1.ctx.look, 'daily', 'PT-LOOK-1: an Independent page with no look asked prints Daily');
+    const twin = [SKILL[0], Object.assign({}, SKILL[0], { skillId: 'add_1k_mixed' })];
+    const p2 = independentPlan({ items: stackRun(6), skills: twin });
+    eq(p2.header.title, 'Mixed practice', 'PT-TTL-1: two skills with the same I Can wording are still a mixed page');
+    const tst = ROLE_MODULES.test;
+    const named = [Object.assign({}, SKILL[0], { iCan: 'I Can add within 1,000 (with regrouping)' })];
+    const one = tst.plan({ items: stackRun(6).map((it) => Object.assign({ pool: 'main' }, it)), skills: named, pools: [{ id: 'main' }] });
+    ok(/^Test A: /.test(one.header.title), `PT-TTL-1: a one-skill test names its topic (${one.header.title})`);
+    const two = tst.plan({ items: stackRun(6).map((it) => Object.assign({ pool: 'main' }, it)), skills: twin, pools: [{ id: 'main' }] });
+    eq(two.header.title, 'Test A', 'PT-TTL-1: a test of several skills names no topic');
+}
+{
     // More Practice: every letter its own sheet.
     const p = morePracticePlan({ items: stackRun(20), skills: SKILL, seed: 42 });
     eq(p.sheets.map((s) => s.header.tab[2]), ['Practice A', 'Practice B', 'Practice C', 'Practice D'], 'PT-MPR-1: Practice A to D');
     eq(p.meta.scoreOutOf, [6, 6, 4, 4], 'PT-MPR-1: each letter has its own Score');
     eq(p.sheets.map((s) => s.seed), ['A', 'B', 'C', 'D'].map((L) => letterSeed(42, L)), 'PT-MPR-2: each letter has its own seed');
     const r = renderPlan(p);
-    ok(r.pupilPages.every((pg) => /data-ws-label="letter">a\.<\/span>/.test(pg)), 'PT-MPR-1: every letter starts at a.');
+    ok(r.pupilPages.every((pg) => /data-ws-label="tab">1<\/span>/.test(pg)), 'PT-MPR-1: every letter starts at 1.');
     ok(r.pupilPages.every((pg) => /<b>1\/1<\/b>/.test(pg)), 'PT-MPR-1: each letter is a one-page sheet (1/1)');
     ok(r.pupilPages.every((pg) => !pg.includes('class="mq-cont"')), 'PT-MPR-1: no letter carries a continuation header');
     ok(r.keyPages.length === 4 && r.keyPages.every((pg) => /Key · Form A · seed \d+/.test(pg)), 'AK-3: one key per letter, with its seed');
@@ -463,7 +479,7 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     // Critic round 2 (C4): the Guided page is lettered and scored like every other role; the
     // worked example carries the Model tab and is not scored.
     eq(plan.header.score, plan.meta.items - 1, 'Guided: Score counts every cell but the worked example');
-    ok(/data-ws-label="letter"/.test(r.pupilHtml), 'Guided: quiet letter labels');
+    ok(/data-ws-label="tab"/.test(r.pupilHtml), 'Guided: black number tabs (PT-LOOK-1, Daily)');
     ok(/data-ws-label="model"/.test(r.pupilPages[0]), 'Guided: the worked example carries the Model tab');
     ok(/data-ws-ink="trace"/.test(r.pupilPages[0]), 'PT-GDP-1: cell 1 carries its answer in trace grey');
     ok(/Guided Practice:/.test(r.pupilHtml), 'PT 2.3: the Guided Practice band');

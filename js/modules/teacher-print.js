@@ -100,7 +100,8 @@ function initState() {
     pr = {
         title: '',
         sections: [newSection(fromQueue())],
-        size: d.size, look: 'auto', paper: d.paper, photocopySafe: d.photocopySafe,
+        // PT-LOOK-1 (owner ruling 2026-09-26): one worksheet look, Daily - there is no Look choice.
+        size: d.size, paper: d.paper, photocopySafe: d.photocopySafe,
         // S6: step-by-step anchor problems on Independent, More Practice and Mixed practice.
         anchors: 'off',
         header: { name: true, date: true, score: true, tab: true, title: true },
@@ -310,7 +311,6 @@ function onClick(e) {
         case 'clear-section': sec(d.sec).skills = []; sec(d.sec).menu = ''; renderWhat(); scheduleBuild(); break;
         case 'remove-section': pr.sections.splice(Number(d.sec), 1); if (!pr.sections.length) pr.sections.push(newSection()); renderWhat(); scheduleBuild(); break;
         case 'size': pr.size = d.v; renderSetup(); scheduleBuild(); break;
-        case 'look': pr.look = d.v; renderSetup(); scheduleBuild(); break;
         case 'paper': pr.paper = d.v; renderSetup(); scheduleBuild(); break;
         case 'anchors': if (b.getAttribute('aria-disabled') === 'true') break; pr.anchors = d.v; renderSetup(); scheduleBuild(); break;
         case 'header': pr.header[d.v] = !pr.header[d.v]; renderSetup(); scheduleBuild(); break;
@@ -646,8 +646,6 @@ function renderSetup() {
     <h2 class="tv-h2" id="tvSetupH">Page setup</h2>
     <div><span class="tv-label">Size</span>${seg('size', pr.size, [['S', 'S', 'Small'], ['M', 'M', 'Medium'], ['L', 'L', 'Large']], 'Size')}${pr.size === 'S' && pr.sections.some((x) => x.role === 'lesson') ? `
       <p class="tv-cap" id="tvSizeLesson" style="margin-top:6px;">A lesson prints at Medium: at Small its regroup boxes and step words are too small to write in. The other page types print at Small.</p>` : ''}</div>
-    <div><span class="tv-label">Look</span>${seg('look', pr.look, [['auto', 'Auto'], ['ican', 'I Can'], ['daily', 'Daily']], 'Look')}
-      <p class="tv-cap" style="margin-top:6px;">${pr.look === 'daily' ? 'Daily: a light header for everyday practice.' : 'I Can: the title states the goal. Auto uses each page type\'s own look (Daily on fact rows, fact probes and Mixed practice).'}</p></div>
     <div class="tv-fields-2">
       <div><span class="tv-label">Paper</span>${seg('paper', pr.paper, [['A4', 'A4'], ['Letter', 'Letter']], 'Paper')}</div>
     </div>
@@ -753,8 +751,6 @@ function requestFor(s, i) {
         practicePages: s.role === 'lesson' ? s.pages : undefined,
         mixed: s.role === 'lesson' ? !!s.mixed : undefined,
         size: pr.size,
-        // 'auto' lets each page type take its own default look (Daily on the fact layouts).
-        look: pr.look === 'daily' || pr.look === 'ican' ? pr.look : 'auto',
         paper: pr.paper,
         photocopySafe: pr.photocopySafe,
         anchors: anchorsBlocked() ? 'off' : (pr.anchors || 'off'),

@@ -71,7 +71,7 @@ import {
 /** PT-FRM-9 / HD-5 / PT-KEY-3: the id line of a key's strand tab. */
 export const KEY_ID_LINE = 'Answer Key';
 
-const DEFAULT_CTX = Object.freeze({ mode: 'print', look: 'ican', size: 'L', scaffoldLevel: 1, paper: 'A4' });
+const DEFAULT_CTX = Object.freeze({ mode: 'print', look: 'daily', size: 'L', scaffoldLevel: 1, paper: 'A4' });   // PT-LOOK-1
 
 const num = (v) => (v === undefined || v === null ? '' : String(v));
 

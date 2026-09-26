@@ -37,7 +37,7 @@ export { esc, blank, instructionHtml, styleBlock, deriveSeed, rng, shuffle, reso
 /* ======================================================================= the context */
 
 /** Size, look and paper of a plan input, with the role's default look (PAGE_TYPES appendix 4). */
-export function ctxOf(input = {}, defaultLook = 'ican') {
+export function ctxOf(input = {}, defaultLook = DEFAULT_LOOK) {
     const c = input.ctx || {};
     const size = SIZES[c.size] ? c.size : DEFAULT_SIZE;
     const look = LOOKS[c.look] ? c.look : (LOOKS[defaultLook] ? defaultLook : DEFAULT_LOOK);
@@ -68,7 +68,20 @@ export function topicOf(iCan) {
 }
 
 /**
+ * PT-TTL-1 (owner ruling 2026-09-26): the ONE skill a sheet's items come from, or null when they
+ * come from two or more. Skills are counted by id, never by their "I Can" wording: two skills that
+ * share a title are still a mixed page.
+ */
+export function oneSkill(skills = []) {
+    const keys = new Set((skills || []).filter(Boolean).map((s) => `${s.categoryId || ''}:${s.skillId || ''}`));
+    return keys.size === 1 ? skills.find(Boolean) : null;
+}
+
+/**
  * The frame of one role's sheet.
+ * PT-TTL-1: a sheet of one skill carries that skill's "I Can ..." line; a sheet of two or more
+ * carries no I Can line - the neutral "Mixed practice" (or the role's fixed title).
+ *
  * @param {Object} o
  * @param {Object[]} o.skills        skill metadata rows {categoryId, skillId, label, grade, ccss, iCan}
  * @param {Object} o.input           the role input (header options)
@@ -83,7 +96,9 @@ export function frameOf({ skills = [], input = {}, tabId, title, twoLine = false
     const h = input.header || {};
     const words = skills.map(skillWords);
     const titles = [...new Set(words.map((w) => w.iCan).filter(Boolean))];
-    const derived = title || (titles.length === 1 ? titles[0] : titles.length ? 'Mixed practice' : 'I Can practise');
+    const single = skills.length ? oneSkill(skills) : null;
+    const derived = title || (skills.length > 1 && !single ? 'Mixed practice'
+        : titles.length === 1 ? titles[0] : titles.length ? 'Mixed practice' : 'I Can practise');
     const finalTitle = typeof h.title === 'string' && h.title.trim() ? h.title.trim() : derived;
     const strands = [...new Set(words.map((w) => w.strand).filter(Boolean))];
     const level = levelLine(skills.flatMap((s) => s.grades || [s.grade]));
@@ -496,7 +511,7 @@ export function assemble(role, input, frame, pages, extra = {}) {
 export const poolItems = (input, id) => (input.items || []).filter((it) => (it.pool || 'main') === id);
 
 export default {
-    ctxOf, labelStyleOf, topicOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, bestCols, planItem,
+    ctxOf, labelStyleOf, topicOf, oneSkill, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, bestCols, planItem,
     gridPart, instructionPart, instructionKeyOf, instructionText, answerOf, wrongOf, workedStepsOf, stringsOf,
     wrongPattern, opOf, opGlyphOf, operandsOf, oralFrameOf, generalSteps, providerWorkedSteps, instructionVarsOf, checkLine, writeLine, stepsHtml,
     slotKey, assemble, poolItems, isWhole, JUDGE_LABELS, STRAND_BY_CATEGORY,

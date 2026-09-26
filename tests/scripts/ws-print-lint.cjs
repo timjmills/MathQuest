@@ -1686,7 +1686,7 @@ async function runApp(source) {
                                 opts = { ...(opts || {}), support: [...new Set([...(def.default || []), ...want])] };
                             }
                         }
-                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId, opts }], count: practice ? COUNT : undefined }], size: KIT_SIZE, look: practice ? 'ican' : 'auto', key: true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
+                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId, opts }], count: practice ? COUNT : undefined }], size: KIT_SIZE, key: true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
                         let out;
                         try { out = await window.buildSheet(req); } catch (e) { if (e && e.unsupported) return { unsupported: e.message }; throw e; }
                         const body = [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');

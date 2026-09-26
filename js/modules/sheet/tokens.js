@@ -151,7 +151,16 @@ export const LOOKS = Object.freeze({
     }),
 });
 export const LOOK_IDS = Object.freeze(['ican', 'daily']);
-export const DEFAULT_LOOK = 'ican';
+// Owner ruling 2026-09-26: ONE worksheet look, Daily. "I Can" is retired for worksheets - a page
+// of one skill carries its "I Can ..." title line in the Daily header instead. `ican` stays in
+// LOOKS / LOOK_IDS only so old saved sets and share codes still decode (the print bridge maps a
+// stored 'ican' or 'auto' to 'daily'), and for the lesson packet, a fixed one-size design that
+// pins its own look (design/LESSON_LIBRARY_PLAN.md section 8a).
+export const DEFAULT_LOOK = 'daily';
+/** The look every worksheet page prints in, whatever look a request or saved set names. */
+export const WORKSHEET_LOOK = 'daily';
+/** The lesson packet's own look (pinned: the lesson pages passed the critic in it). */
+export const LESSON_LOOK = 'ican';
 
 // TY-22: vertical facts always use 0.72 em tracks and T = 3 in both looks.
 export const FACT_TRACK_EM = 0.72;
@@ -380,7 +389,7 @@ export function metricsFor(size = DEFAULT_SIZE, look = DEFAULT_LOOK, { factColum
 
 export default {
     INK, STROKE, STROKE_WIDTHS, DASH, HATCH, PAPER, DEFAULT_PAPER, PAGE_CHROME,
-    SIZES, SIZE_IDS, DEFAULT_SIZE, LOOKS, LOOK_IDS, DEFAULT_LOOK,
+    SIZES, SIZE_IDS, DEFAULT_SIZE, LOOKS, LOOK_IDS, DEFAULT_LOOK, WORKSHEET_LOOK, LESSON_LOOK,
     FACT_TRACK_EM, FACT_TRACKS, MINUS, TIMES, DIV, opGlyph,
     EM_MM, trackMm, trackEmFor, trackFloorMm, SEPARATOR_EM,
     FACT_LADDER, FACT_AUTO_COLS, FACT_PROBE_COLS, FACT_PROBE_XL_PT, FACT_CELL_H_MM, factDigitPt, factCellHMm,

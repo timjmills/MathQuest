@@ -288,9 +288,12 @@ async function e2e() {
         await new Promise(r => setTimeout(r, 200));
         // The request shape teacher-print.js builds (requestFor): skills[].opts from the set.
         const skills = window.UnifiedSkills.skills.map(s => ({ categoryId: s.categoryId, skillId: s.skillId, opts: s.opts || {} }));
-        const res = await window.buildSheet({ role: 'more-practice', sections: [{ skills, columns: 'auto' }], letters: ['A', 'B'], size: 'standard', look: 'ican', paper: 'A4', key: true, seed: 4242 });
+        const res = await window.buildSheet({ role: 'more-practice', sections: [{ skills, columns: 'auto' }], letters: ['A', 'B'], size: 'standard', paper: 'A4', key: true, seed: 4242 });
         const div = document.createElement('div');
         div.innerHTML = res.pupilHtml;
+        // The item labels are the Daily look's number tabs (PT-LOOK-1): a tab "1" beside "7 × 1"
+        // would read "17 × 1", so the labels come out before the text is read.
+        div.querySelectorAll('[data-ws-label]').forEach((l) => l.remove());
         const txt = div.textContent.replace(/\s+/g, ' ');
         return { pages: res.pageCount, items: txt.match(/\d+\s*×\s*\d+/g) || [], optsSent: skills.map(s => s.skillId + ':' + JSON.stringify(s.opts)) };
     });
@@ -300,9 +303,12 @@ async function e2e() {
     log(`buildSheet (teacher Print): ${sheet.pages} pages, ${sheet.items.length} x items — ${sheet.items.join(', ')}`);
     // A row reset to its defaults on the Print screen prints the defaults, not the set's options.
     const resetRow = await tp.evaluate(async () => {
-        const res = await window.buildSheet({ role: 'more-practice', sections: [{ skills: [{ categoryId: 'multiplication', skillId: 'mult_facts', opts: {} }], columns: 'auto' }], letters: ['A', 'B'], size: 'standard', look: 'ican', paper: 'A4', key: false, seed: 4243 });
+        const res = await window.buildSheet({ role: 'more-practice', sections: [{ skills: [{ categoryId: 'multiplication', skillId: 'mult_facts', opts: {} }], columns: 'auto' }], letters: ['A', 'B'], size: 'standard', paper: 'A4', key: false, seed: 4243 });
         const div = document.createElement('div');
         div.innerHTML = res.pupilHtml;
+        // The item labels are the Daily look's number tabs (PT-LOOK-1): a tab "1" beside "7 × 1"
+        // would read "17 × 1", so the labels come out before the text is read.
+        div.querySelectorAll('[data-ws-label]').forEach((l) => l.remove());
         return div.textContent.replace(/\s+/g, ' ').match(/\d+\s*×\s*\d+/g) || [];
     });
     check(resetRow.some(t => MULT_OK(t) === false), `buildSheet with explicit default options still drilled only x7/x8: ${resetRow.join(', ')}`);

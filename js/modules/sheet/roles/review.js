@@ -13,7 +13,7 @@
 
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, bestCols, planItem, gridPart, instructionKeyOf,
-    instructionText, assemble, poolItems, topicOf, labelStyleOf,
+    instructionText, assemble, poolItems, topicOf, oneSkill, labelStyleOf,
 } from './compose.js';
 
 export const ROLE_ID = 'review';
@@ -56,12 +56,14 @@ export function plan(input = {}) {
     const earlier = poolItems(input, 'earlier');
     const g = geometry({ main, earlier }, input);
     const mainSkills = (input.skills || []).filter((s) => main.some((it) => it.q && it.q.skillId === s.skillId));
-    const topic = topicOf(((mainSkills[0] || (input.skills || [])[0]) || {}).iCan || '');
+    // PT-TTL-1: the topic of the ONE skill under review; several skills name none.
+    const single = oneSkill(mainSkills.length ? mainSkills : input.skills || []);
+    const topic = single ? topicOf(single.iCan || '') : '';
     const useM = main.slice(0, g.mRows * g.cols);
     const useE = g.eRows ? earlier.slice(0, g.eRows * g.cols) : [];
     const n = useM.length + useE.length;
     const n0 = Math.max(1, Number(input.lesson) || 1);
-    const frame = frameOf({ skills: mainSkills.length ? mainSkills : input.skills || [], input, tabId: `Review ${n0}`, title: `Review: ${topic}`, score: n });
+    const frame = frameOf({ skills: mainSkills.length ? mainSkills : input.skills || [], input, tabId: `Review ${n0}`, title: topic ? `Review: ${topic}` : 'Review', score: n });
     const rowsM = Math.ceil(useM.length / g.cols);
     const rowsE = Math.ceil(useE.length / g.cols);
     const cellH = g.avail / Math.max(1, rowsM + rowsE);

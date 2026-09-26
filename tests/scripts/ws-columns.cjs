@@ -76,7 +76,7 @@ const ONLY = (arg('templates', '') || '').split(',').filter(Boolean);
             for (const sk of byTpl[tpl]) {
                 const got = await page.evaluate(async ({ sk, size, want }) => {
                     try {
-                        const r = await window.buildSheet({ role: 'independent', sections: [{ skills: [sk], count: 6, columns: want }], size, look: 'ican', paper: 'A4', seed: 5, form: 'A', key: false });
+                        const r = await window.buildSheet({ role: 'independent', sections: [{ skills: [sk], count: 6, columns: want }], size, paper: 'A4', seed: 5, form: 'A', key: false });
                         const f = r.fits || {};
                         return { cols: Number(f.cols) || 0, note: String(f.note || '').slice(0, 120) };
                     } catch (e) { return { cols: 0, note: `error: ${String(e && e.message || e).slice(0, 100)}` }; }

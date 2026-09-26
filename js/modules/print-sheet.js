@@ -27,7 +27,7 @@ import { factSetTitle, optionsFor, normalizeOptions } from './skill-options.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, WORKSHEET_LOOK, LESSON_LOOK } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
@@ -70,10 +70,11 @@ function normaliseRequest(req = {}) {
     const asked = ROLE_ALIASES[req.role] || req.role;
     const role = ROLES.has(asked) ? asked : 'independent';
     const size = ['S', 'M', 'L'].includes(req.size) ? req.size : 'L';
-    // PT-LOOK-1 / PAGE_TYPES appendix 4: 'auto' takes the role's own default look - I Can on the
-    // lesson roles, Daily on the fact layouts and Mixed practice; the dialog may choose either.
-    const mod = ROLE_MODULES[role];
-    const look = req.look === 'daily' || req.look === 'ican' ? req.look : ((mod && mod.DEFAULT_LOOK) || 'ican');
+    // PT-LOOK-1 (owner ruling 2026-09-26): ONE worksheet look, Daily, on every page type. A
+    // stored 'ican' or 'auto' (old saved sets, share codes, the retired Look control) prints
+    // Daily. Only the lesson packet keeps its own pinned look: the role 'lesson' itself, and the
+    // practice / mixed pages the packet builds through `lessonLook` (roles/lesson.js, section 8a).
+    const look = role === 'lesson' || req.lessonLook === LESSON_LOOK ? LESSON_LOOK : WORKSHEET_LOOK;
     const paper = /letter/i.test(String(req.paper || '')) ? 'Letter' : 'A4';
     const seed = Number.isFinite(Number(req.seed)) && req.seed !== null && req.seed !== ''
         ? (Number(req.seed) >>> 0) : (Math.floor(Math.random() * 900000) + 100000);
@@ -117,9 +118,6 @@ function normaliseRequest(req = {}) {
         // optional Mixed practice page.
         practicePages: req.practicePages !== undefined && req.practicePages !== null ? clampInt(req.practicePages, 0, 10, 1) : 1,
         mixed: !!req.mixed,
-        // The look the request asked for ('auto' when none): a lesson's Mixed practice page keeps
-        // the lesson's I Can look unless the teacher chose Daily.
-        lookAsked: req.look === 'daily' || req.look === 'ican' ? req.look : 'auto',
         // A practice page's step reminder (the lesson's anchor chart in one strip): {html, hMm}.
         stepStrip: req.stepStrip && req.stepStrip.html && Number(req.stepStrip.hMm) > 0 ? { html: String(req.stepStrip.html), hMm: Number(req.stepStrip.hMm) } : null,
         // The strand tab's last line, when a packet names its part ("Practice 1", lessons r1).
@@ -702,7 +700,7 @@ function allocateHostSupports(items, n) {
  * function (the SAME one for the pupil page, the key and the measurement), the key, and the
  * class tokens the role writes onto the cell.
  */
-function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = null } = {}) {
+function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = null, look = WORKSHEET_LOOK } = {}) {
     const q0 = g.q;
     // S2: a legacy-drawn fact (sub_facts' vertical fact) that carries supports is drawn by the kit's
     // fact template, which can draw them - the same upgrade the old fact cue made in the generator.
@@ -800,7 +798,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         if (!legacy) return true;
         if (showable === null) {
             try {
-                const blankHtml = legacyClean(renderCell(q, resolveCtx({ mode: 'print', size, look: 'ican', state: 'blank' }))).replace(STAMP_RE, '');
+                const blankHtml = legacyClean(renderCell(q, resolveCtx({ mode: 'print', size, look, state: 'blank' }))).replace(STAMP_RE, '');
                 showable = legacyKeyFill(blankHtml, null, { value: answer, display: answer }, { shown: true }) !== null;
             } catch (e) { showable = false; }
         }
@@ -808,7 +806,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
     };
     let fp;
     const qFoot = supportsBox.cur ? Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { supports: supportsBox.cur }) }) }) : q;
-    try { fp = cellFootprint(qFoot, resolveCtx({ mode: 'print', size: forceL ? 'L' : size, look: 'ican' })); } catch (e) { fp = { wMm: 93, hMm: null, measure: true, maxCols: 2 }; }
+    try { fp = cellFootprint(qFoot, resolveCtx({ mode: 'print', size: forceL ? 'L' : size, look })); } catch (e) { fp = { wMm: 93, hMm: null, measure: true, maxCols: 2 }; }
     if (legacy) {
         // SCC-A6: a legacy cell is sized by measurement. Its size class caps the columns only for
         // word problems (PT-WPR-1); everything else is decided by what the measurement shows.
@@ -824,7 +822,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
     let cellPrompt = null;
     if (legacy) {
         try {
-            const blankHtml = legacyClean(renderCell(q, resolveCtx({ mode: 'print', size, look: 'ican', state: 'blank' })));
+            const blankHtml = legacyClean(renderCell(q, resolveCtx({ mode: 'print', size, look, state: 'blank' })));
             const m = PROMPT_RE.exec(blankHtml);
             if (m && isGenericPrompt(m[2])) cellPrompt = m[2].trim();
         } catch (e) { cellPrompt = null; }
@@ -1316,7 +1314,7 @@ function anchorSet(sk, si, n, { variant, colsList, twinCols }) {
             try { q = generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: 0 }); } catch (e) { q = null; }
             if (!q || seen.has(signature(q))) continue;
             seen.add(signature(q));
-            const it = hostItem({ q, skill: sk }, si, n.size, { supports: false });
+            const it = hostItem({ q, skill: sk }, si, n.size, { supports: false, look: n.look });
             if (eligible === null) eligible = anchorEligible(it);
             if (!eligible) return;
             const a = anchorItem(it, { variant, twinCols });
@@ -1372,7 +1370,8 @@ function anchorSummary(mode, list, notes) {
  * @param {{skills: {categoryId, skillId, opts?, weight?}[], count?: number|'auto', pages?: number,
  *          columns?: 'auto'|number, instructionKey?: string}[]} req.sections
  * @param {'S'|'M'|'L'} [req.size]           default 'L'
- * @param {'auto'|'ican'|'daily'} [req.look] default 'auto' (= I Can on these roles)
+ * @param {'auto'|'ican'|'daily'} [req.look] ignored: every worksheet prints Daily (PT-LOOK-1);
+ *        kept so old saved requests still build
  * @param {'A4'|'Letter'} [req.paper]        default 'A4'
  * @param {Object} [req.header]              {name, date, score, tab, title, lesson}; false hides a part
  * @param {number} [req.seed]                the same seed reprints the same sheet
@@ -1427,9 +1426,12 @@ export async function buildSheet(req = {}) {
     if (n.sections.length === 1 && n.role === 'independent' && n.anchors === 'off') n.sections = n.sections.flatMap((sec, gi) => splitBySupports(sec, gi, n));
 
     const skills = n.sections.flatMap((s) => s.skills.map(metaOf));
+    // PT-TTL-1 (owner ruling 2026-09-26): a sheet of ONE skill carries its "I Can ..." line in the
+    // Daily header; a set of two or more skills carries the neutral "Mixed practice", never an I Can.
     const titles = [...new Set(skills.map((s) => s.iCan))];
+    const skillKeys = new Set(skills.map((s) => `${s.categoryId}:${s.skillId}`));
     const title = typeof n.header.title === 'string' && n.header.title.trim() ? n.header.title.trim()
-        : titles.length === 1 ? titles[0] : 'Mixed practice';
+        : skillKeys.size === 1 && titles.length === 1 ? titles[0] : 'Mixed practice';
     const header = Object.assign({}, n.header, { titleLines: n.header.title === false ? 0 : measureTitleLines(title, n.size) });
     const layoutHeader = { tab: n.header.tab === false ? false : ['Level', 'Strand', 'Id'], title: n.header.title === false ? '' : title, titleLines: header.titleLines };
     const lctx = { paper, header: layoutHeader };
@@ -1474,7 +1476,7 @@ export async function buildSheet(req = {}) {
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
         const gen = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null }, extra));
         const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix, alt: sec.supportAlt };
-        return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size, { mix })], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
+        return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size, { mix, look: n.look })], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
     };
 
     const notes = [];
@@ -1853,7 +1855,7 @@ async function buildRoleSheet(n, metaOf) {
             next += batch;
             for (const g of gen) {
                 if (out.length >= want) break;
-                const it = settlePrompts([hostItem(g, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
+                const it = settlePrompts([hostItem(g, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix }, look: n.look })], metaOf(g.skill).instructionKey)[0];
                 // Error analysis never falls back to an "Answer:" line under the cell: the shown work
                 // must sit in the cell's own slot, or the pupil sees two answer places (C1).
                 if (needsShow && (pass < 3 || strictShow) && !it.canShow()) continue;
@@ -2044,22 +2046,24 @@ async function buildLesson(n, metaOf) {
 
     // 1. The anchor chart (always L) and the teaching sheet: Vocabulary, Warm-up, Guided, Independent.
     const chart = await buildRoleSheet(Object.assign({}, nz, {
-        size: 'L', role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'chart' }),
+        size: 'L', role: 'lesson', header, look: LESSON_LOOK, lessonInput: Object.assign({}, lessonInput, { part: 'chart' }),
     }), metaOf);
     const teach = await buildRoleSheet(Object.assign({}, nz, {
-        role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'sheet' }),
+        role: 'lesson', header, look: LESSON_LOOK, lessonInput: Object.assign({}, lessonInput, { part: 'sheet' }),
     }), metaOf);
     const parts = [{ part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
 
     // 2. Massed practice: Independent pages with the chart's step strip, the grid filling the page
     // body in ONE frame (CL-1; lessons r1: no blank band above the footer, no gutters).
     const common = {
-        size, look: 'ican', paper: n.paper, key: n.key, labels: n.labels, lesson: lessonNo,
+        // The packet's practice and mixed pages keep the lesson's pinned look (section 8a): the
+        // one-look rule maps every other request to Daily.
+        size, look: LESSON_LOOK, lessonLook: LESSON_LOOK, paper: n.paper, key: n.key, labels: n.labels, lesson: lessonNo,
         photocopySafe: n.photocopySafe, header,
     };
     const strip = (teach.extras || []).find((x) => x.lessonStrip);
     const stripH = strip && strip.measured && strip.measured[1] ? strip.measured[1].hMm + 0.5 : 0;
-    const stripHtml = strip && stripH ? strip.render(resolveCtx({ size, look: 'ican', mode: 'print' })) : '';
+    const stripHtml = strip && stripH ? strip.render(resolveCtx({ size, look: LESSON_LOOK, mode: 'print' })) : '';
     // A rounding item ("27 -> ___") is a one-number answer on one line, like a fact.
     const oneLine = (it) => it.template === 'fact' || (it.template === 'pv' && it.kind === 'round');
     const facts = (teach.items || []).filter((it) => it.pool === 'main').every(oneLine);
@@ -2087,7 +2091,7 @@ async function buildLesson(n, metaOf) {
         seed: (n.seed + 7919) >>> 0,
         // (At L type the strip's words are a point bigger: 2 mm more for it.)
         stepStrip: withStrip && stripHtml ? (practiceSize === size ? { html: stripHtml, hMm: stripH }
-            : { html: strip.render(resolveCtx({ size: practiceSize, look: 'ican', mode: 'print' })), hMm: stripH + 2 }) : undefined,
+            : { html: strip.render(resolveCtx({ size: practiceSize, look: LESSON_LOOK, mode: 'print' })), hMm: stripH + 2 }) : undefined,
     });
     const practiceTried = [];
     const practiceTexts = [];
@@ -2111,10 +2115,10 @@ async function buildLesson(n, metaOf) {
     if (n.mixed) {
         const withSkills = data && data.mixWith ? data.mixWith.map(skillRef) : earlierSkills(sk, 2);
         const res = await buildSheet(Object.assign({}, common, {
-            // The lesson's own look (I Can) unless the teacher chose Daily for the packet.
+            // The lesson's own pinned look (section 8a; `common` carries it).
             // Lessons r2: the lesson's own skill fills at least half the page (its weight is the
             // partners' together), the earlier skills the rest.
-            role: 'mixed-practice', look: n.lookAsked === 'daily' ? 'daily' : 'ican',
+            role: 'mixed-practice',
             // Lessons r3: never a problem the Practice page printed; the lesson skill at least
             // half the placed items (`leadHalf`, enforced after packing).
             sections: [{ skills: [Object.assign({}, practiceSk, { weight: Math.max(1, withSkills.length) + 0.5, avoidTexts: practiceTexts }), ...withSkills] }], latticeN: 6, leadHalf: true,

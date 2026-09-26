@@ -11,8 +11,8 @@
 //
 // Rules this file implements
 //   PT-FRM-1..9   frame: paper, header, Score /N, strand tab, "I Can" title, footer, sheet ids
-//   PT-LOOK-1     both roles default to the I Can look; the dialog may choose Daily
-//   PT-LBL-1..7   quiet letters (I Can) or black tabs (Daily); run-on and restart rules
+//   PT-LOOK-1     one worksheet look, Daily (owner ruling 2026-09-26); a one-skill page keeps its I Can title
+//   PT-LBL-1..7   black tabs (Daily; quiet letters only on a retired I Can request); run-on and restart rules
 //   PT-IND-1..4, PT-MPR-1..3   the two roles
 //   HD-5 / HD-6   "Level N", never "Grade"; grade and CCSS only in the teacher footer (HD-30)
 //   HD-10 / HD-13 title grammar and the fixed "Mixed practice" title
@@ -501,7 +501,7 @@ const LETTERS = 'ABCDEFGHIJ';
 function normaliseInput(input = {}) {
     const ctxIn = input.ctx || {};
     const size = SIZES[ctxIn.size] ? ctxIn.size : DEFAULT_SIZE;
-    const look = LOOKS[ctxIn.look] ? ctxIn.look : DEFAULT_LOOK;      // PT-LOOK-1: 'auto' -> I Can
+    const look = LOOKS[ctxIn.look] ? ctxIn.look : DEFAULT_LOOK;      // PT-LOOK-1: 'auto' -> Daily
     const paper = paperOf(ctxIn.paper).id;
     const items = (input.items || []).map((it) => (it && (it.q || it.footprint || it.render) ? it : { q: it }));
     const sections = Array.isArray(input.sections) && input.sections.length ? input.sections : [{ columns: 'auto' }];
@@ -534,7 +534,10 @@ export function frameWords(role, input, skills, { tabId }) {
     const header = input.header || {};
     const words = skills.map(skillWords);
     const titles = [...new Set(words.map((w) => w.iCan).filter(Boolean))];
-    const derived = titles.length === 1 ? titles[0] : titles.length ? 'Mixed practice' : 'I Can practise';
+    // PT-TTL-1 (owner ruling 2026-09-26): only a sheet of ONE skill (counted by id, never by its
+    // wording) carries an "I Can" line; two or more skills take the neutral "Mixed practice".
+    const skillKeys = new Set(skills.map((s) => `${s.categoryId || ''}:${s.skillId || ''}`));
+    const derived = skillKeys.size > 1 ? 'Mixed practice' : titles.length === 1 ? titles[0] : titles.length ? 'Mixed practice' : 'I Can practise';
     const title = typeof header.title === 'string' && header.title.trim() ? header.title.trim() : derived;
     const strands = [...new Set(words.map((w) => w.strand).filter(Boolean))];
     const level = levelLine(skills.flatMap((s) => s.grades || [s.grade]));

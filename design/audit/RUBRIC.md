@@ -125,9 +125,12 @@ and the approved mock-up pack (`design/mockups/out/png/`, section 5 below).
 - **Andika** for every character of question content, on paper and in the screen cell. No serif
   fallback, no JetBrains Mono, no Nunito inside the cell.
 - The page frame: Name / Date / Score `/N` header, the strand tab (`Level N` · strand · sheet id),
-  one "I Can …" title (or the fixed title for that role), a 2.25 pt rule, instruction line, the
+  one "I Can …" title on a one-skill sheet (or the fixed title for that role, or "Mixed practice"), a 2.25 pt rule, instruction line, the
   cell grid, a 7 pt teacher footer. No "Part 01" headings, no shadowed heading cards.
-- Labels per look: quiet letters (I Can) or black number tabs (Daily), one sequence per sheet.
+- Labels: black number tabs (the Daily look, the one worksheet look since the owner ruling of 2026-09-26),
+  one sequence per sheet. Quiet letters (the retired I Can look) appear only inside the lesson packet.
+- Title (PT-TTL-1): a one-skill sheet carries its "I Can ..." line; a sheet of two or more skills carries no
+  I Can line ("Mixed practice", or the role's fixed title without a topic). An I Can line over mixed items is a finding.
 - Stacked arithmetic on a digit grid (operator in its own track, rule under the full width);
   fractions stacked over a bar, never slashed; true operator glyphs (−, ×, ÷).
 - Answer key: facsimile, answers in Andika 700 where the pupil writes, "Answer Key" in the tab.
@@ -181,8 +184,9 @@ A cap sets the **maximum** for the criterion named, whatever else is right.
 ## 5. Calibration references
 
 - **What 10 looks like** — the approved mock-up pack, built by `node design/mockups/build.cjs`:
-  `01-computation-p1.png` (Daily look, stacked addition), `05-level-k-number-sense-p2.png`
-  (I Can look, count and write), `02-fact-fluency-p*.png` (fact rows), `04-lesson-packet-level2-p*.png`
+  `01-computation-p1.png` (Daily look, stacked addition — the one worksheet look since 2026-09-26),
+  `05-level-k-number-sense-p2.png` (count and write; drawn in the retired I Can look, so judge its content
+  and spacing, not its thin rules and letter labels), `02-fact-fluency-p*.png` (fact rows), `04-lesson-packet-level2-p*.png`
   (opener, guided, independent), `09-thinking-pages-p*.png`, `10-visual-grids-p*.png`.
 - **What 3-5 looks like** — the owner's printout of 2026-09-24 (`design/audit/reference/owner-printout-2026-09-24/`):
   black place-value disks with invisible labels (H2), blue disks on paper (H4), solid black
