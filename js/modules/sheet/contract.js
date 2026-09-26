@@ -216,6 +216,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'share-fraction': 'Share equally. Write how much each one gets.',
     'scaling-compare': 'Do _not_ multiply. Write <, > or = in the circle.',
     'story-fraction': 'Read the story. Write the answer.',
+    'equal-or-not': 'Are they equal? Write = or ≠ in the circle.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',

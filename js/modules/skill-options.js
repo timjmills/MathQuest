@@ -2022,12 +2022,21 @@ const _p12Strip = (help) => ({ ...picturesOption(true), group: 'support', strip:
 const _p12Variants = (key, variants, labels, opts = {}) => ({
     ...formsOption(labels.map((l, i) => ({ v: i, l })), opts), variantKey: key, variants,
 });
-const _fracNvForms = (key, simplify = true) => _p12Variants(key, simplify ? ['straight', 'missing_num', 'simplify'] : ['straight', 'missing_num'],
-    ['Work it out (2/6 + 3/6 = __)', 'Find the missing number (2/6 + __/6 = 5/6)', ...(simplify ? ['Work it out and simplify'] : [])],
-    { label: 'What the items ask' });
-const _mixedNvForms = (key, simplify = true) => _p12Variants(key, simplify ? ['straight', 'missing', 'simplify'] : ['straight', 'missing'],
-    ['Work it out (2 1/3 + 1 1/3 = __)', 'Find the missing number (2 1/3 + __ = 4)', ...(simplify ? ['Work it out and simplify'] : [])],
-    { label: 'What the items ask' });
+// the subtraction twins name their own examples (options-r3 O5: they showed additions)
+const _fracNvForms = (key, simplify = true) => {
+    const sub = /^sub_/.test(key);
+    return _p12Variants(key, simplify ? ['straight', 'missing_num', 'simplify'] : ['straight', 'missing_num'],
+        sub ? ['Work it out (7/8 − 3/8 = __)', 'Find the missing number (7/8 − __/8 = 4/8)', ...(simplify ? ['Work it out and simplify (6/8 − 2/8 = 1/2)'] : [])]
+            : ['Work it out (2/6 + 3/6 = __)', 'Find the missing number (2/6 + __/6 = 5/6)', ...(simplify ? ['Work it out and simplify (2/6 + 2/6 = 2/3)'] : [])],
+        { label: 'What the items ask' });
+};
+const _mixedNvForms = (key, simplify = true) => {
+    const sub = /^sub_/.test(key);
+    return _p12Variants(key, simplify ? ['straight', 'missing', 'simplify'] : ['straight', 'missing'],
+        sub ? ['Work it out (4 1/3 − 1 2/3 = __)', 'Find the missing number (4 1/3 − __ = 2 2/3)', ...(simplify ? ['Work it out and simplify'] : [])]
+            : ['Work it out (2 1/3 + 1 1/3 = __)', 'Find the missing number (2 1/3 + __ = 4)', ...(simplify ? ['Work it out and simplify'] : [])],
+        { label: 'What the items ask' });
+};
 Object.assign(P12_OPTIONS, {
     'fractions:identify': [_p12Denoms(), _p12Variants('identify', ['standard', 'pickModel', 'partLabel'],
         ['What fraction is shaded?', 'Pick the model that shows the fraction', 'Name the numerator or the denominator'])],
@@ -2060,7 +2069,10 @@ Object.assign(P12_OPTIONS, {
     'fractions:round_fractions': [_p12Denoms()],
     'fractions:fraction_bar_ops': [_p12Denoms()],
     'fractions:fraction_nl_drag': [_p12Denoms()],
-    'composing:fraction_number_line': [_p12Denoms()],
+    'composing:fraction_number_line': [_p12Denoms(), formsOption([
+        { v: 0, l: 'Read the dot (write the fraction at the dot)' }, { v: 1, l: 'Count the jumps from 0 to the dot' },
+        { v: 2, l: 'Mark the fraction on the line' }, { v: 3, l: 'Past 1 (a line from 0 to 2 or 3)' }],
+        { label: 'What the items ask', help: 'Default: reading the dot, counting the jumps and lines past 1, mixed (one instruction: write the number at each dot). Tick one kind for a page of it alone; marking the fraction is its own page.' })],
     'composing:whole_as_fraction': [_p12Denoms()],
 
     'fraction_operations:add_fractions_like': [_p12Denoms([2, 3, 5, 7]), _p12Strip()],
@@ -2924,11 +2936,12 @@ const _FRAC_HOPS = {
 /** Bar modes (fractions lane): each part of a bar labelled with its size - a hint that fades. */
 const _FRAC_LABELS = {
     id: 'partLabels', label: 'Label the parts', type: 'bool', default: false, group: 'support',
-    help: 'On writes the size of one part inside every part of the bars (1/4 in each quarter), so the pupil reads '
-        + 'the unit fraction instead of working it out. A hint: switch it off as the pupil grows sure. Bars and '
-        + 'fraction walls only; parts too narrow to hold it stay blank.',
-    appliesTo: (o) => !Array.isArray(o.model) || o.model.some((m) => m === 'bar' || m === 'wall'),
+    help: 'On writes the size of one part inside every part of the model (1/4 in each quarter), so the pupil reads '
+        + 'the unit fraction instead of working it out. A hint: switch it off as the pupil grows sure. Bars, fraction '
+        + 'walls, rectangles and circles; parts too narrow to hold it stay blank.',
+    appliesTo: (o) => !Array.isArray(o.model) || o.model.some((m) => m !== 'line'),
 };
+const _FRAC_LABELS_UNLESS_DEFAULT = _FRAC_LABELS;
 const _ap3Model = (values, dflt, help, appliesTo = null) => ({
     id: 'model', label: 'Fraction model', type: 'set', group: 'layout', default: dflt,
     values: values.map(v => ({ v, l: _AP3_MODEL[v] })), allLabel: 'Every model, mixed', help,
@@ -2978,7 +2991,7 @@ const _AP3_OPTIONS = {
         'Default: circles, as the skill always drew. Both fractions are drawn as the ticked model on the same size of whole, '
         + 'so the pupil sees they cover the same amount. Bars (fraction strips) are the usual picture for equivalence; '
         + 'a fraction wall puts one bar under the other so the equal lengths line up. Number lines are two lines, one under '
-        + 'the other, 0 under 0: equivalent fractions sit at the same point.'), _FRAC_LABELS],
+        + 'the other, 0 under 0: equivalent fractions sit at the same point.'), _FRAC_LABELS_UNLESS_DEFAULT],
     'fraction_operations:add_fractions_like': [_ap3Model(['bar', 'area', 'circle'], ['bar'],
         'Default: the skill\'s own bars. A rectangle or a circle draws each fraction of the sum that way, in black and '
         + 'white, and never draws the answer. Pictures off prints numbers only.', (o) => o.pictures !== false)],
@@ -3046,7 +3059,31 @@ const _FRAC_ARCS = (op) => ({
         + `the number both parts are ${op === '×' ? 'multiplied' : 'divided'} by (his working, not scored). "Written" shows it (a hint); `
         + 'no arcs is the fraction sentence alone. Only the missing-number items carry arcs.',
 });
+/** Mixed numbers: whether the parts make a whole (adding) or a whole is broken up (taking away). */
+const _FRAC_REGROUP = (sub) => ({
+    id: 'regroup', label: sub ? 'Breaking a whole (4 1/5 − 1 3/5)' : 'Regrouping (2 3/4 + 1 2/4)', type: 'enum', default: 'mixed', group: 'difficulty',
+    values: [{ v: 'none', l: 'Never' }, { v: 'mixed', l: 'Some items' }, { v: 'always', l: 'Every item' }],
+    help: sub ? 'Every item: the second fraction part is bigger than the first, so a whole is broken into parts first. Never: the parts subtract as they are.'
+        : 'Every item: the fraction parts make a whole or more, which moves into the wholes. Never: the parts stay under a whole.',
+});
+const _FRAC_SUMS = {
+    id: 'sums', label: 'The sums', type: 'enum', default: 'mixed', group: 'difficulty',
+    values: [{ v: 'under', l: 'Less than 1' }, { v: 'mixed', l: 'Some past 1' }, { v: 'over', l: 'More than 1 (write as a mixed number)' }],
+    help: 'Less than 1 keeps every sum inside one whole; more than 1 makes every sum an improper fraction to write as a mixed number.',
+};
 const _FRAC_LANE_OPTIONS = {
+    'fraction_operations:add_mixed_like': [_FRAC_REGROUP(false)],
+    'fraction_operations:sub_mixed_like': [_FRAC_REGROUP(true)],
+    'fraction_operations:add_mixed_like_nv': [_FRAC_REGROUP(false)],
+    'fraction_operations:sub_mixed_like_nv': [_FRAC_REGROUP(true)],
+    'fraction_operations:add_fractions_like': [_FRAC_SUMS],
+    'fraction_operations:add_frac_like_nv': [_FRAC_SUMS],
+    'fractions:compare': [{
+        id: 'pairs', label: 'Which pairs', type: 'enum', default: 'mixed', group: 'difficulty',
+        values: [{ v: 'like', l: 'Same denominator (2/5 and 4/5)' }, { v: 'sameNum', l: 'Same numerator (3/4 and 3/8)' },
+            { v: 'unlike', l: 'Different (2/3 and 3/4)' }, { v: 'mixed', l: 'All three' }],
+        help: 'The comparing ladder: one denominator (compare the numerators), one numerator (the bigger denominator is the smaller part), then both different.',
+    }],
     'fractions:fraction_bar_ops': [_ap3Model(['bar', 'wall'], ['bar'],
         'Default: the two bars side by side. A fraction wall puts one bar under the other on the same whole, left edges '
         + 'lined up, with the number sentence on one line under them. The answer is never drawn.'), _FRAC_LABELS],

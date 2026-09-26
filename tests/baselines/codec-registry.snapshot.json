@@ -94,7 +94,9 @@
     "lineHops": "6D",
     "barModel": "6E",
     "opArcs": "6F",
-    "countLine": "6G"
+    "countLine": "6G",
+    "pairs": "6H",
+    "sums": "6I"
   },
   "blocks": {
     "0": {
@@ -643,7 +645,18 @@
       "value": "V",
       "none": "N"
     },
-    "countLine": {}
+    "countLine": {},
+    "pairs": {
+      "like": "L",
+      "sameNum": "N",
+      "unlike": "U",
+      "mixed": "M"
+    },
+    "sums": {
+      "under": "U",
+      "mixed": "M",
+      "over": "O"
+    }
   },
   "scalarOnly": {
     "range": "decimal",

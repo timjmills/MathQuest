@@ -196,7 +196,9 @@ export const MULTI_KEYS = Object.freeze({
     barModel: '6E',      // a fraction of an amount / find the whole: the bar model with braces, a hint
     opArcs: '6F',        // equivalent fractions / simplify: operator arcs blank / with the value / none
     countLine: '6G',     // count in fractions: the number line over the row of counts (a hint)
-    // NEXT FREE FOR LANE fractions: 6H (to 6P).
+    pairs: '6H',         // compare fractions: same denominator / same numerator / different
+    sums: '6I',          // add fractions: sums under 1 / some past 1 / over 1
+    // NEXT FREE FOR LANE fractions: 6J (to 6P).
 
     // Block 7 — option-panel round 3 (design/audit/OPTIONS-CRITIC-R2.md §5 #7, #20)
     poolSize: '7A',      // mixed pools: every member one step easier / as set / harder
@@ -239,6 +241,8 @@ export const VALUE_TOKENS = Object.freeze({
         // block 1 P10 time + money (draw and write reuse Q and R)
         hm: 'H', minutes: 'T', ring: 'Y', sign: 'G' }),
     regroup: Object.freeze({ none: 'N', always: 'A', mixed: 'M' }),
+    pairs: Object.freeze({ like: 'L', sameNum: 'N', unlike: 'U', mixed: 'M' }),
+    sums: Object.freeze({ under: 'U', mixed: 'M', over: 'O' }),
     orientation: Object.freeze({ vertical: 'V', horizontal: 'H',
         // P11 count_objects arrangement
         rows: 'R', line: 'L', scattered: 'S' }),

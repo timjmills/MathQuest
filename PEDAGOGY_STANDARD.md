@@ -1320,6 +1320,7 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `share-fraction` | Share equally. Write how much each one gets. | a fraction as division: a wholes shared by b, the wholes drawn cut into b parts (added 2026-09-25, fractions lane) |
 | `scaling-compare` | Do _not_ multiply. Write <, > or = in the circle. | multiplication as scaling: compare a fraction times a number with the number (added 2026-09-25, fractions lane) |
 | `story-fraction` | Read the story. Write the answer. | a fraction word problem: the story over its number sentence, the answer in the fraction boxes (added 2026-09-25, fractions lane) |
+| `equal-or-not` | Are they equal? Write = or ≠ in the circle. | equivalent fractions: two fractions, the pupil writes = or ≠ between them (added 2026-09-25, fractions lane) |
 | `default-write` | Solve. Write the answer. | default adapter: skills with no provider, number or text answer |
 | `default-circle` | Circle the answer. | default adapter: choice items |
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |

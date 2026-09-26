@@ -227,6 +227,13 @@ export function fracModelGeom(p) {
                 body += d === 1
                     ? part('circle', `cx="${f2(cx)}" cy="${f2(cy)}" r="${f2(r)}"`, idx, on(idx, i), o, box)
                     : part('path', `d="${sectorPath(cx, cy, r, a0, a1)}"`, idx, on(idx, i), o, box);
+                // `labels` on a circle: the unit fraction at the middle of each sector, where the
+                // sector is wide enough to hold it (never shrunk)
+                if (p.labels && d > 1) {
+                    const lab = D.label * PT_MM, am = (a0 + a1) / 2, rm = r * 0.58;
+                    const sb = { x: cx + rm * Math.cos(am) - 3.5, y: cy + rm * Math.sin(am) - lab * 1.2, w: 7, h: lab * 2.4 };
+                    if ((2 * Math.PI * rm) / d >= Math.max(7, String(d).length * lab * 0.55 + 2.5) && r * 0.84 >= lab * 2.4) body += partLabel(p.labels, d, sb, lab);
+                }
             }
             body += `<circle cx="${f2(cx)}" cy="${f2(cy)}" r="${f2(r)}" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}"/>`;
         } else {
@@ -237,7 +244,7 @@ export function fracModelGeom(p) {
                 const box = { x: ox + k * cw, y: oy + r * ch, w: cw, h: ch };
                 body += part('rect', `x="${f2(box.x)}" y="${f2(box.y)}" width="${f2(cw)}" height="${f2(ch)}"`, idx, on(idx, i), o, box);
                 // `labels`: each part names its size (1/4, or 0.1 for tenths) - a hint the pupil reads
-                if (p.labels && kind === 'bar') body += partLabel(p.labels, d, box, D.label * PT_MM);
+                if (p.labels) body += partLabel(p.labels, d, box, D.label * PT_MM);
             }
             body += `<rect x="${f2(ox)}" y="${f2(oy)}" width="${f2(one.w)}" height="${f2(one.h)}" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}"/>`;
         }
@@ -366,7 +373,10 @@ function termFrac(p, t, ctx, vals) {
     const wholeOnly = t.frac === 'wnd' && !Number(an.n) && Number(an.w) > 0;
     const noWhole = t.frac === 'wnd' && !Number(an.w) && Number(an.n) > 0;
     const part = sfx && isTwin(ctx) ? (id) => ` data-mq-part="${id}"` : () => '';
-    const box = (id) => slotBox(ctx, id + sfx, v(id + sfx), mark, !(wholeOnly && id !== 'w') && !(noWhole && id === 'w'), part(id), p.boxDigits || 2);
+    // shown work (a thinking page's A / B, Error analysis) leaves a box empty when the pupil
+    // wrote nothing there: that empty box is part of the work, not an answer slot
+    const box = (id) => slotBox(ctx, id + sfx, v(id + sfx), mark,
+        !(wholeOnly && id !== 'w') && !(noWhole && id === 'w') && !(ctx.state === 'wrong' && v(id + sfx) === ''), part(id), p.boxDigits || 2);
     const TPL = { w: '{w}', n: `{n}/${t.d}`, d: `${t.n}/{d}`, nd: '{n}/{d}', wnd: '{w} {n}/{d}' };
     const wrapTerm = (html) => (sfx && isTwin(ctx) && TPL[t.frac] ? `<span data-mq-tpl="${TPL[t.frac]}" style="display:inline-flex;align-items:center;flex:none;">${html}</span>` : html);
     return wrapTerm(termFracInner(p, t, ctx, vals, box, v, sfx));
@@ -496,11 +506,15 @@ function areaProductGeom(a, size, hatch) {
     // the rows' bracket (left) and the columns' bracket (under), each with its fraction
     const rb = (a.shadeRows | 0) * ch, bx = x0 - 2;
     body += `<path d="M${f2(bx + 1.2)} ${f2(y0)} H${f2(bx)} V${f2(y0 + rb)} H${f2(bx + 1.2)}" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}"/>`;
-    body += text(bx - lab * 1.2 - 0.5, y0 + rb / 2 + lab * 0.35, `${a.n1}/${a.d1}`);
+    // each bracket's fraction stacked over its bar (TY-7: never a slash)
+    const sfrac = (cx, top, n, d) => text(cx, top + lab * 0.85, String(n))
+        + `<line x1="${f2(cx - lab * 0.45)}" y1="${f2(top + lab * 1.12)}" x2="${f2(cx + lab * 0.45)}" y2="${f2(top + lab * 1.12)}" stroke="${INK.ink}" stroke-width="${HAIR}"/>`
+        + text(cx, top + lab * 2.1, String(d));
+    body += sfrac(bx - lab * 0.9 - 0.8, y0 + rb / 2 - lab * 1.1, a.n1, a.d1);
     const cb = (a.markCols | 0) * cw, by = y0 + H + 2;
     body += `<path d="M${f2(x0)} ${f2(by - 1.2)} V${f2(by)} H${f2(x0 + cb)} V${f2(by - 1.2)}" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}"/>`;
-    body += text(x0 + cb / 2, by + lab + 0.8, `${a.n2}/${a.d2}`);
-    const wMm = x0 + W + 1, hMm = by + lab * 1.3 + 1.5;
+    body += sfrac(x0 + cb / 2, by + 0.6, a.n2, a.d2);
+    const wMm = x0 + W + 1, hMm = by + lab * 2.4 + 1.5;
     return { body, wMm, hMm, aria: `area model: rows and columns` };
 }
 function areaProduct(p, ctx) {
@@ -594,13 +608,17 @@ function renderRow(p, ctx) {
                 + `</span>`;
         }
         const eq = `${join(p, (p.joins || [])[n - 1] || '=', ctx, vals)}${renderTerm(p, terms[n], n, ctx, vals, true)}`;
-        parts.push(`<span style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};flex:none;">`
-            + (p.area
-                // the area model above a sentence of numbers, the sentence on one line
-                ? `${areaProduct(p, ctx)}<span${hold} style="display:flex;align-items:center;gap:${L(ctx, 4)};">${top.join('')}${eq}</span>`
-                : p.oneLine && !stacked ? topRow
+        if (p.area) {
+            // the area model and the sentence of numbers (on one line) WRAP like modelTop: under
+            // each other in a narrow cell, side by side in a whole-width one (RUBRIC H13)
+            parts.push(`<span class="fm-mtop" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:${L(ctx, 3)} ${L(ctx, 10)};flex:1 1 auto;min-width:0;">`
+                + `<span style="display:flex;flex:none;">${areaProduct(p, ctx)}</span><span${hold} style="display:flex;align-items:center;gap:${L(ctx, 4)};flex:none;">${top.join('')}${eq}</span></span>`);
+        } else {
+            parts.push(`<span style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};flex:none;">`
+                + (p.oneLine && !stacked ? topRow
                     : `${topRow}<span${hold} style="display:flex;align-items:center;gap:${L(ctx, 4)};">${eq}</span>`)
-            + `</span>`);
+                + `</span>`);
+        }
     } else {
         terms.forEach((t, i) => {
             if (i > 0) parts.push(join(p, (p.joins || [])[i - 1] || '', ctx, vals));
@@ -620,6 +638,17 @@ function renderRow(p, ctx) {
     const multi = isTwin(ctx) && answerTerms(p).length > 1 ? ` data-mq-join="${esc(p.answerJoin || ' + ')}"` : '';
     return `<div class="fm-row"${slotAttrs}${shadeSlot}${model}${multi}${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;${col}flex-wrap:nowrap;align-items:center;justify-content:center;`
         + `gap:${L(ctx, pick ? 5 : 4)};row-gap:${L(ctx, 4)};">${parts.join('')}</div>`;
+}
+
+/**
+ * A model and its sentence in a wrapping row (modelTop, area): side by side when both fit one of
+ * two columns, or when one is already wider than that (the item gets a whole-width cell, where the
+ * two stand side by side); otherwise one under the other.
+ */
+function sideOrStack(mw, mh, lw, lh, gap) {
+    const side = mw + 10 + lw;
+    if (side <= 80 || (Math.max(mw, lw) > 80 && side <= 170)) return { w: side, h: Math.max(mh, lh) };
+    return { w: Math.max(mw, lw), h: mh + gap + lh };
 }
 
 /** Natural size of the row (mm at the ctx preset), for the layout. */
@@ -658,10 +687,11 @@ function rowSize(p, ctx) {
         const joinsW = (terms.length - 1) * (dig * 0.75 + 2 * 3);
         const lineW = terms.reduce((a, t) => a + fracW(t), 0) + joinsW;
         const lineH = Math.max(...terms.map((t) => fracH(t)));
-        return { w: Math.max(g.wMm, lineW), h: g.hMm + 4 + lineH };
+        return sideOrStack(g.wMm, g.hMm, lineW, lineH, 4);
     }
     const split = answerLine(p);
     const list = split ? terms.slice(0, -1) : terms;
+    const numbersOnly = !terms.some((t) => t.kind) && !p.area;
     const stacked = split && !!p.stack;
     const tb = stacked ? false : below;
     list.forEach((t, i) => {
@@ -673,17 +703,19 @@ function rowSize(p, ctx) {
             w = Math.max(w, tw);
             h += th + (i > 0 ? dig * 1.05 + 4 : 0);
         } else {
-            w += tw + (i > 0 ? 8 + 8 : 0);
+            // a sign between two pictures takes room for the pictures' spacing; between numbers
+            // only (a No-Visuals sentence) it is its glyph and the row's two gaps (measured)
+            w += tw + (i > 0 ? (numbersOnly ? 8 + dig * 0.62 : 8 + 8) : 0);
             h = Math.max(h, th + (t.letter ? 11 : 0));
         }
     });
     if (split) {
         const last = terms[terms.length - 1];
         if (p.area) {
-            // the area model over one line: the numbers, "=", the answer
+            // the area model and one line: the numbers, "=", the answer (side by side when wide)
             const g = areaProductGeom(p.area, size, false);
-            w = Math.max(g.wMm, w + 16 + fracW(last));
-            h = g.hMm + 3 + Math.max(h, fracH(last));
+            const r = sideOrStack(g.wMm, g.hMm, w + 16 + fracW(last), Math.max(h, fracH(last)), 3);
+            w = r.w; h = r.h;
         } else if (p.oneLine && !stacked) {
             w += 16 + fracW(last);
             h = Math.max(h, (list.reduce((m, t) => Math.max(m, t.kind ? fracModelGeom({ n: t.n, d: t.d, w: t.w, kind: t.kind, size, wholeMm: p.wholeMm, blank: true, models: countsOf(t).models, copies: t.copies, perRow: p.perRow, barH: p.barH }).hMm : 0), 0)) + 2 + fracH(last));
@@ -1003,7 +1035,8 @@ register('frac-model', {
         const st = storySize(p, ctx);
         const wMm = Math.ceil(Math.max(r.w, st.w) + 8), hMm = Math.ceil(r.h + st.h + 8);
         // a story keeps its lines whole: two columns at most, one when a line is longer than half the page
-        const maxCols = wMm <= 56 && !st.h ? 3 : wMm <= 88 ? 2 : 1;
+        // a story is a word problem: its own single column (PT-WPR-1)
+        const maxCols = st.h ? 1 : wMm <= 56 ? 3 : wMm <= 88 ? 2 : 1;
         return { wMm, hMm, measure: true, factLike: false, maxCols };
     },
     inputs(p) {

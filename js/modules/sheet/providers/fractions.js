@@ -22,7 +22,7 @@
 //
 // Pure module (SCC-01).
 
-import { registerSkill } from '../contract.js';
+import { registerSkill, getProvider } from '../contract.js';
 import { strings, step, clampSteps, chooseWrong } from './util.js';
 
 const payloadOf = (q) => (q && q.cell && q.cell.template === 'frac-model' && q.cell.payload) || null;
@@ -47,6 +47,8 @@ function fracOpen(q, { rows = 6 } = {}) {
     if (p.task === 'shade' || p.task === 'pick') base = p.show;
     else if (p.task === 'write' || p.task === 'part' || p.task === 'sign') base = p.terms[0];
     else if (p.task === 'op') {
+        const so = sentenceOpen(q, rows);
+        if (so) return so;
         const s = sentenceOf(q);
         const a = p.answer || {};
         if (s && s.terms.length === 2 && s.ops[0] === '+' && !s.terms[0].w && !s.terms[1].w && s.terms[0].d === s.terms[1].d && !a.w && a.n) {
@@ -65,6 +67,8 @@ function fracOpen(q, { rows = 6 } = {}) {
             }
         }
         base = a.n && !a.w ? { n: a.n, d: a.d } : null;
+        // a mixed-number answer: the fractions equal to it written improper (7/4 = 14/8 ...)
+        if (!base && Number(a.w) > 0 && Number(a.n) > 0 && Number(a.d) > 1) return equivOpen(Number(a.w) * Number(a.d) + Number(a.n), Number(a.d), rows);
     }
     if (!base || !(Number(base.n) > 0) || !(Number(base.d) > 1)) return null;
     const g = gcd(Number(base.n), Number(base.d));
@@ -156,6 +160,40 @@ function mixedOpen(q, { rows = 6 } = {}) {
         columns: ['Improper fraction', 'Mixed number'], example: [fr(own, d), mixedText(Math.floor(own / d), own % d, d)], keyRows, total: Infinity };
 }
 
+/**
+ * Stretch for a + or − sentence with ONE denominator (fractions or mixed numbers, the answer or
+ * a missing number): other pairs that make the same total, or have the same difference, counted
+ * in parts of that denominator. Unlike denominators return null (the equivalents task follows).
+ */
+function sentenceOpen(q, rows = 6) {
+    const p = payloadOf(q);
+    if (!p || p.task !== 'op' || (p.terms || []).length !== 3) return null;
+    const op = (p.joins || [])[0];
+    if (op !== '+' && op !== '−') return null;
+    const ai = p.terms.findIndex((t) => /^(n|d|w|nd|wnd)$/.test(t.frac || ''));
+    const [x, y, r0] = p.terms;
+    const a = p.answer || {};
+    // the three numbers, the unknown taken from the answer
+    const fill = (t, i) => (i === ai ? { w: Number(a.w) || 0, n: Number(a.n) || 0, d: Number(a.d) || Number(t.d) || 1 } : { w: Number(t.w) || 0, n: Number(t.n) || 0, d: Number(t.d) || 1 });
+    const X = fill(x, 0), Y = fill(y, 1), R = fill(r0, 2);
+    const D = X.d;
+    if (Y.d !== D) return null;
+    const parts = (t) => (t.n ? (t.d === D ? t.w * D + t.n : null) : t.w * D);
+    const r = parts(R);
+    if (r === null || !(r > 0)) return null;
+    const text = (v) => (v % D === 0 ? String(v / D) : mixedText(Math.floor(v / D), v % D, D));
+    const keyRows = [];
+    if (op === '+') {
+        if (r < 5) return null;
+        for (let k = r - 2; k >= 1 && keyRows.length < rows; k--) keyRows.push([text(k), text(r - k), text(r)]);
+        return { prompt: [`Two numbers add to ${text(r)}.`, 'Find different pairs.'], columns: ['First number', 'Second number', 'Check: total'],
+            example: [text(r - 1), text(1), text(r)], keyRows, total: r - 1 };
+    }
+    for (let k = 2; keyRows.length < rows; k++) keyRows.push([text(r + k), text(k), text(r)]);
+    return { prompt: [`Two numbers have a difference of ${text(r)}.`, 'Find different pairs.'], columns: ['First number', 'Second number', 'Check: difference'],
+        example: [text(r + 1), text(1), text(r)], keyRows, total: Infinity };
+}
+
 /* ================================================================ write the fraction shown */
 
 function writeSteps(q) {
@@ -212,6 +250,36 @@ registerSkill('fractions:write_fraction', {
     misconceptions: ['counted-unshaded', 'part-over-part', 'counted-ticks'],
     workedSteps: writeSteps,
     wrongAnswer: writeWrong,
+});
+
+/*
+ * composing:fraction_number_line: reading the dot (a `frac-model` line, write task) or marking the
+ * fraction (the `nl-place` cell). A marking item takes the place-it-on-the-line provider's
+ * strings, steps and wrong answers, so each item gets the words of its own task (LESSONS L6).
+ */
+const FNL_WRITE = strings({
+    iCan: 'I Can find fractions on a number line',
+    instructionKey: 'line-write',
+    steps: ['Count the equal parts from 0 to 1. That is the denominator.', 'Count the parts from 0 to the dot. That is the numerator.', 'Write the numerator over the denominator.'],
+    say: 'The dot is at __.',
+    sayValues: (q) => { const p = payloadOf(q); return p && p.task === 'write' ? [fr(p.terms[0].n, p.terms[0].d)] : null; },
+    vocabulary: ['number line', 'equal parts', 'numerator', 'denominator'],
+});
+const FNL_PLACE = strings({
+    iCan: 'I Can find fractions on a number line',
+    instructionKey: 'line-mark',
+    steps: ['Find what one space on the line is worth.', 'Count the spaces from 0 to the number.', 'Mark a dot on that tick.'],
+    say: '__ is __ parts from 0.',
+    vocabulary: ['number line', 'tick', 'equal parts'],
+});
+const isPlace = (q) => !!(q && q.cell && q.cell.template === 'nl-place');
+const placeDef = () => getProvider('fractions', 'fraction_nl_drag');
+registerSkill('composing:fraction_number_line', {
+    open: fracOpen,
+    strings: (ref = {}) => (isPlace(ref && ref.q) ? FNL_PLACE(ref) : FNL_WRITE(ref)),
+    misconceptions: ['counted-unshaded', 'counted-ticks', 'counted-from-end'],
+    workedSteps: (q) => (isPlace(q) ? (placeDef().workedSteps || (() => []))(q) : writeSteps(q)),
+    wrongAnswer: (q) => (isPlace(q) ? (placeDef().wrongAnswer || (() => null))(q) : writeWrong(q)),
 });
 
 registerSkill('fractions:identify', {
@@ -556,7 +624,7 @@ function sentenceWrong(q) {
     }
     if (op === '÷') {
         // the commonest error: divided the other way (4 ÷ 1/3 read as 4 × 1/3, 1/3 ÷ 2 as 2/3)
-        if (isWholeTerm(x)) c.push({ value: fr(x.w, y.d), misconception: 'divided-wrong-way', slot: 'w', slots: { w: fr(x.w, y.d) }, explain: `Found ${fr(1, y.d)} of ${x.w}. The question is how many ${fr(1, y.d)} parts FIT in ${x.w}.` });
+        if (isWholeTerm(x)) c.push({ value: String(y.d), misconception: 'one-whole-only', slot: 'w', slots: { w: String(y.d) }, explain: `Counted the ${fr(1, y.d)} parts in ONE whole only. Each of the ${x.w} wholes has ${y.d} of them.` });
         else c.push({ value: fr(y.w, x.d), misconception: 'divided-wrong-way', slot: 'n', slots: { n: String(y.w), d: String(x.d), w: '' }, explain: `Multiplied instead of dividing. Cut ${fr(x.n, x.d)} into ${y.w} parts: each part is SMALLER.` });
     }
     return chooseWrong(q, c);
@@ -579,15 +647,18 @@ const sayOf = (q) => {
 };
 
 /** Register one fraction-sentence skill (its label and its operation). */
-export function registerFractionSentence(key, op, extra = {}) {
+function sentenceDef(op, extra = {}) {
     const def = SENTENCE[op];
-    registerSkill(key, {
+    return {
         open: fracOpen,
         strings: strings(Object.assign({}, def, { sayValues: sayOf, vocabulary: ['numerator', 'denominator'] }, extra)),
-        misconceptions: ['added-denominators', 'subtracted-denominators', 'did-not-regroup', 'wholes-only', 'multiplied-denominator', 'divided-wrong-way'],
+        misconceptions: ['added-denominators', 'subtracted-denominators', 'did-not-regroup', 'wholes-only', 'multiplied-denominator', 'divided-wrong-way', 'one-whole-only'],
         workedSteps: sentenceSteps,
         wrongAnswer: sentenceWrong,
-    });
+    };
+}
+export function registerFractionSentence(key, op, extra = {}) {
+    registerSkill(key, sentenceDef(op, extra));
 }
 
 registerFractionSentence('fraction_operations:add_fractions_like', '+', { iCan: 'I Can add fractions with the same denominator' });
@@ -606,6 +677,68 @@ registerFractionSentence('fraction_operations:mult_frac_whole', 'x');
 registerFractionSentence('fraction_operations:mult_frac_frac', 'x', { iCan: 'I Can multiply two fractions',
     steps: ['Draw rows for the first fraction.', 'Take the columns of the second fraction.', 'Count the cells inside both. Count all the cells.'], say: '__ times __ is __.' });
 registerFractionSentence('fraction_operations:div_unit_fraction', '÷');
+// the No-Visuals twins: the same sentence in numbers; a missing-number item has its own steps
+function missingOf(q) {
+    const p = payloadOf(q);
+    if (!p || p.task !== 'op') return null;
+    const i = p.terms.findIndex((t) => /^(n|d|w|nd|wnd)$/.test(t.frac || ''));
+    if (i < 0 || i === p.terms.length - 1) return null;
+    return { p, x: p.terms[0], y: p.terms[i], r: p.terms[p.terms.length - 1], op: p.joins[0] };
+}
+const mt = (t) => mixedText(t.w, t.n, t.d);
+function registerNvSentence(key, op, extra) {
+    const base = sentenceDef(op, extra);
+    const steps0 = base.workedSteps, wrong0 = base.wrongAnswer;
+    // the instruction follows the item's form (LESSONS L6): "Write the missing number." for a
+    // missing-number item, "Write the answer in simplest form." for a simplify item
+    const miss = strings(Object.assign({}, SENTENCE[op], { sayValues: sayOf, vocabulary: ['numerator', 'denominator'] }, extra, { instructionKey: 'missing' }));
+    const simp = strings(Object.assign({}, SENTENCE[op], { sayValues: sayOf, vocabulary: ['numerator', 'denominator', 'simplest form'] }, extra, { instructionKey: 'simplest-form' }));
+    registerSkill(key, {
+        open: fracOpen,
+        strings: (ref = {}) => {
+            const q = ref && ref.q;
+            if (q && missingOf(q)) return miss(ref);
+            if (q && q._variant === 'simplify') return simp(ref);
+            return base.strings(ref);
+        },
+        misconceptions: [...base.misconceptions, 'added-instead'],
+        workedSteps: (q) => {
+            const m = missingOf(q);
+            if (!m) return steps0(q);
+            const sub = m.op === '−';
+            const ans = mt(m.y);
+            const marks = m.y.frac === 'n' ? [{ slot: 'n', value: String(m.y.n) }]
+                : [{ slot: 'w', value: m.y.w ? String(m.y.w) : '' }, { slot: 'n', value: String(m.y.n) }, { slot: 'd', value: String(m.y.d) }];
+            return clampSteps([
+                step(sub ? `${mt(m.x)} take away the missing number leaves ${mt(m.r)}.` : `${mt(m.x)} and the missing number make ${mt(m.r)}.`),
+                step(sub ? `Find it: ${mt(m.x)} − ${mt(m.r)} = ${ans}.` : `Find it: ${mt(m.r)} − ${mt(m.x)} = ${ans}.`),
+                step(`Check: ${mt(m.x)} ${m.op} ${ans} = ${mt(m.r)}. Write ${ans}.`, marks),
+            ]);
+        },
+        wrongAnswer: (q) => {
+            const m = missingOf(q);
+            if (!m) return wrong0(q);
+            if (m.y.frac === 'n') {
+                const v = m.x.n + m.r.n;
+                return chooseWrong(q, [{ value: String(v), misconception: 'added-instead', slot: 'n', slots: { n: String(v) },
+                    explain: m.op === '−' ? 'Added the two numbers you see. Take the answer away from the first number.' : 'Added the two numbers you see. The missing number is the difference.' }]);
+            }
+            return null;
+        },
+    });
+}
+registerNvSentence('fraction_operations:add_frac_like_nv', '+', { iCan: 'I Can add fractions with the same denominator' });
+registerNvSentence('fraction_operations:sub_frac_like_nv', '−', { iCan: 'I Can subtract fractions with the same denominator' });
+registerNvSentence('fraction_operations:add_mixed_like_nv', '+', { iCan: 'I Can add mixed numbers with the same denominator' });
+registerNvSentence('fraction_operations:sub_mixed_like_nv', '−', { iCan: 'I Can subtract mixed numbers with the same denominator' });
+registerNvSentence('fraction_operations:add_mixed_unlike_nv', '+', { iCan: 'I Can add mixed numbers with different denominators',
+    steps: ['Find a denominator both go into.', 'Change both fraction parts to it.', 'Add the wholes, then the parts. Regroup a whole.'] });
+registerNvSentence('fraction_operations:sub_mixed_unlike_nv', '−', { iCan: 'I Can subtract mixed numbers with different denominators',
+    steps: ['Find a denominator both go into.', 'Change both fraction parts to it.', 'Subtract. Break a whole if the part is too small.'] });
+registerNvSentence('fraction_operations:add_frac_unlike_nv', '+', { iCan: 'I Can add fractions with different denominators',
+    steps: ['Find a denominator both go into.', 'Change both fractions to it.', 'Add the numerators. Simplify.'] });
+registerNvSentence('fraction_operations:sub_frac_unlike_nv', '−', { iCan: 'I Can subtract fractions with different denominators',
+    steps: ['Find a denominator both go into.', 'Change both fractions to it.', 'Subtract the numerators. Simplify.'] });
 registerFractionSentence('fractions:fraction_bar_ops', '+', { iCan: 'I Can add and subtract fractions with fraction bars',
     steps: ['Look at the bars: are the parts the same size?', 'If not, cut the bars into the same size of parts.', 'Add or subtract the parts. Write the answer.'] });
 
@@ -995,15 +1128,25 @@ const EQUIV_DEF = {
         ]);
     },
 };
-registerSkill('fractions:equivalent', EQUIV_DEF);
-registerSkill('fractions:equiv_frac_nv', { ...EQUIV_DEF, strings: strings({
+/** An = / ≠ item takes its own instruction and steps (LESSONS L6); the rest keep the skill's. */
+const EQ_SIGN = strings({
+    iCan: 'I Can find equivalent fractions',
+    instructionKey: 'equal-or-not',
+    steps: ['Look at the denominators: what is the first one multiplied by?', 'Multiply the first numerator by the same number.', 'The same fraction? Write =. Not the same? Write ≠.'],
+    say: '__ and __ are __.',
+    sayValues: (q) => { const p = payloadOf(q); if (!p || p.task !== 'sign') return null; const [a, b] = p.terms; return [fr(a.n, a.d), fr(b.n, b.d), p.answer.sign === '=' ? 'equal' : 'not equal']; },
+    vocabulary: ['equivalent', 'equal', 'not equal'],
+});
+const bySign = (def) => (ref = {}) => { const p = payloadOf(ref && ref.q); return p && p.task === 'sign' ? EQ_SIGN(ref) : def(ref); };
+registerSkill('fractions:equivalent', { ...EQUIV_DEF, strings: bySign(EQUIV_DEF.strings) });
+registerSkill('fractions:equiv_frac_nv', { ...EQUIV_DEF, strings: bySign(strings({
     iCan: 'I Can find equivalent fractions without pictures',
     instructionKey: 'missing',
     steps: ['Look at the two numbers you know on the top or the bottom: what are they multiplied or divided by?', 'Do the same to the other part.', 'Write the missing number.'],
     say: '__ is equal to __.',
     sayValues: (q) => { const p = payloadOf(q); return p && p.task === 'op' ? [fr(p.terms[0].n, p.terms[0].d), fr(p.answer.n, p.answer.d)] : null; },
     vocabulary: ['equivalent', 'numerator', 'denominator', 'multiply', 'divide'],
-}) });
+})) });
 
 registerSkill('fractions:simplify', {
     open: fracOpen,

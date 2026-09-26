@@ -101,7 +101,7 @@ function _fBarModes(payload) {
     const oh = state.skillOptions;
     if (oh && oh.lineHops === true && payload.task === 'write' && payload.terms.some(t => t.kind === 'line')) payload.hops = true;
     const o = state.skillOptions;
-    if (o && o.partLabels === true && payload.terms.some(t => t.kind === 'bar')) payload.labels = 'unit';
+    if (o && o.partLabels === true && payload.terms.some(t => t.kind && t.kind !== 'line' && t.kind !== 'hundred')) payload.labels = 'unit';
     return payload;
 }
 
@@ -151,7 +151,7 @@ function _fParts(str) {
  * whole (never the answer: RP-1), "=", and the answer boxes - a mixed number's three boxes when
  * the answer can be 1 or more (`mixed`), a fraction's two otherwise. Pictures off: numbers only.
  */
-function _fSentenceKit(q, terms, ops, kind, { mixed = false, wholeMm = 26, stack = false, perRow = 0, area = null, barH = 0, story = null, modelTop = false } = {}) {
+function _fSentenceKit(q, terms, ops, kind, { mixed = false, wholeMm = 26, stack = false, perRow = 0, area = null, barH = 0, story = null, modelTop = false, boxDigits = 0 } = {}) {
     const k = _fPicturesOff() ? null : kind;
     const a = _fParts(q.ans) || {};
     // the answer's boxes: a mixed number's three where the answer can reach 1, a fraction's two,
@@ -172,8 +172,64 @@ function _fSentenceKit(q, terms, ops, kind, { mixed = false, wholeMm = 26, stack
     if (Array.isArray(story) && story.length) { payload.story = story; payload.oneLine = true; }
     // `modelTop`: the first term's picture alone above, the whole sentence on one line under it
     if (modelTop && k) payload.modelTop = true;
+    // one-digit answer boxes when every number of the answer is a single digit (a narrower
+    // sentence keeps to one of two columns)
+    if (boxDigits) payload.boxDigits = boxDigits;
     _fKit(q, payload);
     q.fractionModel = k;
+}
+
+/** `regroup` on the mixed-number add / subtract skills: 'none' | 'always', or null (some items). */
+function _fRegroup() {
+    const v = state.skillOptions && state.skillOptions.regroup;
+    return v === 'none' || v === 'always' ? v : null;
+}
+
+/**
+ * Two mixed-number fraction parts with one denominator, honouring `regroup` (options-r3 O2: the
+ * essential difficulty step). Adding: the parts make a whole or more (regroup) or not. Taking away:
+ * the second part is bigger than the first (borrow a whole) or not. `null` mixes them.
+ */
+function _fMixedParts(sub) {
+    const rg = _fRegroup();
+    const need = rg === 'always' ? true : rg === 'none' ? false : Math.random() < 0.5;
+    // a page with no regrouping needs 3 parts at least (halves always regroup 1/2 + 1/2)
+    const den = pick(need && !sub ? [2, 3, 4, 5, 6, 8] : [3, 4, 5, 6, 8]);
+    let f1, f2;
+    if (!sub) {
+        if (need) { f1 = randInt(Math.ceil(den / 2), den - 1); f2 = randInt(Math.max(1, den - f1), den - 1); }
+        else { f1 = randInt(1, den - 2); f2 = randInt(1, den - 1 - f1); }
+    } else if (need) { f1 = randInt(1, den - 2); f2 = randInt(f1 + 1, den - 1); }
+    else { f1 = randInt(2, den - 1); f2 = randInt(1, f1 - 1); }
+    return { den, f1, f2, regroup: sub ? f2 > f1 : f1 + f2 >= den };
+}
+
+/**
+ * compare `pairs` (options-r3 O2, the 3.NF.A.3d / 4.NF.A.2 ladder): 'like' one denominator,
+ * 'sameNum' one numerator, 'unlike' both different; null mixes them. Never the same fraction twice.
+ */
+function _fComparePair(dens) {
+    const v = state.skillOptions && state.skillOptions.pairs;
+    const kind = v === 'like' || v === 'sameNum' || v === 'unlike' ? v : pick(['like', 'sameNum', 'unlike', 'unlike']);
+    for (let t = 0; t < 40; t++) {
+        const d1 = pick(dens);
+        if (kind === 'like') {
+            if (d1 < 3) continue;
+            const n1 = randInt(1, d1 - 1);
+            let n2 = randInt(1, d1 - 1);
+            if (n2 === n1) n2 = n1 < d1 - 1 ? n1 + 1 : n1 - 1;
+            return { n1, d1, n2, d2: d1 };
+        }
+        const d2 = pick(dens.filter(d => d !== d1));
+        if (kind === 'sameNum') {
+            const n = randInt(1, Math.min(d1, d2) - 1);
+            return { n1: n, d1, n2: n, d2 };
+        }
+        const n1 = randInt(1, d1 - 1), n2 = randInt(1, d2 - 1);
+        if (n1 === n2 || n1 * d2 === n2 * d1) continue;
+        return { n1, d1, n2, d2 };
+    }
+    return { n1: 1, d1: 3, n2: 2, d2: 5 };
 }
 
 // P12: a SET option the teacher changed from its default (skill-options.js), else null.
@@ -324,19 +380,26 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 // Grade 4: Add fractions with SAME denominator
                 const den = rng(2, 12);
                 const maxNum = den - 1;
-                const n1 = rng(1, maxNum);
-                const n2 = rng(1, maxNum);
+                // `sums` (options-r3 O2): the sum less than 1, or past 1 (an improper sum to write
+                // as a mixed number); by default either
+                const _sums = state.skillOptions && state.skillOptions.sums;
+                const den2 = _sums === 'under' || _sums === 'over' ? Math.max(3, den) : den;
+                let n1 = rng(1, maxNum);
+                let n2 = rng(1, maxNum);
+                if (_sums === 'under') { n1 = rng(1, den2 - 2); n2 = rng(1, den2 - 1 - n1); }
+                else if (_sums === 'over') { n1 = rng(Math.ceil(den2 / 2), den2 - 1); n2 = rng(den2 - n1 + 1, den2 - 1); }
+                else { n1 = Math.min(n1, den2 - 1); n2 = Math.min(n2, den2 - 1); }
                 const sumNum = n1 + n2;
-                const answer = _fracStr(sumNum, den);
+                const answer = _fracStr(sumNum, den2);
 
-                q.text = `Calculate: ${n1}/${den} + ${n2}/${den} = ?`;
+                q.text = `Calculate: ${n1}/${den2} + ${n2}/${den2} = ?`;
                 q.ans = answer;
                 q.answerType = "text";
-                q.hint = `Same denominator! Add the numerators: ${n1} + ${n2} = ${sumNum}. Then simplify ${sumNum}/${den} if possible.`;
+                q.hint = `Same denominator! Add the numerators: ${n1} + ${n2} = ${sumNum}. Then simplify ${sumNum}/${den2} if possible.`;
 
                 // KIT (O6 lane AP3): both fractions drawn on one whole as the ticked model (bars by
                 // default), never the sum (RP-1); the pupil writes the sum in the boxes after "=".
-                _fSentenceKit(q, [{ n: n1, d: den }, { n: n2, d: den }], ['+'], _fModelPick() || 'bar', { mixed: sumNum >= den });
+                _fSentenceKit(q, [{ n: n1, d: den2 }, { n: n2, d: den2 }], ['+'], _fModelPick() || 'bar', { mixed: sumNum >= den2 });
                 return;
 
             } else if (fracSkill === "sub_fractions_like") {
@@ -358,12 +421,12 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
 
             } else if (fracSkill === "add_mixed_like") {
-                // Grade 4: Add mixed numbers with SAME denominator
-                const den = pick([2, 3, 4, 5, 6, 8]);
-                const w1 = rng(1, 4);
-                const f1 = rng(1, den - 1);
-                const w2 = rng(1, 3);
-                const f2 = rng(1, den - 1);
+                // Grade 4: Add mixed numbers with SAME denominator; `regroup` sets whether the parts
+                // make a whole
+                const { den, f1, f2 } = _fMixedParts(false);
+                // wholes 1 to 3 and 1 to 2: every mixed number fits two rows of bars
+                const w1 = rng(1, 3);
+                const w2 = rng(1, 2);
                 const totalNum = (w1 * den + f1) + (w2 * den + f2);
                 const answer = _fracStr(totalNum, den);
 
@@ -387,20 +450,12 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
 
             } else if (fracSkill === "sub_mixed_like") {
-                // Grade 4: Subtract mixed numbers with SAME denominator
-                const den = pick([2, 3, 4, 5, 6, 8]);
-                let w1 = rng(2, 5);
-                let f1 = rng(1, den - 1);
-                let w2 = rng(1, w1 - 1);
-                let f2 = rng(1, den - 1);
-                // Ensure result >= 0
-                const total1 = w1 * den + f1;
-                const total2 = w2 * den + f2;
-                if (total1 <= total2) {
-                    w1 = w2 + 1;
-                    f1 = f2 + 1;
-                    if (f1 >= den) { f1 = 1; w1++; }
-                }
+                // Grade 4: Subtract mixed numbers with SAME denominator; `regroup` sets whether a
+                // whole is broken up (the second part bigger than the first). w1 > w2, so the
+                // difference is always positive.
+                const { den, f1, f2 } = _fMixedParts(true);
+                const w1 = rng(2, 3);
+                const w2 = rng(1, w1 - 1);
                 const resultNum = (w1 * den + f1) - (w2 * den + f2);
                 const answer = _fracStr(Math.max(0, resultNum), den);
                 const needsBorrow = f1 < f2;
@@ -682,607 +737,181 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             // ==================== NON-VISUAL ADD/SUB FRACTION SKILLS ====================
 
-            } else if (fracSkill === "add_frac_like_nv" && Math.random() < 0.20) {
-                // Phase 4.5 batch 9: dnd-categorize variant - sort sums vs 1
-                const den = pick([4, 5, 6, 8]);
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < 5 && safety < 60) {
-                    safety++;
-                    const a = rng(1, den - 1);
-                    const b = rng(1, den - 1);
-                    const key = `${a}+${b}/${den}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    items.push({ a, b, sum: (a + b) / den });
-                }
-                const tiles = items.map((it, i) => ({ id: 't' + i, label: `${it.a}/${den} + ${it.b}/${den}` }));
-                const ans = {};
-                items.forEach((it, i) => {
-                    if (Math.abs(it.sum - 1) < 1e-9) ans['t' + i] = 'eq';
-                    else if (it.sum > 1) ans['t' + i] = 'more';
-                    else ans['t' + i] = 'less';
-                });
-                q.text = 'Sort each sum into the correct bin.';
-                q.answerType = 'dnd-generic';
-                q.dndMode = 'categorize';
-                q.tiles = tiles;
-                q.bins = [
-                    { id: 'less', label: 'Less than 1' },
-                    { id: 'eq', label: 'Equal to 1' },
-                    { id: 'more', label: 'More than 1' }
-                ];
-                q.ans = ans;
-                q.hint = `Add the numerators and compare to ${den} (= 1 whole).`;
-                q.options = [];
-                q.printFormat = 'dnd-generic';
-                q.skillLabel = 'Add Fractions (Like)';
-                return;
-            } else if (fracSkill === "add_frac_like_nv") {
-                // Grade 4: Add proper fractions, like denominators (no visual)
-                const den = rng(2, 12);
-                const maxNum = den - 1;
-                // LRU rotation across 3 sub-types (was Math.random() chain).
+            } else if (fracSkill === "add_frac_like_nv" || fracSkill === "sub_frac_like_nv") {
+                // Grade 4 (4.NF.B.3a): add or subtract fractions with one denominator, numbers only.
+                // KIT (fractions lane; options-r3 O4: the page ignored the ticked item type and
+                // printed 2-3 legacy cells): three forms, the `forms` option, each exactly what its
+                // label says -
+                //   straight     2/6 + 3/6 = [ ]/[ ]      (any equal answer is right on screen)
+                //   missing_num  2/6 + [ ]/6 = 5/6
+                //   simplify     2/6 + 2/6 = [ ]/[ ] in simplest form (a mixed number past 1)
+                // The old sort-into-bins form was legacy print only and is gone.
+                const sub = fracSkill === "sub_frac_like_nv";
+                const op = sub ? '\u2212' : '+';
                 const roll = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('add_frac_like_nv', ["straight","missing_num","simplify"])
-                    : (Math.random() < 0.5 ? 'straight' : (Math.random() < 0.5 ? 'missing_num' : 'simplify'));
+                    ? window.pickVariant(fracSkill, ["straight", "missing_num", "simplify"])
+                    : pick(['straight', 'missing_num', 'simplify']);
                 q._variant = roll;
-
-                if (roll === 'straight') {
-                    // Type 1: Straightforward addition
-                    const n1 = rng(1, maxNum);
-                    const n2 = rng(1, maxNum);
-                    const sumNum = n1 + n2;
-                    q.text = `${n1}/${den} + ${n2}/${den} = ?`;
-                    q.ans = _fracStr(sumNum, den);
-                    q.hint = `Same denominator: add numerators. ${n1} + ${n2} = ${sumNum}. Simplify ${sumNum}/${den} if possible.`;
-                } else if (roll === 'missing_num') {
-                    // Type 2: Missing numerator
-                    const n1 = rng(1, maxNum);
-                    const n2 = rng(1, maxNum);
-                    const sumNum = n1 + n2;
-                    q.text = `${n1}/${den} + ?/${den} = ${_fracStr(sumNum, den)}. Find the missing numerator.`;
-                    q.ans = String(n2);
-                    q.hint = `What plus ${n1} equals ${sumNum}? The missing numerator is ${sumNum} \u2212 ${n1}.`;
-                } else {
-                    // Type 3: Simplify the sum
-                    const n1 = rng(1, maxNum);
-                    const n2 = rng(1, maxNum);
-                    const sumNum = n1 + n2;
-                    q.text = `Add and simplify: ${n1}/${den} + ${n2}/${den}`;
-                    q.ans = _fracStr(sumNum, den);
-                    const [sn, sd] = _simplify(sumNum, den);
-                    q.hint = `${n1} + ${n2} = ${sumNum}. So the sum is ${sumNum}/${den}${sn !== sumNum || sd !== den ? ` = ${sn}/${sd}` : ''}.${sumNum >= den ? ` Convert to mixed number: ${_fracStr(sumNum, den)}.` : ''}`;
-                }
-                q.answerType = "text";
-                q.printFormat = "frac-add-like-nv";
-                q.skillLabel = "Add Fractions (Like)";
-                return;
-
-            } else if (fracSkill === "sub_frac_like_nv" && Math.random() < 0.20) {
-                // Phase 4.5 batch 9: dnd-categorize variant - sort differences relative to 1/2
-                const den = pick([4, 6, 8, 10]);
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < 5 && safety < 60) {
-                    safety++;
-                    const a = rng(2, den);
-                    const b = rng(1, a - 1);
-                    const key = `${a}-${b}/${den}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    items.push({ a, b, diff: (a - b) / den });
-                }
-                const tiles = items.map((it, i) => ({ id: 't' + i, label: `${it.a}/${den} - ${it.b}/${den}` }));
-                const ans = {};
-                items.forEach((it, i) => {
-                    if (Math.abs(it.diff - 0.5) < 1e-9) ans['t' + i] = 'eq';
-                    else if (it.diff > 0.5) ans['t' + i] = 'more';
-                    else ans['t' + i] = 'less';
-                });
-                q.text = 'Sort each difference into the correct bin (compared to 1/2).';
-                q.answerType = 'dnd-generic';
-                q.dndMode = 'categorize';
-                q.tiles = tiles;
-                q.bins = [
-                    { id: 'less', label: 'Less than 1/2' },
-                    { id: 'eq', label: 'Equal to 1/2' },
-                    { id: 'more', label: 'More than 1/2' }
-                ];
-                q.ans = ans;
-                q.hint = `Subtract the numerators, then compare ${den === 4 ? '2/4' : den === 6 ? '3/6' : den === 8 ? '4/8' : '5/10'} to your result.`;
+                const den = rng(3, 12);
+                // `sums` (adding): the sum under 1 or past 1; by default either
+                const _sums = !sub && state.skillOptions && state.skillOptions.sums;
+                let n1, n2;
+                if (sub) { n1 = rng(2, den); n2 = rng(1, n1 - 1); }
+                else if (_sums === 'under') { n1 = rng(1, den - 2); n2 = rng(1, den - 1 - n1); }
+                else if (_sums === 'over') { n1 = rng(Math.ceil(den / 2), den - 1); n2 = rng(den - n1 + 1, den - 1); }
+                else { n1 = rng(1, den - 1); n2 = rng(1, den - 1); }
+                // a whole-number sum has no fraction to write or simplify: one part less
+                if (!sub && n1 + n2 === den) { if (n2 > 1) n2 -= 1; else n1 -= 1; }
+                const res = sub ? n1 - n2 : n1 + n2;
+                q.answerType = 'text';
                 q.options = [];
-                q.printFormat = 'dnd-generic';
-                q.skillLabel = 'Subtract Fractions (Like)';
-                return;
-            } else if (fracSkill === "sub_frac_like_nv") {
-                // Grade 4: Subtract proper fractions, like denominators (no visual)
-                const den = rng(2, 12);
-                // LRU rotation across 3 sub-types (was Math.random() chain).
-                const roll = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('sub_frac_like_nv', ["straight","missing_num","simplify"])
-                    : (Math.random() < 0.5 ? 'straight' : (Math.random() < 0.5 ? 'missing_num' : 'simplify'));
-                q._variant = roll;
-
-                if (roll === 'straight') {
-                    // Type 1: Straightforward subtraction
-                    const n1 = rng(2, den);
-                    const n2 = rng(1, n1 - 1);
-                    const diffNum = n1 - n2;
-                    q.text = `${n1}/${den} \u2212 ${n2}/${den} = ?`;
-                    q.ans = _fracStr(diffNum, den);
-                    q.hint = `Same denominator: subtract numerators. ${n1} \u2212 ${n2} = ${diffNum}. Simplify ${diffNum}/${den} if possible.`;
-                } else if (roll === 'missing_num') {
-                    // Type 2: Missing numerator
-                    const n1 = rng(2, den);
-                    const n2 = rng(1, n1 - 1);
-                    const diffNum = n1 - n2;
-                    q.text = `${n1}/${den} \u2212 ?/${den} = ${_fracStr(diffNum, den)}. Find the missing numerator.`;
+                q.skillLabel = sub ? 'Subtract Fractions (Like)' : 'Add Fractions (Like)';
+                if (roll === 'missing_num') {
+                    q.text = `${n1}/${den} ${op} ?/${den} = ${res}/${den}. Find the missing numerator.`;
                     q.ans = String(n2);
-                    q.hint = `${n1} minus what equals ${diffNum}? The missing numerator is ${n1} \u2212 ${diffNum} = ${n2}.`;
-                } else {
-                    // Type 3: Subtract and simplify
-                    const n1 = rng(2, den);
-                    const n2 = rng(1, n1 - 1);
-                    const diffNum = n1 - n2;
-                    q.text = `Subtract and simplify: ${n1}/${den} \u2212 ${n2}/${den}`;
-                    q.ans = _fracStr(diffNum, den);
-                    const [sn, sd] = _simplify(diffNum, den);
-                    q.hint = `${n1} \u2212 ${n2} = ${diffNum}. So the difference is ${diffNum}/${den}${sn !== diffNum || sd !== den ? ` = ${sn}/${sd}` : ''}.`;
+                    q.hint = sub ? `${n1} take away what makes ${res}? ${n1} \u2212 ${res} = ${n2}.` : `What plus ${n1} makes ${res}? ${res} \u2212 ${n1} = ${n2}.`;
+                    _fKit(q, { task: 'op', terms: [{ n: n1, d: den }, { n: n2, d: den, frac: 'n' }, { n: res, d: den }], joins: [op, '='], answer: { n: n2, d: den }, boxDigits: n2 < 10 ? 1 : 2 });
+                    return;
                 }
-                q.answerType = "text";
-                q.printFormat = "frac-sub-like-nv";
-                q.skillLabel = "Subtract Fractions (Like)";
+                if (roll === 'simplify') {
+                    q.text = `${sub ? 'Subtract' : 'Add'} and simplify: ${n1}/${den} ${op} ${n2}/${den}`;
+                    q.ans = _fracStr(res, den);
+                    const [sn, sd] = _simplify(res, den);
+                    q.hint = `${n1} ${op} ${n2} = ${res}. So the answer is ${res}/${den}${sn !== res || sd !== den ? ` = ${sn}/${sd}` : ''}.${res > den ? ` Past 1: write it as ${_fracStr(res, den)}.` : ''}`;
+                    _fSentenceKit(q, [{ n: n1, d: den }, { n: n2, d: den }], [op], null, { mixed: res > den, boxDigits: den < 10 ? 1 : 2 });
+                    return;
+                }
+                q.text = `${n1}/${den} ${op} ${n2}/${den} = ?`;
+                q.ans = `${res}/${den}`;
+                q.noSimplify = false;
+                q.hint = `Same denominator: ${sub ? 'subtract' : 'add'} the numerators. ${n1} ${op} ${n2} = ${res}. The denominator stays ${den}.`;
+                _fSentenceKit(q, [{ n: n1, d: den }, { n: n2, d: den }], [op], null, { mixed: false, boxDigits: den < 10 && res < 10 ? 1 : 2 });
                 return;
 
-            } else if (fracSkill === "add_frac_unlike_nv" && Math.random() < 0.20) {
-                // Phase 4.5 batch 9: dnd-categorize variant - sort sums vs 1
-                const dPool = [2, 3, 4, 5, 6, 8];
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < 5 && safety < 100) {
-                    safety++;
-                    const dx = pick(dPool);
-                    let dy = pick(dPool);
-                    if (dx === dy) dy = pick(dPool.filter(x => x !== dx));
-                    const a = rng(1, dx - 1);
-                    const b = rng(1, dy - 1);
-                    const key = `${a}/${dx}+${b}/${dy}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    items.push({ a, dx, b, dy, sum: a / dx + b / dy });
-                }
-                const tiles = items.map((it, i) => ({ id: 't' + i, label: `${it.a}/${it.dx} + ${it.b}/${it.dy}` }));
-                const ans = {};
-                items.forEach((it, i) => {
-                    if (Math.abs(it.sum - 1) < 1e-9) ans['t' + i] = 'eq';
-                    else if (it.sum > 1) ans['t' + i] = 'more';
-                    else ans['t' + i] = 'less';
-                });
-                q.text = 'Sort each sum into the correct bin.';
-                q.answerType = 'dnd-generic';
-                q.dndMode = 'categorize';
-                q.tiles = tiles;
-                q.bins = [
-                    { id: 'less', label: 'Less than 1' },
-                    { id: 'eq', label: 'Equal to 1' },
-                    { id: 'more', label: 'More than 1' }
-                ];
-                q.ans = ans;
-                q.hint = 'Convert to a common denominator, add, then compare to 1.';
-                q.options = [];
-                q.printFormat = 'dnd-generic';
-                q.skillLabel = 'Add Fractions (Unlike)';
-                return;
-            } else if (fracSkill === "add_frac_unlike_nv") {
-                // Grade 5: Add proper fractions, unlike denominators (no visual)
+            } else if (fracSkill === "add_frac_unlike_nv" || fracSkill === "sub_frac_unlike_nv") {
+                // Grade 5 (5.NF.A.1): add or subtract fractions with different denominators, numbers
+                // only. KIT (fractions lane; options-r3 O4: each form printed another form's item
+                // in a legacy cell). Each form is what its label says -
+                //   straight     1/2 + 1/3 = [ ]/[ ]       (any equal answer is right on screen)
+                //   missing_num  1/2 + [ ]/3 = 5/6
+                //   simplify     the same, the answer in simplest form (a mixed number past 1)
+                const sub = fracSkill === "sub_frac_unlike_nv";
+                const op = sub ? '\u2212' : '+';
                 const denPairs = [[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]];
                 const [d1, d2] = pick(denPairs);
                 const lcd = _lcm(d1, d2);
-                // LRU rotation across 3 sub-types (was Math.random() chain).
                 const roll = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('add_frac_unlike_nv', ["straight","missing_num","simplify"])
-                    : (Math.random() < 0.5 ? 'straight' : (Math.random() < 0.5 ? 'missing_num' : 'simplify'));
+                    ? window.pickVariant(fracSkill, ["straight", "missing_num", "simplify"])
+                    : pick(['straight', 'missing_num', 'simplify']);
                 q._variant = roll;
-
-                if (roll === 'straight') {
-                    // Type 1: Straightforward addition
-                    const n1 = rng(1, d1 - 1);
-                    const n2 = rng(1, d2 - 1);
-                    const sumNum = n1 * (lcd / d1) + n2 * (lcd / d2);
-                    q.text = `${n1}/${d1} + ${n2}/${d2} = ?`;
-                    q.ans = _fracStr(sumNum, lcd);
-                    q.hint = `LCD = ${lcd}. Convert: ${n1}/${d1} = ${n1 * (lcd / d1)}/${lcd}, ${n2}/${d2} = ${n2 * (lcd / d2)}/${lcd}. Add: ${n1 * (lcd / d1)} + ${n2 * (lcd / d2)} = ${sumNum}. Simplify ${sumNum}/${lcd}.`;
-                } else if (roll === 'missing_num') {
-                    // Type 2: Show LCD conversion step
-                    const n1 = rng(1, d1 - 1);
-                    const n2 = rng(1, d2 - 1);
-                    const conv1 = n1 * (lcd / d1);
-                    const conv2 = n2 * (lcd / d2);
-                    const sumNum = conv1 + conv2;
-                    q.text = `${n1}/${d1} + ${n2}/${d2} = ${conv1}/${lcd} + ${conv2}/${lcd} = ?`;
-                    q.ans = _fracStr(sumNum, lcd);
-                    q.hint = `The fractions are already converted to LCD ${lcd}. Add: ${conv1} + ${conv2} = ${sumNum}. Simplify ${sumNum}/${lcd}.`;
-                } else {
-                    // Type 3: Missing numerator
-                    const n1 = rng(1, d1 - 1);
-                    const n2 = rng(1, d2 - 1);
-                    const sumNum = n1 * (lcd / d1) + n2 * (lcd / d2);
-                    q.text = `${n1}/${d1} + ?/${d2} = ${_fracStr(sumNum, lcd)}. Find the missing numerator.`;
-                    q.ans = String(n2);
-                    q.hint = `Convert ${n1}/${d1} to ${n1 * (lcd / d1)}/${lcd}. The sum is ${_fracStr(sumNum, lcd)}. Work backward: ${_fracStr(sumNum, lcd)} \u2212 ${n1 * (lcd / d1)}/${lcd} = ${n2 * (lcd / d2)}/${lcd} = ${n2}/${d2}.`;
-                }
-                q.answerType = "text";
-                q.printFormat = "frac-add-unlike-nv";
-                q.skillLabel = "Add Fractions (Unlike)";
-                return;
-
-            } else if (fracSkill === "sub_frac_unlike_nv" && Math.random() < 0.20) {
-                // Phase 4.5 batch 9: dnd-categorize variant - sort differences vs 1/2
-                const dPool = [2, 3, 4, 5, 6, 8];
-                const items = [];
-                const seen = new Set();
-                let safety = 0;
-                while (items.length < 5 && safety < 200) {
-                    safety++;
-                    const dx = pick(dPool);
-                    let dy = pick(dPool);
-                    if (dx === dy) dy = pick(dPool.filter(x => x !== dx));
-                    const a = rng(1, dx - 1);
-                    const b = rng(1, dy - 1);
-                    const va = a / dx;
-                    const vb = b / dy;
-                    if (va <= vb) continue; // need positive difference
-                    const key = `${a}/${dx}-${b}/${dy}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    items.push({ a, dx, b, dy, diff: va - vb });
-                }
-                // Fallback in case loop doesn't fill
-                while (items.length < 3) {
-                    items.push({ a: 3, dx: 4, b: 1, dy: 2, diff: 0.25 });
-                }
-                const tiles = items.map((it, i) => ({ id: 't' + i, label: `${it.a}/${it.dx} - ${it.b}/${it.dy}` }));
-                const ans = {};
-                items.forEach((it, i) => {
-                    if (Math.abs(it.diff - 0.5) < 1e-9) ans['t' + i] = 'eq';
-                    else if (it.diff > 0.5) ans['t' + i] = 'more';
-                    else ans['t' + i] = 'less';
-                });
-                q.text = 'Sort each difference into the correct bin (compared to 1/2).';
-                q.answerType = 'dnd-generic';
-                q.dndMode = 'categorize';
-                q.tiles = tiles;
-                q.bins = [
-                    { id: 'less', label: 'Less than 1/2' },
-                    { id: 'eq', label: 'Equal to 1/2' },
-                    { id: 'more', label: 'More than 1/2' }
-                ];
-                q.ans = ans;
-                q.hint = 'Find a common denominator, subtract, then compare to 1/2.';
-                q.options = [];
-                q.printFormat = 'dnd-generic';
-                q.skillLabel = 'Subtract Fractions (Unlike)';
-                return;
-            } else if (fracSkill === "sub_frac_unlike_nv") {
-                // Grade 5: Subtract proper fractions, unlike denominators (no visual)
-                const denPairs = [[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]];
-                const [d1, d2] = pick(denPairs);
-                const lcd = _lcm(d1, d2);
-                // LRU rotation across 3 sub-types (was Math.random() chain).
-                const roll = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('sub_frac_unlike_nv', ["straight","missing_num","simplify"])
-                    : (Math.random() < 0.5 ? 'straight' : (Math.random() < 0.5 ? 'missing_num' : 'simplify'));
-                q._variant = roll;
-
-                // Generate n1, n2 ensuring result >= 0
-                let n1, n2, conv1, conv2;
+                let n1, n2, c1, c2, t = 0;
                 do {
-                    n1 = rng(1, d1 - 1);
-                    n2 = rng(1, d2 - 1);
-                    conv1 = n1 * (lcd / d1);
-                    conv2 = n2 * (lcd / d2);
-                } while (conv1 <= conv2);
-
-                const diffNum = conv1 - conv2;
-
-                if (roll === 'straight') {
-                    // Type 1: Straightforward subtraction
-                    q.text = `${n1}/${d1} \u2212 ${n2}/${d2} = ?`;
-                    q.ans = _fracStr(diffNum, lcd);
-                    q.hint = `LCD = ${lcd}. Convert: ${n1}/${d1} = ${conv1}/${lcd}, ${n2}/${d2} = ${conv2}/${lcd}. Subtract: ${conv1} \u2212 ${conv2} = ${diffNum}. Simplify ${diffNum}/${lcd}.`;
-                } else if (roll === 'missing_num') {
-                    // Type 2: Show LCD conversion step
-                    q.text = `${n1}/${d1} \u2212 ${n2}/${d2} = ${conv1}/${lcd} \u2212 ${conv2}/${lcd} = ?`;
-                    q.ans = _fracStr(diffNum, lcd);
-                    q.hint = `Fractions are already converted to LCD ${lcd}. Subtract: ${conv1} \u2212 ${conv2} = ${diffNum}. Simplify ${diffNum}/${lcd}.`;
-                } else {
-                    // Type 3: Missing numerator
-                    q.text = `${n1}/${d1} \u2212 ?/${d2} = ${_fracStr(diffNum, lcd)}. Find the missing numerator.`;
+                    n1 = rng(1, d1 - 1); n2 = rng(1, d2 - 1);
+                    c1 = n1 * (lcd / d1); c2 = n2 * (lcd / d2);
+                } while (((sub && c1 <= c2) || (!sub && (c1 + c2) % lcd === 0)) && ++t < 40);
+                if (sub && c1 <= c2) { n1 = d1 - 1; n2 = 1; c1 = n1 * (lcd / d1); c2 = lcd / d2; }
+                const res = sub ? c1 - c2 : c1 + c2;
+                q.answerType = 'text';
+                q.options = [];
+                q.skillLabel = sub ? 'Subtract Fractions (Unlike)' : 'Add Fractions (Unlike)';
+                if (roll === 'missing_num') {
+                    q.text = `${n1}/${d1} ${op} ?/${d2} = ${res}/${lcd}. Find the missing numerator.`;
                     q.ans = String(n2);
-                    q.hint = `Convert ${n1}/${d1} to ${conv1}/${lcd}. The difference is ${_fracStr(diffNum, lcd)}. Work backward: ${conv1}/${lcd} \u2212 ${_fracStr(diffNum, lcd)} = ${conv2}/${lcd} = ${n2}/${d2}.`;
+                    q.hint = `${n1}/${d1} = ${c1}/${lcd}. ${sub ? `${c1} \u2212 ${res}` : `${res} \u2212 ${c1}`} = ${c2}, so the missing fraction is ${c2}/${lcd} = ${n2}/${d2}.`;
+                    _fKit(q, { task: 'op', terms: [{ n: n1, d: d1 }, { n: n2, d: d2, frac: 'n' }, { n: res, d: lcd }], joins: [op, '='], answer: { n: n2, d: d2 }, boxDigits: 1 });
+                    return;
                 }
-                q.answerType = "text";
-                q.printFormat = "frac-sub-unlike-nv";
-                q.skillLabel = "Subtract Fractions (Unlike)";
+                q.hint = `Make the denominators the same: ${lcd}. ${n1}/${d1} = ${c1}/${lcd}, ${n2}/${d2} = ${c2}/${lcd}. ${c1} ${op} ${c2} = ${res}.`;
+                if (roll === 'simplify') {
+                    q.text = `${sub ? 'Subtract' : 'Add'} and simplify: ${n1}/${d1} ${op} ${n2}/${d2}`;
+                    q.ans = _fracStr(res, lcd);
+                    _fSentenceKit(q, [{ n: n1, d: d1 }, { n: n2, d: d2 }], [op], null, { mixed: res > lcd, boxDigits: lcd < 10 ? 1 : 2 });
+                    return;
+                }
+                q.text = `${n1}/${d1} ${op} ${n2}/${d2} = ?`;
+                q.ans = `${res}/${lcd}`;
+                _fSentenceKit(q, [{ n: n1, d: d1 }, { n: n2, d: d2 }], [op], null, { mixed: false, boxDigits: lcd < 10 && res < 10 ? 1 : 2 });
                 return;
 
-            } else if (fracSkill === "add_mixed_like_nv") {
-                // Grade 4: Add mixed numbers, like denominators (no visual)
-                const den = pick([2, 3, 4, 5, 6, 8]);
-                // LRU rotation across 3 sub-types (was Math.random() chain).
+            } else if (fracSkill === "add_mixed_like_nv" || fracSkill === "sub_mixed_like_nv") {
+                // Grade 4 (4.NF.B.3c): add or subtract mixed numbers with one denominator, numbers
+                // only. KIT (fractions lane; options-r3 O4: "Work it out and simplify" printed
+                // missing-number items). Each form is what its label says -
+                //   straight  2 1/4 + 1 3/4 = [ ] [ ]/[ ]   (regrouped, the fraction part as it comes)
+                //   missing   2 1/4 + [ ] [ ]/[ ] = 4
+                //   simplify  the same sum, the answer in simplest form
+                // and `regroup` sets whether the parts make a whole (or a whole is broken up).
+                const sub = fracSkill === "sub_mixed_like_nv";
+                const op = sub ? '\u2212' : '+';
                 const roll = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('add_mixed_like_nv', ["straight","missing","simplify"])
-                    : (Math.random() < 0.5 ? 'straight' : (Math.random() < 0.5 ? 'missing' : 'simplify'));
+                    ? window.pickVariant(fracSkill, ["straight", "missing", "simplify"])
+                    : pick(['straight', 'missing', 'simplify']);
                 q._variant = roll;
-
-                if (roll === 'straight') {
-                    // Type 1: Straightforward addition
-                    const w1 = rng(1, 9);
-                    const f1 = rng(1, den - 1);
-                    const w2 = rng(1, 9);
-                    const f2 = rng(1, den - 1);
-                    const totalNum = (w1 * den + f1) + (w2 * den + f2);
-                    q.text = `${w1} ${f1}/${den} + ${w2} ${f2}/${den} = ?`;
-                    q.ans = _fracStr(totalNum, den);
-                    const fracSum = f1 + f2;
-                    q.hint = `Add wholes: ${w1} + ${w2} = ${w1 + w2}. Add fractions: ${f1}/${den} + ${f2}/${den} = ${fracSum}/${den}.${fracSum >= den ? ` Regroup: ${fracSum}/${den} = 1 ${fracSum - den}/${den}.` : ''} Simplify.`;
-                } else if (roll === 'missing') {
-                    // Type 2: With regrouping (fraction sum >= denominator)
-                    const w1 = rng(1, 9);
-                    const w2 = rng(1, 9);
-                    // Ensure fractions add to >= den for regrouping
-                    const f1 = rng(Math.ceil(den / 2), den - 1);
-                    const f2 = rng(Math.max(1, den - f1), den - 1);
-                    const totalNum = (w1 * den + f1) + (w2 * den + f2);
-                    q.text = `${w1} ${f1}/${den} + ${w2} ${f2}/${den} = ?`;
-                    q.ans = _fracStr(totalNum, den);
-                    const fracSum = f1 + f2;
-                    q.hint = `Add wholes: ${w1} + ${w2} = ${w1 + w2}. Fractions: ${f1} + ${f2} = ${fracSum}. Since ${fracSum} \u2265 ${den}, regroup: ${fracSum}/${den} = ${Math.floor(fracSum / den)} ${fracSum % den}/${den}. Total: ${_fracStr(totalNum, den)}.`;
-                } else {
-                    // Type 3: Missing whole number or mixed number
-                    const w1 = rng(1, 5);
-                    const f1 = rng(1, den - 1);
-                    const w2 = rng(1, 5);
-                    const f2 = rng(1, den - 1);
-                    const totalNum = (w1 * den + f1) + (w2 * den + f2);
-                    const totalStr = _fracStr(totalNum, den);
-                    q.text = `${w1} ${f1}/${den} + ? = ${totalStr}. Find the missing number.`;
-                    // The missing addend is w2 f2/den
-                    const missingNum = (w2 * den + f2);
-                    q.ans = _fracStr(missingNum, den);
-                    q.hint = `${totalStr} \u2212 ${w1} ${f1}/${den} = ? Convert to improper: ${totalNum}/${den} \u2212 ${w1 * den + f1}/${den} = ${missingNum}/${den} = ${_fracStr(missingNum, den)}.`;
+                const { den, f1, f2, regroup } = _fMixedParts(sub);
+                const w1 = sub ? rng(2, 9) : rng(1, 8);
+                const w2 = sub ? rng(1, w1 - 1) : rng(1, 9 - w1);
+                const t1 = w1 * den + f1, t2 = w2 * den + f2;
+                const tot = sub ? t1 - t2 : t1 + t2;
+                const raw = (v) => { const w = Math.floor(v / den), r = v % den; return w && r ? `${w} ${r}/${den}` : w ? String(w) : `${r}/${den}`; };
+                q.answerType = 'text';
+                q.options = [];
+                q.skillLabel = sub ? 'Subtract Mixed (Like)' : 'Add Mixed (Like)';
+                if (roll === 'missing') {
+                    const tw = Math.floor(tot / den), tn = tot % den;
+                    q.text = `${w1} ${f1}/${den} ${op} ? = ${raw(tot)}. Find the missing number.`;
+                    q.ans = raw(t2);
+                    q.hint = sub ? `${w1} ${f1}/${den} \u2212 ${raw(tot)} = ${raw(t2)}.` : `${raw(tot)} \u2212 ${w1} ${f1}/${den} = ${raw(t2)}.`;
+                    _fKit(q, { task: 'op', terms: [{ w: w1, n: f1, d: den }, { w: w2, n: f2, d: den, frac: 'wnd' }, { w: tw, n: tn, d: tn ? den : 1 }],
+                        joins: [op, '='], answer: { w: w2, n: f2, d: den }, boxDigits: 1 });
+                    return;
                 }
-                q.answerType = "text";
-                q.printFormat = "frac-add-mixed-like-nv";
-                q.skillLabel = "Add Mixed (Like)";
+                q.text = `${w1} ${f1}/${den} ${op} ${w2} ${f2}/${den} = ?`;
+                q.ans = roll === 'simplify' ? _fracStr(tot, den) : raw(tot);
+                q.hint = sub
+                    ? (regroup ? `${f1}/${den} is less than ${f2}/${den}: break a whole. ${w1} ${f1}/${den} = ${w1 - 1} ${f1 + den}/${den}. Then subtract.` : `Subtract the wholes: ${w1} \u2212 ${w2} = ${w1 - w2}. Subtract the parts: ${f1} \u2212 ${f2} = ${f1 - f2}.`)
+                    : (regroup ? `Add the wholes: ${w1 + w2}. Add the parts: ${f1 + f2}/${den} = 1 ${f1 + f2 - den}/${den}. Regroup the whole.` : `Add the wholes: ${w1 + w2}. Add the parts: ${f1 + f2}/${den}.`);
+                if (roll === 'simplify') q.text = `${sub ? 'Subtract' : 'Add'} and simplify: ${w1} ${f1}/${den} ${op} ${w2} ${f2}/${den}`;
+                _fSentenceKit(q, [{ w: w1, n: f1, d: den }, { w: w2, n: f2, d: den }], [op], null, { mixed: true, boxDigits: tot < 10 * den ? 1 : 2 });
                 return;
 
-            } else if (fracSkill === "sub_mixed_like_nv") {
-                // Grade 4: Subtract mixed numbers, like denominators (no visual)
-                const den = pick([2, 3, 4, 5, 6, 8]);
-                // LRU rotation across 3 sub-types (was Math.random() chain).
-                const roll = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('sub_mixed_like_nv', ["straight","missing","simplify"])
-                    : (Math.random() < 0.5 ? 'straight' : (Math.random() < 0.5 ? 'missing' : 'simplify'));
-                q._variant = roll;
-
-                if (roll === 'straight') {
-                    // Type 1: Straightforward subtraction (no borrowing needed)
-                    const w1 = rng(2, 9);
-                    const f1 = rng(1, den - 1);
-                    const w2 = rng(1, w1 - 1);
-                    let f2 = rng(1, Math.min(f1, den - 1)); // f2 <= f1 so no borrowing
-                    if (f2 > f1) f2 = f1 > 1 ? rng(1, f1 - 1) : 1;
-                    // Ensure f2 <= f1 for no borrowing
-                    if (f2 > f1) { const tmp = f1; f2 = tmp > 1 ? rng(1, tmp - 1) : 1; }
-                    const total1 = w1 * den + f1;
-                    const total2 = w2 * den + f2;
-                    const diffNum = total1 - total2;
-                    q.text = `${w1} ${f1}/${den} \u2212 ${w2} ${f2}/${den} = ?`;
-                    q.ans = _fracStr(diffNum, den);
-                    q.hint = `Subtract wholes: ${w1} \u2212 ${w2} = ${w1 - w2}. Subtract fractions: ${f1}/${den} \u2212 ${f2}/${den} = ${f1 - f2}/${den}. Simplify.`;
-                } else if (roll === 'missing') {
-                    // Type 2: With borrowing (f2 > f1)
-                    const w1 = rng(3, 9);
-                    const w2 = rng(1, w1 - 1);
-                    const f1 = rng(1, Math.floor(den / 2));
-                    const f2 = rng(f1 + 1, den - 1); // f2 > f1 forces borrowing
-                    const total1 = w1 * den + f1;
-                    const total2 = w2 * den + f2;
-                    const diffNum = total1 - total2;
-                    q.text = `${w1} ${f1}/${den} \u2212 ${w2} ${f2}/${den} = ?`;
-                    q.ans = _fracStr(Math.max(0, diffNum), den);
-                    q.hint = `Since ${f1} < ${f2}, borrow 1 from ${w1}: ${w1} ${f1}/${den} = ${w1 - 1} ${f1 + den}/${den}. Now subtract: ${w1 - 1} \u2212 ${w2} = ${w1 - 1 - w2}, ${f1 + den} \u2212 ${f2} = ${f1 + den - f2}. Result: ${_fracStr(Math.max(0, diffNum), den)}.`;
-                } else {
-                    // Type 3: Missing subtrahend
-                    const w1 = rng(3, 7);
-                    const f1 = rng(1, den - 1);
-                    const w2 = rng(1, w1 - 1);
-                    const f2 = rng(1, den - 1);
-                    const total1 = w1 * den + f1;
-                    const total2 = w2 * den + f2;
-                    const diffNum = total1 - total2;
-                    if (diffNum <= 0) {
-                        // Fallback to straightforward
-                        const safeDiff = total1 - (w2 * den + 1);
-                        q.text = `${w1} ${f1}/${den} \u2212 ${w2} 1/${den} = ?`;
-                        q.ans = _fracStr(Math.max(0, safeDiff), den);
-                        q.hint = `Subtract wholes: ${w1} \u2212 ${w2} = ${w1 - w2}. Subtract fractions: ${f1}/${den} \u2212 1/${den} = ${f1 - 1}/${den}. ${f1 < 1 ? 'Need to borrow.' : 'Simplify.'}`;
-                    } else {
-                        const diffStr = _fracStr(diffNum, den);
-                        q.text = `${w1} ${f1}/${den} \u2212 ? = ${diffStr}. Find the missing number.`;
-                        q.ans = _fracStr(total2, den);
-                        q.hint = `${w1} ${f1}/${den} \u2212 ${diffStr} = ? Convert to improper: ${total1}/${den} \u2212 ${diffNum}/${den} = ${total2}/${den} = ${_fracStr(total2, den)}.`;
-                    }
-                }
-                q.answerType = "text";
-                q.printFormat = "frac-sub-mixed-like-nv";
-                q.skillLabel = "Subtract Mixed (Like)";
-                return;
-
-            } else if (fracSkill === "add_mixed_unlike_nv") {
-                // Grade 5: Add mixed numbers, unlike denominators (no visual)
+            } else if (fracSkill === "add_mixed_unlike_nv" || fracSkill === "sub_mixed_unlike_nv") {
+                // Grade 5 (5.NF.A.1): add or subtract mixed numbers with different denominators,
+                // numbers only. KIT (fractions lane; options-r3 O4: the forms printed each other's
+                // items in legacy cells). Each form is what its label says -
+                //   straight  2 1/2 + 1 1/3 = [ ] [ ]/[ ]   (in the common denominator)
+                //   missing   2 1/2 + [ ] [ ]/[ ] = 3 5/6
+                //   simplify  (adding only) the answer in simplest form
+                const sub = fracSkill === "sub_mixed_unlike_nv";
+                const op = sub ? '\u2212' : '+';
                 const denPairs = [[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]];
                 const [d1, d2] = pick(denPairs);
                 const lcd = _lcm(d1, d2);
-                // LRU rotation across 3 sub-types (was Math.random() chain).
-                const roll = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('add_mixed_unlike_nv', ["straight","missing","simplify"])
-                    : (Math.random() < 0.5 ? 'straight' : (Math.random() < 0.5 ? 'missing' : 'simplify'));
+                const forms = sub ? ["straight", "missing"] : ["straight", "missing", "simplify"];
+                const roll = (typeof window !== 'undefined' && window.pickVariant) ? window.pickVariant(fracSkill, forms) : pick(forms);
                 q._variant = roll;
-
-                if (roll === 'straight') {
-                    // Type 1: Straightforward addition
-                    const w1 = rng(1, 6);
-                    const f1 = rng(1, d1 - 1);
-                    const w2 = rng(1, 6);
-                    const f2 = rng(1, d2 - 1);
-                    const totalNum = (w1 * d1 + f1) * (lcd / d1) + (w2 * d2 + f2) * (lcd / d2);
-                    const conv1 = f1 * (lcd / d1);
-                    const conv2 = f2 * (lcd / d2);
-                    q.text = `${w1} ${f1}/${d1} + ${w2} ${f2}/${d2} = ?`;
-                    q.ans = _fracStr(totalNum, lcd);
-                    q.hint = `LCD = ${lcd}. Convert fractions: ${f1}/${d1} = ${conv1}/${lcd}, ${f2}/${d2} = ${conv2}/${lcd}. Add wholes: ${w1} + ${w2} = ${w1 + w2}. Add fractions: ${conv1} + ${conv2} = ${conv1 + conv2}.${conv1 + conv2 >= lcd ? ` Regroup: ${conv1 + conv2}/${lcd} = 1 ${conv1 + conv2 - lcd}/${lcd}.` : ''} Simplify.`;
-                } else if (roll === 'missing') {
-                    // Type 2: With regrouping (fractions sum >= lcd)
-                    const w1 = rng(1, 6);
-                    const w2 = rng(1, 6);
-                    // Pick fractions that sum to >= lcd
-                    let f1, f2, conv1, conv2;
-                    do {
-                        f1 = rng(1, d1 - 1);
-                        f2 = rng(1, d2 - 1);
-                        conv1 = f1 * (lcd / d1);
-                        conv2 = f2 * (lcd / d2);
-                    } while (conv1 + conv2 < lcd);
-                    const totalNum = (w1 * d1 + f1) * (lcd / d1) + (w2 * d2 + f2) * (lcd / d2);
-                    q.text = `${w1} ${f1}/${d1} + ${w2} ${f2}/${d2} = ?`;
-                    q.ans = _fracStr(totalNum, lcd);
-                    const fracSum = conv1 + conv2;
-                    q.hint = `LCD = ${lcd}. Fractions: ${conv1}/${lcd} + ${conv2}/${lcd} = ${fracSum}/${lcd}. Since ${fracSum} \u2265 ${lcd}, regroup. Wholes: ${w1} + ${w2} + 1 = ${w1 + w2 + 1}. Fraction remainder: ${fracSum - lcd}/${lcd}. Simplify.`;
-                } else {
-                    // Type 3: Missing addend
-                    const w1 = rng(1, 4);
-                    const f1 = rng(1, d1 - 1);
-                    const w2 = rng(1, 4);
-                    const f2 = rng(1, d2 - 1);
-                    const total1 = (w1 * d1 + f1) * (lcd / d1);
-                    const total2 = (w2 * d2 + f2) * (lcd / d2);
-                    const totalNum = total1 + total2;
-                    const totalStr = _fracStr(totalNum, lcd);
-                    q.text = `${w1} ${f1}/${d1} + ? = ${totalStr}. Find the missing number.`;
-                    q.ans = _fracStr(total2, lcd);
-                    q.hint = `${totalStr} \u2212 ${w1} ${f1}/${d1} = ? Convert to LCD ${lcd}: ${totalNum}/${lcd} \u2212 ${total1}/${lcd} = ${total2}/${lcd} = ${_fracStr(total2, lcd)}.`;
+                const f1 = rng(1, d1 - 1), f2 = rng(1, d2 - 1);
+                const w1 = sub ? rng(2, 6) : rng(1, 5);
+                const w2 = sub ? rng(1, w1 - 1) : rng(1, 4);
+                const t1 = (w1 * d1 + f1) * (lcd / d1), t2 = (w2 * d2 + f2) * (lcd / d2);
+                const tot = sub ? t1 - t2 : t1 + t2;
+                const raw = (v) => { const w = Math.floor(v / lcd), r = v % lcd; return w && r ? `${w} ${r}/${lcd}` : w ? String(w) : `${r}/${lcd}`; };
+                q.answerType = 'text';
+                q.options = [];
+                q.skillLabel = sub ? 'Subtract Mixed (Unlike)' : 'Add Mixed (Unlike)';
+                const big = lcd >= 10 || tot >= 10 * lcd;
+                if (roll === 'missing') {
+                    const tw = Math.floor(tot / lcd), tn = tot % lcd;
+                    q.text = `${w1} ${f1}/${d1} ${op} ? = ${raw(tot)}. Find the missing number.`;
+                    q.ans = `${w2} ${f2}/${d2}`;
+                    q.hint = sub ? `${w1} ${f1}/${d1} \u2212 ${raw(tot)} = ${w2} ${f2}/${d2}.` : `${raw(tot)} \u2212 ${w1} ${f1}/${d1} = ${w2} ${f2}/${d2}.`;
+                    _fKit(q, { task: 'op', terms: [{ w: w1, n: f1, d: d1 }, { w: w2, n: f2, d: d2, frac: 'wnd' }, { w: tw, n: tn, d: tn ? lcd : 1 }],
+                        joins: [op, '='], answer: { w: w2, n: f2, d: d2 }, boxDigits: d2 >= 10 ? 2 : 1 });
+                    return;
                 }
-                q.answerType = "text";
-                q.printFormat = "frac-add-mixed-unlike-nv";
-                q.skillLabel = "Add Mixed (Unlike)";
-                return;
-
-            } else if (fracSkill === "sub_mixed_unlike_nv") {
-                // Grade 5: Subtract mixed numbers, unlike denominators (no visual)
-                const denPairs = [[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]];
-                const [d1, d2] = pick(denPairs);
-                const lcd = _lcm(d1, d2);
-                // LRU rotation across 2 sub-types (was Math.random() chain).
-                const roll = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('sub_mixed_unlike_nv', ["straight","missing"])
-                    : (Math.random() < 0.5 ? 'straight' : 'missing');
-                q._variant = roll;
-
-                if (roll === 'straight') {
-                    // Type 1: Straightforward subtraction
-                    const w1 = rng(3, 6);
-                    const f1 = rng(1, d1 - 1);
-                    const w2 = rng(1, w1 - 1);
-                    const f2 = rng(1, d2 - 1);
-                    const total1 = (w1 * d1 + f1) * (lcd / d1);
-                    const total2 = (w2 * d2 + f2) * (lcd / d2);
-                    // Ensure positive result
-                    if (total1 <= total2) {
-                        // Fallback: increase w1
-                        const w1b = w2 + 2;
-                        const total1b = (w1b * d1 + f1) * (lcd / d1);
-                        const diffNum = total1b - total2;
-                        const conv1 = f1 * (lcd / d1);
-                        const conv2 = f2 * (lcd / d2);
-                        q.text = `${w1b} ${f1}/${d1} \u2212 ${w2} ${f2}/${d2} = ?`;
-                        q.ans = _fracStr(Math.max(0, diffNum), lcd);
-                        q.hint = `LCD = ${lcd}. Convert: ${f1}/${d1} = ${conv1}/${lcd}, ${f2}/${d2} = ${conv2}/${lcd}.${conv1 < conv2 ? ` Since ${conv1} < ${conv2}, borrow 1 whole.` : ''} Subtract wholes, subtract fractions. Simplify.`;
-                    } else {
-                        const diffNum = total1 - total2;
-                        const conv1 = f1 * (lcd / d1);
-                        const conv2 = f2 * (lcd / d2);
-                        q.text = `${w1} ${f1}/${d1} \u2212 ${w2} ${f2}/${d2} = ?`;
-                        q.ans = _fracStr(diffNum, lcd);
-                        q.hint = `LCD = ${lcd}. Convert: ${f1}/${d1} = ${conv1}/${lcd}, ${f2}/${d2} = ${conv2}/${lcd}.${conv1 < conv2 ? ` Since ${conv1} < ${conv2}, borrow 1 whole.` : ''} Subtract wholes, subtract fractions. Simplify.`;
-                    }
-                } else if (roll === 'missing') {
-                    // Type 2: With borrowing
-                    const w1 = rng(3, 6);
-                    const w2 = rng(1, w1 - 1);
-                    // Pick fractions where f1 < f2 in LCD terms to force borrowing
-                    let f1, f2, conv1, conv2;
-                    let attempts = 0;
-                    do {
-                        f1 = rng(1, d1 - 1);
-                        f2 = rng(1, d2 - 1);
-                        conv1 = f1 * (lcd / d1);
-                        conv2 = f2 * (lcd / d2);
-                        attempts++;
-                    } while (conv1 >= conv2 && attempts < 50);
-                    // If we couldn't force borrowing, just do straightforward
-                    if (conv1 >= conv2) {
-                        const tmp = f1; f1 = f2; f2 = tmp;
-                        conv1 = f1 * (lcd / d1);
-                        conv2 = f2 * (lcd / d2);
-                    }
-                    const total1 = (w1 * d1 + f1) * (lcd / d1);
-                    const total2 = (w2 * d2 + f2) * (lcd / d2);
-                    const diffNum = total1 - total2;
-                    if (diffNum <= 0) {
-                        // Safety: increase w1
-                        const w1b = w2 + 2;
-                        const total1b = (w1b * d1 + f1) * (lcd / d1);
-                        q.text = `${w1b} ${f1}/${d1} \u2212 ${w2} ${f2}/${d2} = ?`;
-                        q.ans = _fracStr(Math.max(0, total1b - total2), lcd);
-                        q.hint = `LCD = ${lcd}. Convert fractions: ${conv1}/${lcd} and ${conv2}/${lcd}. Since ${conv1} < ${conv2}, borrow 1 whole (= ${lcd}/${lcd}). Then subtract. Simplify.`;
-                    } else {
-                        q.text = `${w1} ${f1}/${d1} \u2212 ${w2} ${f2}/${d2} = ?`;
-                        q.ans = _fracStr(diffNum, lcd);
-                        q.hint = `LCD = ${lcd}. Convert fractions: ${conv1}/${lcd} and ${conv2}/${lcd}. Since ${conv1} < ${conv2}, borrow 1 whole (= ${lcd}/${lcd}): ${conv1 + lcd}/${lcd} \u2212 ${conv2}/${lcd} = ${conv1 + lcd - conv2}/${lcd}. Subtract wholes: ${w1 - 1} \u2212 ${w2} = ${w1 - 1 - w2}. Simplify.`;
-                    }
-                } else {
-                    // Type 3: Missing subtrahend
-                    const w1 = rng(3, 6);
-                    const f1 = rng(1, d1 - 1);
-                    const w2 = rng(1, w1 - 1);
-                    const f2 = rng(1, d2 - 1);
-                    const total1 = (w1 * d1 + f1) * (lcd / d1);
-                    const total2 = (w2 * d2 + f2) * (lcd / d2);
-                    if (total1 <= total2) {
-                        // Fallback to straightforward
-                        const w1b = w2 + 2;
-                        const total1b = (w1b * d1 + f1) * (lcd / d1);
-                        const diffNum = total1b - total2;
-                        q.text = `${w1b} ${f1}/${d1} \u2212 ${w2} ${f2}/${d2} = ?`;
-                        q.ans = _fracStr(Math.max(0, diffNum), lcd);
-                        q.hint = `LCD = ${lcd}. Convert fractions and subtract. Simplify.`;
-                    } else {
-                        const diffNum = total1 - total2;
-                        const diffStr = _fracStr(diffNum, lcd);
-                        q.text = `${w1} ${f1}/${d1} \u2212 ? = ${diffStr}. Find the missing number.`;
-                        q.ans = _fracStr(total2, lcd);
-                        q.hint = `${w1} ${f1}/${d1} \u2212 ${diffStr} = ? Convert to LCD ${lcd}: ${total1}/${lcd} \u2212 ${diffNum}/${lcd} = ${total2}/${lcd} = ${_fracStr(total2, lcd)}.`;
-                    }
-                }
-                q.answerType = "text";
-                q.printFormat = "frac-sub-mixed-unlike-nv";
-                q.skillLabel = "Subtract Mixed (Unlike)";
+                q.text = roll === 'simplify' ? `${sub ? 'Subtract' : 'Add'} and simplify: ${w1} ${f1}/${d1} ${op} ${w2} ${f2}/${d2}` : `${w1} ${f1}/${d1} ${op} ${w2} ${f2}/${d2} = ?`;
+                q.ans = roll === 'simplify' ? _fracStr(tot, lcd) : raw(tot);
+                q.hint = `Make the denominators the same: ${lcd}. ${f1}/${d1} = ${f1 * (lcd / d1)}/${lcd}, ${f2}/${d2} = ${f2 * (lcd / d2)}/${lcd}. Then ${sub ? 'subtract' : 'add'} the wholes and the parts.`;
+                _fSentenceKit(q, [{ w: w1, n: f1, d: d1 }, { w: w2, n: f2, d: d2 }], [op], null, { mixed: true, boxDigits: big ? 2 : 1 });
                 return;
 
             } else if (fracSkill === "identify_nv") {
@@ -2369,7 +1998,8 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 // makes, drawn as the matching skill draws it - equal groups of a fraction, the area
                 // model of a fraction of a fraction, the wholes cut into unit fractions - and the
                 // answer boxes. The _plain twin keeps the story and the sentence without pictures.
-                const kind = pick(['groups', 'servings', 'area', 'cut']);
+                // the four stories in turn (a page never repeats one kind three times)
+                const kind = window.pickVariant ? window.pickVariant('frac_mult_word', ['groups', 'servings', 'area', 'cut']) : pick(['groups', 'servings', 'area', 'cut']);
                 if (kind === 'groups' || kind === 'servings') {
                     const d = kind === 'groups' ? pick([2, 3, 4]) : pick([3, 4, 5, 6]);
                     const n = rng(1, d - 1);
@@ -2383,7 +2013,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.acceptedAnswers = [...new Set([q.ans, `${prodN}/${d}`])];
                     q.hint = `${k} groups of ${n}/${d}: ${k} × ${n}/${d} = ${prodN}/${d} = ${q.ans}.`;
                     _fSentenceKit(q, [{ w: k, n: 0, d: 1, kind: null }, { n, d, copies: k }], ['\u00d7'], 'bar',
-                        { mixed: prodN >= d, wholeMm: 16, perRow: 3, barH: 9, story: _fStoryLines(text) });
+                        { mixed: prodN >= d, wholeMm: 16, perRow: 5, barH: 8, story: _fStoryLines(text) });
                 } else if (kind === 'area') {
                     const d1 = pick([2, 3, 4]), n1 = rng(1, d1 - 1);
                     const d2 = pick([2, 3, 4, 5]), n2 = rng(1, d2 - 1);
@@ -2393,7 +2023,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.acceptedAnswers = [...new Set([q.ans, `${n1 * n2}/${d1 * d2}`])];
                     q.hint = `Area = ${n1}/${d1} × ${n2}/${d2} = ${n1 * n2}/${d1 * d2}${q.ans !== `${n1 * n2}/${d1 * d2}` ? ` = ${q.ans}` : ''} square yards.`;
                     _fSentenceKit(q, [{ n: n1, d: d1, kind: null }, { n: n2, d: d2, kind: null }], ['\u00d7'], 'area',
-                        { area: { rows: d1, cols: d2, shadeRows: n1, markCols: n2, n1, d1, n2, d2, k: 0.8 }, story: _fStoryLines(text) });
+                        { area: { rows: d1, cols: d2, shadeRows: n1, markCols: n2, n1, d1, n2, d2, k: 0.6 }, story: _fStoryLines(text) });
                 } else {
                     const d = pick([2, 3, 4, 5, 6]);
                     const whole = rng(2, 4);
@@ -2553,229 +2183,54 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
 
             } else if (fracSkill === "fraction_number_line") {
-                // Grade 3: Fractions on a number line — 5 problem types
-                // Reusable SVG number line builder
-                function _buildFractionNumberLine(opts) {
-                    const {
-                        maxWhole = 1, den, arrowAt = null, shadedTo = null,
-                        dotAt = null, clickable = false, tickLabels = false,
-                        lineId = 'fnl', highlightTick = null, lineIndex = null
-                    } = opts;
-                    const W = 440, H = 110, lineY = 55, leftX = 30, rightX = W - 30;
-                    const span = rightX - leftX;
-                    const totalParts = maxWhole * den;
-                    let svg = '';
-
-                    // Shaded segment (blue rect from 0)
-                    if (shadedTo !== null) {
-                        const sX = leftX + (shadedTo / totalParts) * span;
-                        svg += `<rect x="${leftX}" y="${lineY - 6}" width="${sX - leftX}" height="12" fill="var(--accent-cyan)" opacity="0.45" rx="2"/>`;
-                    }
-
-                    // Main line
-                    svg += `<line x1="${leftX}" y1="${lineY}" x2="${rightX}" y2="${lineY}" stroke="var(--text-bright)" stroke-width="${STROKE.bold}"/>`;
-                    // Arrow tips on both ends
-                    svg += `<polygon points="${leftX - 6},${lineY} ${leftX + 2},${lineY - 4} ${leftX + 2},${lineY + 4}" fill="var(--text-bright)"/>`;
-                    svg += `<polygon points="${rightX + 6},${lineY} ${rightX - 2},${lineY - 4} ${rightX - 2},${lineY + 4}" fill="var(--text-bright)"/>`;
-
-                    // Ticks and labels
-                    for (let i = 0; i <= totalParts; i++) {
-                        const x = leftX + (i / totalParts) * span;
-                        const isWhole = i % den === 0;
-                        const tickH = isWhole ? 14 : 8;
-                        const sw = isWhole ? STROKE.bold : STROKE.normal;
-                        svg += `<line x1="${x}" y1="${lineY - tickH}" x2="${x}" y2="${lineY + tickH}" stroke="var(--text-bright)" stroke-width="${sw}"/>`;
-
-                        // Whole number labels
-                        if (isWhole) {
-                            svg += `<text x="${x}" y="${lineY + 30}" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--text-bright)" font-size="14" font-weight="bold">${i / den}</text>`;
-                        }
-                        // Fraction labels on minor ticks
-                        if (tickLabels && !isWhole) {
-                            const [sn, sd] = _simplify(i, den);
-                            if (maxWhole > 1 && i > den) {
-                                // Show as improper fraction for lines > 1
-                                svg += `<text x="${x}" y="${lineY + 28}" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--text-dim, var(--text-bright))" font-size="9">${i}/${den}</text>`;
-                            } else {
-                                svg += `<text x="${x}" y="${lineY + 28}" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--text-dim, var(--text-bright))" font-size="9">${sn}/${sd}</text>`;
-                            }
-                        }
-
-                        // Clickable hit areas for Type C
-                        if (clickable) {
-                            const prefix = lineIndex !== null ? `${lineId}_${lineIndex}` : lineId;
-                            const hlClass = (highlightTick === i) ? ' fnl-tick-selected' : '';
-                            svg += `<rect x="${x - 12}" y="${lineY - 22}" width="24" height="44" fill="transparent" class="fnl-tick-target${hlClass}" data-tick="${i}" onclick="selectNumberLineTick('${prefix}', ${i}, ${totalParts})" style="cursor:pointer;"/>`;
-                        }
-                    }
-
-                    // Green down-arrow with "?"
-                    if (arrowAt !== null) {
-                        const ax = leftX + (arrowAt / totalParts) * span;
-                        svg += `<polygon points="${ax - 7},12 ${ax + 7},12 ${ax},${lineY - 16}" fill="var(--accent-green)"/>`;
-                        svg += `<text x="${ax}" y="10" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--accent-green)" font-size="12" font-weight="bold">?</text>`;
-                    }
-
-                    // Green dot at specific position
-                    if (dotAt !== null) {
-                        const dx = leftX + (dotAt / totalParts) * span;
-                        svg += `<circle cx="${dx}" cy="${lineY}" r="7" fill="var(--accent-green)" stroke="${COLORS.bg}" stroke-width="${STROKE.normal}"/>`;
-                    }
-
-                    return `<svg viewBox="0 0 ${W} ${H}" style="display:block;margin:0 auto;max-width:100%;width:100%;" id="${lineId}_svg">${svg}</svg>`;
+                // Grade 3 (3.NF.A.2a/b, 3.NF.A.3c; WRM Y3.B6.S8-S9). KIT (fractions lane, options-r3:
+                // it printed ONE item per page in the legacy layout with a colour bar and an "Answer:"
+                // line). Four forms, the `forms` option:
+                //   0 read    a dot on a 0-1 line cut into equal parts: write the fraction at the dot
+                //   1 jumps   the same line with the jumps from 0 drawn (count the jumps)
+                //   2 place   mark the fraction on the line (the kit's nl-place cell: tap on screen)
+                //   3 past 1  a line from 0 to 2 or 3: write the fraction at the dot (6/4)
+                // Read, jumps and past-1 are one instruction ("Write the number at each dot."), so
+                // the default mixes them; placing is its own page when ticked alone.
+                const _fnlForms = _fChanged('forms');
+                const form = _fnlForms ? pick(_fnlForms) : pick([0, 0, 1, 3]);
+                q.skillLabel = 'Fractions on a Number Line';
+                q.options = [];
+                if (form === 2) {
+                    const den = pick(_filterDens([2, 3, 4, 5, 6, 8, 10]));
+                    const num = rng(1, den - 1);
+                    q.ans = [num / den];
+                    q.nlData = { min: 0, max: 1, tickStep: 1 / den, labelStep: 1, mode: 'fraction', denom: den, targets: [{ value: num / den, label: `${num}/${den}` }] };
+                    q.hint = `The line is cut into ${den} equal parts. Count ${num} parts from 0.`;
+                    q.printFormat = 'nl-drag';
+                    _nlKit(q);
+                    return;
                 }
-
-                // Weighted random type selection
-                const typeRoll = Math.random();
-                let problemType;
-                if (typeRoll < 0.25) problemType = 'A';       // Identify Point (25%)
-                else if (typeRoll < 0.45) problemType = 'B';   // Which Line Shows (20%)
-                else if (typeRoll < 0.65) problemType = 'C';   // Place Fraction (20%)
-                else if (typeRoll < 0.80) problemType = 'D';   // Identify Shaded (15%)
-                else problemType = 'E';                        // Fractions > 1 (20%)
-
-                const denChoices = [2, 3, 4, 5, 6, 8];
-
-                if (problemType === 'A') {
-                    // Type A: Identify the fraction at the green arrow
-                    const den = pick(denChoices);
-                    const num = rng(1, den - 1);
-                    q.text = `What fraction is shown at the arrow on the number line?`;
-                    q.ans = simplifyFraction(num, den);
-                    q.answerType = "text";
-                    q.hint = `The number line from 0 to 1 is divided into ${den} equal parts. Count how many parts from 0 to the arrow.`;
-                    q.printFormat = 'fraction-number-line';
-
-                    const lineSVG = _buildFractionNumberLine({ den, arrowAt: num });
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Fractions on a Number Line</div>
-                        ${lineSVG}
-                        <div style="margin-top:6px;font-size:0.85rem;color:var(--text-bright);">The line is divided into <strong>${den}</strong> equal parts.</div>
-                    </div>`;
-
-                } else if (problemType === 'B') {
-                    // Type B: Which number line shows the given fraction?
-                    // Need at least 3 distinct positions → den >= 4
-                    const den = pick([4, 5, 6, 8]);
-                    const correctNum = rng(1, den - 1);
-                    const correctPos = correctNum; // position in parts
-                    const labels = ['A', 'B', 'C'];
-                    const correctIndex = rng(0, 2);
-
-                    // Generate 2 wrong positions (different from correct and each other)
-                    const wrongPositions = [];
-                    while (wrongPositions.length < 2) {
-                        const w = rng(1, den - 1);
-                        if (w !== correctPos && !wrongPositions.includes(w)) wrongPositions.push(w);
-                    }
-
-                    let linesHTML = '';
-                    let wrongIdx = 0;
-                    for (let li = 0; li < 3; li++) {
-                        const shadedPos = li === correctIndex ? correctPos : wrongPositions[wrongIdx++];
-                        const lineSVG = _buildFractionNumberLine({ den, shadedTo: shadedPos, lineIndex: li });
-                        linesHTML += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                            <span style="font-weight:800;font-size:1.1rem;color:var(--accent-cyan);min-width:20px;">${labels[li]}</span>
-                            <div style="flex:1;">${lineSVG}</div>
-                        </div>`;
-                    }
-
-                    const [sn, sd] = _simplify(correctNum, den);
-                    q.text = `Which number line shows ${sn}/${sd} shaded?`;
-                    q.ans = labels[correctIndex];
-                    q.answerType = "multiple-choice";
-                    q.options = shuffle(['A', 'B', 'C']);
-                    q.hint = `${sn}/${sd} means ${correctNum} out of ${den} parts shaded from 0.`;
-                    q.printFormat = 'fraction-number-line';
-
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Which Number Line Shows the Fraction?</div>
-                        ${linesHTML}
-                    </div>`;
-
-                } else if (problemType === 'C') {
-                    // Type C: Place the fraction on the number line (interactive click)
-                    const den = pick(denChoices);
-                    const num = rng(1, den - 1);
-                    const [sn, sd] = _simplify(num, den);
-                    q.text = `Place ${sn}/${sd} on the number line by clicking the correct tick mark.`;
-                    // Paper wording. The screen keeps "click"; a pupil holding a pencil cannot
-                    // click, so the printed cell takes the `line-mark` string from the controlled
-                    // instruction library ("Mark the number on the line.", PEDAGOGY_STANDARD 10.1)
-                    // with the fraction named. BD-17 lets a NUMBER LINE keep its tick marks, but
-                    // the ACTION has to be one a pencil does, and the short string also brings the
-                    // cell back under the 12-word instruction cap (BD-10 / P-LG-1).
-                    q.printText = `Mark ${sn}/${sd} on the line.`;
-                    q.ans = num; // tick index
-                    // q.ans is the tick INDEX, which is what the screen widget checks. Printed on
-                    // a key beside "Mark 7/8 on the line." it read just "7", which a teacher
-                    // cannot mark a pencil mark against, so the paper key names the fraction and
-                    // where the mark belongs.
-                    q.printAnswer = `${sn}/${sd} — tick mark ${num} of ${den} after 0`;
-                    q.answerType = "number-line-place";
-                    q.hint = `${sn}/${sd} means ${num} out of ${den} parts from 0. Count ${num} tick marks from the left.`;
-                    q.printFormat = 'fraction-number-line';
-                    q.nlpDen = den;
-                    q.nlpCorrectTick = num;
-
-                    const lineSVG = _buildFractionNumberLine({ den, clickable: true, lineId: 'fnlC' });
-                    // The instruction lives in q.text (screen) / q.printText (paper) and is NOT
-                    // repeated inside the cell (BD-10 / P-LG-5). The visual carries the fraction
-                    // as a label so the pupil can see what is being placed, not a second command.
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Place the Fraction</div>
-                        <div style="margin-bottom:8px;font-size:1.3rem;"><strong style="color:var(--accent-green);">${sn}/${sd}</strong></div>
-                        ${lineSVG}
-                        <div style="margin-top:10px;">
-                            <button class="btn btn-primary" id="checkPlacementBtn" onclick="checkNumberLinePlacement()" style="opacity:0.5;pointer-events:none;">Check Placement</button>
-                        </div>
-                    </div>`;
-
-                } else if (problemType === 'D') {
-                    // Type D: Identify the shaded portion
-                    const den = pick(denChoices);
-                    const num = rng(1, den - 1);
-                    q.text = `What fraction of the number line is shaded?`;
-                    q.ans = simplifyFraction(num, den);
-                    q.answerType = "text";
-                    q.hint = `Count how many parts are shaded (blue) out of ${den} total parts.`;
-                    q.printFormat = 'fraction-number-line';
-
-                    const lineSVG = _buildFractionNumberLine({ den, shadedTo: num });
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Fractions on a Number Line</div>
-                        ${lineSVG}
-                        <div style="margin-top:6px;font-size:0.85rem;color:var(--text-bright);">The line is divided into <strong>${den}</strong> equal parts. What fraction is shaded?</div>
-                    </div>`;
-
-                } else {
-                    // Type E: Fractions greater than 1 (improper fractions / mixed numbers)
-                    const den = pick([2, 3, 4, 5, 6]);
+                q.answerType = 'text';
+                q.noSimplify = true;
+                if (form === 3) {
+                    const den = pick(_filterDens([2, 3, 4, 5, 6]));
                     const maxW = den <= 3 ? 3 : 2;
-                    const totalParts = maxW * den;
-                    // Pick a position > den (greater than 1) and not on a whole number
                     let num;
-                    do {
-                        num = rng(den + 1, totalParts - 1);
-                    } while (num % den === 0);
-
-                    const wholeP = Math.floor(num / den);
-                    const remP = num % den;
-                    const [sRemN, sRemD] = _simplify(remP, den);
-                    // Accept both improper and mixed number forms
-                    q.text = `What fraction or mixed number is at the arrow?`;
-                    q.ans = simplifyFraction(num, den); // e.g. "5/4" or "7/3"
-                    q.answerType = "text";
-                    q.hint = `The number line goes from 0 to ${maxW} and is divided into ${den} equal parts per whole. Count ${num} parts from 0. Answer as improper (${num}/${den}) or mixed (${wholeP} ${sRemN}/${sRemD}).`;
-                    q.printFormat = 'fraction-number-line';
-
-                    const lineSVG = _buildFractionNumberLine({ maxWhole: maxW, den, arrowAt: num });
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Fractions Greater Than 1</div>
-                        ${lineSVG}
-                        <div style="margin-top:6px;font-size:0.85rem;color:var(--text-bright);">Each whole is divided into <strong>${den}</strong> equal parts. Answer as a fraction or mixed number.</div>
-                    </div>`;
+                    do { num = rng(den + 1, maxW * den - 1); } while (num % den === 0);
+                    q.text = `What fraction is at the dot?`;
+                    q.ans = `${num}/${den}`;
+                    const w = Math.floor(num / den), r = num % den;
+                    q.acceptedAnswers = [q.ans, `${w} ${r}/${den}`];
+                    q.hint = `Each whole is cut into ${den} equal parts. Count the parts from 0 to the dot: ${num}.`;
+                    _fKit(q, { task: 'write', terms: [{ n: num, d: den, kind: 'line', frac: 'nd', models: maxW }], answer: { n: num, d: den },
+                        wholeMm: maxW === 3 ? 22 : 32, fracAt: 'below' });
+                    return;
                 }
+                const den = pick(_filterDens([2, 3, 4, 5, 6, 8, 10]));
+                const num = rng(1, den - 1);
+                q.text = form === 1 ? `Count the jumps from 0. What fraction is at the dot?` : `What fraction is at the dot?`;
+                q.ans = `${num}/${den}`;
+                q.hint = `The line from 0 to 1 is cut into ${den} equal parts. Count the parts from 0 to the dot.`;
+                // the fraction boxes beside the line (a 0-1 line keeps to one of two columns at every
+                // size, so Size S holds more rows than L)
+                _fKit(q, { task: 'write', terms: [{ n: num, d: den, kind: 'line', frac: 'nd' }], answer: { n: num, d: den },
+                    wholeMm: _fWriteWhole('line'), hops: form === 1 });
                 return;
 
             } else if (fracSkill === "whole_as_fraction") {
@@ -2908,11 +2363,13 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 const efvBaseDens = [2, 3, 4, 5, 6];
                 const efvBaseDen = pick(efvBaseDens);
                 const efvBaseNum = rng(1, efvBaseDen - 1);
-                const efvMultiplier = pick([2, 3, 4]);
-                const efvEquivNum = efvBaseNum * efvMultiplier;
-                const efvEquivDen = efvBaseDen * efvMultiplier;
                 // O6 `model`: the ticked model (else circles), both fractions on the SAME whole.
                 const _efvModel = _fModelPick();
+                // a circle keeps to 12 parts at most (a 24-part circle is slivers: options-r3)
+                const _efvMults = [2, 3, 4].filter(m => (_efvModel && _efvModel !== 'circle') || efvBaseDen * m <= 12);
+                const efvMultiplier = pick(_efvMults.length ? _efvMults : [2]);
+                const efvEquivNum = efvBaseNum * efvMultiplier;
+                const efvEquivDen = efvBaseDen * efvMultiplier;
 
                 const efvRoll = Math.random();
                 if (efvRoll < 0.30) {
@@ -2963,11 +2420,15 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         ];
                         const strategy = pick(distractorStrategies);
                         const distractor = strategy.fn();
-                        efvCmpNum2 = Math.max(1, Math.min(efvCmpDen2 - 1, distractor.n));
+                        // a proper fraction on one whole: the denominator first, then the numerator under it
                         efvCmpDen2 = Math.max(2, distractor.d);
+                        if (efvCmpDen2 > 12 && (!_efvModel || _efvModel === 'circle')) efvCmpDen2 = efvEquivDen;
+                        efvCmpNum2 = Math.max(1, Math.min(efvCmpDen2 - 1, distractor.n));
                         // Ensure it's actually non-equivalent
-                        if (efvCmpNum2 / efvCmpDen2 === efvBaseNum / efvBaseDen) {
-                            efvCmpNum2 = Math.max(1, Math.min(efvCmpDen2 - 1, efvCmpNum2 + 1));
+                        if (efvCmpNum2 * efvBaseDen === efvBaseNum * efvCmpDen2) {
+                            // one part off the equivalent fraction: never equal, always proper
+                            efvCmpDen2 = efvEquivDen;
+                            efvCmpNum2 = efvEquivNum + 1 < efvEquivDen ? efvEquivNum + 1 : efvEquivNum - 1;
                         }
                         // Tag the wrong choice ("=" since correct answer is "≠") with the
                         // misconception message corresponding to the strategy used.
@@ -4036,16 +3497,8 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     : pick(['standard', 'numericOnly', 'compareHalf']);
                 if (cmpVariant === 'numericOnly') {
                     // Numeric-only comparison (no visual)
-                    const denoms2 = [2, 3, 4, 5, 6, 8, 10, 12];
-                    const cd1 = pick(denoms2);
-                    const cd2 = pick(denoms2);
-                    let cn1 = rng(1, cd1 - 1);
-                    let cn2 = rng(1, cd2 - 1);
-                    // Avoid trivial equals on different denoms
-                    if (cn1 / cd1 === cn2 / cd2 && Math.random() < 0.7) {
-                        cn2 = (cn2 % (cd2 - 1)) + 1;
-                        if (cn2 === cn1 && cd1 === cd2) cn2 = Math.max(1, cn2 - 1);
-                    }
+                    // `pairs`: one denominator, one numerator, or both different (never the same fraction)
+                    const { n1: cn1, d1: cd1, n2: cn2, d2: cd2 } = _fComparePair([2, 3, 4, 5, 6, 8, 10, 12]);
                     // Numbers only, in the same cell as the picture items: <, > or = in the circle
                     // between the two fractions (one instruction for the page, P-LG-5).
                     const v1 = cn1 / cd1, v2 = cn2 / cd2;
@@ -4077,13 +3530,8 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 // Level 2: compare two fractions drawn on the SAME whole (the kit's `frac-model`
                 // cell, O6 lane AP3): the pupil writes <, > or = in the circle between them. Bars
                 // unless the teacher ticked other models; paper, key and screen are one drawing.
-                const denoms = [2, 3, 4, 5, 6, 8];
-                const d1 = pick(denoms);
-                const d2 = pick(denoms);
-                const n1 = rng(1, d1 - 1);
-                let n2 = rng(1, d2 - 1);
-                // never the same fraction twice (3/4 and 3/4): an equal pair is equal in another name
-                if (d1 === d2 && n1 === n2 && d2 > 2) n2 = n1 < d2 - 1 ? n1 + 1 : n1 - 1;
+                // `pairs`: one denominator, one numerator, or both different (never the same fraction)
+                const { n1, d1, n2, d2 } = _fComparePair([2, 3, 4, 5, 6, 8]);
                 const val1 = n1 / d1;
                 const val2 = n2 / d2;
 
