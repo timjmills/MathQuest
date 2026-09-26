@@ -462,7 +462,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const form = FORMS.includes(_cgDir) ? _cgDir : FORMS[_kDealShuffled(6) % 3];
         const _cgTop = Number(_kOpt('band')) || 10;
         q._variant = form;
-        const wantSame = form === 'same' && rng(0, 1) === 0;   // rolled: a dealt same / not alternated
+        const wantSame = form === 'same' && _kDraw('cg-same', 2) === 0;   // L10: page-dealt, repeats allowed
         let countA, countB;
         if (wantSame) {
             countA = countB = 2 + _kDealShuffled(_cgTop - 1);
@@ -470,7 +470,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             const diff = [1, 1, 2, 2, 3][_kDraw('cg-diff', 5)];
             const lo = Math.max(1, Math.min(2, _cgTop - diff - 1)) + rng(0, Math.max(0, _cgTop - 2 - diff));   // 2 .. top - diff
             const big = lo + diff;
-            [countA, countB] = rng(0, 1) === 1 ? [big, lo] : [lo, big];
+            [countA, countB] = _kDraw('cg-order', 2) === 1 ? [big, lo] : [lo, big];   // L10: which box answers is page-dealt (critic guided-r1: every answer was B)
         }
         let labels, values, correct, questionText, printText;
         if (form === 'same') {

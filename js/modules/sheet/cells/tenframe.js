@@ -25,7 +25,7 @@ import { L, P, B, INK, GREY, root, digitPt, sizeOf, inkOf, isTwin, answered, fix
 
 // R3 (critic round 3): 10-11 mm boxes left the lower half of every cell empty and a small frame to
 // draw in; 11-12.5 mm boxes (a 62.5 mm frame at L beside its number) still fit a 2-column cell.
-const CELL = { S: 11, M: 12, L: 12.5 };
+const CELL = { S: 10, M: 11.25, L: 12.5 };   // S at 0.8 of L (critic guided-r1: S drew at L's size)
 
 /** How many counters the frame shows in this state. */
 function shownCount(p, ctx) {

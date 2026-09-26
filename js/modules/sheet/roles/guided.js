@@ -454,6 +454,12 @@ function fadeRender(it, stage, ans) {
         return work ? `<div class="mq-workwrap">${withCue(html, it, stage)}${work}</div>` : withCue(html, it, stage);
     };
     return (c, o) => {
+        // The key's Model is a facsimile of the pupil's (AK-1; critic guided-r1: the count_objects key
+        // dropped the Model's grey count tags): the same traced state, working and all.
+        if (c.state !== 'blank' && stage === 'model' && ans) {
+            const html = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { shown: ans, ink: 'trace' }));
+            return cue(it.template === 'stack' ? traceCarries(html, it) : html);
+        }
         if (c.state !== 'blank') {
             const html = it.render(c, o);
             return cue(stage === 'model' && it.template === 'stack' ? traceCarries(html, it) : html);
