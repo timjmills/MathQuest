@@ -539,3 +539,157 @@ export function triangleFigure(q, maxDim) {
         hint: 'Multiply the base by the height, then halve it.',
     });
 }
+
+/* ============================================================ volume (solid-kit) */
+
+const CUBIC = (u) => `cubic ${u}`;
+/** A solid's item for the solid-kit cell (the screen twin, the answer fields). */
+function finishSolid(q, payload, { text, ans, printFormat, skillLabel, hint }) {
+    q.cell = { template: 'solid-kit', v: 1, payload };
+    q.visual = k2Twin('solid-kit', payload);
+    q.text = text;
+    q.ans = ans;
+    q.answerType = 'number';
+    q.options = [];
+    q.hint = hint;
+    q.printFormat = printFormat;
+    q.skillLabel = skillLabel;
+    return q;
+}
+
+/** Drawn units for real edges: to scale up to 10, else in proportion with every edge 1 or more. */
+function drawnDims(dims) {
+    const m = Math.max(...dims);
+    if (m <= 10) return { d: dims.slice(), toScale: true };
+    return { d: dims.map((v) => Math.max(2, Math.round((v * 10) / m))), toScale: false };
+}
+
+const VOLUME_STORIES = [
+    { obj: 'fish tank', verb: 'has', unit: 'ft' }, { obj: 'storage box', verb: 'has', unit: 'ft' },
+    { obj: 'sandbox', verb: 'built', unit: 'ft' }, { obj: 'gift box', verb: 'wrapped', unit: 'in' },
+    { obj: 'planter', verb: 'filled', unit: 'm' },
+];
+const UNIT_NAME = { m: 'meters', ft: 'feet', in: 'inches', cm: 'centimeters' };
+
+/**
+ * One rectangular prism (area_perimeter:volume). Variants: standard (the three edges labelled),
+ * missing (the volume given, one edge "?"), word (a story; the labelled solid is the Support-level-2
+ * sketch). The unit-cube lines are the level-2 hint when the solid is drawn to scale.
+ */
+export function volumeFigure(q, variant, cap) {
+    geoBegin();
+    const lvl = geoLevel(1);
+    // never a rod: the longest edge is at most four times the shortest
+    let l, w, h;
+    for (let t = 0; t < 40; t++) {
+        l = randInt(2, cap); w = randInt(2, Math.max(2, cap - 1)); h = randInt(2, Math.max(2, cap - 1));
+        if (Math.max(l, w, h) <= 4 * Math.min(l, w, h)) break;
+    }
+    const vol = l * w * h;
+    const { d: [dl, dw, dh], toScale } = drawnDims([l, w, h]);
+    const box = { x: 0, y: 0, z: 0, l: dl, w: dw, h: dh };
+    const edges = [
+        { a: [0, 0, 0], b: [dl, 0, 0], v: l, name: 'length' },
+        { a: [dl, 0, 0], b: [dl, dw, 0], v: w, name: 'width' },
+        { a: [0, 0, 0], b: [0, 0, dh], v: h, name: 'height' },
+    ];
+    if (variant === 'missing') {
+        const unit = pick(['cm', 'in']);
+        const mi = randInt(0, 2);
+        const labels = edges.map((e, i) => ({ a: e.a, b: e.b, v: i === mi ? '?' : e.v }));
+        const ans = edges[mi].v;
+        return finishSolid(q, {
+            boxes: [box], toScale, labels, unit, given: [`Volume = ${vol} ${CUBIC(unit)}`],
+            ask: [{ id: 'edge', label: '?', unit, ans }], formula: 'Volume = length × width × height', hint: lvl >= 2, traced: lvl >= 3,
+        }, {
+            text: `The volume is ${vol} ${CUBIC(unit)}. What is the missing edge?`, ans, printFormat: 'volume-missing',
+            skillLabel: 'Volume · Find Missing Side', hint: 'Multiply the two edges you know. Divide the volume by that.',
+        });
+    }
+    if (variant === 'word') {
+        const st = pick(VOLUME_STORIES), name = pick(NAMES), unit = st.unit;
+        const story = [
+            `${name} ${st.verb} a ${st.obj} shaped like a box.`,
+            `It is ${l} ${unit} long, ${w} ${unit} wide and ${h} ${unit} tall.`,
+            `What is its volume in cubic ${UNIT_NAME[unit]}?`,
+        ];
+        return finishSolid(q, {
+            boxes: [box], toScale, labels: edges.map((e) => ({ a: e.a, b: e.b, v: e.v })), unit, story, sketch: true,
+            ask: [{ id: 'volume', label: 'Volume', unit: CUBIC(unit), ans: vol }], formula: 'Volume = length × width × height',
+            hint: lvl >= 2, traced: lvl >= 3,
+        }, {
+            text: story.join(' ').replace(/ /g, ' '), ans: vol, printFormat: 'volume-story', skillLabel: 'Volume · Word Problem',
+            hint: `Volume = length × width × height = ${l} × ${w} × ${h}.`,
+        });
+    }
+    const unit = pick(['cm', 'm', 'in', 'ft']);
+    return finishSolid(q, {
+        boxes: [box], toScale, labels: edges.map((e) => ({ a: e.a, b: e.b, v: e.v })), unit,
+        ask: [{ id: 'volume', label: 'Volume', unit: CUBIC(unit), ans: vol }], formula: 'Volume = length × width × height',
+        hint: lvl >= 2, traced: lvl >= 3,
+    }, {
+        text: 'Find the volume of the rectangular prism.', ans: vol, printFormat: 'geometry-volume', skillLabel: 'Volume',
+        hint: `Volume = length × width × height = ${l} × ${w} × ${h}.`,
+    });
+}
+
+/**
+ * Two rectangular prisms joined, not overlapping (area_perimeter:volume_composite, 5.MD.C.5c).
+ * Kinds (option `shapes`, 5H): 0 side by side (one depth, two heights: an L-shaped front), 1 one
+ * stacked on the other. The solid is drawn as one (no seam); the split between the two prisms is
+ * the Support-level-2 hint. The volume is at most `maxVol` (the "Volume to" band).
+ */
+export function compositeVolume(q, maxVol) {
+    geoBegin();
+    const lvl = geoLevel(1);
+    const ticked = geoOpt('shapes');
+    const pool = Array.isArray(ticked) && ticked.length ? ticked.map(Number).filter((k) => k === 0 || k === 1) : [0, 1];
+    const kind = (pool.length ? pool : [0, 1])[geoDeal('volc-kind', pool.length || 2)];
+    const unit = pick(['cm', 'm', 'in', 'ft']);
+    let boxes, labels, split, vol, parts;
+    for (let tries = 0; tries < 60; tries++) {
+        if (kind === 0) {
+            const l1 = randInt(1, 4), l2 = randInt(1, 4), d = randInt(2, 4);
+            let h1 = randInt(1, 5), h2 = randInt(1, 5);
+            if (h1 === h2) h2 = h1 === 5 ? 3 : h1 + 1;
+            const L = l1 + l2;
+            boxes = [{ x: 0, y: 0, z: 0, l: l1, w: d, h: h1 }, { x: l1, y: 0, z: 0, l: l2, w: d, h: h2 }];
+            // every label on an edge with open space beside it: the two lengths share the bottom
+            // line (ticks mark where each one ends), the right prism's height is on its back edge
+            labels = [
+                { a: [0, 0, 0], b: [l1, 0, 0], v: l1, ticks: true }, { a: [l1, 0, 0], b: [L, 0, 0], v: l2, ticks: true },
+                { a: [0, 0, 0], b: [0, 0, h1], v: h1 }, { a: [L, d, 0], b: [L, d, h2], v: h2 },
+                { a: [L, 0, 0], b: [L, d, 0], v: d },
+            ];
+            split = [[[l1, 0, 0], [l1, 0, Math.min(h1, h2)]]];
+            parts = [l1 * d * h1, l2 * d * h2];
+        } else {
+            const l1 = randInt(3, 5), d1 = randInt(2, 4), h1 = randInt(1, 3);
+            // the top prism is 2 units or more each way, so its two top labels have room
+            const l2 = randInt(2, l1 - 1), d2 = randInt(2, d1), h2 = randInt(1, 3);
+            boxes = [{ x: 0, y: 0, z: 0, l: l1, w: d1, h: h1 }, { x: 0, y: 0, z: h1, l: l2, w: d2, h: h2 }];
+            const H = h1 + h2;
+            labels = [
+                // every label on an edge with open space beside it: the bottom prism's height on
+                // its back edge, the top prism's height on the left line (ticks mark where it
+                // starts), its length on its top back edge, its width on its top left edge
+                { a: [0, 0, 0], b: [l1, 0, 0], v: l1 }, { a: [l1, 0, 0], b: [l1, d1, 0], v: d1 },
+                { a: [l1, d1, 0], b: [l1, d1, h1], v: h1 }, { a: [0, d2, H], b: [l2, d2, H], v: l2 },
+                { a: [0, 0, h1], b: [0, 0, H], v: h2, ticks: true }, { a: [0, 0, H], b: [0, d2, H], v: d2 },
+            ];
+            split = [[[0, 0, h1], [l2, 0, h1]]];
+            parts = [l1 * d1 * h1, l2 * d2 * h2];
+        }
+        vol = parts[0] + parts[1];
+        if (vol <= maxVol) break;
+    }
+    return finishSolid(q, {
+        boxes, toScale: true, cubes: false, labels, split, unit, parts,
+        ask: [{ id: 'volume', label: 'Volume', unit: CUBIC(unit), ans: vol }],
+        formula: 'Find the volume of each prism. Add them.', hint: lvl >= 2, traced: lvl >= 3,
+    }, {
+        text: 'Find the volume of the solid made of two rectangular prisms.', ans: vol, printFormat: 'volume-composite',
+        skillLabel: kind === 0 ? 'Composite Volume · Side by Side' : 'Composite Volume · Stacked',
+        hint: 'Split the solid into two rectangular prisms. Find each volume. Add them.',
+    });
+}

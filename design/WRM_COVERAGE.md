@@ -24,7 +24,7 @@ Sources:
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
 - Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 328 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 329 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -610,8 +610,6 @@ whatever happens to the WRM gaps.
   WRM: Y5.B15.S1
 - **5.MD.C.4** Measure volumes by counting unit cubes, using cubic cm, cubic in, cubic ft, and improvised units.  
   WRM: Y5.B15.S1, Y5.B15.S2, Y5.B15.S3, Y6.B10.S7
-- **5.MD.C.5c** Recognize volume as additive. Find volumes of solid figures composed of two non-overlapping right rectangular prisms by adding the volumes of the non-overlapping parts, applying this technique to solve real world problems.  
-  WRM: Y6.B10 supplement "Volume of composite solids"
 - **5.NBT.A.3a** Read and write decimals to thousandths using base-ten numerals, number names, and expanded form, e.g., 347.392 = 3 × 100 + 4 × 10 + 7 × 1 + 3 × (1/10) + 9 × (1/100) + 2 × (1/1000).  
   WRM: Y4.B9.S3, Y4.B9.S4
 - **K.G.B.5** Model shapes in the world by building shapes from components (e.g., sticks and clay balls) and drawing shapes.  
@@ -3662,9 +3660,9 @@ whatever happens to the WRM gaps.
   Proposal: Volume by Counting Cubes  
   Vocabulary: volume, layer, cubic centimetre (cm³)  
 - **Y6.B10.S8** Volume of a cuboid — covered. _5.MD.C.5, M.EE.5.MD.5_  
-  Skills: Volume (Rectangular Prisms) (`area_perimeter:volume`)  
+  Skills: Volume (Rectangular Prisms) (`area_perimeter:volume`); Composite 3D Volume (Visual) (`area_perimeter:volume_composite`)  
   Vocabulary: volume, layer, cubic cm (cm³)  
-- _Awsaj supplement (not a WRM step):_ Volume of composite solids — 5.MD.C.5, 5.MD.C.5c (no skill)
+- _Awsaj supplement (not a WRM step):_ Volume of composite solids — 5.MD.C.5, 5.MD.C.5c
 
 #### Y6.B11 Spring Block 6: Statistics
 

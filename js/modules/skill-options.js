@@ -2258,7 +2258,11 @@ Object.assign(P12_OPTIONS, {
     'area_perimeter:volume': [_p12Variants('volume', ['standard', 'missing', 'word'], ['Find the volume', 'Find a missing edge (the volume is given)', 'A story (a box, a tank)'])],
     'area_perimeter:area_polygon_decompose': [_p12Kinds('shapes', 'Which shapes', [['L-shapes', 'L-shape'], ['U-shapes', 'U-shape'], ['T-shapes', 'T-shape']])],
     'area_perimeter:composite_shapes': [_p12Variants('composite_shapes', ['perim_only', 'dual_pa'], ['The perimeter only', 'The perimeter and the area'])],
-    'area_perimeter:volume_composite': [_p12Kinds('shapes', 'Which solids', [['Rectangular prisms', 'rectangular pr'], ['Cubes', 'this cube']])],
+    // Build lane geometry (volume_composite_repair): two prisms joined, read directly by gen-geo-kit.js.
+    'area_perimeter:volume_composite': [{ id: 'shapes', label: 'How the prisms join', type: 'set', default: [0, 1], group: 'difficulty',
+        values: [{ v: 0, l: 'Side by side (one depth, two heights)' }, { v: 1, l: 'One on top of the other' }],
+        allLabel: 'Both, mixed',
+        help: 'Side by side comes first: the two prisms share their depth. Stacked prisms each have their own length, width and height.' }],
     'angles_lines:identify_angles': [_clickOrName('Name the angle (acute, right, obtuse)', '^What type'),
         _p12Kinds('shapes', 'Which angles', [['Right', 'right|=> Right$'], ['Acute', 'acute|=> Acute$'], ['Obtuse', 'obtuse|=> Obtuse$'], ['Straight', '=> Straight$']])],
     'angles_lines:measure_angles': [_p12Kinds('forms', 'Which angles', [['Multiples of 45° (45, 90, 135, 180)', '=> (45|90|135|180)°$'],
@@ -2709,7 +2713,7 @@ const _o2Add = (key, ...defs) => {
     ['area_perimeter:volume', _o2RangeBand([12, 30], { label: 'Numbers to' })],
     ['area_perimeter:composite_shapes', _o2RangeBand([25, 40], { label: 'Numbers to' })],
     ['area_perimeter:area_polygon_decompose', _o2RangeBand([25, 50], { label: 'Area to' })],
-    ['area_perimeter:volume_composite', _o2RangeBand([50, 100], { label: 'Volume to' })],
+    ['area_perimeter:volume_composite', _o2RangeBand([30, 60], { label: 'Volume to' })],
     // ---- shapes, angles, coordinates
     // The naming skills (name_2d / 3d_shapes, identify_angles / lines, classify_triangles,
     // measure_angles, cross_section_3d, shape_positions) are NOT given a pick-list ladder:
@@ -2835,6 +2839,10 @@ const _AP2_POINTS = { all: 'Points named with their coordinates: A(3, 2)', some:
             allLabel: 'All three, mixed',
             help: 'Rectangles and squares come first. A page of all three has three four-sided shapes to two triangles and one 5- or 6-sided shape.' },
         levelSubset([3, 2, 1], 1, 'Level 3 writes the answer in grey to trace; level 2 prints a grey addition frame, one blank for each side (___ + ___ + ___ + ___ =); level 1 is the figure alone.')],
+    ['area_perimeter:volume',
+        levelSubset([3, 2, 1], 1, 'Level 3 writes the answer in grey to trace; level 2 draws the unit cubes in grey on the faces and the formula line (and, on a story, the labelled solid); level 1 is the labelled solid alone.')],
+    ['area_perimeter:volume_composite',
+        levelSubset([3, 2, 1], 1, 'Level 3 writes the answer in grey to trace; level 2 draws a grey line where the two prisms meet and the formula line; level 1 leaves the split to the pupil.')],
     ['area_perimeter:area_triangle',
         { id: 'shapes', label: 'Which triangles', type: 'set', default: [0, 1, 2], group: 'difficulty',
             values: [{ v: 0, l: 'Right triangles (the height is a side)' }, { v: 1, l: 'Acute triangles (the height inside)' },

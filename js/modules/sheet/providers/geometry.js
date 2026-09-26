@@ -331,3 +331,63 @@ for (const [id, def] of Object.entries(FILL_DEFS)) {
     });
 }
 export const GEO_FILL_SKILLS = Object.freeze(Object.keys(FILL_DEFS).map((id) => `shapes_early:${id}`));
+
+/* ============================================================ volume (solid-kit) */
+// area_perimeter:volume, area_perimeter:volume_composite. The misconception bank:
+//   M-V1  added the edges              M-V2  multiplied two edges only (an area)
+//   M-V3  multiplied every edge shown on a composite (the whole box round it)
+//   M-V4  found only one of the two prisms
+function volSteps(q) {
+    const p = payloadOf(q);
+    const a = (p.ask || [])[0] || {};
+    const vals = (p.labels || []).map((l) => l.v);
+    if (a.id === 'edge') {
+        const known = vals.filter((v) => v !== '?');
+        const V = Number(String((p.given || [''])[0]).replace(/[^0-9]+/g, ' ').trim().split(' ')[0]);
+        return [step(`Multiply the two edges you know: ${known.join(' × ')} = ${known[0] * known[1]}.`),
+            step(`Divide the volume: ${V} ÷ ${known[0] * known[1]} = ${a.ans}.`, [{ slot: 'edge', value: String(a.ans) }])];
+    }
+    if ((p.parts || []).length === 2) {
+        return [step('Split the solid into two rectangular prisms.'),
+            step(`Find each volume: ${p.parts[0]} and ${p.parts[1]}.`),
+            step(`Add them: ${p.parts[0]} + ${p.parts[1]} = ${a.ans}.`, [{ slot: 'volume', value: String(a.ans) }])];
+    }
+    return [step(`Read the edges: ${vals.join(', ')}.`),
+        step(`Multiply: ${vals.join(' × ')} = ${a.ans}.`, [{ slot: 'volume', value: String(a.ans) }])];
+}
+function volWrong(q) {
+    const p = payloadOf(q);
+    const a = (p.ask || [])[0] || {};
+    const vals = (p.labels || []).map((l) => l.v).filter((v) => v !== '?').map(Number);
+    const c = [];
+    if (a.id === 'edge') {
+        const V = Number(String((p.given || [''])[0]).replace(/[^0-9]+/g, ' ').trim().split(' ')[0]);
+        c.push({ value: V - vals[0] * vals[1], slot: 'edge', misconception: 'M-V2', explain: 'Took away instead of dividing.' });
+        return chooseWrong(q, c);
+    }
+    if ((p.parts || []).length === 2) {
+        c.push({ value: Math.max(...p.parts), slot: 'volume', misconception: 'M-V4', explain: 'Found only one of the two prisms.' });
+        const bx = p.boxes || [];
+        const L = Math.max(...bx.map((b) => b.x + b.l)), D = Math.max(...bx.map((b) => b.y + b.w)), H = Math.max(...bx.map((b) => b.z + b.h));
+        c.push({ value: L * D * H, slot: 'volume', misconception: 'M-V3', explain: 'Multiplied the outside edges: the missing corner was counted too.' });
+        return chooseWrong(q, c);
+    }
+    c.push({ value: vals.reduce((s, v) => s + v, 0), slot: 'volume', misconception: 'M-V1', explain: 'Added the edges instead of multiplying.' });
+    if (vals.length === 3) c.push({ value: vals[0] * vals[1], slot: 'volume', misconception: 'M-V2', explain: 'Multiplied two edges only: that is the area of one face.' });
+    return chooseWrong(q, c);
+}
+const VOL_DEFS = {
+    volume: { iCan: 'I Can find the volume of a rectangular prism', instructionKey: 'volume',
+        steps: ['Find the length, the width and the height.', 'Multiply them.', 'Write the volume in cubic units.'] },
+    volume_composite: { iCan: 'I Can find the volume of two joined prisms', instructionKey: 'volume-composite',
+        steps: ['Split the solid into two prisms.', 'Find the volume of each.', 'Add the two volumes.'] },
+};
+for (const [id, def] of Object.entries(VOL_DEFS)) {
+    registerSkill(`area_perimeter:${id}`, {
+        strings: strings({ iCan: def.iCan, instructionKey: def.instructionKey, steps: def.steps,
+            say: 'The answer is __.', sayValues: (q) => { const a = (payloadOf(q).ask || [])[0] || {}; return [`${a.ans} ${a.unit || ''}`.trim()]; } }),
+        misconceptions: ['M-V1', 'M-V2', 'M-V3', 'M-V4'],
+        workedSteps: (q) => clampSteps(volSteps(q)),
+        wrongAnswer: volWrong,
+    });
+}

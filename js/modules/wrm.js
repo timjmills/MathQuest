@@ -714,6 +714,7 @@ export const SKILL_WRM = {
     'area_perimeter:area_polygon_decompose': ['Y5.B8.S5'],
     'area_perimeter:composite_shapes': [{ step: 'Y5.B8.S2', note: 'perimeter' }, 'Y5.B8.S5'],
     'area_perimeter:volume': ['Y6.B10.S8'],
+    'area_perimeter:volume_composite': ['Y6.B10.S8'],
 
     // ---- angles_lines
     'angles_lines:identify_angles': [

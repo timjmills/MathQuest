@@ -6,7 +6,8 @@ import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-token
 import { optionsFor } from './skill-options.js';
 import { k2Twin, COMPOSE_LETTERS } from './sheet/index.js';
 import { geoOpt, geoBegin, geoDeal, geoLevel, areaUnitSquares, perimeterGrid, perimeterFigure, areaFigure,
-    areaPerimeterFigure, compositeFigure, decomposeFigure, triangleFigure, storyFigure } from './gen-geo-kit.js';
+    areaPerimeterFigure, compositeFigure, decomposeFigure, triangleFigure, storyFigure,
+    volumeFigure, compositeVolume } from './gen-geo-kit.js';
 import { compositionsFor, dealComposition, decoyPieceSets, nameBank, namesFor, corners, transformShape } from './geo-compose.js';
 import { blockPoints } from './widgets/compose-shape-blocks.js';
 
@@ -1780,40 +1781,10 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
             // dimensions so it remains a Grade 5 challenge rather than a
             // duplicate of `volume`.
             if (mappedSkill === "volume_composite") {
-                const volDim = Math.max(4, Math.min(Math.ceil(Math.pow(range, 1 / 3)) + 2, 25));
-                const isCube = Math.random() < 0.30;
-                let length, width, height;
-                if (isCube) {
-                    const side = rng(3, volDim);
-                    length = width = height = side;
-                } else {
-                    length = rng(3, volDim);
-                    width = rng(3, Math.max(3, volDim - 1));
-                    height = rng(3, Math.max(3, volDim - 1));
-                }
-                const totalVol = length * width * height;
-                q.text = isCube
-                    ? `Find the volume of this cube (side = ${length}).`
-                    : `Find the volume of this rectangular prism: length = ${length}, width = ${width}, height = ${height}.`;
-                q.ans = totalVol;
-                q.answerType = "number";
-                q.options = buildNumericOptions(totalVol);
-                q.hint = isCube
-                    ? `Volume of a cube = side × side × side = ${length} × ${length} × ${length} = ${totalVol}.`
-                    : `Volume = length × width × height = ${length} × ${width} × ${height} = ${totalVol}.`;
-                const _vcSvg = create3DBoxSVG(length, width, height, false)
-                    .replace(/\swidth="[^"]*"/, '')
-                    .replace(/\sheight="[^"]*"/, '')
-                    .replace(/style="([^"]*)"/, 'style="$1;display:block;width:100%;height:auto;"');
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">Volume</div>
-                    <div style="display:inline-block;width:min(360px,90%);margin:16px auto;line-height:0;">${_vcSvg}</div>
-                    <div style="margin-top:8px;font-size:1.1rem;font-weight:600;">Volume = <span style="border-bottom:2px solid var(--accent-green);padding:0 18px;">?</span> cubic units</div>
-                </div>`;
-                q.geometryData = { length, width, height, volume: totalVol, isCube };
-                q.skillLabel = isCube ? 'Cube Volume' : 'Prism Volume';
-                q.printFormat = 'geometry-volume';
-                return;
+                // Build lane geometry (volume_composite_repair, 5.MD.C.5c): two rectangular prisms
+                // joined, drawn as one solid by the solid-kit cell (it dealt ONE prism before).
+                // "Volume to" bounds the answer.
+                return compositeVolume(q, Math.max(30, Math.min(range, 200)));
             }
 
 
@@ -1854,90 +1825,10 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const _volVariant = (window.pickVariant
                     ? window.pickVariant('volume', ['standard','missing','word'], state)
                     : (Math.random() < 0.40 ? 'standard' : (Math.random() < 0.50 ? 'missing' : 'word')));
-                const _volCap = Math.max(3, Math.min(Math.ceil(Math.pow(range, 1/3)), 30));
-
-                if (_volVariant === 'missing') {
-                    const a = rng(2, _volCap);
-                    const b = rng(2, Math.max(2, _volCap - 1));
-                    const missing = rng(2, Math.max(2, _volCap - 1));
-                    const volume = a * b * missing;
-                    // Pick which dimension is missing
-                    const labels = ['length', 'width', 'height'];
-                    const missingIdx = randInt(0, 2);
-                    const dimVals = [a, b, missing];
-                    // Place "missing" at missingIdx
-                    [dimVals[2], dimVals[missingIdx]] = [dimVals[missingIdx], dimVals[2]];
-                    const known1Label = labels.filter((_, i) => i !== missingIdx)[0];
-                    const known2Label = labels.filter((_, i) => i !== missingIdx)[1];
-                    const known1Val = dimVals[labels.indexOf(known1Label)];
-                    const known2Val = dimVals[labels.indexOf(known2Label)];
-                    const missingLabel = labels[missingIdx];
-                    q.ans = missing;
-                    q.text = `A rectangular box has a volume of ${volume} cubic inches, a ${known1Label} of ${known1Val} inches, and a ${known2Label} of ${known2Val} inches. What is the ${missingLabel}?`;
-                    q.hint = `Volume = length × width × height. Divide volume by the two known sides: ${volume} ÷ (${known1Val} × ${known2Val}) = ${volume} ÷ ${known1Val * known2Val} = ${missing} inches.`;
-                    q.a = volume;
-                    q.b = known1Val * known2Val;
-                    q.op = '÷';
-                    q.answerType = 'number';
-                    q.options = buildNumericOptions(q.ans);
-                    q.skillLabel = 'Volume · Find Missing Side';
-                    q.printFormat = 'standard';
-                    return q;
-                }
-                if (_volVariant === 'word') {
-                    const name = (typeof pickName === 'function') ? pickName() : pick(['Maria','Liam','Aisha','Noah','Sofia','Owen']);
-                    const ctx = pick([
-                        { obj: 'fish tank', unit: 'ft', cubicUnit: 'cubic feet' },
-                        { obj: 'storage box', unit: 'ft', cubicUnit: 'cubic feet' },
-                        { obj: 'sandbox', unit: 'ft', cubicUnit: 'cubic feet' },
-                        { obj: 'planter', unit: 'ft', cubicUnit: 'cubic feet' },
-                        { obj: 'cooler', unit: 'ft', cubicUnit: 'cubic feet' }
-                    ]);
-                    const length = rng(2, _volCap);
-                    const width = rng(2, Math.max(2, _volCap - 1));
-                    const height = rng(2, Math.max(2, _volCap - 1));
-                    const volume = length * width * height;
-                    q.ans = volume;
-                    q.text = `${name} has a rectangular ${ctx.obj} that is ${length} ${ctx.unit} long, ${width} ${ctx.unit} wide, and ${height} ${ctx.unit} tall. What is its volume in ${ctx.cubicUnit}?`;
-                    q.hint = `Volume = length × width × height = ${length} × ${width} × ${height} = ${volume} ${ctx.cubicUnit}.`;
-                    q.a = length * width;
-                    q.b = height;
-                    q.op = '×';
-                    q.answerType = 'number';
-                    q.options = buildNumericOptions(q.ans);
-                    q.skillLabel = 'Volume · Word Problem';
-                    q.printFormat = 'spacious';
-                    return q;
-                }
-
-                // Volume of rectangular prism - use cube root for 3D scaling
-                const volDim = Math.max(3, Math.min(Math.ceil(Math.pow(range, 1/3)), 30));
-                const length = rng(2, volDim);
-                const width = rng(2, Math.max(2, volDim - 1));
-                const height = rng(2, Math.max(2, volDim - 1));
-                const volume = length * width * height;
-
-                q.ans = volume;
-                q.text = `Find the volume: length = ${length}, width = ${width}, height = ${height}`;
-                q.hint = `Volume = length × width × height = ${length} × ${width} × ${height}`;
-
-                // Replaced `transform:scale(2)` wrapper with a width-clamped responsive
-                // container. The previous transform doubled an already-up-to-360px SVG
-                // to 720px, which overflowed map cards and worksheet cells. We now
-                // rewrite the inline width/height attributes on the returned SVG so it
-                // fluidly fills a max-360px parent while the viewBox preserves aspect.
-                const _volSvg = create3DBoxSVG(length, width, height, false)
-                    .replace(/\swidth="[^"]*"/, '')
-                    .replace(/\sheight="[^"]*"/, '')
-                    .replace(/style="([^"]*)"/, 'style="$1;display:block;width:100%;height:auto;"');
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.15rem;">Volume</div>
-                    <div style="display:inline-block;width:min(360px,90%);margin:16px auto;line-height:0;">${_volSvg}</div>
-                    <div style="font-size:1.15rem;margin-top:10px;">V = l × w × h = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> cubic units</div>
-                </div>`;
-                q.options = buildNumericOptions(volume);
-                q.geometryData = { length, width, height, volume };
-                q.printFormat = "geometry-volume";
+                q._variant = _volVariant;
+                // Build lane geometry: the solid-kit cell (a labelled prism in black and white; the
+                // unit cubes are the Support-level-2 hint).
+                return volumeFigure(q, _volVariant, Math.max(3, Math.min(Math.ceil(Math.pow(range, 1 / 3)), 30)));
             } else if (geoSkill === "identify_angles" && Math.random() < 0.30) {
                 // Multi-select: "Click ALL the X angles." — 4-6 angle SVGs
                 const angleTypeChoices = ['acute', 'right', 'obtuse'];

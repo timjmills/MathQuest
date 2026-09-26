@@ -120,7 +120,8 @@ export function figureSVG(p, ctx) {
     const labW = (v) => textW(v, dPt) + (unit && v !== '?' ? textW(` ${unit}`, uPt) : 0);
     // a labelled figure shrinks (never below 60 %) until it and its labels fit the cell (L1: the
     // cell is narrower at S); a figure on unit squares keeps its squares (RP-5: 6 mm or more)
-    let k = onGrid ? SQUARE[size] : Math.min(FIG[size].w / (wU || 1), FIG[size].h / (hU || 1));
+    // a story's sketch is smaller (the story is the item; the sketch is a picture of it)
+    let k = onGrid ? SQUARE[size] : Math.min(FIG[size].w / (wU || 1), FIG[size].h / (hU || 1)) * (p.sketch ? 0.6 : 1);
     const k0 = k;
     let P2, labels, hF, hT, hSide, bx1, by1, bx2, by2;
     let grown = 0;
@@ -256,8 +257,11 @@ function answerLine(p, ctx, a, several) {
 export function renderFigure(p, ctx, root) {
     // a word problem's sketch is a hint (Support level 2, a Model or Guided page); its story is
     // one sentence a line at the text size + 2 (P-WP-17)
-    const drawn = !p.sketch || hintsOn(p, ctx);
-    const f = drawn ? figureSVG(p, ctx) : { html: '' };
+    // a story's figure is drawn on every item, the same size; its side lengths are written on it
+    // only as the Support-level-2 hint (the pupil reads them from the story)
+    const bare = p.sketch && !hintsOn(p, ctx);
+    const drawn = !bare;
+    const f = figureSVG(bare ? { ...p, edges: [] } : p, ctx);
     const story = (p.story || []).length
         ? `<div class="sg-story" style="font-size:${P(ctx, textPt(ctx) + 2)};line-height:1.3;text-align:left;max-width:${L(ctx, FIGURE_COL[sizeOf(ctx)].wMm - 8)};white-space:normal;">${p.story.map((t) => `<div>${esc(t)}</div>`).join('')}</div>` : '';
     const unitLine = drawn && p.unit && !unitOnLabels(p) && shownLabels(p)
