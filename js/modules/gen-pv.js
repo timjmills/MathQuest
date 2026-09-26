@@ -38,6 +38,7 @@
 
 import { state } from './state.js';
 import { randInt, shuffle } from './utils.js';
+import { dealAt } from './page-deal.js';
 import { normalizeOptions, pvRefusal, pvRoundPlace, pvCap, pvBand, ROUND_NL } from './skill-options.js';
 import { diskMatSVG, numeralTracksHTML, roundingLineSVG } from './sheet/index.js';
 import { plainNumeralHTML, placeChartHTML, hundredsRowsHTML, hundredsWindow, pvLineSVG, moreLessLine, stripHTML, shiftChartHTML, roundingTableHTML } from './pv-support-cell.js';
@@ -81,41 +82,15 @@ let _liveCursor = -1;
 let _at = 0;
 function beginItem() { _at = Number.isFinite(state.itemIndex) ? state.itemIndex : ++_liveCursor; }
 /*
- * SEEDED BLOCK DEALING (critic pv-r1, LESSONS L10). A generator still deals its edge cases in blocks
- * (one halfway number and one round-up-across in every six, so a page of six always teaches them),
- * but WHICH item of a block gets which is a permutation drawn from the PAGE's seed and the block
- * number - never the item's position: item b is not always the halfway one, and two seeds give two
- * different pages. The page's seed is the item's seed minus its index (a page deals item i with
- * seed base + i, generate-question.js); live play, which has no seed, draws one key per visit.
- * `salt` keeps two attributes of one item independent (one draw per attribute).
+ * SEEDED DEALING (critic pv-r1, LESSONS L10) through the one page dealer, page-deal.js. A generator
+ * still deals its edge cases in blocks (one halfway number and one round-up-across in every six, so
+ * a page of six always teaches them), but WHICH item of a block gets which is shuffled from the
+ * page's seeded rng - never the item's position - so two seeds give two different pages and no page
+ * reads in a cycle. Positions are addressable (dealAt): asking twice in one item returns the same
+ * deal. `salt` names an independent attribute (one key per attribute, page-deal.js).
  */
-let _liveKey = null;
-function pageKey() {
-    if (Number.isFinite(state.itemSeed) && Number.isFinite(state.itemIndex)) return (state.itemSeed - state.itemIndex) >>> 0;
-    if (_liveKey === null) _liveKey = Math.floor(Math.random() * 2147483647) >>> 0;
-    return _liveKey;
-}
-function mix32(a, b) {
-    let h = (a ^ Math.imul(b >>> 0, 0x9e3779b1)) >>> 0;
-    h = Math.imul(h ^ (h >>> 16), 0x85ebca6b) >>> 0;
-    h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35) >>> 0;
-    return (h ^ (h >>> 16)) >>> 0;
-}
-/** The order of 0 .. L-1 for the current block of L items: each block takes every value once. */
-function blockOrder(L, salt = 0) {
-    const n = Math.max(1, L);
-    const block = Math.floor(_at / n);
-    let k = mix32(mix32(pageKey(), block * 7919 + n), salt + 17);
-    const out = Array.from({ length: n }, (_, i) => i);
-    for (let i = n - 1; i > 0; i--) {
-        k = mix32(k, i);
-        const j = k % (i + 1);
-        [out[i], out[j]] = [out[j], out[i]];
-    }
-    return out;
-}
-/** This item's value 0 .. n-1 in its block (a seeded permutation; every value once a block). */
-const slot = (n, salt = 0) => (n <= 1 ? 0 : blockOrder(n, salt)[((_at % n) + n) % n]);
+/** This item's value 0 .. n-1, dealt under its own key (every value in each block of max(6, n)). */
+const slot = (n, salt = 0) => (n <= 1 ? 0 : dealAt(`pv:${n}:${salt}`, n, _at));
 
 function optsOf(cat, skill) {
     // A mixed parent's options (only `level`) never name a member's own options, so the member's
@@ -232,12 +207,12 @@ function genPlace(q, skill, o) {
     if (!ticked.length) ticked = bandPlaces;
     // Every place once per block of items, but in a different order each block, so the answers
     // never run ones, tens, hundreds, ones, tens ... down the page (round-3 finding).
-    let place = ticked[blockOrder(ticked.length)[slot(ticked.length)]];
+    let place = ticked[slot(ticked.length, 'place')];
     if (place > hi) { lo = place; hi = place * 10 - 1; nd = String(hi).length; }
     // PN-7: the value of a zero, on about a third of items. A zero is never the leading digit, so
     // a leading place hands its zero to a lower place.
     const zeroAsk = skill === 'value' && !!o.zeroDigit && nd >= 2 && slot(3) === 1;
-    if (zeroAsk && place >= 10 ** (nd - 1)) place = 10 ** (_at % (nd - 1));
+    if (zeroAsk && place >= 10 ** (nd - 1)) place = 10 ** randInt(0, nd - 2);
     // PN-5: a repeated digit (747: which 7?), only when asked; otherwise the asked digit appears
     // once, so "the underlined digit" and "the 7" never mean two different digits.
     const repeat = skill === 'identify' && !!o.repeatDigit && nd >= 2;
@@ -347,7 +322,7 @@ function genDecimalValue(q, o) {
     const d = decOf(o);
     // PN-7 carried over: the value of a zero, on about a third of items, in a middle place.
     const zeroAsk = !!o.zeroDigit && d >= 2 && slot(3) === 1;
-    const place = zeroAsk ? DEC_PLACES[randInt(0, d - 2)] : DEC_PLACES[blockOrder(d)[slot(d)]];
+    const place = zeroAsk ? DEC_PLACES[randInt(0, d - 2)] : DEC_PLACES[slot(d, 'place')];
     let num = decimalNumber(d);
     if (zeroAsk) {
         const fr = num.fr.slice();
@@ -613,8 +588,8 @@ function genMoreLess(q, skill, o) {
     // Step 0 is "both jumps the name promises" (1 and 10, or 10 and 100), dealt in turn with the
     // direction so a page of four already carries all four: 1 more, 1 less, 10 more, 10 less.
     const both = skill === 'more_less_100' ? [10, 100] : [1, 10];
-    const step = Number(o.step) || both[Math.floor(_at / 2) % 2];
-    const dir = o.dir === 'both' ? (randInt(0, 1) === 0 ? 'more' : 'less') : (o.dir || 'more');
+    const step = Number(o.step) || both[slot(2, 'step')];
+    const dir = o.dir === 'both' ? (slot(2, 'dir') === 0 ? 'more' : 'less') : (o.dir || 'more');
     const cap = capOf('placevalue', skill, o, 100);
     // Support is its own control (P-1): a strip of the hundreds chart, the chart rows, a number
     // line, or nothing. It changes the picture, never the numbers dealt, except that a chart
@@ -880,7 +855,7 @@ function genTimesTen(q, skill, o) {
     powers.sort((a, b) => a - b);
     const power = powers[slot(powers.length)];
     // 'both': a block of × (one per power), then a block of ÷, so every op meets every power.
-    const op = o.op === 'both' ? (Math.floor(_at / powers.length) % 2 === 0 ? 'x' : '/') : o.op === '/' ? '/' : 'x';
+    const op = o.op === 'both' ? (slot(2, 'op') === 0 ? 'x' : '/') : o.op === '/' ? '/' : 'x';
     const cap = capOf('placevalue', skill, o, 10000);
     const kMax = Math.max(1, Math.floor(cap / power));
     let n, ans;
@@ -1270,8 +1245,8 @@ function genNearest(q, skill, o) {
     if (scope === 'judge') {
         // RN-14: a finished rounding in black; about half are wrong, each from §14.
         const wrongs = pvRoundingErrors(n, P);
-        const isWrong = randInt(0, 1) === 1 && wrongs.length > 0;
-        const shown = isWrong ? wrongs[Math.floor(_at / 2) % wrongs.length].value : rounded;
+        const isWrong = slot(2, 'judge') === 1 && wrongs.length > 0;
+        const shown = isWrong ? wrongs[randInt(0, wrongs.length - 1)].value : rounded;
         q.text = `Check: ${fmt(n)} rounded to ${name} is ${fmt(shown)}. Is it correct?`;
         q.printText = 'Check the work. Check one box: Correct or Fix it.';
         q.answerType = 'multiple-choice';
@@ -1522,7 +1497,6 @@ function genScaleLine(q, skill, o) {
     // The asked ticks: never an end, never a labelled tick (with every tick labelled, any inner one).
     const fixed = labels === 'step' ? new Set([0, n]) : scaleLabelled(n, labels);
     const free = Array.from({ length: n - 1 }, (_, i) => i + 1).filter((i) => !fixed.has(i));
-    const order = blockOrder(free.length);
     const val = (i) => r6(lo + i * step);
     q.options = [];
     q.visual = '';
@@ -1546,7 +1520,7 @@ function genScaleLine(q, skill, o) {
         setCell(q, { kind: 'scale', task, lo, hi, step, labels, targets, n: targets[0], keyValue: q.ans });
         return;
     }
-    const k = free[order[slot(free.length)]];
+    const k = free[slot(free.length, 'tick')];
     // Edge case (WRM Y4 "arrows between ticks"): one read item in six points HALFWAY along a jump
     // of an even size (45 on a line in tens), never past the band's last jump.
     const half = task === 'read' && !dec && step % 2 === 0 && slot(6) === 4 && k < n;
@@ -1848,7 +1822,7 @@ function genEstimate(q, skill, o) {
         // The estimate owns its numbers (the place's two-digit multiples); only a mixed review's
         // Max Number narrows them, never below three of the place.
         const top = Math.max(3 * P, rangeCap(skill, P * 10 - 1));
-        op = skill === 'estimate_sum' ? '+' : skill === 'estimate_diff' ? '−' : skill === 'estimate_products' ? '×' : (randInt(0, 1) === 0 ? '+' : '−');
+        op = skill === 'estimate_sum' ? '+' : skill === 'estimate_diff' ? '−' : skill === 'estimate_products' ? '×' : (slot(2, 'op') === 0 ? '+' : '−');
         if (op === '×') {
             a = estOperand(P, P + 1, top);
             b = randInt(2, 9);
@@ -1901,12 +1875,12 @@ function genEstimate(q, skill, o) {
         // ES-6: an exact answer in black; HALF are genuinely reasonable (the true answer), dealt,
         // never rolled — the gate holds the page to 40-60% (§17 reasonable-balance). A wrong one
         // is off by a whole place (M-G4, a dropped or extra zero) or several of the place.
-        const reasonable = Math.floor(_at / 2) % 2 === 0;
+        const reasonable = slot(2, 'reasonable') === 0;
         const exactShown = op === '÷' ? Math.round(exact) : exact;
         let shown = exactShown;
         if (!reasonable) {
-            const k = Math.floor(_at / 4) % 3;
-            shown = k === 0 ? exactShown * 10 : k === 1 && exactShown >= 20 ? Math.round(exactShown / 10) : exactShown + (3 + (_at % 3)) * (op === '×' ? P * b : P);
+            const k = slot(3, 'unreasonable');
+            shown = k === 0 ? exactShown * 10 : k === 1 && exactShown >= 20 ? Math.round(exactShown / 10) : exactShown + (3 + randInt(0, 2)) * (op === '×' ? P * b : P);
             if (shown === exactShown) shown = exactShown * 10;
         }
         q.text = `Is this answer reasonable? ${expr} ${op === '÷' ? '≈' : '='} ${fmt(shown)}`;

@@ -289,6 +289,33 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
     return { why: why ? why.textContent.trim() : '', marked: !!(card && card.classList.contains('is-unfit')) };
   });
   if (!unfit.why || !unfit.marked) fail(`Print: an unfit page type does not say why (${JSON.stringify(unfit)})`);
+  // Stretch is WITHHELD for a skill with no open problem of its own (a K counting picture): its card
+  // is disabled, says why, and cannot be chosen; an operation skill keeps it.
+  await page.evaluate(() => { window.tvOpenPrintWith([{ categoryId: 'counting', skillId: 'count_objects' }]); window.tvGo('print'); });
+  await sleep(200);
+  const noStretch = await page.evaluate(async () => {
+    const scr = document.querySelector('#teacherMain [data-screen="print"]');
+    if (!scr.querySelector('[data-act="role"]')) scr.querySelector('[data-act="types"]').click();
+    const card = scr.querySelector('[data-act="role"][data-v="stretch"]');
+    const out = { disabled: card && card.getAttribute('aria-disabled') === 'true', title: card ? card.getAttribute('title') || '' : '' };
+    const note = card && card.getAttribute('aria-describedby') ? document.getElementById(card.getAttribute('aria-describedby')) : null;
+    out.note = note ? note.textContent.trim() : '';
+    card && card.click();
+    await new Promise((r) => setTimeout(r, 300));
+    const again = scr.querySelector('[data-act="role"][data-v="stretch"]');
+    out.chosen = !!(again && again.getAttribute('aria-checked') === 'true');
+    return out;
+  });
+  if (!noStretch.disabled || !/No Stretch/.test(noStretch.title) || !/No Stretch/.test(noStretch.note) || noStretch.chosen) fail(`Print: Stretch is not withheld, with its reason, for a skill with no open problem (${JSON.stringify(noStretch)})`);
+  await page.evaluate(() => { window.tvOpenPrintWith([{ categoryId: 'addition', skillId: 'add_20_regroup' }]); window.tvGo('print'); });
+  await sleep(200);
+  const hasStretch = await page.evaluate(() => {
+    const scr = document.querySelector('#teacherMain [data-screen="print"]');
+    if (!scr.querySelector('[data-act="role"]')) scr.querySelector('[data-act="types"]').click();
+    const card = scr.querySelector('[data-act="role"][data-v="stretch"]');
+    return !!card && card.getAttribute('aria-disabled') !== 'true';
+  });
+  if (!hasStretch) fail('Print: Stretch is withheld for an operation skill that has an open problem');
   // A one-page type too small for every chosen skill says so (never drops a skill quietly).
   await page.evaluate(() => {
     window.tvOpenPrintWith([['composing', 'base10_regroup'], ['addition', 'add_10_no_regroup'], ['addition', 'add_10_regroup'], ['addition', 'add_20_no_regroup']].map(([c, s]) => ({ categoryId: c, skillId: s })));

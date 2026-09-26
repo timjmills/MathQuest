@@ -11,10 +11,25 @@
 //   Key        the table filled with example answers that satisfy the check rule, so the key is
 //              still a facsimile; "I found them all" is not ticked (there are more)
 //
-// The DEFAULT ADAPTER of section 10 (`open(q)` not supplied): "find different problems with the
-// answer N", columns = the skill's operands plus the check. For the four operations the operands
-// are the problem's own; for any other whole-number answer N the task is "two numbers that add to
-// N". A skill whose answer is not a whole number prints the "problems like this one" table (basic).
+// WHERE THE OPEN PROBLEM COMES FROM (2026-09-26, systemic-fix lane). In this order:
+//   1. The skill's provider `open(q, {size})` (SCC 3.2): the skill's own open problem, written by
+//      its family lane. It returns the task below — {prompt: string[], columns: string[],
+//      example: [], keyRows: [[]], rule?, total?, basic?} — or null when this item has none (the
+//      host then deals another).
+//   2. The DEFAULT, only where it is ON TOPIC: an item of one of the four operations with its own
+//      two operands and a whole-number answer N: "two numbers <op> to N, find different pairs"
+//      (the problem's own operation and numbers, so it is the skill's own question opened up).
+//   3. Otherwise the skill has NO STRETCH YET and the role is WITHHELD for it (PAGE_TYPES allows a
+//      role to be withheld): `supports()` names the reason, buildSheet throws it as `unsupported`,
+//      and the print screen marks the Stretch card with it.
+// Why withhold rather than a generic fallback: the two generic tasks this role used to print for
+// every other skill were off topic — "Two numbers add to 18" on a counting picture, "Here is one
+// problem and its answer" with the instruction as the problem and "B" as its answer, a figure skill
+// without its figure — and failed every K picture skill and every figure skill (critics k2-r1,
+// figures-r6). A made-up "make a problem like this one" for a picture, a graph or a clock asks a
+// K pupil to author a drawn problem, which is not a stretch of the skill but a new, harder skill,
+// and its key could only say "answers vary". An honest "not yet" costs the teacher one click; an
+// off-topic page costs the pupil the lesson.
 //
 // Pure module (SCC-01).
 
@@ -22,8 +37,47 @@ import {
     ctxOf, frameOf, layoutHeader, bandMetrics, planItem, gridPart, instructionPart, assemble, poolItems,
     answerOf, opOf, operandsOf, esc, blank, writeLine, checkLine, slotKey,    judgeGroup,
 } from './compose.js';
+import { getProvider } from '../index.js';
 
 export const ROLE_ID = 'stretch';
+
+/** The reason the print screen shows when no chosen skill has an open problem yet. */
+export const NO_STRETCH_REASON = 'No Stretch for this skill yet: it has no open problem of its own. '
+    + 'Choose Reason It or True or False? for a thinking page.';
+
+/** A provider's open task, checked for the shape this role draws; null when it is not usable. */
+function providerTask(q, size) {
+    let p = null;
+    try { p = getProvider(q.categoryId || '', q.skillId || ''); } catch (e) { p = null; }
+    if (!p || !Array.isArray(p.real) || !p.real.includes('open') || typeof p.open !== 'function') return undefined;
+    let t = null;
+    try { t = p.open(q, { size }); } catch (e) { t = null; }
+    if (!t || !Array.isArray(t.prompt) || !t.prompt.length || !Array.isArray(t.columns) || !t.columns.length) return null;
+    return {
+        prompt: t.prompt.map(String), columns: t.columns.map(String),
+        example: Array.isArray(t.example) ? t.example : [],
+        keyRows: Array.isArray(t.keyRows) ? t.keyRows : [],
+        rule: t.rule || '', total: t.total === undefined ? Infinity : t.total, basic: !!t.basic,
+    };
+}
+
+/** True when this skill has a provider-written open problem (`open(q)`), whatever the item. */
+export function hasOwnOpen(categoryId, skillId) {
+    try {
+        const p = getProvider(categoryId || '', skillId || '');
+        return !!(p && Array.isArray(p.real) && p.real.includes('open') && typeof p.open === 'function');
+    } catch (e) { return false; }
+}
+
+/**
+ * Whether one question can be a Stretch problem, and why not. '' = yes (the provider's own open
+ * problem, or the on-topic operation default); otherwise the reason. Pure: the print screen asks
+ * it of sample items to mark the Stretch card before the teacher picks it.
+ */
+export function stretchWhy(q, size = 'L') {
+    const task = openTask({ q }, size);
+    return task ? '' : NO_STRETCH_REASON;
+}
 
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1];
@@ -31,10 +85,17 @@ export const measureCols = () => [1];
 const EMPTY_ROWS = { S: 4, M: 6, L: 6 };
 const toInt = (v) => Number(String(v).replace(/,/g, ''));
 
-/** The open task of one question (`open(q)` default): prompt, columns, example row, key rows. */
+/**
+ * The open task of one question: the provider's `open(q)`, else the on-topic operation default,
+ * else null (no Stretch for this item; see the header).
+ */
 export function openTask(it, size = 'L') {
     const q = it.q || {};
+    const own = providerTask(q, size);
+    if (own !== undefined) return own;
     const ans = answerOf(it);
+    // Only the four operations have an on-topic default. opOf falls back to the category; an item
+    // that names another operation in its own fields (a fraction sum) is not a whole-number pair.
     const op = opOf(q);
     const ops = operandsOf(q);
     const N = /^-?\d+$/.test(ans.replace(/,/g, '')) ? toInt(ans) : null;
@@ -64,34 +125,17 @@ export function openTask(it, size = 'L') {
             basic: false,
         };
     }
-    if (N !== null && N >= 2) {
-        for (let a = N - 1; a >= 0 && pairs.length < 8; a -= Math.max(1, Math.round(N / 7))) add(a, N - a);
-        for (let a = N - 1; a >= 0 && pairs.length < rowsN + 1; a--) add(a, N - a);
-        return {
-            prompt: [`Two numbers add to ${N}.`, 'Find different pairs.'],
-            columns: ['First number', 'Second number', 'Check: total'],
-            example: [N, 0, N],
-            keyRows: pairs.filter((p) => !(p.a === N && p.b === 0)).slice(0, rowsN).map((p) => [p.a, p.b, N]),
-            rule: `+ = ${N}`,
-            total: N + 1,
-            basic: false,
-        };
-    }
-    // Basic: not a whole-number answer. The pupil finds more problems with the same kind of answer.
-    const text = String(q.printText || q.text || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
-    return {
-        prompt: ['Here is one problem and its answer.', 'Find more problems like it. Solve them.'],
-        columns: ['Problem', 'Answer'],
-        example: [text || 'the problem above', ans || '—'],
-        keyRows: [],
-        rule: '',
-        basic: true,
-    };
+    // No on-topic default: "two numbers add to N" on a counting picture, or "here is one problem"
+    // without its drawing, was the off-topic page this role must never print (header). Withheld.
+    return null;
 }
 
 export function prepare(it, info = {}) {
     const size = info.size || 'L';
     const task = openTask(it, size);
+    // No open problem for this item: the host deals another, and if none of the skill's items has
+    // one, supports() withholds the role with its reason.
+    if (!task) return null;
     // PT-STC-1: 3 to 6 empty rows, and never more rows than the key can fill (a key row per
     // empty row, AK-2). A number with fewer than three other answers (0 x n, a prime product,
     // a sum of 2) is no open problem: the host deals another.
@@ -132,6 +176,14 @@ export function prepare(it, info = {}) {
     });
 }
 
+/**
+ * Withhold the role when nothing could be dealt (buildSheet throws the reason as `unsupported`,
+ * and the print screen shows it on the Stretch card).
+ */
+export function supports(items) {
+    return items && items.length ? '' : NO_STRETCH_REASON;
+}
+
 export function counts(pools, input) {
     const ctx = ctxOf(input);
     const items = pools.main || [];
@@ -157,4 +209,4 @@ export function plan(input = {}) {
     });
 }
 
-export default { ROLE_ID, sources, measureCols, prepare, counts, plan, openTask };
+export default { ROLE_ID, sources, measureCols, prepare, supports, counts, plan, openTask, stretchWhy, hasOwnOpen, NO_STRETCH_REASON };

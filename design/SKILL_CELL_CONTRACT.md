@@ -1039,7 +1039,7 @@ Stretch. So the optional members also have defaults. They are deliberately plain
 |---|---|
 | `decision(q)` | scope `judge`: the cell drawn `answered` or `wrong` (seeded, half each) with two check boxes, "Correct" and "Not correct". A real provider replaces this with a decision tied to the structure (regroup or not, which operation, which unit). |
 | `setupOnly(q)` | scope `setup`: the blank cell with computation slots removed. Stacked problems show empty operand tracks to copy the numbers into; other cells show the givens with an instruction to circle what is needed. |
-| `open(q)` | numeric answers: "make this answer in different ways" with a results table of 4 rows as the entry scaffold. Non-numeric answers: "change one part, then solve" with a two-column results table. |
+| `open(q)` | Only where it stays on topic: an item of one of the four operations, with its own two operands and a whole-number answer N, gets "two numbers <op> to N, find different pairs" with a results table as the entry scaffold. Every other skill has NO default: Stretch is **withheld** for it (`stretch.js supports()` names the reason, the print screen marks the Stretch card) until its provider supplies `open(q, {size})` returning `{prompt[], columns[], example[], keyRows[][], rule?, total?}` or null. (2026-09-26: the old generic defaults, "two numbers add to N" and "here is one problem and its answer", were off topic on every picture and figure skill.) |
 | `variants`, `notations`, `representations` | none. The dialog's problem-mix control shows "one type" only and says why. |
 
 ---

@@ -25,7 +25,9 @@ const PRACTICE = parseInt(arg('pages', '1'), 10);
 
 /** The three samples the owner asked for (2026-09-25), with the options that make each one. */
 const LESSONS = [
-    { id: 'add', dir: 'add-within-10', skill: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 10 } } },
+    // Counting on is the strategy for adding 1, 2 or 3 (lessons r1: the sums spread over 1-10 and the
+    // big number falls on either side, instead of eight make-10 facts in twelve).
+    { id: 'add', dir: 'add-within-10', skill: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 10, constant: [1, 2, 3] } } },
     { id: 'sub', dir: 'subtract-2-digit-regroup', skill: { categoryId: 'subtraction', skillId: 'sub_100_regroup' } },
     { id: 'round', dir: 'round-nearest-10', skill: { categoryId: 'number_sense', skillId: 'nearest_10' } },
 ].filter((l) => !ONLY || ONLY.split(',').includes(l.id));
@@ -46,14 +48,48 @@ print(json.dumps(pages))
 
 function sheetCheck(page) {
     return page.evaluate(() => {
-        const out = { pages: 0, problems: [], fonts: {} };
+        const out = { pages: 0, problems: [], bands: [], stats: [], fonts: {} };
         document.querySelectorAll('.ws-page').forEach((pg, i) => {
             out.pages++;
+            const stat = { page: i + 1, cells: 0, labelled: pg.querySelectorAll('[data-ws-label], .ws-letter').length, maxBand: 0, blank: 0 };
+            out.stats.push(stat);
             const body = pg.querySelector('.ws-body');
             if (body && body.scrollHeight > body.clientHeight + 1) out.problems.push(`page ${i + 1}: the body overflows by ${((body.scrollHeight - body.clientHeight) * 25.4 / 96).toFixed(1)} mm`);
             pg.querySelectorAll('.ws-cell').forEach((c, k) => {
                 if (c.scrollHeight > c.clientHeight + 1 || c.scrollWidth > c.clientWidth + 1) out.problems.push(`page ${i + 1} cell ${k + 1}: content overflows its cell (${((c.scrollHeight - c.clientHeight) * 25.4 / 96).toFixed(1)} mm)`);
+                // H13 self-check (the critic's measure): the largest empty band inside the cell,
+                // top/bottom and left/right, as a share of the cell (labels left out).
+                const cr = c.getBoundingClientRect();
+                let box = null;
+                for (const d of c.querySelectorAll('*')) {
+                    if (d.closest('[data-ws-label], .ws-letter')) continue;
+                    const st = getComputedStyle(d);
+                    if (st.visibility === 'hidden' || st.display === 'none') continue;
+                    const r = d.getBoundingClientRect();
+                    if (!r.width || !r.height) continue;
+                    // An answer slot or zone is the pupil's writing space: it counts as content.
+                    const leaf = !d.children.length || d instanceof SVGElement || /^(svg|img)$/i.test(d.tagName) || d.hasAttribute('data-ws-slot');
+                    const bordered = parseFloat(st.borderTopWidth) || parseFloat(st.borderBottomWidth);
+                    if (!leaf && !bordered && !(d.textContent || '').trim()) continue;
+                    if (!leaf && !bordered) continue;
+                    box = box ? { t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom), l: Math.min(box.l, r.left), r: Math.max(box.r, r.right) } : { t: r.top, b: r.bottom, l: r.left, r: r.right };
+                }
+                if (!box || cr.height < 40 || cr.width < 40) return;
+                const v = Math.max(box.t - cr.top, cr.bottom - box.b, 0) / cr.height;
+                const h = Math.max(box.l - cr.left, cr.right - box.r, 0) / cr.width;
+                stat.cells++;
+                stat.maxBand = Math.max(stat.maxBand, Math.round(Math.max(v, h) * 100));
+                if (v >= 0.3 || h >= 0.3) out.bands.push(`page ${i + 1} cell ${k + 1}: empty band ${Math.round(Math.max(v, h) * 100)}% ${v >= h ? 'tall' : 'wide'} (${(cr.width * 25.4 / 96).toFixed(0)} x ${(cr.height * 25.4 / 96).toFixed(0)} mm)`);
             });
+            // The page's own blank: the body below its last band.
+            if (body) {
+                const br = body.getBoundingClientRect();
+                const kids = [...body.children].filter((x) => x.getBoundingClientRect().height > 0);
+                const last = kids.length ? Math.max(...kids.map((x) => x.getBoundingClientRect().bottom)) : br.top;
+                const blank = (br.bottom - last) / br.height;
+                stat.blank = Math.round(Math.max(0, blank) * 100);
+                if (blank > 0.08) out.bands.push(`page ${i + 1}: ${Math.round(blank * 100)}% of the body blank at the bottom`);
+            }
             for (const el of pg.querySelectorAll('*')) {
                 if (![...el.childNodes].some((t) => t.nodeType === 3 && t.textContent.trim())) continue;
                 const f = getComputedStyle(el).fontFamily.split(',')[0].replace(/["']/g, '').trim();
@@ -113,6 +149,8 @@ async function printDoc(page, html, pdfPath) {
             fs.writeFileSync(path.join(dir, 'meta.json'), JSON.stringify(meta, null, 1));
             console.log(`${l.dir} ${size}: ${built.pageCount} pages + ${built.keyPageCount} key; ${[...checkP.problems, ...checkK.problems].length} layout problems; fonts ${Object.keys(checkP.fonts).join(',')}`);
             for (const p of [...checkP.problems, ...checkK.problems.map((x) => `key ${x}`)].slice(0, 12)) console.log(`   ${p}`);
+            for (const b of checkP.bands.slice(0, 16)) console.log(`   H13? ${b}`);
+            if (has('stats')) for (const st of checkP.stats) console.log(`   p${st.page}: ${st.labelled} lettered items, ${st.cells} cells, largest empty band ${st.maxBand}%, body blank at foot ${st.blank}%`);
             summary.push({ lesson: l.dir, size, pages: built.pageCount, keyPages: built.keyPageCount, problems: checkP.problems.length + checkK.problems.length });
             if (has('copy') && size === 'L') {
                 const dest = path.join(ROOT, 'design', 'lesson-samples', l.dir);

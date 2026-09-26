@@ -590,7 +590,7 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
     const split = new Set(sectionsIn.map((s) => s.splitOf).filter((x) => x !== undefined && x !== null));
     const layouts = sectionsIn.map((sec, si) => {
         const L0 = resolveSectionLayout(
-            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols },
+            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
             itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
         );
         // A split section's two parts share the page: their rows are sized to what they hold.
@@ -686,7 +686,7 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
         const its = sheetItems[si] || [];
         const keep = () => { sections.push(sec); items.push(its); };
         if (its.length < 2 || its.some((it) => it.anchor)) return keep();
-        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols };
+        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap };
         const whole = resolveSectionLayout(Object.assign({ floor: sec.floor }, base), its, paper, availableWidthMm, { size, look });
         const one = (it) => it.fclass === 'word' || it.fclass === 'wide'
             || itemCap(itemInfo(it, { size, look, paper, mode: 'print' })) < 2;
@@ -720,7 +720,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     if (!input.anchors) {
         sheetItems = sheetItems.map((its, si) => {
             const sec = norm.sections[si] || {};
-            const Lp = resolveSectionLayout({ role, columns: sec.columns, count: its.length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols },
+            const Lp = resolveSectionLayout({ role, columns: sec.columns, count: its.length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
                 its, norm.paper, Number(norm.ctxIn.availableWidthMm) || LIVE_W_MM, { size, look });
             return groupByHeight(its, Lp.cols);
         });
@@ -801,13 +801,15 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 continue;
             }
             // RUBRIC H13: each row as tall as what it holds (rowShape), when the rows differ.
+            // (`noCap`, a lesson practice page: one frame, every row the same, no row gaps.)
+            const noCapSec = !!(norm.sections[part.section] || {}).noCap;
             const shape = part.chunk.gridMm ? { heightMm: part.chunk.gridMm, rowsTpl: part.chunk.rowsTpl || '' }
-                : its.some((it) => it.anchor) ? null : rowShape(its, L.cols, part.chunk.rows, L.cellH);
+                : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, L.cellH);
             // A lone grid shorter than its page (the teacher's count, a capped row) spends the
             // spare height as whitespace between its rows (grid.js rowGap), never inside cells.
             const avail = pg.cont ? L.gridHCont : L.gridH;
             const baseMm = shape ? shape.heightMm : fillByFlex ? 0 : part.chunk.rows * L.cellH;
-            const gap = lone && baseMm && !its.some((it) => it.anchor) ? rowGapFor(part.chunk.rows, baseMm, avail) : { gap: 0 };
+            const gap = lone && baseMm && !noCapSec && !its.some((it) => it.anchor) ? rowGapFor(part.chunk.rows, baseMm, avail) : { gap: 0 };
             sections.push({
                 kind: 'grid',
                 cols: L.cols,
@@ -877,7 +879,7 @@ export function composePractice(role, input = {}) {
 
     if (role !== 'more-practice') {
         const lesson = Math.max(1, Number(input.lesson) || 1);
-        const sheet = composeSheet(role, input, norm, bySection, { tabId: `Lesson ${lesson}`, seed, form });
+        const sheet = composeSheet(role, input, norm, bySection, { tabId: input.tabId || `Lesson ${lesson}`, seed, form });
         return base(sheet, {
             meta: {
                 role, items: norm.items.length, scoreOutOf: sheet.score, pages: sheet.pages.length,
