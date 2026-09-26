@@ -278,6 +278,24 @@ const OPS_BUILD_MAKERS = {
         const n = k * int(r, 2, 5);
         return { ans: n / k, text: `Share ${n} counters.`, share: { kind, n, k, look } };
     },
+    'addition:add_sub_patterns': (r) => {
+        const kind = pick(r, ['result', 'missing', 'words']);
+        const op = pick(r, ['+', '-']);
+        const places = [[1, 10], [1, 10, 100], [1, 10, 100, 1000]][int(r, 0, 2)];
+        const given = int(r, 0, 1) === 1;
+        let a = int(r, 2, 8), b = int(r, 2, 8);
+        if (op === '+') { while (a + b > 9) b--; } else if (b >= a) [a, b] = [Math.max(a, b) + 1, Math.min(a, b)];
+        if (a > 9) a = 9;
+        const res = op === '+' ? a + b : a - b;
+        const parts = [];
+        places.forEach((pl, i) => {
+            if (i === 0 && given) return;
+            if (kind === 'missing') parts.push(String(b * pl));
+            else if (kind === 'words' && pl > 1) { parts.push(String(res)); parts.push(String(res * pl)); }
+            else parts.push(String(res * pl));
+        });
+        return { ans: parts.join(', '), keyParts: parts, text: `${op === '+' ? 'Add' : 'Subtract'}: ${a} ${op} ${b}.`, ladder: { kind, op, a, b, places, given, res } };
+    },
 };
 Object.assign(ITEM_MAKERS, OPS_BUILD_MAKERS);
 

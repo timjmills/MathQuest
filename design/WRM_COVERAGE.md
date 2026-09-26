@@ -22,20 +22,20 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 529 (61%), partial only 137 (16%), gap 206 (24%).
+- Covered 533 (61%), partial only 134 (15%), gap 205 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 330 skills carry WRM tags. 160 proposals (118 new skills, 42 options on existing skills) would close every gap.
+- 331 skills carry WRM tags. 159 proposals (117 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
 | Reception | PK | 18 | 119 | 69 (58%) | 19 | 31 |
 | Year 1 | K | 14 | 116 | 73 (63%) | 23 | 20 |
 | Year 2 | 1 | 11 | 124 | 81 (65%) | 17 | 26 |
-| Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
-| Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
+| Year 3 | 2 | 12 | 134 | 81 (60%) | 22 | 31 |
+| Year 4 | 3 | 14 | 129 | 82 (64%) | 17 | 30 |
 | Year 5 | 4 | 15 | 136 | 84 (62%) | 21 | 31 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **529 (61%)** | **137** | **206** |
+| **All** | | **97** | **872** | **533 (61%)** | **134** | **205** |
 
 ## Source disagreements
 
@@ -458,15 +458,12 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Closes (1): Y6.B2.S4 Rules of divisibility  
   _proposal id: divisibility_rules_
 
-### operations (26 proposals, 41 steps)
+### operations (25 proposals, 37 steps)
 
 - **To the Next Ten** — new skill `addition:bridge_to_next_ten`. Teaches adding to reach the next multiple of 10 (38 + 2 = 40), then crossing it (38 + 5 = 38 + 2 + 3), and subtracting back to a ten (43 - 3). Representation: a number line with the ten marked; write the jump to the ten and then the rest.  
   Closes (4): Y2.B2.S8 Add to the next 10; Y2.B2.S11 Subtract from a 10; Y3.B2.S6 Add 1s across a 10; Y3.B2.S8 Subtract 1s across a 10  
   Strengthens: Y2.B2.S9  
   _proposal id: add_next_10_
-- **Spot the Pattern (+/−)** — new skill `addition:add_sub_patterns`. Teaches using known facts to add and subtract 1s, 10s and 100s (3 + 4, 30 + 40, 300 + 400) and seeing what changes and what stays the same. Representation: a three-row fact ladder with the first row done; complete the others.  
-  Closes (4): Y3.B2.S2 Add and subtract 1s; Y3.B2.S5 Spot the pattern; Y3.B2.S10 Make connections; Y4.B2.S1 Add and subtract 1s, 10s, 100s and 1,000s  
-  _proposal id: add_sub_patterns_
 - **Related Times-Tables** — new skill `multiplication:related_tables`. Teaches using one table to find another: 2 → 4 → 8 by doubling, 3 → 6 → 12, 5 and 10, and 9 as 10 − 1. Representation: a three-column table with the known table given; fill the doubled table.  
   Closes (4): Y3.B3.S15 The 2, 4 and 8 times-tables; Y4.B4.S6 The 3, 6 and 9 times-tables; Y4.B5.S7 Related facts – multiplication and division; Y4.B5.S15 Efficient multiplication  
   _proposal id: tables_links_
@@ -593,8 +590,6 @@ whatever happens to the WRM gaps.
   WRM: Y2.B6.S3, Y2.B6.S4, Y3.B5.S7
 - **2.MD.B.5** Use addition and subtraction within 100 to solve word problems involving lengths that are given in the same units, e.g., by using drawings (such as drawings of rulers) and equations with a symbol for the unknown number to represent the problem.  
   WRM: Y2.B6.S5, Y3.B5.S8, Y3.B5.S9, Y3.B5.S12, Y3.B5 supplement "Solve 'longer by' problems using bar models", Y3.B5 supplement "Solve 'shorter by' problems using bar models"
-- **2.NBT.B.9** Explain why addition and subtraction strategies work, using place value and the properties of operations.  
-  WRM: Y3.B2.S10
 - **4.MD.C.5** Recognize angles as geometric shapes that are formed wherever two rays share a common endpoint, and understand concepts of angle measurement:  
   WRM: Y4.B12.S1, Y4.B12.S2, Y6.B12.S1
 - **5.MD.C.3** Recognize volume as an attribute of solid figures and understand concepts of volume measurement.  
@@ -1963,9 +1958,9 @@ whatever happens to the WRM gaps.
 - **Y3.B2.S1** Apply number bonds within 10 — covered. _2.OA.B.2_  
   Skills: Addition Facts (within 20) (`addition:add_facts`); Subtraction Facts (within 20) (`subtraction:sub_facts`)  
   Vocabulary: number bond, ones, tens  
-- **Y3.B2.S2** Add and subtract 1s — PARTIAL. _2.NBT.B.5, M.EE.2.NBT.5_  
+- **Y3.B2.S2** Add and subtract 1s — covered. _2.NBT.B.5, M.EE.2.NBT.5_  
+  Skills: Spot the Pattern (+/−) (`addition:add_sub_patterns`)  
   Partial: Add within 100 (No Regrouping) (`addition:add_100_no_regroup`), missing adding and subtracting only ones to a 2- or 3-digit number mentally  
-  Proposal: Spot the Pattern (+/−)  
   Vocabulary: ones, tens, hundreds column, exchange  
 - **Y3.B2.S3** Add and subtract 10s — covered. _2.NBT.B.5, 2.NBT.B.8, M.EE.2.NBT.5_  
   Skills: Add & Subtract by 10s (`addition:add_sub_10s`); 10 More, 10 Less, 100 More, 100 Less (`placevalue:more_less_100`) {10 more, 10 less}  
@@ -1973,8 +1968,8 @@ whatever happens to the WRM gaps.
 - **Y3.B2.S4** Add and subtract 100s — covered. _2.NBT.B.7, 2.NBT.B.8, M.EE.2.NBT.7_  
   Skills: Add & Subtract by 100s (`addition:add_sub_100s`)  
   Vocabulary: hundred, column, multiple of 100  
-- **Y3.B2.S5** Spot the pattern — GAP. _2.NBT.B.5, 2.NBT.B.8, M.EE.2.NBT.5_  
-  Proposal: Spot the Pattern (+/−)  
+- **Y3.B2.S5** Spot the pattern — covered. _2.NBT.B.5, 2.NBT.B.8, M.EE.2.NBT.5_  
+  Skills: Spot the Pattern (+/−) (`addition:add_sub_patterns`)  
   Vocabulary: column, changes, stays the same  
 - **Y3.B2.S6** Add 1s across a 10 — PARTIAL. _2.NBT.B.5, M.EE.2.NBT.5_  
   Partial: Make a Ten Strategy (`number_sense:make_a_ten`), missing adding ones across a ten in a 2- or 3-digit number (68 + 5)  
@@ -1990,9 +1985,9 @@ whatever happens to the WRM gaps.
 - **Y3.B2.S9** Subtract 10s across a 100 — GAP. _2.NBT.B.7, M.EE.2.NBT.7_  
   Proposal: Add and Subtract 10s Across 100 (option)  
   Vocabulary: multiple of 100, previous, partition  
-- **Y3.B2.S10** Make connections — PARTIAL. _2.NBT.B.5, 2.NBT.B.9, M.EE.2.NBT.5_  
+- **Y3.B2.S10** Make connections — covered. _2.NBT.B.5, 2.NBT.B.9, M.EE.2.NBT.5_  
+  Skills: Spot the Pattern (+/−) (`addition:add_sub_patterns`)  
   Partial: Compensation Strategy (`number_sense:compensation`), missing explaining links between facts, place value and the column method (2.NBT.B.9)  
-  Proposal: Spot the Pattern (+/−)  
   Vocabulary: ones, tens, hundreds, fact family, part, whole  
 - **Y3.B2.S11** Add two numbers (no exchange) — covered. _2.NBT.B.7, M.EE.2.NBT.7_  
   Skills: Add within 1,000 (No Regrouping) (`addition:add_1k_no_regroup`)  
@@ -2443,9 +2438,9 @@ whatever happens to the WRM gaps.
 
 #### Y4.B2 Autumn Block 2: Addition and subtraction
 
-- **Y4.B2.S1** Add and subtract 1s, 10s, 100s and 1,000s — PARTIAL. _3.NBT.A.2, M.EE.3.NBT.2_  
+- **Y4.B2.S1** Add and subtract 1s, 10s, 100s and 1,000s — covered. _3.NBT.A.2, M.EE.3.NBT.2_  
+  Skills: Spot the Pattern (+/−) (`addition:add_sub_patterns`)  
   Partial: Add & Subtract by 100s (`addition:add_sub_100s`), missing adding and subtracting 1s, 10s, 100s and 1,000s to 4-digit numbers  
-  Proposal: Spot the Pattern (+/−)  
   Vocabulary: place value, column, exchange  
 - **Y4.B2.S2** Add up to two 4-digit numbers - no exchange — covered. _3.NBT.A.2, 4.NBT.B.4, M.EE.3.NBT.2, M.EE.4.NBT.4_  
   Skills: Add within 10,000 (No Regrouping) (`addition:add_10k_no_regroup`)  

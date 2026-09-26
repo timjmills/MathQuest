@@ -232,6 +232,9 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'share-left-rings': 'Draw the same number in each ring. Fill in the boxes.',
     'fair-check': 'Is it fair? Check one box.',
     'share-mixed': 'Draw or circle the counters. Then fill in the boxes.',
+    'ladder-result': 'Use the first fact. Write each answer.',
+    'ladder-missing': 'Use the first fact. Write the missing numbers.',
+    'ladder-fill': 'Use the first fact. Fill in the boxes.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',

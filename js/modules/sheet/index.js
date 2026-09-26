@@ -109,9 +109,11 @@ import './cells/number-line.js';
 import './cells/int-line.js';
 // Build lane operations (2026-09-26): share on plates, make equal groups, is it fair.
 import './cells/share-plates.js';
+// Build lane operations (2026-09-26): a known fact in tens and hundreds.
+import './cells/fact-ladder.js';
 import './cells/family.js';
 export { factDigitTracks, factGridStyle, FACT_OP_TRACK_EM } from './cells/fact.js';
-export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'remainder', 'number-line', 'fact-family', 'cloze-bank', 'int-line', 'share-plates'];
+export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'remainder', 'number-line', 'fact-family', 'cloze-bank', 'int-line', 'share-plates', 'fact-ladder'];
 
 
 // K-2 picture cells: counters, ten frame, base-10 mat, number bond, chart window, number track,

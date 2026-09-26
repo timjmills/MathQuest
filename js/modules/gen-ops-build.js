@@ -366,12 +366,82 @@ export function genShareGroupEarly(q) {
     return q;
 }
 
+/* ============================================================== addition:add_sub_patterns */
+
+/** The kinds, in the order of "What the pupil does" (forms 0-3). */
+export const LADDER_KINDS = Object.freeze(['add', 'sub', 'missing', 'words']);
+/** The ladder's places for each "Numbers to" band. */
+const LADDER_PLACES = { 100: [1, 10], 1000: [1, 10, 100], 10000: [1, 10, 100, 1000] };
+/** Every known fact with a one-digit answer: [a, b] for + (a + b <= 9), for − (b < a <= 9). */
+const LADDER_ADD = Object.freeze([1, 2, 3, 4, 5, 6, 7, 8].flatMap((a) => [1, 2, 3, 4, 5, 6, 7, 8].filter((b) => a + b <= 9).map((b) => [a, b])));
+const LADDER_SUB = Object.freeze([2, 3, 4, 5, 6, 7, 8, 9].flatMap((a) => [1, 2, 3, 4, 5, 6, 7, 8].filter((b) => b < a).map((b) => [a, b])));
+
+export function genAddSubPatterns(q) {
+    const kinds = ticked('forms', [0, 1, 2, 3]).map((i) => LADDER_KINDS[i]).filter(Boolean);
+    const kind = kinds.length > 1 ? kinds[dealIndex('asp:kind', kinds.length)] : kinds[0] || 'add';
+    const band = LADDER_PLACES[Number(opt('band'))] ? Number(opt('band')) : 1000;
+    const places = LADDER_PLACES[band];
+    const look = (() => { const v = opt('notation'); const t = Array.isArray(v) ? v[0] : v; return t === 'stacked' ? 'stacked' : 'across'; })();
+    const levels = ticked('level', [2, 1]).slice().sort((x, y) => y - x);
+    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : 0;
+    const given = levels[fadeRung(at, levels.length, state.itemCount, Number.isFinite(state.itemIndex))] >= 2;
+    // + or − : the kind says it, or (missing, words) it is its own deal
+    const op = kind === 'add' ? '+' : kind === 'sub' ? '-' : dealIndex('asp:op', 2) === 0 ? '+' : '-';
+    // place words name every number by its place ("3 tens"), so no 1 (never "1 tens", and a
+    // printed "ten" after a box would give the 1 away)
+    const facts = (op === '+' ? LADDER_ADD : LADDER_SUB).filter(([x, y]) => kind !== 'words' || (x > 1 && y > 1 && (op === '+' ? x + y : x - y) > 1));
+    const [a, b] = dealPick(`asp:fact:${op}:${kind === 'words' ? 'w' : 'n'}`, facts);
+    const glyph = op === '+' ? '+' : '−';
+    const res = op === '+' ? a + b : a - b;
+    const payloadKind = kind === 'missing' ? 'missing' : kind === 'words' ? 'words' : 'result';
+    const payload = { kind: payloadKind, op, a, b, places, given, look };
+    const rows = places.map((pl) => ({ A: a * pl, B: b * pl, R: res * pl, pl }));
+    const asked = rows.filter((r, i) => !(i === 0 && given));
+    const parts = [];
+    for (const r of asked) {
+        if (payloadKind === 'missing') parts.push(String(r.B));
+        else if (payloadKind === 'words' && r.pl > 1) { parts.push(String(res)); parts.push(String(r.R)); }
+        else parts.push(String(r.R));
+    }
+    const PW = { 10: 'tens', 100: 'hundreds', 1000: 'thousands' };
+    let text, printText;
+    if (payloadKind === 'result') {
+        text = `${op === '+' ? 'Add' : 'Subtract'}: ${rows.map((r) => `${r.A} ${glyph} ${r.B}`).join(', ')}.`;
+        printText = 'Use the first fact. Write each answer.';
+    } else if (payloadKind === 'missing') {
+        text = `Find the missing numbers: ${rows.slice(1).map((r) => `${r.A} ${glyph} ? = ${r.R}`).join(', ')}.`;
+        printText = 'Use the first fact. Write the missing numbers.';
+    } else {
+        text = `${rows.slice(1).map((r) => `${a} ${PW[r.pl]} ${glyph} ${b} ${PW[r.pl]} = ? ${PW[r.pl]}`).join(', ')}.`;
+        printText = 'Use the first fact. Fill in the boxes.';
+    }
+    q.text = text;
+    q.printText = printText;
+    q.ans = parts.join(', ');
+    q.keyParts = parts;
+    q.acceptedAnswers = [parts.join(', '), parts.join(','), parts.join(' ')];
+    q.answerType = 'text';
+    q.selfAnswering = true;
+    q.options = [];
+    q.a = a; q.b = b; q.op = op === '+' ? '+' : '−';
+    q.hint = `${a} ${glyph} ${b} = ${res}. ${a} tens ${glyph} ${b} tens = ${res} tens = ${res * 10}. The digits stay the same; the place changes.`;
+    q.skillLabel = 'Spot the Pattern';
+    q.ladder = { kind: payloadKind, op, a, b, places: places.slice(), given, res };
+    q.cell = { template: 'fact-ladder', v: 1, payload };
+    q.visual = k2Twin('fact-ladder', payload);
+    q.printFormat = 'fact-ladder';
+    // what the pupil sees: place words are always written across
+    q.notation = payloadKind === 'words' ? 'across' : look;
+    return q;
+}
+
 /* ------------------------------------------------------------------------------ dispatch */
 
 /** Every skill id this module generates, by its id within its category. */
 export const OPS_BUILD_SKILLS = Object.freeze({
     count_through_zero: genCountThroughZero,
     share_and_group_early: genShareGroupEarly,
+    add_sub_patterns: genAddSubPatterns,
 });
 
 /** Generate `q` for a build-lane skill; false when the id is not one of them. */

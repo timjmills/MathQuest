@@ -430,3 +430,108 @@ for (const op of ['add', 'sub']) {
     }
 }
 
+/* =============================================================== add_sub_patterns (build lane) */
+
+// Build list, lane operations, entry 3 (2026-09-26): a known fact and the same fact in tens and
+// hundreds (3 + 4 = 7, 30 + 40 = 70, 300 + 400 = 700). The item's own data is q.ladder
+// (gen-ops-build.js). The misconceptions (research notes, 2026-09-26; build list): adding the
+// zeros too (30 + 40 = 700), dropping a zero (300 + 400 = 70), and in words writing the number
+// for the tens (3 tens + 4 tens = 70 tens).
+
+const ladderOf = (q) => obj(q && q.ladder);
+const LADDER_KINDS = ['add', 'sub', 'missing', 'words'];
+
+function ladderStringsBy(pick) {
+    const fn = (ref = {}) => strings(pick(ref && ref.q, ref || {}))(ref);
+    fn.def = pick(null, {});
+    return fn;
+}
+
+/** The rows the pupil writes, and the right value of each box in reading order. */
+function ladderAsked(d) {
+    const rows = d.places.map((pl) => ({ pl, A: d.a * pl, B: d.b * pl, R: d.res * pl }));
+    const asked = rows.filter((r, i) => !(i === 0 && d.given));
+    const right = [];
+    asked.forEach((r) => {
+        if (d.kind === 'missing') right.push(r.B);
+        else if (d.kind === 'words' && r.pl > 1) { right.push(d.res); right.push(r.R); }
+        else right.push(r.R);
+    });
+    return { asked, right };
+}
+
+registerSkill('addition:add_sub_patterns', {
+    strings: ladderStringsBy((q, ref = {}) => {
+        const d = q ? ladderOf(q) : null;
+        const opts = ref.opts || {};
+        const forms = Array.isArray(opts.forms) && opts.forms.length ? opts.forms.filter((i) => LADDER_KINDS[i]) : [0];
+        const kinds = forms.length ? forms.map((i) => LADDER_KINDS[i]) : ['add'];
+        const mixed = !d && kinds.length > 1;
+        const kind = d ? (d.kind === 'result' ? (d.op === '-' ? 'sub' : 'add') : d.kind) : kinds[0];
+        const sub = kind === 'sub';
+        // the places the ladder reaches: the band (to 100, 1000, 10 000) or the item's own rows
+        const top = d && Array.isArray(d.places) ? Math.max(...d.places) : ({ 100: 10, 1000: 100, 10000: 1000 }[Number(opts.band)] || 100);
+        const units = top >= 1000 ? 'tens, hundreds and thousands' : top >= 100 ? 'tens and hundreds' : 'tens';
+        return {
+            iCan: mixed ? `I Can use a fact to add and subtract ${units}`
+                : kind === 'words' ? `I Can add and subtract ${units} in place words`
+                    : kind === 'missing' ? 'I Can use a fact to find a missing number'
+                        : sub ? `I Can use a fact to subtract ${units}` : `I Can use a fact to add ${units}`,
+            instructionKey: mixed || kind === 'words' ? 'ladder-fill' : kind === 'missing' ? 'ladder-missing' : 'ladder-result',
+            steps: kind === 'words'
+                ? ['Read the first fact.', 'Tens: the same digits, now tens.', 'Write how many tens.', 'Write the number: put the zero on.']
+                : ['Read the first fact.', 'Look down: the digits stay the same.', 'Each row adds one more zero.', 'Write each answer with its zeros.'],
+            say: kind === 'words' ? '__ tens and __ tens make __ tens.' : '__ and __ make __, so __ and __ make __.',
+            sayValues: (item) => {
+                const e = ladderOf(item);
+                if (!e) return null;
+                if (e.kind === 'words') return [e.a, e.b, e.res];
+                const g = e.op === '-' ? 'take away' : 'and';
+                const v = e.op === '-' ? 'is' : 'make';
+                return `${e.a} ${g} ${e.b} ${v} ${e.res}, so ${e.a * 10} ${g} ${e.b * 10} ${v} ${e.res * 10}.`;
+            },
+        };
+    }),
+    misconceptions: ['added-zeros', 'dropped-zero', 'tens-as-number'],
+    workedSteps: (q) => {
+        const d = ladderOf(q);
+        if (!d) return [];
+        const g = d.op === '-' ? '−' : '+';
+        const { right } = ladderAsked(d);
+        const all = right.map((v, i) => ({ slot: `b${i}`, value: String(v) }));
+        const out = [step(`Read the fact: ${d.a} ${g} ${d.b} = ${d.res}.`)];
+        if (d.kind === 'words') {
+            out.push(step(`${d.a} tens ${g} ${d.b} tens = ${d.res} tens.`));
+            out.push(step(`${d.res} tens is ${d.res * 10}.`));
+        } else if (d.kind === 'missing') {
+            out.push(step(`${d.a * 10} ${g} ? = ${d.res * 10}: the missing number is ${d.b * 10}.`));
+        } else {
+            out.push(step(`${d.a * 10} ${g} ${d.b * 10}: the same digits, one zero: ${d.res * 10}.`));
+        }
+        out.push(step('Do each row the same way.', all));
+        return clampSteps(out);
+    },
+    wrongAnswer: (q) => {
+        const d = ladderOf(q);
+        if (!d) return null;
+        const { asked, right } = ladderAsked(d);
+        // the first box of a tens (or more) row
+        const k = asked.findIndex((r) => r.pl >= 10);
+        if (k < 0) return null;
+        const first = asked.slice(0, k).reduce((n, r) => n + (d.kind === 'words' && r.pl > 1 ? 2 : 1), 0);
+        const r = asked[k];
+        const withV = (i, v) => right.map((x, j) => String(j === i ? v : x)).join(', ');
+        const c = [];
+        if (d.kind === 'words') {
+            c.push({ value: withV(first, r.R), misconception: 'tens-as-number', slot: `b${first}`,
+                slots: { [`b${first}`]: String(r.R) }, explain: `Wrote ${r.R} ${r.pl === 10 ? 'tens' : 'hundreds'}: it is ${d.res}.` });
+        } else {
+            const v = d.kind === 'missing' ? r.B * 10 : r.R * 10;
+            c.push({ value: withV(first, v), misconception: 'added-zeros', slot: `b${first}`, slots: { [`b${first}`]: String(v) },
+                explain: 'Counted the zeros of both numbers: one zero too many.' });
+            const drop = d.kind === 'missing' ? r.B / 10 : r.R / 10;
+            if (Number.isInteger(drop) && drop > 0) c.push({ value: withV(first, drop), misconception: 'dropped-zero', slot: `b${first}`, slots: { [`b${first}`]: String(drop) }, explain: 'Left off a zero: the place changed.' });
+        }
+        return chooseWrong(q, c);
+    },
+});

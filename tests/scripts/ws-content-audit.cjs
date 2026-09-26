@@ -364,7 +364,7 @@ function framesPromised(id, label) {
 const SHAPE_OF = {
     column: ['column-add', 'column-sub', 'add-facts-vertical', 'sub-facts-vertical', 'mult-facts-vertical', 'long-division'],
     across: ['(none)', 'add-facts-horizontal', 'sub-facts-horizontal', 'mult-facts-horizontal', 'div-facts-horizontal',
-        'div-facts-fraction', 'missing-number', 'missing-operator', 'missing-factor', 'inline-cloze', 'build-expr'],
+        'div-facts-fraction', 'missing-number', 'missing-operator', 'missing-factor', 'inline-cloze', 'build-expr', 'fact-ladder'],
     word: ['word-add', 'word-sub', 'word-problem', 'word-plain', 'unknown-start-wp'],
     model: ['area-model-mult', 'area-model-mult-hard', 'area-model-div', 'box-division', 'array-builder', 'arrays-groups',
         'dot-array-visual', 'add-5-pictures', 'sub-5-pictures', 'div-remainders', 'mult-properties', 'mult-chart', 'mult-chart-tier',
@@ -629,6 +629,10 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm, opt
             item.opts = q.skillOptions ? JSON.parse(JSON.stringify(q.skillOptions)) : null;
         }
         // Build lane operations: a line through zero (int-line) carries its payload and q.ctz.
+        if (q.cell && q.cell.template === 'fact-ladder') {
+            item.cellT = q.cell.template;
+            try { item.cellP = JSON.parse(JSON.stringify(q.cell.payload || {})); } catch (e) { item.cellP = {}; }
+        }
         if (q.cell && q.cell.template === 'share-plates') {
             item.cellT = q.cell.template;
             try { item.cellP = JSON.parse(JSON.stringify(q.cell.payload || {})); } catch (e) { item.cellP = {}; }
@@ -1059,6 +1063,35 @@ function shareRules(items, F) {
         } else bad.push(`unknown kind ${p.kind}`);
     }
     if (bad.length) F('share-plates', `${bad.length} shares are wrong: ${[...new Set(bad)].slice(0, 4).join('; ')}`);
+}
+
+/**
+ * Build lane operations, entry 3: a fact ladder (add_sub_patterns) is one known fact times 1, 10,
+ * 100 ... Every row must be the fact times its place (so the digits stay and only the zeros
+ * change), a subtraction never goes below zero, and the key is exactly the boxes the pupil fills
+ * in reading order (the given first answer is not keyed).
+ */
+function ladderRules(items, F) {
+    const live = items.filter(it => it && !it.error && !it.empty && it.cellT === 'fact-ladder');
+    if (!live.length) return;
+    const bad = [];
+    for (const it of live) {
+        const p = it.cellP || {};
+        const a = Number(p.a), b = Number(p.b), pl = p.places || [];
+        const res = p.op === '-' ? a - b : a + b;
+        if (!(a >= 1 && b >= 1 && res >= 0 && res <= 9)) bad.push(`fact ${a} ${p.op} ${b} is not a single-digit fact`);
+        if (!pl.length || pl[0] !== 1 || pl.some((v, i) => i && v !== pl[i - 1] * 10)) bad.push(`places ${pl.join(',')} are not 1, 10, 100 ...`);
+        const want = [];
+        pl.forEach((v, i) => {
+            if (i === 0 && p.given) return;
+            if (p.kind === 'missing') want.push(b * v);
+            else if (p.kind === 'words' && v > 1) { want.push(res); want.push(res * v); }
+            else want.push(res * v);
+        });
+        if (String(it.ans).replace(/\s/g, '') !== want.join(',')) bad.push(`${a} ${p.op} ${b} keyed ${it.ans}, wants ${want.join(', ')}`);
+        if (p.kind === 'words' && (a < 2 || b < 2 || res < 2)) bad.push(`place words with a 1: ${a} ${p.op} ${b}`);
+    }
+    if (bad.length) F('fact-ladder', `${bad.length} ladders are wrong: ${[...new Set(bad)].slice(0, 4).join('; ')}`);
 }
 
 /**
@@ -2091,6 +2124,7 @@ function audit(skill, items) {
     countByRules(items, F);
     intRules(items, F);
     shareRules(items, F);
+    ladderRules(items, F);
 
     if (r.eqRemainder) NOTE('answer-floor', `${r.eqRemainder} of ${r.eqChecked} equations answer with the whole-number quotient and drop the remainder`);
 

@@ -127,7 +127,7 @@ export const SKILL_GRADES = {
     'missing_factor_or_addend': 3,  // 3.OA.A.4 — determine the unknown in an equation
     // Integers
     'number_line_int': 6, 'compare_int': 6, 'add_int': 6, 'sub_int': 6,
-    'count_through_zero': 4, 'share_and_group_early': 'K',
+    'count_through_zero': 4, 'share_and_group_early': 'K', 'add_sub_patterns': 2,
     // Fraction Operations
     'add_fractions_like': 4, 'sub_fractions_like': 4, 'add_mixed_like': 4, 'sub_mixed_like': 4,
     'mult_frac_whole': 4, 'decompose_fractions': 4, 'frac_word_problems': 4, 'frac_word_problems_plain': 4, 'frac_10_100': 4,
@@ -661,6 +661,9 @@ export const SKILLS = {
         { v: "add_column_multi", l: "Add Three or Four Numbers in Columns" },   // CM-3 … CM-8: the regroup box must hold a 2-digit carry
         { v: "add_missing_digit", l: "Find the Missing Digit (Addition)" },      // AC-19: a dashed digit box inside a finished column
         { v: "fact_family_sort", l: "Is It a Fact Family? (+/−)" },              // FF-6: needs NON-examples, which a fact-family skill must never emit
+        // APPENDED 2026-09-26 (build list, lane operations, entry 3): a known fact in tens and hundreds,
+        // what changes and what stays (2.NBT.8-9, 3.NBT.2).
+        { v: "add_sub_patterns", l: "Spot the Pattern (+/−)" },
     ],
     subtraction: [
         { v: "sub_facts", l: "Subtraction Facts (within 20)" },
@@ -1671,7 +1674,7 @@ export const SKILL_TIME_CATEGORY = {
     sub_1m_no_regroup: "quick", sub_1m_regroup: "quick", sub_1m_mixed: "quick",
     // Basic operations & arithmetic
     add_decimal: "quick", sub_decimal: "quick", mult_decimal: "quick", div_decimal: "quick",
-    add_int: "quick", sub_int: "quick", count_through_zero: "quick", share_and_group_early: "quick",
+    add_int: "quick", sub_int: "quick", count_through_zero: "quick", share_and_group_early: "quick", add_sub_patterns: "quick",
     missing_add_sub: "quick", missing_mult_div: "quick",
     // Reusable primitive demos
     cloze_addition: "quick", hotspot_quads: "quick",
@@ -1890,7 +1893,7 @@ export const SKILL_PRINT_SIZE = {
     estimate_sums_diffs: "standard", estimate_products: "standard", estimate_quotient: "standard",
     make_a_ten: "medium", doubles_near_doubles: "medium", compensation: "medium",
     expand: "medium", combine: "medium",
-    add_int: "standard", sub_int: "standard", number_line_int: "standard", count_through_zero: "wide", share_and_group_early: "medium",
+    add_int: "standard", sub_int: "standard", number_line_int: "standard", count_through_zero: "wide", share_and_group_early: "medium", add_sub_patterns: "medium",
     solve_unknown: "standard", evaluate_expression: "standard",
     write_expression: "standard", inequalities: "standard",
     build_expr_addsub: "wide", build_expr_multdiv: "wide",

@@ -24,23 +24,23 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 603 live skills; 494 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 604 live skills; 495 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
-- **Full coverage: CCSS 77 of 177 standards FULL, 89 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 105 FULL, 90 PARTIAL, 22 GAP.
+- **Full coverage: CCSS 77 of 177 standards FULL, 90 PARTIAL, 10 GAP** (tagged: 167). Counting leaves and lettered parts (217): 105 FULL, 91 PARTIAL, 21 GAP.
 - **Essential Elements: 86 of 117 FULL, 28 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
-- The one build list: 273 entries — 130 new skills, 88 options on existing skills, 2 repairs; 160 from the White Rose audit (40 of them extended to close standards clauses), 60 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+- The one build list: 272 entries — 129 new skills, 88 options on existing skills, 2 repairs; 159 from the White Rose audit (40 of them extended to close standards clauses), 60 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
 
 | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
 |---|---|---|---|---|
 | K | 10 / 11 / 1 of 22 (45% full) | 11 / 12 / 1 of 24 | 6 / 4 / 0 of 10 (60% full) | 21/22, 10/10 |
 | 1 | 11 / 10 / 0 of 21 (52% full) | 13 / 10 / 0 of 23 | 10 / 5 / 1 of 16 (63% full) | 21/21, 16/16 |
-| 2 | 12 / 10 / 4 of 26 (46% full) | 12 / 9 / 6 of 27 | 12 / 6 / 1 of 19 (63% full) | 22/26, 18/19 |
+| 2 | 12 / 11 / 3 of 26 (46% full) | 12 / 10 / 5 of 27 | 12 / 6 / 1 of 19 (63% full) | 23/26, 18/19 |
 | 3 | 12 / 13 / 0 of 25 (48% full) | 18 / 15 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
 | 4 | 14 / 13 / 1 of 28 (50% full) | 19 / 13 / 2 of 34 | 16 / 4 / 0 of 20 (80% full) | 27/28, 20/20 |
 | 5 | 10 / 14 / 2 of 26 (38% full) | 16 / 13 / 5 of 34 | 13 / 4 / 1 of 18 (72% full) | 24/26, 17/18 |
 | 6 | 8 / 18 / 3 of 29 (28% full) | 16 / 18 / 8 of 42 | 14 / 3 / 0 of 17 (82% full) | 26/29, 17/17 |
-| **All** | **77 / 89 / 11 of 177 (44% full)** | **105 / 90 / 22 of 217** | **86 / 28 / 3 of 117 (74% full)** | 166/177, 115/117 |
+| **All** | **77 / 90 / 10 of 177 (44% full)** | **105 / 91 / 21 of 217** | **86 / 28 / 3 of 117 (74% full)** | 167/177, 115/117 |
 
 ## Tag fixes made by this audit
 
@@ -231,47 +231,46 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 36 | **Faces, Edges or Vertices (option)** (`shape_faces`) | option on `shapes_early:count_edges_faces_vertices` | - | 1 |
 | 37 | **3-D Shapes: Names and Properties** (`shapes_3d_props`) | new `shapes_classify:3d_shape_properties` | - | 1 |
 
-### Operations (37)
+### Operations (36)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
 |---|---|---|---|---|
 | 1 | **Number Bonds in Order** (`systematic_bonds`) | new `composing:bonds_in_order` | K.OA.A.3, M.EE.1.NBT.4, M.EE.1.NBT.6, M.EE.2.NBT.6 | 1 |
-| 2 | **Spot the Pattern (+/−)** (`add_sub_patterns`) | new `addition:add_sub_patterns` | 2.NBT.B.9 | 4 |
-| 3 | **Long Multiplication and Division (4-digit)** (`long_mult`) | new `multiplication:long_multiplication_4x2` | 5.NBT.B.5 | 4 |
-| 4 | **Compare Calculations** (`compare_calcs`) | new `algebra:compare_calculations` | 5.OA.A.2, M.EE.6.EE.3 | 1 |
-| 5 | **To the Next Ten** (`add_next_10`) | new `addition:bridge_to_next_ten` | - | 4 |
-| 6 | **Add Three Numbers: Stories and Make a Ten First (option)** (`add_three_forms`) | option on `addition:add_three` | 1.OA.A.2, 1.OA.B.3 | - |
-| 7 | **Add and Subtract 10s Across 100 (option)** (`cross_100`) | option on `addition:add_sub_100s` | 2.NBT.B.7 | 2 |
-| 8 | **Multiply Three Numbers** (`mult_three`) | new `multiplication:multiply_three_numbers` | 3.OA.B.5 | 2 |
-| 9 | **Add and Subtract With a Base-10 Picture (option)** (`stack_base10_support`) | option on `addition:add_100_mixed` | 1.NBT.C.4, 2.NBT.B.7 | - |
-| 10 | **Related Times-Tables** (`tables_links`) | new `multiplication:related_tables` | - | 4 |
-| 11 | **Add and Subtract Multiples of Ten (option)** (`tens_any`) | option on `addition:add_sub_10s` | 1.NBT.C.4, 1.NBT.C.6 | - |
-| 12 | **Add or Multiply?** (`add_or_mult`) | new `algebra:add_or_multiply` | 4.OA.A.2 | 1 |
-| 13 | **Add or Subtract 1 or 2** (`add_sub_1_2`) | new `addition:add_sub_1_or_2` | K.CC.B.4c | 1 |
-| 14 | **Compare Number Sentences** (`compare_sentences`) | new `algebra:compare_number_sentences` | 1.OA.D.7 | 1 |
-| 15 | **Make Equal Groups** (`equal_groups_early`) | new `multiplication:make_equal_groups` | 2.OA.C.4 | 1 |
-| 16 | **Mental Calculation and Estimation** (`mental_estimate`) | new `number_sense:estimate_and_check` | 3.OA.D.8 | 1 |
-| 17 | **Part-Whole Model** (`part_whole`) | new `composing:part_whole_model` | K.OA.A.1 | 1 |
-| 18 | **Bonds to 100** (`bonds_100`) | new `addition:bonds_to_100` | - | 2 |
-| 19 | **Times as Many: Statements and Equations (option)** (`comparison_statements`) | option on `multiplication:mult_comparison` | 4.OA.A.1 | - |
-| 20 | **True or False Equations (repair)** (`equal_sign_repair`) | repair on `addition:equal_sign` | 1.OA.D.7 | - |
-| 21 | **Why Does It Work?** (`explain_strategy`) | new `number_sense:why_it_works` | 2.NBT.B.9 | - |
-| 22 | **Subtract Back Through Ten (option)** (`make_ten_subtract`) | option on `number_sense:make_a_ten` | 1.OA.C.6 | - |
-| 23 | **Multiply a 4-Digit Number by a 1-Digit Number (option)** (`mult_4x1`) | option on `multiplication:multiply` | 4.NBT.B.5 | - |
-| 24 | **Write the Number Sentence for the Picture (option)** (`pictures_to_sentence`) | option on `addition:add_5_pictures` | K.OA.A.1 | - |
-| 25 | **What Do +, − and = Mean? (option)** (`sign_meanings`) | option on `number_ops_mixed:which_sign` | M.EE.2.NBT.5 | - |
-| 26 | **Number Bonds to 20** (`bonds_20`) | new `composing:bonds_to_20` | - | 1 |
-| 27 | **Correspondence Problems** (`correspondence`) | new `multiplication:correspondence_problems` | - | 1 |
-| 28 | **Find the Difference** (`difference`) | new `subtraction:find_the_difference` | - | 1 |
-| 29 | **Division Using Factors** (`div_factors`) | new `division:divide_using_factors` | - | 1 |
-| 30 | **How Many Ways?** (`how_many_ways`) | new `multiplication:how_many_ways` | - | 1 |
-| 31 | **Inverse Operations (option)** (`inverse_check`) | option on `subtraction:sub_check_by_adding` | - | 1 |
-| 32 | **Reason from Known Facts** (`known_facts`) | new `multiplication:reason_from_known_facts` | - | 1 |
-| 33 | **Long Division with Remainders (option)** (`long_div_rem`) | option on `division:long_div_2digit` | - | 1 |
-| 34 | **Mental or Written?** (`make_decisions`) | new `addition:choose_a_method` | - | 1 |
-| 35 | **Mental Addition and Subtraction** (`mental_add_sub`) | new `addition:mental_strategies` | - | 1 |
-| 36 | **Multiples of 10, 100 and 1,000 (option)** (`mult_multiples`) | option on `multiplication:mult_zeros` | - | 1 |
-| 37 | **Partition to Multiply** (`informal_mult`) | new `multiplication:partition_multiply` | - | - |
+| 2 | **Long Multiplication and Division (4-digit)** (`long_mult`) | new `multiplication:long_multiplication_4x2` | 5.NBT.B.5 | 4 |
+| 3 | **Compare Calculations** (`compare_calcs`) | new `algebra:compare_calculations` | 5.OA.A.2, M.EE.6.EE.3 | 1 |
+| 4 | **To the Next Ten** (`add_next_10`) | new `addition:bridge_to_next_ten` | - | 4 |
+| 5 | **Add Three Numbers: Stories and Make a Ten First (option)** (`add_three_forms`) | option on `addition:add_three` | 1.OA.A.2, 1.OA.B.3 | - |
+| 6 | **Add and Subtract 10s Across 100 (option)** (`cross_100`) | option on `addition:add_sub_100s` | 2.NBT.B.7 | 2 |
+| 7 | **Multiply Three Numbers** (`mult_three`) | new `multiplication:multiply_three_numbers` | 3.OA.B.5 | 2 |
+| 8 | **Add and Subtract With a Base-10 Picture (option)** (`stack_base10_support`) | option on `addition:add_100_mixed` | 1.NBT.C.4, 2.NBT.B.7 | - |
+| 9 | **Related Times-Tables** (`tables_links`) | new `multiplication:related_tables` | - | 4 |
+| 10 | **Add and Subtract Multiples of Ten (option)** (`tens_any`) | option on `addition:add_sub_10s` | 1.NBT.C.4, 1.NBT.C.6 | - |
+| 11 | **Add or Multiply?** (`add_or_mult`) | new `algebra:add_or_multiply` | 4.OA.A.2 | 1 |
+| 12 | **Add or Subtract 1 or 2** (`add_sub_1_2`) | new `addition:add_sub_1_or_2` | K.CC.B.4c | 1 |
+| 13 | **Compare Number Sentences** (`compare_sentences`) | new `algebra:compare_number_sentences` | 1.OA.D.7 | 1 |
+| 14 | **Make Equal Groups** (`equal_groups_early`) | new `multiplication:make_equal_groups` | 2.OA.C.4 | 1 |
+| 15 | **Mental Calculation and Estimation** (`mental_estimate`) | new `number_sense:estimate_and_check` | 3.OA.D.8 | 1 |
+| 16 | **Part-Whole Model** (`part_whole`) | new `composing:part_whole_model` | K.OA.A.1 | 1 |
+| 17 | **Bonds to 100** (`bonds_100`) | new `addition:bonds_to_100` | - | 2 |
+| 18 | **Times as Many: Statements and Equations (option)** (`comparison_statements`) | option on `multiplication:mult_comparison` | 4.OA.A.1 | - |
+| 19 | **True or False Equations (repair)** (`equal_sign_repair`) | repair on `addition:equal_sign` | 1.OA.D.7 | - |
+| 20 | **Why Does It Work?** (`explain_strategy`) | new `number_sense:why_it_works` | 2.NBT.B.9 | - |
+| 21 | **Subtract Back Through Ten (option)** (`make_ten_subtract`) | option on `number_sense:make_a_ten` | 1.OA.C.6 | - |
+| 22 | **Multiply a 4-Digit Number by a 1-Digit Number (option)** (`mult_4x1`) | option on `multiplication:multiply` | 4.NBT.B.5 | - |
+| 23 | **Write the Number Sentence for the Picture (option)** (`pictures_to_sentence`) | option on `addition:add_5_pictures` | K.OA.A.1 | - |
+| 24 | **What Do +, − and = Mean? (option)** (`sign_meanings`) | option on `number_ops_mixed:which_sign` | M.EE.2.NBT.5 | - |
+| 25 | **Number Bonds to 20** (`bonds_20`) | new `composing:bonds_to_20` | - | 1 |
+| 26 | **Correspondence Problems** (`correspondence`) | new `multiplication:correspondence_problems` | - | 1 |
+| 27 | **Find the Difference** (`difference`) | new `subtraction:find_the_difference` | - | 1 |
+| 28 | **Division Using Factors** (`div_factors`) | new `division:divide_using_factors` | - | 1 |
+| 29 | **How Many Ways?** (`how_many_ways`) | new `multiplication:how_many_ways` | - | 1 |
+| 30 | **Inverse Operations (option)** (`inverse_check`) | option on `subtraction:sub_check_by_adding` | - | 1 |
+| 31 | **Reason from Known Facts** (`known_facts`) | new `multiplication:reason_from_known_facts` | - | 1 |
+| 32 | **Long Division with Remainders (option)** (`long_div_rem`) | option on `division:long_div_2digit` | - | 1 |
+| 33 | **Mental or Written?** (`make_decisions`) | new `addition:choose_a_method` | - | 1 |
+| 34 | **Mental Addition and Subtraction** (`mental_add_sub`) | new `addition:mental_strategies` | - | 1 |
+| 35 | **Multiples of 10, 100 and 1,000 (option)** (`mult_multiples`) | option on `multiplication:mult_zeros` | - | 1 |
+| 36 | **Partition to Multiply** (`informal_mult`) | new `multiplication:partition_multiply` | - | - |
 
 ### Counting and early number (17)
 
@@ -579,9 +578,10 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught in part by: Add within 1,000 (`addition:add_1k_mixed`); Subtract within 1,000 (`subtraction:sub_1k_mixed`); Add & Subtract by 100s (`addition:add_sub_100s`); Check a Subtraction by Adding (`subtraction:sub_check_by_adding`)  
   Missing: concrete models or drawings (base-10, place-value disks) related to the written method  
   Build: Add and Subtract With a Base-10 Picture (option) (`stack_base10_support`); Add and Subtract 10s Across 100 (option) (`cross_100`)
-- **2.NBT.B.9** — GAP. Explain why addition and subtraction strategies work, using place value and the properties of operations.  
-  Missing: explain why addition and subtraction strategies work, using place value and the properties of operations  
-  Build: Why Does It Work? (`explain_strategy`); Spot the Pattern (+/−) (`add_sub_patterns`)
+- **2.NBT.B.9** — PARTIAL. Explain why addition and subtraction strategies work, using place value and the properties of operations.  
+  Taught in part by: Spot the Pattern (+/−) (`addition:add_sub_patterns`)  
+  Missing: explain why a strategy works using the properties of operations (the place-value part: add_sub_patterns, "3 tens + 4 tens = 7 tens = 70")  
+  Build: Why Does It Work? (`explain_strategy`)
 - **2.MD.A.1** — PARTIAL. Measure the length of an object by selecting and using appropriate tools such as rulers, yardsticks, meter sticks, and measuring tapes.  
   Taught in part by: Reading a Ruler (Visual) (`measurement:reading_ruler`)  
   Missing: centimetre rulers, metre sticks, yardsticks and tapes (the skill reads inches); selecting the appropriate tool  
@@ -1237,7 +1237,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **2.NBT.B.5** — FULL. Fluently add and subtract within 100 using strategies based on place value, properties of operations, and/or the relationship between addition and subtraction.  
   Taught by: Add within 100 (`addition:add_100_mixed`); Subtract within 100 (`subtraction:sub_100_mixed`); Compensation Strategy (`number_sense:compensation`); Mixed Addition & Subtraction (`subtraction:mixed_add_sub`)  
-  Also tagged: `addition:add`, `addition:add_50_no_regroup`, `addition:add_50_regroup`, `addition:add_50_mixed`, `addition:add_100_no_regroup`, `addition:add_100_regroup`, `subtraction:subtract`, `subtraction:sub_50_no_regroup`, `subtraction:sub_50_regroup`, `subtraction:sub_50_mixed`, `subtraction:sub_100_no_regroup`, `subtraction:sub_100_regroup`
+  Also tagged: `addition:add`, `addition:add_50_no_regroup`, `addition:add_50_regroup`, `addition:add_50_mixed`, `addition:add_100_no_regroup`, `addition:add_100_regroup`, `subtraction:subtract`, `subtraction:sub_50_no_regroup`, `subtraction:sub_50_regroup`, `subtraction:sub_50_mixed`, `subtraction:sub_100_no_regroup`, `subtraction:sub_100_regroup`, `addition:add_sub_patterns`
 - **2.NBT.B.6** — FULL. Add up to four two-digit numbers using strategies based on place value and properties of operations.  
   Taught by: Add Three or Four Numbers in Columns (`addition:add_column_multi`)  
 - **2.NBT.B.7** — PARTIAL. Add and subtract within 1000, using concrete models or drawings and strategies based on place value, properties of operations, and/or the relationship between addition and subtraction; relate the strategy to a written method. Understand that in adding or subtracting three-digit numbers, one adds or subtracts hundreds and hundreds, tens and tens, ones and ones; and sometimes it is necessary to compose or decompose tens or hundreds.  
@@ -1246,8 +1246,10 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Also tagged: `addition:add_1k_no_regroup`, `addition:add_1k_regroup`, `addition:add_wp_1k`, `addition:add_wp_1k_plain`, `subtraction:sub_1k_no_regroup`, `subtraction:sub_1k_regroup`, `subtraction:sub_wp_1k`, `subtraction:sub_wp_1k_plain`, `subtraction:sub_across_zeros`
 - **2.NBT.B.8** — FULL. Mentally add 10 or 100 to a given number 100–900, and mentally subtract 10 or 100 from a given number 100–900.  
   Taught by: 10 More, 10 Less, 100 More, 100 Less (`placevalue:more_less_100`); Add & Subtract by 100s (`addition:add_sub_100s`)  
-- **2.NBT.B.9** — GAP. Explain why addition and subtraction strategies work, using place value and the properties of operations.  
-  Missing: explain why addition and subtraction strategies work, using place value and the properties of operations → `explain_strategy`, `add_sub_patterns`  
+  Also tagged: `addition:add_sub_patterns`
+- **2.NBT.B.9** — PARTIAL. Explain why addition and subtraction strategies work, using place value and the properties of operations.  
+  In part: Spot the Pattern (+/−) (`addition:add_sub_patterns`)  
+  Missing: explain why a strategy works using the properties of operations (the place-value part: add_sub_patterns, "3 tens + 4 tens = 7 tens = 70") → `explain_strategy`  
 #### Measurement and Data (2.MD)
 
 *A. Measure and estimate lengths in standard units.*
@@ -1349,7 +1351,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Also tagged: `number_sense:between_tens`, `number_sense:place_on_number_line`, `number_sense:round_sort_10`, `number_sense:round_sort_100`, `number_sense:estimate_sum`, `number_sense:estimate_diff`, `number_sense:estimate_sums_diffs`, `number_sense:rounding_table`
 - **3.NBT.A.2** — FULL. Fluently add and subtract within 1000 using strategies and algorithms based on place value, properties of operations, and/or the relationship between addition and subtraction.  
   Taught by: Add within 1,000 (`addition:add_1k_mixed`); Subtract within 1,000 (`subtraction:sub_1k_mixed`)  
-  Also tagged: `addition:add_1k_no_regroup`, `addition:add_1k_regroup`, `addition:add_wp_1k`, `addition:add_wp_1k_plain`, `addition:add_missing_digit`, `subtraction:sub_1k_no_regroup`, `subtraction:sub_1k_regroup`, `subtraction:sub_wp_1k`, `subtraction:sub_wp_1k_plain`, `subtraction:sub_across_zeros`, `subtraction:sub_missing_digit`, `subtraction:sub_check_by_adding`, `algebra:tape_diagram`, `algebra:tape_diagram_plain`
+  Also tagged: `addition:add_1k_no_regroup`, `addition:add_1k_regroup`, `addition:add_wp_1k`, `addition:add_wp_1k_plain`, `addition:add_missing_digit`, `subtraction:sub_1k_no_regroup`, `subtraction:sub_1k_regroup`, `subtraction:sub_wp_1k`, `subtraction:sub_wp_1k_plain`, `subtraction:sub_across_zeros`, `subtraction:sub_missing_digit`, `subtraction:sub_check_by_adding`, `addition:add_sub_patterns`, `algebra:tape_diagram`, `algebra:tape_diagram_plain`
 - **3.NBT.A.3** — FULL. Multiply one-digit whole numbers by multiples of 10 in the range 10–90 (e.g., 9 × 80, 5 × 60) using strategies based on place value and properties of operations.  
   Taught by: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`)  
 #### Number and Operations—Fractions (3.NF)

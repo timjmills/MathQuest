@@ -254,6 +254,8 @@ export const SKILL_STANDARDS = {
     // Build lane operations, entry 2 (2026-09-26): share onto plates, make equal groups, is it
     // fair?, share with some left over; an even number shared between two to 20 (EE 2.OA.3).
     'division:share_and_group_early': { ccss: ['K.OA.A.1', 'K.OA.A.4', 'K.OA.A.2', '3.OA.A.2'], ee: ['M.EE.K.OA.1', 'M.EE.3.OA.2', 'M.EE.2.OA.3'] }, // Share and Make Groups
+    // Build lane operations, entry 3 (2026-09-26): a known fact in tens and hundreds, in place words.
+    'addition:add_sub_patterns': { ccss: ['2.NBT.B.8', '2.NBT.B.5', '2.NBT.B.9', '3.NBT.A.2'], ee: ['M.EE.2.NBT.5', 'M.EE.3.NBT.2'] }, // Spot the Pattern (+/−)
 
     // ---- number_ops_mixed
     'number_ops_mixed:mixed': { ccss: [], ee: [], pool: true }, // All Four Operations (+ − × ÷)

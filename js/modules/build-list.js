@@ -314,7 +314,7 @@ export const STANDARD_PROPOSALS = {
         problemTypes: ['pick the reason for a worked strategy (add tens to tens, ones to ones)', 'why is 38 + 25 = 40 + 23?', 'why does 52 − 17 = 55 − 20?', 'find the step that is wrong and say why'],
         templates: ['equation', 'stack'], newTemplates: [], answer: 'tick a reason from a bank of 3 (Say: frame on the model)',
         ladder: 'O2 within 100 → 1,000 · O3 base-10 picture of the step → none · O6 picture / numbers',
-        misconceptions: ['compensation changes the answer', 'the order of subtraction does not matter'], wrmSteps: ['Y3.B2.S2', 'Y3.B2.S5'], after: ['add_sub_patterns'],
+        misconceptions: ['compensation changes the answer', 'the order of subtraction does not matter'], wrmSteps: ['Y3.B2.S2', 'Y3.B2.S5'], after: [],
     }),
     // ------------------------------------------------------------------ measurement
     order_length_tasks: P({

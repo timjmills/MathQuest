@@ -97,7 +97,7 @@ export const CCSS_AUDIT = {
     '2.NBT.B.6': F(['addition:add_column_multi']),
     '2.NBT.B.7': P(['addition:add_1k_mixed', 'subtraction:sub_1k_mixed', 'addition:add_sub_100s', 'subtraction:sub_check_by_adding'], ['concrete models or drawings (base-10, place-value disks) related to the written method'], ['stack_base10_support', 'cross_100']),
     '2.NBT.B.8': F(['placevalue:more_less_100', 'addition:add_sub_100s']),
-    '2.NBT.B.9': G(['explain why addition and subtraction strategies work, using place value and the properties of operations'], ['explain_strategy', 'add_sub_patterns']),
+    '2.NBT.B.9': P(['addition:add_sub_patterns'], ['explain why a strategy works using the properties of operations (the place-value part: add_sub_patterns, "3 tens + 4 tens = 7 tens = 70")'], ['explain_strategy']),
     '2.MD.A.1': P(['measurement:reading_ruler'], ['centimetre rulers, metre sticks, yardsticks and tapes (the skill reads inches)', 'selecting the appropriate tool'], ['ruler_cm', 'metres']),
     '2.MD.A.2': G(['measure one object twice with units of different lengths and relate the counts to the unit size'], ['measure_two_units', 'mm_cm_m']),
     '2.MD.A.3': F(['measurement:estimate_length']),

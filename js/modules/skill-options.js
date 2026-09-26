@@ -3328,6 +3328,39 @@ const OPS_BUILD_OPTIONS = {
             helpShort: 'Plates or rings.',
         },
     ],
+    // Entry 3 · Spot the Pattern (+/−) (2.NBT.8-9, 3.NBT.2; WRM Y3 / Y4).
+    'addition:add_sub_patterns': [
+        {
+            id: 'forms', label: 'What the pupil does', type: 'set', default: [0], group: 'difficulty',
+            values: [
+                { v: 0, l: 'Add: 3 + 4, 30 + 40, 300 + 400 (default)' },
+                { v: 1, l: 'Subtract: 7 − 3, 70 − 30, 700 − 300' },
+                { v: 2, l: 'Missing number: 30 + [ ] = 70' },
+                { v: 3, l: 'In place words: 3 tens + 4 tens = [ ] tens = [ ]' },
+            ],
+            match: ['^Add:', '^Subtract:', 'missing numbers', '(tens|hundreds|thousands) [+-] \\d'],
+            allLabel: 'All four, mixed',
+            help: 'Tick one kind for a page of it, or several to mix them. The place words say WHY the pattern works: '
+                + '3 tens and 4 tens are 7 tens.',
+            helpShort: 'Add, subtract, a missing number, or place words.',
+        },
+        {
+            id: 'band', label: 'The ladder goes to', type: 'enum', default: 1000, group: 'difficulty', accept: 'max',
+            values: [{ v: 100, l: 'Tens (3 + 4, 30 + 40)' }, { v: 1000, l: 'Hundreds (to 300 + 400) (default)' },
+                { v: 10000, l: 'Thousands (to 3000 + 4000)' }],
+            help: 'How many rows the ladder has: each row is the fact times 10 again.',
+            helpShort: 'Two, three or four rows.',
+        },
+        levelSubset([2, 1], 2, 'Level 2 prints the known fact with its answer (the pupil uses it); level 1 leaves its '
+            + 'answer to write too.'),
+        {
+            id: 'notation', label: 'How it is written', type: 'enum', default: 'across', group: 'layout',
+            values: [{ v: 'across', l: 'Across, one row under the other (default)' }, { v: 'stacked', l: 'Stacked sums, side by side' }],
+            help: 'Across lines the numbers up under each other, so the zeros show what changes. Stacked writes each row as a '
+                + 'column sum. Place words are always across.',
+            helpShort: 'A ladder of rows, or column sums side by side.',
+        },
+    ],
 };
 Object.assign(SKILL_OPTIONS, OPS_BUILD_OPTIONS);
 // ============================ end OPERATIONS BUILD LANE =========================================

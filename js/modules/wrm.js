@@ -445,6 +445,8 @@ export const SKILL_WRM = {
     // temperature below zero, the difference across zero.
     'integers:count_through_zero': ['Y5.B13.S2', 'Y5.B13.S3', 'Y5.B13.S5'],
     // Build lane operations, entry 2 (2026-09-26): sharing and grouping, fair / not fair, left over.
+    // Build lane operations, entry 3 (2026-09-26): a known fact in tens and hundreds.
+    'addition:add_sub_patterns': ['Y3.B2.S2', 'Y3.B2.S5', 'Y3.B2.S10', 'Y4.B2.S1'],
     'division:share_and_group_early': ['R.B9.S6', 'R.B9.S8', 'R.B11.S10', 'R.B11.S12', 'R.B11.S13', 'R.B14.S2', 'R.B14.S4', 'R.B16.S1', 'R.B16.S2', 'R.B16.S3', 'R.B16.S5', 'Y1.B9.S9', 'Y2.B5.S8'],
 
     // ---- number_ops_mixed
@@ -2184,14 +2186,6 @@ export const WRM_PROPOSALS = {
         representation: 'two expressions with a circle between; write <, > or =',
         family: 'operations',
         steps: ['Y2.B2.S20'],
-    },
-    add_sub_patterns: {
-        kind: 'new', skill: 'addition:add_sub_patterns',
-        name: 'Spot the Pattern (+/−)',
-        teaches: 'using known facts to add and subtract 1s, 10s and 100s (3 + 4, 30 + 40, 300 + 400) and seeing what changes and what stays the same',
-        representation: 'a three-row fact ladder with the first row done; complete the others',
-        family: 'operations',
-        steps: ['Y3.B2.S2', 'Y3.B2.S5', 'Y3.B2.S10', 'Y4.B2.S1'],
     },
     cross_100: {
         kind: 'option', skill: 'addition:add_sub_100s', option: 'tens across 100',
