@@ -49,14 +49,17 @@ export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', 
     // teacher's count) spends the page's spare height as WHITESPACE BETWEEN rows - each row its
     // own framed strip - never as empty space inside the cells. Only with a fixed height.
     const Hmm = parseFloat(height);
-    if (rowGap > 0 && r > 1 && Number.isFinite(Hmm) && !spanFirst) {
+    if (rowGap > 0 && r > 1 && Number.isFinite(Hmm)) {
         const fr = /repeat\(/.test(rowsTpl || 'repeat(') ? Array(r).fill(1) : String(rowsTpl).split(/\s+/).map((t) => parseFloat(t) || 1);
         const sum = fr.reduce((a, b) => a + b, 0);
         const inner = Hmm - rowGap * (r - 1);
         const rowsHtml = [];
         for (let i = 0; i < r; i++) {
             const h = Math.round((inner * fr[i] / sum) * 100) / 100;
-            const part = out.slice(i * cols, (i + 1) * cols).join('') + (i === r - 1 ? out.slice(r * cols).join('') : '');
+            // With `spanFirst` row 1 is the spanning cell alone (the Guided model); the rest follow.
+            const from = spanFirst ? (i === 0 ? 0 : 1 + (i - 1) * cols) : i * cols;
+            const to = spanFirst ? (i === 0 ? 1 : 1 + i * cols) : (i + 1) * cols;
+            const part = out.slice(from, to).join('') + (i === r - 1 ? out.slice(to).join('') : '');
             rowsHtml.push(`<div class="ws-grid ${cls} ws-gridrow" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:1fr;height:${h}mm;${i ? `margin-top:${rowGap}mm;` : ''}">${part}</div>`);
         }
         return `<div class="ws-gridrows" data-ws-rowgap="${rowGap}" style="flex:none;">${rowsHtml.join('')}</div>`;

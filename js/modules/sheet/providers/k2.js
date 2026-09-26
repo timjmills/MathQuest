@@ -544,6 +544,12 @@ function chartSteps(q) {
     if (shows(t - 10)) out.push(step(`The number above is ${t - 10}. Ten more is ${t}.`));
     if (out.length < 2 && shows(t + 10)) out.push(step(`The number below is ${t + 10}. Ten less is ${t}.`));
     if (out.length < 2 && t % 10 !== 0 && shows(t + 1)) out.push(step(`The number after is ${t + 1}. One less is ${t}.`));
+    // Guided fade (critic guided-r1): the first relation is two steps, the number to read and
+    // then the result, so a first try's grey hint ("The number before is 66.") never holds it.
+    if (out.length) {
+        const m = out[0].text.match(/^(The number \w+ is \d+\.) (.*)$/);
+        if (m) out.splice(0, 1, step(m[1]), step(m[2]));
+    }
     out.push(step(`Write ${t}.`, [{ slot: 'answer', value: String(t) }]));
     return out;
 }
@@ -556,7 +562,10 @@ registerSkill('composing:hundreds_chart_fill', {
         steps: [
             'Look left: the number before. Add 1.',
             'Look up: the number above. Add 10.',
-            'Both ways give the same number. Write it.',
+            // Round-4 re-grade: a gap in the window's top row has no number above; its worked
+            // steps read the number below, so the Steps band names that way too.
+            'Top row? Look down: the number below. Take away 10.',
+            'Write the missing number.',
         ],
         say: 'The missing number is __.',
     }),
@@ -583,7 +592,10 @@ registerSkill('composing:number_chart_fill', {
         steps: [
             'Look left: the number before. Add 1.',
             'Look up: the number above. Add 10.',
-            'Both ways give the same number. Write it.',
+            // Round-4 re-grade: a gap in the window's top row has no number above; its worked
+            // steps read the number below, so the Steps band names that way too.
+            'Top row? Look down: the number below. Take away 10.',
+            'Write the missing number.',
         ],
         say: 'The missing number is __.',
     }),
