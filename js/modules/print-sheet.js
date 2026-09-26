@@ -948,10 +948,40 @@ function measureItems(items, { size, look, colsList }) {
                             if (pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) { fits = false; why(it, c, 'shrunk picture'); }
                         }
                     }
-                    best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits };
+                    // A role that places part of the cell in one of several ways (error analysis,
+                    // AX-4: the Correct / Fix-it block in ONE place on every cell of a page) names
+                    // them in `judgeModes`; each is drawn and measured here, and the role picks the
+                    // one the whole page can use. null: that way does not fit (or does not apply).
+                    const vary = {};
+                    if (fits && Array.isArray(it.judgeModes)) {
+                        const grow = (Math.max(hPx, r.height) - r.height) / PX_PER_MM;
+                        for (const mode of it.judgeModes) {
+                            let mb = '';
+                            try { mb = it.render(ctx, { cols: c, judge: mode }); } catch (e) { mb = ''; }
+                            if (!mb || !String(mb).includes(`data-judge-mode="${mode}"`)) { vary[mode] = null; continue; }
+                            root.innerHTML = `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
+                                + `<span class="ws-letter">m.</span>${mb}</div>`;
+                            const mc = root.firstChild;
+                            const cr = mc.getBoundingClientRect();
+                            let over = false;
+                            for (const el of mc.querySelectorAll('*')) {
+                                const er = el.getBoundingClientRect();
+                                if ((!er.width && !er.height) || getComputedStyle(el).position === 'absolute') continue;
+                                if (er.right > cr.right - padR + 1 || er.left < cr.left + padL - 1) { over = true; break; }
+                            }
+                            vary[mode] = over ? null : cr.height / PX_PER_MM + grow;
+                        }
+                    }
+                    const modes = Object.assign({}, best.modes || {});
+                    for (const mode of Object.keys(vary)) modes[mode] = vary[mode] === null || modes[mode] === null ? null : Math.max(modes[mode] || 0, vary[mode]);
+                    best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits, modes };
                 }
                 it.measured = it.measured || {};
                 it.measured[c] = { hMm: Math.ceil(best.hMm * 10) / 10, fits: best.fits };
+                if (best.modes && Object.keys(best.modes).length) {
+                    it.measured[c].modes = {};
+                    for (const [mode, h] of Object.entries(best.modes)) it.measured[c].modes[mode] = h === null ? null : Math.ceil(h * 10) / 10;
+                }
             }
         }
         // A MINIMUM COLUMN WIDTH for legacy markup that reflows instead of overflowing (an area

@@ -543,6 +543,17 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
     const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
     const html = p && p.render(ctx, { cols: 1 });
     ok(html && (html.match(/data-ws-slot="ea-ans-\d"/g) || []).length === 3, 'Error analysis: a three-value answer gets one fix box per value');
+    // Critic regrade 5 (AX-4): the Correct / Fix-it block in ONE place on every cell of a page.
+    const { intoAnswerColumn } = ROLE_MODULES['error-analysis'];
+    eq(intoAnswerColumn('<div><svg></svg><div class="fg-ask"><div>Q</div><div>A</div></div></div>', '<i>J</i>'),
+        '<div><svg></svg><div class="fg-ask"><div>Q</div><div>A</div><i>J</i></div></div>', 'Error analysis: the judgement goes at the END of the item\'s own answer column');
+    eq(intoAnswerColumn('<div><span>7</span></div>', '<i>J</i>'), null, 'Error analysis: no answer column, no insertion');
+    const modes = new Set();
+    for (const mode of ['beside', 'below']) {
+        const hm = p && p.render(ctx, { cols: 1, judge: mode });
+        if (hm && new RegExp(`mq-j${mode}[^"]*"[^>]*data-judge-mode="${mode}"`).test(hm)) modes.add(mode);
+    }
+    ok(modes.size === 2 && Array.isArray(p.judgeModes) && p.judgeModes.includes('incol'), 'Error analysis: the page\'s judge mode reaches every cell, and the host is told which modes to measure');
 }
 // Guided Steps band: the provider's own steps, read row by row (1 2 / 3 4), never 1 3 / 2.
 {

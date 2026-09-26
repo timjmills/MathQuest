@@ -41,7 +41,7 @@ import {
 import { gridHeightMm, SAFETY_H_MM, rowGapFor } from '../layout.js';
 import { coinSVG } from '../cells/tmkit.js';
 import { gridSlots } from '../cells/mult-grid.js';
-import { getProvider, resolveCtx } from '../index.js';
+import { getProvider, resolveCtx, getCell, hasCell } from '../index.js';
 
 export const ROLE_ID = 'error-analysis';
 // WORKSHEET_DESIGN_STANDARD 12.1: Error analysis 6 / 4 / 2-4 (the 04-E mock-up's 2 x 3 at L
@@ -184,6 +184,27 @@ export function insertOf(a, b) {
     return B.slice(p, B.length - s);
 }
 
+/**
+ * `html` with `extra` appended inside the item's own ANSWER COLUMN - the block beside a picture
+ * that holds the question and its answer place (`fg-ask` on the data cells, or any element a
+ * template marks `data-ws-anscol`). null when the item has none. The Correct / Fix-it block then
+ * sits under the pupil's answer in every cell, whatever the width of the picture (AX-4, critic
+ * regrade 5: "a places the check block under the chart, b to its right").
+ */
+export function intoAnswerColumn(html, extra) {
+    const H = String(html);
+    const m = /<div\b[^>]*(?:class="[^"]*\bfg-ask\b[^"]*"|data-ws-anscol)[^>]*>/.exec(H);
+    if (!m) return null;
+    const tag = /<(\/?)div\b[^>]*>/g;
+    tag.lastIndex = m.index + m[0].length;
+    let depth = 1;
+    for (let t = tag.exec(H); t; t = tag.exec(H)) {
+        depth += t[1] ? -1 : 1;
+        if (!depth) return H.slice(0, t.index) + extra + H.slice(t.index);
+    }
+    return null;
+}
+
 /** Templates whose several answers sit in a strip or chart: the fix is the strip again, clean. */
 const REDO = new Set(['seqstrip', 'count-row', 'cloze-bank']);
 
@@ -239,6 +260,15 @@ function storyWork(it, shown, wrong, isWrong) {
     return o.length >= 2 && g ? `${o[0]} ${g} ${o[1]} = ${shown}` : '';
 }
 
+/** Is the item's own answer a check box (the pupil CHOSE it, rather than wrote it)? */
+function answersByCheck(it) {
+    const payload = (it.q && it.q.cell && it.q.cell.payload) || {};
+    if (it.key && it.key.slots && it.key.slots.choice) return true;
+    try {
+        return hasCell(it.template) && (getCell(it.template).inputs(payload) || []).some((x) => x && (x.shape === 'check' || x.kind === 'check'));
+    } catch (e) { return false; }
+}
+
 /** The choices of a one-value answer that is one of a few words (Enough / Not enough, a.m. / p.m.). */
 function choicesOf(it, correct, shown) {
     const q = it.q || {};
@@ -258,6 +288,13 @@ function choicesOf(it, correct, shown) {
     if (ks.choice) {
         const labs = opts.length >= 2 && i >= 0 ? opts : /^[A-D]$/.test(correct) ? ['A', 'B', 'C', 'D'].slice(0, Math.max(2, 'ABCD'.indexOf(correct) + 1, 'ABCD'.indexOf(String(shown)) + 1)) : null;
         if (labs && labs.includes(correct)) return { labels: labs, correct: labs.indexOf(correct) };
+    }
+    // The item's answer is a CHECK among its own categories ("Which has the most? Check one
+    // box." on a graph): the fix is checking the right one, the item's shape - never the word
+    // written on a line (critic regrade 5: a box on one item, a line on the next).
+    const cats = Array.isArray(payload.categories) ? payload.categories.map(String) : [];
+    if (answersByCheck(it) && cats.length >= 2 && cats.includes(correct)) {
+        return { labels: cats, correct: cats.indexOf(correct) };
     }
     // A multiple-choice item whose options are too long to write out again (a word name): the
     // fix is the letter the item prints beside the option (A-D). A short option (a fraction, a
@@ -428,7 +465,8 @@ export function prepare(it, info = {}) {
     // The fix's width on paper (mm), so a wide fix goes under the work, never over the edge.
     const fixWidth = (size) => {
         if (kind === 'value') return Math.max(26, Math.max(correct.length, String(shown).length) * digitMm(size) + 8);
-        if (kind === 'text') return Math.min(80, Math.max(40, Math.max(correct.length, String(shown).length) * 2.9 + 10));
+        // a word is HANDWRITTEN: ~6 mm a letter at L (critic regrade 5: "trapezoid" on a 40 mm line)
+        if (kind === 'text') return Math.min(90, Math.max(40, Math.max(correct.length, String(shown).length) * ({ S: 5, M: 5.5, L: 6 }[size] || 6) + 8));
         if (kind === 'parts') {
             return P.parts.reduce((s, x, i) => s + Math.max(16, Math.max(x.value.length, String((sParts || [])[i] || '').length) * digitMm(size) + 6) + 4, 0)
                 + (labels ? 0 : glue.join('').length * 3.2);
@@ -475,7 +513,8 @@ export function prepare(it, info = {}) {
         body = ungraded(body);
         drawZone = ungraded(drawZone);
         const askedFix = !!drawZone || ((kind === 'draw' || kind === 'line') && /data-ws-slot="(?:fix|x\d)/.test(body));
-        const verb = kind === 'draw' || drewWork ? 'drew' : redraw === 'mark' ? 'marked' : 'wrote';
+        // "Sam chose:" over a ticked box - he wrote nothing (critic regrade 5)
+        const verb = kind === 'draw' || drewWork ? 'drew' : redraw === 'mark' ? 'marked' : kind === 'choice' && answersByCheck(it) ? 'chose' : 'wrote';
         // A line-mark item names its number only in the page's own instruction: the finished
         // work says which number was to be marked, or it cannot be checked (critic round 3).
         // An estimate is judged against ITS rounding rule, so the rule is printed with the work
@@ -544,12 +583,23 @@ export function prepare(it, info = {}) {
             fix = `<span class="mq-redraw mq-fixslot" data-ws-slot="ea-draw" data-ws-shape="open" data-ws-graded="0"><small>Fix it: ${kind === 'draw' || redraw === 'draw' ? 'draw' : redraw === 'mark' ? 'mark' : 'write'} it again.</small>${zone}</span>`;
         }
         const below = kind === 'redo';
-        // The flow: the work, then the judgement beside it when it fits (else under it), then a
-        // redraw zone across the whole cell. The decision boxes always come before the fix.
-        return `<div class="mq-judge mq-judge3${drawnJudge ? ' mq-judge-drawn' : ''}" style="--mq-jw:${Math.round(judgeMin(c.size))}mm">`
+        const judge = judgeGroup('ea-judge', `${checkLine('ea-ok', JUDGE_LABELS.correct, c, key, { graded: false })}`
+            + `<span class="mq-fixrow">${checkLine('ea-fix', JUDGE_LABELS.fixIt, c, key, { graded: false })}${below ? '' : fix}</span>`);
+        // An item with its own answer column (a graph and its question): the judgement goes under
+        // the pupil's answer, inside that column, on every cell (AX-4) - and costs no width.
+        const modal = !below && !drawnJudge && kind !== 'draw';
+        if (modal && (o.judge === 'incol' || !o.judge)) {
+            const inCol = intoAnswerColumn(shownWork, `<div class="mq-judgecol">${judge}</div>`);
+            if (inCol) return `<div class="mq-judge mq-judge3 mq-judge-incol" data-judge-mode="incol">${inCol}</div>`;
+        }
+        // The flow: the work, then the judgement, then a redraw zone across the whole cell. The
+        // decision boxes always come before the fix. The page decides ONE place for every cell
+        // (`o.judge`: 'beside' at the cell's right, 'below' in one row under the work - AX-4);
+        // unset (measuring), it flows beside when it fits, else under.
+        const mode = modal && (o.judge === 'beside' || o.judge === 'below') ? o.judge : '';
+        return `<div class="mq-judge mq-judge3${mode ? ` mq-j${mode}` : ''}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm">`
             + shownWork
-            + judgeGroup('ea-judge', `${checkLine('ea-ok', JUDGE_LABELS.correct, c, key, { graded: false })}`
-                + `<span class="mq-fixrow">${checkLine('ea-fix', JUDGE_LABELS.fixIt, c, key, { graded: false })}${below ? '' : fix}</span>`)
+            + judge
             + (below ? fix : '')
             + `</div>`;
     };
@@ -563,6 +613,8 @@ export function prepare(it, info = {}) {
         // two columns is that layout, not markup collapsing, so the host measures each count as
         // it is and the page takes whichever holds more (critic round 3: half-empty pages).
         colsLayout: true,
+        // the places the Correct / Fix-it block can take; the host measures each (AX-4)
+        judgeModes: kind === 'draw' || kind === 'redo' ? undefined : ['incol', 'beside', 'below'],
         // The judgement column sits beside the work; a word problem or a wide picture keeps its
         // own single column (PT-WPR-1).
         footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: Math.min(2, (it.footprint && it.footprint.maxCols) || 2) }),
@@ -621,14 +673,23 @@ function staticLayout(items, input) {
 
 // + 4 mm: the grid's rules and the band edge come out of the row, and a measured cell is rounded
 // to 0.1 mm (a mult chart at 112 mm in a 113 mm row overflowed by 3.5 mm).
-const heightAt = (it, cols) => { const m = it.measured && it.measured[cols]; return m && Number.isFinite(m.hMm) && m.fits !== false ? m.hMm + 4 : Infinity; };
+// `mode` ('incol' | 'beside' | 'below'): the height with the Correct / Fix-it block in that one
+// place (the host measures each `judgeModes`; null = it does not fit there); an item measured
+// without modes (a drawn model) is the same height either way.
+const JUDGE_MODES = ['incol', 'beside', 'below'];
+const heightAt = (it, cols, mode) => {
+    const m = it.measured && it.measured[cols];
+    if (!m || !Number.isFinite(m.hMm) || m.fits === false) return Infinity;
+    const h = mode && m.modes ? m.modes[mode] : m.hMm;
+    return Number.isFinite(h) ? h + 4 : Infinity;
+};
 
 /**
  * Choose n items (in order) that fit `rows` rows of `cols` columns, about half of them wrong
  * (PT-ERR-1): an item is taken while its measured height fits G / rows and its kind (wrong or
  * right) still has room. null when fewer than n fit.
  */
-function pick(items, cols, rows, G) {
+function pick(items, cols, rows, G, mode) {
     const n = cols * rows;
     const h = (G - SAFETY_H_MM) / rows;
     const wantWrong = Math.max(1, Math.round(n / 2));
@@ -636,7 +697,7 @@ function pick(items, cols, rows, G) {
     let w = 0;
     for (const it of items) {
         if (out.length >= n) break;
-        if (heightAt(it, cols) > h) continue;
+        if (heightAt(it, cols, mode) > h) continue;
         const bad = !!(it.thinking && it.thinking.isWrong);
         if (bad ? w >= wantWrong : out.length - w >= n - wantWrong) continue;
         out.push(it);
@@ -659,18 +720,23 @@ function measuredLayout(items, input) {
     let best = null;
     for (const cols of word ? [1] : [1, 2]) {
         for (let rows = Math.floor(ceil / cols); rows >= 1; rows--) {
-            const got = pick(items, cols, rows, G);
+            // AX-4: the judgement in ONE place on the page - beside the work when every item
+            // has room for it there, else under the work on every cell.
+            // (in the item's own answer column first, as it costs no width)
+            let mode = null;
+            let got = null;
+            for (const m of JUDGE_MODES) { got = pick(items, cols, rows, G, m); if (got) { mode = m; break; } }
             // RUBRIC H13: the same number of items in fewer, fuller rows loses to more rows the
             // items fill (a 2 x 1 thermometer page left 47% of each cell empty; 1 x 2 fills it).
-            const fill = got ? Math.max(...got.map((it) => heightAt(it, cols))) * rows / G : 0;
-            if (got && (!best || got.length > best.items.length || (got.length === best.items.length && fill > best.fill + 0.1))) best = { cols, rows, items: got, fill };
+            const fill = got ? Math.max(...got.map((it) => heightAt(it, cols, mode))) * rows / G : 0;
+            if (got && (!best || got.length > best.items.length || (got.length === best.items.length && fill > best.fill + 0.1))) best = { cols, rows, items: got, fill, mode };
             if (got) break;
         }
     }
     if (!best) return null;
     const perPage = best.cols * best.rows;
     return {
-        role: ROLE_ID, cols: best.cols, rows: best.rows, perPage, pages: 1, count: perPage, cellH: G / best.rows, gridH: G,
+        role: ROLE_ID, cols: best.cols, rows: best.rows, mode: best.mode, perPage, pages: 1, count: perPage, cellH: G / best.rows, gridH: G,
         items: best.items, clamped: false, note: '', notes: [], digitPt: ctx.s.digitPt, size: ctx.size, look: ctx.look, cls: 'standard',
     };
 }
@@ -699,18 +765,24 @@ export function plan(input = {}) {
     const L = M || staticLayout(all, input);
     // Unmeasured (or nothing fits the measured grid): the first items, still about half of them
     // wrong (PT-ERR-1) - a one-item page is never a page with no mistake on it.
-    const items = M ? M.items : balanced(all, L.perPage);
+    // Items whose fix is checked sit together after the written ones, so one row keeps one slot
+    // shape (critic regrade 5: a box on one item, a line on the next). Stable: deal order kept.
+    const isPick = (it) => (it.thinking && it.thinking.kind === 'choice' ? 1 : 0);
+    const items = (M ? M.items : balanced(all, L.perPage)).slice().sort((a, b) => isPick(a) - isPick(b));
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Check it', score: items.length });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
-    const grid = gridPart(items.map((it) => planItem(it, { cols: L.cols })), { cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
+    const judged = (it) => (L.mode && typeof it.render === 'function' ? (c, o) => it.render(c, Object.assign({}, o, { judge: L.mode })) : undefined);
+    const grid = gridPart(items.map((it) => planItem(it, { cols: L.cols, render: judged(it) })), { cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
     if (rows === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
     // RUBRIC H13 (critic round 4): a row is as tall as what it holds (+10%), never the page's
     // share of the grid - cells stretched to G / rows left 30-45% empty under the fix. The
     // spare page height goes BETWEEN the rows (the density lane's rowGapFor, as on a Test).
-    if (M && rows > 1) {
+    // A lone row too: a cell as tall as its content, the page's spare height left under the grid
+    // (critic k2-r1 / regrade 5: 38-48% bands under every one-row page's cells).
+    if (M) {
         const rowH = [];
         for (let r = 0; r < rows; r++) {
-            const hs = items.slice(r * L.cols, (r + 1) * L.cols).map((it) => heightAt(it, L.cols)).filter(Number.isFinite);
+            const hs = items.slice(r * L.cols, (r + 1) * L.cols).map((it) => heightAt(it, L.cols, L.mode)).filter(Number.isFinite);
             rowH.push(hs.length ? Math.round(Math.min(L.gridH / rows, Math.max(...hs) * 1.1) * 100) / 100 : L.gridH / rows);
         }
         const sum = rowH.reduce((a, b) => a + b, 0);
@@ -729,7 +801,9 @@ export function plan(input = {}) {
     const marked = items.length && items.every((it) => it.thinking && it.thinking.redraw === 'mark');
     // the fix is checking the right option on every item: the instruction says so (critic round 4)
     const checked = items.length && items.every((it) => it.thinking && it.thinking.kind === 'choice');
-    return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(drawn ? 'check-fix-draw' : marked ? 'check-fix-mark' : checked ? 'check-fix-check' : 'check-fix-write'), grid] }], {
+    // some fixes are written and some checked (a graph page: "How many?" and "Which has the most?")
+    const someChecked = items.some((it) => it.thinking && it.thinking.kind === 'choice');
+    return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(drawn ? 'check-fix-draw' : marked ? 'check-fix-mark' : checked ? 'check-fix-check' : someChecked ? 'check-fix-mixed' : 'check-fix-write'), grid] }], {
         meta: { items: items.length, scoreOutOf: items.length, wrongShare, fits: [Object.assign(fit, { line: fitsLine(fit) })], notes: L.note ? [L.note] : [] },
     });
 }
@@ -737,5 +811,5 @@ export function plan(input = {}) {
 /** Which items show a wrong answer: a seeded 40-60% pattern over the run (PT-ERR-1). */
 export const wrongFlags = (n, seed) => wrongPattern(n, seed, ROLE_ID);
 
-export default { ROLE_ID, sources, measureCols, prepare, supports, counts, plan, wrongFlags, realWrongOf, pupilInk };
+export default { ROLE_ID, sources, measureCols, prepare, supports, counts, plan, wrongFlags, realWrongOf, pupilInk, intoAnswerColumn };
 export { esc };

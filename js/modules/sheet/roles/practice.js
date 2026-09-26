@@ -258,6 +258,14 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-judge3>.mq-redraw{flex:1 1 100%}
 /* the finished work and its judgement sit in the middle of the cell like every kit cell (H13: no band pinned under it) */
 :is(.ws-page,.ws-sheet) .ws-cell.mq-eacell>.mq-judge.mq-judge3{flex:0 0 auto}
+/* AX-4: one place for the Correct / Fix-it block on every cell of a page - under the work (one row), at the cell's right beside it, or in the item's own answer column */
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbelow>.mq-judge-row{flex:1 1 100%;min-width:100%}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside{flex-wrap:nowrap;justify-content:space-between}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside>.mq-judge-work{flex:1 0 auto;min-width:auto}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside>.mq-judge-row{flex:0 0 var(--mq-jw,44mm);min-width:0}
+:is(.ws-page,.ws-sheet) .mq-judgecol{margin-top:3mm;text-align:left}
+:is(.ws-page,.ws-sheet) .mq-judgecol>.mq-judge-row{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:6mm;row-gap:2mm;padding:0}
+:is(.ws-page,.ws-sheet) .mq-judgecol .mq-fixrow{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:4mm;row-gap:2mm}
 :is(.ws-page,.ws-sheet) .mq-judge-drawn .mq-fixrow{display:contents}
 :is(.ws-page,.ws-sheet) .mq-judge-drawn .mq-fixzone{flex:0 0 100%}
 /* the key's correction is black Andika 700, even inside the pupil's grey work (a fix box per fact) */

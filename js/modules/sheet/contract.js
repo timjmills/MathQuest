@@ -104,6 +104,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'check-fix-draw': 'Is it right? Check one box. Fix it: draw it again.',
     'check-fix-mark': 'Is it right? Check one box. Fix it: mark it again.',
     'check-fix-check': 'Is it right? If not, check Fix it and the right one.',
+    'check-fix-mixed': 'Is it right? Check one box. Fix it: write or check.',
     'check-by': 'Multiply to check. Check one box: Correct or Fix it.',
     'true-false': 'Check one box: True or False. Finish the sentence.',
     spot: 'Find the mistake. Circle it. Write the correct answer.',
