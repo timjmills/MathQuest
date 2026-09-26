@@ -110,6 +110,14 @@ Reasoning steps ("spot the pattern", "compare", "estimate") stay in their host a
   `buildLesson(lessonId)` and `lessonId` through `teacher-print`, **samples byte-identical**. Split archetype code out of
   `lesson.js` into `lesson-arch/{fact,column,line}.js` (byte-identical). `ws-lesson-seed` → `seed-db.js`;
   `ws-lesson-coverage` (report-only, r4 samples read as passed); build-list integration; `tests/lib/browser-lock.cjs`.
+- **Phase 1, first in line — the samples' prerequisite lessons (§8b):** the three samples' Prerequisite
+  Checks route to 11 lessons not written yet (their `NEEDS` entries; `design/LESSON_COVERAGE.md`,
+  "Waiting for prerequisite lessons"): Y1.B1.S2 Count objects, Y1.B1.S6 Count on from any number,
+  Y1.B1.S11 Fewer, more, same, Y1.B2.S5 Number bonds within 10 (for add within 10); Y2.B1.S4 Use a
+  place value chart, Y2.B1.S5 Partition numbers to 100, Y2.B2.S10 Subtract across 10, Y2.B2.S17
+  Subtract two 2-digit numbers (not across a 10) (for subtract with regrouping); Y1.B9.S2 Count in
+  10s, Y2.B1.S10 10s and 1s on the number line to 100, Y3.B1.S3 Number line to 100 (for round to
+  the nearest 10). They open the pilot list of their archetypes.
 - **Phase 1 — archetype certification.** Per archetype: 3 pilot lessons spanning its variation; E builds the module,
   `stepState`, icons, vocabulary pictures; the critic grades every page at L and M, seeds 4242 and 1001, keys included,
   until all ≥ 8. Waves: 1a A1, A2, A3, A4, A6 · 1b A5, A7, A10, A8 · 1c A9, A12, A11, A13.

@@ -56,7 +56,8 @@ function layoutCheck(page, size, isKey) {
             const sheet = pg.getAttribute('data-ws-sheet') || '';
             const body = pg.querySelector('.ws-body');
             if (body && body.scrollHeight > body.clientHeight + 1) out.push(['LR-13', `page ${i + 1} (${sheet}): the body overflows`]);
-            if (body && !isKey) {
+            // (A Prerequisite Check is a fixed count of 3-4 questions, LR-17: its foot may stay blank.)
+            if (body && !isKey && sheet !== 'lesson-prereq') {
                 const br = body.getBoundingClientRect();
                 const kids = [...body.children].filter((x) => x.getBoundingClientRect().height > 0);
                 const last = kids.length ? Math.max(...kids.map((x) => x.getBoundingClientRect().bottom)) : br.top;
@@ -250,7 +251,7 @@ async function renderDoc(app, html) {
             return { partHtml: b.lesson.partHtml, pupil: b.pupilHtml, violations: b.lesson.check.violations, refreshed: b.lesson.refreshed };
         }, { req, extra });
         const base = await run({});
-        const PARTS = ['chart', 'sheet', 'practice', 'mixed'];
+        const PARTS = ['prereq', 'chart', 'sheet', 'practice', 'mixed'];
         for (const part of PARTS) {
             const r = await run({ refresh: part });
             if (String(r.refreshed) !== part) fail(where, 'LR-18', `refreshing ${part} was not read as a refresh (${r.refreshed})`);

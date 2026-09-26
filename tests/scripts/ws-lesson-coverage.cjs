@@ -72,10 +72,41 @@ function seedOfRow(r) {
 
     // ---- structure
     const problems = lib.validateLibrary({ stepIcons: prereqs.STEP_ICONS, caseNames, skillExists });
+    const needs0 = lib.allNeeds();
+    const posOf = new Map(seedDb.SEEDS.map((x, i) => [x.id, i]));
+    const waiting = {};
     for (const [id, l] of Object.entries(lib.LESSONS)) {
         if (/^(R|Y\d)\./.test(id) && !seedDb.seedOf(id)) problems.push(`lesson ${id}: not a WRM small step`);
         for (const s of l.steps || []) if (!seedDb.seedOf(s)) problems.push(`lesson ${id}: step ${s} is not a WRM small step`);
+        // LR-17: every prerequisite a lesson of the library, or recorded as a NEEDS entry; WRM ids
+        // real small steps; most basic first (curriculum order).
+        const pre = l.prereqs || [];
+        for (const p of pre) {
+            if (/^(R|Y\d)\./.test(p.lesson) && !seedDb.seedOf(p.lesson)) problems.push(`lesson ${id}: LR-17 prerequisite ${p.lesson} is not a WRM small step`);
+            if (!lib.LESSONS[p.lesson]) {
+                if (!needs0.some((nd) => nd.kind === 'lesson' && nd.lesson === id && nd.prereq === p.lesson)) problems.push(`lesson ${id}: LR-17 prerequisite ${p.lesson} is neither a lesson nor a NEEDS entry`);
+                (waiting[id] = waiting[id] || []).push(p.lesson);
+            }
+        }
+        const ps = pre.map((p) => posOf.get(p.lesson)).filter((x) => x !== undefined);
+        if (ps.some((x, i) => i && x < ps[i - 1])) problems.push(`lesson ${id}: LR-17 the Prerequisite Check is not most basic first`);
+        // LR-18: every lesson has every part.
+        const r = lib.routineOf(l) || {};
+        const missing = [['prereq', pre.length >= 3], ['chart', (r.steps || []).length && r.example], ['sheet', (r.steps || []).length], ['practice', l.practice && l.practice.skill], ['mixed', (l.mixWith || []).length]].filter(([, ok]) => !ok).map(([k]) => k);
+        if (missing.length) problems.push(`lesson ${id}: LR-18 missing part(s): ${missing.join(', ')}`);
     }
+    // LR-17: the prerequisite graph has no cycle (a lesson never requires itself through a chain).
+    const edges = Object.fromEntries(Object.entries(lib.LESSONS).map(([id, l]) => [id, (l.prereqs || []).map((p) => p.lesson).filter((x) => lib.LESSONS[x])]));
+    const state = {};
+    const visit = (id, path) => {
+        if (state[id] === 2) return;
+        if (state[id] === 1) { problems.push(`LR-17: a prerequisite cycle: ${path.concat(id).join(' -> ')}`); return; }
+        state[id] = 1;
+        for (const nx of edges[id] || []) visit(nx, path.concat(id));
+        state[id] = 2;
+    };
+    for (const id of Object.keys(edges)) visit(id, []);
+    for (const nd of needs0) if (nd.kind === 'lesson' && lib.LESSONS[nd.prereq]) problems.push(`need of ${nd.lesson}: prerequisite lesson ${nd.prereq} is built (drop the NEEDS entry)`);
 
     // ---- status from the critic grades
     const rounds = gradeRounds();
@@ -183,6 +214,7 @@ function seedOfRow(r) {
     const byCurriculum = (a, b) => (pos.has(a.id) ? pos.get(a.id) : 1e6) - (pos.has(b.id) ? pos.get(b.id) : 1e6) || a.id.localeCompare(b.id);
     const out = {
         lessons: Object.values(rec).sort(byCurriculum), byYear, ledger, ccss: ccssRows, ee: eeRows, toMake: toMake.length, needs, archetypes, problems,
+        waiting,
         milestones: known.concat(fresh.map((m) => Object.assign({ date: new Date().toISOString().slice(0, 10) }, m))),
     };
     if (has('json')) { console.log(JSON.stringify(out, null, 1)); return; }
@@ -240,6 +272,18 @@ function seedOfRow(r) {
         p('|---|---|---|---|---|');
         for (const r of eeRows.filter((x) => x.lessons)) p(`| ${r.code} | ${r.skills} | ${r.lessons} | ${r.passed} | ${r.lessonVerdict} |`);
         p(`\n${eeRows.filter((r) => r.lessonVerdict === 'FULL').length} of ${eeRows.length} Essential Elements are FULL by lessons.`);
+        p();
+        p('## Waiting for prerequisite lessons (LR-17)');
+        p();
+        p('Every lesson opens with a Prerequisite Check whose questions route to earlier lessons. These lessons point at');
+        p('prerequisite lessons not written yet (recorded as NEEDS; the Phase 1 pilot list puts them first):');
+        p();
+        if (!Object.keys(waiting).length) p('None.');
+        else {
+            p('| Lesson | Prerequisite lessons still to make |');
+            p('|---|---|');
+            for (const [id, list] of Object.entries(waiting)) p(`| ${id} | ${list.map((x) => `${x} ${(seedDb.seedOf(x) || {}).title || ''}`.trim()).join('; ')} |`);
+        }
         p();
         p('## Needs (skills, options and lessons that lessons wait for)');
         p();

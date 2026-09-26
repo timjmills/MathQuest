@@ -1,13 +1,17 @@
 // js/modules/sheet/lesson-pages/prereq-check.js
-// LESSON PAGE BUILDER "prereq-check" (design/LESSON_LIBRARY_PLAN.md §8c): the lesson sheet's opening check of the
-// prerequisite skills (today the Warm-up: one or two quick items of each prerequisite skill side
-// by side; the Prerequisite Check of §8b replaces it).
+// LESSON PAGE BUILDER "prereq-check" (design/LESSON_LIBRARY_PLAN.md §8b, §8c): the PREREQUISITE CHECK
+// that opens every lesson packet (prereqPlan: 3-4 questions, each routed to its prerequisite lesson,
+// and the key's routing table), and the older Warm-up band of a lesson sheet with no check
+// (warmUpBand: one or two quick items of each prerequisite skill side by side).
 // Shared by the lesson packet and, through the role lane's adapters, by any skill's Practice / Quiz
 // paper; the skill supplies the data (design/SKILL_CELL_CONTRACT.md §3.9). Moved from roles/lesson.js
 // (phase 0: the sample lessons render byte-identical). Pure module (SCC-01).
 
-import { ctxOf, planItem, gridPart, instructionPart, instructionKeyOf, poolItems } from '../roles/compose.js';
-import { band, hAt, warmPools } from './common.js';
+import {
+    ctxOf, planItem, gridPart, instructionPart, instructionKeyOf, instructionText, poolItems, frameOf, layoutHeader,
+    bandMetrics, assemble, labelStyleOf, esc,
+} from '../roles/compose.js';
+import { band, hAt, warmPools, plainItem } from './common.js';
 
 /** How many cells each prerequisite gets in its share of the width. */
 export function warmShape(pools, input) {
@@ -105,4 +109,117 @@ export function warmUpBand({ input, m, labels, warmPlaced, groups, letter = 1 })
     return { letter, warmCount };
 }
 
-export default { warmShape, warmUpBand };
+/* ================================================================ the Prerequisite Check */
+
+/**
+ * THE PREREQUISITE CHECK (owner ruling 2026-09-26, plan §8b, LESSON_RULES.md LR-17): the first part
+ * of every lesson packet. 3-4 questions, one per prerequisite, most basic first; each is one item of
+ * that prerequisite's skill (with its options) in a boxed cell of its own, under its one-line library
+ * instruction, and carries a small teacher tag "If missed → Lesson <id> <title>". Two questions a
+ * row (a half of the page each, like the Warm-up it replaces), or three thirds when three fit; the
+ * page's spare height goes into the cells, their problems centred (H13).
+ *
+ * `input.lesson.prereqs`: [{lesson, title, why}] in order; the host deals pool `p<i>` from the
+ * prerequisite's skill ref (roles/lesson.js sources). Returns the pupil page's plan; its
+ * `meta.routePlan` is the key's ROUTING TABLE page (the host renders it after the key).
+ */
+export function prereqPlan(input, { ROLE_ID }) {
+    const ctx = ctxOf(input);
+    const lesson = input.lesson || {};
+    const list = lesson.prereqs || [];
+    const target = input.targetSkill ? [input.targetSkill] : (input.skills || []).slice(0, 1);
+    const labels = labelStyleOf(ctx.look, input.labels);
+    const qs = list.map((p, i) => ({ p, it: poolItems(input, `p${i}`)[0] || null })).filter((x) => x.it);
+    const n = qs.length;
+    const frame = frameOf({ skills: target, input, tabId: 'Check', score: n, footerLeft: lesson.tagLine });
+    const m = bandMetrics(ctx, layoutHeader(frame.header));
+    const fitsAt = (its, c) => its.every((it) => {
+        const mm = it.measured && it.measured[c];
+        return (mm ? mm.fits !== false : true) && !(c > 1 && (it.fclass === 'word' || it.fclass === 'wide'));
+    });
+    // Rows: 2 + 2 for four; three thirds when all three fit a third, else 2 + 1.
+    const all = qs.map((q) => q.it);
+    let rowSizes;
+    if (n === 3 && fitsAt(all, 3)) rowSizes = [3];
+    else if (n <= 2) rowSizes = [n];
+    else rowSizes = n === 3 ? [2, 1] : [2, 2];
+    const rows = [];
+    let k = 0;
+    for (const r of rowSizes) {
+        const its = qs.slice(k, k + r);
+        // A pair that does not fit two halves takes a full-width row each (PG-20: never shrunk).
+        if (r === 2 && !fitsAt(its.map((q) => q.it), 2)) its.forEach((q, j) => rows.push({ qs: [q], cols: 1, start: k + 1 + j }));
+        else rows.push({ qs: its, cols: r === 3 ? 3 : r === 2 ? 2 : 1, start: k + 1 });
+        k += r;
+    }
+    const charMm = 0.5 * m.textPt * (25.4 / 72);
+    const widthMm = (r) => 186 / Math.max(1, r.qs.length);
+    const tagText = (q) => `If missed → Lesson ${q.p.lesson}${q.p.title ? ` ${q.p.title}` : ''}`;
+    // The teacher tag: 9 pt, one line where it fits (two at most).
+    const TAG_LINE_MM = 9 * (25.4 / 72) * 1.3;
+    const tagLines = (q, w) => (tagText(q).length * 1.75 > w - 6 ? 2 : 1);
+    for (const r of rows) {
+        const w = widthMm(r);
+        r.instrH = r.qs.some((q) => String(instructionText(instructionKeyOf([q.it], input.skills), [q.it]) || '').length * charMm > w - 8) ? m.instr * 1.75 : m.instr;
+        r.tagH = Math.max(...r.qs.map((q) => tagLines(q, w))) * TAG_LINE_MM + 2;
+        r.cellH = Math.max(20, hAt(r.qs.map((q) => q.it), r.cols));
+    }
+    const used = m.strip + rows.reduce((a, r) => a + r.instrH + r.cellH + r.tagH, 0);
+    // The spare height goes into the cells, a third of a cell's own height at most (a centred
+    // problem keeps every empty band under 30 %, H13); a check of 3-4 questions is a fixed count,
+    // so what is left stays at the foot of the page.
+    const spare = Math.max(0, m.budget - used - 1);
+    for (const r of rows) r.cellH += Math.min(r.cellH * 0.33, spare / rows.length);
+    const parts = rows.map((r) => {
+        const halves = r.qs.map((q, j) => ({
+            kind: 'col', cls: `mq-lwarmcol mq-lprecol${r.instrH > m.instr ? ' mq-lwarm2' : ''}`,
+            parts: [
+                instructionPart(instructionKeyOf([q.it], input.skills), [q.it]),
+                gridPart([planItem(Object.assign({}, q.it, { cellCls: [q.it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }), { cols: r.cols })], { cols: 1, rows: 1, cellH: r.cellH, labels, start: r.start + j }),
+                { kind: 'html', html: `<p class="mq-lpretag" data-ws-teacher style="min-height:${(r.tagH - 2).toFixed(2)}mm">${esc(tagText(q))}</p>` },
+            ],
+        }));
+        return halves.length > 1 ? { kind: 'row', cls: 'mq-lwarmrow mq-lprerow', widths: halves.map(() => '1fr'), parts: halves } : halves[0];
+    });
+    const section = { kind: 'band', label: 'Prerequisite Check:', instr: '', content: { kind: 'col', cls: 'mq-lwarmstack mq-lprestack', parts } };
+    const plan = assemble(ROLE_ID, input, frame, [{ header: frame.header, sections: [section] }], {
+        scaffoldLevel: 1,
+        meta: {
+            items: n, scoreOutOf: n, part: 'prereq',
+            usedItems: qs.map((q) => plainItem(q.it)),
+            prereqs: qs.map((q, i) => ({ letter: i + 1, lesson: q.p.lesson, title: q.p.title || '', skill: q.it.skill, text: String((q.it.q && q.it.q.text) || '') })),
+            routePlan: routePlan(input, qs, { ROLE_ID, labels }),
+            fits: [{ cols: 2, rows: rows.length, line: `Fits: a Prerequisite Check of ${n} question${n === 1 ? '' : 's'} on 1 page.` }],
+            notes: [],
+        },
+    });
+    plan.cls = [plan.cls || '', 'mq-lesson'].filter(Boolean).join(' ');
+    return plan;
+}
+
+/** The letter a question prints with (a, b, c, d: the lesson sheet's labels). */
+const letterOf = (i) => String.fromCharCode(96 + i);
+
+/**
+ * The key's ROUTING TABLE (plan §8b): each question, what it checks, and the lesson to teach first
+ * when it is missed; the rule for two or more misses (the earliest first, then back to this lesson).
+ * A teacher page: no Name, Date or Score.
+ */
+function routePlan(input, qs, { ROLE_ID }) {
+    const lesson = input.lesson || {};
+    const target = input.targetSkill ? [input.targetSkill] : (input.skills || []).slice(0, 1);
+    const f = frameOf({ skills: target, input, tabId: 'Check key', score: 0, footerLeft: lesson.tagLine });
+    const header = Object.assign({}, f.header, { name: false, date: false, score: false });
+    const rowsHtml = qs.map((q, i) => `<tr><td class="mq-lroute-q">${letterOf(i + 1)}</td><td>${esc(q.p.why || '')}</td>`
+        + `<td><b>Lesson ${esc(q.p.lesson)}</b>${q.p.title ? ` ${esc(q.p.title)}` : ''}</td></tr>`).join('');
+    const html = `<div class="mq-lroute"><table><thead><tr><th>Question</th><th>What it checks</th><th>If missed, teach first</th></tr></thead><tbody>${rowsHtml}</tbody></table>`
+        + '<ul><li><b>All correct:</b> start this lesson with its anchor chart.</li>'
+        + '<li><b>One missed:</b> teach that lesson first, then come back to this lesson.</li>'
+        + '<li><b>Two or more missed:</b> start with the earliest one missed (the first letter), then the next, then come back to this lesson.</li></ul></div>';
+    const section = { kind: 'band', label: 'Prerequisite Check: where next', instr: '', html };
+    const plan = assemble(ROLE_ID, input, Object.assign({}, f, { header }), [{ header, sections: [section] }], { scaffoldLevel: 1, meta: { items: 0, part: 'prereq-route' } });
+    plan.cls = [plan.cls || '', 'mq-lesson'].filter(Boolean).join(' ');
+    return plan;
+}
+
+export default { warmShape, warmUpBand, prereqPlan };

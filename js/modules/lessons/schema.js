@@ -28,7 +28,11 @@
 //                                                      critic grades): lessonById accepts it
 //     practice: {skill: 'category:skill', opts?}       THE skill that practises it, with the option
 //                                                      values the lesson deals (LINK-1)
-//     warmup:   [{key, opts?, why}]                    the prerequisite skills the Warm-up reviews
+//     prereqs:  [{lesson, key, opts?, why}]            THE PREREQUISITE CHECK (LR-17): 3-4 prerequisite
+//                                                      lessons, most basic first, each with the skill
+//                                                      (and options) its question is dealt from; a
+//                                                      lesson not written yet is a NEEDS entry
+//     warmup?:  [{key, opts?, why}]                    (older) a Warm-up's prerequisite skills
 //     mixWith:  [{key, opts?, title?, ...floors}]      Mixed practice partners (EARLIER skills, LR-9)
 //     steps?:   ['Y1.B2.S9', ...]                      further WRM steps it teaches (aliases)
 //     note?:    '...'                                  why this step / this skill (a reviewer's note)
@@ -76,6 +80,10 @@ export const FAMILY_IDS = Object.freeze(['early', 'placevalue', 'addsub', 'multd
 
 /** Need kinds (§3): what a lesson waits for. */
 export const NEED_KINDS = Object.freeze(['skill', 'option', 'steps', 'lesson']);
+
+/** A Prerequisite Check holds 3 or 4 questions (owner ruling 2026-09-26). */
+export const PREREQ_MIN = 3;
+export const PREREQ_MAX = 4;
 
 const isSkillKey = (k) => /^[a-z0-9_]+:[a-z0-9_]+$/.test(String(k || ''));
 
@@ -125,6 +133,16 @@ export function validateLesson(id, l, known = {}) {
     if (!l.practice || !isSkillKey(l.practice.skill)) e('practice: {skill: "category:skill", opts?}');
     else if (known.skillExists && !known.skillExists(l.practice.skill)) e(`practice skill ${l.practice.skill} is not live`);
     for (const w of l.warmup || []) if (!isSkillKey(w.key)) e(`warm-up "${w.key}" is not a skill key`);
+    // LR-17: the Prerequisite Check.
+    const pre = l.prereqs || [];
+    if (pre.length < PREREQ_MIN || pre.length > PREREQ_MAX) e(`LR-17: a Prerequisite Check of ${pre.length} question(s) (${PREREQ_MIN}-${PREREQ_MAX})`);
+    for (const p of pre) {
+        if (!kindOf(p.lesson)) e(`LR-17: prerequisite "${p.lesson}" is not a lesson id`);
+        if (p.lesson === id) e('LR-17: the lesson is its own prerequisite');
+        if (!isSkillKey(p.key)) e(`LR-17: prerequisite ${p.lesson}: "${p.key}" is not a skill key`);
+        else if (known.skillExists && !known.skillExists(p.key)) e(`LR-17: prerequisite ${p.lesson}: ${p.key} is not live`);
+    }
+    if (!(l.mixWith || []).length) e('LR-18: no Mixed partners (the mixed part)');
     for (const m of l.mixWith || []) if (!isSkillKey(m.key)) e(`mixWith "${m.key}" is not a skill key`);
     if (l.steps) for (const s of l.steps) if (kindOf(s) !== 'wrm') e(`steps: "${s}" is not a WRM step id`);
     return bad;

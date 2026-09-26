@@ -1146,9 +1146,16 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     eq((LIB.defaultLessonForSkill('subtraction', 'sub_100_regroup') || {}).id, 'Y2.B2.S18', 'library: a skill finds its default lesson');
     eq([SCHEMA.kindOf('Y2.B2.S18'), SCHEMA.kindOf('ccss:6.NS.A.1'), SCHEMA.kindOf('ee:M.EE.6.SP.1'), SCHEMA.kindOf('skill:addition:add_facts'), SCHEMA.kindOf('Y9.B1')].join(','), 'wrm,ccss,ee,skill,', 'library: lesson id kinds');
     // The prerequisite skills (plan §8e): a lesson's own list, else the seed's fallback.
-    eq(LIB.prerequisiteSkillsFor('subtraction', 'sub_100_regroup').map((p) => p.skillId).join(','), 'subtract,sub_100_no_regroup', 'library: a skill with a lesson lists its lesson prerequisites');
+    eq(LIB.prerequisiteSkillsFor('subtraction', 'sub_100_regroup').map((p) => p.skillId).join(','), 'identify,expand,sub_10_regroup,sub_100_no_regroup', 'library: a skill with a lesson lists its Prerequisite Check skills');
     ok(LIB.prerequisiteSkillsFor('multiplication', 'mult_facts').length > 0 && LIB.prerequisiteSkillsFor('multiplication', 'mult_facts').every((p) => p.categoryId && p.skillId && p.why), 'library: a skill with no lesson takes the seed fallback, each with its reason');
     ok(LIB.lessonData('Y4.B1.S14').cases.includes('toHundred') && !('archetype' in LIB.lessonData('Y4.B1.S14')), 'library: lessonData is the routine plus the lesson (no archetype field for the engine)');
+    // LR-17: the Prerequisite Check - 3 or 4 questions, routed earliest-missed first.
+    const lsn = LIB.lessonById('Y2.B2.S18');
+    const two = Object.assign({}, lsn, { prereqs: lsn.prereqs.slice(0, 2) });
+    ok(SCHEMA.validateLesson('Y2.B2.S18', two).some((m) => /LR-17/.test(m)) && !SCHEMA.validateLesson('Y2.B2.S18', lsn).length, 'LR-17: a check of 2 questions fails, the sample passes');
+    ok(SCHEMA.validateLesson('Y2.B2.S18', Object.assign({}, lsn, { prereqs: lsn.prereqs.concat([{ lesson: 'Y2.B2.S18', key: 'addition:add_facts' }]) })).some((m) => /own prerequisite|LR-17/.test(m)), 'LR-17: 5 questions or a self-prerequisite fails');
+    eq(LIB.prereqRoute('Y2.B2.S18', [4, 2]).map((r) => r.lesson).join(','), 'Y2.B1.S5,Y2.B2.S17,Y2.B2.S18', 'LR-17: two misses go earliest first, then back to the lesson');
+    eq(LIB.prereqRoute('Y2.B2.S18', []).length, 0, 'LR-17: nothing missed - straight to the anchor chart');
     // Lesson NEEDS reach the build list (plan §2): a match blocks the entry, a new need is an entry.
     const blOpt = BL.buildList(null, []).find((e) => e.kind === 'option');
     const blMerged = BL.buildList(null, [{ lesson: 'Y2.B2.S18', kind: 'option', skill: blOpt.skill, option: blOpt.option, name: 'x' },

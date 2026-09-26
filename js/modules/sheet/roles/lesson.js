@@ -59,7 +59,7 @@ import { roundLineSvg, roundLineMm, roundLinePad, isRound } from '../lesson-arch
 import { EXAMPLE_KEYS, keyOfItem, mainPool, warmPools, plainItem, stateGroups, namedSteps, stepMarker, hAt, fitsWidth, hOf } from '../lesson-pages/common.js';
 import { pickExample, pickSecond, otherExamples, chartLayout, stateItems, finalItems, secondItems, chartPage } from '../lesson-pages/chart.js';
 import { vocabItem, vocabOrder, vocabBands } from '../lesson-pages/vocab.js';
-import { warmShape, warmUpBand } from '../lesson-pages/prereq-check.js';
+import { warmShape, warmUpBand, prereqPlan } from '../lesson-pages/prereq-check.js';
 import { pickWeDo, stepsItem, weDoBand } from '../lesson-pages/we-do.js';
 import { stripHtml, stripItem } from '../lesson-pages/practice.js';
 
@@ -82,6 +82,8 @@ const AUTO_COLS = { S: 4, M: 3, L: 3 };
 /** The lesson skill ('main') and one pool per prerequisite skill ('w0', 'w1'). */
 export function sources(skills, helpers = {}) {
     const main = skills[0];
+    // The Prerequisite Check (LR-17): one pool per prerequisite, `p<i>`, dealt from its skill ref.
+    if (helpers.lesson && helpers.lesson.part === 'prereq') return (helpers.lesson.prereqs || []).map((p, i) => ({ id: `p${i}`, skills: [p.ref] }));
     const pre = ((helpers.lesson && helpers.lesson.warmSkills) || []).slice(0, 2);
     // Lessons r3: an example case the main pool rarely deals (a 0 in the ones AND a one-place
     // bottom number; a number in the 90s) gets a pool of its own, dealt to the case's `ref`
@@ -99,6 +101,7 @@ export function sources(skills, helpers = {}) {
 export const measureCols = () => [1, 2, 3, 4];
 
 export function counts(pools, input) {
+    if (input.lesson && input.lesson.part === 'prereq') return Object.fromEntries(Object.keys(pools).map((id) => [id, 1]));
     const shape = warmShape(pools, input);
     const out = { main: PROBE };
     for (const [id, s] of Object.entries(shape)) out[id] = s.k * (s.rows || 1);
@@ -115,6 +118,7 @@ export function counts(pools, input) {
  */
 export function extras(input = {}) {
     const lesson = input.lesson || {};
+    if (lesson.part === 'prereq') return [];
     const data = lesson.data || null;
     const main = mainPool(input);
     const ex = pickExample(main, data);
@@ -140,6 +144,7 @@ export function extras(input = {}) {
 /* ============================================================================== the plan */
 
 export function plan(input = {}) {
+    if (input.lesson && input.lesson.part === 'prereq') return prereqPlan(input, { ROLE_ID });
     const ctx = ctxOf(input);
     const lesson = input.lesson || {};
     const data = lesson.data || null;

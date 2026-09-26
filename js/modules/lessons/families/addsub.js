@@ -107,9 +107,13 @@ export const LESSONS = Object.freeze({
         slug: 'add-within-10',
         practice: { skill: 'addition:add_facts', opts: { band: 10, constant: [1, 2, 3] } },
         defaultFor: true,
-        warmup: [
-            { key: 'counting:count_objects', opts: { band: 10 }, why: 'Counting a set is how a sum is found.' },
-            { key: 'composing:number_bonds', opts: { band: 10 }, why: 'Two parts make a whole: the idea of adding.' },
+        // LR-17 (owner ruling 2026-09-26): the Prerequisite Check, most basic first; a question
+        // missed sends the pupil to that lesson first, then back. (It replaces the Warm-up.)
+        prereqs: [
+            { lesson: 'Y1.B1.S2', key: 'counting:count_objects', opts: { band: 10 }, why: 'Counting a set is how a sum is found.' },
+            { lesson: 'Y1.B1.S6', key: 'counting:count_sequence', why: 'Counting on says the next numbers from any number.' },
+            { lesson: 'Y1.B1.S11', key: 'comparing:compare_groups', why: 'Step 1 starts with the bigger number.' },
+            { lesson: 'Y1.B2.S5', key: 'composing:number_bonds', opts: { band: 10 }, why: 'Two parts make a whole: the idea of adding.' },
         ],
         mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 }, title: 'Number Bonds' }, { key: 'counting:count_objects', opts: { band: 10 } }],
         note: 'Counting on from the bigger number is WRM Y1 "Addition - add more"; the add 1-3 constant keeps each hop countable.',
@@ -121,9 +125,12 @@ export const LESSONS = Object.freeze({
         slug: 'subtract-2-digit-regroup',
         practice: { skill: 'subtraction:sub_100_regroup' },
         defaultFor: true,
-        warmup: [
-            { key: 'subtraction:subtract', opts: { band: 20, regroup: 'always' }, why: 'After regrouping, the ones column is a teen fact: 13 − 5.' },
-            { key: 'subtraction:sub_100_no_regroup', why: 'The column steps without the new part.' },
+        // LR-17: the Prerequisite Check, most basic first.
+        prereqs: [
+            { lesson: 'Y2.B1.S4', key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Regrouping reads the tens digit and the ones digit.' },
+            { lesson: 'Y2.B1.S5', key: 'placevalue:expand', opts: { band: 99, zeroPlace: 'none' }, why: 'A 2-digit number is its tens and its ones: 63 = 60 + 3.' },
+            { lesson: 'Y2.B2.S10', key: 'subtraction:sub_10_regroup', why: 'After regrouping, the ones column is a teen fact: 13 − 5.' },
+            { lesson: 'Y2.B2.S17', key: 'subtraction:sub_100_no_regroup', why: 'The column steps without the new part.' },
         ],
         // Lessons r2: the partner is 2-digit addition (never 2 + 8 in a carry scaffold).
         // Lessons r4: sums to 99, so the column has no empty hundreds place.
@@ -131,6 +138,16 @@ export const LESSONS = Object.freeze({
     },
 });
 
-export const NEEDS = Object.freeze([]);
+// LR-17: the Prerequisite Check's lessons that are not written yet (Phase 1 pilots, first in line).
+export const NEEDS = Object.freeze([
+    { lesson: 'Y1.B2.S9', kind: 'lesson', prereq: 'Y1.B1.S2', name: 'Count objects', why: 'Prerequisite Check question 1 routes here' },
+    { lesson: 'Y1.B2.S9', kind: 'lesson', prereq: 'Y1.B1.S6', name: 'Count on from any number', why: 'Prerequisite Check question 2 routes here' },
+    { lesson: 'Y1.B2.S9', kind: 'lesson', prereq: 'Y1.B1.S11', name: 'Fewer, more, same', why: 'Prerequisite Check question 3 routes here' },
+    { lesson: 'Y1.B2.S9', kind: 'lesson', prereq: 'Y1.B2.S5', name: 'Number bonds within 10', why: 'Prerequisite Check question 4 routes here' },
+    { lesson: 'Y2.B2.S18', kind: 'lesson', prereq: 'Y2.B1.S4', name: 'Use a place value chart', why: 'Prerequisite Check question 1 routes here' },
+    { lesson: 'Y2.B2.S18', kind: 'lesson', prereq: 'Y2.B1.S5', name: 'Partition numbers to 100', why: 'Prerequisite Check question 2 routes here' },
+    { lesson: 'Y2.B2.S18', kind: 'lesson', prereq: 'Y2.B2.S10', name: 'Subtract across 10', why: 'Prerequisite Check question 3 routes here' },
+    { lesson: 'Y2.B2.S18', kind: 'lesson', prereq: 'Y2.B2.S17', name: 'Subtract two 2-digit numbers (not across a 10)', why: 'Prerequisite Check question 4 routes here' },
+]);
 
 export default { ROUTINES, LESSONS, NEEDS };

@@ -54,7 +54,7 @@ const PAGE_GROUPS = [
         ['word-problems', 'Word problems', 'Stories with room to work.'],
     ]],
     ['Teach', [
-        ['lesson', 'Lesson', 'Anchor chart, warm-up, we do, then practice.'],
+        ['lesson', 'Lesson', 'Prerequisite check, anchor chart, we do, then practice.'],
         ['opener', 'Lesson opener', 'A warm-up to start the lesson.'],
         ['scripted-model', 'Scripted model', 'Worked examples and what to say.'],
         ['guided', 'Guided', 'Help that fades item by item.'],

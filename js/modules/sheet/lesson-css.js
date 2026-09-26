@@ -93,6 +93,15 @@ ${ICON_CSS}
 :is(.ws-page,.ws-sheet) .mq-lwarmrow .mq-rowcol+.mq-rowcol{border-left:var(--ws-hair) solid var(--ws-ink)}
 :is(.ws-page,.ws-sheet) .mq-lwarmcol{display:flex;flex-direction:column;min-width:0}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-lvcenter{justify-content:center}
+:is(.ws-page,.ws-sheet) .mq-lpretag{margin:0;padding:.6mm 3mm 1.4mm;font-size:9pt;line-height:1.3;color:var(--ws-grey,#949494);box-sizing:border-box}
+:is(.ws-page,.ws-sheet) .mq-lprestack>.mq-lwarmrow+.mq-lwarmrow,:is(.ws-page,.ws-sheet) .mq-lprestack>*+*{border-top:var(--ws-hair) solid var(--ws-ink)}
+:is(.ws-page,.ws-sheet) .mq-lroute{font-size:var(--ws-text);line-height:1.35;padding:3mm 4mm}
+:is(.ws-page,.ws-sheet) .mq-lroute table{border-collapse:collapse;width:100%;margin:0 0 4mm}
+:is(.ws-page,.ws-sheet) .mq-lroute th,:is(.ws-page,.ws-sheet) .mq-lroute td{border:var(--ws-hair) solid var(--ws-ink);padding:1.6mm 2.4mm;text-align:left;vertical-align:top}
+:is(.ws-page,.ws-sheet) .mq-lroute th{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-lroute td.mq-lroute-q{font-weight:700;text-align:center;width:14mm}
+:is(.ws-page,.ws-sheet) .mq-lroute ul{margin:0;padding-left:5mm}
+:is(.ws-page,.ws-sheet) .mq-lroute li+li{margin-top:1.5mm}
 :is(.ws-page,.ws-sheet) .mq-lwarmcol>.ws-instrline{padding-left:3mm;padding-right:2mm}
 :is(.ws-page,.ws-sheet) .mq-lwarmcol.mq-lwarm2>.ws-instrline{height:calc(var(--ws-instr) * 1.75);line-height:1.2;align-items:center}
 :is(.ws-page,.ws-sheet) .mq-lwarmrow .mq-rowcol+.mq-rowcol .ws-grid{border-left-width:0}

@@ -55,9 +55,12 @@ export const LESSONS = Object.freeze({
         slug: 'round-nearest-10',
         practice: { skill: 'number_sense:nearest_10' },
         defaultFor: true,
-        warmup: [
-            { key: 'number_sense:between_tens', why: 'Rounding starts by naming the two tens.' },
-            { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Rounding reads the tens digit and the ones digit.' },
+        // LR-17: the Prerequisite Check, most basic first.
+        prereqs: [
+            { lesson: 'Y1.B9.S2', key: 'patterns:seq_10', opts: { forms: [0], unknown: [1] }, why: 'The tens a number is rounded to: 10, 20, 30 ...' },
+            { lesson: 'Y2.B1.S4', key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Rounding reads the tens digit and the ones digit.' },
+            { lesson: 'Y2.B1.S10', key: 'number_sense:between_tens', why: 'Rounding starts by naming the two tens.' },
+            { lesson: 'Y3.B1.S3', key: 'number_sense:place_on_number_line', why: 'The rounding line is a number line to 100.' },
         ],
         // Mixed practice: EARLIER skills only, each from its own strand (lessons r1: never nearest
         // 100, which comes after, and never two "Number Sense" sections).
@@ -65,6 +68,12 @@ export const LESSONS = Object.freeze({
     },
 });
 
-export const NEEDS = Object.freeze([]);
+// LR-17: the Prerequisite Check's lessons that are not written yet (Phase 1 pilots, first in line).
+export const NEEDS = Object.freeze([
+    { lesson: 'Y4.B1.S14', kind: 'lesson', prereq: 'Y1.B9.S2', name: 'Count in 10s', why: 'Prerequisite Check question 1 routes here' },
+    { lesson: 'Y4.B1.S14', kind: 'lesson', prereq: 'Y2.B1.S4', name: 'Use a place value chart', why: 'Prerequisite Check question 2 routes here' },
+    { lesson: 'Y4.B1.S14', kind: 'lesson', prereq: 'Y2.B1.S10', name: '10s and 1s on the number line to 100', why: 'Prerequisite Check question 3 routes here' },
+    { lesson: 'Y4.B1.S14', kind: 'lesson', prereq: 'Y3.B1.S3', name: 'Number line to 100', why: 'Prerequisite Check question 4 routes here' },
+]);
 
 export default { ROUTINES, LESSONS, NEEDS };

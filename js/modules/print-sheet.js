@@ -2097,12 +2097,21 @@ export const LESSON_SIZE_WHY = 'A lesson prints at one size, Large: its anchor c
  * Every lesson HAS every part; the teacher prints any subset (`parts`) and can refresh any one with
  * new numbers (`lessonSeeds`).
  */
-export const LESSON_PARTS = Object.freeze(['chart', 'sheet', 'practice', 'mixed']);
-const PART_OFFSET = Object.freeze({ chart: 0, sheet: 0, practice: 7919, mixed: 15838 });
+export const LESSON_PARTS = Object.freeze(['prereq', 'chart', 'sheet', 'practice', 'mixed']);
+const PART_OFFSET = Object.freeze({ prereq: 3571, chart: 0, sheet: 0, practice: 7919, mixed: 15838 });
+
+/** The WRM seed records (titles of prerequisite lessons), loaded when a lesson is first built. */
+let seedDbMod = null;
+async function loadSeedDb() {
+    if (seedDbMod) return seedDbMod;
+    try { seedDbMod = await import('./lessons/seed-db.js'); } catch (e) { seedDbMod = { seedOf: () => null }; }
+    return seedDbMod;
+}
 
 /**
  * A part's seed: refresh 0 is the packet's own deal (the chart and the lesson sheet share the
- * packet seed; Practice +7919, Mixed +15838 - the seeds every packet printed before parts had);
+ * packet seed; Practice +7919, Mixed +15838 - the seeds every packet printed before parts had;
+ * the Prerequisite Check +3571);
  * refresh k > 0 is a new deal of that part alone. The Print screen passes the result in
  * `lessonSeeds[part]` ("New numbers" beside each part).
  */
@@ -2145,7 +2154,16 @@ async function buildLesson(n, metaOf) {
     if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
     const data = dataOf(sk);
-    const warmSkills = data ? data.skills.map(skillRef) : earlierSkills(sk, 2);
+    // LR-17: the PREREQUISITE CHECK - one question per prerequisite lesson, most basic first. It
+    // replaces the lesson sheet's Warm-up (a lesson without one keeps the Warm-up).
+    const seedDb = await loadSeedDb();
+    const prereqList = (data && Array.isArray(data.prereqs) ? data.prereqs : []).map((p) => {
+        const ref = skillRef(p);
+        delete ref.lesson;
+        const rec = seedDb.seedOf ? seedDb.seedOf(p.lesson) : null;
+        return { ref, lesson: p.lesson, title: (rec && rec.title) || p.title || '', why: p.why || '' };
+    });
+    const warmSkills = prereqList.length ? [] : data ? data.skills.map(skillRef) : earlierSkills(sk, 2);
     let st = { ccss: [], ee: [], approx: false };
     try { if (standardsMod) st = standardsMod.standardsFor(sk.categoryId, sk.skillId); } catch (e) { /* no tags */ }
     // The lesson's tags: the PRIMARY CCSS code (an approximate mapping is no tag) and its EEs.
@@ -2169,10 +2187,11 @@ async function buildLesson(n, metaOf) {
     // REFRESHED part (its seed not the packet's own) is dealt last, avoiding every other part.
     const seeds = Object.fromEntries(LESSON_PARTS.map((x) => [x, n.lessonSeeds && n.lessonSeeds[x] !== undefined ? n.lessonSeeds[x] : lessonPartSeed(n.seed, x)]));
     const refreshed = LESSON_PARTS.filter((x) => seeds[x] !== lessonPartSeed(n.seed, x));
-    const printed = n.parts || LESSON_PARTS.filter((x) => x === 'chart' || x === 'sheet' || (x === 'practice' && n.practicePages > 0) || (x === 'mixed' && n.mixed));
+    const hasPart = (x) => x !== 'prereq' || prereqList.length > 0;
+    const printed = (n.parts || LESSON_PARTS.filter((x) => x === 'prereq' || x === 'chart' || x === 'sheet' || (x === 'practice' && n.practicePages > 0) || (x === 'mixed' && n.mixed))).filter(hasPart);
     const partsMode = !!(n.parts || refreshed.length);
-    const lastAt = refreshed.length ? LESSON_PARTS.length - 1 : Math.max(1, ...printed.map((x) => LESSON_PARTS.indexOf(x)));
-    const built = partsMode ? LESSON_PARTS.slice(0, lastAt + 1) : printed;
+    const lastAt = refreshed.length ? LESSON_PARTS.length - 1 : Math.max(LESSON_PARTS.indexOf('sheet'), ...printed.map((x) => LESSON_PARTS.indexOf(x)));
+    const built = (partsMode ? LESSON_PARTS.slice(0, lastAt + 1) : printed).filter(hasPart);
     const practicePages = n.practicePages > 0 ? n.practicePages : 1;
     const buildChart = (seed, avoid) => buildRoleSheet(Object.assign({}, nz, {
         seed, size: 'L', role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'chart' }, avoid ? { warmSkills: warmSkills.map((w) => Object.assign({}, w, avoid)), avoidKeys: avoid.avoidHard } : {}),
@@ -2181,12 +2200,28 @@ async function buildLesson(n, metaOf) {
         seed, role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'sheet' }, avoid ? { warmSkills: warmSkills.map((w) => Object.assign({}, w, avoid)), avoidKeys: avoid.avoidHard } : {}),
     }, avoid ? { sections: [Object.assign({}, nz.sections[0], { skills: [Object.assign({}, sk, avoid)] })] } : {}), metaOf);
 
+    // 0. The Prerequisite Check (LR-17), its key followed by the routing table page.
+    const buildPrereq = async (seed, avoid) => {
+        const res = await buildRoleSheet(Object.assign({}, nz, {
+            seed, role: 'lesson', header, look: 'ican',
+            lessonInput: Object.assign({}, lessonInput, { part: 'prereq', prereqs: prereqList.map((p) => Object.assign({}, p, { ref: Object.assign({}, p.ref, avoid || {}) })) }),
+        }), metaOf);
+        const route = res.plan && res.plan.meta && res.plan.meta.routePlan;
+        if (route && n.key) {
+            const r = renderPlan(route, { key: false });
+            res.keyHtml = [res.keyHtml || '', r.pupilHtml].filter(Boolean).join('\n');
+            res.keyPageCount = (res.keyPageCount || 0) + r.pupilPages.length;
+        }
+        return res;
+    };
+    let prereq = prereqList.length ? await buildPrereq(seeds.prereq === lessonPartSeed(n.seed, 'prereq') ? seeds.prereq : lessonPartSeed(n.seed, 'prereq')) : null;
+
     // 1. The anchor chart (always L) and the teaching sheet: Vocabulary, Warm-up, Guided, Independent.
     const chart0 = await buildChart(seeds.chart === lessonPartSeed(n.seed, 'chart') ? seeds.chart : lessonPartSeed(n.seed, 'chart'));
     const teach0 = await buildTeach(seeds.sheet === lessonPartSeed(n.seed, 'sheet') ? seeds.sheet : lessonPartSeed(n.seed, 'sheet'));
     let chart = chart0;
     let teach = teach0;
-    const parts = [{ part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
+    const parts = [...(prereq ? [{ part: 'prereq', role: 'lesson', res: prereq }] : []), { part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
 
     // LR-5 (lessons r4): ONE avoid set for the whole packet. The chart's examples (never again,
     // not even turned round) and every item the teaching sheet placed go in first; each page adds
@@ -2205,6 +2240,7 @@ async function buildLesson(n, metaOf) {
     const chartMeta = (chart.plan && chart.plan.meta) || {};
     hold('chart', chartMeta.chartItems, true);
     hold('teach', teach.plan && teach.plan.meta && teach.plan.meta.usedItems);
+    if (prereq) hold('prereq', prereq.plan && prereq.plan.meta && prereq.plan.meta.usedItems);
     // (A packet-wide avoid set needs more tries than a page's own rules: 60 a slot.)
     const avoidOf = () => (packetOn ? { avoidHard: new Set(avoidHard), avoidSoft: new Set(avoidSoft), tries: 60 } : {});
 
@@ -2282,8 +2318,8 @@ async function buildLesson(n, metaOf) {
     // REFRESHED parts (LR-18): each dealt again with its own seed, avoiding every OTHER part - the
     // other parts never change, and the packet's one avoid set still holds (a new chart never
     // shows a problem the practice page deals; a new practice page never deals a chart example).
-    const PART_OF = { chart: 'chart', sheet: 'teach', practice: 'practice', mixed: 'mixed' };
-    for (const x of refreshed) {
+    const PART_OF = { prereq: 'prereq', chart: 'chart', sheet: 'teach', practice: 'practice', mixed: 'mixed' };
+    for (const x of refreshed.filter(hasPart)) {
         const key = PART_OF[x];
         const others = placed.filter((it) => it.part !== key);
         const hard = new Set();
@@ -2296,7 +2332,8 @@ async function buildLesson(n, metaOf) {
         }
         const avoid = () => (packetOn ? { avoidHard: new Set(hard), avoidSoft: new Set(soft), tries: 60 } : {});
         let res;
-        if (x === 'chart') { res = await buildChart(seeds.chart, avoid()); chart = res; }
+        if (x === 'prereq') { res = await buildPrereq(seeds.prereq, avoid()); prereq = res; }
+        else if (x === 'chart') { res = await buildChart(seeds.chart, avoid()); chart = res; }
         else if (x === 'sheet') { res = await buildTeach(seeds.sheet, avoid()); teach = res; }
         else if (x === 'practice') res = await buildPractice(seeds.practice, practiceSection({ skill: Object.assign({}, practiceSk0, avoid()), facts, rounding }));
         else res = await buildMixed(seeds.mixed, avoid);
@@ -2306,7 +2343,7 @@ async function buildLesson(n, metaOf) {
         parts[at] = entry;
         for (let i = placed.length - 1; i >= 0; i--) if (placed[i].part === key) placed.splice(i, 1);
         if (x === 'chart') for (const it of ((res.plan && res.plan.meta && res.plan.meta.chartItems) || [])) placed.push(Object.assign({ part: 'chart' }, it));
-        else if (x === 'sheet') for (const it of ((res.plan && res.plan.meta && res.plan.meta.usedItems) || [])) placed.push(Object.assign({ part: 'teach' }, it));
+        else if (x === 'sheet' || x === 'prereq') for (const it of ((res.plan && res.plan.meta && res.plan.meta.usedItems) || [])) placed.push(Object.assign({ part: key }, it));
         else for (const it of res.items || []) placed.push(Object.assign({ part: key }, it));
     }
     const chartMetaNow = (chart.plan && chart.plan.meta) || {};
@@ -2334,7 +2371,7 @@ async function buildLesson(n, metaOf) {
     // ws-lesson-check.cjs fails on any violation (a `soft` one is reported, not failed).
     const checkLesson = { skill: `${sk.categoryId}:${sk.skillId}`, cases: data && data.cases, caps: (data && data.caps) || {} };
     const violations = packetViolations({ lesson: checkLesson, placed, chartCases: chartMetaNow.chartCases || [], sizePrinted: size, packetSize: LESSON_PACKET_SIZE });
-    const PART_NAME = { chart: 'Anchor chart', teach: 'Lesson', practice: 'Practice', mixed: 'Mixed' };
+    const PART_NAME = { prereq: 'Prerequisite Check', chart: 'Anchor chart', teach: 'Lesson', practice: 'Practice', mixed: 'Mixed' };
     const line = outParts.map((p) => `${PART_NAME[p.part]}: ${p.res.pageCount} page${p.res.pageCount === 1 ? '' : 's'}`).join(' · ');
     return {
         pupilHtml, keyHtml, pageCount, keyPageCount,
@@ -2364,6 +2401,8 @@ async function buildLesson(n, metaOf) {
             // LR-18: the parts built (a printed part's earlier parts are built too), printed and
             // refreshed, each part's seed, and each part's own pupil / key HTML.
             partsBuilt: allParts.map((p) => (p.part === 'teach' ? 'sheet' : p.part)), printed, refreshed, seeds, partHtml,
+            // LR-17: the Prerequisite Check's questions and where each routes (the key's table).
+            prereqs: prereq && prereq.plan && prereq.plan.meta ? prereq.plan.meta.prereqs : [],
             example: chart.plan && chart.plan.meta ? chart.plan.meta.example : '',
             chart: chart.plan && chart.plan.meta ? { zoom: chart.plan.meta.chartZoom, example2: chart.plan.meta.example2, example2Found: chart.plan.meta.example2Found, sizing: chart.plan.meta.chartSizing, example3: chart.plan.meta.example3, example4: chart.plan.meta.example4 } : null,
             practiceTried,

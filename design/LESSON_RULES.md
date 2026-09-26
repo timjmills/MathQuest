@@ -11,19 +11,23 @@ still govern; this file is the part of them lessons kept getting wrong.
 
 Before a new lesson goes to a critic:
 
-1. **Data entry** in `lessons/prereqs.js`: `skills` (Warm-up prerequisites), `concepts`, `vocab` (≤ 3, each
-   with a picture), `steps` (2–5 words, **one distinct icon each**), `chant` (or `''` and why),
-   `example: {match, test?, prefer?}`, and `mixWith` (EARLIER skills only, with the floors they need).
-2. **Declare the cases** (`cases`, names from `sheet/lesson-rules.js` `CASE_FAMILIES`) — every kind of item
+1. **Data entry** in the family file (`lessons/families/<family>.js`, shapes in `lessons/schema.js`): a
+   ROUTINE (`archetype`, `concepts`, `vocab` (≤ 3, each with a picture), `steps` (2–5 words, **one distinct
+   icon each**), `chant` (or `''` and why), `example: {match, test?, prefer?}`) and a LESSON (`routine`,
+   `practice: {skill, opts}`, `prereqs`, `mixWith` - EARLIER skills only, with the floors they need).
+2. **The Prerequisite Check** (`prereqs`, LR-17): 3-4 earlier lessons, most basic first, each with the
+   skill and options its question is dealt from and a `why`. A prerequisite lesson not written yet gets a
+   `NEEDS` entry (`kind: 'lesson', prereq`).
+3. **Declare the cases** (`cases`, names from `sheet/lesson-rules.js` `CASE_FAMILIES`) — every kind of item
    the practice will deal. For each case the worked example does not show, add an other example
    (`second` / `third` / `fourth: {test, label, ref?}`). A rare case gets `ref` floors so its own pool
    deals it.
-3. **Pool floors** where the skill's generator deals more than the lesson teaches: `minOperand`,
+4. **Pool floors** where the skill's generator deals more than the lesson teaches: `minOperand`,
    `minTop`, `maxTop`, `distinctFirst`, `distinctAnswer`, `noNearTwin`, `caps: {case: n}`.
-4. Run `node tests/scripts/ws-lesson-check.cjs --only <lesson>` (25 seeds × L, S). It must print OK.
-5. Render three seeds (`node tests/scripts/ws-lesson-samples.cjs --seed <n> --stats`) and look at every
+5. Run `node tests/scripts/ws-lesson-coverage.cjs` (structure) and `node tests/scripts/ws-lesson-check.cjs --only <lesson>` (25 seeds × L, S). It must print OK.
+6. Render three seeds (`node tests/scripts/ws-lesson-samples.cjs --seed <n> --stats`) and look at every
    PNG: the gate cannot see whether a drawing teaches.
-6. Then, and only then, a critic round.
+7. Then, and only then, a critic round.
 
 ## The rules
 
@@ -45,6 +49,7 @@ Before a new lesson goes to a critic:
 | LR-14 | **Keys are facsimiles and complete**: they fill regroup and carry boxes (owner ruling: AK-2 over VA-13), every graded slot, and nothing the pupil is not asked to draw (no dot or hop on a Guided number line key). | r1 (owner ruling), r4 minor (round Guided key) | Engine (stack `regroupWorking`, `weDoRender`). Gate: no empty graded slot on a key. Pixel facsimile: critic (`facsimile.py`). |
 | LR-15 | **The chart is a poster**: L type at every size, panels sized to their content and never shrunk below 0.8×, the other examples at least 0.85× with their answers at digit size. | r1, r2, r4 #4 | Engine (`chartPage` zoom solve). Critic's eye for legibility. |
 | LR-16 | **Sizes on other pages: every item at its floor at least** (owner ruling 2026-09-26). Printed on Practice or Mixed pages at S / M / L, every item that can be drawn at the chosen size is; one that cannot keeps its template's `minSize` (the regroup stack: M) and the page packs the others around it, never forced up a size. | owner ruling 2026-09-26 | Kit: `minSize` on the template (`stackMinSize`, `footprint().minSize`), `atLeastSize` in tokens. Mixed page: a page holding a floored item takes the lattice with the fewest over-wide shelves, then the most problems (`mixed-practice.js` `packing`); the pv rounding cell is measured up to four across at S (L1). The general mixed-height packer is the paginator lane's. Gate: a Mixed page at S holding a `minSize: M` item holds more items than at L, keeps every item at its floor, and passes H13. |
+| LR-17 | **Every lesson opens with a Prerequisite Check** (owner ruling 2026-09-26, plan §8b): 3-4 questions, most basic first, each tied to ONE prerequisite lesson and the skill (with options) its question is dealt from. It replaces the Warm-up. Each question carries a small teacher tag "If missed → Lesson <id> <title>"; the key adds the routing table. A miss sends the pupil to that lesson first, then back; two or more misses start with the earliest. A prerequisite lesson not written yet is a NEEDS entry; the prerequisite graph has no cycle. | owner ruling 2026-09-26 | Data: the lesson's `prereqs` (`lessons/schema.js` validateLesson: 3-4, real lesson ids, live skills, not itself). Engine: the `prereq` part (`lesson-pages/prereq-check.js` prereqPlan + the routing page), `library.js prereqRoute`. Gate: `ws-lesson-coverage` fails a missing / short / long check, an unknown lesson (neither built nor a NEEDS entry), a check not most basic first, a cycle; lists lessons waiting only for prerequisite lessons. `ws-lesson-check` runs the check as a part (LR-5 over it, LR-18 refresh). |
 | LR-18 | **Every lesson has every part; the teacher prints any subset and can refresh any part with new numbers** (owner ruling 2026-09-26, plan §8e). Parts: `chart`, `sheet` (Vocabulary, Warm-up / Prerequisite Check, We Do, Independent), `practice`, `mixed`. A refreshed part changes alone (its key follows) and still keeps the packet's one avoid set: it avoids every OTHER part; a part printed alone is the page it is in the whole packet. | owner ruling 2026-09-26 | Engine: `buildSheet({role: 'lesson', parts, lessonSeeds})`, `lessonPartSeed(seed, part, refresh)` (refresh 0 = the packet's own deal, so the default packet is byte-identical); a refreshed part is dealt last with `avoidHard` / `avoidSoft` / `lesson.avoidKeys` from the other parts. Gate (first seed, every lesson): each part refreshed alone changes that part and its key and no other part, no hard LR violation after it; each part printed alone equals its page in the packet. |
 
 ## What still needs a critic's eye

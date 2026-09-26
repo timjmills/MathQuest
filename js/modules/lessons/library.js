@@ -82,6 +82,8 @@ export function lessonData(idOrSlug) {
     const r = l && routineOf(l);
     if (!l || !r) return null;
     const out = Object.assign({}, r, { skills: (l.warmup || []).slice(), mixWith: (l.mixWith || []).slice() });
+    // LR-17: the Prerequisite Check (it replaces the Warm-up).
+    if (l.prereqs) out.prereqs = l.prereqs.map((p) => Object.assign({}, p));
     delete out.archetype;
     return out;
 }
@@ -150,6 +152,20 @@ export function prerequisiteSkillsFor(categoryId, skillId) {
     return out;
 }
 
+/**
+ * THE ROUTING RULE of a Prerequisite Check (owner ruling 2026-09-26, plan §8b): the lessons a pupil
+ * is sent to, in order, then back to this lesson. `missed` holds the question numbers (1-based, the
+ * check's order) or the prerequisite lesson ids; two or more misses start with the EARLIEST (the
+ * check runs most basic first). [] when nothing was missed (straight on to the anchor chart).
+ */
+export function prereqRoute(idOrSlug, missed = []) {
+    const l = lessonById(idOrSlug);
+    const list = (l && l.prereqs) || [];
+    const hit = new Set((missed || []).map(String));
+    return list.filter((p, i) => hit.has(String(i + 1)) || hit.has(p.lesson)).map((p) => ({ lesson: p.lesson, built: !!LESSONS[p.lesson], skill: p.key }))
+        .concat(list.some((p, i) => hit.has(String(i + 1)) || hit.has(p.lesson)) ? [{ lesson: l.id, back: true }] : []);
+}
+
 /** Every family's needs, each with its family. */
 export function allNeeds() {
     return FAMILY_IDS.flatMap((f) => ((FAMILIES[f] && FAMILIES[f].NEEDS) || []).map((n) => Object.assign({ family: f }, n)));
@@ -180,5 +196,5 @@ export function validateLibrary(known = {}) {
 
 export default {
     FAMILIES, ROUTINES, LESSONS, FAMILY_OF, lessonIdOf, lessonById, routineOf, lessonData, practiceRef,
-    lessonsForSkill, defaultLessonForSkill, prerequisiteSkillsFor, allNeeds, validateLibrary,
+    lessonsForSkill, defaultLessonForSkill, prerequisiteSkillsFor, prereqRoute, allNeeds, validateLibrary,
 };
