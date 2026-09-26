@@ -296,6 +296,20 @@ const OPS_BUILD_MAKERS = {
         });
         return { ans: parts.join(', '), keyParts: parts, text: `${op === '+' ? 'Add' : 'Subtract'}: ${a} ${op} ${b}.`, ladder: { kind, op, a, b, places, given, res } };
     },
+    'multiplication:long_multiplication': (r) => {
+        const kind = pick(r, ['mult', 'div', 'short']);
+        const digits = pick(r, [3, 4]);
+        const level = int(r, 0, 2);
+        const lo = 10 ** (digits - 1);
+        if (kind === 'div') {
+            const d = int(r, 2, 9);
+            const quo = int(r, Math.ceil(lo / d) + 1, Math.floor((10 * lo - 1) / d));
+            return { ans: quo, text: `Divide: ${quo * d} ÷ ${d}.`, lm: { kind, a: quo * d, b: d, level, digits } };
+        }
+        const a = int(r, lo + 1, 10 * lo - 1);
+        const b = kind === 'short' ? int(r, 2, 9) : int(r, 1, 9) * 10 + int(r, 2, 9);
+        return { ans: a * b, text: `Multiply: ${a} × ${b}.`, lm: { kind, a, b, level, digits } };
+    },
 };
 Object.assign(ITEM_MAKERS, OPS_BUILD_MAKERS);
 

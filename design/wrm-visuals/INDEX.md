@@ -240,9 +240,9 @@ the first entry.
 | V186 | Odometer / 7-digit counter display | Y6 N04 | 1 | GAP | - | `vis_pv_bands_millions`* | `placevalue` |
 | V187 | Operator arcs (× n / ÷ n, + / − above and below a pair) | Y5 N5-08, Y6 N05 | 12 | GAP | `fractions:equivalent`, `fractions:equiv_frac_nv`, `fractions:simplify`, `template:equation`, `conversions:f_to_p` | `vis_operator_arcs`*, `add_or_mult` | `fractions` |
 | V188 | Conversion ladder (mm → cm → m → km) | Y5 N5-22, Y6 N06 | 4 | GAP | `measurement:length_metric`, `measurement:unit_conversions` | `vis_conversion_models`* | `measurement` |
-| V189 | Short division (bus stop) with exchanges, r and decimal point | Y5 N5-10, Y6 N07 | 9 | PARTIAL | `multiplication:long_multiplication_4x2` | `vis_division_layouts`* | `operations` |
+| V189 | Short division (bus stop) with exchanges, r and decimal point | Y5 N5-10, Y6 N07 | 9 | PARTIAL | `multiplication:long_multiplication` | `vis_division_layouts`* | `operations` |
 | V190 | Long division with step notes and a multiples list | Y6 N08 (M/P) | 2 | PARTIAL | `division:long_div_2digit`, `division:div_fix_estimate` | `vis_division_layouts`*, `long_div_rem` | `operations` |
-| V191 | Long multiplication with partial-product rows | Y5 N5-09, Y6 N09 | 5 | MATCH | `template:long-multiplication`, `multiplication:long_multiplication_4x2`, `multiplication:multiply` | - | - |
+| V191 | Long multiplication with partial-product rows | Y5 N5-09, Y6 N09 | 5 | MATCH | `template:long-multiplication`, `multiplication:long_multiplication`, `multiplication:multiply` | - | - |
 | V192 | Factor tree / halving tree | Y6 N10 | 2 | GAP | `number_theory:prime_composite` | `vis_factor_diagrams`*, `div_factors` | `numtheory` |
 | V193 | Spider diagram of related facts | Y6 N11 | 1 | GAP | - | `known_facts` | `operations` |
 | V194 | Two-way area grid for fraction × fraction | Y6 N14 | 1 | PARTIAL | `fraction_operations:mult_frac_frac` | `vis_frac_area_modes`* | `fractions` |

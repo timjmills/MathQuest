@@ -1,5 +1,5 @@
 // js/modules/sheet/cells/long-multiplication.js
-// Two written methods for multiplication:long_multiplication_4x2 ("Long Multiplication and Short
+// Two written methods for multiplication:long_multiplication ("Long Multiplication and Short
 // Division", build list lane operations, entry 4; 4.NBT.B.5, 5.NBT.B.5, 4.NBT.B.6; WRM Y5 B5).
 //
 // `long-multiplication` - the column grid with one partial-product row per multiplier digit:
@@ -98,6 +98,8 @@ const rowHOf = (g) => Math.max(g.writeMm, 6) + 1;
 const slimOf = (g) => g.carryMm * 0.8;
 // the exchange box's share of a short-division digit column, in tracks
 const EX_W = 0.62;
+// the operator gutter ("×", "+") of the multiplication grid, in tracks: the sign stands clear of the digits
+const GUTTER = 1.6;
 
 /** A scratch input for the screen twin: typed, never graded, outside the tab order. */
 function scratch(labelText, small = false) {
@@ -136,7 +138,7 @@ function lmFootprint(p, ctx) {
     const notes = lvl >= 2 && !single ? (`(${w.A} × ${Number(w.B[0]) * 10})`.length * 0.5 * g.zoneEm * g.E + 3) : 0;
     const slim = lvl >= 1 ? (single ? 1 : 3) * (slimOf(g) + 0.6) : 0;
     return {
-        wMm: Math.ceil((n + 1.1) * tr + notes + 8),
+        wMm: Math.ceil((n + GUTTER) * tr + notes + 8),
         hMm: Math.ceil(2 * g.E * 1.25 + (single ? 0 : 2 * rowHOf(g)) + g.stripMm + slim + 10),
         tracks: n + 1,
     };
@@ -161,7 +163,7 @@ register('long-multiplication', {
         const single = w.B.length === 1;
         const notes = lvl >= 2 && !single;
         const colOf = (place) => 1 + n - place;          // grid column of a place (1 = the operator gutter)
-        const cols = `grid-template-columns:${g.em(tr * 1.1)} repeat(${n}, ${g.em(tr)})${notes ? ' auto' : ''};`;
+        const cols = `grid-template-columns:${g.em(tr * GUTTER)} repeat(${n}, ${g.em(tr)})${notes ? ' auto' : ''};`;
         const rowH = g.em(rowHOf(g));
         const slimH = g.em(slimOf(g));
         let html = '';
@@ -261,7 +263,9 @@ register('long-multiplication', {
     },
     footprint(p, ctx) {
         const f = lmFootprint(p, ctx);
-        return Object.assign(f, { measure: true, factLike: false, maxCols: 2 });
+        // three to a row when the grid is narrow enough (short multiplication, a 3-digit grid with no
+        // row names): two would leave a third of each cell empty (H13)
+        return Object.assign(f, { measure: true, factLike: false, maxCols: f.wMm <= 58 ? 3 : 2 });
     },
     inputs(p) {
         const { n } = lmKey(p);

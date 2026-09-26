@@ -22,9 +22,9 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 533 (61%), partial only 134 (15%), gap 205 (24%).
+- Covered 536 (61%), partial only 131 (15%), gap 205 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 331 skills carry WRM tags. 159 proposals (117 new skills, 42 options on existing skills) would close every gap.
+- 332 skills carry WRM tags. 158 proposals (116 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -33,9 +33,9 @@ Sources:
 | Year 2 | 1 | 11 | 124 | 81 (65%) | 17 | 26 |
 | Year 3 | 2 | 12 | 134 | 81 (60%) | 22 | 31 |
 | Year 4 | 3 | 14 | 129 | 82 (64%) | 17 | 30 |
-| Year 5 | 4 | 15 | 136 | 84 (62%) | 21 | 31 |
+| Year 5 | 4 | 15 | 136 | 87 (64%) | 18 | 31 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **533 (61%)** | **134** | **205** |
+| **All** | | **97** | **872** | **536 (61%)** | **131** | **205** |
 
 ## Source disagreements
 
@@ -458,7 +458,7 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Closes (1): Y6.B2.S4 Rules of divisibility  
   _proposal id: divisibility_rules_
 
-### operations (25 proposals, 37 steps)
+### operations (24 proposals, 34 steps)
 
 - **To the Next Ten** — new skill `addition:bridge_to_next_ten`. Teaches adding to reach the next multiple of 10 (38 + 2 = 40), then crossing it (38 + 5 = 38 + 2 + 3), and subtracting back to a ten (43 - 3). Representation: a number line with the ten marked; write the jump to the ten and then the rest.  
   Closes (4): Y2.B2.S8 Add to the next 10; Y2.B2.S11 Subtract from a 10; Y3.B2.S6 Add 1s across a 10; Y3.B2.S8 Subtract 1s across a 10  
@@ -467,10 +467,6 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
 - **Related Times-Tables** — new skill `multiplication:related_tables`. Teaches using one table to find another: 2 → 4 → 8 by doubling, 3 → 6 → 12, 5 and 10, and 9 as 10 − 1. Representation: a three-column table with the known table given; fill the doubled table.  
   Closes (4): Y3.B3.S15 The 2, 4 and 8 times-tables; Y4.B4.S6 The 3, 6 and 9 times-tables; Y4.B5.S7 Related facts – multiplication and division; Y4.B5.S15 Efficient multiplication  
   _proposal id: tables_links_
-- **Long Multiplication and Division (4-digit)** — new skill `multiplication:long_multiplication_4x2`. Teaches long multiplication of a 4-digit by a 2-digit number, short division of a 4-digit number, and choosing an efficient division method. Representation: a column grid with carry boxes and the placeholder row; option: short division bus stop with exchange boxes.  
-  Closes (4): Y5.B5.S1 Multiply up to a 4-digit number by a 1-digit number; Y5.B5.S5 Multiply a 4-digit number by a 2-digit number; Y5.B5.S8 Divide a 4-digit number by a 1-digit number; Y5.B5.S10 Efficient division  
-  Strengthens: Y6.B2.S7  
-  _proposal id: long_mult_
 - **Bonds to 100** — new skill `addition:bonds_to_100`. Teaches pairs of tens that make 100 (30 + 70) and later any pair (37 + 63), from bonds to 10. Representation: a hundred square or bead string with part shaded; part-whole diagram; write the missing part.  
   Closes (2): Y2.B2.S4 Bonds to 100 (tens); Y3.B2.S19 Complements to 100  
   _proposal id: bonds_100_
@@ -481,6 +477,9 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
   Closes (2): Y4.B4.S12 Divide a number by 1 and itself; Y4.B4.S13 Multiply three numbers  
   Strengthens: Y4.B5.S2  
   _proposal id: mult_three_
+- **Division Using Factors** — new skill `division:divide_using_factors`. Teaches dividing by a 2-digit number by dividing by its factors in turn (420 ÷ 12 = 420 ÷ 2 ÷ 6). Representation: a two-step arrow diagram with the factor pair chosen.  
+  Closes (2): Y6.B2.S10 Division using factors; Y5.B5.S10 Efficient division  
+  _proposal id: div_factors_
 - **Part-Whole Model** — new skill `composing:part_whole_model`. Teaches parts and wholes: the cherry part-whole model, writing the four number sentences it shows, and finding a missing part. Representation: the bar/cherry part-whole diagram in B&W with one box empty; write the missing part or the number sentence.  
   Closes (1): Y1.B2.S1 Introduce parts and wholes  
   Strengthens: Y1.B2.S2  
@@ -525,9 +524,6 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
 - **Multiples of 10, 100 and 1,000 (option)** — option on `multiplication:mult_zeros`: multiples of 10, 100, 1,000. Teaches recognising and generating multiples of 10, 100 and 1,000. Representation: a "is it a multiple of" task on number_theory:multiples with base 10/100/1,000.  
   Closes (1): Y5.B3.S10 Multiples of 10, 100 and 1,000  
   _proposal id: mult_multiples_
-- **Division Using Factors** — new skill `division:divide_using_factors`. Teaches dividing by a 2-digit number by dividing by its factors in turn (420 ÷ 12 = 420 ÷ 2 ÷ 6). Representation: a two-step arrow diagram with the factor pair chosen.  
-  Closes (1): Y6.B2.S10 Division using factors  
-  _proposal id: div_factors_
 - **Long Division with Remainders (option)** — option on `division:long_div_2digit`: remainders. Teaches long division by a 2-digit number with remainders written as r, a fraction or a decimal. Representation: a remainder-form option on long_div_2digit.  
   Closes (1): Y6.B2.S12 Long division with remainders  
   _proposal id: long_div_rem_
@@ -3010,9 +3006,9 @@ whatever happens to the WRM gaps.
 
 #### Y5.B5 Spring Block 1: Multiplication and division B
 
-- **Y5.B5.S1** Multiply up to a 4-digit number by a 1-digit number — PARTIAL. _4.NBT.B.5_  
+- **Y5.B5.S1** Multiply up to a 4-digit number by a 1-digit number — covered. _4.NBT.B.5_  
+  Skills: Long Multiplication and Short Division (`multiplication:long_multiplication`)  
   Partial: Basic Multiplication (`multiplication:multiply`), missing 4-digit × 1-digit (the largest size is 3-digit × 1-digit)  
-  Proposal: Long Multiplication and Division (4-digit)  
   Vocabulary: column, exchange, estimate  
 - **Y5.B5.S2** Multiply a 2-digit number by a 2-digit number (area model) — covered. _4.NBT.B.5_  
   Skills: Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`) {2 × 2}  
@@ -3021,28 +3017,29 @@ whatever happens to the WRM gaps.
   Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 2-digit}; Write the Placeholder Zero (`multiplication:mult_placeholder_zero`)  
   Vocabulary: partial product, place holder, exchange  
 - **Y5.B5.S4** Multiply a 3-digit number by a 2-digit number — covered. _5.NBT.B.5, M.EE.5.NBT.5_  
-  Skills: Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`) {2 × 3}; Write the Placeholder Zero (`multiplication:mult_placeholder_zero`)  
+  Skills: Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`) {2 × 3}; Write the Placeholder Zero (`multiplication:mult_placeholder_zero`); Long Multiplication and Short Division (`multiplication:long_multiplication`)  
   Vocabulary: place holder, exchange  
-- **Y5.B5.S5** Multiply a 4-digit number by a 2-digit number — PARTIAL. _5.NBT.B.5, M.EE.5.NBT.5_  
+- **Y5.B5.S5** Multiply a 4-digit number by a 2-digit number — covered. _5.NBT.B.5, M.EE.5.NBT.5_  
+  Skills: Long Multiplication and Short Division (`multiplication:long_multiplication`)  
   Partial: Write the Placeholder Zero (`multiplication:mult_placeholder_zero`), missing a 4-digit by 2-digit long multiplication worked to the end  
-  Proposal: Long Multiplication and Division (4-digit)  
   Vocabulary: partial product, placeholder, exchange  
 - **Y5.B5.S6** Solve problems with multiplication — covered. _4.OA.A.3, M.EE.4.OA.3_  
   Skills: Mixed Word Problems (+−×÷) (Visual) (`number_ops_mixed:word_problems_mixed`); Multi-Step Word Problems (Visual) (`algebra:multi_step_word`)  
   Vocabulary: efficient, factor pair, adjust  
 - **Y5.B5.S7** Short division — covered. _4.NBT.B.6_  
-  Skills: Box Method Division (3÷1 digit) (`division:box_division_hard`); Zero in the Quotient (`division:div_zero_in_quotient`)  
+  Skills: Long Multiplication and Short Division (`multiplication:long_multiplication`); Box Method Division (3÷1 digit) (`division:box_division_hard`); Zero in the Quotient (`division:div_zero_in_quotient`)  
   Vocabulary: exchange, greatest place value, short division, bus stop  
-- **Y5.B5.S8** Divide a 4-digit number by a 1-digit number — PARTIAL. _4.NBT.B.6_  
+- **Y5.B5.S8** Divide a 4-digit number by a 1-digit number — covered. _4.NBT.B.6_  
+  Skills: Long Multiplication and Short Division (`multiplication:long_multiplication`)  
   Partial: Box Method Division (3÷1 digit) (`division:box_division_hard`), missing 4-digit dividends  
-  Proposal: Long Multiplication and Division (4-digit)  
   Vocabulary: exchange, placeholder, thousands column  
 - **Y5.B5.S9** Divide with remainders — covered. _4.NBT.B.6_  
   Skills: Division with Remainders (Visual) (`division:div_remainders`); Box Method Division (3÷1 digit) (`division:box_division_hard`); Is the Remainder Finished? (`division:remainder_too_big`)  
   Vocabulary: remainder, exchange, divisor  
 - **Y5.B5.S10** Efficient division — PARTIAL. _4.NBT.B.6_  
+  Partial: Long Multiplication and Short Division (`multiplication:long_multiplication`), missing short division is one efficient method; choosing between methods is not dealt  
   Partial: Area Model Division (3÷1 digit) (`division:area_model_div_3by1`), missing choosing an efficient method (factors, known facts, partitioning)  
-  Proposal: Long Multiplication and Division (4-digit)  
+  Proposal: Division Using Factors  
   Vocabulary: factor, factor pair, efficient  
 - **Y5.B5.S11** Solve problems with multiplication and division — covered. _4.OA.A.2, 4.OA.A.3, M.EE.4.OA.2, M.EE.4.OA.3_  
   Skills: Times as Many Word Problems (Visual) (`multiplication:mult_comparison`); Interpret the Remainder (Word Problems) (`division:remainder_interpret`); Mixed Word Problems (+−×÷) (Visual) (`number_ops_mixed:word_problems_mixed`)  
@@ -3375,15 +3372,14 @@ whatever happens to the WRM gaps.
   Proposal: Square and Cube Numbers  
   Vocabulary: square number, cube number, squared, cubed  
 - **Y6.B2.S7** Multiply up to a 4-digit number by a 2-digit number — covered. _5.NBT.B.5, M.EE.5.NBT.5_  
-  Skills: Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`)  
+  Skills: Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`); Long Multiplication and Short Division (`multiplication:long_multiplication`)  
   Partial: Write the Placeholder Zero (`multiplication:mult_placeholder_zero`), missing the whole 4-digit by 2-digit calculation  
-  Proposal: Long Multiplication and Division (4-digit)  
   Vocabulary: partial product, placeholder zero, exchange  
 - **Y6.B2.S8** Solve problems with multiplication — covered. _5.NBT.B.5, 4.OA.A.3, M.EE.5.NBT.5, M.EE.4.OA.3_  
   Skills: Mixed Word Problems (+−×÷) (Visual) (`number_ops_mixed:word_problems_mixed`); Multi-Step Word Problems (Visual) (`algebra:multi_step_word`)  
   Vocabulary: factor, adjust, efficient  
 - **Y6.B2.S9** Short division — covered. _5.NBT.B.6, M.EE.5.NBT.6_  
-  Skills: Box Method Division (3÷1 digit) (`division:box_division_hard`); Zero in the Quotient (`division:div_zero_in_quotient`)  
+  Skills: Long Multiplication and Short Division (`multiplication:long_multiplication`); Box Method Division (3÷1 digit) (`division:box_division_hard`); Zero in the Quotient (`division:div_zero_in_quotient`)  
   Vocabulary: divisor, remainder, exchange  
 - **Y6.B2.S10** Division using factors — GAP. _5.NBT.B.6, 3.OA.B.5, M.EE.5.NBT.6_  
   Proposal: Division Using Factors  

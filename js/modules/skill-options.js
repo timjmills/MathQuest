@@ -3362,7 +3362,7 @@ const OPS_BUILD_OPTIONS = {
         },
     ],
     // Entry 4 · Long Multiplication and Short Division (4.NBT.5-6, 5.NBT.5; WRM Y5 B5).
-    'multiplication:long_multiplication_4x2': [
+    'multiplication:long_multiplication': [
         {
             id: 'forms', label: 'What the pupil does', type: 'set', default: [0], group: 'difficulty',
             values: [

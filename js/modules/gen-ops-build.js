@@ -435,7 +435,7 @@ export function genAddSubPatterns(q) {
     return q;
 }
 
-/* ================================================ multiplication:long_multiplication_4x2 */
+/* ================================================ multiplication:long_multiplication */
 
 // Build list, lane operations, entry 4 (2026-09-26): long multiplication of a 3- or 4-digit
 // number by a 2-digit one (4.NBT.B.5, 5.NBT.B.5; WRM Y5.B5.S5), and short division of a 3- or
@@ -518,7 +518,7 @@ export function genLongMult(q) {
     q.a = a; q.b = b; q.op = '×';
     q.answerType = 'number';
     q.options = [];
-    q.hint = short ? `Multiply each digit of ${a} by ${ones}, from the ones. Write a carry small, in the box of the next place.`
+    q.hint = short ? `Multiply each digit of ${a} by ${ones}, from the ones. Write the tens small, in the box of the next place.`
         : `First ${a} × ${ones}. Then ${a} × ${tens * 10}: write 0 in the ones first. Add the two rows.`;
     q.skillLabel = short ? 'Short Multiplication' : 'Long Multiplication';
     q.lm = { kind, a, b, level, digits };
@@ -536,7 +536,7 @@ export const OPS_BUILD_SKILLS = Object.freeze({
     count_through_zero: genCountThroughZero,
     share_and_group_early: genShareGroupEarly,
     add_sub_patterns: genAddSubPatterns,
-    long_multiplication_4x2: genLongMult,
+    long_multiplication: genLongMult,
 });
 
 /** Generate `q` for a build-lane skill; false when the id is not one of them. */

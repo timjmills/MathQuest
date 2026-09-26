@@ -212,7 +212,7 @@ export const SKILL_STANDARDS = {
     'multiplication:mult_placeholder_zero': { ccss: ['4.NBT.B.5', '5.NBT.B.5'], ee: ['M.EE.5.NBT.5'] }, // Write the Placeholder Zero
     'multiplication:mult_missing_digit': { ccss: ['4.NBT.B.5'], ee: [] }, // Find the Missing Digit (Multiplication)
     // Build lane operations, entry 4 (2026-09-26): long multiplication and short division.
-    'multiplication:long_multiplication_4x2': { ccss: ['5.NBT.B.5', '4.NBT.B.5', '4.NBT.B.6'], ee: ['M.EE.5.NBT.5'] }, // Long Multiplication and Short Division
+    'multiplication:long_multiplication': { ccss: ['5.NBT.B.5', '4.NBT.B.5', '4.NBT.B.6'], ee: ['M.EE.5.NBT.5'] }, // Long Multiplication and Short Division
     'multiplication:count_by_tables': { ccss: ['3.OA.C.7', '3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Count by 1–12 (3.OA.7 prep: skip-counting the tables)
 
     // ---- division

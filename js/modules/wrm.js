@@ -375,7 +375,7 @@ export const SKILL_WRM = {
         { step: 'Y6.B2.S7', partial: 'the whole 4-digit by 2-digit calculation' },
     ],
     // Build lane operations, entry 4 (2026-09-26): long multiplication and short division.
-    'multiplication:long_multiplication_4x2': [
+    'multiplication:long_multiplication': [
         'Y5.B5.S1', 'Y5.B5.S4', 'Y5.B5.S5', 'Y5.B5.S7', 'Y5.B5.S8', 'Y6.B2.S7', 'Y6.B2.S9',
         { step: 'Y5.B5.S10', partial: 'short division is one efficient method; choosing between methods is not dealt' },
     ],
@@ -2289,7 +2289,7 @@ export const WRM_PROPOSALS = {
         representation: 'a two-step arrow diagram with the factor pair chosen',
         family: 'operations',
         // Y5.B5.S10 "Efficient division": choosing a method (the factor method among them) is
-        // what this entry adds beside long_multiplication_4x2's short division (2026-09-26)
+        // what this entry adds beside long_multiplication's short division (2026-09-26)
         steps: ['Y6.B2.S10', 'Y5.B5.S10'],
     },
     long_div_rem: {

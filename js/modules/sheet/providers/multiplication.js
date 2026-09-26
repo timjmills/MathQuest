@@ -225,7 +225,7 @@ registerSkill('multiplication:area_model_mult_hard', {
 // (fill, the factors on its edges, shading multiples, a row's rule), and each needs its own words.
 
 
-/* ================================================================ long_multiplication_4x2 */
+/* ================================================================ long_multiplication */
 
 // Build list, lane operations, entry 4 (2026-09-26): long multiplication (3- or 4-digit × 2-digit)
 // and short division (3- or 4-digit ÷ 1-digit). The item's own data is q.lm (gen-ops-build.js).
@@ -241,7 +241,7 @@ function lmStringsBy(pick) {
     return fn;
 }
 
-registerSkill('multiplication:long_multiplication_4x2', {
+registerSkill('multiplication:long_multiplication', {
     strings: lmStringsBy((q, ref = {}) => {
         const d = q ? lmOf(q) : null;
         const opts = ref.opts || {};
@@ -255,7 +255,7 @@ registerSkill('multiplication:long_multiplication_4x2', {
             return {
                 iCan: `I Can multiply and divide ${nd} numbers`,
                 instructionKey: 'long-mult-div',
-                steps: ['Read the sign: × or ÷.', 'Work one digit at a time.', 'Write carries small, in their boxes.', 'Write the answer in the boxes.'],
+                steps: ['Read the sign: × or ÷.', 'Work one digit at a time.', 'Write the extra tens small, in the boxes.', 'Write the answer in the boxes.'],
                 say: '__ times __ is __. / __ divided by __ is __.',
             };
         }
@@ -263,7 +263,7 @@ registerSkill('multiplication:long_multiplication_4x2', {
             return {
                 iCan: `I Can multiply a ${nd} number by a 1-digit number`,
                 instructionKey: 'short-mult',
-                steps: ['Multiply the ones.', 'Write the carry in the box of the next place.', 'Multiply the next digit. Add the carry.', 'Keep going to the last digit.'],
+                steps: ['Multiply the ones.', 'Write the tens in the box of the next place.', 'Multiply the next digit. Add the number in its box.', 'Keep going to the last digit.'],
                 say: '__ times __ is __.',
                 sayValues: (item) => { const e = lmOf(item); return e ? [e.a, e.b, e.a * e.b] : null; },
             };
@@ -285,7 +285,7 @@ registerSkill('multiplication:long_multiplication_4x2', {
             sayValues: (item) => { const e = lmOf(item); return e ? [e.a, e.b, e.a * e.b] : null; },
         };
     }),
-    misconceptions: ['no-placeholder', 'carry-wrong-row', 'dropped-exchange', 'dropped-carry'],
+    misconceptions: ['no-placeholder', 'carry-wrong-row', 'dropped-exchange', 'dropped-carry', 'subtracted', 'added'],
     workedSteps: (q) => {
         const d = lmOf(q);
         if (!d) return [];
@@ -309,7 +309,7 @@ registerSkill('multiplication:long_multiplication_4x2', {
             let c = 0;
             for (let i = A.length - 1; i >= 0 && out.length < 4; i--) {
                 const pr = Number(A[i]) * d.b + c;
-                out.push(step(`${A[i]} × ${d.b}${c ? ` + ${c}` : ''} = ${pr}${i > 0 && pr >= 10 ? `: write ${pr % 10}, carry ${Math.floor(pr / 10)}` : ''}.`));
+                out.push(step(`${A[i]} × ${d.b}${c ? ` + ${c}` : ''} = ${pr}${i > 0 && pr >= 10 ? `: write ${pr % 10}, and ${Math.floor(pr / 10)} in the next box` : ''}.`));
                 c = Math.floor(pr / 10);
             }
             out.push(step(`${d.a} × ${d.b} = ${d.a * d.b}.`, [{ slot: 'answer', value: String(d.a * d.b) }]));
@@ -330,20 +330,24 @@ registerSkill('multiplication:long_multiplication_4x2', {
             // the exchange dropped: every digit divided on its own, the remainders thrown away
             const v = Number(String(d.a).split('').map((x) => String(Math.floor(Number(x) / d.b))).join('')) || 0;
             return chooseWrong(q, [
-                v !== Math.floor(d.a / d.b) && v > 0 ? { value: v, misconception: 'dropped-exchange', explain: 'Did not carry what was left to the next digit.' } : null,
+                v !== Math.floor(d.a / d.b) && v > 0 ? { value: v, misconception: 'dropped-exchange', explain: 'Did not move what was left to the next digit.' } : null,
+                { value: d.a - d.b, misconception: 'subtracted', explain: 'Took the divisor away instead of dividing.' },
             ]);
         }
         if (d.kind === 'short') {
             // the carries dropped: each digit's product written alone, its tens thrown away
             const A = String(d.a);
             const v = Number(A.split('').map((x) => String((Number(x) * d.b) % 10)).join('')) || 0;
-            return chooseWrong(q, [v !== d.a * d.b ? { value: v, misconception: 'dropped-carry', explain: 'Did not add the carries.' } : null]);
+            return chooseWrong(q, [
+                v !== d.a * d.b ? { value: v, misconception: 'dropped-carry', explain: 'Did not add the numbers in the small boxes.' } : null,
+                { value: d.a + d.b, misconception: 'added', explain: 'Added instead of multiplied.' },
+            ]);
         }
         const ones = d.b % 10, tens = Math.floor(d.b / 10);
         return chooseWrong(q, [
             // the placeholder forgotten: the tens row added as if it were ones
             { value: d.a * ones + d.a * tens, misconception: 'no-placeholder', explain: 'The second row has no 0: it was added as ones, not tens.' },
-            { value: d.a * ones + d.a * tens * 10 + 10, misconception: 'carry-wrong-row', explain: 'A carry was added in the wrong row.' },
+            { value: d.a * ones + d.a * tens * 10 + 10, misconception: 'carry-wrong-row', explain: 'A small-box number was added in the wrong row.' },
         ]);
     },
 });

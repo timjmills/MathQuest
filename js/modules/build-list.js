@@ -298,15 +298,6 @@ export const STANDARD_PROPOSALS = {
         ladder: 'O2 facts to 5 × 5 → 10 × 10 · O3 comparison bar model → none · O6 bars / plain',
         misconceptions: ['reads 5 × 7 as "5 more than 7"', 'only one of the two statements is true'], wrmSteps: [], after: [],
     }),
-    mult_4x1: P({
-        kind: 'option', skill: 'multiplication:multiply', also: ['multiplication:area_model_mult'], option: 'size "4-digit × 1-digit" (tiles 41) on the column method and the area model',
-        name: 'Multiply a 4-Digit Number by a 1-Digit Number (option)', grade: '4', family: 'operations', standards: ['4.NBT.B.5'], ee: [],
-        teaches: 'multiplying a whole number of up to four digits by a one-digit number, with the area model and the column method side by side',
-        problemTypes: ['area model with four parts', 'column method with carries', 'match the model to the column', 'estimate first'],
-        templates: ['stack', 'area-model'], newTemplates: [], answer: 'write the product in the grid',
-        ladder: 'O2 no carry → carries → zero digits (3,045 × 6) · O3 carry boxes and partial products → none · O6 area model / column',
-        misconceptions: ['forgets a carry into the thousands', 'multiplies a zero digit as 1'], wrmSteps: ['Y4.B5.S11'], after: [],
-    }),
     explain_strategy: P({
         kind: 'new', skill: 'number_sense:why_it_works', name: 'Why Does It Work?', grade: '2', family: 'operations',
         standards: ['2.NBT.B.9'], ee: [],
