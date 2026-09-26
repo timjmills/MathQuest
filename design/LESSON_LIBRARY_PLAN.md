@@ -180,7 +180,8 @@ types". One design per page job, used by both the lesson packet and the Print sc
 | Warm-up / pre-skill check | the **Prerequisite Check** (§8b) | lesson sheet warm-up |
 | Independent / More practice | the lesson **practice** page (one frame, rows sized to content, min-size floors §8a) | practice page |
 | Review / Mixed practice | the lesson **mixed** page (earlier skills only, lesson skill ≥ half) | mixed page |
-| Find the mistake, Test, Reason it, Stretch | keep their jobs, but reuse the practice-page frame and row sizing | — |
+| Test, Reason it, Stretch | keep their jobs, but reuse the practice-page frame and row sizing | — |
+| Find the mistake (error analysis) | **dropped from lessons and from the pass bar** (owner ruling 2026-09-26, §8d) | — |
 
 Build order: the engine lane (E) extracts the lesson page builders into shared, archetype-driven modules
 (`sheet/lesson-pages/*`) during Phase 0 (samples byte-identical). The role lane then turns `roles/guided.js`,
@@ -188,6 +189,13 @@ Build order: the engine lane (E) extracts the lesson page builders into shared, 
 those builders for ANY skill, falling back to the old role only for skills whose archetype is not built yet. Providers
 supply the data both need (worked steps, cases, row-1 hint / level-2 cue, prerequisites). Each switched skill is
 re-graded by the critic; the old page stays until its replacement passes.
+
+## 8d. Owner ruling: no Find-the-mistake in lessons (2026-09-26)
+
+"Let's forgo the find the error type for future lessons." The error-analysis (Find the mistake) page is not part of any
+lesson packet or the lesson library, and it is **no longer part of the 8/10 pass bar**: critics do not grade it and a
+skill passes without it. The existing page stays printable from the Print screen as it is (frozen, no further work),
+except that the answer-giveaway fixes already made (formatted wrong values, fix-box widths) are kept.
 
 ## 9. Risks
 
