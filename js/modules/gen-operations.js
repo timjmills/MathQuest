@@ -1723,13 +1723,14 @@ function _generateLadderV2(q, skill, helpers, range) {
         q.hint = `${divisor} does not go into the next digit, so write 0 above it — do not skip the place. `
             + `${divisor} goes into ${String(dividend)[0]}${String(dividend).length > 3 ? String(dividend)[1] : ''} `
             + `${Math.floor(quotient / Math.pow(10, String(quotient).length - 1))} times, then 0, then finish.`;
-        q.visual = _wsCell(
-            `<div style="display:inline-flex;align-items:flex-end;font-size:1.9rem;font-weight:700;">`
-            + `<span style="padding-bottom:6px;">${divisor}</span>`
-            + `<div style="border-top:2.25px solid ${_WS_INK};border-left:2.25px solid ${_WS_INK};`
-            + `padding:6px 16px 6px 12px;border-top-left-radius:8px;">${dividend}</div></div>`
-            + `<div style="margin-top:8px;font-size:1rem;">Write a digit in <b>every</b> place of the answer.</div>`);
-        q.printFormat = 'long-division';
+        // The kit's `short-division` bus stop (lint 2026-09-26: the legacy bracket was Arial and had
+        // no named slot): a quotient box over EVERY digit, so the pupil sees the place the 0 must
+        // fill, and the exchange boxes carry what is left to the next digit. Paper, key and the
+        // screen twin are the same drawing; the quotient boxes are typed one digit each.
+        const _zqPayload = { dividend, divisor, level: 1 };
+        q.cell = { template: 'short-division', v: 1, payload: _zqPayload };
+        q.visual = _kitTwin('short-division', _zqPayload, { join: '' });
+        q.printFormat = 'short-div-kit';
         q.notation = 'bracket';
         return true;
     }
@@ -2084,7 +2085,10 @@ function _intLineKit(q, a, b, op) {
     q.nlMax = max;
 }
 
-const _KIT_FACT_SKILLS = new Set(['add_facts', 'mult_facts', 'div_facts', 'add', 'subtract']);
+const _KIT_FACT_SKILLS = new Set(['add_facts', 'mult_facts', 'div_facts', 'add', 'subtract', 'add_sub_10s', 'add_sub_100s']);
+// Adding and subtracting tens / hundreds ("60 + 10 = [ ]") are mental facts read across, whatever
+// their digits: the kit's horizontal fact, never a column (lint AK-4 on the legacy cell, 2026-09-26).
+const _KIT_ACROSS_SKILLS = new Set(['add_sub_10s', 'add_sub_100s']);
 const _KIT_OP = { '+': '+', '-': '-', '−': '-', '×': '*', '÷': '/' };
 
 /**
@@ -2112,6 +2116,11 @@ function _applyKitFactCell(q, skill, range) {
             return;
         }
         q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: 'horiz', digits } };
+        return;
+    }
+    if (_KIT_ACROSS_SKILLS.has(skill) && (op === '+' || op === '-')) {
+        q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: 'horiz', digits } };
+        q.notation = 'across';
         return;
     }
     const across = q.notation === 'across' || /horizontal/.test(String(q.printFormat || ''));
@@ -4401,6 +4410,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     : `Think: What number makes this subtraction true?`;
                 q.missingNumberData = { position, a, b, c };
                 q.printFormat = "missing-number";
+                // The kit's `equation` cell (lint AK-4, 2026-09-26: the legacy sentence's 40 px box
+                // was not a named slot, so the key stamped its answer under the cell). One box
+                // width for the whole page: the widest answer the band allows (L-LEAK).
+                q.cell = { template: 'equation', v: 1, payload: {
+                    a, b, op: position.includes('add') || position === 'sum' ? '+' : '-', result: c,
+                    unknown: position === 'first_add' || position === 'minuend' ? 'a' : position === 'second_add' || position === 'subtrahend' ? 'b' : 'result',
+                    digits: String(missingMax).length + (useDec ? dp + 1 : 0),
+                } };
                 q.options = buildNumericOptions(ans);
                 return;
             }
@@ -4573,13 +4590,15 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.missingNumberData = { position, a, b, c, displayText };
                 q.printFormat = "missing-factor";
                 // P11: a ÷ item written on a bracket or a fraction bar prints that way too (the kit's
-                // `equation` cell, its ÷ notation branch); Across keeps the one-line legacy cell.
-                if ((q.notation === 'bracket' || q.notation === 'fraction') && q.op === '÷') {
-                    q.cell = { template: 'equation', v: 1, payload: {
-                        a, b, op: '/', result: c, notation: q.notation, digits: String(ans).length,
-                        unknown: position === 'dividend' ? 'a' : position === 'divisor' ? 'b' : 'result',
-                    } };
-                }
+                // `equation` cell, its ÷ notation branch); Across is the same cell as one sentence
+                // (lint AK-4, 2026-09-26: the legacy box was not a named slot). One box width for the
+                // page: the widest answer the band allows, never this answer's own length (L-LEAK).
+                const _mmDiv2 = q.op === '÷';
+                q.cell = { template: 'equation', v: 1, payload: {
+                    a, b, op: _mmDiv2 ? '/' : '*', result: c, digits: String(mmFactorMax * mmFactorMax).length,
+                    ...(_mmDiv2 && (q.notation === 'bracket' || q.notation === 'fraction') ? { notation: q.notation } : {}),
+                    unknown: position === 'dividend' || position === 'first_factor' ? 'a' : position === 'divisor' || position === 'second_factor' ? 'b' : 'result',
+                } };
                 
                 q.visual = `<div style="text-align:center;font-size:1.5rem;font-weight:600;margin:20px 0;">
                     ${displayText || text}
