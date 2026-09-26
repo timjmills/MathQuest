@@ -217,6 +217,11 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'scaling-compare': 'Do _not_ multiply. Write <, > or = in the circle.',
     'story-fraction': 'Read the story. Write the answer.',
     'equal-or-not': 'Are they equal? Write = or ≠ in the circle.',
+    // O6 lane AP2 round 3 (2026-09-25): the figure and data cells moved to the kit.
+    'read-thermometer': 'Read the thermometer. Write the temperature.',
+    'read-ruler': 'Read the ruler. Write the number the arrow points to.',
+    'add-sides': 'Add the lengths of all the sides. Write the perimeter.',
+    tally: 'Use the tally chart. Answer the questions.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',

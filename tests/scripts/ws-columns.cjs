@@ -33,6 +33,11 @@ const ONE_COLUMN = {
     'number-line': { cols: 1, why: 'a number line needs the full width for 1 cm ticks and labels (RP number-line minimums)' },
     'hop-line': { cols: 1, why: 'a hop line needs the full width for its arcs and tick labels' },
     timeline: { cols: 1, why: 'an elapsed-time line needs the full width for its hour ticks and hops' },
+    // O6 lane AP2 round 3 (critic round 4): WORKSHEET_DESIGN_STANDARD.md section 11.2 gives the
+    // ruler and the graph plot one column each, and RP-133 keeps a graph and its question in one cell.
+    ruler: { cols: 1, why: 'a ruler prints at true scale only (RP-160): 6 inches is 158 mm, the whole live width (section 11.2: 1 column)' },
+    'bar-graph': { cols: 1, why: 'the plot area is 80 x 60 / 90 x 70 / 100 x 80 mm (section 11.2) and its question sits beside it in the same cell (RP-133)' },
+    pictograph: { cols: 1, why: 'a graph (section 11.2: 1 column): the table of up to 8 pictures a row, its key, and its question beside it in the same cell (RP-133)' },
     equation: { cols: { S: 3, M: 2, L: 2 }, why: 'at M / L an equation with two 2-digit numbers, a sign circle and a slot is wider than a 3-column cell at the size\'s digit height (DN-11: columns never shrink digits); 2 columns hold it' },
 };
 

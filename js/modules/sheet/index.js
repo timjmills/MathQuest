@@ -156,10 +156,14 @@ export {
 export { amountText } from './cells/coins.js';
 export const TM_TEMPLATE_IDS = ['clock', 'timeline', 'coins', 'money-columns'];
 
+// O6 lane AP2 round 3: the figure and data cells (thermometer, ruler, bar graph, perimeter shape).
+export { thermometerSVG, rulerSVG, barGraphSVG, perimeterSVG, splitMixed as figureSplitMixed, FIGURE_TEMPLATE_IDS } from './cells/figures.js';
+import { FIGURE_TEMPLATE_IDS } from './cells/figures.js';
+
 /** Which cell templates this build carries. `legacy` is registered by `adapters.js`. */
 export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv',
     'counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic', 'word-work',
-    ...OPS_TEMPLATE_IDS, ...TM_TEMPLATE_IDS, 'function-table'];
+    ...OPS_TEMPLATE_IDS, ...TM_TEMPLATE_IDS, 'function-table', ...FIGURE_TEMPLATE_IDS];
 
 /* ------------------------------------------------- skill providers (register on load) */
 // The real per-skill providers (strings, workedSteps, wrongAnswer, stories). Importing the

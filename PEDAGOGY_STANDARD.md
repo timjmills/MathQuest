@@ -1321,6 +1321,10 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `scaling-compare` | Do _not_ multiply. Write <, > or = in the circle. | multiplication as scaling: compare a fraction times a number with the number (added 2026-09-25, fractions lane) |
 | `story-fraction` | Read the story. Write the answer. | a fraction word problem: the story over its number sentence, the answer in the fraction boxes (added 2026-09-25, fractions lane) |
 | `equal-or-not` | Are they equal? Write = or ≠ in the circle. | equivalent fractions: two fractions, the pupil writes = or ≠ between them (added 2026-09-25, fractions lane) |
+| `read-thermometer` | Read the thermometer. Write the temperature. | read a thermometer: one box, the unit printed after it (added 2026-09-25, O6 lane AP2) |
+| `read-ruler` | Read the ruler. Write the number the arrow points to. | read an inch ruler at true scale: one answer slot, a whole box and a stacked fraction on a half / quarter ruler (added 2026-09-25, O6 lane AP2) |
+| `add-sides` | Add the lengths of all the sides. Write the perimeter. | perimeter of a drawn rectangle, square or triangle (added 2026-09-25, O6 lane AP2) |
+| `tally` | Use the tally chart. Answer the questions. | read a tally chart: one box, or one check box for the row with the most / least (added 2026-09-25, O6 lane AP2) |
 | `default-write` | Solve. Write the answer. | default adapter: skills with no provider, number or text answer |
 | `default-circle` | Circle the answer. | default adapter: choice items |
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |

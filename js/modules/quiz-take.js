@@ -212,7 +212,10 @@ const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlan
     // round 3: the kit cell travels with the item, so the quiz draws the paper's cell
     'cell', 'skillId', 'categoryId',
     // 2026-09-26: a fraction's two forms, graded from the cell's own boxes
-    'dualFractionAnswers'];
+    'dualFractionAnswers',
+    // AP2 round 3: a twin that prints its own question (a graph's) says its instruction here,
+    // as it does on the card and the worksheet
+    'screenInstr'];
 export function quizQuestionData(q) {
     if (!q) return null;
     const d = {
