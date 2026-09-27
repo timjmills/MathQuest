@@ -1676,6 +1676,7 @@ ALWAYS / SOMETIMES / NEVER
 **Purpose.** Mark by position: the same page with the answers in place. The facsimile answer key is a **base companion of every role, for every skill**: there is no page type and no skill without an answer sheet (owner ruling 2026-09-19; PT-KEY-7, PT-CMP-5).
 
 - **PT-KEY-1.** Every page of every role has a key, for every skill; a page with scored cells can never print without one being available. The key is the identical page rendered with `state: answered`: same geometry, same labels, same pagination. The lint checks that the key's cell count equals the pupil page's.
+- **PT-KEY-1a.** (owner ruling 2026-09-27; recorded, not yet built) The answers on every key print in red; the rest of the key stays a black-and-white facsimile of the pupil page. See WORKSHEET_DESIGN_STANDARD INK-31.
 - **PT-KEY-2.** Answers print in black Andika 700 in the answer slots, with regrouping marks, partial products, quotient working, drawn clock hands and shading shown (the flat grey, or hatch when Photocopy-safe). The key is black and white like everything else.
 - **PT-KEY-3.** The tab's id line reads `Answer Key` and "Answer Key" prints on the Name rule, so a key cannot be mistaken for a pupil page.
 - **PT-KEY-4.** Reduction is an option, never a default: full size, or 2-up (landscape). A reduced key is rendered from the size-S layout of the same items in the same cell order, never by scaling the page down (design standard AK-5, PG-20); no other reduction is offered. Text never drops below 7 pt on a key.

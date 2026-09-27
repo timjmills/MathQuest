@@ -45,12 +45,33 @@ custom score per problem / type of problem and the tagging of problems."
 - The key adds a **standards breakdown**: points per CCSS / EE / WRM step, so the teacher sees which standards a pupil
   missed.
 
+## Selecting skills — gallery + saved sets (owner, 2026-09-27; RECORDED, NOT YET BUILT)
+
+Owner: "whenever selecting problems for print, quiz, practice, etc. it should always show the gallery screen by default
+with thumbnails with options for big 3, medium 4, small 5 across, search bar, grade and domain and topic selection. So
+it's easy to select skills for the set. Then the set automatically saves in the browser unless deleted. There should be
+a sets area to see all the sets and to select for different things. Lesson selection will be different but can still
+use thumbnail view as well. Don't do this now. Just record."
+
+- **Gallery by default.** Every place a teacher picks skills (Practice paper, mixed review, Quiz, Send practice code,
+  practice) opens the gallery of skill thumbnails first.
+- **Thumbnail size choice:** Big = 3 across, Medium = 4, Small = 5 (on desktop; fewer where the screen is too narrow,
+  never a horizontal scroll). The list view stays available.
+- **Filter bar:** a search box plus Grade, Domain and Topic selection (the shared search also accepts WRM / CCSS / EE
+  codes).
+- **The set saves itself.** The skills chosen form a set that is saved in the browser automatically (localStorage, like
+  today's teacher sets) and stays until the teacher deletes it.
+- **Sets area.** One place lists every saved set (thumbnails or list); a set can be picked for any paper, quiz or
+  practice code.
+- **Lessons are picked separately** (the lesson library has its own picker), which may also use thumbnails.
+- Owner: the teacher-UI lane builds this when work resumes; it supersedes "three columns" below.
+
 ## Browsing skills, sets, lessons
 
 - **Thumbnail view and list view everywhere** a teacher picks from many things (skills library, the skill picker inside
   each paper, saved sets, the lesson library), with the same toggle in the same place, remembered per teacher.
 - **Thumbnails in three columns** (was two) on desktop; fewer columns only where the screen is too narrow (tablet 2,
-  phone 1) — never a horizontal scroll.
+  phone 1) — never a horizontal scroll. *(Superseded 2026-09-27 by the Big 3 / Medium 4 / Small 5 choice above.)*
 - The thumbnail shows the real first page (or the screen card) of that skill / set / lesson.
 - One consistent search-and-filter bar (grade, domain, WRM / CCSS / EE code, text).
 

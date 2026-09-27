@@ -33,6 +33,8 @@ below; this file only points to them.
 | Retire the I Can look; Daily look everywhere, single-skill pages keep an I Can line | `PAGE_TYPES.md` (on the teacher-UI lane branch) |
 | Rounding: plain rounding with a written answer, and one number rounded to 2+ places | met (critic pv-r3) |
 | Per-part "New numbers" for the built lessons; per-section refresh noted as a later option | `LESSON_LIBRARY_PLAN.md` §8e |
+| **2026-09-27, recorded, not built:** answers on every printed key are red (rest of the key and the pupil page stay B&W) | `WORKSHEET_DESIGN_STANDARD.md` INK-31, `PAGE_TYPES.md` PT-KEY-1a |
+| **2026-09-27, recorded, not built:** skill selection always opens a gallery (Big 3 / Medium 4 / Small 5 across, search, grade, domain, topic); the set auto-saves in the browser until deleted; a Sets area lists all sets for any paper; lessons have their own picker | `design/TEACHER_SCREENS.md` "Selecting skills" |
 
 Open questions for the owner: (1) "Practice map" tile — the UI lane wired it to the existing MAP tests screen; confirm
 or say what it should open. (2) money_count defaults to "all the same coin", so its worked example can't show two kinds
@@ -101,3 +103,4 @@ To recreate a lane: `git worktree add .claude/worktrees/<lane> -b <local-name> o
 2. If the worktrees survive: resume each lane with "resumed after owner pause; your tree is WIP-committed; continue
    from the Next column", at most 8 agents, browser gates one at a time.
 3. Critic every lane before merge; merge + full gates + stamp (`ws-stamp-assets`) + deploy what passes.
+4. To build on resume (owner rulings of 2026-09-27): red answers on keys (a small lane: key template colour + ink / print-lint rules), and the skill gallery + auto-saved sets + Sets area (teacher-UI lane).
