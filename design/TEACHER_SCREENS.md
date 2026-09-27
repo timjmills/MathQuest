@@ -63,6 +63,7 @@ use thumbnail view as well. Don't do this now. Just record."
   today's teacher sets) and stays until the teacher deletes it.
 - **Sets area.** One place lists every saved set (thumbnails or list); a set can be picked for any paper, quiz or
   practice code.
+- **Pick many at once** (owner, 2026-09-27): in both thumbnail and list view the teacher can select several skills in one go (tick each card or row, shift-click a range, "Select all shown" for the filtered view), then add them to the set together.
 - **Lessons are picked separately** (the lesson library has its own picker), which may also use thumbnails.
 - Owner: the teacher-UI lane builds this when work resumes; it supersedes "three columns" below.
 

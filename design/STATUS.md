@@ -34,7 +34,7 @@ below; this file only points to them.
 | Rounding: plain rounding with a written answer, and one number rounded to 2+ places | met (critic pv-r3) |
 | Per-part "New numbers" for the built lessons; per-section refresh noted as a later option | `LESSON_LIBRARY_PLAN.md` §8e |
 | **2026-09-27, recorded, not built:** answers on every printed key are red (rest of the key and the pupil page stay B&W) | `WORKSHEET_DESIGN_STANDARD.md` INK-31, `PAGE_TYPES.md` PT-KEY-1a |
-| **2026-09-27, recorded, not built:** skill selection always opens a gallery (Big 3 / Medium 4 / Small 5 across, search, grade, domain, topic); the set auto-saves in the browser until deleted; a Sets area lists all sets for any paper; lessons have their own picker | `design/TEACHER_SCREENS.md` "Selecting skills" |
+| **2026-09-27, recorded, not built:** skill selection always opens a gallery (Big 3 / Medium 4 / Small 5 across, search, grade, domain, topic); the set auto-saves in the browser until deleted; a Sets area lists all sets for any paper; lessons have their own picker; several skills can be selected in one go in thumbnail or list view | `design/TEACHER_SCREENS.md` "Selecting skills" |
 
 Open questions for the owner: (1) "Practice map" tile — the UI lane wired it to the existing MAP tests screen; confirm
 or say what it should open. (2) money_count defaults to "all the same coin", so its worked example can't show two kinds
