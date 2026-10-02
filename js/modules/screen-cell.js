@@ -522,31 +522,80 @@ export function wireStackEntry(root, { autofocus = false } = {}) {
 const LIVE_EXPECT = new WeakMap();
 const _liveNorm = (v) => String(v == null ? '' : v).replace(/[,\s]/g, '').replace(/[−–]/g, '-').replace(/[×xX*]/g, '×').toLowerCase();
 
-function _liveMark(el) {
+/*
+ * WAVE 1 / A2 (owner 2026-10-02): "Each answer box should turn green as it's filled if correct, or
+ * red if wrong." Each box is judged on its own against the value it was bound to (the same
+ * expectations as the green above, which come from each item's own answer data and accepted forms):
+ *   - right at once: `mq-live-correct` (green + a tick in the corner)
+ *   - wrong: `mq-live-wrong` (red + a cross in the corner) once the pupil leaves the box (blur or
+ *     Tab) or the box holds as many characters as its longest accepted answer
+ * Editing a red box clears its red; it is judged again when filled again. Colour is never the only
+ * cue (the corner mark), and the digits are never covered. A red box adds NO wrong try: the Skip
+ * count stays per Check press. The quiz never wires this (it would reveal answers).
+ */
+const LIVE_NUM = new WeakSet();       // a single numeric answer place: "7.0" and "7" are the same number
+const _isNum = (v) => v !== '' && v !== '-' && v !== '.' && Number.isFinite(Number(v));
+
+function _liveMark(el, final) {
     const want = LIVE_EXPECT.get(el);
     if (!want) return;
     const v = _liveNorm(el.value);
-    el.classList.toggle('mq-live-correct', v !== '' && want.some((w) => _liveNorm(w) === v));
+    const num = LIVE_NUM.has(el);
+    const ok = v !== '' && want.some((w) => _liveNorm(w) === v || (num && _isNum(v) && _isNum(_liveNorm(w)) && Number(v) === Number(_liveNorm(w))));
+    const maxLen = Math.max(...want.map((w) => _liveNorm(w).length));
+    // a single answer place judges on fill only when its answer is a number (anything else waits for Check)
+    const judgeable = !el.hasAttribute('data-mq-single') || num;
+    const bad = !ok && v !== '' && judgeable && (!!final || v.length >= maxLen);
+    el.classList.toggle('mq-live-correct', ok);
+    el.classList.toggle('mq-live-wrong', bad);
+    if (bad) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
 }
 
-function _liveBind(el, expected) {
+function _liveBind(el, expected, { single = false, numeric = false } = {}) {
     const list = (Array.isArray(expected) ? expected : [expected]).map((w) => String(w == null ? '' : w)).filter((w) => w !== '');
     if (!el || !list.length) return false;
     LIVE_EXPECT.set(el, list);
+    if (single) el.setAttribute('data-mq-single', '1'); else el.removeAttribute('data-mq-single');
+    if (numeric) LIVE_NUM.add(el); else LIVE_NUM.delete(el);
     if (el.dataset.mqLive !== '1') {
         el.dataset.mqLive = '1';
-        el.addEventListener('input', () => _liveMark(el));
-        el.addEventListener('change', () => _liveMark(el));
+        el.addEventListener('input', () => _liveMark(el, false));
+        el.addEventListener('change', () => _liveMark(el, true));
+        el.addEventListener('blur', () => _liveMark(el, true));
     }
-    _liveMark(el);
+    _liveMark(el, false);
     return true;
+}
+
+/**
+ * The host's Check judged the one answer place: colour the box (green / red + its corner mark)
+ * and keep the host's own message (no double feedback). Only a visible place that IS the answer,
+ * never a hidden host fed by several boxes.
+ */
+export function markBoxSubmitted(el, ok) {
+    if (!el || el.type === 'hidden' || el.classList.contains('mq-cellslot-host')) return;
+    if (!el.offsetWidth && !el.offsetHeight) return;
+    el.classList.toggle('mq-live-correct', !!ok);
+    el.classList.toggle('mq-live-wrong', !ok);
+    if (!ok) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
+    if (el.dataset.mqSubmitMark !== '1') {
+        el.dataset.mqSubmitMark = '1';
+        el.addEventListener('input', () => {
+            if (LIVE_EXPECT.has(el)) return;               // a bound box re-judges itself
+            el.classList.remove('mq-live-wrong', 'mq-live-correct');
+            el.removeAttribute('aria-invalid');
+        });
+    }
 }
 
 /** Stop marking an input that outlives its cell (the practice card's #answerInput). */
 export function unwireLiveCorrect(el) {
     if (!el) return;
     LIVE_EXPECT.delete(el);
-    el.classList.remove('mq-live-correct');
+    LIVE_NUM.delete(el);
+    el.removeAttribute('data-mq-single');
+    el.classList.remove('mq-live-correct', 'mq-live-wrong');
+    el.removeAttribute('aria-invalid');
 }
 
 /**
@@ -654,7 +703,7 @@ export function wireLiveCorrect(root, { q = null, kind = null, single = null } =
         const whole = a != null && typeof a !== 'object' ? [String(a)] : [];
         if (Array.isArray(q.acceptedAnswers)) q.acceptedAnswers.forEach((x) => { if (x != null && typeof x !== 'object') whole.push(String(x)); });
         if (typeof a === 'number' && Number.isInteger(a)) whole.push(a.toLocaleString('en-US'));
-        if (whole.length && _liveBind(single, whole)) n++;
+        if (whole.length && _liveBind(single, whole, { single: true, numeric: q.answerType === 'number' || typeof a === 'number' })) n++;
     }
     return n;
 }

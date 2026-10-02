@@ -1375,6 +1375,53 @@ html body .hint-speak-btn { min-width: 44px; min-height: 44px; }
 .student-start-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 0 var(--mq-orange-d); }
 @media (max-width: 480px) { .student-start-btn { flex: 1 1 44%; max-width: none; min-height: 56px; padding: 10px 12px; font-size: 1.05rem; } }
 
+/* ---- WAVE 1 / A2 (2026-10-02). Per-box feedback: each answer box turns green when right, red when
+   wrong (screen-cell.js wireLiveCorrect / markBoxSubmitted). PRACTICE CARD and ONLINE WORKSHEET
+   only; the quiz never wires it (it would reveal answers); print never loads it.
+   INK-6 spirit: colour is never the only cue - a tick or a cross sits in the box's top-right
+   corner, small enough to clear the digits. Tokens: AA on white (green 5.6:1, red 6.5:1); the
+   digits stay black on the pale fills. No motion, so nothing to reduce. */
+:root {
+    --mq-box-ok: #1B7A43;  --mq-box-ok-bg: #E3F4EA;
+    --mq-box-bad: #B3261E; --mq-box-bad-bg: #FDE7E4;
+}
+html body .mq-scell input.mq-live-wrong,
+html body .mq-scell .mq-kit input.mq-digit.mq-live-wrong,
+html body .mq-scell .mq-kit input.mq-carry.mq-live-wrong,
+html body .mq-scell.mq-scell .mq-kit :is(.ab, .rg)[data-ws-seg] > input.mq-live-wrong.mq-live-wrong {
+    background-color: var(--mq-box-bad-bg) !important; color: #000 !important;
+    border-color: var(--mq-box-bad) !important;
+    box-shadow: inset 0 0 0 3px var(--mq-box-bad) !important;
+}
+html body .mq-scell [data-mq-cell]:has(> input.mq-live-wrong),
+html body .mq-scell .mq-cellbox:has(> input.mq-live-wrong) { border-color: var(--mq-box-bad) !important; background: var(--mq-box-bad-bg) !important; }
+/* a drawn tile (count rows, chart gaps) keeps its own white fill on the tile, and its input is clear
+   (line 1163 above): the verdict fill goes on the input, which covers the tile */
+html body .mq-scell [data-mq-cell] > input.mq-cellslot.mq-live-correct { background-color: var(--mq-box-ok-bg) !important; }
+html body .mq-scell [data-mq-cell] > input.mq-cellslot.mq-live-wrong { background-color: var(--mq-box-bad-bg) !important; }
+/* the corner marks: an SVG in the box's own background, so it never moves the layout or the digits */
+html body .mq-scell input.mq-live-correct.mq-live-correct,
+html body .mq-scell .mq-kit input.mq-live-correct.mq-live-correct,
+html body .mq-scell.mq-scell .mq-kit :is(.ab, .rg)[data-ws-seg] > input.mq-live-correct.mq-live-correct.mq-live-correct {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M3.5 10.5l4.2 4.2L16.5 5.5' fill='none' stroke='%231B7A43' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important; background-position: top 4px right 4px !important; background-size: 13px 13px !important;
+}
+html body .mq-scell input.mq-live-wrong.mq-live-wrong,
+html body .mq-scell .mq-kit input.mq-live-wrong.mq-live-wrong,
+html body .mq-scell.mq-scell .mq-kit :is(.ab, .rg)[data-ws-seg] > input.mq-live-wrong.mq-live-wrong.mq-live-wrong {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M4.5 4.5l11 11M15.5 4.5l-11 11' fill='none' stroke='%23B3261E' stroke-width='3.4' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important; background-position: top 4px right 4px !important; background-size: 13px 13px !important;
+}
+/* one cue, not two: a digit box that carries the corner mark does not also hang the older round
+   badge off its bottom-right corner */
+html body .mq-scell .mq-kit .ab:has(> input.mq-live-correct)::after,
+html body .mq-scell .mq-kit .ab:has(> input.mq-live-wrong)::after { content: none !important; display: none !important; }
+/* the box the pupil is in right now keeps the Lane A yellow pulse (focus beats the verdict colour);
+   the corner mark still shows, and the colour appears the moment the pupil leaves the box */
+@media print {
+    html body .mq-scell input.mq-live-wrong, html body .mq-scell input.mq-live-correct { background-image: none !important; }
+}
+
 /* Wave 1 lane C: the ten-column chart on a phone keeps rows of ten at SP-10's 34.5 x 44 px or more:
    its writing slots and inputs fill their square and never widen it (the generic 44 px floor on a
    [data-mq-cell] would push each slot into its neighbour), and on a phone the chart takes the card's

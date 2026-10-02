@@ -11,7 +11,7 @@ import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, wireCellInputs, signsFor,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, wireCellInputs, signsFor,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
 } from './screen-cell.js';
 
@@ -2380,6 +2380,7 @@ export function checkWorksheetAnswer(idx) {
         card.style.background = "linear-gradient(135deg, rgba(6,214,160,0.25), rgba(0,191,165,0.15))";
         card.style.border = "3px solid var(--correct)";
         card.style.boxShadow = "0 6px 20px rgba(6,214,160,0.3)";
+        markBoxSubmitted(input, true);      // Wave 1 / A2: the one answer place shows the verdict too
         input.disabled = true;
         wsRecordAnswer(idx, true);
 
@@ -2405,6 +2406,7 @@ export function checkWorksheetAnswer(idx) {
         input.style.background = "rgba(239,71,111,0.15)";
         card.style.background = "rgba(239,71,111,0.08)";
         card.style.border = "2px solid var(--incorrect)";
+        markBoxSubmitted(input, false);
         wsRecordAnswer(idx, false);
     }
 }
