@@ -27,7 +27,7 @@
 // widget on demand).
 // No window writes; no state import.
 
-import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
+import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
 import { optionsFor, resolveAnsBox } from './skill-options.js';
 import {
     supportsForItem, canDraw, supportNeeds, touchNumbers, touchColumns, touchNumberHTML, touchOpts, touchDigit,
@@ -574,31 +574,349 @@ export function wireStackEntry(root, { autofocus = false } = {}) {
 const LIVE_EXPECT = new WeakMap();
 const _liveNorm = (v) => String(v == null ? '' : v).replace(/[,\s]/g, '').replace(/[−–]/g, '-').replace(/[×xX*]/g, '×').toLowerCase();
 
-function _liveMark(el) {
+/*
+ * WAVE 1 / A2 (owner 2026-10-02): "Each answer box should turn green as it's filled if correct, or
+ * red if wrong." Each box is judged on its own against the value it was bound to (the same
+ * expectations as the green above, which come from each item's own answer data and accepted forms):
+ *   - right at once: `mq-live-correct` (green + a tick in the corner)
+ *   - wrong: `mq-live-wrong` (red + a cross in the corner) once the pupil leaves the box (blur or
+ *     Tab) or the box holds as many characters as its longest accepted answer
+ * Editing a red box clears its red; it is judged again when filled again. Colour is never the only
+ * cue (the corner mark), and the digits are never covered. A red box adds NO wrong try: the Skip
+ * count stays per Check press. The quiz never wires this (it would reveal answers).
+ */
+const LIVE_NUM = new WeakSet();       // a single numeric answer place: "7.0" and "7" are the same number
+const _isNum = (v) => v !== '' && v !== '-' && v !== '.' && Number.isFinite(Number(v));
+
+// Leaving a box for the item's own Hint / Read / Check / speaker / Skip is not "leaving the box":
+// the entry may be half typed, so it is not judged (red) until the pupil goes to another answer
+// box or away from the item. relatedTarget covers keyboard and most pointers; the pointerdown
+// stamp covers browsers whose buttons take no focus on click.
+const _CONTROL_SEL = 'button, a[href], [role="button"], .hint-popup, .mq-wsbar, #hintBtn, .hint-btn, .ws-tts-btn';
+let _lastControlDown = 0;
+if (typeof document !== 'undefined' && !window.__mqCtlDownBound) {
+    window.__mqCtlDownBound = true;
+    document.addEventListener('pointerdown', (e) => { if (e.target && e.target.closest && e.target.closest(_CONTROL_SEL)) _lastControlDown = Date.now(); }, true);
+}
+function _toControl(e) {
+    const t = e && e.relatedTarget;
+    if (t && t.closest && t.closest(_CONTROL_SEL)) return true;
+    return !t && Date.now() - _lastControlDown < 700;
+}
+
+const LIVE_FN = new WeakMap();        // a box judged by a function of its value (a rule table's "make" rows)
+
+/*
+ * The tick / cross badge sits on the box's OUTER corner, never on its digits, and clear of everything
+ * else in the item (another answer box, a jump arc, a bar or rule, a label). It is a child of the item's
+ * own card (#questionCard / .problem-card), placed against that card, so a dialog, the settings panel or
+ * the hint box covers it exactly as it covers the box. It is placed again when the box or the card
+ * changes size (ResizeObserver), on resize, and when the card scrolls; the box's own classes say which
+ * badge it shows and it goes with the box.
+ */
+const BADGES = new Map();            // box -> { b: the badge span, host: the item card }
+let _badgeSeq = 0;
+let _badgeRO = null;
+let _badgeRaf = 0;
+let _measureCtx = null;
+/** Where the pupil's digits are in a box (viewport px): the text's width, and the cap height about the middle. */
+function _writtenRect(el, r) {
+    const v = String(el.value || '');
+    if (!v) return null;
+    try {
+        _measureCtx = _measureCtx || document.createElement('canvas').getContext('2d');
+        const cs = getComputedStyle(el);
+        _measureCtx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+        const tw = _measureCtx.measureText(v).width;
+        const fs = parseFloat(cs.fontSize) || 16;
+        const pl = parseFloat(cs.paddingLeft) || 0, pr = parseFloat(cs.paddingRight) || 0, bw = parseFloat(cs.borderLeftWidth) || 0;
+        const left = /left|start/.test(cs.textAlign) ? r.left + bw + pl : r.left + pl + (r.width - pl - pr) / 2 - tw / 2;
+        return { l: left, r: left + tw, t: r.top + r.height / 2 - 0.36 * fs, b: r.top + r.height / 2 + 0.36 * fs };
+    } catch (e) { return null; }
+}
+const _rectOf = (q) => ({ l: q.left, r: q.right, t: q.top, b: q.bottom });
+const _overlapArea = (a, b) => Math.max(0, Math.min(a.r, b.r) - Math.max(a.l, b.l)) * Math.max(0, Math.min(a.b, b.b) - Math.max(a.t, b.t));
+const _BOX_FRAME = 'table, tr, td, th, tbody, [data-mq-cell], .k2-tile, .ab, .rg, .mq-cellbox, .mq-slothost';
+const _BADGE_SKIP = '.mq-wsbar, .hint-popup, button, .mq-live-badge, .mq-sr, script, style';
+
+/** What a badge must not sit on in this item (viewport rects): the digits written in the box, other answer
+ *  boxes, drawn arcs and lines, text (labels, numbers, signs) and the rules and bars (element borders). */
+function _obstacles(host, el, r) {
+    const out = [];
+    const w = _writtenRect(el, r);
+    if (w) out.push(w);
+    host.querySelectorAll('input:not([type="hidden"]), textarea').forEach((o) => {
+        if (o === el) return;
+        const q = o.getBoundingClientRect();
+        if (q.width && q.height) out.push(_rectOf(q));
+    });
+    host.querySelectorAll('svg path, svg line, svg polyline, svg text').forEach((o) => {
+        if (o.closest(_BADGE_SKIP)) return;
+        if (o.tagName === 'path' && typeof o.getTotalLength === 'function' && typeof o.getScreenCTM === 'function') {
+            // a curve (a jump arc) is its stroke, not the empty box around it: sample along it
+            try {
+                const m = o.getScreenCTM(); const svg = o.ownerSVGElement; const len = o.getTotalLength();
+                if (m && svg && len > 0) {
+                    for (let d = 0; d <= len + 0.1; d += 4) {
+                        const pt = svg.createSVGPoint(); const p0 = o.getPointAtLength(Math.min(d, len)); pt.x = p0.x; pt.y = p0.y;
+                        const sp = pt.matrixTransform(m);
+                        out.push({ l: sp.x - 1.5, r: sp.x + 1.5, t: sp.y - 1.5, b: sp.y + 1.5 });
+                    }
+                    return;
+                }
+            } catch (e) { /* fall back to the box */ }
+        }
+        const q = o.getBoundingClientRect();
+        if (q.width || q.height) out.push(_rectOf(q));
+    });
+    const walker = document.createTreeWalker(host, NodeFilter.SHOW_TEXT);
+    const rng = document.createRange();
+    while (walker.nextNode()) {
+        const t = walker.currentNode;
+        if (!/\S/.test(t.nodeValue || '')) continue;
+        const pe = t.parentElement;
+        if (!pe || pe.closest(_BADGE_SKIP) || pe.tagName === 'OPTION') continue;
+        rng.selectNodeContents(t);
+        Array.from(rng.getClientRects()).forEach((q) => { if (q.width && q.height) out.push(_rectOf(q)); });
+    }
+    host.querySelectorAll('*').forEach((o) => {
+        if (o === el || o.contains(el) || o.closest(_BADGE_SKIP) || o.tagName === 'svg' || o.closest('svg')) return;
+        // a grid's own lines and an answer box's own tile are the box's surroundings, not rules to keep clear of
+        if (o.matches(_BOX_FRAME)) return;
+        const cs = getComputedStyle(o);
+        if (cs.display === 'none' || cs.visibility === 'hidden') return;
+        const q = o.getBoundingClientRect();
+        if (!q.width || !q.height) return;
+        const e = (side) => (cs['border' + side + 'Style'] !== 'none' ? parseFloat(cs['border' + side + 'Width']) || 0 : 0);
+        const T = e('Top'), B = e('Bottom'), Lf = e('Left'), Rt = e('Right');
+        if (T >= 1) out.push({ l: q.left, r: q.right, t: q.top, b: q.top + T });
+        if (B >= 1) out.push({ l: q.left, r: q.right, t: q.bottom - B, b: q.bottom });
+        if (Lf >= 1) out.push({ l: q.left, r: q.left + Lf, t: q.top, b: q.bottom });
+        if (Rt >= 1) out.push({ l: q.right - Rt, r: q.right, t: q.top, b: q.bottom });
+    });
+    return out;
+}
+
+/** Where the badge goes: as near the box's top-right corner as it can sit without touching anything. The
+ *  band around the box (and its inside, if the box is roomy) is searched in 3 px steps, nearest the corner
+ *  first, outside the box before inside; the position with no overlap is taken, else the least overlap. */
+function _badgeSpot(el, r, host) {
+    const w = r.width, h = r.height;
+    const cands = [];
+    for (let L = -19; L <= w + 1; L += 3) {
+        for (let T = -19; T <= h + 1; T += 3) {
+            const cx = L + 9, cy = T + 9;
+            const inside = cx > 6 && cx < w - 6 && cy > 6 && cy < h - 6;
+            // only the band around the box, or the inside of a roomy box
+            if (!inside && !(cx < 3 || cx > w - 3 || cy < 3 || cy > h - 3)) continue;
+            cands.push({ c: [L, T], d: Math.hypot(cx - w, cy) + (inside ? 14 : 0) });
+        }
+    }
+    cands.sort((x, y) => x.d - y.d);
+    const obs = _obstacles(host, el, r);
+    let best = [w - 12, -11], bestArea = Infinity;
+    for (const { c } of cands) {
+        const box = { l: r.left + c[0], r: r.left + c[0] + 18, t: r.top + c[1], b: r.top + c[1] + 18 };
+        let area = 0;
+        for (const o of obs) { area += _overlapArea(box, o); if (area >= bestArea) break; }
+        if (area < bestArea) { best = c; bestArea = area; if (area === 0) break; }
+    }
+    return best;
+}
+
+function _badgePlace(el) {
+    const rec = BADGES.get(el);
+    if (!rec) return;
+    const { b, host } = rec;
+    const kind = el.classList.contains('mq-live-wrong') ? 'bad' : el.classList.contains('mq-live-correct') ? 'ok' : '';
+    if (!el.isConnected || !host.isConnected || !kind) { _badgeDrop(el); return; }
+    b.dataset.kind = kind;
+    const r = el.getBoundingClientRect();
+    // not shown while the box is not, nor while this item's hint box is open over it
+    const hintOpen = !!host.querySelector('.hint-popup.active');
+    // a box scrolled out of view inside its own swipe row (a ten-column chart, a number line) hides its badge
+    let clipped = false;
+    for (let a = el.parentElement; a && a !== host; a = a.parentElement) {
+        const ox = getComputedStyle(a).overflowX;
+        if ((ox === 'auto' || ox === 'scroll' || ox === 'hidden') && a.scrollWidth > a.clientWidth + 1) {
+            const q = a.getBoundingClientRect();
+            if (r.right <= q.left + 2 || r.left >= q.right - 2) { clipped = true; break; }
+        }
+    }
+    if (!r.width || !r.height || hintOpen || clipped) { b.style.display = 'none'; return; }
+    b.style.display = '';
+    const c = _badgeSpot(el, r, host);
+    const hr = host.getBoundingClientRect();
+    b.style.left = Math.round(r.left + c[0] - hr.left - host.clientLeft + host.scrollLeft) + 'px';
+    b.style.top = Math.round(r.top + c[1] - hr.top - host.clientTop + host.scrollTop) + 'px';
+}
+function _badgeDrop(el) {
+    const rec = BADGES.get(el);
+    if (!rec) return;
+    rec.b.remove();
+    BADGES.delete(el);
+    if (_badgeRO) { try { _badgeRO.unobserve(el); } catch (e) { /* gone */ } }
+    delete el.dataset.mqBadge;
+}
+/** Badges whose box has left the page (a new question drew over the card) go with it. */
+export function pruneBadges() {
+    Array.from(BADGES.keys()).forEach((el) => { if (!el.isConnected) _badgeDrop(el); });
+}
+function _badgePlaceAll() {
+    _badgeRaf = 0;
+    Array.from(BADGES.keys()).forEach(_badgePlace);
+}
+function _badgeSoon() {
+    if (!_badgeRaf && typeof requestAnimationFrame === 'function') _badgeRaf = requestAnimationFrame(_badgePlaceAll);
+}
+function _badgeTrack(el) {
+    if (typeof document === 'undefined' || !document.body) return;
+    const host = el.closest('#questionCard, .problem-card');
+    if (!host) return;
+    pruneBadges();
+    if (!BADGES.has(el)) {
+        if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+        const b = document.createElement('span');
+        b.className = 'mq-live-badge';
+        b.setAttribute('aria-hidden', 'true');
+        const id = String(++_badgeSeq);
+        b.dataset.id = id; el.dataset.mqBadge = id;
+        host.appendChild(b);
+        BADGES.set(el, { b, host });
+        if (typeof ResizeObserver === 'function') {
+            _badgeRO = _badgeRO || new ResizeObserver(_badgeSoon);
+            _badgeRO.observe(el); _badgeRO.observe(host);
+        }
+        if (host.dataset.mqBadgeHost !== '1') {
+            host.dataset.mqBadgeHost = '1';
+            host.addEventListener('scroll', _badgeSoon, true);
+            window.addEventListener('resize', _badgeSoon);
+        }
+    }
+    _badgeSoon();
+    // the layout settles after the verdict (fonts, a ladder step, the screen-fit pass); never while the
+    // pupil is typing in this card (the scan must not slow the keys)
+    const settle = () => { const a = document.activeElement; if (!(a && a.tagName === 'INPUT' && host.contains(a))) _badgePlace(el); };
+    setTimeout(settle, 150);
+    setTimeout(settle, 600);
+}
+
+function _liveSet(el, ok, bad) {
+    el.classList.toggle('mq-live-correct', ok);
+    el.classList.toggle('mq-live-wrong', bad);
+    if (ok || bad) _badgeTrack(el);
+    if (bad) {
+        el.setAttribute('aria-invalid', 'true');
+        // owner 2026-10-02: an item whose box went red before it was checked right is "helped"
+        const host = el.closest('.problem-card, #questionCard');
+        if (host) host.dataset.mqHelped = '1';
+    } else el.removeAttribute('aria-invalid');
+}
+
+/** Did any box of this item (the practice card, or a worksheet card) go red since it was drawn? */
+export function itemWasHelped(host) {
+    return !!host && host.dataset && host.dataset.mqHelped === '1';
+}
+
+function _liveMark(el, final) {
+    const fn = LIVE_FN.get(el);
+    if (fn) {
+        const raw = String(el.value == null ? '' : el.value).trim();
+        const verdict = raw === '' ? null : fn(raw);
+        _liveSet(el, verdict === true, verdict === false && !!final);
+        return;
+    }
     const want = LIVE_EXPECT.get(el);
     if (!want) return;
     const v = _liveNorm(el.value);
-    el.classList.toggle('mq-live-correct', v !== '' && want.some((w) => _liveNorm(w) === v));
+    const num = LIVE_NUM.has(el);
+    const ok = v !== '' && want.some((w) => _liveNorm(w) === v || (num && _isNum(v) && _isNum(_liveNorm(w)) && Number(v) === Number(_liveNorm(w))));
+    const maxLen = Math.max(...want.map((w) => _liveNorm(w).length));
+    // a single answer place judges on fill only when its answer is a number (anything else waits for Check)
+    const judgeable = !el.hasAttribute('data-mq-single') || num;
+    // a number entry that starts with 0 is still being written ("07" is accepted for 7): not red yet
+    const zeroLead = num && /^-?0/.test(v) && v.length < maxLen + 1;
+    const bad = !ok && v !== '' && judgeable && ((!!final) || (v.length >= maxLen && !zeroLead));
+    _liveSet(el, ok, bad);
 }
 
-function _liveBind(el, expected) {
+function _liveBind(el, expected, { single = false, numeric = false } = {}) {
     const list = (Array.isArray(expected) ? expected : [expected]).map((w) => String(w == null ? '' : w)).filter((w) => w !== '');
     if (!el || !list.length) return false;
     LIVE_EXPECT.set(el, list);
+    if (single) el.setAttribute('data-mq-single', '1'); else el.removeAttribute('data-mq-single');
+    if (numeric) LIVE_NUM.add(el); else LIVE_NUM.delete(el);
     if (el.dataset.mqLive !== '1') {
         el.dataset.mqLive = '1';
-        el.addEventListener('input', () => _liveMark(el));
-        el.addEventListener('change', () => _liveMark(el));
+        el.addEventListener('input', () => _liveMark(el, false));
+        el.addEventListener('change', () => _liveMark(el, false));      // the blur that follows judges it
+        el.addEventListener('blur', (e) => _liveMark(el, !_toControl(e)));
     }
-    _liveMark(el);
+    _liveMark(el, false);
     return true;
+}
+
+/**
+ * Bind a box to a judge: fn(value) -> true | false | null (null: cannot be judged yet). `group` is
+ * the other boxes the verdict depends on (a rule table's Out box depends on its In box): when one
+ * of them changes, the rest are judged again - a box the pupil has left is judged as final.
+ */
+function _liveBindFn(el, fn, group = []) {
+    if (!el || typeof fn !== 'function') return false;
+    LIVE_FN.set(el, fn);
+    LIVE_EXPECT.set(el, ['']);             // marks the box as bound (unwire, markBoxSubmitted)
+    if (el.dataset.mqLive !== '1') {
+        el.dataset.mqLive = '1';
+        // The other boxes of the group are re-judged as UNFINISHED (a half-typed In number must not turn
+        // its neighbours red); a box that is already red stays red unless it is now right.
+        const again = (final) => {
+            _liveMark(el, final);
+            group.forEach((o) => {
+                if (o === el || !String(o.value || '').trim()) return;
+                const wasRed = o.classList.contains('mq-live-wrong');
+                _liveMark(o, false);
+                if (wasRed && !o.classList.contains('mq-live-correct')) _liveSet(o, false, true);
+            });
+        };
+        el.addEventListener('input', () => again(false));
+        el.addEventListener('change', () => again(false));
+        el.addEventListener('blur', (e) => again(!_toControl(e)));
+    }
+    _liveMark(el, false);
+    return true;
+}
+
+/**
+ * The host's Check judged the one answer place: colour the box (green / red + its corner mark)
+ * and keep the host's own message (no double feedback). Only a visible place that IS the answer,
+ * never a hidden host fed by several boxes.
+ */
+export function markBoxSubmitted(el, ok) {
+    if (!el || el.type === 'hidden' || el.classList.contains('mq-cellslot-host')) return;
+    if (!el.offsetWidth && !el.offsetHeight) return;
+    el.classList.toggle('mq-live-correct', !!ok);
+    el.classList.toggle('mq-live-wrong', !ok);
+    _badgeTrack(el);
+    if (!ok) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
+    if (el.dataset.mqSubmitMark !== '1') {
+        el.dataset.mqSubmitMark = '1';
+        el.addEventListener('input', () => {
+            if (LIVE_EXPECT.has(el)) return;               // a bound box re-judges itself
+            el.classList.remove('mq-live-wrong', 'mq-live-correct');
+            el.removeAttribute('aria-invalid');
+        });
+    }
 }
 
 /** Stop marking an input that outlives its cell (the practice card's #answerInput). */
 export function unwireLiveCorrect(el) {
     if (!el) return;
     LIVE_EXPECT.delete(el);
-    el.classList.remove('mq-live-correct');
+    LIVE_NUM.delete(el);
+    LIVE_FN.delete(el);
+    el.removeAttribute('data-mq-single');
+    el.classList.remove('mq-live-correct', 'mq-live-wrong');
+    el.removeAttribute('aria-invalid');
 }
 
 /**
@@ -645,6 +963,103 @@ export function stackExpectations(k) {
     return out;
 }
 
+const _ftNum = (s) => (/^\d+$/.test(String(s).replace(/,/g, '').trim()) ? Number(String(s).replace(/,/g, '')) : NaN);
+const _ftSameRule = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((s, i) => s.op === b[i].op && Number(s.n) === Number(b[i].n));
+
+/**
+ * A rule table's boxes, in reading order (the slots of ftSlots). A table with a fixed answer
+ * (outputs / inputs / mixed / rule tasks) judges each box against its slot's value, the way
+ * ftAnswerMatches does. A "make your own" table has no fixed answer, so each box is judged from
+ * the rule: an Out box must be the rule applied to its row's In box, an In box a whole number
+ * that no other row uses, the check box the rule's value.
+ */
+function _bindFunctionTable(boxes, p) {
+    const slots = ftSlots(p);
+    if (!slots.length || slots.length !== boxes.length) return 0;
+    let n = 0;
+    if (p.task === 'make') {
+        const rows = {};
+        slots.forEach((s, k) => { if (s.row !== undefined) (rows[s.row] = rows[s.row] || {})[s.col] = boxes[k]; });
+        const inBoxes = Object.values(rows).map((r) => r.in).filter(Boolean);
+        const outAll = [...inBoxes, ...Object.values(rows).map((r) => r.out).filter(Boolean)];
+        slots.forEach((s, k) => {
+            const b = boxes[k];
+            let fn = null;
+            if (s.id === 'chk') fn = (v) => _ftNum(v) === Number(p.check.y);
+            else if (s.col === 'in') fn = (v) => Number.isFinite(_ftNum(v)) && inBoxes.filter((o) => o !== b && _ftNum(o.value) === _ftNum(v)).length === 0;
+            else if (s.col === 'out') {
+                const inEl = rows[s.row] && rows[s.row].in;
+                fn = (v) => { const i = inEl ? _ftNum(inEl.value) : NaN; return Number.isFinite(i) ? applyRule(p.rule, i) === _ftNum(v) : null; };
+            }
+            if (fn && _liveBindFn(b, fn, outAll)) n++;
+        });
+        return n;
+    }
+    slots.forEach((s, k) => {
+        const b = boxes[k];
+        let ok = false;
+        if (s.kind === 'sign') ok = _liveBindFn(b, (v) => signOf(v) !== '' && signOf(v) === signOf(s.value));
+        else if (s.kind === 'rule') ok = _liveBindFn(b, (v) => _ftSameRule(parseRule(v), p.rule));
+        else ok = _liveBindFn(b, (v) => _ftNum(v) === Number(s.value));
+        if (ok) n++;
+    });
+    return n;
+}
+
+const _fracNorm = (s) => String(s == null ? '' : s).trim().replace(/\s+/g, ' ').toLowerCase();
+
+function _bindOwnBoxes(root, q) {
+    let n = 0;
+    const bind = (el, expected, opts) => { if (el && el.dataset.mqLive !== '1' && _liveBind(el, expected, opts)) n++; };
+    // data-answer, compared exactly (the older checkers compare the trimmed text)
+    root.querySelectorAll('input.fact-family-input[data-answer], input.number-family-input[data-answer], input.area-model-input[data-answer], input.area-model-total[data-answer], input.fp-input[data-answer]')
+        .forEach((el) => bind(el, String(el.dataset.answer).replace(/,/g, '')));
+    // expanded form: the place-value part as a number
+    root.querySelectorAll('input.expanded-input-box[data-expected]').forEach((el) => bind(el, el.getAttribute('data-expected'), { numeric: true }));
+    if (q && Array.isArray(q.expandedValues)) {
+        root.querySelectorAll('input.ws-expanded-input').forEach((el) => {
+            const v = q.expandedValues[Number(el.getAttribute('data-expanded-idx'))];
+            if (v !== undefined) bind(el, String(v), { numeric: true });
+        });
+    }
+    // coordinates: point idx, x then y
+    if (q && Array.isArray(q.ans) && q.ans.every((p) => p && typeof p === 'object' && 'x' in p)) {
+        root.querySelectorAll('input.ci-x, input.ci-y').forEach((el) => {
+            const pt = q.ans[Number(el.getAttribute('data-point'))];
+            if (pt) bind(el, String(el.classList.contains('ci-x') ? pt.x : pt.y), { numeric: true });
+        });
+    }
+    // perimeter + area
+    if (q && q.dualAnswers) {
+        bind(root.querySelector('#perimeterInput, [id^="ws_perimeter_"]'), String(q.dualAnswers.perimeter), { numeric: true });
+        bind(root.querySelector('#areaInput, [id^="ws_area_"]'), String(q.dualAnswers.area), { numeric: true });
+    }
+    // mixed number + improper fraction: the checker's own compare (trim, collapse spaces, lower-case)
+    if (q && q.dualFractionAnswers) {
+        [['#mixedInput', q.dualFractionAnswers.mixed], ['#improperInput', q.dualFractionAnswers.improper]].forEach(([sel, want]) => {
+            const el = root.querySelector(sel);
+            if (el && el.dataset.mqLive !== '1' && _liveBindFn(el, (v) => _fracNorm(v) === _fracNorm(want))) n++;
+        });
+    }
+    // ordering boxes: the n-th item of the answer (text, else the same number)
+    if (q && typeof q.ans === 'string' && root.querySelector('input.order-input-box, input.ws-order-input')) {
+        const parts = q.ans.split(',').map((s) => s.trim());
+        root.querySelectorAll('input.order-input-box, input.ws-order-input').forEach((el) => {
+            const want = parts[Number(el.getAttribute('data-order-idx'))];
+            if (want !== undefined && el.dataset.mqLive !== '1') {
+                if (_liveBindFn(el, (v) => { const u = v.replace(/,/g, '').replace(/\s+/g, ''); return u === want || (Number.isFinite(parseFloat(u)) && Number.isFinite(parseFloat(want)) && parseFloat(u) === parseFloat(want)); })) n++;
+            }
+        });
+    }
+    // a legacy column's answer boxes (no kit slot ids): the answer's digits, right-aligned
+    const cols = Array.from(root.querySelectorAll('input.column-answer-input:not(.column-carry-input):not([data-ws-slot])'));
+    if (cols.length && q && q.ans != null && /^-?[\d,]+$/.test(String(q.ans))) {
+        const d = String(q.ans).replace(/[^0-9]/g, '');
+        cols.forEach((el, i) => { const at = d.length - cols.length + i; if (at >= 0) bind(el, d[at]); });
+    }
+    return n;
+}
+
 /** The value each of a multi-slot answer's boxes should hold (reading order), or null. */
 function _slotExpectations(q, count, join) {
     if (!q || !count) return null;
@@ -676,6 +1091,9 @@ function _slotExpectations(q, count, join) {
  */
 export function wireLiveCorrect(root, { q = null, kind = null, single = null } = {}) {
     if (!root || !q) return 0;
+    pruneBadges();
+    const _h = root.closest && root.closest('.problem-card, #questionCard');
+    if (_h && !(_h.id === 'questionCard' && root.id === 'answerInputArea')) delete _h.dataset.mqHelped;   // a new item starts clean
     let n = 0;
     // 1. a kit stack: each answer digit, each regroup box that should hold something
     const stk = root.querySelector('.ws-stack');
@@ -698,15 +1116,23 @@ export function wireLiveCorrect(root, { q = null, kind = null, single = null } =
         const joinEl = boxes[0].closest('[data-mq-join]');
         const join = joinEl ? joinEl.getAttribute('data-mq-join') : ', ';
         const exp = _slotExpectations(q, boxes.length, join);
-        if (exp) boxes.forEach((b, k) => { if (_liveBind(b, exp[k])) n++; });
+        if (q.ftCheck) n += _bindFunctionTable(boxes, q.ftCheck);
+        else if (exp) boxes.forEach((b, k) => { if (_liveBind(b, exp[k])) n++; });
     }
+    // 2b. WAVE 1 / A2: the older drawings that answer in their own boxes. Each judges against the
+    // value its own checker uses (never a stricter one):
+    //   fact / number family, area model, factor-pair blanks: the box's `data-answer`, exact;
+    //   expanded form: `data-expected`, as a number; coordinates: the point's x / y;
+    //   perimeter + area: `dualAnswers`; mixed + improper: `dualFractionAnswers`; ordering: the
+    //   n-th item of the answer; a legacy column's answer boxes: the answer's digits, right-aligned.
+    n += _bindOwnBoxes(root, q);
     // 3. the host's one answer place: the whole value, never a prefix
     if (single && !single.classList.contains('mq-cellslot-host') && single.type !== 'hidden') {
         const a = q.ans;
         const whole = a != null && typeof a !== 'object' ? [String(a)] : [];
         if (Array.isArray(q.acceptedAnswers)) q.acceptedAnswers.forEach((x) => { if (x != null && typeof x !== 'object') whole.push(String(x)); });
         if (typeof a === 'number' && Number.isInteger(a)) whole.push(a.toLocaleString('en-US'));
-        if (whole.length && _liveBind(single, whole)) n++;
+        if (whole.length && _liveBind(single, whole, { single: true, numeric: q.answerType === 'number' || typeof a === 'number' })) n++;
     }
     return n;
 }
@@ -2257,6 +2683,15 @@ export function fitTwinRows(root) {
         // ten-column chart, whose squares are sized from the host's digits and which swipes inside
         // its own cell instead (TY-10, SP-11a / SP-12a; critic round 4 defect F)
         if (twin.querySelector('.k2-chart-ten')) return;
+        // Fit once per cell width. This pass re-runs on every DOM change (monoCell's afterInk), and
+        // typing changes the DOM (live marks, badges). Parts with a fixed pixel floor - the 44 px
+        // answer boxes - never shrink with --mq-k2, so their overflow never goes away and each
+        // re-run would ratchet the drawing smaller as the pupil types. Only a new cell width
+        // (rotation, resize) earns a new fit.
+        // (the key also counts the drawing's elements, so a widget that mounts late is still fitted)
+        const fitW = `${Math.round(box.width)}:${twin.getElementsByTagName('*').length}`;
+        if (twin.dataset.mqFitW === fitW) return;
+        twin.dataset.mqFitW = fitW;
         const tw = twin.scrollWidth;
         const avail = Math.min(box.width, twin.parentElement ? twin.parentElement.clientWidth || box.width : box.width) - 8;
         const over = Array.from(twin.querySelectorAll('*')).reduce((m, el) => {

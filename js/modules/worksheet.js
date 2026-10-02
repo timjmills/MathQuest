@@ -1,6 +1,7 @@
 import { worksheetLadderWrong, markTried } from './support-ladder.js';
 import { state } from './state.js';
 import { skipAfterFor } from './skip-rule.js';
+import { updateSkillProgress } from './progress.js';
 import { SKILLS } from './data.js';
 import { shuffle, normalizeText } from './utils.js';
 import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
@@ -11,7 +12,7 @@ import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, wireCellInputs, signsFor,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, itemWasHelped, wireCellInputs, signsFor,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
 } from './screen-cell.js';
 
@@ -2346,8 +2347,11 @@ export function checkWorksheetAnswer(idx) {
     if (isNumeric) {
         const expectedDigits = String(q.ans).replace(/[^0-9]/g, '').length;
         const userDigits = value.replace(/[^0-9]/g, '').length;
+        const cleanedForZero = value.replace(/,/g, '');
 
-        if (userDigits < expectedDigits || expectedDigits === 0) {
+        // a leading 0 is still being written ("07" is accepted for 7), so "0" is not yet a wrong answer
+        const _writingZero = /^-?0\d*$/.test(cleanedForZero) && Number(cleanedForZero) !== Number(q.ans) && userDigits <= expectedDigits;
+        if (userDigits < expectedDigits || expectedDigits === 0 || _writingZero) {
             // Still typing — reset any wrong styling so student can retry
             input.style.borderColor = "var(--accent-cyan)";
             input.style.background = "var(--bg-card-light)";
@@ -2380,6 +2384,12 @@ export function checkWorksheetAnswer(idx) {
         card.style.background = "linear-gradient(135deg, rgba(6,214,160,0.25), rgba(0,191,165,0.15))";
         card.style.border = "3px solid var(--correct)";
         card.style.boxShadow = "0 6px 20px rgba(6,214,160,0.3)";
+        markBoxSubmitted(input, true);      // Wave 1 / A2: the one answer place shows the verdict too
+        // a support-ladder "Not yet..." line from an earlier try is stale now
+        card.querySelectorAll('.mq-ladder-msg').forEach((el) => el.remove());
+        // owner 2026-10-02: a box that went red first makes this item "helped" (correct, counted like
+        // a second-try correct; a worksheet awards no per-item XP or streak, so it is recorded on the item)
+        if (itemWasHelped(card)) q._helped = true;
         input.disabled = true;
         wsRecordAnswer(idx, true);
 
@@ -2405,13 +2415,60 @@ export function checkWorksheetAnswer(idx) {
         input.style.background = "rgba(239,71,111,0.15)";
         card.style.background = "rgba(239,71,111,0.08)";
         card.style.border = "2px solid var(--incorrect)";
+        markBoxSubmitted(input, false);
         wsRecordAnswer(idx, false);
+    }
+}
+
+/**
+ * Owner 2026-10-02: every online-worksheet problem reaches the skill's progress (and, through it, the
+ * spaced-repetition record, the practice log and adaptive difficulty) when the worksheet is checked,
+ * by the same API the practice card uses:
+ *   clean correct -> a hit;  helped (a box went red before it was right) -> a miss then a hit, like a
+ *   second-try correct;  answered but wrong -> a miss;  blank / skipped -> nothing (no attempt was made).
+ * Once per item however often Check all runs: a wrong item that is later put right adds only its hit
+ * (so it too ends as a miss then a hit); a worksheet awards no XP or streak.
+ */
+function wsPre(card) {
+    const ins = Array.from(card.querySelectorAll('input:not([type="hidden"]), textarea'));
+    const touched = ins.some((e) => String(e.value || '').trim() !== '')
+        || !!card.querySelector('[aria-checked="true"], .selected, .answer-btn.correct, .answer-btn.incorrect, .dnd-tile.placed, .mq-tried');
+    // Check all writes the right answer into a wrong or blank card and marks its boxes revealed; the pupil
+    // typing in a box clears that mark. A card whose boxes are all still revealed holds no new work.
+    const stale = ins.length > 0 && ins.every((e) => e.dataset.mqRevealed === '1');
+    return { touched, stale };
+}
+if (typeof document !== 'undefined' && !window.__mqRevealBound) {
+    window.__mqRevealBound = true;
+    document.addEventListener('input', (e) => { if (e.target && e.target.dataset && e.target.dataset.mqRevealed) delete e.target.dataset.mqRevealed; }, true);
+}
+function wsLogProgress(q, card, isCorrect, pre) {
+    if (!q || q._skipped) return;
+    const sk = q.skillId || state.skill;
+    if (!sk) return;
+    // Check all writes the right answer into a wrong or blank card: that item is "revealed" and earns no
+    // more credit (a pupil copying the shown answer back is not a correct answer), unless it already scored
+    if (q._revealed && !q._progHit) return;
+    const log = (ok) => {
+        updateSkillProgress(sk, ok);
+        try { if (typeof window.recordPracticeLog === 'function') window.recordPracticeLog(sk, ok, 0); } catch (e) { /* optional */ }
+        try { if (state.adaptiveModeEnabled && typeof window.recordAdaptiveAnswer === 'function') window.recordAdaptiveAnswer(sk, ok); } catch (e) { /* optional */ }
+    };
+    if (isCorrect) {
+        if (q._progHit) return;
+        if (q._helped && !q._progMiss) { log(false); q._progMiss = true; }
+        log(true); q._progHit = true;
+    } else {
+        if (pre.touched && !q._progMiss && !q._progHit) { log(false); q._progMiss = true; }
+        q._revealed = true;                              // this pass showed the answer (or the item stays wrong)
+        card.querySelectorAll('input:not([type="hidden"]), textarea').forEach((e) => { e.dataset.mqRevealed = '1'; });
     }
 }
 
 export function checkAllWorksheet() {
     let correct = 0;
     let skipped = 0;
+    let helped = 0;
     const totalAll = state.worksheetQs.length;
 
     state.worksheetQs.forEach((q, idx) => {
@@ -2420,6 +2477,10 @@ export function checkAllWorksheet() {
         // Skipped problems: do NOT grade, do NOT count in the total. Just
         // tally for the score-card breakdown.
         if (q && q._skipped) { skipped++; return; }
+        // taken BEFORE grading: Check all writes the right answer into a wrong or blank card
+        const _pre = wsPre(card);
+        // a helped item: a box went red before it was right (any multi-box type, not only the one-box path)
+        if (itemWasHelped(card)) q._helped = true;
 
         let value = '';
         let isCorrect = false;
@@ -2849,6 +2910,8 @@ export function checkAllWorksheet() {
         }
 
         if (isCorrect) correct++;
+        if (isCorrect && q._helped) helped++;
+        wsLogProgress(q, card, isCorrect, _pre);
     });
 
     // Skipped problems are excluded from the denominator so percent reflects
@@ -2866,10 +2929,13 @@ export function checkAllWorksheet() {
     const skipNote = skipped > 0
         ? ` <span style="color:var(--accent-cyan); font-size:1rem;">• Skipped: ${skipped}</span>`
         : '';
+    const helpNote = helped > 0
+        ? ` <span style="color:var(--accent-cyan); font-size:1rem;">• Helped: ${helped}</span>`
+        : '';
     document.getElementById("worksheetResult").innerHTML = `
         <span style="color:${isPassing ? 'var(--correct)' : 'var(--incorrect)'}; font-size:1.3rem;">
             Score: ${correct}/${total} (${percentage}%)
-        </span>${skipNote}
+        </span>${skipNote}${helpNote}
     `;
 
     if (total > 0 && correct === total) confetti();
