@@ -25,3 +25,15 @@ R2-4 index.html:352 Start buttons now sit above "Game Setup" under the line "Cus
 R2-5 practice-card-pulse-1280.png header reads "Mixed Mode (All Categories)" for a one-skill run (pre-existing, outside lane). Not scored.
 
 To reach 10: C1 show the chosen skill with the Start buttons (R2-4); C2 a guarded, tested MAP skip (R2-1); C3 evidence PNGs that show the feature at both widths (R2-2); C4 R2-1 plus a worksheet behaviour check in ws-options-verify (skipAfter currently tested on the practice gate only, not wsNoteWrong).
+
+# Round 3 critic (Opus low, browser-verified, ce092db; scope: "Pupil play" disclosure + base merge)
+Verdict: PASS. Scores: C1 ease 9, C2 teaching/scaffold 8, C3 layout/spacing 8, C4 owner-fidelity 8.
+Runs: ws-supports-unit OK (257/0); ws-boot-smoke OK; own probe (1280 + 390, 0 console errors) on host 'global' (Add Skills modal, print/practice list) and host 'qs' (Quick Start edit mode). Teacher-print popover = builder's options-play-*.png (same groupedOptionRowsHTML).
+Checks: limit not weakened: restingOptions drops only group 'play' (calculator, skipAfter) plus appliesTo-hidden, identical to the old filter otherwise; only 4 PLAY_GROUP references, both play defs. Summary: default "Calculator off · Skip after 5"; skipAfter 0 -> "Skip off"; calculator on + 1 -> "Calculator on · Skip after 1" (both hosts). Disclosure is native details/summary: tabbable, Enter toggles, expanded state exposed natively; summary 44 px tall at 390 (249 px wide). Redraw: mouse open then skoEdit -> stays open (true/true). All 5 hosts (so, global, mixed, qs, queue) + popover call groupedOptionRowsHTML; global and qs verified in DOM. Merge: worksheet.js keeps setActiveProblem(0) and Lane E's mqLaidOut/_wsSchedPending lines; no conflict markers.
+
+Defects (ranked):
+R3-1 skill-options-ui.js:110 summary chevron is a fixed "&#9662;" in both states. Observed: options-play-open-390.png and closed state both show the down arrow; no visual open/closed cue. C1 -0.5. Fix: render "&#9656;" when closed and "&#9662;" when open (or CSS rotate on details[open]). Check: closed and open PNGs differ in the chevron.
+R3-2 skill-options-ui.js:116 `_playOpen` is one module-global for every host and skill: opening Pupil play on one skill opens it on every panel drawn afterwards this session. C1 0 now. Fix: key it by host+category+skill (Map). Check: open on add_facts, open panel for another skill -> closed.
+R3-3 ontoggle is async: an edit dispatched in the same task as the keyboard toggle redraws with _playOpen stale (probe: openAfterKey true, openAfterRedraw false). Not reachable by a human; 0 points. Fix (optional): read the current details.open from the DOM in the rerender path. Check: focus+Enter then immediate skoEdit keeps it open.
+R3-4 design/audit/runs/wave1-A/options-play-closed-1280.png: the disclosure is below the fold, so the "closed" shot does not show it. Evidence -0, C3 evidence note. Fix: scroll the popover to the disclosure before the shot. Check: PNG shows the closed "Pupil play" line.
+R3-5 (outside lane, not scored) Add Skills modal at 390 is clipped at the left edge (scratchpad print-open-390.png).
