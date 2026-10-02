@@ -1,0 +1,236 @@
+{
+  "skill": "composing:odd_even",
+  "category": "composing",
+  "skillId": "odd_even",
+  "label": "Odd or Even? (Visual)",
+  "grade": "2",
+  "dir": "composing__odd_even",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 75.667,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 65,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 826568,
+      "title": "I Can tell if a number is odd or even",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Is 16 odd or even?",
+          "ans": "Even",
+          "measured": {
+            "1": {
+              "hMm": 65,
+              "fits": true
+            },
+            "2": {
+              "hMm": 65,
+              "fits": true
+            },
+            "3": {
+              "hMm": 65,
+              "fits": true
+            },
+            "4": {
+              "hMm": 60,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Is 3 odd or even?",
+          "ans": "Odd",
+          "measured": {
+            "1": {
+              "hMm": 50.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 50.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 50.9,
+              "fits": true
+            },
+            "4": {
+              "hMm": 50.9,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Is 10 odd or even?",
+          "ans": "Even",
+          "measured": {
+            "1": {
+              "hMm": 50.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 50.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 50.9,
+              "fits": true
+            },
+            "4": {
+              "hMm": 48.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Is 11 odd or even?",
+          "ans": "Odd",
+          "measured": {
+            "1": {
+              "hMm": 65,
+              "fits": true
+            },
+            "2": {
+              "hMm": 65,
+              "fits": true
+            },
+            "3": {
+              "hMm": 65,
+              "fits": true
+            },
+            "4": {
+              "hMm": 60,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Is 19 odd or even?",
+          "ans": "Odd",
+          "measured": {
+            "1": {
+              "hMm": 65,
+              "fits": true
+            },
+            "2": {
+              "hMm": 65,
+              "fits": true
+            },
+            "3": {
+              "hMm": 65,
+              "fits": true
+            },
+            "4": {
+              "hMm": 60,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Is 1 odd or even?",
+          "ans": "Odd",
+          "measured": {
+            "1": {
+              "hMm": 50.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 50.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 50.9,
+              "fits": true
+            },
+            "4": {
+              "hMm": 50.9,
+              "fits": true
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 70,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 73,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 38
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 38
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

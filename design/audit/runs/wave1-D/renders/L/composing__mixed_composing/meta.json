@@ -1,0 +1,166 @@
+{
+  "skill": "composing:mixed_composing",
+  "category": "composing",
+  "skillId": "mixed_composing",
+  "label": "Mixed Number Sense",
+  "grade": "M",
+  "dir": "composing__mixed_composing",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt. Tall problems: 3 rows per page.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 75.667,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Tall problems: 3 rows per page.",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt. Tall problems: 3 rows per page.",
+            "cls": "short",
+            "digitPt": 28,
+            "hMin": 65.6,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 795545,
+      "title": "I Can make mixed number sense",
+      "notes": [
+        "Tall problems: 3 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "counters",
+          "fclass": "short",
+          "text": "10 and what number make 19?",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 65.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 65.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 65.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 65.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "The frame shows 1. How many more make 10?",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 49.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 49.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 55.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 50.8,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "short",
+          "text": "Write 7 as a fraction with denominator 1.",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 58.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 58.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 58.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 58.4,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 52,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 58,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          3
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 26
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          3
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 29
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

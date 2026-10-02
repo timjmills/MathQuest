@@ -1,0 +1,260 @@
+{
+  "skill": "multiplication:mult_comparison",
+  "category": "multiplication",
+  "skillId": "mult_comparison",
+  "label": "Times as Many Word Problems (Visual)",
+  "grade": "4",
+  "dir": "multiplication__mult_comparison",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 76,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 62.9,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 978949,
+      "title": "I Can solve times-as-many stories",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom has 4 buttons. Sam has 8 buttons. How many times as many buttons does Sam ha",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 34.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 52.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 52.9,
+              "fits": true
+            },
+            "4": {
+              "hMm": 50,
+              "fits": false
+            },
+            "5": {
+              "hMm": 50,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 3 crayons. Leo has 6 crayons. How many times as many crayons does Leo ha",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 34.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 52.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 52.9,
+              "fits": true
+            },
+            "4": {
+              "hMm": 50,
+              "fits": false
+            },
+            "5": {
+              "hMm": 50,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 16 stamps. That is 8 times as many as Mia has. How many stamps does Mia ",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 34.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 53.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 55.1,
+              "fits": false
+            },
+            "4": {
+              "hMm": 55.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 55.1,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia has 7 beads. Ana has 14 beads. How many times as many beads does Ana have?",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 34.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 52.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 52.9,
+              "fits": true
+            },
+            "4": {
+              "hMm": 50,
+              "fits": false
+            },
+            "5": {
+              "hMm": 50,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana has 7 shells. Noor has 3 times as many shells. How many shells does Noor hav",
+          "ans": "21",
+          "measured": {
+            "1": {
+              "hMm": 34.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 57.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 59.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 59.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 59.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor has 56 cards. That is 8 times as many as Omar has. How many cards does Omar",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 34.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 53.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 55.1,
+              "fits": false
+            },
+            "4": {
+              "hMm": 55.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 55.1,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 189,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 218,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 71
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 97
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

@@ -1,0 +1,682 @@
+{
+  "skill": "composing:select_even_odd",
+  "category": "composing",
+  "skillId": "select_even_odd",
+  "label": "Circle the Even or Odd Numbers (MAP)",
+  "grade": "2",
+  "dir": "composing__select_even_odd",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 3,
+        "rows": 7,
+        "perPage": 21,
+        "pages": 1,
+        "note": "Fits: 3 columns x 7 rows, 21 per page, 1 page. Digits 16 pt. Dense: 3 x 7, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 3,
+            "rows": 7,
+            "perPage": 21,
+            "pages": 1,
+            "cellW": 62,
+            "cellH": 32.571,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 3 x 7, cells sized to the problems.",
+            "line": "Fits: 3 columns x 7 rows, 21 per page, 1 page. Digits 16 pt. Dense: 3 x 7, cells sized to the problems.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 26.6,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 37489,
+      "title": "I Can sort even and odd numbers",
+      "notes": [
+        "Dense: 3 x 7, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt0\",\"opt5\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the ODD numbers.",
+          "ans": "[\"opt0\",\"opt3\",\"opt5\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the ODD numbers.",
+          "ans": "[\"opt0\",\"opt4\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt1\",\"opt2\",\"opt4\",\"opt5\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt0\",\"opt3\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the ODD numbers.",
+          "ans": "[\"opt0\",\"opt3\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the ODD numbers.",
+          "ans": "[\"opt2\",\"opt3\",\"opt4\",\"opt5\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the ODD numbers.",
+          "ans": "[\"opt0\",\"opt3\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt1\",\"opt2\",\"opt3\",\"opt5\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt3\",\"opt5\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt0\",\"opt3\",\"opt4\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt0\",\"opt2\",\"opt3\",\"opt4\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the ODD numbers.",
+          "ans": "[\"opt0\",\"opt1\",\"opt3\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the ODD numbers.",
+          "ans": "[\"opt1\",\"opt3\",\"opt4\",\"opt5\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt1\",\"opt2\",\"opt5\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt0\",\"opt2\",\"opt3\",\"opt5\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt2\",\"opt4\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the ODD numbers.",
+          "ans": "[\"opt2\",\"opt3\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt0\",\"opt4\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt2\",\"opt3\",\"opt5\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt0\",\"opt3\",\"opt4\"]",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 193,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 196,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          21
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 161
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          21
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 161
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

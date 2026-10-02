@@ -1,0 +1,206 @@
+{
+  "skill": "multiplication:number_families_mult",
+  "category": "multiplication",
+  "skillId": "number_families_mult",
+  "label": "Number Families (Multiply & Divide)",
+  "grade": "3",
+  "dir": "multiplication__number_families_mult",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 2,
+        "perPage": 4,
+        "pages": 1,
+        "note": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 16 pt. Tall problems: 2 rows per page.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 2,
+            "perPage": 4,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 114,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Tall problems: 2 rows per page.",
+            "line": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 16 pt. Tall problems: 2 rows per page.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 91.1,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 480508,
+      "title": "I Can multiply number families & divide",
+      "notes": [
+        "Tall problems: 2 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "2, 2, 4",
+          "measured": {
+            "1": {
+              "hMm": 62.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 62.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 84.8,
+              "fits": false
+            },
+            "4": {
+              "hMm": 117.4,
+              "fits": false
+            },
+            "5": {
+              "hMm": 117.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "3, 3, 9",
+          "measured": {
+            "1": {
+              "hMm": 62.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 62.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 84.8,
+              "fits": false
+            },
+            "4": {
+              "hMm": 117.4,
+              "fits": false
+            },
+            "5": {
+              "hMm": 117.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "3, 4, 12",
+          "measured": {
+            "1": {
+              "hMm": 91.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 91.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 135.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 190.4,
+              "fits": false
+            },
+            "5": {
+              "hMm": 190.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Number Family: Complete all equations",
+          "ans": "5, 5, 25",
+          "measured": {
+            "1": {
+              "hMm": 62.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 62.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 84.8,
+              "fits": false
+            },
+            "4": {
+              "hMm": 117.4,
+              "fits": false
+            },
+            "5": {
+              "hMm": 117.4,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 109,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 124,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 70
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 74
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

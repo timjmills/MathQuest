@@ -1,0 +1,286 @@
+{
+  "skill": "division:missing_mult_div",
+  "category": "division",
+  "skillId": "missing_mult_div",
+  "label": "Missing Factors (×/÷)",
+  "grade": "3",
+  "dir": "division__missing_mult_div",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 1,
+        "rows": 8,
+        "perPage": 8,
+        "pages": 1,
+        "note": "Fits: 1 column x 8 rows, 8 per page, 1 page. Digits 28 pt. Dense: 1 x 8, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 8,
+            "perPage": 8,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 28.375,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 1 x 8, cells sized to the problems.",
+            "line": "Fits: 1 column x 8 rows, 8 per page, 1 page. Digits 28 pt. Dense: 1 x 8, cells sized to the problems.",
+            "cls": "short",
+            "digitPt": 28,
+            "hMin": 23,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 495367,
+      "title": "I Can divide missing factors ×/÷",
+      "notes": [
+        "Dense: 1 x 8, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "12 × 8 = ___",
+          "ans": "96",
+          "measured": {
+            "1": {
+              "hMm": 17.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 17.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 17.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 17.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "___ ÷ 6 = 2",
+          "ans": "12",
+          "measured": {
+            "1": {
+              "hMm": 17.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 17.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 17.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 17.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "8 × 2 = ___",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 17.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 17.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 17.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 17.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "___ ÷ 10 = 12",
+          "ans": "120",
+          "measured": {
+            "1": {
+              "hMm": 17.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 17.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 17.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 17.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "___ ÷ 11 = 12",
+          "ans": "132",
+          "measured": {
+            "1": {
+              "hMm": 17.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 17.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 17.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 17.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "6 ÷ 2 = ___",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 17.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 17.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 17.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 17.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "4 × 5 = ___",
+          "ans": "20",
+          "measured": {
+            "1": {
+              "hMm": 17.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 17.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 17.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 17.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "2 × 9 = ___",
+          "ans": "18",
+          "measured": {
+            "1": {
+              "hMm": 17.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 17.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 17.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 17.4,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 79,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 90,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 54
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 62
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

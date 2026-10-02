@@ -609,7 +609,11 @@ function planItem(it, level, cols) {
  * each row is as tall as its tallest problem with DENSE_ROOM to spare, never the even share of the
  * grid a lone section fills, and three rows of either leave the page's 1 mm safety (PG-12).
  */
-export function splitCellH(L) {
+export function splitCellH(L, rowsUsed = 0) {
+    // A part that holds fewer rows than its page allows (wave 1 lane D: Mixed Multiplication's two
+    // story rows drawn at a third of the page each, 1 mm over their content, a story overflowed)
+    // takes 6 mm over its tallest problem (at most DENSE_ROOM), within the grid its rows can have.
+    if (rowsUsed > 0 && rowsUsed < L.rows) return Math.round(Math.min(Math.max(L.cellH, L.hMin + 6), L.hMin * DENSE_ROOM, (L.gridH - 1) / rowsUsed) * 1000) / 1000;
     return Math.round(Math.min(L.cellH, L.hMin * DENSE_ROOM, (L.gridH - 1) / Math.max(1, L.rows)) * 1000) / 1000;
 }
 
@@ -617,6 +621,8 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
     const instr = instructionMm(size);
     const body = bodyHeightMm(paper, headerFirst);
     const split = new Set(sectionsIn.map((s) => s.splitOf).filter((x) => x !== undefined && x !== null));
+    // the parts of a section whose column problems were split off (fineSplit): rows sized to what they hold
+    const fineParts = new Set(sectionsIn.flatMap((s, i) => (s.fineSplit ? [i, s.splitOf] : [])));
     const layouts = sectionsIn.map((sec, si) => {
         const L0 = resolveSectionLayout(
             { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
@@ -624,7 +630,7 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
         );
         // A split section's two parts share the page: their rows are sized to what they hold.
         const L = (sec.splitOf !== undefined && sec.splitOf !== null) || split.has(si)
-            ? Object.assign({}, L0, { cellH: splitCellH(L0), fill: false }) : L0;
+            ? Object.assign({}, L0, { cellH: splitCellH(L0, fineParts.has(si) ? Math.ceil(itemsBySection[si].length / Math.max(1, L0.cols)) : 0), fill: false }) : L0;
         // S6 SECTIONS: anchor band + 3-4 problems per block; the band's height comes off the page
         // (anchors.js blockPlan) and a block is never split.
         const aMm = anchorBandOf(anchors, si);
@@ -709,6 +715,32 @@ function sheetLayout(role, input, norm, sheetItems, tabId) {
  * printed again on the same page). Not with step-by-step anchors (their bands are keyed by
  * section).
  */
+/**
+ * RUBRIC H13 for a MIXED section (wave 1 lane D, 2026-10-02: Mixed Multiplication printed a
+ * three-digit column fact alone in a 92 mm cell, two thirds of the cell empty beside it). Column
+ * and fact work (the `stack` / `fact` templates) stands in more columns than the pictures and
+ * stories it is dealt with; when at least two of them share a section with problems that hold
+ * fewer columns, they form a group of their own in their own columns (one row: the rest of
+ * the row left open; more: as many columns as fill whole rows). Returns {mid, fine, cols} or null. Used by splitWide here and by the host's
+ * capacity count (print-sheet.js layoutOf), so the page is counted as it prints.
+ */
+export function fineSplit(base, narrow, paper, availableWidthMm, opts) {
+    const tpl = (it) => (it && (it.template || (it.q && it.q.cell && it.q.cell.template))) || '';
+    const isFine = (it) => tpl(it) === 'stack' || tpl(it) === 'fact';
+    const fine = narrow.filter(isFine);
+    const mid = narrow.filter((it) => !isFine(it));
+    if (fine.length < 2 || !mid.length) return null;
+    const Lm = resolveSectionLayout(Object.assign({}, base, { count: mid.length }), mid, paper, availableWidthMm, opts);
+    const Lf = resolveSectionLayout(Object.assign({}, base, { count: fine.length, floor: null }), fine, paper, availableWidthMm, opts);
+    // as many columns as the group fills: three facts are one row of three, never a row of four with a hole
+    // one row: the group's own columns, the rest of the row left open (a blank run, never a box);
+    // more: as many columns as fill whole rows
+    let cols = Lf.cols;
+    if (fine.length > Lf.cols) while (cols > Lm.cols && fine.length % cols !== 0) cols--;
+    if (cols <= Lm.cols) return null;
+    return { mid, fine, cols };
+}
+
 export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM } = {}) {
     const { size, look, paper } = norm;
     const sections = [];
@@ -723,6 +755,19 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
             || itemCap(itemInfo(it, { size, look, paper, mode: 'print' })) < 2;
         const wide = its.filter(one);
         const narrow = its.filter((it) => !one(it));
+        const fs = !sec.columns || sec.columns === 'auto' ? fineSplit(Object.assign({}, base, { floor: null }), narrow, paper, availableWidthMm, { size, look }) : null;
+        if (fs) {
+            const at = sections.length;
+            sections.push(Object.assign({}, sec));
+            items.push(fs.mid);
+            sections.push(Object.assign({}, sec, { columns: fs.cols, floor: null, splitOf: at, fineSplit: true }));
+            items.push(fs.fine);
+            if (wide.length) {
+                sections.push(Object.assign({}, sec, { columns: 1, floor: null, splitOf: at }));
+                items.push(wide);
+            }
+            return;
+        }
         if (!wide.length || !narrow.length) return keep();
         // (narrow keeps its order here; composeSheet groups by height once the columns are known)
         const L = resolveSectionLayout(Object.assign({}, base, { count: narrow.length, floor: sec.floor }), narrow, paper, availableWidthMm, { size, look });
@@ -857,7 +902,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // instruction (splitWide): the line is not printed twice.
             const sec = norm.sections[part.section] || {};
             const prevPart = pg.parts[pg.parts.indexOf(part) - 1];
-            const shares = sec.splitOf !== undefined && prevPart && prevPart.section === sec.splitOf;
+            const shares = sec.splitOf !== undefined && prevPart && (prevPart.section === sec.splitOf || (norm.sections[prevPart.section] || {}).splitOf === sec.splitOf);
             if (!shares) sections.push({ kind: 'html', html: instructionHtml(instr[part.section].key, instr[part.section].text) });
             if (L.blocks && part.chunk.blocks) {
                 // S6 SECTIONS: each block is its anchor band (its own Model tab, no label, no
@@ -910,10 +955,12 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         cols: L.cols, rows: L.rows, perPage: L.perPage, pages: L.pages, cellW: L.cellW, cellH: L.cellH,
         requested: L.requested, clamped: L.clamped,
         // The dialog's line tells the truth about a split-off group (splitWide).
-        note: norm.sections[si].splitOf !== undefined
+        note: norm.sections[si].fineSplit ? [`${sheetItems[si].length} column problems in ${L.cols} columns.`, L.note].filter(Boolean).join(' ')
+            : norm.sections[si].splitOf !== undefined
             ? [`${sheetItems[si].length} problem${sheetItems[si].length === 1 ? ' is' : 's are'} too wide for ${layouts[norm.sections[si].splitOf].cols} columns: full width, at the bottom.`, L.note].filter(Boolean).join(' ')
             : L.note,
-        line: norm.sections[si].splitOf !== undefined
+        line: norm.sections[si].fineSplit ? `${fitsLine(L)} ${sheetItems[si].length} column problems in ${L.cols} columns.`
+            : norm.sections[si].splitOf !== undefined
             ? `${fitsLine(L)} ${sheetItems[si].length} full-width problem${sheetItems[si].length === 1 ? '' : 's'} at the bottom.` : fitsLine(L),
         cls: L.cls, digitPt: L.digitPt,
         hMin: L.hMin, anchorMm: L.anchorMm || 0, blocks: L.blocks || null,

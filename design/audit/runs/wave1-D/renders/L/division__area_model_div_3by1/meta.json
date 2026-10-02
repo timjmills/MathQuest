@@ -1,0 +1,190 @@
+{
+  "skill": "division:area_model_div_3by1",
+  "category": "division",
+  "skillId": "area_model_div_3by1",
+  "label": "Area Model Division (3÷1 digit)",
+  "grade": "5",
+  "dir": "division__area_model_div_3by1",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 2,
+        "perPage": 4,
+        "pages": 1,
+        "note": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 28 pt. Tall problems: 2 rows per page.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 2,
+            "perPage": 4,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 113.5,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Tall problems: 2 rows per page.",
+            "line": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 28 pt. Tall problems: 2 rows per page.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 79.7,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 457771,
+      "title": "I Can divide area model",
+      "notes": [
+        "Tall problems: 2 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Use the area model to find 152 ÷ 8",
+          "ans": "19",
+          "measured": {
+            "1": {
+              "hMm": 79.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 79.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 90,
+              "fits": true
+            },
+            "4": {
+              "hMm": 141.1,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Use the area model to find 275 ÷ 5",
+          "ans": "55",
+          "measured": {
+            "1": {
+              "hMm": 79.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 79.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 90,
+              "fits": true
+            },
+            "4": {
+              "hMm": 141.1,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Use the area model to find 231 ÷ 7",
+          "ans": "33",
+          "measured": {
+            "1": {
+              "hMm": 79.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 79.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 90,
+              "fits": true
+            },
+            "4": {
+              "hMm": 141.1,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Use the area model to find 246 ÷ 2",
+          "ans": "123",
+          "measured": {
+            "1": {
+              "hMm": 79.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 79.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 119,
+              "fits": false
+            },
+            "4": {
+              "hMm": 141.1,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 143,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 150,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 54
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 58
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

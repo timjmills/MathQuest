@@ -1,0 +1,934 @@
+{
+  "skill": "subtraction:missing_add_sub",
+  "category": "subtraction",
+  "skillId": "missing_add_sub",
+  "label": "Missing Numbers (+/−)",
+  "grade": "1",
+  "dir": "subtraction__missing_add_sub",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 3,
+        "rows": 10,
+        "perPage": 30,
+        "pages": 1,
+        "note": "Fits: 3 columns x 10 rows, 30 per page, 1 page. Digits 16 pt. Dense: 3 x 10, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 3,
+            "rows": 10,
+            "perPage": 30,
+            "pages": 1,
+            "cellW": 62,
+            "cellH": 20.5,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 3 x 10, cells sized to the problems.",
+            "line": "Fits: 3 columns x 10 rows, 30 per page, 1 page. Digits 16 pt. Dense: 3 x 10, cells sized to the problems.",
+            "cls": "short",
+            "digitPt": 16,
+            "hMin": 16,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 503800,
+      "title": "I Can subtract missing numbers +/−",
+      "notes": [
+        "Dense: 3 x 10, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "___ + 2 = 11",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "15 − ___ = 1",
+          "ans": "14",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "5 + ___ = 16",
+          "ans": "11",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "3 + ___ = 12",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "19 − 6 = ___",
+          "ans": "13",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "2 + 3 = ___",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "20 − ___ = 19",
+          "ans": "1",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "12 − 4 = ___",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "10 + 9 = ___",
+          "ans": "19",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "10 + 7 = ___",
+          "ans": "17",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "___ + 10 = 15",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "10 + 6 = ___",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "___ + 9 = 13",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "20 − ___ = 6",
+          "ans": "14",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "20 − 9 = ___",
+          "ans": "11",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "20 − ___ = 9",
+          "ans": "11",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "7 + ___ = 14",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "___ + 4 = 6",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "15 − ___ = 7",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "13 − ___ = 9",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "14 − ___ = 6",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "13 − ___ = 11",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "3 + ___ = 5",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "___ − 4 = 5",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "9 + 10 = ___",
+          "ans": "19",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "14 − 6 = ___",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "9 + ___ = 12",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "___ − 8 = 6",
+          "ans": "14",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "18 − 2 = ___",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "18 − ___ = 2",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 12.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 12.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 12.5,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 182,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 206,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          30
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 164
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          30
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 194
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

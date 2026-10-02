@@ -1,0 +1,262 @@
+{
+  "skill": "multiplication:dot_array_mult",
+  "category": "multiplication",
+  "skillId": "dot_array_mult",
+  "label": "Dot Array Multiplication (B&W)",
+  "grade": "2",
+  "dir": "multiplication__dot_array_mult",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 76,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Rows sized to the problems they hold.",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
+            "cls": "short",
+            "digitPt": 16,
+            "hMin": 85.1,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 255801,
+      "title": "I Can multiply using a dot array",
+      "notes": [
+        "Rows sized to the problems they hold."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "arrays",
+          "fclass": "short",
+          "text": "Multiply the array: 3 rows × 10 columns = ?",
+          "ans": "30",
+          "measured": {
+            "1": {
+              "hMm": 44.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 44.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 44.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 44.6,
+              "fits": false
+            },
+            "5": {
+              "hMm": 44.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "arrays",
+          "fclass": "short",
+          "text": "Multiply the array: 4 rows × 6 columns = ?",
+          "ans": "24",
+          "measured": {
+            "1": {
+              "hMm": 52.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 52.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 52.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 52.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 52.1,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "arrays",
+          "fclass": "short",
+          "text": "Multiply the array: 5 rows × 6 columns = ?",
+          "ans": "30",
+          "measured": {
+            "1": {
+              "hMm": 59.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 59.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 59.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 59.6,
+              "fits": false
+            },
+            "5": {
+              "hMm": 59.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "arrays",
+          "fclass": "short",
+          "text": "Multiply the array: 7 rows × 8 columns = ?",
+          "ans": "56",
+          "measured": {
+            "1": {
+              "hMm": 71.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 71.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 71.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 71.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 71.1,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "arrays",
+          "fclass": "short",
+          "text": "Multiply the array: 2 rows × 3 columns = ?",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 37.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 37.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 37.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 37.1,
+              "fits": true
+            },
+            "5": {
+              "hMm": 37.1,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "arrays",
+          "fclass": "short",
+          "text": "Multiply the array: 3 rows × 2 columns = ?",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 44.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 44.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 44.6,
+              "fits": true
+            },
+            "4": {
+              "hMm": 44.6,
+              "fits": true
+            },
+            "5": {
+              "hMm": 44.6,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 105,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 114,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 32
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 38
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

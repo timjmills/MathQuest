@@ -1,0 +1,260 @@
+{
+  "skill": "multiplication:mixed_multiplication",
+  "category": "multiplication",
+  "skillId": "mixed_multiplication",
+  "label": "Mixed Multiplication",
+  "grade": "M",
+  "dir": "multiplication__mixed_multiplication",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 76,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 57.4,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 57023,
+      "title": "I Can review multiplication",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor has 4 plates. Each plate has 7 pencils. How many pencils are there in all?",
+          "ans": "28",
+          "measured": {
+            "1": {
+              "hMm": 34.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 57.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 59.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 59.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 59.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar has 4 baskets. Each basket has 6 apples. How many apples are there in all?",
+          "ans": "24",
+          "measured": {
+            "1": {
+              "hMm": 34.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 57.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 59.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 59.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 59.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 9 × 64",
+          "ans": "576",
+          "measured": {
+            "1": {
+              "hMm": 51.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 51.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 51.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 51.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 51.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 4 × 217",
+          "ans": "868",
+          "measured": {
+            "1": {
+              "hMm": 51.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 51.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 51.3,
+              "fits": false
+            },
+            "4": {
+              "hMm": 51.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 51.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 5 × 49",
+          "ans": "245",
+          "measured": {
+            "1": {
+              "hMm": 51.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 51.3,
+              "fits": true
+            },
+            "3": {
+              "hMm": 51.3,
+              "fits": true
+            },
+            "4": {
+              "hMm": 51.3,
+              "fits": false
+            },
+            "5": {
+              "hMm": 51.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki has 2 jars. Each jar has 3 stamps. How many stamps are there in all?",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 34.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 57.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 59.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 59.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 59.2,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 133,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 170,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 76
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 110
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

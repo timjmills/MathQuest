@@ -1,0 +1,204 @@
+{
+  "skill": "division:box_division_hard",
+  "category": "division",
+  "skillId": "box_division_hard",
+  "label": "Box Method Division (3÷1 digit)",
+  "grade": "4",
+  "dir": "division__box_division_hard",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 1,
+        "rows": 4,
+        "perPage": 4,
+        "pages": 1,
+        "note": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 16 pt.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 4,
+            "perPage": 4,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 57,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 16 pt.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 54.9,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 77267,
+      "title": "I Can divide box method",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "880 ÷ 5 = ?",
+          "ans": "176",
+          "measured": {
+            "1": {
+              "hMm": 54.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "3": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "4": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "5": {
+              "hMm": 58.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "702 ÷ 9 = ?",
+          "ans": "78",
+          "measured": {
+            "1": {
+              "hMm": 54.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "3": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "4": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "5": {
+              "hMm": 58.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "168 ÷ 6 = ?",
+          "ans": "28",
+          "measured": {
+            "1": {
+              "hMm": 54.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "3": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "4": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "5": {
+              "hMm": 58.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "284 ÷ 4 = ?",
+          "ans": "71",
+          "measured": {
+            "1": {
+              "hMm": 54.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "3": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "4": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "5": {
+              "hMm": 58.7,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 51,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 58,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 30
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 34
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

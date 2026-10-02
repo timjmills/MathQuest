@@ -1,0 +1,206 @@
+{
+  "skill": "addition:comparison_word",
+  "category": "addition",
+  "skillId": "comparison_word",
+  "label": "How Many More/Fewer? (Visual)",
+  "grade": "1",
+  "dir": "addition__comparison_word",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 2,
+        "perPage": 4,
+        "pages": 1,
+        "note": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 16 pt. Tall problems: 2 rows per page.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 2,
+            "perPage": 4,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 110.05,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Tall problems: 2 rows per page.",
+            "line": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 16 pt. Tall problems: 2 rows per page.",
+            "cls": "short",
+            "digitPt": 16,
+            "hMin": 75.7,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 306807,
+      "title": "I Can add how many more/fewer?",
+      "notes": [
+        "Tall problems: 2 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "Hana has 3 basketballs. Maya has 1 basketball. How many MORE basketballs does Ha",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 71.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 75.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 67.8,
+              "fits": false
+            },
+            "4": {
+              "hMm": 78.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 91.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "Yuki has 7 notes. Jamal has 4 notes. How many MORE notes does Yuki have than Jam",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 65.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 75.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 67.8,
+              "fits": false
+            },
+            "4": {
+              "hMm": 66.7,
+              "fits": false
+            },
+            "5": {
+              "hMm": 74,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "Olivia has 9 seeds. Priya has 7 seeds. How many FEWER seeds does Priya have than",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 65.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 75.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 67.8,
+              "fits": false
+            },
+            "4": {
+              "hMm": 66.7,
+              "fits": false
+            },
+            "5": {
+              "hMm": 74,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "Noah has 17 grapes. Eli has 7 grapes. How many FEWER grapes does Eli have than N",
+          "ans": "10",
+          "measured": {
+            "1": {
+              "hMm": 65.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 75.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 67.8,
+              "fits": false
+            },
+            "4": {
+              "hMm": 66.7,
+              "fits": false
+            },
+            "5": {
+              "hMm": 74,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 147,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 154,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 50
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 54
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

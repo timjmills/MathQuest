@@ -1,0 +1,260 @@
+{
+  "skill": "division:area_model_div_3by1",
+  "category": "division",
+  "skillId": "area_model_div_3by1",
+  "label": "Area Model Division (3÷1 digit)",
+  "grade": "5",
+  "dir": "division__area_model_div_3by1",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 76,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 73.2,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 457771,
+      "title": "I Can divide area model",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Use the area model to find 152 ÷ 8",
+          "ans": "19",
+          "measured": {
+            "1": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 83.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 129.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 138.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Use the area model to find 275 ÷ 5",
+          "ans": "55",
+          "measured": {
+            "1": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 83.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 129.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 138.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Use the area model to find 231 ÷ 7",
+          "ans": "33",
+          "measured": {
+            "1": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 83.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 129.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 138.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Use the area model to find 246 ÷ 2",
+          "ans": "123",
+          "measured": {
+            "1": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 112.1,
+              "fits": false
+            },
+            "4": {
+              "hMm": 129.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 138.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Use the area model to find 168 ÷ 8",
+          "ans": "21",
+          "measured": {
+            "1": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 83.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 129.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 138.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Use the area model to find 258 ÷ 2",
+          "ans": "129",
+          "measured": {
+            "1": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 112.1,
+              "fits": false
+            },
+            "4": {
+              "hMm": 129.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 138.4,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 197,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 206,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 74
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 80
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

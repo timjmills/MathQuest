@@ -1,0 +1,310 @@
+{
+  "skill": "multiplication:mult_missing_digit",
+  "category": "multiplication",
+  "skillId": "mult_missing_digit",
+  "label": "Find the Missing Digit (Multiplication)",
+  "grade": "4",
+  "dir": "multiplication__mult_missing_digit",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 3,
+        "rows": 3,
+        "perPage": 9,
+        "pages": 1,
+        "note": "Fits: 3 columns x 3 rows, 9 per page, 1 page. Digits 28 pt. Dense: 3 x 3, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 3,
+            "rows": 3,
+            "perPage": 9,
+            "pages": 1,
+            "cellW": 62,
+            "cellH": 71.5,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 3 x 3, cells sized to the problems.",
+            "line": "Fits: 3 columns x 3 rows, 9 per page, 1 page. Digits 28 pt. Dense: 3 x 3, cells sized to the problems.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 50,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 600734,
+      "title": "I Can find the missing digit (multiplication)",
+      "notes": [
+        "Dense: 3 x 3, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "4": {
+              "hMm": 48.7,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "4": {
+              "hMm": 48.7,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "4": {
+              "hMm": 48.7,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "4": {
+              "hMm": 48.7,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "4": {
+              "hMm": 48.7,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "4": {
+              "hMm": 48.7,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "0",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "4": {
+              "hMm": 48.7,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "4": {
+              "hMm": 48.7,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "0",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 48.7,
+              "fits": true
+            },
+            "4": {
+              "hMm": 48.7,
+              "fits": true
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 77,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 85,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          9
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 77
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          9
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 86
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

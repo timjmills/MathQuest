@@ -1,0 +1,374 @@
+{
+  "skill": "composing:fraction_number_line",
+  "category": "composing",
+  "skillId": "fraction_number_line",
+  "label": "Fractions on Number Line (Visual)",
+  "grade": "3",
+  "dir": "composing__fraction_number_line",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 5,
+        "perPage": 10,
+        "pages": 1,
+        "note": "Fits: 2 columns x 5 rows, 10 per page, 1 page. Digits 16 pt. Dense: 2 x 5, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 5,
+            "perPage": 10,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 38.8,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 2 x 5, cells sized to the problems.",
+            "line": "Fits: 2 columns x 5 rows, 10 per page, 1 page. Digits 16 pt. Dense: 2 x 5, cells sized to the problems.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 28.2,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 356119,
+      "title": "I Can read a fraction on a number line",
+      "notes": [
+        "Dense: 2 x 5, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "frac-model",
+          "fclass": "standard",
+          "text": "What fraction does the dot show?",
+          "ans": "1/2",
+          "measured": {
+            "1": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 28.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "standard",
+          "text": "What fraction does the dot show?",
+          "ans": "6/8",
+          "measured": {
+            "1": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 28.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "standard",
+          "text": "What fraction does the dot show?",
+          "ans": "4/8",
+          "measured": {
+            "1": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 28.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "standard",
+          "text": "What fraction does the dot show?",
+          "ans": "7/8",
+          "measured": {
+            "1": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 28.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "standard",
+          "text": "What fraction does the dot show?",
+          "ans": "3/6",
+          "measured": {
+            "1": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 28.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "standard",
+          "text": "What fraction does the dot show?",
+          "ans": "1/8",
+          "measured": {
+            "1": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 28.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "standard",
+          "text": "What fraction does the dot show?",
+          "ans": "2/3",
+          "measured": {
+            "1": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 28.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "standard",
+          "text": "What fraction does the dot show?",
+          "ans": "3/8",
+          "measured": {
+            "1": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 28.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "standard",
+          "text": "What fraction does the dot show?",
+          "ans": "1/3",
+          "measured": {
+            "1": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 28.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "standard",
+          "text": "What fraction does the dot show?",
+          "ans": "2/4",
+          "measured": {
+            "1": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 28.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 28.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 28.2,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 72,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 95,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          10
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 44
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          10
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 64
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

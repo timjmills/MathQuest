@@ -1,0 +1,166 @@
+{
+  "skill": "division:box_division_hard",
+  "category": "division",
+  "skillId": "box_division_hard",
+  "label": "Box Method Division (3÷1 digit)",
+  "grade": "4",
+  "dir": "division__box_division_hard",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 1,
+        "rows": 3,
+        "perPage": 3,
+        "pages": 1,
+        "note": "Fits: 1 column x 3 rows, 3 per page, 1 page. Digits 28 pt. Tall problems: 3 rows per page.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 3,
+            "perPage": 3,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 75.667,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Tall problems: 3 rows per page.",
+            "line": "Fits: 1 column x 3 rows, 3 per page, 1 page. Digits 28 pt. Tall problems: 3 rows per page.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 61.1,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 77267,
+      "title": "I Can divide box method",
+      "notes": [
+        "Tall problems: 3 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "880 ÷ 5 = ?",
+          "ans": "176",
+          "measured": {
+            "1": {
+              "hMm": 61.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 61.1,
+              "fits": false
+            },
+            "3": {
+              "hMm": 61.1,
+              "fits": false
+            },
+            "4": {
+              "hMm": 66.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "702 ÷ 9 = ?",
+          "ans": "78",
+          "measured": {
+            "1": {
+              "hMm": 61.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 61.1,
+              "fits": false
+            },
+            "3": {
+              "hMm": 61.1,
+              "fits": false
+            },
+            "4": {
+              "hMm": 66.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "168 ÷ 6 = ?",
+          "ans": "28",
+          "measured": {
+            "1": {
+              "hMm": 61.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 61.1,
+              "fits": false
+            },
+            "3": {
+              "hMm": 61.1,
+              "fits": false
+            },
+            "4": {
+              "hMm": 66.2,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 47,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 53,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          3
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 26
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          3
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 29
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

@@ -1,0 +1,286 @@
+{
+  "skill": "composing:whole_as_fraction",
+  "category": "composing",
+  "skillId": "whole_as_fraction",
+  "label": "Whole Numbers as Fractions (Visual)",
+  "grade": "3",
+  "dir": "composing__whole_as_fraction",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 4,
+        "perPage": 8,
+        "pages": 1,
+        "note": "Fits: 2 columns x 4 rows, 8 per page, 1 page. Digits 28 pt. Rows sized to the problems they hold.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 4,
+            "perPage": 8,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 56.75,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Rows sized to the problems they hold.",
+            "line": "Fits: 2 columns x 4 rows, 8 per page, 1 page. Digits 28 pt. Rows sized to the problems they hold.",
+            "cls": "short",
+            "digitPt": 28,
+            "hMin": 58.4,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 488829,
+      "title": "I Can write a whole number as a fraction",
+      "notes": [
+        "Rows sized to the problems they hold."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "frac-model",
+          "fclass": "short",
+          "text": "Write 5 as a fraction with denominator 1.",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 44.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 44.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 44.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 44.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "short",
+          "text": "Write 6 as a fraction with denominator 1.",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 44.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 44.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 44.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 44.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "short",
+          "text": "Write 9 as a fraction with denominator 1.",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 58.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 58.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 58.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 58.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "short",
+          "text": "Write 3 as a fraction with denominator 1.",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 32.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 32.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 32.5,
+              "fits": false
+            },
+            "4": {
+              "hMm": 32.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "short",
+          "text": "Write 7 as a fraction with denominator 1.",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 58.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 58.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 58.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 58.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "short",
+          "text": "Write 8 as a fraction with denominator 1.",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 58.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 58.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 58.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 58.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "short",
+          "text": "Write 4 as a fraction with denominator 1.",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 44.4,
+              "fits": true
+            },
+            "2": {
+              "hMm": 44.4,
+              "fits": true
+            },
+            "3": {
+              "hMm": 44.4,
+              "fits": false
+            },
+            "4": {
+              "hMm": 44.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-model",
+          "fclass": "short",
+          "text": "Write 2 as a fraction with denominator 1.",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 32.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 32.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 32.5,
+              "fits": false
+            },
+            "4": {
+              "hMm": 32.5,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 78,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 89,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 46
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 54
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

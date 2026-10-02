@@ -30,7 +30,7 @@ import { kitCellSpec } from './print-generate.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
-import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
+import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, fineSplit } from './sheet/roles/practice.js';
 import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
@@ -1283,25 +1283,32 @@ function layoutOf(role, section, items, n, ctx) {
     const whole = resolveSectionLayout(base, items, ctx.paper, LIVE_W_MM, opts);
     if (!(role === 'independent' || role === 'more-practice') || (n.anchors && n.anchors !== 'off') || section.gridH || items.length < 2) return whole;
     const wide = items.filter((it) => oneColumnOnly(it, n));
-    const narrow = items.filter((it) => !oneColumnOnly(it, n));
-    if (!wide.length || !narrow.length) return whole;
+    const narrow0 = items.filter((it) => !oneColumnOnly(it, n));
+    // the column problems of a mixed section in a group of their own (practice.js fineSplit)
+    const fs = !section.columns || section.columns === 'auto'
+        ? fineSplit(Object.assign({}, base, { floor: null }), narrow0, ctx.paper, LIVE_W_MM, { size: n.size, look: n.look }) : null;
+    const narrow = fs ? fs.mid : narrow0;
+    if (!fs && (!wide.length || !narrow.length)) return whole;
     const Ln = resolveSectionLayout(Object.assign({}, base, { count: narrow.length, floor: floorOf(narrow) }), narrow, ctx.paper, LIVE_W_MM, opts);
-    if (Ln.cols <= whole.cols) return whole;
-    const Lw = resolveSectionLayout(Object.assign({}, base, { columns: 1, count: wide.length, floor: null }), wide, ctx.paper, LIVE_W_MM, opts);
+    if (!fs && Ln.cols <= whole.cols) return whole;
+    const Lw = wide.length ? resolveSectionLayout(Object.assign({}, base, { columns: 1, count: wide.length, floor: null }), wide, ctx.paper, LIVE_W_MM, opts) : null;
+    const Lf = fs ? resolveSectionLayout(Object.assign({}, base, { columns: fs.cols, count: fs.fine.length, floor: null }), fs.fine, ctx.paper, LIVE_W_MM, opts) : null;
     // How many of the run a page holds: the items come in the order they are dealt (the probe is
     // the start of the run), so the first N are counted exactly; past the probe, the probe's share
-    // of full-width problems is assumed.
-    // The narrow group's rows and the wide group's rows are drawn at their layouts' cell heights;
-    // the wide group shares the section's instruction line (paginate.js placeSections).
+    // of each group is assumed. Each group's rows are drawn at its layout's cell height; the
+    // split-off groups share the section's instruction line (paginate.js placeSections).
     const G = Ln.gridH;
-    const hN = splitCellH(Ln), hW = splitCellH(Lw);
-    const isWide = items.map((it) => oneColumnOnly(it, n));
-    const f = wide.length / items.length;
+    const hW = Lw ? splitCellH(Lw) : 0, hF = Lf ? splitCellH(Lf) : 0;
+    const fineSet = new Set(fs ? fs.fine : []);
+    const kind = items.map((it) => (oneColumnOnly(it, n) ? 'w' : fineSet.has(it) ? 'f' : 'n'));
+    const share = (k) => kind.filter((x) => x === k).length / items.length;
     let best = 1;
     for (let N = 2; N <= 40; N++) {
-        const nw = N <= items.length ? isWide.slice(0, N).filter(Boolean).length : Math.round(N * f);
-        const nn = N - nw;
-        if (Math.ceil(nn / Ln.cols) * hN + nw * hW > G - 0.99) break;
+        const cnt = (k) => (N <= items.length ? kind.slice(0, N).filter((x) => x === k).length : Math.round(N * share(k)));
+        const nw = cnt('w'), nf = cnt('f'), nn = N - nw - nf;
+        const rN = Math.ceil(nn / Ln.cols);
+        const h = rN * splitCellH(Ln, fs ? rN : 0) + nw * hW + (Lf ? Math.ceil(nf / Lf.cols) * hF : 0);
+        if (h > G - 0.99) break;
         best = N;
     }
     return Object.assign({}, Ln, { perPage: best, splitWide: true });

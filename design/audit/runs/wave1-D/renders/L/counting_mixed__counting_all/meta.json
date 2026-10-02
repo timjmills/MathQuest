@@ -1,0 +1,184 @@
+{
+  "skill": "counting_mixed:counting_all",
+  "category": "counting_mixed",
+  "skillId": "counting_all",
+  "label": "All Counting & Cardinality",
+  "grade": "M",
+  "dir": "counting_mixed__counting_all",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 2,
+        "perPage": 4,
+        "pages": 1,
+        "note": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 28 pt. Tall problems: 2 rows per page. 1 problem is too wide for 2 columns: full width, at the bottom. Tall problems: 2 rows per page. Very tall problems: fewer than 3 rows fit.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 2,
+            "perPage": 4,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 90.96,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Tall problems: 2 rows per page.",
+            "line": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 28 pt. Tall problems: 2 rows per page.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 75.8,
+            "anchorMm": 0,
+            "blocks": null
+          },
+          {
+            "cols": 1,
+            "rows": 2,
+            "perPage": 2,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 93.12,
+            "requested": 1,
+            "clamped": false,
+            "note": "1 problem is too wide for 2 columns: full width, at the bottom. Tall problems: 2 rows per page. Very tall problems: fewer than 3 rows fit.",
+            "line": "Fits: 1 column x 2 rows, 2 per page, 1 page. Digits 28 pt. Tall problems: 2 rows per page. Very tall problems: fewer than 3 rows fit. 1 full-width problem at the bottom.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 77.6,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 125195,
+      "title": "I Can work on all counting & cardinality",
+      "notes": [
+        "Tall problems: 2 rows per page.",
+        "1 problem is too wide for 2 columns: full width, at the bottom. Tall problems: 2 rows per page. Very tall problems: fewer than 3 rows fit."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "frac-wall",
+          "fclass": "standard",
+          "text": "Use halves and quarters and eighths to make 1 whole.",
+          "ans": "1 whole",
+          "measured": {
+            "1": {
+              "hMm": 75.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 75.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 75.8,
+              "fits": false
+            },
+            "4": {
+              "hMm": 75.8,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Build 36. Trade 1 ten for 10 ones.",
+          "ans": "36",
+          "measured": {
+            "1": {
+              "hMm": 77.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 77.6,
+              "fits": false
+            },
+            "3": {
+              "hMm": 84,
+              "fits": false
+            },
+            "4": {
+              "hMm": 90.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "compare",
+          "fclass": "short",
+          "text": "Which group has more counters?",
+          "ans": "A",
+          "measured": {
+            "1": {
+              "hMm": 74.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 74.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 74.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 69.4,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 103,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 110,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          3
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 64
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          3
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 68
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

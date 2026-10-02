@@ -97,6 +97,15 @@ export function applyWordWork(q) {
         if (payload && !two && payload.steps.length === 1 && payload.steps[0].op !== '/') {
             payload.tracks = skillTracks(skill === outer ? skill : (isWordWorkSkill(skill) ? skill : outer), payload.steps[0].op);
         }
+        // A times-as-many story divides a TIMES-TABLE fact (4.OA.2: 45 is 5 times as many as 9):
+        // the division frame keeps the divisor, dividend and quotient boxes but drops the long
+        // division working rows, which a known fact never needs (P-1 writing load; wave 1 lane D:
+        // the working made every cell 120 mm tall, two problems to a page).
+        if (payload && /^mult_comparison(_plain)?$/.test(skill === outer ? skill : (isWordWorkSkill(skill) ? skill : outer))) {
+            for (const st of payload.steps) {
+                if (st.op === '/' && st.bottom > 0 && st.bottom <= 10 && st.top % st.bottom === 0 && st.top / st.bottom <= 10) st.fact = true;
+            }
+        }
     } catch (e) { payload = null; }
     if (!payload) return q;
     // the retold story is the item's text on every host (the card, the worksheet, the quiz, print)

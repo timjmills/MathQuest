@@ -1,0 +1,260 @@
+{
+  "skill": "division:area_model_div_2by1",
+  "category": "division",
+  "skillId": "area_model_div_2by1",
+  "label": "Area Model Division (2÷1 digit)",
+  "grade": "4",
+  "dir": "division__area_model_div_2by1",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 76,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 73.2,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 933558,
+      "title": "I Can divide area model",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Use the area model to find 60 ÷ 5",
+          "ans": "12",
+          "measured": {
+            "1": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 83.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 129.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 138.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Use the area model to find 64 ÷ 2",
+          "ans": "32",
+          "measured": {
+            "1": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 83.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 129.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 138.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Use the area model to find 72 ÷ 9",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 83.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 121.8,
+              "fits": false
+            },
+            "5": {
+              "hMm": 138.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Use the area model to find 72 ÷ 6",
+          "ans": "12",
+          "measured": {
+            "1": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 83.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 129.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 138.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Use the area model to find 24 ÷ 2",
+          "ans": "12",
+          "measured": {
+            "1": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 83.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 129.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 138.4,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "Use the area model to find 90 ÷ 5",
+          "ans": "18",
+          "measured": {
+            "1": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 73.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 83.5,
+              "fits": true
+            },
+            "4": {
+              "hMm": 129.1,
+              "fits": false
+            },
+            "5": {
+              "hMm": 138.4,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 197,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 206,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 74
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 80
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

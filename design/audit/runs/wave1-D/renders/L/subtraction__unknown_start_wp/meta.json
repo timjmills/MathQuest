@@ -1,0 +1,142 @@
+{
+  "skill": "subtraction:unknown_start_wp",
+  "category": "subtraction",
+  "skillId": "unknown_start_wp",
+  "label": "Unknown Start Word Problems (Visual)",
+  "grade": "2",
+  "dir": "subtraction__unknown_start_wp",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 1,
+        "rows": 2,
+        "perPage": 2,
+        "pages": 1,
+        "note": "Fits: 1 column x 2 rows, 2 per page, 1 page. Digits 28 pt. Word problems print in 1 column. Tall problems: 2 rows per page.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 2,
+            "perPage": 2,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 113.5,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Word problems print in 1 column. Tall problems: 2 rows per page.",
+            "line": "Fits: 1 column x 2 rows, 2 per page, 1 page. Digits 28 pt. Word problems print in 1 column. Tall problems: 2 rows per page.",
+            "cls": "word",
+            "digitPt": 28,
+            "hMin": 82.1,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 857602,
+      "title": "I Can subtract unknown start word problems",
+      "notes": [
+        "Word problems print in 1 column. Tall problems: 2 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "legacy",
+          "fclass": "word",
+          "text": "Olivia had some marbles. Olivia gave 8 of them. Now Olivia has 84 marbles. How m",
+          "ans": "92",
+          "measured": {
+            "1": {
+              "hMm": 82.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 88.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": true
+            },
+            "4": {
+              "hMm": 112.9,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "word",
+          "text": "Layla had some cookies. Then Layla baked 2 more. Now Layla has 12 cookies. How m",
+          "ans": "10",
+          "measured": {
+            "1": {
+              "hMm": 82.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 88.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 100.2,
+              "fits": true
+            },
+            "4": {
+              "hMm": 119,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 99,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 104,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          2
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 32
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          2
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 34
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

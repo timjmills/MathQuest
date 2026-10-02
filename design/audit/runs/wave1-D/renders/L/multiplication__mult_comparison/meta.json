@@ -1,0 +1,190 @@
+{
+  "skill": "multiplication:mult_comparison",
+  "category": "multiplication",
+  "skillId": "mult_comparison",
+  "label": "Times as Many Word Problems (Visual)",
+  "grade": "4",
+  "dir": "multiplication__mult_comparison",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 2,
+        "perPage": 4,
+        "pages": 1,
+        "note": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 28 pt. Tall problems: 2 rows per page.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 2,
+            "perPage": 4,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 113.5,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Tall problems: 2 rows per page.",
+            "line": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 28 pt. Tall problems: 2 rows per page.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 80.8,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 978949,
+      "title": "I Can solve times-as-many stories",
+      "notes": [
+        "Tall problems: 2 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom has 4 buttons. Sam has 8 buttons. How many times as many buttons does Sam ha",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 67.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 74.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 69.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 3 crayons. Leo has 6 crayons. How many times as many crayons does Leo ha",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 42.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 67.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 74.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 69.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 16 stamps. That is 8 times as many as Mia has. How many stamps does Mia ",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 42.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 73.5,
+              "fits": true
+            },
+            "3": {
+              "hMm": 69,
+              "fits": false
+            },
+            "4": {
+              "hMm": 69,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia has 7 beads. Ana has 14 beads. How many times as many beads does Ana have?",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 50.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 67.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 74.1,
+              "fits": true
+            },
+            "4": {
+              "hMm": 63.2,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 137,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 155,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 49
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 64
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

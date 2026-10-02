@@ -608,7 +608,9 @@ register('frac-model', {
     footprint(p, ctx) {
         const { w, h } = rowSize(p, ctx);
         const wMm = Math.ceil(w + 8), hMm = Math.ceil(h + 8);
-        return { wMm, hMm, measure: true, factLike: false, maxCols: wMm <= 56 ? 3 : wMm <= 88 ? 2 : 1 };
+        // `oneCol` (whole_as_fraction, wave 1 lane D): every item of the page in one column, so a short
+        // whole never stands alone beside an empty cell over a column of long ones
+        return { wMm, hMm, measure: true, factLike: false, maxCols: p.oneCol ? 1 : wMm <= 56 ? 3 : wMm <= 88 ? 2 : 1 };
     },
     inputs(p) {
         if (p.task === 'shade') return [{ id: 'answer', kind: 'number', shape: 'draw', graded: true, order: 0, scopes: ['full'] }];

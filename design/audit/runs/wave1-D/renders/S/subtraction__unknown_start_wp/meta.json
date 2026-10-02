@@ -1,0 +1,178 @@
+{
+  "skill": "subtraction:unknown_start_wp",
+  "category": "subtraction",
+  "skillId": "unknown_start_wp",
+  "label": "Unknown Start Word Problems (Visual)",
+  "grade": "2",
+  "dir": "subtraction__unknown_start_wp",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 1,
+        "rows": 3,
+        "perPage": 3,
+        "pages": 1,
+        "note": "Fits: 1 column x 3 rows, 3 per page, 1 page. Digits 16 pt. Word problems print in 1 column. Tall problems: 3 rows per page.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 3,
+            "perPage": 3,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 76,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Word problems print in 1 column. Tall problems: 3 rows per page.",
+            "line": "Fits: 1 column x 3 rows, 3 per page, 1 page. Digits 16 pt. Word problems print in 1 column. Tall problems: 3 rows per page.",
+            "cls": "word",
+            "digitPt": 16,
+            "hMin": 74,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 857602,
+      "title": "I Can subtract unknown start word problems",
+      "notes": [
+        "Word problems print in 1 column. Tall problems: 3 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "legacy",
+          "fclass": "word",
+          "text": "Olivia had some marbles. Olivia gave 8 of them. Now Olivia has 84 marbles. How m",
+          "ans": "92",
+          "measured": {
+            "1": {
+              "hMm": 74,
+              "fits": true
+            },
+            "2": {
+              "hMm": 80,
+              "fits": true
+            },
+            "3": {
+              "hMm": 92,
+              "fits": true
+            },
+            "4": {
+              "hMm": 101.7,
+              "fits": false
+            },
+            "5": {
+              "hMm": 129,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "word",
+          "text": "Layla had some cookies. Then Layla baked 2 more. Now Layla has 12 cookies. How m",
+          "ans": "10",
+          "measured": {
+            "1": {
+              "hMm": 74,
+              "fits": true
+            },
+            "2": {
+              "hMm": 80,
+              "fits": true
+            },
+            "3": {
+              "hMm": 92,
+              "fits": true
+            },
+            "4": {
+              "hMm": 107.7,
+              "fits": false
+            },
+            "5": {
+              "hMm": 129,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "word",
+          "text": "Noah started with some shells. After giving 13 away, Noah has 85 left. How many ",
+          "ans": "98",
+          "measured": {
+            "1": {
+              "hMm": 74,
+              "fits": true
+            },
+            "2": {
+              "hMm": 80,
+              "fits": true
+            },
+            "3": {
+              "hMm": 86,
+              "fits": true
+            },
+            "4": {
+              "hMm": 101.7,
+              "fits": false
+            },
+            "5": {
+              "hMm": 123,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 126,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 132,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          3
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 41
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          3
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 44
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

@@ -1,0 +1,190 @@
+{
+  "skill": "multiplication:mult_div_fact_family",
+  "category": "multiplication",
+  "skillId": "mult_div_fact_family",
+  "label": "Multiplication Fact Families",
+  "grade": "3",
+  "dir": "multiplication__mult_div_fact_family",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 2,
+        "perPage": 4,
+        "pages": 1,
+        "note": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 28 pt. Tall problems: 2 rows per page.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 2,
+            "perPage": 4,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 113.5,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Tall problems: 2 rows per page.",
+            "line": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 28 pt. Tall problems: 2 rows per page.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 101.2,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 819899,
+      "title": "I Can multiply fact families",
+      "notes": [
+        "Tall problems: 2 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "fact-family",
+          "fclass": "standard",
+          "text": "Fact Family: 12, 4, 48",
+          "ans": "48, 48, 4, 12",
+          "measured": {
+            "1": {
+              "hMm": 101.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 101.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 101.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 101.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact-family",
+          "fclass": "standard",
+          "text": "Fact Family: 11, 7, 77",
+          "ans": "77, 77, 7, 11",
+          "measured": {
+            "1": {
+              "hMm": 101.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 101.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 101.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 101.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact-family",
+          "fclass": "standard",
+          "text": "Fact Family: 5, 6, 30",
+          "ans": "30, 30, 6, 5",
+          "measured": {
+            "1": {
+              "hMm": 101.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 101.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 101.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 101.2,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "fact-family",
+          "fclass": "standard",
+          "text": "Fact Family: 5, 2, 10",
+          "ans": "10, 10, 2, 5",
+          "measured": {
+            "1": {
+              "hMm": 101.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 101.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 101.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 101.2,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 99,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 134,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 78
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 110
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

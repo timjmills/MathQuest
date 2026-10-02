@@ -1,0 +1,334 @@
+{
+  "skill": "composing:select_even_odd",
+  "category": "composing",
+  "skillId": "select_even_odd",
+  "label": "Circle the Even or Odd Numbers (MAP)",
+  "grade": "2",
+  "dir": "composing__select_even_odd",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 5,
+        "perPage": 10,
+        "pages": 1,
+        "note": "Fits: 2 columns x 5 rows, 10 per page, 1 page. Digits 28 pt. Dense: 2 x 5, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 5,
+            "perPage": 10,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 45.4,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 2 x 5, cells sized to the problems.",
+            "line": "Fits: 2 columns x 5 rows, 10 per page, 1 page. Digits 28 pt. Dense: 2 x 5, cells sized to the problems.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 35.7,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 37489,
+      "title": "I Can sort even and odd numbers",
+      "notes": [
+        "Dense: 2 x 5, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt0\",\"opt5\"]",
+          "measured": {
+            "1": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the ODD numbers.",
+          "ans": "[\"opt0\",\"opt3\",\"opt5\"]",
+          "measured": {
+            "1": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the ODD numbers.",
+          "ans": "[\"opt0\",\"opt4\"]",
+          "measured": {
+            "1": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt1\",\"opt2\",\"opt4\",\"opt5\"]",
+          "measured": {
+            "1": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt0\",\"opt3\"]",
+          "measured": {
+            "1": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the ODD numbers.",
+          "ans": "[\"opt0\",\"opt3\"]",
+          "measured": {
+            "1": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the ODD numbers.",
+          "ans": "[\"opt2\",\"opt3\",\"opt4\",\"opt5\"]",
+          "measured": {
+            "1": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "4": {
+              "hMm": 35.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the ODD numbers.",
+          "ans": "[\"opt0\",\"opt3\"]",
+          "measured": {
+            "1": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt1\",\"opt2\",\"opt3\",\"opt5\"]",
+          "measured": {
+            "1": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "parity",
+          "fclass": "standard",
+          "text": "Click ALL the EVEN numbers.",
+          "ans": "[\"opt3\",\"opt5\"]",
+          "measured": {
+            "1": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "2": {
+              "hMm": 35.7,
+              "fits": true
+            },
+            "3": {
+              "hMm": 35.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 35.7,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 116,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 119,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          10
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 84
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          10
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 84
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

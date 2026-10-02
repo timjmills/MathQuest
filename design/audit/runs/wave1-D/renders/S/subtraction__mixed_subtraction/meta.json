@@ -1,0 +1,269 @@
+{
+  "skill": "subtraction:mixed_subtraction",
+  "category": "subtraction",
+  "skillId": "mixed_subtraction",
+  "label": "Mixed Subtraction",
+  "grade": "M",
+  "dir": "subtraction__mixed_subtraction",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt. 3 column problems in 4 columns. Dense: 4 x 4, cells sized to the problems. 1 problem is too wide for 2 columns: full width, at the bottom. Tall problems: 3 rows per page.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 75.48,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 62.9,
+            "anchorMm": 0,
+            "blocks": null
+          },
+          {
+            "cols": 4,
+            "rows": 4,
+            "perPage": 16,
+            "pages": 1,
+            "cellW": 46.5,
+            "cellH": 50.4,
+            "requested": 4,
+            "clamped": false,
+            "note": "3 column problems in 4 columns. Dense: 4 x 4, cells sized to the problems.",
+            "line": "Fits: 4 columns x 4 rows, 16 per page, 1 page. Digits 16 pt. Dense: 4 x 4, cells sized to the problems. 3 column problems in 4 columns.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 42,
+            "anchorMm": 0,
+            "blocks": null
+          },
+          {
+            "cols": 1,
+            "rows": 3,
+            "perPage": 3,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 75.667,
+            "requested": 1,
+            "clamped": false,
+            "note": "1 problem is too wide for 2 columns: full width, at the bottom. Tall problems: 3 rows per page.",
+            "line": "Fits: 1 column x 3 rows, 3 per page, 1 page. Digits 16 pt. Tall problems: 3 rows per page. 1 full-width problem at the bottom.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 69.9,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 756635,
+      "title": "I Can review subtraction",
+      "notes": [
+        "3 column problems in 4 columns. Dense: 4 x 4, cells sized to the problems.",
+        "1 problem is too wide for 2 columns: full width, at the bottom. Tall problems: 3 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "3,636 − 1,022 = ?",
+          "ans": "2614",
+          "measured": {
+            "1": {
+              "hMm": 39,
+              "fits": true
+            },
+            "2": {
+              "hMm": 39,
+              "fits": true
+            },
+            "3": {
+              "hMm": 39,
+              "fits": true
+            },
+            "4": {
+              "hMm": 39,
+              "fits": true
+            },
+            "5": {
+              "hMm": 39,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "There are 510 cookies in a box. Aya takes 376 cookies out. How many cookies are ",
+          "ans": "134",
+          "measured": {
+            "1": {
+              "hMm": 39.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 62.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 64.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 64.6,
+              "fits": false
+            },
+            "5": {
+              "hMm": 64.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "8,924 − 2,720 = ?",
+          "ans": "6204",
+          "measured": {
+            "1": {
+              "hMm": 39,
+              "fits": true
+            },
+            "2": {
+              "hMm": 39,
+              "fits": true
+            },
+            "3": {
+              "hMm": 39,
+              "fits": true
+            },
+            "4": {
+              "hMm": 39,
+              "fits": true
+            },
+            "5": {
+              "hMm": 39,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "816 − 416 = ?",
+          "ans": "400",
+          "measured": {
+            "1": {
+              "hMm": 39,
+              "fits": true
+            },
+            "2": {
+              "hMm": 39,
+              "fits": true
+            },
+            "3": {
+              "hMm": 39,
+              "fits": true
+            },
+            "4": {
+              "hMm": 39,
+              "fits": true
+            },
+            "5": {
+              "hMm": 39,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "The museum has 238,628 dollars. The museum gives 201,717 dollars to the shop. Ho",
+          "ans": "36911",
+          "measured": {
+            "1": {
+              "hMm": 69.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 64.6,
+              "fits": false
+            },
+            "3": {
+              "hMm": 64.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 64.6,
+              "fits": false
+            },
+            "5": {
+              "hMm": 64.6,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 117,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 166,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          5
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 64
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          5
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 110
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

@@ -1,0 +1,279 @@
+{
+  "skill": "multiplication:mult_properties",
+  "category": "multiplication",
+  "skillId": "mult_properties",
+  "label": "Multiplication Properties (Visual)",
+  "grade": "3",
+  "dir": "multiplication__mult_properties",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 4,
+        "perPage": 8,
+        "pages": 1,
+        "note": "Fits: 2 columns x 4 rows, 8 per page, 1 page. Digits 28 pt. 3 problems are too wide for 2 columns: full width, at the bottom. Dense: 1 x 6, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 4,
+            "perPage": 8,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 56.5,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 2 columns x 4 rows, 8 per page, 1 page. Digits 28 pt.",
+            "cls": "short",
+            "digitPt": 28,
+            "hMin": 56.1,
+            "anchorMm": 0,
+            "blocks": null
+          },
+          {
+            "cols": 1,
+            "rows": 6,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 35.4,
+            "requested": 1,
+            "clamped": false,
+            "note": "3 problems are too wide for 2 columns: full width, at the bottom. Dense: 1 x 6, cells sized to the problems.",
+            "line": "Fits: 1 column x 6 rows, 6 per page, 1 page. Digits 28 pt. Dense: 1 x 6, cells sized to the problems. 3 full-width problems at the bottom.",
+            "cls": "short",
+            "digitPt": 28,
+            "hMin": 29.5,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 760977,
+      "title": "I Can multiply properties",
+      "notes": [
+        "3 problems are too wide for 2 columns: full width, at the bottom. Dense: 1 x 6, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "What is 1 × 3?",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 50.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 50.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 50.8,
+              "fits": true
+            },
+            "4": {
+              "hMm": 56,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "What is 0 × 11?",
+          "ans": "0",
+          "measured": {
+            "1": {
+              "hMm": 50.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 50.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 50.8,
+              "fits": true
+            },
+            "4": {
+              "hMm": 58.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "3 × 7 = 2 × 7 + ___ × 7. What is the missing number?",
+          "ans": "1",
+          "measured": {
+            "1": {
+              "hMm": 29.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.7,
+              "fits": false
+            },
+            "3": {
+              "hMm": 48.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 81.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "4 × 5 = 1 × 5 + ___ × 5. What is the missing number?",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 29.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.7,
+              "fits": false
+            },
+            "3": {
+              "hMm": 48.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 81.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "If 4 × 6 = 24, what is 6 × 4?",
+          "ans": "24",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true
+            },
+            "2": {
+              "hMm": 56.1,
+              "fits": true
+            },
+            "3": {
+              "hMm": 89.9,
+              "fits": false
+            },
+            "4": {
+              "hMm": 95.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "4 × 6 = 1 × 6 + ___ × 6. What is the missing number?",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 29.5,
+              "fits": true
+            },
+            "2": {
+              "hMm": 48.7,
+              "fits": false
+            },
+            "3": {
+              "hMm": 48.7,
+              "fits": false
+            },
+            "4": {
+              "hMm": 81.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "short",
+          "text": "What is 4 × 1?",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 50.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 50.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 50.8,
+              "fits": true
+            },
+            "4": {
+              "hMm": 56,
+              "fits": true
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 164,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 174,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          7
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 56
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          7
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 63
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

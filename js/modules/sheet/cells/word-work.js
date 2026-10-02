@@ -716,8 +716,9 @@ function divisionWork(ctx, st, show, idx, p = {}, isAnswer = false) {
         }
         return out;
     };
-    const eRows = rowsOf(eSteps);
-    const sRows = rowsOf(steps);
+    // a times-table fact (`st.fact`, word-work.js) keeps no working rows: the quotient is known
+    const eRows = st.fact ? [] : rowsOf(eSteps);
+    const sRows = st.fact ? [] : rowsOf(steps);
     eRows.forEach((er, k) => {
         const sr = sRows[k] || { text: '', end: 0 };
         const row = 3 + k;

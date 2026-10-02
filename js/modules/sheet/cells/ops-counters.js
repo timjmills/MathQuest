@@ -155,6 +155,7 @@ register('arrays', {
             return { first: l[0], second: l[1], total: l[2] };
         });
         const pic = arraysPicture(g, p);
+        const rows = Number(p.rows), cols = Number(p.cols);
         // "[ ] groups of [ ]." mirrors "[ ] rows of [ ]." ("There are" made the line 97 mm at L,
         // wider than a 2-column cell).
         const words = p.kind === 'equal_groups'

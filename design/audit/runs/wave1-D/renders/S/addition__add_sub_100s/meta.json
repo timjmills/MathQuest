@@ -1,0 +1,934 @@
+{
+  "skill": "addition:add_sub_100s",
+  "category": "addition",
+  "skillId": "add_sub_100s",
+  "label": "Add & Subtract by 100s",
+  "grade": "2",
+  "dir": "addition__add_sub_100s",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 5,
+        "rows": 6,
+        "perPage": 30,
+        "pages": 1,
+        "note": "Fits: 5 columns x 6 rows, 30 per page, 1 page. Digits 16 pt. Dense: 5 x 5, cells sized to the problems. Page filled: 30 short problems (at most 30, DN-1).",
+        "sections": [
+          {
+            "cols": 5,
+            "rows": 6,
+            "perPage": 30,
+            "pages": 1,
+            "cellW": 37.2,
+            "cellH": 37.3,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 5 x 5, cells sized to the problems. Page filled: 30 short problems (at most 30, DN-1).",
+            "line": "Fits: 5 columns x 6 rows, 30 per page, 1 page. Digits 16 pt. Dense: 5 x 5, cells sized to the problems. Page filled: 30 short problems (at most 30, DN-1).",
+            "cls": "short",
+            "digitPt": 16,
+            "hMin": 27.2,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 205040,
+      "title": "I Can add & subtract by 100s",
+      "notes": [
+        "Dense: 5 x 5, cells sized to the problems. Page filled: 30 short problems (at most 30, DN-1)."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "900 + 100 = ?",
+          "ans": "1000",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "300 + 100 = ?",
+          "ans": "400",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "900 − 100 = ?",
+          "ans": "800",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "100 + 100 = ?",
+          "ans": "200",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "600 + 100 = ?",
+          "ans": "700",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "200 + 100 = ?",
+          "ans": "300",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "400 + 100 = ?",
+          "ans": "500",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "500 + 100 = ?",
+          "ans": "600",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "800 − 100 = ?",
+          "ans": "700",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "700 + 100 = ?",
+          "ans": "800",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "700 − 100 = ?",
+          "ans": "600",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "500 − 100 = ?",
+          "ans": "400",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "800 + 100 = ?",
+          "ans": "900",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "200 − 100 = ?",
+          "ans": "100",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "300 − 100 = ?",
+          "ans": "200",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "0 + 100 = ?",
+          "ans": "100",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "100 − 100 = ?",
+          "ans": "0",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "600 − 100 = ?",
+          "ans": "500",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "1000 − 100 = ?",
+          "ans": "900",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "800 + 100 = ?",
+          "ans": "900",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "400 + 100 = ?",
+          "ans": "500",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "400 − 100 = ?",
+          "ans": "300",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "100 − 100 = ?",
+          "ans": "0",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "800 + 100 = ?",
+          "ans": "900",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "600 − 100 = ?",
+          "ans": "500",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "800 − 100 = ?",
+          "ans": "700",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "1000 − 100 = ?",
+          "ans": "900",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "900 + 100 = ?",
+          "ans": "1000",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "900 + 100 = ?",
+          "ans": "1000",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "short",
+          "text": "500 + 100 = ?",
+          "ans": "600",
+          "measured": {
+            "1": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "2": {
+              "hMm": 27.2,
+              "fits": true
+            },
+            "3": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "4": {
+              "hMm": 27.2,
+              "fits": false
+            },
+            "5": {
+              "hMm": 37.2,
+              "fits": true
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 148,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 181,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          30
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 254
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          30
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 343
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

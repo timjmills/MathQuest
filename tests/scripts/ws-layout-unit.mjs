@@ -31,6 +31,7 @@ import {
     renderPlan, sectionInstructionKey, instructionHtml, levelLine, estimateTitleLines,
 } from '../../js/modules/sheet/roles/practice.js';
 import { ROLE_IDS, ROLE_MODULES, ROLE_ALIASES } from '../../js/modules/sheet/roles/index.js';
+import { fineSplit } from '../../js/modules/sheet/roles/practice.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, getProvider } from '../../js/modules/sheet/index.js';
 import { stack, regroupWorking } from '../../js/modules/sheet/cells/stack.js';
 import { SLOT, SIZES as KIT_SIZES, slotRadiusMm, stripSegStyle, stripPos } from '../../js/modules/sheet/tokens.js';
@@ -1204,6 +1205,22 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     ok(full.length === 2 && full[1].count * 3 > full[0].count, `PG-23 (packByHeight): a last page is never under a third of the first (${full.map((c) => c.count).join(' + ')})`);
     const one = packByHeight(mk([50, 60, 57, 40]), 1, grid);
     eq(one.map((c) => c.count), [4], 'PG-23 (packByHeight): a section that fits one page stays one page');
+}
+
+// Wave 1 lane D (2026-10-02): a mixed section's column problems form a group of their own in more
+// columns than the stories and pictures they are dealt with (RUBRIC H13: a three-digit column fact
+// alone in a 92 mm cell, two thirds of it empty).
+{
+    const story = (i) => ({ id: `w${i}`, template: 'word-work', fclass: 'standard', measured: { 1: { hMm: 50, fits: true }, 2: { hMm: 75, fits: true }, 3: { hMm: 80, fits: false } }, footprint: { wMm: 93, hMm: null, measure: true, maxCols: 2 } });
+    const col = (i) => ({ id: `s${i}`, template: 'stack', fclass: 'standard', measured: { 1: { hMm: 45, fits: true }, 2: { hMm: 45, fits: true }, 3: { hMm: 45, fits: true }, 4: { hMm: 45, fits: true } }, footprint: { wMm: 36, hMm: null, measure: true, maxCols: 4 } });
+    const base = { role: 'independent', columns: 'auto', dense: true };
+    const opts = { size: 'L', look: 'ican', header: FULL_HEADER };
+    const two = fineSplit(base, [story(1), col(1), story(2), col(2)], 'A4', 186, opts);
+    ok(two && two.fine.length === 2 && two.mid.length === 2 && two.cols > 2, `fineSplit: two column facts among stories take their own columns (${two && two.cols})`);
+    const six = fineSplit(base, [story(1), col(1), col(2), col(3), col(4), col(5), col(6)], 'A4', 186, opts);
+    ok(six && six.fine.length % six.cols === 0, `fineSplit: six column facts fill whole rows (${six && six.cols} columns)`);
+    ok(fineSplit(base, [story(1), col(1), story(2)], 'A4', 186, opts) === null, 'fineSplit: one column fact stays with the section');
+    ok(fineSplit(base, [col(1), col(2), col(3)], 'A4', 186, opts) === null, 'fineSplit: a section of column facts only is not split');
 }
 
 /* ======================================================================= report */

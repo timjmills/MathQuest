@@ -1,0 +1,794 @@
+{
+  "skill": "multiplication:mult_missing_digit",
+  "category": "multiplication",
+  "skillId": "mult_missing_digit",
+  "label": "Find the Missing Digit (Multiplication)",
+  "grade": "4",
+  "dir": "multiplication__mult_missing_digit",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 5,
+        "rows": 5,
+        "perPage": 25,
+        "pages": 1,
+        "note": "Fits: 5 columns x 5 rows, 25 per page, 1 page. Digits 16 pt. Dense: 5 x 5, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 5,
+            "rows": 5,
+            "perPage": 25,
+            "pages": 1,
+            "cellW": 37.2,
+            "cellH": 45.6,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 5 x 5, cells sized to the problems.",
+            "line": "Fits: 5 columns x 5 rows, 25 per page, 1 page. Digits 16 pt. Dense: 5 x 5, cells sized to the problems.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 34,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 600734,
+      "title": "I Can find the missing digit (multiplication)",
+      "notes": [
+        "Dense: 5 x 5, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "0",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "0",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        },
+        {
+          "template": "stack",
+          "fclass": "standard",
+          "text": "Find the missing digit.",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 33,
+              "fits": true
+            },
+            "2": {
+              "hMm": 33,
+              "fits": true
+            },
+            "3": {
+              "hMm": 33,
+              "fits": true
+            },
+            "4": {
+              "hMm": 33,
+              "fits": true
+            },
+            "5": {
+              "hMm": 33,
+              "fits": true
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 151,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 165,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          25
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 187
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          25
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 212
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

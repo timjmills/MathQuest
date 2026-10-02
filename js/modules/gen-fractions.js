@@ -3687,7 +3687,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.acceptedAnswers = [String(whole), `${whole}/1`];
                     q.hint = `Any whole number can be written as that number over 1. ${whole} = ${whole}/1.`;
                     _fKit(q, { task: 'op', terms: [{ w: whole, n: 0, d: 1, kind: 'bar' }, { n: whole, d: 1, frac: 'n' }], joins: ['='], answer: { n: whole, d: 1 },
-                        wholeMm: 12, barH: 11, ...(whole > 5 ? { perRow: 5 } : {}) });
+                        wholeMm: 11, barH: 11, perRow: 3 });
                 } else {
                     const den = pick([2, 3, 4, 5, 6, 8]);
                     q.text = `Write 1 as a fraction with denominator ${den}.`;

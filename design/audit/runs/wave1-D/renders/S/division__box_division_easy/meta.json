@@ -1,0 +1,260 @@
+{
+  "skill": "division:box_division_easy",
+  "category": "division",
+  "skillId": "box_division_easy",
+  "label": "Box Method Division (2÷1 digit)",
+  "grade": "3",
+  "dir": "division__box_division_easy",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 76,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 54.9,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 667752,
+      "title": "I Can divide box method",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "22 ÷ 2 = ?",
+          "ans": "11",
+          "measured": {
+            "1": {
+              "hMm": 54.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 54.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "4": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "5": {
+              "hMm": 58.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "81 ÷ 9 = ?",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 54.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 54.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "4": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "5": {
+              "hMm": 58.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "76 ÷ 4 = ?",
+          "ans": "19",
+          "measured": {
+            "1": {
+              "hMm": 54.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 54.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "4": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "5": {
+              "hMm": 58.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "12 ÷ 3 = ?",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 54.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 54.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "4": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "5": {
+              "hMm": 58.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "63 ÷ 9 = ?",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 54.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 54.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "4": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "5": {
+              "hMm": 58.7,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "20 ÷ 5 = ?",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 54.9,
+              "fits": true
+            },
+            "2": {
+              "hMm": 54.9,
+              "fits": true
+            },
+            "3": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "4": {
+              "hMm": 54.9,
+              "fits": false
+            },
+            "5": {
+              "hMm": 58.7,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 59,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 68,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 38
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 44
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

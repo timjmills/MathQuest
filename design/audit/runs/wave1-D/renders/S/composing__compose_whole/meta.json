@@ -1,0 +1,260 @@
+{
+  "skill": "composing:compose_whole",
+  "category": "composing",
+  "skillId": "compose_whole",
+  "label": "Compose 1 Whole from Unit Fractions",
+  "grade": "3",
+  "dir": "composing__compose_whole",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 76,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 61.6,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 532414,
+      "title": "I Can make 1 whole from unit fractions",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "frac-wall",
+          "fclass": "standard",
+          "text": "Use halves and quarters to make 1 whole.",
+          "ans": "1 whole",
+          "measured": {
+            "1": {
+              "hMm": 51.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 51.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 51.8,
+              "fits": false
+            },
+            "4": {
+              "hMm": 51.8,
+              "fits": false
+            },
+            "5": {
+              "hMm": 51.8,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-wall",
+          "fclass": "standard",
+          "text": "Use halves and thirds and sixths to make 1 whole.",
+          "ans": "1 whole",
+          "measured": {
+            "1": {
+              "hMm": 61.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 61.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 61.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 61.6,
+              "fits": false
+            },
+            "5": {
+              "hMm": 61.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-wall",
+          "fclass": "standard",
+          "text": "Use halves and sixths to make 1 whole.",
+          "ans": "1 whole",
+          "measured": {
+            "1": {
+              "hMm": 51.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 51.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 51.8,
+              "fits": false
+            },
+            "4": {
+              "hMm": 51.8,
+              "fits": false
+            },
+            "5": {
+              "hMm": 51.8,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-wall",
+          "fclass": "standard",
+          "text": "Use quarters and eighths to make 1 whole.",
+          "ans": "1 whole",
+          "measured": {
+            "1": {
+              "hMm": 51.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 51.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 60.5,
+              "fits": false
+            },
+            "4": {
+              "hMm": 60.5,
+              "fits": false
+            },
+            "5": {
+              "hMm": 60.5,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-wall",
+          "fclass": "standard",
+          "text": "Use halves and quarters and eighths to make 1 whole.",
+          "ans": "1 whole",
+          "measured": {
+            "1": {
+              "hMm": 61.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 61.6,
+              "fits": true
+            },
+            "3": {
+              "hMm": 61.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 61.6,
+              "fits": false
+            },
+            "5": {
+              "hMm": 61.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "frac-wall",
+          "fclass": "standard",
+          "text": "Use thirds and sixths to make 1 whole.",
+          "ans": "1 whole",
+          "measured": {
+            "1": {
+              "hMm": 51.8,
+              "fits": true
+            },
+            "2": {
+              "hMm": 51.8,
+              "fits": true
+            },
+            "3": {
+              "hMm": 51.8,
+              "fits": false
+            },
+            "4": {
+              "hMm": 51.8,
+              "fits": false
+            },
+            "5": {
+              "hMm": 51.8,
+              "fits": false
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 238,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 264,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 198
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 221
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}
