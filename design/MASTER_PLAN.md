@@ -18,7 +18,7 @@ deployed tree for these files). **The owner orders the waves before work starts.
 **Standing rules:**
 - An independent critic scores ≥ 8 before anything merges.
 - Full gates, stamp, then deploy.
-- At most 8 agents, with browser gates one at a time.
+- At most 8 agents, with browser gates one at a time. Agents run on Sonnet at low effort by default; escalate to Sonnet medium, then Opus low, then Opus medium at most, only for a persistent unsolved issue (see CLAUDE.md "Agents").
 - `design/STATUS.md` is updated after each wave.
 - The paused lane branches (`claude/sweet-newton-c8wrv1-wip-*`) are reused where their work fits.
 
