@@ -18,9 +18,6 @@
 export const ROW_MAX = 12;           // rows in the list
 export const STEP_MAX = 100000;
 export const AT_MAX = 1000000;
-/** Counting down from a typed start: fewer than this many numbers fit before 0, so the start is raised. */
-export const DOWN_MIN = 3;
-export const DOWN_LIFT = 8;
 
 const num = (v) => { const n = Math.round(Number(v)); return Number.isFinite(n) ? n : NaN; };
 
@@ -77,7 +74,18 @@ export function decodeRows(body) {
 
 /* ------------------------------------------------------------------ the numbers of a row */
 
-/** The numbers one row shows: `n` of them (12 or 15), fewer when a typed down start runs out before 0. */
+/**
+ * The start a counting-back row really uses. Every row holds the full 12 (or 15) numbers, so a typed down start that
+ * cannot give that many without going below 0 is raised to the smallest start that can, keeping its ones digit
+ * (12 down by 5 -> 57: 57, 52 ... 2). Returns the start the row uses; equal to `row.at` when nothing was raised.
+ */
+export function downStart(row, n = 12) {
+    const t = row.step;
+    const need = (n - 1) * t;
+    return row.at >= need ? row.at : need + (row.at % t);
+}
+
+/** The numbers one row shows: always `n` of them (12, or 15 on the long line), never below 0. */
 export function rowValues(row, n) {
     const t = row.step;
     if (row.dir !== 'down') {
@@ -85,10 +93,8 @@ export function rowValues(row, n) {
         return Array.from({ length: n }, (_, i) => a0 + t * i);
     }
     if (row.start === 'custom') {
-        let top = row.at;
-        let m = Math.min(n, Math.floor(top / t) + 1);
-        if (m < DOWN_MIN) { top = (DOWN_LIFT - 1) * t + (top % t); m = DOWN_LIFT; }   // too short: raise the start, keeping its ones
-        return Array.from({ length: m }, (_, i) => top - t * i);
+        const top = downStart(row, n);
+        return Array.from({ length: n }, (_, i) => top - t * i);
     }
     const hi = row.start === 'zero' ? n - 1 : n;            // from the end of the table down, or down to 0
     return Array.from({ length: n }, (_, i) => t * (hi - i));
@@ -107,39 +113,39 @@ export function rowsSummary(rows) {
 }
 
 /* ------------------------------------------------------------------ one page */
-// "All 12 tables on one page" with rows chosen prints THOSE rows once each, in order, on one page at
-// size S in compact form. The page holds twelve single-line rows; a row of wide numbers wraps to two
-// or more lines (the same geometry as sheet/cells/count-row.js at S, compact), so the list is cut
-// where the lines run out. The estimate is the cell's own arithmetic, kept in step with it.
+// "All rows on one page" keeps the compact sheet (owner 2026-10-02): every row is a single line of 12 numbers at size S, so
+// the page holds twelve lines. A row whose widest number cannot be written on one line even at the 9 pt floor (more than six
+// characters, "100,000") takes two lines of six. With rows chosen the sheet prints those rows once each, in order, until its
+// twelve lines run out; with none chosen it is the tables x 1 to x 12. The test below is the cell's own arithmetic
+// (sheet/cells/count-row.js, compact), kept in step with it.
 
-const S_PITCH = 13.5, S_GAP = 1, S_LIVE = 178, S_TAB = 12, S_MIN_BOX = 11;
+const S_LIVE = 178, S_GAP = 1, S_TAB = 12, FLOOR = 9;
 const fmtLen = (n) => Number(n).toLocaleString('en-US').length;
 
-/** How many lines one row takes on the one-page sheet. */
-export function rowLines(row, n = 12) {
+/** How many lines one row takes on the one-page sheet: 1, or 2 when its numbers are too wide for one line at the floor. */
+export function rowLines(row, signed = false, n = 12) {
     const values = rowValues(row, n);
     const chars = Math.max(1, ...values.map(fmtLen));
-    const tabText = (row.dir === 'down' ? 1 : 0) + fmtLen(row.step);
-    const tab = Math.max(S_TAB, tabText * 0.6 * Math.min(16 * 0.64 * 1.05 * 1, 20) * 0.3528 + 7) + 2;
-    const wide = Math.max(0, chars - 3) * 3;
-    const len = values.length;
-    const fitPitch = (S_LIVE - tab + S_GAP) / len;
-    if (fitPitch - S_GAP >= S_MIN_BOX + wide) return 1;
-    const boxW = S_PITCH - S_GAP + wide;
-    let perRow = Math.ceil(len / 2);
-    const fitN = Math.max(1, Math.floor((S_LIVE - tab + S_GAP) / (boxW + S_GAP)));
-    if (fitN < perRow) perRow = Math.ceil(len / Math.ceil(len / fitN));
-    return Math.ceil(len / perRow);
+    if (chars <= 3) return 1;
+    const tabLen = fmtLen(row.step) + (signed ? 1 : 0);
+    const tab = (tabLen <= 2 ? S_TAB : Math.max(S_TAB, tabLen * 0.6 * Math.min(16 * 1.05, 20) * 0.3528 + 7)) + 2;
+    const pitch = (S_LIVE - tab + S_GAP) / values.length;
+    const pt = Math.min(16, 18, (pitch - S_GAP - 2) / (0.56 * Math.max(2, chars)) * 72 / 25.4);
+    return pt >= FLOOR ? 1 : 2;
 }
 
 export const ONE_PAGE_LINES = 12;
+/** The tables the one-page sheet prints when no rows are chosen. */
+export const ONE_PAGE_ITEMS = 12;
 
 /** The rows the one-page sheet prints: the list in order, until its lines run out (at least one row). */
 export function onePageRows(rows) {
+    const list = normalizeRows(rows);
+    const signed = list.some((r) => r.dir === 'down');          // the step tab carries a + / - sign when any row goes back
     const out = [];
     let used = 0;
-    for (const r of normalizeRows(rows)) {
-        const l = rowLines(r);
+    for (const r of list) {
+        const l = rowLines(r, signed);
         if (out.length && used + l > ONE_PAGE_LINES) break;
         out.push(r);
         used += l;

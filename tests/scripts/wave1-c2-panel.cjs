@@ -66,6 +66,7 @@ const rowsNow = (page) => page.evaluate((c, s) => window.getSetOptions(c, s).row
     const setSel = async (i, kind, value) => {
       await page.evaluate((i, kind, value) => {
         const lines = document.querySelectorAll('#skillOptionsPopover .sko-row-line');
+        if (kind === 'direction') { lines[i].querySelector('button[aria-label^="Row"]').click(); return; }   // the direction is one toggle button
         const el = [...lines[i].querySelectorAll('select')].find((s) => new RegExp(kind).test(s.getAttribute('aria-label')));
         el.value = value; el.dispatchEvent(new Event('change', { bubbles: true }));
       }, i, kind, value);
@@ -85,6 +86,13 @@ const rowsNow = (page) => page.evaluate((c, s) => window.getSetOptions(c, s).row
     const rows = await rowsNow(page);
     const want = [{ step: 2, start: 'zero', dir: 'up' }, { step: 5, start: 'custom', at: 3, dir: 'up' }, { step: 25, start: 'custom', at: 100, dir: 'down' }, { step: 1000, start: 'custom', at: 2000, dir: 'down' }];
     check(canon(rows) === canon(want), `${W}: rows after editing ${JSON.stringify(rows)}`);
+    // a back row too short for 12 numbers says where it really starts; each row is ONE line (the editor is compact at 390)
+    const noteInfo = await page.evaluate(() => {
+      const lines = [...document.querySelectorAll('#skillOptionsPopover .sko-row-line')];
+      return { notes: lines.map((l) => (l.querySelector('.sko-row-note') || {}).textContent || ''), heights: lines.map((l) => Math.round(l.querySelector('div').getBoundingClientRect().height)) };
+    });
+    check(/Starts at 275 so the row has 12 numbers/.test(noteInfo.notes[2]) && /Starts at 11,000 so the row has 12 numbers/.test(noteInfo.notes[3]), `${W}: lifted starts are explained: ${JSON.stringify(noteInfo.notes)}`);
+    check(noteInfo.heights.every((hh) => hh <= 52), `${W}: every row editor is one line (heights ${noteInfo.heights})`);
     // remove one row and put it back through its chip
     await page.evaluate(() => document.querySelectorAll('#skillOptionsPopover .sko-row-line')[3].querySelector('button[aria-label^="Remove"]').click());
     await sleep(250);

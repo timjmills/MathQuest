@@ -12,20 +12,20 @@
           "cols": 1,
           "rows": 5,
           "perPage": 5,
-          "pages": 1,
-          "note": "Fits: 1 column x 5 rows, 5 per page, 1 page. Digits 28 pt. Dense: 1 x 5, cells sized to the problems.",
+          "pages": 3,
+          "note": "Fits: 1 column x 5 rows, 5 per page, 3 pages. Digits 28 pt. Dense: 1 x 5, cells sized to the problems.",
           "sections": [
             {
               "cols": 1,
               "rows": 5,
               "perPage": 5,
-              "pages": 1,
+              "pages": 3,
               "cellW": 186,
               "cellH": 45.4,
               "requested": "auto",
               "clamped": false,
               "note": "Dense: 1 x 5, cells sized to the problems.",
-              "line": "Fits: 1 column x 5 rows, 5 per page, 1 page. Digits 28 pt. Dense: 1 x 5, cells sized to the problems.",
+              "line": "Fits: 1 column x 5 rows, 5 per page, 3 pages. Digits 28 pt. Dense: 1 x 5, cells sized to the problems.",
               "cls": "standard",
               "digitPt": 28,
               "hMin": 43.9,
@@ -34,8 +34,8 @@
             }
           ]
         },
-        "pageCount": 1,
-        "keyPageCount": 1,
+        "pageCount": 3,
+        "keyPageCount": 3,
         "seed": 244652,
         "title": "I Can count by 25",
         "notes": [
@@ -52,7 +52,55 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 25. Write the missing numbers.",
-            "ans": "100, 150, 175, 250, 275",
+            "ans": "100, 150, 175, 225, 300",
+            "measured": {
+              "1": {
+                "hMm": 43.9,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.9,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
+            "ans": "75, 150, 175, 250, 275",
+            "measured": {
+              "1": {
+                "hMm": 43.9,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.9,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
+            "ans": "100, 125, 200, 225, 275",
             "measured": {
               "1": {
                 "hMm": 43.9,
@@ -100,6 +148,54 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 25. Write the missing numbers.",
+            "ans": "75, 125, 175, 225, 300",
+            "measured": {
+              "1": {
+                "hMm": 43.9,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.9,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
+            "ans": "75, 150, 200, 250, 300",
+            "measured": {
+              "1": {
+                "hMm": 43.9,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.9,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
             "ans": "100, 150, 200, 225, 300",
             "measured": {
               "1": {
@@ -124,7 +220,103 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 25. Write the missing numbers.",
-            "ans": "100, 125, 200, 250, 275",
+            "ans": "75, 150, 200, 250, 275",
+            "measured": {
+              "1": {
+                "hMm": 43.9,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.9,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
+            "ans": "100, 150, 175, 250, 300",
+            "measured": {
+              "1": {
+                "hMm": 43.9,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.9,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
+            "ans": "75, 125, 200, 225, 300",
+            "measured": {
+              "1": {
+                "hMm": 43.9,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.9,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
+            "ans": "75, 150, 175, 225, 275",
+            "measured": {
+              "1": {
+                "hMm": 43.9,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.9,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.9,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
+            "ans": "100, 150, 200, 250, 300",
             "measured": {
               "1": {
                 "hMm": 43.9,
@@ -148,7 +340,19 @@
         "pages": [
           {
             "file": "independent-p1.png",
-            "words": 81,
+            "words": 90,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "independent-p2.png",
+            "words": 84,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "independent-p3.png",
+            "words": 57,
             "w_mm": 209.9,
             "h_mm": 297
           }
@@ -156,31 +360,47 @@
         "keyPages": [
           {
             "file": "independent-key-p1.png",
-            "words": 104,
+            "words": 118,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "independent-key-p2.png",
+            "words": 112,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "independent-key-p3.png",
+            "words": 70,
             "w_mm": 209.9,
             "h_mm": 297
           }
         ],
         "check": {
-          "pages": 1,
+          "pages": 3,
           "cells": [
-            4
+            5,
+            5,
+            2
           ],
           "problems": [],
           "fonts": {
-            "Andika": 50
+            "Andika": 138
           },
           "fontsReady": true,
           "andika": true
         },
         "keyCheck": {
-          "pages": 1,
+          "pages": 3,
           "cells": [
-            4
+            5,
+            5,
+            2
           ],
           "problems": [],
           "fonts": {
-            "Andika": 70
+            "Andika": 198
           },
           "fontsReady": true,
           "andika": true
@@ -191,7 +411,7 @@
           "cols": 1,
           "rows": 5,
           "perPage": 5,
-          "pages": 1,
+          "pages": 3,
           "note": "Fits: 1 column x 5 rows, 5 per page, 1 page. Digits 28 pt. Dense: 1 x 5, cells sized to the problems.",
           "sections": [
             {
@@ -213,8 +433,8 @@
             }
           ]
         },
-        "pageCount": 1,
-        "keyPageCount": 1,
+        "pageCount": 3,
+        "keyPageCount": 3,
         "seed": 720587,
         "title": "I Can count by 25",
         "notes": [
@@ -256,8 +476,133 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 25. Write the missing numbers.",
+            "ans": "75, 150, 175, 250, 275",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
+            "ans": "100, 125, 175, 225, 275",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
+            "ans": "100, 150, 175, 225, 275",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
+            "ans": "75, 150, 175, 250, 300",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
+            "ans": "100, 150, 175, 250, 275",
+            "letter": "B",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
             "ans": "75, 125, 200, 250, 300",
-            "letter": "A",
+            "letter": "B",
             "measured": {
               "1": {
                 "hMm": 43.7,
@@ -281,8 +626,8 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 25. Write the missing numbers.",
-            "ans": "75, 125, 200, 250, 275",
-            "letter": "A",
+            "ans": "100, 150, 200, 225, 275",
+            "letter": "B",
             "measured": {
               "1": {
                 "hMm": 43.7,
@@ -306,8 +651,83 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 25. Write the missing numbers.",
-            "ans": "75, 150, 200, 250, 275",
-            "letter": "A",
+            "ans": "100, 125, 200, 225, 300",
+            "letter": "B",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
+            "ans": "75, 150, 200, 225, 275",
+            "letter": "B",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
+            "ans": "100, 150, 175, 225, 275",
+            "letter": "C",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
+            "ans": "75, 125, 175, 225, 275",
+            "letter": "C",
             "measured": {
               "1": {
                 "hMm": 43.7,
@@ -331,7 +751,19 @@
         "pages": [
           {
             "file": "more-practice-p1.png",
-            "words": 81,
+            "words": 90,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "more-practice-p2.png",
+            "words": 90,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "more-practice-p3.png",
+            "words": 63,
             "w_mm": 209.9,
             "h_mm": 297
           }
@@ -339,31 +771,47 @@
         "keyPages": [
           {
             "file": "more-practice-key-p1.png",
-            "words": 104,
+            "words": 118,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "more-practice-key-p2.png",
+            "words": 118,
+            "w_mm": 209.9,
+            "h_mm": 297
+          },
+          {
+            "file": "more-practice-key-p3.png",
+            "words": 76,
             "w_mm": 209.9,
             "h_mm": 297
           }
         ],
         "check": {
-          "pages": 1,
+          "pages": 3,
           "cells": [
-            4
+            5,
+            5,
+            2
           ],
           "problems": [],
           "fonts": {
-            "Andika": 50
+            "Andika": 150
           },
           "fontsReady": true,
           "andika": true
         },
         "keyCheck": {
-          "pages": 1,
+          "pages": 3,
           "cells": [
-            4
+            5,
+            5,
+            2
           ],
           "problems": [],
           "fonts": {
-            "Andika": 70
+            "Andika": 210
           },
           "fontsReady": true,
           "andika": true
@@ -406,6 +854,54 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 25. Write the missing numbers.",
+            "ans": "100, 150, 200, 250, 300",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
+            "ans": "75, 125, 175, 250, 300",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
             "ans": "100, 125, 200, 225, 300",
             "measured": {
               "1": {
@@ -430,7 +926,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 25. Write the missing numbers.",
-            "ans": "75, 150, 200, 250, 300",
+            "ans": "100, 150, 175, 225, 300",
             "measured": {
               "1": {
                 "hMm": 43.7,
@@ -454,7 +950,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 25. Write the missing numbers.",
-            "ans": "100, 150, 175, 250, 300",
+            "ans": "75, 125, 175, 250, 275",
             "measured": {
               "1": {
                 "hMm": 43.7,
@@ -478,55 +974,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 25. Write the missing numbers.",
-            "ans": "100, 125, 175, 250, 275",
-            "measured": {
-              "1": {
-                "hMm": 43.7,
-                "fits": true
-              },
-              "2": {
-                "hMm": 43.7,
-                "fits": false
-              },
-              "3": {
-                "hMm": 43.7,
-                "fits": false
-              },
-              "4": {
-                "hMm": 43.7,
-                "fits": false
-              }
-            }
-          },
-          {
-            "template": "count-row",
-            "fclass": "standard",
-            "text": "Count by 25. Write the missing numbers.",
-            "ans": "75, 150, 200, 250, 275",
-            "measured": {
-              "1": {
-                "hMm": 43.7,
-                "fits": true
-              },
-              "2": {
-                "hMm": 43.7,
-                "fits": false
-              },
-              "3": {
-                "hMm": 43.7,
-                "fits": false
-              },
-              "4": {
-                "hMm": 43.7,
-                "fits": false
-              }
-            }
-          },
-          {
-            "template": "count-row",
-            "fclass": "standard",
-            "text": "Count by 25. Write the missing numbers.",
-            "ans": "75, 125, 200, 250, 275",
+            "ans": "100, 125, 200, 225, 275",
             "measured": {
               "1": {
                 "hMm": 43.7,
@@ -550,13 +998,13 @@
         "pages": [
           {
             "file": "guided-p1.png",
-            "words": 136,
+            "words": 135,
             "w_mm": 209.9,
             "h_mm": 297
           },
           {
             "file": "guided-p2.png",
-            "words": 114,
+            "words": 113,
             "w_mm": 209.9,
             "h_mm": 297
           }
@@ -564,13 +1012,13 @@
         "keyPages": [
           {
             "file": "guided-key-p1.png",
-            "words": 144,
+            "words": 143,
             "w_mm": 209.9,
             "h_mm": 297
           },
           {
             "file": "guided-key-p2.png",
-            "words": 137,
+            "words": 136,
             "w_mm": 209.9,
             "h_mm": 297
           }
@@ -618,7 +1066,7 @@
               "rows": 5,
               "perPage": 5,
               "pages": 1,
-              "count": 4,
+              "count": 5,
               "cellW": 186,
               "innerW": 184.942,
               "cellH": 45.4,
@@ -662,6 +1110,54 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 25. Write the missing numbers.",
+            "ans": "75, 125, 200, 225, 275",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
+            "ans": "100, 125, 200, 250, 275",
+            "measured": {
+              "1": {
+                "hMm": 43.7,
+                "fits": true
+              },
+              "2": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "3": {
+                "hMm": 43.7,
+                "fits": false
+              },
+              "4": {
+                "hMm": 43.7,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25. Write the missing numbers.",
             "ans": "100, 150, 175, 225, 300",
             "measured": {
               "1": {
@@ -686,7 +1182,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 25. Write the missing numbers.",
-            "ans": "100, 150, 175, 250, 300",
+            "ans": "75, 150, 175, 250, 275",
             "measured": {
               "1": {
                 "hMm": 43.7,
@@ -710,31 +1206,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 25. Write the missing numbers.",
-            "ans": "100, 150, 200, 225, 275",
-            "measured": {
-              "1": {
-                "hMm": 43.7,
-                "fits": true
-              },
-              "2": {
-                "hMm": 43.7,
-                "fits": false
-              },
-              "3": {
-                "hMm": 43.7,
-                "fits": false
-              },
-              "4": {
-                "hMm": 43.7,
-                "fits": false
-              }
-            }
-          },
-          {
-            "template": "count-row",
-            "fclass": "standard",
-            "text": "Count by 25. Write the missing numbers.",
-            "ans": "100, 125, 175, 250, 300",
+            "ans": "100, 125, 200, 225, 275",
             "measured": {
               "1": {
                 "hMm": 43.7,
@@ -758,7 +1230,7 @@
         "pages": [
           {
             "file": "test-p1.png",
-            "words": 81,
+            "words": 90,
             "w_mm": 209.9,
             "h_mm": 297
           }
@@ -766,7 +1238,7 @@
         "keyPages": [
           {
             "file": "test-key-p1.png",
-            "words": 104,
+            "words": 118,
             "w_mm": 209.9,
             "h_mm": 297
           }
@@ -774,11 +1246,11 @@
         "check": {
           "pages": 1,
           "cells": [
-            4
+            5
           ],
           "problems": [],
           "fonts": {
-            "Andika": 50
+            "Andika": 59
           },
           "fontsReady": true,
           "andika": true
@@ -786,11 +1258,11 @@
         "keyCheck": {
           "pages": 1,
           "cells": [
-            4
+            5
           ],
           "problems": [],
           "fonts": {
-            "Andika": 70
+            "Andika": 84
           },
           "fontsReady": true,
           "andika": true

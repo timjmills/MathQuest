@@ -913,9 +913,19 @@ function wireChartSwipe(cellEl) {
     });
 }
 
+/** A count-by row swipes sideways inside its cell on a phone; a box that takes focus scrolls into view so no gap is missed. */
+function wireSwipeRows(cellEl) {
+    cellEl.querySelectorAll('[data-mq-swiperow]').forEach((w) => {
+        if (w.dataset.mqSwipe === '1') return;
+        w.dataset.mqSwipe = '1';
+        w.addEventListener('focusin', (e) => { if (e.target && e.target.scrollIntoView) e.target.scrollIntoView({ inline: 'nearest', block: 'nearest' }); });
+    });
+}
+
 export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     if (!cellEl || !input) return false;
     wireOpsWork(cellEl);
+    wireSwipeRows(cellEl);
     const slots = Array.from(cellEl.querySelectorAll('[data-mq-cell]'));
     if (!slots.length) return false;
     wireChartSwipe(cellEl);
@@ -2204,6 +2214,22 @@ export function fitTwinRows(root) {
         // one item still wider than the cell: the drawing's millimetre shrinks to fit - except a
         // ten-column chart, whose squares are sized from the host's digits and which swipes inside
         // its own cell instead (TY-10, SP-11a / SP-12a; critic round 4 defect F)
+        // a count-by row (two lines of six, wave 1 C2) keeps its box size and swipes inside its own cell on a phone
+        const sw = twin.querySelector('[data-mq-swiperow]');
+        if (sw) {
+            // shrink the millimetre only as far as keeps every box a 44 px touch target, then it swipes (SP-10, SP-11a)
+            const cur = parseFloat(getComputedStyle(twin).getPropertyValue('--mq-k2')) || 3.4;
+            const need = sw.scrollWidth, have = sw.clientWidth;
+            if (need > have + 1 && have > 0) {
+                const slot = twin.querySelector('.k2-tile-slot');
+                const r = slot ? slot.getBoundingClientRect() : null;
+                const small = r ? Math.min(r.width, r.height) : 0;       // the host's input is at least 44 px each way, so no tile shrinks below that
+                const floor = small > 0 ? cur * 44 / small : cur * 0.75;
+                const k = Math.max(Math.min(cur, floor), cur * have / need);
+                if (k < cur - 0.01) { twin.style.setProperty('--mq-k2', `${k.toFixed(2)}px`); changed = true; }
+            }
+            return;
+        }
         if (twin.querySelector('.k2-chart-ten')) return;
         const tw = twin.scrollWidth;
         const avail = Math.min(box.width, twin.parentElement ? twin.parentElement.clientWidth || box.width : box.width) - 8;

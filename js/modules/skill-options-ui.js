@@ -19,7 +19,7 @@
 // instead keep the values on its own rows (a Quick Start card carries its `opts` in localStorage)
 // by supplying read / write.
 import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions, isPlayOption, isMoreOption, playSummary } from './skill-options.js';
-import { normalizeRows, ROW_MAX, STEP_MAX, AT_MAX } from './count-rows.js';
+import { normalizeRows, downStart, ROW_MAX, STEP_MAX, AT_MAX } from './count-rows.js';
 import { getSetOptions, setSetOptions, onSetOptionsChanged } from './skill-option-store.js';
 import { SKILLS } from './data.js';
 import { state } from './state.js';
@@ -188,7 +188,7 @@ export function optionControlHTML(def, cur, color, h) {
     const tip = def.help ? ` title="${escHTML(def.help)}"` : '';
     const id = escHTML(def.id);
     const extra = h.extra ? (h.extra(def) || '') : '';
-    if (def.type === 'rows') return _rowsControlHTML(def, v, color, h, tip) + extra;
+    if (def.type === 'rows') return _rowsControlHTML(def, v, color, h, tip, cur) + extra;
     if (def.type === 'bool') {
         return `<label${tip} style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.82rem;color:var(--text);">
             <input type="checkbox" ${v ? 'checked' : ''} style="width:15px;height:15px;flex:none;"
@@ -291,7 +291,7 @@ export function mqRows(json, op, i, val) {
     return JSON.stringify(normalizeRows(rows));
 }
 
-function _rowsControlHTML(def, rows, color, h, tip) {
+function _rowsControlHTML(def, rows, color, h, tip, cur) {
     const list = normalizeRows(rows);
     const id = escHTML(def.id);
     const js = escHTML(JSON.stringify(list));
@@ -303,19 +303,24 @@ function _rowsControlHTML(def, rows, color, h, tip) {
             + `style="min-width:40px;min-height:40px;padding:0 6px;border:1px solid ${on ? color : 'var(--border)'};border-radius:7px;cursor:pointer;font-size:0.85rem;font-weight:${on ? 700 : 400};`
             + `background:${on ? color + '22' : 'transparent'};color:var(--text);">${n}</button>`;
     }).join('');
+    const nNum = Number((cur && cur.jumps) || 12) === 15 ? 15 : 12;
     const rowsHtml = list.map((r, i) => {
-        const startSel = `<select aria-label="Row ${i + 1} starts at" onchange="${call('start', i, 'this.value')}" style="${field}width:100%;">`
-            + [['step', 'From the step'], ['zero', 'From 0'], ['custom', 'From a number']]
+        const startSel = `<select aria-label="Row ${i + 1} starts at" onchange="${call('start', i, 'this.value')}" style="${field}width:100%;padding:6px 4px;">`
+            + [['step', 'Step'], ['zero', '0'], ['custom', 'Number']]
                 .map(([v, l]) => `<option value="${v}"${r.start === v ? ' selected' : ''}>${l}</option>`).join('') + '</select>';
         const atInput = r.start === 'custom'
-            ? `<input type="number" inputmode="numeric" min="0" max="${AT_MAX}" value="${r.at}" aria-label="Row ${i + 1} start number" onchange="${call('at', i, 'this.value')}" style="${field}width:96px;">` : '';
-        const dirSel = `<select aria-label="Row ${i + 1} direction" onchange="${call('dir', i, 'this.value')}" style="${field}width:100%;">`
-            + [['up', 'Counting on'], ['down', 'Counting back']].map(([v, l]) => `<option value="${v}"${r.dir === v ? ' selected' : ''}>${l}</option>`).join('') + '</select>';
-        return `<div class="sko-row-line" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 0;border-top:1px solid var(--border);">`
-            + `<span style="font-size:0.78rem;color:var(--text-dim);min-width:56px;">Count by</span>`
-            + `<input type="number" inputmode="numeric" min="1" max="${STEP_MAX}" value="${r.step}" aria-label="Row ${i + 1} count by" onchange="${call('step', i, 'this.value')}" style="${field}width:88px;">`
-            + `<span style="flex:1 1 140px;min-width:0;">${startSel}</span>${atInput}<span style="flex:1 1 130px;min-width:0;">${dirSel}</span>`
-            + `<button type="button" aria-label="Remove row ${i + 1}" onclick="${call('remove', i, '0')}" style="min-width:40px;min-height:40px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text);cursor:pointer;font-size:1rem;">&times;</button></div>`;
+            ? `<input type="number" inputmode="numeric" min="0" max="${AT_MAX}" value="${r.at}" aria-label="Row ${i + 1} start number" onchange="${call('at', i, 'this.value')}" style="${field}width:76px;flex:none;">` : '';
+        const down = r.dir === 'down';
+        const dirBtn = `<button type="button" aria-label="Row ${i + 1} direction: ${down ? 'counting back' : 'counting on'}. Tap to change" onclick="${call('dir', i, `'${down ? 'up' : 'down'}'`)}" `
+            + `style="${field}flex:none;width:68px;cursor:pointer;font-weight:600;">${down ? '&darr; Back' : '&uarr; On'}</button>`;
+        const lifted = down && r.start === 'custom' ? downStart(r, nNum) : null;
+        const note = lifted !== null && lifted !== r.at
+            ? `<div class="sko-row-note" style="font-size:0.7rem;color:var(--text-dim);padding:0 0 4px 0;">Starts at ${lifted.toLocaleString('en-US')} so the row has ${nNum} numbers.</div>` : '';
+        return `<div class="sko-row-line" style="padding:6px 0;border-top:1px solid var(--border);">`
+            + `<div style="display:flex;flex-wrap:nowrap;align-items:center;gap:4px;">`
+            + `<input type="number" inputmode="numeric" min="1" max="${STEP_MAX}" value="${r.step}" aria-label="Row ${i + 1} count by" onchange="${call('step', i, 'this.value')}" style="${field}width:74px;flex:none;">`
+            + `<span style="flex:1 1 60px;min-width:0;">${startSel}</span>${atInput}${dirBtn}`
+            + `<button type="button" aria-label="Remove row ${i + 1}" onclick="${call('remove', i, '0')}" style="min-width:36px;min-height:40px;flex:none;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text);cursor:pointer;font-size:1rem;">&times;</button></div>${note}</div>`;
     }).join('');
     const full = list.length >= ROW_MAX;
     return `<div class="sko-rows"${tip} style="font-size:0.82rem;color:var(--text);">`

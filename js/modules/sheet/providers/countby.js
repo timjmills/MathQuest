@@ -122,7 +122,7 @@ registerSkill('multiplication:count_by_tables', {
                 'Read the number in the box. That is the jump.',
                 'Add the jump to a number to get the next one.',
                 'Write each missing number in its box.',
-                'Check: the last number is the last jump.',
+                'Check: every jump is the same size.',
             ] : dir === 'down' ? [
                 'Read the number in the box. That is the jump.',
                 'Take the jump away from a number to get the next one.',

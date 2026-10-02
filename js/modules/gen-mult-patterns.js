@@ -16,7 +16,7 @@
 // Randomness is Math.random, which generateQuestionFor() seeds, so a page is reproducible.
 
 import { state } from './state.js';
-import { dealIndex } from './page-deal.js';
+import { dealIndex, pageConstant } from './page-deal.js';
 import { randInt, shuffle } from './utils.js';
 import { optionsFor, pvCap } from './skill-options.js';
 import { normalizeRows, isPlainRow, rowValues, rowsSummary, onePageRows } from './count-rows.js';
@@ -83,6 +83,35 @@ const pctCount = (pct, n) => (pct >= 100 ? n : Math.max(1, Math.min(n, Math.roun
 
 let _lastTable = null;
 
+const _gapCache = new Map();
+const _hash = (str) => { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+function _mulberry(seed) {
+    let a = seed >>> 0;
+    return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+/** The k-th distinct set of gaps for a row on this page: a pure function of the page seed, the row key and k. */
+function listBlanks(deal, rowKey, k) {
+    const pageSeed = pageConstant('cbt-gaps', 1 << 30);
+    const ck = `${pageSeed}|${rowKey}`;
+    const c = _gapCache.get(ck) || { list: [], j: 0 };
+    const prefix = (b) => [2, 3, 4].map((i) => (b.includes(i) ? 1 : 0)).join('');
+    const saved = Math.random;
+    try {
+        while (c.list.length <= k && c.j < 600) {
+            Math.random = _mulberry((pageSeed ^ _hash(rowKey) ^ Math.imul(c.j + 1, 2654435761)) >>> 0);
+            c.j++;
+            const b = deal();
+            const prev = c.list[c.list.length - 1];
+            if (c.list.some((x) => x.join() === b.join())) continue;
+            if (prev && prefix(prev) === prefix(b) && c.j < c.list.length * 4 + 40) continue;
+            c.list.push(b);
+        }
+    } finally { Math.random = saved; }
+    if (_gapCache.size > 300) _gapCache.clear();
+    _gapCache.set(ck, c);
+    return c.list[k % Math.max(1, c.list.length)];
+}
+
 export function genCountByTables(q) {
     // Owner 2026-10-02: "All rows on one page" deals the rows once each, in order, on a printed page (live play deals as usual).
     const onePage = !!opt('onePage') && Number.isFinite(state.itemIndex);
@@ -142,16 +171,24 @@ export function genCountByTables(q) {
     const len = values.length;
     const pct = Number(opt('missing')) || 50;
     const fill = opt('fill') || 'two';
-    let blanks;
-    if (fill === 'half') {
-        // 50 % filled: half the numbers print (the first always), the other half are writing places spread along the row.
-        const pool = Array.from({ length: len - 2 }, (_, i) => i + 2);
-        blanks = spreadBlanks(pool, Math.min(pool.length, Math.floor(len / 2)));
-    } else {
+    const deal = () => {
+        if (fill === 'half') {
+            // 50 % filled: half the numbers print (the first always), the other half are writing places spread along the row.
+            const pool = Array.from({ length: len - 2 }, (_, i) => i + 2);
+            return spreadBlanks(pool, Math.min(pool.length, Math.floor(len / 2)));
+        }
         const skip = fill === 'one' ? 1 : 2;                              // the numbers that always show
         const pool = Array.from({ length: len - skip }, (_, i) => i + skip);
-        blanks = spreadBlanks(pool, pctCount(pct, pool.length));
-    }
+        return spreadBlanks(pool, pctCount(pct, pool.length));
+    };
+    // A page never repeats a row (wave 1 C2): item k of a typed list takes the k-th DISTINCT candidate set of gaps for its row,
+    // and neighbouring candidates open with a different printed run (7, 14, 21 ... must not open every row of a one-step page).
+    // The candidates are a pure function of (the page's seed, the row, k), so a regenerated item is the same item.
+    // Printed pages with a chosen list only (a plain list's FIRST pass through its tables, and the usual tables page, print exactly as before).
+    let blanks;
+    if (Number.isFinite(state.itemIndex) && pageRows.length && !onePage && (!plainSteps || plainSteps.length < 6)) {
+        blanks = listBlanks(deal, `${t}|${row.start}|${row.at}|${row.dir}|${len}|${fill}|${pct}`, idx);
+    } else blanks = deal();
     const parts = blanks.map(i => values[i]);
     const shape = opt('shape') || 'box';
     // The multiplication fact under a number ("3 × 4"): only where every number is a multiple of the step.

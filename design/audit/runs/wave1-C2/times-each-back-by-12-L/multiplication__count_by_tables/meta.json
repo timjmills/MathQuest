@@ -9,35 +9,37 @@
     "independent": {
       "fits": {
         "cols": 1,
-        "rows": 4,
-        "perPage": 4,
-        "pages": 1,
-        "note": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 28 pt.",
+        "rows": 2,
+        "perPage": 2,
+        "pages": 6,
+        "note": "Fits: 1 column x 2 rows, 2 per page, 6 pages. Digits 28 pt. Tall problems: 2 rows per page. Very tall problems: fewer than 3 rows fit.",
         "sections": [
           {
             "cols": 1,
-            "rows": 4,
-            "perPage": 4,
-            "pages": 1,
+            "rows": 2,
+            "perPage": 2,
+            "pages": 6,
             "cellW": 186,
-            "cellH": 56.75,
+            "cellH": 113.5,
             "requested": "auto",
             "clamped": false,
-            "note": "",
-            "line": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 28 pt.",
+            "note": "Tall problems: 2 rows per page. Very tall problems: fewer than 3 rows fit.",
+            "line": "Fits: 1 column x 2 rows, 2 per page, 6 pages. Digits 28 pt. Tall problems: 2 rows per page. Very tall problems: fewer than 3 rows fit.",
             "cls": "standard",
             "digitPt": 28,
-            "hMin": 54.3,
+            "hMin": 79.6,
             "anchorMm": 0,
             "blocks": null
           }
         ]
       },
-      "pageCount": 1,
-      "keyPageCount": 1,
+      "pageCount": 6,
+      "keyPageCount": 6,
       "seed": 244652,
       "title": "I Can count back by 12 (15 jumps)",
-      "notes": [],
+      "notes": [
+        "Tall problems: 2 rows per page. Very tall problems: fewer than 3 rows fit."
+      ],
       "gaps": [],
       "anchors": {
         "mode": "off",
@@ -49,22 +51,22 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 12. Write the missing numbers.",
-          "ans": "144, 120, 108, 72, 60, 24, 12",
+          "ans": "144, 132, 108, 84, 48, 24, 12",
           "measured": {
             "1": {
-              "hMm": 54.3,
+              "hMm": 79.6,
               "fits": true
             },
             "2": {
-              "hMm": 54.3,
+              "hMm": 79.6,
               "fits": false
             },
             "3": {
-              "hMm": 54.3,
+              "hMm": 79.6,
               "fits": false
             },
             "4": {
-              "hMm": 54.3,
+              "hMm": 79.6,
               "fits": false
             }
           }
@@ -73,22 +75,22 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 12. Write the missing numbers.",
-          "ans": "144, 120, 108, 84, 60, 36, 24",
+          "ans": "144, 120, 96, 84, 60, 36, 12",
           "measured": {
             "1": {
-              "hMm": 54.3,
+              "hMm": 79.6,
               "fits": true
             },
             "2": {
-              "hMm": 54.3,
+              "hMm": 79.6,
               "fits": false
             },
             "3": {
-              "hMm": 54.3,
+              "hMm": 79.6,
               "fits": false
             },
             "4": {
-              "hMm": 54.3,
+              "hMm": 79.6,
               "fits": false
             }
           }
@@ -97,22 +99,238 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 12. Write the missing numbers.",
-          "ans": "144, 120, 96, 84, 48, 36, 12",
+          "ans": "144, 132, 96, 72, 48, 24, 12",
           "measured": {
             "1": {
-              "hMm": 54.3,
+              "hMm": 79.6,
               "fits": true
             },
             "2": {
-              "hMm": 54.3,
+              "hMm": 79.6,
               "fits": false
             },
             "3": {
-              "hMm": 54.3,
+              "hMm": 79.6,
               "fits": false
             },
             "4": {
-              "hMm": 54.3,
+              "hMm": 79.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count back by 12. Write the missing numbers.",
+          "ans": "156, 132, 108, 84, 48, 36, 24",
+          "measured": {
+            "1": {
+              "hMm": 79.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "3": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 79.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count back by 12. Write the missing numbers.",
+          "ans": "156, 120, 108, 72, 60, 36, 12",
+          "measured": {
+            "1": {
+              "hMm": 79.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "3": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 79.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count back by 12. Write the missing numbers.",
+          "ans": "144, 120, 108, 84, 48, 36, 12",
+          "measured": {
+            "1": {
+              "hMm": 79.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "3": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 79.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count back by 12. Write the missing numbers.",
+          "ans": "156, 132, 108, 84, 60, 24, 12",
+          "measured": {
+            "1": {
+              "hMm": 79.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "3": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 79.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count back by 12. Write the missing numbers.",
+          "ans": "156, 120, 96, 84, 60, 36, 24",
+          "measured": {
+            "1": {
+              "hMm": 79.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "3": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 79.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count back by 12. Write the missing numbers.",
+          "ans": "144, 120, 108, 72, 60, 36, 24",
+          "measured": {
+            "1": {
+              "hMm": 79.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "3": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 79.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count back by 12. Write the missing numbers.",
+          "ans": "156, 120, 96, 72, 60, 36, 24",
+          "measured": {
+            "1": {
+              "hMm": 79.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "3": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 79.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count back by 12. Write the missing numbers.",
+          "ans": "144, 132, 96, 84, 48, 24, 12",
+          "measured": {
+            "1": {
+              "hMm": 79.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "3": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 79.6,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count back by 12. Write the missing numbers.",
+          "ans": "156, 132, 96, 84, 60, 36, 12",
+          "measured": {
+            "1": {
+              "hMm": 79.6,
+              "fits": true
+            },
+            "2": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "3": {
+              "hMm": 79.6,
+              "fits": false
+            },
+            "4": {
+              "hMm": 79.6,
               "fits": false
             }
           }
@@ -121,7 +339,37 @@
       "pages": [
         {
           "file": "independent-p1.png",
-          "words": 214,
+          "words": 159,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "independent-p2.png",
+          "words": 150,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "independent-p3.png",
+          "words": 150,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "independent-p4.png",
+          "words": 150,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "independent-p5.png",
+          "words": 150,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "independent-p6.png",
+          "words": 150,
           "w_mm": 209.9,
           "h_mm": 297
         }
@@ -129,31 +377,71 @@
       "keyPages": [
         {
           "file": "independent-key-p1.png",
-          "words": 238,
+          "words": 176,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "independent-key-p2.png",
+          "words": 167,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "independent-key-p3.png",
+          "words": 167,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "independent-key-p4.png",
+          "words": 167,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "independent-key-p5.png",
+          "words": 167,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "independent-key-p6.png",
+          "words": 167,
           "w_mm": 209.9,
           "h_mm": 297
         }
       ],
       "check": {
-        "pages": 1,
+        "pages": 6,
         "cells": [
-          3
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
         ],
         "problems": [],
         "fonts": {
-          "Andika": 89
+          "Andika": 354
         },
         "fontsReady": true,
         "andika": true
       },
       "keyCheck": {
-        "pages": 1,
+        "pages": 6,
         "cells": [
-          3
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
         ],
         "problems": [],
         "fonts": {
-          "Andika": 110
+          "Andika": 438
         },
         "fontsReady": true,
         "andika": true

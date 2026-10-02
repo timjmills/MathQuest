@@ -31,7 +31,7 @@ import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTIO
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
-import { onePageRows } from './count-rows.js';
+import { onePageRows, ONE_PAGE_ITEMS } from './count-rows.js';
 import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
@@ -102,7 +102,7 @@ function normaliseRequest(req = {}) {
     // page in one column, drawn at the smallest print size (the page holds twelve rows only at S).
     let onePage = false;
     for (const sec of sections) {
-        let rowCount = 12;
+        let rowCount = ONE_PAGE_ITEMS;
         const on = sec.skills.some((k) => {
             try {
                 if (k.skillId !== 'count_by_tables') return false;

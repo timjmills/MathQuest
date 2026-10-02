@@ -943,13 +943,13 @@ function countByRules(items, F) {
                 if (sm === 'step' && (values[0] !== nJ * step || values.length !== nJ)) bad.row.push(`counting back from the end of the table should run ${nJ * step} .. ${step}, not ${values[0]} .. ${values[values.length - 1]}`);
                 if (sm === 'zero' && (values[0] !== (nJ - 1) * step || values[values.length - 1] !== 0 || values.length !== nJ)) bad.row.push(`counting back to 0 should end on 0 after ${nJ} numbers, not ${values[values.length - 1]} after ${values.length}`);
                 if (sm === 'custom') {
-                    const fits = Math.min(nJ, Math.floor(row.at / step) + 1);
-                    const want = fits < 3 ? { top: 7 * step + (row.at % step), len: 8 } : { top: row.at, len: fits };
-                    if (values[0] !== want.top || values.length !== want.len) bad.row.push(`counting back from ${row.at} by ${step} should be ${want.len} numbers from ${want.top}, not ${values.length} from ${values[0]}`);
-                    if (row.at % step !== values[values.length - 1] % step) bad.row.push('the ones of the typed start were lost');
+                    // every row holds the full nJ numbers: a start too small is raised to the smallest that works, keeping its ones
+                    const top = row.at >= (nJ - 1) * step ? row.at : (nJ - 1) * step + (row.at % step);
+                    if (values[0] !== top || values.length !== nJ) bad.row.push(`counting back from ${row.at} by ${step} should be ${nJ} numbers from ${top}, not ${values.length} from ${values[0]}`);
+                    if (row.at % step !== values[values.length - 1] % step && top !== row.at) bad.row.push('the ones of the typed start were lost');
                 }
             }
-            if (values.length < 3) bad.row.push(`a row of only ${values.length} numbers`);
+            if (values.length !== nJ) bad.row.push(`a row of ${values.length} numbers, not ${nJ}`);
             // The tab says the way when any chosen row goes down; the multiplication labels are the facts of the row, or absent.
             const anyDown = chosen ? chosen.some(r => r.dir === 'down') : false, anyUp = chosen ? chosen.some(r => r.dir === 'up') : true;
             const pageDir = !anyDown ? 'forward' : anyUp ? 'mixed' : 'back';
@@ -1053,6 +1053,16 @@ function countByRules(items, F) {
         const seq = cbRows.map(key);
         const cyc = n >= 4 && seq.length >= 2 * n && seq.slice(n, 2 * n).join() === seq.slice(0, n).join() && seq.slice(2 * n, 3 * n).join() === seq.slice(0, n).join();
         if (cyc) bad.row.push('a shuffled page deals the rows in the same order every round');
+    }
+    // Wave 1 C2: no row of a page repeats another exactly (same numbers, same gaps), and the first printed run is not the same on every row of a one-step page.
+    {
+        const rowsList = live.filter(x => x.cellT === 'count-row' && x.countBy && x.opts && Array.isArray(x.opts.rows) && x.opts.rows.length && !x.opts.onePage);
+        const pageOf = (k) => Math.floor(k / 6);
+        const seenKey = new Map();
+        rowsList.forEach((x, k) => {
+            const key = `${pageOf(k)}|${x.countBy.values.join()}|${x.countBy.blanks.join()}`;
+            if (seenKey.has(key)) bad.row.push(`rows ${seenKey.get(key) + 1} and ${k + 1} of a page are identical`); else seenKey.set(key, k);
+        });
     }
     if (bad.row.length) F('count-row', `${bad.row.length} count-by rows are wrong: ${show(bad.row)}`);
     if (bad.pat.length) F('pattern-rule', `${bad.pat.length} patterns break their rule: ${show(bad.pat)}`);

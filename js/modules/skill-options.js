@@ -1341,10 +1341,10 @@ const CB_CHART_LINE_OPTIONS = {
             id: 'rows', label: 'Count-bys on the page', type: 'rows', default: [], group: 'difficulty',
             helpShort: 'Tap tables 1 to 12 or type any step; each row has its own start and direction.',
             help: 'Choose the rows the page deals: tap any of the tables 1 to 12, or type any other step (7, 15, 25, 250, 1,000 up to 100,000) and add it. '
-                + 'Each row has its own start (the step itself, 0, or a number you type: by 5 from 3 is 3, 8, 13 …) and its own direction (on, or back down towards 0, never below 0: 30 down by 5 is 30, 25 … 0, and a start too small to give even three numbers, such as 3 down by 100, is raised to give eight, keeping its ones). '
+                + 'Each row has its own start (the step itself, 0, or a number you type: by 5 from 3 is 3, 8, 13 …) and its own direction (on, or back down towards 0, never below 0). Every row holds the full 12 numbers, in two lines of 6, so a back row whose start is too small is raised to the smallest start that works, keeping its ones digit (12 down by 5 starts at 57), and the panel says so beside the row). '
                 + 'The page deals your rows in order (or shuffled, under "More"), and starts the list again when the page has more rows than you chose. '
-                + 'Nothing chosen is the usual page: the tables 2 to 12 across the page. A row of big numbers gets wider boxes and wraps to more lines with a turn arrow. '
-                + 'On the one-page sheet, the rows you chose print once each, in order, as many as fit one page.',
+                + 'Nothing chosen is the usual page: the tables 2 to 12 across the page. Every row is two lines of 6 numbers across the full width; big numbers get smaller digits (never below 9 pt) rather than fewer per line. '
+                + 'On the one-page sheet, the rows you chose print once each, in order, as many as fit one page (the compact one-line sheet).',
             summary: (v) => (Array.isArray(v) && v.length ? `${v.length} row${v.length === 1 ? '' : 's'}` : 'Tables 2 to 12'),
         },
         { ..._cbTables(1, 'Tables', 'Count by', 'Old control: the ticked tables now live in the list of rows.'), hidden: true },
@@ -1360,10 +1360,10 @@ const CB_CHART_LINE_OPTIONS = {
         _cbPercent(50),
         {
             id: 'times', label: 'Multiplication under each number', type: 'enum', default: 'none', group: 'support',
-            helpShort: 'A hint: 1 × 4, 2 × 4 … under the numbers. Fade it, and leave it off tests.',
+            helpShort: 'A hint: the fact that makes each number (2 × 5 under 10). Fade it; off on tests.',
             values: [{ v: 'none', l: 'None' }, { v: 'each', l: 'Under every number (1 × 4, 2 × 4, 3 × 4 …)' },
                 { v: 'given', l: 'Under the printed numbers only' }],
-            help: 'A hint that links skip counting to multiplication: the jump number times the step is written under the number, the same on the pupil page and the key. '
+            help: 'A hint that links skip counting to multiplication: under each number is the fact that makes it (2 × 5 under 10), the same on the pupil page and the key. '
                 + 'It is a hint, so it fades: under every number, then under the printed numbers only (the pupil works out the facts for the gaps), then None. '
                 + 'Guided pages draw it in grey, and test and review pages leave it out. '
                 + 'It is shown only where every number is a multiple of the step (not for a typed start that is not), and not on the one-page sheet.',
@@ -1372,16 +1372,16 @@ const CB_CHART_LINE_OPTIONS = {
         {
             // Owner (2026-10-02): "I want to be able to fit all 12 of the 1-12 skip counting numbers on one page."
             id: 'onePage', label: 'All rows on one page', type: 'bool', default: false, group: 'layout',
-            helpShort: 'Your rows (or the tables 1 to 12) once each on one sheet, as many as fit.',
-            help: 'Prints the page on ONE sheet (and its key on one page) at the smallest print size. With no rows chosen it is the twelve tables, x 1 to x 12, in order. '
-                + 'With rows chosen it is those rows once each, in order, as many as fit (a row of big numbers takes two or more lines, so fewer fit). '
-                + 'Every row is then 12 numbers long, and the multiplication facts are not shown. The numbers printed to start and "Numbers left blank" still apply.',
+            helpShort: 'Your rows (or the tables 1 to 12) once each on one compact sheet.',
+            help: 'Prints the page on ONE sheet (and its key on one page) at the smallest print size. With no rows chosen it is the twelve tables, x 1 to x 12, in order, each a single compact line of 12 numbers. '
+                + 'With rows chosen it is those rows once each, in order, as many as fit (twelve lines; a row of very wide numbers takes two lines of six, so fewer fit). '
+                + 'Every row is then one line of 12 numbers (the other pages use two lines of six), and the multiplication facts are not shown. The numbers printed to start and "Numbers left blank" still apply.',
         },
         {
             id: 'jumps', label: 'Line runs to', type: 'enum', default: 12, group: 'more',
             helpShort: 'How many numbers a row holds: 12 or 15.',
-            values: [{ v: 12, l: '12 numbers (to 12 ×)' }, { v: 15, l: '15 numbers (to 15 ×; the row wraps to two lines)' }],
-            help: 'How many numbers a row holds: 12 (the table to × 12) or 15 (on to × 15). A row that starts at 0 holds the same count, one multiple shorter at the top.',
+            values: [{ v: 12, l: '12 numbers (two lines of 6)' }, { v: 15, l: '15 numbers (three lines of 5)' }],
+            help: 'How many numbers a row holds: 12 (two lines of 6, the table to × 12) or 15 (three lines of 5, on to × 15). A row that starts at 0 holds the same count, one multiple shorter at the top.',
             lockedBy: _onePageLock(12),
             summary: (v) => `${v} numbers`,
         },
