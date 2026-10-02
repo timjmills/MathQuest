@@ -768,13 +768,19 @@ export function groupByHeight(items, cols) {
  *
  * @returns {{rowsTpl: string, heightMm: number} | null}
  */
+/** A legacy cell's row height: its own measurement when it has one (never past cellH), else cellH. */
+const legacyH = (it, cols, cellH) => {
+    const m = it.measured && it.measured[cols];
+    return m && Number.isFinite(m.hMm) && m.hMm > 0 ? Math.min(cellH, m.hMm + 1) : cellH;
+};
+
 export function rowShape(items, cols, rows, cellH) {
     if (!items.length || rows < 1) return null;
     const w = [];
     const mins = [];
     for (let r = 0; r < rows; r++) {
         // a legacy cell (no trusted height) keeps the layout's full row height (cellH)
-        const hs = items.slice(r * cols, (r + 1) * cols).map((it) => measuredH(it, cols) || (it && (it.legacy || it.template === 'legacy') ? cellH : 0));
+        const hs = items.slice(r * cols, (r + 1) * cols).map((it) => measuredH(it, cols) || (it && (it.legacy || it.template === 'legacy') ? legacyH(it, cols, cellH) : 0));
         if (!hs.length || hs.some((h) => !h)) return null;
         w.push(Math.max(...hs));
         mins.push(Math.min(...hs));

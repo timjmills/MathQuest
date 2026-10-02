@@ -127,7 +127,7 @@ register('parity', {
         const on = checkedChoice(p, ctx, WORDS);
         const pic = p.dots === false ? '' : `<div style="display:flex;justify-content:center;margin-top:${L(ctx, 3)};">${pairsPicture(ctx, Number(p.n) || 0, { rings: !!p.rings || !!workInk(ctx, 'pairs') })}</div>`;
         const row = choiceRow(ctx, WORDS.map((label) => ({ label })), {
-            on, gapMm: 10 * k, labelPt: textPt(ctx) + 4, ring: { index: p.correct || 0, ink: workInk(ctx, 'ring') },
+            on, gapMm: 20 * k, labelPt: textPt(ctx) + 4, ring: { index: p.correct || 0, ink: workInk(ctx, 'ring') },
         });
         return root(ctx, 'k2-parity', `<div>${numeral(ctx, p.n)}</div>${pic}<div style="display:inline-block;margin-top:${L(ctx, 4)};">${row}</div>`);
     },
@@ -151,7 +151,7 @@ register('parity', {
         } else if (p.task === 'which') {
             w = (p.nums || []).reduce((a, v) => a + Math.max(9, String(v).length * 6.2) * k, 0) + 2 * 9 * k;
         } else {
-            w = Math.max(Math.min(5, Math.ceil((Number(p.n) || 0) / 2)) * 9.4 * k + 3, 44 * k);
+            w = Math.max(Math.min(5, Math.ceil((Number(p.n) || 0) / 2)) * 9.4 * k + 3, 54 * k);
         }
         w += 6;
         const third = small ? 55 : 61;

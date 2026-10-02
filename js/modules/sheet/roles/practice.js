@@ -988,6 +988,24 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 items: its.map((it) => planItem(it, level, L.cols)),
             });
         }
+        // SPREAD across parts (wave 1 lane D): a page of several grids (a mixed pool dealt by height
+        // class) that leaves more than a fifth of its body empty shares the spare among its grids'
+        // rows the same way a lone grid does (spreadRows), never as gaps between rows.
+        if (!lone && !input.stepStrip && !pg.parts.some((pp) => layouts[pp.section].blocks || (norm.sections[pp.section] || {}).noCap)) {
+            const grids = sections.filter((x) => x.kind === 'grid' && !x.rowGap && /fixed/.test(x.cls) && parseFloat(x.height) > 0 && !/mq-anchorgrid/.test(x.cls));
+            const L1 = layouts[pg.parts[0].section];
+            const availAll = (pg.cont ? L1.gridHCont : L1.gridH) - (pg.parts.length - 1) * instructionMm(size);
+            const used = grids.reduce((a, x) => a + parseFloat(x.height), 0);
+            if (grids.length === pg.parts.length && used > 0 && used < 0.8 * availAll) {
+                const f = (availAll - grids.length) / used;
+                for (const x of grids) {
+                    const b = parseFloat(x.height);
+                    const sp = spreadRows(x._its, x.cols, x.rows, b, b * f + 1, 0);
+                    if (sp) { x.height = `${sp.heightMm}mm`; x.rowsTpl = sp.rowsTpl; }
+                }
+            }
+        }
+        for (const x of sections) delete x._its;
         return { header: pg.cont ? cont : first, sections };
     });
 
