@@ -148,9 +148,18 @@ function arcsSVG(ctx, g, k) {
     let d = '';
     for (let i = 0; i < k - 1; i++) {
         const a = i * g.pitch + g.w / 2 + 1.2, b = (i + 1) * g.pitch + g.w / 2 - 1.2;
-        d += `M${n2(a)} ${n2(H)} Q${n2((a + b) / 2)} ${n2(-H * 0.55)} ${n2(b)} ${n2(H)} `;
-        // a small arrowhead where the hop lands
-        d += `M${n2(b - 1.3)} ${n2(H - 1.1)} L${n2(b)} ${n2(H)} L${n2(b + 0.2)} ${n2(H - 1.5)} `;
+        const cx = (a + b) / 2, cy = -H * 0.55;
+        d += `M${n2(a)} ${n2(H)} Q${n2(cx)} ${n2(cy)} ${n2(b)} ${n2(H)} `;
+        // a small arrowhead where the hop lands: two equal wings either side of the arc's own
+        // direction at the tip (the curve's end tangent points from the control point to the tip)
+        const tx = b - cx, ty = H - cy, tl = Math.hypot(tx, ty) || 1;
+        const ux = tx / tl, uy = ty / tl, len = 1.5, ang = 0.5;   // wing length mm, half-angle rad (~29°)
+        const wing = (s) => {
+            const c = Math.cos(s * ang), sn = Math.sin(s * ang);
+            return [b - len * (ux * c - uy * sn), H - len * (ux * sn + uy * c)];
+        };
+        const [l1x, l1y] = wing(1), [l2x, l2y] = wing(-1);
+        d += `M${n2(l1x)} ${n2(l1y)} L${n2(b)} ${n2(H)} L${n2(l2x)} ${n2(l2y)} `;
     }
     return `<svg aria-hidden="true" viewBox="0 0 ${n2(W)} ${n2(H)}" style="display:block;width:${L(ctx, W)};height:${L(ctx, H)};overflow:visible;">`
         + `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${n2(SW.hair)}" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
