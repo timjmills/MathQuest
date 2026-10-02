@@ -11,6 +11,7 @@ import {
 } from './widget-retry.js';
 import { ftAnswerMatches } from './sheet/index.js';
 import { practiceLadderWrong, markTried, ladderWillHelp, ladderOf } from './support-ladder.js';
+import { markBoxSubmitted, itemWasHelped } from './screen-cell.js';
 
 // Expose per-skill calculator gate so #calcBtn show/hide logic in other
 // modules (question-render, etc.) can consult it. Default is no calc.
@@ -1123,6 +1124,16 @@ export function checkAnswer(userAns, btnElement) {
     // ===== PROGRESS TRACKING & ADAPTIVE DIFFICULTY =====
     // Update skill progress
     const currentSkill = state.skill || 'add';
+    // Wave 1 / A2 (owner 2026-10-02): an item whose box went red before it was checked right is
+    // "helped" - still correct, but it is treated like a second-try correct: reduced XP, no streak
+    // extension, and the progress / spaced-repetition record is a miss then a hit. When a Check
+    // press already recorded the miss (a second try), only the XP and the streak are reduced.
+    const helped = isCorrect && state.mapMode !== true && itemWasHelped(document.getElementById('questionCard'));
+    if (helped && !(state.currentQAttempts > 0)) {
+        updateSkillProgress(currentSkill, false);
+        trackSkillAnswer(false);
+        recordPracticeLog((state.currentQ && state.currentQ.skillId) || state.skill || 'unknown', false, state.questionStartTime ? Date.now() - state.questionStartTime : 0);
+    }
     updateSkillProgress(currentSkill, isCorrect);
     
     // Track performance for adaptive difficulty
@@ -1144,11 +1155,13 @@ export function checkAnswer(userAns, btnElement) {
     if (solutionBtn) solutionBtn.style.display = "inline-block";
 
     if (btnElement) btnElement.classList.add(isCorrect ? "correct" : "incorrect");
+    // Wave 1 / A2: the one answer place takes the verdict's colour too (the message above stays).
+    try { if (!(q.options && q.options.length)) markBoxSubmitted(document.getElementById('answerInput'), isCorrect); } catch (_) { /* optional */ }
 
     if (isCorrect) {
         state.lastAnswerCorrect = true;
         state.score++;
-        state.sessionStreak++;
+        if (!helped) state.sessionStreak++;                 // a helped item does not extend the streak
         // Record the per-question status for the dot row (green dot).
         // Pass userAns so the redo flow can pre-fill the prior answer.
         if (typeof window.recordQuestionStatus === 'function') {
@@ -1159,18 +1172,19 @@ export function checkAnswer(userAns, btnElement) {
         const _g = document.getElementById('gsbGauge');
         if (_g) { _g.classList.remove('gsb-paused', 'gsb-alert'); }
         { const _td = document.getElementById('timerDisplay'); if (_td) _td.classList.remove('timer-paused'); }
-        awardXP(10, 'correct');
+        const _xp = helped ? 5 : 10;                         // helped: half (no assisted amount existed)
+        awardXP(_xp, 'correct');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
         confetti(10);
-        celebrateCorrect(10);
+        celebrateCorrect(_xp);
         saveState();
 
         // Reset wrong-attempt tracking — they got it right
         resetAttemptTracking();
 
         // Streak and surprise bonuses
-        checkStreakBonus();
+        if (!helped) checkStreakBonus();
         checkSurpriseBonus();
 
         if (state.gameMode === "boss") {

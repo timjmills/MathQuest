@@ -360,7 +360,7 @@ async function liveGreen(page) {
     await page.keyboard.type('3', { delay: 15 }); await sleep(60);
     expect('whole answer "13"', await green('#answerInput'), true);
     await typeInto('#answerInput', '14'); expect('whole answer "14" (wrong)', await green('#answerInput'), false);
-    // 3. a quiz: secret without instant feedback, green with it
+    // 3. a quiz: never green per box, with or without instant feedback (Wave 1 / A2: it would reveal answers)
     for (const fb of ['end', 'instant']) {
         await page.evaluate((fb) => {
             const q = { text: '6 + 7 = ?', ans: 13, answerType: 'number', options: [], hint: '', visual: '' };
@@ -372,7 +372,7 @@ async function liveGreen(page) {
         }, fb);
         await sleep(500);
         await typeInto('#qtAnswerInput', '13');
-        expect(`quiz with ${fb} feedback, "13"`, await green('#qtAnswerInput'), fb === 'instant');
+        expect(`quiz with ${fb} feedback, "13"`, await green('#qtAnswerInput'), false);
         await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) {} });
     }
     return fails;
