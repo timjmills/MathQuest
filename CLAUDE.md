@@ -517,4 +517,5 @@ How to call them:
 - **Effort:** the Agent tool has no effort argument; effort comes from the agent definition's frontmatter
   (`.claude/agents/*.md`, `effort: low|medium`). Use the low-effort definitions by default and the medium ones only
   when escalating.
+- Profiles live in `.claude/agents/` (`mq-sonnet-low`, `mq-sonnet-medium`, `mq-opus-low`, `mq-opus-medium`). They load at session start; in a session started before they existed, use `general-purpose` with `model: "sonnet"` (verified 2026-10-02: reports Sonnet 5.5, claude-sonnet-5-5).
 - Say in the agent's brief which step it is on and why, if it was escalated. Record escalations in `design/STATUS.md`.
