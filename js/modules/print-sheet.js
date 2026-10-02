@@ -315,7 +315,10 @@ const LEGACY_TAB_RE = /<span class="ws-tab" data-ws-label="tab" style="position:
 const legacyClean = (html) => balanceDivs(String(html).replace(LEGACY_TAB_RE, ''));
 
 /** Registered K-2 templates that pack as one-symbol answers (a ten frame, a number track, a chart window). */
-const SHORT_TEMPLATES = new Set(['tenframe', 'seqstrip', 'chartwindow']);
+// 'short-division' (div_zero_in_quotient, wave 1 lane D): a one-digit bus stop is 46 mm tall and 60 mm
+// wide, so fifteen stand on a page (3 x 5) where the standard ceiling stopped at twelve and left a
+// strip of a fifth of the page empty.
+const SHORT_TEMPLATES = new Set(['tenframe', 'seqstrip', 'chartwindow', 'short-division']);
 
 /** A fact drawn across ("a ÷ b = ___"): the fact template in its horizontal notation. */
 function isAcrossFact(q, template) {
@@ -1423,7 +1426,7 @@ function anchorSummary(mode, list, notes) {
  * @param {string[]} [req.letters]           More Practice: which letters (default from the count)
  * @returns {Promise<{pupilHtml, keyHtml, pageCount, keyPageCount, fits, items, plan, seed, notes}>}
  */
-export async function buildSheet(req = {}) {
+async function buildSheetOnce(req = {}) {
     const n = normaliseRequest(req);
     if (!n.sections.length) throw new Error('buildSheet: no section has a skill');
     await fontsReady();
@@ -2346,6 +2349,35 @@ ${html}
 try{if(d.fonts&&d.fonts.ready){d.fonts.ready.then(done,done);}else{done();}}catch(e){done();}})();</script>
 </body>
 </html>`;
+}
+
+/**
+ * Build a sheet, then check that an Auto-count Independent page printed on the pages it was asked
+ * for. The page capacity the section is dealt from is an estimate from the measured items; when
+ * the rows it dealt really need one page more (dot_array_mult: 4 + 1, the last page three
+ * quarters empty - wave 1 lane D, critic 2026-10-02), the count steps down until the sheet is the
+ * pages asked for. Nothing else is touched: a teacher's own count, a lesson's pages and every
+ * other role keep what they were dealt.
+ */
+export async function buildSheet(req = {}) {
+    const r = await buildSheetOnce(req);
+    try {
+        const asked = ROLE_ALIASES[req.role] || req.role || 'independent';
+        const secs = Array.isArray(req.sections) ? req.sections : [];
+        if (asked !== 'independent' || secs.length !== 1 || (secs[0].skills || []).length !== 1 || !Array.isArray(r.items)) return r;
+        const s = secs[0];
+        if (s.count !== undefined && s.count !== null && s.count !== 'auto' && s.count !== '') return r;
+        const wanted = Math.max(1, Math.min(10, Number(s.pages) || 1));
+        if (!(r.pageCount > wanted)) return r;
+        let n = r.items.length, best = r;
+        for (let k = 0; k < 8 && n > 1 && best.pageCount > wanted; k++) {
+            n -= 1;
+            best = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: n })] }));
+        }
+        return best;
+    } catch (e) {
+        return r;
+    }
 }
 
 export default { buildSheet, sheetDocument };

@@ -35,7 +35,10 @@ const WORDS = ['Odd', 'Even'];
  */
 function pairsPicture(ctx, n, { rings = false } = {}) {
     const k = pscale(ctx);
-    const d = 4.6 * k, pitch = 7 * k, rowGap = 5.3 * k, pad = 1.2 * k, blockGap = 4.2 * k;   // pairs read down: columns further apart than the rows
+    // A pair is two dots almost touching (0.7 mm apart, one above the other); the pairs stand 4.8 mm
+    // apart, so the eye groups them (proximity) and the dot left over stands alone (2026-10-02 critic:
+    // the dots must be seen in PAIRS, not in rows of five and four).
+    const d = 4.6 * k, pitch = 9.4 * k, rowGap = 5.3 * k, pad = 1.2 * k, blockGap = 4.2 * k;
     const blockH = rowGap + d;
     const blocks = Math.max(1, Math.ceil(n / 10));
     const cols = Math.min(5, Math.ceil(n / 2));
@@ -148,7 +151,7 @@ register('parity', {
         } else if (p.task === 'which') {
             w = (p.nums || []).reduce((a, v) => a + Math.max(9, String(v).length * 6.2) * k, 0) + 2 * 9 * k;
         } else {
-            w = Math.max(Math.min(5, Math.ceil((Number(p.n) || 0) / 2)) * 7 * k + 3, 44 * k);
+            w = Math.max(Math.min(5, Math.ceil((Number(p.n) || 0) / 2)) * 9.4 * k + 3, 44 * k);
         }
         w += 6;
         const third = small ? 55 : 61;

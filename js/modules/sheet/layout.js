@@ -806,17 +806,45 @@ export function packByHeight(items, cols, { gridFirstMm, gridContMm, maxRows, ce
     if (!force && !(hi > lo * 1.6)) return null;
     const rowsAll = [];
     for (let i = 0; i < items.length; i += cols) rowsAll.push(Math.max(...hs.slice(i, i + cols)));
+    // Greedy page by page, each page filled to `f` x its grid (f = 1: full).
+    const run = (f) => {
+        const out = [];
+        let r = 0;
+        while (r < rowsAll.length) {
+            const Gfull = (out.length ? gridContMm : gridFirstMm) - SAFETY_H_MM;
+            const G = Gfull * f;
+            let n = 0, sum = 0;
+            while (r + n < rowsAll.length && n < maxRows && (n === 0 || sum + rowsAll[r + n] <= G)) { sum += rowsAll[r + n]; n++; }
+            out.push({ r0: r, n, sum, Gfull });
+            r += n;
+        }
+        return out;
+    };
+    // PG-23 for rows of different heights (wave 1 lane D, critic 2026-10-02: dot_array_mult dealt
+    // 4 + 1, the last page three quarters empty): a last page holding a third of a page or less is
+    // rebalanced - the pages are filled to the smallest fraction of their grids that still needs
+    // the same number of pages, so the rows spread and no page is an orphan.
+    let plan = run(1);
+    if (plan.length > 1) {
+        const last = plan[plan.length - 1];
+        if (last.sum * 3 <= last.Gfull) {
+            // the fullest fill that still leaves no orphan, so the first pages keep the extra rows
+            for (let f = 0.96; f >= 0.4; f = Math.round((f - 0.04) * 100) / 100) {
+                const cand = run(f);
+                if (cand.length !== plan.length) break;
+                plan = cand;
+                const tail = cand[cand.length - 1];
+                if (tail.sum * 3 > tail.Gfull) break;
+            }
+        }
+    }
     const chunks = [];
-    let r = 0;
-    while (r < rowsAll.length) {
-        const G = (chunks.length ? gridContMm : gridFirstMm) - SAFETY_H_MM;
-        let n = 0, sum = 0;
-        while (r + n < rowsAll.length && n < maxRows && (n === 0 || sum + rowsAll[r + n] <= G)) { sum += rowsAll[r + n]; n++; }
-        const from = r * cols;
-        const count = Math.min(n * cols, items.length - from);
-        const shape = rowShape(items.slice(from, from + count), cols, n, (G + SAFETY_H_MM) / n);
-        chunks.push({ index: chunks.length, from, count, rows: n, rebalanced: false, gridMm: shape ? shape.heightMm : Math.min(G, n * cellH), rowsTpl: shape ? shape.rowsTpl : '' });
-        r += n;
+    for (const pg of plan) {
+        const G = pg.Gfull;
+        const from = pg.r0 * cols;
+        const count = Math.min(pg.n * cols, items.length - from);
+        const shape = rowShape(items.slice(from, from + count), cols, pg.n, (G + SAFETY_H_MM) / pg.n);
+        chunks.push({ index: chunks.length, from, count, rows: pg.n, rebalanced: false, gridMm: shape ? shape.heightMm : Math.min(G, pg.n * cellH), rowsTpl: shape ? shape.rowsTpl : '' });
     }
     return chunks;
 }

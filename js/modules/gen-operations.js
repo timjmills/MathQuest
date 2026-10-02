@@ -2119,7 +2119,9 @@ function _applyKitFactCell(q, skill, range) {
         return;
     }
     if (_KIT_ACROSS_SKILLS.has(skill) && (op === '+' || op === '-')) {
-        q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: 'horiz', digits } };
+        // the answer stays on the equation line (`across: 'beside'`), at 24 pt so a three-digit
+        // sentence ("100 - 10 = ___") still fits two columns of a page
+        q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: 'horiz', digits, across: 'beside', pt: 24 } };
         q.notation = 'across';
         return;
     }
@@ -2745,7 +2747,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     }
                 }
 
-                q.text = `Count the array: ${rows} rows \u00d7 ${cols} columns = ?`;
+                q.text = `Multiply the array: ${rows} rows \u00d7 ${cols} columns = ?`;
                 q.ans = product;
                 q.a = rows; q.b = cols;
                 q.answerType = 'number';
@@ -2774,7 +2776,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // template draws the dots (4 mm minimum, fixed pitch), the count-all box is a named
                 // slot, and the "R rows x C columns" caption (an Arial SVG line under 8 pt) is the
                 // item's own text, which the kit prints in Andika.
-                const _daPayload = { kind: 'count_all', rows, cols };
+                // support 'label' (the default): the rows x columns frame, "7 rows x 8 columns / 7 x 8 = [ ]";
+                // support 'none': the pupil counts both himself, then writes how many in all.
+                const _daPayload = { kind: _daBare ? 'count_all' : 'frame', rows, cols };
                 q.cell = { template: 'arrays', v: 1, payload: _daPayload };
                 q.visual = _kitTwin('arrays', _daPayload);
                 q.printFormat = 'dot-array-visual';

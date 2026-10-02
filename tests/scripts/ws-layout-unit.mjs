@@ -21,7 +21,7 @@
 
 import {
     gridHeightMm, bodyHeightMm, headerHeightMm, FULL_HEADER, factRowsCapacity, stackMaxColumns,
-    stackCapacity, visualGridCapacity, resolveSectionLayout, cellWidthMm, paperOf, autoFitsAt, fillLimit,
+    stackCapacity, visualGridCapacity, resolveSectionLayout, cellWidthMm, paperOf, autoFitsAt, fillLimit, packByHeight,
 } from '../../js/modules/sheet/layout.js';
 import { groupRuns } from '../../js/modules/sheet/cells/k2kit.js';
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../../js/modules/sheet/paginate.js';
@@ -1187,6 +1187,23 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     ok(dense.packed && dense.perPage > 6, `packing: a dense mixed-height section packs past the practice ceiling (${dense.cols} x ${dense.rows})`);
     const plain = L(items, 'auto', 'S');
     ok(plain.perPage <= dense.perPage, 'packing: a section that is not dense keeps its ceiling');
+}
+
+// Wave 1 lane D (critic 2026-10-02): rows of DIFFERENT heights packed by height never leave an
+// orphan last page (dot_array_mult dealt 4 + 1: a last page three quarters empty). PG-23 for
+// packByHeight: a last page of a third of a page or less is rebalanced across the same pages.
+{
+    const mk = (hs) => hs.map((h, i) => ({ id: `p${i}`, measured: { 1: { hMm: h, fits: true } }, footprint: { measure: true, hMm: null, maxCols: 1 } }));
+    const grid = { gridFirstMm: 240, gridContMm: 250, maxRows: 12, cellH: 60, force: true };
+    const orphan = packByHeight(mk([50, 60, 57, 60, 40]), 1, grid);
+    eq(orphan.map((c) => c.count), [3, 2], 'PG-23 (packByHeight): 4 + 1 rows of mixed height are spread 3 + 2, not left as an orphan page');
+    ok(orphan.every((c, i, a) => i === 0 || c.from === a[i - 1].from + a[i - 1].count), 'PG-23 (packByHeight): no row is lost or repeated');
+    const used = (c, hs) => hs.slice(c.from, c.from + c.count).reduce((a, b) => a + b, 0);
+    ok(orphan.every((c) => used(c, [50, 60, 57, 60, 40]) <= grid.gridFirstMm - 1), 'PG-23 (packByHeight): every page still fits its grid');
+    const full = packByHeight(mk([50, 60, 57, 60, 40, 55, 50, 52, 45]), 1, grid);
+    ok(full.length === 2 && full[1].count * 3 > full[0].count, `PG-23 (packByHeight): a last page is never under a third of the first (${full.map((c) => c.count).join(' + ')})`);
+    const one = packByHeight(mk([50, 60, 57, 40]), 1, grid);
+    eq(one.map((c) => c.count), [4], 'PG-23 (packByHeight): a section that fits one page stays one page');
 }
 
 /* ======================================================================= report */

@@ -218,6 +218,8 @@ const ACROSS_TIGHT_OP_EM = 0.8;
 const ACROSS_TIGHT_GAP_EM = 0.18;
 /** The drawn height of a vertical fact (em): two operand rows, the rule, the answer zone. */
 const VERT_FACT_EM = 3.6;
+/** An across fact whose answer stays beside it is one line tall (em): the line, and room to write. */
+const BESIDE_FACT_EM = 2.5;
 /** Advance of one Andika digit (em), for the width estimates below. */
 const DIGIT_EM = 0.56;
 /** A cell's content width at `cols` columns: the nominal width less the side pads and borders. */
@@ -245,6 +247,10 @@ const belowMm = (p, pt, size) => {
 };
 /** 'beside' when the answer fits beside the sentence at this column count, else 'below'. */
 const acrossForm = (p, ctx, pt) => {
+    // `across: 'beside'` (add_sub_10s / add_sub_100s, wave 1 lane D, critic 2026-10-02): the answer
+    // stays ON the equation line at every column count; the page takes as few columns as the
+    // whole sentence needs, never the "answer stacked below" form.
+    if (p.across === 'beside') return 'beside';
     const cols = explicitCols(p, ctx);
     if (!cols || (ctx && ctx.mode === 'screen')) return 'beside';
     return besideMm(p, pt, ctx.size) <= contentMm(cols) - 1 ? 'beside' : 'below';
@@ -306,7 +312,7 @@ register('fact', {
             // height whichever way it is drawn), the spare below the answer (PG-14). So the
             // same item measured across at 1 column and vertical at 5 is one height, not a
             // "collapse" (the host's reflow check), and the answer stays in the top half (CL-4).
-            const hold = ctx.mode === 'screen' ? '' : `min-height:${VERT_FACT_EM}em;`;
+            const hold = ctx.mode === 'screen' ? '' : `min-height:${p.across === 'beside' ? BESIDE_FACT_EM : VERT_FACT_EM}em;`;
             if (acrossForm(p, ctx, pt) === 'below') {
                 // DN-22's "answer stacked below": the sentence on one line with tighter operator
                 // tracks, the same answer line under it, centred. Its width is the sentence
@@ -374,7 +380,14 @@ register('fact', {
             // measures each count it may choose, DN-10); with one, it is the form drawn there.
             const cAt = explicitCols(p, ctx);
             const ptA = p.pt || factDigitPt(Math.min(cAt || ACROSS_MAX_COLS, ACROSS_MAX_COLS));
-            const across = Math.ceil((cAt && acrossForm(p, ctx, ptA) === 'beside' ? besideMm(p, ptA, ctx.size) : belowMm(p, ptA, ctx.size)) + 4);
+            const across = Math.ceil((p.across === 'beside' || (cAt && acrossForm(p, ctx, ptA) === 'beside') ? besideMm(p, ptA, ctx.size) : belowMm(p, ptA, ctx.size)) + 4);
+            if (p.across === 'beside') {
+                // One line tall (BESIDE_FACT_EM) with the label keep-out above and a pad below: the
+                // cell is as tall as its sentence needs, and the width is the whole sentence, so the
+                // page picks the widest column count the sentence fits.
+                const emA = EM_MM[ptA] || (ptA / 72) * 25.4;
+                return { wMm: across, hMm: Math.ceil(emA * BESIDE_FACT_EM + 8), measure: false, factLike: true, maxCols: ACROSS_MAX_COLS };
+            }
             return {
                 wMm: cAt ? across : Math.min(across, vertW), hMm: factCellHMm(cols, ctx.size) + cueHMm(p), measure: !!p.cue,
                 // No `tracks`: an across fact is not stacked work, so 12.3's stacked-digit clamp

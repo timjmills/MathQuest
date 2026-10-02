@@ -40,7 +40,7 @@ function writeSteps(q) {
     if (lineModel(t)) {
         return clampSteps([
             step(`Count the equal parts from 0 to 1: ${t.d}. That is the denominator.`, [{ slot: 'd', value: String(t.d) }]),
-            step(`Count the parts from 0 to the dot: ${t.n}. That is the numerator.`, [{ slot: 'n', value: String(t.n) }]),
+            step(`Count the parts from 0 to ${t.span ? 'the end of the grey' : 'the dot'}: ${t.n}. That is the numerator.`, [{ slot: 'n', value: String(t.n) }]),
             step(`Write ${fr(t.n, t.d)}.`, [{ slot: 'n', value: String(t.n) }, { slot: 'd', value: String(t.d) }]),
         ]);
     }
@@ -125,6 +125,94 @@ registerSkill('fractions:identify', {
                 explain: p.part === 'n' ? 'Wrote the bottom number. The numerator is the TOP number.' : 'Wrote the top number. The denominator is the BOTTOM number.' }]);
         }
         return writeWrong(q);
+    },
+});
+
+/* =============================================================== fractions on a number line */
+// composing:fraction_number_line (wave 1 lane D, 2026-10-02): ONE kind to a page, drawn by the kit.
+// 0 read the dot, 1 read the shaded stretch, 2 read a dot past 1 (frac-model `write`, a line),
+// 3 pick the line that shows the fraction (`pick`), 4 mark the fraction on the line (nl-place).
+
+const anyPayload = (q) => (q && q.cell && q.cell.payload && typeof q.cell.payload === 'object' ? q.cell : null);
+const FNL_READ = strings({
+    iCan: 'I Can read a fraction on a number line', instructionKey: 'write-fraction',
+    steps: ['Count the equal parts from 0 to 1. That is the denominator.', 'Count the parts from 0 to the mark. That is the numerator.', 'Write the numerator over the denominator.'],
+    say: '__ out of __ equal parts.',
+    sayValues: (q) => { const c = anyPayload(q); const t = c && c.template === 'frac-model' && c.payload.terms && c.payload.terms[0]; return t ? [t.n, t.d] : null; },
+    vocabulary: ['number line', 'numerator', 'denominator'],
+});
+const FNL_PICK = strings({
+    iCan: 'I Can find a fraction on a number line', instructionKey: 'circle-line',
+    steps: ['Read the fraction: the denominator is how many equal parts.', 'Count that many parts from 0 on each line.', 'Circle the line with the dot on the right tick.'],
+    say: '__ is __ parts from 0.',
+    sayValues: (q) => { const c = anyPayload(q); return c && c.payload.show ? [fr(c.payload.show.n, c.payload.show.d), c.payload.show.n] : null; },
+    vocabulary: ['number line', 'tick'],
+});
+const FNL_PLACE = strings({
+    iCan: 'I Can place a fraction on a number line', instructionKey: 'line-mark',
+    steps: ['Count the equal parts from 0 to 1.', 'Count the parts from 0 to the fraction.', 'Mark a dot on that tick.'],
+    say: '__ is __ parts from 0.',
+    sayValues: (q) => { const c = anyPayload(q); const ch = c && c.template === 'nl-place' && c.payload.chips && c.payload.chips[0]; return ch ? [ch.label, ch.at] : null; },
+    vocabulary: ['number line', 'tick'],
+});
+const fnlStrings = (ref = {}) => {
+    const c = anyPayload(ref && ref.q);
+    if (c && c.template === 'nl-place') return FNL_PLACE(ref);
+    if (c && c.payload.task === 'pick') return FNL_PICK(ref);
+    return FNL_READ(ref);
+};
+fnlStrings.def = FNL_READ.def;
+
+registerSkill('composing:fraction_number_line', {
+    strings: fnlStrings,
+    misconceptions: ['counted-unshaded', 'counted-ticks', 'counted-parts-only', 'counted-from-end'],
+    workedSteps: (q) => {
+        const c = anyPayload(q);
+        if (c && c.template === 'frac-model' && c.payload.task === 'pick') return identifyPickSteps(q);
+        if (c && c.template === 'nl-place') return [];
+        return writeSteps(q);
+    },
+    wrongAnswer: (q) => writeWrong(q),
+});
+
+function identifyPickSteps(q) {
+    const p = payloadOf(q);
+    const right = p.terms.find((t) => t.letter === p.answer.letter);
+    return clampSteps([
+        step(`The fraction is ${fr(p.show.n, p.show.d)}: ${p.show.d} equal parts, ${p.show.n} from 0.`),
+        step(`Count ${p.show.n} parts from 0 on each line.`),
+        step(`Line ${right.letter} has its dot on tick ${p.show.n}. Circle ${right.letter}.`, [{ slot: 'answer', value: right.letter }]),
+    ]);
+}
+
+/* ================================================================ a whole number as a fraction */
+
+registerSkill('composing:whole_as_fraction', {
+    strings: strings({
+        iCan: 'I Can write a whole number as a fraction', instructionKey: 'whole-as-fraction',
+        steps: ['Look at the whole number.', 'A whole number over 1 is the same number: 4 = 4/1.', 'Or 1 whole is all the equal parts: 1 = 4/4.'],
+        say: '__ equals __ over __.',
+        sayValues: (q) => { const p = payloadOf(q); const t = p && p.terms && p.terms[1]; return t ? [p.terms[0].w, t.n, t.d] : null; },
+        vocabulary: ['whole number', 'numerator', 'denominator'],
+    }),
+    misconceptions: ['one-over-whole', 'swapped-parts'],
+    workedSteps: (q) => {
+        const p = payloadOf(q);
+        const t = p && p.terms && p.terms[1];
+        if (!t) return [];
+        return clampSteps(t.d === 1
+            ? [step(`The whole number is ${t.n}.`), step(`A whole number is that many wholes: ${t.n} = ${t.n}/1.`), step(`Write ${t.n} on top.`, [{ slot: 'n', value: String(t.n) }])]
+            : [step(`The whole is cut into ${t.d} equal parts.`), step(`All ${t.d} parts make 1 whole: 1 = ${t.d}/${t.d}.`), step(`Write ${t.d} on top.`, [{ slot: 'n', value: String(t.n) }])]);
+    },
+    wrongAnswer: (q) => {
+        const p = payloadOf(q);
+        const t = p && p.terms && p.terms[1];
+        if (!t) return null;
+        // 4 = 1/1 (the whole written as the denominator), or 1 = 1/6 (one part, not all of them)
+        const v = 1;
+        if (String(v) === String(t.n)) return null;
+        return chooseWrong(q, [{ value: String(v), misconception: 'one-over-whole', slot: 'n', slots: { n: String(v) },
+            explain: t.d === 1 ? 'Wrote 1 on top. The whole number goes on top: 4 = 4/1.' : 'Wrote 1 part. A whole is ALL the parts.' }]);
     },
 });
 

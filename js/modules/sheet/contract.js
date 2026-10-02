@@ -218,6 +218,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'frac-name': 'Write the fraction, or circle the model that shows it.',
     'models-complete': 'Look at the two models. Complete the number sentence.',
     'line-mark-each': 'Mark each number on the line.',
+    // Wave 1 lane D (2026-10-02): whole_as_fraction and fraction_number_line move to the kit.
+    'whole-as-fraction': 'Write the whole number as a fraction.',
+    'circle-line': 'Circle the number line that shows the fraction.',
+    'multiply-array': 'Multiply the rows by the columns. Write the answer.',
     // O6 lane AP2 round 3 (2026-09-25): the figure and data cells moved to the kit.
     'read-thermometer': 'Read the thermometer. Write the temperature.',
     'read-ruler': 'Read the ruler. Write the number the arrow points to.',

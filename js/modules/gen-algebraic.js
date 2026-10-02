@@ -1346,11 +1346,16 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = 'Odd/Even';
                 q.printFormat = 'odd-even';
 
-                const oeRoll = Math.random();
-                let oeType;
-                if (oeRoll < 0.40) oeType = 'single';      // Type 1: Is N odd or even? (40%)
-                else if (oeRoll < 0.70) oeType = 'select';  // Type 2: circle even / cross out odd (30%)
-                else oeType = 'which';                       // Type 3: Which of 3 is odd/even? (30%)
+                // ONE kind per page (PEDAGOGY_STANDARD P-1, critic wave1-D 2026-10-02): the `forms`
+                // option (0 = one number with dots in pairs, 1 = circle even / cross out odd,
+                // 2 = which of three) defaults to kind 0, the concrete step; ticking more kinds mixes
+                // them, dealt by the seeded draw.
+                const _oeForms = (() => {
+                    const f = state.skillOptions && state.skillOptions.forms;
+                    const t = Array.isArray(f) ? [0, 1, 2].filter(v => f.includes(v)) : [];
+                    return t.length ? t : [0];
+                })();
+                const oeType = ['single', 'select', 'which'][_oeForms[Math.floor(Math.random() * _oeForms.length)]];
 
                 if (oeType === 'single') {
                     // Type 1, the CONCRETE type: the number and the number drawn as dots in pairs.

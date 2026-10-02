@@ -2919,7 +2919,9 @@
    weights 600, 800 and 900. On paper every character is Andika, and Andika has only 400 and 700, so
    a 600+ weight is 700, never a synthesized or fallback face (which also printed the minus sign in
    LiberationSans). Additive: only legacy cells and stacked fractions are touched. */
-.print-edition, .print-edition *, .ws-legacy, .ws-legacy * { font-family: 'Andika', sans-serif !important; font-style: normal !important; }
+/* Narrowed 2026-10-02 (critic wave1-D): only a legacy cell inside a kit page (`.ws-legacy`), never the
+   whole legacy print edition. */
+.ws-legacy, .ws-legacy * { font-family: 'Andika', sans-serif !important; font-style: normal !important; }
 .ws-legacy [style*="font-weight:900"], .ws-legacy [style*="font-weight: 900"],
 .ws-legacy [style*="font-weight:800"], .ws-legacy [style*="font-weight: 800"],
 .ws-legacy [style*="font-weight:600"], .ws-legacy [style*="font-weight: 600"],

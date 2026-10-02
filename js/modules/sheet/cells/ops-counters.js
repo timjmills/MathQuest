@@ -136,9 +136,12 @@ function arraysPicture(g, p) {
     return { svg: svgMm(g, W, H, body, 'array of dots'), wMm: W };
 }
 
+/** One answer box: count_all (the pupil counts) and frame (the rows and columns are given). */
+const oneBox = (p) => p.kind === 'count_all' || p.kind === 'frame';
+
 function arraysKey(p) {
     const rows = Number(p.rows), cols = Number(p.cols);
-    return p.kind === 'count_all' ? { total: String(rows * cols) } : { first: String(rows), second: String(cols), total: String(rows * cols) };
+    return oneBox(p) ? { total: String(rows * cols) } : { first: String(rows), second: String(cols), total: String(rows * cols) };
 }
 
 register('arrays', {
@@ -148,7 +151,7 @@ register('arrays', {
         const key = arraysKey(p);
         const vals = slotValues(ctx, key, (w) => {
             const l = splitList(w);
-            if (p.kind === 'count_all' || l.length === 1) return { total: l[l.length - 1] };
+            if (oneBox(p) || l.length === 1) return { total: l[l.length - 1] };
             return { first: l[0], second: l[1], total: l[2] };
         });
         const pic = arraysPicture(g, p);
@@ -158,10 +161,14 @@ register('arrays', {
             ? [{ id: 'first' }, 'groups of', { id: 'second' }, '|', { id: 'total' }, 'in all.']
             : p.kind === 'write_mult'
                 ? [{ id: 'first' }, 'rows of', { id: 'second' }, '|', { id: 'total' }, 'in all.']
-                : [{ id: 'total', mark: 'blank' }, 'in all.'];
+                : p.kind === 'frame'
+                    // The ROWS x COLUMNS frame (dot_array_mult, wave 1 lane D): the counts are written,
+                    // so the pupil multiplies the two numbers instead of counting the dots one by one.
+                    ? [`${rows} rows \u00d7 ${cols} columns`, '|', `${rows} \u00d7 ${cols} =`, { id: 'total', mark: 'blank' }]
+                    : [{ id: 'total', mark: 'blank' }, 'in all.'];
         // On screen the rows-of / groups-of sentence is the host's own inline-blank prompt, so
         // the twin draws the picture alone; the count-all box is the one answer (SL-7).
-        const showSentence = !g.twin || p.kind === 'count_all';
+        const showSentence = !g.twin || oneBox(p);
         const sent = showSentence ? sentence(g, words, { vals, ink, twin: g.twin, textEm: g.textEm * 1.1 }) : '';
         return root(g, 'arrays', `${pic.svg}${sent}`, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
@@ -169,7 +176,7 @@ register('arrays', {
         const k = arraysKey(p);
         const slots = {};
         for (const [id, v] of Object.entries(k)) slots[id] = { value: v, graded: true };
-        return { value: Number(k.total), display: p.kind === 'count_all' ? k.total : `${k.first}, ${k.second}, ${k.total}`, slots };
+        return { value: Number(k.total), display: oneBox(p) ? k.total : `${k.first}, ${k.second}, ${k.total}`, slots };
     },
     footprint(p, ctx) {
         const g = geo(ctx);
@@ -178,7 +185,7 @@ register('arrays', {
         return { wMm: Math.ceil(Math.max(pic.wMm, 66) + 6), hMm: null, measure: true, factLike: false, maxCols: 2 };
     },
     inputs(p) {
-        const ids = p.kind === 'count_all' ? ['total'] : ['first', 'second', 'total'];
+        const ids = oneBox(p) ? ['total'] : ['first', 'second', 'total'];
         return ids.map((id, i) => ({ id, kind: 'number', shape: 'box', graded: true, order: i, inputmode: 'numeric', scopes: ['full'] }));
     },
     layout() { return { card: 'card-medium-visual', checker: 'inline-blanks', requiresVisual: true }; },

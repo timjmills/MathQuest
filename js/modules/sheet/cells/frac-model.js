@@ -164,6 +164,9 @@ export function fracModelGeom(p) {
         const lab = D.label * PT_MM;
         const len = one.w * models, x0 = 4, y = 5.5;
         const X = (k) => x0 + (len * k) / (d * models);
+        // `span` (fraction_number_line, "what fraction is shaded"): the stretch from 0 is shaded in
+        // the one grey, under the ticks, and no dot is drawn (the line's end of grey is the number).
+        if (p.span && !blank) body += `<rect x="${f2(X(0))}" y="${f2(y - 1.9)}" width="${f2(X(total) - X(0))}" height="3.8" fill="${INK.grey}" data-frac-span="${total}"/>`;
         body += `<line x1="${f2(x0 - 2)}" y1="${y}" x2="${f2(X(d * models) + 3)}" y2="${y}" stroke="${INK.ink}" stroke-width="${HEAVY}"/>`;
         body += `<path d="M${f2(X(d * models) + 4.5)} ${y} l-2.4 -1.3 v2.6 z" fill="${INK.ink}"/>`;
         for (let k = 0; k <= d * models; k++) {
@@ -175,7 +178,7 @@ export function fracModelGeom(p) {
                     + `font-family="Andika, sans-serif" fill="${INK.ink}">${k / d}</text>`;
             }
         }
-        if (!blank) body += `<circle cx="${f2(X(total))}" cy="${y}" r="1.25" fill="${INK.ink}" data-frac-dot="${total}"/>`;
+        if (!blank && !p.span) body += `<circle cx="${f2(X(total))}" cy="${y}" r="1.25" fill="${INK.ink}" data-frac-dot="${total}"/>`;
         return { body, wMm: len + 10, hMm: 6 + 3 + lab * 1.3 + 1, aria: `number line from 0 to ${models} in parts of 1/${d}` };
     }
     let idx = 0;
@@ -336,7 +339,7 @@ function termModel(p, t, ctx, { shaded = null, targets = false } = {}) {
         n, d: t.d, w: shaded === null ? t.w : 0, kind: t.kind, size, wholeMm: p.wholeMm,
         blank: !!t.blank && shaded === null, targets, hatch: !!ctx.photocopySafe,
         models: t.blank || shaded !== null ? countsOf(t).models : null,
-        copies: t.copies, perRow: p.perRow, barH: p.barH,
+        copies: t.copies, perRow: p.perRow, barH: p.barH, span: !!t.span,
     });
     const tgt = targets ? ' data-mq-shade="1"' : '';
     return `<svg class="fm-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f2(g.wMm)} ${f2(g.hMm)}" role="img" aria-label="${esc(g.aria)}"${tgt} `
@@ -461,7 +464,9 @@ function renderRow(p, ctx) {
     if (pick) {
         // The choices stand two by two (a 2 x 2 grid), so the cell keeps to one of two columns.
         const cells = terms.map((t, i) => renderTerm(p, t, i, ctx, vals, true)).join('');
-        parts.push(`<span class="fm-choices" style="display:inline-grid;grid-template-columns:repeat(${Math.min(2, terms.length)}, auto);`
+        // Number lines stand one under another (each is 60 mm or more across); other models two by two.
+        const pickCols = terms.every((t) => t.kind === 'line') ? 1 : Math.min(2, terms.length);
+        parts.push(`<span class="fm-choices" style="display:inline-grid;grid-template-columns:repeat(${pickCols}, auto);`
             + `gap:${L(ctx, 3)} ${L(ctx, 6)};align-items:end;justify-items:center;flex:none;">${cells}</span>`);
     } else if (answerLine(p)) {
         // A number sentence of pictures: the pictures and their signs on one line, "= answer" on

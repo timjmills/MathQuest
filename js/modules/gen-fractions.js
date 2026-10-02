@@ -3594,301 +3594,108 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
 
             } else if (fracSkill === "fraction_number_line") {
-                // Grade 3: Fractions on a number line — 5 problem types
-                // Reusable SVG number line builder
-                function _buildFractionNumberLine(opts) {
-                    const {
-                        maxWhole = 1, den, arrowAt = null, shadedTo = null,
-                        dotAt = null, clickable = false, tickLabels = false,
-                        lineId = 'fnl', highlightTick = null, lineIndex = null
-                    } = opts;
-                    const W = 440, H = 110, lineY = 55, leftX = 30, rightX = W - 30;
-                    const span = rightX - leftX;
-                    const totalParts = maxWhole * den;
-                    let svg = '';
-
-                    // Shaded segment (blue rect from 0)
-                    if (shadedTo !== null) {
-                        const sX = leftX + (shadedTo / totalParts) * span;
-                        svg += `<rect x="${leftX}" y="${lineY - 6}" width="${sX - leftX}" height="12" fill="var(--accent-cyan)" opacity="0.45" rx="2"/>`;
-                    }
-
-                    // Main line
-                    svg += `<line x1="${leftX}" y1="${lineY}" x2="${rightX}" y2="${lineY}" stroke="var(--text-bright)" stroke-width="${STROKE.bold}"/>`;
-                    // Arrow tips on both ends
-                    svg += `<polygon points="${leftX - 6},${lineY} ${leftX + 2},${lineY - 4} ${leftX + 2},${lineY + 4}" fill="var(--text-bright)"/>`;
-                    svg += `<polygon points="${rightX + 6},${lineY} ${rightX - 2},${lineY - 4} ${rightX - 2},${lineY + 4}" fill="var(--text-bright)"/>`;
-
-                    // Ticks and labels
-                    for (let i = 0; i <= totalParts; i++) {
-                        const x = leftX + (i / totalParts) * span;
-                        const isWhole = i % den === 0;
-                        const tickH = isWhole ? 14 : 8;
-                        const sw = isWhole ? STROKE.bold : STROKE.normal;
-                        svg += `<line x1="${x}" y1="${lineY - tickH}" x2="${x}" y2="${lineY + tickH}" stroke="var(--text-bright)" stroke-width="${sw}"/>`;
-
-                        // Whole number labels
-                        if (isWhole) {
-                            svg += `<text x="${x}" y="${lineY + 30}" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--text-bright)" font-size="14" font-weight="bold">${i / den}</text>`;
-                        }
-                        // Fraction labels on minor ticks
-                        if (tickLabels && !isWhole) {
-                            const [sn, sd] = _simplify(i, den);
-                            if (maxWhole > 1 && i > den) {
-                                // Show as improper fraction for lines > 1
-                                svg += `<text x="${x}" y="${lineY + 28}" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--text-dim, var(--text-bright))" font-size="9">${i}/${den}</text>`;
-                            } else {
-                                svg += `<text x="${x}" y="${lineY + 28}" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--text-dim, var(--text-bright))" font-size="9">${sn}/${sd}</text>`;
-                            }
-                        }
-
-                        // Clickable hit areas for Type C
-                        if (clickable) {
-                            const prefix = lineIndex !== null ? `${lineId}_${lineIndex}` : lineId;
-                            const hlClass = (highlightTick === i) ? ' fnl-tick-selected' : '';
-                            svg += `<rect x="${x - 12}" y="${lineY - 22}" width="24" height="44" fill="transparent" class="fnl-tick-target${hlClass}" data-tick="${i}" onclick="selectNumberLineTick('${prefix}', ${i}, ${totalParts})" style="cursor:pointer;"/>`;
-                        }
-                    }
-
-                    // Green down-arrow with "?"
-                    if (arrowAt !== null) {
-                        const ax = leftX + (arrowAt / totalParts) * span;
-                        svg += `<polygon points="${ax - 7},12 ${ax + 7},12 ${ax},${lineY - 16}" fill="var(--accent-green)"/>`;
-                        svg += `<text x="${ax}" y="10" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--accent-green)" font-size="12" font-weight="bold">?</text>`;
-                    }
-
-                    // Green dot at specific position
-                    if (dotAt !== null) {
-                        const dx = leftX + (dotAt / totalParts) * span;
-                        svg += `<circle cx="${dx}" cy="${lineY}" r="7" fill="var(--accent-green)" stroke="${COLORS.bg}" stroke-width="${STROKE.normal}"/>`;
-                    }
-
-                    return `<svg viewBox="0 0 ${W} ${H}" style="display:block;margin:0 auto;max-width:140mm;width:100%;" id="${lineId}_svg">${svg}</svg>`;
-                }
-
-                // Weighted random type selection
-                const typeRoll = Math.random();
-                let problemType;
-                if (typeRoll < 0.25) problemType = 'A';       // Identify Point (25%)
-                else if (typeRoll < 0.45) problemType = 'B';   // Which Line Shows (20%)
-                else if (typeRoll < 0.65) problemType = 'C';   // Place Fraction (20%)
-                else if (typeRoll < 0.80) problemType = 'D';   // Identify Shaded (15%)
-                else problemType = 'E';                        // Fractions > 1 (20%)
-
+                // Grade 3 (3.NF.A.2): fractions on a number line, as the kit's cells (Wave 1 lane D,
+                // 2026-10-02: the legacy coloured SVG printed ONE problem to a page with a third of
+                // it empty). ONE kind to a page: the `forms` option (default kind 0, the concrete
+                // reading) picks the kinds - 0 read the dot, 1 read the shaded line, 2 read a dot
+                // past 1, 3 pick the line that shows a fraction, 4 mark a fraction on the line.
+                const _fnlForms = (() => {
+                    const f = state.skillOptions && state.skillOptions.forms;
+                    const t = Array.isArray(f) ? [0, 1, 2, 3, 4].filter(v => f.includes(v)) : [];
+                    return t.length ? t : [0];
+                })();
+                const _fnlKind = _fnlForms[Math.floor(Math.random() * _fnlForms.length)];
                 const denChoices = [2, 3, 4, 5, 6, 8];
-
-                if (problemType === 'A') {
-                    // Type A: Identify the fraction at the green arrow
+                q.skillLabel = 'Fractions on a Number Line';
+                q.options = [];
+                if (_fnlKind === 0 || _fnlKind === 1) {
+                    // read a fraction between 0 and 1: a dot (0), or the shaded stretch from 0 (1)
                     const den = pick(denChoices);
                     const num = rng(1, den - 1);
-                    q.text = `What fraction is shown at the arrow on the number line?`;
-                    q.ans = simplifyFraction(num, den);
-                    q.answerType = "text";
-                    q.hint = `The number line from 0 to 1 is divided into ${den} equal parts. Count how many parts from 0 to the arrow.`;
-                    q.printFormat = 'fraction-number-line';
-
-                    const lineSVG = _buildFractionNumberLine({ den, arrowAt: num });
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Fractions on a Number Line</div>
-                        ${lineSVG}
-                        <div style="margin-top:6px;font-size:0.85rem;color:var(--text-bright);">The line is divided into <strong>${den}</strong> equal parts.</div>
-                    </div>`;
-
-                } else if (problemType === 'B') {
-                    // Type B: Which number line shows the given fraction?
-                    // Need at least 3 distinct positions → den >= 4
-                    const den = pick([4, 5, 6, 8]);
-                    const correctNum = rng(1, den - 1);
-                    const correctPos = correctNum; // position in parts
-                    const labels = ['A', 'B', 'C'];
-                    const correctIndex = rng(0, 2);
-
-                    // Generate 2 wrong positions (different from correct and each other)
-                    const wrongPositions = [];
-                    while (wrongPositions.length < 2) {
-                        const w = rng(1, den - 1);
-                        if (w !== correctPos && !wrongPositions.includes(w)) wrongPositions.push(w);
-                    }
-
-                    let linesHTML = '';
-                    let wrongIdx = 0;
-                    for (let li = 0; li < 3; li++) {
-                        const shadedPos = li === correctIndex ? correctPos : wrongPositions[wrongIdx++];
-                        const lineSVG = _buildFractionNumberLine({ den, shadedTo: shadedPos, lineIndex: li });
-                        linesHTML += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                            <span style="font-weight:800;font-size:1.1rem;color:var(--accent-cyan);min-width:20px;">${labels[li]}</span>
-                            <div style="flex:1;">${lineSVG}</div>
-                        </div>`;
-                    }
-
-                    const [sn, sd] = _simplify(correctNum, den);
-                    q.text = `Which number line shows ${sn}/${sd} shaded?`;
-                    q.ans = labels[correctIndex];
-                    q.answerType = "multiple-choice";
-                    q.options = shuffle(['A', 'B', 'C']);
-                    q.hint = `${sn}/${sd} means ${correctNum} out of ${den} parts shaded from 0.`;
-                    q.printFormat = 'fraction-number-line';
-
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Which Number Line Shows the Fraction?</div>
-                        ${linesHTML}
-                    </div>`;
-
-                } else if (problemType === 'C') {
-                    // Type C: Place the fraction on the number line (interactive click)
-                    const den = pick(denChoices);
-                    const num = rng(1, den - 1);
-                    const [sn, sd] = _simplify(num, den);
-                    q.text = `Place ${sn}/${sd} on the number line by clicking the correct tick mark.`;
-                    // Paper wording. The screen keeps "click"; a pupil holding a pencil cannot
-                    // click, so the printed cell takes the `line-mark` string from the controlled
-                    // instruction library ("Mark the number on the line.", PEDAGOGY_STANDARD 10.1)
-                    // with the fraction named. BD-17 lets a NUMBER LINE keep its tick marks, but
-                    // the ACTION has to be one a pencil does, and the short string also brings the
-                    // cell back under the 12-word instruction cap (BD-10 / P-LG-1).
-                    q.printText = `Mark ${sn}/${sd} on the line.`;
-                    q.ans = num; // tick index
-                    // q.ans is the tick INDEX, which is what the screen widget checks. Printed on
-                    // a key beside "Mark 7/8 on the line." it read just "7", which a teacher
-                    // cannot mark a pencil mark against, so the paper key names the fraction and
-                    // where the mark belongs.
-                    q.printAnswer = `${sn}/${sd} — tick mark ${num} of ${den} after 0`;
-                    q.answerType = "number-line-place";
-                    q.hint = `${sn}/${sd} means ${num} out of ${den} parts from 0. Count ${num} tick marks from the left.`;
-                    q.printFormat = 'fraction-number-line';
-                    q.nlpDen = den;
-                    q.nlpCorrectTick = num;
-
-                    const lineSVG = _buildFractionNumberLine({ den, clickable: true, lineId: 'fnlC' });
-                    // The instruction lives in q.text (screen) / q.printText (paper) and is NOT
-                    // repeated inside the cell (BD-10 / P-LG-5). The visual carries the fraction
-                    // as a label so the pupil can see what is being placed, not a second command.
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Place the Fraction</div>
-                        <div style="margin-bottom:8px;font-size:1.3rem;"><strong style="color:var(--accent-green);">${sn}/${sd}</strong></div>
-                        ${lineSVG}
-                        <div style="margin-top:10px;">
-                            <button class="btn btn-primary" id="checkPlacementBtn" onclick="checkNumberLinePlacement()" style="opacity:0.5;pointer-events:none;">Check Placement</button>
-                        </div>
-                    </div>`;
-
-                } else if (problemType === 'D') {
-                    // Type D: Identify the shaded portion
-                    const den = pick(denChoices);
-                    const num = rng(1, den - 1);
-                    q.text = `What fraction of the number line is shaded?`;
-                    q.ans = simplifyFraction(num, den);
-                    q.answerType = "text";
-                    q.hint = `Count how many parts are shaded (blue) out of ${den} total parts.`;
-                    q.printFormat = 'fraction-number-line';
-
-                    const lineSVG = _buildFractionNumberLine({ den, shadedTo: num });
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Fractions on a Number Line</div>
-                        ${lineSVG}
-                        <div style="margin-top:6px;font-size:0.85rem;color:var(--text-bright);">The line is divided into <strong>${den}</strong> equal parts. What fraction is shaded?</div>
-                    </div>`;
-
-                } else {
-                    // Type E: Fractions greater than 1 (improper fractions / mixed numbers)
+                    const simple = simplifyFraction(num, den);
+                    q.text = _fnlKind === 0 ? 'What fraction does the dot show?' : 'What fraction of the line is shaded?';
+                    q.ans = `${num}/${den}`;
+                    q.acceptedAnswers = simple !== q.ans ? [q.ans, simple] : [q.ans];
+                    q.answerType = 'text';
+                    q.hint = _fnlKind === 0
+                        ? `The line from 0 to 1 is split into ${den} equal parts. Count the parts from 0 to the dot.`
+                        : `The line from 0 to 1 is split into ${den} equal parts. Count the shaded parts from 0.`;
+                    _fKit(q, { task: 'write', terms: [{ n: num, d: den, kind: 'line', span: _fnlKind === 1, frac: 'nd' }], answer: { n: num, d: den }, wholeMm: 60 });
+                } else if (_fnlKind === 2) {
+                    // read a fraction past 1: improper (the pupil writes it over the parts in 1 whole)
                     const den = pick([2, 3, 4, 5, 6]);
                     const maxW = den <= 3 ? 3 : 2;
-                    const totalParts = maxW * den;
-                    // Pick a position > den (greater than 1) and not on a whole number
                     let num;
-                    do {
-                        num = rng(den + 1, totalParts - 1);
-                    } while (num % den === 0);
-
-                    const wholeP = Math.floor(num / den);
-                    const remP = num % den;
-                    const [sRemN, sRemD] = _simplify(remP, den);
-                    // Accept both improper and mixed number forms
-                    q.text = `What fraction or mixed number is at the arrow?`;
-                    q.ans = simplifyFraction(num, den); // e.g. "5/4" or "7/3"
-                    q.answerType = "text";
-                    q.hint = `The number line goes from 0 to ${maxW} and is divided into ${den} equal parts per whole. Count ${num} parts from 0. Answer as improper (${num}/${den}) or mixed (${wholeP} ${sRemN}/${sRemD}).`;
-                    q.printFormat = 'fraction-number-line';
-
-                    const lineSVG = _buildFractionNumberLine({ maxWhole: maxW, den, arrowAt: num });
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Fractions Greater Than 1</div>
-                        ${lineSVG}
-                        <div style="margin-top:6px;font-size:0.85rem;color:var(--text-bright);">Each whole is divided into <strong>${den}</strong> equal parts. Answer as a fraction or mixed number.</div>
-                    </div>`;
+                    do { num = rng(den + 1, maxW * den - 1); } while (num % den === 0);
+                    const wholeP = Math.floor(num / den), remP = num % den;
+                    const simple = simplifyFraction(num, den);
+                    q.text = 'What fraction does the dot show? The line goes past 1.';
+                    q.ans = `${num}/${den}`;
+                    q.acceptedAnswers = [...new Set([q.ans, simple, `${wholeP} ${remP}/${den}`])];
+                    q.answerType = 'text';
+                    q.hint = `Each whole is split into ${den} equal parts. Count ${num} parts from 0. Write ${num}/${den}, or ${wholeP} ${remP}/${den}.`;
+                    _fKit(q, { task: 'write', terms: [{ n: num, d: den, kind: 'line', frac: 'nd' }], answer: { n: num, d: den }, wholeMm: Math.min(60, Math.round(150 / maxW)) });
+                } else if (_fnlKind === 3) {
+                    // pick the line (A, B or C) that shows the written fraction
+                    const den = pick([4, 5, 6, 8]);
+                    const right = rng(1, den - 1);
+                    const wrongs = [];
+                    while (wrongs.length < 2) {
+                        const w = rng(1, den - 1);
+                        if (w !== right && !wrongs.includes(w)) wrongs.push(w);
+                    }
+                    const letters = ['A', 'B', 'C'];
+                    const at = rng(0, 2);
+                    let wi = 0;
+                    const terms = letters.map((L, i) => ({ n: i === at ? right : wrongs[wi++], d: den, kind: 'line', frac: 'none', letter: L }));
+                    q.text = `Which number line shows ${right}/${den}?`;
+                    q.ans = letters[at];
+                    q.answerType = 'multiple-choice';
+                    q.options = letters.slice();
+                    q.hint = `${right}/${den} means ${right} of ${den} equal parts from 0. Count ${right} parts from 0 on each line.`;
+                    _fKit(q, { task: 'pick', show: { n: right, d: den }, terms, answer: { letter: letters[at] }, wholeMm: 50 });
+                } else {
+                    // mark a fraction on the line (the kit's nl-place cell: tap the number, then its tick)
+                    const den = pick(denChoices);
+                    const num = rng(1, den - 1);
+                    q.text = `Put ${num}/${den} on the number line.`;
+                    q.ans = num;
+                    q.answerType = 'text';
+                    q.hint = `${num}/${den} means ${num} out of ${den} parts from 0. Count ${num} tick marks from the left.`;
+                    q.nlData = { min: 0, max: 1, tickStep: 1 / den, labelStep: 1, mode: 'fraction', denom: den, targets: [{ value: num / den, label: `${num}/${den}` }] };
+                    _nlKit(q);
+                    q.skillLabel = 'Fractions on a Number Line';
                 }
                 return;
 
             } else if (fracSkill === "whole_as_fraction") {
-                // Grade 3: Express whole number as fraction
-                //
-                // THE PICTURE (P7.1, WORKSHEET_DESIGN_STANDARD RP-1, RP-90, INK-3). The bars used
-                // to be coloured `--accent-cyan`, which print turned into solid black slabs whose
-                // black partitions vanished into them, a second model (a pie) sat under the first
-                // (RP-4: one visual per cell), and the captions printed the answer ("1 whole =
-                // 1/1", "All 6 parts are filled = 1 whole") under every item. Now: one bar model,
-                // shaded parts in the one grey, every partition an ink line, no caption.
-                const mode = Math.random() < 0.5 ? "whole_over_1" : "one_as_fraction";
-                let questionText, answer, hintText, visualHTML;
-                const SHADE = '#949494';        // INK-3(a): the fill of a shaded part
-                const LINE = 'var(--text-bright, #000)';
-                // One whole, `parts` equal parts, every part shaded. Outline 1.5, partitions 0.75.
-                const wholeBar = (parts, w, h) => {
-                    const segW = w / parts;
-                    let body = `<rect x="0.75" y="0.75" width="${(w - 1.5).toFixed(2)}" height="${(h - 1.5).toFixed(2)}" fill="${SHADE}" stroke="none"/>`;
-                    for (let i = 1; i < parts; i++) {
-                        const x = (i * segW).toFixed(2);
-                        body += `<line x1="${x}" y1="0.75" x2="${x}" y2="${(h - 0.75).toFixed(2)}" stroke="${LINE}" stroke-width="0.75"/>`;
-                    }
-                    body += `<rect x="0.75" y="0.75" width="${(w - 1.5).toFixed(2)}" height="${(h - 1.5).toFixed(2)}" fill="none" stroke="${LINE}" stroke-width="1.5"/>`;
-                    return `<svg class="waf-bar" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block;">${body}</svg>`;
-                };
-
-                if (mode === "whole_over_1") {
-                    const whole = rng(1, 10);
-                    questionText = `Write ${whole} as a fraction with denominator 1.`;
-                    answer = `${whole}/1`;
-                    hintText = `Any whole number can be written as that number over 1. ${whole} = ${whole}/1.`;
-
-                    // Every whole is drawn (RP-92: values above 1 are a row of whole models with a
-                    // gap), so ten wholes are ten bars, never six and an ellipsis. Each whole stays
-                    // at least 6 mm across (RP-5).
-                    const barW = whole > 6 ? 26 : 40;
-                    let bars = '';
-                    for (let i = 0; i < whole; i++) bars += wholeBar(1, barW, 30);
-
-                    visualHTML = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Whole Numbers as Fractions</div>
-                        <div style="font-size:1.5rem;margin-bottom:14px;">
-                            <span style="font-weight:700;">${whole}</span>
-                            <span style="margin:0 10px;font-size:1.3rem;">=</span>
-                            ${fracHTML('?', '1', 'xl')}
-                        </div>
-                        <div style="display:flex;justify-content:center;gap:11px;flex-wrap:wrap;margin-bottom:8px;">${bars}</div>
-                    </div>`;
+                // Grade 3 (3.NF.A.3c): a whole number as a fraction, as the kit's `frac-model`
+                // sentence "4 = [ ]/1" (Wave 1 lane D, 2026-10-02): ONE prompt (the page's
+                // instruction), the "?" numerator IS the answer slot, and no caption or Answer line
+                // repeats it. The bars are the whole number drawn (never the answer, RP-1). ONE kind
+                // to a page: `forms` 0 = a whole number over 1 (default), 1 = 1 as den/den.
+                const f = state.skillOptions && state.skillOptions.forms;
+                const _wfForms = Array.isArray(f) ? [0, 1].filter(v => f.includes(v)) : [];
+                const _wfKind = (_wfForms.length ? _wfForms : [0])[Math.floor(Math.random() * (_wfForms.length || 1))];
+                q.skillLabel = 'Whole Numbers as Fractions';
+                q.answerType = 'number';
+                q.options = [];
+                if (_wfKind === 0) {
+                    const whole = rng(2, 9);
+                    q.text = `Write ${whole} as a fraction with denominator 1.`;
+                    q.ans = String(whole);
+                    q.acceptedAnswers = [String(whole), `${whole}/1`];
+                    q.hint = `Any whole number can be written as that number over 1. ${whole} = ${whole}/1.`;
+                    _fKit(q, { task: 'op', terms: [{ w: whole, n: 0, d: 1, kind: 'bar' }, { n: whole, d: 1, frac: 'n' }], joins: ['='], answer: { n: whole, d: 1 },
+                        wholeMm: 12, barH: 11, ...(whole > 5 ? { perRow: 5 } : {}) });
                 } else {
                     const den = pick([2, 3, 4, 5, 6, 8]);
-                    questionText = `Write 1 as a fraction with denominator ${den}.`;
-                    answer = `${den}/${den}`;
-                    hintText = `1 whole = ${den}/${den}. When numerator equals denominator, the fraction equals 1.`;
-
-                    // Fraction bar minimum 52 x 16 mm (section 11.2): 200 x 60 px is 53 x 16 mm.
-                    visualHTML = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Whole Numbers as Fractions</div>
-                        <div style="font-size:1.5rem;margin-bottom:14px;">
-                            <span style="font-weight:700;">1</span>
-                            <span style="margin:0 10px;font-size:1.3rem;">=</span>
-                            ${fracHTML('?', den, 'xl')}
-                        </div>
-                        <div style="display:flex;justify-content:center;">${wholeBar(den, 200, 60)}</div>
-                    </div>`;
+                    q.text = `Write 1 as a fraction with denominator ${den}.`;
+                    q.ans = String(den);
+                    q.acceptedAnswers = [String(den), `${den}/${den}`];
+                    q.hint = `1 whole = ${den}/${den}. When the numerator equals the denominator, the fraction equals 1.`;
+                    _fKit(q, { task: 'op', terms: [{ w: 1, n: 0, d: den, kind: 'bar' }, { n: den, d: den, frac: 'n' }], joins: ['='], answer: { n: den, d: den }, wholeMm: 50 });
                 }
-
-                q.text = questionText;
-                q.ans = answer;
-                q.answerType = "text";
-                q.hint = hintText;
-                q.visual = visualHTML;
                 return;
 
             // ==================== END NEW FRACTION SKILLS ====================

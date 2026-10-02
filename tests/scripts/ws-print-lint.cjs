@@ -1421,6 +1421,17 @@ function lintKitGeometry(dom, pdf, info, F) {
                 const strip = p.footRect[1] - p.gridBottom;
                 if (body > 0 && strip > 0.2 * body) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)`, 'empty strip under grid');
             }
+            // L-DENSITY PG-23 ORPHAN (wave 1 lane D, critic 2026-10-02: dot_array_mult dealt 4 + 1, the
+            // last page three quarters empty; the item-count check above reads 1 of 4 as a quarter
+            // of the page but not when the items differ in height). With the problem count on Auto,
+            // the LAST page of a multi-page practice sheet may be short, but its problems must fill
+            // at least a third of the page body: under that, the pages were not rebalanced.
+            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && last && pt.pages.length > 1
+                && p.footRect && p.gridBottom !== null && p.gridTop !== null) {
+                const body = p.footRect[1] - (p.padT || 0);
+                const used = p.gridBottom - p.gridTop;
+                if (body > 0 && used < body / 3) F('L-DENSITY', 'PG-23', 'major', { page: p.idx }, `last page ${p.idx}: its problems fill ${Math.round((used / body) * 100)}% of the page body, under a third: the rows were not rebalanced across the sheet's pages (PG-23)`, 'orphan last page');
+            }
         });
     }
     // key
