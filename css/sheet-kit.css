@@ -314,3 +314,7 @@
    height, and a wrapped left-hand teacher line can never collide with it. */
 :is(.ws-page, .ws-sheet) .ws-foot > .ws-copy { position: absolute; left: 0; right: 0; top: 100%; margin-top: 1mm; text-align: center; font-size: 6.5pt; line-height: 1; font-weight: 400; }
 :is(.ws-page, .ws-sheet) .ws-foot > span:last-of-type { text-align: right; }
+
+/* Wave 1 lane C (owner 2026-10-02, all twelve tables on one page): the compact count-by cell trims its
+   vertical padding (row chrome), never its digits. Additive. */
+:is(.ws-page, .ws-sheet) .ws-cell.ws-cell-compact { padding-top: 1.5mm; padding-bottom: 1.5mm; }

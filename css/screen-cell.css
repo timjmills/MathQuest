@@ -1374,3 +1374,65 @@ html body .hint-speak-btn { min-width: 44px; min-height: 44px; }
 }
 .student-start-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 0 var(--mq-orange-d); }
 @media (max-width: 480px) { .student-start-btn { flex: 1 1 44%; max-width: none; min-height: 56px; padding: 10px 12px; font-size: 1.05rem; } }
+
+/* Wave 1 lane C: the ten-column chart on a phone keeps rows of ten at SP-10's 34.5 x 44 px or more:
+   its writing slots and inputs fill their square and never widen it (the generic 44 px floor on a
+   [data-mq-cell] would push each slot into its neighbour), and on a phone the chart takes the card's
+   full width (it spans the grid's two 12 px gutters). Additive. */
+html body .mq-scell .k2-chart [data-mq-cell] { min-width: 0 !important; min-height: 0 !important; }
+html body .mq-scell .k2-chart [data-mq-cell] > input.mq-cellslot { width: 100% !important; min-width: 0 !important; min-height: 0 !important; box-sizing: border-box; }
+@media (max-width: 480px) {
+    #gameView #questionCard.mq-card #questionPaper > #visualAid:has(.k2-chart) { grid-column: 1 / -1 !important; }
+    #gameView #questionCard.mq-card:has(.k2-chart) { padding-left: 6px; padding-right: 6px; }
+    #gameView #questionCard.mq-card #questionPaper:has(.k2-chart) { padding-top: 0 !important; padding-bottom: 0 !important; grid-template-rows: auto 0px auto auto auto 0px !important; }
+    .mq-scell .k2-chartwindow, .mq-scell .k2-chartwindow .k2-chart { margin-top: 0 !important; margin-bottom: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+}
+
+/* Wave 1 lane C: an online-worksheet card holding a ten-column number chart takes the whole grid row
+   (worksheet.js marks it mq-span-row / data-mq-span, which layoutWorksheetGrid keeps), so its squares
+   keep the host's digit size. Additive. */
+.online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard[data-mq-span="1"]:has(.k2-chart) { grid-column: 1 / -1; }
+/* The practice card and the quiz are wider than a worksheet card but their squares are no wider: the
+   chart's digits stay clear of the square edges ("100" keeps >= 4 px each side). Additive. */
+html body #questionCard .mq-scell .k2-chart td, html body .qt-question-card .mq-scell .k2-chart td { font-size: min(calc(var(--mq-k2) * 6.4), 4vw) !important; }
+
+/* Wave 1 lane C (SP table: screen digits 40 px on the practice card, 29 px on the online worksheet, TY-10
+   content never shrinks): on a phone the ten-column chart keeps rows of ten at those digit sizes. Its squares
+   widen to hold the widest number (digits x 0.58 em + 10 px) and the chart scrolls sideways INSIDE its own
+   cell, never the page (as the number line does). Squares stay >= 44 px tall. Additive.
+   Round 5 (critic round 4 defect F, SP-12a 2026-10-02): the same sizing holds on EVERY host - the squares
+   are sized from the digits (48 px on the card and quiz above a phone, 40 px on a phone, 29 px on the
+   online worksheet) and the screen-fit pass never shrinks a ten-column chart. The card / quiz paper widens
+   to 960 px for this chart (below) so ten squares of 48 px digits fit at 1280; where they still do not fit
+   (a tablet) the chart swipes inside its cell as on a phone. */
+.mq-scell .k2-chartwindow:has(> .k2-chart-ten) { overflow-x: auto; scrollbar-width: auto; scrollbar-color: #000 #ddd; padding-bottom: 4px; width: 100%; min-width: 0; max-width: 100%; -webkit-overflow-scrolling: touch; }
+.mq-scell .k2-twin:has(.k2-chart-ten), .mq-scell .ws-cell:has(.k2-chart-ten) { min-width: 0; max-width: 100%; }
+html body .mq-scell .k2-chart.k2-chart-ten {
+    --mq-chfs: 29px; --mq-chw: calc(var(--mq-chd, 3) * 0.58 * var(--mq-chfs) + 10px);
+    width: calc(10 * var(--mq-chw)) !important; max-width: none !important; table-layout: fixed;
+}
+html body #questionCard .mq-scell .k2-chart.k2-chart-ten, html body .qt-question-card .mq-scell .k2-chart.k2-chart-ten { --mq-chfs: 48px; }
+html body #questionCard .mq-scell .k2-chart.k2-chart-ten td, html body .qt-question-card .mq-scell .k2-chart.k2-chart-ten td, html body .mq-scell .k2-chart.k2-chart-ten td { width: var(--mq-chw) !important; font-size: var(--mq-chfs) !important; height: max(56px, calc(var(--mq-chfs) * 1.4)) !important; }
+@media (max-width: 480px) {
+    .mq-scell .k2-chartwindow:has(> .k2-chart-ten) { overflow-x: scroll; }
+    html body #questionCard .mq-scell .k2-chart.k2-chart-ten, html body .qt-question-card .mq-scell .k2-chart.k2-chart-ten { --mq-chfs: 40px; }
+}
+/* SP-12a (2026-10-02, ten-column charts only): the practice card's and the quiz's paper widen past SP-12's
+   720 px to min(96vw, 960 px), and the chart takes the paper's full width (it spans the grid's gutters). */
+#gameView #questionCard.mq-card #questionPaper.mq-qpaper:has(.k2-chart-ten) { width: min(100%, 96vw, 960px); }
+#gameView #questionCard.mq-card #questionPaper > #visualAid:has(.k2-chart-ten) { grid-column: 1 / -1 !important; }
+/* the quiz draws its boxed .ws-cell (12 px pad + border) inside the paper, so its paper is that much wider */
+.qt-question-card .mq-qtpaper:has(.k2-chart-ten) { width: min(100%, 96vw, 990px); }
+
+/* Swipe cue of the ten-column chart (owner ruling 2026-10-02): a big arrow and words under the chart,
+   pinned to the visible edge of the cell while it scrolls, hidden at the end or when the chart fits.
+   Screen only; never over a square. */
+.k2-swipe-cue { display: none; }
+.mq-scell .k2-chartwindow:not([data-mq-end]) .k2-swipe-cue {
+    display: block; position: sticky; left: 0; width: 100%; box-sizing: border-box; text-align: center;
+    padding: 6px 8px; margin-top: 4px; font-size: 20px; line-height: 1.2; color: #000; background: #fff;
+    border-top: 2px solid #000; font-family: "Andika", sans-serif;
+}
+.mq-scell .k2-swipe-cue i { font-style: normal; font-size: 34px; vertical-align: middle; }
+.mq-scell .k2-chartwindow[data-mq-end] .k2-swipe-cue { display: none; }
+@media print { .k2-swipe-cue { display: none !important; } }

@@ -1,0 +1,407 @@
+[
+  {
+    "skill": "composing:hundreds_chart_fill",
+    "category": "composing",
+    "skillId": "hundreds_chart_fill",
+    "label": "Hundreds Chart - Find the Missing Number (Visual)",
+    "grade": "1",
+    "dir": "composing__hundreds_chart_fill",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 1,
+          "rows": 4,
+          "perPage": 4,
+          "pages": 1,
+          "note": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 16 pt. Tall problems: 4 rows per page.",
+          "sections": [
+            {
+              "cols": 1,
+              "rows": 4,
+              "perPage": 4,
+              "pages": 1,
+              "cellW": 186,
+              "cellH": 57,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Tall problems: 4 rows per page.",
+              "line": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 16 pt. Tall problems: 4 rows per page.",
+              "cls": "short",
+              "digitPt": 16,
+              "hMin": 55.8,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 612640,
+        "title": "I Can find missing numbers on a hundreds chart",
+        "notes": [
+          "Tall problems: 4 rows per page."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "chartwindow",
+            "fclass": "short",
+            "text": "Write the missing numbers in the empty boxes.",
+            "ans": "42, 44, 49",
+            "measured": {
+              "1": {
+                "hMm": 55.8,
+                "fits": true
+              },
+              "2": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "3": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "4": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "5": {
+                "hMm": 55.8,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "chartwindow",
+            "fclass": "short",
+            "text": "Write the missing numbers in the empty boxes.",
+            "ans": "12, 16, 18, 20",
+            "measured": {
+              "1": {
+                "hMm": 55.8,
+                "fits": true
+              },
+              "2": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "3": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "4": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "5": {
+                "hMm": 55.8,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "chartwindow",
+            "fclass": "short",
+            "text": "Write the missing numbers in the empty boxes.",
+            "ans": "51, 54, 56",
+            "measured": {
+              "1": {
+                "hMm": 55.8,
+                "fits": true
+              },
+              "2": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "3": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "4": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "5": {
+                "hMm": 55.8,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "chartwindow",
+            "fclass": "short",
+            "text": "Write the missing numbers in the empty boxes.",
+            "ans": "83, 86, 88, 90",
+            "measured": {
+              "1": {
+                "hMm": 55.8,
+                "fits": true
+              },
+              "2": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "3": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "4": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "5": {
+                "hMm": 55.8,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 153,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 170,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            4
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 124
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            4
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 138
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      },
+      "more-practice": {
+        "fits": {
+          "cols": 1,
+          "rows": 4,
+          "perPage": 4,
+          "pages": 1,
+          "note": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 16 pt. Tall problems: 4 rows per page.",
+          "sections": [
+            {
+              "cols": 1,
+              "rows": 4,
+              "perPage": 4,
+              "pages": 1,
+              "cellW": 186,
+              "cellH": 57,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Tall problems: 4 rows per page.",
+              "line": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 16 pt. Tall problems: 4 rows per page.",
+              "cls": "short",
+              "digitPt": 16,
+              "hMin": 55.8,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 976103,
+        "title": "I Can find missing numbers on a hundreds chart",
+        "notes": [
+          "Tall problems: 4 rows per page."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "chartwindow",
+            "fclass": "short",
+            "text": "Write the missing numbers in the empty boxes.",
+            "ans": "41, 44, 46, 50",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 55.8,
+                "fits": true
+              },
+              "2": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "3": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "4": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "5": {
+                "hMm": 55.8,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "chartwindow",
+            "fclass": "short",
+            "text": "Write the missing numbers in the empty boxes.",
+            "ans": "45, 48",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 55.8,
+                "fits": true
+              },
+              "2": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "3": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "4": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "5": {
+                "hMm": 55.8,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "chartwindow",
+            "fclass": "short",
+            "text": "Write the missing numbers in the empty boxes.",
+            "ans": "21, 26, 29",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 55.8,
+                "fits": true
+              },
+              "2": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "3": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "4": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "5": {
+                "hMm": 55.8,
+                "fits": false
+              }
+            }
+          },
+          {
+            "template": "chartwindow",
+            "fclass": "short",
+            "text": "Write the missing numbers in the empty boxes.",
+            "ans": "33, 35, 37, 39",
+            "letter": "A",
+            "measured": {
+              "1": {
+                "hMm": 55.8,
+                "fits": true
+              },
+              "2": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "3": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "4": {
+                "hMm": 55.8,
+                "fits": false
+              },
+              "5": {
+                "hMm": 55.8,
+                "fits": false
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "more-practice-p1.png",
+            "words": 154,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "more-practice-key-p1.png",
+            "words": 170,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            4
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 125
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            4
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 138
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]

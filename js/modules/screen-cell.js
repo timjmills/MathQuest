@@ -894,11 +894,31 @@ function _slotChars(v, kind) {
     return String(v).replace(/[^0-9]/g, '');
 }
 
+/**
+ * A ten-column number chart on a phone swipes sideways INSIDE its own cell (owner ruling 2026-10-02,
+ * WORKSHEET_DESIGN_STANDARD.md SP-11 exception). The "swipe" cue under it hides when the grid is scrolled to
+ * the end (or fits), and a box that takes focus scrolls into view so no empty square is missed.
+ */
+function wireChartSwipe(cellEl) {
+    cellEl.querySelectorAll('.k2-chartwindow').forEach((w) => {
+        if (w.dataset.mqSwipe === '1' || !w.querySelector('.k2-chart-ten')) return;
+        w.dataset.mqSwipe = '1';
+        const upd = () => { w.toggleAttribute('data-mq-end', w.scrollWidth <= w.clientWidth + 1 || w.scrollLeft + w.clientWidth >= w.scrollWidth - 2); };
+        w.addEventListener('scroll', upd, { passive: true });
+        window.addEventListener('resize', upd);
+        w.addEventListener('focusin', (e) => {
+            if (e.target && e.target.scrollIntoView) e.target.scrollIntoView({ inline: 'center', block: 'nearest' });
+        });
+        upd(); setTimeout(upd, 300); setTimeout(upd, 1000);
+    });
+}
+
 export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     if (!cellEl || !input) return false;
     wireOpsWork(cellEl);
     const slots = Array.from(cellEl.querySelectorAll('[data-mq-cell]'));
     if (!slots.length) return false;
+    wireChartSwipe(cellEl);
     // What stands between the answers in `q.ans`: ", " for a list, " R " for a quotient and
     // remainder (the drawing says so with `data-mq-join` on an ancestor of the slots).
     const joinEl = slots[0].closest('[data-mq-join]');
@@ -2181,7 +2201,10 @@ export function fitTwinRows(root) {
             row.dataset.mqWrapped = '1';
             changed = true;
         });
-        // one item still wider than the cell: the drawing's millimetre shrinks to fit
+        // one item still wider than the cell: the drawing's millimetre shrinks to fit - except a
+        // ten-column chart, whose squares are sized from the host's digits and which swipes inside
+        // its own cell instead (TY-10, SP-11a / SP-12a; critic round 4 defect F)
+        if (twin.querySelector('.k2-chart-ten')) return;
         const tw = twin.scrollWidth;
         const avail = Math.min(box.width, twin.parentElement ? twin.parentElement.clientWidth || box.width : box.width) - 8;
         const over = Array.from(twin.querySelectorAll('*')).reduce((m, el) => {

@@ -3,6 +3,12 @@
 > **2026-10-02: the work order is now `design/MASTER_PLAN.md`** (8 waves in the owner's order; owner to confirm the order before work starts). Key answer colour changed to **reddish orange**.
 
 
+> **2026-10-02, Wave 1 lane C (count-by + number charts):** `multiplication:count_by_tables` now defaults to **fill = two**
+> (the first two numbers print). **An old count-by printout reprints with TWO numbers filled, not one, so a pre-lane share code
+> or saved set gives a row with one fewer blank (owner request).** A row of 15 jumps is titled "I Can count by 1 to 12 (15 jumps)";
+> the tables stay 1 to 12. The whole hundreds chart fills its page (17.5 x 19.5 mm squares at the L digit size, any S/M/L) and
+> stays rows of ten on a phone.
+
 Read this first when work resumes. It records what is live, what each work lane had done when it paused, what the
 independent critics last found, and the next step for each lane. Owner rulings are recorded in the design docs named
 below; this file only points to them.
@@ -132,3 +138,7 @@ Browser gates failed with `net::ERR_CERT_AUTHORITY_INVALID` on every CDN (fonts,
     for f in c*.pem; do s=$(openssl x509 -in $f -noout -subject); case "$s" in *Anthropic*) certutil -d sql:/root/.pki/nssdb -A -t "C,," -n "$(echo "$s" | sed 's/.*CN = //; s/,.*//')" -i $f;; esac; done
 
 Gate failures and load numbers measured before this fix (~12:30 UTC) are not trustworthy and are being rerun.
+
+## 9. Escalations
+
+- 2026-10-02 Wave 1 Lane C fix round 5: builder escalated to Opus low (builder ladder step 2 per the brief) - the ten-column chart's desktop digit size failed critic rounds 3 and 4 and the Sonnet-medium builder reported pre-fit-pass numbers (33.4 px vs 15.36 px rendered).

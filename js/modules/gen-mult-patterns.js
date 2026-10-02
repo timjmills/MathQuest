@@ -92,7 +92,17 @@ export function genCountByTables(q) {
     const untouched = tables.length === 12;
     if (untouched) tables = tables.filter((v) => v >= 2);
     let t;
-    if ((untouched || opt('order') === 'mixed') && tables.length > 1) {
+    const _page = Number(state.itemCount) > 1 ? Number(state.itemCount) : tables.length;   // a page without a stated count holds up to every table once: one climb, no repeats
+    if (untouched && opt('order') !== 'mixed' && Number.isFinite(state.itemIndex)) {
+        // In order, every table ticked: the page walks up the tables, spread across 2 to 12
+        // (a page of five climbs, e.g. 2, 4, 6, 9, 11), smallest first. Mixed shuffles them (the branch below).
+        if (_page <= tables.length) {
+            // one table from each stretch of the list, so the pages differ but always climb
+            const k = idx % _page, lo = Math.floor(k * tables.length / _page), hi = Math.max(lo, Math.floor((k + 1) * tables.length / _page) - 1);
+            t = tables[randInt(lo, hi)];
+        } else t = tables[idx % tables.length];
+    // Live play (no itemIndex) keeps the shuffled round below: the climb is for printed pages only.
+    } else if ((untouched || opt('order') === 'mixed') && tables.length > 1) {
         // Mixed: every ticked table once in a shuffled round, then the next round. L10: the round
         // used to be shuffled from the round NUMBER alone, so every seed printed the same order of
         // tables; page-deal.js shuffles each round from the page's own seeded rng.
@@ -101,11 +111,25 @@ export function genCountByTables(q) {
     } else {
         t = tables[idx % tables.length];
     }
+    // Owner 2026-10-02: "All 12 tables on one page" deals x 1 to x 12 in order on a printed page (live play deals as usual).
+    const onePage = !!opt('onePage') && Number.isFinite(state.itemIndex);
+    if (onePage) t = (idx % 12) + 1;
     _lastTable = t;
-    const values = Array.from({ length: 12 }, (_, i) => t * (i + 1));
+    // Wave 1 lane C: the row runs to 12 or 15 jumps; the first one, two or about half the numbers print.
+    const n = !onePage && Number(opt('jumps')) === 15 ? 15 : 12;
+    const values = Array.from({ length: n }, (_, i) => t * (i + 1));
     const pct = Number(opt('missing')) || 50;
-    const pool = Array.from({ length: 11 }, (_, i) => i + 1);          // the first number always shows
-    const blanks = spreadBlanks(pool, pctCount(pct, 11));
+    const fill = opt('fill') || 'two';
+    let blanks;
+    if (fill === 'half') {
+        // 50 % filled: half the numbers print (the first always), the other half are writing places spread along the row.
+        const pool = Array.from({ length: n - 2 }, (_, i) => i + 2);
+        blanks = spreadBlanks(pool, Math.min(pool.length, Math.floor(n / 2)));
+    } else {
+        const skip = fill === 'one' ? 1 : 2;                              // the numbers that always show
+        const pool = Array.from({ length: n - skip }, (_, i) => i + skip);
+        blanks = spreadBlanks(pool, pctCount(pct, pool.length));
+    }
     const parts = blanks.map(i => values[i]);
     const shape = opt('shape') || 'box';
 
@@ -117,11 +141,12 @@ export function genCountByTables(q) {
     q.answerType = 'text';
     q.selfAnswering = true;
     q.options = [];
-    q.a = t; q.b = 12; q.op = '×';
-    q.countBy = { step: t, values: values.slice(), blanks: blanks.slice(), pct };
+    q.a = t; q.b = n; q.op = '×';
+    q.countBy = { step: t, values: values.slice(), blanks: blanks.slice(), pct, fill, jumps: n };
     q.hint = `Each number is ${t} more than the one before. Count on by ${t}.`;
     q.skillLabel = `Count by ${t}`;
     const payload = { values, blanks, look: 'arcs', tab: String(t), shape };
+    if (onePage) { payload.compact = true; q.countBy.onePage = true; }   // twelve rows on one page: tighter chrome, digits at the S working size
     q.cell = { template: 'count-row', v: 1, payload };
     q.visual = k2Twin('count-row', payload);
     q.printFormat = 'count-row';
