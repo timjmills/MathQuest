@@ -35,7 +35,7 @@ import { generateSkillCode, applySkillCode, copySkillCode, updateSkillCodeDispla
 import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility, toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts } from './modules/quick-skills.js';
 import { initGradeChips, renderGradeChips, toggleGradeChip, getActiveGradeChips, clearActiveGradeChips } from './modules/grade-chips.js';
 import { initAdaptiveSession, getAdaptiveLevel, recordAdaptiveAnswer, applyAdaptiveLevelToQuestion, applyAdaptiveSettingsForNextQuestion, toggleAdaptiveMode, resetAdaptiveLevels, getAdaptiveSnapshot, renderAdaptiveLevelChip, setAdaptiveModeEnabled, refreshAdaptiveUI } from './modules/adaptive-engine.js';
-import { selectMode } from './modules/mode-selection.js';
+import { selectMode, startMode } from "./modules/mode-selection.js";
 
 // Variant cycler (LRU rotation + adaptive bias) — must load BEFORE generate-question.js
 // so window.pickVariant is available when gen-*.js modules first execute.
@@ -44,16 +44,17 @@ import { pickVariant, recordVariantWrong, recordVariantRight } from './modules/v
 // Layer 4: Game Logic
 import { startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton, promptFullscreen, acceptFullscreen, declineFullscreen, toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection, skipCurrentQuestion, recordQuestionStatus, renderQuestionDots, recomputeScoreFromHistory, goToQuestionIndex, resumeLiveQuestion } from './modules/game-control.js';
 import { generateQuestion, generateQuestionFor } from './modules/generate-question.js';
-import { skoToggle, skoEdit, skoReset, openSkillOptionsPanel, closeSkillOptionsPanel } from './modules/skill-options-ui.js';
+import { skoPlayOpen, skoToggle, skoEdit, skoReset, openSkillOptionsPanel, closeSkillOptionsPanel } from './modules/skill-options-ui.js';
 import { getSetOptions, setSetOptions, clearSetOptions, describeSetOptions, snapshotSetOptions, restoreSetOptions } from './modules/skill-option-store.js';
 import { encodeOptionPayload, decodeOptionPayload, optionSuffix } from './modules/skill-option-codec.js';
 import { optionsFor, offeredOptionsFor, describeOptions, packOptions, normalizeOptions } from './modules/skill-options.js';
 import { renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber, updateOrderingUI, setupOrderingDragHandlers, reorderSelectedNumber, checkOrderInputsFilled, checkOrderingAnswer, unifiedOrderTileClick, unifiedOrderInputChange, unifiedOrderBoxClear, setupUnifiedOrderingHandlers, renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer, liveValidateExpanded, checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily, selectNumberLineTick, checkNumberLinePlacement, selectOddEvenNumber, checkOddEvenSelection, wireBoxValidation } from './modules/question-render.js';
+import { updateSkipButton, isSkipAvailable, skipAfterFor, calcAllowedFor } from './modules/skip-rule.js';
 import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkFractionInputAnswer, checkShadePartsAnswer, checkWordProblemAnswer, trackSkillAnswer, skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice, ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode, submitFactorPairs, submitInlineBlanks, submitTchartCells, submitMultChartCells, applyReviewOutcome, isReviewing, _celebrateCorrectAnswer, widgetLadderWrong } from './modules/answer-check.js';
 import { showSolutionPopup, closeSolutionPopup, generateSolutionSteps } from './modules/solution-display.js';
 import { handleTchartDrop, removeFromTchart, hideFactorInBank, returnFactorToBank, validateTchartRow, checkTchartComplete, handleTchartCompletion, showTchartFeedback, resetTchart } from './modules/tchart-factor.js';
 import { showDivisibilityHelp, toggleDivSortNumber, dropDivSortNumber, moveNumberToBox, checkDivisibilitySortComplete, setupWorksheetDivisibilitySort, wsToggleDivSortNumber, wsMoveNumberToBox, wsCheckDivisibilitySortComplete } from './modules/divisibility-sort.js';
-import { showHint, closeHintPopup, speakQuestion, speakAnswerOption, stopSpeaking, showWordProblemHint, showSolution, resizeInput, showGeometryHint } from './modules/hints-speech.js';
+import { showHint, speakHint, closeHintPopup, speakQuestion, speakAnswerOption, stopSpeaking, showWordProblemHint, showSolution, resizeInput, showGeometryHint } from './modules/hints-speech.js';
 import { updateBossVisuals, startBossMonster, startRaceCPU, updateRaceVisuals, getPlayerRaceSpeed } from './modules/boss-race.js';
 
 // Layer 5: Composite Features
@@ -266,7 +267,7 @@ Object.assign(window, {
     confirmResetAdaptiveLevels,
 
     // Mode Selection
-    selectMode,
+    selectMode, startMode,
 
     // Game Control
     startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer,
@@ -283,7 +284,7 @@ Object.assign(window, {
     // Question Generation & Rendering
     generateQuestion, generateQuestionFor,
     // Per-skill options that travel with a skill set (owner, 2026-09-24)
-    skoToggle, skoEdit, skoReset, openSkillOptionsPanel, closeSkillOptionsPanel,
+    skoPlayOpen, skoToggle, skoEdit, skoReset, openSkillOptionsPanel, closeSkillOptionsPanel,
     parseSkillCodeParts, buildMixedCode, parseMixedGoals, isSkillCodeWithOptions,
     getSetOptions, setSetOptions, clearSetOptions, describeSetOptions, snapshotSetOptions, restoreSetOptions,
     encodeOptionPayload, decodeOptionPayload, optionSuffix,
@@ -300,6 +301,7 @@ Object.assign(window, {
     // Answer Checking
     checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkFractionInputAnswer, checkShadePartsAnswer, checkWordProblemAnswer, trackSkillAnswer, widgetLadderWrong,
     skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice,
+    updateSkipButton, isSkipAvailable, skipAfterFor, calcAllowedFor,
     ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode,
     submitFactorPairs, submitInlineBlanks, submitTchartCells, submitMultChartCells,
     applyReviewOutcome, isReviewing, _celebrateCorrectAnswer,
@@ -318,7 +320,7 @@ Object.assign(window, {
     setupWorksheetDivisibilitySort, wsToggleDivSortNumber, wsMoveNumberToBox,
     wsCheckDivisibilitySortComplete, showWordProblemHint,
     showSolution, resizeInput, showGeometryHint,
-    showHint, closeHintPopup, speakQuestion, speakAnswerOption, stopSpeaking,
+    showHint, speakHint, closeHintPopup, speakQuestion, speakAnswerOption, stopSpeaking,
 
     // Boss & Race
     updateBossVisuals, startBossMonster, startRaceCPU, updateRaceVisuals, getPlayerRaceSpeed,

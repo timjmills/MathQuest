@@ -1308,3 +1308,69 @@ html body .mq-scell input.mq-workbox:focus { box-shadow: inset 0 0 0 3px #000; }
 /* a start-unknown number line: the given point is where the hops land - a hollow ring, never the
    filled start dot (round 4) */
 html body .mq-scell .mq-nl-start.mq-nl-given .mq-nl-mark::after { background: #fff !important; border: 3px solid #000; box-sizing: border-box; }
+
+/* ---- WAVE 1 (1.2, 2026-10-02). The ACTIVE answer box is yellow and pulses, so the pupil sees where
+   to write. ADDITIVE: R3-3 above (no ring on the cell border) stays; the highlight is on the box
+   itself, never the cell border. Screen only: print never loads a focused input or .mq-active-*.
+   prefers-reduced-motion: the same yellow, steady, no animation. */
+@keyframes mq-active-pulse {
+    0%, 100% { background-color: #fff3a0; box-shadow: 0 0 0 3px #f2c200; }
+    50%      { background-color: #ffe14d; box-shadow: 0 0 0 6px #f2c20066; }
+}
+html body #gameView #questionCard #questionPaper input.mq-slot:focus,
+html body #gameView #questionCard #questionPaper input.mq-cellslot:focus,
+html body #gameView #questionCard #questionPaper [data-mq-cell]:focus-within,
+html body .online-edition .problem-card.mq-wscard.mq-active-problem input.mq-slot:focus,
+html body .online-edition .problem-card.mq-wscard.mq-active-problem input.mq-cellslot:focus,
+html body .online-edition .problem-card.mq-wscard.mq-active-problem [data-mq-cell]:focus-within,
+html body .qt-question-card .ws-cell.mq-scell input.mq-slot:focus,
+html body .qt-question-card .ws-cell.mq-scell input.mq-cellslot:focus,
+html body .qt-question-card .ws-cell.mq-scell [data-mq-cell]:focus-within,
+html body .mq-active-box {
+    background-color: #fff3a0 !important;
+    box-shadow: 0 0 0 3px #f2c200 !important;
+    animation: mq-active-pulse 1.3s ease-in-out infinite !important;
+}
+/* the whole current problem on the online worksheet */
+html body .online-edition .problem-card.mq-wscard.mq-active-problem {
+    background-color: #fffbe0;
+    box-shadow: 0 0 0 4px #f2c200;
+    animation: mq-active-card-pulse 1.6s ease-in-out infinite !important;
+}
+@keyframes mq-active-card-pulse {
+    0%, 100% { box-shadow: 0 0 0 3px #f2c200; }
+    50%      { box-shadow: 0 0 0 8px #f2c20055; }
+}
+html body .online-edition .problem-card.mq-wscard.mq-active-problem input:focus,
+html body .online-edition .problem-card.mq-wscard.mq-active-problem [data-mq-cell]:focus-within {
+    background-color: #fff3a0 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body #gameView #questionCard #questionPaper input.mq-slot:focus,
+    html body #gameView #questionCard #questionPaper input.mq-cellslot:focus,
+    html body #gameView #questionCard #questionPaper [data-mq-cell]:focus-within,
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem input.mq-slot:focus,
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem input.mq-cellslot:focus,
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem [data-mq-cell]:focus-within,
+    html body .qt-question-card .ws-cell.mq-scell input.mq-slot:focus,
+    html body .qt-question-card .ws-cell.mq-scell input.mq-cellslot:focus,
+    html body .qt-question-card .ws-cell.mq-scell [data-mq-cell]:focus-within,
+    html body .mq-active-box,
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem { animation: none !important; }
+}
+@media print {
+    html body .mq-active-box, html body .mq-active-problem { animation: none !important; box-shadow: none !important; background-color: transparent !important; }
+}
+
+/* ---- WAVE 1 (1.5). The hint box's speaker button: 44 px target. */
+html body .hint-speak-btn { min-width: 44px; min-height: 44px; }
+
+/* ---- WAVE 1 (1.6). Student home: four Start buttons (shown for students only). */
+.student-start-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 18px; }
+.student-start-btn {
+    min-height: 64px; padding: 14px 26px; font-size: 1.25rem; font-weight: 900; border-radius: 18px; cursor: pointer;
+    background: var(--mq-orange); color: #fff; border: 2px solid var(--mq-orange-d);
+    box-shadow: 0 6px 0 0 var(--mq-orange-d); flex: 1 1 220px; max-width: 320px;
+}
+.student-start-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 0 var(--mq-orange-d); }
+@media (max-width: 480px) { .student-start-btn { flex: 1 1 44%; max-width: none; min-height: 56px; padding: 10px 12px; font-size: 1.05rem; } }

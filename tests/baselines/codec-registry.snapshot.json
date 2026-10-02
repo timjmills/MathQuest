@@ -89,7 +89,9 @@
     "wpCues": "8A",
     "wpBank": "8B",
     "wpBar": "8C",
-    "bars": "9F"
+    "bars": "9F",
+    "calculator": "6X",
+    "skipAfter": "6Y"
   },
   "blocks": {
     "0": {
@@ -628,7 +630,9 @@
     "bars": {
       "vertical": "V",
       "horizontal": "H"
-    }
+    },
+    "calculator": {},
+    "skipAfter": {}
   },
   "scalarOnly": {
     "range": "decimal",
@@ -657,7 +661,9 @@
     "poolSupport": "decimal",
     "wpCues": "bool",
     "wpBank": "bool",
-    "wpBar": "bool"
+    "wpBar": "bool",
+    "calculator": "bool",
+    "skipAfter": "decimal"
   },
   "subranges": {
     "3B-3M": "build lane k2 (BUILD_LIST.md)",
@@ -670,6 +676,7 @@
     "7T-7Z": "build lane timemoney",
     "8D-8O": "build lane data",
     "8P-8Z": "build lane numtheory",
-    "5N-5Z": "lessons, support ladder and later waves"
+    "5N-5Z": "lessons, support ladder and later waves",
+    "6X-6Z": "Wave 1 lane A (pupil practice: calculator, skip)"
   }
 }

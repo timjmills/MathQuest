@@ -18,7 +18,7 @@
 // change made in the mixed settings shows up in the share panel and in the next link. A host may
 // instead keep the values on its own rows (a Quick Start card carries its `opts` in localStorage)
 // by supplying read / write.
-import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions } from './skill-options.js';
+import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions, isPlayOption, playSummary } from './skill-options.js';
 import { getSetOptions, setSetOptions, onSetOptionsChanged } from './skill-option-store.js';
 import { SKILLS } from './data.js';
 import { state } from './state.js';
@@ -95,14 +95,27 @@ function _liveDef(def) {
  * control with its help line.
  */
 export function groupedOptionRowsHTML(defs, cur, row, headingStyle) {
-    const shown = defs.filter(def => !(typeof def.appliesTo === 'function' && !def.appliesTo(cur)));
+    const all = defs.filter(def => !(typeof def.appliesTo === 'function' && !def.appliesTo(cur)));
+    const shown = all.filter(d => !isPlayOption(d));
+    const play = all.filter(isPlayOption);
     const used = OPTION_GROUPS.filter(g => shown.some(d => optionGroup(d) === g.id));
     const hs = headingStyle || 'font-size:0.68rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-dim);margin:10px 0 0;';
     const heads = used.length > 1 || (used[0] && used[0].id !== 'difficulty');
-    return used.map(g => `<div class="sko-group" data-sko-group="${g.id}">`
+    const groups = used.map(g => `<div class="sko-group" data-sko-group="${g.id}">`
         + (heads ? `<div class="sko-group-head" role="heading" aria-level="3" style="${hs}">${escHTML(g.label)}</div>` : '')
         + shown.filter(d => optionGroup(d) === g.id).map(row).join('') + '</div>').join('');
+    // Pupil play (calculator, skip): one disclosure, closed at rest, its current values in the summary line.
+    const disclosure = play.length
+        ? `<details class="sko-group sko-play" data-sko-group="play"${_playOpen ? ' open' : ''} ontoggle="skoPlayOpen(this.open)" style="margin-top:10px;">`
+            + `<summary class="sko-play-sum" style="cursor:pointer;min-height:44px;display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:700;color:var(--text);">`
+            + `<span aria-hidden="true">&#9662;</span><span>Pupil play</span><span class="sko-play-vals" style="font-weight:500;color:var(--text-dim);">${escHTML(playSummary(play, cur))}</span></summary>`
+            + play.map(row).join('') + '</details>'
+        : '';
+    return groups + disclosure;
 }
+let _playOpen = false;
+/** Remembers whether the Pupil play disclosure is open, so a redraw after a change keeps it open. */
+export function skoPlayOpen(open) { _playOpen = !!open; }
 
 export function escHTML(s) {
     return String(s == null ? '' : s)

@@ -1,6 +1,7 @@
 import { state } from './state.js';
 import { recordPracticeLog } from './storage.js';
 import { skillAllowsCalculator } from './data.js';
+import { updateSkipButton, isSkipAvailable } from './skip-rule.js';
 import {
     isMapTestMode,
     isFirstAttempt,
@@ -348,7 +349,7 @@ export function resetAttemptTracking() {
     state.currentQAttempts = 0;
     state.currentQAttemptHistory = [];
     // Hide skip button + clear any cross-outs
-    const skipBtn = document.getElementById('skipBtn');
+    const skipBtn = document.getElementById('skipQuestionBtn');
     if (skipBtn) skipBtn.style.display = 'none';
     const histBox = document.getElementById('attemptHistoryBox');
     if (histBox) { histBox.innerHTML = ''; histBox.style.display = 'none'; }
@@ -393,45 +394,15 @@ export function appendAttemptHistory(submittedAnswer) {
     histBox.appendChild(chip);
 }
 
-// Make sure a Skip button exists in the DOM (idempotent). Returns the button.
+// The one Skip button is #skipQuestionBtn (index.html). It is hidden until N wrong tries
+// (teacher option, skip-setting.js); there is no second "Next" button any more.
 export function ensureSkipButton() {
-    let skipBtn = document.getElementById('skipBtn');
-    if (skipBtn) return skipBtn;
-    skipBtn = document.createElement('button');
-    skipBtn.id = 'skipBtn';
-    skipBtn.type = 'button';
-    skipBtn.className = 'skip-btn';
-    // Per user spec: button reads "Next →" (not "Skip →") so it doesn't
-    // feel like giving up — the student is moving on after 2 attempts.
-    skipBtn.textContent = 'Next →';
-    skipBtn.style.display = 'none';
-    skipBtn.onclick = () => {
-        if (typeof window.skipCurrentItem === 'function') window.skipCurrentItem();
-    };
-    // Wrap in a container for centering, mount below feedback area
-    const container = document.createElement('div');
-    container.className = 'skip-btn-container';
-    container.appendChild(skipBtn);
-    const feedback = document.getElementById('feedbackArea');
-    if (feedback && feedback.parentNode) {
-        feedback.parentNode.insertBefore(container, feedback.nextSibling);
-    } else {
-        const card = document.getElementById('questionCard');
-        if (card) card.appendChild(container);
-    }
-    return skipBtn;
+    return document.getElementById('skipQuestionBtn');
 }
 
-// Show the skip button after enough wrong attempts (>= 2 total).
-// Per teacher spec: one retry — student attempts, gets it wrong, gets a
-// chance to retry once with already-correct parts preserved, then the
-// "Next →" button appears so they aren't stuck on a problem they can't
-// solve.
+// Reveal Skip once the pupil has made N wrong tries on this question.
 export function showSkipButtonIfNeeded() {
-    if ((state.currentQAttempts || 0) >= 2) {
-        const skipBtn = ensureSkipButton();
-        if (skipBtn) skipBtn.style.display = 'inline-block';
-    }
+    updateSkipButton();
 }
 
 // Record a wrong attempt: bumps counter, stores submission, optionally crosses
@@ -447,12 +418,7 @@ export function recordWrongAttempt({ submitted, btnElement, showHistoryChip, noH
     }
     // On a support-ladder step the action is to try again: no "Next ->" under the feedback (the
     // card's own Skip stays in its tool row).
-    if (noSkip) {
-        const skipBtn = document.getElementById('skipBtn');
-        if (skipBtn) skipBtn.style.display = 'none';
-    } else {
-        showSkipButtonIfNeeded();
-    }
+    showSkipButtonIfNeeded();
 
     // Auto-reveal the hint popup on the FIRST wrong attempt — every skill
     // gets the same scaffolding behavior. Student doesn't have to know to
@@ -475,6 +441,8 @@ export function recordWrongAttempt({ submitted, btnElement, showHistoryChip, noH
 // Standard Practice: mark wrong, advance via nextQuestion (forces past the
 //   "must be correct to advance" guard by setting lastAnswerCorrect = true).
 export function skipCurrentItem() {
+    // A click on a hidden Skip button (or a stray call) must not skip before skipAfter wrong tries.
+    if (!isSkipAvailable()) return;
     // Always reset attempt UI so the next question starts fresh
     state.hasAnswered = true;
     if (state.mapMode === true && state.mapSessionMode === 'practice') {
@@ -1002,7 +970,7 @@ function _ladderAfter(q, userAns) {
     practiceLadderWrong(q, userAns);
     const sb = document.getElementById('solutionBtn');
     if (sb) sb.style.display = 'none';
-    const skipBtn = document.getElementById('skipBtn');
+    const skipBtn = document.getElementById('skipQuestionBtn');
     if (skipBtn) skipBtn.style.display = 'none';
     const card = document.getElementById('questionCard');
     if (card) card.classList.remove('incorrect-bg');

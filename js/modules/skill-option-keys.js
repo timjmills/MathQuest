@@ -104,6 +104,7 @@ export const KEY_SUBRANGES = Object.freeze([
     Object.freeze({ keys: '8D-8O', owner: 'build lane data' }),
     Object.freeze({ keys: '8P-8Z', owner: 'build lane numtheory' }),
     Object.freeze({ keys: '5N-5Z', owner: 'lessons, support ladder and later waves' }),
+    Object.freeze({ keys: '6X-6Z', owner: 'Wave 1 lane A (pupil practice: calculator, skip)' }),
 ]);
 
 // Option id -> its multi-character key. APPEND-ONLY. Take the next letter of your OWN block.
@@ -191,6 +192,10 @@ export const MULTI_KEYS = Object.freeze({
     wordSet: '6A',       // vocabulary: the first N words of the skill's list (the core words)
     most: '6B',          // graphs: the largest count one bar / row / mark may show
     // NEXT FREE IN BLOCK 6: 6C.
+    // Wave 1 lane A (sub-range 6X-6Z, pupil practice): the calculator button and the Skip rule.
+    calculator: '6X',    // every skill: show the pupil a calculator button (default off)
+    skipAfter: '6Y',     // every skill: wrong tries before Skip appears (default 5, 0 = off)
+    // NEXT FREE IN 6X-6Z: 6Z.
 
     // Block 7 — option-panel round 3 (design/audit/OPTIONS-CRITIC-R2.md §5 #7, #20)
     poolSize: '7A',      // mixed pools: every member one step easier / as set / harder
@@ -385,6 +390,8 @@ export const SCALAR_ONLY = Object.freeze({
     touch: 'reserved', cover: 'reserved', mix: 'reserved', anchors: 'reserved',
     // block 8 (word problems)
     wpCues: 'bool', wpBank: 'bool', wpBar: 'bool',
+    // Wave 1 lane A
+    calculator: 'bool', skipAfter: 'decimal',
 });
 
 /**
