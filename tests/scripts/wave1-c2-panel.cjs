@@ -92,6 +92,8 @@ const rowsNow = (page) => page.evaluate((c, s) => window.getSetOptions(c, s).row
       return { notes: lines.map((l) => (l.querySelector('.sko-row-note') || {}).textContent || ''), heights: lines.map((l) => Math.round(l.querySelector('div').getBoundingClientRect().height)) };
     });
     check(/Starts at 275 so the row has 12 numbers/.test(noteInfo.notes[2]) && /Starts at 11,000 so the row has 12 numbers/.test(noteInfo.notes[3]), `${W}: lifted starts are explained: ${JSON.stringify(noteInfo.notes)}`);
+    const selW = await page.evaluate(() => [...document.querySelectorAll('#skillOptionsPopover .sko-row-line select')].map((e) => Math.round(e.getBoundingClientRect().width)));
+    check(selW.length && selW.every((w2) => w2 >= 90), `${W}: the start dropdown has room to show "Number" (widths ${selW})`);
     check(noteInfo.heights.every((hh) => hh <= 52), `${W}: every row editor is one line (heights ${noteInfo.heights})`);
     // remove one row and put it back through its chip
     await page.evaluate(() => document.querySelectorAll('#skillOptionsPopover .sko-row-line')[3].querySelector('button[aria-label^="Remove"]').click());

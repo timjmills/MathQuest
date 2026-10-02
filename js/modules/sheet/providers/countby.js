@@ -99,7 +99,9 @@ function cbPage(q, ref = {}) {
     const rows = ref && ref.opts && Array.isArray(ref.opts.rows) ? ref.opts.rows : [];
     const steps = [...new Set(rows.map((r) => r.step))];
     const downs = rows.filter((r) => r.dir === 'down').length;
-    const froms = [...new Set(rows.map((r) => (r.start === 'custom' ? r.at : null)))];
+    const nn = ref && ref.opts && Number(ref.opts.jumps) === 15 ? 15 : 12;
+    // the start a row really prints: a back row too short for nn numbers is raised to the smallest start that gives them
+    const froms = [...new Set(rows.map((r) => (r.start !== 'custom' ? null : r.dir === 'down' && r.at < (nn - 1) * r.step ? (nn - 1) * r.step + (r.at % r.step) : r.at)))];
     return { dir: !downs ? 'up' : downs === rows.length ? 'down' : 'mixed', steps, from: rows.length && froms.length === 1 && froms[0] !== null ? froms[0] : null };
 }
 const stepWords = (steps) => (!steps.length ? '1 to 12'

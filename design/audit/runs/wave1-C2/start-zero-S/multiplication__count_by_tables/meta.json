@@ -51,7 +51,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 4. Write the missing numbers.",
-          "ans": "8, 16, 24, 36, 44",
+          "ans": "8, 20, 24, 28, 40",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -79,7 +79,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 4. Write the missing numbers.",
-          "ans": "12, 20, 24, 32, 44",
+          "ans": "8, 12, 28, 32, 36",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -107,7 +107,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 4. Write the missing numbers.",
-          "ans": "8, 20, 24, 32, 40",
+          "ans": "8, 24, 28, 36, 44",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -135,7 +135,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 4. Write the missing numbers.",
-          "ans": "8, 16, 28, 36, 44",
+          "ans": "12, 24, 28, 32, 44",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -163,7 +163,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 4. Write the missing numbers.",
-          "ans": "12, 16, 24, 36, 44",
+          "ans": "12, 16, 20, 36, 44",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -191,7 +191,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 4. Write the missing numbers.",
-          "ans": "8, 16, 28, 32, 40",
+          "ans": "8, 16, 20, 28, 40",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -219,7 +219,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 4. Write the missing numbers.",
-          "ans": "12, 20, 28, 32, 44",
+          "ans": "16, 24, 32, 36, 44",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -247,7 +247,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 4. Write the missing numbers.",
-          "ans": "12, 16, 28, 36, 40",
+          "ans": "16, 20, 24, 32, 40",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -275,7 +275,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 4. Write the missing numbers.",
-          "ans": "12, 20, 28, 36, 40",
+          "ans": "12, 16, 24, 28, 32",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -303,7 +303,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 4. Write the missing numbers.",
-          "ans": "8, 20, 28, 32, 40",
+          "ans": "12, 20, 32, 36, 44",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -331,7 +331,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 4. Write the missing numbers.",
-          "ans": "8, 16, 24, 32, 44",
+          "ans": "20, 24, 28, 36, 40",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -359,7 +359,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 4. Write the missing numbers.",
-          "ans": "8, 20, 24, 36, 40",
+          "ans": "8, 12, 20, 24, 40",
           "measured": {
             "1": {
               "hMm": 35.7,

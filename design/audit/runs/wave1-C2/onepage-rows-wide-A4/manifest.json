@@ -10,22 +10,22 @@
       "independent": {
         "fits": {
           "cols": 1,
-          "rows": 10,
-          "perPage": 10,
+          "rows": 9,
+          "perPage": 9,
           "pages": 1,
-          "note": "Fits: 1 column x 10 rows, 10 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
+          "note": "Fits: 1 column x 9 rows, 9 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
           "sections": [
             {
               "cols": 1,
-              "rows": 10,
-              "perPage": 10,
+              "rows": 9,
+              "perPage": 9,
               "pages": 1,
               "cellW": 186,
-              "cellH": 22.8,
+              "cellH": 25.333,
               "requested": 1,
               "clamped": false,
               "note": "Rows sized to the problems they hold.",
-              "line": "Fits: 1 column x 10 rows, 10 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
+              "line": "Fits: 1 column x 9 rows, 9 per page, 1 page. Digits 16 pt. Rows sized to the problems they hold.",
               "cls": "standard",
               "digitPt": 16,
               "hMin": 32.9,
@@ -52,7 +52,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 100,000. Write the missing numbers.",
-            "ans": "1300000, 1500000, 1600000, 1900000, 2000000",
+            "ans": "1200000, 1300000, 1600000, 1800000, 1900000",
             "measured": {
               "1": {
                 "hMm": 32.9,
@@ -64,7 +64,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "17000, 19000, 20000, 22000, 24000",
+            "ans": "16000, 18000, 22000, 23000, 24000",
             "measured": {
               "1": {
                 "hMm": 32.9,
@@ -76,7 +76,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 4. Write the missing numbers.",
-            "ans": "16, 24, 32, 36, 48",
+            "ans": "16, 28, 36, 40, 48",
             "measured": {
               "1": {
                 "hMm": 17.4,
@@ -88,7 +88,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 9. Write the missing numbers.",
-            "ans": "36, 45, 72, 90, 99",
+            "ans": "27, 45, 54, 72, 108",
             "measured": {
               "1": {
                 "hMm": 17.4,
@@ -100,7 +100,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 6. Write the missing numbers.",
-            "ans": "24, 30, 42, 54, 72",
+            "ans": "24, 30, 36, 54, 66",
             "measured": {
               "1": {
                 "hMm": 17.4,
@@ -112,7 +112,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 2. Write the missing numbers.",
-            "ans": "8, 12, 14, 18, 24",
+            "ans": "6, 12, 16, 20, 22",
             "measured": {
               "1": {
                 "hMm": 17.4,
@@ -124,7 +124,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 8. Write the missing numbers.",
-            "ans": "32, 40, 64, 80, 88",
+            "ans": "32, 40, 56, 80, 96",
             "measured": {
               "1": {
                 "hMm": 17.4,
@@ -136,10 +136,22 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 11. Write the missing numbers.",
-            "ans": "33, 66, 88, 99, 121",
+            "ans": "44, 55, 77, 110, 132",
             "measured": {
               "1": {
                 "hMm": 17.4,
+                "fits": true
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1400000, 1500000, 1700000, 1800000, 1900000",
+            "measured": {
+              "1": {
+                "hMm": 32.9,
                 "fits": true
               }
             }
@@ -148,7 +160,7 @@
         "pages": [
           {
             "file": "independent-p1.png",
-            "words": 121,
+            "words": 130,
             "w_mm": 209.9,
             "h_mm": 297
           }
@@ -156,7 +168,7 @@
         "keyPages": [
           {
             "file": "independent-key-p1.png",
-            "words": 164,
+            "words": 178,
             "w_mm": 209.9,
             "h_mm": 297
           }
@@ -164,11 +176,11 @@
         "check": {
           "pages": 1,
           "cells": [
-            8
+            9
           ],
           "problems": [],
           "fonts": {
-            "Andika": 86
+            "Andika": 95
           },
           "fontsReady": true,
           "andika": true
@@ -176,11 +188,11 @@
         "keyCheck": {
           "pages": 1,
           "cells": [
-            8
+            9
           ],
           "problems": [],
           "fonts": {
-            "Andika": 126
+            "Andika": 140
           },
           "fontsReady": true,
           "andika": true

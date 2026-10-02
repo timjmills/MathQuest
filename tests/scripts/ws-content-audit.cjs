@@ -1056,7 +1056,7 @@ function countByRules(items, F) {
     }
     // Wave 1 C2: no row of a page repeats another exactly (same numbers, same gaps), and the first printed run is not the same on every row of a one-step page.
     {
-        const rowsList = live.filter(x => x.cellT === 'count-row' && x.countBy && x.opts && Array.isArray(x.opts.rows) && x.opts.rows.length && !x.opts.onePage);
+        const rowsList = live.filter(x => x.cellT === 'count-row' && x.countBy && !(x.opts && x.opts.onePage));
         const pageOf = (k) => Math.floor(k / 6);
         const seenKey = new Map();
         rowsList.forEach((x, k) => {

@@ -107,12 +107,14 @@ function normaliseRequest(req = {}) {
             try {
                 if (k.skillId !== 'count_by_tables') return false;
                 const o = normalizeOptions(k.categoryId, k.skillId, k.opts || {});
-                // wave 1 C2: with rows chosen the sheet prints THOSE rows once each (as many as fit one page), else x 1 to x 12
+                // wave 1 C2: with rows chosen the sheet prints THOSE rows in order, starting the list again until its twelve lines are full, else x 1 to x 12
                 if (o.onePage && o.rows && o.rows.length) rowCount = onePageRows(o.rows).length;
                 return !!o.onePage;
             } catch (e) { return false; }
         });
-        if (on) { sec.count = rowCount; sec.pages = 1; sec.columns = 1; onePage = true; }
+        if (on) {
+            sec.count = rowCount; sec.pages = 1; sec.columns = 1; onePage = true;
+        }
     }
     return {
         role, size: onePage ? 'S' : size, look, paper, seed, sections,

@@ -101,13 +101,14 @@ export function rowValues(row, n) {
 }
 
 /** What a page of these rows is about: its steps (in order, once each), its way, and a shared typed start. */
-export function rowsSummary(rows) {
+export function rowsSummary(rows, n = 12) {
     const list = normalizeRows(rows);
     const steps = [];
     for (const r of list) if (!steps.includes(r.step)) steps.push(r.step);
     const downs = list.filter((r) => r.dir === 'down').length;
     const dir = !list.length || !downs ? 'up' : downs === list.length ? 'down' : 'mixed';
-    const froms = [...new Set(list.map((r) => (r.start === 'custom' ? r.at : null)))];
+    // the start a row really prints: a back row raised to give n numbers names the raised start (downStart)
+    const froms = [...new Set(list.map((r) => (r.start === 'custom' ? (r.dir === 'down' ? downStart(r, n) : r.at) : null)))];
     const from = list.length && froms.length === 1 && froms[0] !== null ? froms[0] : null;
     return { steps, dir, from, count: list.length };
 }
@@ -115,8 +116,8 @@ export function rowsSummary(rows) {
 /* ------------------------------------------------------------------ one page */
 // "All rows on one page" keeps the compact sheet (owner 2026-10-02): every row is a single line of 12 numbers at size S, so
 // the page holds twelve lines. A row whose widest number cannot be written on one line even at the 9 pt floor (more than six
-// characters, "100,000") takes two lines of six. With rows chosen the sheet prints those rows once each, in order, until its
-// twelve lines run out; with none chosen it is the tables x 1 to x 12. The test below is the cell's own arithmetic
+// characters, "100,000") takes two lines of six. With rows chosen the sheet prints those rows in order and starts the list again until its
+// twelve lines are full; with none chosen it is the tables x 1 to x 12. The test below is the cell's own arithmetic
 // (sheet/cells/count-row.js, compact), kept in step with it.
 
 const S_LIVE = 178, S_GAP = 1, S_TAB = 12, FLOOR = 9;
@@ -138,13 +139,15 @@ export const ONE_PAGE_LINES = 12;
 /** The tables the one-page sheet prints when no rows are chosen. */
 export const ONE_PAGE_ITEMS = 12;
 
-/** The rows the one-page sheet prints: the list in order, until its lines run out (at least one row). */
+/** The rows the one-page sheet prints: the list in order, starting again until its twelve lines are full (at least one row). */
 export function onePageRows(rows) {
     const list = normalizeRows(rows);
+    if (!list.length) return [];
     const signed = list.some((r) => r.dir === 'down');          // the step tab carries a + / - sign when any row goes back
     const out = [];
     let used = 0;
-    for (const r of list) {
+    for (let i = 0; i < 24; i++) {
+        const r = list[i % list.length];
         const l = rowLines(r, signed);
         if (out.length && used + l > ONE_PAGE_LINES) break;
         out.push(r);

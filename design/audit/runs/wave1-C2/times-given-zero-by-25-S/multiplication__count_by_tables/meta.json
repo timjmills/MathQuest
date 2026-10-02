@@ -51,7 +51,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 25. Write the missing numbers.",
-          "ans": "75, 125, 175, 225, 275",
+          "ans": "50, 150, 175, 200, 250",
           "measured": {
             "1": {
               "hMm": 43.7,
@@ -79,7 +79,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 25. Write the missing numbers.",
-          "ans": "50, 125, 175, 200, 250",
+          "ans": "50, 125, 150, 250, 275",
           "measured": {
             "1": {
               "hMm": 43.7,
@@ -107,7 +107,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 25. Write the missing numbers.",
-          "ans": "50, 100, 175, 225, 275",
+          "ans": "125, 150, 200, 225, 250",
           "measured": {
             "1": {
               "hMm": 43.7,
@@ -135,7 +135,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 25. Write the missing numbers.",
-          "ans": "50, 125, 175, 200, 275",
+          "ans": "100, 125, 150, 200, 225",
           "measured": {
             "1": {
               "hMm": 43.7,
@@ -163,7 +163,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 25. Write the missing numbers.",
-          "ans": "50, 100, 150, 225, 250",
+          "ans": "50, 75, 100, 150, 250",
           "measured": {
             "1": {
               "hMm": 43.7,
@@ -191,7 +191,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 25. Write the missing numbers.",
-          "ans": "75, 100, 150, 200, 250",
+          "ans": "50, 100, 125, 250, 275",
           "measured": {
             "1": {
               "hMm": 43.7,
@@ -219,7 +219,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 25. Write the missing numbers.",
-          "ans": "50, 100, 175, 200, 250",
+          "ans": "75, 125, 175, 200, 275",
           "measured": {
             "1": {
               "hMm": 43.7,
@@ -247,7 +247,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 25. Write the missing numbers.",
-          "ans": "50, 125, 150, 200, 250",
+          "ans": "75, 100, 150, 250, 275",
           "measured": {
             "1": {
               "hMm": 43.7,
@@ -275,7 +275,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 25. Write the missing numbers.",
-          "ans": "50, 100, 150, 200, 275",
+          "ans": "50, 100, 150, 225, 275",
           "measured": {
             "1": {
               "hMm": 43.7,
@@ -303,7 +303,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 25. Write the missing numbers.",
-          "ans": "50, 125, 175, 225, 275",
+          "ans": "50, 75, 200, 225, 250",
           "measured": {
             "1": {
               "hMm": 43.7,
@@ -331,7 +331,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 25. Write the missing numbers.",
-          "ans": "50, 100, 150, 200, 250",
+          "ans": "75, 150, 175, 250, 275",
           "measured": {
             "1": {
               "hMm": 43.7,
@@ -359,7 +359,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 25. Write the missing numbers.",
-          "ans": "75, 100, 150, 225, 275",
+          "ans": "75, 100, 125, 200, 225",
           "measured": {
             "1": {
               "hMm": 43.7,

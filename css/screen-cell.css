@@ -1407,6 +1407,9 @@ html body #questionCard .mq-scell .k2-chart td, html body .qt-question-card .mq-
    (a tablet) the chart swipes inside its cell as on a phone. */
 .mq-scell .k2-chartwindow:has(> .k2-chart-ten) { overflow-x: auto; scrollbar-width: auto; scrollbar-color: #000 #ddd; padding-bottom: 4px; width: 100%; min-width: 0; max-width: 100%; -webkit-overflow-scrolling: touch; }
 .mq-scell .k2-twin:has(.k2-chart-ten), .mq-scell .ws-cell:has(.k2-chart-ten) { min-width: 0; max-width: 100%; }
+/* a count-by row swipes inside its own cell: the cell may not grow to the row's width (SP-11a extended 2026-10-02) */
+.mq-scell .k2-twin:has([data-mq-swiperow]), .mq-scell .ws-cell:has([data-mq-swiperow]), .mq-scell .k2-twin:has([data-mq-swiperow]) > * { min-width: 0; max-width: 100%; }
+.mq-scell [data-mq-swiperow] { width: 100%; }
 html body .mq-scell .k2-chart.k2-chart-ten {
     --mq-chfs: 29px; --mq-chw: max(44px, calc(var(--mq-chd, 3) * 0.58 * var(--mq-chfs) + max(10px, min(0.5 * var(--mq-chfs), 14px) * (3 - var(--mq-chd, 3)))));
     width: calc(10 * var(--mq-chw)) !important; max-width: none !important; table-layout: fixed;
@@ -1433,6 +1436,13 @@ html body #questionCard .mq-scell .k2-chart.k2-chart-ten td, html body .qt-quest
     padding: 6px 8px; margin-top: 4px; font-size: 20px; line-height: 1.2; color: #000; background: #fff;
     border-top: 2px solid #000; font-family: "Andika", sans-serif;
 }
+/* the same cue under a count-by row that swipes on a phone (SP-11a extended 2026-10-02) */
+.mq-scell [data-mq-swiperow]:not([data-mq-end]) .k2-swipe-cue {
+    display: block; position: sticky; left: 0; width: 100%; box-sizing: border-box; text-align: center;
+    padding: 6px 8px; margin-top: 4px; font-size: 20px; line-height: 1.2; color: #000; background: #fff;
+    border-top: 2px solid #000; font-family: "Andika", sans-serif;
+}
+.mq-scell [data-mq-swiperow][data-mq-end] .k2-swipe-cue { display: none; }
 .mq-scell .k2-swipe-cue i { font-style: normal; font-size: 34px; vertical-align: middle; }
 .mq-scell .k2-chartwindow[data-mq-end] .k2-swipe-cue { display: none; }
 @media print { .k2-swipe-cue { display: none !important; } }

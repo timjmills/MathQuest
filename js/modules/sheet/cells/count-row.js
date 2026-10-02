@@ -314,7 +314,8 @@ register('count-row', {
         const align = g.tab ? 'left' : 'center';
         return root(ctx, `k2-countrow k2-countrow-${g.look}`,
             `${caption}${isTwin(ctx) && g.look === 'arcs' ? '<div data-mq-swiperow="1" style="overflow-x:auto;max-width:100%;padding-bottom:1px;">' : ''}`
-            + `<div class="k2-countrow-body" data-mq-join=", " style="display:inline-block;text-align:left;">${rowsHtml.join('')}</div>${isTwin(ctx) && g.look === 'arcs' ? '</div>' : ''}${ruleFrame}`,
+            + `<div class="k2-countrow-body" data-mq-join=", " style="display:inline-block;text-align:left;">${rowsHtml.join('')}</div>`
+            + `${isTwin(ctx) && g.look === 'arcs' ? '<span class="k2-swipe-cue" aria-hidden="true"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div>' : ''}${ruleFrame}`,
             { style: `text-align:${align};` });
     },
     answerKey(p) {

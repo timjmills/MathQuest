@@ -51,7 +51,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 100,000. Write the missing numbers.",
-          "ans": "1300000, 1400000, 1600000, 1900000, 2000000, 2200000, 2400000",
+          "ans": "1300000, 1400000, 1600000, 1700000, 1800000, 2000000, 2400000",
           "measured": {
             "1": {
               "hMm": 63.3,
@@ -75,7 +75,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 100,000. Write the missing numbers.",
-          "ans": "1300000, 1500000, 1700000, 1900000, 2100000, 2200000, 2300000",
+          "ans": "1200000, 1500000, 1600000, 1900000, 2000000, 2200000, 2300000",
           "measured": {
             "1": {
               "hMm": 63.3,
@@ -99,7 +99,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 100,000. Write the missing numbers.",
-          "ans": "1200000, 1500000, 1600000, 1900000, 2000000, 2200000, 2400000",
+          "ans": "1200000, 1300000, 1400000, 1700000, 1800000, 1900000, 2200000",
           "measured": {
             "1": {
               "hMm": 63.3,
@@ -123,7 +123,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 100,000. Write the missing numbers.",
-          "ans": "1300000, 1400000, 1600000, 1800000, 2000000, 2200000, 2300000",
+          "ans": "1300000, 1600000, 1700000, 1800000, 2100000, 2200000, 2300000",
           "measured": {
             "1": {
               "hMm": 63.3,
@@ -147,7 +147,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 100,000. Write the missing numbers.",
-          "ans": "1200000, 1400000, 1700000, 1800000, 2100000, 2200000, 2300000",
+          "ans": "1200000, 1600000, 1700000, 1800000, 2000000, 2300000, 2400000",
           "measured": {
             "1": {
               "hMm": 63.3,
@@ -171,7 +171,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 100,000. Write the missing numbers.",
-          "ans": "1200000, 1500000, 1600000, 1800000, 2100000, 2200000, 2400000",
+          "ans": "1200000, 1300000, 1500000, 1800000, 1900000, 2100000, 2400000",
           "measured": {
             "1": {
               "hMm": 63.3,
@@ -195,7 +195,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 100,000. Write the missing numbers.",
-          "ans": "1300000, 1500000, 1600000, 1900000, 2100000, 2200000, 2300000",
+          "ans": "1300000, 1400000, 1500000, 1900000, 2000000, 2200000, 2300000",
           "measured": {
             "1": {
               "hMm": 63.3,
@@ -219,7 +219,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 100,000. Write the missing numbers.",
-          "ans": "1200000, 1400000, 1600000, 1800000, 2000000, 2200000, 2300000",
+          "ans": "1400000, 1700000, 1900000, 2000000, 2200000, 2300000, 2400000",
           "measured": {
             "1": {
               "hMm": 63.3,
@@ -243,7 +243,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 100,000. Write the missing numbers.",
-          "ans": "1300000, 1500000, 1700000, 1900000, 2100000, 2300000, 2400000",
+          "ans": "1200000, 1300000, 1600000, 1800000, 2200000, 2300000, 2400000",
           "measured": {
             "1": {
               "hMm": 63.3,
@@ -267,7 +267,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 100,000. Write the missing numbers.",
-          "ans": "1200000, 1400000, 1600000, 1900000, 2000000, 2300000, 2400000",
+          "ans": "1200000, 1400000, 1600000, 1700000, 1900000, 2100000, 2300000",
           "measured": {
             "1": {
               "hMm": 63.3,
@@ -291,7 +291,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 100,000. Write the missing numbers.",
-          "ans": "1300000, 1500000, 1600000, 1800000, 2100000, 2200000, 2300000",
+          "ans": "1200000, 1400000, 1500000, 1700000, 1800000, 2100000, 2200000",
           "measured": {
             "1": {
               "hMm": 63.3,
@@ -315,7 +315,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 100,000. Write the missing numbers.",
-          "ans": "1200000, 1400000, 1700000, 1900000, 2000000, 2200000, 2400000",
+          "ans": "1500000, 1800000, 1900000, 2000000, 2200000, 2300000, 2400000",
           "measured": {
             "1": {
               "hMm": 63.3,
@@ -481,7 +481,7 @@
         "fonts": [
           [
             "Andika",
-            11
+            14
           ],
           [
             "Nunito",
@@ -552,7 +552,7 @@
         "fonts": [
           [
             "Andika",
-            11
+            14
           ],
           [
             "Nunito",
@@ -623,7 +623,7 @@
         "fonts": [
           [
             "Andika",
-            11
+            14
           ],
           [
             "Nunito",
@@ -675,7 +675,7 @@
         "fonts": [
           [
             "Andika",
-            60
+            78
           ],
           [
             "Nunito",
@@ -738,12 +738,12 @@
         ],
         "fonts": [
           [
-            "Nunito",
-            11
+            "Andika",
+            13
           ],
           [
-            "Andika",
-            10
+            "Nunito",
+            11
           ]
         ],
         "smallTargets": [],

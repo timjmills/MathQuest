@@ -309,17 +309,17 @@ function _rowsControlHTML(def, rows, color, h, tip, cur) {
             + [['step', 'Step'], ['zero', '0'], ['custom', 'Number']]
                 .map(([v, l]) => `<option value="${v}"${r.start === v ? ' selected' : ''}>${l}</option>`).join('') + '</select>';
         const atInput = r.start === 'custom'
-            ? `<input type="number" inputmode="numeric" min="0" max="${AT_MAX}" value="${r.at}" aria-label="Row ${i + 1} start number" onchange="${call('at', i, 'this.value')}" style="${field}width:76px;flex:none;">` : '';
+            ? `<input type="number" inputmode="numeric" min="0" max="${AT_MAX}" value="${r.at}" aria-label="Row ${i + 1} start number" onchange="${call('at', i, 'this.value')}" style="${field}width:68px;flex:none;padding:6px 4px;">` : '';
         const down = r.dir === 'down';
         const dirBtn = `<button type="button" aria-label="Row ${i + 1} direction: ${down ? 'counting back' : 'counting on'}. Tap to change" onclick="${call('dir', i, `'${down ? 'up' : 'down'}'`)}" `
-            + `style="${field}flex:none;width:68px;cursor:pointer;font-weight:600;">${down ? '&darr; Back' : '&uarr; On'}</button>`;
+            + `style="${field}flex:none;width:60px;padding:6px 2px;cursor:pointer;font-weight:600;font-size:0.76rem;">${down ? '&darr; Back' : '&uarr; On'}</button>`;
         const lifted = down && r.start === 'custom' ? downStart(r, nNum) : null;
         const note = lifted !== null && lifted !== r.at
             ? `<div class="sko-row-note" style="font-size:0.7rem;color:var(--text-dim);padding:0 0 4px 0;">Starts at ${lifted.toLocaleString('en-US')} so the row has ${nNum} numbers.</div>` : '';
         return `<div class="sko-row-line" style="padding:6px 0;border-top:1px solid var(--border);">`
             + `<div style="display:flex;flex-wrap:nowrap;align-items:center;gap:4px;">`
-            + `<input type="number" inputmode="numeric" min="1" max="${STEP_MAX}" value="${r.step}" aria-label="Row ${i + 1} count by" onchange="${call('step', i, 'this.value')}" style="${field}width:74px;flex:none;">`
-            + `<span style="flex:1 1 60px;min-width:0;">${startSel}</span>${atInput}${dirBtn}`
+            + `<input type="number" inputmode="numeric" min="1" max="${STEP_MAX}" value="${r.step}" aria-label="Row ${i + 1} count by" onchange="${call('step', i, 'this.value')}" style="${field}width:66px;flex:none;padding:6px 4px;">`
+            + `<span style="flex:1 1 96px;min-width:92px;">${startSel}</span>${atInput}${dirBtn}`
             + `<button type="button" aria-label="Remove row ${i + 1}" onclick="${call('remove', i, '0')}" style="min-width:36px;min-height:40px;flex:none;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text);cursor:pointer;font-size:1rem;">&times;</button></div>${note}</div>`;
     }).join('');
     const full = list.length >= ROW_MAX;

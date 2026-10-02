@@ -36,7 +36,7 @@
       "pageCount": 2,
       "keyPageCount": 2,
       "seed": 244652,
-      "title": "I Can count back by 5 from 30",
+      "title": "I Can count back by 5 from 55",
       "notes": [
         "Dense: 1 x 6, cells sized to the problems."
       ],
@@ -51,7 +51,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 5. Write the missing numbers.",
-          "ans": "45, 30, 20, 15, 0",
+          "ans": "40, 35, 30, 5, 0",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -79,7 +79,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 5. Write the missing numbers.",
-          "ans": "40, 30, 20, 15, 5",
+          "ans": "40, 35, 15, 10, 5",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -107,7 +107,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 5. Write the missing numbers.",
-          "ans": "40, 35, 20, 15, 0",
+          "ans": "45, 40, 30, 25, 5",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -135,7 +135,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 5. Write the missing numbers.",
-          "ans": "40, 30, 25, 10, 5",
+          "ans": "45, 35, 20, 10, 0",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -163,7 +163,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 5. Write the missing numbers.",
-          "ans": "45, 30, 20, 10, 0",
+          "ans": "45, 25, 15, 5, 0",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -191,7 +191,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 5. Write the missing numbers.",
-          "ans": "45, 35, 20, 15, 0",
+          "ans": "45, 30, 20, 15, 10",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -219,7 +219,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 5. Write the missing numbers.",
-          "ans": "45, 30, 25, 10, 0",
+          "ans": "45, 40, 25, 20, 5",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -247,7 +247,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 5. Write the missing numbers.",
-          "ans": "40, 35, 25, 15, 0",
+          "ans": "40, 30, 15, 5, 0",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -275,7 +275,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 5. Write the missing numbers.",
-          "ans": "45, 30, 20, 15, 5",
+          "ans": "45, 40, 35, 15, 0",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -303,7 +303,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 5. Write the missing numbers.",
-          "ans": "40, 35, 25, 15, 5",
+          "ans": "35, 30, 25, 10, 0",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -331,7 +331,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 5. Write the missing numbers.",
-          "ans": "40, 30, 20, 10, 0",
+          "ans": "35, 25, 20, 10, 5",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -359,7 +359,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 5. Write the missing numbers.",
-          "ans": "45, 30, 25, 15, 0",
+          "ans": "30, 25, 15, 10, 5",
           "measured": {
             "1": {
               "hMm": 35.7,

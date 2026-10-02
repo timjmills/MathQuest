@@ -58,3 +58,65 @@ Tree `worktree-agent-a9dc5434f99d8dd40` @ 5bf1aac, diff against `claude/sweet-ne
 Checked correct: down keys (back-tables, back-by-12 with 15 numbers, back-from-30), large keys (14,000 by 1,000; 1,000,000 by 100,000 with 15 numbers), thousands separators in print and on screen, tab widths for −1,000, +100 and 100,000, labels 0 × 25 … 11 × 25 for a zero start, the "given" mode hiding the labels at blanks, labels off on Test, grey labels on Guided, and the share code and the old tables code.
 
 Summary: the codec, keys and look are solid. The page dealing (the order broken by grouping, duplicate items, 3-number rows, half-empty S pages) and the phone wrap are why it does not reach 8.
+
+---
+
+# Round 2 (Opus, low)
+
+Graded at **debc9c6**. The builder's follow-up commit had not landed when I finished. The working tree still holds uncommitted edits to `screen-cell.js`, `count-row.js`, `screen-cell.css` and the standard, plus the untracked `phone-*.png`. I ran the phone probe against that working tree and say so below.
+
+## Verdict: FAIL
+
+| Criterion | Score | One line |
+|---|---|---|
+| C1 Ease of use | 8 | Every row is two lines of 6. The phone card swipes with a cue, and Tab keeps each box visible. The panel rows each fit on one line. |
+| C2 Educational value | 7 | A raised start contradicts the page's own title ("count back by 5 from 30" prints rows from 55). Test items still repeat the same blank pattern. |
+| C3 Spacing and layout | 8 | S pages are full (six rows). Cells fill the width. The 1,000,000 row holds 11.9 pt, above the floor. |
+| C4 Standard fidelity | 8 | Black and white, Andika, facsimile keys, arcs point right. The one-page sheet is byte-identical to 4911898 (A4 and Letter, 6 cases each). |
+
+## Runs
+
+- `wave1-c2-sizes`: OK. Every case is 6+6 (or 5+5+5). The smallest digits are 11.88 pt (100,000 L) and 12.61 pt (hexagons L), both above the 9 pt floor. Labels are at least 10 pt.
+- `wave1-c2-onepage` (with `MQ_BASE_ROOT` set to 4911898): OK. All 12 cases are identical to the base.
+- `wave1-c2-panel`: OK at 1280 and 390. A raised start is explained ("Starts at 275 so the row has 12 numbers."). Each row editor is 44 px high.
+- `ws-content-audit --skill count_by_tables`: OK, 0 failing.
+- `ws-screen-answer --skills multiplication:count_by_tables`: OK (card, worksheet 3/3, quiz 3/3).
+- Tab probe at 390 (the builder's uncommitted `wave1-c2-phone.cjs`, run against the working tree):
+  - Card: PASS in all 4 cases. Tab reaches every box (5, 5, 7 and 5 boxes), each fully visible and none clipped at the bottom. Page scroll width is 0. The cue "Swipe ➞ for more boxes" shows at the start and hides at the end.
+  - Online worksheet: **FAIL in all 4 cases** ("focus left the boxes", 0/5). I did not settle whether this is a fault in the probe (its focus selector) or a real keyboard trap. The builder must make it pass or show it is a fault in the probe.
+
+## Round-1 defects
+
+1. Order follows the teacher's list: **fixed**. Mixed-list p1 prints 2, 5, 25↓, 1,000↓, 2, and the I Can lists the steps in that order.
+2. Short rows and identical items: **fixed**. Every row has 12 numbers.
+3. Raised starts are announced in the panel: **fixed**. The page side is not fixed (see new defect 1).
+4. S pages filled: **fixed**. back-from-30 S has six full rows.
+5. Phone rows with big numbers: **fixed on the card**, using the swipe and cue of SP-11a. Two reservations: this rests on uncommitted work, and the committed `card-390.png` for 100,000 is stale (clipped, no cue).
+6. Label help wording: accepted.
+7. Worked step text: **fixed** ("Check: the numbers go the way the sign says").
+8. Near-identical rows: **not fixed** (see new defect 2).
+9. Compact phone row editor: **fixed** (one line per row).
+
+## TY-10a
+
+The wording is tight. It names the cell, the skill and the look, and says shrink "just enough", "nothing that fits shrinks", and "no other cell". The floor is 9 pt (3.2 mm), 1 pt above TY-11, with an 8 pt floor for labels, which are a hint. The floor is sound, and the measured worst case of 11.9 pt leaves margin. Accepted.
+
+## Ranked defects (RUBRIC §6 form)
+
+1. **C2, major. Where:** `back-from-30-by-5-short-S` (and L), independent p1. The same applies to any raised start.
+   **What:** the I Can says "count back by 5 from 30", but every row starts at 55. The raise is announced in the panel, but the page title and the pupil still read "from 30", so the page contradicts its own name.
+   **Fix:** build the I Can and the instruction from the start actually printed ("from 55"). Or, for a down row, keep the typed start and extend the row below it only if it stays at or above 0. If neither works, refuse the raise.
+2. **C2, minor-major. Where:** `times-each-L` test p1.
+   **What:** items a and c both open "7 14 21 [ ]", and items b and d both have the same first line, "7 14 [ ] 28 [ ] 42". On a 4-item test, two pairs share a line pattern.
+   **Fix:** make the first-line blank patterns distinct across the items on a page. Fall back to the second line only when the distinct patterns run out.
+3. **C1, major (until shown otherwise). Where:** online worksheet at 390, every case.
+   **What:** the Tab walk in `wave1-c2-phone.cjs` never lands in a count-row box.
+   **Fix:** make Tab reach every box in order with each fully visible, or fix the probe's focus selector. Then commit the probe and the clipping fix, and regenerate `card-390.png`.
+4. **C1, minor. Where:** `panel-open-390.png`.
+   **What:** the start dropdown is cut to "Num". The teacher cannot read what it says.
+   **Fix:** shorten the option labels (for example "From…"), or let the select take the width it needs.
+5. **C1, minor. Where:** `phone-by-1-000-from-14-000.png`.
+   **What:** a popover ("…rs in order to find how") and a focus outline overlap the instruction at the top of the card. It may be an artifact of how the screenshot was taken.
+   **Fix:** confirm it does not happen in live play, and retake the screenshot.
+
+Arcs point right on the counting-back rows, as ruled. The compact sheet is untouched. TY-10a is accepted.

@@ -94,16 +94,15 @@ function listBlanks(deal, rowKey, k) {
     const pageSeed = pageConstant('cbt-gaps', 1 << 30);
     const ck = `${pageSeed}|${rowKey}`;
     const c = _gapCache.get(ck) || { list: [], j: 0 };
-    const prefix = (b) => [2, 3, 4].map((i) => (b.includes(i) ? 1 : 0)).join('');
+    const line1 = (b) => b.filter((i) => i < 6).join();   // the gaps of the first line: no two rows of a page open alike
     const saved = Math.random;
     try {
         while (c.list.length <= k && c.j < 600) {
             Math.random = _mulberry((pageSeed ^ _hash(rowKey) ^ Math.imul(c.j + 1, 2654435761)) >>> 0);
             c.j++;
-            const b = deal();
-            const prev = c.list[c.list.length - 1];
+            const b = deal(true);
             if (c.list.some((x) => x.join() === b.join())) continue;
-            if (prev && prefix(prev) === prefix(b) && c.j < c.list.length * 4 + 40) continue;
+            if (c.list.some((x) => line1(x) === line1(b)) && c.j < 300) continue;
             c.list.push(b);
         }
     } finally { Math.random = saved; }
@@ -166,27 +165,32 @@ export function genCountByTables(q) {
     // Wave 1 lane C2: where the row starts and which way it runs (count-rows.js rowValues). Down never goes below 0.
     const values = rowValues(row, n);
     const down = row.dir === 'down';
-    const sum = rowsSummary(pageRows);
+    const sum = rowsSummary(pageRows, n);
     const dirOpt = sum.dir === 'up' ? 'forward' : sum.dir === 'down' ? 'back' : 'mixed';
     const len = values.length;
     const pct = Number(opt('missing')) || 50;
     const fill = opt('fill') || 'two';
-    const deal = () => {
-        if (fill === 'half') {
-            // 50 % filled: half the numbers print (the first always), the other half are writing places spread along the row.
-            const pool = Array.from({ length: len - 2 }, (_, i) => i + 2);
-            return spreadBlanks(pool, Math.min(pool.length, Math.floor(len / 2)));
-        }
-        const skip = fill === 'one' ? 1 : 2;                              // the numbers that always show
+    const deal = (uniform = false) => {
+        const half = fill === 'half';
+        const skip = half ? 2 : (fill === 'one' ? 1 : 2);                 // the numbers that always show
         const pool = Array.from({ length: len - skip }, (_, i) => i + skip);
-        return spreadBlanks(pool, pctCount(pct, pool.length));
+        const k = half ? Math.min(pool.length, Math.floor(len / 2)) : pctCount(pct, pool.length);
+        if (!uniform || k >= pool.length) return spreadBlanks(pool, k);
+        // a typed list's rows: any k of the pool at random, but never more than three gaps in a row (so no row ends in one long gap)
+        for (let t2 = 0; t2 < 40; t2++) {
+            const pick = shuffle(pool.slice()).slice(0, k).sort((x, y) => x - y);
+            let run = 1, worst = 1;
+            for (let q2 = 1; q2 < pick.length; q2++) { run = pick[q2] === pick[q2 - 1] + 1 ? run + 1 : 1; worst = Math.max(worst, run); }
+            if (worst <= 3) return pick;
+        }
+        return spreadBlanks(pool, k);
     };
     // A page never repeats a row (wave 1 C2): item k of a typed list takes the k-th DISTINCT candidate set of gaps for its row,
     // and neighbouring candidates open with a different printed run (7, 14, 21 ... must not open every row of a one-step page).
     // The candidates are a pure function of (the page's seed, the row, k), so a regenerated item is the same item.
     // Printed pages with a chosen list only (a plain list's FIRST pass through its tables, and the usual tables page, print exactly as before).
     let blanks;
-    if (Number.isFinite(state.itemIndex) && pageRows.length && !onePage && (!plainSteps || plainSteps.length < 6)) {
+    if (Number.isFinite(state.itemIndex) && pageRows.length && (onePage || !plainSteps || plainSteps.length < 6)) {
         blanks = listBlanks(deal, `${t}|${row.start}|${row.at}|${row.dir}|${len}|${fill}|${pct}`, idx);
     } else blanks = deal();
     const parts = blanks.map(i => values[i]);

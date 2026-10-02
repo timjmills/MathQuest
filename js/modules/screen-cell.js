@@ -918,7 +918,20 @@ function wireSwipeRows(cellEl) {
     cellEl.querySelectorAll('[data-mq-swiperow]').forEach((w) => {
         if (w.dataset.mqSwipe === '1') return;
         w.dataset.mqSwipe = '1';
-        w.addEventListener('focusin', (e) => { if (e.target && e.target.scrollIntoView) e.target.scrollIntoView({ inline: 'nearest', block: 'nearest' }); });
+        // the cue (SP-11a, extended to count-by rows 2026-10-02) hides at the end of the row, or when the row fits
+        const upd = () => { w.toggleAttribute('data-mq-end', w.scrollWidth <= w.clientWidth + 1 || w.scrollLeft + w.clientWidth >= w.scrollWidth - 2); };
+        w.addEventListener('scroll', upd, { passive: true });
+        window.addEventListener('resize', upd);
+        // a box that takes focus scrolls fully into view, clear of the pinned cue
+        w.addEventListener('focusin', (e) => {
+            const t = e.target;
+            if (!t || !t.getBoundingClientRect) return;
+            const r = t.getBoundingClientRect(), v = w.getBoundingClientRect();
+            if (r.left < v.left + 4) w.scrollLeft -= (v.left + 4 - r.left);
+            else if (r.right > v.right - 4) w.scrollLeft += (r.right - v.right + 4);
+            upd();
+        });
+        upd(); setTimeout(upd, 300); setTimeout(upd, 1000);
     });
 }
 

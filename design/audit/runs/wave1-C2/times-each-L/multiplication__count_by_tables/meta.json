@@ -49,7 +49,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "28, 35, 56, 63, 77",
+          "ans": "35, 42, 70, 77, 84",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -73,7 +73,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "28, 42, 56, 63, 77",
+          "ans": "21, 28, 49, 70, 77",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -97,7 +97,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "21, 42, 56, 63, 77",
+          "ans": "28, 35, 63, 70, 77",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -121,7 +121,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "28, 35, 56, 70, 84",
+          "ans": "28, 42, 49, 56, 84",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -145,7 +145,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "28, 42, 49, 70, 77",
+          "ans": "21, 56, 70, 77, 84",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -169,7 +169,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "21, 42, 49, 63, 84",
+          "ans": "28, 35, 42, 70, 84",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -193,7 +193,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "21, 35, 56, 63, 84",
+          "ans": "21, 35, 42, 49, 84",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -217,7 +217,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "28, 35, 49, 63, 77",
+          "ans": "21, 28, 42, 49, 84",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -241,31 +241,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "21, 35, 56, 70, 84",
-          "measured": {
-            "1": {
-              "hMm": 54.3,
-              "fits": true
-            },
-            "2": {
-              "hMm": 54.3,
-              "fits": false
-            },
-            "3": {
-              "hMm": 54.3,
-              "fits": false
-            },
-            "4": {
-              "hMm": 54.3,
-              "fits": false
-            }
-          }
-        },
-        {
-          "template": "count-row",
-          "fclass": "standard",
-          "text": "Count by 7. Write the missing numbers.",
-          "ans": "28, 42, 56, 70, 77",
+          "ans": "21, 42, 56, 63, 70",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -313,7 +289,31 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "28, 35, 49, 63, 84",
+          "ans": "42, 49, 56, 70, 77",
+          "measured": {
+            "1": {
+              "hMm": 54.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 54.3,
+              "fits": false
+            },
+            "3": {
+              "hMm": 54.3,
+              "fits": false
+            },
+            "4": {
+              "hMm": 54.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 7. Write the missing numbers.",
+          "ans": "35, 56, 63, 77, 84",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -440,7 +440,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "21, 42, 56, 63, 84",
+          "ans": "35, 49, 56, 77, 84",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -464,7 +464,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "21, 35, 49, 63, 77",
+          "ans": "21, 28, 35, 49, 77",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -488,7 +488,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "28, 42, 49, 70, 84",
+          "ans": "21, 35, 63, 70, 77",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -512,7 +512,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "28, 35, 56, 63, 77",
+          "ans": "21, 42, 56, 77, 84",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -536,7 +536,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "28, 42, 56, 70, 84",
+          "ans": "21, 28, 56, 63, 70",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -668,7 +668,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "28, 35, 56, 63, 84",
+          "ans": "28, 35, 42, 56, 84",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -692,7 +692,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "21, 35, 56, 70, 84",
+          "ans": "21, 35, 49, 77, 84",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -716,7 +716,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "28, 42, 56, 70, 84",
+          "ans": "28, 42, 63, 70, 84",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -740,7 +740,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "21, 35, 56, 70, 77",
+          "ans": "21, 28, 49, 63, 84",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -845,108 +845,8 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "21, 42, 49, 70, 84",
+          "ans": "35, 42, 49, 63, 70",
           "letter": "A",
-          "measured": {
-            "1": {
-              "hMm": 54.3,
-              "fits": true
-            },
-            "2": {
-              "hMm": 54.3,
-              "fits": false
-            },
-            "3": {
-              "hMm": 54.3,
-              "fits": false
-            },
-            "4": {
-              "hMm": 54.3,
-              "fits": false
-            }
-          }
-        },
-        {
-          "template": "count-row",
-          "fclass": "standard",
-          "text": "Count by 7. Write the missing numbers.",
-          "ans": "21, 35, 49, 70, 84",
-          "letter": "A",
-          "measured": {
-            "1": {
-              "hMm": 54.3,
-              "fits": true
-            },
-            "2": {
-              "hMm": 54.3,
-              "fits": false
-            },
-            "3": {
-              "hMm": 54.3,
-              "fits": false
-            },
-            "4": {
-              "hMm": 54.3,
-              "fits": false
-            }
-          }
-        },
-        {
-          "template": "count-row",
-          "fclass": "standard",
-          "text": "Count by 7. Write the missing numbers.",
-          "ans": "28, 35, 56, 70, 77",
-          "letter": "A",
-          "measured": {
-            "1": {
-              "hMm": 54.3,
-              "fits": true
-            },
-            "2": {
-              "hMm": 54.3,
-              "fits": false
-            },
-            "3": {
-              "hMm": 54.3,
-              "fits": false
-            },
-            "4": {
-              "hMm": 54.3,
-              "fits": false
-            }
-          }
-        },
-        {
-          "template": "count-row",
-          "fclass": "standard",
-          "text": "Count by 7. Write the missing numbers.",
-          "ans": "21, 42, 49, 70, 77",
-          "letter": "A",
-          "measured": {
-            "1": {
-              "hMm": 54.3,
-              "fits": true
-            },
-            "2": {
-              "hMm": 54.3,
-              "fits": false
-            },
-            "3": {
-              "hMm": 54.3,
-              "fits": false
-            },
-            "4": {
-              "hMm": 54.3,
-              "fits": false
-            }
-          }
-        },
-        {
-          "template": "count-row",
-          "fclass": "standard",
-          "text": "Count by 7. Write the missing numbers.",
-          "ans": "21, 42, 56, 70, 84",
-          "letter": "B",
           "measured": {
             "1": {
               "hMm": 54.3,
@@ -971,6 +871,81 @@
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
           "ans": "28, 35, 56, 63, 84",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 54.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 54.3,
+              "fits": false
+            },
+            "3": {
+              "hMm": 54.3,
+              "fits": false
+            },
+            "4": {
+              "hMm": 54.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 7. Write the missing numbers.",
+          "ans": "35, 56, 70, 77, 84",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 54.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 54.3,
+              "fits": false
+            },
+            "3": {
+              "hMm": 54.3,
+              "fits": false
+            },
+            "4": {
+              "hMm": 54.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 7. Write the missing numbers.",
+          "ans": "21, 28, 63, 70, 77",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 54.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 54.3,
+              "fits": false
+            },
+            "3": {
+              "hMm": 54.3,
+              "fits": false
+            },
+            "4": {
+              "hMm": 54.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 7. Write the missing numbers.",
+          "ans": "35, 49, 56, 70, 84",
           "letter": "B",
           "measured": {
             "1": {
@@ -995,7 +970,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "28, 42, 49, 70, 84",
+          "ans": "21, 28, 42, 49, 77",
           "letter": "B",
           "measured": {
             "1": {
@@ -1020,7 +995,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "21, 35, 56, 63, 84",
+          "ans": "21, 28, 56, 63, 77",
           "letter": "B",
           "measured": {
             "1": {
@@ -1045,7 +1020,32 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "21, 42, 49, 70, 77",
+          "ans": "42, 56, 63, 70, 84",
+          "letter": "B",
+          "measured": {
+            "1": {
+              "hMm": 54.3,
+              "fits": true
+            },
+            "2": {
+              "hMm": 54.3,
+              "fits": false
+            },
+            "3": {
+              "hMm": 54.3,
+              "fits": false
+            },
+            "4": {
+              "hMm": 54.3,
+              "fits": false
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 7. Write the missing numbers.",
+          "ans": "28, 35, 49, 56, 84",
           "letter": "C",
           "measured": {
             "1": {
@@ -1070,7 +1070,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "28, 42, 56, 70, 84",
+          "ans": "28, 42, 49, 56, 70",
           "letter": "C",
           "measured": {
             "1": {
@@ -1095,7 +1095,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "28, 35, 49, 63, 84",
+          "ans": "21, 28, 63, 77, 84",
           "letter": "C",
           "measured": {
             "1": {
@@ -1120,7 +1120,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count by 7. Write the missing numbers.",
-          "ans": "21, 42, 56, 63, 84",
+          "ans": "21, 35, 42, 56, 70",
           "letter": "C",
           "measured": {
             "1": {
@@ -1273,7 +1273,7 @@
         "fonts": [
           [
             "Andika",
-            22
+            25
           ],
           [
             "Nunito",
@@ -1344,7 +1344,7 @@
         "fonts": [
           [
             "Andika",
-            22
+            25
           ],
           [
             "Nunito",
@@ -1415,7 +1415,7 @@
         "fonts": [
           [
             "Andika",
-            22
+            25
           ],
           [
             "Nunito",
@@ -1467,7 +1467,7 @@
         "fonts": [
           [
             "Andika",
-            126
+            144
           ],
           [
             "Nunito",
@@ -1531,7 +1531,7 @@
         "fonts": [
           [
             "Andika",
-            21
+            24
           ],
           [
             "Nunito",

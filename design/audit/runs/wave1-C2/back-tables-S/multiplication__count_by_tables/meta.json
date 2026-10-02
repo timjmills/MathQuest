@@ -51,7 +51,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 3. Write the missing numbers.",
-          "ans": "30, 24, 15, 12, 6",
+          "ans": "30, 27, 18, 15, 9",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -79,7 +79,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 7. Write the missing numbers.",
-          "ans": "70, 49, 42, 21, 7",
+          "ans": "63, 56, 49, 14, 7",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -107,7 +107,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 12. Write the missing numbers.",
-          "ans": "108, 84, 72, 36, 24",
+          "ans": "96, 84, 48, 36, 24",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -135,7 +135,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 3. Write the missing numbers.",
-          "ans": "27, 21, 18, 9, 6",
+          "ans": "27, 18, 12, 9, 6",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -163,7 +163,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 7. Write the missing numbers.",
-          "ans": "63, 49, 35, 28, 7",
+          "ans": "63, 49, 35, 28, 21",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -191,7 +191,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 12. Write the missing numbers.",
-          "ans": "108, 84, 72, 36, 12",
+          "ans": "108, 72, 60, 36, 24",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -219,7 +219,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 3. Write the missing numbers.",
-          "ans": "27, 24, 18, 9, 3",
+          "ans": "24, 18, 12, 6, 3",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -247,7 +247,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 7. Write the missing numbers.",
-          "ans": "70, 49, 35, 21, 14",
+          "ans": "70, 49, 42, 35, 14",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -275,7 +275,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 12. Write the missing numbers.",
-          "ans": "108, 84, 72, 48, 24",
+          "ans": "120, 108, 48, 36, 12",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -303,7 +303,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 3. Write the missing numbers.",
-          "ans": "30, 24, 15, 9, 3",
+          "ans": "30, 24, 15, 9, 6",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -331,7 +331,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 7. Write the missing numbers.",
-          "ans": "63, 56, 42, 21, 14",
+          "ans": "70, 63, 49, 14, 7",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -359,7 +359,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 12. Write the missing numbers.",
-          "ans": "108, 96, 60, 36, 12",
+          "ans": "120, 72, 48, 36, 12",
           "measured": {
             "1": {
               "hMm": 35.7,
@@ -499,7 +499,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 3. Write the missing numbers.",
-          "ans": "27, 21, 18, 12, 6",
+          "ans": "27, 24, 9, 6, 3",
           "measured": {
             "1": {
               "hMm": 35.4,
@@ -523,7 +523,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 7. Write the missing numbers.",
-          "ans": "70, 49, 42, 28, 7",
+          "ans": "70, 56, 42, 35, 21",
           "measured": {
             "1": {
               "hMm": 35.4,
@@ -547,7 +547,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 12. Write the missing numbers.",
-          "ans": "108, 96, 72, 36, 12",
+          "ans": "120, 96, 72, 24, 12",
           "measured": {
             "1": {
               "hMm": 35.4,
@@ -571,7 +571,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 3. Write the missing numbers.",
-          "ans": "27, 24, 18, 12, 6",
+          "ans": "24, 21, 18, 12, 3",
           "measured": {
             "1": {
               "hMm": 35.4,
@@ -595,7 +595,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 7. Write the missing numbers.",
-          "ans": "70, 56, 35, 21, 14",
+          "ans": "70, 49, 28, 21, 7",
           "measured": {
             "1": {
               "hMm": 35.4,
@@ -619,7 +619,7 @@
           "template": "count-row",
           "fclass": "standard",
           "text": "Count back by 12. Write the missing numbers.",
-          "ans": "108, 84, 60, 36, 12",
+          "ans": "96, 84, 72, 36, 12",
           "measured": {
             "1": {
               "hMm": 35.4,

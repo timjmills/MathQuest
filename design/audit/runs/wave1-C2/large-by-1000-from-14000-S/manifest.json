@@ -52,7 +52,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "16000, 18000, 20000, 23000, 24000",
+            "ans": "16000, 17000, 19000, 22000, 23000",
             "measured": {
               "1": {
                 "hMm": 35.7,
@@ -80,7 +80,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "17000, 19000, 21000, 23000, 24000",
+            "ans": "16000, 18000, 22000, 23000, 24000",
             "measured": {
               "1": {
                 "hMm": 35.7,
@@ -108,7 +108,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "16000, 19000, 20000, 22000, 25000",
+            "ans": "16000, 18000, 19000, 20000, 23000",
             "measured": {
               "1": {
                 "hMm": 35.7,
@@ -136,7 +136,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "17000, 18000, 21000, 23000, 24000",
+            "ans": "16000, 17000, 21000, 22000, 24000",
             "measured": {
               "1": {
                 "hMm": 35.7,
@@ -164,7 +164,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "16000, 18000, 21000, 22000, 24000",
+            "ans": "17000, 19000, 20000, 22000, 23000",
             "measured": {
               "1": {
                 "hMm": 35.7,
@@ -192,7 +192,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "17000, 18000, 21000, 23000, 25000",
+            "ans": "18000, 20000, 21000, 22000, 25000",
             "measured": {
               "1": {
                 "hMm": 35.7,
@@ -220,7 +220,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "17000, 19000, 20000, 23000, 25000",
+            "ans": "20000, 21000, 23000, 24000, 25000",
             "measured": {
               "1": {
                 "hMm": 35.7,
@@ -248,7 +248,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "16000, 18000, 20000, 22000, 24000",
+            "ans": "16000, 17000, 18000, 21000, 22000",
             "measured": {
               "1": {
                 "hMm": 35.7,
@@ -276,7 +276,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "17000, 18000, 21000, 22000, 24000",
+            "ans": "17000, 18000, 19000, 24000, 25000",
             "measured": {
               "1": {
                 "hMm": 35.7,
@@ -304,7 +304,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "17000, 19000, 20000, 22000, 24000",
+            "ans": "17000, 18000, 21000, 22000, 23000",
             "measured": {
               "1": {
                 "hMm": 35.7,
@@ -332,7 +332,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "16000, 18000, 21000, 23000, 25000",
+            "ans": "16000, 19000, 20000, 21000, 23000",
             "measured": {
               "1": {
                 "hMm": 35.7,
@@ -360,7 +360,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "16000, 19000, 21000, 23000, 25000",
+            "ans": "18000, 19000, 21000, 22000, 23000",
             "measured": {
               "1": {
                 "hMm": 35.7,
@@ -500,7 +500,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "16000, 18000, 21000, 22000, 24000",
+            "ans": "17000, 18000, 19000, 23000, 25000",
             "measured": {
               "1": {
                 "hMm": 35.4,
@@ -524,7 +524,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "17000, 18000, 21000, 23000, 25000",
+            "ans": "17000, 19000, 22000, 24000, 25000",
             "measured": {
               "1": {
                 "hMm": 35.4,
@@ -548,7 +548,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "16000, 19000, 20000, 23000, 25000",
+            "ans": "17000, 18000, 23000, 24000, 25000",
             "measured": {
               "1": {
                 "hMm": 35.4,
@@ -572,7 +572,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "17000, 19000, 20000, 22000, 24000",
+            "ans": "18000, 19000, 21000, 23000, 25000",
             "measured": {
               "1": {
                 "hMm": 35.4,
@@ -596,7 +596,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "16000, 18000, 21000, 23000, 25000",
+            "ans": "16000, 17000, 21000, 24000, 25000",
             "measured": {
               "1": {
                 "hMm": 35.4,
@@ -620,7 +620,7 @@
             "template": "count-row",
             "fclass": "standard",
             "text": "Count by 1,000. Write the missing numbers.",
-            "ans": "17000, 18000, 21000, 22000, 25000",
+            "ans": "16000, 18000, 22000, 24000, 25000",
             "measured": {
               "1": {
                 "hMm": 35.4,
