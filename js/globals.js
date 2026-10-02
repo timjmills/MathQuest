@@ -49,7 +49,7 @@ import { getSetOptions, setSetOptions, clearSetOptions, describeSetOptions, snap
 import { encodeOptionPayload, decodeOptionPayload, optionSuffix } from './modules/skill-option-codec.js';
 import { optionsFor, offeredOptionsFor, describeOptions, packOptions, normalizeOptions } from './modules/skill-options.js';
 import { renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber, updateOrderingUI, setupOrderingDragHandlers, reorderSelectedNumber, checkOrderInputsFilled, checkOrderingAnswer, unifiedOrderTileClick, unifiedOrderInputChange, unifiedOrderBoxClear, setupUnifiedOrderingHandlers, renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer, liveValidateExpanded, checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily, selectNumberLineTick, checkNumberLinePlacement, selectOddEvenNumber, checkOddEvenSelection, wireBoxValidation } from './modules/question-render.js';
-import { updateSkipButton } from './modules/skip-rule.js';
+import { updateSkipButton, isSkipAvailable, skipAfterFor, calcAllowedFor } from './modules/skip-rule.js';
 import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkFractionInputAnswer, checkShadePartsAnswer, checkWordProblemAnswer, trackSkillAnswer, skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice, ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode, submitFactorPairs, submitInlineBlanks, submitTchartCells, submitMultChartCells, applyReviewOutcome, isReviewing, _celebrateCorrectAnswer, widgetLadderWrong } from './modules/answer-check.js';
 import { showSolutionPopup, closeSolutionPopup, generateSolutionSteps } from './modules/solution-display.js';
 import { handleTchartDrop, removeFromTchart, hideFactorInBank, returnFactorToBank, validateTchartRow, checkTchartComplete, handleTchartCompletion, showTchartFeedback, resetTchart } from './modules/tchart-factor.js';
@@ -301,7 +301,7 @@ Object.assign(window, {
     // Answer Checking
     checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkFractionInputAnswer, checkShadePartsAnswer, checkWordProblemAnswer, trackSkillAnswer, widgetLadderWrong,
     skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice,
-    updateSkipButton,
+    updateSkipButton, isSkipAvailable, skipAfterFor, calcAllowedFor,
     ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode,
     submitFactorPairs, submitInlineBlanks, submitTchartCells, submitMultChartCells,
     applyReviewOutcome, isReviewing, _celebrateCorrectAnswer,

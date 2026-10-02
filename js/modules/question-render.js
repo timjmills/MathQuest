@@ -1,4 +1,5 @@
 import { state } from './state.js';
+import { calcAllowedFor } from './skip-rule.js';
 import { getSkillGrade, gradeCircleHTML } from './data.js';
 import { trackSkillAnswer, resetAttemptTracking } from './answer-check.js';
 import {
@@ -1999,7 +2000,7 @@ function _renderQuestionImpl() {
     // branches so every answerType honours the flag.
     const _calcBtn = document.getElementById('calcBtn');
     // Wave 1 item 1.4: only the teacher's per-skill `calculator` option shows it (off by default).
-    const _calcVisible = (q.skillOptions || state.skillOptions || {}).calculator === true;
+    const _calcVisible = calcAllowedFor(q);
     if (_calcBtn) _calcBtn.style.display = _calcVisible ? 'inline-block' : 'none';
     // If the current question doesn't permit a calculator, dismiss any open
     // panel left over from the previous question. We intentionally DO NOT

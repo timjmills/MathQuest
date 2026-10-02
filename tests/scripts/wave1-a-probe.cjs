@@ -27,9 +27,12 @@ const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!o
       };
     });
     check(home.btns.length === 4 && home.btns.every((b) => b.v), `[${w}] four student start buttons visible ${JSON.stringify(home.btns.map((b) => b.t))}`);
+    const topBtn = await page.evaluate(() => Math.round(document.querySelector('.student-start-btn').getBoundingClientRect().top));
+    const botBtn = await page.evaluate(() => { const bs = Array.from(document.querySelectorAll('.student-start-btn')); return Math.round(Math.max(...bs.map((b) => b.getBoundingClientRect().bottom))); });
+    check(botBtn <= 900, `[${w}] all four Start buttons within the first screen (top ${topBtn}, bottom ${botBtn})`);
     check(!home.startGame && home.cards === 0, `[${w}] old Start Game and mode cards hidden for students`);
     check(home.map === 3, `[${w}] MAP buttons still shown (${home.map})`);
-    await page.screenshot({ path: path.join(OUT, `student-home-${w}.png`), fullPage: true });
+    await page.screenshot({ path: path.join(OUT, `student-home-${w}.png`) });
 
     // practice: pick a skill, start practice via the button
     await page.evaluate(() => {
@@ -89,6 +92,10 @@ const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!o
     }
     check(JSON.stringify(seen) === '[false,false,false,false,true]', `[${w}] skip hidden until 5th wrong try ${JSON.stringify(seen)}`);
     check(await page.evaluate(() => !document.getElementById('skipBtn')), `[${w}] no second Next button`);
+    await page.evaluate(() => document.getElementById('skipQuestionBtn').scrollIntoView({ block: 'center' }));
+    await sleep(200);
+    const skipRect = await page.evaluate(() => { const r = document.getElementById('skipQuestionBtn').getBoundingClientRect(); return { top: r.top, bottom: r.bottom, vh: innerHeight, w: r.width }; });
+    check(skipRect.w > 0 && skipRect.top >= 0 && skipRect.bottom <= skipRect.vh, `[${w}] Skip button is in view ${JSON.stringify(skipRect)}`);
     await page.screenshot({ path: path.join(OUT, `skip-after-5-${w}.png`) });
     // skip off for the skill (per-skill option skipAfter = 0)
     await page.evaluate(() => { window.state.currentQ.skillOptions = { skipAfter: 0 }; window.state.currentQAttempts = 9; window.updateSkipButton(); });
@@ -110,6 +117,18 @@ const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!o
       const c = document.querySelector('.problem-card.mq-active-problem');
       return { id: c && c.id, anim: c && getComputedStyle(c).animationName, n: document.querySelectorAll('.mq-active-problem').length };
     });
+    const wsSkip0 = await page.evaluate(() => Array.from(document.querySelectorAll('.ws-skip-btn')).filter((b) => getComputedStyle(b).display !== 'none').length);
+    check(wsSkip0 === 0, `[${w}] worksheet: no per-card Skip visible before any wrong check (${wsSkip0})`);
+    for (let k = 1; k <= 5; k++) {
+      await page.evaluate(() => { const q = window.state.worksheetQs[0]; const i = document.getElementById('ws_input_0') || document.querySelector('#ws_card_0 input'); i.value = String((Number(q.ans) || 0) + 7777); window.checkWorksheetAnswer(0); });
+      await sleep(150);
+      const vis = await page.evaluate(() => { const b = document.querySelector('#ws_card_0 .ws-skip-btn'); return !!b && getComputedStyle(b).display !== 'none'; });
+      const other = await page.evaluate(() => { const b = document.querySelector('#ws_card_1 .ws-skip-btn'); return !!b && getComputedStyle(b).display !== 'none'; });
+      if (k === 4) check(!vis, `[${w}] worksheet: card 0 Skip hidden after 4 wrong checks`);
+      if (k === 5) check(vis && !other, `[${w}] worksheet: card 0 Skip shown after 5 wrong checks, card 1 still hidden (${vis}/${other})`);
+    }
+    await page.evaluate(() => document.querySelector('#ws_card_0').scrollIntoView({ block: 'center' }));
+    await page.screenshot({ path: path.join(OUT, `worksheet-skip-after-5-${w}.png`) });
     check(ws.id === 'ws_card_0' && /mq-active-card-pulse/.test(ws.anim) && ws.n === 1, `[${w}] worksheet current problem pulses ${JSON.stringify(ws)}`);
     await page.screenshot({ path: path.join(OUT, `worksheet-current-${w}.png`) });
     await page.evaluate(() => window.advanceToNextProblem(0));

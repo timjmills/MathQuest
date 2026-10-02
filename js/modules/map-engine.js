@@ -368,7 +368,7 @@ export function nextMapItem() {
     // Reset wrong-attempt tracking + hide any leftover Skip button / chips
     state.currentQAttempts = 0;
     state.currentQAttemptHistory = [];
-    const _skip = document.getElementById('skipBtn');
+    const _skip = document.getElementById('skipQuestionBtn');
     if (_skip) _skip.style.display = 'none';
     const _hist = document.getElementById('attemptHistoryBox');
     if (_hist) { _hist.innerHTML = ''; _hist.style.display = 'none'; }

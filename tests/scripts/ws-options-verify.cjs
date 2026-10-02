@@ -371,7 +371,13 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         const clashing = supDef.render.filter(v => !['boxsign', 'startarrow', 'steps', 'round-mark'].includes(v));
         return { support: [...keep, ...clashing.slice(0, 2)] };
     };
+    // BEHAVIOUR OPTIONS (Wave 1 lane A, 2026-10-02): `calculator` and `skipAfter` change what the
+    // pupil's screen offers (a calculator button, a Skip button), never the items. They are checked
+    // by their OWN behaviour test below (not "differs from the default"): generation and the printed
+    // page must be UNCHANGED, the value must round-trip a share code, and the screen gate must obey it.
+    const BEHAVIOUR = { calculator: [true], skipAfter: [0, 2, 20] };
     for (const def of defs) {
+        if (BEHAVIOUR[def.id]) { for (const v of BEHAVIOUR[def.id]) tries.push({ def, value: v, behaviour: true }); continue; }
         if (supDef && (def.id === 'cover' || def.id === 'mix')) {
             const base = supportBase(def.id);
             for (const x of def.values) if (JSON.stringify(x.v) !== JSON.stringify(def.default)) tries.push({ def, value: x.v, vl: x.l, base, renderOnly: true });
@@ -519,6 +525,44 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             r.checks.trip = JSON.stringify(back) === JSON.stringify(packed) ? 'ok' : 'fail';
             if (r.checks.trip === 'fail') fail('trip', `packed ${JSON.stringify(packed)} -> "${suffix}" -> ${JSON.stringify(back)}`);
         } catch (e) { r.checks.trip = 'fail'; fail('trip', String(e && e.message || e)); }
+
+        if (t.behaviour) {
+            // generation and print unchanged
+            const bi = gen(opts, APP_RANGE), bd = dfltAt(APP_RANGE);
+            if (!bi.length) fail('gen', 'no items');
+            else if (differs(bi, bd) === true) fail('gen', 'a behaviour option changed the generated items (it must not)');
+            r.checks.gen = r.fails.some(f => f.startsWith('gen:')) ? 'fail' : 'ok';
+            const bp = await sheet(opts, APP_RANGE), bpd = await sheet({}, APP_RANGE);
+            if (bp.error) fail('print', `buildSheet threw: ${bp.error}`);
+            else if (!bpd.error && bp.pupil !== bpd.pupil) fail('print', 'a behaviour option changed the printed page (it must not)');
+            r.checks.print = r.fails.some(f => f.startsWith('print:')) ? 'fail' : 'ok';
+            // screen behaviour: the value is put in the set's store, as a queue / link / Quick Start does
+            const sv = { category: st.category, skill: st.skill, range: st.range, skillOptions: st.skillOptions, gameMode: st.gameMode, currentQ: st.currentQ, att: st.currentQAttempts };
+            try {
+                W.clearSetOptions({ silent: true });
+                W.setSetOptions(categoryId, skillId, opts, { silent: true });
+                st.category = categoryId; st.skill = skillId; st.range = APP_RANGE; st.skillOptions = null; st.gameMode = 'practice';
+                const q = W.generateQuestion();
+                if (!q || !q.skillOptions || q.skillOptions[def.id] !== value) fail('screen/practice', `the question does not carry ${def.id}=${JSON.stringify(value)} from the store`);
+                else if (def.id === 'calculator') {
+                    if (W.calcAllowedFor(q) !== true) fail('screen/practice', 'calculator on, but the screen gate says no');
+                    const off = Object.assign({}, q, { skillOptions: { ...q.skillOptions, calculator: false } });
+                    if (W.calcAllowedFor(off) !== false) fail('screen/practice', 'calculator off, but the screen gate says yes');
+                } else {
+                    st.currentQ = q;
+                    const at = (k) => { st.currentQAttempts = k; return W.isSkipAvailable(); };
+                    if (value === 0) { if (at(0) || at(5) || at(99)) fail('screen/practice', 'skipAfter 0 must never show Skip'); }
+                    else if (at(value - 1) || !at(value) || !at(value + 3)) fail('screen/practice', `Skip must appear at exactly ${value} wrong tries`);
+                }
+            } catch (e) { fail('screen/practice', String(e && e.message || e)); }
+            finally {
+                W.clearSetOptions({ silent: true });
+                Object.assign(st, { category: sv.category, skill: sv.skill, range: sv.range, skillOptions: sv.skillOptions, gameMode: sv.gameMode, currentQ: sv.currentQ, currentQAttempts: sv.att });
+            }
+            r.checks.screen = r.fails.some(f => f.startsWith('screen')) ? 'fail' : 'ok';
+            results.push(r);
+            continue;
+        }
 
         // (a) generation at the app's Max Number, then at the big one when inert / refused
         // A Max Number / Decimal places value EQUAL to the app setting is, by definition, the same

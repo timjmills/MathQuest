@@ -1317,11 +1317,15 @@ html body .mq-scell .mq-nl-start.mq-nl-given .mq-nl-mark::after { background: #f
     0%, 100% { background-color: #fff3a0; box-shadow: 0 0 0 3px #f2c200; }
     50%      { background-color: #ffe14d; box-shadow: 0 0 0 6px #f2c20066; }
 }
-html body .mq-scell input.mq-cellslot:focus,
-html body .mq-scell [data-mq-cell]:focus-within,
-html body #questionPaper input[type=text]:focus,
-html body #questionPaper input[inputmode]:focus,
-html body .mq-scell input.mq-active-box,
+html body #gameView #questionCard #questionPaper input.mq-slot:focus,
+html body #gameView #questionCard #questionPaper input.mq-cellslot:focus,
+html body #gameView #questionCard #questionPaper [data-mq-cell]:focus-within,
+html body .online-edition .problem-card.mq-wscard.mq-active-problem input.mq-slot:focus,
+html body .online-edition .problem-card.mq-wscard.mq-active-problem input.mq-cellslot:focus,
+html body .online-edition .problem-card.mq-wscard.mq-active-problem [data-mq-cell]:focus-within,
+html body .qt-question-card .ws-cell.mq-scell input.mq-slot:focus,
+html body .qt-question-card .ws-cell.mq-scell input.mq-cellslot:focus,
+html body .qt-question-card .ws-cell.mq-scell [data-mq-cell]:focus-within,
 html body .mq-active-box {
     background-color: #fff3a0 !important;
     box-shadow: 0 0 0 3px #f2c200 !important;
@@ -1342,11 +1346,15 @@ html body .online-edition .problem-card.mq-wscard.mq-active-problem [data-mq-cel
     background-color: #fff3a0 !important;
 }
 @media (prefers-reduced-motion: reduce) {
-    html body .mq-scell input.mq-cellslot:focus,
-    html body .mq-scell [data-mq-cell]:focus-within,
-    html body #questionPaper input[type=text]:focus,
-    html body #questionPaper input[inputmode]:focus,
-    html body .mq-scell input.mq-active-box,
+    html body #gameView #questionCard #questionPaper input.mq-slot:focus,
+    html body #gameView #questionCard #questionPaper input.mq-cellslot:focus,
+    html body #gameView #questionCard #questionPaper [data-mq-cell]:focus-within,
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem input.mq-slot:focus,
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem input.mq-cellslot:focus,
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem [data-mq-cell]:focus-within,
+    html body .qt-question-card .ws-cell.mq-scell input.mq-slot:focus,
+    html body .qt-question-card .ws-cell.mq-scell input.mq-cellslot:focus,
+    html body .qt-question-card .ws-cell.mq-scell [data-mq-cell]:focus-within,
     html body .mq-active-box,
     html body .online-edition .problem-card.mq-wscard.mq-active-problem { animation: none !important; }
 }
@@ -1365,4 +1373,4 @@ html body .hint-speak-btn { min-width: 44px; min-height: 44px; }
     box-shadow: 0 6px 0 0 var(--mq-orange-d); flex: 1 1 220px; max-width: 320px;
 }
 .student-start-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 0 var(--mq-orange-d); }
-@media (max-width: 480px) { .student-start-btn { flex-basis: 100%; max-width: none; } }
+@media (max-width: 480px) { .student-start-btn { flex: 1 1 44%; max-width: none; min-height: 56px; padding: 10px 12px; font-size: 1.05rem; } }

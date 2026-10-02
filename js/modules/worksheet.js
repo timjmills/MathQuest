@@ -1448,7 +1448,7 @@ function _wsRenderCard(grid, q, i) {
     // Per-card Skip: grays out the card, marks q._skipped = true,
     // excluded from total in checkAllWorksheet. Universal across all
     // worksheet skills, all answer types.
-    const skipBtnHtml = skipAfterFor(q) === 0 ? '' : `<button class="ws-skip-btn" type="button" onclick="wsSkipCard(${i})" title="Skip this problem (no penalty)">${_tl ? 'Skip' : '⏭ Skip'}</button>`;
+    const skipBtnHtml = skipAfterFor(q) === 0 ? '' : `<button class="ws-skip-btn" type="button" style="display:none" onclick="wsSkipCard(${i})" title="Skip this problem (no penalty)">${_tl ? 'Skip' : '⏭ Skip'}</button>`;
 
     // One card template for every item (owner ruling 2026-09-24): a slim chrome bar (number,
     // Read, Hint, Skip — colour, 44 px targets) and the black-and-white paper cell. The skill
@@ -2234,8 +2234,22 @@ const worksheetBannerRecorded = new Set();
 // Track debounce timers for single-input wrong-answer delay (2 seconds)
 const worksheetWrongTimers = new Map();
 
+// Wave 1 item 1.3: this card's Skip button appears only after skipAfter wrong checks ON THAT CARD
+// (the skill's option, default 5; 0 = never).
+function wsNoteWrong(idx) {
+    const q = state.worksheetQs && state.worksheetQs[idx];
+    if (!q) return;
+    q._wrongChecks = (q._wrongChecks || 0) + 1;
+    const n = skipAfterFor(q);
+    if (n > 0 && q._wrongChecks >= n) {
+        const btn = document.querySelector(`#ws_card_${idx} .ws-skip-btn`);
+        if (btn) btn.style.display = '';
+    }
+}
+
 // Record a worksheet answer in the game stats banner (once per problem)
 function wsRecordAnswer(idx, isCorrect) {
+    if (!isCorrect) wsNoteWrong(idx);
     if (worksheetBannerRecorded.has(idx)) return;
     worksheetBannerRecorded.add(idx);
     if (typeof window !== 'undefined' && window.bannerRecordAnswer) {

@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { SKILLS, DOMAINS } from './data.js';
-import { isSkipAvailable } from './skip-rule.js';
+import { isSkipAvailable, calcAllowedFor } from './skip-rule.js';
 import { isTeacherLaunch, syncPlayChrome, syncBoard } from './launch-chrome.js';
 
 let _fullscreenHandler = null;
@@ -144,7 +144,6 @@ export function recordQuestionStatus(status, opts) {
     // Reset the "last action was a skip" flag once a real answer (correct or
     // incorrect) is recorded so the alternating-skip rule advances properly.
     if (status === 'correct' || status === 'incorrect') {
-        state.lastActionWasSkip = false;
     }
     // Skipped count: increment ONLY on first-time skip (not re-skip via review).
     if (status === 'skipped' && !wasSkipped) {
@@ -510,7 +509,6 @@ export function startGame() {
     state.score = 0;
     state.skippedCount = 0;
     state.totalSkipsEver = 0;
-    state.lastActionWasSkip = false;
     state.questionHistory = [];
     // Reset per-session XP + badges so the end-game modal shows just this run.
     state.sessionXp = 0;
@@ -801,8 +799,7 @@ export function nextQuestion() {
     // q.calculatorAllowed flags and the data.js CALCULATOR_SKILLS list no longer switch it on;
     // the teacher's `calculator` skill option (skill-options.js) is the only gate.
     if (state.currentQ) {
-        const _so = state.currentQ.skillOptions || state.skillOptions || {};
-        state.currentQ.calculatorAllowed = _so.calculator === true;
+        state.currentQ.calculatorAllowed = calcAllowedFor(state.currentQ);
     }
 
     renderQuestion();

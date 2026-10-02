@@ -13,6 +13,12 @@ export function skipAfterFor(q) {
     return Number.isFinite(n) && n >= 0 ? Math.round(n) : SKIP_DEFAULT_TRIES;
 }
 
+/** The skill's `calculator` option for this question: on only when the teacher turned it on. */
+export function calcAllowedFor(q) {
+    const o = (q && q.skillOptions) || state.skillOptions || null;
+    return !!o && o.calculator === true;
+}
+
 /** Skip may be used now: the skill allows it and the pupil has made enough wrong tries. */
 export function isSkipAvailable() {
     const n = skipAfterFor(state.currentQ);
